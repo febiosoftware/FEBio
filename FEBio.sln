@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBio", "FEBio\FEBio.vcproj", "{17C93AA1-E742-49A5-89CD-7591F915F151}"
+	ProjectSection(ProjectDependencies) = postProject
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431} = {21488E61-A11D-4DFA-9D2F-D9FD85578431}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FECore", "FECore\FECore.vcproj", "{21488E61-A11D-4DFA-9D2F-D9FD85578431}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FEBioInstaller", "FEBioInstaller\FEBioInstaller.vdproj", "{964358CC-0F33-42CE-BFCA-F9213F982292}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug|Win32.ActiveCfg = Debug|Win32
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug|Win32.Build.0 = Debug|Win32
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release|Win32.ActiveCfg = Release|Win32
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release|Win32.Build.0 = Release|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug|Win32.ActiveCfg = Debug|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug|Win32.Build.0 = Debug|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release|Win32.ActiveCfg = Release|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release|Win32.Build.0 = Release|Win32
+		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug|Win32.ActiveCfg = Debug
+		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release|Win32.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

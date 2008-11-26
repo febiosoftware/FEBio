@@ -1,0 +1,545 @@
+===========================================================================
+         ________    _________   _________     __     _________
+        |        |\ |        |\ |        |\   |  |\  /         \\
+        |    ____|| |    ____|| |    __  ||   |__|| |    ___    ||
+        |   |\___\| |   |\___\| |   |\_| ||    \_\| |   //  \   ||
+        |   ||      |   ||      |   || | ||    __   |  ||    |  ||
+        |   ||__    |   ||__    |   ||_| ||   |  |\ |  ||    |  ||
+        |       |\  |       |\  |         \\  |  || |  ||    |  ||
+        |    ___||  |    ___||  |    ___   || |  || |  ||    |  ||
+        |   |\__\|  |   |\__\|  |   |\__|  || |  || |  ||    |  ||
+        |   ||      |   ||      |   ||  |  || |  || |  ||    |  ||
+        |   ||      |   ||___   |   ||__|  || |  || |   \\__/   ||
+        |   ||      |        |\ |          || |  || |           ||
+        |___||      |________|| |__________|| |__||  \_________//
+
+      F I N I T E   E L E M E N T S   F O R   B I O M E C H A N I C S
+
+                   --- v e r s i o n - 1 . 1 . 6 ---
+
+
+  Musculoskeletal Research Laboratory
+  University of Utah
+  http://mrl.sci.utah.edu
+
+  copyright (c) 2006-2008 - All rights reserved
+
+===========================================================================
+
+R E L E A S E   N O T E S
+
+===========================================================================
+
+This document describes the features that have been added to the latest
+FEBio release as well as the more important bug fixes. Please consult
+the FEBio User’s Manual for a more detailed description of the new features.
+
+===========================================================================
+
+ R E L E A S E   1.1.7
+
+===========================================================================
+
+1.BUG FIX: augmented lagrangian
+-------------------------------
+A bug was fixed in the augmented lagrangian algorithm when using
+multiple sliding surfaces.
+
+===========================================================================
+
+ R E L E A S E   1.1.6
+
+===========================================================================
+
+1.FEATURE: Multi-step Analysis
+------------------------------
+The user can now split the analysis in separate steps where in each step
+he can define different control parameters and boundary conditions. This
+is useful for instance for defining time dependant boundary conditions or
+for switching between (quasi-) static and dynamic analysis. Multi-step
+problems are defined slightly different. For each step you need to define
+a <Step> section in the input file. The overall structure of the input file
+now looks like this.
+
+<febio_spec>
+	<Control>
+		<!-- global control parameters (e.g. title) --!>
+	</Control>
+	<Material>
+		<!-- material data --!>
+	</Material>
+	<Boundary>
+		<!-- global boundary constraints --!>
+	</Boundary>
+	<Step>
+		<Control>
+			<!-- local control parameters --!>
+		</Control>
+		<Boudary>
+			<!-- local boundary constraints --!>
+		</Boundary>
+	</Step>
+	<Step>
+		...
+	</Step>
+</febio_spec>
+
+In each step section, you can redefine the control parameters, as well as 
+specify boundary conditions that will only be enforced during this step.
+Note that the boundary constraints defined outside the step section are
+considered global and will remain active during all steps.
+
+
+2.FEATURE: Ogden material
+-------------------------
+The Ogden material was added to the FEBio's material library. To use this
+material set the material type to "Ogden". Please see the user manual for
+a description of the material parameters.
+
+<material id="1" type="Ogden">
+	<c1>1</c1>
+	<m1>2</m1>
+	<k>100</k>
+</material>
+
+Note that this material is formulated using an uncoupled formulation. Incom-
+pressibility can be enforced by either increasing the bulk modulus (k) and
+by setting the augmentation flag (<laugon>) to "1".
+
+
+3.BUG FIX: contact
+------------------
+A bug was fixed in the frictionless contact algorithm. Improved convergence
+can be expected for some contact problems. 
+
+===========================================================================
+
+ R E L E A S E   1.1.5
+
+===========================================================================
+
+1. FEATURE: visco-elasticity
+----------------------------
+Visco-elasticity has been added to the material library. To use the visco-elastic
+material you need to add two materials: (1) the visco-elastic material and (2)
+a material describing the elastic equilibrium repsonse.
+
+<material id="1" type="neo-Hookean">
+	<E>1</E>
+	<v>0.33</v>
+</material>
+<material id="2" type="visco-elastic">
+	<t1>0.01</t1>
+	<g1>1</g1>
+	<solid_id>1</solid_id>
+</material>
+
+The solid_id element references the material id of the elastic material. 
+The visco-elastic material is described using a Prony series. Each term
+in this series is parameterized by a relaxation time (ti) and a scalar 
+modulus gi. Up to six terms can be prescribed.
+
+
+2. FEATURE: continuous fiber material
+-------------------------------------
+A new material model was added that has a 2D random fiber distribution. 
+This model replaces the "random" fiber type that could be used to describe
+random fiber materials. Currently, this material uses a Mooney-Rivlin matrix.
+
+3.FEATURE: body forces for shells
+----------------------------------
+Body forces can now also be allowed to shell geometry.
+
+4.FEATURE: linear orthotropic material
+------------------------------------
+A linear orthotropic material was added to FEBio's material library.
+
+5.FEATURE: linear constraints
+-----------------------------
+The user can now apply linear constraints to the problem. A linear constraint
+defines a degree of freedom in function of the other dofs. It is always of 
+the form.
+
+	ui = A1*u1+ ... + A(i-1)*u(i-1) + A(i+1)*u(i+1) + ... + An*un
+
+As many linear constraints can be applied as desired. Only the non-zero
+coefficients need to be specified.
+
+6.FEATURE: SuperLU solver
+-------------------------
+The SuperLU solver has been implemented. To select it, add the following
+line to the Control section of the input file.
+
+<linear_solver type="superlu"></linear_solver>
+
+7.BUG FIX: off-diagonal strains in logfile
+------------------------------------------
+The off-diagonal strians reported in the logfile were off by a constant
+term of 0.5.
+
+
+===========================================================================
+
+ R E L E A S E   1.1.4
+
+===========================================================================
+
+1. FEATURE: new muscle and tendon material models
+-------------------------------------------------
+The muscle and tendon material models due to Silvia Blemker have been
+implemented. These models can be used to simulate the passive and active
+response of muscles and the passive response of tendons. See the user
+manual for more details on these material models.
+
+2. FEATURE: strain output in log file
+-------------------------------------
+The element strain values can now also be outputted to the log file. See
+the user manual for more details.
+
+2. BUGFIX: plot file data for triangular shells
+-----------------------------------------------
+The stress and strain data for triangular shells was not stored correctly
+in the plot database file. This has now been fixed. 
+
+3. BUGFIX: divergence logic
+---------------------------
+A small bug was fixed in the divergence logic.
+
+===========================================================================
+
+ R E L E A S E   1.1.3
+
+===========================================================================
+
+1.FEATURE: iterative linear solver
+----------------------------------
+An iterative linear solver has been added that can be used as an alternative
+to the default skyline solver to solve the system of linear equations Ku = R.
+This iterative solver is attractive for large problems that either require too 
+much memory or take too long to factorize the stiffness matrix. 
+To select the solver, add the following section to the Control section
+of your input file.
+
+<linear_solver type="conjugate gradient">
+	<tolerance>0.01</tolerance>
+	<max_iterations>50</max_iterations>
+	<print_level>0</print_level>
+</linear_solver>
+
+This solver takes three parameters (shown in the example above with their 
+default values). The "tolerance" parameter specifies the convergence tolerance
+on the residual norm of the linear system, where the residual is defined here
+as r = R - Ku. The "max_iterations" parameter sets a maximum on the number of
+iterations. The "print_level" parameter sets the amount of output that the
+linear solver will generate. When set to zero (=default), no output is generated.
+When set to a non-zero value, convergence information is printed only to the
+screen (not to the logfile!).
+
+
+2.FEATURE: shell strains
+------------------------
+FEBio can now output shell strains. To output shell strains set the "shell_strain"
+parameter to 1 in the "plotfile" section of the "Output" section of your input file.
+
+<Output>
+	<plotfile>
+		<shell_strain>1</shell_strain>
+	</plotfile>
+</Output>
+
+The default value for this flag is 0 (=off).
+
+
+3.FEATURE: progress indicator in window title
+---------------------------------------------
+A progress indicator is displayed in the title of the console window
+or terminal for linux/mac). That way the user can monitor the progress of a
+run even when the window is minimized.
+
+
+4.BUG FIX: NIKE3D wedge element
+-------------------------------
+FEBio read the node numbering incorrectly of the wedge element for NIKE3D
+input files.
+
+
+5.BUG FIX: linesearch
+---------------------
+A small bug was fixed in the linesearch algorithm.
+
+
+===========================================================================
+
+ R E L E A S E   1.1.2
+
+===========================================================================
+
+1.FEATURE: Augmented Lagrangian for incompressible materials
+----------------------------------------------------------
+An augmented Lagrangian algorithm was added for the incompressibility
+enforcement. To use this feature, add the following two parameters
+to any material that uses a decoupled formulation (e.g. Mooney-Rivlin)
+
+<laugon>1</laugon>
+<atol>0.05</atol>
+
+The first parameter activates the augmented Lagrangian for incompres-
+sibility and the second parameter specifies the augmented Lagrangian
+convergence tolerance. 
+
+
+2.FEATURE: TC nonlinear orthotropic
+---------------------------------
+A tension-compression nonlinear orthotropic material was added. To use
+this material set the material type to "TC nonlinear orthotropic" and
+define the material parameters. See the user's manual for a description
+of the material parameters.
+
+
+3.FEATURE: contact auto penalty calculation
+-----------------------------------------
+The initial penalty factor can now be calculated automatically. Simply
+specify the "auto" attribute and as value "on" or "off" to use the 
+auto penalty estimation. Default is off.
+
+<penalty auto="on">1</penalty>
+
+In this case the specified value of the penalty element is a scale factor.
+
+
+4.FEATURE: max condition number
+-----------------------------
+When the condition number of the stiffness matrix gets too large, the matrix
+becomes ill-conditioned. When this happens, FEBio will reform the stiffness
+matrix. The maximum value for the condition number (previously hardcoded at 1e5)
+can now be set by the user. To set this value, add the "cmax" parameter to
+the control section of your input file.
+
+<cmax>1e5</cmax>
+
+
+5.BUG FIX: contact with tetrahedral elements
+------------------------------------------
+There were a few bugs found and fixed in the contact algorithm 
+for tetrahedral elements. One bug was rather severe since it could
+crash FEBio.
+
+
+6.BUG FIX: Dilatational stiffness
+-------------------------------
+A bug was found and corrected in the routine that calculates the dilational
+stiffness. This may improve convergence behavior for all materials using a 
+decoupled formulation. 
+
+
+7.BUG FIX: auto timestepper
+-------------------------
+A bug was found and fixed in the auto timestepper routine. Specifically,
+the max time step size was sometimes not respected when it was specified
+through a loadcurve.
+
+
+===========================================================================
+
+ R E L E A S E   1.1.1
+
+===========================================================================
+
+1.FEATURE: data check option
+----------------------------
+A command line option was added that requests FEBio to check the file for 
+potential problems, but without running the file. To use the feature add
+the -c option on the command line. For instance, the following command line
+will perform a data check on the file without running the problem.
+
+>febio -i in.feb -c [enter]
+
+
+2. FEATURE: tied contact interface
+----------------------------------
+A tied contact interface was added. This interface allows you to connect two
+non-conforming meshes. A tied contact is defined similarly as a sliding 
+contact interface, except the contact type is now set to "tied" and there 
+is two pass option. For, instance the following example defines a simple
+tied interface.
+
+<contact type="tied">
+	<tolerance>0.01</tolerance>
+	<penalty>50</penalty>
+	<surface type="master">
+		<quad4>1,2,3,4</quad4>
+	</surface>
+	<surface type="slave">
+		<quad4>5,6,7,8</quad4>
+	</surface>
+</contact>
+
+
+3.BUG FIX: divergence logic
+----------------------------
+A small bug was fixed in the algorithm that determines whether an iteration
+is diverging or not.
+
+
+4.BUG FIX: rigid body reaction forces
+--------------------------------------
+When using prescribed rigid body forces, the rigid body reaction forces where
+not reported accurately.
+
+
+5.BUG FIX: rigid body data logging
+-----------------------------------
+A bug was fixed in the data logging feature of rigid body data when the user
+did not explicitly define the rigid material id(s).
+
+
+6.BUG FIX: bug in bandwidth optimizer
+-------------------------------------
+A bug was found and fixed in the bandwidth optimization algorithm.
+
+
+7.BUG FIX: St.Venant-Kirchhoff
+------------------------------
+The St.Venant-Kirchhoff material was not recognized by FEBio when spelled
+like this. Instead it expected a hyphen instead of the first dot. This is 
+fixed and now the correct type for this material is spelled as follow:
+"St.Venant-Kirchhoff"
+
+
+===========================================================================
+
+ R E L E A S E   1.1.0
+
+===========================================================================
+
+1. FEATURE: Bandwidth reduction algorithm
+-----------------------------------------
+A bandwidth reduction algorithm has been implemented for the default Skyline
+solver. This algorithm attempts to minimize the bandwidth of the global
+stiffness matrix. The result can be a dramatic reduction in memory
+requirements and computing time. To use the algorithm, simply add the
+following option to the Control section of your input file.
+
+<optimize_bw>1</optimize_bw>
+
+
+2. FEATURE: Data Logging
+-----------------------
+The user can request specific data to be stored in the log file. Data can be
+requested for nodes, elements and rigid bodies. To request additional data you
+need to define the new Output section in your input file. In the Output
+section, define a logfile section and in this section define the data that you
+wish to add to the log file. 
+
+<Output>
+	<logfile>
+		<node_data data="x;y;z"></node_data>
+	</logfile>
+</Output>
+
+
+3. FEATURE: Rigid wall interface
+--------------------------------
+The rigid wall interface is a simplification of the sliding contact interface
+where the master surface is a movable wall which can be defined implicitly
+using a plane equation. No geometry needs to be defined for the wall. The
+position of the wall can be controlled with a load curve.
+
+<contact type="rigid_wall">
+	<plane lc="1">0,0,1,0</plane>
+	<tolerance>0.1</tolerance>
+	<penalty>1</penalty>
+</contact>
+
+
+4. FEATURE: User fiber distribution
+-----------------------------------
+An option has been added for transversely isotropic materials to input a user
+defined fiber distribution. The local fiber direction can now be defined on an
+element per element basis. To use this option set the fiber type to "user" in
+the material section. In addition, define the new ElementData section in the
+Geometry section of your input file. In this section specify for each element
+the local fiber direction.
+
+<ElementData>
+	<element id="1">
+		<fiber>1,0,0</fiber>
+	</element> 
+</ElementData>
+
+
+5. FEATURE: Shell formulation
+-----------------------------
+FEBio now supports shell elements. The current formulation allows either four
+node quadrilateral or three node triangular shells with possible thickness
+variations over the shell’s surface. Shells are defined in the Geometry
+section of your input file. Use quad4 for a quadrilateral element and tri3
+for a triangular element.
+
+<Elements>
+	<quad4 id="1" mat="1">1,2,3,4</quad4>
+	<tri3 id="2" mat="1">5,6,7</tri3>
+</Elements>
+
+The shell thickness is defined in the ElementData section and needs to be
+speficied for each node.
+
+<ElementData>
+	<element id="1">
+		<thickness>0.02,0.02,0.02,0.02</thickness>
+	</element>
+</ElementData>
+
+
+6. FEATURE: Restart File
+------------------------
+The user can define a restart input file that can be used to alter some
+control parameters when restarting a previously terminated run. To request the
+creation of a restart file, add the following option to the Control section.
+
+<restart>1</restart>
+
+This option requests the creation of a dump file that can be used to restart
+the analysis. When restarting the analysis you can specify a restart input file
+that may override some of the original control options.
+
+
+7. FEATURE: Rigid Body Forces
+-----------------------------
+Prescribed forces can now be applied directly onto the rigid body’s center of
+mass. To specify a force simply set the type attribute of the corresponding
+rigid body’s degree of freedom to force and set the value to the force’s
+magnitude. Applying a force to a rotational degree of freedom defines a torque
+around the center of mass.
+
+<material id="1" type="rigid body">
+	<trans_x type="force" lc="1">5.0</trans_x>
+	...
+</material>
+
+8. FEATURE: Plot Level
+----------------------
+The user has now more control over when exactly a state is added to the
+plotfile. Choices include: never, all major iterations, all minor iterations,
+only for must points, .... Enter the following option in the Control section of
+your input file to set the plot level.
+
+<plot_level>PLOT_MAJOR_ITRS</plot_level>
+
+
+9. BUG FIX: Improved Contact
+----------------------------
+Several bugs were found and fixed in the contact implementation. Improved
+convergence can be expected for contact analyses.
+
+
+10. BUG FIX: Linesearch
+-----------------------
+A bug was found and fixed in the linesearch algorithm. Problems that depend
+heavily on a linesearch will show improved convergence.
+
+
+11. BUG FIX: Memory allocation failure
+--------------------------------------
+FEBio now prints an error message when memory allocation for the global
+stiffness matrix fails.

@@ -1,0 +1,416 @@
+// DataStore.cpp: implementation of the DataStore class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "DataStore.h"
+#include "fem.h"
+
+//////////////////////////////////////////////////////////////////////
+// DataStore
+//////////////////////////////////////////////////////////////////////
+
+DataStore::DataStore()
+{
+}
+
+DataStore::~DataStore()
+{
+}
+
+//-----------------------------------------------------------------------------
+
+void DataStore::Write()
+{
+	int nrec = m_data.size();
+	for (int i=0; i<nrec; ++i)
+	{
+		DataRecord& DR = m_data[i];
+		DR.Write();
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void DataStore::AddRecord(DataRecord* prec)
+{
+	static int nid = 1;
+	prec->m_nid = nid++;
+	m_data.add(prec);
+}
+
+//////////////////////////////////////////////////////////////////////
+// DataRecord
+//////////////////////////////////////////////////////////////////////
+
+DataRecord::DataRecord(FEM* pfem, const char* szfile)
+{
+	m_pfem = pfem;
+	m_fp = 0;
+	m_szfile[0] = 0;
+
+	if (szfile)
+	{
+		strcpy(m_szfile, szfile);
+		m_fp = fopen(szfile, "wt");
+		fprintf(m_fp, "*Title:%s\n", pfem->GetTitle());
+	}
+
+	m_nid = 0;
+	m_szdata[0] = 0;
+	m_szname[0] = 0;
+	m_szfile[0] = 0;
+	strcpy(m_szdelim," ");
+}
+
+DataRecord::~DataRecord()
+{
+	if (m_fp)
+	{
+		fclose(m_fp);
+		m_fp = 0;
+	}
+}
+
+bool DataRecord::Write()
+{
+	FEM& fem = *m_pfem;
+
+	int nstep = fem.m_pStep->m_ntimesteps;
+	double ftime = fem.m_ftime;
+	char* sz, *ch;
+	if (strlen(m_szname) == 0) sz = m_szdata; else sz = m_szname;
+	double val;
+
+	FILE* fplog = fem.m_log;
+
+	// make a note in the log file
+	fprintf(fplog, "\nData Record #%d\n", m_nid);
+	fprintf(fplog, "===========================================================================\n");
+	fprintf(fplog, "Step = %d\n", nstep);
+	fprintf(fplog, "Time = %.9lg\n", ftime);
+	fprintf(fplog, "Data = %s\n", sz);
+
+	// see if we are saving the data to the logfile or to a 
+	// seperate data file
+	FILE* fp = m_fp;
+	if (fp == 0)
+	{
+		// we store the data in the logfile
+		fp = fplog;
+	}
+	else
+	{
+		// we save the data in a seperate file
+		fprintf(fplog, "File = %s\n", m_szfile);
+
+		// make a note in the data file
+		fprintf(fp,"*Step  = %d\n", nstep);
+		fprintf(fp,"*Time  = %.9lg\n", ftime);
+		fprintf(fp,"*Data  = %s\n", sz);
+	}
+
+	// save the data
+	for (int i=0; i<m_item.size(); ++i)
+	{
+		fprintf(fp, "%d%s", m_item[i], m_szdelim);
+		sz = m_szdata;
+		do
+		{
+			ch = strchr(sz, ';');
+			if (ch) *ch = 0;
+			val = Evaluate(m_item[i], sz);
+			fprintf(fp, "%lg", val);
+			if (ch) 
+			{
+				*ch = ';';
+				sz = ch+1;
+				fprintf(fp, "%s", m_szdelim);
+			}
+			else fprintf(fp, "\n");
+		}
+		while (ch != 0);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void DataRecord::SetItemList(const char* szlist)
+{
+	int i, n = 0, n0, n1, nn;
+	char* ch;
+	char* sz = (char*) szlist;
+	int nread;
+	do
+	{
+		ch = strchr(sz, ',');
+		if (ch) *ch = 0;
+		nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+		switch (nread)
+		{
+		case 1:
+			n1 = n0;
+			nn = 1;
+			break;
+		case 2:
+			nn = 1;
+			break;
+		case 3:
+			break;
+		default:
+			n0 = 0;
+			n1 = -1;
+			nn = 1;
+		}
+
+		for (i=n0; i<=n1; i += nn) ++n;
+
+		if (ch) *ch = ',';
+		sz = ch+1;
+	}
+	while (ch != 0);
+
+	if (n != 0)
+	{
+		m_item.create(n);
+
+		sz = (char*) szlist;
+		n = 0;
+		do
+		{
+			ch = strchr(sz, ',');
+			if (ch) *ch = 0;
+			nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+			switch (nread)
+			{
+			case 1:
+				n1 = n0;
+				nn = 1;
+				break;
+			case 2:
+				nn = 1;
+			}
+
+			for (i=n0; i<=n1; i += nn) m_item[n++] = i;
+			assert(n <= m_item.size());
+
+			if (ch) *ch = ',';
+			sz = ch+1;
+		}
+		while (ch != 0);
+	}
+	else SelectAllItems();
+}
+
+//-----------------------------------------------------------------------------
+
+double NodeDataRecord::Evaluate(int item, const char* szexpr)
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+	FESolver& solver = *fem.m_pStep->m_psolver;
+	vector<double>& Fr = solver.m_Fr;
+	int nnode = item - 1;
+	double val = 0;
+	int ierr;
+	if ((nnode >= 0) && (nnode < mesh.Nodes()))
+	{
+		FENode& node = mesh.Node(nnode);
+		int* id = node.m_ID;
+		m_calc.SetVariable("x", node.m_rt.x);
+		m_calc.SetVariable("y", node.m_rt.y);
+		m_calc.SetVariable("z", node.m_rt.z);
+		m_calc.SetVariable("ux", node.m_rt.x - node.m_r0.x);
+		m_calc.SetVariable("uy", node.m_rt.y - node.m_r0.y);
+		m_calc.SetVariable("uz", node.m_rt.z - node.m_r0.z);
+		m_calc.SetVariable("Rx", (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0));
+		m_calc.SetVariable("Ry", (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0));
+		m_calc.SetVariable("Rz", (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0));
+		if (fem.m_pStep->m_itype == FE_STATIC_PORO)
+		{
+			m_calc.SetVariable("p", node.m_pt);
+			m_calc.SetVariable("vx", node.m_vt.x);
+			m_calc.SetVariable("vy", node.m_vt.y);
+			m_calc.SetVariable("vz", node.m_vt.z);
+		}
+		val = m_calc.eval(szexpr, ierr);
+	}
+	return val;
+}
+
+void NodeDataRecord::SelectAllItems()
+{
+	int n = m_pfem->m_mesh.Nodes();
+	m_item.create(n);
+	for (int i=0; i<n; ++i) m_item[i] = i+1;
+}
+
+void NodeDataRecord::SetItemList(FENodeSet* pns)
+{
+	int n = pns->size();
+	assert(n);
+	m_item.create(n);
+	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i];
+}
+
+//-----------------------------------------------------------------------------
+
+double ElementDataRecord::Evaluate(int item, const char* szexpr)
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+
+	int EB = mesh.SolidElements();
+	int ES = mesh.ShellElements();
+
+	double val = 0;
+	int ierr;
+
+	// find the element
+	// note that currently item is an index into the element array. When shells
+	// are combined with solid elements, this may not result in the correct element as in the input file.
+	// However, in any case it should correspond to the correct element in the plot file
+	int nel = item - 1;
+	mat3ds E;
+	if ((nel >= 0) && (nel < EB)) 
+	{
+		// this is a solid element
+		FESolidElement& el = mesh.SolidElement(nel);
+		mesh.UnpackElement(el);
+
+		int nint = el.GaussPoints();
+		for (int i=0; i<nint; ++i)
+		{
+			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+
+			E = pt.Strain();
+			m_calc.SetVariable("sx", pt.s.xx());
+			m_calc.SetVariable("sy", pt.s.yy());
+			m_calc.SetVariable("sz", pt.s.zz());
+			m_calc.SetVariable("sxy", pt.s.xy());
+			m_calc.SetVariable("syz", pt.s.yz());
+			m_calc.SetVariable("sxz", pt.s.xz());
+			m_calc.SetVariable("Ex", E.xx());
+			m_calc.SetVariable("Ey", E.yy());
+			m_calc.SetVariable("Ez", E.zz());
+			m_calc.SetVariable("Exy", E.xy());
+			m_calc.SetVariable("Eyz", E.yz());
+			m_calc.SetVariable("Exz", E.xz());
+			val += m_calc.eval(szexpr, ierr);
+			if (fem.m_pStep->m_itype == FE_STATIC_PORO)
+			{
+				FEPoroElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
+				m_calc.SetVariable("wx", pt.m_w.x);
+				m_calc.SetVariable("wy", pt.m_w.y);
+				m_calc.SetVariable("wz", pt.m_w.z);
+			}
+		}
+		val /= nint;
+	}
+	else if ((nel >= EB) && (nel - EB < ES))
+	{
+		// this is a shell element
+		FEShellElement& el = mesh.ShellElement(nel - EB);
+		mesh.UnpackElement(el);
+
+		int nint = el.GaussPoints();
+		for (int i=0; i<nint; ++i)
+		{
+			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+
+			E = pt.Strain();
+			m_calc.SetVariable("sx", pt.s.xx());
+			m_calc.SetVariable("sy", pt.s.yy());
+			m_calc.SetVariable("sz", pt.s.zz());
+			m_calc.SetVariable("sxy", pt.s.xy());
+			m_calc.SetVariable("syz", pt.s.yz());
+			m_calc.SetVariable("sxz", pt.s.xz());
+			m_calc.SetVariable("Ex", E.xx());
+			m_calc.SetVariable("Ey", E.yy());
+			m_calc.SetVariable("Ez", E.zz());
+			m_calc.SetVariable("Exy", E.xy());
+			m_calc.SetVariable("Eyz", E.yz());
+			m_calc.SetVariable("Exz", E.xz());
+			val += m_calc.eval(szexpr, ierr);
+		}
+		val /= nint;
+	}
+
+	return val;
+}
+
+void ElementDataRecord::SelectAllItems()
+{
+	int n = m_pfem->m_mesh.ShellElements() + m_pfem->m_mesh.SolidElements();
+	m_item.create(n);
+	for (int i=0; i<n; ++i) m_item[i] = i+1;
+}
+
+//-----------------------------------------------------------------------------
+
+double RigidBodyDataRecord::Evaluate(int item, const char* szexpr)
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+	int nrb = item - 1;
+	double val = 0;
+	int ierr;
+	if ((nrb >= 0) && (nrb < fem.Materials()))
+	{
+		FEMaterial* pm = fem.GetMaterial(nrb);
+		if (pm->Type() == FE_RIGID)
+		{
+			// find the rigid body that has this material
+			for (int i=0; i<fem.m_nrb; ++i)
+			{
+				FERigidBody& RB = fem.m_RB[i];
+				if (RB.m_mat == nrb)
+				{
+					m_calc.SetVariable("x", RB.m_rt.x);
+					m_calc.SetVariable("y", RB.m_rt.y);
+					m_calc.SetVariable("z", RB.m_rt.z);
+					m_calc.SetVariable("qx", RB.m_qt.x);
+					m_calc.SetVariable("qy", RB.m_qt.y);
+					m_calc.SetVariable("qz", RB.m_qt.z);
+					m_calc.SetVariable("qw", RB.m_qt.w);
+					m_calc.SetVariable("Fx", RB.m_Fr.x);
+					m_calc.SetVariable("Fy", RB.m_Fr.y);
+					m_calc.SetVariable("Fz", RB.m_Fr.z);
+					m_calc.SetVariable("Mx", RB.m_Mr.x);
+					m_calc.SetVariable("My", RB.m_Mr.y);
+					m_calc.SetVariable("Mz", RB.m_Mr.z);
+					val = m_calc.eval(szexpr, ierr);
+					break;
+				}
+			}
+		}
+	}
+
+	return val;
+}
+
+void RigidBodyDataRecord::SelectAllItems()
+{
+	int n = 0, i;
+	for (i=0; i<m_pfem->Materials(); ++i)
+	{
+		FEMaterial* pm = m_pfem->GetMaterial(i);
+		if (pm->Type() == FE_RIGID) ++n;
+	}
+
+	if (n > 0)
+	{
+		m_item.create(n);
+		n = 0;
+		for (i=0; i<m_pfem->Materials(); ++i)
+		{
+			FEMaterial* pm  = m_pfem->GetMaterial(i);
+			if (pm->Type() == FE_RIGID)
+			{
+				m_item[n++] = i+1;
+			}
+		}
+	}
+}
