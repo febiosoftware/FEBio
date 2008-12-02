@@ -230,21 +230,12 @@ bool FEAnalysis::Init()
 	}
 
 	// modify the (aug lag) linear constraints
-	if (m_fem.m_LCAL.size())
+	if (m_fem.m_LCSet.size())
 	{
-		list<FEAugLagLinearConstraint>::iterator il = m_fem.m_LCAL.begin();
-		FEAugLagLinearConstraint::DOF& ms = il->m_master;
-		ms.neq = m_fem.m_mesh.Node(ms.node).m_ID[ms.bc];
-		for (int l=0; l<m_fem.m_LCAL.size(); ++l, ++il)
-		{
-			list<FEAugLagLinearConstraint::SlaveDOF>::iterator is = il->m_slave.begin();
-			for (int i=0; i<il->m_slave.size(); ++i, ++is)
-			{
-				is->neq = m_fem.m_mesh.Node(is->node).m_ID[is->bc];
-			}
-		}
+		int M = m_fem.m_LCSet.size();
+		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
+		for (int m=0; m<M; ++m, ++im) (*im)->Init();
 	}
-
 
 	// see if we need to do contact augmentations
 	m_baugment = (m_fem.m_nrj > 0 ? true : false);
@@ -265,6 +256,8 @@ bool FEAnalysis::Init()
 		if (pmi && pmi->m_blaugon) m_baugment = true;
 	}
 
+	// see if we have to do linear constraint augmentations
+	if (m_fem.m_LCSet.size()) m_baugment = true;
 
 	return true;
 }

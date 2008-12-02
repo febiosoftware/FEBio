@@ -191,10 +191,7 @@ bool FESolver::StiffnessMatrix()
 	// calculate linear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	if (m_fem.m_LCAL.size())
-	{
-		LinearConstraintStiffness();
-	}
+	LinearConstraintStiffness();
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -225,14 +222,11 @@ bool FESolver::StiffnessMatrix()
 
 void FESolver::LinearConstraintStiffness()
 {
-	vector<int> en;
-	vector<int> lm;
-	matrix ke;
-	list<FEAugLagLinearConstraint>::iterator it = m_fem.m_LCAL.begin();
-	for (int i=0; i<m_fem.m_LCAL.size(); ++i, ++it)
+	int N = m_fem.m_LCSet.size();
+	if (N > 0)
 	{
-		it->Stiffness(en, lm, ke);
-		AssembleStiffness(en, lm, ke);
+		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
+		for (int i=0; i<N; ++i, ++im) (*im)->Stiffness();
 	}
 }
 
@@ -769,10 +763,7 @@ bool FESolver::Residual(vector<double>& R)
 	// calculate linear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	if (m_fem.m_LCAL.size())
-	{
-		LinearConstraintForces(R);
-	}
+	LinearConstraintForces(R);
 
 	// add discrete element forces
 	if (m_fem.m_DE.size())
@@ -791,9 +782,12 @@ bool FESolver::Residual(vector<double>& R)
 
 void FESolver::LinearConstraintForces(vector<double> &R)
 {
-	int N = m_fem.m_LCAL.size();
-	list<FEAugLagLinearConstraint>::iterator it = m_fem.m_LCAL.begin();
-	for (int i=0; i<N; ++i, ++it) it->Residual(R);
+	int N = m_fem.m_LCSet.size();
+	if (N>0)
+	{
+		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
+		for (int i=0; i<N; ++i, ++im) (*im)->Residual(R);
+	}
 }
 
 //-----------------------------------------------------------------------------

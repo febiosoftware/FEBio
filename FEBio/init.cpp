@@ -282,25 +282,11 @@ bool FEM::InitConstraints()
 	for (i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
 
 	// let's do the aug lag linear constraints
-	if (m_LCAL.size() > 0)
+	if (m_LCSet.size() > 0)
 	{
-		// set the equation numbers for the linear constraints
-		list<FEAugLagLinearConstraint>::iterator it = m_LCAL.begin();
-		int N = m_LCAL.size();
-		for (i=0; i<N; ++i, ++it)
-		{
-			FEAugLagLinearConstraint& lc = *it;
-			lc.m_master.neq = m_mesh.Node(lc.m_master.node).m_ID[lc.m_master.bc];
-
-			// set the slave equation numbers
-			list<FEAugLagLinearConstraint::SlaveDOF>::iterator is = lc.m_slave.begin();
-			int nn = lc.m_slave.size();
-			for (int n=0; n<nn; ++n, ++is)
-			{
-				FEAugLagLinearConstraint::SlaveDOF& sn = *is;
-				sn.neq = m_mesh.Node(sn.node).m_ID[sn.bc];
-			}		
-		}
+		int N = m_LCSet.size();
+		list<FELinearConstraintSet*>::iterator it = m_LCSet.begin();
+		for (i=0; i<N; ++i, ++it) (*it)->Init();
 	}
 
 	return true;

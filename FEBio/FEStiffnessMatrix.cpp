@@ -191,20 +191,25 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			}
 
 			// do the aug lag linear constraints
-			if (fem.m_LCAL.size())
+			if (fem.m_LCSet.size())
 			{
-				vector<int> lm;
-				int N = fem.m_LCAL.size();
-				list<FEAugLagLinearConstraint>::iterator it = fem.m_LCAL.begin();
-				for (i=0; i<N; ++i, ++it)
+				int M = fem.m_LCSet.size();
+				list<FELinearConstraintSet*>::iterator im = fem.m_LCSet.begin();
+				for (int m=0; m<M; ++m, ++im)
 				{
-					lm.create(it->m_slave.size()+1);
-					lm[0] = it->m_master.neq;
-					int n = it->m_slave.size();
-					list<FEAugLagLinearConstraint::SlaveDOF>::iterator is = it->m_slave.begin();
-					for (j=0; i<n; ++j, ++is) lm[j+1] = is->neq;
-
-					build_add(lm);
+					list<FEAugLagLinearConstraint*>& LC = (*im)->m_LC;
+					vector<int> lm;
+					int N = LC.size();
+					list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
+					for (i=0; i<N; ++i, ++it)
+					{
+						int n = (*it)->m_dof.size();
+						lm.create(n);
+						FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
+						for (j=0; j<n; ++j, ++is) lm[j] = is->neq;
+	
+						build_add(lm);
+					}
 				}
 			}
 

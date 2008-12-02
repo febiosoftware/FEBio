@@ -1610,44 +1610,52 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		// make sure there is a constraint defined
 		if (tag.isleaf()) return true;
 
-		// read the master node
-		FEAugLagLinearConstraint LC;
-		int node;
-		tag.AttributeValue("node", node);
-		LC.m_master.node = node-1;
+		// create a new linear constraint manager
+		FELinearConstraintSet* pLCS = new FELinearConstraintSet(&fem);
+		fem.m_LCSet.push_back(pLCS);
 
-		const char* szbc = tag.AttributeValue("bc");
-		if      (strcmp(szbc, "x") == 0) LC.m_master.bc = 0;
-		else if (strcmp(szbc, "y") == 0) LC.m_master.bc = 1;
-		else if (strcmp(szbc, "z") == 0) LC.m_master.bc = 2;
-		else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-
-		// read the slave nodes
+		// read the linear constraints
 		++tag;
 		do
 		{
-			FEAugLagLinearConstraint::SlaveDOF dof;
-			if (tag == "node")
+			if (tag == "linear_constraint")
 			{
-				tag.value(dof.val);
-				tag.AttributeValue("id", node);
-				dof.node = node - 1;
+				FEAugLagLinearConstraint* pLC = new FEAugLagLinearConstraint;
 
-				const char* szbc = tag.AttributeValue("bc");
-				if      (strcmp(szbc, "x") == 0) dof.bc = 0;
-				else if (strcmp(szbc, "y") == 0) dof.bc = 1;
-				else if (strcmp(szbc, "z") == 0) dof.bc = 2;
-				else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+				FEAugLagLinearConstraint::DOF dof;
+				++tag;
+				do
+				{
+					if (tag == "node")
+					{
+						tag.value(dof.val);
+						int node;
+						tag.AttributeValue("id", node);
+						dof.node = node - 1;
 
-				LC.m_slave.push_back(dof);
+						const char* szbc = tag.AttributeValue("bc");
+						if      (strcmp(szbc, "x") == 0) dof.bc = 0;
+						else if (strcmp(szbc, "y") == 0) dof.bc = 1;
+						else if (strcmp(szbc, "z") == 0) dof.bc = 2;
+						else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+	
+						pLC->m_dof.push_back(dof);
+					}
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+
+				// add the linear constraint to the system
+				pLCS->add(pLC);
 			}
+			else if (tag == "tol"    ) tag.value(pLCS->m_tol);
+			else if (tag == "penalty") tag.value(pLCS->m_eps);
+			else if (tag == "maxaug") tag.value(pLCS->m_naugmax);
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
 		while (!tag.isend());
-
-		// add the linear constraint to the system
-		fem.m_LCAL.push_back(LC);
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 

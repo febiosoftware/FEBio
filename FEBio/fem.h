@@ -399,8 +399,8 @@ public:
 		vector<int>					m_LCT;		//!< linear constraint table
 		vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
 
-		// AL linear constraint data
-		list<FEAugLagLinearConstraint>	m_LCAL;	//!< aug lag linear constraint data
+		// Augmented Lagrangian linear constraint data
+		list<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
 
 		// pressure boundary data
 		vector<FE_FACE_PRESSURE>	m_PC;		//!< pressure boundary cards

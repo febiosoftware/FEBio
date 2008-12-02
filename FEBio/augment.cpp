@@ -34,10 +34,11 @@ bool FESolver::Augment()
 	}
 
 	// do linear constraint augmentations
-	if (m_fem.m_LCAL.size())
+	if (m_fem.m_LCSet.size())
 	{
-		list<FEAugLagLinearConstraint>::iterator it = m_fem.m_LCAL.begin();
-		for (int i=0; i<m_fem.m_LCAL.size(); ++i, ++it) bconv = it->Augment() && bconv;
+		int n = m_fem.m_LCSet.size();
+		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
+		for (int i=0; i<n; ++i, ++im) bconv = (*im)->Augment(m_naug) && bconv;
 	}
 
 	// do incompressibility multipliers
