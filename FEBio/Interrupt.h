@@ -17,6 +17,9 @@ public:
 
 	static void handler(int sig);
 	static bool	m_bsig;
+
+	//! CTRL+C interruption handler
+	void interrupt();
 };
 
 #endif // !defined(AFX_INTERRUPT_H__AE370AC5_05F4_4290_B708_FFB4252F0AEB__INCLUDED_)

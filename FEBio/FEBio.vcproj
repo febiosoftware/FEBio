@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CommandManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\console.cpp"
 				>
 			</File>
@@ -215,6 +219,10 @@
 			</File>
 			<File
 				RelativePath=".\FEBio.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBioCommand.cpp"
 				>
 			</File>
 			<File
@@ -560,6 +568,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Command.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CommandManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\console.h"
 				>
 			</File>
@@ -581,6 +597,10 @@
 			</File>
 			<File
 				RelativePath=".\FEAugLagLinearConstraint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBioCommand.h"
 				>
 			</File>
 			<File

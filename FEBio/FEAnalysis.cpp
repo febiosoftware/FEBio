@@ -272,6 +272,10 @@ bool FEAnalysis::Solve()
 		return false;
 	}
 
+	// obtain a pointer to the console object. We'll use this to
+	// set the title of the console window.
+	Console* pShell = Console::GetHandle();
+
 	// convergence flag
 	// we initialize it to true so that when a restart is performed after 
 	// the last time step we terminate normally.
@@ -281,7 +285,7 @@ bool FEAnalysis::Solve()
 	double endtime = m_fem.m_ftime + m_ntime*m_dt0;
 	const double eps = endtime*1e-7;
 
-	Console::SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
+	pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
 
 	// make sure that the timestep is at least the min time step size
 	if (m_bautostep) AutoTimeStep(0);
@@ -445,7 +449,7 @@ bool FEAnalysis::Solve()
 		// the next timestep goes wrong
 		m_fem.m_log.flush();
 
-		Console::SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
+		pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
 	}
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)

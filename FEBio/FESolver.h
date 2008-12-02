@@ -168,11 +168,6 @@ public:
 		void LinearConstraintForces(vector<double>& R);
 	//}
 
-	//{ --- Miscellaneous ---
-
-		//! CTRL+C interruption handler
-		void interrupt();
-
 public:
 		//! serialize data to/from dump file
 		void Serialize(Archive& ar);

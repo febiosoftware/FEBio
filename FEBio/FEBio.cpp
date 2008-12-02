@@ -40,6 +40,7 @@
 
 #include "stdafx.h"
 #include "FESolver.h"
+#include "FEBioCommand.h"
 #include "FECore/FECore.h"
 
 
@@ -83,6 +84,8 @@ bool optimize(FEM& fem, const char* szfile);
 
 bool diagnose(FEM& fem, const char* szfile);
 
+void init_framework(FEM& fem);
+
 //-----------------------------------------------------------------------------
 // The starting point of the application
 
@@ -97,6 +100,10 @@ int main(int argc, char* argv[])
 
 	// create the one and only FEM object
 	FEM fem;
+
+	// intialize the framework
+	init_framework(fem);
+
 
 	// set the filenames
 	fem.SetLogFilename (ops.szlog);
@@ -306,4 +313,11 @@ void Hello(FILE* fp)
 	fprintf(fp,"                                                                           \n");
 	fprintf(fp,"===========================================================================\n");
 	fprintf(fp,"\n\n");
+}
+
+//-----------------------------------------------------------------------------
+
+void init_framework(FEM& fem)
+{
+	FEBioCommand::SetFEM(&fem);
 }

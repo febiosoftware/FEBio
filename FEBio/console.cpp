@@ -10,12 +10,26 @@
 	#include <windows.h>
 #endif
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
+// pointer to the one and only console object. This pointer
+// will be initialized during the first call to GetHandle.
+Console* Console::m_pShell = 0;
 
-bool Console::m_bActive = true;
+//--------------------------------------------------------------------
+//! This class returns the pointer to the console object. On the first
+//! call, the pointer is allocated.
+Console* Console::GetHandle()
+{
+	if (m_pShell == 0)
+	{
+		m_pShell = new Console;
+	}
 
+	return m_pShell;
+}
+
+//--------------------------------------------------------------------
+//! Sets the title of the console window.
 void Console::SetTitle(const char* sz, ...)
 {
 	if (m_bActive)
@@ -35,5 +49,48 @@ void Console::SetTitle(const char* sz, ...)
 #ifdef LINUX
 		printf("%c]0;%s%c", '\033', sztitle, '\007');
 #endif
+	}
+}
+
+//--------------------------------------------------------------------
+//! get a command from the user
+
+void Console::GetCommand(int& nargs, char **argv)
+{
+	static char szcmd[512] = {0};
+
+	// print the command prompt
+	printf("\n>");
+
+	// you must flush the input buffer before using gets
+	fflush(stdin);
+
+	// get the command
+	fgets(szcmd, 255, stdin);
+
+	// fgets does not remove '\n' so we'll do it ourselves
+	char* ch = strrchr(szcmd, '\n');
+	if (ch) *ch = 0;
+
+	// parse the arguments
+	nargs = 0;
+	int n = 0;
+	int l = strlen(szcmd);
+	ch = szcmd;
+	for (int i=0; i<=l; ++i, ++ch)
+	{
+		if (!isspace(*ch) && (*ch != 0))
+		{
+			if (n==0) argv[nargs++] = ch;
+			++n;
+		}
+		else 
+		{
+			if (n!=0)
+			{
+				argv[nargs-1][n] = 0;
+				n = 0;
+			}
+		}
 	}
 }

@@ -19,6 +19,10 @@ bool FEM::Solve()
 	// for instance, in the parameter optimization module
 	EchoInput();
 
+	// obtain a pointer to the console window. We'll use this to 
+	// set the title of the window
+	Console* pShell = Console::GetHandle();
+
 	// Create timer to track total running time
 	Timer	m_TotalTime;
 
@@ -76,7 +80,7 @@ bool FEM::Solve()
 		m_log.printf("\n E R R O R   T E R M I N A T I O N\n\n");
 	}
 
-	Console::SetTitle("(%s) %s - FEBio", (bconv?"NT":"ET"), m_szfile_title);
+	pShell->SetTitle("(%s) %s - FEBio", (bconv?"NT":"ET"), m_szfile_title);
 
 	// We're done !
 	return bconv;
