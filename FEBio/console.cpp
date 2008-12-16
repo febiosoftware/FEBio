@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "console.h"
 #include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
 
 #ifdef WIN32
 	#include <windows.h>

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEViscoElasticMaterial.h"
 
 // register the material with the framework

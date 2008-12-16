@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEAnalysis.h"
 #include "fem.h"
 #include "console.h"

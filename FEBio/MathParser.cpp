@@ -2,7 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "MathParser.h"
 #include <stdio.h>
 #include <stdlib.h>

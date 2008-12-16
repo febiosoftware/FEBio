@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEBioCommand.h"
 #include "fem.h"
 #include "FEException.h"

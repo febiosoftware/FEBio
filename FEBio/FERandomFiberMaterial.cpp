@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FERandomFiberMaterial.h"
 
 // The following file contains the integration points and weights

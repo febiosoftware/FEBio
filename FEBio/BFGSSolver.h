@@ -76,8 +76,8 @@ protected:
 	vector<double>	m_G;	//!< help vector
 	vector<double>	m_H;	//!< help vector
 
-	vector<vector<double>>	m_V;	//!< BFGS update vector v
-	vector<vector<double>>	m_W;	//!< BFGS update vector w
+	vector< vector<double> >	m_V;	//!< BFGS update vector v
+	vector< vector<double> >	m_W;	//!< BFGS update vector w
 
 	double	m_ls;	//!< line search factor
 

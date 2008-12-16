@@ -1,5 +1,5 @@
 #pragma once
-#include "command.h"
+#include "Command.h"
 #include "CommandManager.h"
 
 class FEM;
