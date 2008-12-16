@@ -128,13 +128,13 @@ public:
 	// dilatational component U and derivs
 	// use these to obtain similar results than NIKE3D
 //	double U  (double J) { return 0.5*m_K*log(J)*log(J); }
-//	double Up (double J) { return m_K*log(J)/J; }
-//	double Upp(double J) { return m_K*(1-log(J))/(J*J); }
+	double Up (double J) { return m_K*log(J)/J; }
+	double Upp(double J) { return m_K*(1-log(J))/(J*J); }
 
 	// use these for NIKE3D's Ogden material
 //	double U  (double J) { return 0.25*m_K*(J*J - 2.0*log(J) - 1.0); }
-	double Up (double J) { return 0.5*m_K*(J - 1.0/J); }
-	double Upp(double J) { return 0.5*m_K*(1 + 1.0/(J*J)); }
+//	double Up (double J) { return 0.5*m_K*(J - 1.0/J); }
+//	double Upp(double J) { return 0.5*m_K*(1 + 1.0/(J*J)); }
 
 	// Use these to obtain similar results than ABAQUS
 //	double U  (double J) { return 0.5*m_K*(J-1)*(J-1); }

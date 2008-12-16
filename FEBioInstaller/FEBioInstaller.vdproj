@@ -45,13 +45,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_791B155901954522BF1924CE02CE731E"
-        "OwnerKey" = "8:_8D4D886284B94CFCACC403DA46DC687D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8D4D886284B94CFCACC403DA46DC687D"
+        "MsmKey" = "8:_9FCE161FBDBA447485DFF4AD35B35EDA"
         "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -59,6 +53,12 @@
         {
         "MsmKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DF5515A71EB64FC3A8E74C45234BD671"
+        "OwnerKey" = "8:_9FCE161FBDBA447485DFF4AD35B35EDA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -92,6 +92,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Net.Framework.3.5"
+                    {
+                    "Name" = "8:.NET Framework 3.5"
+                    "ProductCode" = "8:Microsoft.Net.Framework.3.5"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
         "Release"
@@ -116,6 +129,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Net.Framework.3.5"
+                    {
+                    "Name" = "8:.NET Framework 3.5"
+                    "ProductCode" = "8:Microsoft.Net.Framework.3.5"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
     }
@@ -134,6 +160,14 @@
         {
             "LaunchCondition"
             {
+                "{A06ECF26-33A3-4562-8140-9B0E340D4F24}:_9EBCAF05723C43B394045E9262D226C5"
+                {
+                "Name" = "8:.NET Framework"
+                "Message" = "8:[VSDNETMSG]"
+                "Version" = "8:3.5.21022"
+                "AllowLaterVersions" = "11:FALSE"
+                "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=76617"
+                }
             }
         }
         "File"
@@ -337,7 +371,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio"
         "ProductCode" = "8:{8D119670-EC31-42E5-88B5-32CE7DEED12B}"
-        "PackageCode" = "8:{57F9FD84-CB6F-485B-8DC5-CE959F35A613}"
+        "PackageCode" = "8:{479F4D66-8351-4F46-AF10-FF90A174CA3B}"
         "UpgradeCode" = "8:{C651D20C-DA37-45DD-B03F-85DB2BC7C551}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -866,11 +900,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_791B155901954522BF1924CE02CE731E"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_9FCE161FBDBA447485DFF4AD35B35EDA"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -880,11 +914,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_8D4D886284B94CFCACC403DA46DC687D"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_DF5515A71EB64FC3A8E74C45234BD671"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
                 "Properties"
                 {
                 }
