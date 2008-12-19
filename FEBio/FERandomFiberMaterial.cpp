@@ -55,6 +55,16 @@ FERandomFiberMaterial::FERandomFiberMaterial() : FEIncompressibleMaterial(FE_RAN
 	}
 }
 
+void FERandomFiberMaterial::Init()
+{
+	if (m_ksi[0] <= 0) throw MaterialError("ksi1 must be positive.");
+	if (m_ksi[1] <= 0) throw MaterialError("ksi2 must be positive.");
+	if (m_ksi[2] <= 0) throw MaterialError("ksi3 must be positive.");
+	if (m_beta[0] <= 2) throw MaterialError("beta1 must be bigger than 2.");
+	if (m_beta[1] <= 2) throw MaterialError("beta1 must be bigger than 2.");
+	if (m_beta[2] <= 2) throw MaterialError("beta1 must be bigger than 2.");
+}
+
 mat3ds FERandomFiberMaterial::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -148,7 +158,7 @@ mat3ds FERandomFiberMaterial::Stress(FEMaterialPoint& mp)
 	double ksi, beta;
 	double nr[3], n0[3], nt[3];
 	double In, Wl;
-	const double eps = 1.0e-9;
+	const double eps = 0;
 	for (int n=0; n<nint; ++n)
 	{
 		// set the local fiber direction
@@ -156,10 +166,15 @@ mat3ds FERandomFiberMaterial::Stress(FEMaterialPoint& mp)
 		nr[1] = m_sth[n]*m_sph[n];
 		nr[2] = m_cph[n];
 
+		// get the global material fiber direction
+		n0[0] = Q[0][0]*nr[0] + Q[0][1]*nr[1] + Q[0][2]*nr[2];
+		n0[1] = Q[1][0]*nr[0] + Q[1][1]*nr[1] + Q[1][2]*nr[2];
+		n0[2] = Q[2][0]*nr[0] + Q[2][1]*nr[1] + Q[2][2]*nr[2];
+
 		// Calculate In = nr*C*nr
-		In = nr[0]*( C[0][0]*nr[0] + C[0][1]*nr[1] + C[0][2]*nr[2]) +
-			 nr[1]*( C[1][0]*nr[0] + C[1][1]*nr[1] + C[1][2]*nr[2]) +
-			 nr[2]*( C[2][0]*nr[0] + C[2][1]*nr[1] + C[2][2]*nr[2]);
+		In = n0[0]*( C[0][0]*n0[0] + C[0][1]*n0[1] + C[0][2]*n0[2]) +
+			 n0[1]*( C[1][0]*n0[0] + C[1][1]*n0[1] + C[1][2]*n0[2]) +
+			 n0[2]*( C[2][0]*n0[0] + C[2][1]*n0[1] + C[2][2]*n0[2]);
 
 		// only take fibers in tension into consideration
 		if (In > 1. + eps)
@@ -170,11 +185,6 @@ mat3ds FERandomFiberMaterial::Stress(FEMaterialPoint& mp)
 
 			// calculate strain energy derivative
 			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
-
-			// get the global material fiber direction
-			n0[0] = Q[0][0]*nr[0] + Q[0][1]*nr[1] + Q[0][2]*nr[2];
-			n0[1] = Q[1][0]*nr[0] + Q[1][1]*nr[1] + Q[1][2]*nr[2];
-			n0[2] = Q[2][0]*nr[0] + Q[2][1]*nr[1] + Q[2][2]*nr[2];
 
 			// get the global spatial fiber direction
 			nt[0] = F[0][0]*n0[0] + F[0][1]*n0[1] + F[0][2]*n0[2];
@@ -433,7 +443,7 @@ void FERandomFiberMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 	double ksi, beta;
 	double nr[3], n0[3], nt[3];
 	double In, Wl, Wll;
-	const double eps = 1.0e-9;
+	const double eps = 0;
 	for (int n=0; n<nint; ++n)
 	{
 		// set the local fiber direction
@@ -441,10 +451,15 @@ void FERandomFiberMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 		nr[1] = m_sth[n]*m_sph[n];
 		nr[2] = m_cph[n];
 
+		// get the global material fiber direction
+		n0[0] = Q[0][0]*nr[0] + Q[0][1]*nr[1] + Q[0][2]*nr[2];
+		n0[1] = Q[1][0]*nr[0] + Q[1][1]*nr[1] + Q[1][2]*nr[2];
+		n0[2] = Q[2][0]*nr[0] + Q[2][1]*nr[1] + Q[2][2]*nr[2];
+
 		// Calculate In = nr*C*nr
-		In = nr[0]*( C[0][0]*nr[0] + C[0][1]*nr[1] + C[0][2]*nr[2]) +
-			 nr[1]*( C[1][0]*nr[0] + C[1][1]*nr[1] + C[1][2]*nr[2]) +
-			 nr[2]*( C[2][0]*nr[0] + C[2][1]*nr[1] + C[2][2]*nr[2]);
+		In = n0[0]*( C[0][0]*n0[0] + C[0][1]*n0[1] + C[0][2]*n0[2]) +
+			 n0[1]*( C[1][0]*n0[0] + C[1][1]*n0[1] + C[1][2]*n0[2]) +
+			 n0[2]*( C[2][0]*n0[0] + C[2][1]*n0[1] + C[2][2]*n0[2]);
 
 		// only take fibers in tension into consideration
 		if (In > 1. + eps)
@@ -456,11 +471,6 @@ void FERandomFiberMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 			// calculate strain energy derivative
 			Wl  = beta*ksi*pow(In - 1.0, beta - 1.0);
 			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
-
-			// get the global material fiber direction
-			n0[0] = Q[0][0]*nr[0] + Q[0][1]*nr[1] + Q[0][2]*nr[2];
-			n0[1] = Q[1][0]*nr[0] + Q[1][1]*nr[1] + Q[1][2]*nr[2];
-			n0[2] = Q[2][0]*nr[0] + Q[2][1]*nr[1] + Q[2][2]*nr[2];
 
 			// get the global spatial fiber direction
 			nt[0] = F[0][0]*n0[0] + F[0][1]*n0[1] + F[0][2]*n0[2];

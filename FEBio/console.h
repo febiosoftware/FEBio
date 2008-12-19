@@ -22,6 +22,8 @@ public:
 	static Console* GetHandle();
 
 public:
+	Console() { m_bActive = true; }
+
 	//! set the title of the console
 	void SetTitle(const char* sz, ...);
 

@@ -19,6 +19,9 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual void Tangent(double D[6][6], FEMaterialPoint& pt);
 
+	//! material parameter intialization and checking
+	void Init();
+
 public:
 	double	m_c1;	// Mooney-Rivlin coefficient 1
 	double	m_c2;	// Mooney-Rivlin coefficient 2
