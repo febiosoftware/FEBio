@@ -57,6 +57,8 @@ FERandomFiberMaterial::FERandomFiberMaterial() : FEIncompressibleMaterial(FE_RAN
 
 void FERandomFiberMaterial::Init()
 {
+	FEElasticMaterial::Init();
+
 	if (m_ksi[0] <= 0) throw MaterialError("ksi1 must be positive.");
 	if (m_ksi[1] <= 0) throw MaterialError("ksi2 must be positive.");
 	if (m_ksi[2] <= 0) throw MaterialError("ksi3 must be positive.");
@@ -577,13 +579,13 @@ void FERandomFiberMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 
 			// D[3][4] = 0.5*(c(0,1,1,2) + c(0,1,2,1))
-			D[3][4] = w[n]*4.0*Ji*Wll*nt[0]*nt[1]*nt[1]*nt[2];
+			D[3][4] += w[n]*4.0*Ji*Wll*nt[0]*nt[1]*nt[1]*nt[2];
 
 			// D[3][5] = 0.5*(c(0,1,0,2) + c(0,1,2,0))
-			D[3][5] = w[n]*4.0*Ji*Wll*nt[0]*nt[1]*nt[0]*nt[2];
+			D[3][5] += w[n]*4.0*Ji*Wll*nt[0]*nt[1]*nt[0]*nt[2];
 
 			// D[4][5] = 0.5*(c(1,2,0,2) + c(1,2,2,0))
-			D[4][5] = w[n]*4.0*Ji*Wll*nt[1]*nt[2]*nt[0]*nt[2];
+			D[4][5] += w[n]*4.0*Ji*Wll*nt[1]*nt[2]*nt[0]*nt[2];
 		}
 	}
 

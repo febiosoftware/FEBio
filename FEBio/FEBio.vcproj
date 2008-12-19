@@ -358,6 +358,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FERandomFiberNeoHookean.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FERestartImport.cpp"
 				>
 			</File>
@@ -741,6 +745,10 @@
 			</File>
 			<File
 				RelativePath=".\FERandomFiberMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FERandomFiberNeoHookean.h"
 				>
 			</File>
 			<File
