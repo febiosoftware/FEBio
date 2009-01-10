@@ -1313,6 +1313,7 @@ bool FEFEBioImport::ParseConstraints(XMLTag& tag)
 bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
+	FEMesh& m = fem.m_mesh;
 
 	const char* szt = tag.AttributeValue("type");
 
@@ -1366,30 +1367,16 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 
 				FEContactSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
 
-				// count nr of faces
-				int faces = 0, N, nf[4];
-				XMLTag t(tag); ++t;
-				while (!t.isend()) { faces++; ++t; }
-
-				// allocate storage for faces
-				s.Create(faces);
-
-				// read faces
-				++tag;
-				for (int i=0; i<faces; ++i)
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
 				{
-					FESurfaceElement& el = s.Element(i);
-			
-					if (tag == "quad4") el.SetType(FE_NIQUAD);
-					else if (tag == "tri3") el.SetType(FE_NITRI);
-					else throw XMLReader::InvalidTag(tag);
-
-					N = el.Nodes();
-					tag.value(nf, N);
-					for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-
-					++tag;
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
 				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt);
 			}
 			else throw XMLReader::InvalidTag(tag);
 
@@ -1424,30 +1411,16 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 
 				FETiedContactSurface& s = (ntype == 1? ps->ms : ps->ss);
 
-				// count nr of faces
-				int faces = 0, N, nf[4];
-				XMLTag t(tag); ++t;
-				while (!t.isend()) { faces++; ++t; }
-
-				// allocate storage for faces
-				s.Create(faces);
-
-				// read faces
-				++tag;
-				for (int i=0; i<faces; ++i)
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
 				{
-					FESurfaceElement& el = s.Element(i);
-			
-					if (tag == "quad4") el.SetType(FE_NIQUAD);
-					else if (tag == "tri3") el.SetType(FE_NITRI);
-					else throw XMLReader::InvalidTag(tag);
-
-					N = el.Nodes();
-					tag.value(nf, N);
-					for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-
-					++tag;
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
 				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt);
 			}
 			else throw XMLReader::InvalidTag(tag);
 
@@ -1516,30 +1489,16 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			{
 				FEContactSurface& s = ps->m_ss;
 
-				// count nr of faces
-				int faces = 0, N, nf[4];
-				XMLTag t(tag); ++t;
-				while (!t.isend()) { faces++; ++t; }
-
-				// allocate storage for faces
-				s.Create(faces);
-
-				// read faces
-				++tag;
-				for (int i=0; i<faces; ++i)
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
 				{
-					FESurfaceElement& el = s.Element(i);
-		
-					if (tag == "quad4") el.SetType(FE_NIQUAD);
-					else if (tag == "tri3") el.SetType(FE_NITRI);
-					else throw XMLReader::InvalidTag(tag);
-
-					N = el.Nodes();
-					tag.value(nf, N);
-					for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-
-					++tag;
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
 				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt);
 			}
 			else throw XMLReader::InvalidTag(tag);
 
@@ -1900,5 +1859,56 @@ bool FEFEBioImport::ParseStepSection(XMLTag& tag)
 	}
 	while (!tag.isend());
 
+	return true;
+}
+
+//---------------------------------------------------------------------------------
+
+bool FEFEBioImport::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
+{
+	FEM& fem = *m_pfem;
+	FEMesh& m = fem.m_mesh;
+
+	// count nr of faces
+	int faces = 0, N, nf[4];
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { faces++; ++t; }
+
+	// allocate storage for faces
+	s.Create(faces);
+
+	// read faces
+	++tag;
+	for (int i=0; i<faces; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+
+		if (tag == "quad4") el.SetType(FE_NIQUAD);
+		else if (tag == "tri3") el.SetType(FE_NITRI);
+		else throw XMLReader::InvalidTag(tag);
+
+		N = el.Nodes();
+
+		if (nfmt == 0)
+		{
+			tag.value(nf, N);
+			for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+		}
+		else if (nfmt == 1)
+		{
+			tag.value(nf, 2);
+			FEElement* pe = m.FindElementFromID(nf[0]);
+			if (pe)
+			{
+				int ne[4];
+				int nn = m.GetFace(*pe, nf[1]-1, ne);
+				if (nn != N) throw XMLReader::InvalidValue(tag);
+				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
+			}
+			else throw XMLReader::InvalidValue(tag);
+		}
+
+		++tag;
+	}
 	return true;
 }

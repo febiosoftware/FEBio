@@ -220,6 +220,12 @@ public:
 	//! serialize data to or from a binary archive
 	void Serialize(Archive& ar);
 
+	//! Get the face nodes from a given element
+	int GetFace(FEElement& el, int n, int nf[4]);
+
+	//! Finds an element from a given ID
+	FEElement* FindElementFromID(int nid);
+
 protected:
 	vector<FENode>			m_Node;		//!< FE nodes array
 

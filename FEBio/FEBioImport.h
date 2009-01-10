@@ -37,6 +37,7 @@ protected:
 	bool ParseLoadSection       (XMLTag& tag);
 	bool ParseOutputSection     (XMLTag& tag);
 	bool ParseStepSection       (XMLTag& tag);
+	bool ParseSurfaceSection    (XMLTag& tag, FESurface& s, int nfmt);
 
 	FEM*		m_pfem;		//!< pointer to the fem class
 	FEAnalysis*	m_pStep;	//!< pointer to current analysis step

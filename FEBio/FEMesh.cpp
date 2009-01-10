@@ -730,3 +730,75 @@ void FEMesh::Serialize(Archive& ar)
 		ar >> box.r0 >> box.r1;
 	}
 }
+
+//-----------------------------------------------------------------------------
+//! This function returns the face connectivity from a certain element
+
+int FEMesh::GetFace(FEElement& el, int n, int nf[4])
+{
+	int nn = -1;
+	int* en = el.m_node;
+	switch (el.Type())
+	{
+	case FE_HEX:
+		nn = 4;
+		switch (n)
+		{
+		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[5]; nf[3] = en[4]; break;
+		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[6]; nf[3] = en[5]; break;
+		case 2: nf[0] = en[2]; nf[1] = en[3]; nf[2] = en[7]; nf[3] = en[6]; break;
+		case 3: nf[0] = en[0]; nf[1] = en[4]; nf[2] = en[7]; nf[3] = en[3]; break;
+		case 4: nf[0] = en[0]; nf[1] = en[3]; nf[2] = en[2]; nf[3] = en[1]; break;
+		case 5: nf[0] = en[4]; nf[1] = en[5]; nf[2] = en[6]; nf[3] = en[7]; break;
+		}
+		break;
+	case FE_PENTA:
+		switch(n)
+		{
+		case 0: nn = 4; nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[4]; nf[3] = en[3]; break;
+		case 1: nn = 4; nf[0] = en[1]; nf[1] = en[2]; nf[2] = en[5]; nf[3] = en[4]; break;
+		case 2: nn = 4; nf[0] = en[0]; nf[1] = en[3]; nf[2] = en[5]; nf[3] = en[2]; break;
+		case 3: nn = 3; nf[0] = en[0]; nf[1] = en[2]; nf[2] = en[1]; nf[3] = en[1]; break;
+		case 4: nn = 3; nf[0] = en[3]; nf[1] = en[4]; nf[2] = en[5]; nf[3] = en[5]; break;
+		}
+		break;
+	case FE_TET:
+		nn = 3;
+		switch (n)
+		{
+		case 0: nf[0] = en[0]; nf[1] = en[1]; nf[2] = nf[3] = en[3]; break;
+		case 1: nf[0] = en[1]; nf[1] = en[2]; nf[2] = nf[3] = en[3]; break;
+		case 2: nf[0] = en[0]; nf[1] = en[3]; nf[2] = nf[3] = en[2]; break;
+		case 3: nf[0] = en[0]; nf[1] = en[2]; nf[2] = nf[3] = en[1]; break;
+		}
+		break;
+	case FE_SHELL_QUAD:
+		nn = 4;
+		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2]; nf[3] = en[3];
+		break;
+	case FE_SHELL_TRI:
+		nn = 3;
+		nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[2];
+		break;
+	}
+
+	return nn;
+}
+
+//-----------------------------------------------------------------------------
+//! Find an element from a given ID. return 0 if the element cannot be found.
+
+FEElement* FEMesh::FindElementFromID(int nid)
+{
+	int i;
+	// search the solid elements
+	for (i=0; i<m_Elem.size(); ++i)
+		if (m_Elem[i].m_nID == nid) return &m_Elem[i];
+
+	// now do the shells
+	for (i=0; i<m_Shell.size(); ++i)
+		if (m_Shell[i].m_nID == nid) return &m_Shell[i];
+
+	// we could not find it
+	return 0;
+}
