@@ -81,7 +81,8 @@ public:
 	}
 
 	vector<T>& operator = (const vector<T>& a);
-	operator T* () { return m_pdata; }
+	operator T*
+		() { return m_pdata; }
 
 	vector<T> operator - (const vector<T>& a) const
 	{

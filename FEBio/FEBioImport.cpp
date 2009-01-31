@@ -55,6 +55,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 				else if (tag == "Material") ParseMaterialSection(tag);
 				else if (tag == "Geometry") ParseGeometrySection(tag);
 				else if (tag == "Boundary") ParseBoundarySection(tag);
+				else if (tag == "Initial" ) ParseInitialSection (tag);
 				else if (tag == "Globals" ) ParseGlobalsSection (tag);
 				else if (tag == "LoadData") ParseLoadSection    (tag);
 				else if (tag == "Output"  ) ParseOutputSection  (tag);
@@ -803,6 +804,50 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		assert(pmat);
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Read the NodeData section from the FEBio input file
+
+bool FEFEBioImport::ParseInitialSection(XMLTag& tag)
+{
+	if (tag.isleaf()) return true;
+
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+
+	// make sure we've read the nodes section
+	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
+
+	for (int i=0; i<mesh.Nodes(); ++i) mesh.Node(i).m_v0 = vec3d(0,0,0);
+
+	// read nodal data
+	++tag;
+	do
+	{
+		if (tag == "velocity")
+		{
+			++tag;
+			do
+			{
+				if (tag == "node")
+				{
+					int nid = atoi(tag.AttributeValue("id"))-1;
+					vec3d v;
+					tag.value(v);
+					mesh.Node(nid).m_v0 += v;
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
 
 	return true;
 }
