@@ -12,21 +12,15 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! Poroelastic material
+//! Base class for poroelastic materials.
 
 class FEPoroElastic : public FEMaterial
 {
 public:
 	FEPoroElastic();
 
-	double	m_perm;			//!< permeability
-	double	m_permv[3];		//!< permeability for diagonal tensor
-	int		m_nSolidMat;	//!< ID of solid material
-
-	FEElasticMaterial*	m_psmat;	// pointer to the solid material class
-
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() 
+	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
 		return new FEPoroElasticMaterialPoint(m_psmat->CreateMaterialPointData());
 	}
@@ -45,16 +39,14 @@ public:
 	virtual void Tangent(double D[6][6], FEMaterialPoint& pt);
 
 	//! calculate fluid flux
-	virtual vec3d Flux(FEMaterialPoint& pt);
+	virtual vec3d Flux(FEMaterialPoint& pt) = 0;
 
 	//! permeability
-	virtual void Permeability(double k[3][3], FEMaterialPoint& pt);
+	virtual void Permeability(double k[3][3], FEMaterialPoint& pt) = 0;
 
-	// declare as registered
-	DECLARE_REGISTERED(FEPoroElastic);
-
-	// declare parameter list
-	DECLARE_PARAMETER_LIST();
+public:
+	int					m_nSolidMat;	//!< ID of solid material
+	FEElasticMaterial*	m_psmat;		//!< pointer to the solid material class
 };
 
 

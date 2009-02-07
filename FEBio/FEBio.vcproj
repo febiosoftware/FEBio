@@ -350,6 +350,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPoroConstPerm.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPoroElastic.cpp"
 				>
 			</File>
@@ -737,6 +741,10 @@
 			</File>
 			<File
 				RelativePath=".\FEParameterList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPoroConstPerm.h"
 				>
 			</File>
 			<File
