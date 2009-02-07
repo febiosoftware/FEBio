@@ -35,8 +35,8 @@ bool FEM::InitPoro()
 	for (i=0; i<m_mesh.SolidElements(); ++i)
 	{
 		FESolidElement& el = m_mesh.SolidElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() == FE_PORO_ELASTIC)
+		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+		if (pm)
 		{
 			int N = el.Nodes();
 			int* n = el.m_node;
@@ -47,8 +47,8 @@ bool FEM::InitPoro()
 	for (i=0; i<m_mesh.ShellElements(); ++i)
 	{
 		FEShellElement& el = m_mesh.ShellElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() == FE_PORO_ELASTIC)
+		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+		if (pm)
 		{
 			int N = el.Nodes();
 			int* n = el.m_node;
@@ -61,8 +61,8 @@ bool FEM::InitPoro()
 	for (i=0; i<m_mesh.SolidElements(); ++i)
 	{
 		FESolidElement& el = m_mesh.SolidElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() != FE_PORO_ELASTIC)
+		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+		if (pm == 0)
 		{
 			int N = el.Nodes();
 			int* n = el.m_node;
@@ -73,8 +73,8 @@ bool FEM::InitPoro()
 	for (i=0; i<m_mesh.ShellElements(); ++i)
 	{
 		FEShellElement& el = m_mesh.ShellElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() != FE_PORO_ELASTIC)
+		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+		if (pm == 0)
 		{
 			int N = el.Nodes();
 			int* n = el.m_node;
@@ -87,8 +87,8 @@ bool FEM::InitPoro()
 	for (i=0; i<m_mesh.SolidElements(); ++i)
 	{
 		FESolidElement& el = m_mesh.SolidElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() == FE_PORO_ELASTIC)
+		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+		if (pm)
 		{
 			int N = el.Nodes();
 			int* n = el.m_node;
@@ -99,8 +99,8 @@ bool FEM::InitPoro()
 	for (i=0; i<m_mesh.ShellElements(); ++i)
 	{
 		FEShellElement& el = m_mesh.ShellElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() == FE_PORO_ELASTIC)
+		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+		if (pm)
 		{
 			int N = el.Nodes();
 			int* n = el.m_node;

@@ -4,7 +4,7 @@
 class FERandomFiberNeoHookean :	public FEElasticMaterial
 {
 public:
-	FERandomFiberNeoHookean() : FEElasticMaterial(FE_RAND_FIBER_NEOHOOKEAN) {}
+	FERandomFiberNeoHookean() {}
 
 public:
 	double	m_E;	//!< Young's modulus

@@ -20,7 +20,7 @@ END_PARAMETER_LIST();
 // FEPoroElastic
 //////////////////////////////////////////////////////////////////////
 
-FEPoroElastic::FEPoroElastic() : FEMaterial(FE_PORO_ELASTIC) 
+FEPoroElastic::FEPoroElastic()
 {
 	m_perm = 1;
 	m_permv[0] = m_permv[1] = m_permv[2] = 1;

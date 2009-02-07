@@ -20,7 +20,7 @@
 class FERigid : public FEElasticMaterial
 {
 public:
-	FERigid() : FEElasticMaterial(FE_RIGID) 
+	FERigid()
 	{
 		m_com = 0;
 		for (int i=0; i<6; ++i)

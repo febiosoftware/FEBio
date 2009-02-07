@@ -31,36 +31,6 @@ enum FE_Element_Type {
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// ENUM: Material models
-//  Numbers are chosen to be consistent with NIKE3D's material numbers
-//  The materials that are not supported by NIKE3D have material
-//  numbers >= 100.
-//
-
-enum FE_Material_Type {
-	FE_NEOHOOKEAN				= 1,
-	FE_MOONEY_RIVLIN			= 15,
-	FE_TISO_MOONEY_RIVLIN		= 18,
-	FE_RIGID					= 20,
-	FE_OGDEN_MATERIAL			= 63,
-	FE_LINEAR_ELASTIC			= 100,
-	FE_STVENANT_KIRCHHOFF		= 101,
-	FE_INCOMP_NEOHOOKEAN		= 102,
-	FE_PORO_ELASTIC				= 103,
-	FE_LINEAR_ORTHOTROPIC		= 104,
-	FE_VERONDA_WESTMANN			= 115,
-	FE_TISO_VERONDA_WESTMANN    = 118,
-	FE_TC_NONLINEAR_ORTHOTROPIC = 215,
-	FE_MUSCLE_MATERIAL			= 300,
-	FE_TENDON_MATERIAL			= 301,
-	FE_TISO2D_MOONEY_RIVLIN		= 315,
-	FE_RAND_FIBER_MATERIAL		= 316,
-	FE_RAND_FIBER_NEOHOOKEAN	= 318,
-	FE_VISCO_ELASTIC			= 415,
-	FE_NEOHOOKEAN_TRANSISO		= 501		// material added by Shawn Reese
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // ENUM: Fiber distribution generation functions
 //  Each element can be associated with a fiber direction which is generated
 //  from a generator

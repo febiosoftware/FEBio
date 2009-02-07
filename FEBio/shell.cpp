@@ -152,7 +152,7 @@ void FESolver::ElementStiffness(FEShellElement& el, matrix& ke)
 
 	// see if this is a poroelastic material
 	bool bporo = false;
-	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (pm->Type() == FE_PORO_ELASTIC)) bporo = true;
+	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 	// calculate element stiffness matrix
 	ke.zero();

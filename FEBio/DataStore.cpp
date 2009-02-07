@@ -359,8 +359,8 @@ double RigidBodyDataRecord::Evaluate(int item, const char* szexpr)
 	int ierr;
 	if ((nrb >= 0) && (nrb < fem.Materials()))
 	{
-		FEMaterial* pm = fem.GetMaterial(nrb);
-		if (pm->Type() == FE_RIGID)
+		FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(nrb));
+		if (pm)
 		{
 			// find the rigid body that has this material
 			for (int i=0; i<fem.m_nrb; ++i)
@@ -396,8 +396,8 @@ void RigidBodyDataRecord::SelectAllItems()
 	int n = 0, i;
 	for (i=0; i<m_pfem->Materials(); ++i)
 	{
-		FEMaterial* pm = m_pfem->GetMaterial(i);
-		if (pm->Type() == FE_RIGID) ++n;
+		FERigid* pm = dynamic_cast<FERigid*>(m_pfem->GetMaterial(i));
+		if (pm) ++n;
 	}
 
 	if (n > 0)
@@ -406,8 +406,8 @@ void RigidBodyDataRecord::SelectAllItems()
 		n = 0;
 		for (i=0; i<m_pfem->Materials(); ++i)
 		{
-			FEMaterial* pm  = m_pfem->GetMaterial(i);
-			if (pm->Type() == FE_RIGID)
+			FERigid* pm  = dynamic_cast<FERigid*>(m_pfem->GetMaterial(i));
+			if (pm)
 			{
 				m_item[n++] = i+1;
 			}

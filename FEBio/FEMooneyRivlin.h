@@ -17,7 +17,7 @@
 class FEMooneyRivlin : public FEIncompressibleMaterial
 {
 public:
-	FEMooneyRivlin()  : FEIncompressibleMaterial(FE_MOONEY_RIVLIN){}
+	FEMooneyRivlin() {}
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1

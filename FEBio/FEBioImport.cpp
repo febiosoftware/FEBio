@@ -586,7 +586,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 	for (int i=0; i<fem.Materials(); ++i)
 	{
 		FEMaterial* pmat = fem.GetMaterial(i);
-		if (pmat->Type() == FE_PORO_ELASTIC)
+		if (dynamic_cast<FEPoroElastic*>(pmat))
 		{
 			FEPoroElastic* pm = (FEPoroElastic*) pmat;
 			int nsolid = pm->m_nSolidMat;
@@ -609,7 +609,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 			pm->m_psmat = pme;
 		}
 
-		if (pmat->Type() == FE_VISCO_ELASTIC)
+		if (dynamic_cast<FEViscoElasticMaterial*>(pmat))
 		{
 			FEViscoElasticMaterial* pm = (FEViscoElasticMaterial*)(pmat);
 			int nsolid = pm->m_nSolidMat;

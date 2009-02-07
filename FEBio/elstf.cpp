@@ -46,7 +46,7 @@ bool FESolver::StiffnessMatrix()
 			FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
 
 			// skip rigid elements and poro-elastic elements
-			if (pmat->Type() != FE_PORO_ELASTIC)
+			if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
 			{
 				// create the element's stiffness matrix
 				ndof = 3*el.Nodes();
@@ -62,7 +62,7 @@ bool FESolver::StiffnessMatrix()
 				// assemble element matrix in global stiffness matrix
 				AssembleStiffness(el.m_node, el.LM(), ke);
 			}
-			else if (pmat->Type() == FE_PORO_ELASTIC)
+			else if (dynamic_cast<FEPoroElastic*>(pmat))
 			{
 				// allocate stiffness matrix
 				ndof = el.Nodes()*4;
@@ -112,7 +112,7 @@ bool FESolver::StiffnessMatrix()
 			FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
 
 			// skip rigid elements and poro-elastic elements
-			if (pmat->Type() != FE_PORO_ELASTIC)
+			if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
 			{
 				// create the element's stiffness matrix
 				ndof = 6*el.Nodes();
@@ -124,7 +124,7 @@ bool FESolver::StiffnessMatrix()
 				// assemble element matrix in global stiffness matrix
 				AssembleStiffness(el.m_node, el.LM(), ke);
 			}
-			else if (pmat->Type() == FE_PORO_ELASTIC)
+			else if (dynamic_cast<FEPoroElastic*>(pmat))
 			{
 				// TODO: implement poro-elasticity for shells
 			}		
@@ -662,7 +662,7 @@ bool FESolver::Residual(vector<double>& R)
 		}
 
 		// do poro-elastic forces
-		if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO)&&(pm->Type() == FE_PORO_ELASTIC))
+		if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO)&&(dynamic_cast<FEPoroElastic*>(pm)))
 		{
 			// calculate fluid internal work
 			InternalFluidWork(el, fe);
@@ -984,7 +984,7 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 
 	// see if this is a poroelastic material
 	bool bporo = false;
-	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (pmat->Type() == FE_PORO_ELASTIC)) bporo = true;
+	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
 
 	double *Grn, *Gsn, *Gtn;
 	double Gr, Gs, Gt;

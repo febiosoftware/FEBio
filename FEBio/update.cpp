@@ -346,7 +346,7 @@ void FEM::UpdateStresses()
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;
-			if ((m_pStep->m_itype == FE_STATIC_PORO) && (pm->Type() == FE_PORO_ELASTIC)) bporo = true;
+			if ((m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 			// see if the material is incompressible or not
 			// if the material is incompressible the element
@@ -445,7 +445,7 @@ void FEM::UpdateStresses()
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;
-			if ((m_pStep->m_itype == FE_STATIC_PORO) && (pm->Type() == FE_PORO_ELASTIC)) bporo = true;
+			if ((m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 			// see if the material is incompressible or not
 			// if the material is incompressible the element

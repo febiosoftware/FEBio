@@ -20,7 +20,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEOgdenMaterial::FEOgdenMaterial() : FEIncompressibleMaterial(FE_OGDEN_MATERIAL)
+FEOgdenMaterial::FEOgdenMaterial()
 {
 	for (int i=0; i<MAX_TERMS; ++i)
 	{

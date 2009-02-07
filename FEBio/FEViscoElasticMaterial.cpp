@@ -22,7 +22,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEViscoElasticMaterial::FEViscoElasticMaterial() : FEMaterial(FE_VISCO_ELASTIC)
+FEViscoElasticMaterial::FEViscoElasticMaterial()
 {
 	m_pemat = 0;
 	m_g0 = 1;

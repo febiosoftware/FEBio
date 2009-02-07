@@ -17,7 +17,7 @@
 class FELinearElastic : public FEElasticMaterial
 {
 public:
-	FELinearElastic() : FEElasticMaterial(FE_LINEAR_ELASTIC) {}
+	FELinearElastic() {}
 
 public:
 	double	m_E;	//!< Young's modulus

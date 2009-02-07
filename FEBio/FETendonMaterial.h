@@ -21,7 +21,7 @@
 class FETendonMaterial : public FETransverselyIsotropic
 {
 public:
-	FETendonMaterial () : FETransverselyIsotropic(FE_TENDON_MATERIAL) {}
+	FETendonMaterial () {}
 
 public:
 	// transverse constants

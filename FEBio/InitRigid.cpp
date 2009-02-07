@@ -33,8 +33,7 @@ bool FEM::InitRigidBodies()
 	n = 0;
 	for (i=0; i<Materials(); ++i)
 	{
-		FEMaterial* pm = GetMaterial(i);
-		if (pm->Type() == FE_RIGID) mrb[i] = n++;
+		if (dynamic_cast<FERigid*>(GetMaterial(i))) mrb[i] = n++;
 		else mrb[i] = -1;
 	}
 
@@ -43,8 +42,8 @@ bool FEM::InitRigidBodies()
 	for (i=0; i<m_mesh.SolidElements(); ++i)
 	{
 		FESolidElement& el = m_mesh.SolidElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() == FE_RIGID)
+		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
+		if (pm)
 		{
 			el.m_nrigid = el.GetMatID();
 			for (j=0; j<el.Nodes(); ++j)
@@ -59,8 +58,8 @@ bool FEM::InitRigidBodies()
 	for (i=0; i<m_mesh.ShellElements(); ++i)
 	{
 		FEShellElement& el = m_mesh.ShellElement(i);
-		FEMaterial* pm = GetMaterial(el.GetMatID());
-		if (pm->Type() == FE_RIGID)
+		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
+		if (pm)
 		{
 			el.m_nrigid = el.GetMatID();
 			for (j=0; j<el.Nodes(); ++j)

@@ -20,7 +20,7 @@
 class FETransIsoVerondaWestmann : public FETransverselyIsotropic
 {
 public:
-	FETransIsoVerondaWestmann () : FETransverselyIsotropic(FE_TISO_VERONDA_WESTMANN) {}
+	FETransIsoVerondaWestmann () {}
 
 public:
 	double	c1;	//!< Veronda-Westmann coefficient C1

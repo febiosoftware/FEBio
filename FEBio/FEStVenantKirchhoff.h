@@ -20,7 +20,7 @@
 class FEStVenantKirchhoff : public FEElasticMaterial
 {
 public:
-	FEStVenantKirchhoff()  : FEElasticMaterial(FE_STVENANT_KIRCHHOFF) {}
+	FEStVenantKirchhoff() {}
 
 public:
 	double	m_E;	//!< Young's modulus

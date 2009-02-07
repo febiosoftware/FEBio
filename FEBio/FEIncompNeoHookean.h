@@ -17,7 +17,7 @@
 class FEIncompNeoHookean : public FEIncompressibleMaterial
 {
 public:
-	FEIncompNeoHookean() : FEIncompressibleMaterial(FE_INCOMP_NEOHOOKEAN) {}
+	FEIncompNeoHookean() {}
 
 public:
 	double	m_G;	//!< Shear modulus

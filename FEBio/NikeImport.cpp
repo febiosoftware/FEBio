@@ -244,7 +244,7 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 		// check material type
 		switch (mat)
 		{
-		case FE_NEOHOOKEAN:	// NIKE material 1, at least I think
+		case 1:	// Currently mapped to a neo-Hookean
 			{
 				double E, v;
 				FENeoHookean* pmat = new FENeoHookean;
@@ -259,7 +259,7 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 			}
 			break;
 
-		case FE_MOONEY_RIVLIN: // NIKE material 15
+		case 15: // Mooney-Rivlin
 			{
 				FEMooneyRivlin* pmat = new FEMooneyRivlin;
 				pmat->SetName(szname);
@@ -279,7 +279,7 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 			}
 			break;
 
-		case FE_TISO_MOONEY_RIVLIN: // NIKE material 18
+		case 18: // Transversely Isotropic Mooney-Rivlin
 			{
 				FETransIsoMooneyRivlin* pmat = new FETransIsoMooneyRivlin;
 				pmat->SetName(szname);
@@ -361,7 +361,7 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 			}
 			break;
 
-		case FE_RIGID: // NIKE material 20
+		case 20: // Rigid body
 			{
 				double E, v;
 				FERigid* pmat = new FERigid;
@@ -522,7 +522,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		el.SetMatID(n[8] - 1);
 
 		// determine whether this element is rigid
-		if (fem.GetMaterial(el.GetMatID())->Type() == FE_RIGID) el.m_nrigid = 0;
+		FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(el.GetMatID()));
+		if (pm) el.m_nrigid = 0;
 	}
 
 	//////////////////////////// S H E L L   E L E M E N T   D E C K ////////////////////////////
@@ -591,7 +592,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 		nread = sscanf(szline, "%5d%8d%8d%8d%8d", &rb, rn,rn+1,rn+2,rn+3);
 
-		if (fem.GetMaterial(rb-1)->Type() != FE_RIGID)
+		if (dynamic_cast<FERigid*>(fem.GetMaterial(rb-1)) == 0)
 		{
 			return errf(szerr[ERR_RB], rb);
 		}

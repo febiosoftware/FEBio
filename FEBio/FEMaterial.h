@@ -43,7 +43,7 @@ protected:
 class FEMaterial  
 {
 public:
-	FEMaterial(int ntype) { m_ntype = ntype; m_szname[0] = 0; }
+	FEMaterial() { m_szname[0] = 0; }
 	virtual ~FEMaterial() {}
 
 	//! calculate stress at material point
@@ -51,9 +51,6 @@ public:
 
 	//! calculate tangent stiffness at material point
 	virtual void Tangent(double D[6][6], FEMaterialPoint& pt) = 0;
-
-	//! return the material type
-	int Type() { return m_ntype; }
 
 	//! set/get material name
 	void SetName(const char* sz) { strcpy(m_szname, sz); }
@@ -80,8 +77,6 @@ public:
 	virtual const char* GetTypeString();
 
 protected:
-	int		m_ntype;		//!< material type
-
 	char	m_szname[64];	//!< name of material
 };
 
@@ -91,7 +86,7 @@ protected:
 class FEElasticMaterial : public FEMaterial
 {
 public:
-	FEElasticMaterial(int ntype) : FEMaterial(ntype) { m_density = 1; m_pmap = 0;}
+	FEElasticMaterial() { m_density = 1; m_pmap = 0;}
 	~FEElasticMaterial(){ if(m_pmap) delete m_pmap; }
 
 	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }
@@ -123,7 +118,7 @@ class FEIncompressibleMaterial : public FEElasticMaterial
 public:
 	//! constructor
 	/*! \param ntype the unique material ID */
-	FEIncompressibleMaterial(int ntype) : FEElasticMaterial(ntype) { m_blaugon = false; m_atol = 0.01; }
+	FEIncompressibleMaterial() { m_blaugon = false; m_atol = 0.01; }
 
 	// dilatational component U and derivs
 	// use these to obtain similar results than NIKE3D
@@ -173,7 +168,7 @@ class FETransverselyIsotropic : public FEIncompressibleMaterial
 {
 public:
 	//! constructor
-	FETransverselyIsotropic(int ntype) : FEIncompressibleMaterial(ntype)
+	FETransverselyIsotropic()
 	{ 
 		m_plc = 0;
 		lcna = -1;

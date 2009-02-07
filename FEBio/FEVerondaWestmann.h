@@ -17,7 +17,7 @@
 class FEVerondaWestmann : public FEIncompressibleMaterial
 {
 public:
-	FEVerondaWestmann() : FEIncompressibleMaterial(FE_VERONDA_WESTMANN){}
+	FEVerondaWestmann() {}
 
 public:
 	double	c1;	//!< Veronda-Westmann coefficient C1;

@@ -21,7 +21,7 @@
 class FETCNonlinearOrthotropic : public FEIncompressibleMaterial
 {
 public:
-	FETCNonlinearOrthotropic() : FEIncompressibleMaterial(FE_TC_NONLINEAR_ORTHOTROPIC) {}
+	FETCNonlinearOrthotropic() {}
 
 public:
 	//! calculate stress at material point

@@ -31,7 +31,7 @@ END_PARAMETER_LIST();
 // FERandomFiberMaterial
 //////////////////////////////////////////////////////////////////////
 
-FERandomFiberMaterial::FERandomFiberMaterial() : FEIncompressibleMaterial(FE_RAND_FIBER_MATERIAL)
+FERandomFiberMaterial::FERandomFiberMaterial()
 {
 	static bool bfirst = true;
 

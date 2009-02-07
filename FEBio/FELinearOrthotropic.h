@@ -9,7 +9,7 @@ public:
 	double	G12, G23, G31;	// Shear moduli
 
 public:
-	FELinearOrthotropic() : FEElasticMaterial(FE_LINEAR_ORTHOTROPIC){}
+	FELinearOrthotropic() {}
 
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);

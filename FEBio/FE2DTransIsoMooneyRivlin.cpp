@@ -17,7 +17,7 @@ double FE2DTransIsoMooneyRivlin::m_sth[FE2DTransIsoMooneyRivlin::NSTEPS];
 // FE2DTransIsoMooneyRivlin
 //////////////////////////////////////////////////////////////////////
 
-FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin() : FETransverselyIsotropic(FE_TISO2D_MOONEY_RIVLIN)
+FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin()
 {
 	static bool bfirst = true;
 
