@@ -1,6 +1,7 @@
 // restart module
 #include "stdafx.h"
 #include "fem.h"
+#include "FERigid.h"
 #include "FERestartImport.h"
 
 //-----------------------------------------------------------------------------

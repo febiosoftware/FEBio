@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "FESolver.h"
+#include "FEPoroElastic.h"
+#include "FEViscoElasticMaterial.h"
 #include <math.h>
 
 //-----------------------------------------------------------------------------

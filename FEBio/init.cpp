@@ -1,11 +1,14 @@
 #include "stdafx.h"
-#include "fem.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#include "fem.h"
 #include "FEException.h"
 #include "FENodeReorder.h"
+#include "FEPoroElastic.h"
+#include "FEViscoElasticMaterial.h"
+#include "FERigid.h"
 
 // Forward declarations
 void Hello(FILE* fp);

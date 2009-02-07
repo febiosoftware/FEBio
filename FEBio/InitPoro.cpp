@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "fem.h"
+#include "FEPoroElastic.h"
 
 //-----------------------------------------------------------------------------
 //! Initialize poro-elastic data

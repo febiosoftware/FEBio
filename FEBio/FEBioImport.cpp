@@ -4,6 +4,9 @@
 
 #include "stdafx.h"
 #include "FEBioImport.h"
+#include "FEPoroElastic.h"
+#include "FEViscoElasticMaterial.h"
+#include "FERigid.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////

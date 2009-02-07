@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "DataStore.h"
 #include "fem.h"
+#include "FERigid.h"
 
 //////////////////////////////////////////////////////////////////////
 // DataStore

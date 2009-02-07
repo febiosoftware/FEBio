@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "FESolver.h"
 #include <math.h>
+#include "FESolver.h"
+#include "FERigid.h"
 #include "stack.h"
 
 #ifdef WIN32

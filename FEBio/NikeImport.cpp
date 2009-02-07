@@ -7,6 +7,7 @@
 #include "FENeoHookean.h"
 #include "FEMooneyRivlin.h"
 #include "FETransIsoMooneyRivlin.h"
+#include "FERigid.h"
 
 #include <string.h>
 #include <stdlib.h>
