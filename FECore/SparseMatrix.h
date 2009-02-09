@@ -20,7 +20,7 @@
 //! This is the base class for the sparse matrix classes and defines the interface
 //! to the different matrix classes
 
-class SparseMatrix  
+class SparseMatrix
 {
 public:
 	SparseMatrix();
@@ -44,7 +44,7 @@ public:
 	}
 
 	void zero() { memset(m_pd, 0, m_nsize*sizeof(double)); };
-	
+
 	int NonZeroes() { return m_nsize; };
 	int Size() { return m_ndim; }
 
@@ -156,7 +156,7 @@ protected:
 class CompactMatrix : public SparseMatrix
 {
 public:
-	CompactMatrix();
+	CompactMatrix(bool offset = false);
 	virtual ~CompactMatrix();
 
 	void Clear()
@@ -170,6 +170,8 @@ public:
 
 	void add(int i, int j, double v)
 	{
+		int k;
+
 		// only add to lower triangular part
 		// since FEBio only works with the upper triangular part
 		// we have to swap the indices
@@ -178,11 +180,14 @@ public:
 		if (i<=j)
 		{
 			int* pi = m_pindices + m_ppointers[j];
+			if (m_boffset) pi -= 1;
 			int l = m_ppointers[j+1] - m_ppointers[j];
-			for (int n=0; n<l; ++n) 
-				if (pi[n] == i) 
+			for (int n=0; n<l; ++n)
+				if (pi[n] == i + m_boffset)
 				{
-					m_pd[m_ppointers[j] + n] += v;
+					k = m_ppointers[j] + n;
+					if (m_boffset) k -= 1;
+					m_pd[k] += v;
 					return;
 				}
 
@@ -192,6 +197,8 @@ public:
 
 	void set(int i, int j, double v)
 	{
+		int k;
+
 		// only add to lower triangular part
 		// since FEBio only works with the upper triangular part
 		// we have to swap the indices
@@ -200,11 +207,14 @@ public:
 		if (i<=j)
 		{
 			int* pi = m_pindices + m_ppointers[j];
+			if (m_boffset) pi -= 1;
 			int l = m_ppointers[j+1] - m_ppointers[j];
-			for (int n=0; n<l; ++n) 
-				if (pi[n] == i) 
+			for (int n=0; n<l; ++n)
+				if (pi[n] == i + m_boffset)
 				{
-					m_pd[m_ppointers[j] + n] = v;
+					k = m_ppointers[j] + n;
+					if (m_boffset) k -= 1;
+					m_pd[k] = v;
 					return;
 				}
 
@@ -224,10 +234,12 @@ public:
 	double* values  () { return m_pd;   }
 	int*    indices () { return m_pindices;  }
 	int*    pointers() { return m_ppointers; }
+	bool    offset  () { return m_boffset; }
 
 protected:
 	int*	m_pindices;
 	int*	m_ppointers;
+	bool	m_boffset; // adjust array indices for fortran arrays
 };
 
 //-----------------------------------------------------------------------------
@@ -254,9 +266,9 @@ public:
 	{
 		int* pi = m_pind + m_pcol[j];
 		int l = m_pcol[j+1] - m_pcol[j];
-		for (int n=0; n<l; ++n) 
+		for (int n=0; n<l; ++n)
 		{
-			if (pi[n] == i) 
+			if (pi[n] == i)
 			{
 				m_pd[ m_pcol[j] + n ] += v;
 				return;
@@ -269,9 +281,9 @@ public:
 	{
 		int* pi = m_pind + m_pcol[j];
 		int l = m_pcol[j+1] - m_pcol[j];
-		for (int n=0; n<l; ++n) 
+		for (int n=0; n<l; ++n)
 		{
-			if (pi[n] == i) 
+			if (pi[n] == i)
 			{
 				m_pd[ m_pcol[j] + n ] = v;
 				return;
@@ -284,9 +296,9 @@ public:
 	{
 		int* pi = m_pind + m_pcol[i];
 		int l = m_pcol[i+1] - m_pcol[i];
-		for (int n=0; n<l; ++n) 
+		for (int n=0; n<l; ++n)
 		{
-			if (pi[n] == i) 
+			if (pi[n] == i)
 			{
 				return m_pd[ m_pcol[i] + n ];
 			}

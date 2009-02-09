@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "MatrixFactory.h"
 
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -21,11 +22,11 @@ MatrixFactory::~MatrixFactory()
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : MatrixFactory::CreateMatrix
-// This function allocates the initial storage for the spare matrix A. RTTI is 
+// This function allocates the initial storage for the spare matrix A. RTTI is
 // used the resolve the exact type of A. Based in its type the corresponding
 // creation routine is invoked.
 // The LM parameter contains for each element the global equation numbers for the
-// element's degrees of freedom. 'neq' is the number of equations. 
+// element's degrees of freedom. 'neq' is the number of equations.
 //
 
 bool MatrixFactory::CreateMatrix(SparseMatrix* pA, vector< vector<int> >& LM, int neq)
@@ -40,18 +41,18 @@ bool MatrixFactory::CreateMatrix(SparseMatrix* pA, vector< vector<int> >& LM, in
 	else if (pCompact   = dynamic_cast<CompactMatrix*      > (pA)) return CreateCompact      (pCompact  , LM, neq);
 	else if (pCompactUS = dynamic_cast<CompactUnSymmMatrix*> (pA)) return CreateCompactUnSymm(pCompactUS, LM, neq);
 	else if (pFull      = dynamic_cast<FullMatrix*         > (pA)) return CreateFull         (pFull     , LM, neq);
-	
+
 	// If we get here that means the matrix pA is not of a known type.
 	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : MatrixFactory::CreateMatrix
-// This function allocates the initial storage for the spare matrix A. RTTI is 
+// This function allocates the initial storage for the spare matrix A. RTTI is
 // used the resolve the exact type of A. Based in its type the corresponding
 // creation routine is invoked.
 // The LM parameter contains for each element the global equation numbers for the
-// element's degrees of freedom. 'neq' is the number of equations. 
+// element's degrees of freedom. 'neq' is the number of equations.
 //
 
 bool MatrixFactory::CreateMatrix(SparseMatrix* pA, MatrixProfile& mp)
@@ -66,7 +67,7 @@ bool MatrixFactory::CreateMatrix(SparseMatrix* pA, MatrixProfile& mp)
 	else if (pCompact   = dynamic_cast<CompactMatrix*      > (pA)) return CreateCompact      (pCompact  , mp);
 	else if (pCompactUS = dynamic_cast<CompactUnSymmMatrix*> (pA)) return CreateCompactUnSymm(pCompactUS, mp);
 	else if (pFull      = dynamic_cast<FullMatrix*         > (pA)) return CreateFull         (pFull     , mp);
-	
+
 	// If we get here that means the matrix pA is not of a known type.
 	return false;
 }
@@ -111,7 +112,7 @@ bool MatrixFactory::CreateSkyline(SkylineMatrix* pA, vector< vector<int> >& LM, 
 	{
 		lm = LM[i];
 		N = LM[i].size();
-	
+
 		for (j=0; j<N; ++j)
 			if (lm[j] >= 0)
 			{
@@ -157,7 +158,7 @@ bool MatrixFactory::CreateSkyline(SkylineMatrix* pA, MatrixProfile& mp)
 
 	// allocate stiffness matrix
 	double* values = new double[pointers[neq]];
-	if (values==0) 
+	if (values==0)
 	{
 		double falloc = (double) sizeof(double) * (double) (pointers[neq]);
 		throw MemException(falloc);
@@ -176,6 +177,9 @@ bool MatrixFactory::CreateSkyline(SkylineMatrix* pA, MatrixProfile& mp)
 
 bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, int neq)
 {
+/*	This function has been replaced by the MatrixProfile format
+
+
 	int i, j, k, iel, n, *lm, N, Ntot = 0;
 
 	int M = LM.size();
@@ -193,7 +197,7 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, 
 		Ntot += N;
 		for (j=0; j<N; ++j)
 		{
-			if (lm[j] >= 0) pval[lm[j]]++; 
+			if (lm[j] >= 0) pval[lm[j]]++;
 		}
 	}
 
@@ -229,7 +233,7 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, 
 	int* pointers = new int[neq + 1];
 	if (pointers == 0) throw MemException(sizeof(int)*(neq+1));
 
-	pointers[0] = 0;	
+	pointers[0] = 0;
 
 	// loop over all columns, flaggin which row items are used
 	// keeping track of the total count as well
@@ -242,7 +246,7 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, 
 		// zero column
 		for (j=i; j<neq; ++j) pcol[j] = 0;
 		n = 0;
-	
+
 		// loop over all elements in the plec
 		for (j=0; j<pval[i]; ++j)
 		{
@@ -305,7 +309,10 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, 
 	pA->Create(neq, nsize, pvalues, pindices, pointers);
 
 	return true;
+*/
+
 }
+
 
 bool MatrixFactory::CreateCompact(CompactMatrix* pA, MatrixProfile& mp)
 {
@@ -346,7 +353,7 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, MatrixProfile& mp)
 		n = a.size();
 		for (j=0; j<n; j += 2)
 		{
-			for (k=a[j]; k<=a[j+1]; ++k) 
+			for (k=a[j]; k<=a[j+1]; ++k)
 			{
 				pindices[ pointers[k] + pval[k]] = i;
 				++pval[k];
@@ -356,6 +363,13 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, MatrixProfile& mp)
 
 	// cleanup
 	delete [] pval;
+
+	// offset the indicies for fortran arrays
+	if(pA->offset())
+	{
+		for (i=0; i<=neq; ++i) pointers[i]++;
+		for (i=0; i<nsize; ++i) pindices[i]++;
+	}
 
 	// create the values array
 	double* pvalues = new double[nsize];
@@ -392,9 +406,9 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 		Ntot += N;
 		for (j=0; j<N; ++j)
 		{
-			if (pn[j] >= 0) pval[pn[j]]++; 
+			if (pn[j] >= 0) pval[pn[j]]++;
 		}
-	} 
+	}
 
 	// create a "compact" 2D array that stores for each column the element
 	// numbers that contribute to that column
@@ -428,7 +442,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 	int* pointers = new int[neq + 1];
 	if (pointers==0) throw MemException(sizeof(int)*(neq+1));
 
-	pointers[0] = 0;	
+	pointers[0] = 0;
 
 	// loop over all columns, flaggin which row items are used
 	// keeping track of the total count as well
@@ -441,7 +455,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 		// zero column
 		for (j=0; j<neq; ++j) pcol[j] = 0;
 		n = 0;
-	
+
 		// loop over all elements in the plec
 		for (j=0; j<pval[i]; ++j)
 		{
@@ -474,7 +488,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 
 		n = 0;
 		pi = pindices + pointers[i];
-	
+
 		// loop over all elements in the plec
 		for (j=0; j<pval[i]; ++j)
 		{
@@ -547,7 +561,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, MatrixProfile& 
 		n = a.size();
 		for (j=0; j<n; j += 2)
 		{
-			for (k=a[j]; k<=a[j+1]; ++k) 
+			for (k=a[j]; k<=a[j+1]; ++k)
 			{
 				pindices[ pointers[i] + pval[i]] = k;
 				++pval[i];
@@ -555,7 +569,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, MatrixProfile& 
 		}
 		for (j=0; j<n; j += 2)
 		{
-			for (k=a[j]; k<=a[j+1]; ++k) 
+			for (k=a[j]; k<=a[j+1]; ++k)
 			{
 				if (k != i)
 				{
@@ -741,6 +755,7 @@ void MatrixFactory::AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& L
 	int* indices = K.indices();
 	int* pointers = K.pointers();
 	double* pd = K.values();
+	int offset = K.offset();
 
 	int *pi, l, n;
 
@@ -753,13 +768,13 @@ void MatrixFactory::AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& L
 			J = LM[j];
 
 			// only add values to lower-diagonal part of stiffness matrix
-			if ((I>=J) && (J>=0)) 
+			if ((I>=J) && (J>=0))
 			{
-				pi = indices + pointers[J];
+				pi = indices + pointers[J] - offset;
 				l = pointers[J+1] - pointers[J];
-				for (n=0; n<l; ++n) if (pi[n] == I) 
+				for (n=0; n<l; ++n) if (pi[n] == I + offset)
 				{
-					pd[pointers[J] + n] += ke[i][j];
+					pd[pointers[J] + n - offset] += ke[i][j];
 					break;
 				}
 			}
@@ -789,11 +804,11 @@ void MatrixFactory::AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& L
 			J = LMj[j];
 
 			// only add values to lower-diagonal part of stiffness matrix
-			if ((I>=J) && (J>=0)) 
+			if ((I>=J) && (J>=0))
 			{
 				pi = indices + pointers[J];
 				l = pointers[J+1] - pointers[J];
-				for (n=0; n<l; ++n) if (pi[n] == I) 
+				for (n=0; n<l; ++n) if (pi[n] == I)
 				{
 					pd[pointers[J] + n] += ke[i][j];
 					break;

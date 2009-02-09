@@ -112,7 +112,7 @@ bool LUSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 		ip = indx[i];
 		sum = x[ip];
 		x[ip] = x[i];
-		if (ii != 0) 
+		if (ii != 0)
 			for (j=ii-1;j<i;++j) sum -= a(i,j)*x[j];
 		else if (sum != 0)
 			ii = i+1;
@@ -170,6 +170,18 @@ bool SkylineSolver::Factor(SparseMatrix& K)
 		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n");
 		return false;
 	}
+#ifdef DEBUG
+	int i, n;
+	int* pointers;
+	double* values;
+
+	n = pK->Size();
+	pointers = pK->pointers();
+	values = pK->values();
+
+	printf("\nPointers, Values");
+	for (i=0; i<n; i++) printf("\n%d, %g", pointers[i], values[i]);
+#endif
 
 	colsol_factor(pK->Size(), pK->values(), pK->pointers());
 
@@ -274,6 +286,24 @@ bool PSLDLTSolver::Factor(SparseMatrix& K)
 		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");
 		return false;
 	}
+
+#ifdef DEBUG
+	printf("\nThis is a test");
+
+	int i, n, nnz, *pointers, *indices;
+	double* values;
+
+	fflush(stdout);
+	n = pK->Size();
+	nnz = pK->NonZeroes();
+	pointers = pK->pointers();
+	indices = pK->indices();
+	values = pK->values();
+	fprintf(stdout, "\nPointers:");
+	for (i=0; i<n; i++) fprintf(stdout, "\n%d", pointers[i]);
+	fprintf(stdout, "\nIndices, Values:");
+	for (i=0; i<nnz; i++) fprintf(stdout, "\n%d, %g", indices[i], values[i]);
+#endif
 
 	// Do the factorization
 	PSLDLT_Factor(0, pK->Size(), pK->pointers(), pK->indices(), pK->values());
@@ -430,7 +460,7 @@ bool ConjGradIterSolver::Factor(SparseMatrix& K)
 	// store the diagonal elements in P
 	for (j=0; j<neq; ++j) m_P[j] = 1.0 / pv[pr[j]];
 
-	for (j=0; j<neq; ++j) 
+	for (j=0; j<neq; ++j)
 	{
 		// get the number of entries on the column
 		l = pr[j+1]-pr[j];
@@ -470,7 +500,7 @@ bool ConjGradIterSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double
 	vector<double> r(N);
 	A.mult_vector(x, r);
 	for (i=0; i<N; ++i) r[i] = b[i] - r[i];
-	
+
 	// initial norms
 	double rho1 = r*r, rho2;
 	double normb = 0;
@@ -494,7 +524,7 @@ bool ConjGradIterSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double
 		++k;
 
 		// calculate search direction
-		if (k==1) 
+		if (k==1)
 		{
 			p = r;
 		}
