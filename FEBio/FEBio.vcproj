@@ -358,6 +358,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPoroHolmesMow.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FERandomFiberMaterial.cpp"
 				>
 			</File>
@@ -749,6 +753,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPoroElastic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPoroHolmesMow.h"
 				>
 			</File>
 			<File

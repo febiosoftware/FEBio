@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FECore", "FECore\FECore.vcp
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FEBioInstaller", "FEBioInstaller\FEBioInstaller.vdproj", "{964358CC-0F33-42CE-BFCA-F9213F982292}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F158C65-5794-4156-8DF2-7FE96DDAF386}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
