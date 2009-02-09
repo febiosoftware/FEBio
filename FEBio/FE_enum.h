@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // ENUM: Element types
 //  Note that these numbers are actually indices into the m_Traits array
-//  of the ElementLibrary class so make sure the numbers correspond 
+//  of the ElementLibrary class so make sure the numbers correspond
 //  with the entries into this array
 //
 
@@ -55,6 +55,7 @@ enum FE_Linear_Solver_Type {
 	PSLDLT_SOLVER,		// use only where available
 	SUPERLU_SOLVER,		// use only where available
 	SUPERLU_MT_SOLVER,	// use only where available
+	PARDISO_SOLVER, 	// use only where available
 	LU_SOLVER,
 	WSMP_SOLVER,			// use only where available
 	CG_ITERATIVE_SOLVER
@@ -62,7 +63,7 @@ enum FE_Linear_Solver_Type {
 
 ///////////////////////////////////////////////////////////////////////////////
 // ENUM: Analysis types
-//  Types of analysis that can be performed with FEBio. 
+//  Types of analysis that can be performed with FEBio.
 //
 
 enum FE_Analysis_Type {

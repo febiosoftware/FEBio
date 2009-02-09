@@ -22,6 +22,7 @@ bool FESolver::Init()
 		case PSLDLT_SOLVER : m_psolver = new PSLDLTSolver (); break;
 		case SUPERLU_SOLVER: m_psolver = new SuperLUSolver(); break;
 		case SUPERLU_MT_SOLVER: m_psolver = new SuperLU_MT_Solver(); break;
+		case PARDISO_SOLVER: m_psolver = new PardisoSolver(); break;
 		case LU_SOLVER     : m_psolver = new LUSolver(); break;
 		case WSMP_SOLVER   : m_psolver = new WSMPSolver(); break;
 		case CG_ITERATIVE_SOLVER : m_psolver = new ConjGradIterSolver(); break;
@@ -88,7 +89,7 @@ bool FESolver::Init()
 
 	// set the create stiffness matrix flag
 	m_breshape = true;
-	
+
 	// output some information about the direct linear solver
 	m_log.printf(" LINEAR EQUATION SOLVER DATA\n");
 	m_log.printf("===========================================================================\n");
@@ -97,6 +98,7 @@ bool FESolver::Init()
 	if (m_fem.m_nsolver == PSLDLT_SOLVER      ) m_log.printf("PSLDLT\n");
 	if (m_fem.m_nsolver == SUPERLU_SOLVER     ) m_log.printf("SuperLU\n");
 	if (m_fem.m_nsolver == SUPERLU_MT_SOLVER  ) m_log.printf("SuperLU_MT\n");
+	if (m_fem.m_nsolver == PARDISO_SOLVER  ) m_log.printf("Pardiso\n");
 	if (m_fem.m_nsolver == LU_SOLVER          ) m_log.printf("LUSolver\n");
 	if (m_fem.m_nsolver == CG_ITERATIVE_SOLVER) m_log.printf("Conjugate gradient\n");
 	m_log.printf("\tNr of equations ........................... : %d\n", neq);

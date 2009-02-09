@@ -15,12 +15,13 @@
 #include "Timer.h"
 #include "FEException.h"
 #include "Interrupt.h"
+#include "FECore/PardisoSolver.h"
 
 //-----------------------------------------------------------------------------
 //! The solver class.
 
 //! This class is responsible for solving a single time step in the FE
-//! analysis, possibly using results from previous solutions. 
+//! analysis, possibly using results from previous solutions.
 //! In the future this class might become a base-class for different FE solvers.
 //! For instances there could be a different solver for quasi-static, dynamic and
 //! eigenvalue problems.
@@ -28,7 +29,7 @@
 //! the CTRL+C interruptions
 
 
-class FESolver : public Interruptable 
+class FESolver : public Interruptable
 {
 public:
 	//! constructor
@@ -119,7 +120,7 @@ public:
 		//! recalculates the shape of the stiffness matrix
 		bool CreateStiffness(bool breset);
 
-		//! calculate the rigid stiffnes matrices 
+		//! calculate the rigid stiffnes matrices
 		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
 		//! calculates the discrete element stiffness
