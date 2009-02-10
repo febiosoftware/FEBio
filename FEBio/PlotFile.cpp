@@ -287,7 +287,7 @@ bool PlotFile::Write(FEM& fem)
 		{
 		case PLOT_ACCELERATION: write_accelerations(); break;
 		case PLOT_FLUID_FLUX: write_fluid_flux(); break;
-		case PLOT_CONTACT_TRACTION: write_contact_tractions();
+		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
 		default:
 			assert(false);
 		}
