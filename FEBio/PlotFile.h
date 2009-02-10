@@ -66,6 +66,16 @@ protected:
 	};
 
 public:
+	// empty field
+	enum { PLOT_NONE = 0 };
+
+	// scalar fields
+	enum { PLOT_FLUID_PRESSURE=1, PLOT_CONTACT_PRESSURE, PLOT_CONTACT_GAP };
+
+	// vector fields
+	enum { PLOT_DISPLACEMENT=1, PLOT_VELOCITY, PLOT_ACCELERATION, PLOT_FLUID_FLUX, PLOT_CONTACT_TRACTION };
+
+public:
 	//! constructor
 	PlotFile();
 
@@ -84,13 +94,29 @@ public:
 	//! Write current FE state to plot database
 	bool Write(FEM& fem);
 
+protected:
+	// vector fields
+	void write_displacements();
+	void write_velocities();
+	void write_accelerations();
+	void write_fluid_flux();
+	void write_contact_tractions();
+
+	// scalar fields
+	void write_fluid_pressures();
+	void write_contact_pressures();
+	void write_contact_gaps();
+
 public:
-	bool	m_bsstrn;	//!< shell strain flag
+	bool	m_bsstrn;		//!< shell strain flag
+	int		m_nfield[4];	//!< field maps
 
 protected:
 	PLOTHEADER	m_ph;	//!< The plot file header
 
 	Archive	m_ar;		//!< the actual data archive
+
+	FEM*	m_pfem;
 
 };
 

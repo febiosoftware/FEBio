@@ -13,6 +13,10 @@
 PlotFile::PlotFile()
 {
 	m_bsstrn = false;
+	m_nfield[0] = -1;	// displacement
+	m_nfield[1] = -1;	// velocity
+	m_nfield[2] = -1;	// acceleration
+	m_nfield[3] = -1;	// temperature
 }
 
 PlotFile::~PlotFile()
@@ -34,6 +38,31 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 	// open the archive
 	if (m_ar.Create(szfile) == false) return false;
 
+	m_pfem = &fem;
+
+	int itype = fem.m_pStep->m_itype;
+
+	// check the field values
+	if (m_nfield[0] == -1) m_nfield[0] = PLOT_DISPLACEMENT;
+	if (m_nfield[1] == -1)
+	{
+		m_nfield[1] = PLOT_NONE;
+		if ((itype == FE_STATIC_PORO) || (itype == FE_DYNAMIC)) m_nfield[1] = PLOT_VELOCITY;
+	}
+	if (m_nfield[2] == -1)
+	{
+		m_nfield[2] = PLOT_NONE;
+		if (itype == FE_STATIC_PORO) m_nfield[2] = PLOT_FLUID_FLUX;
+		else if (itype == FE_DYNAMIC) m_nfield[2] = PLOT_ACCELERATION;
+		else if (fem.m_bcontact) m_nfield[2] = PLOT_CONTACT_TRACTION;
+	}
+	if (m_nfield[3] == -1)
+	{
+		m_nfield[3] = PLOT_NONE;
+		if (itype == FE_STATIC_PORO) m_nfield[3] = PLOT_FLUID_PRESSURE;
+		else if (fem.m_bcontact) m_nfield[3] = PLOT_CONTACT_GAP;
+	}
+
 	// write the header
 	PLOTHEADER plh = {0};
 
@@ -46,10 +75,10 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 		strcpy(plh.Title, fem.GetTitle());
 
 	plh.neips = 2000;
-	plh.flagA = (fem.m_pStep->m_itype == FE_STATIC_PORO) || (fem.m_pStep->m_itype == FE_DYNAMIC) || (fem.m_bcontact);
-	plh.flagT = ((fem.m_pStep->m_itype == FE_STATIC_PORO) || fem.m_bcontact);
-	plh.flagU = 1;
-	plh.flagV = (fem.m_pStep->m_itype == FE_STATIC_PORO) || (fem.m_pStep->m_itype == FE_DYNAMIC);
+	plh.flagU = (m_nfield[0] == 0? 0 : 1);
+	plh.flagV = (m_nfield[1] == 0? 0 : 1);
+	plh.flagA = (m_nfield[2] == 0? 0 : 1);
+	plh.flagT = (m_nfield[3] == 0? 0 : 1);
 	plh.icode = 6;
 	plh.ndim  = 4;
 	plh.nel2  = 0;
@@ -199,6 +228,8 @@ bool PlotFile::Append(FEM& fem, const char* szfile)
 	// close the file
 	m_ar.Close();
 
+	m_pfem = &fem;
+
 	// reopen the plot file for appending
 	return (m_ar.Append(szfile));
 }
@@ -223,224 +254,55 @@ bool PlotFile::Write(FEM& fem)
 
 	FEMesh& mesh = fem.m_mesh;
 
+	m_pfem = &fem;
+
 	// write the spatial coordinates
 	if (m_ph.flagU)
 	{
-		float xf[3];
-		for (i=0; i<fem.m_mesh.Nodes(); ++i)
+		switch (m_nfield[0])
 		{
-			FENode& node = fem.m_mesh.Node(i);
-
-			// since the PLOT file requires floats we need to convert
-			// the doubles to single precision
-			xf[0] = (float) node.m_rt.x;
-			xf[1] = (float) node.m_rt.y;
-			xf[2] = (float) node.m_rt.z;
-
-			m_ar.write(xf, sizeof(float), 3);
+		case PLOT_DISPLACEMENT: write_displacements(); break;
+		default:
+			assert(false);
 		}
 	}	
 
 	// write the velocities
 	if (m_ph.flagV)
 	{
-		if (fem.m_pStep->m_itype == FE_STATIC_PORO)
+		switch (m_nfield[1])
 		{
-			float vf[3];
-			for (i=0; i<fem.m_mesh.Nodes(); ++i)
-			{
-				FENode& node = fem.m_mesh.Node(i);
-
-				// since the PLOT file requires floats we need to convert
-				// the doubles to single precision
-				vf[0] = (float) node.m_vt.x;
-				vf[1] = (float) node.m_vt.y;
-				vf[2] = (float) node.m_vt.z;
-
-				m_ar.write(vf, sizeof(float), 3);
-			}
-		}
-		else if (fem.m_pStep->m_itype == FE_DYNAMIC)
-		{
-			float vf[3];
-			for (i=0; i<fem.m_mesh.Nodes(); ++i)
-			{
-				FENode& node = fem.m_mesh.Node(i);
-
-				// since the PLOT file requires floats we need to convert
-				// the doubles to single precision
-				vf[0] = (float) node.m_vt.x;
-				vf[1] = (float) node.m_vt.y;
-				vf[2] = (float) node.m_vt.z;
-
-				m_ar.write(vf, sizeof(float), 3);
-			}
+		case PLOT_VELOCITY: write_velocities(); break;
+		case PLOT_FLUID_FLUX: write_fluid_flux(); break;
+		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
+		default:
+			assert(false);
 		}
 	}
-
 
 	// write the accelerations
 	if (m_ph.flagA)
 	{
-		if (fem.m_pStep->m_itype == FE_STATIC_PORO)
+		switch (m_nfield[2])
 		{
-			vector<vec3d> wn(fem.m_mesh.Nodes());
-			vector<int> val(fem.m_mesh.Nodes());
-			for (i=0; i<fem.m_mesh.Nodes(); ++i) val[i] = 0;
-
-			vec3d ew;
-			int n;
-			for (i=0; i<mesh.SolidElements(); ++i)
-			{
-				FESolidElement& el = mesh.SolidElement(i);
-
-				// calculate average flux
-				ew = vec3d(0,0,0);
-				for (j=0; j<el.GaussPoints(); ++j) 
-				{
-					FEMaterialPoint& mp = *el.m_State[j];
-					FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-					ew += pt->m_w;
-				}
-
-				ew /= el.GaussPoints();
-
-				// project to nodes
-				for (j=0; j<el.Nodes(); ++j)
-				{
-					n = el.m_node[j];
-					wn[n] += ew;
-					++val[n];
-				}
-			}
-			for (i=0; i<fem.m_mesh.Nodes(); ++i) if (val[i] != 0) wn[i] /= val[i];
-
-			// output nodal fluxes
-			float af[3];
-			for (i=0; i<fem.m_mesh.Nodes(); ++i)
-			{
-				af[0] = (float) wn[i].x;
-				af[1] = (float) wn[i].y;
-				af[2] = (float) wn[i].z;
-
-				m_ar.write(af, sizeof(float), 3);
-			}
-		}
-		else if (fem.m_bcontact)
-		{
-			vector<float[3]> acc(fem.m_mesh.Nodes());
-			for (i=0; i<fem.m_mesh.Nodes(); ++i) acc[i][0] = acc[i][1] = acc[i][2] = 0;
-			for (i=0; i<fem.m_CI.size(); ++i)
-			{
-				FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (&fem.m_CI[i]);
-				if (psi)
-				{
-					FEContactSurface& ss = psi->m_ss;
-					for (j=0; j<ss.Nodes(); ++j)
-					{
-						int m = ss.node[j];
-						acc[m][0] = (float) ss.Lt[j][0];
-						acc[m][1] = (float) ss.Lt[j][1];
-						acc[m][2] = (float) ss.Lm[j];
-					}
-				}
-			}
-
-			m_ar.write(acc, sizeof(float)*3, fem.m_mesh.Nodes() );
-		}
-		else
-		{
-			float af[3];
-			for (i=0; i<fem.m_mesh.Nodes(); ++i)
-			{
-				FENode& node = fem.m_mesh.Node(i);
-
-				// since the PLOT file requires floats we need to convert
-				// the doubles to single precision
-				af[0] = (float) node.m_at.x;
-				af[1] = (float) node.m_at.y;
-				af[2] = (float) node.m_at.z;
-
-				m_ar.write(af, sizeof(float), 3);
-			}
+		case PLOT_ACCELERATION: write_accelerations(); break;
+		case PLOT_FLUID_FLUX: write_fluid_flux(); break;
+		case PLOT_CONTACT_TRACTION: write_contact_tractions();
+		default:
+			assert(false);
 		}
 	}
 
 	// write the temperatures
 	if (m_ph.flagT)
 	{
-		if (fem.m_pStep->m_itype == FE_STATIC_PORO)
+		switch (m_nfield[3])
 		{
-			float t;
-			for (i=0; i<fem.m_mesh.Nodes(); ++i)
-			{
-				FENode& node = fem.m_mesh.Node(i);
-				t = (float) node.m_pt;
-				m_ar << t;
-			}
-		}
-		else if (fem.m_bcontact)
-		{
-			vector<float> t(mesh.Nodes());
-			t.zero();
-
-			for (i=0; i<fem.ContactInterfaces(); ++i)
-			{
-				FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
-				if (psi)
-				{
-					FEContactSurface& ms = psi->m_ms;
-					FEContactSurface& ss = psi->m_ss;
-
-					for (j=0; j<ms.Nodes(); ++j)
-					{
-//						t[ms.node[j]] += (float) ms.Lm[j];
-						t[ms.node[j]] += (float) (ms.gap[j] < 0 ? 0 : ms.gap[j]);
-					}
-					for (j=0; j<ss.Nodes(); ++j)
-					{
-//						t[ss.node[j]] += (float) ss.Lm[j];
-						t[ss.node[j]] += (float) (ss.gap[j] < 0 ? 0 : ss.gap[j]);
-					}
-				}
-
-				FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&fem.m_CI[i]);
-				if (pti)
-				{
-					FETiedContactSurface& ms = pti->ms;
-					FETiedContactSurface& ss = pti->ss;
-
-					for (j=0; j<ms.Nodes(); ++j)
-					{
-						t[ms.node[j]] += (float) ms.gap[j].norm();
-					}
-					for (j=0; j<ss.Nodes(); ++j)
-					{
-						t[ss.node[j]] += (float) ss.gap[j].norm();
-					}
-				}
-
-				FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
-				if (pri)
-				{
-					FEContactSurface& ss = pri->m_ss;
-					for (j=0; j<ss.Nodes(); ++j)
-					{
-//						t[ss.node[j]] += (float) ss.Lm[j];
-						t[ss.node[j]] += (float) (ss.gap[j] < 0? 0 : ss.gap[j]);
-					}
-				}
-			}
-			
-			for (i=0; i<fem.m_mesh.Nodes(); ++i)
-			{
-				m_ar << t[i];
-			}
-		}
-		else
-		{
-			// TODO: output temperatures
+		case PLOT_FLUID_PRESSURE: write_fluid_pressures(); break;
+		case PLOT_CONTACT_PRESSURE: write_contact_pressures(); break;
+		case PLOT_CONTACT_GAP: write_contact_gaps(); break;
+		default:
+			assert(false);
 		}
 	}
 
@@ -575,4 +437,243 @@ bool PlotFile::Write(FEM& fem)
 void PlotFile::Close()
 {
 	m_ar.Close();
+}
+
+//-----------------------------------------------------------------------------
+
+void PlotFile::write_displacements()
+{
+	FEM& fem = *m_pfem;
+
+	float xf[3];
+	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		FENode& node = fem.m_mesh.Node(i);
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		xf[0] = (float) node.m_rt.x;
+		xf[1] = (float) node.m_rt.y;
+		xf[2] = (float) node.m_rt.z;
+
+		m_ar.write(xf, sizeof(float), 3);
+	}
+}
+
+void PlotFile::write_velocities()
+{
+	FEM& fem = *m_pfem;
+	float vf[3];
+	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		FENode& node = fem.m_mesh.Node(i);
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		vf[0] = (float) node.m_vt.x;
+		vf[1] = (float) node.m_vt.y;
+		vf[2] = (float) node.m_vt.z;
+
+		m_ar.write(vf, sizeof(float), 3);
+	}
+}
+
+void PlotFile::write_accelerations()
+{
+	FEM& fem = *m_pfem;
+	float af[3];
+	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		FENode& node = fem.m_mesh.Node(i);
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		af[0] = (float) node.m_at.x;
+		af[1] = (float) node.m_at.y;
+		af[2] = (float) node.m_at.z;
+
+		m_ar.write(af, sizeof(float), 3);
+	}
+}
+
+void PlotFile::write_fluid_flux()
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+
+	int i, j;
+
+	vector<vec3d> wn(fem.m_mesh.Nodes());
+	vector<int> val(fem.m_mesh.Nodes());
+	for (i=0; i<fem.m_mesh.Nodes(); ++i) val[i] = 0;
+
+	vec3d ew;
+	int n;
+	for (i=0; i<mesh.SolidElements(); ++i)
+	{
+		FESolidElement& el = mesh.SolidElement(i);
+
+		// calculate average flux
+		ew = vec3d(0,0,0);
+		for (j=0; j<el.GaussPoints(); ++j) 
+		{
+			FEMaterialPoint& mp = *el.m_State[j];
+			FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+			ew += pt->m_w;
+		}
+
+		ew /= el.GaussPoints();
+
+		// project to nodes
+		for (j=0; j<el.Nodes(); ++j)
+		{
+			n = el.m_node[j];
+			wn[n] += ew;
+			++val[n];
+		}
+	}
+	for (i=0; i<fem.m_mesh.Nodes(); ++i) if (val[i] != 0) wn[i] /= val[i];
+
+	// output nodal fluxes
+	float af[3];
+	for (i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		af[0] = (float) wn[i].x;
+		af[1] = (float) wn[i].y;
+		af[2] = (float) wn[i].z;
+
+		m_ar.write(af, sizeof(float), 3);
+	}
+}
+
+void PlotFile::write_contact_tractions()
+{
+	FEM& fem = *m_pfem;
+
+	int i, j;
+
+	vector<float[3]> acc(fem.m_mesh.Nodes());
+	for (i=0; i<fem.m_mesh.Nodes(); ++i) acc[i][0] = acc[i][1] = acc[i][2] = 0;
+	for (i=0; i<fem.m_CI.size(); ++i)
+	{
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (&fem.m_CI[i]);
+		if (psi)
+		{
+			FEContactSurface& ss = psi->m_ss;
+			for (j=0; j<ss.Nodes(); ++j)
+			{
+				int m = ss.node[j];
+				acc[m][0] = (float) ss.Lt[j][0];
+				acc[m][1] = (float) ss.Lt[j][1];
+				acc[m][2] = (float) ss.Lm[j];
+			}
+		}
+	}
+
+	m_ar.write(acc, sizeof(float)*3, fem.m_mesh.Nodes() );
+}
+
+void PlotFile::write_fluid_pressures()
+{
+	FEM& fem = *m_pfem;
+	float t;
+	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		FENode& node = fem.m_mesh.Node(i);
+		t = (float) node.m_pt;
+		m_ar << t;
+	}
+}
+
+void PlotFile::write_contact_pressures()
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+
+	vector<float> t(mesh.Nodes());
+	t.zero();
+
+	int i, j;
+
+	for (i=0; i<fem.ContactInterfaces(); ++i)
+	{
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
+		if (psi)
+		{
+			FEContactSurface& ms = psi->m_ms;
+			FEContactSurface& ss = psi->m_ss;
+
+			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.Lm[j];
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
+		}
+
+		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&fem.m_CI[i]);
+		if (pti)
+		{
+			FETiedContactSurface& ms = pti->ms;
+			FETiedContactSurface& ss = pti->ss;
+
+			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.Lm[j].norm();
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j].norm();
+		}
+
+		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
+		if (pri)
+		{
+			FEContactSurface& ss = pri->m_ss;
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
+		}
+	}
+	
+	for (i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		m_ar << t[i];
+	}
+}
+
+void PlotFile::write_contact_gaps()
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+
+	vector<float> t(mesh.Nodes());
+	t.zero();
+
+	int i, j;
+
+	for (i=0; i<fem.ContactInterfaces(); ++i)
+	{
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
+		if (psi)
+		{
+			FEContactSurface& ms = psi->m_ms;
+			FEContactSurface& ss = psi->m_ss;
+
+			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) (ms.gap[j] < 0 ? 0 : ms.gap[j]);
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0 ? 0 : ss.gap[j]);
+		}
+
+		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&fem.m_CI[i]);
+		if (pti)
+		{
+			FETiedContactSurface& ms = pti->ms;
+			FETiedContactSurface& ss = pti->ss;
+
+			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.gap[j].norm();
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j].norm();
+		}
+
+		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
+		if (pri)
+		{
+			FEContactSurface& ss = pri->m_ss;
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0? 0 : ss.gap[j]);
+		}
+	}
+	
+	for (i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		m_ar << t[i];
+	}
 }
