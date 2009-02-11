@@ -117,6 +117,7 @@ void FEM::EchoInput()
 	case FE_PLOT_MINOR_ITRS : m_log.printf("\tplot level ................................ : minor iterations\n"); break;
 	case FE_PLOT_MUST_POINTS: m_log.printf("\tplot level ................................ : must points only\n"); break;
 	}
+	m_log.printf("\tshell strains included .................... : %s\n", (m_plot.m_bsstrn? "Yes" : "No"));
 
 	m_log.printf("\tplot file field data:\n");
 	m_log.printf("\t\tdisplacement ...................... : ");
@@ -153,6 +154,7 @@ void FEM::EchoInput()
 	default: m_log.printf("???\n");
 	}
 
+	m_log.printf("\n\n");
 	m_log.printf(" MATERIAL DATA\n");
 	m_log.printf("===========================================================================\n");
 	for (i=0; i<Materials(); ++i)
