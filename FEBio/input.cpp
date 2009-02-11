@@ -108,6 +108,51 @@ void FEM::EchoInput()
 	m_log.printf("\tMax condition number ........................... : %lg\n", m_pStep->m_psolver->m_cmax);
 	m_log.printf("\n\n");
 
+	m_log.printf(" OUTPUT DATA\n");
+	m_log.printf("===========================================================================\n");
+	switch (m_pStep->m_nplot)
+	{
+	case FE_PLOT_NEVER      : m_log.printf("\tplot level ................................ : never\n"); break;
+	case FE_PLOT_MAJOR_ITRS : m_log.printf("\tplot level ................................ : major iterations\n"); break;
+	case FE_PLOT_MINOR_ITRS : m_log.printf("\tplot level ................................ : minor iterations\n"); break;
+	case FE_PLOT_MUST_POINTS: m_log.printf("\tplot level ................................ : must points only\n"); break;
+	}
+
+	m_log.printf("\tplot file field data:\n");
+	m_log.printf("\t\tdisplacement ...................... : ");
+	switch (m_plot.m_nfield[0])
+	{
+	case PlotFile::PLOT_DISPLACEMENT: m_log.printf("displacement\n"); break;
+	default: m_log.printf("???\n");
+	}
+	m_log.printf("\t\tvelocity .......................... : ");
+	switch (m_plot.m_nfield[1])
+	{
+	case PlotFile::PLOT_NONE            : m_log.printf("none\n"); break;
+	case PlotFile::PLOT_VELOCITY        : m_log.printf("velocity\n"); break;
+	case PlotFile::PLOT_FLUID_FLUX      : m_log.printf("fluid flux\n"); break;
+	case PlotFile::PLOT_CONTACT_TRACTION: m_log.printf("contact traction\n"); break;
+	default: m_log.printf("???\n");
+	}
+	m_log.printf("\t\tacceleration ...................... : ");
+	switch (m_plot.m_nfield[2])
+	{
+	case PlotFile::PLOT_NONE            : m_log.printf("none\n"); break;
+	case PlotFile::PLOT_ACCELERATION    : m_log.printf("acceleration\n"); break;
+	case PlotFile::PLOT_FLUID_FLUX      : m_log.printf("fluid flux\n"); break;
+	case PlotFile::PLOT_CONTACT_TRACTION: m_log.printf("contact traction\n"); break;
+	default: m_log.printf("???\n");
+	}
+	m_log.printf("\t\ttemperature........................ : ");
+	switch (m_plot.m_nfield[3])
+	{
+	case PlotFile::PLOT_NONE            : m_log.printf("none\n"); break;
+	case PlotFile::PLOT_FLUID_PRESSURE  : m_log.printf("fluid pressure\n"); break;
+	case PlotFile::PLOT_CONTACT_PRESSURE: m_log.printf("contact pressure\n"); break;
+	case PlotFile::PLOT_CONTACT_GAP     : m_log.printf("contact gap\n"); break;
+	default: m_log.printf("???\n");
+	}
+
 	m_log.printf(" MATERIAL DATA\n");
 	m_log.printf("===========================================================================\n");
 	for (i=0; i<Materials(); ++i)
