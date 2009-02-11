@@ -133,6 +133,7 @@ void FEM::EchoInput()
 	case PlotFile::PLOT_VELOCITY        : m_log.printf("velocity\n"); break;
 	case PlotFile::PLOT_FLUID_FLUX      : m_log.printf("fluid flux\n"); break;
 	case PlotFile::PLOT_CONTACT_TRACTION: m_log.printf("contact traction\n"); break;
+	case PlotFile::PLOT_REACTION_FORCE  : m_log.printf("reaction force\n"); break;
 	default: m_log.printf("???\n");
 	}
 	m_log.printf("\t\tacceleration ...................... : ");
@@ -142,6 +143,7 @@ void FEM::EchoInput()
 	case PlotFile::PLOT_ACCELERATION    : m_log.printf("acceleration\n"); break;
 	case PlotFile::PLOT_FLUID_FLUX      : m_log.printf("fluid flux\n"); break;
 	case PlotFile::PLOT_CONTACT_TRACTION: m_log.printf("contact traction\n"); break;
+	case PlotFile::PLOT_REACTION_FORCE  : m_log.printf("reaction force\n"); break;
 	default: m_log.printf("???\n");
 	}
 	m_log.printf("\t\ttemperature........................ : ");

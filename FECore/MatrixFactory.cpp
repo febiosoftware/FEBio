@@ -310,7 +310,7 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, 
 
 	return true;
 */
-
+	return false;
 }
 
 

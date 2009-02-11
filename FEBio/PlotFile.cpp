@@ -275,6 +275,7 @@ bool PlotFile::Write(FEM& fem)
 		case PLOT_VELOCITY: write_velocities(); break;
 		case PLOT_FLUID_FLUX: write_fluid_flux(); break;
 		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
+		case PLOT_REACTION_FORCE: write_reaction_forces(); break;
 		default:
 			assert(false);
 		}
@@ -288,6 +289,7 @@ bool PlotFile::Write(FEM& fem)
 		case PLOT_ACCELERATION: write_accelerations(); break;
 		case PLOT_FLUID_FLUX: write_fluid_flux(); break;
 		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
+		case PLOT_REACTION_FORCE: write_reaction_forces(); break;
 		default:
 			assert(false);
 		}
@@ -676,4 +678,26 @@ void PlotFile::write_contact_gaps()
 	{
 		m_ar << t[i];
 	}
+}
+
+void PlotFile::write_reaction_forces()
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+	FESolver& solver = *fem.m_pStep->m_psolver;
+	vector<double>& Fr = solver.m_Fr;
+
+	int N = mesh.Nodes(), i;
+	vector<float[3]> R(N);
+
+	for (i=0; i<N; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		int* id = node.m_ID;
+		R[i][0] = (float) (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0);
+		R[i][1] = (float) (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
+		R[i][2] = (float) (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
+	}
+
+	m_ar.write(R, sizeof(float)*3, N );
 }
