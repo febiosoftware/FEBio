@@ -130,15 +130,10 @@ void FESolver::ElementStiffness(FEShellElement& el, matrix& ke)
 	mat3ds s;
 
 	// get the element's material
-	// TODO:make sure this is not a poroelastic material
 	FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
 
 	// extract the elastic component
-	FEElasticMaterial* pme = 0;
-	if (dynamic_cast<FEPoroElastic*>(pm)) pme = (dynamic_cast<FEPoroElastic*>(pm))->m_psmat;
-	else if (dynamic_cast<FEViscoElasticMaterial*>(pm)) pme = (dynamic_cast<FEViscoElasticMaterial*>(pm))->m_pemat;
-	else pme = dynamic_cast<FEElasticMaterial*>(pm);
-	assert(pme);
+	FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
 
 	double *Grn, *Gsn, *Hn;
 	double Gr, Gs, H;

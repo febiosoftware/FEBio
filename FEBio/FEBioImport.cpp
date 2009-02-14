@@ -493,7 +493,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 					if (tag == "solid_id")
 					{
 						int m; tag.value(m);
-						pm->m_nSolidMat = m-1;
+						pm->m_nBaseMat = m-1;
 						bfound = true;
 					}
 
@@ -510,7 +510,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 					if (tag == "solid_id")
 					{
 						int m; tag.value(m);
-						pm->m_nSolidMat = m-1;
+						pm->m_nBaseMat = m-1;
 						bfound = true;
 					}
 				}
@@ -593,7 +593,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 		if (dynamic_cast<FEPoroElastic*>(pmat))
 		{
 			FEPoroElastic* pm = (FEPoroElastic*) pmat;
-			int nsolid = pm->m_nSolidMat;
+			int nsolid = pm->m_nBaseMat;
 
 			if ((nsolid < 0) || (nsolid >= fem.Materials()))
 			{
@@ -610,13 +610,13 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 				throw XMLReader::Error();
 				return false;
 			}
-			pm->m_psmat = pme;
+			pm->m_pBase = pme;
 		}
 
 		if (dynamic_cast<FEViscoElasticMaterial*>(pmat))
 		{
 			FEViscoElasticMaterial* pm = (FEViscoElasticMaterial*)(pmat);
-			int nsolid = pm->m_nSolidMat;
+			int nsolid = pm->m_nBaseMat;
 
 			if ((nsolid < 0) || (nsolid >= fem.Materials()))
 			{
@@ -633,7 +633,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 				throw XMLReader::Error();
 				return false;
 			}
-			pm->m_pemat = pme;
+			pm->m_pBase = pme;
 		}
 	}
 

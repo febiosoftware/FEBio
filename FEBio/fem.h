@@ -238,6 +238,16 @@ public:
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int id) { return &m_MAT[id]; }
 
+	//! return the elastic material
+	FEElasticMaterial* GetElasticMaterial(int id)
+	{
+		FEMaterial* pm = &m_MAT[id];
+		if (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+		assert(pme);
+		return pme;
+	}
+
 	//! Add a loadcurve to the model
 	void AddLoadCurve(FELoadCurve* plc) { m_LC.add(plc); }
 

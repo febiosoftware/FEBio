@@ -979,10 +979,7 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
 
 	// get the elastic material
-	FEElasticMaterial* pme;
-	if      (dynamic_cast<FEPoroElastic*         >(pmat)) pme = (dynamic_cast<FEPoroElastic*         >(pmat))->m_psmat;
-	else if (dynamic_cast<FEViscoElasticMaterial*>(pmat)) pme = (dynamic_cast<FEViscoElasticMaterial*>(pmat))->m_pemat;
-	else pme = dynamic_cast<FEElasticMaterial*>(pmat);
+	FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
 
 	// see if this is a poroelastic material
 	bool bporo = false;
@@ -1151,9 +1148,7 @@ void FESolver::DilatationalStiffness(FESolidElement& elem, matrix& ke)
 	const int ndof = 3*neln;
 
 	// get the elements material
-	FEMaterial* pm = m_fem.GetMaterial(elem.GetMatID());
-	if (dynamic_cast<FEPoroElastic*>(pm)) pm = (dynamic_cast<FEPoroElastic*>(pm))->m_psmat;
-	else if (dynamic_cast<FEViscoElasticMaterial*>(pm)) pm = (dynamic_cast<FEViscoElasticMaterial*>(pm))->m_pemat;
+	FEElasticMaterial* pm = m_fem.GetElasticMaterial(elem.GetMatID());
 
 	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pm);
 	assert(pmi);

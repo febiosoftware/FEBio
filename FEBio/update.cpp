@@ -340,11 +340,7 @@ void FEM::UpdateStresses()
 			FEMaterial* pm = GetMaterial(el.GetMatID());
 
 			// extract the elastic component
-			FEElasticMaterial* pme = 0;
-			if (dynamic_cast<FEPoroElastic*>(pm)) pme = (dynamic_cast<FEPoroElastic*>(pm))->m_psmat;
-			else if (dynamic_cast<FEViscoElasticMaterial*>(pm)) pme = (dynamic_cast<FEViscoElasticMaterial*>(pm))->m_pemat;
-			else pme = dynamic_cast<FEElasticMaterial*>(pm);
-			assert(pme);
+			FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;
@@ -439,11 +435,7 @@ void FEM::UpdateStresses()
 			FEMaterial* pm = GetMaterial(el.GetMatID());
 
 			// extract the elastic component
-			FEElasticMaterial* pme = 0;
-			if (dynamic_cast<FEPoroElastic*>(pm)) pme = (dynamic_cast<FEPoroElastic*>(pm))->m_psmat;
-			else if (dynamic_cast<FEViscoElasticMaterial*>(pm)) pme = (dynamic_cast<FEViscoElasticMaterial*>(pm))->m_pemat;
-			else pme = dynamic_cast<FEElasticMaterial*>(pm);
-			assert(pme);
+			FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;

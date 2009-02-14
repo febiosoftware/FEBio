@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for poroelastic materials.
 
-class FEPoroElastic : public FEMaterial
+class FEPoroElastic : public FENestedMaterial
 {
 public:
 	FEPoroElastic();
@@ -22,14 +22,8 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
-		return new FEPoroElasticMaterialPoint(m_psmat->CreateMaterialPointData());
+		return new FEPoroElasticMaterialPoint(m_pBase->CreateMaterialPointData());
 	}
-
-	//! return solid component's bulk modulus
-	double BulkModulus() { return m_psmat->BulkModulus(); }
-
-	//! return solid component's density
-	double Density () { return m_psmat->Density(); }
 
 public:
 	//! calculate stress at material point
@@ -43,10 +37,6 @@ public:
 
 	//! permeability
 	virtual void Permeability(double k[3][3], FEMaterialPoint& pt) = 0;
-
-public:
-	int					m_nSolidMat;	//!< ID of solid material
-	FEElasticMaterial*	m_psmat;		//!< pointer to the solid material class
 };
 
 

@@ -104,6 +104,29 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Base class for nested materials. A nested material describes whose material 
+//! response depends on the formulation of another user specified material. For
+//! instance, the FEPoroElastic and FEViscoElastic are two examples of nested
+//! materials.
+
+class FENestedMaterial : public FEMaterial
+{
+public:
+	FENestedMaterial() { m_nBaseMat = -1; m_pBase = 0; }
+	virtual ~FENestedMaterial(){}
+
+	//! return solid component's bulk modulus
+	double BulkModulus() { return m_pBase->BulkModulus(); }
+
+	//! return solid component's density
+	double Density () { return m_pBase->Density(); }
+
+public:
+	int					m_nBaseMat;	//!< material ID of base material
+	FEElasticMaterial*	m_pBase;	//!< pointer to base material
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for incompressible materials
 
 //! In FEBio a decoupled strain energy function is defined for incompressible

@@ -24,7 +24,6 @@ END_PARAMETER_LIST();
 //! constructor
 FEViscoElasticMaterial::FEViscoElasticMaterial()
 {
-	m_pemat = 0;
 	m_g0 = 1;
 	for (int i=0; i<MAX_TERMS; ++i)
 	{
@@ -45,7 +44,7 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
 
 	// get the new elastic stress
-	pt.m_se = m_pemat->Stress(mp);
+	pt.m_se = m_pBase->Stress(mp);
 
 	double dt = mp.dt;
 
@@ -78,7 +77,7 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 void FEViscoElasticMaterial::Tangent(double D[6][6], FEMaterialPoint& pt)
 {
 	// calculate the elastic tangent
-	m_pemat->Tangent(D, pt);
+	m_pBase->Tangent(D, pt);
 
 	double dt = pt.dt;
 

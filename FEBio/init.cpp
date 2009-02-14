@@ -94,14 +94,14 @@ bool FEM::Init()
 		if (dynamic_cast<FEPoroElastic*> (pmat))
 		{
 			FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (pmat);
-			pmat = GetMaterial(pm->m_nSolidMat);
+			pmat = GetMaterial(pm->m_nBaseMat);
 		}
 
 		// same for visco-elastic
 		if (dynamic_cast<FEViscoElasticMaterial*>(pmat))
 		{
 			FEViscoElasticMaterial* pm = dynamic_cast<FEViscoElasticMaterial*>(pmat);
-			pmat = GetMaterial(pm->m_nSolidMat);
+			pmat = GetMaterial(pm->m_nBaseMat);
 		}
 
 		// set the local element coordinates

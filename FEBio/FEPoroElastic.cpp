@@ -11,8 +11,6 @@
 
 FEPoroElastic::FEPoroElastic()
 {
-	m_nSolidMat = -1;
-	m_psmat = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -26,7 +24,7 @@ mat3ds FEPoroElastic::Stress(FEMaterialPoint& mp)
 	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 
 	// calculate solid material stress
-	mat3ds s = m_psmat->Stress(mp);
+	mat3ds s = m_pBase->Stress(mp);
 
 	// add fluid pressure
 	s.xx() -= pt.m_p;
@@ -46,7 +44,7 @@ void FEPoroElastic::Tangent(double D[6][6], FEMaterialPoint& mp)
 	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 
 	// call solid tangent routine
-	m_psmat->Tangent(D, mp);
+	m_pBase->Tangent(D, mp);
 
 	// fluid pressure
 	double p = pt.m_p;
