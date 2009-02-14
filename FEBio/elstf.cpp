@@ -2,7 +2,6 @@
 #include <math.h>
 #include "FESolver.h"
 #include "FEPoroElastic.h"
-#include "FEViscoElasticMaterial.h"
 #include "tens4d.h"
 
 //-----------------------------------------------------------------------------

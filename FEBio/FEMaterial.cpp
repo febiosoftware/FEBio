@@ -42,6 +42,12 @@ void FEElasticMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
+// Material parameters for the FENestedMaterial
+BEGIN_PARAMETER_LIST(FENestedMaterial, FEMaterial)
+	ADD_PARAMETER(m_nBaseMat, FE_PARAM_INT, "solid_id");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 // Material parameters for FEIncompressibleMaterial
 BEGIN_PARAMETER_LIST(FEIncompressibleMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_K, FE_PARAM_DOUBLE, "k");

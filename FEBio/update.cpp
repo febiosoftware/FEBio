@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FEPoroElastic.h"
-#include "FEViscoElasticMaterial.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FESolver::Update

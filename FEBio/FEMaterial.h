@@ -122,8 +122,10 @@ public:
 	double Density () { return m_pBase->Density(); }
 
 public:
-	int					m_nBaseMat;	//!< material ID of base material
+	int					m_nBaseMat;	//!< material ID of base material (one-based!)
 	FEElasticMaterial*	m_pBase;	//!< pointer to base material
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------

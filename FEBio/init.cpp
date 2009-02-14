@@ -6,8 +6,6 @@
 #include "fem.h"
 #include "FEException.h"
 #include "FENodeReorder.h"
-#include "FEPoroElastic.h"
-#include "FEViscoElasticMaterial.h"
 #include "FERigid.h"
 
 // Forward declarations
@@ -88,24 +86,9 @@ bool FEM::Init()
 		m_mesh.UnpackElement(el);
 
 		// get the elements material
-		FEMaterial* pmat = GetMaterial(el.GetMatID());
-
-		// get the elastic part of the material
-		if (dynamic_cast<FEPoroElastic*> (pmat))
-		{
-			FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (pmat);
-			pmat = GetMaterial(pm->m_nBaseMat);
-		}
-
-		// same for visco-elastic
-		if (dynamic_cast<FEViscoElasticMaterial*>(pmat))
-		{
-			FEViscoElasticMaterial* pm = dynamic_cast<FEViscoElasticMaterial*>(pmat);
-			pmat = GetMaterial(pm->m_nBaseMat);
-		}
+		FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
 
 		// set the local element coordinates
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
 		if (pme)
 		{
 			if (pme->m_pmap)
@@ -125,7 +108,7 @@ bool FEM::Init()
 					// TODO: This assumes that pt.Q will not get intialized to
 					//		 a valid value. I should find another way for checking since I
 					//		 would like pt.Q always to be initialized to a decent value.
-					if (dynamic_cast<FETransverselyIsotropic*>(pmat))
+					if (dynamic_cast<FETransverselyIsotropic*>(pme))
 					{
 						FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
 						mat3d& m = pt.Q;

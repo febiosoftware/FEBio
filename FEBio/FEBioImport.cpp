@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "FEBioImport.h"
-#include "FEPoroElastic.h"
-#include "FEViscoElasticMaterial.h"
 #include "FERigid.h"
 #include <string.h>
 
@@ -485,36 +483,6 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 					}
 				}
 
-				// read poro-elastic materials
-				if (!bfound && dynamic_cast<FEPoroElastic*>(pmat))
-				{
-					FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(pmat);
-
-					if (tag == "solid_id")
-					{
-						int m; tag.value(m);
-						pm->m_nBaseMat = m-1;
-						bfound = true;
-					}
-
-					// set the analysis type
-					// TODO: can I do this elsewhere?
-					fem.m_pStep->m_itype = FE_STATIC_PORO;
-				}
-
-				// read visco-elastic materials
-				if (!bfound && dynamic_cast<FEViscoElasticMaterial*>(pmat))
-				{
-					FEViscoElasticMaterial* pm = dynamic_cast<FEViscoElasticMaterial*>(pmat);
-
-					if (tag == "solid_id")
-					{
-						int m; tag.value(m);
-						pm->m_nBaseMat = m-1;
-						bfound = true;
-					}
-				}
-
 				// read rigid body data
 				if (!bfound && dynamic_cast<FERigid*>(pmat))
 				{
@@ -585,54 +553,34 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 	}
 	while (!tag.isend());
 
-	// assign material pointers
-	// this has to be done regardless of whether poro-elasticity is on or not
+	// assign material pointers for nested materials
 	for (int i=0; i<fem.Materials(); ++i)
 	{
-		FEMaterial* pmat = fem.GetMaterial(i);
-		if (dynamic_cast<FEPoroElastic*>(pmat))
+		FENestedMaterial* pm = dynamic_cast<FENestedMaterial*>(fem.GetMaterial(i));
+		if (pm)
 		{
-			FEPoroElastic* pm = (FEPoroElastic*) pmat;
-			int nsolid = pm->m_nBaseMat;
+			// get the ID of the base material
+			// note that m_nBaseMat is a one-based variable!
+			int nbase = pm->m_nBaseMat - 1;
 
-			if ((nsolid < 0) || (nsolid >= fem.Materials()))
+			// make sure the base ID is valid
+			if ((nbase < 0) || (nbase >= fem.Materials()))
 			{
-				fem.m_log.printbox("INPUT ERROR", "Invalid solid material for poro-elastic material\n");
+				fem.m_log.printbox("INPUT ERROR", "Invalid base material ID for material i+1\n");
 				throw XMLReader::Error();
 				return false;
 			}
 
-			// make sure the solid material is a valid material
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(nsolid));
+			// make sure the base material is a valid material (i.e. an elastic material)
+			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(nbase));
 			if (pme == 0)
 			{
-				fem.m_log.printbox("INPUT ERROR", "Invalid solid material for poro-elastic material\n");
-				throw XMLReader::Error();
-				return false;
-			}
-			pm->m_pBase = pme;
-		}
-
-		if (dynamic_cast<FEViscoElasticMaterial*>(pmat))
-		{
-			FEViscoElasticMaterial* pm = (FEViscoElasticMaterial*)(pmat);
-			int nsolid = pm->m_nBaseMat;
-
-			if ((nsolid < 0) || (nsolid >= fem.Materials()))
-			{
-				fem.m_log.printbox("INPUT ERROR", "Invalid solid material for viscoelastic material\n");
+				fem.m_log.printbox("INPUT ERROR", "Invalid base material for material i+1\n");
 				throw XMLReader::Error();
 				return false;
 			}
 
-			// make sure the solid material is a valid material
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(nsolid));
-			if (pme == 0)
-			{
-				fem.m_log.printbox("INPUT ERROR", "Invalid solid material for visco-elastic material\n");
-				throw XMLReader::Error();
-				return false;
-			}
+			// set the base material pointer
 			pm->m_pBase = pme;
 		}
 	}

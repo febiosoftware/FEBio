@@ -5,7 +5,7 @@
 REGISTER_MATERIAL(FEViscoElasticMaterial, "viscoelastic");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEViscoElasticMaterial, FEMaterial)
+BEGIN_PARAMETER_LIST(FEViscoElasticMaterial, FENestedMaterial)
 	ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
 	ADD_PARAMETER(m_t[1], FE_PARAM_DOUBLE, "t2");
 	ADD_PARAMETER(m_t[2], FE_PARAM_DOUBLE, "t3");
