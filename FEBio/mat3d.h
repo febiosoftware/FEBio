@@ -292,6 +292,9 @@ public:
 	// calculates the inverse
 	mat3d inverse() const;
 
+	// calculates the transpose
+	mat3d transpose() const;
+	
 protected:
 	double d[3][3];	// matrix data
 

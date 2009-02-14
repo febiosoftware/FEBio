@@ -22,7 +22,7 @@ bool FESolver::Init()
 		case PSLDLT_SOLVER : m_psolver = new PSLDLTSolver (); break;
 		case SUPERLU_SOLVER: m_psolver = new SuperLUSolver(); break;
 		case SUPERLU_MT_SOLVER: m_psolver = new SuperLU_MT_Solver(); break;
-		case PARDISO_SOLVER: m_psolver = new PardisoSolver(); break;
+//		case PARDISO_SOLVER: m_psolver = new PardisoSolver(); break;
 		case LU_SOLVER     : m_psolver = new LUSolver(); break;
 		case WSMP_SOLVER   : m_psolver = new WSMPSolver(); break;
 		case CG_ITERATIVE_SOLVER : m_psolver = new ConjGradIterSolver(); break;

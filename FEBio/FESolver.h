@@ -15,7 +15,7 @@
 #include "Timer.h"
 #include "FEException.h"
 #include "Interrupt.h"
-#include "FECore/PardisoSolver.h"
+//#include "FECore/PardisoSolver.h"
 
 //-----------------------------------------------------------------------------
 //! The solver class.

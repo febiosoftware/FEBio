@@ -688,3 +688,11 @@ inline mat3d mat3d::inverse() const
 				 D*(d[0][1]*d[2][0] - d[0][0]*d[2][1]),
 				 D*(d[0][0]*d[1][1] - d[0][1]*d[1][0]));
 }
+
+// return the transpose matrix
+inline mat3d mat3d::transpose() const
+{
+	return mat3d(d[0][0], d[1][0], d[2][0],
+				 d[0][1], d[1][1], d[2][1],
+				 d[0][2], d[1][2], d[2][2]);
+}

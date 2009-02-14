@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mat3d.h"
+
 //-----------------------------------------------------------------------------
 //! class for 4th order tensors with major and minor symmetries.
 
@@ -46,11 +48,32 @@ public:
 		if (i<=j) return d[m[j]+i]; else return d[m[i]+j];
 	}
 
-protected:
+	// arithmetic operators
+	tens4ds operator + (const tens4ds& t) const;
+	tens4ds operator - (const tens4ds& t) const;
+	tens4ds operator * (double g) const;
+	tens4ds operator / (double g) const;
+	
+	// arithmetic assignment operators
+	tens4ds& operator += (const tens4ds& t);
+	tens4ds& operator -= (const tens4ds& t);
+	tens4ds& operator *= (double g);
+	tens4ds& operator /= (double g);
+	
+	// extract 6x6 matrix
+	void extract(double d[6][6]);
+	
+public:
 	double d[NNZ];	// stored in column major order
 };
 
 //! Check positive definiteness of a 4th-order symmetric tensor
 bool IsPositiveDefinite(const tens4ds& t);
 
-// outer product for symmetric matrices
+// outer (dyadic) products for symmetric matrices
+tens4ds dyad1s(const mat3ds& a);
+tens4ds dyad1s(const mat3ds& a, const mat3ds& b);
+tens4ds dyad4s(const mat3ds& a);
+tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
+
+inline tens4ds operator * (const double g, const tens4ds& a) { return a*g; }
