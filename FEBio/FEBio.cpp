@@ -39,7 +39,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "FESolver.h"
+#include "fem.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
 
@@ -49,7 +49,7 @@
 //-----------------------------------------------------------------------------
 //!  Command line options
 
-//! This structures stores the command line options that where input by the user
+//! This structures stores the command line options that were input by the user
 
 struct CMDOPTIONS
 {
@@ -148,7 +148,8 @@ int main(int argc, char* argv[])
 		// solve the problem
 		if (ops.brun) 
 		{
-			fem.Solve();
+			bool bret = fem.Solve();
+			return (int) (bret?0:1);
 		}
 		else 
 		{

@@ -175,8 +175,6 @@ void FESolver::ElementStiffness(FEShellElement& el, matrix& ke)
 
 		pt.avgJ = el.m_eJ;
 		pt.avgp = el.m_ep;
-//		pt.Q = el.m_Q[n];
-
 
 		if (bporo)
 		{

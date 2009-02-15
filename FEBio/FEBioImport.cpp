@@ -864,9 +864,6 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 
 			if (tag == "fiber")
 			{
-				FESolidElement* pse = dynamic_cast<FESolidElement*> (pe);
-				if (pse == 0) throw XMLReader::InvalidTag(tag);
-
 				// read the fiber direction
 				tag.value(a);
 
@@ -883,14 +880,31 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 				b.unit();
 				c.unit();
 
-				for (int i=0; i<pse->GaussPoints(); ++i)
+				FESolidElement* pbe = dynamic_cast<FESolidElement*> (pe);
+				FEShellElement* pse = dynamic_cast<FEShellElement*> (pe);
+				if (pbe)
 				{
-					FEElasticMaterialPoint& pt = *pse->m_State[i]->ExtractData<FEElasticMaterialPoint>();
-					mat3d& m = pt.Q;
-					m.zero();
-					m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
-					m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
-					m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
+					for (int i=0; i<pbe->GaussPoints(); ++i)
+					{
+						FEElasticMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						mat3d& m = pt.Q;
+						m.zero();
+						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
+						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
+						m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
+					}
+				}
+				if (pse)
+				{
+					for (int i=0; i<pse->GaussPoints(); ++i)
+					{
+						FEElasticMaterialPoint& pt = *pse->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						mat3d& m = pt.Q;
+						m.zero();
+						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
+						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
+						m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
+					}
 				}
 			}
 			else if (tag == "thickness")

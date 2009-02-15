@@ -125,6 +125,53 @@ bool FEM::Init()
 	}
 	if (bmerr) return false;
 
+	// now do the same thing for shells
+	bmerr = false;
+	for (i=0; i<m_mesh.ShellElements(); ++i)
+	{
+		// unpack element data
+		FEShellElement& el = m_mesh.ShellElement(i);
+
+		// get the elements material
+		FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
+
+		// set the local element coordinates
+		if (pme)
+		{
+			if (pme->m_pmap)
+			{
+				for (int n=0; n<el.GaussPoints(); ++n)
+				{
+					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+					pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+				}
+			}
+			else
+			{
+				if (GetDebugFlag())
+				{
+					// If we get here, then the element has a user-defined fiber direction
+					// we should check to see if it has indeed been specified.
+					// TODO: This assumes that pt.Q will not get intialized to
+					//		 a valid value. I should find another way for checking since I
+					//		 would like pt.Q always to be initialized to a decent value.
+					if (dynamic_cast<FETransverselyIsotropic*>(pme))
+					{
+						FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+						mat3d& m = pt.Q;
+						if (fabs(m.det() - 1) > 1e-7)
+						{
+							// this element did not get specified a user-defined fiber direction
+							m_log.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
+							bmerr = true;
+						}
+					}
+				}
+			}
+		}
+	}
+	if (bmerr) return false;
+
 	// initialize mesh data
 	// note that this must be done AFTER the elements have been assigned material point data !
 	// this is because the mesh data is reset
