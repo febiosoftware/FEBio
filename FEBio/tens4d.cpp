@@ -140,37 +140,39 @@ bool IsPositiveDefinite(const tens4ds& t)
 tens4ds dyad1s(const mat3ds& a)
 {
 	tens4ds c;
-	c.d[0] = a.xx()*a.xx();
-	c.d[1] = a.xx()*a.yy();
-	c.d[3] = a.xx()*a.zz();
-	c.d[6] = a.xx()*a.xy();
-	c.d[10] = a.xx()*a.xz();
-	c.d[15] = a.xx()*a.yz();
+	c.d[ 0] = a.xx()*a.xx();
+	c.d[ 1] = a.xx()*a.yy();
+	c.d[ 3] = a.xx()*a.zz();
+	c.d[ 6] = a.xx()*a.xy();
+	c.d[10] = a.xx()*a.yz();
+	c.d[15] = a.xx()*a.xz();
 
-	c.d[2] = a.yy()*a.yy();
-	c.d[4] = a.yy()*a.zz();
-	c.d[7] = a.yy()*a.xy();
-	c.d[11] = a.yy()*a.xz();
-	c.d[16] = a.yy()*a.yz();
+	c.d[ 2] = a.yy()*a.yy();
+	c.d[ 4] = a.yy()*a.zz();
+	c.d[ 7] = a.yy()*a.xy();
+	c.d[11] = a.yy()*a.yz();
+	c.d[16] = a.yy()*a.xz();
 
-	c.d[5] = a.zz()*a.zz();
-	c.d[8] = a.zz()*a.xy();
-	c.d[12] = a.zz()*a.xz();
-	c.d[17] = a.zz()*a.yz();
+	c.d[ 5] = a.zz()*a.zz();
+	c.d[ 8] = a.zz()*a.xy();
+	c.d[12] = a.zz()*a.yz();
+	c.d[17] = a.zz()*a.xz();
 
-	c.d[9] = a.xy()*a.xy();
-	c.d[13] = a.xy()*a.xz();
-	c.d[18] = a.xy()*a.yz();
+	c.d[ 9] = a.xy()*a.xy();
+	c.d[13] = a.xy()*a.yz();
+	c.d[18] = a.xy()*a.xz();
 
-	c.d[14] = a.xz()*a.xz();
-	c.d[19] = a.xz()*a.yz();
+	c.d[14] = a.yz()*a.yz();
+	c.d[19] = a.yz()*a.xz();
 
-	c.d[20] = a.yz()*a.yz();
+	c.d[20] = a.xz()*a.xz();
 	return c;
 }
 
 //-----------------------------------------------------------------------------
 // (a dyad1s b)_ijkl = a_ij b_kl + b_ij a_kl
+// TODO: this function needs to be fixed!!
+/*
 tens4ds dyad1s(const mat3ds& a, const mat3ds& b)
 {
 	tens4ds c;
@@ -202,44 +204,45 @@ tens4ds dyad1s(const mat3ds& a, const mat3ds& b)
 	c.d[20] = 2*a.yz()*b.yz();
 	return c;
 }
-
+*/
 //-----------------------------------------------------------------------------
 // (a dyad4s a)_ijkl = (a_ik a_jl + a_il a_jk)/2
 tens4ds dyad4s(const mat3ds& a)
 {
 	tens4ds c;
-	c.d[0] =  a.xx()*a.xx();
-	c.d[1] =  a.xy()*a.xy();
-	c.d[3] =  a.xz()*a.xz();
-	c.d[6] =  a.xx()*a.xy();
-	c.d[10] = a.xx()*a.xz();
-	c.d[15] = a.xy()*a.xz();
+	c.d[0] =  a.xx()*a.xx(); // 0000 -> 00x00
+	c.d[1] =  a.xy()*a.xy(); // 0011 -> 01x01
+	c.d[3] =  a.xz()*a.xz(); // 0022 -> 02x02
+	c.d[6] =  a.xx()*a.xy(); // 0001 -> 01x00
+	c.d[10] = a.xy()*a.xz(); // 0012 -> 01x02
+	c.d[15] = a.xx()*a.xz(); // 0002 -> 00x02
 	
-	c.d[2] =  a.yy()*a.yy();
-	c.d[4] =  a.yz()*a.yz();
-	c.d[7] =  a.xy()*a.yy();
-	c.d[11] = a.xy()*a.yz();
-	c.d[16] = a.yy()*a.yz();
+	c.d[2] =  a.yy()*a.yy(); // 1111 -> 11x11
+	c.d[4] =  a.yz()*a.yz(); // 1122 -> 12x12
+	c.d[7] =  a.xy()*a.yy(); // 1101 -> 11x01
+	c.d[11] = a.yy()*a.yz(); // 1112 -> 11x12
+	c.d[16] = a.xy()*a.yz(); // 1102 -> 12x01
 	
-	c.d[5] =  a.zz()*a.zz();
-	c.d[8] =  a.xz()*a.yz();
-	c.d[12] = a.xz()*a.zz();
-	c.d[17] = a.yz()*a.zz();
+	c.d[5] =  a.zz()*a.zz(); // 2222 -> 22x22
+	c.d[8] =  a.xz()*a.yz(); // 2201 -> 12x02
+	c.d[12] = a.yz()*a.zz(); // 2212 -> 22x12
+	c.d[17] = a.xz()*a.zz(); // 2202 -> 22x02
 	
-	c.d[9] =  (a.xx()*a.yy() + a.xy()*a.xy())/2.;
-	c.d[13] = (a.xx()*a.yz() + a.xz()*a.xy())/2.;
-	c.d[18] = (a.xy()*a.yz() + a.xz()*a.yy())/2.;
-	
-	c.d[14] = (a.xx()*a.zz() + a.xz()*a.xz())/2.;
-	c.d[19] = (a.xy()*a.zz() + a.xz()*a.yz())/2.;
-	
-	c.d[20] = (a.yy()*a.zz() + a.yz()*a.yz())/2.;
-	return c;
-	
-}
+	c.d[9] =  (a.xx()*a.yy() + a.xy()*a.xy())*0.5; // 0101 -> 0.5*(00x11 + 01x01)
+	c.d[13] = (a.xy()*a.yz() + a.xz()*a.yy())*0.5; // 0112 -> 0.5*(01x12 + 02x11)
+	c.d[18] = (a.xx()*a.yz() + a.xz()*a.xy())*0.5; // 0102 -> 0.5*(00x12 + 02x01)
 
+	c.d[14] = (a.yy()*a.zz() + a.yz()*a.yz())*0.5; // 1212 -> 0.5*(11x22 + 12x12)
+	c.d[19] = (a.xy()*a.zz() + a.xz()*a.yz())*0.5; // 1202 -> 0.5*(01x22 + 12x02)
+
+	c.d[20] = (a.xx()*a.zz() + a.xz()*a.xz())*0.5; // 0202 -> 0.5*(00x22 + 02x02)
+	
+	return c;
+}
+/*
 //-----------------------------------------------------------------------------
 // (a dyad4s b)_ijkl = (a_ik b_jl + a_il b_jk)/2 +  (b_ik a_jl + b_il a_jk)/2
+// TODO: this function needs to be fixed!!
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b)
 {
 	tens4ds c;
@@ -272,3 +275,4 @@ tens4ds dyad4s(const mat3ds& a, const mat3ds& b)
 	return c;
 	
 }
+*/

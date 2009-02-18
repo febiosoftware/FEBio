@@ -274,6 +274,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEHolmesMow.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEIncompNeoHookean.cpp"
 				>
 			</File>
@@ -669,6 +673,10 @@
 			</File>
 			<File
 				RelativePath=".\FEException.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEHolmesMow.h"
 				>
 			</File>
 			<File

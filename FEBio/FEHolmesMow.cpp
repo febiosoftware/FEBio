@@ -73,7 +73,7 @@ void FEHolmesMow::Tangent(double D[6][6], FEMaterialPoint& mp)
 	
 	// calculate invariants of B
 	I1 = b.tr();
-	I2 = (I1*I1 - b2.tr())/2.;
+	I2 = (I1*I1 - b2.tr())*0.5;
 	I3 = b.det();
 	
 	// lame parameters
@@ -83,10 +83,10 @@ void FEHolmesMow::Tangent(double D[6][6], FEMaterialPoint& mp)
 	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
 	
 	// calculate stress
-	mat3ds s = 0.5*detFi*eQ*((2*mu+lam*(I1-1))*b - lam*b2 - Ha*identity);
+	mat3ds s = pt.s; //0.5*detFi*eQ*((2*mu+lam*(I1-1))*b - lam*b2 - Ha*identity);
 	
 	// calculate elasticity tensor
-	tens4ds c = 4*m_b/Ha*detF/eQ*dyad1s(s) 
-	+ detFi*eQ*(lam*(dyad1s(b) - dyad4s(b2)) + Ha*dyad4s(identity));
+	tens4ds c = 4.*m_b/Ha*detF/eQ*dyad1s(s) 
+	+ detFi*eQ*(lam*(dyad1s(b) - dyad4s(b)) + Ha*dyad4s(identity));
 	c.extract(D);
 }
