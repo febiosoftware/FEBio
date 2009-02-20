@@ -70,6 +70,13 @@ tens4ds& tens4ds::operator /= (double g)
 	return (*this);
 }
 
+// intialize to zero
+void tens4ds::zero()
+{
+	d[0] = d[1] = d[2] = d[3] = d[4] = d[5] = d[6] = d[7] = d[8] = d[9] = 
+	d[10] = d[11] = d[12] = d[13] = d[14] = d[15] = d[16] = d[17] = d[18] = d[19] = d[20] = 0;
+}
+
 // extract 6x6 matrix
 void tens4ds::extract(double D[6][6])
 {
@@ -171,8 +178,6 @@ tens4ds dyad1s(const mat3ds& a)
 
 //-----------------------------------------------------------------------------
 // (a dyad1s b)_ijkl = a_ij b_kl + b_ij a_kl
-// TODO: this function needs to be fixed!!
-/*
 tens4ds dyad1s(const mat3ds& a, const mat3ds& b)
 {
 	tens4ds c;
@@ -180,31 +185,31 @@ tens4ds dyad1s(const mat3ds& a, const mat3ds& b)
 	c.d[1] = a.xx()*b.yy() + b.xx()*a.yy();
 	c.d[3] = a.xx()*b.zz() + b.xx()*a.zz();
 	c.d[6] = a.xx()*b.xy() + b.xx()*a.xy();
-	c.d[10] = a.xx()*b.xz() + b.xx()*a.xz();
-	c.d[15] = a.xx()*b.yz() + b.xx()*a.yz();
+	c.d[10] = a.xx()*b.yz() + b.xx()*a.yz();
+	c.d[15] = a.xx()*b.xz() + b.xx()*a.xz();
 	
 	c.d[2] = 2*a.yy()*b.yy();
 	c.d[4] = a.yy()*b.zz() + b.yy()*a.zz();
 	c.d[7] = a.yy()*b.xy() + b.yy()*a.xy();
-	c.d[11] = a.yy()*b.xz() + b.yy()*a.xz();
-	c.d[16] = a.yy()*b.yz() + b.yy()*a.yz();
+	c.d[11] = a.yy()*b.yz() + b.yy()*a.yz();
+	c.d[16] = a.yy()*b.xz() + b.yy()*a.xz();
 	
 	c.d[5] = 2*a.zz()*b.zz();
 	c.d[8] = a.zz()*b.xy() + b.zz()*a.xy();
-	c.d[12] = a.zz()*b.xz() + b.zz()*a.xz();
-	c.d[17] = a.zz()*b.yz() + b.zz()*a.yz();
+	c.d[12] = a.zz()*b.yz() + b.zz()*a.yz();
+	c.d[17] = a.zz()*b.xz() + b.zz()*a.xz();
 	
 	c.d[9] = 2*a.xy()*b.xy();
-	c.d[13] = a.xy()*b.xz() + b.xy()*a.xz();
-	c.d[18] = a.xy()*b.yz() + b.xy()*a.yz();
+	c.d[13] = a.xy()*b.yz() + b.xy()*a.yz();
+	c.d[18] = a.xy()*b.xz() + b.xy()*a.xz();
 	
-	c.d[14] = 2*a.xz()*b.xz();
-	c.d[19] = a.xz()*b.yz() + b.xz()*a.yz();
+	c.d[14] = 2*a.yz()*b.yz();
+	c.d[19] = a.yz()*b.xz() + b.yz()*a.xz();
 	
-	c.d[20] = 2*a.yz()*b.yz();
+	c.d[20] = 2*a.xz()*b.xz();
 	return c;
 }
-*/
+
 //-----------------------------------------------------------------------------
 // (a dyad4s a)_ijkl = (a_ik a_jl + a_il a_jk)/2
 tens4ds dyad4s(const mat3ds& a)
@@ -239,40 +244,38 @@ tens4ds dyad4s(const mat3ds& a)
 	
 	return c;
 }
-/*
+
 //-----------------------------------------------------------------------------
 // (a dyad4s b)_ijkl = (a_ik b_jl + a_il b_jk)/2 +  (b_ik a_jl + b_il a_jk)/2
-// TODO: this function needs to be fixed!!
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b)
 {
 	tens4ds c;
 	c.d[0] =  2*a.xx()*b.xx();
 	c.d[1] =  2*a.xy()*b.xy();
 	c.d[3] =  2*a.xz()*b.xz();
-	c.d[6] =  a.xx()*b.xy() + a.xy()*b.xx();
-	c.d[10] = a.xx()*b.xz() + a.xz()*b.xx();
-	c.d[15] = a.xy()*b.xz() + a.xz()*b.xy();
+	c.d[6] =  a.xy()*b.xx() + a.xx()*b.xy();
+	c.d[10] = a.xz()*b.xy() + a.xy()*b.xz();
+	c.d[15] = a.xz()*b.xx() + a.xx()*b.xz();
 	
 	c.d[2] =  2*a.yy()*b.yy();
 	c.d[4] =  2*a.yz()*b.yz();
-	c.d[7] =  a.xy()*b.yy() + a.yy()*b.xy();
-	c.d[11] = a.xy()*b.yz() + a.yz()*b.xy();
-	c.d[16] = a.yy()*b.yz() + a.yz()*b.yy();
+	c.d[7] =  a.yy()*b.xy() + a.xy()*b.yy();
+	c.d[11] = a.yz()*b.yy() + a.yy()*b.yz();
+	c.d[16] = a.yz()*b.xy() + a.xy()*b.yz();
 	
 	c.d[5] =  2*a.zz()*b.zz();
-	c.d[8] =  a.xz()*b.yz() + a.yz()*b.xz();
-	c.d[12] = a.xz()*b.zz() + a.zz()*b.xz();
-	c.d[17] = a.yz()*b.zz() + a.zz()*b.yz();
+	c.d[8] =  a.yz()*b.xz() + a.xz()*b.yz();
+	c.d[12] = a.zz()*b.yz() + a.yz()*b.zz();
+	c.d[17] = a.zz()*b.xz() + a.xz()*b.zz();
 	
-	c.d[9] =  (a.xx()*b.yy() + b.xx()*a.yy())/2. + a.xy()*b.xy();
-	c.d[13] = (a.xx()*b.yz() + a.xz()*b.xy() + b.xx()*a.yz() + b.xz()*a.xy())/2.;
-	c.d[18] = (a.xy()*b.yz() + a.xz()*b.yy() + b.xy()*a.yz() + b.xz()*a.yy())/2.;
+	c.d[9] =  0.5*(a.yy()*b.xx() + 2*a.xy()*b.xy() + a.xx()*b.yy());
+	c.d[13] = 0.5*(a.yz()*b.xy() + a.yy()*b.xz() + a.xz()*b.yy() + a.xy()*b.yz());
+	c.d[18] = 0.5*(a.yz()*b.xx() + a.xz()*b.xy() + a.xy()*b.xz() + a.xx()*b.yz());
 	
-	c.d[14] = (a.xx()*b.zz() + b.xx()*a.zz())/2. + a.xz()*b.xz();
-	c.d[19] = (a.xy()*b.zz() + a.xz()*b.yz() + b.xy()*a.zz() + b.xz()*a.yz())/2.;
+	c.d[14] = 0.5*(a.zz()*b.yy() + 2*a.yz()*b.yz() + a.yy()*b.zz());
+	c.d[19] = 0.5*(a.zz()*b.xy() + a.yz()*b.xz() + a.xz()*b.yz() + a.xy()*b.zz());
 	
-	c.d[20] = (a.yy()*b.zz() + b.yy()*a.zz())/2. + a.yz()*b.yz();
+	c.d[20] = 0.5*(a.zz()*b.xx() + 2*a.xz()*b.xz() + a.xx()*b.zz());
 	return c;
 	
 }
-*/

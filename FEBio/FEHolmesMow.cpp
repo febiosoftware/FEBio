@@ -23,6 +23,11 @@ void FEHolmesMow::Init()
 	if (m_E <= 0) throw MaterialError("E must be positive");
 	if (!INRANGE(m_v, -1.0, 0.5)) throw MaterialError("Valid range for v is -1 <= v <= 0.5");
 	if (m_b < 0) throw MaterialError("beta must be positive");
+
+	// Lame coefficients
+	lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+	mu  = 0.5*m_E/(1+m_v);
+	Ha = lam + 2*mu;	
 }
 
 mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
@@ -44,10 +49,7 @@ mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 	double I2 = (I1*I1 - b2.tr())/2.;
 	double I3 = b.det();
 
-	// lame parameters
-	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-	double mu  = 0.5*m_E/(1+m_v);
-	double Ha = lam + 2*mu;
+	// Exponential term
 	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
 	
 	// calculate stress
@@ -63,8 +65,6 @@ void FEHolmesMow::Tangent(double D[6][6], FEMaterialPoint& mp)
 	mat3d &F = pt.F;
 	double detF = pt.J;
 	double detFi = 1.0/detF;
-	// invariants of B
-	double I1, I2, I3;
 	
 	// calculate left Cauchy-Green tensor
 	mat3ds b = (F*F.transpose()).sym();
@@ -72,14 +72,11 @@ void FEHolmesMow::Tangent(double D[6][6], FEMaterialPoint& mp)
 	mat3ds identity(1.,1.,1.,0.,0.,0.);
 	
 	// calculate invariants of B
-	I1 = b.tr();
-	I2 = (I1*I1 - b2.tr())*0.5;
-	I3 = b.det();
+	double I1 = b.tr();
+	double I2 = (I1*I1 - b2.tr())*0.5;
+	double I3 = b.det();
 	
-	// lame parameters
-	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-	double mu  = 0.5*m_E/(1+m_v);
-	double Ha = lam + 2*mu;
+	// Exponential term
 	double eQ = exp(m_b*((2*mu-lam)*(I1-3) + lam*(I2-3))/Ha)/pow(I3,m_b);
 	
 	// calculate stress

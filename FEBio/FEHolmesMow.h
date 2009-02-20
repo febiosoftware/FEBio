@@ -10,6 +10,9 @@ class FEHolmesMow : public FEElasticMaterial
 		double	m_E;	//!< Young's modulus
 		double	m_v;	//!< Poisson's ratio
 		double	m_b;	//!< Exponential stiffening coefficient
+		double	lam;	//!< first Lame coefficient
+		double	mu;		//!< second Lame coefficient
+		double	Ha;		//!< aggregate modulus
 		
 	public:
 		//! calculate stress at material point

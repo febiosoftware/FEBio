@@ -60,6 +60,9 @@ public:
 	tens4ds& operator *= (double g);
 	tens4ds& operator /= (double g);
 	
+	// intialize to zero
+	void zero();
+	
 	// extract 6x6 matrix
 	void extract(double d[6][6]);
 	
@@ -72,8 +75,8 @@ bool IsPositiveDefinite(const tens4ds& t);
 
 // outer (dyadic) products for symmetric matrices
 tens4ds dyad1s(const mat3ds& a);
-//tens4ds dyad1s(const mat3ds& a, const mat3ds& b);
+tens4ds dyad1s(const mat3ds& a, const mat3ds& b);
 tens4ds dyad4s(const mat3ds& a);
-//tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
+tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
 
 inline tens4ds operator * (const double g, const tens4ds& a) { return a*g; }
