@@ -355,6 +355,12 @@ bool FEAnalysis::Solve()
 			}
 			break;
 		}
+		catch (std::bad_alloc e)
+		{
+			bconv = false;
+			m_fem.m_log.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
+			break;
+		}
 		catch (...)
 		{
 			bconv = false;

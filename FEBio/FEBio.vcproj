@@ -274,6 +274,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEFungOrthotropic.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEHolmesMow.cpp"
 				>
 			</File>
@@ -673,6 +677,10 @@
 			</File>
 			<File
 				RelativePath=".\FEException.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEFungOrthotropic.h"
 				>
 			</File>
 			<File
