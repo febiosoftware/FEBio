@@ -10,7 +10,7 @@
 //! This class defines several virtual functions that need to be overriden
 //! in the derived class
 
-class LinearSolver  
+class LinearSolver
 {
 public:
 	LinearSolver() { m_bvalid = false; }
@@ -71,7 +71,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Implements a linear solver that uses a compact column storage format.
 
-//! This solver can only be used on systems where it is available, 
+//! This solver can only be used on systems where it is available,
 //! such as SGI IRIX, SGI ALTIX, ...
 
 #ifdef PSLDLT
@@ -105,7 +105,7 @@ public:
 //! version of BLAS.
 
 #ifdef SUPERLU
-	#include "slu_ddefs.h"
+		#include "slu_ddefs.h"
 #endif
 
 class SuperLUSolver : public LinearSolver
@@ -134,15 +134,15 @@ protected:
 
 
 #ifdef SUPERLU
-	
+
 	SuperMatrix A, L, U, B, X;
 	vector<int>	perm_c;
 	vector<int>	perm_r;
 	vector<int>	etree;
 
 	superlu_options_t	options;
-	SuperLUStat_t		stat;
-	mem_usage_t			mem_usage;
+	SuperLUStat_t	stat;
+	mem_usage_t	mem_usage;
 
 	double	rpg, rcond;
 	double	ferr, berr;
@@ -220,7 +220,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! this class implements an iterative solver that implements the 
+//! this class implements an iterative solver that implements the
 //! conjugate gradient method
 
 class ConjGradIterSolver : public LinearSolver
@@ -234,7 +234,7 @@ public:
 	virtual bool Solve(SparseMatrix& K, matrix& x, matrix& b);
 	virtual void Destroy();
 
-	virtual SparseMatrix* GetMatrix() { return new CompactMatrix(); }	
+	virtual SparseMatrix* GetMatrix() { return new CompactMatrix(); }
 
 public:
 	double	m_tol;		// convergence tolerance

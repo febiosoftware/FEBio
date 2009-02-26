@@ -121,7 +121,7 @@ bool SuperLUSolver::Factor(SparseMatrix& K)
 		{
 			fprintf(stderr, " ESTIMATED CONDITION NUMBER : %lg\n", 1./rcond);
 		}
-		else 
+		else
 		{
 			fprintf(stderr, " FAILED ESTIMAING CONDITION NUMBER\n");
 		}
@@ -129,7 +129,7 @@ bool SuperLUSolver::Factor(SparseMatrix& K)
 
 	// free the stats
 	StatFree(&stat);
-	
+
 	return true;
 
 #endif

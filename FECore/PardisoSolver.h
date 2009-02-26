@@ -36,24 +36,15 @@ public:
 
 protected:
 	/* Pardiso control parameters */
-	int iparm[64];
-	int maxfct, mnum, phase, error, msglvl;
+	int m_iparm[64];
+	int m_maxfct, m_mnum, m_error, m_msglvl;
 
 	/* Matrix data */
-	int mtype;
+	int m_mtype;
 
-	int n, nnz, nrhs;
+	int m_n, m_nnz, m_nrhs;
 
 	/* Internal solver memory pointer */
-	void* pt[64];
-
-	/* Number of processors */
-	int num_procs;
-
-	/* Auxiliary variables */
-	char* var;
-	int i;
-	double ddum; /* Double dummy */
-	int idum; /* Integer dummy */
+	void* m_pt[64];
 };
 

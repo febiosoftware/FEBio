@@ -14,9 +14,9 @@ PardisoSolver::PardisoSolver()
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
 #else
-	mtype = -2; /* Real symmetric matrix */
-	iparm[0] = 0;
-	pardisoinit_(pt, &mtype, iparm);
+	m_mtype = -2; /* Real symmetric matrix */
+	m_iparm[0] = 0;
+	pardisoinit_(m_pt, &m_mtype, m_iparm);
 #endif
 }
 
@@ -27,45 +27,50 @@ bool PardisoSolver::PreProcess(SparseMatrix& K)
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	return false;
 #else
+	/* Auxiliary variables */
+	double ddum; /* Double dummy */
+	int idum; /* Integer dummy */
+
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
-	n = A->Size();
-	nnz = A->NonZeroes();
-	nrhs = 1;
+	m_n = A->Size();
+	m_nnz = A->NonZeroes();
+	m_nrhs = 1;
 
 	/* Number of processors OMP_NUM_THREADS */
-	var = getenv("OMP_NUM_THREADS");
+	char* var = getenv("OMP_NUM_THREADS");
+	int num_procs;
 	if(var) num_procs = atoi(var);
 	else {
 		fprintf(stderr, "Set environment OMP_NUM_THREADS to 1");
 		exit(1);
 	}
-	iparm[2] = num_procs;
+	m_iparm[2] = num_procs;
 
-	maxfct = 1;	/* Maximum number of numerical factorizations */
-	mnum = 1;	/* Which factorization to use */
+	m_maxfct = 1;	/* Maximum number of numerical factorizations */
+	m_mnum = 1;	/* Which factorization to use */
 
-	msglvl = 0;	/* 0 Suppress printing, 1 Print statistical information */
-	error = 0;	/* Initialize error flag */
+	m_msglvl = 0;	/* 0 Suppress printing, 1 Print statistical information */
+	m_error = 0;	/* Initialize m_error flag */
 
 // ------------------------------------------------------------------------------
 // Reordering and Symbolic Factorization.  This step also allocates all memory
 // that is necessary for the factorization.
 // ------------------------------------------------------------------------------
 
-	phase = 11;
+	int phase = 11;
 
-	pardiso_(pt, &maxfct, &mnum, &mtype, &phase, &n, A->values(), A->pointers(), A->indices(),
-		 &idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
+		 &idum, &m_nrhs, m_iparm, &m_msglvl, &ddum, &ddum, &m_error);
 
-	if (error)
+	if (m_error)
 	{
-		fprintf(stderr, "\nERROR during symbolic factorization: %i", error);
+		fprintf(stderr, "\nERROR during symbolic factorization: %i", m_error);
 		exit(2);
 	}
 
 //	fprintf(stderr, "\nReordering completed ...\n");
-//	fprintf(stderr, "\nNumber of nonzeros in factors = %i", iparm[17]);
-//	fprintf(stderr, "\nNumber of factorization MFLOPS = %i", iparm[18]);
+//	fprintf(stderr, "\nNumber of nonzeros in factors = %i", m_iparm[17]);
+//	fprintf(stderr, "\nNumber of factorization MFLOPS = %i", m_iparm[18]);
 
 	return LinearSolver::PreProcess(K);
 #endif
@@ -78,10 +83,13 @@ bool PardisoSolver::Factor(SparseMatrix& K)
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	return false;
 #else
+	/* Auxiliary variables */
+	double ddum; /* Double dummy */
+	int idum; /* Integer dummy */
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
 
-	phase = 22;
+	int phase = 22;
 
 #ifdef DEBUG
 	printf("\nThis is a test");
@@ -94,17 +102,17 @@ bool PardisoSolver::Factor(SparseMatrix& K)
 	indices = A->indices();
 	values = A->values();
 	fprintf(stdout, "\nPointers:");
-	for (i=0; i<n; i++) fprintf(stdout, "\n%d", pointers[i]);
+	for (i=0; i<m_n; i++) fprintf(stdout, "\n%d", pointers[i]);
 	fprintf(stdout, "\nIndices, Values:");
-	for (i=0; i<nnz; i++) fprintf(stdout, "\n%d, %g", indices[i], values[i]);
+	for (i=0; i<m_nnz; i++) fprintf(stdout, "\n%d, %g", indices[i], values[i]);
 #endif
 
-	pardiso_(pt, &maxfct, &mnum, &mtype, &phase, &n, A->values(), A->pointers(), A->indices(),
-		 &idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
+		 &idum, &m_nrhs, m_iparm, &m_msglvl, &ddum, &ddum, &m_error);
 
-	if (error)
+	if (m_error)
 	{
-		fprintf(stderr, "\nERROR during factorization: %i", error);
+		fprintf(stderr, "\nERROR during factorization: %i", m_error);
 		exit(2);
 	}
 
@@ -122,18 +130,21 @@ bool PardisoSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 	return false;
 #else
 
+	/* Auxiliary variables */
+	int idum; /* Integer dummy */
+
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
 
-	phase = 33;
+	int phase = 33;
 
-	iparm[7] = 1;	/* Maximum number of iterative refinement steps */
+	m_iparm[7] = 1;	/* Maximum number of iterative refinement steps */
 
-	pardiso_(pt, &maxfct, &mnum, &mtype, &phase, &n, A->values(), A->pointers(), A->indices(),
-		 &idum, &nrhs, iparm, &msglvl, b, x, &error);
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
+		 &idum, &m_nrhs, m_iparm, &m_msglvl, b, x, &m_error);
 
-	if (error)
+	if (m_error)
 	{
-		fprintf(stderr, "\nERROR during solution: %i", error);
+		fprintf(stderr, "\nERROR during solution: %i", m_error);
 		exit(3);
 	}
 
@@ -164,10 +175,14 @@ void PardisoSolver::Destroy()
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
 #else
-	phase = -1;
+	/* Auxiliary variables */
+	double ddum; /* Double dummy */
+	int idum; /* Integer dummy */
 
-	pardiso_(pt, &maxfct, &mnum, &mtype, &phase, &n, &ddum, &idum, &idum,
-		 &idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
+	int phase = -1;
+
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, &ddum, &idum, &idum,
+		 &idum, &m_nrhs, m_iparm, &m_msglvl, &ddum, &ddum, &m_error);
 
 #endif
 }
