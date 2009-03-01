@@ -326,7 +326,18 @@ void FEM::EchoInput()
 		m_log.printf("\n\n");
 	}
 
+	m_log.printf(" LINEAR SOLVER DATA\n");
+	m_log.printf("===========================================================================\n");
+	m_log.printf("\tSolver type ............................... : ");
+	if (m_nsolver == SKYLINE_SOLVER     ) m_log.printf("Skyline\n");
+	if (m_nsolver == PSLDLT_SOLVER      ) m_log.printf("PSLDLT\n");
+	if (m_nsolver == SUPERLU_SOLVER     ) m_log.printf("SuperLU\n");
+	if (m_nsolver == SUPERLU_MT_SOLVER  ) m_log.printf("SuperLU_MT\n");
+	if (m_nsolver == PARDISO_SOLVER     ) m_log.printf("Pardiso\n");
+	if (m_nsolver == LU_SOLVER          ) m_log.printf("LUSolver\n");
+	if (m_nsolver == CG_ITERATIVE_SOLVER) m_log.printf("Conjugate gradient\n");
+	m_log.printf("\n\n");
+
 	// reset log mode
 	m_log.SetMode(old_mode);
-
 }

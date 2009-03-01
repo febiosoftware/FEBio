@@ -227,6 +227,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 					{
 						if (strcmp(szv, "GAUSS8") == 0) m_nhex8 = FE_HEX;
 						else if (strcmp(szv, "POINT6") == 0) m_nhex8 = FE_RIHEX;
+						else if (strcmp(szv, "UDF") == 0) m_nhex8 = FE_UDFHEX;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "elem", sze);

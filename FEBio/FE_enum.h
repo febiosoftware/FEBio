@@ -16,18 +16,19 @@ enum FE_Element_Type {
 	// 3D solid elements
 	FE_HEX,			// = 0
 	FE_RIHEX,		// = 1
-	FE_TET,			// = 2
-	FE_PENTA,		// = 3
+	FE_UDFHEX,		// = 2
+	FE_TET,			// = 3
+	FE_PENTA,		// = 4
 
 	// 2.5D surface elements
-	FE_QUAD,		// = 4
-	FE_NIQUAD,		// = 5
-	FE_TRI,			// = 6
-	FE_NITRI,		// = 7
+	FE_QUAD,		// = 5
+	FE_NIQUAD,		// = 6
+	FE_TRI,			// = 7
+	FE_NITRI,		// = 8
 
 	// shell elements
-	FE_SHELL_QUAD,	// = 8
-	FE_SHELL_TRI	// = 9
+	FE_SHELL_QUAD,	// = 9
+	FE_SHELL_TRI	// = 10
 };
 
 /////////////////////////////////////////////////////////////////////////////

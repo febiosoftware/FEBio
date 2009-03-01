@@ -696,3 +696,21 @@ inline mat3d mat3d::transpose() const
 				 d[0][1], d[1][1], d[2][1],
 				 d[0][2], d[1][2], d[2][2]);
 }
+
+// return the transposed inverse matrix
+inline mat3d mat3d::transinv() const
+{
+	double D = det();
+	assert(D != 0);
+	D = 1/D;
+
+	return mat3d(D*(d[1][1]*d[2][2] - d[1][2]*d[2][1]), // xx
+				 D*(d[1][2]*d[2][0] - d[1][0]*d[2][2]), // yx
+				 D*(d[1][0]*d[2][1] - d[1][1]*d[2][0]), // zx
+				 D*(d[0][2]*d[2][1] - d[0][1]*d[2][2]), // xy
+				 D*(d[0][0]*d[2][2] - d[0][2]*d[2][0]), // yy
+				 D*(d[0][1]*d[2][0] - d[0][0]*d[2][1]), // zy
+				 D*(d[0][1]*d[1][2] - d[1][1]*d[0][2]), // xz
+				 D*(d[0][2]*d[1][0] - d[0][0]*d[1][2]), // yz
+				 D*(d[0][0]*d[1][1] - d[0][1]*d[1][0])); // zz
+}

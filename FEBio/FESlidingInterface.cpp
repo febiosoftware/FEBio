@@ -100,6 +100,7 @@ void FESlidingInterface::CalcAutoPenalty(FEContactSurface& s)
 			{
 			case FE_HEX:
 			case FE_RIHEX:
+			case FE_UDFHEX:
 				{
 					for (k=0; k<6; ++k)
 					{

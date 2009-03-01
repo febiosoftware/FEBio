@@ -53,10 +53,20 @@ bool FESolver::CreateStiffness(bool breset)
 	m_pK->Clear();
 
 	// create the stiffness matrix
+	m_log.printf("===== reforming stiffness matrix:\n");
 	if (m_pK->Create(m_fem, breset) == false) 
 	{
 		m_log.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;
+	}
+	else
+	{
+		// output some information about the direct linear solver
+		int neq = m_fem.m_neq;
+		int nnz = m_pK->NonZeroes();
+		m_log.printf("\tNr of equations ........................... : %d\n", neq);
+		m_log.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+		m_log.printf("\n");
 	}
 
 	// Do the preprocessing of the solver

@@ -328,9 +328,6 @@ public:
 
 	//{ --- Update routines ---
 
-		//! Update Stresses
-		void UpdateStresses();
-
 		//! Update contact data
 		void UpdateContact();
 	//}

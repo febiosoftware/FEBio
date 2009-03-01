@@ -90,21 +90,5 @@ bool FESolver::Init()
 	// set the create stiffness matrix flag
 	m_breshape = true;
 
-	// output some information about the direct linear solver
-	m_log.printf(" LINEAR EQUATION SOLVER DATA\n");
-	m_log.printf("===========================================================================\n");
-	m_log.printf("\tSolver type ............................... : ");
-	if (m_fem.m_nsolver == SKYLINE_SOLVER     ) m_log.printf("Skyline\n");
-	if (m_fem.m_nsolver == PSLDLT_SOLVER      ) m_log.printf("PSLDLT\n");
-	if (m_fem.m_nsolver == SUPERLU_SOLVER     ) m_log.printf("SuperLU\n");
-	if (m_fem.m_nsolver == SUPERLU_MT_SOLVER  ) m_log.printf("SuperLU_MT\n");
-	if (m_fem.m_nsolver == PARDISO_SOLVER  ) m_log.printf("Pardiso\n");
-	if (m_fem.m_nsolver == LU_SOLVER          ) m_log.printf("LUSolver\n");
-	if (m_fem.m_nsolver == CG_ITERATIVE_SOLVER) m_log.printf("Conjugate gradient\n");
-	m_log.printf("\tNr of equations ........................... : %d\n", neq);
-//	m_log.printf("\tNr of nonzero coefficients ................ : %d\n", m_pK->NonZeroes());
-//	m_log.printf("\tin global stiffness matrix\n");
-//	m_log.printf("\n\n");
-
 	return true;
 }

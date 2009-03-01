@@ -251,7 +251,7 @@ void FESolver::PrepStep(double time)
 	// intialize the stresses
 	// TODO: is this a good place to update the stresses?
 	// Perhaps I should place this back in the residual routine?
-	m_fem.UpdateStresses();
+	UpdateStresses();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -288,6 +288,8 @@ bool FESolver::Quasin(double time)
 //	double r0 = m_R0*m_R0;
 
 	Logfile::MODE oldmode;
+
+	m_fem.m_log.printf("\n===== beginning time step %d : %lg =====\n", m_fem.m_pStep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
@@ -458,7 +460,7 @@ bool FESolver::Quasin(double time)
 				// the last residual but have to recalculate the residual
 				// we also recalculate the stresses in case we are doing augmentations
 				// for incompressible materials
-				m_fem.UpdateStresses();
+				UpdateStresses();
 				Residual(m_R0);
 			}
 		}

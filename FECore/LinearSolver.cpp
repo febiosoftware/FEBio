@@ -183,6 +183,10 @@ bool SkylineSolver::Factor(SparseMatrix& K)
 	for (i=0; i<n; i++) printf("\n%d, %g", pointers[i], values[i]);
 #endif
 
+	FILE* fp = fopen("data.txt", "wt");
+	pK->print(fp);
+	fclose(fp);
+
 	colsol_factor(pK->Size(), pK->values(), pK->pointers());
 
 	return true;

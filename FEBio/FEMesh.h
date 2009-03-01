@@ -205,9 +205,6 @@ public:
 	//! Calculates an elements volume
 	double ElementVolume(FEElement& el);
 
-	//! Calculates the volume of a hex element
-	double HexVolume(FESolidElement& el);
-
 	//! assign a material ID to the entire mesh
 	void SetMatID(int n);
 

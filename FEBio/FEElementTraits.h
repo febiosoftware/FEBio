@@ -165,7 +165,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 // CLASS: FERIHexElementTraits
-// 8-node hexahedral elements with 1-point reduced integration rule
+// 8-node hexahedral elements with 6-point reduced integration rule
 //
 
 class FERIHexElementTraits : public FESolidElementTraits
@@ -180,6 +180,21 @@ public:
 	void init();
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// CLASS: FEUDFHexElementTraits
+// 8-node hexahedral element with uniform deformation gradient
+
+class FEUDFHexElementTraits : public FESolidElementTraits
+{
+public:
+	enum { NINT = 1 };
+	enum { NELN = 8 };
+
+public:
+	FEUDFHexElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_UDFHEX; init(); }
+
+	void init();
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // CLASS: FETetElementTraits

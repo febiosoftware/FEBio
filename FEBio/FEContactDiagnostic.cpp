@@ -257,7 +257,7 @@ void FEContactDiagnostic::deriv_residual(FullMatrix& K)
 		case 2: node.m_rt.z += dx; break;
 		}
 
-		fem.UpdateStresses();
+		solver.UpdateStresses();
 		fem.UpdateContact();
 
 		R1.zero();
@@ -271,7 +271,7 @@ void FEContactDiagnostic::deriv_residual(FullMatrix& K)
 		case 2: node.m_rt.z -= dx; break;
 		}
 
-		fem.UpdateStresses();
+		solver.UpdateStresses();
 		fem.UpdateContact();
 
 		for (i=0; i<3*N; ++i) K(i,j) = (1-(R1[i] - R0[i])/dx)-1;

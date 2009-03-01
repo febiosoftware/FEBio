@@ -63,6 +63,9 @@ public:
 		//! Perform an update
 		void Update(vector<double>& ui, double s);
 
+		//! Update Stresses
+		void UpdateStresses();
+
 		//! Update poroelstic data
 		void UpdatePoro(vector<double>& ui, double s);
 
@@ -150,6 +153,9 @@ public:
 		//! Calculates the internal stress vector for solid elements
 		void InternalForces(FESolidElement& el, vector<double>& fe);
 
+		//! Calculates the internal stress vector for enhanced strain hex elements
+		void UDFInternalForces(FESolidElement& el, vector<double>& fe);
+
 		//! Calculates the internal stress vector for shell elements
 		void InternalForces(FEShellElement& el, vector<double>& fe);
 
@@ -169,10 +175,14 @@ public:
 		void LinearConstraintForces(vector<double>& R);
 	//}
 
+protected:
+	double HexVolume(FESolidElement& el, int state = 0);
+	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8]);
+	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
+
 public:
-		//! serialize data to/from dump file
-		void Serialize(Archive& ar);
-	//}
+	//! serialize data to/from dump file
+	void Serialize(Archive& ar);
 
 public:
 	Logfile&	m_log;	//!< reference to log file

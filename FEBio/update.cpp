@@ -135,7 +135,7 @@ void FESolver::Update(vector<double>& ui, double s)
 	if (m_fem.m_bcontact) m_fem.UpdateContact();
 
 	// update element stresses
-	m_fem.UpdateStresses();
+	UpdateStresses();
 
 	// dump all states to the plot file
 	// when requested
@@ -311,23 +311,25 @@ void FESolver::UpdateRigidBodies(vector<double>& ui, double s)
 //  Updates the element stresses
 //
 
-void FEM::UpdateStresses()
+void FESolver::UpdateStresses()
 {
 	int i, n;
 	int nint;
 	double* gw;
 
+	FEMesh& mesh = m_fem.m_mesh;
+
 	// loop over all solid elements
-	for (i=0; i<m_mesh.SolidElements(); ++i)
+	for (i=0; i<mesh.SolidElements(); ++i)
 	{
 		// get the solid element
-		FESolidElement& el = m_mesh.SolidElement(i);
+		FESolidElement& el = mesh.SolidElement(i);
 
 		// we skip rigid elements
 		if (!el.IsRigid())
 		{
 			// unpack the element data
-			m_mesh.UnpackElement(el);
+			mesh.UnpackElement(el);
 
 			// get the number of integration points
 			nint = el.GaussPoints();
@@ -336,14 +338,14 @@ void FEM::UpdateStresses()
 			gw = el.GaussWeights();
 
 			// get the material
-			FEMaterial* pm = GetMaterial(el.GetMatID());
+			FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
 
 			// extract the elastic component
-			FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
+			FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;
-			if ((m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+			if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 			// see if the material is incompressible or not
 			// if the material is incompressible the element
@@ -413,16 +415,16 @@ void FEM::UpdateStresses()
 	}
 
 	// loop over all shell elements
-	for (i=0; i<m_mesh.ShellElements(); ++i)
+	for (i=0; i<mesh.ShellElements(); ++i)
 	{
 		// get the solid element
-		FEShellElement& el = m_mesh.ShellElement(i);
+		FEShellElement& el = mesh.ShellElement(i);
 
 		// we skip rigid elements
 		if (!el.IsRigid())
 		{
 			// unpack the element data
-			m_mesh.UnpackElement(el);
+			mesh.UnpackElement(el);
 
 			// get the number of integration points
 			nint = el.GaussPoints();
@@ -431,14 +433,14 @@ void FEM::UpdateStresses()
 			gw = el.GaussWeights();
 
 			// get the material
-			FEMaterial* pm = GetMaterial(el.GetMatID());
+			FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
 
 			// extract the elastic component
-			FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
+			FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;
-			if ((m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+			if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 			// see if the material is incompressible or not
 			// if the material is incompressible the element

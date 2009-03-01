@@ -316,8 +316,6 @@ bool FEAnalysis::Solve()
 		// update time
 		m_fem.m_ftime += m_dt;
 
-		m_fem.m_log.printf("\n===== beginning time step %d : %lg =====\n", m_ntimesteps+1, m_fem.m_ftime);
-
 		// solve this timestep,
 		// that is, use the Newton Raphson method to solve the timestep
 		try

@@ -173,7 +173,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		}
 
 
-		fem.UpdateStresses();
+		solver.UpdateStresses();
 		mesh.UnpackElement(el);
 
 		f1.zero();
@@ -186,7 +186,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		case 2: node.m_rt.z -= dx; break;
 		}
 
-		fem.UpdateStresses();
+		solver.UpdateStresses();
 		mesh.UnpackElement(el);
 
 		for (i=0; i<3*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
@@ -214,7 +214,7 @@ double FETangentDiagnostic::residual(double d)
 	}
 
 	// update stresses
-	fem.UpdateStresses();
+	solver.UpdateStresses();
 
 	// get the residual
 	vector<double> R(24);
