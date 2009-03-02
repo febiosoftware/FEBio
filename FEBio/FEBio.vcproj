@@ -214,6 +214,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FE2DTransIsoVerondaWestmann.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEAnalysis.cpp"
 				>
 			</File>
@@ -375,6 +379,10 @@
 			</File>
 			<File
 				RelativePath=".\FERandomFiberNeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FERandomFiberVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -616,6 +624,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FE2DTransIsoVerondaWestmann.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FE_enum.h"
 				>
 			</File>
@@ -781,6 +793,10 @@
 			</File>
 			<File
 				RelativePath=".\FERandomFiberNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FERandomFiberVerondaWestmann.h"
 				>
 			</File>
 			<File

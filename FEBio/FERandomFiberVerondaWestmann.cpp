@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "FERandomFiberMaterial.h"
+#include "StdAfx.h"
+#include "FERandomFiberVerondaWestmann.h"
 
 // TODO: there is a possible bug in the fiber stress and or fiber stiffness
 
@@ -8,17 +8,17 @@
 #include "geodesic.h"
 
 // we store the cos and sin of the angles here
-int FERandomFiberMooneyRivlin::m_nres = 0;
-double FERandomFiberMooneyRivlin::m_cth[NSTH];
-double FERandomFiberMooneyRivlin::m_sth[NSTH];
-double FERandomFiberMooneyRivlin::m_cph[NSTH];
-double FERandomFiberMooneyRivlin::m_sph[NSTH];
+int FERandomFiberVerondaWestmann::m_nres = 0;
+double FERandomFiberVerondaWestmann::m_cth[NSTH];
+double FERandomFiberVerondaWestmann::m_sth[NSTH];
+double FERandomFiberVerondaWestmann::m_cph[NSTH];
+double FERandomFiberVerondaWestmann::m_sph[NSTH];
 
 // register the material with the framework
-REGISTER_MATERIAL(FERandomFiberMooneyRivlin, "random fiber Mooney-Rivlin");
+REGISTER_MATERIAL(FERandomFiberVerondaWestmann, "random fiber Veronda-Westmann");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERandomFiberMooneyRivlin, FEIncompressibleMaterial)
+BEGIN_PARAMETER_LIST(FERandomFiberVerondaWestmann, FEIncompressibleMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
@@ -30,10 +30,10 @@ END_PARAMETER_LIST();
 #endif
 
 //////////////////////////////////////////////////////////////////////
-// FERandomFiberMooneyRivlin
+// FERandomFiberVerondaWestmann
 //////////////////////////////////////////////////////////////////////
 
-FERandomFiberMooneyRivlin::FERandomFiberMooneyRivlin()
+FERandomFiberVerondaWestmann::FERandomFiberVerondaWestmann()
 {
 	static bool bfirst = true;
 
@@ -57,7 +57,7 @@ FERandomFiberMooneyRivlin::FERandomFiberMooneyRivlin()
 	}
 }
 
-void FERandomFiberMooneyRivlin::Init()
+void FERandomFiberVerondaWestmann::Init()
 {
 	FEElasticMaterial::Init();
 
@@ -69,7 +69,7 @@ void FERandomFiberMooneyRivlin::Init()
 	if (m_beta[2] <= 2) throw MaterialError("beta1 must be bigger than 2.");
 }
 
-mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
+mat3ds FERandomFiberVerondaWestmann::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -126,8 +126,8 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	I2 = 0.5*(I1*I1 - ( B2[0][0] + B2[1][1] + B2[2][2]) );
 
 	// strain energy derivatives
-	double W1 = m_c1;
-	double W2 = m_c2;
+	double W1 = m_c1*m_c2*exp(m_c2*(I1-3));
+	double W2 = -0.5*m_c1*m_c2;
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
 
@@ -225,7 +225,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
+void FERandomFiberVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -317,8 +317,10 @@ void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 	B2[2][2] = B[2][0]*B[0][2]+B[2][1]*B[1][2]+B[2][2]*B[2][2];
 
 	// strain energy derivatives
-	double W1 = m_c1;
-	double W2 = m_c2;
+	double W1, W2, W11;
+	W1 = m_c1*m_c2*exp(m_c2*(I1-3));
+	W2 = -0.5*m_c1*m_c2;
+	W11 = m_c2*W1;
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
 
@@ -326,111 +328,132 @@ void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 	double WC = W1*I1 + 2*W2*I2;
 
 	// calculate C:d2WdCdC:C
-	double CWWC = 2*I2*W2;
+	double CWWC = W11*I1*I1+2*I2*W2;
 
 	// D[0][0] = c(0,0,0,0)
 	D[0][0] = -p - (4.0/3.0)*s[0][0] + (8.0/9.0)*Ji*WC;
-	D[0][0] -= (8.0/3.0)*Ji*(W2*I1*B[0][0] - W2*B2[0][0]);
+	D[0][0] += 4.0*Ji*W11*B[0][0]*B[0][0];
 	D[0][0] += (4.0/9.0)*Ji*CWWC;
+	D[0][0] -= (8.0/3.0)*Ji*((W11+W2)*I1*B[0][0] - W2*B2[0][0]);
 
 	// D[1][1] = c(1,1,1,1)
-	D[1][1] = -p - (4.0/3.0)*s[1][1] + (8.0/9.0)*Ji*WC;
-	D[1][1] -= (8.0/3.0)*Ji*(W2*I1*B[1][1] - W2*B2[1][1]);
+	D[1][1] = -p - (4.0/3.0)*s[1][1] + 8.0/9.0*Ji*WC;
+	D[1][1] += 4.0*Ji*W11*B[1][1]*B[1][1];
 	D[1][1] += (4.0/9.0)*Ji*CWWC;
+	D[1][1] -= (8.0/3.0)*Ji*((W11+W2)*I1*B[1][1] - W2*B2[1][1]);
 
 	// D[2][2] = c(2,2,2,2)
 	D[2][2] = -p - (4.0/3.0)*s[2][2] + (8.0/9.0)*Ji*WC;
-	D[2][2] -= (8.0/3.0)*Ji*(W2*I1*B[2][2] - W2*B2[2][2]);
+	D[2][2] += 4.0*Ji*W11*B[2][2]*B[2][2];
 	D[2][2] += (4.0/9.0)*Ji*CWWC;
+	D[2][2] -= (8.0/3.0)*Ji*((W11+W2)*I1*B[2][2] - W2*B2[2][2]);
 
 
 
 	// D[0][1] = D[1][0] = c(0,0,1,1)
 	D[0][1] = p - (2.0/3.0)*(s[0][0] + s[1][1]) - (4.0/9.0)*Ji*WC;
+	D[0][1] += 4.0*Ji*W11*B[0][0]*B[1][1];
 	D[0][1] += 4.0*Ji*W2*(B[0][0]*B[1][1] - B[0][1]*B[0][1]);
 	D[0][1] += (4.0/9.0)*Ji*CWWC;
-	D[0][1] -= (4.0/3.0)*Ji*(W2*(I1*B[0][0] - B2[0][0]));
-	D[0][1] -= (4.0/3.0)*Ji*(W2*(I1*B[1][1] - B2[1][1]));
+	D[0][1] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][0] - W2*B2[0][0]);
+	D[0][1] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[1][1] - W2*B2[1][1]);
 
 	// D[1][2] = D[2][1] = c(1,1,2,2)
 	D[1][2] = p - (2.0/3.0)*(s[1][1] + s[2][2]) - (4.0/9.0)*Ji*WC;
+	D[1][2] += 4.0*Ji*W11*B[1][1]*B[2][2];
 	D[1][2] += 4.0*Ji*W2*(B[1][1]*B[2][2] - B[1][2]*B[1][2]);
 	D[1][2] += (4.0/9.0)*Ji*CWWC;
-	D[1][2] -= (4.0/3.0)*Ji*(W2*(I1*B[1][1] - B2[1][1]));
-	D[1][2] -= (4.0/3.0)*Ji*(W2*(I1*B[2][2] - B2[2][2]));
+	D[1][2] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[1][1] - W2*B2[1][1]);
+	D[1][2] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[2][2] - W2*B2[2][2]);
 
 	// D[0][2] = D[2][0] = c(0,0,2,2)
 	D[0][2] = p - (2.0/3.0)*(s[0][0] + s[2][2]) - (4.0/9.0)*Ji*WC;
+	D[0][2] += 4.0*Ji*W11*B[0][0]*B[2][2];
 	D[0][2] += 4.0*Ji*W2*(B[0][0]*B[2][2] - B[0][2]*B[0][2]);
 	D[0][2] += (4.0/9.0)*Ji*CWWC;
-	D[0][2] -= (4.0/3.0)*Ji*(W2*(I1*B[0][0] - B2[0][0]));
-	D[0][2] -= (4.0/3.0)*Ji*(W2*(I1*B[2][2] - B2[2][2]));
+	D[0][2] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][0] - W2*B2[0][0]);
+	D[0][2] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[2][2] - W2*B2[2][2]);
 
 
 
 	// D[3][3] = 0.5*(c(0,1,0,1) + c(0,1,1,0))
 	D[3][3] = -p + (2.0/3.0)*Ji*WC;
+	D[3][3] += 4.0*Ji*W11*B[0][1]*B[0][1];
 	D[3][3] += 2.0*Ji*W2*(B[0][1]*B[0][1] - B[0][0]*B[1][1]);
 
 	// D[4][4] = 0.5*(c(1,2,1,2) + c(1,2,2,1))
 	D[4][4] = -p + (2.0/3.0)*Ji*WC;
+	D[4][4] += 4.0*Ji*W11*B[1][2]*B[1][2];
 	D[4][4] += 2.0*Ji*W2*(B[1][2]*B[1][2] - B[1][1]*B[2][2]);
 
 	// D[5][5] = 0.5*(c(0,2,0,2) + c(0,2,2,0))
 	D[5][5] = -p + (2.0/3.0)*Ji*WC;
+	D[5][5] += 4.0*Ji*W11*B[0][2]*B[0][2];
 	D[5][5] += 2.0*Ji*W2*(B[0][2]*B[0][2] - B[0][0]*B[2][2]);
 
 
 
 	// D[0][3] = 0.5*(c(0,0,0,1) + c(0,0,1,0))
 	D[0][3] =  -(2.0/3.0)*s[0][1];
-	D[0][3] -= (4.0/3.0)*Ji*(W2*(I1*B[0][1] - B2[0][1]));
+	D[0][3] += 4.0*Ji*W11*B[0][0]*B[0][1];
+	D[0][3] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][1] - W2*B2[0][1]);
 
 	// D[0][4] = 0.5*(c(0,0,1,2) + c(0,0,2,1))
 	D[0][4] =  -(2.0/3.0)*s[1][2];
+	D[0][4] += 4.0*Ji*W11*B[0][0]*B[1][2];
 	D[0][4] += 4.0*Ji*W2*(B[0][0]*B[1][2] - B[0][1]*B[0][2]);
-	D[0][4] -= (4.0/3.0)*Ji*(W2*(I1*B[1][2] - B2[1][2]));
+	D[0][4] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[1][2] - W2*B2[1][2]);
 
 	// D[0][5] = 0.5*(c(0,0,0,2) + c(0,0,2,0))
 	D[0][5] =  -(2.0/3.0)*s[0][2];
-	D[0][5] -= (4.0/3.0)*Ji*(W2*(I1*B[0][2] - B2[0][2]));
+	D[0][5] += 4.0*Ji*W11*B[0][0]*B[0][2];
+	D[0][5] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][2] - W2*B2[0][2]);
 
 	// D[1][3] = 0.5*(c(1,1,0,1) + c(1,1,1,0))
 	D[1][3] =  -(2.0/3.0)*s[0][1];
-	D[1][3] -= (4.0/3.0)*Ji*(W2*(I1*B[0][1] - B2[0][1]));
+	D[1][3] += 4.0*Ji*W11*B[1][1]*B[0][1];
+	D[1][3] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][1] - W2*B2[0][1]);
 
 	// D[1][4] = 0.5*(c(1,1,1,2) + c(1,1,2,1))
 	D[1][4] =  -(2.0/3.0)*s[1][2];
-	D[1][4] -= (4.0/3.0)*Ji*(W2*(I1*B[1][2] - B2[1][2]));
+	D[1][4] += 4.0*Ji*W11*B[1][1]*B[1][2];
+	D[1][4] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[1][2] - W2*B2[1][2]);
 
 	// D[1][5] = 0.5*(c(1,1,0,2) + c(1,1,2,0))
 	D[1][5] =  -(2.0/3.0)*s[0][2];
+	D[1][5] += 4.0*Ji*W11*B[1][1]*B[0][2];
 	D[1][5] += 4.0*Ji*W2*(B[1][1]*B[0][2] - B[0][1]*B[1][2]);
-	D[1][5] -= (4.0/3.0)*Ji*(W2*(I1*B[0][2] - B2[0][2]));
+	D[1][5] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][2] - W2*B2[0][2]);
 
 	// D[2][3] = 0.5*(c(2,2,0,1) + c(2,2,1,0))
 	D[2][3] =  -(2.0/3.0)*s[0][1];
+	D[2][3] += 4.0*Ji*W11*B[2][2]*B[0][1];
 	D[2][3] += 4.0*Ji*W2*(B[2][2]*B[0][1] - B[0][2]*B[1][2]);
-	D[2][3] -= (4.0/3.0)*Ji*(W2*(I1*B[0][1] - B2[0][1]));
+	D[2][3] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][1] - W2*B2[0][1]);
 
 	// D[2][4] = 0.5*(c(2,2,1,2) + c(2,2,2,1))
 	D[2][4] =  -(2.0/3.0)*s[1][2];
-	D[2][4] -= (4.0/3.0)*Ji*(W2*(I1*B[1][2] - B2[1][2]));
+	D[2][4] += 4.0*Ji*W11*B[2][2]*B[1][2];
+	D[2][4] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[1][2] - W2*B2[1][2]);
 
 	// D[2][5] = 0.5*(c(2,2,0,2) + c(2,2,2,0))
 	D[2][5] =  -(2.0/3.0)*s[0][2];
-	D[2][5] -= (4.0/3.0)*Ji*(W2*(I1*B[0][2] - B2[0][2]));
+	D[2][5] += 4.0*Ji*W11*B[2][2]*B[0][2];
+	D[2][5] -= (4.0/3.0)*Ji*((W11+W2)*I1*B[0][2] - W2*B2[0][2]);
 
 
 
 	// D[3][4] = 0.5*(c(0,1,1,2) + c(0,1,2,1))
 	D[3][4] = 2.0*Ji*W2*(B[0][1]*B[1][2] - B[0][2]*B[1][1]);
+	D[3][4] += 4.0*Ji*W11*B[0][1]*B[1][2];
 
 	// D[3][5] = 0.5*(c(0,1,0,2) + c(0,1,2,0))
 	D[3][5] = 2.0*Ji*W2*(B[0][1]*B[0][2] - B[0][0]*B[1][2]);
+	D[3][5] += 4.0*Ji*W11*B[0][1]*B[0][2];
 
 	// D[4][5] = 0.5*(c(1,2,0,2) + c(1,2,2,0))
 	D[4][5] = 2.0*Ji*W2*(B[1][2]*B[0][2] - B[0][1]*B[2][2]);
+	D[4][5] += 4.0*Ji*W11*B[1][2]*B[0][2];
 
 	// --- F I B E R   C O N T R I B U T I O N ---
 

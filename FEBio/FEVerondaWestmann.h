@@ -20,8 +20,8 @@ public:
 	FEVerondaWestmann() {}
 
 public:
-	double	c1;	//!< Veronda-Westmann coefficient C1;
-	double	c2;	//!< Veronda-Westmann coefficient C2;
+	double	m_c1;	//!< Veronda-Westmann coefficient C1;
+	double	m_c2;	//!< Veronda-Westmann coefficient C2;
 
 public:
 	//! calculate stress at material point
@@ -29,6 +29,9 @@ public:
 
 	//! calculate tangent stiffness at material point
 	virtual void Tangent(double D[6][6], FEMaterialPoint& pt);
+
+	//! initialize
+	void Init();
 
 	// declare as registered
 	DECLARE_REGISTERED(FEVerondaWestmann);

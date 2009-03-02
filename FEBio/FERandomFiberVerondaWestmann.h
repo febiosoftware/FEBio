@@ -5,12 +5,12 @@
 //! This class implements a material that consists of a continuous fiber distribution
 
 //! This material is orignally due to Gerard Ateshian and is used to model
-//! articular cartilage. The only difference is that it uses a Mooney-Rivlin matrix.
+//! articular cartilage. The only difference is that it uses a Veronda-Westmann matrix.
 
-class FERandomFiberMooneyRivlin :	public FEIncompressibleMaterial
+class FERandomFiberVerondaWestmann:	public FEIncompressibleMaterial
 {
 public:
-	FERandomFiberMooneyRivlin(void);
+	FERandomFiberVerondaWestmann(void);
 
 public:
 	//! calculate stress at material point
@@ -23,8 +23,8 @@ public:
 	void Init();
 
 public:
-	double	m_c1;	// Mooney-Rivlin coefficient 1
-	double	m_c2;	// Mooney-Rivlin coefficient 2
+	double	m_c1;	// Veronda-Westmann coefficient 1
+	double	m_c2;	// Veronda-Westmann coefficient 2
 
 	double	m_beta[3];
 	double	m_ksi[3];
@@ -37,7 +37,7 @@ public:
 	static double	m_sph[];
 
 	// declare as registered
-	DECLARE_REGISTERED(FERandomFiberMooneyRivlin);
+	DECLARE_REGISTERED(FERandomFiberVerondaWestmann);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
