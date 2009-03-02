@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FERandomFiberVerondaWestmann.h"
 
 // TODO: there is a possible bug in the fiber stress and or fiber stiffness
