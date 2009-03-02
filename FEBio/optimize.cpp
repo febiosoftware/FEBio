@@ -244,7 +244,8 @@ void objfun(Integer m,
 
 	// suppress output to the screen
 	fem.m_log.SetMode(Logfile::FILE_ONLY);
-	Console::Deactivate();
+	Console* pwnd = Console::GetHandle();
+	pwnd->Deactivate();
 
 	// solve the problem
 	if (opt.nprint > 0)
