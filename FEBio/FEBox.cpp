@@ -19,7 +19,7 @@ FEBox::~FEBox()
 
 }
 
-void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1)
+void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 {
 	int i, j, k, n;
 
@@ -88,7 +88,7 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1)
 			{
 				FESolidElement& el = SolidElement(n);
 
-				el.SetType(FE_HEX);
+				el.SetType(nhex);
 				el.m_nID = n+1;
 				el.SetMatID(-1);
 

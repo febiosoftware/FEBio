@@ -102,8 +102,26 @@ public:
 		//! calculates the element biphasic stiffness matrix
 		bool ElementPoroStiffness(FESolidElement& el, matrix& ke);
 
+		//! material stiffness component
+		void MaterialStiffness(FESolidElement& el, matrix& ke);
+
+		//! material stiffness for UDG hex elements
+		void UDGMaterialStiffness(FESolidElement& el, matrix& ke);
+
+		//! geometrical stiffness (i.e. initial stress)
+		void GeometricalStiffness(FESolidElement& el, matrix& ke);
+
+		//! geometrical stiffness for UDG hex elements
+		void UDGGeometricalStiffness(FESolidElement& el, matrix& ke);
+
 		//! Dilatational stiffness component for nearly-incompressible materials
 		void DilatationalStiffness(FESolidElement& elem, matrix& ke);
+
+		//! dilatational stiffness for UDG hex elements
+		void UDGDilatationalStiffness(FESolidElement& el, matrix& ke);
+
+		//! hourglass stiffness for UDG hex elements
+		void UDGHourglassStiffness(FESolidElement& el, matrix& ke);
 
 		//! Dilatational stiffness component for nearly-incompressible materials
 		void DilatationalStiffness(FEShellElement& elem, matrix& ke);
@@ -154,7 +172,10 @@ public:
 		void InternalForces(FESolidElement& el, vector<double>& fe);
 
 		//! Calculates the internal stress vector for enhanced strain hex elements
-		void UDFInternalForces(FESolidElement& el, vector<double>& fe);
+		void UDGInternalForces(FESolidElement& el, vector<double>& fe);
+
+		//! calculates hourglass forces for the UDG element
+		void UDGHourglassForces(FESolidElement& el, vector<double>& fe);
 
 		//! Calculates the internal stress vector for shell elements
 		void InternalForces(FEShellElement& el, vector<double>& fe);
@@ -177,7 +198,7 @@ public:
 
 protected:
 	double HexVolume(FESolidElement& el, int state = 0);
-	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8]);
+	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
 	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
 
 public:

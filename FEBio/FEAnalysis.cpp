@@ -14,6 +14,7 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 	m_itype = FE_STATIC;	// do quasi-static analysis
 	m_istiffpr = 1;			// use pressure stiffness
 	m_baugment = false;		// no augmentations
+	m_hg = 1.0;
 
 	// --- Time Step Data ---
 	m_ntime = 0;

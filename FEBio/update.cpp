@@ -359,11 +359,21 @@ void FESolver::UpdateStresses()
 
 				// calculate the average dilatation and pressure
 				double v = 0, V = 0;
-				for (n=0; n<nint; ++n)
+
+				if (el.Type() == FE_UDGHEX)
 				{
-					v += el.detJt(n)*gw[n];
-					V += el.detJ0(n)*gw[n];
+					v = HexVolume(el, 1);
+					V = HexVolume(el, 0);
 				}
+				else 
+				{
+					for (n=0; n<nint; ++n)
+					{
+						v += el.detJt(n)*gw[n];
+						V += el.detJ0(n)*gw[n];
+					}
+				}
+
 				// calculate volume ratio
 				el.m_eJ = v / V;
 
@@ -373,42 +383,69 @@ void FESolver::UpdateStresses()
 				el.m_ep = pmi->Up(el.m_eJ);
 			}
 
-			// loop over the integration points and calculate
-			// the stress at the integration point
-			for (n=0; n<nint; ++n)
+			// for the enhanced strain hex we need a slightly different procedure
+			// for calculating the element's stress. For this element, the stress
+			// is evaluated using an average deformation gradient.
+			if (el.Type() == FE_UDGHEX)
 			{
-				FEMaterialPoint& mp = *el.m_State[n];
+				// get the material point data
+				FEMaterialPoint& mp = *el.m_State[0];
 				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
-				// get the deformation gradient and determinant
-				pt.J = el.defgrad(pt.F, n);
+				// get the average cartesian derivatives
+				double GX[8], GY[8], GZ[8];
+				this->AvgCartDerivs(el, GX, GY, GZ);
 
-				// three-field element variables
+				// get the average deformation gradient and determinant
+				AvgDefGrad(el, pt.F, GX, GY, GZ);
+				pt.J = pt.F.det();
+
+				// set the element variables
 				pt.avgJ = el.m_eJ;
 				pt.avgp = el.m_ep;
 
-				// poroelasticity data
-				if (bporo)
-				{
-					FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-					// evaluate fluid pressure at gauss-point
-					pt.m_p = el.Evaluate(el.pt(), n);
-
-					// calculate the gradient of p at gauss-point
-					pt.m_gradp = el.gradient(el.pt(), n);
-				}
-
 				// calculate the stress at this material point
 				pt.s = pm->Stress(mp);
-
-				if (bporo)
+			}
+			else
+			{
+				// loop over the integration points and calculate
+				// the stress at the integration point
+				for (n=0; n<nint; ++n)
 				{
-					FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+					FEMaterialPoint& mp = *el.m_State[n];
+					FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
-					// for poroelastic materials also update the fluid flux
-					FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);
-					pt.m_w = pmat->Flux(mp);
+					// get the deformation gradient and determinant
+					pt.J = el.defgrad(pt.F, n);
+
+					// three-field element variables
+					pt.avgJ = el.m_eJ;
+					pt.avgp = el.m_ep;
+
+					// poroelasticity data
+					if (bporo)
+					{
+						FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+						// evaluate fluid pressure at gauss-point
+						pt.m_p = el.Evaluate(el.pt(), n);
+
+						// calculate the gradient of p at gauss-point
+						pt.m_gradp = el.gradient(el.pt(), n);
+					}
+
+					// calculate the stress at this material point
+					pt.s = pm->Stress(mp);
+
+					if (bporo)
+					{
+						FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+						// for poroelastic materials also update the fluid flux
+						FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);
+						pt.m_w = pmat->Flux(mp);
+					}
 				}
 			}
 		}

@@ -261,7 +261,7 @@ bool FETangentDiagnostic::ParseSection(XMLTag& tag)
 	{
 		// create the mesh
 		FEBox box;
-		box.Create(1, 1, 1, vec3d(0,0,0), vec3d(1,1,1));
+		box.Create(1, 1, 1, vec3d(0,0,0), vec3d(1,1,1), fem.m_nhex8);
 
 		// set the geometry
 		fem.m_mesh = box;

@@ -16,7 +16,7 @@ enum FE_Element_Type {
 	// 3D solid elements
 	FE_HEX,			// = 0
 	FE_RIHEX,		// = 1
-	FE_UDFHEX,		// = 2
+	FE_UDGHEX,		// = 2
 	FE_TET,			// = 3
 	FE_PENTA,		// = 4
 

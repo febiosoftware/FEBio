@@ -46,6 +46,5 @@ protected:
 protected:
 	XMLReader	m_xml;	//!< the actual reader
 
-	int	m_nhex8;	// element type for hex8
 	int m_nsteps;	// nr of step sections read
 };

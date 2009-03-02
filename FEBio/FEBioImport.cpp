@@ -35,9 +35,6 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// get the logfile
 	Logfile& log = fem.m_log;
 
-	// set default values
-	m_nhex8 = FE_HEX;
-
 	// loop over all child tags
 	try
 	{
@@ -156,6 +153,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "cmax"              ) tag.value(m_pStep->m_psolver->m_cmax);
 		else if (tag == "optimize_bw"       ) tag.value(fem.m_bwopt);
 		else if (tag == "pressure_stiffness") tag.value(m_pStep->m_istiffpr);
+		else if (tag == "hourglass"         ) tag.value(m_pStep->m_hg);
 		else if (tag == "analysis")
 		{
 			const char* szt = tag.AttributeValue("type");
@@ -225,9 +223,9 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 
 					if (strcmp(sze, "hex8") == 0)
 					{
-						if (strcmp(szv, "GAUSS8") == 0) m_nhex8 = FE_HEX;
-						else if (strcmp(szv, "POINT6") == 0) m_nhex8 = FE_RIHEX;
-						else if (strcmp(szv, "UDF") == 0) m_nhex8 = FE_UDFHEX;
+						if (strcmp(szv, "GAUSS8") == 0) fem.m_nhex8 = FE_HEX;
+						else if (strcmp(szv, "POINT6") == 0) fem.m_nhex8 = FE_RIHEX;
+						else if (strcmp(szv, "UDG") == 0) fem.m_nhex8 = FE_UDGHEX;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "elem", sze);
@@ -679,7 +677,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		if (tag == "hex8")
 		{
 			FESolidElement& el = mesh.SolidElement(nb++); pe = &el;
-			el.SetType(m_nhex8);
+			el.SetType(fem.m_nhex8);
 			el.m_nID = i+1;
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;

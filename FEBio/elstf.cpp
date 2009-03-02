@@ -639,8 +639,8 @@ bool FESolver::Residual(vector<double>& R)
 		if (!el.IsRigid())
 		{
 			// calculate internal force vector
-			if (el.Type() != FE_UDFHEX) InternalForces(el, fe);
-			else UDFInternalForces(el, fe);
+			if (el.Type() != FE_UDGHEX) InternalForces(el, fe);
+			else UDGInternalForces(el, fe);
 
 			// apply body forces
 			if (m_fem.UseBodyForces())
@@ -944,9 +944,59 @@ void FESolver::ElementInertialStiffness(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-//! calculates element stiffness matrix for element iel
+//! This function calculates the element stiffness matrix. It calls the material
+//! stiffness function, the geometrical stiffness function and, if necessary, the
+//! dilatational stiffness function. Note that these three functions only calculate
+//! the upper diagonal matrix due to the symmetry of the element stiffness matrix
+//! The last section of this function fills the rest of the element stiffness matrix.
 
 void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
+{
+	// see if the material is incompressible
+	FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
+	bool bdilst = false;
+	if (dynamic_cast<FEIncompressibleMaterial*>(pme)) bdilst = true;
+
+	if (el.Type() == FE_UDGHEX)
+	{
+		// calculate material stiffness
+		UDGMaterialStiffness(el, ke);
+
+		// calculate geometrical stiffness
+		UDGGeometricalStiffness(el, ke);
+
+		// Calculate dilatational stiffness, if necessary
+		if (bdilst) UDGDilatationalStiffness(el, ke);
+
+		// add hourglass stiffness
+		UDGHourglassStiffness(el, ke);
+	}
+	else
+	{
+		// calculate material stiffness (i.e. constitutive component)
+		MaterialStiffness(el, ke);
+
+		// calculate geometrical stiffness
+		GeometricalStiffness(el, ke);
+
+		// Calculate dilatational stiffness, if necessary
+		if (bdilst) DilatationalStiffness(el, ke);
+	}
+
+	// assign symmetic parts
+	// TODO: Can this be omitted by changing the Assemble routine so that it only
+	// grabs elements from the upper diagonal matrix?
+	int ndof = 3*el.Nodes();
+	int i, j;
+	for (i=0; i<ndof; ++i)
+		for (j=i+1; j<ndof; ++j)
+			ke[j][i] = ke[i][j];
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates element material stiffness element matrix
+
+void FESolver::MaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -954,9 +1004,6 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 	const int nint = el.GaussPoints();
 	const int neln = el.Nodes();
 	const int ndof = 3*neln;
-
-	// stiffness components for the initial stress component of stiffness matrix
-	double kab;
 
 	// global derivatives of shape functions
 	// NOTE: hard-coding of hex elements!
@@ -972,19 +1019,6 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 	// The 'D*BL' matrix
 	double DBL[6][3];
 
-	// element stress
-	mat3ds s;
-
-	// get the element's material
-	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
-
-	// get the elastic material
-	FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
-
-	// see if this is a poroelastic material
-	bool bporo = false;
-	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
-
 	double *Grn, *Gsn, *Gtn;
 	double Gr, Gs, Gt;
 
@@ -993,6 +1027,11 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 	
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
+
+	// see if this is a poroelastic material
+	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
+	bool bporo = false;
+	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
 
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -1005,15 +1044,13 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);
 
-		// ------------ constitutive component --------------
-
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// setup the material point
+		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
 //		el.defgrad(pt.F, n);
 //		pt.J = el.detF(n);
-
 		pt.avgJ = el.m_eJ;
 		pt.avgp = el.m_ep;
 
@@ -1103,12 +1140,66 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 				ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*detJt;
 			}
 		}
+	}
+}
 
-		// ------------ initial stress component --------------
-	
+//-----------------------------------------------------------------------------
+//! calculates element's geometrical stiffness component for integration point n
+
+void FESolver::GeometricalStiffness(FESolidElement &el, matrix &ke)
+{
+	int n, i, j;
+
+	double Gx[8], Gy[8], Gz[8];
+	double *Grn, *Gsn, *Gtn;
+	double Gr, Gs, Gt;
+
+	// nr of nodes
+	int neln = el.Nodes();
+
+	// nr of integration points
+	int nint = el.GaussPoints();
+
+	// jacobian
+	double Ji[3][3], detJt;
+
+	// weights at gauss points
+	const double *gw = el.GaussWeights();
+
+	// stiffness component for the initial stress component of stiffness matrix
+	double kab;
+
+	// calculate geometrical element stiffness matrix
+	for (n=0; n<nint; ++n)
+	{
+		// calculate jacobian
+		el.invjact(Ji, n);
+		detJt = el.detJt(n)*gw[n];
+
+		Grn = el.Gr(n);
+		Gsn = el.Gs(n);
+		Gtn = el.Gt(n);
+
+		for (i=0; i<neln; ++i)
+		{
+			Gr = Grn[i];
+			Gs = Gsn[i];
+			Gt = Gtn[i];
+
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
+			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
+			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
+		}
+
+		// get the material point data
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
 		// element's Cauchy-stress tensor at gauss point n
 		// s is the voight vector
-		s = pt.s;
+		mat3ds& s = pt.s;
 
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
@@ -1121,19 +1212,7 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 				ke[3*i+1][3*j+1] += kab;
 				ke[3*i+2][3*j+2] += kab;
 			}
-
-	} // end loop over gauss-points
-
-	// Dilatational stiffness component
-	// Only for (nearly) incompressible materials
-	if (dynamic_cast<FEIncompressibleMaterial*>(pme)) DilatationalStiffness(el, ke);
-
-	// assign symmetic parts
-	// TODO: Can this be omitted by changing the Assemble routine so that it only
-	// grabs elements from the upper diagonal matrix?
-	for (i=0; i<ndof; ++i)
-		for (j=i+1; j<ndof; ++j)
-			ke[j][i] = ke[i][j];
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1216,6 +1295,301 @@ void FESolver::DilatationalStiffness(FESolidElement& elem, matrix& ke)
 	for (i=0; i<ndof; ++i)
 		for (j=i; j<ndof; ++j)
 			ke[i][j] += k*gradN[i]*gradN[j];
+}
+
+//-----------------------------------------------------------------------------
+
+void FESolver::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
+{
+	// make sure we have the right element type
+	assert(el.Type() == FE_UDGHEX);
+
+	int i, i3, j, j3;
+
+	// Get the current element's data
+	const int neln = el.Nodes();
+
+	double Gxi, Gyi, Gzi;
+	double Gxj, Gyj, Gzj;
+
+	// The 'D' matrix
+	double D[6][6] = {0};	// The 'D' matrix
+
+	// The 'D*BL' matrix
+	double DBL[6][3];
+
+	// see if this is a poroelastic material
+	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
+	bool bporo = false;
+	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
+	
+	// for now we do not allow this element to be used in a poroelastic simulation
+	assert(bporo == false);
+
+	FEMaterialPoint& mp = *el.m_State[0];
+	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+	// calculate the average cartesian derivatives
+	double GX[8], GY[8], GZ[8];
+	AvgCartDerivs(el, GX, GY, GZ);
+
+	// calculate average deformation gradient Fbar
+	mat3d Fb;
+	AvgDefGrad(el, Fb, GX, GY, GZ);
+
+	// calculate the transposed inverse of Fbar
+	mat3d Fti = Fb.transinv();
+
+	// calculate current element volume
+	double ve = HexVolume(el, 1);
+
+	// current averaged shape derivatives
+	double Gx[8], Gy[8], Gz[8];
+	for (i=0; i<8; ++i)
+	{
+		Gx[i] = Fti(0,0)*GX[i]+Fti(0,1)*GY[i]+Fti(0,2)*GZ[i];
+		Gy[i] = Fti(1,0)*GX[i]+Fti(1,1)*GY[i]+Fti(1,2)*GZ[i];
+		Gz[i] = Fti(2,0)*GX[i]+Fti(2,1)*GY[i]+Fti(2,2)*GZ[i];
+	}
+
+	// setup the material point
+	// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
+//	el.defgrad(pt.F, n);
+//	pt.J = el.detF(n);
+	pt.avgJ = el.m_eJ;
+	pt.avgp = el.m_ep;
+
+	// get the 'D' matrix
+	pmat->Tangent(D, mp);
+
+	// we only calculate the upper triangular part
+	// since ke is symmetric. The other part is
+	// determined below using this symmetry.
+	for (i=0, i3=0; i<neln; ++i, i3 += 3)
+	{
+		Gxi = Gx[i];
+		Gyi = Gy[i];
+		Gzi = Gz[i];
+
+		for (j=i, j3 = i3; j<neln; ++j, j3 += 3)
+		{
+			Gxj = Gx[j];
+			Gyj = Gy[j];
+			Gzj = Gz[j];
+
+			// calculate D*BL matrices
+			DBL[0][0] = (D[0][0]*Gxj+D[0][3]*Gyj+D[0][5]*Gzj);
+			DBL[0][1] = (D[0][1]*Gyj+D[0][3]*Gxj+D[0][4]*Gzj);
+			DBL[0][2] = (D[0][2]*Gzj+D[0][4]*Gyj+D[0][5]*Gxj);
+
+			DBL[1][0] = (D[1][0]*Gxj+D[1][3]*Gyj+D[1][5]*Gzj);
+			DBL[1][1] = (D[1][1]*Gyj+D[1][3]*Gxj+D[1][4]*Gzj);
+			DBL[1][2] = (D[1][2]*Gzj+D[1][4]*Gyj+D[1][5]*Gxj);
+
+			DBL[2][0] = (D[2][0]*Gxj+D[2][3]*Gyj+D[2][5]*Gzj);
+			DBL[2][1] = (D[2][1]*Gyj+D[2][3]*Gxj+D[2][4]*Gzj);
+			DBL[2][2] = (D[2][2]*Gzj+D[2][4]*Gyj+D[2][5]*Gxj);
+
+			DBL[3][0] = (D[3][0]*Gxj+D[3][3]*Gyj+D[3][5]*Gzj);
+			DBL[3][1] = (D[3][1]*Gyj+D[3][3]*Gxj+D[3][4]*Gzj);
+			DBL[3][2] = (D[3][2]*Gzj+D[3][4]*Gyj+D[3][5]*Gxj);
+
+			DBL[4][0] = (D[4][0]*Gxj+D[4][3]*Gyj+D[4][5]*Gzj);
+			DBL[4][1] = (D[4][1]*Gyj+D[4][3]*Gxj+D[4][4]*Gzj);
+			DBL[4][2] = (D[4][2]*Gzj+D[4][4]*Gyj+D[4][5]*Gxj);
+
+			DBL[5][0] = (D[5][0]*Gxj+D[5][3]*Gyj+D[5][5]*Gzj);
+			DBL[5][1] = (D[5][1]*Gyj+D[5][3]*Gxj+D[5][4]*Gzj);
+			DBL[5][2] = (D[5][2]*Gzj+D[5][4]*Gyj+D[5][5]*Gxj);
+
+			ke[i3  ][j3  ] += (Gxi*DBL[0][0] + Gyi*DBL[3][0] + Gzi*DBL[5][0] )*ve;
+			ke[i3  ][j3+1] += (Gxi*DBL[0][1] + Gyi*DBL[3][1] + Gzi*DBL[5][1] )*ve;
+			ke[i3  ][j3+2] += (Gxi*DBL[0][2] + Gyi*DBL[3][2] + Gzi*DBL[5][2] )*ve;
+
+			ke[i3+1][j3  ] += (Gyi*DBL[1][0] + Gxi*DBL[3][0] + Gzi*DBL[4][0] )*ve;
+			ke[i3+1][j3+1] += (Gyi*DBL[1][1] + Gxi*DBL[3][1] + Gzi*DBL[4][1] )*ve;
+			ke[i3+1][j3+2] += (Gyi*DBL[1][2] + Gxi*DBL[3][2] + Gzi*DBL[4][2] )*ve;
+
+			ke[i3+2][j3  ] += (Gzi*DBL[2][0] + Gyi*DBL[4][0] + Gxi*DBL[5][0] )*ve;
+			ke[i3+2][j3+1] += (Gzi*DBL[2][1] + Gyi*DBL[4][1] + Gxi*DBL[5][1] )*ve;
+			ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*ve;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FESolver::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
+{
+	int i, j;
+
+	// stiffness component for the initial stress component of stiffness matrix
+	double kab;
+
+	// get the material point data
+	FEMaterialPoint& mp = *el.m_State[0];
+	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+	// element's Cauchy-stress tensor at gauss point n
+	// s is the voight vector
+	mat3ds& s = pt.s;
+
+	// calculate the average cartesian derivatives
+	double GX[8], GY[8], GZ[8];
+	AvgCartDerivs(el, GX, GY, GZ);
+
+	// calculate average deformation gradient Fbar
+	mat3d Fb;
+	AvgDefGrad(el, Fb, GX, GY, GZ);
+
+	// calculate the transposed inverse of Fbar
+	mat3d Fti = Fb.transinv();
+
+	// calculate current element volume
+	double ve = HexVolume(el, 1);
+
+	// current averaged shape derivatives
+	double Gx[8], Gy[8], Gz[8];
+	for (i=0; i<8; ++i)
+	{
+		Gx[i] = Fti(0,0)*GX[i]+Fti(0,1)*GY[i]+Fti(0,2)*GZ[i];
+		Gy[i] = Fti(1,0)*GX[i]+Fti(1,1)*GY[i]+Fti(1,2)*GZ[i];
+		Gz[i] = Fti(2,0)*GX[i]+Fti(2,1)*GY[i]+Fti(2,2)*GZ[i];
+	}
+
+	for (i=0; i<8; ++i)
+		for (j=i; j<8; ++j)
+		{
+			kab = (Gx[i]*(s.xx()*Gx[j]+s.xy()*Gy[j]+s.xz()*Gz[j]) +
+				   Gy[i]*(s.xy()*Gx[j]+s.yy()*Gy[j]+s.yz()*Gz[j]) + 
+				   Gz[i]*(s.xz()*Gx[j]+s.yz()*Gy[j]+s.zz()*Gz[j]))*ve;
+
+			ke[3*i  ][3*j  ] += kab;
+			ke[3*i+1][3*j+1] += kab;
+			ke[3*i+2][3*j+2] += kab;
+		}
+}
+
+//-----------------------------------------------------------------------------
+
+void FESolver::UDGDilatationalStiffness(FESolidElement& el, matrix& ke)
+{
+	int i, j;
+
+	const int nint = el.GaussPoints();
+	const int neln = el.Nodes();
+	const int ndof = 3*neln;
+
+	// get the elements material
+	FEElasticMaterial* pm = m_fem.GetElasticMaterial(el.GetMatID());
+
+	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pm);
+	assert(pmi);
+
+	// calculate the average cartesian derivatives
+	double Gx[8], Gy[8], Gz[8];
+	AvgCartDerivs(el, Gx, Gy, Gz, 1);
+
+	// calculate element volume
+	double ve = HexVolume(el, 1);
+	double Ve = HexVolume(el, 0);
+
+	// get effective modulus
+	double k = pmi->Upp(el.m_eJ);
+
+	// next, we add the Lagrangian contribution
+	// note that this term will always be zero if the material does not
+	// use the augmented lagrangian
+	k += el.m_Lk*pmi->hpp(el.m_eJ);
+
+	// multiply with volume
+	k *= (ve*ve)/Ve;
+
+	// calculate dilatational stiffness component
+	// we only calculate the upper triangular part
+	// since ke is symmetric.
+	for (i=0; i<8; ++i)
+		for (j=i; j<8; ++j)
+		{
+			ke[3*i  ][3*j  ] += k*Gx[i]*Gx[j];
+			ke[3*i  ][3*j+1] += k*Gx[i]*Gy[j];
+			ke[3*i  ][3*j+2] += k*Gx[i]*Gz[j];
+
+			ke[3*i+1][3*j  ] += k*Gy[i]*Gx[j];
+			ke[3*i+1][3*j+1] += k*Gy[i]*Gy[j];
+			ke[3*i+1][3*j+2] += k*Gy[i]*Gz[j];
+
+			ke[3*i+2][3*j  ] += k*Gz[i]*Gx[j];
+			ke[3*i+2][3*j+1] += k*Gz[i]*Gy[j];
+			ke[3*i+2][3*j+2] += k*Gz[i]*Gz[j];
+		}
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the hourglass stiffness for UDG hex elements
+
+void FESolver::UDGHourglassStiffness(FESolidElement& el, matrix& ke)
+{
+	int i, j;
+
+	const double h4[8] = { 1,-1, 1,-1, 1,-1, 1,-1 };
+	const double h5[8] = { 1,-1,-1, 1,-1, 1, 1,-1 };
+	const double h6[8] = { 1, 1,-1,-1,-1,-1, 1, 1 };
+	const double h7[8] = {-1, 1,-1, 1, 1,-1, 1,-1 };
+
+	vec3d* r0 = el.r0();
+	vec3d* rt = el.rt();
+
+	double x4 = 0, x5 = 0, x6 = 0, x7 = 0;
+	double y4 = 0, y5 = 0, y6 = 0, y7 = 0;
+	double z4 = 0, z5 = 0, z6 = 0, z7 = 0;
+
+	double X4 = 0, X5 = 0, X6 = 0, X7 = 0;
+	double Y4 = 0, Y5 = 0, Y6 = 0, Y7 = 0;
+	double Z4 = 0, Z5 = 0, Z6 = 0, Z7 = 0;
+
+	for (i=0; i<8; ++i)
+	{
+		X4 += h4[i]*r0[i].x; Y4 += h4[i]*r0[i].y; Z4 += h4[i]*r0[i].z;
+		X5 += h5[i]*r0[i].x; Y5 += h5[i]*r0[i].y; Z5 += h5[i]*r0[i].z;
+		X6 += h6[i]*r0[i].x; Y6 += h6[i]*r0[i].y; Z6 += h6[i]*r0[i].z;
+		X7 += h7[i]*r0[i].x; Y7 += h7[i]*r0[i].y; Z7 += h7[i]*r0[i].z;
+
+		x4 += h4[i]*rt[i].x; y4 += h4[i]*rt[i].y; z4 += h4[i]*rt[i].z;
+		x5 += h5[i]*rt[i].x; y5 += h5[i]*rt[i].y; z5 += h5[i]*rt[i].z;
+		x6 += h6[i]*rt[i].x; y6 += h6[i]*rt[i].y; z6 += h6[i]*rt[i].z;
+		x7 += h7[i]*rt[i].x; y7 += h7[i]*rt[i].y; z7 += h7[i]*rt[i].z;
+	}
+
+	double GX[8], GY[8], GZ[8];
+	AvgCartDerivs(el, GX, GY, GZ);
+
+	double g4[8] = {0}, g5[8] = {0}, g6[8] = {0}, g7[8] = {0};
+
+	for (i=0; i<8; ++i)
+	{
+		g4[i] = h4[i] - (GX[i]*X4 + GY[i]*Y4 + GZ[i]*Z4);
+		g5[i] = h5[i] - (GX[i]*X5 + GY[i]*Y5 + GZ[i]*Z5);
+		g6[i] = h6[i] - (GX[i]*X6 + GY[i]*Y6 + GZ[i]*Z6);
+		g7[i] = h7[i] - (GX[i]*X7 + GY[i]*Y7 + GZ[i]*Z7);
+	}
+
+	// calculate hourglass stiffness
+	double hg = m_fem.m_pStep->m_hg;
+
+	double kab;
+
+	for (i=0; i<8; ++i)
+	{
+		for (j=i; j<8; ++j)
+		{
+			kab = hg*(g4[i]*g4[j] + g5[i]*g5[j] + g6[i]*g6[j] + g7[j]*g7[j]);
+
+			ke[3*i  ][3*j  ] += kab;
+			ke[3*i+1][3*j+1] += kab;
+			ke[3*i+2][3*j+2] += kab;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1378,10 +1752,10 @@ void FESolver::InternalForces(FESolidElement& el, vector<double>& fe)
 //! calculates the internal equivalent nodal forces for enhanced strain
 //! solid elements.
 
-void FESolver::UDFInternalForces(FESolidElement& el, vector<double>& fe)
+void FESolver::UDGInternalForces(FESolidElement& el, vector<double>& fe)
 {
 	// make sure this element is of the correct type
-	assert(el.Type() == FE_UDFHEX);
+	assert(el.Type() == FE_UDGHEX);
 
 	// get the stress data
 	FEMaterialPoint& mp = *el.m_State[0];
@@ -1417,7 +1791,91 @@ void FESolver::UDFInternalForces(FESolidElement& el, vector<double>& fe)
 		fe[3*i+2] -= ve*(Gx*s.xz() + Gy*s.yz() + Gz*s.zz());
 	}
 
-	// TODO: add hourglass forces
+	// add hourglass forces
+	UDGHourglassForces(el, fe);
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the hourglass forces
+
+void FESolver::UDGHourglassForces(FESolidElement &el, vector<double> &fe)
+{
+	int i;
+
+	const double h4[8] = { 1,-1, 1,-1, 1,-1, 1,-1 };
+	const double h5[8] = { 1,-1,-1, 1,-1, 1, 1,-1 };
+	const double h6[8] = { 1, 1,-1,-1,-1,-1, 1, 1 };
+	const double h7[8] = {-1, 1,-1, 1, 1,-1, 1,-1 };
+
+	vec3d* r0 = el.r0();
+	vec3d* rt = el.rt();
+
+	double x4 = 0, x5 = 0, x6 = 0, x7 = 0;
+	double y4 = 0, y5 = 0, y6 = 0, y7 = 0;
+	double z4 = 0, z5 = 0, z6 = 0, z7 = 0;
+
+	double X4 = 0, X5 = 0, X6 = 0, X7 = 0;
+	double Y4 = 0, Y5 = 0, Y6 = 0, Y7 = 0;
+	double Z4 = 0, Z5 = 0, Z6 = 0, Z7 = 0;
+
+	for (i=0; i<8; ++i)
+	{
+		X4 += h4[i]*r0[i].x; Y4 += h4[i]*r0[i].y; Z4 += h4[i]*r0[i].z;
+		X5 += h5[i]*r0[i].x; Y5 += h5[i]*r0[i].y; Z5 += h5[i]*r0[i].z;
+		X6 += h6[i]*r0[i].x; Y6 += h6[i]*r0[i].y; Z6 += h6[i]*r0[i].z;
+		X7 += h7[i]*r0[i].x; Y7 += h7[i]*r0[i].y; Z7 += h7[i]*r0[i].z;
+
+		x4 += h4[i]*rt[i].x; y4 += h4[i]*rt[i].y; z4 += h4[i]*rt[i].z;
+		x5 += h5[i]*rt[i].x; y5 += h5[i]*rt[i].y; z5 += h5[i]*rt[i].z;
+		x6 += h6[i]*rt[i].x; y6 += h6[i]*rt[i].y; z6 += h6[i]*rt[i].z;
+		x7 += h7[i]*rt[i].x; y7 += h7[i]*rt[i].y; z7 += h7[i]*rt[i].z;
+	}
+
+	double GX[8], GY[8], GZ[8];
+	AvgCartDerivs(el, GX, GY, GZ);
+
+	mat3d F;
+	AvgDefGrad(el, F, GX, GY, GZ);
+
+	double u4 = 0, u5 = 0, u6 = 0, u7 = 0;
+	double v4 = 0, v5 = 0, v6 = 0, v7 = 0;
+	double w4 = 0, w5 = 0, w6 = 0, w7 = 0;
+
+	u4 = x4 - (F[0][0]*X4 + F[0][1]*Y4 + F[0][2]*Z4);
+	v4 = y4 - (F[1][0]*X4 + F[1][1]*Y4 + F[1][2]*Z4);
+	w4 = z4 - (F[2][0]*X4 + F[2][1]*Y4 + F[2][2]*Z4);
+
+	u5 = x5 - (F[0][0]*X5 + F[0][1]*Y5 + F[0][2]*Z5);
+	v5 = y5 - (F[1][0]*X5 + F[1][1]*Y5 + F[1][2]*Z5);
+	w5 = z5 - (F[2][0]*X5 + F[2][1]*Y5 + F[2][2]*Z5);
+
+	u6 = x6 - (F[0][0]*X6 + F[0][1]*Y6 + F[0][2]*Z6);
+	v6 = y6 - (F[1][0]*X6 + F[1][1]*Y6 + F[1][2]*Z6);
+	w6 = z6 - (F[2][0]*X6 + F[2][1]*Y6 + F[2][2]*Z6);
+
+	u7 = x7 - (F[0][0]*X7 + F[0][1]*Y7 + F[0][2]*Z7);
+	v7 = y7 - (F[1][0]*X7 + F[1][1]*Y7 + F[1][2]*Z7);
+	w7 = z7 - (F[2][0]*X7 + F[2][1]*Y7 + F[2][2]*Z7);
+
+	double g4[8] = {0}, g5[8] = {0}, g6[8] = {0}, g7[8] = {0};
+
+	for (i=0; i<8; ++i)
+	{
+		g4[i] = h4[i] - (GX[i]*X4 + GY[i]*Y4 + GZ[i]*Z4);
+		g5[i] = h5[i] - (GX[i]*X5 + GY[i]*Y5 + GZ[i]*Z5);
+		g6[i] = h6[i] - (GX[i]*X6 + GY[i]*Y6 + GZ[i]*Z6);
+		g7[i] = h7[i] - (GX[i]*X7 + GY[i]*Y7 + GZ[i]*Z7);
+	}
+
+	// calculate hourglass forces
+	double hg = m_fem.m_pStep->m_hg;
+
+	for (i=0; i<8; ++i)
+	{
+		fe[3*i  ] -= hg*(g4[i]*u4 + g5[i]*u5 + g6[i]*u6 + g7[i]*u7);
+		fe[3*i+1] -= hg*(g4[i]*v4 + g5[i]*v5 + g6[i]*v6 + g7[i]*v7);
+		fe[3*i+2] -= hg*(g4[i]*w4 + g5[i]*w5 + g6[i]*w6 + g7[i]*w7);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1449,10 +1907,10 @@ void FESolver::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[
 //-----------------------------------------------------------------------------
 //! Calculates the average Cartesian derivatives
 
-void FESolver::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8])
+void FESolver::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int nstate)
 {
 	// get the nodal coordinates
-	vec3d* r = el.r0();
+	vec3d* r = (nstate == 0? el.r0() : el.rt());
 	double x1 = r[0].x, y1 = r[0].y, z1 = r[0].z;
 	double x2 = r[1].x, y2 = r[1].y, z2 = r[1].z;
 	double x3 = r[2].x, y3 = r[2].y, z3 = r[2].z;

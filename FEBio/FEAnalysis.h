@@ -61,6 +61,7 @@ public:
 		int		m_itype;		//!< analysis type
 		int		m_istiffpr;		//!< calculate pressure stiffness
 		bool	m_baugment;		//!< use Lagrangian augmentation
+		double	m_hg;			//!< hourglass parameter
 	//}
 
 	// --- Time Step Data ---

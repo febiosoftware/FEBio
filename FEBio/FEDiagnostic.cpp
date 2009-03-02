@@ -41,9 +41,6 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 
 	Logfile& log = fem.m_log;
 
-	// set default values
-	m_nhex8 = FE_HEX;
-
 	m_pStep = &fem.m_Step[0];
 
 	// loop over all child tags

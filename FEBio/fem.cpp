@@ -16,6 +16,7 @@ FEM::FEM()
 	m_pStep = new FEAnalysis(*this);
 	m_Step.add(m_pStep);
 	m_nStep = 0;
+	m_nhex8 = FE_HEX;
 
 	// --- Geometry Data ---
 	m_nreq = 0;

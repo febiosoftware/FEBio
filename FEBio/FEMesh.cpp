@@ -681,7 +681,7 @@ void FEMesh::Serialize(Archive& ar)
 			{
 			case FE_HEX:
 			case FE_RIHEX:
-			case FE_UDFHEX:
+			case FE_UDGHEX:
 			case FE_PENTA:
 			case FE_TET:
 				{

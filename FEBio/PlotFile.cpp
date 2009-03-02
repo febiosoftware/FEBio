@@ -137,7 +137,7 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 		{
 		case FE_HEX:
 		case FE_RIHEX:
-		case FE_UDFHEX:
+		case FE_UDGHEX:
 			for (j=0; j<N; ++j) n[j] = el.m_node[j]+1;
 			break;
 		case FE_PENTA:

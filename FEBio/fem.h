@@ -349,6 +349,7 @@ public:
 		int						m_nStep;	//!< current analysis step
 		FEAnalysis*				m_pStep;	//!< pointer to current analysis step
 		double					m_ftime;	//!< current time value
+		int	m_nhex8;						//!< element type for hex8
 	//}
 
 	// --- Geometry Data ---

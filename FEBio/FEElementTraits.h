@@ -191,7 +191,7 @@ public:
 	enum { NELN = 8 };
 
 public:
-	FEUDFHexElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_UDFHEX; init(); }
+	FEUDFHexElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_UDGHEX; init(); }
 
 	void init();
 };
