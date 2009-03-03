@@ -96,11 +96,11 @@ void SkylineMatrix::Create(double* pv, int* pp, int N)
 // CompactMatrix
 //////////////////////////////////////////////////////////////////////
 
-CompactMatrix::CompactMatrix(bool offset)
+CompactMatrix::CompactMatrix(int offset)
 {
 	m_pindices = 0;
 	m_ppointers = 0;
-	m_boffset = offset;
+	m_offset = offset;
 }
 
 CompactMatrix::~CompactMatrix()

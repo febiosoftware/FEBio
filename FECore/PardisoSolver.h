@@ -30,7 +30,7 @@ public:
 	virtual bool Solve(SparseMatrix& K, matrix& x, matrix& b);
 	virtual void Destroy();
 
-	virtual SparseMatrix* GetMatrix() { return new CompactMatrix(true); }
+	virtual SparseMatrix* GetMatrix() { return new CompactMatrix(1); }
 
 	PardisoSolver();
 

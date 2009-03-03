@@ -156,7 +156,7 @@ protected:
 class CompactMatrix : public SparseMatrix
 {
 public:
-	CompactMatrix(bool offset = false);
+	CompactMatrix(int offset = 0);
 	virtual ~CompactMatrix();
 
 	void Clear()
@@ -180,13 +180,13 @@ public:
 		if (i<=j)
 		{
 			int* pi = m_pindices + m_ppointers[j];
-			if (m_boffset) pi -= 1;
+			pi -= m_offset;
 			int l = m_ppointers[j+1] - m_ppointers[j];
 			for (int n=0; n<l; ++n)
-				if (pi[n] == i + m_boffset)
+				if (pi[n] == i + m_offset)
 				{
 					k = m_ppointers[j] + n;
-					if (m_boffset) k -= 1;
+					k -= m_offset;
 					m_pd[k] += v;
 					return;
 				}
@@ -207,13 +207,13 @@ public:
 		if (i<=j)
 		{
 			int* pi = m_pindices + m_ppointers[j];
-			if (m_boffset) pi -= 1;
+			pi -= m_offset;
 			int l = m_ppointers[j+1] - m_ppointers[j];
 			for (int n=0; n<l; ++n)
-				if (pi[n] == i + m_boffset)
+				if (pi[n] == i + m_offset)
 				{
 					k = m_ppointers[j] + n;
-					if (m_boffset) k -= 1;
+					k -= m_offset;
 					m_pd[k] = v;
 					return;
 				}
@@ -234,12 +234,12 @@ public:
 	double* values  () { return m_pd;   }
 	int*    indices () { return m_pindices;  }
 	int*    pointers() { return m_ppointers; }
-	bool    offset  () { return m_boffset; }
+	int     offset  () { return m_offset; }
 
 protected:
 	int*	m_pindices;
 	int*	m_ppointers;
-	bool	m_boffset; // adjust array indices for fortran arrays
+	int	m_offset; // adjust array indices for fortran arrays
 };
 
 //-----------------------------------------------------------------------------
