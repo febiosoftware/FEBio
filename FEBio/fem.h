@@ -392,6 +392,12 @@ public:
 		// concentrated nodal loads data
 		vector<FENodalForce>	m_FC;		//!< concentrated nodal force cards
 
+		// rigid displacements
+		vector<FERigidBodyDisplacement>	m_RDC;	//!< rigid body displacements
+
+		// rigid forces
+		vector<FERigidBodyForce>	m_RFC;	//!< rigid body forces
+
 		// rigid nodes
 		vector<FERigidNode>		m_RN;		//!< rigid nodes
 

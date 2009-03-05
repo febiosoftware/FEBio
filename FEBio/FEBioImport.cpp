@@ -300,6 +300,8 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 	const char* sztype = 0;
 	const char* szname = 0;
 
+	int nmat = 0;
+
 	++tag;
 	do
 	{
@@ -315,6 +317,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 
 		// add the material
 		fem.AddMaterial(pmat);
+		++nmat;
 
 		// set the material's name
 		if (szname) pmat->SetName(szname);
@@ -503,12 +506,43 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 
 						if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
 						else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-						else if (strcmp(szt, "prescribed") == 0) pm->m_bc[bc] = lc;
+						else if (strcmp(szt, "prescribed") == 0) 
+						{
+							pm->m_bc[bc] = lc;
+							FERigidBodyDisplacement DC;
+							DC.id = nmat;
+							DC.bc = bc;
+							DC.lc = lc;
+							tag.value(DC.sf);
+							fem.m_RDC.add(DC);
+
+							// add this boundary condition to the current step
+							if (m_nsteps > 0)
+							{
+								int n = fem.m_RDC.size()-1;
+								FERigidBodyDisplacement* pDC = &fem.m_RDC[n];
+								m_pStep->AddBoundaryCondition(pDC);
+								pDC->Deactivate();
+							}
+						}
 						else if (strcmp(szt, "force") == 0)
 						{
 							pm->m_bc[bc] = 0;
-							pm->m_fc[bc] = lc-1;
-							tag.value(pm->m_fs[bc]);
+							FERigidBodyForce FC;
+							FC.id = nmat;
+							FC.bc = bc;
+							FC.lc = lc-1;
+							tag.value(FC.sf);
+							fem.m_RFC.add(FC);
+
+							// add this boundary condition to the current step
+							if (m_nsteps > 0)
+							{
+								int n = fem.m_RFC.size()-1;
+								FERigidBodyForce* pFC = &fem.m_RFC[n];
+								m_pStep->AddBoundaryCondition(pFC);
+								pFC->Deactivate();
+							}
 						}
 						bfound = true;
 					}
@@ -527,13 +561,44 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 
 						if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
 						else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-						else if (strcmp(szt, "prescribed") == 0) pm->m_bc[bc] = lc;
+						else if (strcmp(szt, "prescribed") == 0) 
+						{
+							pm->m_bc[bc] = lc;
+							FERigidBodyDisplacement DC;
+							DC.id = nmat;
+							DC.bc = bc;
+							DC.lc = lc;
+							tag.value(DC.sf);
+							fem.m_RDC.add(DC);
+
+							// add this boundary condition to the current step
+							if (m_nsteps > 0)
+							{
+								int n = fem.m_RDC.size()-1;
+								FERigidBodyDisplacement* pDC = &fem.m_RDC[n];
+								m_pStep->AddBoundaryCondition(pDC);
+								pDC->Deactivate();
+							}
+						}
 						else if (strcmp(szt, "force") == 0)
 						{
 							pm->m_bc[bc] = 0;
-							pm->m_fc[bc] = lc-1;
-							tag.value(pm->m_fs[bc]);
-						}
+							FERigidBodyForce FC;
+							FC.id = nmat;
+							FC.bc = bc;
+							FC.lc = lc-1;
+							tag.value(FC.sf);
+							fem.m_RFC.add(FC);
+
+							// add this boundary condition to the current step
+							if (m_nsteps > 0)
+							{
+								int n = fem.m_RFC.size()-1;
+								FERigidBodyForce* pFC = &fem.m_RFC[n];
+								m_pStep->AddBoundaryCondition(pFC);
+								pFC->Deactivate();
+							}
+						}						
 						bfound = true;
 					}
 				}
@@ -1249,6 +1314,51 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 			while (!tag.isend());
 
 			fem.m_DE.add(de);
+		}
+		else if (tag == "rigid_body")
+		{
+			// currently we only allow this to be specified in the multistep feature
+			assert(m_nstep);
+
+			int id;
+			tag.AttributeValue("id", id);
+
+			++tag;
+			do
+			{
+				if (tag == "translate")
+				{
+					const char* szbc = tag.AttributeValue("bc");
+					int bc;
+					if      (strcmp(szbc, "x") == 0) bc = 0;
+					else if (strcmp(szbc, "y") == 0) bc = 1;
+					else if (strcmp(szbc, "z") == 0) bc = 2;
+					else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
+
+					int lc=-1;
+					tag.AttributeValue("lc", lc);
+
+					FERigidBodyDisplacement DC;
+					DC.id = id;
+					DC.bc = bc;
+					DC.lc = lc+1;
+					tag.value(DC.sf);
+					fem.m_RDC.add(DC);
+
+					// make sure to free the material BC
+					FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(id-1));
+					assert(pm);
+					pm->m_bc[bc] = 0;
+
+					int n = fem.m_RDC.size()-1;
+					FERigidBodyDisplacement* pDC = &fem.m_RDC[n];
+					pDC->Deactivate();
+					fem.m_pStep->AddBoundaryCondition(pDC);
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

@@ -2,6 +2,7 @@
 #include "FEAnalysis.h"
 #include "fem.h"
 #include "console.h"
+#include "FERigid.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -88,6 +89,35 @@ bool FEAnalysis::Init()
 	// activate the boundary conditions
 	for (i=0; i<m_BC.size(); ++i) m_BC[i]->Activate();
 
+	// clear the active rigid body BC's
+	for (i=0; i<m_fem.m_RB.size(); ++i)
+	{
+		FERigidBody& RB = m_fem.m_RB[i];
+		FERigid* pm = dynamic_cast<FERigid*>(m_fem.GetMaterial(RB.m_mat));
+		for (j=0; j<6; ++j)
+		{
+			if (RB.m_pDC[j])
+			{
+				RB.m_pDC[j] = 0;
+				pm->m_bc[j] = 0;
+			}
+		}
+	}
+
+	// set the active rigid bodies BC's
+	for (i=0; i<m_fem.m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement& DC = m_fem.m_RDC[i];
+		FERigidBody& RB = m_fem.m_RB[DC.id];
+		assert(RB.m_pDC[DC.bc] == 0);
+		if (RB.m_bActive && DC.IsActive())
+		{
+			RB.m_pDC[DC.bc] = &DC;
+			FERigid* pm = dynamic_cast<FERigid*>(m_fem.GetMaterial(RB.m_mat));
+			pm->m_bc[DC.bc] = 1;
+		}
+	}
+
 	// reset nodal ID's
 	FEMesh& mesh = m_fem.m_mesh;
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -163,12 +193,7 @@ bool FEAnalysis::Init()
 		if (mec[i] == 0)
 		{
 			m_fem.m_log.printbox("WARNING", "Rigid body %d is not being used.", m_fem.m_RB[i].m_mat+1);
-			m_fem.m_RB[i].m_bc[0] = -1;
-			m_fem.m_RB[i].m_bc[1] = -1;
-			m_fem.m_RB[i].m_bc[2] = -1;
-			m_fem.m_RB[i].m_bc[3] = -1;
-			m_fem.m_RB[i].m_bc[4] = -1;
-			m_fem.m_RB[i].m_bc[5] = -1;
+			m_fem.m_RB[i].m_bActive = false;
 		}
 
 	// initialize equations

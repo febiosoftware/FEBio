@@ -172,7 +172,7 @@ void FESolver::PrepStep(double time)
 		}
 	}
 
-	// apply prescribed rigid body constraints
+	// initialize rigid bodies
 	for (i=0; i<m_fem.m_nrb; ++i)
 	{
 		FERigidBody& RB = m_fem.m_RB[i];
@@ -180,16 +180,7 @@ void FESolver::PrepStep(double time)
 		// clear reaction forces
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 
-		for (j=0; j<6; ++j)
-		{
-			int I = -RB.m_LM[j]-2;
-			int lc = RB.m_bc[j];
-			if ((I >= 0) && (lc > 0))
-			{
-				m_ui[I] = m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Ut[j];
-			}
-		}
-
+		// store previous state
 		RB.m_rp = RB.m_rt;
 		RB.m_qp = RB.m_qt;
 		RB.m_Up[0] = RB.m_Ut[0];
@@ -198,19 +189,39 @@ void FESolver::PrepStep(double time)
 		RB.m_Up[3] = RB.m_Ut[3];
 		RB.m_Up[4] = RB.m_Ut[4];
 		RB.m_Up[5] = RB.m_Ut[5];
+	}
 
-		// apply prescribed rigid body forces
-		FERigid* pm = dynamic_cast<FERigid*>(m_fem.GetMaterial(RB.m_mat));
-		for (j=0; j<6; ++j)
+	// apply rigid displacements
+	for (i=0; i<m_fem.m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement& DC = m_fem.m_RDC[i];
+		FERigidBody& RB = m_fem.m_RB[DC.id];
+		if (RB.m_bActive && DC.IsActive())
 		{
-			int lc = pm->m_fc[j];
-			int I  = RB.m_LM[j];
+			int I = -RB.m_LM[DC.bc]-2;
+			int lc = DC.lc;
+			if ((I >= 0) && (lc > 0))
+			{
+				m_ui[I] = m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Ut[DC.bc];
+			}
+		}
+	}
+
+	// apply prescribed rigid body forces
+	for (i=0; i<m_fem.m_RFC.size(); ++i)
+	{
+		FERigidBodyForce& FC = m_fem.m_RFC[i];
+		FERigidBody& RB = m_fem.m_RB[FC.id];
+		if (RB.m_bActive && FC.IsActive())
+		{
+			int lc = FC.lc;
+			int I  = RB.m_LM[FC.bc];
 			if ((I>=0) && (lc >= 0))
 			{
-				double f = m_fem.GetLoadCurve(lc)->Value()*pm->m_fs[j];
+				double f = m_fem.GetLoadCurve(lc)->Value()*FC.sf;
 				m_Fn[I] += f;
 
-				switch (j)
+				switch (FC.bc)
 				{
 				case 0: RB.m_Fr.x += f; break;
 				case 1: RB.m_Fr.y += f; break;

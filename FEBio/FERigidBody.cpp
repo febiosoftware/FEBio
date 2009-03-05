@@ -15,6 +15,8 @@
 FERigidBody::FERigidBody()
 {
 	m_pfem = 0;
+	m_bActive = true;
+	for (int i=0; i<6; ++i) m_pDC[i] = 0;
 }
 
 FERigidBody::~FERigidBody()

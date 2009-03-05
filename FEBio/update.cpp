@@ -207,55 +207,56 @@ void FESolver::UpdateRigidBodies(vector<double>& ui, double s)
 	{
 		// get the rigid body
 		FERigidBody& RB = m_fem.m_RB[i];
-
-		lm = RB.m_LM;
-
-		du = RB.m_du;
-
-		// first do the displacements
-		for (j=0; j<3; ++j)
+		if (RB.m_bActive)
 		{
-			lc = RB.m_bc[j];
+			lm = RB.m_LM;
 
-			if (lc != 0)
+			du = RB.m_du;
+
+			// first do the displacements
+			FERigidBodyDisplacement* pdc;
+			for (j=0; j<3; ++j)
 			{
-				// dof is prescribed
-				du[j] = (lc < 0? 0 : m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+				pdc = RB.m_pDC[j];
+				if (pdc)
+				{
+					lc = pdc->lc;
+					du[j] = (lc < 0? 0 : m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+				}
+				else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
 			}
-			else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
-		}
 
-		RB.m_rt.x = RB.m_rp.x + du[0];
-		RB.m_rt.y = RB.m_rp.y + du[1];
-		RB.m_rt.z = RB.m_rp.z + du[2];
+			RB.m_rt.x = RB.m_rp.x + du[0];
+			RB.m_rt.y = RB.m_rp.y + du[1];
+			RB.m_rt.z = RB.m_rp.z + du[2];
 
-		// next, we do the rotations. We do this seperatly since
-		// they need to be interpreted differently than displacements
-		for (j=3; j<6; ++j)
-		{
-			lc = RB.m_bc[j];
-
-			if (lc != 0)
+			// next, we do the rotations. We do this seperatly since
+			// they need to be interpreted differently than displacements
+			for (j=3; j<6; ++j)
 			{
-				// dof is prescribed
-				du[j] = (lc < 0? 0 : m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+				pdc = RB.m_pDC[j];
+				if (pdc)
+				{
+					lc = pdc->lc;
+					du[j] = (lc < 0? 0 : m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+				}
+				else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
 			}
-			else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
+
+			r = vec3d(du[3], du[4], du[5]);
+			w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
+			dq = quatd(w, r);
+
+			RB.m_qt = dq*RB.m_qp;
+			RB.m_qt.MakeUnit();
+
+			RB.m_Ut[0] = RB.m_Up[0] + du[0];
+			RB.m_Ut[1] = RB.m_Up[1] + du[1];
+			RB.m_Ut[2] = RB.m_Up[2] + du[2];
+			RB.m_Ut[3] = RB.m_Up[3] + du[3];
+			RB.m_Ut[4] = RB.m_Up[4] + du[4];
+			RB.m_Ut[5] = RB.m_Up[5] + du[5];
 		}
-
-		r = vec3d(du[3], du[4], du[5]);
-		w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
-		dq = quatd(w, r);
-
-		RB.m_qt = dq*RB.m_qp;
-		RB.m_qt.MakeUnit();
-
-		RB.m_Ut[0] = RB.m_Up[0] + du[0];
-		RB.m_Ut[1] = RB.m_Up[1] + du[1];
-		RB.m_Ut[2] = RB.m_Up[2] + du[2];
-		RB.m_Ut[3] = RB.m_Up[3] + du[3];
-		RB.m_Ut[4] = RB.m_Up[4] + du[4];
-		RB.m_Ut[5] = RB.m_Up[5] + du[5];
 	}
 
 	// update rigid body nodes

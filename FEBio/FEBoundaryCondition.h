@@ -7,6 +7,7 @@ class FEBoundaryCondition
 {
 public:
 	FEBoundaryCondition() { m_bactive = true; }
+	virtual ~FEBoundaryCondition(){}
 
 	bool IsActive() { return m_bactive; }
 

@@ -381,8 +381,10 @@ bool FEM::InitEquations()
 	for (i=0; i<m_nrb; ++i)
 	{
 		FERigidBody& RB = m_RB[i];
+		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(RB.m_mat));
+		assert(pm);
 		for (j=0; j<6; ++j)
-			if (RB.m_bc[j] >= 0)
+			if (pm->m_bc[j] >= 0)
 			{
 				RB.m_LM[j] = m_neq++;
 			}
@@ -411,10 +413,11 @@ bool FEM::InitEquations()
 	for (i=0; i<m_nrb; ++i)
 	{
 		FERigidBody& RB = m_RB[i];
+		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
 			n = RB.m_LM[j];
-			if (RB.m_bc[j] > 0) RB.m_LM[j] = -n-2;
+			if (pm->m_bc[j] > 0) RB.m_LM[j] = -n-2;
 		}
 	}
 

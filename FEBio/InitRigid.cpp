@@ -193,12 +193,12 @@ bool FEM::InitRigidBodies()
 
 		m_RB[i].m_mat = j;
 
-		// initialize constraints
+/*		// initialize constraints
 		for (j=0; j<6; ++j)
 		{
 			m_RB[i].m_bc[j] = pm->m_bc[j];
 		}
-
+*/
 		// initialize center of mass
 		if (pm->m_com == 1)
 		{
@@ -300,6 +300,21 @@ bool FEM::InitRigidBodies()
 				break;
 			}
 		}
+	}
+
+	// the rigid body constraints are still associated with the rigid materials
+	// so we now associate them with the rigid bodies
+	for (i=0; i<m_RDC.size(); ++i)
+	{
+		FERigidBodyDisplacement& DC = m_RDC[i];
+		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(DC.id-1));
+		DC.id = pm->m_nRB;
+	}
+	for (i=0; i<m_RFC.size(); ++i)
+	{
+		FERigidBodyForce& FC = m_RFC[i];
+		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(FC.id-1));
+		FC.id = pm->m_nRB;
 	}
 
 	return true;

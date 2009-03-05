@@ -175,7 +175,7 @@ bool FEM::Serialize(Archive& ar)
 
 			ar << rb.m_nID << rb.m_mat << rb.m_mass << rb.m_Fr << rb.m_Mr;
 			ar << rb.m_r0 << rb.m_rt << rb.m_qt;
-			ar.write(rb.m_bc, sizeof(int), 6);
+//			ar.write(rb.m_bc, sizeof(int), 6);
 			ar.write(rb.m_LM, sizeof(int), 6);
 			ar.write(rb.m_Up, sizeof(double), 6);
 			ar.write(rb.m_Ut, sizeof(double), 6);
@@ -514,7 +514,7 @@ bool FEM::Serialize(Archive& ar)
 
 			ar >> rb.m_nID >> rb.m_mat >> rb.m_mass >> rb.m_Fr >> rb.m_Mr;
 			ar >> rb.m_r0 >> rb.m_rt >> rb.m_qt;
-			ar.read(rb.m_bc, sizeof(int), 6);
+//			ar.read(rb.m_bc, sizeof(int), 6);
 			ar.read(rb.m_LM, sizeof(int), 6);
 			ar.read(rb.m_Up, sizeof(double), 6);
 			ar.read(rb.m_Ut, sizeof(double), 6);
