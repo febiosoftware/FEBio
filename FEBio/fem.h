@@ -232,6 +232,9 @@ public:
 	//! Add a material to the model
 	void AddMaterial(FEMaterial* pm) { m_MAT.add(pm); }
 
+	//! Add a parameter list
+	void AddParameterList(FEParameterList* pl) { m_MPL.add(pl); }
+
 	//! get the number of materials
 	int Materials() { return m_MAT.size(); }
 
@@ -376,6 +379,7 @@ protected:
 	// --- Material Data ---
 	//{
 		ptr_vector<FEMaterial>	m_MAT;		//!< array of materials
+		ptr_vector<FEParameterList>	m_MPL;	//!< material parameter lists
 	//}
 
 	// --- Load Curve Data ---

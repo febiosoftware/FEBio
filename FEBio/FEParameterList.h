@@ -24,6 +24,15 @@ public:
 	FEParamType	m_itype;	// type of variable
 	const char*	m_szname;	// name of the parameter
 	int			m_ndim;		// dimension of array
+	int			m_nlc;		// load curve number for dynamic parameters (-1 for static)
+
+	FEParam()
+	{
+		m_pv = 0;
+		m_itype = FE_PARAM_DOUBLE;
+		m_ndim = 1;
+		m_nlc = -1;
+	}
 
 public:
 	//! retrieves the value for a non-array item

@@ -18,6 +18,11 @@ public:
 	double	m_c1;	//!< Mooney-Rivlin parameter c1
 	double	m_c2;	//!< Mooney-Rivlin parameter c2
 
+	//--- active contraction stuff ---
+	double	m_a[2];
+	double	m_ac;
+	// -------------------------------
+
 public:
 	//! constructor
 	FE2DTransIsoMooneyRivlin();

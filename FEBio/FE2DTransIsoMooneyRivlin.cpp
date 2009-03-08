@@ -8,6 +8,8 @@ REGISTER_MATERIAL(FE2DTransIsoMooneyRivlin, "2D trans iso Mooney-Rivlin");
 BEGIN_PARAMETER_LIST(FE2DTransIsoMooneyRivlin, FETransverselyIsotropic)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
+	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLEV, 2, "a");
+	ADD_PARAMETER(m_ac, FE_PARAM_DOUBLE, "active_contraction");
 END_PARAMETER_LIST();
 
 double FE2DTransIsoMooneyRivlin::m_cth[FE2DTransIsoMooneyRivlin::NSTEPS];
@@ -33,6 +35,9 @@ FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin()
 		}
 		bfirst = false;
 	}
+
+	m_a[0] = m_a[1] = 0;
+	m_ac = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,6 +179,25 @@ mat3ds FE2DTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 //		T[2][0] += wa*W4*I4*a.z*a.x;
 //		T[2][1] += wa*W4*I4*a.z*a.y;
 		T[2][2] += wa*W4*I4*a.z*a.z;
+
+		// add active contraction stuff
+		if (m_ac > 0)
+		{
+			double at = m_ac *sqrt((m_a[0]*v.y)*(m_a[0]*v.y) + (m_a[1]*v.z)*(m_a[1]*v.z));
+			double In = lam*lam;
+
+			T[0][0] += at*a.x*a.x/In;
+			T[0][1] += at*a.x*a.y/In;
+			T[0][2] += at*a.x*a.z/In;
+
+//			T[1][0] += at*a.y*a.x/In;
+			T[1][1] += at*a.y*a.y/In;
+			T[1][2] += at*a.y*a.z/In;
+
+//			T[2][0] += at*a.z*a.x/In;
+//			T[2][1] += at*a.z*a.y/In;
+			T[2][2] += at*a.z*a.z/In;
+		}
 	}
 
 	// (trace of T)/3
@@ -566,6 +590,44 @@ void FE2DTransIsoMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 		// D[4][5] = 0.5*(c(1,2,0,2) + c(1,2,2,0))
 		D[4][5] += wa*4.0*Ji*W44*I4*I4*a.y*a.z*a.x*a.z;
+
+		// add active contraction stuff
+		if (m_ac > 0)
+		{
+			double T[3][3] = {0};
+			double at = m_ac *sqrt((m_a[0]*v.y)*(m_a[0]*v.y) + (m_a[1]*v.z)*(m_a[1]*v.z));
+			double In = lam*lam;
+
+			T[0][0] = at*a.x*a.x/In;
+			T[0][1] = at*a.x*a.y/In;
+			T[0][2] = at*a.x*a.z/In;
+
+			T[1][0] = at*a.y*a.x/In;
+			T[1][1] = at*a.y*a.y/In;
+			T[1][2] = at*a.y*a.z/In;
+
+			T[2][0] = at*a.z*a.x/In;
+			T[2][1] = at*a.z*a.y/In;
+			T[2][2] = at*a.z*a.z/In;
+
+			D[0][0] += T[0][0];	// c(0,0,0,0)
+			D[0][1] += T[1][1];	// c(0,0,1,1)
+			D[0][2] += T[2][2]; // c(0,0,2,2)
+			D[0][3] += T[0][1]; // c(0,0,0,1)
+			D[0][4] += T[1][2]; // c(0,0,1,2)
+			D[0][5] += T[0][2]; // c(0,0,0,2)
+
+			D[1][1] += T[1][1]; // c(1,1,1,1)
+			D[1][2] += T[2][2]; // c(1,1,2,2)
+			D[1][3] += T[0][1]; // c(1,1,0,1)
+			D[1][4] += T[1][2]; // c(1,1,1,2)
+			D[1][5] += T[0][2]; // c(1,1,0,2)
+
+			D[2][2] += T[2][2]; // c(2,2,2,2)
+			D[2][3] += T[0][1]; // c(2,2,0,1)
+			D[2][4] += T[1][2]; // c(2,2,1,2)
+			D[2][5] += T[0][2]; // c(2,2,0,2)
+		}
 	}
 
 	// set symmetric components

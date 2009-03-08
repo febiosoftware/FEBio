@@ -29,6 +29,11 @@ public:
 	double	m_beta[3];
 	double	m_ksi[3];
 
+	//--- active contraction stuff ---
+	double	m_a[3];
+	double	m_ac;
+	// -------------------------------
+
 	static	int	m_nres;	// integration rule
 
 	static double	m_cth[];

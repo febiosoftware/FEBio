@@ -323,7 +323,8 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 		if (szname) pmat->SetName(szname);
 
 		// get the material's parameter list
-		auto_ptr<FEParameterList> pl(pmat->GetParameterList());
+		FEParameterList* pl = pmat->GetParameterList();
+		fem.AddParameterList(pl);
 
 		// loop over all parameters
 		++tag;
@@ -343,6 +344,10 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 				default:
 					assert(false);
 				}
+
+				int lc = -1;
+				tag.AttributeValue("lc", lc, true);
+				if (lc != -1) pp->m_nlc = lc;
 			}
 			else
 			{

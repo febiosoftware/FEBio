@@ -23,6 +23,8 @@ BEGIN_PARAMETER_LIST(FERandomFiberMooneyRivlin, FEIncompressibleMaterial)
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
 	ADD_PARAMETERV(m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
+	ADD_PARAMETERV(m_a, FE_PARAM_DOUBLEV, 3, "a");
+	ADD_PARAMETER(m_ac, FE_PARAM_DOUBLE, "active_contraction");
 END_PARAMETER_LIST();
 
 #ifndef SQR
@@ -55,6 +57,9 @@ FERandomFiberMooneyRivlin::FERandomFiberMooneyRivlin()
 
 		bfirst = false;
 	}
+
+	m_a[0] = m_a[1] = m_a[2] = 0;
+	m_ac = 0;
 }
 
 void FERandomFiberMooneyRivlin::Init()
@@ -157,7 +162,6 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	// get the element's local coordinate system
 	mat3d& Q = pt.Q;
 
-
 	// loop over all integration points
 	double ksi, beta;
 	double nr[3], n0[3], nt[3];
@@ -175,6 +179,11 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 		n0[1] = Q[1][0]*nr[0] + Q[1][1]*nr[1] + Q[1][2]*nr[2];
 		n0[2] = Q[2][0]*nr[0] + Q[2][1]*nr[1] + Q[2][2]*nr[2];
 
+		// get the global spatial fiber direction
+		nt[0] = F[0][0]*n0[0] + F[0][1]*n0[1] + F[0][2]*n0[2];
+		nt[1] = F[1][0]*n0[0] + F[1][1]*n0[1] + F[1][2]*n0[2];
+		nt[2] = F[2][0]*n0[0] + F[2][1]*n0[1] + F[2][2]*n0[2];
+
 		// Calculate In = nr*C*nr
 		In = n0[0]*( C[0][0]*n0[0] + C[0][1]*n0[1] + C[0][2]*n0[2]) +
 			 n0[1]*( C[1][0]*n0[0] + C[1][1]*n0[1] + C[1][2]*n0[2]) +
@@ -190,11 +199,6 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 			// calculate strain energy derivative
 			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
 
-			// get the global spatial fiber direction
-			nt[0] = F[0][0]*n0[0] + F[0][1]*n0[1] + F[0][2]*n0[2];
-			nt[1] = F[1][0]*n0[0] + F[1][1]*n0[1] + F[1][2]*n0[2];
-			nt[2] = F[2][0]*n0[0] + F[2][1]*n0[1] + F[2][2]*n0[2];
-
 			// calculate the stress
 			T[0][0] += Wl*nt[0]*nt[0]*w[n];
 			T[0][1] += Wl*nt[0]*nt[1]*w[n];
@@ -207,6 +211,24 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 //			T[2][0] += Wl*nt[2]*nt[0]*w[n];
 //			T[2][1] += Wl*nt[2]*nt[1]*w[n];
 			T[2][2] += Wl*nt[2]*nt[2]*w[n];
+		}
+
+		// add active contraction stuff
+		if (m_ac > 0)
+		{
+			double at = m_ac *sqrt(SQR(m_a[0]*nr[0]) + SQR(m_a[1]*nr[1]) + SQR(m_a[2]*nr[2]));
+
+			T[0][0] += at*nt[0]*nt[0]/In;
+			T[0][1] += at*nt[0]*nt[1]/In;
+			T[0][2] += at*nt[0]*nt[2]/In;
+
+//			T[1][0] += at*nt[1]*nt[0]/In;
+			T[1][1] += at*nt[1]*nt[1]/In;
+			T[1][2] += at*nt[1]*nt[2]/In;
+
+//			T[2][0] += at*nt[2]*nt[0]/In;
+//			T[2][1] += at*nt[2]*nt[1]/In;
+			T[2][2] += at*nt[2]*nt[2]/In;
 		}
 	}
 
@@ -460,6 +482,11 @@ void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 		n0[1] = Q[1][0]*nr[0] + Q[1][1]*nr[1] + Q[1][2]*nr[2];
 		n0[2] = Q[2][0]*nr[0] + Q[2][1]*nr[1] + Q[2][2]*nr[2];
 
+		// get the global spatial fiber direction
+		nt[0] = F[0][0]*n0[0] + F[0][1]*n0[1] + F[0][2]*n0[2];
+		nt[1] = F[1][0]*n0[0] + F[1][1]*n0[1] + F[1][2]*n0[2];
+		nt[2] = F[2][0]*n0[0] + F[2][1]*n0[1] + F[2][2]*n0[2];
+
 		// Calculate In = nr*C*nr
 		In = n0[0]*( C[0][0]*n0[0] + C[0][1]*n0[1] + C[0][2]*n0[2]) +
 			 n0[1]*( C[1][0]*n0[0] + C[1][1]*n0[1] + C[1][2]*n0[2]) +
@@ -475,11 +502,6 @@ void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 			// calculate strain energy derivative
 			Wl  = beta*ksi*pow(In - 1.0, beta - 1.0);
 			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
-
-			// get the global spatial fiber direction
-			nt[0] = F[0][0]*n0[0] + F[0][1]*n0[1] + F[0][2]*n0[2];
-			nt[1] = F[1][0]*n0[0] + F[1][1]*n0[1] + F[1][2]*n0[2];
-			nt[2] = F[2][0]*n0[0] + F[2][1]*n0[1] + F[2][2]*n0[2];
 
 			// calculate dWdC:C
 			double WC = Wl*In;
@@ -588,6 +610,43 @@ void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 			// D[4][5] = 0.5*(c(1,2,0,2) + c(1,2,2,0))
 			D[4][5] += w[n]*4.0*Ji*Wll*nt[1]*nt[2]*nt[0]*nt[2];
+		}
+
+		// add active contraction stuff
+		if (m_ac > 0)
+		{
+			double at = m_ac *sqrt(SQR(m_a[0]*nr[0]) + SQR(m_a[1]*nr[1]) + SQR(m_a[2]*nr[2]));
+			double T[3][3] = {0};
+
+			T[0][0] = at*nt[0]*nt[0]/In;
+			T[0][1] = at*nt[0]*nt[1]/In;
+			T[0][2] = at*nt[0]*nt[2]/In;
+
+			T[1][0] = at*nt[1]*nt[0]/In;
+			T[1][1] = at*nt[1]*nt[1]/In;
+			T[1][2] = at*nt[1]*nt[2]/In;
+
+			T[2][0] = at*nt[2]*nt[0]/In;
+			T[2][1] = at*nt[2]*nt[1]/In;
+			T[2][2] = at*nt[2]*nt[2]/In;
+
+			D[0][0] += T[0][0];	// c(0,0,0,0)
+			D[0][1] += T[1][1];	// c(0,0,1,1)
+			D[0][2] += T[2][2]; // c(0,0,2,2)
+			D[0][3] += T[0][1]; // c(0,0,0,1)
+			D[0][4] += T[1][2]; // c(0,0,1,2)
+			D[0][5] += T[0][2]; // c(0,0,0,2)
+
+			D[1][1] += T[1][1]; // c(1,1,1,1)
+			D[1][2] += T[2][2]; // c(1,1,2,2)
+			D[1][3] += T[0][1]; // c(1,1,0,1)
+			D[1][4] += T[1][2]; // c(1,1,1,2)
+			D[1][5] += T[0][2]; // c(1,1,0,2)
+
+			D[2][2] += T[2][2]; // c(2,2,2,2)
+			D[2][3] += T[0][1]; // c(2,2,0,1)
+			D[2][4] += T[1][2]; // c(2,2,1,2)
+			D[2][5] += T[0][2]; // c(2,2,0,2)
 		}
 	}
 

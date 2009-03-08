@@ -92,6 +92,28 @@ void FESolver::PrepStep(double time)
 	// evaluate load curve values at current time
 	for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(time);
 
+	// evaluate parameter lists
+	for (i=0; i<m_fem.m_MPL.size(); ++i)
+	{
+		FEParameterList* pl = &m_fem.m_MPL[i];
+		list<FEParam>::iterator pi = pl->first();
+		for (j=0; j<pl->Parameters(); ++j, ++pi)
+		{
+			if (pi->m_nlc >= 0)
+			{
+				double v = m_fem.GetLoadCurve(pi->m_nlc)->Value();
+				switch (pi->m_itype)
+				{
+				case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
+				case FE_PARAM_DOUBLE: pi->value<double>() = v; break;
+				case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
+				default: 
+					assert(false);
+				}
+			}
+		}
+	}
+
 	// zero total displacements/pressures
 	m_Ui.zero();
 
