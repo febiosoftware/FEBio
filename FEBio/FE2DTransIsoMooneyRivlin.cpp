@@ -36,6 +36,9 @@ FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin()
 		bfirst = false;
 	}
 
+	m_c1 = 0;
+	m_c2 = 0;
+
 	m_a[0] = m_a[1] = 0;
 	m_ac = 0;
 }
@@ -183,20 +186,20 @@ mat3ds FE2DTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 		// add active contraction stuff
 		if (m_ac > 0)
 		{
-			double at = m_ac *sqrt((m_a[0]*v.y)*(m_a[0]*v.y) + (m_a[1]*v.z)*(m_a[1]*v.z));
-			double In = lam*lam;
+			// the factor of .5 is to cancel the factor of two in the calculation of the stress
+			double at = 0.5*wa*m_ac *sqrt((m_a[0]*v.y)*(m_a[0]*v.y) + (m_a[1]*v.z)*(m_a[1]*v.z));
 
-			T[0][0] += at*a.x*a.x/In;
-			T[0][1] += at*a.x*a.y/In;
-			T[0][2] += at*a.x*a.z/In;
+			T[0][0] += at*a.x*a.x;
+			T[0][1] += at*a.x*a.y;
+			T[0][2] += at*a.x*a.z;
 
-//			T[1][0] += at*a.y*a.x/In;
-			T[1][1] += at*a.y*a.y/In;
-			T[1][2] += at*a.y*a.z/In;
+//			T[1][0] += at*a.y*a.x;
+			T[1][1] += at*a.y*a.y;
+			T[1][2] += at*a.y*a.z;
 
-//			T[2][0] += at*a.z*a.x/In;
-//			T[2][1] += at*a.z*a.y/In;
-			T[2][2] += at*a.z*a.z/In;
+//			T[2][0] += at*a.z*a.x;
+//			T[2][1] += at*a.z*a.y;
+			T[2][2] += at*a.z*a.z;
 		}
 	}
 
@@ -592,42 +595,41 @@ void FE2DTransIsoMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 		D[4][5] += wa*4.0*Ji*W44*I4*I4*a.y*a.z*a.x*a.z;
 
 		// add active contraction stuff
-		if (m_ac > 0)
+		// NOTE: I commented the active fiber stiffness out since I think it will lead to 
+		// a nonsymmetric D matrix and I can't deal with that yet. Besides, most
+		// problems seem to be running just fine without this contribution.
+/*		if (m_ac > 0)
 		{
-			double T[3][3] = {0};
-			double at = m_ac *sqrt((m_a[0]*v.y)*(m_a[0]*v.y) + (m_a[1]*v.z)*(m_a[1]*v.z));
-			double In = lam*lam;
+			double at = wa*m_ac *sqrt((m_a[0]*v.y)*(m_a[0]*v.y) + (m_a[1]*v.z)*(m_a[1]*v.z));
 
-			T[0][0] = at*a.x*a.x/In;
-			T[0][1] = at*a.x*a.y/In;
-			T[0][2] = at*a.x*a.z/In;
+			D[0][0] += at*(a.x*a.x - 2.0*a.x*a.x*a.x*a.x);	// c(0,0,0,0)
+			D[0][1] += at*(a.x*a.x - 2.0*a.x*a.x*a.y*a.y);	// c(0,0,1,1)
+			D[0][2] += at*(a.x*a.x - 2.0*a.x*a.x*a.z*a.z); // c(0,0,2,2)
+			D[0][3] -= at*(2.0*a.x*a.x*a.x*a.y); // c(0,0,0,1)
+			D[0][4] -= at*(2.0*a.x*a.x*a.y*a.z); // c(0,0,1,2)
+			D[0][5] -= at*(2.0*a.x*a.x*a.x*a.z); // c(0,0,0,2)
 
-			T[1][0] = at*a.y*a.x/In;
-			T[1][1] = at*a.y*a.y/In;
-			T[1][2] = at*a.y*a.z/In;
+			D[1][1] += at*(a.y*a.y - 2.0*a.y*a.y*a.y*a.y); // c(1,1,1,1)
+			D[1][2] += at*(a.y*a.y - 2.0*a.y*a.y*a.z*a.z); // c(1,1,2,2)
+			D[1][3] -= at*(2.0*a.y*a.y*a.x*a.y); // c(1,1,0,1)
+			D[1][4] -= at*(2.0*a.y*a.y*a.y*a.z); // c(1,1,1,2)
+			D[1][5] -= at*(2.0*a.y*a.y*a.x*a.z); // c(1,1,0,2)
 
-			T[2][0] = at*a.z*a.x/In;
-			T[2][1] = at*a.z*a.y/In;
-			T[2][2] = at*a.z*a.z/In;
+			D[2][2] += at*(a.z*a.z - 2.0*a.z*a.z*a.z*a.z); // c(2,2,2,2)
+			D[2][3] -= at*(2.0*a.z*a.z*a.x*a.y); // c(2,2,0,1)
+			D[2][4] -= at*(2.0*a.z*a.z*a.y*a.z); // c(2,2,1,2)
+			D[2][5] -= at*(2.0*a.z*a.z*a.x*a.z); // c(2,2,0,2)
 
-			D[0][0] += T[0][0];	// c(0,0,0,0)
-			D[0][1] += T[1][1];	// c(0,0,1,1)
-			D[0][2] += T[2][2]; // c(0,0,2,2)
-			D[0][3] += T[0][1]; // c(0,0,0,1)
-			D[0][4] += T[1][2]; // c(0,0,1,2)
-			D[0][5] += T[0][2]; // c(0,0,0,2)
+			D[3][3] -= at*(2.0*a.x*a.y*a.x*a.y); // c(0,1,0,1)
+			D[3][4] -= at*(2.0*a.x*a.y*a.y*a.z); // c(0,1,1,2)
+			D[3][5] -= at*(2.0*a.x*a.y*a.x*a.z); // c(0,1,0,2)
 
-			D[1][1] += T[1][1]; // c(1,1,1,1)
-			D[1][2] += T[2][2]; // c(1,1,2,2)
-			D[1][3] += T[0][1]; // c(1,1,0,1)
-			D[1][4] += T[1][2]; // c(1,1,1,2)
-			D[1][5] += T[0][2]; // c(1,1,0,2)
+			D[4][4] -= at*(2.0*a.y*a.z*a.y*a.z); // c(1,2,1,2)
+			D[4][5] -= at*(2.0*a.y*a.z*a.x*a.z); // c(1,2,0,2)
 
-			D[2][2] += T[2][2]; // c(2,2,2,2)
-			D[2][3] += T[0][1]; // c(2,2,0,1)
-			D[2][4] += T[1][2]; // c(2,2,1,2)
-			D[2][5] += T[0][2]; // c(2,2,0,2)
+			D[5][5] -= at*(2.0*a.x*a.z*a.x*a.z); // c(0,2,0,2)
 		}
+*/
 	}
 
 	// set symmetric components

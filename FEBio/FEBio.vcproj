@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FE2DFiberNeoHookean.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FE2DTransIsoMooneyRivlin.cpp"
 				>
 			</File>
@@ -617,6 +621,10 @@
 			</File>
 			<File
 				RelativePath=".\DataStore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FE2DFiberNeoHookean.h"
 				>
 			</File>
 			<File

@@ -198,6 +198,9 @@ public:
 		m_plc = 0;
 		lcna = -1;
 		m_ascl = 0;
+
+		c3 = c4 = c5 = 0;
+		lam1 = 1;
 	}
 
 public:
