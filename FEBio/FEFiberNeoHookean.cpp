@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEFiberNeoHookean.h"
 
 // The following file contains the integration points and weights

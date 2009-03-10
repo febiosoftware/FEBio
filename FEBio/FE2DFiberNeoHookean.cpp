@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FE2DFiberNeoHookean.h"
 
 // register the material with the framework
