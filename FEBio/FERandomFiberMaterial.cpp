@@ -216,19 +216,20 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 		// add active contraction stuff
 		if (m_ac > 0)
 		{
-			double at = m_ac *sqrt(SQR(m_a[0]*nr[0]) + SQR(m_a[1]*nr[1]) + SQR(m_a[2]*nr[2]));
+			// The .5 is to compensate for the 2 multiplier later.
+			double at = 0.5*w[n]*m_ac *sqrt(SQR(m_a[0]*nr[0]) + SQR(m_a[1]*nr[1]) + SQR(m_a[2]*nr[2]));
 
-			T[0][0] += at*nt[0]*nt[0]/In;
-			T[0][1] += at*nt[0]*nt[1]/In;
-			T[0][2] += at*nt[0]*nt[2]/In;
+			T[0][0] += at*nt[0]*nt[0];
+			T[0][1] += at*nt[0]*nt[1];
+			T[0][2] += at*nt[0]*nt[2];
 
-//			T[1][0] += at*nt[1]*nt[0]/In;
-			T[1][1] += at*nt[1]*nt[1]/In;
-			T[1][2] += at*nt[1]*nt[2]/In;
+//			T[1][0] += at*nt[1]*nt[0];
+			T[1][1] += at*nt[1]*nt[1];
+			T[1][2] += at*nt[1]*nt[2];
 
-//			T[2][0] += at*nt[2]*nt[0]/In;
-//			T[2][1] += at*nt[2]*nt[1]/In;
-			T[2][2] += at*nt[2]*nt[2]/In;
+//			T[2][0] += at*nt[2]*nt[0];
+//			T[2][1] += at*nt[2]*nt[1];
+			T[2][2] += at*nt[2]*nt[2];
 		}
 	}
 
@@ -610,43 +611,6 @@ void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 			// D[4][5] = 0.5*(c(1,2,0,2) + c(1,2,2,0))
 			D[4][5] += w[n]*4.0*Ji*Wll*nt[1]*nt[2]*nt[0]*nt[2];
-		}
-
-		// add active contraction stuff
-		if (m_ac > 0)
-		{
-			double at = m_ac *sqrt(SQR(m_a[0]*nr[0]) + SQR(m_a[1]*nr[1]) + SQR(m_a[2]*nr[2]));
-			double T[3][3] = {0};
-
-			T[0][0] = at*nt[0]*nt[0]/In;
-			T[0][1] = at*nt[0]*nt[1]/In;
-			T[0][2] = at*nt[0]*nt[2]/In;
-
-			T[1][0] = at*nt[1]*nt[0]/In;
-			T[1][1] = at*nt[1]*nt[1]/In;
-			T[1][2] = at*nt[1]*nt[2]/In;
-
-			T[2][0] = at*nt[2]*nt[0]/In;
-			T[2][1] = at*nt[2]*nt[1]/In;
-			T[2][2] = at*nt[2]*nt[2]/In;
-
-			D[0][0] += T[0][0];	// c(0,0,0,0)
-			D[0][1] += T[1][1];	// c(0,0,1,1)
-			D[0][2] += T[2][2]; // c(0,0,2,2)
-			D[0][3] += T[0][1]; // c(0,0,0,1)
-			D[0][4] += T[1][2]; // c(0,0,1,2)
-			D[0][5] += T[0][2]; // c(0,0,0,2)
-
-			D[1][1] += T[1][1]; // c(1,1,1,1)
-			D[1][2] += T[2][2]; // c(1,1,2,2)
-			D[1][3] += T[0][1]; // c(1,1,0,1)
-			D[1][4] += T[1][2]; // c(1,1,1,2)
-			D[1][5] += T[0][2]; // c(1,1,0,2)
-
-			D[2][2] += T[2][2]; // c(2,2,2,2)
-			D[2][3] += T[0][1]; // c(2,2,0,1)
-			D[2][4] += T[1][2]; // c(2,2,1,2)
-			D[2][5] += T[0][2]; // c(2,2,0,2)
 		}
 	}
 

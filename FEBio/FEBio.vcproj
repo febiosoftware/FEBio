@@ -282,6 +282,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEFiberNeoHookean.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEFungOrthotropic.cpp"
 				>
 			</File>
@@ -697,6 +701,10 @@
 			</File>
 			<File
 				RelativePath=".\FEException.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEFiberNeoHookean.h"
 				>
 			</File>
 			<File
