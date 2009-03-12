@@ -92,17 +92,15 @@ bool PardisoSolver::Factor(SparseMatrix& K)
 	int phase = 22;
 
 #ifdef DEBUG
-	printf("\nThis is a test");
 
 	int i, *pointers, *indices;
 	double* values;
 
-	fflush(stdout);
 	pointers = A->pointers();
 	indices = A->indices();
 	values = A->values();
 	fprintf(stdout, "\nPointers:");
-	for (i=0; i<m_n; i++) fprintf(stdout, "\n%d", pointers[i]);
+	for (i=0; i<=m_n; i++) fprintf(stdout, "\n%d", pointers[i]);
 	fprintf(stdout, "\nIndices, Values:");
 	for (i=0; i<m_nnz; i++) fprintf(stdout, "\n%d, %g", indices[i], values[i]);
 #endif
@@ -183,6 +181,8 @@ void PardisoSolver::Destroy()
 
 	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, &ddum, &idum, &idum,
 		 &idum, &m_nrhs, m_iparm, &m_msglvl, &ddum, &ddum, &m_error);
+
+	LinearSolver::Destroy();
 
 #endif
 }

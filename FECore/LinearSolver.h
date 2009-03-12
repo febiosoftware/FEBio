@@ -196,30 +196,6 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-//! This class implements the Watson Sparse Matrix Package.
-
-//! For information on this solver visit:
-//!		http://www-users.cs.umn.edu/~agupta/wsmp
-
-#ifdef WSMP
-extern "C" {
-	void wssmp();
-}
-#endif // WSMP
-
-class WSMPSolver : public LinearSolver
-{
-public:
-	virtual bool PreProcess(SparseMatrix& K);
-	virtual bool Factor(SparseMatrix& K);
-	virtual bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
-	virtual bool Solve(SparseMatrix& K, matrix& x, matrix& b);
-	virtual void Destroy();
-
-	virtual SparseMatrix* GetMatrix() { return new CompactMatrix(); }
-};
-
-//-----------------------------------------------------------------------------
 //! this class implements an iterative solver that implements the
 //! conjugate gradient method
 

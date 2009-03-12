@@ -292,12 +292,10 @@ bool PSLDLTSolver::Factor(SparseMatrix& K)
 	}
 
 #ifdef DEBUG
-	printf("\nThis is a test");
 
 	int i, n, nnz, *pointers, *indices;
 	double* values;
 
-	fflush(stdout);
 	n = pK->Size();
 	nnz = pK->NonZeroes();
 	pointers = pK->pointers();
@@ -373,64 +371,6 @@ void PSLDLTSolver::Destroy()
 #else
 	if (m_bvalid) PSLDLT_Destroy(0);
 	LinearSolver::Destroy();
-#endif
-}
-
-//////////////////////////////////////////////////////////////////////
-// WSMPSolver
-//////////////////////////////////////////////////////////////////////
-
-bool WSMPSolver::PreProcess(SparseMatrix& K)
-{
-#ifndef WSMP
-	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform.\n\n");
-	return false;
-#else
-
-	return false;
-#endif
-}
-
-bool WSMPSolver::Factor(SparseMatrix& K)
-{
-#ifndef WSMP
-	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform.\n\n");
-	return false;
-#else
-
-	return false;
-#endif
-}
-
-bool WSMPSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
-{
-#ifndef WSMP
-	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform.\n\n");
-	return false;
-#else
-
-	return false;
-#endif
-}
-
-bool WSMPSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
-{
-#ifndef WSMP
-	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform.\n\n");
-	return false;
-#else
-
-	return false;
-#endif
-}
-
-void WSMPSolver::Destroy()
-{
-#ifndef WSMP
-	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform.\n\n");
-	return;
-#else
-
 #endif
 }
 
