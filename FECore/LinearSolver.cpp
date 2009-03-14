@@ -7,6 +7,13 @@
 #include <math.h>
 #include "LinearSolver.h"
 
+//-----------------------------------------------------------------------------
+// The variable m_numthreads determines the number of threads to request for
+// solvers that can take advantage of multiple processors. 
+
+int LinearSolver::m_numthreads = 1;
+
+//-----------------------------------------------------------------------------
 void colsol_factor(int N, double* values, int* pointers);
 void colsol_solve (int N, double* values, int* pointers, double* R);
 

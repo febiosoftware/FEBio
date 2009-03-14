@@ -24,8 +24,13 @@ public:
 
 	virtual SparseMatrix* GetMatrix() = 0;
 
+	//! set the number of threads
+	static void SetNumThreads(int n) { m_numthreads = (n>0? n : 1); }
+
 protected:
 	bool	m_bvalid;	// flag indication wether a valid matrix structure is ready
+
+	static int	m_numthreads;	// nr of threads to create
 };
 
 //-----------------------------------------------------------------------------

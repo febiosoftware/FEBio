@@ -12,6 +12,7 @@
 #include "matrix.h"
 
 	/* Pardiso Fortran prototypes */
+#ifndef WIN32
 extern "C"
 {
 	int pardisoinit_(void *, int *, int *);
@@ -20,6 +21,7 @@ extern "C"
 		double *, int *, int *, int *, int *, int *,
 		int *, double *, double *, int *);
 }
+#endif
 
 class PardisoSolver : public LinearSolver
 {

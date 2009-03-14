@@ -3,6 +3,33 @@
 #include <stdlib.h>
 #include "PardisoSolver.h"
 
+#if defined(WIN32) && defined(PARDISO_DLL)
+typedef int (*PARDISOINITFNC)(void*, int*, int*);
+typedef int (*PARDISOFNC)(void *, int *, int *, int *, int *, int *,
+		double *, int *, int *, int *, int *, int *,
+		int *, double *, double *, int *);
+
+PARDISOINITFNC pardisoinit_;
+PARDISOFNC pardiso_;
+
+#ifndef PARDISO 
+#define PARDISO
+#endif
+
+#include "windows.h"
+HINSTANCE HPARDISO_DLL = 0;
+#elif defined PARDISO
+extern "C"
+{
+	int pardisoinit_(void *, int *, int *);
+
+	int pardiso_(void *, int *, int *, int *, int *, int *,
+		double *, int *, int *, int *, int *, int *,
+		int *, double *, double *, int *);
+}
+#endif // PARDISODLL
+
+
 //////////////////////////////////////////////////////////////
 // PardisoSolver
 //////////////////////////////////////////////////////////////
@@ -14,6 +41,22 @@ PardisoSolver::PardisoSolver()
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
 #else
+#if defined(WIN32) && defined(PARDISODLL)
+	HPARDISODLL = LoadLibraryA("libpardiso.dll");
+	if (HPARDISODLL)
+		fprintf(stderr, "Pardiso library loaded successfully.\n");
+	else
+	{
+		fprintf(stderr, "Failed loading pardiso library.\n");
+		exit(1);
+	}
+
+	pardisoinit_ = (PARDISOINITFNC) GetProcAddress(HPARDISODLL, "pardisoinit_");
+	if (pardisoinit_ == 0) exit(1);
+	pardiso_ = (PARDISOFNC) GetProcAddress(HPARDISODLL, "pardiso_");
+	if (pardiso_ == 0) exit(1);
+
+#endif 
 	m_mtype = -2; /* Real symmetric matrix */
 	m_iparm[0] = 0;
 	pardisoinit_(m_pt, &m_mtype, m_iparm);
@@ -36,15 +79,8 @@ bool PardisoSolver::PreProcess(SparseMatrix& K)
 	m_nnz = A->NonZeroes();
 	m_nrhs = 1;
 
-	/* Number of processors OMP_NUM_THREADS */
-	char* var = getenv("OMP_NUM_THREADS");
-	int num_procs;
-	if(var) num_procs = atoi(var);
-	else {
-		fprintf(stderr, "Set environment OMP_NUM_THREADS to 1");
-		exit(1);
-	}
-	m_iparm[2] = num_procs;
+	// number of processors: use value of OMP_NUM_THREADS
+	m_iparm[2] = 1;
 
 	m_maxfct = 1;	/* Maximum number of numerical factorizations */
 	m_mnum = 1;	/* Which factorization to use */
