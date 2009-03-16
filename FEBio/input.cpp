@@ -25,7 +25,7 @@ bool FEM::Input(const char* szfile)
 	// to determine what file reader we need.
 	const char* szext = strrchr(szfile, '.');
 
-	if (szext && ((strcmp(szext, ".xml")== 0) || 
+	if (szext && ((strcmp(szext, ".xml")== 0) ||
 		          (strcmp(szext, ".XML")== 0) ||
 				  (strcmp(szext, ".feb")== 0) ))
 	{
@@ -39,7 +39,7 @@ bool FEM::Input(const char* szfile)
 	}
 
 	// Load the file
-	if (pin->Load(*this, szfile) == false) 
+	if (pin->Load(*this, szfile) == false)
 	{
 		char szerr[256];
 		pin->GetErrorMessage(szerr);
@@ -98,7 +98,7 @@ void FEM::EchoInput()
 	m_log.printf("\tMax nr of stiffness reformations ............... : %d\n", m_pStep->m_psolver->m_maxref);
 	m_log.printf("\tper time steps\n");
 	m_log.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", m_pStep->m_psolver->m_maxups);
-	m_log.printf("\tbetween stiffness matrix reformations\n"); 
+	m_log.printf("\tbetween stiffness matrix reformations\n");
 	m_log.printf("\tDisplacement convergence tolerance ............. : %lg\n", m_pStep->m_psolver->m_Dtol);
 	m_log.printf("\tEnergy convergence tolerance ................... : %lg\n", m_pStep->m_psolver->m_Etol);
 	m_log.printf("\tResidual convergence tolerance ................. : %lg\n", m_pStep->m_psolver->m_Rtol);
@@ -193,7 +193,7 @@ void FEM::EchoInput()
 				case FE_PARAM_DOUBLE : m_log.printf("%s : %lg\n", sz, it->value<double>()); break;
 				case FE_PARAM_INT    : m_log.printf("%s : %d\n" , sz, it->value<int   >()); break;
 				case FE_PARAM_BOOL   : m_log.printf("%s : %d\n" , sz, it->value<bool  >()); break;
-				case FE_PARAM_INTV   : 
+				case FE_PARAM_INTV   :
 				case FE_PARAM_DOUBLEV:
 					{
 						int n = it->m_ndim;
@@ -334,6 +334,7 @@ void FEM::EchoInput()
 	if (m_nsolver == SUPERLU_SOLVER     ) m_log.printf("SuperLU\n");
 	if (m_nsolver == SUPERLU_MT_SOLVER  ) m_log.printf("SuperLU_MT\n");
 	if (m_nsolver == PARDISO_SOLVER     ) m_log.printf("Pardiso\n");
+	if (m_nsolver == WSMP_SOLVER        ) m_log.printf("WSMP\n");
 	if (m_nsolver == LU_SOLVER          ) m_log.printf("LUSolver\n");
 	if (m_nsolver == CG_ITERATIVE_SOLVER) m_log.printf("Conjugate gradient\n");
 	m_log.printf("\n\n");

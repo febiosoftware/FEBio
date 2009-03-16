@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FESolver.h"
 #include "fem.h"
+#include "FECore/PardisoSolver.h"
+#include "FECore/WSMPSolver.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FESolver::Init

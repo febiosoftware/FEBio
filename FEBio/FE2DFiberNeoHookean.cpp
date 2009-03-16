@@ -115,7 +115,7 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 
 			// normalize material axis and store fiber stretch
 			a.unit();
-	
+
 			// add active contraction stuff
 			at = wa*m_ac *sqrt((m_a[0]*v.x)*(m_a[0]*v.x) + (m_a[1]*v.y)*(m_a[1]*v.y));
 
@@ -145,7 +145,7 @@ void FE2DFiberNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 	double lam1 = lam / detF;
 	double mu1  = (mu - lam*log(detF)) / detF;
-	
+
 	// --- M A T R I X   C O N T R I B U T I O N ---
 	D[0][0] = lam1+2.*mu1; D[0][1] = lam1       ; D[0][2] = lam1       ;
 	D[1][0] = lam1       ; D[1][1] = lam1+2.*mu1; D[1][2] = lam1       ;
@@ -155,7 +155,7 @@ void FE2DFiberNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[5][5] = mu1;
 
 	// --- F I B E R   C O N T R I B U T I O N ---
-	// NOTE: I commented the fiber stiffness out since I think it will lead to 
+	// NOTE: I commented the fiber stiffness out since I think it will lead to
 	// a nonsymmetric D matrix and I can't deal with that yet. Besides, most
 	// problems seem to be running just fine without this contribution.
 /*
@@ -185,7 +185,7 @@ void FE2DFiberNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 			// normalize material axis and store fiber stretch
 			lam = a.unit();
-	
+
 			// add active contraction stuff
 			at = wa*m_ac *sqrt((m_a[0]*v.x)*(m_a[0]*v.x) + (m_a[1]*v.y)*(m_a[1]*v.y));
 			In = lam*lam;

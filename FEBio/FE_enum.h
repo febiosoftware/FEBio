@@ -58,7 +58,7 @@ enum FE_Linear_Solver_Type {
 	SUPERLU_MT_SOLVER,	// use only where available
 	PARDISO_SOLVER, 	// use only where available
 	LU_SOLVER,
-	WSMP_SOLVER,			// use only where available
+	WSMP_SOLVER,		// use only where available
 	CG_ITERATIVE_SOLVER
 };
 

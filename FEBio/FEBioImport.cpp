@@ -243,6 +243,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 			else if (strcmp(szt, "superlu"           ) == 0) fem.m_nsolver = SUPERLU_SOLVER;
 			else if (strcmp(szt, "superlu_mt"        ) == 0) fem.m_nsolver = SUPERLU_MT_SOLVER;
 			else if (strcmp(szt, "pardiso"           ) == 0) fem.m_nsolver = PARDISO_SOLVER;
+			else if (strcmp(szt, "wsmp"              ) == 0) fem.m_nsolver = WSMP_SOLVER;
 			else if (strcmp(szt, "conjugate gradient") == 0)
 			{
 				fem.m_nsolver = CG_ITERATIVE_SOLVER;
@@ -511,7 +512,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 
 						if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
 						else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-						else if (strcmp(szt, "prescribed") == 0) 
+						else if (strcmp(szt, "prescribed") == 0)
 						{
 							pm->m_bc[bc] = lc;
 							FERigidBodyDisplacement DC;
@@ -566,7 +567,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 
 						if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
 						else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-						else if (strcmp(szt, "prescribed") == 0) 
+						else if (strcmp(szt, "prescribed") == 0)
 						{
 							pm->m_bc[bc] = lc;
 							FERigidBodyDisplacement DC;
@@ -603,7 +604,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 								m_pStep->AddBoundaryCondition(pFC);
 								pFC->Deactivate();
 							}
-						}						
+						}
 						bfound = true;
 					}
 				}
@@ -1323,7 +1324,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 		else if (tag == "rigid_body")
 		{
 			// currently we only allow this to be specified in the multistep feature
-			assert(m_nstep);
+			assert(m_nsteps);
 
 			int id;
 			tag.AttributeValue("id", id);
