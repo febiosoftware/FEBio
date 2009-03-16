@@ -213,6 +213,10 @@
 				RelativePath=".\vector.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\WSMPSolver.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -257,6 +261,10 @@
 			</File>
 			<File
 				RelativePath=".\vector.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WSMPSolver.h"
 				>
 			</File>
 		</Filter>
