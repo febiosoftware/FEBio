@@ -177,7 +177,7 @@ public:
 		// we have to swap the indices
 		i ^= j; j ^= i; i ^= j;
 
-		if (i<=j)
+		if (j<=i)
 		{
 			int* pi = m_pindices + m_ppointers[j];
 			pi -= m_offset;
@@ -204,7 +204,7 @@ public:
 		// we have to swap the indices
 		i ^= j; j ^= i; i ^= j;
 
-		if (i<=j)
+		if (j<=i)
 		{
 			int* pi = m_pindices + m_ppointers[j];
 			pi -= m_offset;
