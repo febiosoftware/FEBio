@@ -386,10 +386,12 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 			if (ch != '>') throw XMLSyntaxError();
 	
 			// find the start of the next tag
-			while (isspace(ch=GetChar()));
-			if (ch != '<') throw XMLSyntaxError();
-
-			fseek(m_fp, -1, SEEK_CUR);
+			if (tag.m_nlevel)
+			{
+				while (isspace(ch=GetChar()));
+				if (ch != '<') throw XMLSyntaxError();
+				fseek(m_fp, -1, SEEK_CUR);
+			}
 		}
 		else
 		{

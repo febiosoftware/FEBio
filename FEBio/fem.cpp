@@ -2,6 +2,7 @@
 #include "fem.h"
 #include <string.h>
 #include "Archive.h"
+#include "XMLReader.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FEM::FEM
@@ -265,4 +266,105 @@ double* FEM::FindParameter(const char* szparam)
 
 	// oh, oh, we didn't find it
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Reads the FEBio configuration file. This file contains some default settings.
+
+bool FEM::Configure(const char *szfile)
+{
+	// open the configuration file
+	XMLReader xml;
+	if (xml.Open(szfile) == false)
+	{
+		fprintf(stderr, "FATAL ERROR: Failed reading FEBio configuration file %s.\n", szfile);
+		return false;
+	}
+
+	// get the logfile
+	Logfile& log = m_log;
+
+	// loop over all child tags
+	try
+	{
+		// Find the root element
+		XMLTag tag;
+		if (xml.FindTag("febio_config", tag) == false) return false;
+
+		if (strcmp(tag.m_szatv[0], "1.0") == 0)
+		{
+			if (!tag.isleaf())
+			{
+				// Read version 1.0
+				++tag;
+				do
+				{
+					if (tag == "linear_solver")
+					{
+						const char* szt = tag.AttributeValue("type");
+						if      (strcmp(szt, "skyline"           ) == 0) m_nsolver = SKYLINE_SOLVER;
+						else if (strcmp(szt, "psldlt"            ) == 0) m_nsolver = PSLDLT_SOLVER;
+						else if (strcmp(szt, "superlu"           ) == 0) m_nsolver = SUPERLU_SOLVER;
+						else if (strcmp(szt, "superlu_mt"        ) == 0) m_nsolver = SUPERLU_MT_SOLVER;
+						else if (strcmp(szt, "pardiso"           ) == 0) m_nsolver = PARDISO_SOLVER;
+						else if (strcmp(szt, "wsmp"              ) == 0) m_nsolver = WSMP_SOLVER;
+					}
+					else throw XMLReader::InvalidTag(tag);
+
+					// go to the next tag
+					++tag;
+				}
+				while (!tag.isend());
+			}
+		}
+		else 
+		{
+			log.printbox("FATAL ERROR", "Invalid version for FEBio configuration file.");
+			return false;
+		}
+	}
+	catch (XMLReader::XMLSyntaxError)
+	{
+		log.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
+		return false;
+	}
+	catch (XMLReader::InvalidTag e)
+	{
+		log.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (XMLReader::InvalidAttributeValue e)
+	{
+		const char* szt = e.tag.m_sztag;
+		const char* sza = e.szatt;
+		const char* szv = e.szval;
+		int l = e.tag.m_nstart_line;
+		log.printf("FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
+		return false;
+	}
+	catch (XMLReader::InvalidValue e)
+	{
+		log.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (XMLReader::MissingAttribute e)
+	{
+		log.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (XMLReader::UnmatchedEndTag e)
+	{
+		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
+		log.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (...)
+	{
+		log.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		return false;
+	}
+
+	xml.Close();
+
+	return true;
 }

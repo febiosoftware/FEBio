@@ -64,6 +64,8 @@ struct CMDOPTIONS
 	bool	bdmp;				//!< dump flag
 	char	szdmp[MAXFILE];		//!< dump file name
 
+	char	szcnf[MAXFILE];		//!< configuration file
+
 	bool	bdiag;				//!< run diagnostic file
 	bool	brun;				//!< run the problem or just check data?
 	bool	brstrt;				//!< restart flag
@@ -104,6 +106,11 @@ int main(int argc, char* argv[])
 	// intialize the framework
 	init_framework(fem);
 
+	// read the configration file if specified
+	if (ops.szcnf)
+	{
+		if (fem.Configure(ops.szcnf) == false) return 1;
+	}
 
 	// set the filenames
 	fem.SetLogFilename (ops.szlog);
@@ -134,15 +141,15 @@ int main(int argc, char* argv[])
 		if (ops.brstrt)
 		{
 			// do a restart
-			if (fem.Restart(ops.szfile) == false) return 0;
+			if (fem.Restart(ops.szfile) == false) return 1;
 		}
 		else
 		{
 			// read input data
-			if (fem.Input(ops.szfile) == false) return 0;
+			if (fem.Input(ops.szfile) == false) return 1;
 
 			// initialize and check data 
-			if (fem.Init() == false) return 0;
+			if (fem.Init() == false) return 1;
 		}
 
 		// solve the problem
@@ -177,6 +184,8 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ops.brun = true;
 	ops.bdiag = false;
 	ops.bsplash = true;
+
+	sprintf(ops.szcnf, "febio.xml");
 
 	// if there are no arguments, ask for an input file
 	if (nargs == 1)
@@ -240,6 +249,14 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 			{
 				// don't show the welcome message
 				ops.bsplash = false;
+			}
+			else if (strcmp(sz, "-cnf") == 0)
+			{
+				strcpy(ops.szcnf, argv[++i]);
+			}
+			else if (strcmp(sz, "-noconfig") == 0)
+			{
+				ops.szcnf[0] = 0;
 			}
 			else
 			{

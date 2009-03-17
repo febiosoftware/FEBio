@@ -202,6 +202,9 @@ public:
 	//! destructor
 	virtual ~FEM();
 
+	//! read the configuration file
+	bool Configure(const char* szfile);
+
 	//! Restart from restart point
 	bool Restart(const char* szfile);
 
