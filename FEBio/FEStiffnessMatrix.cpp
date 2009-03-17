@@ -118,6 +118,23 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				}
 			}
 
+			// Add discrete elements
+			if (fem.m_DE.size() > 0)
+			{
+				vector<int> lm(6);
+				for (i=0; i<fem.m_DE.size(); ++i)
+				{
+					FE_DISCRETE_ELEMENT& de = fem.m_DE[i];
+					lm[0] = mesh.Node(de.n1).m_ID[0];
+					lm[1] = mesh.Node(de.n1).m_ID[1];
+					lm[2] = mesh.Node(de.n1).m_ID[2];
+					lm[3] = mesh.Node(de.n2).m_ID[0];
+					lm[4] = mesh.Node(de.n2).m_ID[1];
+					lm[5] = mesh.Node(de.n2).m_ID[2];
+					build_add(lm);
+				}
+			}
+
 			// Add linear constraints to the profile
 			// TODO: we need to add a function build_add(lmi, lmj) for
 			// this type of "elements". Now we allocate too much memory
