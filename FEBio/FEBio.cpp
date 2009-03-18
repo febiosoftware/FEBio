@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 	init_framework(fem);
 
 	// read the configration file if specified
-	if (ops.szcnf)
+	if (ops.szcnf[0])
 	{
 		if (fem.Configure(ops.szcnf) == false) return 1;
 	}
