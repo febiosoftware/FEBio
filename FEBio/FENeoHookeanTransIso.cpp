@@ -6,7 +6,7 @@
 REGISTER_MATERIAL(FENeoHookeanTransIso, "neo-Hookean transiso");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FENeoHookeanTransIso, FEMaterial)
+BEGIN_PARAMETER_LIST(FENeoHookeanTransIso, FEElasticMaterial)
 	ADD_PARAMETER(m_Ep, FE_PARAM_DOUBLE, "Ep");
 	ADD_PARAMETER(m_Ez, FE_PARAM_DOUBLE, "Ez");
 	ADD_PARAMETER(m_vz, FE_PARAM_DOUBLE, "vz");
