@@ -38,9 +38,9 @@ mat3ds FENeoHookeanTransIso::Stress(FEMaterialPoint& mp)
 	a0.z = pt.Q[2][0];
 
 	// for testing (comment out)
-	a0.x=1;
-	a0.y=0;
-	a0.z=0;
+//	a0.x=1;
+//	a0.y=0;
+//	a0.z=0;
 
 	// calculate the current material axis lam*a = F*a0;
 	a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
@@ -147,9 +147,9 @@ void FENeoHookeanTransIso::Tangent(double D[6][6], FEMaterialPoint& mp)
 	a0.z = pt.Q[2][0];
 
 	// for testing (comment out)
-	a0.x=1;
-	a0.y=0;
-	a0.z=0;
+//	a0.x=1;
+//	a0.y=0;
+//	a0.z=0;
 
 	// calculate the current material axis lam*a = F*a0;
 	a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
