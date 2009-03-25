@@ -62,6 +62,7 @@ bool WSMPSolver::PreProcess(SparseMatrix& K)
 
 	m_iparm[1] = 1;
 	m_iparm[2] = 1;
+	m_dparm[9] = 10^(-18); // matrix singularity threshold
 
 	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
@@ -105,8 +106,12 @@ bool WSMPSolver::Factor(SparseMatrix& K)
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
 
+#ifdef PRINTHB
+	A->print_hb();
+#endif
+
 // ------------------------------------------------------------------------------
-// This step performs Cholesky factorization
+// This step performs Cholesky or LDLT factorization
 // ------------------------------------------------------------------------------
 
 #ifdef DEBUG
@@ -125,7 +130,7 @@ bool WSMPSolver::Factor(SparseMatrix& K)
 
 	m_iparm[1] = 3;
 	m_iparm[2] = 3;
-	m_iparm[30] = 1;
+	m_iparm[30] = 0; // Cholesky factorization
 
 	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
@@ -136,9 +141,9 @@ bool WSMPSolver::Factor(SparseMatrix& K)
 
 		if (m_iparm[63] > 0) // Try LDL factorization
 		{
+			m_iparm[1] = 3;
 			m_iparm[2] = 3;
-			m_iparm[3] = 3;
-			m_iparm[31] = 1;
+			m_iparm[30] = 1;
 
 			wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
 				 &ddum, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);

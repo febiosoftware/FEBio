@@ -54,7 +54,7 @@ protected:
 	int	m_ndim;	// dimension of matrix
 
 	double*	m_pd;		// matrix values
-	int		m_nsize;	// size of m_pd array
+	int	m_nsize;	// size of m_pd array
 };
 
 //-----------------------------------------------------------------------------
@@ -235,6 +235,8 @@ public:
 	int*    indices () { return m_pindices;  }
 	int*    pointers() { return m_ppointers; }
 	int     offset  () { return m_offset; }
+
+	void print_hb(); // Output Harwell-Boeing compact matrix
 
 protected:
 	int*	m_pindices;

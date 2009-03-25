@@ -172,6 +172,25 @@ void CompactMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 	}
 }
 
+void CompactMatrix::print_hb()
+{
+	int i, isize, dsize;
+
+	isize = sizeof(int);
+	dsize = sizeof(double);
+
+	FILE* fout = fopen("hb_matrix.out", "wb");
+
+	fwrite(&m_ndim, isize, 1, fout);
+	fwrite(&m_nsize, isize, 1, fout);
+	fwrite(m_ppointers, isize, m_ndim+1, fout);
+	fwrite(m_pindices, isize, m_nsize, fout);
+	fwrite(m_pd, dsize, m_nsize, fout);
+
+	fclose(fout);
+
+}
+
 //////////////////////////////////////////////////////////////////////
 // CompactUnSymmMatrix
 //////////////////////////////////////////////////////////////////////

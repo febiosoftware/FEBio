@@ -12,7 +12,7 @@ typedef int (*PARDISOFNC)(void *, int *, int *, int *, int *, int *,
 PARDISOINITFNC pardisoinit_;
 PARDISOFNC pardiso_;
 
-#ifndef PARDISO 
+#ifndef PARDISO
 #define PARDISO
 #endif
 
@@ -56,7 +56,7 @@ PardisoSolver::PardisoSolver()
 	pardiso_ = (PARDISOFNC) GetProcAddress(HPARDISODLL, "pardiso_");
 	if (pardiso_ == 0) exit(1);
 
-#endif 
+#endif
 	m_mtype = -2; /* Real symmetric matrix */
 	m_iparm[0] = 0;
 	pardisoinit_(m_pt, &m_mtype, m_iparm);
@@ -113,6 +113,10 @@ bool PardisoSolver::Factor(SparseMatrix& K)
 #else
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
 	int phase = 22;
+
+#ifdef PRINTHB
+	A->print_hb();
+#endif
 
 	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
