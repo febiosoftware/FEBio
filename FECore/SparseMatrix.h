@@ -224,7 +224,7 @@ public:
 
 	double diag(int i)
 	{
-		return m_pd[m_ppointers[i]];
+		return m_pd[m_ppointers[i] - m_offset];
 	}
 
 
@@ -241,7 +241,7 @@ public:
 protected:
 	int*	m_pindices;
 	int*	m_ppointers;
-	int	m_offset; // adjust array indices for fortran arrays
+	int		m_offset; // adjust array indices for fortran arrays
 };
 
 //-----------------------------------------------------------------------------
