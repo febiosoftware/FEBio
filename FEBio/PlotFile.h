@@ -73,7 +73,7 @@ public:
 	enum { PLOT_FLUID_PRESSURE=1, PLOT_CONTACT_PRESSURE, PLOT_CONTACT_GAP };
 
 	// vector fields
-	enum { PLOT_DISPLACEMENT=1, PLOT_VELOCITY, PLOT_ACCELERATION, PLOT_FLUID_FLUX, PLOT_CONTACT_TRACTION, PLOT_REACTION_FORCE };
+	enum { PLOT_DISPLACEMENT=1, PLOT_VELOCITY, PLOT_ACCELERATION, PLOT_FLUID_FLUX, PLOT_CONTACT_TRACTION, PLOT_REACTION_FORCE, PLOT_MATERIAL_FIBER };
 
 public:
 	//! constructor
@@ -102,6 +102,7 @@ protected:
 	void write_fluid_flux();
 	void write_contact_tractions();
 	void write_reaction_forces();
+	void write_material_fibers();
 
 	// scalar fields
 	void write_fluid_pressures();

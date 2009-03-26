@@ -1960,6 +1960,7 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 						else if (strcmp(szval, "FLUID_FLUX") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_FLUID_FLUX;
 						else if (strcmp(szval, "CONTACT_TRACTION") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_CONTACT_TRACTION;
 						else if (strcmp(szval, "REACTION_FORCE") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_REACTION_FORCE;
+						else if (strcmp(szval, "MATERIAL_FIBER") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_MATERIAL_FIBER;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else if (strcmp(szfield, "acceleration") == 0)
@@ -1969,6 +1970,7 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 						else if (strcmp(szval, "FLUID_FLUX") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_FLUID_FLUX;
 						else if (strcmp(szval, "CONTACT_TRACTION") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_CONTACT_TRACTION;
 						else if (strcmp(szval, "REACTION_FORCE") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_REACTION_FORCE;
+						else if (strcmp(szval, "MATERIAL_FIBER") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_MATERIAL_FIBER;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else if (strcmp(szfield, "temperature") == 0)

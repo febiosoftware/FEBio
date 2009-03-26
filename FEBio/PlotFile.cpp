@@ -277,6 +277,7 @@ bool PlotFile::Write(FEM& fem)
 		case PLOT_FLUID_FLUX: write_fluid_flux(); break;
 		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
 		case PLOT_REACTION_FORCE: write_reaction_forces(); break;
+		case PLOT_MATERIAL_FIBER: write_material_fibers(); break;
 		default:
 			assert(false);
 		}
@@ -291,6 +292,7 @@ bool PlotFile::Write(FEM& fem)
 		case PLOT_FLUID_FLUX: write_fluid_flux(); break;
 		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
 		case PLOT_REACTION_FORCE: write_reaction_forces(); break;
+		case PLOT_MATERIAL_FIBER: write_material_fibers(); break;
 		default:
 			assert(false);
 		}
@@ -701,4 +703,64 @@ void PlotFile::write_reaction_forces()
 	}
 
 	m_ar.write(R, sizeof(float)*3, N );
+}
+
+void PlotFile::write_material_fibers()
+{
+	int i, j, n;
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+	int N = mesh.Nodes();
+	int BE = mesh.SolidElements();
+	int SE = mesh.ShellElements();
+	vector<vec3d> v(N);
+	for (i=0; i<N; ++i) v[i] = vec3d(0,0,0);
+
+	vec3d r;
+	for (i=0; i<BE; ++i)
+	{
+		FESolidElement& el = mesh.SolidElement(i);
+		n = el.GaussPoints();
+		r = vec3d(0,0,0);
+		for (j=0; j<n; ++j)
+		{
+			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+			r.x += pt.Q[0][0];
+			r.y += pt.Q[1][0];
+			r.z += pt.Q[2][0];
+		}
+		r /= n;
+
+		n = el.Nodes();
+		for (j=0; j<n; ++j) v[el.m_node[j]] += r;
+	}
+
+	for (i=0; i<SE; ++i)
+	{
+		FEShellElement& el = mesh.ShellElement(i);
+		n = el.GaussPoints();
+		r = vec3d(0,0,0);
+		for (j=0; j<n; ++j)
+		{
+			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+			r.x += pt.Q[0][0];
+			r.y += pt.Q[1][0];
+			r.z += pt.Q[2][0];
+		}
+		r /= n;
+
+		n = el.Nodes();
+		for (j=0; j<n; ++j) v[el.m_node[j]] += r;
+	}
+
+	float vf[3];
+	for (i=0; i<N; ++i)
+	{
+		v[i].unit();
+		vf[0] = (float) v[i].x;
+		vf[1] = (float) v[i].y;
+		vf[2] = (float) v[i].z;
+
+		m_ar.write(vf, sizeof(float)*3, 1);
+	}
 }
