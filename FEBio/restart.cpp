@@ -334,7 +334,7 @@ bool FEM::Serialize(Archive& ar)
 		ar << m_PC.size();
 		for (i=0; i<m_PC.size(); ++i)
 		{
-			ar.write(m_PC+i, sizeof(FE_FACE_PRESSURE), 1);
+			ar.write(m_PC+i, sizeof(FEPressureLoad), 1);
 		}
 
 		// body forces
@@ -746,7 +746,7 @@ bool FEM::Serialize(Archive& ar)
 		m_PC.create(npr);
 		for (i=0; i<npr; ++i)
 		{
-			ar.read(m_PC+i, sizeof(FE_FACE_PRESSURE), 1);
+			ar.read(m_PC+i, sizeof(FEPressureLoad), 1);
 		}
 
 		// body forces

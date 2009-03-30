@@ -478,6 +478,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\getapppath.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\init.cpp"
 				>
 			</File>

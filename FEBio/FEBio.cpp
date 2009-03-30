@@ -43,7 +43,6 @@
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
 
-
 #define MAXFILE 256
 
 //-----------------------------------------------------------------------------
@@ -87,6 +86,8 @@ bool optimize(FEM& fem, const char* szfile);
 bool diagnose(FEM& fem, const char* szfile);
 
 void init_framework(FEM& fem);
+
+int get_app_path (char *pname, size_t pathsize);
 
 //-----------------------------------------------------------------------------
 // The starting point of the application
@@ -185,7 +186,15 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ops.bdiag = false;
 	ops.bsplash = true;
 
-	sprintf(ops.szcnf, "febio.xml");
+	// set the location of the configuration file
+	char szpath[1024] = {0};
+	get_app_path (szpath, 1023);
+
+	char* ch = strrchr(szpath, '\\');
+	if (ch == 0) ch = strrchr(szpath, '/');
+	if (ch) ch[1] = 0;
+
+	sprintf(ops.szcnf, "%sfebio.xml", szpath);
 
 	// if there are no arguments, ask for an input file
 	if (nargs == 1)
@@ -268,12 +277,12 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 
 	// derive the other filenames
 	char szbase[256]; strcpy(szbase, ops.szfile);
-	char* ch = strrchr(szbase, '.');
+	ch = strrchr(szbase, '.');
 	if (ch) *ch = 0;
 
 	char* szext = (ch?ch+1:0);
 
-	char szpath[256]; strcpy(szpath, ops.szfile);
+	strcpy(szpath, ops.szfile);
 	ch = strrchr(szpath, '/');
 	if (ch == 0) ch = strrchr(szpath, '\\');
 	if (ch) *(ch+1) = 0; else szpath[0] = 0;

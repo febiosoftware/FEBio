@@ -151,35 +151,41 @@ bool FESolver::StiffnessMatrix()
 	}
 
 	// calculate pressure stiffness term
-	int npr = m_fem.m_PC.size();
-	for (int m=0; m<npr; ++m)
+	if (m_fem.m_pStep->m_istiffpr != 0) 
 	{
-		// get the surface element
-		FESurfaceElement& el = m_fem.m_psurf->Element(m);
-
-		// skip rigid surface elements
-		// TODO: do we really need to skip rigid elements?
-		if (!el.IsRigid())
+		int npr = m_fem.m_PC.size();
+		for (int m=0; m<npr; ++m)
 		{
-			mesh.UnpackElement(el);
+			// get the surface element
+			FESurfaceElement& el = m_fem.m_psurf->Element(m);
 
-			// calculate nodal pressures
-			double* pt = el.pt();
-			FE_FACE_PRESSURE& pc = m_fem.m_PC[m];
+			// skip rigid surface elements
+			// TODO: do we really need to skip rigid elements?
+			if (!el.IsRigid())
+			{
+				mesh.UnpackElement(el);
 
-			double g = m_fem.GetLoadCurve(pc.lc)->Value();
+				// calculate nodal pressures
+				double* pt = el.pt();
+				FEPressureLoad& pc = m_fem.m_PC[m];
 
-			for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
+				if (!pc.blinear)
+				{
+					double g = m_fem.GetLoadCurve(pc.lc)->Value();
 
-			// get the element stiffness matrix
-			ndof = 3*el.Nodes();
-			ke.Create(ndof, ndof);
+					for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
 
-			// calculate pressure stiffness
-			if (m_fem.m_pStep->m_istiffpr != 0) PressureStiffness(el, ke);
+					// get the element stiffness matrix
+					ndof = 3*el.Nodes();
+					ke.Create(ndof, ndof);
 
-			// assemble element matrix in global stiffness matrix
-			AssembleStiffness(el.m_node, el.LM(), ke);
+					// calculate pressure stiffness
+					PressureStiffness(el, ke);
+
+					// assemble element matrix in global stiffness matrix
+					AssembleStiffness(el.m_node, el.LM(), ke);
+				}
+			}
 		}
 	}
 
@@ -735,7 +741,7 @@ bool FESolver::Residual(vector<double>& R)
 
 		// calculate nodal pressures
 		double* pt = el.pt();
-		FE_FACE_PRESSURE& pc = m_fem.m_PC[i];
+		FEPressureLoad& pc = m_fem.m_PC[i];
 
 		double g = m_fem.GetLoadCurve(pc.lc)->Value();
 
@@ -744,7 +750,7 @@ bool FESolver::Residual(vector<double>& R)
 		ndof = 3*el.Nodes();
 		fe.create(ndof);
 
-		if (PressureForce(el, fe) == false) return false;
+		if (pc.blinear) LinearPressureForce(el, fe); else PressureForce(el, fe);
 
 		// add element force vector to global force vector
 		AssembleResidual(el.m_node, el.LM(), fe, R);
@@ -2047,6 +2053,74 @@ double FESolver::HexVolume(FESolidElement& el, int state)
 	// calculate the volume V= xi*B1[i] = yi*B2[i] = zi*B3[i] (sum over i)
 	return (x1*B1[0]+x2*B1[1]+x3*B1[2]+x4*B1[3]+x5*B1[4]+x6*B1[5]+x7*B1[6]+x8*B1[7]);
 }
+
+//-----------------------------------------------------------------------------
+//! calculates the equivalent nodal forces due to hydrostatic pressure
+
+bool FESolver::LinearPressureForce(FESurfaceElement& el, vector<double>& fe)
+{
+	int i, n;
+
+	// nr integration points
+	int nint = el.GaussPoints();
+
+	// nr of element nodes
+	int neln = el.Nodes();
+
+	// pressure at nodes
+	double *pn = el.pt();
+
+	// nodal coordinates
+	vec3d *r0 = el.r0();
+
+	double* Gr, *Gs;
+	double* N;
+	double* w  = el.GaussWeights();
+
+	// pressure at integration points
+	double pr;
+
+	vec3d dxr, dxs;
+
+	// force vector
+	vec3d f;
+
+	// repeat over integration points
+	fe.zero();
+	for (n=0; n<nint; ++n)
+	{
+		N  = el.H(n);
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+
+		pr = 0;
+		dxr = dxs = vec3d(0,0,0);
+		for (i=0; i<neln; ++i) 
+		{
+			pr += N[i]*pn[i];
+
+			dxr.x += Gr[i]*r0[i].x;
+			dxr.y += Gr[i]*r0[i].y;
+			dxr.z += Gr[i]*r0[i].z;
+
+			dxs.x += Gs[i]*r0[i].x;
+			dxs.y += Gs[i]*r0[i].y;
+			dxs.z += Gs[i]*r0[i].z;
+		}
+
+		f = (dxr ^ dxs)*pr*w[n];
+
+		for (i=0; i<neln; ++i)
+		{
+			fe[3*i  ] += N[i]*f.x;
+			fe[3*i+1] += N[i]*f.y;
+			fe[3*i+2] += N[i]*f.z;
+		}
+	}
+
+	return true;
+}
+
 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure

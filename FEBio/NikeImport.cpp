@@ -826,7 +826,7 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 			FESurfaceElement& el = fem.m_psurf->Element(i);
 
 			// read the card data
-			FE_FACE_PRESSURE& pc = fem.m_PC[i];
+			FEPressureLoad& pc = fem.m_PC[i];
 			double* s = pc.s;
 			pc.face = i;
 

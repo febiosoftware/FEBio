@@ -1260,6 +1260,16 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 		}
 		else if (tag == "pressure")
 		{
+			const char* sz;
+			bool blinear = false;
+			sz = tag.AttributeValue("type", true);
+			if (sz)
+			{
+				if (strcmp(sz, "linear") == 0) blinear = true;
+				else if (strcmp(sz, "nonlinear") == 0) blinear = false;
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+			}
+
 			// count how many pressure cards there are
 			int npr = 0;
 			XMLTag t(tag); ++t;
@@ -1273,11 +1283,11 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 			++tag;
 			int nf[4], N;
 			double s;
-			const char* sz;
 			for (int i=0; i<npr; ++i)
 			{
-				FE_FACE_PRESSURE& pc = fem.m_PC[i];
+				FEPressureLoad& pc = fem.m_PC[i];
 				FESurfaceElement& el = fem.m_psurf->Element(i);
+				pc.blinear = blinear;
 
 				sz = tag.AttributeValue("lc", true);
 				if (sz) pc.lc = atoi(sz); else pc.lc = 0;

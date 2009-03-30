@@ -164,6 +164,9 @@ public:
 		//! Calculates external pressure forces
 		bool PressureForce(FESurfaceElement& el, vector<double>& fe);
 
+		//! Calculates the linear external pressure forces (ie. non-follower forces)
+		bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe);
+
 		//! Calculates the internal fluid forces
 		bool InternalFluidWork(FESolidElement& elem, vector<double>& fe);
 

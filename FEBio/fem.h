@@ -141,16 +141,19 @@ public:
 	int	rid;	// rigid body number
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// STRUCT: FE_FACE_PRESSURE
-// face pressure boundary data
-//
+//-----------------------------------------------------------------------------
+//! This class describes a pressure load on a surface element
 
-struct FE_FACE_PRESSURE : public FEBoundaryCondition
+class FEPressureLoad : public FEBoundaryCondition
 {
-	double	s[4];	// nodal scale factors
-	int		face;	// face number
-	int		lc;		// load curve
+public:
+	FEPressureLoad() { s[0] = s[1] = s[2] = s[3] = 1.0; blinear = false; }
+
+public:
+	double	s[4];		// nodal scale factors
+	int		face;		// face number
+	int		lc;			// load curve
+	bool	blinear;	// linear or not (true is non-follower, false is follower)
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -417,7 +420,7 @@ public:
 		list<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
 
 		// pressure boundary data
-		vector<FE_FACE_PRESSURE>	m_PC;		//!< pressure boundary cards
+		vector<FEPressureLoad>	m_PC;		//!< pressure boundary cards
 
 		// body force loads
 		FE_BODYFORCE	m_BF[3];		//!< body force data
