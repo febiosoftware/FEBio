@@ -4,6 +4,12 @@
 #include "windows.h"
 #endif
 
+#ifdef __APPLE__
+#include <sys/param.h>
+#include <mach-o/dyld.h>
+#include <unistd.h>
+#endif
+
 //-----------------------------------------------------------------------------
 // This function determines *where* the exe actually lives
 // This code is from Ian MacArthur from the FLTK forum: fltk.general 

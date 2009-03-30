@@ -14,6 +14,10 @@
 	#define ISNAN(x) isnan(x)
 #endif
 
+#ifdef __APPLE__
+#include <math.h>
+#define ISNAN(x) isnan(x)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FESolver::SolveStep
