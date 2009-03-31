@@ -1195,6 +1195,8 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				if      (strcmp(sz, "x") == 0) bc = 0;
 				else if (strcmp(sz, "y") == 0) bc = 1;
 				else if (strcmp(sz, "z") == 0) bc = 2;
+				else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
+	
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 				sz = tag.AttributeValue("lc", true);
@@ -1237,6 +1239,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				if      (strcmp(sz, "x") == 0) bc = 0;
 				else if (strcmp(sz, "y") == 0) bc = 1;
 				else if (strcmp(sz, "z") == 0) bc = 2;
+				else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 				sz = tag.AttributeValue("lc", true);

@@ -2341,6 +2341,7 @@ void FESolver::NodalForces(vector<double>& F)
 			n = node.m_ID[bc];
 		
 			f = s*m_fem.GetLoadCurve(lc)->Value();
+			if (bc == 6) f *= m_fem.m_pStep->m_dt;	// GAA
 
 			if (n >= 0) F[n] = f;
 			else if (node.m_rid >=0)
