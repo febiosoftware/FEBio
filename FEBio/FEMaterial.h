@@ -77,7 +77,7 @@ public:
 	virtual const char* GetTypeString();
 
 protected:
-	char	m_szname[64];	//!< name of material
+	char	m_szname[128];	//!< name of material
 };
 
 //-----------------------------------------------------------------------------
