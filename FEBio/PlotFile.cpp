@@ -65,7 +65,7 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 	}
 	if (m_nfield[4] == -1)
 	{
-		m_nfield[4] = PLOT_PLASTIC_STRAIN;
+		m_nfield[4] = PLOT_FIBER_STRAIN;
 	}
 
 	// write the header
