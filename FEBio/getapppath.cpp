@@ -27,7 +27,7 @@ int get_app_path (char *pname, size_t pathsize)
 	/* Oddly, the readlink(2) man page says no NULL is appended. */
 	/* So you have to do it yourself, based on the return value: */
 	pathsize --; /* Preserve a space to add the trailing NULL */
-	result = `														readlink("/proc/self/exe", pname, pathsize);
+	result = readlink("/proc/self/exe", pname, pathsize);
 	if (result > 0)
 	{
 		pname[result] = 0; /* add the #@!%ing NULL */
