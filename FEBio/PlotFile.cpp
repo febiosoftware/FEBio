@@ -17,6 +17,7 @@ PlotFile::PlotFile()
 	m_nfield[1] = -1;	// velocity
 	m_nfield[2] = -1;	// acceleration
 	m_nfield[3] = -1;	// temperature
+	m_nfield[4] = -1;	// plastic strain
 }
 
 PlotFile::~PlotFile()
@@ -61,6 +62,10 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 		m_nfield[3] = PLOT_NONE;
 		if (itype == FE_STATIC_PORO) m_nfield[3] = PLOT_FLUID_PRESSURE;
 		else if (fem.m_bcontact) m_nfield[3] = PLOT_CONTACT_GAP;
+	}
+	if (m_nfield[4] == -1)
+	{
+		m_nfield[4] = PLOT_PLASTIC_STRAIN;
 	}
 
 	// write the header
@@ -342,6 +347,11 @@ bool PlotFile::Write(FEM& fem)
 			s[3] += (float) (f*pt.s.xy());
 			s[4] += (float) (f*pt.s.yz());
 			s[5] += (float) (f*pt.s.xz());
+
+			if (m_nfield[4] == PLOT_FIBER_STRAIN)
+			{
+				s[6] += (float) f*fiber_strain(el, j);
+			}
 		}
 
 		m_ar.write(s, sizeof(float), 7);
@@ -763,4 +773,26 @@ void PlotFile::write_material_fibers()
 
 		m_ar.write(vf, sizeof(float)*3, 1);
 	}
+}
+
+float PlotFile::fiber_strain(FESolidElement &el, int j)
+{
+	// see if this element belongs to a tranversely isotropic material
+	int mid = el.GetMatID();
+	if (dynamic_cast<FETransverselyIsotropic*>(m_pfem->GetElasticMaterial(mid)))
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+
+		// get the initial fiber direction
+		vec3d a0;
+		a0.x = pt.Q[0][0];
+		a0.y = pt.Q[1][0];
+		a0.z = pt.Q[2][0];
+
+		// calculate the current fiber direction
+		vec3d a = pt.F*a0;
+
+		return (float) a.norm();
+	}
+	else return 0.f;
 }

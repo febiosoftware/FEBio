@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "Archive.h"
+#include "FEMesh.h"
 
 class FEM;
 
@@ -70,7 +71,7 @@ public:
 	enum { PLOT_NONE = 0 };
 
 	// scalar fields
-	enum { PLOT_FLUID_PRESSURE=1, PLOT_CONTACT_PRESSURE, PLOT_CONTACT_GAP };
+	enum { PLOT_FLUID_PRESSURE=1, PLOT_CONTACT_PRESSURE, PLOT_CONTACT_GAP, PLOT_PLASTIC_STRAIN, PLOT_FIBER_STRAIN };
 
 	// vector fields
 	enum { PLOT_DISPLACEMENT=1, PLOT_VELOCITY, PLOT_ACCELERATION, PLOT_FLUID_FLUX, PLOT_CONTACT_TRACTION, PLOT_REACTION_FORCE, PLOT_MATERIAL_FIBER };
@@ -109,9 +110,12 @@ protected:
 	void write_contact_pressures();
 	void write_contact_gaps();
 
+	// plastic stress fields
+	float fiber_strain(FESolidElement& el, int j);
+
 public:
 	bool	m_bsstrn;		//!< shell strain flag
-	int		m_nfield[4];	//!< field maps
+	int		m_nfield[5];	//!< field maps
 
 protected:
 	PLOTHEADER	m_ph;	//!< The plot file header
