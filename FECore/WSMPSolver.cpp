@@ -56,13 +56,35 @@ bool WSMPSolver::PreProcess(SparseMatrix& K)
 		exit(2);
 	}
 
+	return LinearSolver::PreProcess(K);
+#endif
+}
+
+bool WSMPSolver::Factor(SparseMatrix& K)
+{
+	// Make sure the solver is available
+#ifndef WSMP
+	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform\n\n");
+	return false;
+#else
+	// Auxiliary variables
+	int idum, nrhs=1, naux=0;
+	double ddum;
+
+	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
+
+
+#ifdef PRINTHB
+	A->print_hb(); // Write Harwell-Boeing matrix to file
+#endif
+
 // ------------------------------------------------------------------------------
 // This step performs matrix ordering
 // ------------------------------------------------------------------------------
 
 	m_iparm[1] = 1;
 	m_iparm[2] = 1;
-	m_dparm[9] = 10^(-18); // matrix singularity threshold
+	m_dparm[9] = 1.0e-18; // matrix singularity threshold
 
 	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);
@@ -88,49 +110,13 @@ bool WSMPSolver::PreProcess(SparseMatrix& K)
 		fprintf(stderr, "\nERROR during ordering: %i", m_iparm[63]);
 		exit(2);
 	}
-
-	return LinearSolver::PreProcess(K);
-#endif
-}
-
-bool WSMPSolver::Factor(SparseMatrix& K)
-{
-	/* Make sure the solver is available */
-#ifndef WSMP
-	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform\n\n");
-	return false;
-#else
-	/* Auxiliary variables */
-	int idum, nrhs=1, naux=0;
-	double ddum;
-
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
-
-#ifdef PRINTHB
-	A->print_hb();
-#endif
-
 // ------------------------------------------------------------------------------
 // This step performs Cholesky or LDLT factorization
 // ------------------------------------------------------------------------------
 
-#ifdef DEBUG
-
-	int i, *pointers, *indices;
-	double* values;
-
-	pointers = A->pointers();
-	indices = A->indices();
-	values = A->values();
-	fprintf(stdout, "\nPointers:");
-	for (i=0; i<=m_n; i++) fprintf(stdout, "\n%d", pointers[i]);
-	fprintf(stdout, "\nIndices, Values:");
-	for (i=0; i<m_nnz; i++) fprintf(stdout, "\n%d, %g", indices[i], values[i]);
-#endif
-
 	m_iparm[1] = 3;
 	m_iparm[2] = 3;
-	m_iparm[30] = 0; // Cholesky factorization
+	m_iparm[30] = 1; // 0: Cholesky factorization
 
 	wssmp_(&m_n, A->pointers(), A->indices(), A->values(), &ddum, m_perm, m_invp,
 		 m_b, &m_n, &nrhs, &ddum, &naux, &idum, m_iparm, m_dparm);

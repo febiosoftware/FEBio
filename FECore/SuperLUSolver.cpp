@@ -45,7 +45,7 @@ bool SuperLUSolver::PreProcess(SparseMatrix& K)
 	m_balloc = true;
 
 	// estimate the condition number
-
+	m_bcond = true;
 
 	return LinearSolver::PreProcess(K);
 #endif
@@ -102,6 +102,13 @@ bool SuperLUSolver::Factor(SparseMatrix& K)
 	B.ncol = 0;
 	X.ncol = 0;
 
+#ifdef PRINTHB
+	// get a reference to the correct matrix type
+	CompactUnSymmMatrix& C = dynamic_cast<CompactUnSymmMatrix&> (K);
+
+	C.print_hb(); // Write Harwell-Boeing matrix to file
+#endif
+
 	// factorize the matrix
 	options.Fact = DOFACT;
     dgssvx(&options, &A, perm_c, perm_r, etree, equed, NULL, NULL,
@@ -119,11 +126,11 @@ bool SuperLUSolver::Factor(SparseMatrix& K)
 		dgscon(&cnorm, &L, &U, normA, &rcond, &stat, &info);
 		if (info == 0)
 		{
-			fprintf(stderr, " ESTIMATED CONDITION NUMBER : %lg\n", 1./rcond);
+			fprintf(stdout, " ESTIMATED CONDITION NUMBER : %lg\n", 1./rcond);
 		}
 		else
 		{
-			fprintf(stderr, " FAILED ESTIMAING CONDITION NUMBER\n");
+			fprintf(stdout, " FAILED ESTIMAING CONDITION NUMBER\n");
 		}
 	}
 

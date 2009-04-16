@@ -317,6 +317,8 @@ public:
 	int*    rowind() { return m_pind; }
 	int*    colptr() { return m_pcol; }
 
+	void print_hb(); // Output Harwell-Boeing compact matrix
+
 protected:
 	int*	m_pind;	// row indices of values
 	int*	m_pcol;	// start of columns

@@ -12,7 +12,7 @@ void Hello(FILE* fp);
 
 //-----------------------------------------------------------------------------
 //! This routine reads in an input file and performs some initialization stuff.
-//! The rest of the initialization is done int Init
+//! The rest of the initialization is done in Init
 
 bool FEM::Input(const char* szfile)
 {

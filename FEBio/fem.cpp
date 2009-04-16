@@ -36,7 +36,7 @@ FEM::FEM()
 	// (nothing to initialize yet)
 
 	// --- Boundary Condition Data ---
-	for (int i=0; i<3; ++i) 
+	for (int i=0; i<3; ++i)
 	{
 		m_BF[i].lc = -1;
 		m_BF[i].s = 0.0;
@@ -78,7 +78,7 @@ FEM::~FEM()
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEM::FEM(FEM& fem)
 // copy constructor.
-// The copy constructor and assignment operator are used for push/pop'ing. 
+// The copy constructor and assignment operator are used for push/pop'ing.
 // Note that not all data is copied. We only copy the data that is relevant
 // for push/pop'ing
 //
@@ -93,7 +93,7 @@ FEM::FEM(FEM& fem)
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEM::operator = (FEM& fem)
 // assignment operator
-// The copy constructor and assignment operator are used for push/pop'ing. 
+// The copy constructor and assignment operator are used for push/pop'ing.
 // Note that not all data is copied. We only copy the data that is relevant
 // for push/pop'ing
 //
@@ -228,10 +228,10 @@ double* FEM::FindParameter(const char* szparam)
 	{
 		switch (pp->m_itype)
 		{
-		case FE_PARAM_DOUBLE: 
+		case FE_PARAM_DOUBLE:
 			{
 				assert(index<0);
-				return &pp->value<double>(); 
+				return &pp->value<double>();
 			}
 			break;
 		case FE_PARAM_DOUBLEV:
@@ -317,7 +317,7 @@ bool FEM::Configure(const char *szfile)
 				while (!tag.isend());
 			}
 		}
-		else 
+		else
 		{
 			log.printbox("FATAL ERROR", "Invalid version for FEBio configuration file.");
 			return false;

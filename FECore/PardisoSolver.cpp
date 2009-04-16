@@ -84,6 +84,19 @@ bool PardisoSolver::PreProcess(SparseMatrix& K)
 	m_msglvl = 0;	/* 0 Suppress printing, 1 Print statistical information */
 	m_error = 0;	/* Initialize m_error flag */
 
+	return LinearSolver::PreProcess(K);
+#endif
+}
+
+bool PardisoSolver::Factor(SparseMatrix& K)
+{
+	/* Make sure the solver is available */
+#ifndef PARDISO
+	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
+	return false;
+#else
+	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
+
 // ------------------------------------------------------------------------------
 // Reordering and Symbolic Factorization.  This step also allocates all memory
 // that is necessary for the factorization.
@@ -100,19 +113,11 @@ bool PardisoSolver::PreProcess(SparseMatrix& K)
 		exit(2);
 	}
 
-	return LinearSolver::PreProcess(K);
-#endif
-}
+// ------------------------------------------------------------------------------
+// This step does the factorization
+// ------------------------------------------------------------------------------
 
-bool PardisoSolver::Factor(SparseMatrix& K)
-{
-	/* Make sure the solver is available */
-#ifndef PARDISO
-	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
-	return false;
-#else
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
-	int phase = 22;
+	phase = 22;
 
 #ifdef PRINTHB
 	A->print_hb();

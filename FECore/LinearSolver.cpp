@@ -9,7 +9,7 @@
 
 //-----------------------------------------------------------------------------
 // The variable m_numthreads determines the number of threads to request for
-// solvers that can take advantage of multiple processors. 
+// solvers that can take advantage of multiple processors.
 
 int LinearSolver::m_numthreads = 1;
 

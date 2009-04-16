@@ -9,9 +9,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "assert.h"
+#include <assert.h>
 
-template <typename T> class queue  
+template <typename T> class queue
 {
 public:
 	queue(int n)

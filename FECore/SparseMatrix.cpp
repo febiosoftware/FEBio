@@ -215,3 +215,22 @@ void CompactUnSymmMatrix::Create(int N, int nz, double* pv, int* pi, int* pc)
 	m_ndim  = N;
 	m_nsize = nz;
 }
+
+void CompactUnSymmMatrix::print_hb()
+{
+	int i, isize, dsize;
+
+	isize = sizeof(int);
+	dsize = sizeof(double);
+
+	FILE* fout = fopen("hb_matrix.out", "wb");
+
+	fwrite(&m_ndim, isize, 1, fout);
+	fwrite(&m_nsize, isize, 1, fout);
+	fwrite(m_pcol, isize, m_ndim+1, fout);
+	fwrite(m_pind, isize, m_nsize, fout);
+	fwrite(m_pd, dsize, m_nsize, fout);
+
+	fclose(fout);
+
+}

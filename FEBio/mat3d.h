@@ -208,15 +208,15 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! This class describes a general 3D matrix of doubles
-class mat3d  
+class mat3d
 {
 public:
 	// default constructor
 	mat3d() {}
 
 	// constructors
-	mat3d(double a00, double a01, double a02, 
-		  double a10, double a11, double a12, 
+	mat3d(double a00, double a01, double a02,
+		  double a10, double a11, double a12,
 		  double a20, double a21, double a22);
 
 	mat3d(double m[3][3]);
@@ -297,7 +297,7 @@ public:
 
 	// calculates the transposed inverse
 	mat3d transinv() const;
-	
+
 protected:
 	double d[3][3];	// matrix data
 

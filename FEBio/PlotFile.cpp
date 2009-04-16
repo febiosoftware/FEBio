@@ -28,7 +28,7 @@ PlotFile::~PlotFile()
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : PlotFile::Open
-//  Opens the PLOT database. That is, an archive is created and the PLOTHEADER 
+//  Opens the PLOT database. That is, an archive is created and the PLOTHEADER
 //  is written as well as the initial geometry of the model.
 //
 
@@ -136,7 +136,7 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 		FESolidElement& el = mesh.SolidElement(i);
 
 		el.m_nID = nid++;
-		
+
 		N = el.Nodes();
 		switch (el.Type())
 		{
@@ -165,9 +165,9 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 			n[4] = n[5] = n[6] = n[7] = el.m_node[3]+1;
 			break;
 		}
-			
+
 		n[8] = el.GetMatID()+1;
-		
+
 		m_ar.write(n, sizeof(int), 9);
 	}
 
@@ -194,9 +194,9 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 			n[3] = el.m_node[2]+1;
 			break;
 		}
-			
+
 		n[4] = el.GetMatID()+1;
-		
+
 		m_ar.write(n, sizeof(int), 5);
 	}
 
@@ -225,7 +225,7 @@ bool PlotFile::Append(FEM& fem, const char* szfile)
 
 	if (plh.nv2d == 32) m_bsstrn = false;
 	else if (plh.nv2d == 44) m_bsstrn = true;
-	else 
+	else
 	{
 		m_ar.Close();
 		return false;
@@ -271,7 +271,7 @@ bool PlotFile::Write(FEM& fem)
 		default:
 			assert(false);
 		}
-	}	
+	}
 
 	// write the velocities
 	if (m_ph.flagV)
@@ -534,7 +534,7 @@ void PlotFile::write_fluid_flux()
 
 		// calculate average flux
 		ew = vec3d(0,0,0);
-		for (j=0; j<el.GaussPoints(); ++j) 
+		for (j=0; j<el.GaussPoints(); ++j)
 		{
 			FEMaterialPoint& mp = *el.m_State[j];
 			FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
@@ -644,7 +644,7 @@ void PlotFile::write_contact_pressures()
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
 		}
 	}
-	
+
 	for (i=0; i<fem.m_mesh.Nodes(); ++i)
 	{
 		m_ar << t[i];
@@ -690,7 +690,7 @@ void PlotFile::write_contact_gaps()
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0? 0 : ss.gap[j]);
 		}
 	}
-	
+
 	for (i=0; i<fem.m_mesh.Nodes(); ++i)
 	{
 		m_ar << t[i];
