@@ -1996,8 +1996,9 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 					}
 					else if (strcmp(szfield, "plastic strain") == 0)
 					{
-						if      (strcmp(szval, "PLASTIC_STRAIN") == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_PLASTIC_STRAIN;
-						else if (strcmp(szval, "FIBER_STRAIN"  ) == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_FIBER_STRAIN;
+						if      (strcmp(szval, "PLASTIC_STRAIN"  ) == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_PLASTIC_STRAIN;
+						else if (strcmp(szval, "FIBER_STRAIN"    ) == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_FIBER_STRAIN;
+						else if (strcmp(szval, "DEV_FIBER_STRAIN") == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_DEV_FIBER_STRAIN;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "field", szfield);

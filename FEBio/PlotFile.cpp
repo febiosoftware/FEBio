@@ -65,7 +65,7 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 	}
 	if (m_nfield[4] == -1)
 	{
-		m_nfield[4] = PLOT_FIBER_STRAIN;
+		m_nfield[4] = PLOT_DEV_FIBER_STRAIN;
 	}
 
 	// write the header
@@ -351,6 +351,10 @@ bool PlotFile::Write(FEM& fem)
 			if (m_nfield[4] == PLOT_FIBER_STRAIN)
 			{
 				s[6] += (float) f*fiber_strain(el, j);
+			}
+			else if (m_nfield[4] == PLOT_DEV_FIBER_STRAIN)
+			{
+				s[6] += (float) f*dev_fiber_strain(el, j);
 			}
 		}
 
@@ -793,6 +797,31 @@ float PlotFile::fiber_strain(FESolidElement &el, int j)
 		vec3d a = pt.F*a0;
 
 		return (float) a.norm();
+	}
+	else return 0.f;
+}
+
+float PlotFile::dev_fiber_strain(FESolidElement &el, int j)
+{
+	// see if this element belongs to a tranversely isotropic material
+	int mid = el.GetMatID();
+	if (dynamic_cast<FETransverselyIsotropic*>(m_pfem->GetElasticMaterial(mid)))
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+
+		// get the jacobian
+		double J = pt.J;
+		double Jm13 = pow(J, -1.0/3.0);
+
+		// get the initial fiber direction
+		vec3d a0;
+		a0.x = pt.Q[0][0];
+		a0.y = pt.Q[1][0];
+		a0.z = pt.Q[2][0];
+
+		// calculate the current fiber direction
+		vec3d a = pt.F*a0;
+		return (float) (Jm13*a.unit());
 	}
 	else return 0.f;
 }
