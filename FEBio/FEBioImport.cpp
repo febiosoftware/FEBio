@@ -1463,7 +1463,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		FESlidingInterface* ps = new FESlidingInterface(&fem);
 		fem.m_CI.add(ps);
 
-		ps->npass = 1;
+		ps->m_npass = 1;
 
 		++tag;
 		do
@@ -1493,7 +1493,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 				tag.value(n);
 				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
 
-				ps->npass = n+1;
+				ps->m_npass = n+1;
 			}
 			else if (tag == "seg_up") tag.value(ps->m_nsegup);
 			else if (tag == "laugon") tag.value(ps->m_blaugon);

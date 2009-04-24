@@ -614,39 +614,52 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 	if (m_numsi)
 	{
 		// read the sliding interface control cards
-		int itype, iaux;
+		int iaux;
+		vector<SLIDING_INTERFACE> SI(m_numsi);
 		for (i=0; i<m_numsi; ++i)
 		{
+			if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_SI]);
+			nread = sscanf(szline, "%8d%8d%4d%10lg%10lg%*10lg%*10lg%*10lg%*5d%5d", &SI[i].nss, &SI[i].nms, &SI[i].itype, &SI[i].sfac, &SI[i].mus, &iaux);
+			if (nread != 6) return errf(szerr[ERR_SI]);
+
+			// make sure interface type == 3
+			if (ABS(SI[i].itype) != 3) return errf(szerr[ERR_SIT]);
+
+			// read the auxiliary control card
+			if (iaux)
+			{
+				if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_SI]);
+				nread = sscanf(szline, "%5d%10lg%10lg%10lg", &SI[i].iaug, &SI[i].altoln, &SI[i].altolt, &SI[i].tkmult);
+				if (nread != 4) return errf(szerr[ERR_SI]);
+			}
+		}
+
+		// create the sliding interfaces
+		for (i=0; i<m_numsi; ++i)
+		{
+			// create a new sliding interface and add it to the model
 			FESlidingInterface* psi = new FESlidingInterface(&fem);
 			fem.m_CI.add(psi);
-
 			FESlidingInterface& si = *psi;
 
-			if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_SI]);
-			nread = sscanf(szline, "%8d%8d%4d%10lg%*10lg%*10lg%*10lg%*10lg%*5d%5d", &si.nse, &si.nme, &itype, &si.m_eps, &iaux);
+			// allocate storage for contact surfaces
+			si.m_ss.Create(SI[i].nss);
+			si.m_ms.Create(SI[i].nms);
+
+			// set contact parameters
+			si.m_eps = SI[i].sfac;
+			si.m_atol = SI[i].altoln;
+			si.m_mu = SI[i].mus;
 
 			// validate the penalty factor
 			if (si.m_eps == 0) si.m_eps = 1;
 			if (si.m_eps < 0) si.m_eps *= -1;
 
-			// make sure interface type == 3
-			if (ABS(itype) != 3) return errf(szerr[ERR_SIT]);
+			si.m_npass = 2;
+			if (SI[i].itype == -3) si.m_npass = 1;
 
-			si.npass = 2;
-			if (itype == -3) { si.npass = 1; itype = 3; }
-
-			// read the auxiliary controle card
-			if (iaux)
-			{
-				int iaug;
-
-				if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_SI]);
-				nread = sscanf(szline, "%5d%10lg", &iaug, &si.m_atol);
-				if (nread != 2) return errf(szerr[ERR_SI]);
-
-				// set default lag aug tolerance
-				if (si.m_atol == 0) si.m_atol = 0.1;
-			}
+			// set default lag aug tolerance
+			if (si.m_atol == 0) si.m_atol = 0.1;
 		}
 
 		// read the sliding interfaces
@@ -654,11 +667,12 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		for (i=0; i<m_numsi; ++i)
 		{
 			FESlidingInterface& si = dynamic_cast<FESlidingInterface&>(fem.m_CI[i]);
-			si.m_ss.Create(si.nse);
-			si.m_ms.Create(si.nme);
+
+			int nss = si.m_ss.Elements();
+			int nms = si.m_ms.Elements();
 
 			// read the slave facets
-			for (j=0; j<si.nse; ++j)
+			for (j=0; j<nss; ++j)
 			{
 				FESurfaceElement& el = si.m_ss.Element(j);
 
@@ -676,7 +690,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 			}
 
 			// read the master facets
-			for (j=0; j<si.nme; ++j)
+			for (j=0; j<nms; ++j)
 			{
 				FESurfaceElement& el = si.m_ms.Element(j);
 

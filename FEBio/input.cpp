@@ -246,7 +246,7 @@ void FEM::EchoInput()
 				m_log.printf("contact interface %d:\n", i+1);
 				m_log.printf("\tType                           : sliding with gaps\n");
 				m_log.printf("\tPenalty factor                 : %lg\n", psi->m_eps);
-				m_log.printf("\tTwo-pass algorithm             : %s\n", (psi->npass==1? "off":"on"));
+				m_log.printf("\tTwo-pass algorithm             : %s\n", (psi->m_npass==1? "off":"on"));
 				m_log.printf("\tAugmented Lagrangian           : %s\n", (psi->m_blaugon? "on" : "off"));
 				if (psi->m_blaugon)
 					m_log.printf("\tAugmented Lagrangian tolerance : %lg\n", psi->m_atol);

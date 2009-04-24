@@ -78,10 +78,7 @@ public:
 	FEContactSurface	m_ss;	//!< slave surface
 	FEContactSurface	m_ms;	//!< master surface
 
-	int nse;	//!< number of slave elements
-	int nme;	//!< number of master elements
-
-	int		npass;	//!< nr of passes (1 or 2)
+	int		m_npass;	//!< nr of passes (1 or 2)
 
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations

@@ -196,9 +196,7 @@ bool FEContactDiagnostic::Init()
 	FESlidingInterface* ps = new FESlidingInterface(&fem);
 	ps->m_atol = 0.1;
 	ps->m_eps = 1;
-	ps->nme = 1;
-	ps->nse = 1;
-	ps->npass = 1;
+	ps->m_npass = 1;
 	ps->m_nsegup = 0;
 	FEContactSurface& ms = ps->m_ms;
 	ms.Create(1);

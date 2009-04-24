@@ -303,7 +303,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 						}
 					}
 	
-					if (psi->npass == 2)
+					if (psi->m_npass == 2)
 					{
 						for (j=0; j<ms.Nodes(); ++j)
 						{

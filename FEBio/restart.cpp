@@ -199,12 +199,10 @@ bool FEM::Serialize(Archive& ar)
 			if (psi)
 			{
 				ar << psi->Type();
-				ar << psi->npass;
+				ar << psi->m_npass;
 				ar << psi->m_eps;
 				ar << psi->m_atol;
 				ar << psi->m_nplc;
-				ar << psi->nse;
-				ar << psi->nme;
 				ar << psi->m_bautopen;
 				ar << psi->m_nsegup;
 				ar << psi->m_blaugon;
@@ -548,12 +546,10 @@ bool FEM::Serialize(Archive& ar)
 					FESlidingInterface& si = *ps;
 					m_CI.add(ps);
 
-					ar >> si.npass;
+					ar >> si.m_npass;
 					ar >> si.m_eps;
 					ar >> si.m_atol;
 					ar >> si.m_nplc;
-					ar >> si.nse;
-					ar >> si.nme;
 					ar >> si.m_bautopen;
 					ar >> si.m_nsegup;
 					ar >> si.m_blaugon;

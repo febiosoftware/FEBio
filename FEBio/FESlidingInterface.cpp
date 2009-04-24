@@ -212,7 +212,7 @@ void FESlidingInterface::Init()
 
 	// for two-pass algorithms we repeat the previous
 	// two steps with master and slave switched
-	if (npass == 2)
+	if (m_npass == 2)
 	{
 //		m_ss.UpdateNormals();
 		ProjectSurface(m_ms, m_ss, true);
@@ -507,7 +507,7 @@ void FESlidingInterface::Update()
 	// this also calculates the nodal gap functions
 	ProjectSurface(m_ss, m_ms, bupdate);
 
-	if (npass == 2)
+	if (m_npass == 2)
 	{
 		m_ss.Update();
 		ProjectSurface(m_ms, m_ss, bupdate);
@@ -550,7 +550,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 	vec3d dxr, dxs;
 
 	// do two-pass
-	for (np=0; np<npass; ++np)
+	for (np=0; np<m_npass; ++np)
 	{
 		// pick the slave and master surfaces
 		FEContactSurface& ss = (np==0? m_ss : m_ms);
@@ -915,7 +915,7 @@ void FESlidingInterface::ContactStiffness()
 	FESolver* psolver = m_pfem->m_pStep->m_psolver;
 
 	// do two-pass
-	for (np=0; np<npass; ++np)
+	for (np=0; np<m_npass; ++np)
 	{
 		// get the master and slave surface
 		FEContactSurface& ss = (np==0?m_ss:m_ms);	

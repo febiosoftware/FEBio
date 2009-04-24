@@ -7,6 +7,20 @@
 
 class FENIKEImport : public FEFileImport
 {
+protected:
+	struct SLIDING_INTERFACE
+	{
+		int		nss;		// nr of slave elements
+		int		nms;		// nr of master elements
+		int		itype;		// type of sliding interface
+		double	sfac;		// penalty scale factor
+		double	mus;		// static friction coeff
+		int		iaug;		// nr of augmentations
+		double	altoln;		// normal augmentation tolerance
+		double	altolt;		// tangent augmentation tolerance
+		double	tkmult;		// tangent stiffness multiplier
+	};
+
 public:
 	bool Load(FEM& fem, const char* szfile);
 
