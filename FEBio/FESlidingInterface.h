@@ -61,14 +61,14 @@ protected:
 	//! calculate auto penalty factor
 	void CalcAutoPenalty(FEContactSurface& s);
 
-	//! calculate the nodal projection on the master surface
-	void UpdateSegments(FEContactSurface& ss, FEContactSurface& ms);
-
 	//! calculate the nodal force of a slave node
 	void ContactNodalForce(int m, FEContactSurface& ss, FESurfaceElement& mel, vector<double>& fe);
 
 	//! calculate the stiffness contribution of a single slave node
 	void ContactNodalStiffness(int m, FEContactSurface& ss, FESurfaceElement& mel, matrix& ke);
+
+	//! map the frictional data from the old element to the new element
+//	void MapFrictionData(int inode, FESurfaceElement& sn, FESurfaceElement& so, vec3d& q);
 
 private:
 	//! copy constructor hidden
@@ -78,13 +78,15 @@ public:
 	FEContactSurface	m_ss;	//!< slave surface
 	FEContactSurface	m_ms;	//!< master surface
 
-	int		m_npass;	//!< nr of passes (1 or 2)
+	int				m_npass;	//!< nr of passes (1 or 2)
 
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations
 	double			m_gtol;		//!< gap tolerance
 	double			m_atol;		//!< augmentation tolerance
 	bool			m_blaugon;	//!< augmented lagrangian flag
+
+	double			m_stol;		//!< search tolerance
 
 	bool			m_bautopen;	//!< auto penalty calculation factor
 	double			m_eps;		//!< penalty scale factor

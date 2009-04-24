@@ -27,6 +27,8 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 
 	m_gtol = 0;
 
+	m_stol = 0.01;
+
 	m_nplc = -1;
 	m_pplc = 0;
 	m_nsegup = 0;	// always do segment updates
@@ -222,48 +224,6 @@ void FESlidingInterface::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the slave node projection on the master surface
-
-void FESlidingInterface::UpdateSegments(FEContactSurface& ss, FEContactSurface& ms)
-{
-	int i, a;
-	vec3d rs;
-	FEElement* pme;
-	double r, s;
-
-	// neirest neigbour query
-	FENNQuery query(&ms);
-	query.Init();
-
-	// loop over all slave nodes
-	for (i=0; i<ss.Nodes(); ++i)
-	{
-		// get the slave node
-		FENode& node = ss.Node(i);
-
-		// get the global node number of this slave node
-		a = ss.node[i];
-
-		// get the spatial position
-		rs = node.m_rt;
-
-		// get the master element to which this node belongs (if any)
-		pme = ss.pme[i];
-
-		// if this node has already been associated with a master
-		// segment, then see if it is still inside the segment
-		if (pme)
-		{
-			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&>(*pme);
-			r = ss.rs[i][0];
-			s = ss.rs[i][1];
-
-
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 //!  Projects the slave surface onto the master surface.
 //!  That is for each slave node we determine the closest
 //!  master element and the projection of the slave node onto
@@ -277,38 +237,22 @@ void FESlidingInterface::UpdateSegments(FEContactSurface& ss, FEContactSurface& 
 
 void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& ms, bool bupseg, bool bmove)
 {
-	int i, l;
-
-	int ne;
+	int i;
 	double r, s;
-
 	FEElement* pme;
-
-	// shape function values of the master element at the slave node projection
-	double H[4], Hr[4], Hs[4];
+	bool bfirst = true;
 
 	// spatial position of slave node
 	vec3d x;
 
-	// spatial position of master nodes
-	vec3d y[4];
-
 	// slave node projection
 	vec3d q;
-
-	vec3d xr, xs;
-
-	// master normal at slave projection
-	vec3d np;
 
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
 
-	// tolerance for checking whether a node projection is in the element or not
-	const double eps = 0.01;
-
-	// flag to indicate a new contact is established
-	bool bnew;
+	// get the logfile
+	Logfile& log = m_pfem->m_log;
 
 	// loop over all slave nodes
 	for (i=0; i<ss.Nodes(); ++i)
@@ -319,150 +263,77 @@ void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& 
 		// get the nodal position
 		x = node.m_rt;
 
+		// get the global node number
+		int m = ss.node[i];
+
 		// get the previous master element (if any)
 		pme = ss.pme[i];
 
-		// first, let's see if the node still is 
-		// in the same master element
+		// If the node is in contact, let's see if the node still is 
+		// on the same master element
 		if (pme != 0)
 		{
 			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&>(*pme);
-			ne = mel.Nodes();
 
 			r = ss.rs[i][0];
 			s = ss.rs[i][1];
 
 			q = ms.ProjectToSurface(mel, x, r, s);
+			ss.rs[i][0] = r;
+			ss.rs[i][1] = s;
 
 			// we only check when we can update the segments
 			// otherwise, we just stick with this element, even
 			// if the node is no longer inside it.
 			if (bupseg)
 			{
-				if (ne == 4)
+				if (!ms.IsInsideElement(mel, r, s, m_stol) && bupseg)
 				{
-					// check quads
-					if ((r >= -1-eps) && (r <= 1+eps) && (s >= -1-eps) && (s <= 1+eps))
+					FEElement* pold = pme; 
+					// see if the node might have moved to a neighbour element
+					ss.rs[i] = vec2d(0,0);
+					pme = ms.FindMasterSegment(x, q, ss.rs[i], bfirst, m_stol);
+
+					if (pme == 0)
 					{
-						// yes, it is
-						ss.rs[i][0] = r;
-						ss.rs[i][1] = s;
+						// nope, if has genuinly left contact
+						int* n = pold->m_node;
+//						log.printf("node %d has left element (%d, %d, %d, %d)\n", m+1, n[0]+1, n[1]+1, n[2]+1, n[3]+1);
 					}
-					else
-					{
-						ss.rs[i][0] = 0;
-						ss.rs[i][1] = 0;
-						pme = 0;
-					}
+
+					//TODO: translate friction data to new master element
 				}
-				else
-				{
-					// check triangles
-					if ((r >= -eps) && (s >= -eps) && (r+s <= 1+eps))
-					{
-						// yes, it is
-						ss.rs[i][0] = r;
-						ss.rs[i][1] = s;
-					}
-					else 
-					{
-						ss.rs[i][0] = 0;
-						ss.rs[i][1] = 0;
-						pme = 0;
-					}
-				}
-			}
-			else
-			{
-				ss.rs[i][0] = r;
-				ss.rs[i][1] = s;
 			}
 		}
-
-		// is this a new contact?
-		bnew = (pme == 0);
-
-		// If we havn't found a master element yet,
-		// we'll do it the hard way
-		// only do this when allowed to update the segments
-		if ((pme == 0) && bupseg)
+		else if (bupseg)
 		{
 			// get the master element
 			// don't forget to initialize the search for the first node!
-			pme = ms.FindMasterSegment(x, q, ss.rs[i], (i==0));
+			ss.rs[i] = vec2d(0,0);
+			pme = ms.FindMasterSegment(x, q, ss.rs[i], bfirst, m_stol);
 		}
 
 		// if we found a master element, update the gap and normal data
 		ss.pme[i] = pme;
 		if (pme != 0)
 		{
-			// If we found a master element, we calculate the intersection
-			// more accurately.
-			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*pme);
-			m_pfem->m_mesh.UnpackElement(mel);
-				
+			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&>(*pme);
+
 			r = ss.rs[i][0];
 			s = ss.rs[i][1];
 
 			// if this is a new contact, copy the current coordinates
 			// to the previous ones
-			if (bnew)
-			{
-				ss.rsp[i][0] = r;
-				ss.rsp[i][1] = s;
-
-				ss.M[i] = ss.Metric0(mel, r, s);
-			}
-
-			ne = mel.Nodes();
-			for (l=0; l<ne; ++l) y[l] = mesh.Node(mel.m_node[l]).m_rt;
-
-			if (ne == 4)
-			{
-				H[0] = 0.25*(1 - r)*(1 - s);
-				H[1] = 0.25*(1 + r)*(1 - s);
-				H[2] = 0.25*(1 + r)*(1 + s);
-				H[3] = 0.25*(1 - r)*(1 + s);
-
-				Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-				Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-				Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-				Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-			}
-			else if (ne == 3)
-			{
-				H[0] = 1-r-s;
-				H[1] = r;
-				H[2] = s;
-
-				Hr[0] = -1; Hs[0] = -1;
-				Hr[1] =  1; Hs[1] =  0;
-				Hr[2] =  0; Hs[2] =  1;
-			}
-			else assert(false);
-
-	
-			// calculate the master normal at the slave node
-			xr = vec3d(0,0,0);
-			xs = vec3d(0,0,0);
-			for (l=0; l<ne; ++l)
-			{
-				xr += y[l]*Hr[l];
-				xs += y[l]*Hs[l];
-			}
-			np = xr ^ xs;
-
-			// normalize vector
-			np.unit();
+			ss.M[i] = ss.Metric0(mel, r, s);
 
 			// the slave normal is set to the master element normal
-			ss.nu[i] = np;
+			ss.nu[i] = ss.SurfaceNormal(mel, r, s);
 
 			// calculate gap
-			ss.gap[i] = -(np*(x - q)) + ss.off[i];
+			ss.gap[i] = -(ss.nu[i]*(x - q)) + ss.off[i];
 			if (bmove && (ss.gap[i]>0))
 			{
-				node.m_r0 = node.m_rt = q + np*ss.off[i];
+				node.m_r0 = node.m_rt = q + ss.nu[i]*ss.off[i];
 				ss.gap[i] = 0;
 			}
 

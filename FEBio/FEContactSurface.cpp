@@ -4,13 +4,14 @@
 //-----------------------------------------------------------------------------
 //! Finds the (master) element that contains the projection of a (slave) node
 
-FEElement* FEContactSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool binit_nq)
+FEElement* FEContactSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
 {
 	// get the mesh
 	FEMesh& mesh = *m_pmesh;
 
 	// see if we need to initialize the NQ structure
 	if (binit_nq) m_NQ.Init();
+	binit_nq = false;
 
 	// let's find the closest master node
 	int mn = m_NQ.Find(x);
@@ -23,7 +24,6 @@ FEElement* FEContactSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, boo
 
 	// now that we found the closest master node, lets see if we can find 
 	// the best master element
-	const double eps = 0.01;
 	int N;
 
 	// loop over all master elements that contain the node mn
@@ -39,25 +39,7 @@ FEElement* FEContactSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, boo
 		r[0] = 0;
 		r[1] = 0;
 		q = ProjectToSurface(el, x, r[0], r[1]);
-
-		// see if we have a winner
-		if (N == 4)
-		{
-			if ((r[0] >= -1-eps) && (r[0] <= 1+eps) && (r[1] >= -1-eps) && (r[1] <= 1+eps))
-			{
-				// we have a winner!
-				return pe[j];
-			}
-		}
-		else if (N == 3)
-		{
-			if ((r[0] >= -eps) && (r[1] >= -eps) && (r[0]+r[1] <= 1 + eps))
-			{
-				// we have a winner
-				return pe[j];
-			}
-		} 
-		else assert(false);
+		if (IsInsideElement(el, r[0], r[1], tol)) return pe[j];
 	}
 
 	// we did not find a master surface

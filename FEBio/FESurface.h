@@ -62,6 +62,12 @@ public:
 	//! calculate the metric tensor
 	mat2d Metric0(FESurfaceElement& el, double r, double s);
 
+	//! calculate the surface normal
+	vec3d SurfaceNormal(FESurfaceElement& el, double r, double s);
+
+	//! check to see if a point is on element
+	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
+
 protected:
 	FEMesh*	m_pmesh;			//!< pointer to parent mesh
 

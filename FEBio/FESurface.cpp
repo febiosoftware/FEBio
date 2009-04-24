@@ -91,8 +91,6 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 	// loop until converged
 	do
 	{
-		double A[2][2] = {0};
-
 		if (ne == 4)
 		{
 			// do quadrilaterals
@@ -121,6 +119,7 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		// set up the system of equations
 		q = vec3d(0,0,0);
 		R[0] = R[1] = 0;
+		double A[2][2] = {0};
 		for (i=0; i<ne; ++i)
 		{
 			R[0] -= (x*y[i])*Hr[i];
@@ -131,8 +130,8 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 
 			for (j=0; j<ne; ++j)
 			{
-				R[0] -= -H[i]*Hr[j]*(y[i]*y[j]);
-				R[1] -= -H[i]*Hs[j]*(y[i]*y[j]);
+				R[0] -= -H[j]*Hr[i]*(y[i]*y[j]);
+				R[1] -= -H[j]*Hs[i]*(y[i]*y[j]);
 
 				A[0][0] += -(y[i]*y[j])*(Hr[i]*Hr[j]);
 				A[1][1] += -(y[i]*y[j])*(Hs[i]*Hs[j]);
@@ -220,7 +219,6 @@ double FESurface::FaceArea(FESurfaceElement& el)
 
 //-----------------------------------------------------------------------------
 //! Calculates the metric tensor at the point with surface coordinates (r,s)
-//! Note that we assume that the surface element is unpacked.
 // TODO: perhaps I should place this function in the element class
 
 mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
@@ -230,6 +228,10 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 
 	// nr of element nodes
 	int neln = el.Nodes();
+
+	// element nodes
+	vec3d r0[4];
+	for (int i=0; i<neln; ++i) r0[i] = m_pmesh->Node(el.m_node[i]).m_r0;
 
 	// shape function derivatives
 	double Hr[4], Hs[4];
@@ -250,9 +252,6 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 	}
 	else assert(false);
 
-	// reference nodal coordinates
-	vec3d* r0 = el.r0();
-
 	// get the tangent vectors
 	vec3d t1(0,0,0);
 	vec3d t2(0,0,0);
@@ -269,4 +268,82 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 
 	// calculate metric tensor
 	return mat2d(t1*t1, t1*t2, t2*t1, t2*t2);
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the normal of a surface element at the natural
+//! coordinates (r,s)
+
+vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s)
+{
+	int l;
+	FEMesh& mesh = *m_pmesh;
+
+	// get the coordinates of the element nodes
+	int ne = el.Nodes();
+	vec3d y[4];
+	for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
+
+	// set up shape functions and derivatives
+	double H[4], Hr[4], Hs[4];
+	if (ne == 4)
+	{
+		H[0] = 0.25*(1 - r)*(1 - s);
+		H[1] = 0.25*(1 + r)*(1 - s);
+		H[2] = 0.25*(1 + r)*(1 + s);
+		H[3] = 0.25*(1 - r)*(1 + s);
+
+		Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
+		Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
+		Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
+		Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
+	}
+	else if (ne == 3)
+	{
+		H[0] = 1-r-s;
+		H[1] = r;
+		H[2] = s;
+
+		Hr[0] = -1; Hs[0] = -1;
+		Hr[1] =  1; Hs[1] =  0;
+		Hr[2] =  0; Hs[2] =  1;
+	}
+	else assert(false);
+
+	// calculate the element tangents
+	vec3d xr(0,0,0), xs;
+	for (l=0; l<ne; ++l)
+	{
+		xr += y[l]*Hr[l];
+		xs += y[l]*Hs[l];
+	}
+
+	// calculate the normal
+	vec3d np = xr ^ xs;
+	np.unit();
+
+	return np;
+}
+
+//-----------------------------------------------------------------------------
+//! This function checks whether the point with natural coordinates (r,s) is
+//! inside the element, within a tolerance of tol.
+
+bool FESurface::IsInsideElement(FESurfaceElement& el, double r, double s, double tol)
+{
+	int ne = el.Nodes();
+	if (ne == 4)
+	{
+		// check quads
+		if ((r >= -1-tol) && (r <= 1+tol) && (s >= -1-tol) && (s <= 1+tol)) return true;
+		else return false;
+	}
+	else
+	{
+		// check triangles
+		if ((r >= -tol) && (s >= -tol) && (r+s <= 1+tol)) return true;
+		else return false;
+	}
+	assert(false);
+	return false;
 }
