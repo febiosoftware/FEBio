@@ -59,14 +59,26 @@ public:
 	//! calculate the surface area of a surface element
 	double FaceArea(FESurfaceElement& el);
 
-	//! calculate the metric tensor
+	//! calculate the metric tensor in the reference configuration
 	mat2d Metric0(FESurfaceElement& el, double r, double s);
+
+	//! calculate the metric tensor in the current configuration
+	mat2d Metric(FESurfaceElement& el, double r, double s);
 
 	//! calculate the surface normal
 	vec3d SurfaceNormal(FESurfaceElement& el, double r, double s);
 
 	//! check to see if a point is on element
 	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
+
+	//! return the point on a surface element
+	vec3d PointOnSurface(FESurfaceElement& el, double r, double s);
+
+	//! calculates covariant base vectors of a surface
+	void CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
+
+	//! calculates contravariant base vectors of a surface
+	void ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
 protected:
 	FEMesh*	m_pmesh;			//!< pointer to parent mesh

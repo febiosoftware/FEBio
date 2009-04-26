@@ -289,8 +289,8 @@ void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& 
 			{
 				if (!ms.IsInsideElement(mel, r, s, m_stol) && bupseg)
 				{
+					// see if the node might have moved to another master element
 					FEElement* pold = pme; 
-					// see if the node might have moved to a neighbour element
 					ss.rs[i] = vec2d(0,0);
 					pme = ms.FindMasterSegment(x, q, ss.rs[i], bfirst, m_stol);
 
@@ -300,8 +300,15 @@ void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& 
 						int* n = pold->m_node;
 //						log.printf("node %d has left element (%d, %d, %d, %d)\n", m+1, n[0]+1, n[1]+1, n[2]+1, n[3]+1);
 					}
-
-					//TODO: translate friction data to new master element
+					else if (m_mu*m_epsf > 0)
+					{
+						// the node has moved to another master segment.
+						// If friction is active we need to translate the frictional
+						// data to the new master segment.
+						FESurfaceElement& eo = dynamic_cast<FESurfaceElement&>(*pold);
+						FESurfaceElement& en = dynamic_cast<FESurfaceElement&>(*pme );
+						MapFrictionData(i, ss, ms, en, eo, q);
+					}
 				}
 			}
 		}
@@ -311,6 +318,12 @@ void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& 
 			// don't forget to initialize the search for the first node!
 			ss.rs[i] = vec2d(0,0);
 			pme = ms.FindMasterSegment(x, q, ss.rs[i], bfirst, m_stol);
+			if (pme)
+			{
+				// the node has come into contact so make sure to initialize
+				// the previous natural coordinates for friction.
+				ss.rsp[i] = ss.rs[i];
+			}
 		}
 
 		// if we found a master element, update the gap and normal data
@@ -1541,4 +1554,43 @@ bool FESlidingInterface::Augment(int naug)
 	normg0 = normg1;
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! This function transforms friction data between two master segments
+
+void FESlidingInterface::MapFrictionData(int inode, FEContactSurface& ss, FEContactSurface& ms, FESurfaceElement &en, FESurfaceElement &eo, vec3d &q)
+{
+	// first we find the projection of the old point on the new segment
+	double r = ss.rs[inode][0];
+	double s = ss.rs[inode][1];
+	double rp = ss.rsp[inode][0], ro = rp;
+	double sp = ss.rsp[inode][1], so = sp;
+	vec3d xn = ms.PointOnSurface(eo, rp, sp);
+	vec3d qn;
+	qn = ms.ProjectToSurface(en, xn, rp, sp);
+	ss.rsp[inode][0] = rp;
+	ss.rsp[inode][1] = sp;
+
+	// next, we transform the frictional traction
+	// since these tractions are decomposed in the local 
+	// element coordinate system, we have to a coordinate transformation
+	// note that this transformation needs to be done in curvilinear
+	// coordinates since the base vectors may not be orthonormal
+	vec3d to[2], tn[2];
+	ms.ContraBaseVectors(eo, ro, so, to);
+	ms.CoBaseVectors(en, r, s, tn);
+
+	double Lt[2];
+	Lt[0] = ss.Lt[inode][0];
+	Lt[1] = ss.Lt[inode][1];
+	
+	vec3d t;
+	t = to[0]*Lt[0] + to[1]*Lt[1];
+
+	Lt[0] = t*tn[0];
+	Lt[1] = t*tn[1];
+
+	ss.Lt[inode][0] = Lt[0];
+	ss.Lt[inode][1] = Lt[1];
 }

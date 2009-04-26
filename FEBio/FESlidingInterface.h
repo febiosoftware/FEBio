@@ -68,7 +68,7 @@ protected:
 	void ContactNodalStiffness(int m, FEContactSurface& ss, FESurfaceElement& mel, matrix& ke);
 
 	//! map the frictional data from the old element to the new element
-//	void MapFrictionData(int inode, FESurfaceElement& sn, FESurfaceElement& so, vec3d& q);
+	void MapFrictionData(int inode, FEContactSurface& ss, FEContactSurface& ms, FESurfaceElement& sn, FESurfaceElement& so, vec3d& q);
 
 private:
 	//! copy constructor hidden

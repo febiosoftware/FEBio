@@ -580,12 +580,35 @@ void PlotFile::write_contact_tractions()
 		if (psi)
 		{
 			FEContactSurface& ss = psi->m_ss;
+			FEContactSurface& ms = psi->m_ms;
 			for (j=0; j<ss.Nodes(); ++j)
 			{
 				int m = ss.node[j];
-				acc[m][0] = (float) ss.Lt[j][0];
-				acc[m][1] = (float) ss.Lt[j][1];
-				acc[m][2] = (float) ss.Lm[j];
+				FEElement* pe = ss.pme[j];
+				if (pe)
+				{
+					FESurfaceElement& el = dynamic_cast<FESurfaceElement&>(*pe);
+					double Tn = ss.Lm[j];
+					double T1 = ss.Lt[j][0];
+					double T2 = ss.Lt[j][1];
+					double r = ss.rs[j][0];
+					double s = ss.rs[j][1];
+
+					vec3d tn = ss.nu[j]*Tn, tt;
+					vec3d e[2];
+					ms.ContraBaseVectors(el, r, s, e);
+					tt = e[0]*T1 + e[1]*T2;
+
+					vec3d t = tn + tt;
+
+					acc[m][0] += (float) t.x;
+					acc[m][1] += (float) t.y;
+					acc[m][2] += (float) t.z;
+					
+//					acc[m][0] = (float) ss.Lt[j][0];
+//					acc[m][1] = (float) ss.Lt[j][1];
+//					acc[m][2] = (float) ss.Lm[j];
+				}
 			}
 		}
 	}

@@ -18,19 +18,31 @@ Global
 		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug - Skyline only|Win32 = Debug - Skyline only|Win32
 		Debug|Win32 = Debug|Win32
+		Release - Skyline only|Win32 = Release - Skyline only|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - Skyline only|Win32.ActiveCfg = Debug - Skyline only|Win32
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - Skyline only|Win32.Build.0 = Debug - Skyline only|Win32
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug|Win32.ActiveCfg = Debug|Win32
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug|Win32.Build.0 = Debug|Win32
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release - Skyline only|Win32.ActiveCfg = Release - Skyline only|Win32
+		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release - Skyline only|Win32.Build.0 = Release - Skyline only|Win32
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release|Win32.ActiveCfg = Release|Win32
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release|Win32.Build.0 = Release|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - Skyline only|Win32.ActiveCfg = Debug - Skyline only|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - Skyline only|Win32.Build.0 = Debug - Skyline only|Win32
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug|Win32.ActiveCfg = Debug|Win32
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug|Win32.Build.0 = Debug|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release - Skyline only|Win32.ActiveCfg = Release - Skyline only|Win32
+		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release - Skyline only|Win32.Build.0 = Release - Skyline only|Win32
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release|Win32.ActiveCfg = Release|Win32
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release|Win32.Build.0 = Release|Win32
+		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug - Skyline only|Win32.ActiveCfg = Debug - Skyline only
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug|Win32.ActiveCfg = Debug
+		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release - Skyline only|Win32.ActiveCfg = Release - Skyline only
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

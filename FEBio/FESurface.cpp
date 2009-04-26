@@ -223,9 +223,6 @@ double FESurface::FaceArea(FESurfaceElement& el)
 
 mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 {
-	// make sure the element is unpacked
-	assert(el.IsUnpacked());
-
 	// nr of element nodes
 	int neln = el.Nodes();
 
@@ -264,6 +261,56 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 		t2.x += Hs[k]*r0[k].x;
 		t2.y += Hs[k]*r0[k].y;
 		t2.z += Hs[k]*r0[k].z;
+	}
+
+	// calculate metric tensor
+	return mat2d(t1*t1, t1*t2, t2*t1, t2*t2);
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the metric tensor at the point with surface coordinates (r,s)
+// TODO: perhaps I should place this function in the element class
+
+mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
+{
+	// nr of element nodes
+	int neln = el.Nodes();
+
+	// element nodes
+	vec3d rt[4];
+	for (int i=0; i<neln; ++i) rt[i] = m_pmesh->Node(el.m_node[i]).m_rt;
+
+	// shape function derivatives
+	double Hr[4], Hs[4];
+
+	// get the shape function values at this slave node
+	if (neln == 4)
+	{
+		Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
+		Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
+		Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
+		Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
+	}
+	else if (neln == 3)
+	{
+		Hr[0] = -1; Hs[0] = -1;
+		Hr[1] =  1; Hs[1] =  0;
+		Hr[2] =  0; Hs[2] =  1;
+	}
+	else assert(false);
+
+	// get the tangent vectors
+	vec3d t1(0,0,0);
+	vec3d t2(0,0,0);
+	for (int k=0; k<neln; ++k)
+	{
+		t1.x += Hr[k]*rt[k].x;
+		t1.y += Hr[k]*rt[k].y;
+		t1.z += Hr[k]*rt[k].z;
+		
+		t2.x += Hs[k]*rt[k].x;
+		t2.y += Hs[k]*rt[k].y;
+		t2.z += Hs[k]*rt[k].z;
 	}
 
 	// calculate metric tensor
@@ -346,4 +393,79 @@ bool FESurface::IsInsideElement(FESurfaceElement& el, double r, double s, double
 	}
 	assert(false);
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! This function evaluates the natural coordinates of a point on a surface
+//! and returns the point on global coordinates
+
+vec3d FESurface::PointOnSurface(FESurfaceElement &el, double r, double s)
+{
+	int i;
+	vec3d y[4];
+	double H[4];
+	int n = el.Nodes();
+	for (i=0; i<n; ++i) y[i] = m_pmesh->Node(el.m_node[i]).m_rt;
+	if (n == 4)
+	{
+		H[0] = 0.25*(1-r)*(1-s);
+		H[1] = 0.25*(1+r)*(1-s);
+		H[2] = 0.25*(1+r)*(1+s);
+		H[3] = 0.25*(1-r)*(1+s);
+	}
+	else if (n == 3)
+	{
+		H[0] = 1 - r - s;
+		H[1] = r;
+		H[2] = s;
+	}
+	vec3d q(0,0,0);
+	for (i=0; i<4; ++i) q += y[i]*H[i];
+
+	return q;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the covariant base vectors of a surface element
+//! at the natural coordinates (r,s)
+
+void FESurface::CoBaseVectors(FESurfaceElement &el, double r, double s, vec3d t[2])
+{
+	int i;
+	vec3d y[4];
+	double H0[4], H1[4];
+	int n = el.Nodes();
+	for (i=0; i<n; ++i) y[i] = m_pmesh->Node(el.m_node[i]).m_rt;
+	if (n == 4)
+	{
+		H0[0] = -0.25*(1-s); H1[0] = -0.25*(1-r);
+		H0[1] =  0.25*(1-s); H1[1] = -0.25*(1+r);
+		H0[2] =  0.25*(1+s); H1[2] =  0.25*(1+r);
+		H0[3] = -0.25*(1+s); H1[3] =  0.25*(1-r);
+	}
+	else if (n == 3)
+	{
+		H0[0] = -1; H1[0] = -1;
+		H0[1] =  1; H1[1] =  0;
+		H0[2] =  0; H1[2] =  1;
+	}
+	t[0] = t[1] = vec3d(0,0,0);
+	for (i=0; i<4; ++i) 
+	{
+		t[0] += y[i]*H0[i];
+		t[1] += y[i]*H1[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FESurface::ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2])
+{
+	vec3d e[2];
+	CoBaseVectors(el, r, s, e);
+	mat2d M = Metric(el, r, s);
+	mat2d Mi = M.inverse();
+
+	t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
+	t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
 }
