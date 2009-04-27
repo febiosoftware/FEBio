@@ -353,7 +353,14 @@ void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& 
 			// TODO: what should we do if the gap function becomes
 			// negative? setting the Lagrange multipliers to zero
 			// might make the system unstable.
-		}
+/*			if (ss.gap[i] < 0)
+			{
+				ss.Lm[i] = 0;
+				ss.Lt[i][0] = 0;
+				ss.Lt[i][1] = 0;
+				ss.pme[i] = 0;
+			}
+*/		}
 		else
 		{
 			// TODO: Is this a good criteria for out-of-contact?
@@ -1574,12 +1581,13 @@ void FESlidingInterface::MapFrictionData(int inode, FEContactSurface& ss, FECont
 
 	// next, we transform the frictional traction
 	// since these tractions are decomposed in the local 
-	// element coordinate system, we have to a coordinate transformation
+	// element coordinate system, we have to do a coordinate transformation
 	// note that this transformation needs to be done in curvilinear
-	// coordinates since the base vectors may not be orthonormal
+	// coordinates since the base vectors may not be orthonormal. Also
+	// note that we are doing this in the reference configuration
 	vec3d to[2], tn[2];
-	ms.ContraBaseVectors(eo, ro, so, to);
-	ms.CoBaseVectors(en, r, s, tn);
+	ms.ContraBaseVectors0(eo, ro, so, to);
+	ms.CoBaseVectors0(en, r, s, tn);
 
 	double Lt[2];
 	Lt[0] = ss.Lt[inode][0];

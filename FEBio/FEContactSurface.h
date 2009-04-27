@@ -28,10 +28,13 @@ public:
 	}
 
 	//! Update the surface data
-	void Update();
+	void Update() {}
 
 	//! Find element that contains the projection of x
 	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol);
+
+	//! Calculate the total traction at a node
+	vec3d traction(int inode);
 
 public:
 	vector<double>		gap;	//!< gap function at nodes

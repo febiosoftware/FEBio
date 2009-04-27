@@ -97,8 +97,27 @@ void FEContactSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Update surface data
+//! 
 
-void FEContactSurface::Update()
+vec3d FEContactSurface::traction(int inode)
 {
+	vec3d t(0,0,0);
+	FEElement* pe = pme[inode];
+	if (pe)
+	{
+		FESurfaceElement& el = dynamic_cast<FESurfaceElement&>(*pe);
+		double Tn = Lm[inode];
+		double T1 = Lt[inode][0];
+		double T2 = Lt[inode][1];
+		double r = rs[inode][0];
+		double s = rs[inode][1];
+
+		vec3d tn = nu[inode]*Tn, tt;
+		vec3d e[2];
+		ContraBaseVectors0(el, r, s, e);
+		tt = e[0]*T1 + e[1]*T2;
+		t = tn + tt;
+	}
+
+	return t;
 }
