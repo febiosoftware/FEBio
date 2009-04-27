@@ -29,6 +29,8 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 
 	m_stol = 0.01;
 
+	m_ktmult = 0;
+
 	m_nplc = -1;
 	m_pplc = 0;
 	m_nsegup = 0;	// always do segment updates

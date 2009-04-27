@@ -1475,6 +1475,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			else if (tag == "minaug") tag.value(ps->m_naugmin);
 			else if (tag == "maxaug") tag.value(ps->m_naugmax);
 			else if (tag == "search_tol") tag.value(ps->m_stol);
+			else if (tag == "ktmult") tag.value(ps->m_ktmult);
 			else if (tag == "penalty")
 			{
 				const char* sz = tag.AttributeValue("lc", true);
