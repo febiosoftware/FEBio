@@ -630,6 +630,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\hello.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\init.cpp"
 				>
 			</File>

@@ -32,6 +32,10 @@ public:
 
 	void GetCommand(int& nargs, char** argv);
 
+	void Draw(unsigned char* img, int nx, int ny);
+
+	void Write(const char* sz, unsigned short att);
+
 protected:
 	bool	m_bActive;
 

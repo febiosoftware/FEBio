@@ -80,6 +80,7 @@ struct CMDOPTIONS
 
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
 void Hello(FILE* fp);
+void print_banner();
 
 bool optimize(FEM& fem, const char* szfile);
 
@@ -99,7 +100,14 @@ int main(int argc, char* argv[])
 	if (ParseCmdLine(argc, argv, ops) == false) return 0;
 
 	// print welcome message
-	if (ops.bsplash) Hello(stdout);
+	if (ops.bsplash)
+	{
+#ifdef WIN32
+		print_banner();
+#else
+		Hello(stdout);
+#endif
+	}
 
 	// if there are no arguments, ask for an input file
 	if (argc == 1)
@@ -303,43 +311,6 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	}
 
 	return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : Hello
-// Prints the FEBio banner to a file
-//
-
-void Hello(FILE* fp)
-{
-	fprintf(fp,"===========================================================================\n");
-	fprintf(fp,"         ________    _________   _________     __     _________            \n");
-	fprintf(fp,"        |        |\\ |        |\\ |        |\\   |  |\\  /         \\\\          \n");
-	fprintf(fp,"        |    ____|| |    ____|| |    __  ||   |__|| |    ___    ||         \n");
-	fprintf(fp,"        |   |\\___\\| |   |\\___\\| |   |\\_| ||    \\_\\| |   //  \\   ||         \n");
-	fprintf(fp,"        |   ||      |   ||      |   || | ||    __   |  ||    |  ||         \n");
-	fprintf(fp,"        |   ||__    |   ||__    |   ||_| ||   |  |\\ |  ||    |  ||         \n");
-	fprintf(fp,"        |       |\\  |       |\\  |         \\\\  |  || |  ||    |  ||         \n");
-	fprintf(fp,"        |    ___||  |    ___||  |    ___   || |  || |  ||    |  ||         \n");
-	fprintf(fp,"        |   |\\__\\|  |   |\\__\\|  |   |\\__|  || |  || |  ||    |  ||         \n");
-	fprintf(fp,"        |   ||      |   ||      |   ||  |  || |  || |  ||    |  ||         \n");
-	fprintf(fp,"        |   ||      |   ||___   |   ||__|  || |  || |   \\\\__/   ||         \n");
-	fprintf(fp,"        |   ||      |        |\\ |          || |  || |           ||         \n");
-	fprintf(fp,"        |___||      |________|| |__________|| |__||  \\_________//          \n");
-	fprintf(fp,"                                                                           \n");
-	fprintf(fp,"      F I N I T E   E L E M E N T S   F O R   B I O M E C H A N I C S      \n");
-	fprintf(fp,"                                                                           \n");
-	fprintf(fp,"                   --- v e r s i o n - %d . %d . %d ---                    \n", VERSION, SUBVERSION, SUBSUBVERSION);
-	fprintf(fp,"                                                                           \n");
-	fprintf(fp,"                                                                           \n");
-	fprintf(fp,"  Musculoskeletal Research Laboratory                                      \n");
-	fprintf(fp,"  University of Utah                                                       \n");
-	fprintf(fp,"  http://mrl.sci.utah.edu                                                  \n");
-	fprintf(fp,"                                                                           \n");
-	fprintf(fp,"  copyright (c) 2006-2008 - All rights reserved                            \n");
-	fprintf(fp,"                                                                           \n");
-	fprintf(fp,"===========================================================================\n");
-	fprintf(fp,"\n\n");
 }
 
 //-----------------------------------------------------------------------------

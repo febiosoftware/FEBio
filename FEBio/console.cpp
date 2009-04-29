@@ -96,3 +96,41 @@ void Console::GetCommand(int& nargs, char **argv)
 		}
 	}
 }
+
+//--------------------------------------------------------------------
+//! this function draws an image to the console
+
+void Console::Draw(unsigned char *img, int nx, int ny)
+{
+#ifdef WIN32
+	int i, j, n = 0;
+	WORD att;
+	printf("\n");
+	HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD col[] = {0x00, 0x04, 0x02, 0x01, 0x0C, 0x0A, 0x09, 0x08, 0x0F};
+	for (j=0; j<ny; ++j)
+	{
+		for (i=0; i<nx; ++i)
+		{
+			att = (WORD) ((col[img[n++]] << 4)%0xFF);
+			SetConsoleTextAttribute(hout, att);
+			printf(" ");
+		}
+		printf("\n");
+	}
+	SetConsoleTextAttribute(hout, 0x0F);
+#endif
+}
+
+//--------------------------------------------------------------------
+
+void Console::Write(const char *sz, unsigned short att)
+{
+#ifdef WIN32
+	printf("\n");
+	HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hout, (WORD) att);
+	printf("%s", sz);
+	SetConsoleTextAttribute(hout, 0x0F);
+#endif
+}
