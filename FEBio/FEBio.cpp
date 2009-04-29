@@ -101,6 +101,13 @@ int main(int argc, char* argv[])
 	// print welcome message
 	if (ops.bsplash) Hello(stdout);
 
+	// if there are no arguments, ask for an input file
+	if (argc == 1)
+	{
+		printf("Enter input file: ");
+		scanf("%s", ops.szfile);
+	}
+
 	// create the one and only FEM object
 	FEM fem;
 
@@ -186,6 +193,8 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ops.bdiag = false;
 	ops.bsplash = true;
 
+	ops.szfile[0] = 0;
+
 	// set the location of the configuration file
 	char szpath[1024] = {0};
 	get_app_path (szpath, 1023);
@@ -196,82 +205,73 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 
 	sprintf(ops.szcnf, "%sfebio.xml", szpath);
 
-	// if there are no arguments, ask for an input file
-	if (nargs == 1)
+	// loop over the arguments
+	char* sz;
+	for (int i=1; i<nargs; ++i)
 	{
-		printf("Enter input file: ");
-		scanf("%s", ops.szfile);
-	}
-	else
-	{
-		// loop over the arguments
-		char* sz;
-		for (int i=1; i<nargs; ++i)
-		{
-			sz = argv[i];
+		sz = argv[i];
 
-			if (strcmp(sz,"-r") == 0) 
-			{
-				ops.brstrt = true;
-				strcpy(ops.szfile, argv[++i]);
-			}
-			else if (strcmp(sz, "-d") == 0)
-			{
-				ops.bdiag = true;
-				strcpy(ops.szfile, argv[++i]);
-			}
-			else if (strcmp(sz, "-p") == 0)
-			{
-				ops.bplt = true;
-				strcpy(ops.szplt, argv[++i]);
-			}
-			else if (strcmp(sz, "-a") == 0)
-			{
-				ops.bdmp = true;
-				strcpy(ops.szdmp, argv[++i]);
-			}
-			else if (strcmp(sz, "-o") == 0)
-			{
-				ops.blog = true;
-				strcpy(ops.szlog, argv[++i]);
-			}
-			else if (strcmp(sz, "-i") == 0)
-			{
-				strcpy(ops.szfile, argv[++i]);
-			}
-			else if (strcmp(sz, "-s") == 0)
-			{
-				ops.boptim = true;
-				strcpy(ops.szfile, argv[++i]);
-			}
-			else if (strcmp(sz, "-g") == 0)
-			{
-				ops.bdebug = true;
-			}
-			else if (strcmp(sz, "-c") == 0)
-			{
-				// don't run the problem.
-				// just do a data check
-				ops.brun = false;
-			}
-			else if (strcmp(sz, "-nosplash") == 0)
-			{
-				// don't show the welcome message
-				ops.bsplash = false;
-			}
-			else if (strcmp(sz, "-cnf") == 0)
-			{
-				strcpy(ops.szcnf, argv[++i]);
-			}
-			else if (strcmp(sz, "-noconfig") == 0)
-			{
-				ops.szcnf[0] = 0;
-			}
-			else
-			{
-				fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
-				return false;
-			}
+		if (strcmp(sz,"-r") == 0) 
+		{
+			ops.brstrt = true;
+			strcpy(ops.szfile, argv[++i]);
+		}
+		else if (strcmp(sz, "-d") == 0)
+		{
+			ops.bdiag = true;
+			strcpy(ops.szfile, argv[++i]);
+		}
+		else if (strcmp(sz, "-p") == 0)
+		{
+			ops.bplt = true;
+			strcpy(ops.szplt, argv[++i]);
+		}
+		else if (strcmp(sz, "-a") == 0)
+		{
+			ops.bdmp = true;
+			strcpy(ops.szdmp, argv[++i]);
+		}
+		else if (strcmp(sz, "-o") == 0)
+		{
+			ops.blog = true;
+			strcpy(ops.szlog, argv[++i]);
+		}
+		else if (strcmp(sz, "-i") == 0)
+		{
+			strcpy(ops.szfile, argv[++i]);
+		}
+		else if (strcmp(sz, "-s") == 0)
+		{
+			ops.boptim = true;
+			strcpy(ops.szfile, argv[++i]);
+		}
+		else if (strcmp(sz, "-g") == 0)
+		{
+			ops.bdebug = true;
+		}
+		else if (strcmp(sz, "-c") == 0)
+		{
+			// don't run the problem.
+			// just do a data check
+			ops.brun = false;
+		}
+		else if (strcmp(sz, "-nosplash") == 0)
+		{
+			// don't show the welcome message
+			ops.bsplash = false;
+		}
+		else if (strcmp(sz, "-cnf") == 0)
+		{
+			strcpy(ops.szcnf, argv[++i]);
+		}
+		else if (strcmp(sz, "-noconfig") == 0)
+		{
+			ops.szcnf[0] = 0;
+		}
+		else
+		{
+			fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
+			return false;
 		}
 	}
 
