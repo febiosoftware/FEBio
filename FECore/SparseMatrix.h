@@ -266,6 +266,9 @@ public:
 
 	void add(int i, int j, double v)
 	{
+		assert((i>=0) && (i<m_ndim));
+		assert((j>=0) && (j<m_ndim));
+
 		int* pi = m_pind + m_pcol[j];
 		int l = m_pcol[j+1] - m_pcol[j];
 		for (int n=0; n<l; ++n)
@@ -292,6 +295,17 @@ public:
 			}
 		}
 		assert(false);
+	}
+
+	double get(int i, int j)
+	{
+		int* pi = m_pind + m_pcol[j];
+		int l = m_pcol[j+1] - m_pcol[j];
+		for (int n=0; n<l; ++n)
+		{
+			if (pi[n] == i) return m_pd[ m_pcol[j] + n ];
+		}
+		return 0;
 	}
 
 	double diag(int i)

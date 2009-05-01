@@ -423,6 +423,58 @@ void FESolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 				}
 			}
 		}
+		else
+		{
+			// loop over rows
+			for (i=0; i<n; ++i)
+			{
+				FENode& nodei = m_fem.m_mesh.Node(en[i]);
+				if (nodei.m_rid>=0)
+				{
+					// node i is a rigid body
+					// get the rigid body this node is attached to
+					FERigidBody& RBi = m_fem.m_RB[nodei.m_rid];
+
+					// get the rigid body equation nrs.
+					lmi = RBi.m_LM;
+
+					// get the relative distance to the center of mass
+					ai = nodei.m_rt - RBi.m_rt;
+
+					Ri[0][1] = ai.z; Ri[0][2] =-ai.y;
+					Ri[1][0] =-ai.z; Ri[1][2] = ai.x;
+					Ri[2][0] = ai.y; Ri[2][1] =-ai.x;
+
+					// get the element sub-matrix
+					for (k=0; k<ndof; ++k)
+						for (l=0; l<ndof; ++l)
+							kij[k][l] = ke[ndof*i+k][ndof*j+l];
+
+					// add the stiffness components to the Krf matrix
+
+					// Kij
+					for (k=0; k<ndof; ++k)
+						for (l=0; l<3; ++l)
+						{
+							KF[k][l] = kij[l][k];
+							KF[k][3+l] = Ri[l][0]*kij[0][k] + Ri[l][1]*kij[1][k] + Ri[l][2]*kij[2][k];
+						}
+
+					for (k=0; k<6; ++k)
+						for (l=0; l<ndof; ++l)
+						{
+							I = lmi[k];
+							J = elm[ndof*j+l];
+
+							if (I >= 0)
+							{
+								if (J < -1) m_Fd[I] -= KF[l][k]*m_ui[-J-2];
+								else if (J >= 0) K.add(I,J, KF[l][k]);
+							}
+						}
+				}
+			}
+		}
 	}
 }
 
