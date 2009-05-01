@@ -316,7 +316,7 @@ inline mat3d operator & (const vec3d& a, const vec3d& b)
 				 a.z*b.x, a.z*b.y, a.z*b.z);
 }
 
-inline mat3ds self_product(const vec3d& a)
+inline mat3ds dyad(const vec3d& a)
 {
 	return mat3ds(a.x*a.x, a.y*a.y, a.z*a.z, a.x*a.y, a.y*a.z, a.x*a.z);
 }

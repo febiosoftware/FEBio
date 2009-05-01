@@ -74,7 +74,10 @@ public:
 	mat3ds Strain();
 
 	mat3ds RightCauchyGreen();
-	mat3ds LeftCauchyGreen();
+	mat3ds LeftCauchyGreen ();
+
+	mat3ds DevRightCauchyGreen();
+	mat3ds DevLeftCauchyGreen ();
 
 	mat3ds pull_back(const mat3ds& A);
 	mat3ds push_forward(const mat3ds& A);

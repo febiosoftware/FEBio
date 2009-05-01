@@ -36,10 +36,12 @@ public:
 
 	static	int	m_nres;	// integration rule
 
+	int	m_nint;		// integration points
 	static double	m_cth[];
 	static double	m_sth[];
 	static double	m_cph[];
 	static double	m_sph[];
+	static double	m_w[];
 
 	// declare as registered
 	DECLARE_REGISTERED(FERandomFiberMooneyRivlin);

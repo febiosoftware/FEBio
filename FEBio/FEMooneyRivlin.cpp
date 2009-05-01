@@ -39,10 +39,8 @@ mat3ds FEMooneyRivlin::Stress(FEMaterialPoint& mp)
 	double Jm23 = Jm13*Jm13;
 	double twoJi = 2.0*Ji;
 
-	// left Cauchy-Green tensor and its square
-	double B[3][3], B2[3][3];
-
 	// calculate deviatoric left Cauchy-Green tensor
+	double B[3][3];
 	B[0][0] = Jm23*(F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2]);
 	B[0][1] = Jm23*(F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2]);
 	B[0][2] = Jm23*(F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2]);
@@ -57,6 +55,7 @@ mat3ds FEMooneyRivlin::Stress(FEMaterialPoint& mp)
 
 	// calculate square of B
 	// (we commented out the matrix components we do not need)
+	double B2[3][3];
 	B2[0][0] = B[0][0]*B[0][0]+B[0][1]*B[1][0]+B[0][2]*B[2][0];
 	B2[0][1] = B[0][0]*B[0][1]+B[0][1]*B[1][1]+B[0][2]*B[2][1];
 	B2[0][2] = B[0][0]*B[0][2]+B[0][1]*B[1][2]+B[0][2]*B[2][2];

@@ -27,7 +27,7 @@ mat3ds FEElasticMaterialPoint::RightCauchyGreen()
 
 mat3ds FEElasticMaterialPoint::LeftCauchyGreen()
 {
-	// get the right Cauchy-Green tensor
+	// get the left Cauchy-Green tensor
 	// b = F*Ft
 	mat3ds b;
 	b.xx() = F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2]; // = b[0][0]
@@ -36,6 +36,46 @@ mat3ds FEElasticMaterialPoint::LeftCauchyGreen()
 	b.xy() = F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2]; // = b[0][1]
 	b.yz() = F[1][0]*F[2][0]+F[1][1]*F[2][1]+F[1][2]*F[2][2]; // = b[1][2]
 	b.xz() = F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2]; // = b[0][2]
+
+	return b;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the right Cauchy-Green tensor at the current material point
+
+mat3ds FEElasticMaterialPoint::DevRightCauchyGreen()
+{
+	double Jm23 = pow(J, -2.0/3.0);
+
+	// get the deviatoric right Cauchy-Green tensor
+	// C = Ft*F
+	mat3ds C;
+	C.xx() = Jm23*(F[0][0]*F[0][0]+F[1][0]*F[1][0]+F[2][0]*F[2][0]); // = C[0][0]
+	C.yy() = Jm23*(F[0][1]*F[0][1]+F[1][1]*F[1][1]+F[2][1]*F[2][1]); // = C[1][1]
+	C.zz() = Jm23*(F[0][2]*F[0][2]+F[1][2]*F[1][2]+F[2][2]*F[2][2]); // = C[2][2]
+	C.xy() = Jm23*(F[0][0]*F[0][1]+F[1][0]*F[1][1]+F[2][0]*F[2][1]); // = C[0][1]
+	C.yz() = Jm23*(F[0][1]*F[0][2]+F[1][1]*F[1][2]+F[2][1]*F[2][2]); // = C[1][2]
+	C.xz() = Jm23*(F[0][0]*F[0][2]+F[1][0]*F[1][2]+F[2][0]*F[2][2]); // = C[0][2]
+
+	return C;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the left Cauchy-Green tensor at the current material point
+
+mat3ds FEElasticMaterialPoint::DevLeftCauchyGreen()
+{
+	double Jm23 = pow(J, -2.0/3.0);
+
+	// get the left Cauchy-Green tensor
+	// b = F*Ft
+	mat3ds b;
+	b.xx() = Jm23*(F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2]); // = b[0][0]
+	b.yy() = Jm23*(F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2]); // = b[1][1]
+	b.zz() = Jm23*(F[2][0]*F[2][0]+F[2][1]*F[2][1]+F[2][2]*F[2][2]); // = b[2][2]
+	b.xy() = Jm23*(F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2]); // = b[0][1]
+	b.yz() = Jm23*(F[1][0]*F[2][0]+F[1][1]*F[2][1]+F[1][2]*F[2][2]); // = b[1][2]
+	b.xz() = Jm23*(F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2]); // = b[0][2]
 
 	return b;
 }
