@@ -148,7 +148,7 @@ mat3ds FE2DTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 		if (m_ac > 0)
 		{
 			// The .5 is to compensate for the 2 multiplier later.
-			double at = 0.5*w*m_ac /sqrt(SQR(a.x/m_a[0]) + SQR(a.y / m_a[1]) + SQR(a.z / m_a[2]));
+			double at = 0.5*w*m_ac /sqrt(SQR(v.y/m_a[0]) + SQR(v.z / m_a[1]));
 			Tf += N*at;
 		}
 	}
