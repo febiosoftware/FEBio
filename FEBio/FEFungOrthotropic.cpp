@@ -108,7 +108,7 @@ mat3ds FEFungOrthotropic::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FEFungOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEFungOrthotropic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -166,7 +166,6 @@ void FEFungOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
 	C = (eQ/detF)*C + (2*detF/m_c/eQ)*dyad1s(s);
 	// bulk elasticity, to optionally enforce incompressibility
 	C += m_K/detF*(dyad1s(identity) - 2*log(detF)*dyad4s(identity));
-	C.extract(D);
-	return;
+	
+	return C;
 }
-

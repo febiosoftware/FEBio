@@ -31,7 +31,7 @@ public:
 	virtual mat3ds Stress(FEMaterialPoint& pt);
 
 	//! calculate tangent stiffness at material point
-	virtual void Tangent(double D[6][6], FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
 	// declare as registered
 	DECLARE_REGISTERED(FETransIsoMooneyRivlin);

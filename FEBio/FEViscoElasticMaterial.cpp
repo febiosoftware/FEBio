@@ -74,10 +74,12 @@ mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 
 //-----------------------------------------------------------------------------
 
-void FEViscoElasticMaterial::Tangent(double D[6][6], FEMaterialPoint& pt)
+tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 {
 	// calculate the elastic tangent
-	m_pBase->Tangent(D, pt);
+	tens4ds C = m_pBase->Tangent(pt);
+	double D[6][6] = {0};
+	C.extract(D);
 
 	double dt = pt.dt;
 
@@ -100,4 +102,6 @@ void FEViscoElasticMaterial::Tangent(double D[6][6], FEMaterialPoint& pt)
 	D[3][0] *= f; D[3][1] *= f; D[3][2] *= f; D[3][3] *= f; D[3][4] *= f; D[3][5] *= f;
 	D[4][0] *= f; D[4][1] *= f; D[4][2] *= f; D[4][3] *= f; D[4][4] *= f; D[4][5] *= f;
 	D[5][0] *= f; D[5][1] *= f; D[5][2] *= f; D[5][3] *= f; D[5][4] *= f; D[5][5] *= f;
+
+	return tens4ds(D);
 }

@@ -49,8 +49,10 @@ mat3ds FELinearOrthotropic::Stress(FEMaterialPoint& mp)
 	e.yz() = 0.5*(F[1][2] + F[2][1]);
 
 	// calculate stiffness matrix
+	tens4ds C = Tangent(pt);
+
 	double D[6][6] = {0};
-	Tangent(D, pt);
+	C.extract(D);
 
 	// calculate stress
 	mat3ds s;
@@ -65,7 +67,7 @@ mat3ds FELinearOrthotropic::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FELinearOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FELinearOrthotropic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -75,6 +77,7 @@ void FELinearOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 	double G = 1.0/(1.0 - v12*v21 - v23*v32 - v31*v13 - 2.0*v21*v32*v13);
 
+	double D[6][6] = {0};
 	D[0][0] = E1*(1.0 - v23*v32)*G; 
 	D[1][1] = E2*(1.0 - v13*v31)*G;
 	D[2][2] = E3*(1.0 - v12*v21)*G;
@@ -85,4 +88,6 @@ void FELinearOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[0][1] = D[1][0] = E1*(v21 + v31*v23)*G;
 	D[0][2] = D[2][0] = E1*(v31 + v21*v32)*G;
 	D[1][2] = D[2][1] = E2*(v32 + v12*v31)*G;
+
+	return tens4ds(D);
 }

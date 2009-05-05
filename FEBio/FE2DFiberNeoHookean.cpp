@@ -131,7 +131,7 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FE2DFiberNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FE2DFiberNeoHookean::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -147,6 +147,7 @@ void FE2DFiberNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 	double mu1  = (mu - lam*log(detF)) / detF;
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
+	double D[6][6] = {0};
 	D[0][0] = lam1+2.*mu1; D[0][1] = lam1       ; D[0][2] = lam1       ;
 	D[1][0] = lam1       ; D[1][1] = lam1+2.*mu1; D[1][2] = lam1       ;
 	D[2][0] = lam1       ; D[2][1] = lam1       ; D[2][2] = lam1+2.*mu1;
@@ -219,4 +220,5 @@ void FE2DFiberNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 		}
 	}
 */
+	return tens4ds(D);
 }

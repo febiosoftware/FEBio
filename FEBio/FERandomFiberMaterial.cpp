@@ -6,7 +6,6 @@
 // The following file contains the integration points and weights
 // for the integration over a unit sphere in spherical coordinates
 #include "geodesic.h"
-#include "tens4d.h"
 
 // we store the cos and sin of the angles here
 int FERandomFiberMooneyRivlin::m_nres = 0;
@@ -175,8 +174,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-
-void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FERandomFiberMooneyRivlin::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -297,6 +295,5 @@ void FERandomFiberMooneyRivlin::Tangent(double D[6][6], FEMaterialPoint& mp)
 	// add fiber contribution to total tangent
 	c += cf;
 
-	// extract Voigt matrix
-	c.extract(D);
+	return c;
 }

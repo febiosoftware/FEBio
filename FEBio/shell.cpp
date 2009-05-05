@@ -187,7 +187,8 @@ void FESolver::ElementStiffness(FEShellElement& el, matrix& ke)
 		}
 
 		// get the 'D' matrix
-		pm->Tangent(D, mp);
+		tens4ds C = pm->Tangent(mp);
+		C.extract(D);
 
 		for (i=0; i<neln; ++i)
 		{

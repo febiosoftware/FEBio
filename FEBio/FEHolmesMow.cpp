@@ -58,7 +58,7 @@ mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FEHolmesMow::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -85,5 +85,6 @@ void FEHolmesMow::Tangent(double D[6][6], FEMaterialPoint& mp)
 	// calculate elasticity tensor
 	tens4ds c = 4.*m_b/Ha*detF/eQ*dyad1s(s) 
 	+ detFi*eQ*(lam*(dyad1s(b) - dyad4s(b)) + Ha*dyad4s(identity));
-	c.extract(D);
+	
+	return c;
 }

@@ -86,7 +86,7 @@ mat3ds FEStVenantKirchhoff::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FEStVenantKirchhoff::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEStVenantKirchhoff::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -116,6 +116,8 @@ void FEStVenantKirchhoff::Tangent(double D[6][6], FEMaterialPoint& mp)
 	double lam1 = lam / detF;
 	double mu1  = 2.0*mu/detF;
 
+	double D[6][6] = {0};
+
 	D[0][0] = lam1*b[0][0]*b[0][0] + mu1*(b[0][0]*b[0][0]);
 	D[1][1] = lam1*b[1][1]*b[1][1] + mu1*(b[1][1]*b[1][1]);
 	D[2][2] = lam1*b[2][2]*b[2][2] + mu1*(b[2][2]*b[2][2]);
@@ -144,4 +146,5 @@ void FEStVenantKirchhoff::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[5][3] = D[3][5] = lam1*b[0][1]*b[0][2] + mu1*0.5*(b[0][0]*b[1][2] + b[0][2]*b[0][1]);
 	D[5][4] = D[4][5] = lam1*b[1][2]*b[0][2] + mu1*0.5*(b[0][1]*b[2][2] + b[1][2]*b[0][2]);
 
+	return tens4ds(D);
 }

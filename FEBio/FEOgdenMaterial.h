@@ -15,7 +15,7 @@ public:
 	mat3ds Stress(FEMaterialPoint& pt);
 
 	//! calculate the tangent
-	void Tangent(double D[][6], FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
 protected:
 	void EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps = 0);

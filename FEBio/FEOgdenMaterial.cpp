@@ -165,7 +165,7 @@ mat3ds FEOgdenMaterial::Stress(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Calculates the spatial tangent
-void FEOgdenMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEOgdenMaterial::Tangent(FEMaterialPoint& mp)
 {
 	int i, j, k, l, n, i0, i1, j0, j1;
 	double Di, Dpi, beta, gab;
@@ -211,7 +211,7 @@ void FEOgdenMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 		lamd[2][i] = pow(ld[2], m_m[i]);
 	}
 
-	memset(D, 0, sizeof(double)* 6*6);
+	double D[6][6] = {0};
 
 	mat3dd I(1.0);	// unit matrix
 
@@ -471,4 +471,6 @@ void FEOgdenMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 	for (j=0; j<6; ++j)
 		for (k=j+1; k<6; ++k)
 			D[k][j] = D[j][k];
+
+	return tens4ds(D);
 }

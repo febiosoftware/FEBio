@@ -61,7 +61,7 @@ mat3ds FEIncompNeoHookean::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FEIncompNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEIncompNeoHookean::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -91,6 +91,7 @@ void FEIncompNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 	double p = pt.avgp; // average element pressure
 
+	double D[6][6] = {0};
 	D[0][0] = 2.*muJ*(4.*Ib/9. - 2.*b[0][0]/3.) - p;
 	D[1][1] = 2.*muJ*(4.*Ib/9. - 2.*b[1][1]/3.) - p;
 	D[2][2] = 2.*muJ*(4.*Ib/9. - 2.*b[2][2]/3.) - p;
@@ -104,4 +105,6 @@ void FEIncompNeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[5][0] = D[0][5] = D[5][1] = D[1][5] = D[5][2] = D[2][5] = -2.*muJ/3.*b[0][2];
 
 	D[3][3] = D[4][4] = D[5][5] = muJ*Ib/3. - p;
+
+	return tens4ds(D);
 }

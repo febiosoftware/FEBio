@@ -33,38 +33,22 @@ mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
 
 	// calculate left Cauchy-Green tensor
 	// (we commented out the matrix components we do not need)
-	double b[3][3];
-
-	b[0][0] = F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2];
-	b[0][1] = F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2];
-	b[0][2] = F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2];
-
-//	b[1][0] = F[1][0]*F[0][0]+F[1][1]*F[0][1]+F[1][2]*F[0][2];
-	b[1][1] = F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2];
-	b[1][2] = F[1][0]*F[2][0]+F[1][1]*F[2][1]+F[1][2]*F[2][2];
-
-//	b[2][0] = F[2][0]*F[0][0]+F[2][1]*F[0][1]+F[2][2]*F[0][2];
-//	b[2][1] = F[2][0]*F[1][0]+F[2][1]*F[1][1]+F[2][2]*F[1][2];
-	b[2][2] = F[2][0]*F[2][0]+F[2][1]*F[2][1]+F[2][2]*F[2][2];
+	mat3ds b = pt.LeftCauchyGreen();
 
 	// lame parameters
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	double mu  = 0.5*m_E/(1+m_v);
 
-	// calculate stress
-	mat3ds s;
+	// Identity
+	mat3dd I(1);
 
-	s.xx() = (mu*(b[0][0] - 1) + lam*lndetF)*detFi;
-	s.yy() = (mu*(b[1][1] - 1) + lam*lndetF)*detFi;
-	s.zz() = (mu*(b[2][2] - 1) + lam*lndetF)*detFi;
-	s.xy() = mu*b[0][1]*detFi;
-	s.yz() = mu*b[1][2]*detFi;
-	s.xz() = mu*b[0][2]*detFi;
+	// calculate stress
+	mat3ds s = (b - I)*(mu*detFi) + I*(lam*lndetF*detFi);
 
 	return s;
 }
 
-void FENeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FENeoHookean::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -79,10 +63,13 @@ void FENeoHookean::Tangent(double D[6][6], FEMaterialPoint& mp)
 	double lam1 = lam / detF;
 	double mu1  = (mu - lam*log(detF)) / detF;
 	
+	double D[6][6] = {0};
 	D[0][0] = lam1+2.*mu1; D[0][1] = lam1       ; D[0][2] = lam1       ;
 	D[1][0] = lam1       ; D[1][1] = lam1+2.*mu1; D[1][2] = lam1       ;
 	D[2][0] = lam1       ; D[2][1] = lam1       ; D[2][2] = lam1+2.*mu1;
 	D[3][3] = mu1;
 	D[4][4] = mu1;
 	D[5][5] = mu1;
+
+	return tens4ds(D);
 }

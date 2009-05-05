@@ -19,7 +19,7 @@ public:
 	mat3ds Stress(FEMaterialPoint& pt);
 
 	//! tangent function
-	void Tangent(double D[6][6], FEMaterialPoint& pt);
+	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
 	// returns a pointer to a new material point object
 	virtual FEMaterialPoint* CreateMaterialPointData() 

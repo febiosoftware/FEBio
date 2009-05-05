@@ -127,7 +127,7 @@ mat3ds FENeoHookeanTransIso::Stress(FEMaterialPoint& mp)
 
 }
 
-void FENeoHookeanTransIso::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FENeoHookeanTransIso::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -212,6 +212,7 @@ void FENeoHookeanTransIso::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 
 	//trans iso
+	double D[6][6] = {0};
 	D[0][0]=(2*a.x*a.x*B[0][0]*(m_alpha + 2*m_gz)*I4 + m_gp*(2 - 4*a.x*a.x*B[0][0]*I4 + 4*a.x*a.x*a.x*a.x*I4*I4) + J*m_lamp + a.x*a.x*a.x*a.x*(2*m_gz - 4*m_gz*I4*I4 + lam*m_lamz))/J;
 	D[0][1]=(a.y*a.y*m_alpha*B[0][0]*I4 + 4*a.x*a.y*B[0][1]*(-m_gp + m_gz)*I4 - J*m_lamp + 2*I3*m_lamp + a.x*a.x*(m_alpha*B[1][1]*I4 + a.y*a.y*(2*m_gz + 4*m_gp*I4*I4 - 4*m_gz*I4*I4 + lam*m_lamz)))/J;
 	D[0][2]=(a.z*a.z*m_alpha*B[0][0]*I4 + 4*a.x*a.z*B[0][2]*(-m_gp + m_gz)*I4 - J*m_lamp + 2*I3*m_lamp + a.x*a.x*(m_alpha*B[2][2]*I4 + a.z*a.z*(2*m_gz + 4*m_gp*I4*I4 - 4*m_gz*I4*I4 + lam*m_lamz)))/J;
@@ -242,6 +243,7 @@ void FENeoHookeanTransIso::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[4][3] = D[3][4]; D[5][3] = D[3][5];
 	D[5][4] = D[4][5];
 
+/*
 	FILE* fp = fopen("C.txt", "wt");
 	int i, j;
 	for (i=0; i<6; ++i)
@@ -250,7 +252,7 @@ void FENeoHookeanTransIso::Tangent(double D[6][6], FEMaterialPoint& mp)
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
-
+*/
 
 	//the following code is used for testing purposes and replaces the above stiffness when testing
 	//comment out for normal use
@@ -326,4 +328,5 @@ void FENeoHookeanTransIso::Tangent(double D[6][6], FEMaterialPoint& mp)
 	//D[4][5]=0;
 	//D[5][5]=1;
 
+	return tens4ds(D);
 }

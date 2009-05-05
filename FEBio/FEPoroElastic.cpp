@@ -39,17 +39,20 @@ mat3ds FEPoroElastic::Stress(FEMaterialPoint& mp)
 //! that this function is declared in the base class, so you don't have to 
 //! reimplement it unless additional tangent components are required.
 
-void FEPoroElastic::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEPoroElastic::Tangent(FEMaterialPoint& mp)
 {
 	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 
 	// call solid tangent routine
-	m_pBase->Tangent(D, mp);
+	tens4ds c = m_pBase->Tangent(mp);
 
 	// fluid pressure
 	double p = pt.m_p;
 
 	// adjust tangent for pressures
+	double D[6][6] = {0};
+	c.extract(D);
+
 	D[0][0] -= -p;
 	D[1][1] -= -p;
 	D[2][2] -= -p;
@@ -61,4 +64,6 @@ void FEPoroElastic::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[3][3] -= -p;
 	D[4][4] -= -p;
 	D[5][5] -= -p;
+
+	return tens4ds(D);
 }

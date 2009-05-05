@@ -225,7 +225,7 @@ mat3ds FERandomFiberVerondaWestmann::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FERandomFiberVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FERandomFiberVerondaWestmann::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -323,6 +323,7 @@ void FERandomFiberVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
 	W11 = m_c2*W1;
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
+	double D[6][6] = {0};
 
 	// calculate dWdC:C
 	double WC = W1*I1 + 2*W2*I2;
@@ -620,4 +621,6 @@ void FERandomFiberVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[3][2] = D[2][3]; D[4][2] = D[2][4]; D[5][2] = D[2][5];
 	D[4][3] = D[3][4]; D[5][3] = D[3][5];
 	D[5][4] = D[4][5];
+
+	return tens4ds(D);
 }

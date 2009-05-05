@@ -237,7 +237,7 @@ mat3ds FEMuscleMaterial::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FEMuscleMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEMuscleMaterial::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -522,6 +522,7 @@ void FEMuscleMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 
 
 	// --- calculate elasticity tensor ---
+	double D[6][6] = {0};
 	int i, j, k, l, m, n;
 	for (i=0; i<6; ++i)
 		for (j=i; j<6; ++j)
@@ -660,4 +661,6 @@ void FEMuscleMaterial::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[3][2] = D[2][3]; D[4][2] = D[2][4]; D[5][2] = D[2][5];
 	D[4][3] = D[3][4]; D[5][3] = D[3][5];
 	D[5][4] = D[4][5];
+
+	return tens4ds(D);
 }

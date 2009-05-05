@@ -208,7 +208,7 @@ mat3ds FETCNonlinearOrthotropic::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FETCNonlinearOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -393,6 +393,8 @@ void FETCNonlinearOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
 	}
 	// ------------------------------------
 
+	double D[6][6] = {0};
+
 	// calculate dWdC:C
 	double WC = W1*I1 + 2*W2*I2 + W4a*I4a + W4b*I4b + W4c*I4c;
 
@@ -574,4 +576,6 @@ void FETCNonlinearOrthotropic::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[3][2] = D[2][3]; D[4][2] = D[2][4]; D[5][2] = D[2][5];
 	D[4][3] = D[3][4]; D[5][3] = D[3][5];
 	D[5][4] = D[4][5];
+
+	return tens4ds(D);
 }

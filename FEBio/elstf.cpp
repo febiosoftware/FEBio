@@ -1121,7 +1121,8 @@ void FESolver::MaterialStiffness(FESolidElement &el, matrix &ke)
 		}
 
 		// get the 'D' matrix
-		pmat->Tangent(D, mp);
+		tens4ds C = pmat->Tangent(mp);
+		C.extract(D);
 
 /*		if (m_fem.GetDebugFlag())
 		{
@@ -1418,7 +1419,8 @@ void FESolver::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 	pt.avgp = el.m_ep;
 
 	// get the 'D' matrix
-	pmat->Tangent(D, mp);
+	tens4ds C = pmat->Tangent(mp);
+	C.extract(D);
 
 	// we only calculate the upper triangular part
 	// since ke is symmetric. The other part is

@@ -129,7 +129,7 @@ mat3ds FEVerondaWestmann::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-void FEVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FEVerondaWestmann::Tangent(FEMaterialPoint& mp)
 {
 	const double third = 1.0 / 3.0;
 
@@ -230,6 +230,8 @@ void FEVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
 	W2 = -0.5*m_c1*m_c2;
 	W11 = m_c2*W1;
 	// ---
+
+	double D[6][6] = {0};
 
 	// calculate dWdC:C
 	double WC = W1*I1 + 2*W2*I2;
@@ -369,4 +371,5 @@ void FEVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[4][3] = D[3][4]; D[5][3] = D[3][5];
 	D[5][4] = D[4][5];
 
+	return tens4ds(D);
 }

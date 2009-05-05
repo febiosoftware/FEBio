@@ -11,6 +11,7 @@
 
 #include "FEElement.h"
 #include "quatd.h"
+#include "tens4d.h"
 #include "LoadCurve.h"
 #include "string.h"
 #include "FE_enum.h"
@@ -50,7 +51,7 @@ public:
 	virtual mat3ds Stress(FEMaterialPoint& pt) = 0;
 
 	//! calculate tangent stiffness at material point
-	virtual void Tangent(double D[6][6], FEMaterialPoint& pt) = 0;
+	virtual tens4ds Tangent(FEMaterialPoint& pt) = 0;
 
 	//! set/get material name
 	void SetName(const char* sz) { strcpy(m_szname, sz); }

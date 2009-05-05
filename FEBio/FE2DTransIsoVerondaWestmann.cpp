@@ -195,7 +195,7 @@ mat3ds FE2DTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 //! Calculates the elasticity tensor for this material.
 //! \param D elasticity tensor
 //! \param pt material point at which to evaulate the elasticity tensor
-void FE2DTransIsoVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
+tens4ds FE2DTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -286,6 +286,7 @@ void FE2DTransIsoVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
 	B2[2][2] = B[2][0]*B[0][2]+B[2][1]*B[1][2]+B[2][2]*B[2][2];
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
+	double D[6][6];
 
 	// strain energy derivatives
 	double W1, W2, W11;
@@ -598,4 +599,6 @@ void FE2DTransIsoVerondaWestmann::Tangent(double D[6][6], FEMaterialPoint& mp)
 	D[3][2] = D[2][3]; D[4][2] = D[2][4]; D[5][2] = D[2][5];
 	D[4][3] = D[3][4]; D[5][3] = D[3][5];
 	D[5][4] = D[4][5];
+
+	return tens4ds(D);
 }
