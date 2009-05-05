@@ -157,7 +157,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 		if (m_ac > 0)
 		{
 			// The .5 is to compensate for the 2 multiplier later.
-			double at = 0.5*m_w[n]*m_ac *sqrt(SQR(m_a[0]*nr.x) + SQR(m_a[1]*nr.y) + SQR(m_a[2]*nr.z));
+			double at = 0.5*m_w[n]*m_ac /sqrt(SQR(nr.x/m_a[0]) + SQR(nr.y / m_a[1]) + SQR(nr.z / m_a[2]));
 			T += N*at;
 		}
 	}
@@ -276,6 +276,7 @@ tens4ds FERandomFiberMooneyRivlin::Tangent(FEMaterialPoint& mp)
 			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
 
 			// calculate dWdC:C
+			// TODO: is this correct? the nt vector is not normalized!!!
 			double WC = Wl*In;
 
 			// calculate C:d2WdCdC:C

@@ -42,4 +42,6 @@ public:
 protected:
 	static double	m_cth[NSTEPS];
 	static double	m_sth[NSTEPS];
+
+	double	m_w[2];
 };
