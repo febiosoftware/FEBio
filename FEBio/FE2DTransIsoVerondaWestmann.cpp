@@ -289,9 +289,9 @@ tens4ds FE2DTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 		N2 = dyad(a);
 		N4 = dyad1s(N2);
 
-		WCCxC = N2*(Wll*In);
+		WCCxC = N2*(Wll*In*In);
 
-		cfw = N4*(4.0*Wll) - dyad1s(WCCxC, I)*(4.0/3.0) + IxI*(4.0/9.0*CWWC);
+		cfw = N4*(4.0*Wll*In*In) - dyad1s(WCCxC, I)*(4.0/3.0) + IxI*(4.0/9.0*CWWC);
 
 		cf += (I4mIxId3)*(4.0/3.0*Ji*WC*w) + cfw*(Ji*w);
 	}
