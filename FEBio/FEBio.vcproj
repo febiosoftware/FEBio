@@ -374,6 +374,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEArrudaBoyce.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEAugLagLinearConstraint.cpp"
 				>
 			</File>
@@ -817,6 +821,10 @@
 			</File>
 			<File
 				RelativePath=".\FEAnalysis.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEArrudaBoyce.h"
 				>
 			</File>
 			<File
