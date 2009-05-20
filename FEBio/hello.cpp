@@ -30,7 +30,7 @@ unsigned char banner[] = {
 
 #ifdef WIN32
 
-#include "Console.h"
+#include "console.h"
 #include "windows.h"
 
 void print_banner()
