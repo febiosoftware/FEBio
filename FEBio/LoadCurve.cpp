@@ -111,3 +111,30 @@ bool FELoadCurve::HasPoint(double t)
 
 	return false;
 }
+
+//-----------------------------------------------------------------------------
+
+void FELoadCurve::Serialize(Archive &ar)
+{
+	if (ar.IsSaving())
+	{
+		int n = Points();
+		ar << n;
+		for (int j=0; j<n; ++j)
+		{
+			LOADPOINT& p = LoadPoint(j);
+			ar << p.time << p.value;
+		}
+	}
+	else
+	{
+		int j, n;
+		ar >> n;
+		Create(n);
+		for (j=0; j<n; ++j)
+		{
+			LOADPOINT& p = LoadPoint(j);
+			ar >> p.time >> p.value;
+		}
+	}
+}

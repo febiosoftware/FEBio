@@ -32,6 +32,12 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 	m_nretries = 0;
 	m_maxretries = 5;
 
+	// initialize counters
+	m_ntotref    = 0;		// total nr of stiffness reformations
+	m_ntotiter   = 0;		// total nr of non-linear iterations
+	m_ntimesteps = 0;		// time steps completed
+	m_ntotrhs    = 0;		// total nr of right hand side evaluations
+
 	// --- I/O Data ---
 	m_bDump = false;
 	m_nplot = FE_PLOT_MAJOR_ITRS;
@@ -57,12 +63,6 @@ void FEAnalysis::Finish()
 bool FEAnalysis::Init()
 {
 	int i, j, n;
-
-	// initialize counters
-	m_ntotref    = 0;		// total nr of stiffness reformations
-	m_ntotiter   = 0;		// total nr of non-linear iterations
-	m_ntimesteps = 0;		// time steps completed
-	m_ntotrhs    = 0;		// total nr of right hand side evaluations
 
 	// set first time step
 	m_dt = m_dt0;
@@ -245,10 +245,10 @@ bool FEAnalysis::Init()
 	if (m_fem.m_LinC.size())
 	{
 		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<m_fem.m_LinC.size(); ++l, ++il)
+		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
 		{
 			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
-			for (int i=0; i<il->slave.size(); ++i, ++is)
+			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
 			{
 				is->neq = m_fem.m_mesh.Node(is->node).m_ID[is->bc];
 			}
@@ -308,13 +308,10 @@ bool FEAnalysis::Solve()
 	bool bconv = true;
 
 	// calculate end time value
-	double endtime = m_fem.m_ftime + m_ntime*m_dt0;
+	double endtime = m_ntime*m_dt0;
 	const double eps = endtime*1e-7;
 
 	pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
-
-	// make sure that the timestep is at least the min time step size
-	if (m_bautostep) AutoTimeStep(0);
 
 	// keep a stack for push/pop'ing
 	stack<FEM> state(1);
@@ -325,6 +322,19 @@ bool FEAnalysis::Solve()
 		printf("\nProgress:\n");
 		for (int i=0; i<50; ++i) printf("\xB0"); printf("\r");
 		m_fem.m_log.SetMode(Logfile::FILE_ONLY);
+	}
+
+	// if we restarted we need to update the timestep
+	// before continuing
+	if (m_ntimesteps != 0)
+	{
+		// update time step
+		if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
+	}
+	else
+	{
+		// make sure that the timestep is at least the min time step size
+		if (m_bautostep) AutoTimeStep(0);
 	}
 
 	// repeat for all timesteps
@@ -507,19 +517,19 @@ bool FEAnalysis::Solve()
 //-----------------------------------------------------------------------------
 void FEAnalysis::Serialize(Archive& ar)
 {
-	// TODO:	serialize the boundary conditions
-	//			not sure how to do this yet.
 	if (ar.IsSaving())
 	{
 		// --- analysis data ---
 		ar << m_itype;
 		ar << m_istiffpr;
 		ar << m_baugment;
+		ar << m_hg;
 
 		// --- Time Step Data ---
 		ar << m_ntime;
 		ar << m_dt;
 		ar << m_dt0;
+		ar << m_tend;
 		ar << m_bautostep;
 		ar << m_iteopt;
 		ar << m_dtmin;
@@ -536,9 +546,13 @@ void FEAnalysis::Serialize(Archive& ar)
 		ar << m_ntimesteps;
 
 		// --- I/O Data ---
-		ar << m_bDump;
 		ar << m_nplot;
 		ar << m_nprint;
+		ar << m_bDump;
+
+		// boundary conditions
+		ar << (int) m_BC.size();
+		for (int i=0; i< (int) m_BC.size(); ++i) ar << m_BC[i]->GetID();
 	}
 	else
 	{
@@ -546,11 +560,13 @@ void FEAnalysis::Serialize(Archive& ar)
 		ar >> m_itype;
 		ar >> m_istiffpr;
 		ar >> m_baugment;
+		ar >> m_hg;
 
 		// --- Time Step Data ---
 		ar >> m_ntime;
 		ar >> m_dt;
 		ar >> m_dt0;
+		ar >> m_tend;
 		ar >> m_bautostep;
 		ar >> m_iteopt;
 		ar >> m_dtmin;
@@ -567,9 +583,21 @@ void FEAnalysis::Serialize(Archive& ar)
 		ar >> m_ntimesteps;
 
 		// --- I/O Data ---
-		ar >> m_bDump;
 		ar >> m_nplot;
 		ar >> m_nprint;
+		ar >> m_bDump;
+
+		// boundary conditions
+		int n, nbc;
+		ar >> n;
+		if (n) m_BC.create(n);
+		for (int i=0; i<n; ++i)
+		{
+			ar >> nbc;
+			FEBoundaryCondition* pbc = m_fem.FindBC(nbc);
+			assert(pbc);
+			m_BC.add(pbc);
+		}
 	}
 
 	// serialize solver data

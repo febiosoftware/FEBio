@@ -32,11 +32,11 @@ bool FEM::Solve()
 	// convergence flag
 	bool bconv = true;
 
-	// intialize time
-	m_ftime = 0;
-
 	// loop over all analysis steps
-	for (int nstep=0; nstep < m_Step.size(); ++nstep)
+	// Note that we don't necessarily from step 0.
+	// This is because the user could have restarted
+	// the analysis. 
+	for (int nstep=m_nStep; nstep < m_Step.size(); ++nstep)
 	{
 		// set the current analysis step
 		m_nStep = nstep;

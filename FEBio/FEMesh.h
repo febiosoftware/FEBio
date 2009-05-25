@@ -234,7 +234,7 @@ protected:
 
 	ptr_vector<FENodeSet>	m_NodeSet;	//!< node sets
 
-	FE_BOUNDING_BOX		m_box;	//! bounding box
+	FE_BOUNDING_BOX		m_box;	//!< bounding box
 };
 
 #endif // !defined(AFX_FEMESH_H__81ABA97F_AD5F_4F1D_8EE9_95B67EBA448E__INCLUDED_)

@@ -525,7 +525,7 @@ void FESolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 					assert(elm[i] == -1);
 
 					list<FELinearConstraint::SlaveDOF>::iterator is = Li.slave.begin();
-					for (k=0; k<Li.slave.size(); ++k, ++is)
+					for (k=0; k<(int)Li.slave.size(); ++k, ++is)
 					{
 						I = is->neq;
 						J = elm[j];
@@ -548,7 +548,7 @@ void FESolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 
 					list<FELinearConstraint::SlaveDOF>::iterator js = Lj.slave.begin();
 
-					for (k=0; k<Lj.slave.size(); ++k, ++js)
+					for (k=0; k<(int)Lj.slave.size(); ++k, ++js)
 					{
 						I = elm[i];
 						J = js->neq;
@@ -574,10 +574,10 @@ void FESolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 					assert(elm[i] == -1);
 					assert(elm[j] == -1);
 
-					for (k=0; k<Li.slave.size(); ++k, ++is)
+					for (k=0; k<(int)Li.slave.size(); ++k, ++is)
 					{
 						js = Lj.slave.begin();
-						for  (l=0; l<Lj.slave.size(); ++l, ++js)
+						for  (l=0; l<(int)Lj.slave.size(); ++l, ++js)
 						{
 							I = is->neq;
 							J = js->neq;

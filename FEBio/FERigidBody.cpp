@@ -24,11 +24,9 @@ FERigidBody::~FERigidBody()
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEM::Update
-// Calculates the total mass and center of mass of a rigid body
-//
-
+//-----------------------------------------------------------------------------
+//! Calculates the total mass and center of mass of a rigid body
+//!
 void FERigidBody::Update()
 {
 	// make sure the rigid body is attached to a FEM
@@ -101,4 +99,30 @@ void FERigidBody::Update()
 
 	// store com
 	m_r0 = m_rt = rc;
+}
+
+//-----------------------------------------------------------------------------
+
+void FERigidBody::Serialize(Archive& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_nID << m_mat << m_mass << m_Fr << m_Mr;
+		ar << m_r0 << m_rt << m_qt;
+//		ar.write(m_bc, sizeof(int), 6);
+		ar.write(m_LM, sizeof(int), 6);
+		ar.write(m_Up, sizeof(double), 6);
+		ar.write(m_Ut, sizeof(double), 6);
+		ar.write(m_du, sizeof(double), 6);
+	}
+	else
+	{
+		ar >> m_nID >> m_mat >> m_mass >> m_Fr >> m_Mr;
+		ar >> m_r0 >> m_rt >> m_qt;
+//		ar.read(m_bc, sizeof(int), 6);
+		ar.read(m_LM, sizeof(int), 6);
+		ar.read(m_Up, sizeof(double), 6);
+		ar.read(m_Ut, sizeof(double), 6);
+		ar.read(m_du, sizeof(double), 6);
+	}
 }

@@ -677,27 +677,16 @@ void FEMesh::Serialize(Archive& ar)
 			FESolidElement& el = SolidElement(i);
 			ar >> n;
 
-			switch (n)
-			{
-			case FE_HEX:
-			case FE_RIHEX:
-			case FE_UDGHEX:
-			case FE_PENTA:
-			case FE_TET:
-				{
-					el.SetType(n);
+			el.SetType(n);
 
-					ar >> mat; el.SetMatID(mat);
-					ar >> el.m_nrigid;
-					ar >> el.m_nID;
-					ar >> el.m_node;
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
 
-					ar >> el.m_eJ;
-					ar >> el.m_ep;
-					ar >> el.m_Lk;
-				}
-				break;
-			}
+			ar >> el.m_eJ;
+			ar >> el.m_ep;
+			ar >> el.m_Lk;
 		}
 
 		// read shell element data
@@ -706,26 +695,18 @@ void FEMesh::Serialize(Archive& ar)
 			FEShellElement& el = ShellElement(i);
 			ar >> n;
 
-			switch (n)
-			{
-			case FE_SHELL_QUAD:
-			case FE_SHELL_TRI:
-				{
-					el.SetType(n);
+			el.SetType(n);
 
-					ar >> el.m_eJ;
-					ar >> el.m_ep;
+			ar >> el.m_eJ;
+			ar >> el.m_ep;
 
-					ar >> mat; el.SetMatID(mat);
-					ar >> el.m_nrigid;
-					ar >> el.m_nID;
-					ar >> el.m_node;
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
 
-					ar >> el.m_h0;
-					ar >> el.m_Lk;
-				}
-				break;
-			}
+			ar >> el.m_h0;
+			ar >> el.m_Lk;
 		}
 
 		// read bounding box data

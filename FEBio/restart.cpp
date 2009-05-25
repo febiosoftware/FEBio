@@ -56,36 +56,133 @@ bool FEM::Restart(const char* szfile)
 
 bool FEM::Serialize(Archive& ar)
 {
-	int i, j, k, n, m;
-
 	if (ar.IsSaving())
 	{
 		// --- version number ---
-		ar << RSTRTVERSION;
+		ar << (int) RSTRTVERSION;
+	}
+	else
+	{
+		// --- version ---
+		int nversion;
+		ar >> nversion;
 
-		// --- analysis data ---
-		ar << m_Step.size();
-		for (i=0; i<m_Step.size(); ++i) m_Step[i].Serialize(ar);
+		// make sure it is the right version
+		if (nversion != RSTRTVERSION) return false;
+	}
 
-		ar << m_ftime;
+	// --- Load Data ---
+	SerializeLoadData(ar);
 
-		// --- Load Curve Data ---
+	// --- Material Data ---
+	SerializeMaterials(ar);
+
+	// --- Geometry Data ---
+	SerializeGeometry(ar);
+
+	// --- Contact Data ---
+	SerializeContactData(ar);
+
+	// --- Boundary Condition Data ---
+	SerializeBoundaryData(ar);
+
+	// --- Analysis data ---
+	SerializeAnalysisData(ar);
+
+	// --- Save IO Data
+	SerializeIOData(ar);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void FEM::SerializeLoadData(Archive& ar)
+{
+	if (ar.IsSaving())
+	{
+		// load curve data
 		ar << LoadCurves();
-		for (i=0; i<LoadCurves(); ++i)
+		for (int i=0; i<LoadCurves(); ++i) GetLoadCurve(i)->Serialize(ar);
+	}
+	else
+	{
+		// loadcurve data
+		int nlc;
+		ar >> nlc;
+		for (int i=0; i<nlc; ++i)
 		{
-			FELoadCurve& lc = *GetLoadCurve(i);
-			n = lc.Points();
-			ar << n;
-			for (j=0; j<n; ++j)
-			{
-				LOADPOINT& p = lc.LoadPoint(j);
-				ar << p.time << p.value;
-			}
+			FELoadCurve* plc = new FELoadCurve;
+			plc->Serialize(ar);
+			AddLoadCurve(plc);
 		}
+	}
+}
 
-		// --- Material Data ---
+//-----------------------------------------------------------------------------
+
+void FEM::SerializeAnalysisData(Archive &ar)
+{
+	if (ar.IsSaving())
+	{
+		// analysis steps
+		int i;
+		ar << (int) m_Step.size();
+		for (i=0; i<(int) m_Step.size(); ++i) m_Step[i].Serialize(ar);
+		ar << m_nStep;
+		ar << m_ftime;
+		ar << m_nhex8;
+
+		// body forces
+		ar.write(m_BF  ,sizeof(FE_BODYFORCE), 1);
+		ar.write(m_BF+1,sizeof(FE_BODYFORCE), 1);
+		ar.write(m_BF+2,sizeof(FE_BODYFORCE), 1);
+
+		ar << m_acc;
+
+		// direct solver data
+		ar << m_nsolver;
+		ar << m_neq;
+		ar << m_bwopt;
+	}
+	else
+	{
+		m_Step.clear();
+		// analysis steps
+		int nsteps, i;
+		ar >> nsteps;
+		for (i=0; i<nsteps; ++i)
+		{
+			FEAnalysis* pstep = new FEAnalysis(*this);
+			pstep->Serialize(ar);
+			m_Step.add(pstep);
+		}
+		ar >> m_nStep;
+		ar >> m_ftime;
+		ar >> m_nhex8;
+
+		// body forces
+		ar.read(m_BF  ,sizeof(FE_BODYFORCE), 1);
+		ar.read(m_BF+1,sizeof(FE_BODYFORCE), 1);
+		ar.read(m_BF+2,sizeof(FE_BODYFORCE), 1);
+
+		ar >> m_acc;
+
+		// direct solver data
+		ar >> m_nsolver;
+		ar >> m_neq;
+		ar >> m_bwopt;
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEM::SerializeMaterials(Archive& ar)
+{
+	if (ar.IsSaving())
+	{
 		ar << Materials();
-		for (i=0; i<Materials(); ++i)
+		for (int i=0; i<Materials(); ++i)
 		{
 			FEMaterial* pmat = GetMaterial(i);
 
@@ -113,6 +210,9 @@ bool FEM::Serialize(Archive& ar)
 				default:
 					assert(false);
 				}
+
+				// store parameter data
+				ar << it->m_nlc;
 			}
 
 			// not all parameters can be serialized through the parameter lists
@@ -121,12 +221,15 @@ bool FEM::Serialize(Archive& ar)
 			if (dynamic_cast<FETransverselyIsotropic*>(pmat))
 			{
 				FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
+				ar << pm->lcna;
+				ar << pm->m_ascl;
 				ar << pm->ca0;
 				ar << pm->beta;
 				ar << pm->l0;
 				ar << pm->refl;
 			}
 
+			// TODO: do we really need to store this data?
 			if (dynamic_cast<FERigid*>(pmat))
 			{
 				FERigid* pm = dynamic_cast<FERigid*>(pmat);
@@ -135,9 +238,89 @@ bool FEM::Serialize(Archive& ar)
 				ar.write(pm->m_fs, sizeof(double), 6);
 			}
 		}
+	}
+	else
+	{
+		int nmat;
+		char szmat[256] = {0}, szvar[256] = {0};
+		ar >> nmat;
+		for (int i=0; i<nmat; ++i)
+		{
+			// read the type string
+			ar >> szmat;
 
-		// --- Geometry Data ---
-		m_mesh.Serialize(ar);
+			// create a material
+			FEMaterial* pmat = FEMaterialFactory::CreateMaterial(szmat);
+			assert(pmat);
+			AddMaterial(pmat);
+
+			// read the name
+			ar >> szmat;
+			pmat->SetName(szmat);
+
+			// read all parameters
+			FEParameterList* pl = pmat->GetParameterList();
+			AddParameterList(pl);
+			int n = 0;
+			ar >> n;
+			assert(n == pl->Parameters());
+			list<FEParam>::iterator it = pl->first();
+			for (int j=0; j<n; ++j, ++it)
+			{
+				// read the value
+				switch (it->m_itype)
+				{
+				case FE_PARAM_INT    : ar >> it->value<int   >(); break;
+				case FE_PARAM_BOOL   : ar >> it->value<bool  >(); break;
+				case FE_PARAM_DOUBLE : ar >> it->value<double>(); break;
+				case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<double>()[k]; } break;
+				case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<int   >()[k]; } break;
+				default:
+					assert(false);
+				}
+
+				// read parameter data
+				ar >> it->m_nlc;
+			}
+
+			// not all parameters can be serialized through the parameter lists
+			// so we have to save those parameters the hard way
+
+			if (dynamic_cast<FETransverselyIsotropic*>(pmat))
+			{
+				FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
+				ar >> pm->lcna;
+				ar >> pm->m_ascl;
+				ar >> pm->ca0;
+				ar >> pm->beta;
+				ar >> pm->l0;
+				ar >> pm->refl;
+
+				if (pm->lcna >= 0) pm->m_plc = GetLoadCurve(pm->lcna);
+			}
+
+			if (dynamic_cast<FERigid*>(pmat))
+			{
+				FERigid* pm = dynamic_cast<FERigid*>(pmat);
+				ar.read(pm->m_bc, sizeof(int), 6);
+				ar.read(pm->m_fc, sizeof(int), 6);
+				ar.read(pm->m_fs, sizeof(double), 6);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEM::SerializeGeometry(Archive &ar)
+{
+	// serialize the mesh first 
+	m_mesh.Serialize(ar);
+
+	// serialize the other geometry data
+	if (ar.IsSaving())
+	{
+		int i, j, n;
 
 		// write solid element state data
 		for (i=0; i<m_mesh.SolidElements(); ++i)
@@ -168,179 +351,12 @@ bool FEM::Serialize(Archive& ar)
 		}
 
 		// rigid bodies
-		ar << m_nreq << m_nrb << m_nrm;
-		for (i=0; i<m_nrb; ++i)
-		{
-			FERigidBody& rb = m_RB[i];
-
-			ar << rb.m_nID << rb.m_mat << rb.m_mass << rb.m_Fr << rb.m_Mr;
-			ar << rb.m_r0 << rb.m_rt << rb.m_qt;
-//			ar.write(rb.m_bc, sizeof(int), 6);
-			ar.write(rb.m_LM, sizeof(int), 6);
-			ar.write(rb.m_Up, sizeof(double), 6);
-			ar.write(rb.m_Ut, sizeof(double), 6);
-			ar.write(rb.m_du, sizeof(double), 6);
-		}
+		ar << m_nreq << m_nrm << m_nrb;
+		for (i=0; i<m_nrb; ++i) m_RB[i].Serialize(ar);
 
 		// rigid joints
 		ar << m_nrj;
-		for (i=0; i<m_nrj; ++i)
-		{
-			ar.write(&m_RJ[i], sizeof(FERigidJoint), 1);
-		}
-
-		// contact data
-		ar << m_bcontact;
-		ar << ContactInterfaces();
-		for (i=0; i<ContactInterfaces(); ++i)
-		{
-			FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&m_CI[i]);
-
-			if (psi)
-			{
-				ar << psi->Type();
-				ar << psi->m_npass;
-				ar << psi->m_eps;
-				ar << psi->m_atol;
-				ar << psi->m_nplc;
-				ar << psi->m_bautopen;
-				ar << psi->m_nsegup;
-				ar << psi->m_blaugon;
-
-				for (j=0; j<2; ++j)
-				{
-					FEContactSurface& s = (j==0? psi->m_ss : psi->m_ms);
-
-					int ne = s.Elements();
-					ar << ne;
-
-					for (k=0; k<ne; ++k)
-					{
-						FESurfaceElement& el = s.Element(k);
-						ar << el.Type();
-						ar << el.GetMatID() << el.m_nID << el.m_nrigid;
-						ar << el.m_node;
-						ar << el.m_lnode;
-					}
-
-					ar << s.eps;
-					ar << s.gap;
-					ar << s.nu;
-					ar << s.rs;
-					ar << s.Lm;
-					ar << s.off;
-				}
-			}
-
-			FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&m_CI[i]);
-			if (pti)
-			{
-				ar << pti->Type();
-				ar << pti->m_eps;
-				ar << pti->m_atol;
-				ar << pti->m_nplc;
-				ar << pti->nse;
-				ar << pti->nme;
-
-				for (j=0; j<2; ++j)
-				{
-					FETiedContactSurface& s = (j==0? pti->ss : pti->ms);
-
-					int ne = s.Elements();
-					ar << ne;
-
-					for (k=0; k<ne; ++k)
-					{
-						FESurfaceElement& el = s.Element(k);
-						ar << el.Type();
-						ar << el.GetMatID() << el.m_nID << el.m_nrigid;
-						ar << el.m_node;
-						ar << el.m_lnode;
-					}
-
-					ar << s.gap;
-					ar << s.rs;
-					ar << s.Lm;
-				}
-			}
-
-			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&m_CI[i]);
-			if (pri)
-			{
-				ar << pri->Type();
-				ar << pri->m_eps;
-				ar << pri->m_atol;
-				ar << pri->m_nplc;
-
-				FEContactSurface& s = pri->m_ss;
-
-				int ne = s.Elements();
-				ar << ne;
-
-				for (k=0; k<ne; ++k)
-				{
-					FESurfaceElement& el = s.Element(k);
-					ar << el.Type();
-					ar << el.GetMatID() << el.m_nID << el.m_nrigid;
-					ar << el.m_node;
-					ar << el.m_lnode;
-				}
-
-				ar << s.gap;
-				ar << s.nu;
-				ar << s.rs;
-				ar << s.Lm;
-				ar << s.off;
-				
-				// plane data
-				if (dynamic_cast<FEPlane*>(pri->m_mp))
-				{
-					FEPlane* pp = dynamic_cast<FEPlane*>(pri->m_mp);
-					ar << FE_RIGID_PLANE;
-					ar << pp->m_nplc;
-					double* a = pp->GetEquation();
-					ar << a[0] << a[1] << a[2] << a[3];
-				}
-				else if (dynamic_cast<FERigidSphere*>(pri->m_mp))
-				{
-					FERigidSphere* ps = dynamic_cast<FERigidSphere*>(pri->m_mp);
-					ar << FE_RIGID_SPHERE;
-					ar << ps->m_rc;
-					ar << ps->m_R;
-					ar << ps->m_nplc[0] << ps->m_nplc[1] << ps->m_nplc[2];
-				}
-			}
-		}
-
-		// --- Boundary Condition Data ---
-
-		// displacements
-		ar << m_DC.size();
-		for (i=0; i<m_DC.size(); ++i)
-		{
-			ar.write(m_DC+i, sizeof(FENodalDisplacement), 1);
-		}
-
-		// nodal loads
-		ar << m_FC.size();
-		for (i=0; i<m_FC.size(); ++i)
-		{
-			ar.write(m_FC+i, sizeof(FENodalForce), 1);
-		}
-
-		// pressure forces
-		ar << m_PC.size();
-		for (i=0; i<m_PC.size(); ++i)
-		{
-			ar.write(m_PC+i, sizeof(FEPressureLoad), 1);
-		}
-
-		// body forces
-		ar.write(m_BF  ,sizeof(FE_BODYFORCE), 1);
-		ar.write(m_BF+1,sizeof(FE_BODYFORCE), 1);
-		ar.write(m_BF+2,sizeof(FE_BODYFORCE), 1);
-
-		ar << m_acc;
+		for (i=0; i<m_nrj; ++i) m_RJ[i].Serialize(ar);	
 
 		// discrete elements
 		ar << m_DE.size();
@@ -350,113 +366,10 @@ bool FEM::Serialize(Archive& ar)
 			ar << de.n1 << de.n2;
 			ar << de.E;
 		}
-
-		// --- Direct Solver Data ---
-		ar << m_nsolver;
-		ar << m_neq;
-
-		// --- I/O-stuff ---
-		ar << m_szfile << m_szplot << m_szlog << m_szdump;
-		ar << m_sztitle;
 	}
 	else
 	{
-		int mat=0;
-
-		// --- version ---
-		ar >> n;
-
-		// --- analysis data ---
-		int nsteps;
-		ar >> nsteps;
-		for (i=0; i<nsteps; ++i)
-		{
-			FEAnalysis* pstep = new FEAnalysis(*this);
-			m_Step.add(pstep);
-			pstep->Serialize(ar);
-		}
-
-		ar >> m_ftime;
-
-		// --- Load Curve Data ---
-		int nlc;
-		ar >> nlc;
-		for (i=0; i<nlc; ++i)
-		{
-			FELoadCurve* plc = new FELoadCurve;
-			ar >> n;
-			plc->Create(n);
-			for (j=0; j<n; ++j)
-			{
-				LOADPOINT& p = plc->LoadPoint(j);
-				ar >> p.time >> p.value;
-			}
-			AddLoadCurve(plc);
-		}
-
-		// --- Material Data ---
-		int nmat;
-		char szmat[256] = {0}, szvar[256] = {0};
-		ar >> nmat;
-		for (i=0; i<nmat; ++i)
-		{
-			// read the type string
-			ar >> szmat;
-
-			// create a material
-			FEMaterial* pmat = FEMaterialFactory::CreateMaterial(szmat);
-			assert(pmat);
-			AddMaterial(pmat);
-
-			// read the name
-			ar >> szmat;
-			pmat->SetName(szmat);
-
-			// read all parameters
-			auto_ptr<FEParameterList> pl(pmat->GetParameterList());
-			int n = 0;
-			ar >> n;
-			assert(n == pl->Parameters());
-			list<FEParam>::iterator it = pl->first();
-			for (int j=0; j<n; ++j, ++it)
-			{
-				// read the value
-				switch (it->m_itype)
-				{
-				case FE_PARAM_INT    : ar >> it->value<int   >(); break;
-				case FE_PARAM_BOOL   : ar >> it->value<bool  >(); break;
-				case FE_PARAM_DOUBLE : ar >> it->value<double>(); break;
-				case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<double>()[k]; } break;
-				case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<int   >()[k]; } break;
-				default:
-					assert(false);
-				}
-			}
-	
-			// not all parameters can be serialized through the parameter lists
-			// so we have to save those parameters the hard way
-
-			if (dynamic_cast<FETransverselyIsotropic*>(pmat))
-			{
-				FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
-				ar >> pm->ca0;
-				ar >> pm->beta;
-				ar >> pm->l0;
-				ar >> pm->refl;
-			}
-
-			if (dynamic_cast<FERigid*>(pmat))
-			{
-				FERigid* pm = dynamic_cast<FERigid*>(pmat);
-				ar.read(pm->m_bc, sizeof(int), 6);
-				ar.read(pm->m_fc, sizeof(int), 6);
-				ar.read(pm->m_fs, sizeof(double), 6);
-			}
-		}
-
-		// --- Geometry Data ---
-
-		m_mesh.Serialize(ar);
+		int i, j, n, m, mat;
 
 		// read solid element state data
 		for (i=0; i<m_mesh.SolidElements(); ++i)
@@ -504,20 +417,12 @@ bool FEM::Serialize(Archive& ar)
 		}
 
 		// rigid bodies
-		ar >> m_nreq >> m_nrb >> m_nrm;
+		ar >> m_nreq >> m_nrm >> m_nrb;
 		if (m_nrb) m_RB.create(m_nrb);
 		for (i=0; i<m_nrb; ++i)
 		{
 			FERigidBody& rb = m_RB[i];
-
-			ar >> rb.m_nID >> rb.m_mat >> rb.m_mass >> rb.m_Fr >> rb.m_Mr;
-			ar >> rb.m_r0 >> rb.m_rt >> rb.m_qt;
-//			ar.read(rb.m_bc, sizeof(int), 6);
-			ar.read(rb.m_LM, sizeof(int), 6);
-			ar.read(rb.m_Up, sizeof(double), 6);
-			ar.read(rb.m_Ut, sizeof(double), 6);
-			ar.read(rb.m_du, sizeof(double), 6);
-
+			rb.Serialize(ar);
 			rb.AttachToFEM(this);
 		}
 
@@ -526,254 +431,251 @@ bool FEM::Serialize(Archive& ar)
 		for (i=0; i<m_nrj; ++i)
 		{
 			FERigidJoint* prj = new FERigidJoint(this);
-			ar.read(prj, sizeof(FERigidJoint), 1);
+			prj->Serialize(ar);
 			m_RJ.add(prj);
 		}
-
-		// contact data
-		int numci;
-		ar >> m_bcontact;
-		ar >> numci;
-		for (i=0; i<numci; ++i)
-		{
-			ar >> n;
-
-			switch (n)
-			{
-			case FE_CONTACT_SLIDING:
-				{
-					FESlidingInterface* ps = new FESlidingInterface(this);
-					FESlidingInterface& si = *ps;
-					m_CI.add(ps);
-
-					ar >> si.m_npass;
-					ar >> si.m_eps;
-					ar >> si.m_atol;
-					ar >> si.m_nplc;
-					ar >> si.m_bautopen;
-					ar >> si.m_nsegup;
-					ar >> si.m_blaugon;
-
-					if (si.m_nplc >= 0) si.m_pplc = &m_LC[si.m_nplc];
-
-					for (j=0; j<2; ++j)
-					{
-						FEContactSurface& s = (j==0? si.m_ss : si.m_ms);
-
-						int ne=0;
-						ar >> ne;
-						s.Create(ne);
-
-						for (k=0; k<ne; ++k)
-						{
-							FESurfaceElement& el = s.Element(k);
-	
-							ar >> n;
-							el.SetType(n);
-		
-							ar >> mat >> el.m_nID >> el.m_nrigid;
-							ar >> el.m_node;
-							ar >> el.m_lnode;
-
-							el.SetMatID(mat);
-						}
-
-						// initialize surface
-						s.Init();
-
-						// read the contact data
-						// Note that we do this after Init() since this data gets 
-						// initialized to zero there
-						ar >> s.eps;
-						ar >> s.gap;
-						ar >> s.nu;
-						ar >> s.rs;
-						ar >> s.Lm;
-						ar >> s.off;
-					}
-				}
-				break;
-
-			case FE_CONTACT_TIED:
-				{
-					FETiedInterface* pt = new FETiedInterface(this);
-					FETiedInterface& ti = *pt;
-					m_CI.add(pt);
-
-					ar >> ti.m_eps;
-					ar >> ti.m_atol;
-					ar >> ti.m_nplc;
-					ar >> ti.nse;
-					ar >> ti.nme;
-
-					if (ti.m_nplc >= 0) ti.m_pplc = &m_LC[ti.m_nplc];
-
-					for (j=0; j<2; ++j)
-					{
-						FETiedContactSurface& s = (j==0? ti.ss : ti.ms);
-
-						int ne=0;
-						ar >> ne;
-						s.Create(ne);
-
-						for (k=0; k<ne; ++k)
-						{
-							FESurfaceElement& el = s.Element(k);
-	
-							ar >> n;
-							el.SetType(n);
-		
-							ar >> mat >> el.m_nID >> el.m_nrigid;
-							ar >> el.m_node;
-							ar >> el.m_lnode;
-
-							el.SetMatID(mat);
-						}
-
-						// initialize surface
-						s.Init();
-
-						// read the contact data
-						// Note that we do this after Init() since this data gets 
-						// initialized to zero there
-						ar >> s.gap;
-						ar >> s.rs;
-						ar >> s.Lm;
-					}
-				}
-				break;
-
-			case FE_CONTACT_RIGIDWALL:
-				{
-					FERigidWallInterface* pr = new FERigidWallInterface(this);
-					FERigidWallInterface& ri = *pr;
-					m_CI.add(pr);
-
-					ar >> ri.m_eps;
-					ar >> ri.m_atol;
-					ar >> ri.m_nplc;
-
-
-					if (ri.m_nplc >= 0) ri.m_pplc = &m_LC[ri.m_nplc];
-
-					FEContactSurface& s = ri.m_ss;
-
-					int ne=0;
-					ar >> ne;
-					s.Create(ne);
-
-					for (k=0; k<ne; ++k)
-					{
-						FESurfaceElement& el = s.Element(k);
-	
-						ar >> n;
-						el.SetType(n);
-		
-						ar >> mat >> el.m_nID >> el.m_nrigid;
-						ar >> el.m_node;
-						ar >> el.m_lnode;
-
-						el.SetMatID(mat);
-					}
-
-					// initialize surface
-					s.Init();
-
-					ar >> s.gap;
-					ar >> s.nu;
-					ar >> s.rs;
-					ar >> s.Lm;
-					ar >> s.off;
-
-					// plane data
-					int ntype;
-					ar >> ntype;
-					switch (ntype)
-					{
-					case FE_RIGID_PLANE:
-						{
-							ri.SetMasterSurface(new FEPlane(this));
-							FEPlane& pl = dynamic_cast<FEPlane&>(*ri.m_mp);
-							ar >> pl.m_nplc;
-							if (pl.m_nplc >= 0) pl.m_pplc = &m_LC[pl.m_nplc];
-							double* a = pl.GetEquation();
-							ar >> a[0] >> a[1] >> a[2] >> a[4];
-						}
-						break;
-					case FE_RIGID_SPHERE:
-						{
-							ri.SetMasterSurface(new FERigidSphere(this));
-							FERigidSphere& s = dynamic_cast<FERigidSphere&>(*ri.m_mp);
-							ar >> s.m_rc;
-							ar >> s.m_R;
-							ar >> s.m_nplc[0] >> s.m_nplc[1] >> s.m_nplc[2];
-						}
-						break;
-					default:
-						assert(false);
-					}
-				}
-			}
-		}
-
-		// --- Boundary Condition Data ---
-
-		// displacements
-		int ndis;
-		ar >> ndis;
-		m_DC.create(ndis);
-		for (i=0; i<ndis; ++i)
-		{
-			ar.read(m_DC+i, sizeof(FENodalDisplacement), 1);
-		}
-
-		// nodal loads
-		int ncnf;
-		ar >> ncnf;
-		m_FC.create(ncnf);
-		for (i=0; i<ncnf; ++i)
-		{
-			ar.read(m_FC+i, sizeof(FENodalForce), 1);
-		}
-
-		// pressure forces
-		int npr;
-		ar >> npr;
-		m_PC.create(npr);
-		for (i=0; i<npr; ++i)
-		{
-			ar.read(m_PC+i, sizeof(FEPressureLoad), 1);
-		}
-
-		// body forces
-		ar.read(m_BF  ,sizeof(FE_BODYFORCE), 1);
-		ar.read(m_BF+1,sizeof(FE_BODYFORCE), 1);
-		ar.read(m_BF+2,sizeof(FE_BODYFORCE), 1);
-
-		ar >> m_acc;
 
 		// discrete elements
 		int nde;
 		ar >> nde;
-		if (nde > 0)
+		if (nde > 0) m_DE.setsize(nde);
+		for (i=0; i<nde; ++i)
 		{
-			m_DE.setsize(nde);
-			for (i=0; i<nde; ++i)
+			FE_DISCRETE_ELEMENT& de = m_DE[i];
+			ar >> de.n1 >> de.n2;
+			ar >> de.E;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEM::SerializeContactData(Archive &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_bcontact;
+		ar << ContactInterfaces();
+		for (int i=0; i<ContactInterfaces(); ++i)
+		{
+			ar << m_CI[i].Type();
+			m_CI[i].Serialize(ar);
+		}
+	}
+	else
+	{
+		int numci, ntype;
+		ar >> m_bcontact;
+		ar >> numci;
+		for (int i=0; i<numci; ++i)
+		{
+			FEContactInterface* ps;
+
+			// get the interface type
+			ar >> ntype;
+
+			// create a new interface
+			switch (ntype)
 			{
-				FE_DISCRETE_ELEMENT& de = m_DE[i];
-				ar >> de.n1 >> de.n2;
-				ar >> de.E;
+			case FE_CONTACT_SLIDING  : ps = new FESlidingInterface(this); break;
+			case FE_CONTACT_TIED     : ps = new FETiedInterface(this); break;
+			case FE_CONTACT_RIGIDWALL: ps = new FERigidWallInterface(this); break;
+			default:
+				assert(false);
 			}
+				
+			// serialize interface data from archive
+			ps->Serialize(ar);
+
+			// add interface to list
+			m_CI.add(ps);
+		}	
+	}
+}
+
+//-----------------------------------------------------------------------------
+// TODO: do we need to store the m_bActive flag of the boundary conditions?
+//
+void FEM::SerializeBoundaryData(Archive& ar)
+{
+	int i;
+
+	if (ar.IsSaving())
+	{
+		// displacements
+		ar << m_DC.size();
+		for (i=0; i<m_DC.size(); ++i) 
+		{
+			FENodalDisplacement& dc = m_DC[i];
+			ar << dc.bc << dc.lc << dc.node << dc.s;
 		}
 
-		// --- Direct Solver Data ---
-		ar >> m_nsolver;
-		ar >> m_neq;
+		// nodal loads
+		ar << m_FC.size();
+		for (i=0; i<m_FC.size(); ++i)
+		{
+			FENodalForce& fc = m_FC[i];
+			ar << fc.bc << fc.lc << fc.node << fc.s;
+		}
 
-		// --- I/O-stuff ---
+		// pressure forces
+		ar << m_PC.size();
+		for (i=0; i<m_PC.size(); ++i)
+		{
+			FEPressureLoad& pc = m_PC[i];
+			ar << pc.blinear << pc.face << pc.lc;
+			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
+		}
+
+		// rigid body displacements
+		ar << m_RDC.size();
+		for (i=0; i<m_RDC.size(); ++i)
+		{
+			FERigidBodyDisplacement& dc = m_RDC[i];
+			ar << dc.bc << dc.id << dc.lc << dc.sf;
+		}
+
+		// rigid body forces
+		ar << m_RFC.size();
+		for (i=0; i<m_RFC.size(); ++i)
+		{
+			FERigidBodyForce& fc = m_RFC[i];
+			ar << fc.bc << fc.id << fc.lc << fc.sf;
+		}
+
+		// rigid nodes
+		ar << m_RN.size();
+		for (i=0; i<m_RN.size(); ++i)
+		{
+			FERigidNode& rn = m_RN[i];
+			ar << rn.nid << rn.rid;
+		}
+
+		// linear constraints
+		ar << (int) m_LinC.size();
+		list<FELinearConstraint>::iterator it = m_LinC.begin();
+		for (i=0; i<(int) m_LinC.size(); ++i, ++it) it->Serialize(ar);
+
+		ar << m_LCT;
+
+		// aug lag linear constraints
+		ar << (int) m_LCSet.size();
+		list<FELinearConstraintSet*>::iterator ic = m_LCSet.begin();
+		for (i=0; i< (int) m_LCSet.size(); ++i, ++ic) (*ic)->Serialize(ar);
+	}
+	else
+	{
+		int n;
+		// displacements
+		ar >> n;
+		if (n) m_DC.create(n);
+		for (i=0; i<n; ++i) 
+		{
+			FENodalDisplacement& dc = m_DC[i];
+			ar >> dc.bc >> dc.lc >> dc.node >> dc.s;
+		}
+		
+		// nodal loads
+		ar >> n;
+		if (n) m_FC.create(n);
+		for (i=0; i<n; ++i)
+		{
+			FENodalForce& fc = m_FC[i];
+			ar >> fc.bc >> fc.lc >> fc.node >> fc.s;
+		}
+
+		// pressure forces
+		ar >> n;
+		if (n) m_PC.create(n);
+		for (i=0; i<n; ++i)
+		{
+			FEPressureLoad& pc = m_PC[i];
+			ar >> pc.blinear >> pc.face >> pc.lc;
+			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
+		}
+
+		// rigid body displacements
+		ar >> n;
+		if (n) m_RDC.create(n);
+		for (i=0; i<n; ++i)
+		{
+			FERigidBodyDisplacement& dc = m_RDC[i];
+			ar >> dc.bc >> dc.id >> dc.lc >> dc.sf;
+		}
+
+		// rigid body forces
+		ar >> n;
+		if (n) m_RFC.create(n);
+		for (i=0; i<n; ++i)
+		{
+			FERigidBodyForce& fc = m_RFC[i];
+			ar >> fc.bc >> fc.id >> fc.lc >> fc.sf;
+		}
+
+		// rigid nodes
+		ar >> n;
+		if (n) m_RN.create(n);
+		for (i=0; i<n; ++i)
+		{
+			FERigidNode& rn = m_RN[i];
+			ar >> rn.nid >> rn.rid;
+		}
+
+		// linear constraints
+		ar >> n;
+		FELinearConstraint LC;
+		for (i=0; i<n; ++i)
+		{
+			LC.Serialize(ar);
+			m_LinC.push_back(LC);
+		}
+
+		ar >> m_LCT;
+
+		// reset the pointer table
+		int nlin = m_LinC.size();
+		m_LCA.create(nlin);
+		list<FELinearConstraint>::iterator ic = m_LinC.begin();
+		for (i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
+
+		// aug lag linear constraints
+		ar >> n;
+		for (i=0; i<n; ++i)
+		{
+			FELinearConstraintSet* plc = new FELinearConstraintSet(this);
+			plc->Serialize(ar);
+			m_LCSet.push_back(plc);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// TODO: serialize data records
+
+void FEM::SerializeIOData(Archive &ar)
+{
+	if (ar.IsSaving())
+	{
+		// file names
+		ar << m_szfile << m_szplot << m_szlog << m_szdump;
+		ar << m_sztitle;
+
+		// plot file
+		int* n = m_plot.m_nfield;
+		ar << n[0] << n[1] << n[2] << n[3] << n[4];
+	}
+	else
+	{
+		// file names
 		ar >> m_szfile >> m_szplot >> m_szlog >> m_szdump;
 		ar >> m_sztitle;
-	}
 
-	return true;
+		// don't forget to call SetInputFilename so
+		// that m_szfile_title gets initialized
+		SetInputFilename(m_szfile);
+
+		// plot file
+		int* n = m_plot.m_nfield;
+		ar >> n[0] >> n[1] >> n[2] >> n[3] >> n[4];
+	}
 }

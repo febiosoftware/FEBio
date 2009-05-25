@@ -27,6 +27,6 @@
 // It is incremented when the structure of this file is modified.
 //
 
-#define RSTRTVERSION		0x05
+#define RSTRTVERSION		0x06
 
 #endif // !defined(AFX_VERSION_H__5901DABB_91FB_C34E_9011_12397479QBEE__INCLUDED_)

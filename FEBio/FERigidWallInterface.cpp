@@ -371,3 +371,119 @@ bool FERigidWallInterface::Augment(int naug)
 
 	return bconv;
 }
+
+//-----------------------------------------------------------------------------
+
+void FERigidWallInterface::Serialize(Archive &ar)
+{
+	int k, n, mat;
+	if (ar.IsSaving())
+	{
+		ar << m_eps;
+		ar << m_atol;
+		ar << m_nplc;
+
+		FEContactSurface& s = m_ss;
+
+		int ne = s.Elements();
+		ar << ne;
+
+		for (k=0; k<ne; ++k)
+		{
+			FESurfaceElement& el = s.Element(k);
+			ar << el.Type();
+			ar << el.GetMatID() << el.m_nID << el.m_nrigid;
+			ar << el.m_node;
+			ar << el.m_lnode;
+		}
+
+		ar << s.gap;
+		ar << s.nu;
+		ar << s.rs;
+		ar << s.Lm;
+		ar << s.off;
+		
+		// plane data
+		if (dynamic_cast<FEPlane*>(m_mp))
+		{
+			FEPlane* pp = dynamic_cast<FEPlane*>(m_mp);
+			ar << FE_RIGID_PLANE;
+			ar << pp->m_nplc;
+			double* a = pp->GetEquation();
+			ar << a[0] << a[1] << a[2] << a[3];
+		}
+		else if (dynamic_cast<FERigidSphere*>(m_mp))
+		{
+			FERigidSphere* ps = dynamic_cast<FERigidSphere*>(m_mp);
+			ar << FE_RIGID_SPHERE;
+			ar << ps->m_rc;
+			ar << ps->m_R;
+			ar << ps->m_nplc[0] << ps->m_nplc[1] << ps->m_nplc[2];
+		}
+	}
+	else
+	{
+		ar >> m_eps;
+		ar >> m_atol;
+		ar >> m_nplc;
+
+		if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
+
+		FEContactSurface& s = m_ss;
+
+		int ne=0;
+		ar >> ne;
+		s.Create(ne);
+
+		for (k=0; k<ne; ++k)
+		{
+			FESurfaceElement& el = s.Element(k);
+
+			ar >> n;
+			el.SetType(n);
+
+			ar >> mat >> el.m_nID >> el.m_nrigid;
+			ar >> el.m_node;
+			ar >> el.m_lnode;
+
+			el.SetMatID(mat);
+		}
+
+		// initialize surface
+		s.Init();
+
+		ar >> s.gap;
+		ar >> s.nu;
+		ar >> s.rs;
+		ar >> s.Lm;
+		ar >> s.off;
+
+		// plane data
+		int ntype;
+		ar >> ntype;
+		switch (ntype)
+		{
+		case FE_RIGID_PLANE:
+			{
+				SetMasterSurface(new FEPlane(m_pfem));
+				FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
+				ar >> pl.m_nplc;
+				if (pl.m_nplc >= 0) pl.m_pplc = m_pfem->GetLoadCurve(pl.m_nplc);
+				double* a = pl.GetEquation();
+				ar >> a[0] >> a[1] >> a[2] >> a[4];
+			}
+			break;
+		case FE_RIGID_SPHERE:
+			{
+				SetMasterSurface(new FERigidSphere(m_pfem));
+				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
+				ar >> s.m_rc;
+				ar >> s.m_R;
+				ar >> s.m_nplc[0] >> s.m_nplc[1] >> s.m_nplc[2];
+			}
+			break;
+		default:
+			assert(false);
+		}
+	}
+}

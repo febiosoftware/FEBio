@@ -11,6 +11,7 @@
 
 #include "FEMesh.h"
 #include "FESurface.h"
+#include "Archive.h"
 
 class FEM;
 
@@ -46,6 +47,9 @@ public:
 
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug) = 0;
+
+	//! serialize data to archive
+	virtual void Serialize(Archive& ar) = 0;
 
 protected:
 	//! don't call the default constructor

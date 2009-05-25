@@ -23,84 +23,108 @@ FERestartImport::~FERestartImport()
 
 bool FERestartImport::Load(FEM& fem, const char* szfile)
 {
-	// open the XML file
-	if (m_xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening restart file %s\n", szfile);
-
-	// keep a pointer to the fem object
-	m_pfem = &fem;
-
-	// loop over child tags
-	try
+	// check the extension of the file
+	// if the extension is .dmp or not given it is assumed the file
+	// is a bindary archive (dump file). Otherwise it is assumed the
+	// file is a restart input file.
+	const char* ch = strrchr(szfile, '.');
+	if ((ch == 0) || (strcmp(ch, ".dmp") == 0) || (strcmp(ch, ".DMP") == 0))
 	{
-		// find the root element
-		XMLTag tag;
-		if (m_xml.FindTag("febio_restart", tag) == false) return errf("FATAL ERROR: File does not contain restart data.\n");
-
-		// check the version number
-		if (strcmp(tag.m_szatv[0], "1.0") != 0) return errf("FATAL ERROR: Incorrect restart file version\n");
-
-		// the next tag has to be the archive
-		++tag;
-		if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
-		char szar[256];
-		tag.value(szar);
+		// the file is binary so just read the dump file and return
 
 		// open the archive
 		Archive ar;
-		if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
+		if (ar.Open(szfile) == false) return errf("FATAL ERROR: failed opening restart archive\n");
 
 		// read the archive
-		if (fem.Serialize(ar) == false) return errf("FATAL ERROR: failed reading restart data from archive %s\n", szar);
+		if (fem.Serialize(ar) == false) return errf("FATAL ERROR: failed reading restart data from archive %s\n", szfile);
 
-		// read the restart data
-		++tag;
-		while (!tag.isend())
+		// we're done
+		return true;
+	}
+	else
+	{
+		// the file is assumed to be a xml-text file
+
+		// open the XML file
+		if (m_xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening restart file %s\n", szfile);
+
+		// keep a pointer to the fem object
+		m_pfem = &fem;
+
+		// loop over child tags
+		try
 		{
-			if      (tag == "Control") ParseControlSection  (tag);
-			else if (tag == "LoadData") ParseLoadSection    (tag);
-			else throw XMLReader::InvalidTag(tag);
+			// find the root element
+			XMLTag tag;
+			if (m_xml.FindTag("febio_restart", tag) == false) return errf("FATAL ERROR: File does not contain restart data.\n");
 
+			// check the version number
+			if (strcmp(tag.m_szatv[0], "1.0") != 0) return errf("FATAL ERROR: Incorrect restart file version\n");
+
+			// the next tag has to be the archive
 			++tag;
-		}
-	}
-	catch (XMLReader::XMLSyntaxError)
-	{
-		fprintf(stderr, "FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
-		return false;
-	}
-	catch (XMLReader::InvalidTag e)
-	{
-		fprintf(stderr, "FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::InvalidAttributeValue e)
-	{
-		const char* szt = e.tag.m_sztag;
-		const char* sza = e.szatt;
-		const char* szv = e.szval;
-		int l = e.tag.m_nstart_line;
-		fprintf(stderr, "FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
-		return false;
-	}
-	catch (XMLReader::MissingAttribute e)
-	{
-		fprintf(stderr, "FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (XMLReader::UnmatchedEndTag e)
-	{
-		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
-		fprintf(stderr, "FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
-		return false;
-	}
-	catch (...)
-	{
-		fprintf(stderr, "FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
-		return false;
-	}
+			if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
+			char szar[256];
+			tag.value(szar);
 
-	// close the XML file
-	m_xml.Close();
+			// open the archive
+			Archive ar;
+			if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
+
+			// read the archive
+			if (fem.Serialize(ar) == false) return errf("FATAL ERROR: failed reading restart data from archive %s\n", szar);
+
+			// read the restart data
+			++tag;
+			while (!tag.isend())
+			{
+				if      (tag == "Control") ParseControlSection  (tag);
+				else if (tag == "LoadData") ParseLoadSection    (tag);
+				else throw XMLReader::InvalidTag(tag);
+
+				++tag;
+			}
+		}
+		catch (XMLReader::XMLSyntaxError)
+		{
+			fprintf(stderr, "FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
+			return false;
+		}
+		catch (XMLReader::InvalidTag e)
+		{
+			fprintf(stderr, "FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+			return false;
+		}
+		catch (XMLReader::InvalidAttributeValue e)
+		{
+			const char* szt = e.tag.m_sztag;
+			const char* sza = e.szatt;
+			const char* szv = e.szval;
+			int l = e.tag.m_nstart_line;
+			fprintf(stderr, "FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
+			return false;
+		}
+		catch (XMLReader::MissingAttribute e)
+		{
+			fprintf(stderr, "FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
+			return false;
+		}
+		catch (XMLReader::UnmatchedEndTag e)
+		{
+			const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
+			fprintf(stderr, "FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+			return false;
+		}
+		catch (...)
+		{
+			fprintf(stderr, "FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
+			return false;
+		}
+
+		// close the XML file
+		m_xml.Close();
+	}
 
 	// we're done!
 	return true;

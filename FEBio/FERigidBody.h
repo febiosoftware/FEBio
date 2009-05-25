@@ -13,6 +13,7 @@
 #include "vec3d.h"
 #include "quatd.h"
 #include "FEBoundaryCondition.h"
+#include "Archive.h"
 
 class FEM;
 
@@ -53,6 +54,9 @@ public:
 	void AttachToFEM(FEM* pfem) { m_pfem = pfem; }
 
 	void Update();
+
+	//! serialize data to archive
+	void Serialize(Archive& ar);
 
 public:
 	int		m_nID;		// ID of rigid body

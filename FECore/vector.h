@@ -265,7 +265,6 @@ public:
 	// function to return the size of the vector
 	int size() const { return m_nsize; }
 
-protected:
 	void clear()
 	{
 		for (int i=0; i<m_nsize; ++i) delete m_pdata[i];

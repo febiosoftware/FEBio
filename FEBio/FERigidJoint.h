@@ -11,6 +11,7 @@
 
 #include "vec3d.h"
 #include "FECore/vector.h"
+#include "Archive.h"
 
 class FEM;
 
@@ -52,6 +53,9 @@ public:
 
 	//! calculate Lagrangian augmentation
 	bool Augment();
+
+	//! serialize data to archive
+	void Serialize(Archive& ar);
 
 public:
 	int	m_nRBa;		//!< rigid body A that the joint connects

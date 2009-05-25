@@ -91,6 +91,12 @@ void FESolver::Serialize(Archive& ar)
 		ar << m_maxups;
 		ar << m_maxref;
 		ar << m_cmax;
+
+		ar << m_nrhs;
+		ar << m_niter;
+		ar << m_nref;
+		ar << m_nups;
+		ar << m_naug;
 	}
 	else
 	{
@@ -98,5 +104,11 @@ void FESolver::Serialize(Archive& ar)
 		ar >> m_maxups;
 		ar >> m_maxref;
 		ar >> m_cmax;
+
+		ar >> m_nrhs;
+		ar >> m_niter;
+		ar >> m_nref;
+		ar >> m_nups;
+		ar >> m_naug;
 	}
 }

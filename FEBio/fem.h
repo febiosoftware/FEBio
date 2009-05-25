@@ -93,6 +93,16 @@ public:
 		double	val;	// coefficient value
 	};
 
+public:
+	FELinearConstraint(){}
+	FELinearConstraint(const FELinearConstraint& LC)
+	{
+		master = LC.master;
+		int n = (int) LC.slave.size();
+		list<SlaveDOF>::const_iterator it = LC.slave.begin();
+		for (int i=0; i<n; ++i) slave.push_back(*it);
+	}
+
 	double FindDOF(int n)
 	{
 		int N = slave.size();
@@ -100,6 +110,31 @@ public:
 		for (int i=0; i<N; ++i, ++it) if (it->neq == n) return it->val;
 
 		return 0;
+	}
+
+	void Serialize(Archive& ar)
+	{
+		if (ar.IsSaving())
+		{
+			ar.write(&master, sizeof(DOF), 1);
+			int n = (int) slave.size();
+			ar << n;
+			list<SlaveDOF>::iterator it = slave.begin();
+			for (int i=0; i<n; ++i, ++it) ar << it->val << it->node << it->bc << it->neq;
+		}
+		else
+		{
+			slave.clear();
+			ar.read(&master, sizeof(DOF), 1);
+			int n;
+			ar >> n;
+			for (int i=0; i<n; ++i)
+			{
+				SlaveDOF dof;
+				ar >> dof.val >> dof.node >> dof.bc >> dof.neq;
+				slave.push_back(dof);
+			}
+		}
 	}
 
 public:
@@ -304,6 +339,9 @@ public:
 	//! return number of contact interfaces
 	int ContactInterfaces() { return m_CI.size(); } 
 
+	//! find a boundary condition from the ID
+	FEBoundaryCondition* FindBC(int nid);
+
 protected:
 	// copy constructor and assignment operator are protected since they
 	// are reserved for a special purpose and cannot be used in a way
@@ -314,6 +352,15 @@ protected:
 
 	//! assignment operator
 	void operator = (FEM& fem);
+
+protected:
+	void SerializeMaterials   (Archive& ar);
+	void SerializeAnalysisData(Archive& ar);
+	void SerializeGeometry    (Archive& ar);
+	void SerializeContactData (Archive& ar);
+	void SerializeBoundaryData(Archive& ar);
+	void SerializeIOData      (Archive& ar);
+	void SerializeLoadData    (Archive& ar);
 
 public:
 	//{ --- Initialization routines ---
@@ -359,6 +406,10 @@ public:
 		FEAnalysis*				m_pStep;	//!< pointer to current analysis step
 		double					m_ftime;	//!< current time value
 		int	m_nhex8;						//!< element type for hex8
+
+		// body force loads
+		FE_BODYFORCE	m_BF[3];		//!< body force data
+		vec3d			m_acc;			//!< acceleration due to bodyforces
 	//}
 
 	// --- Geometry Data ---
@@ -367,16 +418,21 @@ public:
 
 		FESurface*	m_psurf;	//!< surface element array
 
-		// --rigid body data--
+		// rigid body data
 		int						m_nreq;	//!< start of rigid body equations
-		vector<FERigidBody>		m_RB;	//!< rigid body array
-		int						m_nrb;	//!< nr of rigid bodies in problem
 		int						m_nrm;	//!< nr of rigid materials
+		int						m_nrb;	//!< nr of rigid bodies in problem
+		vector<FERigidBody>		m_RB;	//!< rigid body array
 
+		// rigid joints
 		int							m_nrj;	//!< nr of rigid joints
 		ptr_vector<FERigidJoint>	m_RJ;	//!< rigid joint array
 
-		// --contact data--
+		// discrete elements
+		vector<FE_DISCRETE_ELEMENT>	m_DE;	//!< discrete elements
+	//}
+
+	//{ --- Contact Data --
 		bool								m_bcontact;	//!< contact flag
 		ptr_vector<FEContactInterface>		m_CI;		//!< contact interface array
 	//}
@@ -402,6 +458,9 @@ public:
 		// concentrated nodal loads data
 		vector<FENodalForce>	m_FC;		//!< concentrated nodal force cards
 
+		// pressure boundary data
+		vector<FEPressureLoad>	m_PC;		//!< pressure boundary cards
+
 		// rigid displacements
 		vector<FERigidBodyDisplacement>	m_RDC;	//!< rigid body displacements
 
@@ -418,16 +477,6 @@ public:
 
 		// Augmented Lagrangian linear constraint data
 		list<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
-
-		// pressure boundary data
-		vector<FEPressureLoad>	m_PC;		//!< pressure boundary cards
-
-		// body force loads
-		FE_BODYFORCE	m_BF[3];		//!< body force data
-		vec3d			m_acc;			//!< acceleration due to bodyforces
-
-		// discrete elements
-		vector<FE_DISCRETE_ELEMENT>	m_DE;	//!< discrete elements
 	//}
 
 	// --- Direct Solver Data ---

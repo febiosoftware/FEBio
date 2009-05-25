@@ -394,6 +394,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBoundaryCondition.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBox.cpp"
 				>
 			</File>

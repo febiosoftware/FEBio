@@ -4,12 +4,10 @@
 #include "Archive.h"
 #include "XMLReader.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FEM::FEM
-// constructor of the FEM class
-// Initializes default variables
-//
-
+//-----------------------------------------------------------------------------
+//! Constructor of the FEM class
+//! Initializes default variables
+//!
 FEM::FEM()
 {
 	// --- Analysis Data ---
@@ -18,6 +16,8 @@ FEM::FEM()
 	m_Step.add(m_pStep);
 	m_nStep = 0;
 	m_nhex8 = FE_HEX;
+
+	m_ftime = 0;
 
 	// --- Geometry Data ---
 	m_nreq = 0;
@@ -367,4 +367,22 @@ bool FEM::Configure(const char *szfile)
 	xml.Close();
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+FEBoundaryCondition* FEM::FindBC(int nid)
+{
+	int i;
+	for (i=0; i<m_DC.size(); ++i) if (m_DC[i].GetID() == nid) return &m_DC[i];
+
+	for (i=0; i<m_FC.size(); ++i) if (m_FC[i].GetID() == nid) return &m_FC[i];
+
+	for (i=0; i<m_PC.size(); ++i) if (m_PC[i].GetID() == nid) return &m_PC[i];
+
+	for (i=0; i<m_RDC.size(); ++i) if (m_RDC[i].GetID() == nid) return &m_RDC[i];
+
+	for (i=0; i<m_RFC.size(); ++i) if (m_RFC[i].GetID() == nid) return &m_RFC[i];
+
+	return 0;
 }

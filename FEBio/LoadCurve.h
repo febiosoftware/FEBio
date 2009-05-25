@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/vector.h"
+#include "Archive.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements the concept of a loadcurve.
@@ -78,6 +79,9 @@ public:
 
 	//! see if there is a point at time t
 	bool HasPoint(double t);
+
+	//! Serialize data to archive
+	void Serialize(Archive& ar);
 
 protected:
 	vector<LOADPOINT>	m_lp;	//!< load time values

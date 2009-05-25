@@ -37,6 +37,7 @@ public:
 	double	m_E;		//!< Young's modulus
 	double	m_v;		//!< Poisson's ratio
 
+public:
 	int		m_com;	//!< center of mass input flag
 	vec3d	m_rc;	//!< center of mass
 

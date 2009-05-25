@@ -3,6 +3,7 @@
 #include "FECore/vector.h"
 #include "FECore/matrix.h"
 #include "FEStiffnessMatrix.h"
+#include "Archive.h"
 #include <list>
 using namespace std;
 
@@ -33,6 +34,9 @@ public:
 	//! constructor
 	FEAugLagLinearConstraint() { m_lam = 0; }
 
+	//! serialize data to archive
+	void Serialize(Archive& ar);
+
 public:
 	list<DOF>	m_dof;	//!< list of participating dofs
 	double		m_lam;	//!< lagrange multiplier
@@ -61,6 +65,9 @@ public:
 
 	//! initialization
 	void Init();
+
+	//! serialize data to archive
+	void Serialize(Archive& ar);
 
 protected:
 	//! calculate the constraint value

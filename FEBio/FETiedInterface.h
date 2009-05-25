@@ -53,6 +53,9 @@ public:
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug);
 
+	//! serialize data to archive
+	void Serialize(Archive& ar);
+
 private:
 	//! copy constructor hidden
 	FETiedInterface(FETiedInterface& si){}

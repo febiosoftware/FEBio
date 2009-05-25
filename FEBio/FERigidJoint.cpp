@@ -218,3 +218,17 @@ bool FERigidJoint::Augment()
 	
 	return bconv;
 }
+
+//-----------------------------------------------------------------------------
+
+void FERigidJoint::Serialize(Archive& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar.write(this, sizeof(FERigidJoint), 1);
+	}
+	else
+	{
+		ar.read(this, sizeof(FERigidJoint), 1);
+	}
+}

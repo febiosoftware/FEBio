@@ -57,6 +57,9 @@ public:
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug);
 
+	//! serialize data to archive
+	void Serialize(Archive& ar);
+
 protected:
 	//! calculate auto penalty factor
 	void CalcAutoPenalty(FEContactSurface& s);

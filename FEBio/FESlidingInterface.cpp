@@ -1594,3 +1594,113 @@ void FESlidingInterface::MapFrictionData(int inode, FEContactSurface& ss, FECont
 	ss.Lt[inode][0] = Lt[0];
 	ss.Lt[inode][1] = Lt[1];
 }
+
+//-----------------------------------------------------------------------------
+
+void FESlidingInterface::Serialize(Archive& ar)
+{
+	int j, k, n, mat;
+
+	if (ar.IsSaving())
+	{
+		ar << m_npass;
+		ar << m_naugmax;
+		ar << m_naugmin;
+		ar << m_gtol;
+		ar << m_atol;
+		ar << m_blaugon;
+		ar << m_ktmult;
+		ar << m_stol;
+		ar << m_bautopen;
+		ar << m_eps;
+		ar << m_mu;
+		ar << m_epsf;
+		ar << m_nsegup;
+		ar << m_nplc;
+
+		for (j=0; j<2; ++j)
+		{
+			FEContactSurface& s = (j==0? m_ss : m_ms);
+
+			int ne = s.Elements();
+			ar << ne;
+
+			for (k=0; k<ne; ++k)
+			{
+				FESurfaceElement& el = s.Element(k);
+				ar << el.Type();
+				ar << el.GetMatID() << el.m_nID << el.m_nrigid;
+				ar << el.m_node;
+				ar << el.m_lnode;
+			}
+
+			ar << s.gap;
+			ar << s.nu;
+			ar << s.rs;
+			ar << s.rsp;
+			ar << s.Lm;
+			ar << s.M;
+			ar << s.Lt;
+			ar << s.off;
+			ar << s.eps;
+		}
+	}
+	else
+	{
+		ar >> m_npass;
+		ar >> m_naugmax;
+		ar >> m_naugmin;
+		ar >> m_gtol;
+		ar >> m_atol;
+		ar >> m_blaugon;
+		ar >> m_ktmult;
+		ar >> m_stol;
+		ar >> m_bautopen;
+		ar >> m_eps;
+		ar >> m_mu;
+		ar >> m_epsf;
+		ar >> m_nsegup;
+		ar >> m_nplc;
+
+		if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
+
+		for (j=0; j<2; ++j)
+		{
+			FEContactSurface& s = (j==0? m_ss : m_ms);
+
+			int ne=0;
+			ar >> ne;
+			s.Create(ne);
+
+			for (k=0; k<ne; ++k)
+			{
+				FESurfaceElement& el = s.Element(k);
+
+				ar >> n;
+				el.SetType(n);
+
+				ar >> mat >> el.m_nID >> el.m_nrigid;
+				ar >> el.m_node;
+				ar >> el.m_lnode;
+
+				el.SetMatID(mat);
+			}
+
+			// initialize surface
+			s.Init();
+
+			// read the contact data
+			// Note that we do this after Init() since this data gets 
+			// initialized to zero there
+			ar >> s.gap;
+			ar >> s.nu;
+			ar >> s.rs;
+			ar >> s.rsp;
+			ar >> s.Lm;
+			ar >> s.M;
+			ar >> s.Lt;
+			ar >> s.off;
+			ar >> s.eps;
+		}
+	}
+}

@@ -3,6 +3,33 @@
 #include "fem.h"
 
 //-----------------------------------------------------------------------------
+void FEAugLagLinearConstraint::Serialize(Archive& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_lam;
+
+		ar << (int) m_dof.size();
+		list<DOF>::iterator it = m_dof.begin();
+		for (int i=0; i<(int) m_dof.size(); ++i, ++it) ar << it->bc << it->neq << it->node << it->val;
+	}
+	else
+	{
+		ar >> m_lam;
+
+		int n;
+		ar >> n;
+		DOF dof;
+		m_dof.clear();
+		for (int i=0; i<n; ++i)
+		{
+			ar >> dof.bc >> dof.neq >> dof.node >> dof.val;
+			m_dof.push_back(dof);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 FELinearConstraintSet::FELinearConstraintSet(FEM* pfem)
 {
 	static int nc = 1;
@@ -180,5 +207,31 @@ void FELinearConstraintSet::Stiffness()
 		}
 
 		psolver->AssembleStiffness(en, elm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FELinearConstraintSet::Serialize(Archive& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_tol << m_eps << m_naugmax << m_nID;
+		ar << (int) m_LC.size();
+		list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
+		for (int i=0; i<(int) m_LC.size(); ++i, ++it) (*it)->Serialize(ar);
+	}
+	else
+	{
+		ar >> m_tol >> m_eps >> m_naugmax >> m_nID;
+		int n;
+		ar >> n;
+		m_LC.clear();
+		for (int i=0; i<n; ++i)
+		{
+			FEAugLagLinearConstraint* plc = new FEAugLagLinearConstraint;
+			plc->Serialize(ar);
+			m_LC.push_back(plc);
+		}
 	}
 }
