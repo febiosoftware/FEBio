@@ -1,0 +1,22 @@
+ 
+FEBio Makefile Installation Guide
+
+1. make.inc
+
+This directory (FEBioInstaller) contains examples of the make include file for Linux, Mac osx and SGI Altix (make.lnx, make.osx, and make.alt) using the Intel Math Kernel Library (MKL) for the Pardiso solver and the BLAS for the SuperLU solver.  The file make.gen contains generic instructions (i.e., not using the MKL) for the Pardiso shared library (from www.pardiso-project.org) and the generic BLAS included with SuperLU.  These files need to be customized for your installation and copied to make.inc in the main FEBio directory.
+
+2. SuperLU
+
+If you are using the MKL BLAS for SuperLU, edit the Makefile and remove lsame.o from LAAUX (lsame.o is included in the MKL).  If you are not using the MKL, it is recommended that you get an optimized BLAS for your platform.  The documentation for SuperLU has some recommendations.
+
+3. Pardiso
+
+If you are using the shared library for Pardiso, it requires a license key, which can be specified by the environment variable PARDISO_LIC_PATH.  See the Pardiso documentation for more information.  Note that the shared library also requires an optimized LAPACK and BLAS.  The example in make.gen uses the AMD Core Math Library (ACML) 
+
+4. includes.bash
+
+This bash script generates the files dependencies.mk and objects.mk in the subdirectories FEBio and FECore.  If new code files are added, this script needs to be run to update the make process.  Note that it generates some circular dependencies and there will be warnings in the make process.
+
+5. febio.xml
+
+FEBio now requires a configuration file febio.xml.  This needs to either be put in the same directory as the executable or can be specified on the command line such as: febio.lnx -i inputfile.feb -cnf someconfig.xml.  The febio.xml file in this directory specifies Pardiso as the linear solver.

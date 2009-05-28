@@ -1,0 +1,15 @@
+
+include ../make.inc
+
+TARGET = ../bin/febio.$(PLAT)
+
+FECORE = ../lib/fecore_$(PLAT).a
+
+include objects.mk
+
+$(TARGET):
+	$(CC) -o $(TARGET) $(DEF) $(INC) *.cpp $(FLG) $(FECORE) $(LIBS)
+
+clean:
+	rm $(TARGET)
+	rm *.o

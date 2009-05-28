@@ -1,0 +1,24 @@
+# Make include file for FEBio on Linux
+
+HOME_PATH = /home/sci/rawlins/Projects
+
+PLAT = lnx
+
+CC = g++
+
+DEF = -DLINUX -DSUPERLU -DPARDISO
+
+FLG = -static -O3
+
+# Pardiso solver
+MKL_PATH = /opt/intel/mkllib/em64t/
+MKL_LIB = -L$(MKL_PATH) -lmkl_lapack -lmkl_em64t -liomp5 -pthread
+
+# SuperLU solver
+SUPERLU_INC = $(HOME_PATH)/SuperLU_3.1/SRC/
+SUPERLU_LIB_PATH = $(HOME_PATH)/SuperLU_3.1/lib/
+SUPERLU_LIB = -L$(SUPERLU_LIB_PATH) -lsuperlu_3.1_$(PLAT)
+
+LIBS = $(SUPERLU_LIB) $(MKL_LIB)
+
+INC = -I$(SUPERLU_INC) -I..

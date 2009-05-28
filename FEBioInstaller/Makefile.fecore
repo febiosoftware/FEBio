@@ -1,0 +1,18 @@
+
+include ../make.inc
+
+include objects.mk
+
+LIB = ../lib/fecore_$(PLAT).a
+
+$(LIB): $(OBJ)
+	ar -cvq $(LIB) $(OBJ)
+
+include dependencies.mk
+
+%.o: %.cpp
+	$(CC) -c $(INC) $(DEF) $(FLG) $<
+
+clean:
+	rm *.o
+	rm $(LIB)

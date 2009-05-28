@@ -1,0 +1,26 @@
+# Make include file for FEBio on Mac
+
+HOME_PATH = /home/sci/rawlins/Projects
+
+PLAT = osx
+
+CC = icpc
+
+DEF = -DLINUX -DSUPERLU -DPARDISO -DMAC
+
+FLG = -O3
+
+# Pardiso solver
+INTEL_PATH = /opt/intel/Compiler/11.0/056/lib/
+MKL_PATH = /opt/intel/Compiler/11.0/056/Frameworks/mkl/lib/em64t/
+MKL_LIB = $(MKL_PATH)libmkl_intel_lp64.a $(MKL_PATH)libmkl_intel_thread.a $(MKL_PATH)libmkl_core.a \
+	$(MKL_PATH)libmkl_pgi_thread.a $(INTEL_PATH)libiomp5.a
+
+# SuperLU solver
+SUPERLU_INC = $(HOME_PATH)/SuperLU_3.1/SRC/
+SUPERLU_LIB_PATH = $(HOME_PATH)/SuperLU_3.1/lib/
+SUPERLU_LIB = $(SUPERLU_LIB_PATH)libsuperlu_3.1_osx.a
+
+LIBS = $(SUPERLU_LIB) $(MKL_LIB)
+
+INC = -I$(SUPERLU_INC) -I..
