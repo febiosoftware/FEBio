@@ -198,6 +198,12 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "max_ups"           ) tag.value(fem.m_pStep->m_psolver->m_maxups);
 		else if (tag == "cmax"              ) tag.value(fem.m_pStep->m_psolver->m_cmax);
 		else if (tag == "pressure_stiffness") tag.value(fem.m_pStep->m_istiffpr);
+		else if (tag == "debug")
+		{
+			int n;
+			tag.value(n);
+			fem.SetDebugFlag(n!=0);
+		}
 		else if (tag == "restart" ) 
 		{
 			const char* szf = tag.AttributeValue("file", true);

@@ -250,6 +250,8 @@ void FEM::EchoInput()
 				m_log.printf("\tAugmented Lagrangian           : %s\n", (psi->m_blaugon? "on" : "off"));
 				if (psi->m_blaugon)
 					m_log.printf("\tAugmented Lagrangian tolerance : %lg\n", psi->m_atol);
+				m_log.printf("\tmaster segments                : %d\n", (psi->m_ms.Elements()));
+				m_log.printf("\tslave segments                 : %d\n", (psi->m_ss.Elements()));
 			}
 
 			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(&m_CI[i]);

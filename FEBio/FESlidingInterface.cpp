@@ -30,6 +30,7 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 	m_stol = 0.01;
 
 	m_ktmult = 0;
+	m_knmult = 1;
 
 	m_nplc = -1;
 	m_pplc = 0;
@@ -1085,7 +1086,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 				sum *= gap;
 				sum -= D1[k]*N1[l]+D2[k]*N2[l]+N1[k]*D1[l]+N2[k]*D2[l];
 				sum += K[0][1]*(D1[k]*D2[l]+D2[k]*D1[l]);
-				sum *= tn;
+				sum *= tn*m_knmult;
 
 				sum += eps*HEAVYSIDE(Lm+eps*gap)*N[k]*N[l];
 	
@@ -1610,6 +1611,7 @@ void FESlidingInterface::Serialize(Archive& ar)
 		ar << m_atol;
 		ar << m_blaugon;
 		ar << m_ktmult;
+		ar << m_knmult;
 		ar << m_stol;
 		ar << m_bautopen;
 		ar << m_eps;
@@ -1654,6 +1656,7 @@ void FESlidingInterface::Serialize(Archive& ar)
 		ar >> m_atol;
 		ar >> m_blaugon;
 		ar >> m_ktmult;
+		ar >> m_knmult;
 		ar >> m_stol;
 		ar >> m_bautopen;
 		ar >> m_eps;
