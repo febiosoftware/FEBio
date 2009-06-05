@@ -31,7 +31,7 @@ bool WSMPSolver::PreProcess(SparseMatrix& K)
 	// Number of processors OMP_NUM_THREADS
 	char* var = getenv("OMP_NUM_THREADS");
 	int num_procs;
-	if(var) num_procs = atoi(var);
+	if(var) num_procs = -atoi(var); // edited 6/1/09 (added negative) per Anshul Gupta
 	else {
 		fprintf(stderr, "Set environment OMP_NUM_THREADS to 1");
 		exit(1);
