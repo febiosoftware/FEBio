@@ -409,7 +409,7 @@ bool FEMesh::Init()
 				fprintf(stderr, "Nodes:");
 				for (int n=0; n<el.Nodes(); ++n)
 				{
-					fprintf(stderr, "%d", el.m_node[n]);
+					fprintf(stderr, "%d", el.m_node[n]+1);
 					if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
 				}
 			}
@@ -475,7 +475,7 @@ bool FEMesh::Init()
 				fprintf(stderr, "Nodes:");
 				for (int n=0; n<el.Nodes(); ++n)
 				{
-					fprintf(stderr, "%d", el.m_node[n]);
+					fprintf(stderr, "%d", el.m_node[n]+1);
 					if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
 				}
 			}

@@ -17,7 +17,7 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 	static int count = 1;
 	m_ntype = FE_CONTACT_SLIDING;
 
-	m_blaugon = true; // use augmented lagrangian
+	m_blaugon = false; // don't use augmented lagrangian by default
 
 	m_mu = 0;
 	m_epsf = 0;

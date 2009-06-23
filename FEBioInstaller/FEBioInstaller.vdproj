@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_0EA899C69D3949C4B547DC23E63AFE59"
+        "OwnerKey" = "8:_96838714292C4548B3CB0E39F583A95E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_19C78F55C9824FF3B9A34C422328AA7F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -45,6 +51,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_96838714292C4548B3CB0E39F583A95E"
+        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -52,6 +64,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EC0BBDE2A025403DBDF0F6027714B32B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F43A7B3EA56840998013B08F9B887A34"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -354,6 +372,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F43A7B3EA56840998013B08F9B887A34"
+            {
+            "SourcePath" = "8:..\\Release\\febio.xml"
+            "TargetName" = "8:febio.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -433,7 +471,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio"
         "ProductCode" = "8:{8D119670-EC31-42E5-88B5-32CE7DEED12B}"
-        "PackageCode" = "8:{479F4D66-8351-4F46-AF10-FF90A174CA3B}"
+        "PackageCode" = "8:{B1DF410B-73CC-430C-9211-33642BE78B06}"
         "UpgradeCode" = "8:{C651D20C-DA37-45DD-B03F-85DB2BC7C551}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -558,12 +596,12 @@
             "Arguments" = "8:"
             "Description" = "8:Finite Elements for Biomechanics"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
+            "IconIndex" = "3:102"
             "Transitive" = "11:FALSE"
             "Target" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
             "Folder" = "8:_BCB3F49C79F24378B1A64ABDDCA71505"
             "WorkingFolder" = "8:_A9F30665B9534E439753127ACED5EF05"
-            "Icon" = "8:"
+            "Icon" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
             "Feature" = "8:"
             }
         }
@@ -962,12 +1000,40 @@
         }
         "MergeModule"
         {
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_0EA899C69D3949C4B547DC23E63AFE59"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_96838714292C4548B3CB0E39F583A95E"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
         }
         "ProjectOutput"
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B5DBEA9D13BD4A3299351E9AD71B980A"
             {
-            "SourcePath" = "8:..\\Debug - Skyline only\\FEBio.exe"
+            "SourcePath" = "8:..\\Release\\FEBio.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"

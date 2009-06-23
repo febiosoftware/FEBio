@@ -26,7 +26,7 @@
 //!
 //! This software is developed at the Scientific Computing and Imaging institute
 //! at the University of Utah. All rights reserved.
-//! Copyright (c) 2006 - 2008
+//! Copyright (c) 2006 - 2009
 //! 
 //! Main developers:	
 //!  - Steve Maas
@@ -102,11 +102,11 @@ int main(int argc, char* argv[])
 	// print welcome message
 	if (ops.bsplash)
 	{
-#ifdef WIN32
-		print_banner();
-#else
+//#ifdef WIN32
+//		print_banner();
+//#else
 		Hello(stdout);
-#endif
+//#endif
 	}
 
 	// if there are no arguments, ask for an input file

@@ -18,8 +18,8 @@
 //
 
 #define VERSION			1
-#define SUBVERSION		2
-#define SUBSUBVERSION	0
+#define SUBVERSION		1
+#define SUBSUBVERSION	7
 
 ///////////////////////////////////////////////////////////////////////////////
 // Restart file version
