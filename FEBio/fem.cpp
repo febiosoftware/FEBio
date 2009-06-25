@@ -3,6 +3,7 @@
 #include <string.h>
 #include "Archive.h"
 #include "XMLReader.h"
+#include "FEFacet2FacetSliding.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
@@ -137,6 +138,9 @@ void FEM::operator =(FEM& fem)
 			{
 			case FE_CONTACT_SLIDING:
 				pci = new FESlidingInterface(this);
+				break;
+			case FE_FACET2FACET_SLIDING:
+				pci = new FEFacet2FacetSliding(this);
 				break;
 			case FE_CONTACT_TIED:
 				pci = new FETiedInterface(this);

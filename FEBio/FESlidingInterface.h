@@ -104,6 +104,4 @@ public:
 	FELoadCurve*	m_pplc;		//!< pointer to penalty load curve
 };
 
-
-
 #endif // !defined(AFX_FESLIDINGINTERFACE_H__742CFDED_B4BF_47AF_B673_1D26FE03F934__INCLUDED_)

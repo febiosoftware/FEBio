@@ -438,6 +438,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEFacet2FacetSliding.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEFiberNeoHookean.cpp"
 				>
 			</File>
@@ -885,6 +889,10 @@
 			</File>
 			<File
 				RelativePath=".\FEException.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEFacet2FacetSliding.h"
 				>
 			</File>
 			<File

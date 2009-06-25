@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
+#include "FEFacet2FacetSliding.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -342,6 +343,62 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 									lm[6*(k+1)+5] = id[9];
 								}
 	
+								build_add(lm);
+							}
+						}
+					}
+				}
+
+				// facet-to-facet sliding interfaces
+				FEFacet2FacetSliding* pfi = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+				if (pfi)
+				{
+					vector<int> lm(6*8);
+
+					FEFacetSlidingSurface& ss = pfi->m_ss;
+					FEFacetSlidingSurface& ms = pfi->m_ms;
+
+					int ni = 0, k, l;
+					for (j=0; j<ss.Elements(); ++j)
+					{
+						FESurfaceElement& se = ss.Element(j);
+						int nint = se.GaussPoints();
+						int* sn = se.m_node;
+						for (k=0; k<nint; ++k, ++ni)
+						{
+							FESurfaceElement* pe = ss.m_pme[ni];
+							if (pe != 0)
+							{
+								FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+								int* mn = me.m_node;
+
+								lm.set(-1);
+
+								int nseln = se.Nodes();
+								int nmeln = me.Nodes();
+
+								for (l=0; l<nseln; ++l)
+								{
+									id = fem.m_mesh.Node(sn[l]).m_ID;
+									lm[6*l  ] = id[0];
+									lm[6*l+1] = id[1];
+									lm[6*l+2] = id[2];
+									lm[6*l+3] = id[7];
+									lm[6*l+4] = id[8];
+									lm[6*l+5] = id[9];
+								}
+
+								for (l=0; l<nmeln; ++l)
+								{
+									id = fem.m_mesh.Node(mn[l]).m_ID;
+									lm[6*(l+nseln)  ] = id[0];
+									lm[6*(l+nseln)+1] = id[1];
+									lm[6*(l+nseln)+2] = id[2];
+									lm[6*(l+nseln)+3] = id[7];
+									lm[6*(l+nseln)+4] = id[8];
+									lm[6*(l+nseln)+5] = id[9];
+								}
+
 								build_add(lm);
 							}
 						}

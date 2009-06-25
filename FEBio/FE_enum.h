@@ -104,7 +104,8 @@ enum FE_Unpack_Flags {
 enum FE_Contact_Types {
 	FE_CONTACT_SLIDING		= 1,
 	FE_CONTACT_RIGIDWALL	= 2,
-	FE_CONTACT_TIED			= 3
+	FE_CONTACT_TIED			= 3,
+	FE_FACET2FACET_SLIDING	= 4
 };
 
 ///////////////////////////////////////////////////////////////////////////////

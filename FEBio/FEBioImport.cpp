@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEBioImport.h"
 #include "FERigid.h"
+#include "FEFacet2FacetSliding.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1519,6 +1520,53 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 
 				// read the surface section
 				ParseSurfaceSection(tag, s, nfmt);
+			}
+			else throw XMLReader::InvalidTag(tag);
+
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (strcmp(szt, "facet-to-facet sliding") == 0)
+	{
+		// --- F A C E T   T O   F A C E T   S L I D I N G ---
+
+		FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
+		fem.m_CI.add(ps);
+
+		++tag;
+		do
+		{
+			if (tag == "penalty") tag.value(ps->m_epsn);
+			else if (tag == "surface")
+			{
+				const char* sztype = tag.AttributeValue("type");
+				int ntype;
+				if (strcmp(sztype, "master") == 0) ntype = 1;
+				else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+				FEFacetSlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
+				{
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt);
+
+				// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
+				// so we have to modify those elements to FE_QUAD and FE_TRI
+				// TODO: we need a better way of doing this!
+				for (int i=0; i<s.Elements(); ++i)
+				{
+					FESurfaceElement& e = s.Element(i);
+					if (e.Nodes() == 4) e.SetType(FE_QUAD); 
+					else e.SetType(FE_TRI);
+				}
 			}
 			else throw XMLReader::InvalidTag(tag);
 

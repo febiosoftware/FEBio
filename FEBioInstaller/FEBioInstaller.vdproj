@@ -21,6 +21,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1906FC4308814B67A15AD988E9FC23DC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_19C78F55C9824FF3B9A34C422328AA7F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -53,6 +59,12 @@
         {
         "MsmKey" = "8:_96838714292C4548B3CB0E39F583A95E"
         "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A642B39421E249E482ECF5FAA180395F"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -252,6 +264,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1906FC4308814B67A15AD988E9FC23DC"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\FEBio_tm.pdf"
+            "TargetName" = "8:FEBio_tm.pdf"
+            "Tag" = "8:"
+            "Folder" = "8:_BCB3F49C79F24378B1A64ABDDCA71505"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_19C78F55C9824FF3B9A34C422328AA7F"
             {
             "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Examples\\Tutorials\\sample02.feb"
@@ -297,7 +329,7 @@
             "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\README.txt"
             "TargetName" = "8:README.txt"
             "Tag" = "8:"
-            "Folder" = "8:_8109150E167A493687F8B1BF257A8722"
+            "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -338,6 +370,26 @@
             "TargetName" = "8:sample03.feb"
             "Tag" = "8:"
             "Folder" = "8:_699C404767DE4207B119782F46461B67"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A642B39421E249E482ECF5FAA180395F"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\FEBio_um.pdf"
+            "TargetName" = "8:FEBio_um.pdf"
+            "Tag" = "8:"
+            "Folder" = "8:_BCB3F49C79F24378B1A64ABDDCA71505"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -409,7 +461,7 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_BCB3F49C79F24378B1A64ABDDCA71505"
                     {
-                    "Name" = "8:FEBio 1.1"
+                    "Name" = "8:FEBio 1.1.7"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -471,7 +523,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio"
         "ProductCode" = "8:{8D119670-EC31-42E5-88B5-32CE7DEED12B}"
-        "PackageCode" = "8:{B1DF410B-73CC-430C-9211-33642BE78B06}"
+        "PackageCode" = "8:{7DA529C9-3D18-408D-8937-BA60BCDD535B}"
         "UpgradeCode" = "8:{C651D20C-DA37-45DD-B03F-85DB2BC7C551}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
@@ -592,7 +644,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8FDB5C2951F0402EB8218C329706F317"
             {
-            "Name" = "8:FEBio 1.1"
+            "Name" = "8:FEBio 1.1.7"
             "Arguments" = "8:"
             "Description" = "8:Finite Elements for Biomechanics"
             "ShowCmd" = "3:1"
