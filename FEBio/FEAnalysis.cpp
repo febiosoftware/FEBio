@@ -267,12 +267,8 @@ bool FEAnalysis::Init()
 	m_baugment = (m_fem.m_nrj > 0 ? true : false);
 	for (i=0; i<m_fem.m_CI.size(); ++i)
 	{
-		FESlidingInterface* ps = dynamic_cast<FESlidingInterface*>(&m_fem.m_CI[i]);
-		if (ps)
-		{
-			if (ps->m_blaugon) m_baugment = true;
-		}
-		else m_baugment = true;
+		FEContactInterface& ci = m_fem.m_CI[i];
+		if (ci.m_blaugon) m_baugment = true;
 	}
 
 	// see if we to do incompressible augmentations

@@ -1538,6 +1538,8 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		do
 		{
 			if (tag == "penalty") tag.value(ps->m_epsn);
+			else if (tag == "knmult") tag.value(ps->m_knmult);
+			else if (tag == "search_tol") tag.value(ps->m_stol);
 			else if (tag == "surface")
 			{
 				const char* sztype = tag.AttributeValue("type");

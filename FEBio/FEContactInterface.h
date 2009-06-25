@@ -55,6 +55,9 @@ protected:
 	//! don't call the default constructor
 	FEContactInterface() {m_pfem=0;}
 
+public:
+	bool	m_blaugon;	//!< augmented lagrangian flag
+
 protected:
 	FEM*	m_pfem;	//!< FEM class this interface belongs to
 

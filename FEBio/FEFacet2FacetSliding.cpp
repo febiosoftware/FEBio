@@ -90,6 +90,13 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEM* pfem) : FEContactInterface(pfem)
 
 	// default parameters
 	m_epsn = 1.0;
+	m_knmult = 1.0;
+	m_stol = 0.01;
+
+	m_atol = 0.01;
+	m_gtol = 0;
+	m_naugmin = 0;
+	m_naugmax = 10;
 }
 
 //-----------------------------------------------------------------------------
@@ -140,7 +147,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 
 			// find the master segment this element belongs to
 			ss.m_rs[ni] = vec2d(0,0);
-			FESurfaceElement* pme = dynamic_cast<FESurfaceElement*>(ms.FindMasterSegment(x, q, ss.m_rs[ni], bfirst, 0.01));
+			FESurfaceElement* pme = dynamic_cast<FESurfaceElement*>(ms.FindMasterSegment(x, q, ss.m_rs[ni], bfirst, m_stol));
 			ss.m_pme[ni] = pme;
 
 			if (pme)
@@ -293,8 +300,12 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 				// gap function
 				double g = m_ss.m_gap[ni];
 				
+				// lagrange multiplier
+				double Lm = m_ss.m_Lm[ni];
+
 				// contact traction
-				double tn = m_epsn*MBRACKET(g);
+				double tn = Lm + m_epsn*g;
+				tn = MBRACKET(tn);
 
 				// calculate the force vector
 				fe.create(ndof);
@@ -323,11 +334,12 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 }
 
 //-----------------------------------------------------------------------------
+
 void FEFacet2FacetSliding::ContactStiffness()
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
-	vector<double> N;
+	double N[24], T1[24], T2[24], N1[24] = {0}, N2[24] = {0}, D1[24], D2[24], Nb1[24], Nb2[24];
 	matrix ke;
 
 	// keep a running counter of integration points
@@ -339,7 +351,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 	// get the solver
 	FESolver* psolver = m_pfem->m_pStep->m_psolver;
 
-	double detJ[4], w[4], *Hs, Hm[4];
+	double detJ[4], w[4], *Hs, Hm[4], Hmr[4], Hms[4];
 
 	// loop over all slave elements
 	for (i=0; i<m_ss.Elements(); ++i)
@@ -444,12 +456,16 @@ void FEFacet2FacetSliding::ContactStiffness()
 				// gap function
 				double g = m_ss.m_gap[ni];
 				
+				// lagrange multiplier
+				double Lm = m_ss.m_Lm[ni];
+
 				// contact traction
-				double tn = m_epsn*HEAVYSIDE(m_epsn*g);
+				double tn = Lm + m_epsn*g;
+				tn = MBRACKET(tn);
+
+				double dtn = m_epsn*HEAVYSIDE(Lm + m_epsn*g);
 
 				// calculate the N-vector
-				N.create(ndof);
-
 				for (k=0; k<nseln; ++k)
 				{
 					N[3*k  ] = Hs[k]*nu.x;
@@ -464,10 +480,138 @@ void FEFacet2FacetSliding::ContactStiffness()
 					N[3*(k+nseln)+2] = -Hm[k]*nu.z;
 				}
 
-				// calculate the stiffness matrix
+				// --- N O R M A L   S T I F F N E S S ---
+
+				// create the stiffness matrix
 				ke.Create(ndof, ndof);
+
+				// add the first order term (= D(tn)*dg )
 				for (k=0; k<ndof; ++k)
-					for (l=0; l<ndof; ++l) ke[k][l] = tn*N[k]*N[l]*detJ[j]*w[j];
+					for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
+
+				// add the higher order terms (= tn*D(dg) )
+				if (m_knmult > 0)
+				{
+					// calculate the master shape fncs derivatives
+					if (nmeln == 4)
+					{
+						Hmr[0] = -0.25*(1-s); Hms[0] = -0.25*(1-r);
+						Hmr[1] =  0.25*(1-s); Hms[1] = -0.25*(1+r);
+						Hmr[2] =  0.25*(1+s); Hms[2] =  0.25*(1+r);
+						Hmr[3] = -0.25*(1+s); Hms[3] =  0.25*(1-r);
+					}
+					else
+					{
+						Hmr[0] = -1; Hms[0] = -1;
+						Hmr[1] =  1; Hms[1] =  0;
+						Hmr[2] =  0; Hms[2] =  1;
+					}
+
+					// get the master nodes
+					vec3d* rt = me.rt();
+
+					// get the tangent vectors
+					vec3d tau1(0,0,0), tau2(0,0,0);
+					for (k=0; k<nmeln; ++k)
+					{
+						tau1.x += Hmr[k]*rt[k].x;
+						tau1.y += Hmr[k]*rt[k].y;
+						tau1.z += Hmr[k]*rt[k].z;
+	
+						tau2.x += Hms[k]*rt[k].x;
+						tau2.y += Hms[k]*rt[k].y;
+						tau2.z += Hms[k]*rt[k].z;
+					}
+
+					// set up the Ti vectors
+					for (k=0; k<nseln; ++k)
+					{
+						T1[k*3  ] = Hs[k]*tau1.x; T2[k*3  ] = Hs[k]*tau2.x;
+						T1[k*3+1] = Hs[k]*tau1.y; T2[k*3+1] = Hs[k]*tau2.y;
+						T1[k*3+2] = Hs[k]*tau1.z; T2[k*3+2] = Hs[k]*tau2.z;
+					}
+
+					for (k=0; k<nmeln; ++k) 
+					{
+						T1[(k+nseln)*3  ] = -Hm[k]*tau1.x;
+						T1[(k+nseln)*3+1] = -Hm[k]*tau1.y;
+						T1[(k+nseln)*3+2] = -Hm[k]*tau1.z;
+
+						T2[(k+nseln)*3  ] = -Hm[k]*tau2.x;
+						T2[(k+nseln)*3+1] = -Hm[k]*tau2.y;
+						T2[(k+nseln)*3+2] = -Hm[k]*tau2.z;
+					}
+
+					// set up the Ni vectors
+					for (k=0; k<nmeln; ++k) 
+					{
+						N1[(k+nseln)*3  ] = -Hmr[k]*nu.x;
+						N1[(k+nseln)*3+1] = -Hmr[k]*nu.y;
+						N1[(k+nseln)*3+2] = -Hmr[k]*nu.z;
+
+						N2[(k+nseln)*3  ] = -Hms[k]*nu.x;
+						N2[(k+nseln)*3+1] = -Hms[k]*nu.y;
+						N2[(k+nseln)*3+2] = -Hms[k]*nu.z;
+					}
+
+					// calculate metric tensor
+					mat2d M;
+					M[0][0] = tau1*tau1; M[0][1] = tau1*tau2; 
+					M[1][0] = tau2*tau1; M[1][1] = tau2*tau2; 
+
+					// calculate reciprocal metric tensor
+					mat2d Mi = M.inverse();
+
+					// calculate curvature tensor
+					double K[2][2] = {0};
+					const double Grs[4] = {0.25, -0.25, 0.25, -0.25};
+					if (nmeln == 4)
+					{
+						for (k=0; k<nmeln; ++k)
+						{
+							K[0][1] += (nu*rt[k])*Grs[k];
+							K[1][0] += (nu*rt[k])*Grs[k];
+						}
+					}
+
+					// setup A matrix A = M + gK
+					double A[2][2];
+					A[0][0] = M[0][0] + g*K[0][0];
+					A[0][1] = M[0][1] + g*K[0][1];
+					A[1][0] = M[1][0] + g*K[1][0];
+					A[1][1] = M[1][1] + g*K[1][1];
+
+					// calculate determinant of A
+					double detA = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+
+					// setup Di vectors
+					for (k=0; k<ndof; ++k)
+					{
+						D1[k] = (1/detA)*(A[1][1]*(T1[k]+g*N1[k]) - A[0][1]*(T2[k] + g*N2[k]));
+						D2[k] = (1/detA)*(A[0][0]*(T2[k]+g*N2[k]) - A[0][1]*(T1[k] + g*N1[k]));
+					}
+
+					// setup Nbi vectors
+					for (k=0; k<ndof; ++k)
+					{
+						Nb1[k] = N1[k] - K[0][1]*D2[k];
+						Nb2[k] = N2[k] - K[0][1]*D1[k];
+					}
+
+					// add it to the stiffness
+					double sum;
+					for (k=0; k<ndof; ++k)
+						for (l=0; l<ndof; ++l)
+						{
+							sum = Mi[0][0]*Nb1[k]*Nb1[l]+Mi[0][1]*(Nb1[k]*Nb2[l]+Nb2[k]*Nb1[l])+Mi[1][1]*Nb2[k]*Nb2[l];
+							sum *= g;
+							sum -= D1[k]*N1[l]+D2[k]*N2[l]+N1[k]*D1[l]+N2[k]*D2[l];
+							sum += K[0][1]*(D1[k]*D2[l]+D2[k]*D1[l]);
+							sum *= tn*m_knmult;
+
+							ke[k][l] += sum*detJ[j]*w[j];
+						}
+				}
 
 				// assemble the global residual
 				psolver->AssembleStiffness(en, LM, ke);
@@ -479,7 +623,107 @@ void FEFacet2FacetSliding::ContactStiffness()
 //-----------------------------------------------------------------------------
 bool FEFacet2FacetSliding::Augment(int naug)
 {
-	return true;
+	// make sure we need to augment
+	if (!m_blaugon) return true;
+
+	int i;
+	double Ln;
+	bool bconv = true;
+
+	static double normg0 = 0;
+
+	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
+	// a. normal component
+	int NS = m_ss.m_Lm.size();
+	int NM = m_ms.m_Lm.size();
+	double normL0 = 0;
+	for (i=0; i<NS; ++i) normL0 += m_ss.m_Lm[i]*m_ss.m_Lm[i];
+	for (i=0; i<NM; ++i) normL0 += m_ms.m_Lm[i]*m_ms.m_Lm[i];
+	normL0 = sqrt(normL0);
+
+	// --- c a l c u l a t e   c u r r e n t   n o r m s ---
+	// a. normal component
+	double normL1 = 0;	// force norm
+	double normg1 = 0;	// gap norm
+	int N = 0;
+	for (i=0; i<NS; ++i)
+	{
+		// update Lagrange multipliers
+		Ln = m_ss.m_Lm[i] + m_epsn*m_ss.m_gap[i];
+		Ln = MBRACKET(Ln);
+
+		normL1 += Ln*Ln;
+
+		if (m_ss.m_gap[i] > 0)
+		{
+			normg1 += m_ss.m_gap[i]*m_ss.m_gap[i];
+			++N;
+		}
+	}	
+
+	for (i=0; i<NM; ++i)
+	{
+		// update Lagrange multipliers
+		Ln = m_ms.m_Lm[i] + m_epsn*m_ms.m_gap[i];
+		Ln = MBRACKET(Ln);
+
+		normL1 += Ln*Ln;
+		if (m_ms.m_gap[i] > 0)
+		{
+			normg1 += m_ms.m_gap[i]*m_ms.m_gap[i];
+			++N;
+		}
+	}
+	if (N == 0) N=1;
+
+	normL1 = sqrt(normL1);
+	normg1 = sqrt(normg1 / N);
+
+	if (naug == 0) normg0 = 0;
+
+	Logfile& log = m_pfem->m_log;
+
+	// calculate and print convergence norms
+	double lnorm = 0, gnorm = 0;
+	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
+	if (normg1 != 0) gnorm = fabs(normg1 - normg0)/normg1; else gnorm = fabs(normg1 - normg0);
+
+	log.printf(" sliding interface # %d\n", m_nID);
+	log.printf("                        CURRENT        REQUIRED\n");
+	log.printf("    normal force : %15le", lnorm);
+	if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
+	log.printf("    gap function : %15le", gnorm);
+	if (m_gtol > 0) log.printf("%15le\n", m_gtol); else log.printf("       ***\n");
+
+	// check convergence
+	bconv = true;
+	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
+	if ((m_gtol > 0) && (gnorm > m_gtol)) bconv = false;
+	if (m_naugmin > naug) bconv = false;
+	if (m_naugmax <= naug) bconv = true;
+		
+	if (bconv == false)
+	{
+		// we did not converge so update multipliers
+		for (i=0; i<NS; ++i)
+		{
+			// update Lagrange multipliers
+			Ln = m_ss.m_Lm[i] + m_epsn*m_ss.m_gap[i];
+			m_ss.m_Lm[i] = MBRACKET(Ln);
+		}	
+
+		for (i=0; i<NM; ++i)
+		{
+			// update Lagrange multipliers
+			Ln = m_ms.m_Lm[i] + m_epsn*m_ms.m_gap[i];
+			m_ms.m_Lm[i] = MBRACKET(Ln);
+		}
+	}
+
+	// store the last gap norm
+	normg0 = normg1;
+
+	return bconv;
 }
 
 //-----------------------------------------------------------------------------

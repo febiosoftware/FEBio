@@ -87,7 +87,6 @@ public:
 	int				m_naugmin;	//!< minimum nr of augmentations
 	double			m_gtol;		//!< gap tolerance
 	double			m_atol;		//!< augmentation tolerance
-	bool			m_blaugon;	//!< augmented lagrangian flag
 	double			m_ktmult;	//!< multiplier for tangential stiffness
 	double			m_knmult;	//!< multiplier for normal stiffness
 

@@ -14,6 +14,8 @@ FEContactInterface::FEContactInterface(FEM* pfem)
 	m_pfem = pfem;
 	m_ntype = 0;
 	m_nID = -1;
+
+	m_blaugon = false;
 }
 
 FEContactInterface::~FEContactInterface()

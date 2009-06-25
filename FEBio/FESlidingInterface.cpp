@@ -17,8 +17,6 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 	static int count = 1;
 	m_ntype = FE_CONTACT_SLIDING;
 
-	m_blaugon = false; // don't use augmented lagrangian by default
-
 	m_mu = 0;
 	m_epsf = 0;
 
@@ -1345,6 +1343,8 @@ bool FESlidingInterface::Augment(int naug)
 
 	for (i=0; i<m_ms.Nodes(); ++i)
 	{
+		eps = m_ms.eps[i]*scale;
+
 		// update Lagrange multipliers
 		Ln = m_ms.Lm[i] + eps*m_ms.gap[i];
 		Ln = MBRACKET(Ln);
@@ -1454,6 +1454,8 @@ bool FESlidingInterface::Augment(int naug)
 		// we did not converge so update multipliers
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
+			eps = m_ss.eps[i]*scale;
+
 			// update Lagrange multipliers
 			Ln = m_ss.Lm[i] + eps*m_ss.gap[i];
 			m_ss.Lm[i] = MBRACKET(Ln);
@@ -1500,6 +1502,8 @@ bool FESlidingInterface::Augment(int naug)
 
 		for (i=0; i<m_ms.Nodes(); ++i)
 		{
+			eps = m_ms.eps[i]*scale;
+
 			// update Lagrange multipliers
 			Ln = m_ms.Lm[i] + eps*m_ms.gap[i];
 			m_ms.Lm[i] = MBRACKET(Ln);

@@ -68,7 +68,14 @@ protected:
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms);
 
 public:
-	double	m_epsn;	//!< normal penalty factor
+	double	m_epsn;		//!< normal penalty factor
+	double	m_knmult;	//!< normal stiffness multiplier
+	double	m_stol;		//!< search tolerance
+
+	double	m_atol;		//!< aug lag tolernace
+	double	m_gtol;		//!< gap tolerance
+	int		m_naugmin;	//!< min nr of augmentations
+	int		m_naugmax;	//!< max nr of augmentations
 
 	FEFacetSlidingSurface	m_ms;	//!< master surface
 	FEFacetSlidingSurface	m_ss;	//!< slave surface
