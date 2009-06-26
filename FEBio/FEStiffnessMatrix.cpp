@@ -257,65 +257,24 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				{
 					vector<int> lm(6*5);
 
-					FEContactSurface& ss = psi->m_ss;
-					FEContactSurface& ms = psi->m_ms;
-
-					for (j=0; j<ss.Nodes(); ++j)
+					for (int np=0; np<psi->m_npass; ++np)
 					{
-						FEElement* pe = ss.pme[j];
+						FEContactSurface& ss = (np==0? psi->m_ss : psi->m_ms);
+						FEContactSurface& ms = (np==0? psi->m_ms : psi->m_ss);
 
-						if (pe != 0)
+						for (j=0; j<ss.Nodes(); ++j)
 						{
-							FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
-							int* en = me.m_node;
+							FEElement* pe = ss.pme[j];
 
-							// Note that we need to grab the rigid degrees of freedom as well
-							// this is in case one of the nodes belongs to a rigid body.
-							n = me.Nodes();
-							if (n == 3)
-							{
-								lm[6*(3+1)  ] = -1;
-								lm[6*(3+1)+1] = -1;
-								lm[6*(3+1)+2] = -1;
-								lm[6*(3+1)+3] = -1;
-								lm[6*(3+1)+4] = -1;
-								lm[6*(3+1)+5] = -1;
-							}
-
-							lm[0] = ss.Node(j).m_ID[0];
-							lm[1] = ss.Node(j).m_ID[1];
-							lm[2] = ss.Node(j).m_ID[2];
-							lm[3] = ss.Node(j).m_ID[7];
-							lm[4] = ss.Node(j).m_ID[8];
-							lm[5] = ss.Node(j).m_ID[9];
-
-							for (k=0; k<n; ++k)
-							{
-								id = fem.m_mesh.Node(en[k]).m_ID;
-								lm[6*(k+1)  ] = id[0];
-								lm[6*(k+1)+1] = id[1];
-								lm[6*(k+1)+2] = id[2];
-								lm[6*(k+1)+3] = id[7];
-								lm[6*(k+1)+4] = id[8];
-								lm[6*(k+1)+5] = id[9];
-							}
-
-							build_add(lm);
-						}
-					}
-	
-					if (psi->m_npass == 2)
-					{
-						for (j=0; j<ms.Nodes(); ++j)
-						{
-							FEElement* pe = ms.pme[j];
 							if (pe != 0)
 							{
-								FESurfaceElement& se = dynamic_cast<FESurfaceElement&> (*pe);
-								int* en = se.m_node;
+								FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+								int* en = me.m_node;
 
-								n = se.Nodes();
-								if (n==3)
+								// Note that we need to grab the rigid degrees of freedom as well
+								// this is in case one of the nodes belongs to a rigid body.
+								n = me.Nodes();
+								if (n == 3)
 								{
 									lm[6*(3+1)  ] = -1;
 									lm[6*(3+1)+1] = -1;
@@ -325,12 +284,12 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 									lm[6*(3+1)+5] = -1;
 								}
 
-								lm[0] = ms.Node(j).m_ID[0];
-								lm[1] = ms.Node(j).m_ID[1];
-								lm[2] = ms.Node(j).m_ID[2];
-								lm[4] = ms.Node(j).m_ID[7];
-								lm[5] = ms.Node(j).m_ID[8];
-								lm[6] = ms.Node(j).m_ID[9];
+								lm[0] = ss.Node(j).m_ID[0];
+								lm[1] = ss.Node(j).m_ID[1];
+								lm[2] = ss.Node(j).m_ID[2];
+								lm[3] = ss.Node(j).m_ID[7];
+								lm[4] = ss.Node(j).m_ID[8];
+								lm[5] = ss.Node(j).m_ID[9];
 
 								for (k=0; k<n; ++k)
 								{
@@ -342,7 +301,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 									lm[6*(k+1)+4] = id[8];
 									lm[6*(k+1)+5] = id[9];
 								}
-	
+
 								build_add(lm);
 							}
 						}
@@ -355,51 +314,54 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				{
 					vector<int> lm(6*8);
 
-					FEFacetSlidingSurface& ss = pfi->m_ss;
-					FEFacetSlidingSurface& ms = pfi->m_ms;
-
-					int ni = 0, k, l;
-					for (j=0; j<ss.Elements(); ++j)
+					for (int np=0; np<pfi->m_npass; ++np)
 					{
-						FESurfaceElement& se = ss.Element(j);
-						int nint = se.GaussPoints();
-						int* sn = se.m_node;
-						for (k=0; k<nint; ++k, ++ni)
+						FEFacetSlidingSurface& ss = (np == 0? pfi->m_ss : pfi->m_ms);
+						FEFacetSlidingSurface& ms = (np == 0? pfi->m_ms : pfi->m_ss);
+
+						int ni = 0, k, l;
+						for (j=0; j<ss.Elements(); ++j)
 						{
-							FESurfaceElement* pe = ss.m_pme[ni];
-							if (pe != 0)
+							FESurfaceElement& se = ss.Element(j);
+							int nint = se.GaussPoints();
+							int* sn = se.m_node;
+							for (k=0; k<nint; ++k, ++ni)
 							{
-								FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
-								int* mn = me.m_node;
-
-								lm.set(-1);
-
-								int nseln = se.Nodes();
-								int nmeln = me.Nodes();
-
-								for (l=0; l<nseln; ++l)
+								FESurfaceElement* pe = ss.m_pme[ni];
+								if (pe != 0)
 								{
-									id = fem.m_mesh.Node(sn[l]).m_ID;
-									lm[6*l  ] = id[0];
-									lm[6*l+1] = id[1];
-									lm[6*l+2] = id[2];
-									lm[6*l+3] = id[7];
-									lm[6*l+4] = id[8];
-									lm[6*l+5] = id[9];
-								}
+									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+									int* mn = me.m_node;
 
-								for (l=0; l<nmeln; ++l)
-								{
-									id = fem.m_mesh.Node(mn[l]).m_ID;
-									lm[6*(l+nseln)  ] = id[0];
-									lm[6*(l+nseln)+1] = id[1];
-									lm[6*(l+nseln)+2] = id[2];
-									lm[6*(l+nseln)+3] = id[7];
-									lm[6*(l+nseln)+4] = id[8];
-									lm[6*(l+nseln)+5] = id[9];
-								}
+									lm.set(-1);
 
-								build_add(lm);
+									int nseln = se.Nodes();
+									int nmeln = me.Nodes();
+
+									for (l=0; l<nseln; ++l)
+									{
+										id = fem.m_mesh.Node(sn[l]).m_ID;
+										lm[6*l  ] = id[0];
+										lm[6*l+1] = id[1];
+										lm[6*l+2] = id[2];
+										lm[6*l+3] = id[7];
+										lm[6*l+4] = id[8];
+										lm[6*l+5] = id[9];
+									}
+
+									for (l=0; l<nmeln; ++l)
+									{
+										id = fem.m_mesh.Node(mn[l]).m_ID;
+										lm[6*(l+nseln)  ] = id[0];
+										lm[6*(l+nseln)+1] = id[1];
+										lm[6*(l+nseln)+2] = id[2];
+										lm[6*(l+nseln)+3] = id[7];
+										lm[6*(l+nseln)+4] = id[8];
+										lm[6*(l+nseln)+5] = id[9];
+									}
+
+									build_add(lm);
+								}
 							}
 						}
 					}

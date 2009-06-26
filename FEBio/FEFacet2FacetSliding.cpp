@@ -92,6 +92,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEM* pfem) : FEContactInterface(pfem)
 	m_epsn = 1.0;
 	m_knmult = 1.0;
 	m_stol = 0.01;
+	m_npass = 1;
 
 	m_atol = 0.01;
 	m_gtol = 0;
@@ -109,6 +110,8 @@ void FEFacet2FacetSliding::Init()
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms);
+
+	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
 }
 
 //-----------------------------------------------------------------------------
@@ -177,6 +180,7 @@ void FEFacet2FacetSliding::Update()
 {
 	// project slave surface to master surface
 	ProjectSurface(m_ss, m_ms);
+	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
 }
 
 //-----------------------------------------------------------------------------
@@ -202,132 +206,138 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 
 	double detJ[4], w[4], *Hs, Hm[4];
 
-	// loop over all slave elements
-	for (i=0; i<m_ss.Elements(); ++i)
+	for (int np=0; np<m_npass; ++np)
 	{
-		FESurfaceElement& se = m_ss.Element(i);
-		pm->UnpackElement(se);
-		int nseln = se.Nodes();
-		int nint = se.GaussPoints();
+		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
+		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
-		// copy the LM vector
-		sLM = se.LM();
-
-		// nodal coordinates
-		vec3d* r0 = se.r0();
-
-		// we calculate all the metrics we need before we
-		// calculate the nodal forces
-		for (j=0; j<nint; ++j)
+		// loop over all slave elements
+		for (i=0; i<ss.Elements(); ++i)
 		{
-			double* Gr = se.Gr(j);
-			double* Gs = se.Gs(j);
+			FESurfaceElement& se = ss.Element(i);
+			pm->UnpackElement(se);
+			int nseln = se.Nodes();
+			int nint = se.GaussPoints();
 
-			// calculate jacobian
-			// note that we are integrating over the reference surface
-			vec3d dxr, dxs;
-			for (k=0; k<nseln; ++k)
+			// copy the LM vector
+			sLM = se.LM();
+
+			// nodal coordinates
+			vec3d* r0 = se.r0();
+
+			// we calculate all the metrics we need before we
+			// calculate the nodal forces
+			for (j=0; j<nint; ++j)
 			{
-				dxr.x += Gr[k]*r0[k].x;
-				dxr.y += Gr[k]*r0[k].y;
-				dxr.z += Gr[k]*r0[k].z;
+				double* Gr = se.Gr(j);
+				double* Gs = se.Gs(j);
 
-				dxs.x += Gs[k]*r0[k].x;
-				dxs.y += Gs[k]*r0[k].y;
-				dxs.z += Gs[k]*r0[k].z;
+				// calculate jacobian
+				// note that we are integrating over the reference surface
+				vec3d dxr, dxs;
+				for (k=0; k<nseln; ++k)
+				{
+					dxr.x += Gr[k]*r0[k].x;
+					dxr.y += Gr[k]*r0[k].y;
+					dxr.z += Gr[k]*r0[k].z;
+
+					dxs.x += Gs[k]*r0[k].x;
+					dxs.y += Gs[k]*r0[k].y;
+					dxs.z += Gs[k]*r0[k].z;
+				}
+
+				// jacobians
+				detJ[j] = (dxr ^ dxs).norm();
+
+				// integration weights
+				w[j] = se.GaussWeights()[j];
 			}
 
-			// jacobians
-			detJ[j] = (dxr ^ dxs).norm();
-
-			// integration weights
-			w[j] = se.GaussWeights()[j];
-		}
-
-		// loop over all integration points
-		for (int j=0; j<nint; ++j, ++ni)
-		{
-			// get the master element
-			FESurfaceElement* pme = m_ss.m_pme[ni];
-			if (pme)
+			// loop over all integration points
+			for (int j=0; j<nint; ++j, ++ni)
 			{
-				FESurfaceElement& me = *pme;
-				pm->UnpackElement(me);
-
-				int nmeln = me.Nodes();
-				mLM = me.LM();
-
-				// calculate degrees of freedom
-				int ndof = 3*(nseln + nmeln);
-
-				// build the LM vector
-				LM.create(ndof);
-				for (k=0; k<nseln; ++k)
+				// get the master element
+				FESurfaceElement* pme = ss.m_pme[ni];
+				if (pme)
 				{
-					LM[3*k  ] = sLM[3*k  ];
-					LM[3*k+1] = sLM[3*k+1];
-					LM[3*k+2] = sLM[3*k+2];
+					FESurfaceElement& me = *pme;
+					pm->UnpackElement(me);
+
+					int nmeln = me.Nodes();
+					mLM = me.LM();
+
+					// calculate degrees of freedom
+					int ndof = 3*(nseln + nmeln);
+
+					// build the LM vector
+					LM.create(ndof);
+					for (k=0; k<nseln; ++k)
+					{
+						LM[3*k  ] = sLM[3*k  ];
+						LM[3*k+1] = sLM[3*k+1];
+						LM[3*k+2] = sLM[3*k+2];
+					}
+
+					for (k=0; k<nmeln; ++k)
+					{
+						LM[3*(k+nseln)  ] = mLM[3*k  ];
+						LM[3*(k+nseln)+1] = mLM[3*k+1];
+						LM[3*(k+nseln)+2] = mLM[3*k+2];
+					}
+
+					// build the en vector
+					en.create(nseln+nmeln);
+					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
+					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+
+					// calculate shape functions
+					Hs = se.H(j);
+
+					double r = ss.m_rs[ni][0];
+					double s = ss.m_rs[ni][1];
+					if (me.Nodes() == 4)
+					{
+						Hm[0] = 0.25*(1-r)*(1-s);
+						Hm[1] = 0.25*(1+r)*(1-s);
+						Hm[2] = 0.25*(1+r)*(1+s);
+						Hm[3] = 0.25*(1-r)*(1+s);
+					}
+
+					// get normal vector
+					vec3d nu = ss.m_nu[ni];
+
+					// gap function
+					double g = ss.m_gap[ni];
+					
+					// lagrange multiplier
+					double Lm = ss.m_Lm[ni];
+
+					// contact traction
+					double tn = Lm + m_epsn*g;
+					tn = MBRACKET(tn);
+
+					// calculate the force vector
+					fe.create(ndof);
+
+					for (k=0; k<nseln; ++k)
+					{
+						fe[3*k  ] = Hs[k]*nu.x;
+						fe[3*k+1] = Hs[k]*nu.y;
+						fe[3*k+2] = Hs[k]*nu.z;
+					}
+
+					for (k=0; k<nmeln; ++k)
+					{
+						fe[3*(k+nseln)  ] = -Hm[k]*nu.x;
+						fe[3*(k+nseln)+1] = -Hm[k]*nu.y;
+						fe[3*(k+nseln)+2] = -Hm[k]*nu.z;
+					}
+
+					for (k=0; k<ndof; ++k) fe[k] *= tn*detJ[j]*w[j];
+
+					// assemble the global residual
+					psolver->AssembleResidual(en, LM, fe, F);
 				}
-
-				for (k=0; k<nmeln; ++k)
-				{
-					LM[3*(k+nseln)  ] = mLM[3*k  ];
-					LM[3*(k+nseln)+1] = mLM[3*k+1];
-					LM[3*(k+nseln)+2] = mLM[3*k+2];
-				}
-
-				// build the en vector
-				en.create(nseln+nmeln);
-				for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
-				for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
-
-				// calculate shape functions
-				Hs = se.H(j);
-
-				double r = m_ss.m_rs[ni][0];
-				double s = m_ss.m_rs[ni][1];
-				if (me.Nodes() == 4)
-				{
-					Hm[0] = 0.25*(1-r)*(1-s);
-					Hm[1] = 0.25*(1+r)*(1-s);
-					Hm[2] = 0.25*(1+r)*(1+s);
-					Hm[3] = 0.25*(1-r)*(1+s);
-				}
-
-				// get normal vector
-				vec3d nu = m_ss.m_nu[ni];
-
-				// gap function
-				double g = m_ss.m_gap[ni];
-				
-				// lagrange multiplier
-				double Lm = m_ss.m_Lm[ni];
-
-				// contact traction
-				double tn = Lm + m_epsn*g;
-				tn = MBRACKET(tn);
-
-				// calculate the force vector
-				fe.create(ndof);
-
-				for (k=0; k<nseln; ++k)
-				{
-					fe[3*k  ] = Hs[k]*nu.x;
-					fe[3*k+1] = Hs[k]*nu.y;
-					fe[3*k+2] = Hs[k]*nu.z;
-				}
-
-				for (k=0; k<nmeln; ++k)
-				{
-					fe[3*(k+nseln)  ] = -Hm[k]*nu.x;
-					fe[3*(k+nseln)+1] = -Hm[k]*nu.y;
-					fe[3*(k+nseln)+2] = -Hm[k]*nu.z;
-				}
-
-				for (k=0; k<ndof; ++k) fe[k] *= tn*detJ[j]*w[j];
-
-				// assemble the global residual
-				psolver->AssembleResidual(en, LM, fe, F);
 			}
 		}
 	}
@@ -353,268 +363,274 @@ void FEFacet2FacetSliding::ContactStiffness()
 
 	double detJ[4], w[4], *Hs, Hm[4], Hmr[4], Hms[4];
 
-	// loop over all slave elements
-	for (i=0; i<m_ss.Elements(); ++i)
+	for (int np=0; np < m_npass; ++np)
 	{
-		FESurfaceElement& se = m_ss.Element(i);
-		pm->UnpackElement(se);
-		int nseln = se.Nodes();
-		int nint = se.GaussPoints();
+		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
+		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
-		// copy the LM vector
-		sLM = se.LM();
-
-		// nodal coordinates
-		vec3d* r0 = se.r0();
-
-		// we calculate all the metrics we need before we
-		// calculate the nodal forces
-		for (j=0; j<nint; ++j)
+		// loop over all slave elements
+		for (i=0; i<ss.Elements(); ++i)
 		{
-			double* Gr = se.Gr(j);
-			double* Gs = se.Gs(j);
+			FESurfaceElement& se = ss.Element(i);
+			pm->UnpackElement(se);
+			int nseln = se.Nodes();
+			int nint = se.GaussPoints();
 
-			// calculate jacobian
-			// note that we are integrating over the reference surface
-			vec3d dxr, dxs;
-			for (k=0; k<nseln; ++k)
+			// copy the LM vector
+			sLM = se.LM();
+
+			// nodal coordinates
+			vec3d* r0 = se.r0();
+
+			// we calculate all the metrics we need before we
+			// calculate the nodal forces
+			for (j=0; j<nint; ++j)
 			{
-				dxr.x += Gr[k]*r0[k].x;
-				dxr.y += Gr[k]*r0[k].y;
-				dxr.z += Gr[k]*r0[k].z;
+				double* Gr = se.Gr(j);
+				double* Gs = se.Gs(j);
 
-				dxs.x += Gs[k]*r0[k].x;
-				dxs.y += Gs[k]*r0[k].y;
-				dxs.z += Gs[k]*r0[k].z;
+				// calculate jacobian
+				// note that we are integrating over the reference surface
+				vec3d dxr, dxs;
+				for (k=0; k<nseln; ++k)
+				{
+					dxr.x += Gr[k]*r0[k].x;
+					dxr.y += Gr[k]*r0[k].y;
+					dxr.z += Gr[k]*r0[k].z;
+
+					dxs.x += Gs[k]*r0[k].x;
+					dxs.y += Gs[k]*r0[k].y;
+					dxs.z += Gs[k]*r0[k].z;
+				}
+
+				// jacobians
+				detJ[j] = (dxr ^ dxs).norm();
+
+				// integration weights
+				w[j] = se.GaussWeights()[j];
 			}
 
-			// jacobians
-			detJ[j] = (dxr ^ dxs).norm();
-
-			// integration weights
-			w[j] = se.GaussWeights()[j];
-		}
-
-		// loop over all integration points
-		for (int j=0; j<nint; ++j, ++ni)
-		{
-			// get the master element
-			FESurfaceElement* pme = m_ss.m_pme[ni];
-			if (pme)
+			// loop over all integration points
+			for (int j=0; j<nint; ++j, ++ni)
 			{
-				FESurfaceElement& me = *pme;
-				pm->UnpackElement(me);
-
-				int nmeln = me.Nodes();
-				mLM = me.LM();
-
-				// calculate degrees of freedom
-				int ndof = 3*(nseln + nmeln);
-
-				// build the LM vector
-				LM.create(ndof);
-				for (k=0; k<nseln; ++k)
+				// get the master element
+				FESurfaceElement* pme = ss.m_pme[ni];
+				if (pme)
 				{
-					LM[3*k  ] = sLM[3*k  ];
-					LM[3*k+1] = sLM[3*k+1];
-					LM[3*k+2] = sLM[3*k+2];
-				}
+					FESurfaceElement& me = *pme;
+					pm->UnpackElement(me);
 
-				for (k=0; k<nmeln; ++k)
-				{
-					LM[3*(k+nseln)  ] = mLM[3*k  ];
-					LM[3*(k+nseln)+1] = mLM[3*k+1];
-					LM[3*(k+nseln)+2] = mLM[3*k+2];
-				}
+					int nmeln = me.Nodes();
+					mLM = me.LM();
 
-				// build the en vector
-				en.create(nseln+nmeln);
-				for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
-				for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+					// calculate degrees of freedom
+					int ndof = 3*(nseln + nmeln);
 
-				// calculate shape functions
-				Hs = se.H(j);
-				double r = m_ss.m_rs[ni][0];
-				double s = m_ss.m_rs[ni][1];
-				if (me.Nodes() == 4)
-				{
-					Hm[0] = 0.25*(1-r)*(1-s);
-					Hm[1] = 0.25*(1+r)*(1-s);
-					Hm[2] = 0.25*(1+r)*(1+s);
-					Hm[3] = 0.25*(1-r)*(1+s);
-				}
-				else
-				{
-					Hm[0] = 1 - r - s;
-					Hm[1] = r;
-					Hm[2] = s;
-				}
-
-				// get normal vector
-				vec3d nu = m_ss.m_nu[ni];
-
-				// gap function
-				double g = m_ss.m_gap[ni];
-				
-				// lagrange multiplier
-				double Lm = m_ss.m_Lm[ni];
-
-				// contact traction
-				double tn = Lm + m_epsn*g;
-				tn = MBRACKET(tn);
-
-				double dtn = m_epsn*HEAVYSIDE(Lm + m_epsn*g);
-
-				// calculate the N-vector
-				for (k=0; k<nseln; ++k)
-				{
-					N[3*k  ] = Hs[k]*nu.x;
-					N[3*k+1] = Hs[k]*nu.y;
-					N[3*k+2] = Hs[k]*nu.z;
-				}
-
-				for (k=0; k<nmeln; ++k)
-				{
-					N[3*(k+nseln)  ] = -Hm[k]*nu.x;
-					N[3*(k+nseln)+1] = -Hm[k]*nu.y;
-					N[3*(k+nseln)+2] = -Hm[k]*nu.z;
-				}
-
-				// --- N O R M A L   S T I F F N E S S ---
-
-				// create the stiffness matrix
-				ke.Create(ndof, ndof);
-
-				// add the first order term (= D(tn)*dg )
-				for (k=0; k<ndof; ++k)
-					for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
-
-				// add the higher order terms (= tn*D(dg) )
-				if (m_knmult > 0)
-				{
-					// calculate the master shape fncs derivatives
-					if (nmeln == 4)
+					// build the LM vector
+					LM.create(ndof);
+					for (k=0; k<nseln; ++k)
 					{
-						Hmr[0] = -0.25*(1-s); Hms[0] = -0.25*(1-r);
-						Hmr[1] =  0.25*(1-s); Hms[1] = -0.25*(1+r);
-						Hmr[2] =  0.25*(1+s); Hms[2] =  0.25*(1+r);
-						Hmr[3] = -0.25*(1+s); Hms[3] =  0.25*(1-r);
+						LM[3*k  ] = sLM[3*k  ];
+						LM[3*k+1] = sLM[3*k+1];
+						LM[3*k+2] = sLM[3*k+2];
+					}
+
+					for (k=0; k<nmeln; ++k)
+					{
+						LM[3*(k+nseln)  ] = mLM[3*k  ];
+						LM[3*(k+nseln)+1] = mLM[3*k+1];
+						LM[3*(k+nseln)+2] = mLM[3*k+2];
+					}
+
+					// build the en vector
+					en.create(nseln+nmeln);
+					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
+					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+
+					// calculate shape functions
+					Hs = se.H(j);
+					double r = ss.m_rs[ni][0];
+					double s = ss.m_rs[ni][1];
+					if (me.Nodes() == 4)
+					{
+						Hm[0] = 0.25*(1-r)*(1-s);
+						Hm[1] = 0.25*(1+r)*(1-s);
+						Hm[2] = 0.25*(1+r)*(1+s);
+						Hm[3] = 0.25*(1-r)*(1+s);
 					}
 					else
 					{
-						Hmr[0] = -1; Hms[0] = -1;
-						Hmr[1] =  1; Hms[1] =  0;
-						Hmr[2] =  0; Hms[2] =  1;
+						Hm[0] = 1 - r - s;
+						Hm[1] = r;
+						Hm[2] = s;
 					}
 
-					// get the master nodes
-					vec3d* rt = me.rt();
+					// get normal vector
+					vec3d nu = ss.m_nu[ni];
 
-					// get the tangent vectors
-					vec3d tau1(0,0,0), tau2(0,0,0);
-					for (k=0; k<nmeln; ++k)
-					{
-						tau1.x += Hmr[k]*rt[k].x;
-						tau1.y += Hmr[k]*rt[k].y;
-						tau1.z += Hmr[k]*rt[k].z;
-	
-						tau2.x += Hms[k]*rt[k].x;
-						tau2.y += Hms[k]*rt[k].y;
-						tau2.z += Hms[k]*rt[k].z;
-					}
+					// gap function
+					double g = ss.m_gap[ni];
+					
+					// lagrange multiplier
+					double Lm = ss.m_Lm[ni];
 
-					// set up the Ti vectors
+					// contact traction
+					double tn = Lm + m_epsn*g;
+					tn = MBRACKET(tn);
+
+					double dtn = m_epsn*HEAVYSIDE(Lm + m_epsn*g);
+
+					// calculate the N-vector
 					for (k=0; k<nseln; ++k)
 					{
-						T1[k*3  ] = Hs[k]*tau1.x; T2[k*3  ] = Hs[k]*tau2.x;
-						T1[k*3+1] = Hs[k]*tau1.y; T2[k*3+1] = Hs[k]*tau2.y;
-						T1[k*3+2] = Hs[k]*tau1.z; T2[k*3+2] = Hs[k]*tau2.z;
+						N[3*k  ] = Hs[k]*nu.x;
+						N[3*k+1] = Hs[k]*nu.y;
+						N[3*k+2] = Hs[k]*nu.z;
 					}
 
-					for (k=0; k<nmeln; ++k) 
+					for (k=0; k<nmeln; ++k)
 					{
-						T1[(k+nseln)*3  ] = -Hm[k]*tau1.x;
-						T1[(k+nseln)*3+1] = -Hm[k]*tau1.y;
-						T1[(k+nseln)*3+2] = -Hm[k]*tau1.z;
-
-						T2[(k+nseln)*3  ] = -Hm[k]*tau2.x;
-						T2[(k+nseln)*3+1] = -Hm[k]*tau2.y;
-						T2[(k+nseln)*3+2] = -Hm[k]*tau2.z;
+						N[3*(k+nseln)  ] = -Hm[k]*nu.x;
+						N[3*(k+nseln)+1] = -Hm[k]*nu.y;
+						N[3*(k+nseln)+2] = -Hm[k]*nu.z;
 					}
 
-					// set up the Ni vectors
-					for (k=0; k<nmeln; ++k) 
+					// --- N O R M A L   S T I F F N E S S ---
+
+					// create the stiffness matrix
+					ke.Create(ndof, ndof);
+
+					// add the first order term (= D(tn)*dg )
+					for (k=0; k<ndof; ++k)
+						for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
+
+					// add the higher order terms (= tn*D(dg) )
+					if (m_knmult > 0)
 					{
-						N1[(k+nseln)*3  ] = -Hmr[k]*nu.x;
-						N1[(k+nseln)*3+1] = -Hmr[k]*nu.y;
-						N1[(k+nseln)*3+2] = -Hmr[k]*nu.z;
+						// calculate the master shape fncs derivatives
+						if (nmeln == 4)
+						{
+							Hmr[0] = -0.25*(1-s); Hms[0] = -0.25*(1-r);
+							Hmr[1] =  0.25*(1-s); Hms[1] = -0.25*(1+r);
+							Hmr[2] =  0.25*(1+s); Hms[2] =  0.25*(1+r);
+							Hmr[3] = -0.25*(1+s); Hms[3] =  0.25*(1-r);
+						}
+						else
+						{
+							Hmr[0] = -1; Hms[0] = -1;
+							Hmr[1] =  1; Hms[1] =  0;
+							Hmr[2] =  0; Hms[2] =  1;
+						}
 
-						N2[(k+nseln)*3  ] = -Hms[k]*nu.x;
-						N2[(k+nseln)*3+1] = -Hms[k]*nu.y;
-						N2[(k+nseln)*3+2] = -Hms[k]*nu.z;
-					}
+						// get the master nodes
+						vec3d* rt = me.rt();
 
-					// calculate metric tensor
-					mat2d M;
-					M[0][0] = tau1*tau1; M[0][1] = tau1*tau2; 
-					M[1][0] = tau2*tau1; M[1][1] = tau2*tau2; 
-
-					// calculate reciprocal metric tensor
-					mat2d Mi = M.inverse();
-
-					// calculate curvature tensor
-					double K[2][2] = {0};
-					const double Grs[4] = {0.25, -0.25, 0.25, -0.25};
-					if (nmeln == 4)
-					{
+						// get the tangent vectors
+						vec3d tau1(0,0,0), tau2(0,0,0);
 						for (k=0; k<nmeln; ++k)
 						{
-							K[0][1] += (nu*rt[k])*Grs[k];
-							K[1][0] += (nu*rt[k])*Grs[k];
+							tau1.x += Hmr[k]*rt[k].x;
+							tau1.y += Hmr[k]*rt[k].y;
+							tau1.z += Hmr[k]*rt[k].z;
+		
+							tau2.x += Hms[k]*rt[k].x;
+							tau2.y += Hms[k]*rt[k].y;
+							tau2.z += Hms[k]*rt[k].z;
 						}
-					}
 
-					// setup A matrix A = M + gK
-					double A[2][2];
-					A[0][0] = M[0][0] + g*K[0][0];
-					A[0][1] = M[0][1] + g*K[0][1];
-					A[1][0] = M[1][0] + g*K[1][0];
-					A[1][1] = M[1][1] + g*K[1][1];
-
-					// calculate determinant of A
-					double detA = A[0][0]*A[1][1] - A[0][1]*A[1][0];
-
-					// setup Di vectors
-					for (k=0; k<ndof; ++k)
-					{
-						D1[k] = (1/detA)*(A[1][1]*(T1[k]+g*N1[k]) - A[0][1]*(T2[k] + g*N2[k]));
-						D2[k] = (1/detA)*(A[0][0]*(T2[k]+g*N2[k]) - A[0][1]*(T1[k] + g*N1[k]));
-					}
-
-					// setup Nbi vectors
-					for (k=0; k<ndof; ++k)
-					{
-						Nb1[k] = N1[k] - K[0][1]*D2[k];
-						Nb2[k] = N2[k] - K[0][1]*D1[k];
-					}
-
-					// add it to the stiffness
-					double sum;
-					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l)
+						// set up the Ti vectors
+						for (k=0; k<nseln; ++k)
 						{
-							sum = Mi[0][0]*Nb1[k]*Nb1[l]+Mi[0][1]*(Nb1[k]*Nb2[l]+Nb2[k]*Nb1[l])+Mi[1][1]*Nb2[k]*Nb2[l];
-							sum *= g;
-							sum -= D1[k]*N1[l]+D2[k]*N2[l]+N1[k]*D1[l]+N2[k]*D2[l];
-							sum += K[0][1]*(D1[k]*D2[l]+D2[k]*D1[l]);
-							sum *= tn*m_knmult;
-
-							ke[k][l] += sum*detJ[j]*w[j];
+							T1[k*3  ] = Hs[k]*tau1.x; T2[k*3  ] = Hs[k]*tau2.x;
+							T1[k*3+1] = Hs[k]*tau1.y; T2[k*3+1] = Hs[k]*tau2.y;
+							T1[k*3+2] = Hs[k]*tau1.z; T2[k*3+2] = Hs[k]*tau2.z;
 						}
-				}
 
-				// assemble the global residual
-				psolver->AssembleStiffness(en, LM, ke);
+						for (k=0; k<nmeln; ++k) 
+						{
+							T1[(k+nseln)*3  ] = -Hm[k]*tau1.x;
+							T1[(k+nseln)*3+1] = -Hm[k]*tau1.y;
+							T1[(k+nseln)*3+2] = -Hm[k]*tau1.z;
+
+							T2[(k+nseln)*3  ] = -Hm[k]*tau2.x;
+							T2[(k+nseln)*3+1] = -Hm[k]*tau2.y;
+							T2[(k+nseln)*3+2] = -Hm[k]*tau2.z;
+						}
+
+						// set up the Ni vectors
+						for (k=0; k<nmeln; ++k) 
+						{
+							N1[(k+nseln)*3  ] = -Hmr[k]*nu.x;
+							N1[(k+nseln)*3+1] = -Hmr[k]*nu.y;
+							N1[(k+nseln)*3+2] = -Hmr[k]*nu.z;
+
+							N2[(k+nseln)*3  ] = -Hms[k]*nu.x;
+							N2[(k+nseln)*3+1] = -Hms[k]*nu.y;
+							N2[(k+nseln)*3+2] = -Hms[k]*nu.z;
+						}
+
+						// calculate metric tensor
+						mat2d M;
+						M[0][0] = tau1*tau1; M[0][1] = tau1*tau2; 
+						M[1][0] = tau2*tau1; M[1][1] = tau2*tau2; 
+
+						// calculate reciprocal metric tensor
+						mat2d Mi = M.inverse();
+
+						// calculate curvature tensor
+						double K[2][2] = {0};
+						const double Grs[4] = {0.25, -0.25, 0.25, -0.25};
+						if (nmeln == 4)
+						{
+							for (k=0; k<nmeln; ++k)
+							{
+								K[0][1] += (nu*rt[k])*Grs[k];
+								K[1][0] += (nu*rt[k])*Grs[k];
+							}
+						}
+
+						// setup A matrix A = M + gK
+						double A[2][2];
+						A[0][0] = M[0][0] + g*K[0][0];
+						A[0][1] = M[0][1] + g*K[0][1];
+						A[1][0] = M[1][0] + g*K[1][0];
+						A[1][1] = M[1][1] + g*K[1][1];
+
+						// calculate determinant of A
+						double detA = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+
+						// setup Di vectors
+						for (k=0; k<ndof; ++k)
+						{
+							D1[k] = (1/detA)*(A[1][1]*(T1[k]+g*N1[k]) - A[0][1]*(T2[k] + g*N2[k]));
+							D2[k] = (1/detA)*(A[0][0]*(T2[k]+g*N2[k]) - A[0][1]*(T1[k] + g*N1[k]));
+						}
+
+						// setup Nbi vectors
+						for (k=0; k<ndof; ++k)
+						{
+							Nb1[k] = N1[k] - K[0][1]*D2[k];
+							Nb2[k] = N2[k] - K[0][1]*D1[k];
+						}
+
+						// add it to the stiffness
+						double sum;
+						for (k=0; k<ndof; ++k)
+							for (l=0; l<ndof; ++l)
+							{
+								sum = Mi[0][0]*Nb1[k]*Nb1[l]+Mi[0][1]*(Nb1[k]*Nb2[l]+Nb2[k]*Nb1[l])+Mi[1][1]*Nb2[k]*Nb2[l];
+								sum *= g;
+								sum -= D1[k]*N1[l]+D2[k]*N2[l]+N1[k]*D1[l]+N2[k]*D2[l];
+								sum += K[0][1]*(D1[k]*D2[l]+D2[k]*D1[l]);
+								sum *= tn*m_knmult;
+
+								ke[k][l] += sum*detJ[j]*w[j];
+							}
+					}
+
+					// assemble the global residual
+					psolver->AssembleStiffness(en, LM, ke);
+				}
 			}
 		}
 	}

@@ -1538,8 +1538,21 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		do
 		{
 			if (tag == "penalty") tag.value(ps->m_epsn);
+			else if (tag == "laugon") tag.value(ps->m_blaugon);
+			else if (tag == "tolerance") tag.value(ps->m_atol);
+			else if (tag == "gaptol") tag.value(ps->m_gtol);
+			else if (tag == "minaug") tag.value(ps->m_naugmin);
+			else if (tag == "maxaug") tag.value(ps->m_naugmax);
 			else if (tag == "knmult") tag.value(ps->m_knmult);
 			else if (tag == "search_tol") tag.value(ps->m_stol);
+			else if (tag == "two_pass")
+			{
+				int n;
+				tag.value(n);
+				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
+
+				ps->m_npass = n+1;
+			}
 			else if (tag == "surface")
 			{
 				const char* sztype = tag.AttributeValue("type");
