@@ -41,6 +41,7 @@ public:
 	char	m_szdelim[MAX_DELIM];	//!< delimiter used
 	vector<int>	m_item;				//!< item list
 	MathParser	m_calc;
+	bool	m_bcomm;			//!< export comments or not
 
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record

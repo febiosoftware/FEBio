@@ -1945,9 +1945,15 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 					sz = tag.AttributeValue("name", true);
 					if (sz != 0) strcpy(prec->m_szname, sz);
 
-
 					sz = tag.AttributeValue("delim", true);
 					if (sz != 0) strcpy(prec->m_szdelim, sz);
+
+					sz = tag.AttributeValue("comments", true);
+					if (sz != 0)
+					{
+						if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
+						else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+					}
 
 					if (tag.isleaf()) prec->DataRecord::SetItemList(tag.szvalue());
 					else
@@ -1990,6 +1996,13 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 					sz = tag.AttributeValue("delim", true);
 					if (sz != 0) strcpy(prec->m_szdelim, sz);
 
+					sz = tag.AttributeValue("comments", true);
+					if (sz != 0)
+					{
+						if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
+						else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+					}
+
 					prec->SetItemList(tag.szvalue());
 
 					fem.m_Data.AddRecord(prec);
@@ -2007,6 +2020,14 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 
 					sz = tag.AttributeValue("delim", true);
 					if (sz != 0) strcpy(prec->m_szdelim, sz);
+
+					sz = tag.AttributeValue("comments", true);
+					if (sz != 0)
+					{
+						if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
+						else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+					}
+
 					prec->SetItemList(tag.szvalue());
 
 					fem.m_Data.AddRecord(prec);

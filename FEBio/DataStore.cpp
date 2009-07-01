@@ -49,6 +49,7 @@ DataRecord::DataRecord(FEM* pfem, const char* szfile)
 	m_pfem = pfem;
 	m_fp = 0;
 	m_szfile[0] = 0;
+	m_bcomm = true;
 
 	if (szfile)
 	{
@@ -100,7 +101,7 @@ bool DataRecord::Write()
 		// we store the data in the logfile
 		fp = fplog;
 	}
-	else
+	else if (m_bcomm)
 	{
 		// we save the data in a seperate file
 		fprintf(fplog, "File = %s\n", m_szfile);
