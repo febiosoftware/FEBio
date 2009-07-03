@@ -361,6 +361,22 @@ void FEFacet2FacetSliding::ContactStiffness()
 	// get the solver
 	FESolver* psolver = m_pfem->m_pStep->m_psolver;
 
+	// see how many reformations we've had to do so far
+	int nref = psolver->m_nref;
+
+	// set higher order stiffness mutliplier
+	double knmult = m_knmult;
+	if (m_knmult < 0)
+	{
+		int ni = int(-m_knmult);
+		if (nref >= ni)
+		{
+			knmult = 1; 
+			m_pfem->m_log.printf("Higher order stiffness terms included.\n");
+		}
+		else knmult = 0;
+	}
+
 	double detJ[4], w[4], *Hs, Hm[4], Hmr[4], Hms[4];
 
 	for (int np=0; np < m_npass; ++np)
@@ -505,7 +521,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 						for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
 
 					// add the higher order terms (= tn*D(dg) )
-					if (m_knmult > 0)
+					if (knmult > 0)
 					{
 						// calculate the master shape fncs derivatives
 						if (nmeln == 4)
@@ -622,7 +638,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 								sum *= g;
 								sum -= D1[k]*N1[l]+D2[k]*N2[l]+N1[k]*D1[l]+N2[k]*D2[l];
 								sum += K[0][1]*(D1[k]*D2[l]+D2[k]*D1[l]);
-								sum *= tn*m_knmult;
+								sum *= tn*knmult;
 
 								ke[k][l] += sum*detJ[j]*w[j];
 							}
