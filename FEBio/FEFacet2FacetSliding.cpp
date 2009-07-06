@@ -212,6 +212,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
 		// loop over all slave elements
+		ni = 0;
 		for (i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
@@ -385,6 +386,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
 		// loop over all slave elements
+		ni = 0;
 		for (i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
