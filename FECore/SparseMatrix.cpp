@@ -174,7 +174,7 @@ void CompactMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 
 void CompactMatrix::print_hb()
 {
-	int i, isize, dsize;
+	int isize, dsize;
 
 	isize = sizeof(int);
 	dsize = sizeof(double);

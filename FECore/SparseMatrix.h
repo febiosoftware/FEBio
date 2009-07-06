@@ -222,6 +222,23 @@ public:
 		}
 	}
 
+	double get(int i, int j)
+	{
+		if (j>i) { i ^= j; j ^= i; i ^= j; }
+
+		int *pi = m_pindices + m_ppointers[j], k;
+		pi -= m_offset;
+		int l = m_ppointers[j+1] - m_ppointers[j];
+		for (int n=0; n<l; ++n)
+			if (pi[n] == i + m_offset)
+			{
+				k = m_ppointers[j] + n;
+				k -= m_offset;
+				return m_pd[k];
+			}
+		return 0;
+	}
+
 	double diag(int i)
 	{
 		return m_pd[m_ppointers[i] - m_offset];
