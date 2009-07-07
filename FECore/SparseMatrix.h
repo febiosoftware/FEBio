@@ -48,7 +48,7 @@ public:
 	int NonZeroes() { return m_nsize; };
 	int Size() { return m_ndim; }
 
-	void print(FILE* fp);
+	void print(FILE* fp, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
 
 protected:
 	int	m_ndim;	// dimension of matrix

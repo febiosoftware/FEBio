@@ -21,14 +21,14 @@ SparseMatrix::~SparseMatrix()
 
 }
 
-void SparseMatrix::print(FILE* fp)
+void SparseMatrix::print(FILE* fp, int i0, int j0, int i1, int j1)
 {
-	int MAXDIM = 50;
-	int ndim = (m_ndim > MAXDIM ? MAXDIM : m_ndim);
+	if ((i1 < 0) || (i1 >= m_ndim)) i1 = m_ndim-1;
+	if ((j1 < 0) || (j1 >= m_ndim)) j1 = m_ndim-1;
 
-	for (int i=0; i<ndim; ++i)
+	for (int i=i0; i<=i1; ++i)
 	{
-		for (int j=0; j<ndim; ++j)
+		for (int j=j0; j<=j1; ++j)
 		{
 			fprintf(fp, "%10.3g", get(i,j));
 		}
@@ -218,7 +218,7 @@ void CompactUnSymmMatrix::Create(int N, int nz, double* pv, int* pi, int* pc)
 
 void CompactUnSymmMatrix::print_hb()
 {
-	int i, isize, dsize;
+	int isize, dsize;
 
 	isize = sizeof(int);
 	dsize = sizeof(double);

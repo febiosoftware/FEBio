@@ -50,6 +50,9 @@ public:
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
 public:
+	FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
+
+public:
 
 	//{ --- Solution functions ---
 
