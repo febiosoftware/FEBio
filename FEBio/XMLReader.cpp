@@ -275,10 +275,34 @@ void XMLReader::ReadTag(XMLTag& tag)
 		while ((ch=GetChar())!='<') if (!isspace(ch)) throw XMLSyntaxError();
 
 		ch = GetChar();
-		if ((ch == '!') || (ch == '?'))
+		if (ch == '!')
 		{
-			// read comment
-			while ((ch = GetChar()) != '>');
+			// parse the comment
+			ch = GetChar(); if (ch != '-') throw XMLSyntaxError();
+			ch = GetChar(); if (ch != '-') throw XMLSyntaxError();
+
+			// find the end of the comment
+			do
+			{
+				ch = GetChar();
+				if (ch == '-')
+				{
+					ch = GetChar();
+					if (ch == '-')
+					{
+						ch = GetChar();
+						if (ch == '>') break;
+					}
+				}
+			}
+			while (1);
+		}
+		else if (ch == '?')
+		{
+			// parse the xml header tag
+			while ((ch = GetChar()) != '?');
+			ch = GetChar();
+			if (ch != '>') throw XMLSyntaxError();
 		}
 		else break;
 	}
