@@ -457,7 +457,7 @@ void FESolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 						for (l=0; l<3; ++l)
 						{
 							KF[k][l] = kij[l][k];
-							KF[k][3+l] = Ri[l][0]*kij[0][k] + Ri[l][1]*kij[1][k] + Ri[l][2]*kij[2][k];
+							KF[k][3+l] = Ri[0][l]*kij[0][k] + Ri[1][l]*kij[1][k] + Ri[2][l]*kij[2][k];
 						}
 
 					for (k=0; k<6; ++k)
