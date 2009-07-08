@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEPrintMatrixDiagnostic.h"
 
 FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEM& fem) : FEDiagnostic(fem)
