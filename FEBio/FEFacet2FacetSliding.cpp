@@ -34,6 +34,14 @@ void FEFacetSlidingSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
+{
+	m_Lm  = s.m_Lm;
+	m_gap = s.m_gap;
+	m_pme.zero();
+}
+
+//-----------------------------------------------------------------------------
 //! Finds the (master) element that contains the projection of a (slave) node
 
 FEElement* FEFacetSlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
@@ -186,6 +194,9 @@ void FEFacet2FacetSliding::Update()
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::ShallowCopy(FEContactInterface &ci)
 {
+	FEFacet2FacetSliding& si = dynamic_cast<FEFacet2FacetSliding&>(ci);
+	m_ss.ShallowCopy(si.m_ss);
+	m_ms.ShallowCopy(si.m_ms);
 }
 
 //-----------------------------------------------------------------------------

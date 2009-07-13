@@ -1600,6 +1600,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		do
 		{
 			if (tag == "tolerance") tag.value(ps->m_atol);
+			else if (tag == "laugon") tag.value(ps->m_blaugon);
 			else if (tag == "penalty")
 			{
 				const char* sz = tag.AttributeValue("lc", true);
@@ -1644,6 +1645,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		do
 		{
 			if (tag == "tolerance") tag.value(ps->m_atol);
+			else if (tag == "laugon") tag.value(ps->m_blaugon);
 			else if (tag == "penalty")
 			{
 				const char* sz = tag.AttributeValue("lc", true);

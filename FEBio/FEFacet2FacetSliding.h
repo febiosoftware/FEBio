@@ -18,6 +18,8 @@ public:
 	//! Find element that contains the projection of x
 	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol);
 
+	void ShallowCopy(FEFacetSlidingSurface& s);
+
 public:
 	vector<double>				m_gap;	//!< gap function at integration points
 	vector<vec3d>				m_nu;	//!< master normal at integration points
