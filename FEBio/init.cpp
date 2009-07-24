@@ -83,7 +83,16 @@ bool FEM::Init()
 	{
 		// unpack element data
 		FESolidElement& el = m_mesh.SolidElement(i);
-		m_mesh.UnpackElement(el);
+
+		try
+		{
+			m_mesh.UnpackElement(el);
+		}
+		catch (NegativeJacobian e)
+		{
+			m_log.printbox("F A T A L   E R R O R", "A negative jacobian was detected at\n integration point %d of element %d.\nDid you use the right node numbering?", e.m_iel, e.m_ng);
+			return false;
+		}
 
 		// get the elements material
 		FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
