@@ -172,7 +172,7 @@ void CompactMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 	}
 }
 
-void CompactMatrix::print_hb()
+bool CompactMatrix::print_hb()
 {
 	int isize, dsize;
 
@@ -180,6 +180,7 @@ void CompactMatrix::print_hb()
 	dsize = sizeof(double);
 
 	FILE* fout = fopen("hb_matrix.out", "wb");
+	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
 
 	fwrite(&m_ndim, isize, 1, fout);
 	fwrite(&m_nsize, isize, 1, fout);
@@ -188,6 +189,7 @@ void CompactMatrix::print_hb()
 	fwrite(m_pd, dsize, m_nsize, fout);
 
 	fclose(fout);
+	return true;
 
 }
 
@@ -216,7 +218,7 @@ void CompactUnSymmMatrix::Create(int N, int nz, double* pv, int* pi, int* pc)
 	m_nsize = nz;
 }
 
-void CompactUnSymmMatrix::print_hb()
+bool CompactUnSymmMatrix::print_hb()
 {
 	int isize, dsize;
 
@@ -224,6 +226,7 @@ void CompactUnSymmMatrix::print_hb()
 	dsize = sizeof(double);
 
 	FILE* fout = fopen("hb_matrix.out", "wb");
+	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
 
 	fwrite(&m_ndim, isize, 1, fout);
 	fwrite(&m_nsize, isize, 1, fout);
@@ -232,5 +235,5 @@ void CompactUnSymmMatrix::print_hb()
 	fwrite(m_pd, dsize, m_nsize, fout);
 
 	fclose(fout);
-
+	return true;
 }

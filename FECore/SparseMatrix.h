@@ -253,7 +253,7 @@ public:
 	int*    pointers() { return m_ppointers; }
 	int     offset  () { return m_offset; }
 
-	void print_hb(); // Output Harwell-Boeing compact matrix
+	bool print_hb(); // Output Harwell-Boeing compact matrix
 
 protected:
 	int*	m_pindices;
@@ -348,7 +348,7 @@ public:
 	int*    rowind() { return m_pind; }
 	int*    colptr() { return m_pcol; }
 
-	void print_hb(); // Output Harwell-Boeing compact matrix
+	bool print_hb(); // Output Harwell-Boeing compact matrix
 
 protected:
 	int*	m_pind;	// row indices of values
