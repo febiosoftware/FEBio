@@ -28,7 +28,7 @@ public:
 	//! initialization
 	virtual bool Init() { return true; }
 
-	//! run the diagnostic. Retunrs true on pass, false on failure
+	//! run the diagnostic. Returns true on pass, false on failure
 	virtual bool Run() = 0;
 
 	//! load data from file

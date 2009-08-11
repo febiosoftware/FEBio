@@ -40,6 +40,7 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 	else if (tag == "range")
 	{
 		tag.value(m_rng, 4);
+		return true;
 	}
 
 	return  false;

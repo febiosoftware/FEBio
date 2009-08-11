@@ -7,6 +7,7 @@
 #include "FETangentDiagnostic.h"
 #include "FEContactDiagnostic.h"
 #include "FEPrintMatrixDiagnostic.h"
+#include "FEPrintHBMatrixDiagnostic.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -51,9 +52,10 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 		XMLTag tag;
 		if (m_xml.FindTag("febio_diagnostic", tag) == false) return false;
 
-		if      (strcmp(tag.m_szatv[0], "tangent test") == 0) m_pdia = new FETangentDiagnostic(fem);
-		else if (strcmp(tag.m_szatv[0], "contact test") == 0) m_pdia = new FEContactDiagnostic(fem);
-		else if (strcmp(tag.m_szatv[0], "print matrix") == 0) m_pdia = new FEPrintMatrixDiagnostic(fem);
+		if      (strcmp(tag.m_szatv[0], "tangent test"  ) == 0) m_pdia = new FETangentDiagnostic(fem);
+		else if (strcmp(tag.m_szatv[0], "contact test"  ) == 0) m_pdia = new FEContactDiagnostic(fem);
+		else if (strcmp(tag.m_szatv[0], "print matrix"  ) == 0) m_pdia = new FEPrintMatrixDiagnostic(fem);
+		else if (strcmp(tag.m_szatv[0], "print hbmatrix") == 0) m_pdia = new FEPrintHBMatrixDiagnostic(fem);
 		else 
 		{
 			log.printf("\nERROR: unknown diagnostic\n\n");
