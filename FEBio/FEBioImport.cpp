@@ -6,6 +6,7 @@
 #include "FEBioImport.h"
 #include "FERigid.h"
 #include "FEFacet2FacetSliding.h"
+#include "FESlidingInterface2.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1584,6 +1585,62 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 				}
 			}
 			else throw XMLReader::InvalidTag(tag);
+
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (strcmp(szt, "sliding2") == 0)
+	{
+		// --- S L I D I N G   I N T E R F A C E   2 ---
+		FESlidingInterface2* ps = new FESlidingInterface2(&fem);
+		fem.m_CI.add(ps);
+
+		++tag;
+		do
+		{
+			if      (tag == "laugon") tag.value(ps->m_blaugon);
+			else if (tag == "altol") tag.value(ps->m_atol);
+			else if (tag == "penalty") tag.value(ps->m_eps);
+			else if (tag == "two_pass") 
+			{
+				int n;
+				tag.value(n);
+				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
+
+				ps->m_npass = n+1;
+			}
+			else if (tag == "surface")
+			{
+				const char* sztype = tag.AttributeValue("type");
+				int ntype;
+				if (strcmp(sztype, "master") == 0) ntype = 1;
+				else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+				FEContactSurface2& s = (ntype == 1? ps->m_ms : ps->m_ss);
+
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
+				{
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt);
+
+				// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
+				// For this type of contact we want gaussian quadrature,
+				// so we have to modify those elements to FE_QUAD and FE_TRI
+				// TODO: we need a better way of doing this!
+				for (int i=0; i<s.Elements(); ++i)
+				{
+					FESurfaceElement& e = s.Element(i);
+					if (e.Nodes() == 4) e.SetType(FE_QUAD); 
+					else e.SetType(FE_TRI);
+				}
+			}
 
 			++tag;
 		}

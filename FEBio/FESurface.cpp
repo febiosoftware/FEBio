@@ -268,6 +268,93 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 }
 
 //-----------------------------------------------------------------------------
+vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
+{
+	int l;
+	FEMesh& mesh = *m_pmesh;
+
+	// get the coordinates of the element nodes
+	int ne = el.Nodes();
+	vec3d y[4];
+	for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
+
+	// set up shape functions and derivatives
+	double H[4];
+	if (ne == 4)
+	{
+		H[0] = 0.25*(1 - r)*(1 - s);
+		H[1] = 0.25*(1 + r)*(1 - s);
+		H[2] = 0.25*(1 + r)*(1 + s);
+		H[3] = 0.25*(1 - r)*(1 + s);
+	}
+	else if (ne == 3)
+	{
+		H[0] = 1-r-s;
+		H[1] = r;
+		H[2] = s;
+	}
+	else assert(false);
+
+	// calculate the element position
+	vec3d q;
+	for (l=0; l<ne; ++l) q += y[l]*H[l];
+
+	return q;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the global location of an integration point
+//!
+
+vec3d FESurface::Local2Global(FESurfaceElement &el, int n)
+{
+	FEMesh& m = *m_pmesh;
+
+	// get the shape function derivatives at this integration point
+	double* H = el.H(n);
+
+	// calculate the location
+	vec3d r;
+	int ne = el.Nodes();
+	for (int i=0; i<ne; ++i) r += m.Node(el.m_node[i]).m_rt*H[i];
+
+	return r;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the noraml of a surface element at integration
+//! point n
+
+vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
+{
+	int i;
+	FEMesh& m = *m_pmesh;
+
+	// get the shape function derivatives at this integration point
+	double* Hr = el.Gr(n);
+	double* Hs = el.Gs(n);
+
+	// get the coordinates of the element nodes
+	int ne = el.Nodes();
+	vec3d y[4];
+	for (i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).m_rt;
+
+	// calculate the tangents
+	vec3d xr, xs;
+	for (i=0; i<ne; ++i)
+	{
+		xr += y[i]*Hr[i];
+		xs += y[i]*Hs[i];
+	}
+
+	// calculate the normal
+	vec3d np = xr ^ xs;
+	np.unit();
+
+	return np;
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the normal of a surface element at the natural
 //! coordinates (r,s)
 

@@ -65,6 +65,15 @@ public:
 	//! calculate the surface normal
 	vec3d SurfaceNormal(FESurfaceElement& el, double r, double s);
 
+	//! calculate the surface normal at an integration point
+	vec3d SurfaceNormal(FESurfaceElement& el, int n);
+
+	//! calculate the global position of a point on the surface
+	vec3d Local2Global(FESurfaceElement& el, double r, double s);
+
+	//! calculate the global position of an integration point
+	vec3d Local2Global(FESurfaceElement& el, int n);
+
 	//! check to see if a point is on element
 	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
 
