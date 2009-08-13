@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FESlidingInterface2.h"
 #include "fem.h"
 
