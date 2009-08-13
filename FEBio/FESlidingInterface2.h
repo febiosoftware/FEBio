@@ -18,6 +18,11 @@ public:
 	//! find the intersection of a ray with the surface
 	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2]);
 
+protected:
+	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
+	bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
+	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
+
 public:
 	vector<double>				m_gap;	//!< gap function at integration points
 	vector<vec3d>				m_nu;	//!< normal at integration points
@@ -64,6 +69,7 @@ public:
 	FEContactSurface2	m_ms;	//!< master surface
 	FEContactSurface2	m_ss;	//!< slave surface
 
+	int		m_knmult;	//!< higher order stiffness multiplier
 	int		m_npass;	//!< nr of passes
 	double	m_atol;		//!< augmentation tolerance
 	double	m_eps;		//!< penalty factor

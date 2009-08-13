@@ -6,6 +6,7 @@
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
 #include "FEFacet2FacetSliding.h"
+#include "FESlidingInterface2.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -318,6 +319,65 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					{
 						FEFacetSlidingSurface& ss = (np == 0? pfi->m_ss : pfi->m_ms);
 						FEFacetSlidingSurface& ms = (np == 0? pfi->m_ms : pfi->m_ss);
+
+						int ni = 0, k, l;
+						for (j=0; j<ss.Elements(); ++j)
+						{
+							FESurfaceElement& se = ss.Element(j);
+							int nint = se.GaussPoints();
+							int* sn = se.m_node;
+							for (k=0; k<nint; ++k, ++ni)
+							{
+								FESurfaceElement* pe = ss.m_pme[ni];
+								if (pe != 0)
+								{
+									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+									int* mn = me.m_node;
+
+									lm.set(-1);
+
+									int nseln = se.Nodes();
+									int nmeln = me.Nodes();
+
+									for (l=0; l<nseln; ++l)
+									{
+										id = fem.m_mesh.Node(sn[l]).m_ID;
+										lm[6*l  ] = id[0];
+										lm[6*l+1] = id[1];
+										lm[6*l+2] = id[2];
+										lm[6*l+3] = id[7];
+										lm[6*l+4] = id[8];
+										lm[6*l+5] = id[9];
+									}
+
+									for (l=0; l<nmeln; ++l)
+									{
+										id = fem.m_mesh.Node(mn[l]).m_ID;
+										lm[6*(l+nseln)  ] = id[0];
+										lm[6*(l+nseln)+1] = id[1];
+										lm[6*(l+nseln)+2] = id[2];
+										lm[6*(l+nseln)+3] = id[7];
+										lm[6*(l+nseln)+4] = id[8];
+										lm[6*(l+nseln)+5] = id[9];
+									}
+
+									build_add(lm);
+								}
+							}
+						}
+					}
+				}
+
+				// facet-to-facet sliding interfaces
+				FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
+				if (ps2)
+				{
+					vector<int> lm(6*8);
+
+					for (int np=0; np<ps2->m_npass; ++np)
+					{
+						FEContactSurface2& ss = (np == 0? ps2->m_ss : ps2->m_ms);
+						FEContactSurface2& ms = (np == 0? ps2->m_ms : ps2->m_ss);
 
 						int ni = 0, k, l;
 						for (j=0; j<ss.Elements(); ++j)

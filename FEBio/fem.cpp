@@ -4,6 +4,7 @@
 #include "Archive.h"
 #include "XMLReader.h"
 #include "FEFacet2FacetSliding.h"
+#include "FESlidingInterface2.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
@@ -148,6 +149,8 @@ void FEM::operator =(FEM& fem)
 			case FE_CONTACT_RIGIDWALL:
 				pci = new FERigidWallInterface(this);
 				break;
+			case FE_CONTACT_SLIDING2:
+				pci = new FESlidingInterface2(this);
 			default:
 				assert(false);
 			}

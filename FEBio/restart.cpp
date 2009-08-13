@@ -4,6 +4,7 @@
 #include "FERigid.h"
 #include "FERestartImport.h"
 #include "FEFacet2FacetSliding.h"
+#include "FESlidingInterface2.h"
 
 //-----------------------------------------------------------------------------
 //!  This routine reads a binary archive that stores a restart point and prepares
@@ -482,6 +483,7 @@ void FEM::SerializeContactData(Archive &ar)
 			case FE_FACET2FACET_SLIDING: ps = new FEFacet2FacetSliding(this); break;
 			case FE_CONTACT_TIED     : ps = new FETiedInterface(this); break;
 			case FE_CONTACT_RIGIDWALL: ps = new FERigidWallInterface(this); break;
+			case FE_CONTACT_SLIDING2 : ps = new FESlidingInterface2(this); break;
 			default:
 				assert(false);
 			}
