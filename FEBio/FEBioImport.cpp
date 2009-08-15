@@ -1599,11 +1599,12 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		++tag;
 		do
 		{
-			if      (tag == "laugon") tag.value(ps->m_blaugon);
-			else if (tag == "tolerance") tag.value(ps->m_atol);
-			else if (tag == "penalty") tag.value(ps->m_eps);
-			else if (tag == "knmult") tag.value(ps->m_knmult);
-			else if (tag == "two_pass") 
+			if      (tag == "laugon"    ) tag.value(ps->m_blaugon);
+			else if (tag == "tolerance" ) tag.value(ps->m_atol);
+			else if (tag == "penalty"   ) tag.value(ps->m_eps);
+			else if (tag == "knmult"    ) tag.value(ps->m_knmult);
+			else if (tag == "search_tol") tag.value(ps->m_stol);
+			else if (tag == "two_pass"  ) 
 			{
 				int n;
 				tag.value(n);

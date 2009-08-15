@@ -16,7 +16,7 @@ public:
 	void ShallowCopy(FEContactSurface2& s);
 
 	//! find the intersection of a ray with the surface
-	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2]);
+	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps);
 
 protected:
 	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
@@ -73,4 +73,5 @@ public:
 	int		m_npass;	//!< nr of passes
 	double	m_atol;		//!< augmentation tolerance
 	double	m_eps;		//!< penalty factor
+	double	m_stol;		//!< search tolerance
 };

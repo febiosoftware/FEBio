@@ -310,7 +310,7 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, int n)
 {
 	FEMesh& m = *m_pmesh;
 
-	// get the shape function derivatives at this integration point
+	// get the shape functions at this integration point
 	double* H = el.H(n);
 
 	// calculate the location
