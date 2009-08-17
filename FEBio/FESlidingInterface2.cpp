@@ -5,6 +5,13 @@
 //-----------------------------------------------------------------------------
 // FEContactSurface2
 //-----------------------------------------------------------------------------
+
+FEContactSurface2::FEContactSurface2(FEM* pfem) : FESurface(&pfem->m_mesh)
+{ 
+	m_pfem = pfem; 
+}
+
+//-----------------------------------------------------------------------------
 void FEContactSurface2::Init()
 {
 	// initialize surface data first
@@ -30,6 +37,13 @@ void FEContactSurface2::Init()
 	m_nu.zero();
 	m_pme.set(0);
 	m_Lm.zero();
+
+	// allocate biphasic stuff
+	if (m_pfem->m_pStep->m_itype == FE_STATIC_PORO)
+	{
+		m_pg.create(nint);
+		m_pg.zero();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -249,7 +263,7 @@ FESurfaceElement* FEContactSurface2::FindIntersection(vec3d r, vec3d n, double r
 // FESlidingInterface2
 //-----------------------------------------------------------------------------
 
-FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	m_ntype = FE_CONTACT_SLIDING2;
 	static int count = 1;
@@ -270,9 +284,11 @@ void FESlidingInterface2::Init()
 	m_ss.Init();
 	m_ms.Init();
 
+	// for now we enforce penalty method for biphasic contact
+	if (m_pfem->m_pStep->m_itype == FE_STATIC_PORO) m_blaugon = 0;
+
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms);
-
 	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
 }
 
@@ -284,6 +300,10 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 	vec3d r, nu;
 	double rs[2];
 
+	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+
+	double ps[4], p1;
+
 	// loop over all integration points
 	int n = 0;
 	for (int i=0; i<ss.Elements(); ++i)
@@ -291,11 +311,22 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 		FESurfaceElement& el = ss.Element(i);
 		mesh.UnpackElement(el);
 
+		int ne = el.Nodes();
 		int nint = el.GaussPoints();
+
+		// get the nodal pressures
+		if (bporo)
+		{
+			for (int j=0; j<ne; ++j) ps[j] = el.pt()[j];
+		}
+
 		for (int j=0; j<nint; ++j, ++n)
 		{
 			// calculate the global position of the integration point
 			r = ss.Local2Global(el, j);
+
+			// get the pressure at the integration point
+			if (bporo) p1 = el.Evaluate(ps, j);
 
 			// calculate the normal at this integration point
 			nu = ss.SurfaceNormal(el, j);
@@ -317,6 +348,14 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				// NOTE: this has the opposite sign compared
 				// to Gerard's notes.
 				ss.m_gap[n] = nu*(r - q);
+
+				// calculate the pressure gap function
+				if (bporo)
+				{
+					mesh.UnpackElement(*pme);
+					double p2 = pme->Evaluate(pme->pt(), rs[0], rs[1]);
+					ss.m_pg[n] = p1 - p2;
+				}
 			}
 			else
 			{

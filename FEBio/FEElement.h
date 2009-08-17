@@ -333,6 +333,37 @@ public:
 	double* Gr(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 	double* Gs(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
 
+	double Evaluate(double* d, int n)
+	{
+		double* N = H(n);
+		int ne = Nodes();
+		double a = 0;
+		for (int i=0; i<ne; ++i) a += N[i]*d[i];
+		return a;
+	}
+
+	double Evaluate(double* d, double r, double s)
+	{
+		int n = Nodes();
+		double H[4];
+		if (n == 4)
+		{
+			H[0] = 0.25*(1-r)*(1-s);
+			H[1] = 0.25*(1+r)*(1-s);
+			H[2] = 0.25*(1+r)*(1+s);
+			H[3] = 0.25*(1-r)*(1+s);
+		}
+		else
+		{
+			H[0] = 1 - r - s;
+			H[1] = r;
+			H[2] = s;
+		}
+		double a = 0;
+		for (int i=0; i<n; ++i) a += H[i]*d[i];
+		return a;
+	}
+
 public:
 	vector<int>	m_lnode;	//!< local node numbering (compared to m_node which is a global numbering)
 };
