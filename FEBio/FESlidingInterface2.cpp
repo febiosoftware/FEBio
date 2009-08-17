@@ -273,6 +273,7 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_knmult = 1;
 	m_atol = 0.02;
 	m_eps = 1;
+	m_epsp = 1;
 	m_npass = 1;
 	m_stol = 0.01;
 }
@@ -397,6 +398,8 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 	// get the solver
 	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+
+	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
 
 	double detJ[4], w[4], *Hs, Hm[4];
 
@@ -538,6 +541,31 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 					// assemble the global residual
 					psolver->AssembleResidual(en, LM, fe, F);
+
+					// do the biphasic stuff
+					if (bporo)
+					{
+						// calculate nr of pressure dofs
+						int ndof = nseln + nmeln;
+
+						// calculate the flow rate
+						double wn = m_epsp*ss.m_pg[ni];
+
+						// fill the LM
+						LM.create(ndof);
+						for (k=0; k<nseln; ++k) LM[k        ] = sLM[3*nseln+k];
+						for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[3*nmeln+k];
+
+						// fill the force array
+						fe.create(ndof);
+						for (k=0; k<nseln; ++k) fe[k      ] = Hs[k];
+						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
+
+						for (k=0; k<ndof; ++k) fe[k] *= wn*detJ[j]*w[j];
+
+						// assemble residual
+						psolver->AssembleResidual(en, LM, fe, F);
+					}
 				}
 			}
 		}
