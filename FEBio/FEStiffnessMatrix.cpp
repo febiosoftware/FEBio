@@ -372,7 +372,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
 				if (ps2)
 				{
-					vector<int> lm(6*8);
+					vector<int> lm(7*8);
 
 					for (int np=0; np<ps2->m_npass; ++np)
 					{
@@ -401,23 +401,25 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 									for (l=0; l<nseln; ++l)
 									{
 										id = fem.m_mesh.Node(sn[l]).m_ID;
-										lm[6*l  ] = id[0];
-										lm[6*l+1] = id[1];
-										lm[6*l+2] = id[2];
-										lm[6*l+3] = id[7];
-										lm[6*l+4] = id[8];
-										lm[6*l+5] = id[9];
+										lm[7*l  ] = id[0];
+										lm[7*l+1] = id[1];
+										lm[7*l+2] = id[2];
+										lm[7*l+3] = id[3];
+										lm[7*l+4] = id[7];
+										lm[7*l+5] = id[8];
+										lm[7*l+6] = id[9];
 									}
 
 									for (l=0; l<nmeln; ++l)
 									{
 										id = fem.m_mesh.Node(mn[l]).m_ID;
-										lm[6*(l+nseln)  ] = id[0];
-										lm[6*(l+nseln)+1] = id[1];
-										lm[6*(l+nseln)+2] = id[2];
-										lm[6*(l+nseln)+3] = id[7];
-										lm[6*(l+nseln)+4] = id[8];
-										lm[6*(l+nseln)+5] = id[9];
+										lm[7*(l+nseln)  ] = id[0];
+										lm[7*(l+nseln)+1] = id[1];
+										lm[7*(l+nseln)+2] = id[2];
+										lm[7*(l+nseln)+3] = id[3];
+										lm[7*(l+nseln)+4] = id[7];
+										lm[7*(l+nseln)+5] = id[8];
+										lm[7*(l+nseln)+6] = id[9];
 									}
 
 									build_add(lm);

@@ -404,7 +404,7 @@ bool FESolver::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			if ((m_niter == 0) && (m_normR1 < 1.0e-20))
+			if ((m_normR1 < 1.0e-20))
 			{
 				// check for almost zero-residual on the first iteration
 				// this might be an indication that there is no force on the system

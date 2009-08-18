@@ -403,6 +403,8 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 	double detJ[4], w[4], *Hs, Hm[4];
 
+	double dt = m_pfem->m_pStep->m_dt;
+
 	for (int np=0; np<m_npass; ++np)
 	{
 		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
@@ -561,7 +563,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 						for (k=0; k<nseln; ++k) fe[k      ] = Hs[k];
 						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
 
-						for (k=0; k<ndof; ++k) fe[k] *= wn*detJ[j]*w[j];
+						for (k=0; k<ndof; ++k) fe[k] *= dt*wn*detJ[j]*w[j];
 
 						// assemble residual
 						psolver->AssembleResidual(en, LM, fe, F);
@@ -579,6 +581,8 @@ void FESlidingInterface2::ContactStiffness()
 	vector<int> sLM, mLM, LM, en;
 	double N[24], T1[24], T2[24], N1[24] = {0}, N2[24] = {0}, D1[24], D2[24], Nb1[24], Nb2[24];
 	matrix ke;
+
+	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
 
 	// keep a running counter of integration points
 	int ni = 0;
@@ -754,8 +758,34 @@ void FESlidingInterface2::ContactStiffness()
 					{
 					}
 
-					// assemble the global residual
+					// assemble the global stiffness
 					psolver->AssembleStiffness(en, LM, ke);
+
+					// --- B I P H A S I C   S T I F F N E S S ---
+					if (bporo)
+					{
+						double wn = m_epsp*ss.m_pg[ni];
+
+						double dt = m_pfem->m_pStep->m_dt;
+
+						int ndof = nseln+nmeln;
+
+						LM.create(ndof);
+						for (k=0; k<nseln; ++k) LM[k      ] = sLM[3*nseln+k];
+						for (k=0; k<nmeln; ++k) LM[k+nseln] = mLM[3*nmeln+k];
+
+						for (k=0; k<nseln; ++k) N[k] = Hs[k];
+						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+
+						// TODO: I'm still not sure about the sign here
+						//       I think it's positive but I should double check it
+						ke.Create(ndof, ndof);
+						for (k=0; k<ndof; ++k)
+							for (l=0; l<ndof; ++l) ke[k][l] = dt*wn*w[j]*detJ[j]*N[k]*N[l];
+
+						// assemble the global stiffness
+						psolver->AssembleStiffness(en, LM, ke);
+					}
 				}
 			}
 		}
