@@ -40,11 +40,19 @@ bool FESolver::Init()
 		}
 	}
 
-	// create the stiffness matrix
+	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the solver allocate the correct type of matrix format
+	SparseMatrix* pS = m_psolver->GetMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
+	if (pS == 0)
+	{
+		m_log.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
+		return false;
+	}
+
+	// Create the stiffness matrix.
 	// Note that this does not construct the stiffness matrix. This
-	// is done later in the StiffnessMatrix routine
-	m_pK = new FEStiffnessMatrix(m_psolver->GetMatrix(0));
+	// is done later in the StiffnessMatrix routine.
+	m_pK = new FEStiffnessMatrix(pS);
 	if (m_pK == 0)
 	{
 		m_log.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");

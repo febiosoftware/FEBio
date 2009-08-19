@@ -291,6 +291,10 @@ void FESlidingInterface2::Init()
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms);
 	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
+
+	// this contact implementation requires a non-symmetric stiffness matrix
+	// so inform the FEM class
+	m_pfem->SetSymmetryFlag(false);
 }
 
 //-----------------------------------------------------------------------------

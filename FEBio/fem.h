@@ -342,6 +342,9 @@ public:
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
 
+	//! Set the sparse matrix symmetry flag
+	void SetSymmetryFlag(bool bsymm) { m_bsymm = bsymm; }
+
 protected:
 	// copy constructor and assignment operator are protected since they
 	// are reserved for a special purpose and cannot be used in a way
