@@ -560,7 +560,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 						// fill the force array
 						fe.create(ndof);
-						for (k=0; k<nseln; ++k) fe[k      ] = Hs[k];
+						for (k=0; k<nseln; ++k) fe[k      ] =  Hs[k];
 						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
 
 						for (k=0; k<ndof; ++k) fe[k] *= dt*wn*detJ[j]*w[j];
@@ -774,11 +774,10 @@ void FESlidingInterface2::ContactStiffness()
 						for (k=0; k<nseln; ++k) LM[k      ] = sLM[3*nseln+k];
 						for (k=0; k<nmeln; ++k) LM[k+nseln] = mLM[3*nmeln+k];
 
-						for (k=0; k<nseln; ++k) N[k] = Hs[k];
+						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
 						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
 
-						// TODO: I'm still not sure about the sign here
-						//       I think it's positive but I should double check it
+						// build the "element" stiffness
 						ke.Create(ndof, ndof);
 						for (k=0; k<ndof; ++k)
 							for (l=0; l<ndof; ++l) ke[k][l] = dt*wn*w[j]*detJ[j]*N[k]*N[l];

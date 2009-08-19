@@ -1,8 +1,14 @@
 #include "stdafx.h"
 #include "FESolver.h"
 #include "fem.h"
+#include "FECore/SkylineSolver.h"
+#include "FECore/PSLDLTSolver.h"
+#include "FECore/SuperLUSolver.h"
+#include "FECore/SuperLU_MT_Solver.h"
+#include "FECore/LUSolver.h"
 #include "FECore/PardisoSolver.h"
 #include "FECore/WSMPSolver.h"
+#include "FECore/ConjGradIterSolver.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FESolver::Init
@@ -20,13 +26,13 @@ bool FESolver::Init()
 	{
 		switch (m_fem.m_nsolver)
 		{
-		case SKYLINE_SOLVER: m_psolver = new SkylineSolver(); break;
-		case PSLDLT_SOLVER : m_psolver = new PSLDLTSolver (); break;
-		case SUPERLU_SOLVER: m_psolver = new SuperLUSolver(); break;
-		case SUPERLU_MT_SOLVER: m_psolver = new SuperLU_MT_Solver(); break;
-		case PARDISO_SOLVER: m_psolver = new PardisoSolver(); break;
-		case LU_SOLVER     : m_psolver = new LUSolver(); break;
-		case WSMP_SOLVER   : m_psolver = new WSMPSolver(); break;
+		case SKYLINE_SOLVER      : m_psolver = new SkylineSolver(); break;
+		case PSLDLT_SOLVER       : m_psolver = new PSLDLTSolver (); break;
+		case SUPERLU_SOLVER      : m_psolver = new SuperLUSolver(); break;
+		case SUPERLU_MT_SOLVER   : m_psolver = new SuperLU_MT_Solver(); break;
+		case PARDISO_SOLVER      : m_psolver = new PardisoSolver(); break;
+		case LU_SOLVER           : m_psolver = new LUSolver(); break;
+		case WSMP_SOLVER         : m_psolver = new WSMPSolver(); break;
 		case CG_ITERATIVE_SOLVER : m_psolver = new ConjGradIterSolver(); break;
 		default:
 			m_log.printbox("FATAL ERROR","Unknown solver type selected\n");
@@ -38,7 +44,7 @@ bool FESolver::Init()
 	// we let the solver allocate the correct type of matrix format
 	// Note that this does not construct the stiffness matrix. This
 	// is done later in the StiffnessMatrix routine
-	m_pK = new FEStiffnessMatrix(m_psolver->GetMatrix());
+	m_pK = new FEStiffnessMatrix(m_psolver->GetMatrix(0));
 	if (m_pK == 0)
 	{
 		m_log.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");

@@ -29,6 +29,8 @@ FEM::FEM()
 
 	m_bcontact = false;		// assume no contact
 
+	m_bsymm = true;	// assume symmetric stiffness matrix
+
 	m_psurf = new FESurface(&m_mesh);
 
 	// --- Material Data ---

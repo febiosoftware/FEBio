@@ -274,6 +274,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\colsol.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ConjGradIterSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FECore.cpp"
 				>
 			</File>
@@ -282,7 +290,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\lusolver.cpp"
+				RelativePath=".\LUSolver.cpp"
 				>
 			</File>
 			<File
@@ -299,6 +307,14 @@
 			</File>
 			<File
 				RelativePath=".\PardisoSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PSLDLTSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkylineSolver.cpp"
 				>
 			</File>
 			<File
@@ -364,11 +380,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\ConjGradIterSolver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FECore.h"
 				>
 			</File>
 			<File
 				RelativePath=".\LinearSolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LUSolver.h"
 				>
 			</File>
 			<File
@@ -388,11 +412,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PSLDLTSolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkylineSolver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SparseMatrix.h"
 				>
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SuperLU_MT_Solver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SuperLUSolver.h"
 				>
 			</File>
 			<File

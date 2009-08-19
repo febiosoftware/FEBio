@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
-#include "LinearSolver.h"
+#include "SuperLUSolver.h"
 
 //////////////////////////////////////////////////////////////////////
 // SUPERLUSolver

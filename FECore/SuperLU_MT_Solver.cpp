@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
-#include "LinearSolver.h"
+#include "SuperLU_MT_Solver.h"
 
 //-----------------------------------------------------------------------------
 //! constructor

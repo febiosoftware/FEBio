@@ -26,13 +26,13 @@ extern "C"
 class PardisoSolver : public LinearSolver
 {
 public:
-	virtual bool PreProcess(SparseMatrix& K);
-	virtual bool Factor(SparseMatrix& K);
-	virtual bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
-	virtual bool Solve(SparseMatrix& K, matrix& x, matrix& b);
-	virtual void Destroy();
+	bool PreProcess(SparseMatrix& K);
+	bool Factor(SparseMatrix& K);
+	bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
+	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
+	void Destroy();
 
-	virtual SparseMatrix* GetMatrix() { return new CompactMatrix(1); }
+	SparseMatrix* GetMatrix(int ntype) { return (ntype == SPARSE_SYMMETRIC: new CompactMatrix(1) : 0); }
 
 	PardisoSolver();
 

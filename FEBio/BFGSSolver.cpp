@@ -53,7 +53,7 @@ bool BFGSSolver::Solve(vector<double>& x, NonLinearSystem& S)
 	m_pls = 0;
 
 	// allocate a sparse matrix
-	m_pK = m_pls->GetMatrix();
+	m_pK = m_pls->GetMatrix(0);
 
 	// set the solution vector
 	// it is assumed that the input parameter x an intial guess

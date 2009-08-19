@@ -7,6 +7,7 @@
 #include "FERigid.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FECore/ConjGradIterSolver.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////

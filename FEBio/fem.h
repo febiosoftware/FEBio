@@ -484,6 +484,7 @@ public:
 		int		m_nsolver;	//!< type of solver selected
 		int		m_neq;		//!< number of equations
 		int		m_bwopt;	//!< bandwidth optimization flag
+		bool	m_bsymm;	//!< symmetric flag
 	//}
  
 	// --- I/O-Data --- 
