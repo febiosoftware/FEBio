@@ -583,7 +583,7 @@ void FESlidingInterface2::ContactStiffness()
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
-	double N[24], T1[24], T2[24], N1[24] = {0}, N2[24] = {0}, D1[24], D2[24], Nb1[24], Nb2[24];
+	double N[24];
 	matrix ke;
 
 	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
@@ -613,7 +613,7 @@ void FESlidingInterface2::ContactStiffness()
 		else knmult = 0;
 	}
 
-	double detJ[4], w[4], *Hs, Hm[4], Hmr[4], Hms[4];
+	double detJ[4], w[4], *Hs, Hm[4];
 
 	for (int np=0; np < m_npass; ++np)
 	{
@@ -760,6 +760,42 @@ void FESlidingInterface2::ContactStiffness()
 					// add the higher order terms (= tn*D(dg) )
 					if (knmult > 0)
 					{
+						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
+						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+
+						double* Hr = se.Gr(j);
+						double* Hs = se.Gs(j);
+						vec3d g1, g2;
+						for (k=0; k<nseln; ++k)
+						{
+							g1 += pm->Node(se.m_node[k]).m_rt*Hr[k];
+							g2 += pm->Node(se.m_node[k]).m_rt*Hs[k];
+						}
+
+						mat3d G1, G2;
+						G1[0][0] =     0; G1[0][1] = -g1.z; G1[0][2] =  g1.y;
+						G1[1][0] =  g1.z; G1[1][1] =     0; G1[1][2] = -g1.x;
+						G1[2][0] = -g1.y; G1[2][1] = -g1.x; G1[2][2] =     0;
+
+						G2[0][0] =     0; G1[0][1] = -g2.z; G1[0][2] =  g2.y;
+						G2[1][0] =  g2.z; G1[1][1] =     0; G1[1][2] = -g2.x;
+						G2[2][0] = -g2.y; G1[2][1] = -g2.x; G1[2][2] =     0;
+
+						for (k=0; k<nseln+nmeln; ++k)
+							for (l=0; l<nseln; ++l)
+							{
+								ke[k*3  ][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*G2[0][0] + Hs[l]*G1[0][0]);
+								ke[k*3  ][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*G2[0][1] + Hs[l]*G1[0][1]);
+								ke[k*3  ][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*G2[0][2] + Hs[l]*G1[0][2]);
+
+								ke[k*3+1][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*G2[1][0] + Hs[l]*G1[1][0]);
+								ke[k*3+1][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*G2[1][1] + Hs[l]*G1[1][1]);
+								ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*G2[1][2] + Hs[l]*G1[1][2]);
+
+								ke[k*3+2][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*G2[2][0] + Hs[l]*G1[2][0]);
+								ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*G2[2][1] + Hs[l]*G1[2][1]);
+								ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*G2[2][2] + Hs[l]*G1[2][2]);
+							}
 					}
 
 					// assemble the global stiffness
