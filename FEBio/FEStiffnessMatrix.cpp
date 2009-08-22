@@ -404,7 +404,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 										lm[7*l  ] = id[0];
 										lm[7*l+1] = id[1];
 										lm[7*l+2] = id[2];
-										lm[7*l+3] = id[3];
+										lm[7*l+3] = id[6];
 										lm[7*l+4] = id[7];
 										lm[7*l+5] = id[8];
 										lm[7*l+6] = id[9];
@@ -416,7 +416,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 										lm[7*(l+nseln)  ] = id[0];
 										lm[7*(l+nseln)+1] = id[1];
 										lm[7*(l+nseln)+2] = id[2];
-										lm[7*(l+nseln)+3] = id[3];
+										lm[7*(l+nseln)+3] = id[6];
 										lm[7*(l+nseln)+4] = id[7];
 										lm[7*(l+nseln)+5] = id[8];
 										lm[7*(l+nseln)+6] = id[9];

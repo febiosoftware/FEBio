@@ -333,7 +333,7 @@ public:
 	double* Gr(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 	double* Gs(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
 
-	double Evaluate(double* d, int n)
+	double eval(double* d, int n)
 	{
 		double* N = H(n);
 		int ne = Nodes();
@@ -342,10 +342,57 @@ public:
 		return a;
 	}
 
-	double Evaluate(double* d, double r, double s)
+	double eval(double* d, double r, double s)
 	{
 		int n = Nodes();
 		double H[4];
+		shape_fnc(H, r, s);
+		double a = 0;
+		for (int i=0; i<n; ++i) a += H[i]*d[i];
+		return a;
+	}
+
+	double eval_deriv1(double* d, int j)
+	{
+		double* Hr = Gr(j);
+		int n = Nodes();
+		double s = 0;
+		for (int i=0; i<n; ++i) s +=  Hr[i]*d[i];
+		return s;
+	}
+
+	double eval_deriv2(double* d, int j)
+	{
+		double* Hs = Gs(j);
+		int n = Nodes();
+		double s = 0;
+		for (int i=0; i<n; ++i) s +=  Hs[i]*d[i];
+		return s;
+	}
+
+	double eval_deriv1(double* d, double r, double s)
+	{
+		double Hr[4], Hs[4];
+		shape_deriv(Hr, Hs, r, s);
+		int n = Nodes();
+		double a = 0;
+		for (int i=0; i<n; ++i) a +=  Hr[i]*d[i];
+		return a;
+	}
+
+	double eval_deriv2(double* d, double r, double s)
+	{
+		double Hr[4], Hs[4];
+		shape_deriv(Hr, Hs, r, s);
+		int n = Nodes();
+		double a = 0;
+		for (int i=0; i<n; ++i) a +=  Hs[i]*d[i];
+		return a;
+	}
+
+	void shape_fnc(double* H, double r, double s)
+	{
+		int n = Nodes();
 		if (n == 4)
 		{
 			H[0] = 0.25*(1-r)*(1-s);
@@ -353,15 +400,32 @@ public:
 			H[2] = 0.25*(1+r)*(1+s);
 			H[3] = 0.25*(1-r)*(1+s);
 		}
-		else
+		else if (n==3)
 		{
 			H[0] = 1 - r - s;
 			H[1] = r;
 			H[2] = s;
 		}
-		double a = 0;
-		for (int i=0; i<n; ++i) a += H[i]*d[i];
-		return a;
+		else assert(false);
+	}
+
+	void shape_deriv(double* Gr, double* Gs, double r, double s)
+	{
+		int n = Nodes();
+		if (n == 4)
+		{
+			Gr[0] = -0.25*(1-s); Gs[0] = -0.25*(1-r);
+			Gr[1] =  0.25*(1-s); Gs[1] = -0.25*(1+r);
+			Gr[2] =  0.25*(1+s); Gs[2] =  0.25*(1+r);
+			Gr[3] = -0.25*(1+s); Gs[3] =  0.25*(1-r);
+		}
+		else if (n == 3)
+		{
+			Gr[0] = -1; Gs[0] = -1;
+			Gr[1] =  1; Gs[1] =  0;
+			Gr[2] =  0; Gs[2] =  1;
+		}
+		else assert(false);
 	}
 
 public:

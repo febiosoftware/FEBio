@@ -714,3 +714,11 @@ inline mat3d mat3d::transinv() const
 				 D*(d[0][2]*d[1][0] - d[0][0]*d[1][2]), // yz
 				 D*(d[0][0]*d[1][1] - d[0][1]*d[1][0])); // zz
 }
+
+// calculate the skew symmetric matrix from a vector
+inline void mat3d::skew(const vec3d& v)
+{
+	d[0][0] =    0; d[0][1] = -v.z; d[0][2] =  v.y;
+	d[1][0] =  v.z; d[1][1] =    0; d[1][2] = -v.x;
+	d[2][0] = -v.y; d[2][1] = -v.x; d[2][2] =    0;
+}

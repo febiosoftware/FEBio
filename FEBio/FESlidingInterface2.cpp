@@ -331,7 +331,7 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 			r = ss.Local2Global(el, j);
 
 			// get the pressure at the integration point
-			if (bporo) p1 = el.Evaluate(ps, j);
+			if (bporo) p1 = el.eval(ps, j);
 
 			// calculate the normal at this integration point
 			nu = ss.SurfaceNormal(el, j);
@@ -358,7 +358,7 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				if (bporo)
 				{
 					mesh.UnpackElement(*pme);
-					double p2 = pme->Evaluate(pme->pt(), rs[0], rs[1]);
+					double p2 = pme->eval(pme->pt(), rs[0], rs[1]);
 					ss.m_pg[n] = p1 - p2;
 				}
 			}
@@ -393,9 +393,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
-
-	// keep a running counter of integration points
-	int ni = 0;
+	double detJ[4], w[4], *Hs, Hm[4];
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -403,71 +401,67 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 	// get the solver
 	FESolver* psolver = m_pfem->m_pStep->m_psolver;
 
+	// set poro flag
 	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
 
-	double detJ[4], w[4], *Hs, Hm[4];
-
+	// get the current time step
 	double dt = m_pfem->m_pStep->m_dt;
 
+	// loop over the nr of passes
 	for (int np=0; np<m_npass; ++np)
 	{
+		// get slave and master surface
 		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
 		FEContactSurface2& ms = (np == 0? m_ms : m_ss);
 
+		// keep a running counter of integration points
+		int ni = 0;
+
 		// loop over all slave elements
-		ni = 0;
 		for (i=0; i<ss.Elements(); ++i)
 		{
+			// get the surface element
 			FESurfaceElement& se = ss.Element(i);
 			pm->UnpackElement(se);
+
+			// get the nr of nodes and integration points
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			// copy the LM vector
+			// copy the LM vector; we'll need it later
 			sLM = se.LM();
-
-			// nodal coordinates
-			vec3d* rt = se.rt();
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
 			for (j=0; j<nint; ++j)
 			{
-				double* Gr = se.Gr(j);
-				double* Gs = se.Gs(j);
+				// get the base vectors
+				vec3d g[2];
+				ss.CoBaseVectors(se, j, g);
 
-				// calculate jacobian
-				// note that we are integrating over the current surface
-				vec3d dxr, dxs;
-				for (k=0; k<nseln; ++k)
-				{
-					dxr.x += Gr[k]*rt[k].x;
-					dxr.y += Gr[k]*rt[k].y;
-					dxr.z += Gr[k]*rt[k].z;
-
-					dxs.x += Gs[k]*rt[k].x;
-					dxs.y += Gs[k]*rt[k].y;
-					dxs.z += Gs[k]*rt[k].z;
-				}
-
-				// jacobians
-				detJ[j] = (dxr ^ dxs).norm();
+				// jacobians: J = |g0xg1|
+				detJ[j] = (g[0] ^ g[1]).norm();
 
 				// integration weights
 				w[j] = se.GaussWeights()[j];
 			}
 
 			// loop over all integration points
-			for (int j=0; j<nint; ++j, ++ni)
+			// note that we are integrating over the current surface
+			for (j=0; j<nint; ++j, ++ni)
 			{
 				// get the master element
 				FESurfaceElement* pme = ss.m_pme[ni];
 				if (pme)
 				{
+					// get the master element
 					FESurfaceElement& me = *pme;
 					pm->UnpackElement(me);
 
+					// get the nr of master element nodes
 					int nmeln = me.Nodes();
+
+					// copy LM vector
 					mLM = me.LM();
 
 					// calculate degrees of freedom
@@ -491,27 +485,16 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 					// build the en vector
 					en.create(nseln+nmeln);
-					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
+					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
-					// calculate shape functions
+					// get slave element shape functions
 					Hs = se.H(j);
 
+					// get master element shape functions
 					double r = ss.m_rs[ni][0];
 					double s = ss.m_rs[ni][1];
-					if (me.Nodes() == 4)
-					{
-						Hm[0] = 0.25*(1-r)*(1-s);
-						Hm[1] = 0.25*(1+r)*(1-s);
-						Hm[2] = 0.25*(1+r)*(1+s);
-						Hm[3] = 0.25*(1-r)*(1+s);
-					}
-					else if (me.Nodes() == 3)
-					{
-						Hm[0] = 1-r-s;
-						Hm[1] = r;
-						Hm[2] = s;
-					}
+					me.shape_fnc(Hm, r, s);
 
 					// get normal vector
 					vec3d nu = ss.m_nu[ni];
@@ -549,6 +532,8 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					psolver->AssembleResidual(en, LM, fe, F);
 
 					// do the biphasic stuff
+					// TODO: I should only do this when the node is actually in contact
+					//       in other words, when g >= 0
 					if (bporo)
 					{
 						// calculate nr of pressure dofs
@@ -567,6 +552,9 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 						for (k=0; k<nseln; ++k) fe[k      ] =  Hs[k];
 						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
 
+						// NOTE: We have to multiply with the timestep dt
+						//       because of our biphasic formulation.
+						//       I don't think Gerard needs to do this in his formulation.
 						for (k=0; k<ndof; ++k) fe[k] *= dt*wn*detJ[j]*w[j];
 
 						// assemble residual
@@ -583,13 +571,12 @@ void FESlidingInterface2::ContactStiffness()
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
+	double detJ[4], w[4], *Hs, Hm[4], pt[4], dpr[4], dps[4];
 	double N[24];
 	matrix ke;
 
+	// set the poro flag
 	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
-
-	// keep a running counter of integration points
-	int ni = 0;
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -613,19 +600,24 @@ void FESlidingInterface2::ContactStiffness()
 		else knmult = 0;
 	}
 
-	double detJ[4], w[4], *Hs, Hm[4];
-
+	// do single- or two-pass
 	for (int np=0; np < m_npass; ++np)
 	{
+		// get the slave and master surface
 		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
 		FEContactSurface2& ms = (np == 0? m_ms : m_ss);
 
+		// keep a running counter of the integration points
+		int ni = 0;
+
 		// loop over all slave elements
-		ni = 0;
 		for (i=0; i<ss.Elements(); ++i)
 		{
+			// get ths slave element
 			FESurfaceElement& se = ss.Element(i);
 			pm->UnpackElement(se);
+
+			// get nr of nodes and integration points
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
@@ -639,28 +631,23 @@ void FESlidingInterface2::ContactStiffness()
 			// calculate the nodal forces
 			for (j=0; j<nint; ++j)
 			{
-				double* Gr = se.Gr(j);
-				double* Gs = se.Gs(j);
+				// get the base vectors
+				vec3d g[2];
+				ss.CoBaseVectors(se, j, g);
 
-				// calculate jacobian
-				// note that we are integrating over the reference surface
-				vec3d dxr, dxs;
-				for (k=0; k<nseln; ++k)
-				{
-					dxr.x += Gr[k]*rt[k].x;
-					dxr.y += Gr[k]*rt[k].y;
-					dxr.z += Gr[k]*rt[k].z;
-
-					dxs.x += Gs[k]*rt[k].x;
-					dxs.y += Gs[k]*rt[k].y;
-					dxs.z += Gs[k]*rt[k].z;
-				}
-
-				// jacobians
-				detJ[j] = (dxr ^ dxs).norm();
+				// jacobians: J = |g0xg1|
+				detJ[j] = (g[0] ^ g[1]).norm();
 
 				// integration weights
 				w[j] = se.GaussWeights()[j];
+
+				// pressure
+				if (bporo)
+				{
+					pt[j] = se.eval(se.pt(), j);
+					dpr[j] = se.eval_deriv1(se.pt(), j);
+					dps[j] = se.eval_deriv2(se.pt(), j);
+				}
 			}
 
 			// loop over all integration points
@@ -670,10 +657,15 @@ void FESlidingInterface2::ContactStiffness()
 				FESurfaceElement* pme = ss.m_pme[ni];
 				if (pme)
 				{
+					// --- S O L I D - S O L I D   C O N T A C T ---
+
 					FESurfaceElement& me = *pme;
 					pm->UnpackElement(me);
 
+					// get the nr of master nodes
 					int nmeln = me.Nodes();
+
+					// copy the LM vector
 					mLM = me.LM();
 
 					// calculate degrees of freedom
@@ -700,25 +692,15 @@ void FESlidingInterface2::ContactStiffness()
 					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
-					// calculate shape functions
+					// slave shape functions
 					Hs = se.H(j);
+
+					// master shape functions
 					double r = ss.m_rs[ni][0];
 					double s = ss.m_rs[ni][1];
-					if (me.Nodes() == 4)
-					{
-						Hm[0] = 0.25*(1-r)*(1-s);
-						Hm[1] = 0.25*(1+r)*(1-s);
-						Hm[2] = 0.25*(1+r)*(1+s);
-						Hm[3] = 0.25*(1-r)*(1+s);
-					}
-					else
-					{
-						Hm[0] = 1 - r - s;
-						Hm[1] = r;
-						Hm[2] = s;
-					}
+					me.shape_fnc(Hm, r, s);
 
-					// get normal vector
+					// get slave normal vector
 					vec3d nu = ss.m_nu[ni];
 
 					// gap function
@@ -732,6 +714,9 @@ void FESlidingInterface2::ContactStiffness()
 					tn = MBRACKET(tn);
 
 					double dtn = m_eps*HEAVYSIDE(Lm + m_eps*g);
+
+					// a. NxN-term
+					//------------------------------------
 
 					// calculate the N-vector
 					for (k=0; k<nseln; ++k)
@@ -748,55 +733,77 @@ void FESlidingInterface2::ContactStiffness()
 						N[3*(k+nseln)+2] = Hm[k]*nu.z;
 					}
 
-					// --- N O R M A L   S T I F F N E S S ---
-
 					// create the stiffness matrix
 					ke.Create(ndof, ndof);
 
-					// add the first order term
 					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
+						for (l=0; l<ndof; ++l) ke[k][l] = m_eps*N[k]*N[l]*detJ[j]*w[j];
 
-					// add the higher order terms (= tn*D(dg) )
-					if (knmult > 0)
-					{
-						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+					// b. A-term
+					//-------------------------------------
 
-						double* Hr = se.Gr(j);
-						double* Hs = se.Gs(j);
-						vec3d g1, g2;
-						for (k=0; k<nseln; ++k)
+					for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
+					for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+
+					double* Hr = se.Gr(j);
+					double* Hs = se.Gs(j);
+					vec3d gs[2];
+					ss.CoBaseVectors(se, j, gs);
+
+					mat3d S1, S2;
+					S1.skew(gs[0]);
+					S2.skew(gs[1]);
+
+					for (k=0; k<nseln+nmeln; ++k)
+						for (l=0; l<nseln; ++l)
 						{
-							g1 += pm->Node(se.m_node[k]).m_rt*Hr[k];
-							g2 += pm->Node(se.m_node[k]).m_rt*Hs[k];
-						}
+							ke[k*3  ][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*S2[0][0] + Hs[l]*S1[0][0]);
+							ke[k*3  ][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*S2[0][1] + Hs[l]*S1[0][1]);
+							ke[k*3  ][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*S2[0][2] + Hs[l]*S1[0][2]);
 
-						mat3d G1, G2;
-						G1[0][0] =     0; G1[0][1] = -g1.z; G1[0][2] =  g1.y;
-						G1[1][0] =  g1.z; G1[1][1] =     0; G1[1][2] = -g1.x;
-						G1[2][0] = -g1.y; G1[2][1] = -g1.x; G1[2][2] =     0;
+							ke[k*3+1][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*S2[1][0] + Hs[l]*S1[1][0]);
+							ke[k*3+1][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*S2[1][1] + Hs[l]*S1[1][1]);
+							ke[k*3+1][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*S2[1][2] + Hs[l]*S1[1][2]);
 
-						G2[0][0] =     0; G1[0][1] = -g2.z; G1[0][2] =  g2.y;
-						G2[1][0] =  g2.z; G1[1][1] =     0; G1[1][2] = -g2.x;
-						G2[2][0] = -g2.y; G1[2][1] = -g2.x; G1[2][2] =     0;
-
-						for (k=0; k<nseln+nmeln; ++k)
-							for (l=0; l<nseln; ++l)
-							{
-								ke[k*3  ][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*G2[0][0] + Hs[l]*G1[0][0]);
-								ke[k*3  ][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*G2[0][1] + Hs[l]*G1[0][1]);
-								ke[k*3  ][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*G2[0][2] + Hs[l]*G1[0][2]);
-
-								ke[k*3+1][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*G2[1][0] + Hs[l]*G1[1][0]);
-								ke[k*3+1][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*G2[1][1] + Hs[l]*G1[1][1]);
-								ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*G2[1][2] + Hs[l]*G1[1][2]);
-
-								ke[k*3+2][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*G2[2][0] + Hs[l]*G1[2][0]);
-								ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*G2[2][1] + Hs[l]*G1[2][1]);
-								ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*G2[2][2] + Hs[l]*G1[2][2]);
-							}
+							ke[k*3+2][l*3  ] += tn*w[j]*N[k]*(-Hr[l]*S2[2][0] + Hs[l]*S1[2][0]);
+							ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*S2[2][1] + Hs[l]*S1[2][1]);
+							ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*S2[2][2] + Hs[l]*S1[2][2]);
 					}
+
+					// c. M-term
+					//---------------------------------------
+
+					vec3d gm[2];
+					ms.CoBaseVectors(me, r, s, gm);
+
+					mat2d A, Ai;
+					A[0][0] = gs[0]*gm[0]; A[0][1] = gs[0]*gm[1];
+					A[1][0] = gs[1]*gm[0]; A[1][1] = gs[1]*gm[1];
+
+					Ai = A.inverse();
+
+					vec3d Gm[2];
+					Gm[0] = gs[0]*Ai[0][0] + gs[1]*Ai[0][1];
+					Gm[1] = gs[0]*Ai[1][0] + gs[1]*Ai[1][1];
+
+					double Hmr[4], Hms[4];
+					me.shape_deriv(Hmr, Hms, r, s);
+
+					for (k=0; k<nseln; ++k)
+						for (l=0; l<nseln+nmeln; ++l)
+						{
+							ke[(k+nseln)*3  ][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].x + Hms[k]*nu.x*Gm[1].x)*N[l];
+							ke[(k+nseln)*3  ][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].y + Hms[k]*nu.x*Gm[1].y)*N[l];
+							ke[(k+nseln)*3  ][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].z + Hms[k]*nu.x*Gm[1].z)*N[l];
+
+							ke[(k+nseln)*3+1][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].x + Hms[k]*nu.y*Gm[1].x)*N[l];
+							ke[(k+nseln)*3+1][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].y + Hms[k]*nu.y*Gm[1].y)*N[l];
+							ke[(k+nseln)*3+1][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].z + Hms[k]*nu.y*Gm[1].z)*N[l];
+
+							ke[(k+nseln)*3+2][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].x + Hms[k]*nu.z*Gm[1].x)*N[l];
+							ke[(k+nseln)*3+2][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].y + Hms[k]*nu.z*Gm[1].y)*N[l];
+							ke[(k+nseln)*3+2][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].z + Hms[k]*nu.z*Gm[1].z)*N[l];
+						}
 
 					// assemble the global stiffness
 					psolver->AssembleStiffness(en, LM, ke);
@@ -804,23 +811,110 @@ void FESlidingInterface2::ContactStiffness()
 					// --- B I P H A S I C   S T I F F N E S S ---
 					if (bporo)
 					{
-						double wn = m_epsp*ss.m_pg[ni];
-
 						double dt = m_pfem->m_pStep->m_dt;
 
-						int ndof = nseln+nmeln;
+						// --- S O L I D - P R E S S U R E   C O N T A C T ---
+
+						int ndof = 4*(nseln+nmeln);
+						LM.create(ndof);
+						for (k=0; k<nseln; ++k)
+						{
+							LM[4*k  ] = sLM[3*k  ];			// x-dof
+							LM[4*k+1] = sLM[3*k+1];			// y-dof
+							LM[4*k+2] = sLM[3*k+2];			// z-dof
+							LM[4*k+3] = sLM[3*nseln+k];		// p-dof
+						}
+						for (k=0; k<nmeln; ++k)
+						{
+							LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
+							LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
+							LM[4*(k+nseln)+2] = mLM[3*k+2];			// z-dof
+							LM[4*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
+						}
+
+						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
+						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+
+						ke.Create(ndof, ndof);
+						ke.zero();
+
+						double dpmr, dpms;
+						dpmr = me.eval_deriv1(me.pt(), r, s);
+						dpms = me.eval_deriv2(me.pt(), r, s);
+
+						for (k=0; k<nseln+nmeln; ++k)
+							for (l=0; l<nseln+nmeln; ++l)
+							{
+								ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].x + dpms*Gm[1].x);
+								ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
+								ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
+							}
+
+						double H2r[8] = {0}, H2s[8] = {0};
+						for (k=0; k<nmeln; ++k) 
+						{
+							H2r[k+nseln] = Hmr[k];
+							H2s[k+nseln] = Hms[k];
+						}
+
+						double G2r[24], G2s[24];
+						for (k=0; k<nseln+nmeln; ++k)
+						{
+							G2r[3*k  ] = N[k]*Gm[0].x;
+							G2r[3*k+1] = N[k]*Gm[0].y;
+							G2r[3*k+2] = N[k]*Gm[0].z;
+
+							G2s[3*k  ] = N[k]*Gm[1].x;
+							G2s[3*k+1] = N[k]*Gm[1].y;
+							G2s[3*k+2] = N[k]*Gm[1].z;
+						}
+
+						double wn = m_epsp*ss.m_pg[ni];
+
+						for (k=0; k<nseln+nmeln; ++k)
+							for (l=0; l<nseln+nmeln; ++l)
+							{
+								ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l  ] + H2s[k]*G2s[3*l  ]);
+								ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+1] + H2s[k]*G2s[3*l+1]);
+								ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+2] + H2s[k]*G2s[3*l+2]);
+							}
+
+						for (k=0; k<nseln+nmeln; ++k)
+							for (l=0; l<nseln+nmeln; ++l)
+							{
+								mat3d A;
+
+								A[0][0] = -Hr[l]*S2[0][0] + Hs[l]*S1[0][0];
+								A[0][1] = -Hr[l]*S2[0][1] + Hs[l]*S1[0][1];
+								A[0][2] = -Hr[l]*S2[0][2] + Hs[l]*S1[0][2];
+
+								A[1][0] = -Hr[l]*S2[1][0] + Hs[l]*S1[1][0];
+								A[1][1] = -Hr[l]*S2[1][1] + Hs[l]*S1[1][1];
+								A[1][2] = -Hr[l]*S2[1][2] + Hs[l]*S1[1][2];
+
+								A[2][0] = -Hr[l]*S2[2][0] + Hs[l]*S1[2][0];
+								A[2][1] = -Hr[l]*S2[2][1] + Hs[l]*S1[2][1];
+								A[2][2] = -Hr[l]*S2[2][2] + Hs[l]*S1[2][2];
+
+								ke[4*k + 3][4*l  ] += dt*w[j]*wn*N[k]*(A[0][0]*nu.x + A[0][1]*nu.y + A[0][2]*nu.z);
+								ke[4*k + 3][4*l+1] += dt*w[j]*wn*N[k]*(A[1][0]*nu.x + A[1][1]*nu.y + A[1][2]*nu.z);
+								ke[4*k + 3][4*l+2] += dt*w[j]*wn*N[k]*(A[2][0]*nu.x + A[2][1]*nu.y + A[2][2]*nu.z);
+							}
+
+						psolver->AssembleStiffness(en, LM, ke);
+
+						// --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
+
+						ndof = nseln+nmeln;
 
 						LM.create(ndof);
 						for (k=0; k<nseln; ++k) LM[k      ] = sLM[3*nseln+k];
 						for (k=0; k<nmeln; ++k) LM[k+nseln] = mLM[3*nmeln+k];
 
-						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-
 						// build the "element" stiffness
 						ke.Create(ndof, ndof);
 						for (k=0; k<ndof; ++k)
-							for (l=0; l<ndof; ++l) ke[k][l] = dt*wn*w[j]*detJ[j]*N[k]*N[l];
+							for (l=0; l<ndof; ++l) ke[k][l] = -dt*m_epsp*w[j]*detJ[j]*N[k]*N[l];
 
 						// assemble the global stiffness
 						psolver->AssembleStiffness(en, LM, ke);

@@ -45,7 +45,7 @@ bool SuperLUSolver::PreProcess(SparseMatrix& K)
 	m_balloc = true;
 
 	// estimate the condition number
-	m_bcond = true;
+	m_bcond = false;
 
 	return LinearSolver::PreProcess(K);
 #endif
@@ -101,13 +101,6 @@ bool SuperLUSolver::Factor(SparseMatrix& K)
 	// set nr of columns of B to zero to make sure we don't solve anything here
 	B.ncol = 0;
 	X.ncol = 0;
-
-#ifdef PRINTHB
-	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& C = dynamic_cast<CompactUnSymmMatrix&> (K);
-
-	C.print_hb(); // Write Harwell-Boeing matrix to file
-#endif
 
 	// factorize the matrix
 	options.Fact = DOFACT;

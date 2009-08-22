@@ -464,6 +464,53 @@ vec3d FESurface::PointOnSurface(FESurfaceElement &el, double r, double s)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the covariant base vectors of a surface element
+//! at an integration point
+
+void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2])
+{
+	FEMesh& m = *m_pmesh;
+
+	// get the nr of nodes
+	int n = el.Nodes();
+
+	// get the shape function derivatives
+	double Hr[4], Hs[4];
+	el.shape_deriv(Hr, Hs, r, s);
+
+	t[0] = t[1] = vec3d(0,0,0);
+	for (int i=0; i<n; ++i)
+	{
+		t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
+		t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//! This function calculates the covariant base vectors of a surface element
+//! at an integration point
+
+void FESurface::CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
+{
+	FEMesh& m = *m_pmesh;
+
+	// get the nr of nodes
+	int n = el.Nodes();
+
+	// get the shape function derivatives
+	double* Hr = el.Gr(j);
+	double* Hs = el.Gs(j);
+
+	t[0] = t[1] = vec3d(0,0,0);
+	for (int i=0; i<n; ++i)
+	{
+		t[0] += m.Node(el.m_node[i]).m_rt*Hr[i];
+		t[1] += m.Node(el.m_node[i]).m_rt*Hs[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the covariant base vectors of a surface element
 //! at the natural coordinates (r,s)
 
 void FESurface::CoBaseVectors0(FESurfaceElement &el, double r, double s, vec3d t[2])

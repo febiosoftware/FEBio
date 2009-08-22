@@ -80,6 +80,12 @@ public:
 	//! return the point on a surface element
 	vec3d PointOnSurface(FESurfaceElement& el, double r, double s);
 
+	//! calculates the covariant base vectors of a surface at an integration point
+	void CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
+
+	//! calculates the covariant base vectors of a surface at an integration point
+	void CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
+
 	//! calculates covariant base vectors of a surface
 	void CoBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
 

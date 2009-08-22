@@ -298,6 +298,9 @@ public:
 	// calculates the transposed inverse
 	mat3d transinv() const;
 
+	// calculate the skew-symmetric matrix from a vector
+	void skew(const vec3d& v);
+
 protected:
 	double d[3][3];	// matrix data
 
