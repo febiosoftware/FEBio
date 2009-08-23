@@ -23,7 +23,7 @@ bool SuperLUSolver::PreProcess(SparseMatrix& K)
 	// set custom options
 	set_default_options(&options);
 	options.ColPerm			= MMD_AT_PLUS_A;
-	options.SymmetricMode	= YES;		// we use symmetric mode
+	options.SymmetricMode	= (m_bsymm ? YES : NO);		// we use symmetric mode
 	options.DiagPivotThresh	= 0.0;
 	options.Equil			= NO;		// no equilibration
 

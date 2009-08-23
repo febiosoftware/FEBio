@@ -23,9 +23,13 @@ public:
 	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
 	void Destroy();
 
-	SparseMatrix* GetMatrix(int ntype) { return new CompactUnSymmMatrix(); }
+	SparseMatrix* GetMatrix(int ntype)
+	{
+		m_bsymm = (ntype == SPARSE_SYMMETRIC);
+		return new CompactUnSymmMatrix(); 
+	}
 
-	SuperLUSolver() { m_balloc = false; m_bfact = false; m_bcond = false; }
+	SuperLUSolver() { m_balloc = false; m_bfact = false; m_bcond = false; m_bsymm = true; }
 
 #ifdef SUPERLU
 protected:
@@ -34,6 +38,7 @@ protected:
 
 protected:
 
+	bool m_bsymm;	// use symmetric mode or not
 	bool m_balloc;
 	bool m_bfact;
 	bool m_bcond;	// calculate condition numbers
