@@ -18,6 +18,7 @@ FEM::FEM()
 	m_Step.add(m_pStep);
 	m_nStep = 0;
 	m_nhex8 = FE_HEX;
+	m_bsym_poro = true;	// use symmetric poro implementation
 
 	m_ftime = 0;
 
@@ -28,8 +29,6 @@ FEM::FEM()
 	m_nrj = 0;
 
 	m_bcontact = false;		// assume no contact
-
-	m_bsymm = true;	// assume symmetric stiffness matrix
 
 	m_psurf = new FESurface(&m_mesh);
 

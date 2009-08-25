@@ -403,9 +403,13 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 	// set poro flag
 	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+	
+	// get the poro-elasticity symmetry flag
+	bool bsymm = m_pfem->m_bsym_poro;
 
-	// get the current time step
-	double dt = m_pfem->m_pStep->m_dt;
+	// if we're using the symmetric formulation
+	// we need to multiply with the timestep
+	double dt = (bsymm?m_pfem->m_pStep->m_dt:1);
 
 	// loop over the nr of passes
 	for (int np=0; np<m_npass; ++np)
@@ -552,9 +556,9 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 						for (k=0; k<nseln; ++k) fe[k      ] =  Hs[k];
 						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
 
-						// NOTE: We have to multiply with the timestep dt
-						//       because of our biphasic formulation.
-						//       I don't think Gerard needs to do this in his formulation.
+						// NOTE: note that dt is either the timestep
+						//       or one, depending on whether we are 
+						//       using the symmetric poro version or not
 						for (k=0; k<ndof; ++k) fe[k] *= dt*wn*detJ[j]*w[j];
 
 						// assemble residual
@@ -577,6 +581,9 @@ void FESlidingInterface2::ContactStiffness()
 
 	// set the poro flag
 	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+
+	// get the poroelasticity symmetry flag
+	bool bsymm = m_pfem->m_bsym_poro;
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -624,9 +631,6 @@ void FESlidingInterface2::ContactStiffness()
 			// copy the LM vector
 			sLM = se.LM();
 
-			// nodal coordinates
-			vec3d* rt = se.rt();
-
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
 			for (j=0; j<nint; ++j)
@@ -651,7 +655,7 @@ void FESlidingInterface2::ContactStiffness()
 			}
 
 			// loop over all integration points
-			for (int j=0; j<nint; ++j, ++ni)
+			for (j=0; j<nint; ++j, ++ni)
 			{
 				// get the master element
 				FESurfaceElement* pme = ss.m_pme[ni];
@@ -689,7 +693,7 @@ void FESlidingInterface2::ContactStiffness()
 
 					// build the en vector
 					en.create(nseln+nmeln);
-					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
+					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
 					// slave shape functions
@@ -753,7 +757,7 @@ void FESlidingInterface2::ContactStiffness()
 					mat3d S1, S2;
 					S1.skew(gs[0]);
 					S2.skew(gs[1]);
-
+/*
 					for (k=0; k<nseln+nmeln; ++k)
 						for (l=0; l<nseln; ++l)
 						{
@@ -769,7 +773,7 @@ void FESlidingInterface2::ContactStiffness()
 							ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Hr[l]*S2[2][1] + Hs[l]*S1[2][1]);
 							ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Hr[l]*S2[2][2] + Hs[l]*S1[2][2]);
 					}
-
+*/
 					// c. M-term
 					//---------------------------------------
 
@@ -788,7 +792,7 @@ void FESlidingInterface2::ContactStiffness()
 
 					double Hmr[4], Hms[4];
 					me.shape_deriv(Hmr, Hms, r, s);
-
+/*
 					for (k=0; k<nseln; ++k)
 						for (l=0; l<nseln+nmeln; ++l)
 						{
@@ -804,14 +808,17 @@ void FESlidingInterface2::ContactStiffness()
 							ke[(k+nseln)*3+2][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].y + Hms[k]*nu.z*Gm[1].y)*N[l];
 							ke[(k+nseln)*3+2][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].z + Hms[k]*nu.z*Gm[1].z)*N[l];
 						}
-
+*/
 					// assemble the global stiffness
 					psolver->AssembleStiffness(en, LM, ke);
 
 					// --- B I P H A S I C   S T I F F N E S S ---
 					if (bporo)
 					{
-						double dt = m_pfem->m_pStep->m_dt;
+						// the variable dt is either the timestep or one
+						// depending on whether we are using the symmetric
+						// poro version or not.
+						double dt = (bsymm?m_pfem->m_pStep->m_dt:1);
 
 						// --- S O L I D - P R E S S U R E   C O N T A C T ---
 
@@ -901,7 +908,7 @@ void FESlidingInterface2::ContactStiffness()
 								ke[4*k + 3][4*l+2] += dt*w[j]*wn*N[k]*(A[2][0]*nu.x + A[2][1]*nu.y + A[2][2]*nu.z);
 							}
 
-						psolver->AssembleStiffness(en, LM, ke);
+//						psolver->AssembleStiffness(en, LM, ke);
 
 						// --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
 

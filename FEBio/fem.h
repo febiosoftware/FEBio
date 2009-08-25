@@ -409,6 +409,7 @@ public:
 		FEAnalysis*				m_pStep;	//!< pointer to current analysis step
 		double					m_ftime;	//!< current time value
 		int	m_nhex8;						//!< element type for hex8
+		bool	m_bsym_poro;	//!< symmetric (old) poro-elastic flag
 
 		// body force loads
 		FE_BODYFORCE	m_BF[3];		//!< body force data

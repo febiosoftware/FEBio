@@ -37,6 +37,9 @@ bool FEM::InitPoro()
 		return true;
 	}
 
+	// see if we are the symmetric version or not
+	if (m_bsym_poro == false) this->SetSymmetryFlag(false);
+
 	// fix all pressure dofs that are not used
 	// that is, that are not part of a poro-elastic element
 	// this is done in three steps

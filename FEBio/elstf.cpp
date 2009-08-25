@@ -2470,6 +2470,7 @@ bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 	fe.zero();
 
 	double dt = m_fem.m_pStep->m_dt;
+	bool bsymm = m_fem.m_bsym_poro;
 
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -2509,9 +2510,19 @@ bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 		vec3d& w = pt.m_w;
 
 		// update force vector
-		for (i=0; i<neln; ++i)
+		if (bsymm)
 		{
-			fe[i] -= dt*(B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - trd*H[i])*detJ*wg[n];
+			for (i=0; i<neln; ++i)
+			{
+				fe[i] -= dt*(B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - trd*H[i])*detJ*wg[n];
+			}
+		}
+		else
+		{
+			for (i=0; i<neln; ++i)
+			{
+				fe[i] -= (B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - trd*H[i])*detJ*wg[n];
+			}
 		}
 	}
 
@@ -2529,10 +2540,10 @@ bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 	int neln = el.Nodes();
 
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz;
+	double Gx, Gy, Gz, GX, GY, GZ;
 
 	// jacobian
-	double Ji[3][3], detJ;
+	double Ji[3][3], detJ, J0i[3][3];
 
 	// Bp-matrix
 	vector<double[3]> B(neln);
@@ -2563,8 +2574,22 @@ bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 		return false;
 	}
 
+	// if we use the symmetric version of the poro-implementation
+	// we have to multiply some stiffness terms with the time step
+	bool bsymm = m_fem.m_bsym_poro;
+	double dt = m_fem.m_pStep->m_dt;
+
+	FEMesh& mesh = m_fem.m_mesh;
+
 	// gauss-weights
 	double* gw = el.GaussWeights();
+
+	vec3d rp[8], v[8];
+	for (i=0; i<neln; ++i) 
+	{
+		rp[i] = mesh.Node(el.m_node[i]).m_rp;
+		v[i] = mesh.Node(el.m_node[i]).m_vt;
+	}
 
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -2597,22 +2622,34 @@ bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 		}
 
 		// get the permeability tensor
-		// TODO: note that we pass a material point although it is not initialized
-		// we can get away with this for now since the permeability tensor that
-		// is returned is constant, but if this is no longer the case we should
-		// initialize the material point data.
+		el.defgrad(pt.F, n);
+		pt.J = pt.F.det();
 		pm->Permeability(k, mp);
 
 		// calculate the Q = Bt*k*B matrix
-		double dt = m_fem.m_pStep->m_dt;
-		for (i=0; i<neln; ++i)
-			for (j=0; j<neln; ++j)
-			{
-				for (l=0; l<3; ++l)
+		if (bsymm)
+		{
+			// when using the symmetric version we need to multiply this stiffness term with dt
+			for (i=0; i<neln; ++i)
+				for (j=0; j<neln; ++j)
 				{
-					ke[3*neln+i][3*neln+j] -= dt*detJ*gw[n]*(B[i][0]*k[0][l]+B[i][1]*k[1][l]+B[i][2]*k[2][l])*B[j][l];
+					for (l=0; l<3; ++l)
+					{
+						ke[3*neln+i][3*neln+j] -= dt*detJ*gw[n]*(B[i][0]*k[0][l]+B[i][1]*k[1][l]+B[i][2]*k[2][l])*B[j][l];
+					}
 				}
-			}
+		}
+		else
+		{
+			for (i=0; i<neln; ++i)
+				for (j=0; j<neln; ++j)
+				{
+					for (l=0; l<3; ++l)
+					{
+						ke[3*neln+i][3*neln+j] -= detJ*gw[n]*(B[i][0]*k[0][l]+B[i][1]*k[1][l]+B[i][2]*k[2][l])*B[j][l];
+					}
+				}
+		}
 
 		// calculate the G-matrix
 		for (i=0; i<neln; ++i)
@@ -2621,11 +2658,65 @@ bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 				ke[3*i  ][3*neln+j] -= detJ*gw[n]*B[i][0]*H[j];
 				ke[3*i+1][3*neln+j] -= detJ*gw[n]*B[i][1]*H[j];
 				ke[3*i+2][3*neln+j] -= detJ*gw[n]*B[i][2]*H[j];
-
-				ke[3*neln+j][3*i  ] -= detJ*gw[n]*B[i][0]*H[j];
-				ke[3*neln+j][3*i+1] -= detJ*gw[n]*B[i][1]*H[j];
-				ke[3*neln+j][3*i+2] -= detJ*gw[n]*B[i][2]*H[j];
 			}
+
+		if (bsymm)
+		{
+			for (i=0; i<neln; ++i)
+				for (j=0; j<neln; ++j)
+				{
+					ke[3*neln+j][3*i  ] -= detJ*gw[n]*B[i][0]*H[j];
+					ke[3*neln+j][3*i+1] -= detJ*gw[n]*B[i][1]*H[j];
+					ke[3*neln+j][3*i+2] -= detJ*gw[n]*B[i][2]*H[j];
+				}
+		}
+		else
+		{
+			// we need to calculate the divergence of v. To do this we use
+			// the formula div(v) = 1/J*dJdt, where J = det(F)
+			el.invjac0(J0i, n);
+
+			// next we calculate the deformation gradient
+			mat3d Fp, gradv;
+			Fp.zero();
+			gradv.zero();
+
+			for (i=0; i<neln; ++i)
+			{
+				// calculate global gradient of shape functions
+				// note that we need the transposed of Ji, not Ji itself !
+				Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+				Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+				Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+
+				GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
+				GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
+				GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
+
+				Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
+				Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
+				Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
+
+				gradv[0][0] += v[i].x*Gx; gradv[1][0] += v[i].y*Gx; gradv[2][0] += v[i].z*Gx;
+				gradv[0][1] += v[i].x*Gy; gradv[1][1] += v[i].y*Gy; gradv[2][1] += v[i].z*Gy;
+				gradv[0][2] += v[i].x*Gz; gradv[1][2] += v[i].y*Gz; gradv[2][2] += v[i].z*Gz;
+			}
+
+			// next we get the determinant
+			double Jp = Fp.det();
+			double J = pt.J;
+
+			// and then finally
+			double divv = ((J-Jp)/dt)/J;
+
+			for (i=0; i<neln; ++i)
+				for (j=0; j<neln; ++j)
+				{
+					ke[3*neln+i][3*j  ] -= detJ*gw[n]*H[i]*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
+					ke[3*neln+i][3*j+1] -= detJ*gw[n]*H[i]*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
+					ke[3*neln+i][3*j+2] -= detJ*gw[n]*H[i]*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
+				}
+		}
 	}
 
 	return true;
