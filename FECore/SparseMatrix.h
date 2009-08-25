@@ -72,6 +72,7 @@ public:
 	{
 		if (m_pd) delete [] m_pd; m_pd = 0;
 		if (m_pr) delete [] m_pr; m_pr = 0;
+		m_ndim = 0;
 	}
 
 	void Create(int N);

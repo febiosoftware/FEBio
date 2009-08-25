@@ -248,6 +248,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 			else if (strcmp(szt, "superlu_mt"        ) == 0) fem.m_nsolver = SUPERLU_MT_SOLVER;
 			else if (strcmp(szt, "pardiso"           ) == 0) fem.m_nsolver = PARDISO_SOLVER;
 			else if (strcmp(szt, "wsmp"              ) == 0) fem.m_nsolver = WSMP_SOLVER;
+			else if (strcmp(szt, "lusolver"          ) == 0) fem.m_nsolver = LU_SOLVER;
 			else if (strcmp(szt, "conjugate gradient") == 0)
 			{
 				fem.m_nsolver = CG_ITERATIVE_SOLVER;
