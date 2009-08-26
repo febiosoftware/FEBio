@@ -288,13 +288,12 @@ void FESlidingInterface2::Init()
 	// for now we enforce penalty method for biphasic contact
 	if (m_pfem->m_pStep->m_itype == FE_STATIC_PORO) m_blaugon = 0;
 
-	// project slave surface onto master surface
-	ProjectSurface(m_ss, m_ms);
-	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
-
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	m_pfem->SetSymmetryFlag(false);
+
+	// update sliding interface data
+	Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -375,8 +374,101 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::Update()
 {	
+	int i, j, n, id;
+
+	// project the surfaces onto each other
+	// this will update the gap functions as well
 	ProjectSurface(m_ss, m_ms);
 	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
+
+	// set poro flag
+	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+
+	// only continue if we are doing a poro-elastic simulation
+	if (bporo == false) return;
+
+	if (m_pfem->m_pStep->m_ntimesteps > 10) return;
+
+	// now that the nodes have been projected, we need to figure out
+	// if we need to modify the constraints on the pressure dofs
+	for (int np=0; np<m_npass; ++np)
+	{
+		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
+
+		// first, mark all nodes as free-draining
+		// this is done by setting the dof's equation number
+		// to a negative number
+		for (i=0; i<ss.Nodes(); ++i) 
+		{
+			id = ss.Node(i).m_ID[6];
+			if (id < -1) ss.Node(i).m_ID[6] = -id-2;
+		}
+
+		// keep a running counter of integration points.
+		int ni = 0;
+
+		// loop over all elements
+		for (n=0; n<ss.Elements(); ++n)
+		{
+			FESurfaceElement& el = ss.Element(n);
+
+			// get the nodal tractions at the integration points
+			double ti[4], gi[4];
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+			for (i=0; i<nint; ++i, ++ni) 
+			{
+				gi[i] = ss.m_gap[ni];
+				ti[i] = m_eps*MBRACKET(gi[i]);
+			}
+
+			// setup the (over-determined) system to find the nodal values
+			// TODO: this is the same for all surface elements, so
+			//       maybe we should do this only once
+			matrix A;
+			A.Create(nint, neln);
+			for (i=0; i<nint; ++i)
+			{
+				double* H = el.H(i);
+				for (j=0; j<neln; ++j) A[i][j] = H[j];
+			}
+
+			double tn[4];
+
+			if (nint == neln)
+			{
+				matrix Ai = A.inverse();
+
+				for (i=0; i<neln; ++i)
+				{
+					tn[i] = 0;
+					for (j=0; j<nint; ++j) tn[i] += Ai[i][j]*ti[j];
+				}
+			}
+			else
+			{
+				// TODO: I still need to do this case
+				assert(false);
+			}
+
+			for (i=0; i<neln; ++i)
+			{
+				FENode& node = ss.Node(el.m_lnode[i]);
+				id = node.m_ID[6];
+				if ((id >= 0) && (tn[i] == 0))
+				{
+					node.m_ID[6] = -id-2;
+				}
+			}
+		}
+	}
+
+	// if we only did single pass, the dofs of the secondary surface 
+	// have not been modified, so we modify them here.
+	if (m_npass == 1)
+	{
+
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -538,7 +630,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					// do the biphasic stuff
 					// TODO: I should only do this when the node is actually in contact
 					//       in other words, when g >= 0
-					if (bporo)
+					if (bporo && (g >= 0))
 					{
 						// calculate nr of pressure dofs
 						int ndof = nseln + nmeln;
@@ -772,9 +864,8 @@ void FESlidingInterface2::ContactStiffness()
 							ke[k*3+2][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[2][0] + Gs[l]*S1[2][0]);
 							ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[2][1] + Gs[l]*S1[2][1]);
 							ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[2][2] + Gs[l]*S1[2][2]);
-					}
-*/
-					// c. M-term
+						}
+*/					// c. M-term
 					//---------------------------------------
 
 					vec3d gm[2];
@@ -813,7 +904,7 @@ void FESlidingInterface2::ContactStiffness()
 					psolver->AssembleStiffness(en, LM, ke);
 
 					// --- B I P H A S I C   S T I F F N E S S ---
-					if (bporo)
+					if (bporo && (g >= 0))
 					{
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
