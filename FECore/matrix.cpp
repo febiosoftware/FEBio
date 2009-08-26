@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "matrix.h"
+#include "assert.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -24,4 +25,55 @@ vector<double> operator / (vector<double>& b, matrix& m)
 	lubksb(a, n, indx, x);
 
 	return x;
+}
+
+matrix matrix::operator * (const matrix& m)
+{
+	assert(m_nc == m.m_nr);
+	matrix a(m_nr, m.m_nc);
+
+	for (int i=0; i<m_nr; ++i)
+	{
+		for (int j=0; j<m.m_nc; ++j)
+		{
+			a(i,j) = 0;
+			for (int k=0; k<m_nc; ++k) a(i,j) += m_pr[i][k]*m(k,j);
+		}
+	}
+
+	return a;
+}
+
+matrix matrix::inverse()
+{
+	// make sure this is a square matrix
+	assert(m_nr == m_nc);
+
+	// make a copy of this matrix
+	// since we don't want to change it
+	matrix a(*this);
+
+	// do a LU decomposition
+	int n = m_nr;
+	vector<int> indx(n);
+	ludcmp(a, n, indx);
+
+	// allocate the inverse matrix
+	matrix ai(n, n);
+
+	// do a backsubstituation on the columns of a
+	vector<double> b(n); b.zero();
+	for (int j=0; j<n; ++j)
+	{
+		b[j] = 1;
+		lubksb(a, n, indx, b);
+
+		for (int i=0; i<n; ++i)
+		{
+			ai[i][j] = b[i];
+			b[i] = 0;
+		}
+	}
+
+	return ai;
 }

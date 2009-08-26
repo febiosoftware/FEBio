@@ -93,6 +93,8 @@ public:
 
 	double& operator () (int i, int j) { return m_pr[i][j]; }
 
+	double operator () (int i, int j) const { return m_pr[i][j]; }
+
 	int rows   () { return m_nr; }
 	int columns() { return m_nc; }
 
@@ -108,6 +110,10 @@ public:
 			for (j=0; j<m_nc; ++j) At[j][i] = m_pr[i][j];
 		return At;
 	}
+
+	matrix inverse();
+
+	matrix operator * (const matrix& m);
 
 protected:
 	double**	m_pr;	// pointer to rows
