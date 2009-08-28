@@ -285,12 +285,21 @@ void FESlidingInterface2::Init()
 	m_ss.Init();
 	m_ms.Init();
 
+	bool bporo = m_pfem->m_pStep->m_itype == FE_STATIC_PORO;
+
 	// for now we enforce penalty method for biphasic contact
-	if (m_pfem->m_pStep->m_itype == FE_STATIC_PORO) m_blaugon = 0;
+	if (bporo) m_blaugon = 0;
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	m_pfem->SetSymmetryFlag(false);
+
+	// make sure we are using full-Newton
+	if (bporo && (m_pfem->m_pStep->m_psolver->m_maxups != 0))
+	{
+		m_pfem->m_pStep->m_psolver->m_maxups = 0;
+		m_pfem->m_log.printbox("WARNING", "The biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+	}
 
 	// update sliding interface data
 	Update();
@@ -335,8 +344,23 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 			// calculate the normal at this integration point
 			nu = ss.SurfaceNormal(el, j);
 
+			// first see if the old intersected face is still good enough
+			pme = ss.m_pme[n];
+			if (pme)
+			{
+				double g;
+
+				// see if the ray intersects this element
+				if (ms.Intersect(*pme, r, nu, rs, g, m_stol))
+				{
+					ss.m_rs[n][0] = rs[0];
+					ss.m_rs[n][1] = rs[1];
+				}
+				else pme = 0;
+			}
+
 			// find the intersection point with the master surface
-			pme = ms.FindIntersection(r, nu, rs, m_stol);
+			if (pme == 0) pme = ms.FindIntersection(r, nu, rs, m_stol);
 
 			ss.m_pme[n] = pme;
 			ss.m_nu[n] = nu;
@@ -354,12 +378,13 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				ss.m_gap[n] = nu*(r - q);
 
 				// calculate the pressure gap function
-				if (bporo)
+				if (bporo && ss.m_gap[n] >= 0)
 				{
 					mesh.UnpackElement(*pme);
 					double p2 = pme->eval(pme->pt(), rs[0], rs[1]);
 					ss.m_pg[n] = p1 - p2;
 				}
+				else ss.m_pg[n] = 0;
 			}
 			else
 			{
@@ -387,15 +412,13 @@ void FESlidingInterface2::Update()
 	// only continue if we are doing a poro-elastic simulation
 	if (bporo == false) return;
 
-	if (m_pfem->m_pStep->m_ntimesteps > 10) return;
-
 	// now that the nodes have been projected, we need to figure out
 	// if we need to modify the constraints on the pressure dofs
 	for (int np=0; np<m_npass; ++np)
 	{
 		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
 
-		// first, mark all nodes as free-draining
+		// first, mark all nodes as non free-draining (= pos. ID)
 		// this is done by setting the dof's equation number
 		// to a negative number
 		for (i=0; i<ss.Nodes(); ++i) 
@@ -455,9 +478,13 @@ void FESlidingInterface2::Update()
 			{
 				FENode& node = ss.Node(el.m_lnode[i]);
 				id = node.m_ID[6];
-				if ((id >= 0) && (tn[i] == 0))
+				if ((id >= 0) && (tn[i] <= 0))
 				{
+					// fix the prescribed dof
 					node.m_ID[6] = -id-2;
+
+					// set the fluid pressure to zero
+					node.m_pt = 0;
 				}
 			}
 		}
@@ -833,7 +860,7 @@ void FESlidingInterface2::ContactStiffness()
 					ke.Create(ndof, ndof);
 
 					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l) ke[k][l] = m_eps*N[k]*N[l]*detJ[j]*w[j];
+						for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
 
 					// b. A-term
 					//-------------------------------------

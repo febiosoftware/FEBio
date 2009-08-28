@@ -18,7 +18,7 @@ public:
 	//! find the intersection of a ray with the surface
 	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps);
 
-protected:
+public:
 	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
 	bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
 	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
