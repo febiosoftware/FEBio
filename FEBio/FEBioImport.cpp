@@ -158,6 +158,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "pressure_stiffness") tag.value(m_pStep->m_istiffpr);
 		else if (tag == "hourglass"         ) tag.value(m_pStep->m_hg);
 		else if (tag == "symmetric_biphasic") tag.value(fem.m_bsym_poro);
+		else if (tag == "plane_strain"      ) tag.value(fem.m_bplane_strain);
 		else if (tag == "analysis")
 		{
 			const char* szt = tag.AttributeValue("type");

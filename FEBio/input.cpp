@@ -78,6 +78,7 @@ void FEM::EchoInput()
 	m_log.printf("\t   eq.%2d: quasi-static\n", FE_STATIC);
 	m_log.printf("\t   eq.%2d: dynamic\n", FE_DYNAMIC);
 	m_log.printf("\t   eq.%2d: quasi-static + poro-elasticity\n", FE_STATIC_PORO);
+	m_log.printf("\tPlane strain mode .............................. : %s\n", (m_bplane_strain? "yes" : "no"));
 	m_log.printf("\tNumber of materials ............................ : %d\n", Materials());
 	m_log.printf("\tNumber of nodes ................................ : %d\n", m_mesh.Nodes() );
 	m_log.printf("\tNumber of solid elements ....................... : %d\n", m_mesh.SolidElements());

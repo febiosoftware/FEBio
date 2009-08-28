@@ -58,6 +58,12 @@ bool FEM::Init()
 	// evaluate all loadcurves at the initial time
 	for (i=0; i<LoadCurves(); ++i) m_LC[i].Evaluate(0);
 
+	// if the analysis is run in plain-strain mode we fix all the z-dofs of all nodes
+	if (m_bplane_strain)
+	{
+		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[2] = -1;
+	}
+
 	// find and remove isolated vertices
 	int ni = m_mesh.RemoveIsolatedVertices();
 	if (ni != 0) 
