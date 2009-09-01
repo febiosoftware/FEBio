@@ -95,6 +95,8 @@ public:
 	bool			m_bautopen;	//!< auto penalty calculation factor
 	double			m_eps;		//!< penalty scale factor
 
+	bool			m_breloc;	//!< initial node relocation
+
 	double			m_mu;		//!< friction coefficient
 	double			m_epsf;		//!< penalty scale factor for friction
 

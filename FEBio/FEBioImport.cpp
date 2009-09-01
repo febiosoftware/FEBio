@@ -1483,6 +1483,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			else if (tag == "search_tol") tag.value(ps->m_stol);
 			else if (tag == "ktmult") tag.value(ps->m_ktmult);
 			else if (tag == "knmult") tag.value(ps->m_knmult);
+			else if (tag == "node_reloc") tag.value(ps->m_breloc);
 			else if (tag == "penalty")
 			{
 				const char* sz = tag.AttributeValue("lc", true);

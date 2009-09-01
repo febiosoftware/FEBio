@@ -30,6 +30,8 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 	m_ktmult = 0;
 	m_knmult = 1;
 
+	m_breloc = true;
+
 	m_nplc = -1;
 	m_pplc = 0;
 	m_nsegup = 0;	// always do segment updates
@@ -206,7 +208,7 @@ void FESlidingInterface::Init()
 //	m_ms.UpdateNormals();
 
 	// project slave surface onto master surface
-	ProjectSurface(m_ss, m_ms, true);
+	ProjectSurface(m_ss, m_ms, m_breloc);
 
 	if (m_bautopen)	CalcAutoPenalty(m_ss);
 
