@@ -37,7 +37,9 @@ public:
 
 	//! permeability
 	virtual void Permeability(double k[3][3], FEMaterialPoint& pt) = 0;
-};
 
+	//! tangent of permeability
+	virtual tens4ds Tangent_Permeability(FEMaterialPoint& mp) = 0;
+};
 
 #endif // !defined(AFX_FEPOROELASTIC_H__C67341B3_B080_4E3B_8B34_D73AEF86BB33__INCLUDED_)

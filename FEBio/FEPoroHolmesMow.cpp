@@ -71,3 +71,23 @@ void FEPoroHolmesMow::Permeability(double k[3][3], FEMaterialPoint& mp)
 	k[1][0] = k[1][2] = 0;
 	k[2][0] = k[2][1] = 0;
 }
+
+//-----------------------------------------------------------------------------
+//! Tangent of permeability
+tens4ds FEPoroHolmesMow::Tangent_Permeability(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// relative volume
+	double J = et.J;
+
+	mat3dd I(1);	// Identity
+	tens4ds IxI = dyad1s(I);
+	tens4ds I4  = dyad4s(I);
+
+	double k = m_perm*pow((J-m_phi0)/(1.0-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+
+	double f = 1 + m_alpha*J / (J - m_phi0) + m_M*J*J;
+
+	return (IxI*f + I4)*k;
+}

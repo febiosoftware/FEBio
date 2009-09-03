@@ -2622,8 +2622,6 @@ bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 		}
 
 		// get the permeability tensor
-		el.defgrad(pt.F, n);
-		pt.J = pt.F.det();
 		pm->Permeability(k, mp);
 
 		// calculate the Q = Bt*k*B matrix
@@ -2715,6 +2713,29 @@ bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 					ke[3*neln+i][3*j  ] -= detJ*gw[n]*H[i]*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
 					ke[3*neln+i][3*j+1] -= detJ*gw[n]*H[i]*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
 					ke[3*neln+i][3*j+2] -= detJ*gw[n]*H[i]*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
+				}
+
+			int T[3][3] = {{0, 3, 5}, {3, 1, 4}, {5, 4, 2}};
+
+			FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+			vec3d Dp = pt.m_gradp;
+
+			tens4ds K = pm->Tangent_Permeability(mp);
+			for (i=0; i<neln; ++i)
+				for (j=0; j<neln; ++j)
+				{
+					double BKB[3][3] = {0};
+					for (int k=0; k<3; ++k)
+						for (int l=0; l<3; ++l)
+						{
+							BKB[0][0] += B[i][k]*K(T[k][0], T[0][l])*B[j][l]; BKB[0][1] += B[i][k]*K(T[k][0], T[1][l])*B[j][l]; BKB[0][2] += B[i][k]*K(T[k][0], T[2][l])*B[j][l];
+							BKB[1][0] += B[i][k]*K(T[k][1], T[0][l])*B[j][l]; BKB[1][1] += B[i][k]*K(T[k][1], T[1][l])*B[j][l]; BKB[1][2] += B[i][k]*K(T[k][1], T[2][l])*B[j][l];
+							BKB[2][0] += B[i][k]*K(T[k][2], T[0][l])*B[j][l]; BKB[2][1] += B[i][k]*K(T[k][2], T[1][l])*B[j][l]; BKB[2][2] += B[i][k]*K(T[k][2], T[2][l])*B[j][l];
+						}
+
+					ke[3*neln+i][3*j  ] -= detJ*gw[n]*( BKB[0][0]*Dp.x + BKB[0][1]*Dp.y + BKB[0][2]*Dp.z);
+					ke[3*neln+i][3*j+1] -= detJ*gw[n]*( BKB[1][0]*Dp.x + BKB[1][1]*Dp.y + BKB[1][2]*Dp.z);
+					ke[3*neln+i][3*j+2] -= detJ*gw[n]*( BKB[2][0]*Dp.x + BKB[2][1]*Dp.y + BKB[2][2]*Dp.z);
 				}
 		}
 	}

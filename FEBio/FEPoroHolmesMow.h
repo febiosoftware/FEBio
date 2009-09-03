@@ -16,7 +16,10 @@ public:
 		
 	//! permeability
 	virtual void Permeability(double k[3][3], FEMaterialPoint& pt);
-		
+
+	//! Tangent of permeability
+	virtual tens4ds Tangent_Permeability(FEMaterialPoint& mp);
+
 public:
 	double	m_perm;			//!< permeability
 	double	m_permv[3];		//!< permeability for diagonal tensor

@@ -55,3 +55,12 @@ void FEPoroConstPerm::Permeability(double k[3][3], FEMaterialPoint& mp)
 	k[1][0] = k[1][2] = 0;
 	k[2][0] = k[2][1] = 0;
 }
+
+//-----------------------------------------------------------------------------
+//! Tangent of permeability
+tens4ds FEPoroConstPerm::Tangent_Permeability(FEMaterialPoint &mp)
+{
+	tens4ds K;
+	K.zero();
+	return K;
+}
