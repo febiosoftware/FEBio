@@ -41,15 +41,15 @@ mat3ds FELinearOrthotropic::Stress(FEMaterialPoint& mp)
 
 	// caculate small strain tensor
 	mat3ds e;
-/*	e.xx() = F[0][0] - 1.0;
+	e.xx() = F[0][0] - 1.0;
 	e.yy() = F[1][1] - 1.0;
 	e.zz() = F[2][2] - 1.0;
 	e.xy() = 0.5*(F[0][1] + F[1][0]);
 	e.xz() = 0.5*(F[0][2] + F[2][0]);
 	e.yz() = 0.5*(F[1][2] + F[2][1]);
-*/
+
 	// euler-lagrange tensor
-	e = (pt.RightCauchyGreen() - mat3dd(1))*0.5;
+//	e = (pt.RightCauchyGreen() - mat3dd(1))*0.5;
 
 	// calculate stiffness matrix
 	tens4ds C = Tangent(pt);
@@ -63,9 +63,9 @@ mat3ds FELinearOrthotropic::Stress(FEMaterialPoint& mp)
 	s.xx() = D[0][0]*e.xx() + D[0][1]*e.yy() + D[0][2]*e.zz();
 	s.yy() = D[1][0]*e.xx() + D[1][1]*e.yy() + D[1][2]*e.zz();
 	s.zz() = D[2][0]*e.xx() + D[2][1]*e.yy() + D[2][2]*e.zz();
-	s.yz() = D[3][3]*e.yz();
-	s.xz() = D[4][4]*e.xz();
-	s.xy() = D[5][5]*e.xy();
+	s.yz() = 2.0*D[3][3]*e.yz();
+	s.xz() = 2.0*D[4][4]*e.xz();
+	s.xy() = 2.0*D[5][5]*e.xy();
 
 	return s;
 }
