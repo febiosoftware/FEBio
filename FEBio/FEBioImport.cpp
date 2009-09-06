@@ -1610,6 +1610,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			else if (tag == "knmult"    ) tag.value(ps->m_knmult);
 			else if (tag == "search_tol") tag.value(ps->m_stol);
 			else if (tag == "pressure_penalty") tag.value(ps->m_epsp);
+			else if (tag == "symmetric_stiffness") tag.value(ps->m_bsymm);
 			else if (tag == "two_pass"  ) 
 			{
 				int n;

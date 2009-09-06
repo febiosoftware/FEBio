@@ -80,6 +80,7 @@ public:
 	double	m_atol;		//!< augmentation tolerance
 	double	m_eps;		//!< penalty factor
 	double	m_stol;		//!< search tolerance
+	bool	m_bsymm;	//!< use symmetric stiffness components only
 
 	// bihpasic contact parameters
 	double	m_epsp;		//!< flow rate penalty

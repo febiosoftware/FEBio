@@ -276,6 +276,7 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_epsp = 1;
 	m_npass = 1;
 	m_stol = 0.01;
+	m_bsymm = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -292,7 +293,7 @@ void FESlidingInterface2::Init()
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
-//	m_pfem->SetSymmetryFlag(false);
+	if (!m_bsymm) m_pfem->SetSymmetryFlag(false);
 
 	// make sure we are using full-Newton
 	if (bporo && (m_pfem->m_pStep->m_psolver->m_maxups != 0))
@@ -876,23 +877,26 @@ void FESlidingInterface2::ContactStiffness()
 					mat3d S1, S2;
 					S1.skew(gs[0]);
 					S2.skew(gs[1]);
-/*
-					for (k=0; k<nseln+nmeln; ++k)
-						for (l=0; l<nseln; ++l)
-						{
-							ke[k*3  ][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[0][0] + Gs[l]*S1[0][0]);
-							ke[k*3  ][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[0][1] + Gs[l]*S1[0][1]);
-							ke[k*3  ][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[0][2] + Gs[l]*S1[0][2]);
 
-							ke[k*3+1][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[1][0] + Gs[l]*S1[1][0]);
-							ke[k*3+1][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[1][1] + Gs[l]*S1[1][1]);
-							ke[k*3+1][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[1][2] + Gs[l]*S1[1][2]);
+					if (!m_bsymm)
+					{
+						for (k=0; k<nseln+nmeln; ++k)
+							for (l=0; l<nseln; ++l)
+							{
+								ke[k*3  ][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[0][0] + Gs[l]*S1[0][0]);
+								ke[k*3  ][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[0][1] + Gs[l]*S1[0][1]);
+								ke[k*3  ][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[0][2] + Gs[l]*S1[0][2]);
 
-							ke[k*3+2][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[2][0] + Gs[l]*S1[2][0]);
-							ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[2][1] + Gs[l]*S1[2][1]);
-							ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[2][2] + Gs[l]*S1[2][2]);
-						}
-*/					// c. M-term
+								ke[k*3+1][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[1][0] + Gs[l]*S1[1][0]);
+								ke[k*3+1][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[1][1] + Gs[l]*S1[1][1]);
+								ke[k*3+1][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[1][2] + Gs[l]*S1[1][2]);
+
+								ke[k*3+2][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[2][0] + Gs[l]*S1[2][0]);
+								ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[2][1] + Gs[l]*S1[2][1]);
+								ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[2][2] + Gs[l]*S1[2][2]);
+							}
+					}
+					// c. M-term
 					//---------------------------------------
 
 					vec3d gm[2];
@@ -910,23 +914,26 @@ void FESlidingInterface2::ContactStiffness()
 
 					double Hmr[4], Hms[4];
 					me.shape_deriv(Hmr, Hms, r, s);
-/*
-					for (k=0; k<nseln; ++k)
-						for (l=0; l<nseln+nmeln; ++l)
-						{
-							ke[(k+nseln)*3  ][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].x + Hms[k]*nu.x*Gm[1].x)*N[l];
-							ke[(k+nseln)*3  ][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].y + Hms[k]*nu.x*Gm[1].y)*N[l];
-							ke[(k+nseln)*3  ][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].z + Hms[k]*nu.x*Gm[1].z)*N[l];
 
-							ke[(k+nseln)*3+1][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].x + Hms[k]*nu.y*Gm[1].x)*N[l];
-							ke[(k+nseln)*3+1][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].y + Hms[k]*nu.y*Gm[1].y)*N[l];
-							ke[(k+nseln)*3+1][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].z + Hms[k]*nu.y*Gm[1].z)*N[l];
+					if (!m_bsymm)
+					{
+						for (k=0; k<nseln; ++k)
+							for (l=0; l<nseln+nmeln; ++l)
+							{
+								ke[(k+nseln)*3  ][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].x + Hms[k]*nu.x*Gm[1].x)*N[l];
+								ke[(k+nseln)*3  ][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].y + Hms[k]*nu.x*Gm[1].y)*N[l];
+								ke[(k+nseln)*3  ][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].z + Hms[k]*nu.x*Gm[1].z)*N[l];
 
-							ke[(k+nseln)*3+2][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].x + Hms[k]*nu.z*Gm[1].x)*N[l];
-							ke[(k+nseln)*3+2][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].y + Hms[k]*nu.z*Gm[1].y)*N[l];
-							ke[(k+nseln)*3+2][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].z + Hms[k]*nu.z*Gm[1].z)*N[l];
-						}
-*/
+								ke[(k+nseln)*3+1][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].x + Hms[k]*nu.y*Gm[1].x)*N[l];
+								ke[(k+nseln)*3+1][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].y + Hms[k]*nu.y*Gm[1].y)*N[l];
+								ke[(k+nseln)*3+1][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].z + Hms[k]*nu.y*Gm[1].z)*N[l];
+
+								ke[(k+nseln)*3+2][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].x + Hms[k]*nu.z*Gm[1].x)*N[l];
+								ke[(k+nseln)*3+2][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].y + Hms[k]*nu.z*Gm[1].y)*N[l];
+								ke[(k+nseln)*3+2][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].z + Hms[k]*nu.z*Gm[1].z)*N[l];
+							}
+					}
+
 					// assemble the global stiffness
 					psolver->AssembleStiffness(en, LM, ke);
 
@@ -996,37 +1003,41 @@ void FESlidingInterface2::ContactStiffness()
 
 						double wn = m_epsp*ss.m_pg[ni];
 
-						for (k=0; k<nseln+nmeln; ++k)
-							for (l=0; l<nseln+nmeln; ++l)
-							{
-								ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l  ] + H2s[k]*G2s[3*l  ]);
-								ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+1] + H2s[k]*G2s[3*l+1]);
-								ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+2] + H2s[k]*G2s[3*l+2]);
-							}
+						if (!m_bsymm)
+						{
+							for (k=0; k<nseln+nmeln; ++k)
+								for (l=0; l<nseln+nmeln; ++l)
+								{
+									ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l  ] + H2s[k]*G2s[3*l  ]);
+									ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+1] + H2s[k]*G2s[3*l+1]);
+									ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+2] + H2s[k]*G2s[3*l+2]);
+								}
 
-						for (k=0; k<nseln+nmeln; ++k)
-							for (l=0; l<nseln+nmeln; ++l)
-							{
-								mat3d A;
+							for (k=0; k<nseln+nmeln; ++k)
+								for (l=0; l<nseln+nmeln; ++l)
+								{
+									mat3d A;
 
-								A[0][0] = -Gr[l]*S2[0][0] + Gs[l]*S1[0][0];
-								A[0][1] = -Gr[l]*S2[0][1] + Gs[l]*S1[0][1];
-								A[0][2] = -Gr[l]*S2[0][2] + Gs[l]*S1[0][2];
+									A[0][0] = -Gr[l]*S2[0][0] + Gs[l]*S1[0][0];
+									A[0][1] = -Gr[l]*S2[0][1] + Gs[l]*S1[0][1];
+									A[0][2] = -Gr[l]*S2[0][2] + Gs[l]*S1[0][2];
 
-								A[1][0] = -Gr[l]*S2[1][0] + Gs[l]*S1[1][0];
-								A[1][1] = -Gr[l]*S2[1][1] + Gs[l]*S1[1][1];
-								A[1][2] = -Gr[l]*S2[1][2] + Gs[l]*S1[1][2];
+									A[1][0] = -Gr[l]*S2[1][0] + Gs[l]*S1[1][0];
+									A[1][1] = -Gr[l]*S2[1][1] + Gs[l]*S1[1][1];
+									A[1][2] = -Gr[l]*S2[1][2] + Gs[l]*S1[1][2];
 
-								A[2][0] = -Gr[l]*S2[2][0] + Gs[l]*S1[2][0];
-								A[2][1] = -Gr[l]*S2[2][1] + Gs[l]*S1[2][1];
-								A[2][2] = -Gr[l]*S2[2][2] + Gs[l]*S1[2][2];
+									A[2][0] = -Gr[l]*S2[2][0] + Gs[l]*S1[2][0];
+									A[2][1] = -Gr[l]*S2[2][1] + Gs[l]*S1[2][1];
+									A[2][2] = -Gr[l]*S2[2][2] + Gs[l]*S1[2][2];
 
-								ke[4*k + 3][4*l  ] += dt*w[j]*wn*N[k]*(A[0][0]*nu.x + A[0][1]*nu.y + A[0][2]*nu.z);
-								ke[4*k + 3][4*l+1] += dt*w[j]*wn*N[k]*(A[1][0]*nu.x + A[1][1]*nu.y + A[1][2]*nu.z);
-								ke[4*k + 3][4*l+2] += dt*w[j]*wn*N[k]*(A[2][0]*nu.x + A[2][1]*nu.y + A[2][2]*nu.z);
-							}
+									ke[4*k + 3][4*l  ] += dt*w[j]*wn*N[k]*(A[0][0]*nu.x + A[0][1]*nu.y + A[0][2]*nu.z);
+									ke[4*k + 3][4*l+1] += dt*w[j]*wn*N[k]*(A[1][0]*nu.x + A[1][1]*nu.y + A[1][2]*nu.z);
+									ke[4*k + 3][4*l+2] += dt*w[j]*wn*N[k]*(A[2][0]*nu.x + A[2][1]*nu.y + A[2][2]*nu.z);
+								}
+	
+							psolver->AssembleStiffness(en, LM, ke);
+						}
 
-//						psolver->AssembleStiffness(en, LM, ke);
 
 						// --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
 
