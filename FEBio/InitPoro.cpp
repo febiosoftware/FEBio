@@ -38,7 +38,17 @@ bool FEM::InitPoro()
 	}
 
 	// see if we are the symmetric version or not
-	if (m_bsym_poro == false) this->SetSymmetryFlag(false);
+	if (m_bsym_poro == false) 
+	{
+		SetSymmetryFlag(false);
+	
+		// make sure we are using full-Newton
+		if (m_pStep->m_psolver->m_maxups != 0)
+		{
+			m_pStep->m_psolver->m_maxups = 0;
+			m_log.printbox("WARNING", "The non-symmetric biphasic algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+		}
+	}
 
 	// fix all pressure dofs that are not used
 	// that is, that are not part of a poro-elastic element

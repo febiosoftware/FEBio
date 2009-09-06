@@ -294,13 +294,17 @@ void FESlidingInterface2::Init()
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
-	if (!m_bsymm) m_pfem->SetSymmetryFlag(false);
-
-	// make sure we are using full-Newton
-	if (bporo && (m_pfem->m_pStep->m_psolver->m_maxups != 0))
+	if (!m_bsymm) 
 	{
-		m_pfem->m_pStep->m_psolver->m_maxups = 0;
-		m_pfem->m_log.printbox("WARNING", "The biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+		// request a non-symmetric stiffness matrix
+		m_pfem->SetSymmetryFlag(false);
+
+		// make sure we are using full-Newton
+		if (bporo && (m_pfem->m_pStep->m_psolver->m_maxups != 0))
+		{
+			m_pfem->m_pStep->m_psolver->m_maxups = 0;
+			m_pfem->m_log.printbox("WARNING", "The non-symmetric biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+		}
 	}
 
 	// update sliding interface data
