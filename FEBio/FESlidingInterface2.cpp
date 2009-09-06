@@ -292,7 +292,7 @@ void FESlidingInterface2::Init()
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
-	m_pfem->SetSymmetryFlag(false);
+//	m_pfem->SetSymmetryFlag(false);
 
 	// make sure we are using full-Newton
 	if (bporo && (m_pfem->m_pStep->m_psolver->m_maxups != 0))
