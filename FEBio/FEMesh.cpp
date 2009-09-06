@@ -67,7 +67,8 @@ void FEMesh::UpdateBox()
 {
 	vec3d r0, r1;
 
-	for (int i=0; i<Nodes(); ++i)
+	r0 = r1 = Node(0).m_rt;
+	for (int i=1; i<Nodes(); ++i)
 	{
 		vec3d r = Node(i).m_rt;
 
@@ -75,15 +76,14 @@ void FEMesh::UpdateBox()
 		if (r.y < r0.y) r0.y = r.y;
 		if (r.z < r0.z) r0.z = r.z;
 
-		if (r.x > r0.x) r1.x = r.x;
-		if (r.y > r0.y) r1.y = r.y;
-		if (r.z > r0.z) r1.z = r.z;
+		if (r.x > r1.x) r1.x = r.x;
+		if (r.y > r1.y) r1.y = r.y;
+		if (r.z > r1.z) r1.z = r.z;
 	}
 
 	m_box.r0 = r0;
 	m_box.r1 = r1;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEMesh::RemoveIsolatedVertices

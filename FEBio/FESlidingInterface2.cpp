@@ -277,6 +277,7 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_npass = 1;
 	m_stol = 0.01;
 	m_bsymm = true;
+	m_srad = 0.01;
 }
 
 //-----------------------------------------------------------------------------
@@ -317,6 +318,8 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
 
 	double ps[4], p1;
+
+	double R = m_srad*mesh.GetBoundingBox().radius();
 
 	// loop over all integration points
 	int n = 0;
@@ -376,16 +379,27 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				// calculate the gap function
 				// NOTE: this has the opposite sign compared
 				// to Gerard's notes.
-				ss.m_gap[n] = nu*(r - q);
+				double g = nu*(r - q);
 
-				// calculate the pressure gap function
-				if (bporo && ss.m_gap[n] >= 0)
+				if (g < R)
 				{
-					mesh.UnpackElement(*pme);
-					double p2 = pme->eval(pme->pt(), rs[0], rs[1]);
-					ss.m_pg[n] = p1 - p2;
+					ss.m_gap[n] = g;
+
+					// calculate the pressure gap function
+					if (bporo && ss.m_gap[n] >= 0)
+					{
+						mesh.UnpackElement(*pme);
+						double p2 = pme->eval(pme->pt(), rs[0], rs[1]);
+						ss.m_pg[n] = p1 - p2;
+					}
+					else ss.m_pg[n] = 0;
 				}
-				else ss.m_pg[n] = 0;
+				else
+				{
+					ss.m_Lm[n] = 0;
+					ss.m_gap[n] = 0;
+					ss.m_pme[n] = 0;
+				}
 			}
 			else
 			{
