@@ -40,8 +40,7 @@ PardisoSolver::PardisoSolver()
 #ifndef PARDISO
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
-#else
-#if defined(WIN32) && defined(PARDISODLL)
+#elif defined(WIN32) && defined(PARDISODLL)
 	HPARDISODLL = LoadLibraryA("libpardiso.dll");
 	if (HPARDISODLL)
 		fprintf(stderr, "Pardiso library loaded successfully.\n");
@@ -57,10 +56,6 @@ PardisoSolver::PardisoSolver()
 	if (pardiso_ == 0) exit(1);
 
 #endif
-	m_mtype = -2; /* Real symmetric matrix */
-	m_iparm[0] = 0;
-	pardisoinit_(m_pt, &m_mtype, m_iparm);
-#endif
 }
 
 bool PardisoSolver::PreProcess(SparseMatrix& K)
@@ -70,9 +65,12 @@ bool PardisoSolver::PreProcess(SparseMatrix& K)
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	return false;
 #else
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
-	m_n = A->Size();
-	m_nnz = A->NonZeroes();
+	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
+	m_iparm[0] = 0;
+	pardisoinit_(m_pt, &m_mtype, m_iparm);
+
+	m_n = K.Size();
+	m_nnz = K.NonZeroes();
 	m_nrhs = 1;
 
 	// number of processors: use value of OMP_NUM_THREADS

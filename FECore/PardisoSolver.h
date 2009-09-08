@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include "SparseMatrix.h"
 #include "LinearSolver.h"
-#include "vector.h"
-#include "matrix.h"
 
 	/* Pardiso Fortran prototypes */
 #ifndef WIN32
@@ -32,21 +29,27 @@ public:
 	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
 	void Destroy();
 
-	SparseMatrix* GetMatrix(int ntype) { return (ntype == SPARSE_SYMMETRIC? new CompactMatrix(1) : 0); }
+	SparseMatrix* GetMatrix(int ntype)
+	{
+		m_bsymm = (ntype == SPARSE_SYMMETRIC);
+		if (m_bsymm) return new CompactSymmMatrix(1);
+		else return new CompactUnSymmMatrix(1, true);
+	}
 
 	PardisoSolver();
 
 protected:
-	/* Pardiso control parameters */
+
+	bool m_bsymm; // use symmetric mode or not
+
+	// Pardiso control parameters
 	int m_iparm[64];
 	int m_maxfct, m_mnum, m_error, m_msglvl;
 
-	/* Matrix data */
+	// Matrix data
 	int m_mtype;
-
 	int m_n, m_nnz, m_nrhs;
 
-	/* Internal solver memory pointer */
-	void* m_pt[64];
+	void* m_pt[64]; // Internal solver memory pointer
 };
 

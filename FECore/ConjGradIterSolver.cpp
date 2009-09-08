@@ -60,7 +60,7 @@ bool ConjGradIterSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double
 {
 	int i;
 
-	CompactMatrix& A = dynamic_cast<CompactMatrix&>(K);
+	CompactSymmMatrix& A = dynamic_cast<CompactSymmMatrix&>(K);
 
 	int N = x.size();
 

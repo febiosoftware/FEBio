@@ -48,13 +48,13 @@ bool SuperLU_MT_Solver::PreProcess(SparseMatrix& A)
 	m_ops.SymmetricMode		= YES;			// is the matrix symmetric or not
     m_ops.drop_tol			= 0;			// drop tolerance (apparently not yet implemented)
 	m_ops.PrintStat			= NO;			// print solver statistics or not
-    m_ops.perm_c			= m_perm_c;		
+    m_ops.perm_c			= m_perm_c;
     m_ops.perm_r			= m_perm_r;
     m_ops.work				= 0;
     m_ops.lwork				= 0;
 
 	// create the SuperMatrix m_A
-    dCreate_CompCol_Matrix(&m_A, N, N, nnz, K.values(), K.rowind(), K.colptr(), SLU_NC, SLU_D, SLU_GE);
+    dCreate_CompCol_Matrix(&m_A, N, N, nnz, K.values(), K.indices(), K.pointers(), SLU_NC, SLU_D, SLU_GE);
 
 	// create the dense matrices B and X
 	// note that we don't provide any data yet

@@ -26,8 +26,8 @@ inline mat3dd mat3dd::operator * (double a) const { return mat3dd(d[0]*a, d[1]*a
 inline mat3dd mat3dd::operator / (double a) const { a = 1./a; return mat3dd(d[0]*a, d[1]*a, d[2]*a); }
 
 // arithmetic operators with mat3ds
-inline mat3ds mat3dd::operator + (const mat3ds& m) const 
-{ 
+inline mat3ds mat3dd::operator + (const mat3ds& m) const
+{
 	return mat3ds(
 		d[0]+m.m[mat3ds::XX],
 		d[1]+m.m[mat3ds::YY],
@@ -38,8 +38,8 @@ inline mat3ds mat3dd::operator + (const mat3ds& m) const
 		);
 }
 
-inline mat3ds mat3dd::operator - (const mat3ds& m) const 
-{ 
+inline mat3ds mat3dd::operator - (const mat3ds& m) const
+{
 	return mat3ds(
 		d[0]-m.m[mat3ds::XX],
 		d[1]-m.m[mat3ds::YY],
@@ -51,8 +51,8 @@ inline mat3ds mat3dd::operator - (const mat3ds& m) const
 }
 
 
-inline mat3ds mat3dd::operator * (const mat3ds& m) const 
-{ 
+inline mat3ds mat3dd::operator * (const mat3ds& m) const
+{
 	return mat3ds(
 		d[0]*m.m[mat3ds::XX],
 		d[1]*m.m[mat3ds::YY],
@@ -179,7 +179,7 @@ inline mat3ds mat3ds::operator * (const mat3dd& d) const
 }
 
 
-// operator + 
+// operator +
 inline mat3ds mat3ds::operator +(const mat3ds& t) const
 {
 	return mat3ds(m[XX]+t.m[XX], m[YY]+t.m[YY], m[ZZ]+t.m[ZZ], m[XY]+t.m[XY], m[YZ]+t.m[YZ],m[XZ]+t.m[XZ]);
@@ -244,7 +244,7 @@ inline mat3ds& mat3ds::operator *= (const mat3ds& t)
 
 	m[XX] = xx; m[YY] = yy; m[ZZ] = zz;
 	m[XY] = xy; m[YZ] = yz; m[XZ] = xz;
-	
+
 	return (*this);
 }
 
@@ -283,7 +283,7 @@ inline mat3ds& mat3ds::operator -= (const mat3dd& d)
 }
 
 // matrix-vector multiplication
-inline vec3d mat3ds::operator* (const vec3d& r) const 
+inline vec3d mat3ds::operator* (const vec3d& r) const
 {
 	return vec3d(
 		r.x*m[XX]+r.y*m[XY]+r.z*m[XZ],
@@ -324,9 +324,9 @@ inline mat3ds mat3ds::dev() const
 //-----------------------------------------------------------------------------
 
 // constructors
-inline mat3da::mat3da(double xy, double yz, double xz) 
-{ 
-	d[0] = xy; d[1] = yz; d[2] = xz; 
+inline mat3da::mat3da(double xy, double yz, double xz)
+{
+	d[0] = xy; d[1] = yz; d[2] = xz;
 }
 
 
@@ -336,8 +336,8 @@ inline mat3da::mat3da(double xy, double yz, double xz)
 //-----------------------------------------------------------------------------
 
 // constructors
-inline mat3d::mat3d(double a00, double a01, double a02, 
-					double a10, double a11, double a12, 
+inline mat3d::mat3d(double a00, double a01, double a02,
+					double a10, double a11, double a12,
 					double a20, double a21, double a22)
 {
 	d[0][0] = a00; d[0][1] = a01; d[0][2] = a02;
@@ -581,17 +581,17 @@ inline mat3d& mat3d::operator *= (const mat3dd& m)
 // arithmetic operators for mat3ds
 inline mat3d& mat3d::operator += (const mat3ds& m)
 {
-	d[0][0] += m.m[m.XX]; d[0][1] += m.m[m.XY]; d[0][2] += m.m[m.XZ]; 
-	d[1][0] += m.m[m.XY]; d[1][1] += m.m[m.YY]; d[1][2] += m.m[m.YZ]; 
-	d[2][0] += m.m[m.XZ]; d[2][1] += m.m[m.YZ]; d[2][2] += m.m[m.ZZ]; 
+	d[0][0] += m.m[m.XX]; d[0][1] += m.m[m.XY]; d[0][2] += m.m[m.XZ];
+	d[1][0] += m.m[m.XY]; d[1][1] += m.m[m.YY]; d[1][2] += m.m[m.YZ];
+	d[2][0] += m.m[m.XZ]; d[2][1] += m.m[m.YZ]; d[2][2] += m.m[m.ZZ];
 	return (*this);
 }
 
 inline mat3d& mat3d::operator -= (const mat3ds& m)
 {
-	d[0][0] -= m.m[m.XX]; d[0][1] -= m.m[m.XY]; d[0][2] -= m.m[m.XZ]; 
-	d[1][0] -= m.m[m.XY]; d[1][1] -= m.m[m.YY]; d[1][2] -= m.m[m.YZ]; 
-	d[2][0] -= m.m[m.XZ]; d[2][1] -= m.m[m.YZ]; d[2][2] -= m.m[m.ZZ]; 
+	d[0][0] -= m.m[m.XX]; d[0][1] -= m.m[m.XY]; d[0][2] -= m.m[m.XZ];
+	d[1][0] -= m.m[m.XY]; d[1][1] -= m.m[m.YY]; d[1][2] -= m.m[m.YZ];
+	d[2][0] -= m.m[m.XZ]; d[2][1] -= m.m[m.YZ]; d[2][2] -= m.m[m.ZZ];
 	return (*this);
 }
 
@@ -626,8 +626,8 @@ inline vec3d mat3d::operator * (const vec3d& r) const
 // determinant
 inline double mat3d::det() const
 {
-	return (d[0][0]*(d[1][1]*d[2][2] - d[1][2]*d[2][1]) 
-		  + d[0][1]*(d[1][2]*d[2][0] - d[2][2]*d[1][0]) 
+	return (d[0][0]*(d[1][1]*d[2][2] - d[1][2]*d[2][1])
+		  + d[0][1]*(d[1][2]*d[2][0] - d[2][2]*d[1][0])
 		  + d[0][2]*(d[1][0]*d[2][1] - d[1][1]*d[2][0]));
 }
 
@@ -648,6 +648,12 @@ inline void mat3d::zero()
 	d[0][0] = d[0][1] = d[0][2] = 0;
 	d[1][0] = d[1][1] = d[1][2] = 0;
 	d[2][0] = d[2][1] = d[2][2] = 0;
+}
+
+// return a column vector from the matrix
+inline vec3d mat3d::col(int j) const
+{
+	return vec3d(d[0][j], d[1][j], d[2][j]);
 }
 
 // return the symmetric matrix 0.5*(A+A^T)

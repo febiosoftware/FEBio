@@ -283,6 +283,9 @@ public:
 	// make unit matrix
 	void unit();
 
+	// return a column vector from the matrix
+	vec3d col(int j) const;
+
 	// return the symmetric matrix 0.5*(A+A^T)
 	mat3ds sym() const;
 

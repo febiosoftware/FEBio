@@ -20,17 +20,18 @@
 //! \mainpage FEBio Documentation
 //! \section sec_intro Introduction
 //! FEBio is a finite element solver that is specifically designed for three
-//! dimensional biomechanical applications. It solves the nonlinear finite 
-//! element equations using a quasi-Newton method called the BFGS-method. It 
+//! dimensional biomechanical applications. It solves the nonlinear finite
+//! element equations using a quasi-Newton method called the BFGS-method. It
 //! also offers several biologically relevant constitutive models.
 //!
 //! This software is developed at the Scientific Computing and Imaging institute
 //! at the University of Utah. All rights reserved.
 //! Copyright (c) 2006 - 2009
-//! 
-//! Main developers:	
+//!
+//! Main developers:
 //!  - Steve Maas
 //!  - Jeff Weiss
+//!  - Dave Rawlins
 //!
 //! Contributors:
 //!  - Alexander Veress
@@ -164,17 +165,17 @@ int main(int argc, char* argv[])
 			// read input data
 			if (fem.Input(ops.szfile) == false) return 1;
 
-			// initialize and check data 
+			// initialize and check data
 			if (fem.Init() == false) return 1;
 		}
 
 		// solve the problem
-		if (ops.brun) 
+		if (ops.brun)
 		{
 			bool bret = fem.Solve();
 			return (int) (bret?0:1);
 		}
-		else 
+		else
 		{
 			printf("\nData check complete\n\n");
 		}
@@ -219,7 +220,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	{
 		sz = argv[i];
 
-		if (strcmp(sz,"-r") == 0) 
+		if (strcmp(sz,"-r") == 0)
 		{
 			ops.brstrt = true;
 			strcpy(ops.szfile, argv[++i]);

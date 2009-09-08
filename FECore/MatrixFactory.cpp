@@ -33,12 +33,12 @@ bool MatrixFactory::CreateMatrix(SparseMatrix* pA, vector< vector<int> >& LM, in
 {
 	// find out what type of matrix we're dealing with
 	CompactUnSymmMatrix* pCompactUS;
-	CompactMatrix* pCompact;
+	CompactSymmMatrix* pCompact;
 	SkylineMatrix* pSkyline;
 	FullMatrix* pFull;
 
 	if      (pSkyline   = dynamic_cast<SkylineMatrix*      > (pA)) return CreateSkyline      (pSkyline  , LM, neq);
-	else if (pCompact   = dynamic_cast<CompactMatrix*      > (pA)) return CreateCompact      (pCompact  , LM, neq);
+	else if (pCompact   = dynamic_cast<CompactSymmMatrix*      > (pA)) return CreateCompact      (pCompact  , LM, neq);
 	else if (pCompactUS = dynamic_cast<CompactUnSymmMatrix*> (pA)) return CreateCompactUnSymm(pCompactUS, LM, neq);
 	else if (pFull      = dynamic_cast<FullMatrix*         > (pA)) return CreateFull         (pFull     , LM, neq);
 
@@ -59,12 +59,12 @@ bool MatrixFactory::CreateMatrix(SparseMatrix* pA, MatrixProfile& mp)
 {
 	// find out what type of matrix we're dealing with
 	CompactUnSymmMatrix* pCompactUS;
-	CompactMatrix* pCompact;
+	CompactSymmMatrix* pCompact;
 	SkylineMatrix* pSkyline;
 	FullMatrix* pFull;
 
 	if      (pSkyline   = dynamic_cast<SkylineMatrix*      > (pA)) return CreateSkyline      (pSkyline  , mp);
-	else if (pCompact   = dynamic_cast<CompactMatrix*      > (pA)) return CreateCompact      (pCompact  , mp);
+	else if (pCompact   = dynamic_cast<CompactSymmMatrix*      > (pA)) return CreateCompact      (pCompact  , mp);
 	else if (pCompactUS = dynamic_cast<CompactUnSymmMatrix*> (pA)) return CreateCompactUnSymm(pCompactUS, mp);
 	else if (pFull      = dynamic_cast<FullMatrix*         > (pA)) return CreateFull         (pFull     , mp);
 
@@ -175,7 +175,7 @@ bool MatrixFactory::CreateSkyline(SkylineMatrix* pA, MatrixProfile& mp)
 // This routine allocates storage for a compact matrix (Hartwell-Boeing format)
 //
 
-bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, int neq)
+bool MatrixFactory::CreateCompact(CompactSymmMatrix* pA, vector< vector<int> >& LM, int neq)
 {
 /*	This function has been replaced by the MatrixProfile format
 
@@ -314,7 +314,7 @@ bool MatrixFactory::CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, 
 }
 
 
-bool MatrixFactory::CreateCompact(CompactMatrix* pA, MatrixProfile& mp)
+bool MatrixFactory::CreateCompact(CompactSymmMatrix* pA, MatrixProfile& mp)
 {
 	int i, j, k, n;
 
@@ -583,6 +583,13 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, MatrixProfile& 
 	// cleanup
 	delete [] pval;
 
+	// offset the indicies for fortran arrays
+	if(pA->offset())
+	{
+		for (i=0; i<=neq; ++i) pointers[i]++;
+		for (i=0; i<nsize; ++i) pindices[i]++;
+	}
+
 	// create the values array
 	double* pvalues = new double[nsize];
 	if (pvalues == 0) throw MemException(sizeof(double)*nsize);
@@ -602,11 +609,11 @@ void MatrixFactory::Assemble(SparseMatrix& K, matrix& ke, vector<int>& LM)
 {
 	// find out what type of matrix we're dealing with
 	CompactUnSymmMatrix* pCompactUS;
-	CompactMatrix* pCompact;
+	CompactSymmMatrix* pCompact;
 	SkylineMatrix* pSkyline;
 	FullMatrix* pFull;
 
-	if      (pCompact   = dynamic_cast<CompactMatrix*      > (&K)) AssembleCompact      (*pCompact  , ke, LM);
+	if      (pCompact   = dynamic_cast<CompactSymmMatrix*      > (&K)) AssembleCompact      (*pCompact  , ke, LM);
 	else if (pCompactUS = dynamic_cast<CompactUnSymmMatrix*> (&K)) AssembleCompactUnSymm(*pCompactUS, ke, LM);
 	else if (pSkyline   = dynamic_cast<SkylineMatrix*      > (&K)) AssembleSkyline      (*pSkyline  , ke, LM);
 	else if (pFull      = dynamic_cast<FullMatrix*         > (&K)) AssembleFull         (*pFull     , ke, LM);
@@ -621,11 +628,11 @@ void MatrixFactory::Assemble(SparseMatrix& K, matrix& ke, vector<int>& LMi, vect
 {
 	// find out what type of matrix we're dealing with
 	CompactUnSymmMatrix* pCompactUS;
-	CompactMatrix* pCompact;
+	CompactSymmMatrix* pCompact;
 	SkylineMatrix* pSkyline;
 	FullMatrix* pFull;
 
-	if      (pCompact   = dynamic_cast<CompactMatrix*      > (&K)) AssembleCompact      (*pCompact  , ke, LMi, LMj);
+	if      (pCompact   = dynamic_cast<CompactSymmMatrix*      > (&K)) AssembleCompact      (*pCompact  , ke, LMi, LMj);
 	else if (pCompactUS = dynamic_cast<CompactUnSymmMatrix*> (&K)) AssembleCompactUnSymm(*pCompactUS, ke, LMi, LMj);
 	else if (pSkyline   = dynamic_cast<SkylineMatrix*      > (&K)) AssembleSkyline      (*pSkyline  , ke, LMi, LMj);
 	else if (pFull      = dynamic_cast<FullMatrix*         > (&K)) AssembleFull         (*pFull     , ke, LMi, LMj);
@@ -746,7 +753,7 @@ void MatrixFactory::AssembleSkyline(SkylineMatrix& K, matrix& ke, vector<int>& L
 // This function assembles the local stiffness matrix
 // into the global stiffness matrix which is in compact column storage
 //
-void MatrixFactory::AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& LM)
+void MatrixFactory::AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int>& LM)
 {
 	int i, j, I, J;
 
@@ -782,7 +789,7 @@ void MatrixFactory::AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& L
 	}
 }
 
-void MatrixFactory::AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void MatrixFactory::AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 

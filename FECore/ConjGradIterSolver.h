@@ -17,7 +17,7 @@ public:
 	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
 	void Destroy();
 
-	SparseMatrix* GetMatrix(int ntype) { return (ntype == SPARSE_SYMMETRIC? new CompactMatrix() : 0); }
+	SparseMatrix* GetMatrix(int ntype) { return (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0); }
 
 public:
 	double	m_tol;		// convergence tolerance

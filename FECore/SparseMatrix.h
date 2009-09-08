@@ -151,14 +151,13 @@ protected:
 //-----------------------------------------------------------------------------
 //! This class stores a sparse matrix in Harwell-Boeing format.
 
-//! This class also assumes the matrix is symmetric and therefor only stores
-//! the lower triangular matrix
+//! This is the base class for the symmetric and unsymmetric classes
 
 class CompactMatrix : public SparseMatrix
 {
 public:
-	CompactMatrix(int offset = 0);
-	virtual ~CompactMatrix();
+	CompactMatrix( int offset );
+	virtual ~CompactMatrix() { Clear(); }
 
 	void Clear()
 	{
@@ -169,9 +168,41 @@ public:
 
 	void Create(int N, int nz, double* pv, int *pi, int* pp);
 
+	virtual void add(int i, int j, double v) = 0;
+
+	virtual void set(int i, int j, double v) = 0;
+
+	virtual double get(int i, int j) { return 0; }
+
+	virtual double diag(int i) = 0;
+
+public:
+	double* values  () { return m_pd;   }
+	int*    indices () { return m_pindices;  }
+	int*    pointers() { return m_ppointers; }
+	int     offset  () { return m_offset; }
+
+	bool print_hb(); // Output Harwell-Boeing compact matrix
+
+protected:
+	int*	m_pindices;
+	int*	m_ppointers;
+	int		m_offset; // adjust array indices for fortran arrays
+};
+
+//-----------------------------------------------------------------------------
+//! This class stores a sparse matrix in Harwell-Boeing format.
+
+//! This class also assumes the matrix is symmetric and therefor only stores
+//! the lower triangular matrix
+
+class CompactSymmMatrix : public CompactMatrix
+{
+public:
+	CompactSymmMatrix( int offset = 0 );
+
 	void add(int i, int j, double v)
 	{
-		int k;
 
 		// only add to lower triangular part
 		// since FEBio only works with the upper triangular part
@@ -186,9 +217,7 @@ public:
 			for (int n=0; n<l; ++n)
 				if (pi[n] == i + m_offset)
 				{
-					k = m_ppointers[j] + n;
-					k -= m_offset;
-					m_pd[k] += v;
+					m_pd[ m_ppointers[j] + n - m_offset ] += v;
 					return;
 				}
 
@@ -248,52 +277,37 @@ public:
 
 	void mult_vector(const vector<double>& x, vector<double>& r);
 
-public:
-	double* values  () { return m_pd;   }
-	int*    indices () { return m_pindices;  }
-	int*    pointers() { return m_ppointers; }
-	int     offset  () { return m_offset; }
-
-	bool print_hb(); // Output Harwell-Boeing compact matrix
-
-protected:
-	int*	m_pindices;
-	int*	m_ppointers;
-	int		m_offset; // adjust array indices for fortran arrays
 };
 
 //-----------------------------------------------------------------------------
 //! This class stores a sparse matrix in Harwell-Boeing format
 
 //! Unlike CompactMatrix does not assume the matrix is symmetric.
+//! This still assumes that the sparsity pattern is symmetric for
+//! row based formats.
 
-class CompactUnSymmMatrix : public SparseMatrix
+class CompactUnSymmMatrix : public CompactMatrix
 {
 public:
-	CompactUnSymmMatrix();
-	virtual ~CompactUnSymmMatrix();
-
-	void Clear()
-	{
-		if (m_pd) delete [] m_pd; m_pd = 0;
-		if (m_pind) delete [] m_pind; m_pind = 0;
-		if (m_pcol) delete [] m_pcol; m_pcol = 0;
-	}
-
-	void Create(int N, int nz, double* pv, int *pi, int* pc);
+	CompactUnSymmMatrix( int offset = 0, bool row_based = false );
 
 	void add(int i, int j, double v)
 	{
+		if (m_brow_based)
+		{
+			i ^= j; j ^= i; i ^= j;
+		}
 		assert((i>=0) && (i<m_ndim));
 		assert((j>=0) && (j<m_ndim));
 
-		int* pi = m_pind + m_pcol[j];
-		int l = m_pcol[j+1] - m_pcol[j];
+		int* pi = m_pindices + m_ppointers[j];
+		pi -= m_offset;
+		int l = m_ppointers[j+1] - m_ppointers[j];
 		for (int n=0; n<l; ++n)
 		{
-			if (pi[n] == i)
+			if (pi[n] == i + m_offset)
 			{
-				m_pd[ m_pcol[j] + n ] += v;
+				m_pd[ m_ppointers[j] + n - m_offset ] += v;
 				return;
 			}
 		}
@@ -302,13 +316,18 @@ public:
 
 	void set(int i, int j, double v)
 	{
-		int* pi = m_pind + m_pcol[j];
-		int l = m_pcol[j+1] - m_pcol[j];
+		if (m_brow_based)
+		{
+			i ^= j; j ^= i; i ^= j;
+		}
+		int* pi = m_pindices + m_ppointers[j];
+		pi -= m_offset;
+		int l = m_ppointers[j+1] - m_ppointers[j];
 		for (int n=0; n<l; ++n)
 		{
-			if (pi[n] == i)
+			if (pi[n] == i + m_offset)
 			{
-				m_pd[ m_pcol[j] + n ] = v;
+				m_pd[ m_ppointers[j] + n - m_offset ] = v;
 				return;
 			}
 		}
@@ -317,24 +336,29 @@ public:
 
 	double get(int i, int j)
 	{
-		int* pi = m_pind + m_pcol[j];
-		int l = m_pcol[j+1] - m_pcol[j];
+		if (m_brow_based)
+		{
+			i ^= j; j ^= i; i ^= j;
+		}
+		int* pi = m_pindices + m_ppointers[j];
+		pi -= m_offset;
+		int l = m_ppointers[j+1] - m_ppointers[j];
 		for (int n=0; n<l; ++n)
 		{
-			if (pi[n] == i) return m_pd[ m_pcol[j] + n ];
+			if (pi[n] == i + m_offset) return m_pd[ m_ppointers[j] + n - m_offset ];
 		}
 		return 0;
 	}
 
 	double diag(int i)
 	{
-		int* pi = m_pind + m_pcol[i];
-		int l = m_pcol[i+1] - m_pcol[i];
+		int* pi = m_pindices + m_ppointers[i];
+		int l = m_ppointers[i+1] - m_ppointers[i];
 		for (int n=0; n<l; ++n)
 		{
 			if (pi[n] == i)
 			{
-				return m_pd[ m_pcol[i] + n ];
+				return m_pd[ m_ppointers[i] + n - m_offset ];
 			}
 		}
 
@@ -343,17 +367,9 @@ public:
 		return 0;
 	}
 
-
-public:
-	double* values() { return m_pd; }
-	int*    rowind() { return m_pind; }
-	int*    colptr() { return m_pcol; }
-
-	bool print_hb(); // Output Harwell-Boeing compact matrix
-
 protected:
-	int*	m_pind;	// row indices of values
-	int*	m_pcol;	// start of columns
+	bool m_brow_based;
+
 };
 
 #endif // !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)

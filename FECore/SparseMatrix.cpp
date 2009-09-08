@@ -103,13 +103,6 @@ CompactMatrix::CompactMatrix(int offset)
 	m_offset = offset;
 }
 
-CompactMatrix::~CompactMatrix()
-{
-	delete [] m_pd;
-	delete [] m_pindices;
-	delete [] m_ppointers;
-}
-
 void CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
 {
 	if (m_pd  ) delete [] m_pd; m_pd = pv;
@@ -120,7 +113,35 @@ void CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
 	m_nsize = nz;
 }
 
-void CompactMatrix::mult_vector(const vector<double>& x, vector<double>& r)
+
+bool CompactMatrix::print_hb()
+{
+	int isize, dsize;
+
+	isize = sizeof(int);
+	dsize = sizeof(double);
+
+	FILE* fout = fopen("hb_matrix.out", "wb");
+	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
+
+	fwrite(&m_ndim, isize, 1, fout);
+	fwrite(&m_nsize, isize, 1, fout);
+	fwrite(m_ppointers, isize, m_ndim+1, fout);
+	fwrite(m_pindices, isize, m_nsize, fout);
+	fwrite(m_pd, dsize, m_nsize, fout);
+
+	fclose(fout);
+	return true;
+
+}
+
+//////////////////////////////////////////////////////////////////////
+// CompactSymmMatrix
+//////////////////////////////////////////////////////////////////////
+
+CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
+
+void CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 {
 	int j, i, n;
 	int N = x.size();
@@ -172,68 +193,7 @@ void CompactMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 	}
 }
 
-bool CompactMatrix::print_hb()
-{
-	int isize, dsize;
-
-	isize = sizeof(int);
-	dsize = sizeof(double);
-
-	FILE* fout = fopen("hb_matrix.out", "wb");
-	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
-
-	fwrite(&m_ndim, isize, 1, fout);
-	fwrite(&m_nsize, isize, 1, fout);
-	fwrite(m_ppointers, isize, m_ndim+1, fout);
-	fwrite(m_pindices, isize, m_nsize, fout);
-	fwrite(m_pd, dsize, m_nsize, fout);
-
-	fclose(fout);
-	return true;
-
-}
-
-//////////////////////////////////////////////////////////////////////
-// CompactUnSymmMatrix
-//////////////////////////////////////////////////////////////////////
-
-CompactUnSymmMatrix::CompactUnSymmMatrix()
-{
-	m_pind = 0;
-	m_pcol = 0;
-}
-
-CompactUnSymmMatrix::~CompactUnSymmMatrix()
-{
-	Clear();
-}
-
-void CompactUnSymmMatrix::Create(int N, int nz, double* pv, int* pi, int* pc)
-{
-	if (m_pd) delete [] m_pd; m_pd = pv;
-	if (m_pind) delete [] m_pind; m_pind = pi;
-	if (m_pcol) delete [] m_pcol; m_pcol = pc;
-
-	m_ndim  = N;
-	m_nsize = nz;
-}
-
-bool CompactUnSymmMatrix::print_hb()
-{
-	int isize, dsize;
-
-	isize = sizeof(int);
-	dsize = sizeof(double);
-
-	FILE* fout = fopen("hb_matrix.out", "wb");
-	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
-
-	fwrite(&m_ndim, isize, 1, fout);
-	fwrite(&m_nsize, isize, 1, fout);
-	fwrite(m_pcol, isize, m_ndim+1, fout);
-	fwrite(m_pind, isize, m_nsize, fout);
-	fwrite(m_pd, dsize, m_nsize, fout);
-
-	fclose(fout);
-	return true;
-}
+CompactUnSymmMatrix::CompactUnSymmMatrix(int offset, bool row_based) : CompactMatrix(offset)
+	{
+		m_brow_based = row_based;
+	}

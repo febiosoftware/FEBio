@@ -28,7 +28,7 @@ bool SuperLUSolver::PreProcess(SparseMatrix& K)
 	options.Equil			= NO;		// no equilibration
 
 	// create the supermatrix A
-    dCreate_CompCol_Matrix(&A, N, N, nnz, rK.values(), rK.rowind(), rK.colptr(), SLU_NC, SLU_D, SLU_GE);
+    dCreate_CompCol_Matrix(&A, N, N, nnz, rK.values(), rK.indices(), rK.pointers(), SLU_NC, SLU_D, SLU_GE);
 
 	// since we don't have any values yet, we don't supply any data to the matrix B and X
 	dCreate_Dense_Matrix(&B, N, 0, NULL, N, SLU_DN, SLU_D, SLU_GE);
@@ -60,7 +60,7 @@ double SuperLUSolver::norm(SparseMatrix& K)
 	// get a reference to the correct matrix type
 	CompactUnSymmMatrix& A = dynamic_cast<CompactUnSymmMatrix&> (K);
 
-	int* ptr = A.colptr();
+	int* ptr = A.pointers();
 	double* pval = A.values(), *pv;
 
 	for (int i=0; i<A.Size(); ++i)

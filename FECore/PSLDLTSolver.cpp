@@ -11,7 +11,7 @@ bool PSLDLTSolver::PreProcess(SparseMatrix& K)
 #else
 
 	// let's make sure the matrix K is of the correct type
-	CompactMatrix* pK = dynamic_cast<CompactMatrix*> (&K);
+	CompactSymmMatrix* pK = dynamic_cast<CompactSymmMatrix*> (&K);
 	if (pK == 0)
 	{
 		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");
@@ -39,7 +39,7 @@ bool PSLDLTSolver::Factor(SparseMatrix& K)
 #else
 
 	// let's make sure the matrix K is of the correct type
-	CompactMatrix* pK = dynamic_cast<CompactMatrix*> (&K);
+	CompactSymmMatrix* pK = dynamic_cast<CompactSymmMatrix*> (&K);
 	if (pK == 0)
 	{
 		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");
@@ -80,7 +80,7 @@ bool PSLDLTSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& R)
 #else
 
 	// let's make sure the matrix K is of the correct type
-	CompactMatrix* pK = dynamic_cast<CompactMatrix*> (&K);
+	CompactSymmMatrix* pK = dynamic_cast<CompactSymmMatrix*> (&K);
 	if (pK == 0)
 	{
 		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");
@@ -105,7 +105,7 @@ bool PSLDLTSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
 #else
 
 	// let's make sure the matrix K is of the correct type
-	CompactMatrix* pK = dynamic_cast<CompactMatrix*> (&K);
+	CompactSymmMatrix* pK = dynamic_cast<CompactSymmMatrix*> (&K);
 	if (pK == 0)
 	{
 		fprintf(stderr, "Stiffness matrix is not of correct type for this solver\n\n");

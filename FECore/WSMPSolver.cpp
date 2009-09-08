@@ -18,7 +18,7 @@ bool WSMPSolver::PreProcess(SparseMatrix& K)
 	int idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
+	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (&K);
 	m_n = A->Size();
 	m_nnz = A->NonZeroes();
 
@@ -71,7 +71,7 @@ bool WSMPSolver::Factor(SparseMatrix& K)
 	int idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
+	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (&K);
 
 
 #ifdef PRINTHB
@@ -159,7 +159,7 @@ bool WSMPSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 	int i, idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
+	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (&K);
 
 // ------------------------------------------------------------------------------
 // This step performs back substitution

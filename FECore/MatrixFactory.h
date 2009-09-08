@@ -54,8 +54,8 @@ private:
 	bool CreateSkyline(SkylineMatrix* pA, MatrixProfile& mp);
 
 	// creates a symmetric compact (Harwell-Boeing) matrix
-	bool CreateCompact(CompactMatrix* pA, vector< vector<int> >& LM, int neq);
-	bool CreateCompact(CompactMatrix* pA, MatrixProfile& mp);
+	bool CreateCompact(CompactSymmMatrix* pA, vector< vector<int> >& LM, int neq);
+	bool CreateCompact(CompactSymmMatrix* pA, MatrixProfile& mp);
 
 	// creates a compact unsymmetric (Harwell-Boeing) matrix
 	bool CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<int> >& LM, int neq);
@@ -70,8 +70,8 @@ private:
 	void AssembleSkyline(SkylineMatrix& K, matrix& ke, vector<int>& LMi, vector<int>& LMj);
 
 	// Assembler routine for compact matrices
-	void AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& LM);
-	void AssembleCompact(CompactMatrix& K, matrix& ke, vector<int>& LMi, vector<int>& LMj);
+	void AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int>& LM);
+	void AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int>& LMi, vector<int>& LMj);
 
 	// Assembler routine for unsymmetric compact matrices
 	void AssembleCompactUnSymm(CompactUnSymmMatrix& K, matrix& ke, vector<int>& LM);
