@@ -135,7 +135,7 @@ bool ConjGradIterSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double
 }
 
 //-----------------------------------------------------------------------------
-void ConjGradIterSolver::Destroy()
+void ConjGradIterSolver::Destroy(SparseMatrix& K)
 {
 
 }

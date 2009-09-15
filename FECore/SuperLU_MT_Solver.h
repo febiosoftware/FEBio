@@ -15,7 +15,7 @@ public:
 	bool Factor(SparseMatrix& K);
 	bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
 	bool Solve(SparseMatrix& K, matrix& x, matrix& b) { return false; }
-	void Destroy();
+	void Destroy(SparseMatrix& K);
 
 	SparseMatrix* GetMatrix(int ntype) { return new CompactUnSymmMatrix(); }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "FEContactInterface.h"
+#include "FEContactSurface.h"
 #include "vec2d.h"
 
 //-----------------------------------------------------------------------------
@@ -75,14 +76,15 @@ public:
 	FEContactSurface2	m_ms;	//!< master surface
 	FEContactSurface2	m_ss;	//!< slave surface
 
-	int		m_knmult;	//!< higher order stiffness multiplier
-	int		m_npass;	//!< nr of passes
-	double	m_atol;		//!< augmentation tolerance
-	double	m_eps;		//!< penalty factor
-	double	m_stol;		//!< search tolerance
-	bool	m_bsymm;	//!< use symmetric stiffness components only
-	double	m_srad;		//!< contact search radius
-
+	int				m_knmult;	//!< higher order stiffness multiplier
+	int				m_npass;	//!< nr of passes
+	double			m_atol;		//!< augmentation tolerance
+	double			m_eps;		//!< penalty factor
+	double			m_stol;		//!< search tolerance
+	bool			m_bsymm;	//!< use symmetric stiffness components only
+	double			m_srad;		//!< contact search radius
+	int				m_naugmax;	//!< maximum nr of augmentations
+	
 	// bihpasic contact parameters
 	double	m_epsp;		//!< flow rate penalty
 };

@@ -197,7 +197,7 @@ bool WSMPSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
 #endif
 }
 
-void WSMPSolver::Destroy()
+void WSMPSolver::Destroy(SparseMatrix& K)
 {
 	/* Make sure the solver is available */
 #ifndef WSMP
@@ -206,7 +206,7 @@ void WSMPSolver::Destroy()
 #else
 
 	wsmp_clear_();
-	LinearSolver::Destroy();
+	LinearSolver::Destroy(K);
 
 #endif
 }

@@ -126,8 +126,8 @@ bool LUSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
 }
 
 //-----------------------------------------------------------------------------
-void LUSolver::Destroy()
+void LUSolver::Destroy(SparseMatrix& K)
 {
 	// nothing to destroy
-	LinearSolver::Destroy();
+	LinearSolver::Destroy(K);
 }

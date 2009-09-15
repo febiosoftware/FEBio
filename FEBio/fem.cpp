@@ -155,6 +155,7 @@ void FEM::operator =(FEM& fem)
 				break;
 			case FE_CONTACT_SLIDING2:
 				pci = new FESlidingInterface2(this);
+				break;
 			default:
 				assert(false);
 			}

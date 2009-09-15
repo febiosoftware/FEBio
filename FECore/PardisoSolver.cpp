@@ -174,7 +174,7 @@ bool PardisoSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
 #endif
 }
 
-void PardisoSolver::Destroy()
+void PardisoSolver::Destroy(SparseMatrix& K)
 {
 	/* Make sure the solver is available */
 #ifndef PARDISO

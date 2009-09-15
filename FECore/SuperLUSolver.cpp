@@ -184,7 +184,7 @@ bool SuperLUSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
 #endif
 }
 
-void SuperLUSolver::Destroy()
+void SuperLUSolver::Destroy(SparseMatrix& K)
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -213,7 +213,7 @@ void SuperLUSolver::Destroy()
 		m_bfact = false;
 	}
 
-	LinearSolver::Destroy();
+	LinearSolver::Destroy(K);
 
 #endif
 }

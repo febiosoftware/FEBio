@@ -169,7 +169,7 @@ bool SuperLU_MT_Solver::Solve(SparseMatrix &K, vector<double> &x, vector<double>
 //-----------------------------------------------------------------------------
 //! Clean up
 
-void SuperLU_MT_Solver::Destroy()
+void SuperLU_MT_Solver::Destroy(SparseMatrix& K)
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -195,7 +195,7 @@ void SuperLU_MT_Solver::Destroy()
 		m_bfact = false;
 	}
 
-	LinearSolver::Destroy();
+	LinearSolver::Destroy(K);
 
 #endif
 }

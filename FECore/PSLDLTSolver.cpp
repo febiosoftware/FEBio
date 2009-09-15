@@ -122,12 +122,12 @@ bool PSLDLTSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
 }
 
 //-----------------------------------------------------------------------------
-void PSLDLTSolver::Destroy()
+void PSLDLTSolver::Destroy(SparseMatrix& K)
 {
 #ifndef PSLDLT
 	fprintf(stderr, "FATAL ERROR : The PSLDLT solver is not available on this platform\n\n");
 #else
 	if (m_bvalid) PSLDLT_Destroy(0);
-	LinearSolver::Destroy();
+	LinearSolver::Destroy(K);
 #endif
 }

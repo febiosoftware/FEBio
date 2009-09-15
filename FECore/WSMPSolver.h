@@ -33,7 +33,7 @@ public:
 	bool Factor(SparseMatrix& K);
 	bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
 	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
-	void Destroy();
+	void Destroy(SparseMatrix& K);
 
 	SparseMatrix* GetMatrix(int ntype) { return (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix(1) : 0); }
 

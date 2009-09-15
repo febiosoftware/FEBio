@@ -96,8 +96,8 @@ bool SkylineSolver::Solve(SparseMatrix& K, matrix& x, matrix& R)
 }
 
 //-----------------------------------------------------------------------------
-void SkylineSolver::Destroy()
+void SkylineSolver::Destroy(SparseMatrix& K)
 {
 	// Nothing to destroy
-	LinearSolver::Destroy();
+	LinearSolver::Destroy(K);
 }

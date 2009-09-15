@@ -2443,21 +2443,27 @@ bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 	int neln = el.Nodes();
 
 	// jacobian
-	double Ji[3][3], detJ;
+	double Ji[3][3], detJ, J0i[3][3];
 
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz;
+	double Gx, Gy, Gz, GX, GY, GZ;
 
 	vec3d* vt = el.vt();
 	double* pn = el.pt();
-
-	double trd;	// trace of velocity gradient
 
 	// Bp-matrix
 	vector<double[3]> B(neln);
 
 	// gauss-weights
 	double* wg = el.GaussWeights();
+
+	FEMesh& mesh = m_fem.m_mesh;
+	
+	vec3d rp[8];
+	for (i=0; i<neln; ++i) 
+	{
+		rp[i] = mesh.Node(el.m_node[i]).m_rp;
+	}
 
 	// get the element's material
 	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (m_fem.GetMaterial(el.GetMatID()));
@@ -2475,19 +2481,27 @@ bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
 
 		// calculate jacobian
 		el.invjact(Ji, n);
 		detJ = el.detJt(n);
 
+		// we need to calculate the divergence of v. To do this we use
+		// the formula div(v) = 1/J*dJdt, where J = det(F)
+		el.invjac0(J0i, n);
+		
+		// next we calculate the deformation gradient
+		mat3d Fp;
+		Fp.zero();
+		
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
 
 		H = el.H(n);
-
-		trd = 0;
 
 		for (i=0; i<neln; ++i)
 		{
@@ -2497,14 +2511,26 @@ bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
 			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 
-			// calculate trace of velocity gradient
-			trd += Gx*vt[i].x + Gy*vt[i].y + Gz*vt[i].z;
-
+			GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
+			GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
+			GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
+			
+			Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
+			Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
+			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
+			
 			// calculate Bp matrix
 			B[i][0] = Gx;
 			B[i][1] = Gy;
 			B[i][2] = Gz;
 		}
+
+		// next we get the determinant
+		double Jp = Fp.det();
+		double J = ept.J;
+		
+		// and then finally
+		double divv = ((J-Jp)/dt)/J;
 
 		// get the flux
 		vec3d& w = pt.m_w;
@@ -2514,14 +2540,14 @@ bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 		{
 			for (i=0; i<neln; ++i)
 			{
-				fe[i] -= dt*(B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - trd*H[i])*detJ*wg[n];
+				fe[i] -= dt*(B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - divv*H[i])*detJ*wg[n];
 			}
 		}
 		else
 		{
 			for (i=0; i<neln; ++i)
 			{
-				fe[i] -= (B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - trd*H[i])*detJ*wg[n];
+				fe[i] -= (B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - divv*H[i])*detJ*wg[n];
 			}
 		}
 	}

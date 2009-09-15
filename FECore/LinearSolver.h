@@ -26,6 +26,7 @@ public:
 	virtual bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b) = 0;
 	virtual bool Solve(SparseMatrix& K, matrix& x, matrix& b) = 0;
 	virtual void Destroy() { m_bvalid = false; };
+	virtual void Destroy(SparseMatrix& K) { m_bvalid = false; };
 
 	//! returns a sparse matrix
 	virtual SparseMatrix* GetMatrix(int ntype) = 0;
