@@ -20,7 +20,11 @@
 #define VERSION			1
 #define SUBVERSION		1
 #define SUBSUBVERSION	7
-
+#ifdef SVN
+#include "svnrev.h"
+#else
+#define SVNREVISION 0
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 // Restart file version
 // This is the version number of the restart dump file format.

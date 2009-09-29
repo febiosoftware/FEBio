@@ -1,0 +1,4 @@
+//  This file is processed by subwcrev.exe in Windows to define the svn revision number
+//	and create svnrev.h
+
+#define SVNREVISION  $WCREV$
