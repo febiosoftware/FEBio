@@ -29,14 +29,16 @@ void FEContactSurface2::Init()
 	m_gap.create(nint);
 	m_nu.create(nint);
 	m_rs.create(nint);
-	m_Lm.create(nint);
+	m_Lmd.create(nint);
+	m_Lmp.create(nint);
 	m_pme.create(nint);
 
 	// set intial values
 	m_gap.zero();
 	m_nu.zero();
 	m_pme.set(0);
-	m_Lm.zero();
+	m_Lmd.zero();
+	m_Lmp.zero();
 
 	// allocate biphasic stuff
 	if (m_pfem->m_pStep->m_itype == FE_STATIC_PORO)
@@ -49,7 +51,8 @@ void FEContactSurface2::Init()
 //-----------------------------------------------------------------------------
 void FEContactSurface2::ShallowCopy(FEContactSurface2 &s)
 {
-	m_Lm  = s.m_Lm;
+	m_Lmd = s.m_Lmd;
+	m_Lmp = s.m_Lmp;
 	m_gap = s.m_gap;
 	m_pme.zero();
 }
@@ -278,6 +281,9 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_stol = 0.01;
 	m_bsymm = true;
 	m_srad = 0.01;
+
+	m_naugmin = 0;
+	m_naugmax = 10;
 }
 
 //-----------------------------------------------------------------------------
@@ -288,9 +294,6 @@ void FESlidingInterface2::Init()
 	m_ms.Init();
 
 	bool bporo = m_pfem->m_pStep->m_itype == FE_STATIC_PORO;
-
-	// for now we enforce penalty method for biphasic contact
-	if (bporo) m_blaugon = 0;
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
@@ -400,7 +403,8 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				}
 				else
 				{
-					ss.m_Lm[n] = 0;
+					ss.m_Lmd[n] = 0;
+					ss.m_Lmp[n] = 0;
 					ss.m_gap[n] = 0;
 					ss.m_pme[n] = 0;
 				}
@@ -408,7 +412,8 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 			else
 			{
 				// the node is not in contact
-				ss.m_Lm[n] = 0;
+				ss.m_Lmd[n] = 0;
+				ss.m_Lmp[n] = 0;
 				ss.m_gap[n] = 0;
 			}
 		}
@@ -645,7 +650,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					double g = ss.m_gap[ni];
 					
 					// lagrange multiplier
-					double Lm = ss.m_Lm[ni];
+					double Lm = ss.m_Lmd[ni];
 
 					// contact traction
 					double tn = Lm + m_eps*g;
@@ -682,7 +687,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 						int ndof = nseln + nmeln;
 
 						// calculate the flow rate
-						double wn = m_epsp*ss.m_pg[ni];
+						double wn = ss.m_Lmp[ni] + m_epsp*ss.m_pg[ni];
 
 						// fill the LM
 						LM.create(ndof);
@@ -849,7 +854,7 @@ void FESlidingInterface2::ContactStiffness()
 					double g = ss.m_gap[ni];
 					
 					// lagrange multiplier
-					double Lm = ss.m_Lm[ni];
+					double Lm = ss.m_Lmd[ni];
 
 					// contact traction
 					double tn = Lm + m_eps*g;
@@ -1019,7 +1024,7 @@ void FESlidingInterface2::ContactStiffness()
 							G2s[3*k+2] = N[k]*Gm[1].z;
 						}
 
-						double wn = m_epsp*ss.m_pg[ni];
+						double wn = ss.m_Lmp[ni] + m_epsp*ss.m_pg[ni];
 
 						if (!m_bsymm)
 						{
@@ -1085,7 +1090,94 @@ void FESlidingInterface2::ContactStiffness()
 //-----------------------------------------------------------------------------
 bool FESlidingInterface2::Augment(int naug)
 {
-	return true;
+	// make sure we need to augment
+	if (!m_blaugon) return true;
+
+	int i;
+	double Ln, Lp;
+	bool bconv = true;
+
+	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
+	// a. normal component
+	int NS = m_ss.m_Lmd.size();
+	int NM = m_ms.m_Lmd.size();
+	double normL0 = 0;
+	for (i=0; i<NS; ++i) normL0 += m_ss.m_Lmd[i]*m_ss.m_Lmd[i] + m_ss.m_Lmp[i]*m_ss.m_Lmp[i];
+	for (i=0; i<NM; ++i) normL0 += m_ms.m_Lmd[i]*m_ms.m_Lmd[i] + m_ms.m_Lmp[i]*m_ms.m_Lmp[i];
+	normL0 = sqrt(normL0);
+
+	// --- c a l c u l a t e   c u r r e n t   n o r m s ---
+	// a. normal component
+	double normL1 = 0;	// force norm
+	for (i=0; i<NS; ++i)
+	{
+		// update Lagrange multipliers
+		Ln = m_ss.m_Lmd[i] + m_eps*m_ss.m_gap[i];
+		Ln = MBRACKET(Ln);
+
+		Lp = 0;
+		if (Ln >= 0) Lp = m_ss.m_Lmp[i] + m_epsp*m_ss.m_pg[i];
+
+		normL1 += Ln*Ln + Lp*Lp;
+	}	
+
+	for (i=0; i<NM; ++i)
+	{
+		// update Lagrange multipliers
+		Ln = m_ms.m_Lmd[i] + m_eps*m_ms.m_gap[i];
+		Ln = MBRACKET(Ln);
+
+		Lp = 0;
+		if (Ln >= 0) Lp = m_ms.m_Lmp[i] + m_epsp*m_ms.m_pg[i];
+
+		normL1 += Ln*Ln + Lp*Lp;
+	}
+	normL1 = sqrt(normL1);
+
+	Logfile& log = m_pfem->m_log;
+
+	// calculate and print convergence norms
+	double lnorm = 0;
+	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
+
+	log.printf(" sliding interface # %d\n", m_nID);
+	log.printf("                        CURRENT        REQUIRED\n");
+	log.printf("    normal force : %15le", lnorm);
+	if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
+
+	// check convergence
+	bconv = true;
+	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
+	if (m_naugmin > naug) bconv = false;
+	if (m_naugmax <= naug) bconv = true;
+		
+	if (bconv == false)
+	{
+		// we did not converge so update multipliers
+		for (i=0; i<NS; ++i)
+		{
+			// update Lagrange multipliers
+			Ln = m_ss.m_Lmd[i] + m_eps*m_ss.m_gap[i];
+			m_ss.m_Lmd[i] = MBRACKET(Ln);
+
+			Lp = 0;
+			if (Ln >= 0) Lp = m_ss.m_Lmp[i] + m_epsp*m_ss.m_pg[i];
+			m_ss.m_Lmp[i] = Lp;
+		}	
+
+		for (i=0; i<NM; ++i)
+		{
+			// update Lagrange multipliers
+			Ln = m_ms.m_Lmd[i] + m_eps*m_ms.m_gap[i];
+			m_ms.m_Lmd[i] = MBRACKET(Ln);
+
+			Lp = 0;
+			if (Ln >= 0) Lp = m_ms.m_Lmp[i] + m_epsp*m_ms.m_pg[i];
+			m_ms.m_Lmp[i] = Lp;
+		}
+	}
+
+	return bconv;
 }
 
 //-----------------------------------------------------------------------------

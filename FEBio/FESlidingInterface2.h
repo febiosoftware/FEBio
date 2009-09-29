@@ -31,7 +31,8 @@ public:
 	vector<double>				m_gap;	//!< gap function at integration points
 	vector<vec3d>				m_nu;	//!< normal at integration points
 	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
-	vector<double>				m_Lm;	//!< lagrange multipliers 
+	vector<double>				m_Lmd;	//!< lagrange multipliers for displacements
+	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
 
 	// biphasic data
@@ -84,6 +85,7 @@ public:
 	bool			m_bsymm;	//!< use symmetric stiffness components only
 	double			m_srad;		//!< contact search radius
 	int				m_naugmax;	//!< maximum nr of augmentations
+	int				m_naugmin;	//!< minimum nr of augmentations
 	
 	// bihpasic contact parameters
 	double	m_epsp;		//!< flow rate penalty
