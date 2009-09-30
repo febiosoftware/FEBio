@@ -17,7 +17,10 @@ public:
 	void ShallowCopy(FEContactSurface2& s);
 
 	//! find the intersection of a ray with the surface
-	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps);
+	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei = 0);
+
+	//! calculate the nodal normals
+	void UpdateNodeNormals();
 
 public:
 	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
@@ -34,6 +37,9 @@ public:
 	vector<double>				m_Lmd;	//!< lagrange multipliers for displacements
 	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
+	vector<int>					m_nei;	//!< surface element indices into arrays
+
+	vector<vec3d>		m_nn;	//!< node normals
 
 	// biphasic data
 	vector<double>				m_pg;	//!< pressure "gap"

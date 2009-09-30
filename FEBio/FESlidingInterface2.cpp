@@ -33,6 +33,17 @@ void FEContactSurface2::Init()
 	m_Lmp.create(nint);
 	m_pme.create(nint);
 
+	m_nn.create(Nodes());
+	m_nn.zero();
+
+	m_nei.create(Elements());
+	nint = 0;
+	for (i=0; i<Elements(); ++i)
+	{
+		m_nei[i] = nint;
+		nint += Element(i).GaussPoints();
+	}
+
 	// set intial values
 	m_gap.zero();
 	m_nu.zero();
@@ -231,9 +242,10 @@ bool FEContactSurface2::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double
 //! It returns a pointer to the element, as well as the isoparametric coordinates
 //! of the intersection point.
 //!
-FESurfaceElement* FEContactSurface2::FindIntersection(vec3d r, vec3d n, double rs[2], double eps)
+FESurfaceElement* FEContactSurface2::FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei)
 {
 	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
+	int imin = -1;
 	FESurfaceElement* pme = 0;
 
 	// loop over all surface element
@@ -252,14 +264,54 @@ FESurfaceElement* FEContactSurface2::FindIntersection(vec3d r, vec3d n, double r
 				// keep results
 				pme = &el;
 				gmin = g;
+				imin = i;
 				rs[0] = r2[0];
 				rs[1] = r2[1];
 			}
 		}	
 	}
 
+	if (pei) *pei = imin;
+
 	// return the intersected element (or zero if none)
 	return pme;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the node normal. Due to the piecewise continuity
+//! of the surface elements this normal is not uniquely defined so in order to
+//! obtain a unique normal the normal is averaged for each node over all the 
+//! element normals at the node
+
+void FEContactSurface2::UpdateNodeNormals()
+{
+	int N = Nodes(), i, j, ne, jp1, jm1;
+	vec3d y[4], n;
+
+	// zero nodal normals
+	m_nn.zero();
+
+	// loop over all elements
+	for (i=0; i<Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		ne = el.Nodes();
+
+		// get the nodal coordinates
+		for (j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
+
+		// calculate the normals
+		for (j=0; j<ne; ++j)
+		{
+			jp1 = (j+1)%ne;
+			jm1 = (j+ne-1)%ne;
+			n = (y[jp1] - y[j]) ^ (y[jm1] - y[j]);
+			m_nn[el.m_lnode[j]] += n;
+		}
+	}
+
+	// normalize all vectors
+	for (i=0; i<N; ++i) m_nn[i].unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -466,7 +518,7 @@ void FESlidingInterface2::Update()
 			for (i=0; i<nint; ++i, ++ni) 
 			{
 				gi[i] = ss.m_gap[ni];
-				ti[i] = m_eps*MBRACKET(gi[i]);
+				ti[i] = ss.m_Lmd[ni] + m_eps*MBRACKET(gi[i]);
 			}
 
 			// setup the (over-determined) system to find the nodal values
@@ -518,7 +570,105 @@ void FESlidingInterface2::Update()
 	// have not been modified, so we modify them here.
 	if (m_npass == 1)
 	{
+		// we need to figure out if we need to fix the pressure dof
+		// for the nodes on the secondary surface. We do this by
+		// finding the traction value on the projection point on the 
+		// primary surface.
 
+		// since we'll do a projection in the direction of the local
+		// normal, we first calculate these nodal normals
+		m_ms.UpdateNodeNormals();
+
+		double rs[2];
+
+		// loop over all nodes of the secondary surface
+		for (int n=0; n<m_ms.Nodes(); ++n)
+		{
+			// get the node
+			FENode& node = m_ms.Node(n);
+
+			// project it onto the primary surface
+			int nei;
+			FESurfaceElement* pse = m_ss.FindIntersection(node.m_rt, m_ms.m_nn[n], rs, m_stol, &nei);
+
+			if (pse)
+			{
+				// we found an element so let's calculate the nodal traction values for this element
+	
+				// get the nodal tractions at the integration points
+				double ti[4], gi[4];
+				int nint = pse->GaussPoints();
+				int neln = pse->Nodes();
+				int noff = m_ss.m_nei[nei];
+				for (i=0; i<nint; ++i) 
+				{
+					gi[i] = m_ss.m_gap[noff + i];
+					ti[i] = m_ss.m_Lmd[noff + i] + m_eps*MBRACKET(gi[i]);
+				}
+
+				// setup the (over-determined) system to find the nodal values
+				// TODO: this is the same for all surface elements, so
+				//       maybe we should do this only once
+				matrix A;
+				A.Create(nint, neln);
+				for (i=0; i<nint; ++i)
+				{
+					double* H = pse->H(i);
+					for (j=0; j<neln; ++j) A[i][j] = H[j];
+				}
+
+				double tn[4];
+
+				if (nint == neln)
+				{
+					matrix Ai = A.inverse();
+
+					for (i=0; i<neln; ++i)
+					{
+						tn[i] = 0;
+						for (j=0; j<nint; ++j) tn[i] += Ai[i][j]*ti[j];
+					}
+				}
+				else
+				{
+					// TODO: I still need to do this case
+					assert(false);
+				}
+
+				// now evaluate the traction at the intersection point
+				double tp = pse->eval(tn, rs[0], rs[1]);
+
+				// if tp <= 0 and the node is free, we fix it. Otherwise,
+				// if tp > 0 and the node is fixed, we free it.
+				id = node.m_ID[6];
+				if ((id >= 0) && (tp <= 0))
+				{
+					// fix the prescribed dof
+					node.m_ID[6] = -id-2;
+
+					// set the fluid pressure to zero
+					node.m_pt = 0;
+				}
+				else if ((id < -1) && (tp > 0))
+				{
+					// free the prescribed dof
+					node.m_ID[6] = -id-2;
+				}
+			}
+			else
+			{
+				// if no element is found the node is definitely not in contact
+				id = node.m_ID[6];
+				if (id >= 0)
+				{
+					// fix the prescribed dof
+					node.m_ID[6] = -id-2;
+
+					// set the fluid pressure to zero
+					node.m_pt = 0;
+				}			
+			}
+		}
 	}
 }
 
