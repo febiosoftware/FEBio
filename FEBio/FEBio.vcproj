@@ -21,13 +21,10 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\febio.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="Create svn revision text"
-				CommandLine="subwcrev . svnrev_tpl.txt svnrev.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -97,7 +94,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\febio.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -173,13 +169,10 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\febio.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="subwcrev . svnrev_tpl.txt svnrev.h"
-				CommandLine="subwcrev . svnrev_tpl.txt svnrev.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -196,7 +189,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;SVN"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -249,7 +242,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets=".\febio.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -1192,10 +1184,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\svnrev.h"
-				>
-			</File>
-			<File
 				RelativePath=".\targetver.h"
 				>
 			</File>
@@ -1244,10 +1232,6 @@
 		</File>
 		<File
 			RelativePath=".\ReadMe.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\svnrev_tpl.txt"
 			>
 		</File>
 		<File
