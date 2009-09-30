@@ -107,7 +107,8 @@ bool PardisoSolver::Factor(SparseMatrix& K)
 
 	if (m_error)
 	{
-		fprintf(stderr, "\nERROR during symbolic factorization: %i", m_error);
+		fprintf(stderr, "\nERROR during symbolic factorization: ");
+		print_err();
 		exit(2);
 	}
 
@@ -126,7 +127,8 @@ bool PardisoSolver::Factor(SparseMatrix& K)
 
 	if (m_error)
 	{
-		fprintf(stderr, "\nERROR during factorization: %i", m_error);
+		fprintf(stderr, "\nERROR during factorization: ");
+		print_err();
 		exit(2);
 	}
 
@@ -152,7 +154,8 @@ bool PardisoSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 
 	if (m_error)
 	{
-		fprintf(stderr, "\nERROR during solution: %i", m_error);
+		fprintf(stderr, "\nERROR during solution: ");
+		print_err();
 		exit(3);
 	}
 
