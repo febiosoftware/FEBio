@@ -23,6 +23,7 @@ public:
 	bool Load(FEM& fem, const char* szfile);
 
 protected:
+	bool ParseModuleSection     (XMLTag& tag);
 	bool ParseControlSection    (XMLTag& tag);
 	bool ParseMaterialSection   (XMLTag& tag);
 	bool ParseGeometrySection   (XMLTag& tag);

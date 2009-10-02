@@ -12,9 +12,10 @@
 FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 {
 	// --- Analysis data ---
-	m_itype = FE_STATIC;	// do quasi-static analysis
-	m_istiffpr = 1;			// use pressure stiffness
-	m_baugment = false;		// no augmentations
+	m_nModule = FE_SOLID;		// solid-mechanics problem
+	m_nanalysis = FE_STATIC;	// do quasi-static analysis
+	m_istiffpr = 1;				// use pressure stiffness
+	m_baugment = false;			// no augmentations
 	m_hg = 1.0;
 
 	// --- Time Step Data ---
@@ -28,7 +29,7 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 	m_naggr = 0;
 
 	// --- Quasi-Newton Solver Variables ---
-	m_psolver = new FESolver(m_fem);
+	m_psolver = 0;
 	m_nretries = 0;
 	m_maxretries = 5;
 
@@ -228,6 +229,7 @@ bool FEAnalysis::Init()
 			case 4: // y-rotation
 			case 5: // z-rotation
 			case 6: // prescribed pressure
+			case 10: // precribed temperature
 				n = node.m_ID[bc];
 				node.m_ID[bc] = (n<0?n:-n-2);
 				break;
@@ -348,8 +350,34 @@ bool FEAnalysis::Solve()
 		// update time
 		m_fem.m_ftime += m_dt;
 
+		int i, j;
+
+		// evaluate load curve values at current time
+		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(m_fem.m_ftime);
+
+		// evaluate parameter lists
+		for (i=0; i<m_fem.m_MPL.size(); ++i)
+		{
+			FEParameterList* pl = &m_fem.m_MPL[i];
+			list<FEParam>::iterator pi = pl->first();
+			for (j=0; j<pl->Parameters(); ++j, ++pi)
+			{
+				if (pi->m_nlc >= 0)
+				{
+					double v = m_fem.GetLoadCurve(pi->m_nlc)->Value();
+					switch (pi->m_itype)
+					{
+					case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
+					case FE_PARAM_DOUBLE: pi->value<double>() = v; break;
+					case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
+					default: 
+						assert(false);
+					}
+				}
+			}
+		}
+
 		// solve this timestep,
-		// that is, use the Newton Raphson method to solve the timestep
 		try
 		{
 			int oldmode = 0;
@@ -516,7 +544,7 @@ void FEAnalysis::Serialize(Archive& ar)
 	if (ar.IsSaving())
 	{
 		// --- analysis data ---
-		ar << m_itype;
+		ar << m_nanalysis;
 		ar << m_istiffpr;
 		ar << m_baugment;
 		ar << m_hg;
@@ -553,7 +581,7 @@ void FEAnalysis::Serialize(Archive& ar)
 	else
 	{
 		// --- analysis data ---
-		ar >> m_itype;
+		ar >> m_nanalysis;
 		ar >> m_istiffpr;
 		ar >> m_baugment;
 		ar >> m_hg;

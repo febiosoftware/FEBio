@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
 #include "fem.h"
+#include "FESolidSolver.h"
 #include "FENNQuery.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,7 +118,7 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	double eps = m_eps;
 	
@@ -220,7 +221,7 @@ void FERigidWallInterface::ContactStiffness()
 
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	// penalty value
 	double eps = Penalty();

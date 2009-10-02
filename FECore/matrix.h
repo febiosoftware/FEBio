@@ -11,7 +11,7 @@
 
 #include <memory.h>
 #include "vector.h"
-
+#include <assert.h>
 class matrix  
 {
 public:
@@ -114,6 +114,20 @@ public:
 	matrix inverse();
 
 	matrix operator * (const matrix& m);
+
+	matrix& operator += (const matrix& m)
+	{
+		assert((m_nr == m.m_nr ) && (m_nc == m.m_nc));
+		for (int i=0; i<m_nsize; ++i) m_pd[i] += m.m_pd[i];
+		return (*this);
+	}
+
+	matrix& operator -= (const matrix& m)
+	{
+		assert((m_nr == m.m_nr ) && (m_nc == m.m_nc));
+		for (int i=0; i<m_nsize; ++i) m_pd[i] -= m.m_pd[i];
+		return (*this);
+	}
 
 protected:
 	double**	m_pr;	// pointer to rows

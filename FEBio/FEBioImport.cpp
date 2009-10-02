@@ -8,6 +8,8 @@
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
 #include "FECore/ConjGradIterSolver.h"
+#include "FESolidSolver.h"
+#include "FEHeatSolver.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +54,8 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 			++tag;
 			do
 			{
-				if      (tag == "Control" ) ParseControlSection (tag);
+				if		(tag == "Module"  ) ParseModuleSection  (tag);
+				else if (tag == "Control" ) ParseControlSection (tag);
 				else if (tag == "Material") ParseMaterialSection(tag);
 				else if (tag == "Geometry") ParseGeometrySection(tag);
 				else if (tag == "Boundary") ParseBoundarySection(tag);
@@ -128,6 +131,31 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+//! This function parses the Module section.
+//! The Module defines the type of problem the user wants to solve (solid, heat, ...)
+//!
+
+bool FEFEBioImport::ParseModuleSection(XMLTag &tag)
+{
+	FEM& fem = *m_pfem;
+
+	// get the type attribute
+	const char* szt = tag.AttributeValue("type");
+
+	assert(m_pStep && (m_pStep->m_psolver == 0));
+
+	if (strcmp(szt, "solid") == 0) m_pStep->m_psolver = new FESolidSolver(fem);
+	else if (strcmp(szt, "heat") == 0)
+	{
+		m_pStep->m_psolver = new FEHeatSolver(fem);
+		m_pStep->m_nModule = FE_HEAT;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+
+	return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEFEBioImport::ParseControlSection
 //  This function parses the control section from the xml file
@@ -136,6 +164,9 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
+
+	// make sure we have a solver defined
+	if (m_pStep->m_psolver == 0) m_pStep->m_psolver = new FESolidSolver(fem);
 
 	char sztitle[256];
 
@@ -162,8 +193,9 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "analysis")
 		{
 			const char* szt = tag.AttributeValue("type");
-			if      (strcmp(szt, "static" ) == 0) m_pStep->m_itype = FE_STATIC;
-			else if (strcmp(szt, "dynamic") == 0) m_pStep->m_itype = FE_DYNAMIC;
+			if      (strcmp(szt, "static" ) == 0) m_pStep->m_nanalysis = FE_STATIC;
+			else if (strcmp(szt, "dynamic") == 0) m_pStep->m_nanalysis = FE_DYNAMIC;
+			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 		}
 		else if (tag == "restart" )
 		{
@@ -712,6 +744,9 @@ bool FEFEBioImport::ParseNodeSection(XMLTag& tag)
 		node.m_ID[8] = -1;
 		node.m_ID[9] = -1;
 
+		// open temperature dof
+		node.m_ID[10] = 0;
+
 		++tag;
 	}
 
@@ -1175,6 +1210,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				else if (strcmp(sz, "vw") == 0) { node.m_ID[4] = node.m_ID[5] = -1; }
 				else if (strcmp(sz, "uw") == 0) { node.m_ID[3] = node.m_ID[5] = -1; }
 				else if (strcmp(sz, "uvw") == 0) { node.m_ID[3] = node.m_ID[4] = node.m_ID[5] = -1; }
+				else if (strcmp(sz, "t") == 0) node.m_ID[10] = -1;
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 				++tag;
 			}
@@ -1202,6 +1238,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				else if (strcmp(sz, "y") == 0) bc = 1;
 				else if (strcmp(sz, "z") == 0) bc = 2;
 				else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
+				else if (strcmp(sz, "t") == 0) bc = 10; 
 	
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
@@ -1246,6 +1283,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				else if (strcmp(sz, "y") == 0) bc = 1;
 				else if (strcmp(sz, "z") == 0) bc = 2;
 				else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
+				else if (strcmp(sz, "t") == 0) bc = 10;
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 				sz = tag.AttributeValue("lc", true);
@@ -1300,6 +1338,14 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 
 				sz = tag.AttributeValue("lc", true);
 				if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+
+				const char* sbc = tag.AttributeValue("bc", true);
+				if (sbc)
+				{
+					if (strcmp(sbc, "p") == 0) pc.bc = 0;
+					else if (strcmp(sbc, "t") == 0) pc.bc = 1;
+					else throw XMLReader::InvalidAttributeValue(tag, "bc", sbc);
+				}
 
 				s  = atof(tag.AttributeValue("scale"));
 				pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
@@ -1651,6 +1697,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 					else e.SetType(FE_TRI);
 				}
 			}
+			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
 		}

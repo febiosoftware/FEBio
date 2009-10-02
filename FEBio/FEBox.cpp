@@ -73,6 +73,9 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 				node.m_ID[7] = -1;
 				node.m_ID[8] = -1;
 				node.m_ID[9] = -1;
+
+				// open temperature dof
+				node.m_ID[10] = 0;
 			}
 		}
 	}

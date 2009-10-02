@@ -94,6 +94,9 @@ public:
 	// poroelasticity-data
 	double	m_pt;	//!< current pressure
 
+	// heat-conduction data
+	double	m_T;	//!< temperature
+
 	// rigid body data
 	int		m_rid;	//!< rigid body number
 

@@ -13,11 +13,11 @@ bool FEM::InitPoro()
 	for (i=0; i<Materials(); ++i)
 		if (dynamic_cast<FEPoroElastic*>(&m_MAT[i]))
 		{
-			m_pStep->m_itype = FE_STATIC_PORO;
+			m_pStep->m_nModule = FE_POROELASTIC;
 			break;
 		}
 
-	if (m_pStep->m_itype != FE_STATIC_PORO)
+	if (m_pStep->m_nModule != FE_POROELASTIC)
 	{
 		// if there is no poroelasticity
 		// we set all pressure degrees of freedoms as fixed

@@ -1,41 +1,79 @@
-// FESolver.cpp: implementation of the FESolver class.
+// FESolidSolver.cpp: implementation of the FESolidSolver class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "FESolver.h"
 #include "fem.h"
-
-///////////////////////////////////////////////////////////////////////////////
-// FESolver Construction/Destruction
-//
+#include "FECore/SkylineSolver.h"
+#include "FECore/PSLDLTSolver.h"
+#include "FECore/SuperLUSolver.h"
+#include "FECore/SuperLU_MT_Solver.h"
+#include "FECore/LUSolver.h"
+#include "FECore/PardisoSolver.h"
+#include "FECore/WSMPSolver.h"
+#include "FECore/ConjGradIterSolver.h"
 
 FESolver::FESolver(FEM& fem) : m_fem(fem), m_log(fem.m_log)
 {
-	// default values
-	m_Rtol = 1e10;
-	m_Dtol = 0.001;
-	m_Etol = 0.01;
-	m_LStol = 0.9;
-	m_LSmin = 0.01;
-	m_LSiter = 5;
-	m_maxups = 10;
-	m_maxref = 15;
-	m_cmax   = 1e5;
-
-	m_niter = 0;
-
 	// Stiffness matrix and linear solver are allocated in Init()
 	m_pK = 0;
-	m_pM = 0;
 	m_psolver = 0;
 }
+
 
 FESolver::~FESolver()
 {
 	delete m_pK;		// clean up stiffnes matrix data
-	delete m_pM;		// clean up mass matrix data
 	delete m_psolver;	// clean up linear solver data
+}
+
+bool FESolver::Init()
+{
+	// Now that we have determined the equation numbers we can continue
+	// with creating the stiffness matrix. First we select the linear solver
+	// The stiffness matrix is created in CreateStiffness
+	// Note that if a particular solver was requested in the input file
+	// then the solver might already be allocated. That's way we need to check it.
+	if (m_psolver == 0)
+	{
+		switch (m_fem.m_nsolver)
+		{
+		case SKYLINE_SOLVER      : m_psolver = new SkylineSolver(); break;
+		case PSLDLT_SOLVER       : m_psolver = new PSLDLTSolver (); break;
+		case SUPERLU_SOLVER      : m_psolver = new SuperLUSolver(); break;
+		case SUPERLU_MT_SOLVER   : m_psolver = new SuperLU_MT_Solver(); break;
+		case PARDISO_SOLVER      : m_psolver = new PardisoSolver(); break;
+		case LU_SOLVER           : m_psolver = new LUSolver(); break;
+		case WSMP_SOLVER         : m_psolver = new WSMPSolver(); break;
+		case CG_ITERATIVE_SOLVER : m_psolver = new ConjGradIterSolver(); break;
+		default:
+			m_log.printbox("FATAL ERROR","Unknown solver type selected\n");
+			return false;
+		}
+	}
+
+	// allocate storage for the sparse matrix that will hold the stiffness matrix data
+	// we let the solver allocate the correct type of matrix format
+	SparseMatrix* pS = m_psolver->GetMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
+	if (pS == 0)
+	{
+		m_log.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
+		return false;
+	}
+
+
+	// Create the stiffness matrix.
+	// Note that this does not construct the stiffness matrix. This
+	// is done later in the StiffnessMatrix routine.
+	m_pK = new FEStiffnessMatrix(pS);
+	if (m_pK == 0)
+	{
+		m_log.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -78,37 +116,4 @@ bool FESolver::CreateStiffness(bool breset)
 
 	// done!
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Save data to dump file
-
-void FESolver::Serialize(Archive& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_Dtol << m_Etol << m_Rtol << m_LSmin << m_LStol << m_LSiter;
-		ar << m_maxups;
-		ar << m_maxref;
-		ar << m_cmax;
-
-		ar << m_nrhs;
-		ar << m_niter;
-		ar << m_nref;
-		ar << m_nups;
-		ar << m_naug;
-	}
-	else
-	{
-		ar >> m_Dtol >> m_Etol >> m_Rtol >> m_LSmin >> m_LStol >> m_LSiter;
-		ar >> m_maxups;
-		ar >> m_maxref;
-		ar >> m_cmax;
-
-		ar >> m_nrhs;
-		ar >> m_niter;
-		ar >> m_nref;
-		ar >> m_nups;
-		ar >> m_naug;
-	}
 }

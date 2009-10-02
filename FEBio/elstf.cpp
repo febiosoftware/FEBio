@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include <math.h>
-#include "FESolver.h"
+#include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 #include "tens4d.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FESolver::StiffnessMatrix()
+bool FESolidSolver::StiffnessMatrix()
 {
 	int iel;
 
@@ -58,7 +58,7 @@ bool FESolver::StiffnessMatrix()
 				ElementStiffness(el, ke);
 
 				// add the inertial stiffness for dynamics
-				if (m_fem.m_pStep->m_itype == FE_DYNAMIC) ElementInertialStiffness(el, ke);
+				if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(el, ke);
 
 				// assemble element matrix in global stiffness matrix
 				AssembleStiffness(el.m_node, el.LM(), ke);
@@ -79,7 +79,7 @@ bool FESolver::StiffnessMatrix()
 		else
 		{
 			// for dynamic analyses we do need to add the inertial stiffness of the rigid body
-			if (m_fem.m_pStep->m_itype == FE_DYNAMIC)
+			if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC)
 			{
 				mesh.UnpackElement(el);
 
@@ -156,34 +156,37 @@ bool FESolver::StiffnessMatrix()
 		int npr = m_fem.m_PC.size();
 		for (int m=0; m<npr; ++m)
 		{
-			// get the surface element
-			FESurfaceElement& el = m_fem.m_psurf->Element(m);
-
-			// skip rigid surface elements
-			// TODO: do we really need to skip rigid elements?
-			if (!el.IsRigid())
+			FEPressureLoad& pc = m_fem.m_PC[m];
+			if (pc.bc == 0)
 			{
-				mesh.UnpackElement(el);
+				// get the surface element
+				FESurfaceElement& el = m_fem.m_psurf->Element(m);
 
-				// calculate nodal pressures
-				double* pt = el.pt();
-				FEPressureLoad& pc = m_fem.m_PC[m];
-
-				if (!pc.blinear)
+				// skip rigid surface elements
+				// TODO: do we really need to skip rigid elements?
+				if (!el.IsRigid())
 				{
-					double g = m_fem.GetLoadCurve(pc.lc)->Value();
+					mesh.UnpackElement(el);
 
-					for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
+					// calculate nodal pressures
+					double* pt = el.pt();
 
-					// get the element stiffness matrix
-					ndof = 3*el.Nodes();
-					ke.Create(ndof, ndof);
+					if (!pc.blinear)
+					{
+						double g = m_fem.GetLoadCurve(pc.lc)->Value();
 
-					// calculate pressure stiffness
-					PressureStiffness(el, ke);
+						for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
 
-					// assemble element matrix in global stiffness matrix
-					AssembleStiffness(el.m_node, el.LM(), ke);
+						// get the element stiffness matrix
+						ndof = 3*el.Nodes();
+						ke.Create(ndof, ndof);
+
+						// calculate pressure stiffness
+						PressureStiffness(el, ke);
+
+						// assemble element matrix in global stiffness matrix
+						AssembleStiffness(el.m_node, el.LM(), ke);
+					}
 				}
 			}
 		}
@@ -227,7 +230,7 @@ bool FESolver::StiffnessMatrix()
 
 //-----------------------------------------------------------------------------
 
-void FESolver::LinearConstraintStiffness()
+void FESolidSolver::LinearConstraintStiffness()
 {
 	int N = m_fem.m_LCSet.size();
 	if (N > 0)
@@ -240,7 +243,7 @@ void FESolver::LinearConstraintStiffness()
 //-----------------------------------------------------------------------------
 //! This function calculates the contact stiffness matrix
 
-void FESolver::ContactStiffness()
+void FESolidSolver::ContactStiffness()
 {
 	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.m_CI[i].ContactStiffness();
 }
@@ -248,7 +251,7 @@ void FESolver::ContactStiffness()
 //-----------------------------------------------------------------------------
 //! This function calculates the rigid stiffness matrices
 
-void FESolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
+void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
 	int i, j, k, l, n = en.size();
 	double kij[MAX_NDOFS][MAX_NDOFS], Ri[3][3] = {0}, Rj[3][3] = {0};
@@ -488,7 +491,7 @@ void FESolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 // matrix prior to assembly? I might have to change the elm vector as well as 
 // the element matrix size.
 
-void FESolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
+void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {
 	// assemble into global stiffness matrix
 	m_pK->Assemble(ke, elm);
@@ -640,7 +643,7 @@ void FESolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 
 //-----------------------------------------------------------------------------
 //! Calculates the contact forces
-void FESolver::ContactForces(vector<double>& R)
+void FESolidSolver::ContactForces(vector<double>& R)
 {
 	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.m_CI[i].ContactForces(R);
 }
@@ -651,7 +654,7 @@ void FESolver::ContactForces(vector<double>& R)
 //! This is because they do not depend on the geometry 
 //! so we only calculate them once (in Quasin) and then add them here.
 
-bool FESolver::Residual(vector<double>& R)
+bool FESolidSolver::Residual(vector<double>& R)
 {
 	int i, j, J, neln;
 	int neq = m_fem.m_neq;
@@ -722,7 +725,7 @@ bool FESolver::Residual(vector<double>& R)
 		}
 
 		// do poro-elastic forces
-		if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO)&&(dynamic_cast<FEPoroElastic*>(pm)))
+		if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC)&&(dynamic_cast<FEPoroElastic*>(pm)))
 		{
 			// calculate fluid internal work
 			InternalFluidWork(el, fe);
@@ -781,31 +784,34 @@ bool FESolver::Residual(vector<double>& R)
 	}
 
 	// calculate inertial forces for dynamic problems
-	if (m_fem.m_pStep->m_itype == FE_DYNAMIC) InertialForces(R);
+	if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) InertialForces(R);
 
 	// calculate forces due to pressure and add them to the residual
 	// loop over surface elements
 	int npr = m_fem.m_PC.size();
 	for (i=0; i<npr; ++i)
 	{
-		FESurfaceElement& el = m_fem.m_psurf->Element(i);
-		mesh.UnpackElement(el);
-
-		// calculate nodal pressures
-		double* pt = el.pt();
 		FEPressureLoad& pc = m_fem.m_PC[i];
+		if (pc.bc == 0)
+		{
+			FESurfaceElement& el = m_fem.m_psurf->Element(i);
+			mesh.UnpackElement(el);
 
-		double g = m_fem.GetLoadCurve(pc.lc)->Value();
+			// calculate nodal pressures
+			double* pt = el.pt();
 
-		for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
+			double g = m_fem.GetLoadCurve(pc.lc)->Value();
 
-		ndof = 3*el.Nodes();
-		fe.create(ndof);
+			for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
 
-		if (pc.blinear) LinearPressureForce(el, fe); else PressureForce(el, fe);
+			ndof = 3*el.Nodes();
+			fe.create(ndof);
 
-		// add element force vector to global force vector
-		AssembleResidual(el.m_node, el.LM(), fe, R);
+			if (pc.blinear) LinearPressureForce(el, fe); else PressureForce(el, fe);
+
+			// add element force vector to global force vector
+			AssembleResidual(el.m_node, el.LM(), fe, R);
+		}
 	}
 
 	// rigid joint forces
@@ -840,7 +846,7 @@ bool FESolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! calculate the linear constraint forces 
 
-void FESolver::LinearConstraintForces(vector<double> &R)
+void FESolidSolver::LinearConstraintForces(vector<double> &R)
 {
 	int N = m_fem.m_LCSet.size();
 	if (N>0)
@@ -855,7 +861,7 @@ void FESolver::LinearConstraintForces(vector<double> &R)
 //!  also checks for rigid dofs and assembles the residual using a condensing
 //!  procedure in the case of rigid dofs.
 
-void FESolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R)
+void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R)
 {
 	int i, j, I, n, l;
 
@@ -952,7 +958,7 @@ void FESolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<double
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
 
-void FESolver::ElementInertialStiffness(FESolidElement& el, matrix& ke)
+void FESolidSolver::ElementInertialStiffness(FESolidElement& el, matrix& ke)
 {
 	int i, j, n;
 
@@ -1008,7 +1014,7 @@ void FESolver::ElementInertialStiffness(FESolidElement& el, matrix& ke)
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
+void FESolidSolver::ElementStiffness(FESolidElement& el, matrix& ke)
 {
 	// see if the material is incompressible
 	FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
@@ -1054,7 +1060,7 @@ void FESolver::ElementStiffness(FESolidElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FESolver::MaterialStiffness(FESolidElement &el, matrix &ke)
+void FESolidSolver::MaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -1089,7 +1095,7 @@ void FESolver::MaterialStiffness(FESolidElement &el, matrix &ke)
 	// see if this is a poroelastic material
 	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
 	bool bporo = false;
-	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
+	if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
 
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -1205,7 +1211,7 @@ void FESolver::MaterialStiffness(FESolidElement &el, matrix &ke)
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for integration point n
 
-void FESolver::GeometricalStiffness(FESolidElement &el, matrix &ke)
+void FESolidSolver::GeometricalStiffness(FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
 
@@ -1277,7 +1283,7 @@ void FESolver::GeometricalStiffness(FESolidElement &el, matrix &ke)
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
 
-void FESolver::DilatationalStiffness(FESolidElement& elem, matrix& ke)
+void FESolidSolver::DilatationalStiffness(FESolidElement& elem, matrix& ke)
 {
 	int i, j, n;
 
@@ -1358,7 +1364,7 @@ void FESolver::DilatationalStiffness(FESolidElement& elem, matrix& ke)
 
 //-----------------------------------------------------------------------------
 
-void FESolver::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
+void FESolidSolver::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	// make sure we have the right element type
 	assert(el.Type() == FE_UDGHEX);
@@ -1380,7 +1386,7 @@ void FESolver::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 	// see if this is a poroelastic material
 	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
 	bool bporo = false;
-	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
+	if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
 	
 	// for now we do not allow this element to be used in a poroelastic simulation
 	assert(bporo == false);
@@ -1479,7 +1485,7 @@ void FESolver::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 
 //-----------------------------------------------------------------------------
 
-void FESolver::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
+void FESolidSolver::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
 {
 	int i, j;
 
@@ -1532,7 +1538,7 @@ void FESolver::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
 
 //-----------------------------------------------------------------------------
 
-void FESolver::UDGDilatationalStiffness(FESolidElement& el, matrix& ke)
+void FESolidSolver::UDGDilatationalStiffness(FESolidElement& el, matrix& ke)
 {
 	int i, j;
 
@@ -1588,7 +1594,7 @@ void FESolver::UDGDilatationalStiffness(FESolidElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! calculates the hourglass stiffness for UDG hex elements
 
-void FESolver::UDGHourglassStiffness(FESolidElement& el, matrix& ke)
+void FESolidSolver::UDGHourglassStiffness(FESolidElement& el, matrix& ke)
 {
 	int i, j;
 
@@ -1655,7 +1661,7 @@ void FESolver::UDGHourglassStiffness(FESolidElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
 
-void FESolver::DilatationalStiffness(FEShellElement& elem, matrix& ke)
+void FESolidSolver::DilatationalStiffness(FEShellElement& elem, matrix& ke)
 {
 	int i, j, n;
 
@@ -1746,7 +1752,7 @@ void FESolver::DilatationalStiffness(FEShellElement& elem, matrix& ke)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FESolver::InternalForces(FESolidElement& el, vector<double>& fe)
+void FESolidSolver::InternalForces(FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -1812,7 +1818,7 @@ void FESolver::InternalForces(FESolidElement& el, vector<double>& fe)
 //! calculates the internal equivalent nodal forces for enhanced strain
 //! solid elements.
 
-void FESolver::UDGInternalForces(FESolidElement& el, vector<double>& fe)
+void FESolidSolver::UDGInternalForces(FESolidElement& el, vector<double>& fe)
 {
 	// make sure this element is of the correct type
 	assert(el.Type() == FE_UDGHEX);
@@ -1858,7 +1864,7 @@ void FESolver::UDGInternalForces(FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates the hourglass forces
 
-void FESolver::UDGHourglassForces(FESolidElement &el, vector<double> &fe)
+void FESolidSolver::UDGHourglassForces(FESolidElement &el, vector<double> &fe)
 {
 	int i;
 
@@ -1959,7 +1965,7 @@ void FESolver::UDGHourglassForces(FESolidElement &el, vector<double> &fe)
 //! Note that we assume that the GX, GY and GX contain the averaged 
 //! Cartesian derivatives
 
-void FESolver::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8])
+void FESolidSolver::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8])
 {
 	vec3d* rt = el.rt();
 
@@ -1983,7 +1989,7 @@ void FESolver::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[
 //-----------------------------------------------------------------------------
 //! Calculates the average Cartesian derivatives
 
-void FESolver::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int nstate)
+void FESolidSolver::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int nstate)
 {
 	// get the nodal coordinates
 	vec3d* r = (nstate == 0? el.r0() : el.rt());
@@ -2049,7 +2055,7 @@ void FESolver::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], dou
 //-----------------------------------------------------------------------------
 //! Calculates the exact volume of a hexahedral element
 
-double FESolver::HexVolume(FESolidElement& el, int state)
+double FESolidSolver::HexVolume(FESolidElement& el, int state)
 {
 	// let's make sure this is indeed a hex element
 //	assert(el.Type() == FE_HEX);
@@ -2111,7 +2117,7 @@ double FESolver::HexVolume(FESolidElement& el, int state)
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FESolver::LinearPressureForce(FESurfaceElement& el, vector<double>& fe)
+bool FESolidSolver::LinearPressureForce(FESurfaceElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -2179,7 +2185,7 @@ bool FESolver::LinearPressureForce(FESurfaceElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FESolver::PressureForce(FESurfaceElement& el, vector<double>& fe)
+bool FESolidSolver::PressureForce(FESurfaceElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -2246,7 +2252,7 @@ bool FESolver::PressureForce(FESurfaceElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 
-bool FESolver::PressureStiffness(FESurfaceElement& el, matrix& ke)
+bool FESolidSolver::PressureStiffness(FESurfaceElement& el, matrix& ke)
 {
 	int i, j, n;
 
@@ -2329,7 +2335,7 @@ bool FESolver::PressureStiffness(FESurfaceElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FESolver::BodyForces(FESolidElement& el, vector<double>& fe)
+void FESolidSolver::BodyForces(FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	double *H;
@@ -2366,7 +2372,7 @@ void FESolver::BodyForces(FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
-void FESolver::NodalForces(vector<double>& F)
+void FESolidSolver::NodalForces(vector<double>& F)
 {
 	int i, id, bc, lc, n;
 	double s, f;
@@ -2395,6 +2401,9 @@ void FESolver::NodalForces(vector<double>& F)
 			n = node.m_ID[bc];
 		
 			f = s*m_fem.GetLoadCurve(lc)->Value();
+			
+			// TODO: this next line only needs to be done when we
+			//		 are using the symmetric version of poroelasticity!
 			if (bc == 6) f *= m_fem.m_pStep->m_dt;	// GAA
 
 			if (n >= 0) F[n] = f;
@@ -2435,7 +2444,7 @@ void FESolver::NodalForces(vector<double>& F)
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
+bool FESolidSolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -2558,7 +2567,7 @@ bool FESolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 
-bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
+bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 {
 	int i, j, l, n;
 
@@ -2772,7 +2781,7 @@ bool FESolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! This function calculates the inertial forces for dynamic problems
 
-void FESolver::InertialForces(vector<double>& R)
+void FESolidSolver::InertialForces(vector<double>& R)
 {
 	int i, j, iel, n;
 	int nint, neln;
@@ -2860,7 +2869,7 @@ void FESolver::InertialForces(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)
 
-void FESolver::DiscreteElementForces(vector<double>& R)
+void FESolidSolver::DiscreteElementForces(vector<double>& R)
 {
 	if (m_fem.m_DE.size() == 0) return;
 
@@ -2912,7 +2921,7 @@ void FESolver::DiscreteElementForces(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
-void FESolver::DiscreteElementStiffness()
+void FESolidSolver::DiscreteElementStiffness()
 {
 	if (m_fem.m_DE.size() == 0) return;
 

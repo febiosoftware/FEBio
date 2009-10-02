@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FESolver.h"
+#include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 #include <math.h>
 
@@ -8,7 +8,7 @@
 //! Note that we use a one-point gauss integration rule for the thickness
 //! integration. This will integrate linear functions exactly.
 
-void FESolver::InternalForces(FEShellElement& el, vector<double>& fe)
+void FESolidSolver::InternalForces(FEShellElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -96,7 +96,7 @@ void FESolver::InternalForces(FEShellElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! Calculates the shell element stiffness matrix
 
-void FESolver::ElementStiffness(FEShellElement& el, matrix& ke)
+void FESolidSolver::ElementStiffness(FEShellElement& el, matrix& ke)
 {
 	int i, i6, j, j6, n;
 
@@ -148,7 +148,7 @@ void FESolver::ElementStiffness(FEShellElement& el, matrix& ke)
 
 	// see if this is a poroelastic material
 	bool bporo = false;
-	if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+	if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 	// calculate element stiffness matrix
 	ke.zero();
@@ -383,7 +383,7 @@ void FESolver::ElementStiffness(FEShellElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates body forces for shells
 
-void FESolver::BodyForces(FEShellElement& el, vector<double>& fe)
+void FESolidSolver::BodyForces(FEShellElement& el, vector<double>& fe)
 {
 	// get the element's material
 	FEMaterial* pme = m_fem.GetMaterial(el.GetMatID());

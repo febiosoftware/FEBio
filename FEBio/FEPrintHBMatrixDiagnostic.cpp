@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEPrintHBMatrixDiagnostic.h"
+#include "FESolidSolver.h"
 
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEM& fem) : FEDiagnostic(fem)
 {
@@ -39,7 +40,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	m_fem.m_Step[0].Init();
 
 	// get and initialize the solver
-	FESolver& solver = *m_fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*m_fem.m_pStep->m_psolver);
 	solver.Init();
 
 	// build the stiffness matrix

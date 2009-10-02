@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FETiedInterface.h"
 #include "fem.h"
+#include "FESolidSolver.h"
 #include "FENNQuery.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -369,7 +370,7 @@ void FETiedInterface::ContactForces(vector<double>& F)
 
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 	
 	// loop over all slave facets
 	int ne = ss.Elements();
@@ -525,7 +526,7 @@ void FETiedInterface::ContactStiffness()
 
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	// loop over all slave elements
 	int ne = ss.Elements();

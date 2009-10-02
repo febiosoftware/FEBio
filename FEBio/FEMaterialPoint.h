@@ -230,3 +230,29 @@ public:
 	mat3ds	m_H[MAX_TERMS];		//!< internal variables
 	mat3ds	m_Hp[MAX_TERMS];	//!< internal variables at previous timestep
 };
+
+//-----------------------------------------------------------------------------
+
+class FEHeatMaterialPoint : public FEMaterialPoint
+{
+public:
+	FEMaterialPoint* Copy()
+	{
+		FEHeatMaterialPoint* pt = new FEHeatMaterialPoint(*this);
+		if (m_pt) pt->m_pt = m_pt->Copy();
+		return pt;
+	}
+
+	void Serialize(Archive& ar)
+	{
+		if (m_pt) m_pt->Serialize(ar);
+	}
+
+	void Init(bool bflag)
+	{
+		if (m_pt) m_pt->Init(bflag);
+	}
+
+public:
+	vec3d	m_q;	//!< heat flux
+};

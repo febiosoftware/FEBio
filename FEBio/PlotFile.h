@@ -71,10 +71,10 @@ public:
 	enum { PLOT_NONE = 0 };
 
 	// scalar fields
-	enum { PLOT_FLUID_PRESSURE=1, PLOT_CONTACT_PRESSURE, PLOT_CONTACT_GAP, PLOT_PLASTIC_STRAIN, PLOT_FIBER_STRAIN, PLOT_DEV_FIBER_STRAIN };
+	enum { PLOT_FLUID_PRESSURE=1, PLOT_CONTACT_PRESSURE, PLOT_CONTACT_GAP, PLOT_PLASTIC_STRAIN, PLOT_FIBER_STRAIN, PLOT_DEV_FIBER_STRAIN, PLOT_TEMPERATURE };
 
 	// vector fields
-	enum { PLOT_DISPLACEMENT=1, PLOT_VELOCITY, PLOT_ACCELERATION, PLOT_FLUID_FLUX, PLOT_CONTACT_TRACTION, PLOT_REACTION_FORCE, PLOT_MATERIAL_FIBER };
+	enum { PLOT_DISPLACEMENT=1, PLOT_VELOCITY, PLOT_ACCELERATION, PLOT_FLUID_FLUX, PLOT_CONTACT_TRACTION, PLOT_REACTION_FORCE, PLOT_MATERIAL_FIBER, PLOT_HEAT_FLUX };
 
 public:
 	//! constructor
@@ -104,11 +104,13 @@ protected:
 	void write_contact_tractions();
 	void write_reaction_forces();
 	void write_material_fibers();
+	void write_heat_flux();
 
 	// scalar fields
 	void write_fluid_pressures();
 	void write_contact_pressures();
 	void write_contact_gaps();
+	void write_temperatures();
 
 	// plastic stress fields
 	float fiber_strain(FESolidElement& el, int j);

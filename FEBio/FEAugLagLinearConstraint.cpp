@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEAugLagLinearConstraint.h"
 #include "fem.h"
+#include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
 void FEAugLagLinearConstraint::Serialize(Archive& ar)
@@ -174,7 +175,7 @@ void FELinearConstraintSet::Residual(vector<double> &R)
 
 void FELinearConstraintSet::Stiffness()
 {
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	vector<int> en;
 	vector<int> elm;

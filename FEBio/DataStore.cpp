@@ -6,6 +6,7 @@
 #include "DataStore.h"
 #include "fem.h"
 #include "FERigid.h"
+#include "FESolidSolver.h"
 
 //////////////////////////////////////////////////////////////////////
 // DataStore
@@ -212,7 +213,7 @@ double NodeDataRecord::Evaluate(int item, const char* szexpr)
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
-	FESolver& solver = *fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 	int nnode = item - 1;
 	double val = 0;
@@ -230,7 +231,7 @@ double NodeDataRecord::Evaluate(int item, const char* szexpr)
 		m_calc.SetVariable("Rx", (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0));
 		m_calc.SetVariable("Ry", (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0));
 		m_calc.SetVariable("Rz", (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0));
-		if (fem.m_pStep->m_itype == FE_STATIC_PORO)
+		if (fem.m_pStep->m_nModule == FE_POROELASTIC)
 		{
 			m_calc.SetVariable("p", node.m_pt);
 			m_calc.SetVariable("vx", node.m_vt.x);
@@ -301,7 +302,7 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 			m_calc.SetVariable("Eyz", E.yz());
 			m_calc.SetVariable("Exz", E.xz());
 			val += m_calc.eval(szexpr, ierr);
-			if (fem.m_pStep->m_itype == FE_STATIC_PORO)
+			if (fem.m_pStep->m_nModule == FE_POROELASTIC)
 			{
 				FEPoroElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
 				m_calc.SetVariable("wx", pt.m_w.x);

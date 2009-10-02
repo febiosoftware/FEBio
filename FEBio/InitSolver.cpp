@@ -1,64 +1,16 @@
 #include "stdafx.h"
-#include "FESolver.h"
+#include "FESolidSolver.h"
 #include "fem.h"
-#include "FECore/SkylineSolver.h"
-#include "FECore/PSLDLTSolver.h"
-#include "FECore/SuperLUSolver.h"
-#include "FECore/SuperLU_MT_Solver.h"
-#include "FECore/LUSolver.h"
-#include "FECore/PardisoSolver.h"
-#include "FECore/WSMPSolver.h"
-#include "FECore/ConjGradIterSolver.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolver::Init
-// Allocates and initializes the data structures used by the FESolver
+// FUNCTION: FESolidSolver::Init
+// Allocates and initializes the data structures used by the FESolidSolver
 //
 
-bool FESolver::Init()
+bool FESolidSolver::Init()
 {
-	// Now that we have determined the equation numbers we can continue
-	// with creating the stiffness matrix. First we select the linear solver
-	// The stiffness matrix is created in CreateStiffness
-	// Note that if a particular solver was requested in the input file
-	// then the solver might already be allocated. That's way we need to check it.
-	if (m_psolver == 0)
-	{
-		switch (m_fem.m_nsolver)
-		{
-		case SKYLINE_SOLVER      : m_psolver = new SkylineSolver(); break;
-		case PSLDLT_SOLVER       : m_psolver = new PSLDLTSolver (); break;
-		case SUPERLU_SOLVER      : m_psolver = new SuperLUSolver(); break;
-		case SUPERLU_MT_SOLVER   : m_psolver = new SuperLU_MT_Solver(); break;
-		case PARDISO_SOLVER      : m_psolver = new PardisoSolver(); break;
-		case LU_SOLVER           : m_psolver = new LUSolver(); break;
-		case WSMP_SOLVER         : m_psolver = new WSMPSolver(); break;
-		case CG_ITERATIVE_SOLVER : m_psolver = new ConjGradIterSolver(); break;
-		default:
-			m_log.printbox("FATAL ERROR","Unknown solver type selected\n");
-			return false;
-		}
-	}
-
-	// allocate storage for the sparse matrix that will hold the stiffness matrix data
-	// we let the solver allocate the correct type of matrix format
-	SparseMatrix* pS = m_psolver->GetMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
-	if (pS == 0)
-	{
-		m_log.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
-		return false;
-	}
-
-	// Create the stiffness matrix.
-	// Note that this does not construct the stiffness matrix. This
-	// is done later in the StiffnessMatrix routine.
-	m_pK = new FEStiffnessMatrix(pS);
-	if (m_pK == 0)
-	{
-		m_log.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
-		return false;
-	}
-
+	// initialize base class
+	if (FESolver::Init() == false) return false;
 
 	// get nr of equations
 	int neq = m_fem.m_neq;

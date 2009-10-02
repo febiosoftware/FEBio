@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Max nr of nodal degrees of freedom
 
-#define MAX_NDOFS	10
+#define MAX_NDOFS	11
 
 // At this point the 7 nodal dofs are used as follows:
 //  1: x-displacement
@@ -31,11 +31,13 @@
 //  8: rigid x-rotation
 //  9: rigid y-rotation
 // 10: rigid z-rotation
+// 11: temperature
 //
 // The rotational degrees of freedom are only used for rigid nodes and shells.
 // The fluid pressure is only used for poroelastic problems.
 // The rigid rotational degrees of freedom are only used for rigid nodes
 // and only during the creation of the stiffenss matrix
+// The temperature is only used during heat-conduction problems
 
 class FEElement;
 

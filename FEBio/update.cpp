@@ -1,15 +1,16 @@
 #include "stdafx.h"
 #include "fem.h"
+#include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FESolver::Update
+// FUNCTION : FESolidSolver::Update
 // Updates the current nodal positions based on the displacement increment
 // and line search factor. If bfinal is true, it also updates the current
 // displacements
 //
 
-void FESolver::Update(vector<double>& ui, double s)
+void FESolidSolver::Update(vector<double>& ui, double s)
 {
 	int i, n;
 
@@ -114,7 +115,7 @@ void FESolver::Update(vector<double>& ui, double s)
 
 	// update velocity and accelerations
 	// for dynamic simulations
-	if (m_fem.m_pStep->m_itype == FE_DYNAMIC)
+	if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC)
 	{
 		int N = mesh.Nodes();
 		double dt = m_fem.m_pStep->m_dt;
@@ -129,7 +130,7 @@ void FESolver::Update(vector<double>& ui, double s)
 	}
 
 	// update poroelastic data
-	if (m_fem.m_pStep->m_itype == FE_STATIC_PORO) UpdatePoro(ui, s);
+	if (m_fem.m_pStep->m_nModule == FE_POROELASTIC) UpdatePoro(ui, s);
 
 	// update contact
 	if (m_fem.m_bcontact) m_fem.UpdateContact();
@@ -145,7 +146,7 @@ void FESolver::Update(vector<double>& ui, double s)
 ///////////////////////////////////////////////////////////////////////////////
 //! Updates the poroelastic data
 
-void FESolver::UpdatePoro(vector<double>& ui, double s)
+void FESolidSolver::UpdatePoro(vector<double>& ui, double s)
 {
 	int i, n;
 
@@ -191,7 +192,7 @@ void FESolver::UpdatePoro(vector<double>& ui, double s)
 ///////////////////////////////////////////////////////////////////////////////
 //! Updates the rigid body data
 
-void FESolver::UpdateRigidBodies(vector<double>& ui, double s)
+void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 {
 	int i, j, lc;
 
@@ -312,7 +313,7 @@ void FESolver::UpdateRigidBodies(vector<double>& ui, double s)
 //  Updates the element stresses
 //
 
-void FESolver::UpdateStresses()
+void FESolidSolver::UpdateStresses()
 {
 	int i, n;
 	int nint;
@@ -346,7 +347,7 @@ void FESolver::UpdateStresses()
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;
-			if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+			if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 			// see if the material is incompressible or not
 			// if the material is incompressible the element
@@ -478,7 +479,7 @@ void FESolver::UpdateStresses()
 
 			// see if we are dealing with a poroelastic material or not
 			bool bporo = false;
-			if ((m_fem.m_pStep->m_itype == FE_STATIC_PORO) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+			if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 			// see if the material is incompressible or not
 			// if the material is incompressible the element

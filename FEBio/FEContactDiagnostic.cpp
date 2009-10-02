@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEContactDiagnostic.h"
 #include "FENeoHookean.h"
+#include "FESolidSolver.h"
 
 void print_matrix(Logfile& log, FullMatrix& m)
 {
@@ -46,7 +47,7 @@ FEContactDiagnostic::~FEContactDiagnostic()
 bool FEContactDiagnostic::Run()
 {
 	// get the solver
-	FESolver& solver = *m_fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*m_fem.m_pStep->m_psolver);
 	solver.Init();
 
 	// make sure contact data is up to data
@@ -154,6 +155,8 @@ bool FEContactDiagnostic::Init()
 		node.m_ID[7] = -1;
 		node.m_ID[8] = -1;
 		node.m_ID[9] = -1;
+
+		node.m_ID[10] = 0;
 	}
 
 	FESolidElement& el0 = mesh.SolidElement(0);
@@ -225,7 +228,7 @@ void FEContactDiagnostic::deriv_residual(FullMatrix& K)
 	FEM& fem = m_fem;
 
 	// get the solver
-	FESolver& solver = *fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 
 	// get the mesh
 	FEMesh& mesh = fem.m_mesh;

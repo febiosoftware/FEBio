@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "FESolver.h"
+#include "FESolidSolver.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolver::Augment
+// FUNCTION: FESolidSolver::Augment
 //  This functions performs the Lagrange augmentations
 //  It returns true if all the augmentation have converged, 
 //	otherwise it returns false
@@ -14,7 +14,7 @@
 //  before the Lagr. multipliers dissapears. 
 //
 
-bool FESolver::Augment()
+bool FESolidSolver::Augment()
 {
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;

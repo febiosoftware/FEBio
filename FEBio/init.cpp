@@ -80,6 +80,9 @@ bool FEM::Init()
 	// initialize poro-elastic data
 	if (InitPoro() == false) return false;
 
+	// initialize heat condition data
+	if (InitHeat() == false) return false;
+
 	// initialize random number generator
 	srand((unsigned) time(NULL));
 

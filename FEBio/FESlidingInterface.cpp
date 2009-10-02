@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FESlidingInterface.h"
 #include "fem.h"
+#include "FESolidSolver.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FESlidingInterface
@@ -435,7 +436,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 	FEMesh& mesh = m_pfem->m_mesh;
 
 	// get the solver
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	vec3d* r0;
 	double w[4];
@@ -806,7 +807,7 @@ void FESlidingInterface::ContactStiffness()
 
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	// do two-pass
 	for (np=0; np<m_npass; ++np)

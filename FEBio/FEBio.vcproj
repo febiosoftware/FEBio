@@ -450,11 +450,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEHeatSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEHolmesMow.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\FEIncompNeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEIsotropicFourier.cpp"
 				>
 			</File>
 			<File
@@ -594,6 +602,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FESolidSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FESolver.cpp"
 				>
 			</File>
@@ -663,6 +675,10 @@
 			</File>
 			<File
 				RelativePath=".\InitContact.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InitHeat.cpp"
 				>
 			</File>
 			<File
@@ -916,11 +932,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEHeatSolver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEHolmesMow.h"
 				>
 			</File>
 			<File
 				RelativePath=".\FEIncompNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEIsotropicFourier.h"
 				>
 			</File>
 			<File
@@ -1057,6 +1081,10 @@
 			</File>
 			<File
 				RelativePath=".\FESlidingInterface2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESolidSolver.h"
 				>
 			</File>
 			<File

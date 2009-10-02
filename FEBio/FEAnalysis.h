@@ -58,7 +58,8 @@ public:
 
 	// --- Control Data ---
 	//{
-		int		m_itype;		//!< analysis type
+		int		m_nModule;		//!< module type
+		int		m_nanalysis;	//!< analysis type
 		int		m_istiffpr;		//!< calculate pressure stiffness
 		bool	m_baugment;		//!< use Lagrangian augmentation
 		double	m_hg;			//!< hourglass parameter

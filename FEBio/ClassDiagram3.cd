@@ -609,7 +609,7 @@
       <FileName>FESlidingInterface.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FESolver" Collapsed="true">
+  <Class Name="FESolidSolver" Collapsed="true">
     <Position X="26.75" Y="11.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>VwQCAUCaCDZEAQAs4UgAgtIRSGCUAQQpCFoKClgQQAA=</HashCode>

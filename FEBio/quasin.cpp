@@ -3,6 +3,7 @@
 #include "FESolver.h"
 #include "FERigid.h"
 #include "stack.h"
+#include "FESolidSolver.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -20,14 +21,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FESolver::SolveStep
+// FUNCTION : FESolidSolver::SolveStep
 //  Solves a single time step
 //  This function mainly calls the Quasin routine 
 //  and deals with exceptions that require the immediate termination of
 //	quasi-Newton iterations.
 //
 
-bool FESolver::SolveStep(double time)
+bool FESolidSolver::SolveStep(double time)
 {
 	bool bret;
 
@@ -78,11 +79,11 @@ bool FESolver::SolveStep(double time)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolver::PrepStep
+// FUNCTION: FESolidSolver::PrepStep
 // Prepares the data for the first QN iteration. 
 //
 
-void FESolver::PrepStep(double time)
+void FESolidSolver::PrepStep(double time)
 {
 	int i, j;
 
@@ -92,31 +93,6 @@ void FESolver::PrepStep(double time)
 	m_nref  = 0;	// nr of stiffness reformations
 	m_nups	= 0;	// nr of stiffness updates between reformations
 	m_naug  = 0;	// nr of augmentations
-
-	// evaluate load curve values at current time
-	for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(time);
-
-	// evaluate parameter lists
-	for (i=0; i<m_fem.m_MPL.size(); ++i)
-	{
-		FEParameterList* pl = &m_fem.m_MPL[i];
-		list<FEParam>::iterator pi = pl->first();
-		for (j=0; j<pl->Parameters(); ++j, ++pi)
-		{
-			if (pi->m_nlc >= 0)
-			{
-				double v = m_fem.GetLoadCurve(pi->m_nlc)->Value();
-				switch (pi->m_itype)
-				{
-				case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
-				case FE_PARAM_DOUBLE: pi->value<double>() = v; break;
-				case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
-				default: 
-					assert(false);
-				}
-			}
-		}
-	}
 
 	// zero total displacements/pressures
 	m_Ui.zero();
@@ -292,13 +268,13 @@ void FESolver::PrepStep(double time)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FESolver::Quasin
+// FUNCTION : FESolidSolver::Quasin
 // Implements the BFGS algorithm to solve the nonlinear FE equations.
 // The details of this implementation of the BFGS method can be found in:
 //   "Finite Element Procedures", K.J. Bathe, p759 and following
 //
 
-bool FESolver::Quasin(double time)
+bool FESolidSolver::Quasin(double time)
 {
 	int i;
 	double s;
@@ -539,11 +515,11 @@ bool FESolver::Quasin(double time)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolver::ReformStiffness
+// FUNCTION: FESolidSolver::ReformStiffness
 // Reforms a stiffness matrix and factorizes it
 //
 
-bool FESolver::ReformStiffness()
+bool FESolidSolver::ReformStiffness()
 {
 	// first, let's make sure we have not reached the max nr of reformations allowed
 	if (m_nref >= m_maxref) throw MaxStiffnessReformations();
@@ -583,7 +559,7 @@ bool FESolver::ReformStiffness()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FESolver::LineSearch
+// FUNCTION : FESolidSolver::LineSearch
 // Performs a linesearch on a NR iteration
 // The description of this method can be found in:
 //    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.
@@ -592,7 +568,7 @@ bool FESolver::ReformStiffness()
 // For instance, define a di so that ui = s*di. Also, define the 
 // position of the nodes at the previous iteration.
 
-double FESolver::LineSearch()
+double FESolidSolver::LineSearch()
 {
 	double s = 1.0;
 	double smin = s;
@@ -714,12 +690,12 @@ double FESolver::LineSearch()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolver::SolveEquations
+// FUNCTION: FESolidSolver::SolveEquations
 // This function solves a system of equations using the BFGS update vectors
 // The variable m_nups keeps track of how many updates have been made so far.
 // 
 
-void FESolver::SolveEquations(vector<double>& x, vector<double>& b)
+void FESolidSolver::SolveEquations(vector<double>& x, vector<double>& b)
 {
 	int i, j;
 	double *vi, *wi, vr, wr;
@@ -762,12 +738,12 @@ void FESolver::SolveEquations(vector<double>& x, vector<double>& b)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolver::SolveEquations
+// FUNCTION: FESolidSolver::SolveEquations
 // This function solves a system of equations using the BFGS update vectors
 // The variable m_nups keeps track of how many updates have been made so far.
 // 
 
-void FESolver::SolveEquations(matrix& x, matrix& b)
+void FESolidSolver::SolveEquations(matrix& x, matrix& b)
 {
 	int i, j, k;
 	double *vi, *wi, vr, wr;
@@ -831,7 +807,7 @@ void FESolver::SolveEquations(matrix& x, matrix& b)
 //! be an indication of an ill-conditioned matrix and the update should
 //! not be performed.
 
-bool FESolver::BFGSUpdate(double s)
+bool FESolidSolver::BFGSUpdate(double s)
 {
 	int i;
 	double dg, dh,dgi, c, r;

@@ -58,6 +58,8 @@ public:
 
 	SparseMatrix* GetSparseMatrixPtr() { return m_pA; }
 
+	void Zero() { m_pA->zero(); }
+
 protected:
 	void build_begin();
 	void build_add(vector<int>& lm);

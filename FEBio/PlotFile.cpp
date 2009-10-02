@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "PlotFile.h"
 #include "fem.h"
+#include "FESolidSolver.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -41,26 +42,34 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 
 	m_pfem = &fem;
 
-	int itype = fem.m_pStep->m_itype;
+	int nmode = fem.m_pStep->m_nModule;
+	int ntype = fem.m_pStep->m_nanalysis;
 
 	// check the field values
-	if (m_nfield[0] == -1) m_nfield[0] = PLOT_DISPLACEMENT;
+	if (m_nfield[0] == -1) 
+	{
+//		if (itype == FE_HEAT_CONDUCTION) m_nfield[0] = PLOT_NONE;
+//		else m_nfield[0] = PLOT_DISPLACEMENT;
+		m_nfield[0] = PLOT_DISPLACEMENT;
+	}
 	if (m_nfield[1] == -1)
 	{
 		m_nfield[1] = PLOT_NONE;
-		if ((itype == FE_STATIC_PORO) || (itype == FE_DYNAMIC)) m_nfield[1] = PLOT_VELOCITY;
+		if ((nmode == FE_POROELASTIC) || (ntype == FE_DYNAMIC)) m_nfield[1] = PLOT_VELOCITY;
+		else if (nmode == FE_HEAT) m_nfield[1] = PLOT_HEAT_FLUX;
 	}
 	if (m_nfield[2] == -1)
 	{
 		m_nfield[2] = PLOT_NONE;
-		if (itype == FE_STATIC_PORO) m_nfield[2] = PLOT_FLUID_FLUX;
-		else if (itype == FE_DYNAMIC) m_nfield[2] = PLOT_ACCELERATION;
+		if (nmode == FE_POROELASTIC) m_nfield[2] = PLOT_FLUID_FLUX;
+		else if (ntype == FE_DYNAMIC) m_nfield[2] = PLOT_ACCELERATION;
 		else if (fem.m_bcontact) m_nfield[2] = PLOT_CONTACT_TRACTION;
 	}
 	if (m_nfield[3] == -1)
 	{
 		m_nfield[3] = PLOT_NONE;
-		if (itype == FE_STATIC_PORO) m_nfield[3] = PLOT_FLUID_PRESSURE;
+		if (nmode == FE_POROELASTIC) m_nfield[3] = PLOT_FLUID_PRESSURE;
+		else if (nmode == FE_HEAT) m_nfield[3] = PLOT_TEMPERATURE;
 		else if (fem.m_bcontact) m_nfield[3] = PLOT_CONTACT_GAP;
 	}
 	if (m_nfield[4] == -1)
@@ -283,6 +292,7 @@ bool PlotFile::Write(FEM& fem)
 		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
 		case PLOT_REACTION_FORCE: write_reaction_forces(); break;
 		case PLOT_MATERIAL_FIBER: write_material_fibers(); break;
+		case PLOT_HEAT_FLUX: write_heat_flux(); break;
 		default:
 			assert(false);
 		}
@@ -298,6 +308,7 @@ bool PlotFile::Write(FEM& fem)
 		case PLOT_CONTACT_TRACTION: write_contact_tractions(); break;
 		case PLOT_REACTION_FORCE: write_reaction_forces(); break;
 		case PLOT_MATERIAL_FIBER: write_material_fibers(); break;
+		case PLOT_HEAT_FLUX: write_heat_flux(); break;
 		default:
 			assert(false);
 		}
@@ -311,6 +322,7 @@ bool PlotFile::Write(FEM& fem)
 		case PLOT_FLUID_PRESSURE: write_fluid_pressures(); break;
 		case PLOT_CONTACT_PRESSURE: write_contact_pressures(); break;
 		case PLOT_CONTACT_GAP: write_contact_gaps(); break;
+		case PLOT_TEMPERATURE: write_temperatures(); break;
 		default:
 			assert(false);
 		}
@@ -339,22 +351,26 @@ bool PlotFile::Write(FEM& fem)
 		// we output the average stress values of the gauss points
 		for (j=0; j<nint; ++j)
 		{
-			FEElasticMaterialPoint& pt = *(el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
+			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
 
-			s[0] += (float) (f*pt.s.xx());
-			s[1] += (float) (f*pt.s.yy());
-			s[2] += (float) (f*pt.s.zz());
-			s[3] += (float) (f*pt.s.xy());
-			s[4] += (float) (f*pt.s.yz());
-			s[5] += (float) (f*pt.s.xz());
+			if (ppt)
+			{
+				FEElasticMaterialPoint& pt = *ppt;
+				s[0] += (float) (f*pt.s.xx());
+				s[1] += (float) (f*pt.s.yy());
+				s[2] += (float) (f*pt.s.zz());
+				s[3] += (float) (f*pt.s.xy());
+				s[4] += (float) (f*pt.s.yz());
+				s[5] += (float) (f*pt.s.xz());
 
-			if (m_nfield[4] == PLOT_FIBER_STRAIN)
-			{
-				s[6] += (float) f*fiber_strain(el, j);
-			}
-			else if (m_nfield[4] == PLOT_DEV_FIBER_STRAIN)
-			{
-				s[6] += (float) f*dev_fiber_strain(el, j);
+				if (m_nfield[4] == PLOT_FIBER_STRAIN)
+				{
+					s[6] += (float) f*fiber_strain(el, j);
+				}
+				else if (m_nfield[4] == PLOT_DEV_FIBER_STRAIN)
+				{
+					s[6] += (float) f*dev_fiber_strain(el, j);
+				}
 			}
 		}
 
@@ -615,6 +631,75 @@ void PlotFile::write_fluid_pressures()
 	}
 }
 
+//-----------------------------------------------------------------------------
+
+void PlotFile::write_temperatures()
+{
+	FEM& fem = *m_pfem;
+	float t;
+	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		FENode& node = fem.m_mesh.Node(i);
+		t = (float) node.m_T;
+		m_ar << t;
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void PlotFile::write_heat_flux()
+{
+	FEM& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
+
+	int i, j;
+
+	vector<vec3d> qn(fem.m_mesh.Nodes());
+	vector<int> val(fem.m_mesh.Nodes());
+	for (i=0; i<fem.m_mesh.Nodes(); ++i) val[i] = 0;
+
+	vec3d ew;
+	int n;
+	for (i=0; i<mesh.SolidElements(); ++i)
+	{
+		FESolidElement& el = mesh.SolidElement(i);
+
+		// calculate average flux
+		ew = vec3d(0,0,0);
+		for (j=0; j<el.GaussPoints(); ++j)
+		{
+			FEMaterialPoint& mp = *el.m_State[j];
+			FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
+
+			ew += pt->m_q;
+		}
+
+		ew /= el.GaussPoints();
+
+		// project to nodes
+		for (j=0; j<el.Nodes(); ++j)
+		{
+			n = el.m_node[j];
+			qn[n] += ew;
+			++val[n];
+		}
+	}
+	for (i=0; i<fem.m_mesh.Nodes(); ++i) if (val[i] != 0) qn[i] /= val[i];
+
+	// output nodal fluxes
+	float af[3];
+	for (i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		af[0] = (float) qn[i].x;
+		af[1] = (float) qn[i].y;
+		af[2] = (float) qn[i].z;
+
+		m_ar.write(af, sizeof(float), 3);
+	}
+}
+
+//-----------------------------------------------------------------------------
+
 void PlotFile::write_contact_pressures()
 {
 	FEM& fem = *m_pfem;
@@ -711,7 +796,7 @@ void PlotFile::write_reaction_forces()
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
-	FESolver& solver = *fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 
 	int N = mesh.Nodes(), i;

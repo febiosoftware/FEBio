@@ -165,6 +165,8 @@ void FEMesh::UnpackElement(FESolidElement& el, unsigned int nflag)
 		lm[7*N + 3*i  ] = -1;
 		lm[7*N + 3*i+1] = -1;
 		lm[7*N + 3*i+2] = -1;
+
+		lm[10*N + i] = id[10];
 	}
 
 	// copy nodal data to element arrays
@@ -237,6 +239,7 @@ void FEMesh::UnpackElement(FEShellElement& el, unsigned int nflag)
 		lm[7*N + 3*i+1] = id[8];
 		lm[7*N + 3*i+2] = id[9];
 
+		lm[10*N + i] = id[10];
 	}
 
 	// copy nodal data to element arrays
@@ -308,6 +311,8 @@ void FEMesh::UnpackElement(FESurfaceElement& el, unsigned int nflag)
 		lm[7*N + 3*i  ] = -1;
 		lm[7*N + 3*i+1] = -1;
 		lm[7*N + 3*i+2] = -1;
+
+		lm[10*N + i] = id[10];
 	}
 
 	// copy nodal data to element arrays
@@ -352,6 +357,8 @@ void FEMesh::Reset()
 		node.m_ap = node.m_at = vec3d(0,0,0);
 
 		node.m_pt = 0;
+
+		node.m_T = 0;
 	}
 
 	// update the mesh

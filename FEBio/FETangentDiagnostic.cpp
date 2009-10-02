@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FETangentDiagnostic.h"
 #include "FEBox.h"
+#include "FESolidSolver.h"
 
 void print_matrix(Logfile& log, matrix& m)
 {
@@ -78,7 +79,7 @@ bool FETangentDiagnostic::Run()
 	fem.m_Step[0].Init();
 
 	// get and initialize the solver
-	FESolver& solver = *fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 	solver.Init();
 
 	// solve the problem
@@ -139,7 +140,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	FEM& fem = m_fem;
 
 	// get the solver
-	FESolver& solver = *fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 
 	// get the mesh
 	FEMesh& mesh = fem.m_mesh;
@@ -199,7 +200,7 @@ double FETangentDiagnostic::residual(double d)
 
 	FEM& fem = dia.m_fem;
 	FEMesh& mesh = fem.m_mesh;
-	FESolver& solver = *fem.m_pStep->m_psolver;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 
 	FESolidElement& el = mesh.SolidElement(0);
 	mesh.UnpackElement(el);

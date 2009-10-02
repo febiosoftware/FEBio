@@ -529,6 +529,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 			FEPressureLoad& pc = m_PC[i];
 			ar << pc.blinear << pc.face << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
+			ar << pc.bc;
 		}
 
 		// rigid body displacements
@@ -596,6 +597,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 			FEPressureLoad& pc = m_PC[i];
 			ar >> pc.blinear >> pc.face >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
+			ar >> pc.bc;
 		}
 
 		// rigid body displacements
