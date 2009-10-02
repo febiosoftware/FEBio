@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FESlidingInterface2.h"
 #include "fem.h"
+#include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
 // FEContactSurface2
@@ -52,7 +53,7 @@ void FEContactSurface2::Init()
 	m_Lmp.zero();
 
 	// allocate biphasic stuff
-	if (m_pfem->m_pStep->m_itype == FE_STATIC_PORO)
+	if (m_pfem->m_pStep->m_nModule == FE_POROELASTIC)
 	{
 		m_pg.create(nint);
 		m_pg.zero();
@@ -332,7 +333,7 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_npass = 1;
 	m_stol = 0.01;
 	m_bsymm = true;
-	m_srad = 0.01;
+	m_srad = 0.1;
 
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -345,7 +346,7 @@ void FESlidingInterface2::Init()
 	m_ss.Init();
 	m_ms.Init();
 
-	bool bporo = m_pfem->m_pStep->m_itype == FE_STATIC_PORO;
+	bool bporo = m_pfem->m_pStep->m_nModule == FE_POROELASTIC;
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
@@ -374,7 +375,7 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 	vec3d r, nu;
 	double rs[2];
 
-	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
 
 	double ps[4], p1;
 
@@ -440,7 +441,7 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				// to Gerard's notes.
 				double g = nu*(r - q);
 
-				if (g < R)
+				if ((g >= 0) && (g <= R))
 				{
 					ss.m_gap[n] = g;
 
@@ -483,7 +484,7 @@ void FESlidingInterface2::Update()
 	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
 
 	// set poro flag
-	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
 
 	// only continue if we are doing a poro-elastic simulation
 	if (bporo == false) return;
@@ -546,8 +547,15 @@ void FESlidingInterface2::Update()
 			}
 			else
 			{
-				// TODO: I still need to do this case
-				assert(false);
+				matrix At = A.transpose();
+				matrix C = At*A;
+				matrix D = C.inverse()*At;
+
+				for (i=0; i<neln; ++i)
+				{
+					tn[i] = 0;
+					for (j=0; j<nint; ++j) tn[i] += D[i][j]*ti[j];
+				}
 			}
 
 			for (i=0; i<neln; ++i)
@@ -631,8 +639,15 @@ void FESlidingInterface2::Update()
 				}
 				else
 				{
-					// TODO: I still need to do this case
-					assert(false);
+					matrix At = A.transpose();
+					matrix C = At*A;
+					matrix D = C.inverse()*At;
+
+					for (i=0; i<neln; ++i)
+					{
+						tn[i] = 0;
+						for (j=0; j<nint; ++j) tn[i] += D[i][j]*ti[j];
+					}
 				}
 
 				// now evaluate the traction at the intersection point
@@ -692,10 +707,10 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 	FEMesh* pm = m_ss.GetMesh();
 
 	// get the solver
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	// set poro flag
-	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
 	
 	// get the poro-elasticity symmetry flag
 	bool bsymm = m_pfem->m_bsym_poro;
@@ -831,7 +846,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					// do the biphasic stuff
 					// TODO: I should only do this when the node is actually in contact
 					//       in other words, when g >= 0
-					if (bporo && (g >= 0))
+					if (bporo && (tn > 0))
 					{
 						// calculate nr of pressure dofs
 						int ndof = nseln + nmeln;
@@ -873,7 +888,7 @@ void FESlidingInterface2::ContactStiffness()
 	matrix ke;
 
 	// set the poro flag
-	bool bporo = (m_pfem->m_pStep->m_itype == FE_STATIC_PORO);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
 
 	// get the poroelasticity symmetry flag
 	bool bsymm = m_pfem->m_bsym_poro;
@@ -882,7 +897,7 @@ void FESlidingInterface2::ContactStiffness()
 	FEMesh* pm = m_ss.GetMesh();
 
 	// get the solver
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;
@@ -1111,7 +1126,7 @@ void FESlidingInterface2::ContactStiffness()
 					psolver->AssembleStiffness(en, LM, ke);
 
 					// --- B I P H A S I C   S T I F F N E S S ---
-					if (bporo && (g >= 0))
+					if (bporo && (tn > 0))
 					{
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
