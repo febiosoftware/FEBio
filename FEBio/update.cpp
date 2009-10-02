@@ -340,7 +340,7 @@ void FESolidSolver::UpdateStresses()
 			gw = el.GaussWeights();
 
 			// get the material
-			FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
+			FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 
 			// extract the elastic component
 			FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
@@ -472,7 +472,7 @@ void FESolidSolver::UpdateStresses()
 			gw = el.GaussWeights();
 
 			// get the material
-			FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
+			FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 
 			// extract the elastic component
 			FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());

@@ -47,12 +47,6 @@ public:
 	FEMaterial() { m_szname[0] = 0; }
 	virtual ~FEMaterial() {}
 
-	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt) = 0;
-
-	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt) = 0;
-
 	//! set/get material name
 	void SetName(const char* sz) { strcpy(m_szname, sz); }
 	const char* GetName() { return m_szname; }
@@ -62,12 +56,6 @@ public:
 
 	//! performs initialization and parameter checking
 	virtual void Init(){}
-
-	//! return the bulk modulus
-	virtual double BulkModulus() = 0;
-
-	//! return the material density
-	virtual double Density() = 0;
 
 public:
 	// this is the first GetParameterList function
@@ -82,9 +70,29 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Base class for solid-materials.
+//! These materials need to define the stress and tangent functions.
+//!
+class FESolidMaterial : public FEMaterial
+{
+public:
+	//! calculate stress at material point
+	virtual mat3ds Stress(FEMaterialPoint& pt) = 0;
+
+	//! calculate tangent stiffness at material point
+	virtual tens4ds Tangent(FEMaterialPoint& pt) = 0;
+
+	//! return the bulk modulus
+	virtual double BulkModulus() = 0;
+
+	//! return the material density
+	virtual double Density() = 0;
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for (hyper-)elastic materials
 
-class FEElasticMaterial : public FEMaterial
+class FEElasticMaterial : public FESolidMaterial
 {
 public:
 	FEElasticMaterial() { m_density = 1; m_pmap = 0;}
@@ -110,7 +118,7 @@ public:
 //! instance, the FEPoroElastic and FEViscoElastic are two examples of nested
 //! materials.
 
-class FENestedMaterial : public FEMaterial
+class FENestedMaterial : public FESolidMaterial
 {
 public:
 	FENestedMaterial() { m_nBaseMat = -1; m_pBase = 0; }

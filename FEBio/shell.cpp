@@ -129,7 +129,7 @@ void FESolidSolver::ElementStiffness(FEShellElement& el, matrix& ke)
 	mat3ds s;
 
 	// get the element's material
-	FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
+	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 
 	// extract the elastic component
 	FEElasticMaterial* pme = m_fem.GetElasticMaterial(el.GetMatID());
@@ -386,7 +386,7 @@ void FESolidSolver::ElementStiffness(FEShellElement& el, matrix& ke)
 void FESolidSolver::BodyForces(FEShellElement& el, vector<double>& fe)
 {
 	// get the element's material
-	FEMaterial* pme = m_fem.GetMaterial(el.GetMatID());
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 
 	// material density
 	double dens = pme->Density();

@@ -14,11 +14,6 @@ public:
 
 public:
 	FEMaterialPoint* CreateMaterialPointData() { return new FEHeatMaterialPoint; }
-	double BulkModulus() { return 0; }
-	double Density() { return 0; }
-
-	mat3ds Stress(FEMaterialPoint& pt) { return mat3ds(); }
-	tens4ds Tangent(FEMaterialPoint& pt) { return tens4ds(); }
 
 public:
 	void Conductivity(double D[3][3]);

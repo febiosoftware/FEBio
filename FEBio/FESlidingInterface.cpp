@@ -171,7 +171,7 @@ void FESlidingInterface::CalcAutoPenalty(FEContactSurface& s)
 		if (bfound)
 		{
 			// get the element's material
-			FEMaterial* pm = m_pfem->GetMaterial(pe->GetMatID());
+			FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 
 			double K = pm->BulkModulus();
 

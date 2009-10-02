@@ -969,7 +969,7 @@ void FESolidSolver::ElementInertialStiffness(FESolidElement& el, matrix& ke)
 	double detJ0;
 
 	// get the material
-	FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
+	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 
 	double a = 4.0 / (m_fem.m_pStep->m_dt*m_fem.m_pStep->m_dt);
 	double d = pm->Density();
@@ -1093,7 +1093,7 @@ void FESolidSolver::MaterialStiffness(FESolidElement &el, matrix &ke)
 	const double *gw = el.GaussWeights();
 
 	// see if this is a poroelastic material
-	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 	bool bporo = false;
 	if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
 
@@ -1384,7 +1384,7 @@ void FESolidSolver::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 	double DBL[6][3];
 
 	// see if this is a poroelastic material
-	FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 	bool bporo = false;
 	if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
 	
@@ -2343,7 +2343,7 @@ void FESolidSolver::BodyForces(FESolidElement& el, vector<double>& fe)
 	// jacobian
 	double detJ, dens;
 
-	FEMaterial* pme = m_fem.GetMaterial(el.GetMatID());
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 
 	dens = pme->Density();
 
@@ -2820,7 +2820,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 		FESolidElement& el = mesh.SolidElement(iel);
 		mesh.UnpackElement(el);
 
-		FEMaterial* pme = m_fem.GetMaterial(el.GetMatID());
+		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 
 		double d = pme->Density();
 
