@@ -53,7 +53,7 @@ void XMLTag::value(double* pf, int n)
 			*sze = ',';
 			sz = sze+1;
 		}
-	}	
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void XMLTag::value(float* pf, int n)
 			*sze = ',';
 			sz = sze+1;
 		}
-	}	
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ void XMLTag::value(int* pi, int n)
 			*sze = ',';
 			sz = sze+1;
 		}
-	}	
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ bool XMLReader::Open(const char* szfile)
 	if (m_fp != 0) return false;
 
 	// open the file
-	m_fp = fopen(szfile, "rt");
+	m_fp = fopen(szfile, "rb");
 	if (m_fp == 0) return false;
 
 	// read the first line
@@ -310,7 +310,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 	// record the startline
 	tag.m_nstart_line = m_nline;
 
-	if (ch == '/') 
+	if (ch == '/')
 	{
 		tag.m_bend = true;
 		ch = GetChar();
@@ -396,8 +396,8 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 			while (isspace(ch=GetChar()));
 
 			int n = 0;
-			do 
-			{ 
+			do
+			{
 				if (ch != *sz++) throw UnmatchedEndTag(tag);
 				ch = GetChar();
 				++n;
@@ -408,7 +408,7 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 			// skip whitespace
 			while (isspace(ch)) ch=GetChar();
 			if (ch != '>') throw XMLSyntaxError();
-	
+
 			// find the start of the next tag
 			if (tag.m_nlevel)
 			{
@@ -426,7 +426,7 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 			fseek(m_fp, -2, SEEK_CUR);
 		}
 	}
-	else 
+	else
 	{
 		fseek(m_fp, -1, SEEK_CUR);
 

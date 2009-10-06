@@ -45,7 +45,7 @@ char* FENIKEImport::read_line(FILE* fp, char* szline, int n)
 bool FENIKEImport::Load(FEM& fem, const char* szfile)
 {
 	// open the file
-	if (Open(szfile, "rt") == 0) return errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);
+	if (Open(szfile, "rb") == 0) return errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);
 
 	// keep a copy of the input file name
 	fem.SetInputFilename(szfile);
@@ -114,13 +114,13 @@ bool FENIKEImport::ReadControlDeck(FEM& fem)
 	if (strcmp(szf,"FL") != 0) return errf(szerr[ERR_FORMAT]);
 
 	// -------- control card 3 --------
-	// read nr of timesteps, time step size, auto step flag, opt nr, of iterations, min step, max step, ... 
+	// read nr of timesteps, time step size, auto step flag, opt nr, of iterations, min step, max step, ...
 	if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 	char szauto[5] = {0};
 	nread = sscanf(szline, "%10d%10lg %4s%5d%5d%10lg%10lg", &fem.m_pStep->m_ntime, &fem.m_pStep->m_dt0, szauto, &fem.m_pStep->m_maxretries, &fem.m_pStep->m_iteopt, &fem.m_pStep->m_dtmin, &fem.m_pStep->m_dtmax);
 	if (nread != 7) return errf(szerr[ERR_CC], 3);
 	if ((strcmp(szauto,"auto") == 0) || (strcmp(szauto,"AUTO") == 0)) fem.m_pStep->m_bautostep = true;
-	
+
 	if (fem.m_pStep->m_iteopt == 0) fem.m_pStep->m_iteopt = 11;
 	if (fem.m_pStep->m_maxretries == 0) fem.m_pStep->m_maxretries = 5;
 	if (fem.m_pStep->m_dtmin == 0) fem.m_pStep->m_dtmin = fem.m_pStep->m_dt0 / 3.0;
@@ -130,7 +130,7 @@ bool FENIKEImport::ReadControlDeck(FEM& fem)
 
 	// -------- control card 4 --------
 	// read nr of loadcurves, nr of displ bound cards, nr of press bound cards, nr of conc. nodal force cards
-	if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile); 
+	if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 	int ax, ay, az;
 	nread = sscanf(szline, "%5d%*5d%5d%5d%5d%*5d%*5d%5d%5d%5d", &m_nlc, &m_ncnf, &m_npr, &m_ndis, &ax, &ay, &az);
 	if (nread != 7) return errf(szerr[ERR_CC], 4);
@@ -270,7 +270,7 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 				A = mp[0][0];
 				B = mp[1][0];
 				v = mp[2][0];
-	
+
 				pmat->c1 = A;
 				pmat->c2 = B;
 
@@ -597,8 +597,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		{
 			return errf(szerr[ERR_RB], rb);
 		}
-				
-		for (j=0; j<nread-1; ++j, ++N, ++nrn) 
+
+		for (j=0; j<nread-1; ++j, ++N, ++nrn)
 		{
 			FERigidNode& rin = fem.m_RN[nrn];
 			rin.nid = rn[j]-1;
@@ -849,7 +849,7 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 
 			if (n[3] == n[2])
 				el.SetType(FE_TRI);
-			else 
+			else
 				el.SetType(FE_QUAD);
 
 			N = el.Nodes();
