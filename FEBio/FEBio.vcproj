@@ -642,6 +642,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FETractionConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FETransIsoMooneyRivlin.cpp"
 				>
 			</File>
@@ -1121,6 +1125,10 @@
 			</File>
 			<File
 				RelativePath=".\FETiedInterface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FETractionConstraint.h"
 				>
 			</File>
 			<File

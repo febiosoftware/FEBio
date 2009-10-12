@@ -27,6 +27,7 @@
 #include "FERigidJoint.h"
 #include "FEAnalysis.h"
 #include "FEAugLagLinearConstraint.h"
+#include "FETractionConstraint.h"
 
 #include <list>
 using namespace std;
@@ -488,6 +489,9 @@ public:
 
 		// Augmented Lagrangian linear constraint data
 		list<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
+
+		// traction constraints data
+		list<FETractionConstraintSet*>	m_RCSet;	//!< traction constraints data
 	//}
 
 	// --- Direct Solver Data ---

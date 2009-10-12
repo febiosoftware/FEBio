@@ -171,6 +171,9 @@ public:
 
 		//! Calculate linear constraint forces
 		void LinearConstraintForces(vector<double>& R);
+
+		//! Calculate traction constraint forces
+		void TractionConstraintForces(vector<double>& R);
 	//}
 
 protected:
@@ -191,6 +194,7 @@ public:
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
 	vector<double> m_R0;	//!< residual at iteration i-1
 	vector<double> m_R1;	//!< residual at iteration i
+	vector<double> m_Ti;	//!< internal nodal tractions (used only for traction constraints for now)
 
 	// BFGS update vectors
 	matrix			m_V;
