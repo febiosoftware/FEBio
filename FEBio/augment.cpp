@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FESolidSolver::Augment
@@ -18,6 +19,9 @@ bool FESolidSolver::Augment()
 {
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
+
+	// Get the logfile
+	Logfile& logf = GetLogfile();
 
 	// Do rigid joint augmentations
 	if (m_fem.m_nrj)
@@ -94,9 +98,9 @@ bool FESolidSolver::Augment()
 				double pctn = 0;
 				if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
 
-				m_log.printf(" material %d\n", i+1);
-				m_log.printf("                        CURRENT         CHANGE        REQUIRED\n");
-				m_log.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
+				logf.printf(" material %d\n", i+1);
+				logf.printf("                        CURRENT         CHANGE        REQUIRED\n");
+				logf.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
 
 				if (pctn >= pmi->m_atol)
 				{

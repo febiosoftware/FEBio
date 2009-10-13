@@ -7,6 +7,7 @@
 #include "FEException.h"
 #include "FENodeReorder.h"
 #include "FERigid.h"
+#include "log.h"
 
 // Forward declarations
 void Hello(FILE* fp);
@@ -33,14 +34,17 @@ bool FEM::Init()
 {
 	int i;
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// Open the logfile
-	m_log.open(m_szlog);
+	log.open(m_szlog);
 
 	// if we don't want to output anything we only output to the logfile
-	if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) m_log.SetMode(Logfile::FILE_ONLY);
+	if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
 
 	// print welcome message to file
-	Hello(m_log);
+	Hello(log);
 
 	// check step data
 	for (int i=0; i<m_Step.size(); ++i)
@@ -69,9 +73,9 @@ bool FEM::Init()
 	if (ni != 0) 
 	{
 		if (ni == 1)
-			m_log.printbox("WARNING", "%d isolated vertex removed.", ni);
+			log.printbox("WARNING", "%d isolated vertex removed.", ni);
 		else
-			m_log.printbox("WARNING", "%d isolated vertices removed.", ni);
+			log.printbox("WARNING", "%d isolated vertices removed.", ni);
 	}
 
 	// initialize rigid body data
@@ -99,7 +103,7 @@ bool FEM::Init()
 		}
 		catch (NegativeJacobian e)
 		{
-			m_log.printbox("F A T A L   E R R O R", "A negative jacobian was detected at\n integration point %d of element %d.\nDid you use the right node numbering?", e.m_iel, e.m_ng);
+			log.printbox("F A T A L   E R R O R", "A negative jacobian was detected at\n integration point %d of element %d.\nDid you use the right node numbering?", e.m_iel, e.m_ng);
 			return false;
 		}
 
@@ -133,7 +137,7 @@ bool FEM::Init()
 						if (fabs(m.det() - 1) > 1e-7)
 						{
 							// this element did not get specified a user-defined fiber direction
-							m_log.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+							log.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
 							bmerr = true;
 						}
 					}
@@ -180,7 +184,7 @@ bool FEM::Init()
 						if (fabs(m.det() - 1) > 1e-7)
 						{
 							// this element did not get specified a user-defined fiber direction
-							m_log.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
+							log.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
 							bmerr = true;
 						}
 					}
@@ -213,13 +217,13 @@ bool FEM::Init()
 		}
 		catch (MaterialError e)
 		{
-			m_log.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			m_log.printf("ERROR: %s\n\n", e.Error());
+			log.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			log.printf("ERROR: %s\n\n", e.Error());
 			return false;
 		}
 		catch (...)
 		{
-			m_log.printf("A fatal error occured during material intialization\n\n");
+			log.printf("A fatal error occured during material intialization\n\n");
 			return false;
 		}
 
@@ -238,13 +242,13 @@ bool FEM::Init()
 		if (el.n1 <0 || el.n1 >= m_mesh.Nodes() ||
 			el.n2 <0 || el.n2 >= m_mesh.Nodes() )
 		{
-			m_log.printf("Invalid node number for discrete element %d\n", i+1);
+			log.printf("Invalid node number for discrete element %d\n", i+1);
 			return false;
 		}
 
 		if (el.E < 0)
 		{
-			m_log.printbox("INPUT ERROR", "Invalide value for sping constant of discrete element %d", i+1);
+			log.printbox("INPUT ERROR", "Invalide value for sping constant of discrete element %d", i+1);
 			return false;
 		}
 	}
@@ -257,7 +261,7 @@ bool FEM::Init()
 	{
 		if (m_plot.Open(*this, m_szplot) == false)
 		{
-			m_log.printf("ERROR : Failed creating PLOT database\n");
+			log.printf("ERROR : Failed creating PLOT database\n");
 			return false;
 		}
 	}
@@ -510,12 +514,15 @@ bool FEM::Reset()
 	// set first time step
 	m_pStep->m_dt = m_pStep->m_dt0;
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
 		if (m_plot.Open(*this, m_szplot) == false)
 		{
-			m_log.printf("ERROR : Failed creating PLOT database\n");
+			log.printf("ERROR : Failed creating PLOT database\n");
 			return false;
 		}
 	}
@@ -528,13 +535,13 @@ bool FEM::Reset()
 	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot.Write(*this);
 
 	// reset the log file
-	m_log.open(m_szlog);
+	log.open(m_szlog);
 
 	// if we don't want to output anything we only output to the logfile
-	if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) m_log.SetMode(Logfile::FILE_ONLY);
+	if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
 
 	// print welcome message to file
-	Hello(m_log);
+	Hello(log);
 
 	// do the callback
 	DoCallback();

@@ -5,6 +5,7 @@
 #include "XMLReader.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
@@ -294,7 +295,7 @@ bool FEM::Configure(const char *szfile)
 	}
 
 	// get the logfile
-	Logfile& log = m_log;
+	Logfile& log = GetLogfile();
 
 	// loop over all child tags
 	try

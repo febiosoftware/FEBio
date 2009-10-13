@@ -5,6 +5,7 @@
 #include "stack.h"
 #include "fem.h"
 #include "console.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! This is the main solve method. This function loops over all analysis steps
@@ -68,16 +69,19 @@ bool FEM::Solve()
 	// get and print elapsed time
 	char sztime[64];
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	m_TotalTime.time_str(sztime);
-	m_log.printf("\n Elapsed time : %s\n\n", sztime);
+	log.printf("\n Elapsed time : %s\n\n", sztime);
 
 	if (bconv)
 	{
-		m_log.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
+		log.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
 	}
 	else
 	{
-		m_log.printf("\n E R R O R   T E R M I N A T I O N\n\n");
+		log.printf("\n E R R O R   T E R M I N A T I O N\n\n");
 	}
 
 	pShell->SetTitle("(%s) %s - FEBio", (bconv?"NT":"ET"), m_szfile_title);

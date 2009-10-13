@@ -6,6 +6,7 @@
 #include "FESlidingInterface.h"
 #include "fem.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FESlidingInterface
@@ -256,7 +257,7 @@ void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& 
 	FEMesh& mesh = *ss.GetMesh();
 
 	// get the logfile
-	Logfile& log = m_pfem->m_log;
+	Logfile& log = GetLogfile();
 
 	// loop over all slave nodes
 	for (i=0; i<ss.Nodes(); ++i)
@@ -1431,7 +1432,8 @@ bool FESlidingInterface::Augment(int naug)
 
 	if (naug == 0) normg0 = 0;
 
-	Logfile& log = m_pfem->m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
 
 	// calculate and print convergence norms
 	double lnorm = 0, gnorm = 0;

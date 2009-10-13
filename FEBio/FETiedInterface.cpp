@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "FENNQuery.h"
+#include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FETiedInterface
@@ -706,7 +707,8 @@ bool FETiedInterface::Augment(int naug)
 	normL1 = sqrt(normL1);
 	normgc = sqrt(normgc / N);
 
-	Logfile& log = m_pfem->m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
 
 	// check convergence of constraints
 	log.printf(" tied interface # %d\n", m_nID);

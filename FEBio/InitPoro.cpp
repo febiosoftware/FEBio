@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FEPoroElastic.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Initialize poro-elastic data
@@ -37,6 +38,9 @@ bool FEM::InitPoro()
 		return true;
 	}
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// see if we are the symmetric version or not
 	if (m_bsym_poro == false) 
 	{
@@ -46,7 +50,7 @@ bool FEM::InitPoro()
 		if (m_pStep->m_psolver->m_maxups != 0)
 		{
 			m_pStep->m_psolver->m_maxups = 0;
-			m_log.printbox("WARNING", "The non-symmetric biphasic algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+			log.printbox("WARNING", "The non-symmetric biphasic algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}
 

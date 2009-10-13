@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FERigid.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 //////////////////////////////////////////////////////////////////////
 // DataStore
@@ -85,7 +86,7 @@ bool DataRecord::Write()
 	if (strlen(m_szname) == 0) sz = m_szdata; else sz = m_szname;
 	double val;
 
-	FILE* fplog = fem.m_log;
+	FILE* fplog = GetLogfile();
 
 	// make a note in the log file
 	fprintf(fplog, "\nData Record #%d\n", m_nid);

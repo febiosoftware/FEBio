@@ -5,6 +5,7 @@
 #include "FEDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEBox.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! The diagnose() function performs a diagnostic test on FEBio. 
@@ -42,8 +43,10 @@ bool diagnose(FEM& fem, const char* szfile)
 	// the return value will designate that pass/fail result
 	bool bret = pdia->Run();
 
-	if (bret) fem.m_log.printf("Diagnostic passed\n");
-	else fem.m_log.printf("Diagnostic failed\n");
+	Logfile& log = GetLogfile();
+
+	if (bret) log.printf("Diagnostic passed\n");
+	else log.printf("Diagnostic failed\n");
 
 	return bret;
 }

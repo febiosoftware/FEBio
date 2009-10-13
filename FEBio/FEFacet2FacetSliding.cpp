@@ -2,6 +2,7 @@
 #include "FEFacet2FacetSliding.h"
 #include "fem.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // FEFacetSlidingSurface
@@ -374,6 +375,9 @@ void FEFacet2FacetSliding::ContactStiffness()
 	// get the solver
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;
 
@@ -385,7 +389,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 		if (nref >= ni)
 		{
 			knmult = 1; 
-			m_pfem->m_log.printf("Higher order stiffness terms included.\n");
+			log.printf("Higher order stiffness terms included.\n");
 		}
 		else knmult = 0;
 	}
@@ -727,7 +731,8 @@ bool FEFacet2FacetSliding::Augment(int naug)
 
 	if (naug == 0) normg0 = 0;
 
-	Logfile& log = m_pfem->m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
 
 	// calculate and print convergence norms
 	double lnorm = 0, gnorm = 0;

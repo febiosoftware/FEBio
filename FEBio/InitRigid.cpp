@@ -2,6 +2,7 @@
 #include "fem.h"
 #include "FERigid.h"
 #include "stack.h"
+#include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEM::InitRigidBodies
@@ -212,6 +213,9 @@ bool FEM::InitRigidBodies()
 		}
 	}
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// set up rigid joints
 	if (m_nrj > 0)
 	{
@@ -224,7 +228,7 @@ bool FEM::InitRigidBodies()
 			pm = dynamic_cast<FERigid*> (GetMaterial(rj.m_nRBa));
 			if (pm == 0)
 			{
-				m_log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+				log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
 				return false;
 			}
 			rj.m_nRBa = pm->m_nRB;
@@ -232,7 +236,7 @@ bool FEM::InitRigidBodies()
 			pm = dynamic_cast<FERigid*> (GetMaterial(rj.m_nRBb));
 			if (pm == 0)
 			{
-				m_log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+				log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
 				return false;
 			}
 			rj.m_nRBb = pm->m_nRB;

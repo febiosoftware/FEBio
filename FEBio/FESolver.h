@@ -42,7 +42,6 @@ public:
 	bool CreateStiffness(bool breset);
 
 public:
-	Logfile&	m_log;	//!< reference to log file
 	FEM&		m_fem;	//!< reference the FE data structure
 
 	// timers

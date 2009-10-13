@@ -4,6 +4,7 @@
 #include "FERigid.h"
 #include "stack.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -32,6 +33,9 @@ bool FESolidSolver::SolveStep(double time)
 {
 	bool bret;
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	try
 	{
 		// let's try to call Quasin
@@ -40,38 +44,38 @@ bool FESolidSolver::SolveStep(double time)
 	catch (NegativeJacobian e)
 	{
 		// A negative jacobian was detected
-		m_log.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+		log.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
 		if (m_fem.m_debug) m_fem.m_plot.Write(m_fem);
 		return false;
 	}
 	catch (MaxStiffnessReformations)
 	{
 		// max nr of reformations is reached
-		m_log.printbox("ERROR", "Max nr of reformations reached.");
+		log.printbox("ERROR", "Max nr of reformations reached.");
 		return false;
 	}
 	catch (ForceConversion)
 	{
 		// user forced conversion of problem
-		m_log.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
+		log.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
 		return true;
 	}
 	catch (IterationFailure)
 	{
 		// user caused a forced iteration failure
-		m_log.printbox("WARNING", "User forced iteration failure.");
+		log.printbox("WARNING", "User forced iteration failure.");
 		return false;
 	}
 	catch (ZeroLinestepSize)
 	{
 		// a zero line step size was detected
-		m_log.printbox("ERROR", "Zero line step size.");
+		log.printbox("ERROR", "Zero line step size.");
 		return false;
 	}
 	catch (EnergyDiverging)
 	{
 		// problem was diverging after stiffness reformation
-		m_log.printbox("ERROR", "Problem diverging uncontrollably.");
+		log.printbox("ERROR", "Problem diverging uncontrollably.");
 		return false;
 	}
 
@@ -302,15 +306,18 @@ bool FESolidSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	m_fem.m_log.printf("\n===== beginning time step %d : %lg =====\n", m_fem.m_pStep->m_ntimesteps+1, m_fem.m_ftime);
+	// get the logfile
+	Logfile& log = GetLogfile();
+
+	log.printf("\n===== beginning time step %d : %lg =====\n", m_fem.m_pStep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
 	{
-		oldmode = m_log.GetMode();
-		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) m_log.SetMode(Logfile::FILE_ONLY);
-		m_log.printf(" %d\n", m_niter+1);
-		m_log.SetMode(oldmode);
+		oldmode = log.GetMode();
+		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) log.SetMode(Logfile::FILE_ONLY);
+		log.printf(" %d\n", m_niter+1);
+		log.SetMode(oldmode);
 
 		// assume we'll converge. 
 		bconv = true;
@@ -363,18 +370,18 @@ bool FESolidSolver::Quasin(double time)
 		if (m_normE1 > m_normEm) bconv = false;
 
 		// print convergence summary
-		oldmode = m_log.GetMode();
-		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) m_log.SetMode(Logfile::FILE_ONLY);
-		m_log.printf(" Nonlinear solution status: time= %lg\n", time); 
-		m_log.printf("\tstiffness updates             = %d\n", m_nups);
-		m_log.printf("\tright hand side evaluations   = %d\n", m_nrhs);
-		m_log.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		m_log.printf("\tstep from line search         = %lf\n", s);
-		m_log.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		m_log.printf("\t   residual         %15le %15le %15le \n", m_normRi, m_normR1, m_Rtol*m_normRi);
-		m_log.printf("\t   energy           %15le %15le %15le \n", m_normEi, m_normE1, m_Etol*m_normEi);
-		m_log.printf("\t   displacement     %15le %15le %15le \n", m_normUi, m_normu ,(m_Dtol*m_Dtol)*m_normU );
-		m_log.SetMode(oldmode);
+		oldmode = log.GetMode();
+		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) log.SetMode(Logfile::FILE_ONLY);
+		log.printf(" Nonlinear solution status: time= %lg\n", time); 
+		log.printf("\tstiffness updates             = %d\n", m_nups);
+		log.printf("\tright hand side evaluations   = %d\n", m_nrhs);
+		log.printf("\tstiffness matrix reformations = %d\n", m_nref);
+		log.printf("\tstep from line search         = %lf\n", s);
+		log.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+		log.printf("\t   residual         %15le %15le %15le \n", m_normRi, m_normR1, m_Rtol*m_normRi);
+		log.printf("\t   energy           %15le %15le %15le \n", m_normEi, m_normE1, m_Etol*m_normEi);
+		log.printf("\t   displacement     %15le %15le %15le \n", m_normUi, m_normu ,(m_Dtol*m_Dtol)*m_normU );
+		log.SetMode(oldmode);
 
 		// check if we have converged. 
 		// If not, calculate the BFGS update vectors
@@ -384,19 +391,19 @@ bool FESolidSolver::Quasin(double time)
 			{
 				// check for almost zero-residual on the first iteration
 				// this might be an indication that there is no force on the system
-				m_log.printbox("WARNING", "No force acting on the system.");
+				log.printbox("WARNING", "No force acting on the system.");
 				bconv = true;
 			}
 			else if (s < m_LSmin)
 			{
 				// check for zero linestep size
-				m_log.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
+				log.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
 			else if (m_normE1 > m_normEm)
 			{
 				// check for diverging
-				m_log.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
+				log.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
 				m_normEm = m_normE1;
 				m_normEi = m_normE1;
 				m_normRi = m_normR1;
@@ -415,7 +422,7 @@ bool FESolidSolver::Quasin(double time)
 							// Stiffness update has failed.
 							// this might be due a too large condition number
 							// or the update was no longer positive definite.
-							m_log.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
+							log.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
 							breform = true;
 						}
 					}
@@ -427,7 +434,7 @@ bool FESolidSolver::Quasin(double time)
 
 						// print a warning only if the user did not intent full-Newton
 						if (m_maxups > 0)
-							m_log.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+							log.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 
 					}
 				}
@@ -442,7 +449,7 @@ bool FESolidSolver::Quasin(double time)
 			// reform stiffness matrices if necessary
 			if (breform)
 			{
-				m_log.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+				log.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
 				// reform the matrix
 				if (ReformStiffness() == false) break;
@@ -458,7 +465,7 @@ bool FESolidSolver::Quasin(double time)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
 
-			m_log.printf("\n........................ augmentation # %d\n", m_naug+1);
+			log.printf("\n........................ augmentation # %d\n", m_naug+1);
 
 			// do the augmentations
 			bconv = Augment();
@@ -482,7 +489,7 @@ bool FESolidSolver::Quasin(double time)
 		m_niter++;
 
 		// let's flush the logfile to make sure the last output will not get lost
-		m_log.flush();
+		log.flush();
 
 		// check for CTRL+C interruption
 		if (m_bsig)
@@ -497,12 +504,12 @@ bool FESolidSolver::Quasin(double time)
 	// print a convergence summary to the log file
 	if (bconv)
 	{
-		Logfile::MODE mode = m_log.SetMode(Logfile::FILE_ONLY);
-		m_log.printf("\nconvergence summary\n");
-		m_log.printf("    number of iterations   : %d\n", m_niter);
-		m_log.printf("    number of reformations : %d\n", m_nref);
+		Logfile::MODE mode = log.SetMode(Logfile::FILE_ONLY);
+		log.printf("\nconvergence summary\n");
+		log.printf("    number of iterations   : %d\n", m_niter);
+		log.printf("    number of reformations : %d\n", m_nref);
 
-		m_log.SetMode(mode);
+		log.SetMode(mode);
 	}
 
 	// if converged we update the total displacements
@@ -585,10 +592,13 @@ double FESolidSolver::LineSearch()
 
 	double rmin = fabs(r0);
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
 	{
-		m_fem.m_log.printf("\nEntering line search\n");
-		m_fem.m_log.printf("       STEPSIZE     INITIAL        CURRENT         REQUIRED\n");
+		log.printf("\nEntering line search\n");
+		log.printf("       STEPSIZE     INITIAL        CURRENT         REQUIRED\n");
 	}
 
 	do
@@ -634,7 +644,7 @@ double FESolidSolver::LineSearch()
 
 		if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
 		{
-			m_fem.m_log.printf("%15lf%15lg%15lg%15lg\n", s, fabs(r0), fabs(r1), fabs(r0*m_LStol));
+			log.printf("%15lf%15lg%15lg%15lg\n", s, fabs(r0), fabs(r1), fabs(r0*m_LStol));
 		}
 
 		if (r > m_LStol)
@@ -676,12 +686,12 @@ double FESolidSolver::LineSearch()
 	{
 		if ((r < m_LStol) && (n < nmax))
 		{
-			m_fem.m_log.printf("------------------------------------------------------------\n");
-			m_fem.m_log.printf("%15lf%15lg%15lg%15lg\n\n", s, fabs(r0), fabs(r1), fabs(r0*m_LStol));
+			log.printf("------------------------------------------------------------\n");
+			log.printf("%15lf%15lg%15lg%15lg\n\n", s, fabs(r0), fabs(r1), fabs(r0*m_LStol));
 		}
 		else if (n >= nmax)
 		{
-			m_fem.m_log.printf("Line search failed: max iterations reached.\n\n");
+			log.printf("Line search failed: max iterations reached.\n\n");
 		}
 	}
 

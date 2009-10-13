@@ -3,6 +3,7 @@
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 #include "tens4d.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
@@ -2503,11 +2504,14 @@ bool FESolidSolver::InternalFluidWork(FESolidElement& el, vector<double>& fe)
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// get the element's material
 	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (m_fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		m_log.printbox("FATAL ERROR", "Incorrect material type\n");
+		log.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 
@@ -2630,11 +2634,14 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 			ke[i][j] = ks[i][j];
 		}
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// get the element's material
 	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (m_fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		m_log.printbox("FATAL ERROR", "Incorrect material type\n");
+		log.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 

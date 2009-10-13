@@ -5,6 +5,7 @@
 #include "FileImport.h"
 #include "NikeImport.h"
 #include "FEBioImport.h"
+#include "log.h"
 #include <string.h>
 
 // Forward declarations
@@ -60,113 +61,116 @@ void FEM::EchoInput()
 	// echo input
 	int i, j;
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// we only output this data to the log file and not the screen
-	Logfile::MODE old_mode = m_log.SetMode(Logfile::FILE_ONLY);
+	Logfile::MODE old_mode = log.SetMode(Logfile::FILE_ONLY);
 
-	m_log.printf("%s\n\n", m_sztitle);
+	log.printf("%s\n\n", m_sztitle);
 
-	m_log.printf(" FILES USED\n");
-	m_log.printf("===========================================================================\n");
-	m_log.printf("\tInput file : %s\n", m_szfile);
-	m_log.printf("\tPlot file  : %s\n", m_szplot);
-	m_log.printf("\tLog file   : %s\n", m_szlog);
-	m_log.printf("\n\n");
+	log.printf(" FILES USED\n");
+	log.printf("===========================================================================\n");
+	log.printf("\tInput file : %s\n", m_szfile);
+	log.printf("\tPlot file  : %s\n", m_szplot);
+	log.printf("\tLog file   : %s\n", m_szlog);
+	log.printf("\n\n");
 
-	m_log.printf(" CONTROL DATA\n");
-	m_log.printf("===========================================================================\n");
-	m_log.printf("Module type ...................................... : %d\n", m_pStep->m_nModule);
-	m_log.printf("\t   eq.%2d: solid mechanics\n", FE_SOLID);
-	m_log.printf("\t   eq.%2d: poroelastic\n", FE_POROELASTIC);
-	m_log.printf("\t   eq.%2d: heat transfer\n", FE_HEAT);
-	m_log.printf("\tAnalysis type .................................. : %d\n", m_pStep->m_nanalysis);
-	m_log.printf("\t   eq.%2d: quasi-static\n", FE_STATIC);
-	m_log.printf("\t   eq.%2d: dynamic\n", FE_DYNAMIC);
-	m_log.printf("\tPlane strain mode .............................. : %s\n", (m_bplane_strain? "yes" : "no"));
-	m_log.printf("\tNumber of materials ............................ : %d\n", Materials());
-	m_log.printf("\tNumber of nodes ................................ : %d\n", m_mesh.Nodes() );
-	m_log.printf("\tNumber of solid elements ....................... : %d\n", m_mesh.SolidElements());
-	m_log.printf("\tNumber of shell elements ....................... : %d\n", m_mesh.ShellElements());
-	m_log.printf("\tNumber of timesteps ............................ : %d\n", m_pStep->m_ntime);
-	m_log.printf("\tTime step size ................................. : %lg\n", m_pStep->m_dt0);
-	m_log.printf("\tAuto time stepper activated .................... : %s\n", (m_pStep->m_bautostep ? "yes" : "no"));
+	log.printf(" CONTROL DATA\n");
+	log.printf("===========================================================================\n");
+	log.printf("Module type ...................................... : %d\n", m_pStep->m_nModule);
+	log.printf("\t   eq.%2d: solid mechanics\n", FE_SOLID);
+	log.printf("\t   eq.%2d: poroelastic\n", FE_POROELASTIC);
+	log.printf("\t   eq.%2d: heat transfer\n", FE_HEAT);
+	log.printf("\tAnalysis type .................................. : %d\n", m_pStep->m_nanalysis);
+	log.printf("\t   eq.%2d: quasi-static\n", FE_STATIC);
+	log.printf("\t   eq.%2d: dynamic\n", FE_DYNAMIC);
+	log.printf("\tPlane strain mode .............................. : %s\n", (m_bplane_strain? "yes" : "no"));
+	log.printf("\tNumber of materials ............................ : %d\n", Materials());
+	log.printf("\tNumber of nodes ................................ : %d\n", m_mesh.Nodes() );
+	log.printf("\tNumber of solid elements ....................... : %d\n", m_mesh.SolidElements());
+	log.printf("\tNumber of shell elements ....................... : %d\n", m_mesh.ShellElements());
+	log.printf("\tNumber of timesteps ............................ : %d\n", m_pStep->m_ntime);
+	log.printf("\tTime step size ................................. : %lg\n", m_pStep->m_dt0);
+	log.printf("\tAuto time stepper activated .................... : %s\n", (m_pStep->m_bautostep ? "yes" : "no"));
 	if (m_pStep->m_bautostep)
 	{
-		m_log.printf("\t  Optimal nr of iterations ..................... : %d\n", m_pStep->m_iteopt);
-		m_log.printf("\t  Minimum allowable step size .................. : %lg\n", m_pStep->m_dtmin);
-		m_log.printf("\t  Maximum allowable step size .................. : %lg\n", m_pStep->m_dtmax);
+		log.printf("\t  Optimal nr of iterations ..................... : %d\n", m_pStep->m_iteopt);
+		log.printf("\t  Minimum allowable step size .................. : %lg\n", m_pStep->m_dtmin);
+		log.printf("\t  Maximum allowable step size .................. : %lg\n", m_pStep->m_dtmax);
 	}
-	m_log.printf("\tNumber of loadcurves ........................... : %d\n", LoadCurves());
-	m_log.printf("\tNumber of displacement boundary conditions ..... : %d\n", m_DC.size());
-	m_log.printf("\tNumber of pressure boundary cards .............. : %d\n", m_PC.size());
-	m_log.printf("\tNumber of concentrated nodal forces ............ : %d\n", m_FC.size());
-	m_log.printf("\tMax nr of stiffness reformations ............... : %d\n", m_pStep->m_psolver->m_maxref);
-	m_log.printf("\tper time steps\n");
-	m_log.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", m_pStep->m_psolver->m_maxups);
-	m_log.printf("\tbetween stiffness matrix reformations\n");
-	m_log.printf("\tDisplacement convergence tolerance ............. : %lg\n", m_pStep->m_psolver->m_Dtol);
-	m_log.printf("\tEnergy convergence tolerance ................... : %lg\n", m_pStep->m_psolver->m_Etol);
-	m_log.printf("\tResidual convergence tolerance ................. : %lg\n", m_pStep->m_psolver->m_Rtol);
-	m_log.printf("\tLinesearch convergence tolerance ............... : %lg\n", m_pStep->m_psolver->m_LStol);
-	m_log.printf("\tMinimum line search size ....................... : %lg\n", m_pStep->m_psolver->m_LSmin);
-	m_log.printf("\tMaximum number of line search iterations ....... : %d\n", m_pStep->m_psolver->m_LSiter);
-	m_log.printf("\tMax condition number ........................... : %lg\n", m_pStep->m_psolver->m_cmax);
-	m_log.printf("\n\n");
+	log.printf("\tNumber of loadcurves ........................... : %d\n", LoadCurves());
+	log.printf("\tNumber of displacement boundary conditions ..... : %d\n", m_DC.size());
+	log.printf("\tNumber of pressure boundary cards .............. : %d\n", m_PC.size());
+	log.printf("\tNumber of concentrated nodal forces ............ : %d\n", m_FC.size());
+	log.printf("\tMax nr of stiffness reformations ............... : %d\n", m_pStep->m_psolver->m_maxref);
+	log.printf("\tper time steps\n");
+	log.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", m_pStep->m_psolver->m_maxups);
+	log.printf("\tbetween stiffness matrix reformations\n");
+	log.printf("\tDisplacement convergence tolerance ............. : %lg\n", m_pStep->m_psolver->m_Dtol);
+	log.printf("\tEnergy convergence tolerance ................... : %lg\n", m_pStep->m_psolver->m_Etol);
+	log.printf("\tResidual convergence tolerance ................. : %lg\n", m_pStep->m_psolver->m_Rtol);
+	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", m_pStep->m_psolver->m_LStol);
+	log.printf("\tMinimum line search size ....................... : %lg\n", m_pStep->m_psolver->m_LSmin);
+	log.printf("\tMaximum number of line search iterations ....... : %d\n", m_pStep->m_psolver->m_LSiter);
+	log.printf("\tMax condition number ........................... : %lg\n", m_pStep->m_psolver->m_cmax);
+	log.printf("\n\n");
 
-	m_log.printf(" OUTPUT DATA\n");
-	m_log.printf("===========================================================================\n");
+	log.printf(" OUTPUT DATA\n");
+	log.printf("===========================================================================\n");
 	switch (m_pStep->m_nplot)
 	{
-	case FE_PLOT_NEVER      : m_log.printf("\tplot level ................................ : never\n"); break;
-	case FE_PLOT_MAJOR_ITRS : m_log.printf("\tplot level ................................ : major iterations\n"); break;
-	case FE_PLOT_MINOR_ITRS : m_log.printf("\tplot level ................................ : minor iterations\n"); break;
-	case FE_PLOT_MUST_POINTS: m_log.printf("\tplot level ................................ : must points only\n"); break;
+	case FE_PLOT_NEVER      : log.printf("\tplot level ................................ : never\n"); break;
+	case FE_PLOT_MAJOR_ITRS : log.printf("\tplot level ................................ : major iterations\n"); break;
+	case FE_PLOT_MINOR_ITRS : log.printf("\tplot level ................................ : minor iterations\n"); break;
+	case FE_PLOT_MUST_POINTS: log.printf("\tplot level ................................ : must points only\n"); break;
 	}
-	m_log.printf("\tshell strains included .................... : %s\n", (m_plot.m_bsstrn? "Yes" : "No"));
+	log.printf("\tshell strains included .................... : %s\n", (m_plot.m_bsstrn? "Yes" : "No"));
 
-	m_log.printf("\tplot file field data:\n");
-	m_log.printf("\t\tdisplacement ...................... : ");
+	log.printf("\tplot file field data:\n");
+	log.printf("\t\tdisplacement ...................... : ");
 	switch (m_plot.m_nfield[0])
 	{
-	case PlotFile::PLOT_DISPLACEMENT: m_log.printf("displacement\n"); break;
-	default: m_log.printf("???\n");
+	case PlotFile::PLOT_DISPLACEMENT: log.printf("displacement\n"); break;
+	default: log.printf("???\n");
 	}
-	m_log.printf("\t\tvelocity .......................... : ");
+	log.printf("\t\tvelocity .......................... : ");
 	switch (m_plot.m_nfield[1])
 	{
-	case PlotFile::PLOT_NONE            : m_log.printf("none\n"); break;
-	case PlotFile::PLOT_VELOCITY        : m_log.printf("velocity\n"); break;
-	case PlotFile::PLOT_FLUID_FLUX      : m_log.printf("fluid flux\n"); break;
-	case PlotFile::PLOT_CONTACT_TRACTION: m_log.printf("contact traction\n"); break;
-	case PlotFile::PLOT_REACTION_FORCE  : m_log.printf("reaction force\n"); break;
-	default: m_log.printf("???\n");
+	case PlotFile::PLOT_NONE            : log.printf("none\n"); break;
+	case PlotFile::PLOT_VELOCITY        : log.printf("velocity\n"); break;
+	case PlotFile::PLOT_FLUID_FLUX      : log.printf("fluid flux\n"); break;
+	case PlotFile::PLOT_CONTACT_TRACTION: log.printf("contact traction\n"); break;
+	case PlotFile::PLOT_REACTION_FORCE  : log.printf("reaction force\n"); break;
+	default: log.printf("???\n");
 	}
-	m_log.printf("\t\tacceleration ...................... : ");
+	log.printf("\t\tacceleration ...................... : ");
 	switch (m_plot.m_nfield[2])
 	{
-	case PlotFile::PLOT_NONE            : m_log.printf("none\n"); break;
-	case PlotFile::PLOT_ACCELERATION    : m_log.printf("acceleration\n"); break;
-	case PlotFile::PLOT_FLUID_FLUX      : m_log.printf("fluid flux\n"); break;
-	case PlotFile::PLOT_CONTACT_TRACTION: m_log.printf("contact traction\n"); break;
-	case PlotFile::PLOT_REACTION_FORCE  : m_log.printf("reaction force\n"); break;
-	default: m_log.printf("???\n");
+	case PlotFile::PLOT_NONE            : log.printf("none\n"); break;
+	case PlotFile::PLOT_ACCELERATION    : log.printf("acceleration\n"); break;
+	case PlotFile::PLOT_FLUID_FLUX      : log.printf("fluid flux\n"); break;
+	case PlotFile::PLOT_CONTACT_TRACTION: log.printf("contact traction\n"); break;
+	case PlotFile::PLOT_REACTION_FORCE  : log.printf("reaction force\n"); break;
+	default: log.printf("???\n");
 	}
-	m_log.printf("\t\ttemperature........................ : ");
+	log.printf("\t\ttemperature........................ : ");
 	switch (m_plot.m_nfield[3])
 	{
-	case PlotFile::PLOT_NONE            : m_log.printf("none\n"); break;
-	case PlotFile::PLOT_FLUID_PRESSURE  : m_log.printf("fluid pressure\n"); break;
-	case PlotFile::PLOT_CONTACT_PRESSURE: m_log.printf("contact pressure\n"); break;
-	case PlotFile::PLOT_CONTACT_GAP     : m_log.printf("contact gap\n"); break;
-	default: m_log.printf("???\n");
+	case PlotFile::PLOT_NONE            : log.printf("none\n"); break;
+	case PlotFile::PLOT_FLUID_PRESSURE  : log.printf("fluid pressure\n"); break;
+	case PlotFile::PLOT_CONTACT_PRESSURE: log.printf("contact pressure\n"); break;
+	case PlotFile::PLOT_CONTACT_GAP     : log.printf("contact gap\n"); break;
+	default: log.printf("???\n");
 	}
 
-	m_log.printf("\n\n");
-	m_log.printf(" MATERIAL DATA\n");
-	m_log.printf("===========================================================================\n");
+	log.printf("\n\n");
+	log.printf(" MATERIAL DATA\n");
+	log.printf("===========================================================================\n");
 	for (i=0; i<Materials(); ++i)
 	{
-		if (i>0) m_log.printf("---------------------------------------------------------------------------\n");
-		m_log.printf("%3d - ", i+1);
+		if (i>0) log.printf("---------------------------------------------------------------------------\n");
+		log.printf("%3d - ", i+1);
 
 		// get the material
 		FEMaterial* pmat = GetMaterial(i);
@@ -177,9 +181,9 @@ void FEM::EchoInput()
 		if (szname[0] == 0) szname = 0;
 
 		// print type and name
-		m_log.printf("%s", sztype);
-		if (szname) m_log.printf(" (%s)", szname);
-		m_log.printf("\n");
+		log.printf("%s", sztype);
+		if (szname) log.printf(" (%s)", szname);
+		log.printf("\n");
 
 		// print the parameter list
 		auto_ptr<FEParameterList> pl(pmat->GetParameterList());
@@ -194,22 +198,22 @@ void FEM::EchoInput()
 				sprintf(sz, "\t%-*s %.*s : ", l, it->m_szname, 50-l, "..................................................");
 				switch (it->m_itype)
 				{
-				case FE_PARAM_DOUBLE : m_log.printf("%s : %lg\n", sz, it->value<double>()); break;
-				case FE_PARAM_INT    : m_log.printf("%s : %d\n" , sz, it->value<int   >()); break;
-				case FE_PARAM_BOOL   : m_log.printf("%s : %d\n" , sz, it->value<bool  >()); break;
+				case FE_PARAM_DOUBLE : log.printf("%s : %lg\n", sz, it->value<double>()); break;
+				case FE_PARAM_INT    : log.printf("%s : %d\n" , sz, it->value<int   >()); break;
+				case FE_PARAM_BOOL   : log.printf("%s : %d\n" , sz, it->value<bool  >()); break;
 				case FE_PARAM_INTV   :
 				case FE_PARAM_DOUBLEV:
 					{
 						int n = it->m_ndim;
-						m_log.printf("%s : ", sz);
+						log.printf("%s : ", sz);
 						for (int k=0; k<n; ++k)
 						{
 							switch (it->m_itype)
 							{
-							case FE_PARAM_INTV   : m_log.printf("%d", it->pvalue<int   >()[k]); break;
-							case FE_PARAM_DOUBLEV: m_log.printf("%lg", it->pvalue<double>()[k]); break;
+							case FE_PARAM_INTV   : log.printf("%d", it->pvalue<int   >()[k]); break;
+							case FE_PARAM_DOUBLEV: log.printf("%lg", it->pvalue<double>()[k]); break;
 							}
-							if (k!=n-1) m_log.printf(","); else m_log.printf("\n");
+							if (k!=n-1) log.printf(","); else log.printf("\n");
 						}
 					}
 					break;
@@ -219,132 +223,132 @@ void FEM::EchoInput()
 			}
 		}
 	}
-	m_log.printf("\n\n");
+	log.printf("\n\n");
 
-	m_log.printf(" LOADCURVE DATA\n");
-	m_log.printf("===========================================================================\n");
+	log.printf(" LOADCURVE DATA\n");
+	log.printf("===========================================================================\n");
 	for (i=0; i<LoadCurves(); ++i)
 	{
-		if (i>0) m_log.printf("---------------------------------------------------------------------------\n");
-		m_log.printf("%3d\n", i+1);
+		if (i>0) log.printf("---------------------------------------------------------------------------\n");
+		log.printf("%3d\n", i+1);
 		FELoadCurve* plc = GetLoadCurve(i);
 		for (j=0; j<plc->Points(); ++j)
 		{
 			LOADPOINT& pt = plc->LoadPoint(j);
-			m_log.printf("%10lg%10lg\n", pt.time, pt.value);
+			log.printf("%10lg%10lg\n", pt.time, pt.value);
 		}
 	}
-	m_log.printf("\n\n");
+	log.printf("\n\n");
 
 	if (m_CI.size() > 0)
 	{
-		m_log.printf(" CONTACT INTERFACE DATA\n");
-		m_log.printf("===========================================================================\n");
+		log.printf(" CONTACT INTERFACE DATA\n");
+		log.printf("===========================================================================\n");
 		for (i=0; i<m_CI.size(); ++i)
 		{
-			if (i>0) m_log.printf("---------------------------------------------------------------------------\n");
+			if (i>0) log.printf("---------------------------------------------------------------------------\n");
 
 			FESlidingInterface *psi = dynamic_cast<FESlidingInterface*>(&m_CI[i]);
 			if (psi)
 			{
-				m_log.printf("contact interface %d:\n", i+1);
-				m_log.printf("\tType                           : sliding with gaps\n");
-				m_log.printf("\tPenalty factor                 : %lg\n", psi->m_eps);
-				m_log.printf("\tTwo-pass algorithm             : %s\n", (psi->m_npass==1? "off":"on"));
-				m_log.printf("\tAugmented Lagrangian           : %s\n", (psi->m_blaugon? "on" : "off"));
+				log.printf("contact interface %d:\n", i+1);
+				log.printf("\tType                           : sliding with gaps\n");
+				log.printf("\tPenalty factor                 : %lg\n", psi->m_eps);
+				log.printf("\tTwo-pass algorithm             : %s\n", (psi->m_npass==1? "off":"on"));
+				log.printf("\tAugmented Lagrangian           : %s\n", (psi->m_blaugon? "on" : "off"));
 				if (psi->m_blaugon)
-					m_log.printf("\tAugmented Lagrangian tolerance : %lg\n", psi->m_atol);
-				m_log.printf("\tmaster segments                : %d\n", (psi->m_ms.Elements()));
-				m_log.printf("\tslave segments                 : %d\n", (psi->m_ss.Elements()));
+					log.printf("\tAugmented Lagrangian tolerance : %lg\n", psi->m_atol);
+				log.printf("\tmaster segments                : %d\n", (psi->m_ms.Elements()));
+				log.printf("\tslave segments                 : %d\n", (psi->m_ss.Elements()));
 			}
 
 			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(&m_CI[i]);
 			if (pti)
 			{
-				m_log.printf("contact interface %d:\n", i+1);
-				m_log.printf("\tType                           : tied\n");
-				m_log.printf("\tPenalty factor                 : %lg\n", pti->m_eps);
-				m_log.printf("\tAugmented Lagrangian tolerance : %lg\n", pti->m_atol);
+				log.printf("contact interface %d:\n", i+1);
+				log.printf("\tType                           : tied\n");
+				log.printf("\tPenalty factor                 : %lg\n", pti->m_eps);
+				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pti->m_atol);
 			}
 
 			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&m_CI[i]);
 			if (pri)
 			{
-				m_log.printf("contact interface %d:\n", i+1);
-				m_log.printf("\tType                           : rigid wall\n");
-				m_log.printf("\tPenalty factor                 : %lg\n", pri->m_eps);
-				m_log.printf("\tAugmented Lagrangian tolerance : %lg\n", pri->m_atol);
+				log.printf("contact interface %d:\n", i+1);
+				log.printf("\tType                           : rigid wall\n");
+				log.printf("\tPenalty factor                 : %lg\n", pri->m_eps);
+				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pri->m_atol);
 				if (dynamic_cast<FEPlane*>(pri->m_mp))
 				{
 					FEPlane* pp = dynamic_cast<FEPlane*>(pri->m_mp);
-					m_log.printf("\tPlane equation:\n");
+					log.printf("\tPlane equation:\n");
 					double* a = pp->GetEquation();
-					m_log.printf("\t\ta = %lg\n", a[0]);
-					m_log.printf("\t\tb = %lg\n", a[1]);
-					m_log.printf("\t\tc = %lg\n", a[2]);
-					m_log.printf("\t\td = %lg\n", a[3]);
+					log.printf("\t\ta = %lg\n", a[0]);
+					log.printf("\t\tb = %lg\n", a[1]);
+					log.printf("\t\tc = %lg\n", a[2]);
+					log.printf("\t\td = %lg\n", a[3]);
 				}
 				else if (dynamic_cast<FERigidSphere*>(pri->m_mp))
 				{
 					FERigidSphere* ps = dynamic_cast<FERigidSphere*>(pri->m_mp);
-					m_log.printf("\trigid sphere:\n");
-					m_log.printf("\t\tx ............... : %lg\n", ps->m_rc.x);
-					m_log.printf("\t\ty ............... : %lg\n", ps->m_rc.y);
-					m_log.printf("\t\tz ............... : %lg\n", ps->m_rc.z);
-					m_log.printf("\t\tR ............... : %lg\n", ps->m_R);
+					log.printf("\trigid sphere:\n");
+					log.printf("\t\tx ............... : %lg\n", ps->m_rc.x);
+					log.printf("\t\ty ............... : %lg\n", ps->m_rc.y);
+					log.printf("\t\tz ............... : %lg\n", ps->m_rc.z);
+					log.printf("\t\tR ............... : %lg\n", ps->m_R);
 				}
 			}
 		}
-		m_log.printf("\n\n");
+		log.printf("\n\n");
 	}
 
 	if (m_nrj > 0)
 	{
-		m_log.printf(" RIGID JOINT DATA\n");
-		m_log.printf("===========================================================================\n");
+		log.printf(" RIGID JOINT DATA\n");
+		log.printf("===========================================================================\n");
 		for (i=0; i<m_nrj; ++i)
 		{
-			if (i>0) m_log.printf("---------------------------------------------------------------------------\n");
+			if (i>0) log.printf("---------------------------------------------------------------------------\n");
 
 			FERigidJoint& rj = m_RJ[i];
-			m_log.printf("rigid joint %d:\n", i+1);
-			m_log.printf("\tRigid body A                   : %d\n", m_RB[rj.m_nRBa].m_mat + 1);
-			m_log.printf("\tRigid body B                   : %d\n", m_RB[rj.m_nRBb].m_mat + 1);
-			m_log.printf("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
-			m_log.printf("\tPenalty factor                 : %lg\n", rj.m_eps );
-			m_log.printf("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
+			log.printf("rigid joint %d:\n", i+1);
+			log.printf("\tRigid body A                   : %d\n", m_RB[rj.m_nRBa].m_mat + 1);
+			log.printf("\tRigid body B                   : %d\n", m_RB[rj.m_nRBb].m_mat + 1);
+			log.printf("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
+			log.printf("\tPenalty factor                 : %lg\n", rj.m_eps );
+			log.printf("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
 		}
-		m_log.printf("\n\n");
+		log.printf("\n\n");
 	}
 
 	if (m_DE.size())
 	{
-		m_log.printf(" DISCRETE ELEMENT DATA\n");
-		m_log.printf("===========================================================================\n");
-		m_log.printf(" Nr of discrete elements : %d\n", m_DE.size());
+		log.printf(" DISCRETE ELEMENT DATA\n");
+		log.printf("===========================================================================\n");
+		log.printf(" Nr of discrete elements : %d\n", m_DE.size());
 		for (i=0; i<m_DE.size(); ++i)
 		{
 			FE_DISCRETE_ELEMENT& de = m_DE[i];
-			m_log.printf(" discrete element %d:\n", i+1);
-			m_log.printf("\tnodes : %d, %d\n", de.n1+1, de.n2+1);
-			m_log.printf("\tE     : %lg\n", de.E);
+			log.printf(" discrete element %d:\n", i+1);
+			log.printf("\tnodes : %d, %d\n", de.n1+1, de.n2+1);
+			log.printf("\tE     : %lg\n", de.E);
 		}
-		m_log.printf("\n\n");
+		log.printf("\n\n");
 	}
 
-	m_log.printf(" LINEAR SOLVER DATA\n");
-	m_log.printf("===========================================================================\n");
-	m_log.printf("\tSolver type ............................... : ");
-	if (m_nsolver == SKYLINE_SOLVER     ) m_log.printf("Skyline\n");
-	if (m_nsolver == PSLDLT_SOLVER      ) m_log.printf("PSLDLT\n");
-	if (m_nsolver == SUPERLU_SOLVER     ) m_log.printf("SuperLU\n");
-	if (m_nsolver == SUPERLU_MT_SOLVER  ) m_log.printf("SuperLU_MT\n");
-	if (m_nsolver == PARDISO_SOLVER     ) m_log.printf("Pardiso\n");
-	if (m_nsolver == WSMP_SOLVER        ) m_log.printf("WSMP\n");
-	if (m_nsolver == LU_SOLVER          ) m_log.printf("LUSolver\n");
-	if (m_nsolver == CG_ITERATIVE_SOLVER) m_log.printf("Conjugate gradient\n");
-	m_log.printf("\n\n");
+	log.printf(" LINEAR SOLVER DATA\n");
+	log.printf("===========================================================================\n");
+	log.printf("\tSolver type ............................... : ");
+	if (m_nsolver == SKYLINE_SOLVER     ) log.printf("Skyline\n");
+	if (m_nsolver == PSLDLT_SOLVER      ) log.printf("PSLDLT\n");
+	if (m_nsolver == SUPERLU_SOLVER     ) log.printf("SuperLU\n");
+	if (m_nsolver == SUPERLU_MT_SOLVER  ) log.printf("SuperLU_MT\n");
+	if (m_nsolver == PARDISO_SOLVER     ) log.printf("Pardiso\n");
+	if (m_nsolver == WSMP_SOLVER        ) log.printf("WSMP\n");
+	if (m_nsolver == LU_SOLVER          ) log.printf("LUSolver\n");
+	if (m_nsolver == CG_ITERATIVE_SOLVER) log.printf("Conjugate gradient\n");
+	log.printf("\n\n");
 
 	// reset log mode
-	m_log.SetMode(old_mode);
+	log.SetMode(old_mode);
 }

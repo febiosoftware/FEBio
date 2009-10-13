@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FESolver.h"
 #include "fem.h"
+#include "log.h"
 #include "FECore/SkylineSolver.h"
 #include "FECore/PSLDLTSolver.h"
 #include "FECore/SuperLUSolver.h"
@@ -14,7 +15,7 @@
 #include "FECore/WSMPSolver.h"
 #include "FECore/ConjGradIterSolver.h"
 
-FESolver::FESolver(FEM& fem) : m_fem(fem), m_log(fem.m_log)
+FESolver::FESolver(FEM& fem) : m_fem(fem)
 {
 	// Stiffness matrix and linear solver are allocated in Init()
 	m_pK = 0;
@@ -30,6 +31,9 @@ FESolver::~FESolver()
 
 bool FESolver::Init()
 {
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// Now that we have determined the equation numbers we can continue
 	// with creating the stiffness matrix. First we select the linear solver
 	// The stiffness matrix is created in CreateStiffness
@@ -48,7 +52,7 @@ bool FESolver::Init()
 		case WSMP_SOLVER         : m_psolver = new WSMPSolver(); break;
 		case CG_ITERATIVE_SOLVER : m_psolver = new ConjGradIterSolver(); break;
 		default:
-			m_log.printbox("FATAL ERROR","Unknown solver type selected\n");
+			log.printbox("FATAL ERROR","Unknown solver type selected\n");
 			return false;
 		}
 	}
@@ -58,7 +62,7 @@ bool FESolver::Init()
 	SparseMatrix* pS = m_psolver->GetMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
 	if (pS == 0)
 	{
-		m_log.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
+		log.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
 		return false;
 	}
 
@@ -69,7 +73,7 @@ bool FESolver::Init()
 	m_pK = new FEStiffnessMatrix(pS);
 	if (m_pK == 0)
 	{
-		m_log.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		log.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
 		return false;
 	}
 
@@ -90,11 +94,14 @@ bool FESolver::CreateStiffness(bool breset)
 	// clean up the stiffness matrix
 	m_pK->Clear();
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// create the stiffness matrix
-	m_log.printf("===== reforming stiffness matrix:\n");
+	log.printf("===== reforming stiffness matrix:\n");
 	if (m_pK->Create(m_fem, breset) == false) 
 	{
-		m_log.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+		log.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;
 	}
 	else
@@ -102,9 +109,9 @@ bool FESolver::CreateStiffness(bool breset)
 		// output some information about the direct linear solver
 		int neq = m_fem.m_neq;
 		int nnz = m_pK->NonZeroes();
-		m_log.printf("\tNr of equations ........................... : %d\n", neq);
-		m_log.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
-		m_log.printf("\n");
+		log.printf("\tNr of equations ........................... : %d\n", neq);
+		log.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+		log.printf("\n");
 	}
 
 	// Do the preprocessing of the solver

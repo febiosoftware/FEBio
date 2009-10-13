@@ -6,6 +6,7 @@
 #include "FETangentDiagnostic.h"
 #include "FEBox.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 void print_matrix(Logfile& log, matrix& m)
 {
@@ -71,7 +72,8 @@ bool FETangentDiagnostic::Run()
 
 	FEMesh& mesh = fem.m_mesh;
 
-	Logfile& log = fem.m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
 
 	Logfile::MODE oldmode = log.SetMode(Logfile::FILE_ONLY);
 

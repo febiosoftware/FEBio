@@ -5,6 +5,7 @@
 #include "FERestartImport.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //!  This routine reads a binary archive that stores a restart point and prepares
@@ -23,11 +24,14 @@ bool FEM::Restart(const char* szfile)
 		return false;
 	}
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// Open the log file for appending
-	if (m_log.append(m_szlog) == false)
+	if (log.append(m_szlog) == false)
 	{
 		printf("WARNING: Could not reopen log file. A new log file is created\n");
-		m_log.open(m_szlog);
+		log.open(m_szlog);
 		return false;
 	}
 
@@ -42,7 +46,7 @@ bool FEM::Restart(const char* szfile)
 	}
 
 	// inform the user from where the problem is restarted
-	m_log.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", m_ftime);
+	log.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", m_ftime);
 
 	return true;
 }

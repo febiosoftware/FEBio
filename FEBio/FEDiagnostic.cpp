@@ -8,6 +8,7 @@
 #include "FEContactDiagnostic.h"
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEPrintHBMatrixDiagnostic.h"
+#include "log.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -41,7 +42,8 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	m_pfem = &fem;
 	m_pdia = 0;
 
-	Logfile& log = fem.m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
 
 	m_pStep = &fem.m_Step[0];
 

@@ -2,6 +2,7 @@
 #include "FESlidingInterface2.h"
 #include "fem.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // FEContactSurface2
@@ -348,6 +349,9 @@ void FESlidingInterface2::Init()
 
 	bool bporo = m_pfem->m_pStep->m_nModule == FE_POROELASTIC;
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
@@ -359,7 +363,7 @@ void FESlidingInterface2::Init()
 		if (bporo && (m_pfem->m_pStep->m_psolver->m_maxups != 0))
 		{
 			m_pfem->m_pStep->m_psolver->m_maxups = 0;
-			m_pfem->m_log.printbox("WARNING", "The non-symmetric biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+			log.printbox("WARNING", "The non-symmetric biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}
 
@@ -902,6 +906,9 @@ void FESlidingInterface2::ContactStiffness()
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// set higher order stiffness mutliplier
 	double knmult = m_knmult;
 	if (m_knmult < 0)
@@ -910,7 +917,7 @@ void FESlidingInterface2::ContactStiffness()
 		if (nref >= ni)
 		{
 			knmult = 1; 
-			m_pfem->m_log.printf("Higher order stiffness terms included.\n");
+			log.printf("Higher order stiffness terms included.\n");
 		}
 		else knmult = 0;
 	}
@@ -1299,7 +1306,8 @@ bool FESlidingInterface2::Augment(int naug)
 	}
 	normL1 = sqrt(normL1);
 
-	Logfile& log = m_pfem->m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
 
 	// calculate and print convergence norms
 	double lnorm = 0;

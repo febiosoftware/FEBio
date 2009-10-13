@@ -6,6 +6,7 @@
 #include "FEContactDiagnostic.h"
 #include "FENeoHookean.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 void print_matrix(Logfile& log, FullMatrix& m)
 {
@@ -66,14 +67,16 @@ bool FEContactDiagnostic::Run()
 	solver.ContactStiffness();
 //	solver.StiffnessMatrix();
 
+	// get the logfile
+	Logfile& log = GetLogfile();
 
-	print_matrix(m_fem.m_log, K0);
+	print_matrix(log, K0);
 
 	// calculate the derivative of the residual
 	FullMatrix K1;
 	deriv_residual(K1);
 
-	print_matrix(m_fem.m_log, K1);
+	print_matrix(log, K1);
 
 	// calculate difference matrix
 	const int N = 48;
@@ -95,9 +98,9 @@ bool FEContactDiagnostic::Run()
 			}
 		}
 
-	print_matrix(m_fem.m_log, Kd);
+	print_matrix(log, Kd);
 
-	m_fem.m_log.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	log.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
 
 	return (kmax < 1e-3);
 }

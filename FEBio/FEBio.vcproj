@@ -1164,6 +1164,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\log.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Logfile.h"
 				>
 			</File>

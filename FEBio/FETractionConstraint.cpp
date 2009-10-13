@@ -2,6 +2,7 @@
 #include "FETractionConstraint.h"
 #include "fem.h"
 #include "FESolidSolver.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 void FETractionConstraint::Serialize(Archive& ar)
@@ -144,7 +145,9 @@ bool FETractionConstraintSet::Augment(int naug)
 		p = fabs((L1 - L0)/L1);
 	else p = fabs(L1 - L0);
 
-	Logfile& log = m_pfem->m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	log.printf("traction constraint set %d: %15.7lg %15.7lg %15.7lg\n", m_nID, L0, fabs(L1 - L0), fabs(m_tol*L1));
 
 	if ((m_naugmax >= 0) && (naug >= m_naugmax)) return true;

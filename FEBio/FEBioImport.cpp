@@ -10,6 +10,7 @@
 #include "FECore/ConjGradIterSolver.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
+#include "log.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	m_nsteps = 0; // reset step section counter
 
 	// get the logfile
-	Logfile& log = fem.m_log;
+	Logfile& log = GetLogfile();
 
 	// loop over all child tags
 	try
@@ -661,6 +662,9 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 	}
 	while (!tag.isend());
 
+	// get the logfile
+	Logfile& log = GetLogfile();
+
 	// assign material pointers for nested materials
 	for (int i=0; i<fem.Materials(); ++i)
 	{
@@ -674,7 +678,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 			// make sure the base ID is valid
 			if ((nbase < 0) || (nbase >= fem.Materials()))
 			{
-				fem.m_log.printbox("INPUT ERROR", "Invalid base material ID for material i+1\n");
+				log.printbox("INPUT ERROR", "Invalid base material ID for material i+1\n");
 				throw XMLReader::Error();
 				return false;
 			}
@@ -683,7 +687,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(nbase));
 			if (pme == 0)
 			{
-				fem.m_log.printbox("INPUT ERROR", "Invalid base material for material i+1\n");
+				log.printbox("INPUT ERROR", "Invalid base material for material i+1\n");
 				throw XMLReader::Error();
 				return false;
 			}

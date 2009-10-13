@@ -5,7 +5,6 @@
 #ifndef _FEM_H_07012006_
 #define _FEM_H_07012006_
 
-#include "Logfile.h"
 #include "PlotFile.h"
 #include "LoadCurve.h"
 #include "FEElementLibrary.h"
@@ -504,7 +503,6 @@ public:
  
 	// --- I/O-Data --- 
 	//{
-		Logfile		m_log;		//!< the log file
 		PlotFile	m_plot;		//!< the plot file
 		DataStore	m_Data;		//!< the data store used for data logging
 

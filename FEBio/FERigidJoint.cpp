@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FERigidJoint.h"
 #include "fem.h"
+#include "log.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -195,7 +196,8 @@ bool FERigidJoint::Augment()
 
 	normF1 = sqrt(Lm*Lm);
 
-	Logfile& log = m_pfem->m_log;
+	// get the logfile
+	Logfile& log = GetLogfile();
 
 	// check convergence of constraints
 	log.printf(" rigid joint # %d\n", m_nID);
