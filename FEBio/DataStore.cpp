@@ -216,6 +216,7 @@ double NodeDataRecord::Evaluate(int item, const char* szexpr)
 	FEMesh& mesh = fem.m_mesh;
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
+	vector<double>& Ti = solver.m_Ti;
 	int nnode = item - 1;
 	double val = 0;
 	int ierr;
@@ -232,6 +233,9 @@ double NodeDataRecord::Evaluate(int item, const char* szexpr)
 		m_calc.SetVariable("Rx", (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0));
 		m_calc.SetVariable("Ry", (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0));
 		m_calc.SetVariable("Rz", (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0));
+		m_calc.SetVariable("Tx", (-id[0] - 2 >= 0 ? Ti[-id[0]-2] : 0));
+		m_calc.SetVariable("Ty", (-id[1] - 2 >= 0 ? Ti[-id[1]-2] : 0));
+		m_calc.SetVariable("Tz", (-id[2] - 2 >= 0 ? Ti[-id[2]-2] : 0));
 		if (fem.m_pStep->m_nModule == FE_POROELASTIC)
 		{
 			m_calc.SetVariable("p", node.m_pt);
