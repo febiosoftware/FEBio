@@ -6,6 +6,7 @@
 #include "PlotFile.h"
 #include "fem.h"
 #include "FESolidSolver.h"
+#include "FEPeriodicBoundary.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -614,6 +615,32 @@ void PlotFile::write_contact_tractions()
 				}
 			}
 		}
+
+		FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(&fem.m_CI[i]);
+		if (pbi)
+		{
+			FEPeriodicSurface& ss = pbi->m_ss;
+			FEPeriodicSurface& ms = pbi->m_ms;
+			for (j=0; j<ss.Nodes(); ++j)
+			{
+				vec3d t = ss.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
+				int m = ss.node[j];
+
+				acc[m][0] += (float) t.x;
+				acc[m][1] += (float) t.y;
+				acc[m][2] += (float) t.z;
+			}
+
+			for (j=0; j<ms.Nodes(); ++j)
+			{
+				vec3d t = ms.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
+				int m = ms.node[j];
+
+				acc[m][0] += (float) t.x;
+				acc[m][1] += (float) t.y;
+				acc[m][2] += (float) t.z;
+			}
+		}
 	}
 
 	m_ar.write(acc, sizeof(float)*3, fem.m_mesh.Nodes() );
@@ -730,6 +757,16 @@ void PlotFile::write_contact_pressures()
 
 			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.Lm[j].norm();
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j].norm();
+		}
+
+		FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(&fem.m_CI[i]);
+		if (pbi)
+		{
+			FEPeriodicSurface& ms = pbi->m_ms;
+			FEPeriodicSurface& ss = pbi->m_ss;
+
+			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.m_Lm[j].norm();
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.m_Lm[j].norm();
 		}
 
 		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);

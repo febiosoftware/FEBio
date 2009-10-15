@@ -16,16 +16,8 @@ public:
 	//! shallow copy
 	void ShallowCopy(FEContactSurface2& s);
 
-	//! find the intersection of a ray with the surface
-	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei = 0);
-
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
-
-public:
-	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
-	bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
-	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
 
 protected:
 	FEM*	m_pfem;

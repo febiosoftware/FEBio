@@ -92,6 +92,14 @@ public:
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
+	//! find the intersection of a ray with the surface
+	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei = 0);
+
+public:
+	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
+	bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
+	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
+
 protected:
 	FEMesh*	m_pmesh;			//!< pointer to parent mesh
 

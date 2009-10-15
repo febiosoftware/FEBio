@@ -553,3 +553,213 @@ void FESurface::ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec
 	t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
 	t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
 }
+
+
+//-----------------------------------------------------------------------------
+// This function calculates the intersection of a ray with a triangle
+// and returns true if the ray intersects the triangle.
+//
+bool FESurface::IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+{
+	vec3d e[2], E[2];
+	mat2d G;
+
+	// create base vectors on triangle
+	e[0] = y[1]-y[0];
+	e[1] = y[2]-y[0];
+
+	// create triangle normal
+	vec3d m = e[0]^e[1]; m.unit();
+
+	double d = n*m;
+	if (d != 0)
+	{
+		// distance from r to triangle
+		g = m*(y[0] - r)/d;
+
+		// intersection point with triangle
+		vec3d q = r + n*g;
+
+		// next, we decompose q into its components
+		// in the triangle basis
+		// we need to create the dual basis
+		// first, we calculate the metric tensor
+		G[0][0] = e[0]*e[0]; G[0][1] = e[0]*e[1];
+		G[1][0] = e[1]*e[0]; G[1][1] = e[1]*e[1];
+
+		// and its inverse
+		mat2d Gi = G.inverse();
+
+		// build dual basis
+		E[0] = e[0]*Gi[0][0] + e[1]*Gi[0][1];
+		E[1] = e[0]*Gi[1][0] + e[1]*Gi[1][1];
+
+		// get the components
+		rs[0] = E[0]*(q - y[0]);
+		rs[1] = E[1]*(q - y[0]);
+
+		// see if the intersection point is inside the triangle
+		if ((rs[0] >= -eps) && (rs[1] >= -eps) && (rs[0]+rs[1] <= 1+eps)) return true;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the intersection of a ray with a quad
+//! and returns true if the ray intersected.
+//!
+bool FESurface::IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+{
+	// first we're going to see if the ray intersects the two subtriangles
+	vec3d x1[3], x2[3];
+	x1[0] = y[0]; x2[0] = y[2];
+	x1[1] = y[1]; x2[1] = y[3];
+	x1[2] = y[3]; x2[2] = y[1];
+
+	bool b = false;
+	double rp, sp;
+
+	if (IntersectTri(x1, r, n, rs, g, eps))
+	{
+		// we've intersected the first triangle
+		b = true;
+		rp = -1.0 + 2.0*rs[0];
+		sp = -1.0 + 2.0*rs[1];
+	}
+	else if (IntersectTri(x2, r, n, rs, g, eps))
+	{
+		// we've intersected the second triangle
+		b = true;
+		rp = 1.0 - 2.0*rs[0];
+		sp = 1.0 - 2.0*rs[1];
+	}
+
+	// if one of the triangels was intersected,
+	// we calculate a more accurate projection
+	if (b)
+	{
+		mat3d A;
+		vec3d dx;
+		vec3d F, F1, F2, F3;
+		double H[4], H1[4], H2[4];
+
+		double l1 = rp;
+		double l2 = sp;
+		double l3 = g;
+		
+		int nn = 0;
+		int maxn = 5;
+		do
+		{
+			// shape functions of quad
+			H[0] = 0.25*(1 - l1)*(1 - l2);
+			H[1] = 0.25*(1 + l1)*(1 - l2);
+			H[2] = 0.25*(1 + l1)*(1 + l2);
+			H[3] = 0.25*(1 - l1)*(1 + l2);
+
+			// shape function derivatives
+			H1[0] = -0.25*(1 - l2); H2[0] = -0.25*(1 - l1);
+			H1[1] =  0.25*(1 - l2); H2[1] = -0.25*(1 + l1);
+			H1[2] =  0.25*(1 + l2); H2[2] =  0.25*(1 + l1);
+			H1[3] = -0.25*(1 + l2); H2[3] =  0.25*(1 - l1);
+
+			// calculate residual
+			F = r + n*l3 - y[0]*H[0] - y[1]*H[1] - y[2]*H[2] - y[3]*H[3];
+
+			// residual derivatives
+			F1 = - y[0]*H1[0] - y[1]*H1[1] - y[2]*H1[2] - y[3]*H1[3];
+			F2 = - y[0]*H2[0] - y[1]*H2[1] - y[2]*H2[2] - y[3]*H2[3];
+			F3 = n;
+
+			// set up the tangent matrix
+			A[0][0] = F1.x; A[0][1] = F2.x; A[0][2] = F3.x;
+			A[1][0] = F1.y; A[1][1] = F2.y; A[1][2] = F3.y;
+			A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
+
+			// calculate solution increment
+			dx = -(A.inverse()*F);
+
+			// update solution
+			l1 += dx.x;
+			l2 += dx.y;
+			l3 += dx.z;
+
+			++nn;
+		}
+		while ((dx.norm() > 1e-7) && (nn < maxn));
+
+		// store results
+		rs[0] = l1;
+		rs[1] = l2;
+		g     = l3;
+
+		// see if the point is inside the quad
+		if ((rs[0] >= -1-eps) && (rs[0] <= 1+eps) && 
+			(rs[1] >= -1-eps) && (rs[1] <= 1+eps)) return true;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the intersection of a ray with a surface element.
+//! It simply calls the tri or quad intersection function based on the type
+//! of element.
+//!
+bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps)
+{
+	int N = el.Nodes();
+
+	// get the element nodes
+	FEMesh& mesh = *m_pmesh;
+	vec3d y[4];
+	for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+
+	// call the correct intersection function
+	if (N == 3) return IntersectTri(y, r, n, rs, g, eps);
+	else if (N == 4) return IntersectQuad(y, r, n, rs, g, eps);
+
+	// if we get here, the ray did not intersect the element
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! This function finds the element which is intersected by the ray (r,n).
+//! It returns a pointer to the element, as well as the isoparametric coordinates
+//! of the intersection point.
+//!
+FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei)
+{
+	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
+	int imin = -1;
+	FESurfaceElement* pme = 0;
+
+	// loop over all surface element
+	for (int i=0; i<Elements(); ++i)
+	{
+		FESurfaceElement& el = Element(i);
+
+		// see if the ray intersects this element
+		if (Intersect(el, r, n, r2, g, eps))
+		{
+			// see if this is the best intersection found so far
+			// TODO: should I put a limit on how small g can
+			//       be to be considered a valid intersection?
+			if (g < gmin)
+			{
+				// keep results
+				pme = &el;
+				gmin = g;
+				imin = i;
+				rs[0] = r2[0];
+				rs[1] = r2[1];
+			}
+		}	
+	}
+
+	if (pei) *pei = imin;
+
+	// return the intersected element (or zero if none)
+	return pme;
+}

@@ -113,7 +113,8 @@ enum FE_Contact_Types {
 	FE_CONTACT_RIGIDWALL	= 2,
 	FE_CONTACT_TIED			= 3,
 	FE_FACET2FACET_SLIDING	= 4,
-	FE_CONTACT_SLIDING2		= 5
+	FE_CONTACT_SLIDING2		= 5,
+	FE_PERIODIC_BOUNDARY	= 6
 };
 
 ///////////////////////////////////////////////////////////////////////////////

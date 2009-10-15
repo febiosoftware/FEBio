@@ -538,6 +538,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPeriodicBoundary.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPoroConstPerm.cpp"
 				>
 			</File>
@@ -1021,6 +1025,10 @@
 			</File>
 			<File
 				RelativePath=".\FEParameterList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPeriodicBoundary.h"
 				>
 			</File>
 			<File

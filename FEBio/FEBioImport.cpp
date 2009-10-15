@@ -7,6 +7,7 @@
 #include "FERigid.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FEPeriodicBoundary.h"
 #include "FECore/ConjGradIterSolver.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
@@ -1734,6 +1735,53 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 				FETiedContactSurface& s = (ntype == 1? ps->ms : ps->ss);
+
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
+				{
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt);
+			}
+			else throw XMLReader::InvalidTag(tag);
+
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (strcmp(szt, "periodic boundary") == 0)
+	{
+		// --- P E R I O D I C   B O U N D A R Y  ---
+
+		FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
+		fem.m_CI.add(ps);
+
+		++tag;
+		do
+		{
+			if (tag == "tolerance") tag.value(ps->m_atol);
+			else if (tag == "laugon") tag.value(ps->m_blaugon);
+			else if (tag == "penalty") tag.value(ps->m_eps);
+			else if (tag == "two_pass"  ) 
+			{
+				int n;
+				tag.value(n);
+				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
+
+				ps->m_npass = n+1;
+			}
+			else if (tag == "surface")
+			{
+				const char* sztype = tag.AttributeValue("type");
+				int ntype;
+				if (strcmp(sztype, "master") == 0) ntype = 1;
+				else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+				FEPeriodicSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);

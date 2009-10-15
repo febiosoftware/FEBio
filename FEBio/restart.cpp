@@ -5,6 +5,7 @@
 #include "FERestartImport.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FEPeriodicBoundary.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -488,6 +489,7 @@ void FEM::SerializeContactData(Archive &ar)
 			case FE_CONTACT_TIED     : ps = new FETiedInterface(this); break;
 			case FE_CONTACT_RIGIDWALL: ps = new FERigidWallInterface(this); break;
 			case FE_CONTACT_SLIDING2 : ps = new FESlidingInterface2(this); break;
+			case FE_PERIODIC_BOUNDARY: ps = new FEPeriodicBoundary(this); break;
 			default:
 				assert(false);
 			}

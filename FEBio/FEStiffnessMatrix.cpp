@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FEPeriodicBoundary.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -478,6 +479,53 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 							build_add(lm);
 						}
+					}
+				}
+
+				// add periodic boundary elements
+				FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(&fem.m_CI[i]);
+				if (pbi)
+				{
+					vector<int> lm(6*5);
+
+					FEPeriodicSurface& ss = pbi->m_ss;
+					FEPeriodicSurface& ms = pbi->m_ms;
+
+					for (j=0; j<ss.Nodes(); ++j)
+					{
+						FESurfaceElement& me = *ss.m_pme[j];
+						int* en = me.m_node;
+
+						n = me.Nodes();
+						if (n == 3)
+						{
+							lm[6*(3+1)  ] = -1;
+							lm[6*(3+1)+1] = -1;
+							lm[6*(3+1)+2] = -1;
+							lm[6*(3+1)+3] = -1;
+							lm[6*(3+1)+4] = -1;
+							lm[6*(3+1)+5] = -1;
+						}
+
+						lm[0] = ss.Node(j).m_ID[0];
+						lm[1] = ss.Node(j).m_ID[1];
+						lm[2] = ss.Node(j).m_ID[2];
+						lm[3] = ss.Node(j).m_ID[7];
+						lm[4] = ss.Node(j).m_ID[8];
+						lm[5] = ss.Node(j).m_ID[9];
+
+						for (k=0; k<n; ++k)
+						{
+							id = fem.m_mesh.Node(en[k]).m_ID;
+							lm[6*(k+1)  ] = id[0];
+							lm[6*(k+1)+1] = id[1];
+							lm[6*(k+1)+2] = id[2];
+							lm[6*(k+1)+3] = id[7];
+							lm[6*(k+1)+4] = id[8];
+							lm[6*(k+1)+5] = id[9];
+						}
+
+						build_add(lm);
 					}
 				}
 

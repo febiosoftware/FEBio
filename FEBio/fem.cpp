@@ -5,6 +5,7 @@
 #include "XMLReader.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FEPeriodicBoundary.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -157,6 +158,8 @@ void FEM::operator =(FEM& fem)
 			case FE_CONTACT_SLIDING2:
 				pci = new FESlidingInterface2(this);
 				break;
+			case FE_PERIODIC_BOUNDARY:
+				pci = new FEPeriodicBoundary(this);
 			default:
 				assert(false);
 			}

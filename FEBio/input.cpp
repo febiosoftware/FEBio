@@ -5,6 +5,7 @@
 #include "FileImport.h"
 #include "NikeImport.h"
 #include "FEBioImport.h"
+#include "FEPeriodicBoundary.h"
 #include "log.h"
 #include <string.h>
 
@@ -269,6 +270,15 @@ void FEM::EchoInput()
 				log.printf("\tType                           : tied\n");
 				log.printf("\tPenalty factor                 : %lg\n", pti->m_eps);
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pti->m_atol);
+			}
+
+			FEPeriodicBoundary *pbi = dynamic_cast<FEPeriodicBoundary*>(&m_CI[i]);
+			if (pbi)
+			{
+				log.printf("contact interface %d:\n", i+1);
+				log.printf("\tType                           : periodic\n");
+				log.printf("\tPenalty factor                 : %lg\n", pbi->m_eps);
+				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pbi->m_atol);
 			}
 
 			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&m_CI[i]);
