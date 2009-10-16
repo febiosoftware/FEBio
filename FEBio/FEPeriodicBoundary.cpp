@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEPeriodicBoundary.h"
 #include "Archive.h"
 #include "fem.h"
@@ -140,7 +140,7 @@ void FEPeriodicBoundary::Update()
 
 			// calculate the master displacement
 			ne = pme->Nodes();
-			for (j=0; j<ne; ++j) 
+			for (j=0; j<ne; ++j)
 			{
 				FENode& node = ms.Node(pme->m_lnode[j]);
 				umi[j] = node.m_rt - node.m_r0;
@@ -203,8 +203,8 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 
 	for (int np=0; np<m_npass; ++np)
 	{
-		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);	
-		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);	
+		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
+		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
 
 		// loop over all slave facets
 		int ne = ss.Elements();
@@ -224,7 +224,7 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 
 			// loop over slave element nodes (which are the integration points as well)
 			for (n=0; n<nseln; ++n)
-			{	
+			{
 				Gr = sel.Gr(n);
 				Gs = sel.Gs(n);
 
@@ -242,7 +242,7 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 					dxs.y += Gs[k]*r0[k].y;
 					dxs.z += Gs[k]*r0[k].z;
 				}
-	
+
 				detJ = (dxr ^ dxs).norm();
 
 				// get slave node contact force
@@ -287,12 +287,12 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 				fe[1] = -detJ*w[n]*tc.y;
 				fe[2] = -detJ*w[n]*tc.z;
 				for (l=0; l<nmeln; ++l)
-				{	
+				{
 					fe[3*(l+1)  ] = detJ*w[n]*tc.x*N[l];
 					fe[3*(l+1)+1] = detJ*w[n]*tc.y*N[l];
 					fe[3*(l+1)+2] = detJ*w[n]*tc.z*N[l];
 				}
-	
+
 				// fill the lm array
 				lm.create(3*(nmeln+1));
 				lm[0] = sLM[n*3  ];
@@ -305,7 +305,7 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 					lm[3*(l+1)+1] = mLM[l*3+1];
 					lm[3*(l+1)+2] = mLM[l*3+2];
 				}
-	
+
 				// fill the en array
 				en.create(nmeln+1);
 				en[0] = sel.m_node[n];
@@ -354,8 +354,8 @@ void FEPeriodicBoundary::ContactStiffness()
 
 	for (int np=0; np<m_npass; ++np)
 	{
-		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);	
-		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);	
+		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
+		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
 
 		// loop over all slave elements
 		int ne = ss.Elements();
@@ -379,7 +379,7 @@ void FEPeriodicBoundary::ContactStiffness()
 				Gs = se.Gs(n);
 
 				m = se.m_lnode[n];
-	
+
 				// calculate jacobian
 				dxr = dxs = vec3d(0,0,0);
 				for (k=0; k<nseln; ++k)
@@ -474,7 +474,7 @@ void FEPeriodicBoundary::ContactStiffness()
 				en.create(nmeln+1);
 				en[0] = se.m_node[n];
 				for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
-						
+
 				// assemble stiffness matrix
 				psolver->AssembleStiffness(en, lm, ke);
 			}
@@ -517,7 +517,7 @@ bool FEPeriodicBoundary::Augment(int naug)
 		g = m_ss.m_gap[i].norm();
 		normgc += g*g;
 		++N;
-	}	
+	}
 	for (i=0; i<m_ms.Nodes(); ++i)
 	{
 		lm = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
@@ -526,7 +526,7 @@ bool FEPeriodicBoundary::Augment(int naug)
 		g = m_ms.m_gap[i].norm();
 		normgc += g*g;
 		++N;
-	}	
+	}
 	if (N == 0) N=1;
 
 	normL1 = sqrt(normL1);
@@ -542,20 +542,20 @@ bool FEPeriodicBoundary::Augment(int naug)
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
 	log.printf("    normal force : %15le %15le\n", pctn, m_atol);
 	log.printf("    gap function : %15le       ***\n", normgc);
-		
-	if (pctn >= m_atol) 
+
+	if (pctn >= m_atol)
 	{
 		bconv = false;
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
 			m_ss.m_Lm[i] = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
-		}	
+		}
 		for (i=0; i<m_ms.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
 			m_ms.m_Lm[i] = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
-		}	
+		}
 	}
 
 	return bconv;
@@ -623,7 +623,7 @@ void FEPeriodicBoundary::Serialize(Archive &ar)
 			s.Init();
 
 			// read the contact data
-			// Note that we do this after Init() since this data gets 
+			// Note that we do this after Init() since this data gets
 			// initialized to zero there
 			ar >> s.m_gap;
 			ar >> s.m_rs;
