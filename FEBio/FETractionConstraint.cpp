@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FETractionConstraint.h"
 #include "fem.h"
 #include "FESolidSolver.h"
@@ -62,7 +62,7 @@ void FETractionConstraintSet::Init()
 		{
 			FETractionConstraint::DOF& sn = *is;
 			sn.neq = mesh.Node(sn.node).m_ID[sn.bc];
-		}		
+		}
 	}
 }
 
@@ -77,7 +77,7 @@ double FETractionConstraintSet::constraint(FETractionConstraint& RC)
 	int n = RC.m_dof.size();
 	double c = 0;
 	list<FETractionConstraint::DOF>::iterator it = RC.m_dof.begin();
-	for (int i=0; i<n; ++i, ++it) 
+	for (int i=0; i<n; ++i, ++it)
 	{
 		if (it->neq >= 0) c += it->val*T[it->neq];
 	}
@@ -103,7 +103,7 @@ void FETractionConstraintSet::Residual(vector<double> &R)
 			if (it->neq >= 0)
 			{
 				R[it->neq] += (RC.m_lam+m_eps*c)*it->val;
-			}		
+			}
 		}
 	}
 }
@@ -117,7 +117,7 @@ void FETractionConstraintSet::Stiffness()
 }
 
 //-----------------------------------------------------------------------------
-//! This function performs an augmentation, if the Lagrange multiplier 
+//! This function performs an augmentation, if the Lagrange multiplier
 //! has not converged
 
 bool FETractionConstraintSet::Augment(int naug)
@@ -152,7 +152,7 @@ bool FETractionConstraintSet::Augment(int naug)
 
 	if ((m_naugmax >= 0) && (naug >= m_naugmax)) return true;
 
-	if (p<= m_tol) 
+	if (p<= m_tol)
 	{
 //		log.printf("(conv)\n");
 		im = m_RC.begin();
@@ -163,7 +163,7 @@ bool FETractionConstraintSet::Augment(int naug)
 		}
 		return true;
 	}
-	else 
+	else
 	{
 		im = m_RC.begin();
 		for (i=0; i<M; ++i, ++im)
