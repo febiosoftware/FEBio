@@ -142,7 +142,7 @@ void FESlidingInterface2::Init()
 
 	// get the logfile
 	Logfile& log = GetLogfile();
-
+	
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
@@ -169,6 +169,7 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 	FESurfaceElement* pme;
 	vec3d r, nu;
 	double rs[2];
+	double Ln;
 
 	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
 
@@ -235,34 +236,40 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				// NOTE: this has the opposite sign compared
 				// to Gerard's notes.
 				double g = nu*(r - q);
+				Ln = ss.m_Lmd[n] + m_eps*g;
 
-				if ((g >= 0) && (g <= R))
+//				if ((g >= 0) && (g <= R))
+				if ((Ln > 0) && (g <= R))
 				{
 					ss.m_gap[n] = g;
 
 					// calculate the pressure gap function
-					if (bporo && ss.m_gap[n] >= 0)
-					{
+					if (bporo) {
 						mesh.UnpackElement(*pme);
 						double p2 = pme->eval(pme->pt(), rs[0], rs[1]);
 						ss.m_pg[n] = p1 - p2;
 					}
-					else ss.m_pg[n] = 0;
 				}
 				else
 				{
 					ss.m_Lmd[n] = 0;
-					ss.m_Lmp[n] = 0;
 					ss.m_gap[n] = 0;
 					ss.m_pme[n] = 0;
+					if (bporo) {
+						ss.m_Lmp[n] = 0;
+						ss.m_pg[n] = 0;
+					}
 				}
 			}
 			else
 			{
 				// the node is not in contact
 				ss.m_Lmd[n] = 0;
-				ss.m_Lmp[n] = 0;
 				ss.m_gap[n] = 0;
+				if (bporo) {
+					ss.m_Lmp[n] = 0;
+					ss.m_pg[n] = 0;
+				}
 			}
 		}
 	}
@@ -290,15 +297,19 @@ void FESlidingInterface2::Update()
 	{
 		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
 
-		// first, mark all nodes as non free-draining (= pos. ID)
+		// first, mark all nodes as free-draining (= neg. ID)
 		// this is done by setting the dof's equation number
-		// to a negative number
+		// to a positive number
 		for (i=0; i<ss.Nodes(); ++i) 
 		{
 			id = ss.Node(i).m_ID[6];
-			if (id < -1) ss.Node(i).m_ID[6] = -id-2;
+			if (id >= 0) {
+				FENode& node = ss.Node(i);
+				// mark node as free-draining
+				node.m_ID[6] = -id-2;
+			}
 		}
-
+		
 		// keep a running counter of integration points.
 		int ni = 0;
 
@@ -314,7 +325,7 @@ void FESlidingInterface2::Update()
 			for (i=0; i<nint; ++i, ++ni) 
 			{
 				gi[i] = ss.m_gap[ni];
-				ti[i] = ss.m_Lmd[ni] + m_eps*MBRACKET(gi[i]);
+				ti[i] = MBRACKET(ss.m_Lmd[ni] + m_eps*gi[i]);
 			}
 
 			// setup the (over-determined) system to find the nodal values
@@ -357,14 +368,21 @@ void FESlidingInterface2::Update()
 			{
 				FENode& node = ss.Node(el.m_lnode[i]);
 				id = node.m_ID[6];
-				if ((id >= 0) && (tn[i] <= 0))
+				if ((id < -1) && (tn[i] > 0))
 				{
-					// fix the prescribed dof
+					// mark node as non free-draining
 					node.m_ID[6] = -id-2;
-
-					// set the fluid pressure to zero
-					node.m_pt = 0;
 				}
+			}
+		}
+		
+		// now set the pressure of free-draining nodes to zero
+		for (i=0; i<ss.Nodes(); ++i) 
+		{
+			if (ss.Node(i).m_ID[6] < -1) {
+				FENode& node = ss.Node(i);
+				// set the fluid pressure to zero
+				node.m_pt = 0;
 			}
 		}
 	}
@@ -389,7 +407,12 @@ void FESlidingInterface2::Update()
 		{
 			// get the node
 			FENode& node = m_ms.Node(n);
-
+			id = node.m_ID[6];
+			if (id >= 0) {
+				// mark node as free-draining
+				node.m_ID[6] = -id-2;
+			}
+			
 			// project it onto the primary surface
 			int nei;
 			FESurfaceElement* pse = m_ss.FindIntersection(node.m_rt, m_ms.m_nn[n], rs, m_stol, &nei);
@@ -406,7 +429,7 @@ void FESlidingInterface2::Update()
 				for (i=0; i<nint; ++i) 
 				{
 					gi[i] = m_ss.m_gap[noff + i];
-					ti[i] = m_ss.m_Lmd[noff + i] + m_eps*MBRACKET(gi[i]);
+					ti[i] = MBRACKET(m_ss.m_Lmd[noff + i] + m_eps*gi[i]);
 				}
 
 				// setup the (over-determined) system to find the nodal values
@@ -448,36 +471,26 @@ void FESlidingInterface2::Update()
 				// now evaluate the traction at the intersection point
 				double tp = pse->eval(tn, rs[0], rs[1]);
 
-				// if tp <= 0 and the node is free, we fix it. Otherwise,
-				// if tp > 0 and the node is fixed, we free it.
+				// if tp > 0, mark node as non free-draining.
 				id = node.m_ID[6];
-				if ((id >= 0) && (tp <= 0))
+				if ((id < -1) && (tp > 0))
 				{
-					// fix the prescribed dof
-					node.m_ID[6] = -id-2;
-
-					// set the fluid pressure to zero
-					node.m_pt = 0;
-				}
-				else if ((id < -1) && (tp > 0))
-				{
-					// free the prescribed dof
+					// mark as non free-draining
 					node.m_ID[6] = -id-2;
 				}
 			}
-			else
+		}
+		
+		// loop over all nodes of the secondary surface 
+		// and set pressure to zero for free-draining nodes
+		for (int n=0; n<m_ms.Nodes(); ++n)
+		{
+			FENode& node = m_ms.Node(n);
+			if (node.m_ID[6] < -1)
 			{
-				// if no element is found the node is definitely not in contact
-				id = node.m_ID[6];
-				if (id >= 0)
-				{
-					// fix the prescribed dof
-					node.m_ID[6] = -id-2;
-
-					// set the fluid pressure to zero
-					node.m_pt = 0;
-				}			
-			}
+				// set the fluid pressure to zero
+				node.m_pt = 0;
+			}			
 		}
 	}
 }
@@ -699,7 +712,7 @@ void FESlidingInterface2::ContactStiffness()
 
 	// get the logfile
 	Logfile& log = GetLogfile();
-
+	
 	// set higher order stiffness mutliplier
 	double knmult = m_knmult;
 	if (m_knmult < 0)
@@ -863,61 +876,61 @@ void FESlidingInterface2::ContactStiffness()
 					mat3d S1, S2;
 					S1.skew(gs[0]);
 					S2.skew(gs[1]);
-
+					mat3d As[4];
+					
 					if (!m_bsymm)
 					{
-						for (k=0; k<nseln+nmeln; ++k)
-							for (l=0; l<nseln; ++l)
+						for (l=0; l<nseln; ++l) {
+							As[l] = S2*Gr[l] - S1*Gs[l];
+							for (k=0; k<nseln+nmeln; ++k)
 							{
-								ke[k*3  ][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[0][0] + Gs[l]*S1[0][0]);
-								ke[k*3  ][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[0][1] + Gs[l]*S1[0][1]);
-								ke[k*3  ][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[0][2] + Gs[l]*S1[0][2]);
-
-								ke[k*3+1][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[1][0] + Gs[l]*S1[1][0]);
-								ke[k*3+1][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[1][1] + Gs[l]*S1[1][1]);
-								ke[k*3+1][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[1][2] + Gs[l]*S1[1][2]);
-
-								ke[k*3+2][l*3  ] += tn*w[j]*N[k]*(-Gr[l]*S2[2][0] + Gs[l]*S1[2][0]);
-								ke[k*3+2][l*3+1] += tn*w[j]*N[k]*(-Gr[l]*S2[2][1] + Gs[l]*S1[2][1]);
-								ke[k*3+2][l*3+2] += tn*w[j]*N[k]*(-Gr[l]*S2[2][2] + Gs[l]*S1[2][2]);
+								ke[k*3  ][l*3  ] -= tn*w[j]*N[k]*As[l][0][0];
+								ke[k*3  ][l*3+1] -= tn*w[j]*N[k]*As[l][0][1];
+								ke[k*3  ][l*3+2] -= tn*w[j]*N[k]*As[l][0][2];
+								
+								ke[k*3+1][l*3  ] -= tn*w[j]*N[k]*As[l][1][0];
+								ke[k*3+1][l*3+1] -= tn*w[j]*N[k]*As[l][1][1];
+								ke[k*3+1][l*3+2] -= tn*w[j]*N[k]*As[l][1][2];
+								
+								ke[k*3+2][l*3  ] -= tn*w[j]*N[k]*As[l][2][0];
+								ke[k*3+2][l*3+1] -= tn*w[j]*N[k]*As[l][2][1];
+								ke[k*3+2][l*3+2] -= tn*w[j]*N[k]*As[l][2][2];
 							}
+						}
 					}
 					// c. M-term
 					//---------------------------------------
 
-					vec3d gm[2];
-					ms.CoBaseVectors(me, r, s, gm);
-
-					mat2d A, Ai;
-					A[0][0] = gs[0]*gm[0]; A[0][1] = gs[0]*gm[1];
-					A[1][0] = gs[1]*gm[0]; A[1][1] = gs[1]*gm[1];
-
-					Ai = A.inverse();
-
 					vec3d Gm[2];
-					Gm[0] = gs[0]*Ai[0][0] + gs[1]*Ai[0][1];
-					Gm[1] = gs[0]*Ai[1][0] + gs[1]*Ai[1][1];
+					ms.ContraBaseVectors0(me, r, s, Gm);
+					
+					// evaluate master surface normal
+					vec3d mnu = Gm[0] ^ Gm[1];
+					mnu.unit();
 
 					double Hmr[4], Hms[4];
 					me.shape_deriv(Hmr, Hms, r, s);
+					vec3d mm[4];
 
 					if (!m_bsymm)
 					{
-						for (k=0; k<nseln; ++k)
+						for (k=0; k<nmeln; ++k) {
+							mm[k] = Gm[0]*Hmr[k] + Gm[1]*Hms[k];
 							for (l=0; l<nseln+nmeln; ++l)
 							{
-								ke[(k+nseln)*3  ][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].x + Hms[k]*nu.x*Gm[1].x)*N[l];
-								ke[(k+nseln)*3  ][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].y + Hms[k]*nu.x*Gm[1].y)*N[l];
-								ke[(k+nseln)*3  ][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.x*Gm[0].z + Hms[k]*nu.x*Gm[1].z)*N[l];
-
-								ke[(k+nseln)*3+1][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].x + Hms[k]*nu.y*Gm[1].x)*N[l];
-								ke[(k+nseln)*3+1][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].y + Hms[k]*nu.y*Gm[1].y)*N[l];
-								ke[(k+nseln)*3+1][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.y*Gm[0].z + Hms[k]*nu.y*Gm[1].z)*N[l];
-
-								ke[(k+nseln)*3+2][l*3  ] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].x + Hms[k]*nu.z*Gm[1].x)*N[l];
-								ke[(k+nseln)*3+2][l*3+1] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].y + Hms[k]*nu.z*Gm[1].y)*N[l];
-								ke[(k+nseln)*3+2][l*3+2] -= tn*detJ[j]*w[j]*(Hmr[k]*nu.z*Gm[0].z + Hms[k]*nu.z*Gm[1].z)*N[l];
+								ke[(k+nseln)*3  ][l*3  ] += tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
+								ke[(k+nseln)*3  ][l*3+1] += tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
+								ke[(k+nseln)*3  ][l*3+2] += tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
+								
+								ke[(k+nseln)*3+1][l*3  ] += tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
+								ke[(k+nseln)*3+1][l*3+1] += tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
+								ke[(k+nseln)*3+1][l*3+2] += tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
+								
+								ke[(k+nseln)*3+2][l*3  ] += tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
+								ke[(k+nseln)*3+2][l*3+1] += tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
+								ke[(k+nseln)*3+2][l*3+2] += tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
 							}
+						}
 					}
 
 					// assemble the global stiffness
@@ -956,6 +969,9 @@ void FESlidingInterface2::ContactStiffness()
 						ke.Create(ndof, ndof);
 						ke.zero();
 
+						// a. q-term
+						//-------------------------------------
+						
 						double dpmr, dpms;
 						dpmr = me.eval_deriv1(me.pt(), r, s);
 						dpms = me.eval_deriv2(me.pt(), r, s);
@@ -968,59 +984,32 @@ void FESlidingInterface2::ContactStiffness()
 								ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
 							}
 
-						double H2r[8] = {0}, H2s[8] = {0};
-						for (k=0; k<nmeln; ++k) 
-						{
-							H2r[k+nseln] = Hmr[k];
-							H2s[k+nseln] = Hms[k];
-						}
-
-						double G2r[24], G2s[24];
-						for (k=0; k<nseln+nmeln; ++k)
-						{
-							G2r[3*k  ] = N[k]*Gm[0].x;
-							G2r[3*k+1] = N[k]*Gm[0].y;
-							G2r[3*k+2] = N[k]*Gm[0].z;
-
-							G2s[3*k  ] = N[k]*Gm[1].x;
-							G2s[3*k+1] = N[k]*Gm[1].y;
-							G2s[3*k+2] = N[k]*Gm[1].z;
-						}
-
 						double wn = ss.m_Lmp[ni] + m_epsp*ss.m_pg[ni];
 
 						if (!m_bsymm)
 						{
-							for (k=0; k<nseln+nmeln; ++k)
-								for (l=0; l<nseln+nmeln; ++l)
+							// b. A-term
+							//-------------------------------------
+							
+							for (l=0; l<nseln; ++l)
+								for (k=0; k<nseln+nmeln; ++k)
 								{
-									ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l  ] + H2s[k]*G2s[3*l  ]);
-									ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+1] + H2s[k]*G2s[3*l+1]);
-									ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*wn*(H2r[k]*G2r[3*l+2] + H2s[k]*G2s[3*l+2]);
-								}
-
-							for (k=0; k<nseln+nmeln; ++k)
-								for (l=0; l<nseln+nmeln; ++l)
-								{
-									mat3d A;
-
-									A[0][0] = -Gr[l]*S2[0][0] + Gs[l]*S1[0][0];
-									A[0][1] = -Gr[l]*S2[0][1] + Gs[l]*S1[0][1];
-									A[0][2] = -Gr[l]*S2[0][2] + Gs[l]*S1[0][2];
-
-									A[1][0] = -Gr[l]*S2[1][0] + Gs[l]*S1[1][0];
-									A[1][1] = -Gr[l]*S2[1][1] + Gs[l]*S1[1][1];
-									A[1][2] = -Gr[l]*S2[1][2] + Gs[l]*S1[1][2];
-
-									A[2][0] = -Gr[l]*S2[2][0] + Gs[l]*S1[2][0];
-									A[2][1] = -Gr[l]*S2[2][1] + Gs[l]*S1[2][1];
-									A[2][2] = -Gr[l]*S2[2][2] + Gs[l]*S1[2][2];
-
-									ke[4*k + 3][4*l  ] += dt*w[j]*wn*N[k]*(A[0][0]*nu.x + A[0][1]*nu.y + A[0][2]*nu.z);
-									ke[4*k + 3][4*l+1] += dt*w[j]*wn*N[k]*(A[1][0]*nu.x + A[1][1]*nu.y + A[1][2]*nu.z);
-									ke[4*k + 3][4*l+2] += dt*w[j]*wn*N[k]*(A[2][0]*nu.x + A[2][1]*nu.y + A[2][2]*nu.z);
+									ke[4*k + 3][4*l  ] -= dt*w[j]*wn*N[k]*(As[l][0][0]*nu.x + As[l][0][1]*nu.y + As[l][0][2]*nu.z);
+									ke[4*k + 3][4*l+1] -= dt*w[j]*wn*N[k]*(As[l][1][0]*nu.x + As[l][1][1]*nu.y + As[l][1][2]*nu.z);
+									ke[4*k + 3][4*l+2] -= dt*w[j]*wn*N[k]*(As[l][2][0]*nu.x + As[l][2][1]*nu.y + As[l][2][2]*nu.z);
 								}
 	
+							// c. m-term
+							//---------------------------------------
+								
+							for (k=0; k<nmeln; ++k)
+								for (l=0; l<nseln+nmeln; ++l)
+								{
+									ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].x;
+									ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].y;
+									ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].z;
+								}
+							
 							psolver->AssembleStiffness(en, LM, ke);
 						}
 
@@ -1060,86 +1049,89 @@ bool FESlidingInterface2::Augment(int naug)
 	double Ln, Lp;
 	bool bconv = true;
 
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
 	int NS = m_ss.m_Lmd.size();
 	int NM = m_ms.m_Lmd.size();
-	double normL0 = 0;
-	for (i=0; i<NS; ++i) normL0 += m_ss.m_Lmd[i]*m_ss.m_Lmd[i] + m_ss.m_Lmp[i]*m_ss.m_Lmp[i];
-	for (i=0; i<NM; ++i) normL0 += m_ms.m_Lmd[i]*m_ms.m_Lmd[i] + m_ms.m_Lmp[i]*m_ms.m_Lmp[i];
-	normL0 = sqrt(normL0);
+//	bool contact = false;
+	double maxgap = 0;
+	double maxpg = 0;
 
-	// --- c a l c u l a t e   c u r r e n t   n o r m s ---
-	// a. normal component
-	double normL1 = 0;	// force norm
+	// update Lagrange multipliers
 	for (i=0; i<NS; ++i)
 	{
-		// update Lagrange multipliers
+		// update Lagrange multipliers on slave surface
 		Ln = m_ss.m_Lmd[i] + m_eps*m_ss.m_gap[i];
-		Ln = MBRACKET(Ln);
-
-		Lp = 0;
-		if (Ln >= 0) Lp = m_ss.m_Lmp[i] + m_epsp*m_ss.m_pg[i];
-
-		normL1 += Ln*Ln + Lp*Lp;
+		m_ss.m_Lmd[i] = MBRACKET(Ln);
+		
+		if (bporo) {
+			Lp = 0;
+			if (Ln > 0) {
+				Lp = m_ss.m_Lmp[i] + m_epsp*m_ss.m_pg[i];
+				maxpg = max(maxpg,fabs(m_ss.m_pg[i]));
+			}
+			m_ss.m_Lmp[i] = Lp;
+		}
+		
+		if (Ln > 0) {
+			maxgap = max(maxgap,m_ss.m_gap[i]);
+/*			if (contact)
+				maxgap = max(maxgap,m_ss.m_gap[i]);
+//				maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
+			else {
+				contact = true;
+				maxgap = m_ss.m_gap[i];
+//				maxgap = fabs(m_ss.m_gap[i]);
+			} */
+		}
 	}	
-
+	
 	for (i=0; i<NM; ++i)
 	{
-		// update Lagrange multipliers
+		// update Lagrange multipliers on master surface
 		Ln = m_ms.m_Lmd[i] + m_eps*m_ms.m_gap[i];
-		Ln = MBRACKET(Ln);
-
-		Lp = 0;
-		if (Ln >= 0) Lp = m_ms.m_Lmp[i] + m_epsp*m_ms.m_pg[i];
-
-		normL1 += Ln*Ln + Lp*Lp;
-	}
-	normL1 = sqrt(normL1);
-
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	// calculate and print convergence norms
-	double lnorm = 0;
-	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
-
-	log.printf(" sliding interface # %d\n", m_nID);
-	log.printf("                        CURRENT        REQUIRED\n");
-	log.printf("    normal force : %15le", lnorm);
-	if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
-
-	// check convergence
-	bconv = true;
-	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
-	if (m_naugmin > naug) bconv = false;
-	if (m_naugmax <= naug) bconv = true;
+		m_ms.m_Lmd[i] = MBRACKET(Ln);
 		
-	if (bconv == false)
-	{
-		// we did not converge so update multipliers
-		for (i=0; i<NS; ++i)
-		{
-			// update Lagrange multipliers
-			Ln = m_ss.m_Lmd[i] + m_eps*m_ss.m_gap[i];
-			m_ss.m_Lmd[i] = MBRACKET(Ln);
-
+		if (bporo) {
 			Lp = 0;
-			if (Ln >= 0) Lp = m_ss.m_Lmp[i] + m_epsp*m_ss.m_pg[i];
-			m_ss.m_Lmp[i] = Lp;
-		}	
-
-		for (i=0; i<NM; ++i)
-		{
-			// update Lagrange multipliers
-			Ln = m_ms.m_Lmd[i] + m_eps*m_ms.m_gap[i];
-			m_ms.m_Lmd[i] = MBRACKET(Ln);
-
-			Lp = 0;
-			if (Ln >= 0) Lp = m_ms.m_Lmp[i] + m_epsp*m_ms.m_pg[i];
+			if (Ln > 0) {
+				Lp = m_ms.m_Lmp[i] + m_epsp*m_ms.m_pg[i];
+				maxpg = max(maxpg,fabs(m_ms.m_pg[i]));
+			}
 			m_ms.m_Lmp[i] = Lp;
 		}
+		
+		if (Ln > 0) {
+			maxgap = max(maxgap,m_ms.m_gap[i]);
+/*			if (contact)
+				maxgap = max(maxgap,m_ms.m_gap[i]);
+//				maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
+			else {
+				contact = true;
+				maxgap = m_ms.m_gap[i];
+//				maxgap = fabs(m_ms.m_gap[i]);
+			} */
+		}
 	}
+
+	// check convergence
+	if (maxgap > m_gtol)
+		bconv = false;
+	if (bporo && maxpg > m_ptol)
+		bconv = false;
+	Logfile& log = GetLogfile();
+	
+	log.printf(" sliding interface # %d\n", m_nID);
+	log.printf("                        CURRENT        REQUIRED\n");
+	log.printf("    maximum gap  : %15le", maxgap);
+	if (m_gtol > 0) log.printf("%15le\n", m_gtol); else log.printf("       ***\n");
+	if (bporo) {
+		log.printf("    maximum pgap : %15le", maxpg);
+		if (m_ptol > 0) log.printf("%15le\n", m_ptol); else log.printf("       ***\n");
+	}
+
 
 	return bconv;
 }

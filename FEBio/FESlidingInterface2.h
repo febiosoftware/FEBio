@@ -78,6 +78,8 @@ public:
 	int				m_knmult;	//!< higher order stiffness multiplier
 	int				m_npass;	//!< nr of passes
 	double			m_atol;		//!< augmentation tolerance
+	double			m_gtol;		//!< gap tolerance
+	double			m_ptol;		//!< pressure gap tolerance
 	double			m_eps;		//!< penalty factor
 	double			m_stol;		//!< search tolerance
 	bool			m_bsymm;	//!< use symmetric stiffness components only
