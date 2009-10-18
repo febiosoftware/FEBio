@@ -362,6 +362,15 @@ public:
 		return a;
 	}
 
+	vec3d eval(vec3d* d, int n)
+	{
+		int ne = Nodes();
+		double* N = H(n);
+		vec3d a(0,0,0);
+		for (int i=0; i<ne; ++i) a += d[i]*N[i];
+		return a;
+	}
+
 	double eval_deriv1(double* d, int j)
 	{
 		double* Hr = Gr(j);

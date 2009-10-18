@@ -211,8 +211,13 @@ class FESolidSolver;
 // forward declaration of the FEM class
 class FEM;
 
-// define the FEBIO callback function
-typedef void (*FEBIO_CALLBACK)(FEM*,void*);
+//-----------------------------------------------------------------------------
+// FEBIO callback structure
+typedef void (*FEBIO_CB_FNC)(FEM*,void*);
+struct FEBIO_CALLBACK {
+	FEBIO_CB_FNC	m_pcb;
+	void*	m_pd;
+};
 
 //-----------------------------------------------------------------------------
 //! Discrete element
@@ -269,9 +274,6 @@ public:
 
 	//! echoes the input data to the logfile
 	void EchoInput();
-
-	//! set callback function
-	void SetCallback(FEBIO_CALLBACK pcb, void* pd) { m_pcb = pcb; m_pcbd = pd; }
 
 	//! Add a material to the model
 	void AddMaterial(FEMaterial* pm) { m_MAT.add(pm); }
@@ -402,9 +404,11 @@ public:
 		//! see if body forces are present
 		bool UseBodyForces() { return ((m_BF[0].lc>=0) || (m_BF[1].lc>=0) || (m_BF[2].lc>=0)); }
 
+		//! set callback function
+		void AddCallback(FEBIO_CB_FNC pcb, void* pd);
+
 		//! call the callback function
 		void DoCallback();
-
 	//}
 
 public:
@@ -518,8 +522,7 @@ protected:
 
 		bool	m_debug;	//!< debug flag
 
-		FEBIO_CALLBACK		m_pcb;	//!< pointer to callback function
-		void*				m_pcbd;	//!< pointer to callback data
+		list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
 	//}
 
 	// some friends of this class

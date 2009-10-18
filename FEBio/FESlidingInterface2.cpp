@@ -129,6 +129,75 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 
 	m_naugmin = 0;
 	m_naugmax = 10;
+
+	m_bdebug = false;
+	m_szdebug[0] = 0;
+	m_fp = 0;
+}
+
+//-----------------------------------------------------------------------------
+
+FESlidingInterface2::~FESlidingInterface2()
+{
+	if (m_fp) fclose(m_fp);
+	m_fp = 0;
+}
+
+//-----------------------------------------------------------------------------
+
+void OnSlidingInterface2Callback(FEM* pfem, void* pd)
+{
+	// get the sliding interface pointer
+	FESlidingInterface2* pi = (FESlidingInterface2*) (pd);
+
+	// see if there is a valid file pointer
+	FILE* fp = pi->m_fp;
+	if (fp == 0) return;
+
+	FEMesh& mesh = pfem->m_mesh;
+
+	double t = pfem->m_ftime;
+	int nt = pfem->m_pStep->m_ntimesteps;
+	fprintf(fp, "----------------------------------------------------------------------------------------------------------------\n");
+	fprintf(fp, "time: %lg\n", t);
+	fprintf(fp, "step: %d\n", nt);
+	fprintf(fp, "--1-|2|------3-------|------4-------|------5-------|------6-------|------7-------|------8-------|------9-------|\n");
+
+	bool bporo = pfem->m_pStep->m_nModule == FE_POROELASTIC;
+
+	// export data
+	for (int n=0; n<pi->m_npass; ++n)
+	{
+		// get the surface
+		FEContactSurface2& s = (n == 0? pi->m_ss : pi->m_ms);
+
+		// loop over all elements
+		int l = 0;
+		for (int i=0; i<s.Elements(); ++i)
+		{
+			// get the element
+			FESurfaceElement& e = s.Element(i);
+			mesh.UnpackElement(e);
+
+			// get the element's nodal coordinates
+			vec3d* rn = e.rt();
+
+			// loop over the integration points
+			int ni = e.GaussPoints();
+			for (int j=0; j<ni; ++j, ++l)
+			{
+				// evaluate the integration's point initial location
+				vec3d r = e.eval(rn, j); 
+
+				double Ld = s.m_Lmd[l];
+				double Lp = (bporo? s.m_Lmp[l] : 0);
+				double g  = s.m_gap[l];
+				double dp = (bporo? s.m_pg[l] : 0); 
+
+				fprintf(fp, "%5d%2d%15lg%15lg%15lg%15lg%15lg%15lg%15lg\n", i+1, j+1, r.x, r.y, r.z, Ld, Lp, g, dp);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -160,6 +229,34 @@ void FESlidingInterface2::Init()
 
 	// update sliding interface data
 	Update();
+
+	// create debug file
+	if (m_bdebug)
+	{
+		m_fp = fopen(m_szdebug, "wt");
+		if (m_fp == 0) 
+		{
+			Logfile& log = GetLogfile();
+			log.printf("WARNING: unable to create debug file. No debug data will be stored.\n");
+			m_bdebug = false;
+		}
+		else
+		{
+			// add a callback function
+			m_pfem->AddCallback(OnSlidingInterface2Callback, this);
+
+
+			fprintf(m_fp, "[ 1] element ID\n");
+			fprintf(m_fp, "[ 2] integration point\n");
+			fprintf(m_fp, "[ 3] x-coord of integration point\n");
+			fprintf(m_fp, "[ 4] y-coord of integration point\n");
+			fprintf(m_fp, "[ 5] z-coord of integration point\n");
+			fprintf(m_fp, "[ 6] traction multiplier\n");
+			fprintf(m_fp, "[ 7] pressure multiplier\n");
+			fprintf(m_fp, "[ 8] displacement gap\n");
+			fprintf(m_fp, "[ 9] pressure difference\n");
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

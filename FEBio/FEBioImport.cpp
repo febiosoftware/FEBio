@@ -1665,6 +1665,12 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			else if (tag == "pressure_penalty") tag.value(ps->m_epsp);
 			else if (tag == "symmetric_stiffness") tag.value(ps->m_bsymm);
 			else if (tag == "search_radius") tag.value(ps->m_srad);
+			else if (tag == "debug")
+			{
+				tag.value(ps->m_bdebug);
+				const char* sz = tag.AttributeValue("file");
+				if (sz) strcpy(ps->m_szdebug, sz);
+			}
 			else if (tag == "two_pass"  ) 
 			{
 				int n;

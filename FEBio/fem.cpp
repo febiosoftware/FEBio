@@ -69,8 +69,6 @@ FEM::FEM()
 
 	m_sztitle[0] = 0;
 	m_debug = false;
-	m_pcb = 0;
-	m_pcbd = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,14 +169,31 @@ void FEM::operator =(FEM& fem)
 	for (i=0; i<ContactInterfaces(); ++i) m_CI[i].ShallowCopy(fem.m_CI[i]);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEM::DoCallback
+//-----------------------------------------------------------------------------
+// This function adds a callback routine
+//
+void FEM::AddCallback(FEBIO_CB_FNC pcb, void *pd)
+{
+	FEBIO_CALLBACK cb;
+	cb.m_pcb = pcb;
+	cb.m_pd = pd;
+
+	m_pcb.push_back(cb);
+}
+
+//-----------------------------------------------------------------------------
+// FEM::DoCallback
 // Call the callback function if there is one defined
 //
 
 void FEM::DoCallback()
 {
-	if (m_pcb) m_pcb(this, m_pcbd);
+	list<FEBIO_CALLBACK>::iterator it = m_pcb.begin();
+	for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
+	{
+		// call the callback function
+		(it->m_pcb)(this, it->m_pd);
+	}
 }
 
 //-----------------------------------------------------------------------------

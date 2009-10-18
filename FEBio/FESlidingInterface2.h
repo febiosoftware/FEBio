@@ -45,7 +45,7 @@ public:
 	FESlidingInterface2(FEM* pfem);
 
 	//! destructor
-	~FESlidingInterface2(void) {}
+	~FESlidingInterface2();
 
 	//! initialization
 	void Init();
@@ -86,6 +86,10 @@ public:
 	double			m_srad;		//!< contact search radius
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations
+
+	bool	m_bdebug;		// debug flag
+	char	m_szdebug[256];	// debug file name
+	FILE*	m_fp;			// debug file
 	
 	// bihpasic contact parameters
 	double	m_epsp;		//!< flow rate penalty
