@@ -45,8 +45,9 @@ void print_banner()
 	printf("                                                                           \n");
 	printf("      F I N I T E   E L E M E N T S   F O R   B I O M E C H A N I C S      \n");
 	printf("                                                                           \n");
-	printf("                 --- v e r s i o n - %d . %d . %d . %d ---                 \n", 
-		VERSION, SUBVERSION, SUBSUBVERSION, SVNREVISION);
+	printf("                 --- v e r s i o n - %d . %d . %d", VERSION, SUBVERSION, SUBSUBVERSION);
+	if (SVNREVISION) printf(" . %d ---                 \n", SVNREVISION);
+	else printf(" ---                 \n");
 	printf("                                                                           \n");
 	printf("                                                                           \n");
 	printf("  Musculoskeletal Research Laboratory                                      \n");
@@ -84,8 +85,9 @@ void Hello(FILE* fp)
 	fprintf(fp,"                                                                           \n");
 	fprintf(fp,"      F I N I T E   E L E M E N T S   F O R   B I O M E C H A N I C S      \n");
 	fprintf(fp,"                                                                           \n");
-	fprintf(fp,"                 --- v e r s i o n - %d . %d . %d . %d ---                 \n", 
-		VERSION, SUBVERSION, SUBSUBVERSION, SVNREVISION);
+	fprintf(fp,"                 --- v e r s i o n - %d . %d . %d", VERSION, SUBVERSION, SUBSUBVERSION);
+	if (SVNREVISION) fprintf(fp," . %d ---                 \n", SVNREVISION);
+	else fprintf(fp," ---                 \n");
 	fprintf(fp,"                                                                           \n");
 	fprintf(fp,"                                                                           \n");
 	fprintf(fp,"  Musculoskeletal Research Laboratory                                      \n");
