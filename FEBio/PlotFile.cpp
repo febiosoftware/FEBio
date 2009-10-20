@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "FEPeriodicBoundary.h"
+#include "FESlidingInterface2.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -587,7 +588,7 @@ void PlotFile::write_contact_tractions()
 {
 	FEM& fem = *m_pfem;
 
-	int i, j, n;
+	int i, j, k, n;
 
 	vector<float[3]> acc(fem.m_mesh.Nodes());
 	for (i=0; i<fem.m_mesh.Nodes(); ++i) acc[i][0] = acc[i][1] = acc[i][2] = 0;
@@ -639,6 +640,33 @@ void PlotFile::write_contact_tractions()
 				acc[m][0] += (float) t.x;
 				acc[m][1] += (float) t.y;
 				acc[m][2] += (float) t.z;
+			}
+		}
+
+		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
+		if (ps2)
+		{
+			FEContactSurface2& ss = ps2->m_ss;
+			FEContactSurface2& ms = ps2->m_ms;
+
+			double ti[4], tn[4];
+			int ni = 0, ne;
+			for (j=0; j<ss.Elements(); ++j)
+			{
+				FESurfaceElement& el = ss.Element(j);
+				ne = el.Nodes();
+				for (k=0; k<ne; ++k, ++ni)
+				{
+					ti[k] = ss.m_Lmd[ni];
+				}
+
+				el.project_to_nodes(ti, tn);
+
+				for (k=0; k<ne; ++k)
+				{
+					int m = ss.node[k];
+					acc[m][2] += (float) tn[k];
+				}
 			}
 		}
 	}

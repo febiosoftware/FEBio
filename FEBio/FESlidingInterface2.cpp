@@ -126,6 +126,8 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_stol = 0.01;
 	m_bsymm = true;
 	m_srad = 0.1;
+	m_gtol = 0.01;
+	m_ptol = 0.01;
 
 	m_naugmin = 0;
 	m_naugmax = 10;
