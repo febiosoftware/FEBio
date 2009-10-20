@@ -50,7 +50,7 @@ FERandomFiberMooneyRivlin::FERandomFiberMooneyRivlin()
 
 		for (int n=0; n<m_nint; ++n)
 		{
-			m_cth[n] = cos(the[n]); 
+			m_cth[n] = cos(the[n]);
 			m_sth[n] = sin(the[n]);
 			m_cph[n] = cos(phi[n]);
 			m_sph[n] = sin(phi[n]);
@@ -81,6 +81,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	const double third = 1.0/3.0;
+	m_nint = (m_nres == 0? NSTL  : NSTH  );
 
 	// deformation gradient
 	mat3d &F = pt.F;
@@ -184,6 +185,7 @@ tens4ds FERandomFiberMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
+	m_nint = (m_nres == 0? NSTL  : NSTH  );
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
