@@ -88,6 +88,9 @@ public:
 				//!< The first index refers to the gauss-point,
 				//!< the second index to the shape function
 
+	matrix Hi;	//!< inverse of H; useful for projection integr. point data to nodal data 
+
+
 	int m_ntype;	//!< type of element
 
 	FEElement*	m_pel;	//!< pointer to unpacked element

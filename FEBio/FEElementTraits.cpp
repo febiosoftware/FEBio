@@ -666,6 +666,8 @@ void FEQuadElementTraits::init()
 		H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
 	}
 
+	Hi = H.inverse();
+
 	for (n=0; n<NINT; ++n)
 	{
 		Gr[n][0] = -0.25*(1-gs[n]);
@@ -700,6 +702,8 @@ void FENIQuadElementTraits::init()
 		H[n][2] = 0.25*(1+gr[n])*(1+gs[n]);
 		H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
 	}
+
+	Hi = H.inverse();
 
 	for (n=0; n<NINT; ++n)
 	{
@@ -737,6 +741,8 @@ void FETriElementTraits::init()
 		H[n][2] = gs[n];
 	}
 
+	Hi = H.inverse();
+
 	for (n=0; n<NINT; ++n)
 	{
 		Gr[n][0] = -1;
@@ -769,6 +775,8 @@ void FENITriElementTraits::init()
 		H[n][1] = gr[n];
 		H[n][2] = gs[n];
 	}
+
+	Hi = H.inverse();
 
 	for (n=0; n<NINT; ++n)
 	{

@@ -447,6 +447,20 @@ public:
 		else assert(false);
 	}
 
+	//! this function projects data from the gauss-points to the nodal points
+	void project_to_nodes(double* ai, double* ao)
+	{
+		int ni = GaussPoints();
+		int ne = Nodes();
+		assert(ni == ne); // TODO: for now we assume that the number of nodes equals the nr of gauss-points
+		matrix& Hi = m_pT->Hi;
+		for (int i=0; i<ne; ++i)
+		{
+			ao[i] = 0;
+			for (int j=0; j<ni; ++j) ao[i] += Hi[i][j]*ai[j];
+		}
+	}
+
 public:
 	vector<int>	m_lnode;	//!< local node numbering (compared to m_node which is a global numbering)
 };

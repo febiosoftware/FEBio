@@ -375,7 +375,7 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::Update()
 {	
-	int i, j, n, id;
+	int i, n, id;
 
 	// project the surfaces onto each other
 	// this will update the gap functions as well
@@ -415,7 +415,7 @@ void FESlidingInterface2::Update()
 		{
 			FESurfaceElement& el = ss.Element(n);
 
-			// get the nodal tractions at the integration points
+			// get the normal tractions at the integration points
 			double ti[4], gi[4];
 			int nint = el.GaussPoints();
 			int neln = el.Nodes();
@@ -425,42 +425,11 @@ void FESlidingInterface2::Update()
 				ti[i] = MBRACKET(ss.m_Lmd[ni] + m_eps*gi[i]);
 			}
 
-			// setup the (over-determined) system to find the nodal values
-			// TODO: this is the same for all surface elements, so
-			//       maybe we should do this only once
-			matrix A;
-			A.Create(nint, neln);
-			for (i=0; i<nint; ++i)
-			{
-				double* H = el.H(i);
-				for (j=0; j<neln; ++j) A[i][j] = H[j];
-			}
-
+			// project the data to the nodes
 			double tn[4];
+			el.project_to_nodes(ti, tn);
 
-			if (nint == neln)
-			{
-				matrix Ai = A.inverse();
-
-				for (i=0; i<neln; ++i)
-				{
-					tn[i] = 0;
-					for (j=0; j<nint; ++j) tn[i] += Ai[i][j]*ti[j];
-				}
-			}
-			else
-			{
-				matrix At = A.transpose();
-				matrix C = At*A;
-				matrix D = C.inverse()*At;
-
-				for (i=0; i<neln; ++i)
-				{
-					tn[i] = 0;
-					for (j=0; j<nint; ++j) tn[i] += D[i][j]*ti[j];
-				}
-			}
-
+			// see if we need to make changes to the BC's
 			for (i=0; i<neln; ++i)
 			{
 				FENode& node = ss.Node(el.m_lnode[i]);
@@ -518,7 +487,7 @@ void FESlidingInterface2::Update()
 			{
 				// we found an element so let's calculate the nodal traction values for this element
 	
-				// get the nodal tractions at the integration points
+				// get the normal tractions at the integration points
 				double ti[4], gi[4];
 				int nint = pse->GaussPoints();
 				int neln = pse->Nodes();
@@ -529,41 +498,9 @@ void FESlidingInterface2::Update()
 					ti[i] = MBRACKET(m_ss.m_Lmd[noff + i] + m_eps*gi[i]);
 				}
 
-				// setup the (over-determined) system to find the nodal values
-				// TODO: this is the same for all surface elements, so
-				//       maybe we should do this only once
-				matrix A;
-				A.Create(nint, neln);
-				for (i=0; i<nint; ++i)
-				{
-					double* H = pse->H(i);
-					for (j=0; j<neln; ++j) A[i][j] = H[j];
-				}
-
+				// project the data to the nodes
 				double tn[4];
-
-				if (nint == neln)
-				{
-					matrix Ai = A.inverse();
-
-					for (i=0; i<neln; ++i)
-					{
-						tn[i] = 0;
-						for (j=0; j<nint; ++j) tn[i] += Ai[i][j]*ti[j];
-					}
-				}
-				else
-				{
-					matrix At = A.transpose();
-					matrix C = At*A;
-					matrix D = C.inverse()*At;
-
-					for (i=0; i<neln; ++i)
-					{
-						tn[i] = 0;
-						for (j=0; j<nint; ++j) tn[i] += D[i][j]*ti[j];
-					}
-				}
+				pse->project_to_nodes(ti, tn);
 
 				// now evaluate the traction at the intersection point
 				double tp = pse->eval(tn, rs[0], rs[1]);
