@@ -36,7 +36,6 @@ public:
 
 	static	int	m_nres;	// integration rule
 
-	int	m_nint;		// integration points
 	static double	m_cth[];
 	static double	m_sth[];
 	static double	m_cph[];

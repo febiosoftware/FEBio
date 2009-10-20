@@ -43,12 +43,12 @@ FERandomFiberMooneyRivlin::FERandomFiberMooneyRivlin()
 	if (bfirst)
 	{
 		// select the integration rule
-		m_nint = (m_nres == 0? NSTL  : NSTH  );
+		const int nint = (m_nres == 0? NSTL  : NSTH  );
 		const double* phi = (m_nres == 0? PHIL  : PHIH  );
 		const double* the = (m_nres == 0? THETAL: THETAH);
 		const double* w   = (m_nres == 0? AREAL : AREAH );
 
-		for (int n=0; n<m_nint; ++n)
+		for (int n=0; n<nint; ++n)
 		{
 			m_cth[n] = cos(the[n]);
 			m_sth[n] = sin(the[n]);
@@ -81,7 +81,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	const double third = 1.0/3.0;
-	m_nint = (m_nres == 0? NSTL  : NSTH  );
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
 
 	// deformation gradient
 	mat3d &F = pt.F;
@@ -121,7 +121,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	vec3d nr, n0, nt;
 	double In, Wl;
 	const double eps = 0;
-	for (int n=0; n<m_nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
 		// set the local fiber direction
 		nr.x = m_cth[n]*m_sph[n];
@@ -185,7 +185,7 @@ tens4ds FERandomFiberMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
-	m_nint = (m_nres == 0? NSTL  : NSTH  );
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
@@ -250,7 +250,7 @@ tens4ds FERandomFiberMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	mat3ds N2;
 	tens4ds N4;
 	tens4ds I4mIxId3 = I4 - IxI/3.0;
-	for (int n=0; n<m_nint; ++n)
+	for (int n=0; n<nint; ++n)
 	{
 		// set the local fiber direction
 		nr.x = m_cth[n]*m_sph[n];
