@@ -1112,7 +1112,7 @@ bool FESlidingInterface2::Augment(int naug)
 		}
 		
 		if (Ln > 0) {
-			maxgap = max(maxgap,m_ss.m_gap[i]);
+			maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
 /*			if (contact)
 				maxgap = max(maxgap,m_ss.m_gap[i]);
 //				maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
@@ -1140,7 +1140,7 @@ bool FESlidingInterface2::Augment(int naug)
 		}
 		
 		if (Ln > 0) {
-			maxgap = max(maxgap,m_ms.m_gap[i]);
+			maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
 /*			if (contact)
 				maxgap = max(maxgap,m_ms.m_gap[i]);
 //				maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
