@@ -1041,9 +1041,9 @@ void FESlidingInterface2::ContactStiffness()
 							for (k=0; k<nmeln; ++k)
 								for (l=0; l<nseln+nmeln; ++l)
 								{
-									ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].x;
-									ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].y;
-									ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].z;
+									ke[4*(k+nseln) + 3][4*l  ] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].x;
+									ke[4*(k+nseln) + 3][4*l+1] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].y;
+									ke[4*(k+nseln) + 3][4*l+2] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].z;
 								}
 							
 							psolver->AssembleStiffness(en, LM, ke);
