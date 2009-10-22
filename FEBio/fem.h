@@ -27,6 +27,7 @@
 #include "FEAnalysis.h"
 #include "FEAugLagLinearConstraint.h"
 #include "FETractionConstraint.h"
+#include "Timer.h"
 
 #include <list>
 using namespace std;
@@ -425,6 +426,9 @@ public:
 		// body force loads
 		FE_BODYFORCE	m_BF[3];		//!< body force data
 		vec3d			m_acc;			//!< acceleration due to bodyforces
+
+		// Create timer to track total running time
+		Timer	m_TotalTime;
 	//}
 
 	// --- Geometry Data ---
@@ -501,6 +505,7 @@ public:
 	//{
 		int		m_nsolver;	//!< type of solver selected
 		int		m_neq;		//!< number of equations
+		int		m_npeq;		//!< number of equations related to pressure dofs
 		int		m_bwopt;	//!< bandwidth optimization flag
 		bool	m_bsymm;	//!< symmetric flag
 	//}

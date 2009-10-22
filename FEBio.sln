@@ -49,6 +49,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		AMDCaProjectFile = C:\Documents and Settings\Steve\My Documents\Visual Studio 2008\Projects\FEBio.sln\CodeAnalyst\FEBio.caw
+		AMDCaProjectFile = C:\Documents and Settings\Steve\My Documents\Visual Studio 2008\Projects\FEBio\CodeAnalyst\FEBio.caw
 	EndGlobalSection
 EndGlobal

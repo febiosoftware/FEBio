@@ -60,6 +60,7 @@ FEM::FEM()
 #endif
 
 	m_neq = 0;
+	m_npeq = 0;
 	m_bwopt = 0;
 
 	// --- I/O-Data ---

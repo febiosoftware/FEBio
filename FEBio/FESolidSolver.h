@@ -181,6 +181,8 @@ protected:
 	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
 	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
 
+	void GetPressureData(vector<double>& pi, vector<double>& ui);
+
 public:
 	//! serialize data to/from dump file
 	void Serialize(Archive& ar);
@@ -196,6 +198,10 @@ public:
 	vector<double> m_R1;	//!< residual at iteration i
 	vector<double> m_Ti;	//!< internal nodal tractions (used only for traction constraints for now)
 
+	// poro data
+	vector<double>	m_pi;	//!< pressure increment vector
+	vector<double>	m_Pi;	//!< Total pressure vector for iteration
+
 	// BFGS update vectors
 	matrix			m_V;
 	matrix			m_W;
@@ -210,6 +216,11 @@ public:
 	double		m_normUi;	//!< initial displacement norm
 	double		m_normU;	//!< current displacement norm
 	double		m_normu;	//!< incremement displacement norm
+
+	// poro data
+	double		m_normPi;	//!< initial pressure norm
+	double		m_normP;	//!< current pressure norm
+	double		m_normp;	//!< incremement pressure norm
 
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag

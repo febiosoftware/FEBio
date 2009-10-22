@@ -134,3 +134,12 @@ public:
 	int run(int nargs, char** argv);
 	DECLARE_COMMAND(FEBioCmd_Version);
 };
+
+//-----------------------------------------------------------------------------
+
+class FEBioCmd_Time : public FEBioCommand
+{
+public:
+	int run(int nargs, char** argv);
+	DECLARE_COMMAND(FEBioCmd_Time);
+};

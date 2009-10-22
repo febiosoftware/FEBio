@@ -100,6 +100,7 @@ void FESolidSolver::PrepStep(double time)
 
 	// zero total displacements/pressures
 	m_Ui.zero();
+	m_Pi.zero();
 
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
@@ -287,6 +288,9 @@ bool FESolidSolver::Quasin(double time)
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
 
+	// poroelasticity flag
+	bool bporo = m_fem.m_pStep->m_nModule == FE_POROELASTIC;
+
 	// prepare for the first iteration
 	PrepStep(time);
 
@@ -353,7 +357,7 @@ bool FESolidSolver::Quasin(double time)
 		m_normu  = (m_ui*m_ui)*(s*s);
 		m_normU  = m_Ui*m_Ui;
 		m_normE1 = s*fabs(m_ui*m_R1);
-	
+
 		// check residual norm
 		if (m_normR1 > m_Rtol*m_normRi) bconv = false;	
 
@@ -369,6 +373,26 @@ bool FESolidSolver::Quasin(double time)
 		// check energy divergence
 		if (m_normE1 > m_normEm) bconv = false;
 
+		// check poroelastic convergence
+		if (bporo)
+		{
+			// extract the pressure increments
+			GetPressureData(m_pi, m_ui);
+
+			// set initial norm
+			if (m_niter == 0) m_normPi = fabs(m_pi*m_pi);
+
+			// update total pressure
+			for (i=0; i<m_fem.m_npeq; ++i) m_Pi[i] += s*m_pi[i];
+
+			// calculate norms
+			m_normP = m_Pi*m_Pi;
+			m_normp = (m_pi*m_pi)*(s*s);
+
+			// check convergence
+			if (m_normp > (m_Dtol*m_Dtol)*m_normP) bconv = false;
+		}
+
 		// print convergence summary
 		oldmode = log.GetMode();
 		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) log.SetMode(Logfile::FILE_ONLY);
@@ -381,6 +405,11 @@ bool FESolidSolver::Quasin(double time)
 		log.printf("\t   residual         %15le %15le %15le \n", m_normRi, m_normR1, m_Rtol*m_normRi);
 		log.printf("\t   energy           %15le %15le %15le \n", m_normEi, m_normE1, m_Etol*m_normEi);
 		log.printf("\t   displacement     %15le %15le %15le \n", m_normUi, m_normu ,(m_Dtol*m_Dtol)*m_normU );
+		if (bporo)
+		{
+			log.printf("\t   fluid pressure   %15le %15le %15le \n", m_normPi, m_normp ,(m_Dtol*m_Dtol)*m_normP );
+		}
+
 		log.SetMode(oldmode);
 
 		// check if we have converged. 
@@ -482,6 +511,13 @@ bool FESolidSolver::Quasin(double time)
 				// for incompressible materials
 				UpdateStresses();
 				Residual(m_R0);
+
+				// reform the matrix if we are using full-Newton
+				if (m_fem.m_pStep->m_psolver->m_maxups == 0)
+				{
+					log.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+					if (ReformStiffness() == false) break;
+				}
 			}
 		}
 	
@@ -519,6 +555,24 @@ bool FESolidSolver::Quasin(double time)
 	}
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
+{
+	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
+	pi.zero();
+	for (int i=0; i<N; ++i)
+	{
+		FENode& n = m_fem.m_mesh.Node(i);
+		nid = n.m_ID[6];
+		if (nid != -1)
+		{
+			nid = (nid < -1 ? -nid-2 : nid);
+			pi[m++] = ui[nid];
+			assert(n <= pi.size());
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

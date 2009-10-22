@@ -16,6 +16,7 @@ REGISTER_COMMAND(FEBioCmd_Print  , "print"  , "print values of variables");
 REGISTER_COMMAND(FEBioCmd_Quit   , "quit"   , "terminate the run and quit");
 REGISTER_COMMAND(FEBioCmd_Restart, "restart", "toggles restart flag");
 REGISTER_COMMAND(FEBioCmd_Version, "version", "print version information");
+REGISTER_COMMAND(FEBioCmd_Time   , "time"   , "print progress time statistics");
 
 //-----------------------------------------------------------------------------
 
@@ -194,5 +195,36 @@ int FEBioCmd_Version::run(int nargs, char **argv)
 	printf("\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
 	printf("compiled on " __DATE__ "\n");
 	printf("using FECore version %s\n\n", FECore::get_version_string());
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+
+int FEBioCmd_Time::run(int nargs, char **argv)
+{
+	double sec = m_pfem->m_TotalTime.peek();
+	double sec0 = sec;
+
+	int nhour, nmin, nsec;
+
+	nhour = (int) (sec / 3600.0); sec -= nhour*3600;
+	nmin  = (int) (sec /   60.0); sec -= nmin*60;
+	nsec  = (int) (sec);
+	printf("Elapsed time       :  %d:%02d:%02d\n", nhour, nmin, nsec);
+
+	double endtime = m_pfem->m_pStep->m_dt0*m_pfem->m_pStep->m_ntime;
+
+	double pct = (m_pfem->m_ftime - m_pfem->m_pStep->m_dt) / endtime;
+	if ((pct != 0) && (m_pfem->m_pStep->m_ntimesteps != 0))
+	{
+		double sec1 = sec0*(1.0/pct - 1.0);
+		nhour = (int) (sec1 / 3600.0); sec1 -= nhour*3600;
+		nmin  = (int) (sec1 /   60.0); sec1 -= nmin*60;
+		nsec  = (int) (sec1);
+		printf("Est. time remaining:  %d:%02d:%02d\n", nhour, nmin, nsec);
+	}
+	else
+		printf("Est. time remaining:  (not available)\n", nhour, nmin, nsec);
+
 	return 0;
 }

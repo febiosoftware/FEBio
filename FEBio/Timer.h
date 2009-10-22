@@ -39,6 +39,9 @@ public:
 	//! return the time as a text string
 	void time_str(char* sz);
 
+	//! check the elapsed time
+	double peek();
+
 private:
 	time_t	m_start;	//!< time at start
 	time_t	m_stop;		//!< time at last stop

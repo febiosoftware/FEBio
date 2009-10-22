@@ -858,6 +858,42 @@ void PlotFile::write_contact_gaps()
 			FEContactSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0? 0 : ss.gap[j]);
 		}
+
+		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
+		if (ps2)
+		{
+			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			double gi[4], gn[4];
+			int ni, ne, n, k;
+
+			for (n=0; n<ps2->m_npass; ++n)
+			{
+				FEContactSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
+
+				int nint = 0;
+				for (j=0; j<s.Elements(); ++j)
+				{
+					FESurfaceElement& el = s.Element(j);
+					ne = el.Nodes();
+					ni = el.GaussPoints();
+					for (k=0; k<ni; ++k, ++nint)
+					{
+						gi[k] = s.m_gap[nint];
+					}
+
+					el.project_to_nodes(gi, gn);
+
+					for (k=0; k<ne; ++k)
+					{
+						int m = el.m_node[k];
+						t[m] += (float) gn[k];
+						val[m]++;
+					}
+				}
+			}
+
+			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
+		}
 	}
 
 	for (i=0; i<fem.m_mesh.Nodes(); ++i)

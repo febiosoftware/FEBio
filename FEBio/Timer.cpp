@@ -26,6 +26,13 @@ void Timer::reset()
 	m_sec = 0;
 }
 
+double Timer::peek()
+{
+	time_t pause;
+	time(&pause);
+	return (m_sec + (double) difftime(pause, m_start));
+}
+
 void Timer::GetTime(int& nhour, int& nmin, int& nsec)
 {
 	double sec = m_sec;

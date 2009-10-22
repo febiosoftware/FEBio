@@ -24,9 +24,6 @@ bool FEM::Solve()
 	// set the title of the window
 	Console* pShell = Console::GetHandle();
 
-	// Create timer to track total running time
-	Timer	m_TotalTime;
-
 	// start the total time tracker
 	m_TotalTime.start();
 

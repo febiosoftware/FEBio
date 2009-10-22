@@ -352,11 +352,11 @@ public:
 
 	double diag(int i)
 	{
-		int* pi = m_pindices + m_ppointers[i];
+		int* pi = m_pindices + m_ppointers[i] - m_offset;
 		int l = m_ppointers[i+1] - m_ppointers[i];
 		for (int n=0; n<l; ++n)
 		{
-			if (pi[n] == i)
+			if (pi[n] == i + m_offset)
 			{
 				return m_pd[ m_ppointers[i] + n - m_offset ];
 			}

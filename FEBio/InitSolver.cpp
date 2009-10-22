@@ -25,6 +25,13 @@ bool FESolidSolver::Init()
 	m_R0.create(neq); m_R0.zero();
 	m_R1.create(neq); m_R1.zero();
 
+	// allocate poro-vectors
+	if (m_fem.m_npeq > 0)
+	{
+		m_pi.create(m_fem.m_npeq); m_pi.zero();
+		m_Pi.create(m_fem.m_npeq); m_Ui.zero();
+	}
+
 	// if we have traction constraints
 	// we store the internal forces seperately
 	m_Ti.create(neq); m_Ti.zero();

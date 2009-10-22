@@ -135,5 +135,13 @@ bool FEM::InitPoro()
 		}
 	}
 
+	// determined the nr of pressure equations
+	m_npeq = 0;
+	for (i=0; i<m_mesh.Nodes(); ++i)
+	{
+		FENode& n = m_mesh.Node(i);
+		if (n.m_ID[6] != -1) m_npeq++;
+	}
+
 	return true;
 }
