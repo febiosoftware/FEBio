@@ -159,6 +159,7 @@ void FEM::operator =(FEM& fem)
 				break;
 			case FE_PERIODIC_BOUNDARY:
 				pci = new FEPeriodicBoundary(this);
+				break;
 			default:
 				assert(false);
 			}
