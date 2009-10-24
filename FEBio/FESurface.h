@@ -60,6 +60,9 @@ public:
 	double FaceArea(FESurfaceElement& el);
 
 	//! calculate the metric tensor in the reference configuration
+	mat2d Metric(FESurfaceElement& el, double r, double s);
+
+	//! calculate the metric tensor in the reference configuration
 	mat2d Metric0(FESurfaceElement& el, double r, double s);
 
 	//! calculate the surface normal
@@ -88,6 +91,9 @@ public:
 
 	//! calculates covariant base vectors of a surface
 	void CoBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
+
+	//! calculates contravariant base vectors of a surface
+	void ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);

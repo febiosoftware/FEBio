@@ -268,6 +268,56 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the metric tensor at the point with surface coordinates (r,s)
+// TODO: perhaps I should place this function in the element class
+
+mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
+{
+	// nr of element nodes
+	int neln = el.Nodes();
+
+	// element nodes
+	vec3d rt[4];
+	for (int i=0; i<neln; ++i) rt[i] = m_pmesh->Node(el.m_node[i]).m_rt;
+
+	// shape function derivatives
+	double Hr[4], Hs[4];
+
+	// get the shape function values at this slave node
+	if (neln == 4)
+	{
+		Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
+		Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
+		Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
+		Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
+	}
+	else if (neln == 3)
+	{
+		Hr[0] = -1; Hs[0] = -1;
+		Hr[1] =  1; Hs[1] =  0;
+		Hr[2] =  0; Hs[2] =  1;
+	}
+	else assert(false);
+
+	// get the tangent vectors
+	vec3d t1(0,0,0);
+	vec3d t2(0,0,0);
+	for (int k=0; k<neln; ++k)
+	{
+		t1.x += Hr[k]*rt[k].x;
+		t1.y += Hr[k]*rt[k].y;
+		t1.z += Hr[k]*rt[k].z;
+		
+		t2.x += Hs[k]*rt[k].x;
+		t2.y += Hs[k]*rt[k].y;
+		t2.z += Hs[k]*rt[k].z;
+	}
+
+	// calculate metric tensor
+	return mat2d(t1*t1, t1*t2, t2*t1, t2*t2);
+}
+
+//-----------------------------------------------------------------------------
 vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
 {
 	int l;
@@ -542,6 +592,18 @@ void FESurface::CoBaseVectors0(FESurfaceElement &el, double r, double s, vec3d t
 }
 
 //-----------------------------------------------------------------------------
+void FESurface::ContraBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2])
+{
+	vec3d e[2];
+	CoBaseVectors(el, r, s, e);
+	mat2d M = Metric(el, r, s);
+	mat2d Mi = M.inverse();
+
+	t[0] = e[0]*Mi[0][0] + e[1]*Mi[0][1];
+	t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
+}
+
+//-----------------------------------------------------------------------------
 
 void FESurface::ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2])
 {
@@ -574,10 +636,10 @@ bool FESurface::IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g
 	double d = n*m;
 	if (d != 0)
 	{
-		// distance from r to triangle
+		// distance from r to plane of triangle
 		g = m*(y[0] - r)/d;
 
-		// intersection point with triangle
+		// intersection point with plane of triangle
 		vec3d q = r + n*g;
 
 		// next, we decompose q into its components
