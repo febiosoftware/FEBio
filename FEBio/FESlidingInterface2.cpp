@@ -338,14 +338,15 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				Ln = ss.m_Lmd[n] + m_eps*g;
 
 //				if ((g >= 0) && (g <= R))
-				if ((Ln > 0) && (g <= R))
+				if ((Ln >= 0) && (g <= R))
 				{
 					ss.m_gap[n] = g;
 
 					// calculate the pressure gap function
 					if (bporo) {
-						mesh.UnpackElement(*pme);
-						double p2 = pme->eval(pme->pt(), rs[0], rs[1]);
+						double pm[4];
+						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
+						double p2 = pme->eval(pm, rs[0], rs[1]);
 						ss.m_pg[n] = p1 - p2;
 					}
 				}
@@ -375,6 +376,141 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 }
 
 //-----------------------------------------------------------------------------
+/*
+void FESlidingInterface2::Update()
+{	
+	int i, n, id;
+	double rs[2];
+
+	// project the surfaces onto each other
+	// this will update the gap functions as well
+	ProjectSurface(m_ss, m_ms);
+	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
+
+	m_ss.UpdateNodeNormals();
+	m_ms.UpdateNodeNormals();
+
+	// set poro flag
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+
+	// only continue if we are doing a poro-elastic simulation
+	if (bporo == false) return;
+
+	// now that the nodes have been projected, we need to figure out
+	// if we need to modify the constraints on the pressure dofs
+	// if the nodes are not in contact, then the degree of freedom
+	// has to be fixed, that is a zero-pressure BC has to be prescribed
+	// To prescribe a dof, we simply make the corresponding equation nr
+	// negative. 
+	for (int np=0; np<2; ++np)
+	{
+		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
+		FEContactSurface2& ms = (np == 0? m_ms : m_ss);
+
+		// first, mark all nodes as free-draining (= neg. ID)
+		// this is done by setting the dof's equation number
+		// to a negative number
+		for (i=0; i<ss.Nodes(); ++i) 
+		{
+			id = ss.Node(i).m_ID[6];
+			if (id >= 0) {
+				FENode& node = ss.Node(i);
+				// mark node as free-draining
+				node.m_ID[6] = -id-2;
+			}
+		}
+		
+		// keep a running counter of integration points.
+		int ni = 0;
+
+		// loop over all elements
+		for (n=0; n<ss.Elements(); ++n)
+		{
+			FESurfaceElement& el = ss.Element(n);
+
+			// get the normal tractions at the integration points
+			double ti[4], gi[4];
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+			for (i=0; i<nint; ++i, ++ni) 
+			{
+				gi[i] = ss.m_gap[ni];
+				ti[i] = MBRACKET(ss.m_Lmd[ni] + m_eps*gi[i]);
+			}
+
+			// project the data to the nodes
+			double tn[4];
+			el.project_to_nodes(ti, tn);
+
+			// see if we need to make changes to the BC's
+			for (i=0; i<neln; ++i)
+			{
+				FENode& node = ss.Node(el.m_lnode[i]);
+				id = node.m_ID[6];
+				if ((id < -1) && (tn[i] > 0))
+				{
+					// mark node as non free-draining
+					node.m_ID[6] = -id-2;
+				}
+			}
+		}
+
+		// loop over all nodes of the primary surface
+		for (n=0; n<ss.Nodes(); ++n)
+		{
+			// get the node
+			FENode& node = ss.Node(n);
+			
+			// project it onto the secondary surface
+			int nei;
+			FESurfaceElement* pme = ms.FindIntersection(node.m_rt, ss.m_nn[n], rs, m_stol, &nei);
+
+			if (pme)
+			{
+				// we found an element so let's calculate the nodal traction values for this element
+	
+				// get the normal tractions at the integration points
+				double ti[4], gi[4];
+				int nint = pme->GaussPoints();
+				int neln = pme->Nodes();
+				int noff = ms.m_nei[nei];
+				for (i=0; i<nint; ++i) 
+				{
+					gi[i] = ms.m_gap[noff + i];
+					ti[i] = MBRACKET(ms.m_Lmd[noff + i] + m_eps*gi[i]);
+				}
+
+				// project the data to the nodes
+				double tn[4];
+				pme->project_to_nodes(ti, tn);
+
+				// now evaluate the traction at the intersection point
+				double tp = pme->eval(tn, rs[0], rs[1]);
+
+				// if tp > 0, mark node as non free-draining.
+				id = node.m_ID[6];
+				if ((id < -1) && (tp > 0))
+				{
+					// mark as non free-draining
+					node.m_ID[6] = -id-2;
+				}
+			}
+		}
+
+		// now set the pressure of free-draining nodes to zero
+		for (i=0; i<ss.Nodes(); ++i) 
+		{
+			if (ss.Node(i).m_ID[6] < -1) {
+				FENode& node = ss.Node(i);
+				// set the fluid pressure to zero
+				node.m_pt = 0;
+			}
+		}
+	}
+}
+*/
+
+//-----------------------------------------------------------------------------
 void FESlidingInterface2::Update()
 {	
 	int i, n, id;
@@ -398,7 +534,192 @@ void FESlidingInterface2::Update()
 
 		// first, mark all nodes as free-draining (= neg. ID)
 		// this is done by setting the dof's equation number
-		// to a positive number
+		// to a negative number
+		for (i=0; i<ss.Nodes(); ++i) 
+		{
+			id = ss.Node(i).m_ID[6];
+			if (id >= 0) {
+				FENode& node = ss.Node(i);
+				// mark node as free-draining
+				node.m_ID[6] = -id-2;
+			}
+		}
+		
+		// keep a running counter of integration points.
+		int ni = 0;
+
+		// loop over all elements
+		for (n=0; n<ss.Elements(); ++n)
+		{
+			FESurfaceElement& el = ss.Element(n);
+
+			// get the normal tractions at the integration points
+			double ti[4], gi[4];
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+			for (i=0; i<nint; ++i, ++ni) 
+			{
+				gi[i] = ss.m_gap[ni];
+				ti[i] = MBRACKET(ss.m_Lmd[ni] + m_eps*gi[i]);
+			}
+
+			// project the data to the nodes
+			double tn[4];
+			el.project_to_nodes(ti, tn);
+
+			// see if we need to make changes to the BC's
+			for (i=0; i<neln; ++i)
+			{
+				FENode& node = ss.Node(el.m_lnode[i]);
+				id = node.m_ID[6];
+				if ((id < -1) && (tn[i] > 0))
+				{
+					// mark node as non free-draining
+					node.m_ID[6] = -id-2;
+				}
+			}
+		}
+		
+		// now set the pressure of free-draining nodes to zero
+		for (i=0; i<ss.Nodes(); ++i) 
+		{
+			if (ss.Node(i).m_ID[6] < -1) {
+				FENode& node = ss.Node(i);
+				// set the fluid pressure to zero
+				node.m_pt = 0;
+			}
+		}
+	}
+
+	// if we only did single pass, the dofs of the secondary surface 
+	// have not been modified, so we modify them here.
+	if (m_npass == 1)
+	{
+		// we need to figure out if we need to fix the pressure dof
+		// for the nodes on the secondary surface. We do this by
+		// finding the traction value on the projection point on the 
+		// primary surface.
+
+		// since we'll do a projection in the direction of the local
+		// normal, we first calculate these nodal normals
+		m_ms.UpdateNodeNormals();
+
+		// loop over all nodes of the secondary surface
+		for (i=0; i<m_ms.Nodes(); ++i)
+		{
+			// get the node
+			FENode& node = m_ms.Node(i);
+			id = node.m_ID[6];
+			if (id >= 0) {
+				// mark node as free-draining
+				node.m_ID[6] = -id-2;
+			}
+		}
+
+		// loop over all elements
+		for (n=0; n<m_ms.Elements(); ++n)
+		{
+			FESurfaceElement& el = m_ms.Element(n);
+
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+
+			double ti[4];
+			double rs[2];
+			for (i=0; i<nint; ++i)
+			{
+				// get the global position of this gauss-point
+				vec3d r = m_ms.Local2Global(el, i);
+
+				// get the normal at this point
+				vec3d nu = m_ms.SurfaceNormal(el, i);
+					
+				// project it onto the primary surface
+				int nei;
+				FESurfaceElement* pse = m_ss.FindIntersection(r, nu, rs, m_stol, &nei);
+
+				if (pse)
+				{
+					// we found an element so let's calculate the nodal traction values for this element
+	
+					// get the normal tractions at the integration points
+					double tsi[4], g;
+					int nsi = pse->GaussPoints();
+					int nse = pse->Nodes();
+					int noff = m_ss.m_nei[nei];
+					for (int j=0; j<nsi; ++j)
+					{
+						g = m_ss.m_gap[noff + j];
+						tsi[j] = MBRACKET(m_ss.m_Lmd[noff + j] + m_eps*g);
+					}
+
+					// project the data to the nodes
+					double tsn[4];
+					pse->project_to_nodes(tsi, tsn);
+
+					// now evaluate the traction at the intersection point
+					ti[i] = pse->eval(tsn, rs[0], rs[1]);
+				}
+				else ti[i] = 0;
+			}
+
+			// project the gauss-points to the nodes
+			double tn[4];
+			el.project_to_nodes(ti, tn);
+
+			// see if we need to make changes to the BC's
+			for (i=0; i<neln; ++i)
+			{
+				FENode& node = m_ms.Node(el.m_lnode[i]);
+				id = node.m_ID[6];
+				if ((id < -1) && (tn[i] > 0))
+				{
+					// mark node as non free-draining
+					node.m_ID[6] = -id-2;
+				}
+			}
+		}
+		
+		// loop over all nodes of the secondary surface 
+		// and set pressure to zero for free-draining nodes
+		for (n=0; n<m_ms.Nodes(); ++n)
+		{
+			FENode& node = m_ms.Node(n);
+			if (node.m_ID[6] < -1)
+			{
+				// set the fluid pressure to zero
+				node.m_pt = 0;
+			}			
+		}
+	}
+}
+
+/*
+//-----------------------------------------------------------------------------
+void FESlidingInterface2::Update()
+{	
+	int i, n, id;
+
+	// project the surfaces onto each other
+	// this will update the gap functions as well
+	ProjectSurface(m_ss, m_ms);
+	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
+
+	// set poro flag
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+
+	// only continue if we are doing a poro-elastic simulation
+	if (bporo == false) return;
+
+	// now that the nodes have been projected, we need to figure out
+	// if we need to modify the constraints on the pressure dofs
+	for (int np=0; np<m_npass; ++np)
+	{
+		FEContactSurface2& ss = (np == 0? m_ss : m_ms);
+
+		// first, mark all nodes as free-draining (= neg. ID)
+		// this is done by setting the dof's equation number
+		// to a negative number
 		for (i=0; i<ss.Nodes(); ++i) 
 		{
 			id = ss.Node(i).m_ID[6];
@@ -530,6 +851,7 @@ void FESlidingInterface2::Update()
 		}
 	}
 }
+*/
 
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::ShallowCopy(FEContactInterface &ci)
@@ -750,7 +1072,8 @@ void FESlidingInterface2::ContactStiffness()
 	Logfile& log = GetLogfile();
 	
 	// set higher order stiffness mutliplier
-	double knmult = m_knmult;
+	// NOTE: We don't need this for this algorithm
+/*	double knmult = m_knmult;
 	if (m_knmult < 0)
 	{
 		int ni = int(-m_knmult);
@@ -761,7 +1084,7 @@ void FESlidingInterface2::ContactStiffness()
 		}
 		else knmult = 0;
 	}
-
+*/
 	// do single- or two-pass
 	for (int np=0; np < m_npass; ++np)
 	{
@@ -916,7 +1239,8 @@ void FESlidingInterface2::ContactStiffness()
 					
 					if (!m_bsymm)
 					{
-						for (l=0; l<nseln; ++l) {
+						for (l=0; l<nseln; ++l)
+						{
 							As[l] = S2*Gr[l] - S1*Gs[l];
 							for (k=0; k<nseln+nmeln; ++k)
 							{
@@ -938,7 +1262,7 @@ void FESlidingInterface2::ContactStiffness()
 					//---------------------------------------
 
 					vec3d Gm[2];
-					ms.ContraBaseVectors0(me, r, s, Gm);
+					ms.ContraBaseVectors(me, r, s, Gm);
 					
 					// evaluate master surface normal
 					vec3d mnu = Gm[0] ^ Gm[1];
@@ -950,7 +1274,8 @@ void FESlidingInterface2::ContactStiffness()
 
 					if (!m_bsymm)
 					{
-						for (k=0; k<nmeln; ++k) {
+						for (k=0; k<nmeln; ++k) 
+						{
 							mm[k] = Gm[0]*Hmr[k] + Gm[1]*Hms[k];
 							for (l=0; l<nseln+nmeln; ++l)
 							{

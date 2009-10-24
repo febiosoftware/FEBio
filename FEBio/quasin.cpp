@@ -294,6 +294,13 @@ bool FESolidSolver::Quasin(double time)
 	// prepare for the first iteration
 	PrepStep(time);
 
+	// check for CTRL+C interruption before we do any work
+	if (m_bsig)
+	{
+		m_bsig = false;
+		interrupt();
+	}
+
 	// calculate initial stiffness matrix
 	if (ReformStiffness() == false) return false;
 
