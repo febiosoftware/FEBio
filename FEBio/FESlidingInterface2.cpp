@@ -509,7 +509,7 @@ void FESlidingInterface2::Update()
 	}
 }
 */
-
+/*
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::Update()
 {	
@@ -693,8 +693,8 @@ void FESlidingInterface2::Update()
 		}
 	}
 }
+*/
 
-/*
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::Update()
 {	
@@ -851,7 +851,7 @@ void FESlidingInterface2::Update()
 		}
 	}
 }
-*/
+
 
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::ShallowCopy(FEContactInterface &ci)
@@ -883,7 +883,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 	// if we're using the symmetric formulation
 	// we need to multiply with the timestep
-	double dt = (bsymm?m_pfem->m_pStep->m_dt:1);
+	double dt = m_pfem->m_pStep->m_dt;
 
 	// loop over the nr of passes
 	for (int np=0; np<m_npass; ++np)
@@ -1030,9 +1030,6 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 						for (k=0; k<nseln; ++k) fe[k      ] =  Hs[k];
 						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
 
-						// NOTE: note that dt is either the timestep
-						//       or one, depending on whether we are 
-						//       using the symmetric poro version or not
 						for (k=0; k<ndof; ++k) fe[k] *= dt*wn*detJ[j]*w[j];
 
 						// assemble residual
@@ -1203,16 +1200,16 @@ void FESlidingInterface2::ContactStiffness()
 					// calculate the N-vector
 					for (k=0; k<nseln; ++k)
 					{
-						N[3*k  ] = -Hs[k]*nu.x;
-						N[3*k+1] = -Hs[k]*nu.y;
-						N[3*k+2] = -Hs[k]*nu.z;
+						N[3*k  ] = Hs[k]*nu.x;
+						N[3*k+1] = Hs[k]*nu.y;
+						N[3*k+2] = Hs[k]*nu.z;
 					}
 
 					for (k=0; k<nmeln; ++k)
 					{
-						N[3*(k+nseln)  ] = Hm[k]*nu.x;
-						N[3*(k+nseln)+1] = Hm[k]*nu.y;
-						N[3*(k+nseln)+2] = Hm[k]*nu.z;
+						N[3*(k+nseln)  ] = -Hm[k]*nu.x;
+						N[3*(k+nseln)+1] = -Hm[k]*nu.y;
+						N[3*(k+nseln)+2] = -Hm[k]*nu.z;
 					}
 
 					// create the stiffness matrix
@@ -1303,52 +1300,52 @@ void FESlidingInterface2::ContactStiffness()
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
 						// poro version or not.
-						double dt = (bsymm?m_pfem->m_pStep->m_dt:1);
+						double dt = m_pfem->m_pStep->m_dt;
 
 						// --- S O L I D - P R E S S U R E   C O N T A C T ---
 
-						int ndof = 4*(nseln+nmeln);
-						LM.create(ndof);
-						for (k=0; k<nseln; ++k)
-						{
-							LM[4*k  ] = sLM[3*k  ];			// x-dof
-							LM[4*k+1] = sLM[3*k+1];			// y-dof
-							LM[4*k+2] = sLM[3*k+2];			// z-dof
-							LM[4*k+3] = sLM[3*nseln+k];		// p-dof
-						}
-						for (k=0; k<nmeln; ++k)
-						{
-							LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
-							LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
-							LM[4*(k+nseln)+2] = mLM[3*k+2];			// z-dof
-							LM[4*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
-						}
-
-						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-
-						ke.Create(ndof, ndof);
-						ke.zero();
-
-						// a. q-term
-						//-------------------------------------
-						
-						double dpmr, dpms;
-						dpmr = me.eval_deriv1(me.pt(), r, s);
-						dpms = me.eval_deriv2(me.pt(), r, s);
-
-						for (k=0; k<nseln+nmeln; ++k)
-							for (l=0; l<nseln+nmeln; ++l)
-							{
-								ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].x + dpms*Gm[1].x);
-								ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
-								ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
-							}
-
-						double wn = ss.m_Lmp[ni] + m_epsp*ss.m_pg[ni];
-
 						if (!m_bsymm)
 						{
+							int ndof = 4*(nseln+nmeln);
+							LM.create(ndof);
+							for (k=0; k<nseln; ++k)
+							{
+								LM[4*k  ] = sLM[3*k  ];			// x-dof
+								LM[4*k+1] = sLM[3*k+1];			// y-dof
+								LM[4*k+2] = sLM[3*k+2];			// z-dof
+								LM[4*k+3] = sLM[3*nseln+k];		// p-dof
+							}
+							for (k=0; k<nmeln; ++k)
+							{
+								LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
+								LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
+								LM[4*(k+nseln)+2] = mLM[3*k+2];			// z-dof
+								LM[4*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
+							}
+
+							for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
+							for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
+
+							ke.Create(ndof, ndof);
+							ke.zero();
+
+							// a. q-term
+							//-------------------------------------
+						
+							double dpmr, dpms;
+							dpmr = me.eval_deriv1(me.pt(), r, s);
+							dpms = me.eval_deriv2(me.pt(), r, s);
+
+							for (k=0; k<nseln+nmeln; ++k)
+								for (l=0; l<nseln+nmeln; ++l)
+								{
+									ke[4*k + 3][4*l  ] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].x + dpms*Gm[1].x);
+									ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
+									ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*m_epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
+								}
+
+							double wn = ss.m_Lmp[ni] + m_epsp*ss.m_pg[ni];
+
 							// b. A-term
 							//-------------------------------------
 							

@@ -37,10 +37,9 @@ mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 	mat3d &F = pt.F;
 	double detF = pt.J;
 	double detFi = 1.0/detF;
-	// invariants of B
 	
 	// calculate left Cauchy-Green tensor
-	mat3ds b = (F*F.transpose()).sym();
+	mat3ds b = pt.LeftCauchyGreen(); //(F*F.transpose()).sym();
 	mat3ds b2 = b*b;
 	mat3ds identity(1.,1.,1.,0.,0.,0.);
 
@@ -67,7 +66,7 @@ tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 	double detFi = 1.0/detF;
 	
 	// calculate left Cauchy-Green tensor
-	mat3ds b = (F*F.transpose()).sym();
+	mat3ds b = pt.LeftCauchyGreen(); //(F*F.transpose()).sym();
 	mat3ds b2 = b*b;
 	mat3ds identity(1.,1.,1.,0.,0.,0.);
 	
