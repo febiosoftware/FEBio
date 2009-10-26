@@ -577,7 +577,7 @@ void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			pi[m++] = ui[nid];
-			assert(n <= pi.size());
+			assert(m <= pi.size());
 		}
 	}
 }
