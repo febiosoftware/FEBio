@@ -2605,6 +2605,7 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 
 	// Bp-matrix
 	vector<double[3]> B(neln);
+	double tmp;
 
 	// permeability tensor
 	double k[3][3];
@@ -2651,6 +2652,9 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 		v[i] = mesh.Node(el.m_node[i]).m_vt;
 	}
+
+	// we'll need this later
+	const int T[3][3] = {{0, 3, 5}, {3, 1, 4}, {5, 4, 2}};
 
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -2699,9 +2703,10 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 		for (i=0; i<neln; ++i)
 			for (j=0; j<neln; ++j)
 			{
-				ke[3*i  ][3*neln+j] -= detJ*gw[n]*B[i][0]*H[j];
-				ke[3*i+1][3*neln+j] -= detJ*gw[n]*B[i][1]*H[j];
-				ke[3*i+2][3*neln+j] -= detJ*gw[n]*B[i][2]*H[j];
+				tmp = detJ*gw[n]*H[j];
+				ke[3*i  ][3*neln+j] -= tmp*B[i][0];
+				ke[3*i+1][3*neln+j] -= tmp*B[i][1];
+				ke[3*i+2][3*neln+j] -= tmp*B[i][2];
 			}
 
 		if (bsymm)
@@ -2709,9 +2714,10 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 			for (i=0; i<neln; ++i)
 				for (j=0; j<neln; ++j)
 				{
-					ke[3*neln+j][3*i  ] -= detJ*gw[n]*B[i][0]*H[j];
-					ke[3*neln+j][3*i+1] -= detJ*gw[n]*B[i][1]*H[j];
-					ke[3*neln+j][3*i+2] -= detJ*gw[n]*B[i][2]*H[j];
+					tmp = detJ*gw[n]*H[j];
+					ke[3*neln+j][3*i  ] -= tmp*B[i][0];
+					ke[3*neln+j][3*i+1] -= tmp*B[i][1];
+					ke[3*neln+j][3*i+2] -= tmp*B[i][2];
 				}
 		}
 		else
@@ -2756,12 +2762,11 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 			for (i=0; i<neln; ++i)
 				for (j=0; j<neln; ++j)
 				{
-					ke[3*neln+i][3*j  ] -= dt*detJ*gw[n]*H[i]*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
-					ke[3*neln+i][3*j+1] -= dt*detJ*gw[n]*H[i]*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
-					ke[3*neln+i][3*j+2] -= dt*detJ*gw[n]*H[i]*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
+					tmp = dt*detJ*gw[n]*H[i];
+					ke[3*neln+i][3*j  ] -= tmp*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
+					ke[3*neln+i][3*j+1] -= tmp*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
+					ke[3*neln+i][3*j+2] -= tmp*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
 				}
-
-			int T[3][3] = {{0, 3, 5}, {3, 1, 4}, {5, 4, 2}};
 
 			FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 			vec3d Dp = pt.m_gradp;
@@ -2779,9 +2784,10 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 							BKB[2][0] += B[i][k]*K(T[k][2], T[0][l])*B[j][l]; BKB[2][1] += B[i][k]*K(T[k][2], T[1][l])*B[j][l]; BKB[2][2] += B[i][k]*K(T[k][2], T[2][l])*B[j][l];
 						}
 
-					ke[3*neln+i][3*j  ] -= dt*detJ*gw[n]*( BKB[0][0]*Dp.x + BKB[0][1]*Dp.y + BKB[0][2]*Dp.z);
-					ke[3*neln+i][3*j+1] -= dt*detJ*gw[n]*( BKB[1][0]*Dp.x + BKB[1][1]*Dp.y + BKB[1][2]*Dp.z);
-					ke[3*neln+i][3*j+2] -= dt*detJ*gw[n]*( BKB[2][0]*Dp.x + BKB[2][1]*Dp.y + BKB[2][2]*Dp.z);
+					tmp = dt*detJ*gw[n];
+					ke[3*neln+i][3*j  ] -= tmp*( BKB[0][0]*Dp.x + BKB[0][1]*Dp.y + BKB[0][2]*Dp.z);
+					ke[3*neln+i][3*j+1] -= tmp*( BKB[1][0]*Dp.x + BKB[1][1]*Dp.y + BKB[1][2]*Dp.z);
+					ke[3*neln+i][3*j+2] -= tmp*( BKB[2][0]*Dp.x + BKB[2][1]*Dp.y + BKB[2][2]*Dp.z);
 				}
 		}
 	}

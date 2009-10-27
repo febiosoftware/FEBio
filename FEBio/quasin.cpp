@@ -242,7 +242,8 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// initialize contact
-	if (m_fem.m_bcontact) m_fem.UpdateContact();
+	// TODO: I don't think I need to update here
+//	if (m_fem.m_bcontact) m_fem.UpdateContact();
 
 	// intialize material point data
 	// NOTE: do this before the stresses are updated
@@ -595,7 +596,8 @@ bool FESolidSolver::ReformStiffness()
 	// recalculate the shape of the stiffness matrix if necessary
 	if (m_breshape)
 	{
-		if (m_fem.m_bcontact) m_fem.UpdateContact();
+		// TODO: I don't think I need to update here
+//		if (m_fem.m_bcontact) m_fem.UpdateContact();
 
 		// reshape the stiffness matrix
 		if (!CreateStiffness(m_niter == 0)) return false;
