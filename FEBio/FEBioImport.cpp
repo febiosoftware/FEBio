@@ -179,6 +179,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "time_steps"        ) tag.value(m_pStep->m_ntime);
 		else if (tag == "step_size"         ) tag.value(m_pStep->m_dt0);
 		else if (tag == "dtol"              ) tag.value(m_pStep->m_psolver->m_Dtol);
+		else if (tag == "ptol"              ) tag.value(m_pStep->m_psolver->m_Ptol);
 		else if (tag == "etol"              ) tag.value(m_pStep->m_psolver->m_Etol);
 		else if (tag == "rtol"              ) tag.value(m_pStep->m_psolver->m_Rtol);
 		else if (tag == "lstol"             ) tag.value(m_pStep->m_psolver->m_LStol);

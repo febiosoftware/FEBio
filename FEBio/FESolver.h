@@ -58,6 +58,7 @@ public:
 	double	m_Rtol;			//!< residual tolerance
 	double	m_Dtol;			//!< displacement tolerance
 	double	m_Etol;			//!< energy tolerance
+	double	m_Ptol;			//!< pressure tolerance
 	double	m_LStol;		//!< line search tolerance
 	double	m_LSmin;		//!< minimum line search step
 	int		m_LSiter;		//!< max nr of line search iterations

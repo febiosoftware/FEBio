@@ -342,10 +342,11 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				double g = nu*(r - q);
 				Ln = ss.m_Lmd[n] + m_eps*g;
 
+				ss.m_gap[n] = (g <= R? g : 0);
+
 //				if ((g >= 0) && (g <= R))
 				if ((Ln >= 0) && (g <= R))
 				{
-					ss.m_gap[n] = g;
 
 					// calculate the pressure gap function
 					if (bporo) {
@@ -357,12 +358,12 @@ void FESlidingInterface2::ProjectSurface(FEContactSurface2& ss, FEContactSurface
 				}
 				else
 				{
-					ss.m_Lmd[n] = 0;
-					ss.m_gap[n] = 0;
+//					ss.m_Lmd[n] = 0;
+//					ss.m_gap[n] = 0;
 					ss.m_pme[n] = 0;
 					if (bporo) {
-						ss.m_Lmp[n] = 0;
-						ss.m_pg[n] = 0;
+//						ss.m_Lmp[n] = 0;
+//						ss.m_pg[n] = 0;
 					}
 				}
 			}
@@ -884,7 +885,8 @@ void FESlidingInterface2::ContactStiffness()
 					double tn = Lm + m_eps*g;
 					tn = MBRACKET(tn);
 
-					double dtn = m_eps*HEAVYSIDE(Lm + m_eps*g);
+//					double dtn = m_eps*HEAVYSIDE(Lm + m_eps*g);
+					double dtn = (tn > 0.? m_eps :0.);
 
 					// a. NxN-term
 					//------------------------------------

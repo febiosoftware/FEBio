@@ -398,7 +398,7 @@ bool FESolidSolver::Quasin(double time)
 			m_normp = (m_pi*m_pi)*(s*s);
 
 			// check convergence
-			if (m_normp > (m_Dtol*m_Dtol)*m_normP) bconv = false;
+			if (m_normp > (m_Ptol*m_Ptol)*m_normP) bconv = false;
 		}
 
 		// print convergence summary
@@ -415,7 +415,7 @@ bool FESolidSolver::Quasin(double time)
 		log.printf("\t   displacement     %15le %15le %15le \n", m_normUi, m_normu ,(m_Dtol*m_Dtol)*m_normU );
 		if (bporo)
 		{
-			log.printf("\t   fluid pressure   %15le %15le %15le \n", m_normPi, m_normp ,(m_Dtol*m_Dtol)*m_normP );
+			log.printf("\t   fluid pressure   %15le %15le %15le \n", m_normPi, m_normp ,(m_Ptol*m_Ptol)*m_normP );
 		}
 
 		log.SetMode(oldmode);

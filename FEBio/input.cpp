@@ -68,6 +68,8 @@ void FEM::EchoInput()
 	// we only output this data to the log file and not the screen
 	Logfile::MODE old_mode = log.SetMode(Logfile::FILE_ONLY);
 
+	bool bporo = m_pStep->m_nModule == FE_POROELASTIC;
+
 	log.printf("%s\n\n", m_sztitle);
 
 	log.printf(" FILES USED\n");
@@ -111,6 +113,7 @@ void FEM::EchoInput()
 	log.printf("\tDisplacement convergence tolerance ............. : %lg\n", m_pStep->m_psolver->m_Dtol);
 	log.printf("\tEnergy convergence tolerance ................... : %lg\n", m_pStep->m_psolver->m_Etol);
 	log.printf("\tResidual convergence tolerance ................. : %lg\n", m_pStep->m_psolver->m_Rtol);
+	if (bporo) log.printf("\tFluid pressure convergence tolernace ........... : %lg\n", m_pStep->m_psolver->m_Ptol);
 	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", m_pStep->m_psolver->m_LStol);
 	log.printf("\tMinimum line search size ....................... : %lg\n", m_pStep->m_psolver->m_LSmin);
 	log.printf("\tMaximum number of line search iterations ....... : %d\n", m_pStep->m_psolver->m_LSiter);
