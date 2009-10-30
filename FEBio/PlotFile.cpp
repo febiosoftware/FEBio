@@ -665,6 +665,9 @@ void PlotFile::write_contact_tractions()
 						li[k] = s.m_Lmd[nint];
 						gi[k] = s.m_gap[nint];
 						ti[k] = li[k] + ps2->m_eps*gi[k];
+
+						gi[k] = (gi[k]>=0?gi[k] : 0);
+						ti[k] = (ti[k]>=0?ti[k] : 0);
 					}
 
 					el.project_to_nodes(li, ln);
@@ -674,9 +677,9 @@ void PlotFile::write_contact_tractions()
 					for (k=0; k<ne; ++k)
 					{
 						int m = el.m_node[k];
-						acc[m][0] += (float) ln[k];
-						acc[m][1] += (float) gn[k];
-						acc[m][2] += (float) tn[k];
+						acc[m][0] += (float) (ln[k]>=0?ln[k]:0);
+						acc[m][1] += (float) (gn[k]>=0?gn[k]:0);
+						acc[m][2] += (float) (tn[k]>=0?tn[k]:0);
 						val[m]++;
 					}
 				}
