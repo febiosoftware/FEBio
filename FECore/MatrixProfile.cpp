@@ -119,14 +119,15 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	int* pcol = new int[neq];
 	if (pcol == 0) throw MemException(sizeof(int)*neq);
 
+	// zero the row indices for the column
+	for (j=0; j<neq; ++j) pcol[j] = -1;
+
 	// loop over all columns
 	int nold;
 	for (i=0; i<neq; ++i)
 	{
 		if (pval[i] > 0)
 		{
-			// zero the row indices for the column
-			for (j=0; j<=i; ++j) pcol[j] = 0;
 
 			// expand column i. That is flag the non-zero rows
 			// that are currently in use for this column.
@@ -135,7 +136,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			for (j=0; j<a.size(); j += 2)
 			{
 				nold += a[j+1] - a[j] + 1;
-				for (k=a[j]; k<=a[j+1]; ++k) pcol[k] = 1;
+				for (k=a[j]; k<=a[j+1]; ++k) pcol[k] = i;
 			}
 		
 			// loop over all elements in the plec, flagging
@@ -150,7 +151,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 				N = LM[iel].size();
 				for (k=0; k<N; ++k)
 				{
-					if ((lm[k] >= 0) && (lm[k] < i) && (pcol[ lm[k] ] == 0)) { ++n; pcol[ lm[k] ] = 1; }
+					if ((lm[k] >= 0) && (lm[k] < i) && (pcol[ lm[k] ] != i)) { ++n; pcol[ lm[k] ] = i; }
 				}
 			}
 
@@ -167,13 +168,13 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 				do
 				{
 					// find a start row index
-					while ((l<=i) && (pcol[l] != 1)) ++l;
+					while ((pcol[l] != i) && (l<=i)) ++l;
 
 					// find the corresponding end row index
 					if (l<=i)
 					{
 						a.add(l);
-						while ((l<i) && (pcol[l+1] == 1)) ++l;
+						while ((pcol[l+1] == i) && (l<i)) ++l;
 						a.add(l);
 						++l;
 					}

@@ -302,12 +302,14 @@ public:
 
 		int* pi = m_pindices + m_ppointers[j];
 		pi -= m_offset;
+		i += m_offset;
+		double* pd = m_pd + (m_ppointers[j] - m_offset);
 		int l = m_ppointers[j+1] - m_ppointers[j];
-		for (int n=0; n<l; ++n)
+		for (int n=0; n<l; ++n, ++pd, ++pi)
 		{
-			if (pi[n] == i + m_offset)
+			if (*pi == i)
 			{
-				m_pd[ m_ppointers[j] + n - m_offset ] += v;
+				*pd += v;
 				return;
 			}
 		}
