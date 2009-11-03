@@ -242,8 +242,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// initialize contact
-	// TODO: I don't think I need to update here
-//	if (m_fem.m_bcontact) m_fem.UpdateContact();
+	if (m_fem.m_bcontact) m_fem.UpdateContact();
 
 	// intialize material point data
 	// NOTE: do this before the stresses are updated
