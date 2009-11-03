@@ -557,7 +557,7 @@ void PlotFile::write_fluid_flux()
 			FEMaterialPoint& mp = *el.m_State[j];
 			FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
 
-			ew += pt->m_w;
+			if (pt) ew += pt->m_w;
 		}
 
 		ew /= el.GaussPoints();
