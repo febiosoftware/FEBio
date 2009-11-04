@@ -1656,16 +1656,17 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		++tag;
 		do
 		{
-			if      (tag == "laugon"    ) tag.value(ps->m_blaugon);
-			else if (tag == "tolerance" ) tag.value(ps->m_atol);
-			else if (tag == "gaptol"    ) tag.value(ps->m_gtol);
-			else if (tag == "ptol"      ) tag.value(ps->m_ptol);
-			else if (tag == "penalty"   ) tag.value(ps->m_eps);
-			else if (tag == "knmult"    ) tag.value(ps->m_knmult);
-			else if (tag == "search_tol") tag.value(ps->m_stol);
-			else if (tag == "pressure_penalty") tag.value(ps->m_epsp);
+			if      (tag == "laugon"             ) tag.value(ps->m_blaugon);
+			else if (tag == "tolerance"          ) tag.value(ps->m_atol);
+			else if (tag == "gaptol"             ) tag.value(ps->m_gtol);
+			else if (tag == "ptol"               ) tag.value(ps->m_ptol);
+			else if (tag == "penalty"            ) tag.value(ps->m_eps);
+			else if (tag == "auto_penalty"       ) tag.value(ps->m_bautopen);
+			else if (tag == "knmult"             ) tag.value(ps->m_knmult);
+			else if (tag == "search_tol"         ) tag.value(ps->m_stol);
+			else if (tag == "pressure_penalty"   ) tag.value(ps->m_epsp);
 			else if (tag == "symmetric_stiffness") tag.value(ps->m_bsymm);
-			else if (tag == "search_radius") tag.value(ps->m_srad);
+			else if (tag == "search_radius"      ) tag.value(ps->m_srad);
 			else if (tag == "debug")
 			{
 				tag.value(ps->m_bdebug);
@@ -2407,6 +2408,7 @@ bool FEFEBioImport::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 				int nn = m.GetFace(*pe, nf[1]-1, ne);
 				if (nn != N) throw XMLReader::InvalidValue(tag);
 				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
+				el.m_nelem = nf[0];
 			}
 			else throw XMLReader::InvalidValue(tag);
 		}

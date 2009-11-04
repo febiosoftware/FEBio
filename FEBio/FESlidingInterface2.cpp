@@ -3,6 +3,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "log.h"
+#include "FEPoroElastic.h"
 
 //-----------------------------------------------------------------------------
 // FEContactSurface2
@@ -133,6 +134,7 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_srad = 0.1;
 	m_gtol = 0.01;
 	m_ptol = 0.01;
+	m_bautopen = false;
 
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -264,6 +266,95 @@ void FESlidingInterface2::Init()
 			fprintf(m_fp, "[ 9] pressure difference\n");
 		}
 	}
+
+	// calculate the penalty
+	if (m_bautopen) CalcAutoPenalty();
+}
+
+//-----------------------------------------------------------------------------
+
+void FESlidingInterface2::CalcAutoPenalty()
+{
+	// get the mesh
+	FEMesh& m = m_pfem->m_mesh;
+
+	double eps = 0;
+	double epsp = 0;
+
+	int N = 0;
+	for (int np=0; np<m_npass; ++np)
+	{
+		FEContactSurface2& s = (np==0? m_ss : m_ms);
+		for (int i=0; i<s.Elements(); ++i)
+		{
+			// get the surface element
+			FESurfaceElement& el = s.Element(i);
+
+			// get the solid element this surface element belongs to
+			FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
+			if (pe)
+			{
+				// get the material
+				FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+
+				// extract the elastic component
+				FEElasticMaterial* pme = m_pfem->GetElasticMaterial(pe->GetMatID());
+
+				// get a material point
+				FEMaterialPoint& mp = *pe->m_State[0];
+				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+				// setup the material point
+				pt.F = mat3dd(1.0);
+				pt.J = 1;
+				pt.avgJ = 1;
+				pt.avgp = 0;
+				pt.s.zero();
+
+				// get the tangent at this point
+				tens4ds C = pme->Tangent(pt);
+
+				// get the upper 3x3
+				mat3d T(mat3ds(C(0,0), C(1,1), C(2,2), C(0,1), C(1,2), C(0,2)));
+				mat3d Ti = T.inverse();
+
+				// calculate average modulus
+				double E = (1/Ti(0,0) + 1/Ti(1,1) + 1/Ti(2,2))/3;
+
+				// if this is a poroelastic element, then also get the permeability tensor
+				double k = 0;
+				FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
+				if (poro)
+				{
+					FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+					pt.m_p = 0;
+					pt.m_w = vec3d(0,0,0);
+					
+					double Kd[3][3];
+					poro->Permeability(Kd, mp);
+					mat3d K(Kd);
+					mat3d Ki = K.inverse();
+
+					k = (1/Ki(0,0) + 1/Ki(1,1) + 1/Ki(2,2))/3;
+				}
+
+				// calculate the area of the surface element
+				double A = s.FaceArea(el);
+
+				// calculate the element's volume
+				double V = m.ElementVolume(*pe);
+
+				// update auto-penalty
+				eps  += E*A/V;
+				epsp += k*A/V;
+				++N;
+			}
+		}
+	}
+
+	// finalyze auto-penalty
+	m_eps  *= eps / N;
+	m_epsp *= epsp / N;
 }
 
 //-----------------------------------------------------------------------------

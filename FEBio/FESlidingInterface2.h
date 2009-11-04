@@ -70,6 +70,7 @@ public:
 
 protected:
 	void ProjectSurface(FEContactSurface2& ss, FEContactSurface2& ms);
+	void CalcAutoPenalty();
 
 public:
 	FEContactSurface2	m_ms;	//!< master surface
@@ -80,12 +81,14 @@ public:
 	double			m_atol;		//!< augmentation tolerance
 	double			m_gtol;		//!< gap tolerance
 	double			m_ptol;		//!< pressure gap tolerance
-	double			m_eps;		//!< penalty factor
 	double			m_stol;		//!< search tolerance
 	bool			m_bsymm;	//!< use symmetric stiffness components only
 	double			m_srad;		//!< contact search radius
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations
+
+	double			m_eps;		//!< penalty factor
+	bool			m_bautopen;	//!< use autopenalty factor
 
 	bool	m_bdebug;		// debug flag
 	char	m_szdebug[256];	// debug file name

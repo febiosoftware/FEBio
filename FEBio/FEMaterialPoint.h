@@ -94,6 +94,8 @@ public:
 			s.zero();
 
 			avgJ = avgp = 0;
+
+			Q.unit();
 		}
 
 		if (m_pt) m_pt->Init(bflag);

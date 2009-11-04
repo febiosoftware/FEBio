@@ -200,9 +200,6 @@ bool FEM::Init()
 	// TODO: perhaps I should not reset the mesh data during the initialization
 	if (m_mesh.Init() == false) return false;
 
-	// initialize contact data
-	if (InitContact() == false) return false;
-
 	// initialize material data
 	char szmat[256] = "Invalid value for material parameter \"%s\" of material %d";
 	for (i=0; i<Materials(); ++i)
@@ -234,6 +231,9 @@ bool FEM::Init()
 			if (pm->lcna >= 0) pm->m_plc = GetLoadCurve(pm->lcna);
 		}
 	}
+
+	// initialize contact data
+	if (InitContact() == false) return false;
 
 	// check discrete elements
 	for (i=0; i<m_DE.size(); ++i)
