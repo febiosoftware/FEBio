@@ -125,15 +125,15 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 
 	// initial values
 	m_knmult = 1;
-	m_atol = 0.02;
+	m_atol = 0.1;
 	m_eps = 1;
 	m_epsp = 1;
 	m_npass = 1;
 	m_stol = 0.01;
 	m_bsymm = true;
 	m_srad = 0.1;
-	m_gtol = 0.01;
-	m_ptol = 0.01;
+	m_gtol = -1;	// we use augmentation tolerance by default
+	m_ptol = -1;	// we use augmentation tolerance by default
 	m_bautopen = false;
 
 	m_naugmin = 0;
@@ -1193,21 +1193,35 @@ bool FESlidingInterface2::Augment(int naug)
 	bool bconv = true;
 
 	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	int NS = m_ss.m_Lmd.size();
+	int NM = m_ms.m_Lmd.size();
 
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
-	int NS = m_ss.m_Lmd.size();
-	int NM = m_ms.m_Lmd.size();
-//	bool contact = false;
+	double normL0 = 0, normP0 = 0;
+	for (i=0; i<NS; ++i) normL0 += m_ss.m_Lmd[i]*m_ss.m_Lmd[i];
+	for (i=0; i<NM; ++i) normL0 += m_ms.m_Lmd[i]*m_ms.m_Lmd[i];
+
+	if (bporo)
+	{
+		for (i=0; i<NS; ++i) normP0 += m_ss.m_Lmp[i]*m_ss.m_Lmp[i];
+		for (i=0; i<NM; ++i) normP0 += m_ms.m_Lmp[i]*m_ms.m_Lmp[i];
+	}
+
+	// b. gap component
+	// (is calculated during update)
 	double maxgap = 0;
 	double maxpg = 0;
 
 	// update Lagrange multipliers
+	double normL1 = 0, normP1 = 0;
 	for (i=0; i<NS; ++i)
 	{
 		// update Lagrange multipliers on slave surface
 		Ln = m_ss.m_Lmd[i] + m_eps*m_ss.m_gap[i];
 		m_ss.m_Lmd[i] = MBRACKET(Ln);
+
+		normL1 += m_ss.m_Lmd[i]*m_ss.m_Lmd[i];
 		
 		if (bporo) {
 			Lp = 0;
@@ -1216,19 +1230,11 @@ bool FESlidingInterface2::Augment(int naug)
 				maxpg = max(maxpg,fabs(m_ss.m_pg[i]));
 			}
 			m_ss.m_Lmp[i] = Lp;
+
+			normP1 += Lp*Lp;
 		}
 		
-		if (Ln > 0) {
-			maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
-/*			if (contact)
-				maxgap = max(maxgap,m_ss.m_gap[i]);
-//				maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
-			else {
-				contact = true;
-				maxgap = m_ss.m_gap[i];
-//				maxgap = fabs(m_ss.m_gap[i]);
-			} */
-		}
+		if (Ln > 0) maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
 	}	
 	
 	for (i=0; i<NM; ++i)
@@ -1236,6 +1242,8 @@ bool FESlidingInterface2::Augment(int naug)
 		// update Lagrange multipliers on master surface
 		Ln = m_ms.m_Lmd[i] + m_eps*m_ms.m_gap[i];
 		m_ms.m_Lmd[i] = MBRACKET(Ln);
+
+		normL1 += m_ms.m_Lmd[i]*m_ms.m_Lmd[i];
 		
 		if (bporo) {
 			Lp = 0;
@@ -1244,37 +1252,36 @@ bool FESlidingInterface2::Augment(int naug)
 				maxpg = max(maxpg,fabs(m_ms.m_pg[i]));
 			}
 			m_ms.m_Lmp[i] = Lp;
+
+			normP1 += Lp*Lp;
 		}
 		
-		if (Ln > 0) {
-			maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
-/*			if (contact)
-				maxgap = max(maxgap,m_ms.m_gap[i]);
-//				maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
-			else {
-				contact = true;
-				maxgap = m_ms.m_gap[i];
-//				maxgap = fabs(m_ms.m_gap[i]);
-			} */
-		}
+		if (Ln > 0) maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
 	}
 
+	// calculate relative norms
+	double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0)); 
+	double pnorm = (normP1 != 0 ? fabs((normP1 - normP0) / normP1) : fabs(normP1 - normP0)); 
+
 	// check convergence
-	if (maxgap > m_gtol)
-		bconv = false;
-	if (bporo && maxpg > m_ptol)
-		bconv = false;
+	if ((m_gtol > 0) && (maxgap > m_gtol)) bconv = false;
+	if ((m_ptol > 0) && (bporo && maxpg > m_ptol)) bconv = false;
+
+	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
+	if ((m_atol > 0) && (pnorm > m_atol)) bconv = false;
+
 	Logfile& log = GetLogfile();
-	
 	log.printf(" sliding interface # %d\n", m_nID);
 	log.printf("                        CURRENT        REQUIRED\n");
+	log.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
+	if (bporo) log.printf("    P multiplier : %15le", pnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
+
 	log.printf("    maximum gap  : %15le", maxgap);
 	if (m_gtol > 0) log.printf("%15le\n", m_gtol); else log.printf("       ***\n");
 	if (bporo) {
 		log.printf("    maximum pgap : %15le", maxpg);
 		if (m_ptol > 0) log.printf("%15le\n", m_ptol); else log.printf("       ***\n");
 	}
-
 
 	return bconv;
 }
