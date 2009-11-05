@@ -1274,7 +1274,7 @@ bool FESlidingInterface2::Augment(int naug)
 	log.printf(" sliding interface # %d\n", m_nID);
 	log.printf("                        CURRENT        REQUIRED\n");
 	log.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
-	if (bporo) log.printf("    P multiplier : %15le", pnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
+	if (bporo) { log.printf("    P multiplier : %15le", pnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n"); }
 
 	log.printf("    maximum gap  : %15le", maxgap);
 	if (m_gtol > 0) log.printf("%15le\n", m_gtol); else log.printf("       ***\n");
