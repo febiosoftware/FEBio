@@ -67,14 +67,29 @@ bool FESolidSolver::StiffnessMatrix()
 			else if (dynamic_cast<FEPoroElastic*>(pmat))
 			{
 				// allocate stiffness matrix
-				ndof = el.Nodes()*4;
+				int neln = el.Nodes();
+				ndof = neln*4;
 				ke.Create(ndof, ndof);
 		
 				// calculate the element stiffness matrix
 				ElementPoroStiffness(el, ke);
-	
+
+				// TODO: the problem here is that the LM array that is returned by the UnpackElement
+				// function does give the equation numbers in the right order. For this reason we
+				// have to create a new lm array and place the equation numbers in the right order.
+				// What we really ought to do is fix the UnpackElement function so that it returns
+				// the LM vector in the right order for poroelastic elements.
+				vector<int> lm(ndof);
+				for (int i=0; i<neln; ++i)
+				{
+					lm[4*i  ] = el.LM()[3*i];
+					lm[4*i+1] = el.LM()[3*i+1];
+					lm[4*i+2] = el.LM()[3*i+2];
+					lm[4*i+3] = el.LM()[3*neln+i];
+				}
+				
 				// assemble element matrix in global stiffness matrix
-				AssembleStiffness(el.m_node, el.LM(), ke);
+				AssembleStiffness(el.m_node, lm, ke);
 			}
 		}
 		else
@@ -2619,10 +2634,12 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 	ElementStiffness(el, ks);
 
 	// copy solid stiffness matrix into ke
-	for (i=0; i<3*neln; ++i)
-		for (j=0; j<3*neln; ++j)
+	for (i=0; i<neln; ++i)
+		for (j=0; j<neln; ++j)
 		{
-			ke[i][j] = ks[i][j];
+			ke[4*i  ][4*j] = ks[3*i  ][3*j  ]; ke[4*i  ][4*j+1] = ks[3*i  ][3*j+1]; ke[4*i  ][4*j+2] = ks[3*i  ][3*j+2];
+			ke[4*i+1][4*j] = ks[3*i+1][3*j  ]; ke[4*i+1][4*j+1] = ks[3*i+1][3*j+1]; ke[4*i+1][4*j+2] = ks[3*i+1][3*j+2];
+			ke[4*i+2][4*j] = ks[3*i+2][3*j  ]; ke[4*i+2][4*j+1] = ks[3*i+2][3*j+1]; ke[4*i+2][4*j+2] = ks[3*i+2][3*j+2];
 		}
 
 	// get the logfile
@@ -2694,9 +2711,9 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 			for (j=0; j<neln; ++j)
 			{
 				tmp = dt*detJ*gw[n];
-				ke[3*neln+i][3*neln+j] -= tmp*(B[i][0]*k[0][0]+B[i][1]*k[1][0]+B[i][2]*k[2][0])*B[j][0];
-				ke[3*neln+i][3*neln+j] -= tmp*(B[i][0]*k[0][1]+B[i][1]*k[1][1]+B[i][2]*k[2][1])*B[j][1];
-				ke[3*neln+i][3*neln+j] -= tmp*(B[i][0]*k[0][2]+B[i][1]*k[1][2]+B[i][2]*k[2][2])*B[j][2];
+				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][0]+B[i][1]*k[1][0]+B[i][2]*k[2][0])*B[j][0];
+				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][1]+B[i][1]*k[1][1]+B[i][2]*k[2][1])*B[j][1];
+				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][2]+B[i][1]*k[1][2]+B[i][2]*k[2][2])*B[j][2];
 			}
 
 		// calculate the G-matrix
@@ -2704,9 +2721,9 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 			for (j=0; j<neln; ++j)
 			{
 				tmp = detJ*gw[n]*H[j];
-				ke[3*i  ][3*neln+j] -= tmp*B[i][0];
-				ke[3*i+1][3*neln+j] -= tmp*B[i][1];
-				ke[3*i+2][3*neln+j] -= tmp*B[i][2];
+				ke[4*i  ][4*j+3] -= tmp*B[i][0];
+				ke[4*i+1][4*j+3] -= tmp*B[i][1];
+				ke[4*i+2][4*j+3] -= tmp*B[i][2];
 			}
 
 		if (bsymm)
@@ -2715,9 +2732,9 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 				for (j=0; j<neln; ++j)
 				{
 					tmp = detJ*gw[n]*H[j];
-					ke[3*neln+j][3*i  ] -= tmp*B[i][0];
-					ke[3*neln+j][3*i+1] -= tmp*B[i][1];
-					ke[3*neln+j][3*i+2] -= tmp*B[i][2];
+					ke[4*j+3][4*i  ] -= tmp*B[i][0];
+					ke[4*j+3][4*i+1] -= tmp*B[i][1];
+					ke[4*j+3][4*i+2] -= tmp*B[i][2];
 				}
 		}
 		else
@@ -2763,9 +2780,9 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 				for (j=0; j<neln; ++j)
 				{
 					tmp = dt*detJ*gw[n]*H[i];
-					ke[3*neln+i][3*j  ] -= tmp*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
-					ke[3*neln+i][3*j+1] -= tmp*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
-					ke[3*neln+i][3*j+2] -= tmp*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
+					ke[4*i+3][4*j  ] -= tmp*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
+					ke[4*i+3][4*j+1] -= tmp*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
+					ke[4*i+3][4*j+2] -= tmp*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
 				}
 
 			FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
@@ -2818,9 +2835,9 @@ bool FESolidSolver::ElementPoroStiffness(FESolidElement& el, matrix& ke)
 					}
 
 					tmp = dt*detJ*gw[n];
-					ke[3*neln+i][3*j  ] -= tmp*( BKB[0][0]*Dp.x + BKB[0][1]*Dp.y + BKB[0][2]*Dp.z);
-					ke[3*neln+i][3*j+1] -= tmp*( BKB[1][0]*Dp.x + BKB[1][1]*Dp.y + BKB[1][2]*Dp.z);
-					ke[3*neln+i][3*j+2] -= tmp*( BKB[2][0]*Dp.x + BKB[2][1]*Dp.y + BKB[2][2]*Dp.z);
+					ke[4*i+3][4*j  ] -= tmp*( BKB[0][0]*Dp.x + BKB[0][1]*Dp.y + BKB[0][2]*Dp.z);
+					ke[4*i+3][4*j+1] -= tmp*( BKB[1][0]*Dp.x + BKB[1][1]*Dp.y + BKB[1][2]*Dp.z);
+					ke[4*i+3][4*j+2] -= tmp*( BKB[2][0]*Dp.x + BKB[2][1]*Dp.y + BKB[2][2]*Dp.z);
 				}
 		}
 	}
