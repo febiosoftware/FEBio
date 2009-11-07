@@ -793,7 +793,8 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 //!
 FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei)
 {
-	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
+//	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
+	double g, gmax = -1e99, r2[2] = {rs[0], rs[1]};
 	int imin = -1;
 	FESurfaceElement* pme = 0;
 
@@ -808,11 +809,13 @@ FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], do
 			// see if this is the best intersection found so far
 			// TODO: should I put a limit on how small g can
 			//       be to be considered a valid intersection?
-			if (g < gmin)
+//			if (g < gmin)
+			if (g > gmax)
 			{
 				// keep results
 				pme = &el;
-				gmin = g;
+//				gmin = g;
+				gmax = g;
 				imin = i;
 				rs[0] = r2[0];
 				rs[1] = r2[1];

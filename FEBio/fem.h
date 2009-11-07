@@ -36,10 +36,10 @@ using namespace std;
 
 
 // Macauley bracket
-#define MBRACKET(x) ((x)>=0? (x): 0)
+#define MBRACKET(x) ((x)>0? (x): 0)
 
 // Heavyside function
-#define HEAVYSIDE(x) ((x)>=0?1:0)
+#define HEAVYSIDE(x) ((x)>0?1:0)
 
 // Heavyside function
 inline double Heavyside(double x)
