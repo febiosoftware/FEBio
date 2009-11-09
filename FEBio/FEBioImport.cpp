@@ -9,6 +9,7 @@
 #include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
 #include "FECore/ConjGradIterSolver.h"
+#include "FECore/SuperLUSolver.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
 #include "log.h"
@@ -280,7 +281,24 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 			const char* szt = tag.AttributeValue("type");
 			if      (strcmp(szt, "skyline"           ) == 0) fem.m_nsolver = SKYLINE_SOLVER;
 			else if (strcmp(szt, "psldlt"            ) == 0) fem.m_nsolver = PSLDLT_SOLVER;
-			else if (strcmp(szt, "superlu"           ) == 0) fem.m_nsolver = SUPERLU_SOLVER;
+			else if (strcmp(szt, "superlu"           ) == 0)
+			{
+				fem.m_nsolver = SUPERLU_SOLVER;
+				if (!tag.isleaf())
+				{
+					SuperLUSolver* ps = new SuperLUSolver();
+					fem.m_pStep->m_psolver->m_psolver = ps;
+
+					++tag;
+					do
+					{
+						if (tag == "print_cnorm") { bool b; tag.value(b); ps->print_cnorm(b); }
+						else throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while (!tag.isend());
+				}
+			}
 			else if (strcmp(szt, "superlu_mt"        ) == 0) fem.m_nsolver = SUPERLU_MT_SOLVER;
 			else if (strcmp(szt, "pardiso"           ) == 0) fem.m_nsolver = PARDISO_SOLVER;
 			else if (strcmp(szt, "wsmp"              ) == 0) fem.m_nsolver = WSMP_SOLVER;

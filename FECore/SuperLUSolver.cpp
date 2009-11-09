@@ -44,9 +44,6 @@ bool SuperLUSolver::PreProcess(SparseMatrix& K)
 
 	m_balloc = true;
 
-	// estimate the condition number
-	m_bcond = false;
-
 	return LinearSolver::PreProcess(K);
 #endif
 }

@@ -31,6 +31,8 @@ public:
 
 	SuperLUSolver() { m_balloc = false; m_bfact = false; m_bcond = false; m_bsymm = true; }
 
+	void print_cnorm(bool b) { m_bcond = b; }
+
 #ifdef SUPERLU
 protected:
 	double norm(SparseMatrix& K); // calculates the 1-norm of the matrix A
