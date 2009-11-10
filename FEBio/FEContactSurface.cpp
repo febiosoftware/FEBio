@@ -121,3 +121,34 @@ vec3d FEContactSurface::traction(int inode)
 
 	return t;
 }
+
+//-----------------------------------------------------------------------------
+
+void FEContactSurface::UpdateNormals()
+{
+	int i, j, jp1, jm1;
+	int N = Nodes();
+	int NE = Elements();
+	for (i=0; i<N; ++i) nu[i] = vec3d(0,0,0);
+	vec3d y[4], e1, e2;
+
+	for (i=0; i<NE; ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		int ne = el.Nodes();
+		for (j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
+
+		for (j=0; j<ne; ++j)
+		{
+			jp1 = (j+1)%ne;
+			jm1 = (j+ne-1)%ne;
+
+			e1 = y[jp1] - y[j];
+			e2 = y[jm1] - y[j];
+
+			nu[el.m_lnode[j]] -= e1 ^ e2;						
+		}
+	}
+
+	for (i=0; i<N; ++i) nu[i].unit();
+}

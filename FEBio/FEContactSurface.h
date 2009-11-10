@@ -36,6 +36,8 @@ public:
 	//! Calculate the total traction at a node
 	vec3d traction(int inode);
 
+	void UpdateNormals();
+
 public:
 	vector<double>		gap;	//!< gap function at nodes
 	vector<vec3d>		nu;		//!< master normal at slave node

@@ -950,44 +950,13 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 	// get the slave node normal
 	vec3d& nu = ss.nu[m];
 
-	// get the master shape function values at this slave node
-	if (nmeln == 4)
-	{
-		// quadrilateral
-		H[0] = 0.25*(1-r)*(1-s);
-		H[1] = 0.25*(1+r)*(1-s);
-		H[2] = 0.25*(1+r)*(1+s);
-		H[3] = 0.25*(1-r)*(1+s);
-
-		Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-		Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-		Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-		Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-	}
-	else if (nmeln == 3)
-	{
-		// triangle
-		H[0] = 1 - r - s;
-		H[1] = r;
-		H[2] = s;
-
-		Hr[0] = -1; Hs[0] = -1;
-		Hr[1] =  1; Hs[1] =  0;
-		Hr[2] =  0; Hs[2] =  1;
-	}
+	// get the master shape function values and the derivatives at this slave node
+	mel.shape_fnc(H, r, s);
+	mel.shape_deriv(Hr, Hs, r, s);
 
 	// get the tangent vectors
-	vec3d tau1(0,0,0), tau2(0,0,0);
-	for (k=0; k<nmeln; ++k)
-	{
-		tau1.x += Hr[k]*rt[k].x;
-		tau1.y += Hr[k]*rt[k].y;
-		tau1.z += Hr[k]*rt[k].z;
-	
-		tau2.x += Hs[k]*rt[k].x;
-		tau2.y += Hs[k]*rt[k].y;
-		tau2.z += Hs[k]*rt[k].z;
-	}
+	vec3d tau[2];
+	ss.CoBaseVectors(mel, r, s, tau);
 
 	// set up the N vector
 	N[0] = nu.x;
@@ -1002,19 +971,19 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 	}
 	
 	// set up the Ti vectors
-	T1[0] = tau1.x; T2[0] = tau2.x;
-	T1[1] = tau1.y; T2[1] = tau2.y;
-	T1[2] = tau1.z; T2[2] = tau2.z;
+	T1[0] = tau[0].x; T2[0] = tau[1].x;
+	T1[1] = tau[0].y; T2[1] = tau[1].y;
+	T1[2] = tau[0].z; T2[2] = tau[1].z;
 
 	for (k=0; k<nmeln; ++k) 
 	{
-		T1[(k+1)*3  ] = -H[k]*tau1.x;
-		T1[(k+1)*3+1] = -H[k]*tau1.y;
-		T1[(k+1)*3+2] = -H[k]*tau1.z;
+		T1[(k+1)*3  ] = -H[k]*tau[0].x;
+		T1[(k+1)*3+1] = -H[k]*tau[0].y;
+		T1[(k+1)*3+2] = -H[k]*tau[0].z;
 
-		T2[(k+1)*3  ] = -H[k]*tau2.x;
-		T2[(k+1)*3+1] = -H[k]*tau2.y;
-		T2[(k+1)*3+2] = -H[k]*tau2.z;
+		T2[(k+1)*3  ] = -H[k]*tau[1].x;
+		T2[(k+1)*3+1] = -H[k]*tau[1].y;
+		T2[(k+1)*3+2] = -H[k]*tau[1].z;
 	}
 
 	// set up the Ni vectors
@@ -1035,8 +1004,8 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 
 	// calculate metric tensor
 	mat2d M;
-	M[0][0] = tau1*tau1; M[0][1] = tau1*tau2; 
-	M[1][0] = tau2*tau1; M[1][1] = tau2*tau2; 
+	M[0][0] = tau[0]*tau[0]; M[0][1] = tau[0]*tau[1]; 
+	M[1][0] = tau[1]*tau[0]; M[1][1] = tau[1]*tau[1]; 
 
 	// calculate reciprocal metric tensor
 	mat2d Mi = M.inverse();
@@ -1123,7 +1092,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 		double TMT = Tt[0]*(Mki[0][0]*Tt[0] + Mki[0][1]*Tt[1]) + Tt[1]*(Mki[1][0]*Tt[0] + Mki[1][1]*Tt[1]);
 
 		// calculate the normalized traction vector
-		vec3d pt = tau1*Tt[0] + tau2*Tt[1];
+		vec3d pt = tau[0]*Tt[0] + tau[1]*Tt[1];
 		pt.unit();
 		
 		// calculate the covariant version
@@ -1152,21 +1121,21 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 
 		for (k=0; k<nmeln; ++k)
 		{
-			T11[3*(k+1)  ] = -Hr[k]*tau1.x;
-			T11[3*(k+1)+1] = -Hr[k]*tau1.y;
-			T11[3*(k+1)+2] = -Hr[k]*tau1.z;
+			T11[3*(k+1)  ] = -Hr[k]*tau[0].x;
+			T11[3*(k+1)+1] = -Hr[k]*tau[0].y;
+			T11[3*(k+1)+2] = -Hr[k]*tau[0].z;
 
-			T12[3*(k+1)  ] = -Hs[k]*tau1.x;
-			T12[3*(k+1)+1] = -Hs[k]*tau1.y;
-			T12[3*(k+1)+2] = -Hs[k]*tau1.z;
+			T12[3*(k+1)  ] = -Hs[k]*tau[0].x;
+			T12[3*(k+1)+1] = -Hs[k]*tau[0].y;
+			T12[3*(k+1)+2] = -Hs[k]*tau[0].z;
 
-			T21[3*(k+1)  ] = -Hr[k]*tau2.x;
-			T21[3*(k+1)+1] = -Hr[k]*tau2.y;
-			T21[3*(k+1)+2] = -Hr[k]*tau2.z;
+			T21[3*(k+1)  ] = -Hr[k]*tau[1].x;
+			T21[3*(k+1)+1] = -Hr[k]*tau[1].y;
+			T21[3*(k+1)+2] = -Hr[k]*tau[1].z;
 
-			T22[3*(k+1)  ] = -Hs[k]*tau2.x;
-			T22[3*(k+1)+1] = -Hs[k]*tau2.y;
-			T22[3*(k+1)+2] = -Hs[k]*tau2.z;
+			T22[3*(k+1)  ] = -Hs[k]*tau[1].x;
+			T22[3*(k+1)+1] = -Hs[k]*tau[1].y;
+			T22[3*(k+1)+2] = -Hs[k]*tau[1].z;
 
 			if (nmeln==4)
 			{
@@ -1186,8 +1155,8 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 
 		vec3d g12(0,0,0);
 		if (nmeln == 4) g12 = rt[0]*Grs[0]+rt[1]*Grs[1]+rt[2]*Grs[2]+rt[3]*Grs[3];
-		double gt1 = g12*tau1;
-		double gt2 = g12*tau2;
+		double gt1 = g12*tau[0];
+		double gt2 = g12*tau[1];
 		double gp = g12*pt;
 
 		for (k=0; k<ndof; ++k)
@@ -1227,7 +1196,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 				// KT1
 				kij  = T11[i]*D1[j] + T12[i]*D2[j];
 				kij += D1[i]*T11[j] + D2[i]*T12[j];
-				kij -= (Hrs[0][1]*tau1)*D1[i]*D2[j] + (Hrs[1][0]*tau1)*D2[i]*D1[j];
+				kij -= (Hrs[0][1]*tau[0])*D1[i]*D2[j] + (Hrs[1][0]*tau[0])*D2[i]*D1[j];
 				kij += Tb11[i]*D1[j] + Tb21[i]*D2[j];
 				kij += D1[i]*Tb11[j] + D2[i]*Tb21[j];
 				kij += gap*(N11[i]*D1[j] + N12[i]*D2[j] + D1[i]*N11[j] + D2[i]*N12[j]);
@@ -1240,7 +1209,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESu
 				// KT2
 				kij  = T21[i]*D1[j] + T22[i]*D2[j];
 				kij += D1[i]*T21[j] + D2[i]*T22[j];
-				kij -= (Hrs[0][1]*tau2)*D1[i]*D2[j] + (Hrs[1][0]*tau2)*D2[i]*D1[j];
+				kij -= (Hrs[0][1]*tau[1])*D1[i]*D2[j] + (Hrs[1][0]*tau[1])*D2[i]*D1[j];
 				kij += Tb12[i]*D1[j] + Tb22[i]*D2[j];
 				kij += D1[i]*Tb12[j] + D2[i]*Tb22[j];
 				kij += gap*(N21[i]*D1[j] + N22[i]*D2[j] + D1[i]*N21[j] + D2[i]*N22[j]);
