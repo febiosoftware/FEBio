@@ -69,11 +69,15 @@ protected:
 	//! project slave surface onto master
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms);
 
+	//! Auto-penalty calculation
+	void CalcAutoPenalty();
+
 public:
 	double	m_epsn;		//!< normal penalty factor
 	double	m_knmult;	//!< normal stiffness multiplier
 	double	m_stol;		//!< search tolerance
 	int		m_npass;	//!< nr of passes
+	bool	m_bautopen;	//!< auto-penalty flag
 
 	double	m_atol;		//!< aug lag tolernace
 	double	m_gtol;		//!< gap tolerance

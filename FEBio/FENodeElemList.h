@@ -37,6 +37,8 @@ public:
 	int Valence(int n) { return m_nval[n]; }
 	FEElement** ElementList(int n) { return (FEElement**) m_eref + m_pn[n]; }
 
+	int Size() { return (int) m_nval.size(); }
+
 protected:
 	vector<int>			m_nval;	// nodal valences
 	vector<FEElement*>	m_eref;	// element pointers

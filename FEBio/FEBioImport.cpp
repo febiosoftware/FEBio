@@ -1562,10 +1562,15 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 				sz = tag.AttributeValue("auto", true);
 				if (sz)
 				{
-					if (strcmp(sz, "on") == 0) ps->m_bautopen = true;
+					if (strcmp(sz, "on") == 0) ps->m_nautopen = 1;
 				}
 
 				tag.value(ps->m_eps);
+			}
+			else if (tag == "auto_penalty")
+			{
+				bool b; tag.value(b);
+				if (b) ps->m_nautopen = 2;
 			}
 			else if (tag == "two_pass")
 			{
@@ -1614,6 +1619,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		do
 		{
 			if (tag == "penalty") tag.value(ps->m_epsn);
+			else if (tag == "auto_penalty") tag.value(ps->m_bautopen);
 			else if (tag == "laugon") tag.value(ps->m_blaugon);
 			else if (tag == "tolerance") tag.value(ps->m_atol);
 			else if (tag == "gaptol") tag.value(ps->m_gtol);

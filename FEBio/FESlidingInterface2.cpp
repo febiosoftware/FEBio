@@ -853,8 +853,10 @@ void FESlidingInterface2::ContactStiffness()
 	Logfile& log = GetLogfile();
 	
 	// set higher order stiffness mutliplier
-	// NOTE: We don't need this for this algorithm
-/*	double knmult = m_knmult;
+	// NOTE: this algrotihm doesn't really need this
+	// but I've added this functionality to compare with the other contact 
+	// algorithms and to see the effect of the different stiffness contributions
+	double knmult = m_knmult;
 	if (m_knmult < 0)
 	{
 		int ni = int(-m_knmult);
@@ -865,7 +867,7 @@ void FESlidingInterface2::ContactStiffness()
 		}
 		else knmult = 0;
 	}
-*/
+
 	// do single- or two-pass
 	for (int np=0; np < m_npass; ++np)
 	{
@@ -1027,48 +1029,49 @@ void FESlidingInterface2::ContactStiffness()
 						{
 							for (k=0; k<nseln+nmeln; ++k)
 							{
-								ke[k*3  ][l*3  ] -= tn*w[j]*N[k]*As[l][0][0];
-								ke[k*3  ][l*3+1] -= tn*w[j]*N[k]*As[l][0][1];
-								ke[k*3  ][l*3+2] -= tn*w[j]*N[k]*As[l][0][2];
+								ke[k*3  ][l*3  ] -= knmult*tn*w[j]*N[k]*As[l][0][0];
+								ke[k*3  ][l*3+1] -= knmult*tn*w[j]*N[k]*As[l][0][1];
+								ke[k*3  ][l*3+2] -= knmult*tn*w[j]*N[k]*As[l][0][2];
 								
-								ke[k*3+1][l*3  ] -= tn*w[j]*N[k]*As[l][1][0];
-								ke[k*3+1][l*3+1] -= tn*w[j]*N[k]*As[l][1][1];
-								ke[k*3+1][l*3+2] -= tn*w[j]*N[k]*As[l][1][2];
+								ke[k*3+1][l*3  ] -= knmult*tn*w[j]*N[k]*As[l][1][0];
+								ke[k*3+1][l*3+1] -= knmult*tn*w[j]*N[k]*As[l][1][1];
+								ke[k*3+1][l*3+2] -= knmult*tn*w[j]*N[k]*As[l][1][2];
 								
-								ke[k*3+2][l*3  ] -= tn*w[j]*N[k]*As[l][2][0];
-								ke[k*3+2][l*3+1] -= tn*w[j]*N[k]*As[l][2][1];
-								ke[k*3+2][l*3+2] -= tn*w[j]*N[k]*As[l][2][2];
+								ke[k*3+2][l*3  ] -= knmult*tn*w[j]*N[k]*As[l][2][0];
+								ke[k*3+2][l*3+1] -= knmult*tn*w[j]*N[k]*As[l][2][1];
+								ke[k*3+2][l*3+2] -= knmult*tn*w[j]*N[k]*As[l][2][2];
 							}
 						}
-					} else 
+					} 
+					else 
 					{	// symmetric
 						for (l=0; l<nseln; ++l)
 						{
 							for (k=0; k<nseln+nmeln; ++k)
 							{
-								ke[k*3  ][l*3  ] -= 0.5*tn*w[j]*N[k]*As[l][0][0];
-								ke[k*3  ][l*3+1] -= 0.5*tn*w[j]*N[k]*As[l][0][1];
-								ke[k*3  ][l*3+2] -= 0.5*tn*w[j]*N[k]*As[l][0][2];
+								ke[k*3  ][l*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
+								ke[k*3  ][l*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
+								ke[k*3  ][l*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
 								
-								ke[k*3+1][l*3  ] -= 0.5*tn*w[j]*N[k]*As[l][1][0];
-								ke[k*3+1][l*3+1] -= 0.5*tn*w[j]*N[k]*As[l][1][1];
-								ke[k*3+1][l*3+2] -= 0.5*tn*w[j]*N[k]*As[l][1][2];
+								ke[k*3+1][l*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
+								ke[k*3+1][l*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
+								ke[k*3+1][l*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
 								
-								ke[k*3+2][l*3  ] -= 0.5*tn*w[j]*N[k]*As[l][2][0];
-								ke[k*3+2][l*3+1] -= 0.5*tn*w[j]*N[k]*As[l][2][1];
-								ke[k*3+2][l*3+2] -= 0.5*tn*w[j]*N[k]*As[l][2][2];
+								ke[k*3+2][l*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
+								ke[k*3+2][l*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
+								ke[k*3+2][l*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
 
-								ke[l*3  ][k*3  ] -= 0.5*tn*w[j]*N[k]*As[l][0][0];
-								ke[l*3+1][k*3  ] -= 0.5*tn*w[j]*N[k]*As[l][0][1];
-								ke[l*3+2][k*3  ] -= 0.5*tn*w[j]*N[k]*As[l][0][2];
+								ke[l*3  ][k*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
+								ke[l*3+1][k*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
+								ke[l*3+2][k*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
 								
-								ke[l*3  ][k*3+1] -= 0.5*tn*w[j]*N[k]*As[l][1][0];
-								ke[l*3+1][k*3+1] -= 0.5*tn*w[j]*N[k]*As[l][1][1];
-								ke[l*3+2][k*3+1] -= 0.5*tn*w[j]*N[k]*As[l][1][2];
+								ke[l*3  ][k*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
+								ke[l*3+1][k*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
+								ke[l*3+2][k*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
 								
-								ke[l*3  ][k*3+2] -= 0.5*tn*w[j]*N[k]*As[l][2][0];
-								ke[l*3+1][k*3+2] -= 0.5*tn*w[j]*N[k]*As[l][2][1];
-								ke[l*3+2][k*3+2] -= 0.5*tn*w[j]*N[k]*As[l][2][2];
+								ke[l*3  ][k*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
+								ke[l*3+1][k*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
+								ke[l*3+2][k*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
 							}
 						}
 					}
@@ -1095,48 +1098,49 @@ void FESlidingInterface2::ContactStiffness()
 						{
 							for (l=0; l<nseln+nmeln; ++l)
 							{
-								ke[(k+nseln)*3  ][l*3  ] += tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[(k+nseln)*3  ][l*3+1] += tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[(k+nseln)*3  ][l*3+2] += tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
+								ke[(k+nseln)*3  ][l*3  ] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
+								ke[(k+nseln)*3  ][l*3+1] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
+								ke[(k+nseln)*3  ][l*3+2] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+1][l*3  ] += tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[(k+nseln)*3+1][l*3+1] += tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[(k+nseln)*3+1][l*3+2] += tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
+								ke[(k+nseln)*3+1][l*3  ] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
+								ke[(k+nseln)*3+1][l*3+1] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
+								ke[(k+nseln)*3+1][l*3+2] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+2][l*3  ] += tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
-								ke[(k+nseln)*3+2][l*3+1] += tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
-								ke[(k+nseln)*3+2][l*3+2] += tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
+								ke[(k+nseln)*3+2][l*3  ] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
+								ke[(k+nseln)*3+2][l*3+1] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
+								ke[(k+nseln)*3+2][l*3+2] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
 							}
 						}
-					} else
+					}
+					else
 					{	// symmetric
 						for (k=0; k<nmeln; ++k) 
 						{
 							for (l=0; l<nseln+nmeln; ++l)
 							{
-								ke[(k+nseln)*3  ][l*3  ] += 0.5*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[(k+nseln)*3  ][l*3+1] += 0.5*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[(k+nseln)*3  ][l*3+2] += 0.5*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
+								ke[(k+nseln)*3  ][l*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
+								ke[(k+nseln)*3  ][l*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
+								ke[(k+nseln)*3  ][l*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+1][l*3  ] += 0.5*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[(k+nseln)*3+1][l*3+1] += 0.5*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[(k+nseln)*3+1][l*3+2] += 0.5*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
+								ke[(k+nseln)*3+1][l*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
+								ke[(k+nseln)*3+1][l*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
+								ke[(k+nseln)*3+1][l*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+2][l*3  ] += 0.5*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
-								ke[(k+nseln)*3+2][l*3+1] += 0.5*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
-								ke[(k+nseln)*3+2][l*3+2] += 0.5*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
+								ke[(k+nseln)*3+2][l*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
+								ke[(k+nseln)*3+2][l*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
+								ke[(k+nseln)*3+2][l*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
 								
-								ke[l*3  ][(k+nseln)*3  ] += 0.5*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[l*3+1][(k+nseln)*3  ] += 0.5*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[l*3+2][(k+nseln)*3  ] += 0.5*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
+								ke[l*3  ][(k+nseln)*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
+								ke[l*3+1][(k+nseln)*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
+								ke[l*3+2][(k+nseln)*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
 								
-								ke[l*3  ][(k+nseln)*3+1] += 0.5*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[l*3+1][(k+nseln)*3+1] += 0.5*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[l*3+2][(k+nseln)*3+1] += 0.5*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
+								ke[l*3  ][(k+nseln)*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
+								ke[l*3+1][(k+nseln)*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
+								ke[l*3+2][(k+nseln)*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
 								
-								ke[l*3  ][(k+nseln)*3+2] += 0.5*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
-								ke[l*3+1][(k+nseln)*3+2] += 0.5*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
-								ke[l*3+2][(k+nseln)*3+2] += 0.5*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
+								ke[l*3  ][(k+nseln)*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
+								ke[l*3+1][(k+nseln)*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
+								ke[l*3+2][(k+nseln)*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
 							}
 						}
 					}

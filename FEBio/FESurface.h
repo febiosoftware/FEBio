@@ -106,6 +106,8 @@ public:
 	bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
 	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
 
+	int FindElement(FESurfaceElement& el);
+
 protected:
 	FEMesh*	m_pmesh;			//!< pointer to parent mesh
 

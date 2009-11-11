@@ -56,7 +56,61 @@ void FESurface::Init()
 
 	// create the node element list
 	m_NEL.Create(*this);
+
+	// see if we can find all elements that the faces belong to
+	for (i=0; i<ne; ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		if (el.m_nelem < 0) el.m_nelem = FindElement(el);
+	}
 }
+
+//-----------------------------------------------------------------------------
+//! Find the element that a face belongs to
+//!
+int FESurface::FindElement(FESurfaceElement& el)
+{
+	// get the mesh to which this surface belongs
+	FEMesh& mesh = *m_pmesh;
+	FENodeElemList& NEL = mesh.NodeElementList();
+
+	int* sf = el.m_node;
+	int node = el.m_node[0];
+	int nval = NEL.Valence(node);
+	FEElement** ppe = NEL.ElementList(node);
+	for (int i=0; i<nval; ++i)
+	{
+		FEElement& e = *ppe[i];
+		int nfaces = 0;
+		switch (e.Type())
+		{
+		case FE_HEX  : nfaces = 6; break;
+		case FE_PENTA: nfaces = 5; break;
+		case FE_TET  : nfaces = 4; break;
+		case FE_QUAD : nfaces = 1; break;
+		case FE_TRI  : nfaces = 1; break;
+		default:
+			assert(false);
+		}
+
+		int nf[4], nn;
+		for (int j=0; j<nfaces; ++j)
+		{
+			nn = mesh.GetFace(e, j, nf);
+			if ((nn == 3) && (el.Nodes() == 3))
+			{
+				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID;
+			}
+			else if ((nn == 4) && (el.Nodes() == 4))
+			{
+				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID;
+			}
+		}
+	}
+
+	return -1;
+}
+
 
 //-----------------------------------------------------------------------------
 //! This function calculates the projection of x on the surface element el.

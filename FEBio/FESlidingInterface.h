@@ -64,6 +64,9 @@ protected:
 	//! calculate auto penalty factor
 	void CalcAutoPenalty(FEContactSurface& s);
 
+	//! new auto-penalty calculation
+	void CalcAutoPenalty2();
+
 	//! calculate the nodal force of a slave node
 	void ContactNodalForce(int m, FEContactSurface& ss, FESurfaceElement& mel, vector<double>& fe);
 
@@ -92,8 +95,8 @@ public:
 
 	double			m_stol;		//!< search tolerance
 
-	bool			m_bautopen;	//!< auto penalty calculation factor
-	double			m_eps;		//!< penalty scale factor
+	int				m_nautopen;	//!< auto penalty calculation factor (0=none, 1=old, 2=new)
+	double			m_eps;		//!< penalty scale factor 
 
 	bool			m_breloc;	//!< initial node relocation
 

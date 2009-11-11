@@ -11,6 +11,7 @@
 
 #include "FEElement.h"
 #include "Archive.h"
+#include "FENodeElemList.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // STRUCT: FE_BOUNDING_BOX
@@ -229,6 +230,12 @@ public:
 	//! Finds an element from a given ID
 	FEElement* FindElementFromID(int nid);
 
+	FENodeElemList& NodeElementList()
+	{
+		if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);
+		return m_NEL;
+	}
+
 protected:
 	vector<FENode>			m_Node;		//!< FE nodes array
 
@@ -238,6 +245,8 @@ protected:
 	ptr_vector<FENodeSet>	m_NodeSet;	//!< node sets
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
+
+	FENodeElemList	m_NEL;
 };
 
 #endif // !defined(AFX_FEMESH_H__81ABA97F_AD5F_4F1D_8EE9_95B67EBA448E__INCLUDED_)

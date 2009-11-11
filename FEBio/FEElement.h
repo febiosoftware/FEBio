@@ -462,6 +462,14 @@ public:
 		}
 	}
 
+	bool HasNode(int n)
+	{ 
+		int l = Nodes(); 
+		for (int i=0; i<l; ++i) 
+			if (m_node[i] == n) return true; 
+		return false;
+	}
+
 public:
 	int		m_nelem;		//!< index of solid or shell element this surface element is a face of
 	vector<int>	m_lnode;	//!< local node numbering (compared to m_node which is a global numbering)
