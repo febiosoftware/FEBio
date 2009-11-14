@@ -70,7 +70,7 @@ public:
 
 protected:
 	void ProjectSurface(FEContactSurface2& ss, FEContactSurface2& ms);
-	void CalcAutoPenalty();
+	double AutoPressurePenalty(FESurface& ss, FESurface& ms);
 
 public:
 	FEContactSurface2	m_ms;	//!< master surface

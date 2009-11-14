@@ -216,7 +216,23 @@ void FESlidingInterface::Init()
 	{
 	case 0: break;
 	case 1:	CalcAutoPenalty(m_ss); break;
-	case 2: CalcAutoPenalty2(); break;
+	case 2: 
+		{
+			double eps = AutoPenalty(m_ss, m_ms);
+			if (m_pfem->GetDebugFlag())
+			{
+				Logfile& log = GetLogfile();
+				double pen = eps*Penalty();
+				log.printf("Penalty factor: %lg\n", pen);
+			}
+
+			for (int np=0; np<m_npass; ++np)
+			{
+				FEContactSurface& s = (np==0? m_ss : m_ms);
+				for (int i=0; i<s.Nodes(); ++i) s.eps[i] = eps;
+			}
+		}
+		break;
 	default: assert(false);
 	}
 
@@ -234,88 +250,10 @@ void FESlidingInterface::Init()
 		{
 		case 0: break;
 		case 1: CalcAutoPenalty(m_ms);
-		case 2: break; // no need to call CalcAutoPenalty2() again
+		case 2: break; // no need to call AutoPenalty() again
 		default:
 			assert(false);
 		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! new auto-contact penalty
-//
-void FESlidingInterface::CalcAutoPenalty2()
-{
-	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
-
-	double eps = 0;
-
-	int N = 0, np;
-	for (np=0; np<m_npass; ++np)
-	{
-		FEContactSurface& s = (np==0? m_ss : m_ms);
-		for (int i=0; i<s.Elements(); ++i)
-		{
-			// get the surface element
-			FESurfaceElement& el = s.Element(i);
-
-			// get the solid element this surface element belongs to
-			FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
-			if (pe)
-			{
-				// get the material
-				FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
-
-				// extract the elastic component
-				FEElasticMaterial* pme = m_pfem->GetElasticMaterial(pe->GetMatID());
-
-				// get a material point
-				FEMaterialPoint& mp = *pe->m_State[0];
-				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
-				// setup the material point
-				pt.F = mat3dd(1.0);
-				pt.J = 1;
-				pt.avgJ = 1;
-				pt.avgp = 0;
-				pt.s.zero();
-
-				// get the tangent at this point
-				tens4ds C = pme->Tangent(pt);
-
-				// get the upper 3x3
-				mat3d T(mat3ds(C(0,0), C(1,1), C(2,2), C(0,1), C(1,2), C(0,2)));
-				mat3d Ti = T.inverse();
-
-				// calculate average modulus
-				double E = (1/Ti(0,0) + 1/Ti(1,1) + 1/Ti(2,2))/3;
-
-				// calculate the area of the surface element
-				double A = s.FaceArea(el);
-
-				// calculate the element's volume
-				double V = m.ElementVolume(*pe);
-
-				// update auto-penalty
-				eps  += E*A/V;
-				++N;
-			}
-		}
-	}
-	eps /= N;
-
-	if (m_pfem->GetDebugFlag())
-	{
-		Logfile& log = GetLogfile();
-		double pen = eps*Penalty();
-		log.printf("Penalty factor: %lg\n", pen);
-	}
-
-	for (np=0; np<m_npass; ++np)
-	{
-		FEContactSurface& s = (np==0? m_ss : m_ms);
-		for (int i=0; i<s.Nodes(); ++i) s.eps[i] = eps;
 	}
 }
 

@@ -69,9 +69,6 @@ protected:
 	//! project slave surface onto master
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms);
 
-	//! Auto-penalty calculation
-	void CalcAutoPenalty();
-
 public:
 	double	m_epsn;		//!< normal penalty factor
 	double	m_knmult;	//!< normal stiffness multiplier

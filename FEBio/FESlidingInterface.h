@@ -64,9 +64,6 @@ protected:
 	//! calculate auto penalty factor
 	void CalcAutoPenalty(FEContactSurface& s);
 
-	//! new auto-penalty calculation
-	void CalcAutoPenalty2();
-
 	//! calculate the nodal force of a slave node
 	void ContactNodalForce(int m, FEContactSurface& ss, FESurfaceElement& mel, vector<double>& fe);
 
