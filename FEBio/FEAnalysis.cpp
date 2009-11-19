@@ -325,7 +325,7 @@ bool FEAnalysis::Solve()
 	bool bconv = true;
 
 	// calculate end time value
-	double endtime = m_ntime*m_dt0;
+	double endtime = m_fem.m_ftime + m_ntime*m_dt0;
 	const double eps = endtime*1e-7;
 
 	pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
