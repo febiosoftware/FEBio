@@ -134,12 +134,12 @@ void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfa
 //-----------------------------------------------------------------------------
 void FESurfaceConstraint::Update()
 {
-	int i, j, ne;
+	int i, j, ne, n0;
 	FESurfaceElement* pme;
 
 	FEMesh& mesh = *m_ss.GetMesh();
 
-	vec3d us, um;
+	vec3d us, um, u0;
 	vec3d umi[4];
 
 	// update gap functions
@@ -149,6 +149,26 @@ void FESurfaceConstraint::Update()
 		FESurfaceConstraintSurface& ms = (np == 0? m_ms : m_ss);
 
 		int N = ss.Nodes();
+
+		// calculate the reference node displacement
+		n0 = ss.m_nref;
+		FENode& node = ss.Node(n0);
+		us = node.m_rt - node.m_r0;
+
+		// get the master element
+		pme = ss.m_pme[n0];
+
+		// calculate the master displacement
+		ne = pme->Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			FENode& node = ms.Node(pme->m_lnode[j]);
+			umi[j] = node.m_rt - node.m_r0;
+		}
+		um = pme->eval(umi, ss.m_rs[n0][0], ss.m_rs[n0][1]);
+
+		// calculate relative reference displacement
+		u0 = us - um;
 
 		for (i=0; i<N; ++i)
 		{
@@ -169,7 +189,7 @@ void FESurfaceConstraint::Update()
 			um = pme->eval(umi, ss.m_rs[i][0], ss.m_rs[i][1]);
 
 			// calculate gap function
-			ss.m_gap[i] = us - um;
+			ss.m_gap[i] = us - um - u0;
 		}
 	}
 }
@@ -223,8 +243,6 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	int n0[4];
-
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	for (int np=0; np<m_npass; ++np)
@@ -236,15 +254,6 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 		int nref = ss.m_nref;
 		FESurfaceElement* pref = ss.m_pme[nref];
 		mesh.UnpackElement(*pref);
-
-		// grab the data we'll need for this element
-		LM0 = pref->LM();
-		int ne0 = pref->Nodes();
-		for (j=0; j<ne0; ++j) n0[j] = pref->m_node[j];
-		r = ss.m_rs[nref][0];
-		s = ss.m_rs[nref][1];
-		double N0[4];
-		pref->shape_fnc(N0, r, s);
 
 		// loop over all slave facets
 		int ne = ss.Elements();
@@ -264,116 +273,95 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 
 			// loop over slave element nodes (which are the integration points as well)
 			for (n=0; n<nseln; ++n)
-				if (n != nref)
+			{
+				Gr = sel.Gr(n);
+				Gs = sel.Gs(n);
+
+				m = sel.m_lnode[n];
+
+				// calculate jacobian
+				dxr = dxs = vec3d(0,0,0);
+				for (k=0; k<nseln; ++k)
 				{
-					Gr = sel.Gr(n);
-					Gs = sel.Gs(n);
+					dxr.x += Gr[k]*r0[k].x;
+					dxr.y += Gr[k]*r0[k].y;
+					dxr.z += Gr[k]*r0[k].z;
 
-					m = sel.m_lnode[n];
-
-					// calculate jacobian
-					dxr = dxs = vec3d(0,0,0);
-					for (k=0; k<nseln; ++k)
-					{
-						dxr.x += Gr[k]*r0[k].x;
-						dxr.y += Gr[k]*r0[k].y;
-						dxr.z += Gr[k]*r0[k].z;
-
-						dxs.x += Gs[k]*r0[k].x;
-						dxs.y += Gs[k]*r0[k].y;
-						dxs.z += Gs[k]*r0[k].z;
-					}
-
-					detJ = (dxr ^ dxs).norm();
-
-					// get slave node contact force
-					tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
-
-					// get the master element
-					FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
-					mesh.UnpackElement(mel, FE_UNPACK_LM);
-
-					mLM = mel.LM();
-
-					// we must unpack the slave element again
-					mesh.UnpackElement(sel);
-
-					nmeln = mel.Nodes();
-
-					// isoparametric coordinates of the projected slave node
-					// onto the master element
-					r = ss.m_rs[m][0];
-					s = ss.m_rs[m][1];
-
-					// get the master shape function values at this slave node
-					if (nmeln == 4)
-					{
-						// quadrilateral
-						N[0] = 0.25*(1-r)*(1-s);
-						N[1] = 0.25*(1+r)*(1-s);
-						N[2] = 0.25*(1+r)*(1+s);
-						N[3] = 0.25*(1-r)*(1+s);
-					}
-					else if (nmeln == 3)
-					{
-						// triangle
-						N[0] = 1 - r - s;
-						N[1] = r;
-						N[2] = s;
-					}
-
-					// calculate force vector
-					fe.create(3*(nmeln+1+1+ne0));
-					fe[0] = -detJ*w[n]*tc.x;
-					fe[1] = -detJ*w[n]*tc.y;
-					fe[2] = -detJ*w[n]*tc.z;
-					for (l=0; l<nmeln; ++l)
-					{
-						fe[3*(l+1)  ] = detJ*w[n]*tc.x*N[l];
-						fe[3*(l+1)+1] = detJ*w[n]*tc.y*N[l];
-						fe[3*(l+1)+2] = detJ*w[n]*tc.z*N[l];
-					}
-					fe[3*(nmeln+1)  ] = 0;//detJ*w[n]*tc.x;
-					fe[3*(nmeln+1)+1] = 0;//detJ*w[n]*tc.y;
-					fe[3*(nmeln+1)+2] = 0;//detJ*w[n]*tc.z;
-					for (l=0; l<ne0; ++l)
-					{
-						fe[3*(nmeln+2+l)  ] = 0;//-detJ*w[n]*tc.x*N0[l];
-						fe[3*(nmeln+2+l)+1] = 0;//-detJ*w[n]*tc.y*N0[l];
-						fe[3*(nmeln+2+l)+2] = 0;//-detJ*w[n]*tc.z*N0[l];
-					}
-
-					// fill the lm array
-					lm.create(3*(nmeln+1+1+ne0));
-					lm[0] = sLM[n*3  ];
-					lm[1] = sLM[n*3+1];
-					lm[2] = sLM[n*3+2];
-					for (l=0; l<nmeln; ++l)
-					{
-						lm[3*(l+1)  ] = mLM[l*3  ];
-						lm[3*(l+1)+1] = mLM[l*3+1];
-						lm[3*(l+1)+2] = mLM[l*3+2];
-					}
-					lm[3*(nmeln+1)  ] = ss.Node(nref).m_ID[0];
-					lm[3*(nmeln+1)+1] = ss.Node(nref).m_ID[1];
-					lm[3*(nmeln+1)+2] = ss.Node(nref).m_ID[2];
-					for (l=0; l<ne0; ++l)
-					{
-						lm[3*(nmeln+2+l)  ] = LM0[l*3  ];
-						lm[3*(nmeln+2+l)+1] = LM0[l*3+1];
-						lm[3*(nmeln+2+l)+2] = LM0[l*3+2];
-					}
-
-					// fill the en array
-					en.create(nmeln+1+1+ne0);
-					en[0] = sel.m_node[n];
-					for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
-					en[nmeln+1] = ss.node[nref];
-					for (l=0; l<ne0; ++l) en[nmeln+2+l] = n0[l];
-
-					// assemble into global force vector
-					psolver->AssembleResidual(en, lm, fe, F);
+					dxs.x += Gs[k]*r0[k].x;
+					dxs.y += Gs[k]*r0[k].y;
+					dxs.z += Gs[k]*r0[k].z;
 				}
+
+				detJ = (dxr ^ dxs).norm();
+
+				// get slave node contact force
+				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
+
+				// get the master element
+				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
+				mesh.UnpackElement(mel, FE_UNPACK_LM);
+
+				mLM = mel.LM();
+
+				// we must unpack the slave element again
+				mesh.UnpackElement(sel);
+
+				nmeln = mel.Nodes();
+
+				// isoparametric coordinates of the projected slave node
+				// onto the master element
+				r = ss.m_rs[m][0];
+				s = ss.m_rs[m][1];
+
+				// get the master shape function values at this slave node
+				if (nmeln == 4)
+				{
+					// quadrilateral
+					N[0] = 0.25*(1-r)*(1-s);
+					N[1] = 0.25*(1+r)*(1-s);
+					N[2] = 0.25*(1+r)*(1+s);
+					N[3] = 0.25*(1-r)*(1+s);
+				}
+				else if (nmeln == 3)
+				{
+					// triangle
+					N[0] = 1 - r - s;
+					N[1] = r;
+					N[2] = s;
+				}
+
+				// calculate force vector
+				fe.create(3*(nmeln+1));
+				fe[0] = -detJ*w[n]*tc.x;
+				fe[1] = -detJ*w[n]*tc.y;
+				fe[2] = -detJ*w[n]*tc.z;
+				for (l=0; l<nmeln; ++l)
+				{
+					fe[3*(l+1)  ] = detJ*w[n]*tc.x*N[l];
+					fe[3*(l+1)+1] = detJ*w[n]*tc.y*N[l];
+					fe[3*(l+1)+2] = detJ*w[n]*tc.z*N[l];
+				}
+
+				// fill the lm array
+				lm.create(3*(nmeln+1));
+				lm[0] = sLM[n*3  ];
+				lm[1] = sLM[n*3+1];
+				lm[2] = sLM[n*3+2];
+				for (l=0; l<nmeln; ++l)
+				{
+					lm[3*(l+1)  ] = mLM[l*3  ];
+					lm[3*(l+1)+1] = mLM[l*3+1];
+					lm[3*(l+1)+2] = mLM[l*3+2];
+				}
+
+				// fill the en array
+				en.create(nmeln+1);
+				en[0] = sel.m_node[n];
+				for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
+
+				// assemble into global force vector
+				psolver->AssembleResidual(en, lm, fe, F);
+			}
 		}
 	}
 }
@@ -435,6 +423,42 @@ void FESurfaceConstraint::ContactStiffness()
 		double N0[4];
 		pref->shape_fnc(N0, r, s);
 
+		// number of degrees of freedom
+		ndof = 3*(1 + ne0);
+		vector<double> N(ndof/3);
+		N[0] = 1;
+		for (k=0; k<ne0; ++k) N[k+1] = -N0[k];
+
+		// stiffness matrix
+		ke.Create(ndof, ndof); ke.zero();
+		for (k=0; k<ndof/3; ++k)
+			for (l=0; l<ndof/3; ++l)
+			{
+				ke[3*k  ][3*l  ] = m_eps*N[k]*N[l];
+				ke[3*k+1][3*l+1] = m_eps*N[k]*N[l];
+				ke[3*k+2][3*l+2] = m_eps*N[k]*N[l];
+			}
+
+		// fill the lm array
+		lm.create(3*(ne0+1));
+		lm[0] = ss.Node(nref).m_ID[0];
+		lm[1] = ss.Node(nref).m_ID[1];
+		lm[2] = ss.Node(nref).m_ID[2];
+		for (l=0; l<ne0; ++l)
+		{
+			lm[3*(l+1)  ] = LM0[l*3  ];
+			lm[3*(l+1)+1] = LM0[l*3+1];
+			lm[3*(l+1)+2] = LM0[l*3+2];
+		}
+
+		// fill the en array
+		en.create(ne0+1);
+		en[0] = ss.node[nref];
+		for (l=0; l<ne0; ++l) en[l+1] = n0[l];
+
+		// assemble stiffness matrix
+//		psolver->AssembleStiffness(en, lm, ke);
+
 		// loop over all slave elements
 		int ne = ss.Elements();
 		for (j=0; j<ne; ++j)
@@ -452,115 +476,100 @@ void FESurfaceConstraint::ContactStiffness()
 
 			// loop over all integration points (that is nodes)
 			for (n=0; n<nseln; ++n)
-				if (n != nref)
+			{
+				Gr = se.Gr(n);
+				Gs = se.Gs(n);
+
+				m = se.m_lnode[n];
+
+				// calculate jacobian
+				dxr = dxs = vec3d(0,0,0);
+				for (k=0; k<nseln; ++k)
 				{
-					Gr = se.Gr(n);
-					Gs = se.Gs(n);
+					dxr.x += Gr[k]*r0[k].x;
+					dxr.y += Gr[k]*r0[k].y;
+					dxr.z += Gr[k]*r0[k].z;
 
-					m = se.m_lnode[n];
-
-					// calculate jacobian
-					dxr = dxs = vec3d(0,0,0);
-					for (k=0; k<nseln; ++k)
-					{
-						dxr.x += Gr[k]*r0[k].x;
-						dxr.y += Gr[k]*r0[k].y;
-						dxr.z += Gr[k]*r0[k].z;
-
-						dxs.x += Gs[k]*r0[k].x;
-						dxs.y += Gs[k]*r0[k].y;
-						dxs.z += Gs[k]*r0[k].z;
-					}
-
-					detJ = (dxr ^ dxs).norm();
-
-					// get the master element
-					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
-					mesh.UnpackElement(me, FE_UNPACK_LM);
-
-					mLM = me.LM();
-					nmeln = me.Nodes();
-
-					// get the master element node positions
-					for (k=0; k<nmeln; ++k) rtm[k] = me.rt()[k];
-
-					// we must unpack the slave element again
-					mesh.UnpackElement(se);
-
-					// slave node natural coordinates in master element
-					r = ss.m_rs[m][0];
-					s = ss.m_rs[m][1];
-
-					// get slave node normal force
-					tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps; //ss.T[m];
-
-					// get the master shape function values at this slave node
-					if (nmeln == 4)
-					{
-						// quadrilateral
-						H[0] = 0.25*(1-r)*(1-s);
-						H[1] = 0.25*(1+r)*(1-s);
-						H[2] = 0.25*(1+r)*(1+s);
-						H[3] = 0.25*(1-r)*(1+s);
-					}
-					else if (nmeln == 3)
-					{
-						// triangle
-						H[0] = 1 - r - s;
-						H[1] = r;
-						H[2] = s;
-					}
-
-					// number of degrees of freedom
-					ndof = 3*(1 + nmeln + 1 + ne0);
-
-					vector<double> N(ndof/3);
-					N[0] = 1;
-					for (k=0; k<nmeln; ++k) N[k+1] = -H[k];
-					N[nmeln + 1] = 0;//-1;
-					for (k=0; k<ne0; ++k) N[(nmeln+2)+k] = N0[k];
-
-					ke.Create(ndof, ndof); ke.zero();
-					for (k=0; k<ndof/3; ++k)
-						for (l=0; l<ndof/3; ++l)
-						{
-							ke[3*k  ][3*l  ] = 0;//w[n]*detJ*m_eps*N[k]*N[l];
-							ke[3*k+1][3*l+1] = 0;//w[n]*detJ*m_eps*N[k]*N[l];
-							ke[3*k+2][3*l+2] = 0;//w[n]*detJ*m_eps*N[k]*N[l];
-						}
-
-					// fill the lm array
-					lm.create(3*(nmeln+1+1+ne0));
-					lm[0] = sLM[n*3  ];
-					lm[1] = sLM[n*3+1];
-					lm[2] = sLM[n*3+2];
-					for (l=0; l<nmeln; ++l)
-					{
-						lm[3*(l+1)  ] = mLM[l*3  ];
-						lm[3*(l+1)+1] = mLM[l*3+1];
-						lm[3*(l+1)+2] = mLM[l*3+2];
-					}
-					lm[3*(nmeln+1)  ] = ss.Node(nref).m_ID[0];
-					lm[3*(nmeln+1)+1] = ss.Node(nref).m_ID[1];
-					lm[3*(nmeln+1)+2] = ss.Node(nref).m_ID[2];
-					for (l=0; l<ne0; ++l)
-					{
-						lm[3*(nmeln+2+l)  ] = LM0[l*3  ];
-						lm[3*(nmeln+2+l)+1] = LM0[l*3+1];
-						lm[3*(nmeln+2+l)+2] = LM0[l*3+2];
-					}
-
-					// fill the en array
-					en.create(nmeln+1+1+ne0);
-					en[0] = se.m_node[n];
-					for (l=0; l<nmeln; ++l) en[l+1] = me.m_node[l];
-					en[nmeln+1] = ss.node[nref];
-					for (l=0; l<ne0; ++l) en[nmeln+2+l] = n0[l];
-
-
-					// assemble stiffness matrix
-					psolver->AssembleStiffness(en, lm, ke);
+					dxs.x += Gs[k]*r0[k].x;
+					dxs.y += Gs[k]*r0[k].y;
+					dxs.z += Gs[k]*r0[k].z;
 				}
+
+				detJ = (dxr ^ dxs).norm();
+
+				// get the master element
+				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
+				mesh.UnpackElement(me, FE_UNPACK_LM);
+
+				mLM = me.LM();
+				nmeln = me.Nodes();
+
+				// get the master element node positions
+				for (k=0; k<nmeln; ++k) rtm[k] = me.rt()[k];
+
+				// we must unpack the slave element again
+				mesh.UnpackElement(se);
+
+				// slave node natural coordinates in master element
+				r = ss.m_rs[m][0];
+				s = ss.m_rs[m][1];
+
+				// get slave node normal force
+				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps; //ss.T[m];
+
+				// get the master shape function values at this slave node
+				if (nmeln == 4)
+				{
+					// quadrilateral
+					H[0] = 0.25*(1-r)*(1-s);
+					H[1] = 0.25*(1+r)*(1-s);
+					H[2] = 0.25*(1+r)*(1+s);
+					H[3] = 0.25*(1-r)*(1+s);
+				}
+				else if (nmeln == 3)
+				{
+					// triangle
+					H[0] = 1 - r - s;
+					H[1] = r;
+					H[2] = s;
+				}
+
+				// number of degrees of freedom
+				ndof = 3*(1 + nmeln);
+
+				vector<double> N(ndof/3);
+				N[0] = 1;
+				for (k=0; k<nmeln; ++k) N[k+1] = -H[k];
+
+				ke.Create(ndof, ndof); ke.zero();
+				for (k=0; k<ndof/3; ++k)
+					for (l=0; l<ndof/3; ++l)
+					{
+						ke[3*k  ][3*l  ] = w[n]*detJ*m_eps*N[k]*N[l];
+						ke[3*k+1][3*l+1] = w[n]*detJ*m_eps*N[k]*N[l];
+						ke[3*k+2][3*l+2] = w[n]*detJ*m_eps*N[k]*N[l];
+					}
+
+				// fill the lm array
+				lm.create(3*(nmeln+1));
+				lm[0] = sLM[n*3  ];
+				lm[1] = sLM[n*3+1];
+				lm[2] = sLM[n*3+2];
+				for (l=0; l<nmeln; ++l)
+				{
+					lm[3*(l+1)  ] = mLM[l*3  ];
+					lm[3*(l+1)+1] = mLM[l*3+1];
+					lm[3*(l+1)+2] = mLM[l*3+2];
+				}
+
+				// fill the en array
+				en.create(nmeln+1);
+				en[0] = se.m_node[n];
+				for (l=0; l<nmeln; ++l) en[l+1] = me.m_node[l];
+
+				// assemble stiffness matrix
+				psolver->AssembleStiffness(en, lm, ke);
+			}
 		}
 	}
 }
@@ -593,27 +602,25 @@ bool FESurfaceConstraint::Augment(int naug)
 	double normgc = 0;
 	int N = 0;
 	for (i=0; i<m_ss.Nodes(); ++i)
-		if (i != m_ss.m_nref)
-		{
-			lm = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
+	{
+		lm = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
 
-			normL1 += lm*lm;
-			g = m_ss.m_gap[i].norm();
-			normgc += g*g;
-			++N;
-		}
+		normL1 += lm*lm;
+		g = m_ss.m_gap[i].norm();
+		normgc += g*g;
+		++N;
+	}
 
 	for (i=0; i<m_ms.Nodes(); ++i)
-		if (i != m_ms.m_nref)
-		{
-			lm = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
+	{
+		lm = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
 
-			normL1 += lm*lm;
-			g = m_ms.m_gap[i].norm();
-			normgc += g*g;
-			++N;
-		}
-		if (N == 0) N=1;
+		normL1 += lm*lm;
+		g = m_ms.m_gap[i].norm();
+		normgc += g*g;
+		++N;
+	}
+	if (N == 0) N=1;
 
 	normL1 = sqrt(normL1);
 	normgc = sqrt(normgc / N);
@@ -633,18 +640,16 @@ bool FESurfaceConstraint::Augment(int naug)
 	{
 		bconv = false;
 		for (i=0; i<m_ss.Nodes(); ++i)
-			if (i != m_ss.m_nref)
-			{
-				// update Lagrange multipliers
-				m_ss.m_Lm[i] = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
-			}
+		{
+			// update Lagrange multipliers
+			m_ss.m_Lm[i] = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
+		}
 
 		for (i=0; i<m_ms.Nodes(); ++i)
-			if (i != m_ms.m_nref)
-			{
-				// update Lagrange multipliers
-				m_ms.m_Lm[i] = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
-			}
+		{
+			// update Lagrange multipliers
+			m_ms.m_Lm[i] = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
+		}
 	}
 
 	return bconv;
