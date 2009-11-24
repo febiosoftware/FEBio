@@ -626,6 +626,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FESurfaceConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FETangentDiagnostic.cpp"
 				>
 			</File>
@@ -1113,6 +1117,10 @@
 			</File>
 			<File
 				RelativePath=".\FESurface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESurfaceConstraint.h"
 				>
 			</File>
 			<File

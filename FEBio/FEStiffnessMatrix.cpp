@@ -8,6 +8,7 @@
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
+#include "FESurfaceConstraint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -483,6 +484,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				}
 
 				// add periodic boundary elements
+				// TODO: what if two_pass ??
 				FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(&fem.m_CI[i]);
 				if (pbi)
 				{
@@ -523,6 +525,72 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 							lm[6*(k+1)+3] = id[7];
 							lm[6*(k+1)+4] = id[8];
 							lm[6*(k+1)+5] = id[9];
+						}
+
+						build_add(lm);
+					}
+				}
+
+				// add surface constraints
+				// TODO: what if two_pass ??
+				FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(&fem.m_CI[i]);
+				if (psc)
+				{
+					vector<int> lm(6*10);
+
+					FESurfaceConstraintSurface& ss = psc->m_ss;
+					FESurfaceConstraintSurface& ms = psc->m_ms;
+
+					int nref = ss.m_nref;
+					FESurfaceElement* pref = ss.m_pme[nref];
+
+					int n0 = pref->Nodes();
+					int nr0[4];
+					for (j=0; j<n0; ++j) nr0[j] = pref->m_node[j];
+
+					for (j=0; j<ss.Nodes(); ++j)
+					{
+						FESurfaceElement& me = *ss.m_pme[j];
+						int* en = me.m_node;
+
+						lm.set(-1);
+
+						n = me.Nodes();
+
+						lm[0] = ss.Node(j).m_ID[0];
+						lm[1] = ss.Node(j).m_ID[1];
+						lm[2] = ss.Node(j).m_ID[2];
+						lm[3] = ss.Node(j).m_ID[7];
+						lm[4] = ss.Node(j).m_ID[8];
+						lm[5] = ss.Node(j).m_ID[9];
+
+						for (k=0; k<n; ++k)
+						{
+							id = fem.m_mesh.Node(en[k]).m_ID;
+							lm[6*(k+1)  ] = id[0];
+							lm[6*(k+1)+1] = id[1];
+							lm[6*(k+1)+2] = id[2];
+							lm[6*(k+1)+3] = id[7];
+							lm[6*(k+1)+4] = id[8];
+							lm[6*(k+1)+5] = id[9];
+						}
+
+						lm[6*(k+n)  ] = ss.Node(nref).m_ID[0];
+						lm[6*(k+n)+1] = ss.Node(nref).m_ID[1];
+						lm[6*(k+n)+2] = ss.Node(nref).m_ID[2];
+						lm[6*(k+n)+3] = ss.Node(nref).m_ID[7];
+						lm[6*(k+n)+4] = ss.Node(nref).m_ID[8];
+						lm[6*(k+n)+5] = ss.Node(nref).m_ID[9];
+
+						for (k=0; k<n0; ++k)
+						{
+							id = fem.m_mesh.Node(nr0[k]).m_ID;
+							lm[6*(k+n+1)  ] = id[0];
+							lm[6*(k+n+1)+1] = id[1];
+							lm[6*(k+n+1)+2] = id[2];
+							lm[6*(k+n+1)+3] = id[7];
+							lm[6*(k+n+1)+4] = id[8];
+							lm[6*(k+n+1)+5] = id[9];
 						}
 
 						build_add(lm);

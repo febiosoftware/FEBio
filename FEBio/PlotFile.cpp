@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "FEPeriodicBoundary.h"
+#include "FESurfaceConstraint.h"
 #include "FESlidingInterface2.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -643,6 +644,32 @@ void PlotFile::write_contact_tractions()
 			}
 		}
 
+		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(&fem.m_CI[i]);
+		if (psc)
+		{
+			FESurfaceConstraintSurface& ss = psc->m_ss;
+			FESurfaceConstraintSurface& ms = psc->m_ms;
+			for (j=0; j<ss.Nodes(); ++j)
+			{
+				vec3d t = ss.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
+				int m = ss.node[j];
+
+				acc[m][0] += (float) t.x;
+				acc[m][1] += (float) t.y;
+				acc[m][2] += (float) t.z;
+			}
+
+			for (j=0; j<ms.Nodes(); ++j)
+			{
+				vec3d t = ms.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
+				int m = ms.node[j];
+
+				acc[m][0] += (float) t.x;
+				acc[m][1] += (float) t.y;
+				acc[m][2] += (float) t.z;
+			}
+		}
+
 		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
 		if (ps2)
 		{
@@ -815,6 +842,16 @@ void PlotFile::write_contact_pressures()
 		{
 			FEPeriodicSurface& ms = pbi->m_ms;
 			FEPeriodicSurface& ss = pbi->m_ss;
+
+			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.m_Lm[j].norm();
+			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.m_Lm[j].norm();
+		}
+
+		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(&fem.m_CI[i]);
+		if (psc)
+		{
+			FESurfaceConstraintSurface& ms = psc->m_ms;
+			FESurfaceConstraintSurface& ss = psc->m_ss;
 
 			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.m_Lm[j].norm();
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.m_Lm[j].norm();

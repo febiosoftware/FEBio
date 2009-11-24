@@ -6,6 +6,7 @@
 #include "NikeImport.h"
 #include "FEBioImport.h"
 #include "FEPeriodicBoundary.h"
+#include "FESurfaceConstraint.h"
 #include "log.h"
 #include <string.h>
 
@@ -282,6 +283,15 @@ void FEM::EchoInput()
 				log.printf("\tType                           : periodic\n");
 				log.printf("\tPenalty factor                 : %lg\n", pbi->m_eps);
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pbi->m_atol);
+			}
+
+			FESurfaceConstraint *psc = dynamic_cast<FESurfaceConstraint*>(&m_CI[i]);
+			if (psc)
+			{
+				log.printf("contact interface %d:\n", i+1);
+				log.printf("\tType                           : surface constraint\n");
+				log.printf("\tPenalty factor                 : %lg\n", psc->m_eps);
+				log.printf("\tAugmented Lagrangian tolerance : %lg\n", psc->m_atol);
 			}
 
 			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&m_CI[i]);
