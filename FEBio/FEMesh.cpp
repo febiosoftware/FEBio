@@ -723,6 +723,23 @@ void FEMesh::Serialize(Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
+int FEMesh::Faces(FEElement& el)
+{
+	switch (el.Type())
+	{
+	case FE_HEX:
+	case FE_RIHEX:
+	case FE_UDGHEX: return 6;
+	case FE_PENTA: return 5;
+	case FE_TET: return 4;
+	case FE_SHELL_QUAD:
+	case FE_SHELL_TRI: return 1;
+	}
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! This function returns the face connectivity from a certain element
 
 int FEMesh::GetFace(FEElement& el, int n, int nf[4])
@@ -732,6 +749,8 @@ int FEMesh::GetFace(FEElement& el, int n, int nf[4])
 	switch (el.Type())
 	{
 	case FE_HEX:
+	case FE_RIHEX:
+	case FE_UDGHEX:
 		nn = 4;
 		switch (n)
 		{

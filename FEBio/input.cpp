@@ -69,6 +69,13 @@ void FEM::EchoInput()
 	// we only output this data to the log file and not the screen
 	Logfile::MODE old_mode = log.SetMode(Logfile::FILE_ONLY);
 
+	// if for some reason the old_mode was set to NEVER, we should not output anything
+	if (old_mode == Logfile::NEVER)
+	{
+		log.SetMode(old_mode);
+		return;
+	}
+
 	bool bporo = m_pStep->m_nModule == FE_POROELASTIC;
 
 	log.printf("%s\n\n", m_sztitle);
@@ -206,6 +213,7 @@ void FEM::EchoInput()
 				case FE_PARAM_DOUBLE : log.printf("%s : %lg\n", sz, it->value<double>()); break;
 				case FE_PARAM_INT    : log.printf("%s : %d\n" , sz, it->value<int   >()); break;
 				case FE_PARAM_BOOL   : log.printf("%s : %d\n" , sz, it->value<bool  >()); break;
+				case FE_PARAM_STRING : log.printf("%s : %s\n" , sz, it->cvalue()); break;
 				case FE_PARAM_INTV   :
 				case FE_PARAM_DOUBLEV:
 					{

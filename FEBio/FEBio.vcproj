@@ -422,6 +422,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEElemElemList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElement.cpp"
 				>
 			</File>
@@ -495,6 +499,10 @@
 			</File>
 			<File
 				RelativePath=".\FEMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEMicroMaterial.cpp"
 				>
 			</File>
 			<File
@@ -916,6 +924,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEElemElemList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElement.h"
 				>
 			</File>
@@ -989,6 +1001,10 @@
 			</File>
 			<File
 				RelativePath=".\FEMesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEMicroMaterial.h"
 				>
 			</File>
 			<File

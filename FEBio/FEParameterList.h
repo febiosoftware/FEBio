@@ -11,6 +11,7 @@ enum FEParamType {
 	FE_PARAM_INT,
 	FE_PARAM_BOOL,
 	FE_PARAM_DOUBLE,
+	FE_PARAM_STRING,
 	FE_PARAM_INTV = 100,
 	FE_PARAM_DOUBLEV,
 };
@@ -40,6 +41,9 @@ public:
 
 	//! retrieves the value for an array item
 	template <class T> T* pvalue() { return (T*) m_pv; }
+
+	//! override the template for char pointers
+	char* cvalue() { return (char*) m_pv; }
 };
 
 //-----------------------------------------------------------------------------

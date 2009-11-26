@@ -38,13 +38,16 @@ bool FEM::Init()
 	Logfile& log = GetLogfile();
 
 	// Open the logfile
-	log.open(m_szlog);
+	if (!log.is_valid()) 
+	{
+		log.open(m_szlog);
 
-	// if we don't want to output anything we only output to the logfile
-	if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
+		// if we don't want to output anything we only output to the logfile
+		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
 
-	// print welcome message to file
-	Hello(log);
+		// print welcome message to file
+		Hello(log);
+	}
 
 	// check step data
 	for (int i=0; i<m_Step.size(); ++i)
@@ -535,13 +538,16 @@ bool FEM::Reset()
 	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot.Write(*this);
 
 	// reset the log file
-	log.open(m_szlog);
+	if (!log.is_valid())
+	{
+		log.open(m_szlog);
 
-	// if we don't want to output anything we only output to the logfile
-	if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
+		// if we don't want to output anything we only output to the logfile
+		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
 
-	// print welcome message to file
-	Hello(log);
+		// print welcome message to file
+		Hello(log);
+	}
 
 	// do the callback
 	DoCallback();

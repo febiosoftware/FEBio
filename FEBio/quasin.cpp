@@ -548,10 +548,12 @@ bool FESolidSolver::Quasin(double time)
 	if (bconv)
 	{
 		Logfile::MODE mode = log.SetMode(Logfile::FILE_ONLY);
-		log.printf("\nconvergence summary\n");
-		log.printf("    number of iterations   : %d\n", m_niter);
-		log.printf("    number of reformations : %d\n", m_nref);
-
+		if (mode != Logfile::NEVER)
+		{
+			log.printf("\nconvergence summary\n");
+			log.printf("    number of iterations   : %d\n", m_niter);
+			log.printf("    number of reformations : %d\n", m_nref);
+		}
 		log.SetMode(mode);
 	}
 

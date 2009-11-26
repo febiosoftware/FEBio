@@ -2,6 +2,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
+#include "FEMicroMaterial.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FESolidSolver::Update
@@ -439,6 +440,13 @@ void FESolidSolver::UpdateStresses()
 
 					// calculate the stress at this material point
 					pt.s = pm->Stress(mp);
+
+					if (dynamic_cast<FEMicroMaterial*>(pme))
+					{
+						// the micro-material screws up the currently unpacked elements
+						// so I have to unpack the element data again
+						mesh.UnpackElement(el);
+					}
 
 					if (bporo)
 					{

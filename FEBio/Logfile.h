@@ -21,7 +21,7 @@
 class Logfile  
 {
 public:
-	enum MODE { FILE_ONLY = 1, SCREEN_ONLY, FILE_AND_SCREEN };
+	enum MODE { NEVER = 0, FILE_ONLY = 1, SCREEN_ONLY, FILE_AND_SCREEN };
 
 public:
 
@@ -58,6 +58,9 @@ public:
 	//! return a file pointer
 	operator FILE* () { return m_fp; }
 
+	//! returns if the logfile is ready to be written to
+	bool is_valid() { return (m_fp != 0); }
+
 private:
 	//! constructor is private so that you cannot create it directly
 	Logfile();
@@ -72,5 +75,6 @@ protected:
 
 	static Logfile* m_plog;	//!< the one and only logfile
 };
+
 
 #endif // !defined(AFX_LOGFILE_H__18090874_EE74_42E8_AB1B_1874D975D646__INCLUDED_)
