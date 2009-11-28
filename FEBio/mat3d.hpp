@@ -329,7 +329,18 @@ inline mat3da::mat3da(double xy, double yz, double xz)
 	d[0] = xy; d[1] = yz; d[2] = xz;
 }
 
+// calculates the antisymmetric matrix from a vector such that for any b,
+// A.b = a x b where A = mat3da(a).
+inline mat3da::mat3da(const vec3d& a)
+{
+	d[0] = -a.z; d[1] = -a.x; d[2] = a.y;
+}
 
+// access operator
+inline double mat3da::operator ()(int i, int j)
+{
+	return (i==j? 0 : (i<j? d[((j-1)<<1)-i] : -d[((i-1)<<1)-j]));
+}
 
 //-----------------------------------------------------------------------------
 // class mat3d : general 3D matrix of doubles
