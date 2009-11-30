@@ -1,6 +1,6 @@
 #pragma once
 #include "FEMaterial.h"
-#include "FEM.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
 //! The micro-material implements material homogenization. The stress and tangents
