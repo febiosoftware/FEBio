@@ -114,9 +114,9 @@ tens4ds FEVerondaWestmann::Tangent(FEMaterialPoint& mp)
 	tens4ds B4  = dyad4s(B);
 
 	// d2W/dCdC:C
-	mat3ds WCCxC = B*I1*(W11 + W2) - B2*W2;
+	mat3ds WCCxC = B*(I1*(W11 + W2)) - B2*W2;
 
-	tens4ds cw = (4.0*Ji)*((W11 + W2)*BxB - W2*B4) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
+	tens4ds cw = BxB*((W11 + W2)*4.0*Ji) - B4*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
 	tens4ds c = (IxI - I4*2)*p - dyad1s(devs, I)*(2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
