@@ -1,8 +1,8 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEMicroMaterial.h"
 #include "FEElemElemList.h"
-#include "Log.h"
-#include "Console.h"
+#include "log.h"
+#include "console.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEMicroMaterial, "micro-material");
@@ -51,7 +51,7 @@ void FEMicroMaterial::PrepRVE()
 	vector<int> tag(N); tag.zero();
 
 	// create the element-element list
-	FEElemElemList EEL; 
+	FEElemElemList EEL;
 	EEL.Create(&m);
 
 	// use the E-E list to tag all exterior nodes
@@ -98,12 +98,12 @@ void FEMicroMaterial::PrepRVE()
 		}
 
 	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for 
+	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
 	Logfile& log = GetLogfile();
 	Logfile::MODE nmode = log.GetMode();
 	GetLogfile().SetMode(Logfile::NEVER);
-	
+
 	// initialize RVE
 	m_rve.Init();
 
@@ -115,7 +115,7 @@ void FEMicroMaterial::PrepRVE()
 mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 {
 	// the logfile is a shared resource between the master FEM and the RVE
-	// in order not to corrupt the logfile we don't print anything for 
+	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
 	Logfile& log = GetLogfile();
 	Logfile::MODE nmode = log.GetMode();
@@ -181,7 +181,7 @@ mat3ds FEMicroMaterial::AveragedStress()
 		nint = el.GaussPoints();
 		w = el.GaussWeights();
 		ve = 0;
-		for (n=0; n<nint; ++n) 
+		for (n=0; n<nint; ++n)
 		{
 			FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 			J = el.detJt(n);

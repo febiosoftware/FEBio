@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEElemElemList.h"
 #include "FENodeElemList.h"
 
@@ -98,8 +98,8 @@ void FEElemElemList::Create(FEMesh* pmesh)
 							// check triangles
 							if (n0 == 3)
 							{
-								if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2])) && 
-									((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2])) && 
+								if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2])) &&
+									((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2])) &&
 									((en0[2] == en1[0]) || (en0[2] == en1[1]) || (en0[2] == en1[2])))
 								{
 									// found it!
@@ -110,9 +110,9 @@ void FEElemElemList::Create(FEMesh* pmesh)
 							// check quads
 							else if (n0 == 4)
 							{
-								if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2]) || (en0[0] == en1[3])) && 
-									((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2]) || (en0[1] == en1[3])) && 
-									((en0[2] == en1[0]) || (en0[2] == en1[1]) || (en0[2] == en1[2]) || (en0[2] == en1[3])) && 
+								if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2]) || (en0[0] == en1[3])) &&
+									((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2]) || (en0[1] == en1[3])) &&
+									((en0[2] == en1[0]) || (en0[2] == en1[1]) || (en0[2] == en1[2]) || (en0[2] == en1[3])) &&
 									((en0[3] == en1[0]) || (en0[3] == en1[1]) || (en0[3] == en1[2]) || (en0[3] == en1[3])))
 								{
 									// found it!
