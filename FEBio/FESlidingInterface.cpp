@@ -183,7 +183,7 @@ void FESlidingInterface::CalcAutoPenalty(FEContactSurface& s)
 			double vol = mesh.ElementVolume(*pe);
 
 			// set the auto calculation factor
-			double eps = K*area*area / vol;
+			double eps = K*area / vol;
 
 			for (k=0; k<face.Nodes(); ++k)
 			{
