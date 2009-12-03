@@ -9,7 +9,7 @@
 // The tensor is stored in column major order:
 //
 //     / 0   1   3   6   10   15  \
-//     |     2   4   7   11   16  | 
+//     |     2   4   7   11   16  |
 //     |         5   8   12   17  |
 // A = |             9   13   18  |
 //     |                 14   19  |
@@ -53,19 +53,19 @@ public:
 	tens4ds operator - (const tens4ds& t) const;
 	tens4ds operator * (double g) const;
 	tens4ds operator / (double g) const;
-	
+
 	// arithmetic assignment operators
 	tens4ds& operator += (const tens4ds& t);
 	tens4ds& operator -= (const tens4ds& t);
 	tens4ds& operator *= (double g);
 	tens4ds& operator /= (double g);
-	
+
 	// intialize to zero
 	void zero();
-	
+
 	// extract 6x6 matrix
 	void extract(double d[6][6]);
-	
+
 public:
 	double d[NNZ];	// stored in column major order
 };
@@ -80,3 +80,7 @@ tens4ds dyad4s(const mat3ds& a);
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
 
 inline tens4ds operator * (const double g, const tens4ds& a) { return a*g; }
+
+// The following file contains the actual definition of the class functions
+#include "tens4d.hpp"
+
