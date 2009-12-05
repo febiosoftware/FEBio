@@ -9,6 +9,163 @@
 #include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
+// FESlidingSurface
+///////////////////////////////////////////////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+//! Finds the (master) element that contains the projection of a (slave) node
+
+FEElement* FESlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
+{
+	// get the mesh
+	FEMesh& mesh = *m_pmesh;
+
+	// see if we need to initialize the NQ structure
+	if (binit_nq) m_NQ.Init();
+	binit_nq = false;
+
+	// let's find the closest master node
+	int mn = m_NQ.Find(x);
+
+	// mn is a local index, so get the global node number too
+	int m = node[mn];
+
+	// get the nodal position
+	vec3d r0 = mesh.Node(m).m_rt;
+
+	// now that we found the closest master node, lets see if we can find 
+	// the best master element
+	int N;
+
+	// loop over all master elements that contain the node mn
+	int nval = m_NEL.Valence(mn);
+	FEElement** pe = m_NEL.ElementList(mn);
+	for (int j=0; j<nval; ++j)
+	{
+		// get the master element
+		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+		N = el.Nodes();
+
+		// project the node on the element
+		r[0] = 0;
+		r[1] = 0;
+		q = ProjectToSurface(el, x, r[0], r[1]);
+		if (IsInsideElement(el, r[0], r[1], tol)) return pe[j];
+	}
+
+	// we did not find a master surface
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Creates a surface for use with a sliding interface. All surface data
+//! structures are allocated.
+//! Note that it is assumed that the element array is already created
+//! and initialized.
+
+void FESlidingSurface::Init()
+{
+	int i, j, n;
+
+	// always intialize base class first!
+	FESurface::Init();
+
+	// get the number of nodes
+	int nn = Nodes();
+
+	// allocate other surface data
+	gap.create(nn);		// gap funtion
+	nu.create(nn);		// node normal 
+	pme.create(nn);		// penetrated master element
+	rs.create(nn);		// natural coords of projected slave node on master element
+	rsp.create(nn);
+	Lm.create(nn);
+	M.create(nn);
+	Lt.create(nn);
+	off.create(nn);
+	eps.create(nn);
+
+	// set initial values
+	gap.zero();
+	pme.set(0);
+	Lm.zero();
+	off.zero();
+	eps.set(1.0);
+
+	// we calculate the gap offset values
+	// This value is used to take the shell thickness into account
+	// note that we force rigid shells to have zero thickness
+	FEMesh& m = *m_pmesh;
+	vector<double> tag(m.Nodes());
+	tag.zero();
+	for (i=0; i<m.ShellElements(); ++i)
+	{
+		FEShellElement& el = m.ShellElement(i);
+		n = el.Nodes();
+		for (j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
+	}
+	for (i=0; i<nn; ++i) off[i] = tag[node[i]];
+}
+
+//-----------------------------------------------------------------------------
+//! 
+
+vec3d FESlidingSurface::traction(int inode)
+{
+	vec3d t(0,0,0);
+	FEElement* pe = pme[inode];
+	if (pe)
+	{
+		FESurfaceElement& el = dynamic_cast<FESurfaceElement&>(*pe);
+		double Tn = Lm[inode];
+		double T1 = Lt[inode][0];
+		double T2 = Lt[inode][1];
+		double r = rs[inode][0];
+		double s = rs[inode][1];
+
+		vec3d tn = nu[inode]*Tn, tt;
+		vec3d e[2];
+		ContraBaseVectors0(el, r, s, e);
+		tt = e[0]*T1 + e[1]*T2;
+		t = tn + tt;
+	}
+
+	return t;
+}
+
+//-----------------------------------------------------------------------------
+
+void FESlidingSurface::UpdateNormals()
+{
+	int i, j, jp1, jm1;
+	int N = Nodes();
+	int NE = Elements();
+	for (i=0; i<N; ++i) nu[i] = vec3d(0,0,0);
+	vec3d y[4], e1, e2;
+
+	for (i=0; i<NE; ++i)
+	{
+		FESurfaceElement& el = Element(i);
+		int ne = el.Nodes();
+		for (j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
+
+		for (j=0; j<ne; ++j)
+		{
+			jp1 = (j+1)%ne;
+			jm1 = (j+ne-1)%ne;
+
+			e1 = y[jp1] - y[j];
+			e2 = y[jm1] - y[j];
+
+			nu[el.m_lnode[j]] -= e1 ^ e2;						
+		}
+	}
+
+	for (i=0; i<N; ++i) nu[i].unit();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // FESlidingInterface
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -44,157 +201,67 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 //-----------------------------------------------------------------------------
 //! Calculates the auto penalty factor
 
-void FESlidingInterface::CalcAutoPenalty(FEContactSurface& s)
+void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 {
-	int i, j, k, n, m, *fn, *en, *pl;
+	int i, k, m;
 
+	// zero penalty values
+	s.eps.zero();
+
+	// get the mesh
 	FEMesh& mesh = *s.GetMesh();
 
-	int LT_HEX[6][4] = {
-		{ 0, 1, 5, 4 },
-		{ 1, 2, 6, 5 },
-		{ 2, 3, 7, 6 },
-		{ 3, 0, 4, 7 },
-		{ 3, 2, 1, 0 },
-		{ 4, 5, 6, 7 }};
-
-	int LT_PENTA[5][4] = {
-		{ 0, 1, 4, 3 },
-		{ 1, 2, 5, 4 },
-		{ 2, 0, 3, 5 },
-		{ 2, 1, 0, 0 },
-		{ 3, 4, 5, 5 }};
-
-	int LT_TET[4][4] = {
-		{ 0, 1, 3, 3 },
-		{ 1, 2, 3, 3 },
-		{ 2, 0, 3, 3 },
-		{ 2, 1, 0, 0 }};
-
-
-	// create the node-element list.
-	// That is, find for each node to which element it belongs
-	FENodeElemList NE;
-	NE.Create(mesh);
-
-	FENodeElemList NF;
-	NF.Create(s);
-
-	// now, we need to find for each face, what element it belongs to
-	bool bfound;
+	// loop over all surface elements
 	FEElement *pe;
-	bool b[4] = {true};
 	for (i=0; i<s.Elements(); ++i)
 	{
+		// get the next face
 		FESurfaceElement& face = s.Element(i);
 
-		// pick a node of this element
-		fn = face.m_node;
-		n = fn[0];
+		// grab the element this face belongs to
+		pe = mesh.FindElementFromID(face.m_nelem);
+		assert(pe);
 
-		// for this node, loop over all elements this node belongs to
-		// and see if this face belongs to the element
-		bfound = false;
-		FEElement** pel = NE.ElementList(n);
-		for (j=0; j<NE.Valence(n); ++j)
+		// we need a measure for the modulus
+		double K = 1;
+
+		switch (m_nautopen)
 		{
-			// get the element
-			pe = pel[j];
-			en = pe->m_node;
-
-			// see what kind of element this is
-			switch (pe->Type())
+		case 1: // use the old algorithm
 			{
-			case FE_HEX:
-			case FE_RIHEX:
-			case FE_UDGHEX:
-				{
-					for (k=0; k<6; ++k)
-					{
-						pl = LT_HEX[k];
-						b[1] = ((fn[1] == en[ pl[0] ]) || (fn[1] == en[pl[1]]) || (fn[1] == en[pl[2]]) || (fn[1] == en[pl[3]]));
-						b[2] = ((fn[2] == en[ pl[0] ]) || (fn[2] == en[pl[1]]) || (fn[2] == en[pl[2]]) || (fn[2] == en[pl[3]]));
-//						b[3] = ((fn[3] == en[ pl[0] ]) || (fn[3] == en[pl[1]]) || (fn[3] == en[pl[2]]) || (fn[3] == en[pl[3]]));
+				// get the element's material
+				FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 
-						if (b[1] && b[2]) { bfound = true; break; }
-					}
-				}
-				break;
-			case FE_PENTA:
-				{
-					for (k=0; k<5; ++k)
-					{
-						pl = LT_PENTA[k];
-						b[1] = ((fn[1] == en[ pl[0] ]) || (fn[1] == en[pl[1]]) || (fn[1] == en[pl[2]]) || (fn[1] == en[pl[3]]));
-						b[2] = ((fn[2] == en[ pl[0] ]) || (fn[2] == en[pl[1]]) || (fn[2] == en[pl[2]]) || (fn[2] == en[pl[3]]));
-//						b[3] = ((fn[3] == en[ pl[0] ]) || (fn[3] == en[pl[1]]) || (fn[3] == en[pl[2]]) || (fn[3] == en[pl[3]]));
-
-						if (b[1] && b[2]) { bfound = true; break; }
-					}
-				}
-				break;
-			case FE_TET:
-				{
-					for (k=0; k<4; ++k)
-					{
-						pl = LT_TET[k];
-						b[1] = ((fn[1] == en[ pl[0] ]) || (fn[1] == en[pl[1]]) || (fn[1] == en[pl[2]]) || (fn[1] == en[pl[3]]));
-						b[2] = ((fn[2] == en[ pl[0] ]) || (fn[2] == en[pl[1]]) || (fn[2] == en[pl[2]]) || (fn[2] == en[pl[3]]));
-//						b[3] = ((fn[3] == en[ pl[0] ]) || (fn[3] == en[pl[1]]) || (fn[3] == en[pl[2]]) || (fn[3] == en[pl[3]]));
-
-						if (b[1] && b[2]) { bfound = true; break; }
-					}
-				}
-				break;
-			case FE_SHELL_QUAD:
-				{
-					b[1] = ((fn[1] == en[0]) || (fn[1] == en[1]) || (fn[1] == en[2]) || (fn[1] == en[3]));
-					b[2] = ((fn[2] == en[0]) || (fn[2] == en[1]) || (fn[2] == en[2]) || (fn[2] == en[3]));
-//					b[3] = ((fn[3] == en[0]) || (fn[3] == en[1]) || (fn[3] == en[2]) || (fn[3] == en[3]));
-
-					if (b[1] && b[2]) bfound = true;
-				}
-			case FE_SHELL_TRI:
-				{
-					b[1] = ((fn[1] == en[0]) || (fn[1] == en[1]) || (fn[1] == en[2]));
-					b[2] = ((fn[2] == en[0]) || (fn[2] == en[1]) || (fn[2] == en[2]));
-//					b[3] = ((fn[3] == en[0]) || (fn[3] == en[1]) || (fn[3] == en[2]));
-
-					if (b[1] && b[2]) bfound = true;
-				}
-				break;
+				// grab its bulk-modulus
+				K = pm->BulkModulus();
 			}
-
-			if (bfound) break;
+			break;
+		case 2: // use the new algorithm
+			{
+				K = AutoPenalty(face, s);
+			}
+			break;
 		}
 
-		// we found the element to which this face belongs
-		if (bfound)
+		// calculate the facet area
+		double area = s.FaceArea(face);
+
+		// calculate the volume element
+		double vol = mesh.ElementVolume(*pe);
+
+		// set the auto calculation factor
+		double eps = K*area / vol;
+
+		// distribute values over nodes
+		for (k=0; k<face.Nodes(); ++k)
 		{
-			// get the element's material
-			FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
-
-			double K = pm->BulkModulus();
-
-			// calculate the facet area
-			double area = s.FaceArea(face);
-
-			// calculate the volume element
-			double vol = mesh.ElementVolume(*pe);
-
-			// set the auto calculation factor
-			double eps = K*area / vol;
-
-			for (k=0; k<face.Nodes(); ++k)
-			{
-				m = face.m_lnode[k];
-				s.eps[m] += eps;
-			}
+			m = face.m_lnode[k];
+			s.eps[m] += eps;
 		}
-		else assert(false);
 	}
 
-	for (i=0; i<s.Nodes(); ++i) s.eps[i] /= NF.Valence(i);
+	// scale values according to valence
+	for (i=0; i<s.Nodes(); ++i) s.eps[i] /= s.m_NEL.Valence(i);
 }
 
 //-----------------------------------------------------------------------------
@@ -211,30 +278,7 @@ void FESlidingInterface::Init()
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, m_breloc);
-
-	switch (m_nautopen)
-	{
-	case 0: break;
-	case 1:	CalcAutoPenalty(m_ss); break;
-	case 2: 
-		{
-			double eps = AutoPenalty(m_ss, m_ms);
-			if (m_pfem->GetDebugFlag())
-			{
-				Logfile& log = GetLogfile();
-				double pen = eps*Penalty();
-				log.printf("Penalty factor: %lg\n", pen);
-			}
-
-			for (int np=0; np<m_npass; ++np)
-			{
-				FEContactSurface& s = (np==0? m_ss : m_ms);
-				for (int i=0; i<s.Nodes(); ++i) s.eps[i] = eps;
-			}
-		}
-		break;
-	default: assert(false);
-	}
+	if (m_nautopen != 0) CalcAutoPenalty(m_ss);
 
 	// set penalty load curve
 	if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
@@ -245,15 +289,7 @@ void FESlidingInterface::Init()
 	{
 //		m_ss.UpdateNormals();
 		ProjectSurface(m_ms, m_ss, true);
-
-		switch (m_nautopen)
-		{
-		case 0: break;
-		case 1: CalcAutoPenalty(m_ms);
-		case 2: break; // no need to call AutoPenalty() again
-		default:
-			assert(false);
-		}
+		if (m_nautopen != 0) CalcAutoPenalty(m_ms);
 	}
 }
 
@@ -269,7 +305,7 @@ void FESlidingInterface::Init()
 //	 3/ contact termination 
 //			either by failure to find master segment or when g < tolerance
 
-void FESlidingInterface::ProjectSurface(FEContactSurface& ss, FEContactSurface& ms, bool bupseg, bool bmove)
+void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove)
 {
 	int i;
 	double r, s;
@@ -478,8 +514,8 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 	for (np=0; np<m_npass; ++np)
 	{
 		// pick the slave and master surfaces
-		FEContactSurface& ss = (np==0? m_ss : m_ms);
-		FEContactSurface& ms = (np==0? m_ms : m_ss);
+		FESlidingSurface& ss = (np==0? m_ss : m_ms);
+		FESlidingSurface& ms = (np==0? m_ms : m_ss);
 
 		// loop over all slave facets
 		int ne = ss.Elements();
@@ -586,7 +622,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 //! \param[in] m local node number
 //! \param[out] fe force vector
 
-void FESlidingInterface::ContactNodalForce(int m, FEContactSurface& ss, FESurfaceElement& mel, vector<double>& fe)
+void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfaceElement& mel, vector<double>& fe)
 {
 	int k, l;
 
@@ -843,8 +879,8 @@ void FESlidingInterface::ContactStiffness()
 	for (np=0; np<m_npass; ++np)
 	{
 		// get the master and slave surface
-		FEContactSurface& ss = (np==0?m_ss:m_ms);	
-		FEContactSurface& ms = (np==0?m_ms:m_ss);	
+		FESlidingSurface& ss = (np==0?m_ss:m_ms);	
+		FESlidingSurface& ms = (np==0?m_ms:m_ss);	
 
 		// loop over all slave elements
 		int ne = ss.Elements();
@@ -937,7 +973,7 @@ void FESlidingInterface::ContactStiffness()
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::ContactNodalStiffness(int m, FEContactSurface& ss, FESurfaceElement& mel, matrix& ke)
+void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESurfaceElement& mel, matrix& ke)
 {
 	int i, j, k, l;
 
@@ -1566,7 +1602,7 @@ bool FESlidingInterface::Augment(int naug)
 //-----------------------------------------------------------------------------
 //! This function transforms friction data between two master segments
 
-void FESlidingInterface::MapFrictionData(int inode, FEContactSurface& ss, FEContactSurface& ms, FESurfaceElement &en, FESurfaceElement &eo, vec3d &q)
+void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlidingSurface& ms, FESurfaceElement &en, FESurfaceElement &eo, vec3d &q)
 {
 	// first we find the projection of the old point on the new segment
 	double r = ss.rs[inode][0];
@@ -1629,7 +1665,7 @@ void FESlidingInterface::Serialize(Archive& ar)
 
 		for (j=0; j<2; ++j)
 		{
-			FEContactSurface& s = (j==0? m_ss : m_ms);
+			FESlidingSurface& s = (j==0? m_ss : m_ms);
 
 			int ne = s.Elements();
 			ar << ne;
@@ -1676,7 +1712,7 @@ void FESlidingInterface::Serialize(Archive& ar)
 
 		for (j=0; j<2; ++j)
 		{
-			FEContactSurface& s = (j==0? m_ss : m_ms);
+			FESlidingSurface& s = (j==0? m_ss : m_ms);
 
 			int ne=0;
 			ar >> ne;

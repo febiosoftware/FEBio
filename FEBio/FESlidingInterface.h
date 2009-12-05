@@ -10,7 +10,53 @@
 #endif // _MSC_VER > 1000
 
 #include "FEContactInterface.h"
-#include "FEContactSurface.h"
+#include "FESurface.h"
+#include "vec2d.h"
+
+//-----------------------------------------------------------------------------
+class FESlidingSurface : public FESurface
+{
+public:
+	//! constructor
+	FESlidingSurface(FEMesh* pm=0) : FESurface(pm) { m_NQ.Attach(this); }
+
+	//! Initializes data structures
+	void Init();
+
+	//! shallow copy
+	void ShallowCopy(FESlidingSurface& s)
+	{
+		Lm  = s.Lm;
+		gap = s.gap;
+		pme.zero();
+		Lt  = s.Lt;
+	}
+
+	//! Update the surface data
+	void Update() {}
+
+	//! Find element that contains the projection of x
+	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol);
+
+	//! Calculate the total traction at a node
+	vec3d traction(int inode);
+
+	void UpdateNormals();
+
+public:
+	vector<double>		gap;	//!< gap function at nodes
+	vector<vec3d>		nu;		//!< master normal at slave node
+	vector<FEElement*>	pme;	//!< master element a slave node penetrates
+	vector<vec2d>		rs;		//!< natural coordinates of slave projection on master element
+	vector<vec2d>		rsp;	//!< natural coordinates at previous time step
+	vector<double>		Lm;		//!< Lagrange multipliers for contact pressure
+	vector<mat2d>		M;		//!< surface metric tensor
+	vector<vec2d>		Lt;		//!< Lagrange multipliers for friction
+	vector<double>		off;	//!< gap offset (= shell thickness)
+	vector<double>		eps;	//!< normal penalty factors
+
+	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node
+};
 
 //-----------------------------------------------------------------------------
 //! This class implements a sliding interface
@@ -35,7 +81,7 @@ public:
 	void Update();
 
 	//! projects slave nodes onto master nodes
-	void ProjectSurface(FEContactSurface& ss, FEContactSurface& ms, bool bupseg, bool bmove = false);
+	void ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove = false);
 
 	//! shallow copy
 	void ShallowCopy(FEContactInterface& ci)
@@ -62,24 +108,24 @@ public:
 
 protected:
 	//! calculate auto penalty factor
-	void CalcAutoPenalty(FEContactSurface& s);
+	void CalcAutoPenalty(FESlidingSurface& s);
 
 	//! calculate the nodal force of a slave node
-	void ContactNodalForce(int m, FEContactSurface& ss, FESurfaceElement& mel, vector<double>& fe);
+	void ContactNodalForce(int m, FESlidingSurface& ss, FESurfaceElement& mel, vector<double>& fe);
 
 	//! calculate the stiffness contribution of a single slave node
-	void ContactNodalStiffness(int m, FEContactSurface& ss, FESurfaceElement& mel, matrix& ke);
+	void ContactNodalStiffness(int m, FESlidingSurface& ss, FESurfaceElement& mel, matrix& ke);
 
 	//! map the frictional data from the old element to the new element
-	void MapFrictionData(int inode, FEContactSurface& ss, FEContactSurface& ms, FESurfaceElement& sn, FESurfaceElement& so, vec3d& q);
+	void MapFrictionData(int inode, FESlidingSurface& ss, FESlidingSurface& ms, FESurfaceElement& sn, FESurfaceElement& so, vec3d& q);
 
 private:
 	//! copy constructor hidden
 	FESlidingInterface(FESlidingInterface& si){}
 
 public:
-	FEContactSurface	m_ss;	//!< slave surface
-	FEContactSurface	m_ms;	//!< master surface
+	FESlidingSurface	m_ss;	//!< slave surface
+	FESlidingSurface	m_ms;	//!< master surface
 
 	int				m_npass;	//!< nr of passes (1 or 2)
 

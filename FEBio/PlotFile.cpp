@@ -600,8 +600,8 @@ void PlotFile::write_contact_tractions()
 		{
 			for (n=0; n<psi->m_npass; ++n)
 			{
-				FEContactSurface& ss = (n==0?psi->m_ss:psi->m_ms);
-				FEContactSurface& ms = (n==0?psi->m_ms:psi->m_ss);
+				FESlidingSurface& ss = (n==0?psi->m_ss:psi->m_ms);
+				FESlidingSurface& ms = (n==0?psi->m_ms:psi->m_ss);
 				for (j=0; j<ss.Nodes(); ++j)
 				{
 					int m = ss.node[j];
@@ -679,7 +679,7 @@ void PlotFile::write_contact_tractions()
 
 			for (n=0; n<ps2->m_npass; ++n)
 			{
-				FEContactSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
+				FESlidingSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
 
 				int nint = 0;
 				for (j=0; j<s.Elements(); ++j)
@@ -691,7 +691,7 @@ void PlotFile::write_contact_tractions()
 					{
 						li[k] = s.m_Lmd[nint];
 						gi[k] = s.m_gap[nint];
-						ti[k] = li[k] + ps2->m_eps*gi[k];
+						ti[k] = li[k] + ps2->m_epsn*gi[k];
 
 						gi[k] = (gi[k]>=0?gi[k] : 0);
 						ti[k] = (ti[k]>=0?ti[k] : 0);
@@ -820,8 +820,8 @@ void PlotFile::write_contact_pressures()
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
 		if (psi)
 		{
-			FEContactSurface& ms = psi->m_ms;
-			FEContactSurface& ss = psi->m_ss;
+			FESlidingSurface& ms = psi->m_ms;
+			FESlidingSurface& ss = psi->m_ss;
 
 			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.Lm[j];
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
@@ -860,7 +860,7 @@ void PlotFile::write_contact_pressures()
 		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
 		if (pri)
 		{
-			FEContactSurface& ss = pri->m_ss;
+			FERigidWallSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
 		}
 	}
@@ -886,8 +886,8 @@ void PlotFile::write_contact_gaps()
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
 		if (psi)
 		{
-			FEContactSurface& ms = psi->m_ms;
-			FEContactSurface& ss = psi->m_ss;
+			FESlidingSurface& ms = psi->m_ms;
+			FESlidingSurface& ss = psi->m_ss;
 
 			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) (ms.gap[j] < 0 ? 0 : ms.gap[j]);
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0 ? 0 : ss.gap[j]);
@@ -906,7 +906,7 @@ void PlotFile::write_contact_gaps()
 		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
 		if (pri)
 		{
-			FEContactSurface& ss = pri->m_ss;
+			FERigidWallSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0? 0 : ss.gap[j]);
 		}
 
@@ -919,7 +919,7 @@ void PlotFile::write_contact_gaps()
 
 			for (n=0; n<ps2->m_npass; ++n)
 			{
-				FEContactSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
+				FESlidingSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
 
 				int nint = 0;
 				for (j=0; j<s.Elements(); ++j)

@@ -56,7 +56,7 @@ protected:
 	FEContactInterface() {m_pfem=0;}
 
 	//! auto-penalty calculation
-	double AutoPenalty(FESurface& ss, FESurface& ms);
+	double AutoPenalty(FESurfaceElement& el, FESurface& s);
 
 public:
 	bool	m_blaugon;	//!< augmented lagrangian flag

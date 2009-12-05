@@ -1,20 +1,20 @@
 #pragma once
 #include "FEContactInterface.h"
-#include "FEContactSurface.h"
+#include "FESurface.h"
 #include "vec2d.h"
 
 //-----------------------------------------------------------------------------
-class FEContactSurface2 : public FESurface
+class FESlidingSurface2 : public FESurface
 {
 public:
 	//! constructor
-	FEContactSurface2(FEM* pfem);
+	FESlidingSurface2(FEM* pfem);
 
 	//! initialization
 	void Init();
 
 	//! shallow copy
-	void ShallowCopy(FEContactSurface2& s);
+	void ShallowCopy(FESlidingSurface2& s);
 
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
@@ -30,6 +30,9 @@ public:
 	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
 	vector<int>					m_nei;	//!< surface element indices into arrays
+
+	vector<double>	m_eps;	//!< penalty factors
+	vector<double>	m_epsp;	//!< pressure penalty factors
 
 	vector<vec3d>		m_nn;	//!< node normals
 
@@ -69,12 +72,17 @@ public:
 	void Serialize(Archive& ar);
 
 protected:
-	void ProjectSurface(FEContactSurface2& ss, FEContactSurface2& ms);
-	double AutoPressurePenalty(FESurface& ss, FESurface& ms);
+	void ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms);
+
+	//! calculate penalty factor
+	void CalcAutoPenalty(FESlidingSurface2& s);
+
+	void CalcAutoPressurePenalty(FESlidingSurface2& s);
+	double AutoPressurePenalty(FESurfaceElement& el, FESlidingSurface2& s);
 
 public:
-	FEContactSurface2	m_ms;	//!< master surface
-	FEContactSurface2	m_ss;	//!< slave surface
+	FESlidingSurface2	m_ms;	//!< master surface
+	FESlidingSurface2	m_ss;	//!< slave surface
 
 	int				m_knmult;	//!< higher order stiffness multiplier
 	int				m_npass;	//!< nr of passes
@@ -87,7 +95,7 @@ public:
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations
 
-	double			m_eps;		//!< penalty factor
+	double			m_epsn;		//!< normal penalty factor
 	bool			m_bautopen;	//!< use autopenalty factor
 
 	bool	m_bdebug;		// debug flag

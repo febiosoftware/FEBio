@@ -1591,7 +1591,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 				if (strcmp(sztype, "master") == 0) ntype = 1;
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
-				FEContactSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				FESlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
@@ -1686,7 +1686,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			else if (tag == "tolerance"          ) tag.value(ps->m_atol);
 			else if (tag == "gaptol"             ) tag.value(ps->m_gtol);
 			else if (tag == "ptol"               ) tag.value(ps->m_ptol);
-			else if (tag == "penalty"            ) tag.value(ps->m_eps);
+			else if (tag == "penalty"            ) tag.value(ps->m_epsn);
 			else if (tag == "auto_penalty"       ) tag.value(ps->m_bautopen);
 			else if (tag == "knmult"             ) tag.value(ps->m_knmult);
 			else if (tag == "search_tol"         ) tag.value(ps->m_stol);
@@ -1714,7 +1714,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 				if (strcmp(sztype, "master") == 0) ntype = 1;
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
-				FEContactSurface2& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				FESlidingSurface2& s = (ntype == 1? ps->m_ms : ps->m_ss);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
@@ -1943,7 +1943,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			}
 			else if (tag == "surface")
 			{
-				FEContactSurface& s = ps->m_ss;
+				FERigidWallSurface& s = ps->m_ss;
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);

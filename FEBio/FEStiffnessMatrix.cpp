@@ -262,8 +262,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 					for (int np=0; np<psi->m_npass; ++np)
 					{
-						FEContactSurface& ss = (np==0? psi->m_ss : psi->m_ms);
-						FEContactSurface& ms = (np==0? psi->m_ms : psi->m_ss);
+						FESlidingSurface& ss = (np==0? psi->m_ss : psi->m_ms);
+						FESlidingSurface& ms = (np==0? psi->m_ms : psi->m_ss);
 
 						for (j=0; j<ss.Nodes(); ++j)
 						{
@@ -378,8 +378,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 					for (int np=0; np<ps2->m_npass; ++np)
 					{
-						FEContactSurface2& ss = (np == 0? ps2->m_ss : ps2->m_ms);
-						FEContactSurface2& ms = (np == 0? ps2->m_ms : ps2->m_ss);
+						FESlidingSurface2& ss = (np == 0? ps2->m_ss : ps2->m_ms);
+						FESlidingSurface2& ms = (np == 0? ps2->m_ms : ps2->m_ss);
 
 						int ni = 0, k, l;
 						for (j=0; j<ss.Elements(); ++j)
@@ -604,7 +604,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				if (pri)
 				{
 					vector<int> lm(6);
-					FEContactSurface& ss = pri->m_ss;
+					FERigidWallSurface& ss = pri->m_ss;
 
 					for (j=0; j<ss.Nodes(); ++j)
 					{

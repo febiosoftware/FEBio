@@ -204,14 +204,14 @@ bool FEContactDiagnostic::Init()
 	ps->m_eps = 1;
 	ps->m_npass = 1;
 	ps->m_nsegup = 0;
-	FEContactSurface& ms = ps->m_ms;
+	FESlidingSurface& ms = ps->m_ms;
 	ms.Create(1);
 	ms.Element(0).SetType(FE_NIQUAD);
 	ms.Element(0).m_node[0] = 4;
 	ms.Element(0).m_node[1] = 5;
 	ms.Element(0).m_node[2] = 6;
 	ms.Element(0).m_node[3] = 7;
-	FEContactSurface& ss = ps->m_ss;
+	FESlidingSurface& ss = ps->m_ss;
 	ss.Create(1);
 	ss.Element(0).SetType(FE_NIQUAD);
 	ss.Element(0).m_node[0] = 11;

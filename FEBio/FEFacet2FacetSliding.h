@@ -26,6 +26,7 @@ public:
 	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
 	vector<double>				m_Lm;	//!< lagrange multipliers 
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
+	vector<double>				m_eps;	//!< penalty values for each integration point
 
 protected:
 	FENNQuery	m_NQ;	//!< used to find the nearest neighbour
@@ -68,6 +69,9 @@ public:
 protected:
 	//! project slave surface onto master
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms);
+
+	//! calculate auto-penalty
+	void CalcAutoPenalty(FEFacetSlidingSurface& s);
 
 public:
 	double	m_epsn;		//!< normal penalty factor

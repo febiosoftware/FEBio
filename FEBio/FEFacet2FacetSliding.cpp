@@ -27,12 +27,14 @@ void FEFacetSlidingSurface::Init()
 	m_rs.create(nint);
 	m_Lm.create(nint);
 	m_pme.create(nint);
+	m_eps.create(nint);
 
 	// set intial values
 	m_gap.zero();
 	m_nu.zero();
 	m_pme.set(0);
 	m_Lm.zero();
+	m_eps.set(1);
 }
 
 //-----------------------------------------------------------------------------
@@ -120,12 +122,51 @@ void FEFacet2FacetSliding::Init()
 	m_ms.Init();
 
 	// calculate penalty factors
-	if (m_bautopen) m_epsn *= AutoPenalty(m_ss, m_ms);
+	if (m_bautopen) CalcAutoPenalty(m_ss);
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms);
 
-	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
+	if (m_npass == 2) 
+	{
+		ProjectSurface(m_ms, m_ss);
+		CalcAutoPenalty(m_ms);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
+{
+	// get the mesh
+	FEMesh& m = m_pfem->m_mesh;
+
+	// loop over all surface elements
+	int ni = 0;
+	for (int i=0; i<s.Elements(); ++i)
+	{
+		// get the surface element
+		FESurfaceElement& el = s.Element(i);
+
+		// find the element this face belongs to
+		FEElement* pe = m.FindElementFromID(el.m_nelem);
+		assert(pe);
+
+		// get the area of the surface element
+		double A = s.FaceArea(el);
+
+		// get the volume of the volume element
+		double V = m.ElementVolume(*pe);
+
+		// calculate a modulus
+		double E = AutoPenalty(el, s);
+
+		// calculate penalty
+		double eps = E*A/V;
+
+		// assign to integation points of surface element
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j, ++ni) s.m_eps[ni] = eps;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -330,8 +371,11 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 					// lagrange multiplier
 					double Lm = ss.m_Lm[ni];
 
+					// penalty value
+					double eps = m_epsn*ss.m_eps[ni];
+
 					// contact traction
-					double tn = Lm + m_epsn*g;
+					double tn = Lm + eps*g;
 					tn = MBRACKET(tn);
 
 					// calculate the force vector
@@ -512,11 +556,14 @@ void FEFacet2FacetSliding::ContactStiffness()
 					// lagrange multiplier
 					double Lm = ss.m_Lm[ni];
 
+					// penalty value
+					double eps = m_epsn*ss.m_eps[ni];
+
 					// contact traction
-					double tn = Lm + m_epsn*g;
+					double tn = Lm + eps*g;
 					tn = MBRACKET(tn);
 
-					double dtn = m_epsn*HEAVYSIDE(Lm + m_epsn*g);
+					double dtn = eps*HEAVYSIDE(Lm + eps*g);
 
 					// calculate the N-vector
 					for (k=0; k<nseln; ++k)
@@ -702,8 +749,11 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	int N = 0;
 	for (i=0; i<NS; ++i)
 	{
+		// penalty value
+		double eps = m_epsn*m_ss.m_eps[i];
+
 		// update Lagrange multipliers
-		Ln = m_ss.m_Lm[i] + m_epsn*m_ss.m_gap[i];
+		Ln = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
 		Ln = MBRACKET(Ln);
 
 		normL1 += Ln*Ln;
@@ -717,8 +767,11 @@ bool FEFacet2FacetSliding::Augment(int naug)
 
 	for (i=0; i<NM; ++i)
 	{
+		// penalty value
+		double eps = m_epsn*m_ms.m_eps[i];
+
 		// update Lagrange multipliers
-		Ln = m_ms.m_Lm[i] + m_epsn*m_ms.m_gap[i];
+		Ln = m_ms.m_Lm[i] + eps*m_ms.m_gap[i];
 		Ln = MBRACKET(Ln);
 
 		normL1 += Ln*Ln;
@@ -762,15 +815,21 @@ bool FEFacet2FacetSliding::Augment(int naug)
 		// we did not converge so update multipliers
 		for (i=0; i<NS; ++i)
 		{
+			// penalty value
+			double eps = m_epsn*m_ss.m_eps[i];
+
 			// update Lagrange multipliers
-			Ln = m_ss.m_Lm[i] + m_epsn*m_ss.m_gap[i];
+			Ln = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
 			m_ss.m_Lm[i] = MBRACKET(Ln);
 		}	
 
 		for (i=0; i<NM; ++i)
 		{
+			// penalty value
+			double eps = m_epsn*m_ms.m_eps[i];
+
 			// update Lagrange multipliers
-			Ln = m_ms.m_Lm[i] + m_epsn*m_ms.m_gap[i];
+			Ln = m_ms.m_Lm[i] + eps*m_ms.m_gap[i];
 			m_ms.m_Lm[i] = MBRACKET(Ln);
 		}
 	}
