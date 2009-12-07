@@ -31,7 +31,7 @@ public:
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
 	vector<int>					m_nei;	//!< surface element indices into arrays
 
-	vector<double>	m_eps;	//!< penalty factors
+	vector<double>	m_epsn;	//!< penalty factors
 	vector<double>	m_epsp;	//!< pressure penalty factors
 
 	vector<vec3d>		m_nn;	//!< node normals

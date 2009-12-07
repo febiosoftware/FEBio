@@ -35,7 +35,7 @@ void FESlidingSurface2::Init()
 	m_Lmd.create(nint);
 	m_Lmp.create(nint);
 	m_pme.create(nint);
-	m_eps.create(nint);
+	m_epsn.create(nint);
 	m_epsp.create(nint);
 
 	m_nn.create(Nodes());
@@ -55,7 +55,7 @@ void FESlidingSurface2::Init()
 	m_pme.set(0);
 	m_Lmd.zero();
 	m_Lmp.zero();
-	m_eps.set(1);
+	m_epsn.set(1);
 	m_epsp.set(1);
 
 	// allocate biphasic stuff
@@ -312,7 +312,7 @@ void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 
 		// assign to integation points of surface element
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j, ++ni) s.m_eps[ni] = eps;
+		for (int j=0; j<nint; ++j, ++ni) s.m_epsn[ni] = eps;
 	}
 }
 
@@ -347,7 +347,7 @@ void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 
 		// assign to integation points of surface element
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j, ++ni) s.m_eps[ni] = eps;
+		for (int j=0; j<nint; ++j, ++ni) s.m_epsp[ni] = eps;
 	}
 }
 
@@ -474,7 +474,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 				// to Gerard's notes.
 				double g = nu*(r - q);
 
-				double eps = m_epsn*ss.m_eps[n];
+				double eps = m_epsn*ss.m_epsn[n];
 
 				Ln = ss.m_Lmd[n] + eps*g;
 
@@ -590,7 +590,7 @@ void FESlidingInterface2::Update()
 			for (i=0; i<nint; ++i, ++ni) 
 			{
 				gap = ss.m_gap[ni];
-				eps = m_epsn*ss.m_eps[ni];
+				eps = m_epsn*ss.m_epsn[ni];
 				ti[i] = MBRACKET(ss.m_Lmd[ni] + eps*gap);
 			}
 
@@ -643,7 +643,7 @@ void FESlidingInterface2::Update()
 					for (i=0; i<nint; ++i) 
 					{
 						gap = ss.m_gap[noff + i];
-						eps = m_epsn*ss.m_eps[noff + i];
+						eps = m_epsn*ss.m_epsn[noff + i];
 						ti[i] = MBRACKET(ss.m_Lmd[noff + i] + eps*gap);
 					}
 
@@ -815,7 +815,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					double Lm = ss.m_Lmd[ni];
 
 					// penalty 
-					double eps = m_epsn*ss.m_eps[ni];
+					double eps = m_epsn*ss.m_epsn[ni];
 
 					// contact traction
 					double tn = Lm + eps*g;
@@ -1027,7 +1027,7 @@ void FESlidingInterface2::ContactStiffness()
 					double Lm = ss.m_Lmd[ni];
 
 					// penalty 
-					double eps = m_epsn*ss.m_eps[ni];
+					double eps = m_epsn*ss.m_epsn[ni];
 
 					// contact traction
 					double tn = Lm + eps*g;
@@ -1346,7 +1346,7 @@ bool FESlidingInterface2::Augment(int naug)
 	for (i=0; i<NS; ++i)
 	{
 		// update Lagrange multipliers on slave surface
-		eps = m_epsn*m_ss.m_eps[i];
+		eps = m_epsn*m_ss.m_epsn[i];
 		Ln = m_ss.m_Lmd[i] + eps*m_ss.m_gap[i];
 		m_ss.m_Lmd[i] = MBRACKET(Ln);
 
@@ -1370,7 +1370,7 @@ bool FESlidingInterface2::Augment(int naug)
 	for (i=0; i<NM; ++i)
 	{
 		// update Lagrange multipliers on master surface
-		eps = m_epsn*m_ms.m_eps[i];
+		eps = m_epsn*m_ms.m_epsn[i];
 		Ln = m_ms.m_Lmd[i] + eps*m_ms.m_gap[i];
 		m_ms.m_Lmd[i] = MBRACKET(Ln);
 
