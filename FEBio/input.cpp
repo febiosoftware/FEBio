@@ -7,6 +7,7 @@
 #include "FEBioImport.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
+#include "FEFacet2FacetSliding.h"
 #include "log.h"
 #include <string.h>
 
@@ -267,12 +268,28 @@ void FEM::EchoInput()
 				log.printf("contact interface %d:\n", i+1);
 				log.printf("\tType                           : sliding with gaps\n");
 				log.printf("\tPenalty factor                 : %lg\n", psi->m_eps);
+				log.printf("\tAuto-penalty                   : %s\n", (psi->m_nautopen==2? "on" : "off"));
 				log.printf("\tTwo-pass algorithm             : %s\n", (psi->m_npass==1? "off":"on"));
 				log.printf("\tAugmented Lagrangian           : %s\n", (psi->m_blaugon? "on" : "off"));
 				if (psi->m_blaugon)
 					log.printf("\tAugmented Lagrangian tolerance : %lg\n", psi->m_atol);
 				log.printf("\tmaster segments                : %d\n", (psi->m_ms.Elements()));
 				log.printf("\tslave segments                 : %d\n", (psi->m_ss.Elements()));
+			}
+
+			FEFacet2FacetSliding* pf2f = dynamic_cast<FEFacet2FacetSliding*>(&m_CI[i]);
+			if (pf2f)
+			{
+				log.printf("contact interface %d:\n", i+1);
+				log.printf("\tType                           : facet-to-facet sliding\n");
+				log.printf("\tPenalty factor                 : %lg\n", pf2f->m_epsn);
+				log.printf("\tAuto-penalty                   : %s\n", (pf2f->m_bautopen? "on" : "off"));
+				log.printf("\tTwo-pass algorithm             : %s\n", (pf2f->m_npass==1? "off": "on" ));
+				log.printf("\tAugmented Lagrangian           : %s\n", (pf2f->m_blaugon ? "on" : "off"));
+				if (pf2f->m_blaugon)
+					log.printf("\tAugmented Lagrangian tolerance : %lg\n", pf2f->m_atol);
+				log.printf("\tmaster segments                : %d\n", (pf2f->m_ms.Elements()));
+				log.printf("\tslave segments                 : %d\n", (pf2f->m_ss.Elements()));
 			}
 
 			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(&m_CI[i]);

@@ -130,7 +130,7 @@ void FEFacet2FacetSliding::Init()
 	if (m_npass == 2) 
 	{
 		ProjectSurface(m_ms, m_ss);
-		CalcAutoPenalty(m_ms);
+		if (m_bautopen) CalcAutoPenalty(m_ms);
 	}
 }
 

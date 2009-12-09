@@ -278,7 +278,8 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
-	double eps = m_eps;
+	// penalty value
+	double pen = Penalty(), eps;
 	
 	// loop over all slave facets
 	int ne = m_ss.Elements();
@@ -324,6 +325,7 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 				detJ = (dxr ^ dxs).norm();
 
 				// get slave node normal force
+				eps = pen*m_ss.eps[m];
 				tn = m_ss.Lm[m] + eps*m_ss.gap[m];
 				tn = MBRACKET(tn);
 
@@ -382,7 +384,7 @@ void FERigidWallInterface::ContactStiffness()
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	// penalty value
-	double eps = Penalty();
+	double pen = Penalty(), eps;
 
 	// loop over all slave elements
 	int ne = m_ss.Elements();
@@ -433,6 +435,8 @@ void FERigidWallInterface::ContactStiffness()
 				Lm = m_ss.Lm[m];
 
 				// get slave node normal force
+				eps = pen*m_ss.eps[m];
+
 				tn = m_ss.Lm[m] + eps*m_ss.gap[m];
 				tn = MBRACKET(tn);
 
@@ -479,7 +483,7 @@ bool FERigidWallInterface::Augment(int naug)
 	bool bconv = true;
 
 	// penalty value
-	double eps = Penalty();
+	double pen = Penalty(), eps;
 
 	// calculate initial norms
 	double normL0 = 0;
@@ -493,6 +497,8 @@ bool FERigidWallInterface::Augment(int naug)
 	for (i=0; i<m_ss.Nodes(); ++i)
 	{
 		// update Lagrange multipliers
+		eps = pen*m_ss.eps[i];
+
 		Lm = m_ss.Lm[i] + eps*m_ss.gap[i];
 		Lm = MBRACKET(Lm);
 		normL1 += Lm*Lm;
@@ -524,6 +530,8 @@ bool FERigidWallInterface::Augment(int naug)
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
+			eps = pen*m_ss.eps[i];
+
 			Lm = m_ss.Lm[i] + eps*m_ss.gap[i];
 			m_ss.Lm[i] = MBRACKET(Lm);
 		}	
