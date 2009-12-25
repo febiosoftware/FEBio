@@ -10,10 +10,11 @@ BFGSSolver::BFGSSolver()
 	m_maxups = 10;
 	m_maxref = 15;
 	m_cmax   = 1e5;
+	m_plinsolve = 0;
 }
 
 //-----------------------------------------------------------------------------
-void BFGSSolver::Init(int neq)
+void BFGSSolver::Init(int neq, LinearSolver* pls)
 {
 	// allocate storage for BFGS update vectors
 	m_V.Create(m_maxups, neq);
@@ -22,8 +23,9 @@ void BFGSSolver::Init(int neq)
 	m_D.create(neq);
 	m_G.create(neq);
 	m_H.create(neq);
-}
 
+	m_plinsolve = pls;
+}
 
 //-----------------------------------------------------------------------------
 //! This function performs a BFGS stiffness update.
@@ -83,4 +85,47 @@ bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector
 	++m_nups;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// This function solves a system of equations using the BFGS update vectors
+// The variable m_nups keeps track of how many updates have been made so far.
+// 
+
+void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
+{
+	int i, j;
+	double *vi, *wi, vr, wr;
+
+	// get the nr of equations
+	int neq = x.size();
+
+	// create temporary storage
+	static vector<double> tmp;
+	tmp = b;
+
+	// loop over all update vectors
+	for (i=m_nups-1; i>=0; --i)
+	{
+		vi = m_V[i];
+		wi = m_W[i];
+
+		wr = 0;
+		for (j=0; j<neq; j++) wr += wi[j]*tmp[j];
+		for (j=0; j<neq; j++) tmp[j] += vi[j]*wr;
+	}
+
+	// perform a backsubstitution
+	m_plinsolve->Solve(x, tmp);
+
+	// loop again over all update vectors
+	for (i=0; i<m_nups; ++i)
+	{
+		vi = m_V[i];
+		wi = m_W[i];
+
+		vr = 0;
+		for (j=0; j<neq; ++j) vr += vi[j]*x[j];
+		for (j=0; j<neq; ++j) x[j] += wi[j]*vr;
+	}
 }

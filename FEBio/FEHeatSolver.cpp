@@ -61,12 +61,8 @@ bool FEHeatSolver::SolveStep(double time)
 	// build the stiffness matrix
 	ReformStiffness();
 
-	FILE* fp = fopen("matrix.txt", "wt");
-	m_pK->GetSparseMatrixPtr()->print(fp);
-	fclose(fp);
-
 	// solve the equations
-	m_psolver->Solve(m_T, m_R);
+	m_plinsolve->Solve(m_T, m_R);
 
 	// update solution
 	Update();
@@ -222,7 +218,7 @@ bool FEHeatSolver::ReformStiffness()
 		m_SolverTime.start();
 		{
 			// factorize the stiffness matrix
-			m_psolver->Factor();
+			m_plinsolve->Factor();
 		}
 		m_SolverTime.stop();
 

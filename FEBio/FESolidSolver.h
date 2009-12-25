@@ -54,9 +54,6 @@ public:
 
 		//! Lagrangian augmentation
 		bool Augment();
-
-		//! solve the system of equations
-		void SolveEquations(vector<double>& x, vector<double>& b);
 	//}
 
 	//{ --- Stiffness matrix routines ---

@@ -59,7 +59,7 @@ bool FESolidSolver::Init()
 	}
 
 	// initialize BFGS data
-	m_bfgs.Init(neq);
+	m_bfgs.Init(neq, m_plinsolve);
 
 	// set the create stiffness matrix flag
 	m_breshape = true;

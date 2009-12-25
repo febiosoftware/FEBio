@@ -49,7 +49,7 @@ public:
 	Timer	m_SolverTime;	//!< tracks time spent in solver
 
 	// linear solver
-	LinearSolver*		m_psolver;	//!< the linear solver
+	LinearSolver*		m_plinsolve;	//!< the linear solver
 
 	// global stiffness matrix
 	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix

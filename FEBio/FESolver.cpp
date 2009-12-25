@@ -19,14 +19,14 @@ FESolver::FESolver(FEM& fem) : m_fem(fem)
 {
 	// Stiffness matrix and linear solver are allocated in Init()
 	m_pK = 0;
-	m_psolver = 0;
+	m_plinsolve = 0;
 }
 
 
 FESolver::~FESolver()
 {
 	delete m_pK;		// clean up stiffnes matrix data
-	delete m_psolver;	// clean up linear solver data
+	delete m_plinsolve;	// clean up linear solver data
 }
 
 bool FESolver::Init()
@@ -39,18 +39,18 @@ bool FESolver::Init()
 	// The stiffness matrix is created in CreateStiffness
 	// Note that if a particular solver was requested in the input file
 	// then the solver might already be allocated. That's way we need to check it.
-	if (m_psolver == 0)
+	if (m_plinsolve == 0)
 	{
 		switch (m_fem.m_nsolver)
 		{
-		case SKYLINE_SOLVER      : m_psolver = new SkylineSolver(); break;
-		case PSLDLT_SOLVER       : m_psolver = new PSLDLTSolver (); break;
-		case SUPERLU_SOLVER      : m_psolver = new SuperLUSolver(); break;
-		case SUPERLU_MT_SOLVER   : m_psolver = new SuperLU_MT_Solver(); break;
-		case PARDISO_SOLVER      : m_psolver = new PardisoSolver(); break;
-		case LU_SOLVER           : m_psolver = new LUSolver(); break;
-		case WSMP_SOLVER         : m_psolver = new WSMPSolver(); break;
-		case CG_ITERATIVE_SOLVER : m_psolver = new ConjGradIterSolver(); break;
+		case SKYLINE_SOLVER      : m_plinsolve = new SkylineSolver(); break;
+		case PSLDLT_SOLVER       : m_plinsolve = new PSLDLTSolver (); break;
+		case SUPERLU_SOLVER      : m_plinsolve = new SuperLUSolver(); break;
+		case SUPERLU_MT_SOLVER   : m_plinsolve = new SuperLU_MT_Solver(); break;
+		case PARDISO_SOLVER      : m_plinsolve = new PardisoSolver(); break;
+		case LU_SOLVER           : m_plinsolve = new LUSolver(); break;
+		case WSMP_SOLVER         : m_plinsolve = new WSMPSolver(); break;
+		case CG_ITERATIVE_SOLVER : m_plinsolve = new ConjGradIterSolver(); break;
 		default:
 			log.printbox("FATAL ERROR","Unknown solver type selected\n");
 			return false;
@@ -59,7 +59,7 @@ bool FESolver::Init()
 
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the solver allocate the correct type of matrix format
-	SparseMatrix* pS = m_psolver->CreateSparseMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
+	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
 	if (pS == 0)
 	{
 		log.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
@@ -89,7 +89,7 @@ bool FESolver::Init()
 bool FESolver::CreateStiffness(bool breset)
 {
 	// clean up the solver
-	if (m_pK->NonZeroes()) m_psolver->Destroy();	// GAA
+	if (m_pK->NonZeroes()) m_plinsolve->Destroy();	// GAA
 
 	// clean up the stiffness matrix
 	m_pK->Clear();
@@ -117,7 +117,7 @@ bool FESolver::CreateStiffness(bool breset)
 	// Do the preprocessing of the solver
 	m_SolverTime.start();
 	{
-		if (!m_psolver->PreProcess()) throw FatalError();
+		if (!m_plinsolve->PreProcess()) throw FatalError();
 	}
 	m_SolverTime.stop();
 

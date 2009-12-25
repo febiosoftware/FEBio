@@ -288,7 +288,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 				if (!tag.isleaf())
 				{
 					SuperLUSolver* ps = new SuperLUSolver();
-					fem.m_pStep->m_psolver->m_psolver = ps;
+					fem.m_pStep->m_psolver->m_plinsolve = ps;
 
 					++tag;
 					do
@@ -308,7 +308,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 			{
 				fem.m_nsolver = CG_ITERATIVE_SOLVER;
 				ConjGradIterSolver* ps;
-				fem.m_pStep->m_psolver->m_psolver = ps = new ConjGradIterSolver();
+				fem.m_pStep->m_psolver->m_plinsolve = ps = new ConjGradIterSolver();
 				if (!tag.isleaf())
 				{
 					++tag;

@@ -334,7 +334,11 @@ bool FESolidSolver::Quasin(double time)
 		bconv = true;
 
 		// solve the equations
-		SolveEquations(m_ui, m_R0);
+		m_SolverTime.start();
+		{
+			m_bfgs.SolveEquations(m_ui, m_R0);
+		}
+		m_SolverTime.stop();
 
 		// check for nans
 		if (m_fem.GetDebugFlag())
@@ -625,7 +629,7 @@ bool FESolidSolver::ReformStiffness()
 		m_SolverTime.start();
 		{
 			// factorize the stiffness matrix
-			m_psolver->Factor();
+			m_plinsolve->Factor();
 		}
 		m_SolverTime.stop();
 
@@ -771,53 +775,3 @@ double FESolidSolver::LineSearch()
 
 	return s;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolidSolver::SolveEquations
-// This function solves a system of equations using the BFGS update vectors
-// The variable m_nups keeps track of how many updates have been made so far.
-// 
-
-void FESolidSolver::SolveEquations(vector<double>& x, vector<double>& b)
-{
-	int i, j;
-	double *vi, *wi, vr, wr;
-
-	// get the nr of equations
-	int neq = m_fem.m_neq;
-
-	// create temporary storage
-	static vector<double> tmp;
-	tmp = b;
-
-	// loop over all update vectors
-	for (i=m_bfgs.m_nups-1; i>=0; --i)
-	{
-		vi = m_bfgs.m_V[i];
-		wi = m_bfgs.m_W[i];
-
-		wr = 0;
-		for (j=0; j<neq; j++) wr += wi[j]*tmp[j];
-		for (j=0; j<neq; j++) tmp[j] += vi[j]*wr;
-	}
-
-	// perform a backsubstitution
-	m_SolverTime.start();
-	{
-		m_psolver->Solve(x, tmp);
-	}
-	m_SolverTime.stop();
-
-	// loop again over all update vectors
-	for (i=0; i<m_bfgs.m_nups; ++i)
-	{
-		vi = m_bfgs.m_V[i];
-		wi = m_bfgs.m_W[i];
-
-		vr = 0;
-		for (j=0; j<neq; ++j) vr += vi[j]*x[j];
-		for (j=0; j<neq; ++j) x[j] += wi[j]*vr;
-	}
-}
-
