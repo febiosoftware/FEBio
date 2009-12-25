@@ -32,10 +32,6 @@ bool FESolidSolver::Init()
 		m_Pi.create(m_fem.m_npeq); m_Ui.zero();
 	}
 
-	// if we have traction constraints
-	// we store the internal forces seperately
-	m_Ti.create(neq); m_Ti.zero();
-
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
 	FEMesh& mesh = m_fem.m_mesh;

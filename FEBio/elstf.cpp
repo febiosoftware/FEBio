@@ -681,7 +681,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 	// zero nodal reaction forces
 	m_Fr.zero();
-	m_Ti.zero();
 
 	// element force vector
 	vector<double> fe;
@@ -724,18 +723,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 			if (m_fem.UseBodyForces())
 			{
 				BodyForces(el, fe);
-			}
-
-			// assemble the element internal into the global internal forces
-			// (only if we have traction constraints)
-			if (m_fem.m_RCSet.size())
-			{
-				vector<int>& lm = el.LM();
-				for (int i=0; i<ndof; ++i)
-				{
-					int I = lm[i];
-					if ( I >= 0) m_Ti[I] += fe[i];
-				}
 			}
 
 			// assemble element 'fe'-vector into global R vector
@@ -860,9 +847,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// enforced using the augmented lagrangian
 	LinearConstraintForces(R);
 
-	// calculate traction constraint forces
-	TractionConstraintForces(R);
-
 	// add discrete element forces
 	if (m_fem.m_DE.size())
 	{
@@ -884,19 +868,6 @@ void FESolidSolver::LinearConstraintForces(vector<double> &R)
 	if (N>0)
 	{
 		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
-		for (int i=0; i<N; ++i, ++im) (*im)->Residual(R);
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! calculate the traction constraint forces 
-
-void FESolidSolver::TractionConstraintForces(vector<double> &R)
-{
-	int N = m_fem.m_RCSet.size();
-	if (N>0)
-	{
-		list<FETractionConstraintSet*>::iterator im = m_fem.m_RCSet.begin();
 		for (int i=0; i<N; ++i, ++im) (*im)->Residual(R);
 	}
 }

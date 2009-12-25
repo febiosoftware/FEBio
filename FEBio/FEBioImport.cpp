@@ -2070,60 +2070,6 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		}
 		while (!tag.isend());
 	}
-	else if (strcmp(szt, "traction constraint") == 0)
-	{
-		FEM& fem = *m_pfem;
-
-		// make sure there is a constraint defined
-		if (tag.isleaf()) return true;
-
-		// create a new traction constraint manager
-		FETractionConstraintSet* pRCS = new FETractionConstraintSet(&fem);
-		fem.m_RCSet.push_back(pRCS);
-
-		// read the traction constraints
-		++tag;
-		do
-		{
-			if (tag == "traction_constraint")
-			{
-				FETractionConstraint* pRC = new FETractionConstraint;
-
-				FETractionConstraint::DOF dof;
-				++tag;
-				do
-				{
-					if (tag == "node")
-					{
-						tag.value(dof.val);
-						int node;
-						tag.AttributeValue("id", node);
-						dof.node = node - 1;
-
-						const char* szbc = tag.AttributeValue("bc");
-						if      (strcmp(szbc, "x") == 0) dof.bc = 0;
-						else if (strcmp(szbc, "y") == 0) dof.bc = 1;
-						else if (strcmp(szbc, "z") == 0) dof.bc = 2;
-						else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-
-						pRC->m_dof.push_back(dof);
-					}
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-
-				// add the residual constraint to the system
-				pRCS->add(pRC);
-			}
-			else if (tag == "tol"    ) tag.value(pRCS->m_tol);
-			else if (tag == "penalty") tag.value(pRCS->m_eps);
-			else if (tag == "maxaug") tag.value(pRCS->m_naugmax);
-			else throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	return true;

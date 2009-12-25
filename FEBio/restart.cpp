@@ -575,11 +575,6 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		ar << (int) m_LCSet.size();
 		list<FELinearConstraintSet*>::iterator ic = m_LCSet.begin();
 		for (i=0; i< (int) m_LCSet.size(); ++i, ++ic) (*ic)->Serialize(ar);
-
-		// aug lag traction constraints
-		ar << (int) m_RCSet.size();
-		list<FETractionConstraintSet*>::iterator tc = m_RCSet.begin();
-		for (i=0; i< (int) m_RCSet.size(); ++i, ++tc) (*tc)->Serialize(ar);
 	}
 	else
 	{
@@ -664,15 +659,6 @@ void FEM::SerializeBoundaryData(Archive& ar)
 			FELinearConstraintSet* plc = new FELinearConstraintSet(this);
 			plc->Serialize(ar);
 			m_LCSet.push_back(plc);
-		}
-
-		// aug lag linear constraints
-		ar >> n;
-		for (i=0; i<n; ++i)
-		{
-			FETractionConstraintSet* prc = new FETractionConstraintSet(this);
-			prc->Serialize(ar);
-			m_RCSet.push_back(prc);
 		}
 	}
 }

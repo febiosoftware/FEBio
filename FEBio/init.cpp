@@ -347,14 +347,6 @@ bool FEM::InitConstraints()
 		for (i=0; i<N; ++i, ++it) (*it)->Init();
 	}
 
-	// let's do the aug lag traction constraints
-	if (m_RCSet.size() > 0)
-	{
-		int N = m_RCSet.size();
-		list<FETractionConstraintSet*>::iterator it = m_RCSet.begin();
-		for (i=0; i<N; ++i, ++it) (*it)->Init();
-	}
-
 	return true;
 }
 

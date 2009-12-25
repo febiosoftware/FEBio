@@ -270,14 +270,6 @@ bool FEAnalysis::Init()
 		for (int m=0; m<M; ++m, ++im) (*im)->Init();
 	}
 
-	// init the traction constraints
-	if (m_fem.m_RCSet.size())
-	{
-		int M = m_fem.m_RCSet.size();
-		list<FETractionConstraintSet*>::iterator im = m_fem.m_RCSet.begin();
-		for (int m=0; m<M; ++m, ++im) (*im)->Init();
-	}
-
 	// see if we need to do contact augmentations
 	m_baugment = (m_fem.m_nrj > 0 ? true : false);
 	for (i=0; i<m_fem.m_CI.size(); ++i)
@@ -295,9 +287,6 @@ bool FEAnalysis::Init()
 
 	// see if we have to do linear constraint augmentations
 	if (m_fem.m_LCSet.size()) m_baugment = true;
-
-	// see if we have to do traction constraint augmentations
-	if (m_fem.m_RCSet.size()) m_baugment = true;
 
 	return true;
 }

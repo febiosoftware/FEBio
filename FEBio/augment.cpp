@@ -45,14 +45,6 @@ bool FESolidSolver::Augment()
 		for (int i=0; i<n; ++i, ++im) bconv = (*im)->Augment(m_naug) && bconv;
 	}
 
-	// do traction constraint augmentations
-	if (m_fem.m_RCSet.size())
-	{
-		int n = m_fem.m_RCSet.size();
-		list<FETractionConstraintSet*>::iterator im = m_fem.m_RCSet.begin();
-		for (int i=0; i<n; ++i, ++im) bconv = (*im)->Augment(m_naug) && bconv;
-	}
-
 	// do incompressibility multipliers
 	for (int i=0; i<m_fem.Materials(); ++i)
 	{
