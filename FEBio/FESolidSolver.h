@@ -52,9 +52,6 @@ public:
 		//! Performs a linesearch
 		double LineSearch();
 
-		//! Do a BFGS stiffness update
-		bool BFGSUpdate(double s);
-
 		//! Lagrangian augmentation
 		bool Augment();
 
@@ -201,11 +198,6 @@ public:
 	// poro data
 	vector<double>	m_pi;	//!< pressure increment vector
 	vector<double>	m_Pi;	//!< Total pressure vector for iteration
-
-	// BFGS update vectors
-	matrix			m_V;
-	matrix			m_W;
-	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
 
 	// convergence norms
 	double		m_normRi;	//!< initial residual norm

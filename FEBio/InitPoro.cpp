@@ -47,9 +47,9 @@ bool FEM::InitPoro()
 		SetSymmetryFlag(false);
 	
 		// make sure we are using full-Newton
-		if (m_pStep->m_psolver->m_maxups != 0)
+		if (m_pStep->m_psolver->m_bfgs.m_maxups != 0)
 		{
-			m_pStep->m_psolver->m_maxups = 0;
+			m_pStep->m_psolver->m_bfgs.m_maxups = 0;
 			log.printbox("WARNING", "The non-symmetric biphasic algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}

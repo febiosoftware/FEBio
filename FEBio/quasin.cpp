@@ -95,7 +95,7 @@ void FESolidSolver::PrepStep(double time)
 	m_niter = 0;	// nr of iterations
 	m_nrhs  = 0;	// nr of RHS evaluations
 	m_nref  = 0;	// nr of stiffness reformations
-	m_nups	= 0;	// nr of stiffness updates between reformations
+	m_bfgs.m_nups	= 0;	// nr of stiffness updates between reformations
 	m_naug  = 0;	// nr of augmentations
 
 	// zero total displacements/pressures
@@ -414,7 +414,7 @@ bool FESolidSolver::Quasin(double time)
 		oldmode = log.GetMode();
 		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) log.SetMode(Logfile::FILE_ONLY);
 		log.printf(" Nonlinear solution status: time= %lg\n", time); 
-		log.printf("\tstiffness updates             = %d\n", m_nups);
+		log.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
 		log.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		log.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_LStol > 0) log.printf("\tstep from line search         = %lf\n", s);
@@ -461,9 +461,9 @@ bool FESolidSolver::Quasin(double time)
 				// do an update
 				if (!breform)
 				{
-					if (m_nups < m_maxups-1)
+					if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
 					{
-						if (BFGSUpdate(s) == false)
+						if (m_bfgs.Update(s, m_ui, m_R0, m_R1) == false)
 						{
 							// Stiffness update has failed.
 							// this might be due a too large condition number
@@ -479,7 +479,7 @@ bool FESolidSolver::Quasin(double time)
 						breform = true;
 
 						// print a warning only if the user did not intent full-Newton
-						if (m_maxups > 0)
+						if (m_bfgs.m_maxups > 0)
 							log.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 
 					}
@@ -530,7 +530,7 @@ bool FESolidSolver::Quasin(double time)
 				Residual(m_R0);
 
 				// reform the matrix if we are using full-Newton
-				if (m_fem.m_pStep->m_psolver->m_maxups == 0)
+				if (m_fem.m_pStep->m_psolver->m_bfgs.m_maxups == 0)
 				{
 					log.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness() == false) break;
@@ -602,7 +602,7 @@ void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 bool FESolidSolver::ReformStiffness()
 {
 	// first, let's make sure we have not reached the max nr of reformations allowed
-	if (m_nref >= m_maxref) throw MaxStiffnessReformations();
+	if (m_nref >= m_bfgs.m_maxref) throw MaxStiffnessReformations();
 
 	// recalculate the shape of the stiffness matrix if necessary
 	if (m_breshape)
@@ -633,7 +633,7 @@ bool FESolidSolver::ReformStiffness()
 		m_nref++;
 
 		// reset bfgs update counter
-		m_nups = 0;
+		m_bfgs.m_nups = 0;
 	}
 
 	return bret;
@@ -792,10 +792,10 @@ void FESolidSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	tmp = b;
 
 	// loop over all update vectors
-	for (i=m_nups-1; i>=0; --i)
+	for (i=m_bfgs.m_nups-1; i>=0; --i)
 	{
-		vi = m_V[i];
-		wi = m_W[i];
+		vi = m_bfgs.m_V[i];
+		wi = m_bfgs.m_W[i];
 
 		wr = 0;
 		for (j=0; j<neq; j++) wr += wi[j]*tmp[j];
@@ -810,10 +810,10 @@ void FESolidSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	m_SolverTime.stop();
 
 	// loop again over all update vectors
-	for (i=0; i<m_nups; ++i)
+	for (i=0; i<m_bfgs.m_nups; ++i)
 	{
-		vi = m_V[i];
-		wi = m_W[i];
+		vi = m_bfgs.m_V[i];
+		wi = m_bfgs.m_W[i];
 
 		vr = 0;
 		for (j=0; j<neq; ++j) vr += vi[j]*x[j];
@@ -846,10 +846,10 @@ void FESolidSolver::SolveEquations(matrix& x, matrix& b)
 	int nr = x.rows();
 
 	// loop over all update vectors
-	for (i=m_nups-1; i>=0; --i)
+	for (i=m_bfgs.m_nups-1; i>=0; --i)
 	{
-		vi = m_V[i];
-		wi = m_W[i];
+		vi = m_bfgs.m_V[i];
+		wi = m_bfgs.m_W[i];
 
 		for (k=0; k<nr; ++k)
 		{
@@ -867,10 +867,10 @@ void FESolidSolver::SolveEquations(matrix& x, matrix& b)
 	m_SolverTime.stop();
 
 	// loop again over all update vectors
-	for (i=0; i<m_nups; ++i)
+	for (i=0; i<m_bfgs.m_nups; ++i)
 	{
-		vi = m_V[i];
-		wi = m_W[i];
+		vi = m_bfgs.m_V[i];
+		wi = m_bfgs.m_W[i];
 
 		for (k=0; k<nr; ++k)
 		{
@@ -879,64 +879,4 @@ void FESolidSolver::SolveEquations(matrix& x, matrix& b)
 			for (j=0; j<neq; ++j) x[k][j] += wi[j]*vr;
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! This function performs a BFGS stiffness update.
-//! The last line search step is input to this function.
-//! This function performs the update assuming the stiffness matrix
-//! is positive definite. In the case that this is not the case
-//! the function returns false. The function also returns false if 
-//! the condition number is too big. A too big condition number might
-//! be an indication of an ill-conditioned matrix and the update should
-//! not be performed.
-
-bool FESolidSolver::BFGSUpdate(double s)
-{
-	int i;
-	double dg, dh,dgi, c, r;
-	double *vn, *wn;
-
-	int neq = m_fem.m_neq;
-
-	// calculate the BFGS update vectors
-	for (i=0; i<neq; ++i)	
-	{
-		m_D[i] = s*m_ui[i];
-		m_G[i] = m_R0[i] - m_R1[i];
-		m_H[i] = m_R0[i]*s;
-	}
-
-	dg = m_D*m_G;
-	dh = m_D*m_H;
-	dgi = 1.0 / dg;
-	r = dg/dh;
-
-	// check to see if this is still a pos definite update
-//	if (r <= 0) 
-//	{
-//		return false;
-//	}
-
-	// calculate the condition number
-//	c = sqrt(r);
-	c = sqrt(fabs(r));
-
-	// make sure c is less than the the maximum.
-	if (c > m_cmax) return false;
-
-	vn = m_V[m_nups];
-	wn = m_W[m_nups];
-
-	// TODO: There might be a bug here. Check signs!
-	for (i=0; i<neq; ++i)	
-	{
-		vn[i] = -m_H[i]*c - m_G[i];
-		wn[i] = m_D[i]*dgi;
-	}
-
-	// increment update counter
-	++m_nups;
-
-	return true;
 }

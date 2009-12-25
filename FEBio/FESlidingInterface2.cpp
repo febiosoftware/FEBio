@@ -233,9 +233,9 @@ void FESlidingInterface2::Init()
 		m_pfem->SetSymmetryFlag(false);
 
 		// make sure we are using full-Newton
-		if (bporo && (m_pfem->m_pStep->m_psolver->m_maxups != 0))
+		if (bporo && (m_pfem->m_pStep->m_psolver->m_bfgs.m_maxups != 0))
 		{
-			m_pfem->m_pStep->m_psolver->m_maxups = 0;
+			m_pfem->m_pStep->m_psolver->m_bfgs.m_maxups = 0;
 			log.printbox("WARNING", "The non-symmetric biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}

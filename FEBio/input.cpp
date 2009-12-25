@@ -115,9 +115,9 @@ void FEM::EchoInput()
 	log.printf("\tNumber of displacement boundary conditions ..... : %d\n", m_DC.size());
 	log.printf("\tNumber of pressure boundary cards .............. : %d\n", m_PC.size());
 	log.printf("\tNumber of concentrated nodal forces ............ : %d\n", m_FC.size());
-	log.printf("\tMax nr of stiffness reformations ............... : %d\n", m_pStep->m_psolver->m_maxref);
+	log.printf("\tMax nr of stiffness reformations ............... : %d\n", m_pStep->m_psolver->m_bfgs.m_maxref);
 	log.printf("\tper time steps\n");
-	log.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", m_pStep->m_psolver->m_maxups);
+	log.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", m_pStep->m_psolver->m_bfgs.m_maxups);
 	log.printf("\tbetween stiffness matrix reformations\n");
 	log.printf("\tDisplacement convergence tolerance ............. : %lg\n", m_pStep->m_psolver->m_Dtol);
 	log.printf("\tEnergy convergence tolerance ................... : %lg\n", m_pStep->m_psolver->m_Etol);
@@ -126,7 +126,7 @@ void FEM::EchoInput()
 	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", m_pStep->m_psolver->m_LStol);
 	log.printf("\tMinimum line search size ....................... : %lg\n", m_pStep->m_psolver->m_LSmin);
 	log.printf("\tMaximum number of line search iterations ....... : %d\n", m_pStep->m_psolver->m_LSiter);
-	log.printf("\tMax condition number ........................... : %lg\n", m_pStep->m_psolver->m_cmax);
+	log.printf("\tMax condition number ........................... : %lg\n", m_pStep->m_psolver->m_bfgs.m_cmax);
 	log.printf("\n\n");
 
 	log.printf(" OUTPUT DATA\n");

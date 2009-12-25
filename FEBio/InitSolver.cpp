@@ -58,13 +58,8 @@ bool FESolidSolver::Init()
 		n = node.m_ID[6]; if (n >= 0) m_Ut[n] = node.m_pt;
 	}
 
-	// allocate storage for BFGS update vectors
-	m_V.Create(m_maxups, neq);
-	m_W.Create(m_maxups, neq);
-
-	m_D .create(neq);
-	m_G .create(neq);
-	m_H .create(neq);
+	// initialize BFGS data
+	m_bfgs.Init(neq);
 
 	// set the create stiffness matrix flag
 	m_breshape = true;

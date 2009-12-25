@@ -169,8 +169,8 @@ bool FENIKEImport::ReadControlDeck(FEM& fem)
 	fem.m_pStep->m_psolver->m_Etol = Etol;
 	fem.m_pStep->m_psolver->m_Rtol = Rtol;
 	fem.m_pStep->m_psolver->m_LStol = LStol;
-	fem.m_pStep->m_psolver->m_maxups = maxups;
-	fem.m_pStep->m_psolver->m_maxref = maxref;
+	fem.m_pStep->m_psolver->m_bfgs.m_maxups = maxups;
+	fem.m_pStep->m_psolver->m_bfgs.m_maxref = maxref;
 
 	// -------- control card 7 --------
 	if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);

@@ -187,9 +187,9 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "lstol"             ) tag.value(m_pStep->m_psolver->m_LStol);
 		else if (tag == "lsmin"             ) tag.value(m_pStep->m_psolver->m_LSmin);
 		else if (tag == "lsiter"            ) tag.value(m_pStep->m_psolver->m_LSiter);
-		else if (tag == "max_refs"          ) tag.value(m_pStep->m_psolver->m_maxref);
-		else if (tag == "max_ups"           ) tag.value(m_pStep->m_psolver->m_maxups);
-		else if (tag == "cmax"              ) tag.value(m_pStep->m_psolver->m_cmax);
+		else if (tag == "max_refs"          ) tag.value(m_pStep->m_psolver->m_bfgs.m_maxref);
+		else if (tag == "max_ups"           ) tag.value(m_pStep->m_psolver->m_bfgs.m_maxups);
+		else if (tag == "cmax"              ) tag.value(m_pStep->m_psolver->m_bfgs.m_cmax);
 		else if (tag == "optimize_bw"       ) tag.value(fem.m_bwopt);
 		else if (tag == "pressure_stiffness") tag.value(m_pStep->m_istiffpr);
 		else if (tag == "hourglass"         ) tag.value(m_pStep->m_hg);

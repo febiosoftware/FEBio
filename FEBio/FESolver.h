@@ -15,6 +15,7 @@
 #include "Timer.h"
 #include "FEException.h"
 #include "Interrupt.h"
+#include "BFGSSolver.h"
 
 //-----------------------------------------------------------------------------
 //! The solver class.
@@ -52,7 +53,6 @@ public:
 
 	// global stiffness matrix
 	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
-	double			m_cmax;			//!< maximum value for the condition number
 
 	// convergence tolerances
 	double	m_Rtol;			//!< residual tolerance
@@ -62,14 +62,14 @@ public:
 	double	m_LStol;		//!< line search tolerance
 	double	m_LSmin;		//!< minimum line search step
 	int		m_LSiter;		//!< max nr of line search iterations
-	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
-	int		m_maxref;		//!< max nr of reformations per time step
+
+	// BFGS parameters
+	BFGSSolver	m_bfgs;		//!< BFGS solver parameters
 
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations
 	int		m_niter;		//!< nr of quasi-newton iterations
 	int		m_nref;			//!< nr of stiffness retormations
-	int		m_nups;			//!< nr of stiffness updates
 	int		m_naug;			//!< nr of augmentations
 };
 
