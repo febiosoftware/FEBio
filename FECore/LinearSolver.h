@@ -18,25 +18,27 @@
 class LinearSolver
 {
 public:
-	LinearSolver() { m_bvalid = false; }
+	LinearSolver() { m_bvalid = false; m_pA = 0; }
 	virtual ~LinearSolver() { Destroy(); }
 
-	virtual bool PreProcess(SparseMatrix& K) { m_bvalid = true; return true; }
-	virtual bool Factor(SparseMatrix& K) = 0;
-	virtual bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b) = 0;
-	virtual bool Solve(SparseMatrix& K, matrix& x, matrix& b) = 0;
+	virtual bool PreProcess() { m_bvalid = true; return true; }
+	virtual bool Factor() = 0;
+	virtual bool Solve(vector<double>& x, vector<double>& b) = 0;
 	virtual void Destroy() { m_bvalid = false; };
-	virtual void Destroy(SparseMatrix& K) { m_bvalid = false; };
 
-	//! returns a sparse matrix
-	virtual SparseMatrix* GetMatrix(int ntype) = 0;
+	//! returns a pointer to the sparse matrix
+	SparseMatrix* GetMatrix() { return m_pA; };
 
 	//! set the number of threads
 	static void SetNumThreads(int n) { m_numthreads = (n>0? n : 1); }
 
+	// create the sparse matrix
+	virtual SparseMatrix* CreateSparseMatrix(int ntype) = 0;
+
 protected:
 	bool	m_bvalid;	// flag indication wether a valid matrix structure is ready
 
+	SparseMatrix*	m_pA;	// the matrix that stores the coefficients
+
 	static int	m_numthreads;	// nr of threads to create
 };
-

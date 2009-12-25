@@ -14,13 +14,12 @@
 class LUSolver : public LinearSolver
 {
 public:
-	bool PreProcess(SparseMatrix& K);
-	bool Factor(SparseMatrix& K);
-	bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
-	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
-	void Destroy(SparseMatrix& K);
+	bool PreProcess();
+	bool Factor();
+	bool Solve(vector<double>& x, vector<double>& b);
+	void Destroy();
 
-	SparseMatrix* GetMatrix(int ntype) { return new FullMatrix(); }
+	SparseMatrix* CreateSparseMatrix(int ntype) { return (m_pA = new FullMatrix()); }
 
 protected:
 	vector<int>	indx;

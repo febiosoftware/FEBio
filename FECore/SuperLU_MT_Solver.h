@@ -11,13 +11,12 @@
 class SuperLU_MT_Solver : public LinearSolver
 {
 public:
-	bool PreProcess(SparseMatrix& K);
-	bool Factor(SparseMatrix& K);
-	bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
-	bool Solve(SparseMatrix& K, matrix& x, matrix& b) { return false; }
-	void Destroy(SparseMatrix& K);
+	bool PreProcess();
+	bool Factor();
+	bool Solve(vector<double>& x, vector<double>& b);
+	void Destroy();
 
-	SparseMatrix* GetMatrix(int ntype) { return new CompactUnSymmMatrix(); }
+	SparseMatrix* CreateSparseMatrix(int ntype) { return (m_pA = new CompactUnSymmMatrix()); }
 
 	SuperLU_MT_Solver();
 

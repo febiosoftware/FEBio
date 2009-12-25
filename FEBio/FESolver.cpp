@@ -59,7 +59,7 @@ bool FESolver::Init()
 
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the solver allocate the correct type of matrix format
-	SparseMatrix* pS = m_psolver->GetMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
+	SparseMatrix* pS = m_psolver->CreateSparseMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
 	if (pS == 0)
 	{
 		log.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
@@ -89,7 +89,7 @@ bool FESolver::Init()
 bool FESolver::CreateStiffness(bool breset)
 {
 	// clean up the solver
-	if (m_pK->NonZeroes()) m_psolver->Destroy(*m_pK);	// GAA
+	if (m_pK->NonZeroes()) m_psolver->Destroy();	// GAA
 
 	// clean up the stiffness matrix
 	m_pK->Clear();
@@ -117,7 +117,7 @@ bool FESolver::CreateStiffness(bool breset)
 	// Do the preprocessing of the solver
 	m_SolverTime.start();
 	{
-		if (!m_psolver->PreProcess(*m_pK)) throw FatalError();
+		if (!m_psolver->PreProcess()) throw FatalError();
 	}
 	m_SolverTime.stop();
 

@@ -16,7 +16,7 @@ SuperLU_MT_Solver::SuperLU_MT_Solver()
 //-----------------------------------------------------------------------------
 //! Solver preprocessing
 
-bool SuperLU_MT_Solver::PreProcess(SparseMatrix& A)
+bool SuperLU_MT_Solver::PreProcess()
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -24,7 +24,7 @@ bool SuperLU_MT_Solver::PreProcess(SparseMatrix& A)
 #else
 
 	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& K = dynamic_cast<CompactUnSymmMatrix&> (A);
+	CompactUnSymmMatrix& K = dynamic_cast<CompactUnSymmMatrix&> (*m_pA);
 
 	// get the number of columns/rows
 	int N = K.Size();
@@ -72,7 +72,7 @@ bool SuperLU_MT_Solver::PreProcess(SparseMatrix& A)
 //-----------------------------------------------------------------------------
 //! Factor the sparse matrix
 
-bool SuperLU_MT_Solver::Factor(SparseMatrix& K)
+bool SuperLU_MT_Solver::Factor()
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -122,7 +122,7 @@ bool SuperLU_MT_Solver::Factor(SparseMatrix& K)
 //-----------------------------------------------------------------------------
 //! Solve the linear system
 
-bool SuperLU_MT_Solver::Solve(SparseMatrix &K, vector<double> &x, vector<double> &b)
+bool SuperLU_MT_Solver::Solve(vector<double> &x, vector<double> &b)
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -169,7 +169,7 @@ bool SuperLU_MT_Solver::Solve(SparseMatrix &K, vector<double> &x, vector<double>
 //-----------------------------------------------------------------------------
 //! Clean up
 
-void SuperLU_MT_Solver::Destroy(SparseMatrix& K)
+void SuperLU_MT_Solver::Destroy()
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -195,7 +195,7 @@ void SuperLU_MT_Solver::Destroy(SparseMatrix& K)
 		m_bfact = false;
 	}
 
-	LinearSolver::Destroy(K);
+	LinearSolver::Destroy();
 
 #endif
 }

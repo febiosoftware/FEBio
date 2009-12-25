@@ -58,7 +58,7 @@ PardisoSolver::PardisoSolver()
 #endif
 }
 
-bool PardisoSolver::PreProcess(SparseMatrix& K)
+bool PardisoSolver::PreProcess()
 {
 	/* Make sure the solver is available */
 #ifndef PARDISO
@@ -69,8 +69,8 @@ bool PardisoSolver::PreProcess(SparseMatrix& K)
 	m_iparm[0] = 0;
 	pardisoinit_(m_pt, &m_mtype, m_iparm);
 
-	m_n = K.Size();
-	m_nnz = K.NonZeroes();
+	m_n = m_pA->Size();
+	m_nnz = m_pA->NonZeroes();
 	m_nrhs = 1;
 
 	// number of processors: use value of OMP_NUM_THREADS
@@ -82,18 +82,18 @@ bool PardisoSolver::PreProcess(SparseMatrix& K)
 	m_msglvl = 0;	/* 0 Suppress printing, 1 Print statistical information */
 	m_error = 0;	/* Initialize m_error flag */
 
-	return LinearSolver::PreProcess(K);
+	return LinearSolver::PreProcess();
 #endif
 }
 
-bool PardisoSolver::Factor(SparseMatrix& K)
+bool PardisoSolver::Factor()
 {
 	/* Make sure the solver is available */
 #ifndef PARDISO
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	return false;
 #else
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
+	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
 
 // ------------------------------------------------------------------------------
 // Reordering and Symbolic Factorization.  This step also allocates all memory
@@ -136,14 +136,14 @@ bool PardisoSolver::Factor(SparseMatrix& K)
 #endif
 }
 
-bool PardisoSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
+bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 {
 	/* Make sure the solver is available */
 #ifndef PARDISO
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	return false;
 #else
-	CompactMatrix* A = dynamic_cast<CompactMatrix*> (&K);
+	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
 
 	int phase = 33;
 
@@ -163,21 +163,7 @@ bool PardisoSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 #endif
 }
 
-bool PardisoSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
-{
-	/* Make sure the solver is available */
-#ifndef PARDISO
-	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
-	return false;
-#else
-
-	//TODO: implement this solver routine for this class
-
-	return false;
-#endif
-}
-
-void PardisoSolver::Destroy(SparseMatrix& K)
+void PardisoSolver::Destroy()
 {
 	/* Make sure the solver is available */
 #ifndef PARDISO

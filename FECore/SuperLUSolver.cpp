@@ -6,7 +6,7 @@
 // SUPERLUSolver
 //////////////////////////////////////////////////////////////////////
 
-bool SuperLUSolver::PreProcess(SparseMatrix& K)
+bool SuperLUSolver::PreProcess()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -15,7 +15,7 @@ bool SuperLUSolver::PreProcess(SparseMatrix& K)
 #else
 
 	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& rK = dynamic_cast<CompactUnSymmMatrix&> (K);
+	CompactUnSymmMatrix& rK = dynamic_cast<CompactUnSymmMatrix&> (m_pA);
 
 	int N = rK.Size();
 	int nnz = rK.NonZeroes();
@@ -44,7 +44,7 @@ bool SuperLUSolver::PreProcess(SparseMatrix& K)
 
 	m_balloc = true;
 
-	return LinearSolver::PreProcess(K);
+	return LinearSolver::PreProcess();
 #endif
 }
 
@@ -74,7 +74,7 @@ double SuperLUSolver::norm(SparseMatrix& K)
 }
 #endif
 
-bool SuperLUSolver::Factor(SparseMatrix& K)
+bool SuperLUSolver::Factor()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -90,7 +90,7 @@ bool SuperLUSolver::Factor(SparseMatrix& K)
 	}
 
 	double normA = 0;
-	if (m_bcond) normA = norm(K);
+	if (m_bcond) normA = norm(*m_pA);
 
 	// initialize stats
 	StatInit(&stat);
@@ -132,7 +132,7 @@ bool SuperLUSolver::Factor(SparseMatrix& K)
 #endif
 }
 
-bool SuperLUSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
+bool SuperLUSolver::Solve(vector<double>& x, vector<double>& b)
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -169,19 +169,7 @@ bool SuperLUSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 #endif
 }
 
-bool SuperLUSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
-{
-	// Make sure the solver is available
-#ifndef SUPERLU
-	fprintf(stderr, "FATAL ERROR: The SUPERLU solver is not available on this platform\n\n");
-	return false;
-#else
-	//TODO: implement this solver routine for this class
-	return false;
-#endif
-}
-
-void SuperLUSolver::Destroy(SparseMatrix& K)
+void SuperLUSolver::Destroy()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -210,7 +198,7 @@ void SuperLUSolver::Destroy(SparseMatrix& K)
 		m_bfact = false;
 	}
 
-	LinearSolver::Destroy(K);
+	LinearSolver::Destroy();
 
 #endif
 }

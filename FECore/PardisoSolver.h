@@ -23,17 +23,18 @@ extern "C"
 class PardisoSolver : public LinearSolver
 {
 public:
-	bool PreProcess(SparseMatrix& K);
-	bool Factor(SparseMatrix& K);
-	bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
-	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
-	void Destroy(SparseMatrix& K);
+	bool PreProcess();
+	bool Factor();
+	bool Solve(vector<double>& x, vector<double>& b);
+	void Destroy();
 
-	SparseMatrix* GetMatrix(int ntype)
+	SparseMatrix* CreateSparseMatrix(int ntype)
 	{
 		m_bsymm = (ntype == SPARSE_SYMMETRIC);
-		if (m_bsymm) return new CompactSymmMatrix(1);
-		else return new CompactUnSymmMatrix(1, true);
+		if (m_bsymm) m_pA = new CompactSymmMatrix(1);
+		else m_pA = new CompactUnSymmMatrix(1, true);
+
+		return m_pA;
 	}
 
 	PardisoSolver();

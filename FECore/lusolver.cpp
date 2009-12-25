@@ -2,26 +2,17 @@
 #include "LUSolver.h"
 
 //-----------------------------------------------------------------------------
-bool LUSolver::PreProcess(SparseMatrix& K)
+bool LUSolver::PreProcess()
 {
-	FullMatrix* pK = dynamic_cast<FullMatrix*> (&K);
-
-	if (pK == 0)
-	{
-		fprintf(stderr, "Stiffness matrix needs to be a FullMatrix for this solver\n");
-		return false;
-	}
-
 	// We don't need to do any preprocessing for this solver
-
-	return LinearSolver::PreProcess(K);
+	return LinearSolver::PreProcess();
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::Factor(SparseMatrix& K)
+bool LUSolver::Factor()
 {
 	// convert to a FullMatrix
-	FullMatrix& a = dynamic_cast<FullMatrix&> (K);
+	FullMatrix& a = dynamic_cast<FullMatrix&> (*m_pA);
 
 	const double TINY = 1.0e-20;
 	int i, imax, j, k;
@@ -87,9 +78,9 @@ bool LUSolver::Factor(SparseMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
+bool LUSolver::Solve(vector<double>& x, vector<double>& b)
 {
-	FullMatrix& a = dynamic_cast<FullMatrix&> (K);
+	FullMatrix& a = dynamic_cast<FullMatrix&> (*m_pA);
 
 	x = b;
 
@@ -120,14 +111,8 @@ bool LUSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
-{
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-void LUSolver::Destroy(SparseMatrix& K)
+void LUSolver::Destroy()
 {
 	// nothing to destroy
-	LinearSolver::Destroy(K);
+	LinearSolver::Destroy();
 }

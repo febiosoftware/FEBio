@@ -57,9 +57,6 @@ public:
 
 		//! solve the system of equations
 		void SolveEquations(vector<double>& x, vector<double>& b);
-
-		//! solve the system of equations
-		void SolveEquations(matrix& x, matrix& b);
 	//}
 
 	//{ --- Stiffness matrix routines ---

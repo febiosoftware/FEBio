@@ -625,7 +625,7 @@ bool FESolidSolver::ReformStiffness()
 		m_SolverTime.start();
 		{
 			// factorize the stiffness matrix
-			m_psolver->Factor(*m_pK);
+			m_psolver->Factor();
 		}
 		m_SolverTime.stop();
 
@@ -805,7 +805,7 @@ void FESolidSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	// perform a backsubstitution
 	m_SolverTime.start();
 	{
-		m_psolver->Solve(*m_pK, x, tmp);
+		m_psolver->Solve(x, tmp);
 	}
 	m_SolverTime.stop();
 
@@ -821,62 +821,3 @@ void FESolidSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FESolidSolver::SolveEquations
-// This function solves a system of equations using the BFGS update vectors
-// The variable m_nups keeps track of how many updates have been made so far.
-// 
-
-void FESolidSolver::SolveEquations(matrix& x, matrix& b)
-{
-	int i, j, k;
-	double *vi, *wi, vr, wr;
-
-	// get the nr of equations
-	int neq = m_fem.m_neq;
-
-	// create temporary storage
-	matrix tmp;
-	tmp = b;
-
-	// get the nr of rows
-	// note that this is actually the nr of columns since we 
-	// store the transpose of matrices in order to have
-	// column major ordering
-	int nr = x.rows();
-
-	// loop over all update vectors
-	for (i=m_bfgs.m_nups-1; i>=0; --i)
-	{
-		vi = m_bfgs.m_V[i];
-		wi = m_bfgs.m_W[i];
-
-		for (k=0; k<nr; ++k)
-		{
-			wr = 0;
-			for (j=0; j<neq; j++) wr += wi[j]*tmp[k][j];
-			for (j=0; j<neq; j++) tmp[k][j] += vi[j]*wr;
-		}
-	}
-
-	// perform a backsubstitution
-	m_SolverTime.start();
-	{
-		m_psolver->Solve(*m_pK, x, tmp);
-	}
-	m_SolverTime.stop();
-
-	// loop again over all update vectors
-	for (i=0; i<m_bfgs.m_nups; ++i)
-	{
-		vi = m_bfgs.m_V[i];
-		wi = m_bfgs.m_W[i];
-
-		for (k=0; k<nr; ++k)
-		{
-			vr = 0;
-			for (j=0; j<neq; ++j) vr += vi[j]*x[k][j];
-			for (j=0; j<neq; ++j) x[k][j] += wi[j]*vr;
-		}
-	}
-}

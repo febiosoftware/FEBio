@@ -10,15 +10,16 @@ ConjGradIterSolver::ConjGradIterSolver()
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::PreProcess(SparseMatrix& K)
+bool ConjGradIterSolver::PreProcess()
 {
+	assert(m_pA);
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::Factor(SparseMatrix& K)
+bool ConjGradIterSolver::Factor()
 {
-/*	CompactMatrix& C = dynamic_cast<CompactMatrix&>(K);
+/*	CompactMatrix& C = dynamic_cast<CompactMatrix&>(*m_pA);
 	int neq = K.Size();
 
 	int* pi = C.indices();
@@ -49,18 +50,11 @@ bool ConjGradIterSolver::Factor(SparseMatrix& K)
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
-{
-	assert(false);
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-bool ConjGradIterSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
+bool ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
 {
 	int i;
 
-	CompactSymmMatrix& A = dynamic_cast<CompactSymmMatrix&>(K);
+	CompactSymmMatrix& A = dynamic_cast<CompactSymmMatrix&>(*m_pA);
 
 	int N = x.size();
 
@@ -135,7 +129,7 @@ bool ConjGradIterSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double
 }
 
 //-----------------------------------------------------------------------------
-void ConjGradIterSolver::Destroy(SparseMatrix& K)
+void ConjGradIterSolver::Destroy()
 {
 
 }

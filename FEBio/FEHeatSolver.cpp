@@ -66,7 +66,7 @@ bool FEHeatSolver::SolveStep(double time)
 	fclose(fp);
 
 	// solve the equations
-	m_psolver->Solve(*m_pK, m_T, m_R);
+	m_psolver->Solve(m_T, m_R);
 
 	// update solution
 	Update();
@@ -222,7 +222,7 @@ bool FEHeatSolver::ReformStiffness()
 		m_SolverTime.start();
 		{
 			// factorize the stiffness matrix
-			m_psolver->Factor(*m_pK);
+			m_psolver->Factor();
 		}
 		m_SolverTime.stop();
 

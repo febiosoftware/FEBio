@@ -7,7 +7,7 @@
 // WSMPSolver
 //////////////////////////////////////////////////////////////
 
-bool WSMPSolver::PreProcess(SparseMatrix& K)
+bool WSMPSolver::PreProcess()
 {
 	// Make sure the solver is available
 #ifndef WSMP
@@ -18,7 +18,7 @@ bool WSMPSolver::PreProcess(SparseMatrix& K)
 	int idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (&K);
+	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (m_pA);
 	m_n = A->Size();
 	m_nnz = A->NonZeroes();
 
@@ -56,11 +56,11 @@ bool WSMPSolver::PreProcess(SparseMatrix& K)
 		exit(2);
 	}
 
-	return LinearSolver::PreProcess(K);
+	return LinearSolver::PreProcess();
 #endif
 }
 
-bool WSMPSolver::Factor(SparseMatrix& K)
+bool WSMPSolver::Factor()
 {
 	// Make sure the solver is available
 #ifndef WSMP
@@ -71,7 +71,7 @@ bool WSMPSolver::Factor(SparseMatrix& K)
 	int idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (&K);
+	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (m_pA);
 
 
 #ifdef PRINTHB
@@ -147,7 +147,7 @@ bool WSMPSolver::Factor(SparseMatrix& K)
 #endif
 }
 
-bool WSMPSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
+bool WSMPSolver::Solve(vector<double>& x, vector<double>& b)
 {
 	/* Make sure the solver is available */
 #ifndef WSMP
@@ -159,7 +159,7 @@ bool WSMPSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 	int i, idum, nrhs=1, naux=0;
 	double ddum;
 
-	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (&K);
+	CompactSymmMatrix* A = dynamic_cast<CompactSymmMatrix*> (m_pA);
 
 // ------------------------------------------------------------------------------
 // This step performs back substitution
@@ -183,21 +183,7 @@ bool WSMPSolver::Solve(SparseMatrix& K, vector<double>& x, vector<double>& b)
 #endif
 }
 
-bool WSMPSolver::Solve(SparseMatrix& K, matrix& x, matrix& b)
-{
-	/* Make sure the solver is available */
-#ifndef WSMP
-	fprintf(stderr, "FATAL ERROR: The WSMP solver is not available on this platform\n\n");
-	return false;
-#else
-
-	//TODO: implement this solver routine for this class
-
-	return false;
-#endif
-}
-
-void WSMPSolver::Destroy(SparseMatrix& K)
+void WSMPSolver::Destroy()
 {
 	/* Make sure the solver is available */
 #ifndef WSMP
@@ -206,7 +192,7 @@ void WSMPSolver::Destroy(SparseMatrix& K)
 #else
 
 	wsmp_clear_();
-	LinearSolver::Destroy(K);
+	LinearSolver::Destroy();
 
 #endif
 }

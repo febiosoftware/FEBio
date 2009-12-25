@@ -11,13 +11,13 @@ class ConjGradIterSolver : public LinearSolver
 public:
 	ConjGradIterSolver();
 
-	bool PreProcess(SparseMatrix& K);
-	bool Factor(SparseMatrix& K);
-	bool Solve(SparseMatrix& K, vector<double>& x, vector<double>& b);
-	bool Solve(SparseMatrix& K, matrix& x, matrix& b);
-	void Destroy(SparseMatrix& K);
+	bool PreProcess();
+	bool Factor();
+	bool Solve(vector<double>& x, vector<double>& b);
 
-	SparseMatrix* GetMatrix(int ntype) { return (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0); }
+	void Destroy();
+
+	SparseMatrix* CreateSparseMatrix(int ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); }
 
 public:
 	double	m_tol;		// convergence tolerance
