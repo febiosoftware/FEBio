@@ -8,6 +8,7 @@
 #include "FENodeReorder.h"
 #include "FERigid.h"
 #include "log.h"
+#include "FESolidSolver.h"
 
 // Forward declarations
 void Hello(FILE* fp);
@@ -110,38 +111,41 @@ bool FEM::Init()
 			return false;
 		}
 
-		// get the elements material
-		FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
-
-		// set the local element coordinates
-		if (pme)
+		if (dynamic_cast<FESolidSolver*>(m_pStep->m_psolver))
 		{
-			if (pme->m_pmap)
+			// get the elements material
+			FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
+
+			// set the local element coordinates
+			if (pme)
 			{
-				for (int n=0; n<el.GaussPoints(); ++n)
+				if (pme->m_pmap)
 				{
-					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-					pt.Q = pme->m_pmap->LocalElementCoord(el, n);
-				}
-			}
-			else
-			{
-				if (GetDebugFlag())
-				{
-					// If we get here, then the element has a user-defined fiber axis
-					// we should check to see if it has indeed been specified.
-					// TODO: This assumes that pt.Q will not get intialized to
-					//		 a valid value. I should find another way for checking since I
-					//		 would like pt.Q always to be initialized to a decent value.
-					if (dynamic_cast<FETransverselyIsotropic*>(pme))
+					for (int n=0; n<el.GaussPoints(); ++n)
 					{
-						FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-						mat3d& m = pt.Q;
-						if (fabs(m.det() - 1) > 1e-7)
+						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+						pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+					}
+				}
+				else
+				{
+					if (GetDebugFlag())
+					{
+						// If we get here, then the element has a user-defined fiber axis
+						// we should check to see if it has indeed been specified.
+						// TODO: This assumes that pt.Q will not get intialized to
+						//		 a valid value. I should find another way for checking since I
+						//		 would like pt.Q always to be initialized to a decent value.
+						if (dynamic_cast<FETransverselyIsotropic*>(pme))
 						{
-							// this element did not get specified a user-defined fiber direction
-							log.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
-							bmerr = true;
+							FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+							mat3d& m = pt.Q;
+							if (fabs(m.det() - 1) > 1e-7)
+							{
+								// this element did not get specified a user-defined fiber direction
+								log.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+								bmerr = true;
+							}
 						}
 					}
 				}
