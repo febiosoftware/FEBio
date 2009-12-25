@@ -162,7 +162,7 @@ bool FENIKEImport::ReadControlDeck(FEM& fem)
 	if (maxref ==   0) maxref = 15;
 	if (Dtol   == 0.0) Dtol   = 0.001;
 	if (Etol   == 0.0) Etol   = 0.01;
-	if (Rtol   == 0.0) Rtol   = 1e10; // i.e. deactivated
+	if (Rtol   == 0.0) Rtol   = 0; // i.e. deactivated
 	if (LStol  == 0.0) LStol  = 0.9;
 
 	fem.m_pStep->m_psolver->m_Dtol = Dtol;

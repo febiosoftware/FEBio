@@ -327,8 +327,6 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		}
 		else throw XMLReader::InvalidTag(tag);
 
-		if (fem.m_pStep->m_psolver->m_Rtol == 0) fem.m_pStep->m_psolver->m_Rtol = 1e10;
-
 		++tag;
 	}
 	while (!tag.isend());

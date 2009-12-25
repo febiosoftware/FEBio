@@ -354,7 +354,17 @@ bool FESolidSolver::Quasin(double time)
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
-		s = LineSearch();
+		if (m_LStol > 0) s = LineSearch();
+		else
+		{
+			s = 1;
+
+			// Update geometry
+			Update(m_ui, s);
+
+			// calculate residual at this point
+			Residual(m_R1);
+		}
 
 		// update total displacements
 		for (i=0; i<m_fem.m_neq; ++i) m_Ui[i] += s*m_ui[i];
@@ -366,16 +376,16 @@ bool FESolidSolver::Quasin(double time)
 		m_normE1 = s*fabs(m_ui*m_R1);
 
 		// check residual norm
-		if (m_normR1 > m_Rtol*m_normRi) bconv = false;	
+		if ((m_Rtol > 0) && (m_normR1 > m_Rtol*m_normRi)) bconv = false;	
 
 		// check displacement norm
-		if (m_normu  > (m_Dtol*m_Dtol)*m_normU ) bconv = false;
+		if ((m_Dtol > 0) && (m_normu  > (m_Dtol*m_Dtol)*m_normU )) bconv = false;
 
 		// check energy norm
-		if (m_normE1 > m_Etol*m_normEi) bconv = false;
+		if ((m_Etol > 0) && (m_normE1 > m_Etol*m_normEi)) bconv = false;
 
 		// check linestep size
-		if (s < m_LSmin) bconv = false;
+		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
 
 		// check energy divergence
 		if (m_normE1 > m_normEm) bconv = false;
@@ -407,7 +417,7 @@ bool FESolidSolver::Quasin(double time)
 		log.printf("\tstiffness updates             = %d\n", m_nups);
 		log.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		log.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		log.printf("\tstep from line search         = %lf\n", s);
+		if (m_LStol > 0) log.printf("\tstep from line search         = %lf\n", s);
 		log.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		log.printf("\t   residual         %15le %15le %15le \n", m_normRi, m_normR1, m_Rtol*m_normRi);
 		log.printf("\t   energy           %15le %15le %15le \n", m_normEi, m_normE1, m_Etol*m_normEi);

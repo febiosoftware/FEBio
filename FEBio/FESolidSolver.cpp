@@ -9,7 +9,7 @@
 FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
 {
 	// default values
-	m_Rtol = 1e10;
+	m_Rtol = 0;	// deactivate residual convergence 
 	m_Dtol = 0.001;
 	m_Etol = 0.01;
 	m_Ptol = 0.01;
