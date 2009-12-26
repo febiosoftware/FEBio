@@ -64,6 +64,9 @@ public:
 		//! calculates the shell element stiffness matrix
 		void ElementStiffness(FEShellElement& el, matrix& ke);
 
+		//! calculates the truss element stiffness matrix
+		void ElementStiffness(FETrussElement& el, matrix& ke);
+
 		//! calculates the solid element inertial stiffness matrix
 		void ElementInertialStiffness(FESolidElement& el, matrix& ke);
 
@@ -138,6 +141,9 @@ public:
 
 		//! Calculates the internal stress vector for solid elements
 		void InternalForces(FESolidElement& el, vector<double>& fe);
+
+		//! Calculates the internal stress vector for solid elements
+		void InternalForces(FETrussElement& el, vector<double>& fe);
 
 		//! Calculates the internal stress vector for enhanced strain hex elements
 		void UDGInternalForces(FESolidElement& el, vector<double>& fe);

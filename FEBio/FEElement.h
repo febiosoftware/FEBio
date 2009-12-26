@@ -640,4 +640,65 @@ public:
 	vector<FEMaterialPoint*>	m_State;
 };
 
+//-----------------------------------------------------------------------------
+
+class FETrussElement : public FEElement
+{
+public:
+	//! intialize element data
+	void Init(bool bflag)
+	{
+		m_State[0]->Init(bflag);
+	}
+
+	double Length0()
+	{
+		assert(m_pT->m_pel == this);
+		vec3d a0 = r0()[0];
+		vec3d b0 = r0()[1];
+		
+		return (b0 - a0).norm();
+	}
+
+	double Length()
+	{
+		assert(m_pT->m_pel == this);
+		vec3d a = rt()[0];
+		vec3d b = rt()[1];
+		
+		return (b - a).norm();
+	}
+
+	vec3d Normal()
+	{
+		assert(m_pT->m_pel == this);
+		assert(m_pT->m_pel == this);
+		vec3d a = rt()[0];
+		vec3d b = rt()[1];
+		vec3d n = b - a;
+		n.unit();
+		return n;
+	}
+
+	double Volume0()
+	{
+		double L = Length0();
+		return m_a0*L;
+	}
+
+	virtual void SetTraits(FEElementTraits* ptraits)
+	{
+		FEElement::SetTraits(ptraits);
+		m_State.create(1);
+		m_State.zero();
+	}
+
+	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
+
+public:
+	double	m_a0;	// cross-sectional area
+
+	vector<FEMaterialPoint*>	m_State;
+};
+
 #endif // !defined(AFX_FEELEMENT_H__2EE38101_58E2_4FEB_B214_BB71B6FB15FB__INCLUDED_)

@@ -3,6 +3,7 @@
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 #include "FEMicroMaterial.h"
+#include "FETrussMaterial.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FESolidSolver::Update
@@ -550,6 +551,27 @@ void FESolidSolver::UpdateStresses()
 		}
 	}
 
+	// update truss element stresses
+	for (i=0; i<mesh.TrussElements(); ++i)
+	{
+		// unpack the element
+		FETrussElement& el = mesh.TrussElement(i);
+		mesh.UnpackElement(el);
+
+		// get the material
+		FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
+		FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(pmat);
+
+		// setup the material point
+		FEMaterialPoint& mp = *(el.m_State[0]);
+		FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
+
+		double l = el.Length();
+		double L = el.Length0();
+		pt.m_l = l / L;
+
+		pt.m_tau = pm->Stress(pt);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

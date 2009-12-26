@@ -264,7 +264,11 @@ void FESolidSolver::PrepStep(double time)
 		int n = el.GaussPoints();
 		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
 	}
-
+	for (i=0; i<mesh.TrussElements(); ++i)
+	{
+		FETrussElement& el = mesh.TrussElement(i);
+		el.m_State[0]->Init(false);
+	}
 
 	// intialize the stresses
 	// TODO: is this a good place to update the stresses?

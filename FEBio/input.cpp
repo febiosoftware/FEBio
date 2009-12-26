@@ -102,6 +102,7 @@ void FEM::EchoInput()
 	log.printf("\tNumber of nodes ................................ : %d\n", m_mesh.Nodes() );
 	log.printf("\tNumber of solid elements ....................... : %d\n", m_mesh.SolidElements());
 	log.printf("\tNumber of shell elements ....................... : %d\n", m_mesh.ShellElements());
+	log.printf("\tNumber of truss elements ....................... : %d\n", m_mesh.TrussElements());
 	log.printf("\tNumber of timesteps ............................ : %d\n", m_pStep->m_ntime);
 	log.printf("\tTime step size ................................. : %lg\n", m_pStep->m_dt0);
 	log.printf("\tAuto time stepper activated .................... : %s\n", (m_pStep->m_bautostep ? "yes" : "no"));

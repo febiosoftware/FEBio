@@ -258,3 +258,32 @@ public:
 public:
 	vec3d	m_q;	//!< heat flux
 };
+
+//-----------------------------------------------------------------------------
+
+class FETrussMaterialPoint : public FEMaterialPoint
+{
+public:
+	FEMaterialPoint* Copy()
+	{
+		FETrussMaterialPoint* pt = new FETrussMaterialPoint(*this);
+		if (m_pt) pt->m_pt = m_pt->Copy();
+		return pt;
+	}
+
+	void Serialize(Archive& ar)
+	{
+		if (m_pt) m_pt->Serialize(ar);
+	}
+
+	void Init(bool bflag)
+	{
+		if (m_pt) m_pt->Init(bflag);
+		m_l = 1;
+		m_tau = 0;
+	}
+
+public:
+	double	m_l;	// strech
+	double	m_tau;	// Kirchoff stress
+};

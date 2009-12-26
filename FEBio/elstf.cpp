@@ -153,6 +153,15 @@ bool FESolidSolver::StiffnessMatrix()
 		}
 	}
 
+	// repeat over truss elements
+	int NT = mesh.TrussElements();
+	for (iel =0; iel<NT; ++iel)
+	{
+		FETrussElement& el = mesh.TrussElement(iel);
+		mesh.UnpackElement(el);
+		ElementStiffness(el, ke);
+		AssembleStiffness(el.m_node, el.LM(), ke);
+	}
 
 	// calculate contact stiffness
 	if (m_fem.m_bcontact) 
@@ -797,6 +806,16 @@ bool FESolidSolver::Residual(vector<double>& R)
 		}
 
 		// TODO: Do poro-elasticity for shells
+	}
+
+	// loop over truss elements
+	int NT = mesh.TrussElements();
+	for (i=0; i<NT; ++i)
+	{
+		FETrussElement& el = mesh.TrussElement(i);
+		mesh.UnpackElement(el);
+		InternalForces(el, fe);
+		AssembleResidual(el.m_node, el.LM(), fe, R);
 	}
 
 	// calculate inertial forces for dynamic problems
@@ -1764,7 +1783,6 @@ void FESolidSolver::DilatationalStiffness(FEShellElement& elem, matrix& ke)
 			ke[i][j] += k*gradN[i]*gradN[j];
 }
 
-
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
@@ -1828,7 +1846,6 @@ void FESolidSolver::InternalForces(FESolidElement& el, vector<double>& fe)
 		}
 	}
 }
-
 
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for enhanced strain

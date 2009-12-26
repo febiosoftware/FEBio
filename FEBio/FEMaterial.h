@@ -234,6 +234,7 @@ public:
 	DECLARE_PARAMETER_LIST();
 };
 
+//-----------------------------------------------------------------------------
 #ifdef WIN32
 inline double acosh(double x)
 {

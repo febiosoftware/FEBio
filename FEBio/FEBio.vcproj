@@ -666,6 +666,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FETrussMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEVerondaWestmann.cpp"
 				>
 			</File>
@@ -815,6 +819,10 @@
 			</File>
 			<File
 				RelativePath=".\Timer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\truss.cpp"
 				>
 			</File>
 			<File
@@ -1161,6 +1169,10 @@
 			</File>
 			<File
 				RelativePath=".\FETransIsoVerondaWestmann.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FETrussMaterial.h"
 				>
 			</File>
 			<File

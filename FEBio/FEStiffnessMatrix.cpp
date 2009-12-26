@@ -92,6 +92,14 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				}
 			}
 
+			// add truss elements to the profile
+			for (i=0; i<mesh.TrussElements(); ++i)
+			{
+				FETrussElement& el = mesh.TrussElement(i);
+				mesh.UnpackElement(el, FE_UNPACK_LM);
+				build_add(el.LM());
+			}
+
 			// add rigid joint "elements" to the profile
 			if (fem.m_nrj)
 			{

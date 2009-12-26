@@ -737,7 +737,7 @@ bool FEFEBioImport::ParseNodeSection(XMLTag& tag)
 	while (!t.isend()) { nodes++; ++t; }
 
 	// create nodes
-	mesh.Create(nodes, 0, 0);
+	mesh.Create(nodes, 0, 0, 0);
 
 	// read nodal coordinates
 	++tag;
@@ -789,24 +789,25 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 	// first we need to figure out how many elements there are
 	XMLTag t(tag); ++t;
-	int nbel = 0, nsel = 0;
+	int nbel = 0, nsel = 0, ntel = 0;
 	while (!t.isend())
 	{
 		if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++nbel;
 		else if ((t == "quad4") || (t == "tri3")) ++nsel;
+		else if ((t == "truss2")) ++ntel;
 		else throw XMLReader::InvalidTag(t);
 
 		++t;
 	}
 
 	// create elements
-	mesh.Create(0, nbel, nsel);
+	mesh.Create(0, nbel, nsel, ntel);
 
 	// read element data
 	++tag;
 	int n[8];
-	int elems = nbel + nsel;
-	int nb = 0, ns = 0, nmat;
+	int elems = nbel + nsel + ntel;
+	int nb = 0, ns = 0, nt = 0, nmat;
 	FEElement* pe;
 	for (i=0; i<elems; ++i)
 	{
@@ -866,6 +867,19 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			// thickness are read in the ElementData section
 			el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = 0.0;
 		}
+		else if (tag == "truss2")
+		{
+			FETrussElement& el = mesh.TrussElement(nt++); pe = &el;
+			el.SetType(FE_TRUSS);
+			el.m_nID = i+1;
+			tag.value(n, el.Nodes());
+			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+			nmat = atoi(tag.AttributeValue("mat"))-1;
+			el.SetMatID(nmat);
+
+			// area is read in the ElementData section
+			el.m_a0 = 0;
+		}
 		else throw XMLReader::InvalidTag(tag);
 
 		// make sure the material number is valid
@@ -890,6 +904,14 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
 		assert(pmat);
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+	}
+
+	for (i=0; i<mesh.TrussElements(); ++i)
+	{
+		FETrussElement& el = mesh.TrussElement(i);
+		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+		assert(pmat);
+		el.SetMaterialPointData(pmat->CreateMaterialPointData(), 0);
 	}
 
 	return true;
@@ -951,14 +973,15 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 
 	int nbel = mesh.SolidElements();
 	int nsel = mesh.ShellElements();
+	int ntel = mesh.TrussElements();
 
 	//make sure we've read the element section
-	int elems = nbel + nsel;
+	int elems = nbel + nsel + ntel;
 	if (elems == 0) throw XMLReader::InvalidTag(tag);
 
 	// create the pelem array
 	vector<FEElement*> pelem;
-	pelem.create(nbel + nsel);
+	pelem.create(nbel + nsel + ntel);
 	pelem.zero();
 
 	for (i=0; i<nbel; ++i)
@@ -971,6 +994,13 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 	for (i=0; i<nsel; ++i)
 	{
 		FEShellElement& el = mesh.ShellElement(i);
+		assert(pelem[el.m_nID-1] == 0);
+		pelem[el.m_nID-1] = &el;
+	}
+
+	for (i=0; i<ntel; ++i)
+	{
+		FETrussElement& el = mesh.TrussElement(i);
 		assert(pelem[el.m_nID-1] == 0);
 		pelem[el.m_nID-1] = &el;
 	}
@@ -1049,6 +1079,14 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 
 				// read shell thickness
 				tag.value(pse->m_h0,pse->Nodes());
+			}
+			else if (tag == "area")
+			{
+				FETrussElement* pt = dynamic_cast<FETrussElement*>(pe);
+				if (pt == 0) throw XMLReader::InvalidTag(tag);
+
+				// read truss area
+				tag.value(pt->m_a0);
 			}
 		}
 		while (!tag.isend());

@@ -27,6 +27,7 @@ FEMesh::FEMesh(FEMesh& m)
 	// copy element data
 	m_Elem  = m.m_Elem;
 	m_Shell = m.m_Shell;
+	m_Truss = m.m_Truss;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -42,6 +43,7 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 	// copy element data
 	m_Elem  = m.m_Elem;
 	m_Shell = m.m_Shell;
+	m_Truss = m.m_Truss;
 
 	return (*this);
 }
@@ -51,11 +53,12 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 //  Allocates storage for mesh data.
 //
 
-void FEMesh::Create(int nodes, int elems, int shells)
+void FEMesh::Create(int nodes, int elems, int shells, int ntruss)
 {
 	if (nodes >0) m_Node.create (nodes);
 	if (elems >0) m_Elem.create (elems);
 	if (shells>0) m_Shell.create(shells);
+	if (ntruss>0) m_Truss.create(ntruss);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,6 +112,13 @@ int FEMesh::RemoveIsolatedVertices()
 	for (i=0; i<ShellElements(); ++i)
 	{
 		FEElement& el = ShellElement(i);
+		n = el.Nodes();
+		for (j=0; j<n; ++j) ++val[el.m_node[j]];
+	}
+
+	for (i=0; i<TrussElements(); ++i)
+	{
+		FEElement& el = TrussElement(i);
 		n = el.Nodes();
 		for (j=0; j<n; ++j) ++val[el.m_node[j]];
 	}
@@ -340,6 +350,72 @@ void FEMesh::UnpackElement(FESurfaceElement& el, unsigned int nflag)
 }
 
 //-----------------------------------------------------------------------------
+
+void FEMesh::UnpackElement(FETrussElement &el, unsigned int nflag)
+{
+	int i, n;
+
+	vec3d* rt = el.rt();
+	vec3d* r0 = el.r0();
+	vec3d* vt = el.vt();
+	double* pt = el.pt();
+
+	int N = el.Nodes();
+	int* lm = el.LM();
+
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+		FENode& node = Node(n);
+
+		int* id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[0];
+		lm[3*i+1] = id[1];
+		lm[3*i+2] = id[2];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[6];
+
+		// rigid rotational dofs
+		lm[4*N + 3*i  ] = id[7];
+		lm[4*N + 3*i+1] = id[8];
+		lm[4*N + 3*i+2] = id[9];
+
+		// fill the rest with -1
+		lm[7*N + 3*i  ] = -1;
+		lm[7*N + 3*i+1] = -1;
+		lm[7*N + 3*i+2] = -1;
+
+		lm[10*N + i] = id[10];
+	}
+
+	// copy nodal data to element arrays
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+
+		FENode& node = Node(n);
+
+		// initial coordinates (= material coordinates)
+		r0[i] = node.m_r0;
+
+		// current coordinates (= spatial coordinates)
+		rt[i] = node.m_rt;
+
+		// current nodal pressures
+		pt[i] = node.m_pt;
+
+		// current nodal velocities
+		vt[i] = node.m_vt;
+	}
+
+	// unpack the traits data
+	el.UnpackTraitsData(nflag);
+}
+
+//-----------------------------------------------------------------------------
 //! Reset the mesh data. Return nodes to their intial position, reset their 
 //! attributes and zero all element stresses.
 
@@ -375,6 +451,13 @@ void FEMesh::Reset()
 	for (i=0; i<ShellElements(); ++i)
 	{
 		FEShellElement& el = ShellElement(i);
+		el.Init(true);
+	}
+
+	// initialize truss element data
+	for (i=0; i<TrussElements(); ++i)
+	{
+		FETrussElement& el = TrussElement(i);
 		el.Init(true);
 	}
 }
@@ -619,7 +702,8 @@ void FEMesh::Serialize(Archive& ar)
 		int nn   = Nodes();
 		int nbel = SolidElements();
 		int nsel = ShellElements();
-		ar << nn << nbel << nsel;
+		int ntel = TrussElements();
+		ar << nn << nbel << nsel << ntel;
 
 		// write nodal data
 		for (i=0; i<nn; ++i) ar.write(&Node(i), sizeof(FENode), 1);
@@ -669,11 +753,11 @@ void FEMesh::Serialize(Archive& ar)
 		int i, n, mat;
 
 		// read mesh item counts
-		int nn, nbel, nsel;
-		ar >> nn >> nbel >> nsel;
+		int nn, nbel, nsel, ntel;
+		ar >> nn >> nbel >> nsel >> ntel;
 
 		// allocate storage for mesh data
-		Create(nn, nbel, nsel);
+		Create(nn, nbel, nsel, ntel);
 
 		// read nodal data
 		for (i=0; i<nn; ++i) ar.read(&Node(i), sizeof(FENode), 1);
@@ -808,6 +892,10 @@ FEElement* FEMesh::FindElementFromID(int nid)
 	// now do the shells
 	for (i=0; i<m_Shell.size(); ++i)
 		if (m_Shell[i].m_nID == nid) return &m_Shell[i];
+
+	// now to the trusses
+	for (i=0; i<m_Truss.size(); ++i)
+		if (m_Truss[i].m_nID == nid) return &m_Truss[i];
 
 	// we could not find it
 	return 0;

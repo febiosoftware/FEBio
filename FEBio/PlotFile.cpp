@@ -98,7 +98,7 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 	plh.flagT = (m_nfield[3] == 0? 0 : 1);
 	plh.icode = 6;
 	plh.ndim  = 4;
-	plh.nel2  = 0;
+	plh.nel2  = fem.m_mesh.TrussElements();
 	plh.nel4  = fem.m_mesh.ShellElements();
 	plh.nel8  = fem.m_mesh.SolidElements();
 	plh.nglbv = 0;
@@ -181,6 +181,21 @@ bool PlotFile::Open(FEM& fem, const char* szfile)
 		n[8] = el.GetMatID()+1;
 
 		m_ar.write(n, sizeof(int), 9);
+	}
+
+	// write truss element data
+	for (i=0; i<mesh.TrussElements(); ++i)
+	{
+		FETrussElement& el = mesh.TrussElement(i);
+		el.m_nID = nid++;
+		n[0] = el.m_node[0]+1;
+		n[1] = el.m_node[1]+1;
+		n[2] = 0;
+		n[3] = 0;
+		n[4] = 0;
+		n[5] = el.GetMatID()+1;
+
+		m_ar.write(n, sizeof(int), 6);
 	}
 
 	// write shell element data
@@ -378,6 +393,21 @@ bool PlotFile::Write(FEM& fem)
 		}
 
 		m_ar.write(s, sizeof(float), 7);
+	}
+
+	// write truss element data
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
+	for (i=0; i<mesh.TrussElements(); ++i)
+	{
+		FETrussElement& el = mesh.TrussElement(i);
+		mesh.UnpackElement(el);
+		FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
+		
+		double l = el.Length();
+		double V = el.Volume0();
+		s[0] = (float) (pt.m_tau*l/V);	// axial force
+
+		m_ar.write(s, sizeof(float), 6);
 	}
 
 	// write shell element data

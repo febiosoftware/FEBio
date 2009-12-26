@@ -28,7 +28,10 @@ enum FE_Element_Type {
 
 	// shell elements
 	FE_SHELL_QUAD,	// = 9
-	FE_SHELL_TRI	// = 10
+	FE_SHELL_TRI,	// = 10
+
+	// truss elements
+	FE_TRUSS		// = 11
 };
 
 /////////////////////////////////////////////////////////////////////////////

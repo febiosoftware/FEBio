@@ -162,7 +162,7 @@ public:
 	FEMesh& operator = (FEMesh& m);
 
 	//! allocate storage for mesh data
-	void Create(int nodes, int elems, int shells);
+	void Create(int nodes, int elems, int shells, int ntruss);
 
 	//! return number of nodes
 	int Nodes() { return m_Node.size(); }
@@ -173,6 +173,9 @@ public:
 	//! count the number of shell elements
 	int ShellElements() { return m_Shell.size(); }
 
+	//! counte the number of truss elements
+	int TrussElements() { return m_Truss.size(); }
+
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }
 
@@ -181,6 +184,9 @@ public:
 
 	//! return reference to a shell element
 	FEShellElement& ShellElement(int i) { return m_Shell[i]; }
+
+	//! return a reference to a  truss element
+	FETrussElement& TrussElement(int i) { return m_Truss[i]; }
 
 	//! update bounding box
 	void UpdateBox();
@@ -199,6 +205,9 @@ public:
 
 	//! Unpack surface element data
 	void UnpackElement(FESurfaceElement& el, unsigned int nflag = FE_UNPACK_ALL);
+
+	//! Unpack truss element data
+	void UnpackElement(FETrussElement& el, unsigned int flag = FE_UNPACK_ALL);
 
 	//! Reset the mesh data
 	void Reset();
@@ -244,6 +253,7 @@ protected:
 
 	vector<FESolidElement>	m_Elem;		//!< FE solid element array
 	vector<FEShellElement>	m_Shell;	//!< FE shell element array
+	vector<FETrussElement>	m_Truss;	//!< FE truss element array
 
 	ptr_vector<FENodeSet>	m_NodeSet;	//!< node sets
 

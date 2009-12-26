@@ -441,7 +441,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 
 	// create mesh
 	FEMesh& mesh = fem.m_mesh;
-	mesh.Create(m_nn, m_nbel, m_nsel);
+	mesh.Create(m_nn, m_nbel, m_nsel, 0);
 
 	////////////////////// N O D A L   C O O R D I N A T E S   D E C K //////////////////////
 
