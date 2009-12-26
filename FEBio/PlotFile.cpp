@@ -405,7 +405,7 @@ bool PlotFile::Write(FEM& fem)
 		
 		double l = el.Length();
 		double V = el.Volume0();
-		s[0] = (float) (pt.m_tau*l/V);	// axial force
+		s[0] = (float) (pt.m_tau*V/l);	// axial force
 
 		m_ar.write(s, sizeof(float), 6);
 	}
