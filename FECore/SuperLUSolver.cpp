@@ -15,7 +15,7 @@ bool SuperLUSolver::PreProcess()
 #else
 
 	// get a reference to the correct matrix type
-	CompactUnSymmMatrix& rK = dynamic_cast<CompactUnSymmMatrix&> (m_pA);
+	CompactUnSymmMatrix& rK = dynamic_cast<CompactUnSymmMatrix&> (*m_pA);
 
 	int N = rK.Size();
 	int nnz = rK.NonZeroes();
