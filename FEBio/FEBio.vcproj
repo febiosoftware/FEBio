@@ -466,6 +466,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEIsotropicElastic.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEIsotropicFourier.cpp"
 				>
 			</File>
@@ -969,6 +973,10 @@
 			</File>
 			<File
 				RelativePath=".\FEIncompNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEIsotropicElastic.h"
 				>
 			</File>
 			<File
