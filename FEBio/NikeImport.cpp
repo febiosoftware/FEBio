@@ -8,6 +8,7 @@
 #include "FEMooneyRivlin.h"
 #include "FETransIsoMooneyRivlin.h"
 #include "FERigid.h"
+#include "FESolidSolver.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -49,6 +50,9 @@ bool FENIKEImport::Load(FEM& fem, const char* szfile)
 
 	// keep a copy of the input file name
 	fem.SetInputFilename(szfile);
+
+	// make sure we have a solver defined
+	if (fem.m_pStep->m_psolver == 0) fem.m_pStep->m_psolver = new FESolidSolver(fem);
 
 	// Read the control deck
 	if (ReadControlDeck(fem) == false) return false;
