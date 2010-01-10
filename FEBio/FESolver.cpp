@@ -66,6 +66,8 @@ bool FESolver::Init()
 		return false;
 	}
 
+	// clean up the stiffness matrix if we have one
+	if (m_pK) delete m_pK; m_pK = 0;
 
 	// Create the stiffness matrix.
 	// Note that this does not construct the stiffness matrix. This
