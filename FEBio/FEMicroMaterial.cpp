@@ -37,7 +37,7 @@ void FEMicroMaterial::Init()
 	m_rve.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
 
 	// make sure we are using the same linear solver as the parent FEM
-	m_rve.m_nsolver = SUPERLU_SOLVER;
+	m_rve.m_nsolver = SKYLINE_SOLVER;
 
 	// create the DC's for this RVE
 	PrepRVE();
@@ -328,36 +328,6 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 					D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
 
 					D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
-/*
-					D[0][0] += Ri[0]*K[0][0]*Rj[0]; 
-					D[1][1] += Ri[1]*K[1][1]*Rj[1]; 
-					D[2][2] += Ri[2]*K[2][2]*Rj[2]; 
-
-					D[0][1] += Ri[0]*K[0][1]*Rj[1];
-					D[0][2] += Ri[0]*K[0][2]*Rj[2];
-					D[1][2] += Ri[1]*K[1][2]*Rj[2];
-
-					D[0][3] += Ri[0]*K[0][0]*Rj[1];
-					D[0][4] += Ri[0]*K[0][1]*Rj[2];
-					D[0][5] += Ri[0]*K[0][0]*Rj[2];
-
-					D[1][3] += Ri[1]*K[1][0]*Rj[1];
-					D[1][4] += Ri[1]*K[1][1]*Rj[2];
-					D[1][5] += Ri[1]*K[1][0]*Rj[2];
-
-					D[2][3] += Ri[2]*K[2][0]*Rj[1];
-					D[2][4] += Ri[2]*K[2][1]*Rj[2];
-					D[2][5] += Ri[2]*K[2][0]*Rj[2];
-
-					D[3][3] += Ri[0]*K[1][0]*Rj[1];
-					D[3][4] += Ri[0]*K[1][1]*Rj[2];
-					D[3][5] += Ri[0]*K[1][0]*Rj[2];
-
-					D[4][4] += Ri[1]*K[2][1]*Rj[2];
-					D[4][5] += Ri[1]*K[2][0]*Rj[2];
-
-					D[5][5] += Ri[0]*K[2][0]*Rj[2];
-*/
 				}
 			}
 		}
@@ -371,8 +341,6 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	D[3][3] *= Vi; D[3][4] *= Vi; D[3][5] *= Vi;
 	D[4][4] *= Vi; D[4][5] *= Vi;
 	D[5][5] *= Vi;
-
-//	tens4ds cm = dynamic_cast<FEElasticMaterial*>(m_rve.GetMaterial(0))->Tangent(mp);
 
 	return tens4ds(D);
 }
