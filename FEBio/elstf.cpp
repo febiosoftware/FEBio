@@ -2,6 +2,7 @@
 #include <math.h>
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
+#include "FEMicroMaterial.h"
 #include "tens4d.h"
 #include "log.h"
 
@@ -246,7 +247,10 @@ bool FESolidSolver::StiffnessMatrix()
 	{
 		for (i=0; i<m_fem.m_neq; ++i)
 		{
-			if (K.diag(i) == 0) throw ZeroDiagonal(i, m_fem);
+			if (K.diag(i) == 0) 
+			{
+				throw ZeroDiagonal(i, m_fem);
+			}
 		}
 	}
 
@@ -1164,6 +1168,13 @@ void FESolidSolver::MaterialStiffness(FESolidElement &el, matrix &ke)
 		// get the 'D' matrix
 		tens4ds C = pmat->Tangent(mp);
 		C.extract(D);
+
+		if (dynamic_cast<FEMicroMaterial*>(pmat))
+		{
+			// the micro-material screws up the currently unpacked elements
+			// so I have to unpack the element data again
+			m_fem.m_mesh.UnpackElement(el);
+		}
 
 /*		if (m_fem.GetDebugFlag())
 		{

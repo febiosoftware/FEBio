@@ -17,7 +17,8 @@ public:
 	char	m_szrve[256];	//!< filename for RVE file
 
 protected:
-	FEM	m_rve;	//!< the RVE (Representive Volume Element)
+	FEM		m_rve;	//!< the RVE (Representive Volume Element)
+	double	m_V0;	//!< initial volume of RVE
 
 public:
 	//! calculate stress at material point
@@ -33,7 +34,7 @@ public:
 
 protected:
 	void PrepRVE();
-	mat3ds AveragedStress();
+	mat3ds AveragedStress(FEMaterialPoint& pt);
 
 public:
 	// declare as registered

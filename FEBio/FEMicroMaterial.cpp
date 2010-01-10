@@ -3,6 +3,7 @@
 #include "FEElemElemList.h"
 #include "log.h"
 #include "console.h"
+#include "FESolidSolver.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEMicroMaterial, "micro-material");
@@ -33,10 +34,10 @@ void FEMicroMaterial::Init()
 	}
 
 	// make sure the RVE problem doesn't output anything to a plot file
-//	m_rve.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
+	m_rve.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
 
 	// make sure we are using the same linear solver as the parent FEM
-	m_rve.m_nsolver = PARDISO_SOLVER;
+	m_rve.m_nsolver = SUPERLU_SOLVER;
 
 	// create the DC's for this RVE
 	PrepRVE();
@@ -67,10 +68,10 @@ void FEMicroMaterial::PrepRVE()
 				int nn = m.GetFace(el, j, fn);
 
 				// mark all nodes
-				tag[ el.m_node[ fn[0] ] ] = 1;
-				tag[ el.m_node[ fn[1] ] ] = 1;
-				tag[ el.m_node[ fn[2] ] ] = 1;
-				if (nn == 4) tag[ el.m_node[ fn[3] ] ] = 1;
+				tag[ fn[0] ] = 1;
+				tag[ fn[1] ] = 1;
+				tag[ fn[2] ] = 1;
+				if (nn == 4) tag[ fn[3] ] = 1;
 			}
 		}
 	}
@@ -107,6 +108,28 @@ void FEMicroMaterial::PrepRVE()
 	// initialize RVE
 	m_rve.Init();
 
+	// calculate intial RVE volume
+	m_V0 = 0;
+	double ve;
+	int nint, n;
+	double* w, J;
+	for (i=0; i<m.SolidElements(); ++i)
+	{
+		FESolidElement& el = m.SolidElement(i);
+		m.UnpackElement(el);
+		nint = el.GaussPoints();
+		w = el.GaussWeights();
+		ve = 0;
+		for (n=0; n<nint; ++n)
+		{
+			FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+			J = el.detJt(n);
+
+			ve += J*w[n];
+		}
+		m_V0 += ve;
+	}
+
 	// reset the logfile mode
 	log.SetMode(nmode);
 }
@@ -114,6 +137,10 @@ void FEMicroMaterial::PrepRVE()
 //-----------------------------------------------------------------------------
 mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 {
+	// get the deformation gradient
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	mat3d F = pt.F;
+
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
@@ -123,10 +150,6 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 
 	// reset the RVE
 	m_rve.Reset();
-
-	// get the deformation gradient
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	mat3d F = pt.F;
 
 	// get the mesh
 	FEMesh& m = m_rve.m_mesh;
@@ -162,15 +185,22 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	Console::GetHandle()->Activate();
 
 	// calculate the averaged stress
-	return AveragedStress();
+	return AveragedStress(pt);
 }
 
 //-----------------------------------------------------------------------------
 
-mat3ds FEMicroMaterial::AveragedStress()
+mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 {
-	mat3ds s(0);
+	// get the deformation gradient
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	mat3d F = pt.F;
+	double J = pt.J;
+
+	// get the mesh
 	FEMesh& m = m_rve.m_mesh;
+/*
+	mat3ds s(0);
 	double V = 0, ve;
 	int nint, n, i;
 	double* w, J;
@@ -191,12 +221,158 @@ mat3ds FEMicroMaterial::AveragedStress()
 		}
 		V += ve;
 	}
+	s /= V;
+*/
+	// get the reaction force vector from the solid solver
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(m_rve.m_pStep->m_psolver);
+	assert(ps);
+	vector<double>& R = ps->m_Fr;
+	mat3ds s(0);
+	for (int i=0; i<(int) m_rve.m_DC.size()/3; ++i)
+	{
+		FENodalDisplacement& dc = m_rve.m_DC[3*i];
+		FENode& n = m.Node(dc.node);
+		vec3d f;
+		f.x = R[-n.m_ID[0]-2];
+		f.y = R[-n.m_ID[1]-2];
+		f.z = R[-n.m_ID[2]-2];
+		s += (f & n.m_rt).sym();
+	}
+	s /= (J / m_V0);
 
-	return (s / V);
+	return s;
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &pt)
+tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 {
-	return dynamic_cast<FESolidMaterial*>(m_rve.GetMaterial(0))->Tangent(pt);
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// get the mesh
+	FEMesh& m = m_rve.m_mesh;
+
+	// get the solver
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(m_rve.m_pStep->m_psolver);
+
+	// the element's stiffness matrix
+	matrix ke;
+
+	// elasticity tensor
+	double D[6][6] = {0};
+
+	// calculate the stiffness matrix
+	int NS = m.SolidElements(), i, j;
+	for (int n=0; n<NS; ++n)
+	{
+		FESolidElement& e = m.SolidElement(n);
+		m.UnpackElement(e);
+
+		// create the element's stiffness matrix
+		int ne = e.Nodes();
+		int ndof = 3*ne;
+		ke.Create(ndof, ndof);
+		ke.zero();
+
+		// calculate the element's stiffness matrix
+		ps->ElementStiffness(e, ke);
+
+		// loop over the element's nodes
+		for (i=0; i<ne; ++i)
+		{
+			FENode& ni = m.Node(e.m_node[i]);
+			for (j=0; j<ne; ++j)
+			{
+				FENode& nj = m.Node(e.m_node[j]);
+				if ((ni.m_ID[0] < 0) && (nj.m_ID[0] < 0))
+				{
+					// both nodes are boundary nodes
+					// so grab the element's submatrix
+					double K[3][3];
+					K[0][0] = ke[3*i  ][3*j  ]; K[0][1] = ke[3*i  ][3*j+1]; K[0][2] = ke[3*i  ][3*j+2];
+					K[1][0] = ke[3*i+1][3*j  ]; K[1][1] = ke[3*i+1][3*j+1]; K[1][2] = ke[3*i+1][3*j+2];
+					K[2][0] = ke[3*i+2][3*j  ]; K[2][1] = ke[3*i+2][3*j+1]; K[2][2] = ke[3*i+2][3*j+2];
+
+					// get the nodal positions
+					vec3d ri = ni.m_rt;
+					vec3d rj = nj.m_rt;
+
+					double Ri[3] = { ri.x, ri.y, ri.z };
+					double Rj[3] = { rj.x, rj.y, rj.z };
+
+					// create the elasticity tensor
+					D[0][0] += Ri[0]*K[0][0]*Rj[0]; 
+					D[1][1] += Ri[1]*K[1][1]*Rj[1]; 
+					D[2][2] += Ri[2]*K[2][2]*Rj[2]; 
+
+					D[0][1] += Ri[0]*K[0][1]*Rj[1];
+					D[0][2] += Ri[0]*K[0][2]*Rj[2];
+					D[1][2] += Ri[1]*K[1][2]*Rj[2];
+
+					D[0][3] += 0.5*(Ri[0]*K[0][0]*Rj[1] + Ri[0]*K[0][1]*Rj[0]);
+					D[0][4] += 0.5*(Ri[0]*K[0][1]*Rj[2] + Ri[0]*K[0][2]*Rj[1]);
+					D[0][5] += 0.5*(Ri[0]*K[0][0]*Rj[2] + Ri[0]*K[0][2]*Rj[0]);
+
+					D[1][3] += 0.5*(Ri[1]*K[1][0]*Rj[1] + Ri[1]*K[1][1]*Rj[0]);
+					D[1][4] += 0.5*(Ri[1]*K[1][1]*Rj[2] + Ri[1]*K[1][2]*Rj[1]);
+					D[1][5] += 0.5*(Ri[1]*K[1][0]*Rj[2] + Ri[1]*K[1][2]*Rj[0]);
+
+					D[2][3] += 0.5*(Ri[2]*K[2][0]*Rj[1] + Ri[2]*K[2][1]*Rj[0]);
+					D[2][4] += 0.5*(Ri[2]*K[2][1]*Rj[2] + Ri[2]*K[2][2]*Rj[1]);
+					D[2][5] += 0.5*(Ri[2]*K[2][0]*Rj[2] + Ri[2]*K[2][2]*Rj[0]);
+
+					D[3][3] += 0.25*(Ri[0]*K[1][0]*Rj[1] + Ri[1]*K[0][0]*Rj[1] + Ri[0]*K[1][1]*Rj[0] + Ri[1]*K[0][1]*Rj[0]);
+					D[3][4] += 0.25*(Ri[0]*K[1][1]*Rj[2] + Ri[1]*K[0][1]*Rj[2] + Ri[0]*K[1][2]*Rj[1] + Ri[1]*K[0][2]*Rj[1]);
+					D[3][5] += 0.25*(Ri[0]*K[1][0]*Rj[2] + Ri[1]*K[0][0]*Rj[2] + Ri[0]*K[1][2]*Rj[0] + Ri[1]*K[0][2]*Rj[0]);
+
+					D[4][4] += 0.25*(Ri[1]*K[2][1]*Rj[2] + Ri[2]*K[1][1]*Rj[2] + Ri[1]*K[2][2]*Rj[1] + Ri[2]*K[1][2]*Rj[1]);
+					D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
+
+					D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
+/*
+					D[0][0] += Ri[0]*K[0][0]*Rj[0]; 
+					D[1][1] += Ri[1]*K[1][1]*Rj[1]; 
+					D[2][2] += Ri[2]*K[2][2]*Rj[2]; 
+
+					D[0][1] += Ri[0]*K[0][1]*Rj[1];
+					D[0][2] += Ri[0]*K[0][2]*Rj[2];
+					D[1][2] += Ri[1]*K[1][2]*Rj[2];
+
+					D[0][3] += Ri[0]*K[0][0]*Rj[1];
+					D[0][4] += Ri[0]*K[0][1]*Rj[2];
+					D[0][5] += Ri[0]*K[0][0]*Rj[2];
+
+					D[1][3] += Ri[1]*K[1][0]*Rj[1];
+					D[1][4] += Ri[1]*K[1][1]*Rj[2];
+					D[1][5] += Ri[1]*K[1][0]*Rj[2];
+
+					D[2][3] += Ri[2]*K[2][0]*Rj[1];
+					D[2][4] += Ri[2]*K[2][1]*Rj[2];
+					D[2][5] += Ri[2]*K[2][0]*Rj[2];
+
+					D[3][3] += Ri[0]*K[1][0]*Rj[1];
+					D[3][4] += Ri[0]*K[1][1]*Rj[2];
+					D[3][5] += Ri[0]*K[1][0]*Rj[2];
+
+					D[4][4] += Ri[1]*K[2][1]*Rj[2];
+					D[4][5] += Ri[1]*K[2][0]*Rj[2];
+
+					D[5][5] += Ri[0]*K[2][0]*Rj[2];
+*/
+				}
+			}
+		}
+	}
+
+	// divide by volume
+	double Vi = pt.J / m_V0;
+	D[0][0] *= Vi; D[0][1] *= Vi; D[0][2] *= Vi; D[0][3] *= Vi; D[0][4] *= Vi; D[0][5] *= Vi;
+	D[1][1] *= Vi; D[1][2] *= Vi; D[1][3] *= Vi; D[1][4] *= Vi; D[1][5] *= Vi;
+	D[2][2] *= Vi; D[2][3] *= Vi; D[2][4] *= Vi; D[2][5] *= Vi;
+	D[3][3] *= Vi; D[3][4] *= Vi; D[3][5] *= Vi;
+	D[4][4] *= Vi; D[4][5] *= Vi;
+	D[5][5] *= Vi;
+
+//	tens4ds cm = dynamic_cast<FEElasticMaterial*>(m_rve.GetMaterial(0))->Tangent(mp);
+
+	return tens4ds(D);
 }
