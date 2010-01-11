@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEMemoryDiagnostic.h"
 #include "log.h"
-#include "Console.h"
+#include "console.h"
 
 FEMemoryDiagnostic::FEMemoryDiagnostic(FEM& fem) : FEDiagnostic(fem)
 {
