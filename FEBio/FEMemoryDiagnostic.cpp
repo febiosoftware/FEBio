@@ -26,16 +26,15 @@ bool FEMemoryDiagnostic::Init()
 	// make sure the iters is a positive number
 	if (m_iters <= 0) return false;
 
-	// intialize
+	// turn off all output
+	m_fem.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
+	m_fem.m_pStep->SetPrintLevel(FE_PRINT_NEVER);
+
 	return true;
 }
 
 bool FEMemoryDiagnostic::Run()
 {
-	// turn off all output
-	m_fem.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
-	m_fem.m_pStep->SetPrintLevel(FE_PRINT_NEVER);
-
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.

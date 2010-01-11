@@ -532,7 +532,7 @@ bool FEM::Reset()
 	// Offcourse we should actually check if this is indeed
 	// the case, otherwise we should also solve for t=0
 	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot.Write(*this);
-
+/*
 	// reset the log file
 	if (!log.is_valid())
 	{
@@ -544,7 +544,7 @@ bool FEM::Reset()
 		// print welcome message to file
 		Hello(log);
 	}
-
+*/
 	// do the callback
 	DoCallback();
 

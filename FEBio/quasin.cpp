@@ -330,7 +330,9 @@ bool FESolidSolver::Quasin(double time)
 	do
 	{
 		oldmode = log.GetMode();
-		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) log.SetMode(Logfile::FILE_ONLY);
+		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) log.SetMode(Logfile::FILE_ONLY);
+
 		log.printf(" %d\n", m_niter+1);
 		log.SetMode(oldmode);
 
@@ -420,7 +422,9 @@ bool FESolidSolver::Quasin(double time)
 
 		// print convergence summary
 		oldmode = log.GetMode();
-		if (m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) log.SetMode(Logfile::FILE_ONLY);
+		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) log.SetMode(Logfile::FILE_ONLY);
+
 		log.printf(" Nonlinear solution status: time= %lg\n", time); 
 		log.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
 		log.printf("\tright hand side evaluations   = %d\n", m_nrhs);
