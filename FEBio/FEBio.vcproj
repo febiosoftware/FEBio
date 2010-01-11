@@ -502,6 +502,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEMemoryDiagnostic.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEMesh.cpp"
 				>
 			</File>
@@ -1009,6 +1013,10 @@
 			</File>
 			<File
 				RelativePath=".\FEMaterialPoint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEMemoryDiagnostic.h"
 				>
 			</File>
 			<File

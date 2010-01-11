@@ -8,6 +8,7 @@
 #include "FEContactDiagnostic.h"
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEPrintHBMatrixDiagnostic.h"
+#include "FEMemoryDiagnostic.h"
 #include "log.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -58,6 +59,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 		else if (strcmp(tag.m_szatv[0], "contact test"  ) == 0) m_pdia = new FEContactDiagnostic(fem);
 		else if (strcmp(tag.m_szatv[0], "print matrix"  ) == 0) m_pdia = new FEPrintMatrixDiagnostic(fem);
 		else if (strcmp(tag.m_szatv[0], "print hbmatrix") == 0) m_pdia = new FEPrintHBMatrixDiagnostic(fem);
+		else if (strcmp(tag.m_szatv[0], "memory test") == 0) m_pdia = new FEMemoryDiagnostic(fem);
 		else 
 		{
 			log.printf("\nERROR: unknown diagnostic\n\n");
