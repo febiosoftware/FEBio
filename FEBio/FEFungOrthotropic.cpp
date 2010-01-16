@@ -81,7 +81,7 @@ mat3ds FEFungOrthotropic::Stress(FEMaterialPoint& mp)
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
 		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
-		A[i] = dyads(a[i]);			// Evaluate the texture tensor in the current configuration
+		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 	
 	// Evaluate exp(Q)
@@ -136,7 +136,7 @@ tens4ds FEFungOrthotropic::Tangent(FEMaterialPoint& mp)
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
 		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
-		A[i] = dyads(a[i]);			// Evaluate the texture tensor in the current configuration
+		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 
 	// Evaluate exp(Q)

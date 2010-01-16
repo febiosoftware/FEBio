@@ -180,11 +180,6 @@ protected:
 
 inline mat3ds operator * (double a, const mat3ds& m) { return m*a; }
 
-inline mat3ds dyads(const vec3d& r)
-{
-	return mat3ds(r.x*r.x, r.y*r.y, r.z*r.z, r.x*r.y, r.y*r.z, r.x*r.z);
-}
-
 //-----------------------------------------------------------------------------
 //! This class describes an anti-symmetric 3D matrix of doubles
 // TODO: expand this class
