@@ -153,7 +153,7 @@ mat3ds FEMuscleMaterial::Stress(FEMaterialPoint& mp)
 		Fp = 0;
 	}
 	else if (lat < lam1)
-*/	if (lat < lam1)
+*/	if (lat < m_fib.m_lam1)
 	{
 		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
 	}
@@ -161,8 +161,8 @@ mat3ds FEMuscleMaterial::Stress(FEMaterialPoint& mp)
 	{
 		double P3, P4;
 
-		P3 = m_P1*m_P2*exp(m_P2*(lam1/m_Lofl - 1));
-		P4 = m_P1*(exp(m_P2*(lam1/m_Lofl - 1)) - 1) - P3*lam1/m_Lofl;
+		P3 = m_P1*m_P2*exp(m_P2*(m_fib.m_lam1/m_Lofl - 1));
+		P4 = m_P1*(exp(m_P2*(m_fib.m_lam1/m_Lofl - 1)) - 1) - P3*m_fib.m_lam1/m_Lofl;
 
 		Fp = P3*lat/m_Lofl + P4;
 	}
@@ -193,7 +193,7 @@ mat3ds FEMuscleMaterial::Stress(FEMaterialPoint& mp)
 	}
 
 	// activation level
-	double alpha = m_ascl*(m_plc ? m_plc->Value():1);
+	double alpha = m_fib.m_ascl*(m_fib.m_plc ? m_fib.m_plc->Value():1);
 
 	// calculate total fiber force
 	double FfDl = m_smax*(Fp + alpha*Fa)/m_Lofl;
@@ -389,7 +389,7 @@ tens4ds FEMuscleMaterial::Tangent(FEMaterialPoint& mp)
 		FpDl = 0;
 	}
 	else if (lat < lam1)
-*/	if (lat < lam1)
+*/	if (lat < m_fib.m_lam1)
 	{
 		Fp = m_P1*(exp(m_P2*(lat/m_Lofl - 1)) - 1);
 		FpDl = m_P1*m_P2*exp(m_P2*(lat/m_Lofl-1))/m_Lofl;
@@ -398,8 +398,8 @@ tens4ds FEMuscleMaterial::Tangent(FEMaterialPoint& mp)
 	{
 		double P3, P4;
 
-		P3 = m_P1*m_P2*exp(m_P2*(lam1/m_Lofl - 1));
-		P4 = m_P1*(exp(m_P2*(lam1/m_Lofl - 1)) - 1) - P3*lam1/m_Lofl;
+		P3 = m_P1*m_P2*exp(m_P2*(m_fib.m_lam1/m_Lofl - 1));
+		P4 = m_P1*(exp(m_P2*(m_fib.m_lam1/m_Lofl - 1)) - 1) - P3*m_fib.m_lam1/m_Lofl;
 
 		Fp = P3*lat/m_Lofl + P4;
 		FpDl = P3/m_Lofl;
@@ -436,7 +436,7 @@ tens4ds FEMuscleMaterial::Tangent(FEMaterialPoint& mp)
 
 
 	// activation level
-	double alpha = m_ascl*(m_plc ? m_plc->Value():1);
+	double alpha = m_fib.m_ascl*(m_fib.m_plc ? m_fib.m_plc->Value():1);
 
 	// calculate total fiber force
 	double FfDl = m_smax*(Fp + alpha*Fa)/m_Lofl;

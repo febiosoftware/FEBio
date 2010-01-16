@@ -113,14 +113,14 @@ mat3ds FE2DTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 		{
 			double lamdi = 1.0/lamd;
 			double Wl;
-			if (lamd < lam1)
+			if (lamd < m_fib.m_lam1)
 			{
-				Wl = lamdi*c3*(exp(c4*(lamd - 1)) - 1);
+				Wl = lamdi*m_fib.m_c3*(exp(m_fib.m_c4*(lamd - 1)) - 1);
 			}
 			else
 			{
-				double c6 = c3*(exp(c4*(lam1-1))-1) - c5*lam1;
-				Wl = lamdi*(c5*lamd + c6);
+				double c6 = m_fib.m_c3*(exp(m_fib.m_c4*(m_fib.m_lam1-1))-1) - m_fib.m_c5*m_fib.m_lam1;
+				Wl = lamdi*(m_fib.m_c5*lamd + c6);
 			}
 			W4  = 0.5*lamdi*Wl;
 		}
@@ -257,15 +257,15 @@ tens4ds FE2DTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 		{
 			double lamdi = 1.0/lamd;
 			double W4, W44;
-			if (lamd < lam1)
+			if (lamd < m_fib.m_lam1)
 			{
-				W4  = lamdi*c3*(exp(c4*(lamd - 1)) - 1);
-				W44 = c3*lamdi*(c4*exp(c4*(lamd - 1)) - lamdi*(exp(c4*(lamd-1))-1));
+				W4  = lamdi*m_fib.m_c3*(exp(m_fib.m_c4*(lamd - 1)) - 1);
+				W44 = m_fib.m_c3*lamdi*(m_fib.m_c4*exp(m_fib.m_c4*(lamd - 1)) - lamdi*(exp(m_fib.m_c4*(lamd-1))-1));
 			}
 			else
 			{
-				double c6 = c3*(exp(c4*(lam1-1))-1) - c5*lam1;
-				W4  = lamdi*(c5*lamd + c6);
+				double c6 = m_fib.m_c3*(exp(m_fib.m_c4*(m_fib.m_lam1-1))-1) - m_fib.m_c5*m_fib.m_lam1;
+				W4  = lamdi*(m_fib.m_c5*lamd + c6);
 				W44 = -c6*lamdi*lamdi;
 			}
 			Wl  = 0.5*lamdi*W4;

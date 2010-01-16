@@ -235,7 +235,7 @@ bool FEM::Init()
 		FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*> (pmat);
 		if (pm)
 		{
-			if (pm->lcna >= 0) pm->m_plc = GetLoadCurve(pm->lcna);
+			if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
 		}
 	}
 

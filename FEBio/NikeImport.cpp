@@ -294,12 +294,12 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 
 				pmat->c1 = mp[0][0];
 				pmat->c2 = mp[0][1];
-				pmat->c3 = mp[0][2];
-				pmat->c4 = mp[0][3];
-				pmat->c5 = mp[0][4];
+				pmat->m_fib.m_c3 = mp[0][2];
+				pmat->m_fib.m_c4 = mp[0][3];
+				pmat->m_fib.m_c5 = mp[0][4];
 
 				pmat->m_K  = mp[1][0];
-				pmat->lam1 = mp[1][1];
+				pmat->m_fib.m_lam1 = mp[1][1];
 
 				int naopt = (int) mp[3][0];
 
@@ -358,11 +358,11 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 				pmat->m_density = density;
 
 				// active contraction input
-				pmat->lcna = (int) mp[5][3] - 1;
-				pmat->ca0  = mp[5][4];
-				pmat->beta = mp[5][5];
-				pmat->refl = mp[5][6];
-				pmat->l0   = mp[5][7];
+				pmat->m_fib.m_lcna = (int) mp[5][3] - 1;
+				pmat->m_fib.m_ca0  = mp[5][4];
+				pmat->m_fib.m_beta = mp[5][5];
+				pmat->m_fib.m_refl = mp[5][6];
+				pmat->m_fib.m_l0   = mp[5][7];
 			}
 			break;
 

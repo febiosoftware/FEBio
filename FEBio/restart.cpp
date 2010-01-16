@@ -229,12 +229,12 @@ void FEM::SerializeMaterials(Archive& ar)
 			if (dynamic_cast<FETransverselyIsotropic*>(pmat))
 			{
 				FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
-				ar << pm->lcna;
-				ar << pm->m_ascl;
-				ar << pm->ca0;
-				ar << pm->beta;
-				ar << pm->l0;
-				ar << pm->refl;
+				ar << pm->m_fib.m_lcna;
+				ar << pm->m_fib.m_ascl;
+				ar << pm->m_fib.m_ca0;
+				ar << pm->m_fib.m_beta;
+				ar << pm->m_fib.m_l0;
+				ar << pm->m_fib.m_refl;
 			}
 
 			// TODO: do we really need to store this data?
@@ -297,14 +297,14 @@ void FEM::SerializeMaterials(Archive& ar)
 			if (dynamic_cast<FETransverselyIsotropic*>(pmat))
 			{
 				FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
-				ar >> pm->lcna;
-				ar >> pm->m_ascl;
-				ar >> pm->ca0;
-				ar >> pm->beta;
-				ar >> pm->l0;
-				ar >> pm->refl;
+				ar >> pm->m_fib.m_lcna;
+				ar >> pm->m_fib.m_ascl;
+				ar >> pm->m_fib.m_ca0;
+				ar >> pm->m_fib.m_beta;
+				ar >> pm->m_fib.m_l0;
+				ar >> pm->m_fib.m_refl;
 
-				if (pm->lcna >= 0) pm->m_plc = GetLoadCurve(pm->lcna);
+				if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
 			}
 
 			if (dynamic_cast<FERigid*>(pmat))

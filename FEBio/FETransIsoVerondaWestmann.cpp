@@ -107,14 +107,14 @@ mat3ds FETransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	{
 		double lamdi = 1.0/lamd;
 		double Wl;
-		if (lamd < lam1)
+		if (lamd < m_fib.m_lam1)
 		{
-			Wl = lamdi*c3*(exp(c4*(lamd - 1)) - 1);
+			Wl = lamdi*m_fib.m_c3*(exp(m_fib.m_c4*(lamd - 1)) - 1);
 		}
 		else
 		{
-			double c6 = c3*(exp(c4*(lam1-1))-1) - c5*lam1;
-			Wl = lamdi*(c5*lamd + c6);
+			double c6 = m_fib.m_c3*(exp(m_fib.m_c4*(m_fib.m_lam1-1))-1) - m_fib.m_c5*m_fib.m_lam1;
+			Wl = lamdi*(m_fib.m_c5*lamd + c6);
 		}
 		W4  = 0.5*lamdi*Wl;
 	}
@@ -153,19 +153,19 @@ mat3ds FETransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	s.xz() = twoJi*T[0][2];
 
 	// --- active contraction contribution ---
-	if (lcna >= 0)
+	if (m_fib.m_lcna >= 0)
 	{
-		double ctenslm = m_plc->Value();
+		double ctenslm = m_fib.m_plc->Value();
 
 		// current sarcomere length
-		double strl = refl*lamd;
+		double strl = m_fib.m_refl*lamd;
 
 		// sarcomere length change
-		double dl = strl - l0;
+		double dl = strl - m_fib.m_l0;
 
 		if (dl >= 0)
 		{
-			double eca50i = (exp(beta*dl) - 1);
+			double eca50i = (exp(m_fib.m_beta*dl) - 1);
 
 			// active fiber stress
 			double saf = ctenslm*eca50i / ( eca50i + 1 );
@@ -304,15 +304,15 @@ tens4ds FETransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 	{
 		double lamdi = 1.0/lamd;
 		double Wl, Wll;
-		if (lamd < lam1)
+		if (lamd < m_fib.m_lam1)
 		{
-			Wl  = lamdi*c3*(exp(c4*(lamd - 1)) - 1);
-			Wll = c3*lamdi*(c4*exp(c4*(lamd - 1)) - lamdi*(exp(c4*(lamd-1))-1));
+			Wl  = lamdi*m_fib.m_c3*(exp(m_fib.m_c4*(lamd - 1)) - 1);
+			Wll = m_fib.m_c3*lamdi*(m_fib.m_c4*exp(m_fib.m_c4*(lamd - 1)) - lamdi*(exp(m_fib.m_c4*(lamd-1))-1));
 		}
 		else
 		{
-			double c6 = c3*(exp(c4*(lam1-1))-1) - c5*lam1;
-			Wl  = lamdi*(c5*lamd + c6);
+			double c6 = m_fib.m_c3*(exp(m_fib.m_c4*(m_fib.m_lam1-1))-1) - m_fib.m_c5*m_fib.m_lam1;
+			Wl  = lamdi*(m_fib.m_c5*lamd + c6);
 			Wll = -c6*lamdi*lamdi;
 		}
 		W4  = 0.5*lamdi*Wl;

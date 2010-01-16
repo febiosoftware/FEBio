@@ -29,8 +29,6 @@ mat3ds FEMooneyRivlin::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	const double third = 1.0/3.0;
-
 	// deformation gradient and its determinant
 	mat3d &F = pt.F;
 	double J = pt.J;

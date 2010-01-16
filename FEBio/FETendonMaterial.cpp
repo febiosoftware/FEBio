@@ -144,7 +144,7 @@ mat3ds FETendonMaterial::Stress(FEMaterialPoint& mp)
 	{
 		Fp = 0;
 	}
-	else if (lat < lam1)
+	else if (lat < m_fib.m_lam1)
 	{
 		Fp = m_L1*(exp(m_L2*(lat - 1)) - 1);
 	}
@@ -152,8 +152,8 @@ mat3ds FETendonMaterial::Stress(FEMaterialPoint& mp)
 	{
 		double L3, L4;
 
-		L3 = m_L1*m_L2*exp(m_L2*(lam1 - 1));
-		L4 = m_L1*(exp(m_L2*(lam1 - 1)) - 1) - L3*lam1;
+		L3 = m_L1*m_L2*exp(m_L2*(m_fib.m_lam1 - 1));
+		L4 = m_L1*(exp(m_L2*(m_fib.m_lam1 - 1)) - 1) - L3*m_fib.m_lam1;
 
 		Fp = L3*lat + L4;
 	}
@@ -345,7 +345,7 @@ tens4ds FETendonMaterial::Tangent(FEMaterialPoint& mp)
 		Fp = 0;
 		FpDl = 0;
 	}
-	else if (lat < lam1)
+	else if (lat < m_fib.m_lam1)
 	{
 		Fp = m_L1*(exp(m_L2*(lat - 1)) - 1);
 		FpDl = m_L1*m_L2*exp(m_L2*(lat - 1));
@@ -354,8 +354,8 @@ tens4ds FETendonMaterial::Tangent(FEMaterialPoint& mp)
 	{
 		double L3, L4;
 
-		L3 = m_L1*m_L2*exp(m_L2*(lam1 - 1));
-		L4 = m_L1*(exp(m_L2*(lam1 - 1)) - 1) - L3*lam1;
+		L3 = m_L1*m_L2*exp(m_L2*(m_fib.m_lam1 - 1));
+		L4 = m_L1*(exp(m_L2*(m_fib.m_lam1 - 1)) - 1) - L3*m_fib.m_lam1;
 
 		Fp = L3*lat + L4;
 		FpDl = L3;

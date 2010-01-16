@@ -446,6 +446,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEFiberMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEFiberNeoHookean.cpp"
 				>
 			</File>

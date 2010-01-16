@@ -187,6 +187,48 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// Base class for fiber materials.
+//
+class FEFiberMaterial : public FEMaterial
+{
+public:
+	FEFiberMaterial()
+	{
+		m_plc = 0;
+		m_lcna = -1;
+		m_ascl = 0;
+
+		m_c3 = m_c4 = m_c5 = 0;
+		m_lam1 = 1;
+	}
+
+	//! Calculate the fiber stress
+	mat3ds Stress(FEMaterialPoint& mp);
+
+	//! Calculate the fiber tangent
+	tens4ds Tangent(FEMaterialPoint& mp);
+
+public:
+	double	m_c3;		//!< Exponential stress coefficient
+	double	m_c4;		//!< Fiber uncrimping coefficient
+	double	m_c5;		//!< Modulus of straightened fibers
+
+	double	m_lam1;		//!< fiber stretch for straightened fibers
+
+	//--- time varying elastance active contraction data ---
+	int		m_lcna;		//!< use active contraction or not
+	double	m_ascl;		//!< activation scale factor
+	double	m_ca0;		//!< intracellular calcium concentration
+	double	m_beta;		//!< shape of peak isometric tension-sarcomere length relation
+	double	m_l0;		//!< unloaded length
+	double	m_refl;		//!< sarcomere length
+
+	// we need load curve data for active contraction
+	FELoadCurve* m_plc;	//!< pointer to current load curve values
+};
+
+
+//-----------------------------------------------------------------------------
 //! Base class for transversely isotropic materials.
 
 //! This class was created to simplify the implementation of the TransIso Mooney-
@@ -202,33 +244,10 @@ class FETransverselyIsotropic : public FEIncompressibleMaterial
 {
 public:
 	//! constructor
-	FETransverselyIsotropic()
-	{ 
-		m_plc = 0;
-		lcna = -1;
-		m_ascl = 0;
-
-		c3 = c4 = c5 = 0;
-		lam1 = 1;
-	}
+	FETransverselyIsotropic() {}
 
 public:
-	double	c3;	//!< Exponential stress coefficient
-	double	c4;	//!< Fiber uncrimping coefficient
-	double	c5;	//!< Modulus of straightened fibers
-
-	double	lam1;	//!< fiber stretch for straightened fibers
-
-	//--- time varying elastance active contraction data ---
-	int		lcna;	//!< use active contraction or not
-	double	m_ascl; //!< activation scale factor
-	double	ca0;	//!< intracellular calcium concentration
-	double	beta;	//!< shape of peak isometric tension-sarcomere length relation
-	double	l0;		//!< unloaded length
-	double	refl;	//!< sarcomere length
-
-	// we need load curve data for active contraction
-	FELoadCurve* m_plc;	//!< pointer to current load curve values
+	FEFiberMaterial	m_fib;
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
