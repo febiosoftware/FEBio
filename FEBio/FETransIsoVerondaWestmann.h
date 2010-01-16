@@ -23,8 +23,8 @@ public:
 	FETransIsoVerondaWestmann () {}
 
 public:
-	double	c1;	//!< Veronda-Westmann coefficient C1
-	double	c2;	//!< Veronda-Westmann coefficient C2
+	double	m_c1;	//!< Veronda-Westmann coefficient C1
+	double	m_c2;	//!< Veronda-Westmann coefficient C2
 
 public:
 	//! calculate stress at material point
