@@ -8,6 +8,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "log.h"
+#include "LSDYNAPlotFile.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
@@ -71,6 +72,8 @@ FEM::FEM()
 
 	m_sztitle[0] = 0;
 	m_debug = false;
+
+	m_plot = new LSDYNAPlotFile;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -250,7 +250,7 @@ void FETangentDiagnostic::solve()
 
 	double d = residual(beta);
 
-	if (fem.m_pStep->m_nplot != FE_PLOT_NEVER) fem.m_plot.Write(fem);
+	if (fem.m_pStep->m_nplot != FE_PLOT_NEVER) fem.m_plot->Write(fem);
 }
 
 bool FETangentDiagnostic::ParseSection(XMLTag& tag)

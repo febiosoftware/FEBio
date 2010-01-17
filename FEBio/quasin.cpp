@@ -45,7 +45,7 @@ bool FESolidSolver::SolveStep(double time)
 	{
 		// A negative jacobian was detected
 		log.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
-		if (m_fem.m_debug) m_fem.m_plot.Write(m_fem);
+		if (m_fem.m_debug) m_fem.m_plot->Write(m_fem);
 		return false;
 	}
 	catch (MaxStiffnessReformations)

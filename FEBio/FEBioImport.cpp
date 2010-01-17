@@ -14,6 +14,7 @@
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
 #include "log.h"
+#include "LSDYNAPlotFile.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2327,52 +2328,54 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 		}
 		else if (tag == "plotfile")
 		{
+			LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(fem.m_plot);
+
 			++tag;
 			do
 			{
-				if (tag == "shell_strain") tag.value(fem.m_plot.m_bsstrn);
+				if (tag == "shell_strain") tag.value(plt.m_bsstrn);
 				else if (tag == "map")
 				{
 					const char* szfield = tag.AttributeValue("field");
 					const char* szval = tag.szvalue();
 					if (strcmp(szfield, "displacement") == 0)
 					{
-						if (strcmp(szval, "DISPLACEMENT") == 0) fem.m_plot.m_nfield[0] = PlotFile::PLOT_DISPLACEMENT;
+						if (strcmp(szval, "DISPLACEMENT") == 0) plt.m_nfield[0] = PLOT_DISPLACEMENT;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else if (strcmp(szfield, "velocity") == 0)
 					{
-						if (strcmp(szval, "NONE") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_NONE;
-						else if (strcmp(szval, "VELOCITY") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_VELOCITY;
-						else if (strcmp(szval, "FLUID_FLUX") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_FLUID_FLUX;
-						else if (strcmp(szval, "CONTACT_TRACTION") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_CONTACT_TRACTION;
-						else if (strcmp(szval, "REACTION_FORCE") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_REACTION_FORCE;
-						else if (strcmp(szval, "MATERIAL_FIBER") == 0) fem.m_plot.m_nfield[1] = PlotFile::PLOT_MATERIAL_FIBER;
+						if (strcmp(szval, "NONE") == 0) plt.m_nfield[1] = PLOT_NONE;
+						else if (strcmp(szval, "VELOCITY") == 0) plt.m_nfield[1] = PLOT_VELOCITY;
+						else if (strcmp(szval, "FLUID_FLUX") == 0) plt.m_nfield[1] = PLOT_FLUID_FLUX;
+						else if (strcmp(szval, "CONTACT_TRACTION") == 0) plt.m_nfield[1] = PLOT_CONTACT_TRACTION;
+						else if (strcmp(szval, "REACTION_FORCE") == 0) plt.m_nfield[1] = PLOT_REACTION_FORCE;
+						else if (strcmp(szval, "MATERIAL_FIBER") == 0) plt.m_nfield[1] = PLOT_MATERIAL_FIBER;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else if (strcmp(szfield, "acceleration") == 0)
 					{
-						if (strcmp(szval, "NONE") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_NONE;
-						else if (strcmp(szval, "ACCELERATION") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_ACCELERATION;
-						else if (strcmp(szval, "FLUID_FLUX") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_FLUID_FLUX;
-						else if (strcmp(szval, "CONTACT_TRACTION") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_CONTACT_TRACTION;
-						else if (strcmp(szval, "REACTION_FORCE") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_REACTION_FORCE;
-						else if (strcmp(szval, "MATERIAL_FIBER") == 0) fem.m_plot.m_nfield[2] = PlotFile::PLOT_MATERIAL_FIBER;
+						if (strcmp(szval, "NONE") == 0) plt.m_nfield[2] = PLOT_NONE;
+						else if (strcmp(szval, "ACCELERATION") == 0) plt.m_nfield[2] = PLOT_ACCELERATION;
+						else if (strcmp(szval, "FLUID_FLUX") == 0) plt.m_nfield[2] = PLOT_FLUID_FLUX;
+						else if (strcmp(szval, "CONTACT_TRACTION") == 0) plt.m_nfield[2] = PLOT_CONTACT_TRACTION;
+						else if (strcmp(szval, "REACTION_FORCE") == 0) plt.m_nfield[2] = PLOT_REACTION_FORCE;
+						else if (strcmp(szval, "MATERIAL_FIBER") == 0) plt.m_nfield[2] = PLOT_MATERIAL_FIBER;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else if (strcmp(szfield, "temperature") == 0)
 					{
-						if (strcmp(szval, "NONE") == 0) fem.m_plot.m_nfield[3] = PlotFile::PLOT_NONE;
-						else if (strcmp(szval, "FLUID_PRESSURE") == 0) fem.m_plot.m_nfield[3] = PlotFile::PLOT_FLUID_PRESSURE;
-						else if (strcmp(szval, "CONTACT_PRESSURE") == 0) fem.m_plot.m_nfield[3] = PlotFile::PLOT_CONTACT_PRESSURE;
-						else if (strcmp(szval, "CONTACT_GAP") == 0) fem.m_plot.m_nfield[3] = PlotFile::PLOT_CONTACT_GAP;
+						if (strcmp(szval, "NONE") == 0) plt.m_nfield[3] = PLOT_NONE;
+						else if (strcmp(szval, "FLUID_PRESSURE") == 0) plt.m_nfield[3] = PLOT_FLUID_PRESSURE;
+						else if (strcmp(szval, "CONTACT_PRESSURE") == 0) plt.m_nfield[3] = PLOT_CONTACT_PRESSURE;
+						else if (strcmp(szval, "CONTACT_GAP") == 0) plt.m_nfield[3] = PLOT_CONTACT_GAP;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else if (strcmp(szfield, "plastic strain") == 0)
 					{
-						if      (strcmp(szval, "PLASTIC_STRAIN"  ) == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_PLASTIC_STRAIN;
-						else if (strcmp(szval, "FIBER_STRAIN"    ) == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_FIBER_STRAIN;
-						else if (strcmp(szval, "DEV_FIBER_STRAIN") == 0) fem.m_plot.m_nfield[4] = PlotFile::PLOT_DEV_FIBER_STRAIN;
+						if      (strcmp(szval, "PLASTIC_STRAIN"  ) == 0) plt.m_nfield[4] = PLOT_PLASTIC_STRAIN;
+						else if (strcmp(szval, "FIBER_STRAIN"    ) == 0) plt.m_nfield[4] = PLOT_FIBER_STRAIN;
+						else if (strcmp(szval, "DEV_FIBER_STRAIN") == 0) plt.m_nfield[4] = PLOT_DEV_FIBER_STRAIN;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "field", szfield);

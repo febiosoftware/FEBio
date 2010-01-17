@@ -127,7 +127,7 @@ int FEBioCmd_Fail::run(int nargs, char **argv)
 int FEBioCmd_Plot::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	m_pfem->m_plot.Write(*m_pfem);
+	m_pfem->m_plot->Write(*m_pfem);
 	return 1;
 }
 

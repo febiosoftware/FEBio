@@ -460,9 +460,9 @@ bool FEAnalysis::Solve()
 				if ((m_nplot == FE_PLOT_MUST_POINTS) && (m_nmplc >= 0))
 				{
 					FELoadCurve& lc = m_fem.m_LC[m_nmplc];
-					if (lc.HasPoint(m_fem.m_ftime)) m_fem.m_plot.Write(m_fem);
+					if (lc.HasPoint(m_fem.m_ftime)) m_fem.m_plot->Write(m_fem);
 				}
-				else m_fem.m_plot.Write(m_fem);
+				else m_fem.m_plot->Write(m_fem);
 			}
 
 			// Dump converged state to the archive

@@ -508,7 +508,7 @@ public:
  
 	// --- I/O-Data --- 
 	//{
-		PlotFile	m_plot;		//!< the plot file
+		PlotFile*	m_plot;		//!< the plot file
 		DataStore	m_Data;		//!< the data store used for data logging
 
 protected:

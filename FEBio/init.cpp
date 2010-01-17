@@ -266,7 +266,7 @@ bool FEM::Init()
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
-		if (m_plot.Open(*this, m_szplot) == false)
+		if (m_plot->Open(*this, m_szplot) == false)
 		{
 			log.printf("ERROR : Failed creating PLOT database\n");
 			return false;
@@ -278,7 +278,7 @@ bool FEM::Init()
 	// Therefor we can output those results here.
 	// Offcourse we should actually check if this is indeed
 	// the case, otherwise we should also solve for t=0
-	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot.Write(*this);
+	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot->Write(*this);
 
 	// do the callback
 	DoCallback();
@@ -519,7 +519,7 @@ bool FEM::Reset()
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
-		if (m_plot.Open(*this, m_szplot) == false)
+		if (m_plot->Open(*this, m_szplot) == false)
 		{
 			log.printf("ERROR : Failed creating PLOT database\n");
 			return false;
@@ -531,7 +531,7 @@ bool FEM::Reset()
 	// Therefor we can output those results here.
 	// Offcourse we should actually check if this is indeed
 	// the case, otherwise we should also solve for t=0
-	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot.Write(*this);
+	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot->Write(*this);
 /*
 	// reset the log file
 	if (!log.is_valid())

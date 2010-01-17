@@ -40,7 +40,7 @@ bool FEM::Restart(const char* szfile)
 	// Open the plot file for appending
 	if (m_szplot)
 	{
-		if (m_plot.Append(*this, m_szplot) == false)
+		if (m_plot->Append(*this, m_szplot) == false)
 		{
 			printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
 			return false;
@@ -675,8 +675,8 @@ void FEM::SerializeIOData(Archive &ar)
 		ar << m_sztitle;
 
 		// plot file
-		int* n = m_plot.m_nfield;
-		ar << n[0] << n[1] << n[2] << n[3] << n[4];
+//		int* n = m_plot.m_nfield;
+//		ar << n[0] << n[1] << n[2] << n[3] << n[4];
 	}
 	else
 	{
@@ -689,7 +689,7 @@ void FEM::SerializeIOData(Archive &ar)
 		SetInputFilename(m_szfile);
 
 		// plot file
-		int* n = m_plot.m_nfield;
-		ar >> n[0] >> n[1] >> n[2] >> n[3] >> n[4];
+//		int* n = m_plot.m_nfield;
+//		ar >> n[0] >> n[1] >> n[2] >> n[3] >> n[4];
 	}
 }

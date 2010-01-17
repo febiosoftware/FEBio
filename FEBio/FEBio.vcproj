@@ -394,6 +394,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBioPlotFile.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBoundaryCondition.cpp"
 				>
 			</File>
@@ -742,6 +746,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LSDYNAPlotFile.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mat3d.cpp"
 				>
 			</File>
@@ -909,6 +917,10 @@
 			</File>
 			<File
 				RelativePath=".\FEBioImport.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBioPlotFile.h"
 				>
 			</File>
 			<File
@@ -1225,6 +1237,10 @@
 			</File>
 			<File
 				RelativePath=".\Logfile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LSDYNAPlotFile.h"
 				>
 			</File>
 			<File
