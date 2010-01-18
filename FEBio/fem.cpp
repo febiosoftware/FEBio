@@ -73,7 +73,7 @@ FEM::FEM()
 	m_sztitle[0] = 0;
 	m_debug = false;
 
-	m_plot = new LSDYNAPlotFile;
+	m_plot = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

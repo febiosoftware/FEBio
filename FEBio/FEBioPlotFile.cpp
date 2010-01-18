@@ -119,6 +119,7 @@ FEBioPlotFile::FEBioPlotFile(void)
 {
 	// set the default export data
 	m_dic.AddNodalVariable(VEC3F, "Displacement");
+	m_dic.AddSolidVariable(MAT3FS, "Stress");
 }
 
 FEBioPlotFile::~FEBioPlotFile(void)
@@ -132,11 +133,12 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	FEMesh& m = fem.m_mesh;
 
 	// setup the header
-	m_hdr.nversion = 0;
+	m_hdr.nsize = sizeof(HEADER);
 	m_hdr.nnodes = m.Nodes();
 	m_hdr.n3d    = m.SolidElements();
 	m_hdr.n2d    = m.ShellElements();
 	m_hdr.n1d    = fem.m_DE.size();
+	m_hdr.nmat   = fem.Materials();
 
 	m_hdr.nglv = m_dic.m_Glob.size();
 	m_hdr.nnv  = m_dic.m_Node.size();
@@ -146,6 +148,10 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 
 	// open the archive
 	if (m_ar.Create(szfile) == false) return false;
+
+	// write the tag
+	unsigned int tag = FEBIO_TAG;
+	m_ar << tag;
 
 	// --- save the header file ---
 	m_ar.write(&m_hdr, sizeof(HEADER), 1);
@@ -185,34 +191,35 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 
 		el.m_nID = nid++;
 
+		// store material number
+		n[0] = el.GetMatID()+1;
+
 		N = el.Nodes();
 		switch (el.Type())
 		{
 		case FE_HEX:
 		case FE_RIHEX:
 		case FE_UDGHEX:
-			for (j=0; j<N; ++j) n[j] = el.m_node[j]+1;
+			for (j=0; j<N; ++j) n[j+1] = el.m_node[j]+1;
 			break;
 		case FE_PENTA:
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[1]+1;
-			n[2] = el.m_node[2]+1;
+			n[1] = el.m_node[0]+1;
+			n[2] = el.m_node[1]+1;
 			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[3]+1;
-			n[5] = el.m_node[4]+1;
-			n[6] = el.m_node[5]+1;
+			n[4] = el.m_node[2]+1;
+			n[5] = el.m_node[3]+1;
+			n[6] = el.m_node[4]+1;
 			n[7] = el.m_node[5]+1;
+			n[8] = el.m_node[5]+1;
 			break;
 		case FE_TET:
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[1]+1;
-			n[2] = el.m_node[2]+1;
+			n[1] = el.m_node[0]+1;
+			n[2] = el.m_node[1]+1;
 			n[3] = el.m_node[2]+1;
-			n[4] = n[5] = n[6] = n[7] = el.m_node[3]+1;
+			n[4] = el.m_node[2]+1;
+			n[5] = n[6] = n[7] = n[8] = el.m_node[3]+1;
 			break;
 		}
-
-		n[8] = el.GetMatID()+1;
 
 		m_ar.write(n, sizeof(int), 9);
 	}
@@ -224,24 +231,25 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 
 		el.m_nID = nid++;
 
+		// save material ID
+		n[0] = el.GetMatID()+1;
+
 		N = el.Nodes();
 		switch (el.Type())
 		{
 		case FE_SHELL_QUAD:
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[1]+1;
-			n[2] = el.m_node[2]+1;
-			n[3] = el.m_node[3]+1;
+			n[1] = el.m_node[0]+1;
+			n[2] = el.m_node[1]+1;
+			n[3] = el.m_node[2]+1;
+			n[4] = el.m_node[3]+1;
 			break;
 		case FE_SHELL_TRI:
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[1]+1;
-			n[2] = el.m_node[2]+1;
+			n[1] = el.m_node[0]+1;
+			n[2] = el.m_node[1]+1;
 			n[3] = el.m_node[2]+1;
+			n[4] = el.m_node[2]+1;
 			break;
 		}
-
-		n[4] = el.GetMatID()+1;
 
 		m_ar.write(n, sizeof(int), 5);
 	}
@@ -251,17 +259,14 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	{
 		FETrussElement& el = m.TrussElement(i);
 		el.m_nID = nid++;
-		n[0] = el.m_node[0]+1;
-		n[1] = el.m_node[1]+1;
-		n[2] = 0;
-		n[3] = 0;
-		n[4] = 0;
-		n[5] = el.GetMatID()+1;
+		n[0] = el.GetMatID()+1;
+		n[1] = el.m_node[0]+1;
+		n[2] = el.m_node[1]+1;
 
-		m_ar.write(n, sizeof(int), 6);
+		m_ar.write(n, sizeof(int), 3);
 	}
 
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -300,6 +305,7 @@ bool FEBioPlotFile::Write(FEM &fem)
 	// save the solid variables
 	if (m_dic.m_Elem.size() > 0)
 	{
+		write_stresses();
 	}
 
 	// save the shell variables
@@ -312,5 +318,49 @@ bool FEBioPlotFile::Write(FEM &fem)
 	{
 	}
 
-	return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::write_stresses()
+{
+	int i, j;
+
+	FEMesh& mesh = m_pfem->m_mesh;
+
+	// write solid element data
+	float s[6] = {0};
+	double f;
+	int nint;
+	for (i=0; i<mesh.SolidElements(); ++i)
+	{
+		FESolidElement& el = mesh.SolidElement(i);
+
+		for (j=0; j<6; ++j) s[j] = 0;
+
+		nint = el.GaussPoints();
+
+		f = 1.0 / (double) nint;
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (j=0; j<nint; ++j)
+		{
+			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
+
+			if (ppt)
+			{
+				FEElasticMaterialPoint& pt = *ppt;
+				s[0] += (float) (f*pt.s.xx());
+				s[1] += (float) (f*pt.s.yy());
+				s[2] += (float) (f*pt.s.zz());
+				s[3] += (float) (f*pt.s.xy());
+				s[4] += (float) (f*pt.s.yz());
+				s[5] += (float) (f*pt.s.xz());
+			}
+		}
+
+		m_ar.write(s, sizeof(float), 6);
+	}
 }

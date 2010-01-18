@@ -9,6 +9,7 @@
 #include "FERigid.h"
 #include "log.h"
 #include "FESolidSolver.h"
+#include "LSDYNAPlotFile.h"
 
 // Forward declarations
 void Hello(FILE* fp);
@@ -266,6 +267,8 @@ bool FEM::Init()
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
+		if (m_plot == 0) m_plot = new LSDYNAPlotFile;
+
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
 			log.printf("ERROR : Failed creating PLOT database\n");
@@ -519,6 +522,8 @@ bool FEM::Reset()
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
+		if (m_plot == 0) m_plot = new LSDYNAPlotFile;
+
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
 			log.printf("ERROR : Failed creating PLOT database\n");

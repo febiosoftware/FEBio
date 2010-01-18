@@ -6,13 +6,16 @@ using namespace std;
 class FEBioPlotFile : public PlotFile
 {
 protected:
+	// FEBio ID tag
+	enum { FEBIO_TAG = 706966 };
+
 	// variable types
 	enum Var_Type { SCALAR, VEC3F, MAT3FS };
 
 	// HEADER structure
 	struct HEADER
 	{
-		int		nversion;		// version of the plotfile
+		int		nsize;			// sizeof(HEADER)
 		int		nnodes;			// number of nodes
 		int		n3d;			// number of solid elements
 		int		n2d;			// number of shell elements
@@ -22,6 +25,9 @@ protected:
 		int		nv3d;			// number of variables for solid elements
 		int		nv2d;			// number of variables for shell elements
 		int		nv1d;			// number of variables for beam elements
+		int		nmat;			// number of parts
+		
+		int		nreserved[53];	// reverved for future use
 	};
 
 	// size of name variables
@@ -68,6 +74,9 @@ public:
 
 	//! Write current FE state to plot database
 	bool Write(FEM& fem);
+
+protected:
+	void write_stresses();
 
 protected:
 	HEADER		m_hdr;	// plot file header

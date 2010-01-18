@@ -141,44 +141,47 @@ void FEM::EchoInput()
 	case FE_PLOT_MUST_POINTS: log.printf("\tplot level ................................ : must points only\n"); break;
 	}
 
-	LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(m_plot);
-	log.printf("\tshell strains included .................... : %s\n", (plt.m_bsstrn? "Yes" : "No"));
+	if (dynamic_cast<LSDYNAPlotFile*>(m_plot))
+	{
+		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(m_plot);
+		log.printf("\tshell strains included .................... : %s\n", (plt.m_bsstrn? "Yes" : "No"));
 
-	log.printf("\tplot file field data:\n");
-	log.printf("\t\tdisplacement ...................... : ");
-	switch (plt.m_nfield[0])
-	{
-	case PLOT_DISPLACEMENT: log.printf("displacement\n"); break;
-	default: log.printf("???\n");
-	}
-	log.printf("\t\tvelocity .......................... : ");
-	switch (plt.m_nfield[1])
-	{
-	case PLOT_NONE            : log.printf("none\n"); break;
-	case PLOT_VELOCITY        : log.printf("velocity\n"); break;
-	case PLOT_FLUID_FLUX      : log.printf("fluid flux\n"); break;
-	case PLOT_CONTACT_TRACTION: log.printf("contact traction\n"); break;
-	case PLOT_REACTION_FORCE  : log.printf("reaction force\n"); break;
-	default: log.printf("???\n");
-	}
-	log.printf("\t\tacceleration ...................... : ");
-	switch (plt.m_nfield[2])
-	{
-	case PLOT_NONE            : log.printf("none\n"); break;
-	case PLOT_ACCELERATION    : log.printf("acceleration\n"); break;
-	case PLOT_FLUID_FLUX      : log.printf("fluid flux\n"); break;
-	case PLOT_CONTACT_TRACTION: log.printf("contact traction\n"); break;
-	case PLOT_REACTION_FORCE  : log.printf("reaction force\n"); break;
-	default: log.printf("???\n");
-	}
-	log.printf("\t\ttemperature........................ : ");
-	switch (plt.m_nfield[3])
-	{
-	case PLOT_NONE            : log.printf("none\n"); break;
-	case PLOT_FLUID_PRESSURE  : log.printf("fluid pressure\n"); break;
-	case PLOT_CONTACT_PRESSURE: log.printf("contact pressure\n"); break;
-	case PLOT_CONTACT_GAP     : log.printf("contact gap\n"); break;
-	default: log.printf("???\n");
+		log.printf("\tplot file field data:\n");
+		log.printf("\t\tdisplacement ...................... : ");
+		switch (plt.m_nfield[0])
+		{
+		case PLOT_DISPLACEMENT: log.printf("displacement\n"); break;
+		default: log.printf("???\n");
+		}
+		log.printf("\t\tvelocity .......................... : ");
+		switch (plt.m_nfield[1])
+		{
+		case PLOT_NONE            : log.printf("none\n"); break;
+		case PLOT_VELOCITY        : log.printf("velocity\n"); break;
+		case PLOT_FLUID_FLUX      : log.printf("fluid flux\n"); break;
+		case PLOT_CONTACT_TRACTION: log.printf("contact traction\n"); break;
+		case PLOT_REACTION_FORCE  : log.printf("reaction force\n"); break;
+		default: log.printf("???\n");
+		}
+		log.printf("\t\tacceleration ...................... : ");
+		switch (plt.m_nfield[2])
+		{
+		case PLOT_NONE            : log.printf("none\n"); break;
+		case PLOT_ACCELERATION    : log.printf("acceleration\n"); break;
+		case PLOT_FLUID_FLUX      : log.printf("fluid flux\n"); break;
+		case PLOT_CONTACT_TRACTION: log.printf("contact traction\n"); break;
+		case PLOT_REACTION_FORCE  : log.printf("reaction force\n"); break;
+		default: log.printf("???\n");
+		}
+		log.printf("\t\ttemperature........................ : ");
+		switch (plt.m_nfield[3])
+		{
+		case PLOT_NONE            : log.printf("none\n"); break;
+		case PLOT_FLUID_PRESSURE  : log.printf("fluid pressure\n"); break;
+		case PLOT_CONTACT_PRESSURE: log.printf("contact pressure\n"); break;
+		case PLOT_CONTACT_GAP     : log.printf("contact gap\n"); break;
+		default: log.printf("???\n");
+		}
 	}
 
 	log.printf("\n\n");
