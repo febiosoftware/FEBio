@@ -8,7 +8,7 @@
 PLAT = lnx
 
 #  The c++ compiler, e.g. g++ for the gnu compiler
-CC = icpc
+CC = g++
 
 #  For Mac add: -DMAC, For Windows replace with: -DWIN32
 DEF = -DLINUX
