@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "LSDYNAPlotFile.h"
 #include "fem.h"
 #include "FESolidSolver.h"
