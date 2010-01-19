@@ -4,50 +4,55 @@
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddGlobalVariable(unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddGlobalVariable(FESaveData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
+	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Glob.push_back(it);
 }
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddNodalVariable(unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddNodalVariable(FESaveData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
+	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Node.push_back(it);
 }
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddSolidVariable(unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddSolidVariable(FESaveData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
+	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Elem.push_back(it);
 }
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddShellVariable(unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddShellVariable(FESaveData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
+	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Shell.push_back(it);
 }
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddBeamVariable(unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddBeamVariable(FESaveData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
+	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Beam.push_back(it);
 }
@@ -118,12 +123,27 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 FEBioPlotFile::FEBioPlotFile(void)
 {
 	// set the default export data
-	m_dic.AddNodalVariable(VEC3F, "Displacement");
-	m_dic.AddSolidVariable(MAT3FS, "Stress");
+	m_dic.AddNodalVariable(new FESaveNodeDisplacement, VEC3F, "Displacement");
+	m_dic.AddSolidVariable(new FESaveElementStress, MAT3FS, "Stress");
 }
 
 FEBioPlotFile::~FEBioPlotFile(void)
 {
+	int i;
+	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Glob.begin();
+	for (i=0; i<(int) m_dic.m_Glob.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Node.begin();
+	for (i=0; i<(int) m_dic.m_Node.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Elem.begin();
+	for (i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Shell.begin();
+	for (i=0; i<(int) m_dic.m_Shell.size(); ++i, ++it) delete it->m_psave;
+
+	it = m_dic.m_Beam.begin();
+	for (i=0; i<(int) m_dic.m_Beam.size(); ++i, ++it) delete it->m_psave;
 }
 
 //-----------------------------------------------------------------------------
@@ -299,13 +319,17 @@ bool FEBioPlotFile::Write(FEM &fem)
 	// save the nodal variables
 	if (m_dic.m_Node.size() > 0)
 	{
-		write_displacements();
+		list<DICTIONARY_ITEM>::iterator it = m_dic.m_Node.begin();
+		for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it)
+			if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
 	}
 
 	// save the solid variables
 	if (m_dic.m_Elem.size() > 0)
 	{
-		write_stresses();
+		list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
+		for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
+			if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
 	}
 
 	// save the shell variables
@@ -322,11 +346,29 @@ bool FEBioPlotFile::Write(FEM &fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::write_stresses()
+void FESaveNodeDisplacement::Save(FEM& fem, Archive& ar)
+{
+	float xf[3];
+	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	{
+		FENode& node = fem.m_mesh.Node(i);
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		xf[0] = (float) node.m_rt.x;
+		xf[1] = (float) node.m_rt.y;
+		xf[2] = (float) node.m_rt.z;
+
+		ar.write(xf, sizeof(float), 3);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FESaveElementStress::Save(FEM& fem, Archive& ar)
 {
 	int i, j;
 
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = fem.m_mesh;
 
 	// write solid element data
 	float s[6] = {0};
@@ -361,6 +403,6 @@ void FEBioPlotFile::write_stresses()
 			}
 		}
 
-		m_ar.write(s, sizeof(float), 6);
+		ar.write(s, sizeof(float), 6);
 	}
 }

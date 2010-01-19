@@ -62,9 +62,6 @@ public:
 	virtual bool Write(FEM& fem) = 0;
 
 protected:
-	void write_displacements();
-
-protected:
 	Archive	m_ar;		//!< the actual data archive
 	FEM*	m_pfem;		//!< pointer to FE model
 };

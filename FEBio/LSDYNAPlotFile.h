@@ -64,6 +64,7 @@ public:
 
 protected:
 	// vector fields
+	void write_displacements();
 	void write_velocities();
 	void write_accelerations();
 	void write_fluid_flux();

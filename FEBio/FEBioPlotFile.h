@@ -3,6 +3,32 @@
 #include <list>
 using namespace std;
 
+//-----------------------------------------------------------------------------
+//! Base class for exporting FE data
+class FESaveData
+{
+public:
+	virtual void Save(FEM& fem, Archive& ar) = 0;
+};
+
+//-----------------------------------------------------------------------------
+class FESaveNodeDisplacement : public FESaveData
+{
+public:
+	void Save(FEM& fem, Archive& ar);
+};
+
+//-----------------------------------------------------------------------------
+class FESaveElementStress : public FESaveData
+{
+public:
+	void Save(FEM& fem, Archive& ar);
+};
+
+//-----------------------------------------------------------------------------
+//! This class implements the facilities to export FE data in the FEBio
+//! plot file format.
+//!
 class FEBioPlotFile : public PlotFile
 {
 protected:
@@ -36,6 +62,7 @@ protected:
 	// Dictionary entry
 	struct DICTIONARY_ITEM
 	{
+		FESaveData*		m_psave;
 		unsigned int	m_ntype;
 		char			m_szname[DI_NAME_SIZE];
 	};
@@ -43,11 +70,11 @@ protected:
 	class Dictionary
 	{
 	public:
-		void AddGlobalVariable(unsigned int ntype, const char* szname);
-		void AddNodalVariable (unsigned int ntype, const char* szname);
-		void AddSolidVariable (unsigned int ntype, const char* szname);
-		void AddShellVariable (unsigned int ntype, const char* szname);
-		void AddBeamVariable  (unsigned int ntype, const char* szname);
+		void AddGlobalVariable(FESaveData* ps, unsigned int ntype, const char* szname);
+		void AddNodalVariable (FESaveData* ps, unsigned int ntype, const char* szname);
+		void AddSolidVariable (FESaveData* ps, unsigned int ntype, const char* szname);
+		void AddShellVariable (FESaveData* ps, unsigned int ntype, const char* szname);
+		void AddBeamVariable  (FESaveData* ps, unsigned int ntype, const char* szname);
 
 	protected:
 		void Save(Archive& ar);
@@ -74,9 +101,6 @@ public:
 
 	//! Write current FE state to plot database
 	bool Write(FEM& fem);
-
-protected:
-	void write_stresses();
 
 protected:
 	HEADER		m_hdr;	// plot file header
