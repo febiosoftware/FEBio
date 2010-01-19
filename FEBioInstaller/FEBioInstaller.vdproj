@@ -15,19 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0EA899C69D3949C4B547DC23E63AFE59"
-        "OwnerKey" = "8:_96838714292C4548B3CB0E39F583A95E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_1906FC4308814B67A15AD988E9FC23DC"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_19C78F55C9824FF3B9A34C422328AA7F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,14 +39,26 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4C275977FD8447969D4892C848251802"
+        "MsmKey" = "8:_58D1B5A0019D41A0ABBF5FD4BEF7DF98"
+        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_639B07A42A5840A7B8365512417C01B9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_96838714292C4548B3CB0E39F583A95E"
-        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
+        "MsmKey" = "8:_9C5F628A6C3B4F0491466BF51608CA64"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A4B6C508995249248AAB5565FF5BB765"
+        "OwnerKey" = "8:_58D1B5A0019D41A0ABBF5FD4BEF7DF98"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -75,7 +75,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_EC0BBDE2A025403DBDF0F6027714B32B"
+        "MsmKey" = "8:_D8CE297C7FE947BFBA51306FB51E8ED9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -267,29 +267,9 @@
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1906FC4308814B67A15AD988E9FC23DC"
             {
             "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\FEBio_tm.pdf"
-            "TargetName" = "8:FEBio_tm.pdf"
+            "TargetName" = "8:FEBio Theory Manual.pdf"
             "Tag" = "8:"
             "Folder" = "8:_BCB3F49C79F24378B1A64ABDDCA71505"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_19C78F55C9824FF3B9A34C422328AA7F"
-            {
-            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Examples\\Tutorials\\sample02.feb"
-            "TargetName" = "8:sample02.feb"
-            "Tag" = "8:"
-            "Folder" = "8:_699C404767DE4207B119782F46461B67"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -364,10 +344,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4C275977FD8447969D4892C848251802"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_639B07A42A5840A7B8365512417C01B9"
             {
-            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Examples\\Tutorials\\sample03.feb"
-            "TargetName" = "8:sample03.feb"
+            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Distribution\\Examples\\Examples.zip"
+            "TargetName" = "8:Examples.zip"
+            "Tag" = "8:"
+            "Folder" = "8:_699C404767DE4207B119782F46461B67"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9C5F628A6C3B4F0491466BF51608CA64"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Distribution\\Examples\\test_suite.bash"
+            "TargetName" = "8:test_suite.bash"
             "Tag" = "8:"
             "Folder" = "8:_699C404767DE4207B119782F46461B67"
             "Condition" = "8:"
@@ -387,7 +387,7 @@
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A642B39421E249E482ECF5FAA180395F"
             {
             "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\FEBio_um.pdf"
-            "TargetName" = "8:FEBio_um.pdf"
+            "TargetName" = "8:FEBio User Manual.pdf"
             "Tag" = "8:"
             "Folder" = "8:_BCB3F49C79F24378B1A64ABDDCA71505"
             "Condition" = "8:"
@@ -404,10 +404,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EC0BBDE2A025403DBDF0F6027714B32B"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D8CE297C7FE947BFBA51306FB51E8ED9"
             {
-            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Examples\\Tutorials\\sample01.feb"
-            "TargetName" = "8:sample01.feb"
+            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Distribution\\Examples\\test_suite.xls"
+            "TargetName" = "8:test_suite.xls"
             "Tag" = "8:"
             "Folder" = "8:_699C404767DE4207B119782F46461B67"
             "Condition" = "8:"
@@ -461,7 +461,7 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_BCB3F49C79F24378B1A64ABDDCA71505"
                     {
-                    "Name" = "8:FEBio 1.1.7"
+                    "Name" = "8:FEBio 1.2.0"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -474,7 +474,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_A9F30665B9534E439753127ACED5EF05"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFilesFolder]\\[ProductName]1p2"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -522,14 +522,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio"
-        "ProductCode" = "8:{8D119670-EC31-42E5-88B5-32CE7DEED12B}"
-        "PackageCode" = "8:{7DA529C9-3D18-408D-8937-BA60BCDD535B}"
+        "ProductCode" = "8:{BA458B9A-3BC4-43D5-A9BA-6A70CA252DD0}"
+        "PackageCode" = "8:{A4650F67-FD86-4AF3-A9CD-7FB7B7A7ACAA}"
         "UpgradeCode" = "8:{C651D20C-DA37-45DD-B03F-85DB2BC7C551}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.1.5"
+        "ProductVersion" = "8:1.2.0"
         "Manufacturer" = "8:University of Utah"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -644,7 +644,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8FDB5C2951F0402EB8218C329706F317"
             {
-            "Name" = "8:FEBio 1.1.7"
+            "Name" = "8:FEBio 1.2.0"
             "Arguments" = "8:"
             "Description" = "8:Finite Elements for Biomechanics"
             "ShowCmd" = "3:1"
@@ -1052,11 +1052,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_0EA899C69D3949C4B547DC23E63AFE59"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_58D1B5A0019D41A0ABBF5FD4BEF7DF98"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -1066,11 +1066,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_96838714292C4548B3CB0E39F583A95E"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A4B6C508995249248AAB5565FF5BB765"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
                 "Properties"
                 {
                 }

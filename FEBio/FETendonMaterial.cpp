@@ -170,7 +170,7 @@ tens4ds FETendonMaterial::Tangent(FEMaterialPoint& mp)
 	double J = pt.J;
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds& devs = pt.s.dev();
+	mat3ds devs = pt.s.dev();
 
 	// mean pressure
 	double p = pt.avgp;	
