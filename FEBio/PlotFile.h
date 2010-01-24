@@ -11,6 +11,7 @@
 
 #include "Archive.h"
 #include "FEMesh.h"
+#include "FEPlotData.h"
 
 class FEM;
 

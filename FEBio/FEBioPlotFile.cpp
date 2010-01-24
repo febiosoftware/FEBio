@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddGlobalVariable(FESaveData* ps, unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
@@ -15,7 +15,7 @@ void FEBioPlotFile::Dictionary::AddGlobalVariable(FESaveData* ps, unsigned int n
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddNodalVariable(FESaveData* ps, unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
@@ -26,7 +26,7 @@ void FEBioPlotFile::Dictionary::AddNodalVariable(FESaveData* ps, unsigned int nt
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddSolidVariable(FESaveData* ps, unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddSolidVariable(FEPlotData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
@@ -37,7 +37,7 @@ void FEBioPlotFile::Dictionary::AddSolidVariable(FESaveData* ps, unsigned int nt
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddShellVariable(FESaveData* ps, unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddShellVariable(FEPlotData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
@@ -48,7 +48,7 @@ void FEBioPlotFile::Dictionary::AddShellVariable(FESaveData* ps, unsigned int nt
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddBeamVariable(FESaveData* ps, unsigned int ntype, const char* szname)
+void FEBioPlotFile::Dictionary::AddBeamVariable(FEPlotData* ps, unsigned int ntype, const char* szname)
 {
 	DICTIONARY_ITEM it;
 	it.m_ntype = ntype;
@@ -123,8 +123,8 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 FEBioPlotFile::FEBioPlotFile(void)
 {
 	// set the default export data
-	m_dic.AddNodalVariable(new FESaveNodeDisplacement, VEC3F, "Displacement");
-	m_dic.AddSolidVariable(new FESaveElementStress, MAT3FS, "Stress");
+	m_dic.AddNodalVariable(new FEPlotNodeDisplacement,  VEC3F, "Displacement");
+	m_dic.AddSolidVariable(new FEPlotElementStress   , MAT3FS, "Stress");
 }
 
 FEBioPlotFile::~FEBioPlotFile(void)
@@ -343,66 +343,4 @@ bool FEBioPlotFile::Write(FEM &fem)
 	}
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-void FESaveNodeDisplacement::Save(FEM& fem, Archive& ar)
-{
-	float xf[3];
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
-	{
-		FENode& node = fem.m_mesh.Node(i);
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		xf[0] = (float) node.m_rt.x;
-		xf[1] = (float) node.m_rt.y;
-		xf[2] = (float) node.m_rt.z;
-
-		ar.write(xf, sizeof(float), 3);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FESaveElementStress::Save(FEM& fem, Archive& ar)
-{
-	int i, j;
-
-	FEMesh& mesh = fem.m_mesh;
-
-	// write solid element data
-	float s[6] = {0};
-	double f;
-	int nint;
-	for (i=0; i<mesh.SolidElements(); ++i)
-	{
-		FESolidElement& el = mesh.SolidElement(i);
-
-		for (j=0; j<6; ++j) s[j] = 0;
-
-		nint = el.GaussPoints();
-
-		f = 1.0 / (double) nint;
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
-		for (j=0; j<nint; ++j)
-		{
-			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
-			if (ppt)
-			{
-				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.s.xx());
-				s[1] += (float) (f*pt.s.yy());
-				s[2] += (float) (f*pt.s.zz());
-				s[3] += (float) (f*pt.s.xy());
-				s[4] += (float) (f*pt.s.yz());
-				s[5] += (float) (f*pt.s.xz());
-			}
-		}
-
-		ar.write(s, sizeof(float), 6);
-	}
 }
