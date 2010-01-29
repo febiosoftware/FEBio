@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <cstdlib>
 #include "FEBioCommand.h"
 #include "fem.h"
 #include "FEException.h"

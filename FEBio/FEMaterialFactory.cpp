@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEMaterialFactory.h"
+#include <cstring>
 
 // This is the one and only instance of the material factory
 // You can retrieve this pointer by calling FEMaterialFactory::GetInstance()
