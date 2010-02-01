@@ -1716,7 +1716,10 @@ void FESolidSolver::DilatationalStiffness(FEShellElement& elem, matrix& ke)
 	const int ndof = 6*neln;
 
 	// get the elements material
-	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(m_fem.GetMaterial(elem.GetMatID()));
+	FEElasticMaterial* pm = m_fem.GetElasticMaterial(elem.GetMatID());
+
+	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pm);
+	assert(pmi);
 
 	// average global derivatives
 	vector<double> gradN(6*neln);
