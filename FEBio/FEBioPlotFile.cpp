@@ -122,9 +122,6 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 
 FEBioPlotFile::FEBioPlotFile(void)
 {
-	// set the default export data
-	m_dic.AddNodalVariable(new FEPlotNodeDisplacement,  VEC3F, "Displacement");
-	m_dic.AddSolidVariable(new FEPlotElementStress   , MAT3FS, "Stress");
 }
 
 FEBioPlotFile::~FEBioPlotFile(void)
@@ -151,6 +148,31 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 {
 	// get the mesh
 	FEMesh& m = fem.m_mesh;
+
+	int nmode = fem.m_pStep->m_nModule;
+	int ntype = fem.m_pStep->m_nanalysis;
+
+	// setup the dictionary
+	m_dic.AddNodalVariable(new FEPlotNodeDisplacement,  VEC3F, "Displacement");
+	m_dic.AddSolidVariable(new FEPlotElementStress   , MAT3FS, "Stress");
+
+	// store dynamic analysis data
+	if ((ntype == FE_DYNAMIC) || (nmode == FE_POROELASTIC)) m_dic.AddNodalVariable(new FEPlotNodeVelocity    , VEC3F, "Velocity");
+	if (ntype == FE_DYNAMIC) m_dic.AddNodalVariable(new FEPlotNodeAcceleration, VEC3F, "Acceleration");
+
+	// store contact data
+	if (fem.m_CI.size() > 0)
+	{
+		m_dic.AddNodalVariable(new FEPlotContactGap     , SCALAR, "Contact gap");
+		m_dic.AddNodalVariable(new FEPlotContactTraction,  VEC3F, "Contact traction");
+	}
+
+	// store poro data
+	if (nmode == FE_POROELASTIC)
+	{
+		m_dic.AddNodalVariable(new FEPlotFluidPressure, SCALAR, "Fluid Pressure");
+		m_dic.AddSolidVariable(new FEPlotFluidFlux    ,  VEC3F, "Fluid Flux");
+	}
 
 	// setup the header
 	m_hdr.nsize = sizeof(HEADER);

@@ -5,6 +5,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "FESlidingInterface2.h"
+#include "FEFacet2FacetSliding.h"
 
 LSDYNAPlotFile::LSDYNAPlotFile()
 {
@@ -718,6 +719,7 @@ void LSDYNAPlotFile::write_contact_tractions()
 	m_ar.write(acc, sizeof(float)*3, fem.m_mesh.Nodes() );
 }
 
+//-----------------------------------------------------------------------------
 void LSDYNAPlotFile::write_fluid_pressures()
 {
 	FEM& fem = *m_pfem;
@@ -731,7 +733,6 @@ void LSDYNAPlotFile::write_fluid_pressures()
 }
 
 //-----------------------------------------------------------------------------
-
 void LSDYNAPlotFile::write_temperatures()
 {
 	FEM& fem = *m_pfem;
@@ -745,7 +746,6 @@ void LSDYNAPlotFile::write_temperatures()
 }
 
 //-----------------------------------------------------------------------------
-
 void LSDYNAPlotFile::write_heat_flux()
 {
 	FEM& fem = *m_pfem;
@@ -902,6 +902,42 @@ void LSDYNAPlotFile::write_contact_gaps()
 		{
 			FERigidWallSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0? 0 : ss.gap[j]);
+		}
+
+		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		if (pf)
+		{
+			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			double gi[4], gn[4];
+			int ni, ne, n, k;
+
+			for (n=0; n<pf->m_npass; ++n)
+			{
+				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
+
+				int nint = 0;
+				for (j=0; j<s.Elements(); ++j)
+				{
+					FESurfaceElement& el = s.Element(j);
+					ne = el.Nodes();
+					ni = el.GaussPoints();
+					for (k=0; k<ni; ++k, ++nint)
+					{
+						gi[k] = s.m_gap[nint];
+					}
+
+					el.project_to_nodes(gi, gn);
+
+					for (k=0; k<ne; ++k)
+					{
+						int m = el.m_node[k];
+						t[m] += (float) gn[k];
+						val[m]++;
+					}
+				}
+			}
+
+			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
 		}
 
 		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);

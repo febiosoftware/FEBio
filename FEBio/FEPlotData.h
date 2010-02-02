@@ -48,3 +48,35 @@ class FEPlotElementStress : public FEPlotData
 public:
 	void Save(FEM& fem, Archive& ar);
 };
+
+//-----------------------------------------------------------------------------
+//! Contact gap
+//!
+class FEPlotContactGap : public FEPlotData
+{
+public:
+	void Save(FEM& fem, Archive& ar);
+};
+
+//-----------------------------------------------------------------------------
+//! Contact traction
+//!
+class FEPlotContactTraction : public FEPlotData
+{
+public:
+	void Save(FEM& fem, Archive& ar);
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotFluidPressure : public FEPlotData
+{
+public:
+	void Save(FEM& fem, Archive& ar);
+};
+
+//-----------------------------------------------------------------------------
+class FEPlotFluidFlux : public FEPlotData
+{
+public:
+	void Save(FEM& fem, Archive& ar);
+};
