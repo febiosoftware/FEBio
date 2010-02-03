@@ -80,3 +80,10 @@ class FEPlotFluidFlux : public FEPlotData
 public:
 	void Save(FEM& fem, Archive& ar);
 };
+
+//-----------------------------------------------------------------------------
+class FEPlotFiberVector : public FEPlotData
+{
+public:
+	void Save(FEM& fem, Archive& ar);
+};

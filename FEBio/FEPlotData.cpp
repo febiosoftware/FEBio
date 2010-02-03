@@ -399,3 +399,33 @@ void FEPlotFluidFlux::Save(FEM &fem, Archive &ar)
 		ar.write(af, sizeof(float), 3);
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FEPlotFiberVector::Save(FEM &fem, Archive &ar)
+{
+	int i, j, n;
+	FEMesh& mesh = fem.m_mesh;
+	int BE = mesh.SolidElements();
+
+	float a[3];
+	vec3d r;
+	for (i=0; i<BE; ++i)
+	{
+		FESolidElement& el = mesh.SolidElement(i);
+		n = el.GaussPoints();
+		r = vec3d(0,0,0);
+		for (j=0; j<n; ++j)
+		{
+			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+			r.x += pt.Q[0][0];
+			r.y += pt.Q[1][0];
+			r.z += pt.Q[2][0];
+		}
+		r /= n;
+
+		a[0] = (float) r.x;
+		a[1] = (float) r.y;
+		a[2] = (float) r.z;
+		ar.write(a, sizeof(float), 3);
+	}
+}

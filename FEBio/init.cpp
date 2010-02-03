@@ -95,6 +95,12 @@ bool FEM::Init()
 	// initialize random number generator
 	srand((unsigned) time(NULL));
 
+	// initialize mesh data
+	// note that this must be done AFTER the elements have been assigned material point data !
+	// this is because the mesh data is reset
+	// TODO: perhaps I should not reset the mesh data during the initialization
+	if (m_mesh.Init() == false) return false;
+
 	// intialize local coordinate data
 	bool bmerr = false;
 	for (i=0; i<m_mesh.SolidElements(); ++i)
@@ -201,12 +207,6 @@ bool FEM::Init()
 		}
 	}
 	if (bmerr) return false;
-
-	// initialize mesh data
-	// note that this must be done AFTER the elements have been assigned material point data !
-	// this is because the mesh data is reset
-	// TODO: perhaps I should not reset the mesh data during the initialization
-	if (m_mesh.Init() == false) return false;
 
 	// initialize material data
 	char szmat[256] = "Invalid value for material parameter \"%s\" of material %d";

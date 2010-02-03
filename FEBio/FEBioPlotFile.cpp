@@ -146,6 +146,8 @@ FEBioPlotFile::~FEBioPlotFile(void)
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 {
+	int i, j, N;
+
 	// get the mesh
 	FEMesh& m = fem.m_mesh;
 
@@ -172,6 +174,18 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	{
 		m_dic.AddNodalVariable(new FEPlotFluidPressure, SCALAR, "Fluid Pressure");
 		m_dic.AddSolidVariable(new FEPlotFluidFlux    ,  VEC3F, "Fluid Flux");
+	}
+
+	// if any material is trans-iso we store material fibers and strain
+	int ntiso = 0;
+	for (i=0; i<fem.Materials(); ++i)
+	{
+		FEElasticMaterial* pm = fem.GetElasticMaterial(i);
+		if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
+	}
+	if (ntiso)
+	{
+		m_dic.AddSolidVariable(new FEPlotFiberVector, VEC3F, "Fiber vector");
 	}
 
 	// setup the header
@@ -202,7 +216,6 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	m_dic.Save(m_ar);
 
 	// --- save the geometry ---
-	int i, j, N;
 	
 	// write the material coordinates
 	float xf[3];
