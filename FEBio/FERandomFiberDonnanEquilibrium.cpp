@@ -14,7 +14,7 @@ double FERandomFiberDonnanEquilibrium::m_sph[NSTH];
 double FERandomFiberDonnanEquilibrium::m_w[NSTH];
 
 // register the material with the framework
-REGISTER_MATERIAL(FERandomFiberDonnanEquilibrium, "random fiber Donnan equilibrium");
+REGISTER_MATERIAL(FERandomFiberDonnanEquilibrium, "EFD Donnan equilibrium");
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FERandomFiberDonnanEquilibrium, FEElasticMaterial)

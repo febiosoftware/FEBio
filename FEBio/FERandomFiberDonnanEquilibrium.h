@@ -2,14 +2,13 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! This class implements a material that consists of a continuous fiber distribution
+//! This class implements a material that consists of a continuous ellipsoidal fiber distribution
 //! superposed on a charged (swelling) gel described by the equations of Donnan equilibrium
-//! The fiber distribution is ellipsoidal.
 
 //! This material is orignally due to Gerard Ateshian and is used to model
 //! articular cartilage.
 
-class FERandomFiberDonnanEquilibrium :	public FEIncompressibleMaterial
+class FERandomFiberDonnanEquilibrium :	public FEElasticMaterial
 	{
 	public:
 		FERandomFiberDonnanEquilibrium(void);
