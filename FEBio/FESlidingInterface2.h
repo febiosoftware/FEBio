@@ -28,8 +28,6 @@ public:
 	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
 	vector<double>				m_Lmd;	//!< lagrange multipliers for displacements
 	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
-	vector<double>				m_tn;	//!< contact traction
-	vector<double>				m_wn;	//!< contact fux
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
 	vector<int>					m_nei;	//!< surface element indices into arrays
 
