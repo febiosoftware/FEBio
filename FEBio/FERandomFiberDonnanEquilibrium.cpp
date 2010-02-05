@@ -234,3 +234,20 @@ tens4ds FERandomFiberDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 	
 	return c;
 }
+
+double FERandomFiberDonnanEquilibrium::BulkModulus()
+{
+	// Evaluate bulk modulus in reference configuration
+
+	// --- M A T R I X   C O N T R I B U T I O N ---
+	
+	// calculate osmotic pressure (assume J=1)
+	double tosm = sqrt(m_cFr*m_cFr+m_bosm*m_bosm);	// tissue osmolarity
+	double pi = m_Rgas*m_Tabs*(tosm - m_bosm);	// osmotic pressure
+	
+	// calculate derivative of osmotic pressure w.r.t. J
+	double bpi = m_Rgas*m_Tabs*m_cFr*m_cFr/m_phiwr/tosm;
+	
+	return -(pi/3.0 + bpi);
+	
+}

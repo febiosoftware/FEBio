@@ -23,6 +23,9 @@ class FERandomFiberDonnanEquilibrium :	public FEElasticMaterial
 		//! material parameter intialization and checking
 		void Init();
 		
+		//! return bulk modulus
+		virtual double BulkModulus();
+		
 	public:
 		double	m_phiwr;	// fluid volume fraction in reference configuration
 		double	m_cFr;		// fixed charge density in reference configuration
