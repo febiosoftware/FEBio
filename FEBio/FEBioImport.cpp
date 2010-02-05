@@ -457,6 +457,10 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 							while (!tag.isend());
 							pmap->SetVectors(a, d);
 						}
+						else if (strcmp(szt, "user") == 0)
+						{
+							// material axis are read in from the ElementData section
+						}
 						else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 						bfound = true;
@@ -1047,6 +1051,57 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 				b.unit();
 				c.unit();
 
+				FESolidElement* pbe = dynamic_cast<FESolidElement*> (pe);
+				FEShellElement* pse = dynamic_cast<FEShellElement*> (pe);
+				if (pbe)
+				{
+					for (int i=0; i<pbe->GaussPoints(); ++i)
+					{
+						FEElasticMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						mat3d& m = pt.Q;
+						m.zero();
+						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
+						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
+						m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
+					}
+				}
+				if (pse)
+				{
+					for (int i=0; i<pse->GaussPoints(); ++i)
+					{
+						FEElasticMaterialPoint& pt = *pse->m_State[i]->ExtractData<FEElasticMaterialPoint>();
+						mat3d& m = pt.Q;
+						m.zero();
+						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
+						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
+						m[2][0] = a.z; m[2][1] = b.z; m[2][2] = c.z;
+					}
+				}
+			}
+			else if (tag == "mat_axis")
+			{
+				vec3d a, d;
+
+				++tag;
+				do
+				{
+					if (tag == "a") tag.value(a);
+					else if (tag == "d") tag.value(d);
+					else throw XMLReader::InvalidTag(tag);
+
+					++tag;
+				}
+				while (!tag.isend());
+
+				vec3d c = a^d;
+				vec3d b = c^a;
+
+				// normalize
+				a.unit();
+				b.unit();
+				c.unit();
+
+				// assign to element
 				FESolidElement* pbe = dynamic_cast<FESolidElement*> (pe);
 				FEShellElement* pse = dynamic_cast<FEShellElement*> (pe);
 				if (pbe)

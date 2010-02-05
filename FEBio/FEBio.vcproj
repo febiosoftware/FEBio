@@ -592,6 +592,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FERandomFiberDonnanEquilibrium.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FERandomFiberMaterial.cpp"
 				>
 			</File>
@@ -1115,6 +1119,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPrintMatrixDiagnostic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FERandomFiberDonnanEquilibrium.h"
 				>
 			</File>
 			<File
