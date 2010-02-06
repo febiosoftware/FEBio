@@ -23,8 +23,6 @@ class FERandomFiberDonnanEquilibrium :	public FEElasticMaterial
 		//! material parameter intialization and checking
 		void Init();
 
-		double BulkModulus() { return 0; }
-		
 		//! return bulk modulus
 		virtual double BulkModulus();
 		
