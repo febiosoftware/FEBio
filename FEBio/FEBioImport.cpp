@@ -1029,10 +1029,9 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 		FEElement* pe = pelem[n];
 
 		vec3d a;
+		++tag;
 		do
 		{
-			++tag;
-
 			if (tag == "fiber")
 			{
 				// read the fiber direction
@@ -1145,6 +1144,8 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 				// read truss area
 				tag.value(pt->m_a0);
 			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
 		}
 		while (!tag.isend());
 
