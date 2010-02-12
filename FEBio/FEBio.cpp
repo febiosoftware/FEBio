@@ -24,18 +24,18 @@
 //! element equations using a quasi-Newton method called the BFGS-method. It
 //! also offers several biologically relevant constitutive models.
 //!
-//! This software is developed at the Scientific Computing and Imaging institute
+//! This software is developed at the Musculoskeletal Research Laboratories
 //! at the University of Utah. All rights reserved.
-//! Copyright (c) 2006 - 2009
+//! Copyright (c) 2006 - 2010
 //!
 //! Main developers:
 //!  - Steve Maas
 //!  - Jeff Weiss
 //!  - Dave Rawlins
+//!  - Gerard Ateshian
 //!
 //! Contributors:
 //!  - Alexander Veress
-//!  - Gerard Ateshian
 //
 ///////////////////////////////////////////////////////////////////////////////
 
