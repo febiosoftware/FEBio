@@ -28,6 +28,9 @@
 //! at the University of Utah. All rights reserved.
 //! Copyright (c) 2006 - 2010
 //!
+//! The subversion (svn) revision number of this code can be found in the file
+//! FEBio/svnrev.h
+//!
 //! Main developers:
 //!  - Steve Maas
 //!  - Jeff Weiss
