@@ -22,19 +22,15 @@ void FEFacetSlidingSurface::Init()
 	}
 
 	// allocate data structures
-	m_gap.resize(nint);
+	m_gap.assign(nint, 0.0);
 	m_nu.resize(nint);
 	m_rs.resize(nint);
-	m_Lm.resize(nint);
-	m_pme.resize(nint);
-	m_eps.resize(nint);
+	m_Lm.assign(nint, 0.0);
+	m_pme.assign(nint, 0);
+	m_eps.assign(nint, 1.0);
 
 	// set intial values
-	m_gap.zero();
 	m_nu.zero();
-	m_pme.set(0);
-	m_Lm.zero();
-	m_eps.set(1);
 }
 
 //-----------------------------------------------------------------------------

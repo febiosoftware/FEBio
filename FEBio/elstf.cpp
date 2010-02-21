@@ -725,8 +725,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 		// get the element force vector and initialize it to zero
 		ndof = 3*el.Nodes();
-		fe.resize(ndof);
-		fe.zero();
+		fe.assign(ndof, 0);
 
 		// skip rigid elements for internal force calculations
 		if (!el.IsRigid())
@@ -783,8 +782,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 		// create the element force vector and initialize to zero
 		ndof = 6*el.Nodes();
-		fe.resize(ndof);
-		fe.zero();
+		fe.assign(ndof, 0);
 
 		if (!el.IsRigid())
 		{

@@ -83,11 +83,8 @@ void FENodeElemList::Create(FEMesh& mesh)
 	int NS = mesh.ShellElements();
 
 	// create nodal valence array
-	m_nval.resize(NN);
+	m_nval.assign(NN, 0);
 	m_pn.resize(NN);
-
-	// clear valence table
-	m_nval.zero();
 
 	// fill valence table
 	int nsize = 0;

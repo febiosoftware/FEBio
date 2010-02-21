@@ -323,10 +323,7 @@ bool FEM::InitConstraints()
 	}
 
 	// create the linear constraint table
-	m_LCT.resize(m_mesh.Nodes()*MAX_NDOFS);
-
-	// initialize it to -1
-	m_LCT.set(-1);
+	m_LCT.assign(m_mesh.Nodes()*MAX_NDOFS, -1);
 
 	list<FELinearConstraint>::iterator ic = m_LinC.begin();
 	for (i=0; i<nlin; ++i, ++ic)

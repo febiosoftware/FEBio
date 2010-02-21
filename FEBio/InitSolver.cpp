@@ -16,20 +16,20 @@ bool FESolidSolver::Init()
 	int neq = m_fem.m_neq;
 
 	// allocate vectors
-	m_Fn.resize(neq); m_Fn.zero();
-	m_Fd.resize(neq); m_Fd.zero();
-	m_Fr.resize(neq); m_Fr.zero();
-	m_ui.resize(neq); m_ui.zero();
-	m_Ui.resize(neq); m_Ui.zero();
-	m_Ut.resize(neq); m_Ut.zero();
-	m_R0.resize(neq); m_R0.zero();
-	m_R1.resize(neq); m_R1.zero();
+	m_Fn.assign(neq, 0);
+	m_Fd.assign(neq, 0);
+	m_Fr.assign(neq, 0);
+	m_ui.assign(neq, 0);
+	m_Ui.assign(neq, 0);
+	m_Ut.assign(neq, 0);
+	m_R0.assign(neq, 0);
+	m_R1.assign(neq, 0);
 
 	// allocate poro-vectors
 	if (m_fem.m_npeq > 0)
 	{
-		m_pi.resize(m_fem.m_npeq); m_pi.zero();
-		m_Pi.resize(m_fem.m_npeq); m_Ui.zero();
+		m_pi.assign(m_fem.m_npeq, 0);
+		m_Pi.assign(m_fem.m_npeq, 0);
 	}
 
 	// we need to fill the total displacement vector m_Ut

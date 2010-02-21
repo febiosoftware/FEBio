@@ -43,7 +43,7 @@ void FENodeNodeList::Create(FEMesh& mesh)
 	vector<int> tag(NN); tag.zero();
 
 	// calculate nodal valences
-	m_nval.resize(NN); m_nval.zero();
+	m_nval.assign(NN, 0);
 	m_pn.resize(NN);
 
 	int nsize = 0;

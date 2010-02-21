@@ -43,6 +43,12 @@ public:
 		m_nsize = n; 
 	}
 
+	void assign(int n, const T& val)
+	{
+		resize(n);
+		for (int i=0; i<n; ++i) m_pdata[i] = val;
+	}
+
 	// destructor
 	virtual ~vector() { delete [] m_pdata; m_pdata = 0; }
 

@@ -75,23 +75,16 @@ void FERigidWallSurface::Init()
 	int nn = Nodes();
 
 	// allocate other surface data
-	gap.resize(nn);		// gap funtion
+	gap.assign(nn, 0);		// gap funtion
 	nu.resize(nn);		// node normal 
-	pme.resize(nn);		// penetrated master element
+	pme.assign(nn, 0);		// penetrated master element
 	rs.resize(nn);		// natural coords of projected slave node on master element
 	rsp.resize(nn);
-	Lm.resize(nn);
+	Lm.assign(nn, 0);
 	M.resize(nn);
 	Lt.resize(nn);
-	off.resize(nn);
-	eps.resize(nn);
-
-	// set initial values
-	gap.zero();
-	pme.set(0);
-	Lm.zero();
-	off.zero();
-	eps.set(1.0);
+	off.assign(nn, 0.0);
+	eps.assign(nn, 1.0);
 
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account

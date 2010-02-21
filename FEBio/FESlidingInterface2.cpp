@@ -29,14 +29,14 @@ void FESlidingSurface2::Init()
 	}
 
 	// allocate data structures
-	m_gap.resize(nint);
+	m_gap.assign(nint, 0.0);
 	m_nu.resize(nint);
 	m_rs.resize(nint);
-	m_Lmd.resize(nint);
-	m_Lmp.resize(nint);
-	m_pme.resize(nint);
-	m_epsn.resize(nint);
-	m_epsp.resize(nint);
+	m_Lmd.assign(nint, 0.0);
+	m_Lmp.assign(nint, 0.0);
+	m_pme.assign(nint, 0);
+	m_epsn.assign(nint, 1.0);
+	m_epsp.assign(nint, 1.0);
 
 	m_nn.resize(Nodes());
 	m_nn.zero();
@@ -50,19 +50,12 @@ void FESlidingSurface2::Init()
 	}
 
 	// set intial values
-	m_gap.zero();
 	m_nu.zero();
-	m_pme.set(0);
-	m_Lmd.zero();
-	m_Lmp.zero();
-	m_epsn.set(1);
-	m_epsp.set(1);
 
 	// allocate biphasic stuff
 	if (m_pfem->m_pStep->m_nModule == FE_POROELASTIC)
 	{
-		m_pg.resize(nint);
-		m_pg.zero();
+		m_pg.assign(nint, 0);
 	}
 }
 

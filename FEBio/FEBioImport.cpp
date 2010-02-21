@@ -988,8 +988,7 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 
 	// create the pelem array
 	vector<FEElement*> pelem;
-	pelem.resize(nbel + nsel + ntel);
-	pelem.zero();
+	pelem.assign(nbel + nsel + ntel, 0);
 
 	for (i=0; i<nbel; ++i)
 	{

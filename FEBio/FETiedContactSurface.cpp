@@ -18,12 +18,11 @@ void FETiedContactSurface::Init()
 
 	// allocate other surface data
 	gap.resize(nn);		// gap funtion
-	pme.resize(nn);		// penetrated master element
+	pme.assign(nn, 0);	// penetrated master element
 	rs.resize(nn);		// natural coords of projected slave node on master element
 	Lm.resize(nn);		// Lagrangian multipliers
 
 	// set initial values
 	gap.zero();
-	pme.set(0);
 	Lm.zero();
 }
