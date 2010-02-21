@@ -36,7 +36,7 @@ public:
 	}
 	vector(const vector<T>& a);
 
-	virtual void resize(int n, int nalloc=0) 
+	void resize(int n, int nalloc=0) 
 	{ 
 		if (nalloc < n) nalloc = n;
 		alloc(nalloc);
@@ -50,7 +50,7 @@ public:
 	}
 
 	// destructor
-	virtual ~vector() { delete [] m_pdata; m_pdata = 0; }
+	~vector() { delete [] m_pdata; m_pdata = 0; }
 
 	void clear()
 	{
@@ -228,7 +228,7 @@ public:
 	ptr_vector() : m_pdata(0), m_nsize(0) {}
 	explicit ptr_vector(int n) : m_pdata(new T*[n]), m_nsize(n) { zero(); }
 
-	virtual void create(int n) 
+	void create(int n) 
 	{ 
 		clear();
 		m_pdata = new T*[n];
@@ -262,7 +262,7 @@ public:
 	void setitem(int n, T* pi) { m_pdata[n] = pi; }
 
 	// destructor
-	virtual ~ptr_vector() { clear(); }
+	~ptr_vector() { clear(); }
 
 	// operators
 	T& operator [] (int i) { return *m_pdata[i]; }
