@@ -174,8 +174,11 @@ public:
 	//! count the number of shell elements
 	int ShellElements() { return m_Shell.size(); }
 
-	//! counte the number of truss elements
+	//! count the number of truss elements
 	int TrussElements() { return m_Truss.size(); }
+
+	//! return total nr of elements
+	int Elements() { return (m_Elem.size() + m_Shell.size() + m_Truss.size()); }
 
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }
@@ -206,9 +209,6 @@ public:
 
 	//! Unpack surface element data
 	void UnpackElement(FESurfaceElement& el, unsigned int nflag = FE_UNPACK_ALL);
-
-	//! Unpack truss element data
-	void UnpackElement(FETrussElement& el, unsigned int flag = FE_UNPACK_ALL);
 
 	//! Reset the mesh data
 	void Reset();
@@ -252,10 +252,6 @@ public:
 	FESolidDomain& SolidDomain() { return m_Elem; }
 	FEShellDomain& ShellDomain() { return m_Shell; }
 	FETrussDomain& TrussDomain() { return m_Truss; }
-
-	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
-	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
-	double HexVolume(FESolidElement& el, int state = 0);
 
 protected:
 	vector<FENode>			m_Node;		//!< FE nodes array

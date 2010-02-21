@@ -912,9 +912,10 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 	}
 
-	for (i=0; i<mesh.TrussElements(); ++i)
+	FETrussDomain& td = mesh.TrussDomain();
+	for (i=0; i<td.size(); ++i)
 	{
-		FETrussElement& el = mesh.TrussElement(i);
+		FETrussElement& el = td.Element(i);
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
 		assert(pmat);
 		el.SetMaterialPointData(pmat->CreateMaterialPointData(), 0);
@@ -979,7 +980,7 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 
 	int nbel = mesh.SolidElements();
 	int nsel = mesh.ShellElements();
-	int ntel = mesh.TrussElements();
+	int ntel = mesh.TrussDomain().size();
 
 	//make sure we've read the element section
 	int elems = nbel + nsel + ntel;

@@ -93,10 +93,11 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			}
 
 			// add truss elements to the profile
-			for (i=0; i<mesh.TrussElements(); ++i)
+			FETrussDomain& td = mesh.TrussDomain();
+			for (i=0; i<td.size(); ++i)
 			{
-				FETrussElement& el = mesh.TrussElement(i);
-				mesh.UnpackElement(el, FE_UNPACK_LM);
+				FETrussElement& el = td.Element(i);
+				td.UnpackElement(el, FE_UNPACK_LM);
 				build_add(el.LM());
 			}
 

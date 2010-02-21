@@ -252,21 +252,24 @@ void FESolidSolver::PrepStep(double time)
 	FEMaterialPoint::time = m_fem.m_ftime;
 
 	FEMesh& mesh = m_fem.m_mesh;
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.size(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		int n = el.GaussPoints();
 		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
 	}
-	for (i=0; i<mesh.ShellElements(); ++i)
+	FEShellDomain& sd = mesh.ShellDomain();
+	for (i=0; i<sd.size(); ++i)
 	{
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		int n = el.GaussPoints();
 		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
 	}
-	for (i=0; i<mesh.TrussElements(); ++i)
+	FETrussDomain& td = mesh.TrussDomain();
+	for (i=0; i<td.size(); ++i)
 	{
-		FETrussElement& el = mesh.TrussElement(i);
+		FETrussElement& el = td.Element(i);
 		el.m_State[0]->Init(false);
 	}
 

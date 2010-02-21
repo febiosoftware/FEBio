@@ -31,14 +31,12 @@ bool FESolidSolver::StiffnessMatrix()
 	// get the mesh
 	FEMesh& mesh = m_fem.m_mesh;
 
-	// get the number of solid elements
-	int NE = mesh.SolidElements();
-
-	// get the number of shell elements
-	int NS = mesh.ShellElements();
+	// total nr of elements
+	int TNE = mesh.Elements();
 
 	// repeat over all solid elements
 	FESolidDomain& bd = mesh.SolidDomain();
+	int NE = bd.size();
 	for (iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = mesh.SolidElement(iel);
@@ -77,7 +75,7 @@ bool FESolidSolver::StiffnessMatrix()
 				bd.ElementPoroStiffness(m_fem, el, ke);
 
 				// TODO: the problem here is that the LM array that is returned by the UnpackElement
-				// function does give the equation numbers in the right order. For this reason we
+				// function does not give the equation numbers in the right order. For this reason we
 				// have to create a new lm array and place the equation numbers in the right order.
 				// What we really ought to do is fix the UnpackElement function so that it returns
 				// the LM vector in the right order for poroelastic elements.
@@ -115,12 +113,13 @@ bool FESolidSolver::StiffnessMatrix()
 
 		if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
 		{
-			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*iel/(NE + NS));
+			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*iel/ TNE);
 		}
 	}
 
 	// repeat over all shell elements
 	FEShellDomain& sd = mesh.ShellDomain();
+	int NS = sd.size();
 	for (iel=0; iel<NS; ++iel)
 	{
 		FEShellElement& el = mesh.ShellElement(iel);
@@ -152,17 +151,17 @@ bool FESolidSolver::StiffnessMatrix()
 
 		if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
 		{
-			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*(NE + iel)/(NE + NS));
+			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*(NE + iel)/ TNE);
 		}
 	}
 
 	// repeat over truss elements
 	FETrussDomain& td = mesh.TrussDomain();
-	int NT = mesh.TrussElements();
+	int NT = td.size();
 	for (iel =0; iel<NT; ++iel)
 	{
-		FETrussElement& el = mesh.TrussElement(iel);
-		mesh.UnpackElement(el);
+		FETrussElement& el = td.Element(iel);
+		td.UnpackElement(el);
 		td.ElementStiffness(m_fem, el, ke);
 		AssembleStiffness(el.m_node, el.LM(), ke);
 	}
@@ -712,8 +711,8 @@ bool FESolidSolver::Residual(vector<double>& R)
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over solid elements
-	int NE = mesh.SolidElements();
 	FESolidDomain& bd = mesh.SolidDomain();
+	int NE = bd.size();
 	for (i=0; i<NE; ++i)
 	{
 		// get the element
@@ -818,12 +817,12 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// loop over truss elements
-	int NT = mesh.TrussElements();
 	FETrussDomain& td = mesh.TrussDomain();
+	int NT = td.size();
 	for (i=0; i<NT; ++i)
 	{
-		FETrussElement& el = mesh.TrussElement(i);
-		mesh.UnpackElement(el);
+		FETrussElement& el = td.Element(i);
+		td.UnpackElement(el);
 		td.InternalForces(el, fe);
 		AssembleResidual(el.m_node, el.LM(), fe, R);
 	}
@@ -1324,9 +1323,10 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	// now multiply F with the mass matrix
 	// first do the solid elements
 	matrix ke;
-	for (iel=0; iel<mesh.SolidElements(); ++iel)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (iel=0; iel<bd.size(); ++iel)
 	{
-		FESolidElement& el = mesh.SolidElement(iel);
+		FESolidElement& el = bd.Element(iel);
 		mesh.UnpackElement(el);
 
 		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));

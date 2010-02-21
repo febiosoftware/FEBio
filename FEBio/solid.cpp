@@ -123,17 +123,17 @@ void FESolidDomain::UDGInternalForces(FEM& fem, FESolidElement& el, vector<doubl
 
 	// calculate the average cartesian derivatives
 	double GX[8], GY[8], GZ[8];
-	m_pMesh->AvgCartDerivs(el, GX, GY, GZ);
+	AvgCartDerivs(el, GX, GY, GZ);
 
 	// calculate average deformation gradient Fbar
 	mat3d Fb;
-	m_pMesh->AvgDefGrad(el, Fb, GX, GY, GZ);
+	AvgDefGrad(el, Fb, GX, GY, GZ);
 
 	// calculate the transposed inverse of Fbar
 	mat3d Fti = Fb.transinv();
 
 	// calculate current element volume
-	double ve = m_pMesh->HexVolume(el, 1);
+	double ve = HexVolume(el, 1);
 
 	// current averaged shape derivatives
 	double Gx, Gy, Gz;
@@ -192,10 +192,10 @@ void FESolidDomain::UDGHourglassForces(FEM& fem, FESolidElement &el, vector<doub
 	}
 
 	double GX[8], GY[8], GZ[8];
-	m_pMesh->AvgCartDerivs(el, GX, GY, GZ);
+	AvgCartDerivs(el, GX, GY, GZ);
 
 	mat3d F;
-	m_pMesh->AvgDefGrad(el, F, GX, GY, GZ);
+	AvgDefGrad(el, F, GX, GY, GZ);
 /*
 	double Ji0[3][3], Jt[3][3];
 	el.invjac0(Ji0, 0);
@@ -728,7 +728,7 @@ void FESolidDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& 
 	FEMesh& mesh = fem.m_mesh;
 
 	double GX[8], GY[8], GZ[8];
-	mesh.AvgCartDerivs(el, GX, GY, GZ);
+	AvgCartDerivs(el, GX, GY, GZ);
 
 	double g4[8] = {0}, g5[8] = {0}, g6[8] = {0}, g7[8] = {0};
 
@@ -779,11 +779,11 @@ void FESolidDomain::UDGDilatationalStiffness(FEM& fem, FESolidElement& el, matri
 
 	// calculate the average cartesian derivatives
 	double Gx[8], Gy[8], Gz[8];
-	mesh.AvgCartDerivs(el, Gx, Gy, Gz, 1);
+	AvgCartDerivs(el, Gx, Gy, Gz, 1);
 
 	// calculate element volume
-	double ve = mesh.HexVolume(el, 1);
-	double Ve = mesh.HexVolume(el, 0);
+	double ve = HexVolume(el, 1);
+	double Ve = HexVolume(el, 0);
 
 	// get effective modulus
 	double k = pmi->Upp(el.m_eJ);
@@ -838,17 +838,17 @@ void FESolidDomain::UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matrix
 
 	// calculate the average cartesian derivatives
 	double GX[8], GY[8], GZ[8];
-	mesh.AvgCartDerivs(el, GX, GY, GZ);
+	AvgCartDerivs(el, GX, GY, GZ);
 
 	// calculate average deformation gradient Fbar
 	mat3d Fb;
-	mesh.AvgDefGrad(el, Fb, GX, GY, GZ);
+	AvgDefGrad(el, Fb, GX, GY, GZ);
 
 	// calculate the transposed inverse of Fbar
 	mat3d Fti = Fb.transinv();
 
 	// calculate current element volume
-	double ve = mesh.HexVolume(el, 1);
+	double ve = HexVolume(el, 1);
 
 	// current averaged shape derivatives
 	double Gx[8], Gy[8], Gz[8];
@@ -909,17 +909,17 @@ void FESolidDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &k
 
 	// calculate the average cartesian derivatives
 	double GX[8], GY[8], GZ[8];
-	mesh.AvgCartDerivs(el, GX, GY, GZ);
+	AvgCartDerivs(el, GX, GY, GZ);
 
 	// calculate average deformation gradient Fbar
 	mat3d Fb;
-	mesh.AvgDefGrad(el, Fb, GX, GY, GZ);
+	AvgDefGrad(el, Fb, GX, GY, GZ);
 
 	// calculate the transposed inverse of Fbar
 	mat3d Fti = Fb.transinv();
 
 	// calculate current element volume
-	double ve = mesh.HexVolume(el, 1);
+	double ve = HexVolume(el, 1);
 
 	// current averaged shape derivatives
 	double Gx[8], Gy[8], Gz[8];
@@ -1342,4 +1342,303 @@ bool FESolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matrix& k
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the average Cartesian derivatives
+//! Note that we assume that the GX, GY and GX contain the averaged 
+//! Cartesian derivatives
+
+void FESolidDomain::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8])
+{
+	vec3d* rt = el.rt();
+
+	F.zero();
+	for (int i=0; i<8; ++i)
+	{
+		F[0][0] += rt[i].x*GX[i];
+		F[0][1] += rt[i].x*GY[i];
+		F[0][2] += rt[i].x*GZ[i];
+
+		F[1][0] += rt[i].y*GX[i];
+		F[1][1] += rt[i].y*GY[i];
+		F[1][2] += rt[i].y*GZ[i];
+
+		F[2][0] += rt[i].z*GX[i];
+		F[2][1] += rt[i].z*GY[i];
+		F[2][2] += rt[i].z*GZ[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the average Cartesian derivatives
+
+void FESolidDomain::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int nstate)
+{
+	// get the nodal coordinates
+	vec3d* r = (nstate == 0? el.r0() : el.rt());
+	double x1 = r[0].x, y1 = r[0].y, z1 = r[0].z;
+	double x2 = r[1].x, y2 = r[1].y, z2 = r[1].z;
+	double x3 = r[2].x, y3 = r[2].y, z3 = r[2].z;
+	double x4 = r[3].x, y4 = r[3].y, z4 = r[3].z;
+	double x5 = r[4].x, y5 = r[4].y, z5 = r[4].z;
+	double x6 = r[5].x, y6 = r[5].y, z6 = r[5].z;
+	double x7 = r[6].x, y7 = r[6].y, z7 = r[6].z;
+	double x8 = r[7].x, y8 = r[7].y, z8 = r[7].z;
+
+	const double f12 = 1.0/12.0;
+
+	// set up the B-matrix
+	// we use the G arrays to store the B-matrix
+	GX[0] = f12*(y2*((z6-z3)-(z4-z5))+y3*(z2-z4)+y4*((z3-z8)-(z5-z2))+y5*((z8-z6)-(z2-z4))+y6*(z5-z2)+y8*(z4-z5));
+	GY[0] = f12*(z2*((x6-x3)-(x4-x5))+z3*(x2-x4)+z4*((x3-x8)-(x5-x2))+z5*((x8-x6)-(x2-x4))+z6*(x5-x2)+z8*(x4-x5));
+	GZ[0] = f12*(x2*((y6-y3)-(y4-y5))+x3*(y2-y4)+x4*((y3-y8)-(y5-y2))+x5*((y8-y6)-(y2-y4))+x6*(y5-y2)+x8*(y4-y5));
+
+	GX[1] = f12*(y3*((z7-z4)-(z1-z6))+y4*(z3-z1)+y1*((z4-z5)-(z6-z3))+y6*((z5-z7)-(z3-z1))+y7*(z6-z3)+y5*(z1-z6));
+	GY[1] = f12*(z3*((x7-x4)-(x1-x6))+z4*(x3-x1)+z1*((x4-x5)-(x6-x3))+z6*((x5-x7)-(x3-x1))+z7*(x6-x3)+z5*(x1-x6));
+	GZ[1] = f12*(x3*((y7-y4)-(y1-y6))+x4*(y3-y1)+x1*((y4-y5)-(y6-y3))+x6*((y5-y7)-(y3-y1))+x7*(y6-y3)+x5*(y1-y6));
+
+	GX[2] = f12*(y4*((z8-z1)-(z2-z7))+y1*(z4-z2)+y2*((z1-z6)-(z7-z4))+y7*((z6-z8)-(z4-z2))+y8*(z7-z4)+y6*(z2-z7));
+	GY[2] = f12*(z4*((x8-x1)-(x2-x7))+z1*(x4-x2)+z2*((x1-x6)-(x7-x4))+z7*((x6-x8)-(x4-x2))+z8*(x7-x4)+z6*(x2-x7));
+	GZ[2] = f12*(x4*((y8-y1)-(y2-y7))+x1*(y4-y2)+x2*((y1-y6)-(y7-y4))+x7*((y6-y8)-(y4-y2))+x8*(y7-y4)+x6*(y2-y7));
+
+	GX[3] = f12*(y1*((z5-z2)-(z3-z8))+y2*(z1-z3)+y3*((z2-z7)-(z8-z1))+y8*((z7-z5)-(z1-z3))+y5*(z8-z1)+y7*(z3-z8));
+	GY[3] = f12*(z1*((x5-x2)-(x3-x8))+z2*(x1-x3)+z3*((x2-x7)-(x8-x1))+z8*((x7-x5)-(x1-x3))+z5*(x8-x1)+z7*(x3-x8));
+	GZ[3] = f12*(x1*((y5-y2)-(y3-y8))+x2*(y1-y3)+x3*((y2-y7)-(y8-y1))+x8*((y7-y5)-(y1-y3))+x5*(y8-y1)+x7*(y3-y8));
+
+	GX[4] = f12*(y8*((z4-z7)-(z6-z1))+y7*(z8-z6)+y6*((z7-z2)-(z1-z8))+y1*((z2-z4)-(z8-z6))+y4*(z1-z8)+y2*(z6-z1));
+	GY[4] = f12*(z8*((x4-x7)-(x6-x1))+z7*(x8-x6)+z6*((x7-x2)-(x1-x8))+z1*((x2-x4)-(x8-x6))+z4*(x1-x8)+z2*(x6-x1));
+	GZ[4] = f12*(x8*((y4-y7)-(y6-y1))+x7*(y8-y6)+x6*((y7-y2)-(y1-y8))+x1*((y2-y4)-(y8-y6))+x4*(y1-y8)+x2*(y6-y1));
+
+	GX[5] = f12*(y5*((z1-z8)-(z7-z2))+y8*(z5-z7)+y7*((z8-z3)-(z2-z5))+y2*((z3-z1)-(z5-z7))+y1*(z2-z5)+y3*(z7-z2));
+	GY[5] = f12*(z5*((x1-x8)-(x7-x2))+z8*(x5-x7)+z7*((x8-x3)-(x2-x5))+z2*((x3-x1)-(x5-x7))+z1*(x2-x5)+z3*(x7-x2));
+	GZ[5] = f12*(x5*((y1-y8)-(y7-y2))+x8*(y5-y7)+x7*((y8-y3)-(y2-y5))+x2*((y3-y1)-(y5-y7))+x1*(y2-y5)+x3*(y7-y2));
+
+	GX[6] = f12*(y6*((z2-z5)-(z8-z3))+y5*(z6-z8)+y8*((z5-z4)-(z3-z6))+y3*((z4-z2)-(z6-z8))+y2*(z3-z6)+y4*(z8-z3));
+	GY[6] = f12*(z6*((x2-x5)-(x8-x3))+z5*(x6-x8)+z8*((x5-x4)-(x3-x6))+z3*((x4-x2)-(x6-x8))+z2*(x3-x6)+z4*(x8-x3));
+	GZ[6] = f12*(x6*((y2-y5)-(y8-y3))+x5*(y6-y8)+x8*((y5-y4)-(y3-y6))+x3*((y4-y2)-(y6-y8))+x2*(y3-y6)+x4*(y8-y3));
+
+	GX[7] = f12*(y7*((z3-z6)-(z5-z4))+y6*(z7-z5)+y5*((z6-z1)-(z4-z7))+y4*((z1-z3)-(z7-z5))+y3*(z4-z7)+y1*(z5-z4));
+	GY[7] = f12*(z7*((x3-x6)-(x5-x4))+z6*(x7-x5)+z5*((x6-x1)-(x4-x7))+z4*((x1-x3)-(x7-x5))+z3*(x4-x7)+z1*(x5-x4));
+	GZ[7] = f12*(x7*((y3-y6)-(y5-y4))+x6*(y7-y5)+x5*((y6-y1)-(y4-y7))+x4*((y1-y3)-(y7-y5))+x3*(y4-y7)+x1*(y5-y4));
+
+	// calculate the volume
+	double Vi = 1./(x1*GX[0]+x2*GX[1]+x3*GX[2]+x4*GX[3]+x5*GX[4]+x6*GX[5]+x7*GX[6]+x8*GX[7]);
+
+	// divide the B-matrix by the volume
+	GX[0] *= Vi; GY[0] *= Vi; GZ[0] *= Vi;
+	GX[1] *= Vi; GY[1] *= Vi; GZ[1] *= Vi;
+	GX[2] *= Vi; GY[2] *= Vi; GZ[2] *= Vi;
+	GX[3] *= Vi; GY[3] *= Vi; GZ[3] *= Vi;
+	GX[4] *= Vi; GY[4] *= Vi; GZ[4] *= Vi;
+	GX[5] *= Vi; GY[5] *= Vi; GZ[5] *= Vi;
+	GX[6] *= Vi; GY[6] *= Vi; GZ[6] *= Vi;
+	GX[7] *= Vi; GY[7] *= Vi; GZ[7] *= Vi;
+}
+//-----------------------------------------------------------------------------
+//! Calculates the exact volume of a hexahedral element
+
+double FESolidDomain::HexVolume(FESolidElement& el, int state)
+{
+	// let's make sure this is indeed a hex element
+//	assert(el.Type() == FE_HEX);
+
+	// get the nodal coordinates
+	vec3d* r = (state == 0? el.r0() : el.rt());
+	double x1 = r[0].x, y1 = r[0].y, z1 = r[0].z;
+	double x2 = r[1].x, y2 = r[1].y, z2 = r[1].z;
+	double x3 = r[2].x, y3 = r[2].y, z3 = r[2].z;
+	double x4 = r[3].x, y4 = r[3].y, z4 = r[3].z;
+	double x5 = r[4].x, y5 = r[4].y, z5 = r[4].z;
+	double x6 = r[5].x, y6 = r[5].y, z6 = r[5].z;
+	double x7 = r[6].x, y7 = r[6].y, z7 = r[6].z;
+	double x8 = r[7].x, y8 = r[7].y, z8 = r[7].z;
+
+	// set up the B-matrix
+	double B1[8];
+//	double B2[8];
+//	double B3[8];
+
+	const double f12 = 1.0/12.0;
+
+	B1[0] = f12*(y2*((z6-z3)-(z4-z5))+y3*(z2-z4)+y4*((z3-z8)-(z5-z2))+y5*((z8-z6)-(z2-z4))+y6*(z5-z2)+y8*(z4-z5));
+//	B2[0] = f12*(z2*((x6-x3)-(x4-x5))+z3*(x2-x4)+z4*((x3-x8)-(x5-x2))+z5*((x8-x6)-(x2-x4))+z6*(x5-x2)+z8*(x4-x5));
+//	B3[0] = f12*(x2*((y6-y3)-(y4-y5))+x3*(y2-y4)+x4*((y3-y8)-(y5-y2))+x5*((y8-y6)-(y2-y4))+x6*(y5-y2)+x8*(y4-y5));
+
+	B1[1] = f12*(y3*((z7-z4)-(z1-z6))+y4*(z3-z1)+y1*((z4-z5)-(z6-z3))+y6*((z5-z7)-(z3-z1))+y7*(z6-z3)+y5*(z1-z6));
+//	B2[1] = f12*(z3*((x7-x4)-(x1-x6))+z4*(x3-x1)+z1*((x4-x5)-(x6-x3))+z6*((x5-x7)-(x3-x1))+z7*(x6-x3)+z5*(x1-x6));
+//	B3[1] = f12*(x3*((y7-y4)-(y1-y6))+x4*(y3-y1)+x1*((y4-y5)-(y6-y3))+x6*((y5-y7)-(y3-y1))+x7*(y6-y3)+x5*(y1-y6));
+
+	B1[2] = f12*(y4*((z8-z1)-(z2-z7))+y1*(z4-z2)+y2*((z1-z6)-(z7-z4))+y7*((z6-z8)-(z4-z2))+y8*(z7-z4)+y6*(z2-z7));
+//	B2[2] = f12*(z4*((x8-x1)-(x2-x7))+z1*(x4-x2)+z2*((x1-x6)-(x7-x4))+z7*((x6-x8)-(x4-x2))+z8*(x7-x4)+z6*(x2-x7));
+//	B3[2] = f12*(x4*((y8-y1)-(y2-y7))+x1*(y4-y2)+x2*((y1-y6)-(y7-y4))+x7*((y6-y8)-(y4-y2))+x8*(y7-y4)+x6*(y2-y7));
+
+	B1[3] = f12*(y1*((z5-z2)-(z3-z8))+y2*(z1-z3)+y3*((z2-z7)-(z8-z1))+y8*((z7-z5)-(z1-z3))+y5*(z8-z1)+y7*(z3-z8));
+//	B2[3] = f12*(z1*((x5-x2)-(x3-x8))+z2*(x1-x3)+z3*((x2-x7)-(x8-x1))+z8*((x7-x5)-(x1-x3))+z5*(x8-x1)+z7*(x3-x8));
+//	B3[3] = f12*(x1*((y5-y2)-(y3-y8))+x2*(y1-y3)+x3*((y2-y7)-(y8-y1))+x8*((y7-y5)-(y1-y3))+x5*(y8-y1)+x7*(y3-y8));
+
+	B1[4] = f12*(y8*((z4-z7)-(z6-z1))+y7*(z8-z6)+y6*((z7-z2)-(z1-z8))+y1*((z2-z4)-(z8-z6))+y4*(z1-z8)+y2*(z6-z1));
+//	B2[4] = f12*(z8*((x4-x7)-(x6-x1))+z7*(x8-x6)+z6*((x7-x2)-(x1-x8))+z1*((x2-x4)-(x8-x6))+z4*(x1-x8)+z2*(x6-x1));
+//	B3[4] = f12*(x8*((y4-y7)-(y6-y1))+x7*(y8-y6)+x6*((y7-y2)-(y1-y8))+x1*((y2-y4)-(y8-y6))+x4*(y1-y8)+x2*(y6-y1));
+
+	B1[5] = f12*(y5*((z1-z8)-(z7-z2))+y8*(z5-z7)+y7*((z8-z3)-(z2-z5))+y2*((z3-z1)-(z5-z7))+y1*(z2-z5)+y3*(z7-z2));
+//	B2[5] = f12*(z5*((x1-x8)-(x7-x2))+z8*(x5-x7)+z7*((x8-x3)-(x2-x5))+z2*((x3-x1)-(x5-x7))+z1*(x2-x5)+z3*(x7-x2));
+//	B3[5] = f12*(x5*((y1-y8)-(y7-y2))+x8*(y5-y7)+x7*((y8-y3)-(y2-y5))+x2*((y3-y1)-(y5-y7))+x1*(y2-y5)+x3*(y7-y2));
+
+	B1[6] = f12*(y6*((z2-z5)-(z8-z3))+y5*(z6-z8)+y8*((z5-z4)-(z3-z6))+y3*((z4-z2)-(z6-z8))+y2*(z3-z6)+y4*(z8-z3));
+//	B2[6] = f12*(z6*((x2-x5)-(x8-x3))+z5*(x6-x8)+z8*((x5-x4)-(x3-x6))+z3*((x4-x2)-(x6-x8))+z2*(x3-x6)+z4*(x8-x3));
+//	B3[6] = f12*(x6*((y2-y5)-(y8-y3))+x5*(y6-y8)+x8*((y5-y4)-(y3-y6))+x3*((y4-y2)-(y6-y8))+x2*(y3-y6)+x4*(y8-y3));
+
+	B1[7] = f12*(y7*((z3-z6)-(z5-z4))+y6*(z7-z5)+y5*((z6-z1)-(z4-z7))+y4*((z1-z3)-(z7-z5))+y3*(z4-z7)+y1*(z5-z4));
+//	B2[7] = f12*(z7*((x3-x6)-(x5-x4))+z6*(x7-x5)+z5*((x6-x1)-(x4-x7))+z4*((x1-x3)-(x7-x5))+z3*(x4-x7)+z1*(x5-x4));
+//	B3[7] = f12*(x7*((y3-y6)-(y5-y4))+x6*(y7-y5)+x5*((y6-y1)-(y4-y7))+x4*((y1-y3)-(y7-y5))+x3*(y4-y7)+x1*(y5-y4));
+
+	// calculate the volume V= xi*B1[i] = yi*B2[i] = zi*B3[i] (sum over i)
+	return (x1*B1[0]+x2*B1[1]+x3*B1[2]+x4*B1[3]+x5*B1[4]+x6*B1[5]+x7*B1[6]+x8*B1[7]);
+}
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::UpdateStresses(FEM &fem)
+{
+	int i, n;
+	int nint;
+	double* gw;
+
+	for (i=0; i<(int) m_Elem.size(); ++i)
+	{
+		// get the solid element
+		FESolidElement& el = m_Elem[i];
+
+		// we skip rigid elements
+		if (!el.IsRigid())
+		{
+			// unpack the element data
+			m_pMesh->UnpackElement(el);
+
+			// get the number of integration points
+			nint = el.GaussPoints();
+
+			// get the integration weights
+			gw = el.GaussWeights();
+
+			// get the material
+			FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+
+			// extract the elastic component
+			FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+
+			// see if we are dealing with a poroelastic material or not
+			bool bporo = false;
+			if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+
+			// see if the material is incompressible or not
+			// if the material is incompressible the element
+			// is a three-field element and we need to evaluate
+			// the average dilatation and pressure fields
+			FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
+			if (pmi)
+			{
+				// get the material's bulk modulus
+				double K = pmi->BulkModulus();
+
+				// calculate the average dilatation and pressure
+				double v = 0, V = 0;
+
+				if (el.Type() == FE_UDGHEX)
+				{
+					v = HexVolume(el, 1);
+					V = HexVolume(el, 0);
+				}
+				else 
+				{
+					for (n=0; n<nint; ++n)
+					{
+						v += el.detJt(n)*gw[n];
+						V += el.detJ0(n)*gw[n];
+					}
+				}
+
+				// calculate volume ratio
+				el.m_eJ = v / V;
+
+				// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
+				//        <----- Lag. mult. ----->   <------ penalty ----->
+//				el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
+				el.m_ep = pmi->Up(el.m_eJ);
+			}
+
+			// for the enhanced strain hex we need a slightly different procedure
+			// for calculating the element's stress. For this element, the stress
+			// is evaluated using an average deformation gradient.
+			if (el.Type() == FE_UDGHEX)
+			{
+				// get the material point data
+				FEMaterialPoint& mp = *el.m_State[0];
+				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+				// get the average cartesian derivatives
+				double GX[8], GY[8], GZ[8];
+				AvgCartDerivs(el, GX, GY, GZ);
+
+				// get the average deformation gradient and determinant
+				AvgDefGrad(el, pt.F, GX, GY, GZ);
+				pt.J = pt.F.det();
+
+				// set the element variables
+				pt.avgJ = el.m_eJ;
+				pt.avgp = el.m_ep;
+
+				// calculate the stress at this material point
+				pt.s = pm->Stress(mp);
+			}
+			else
+			{
+				// loop over the integration points and calculate
+				// the stress at the integration point
+				for (n=0; n<nint; ++n)
+				{
+					FEMaterialPoint& mp = *el.m_State[n];
+					FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+					// get the deformation gradient and determinant
+					pt.J = el.defgrad(pt.F, n);
+
+					// three-field element variables
+					pt.avgJ = el.m_eJ;
+					pt.avgp = el.m_ep;
+
+					// poroelasticity data
+					if (bporo)
+					{
+						FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+						// evaluate fluid pressure at gauss-point
+						pt.m_p = el.Evaluate(el.pt(), n);
+
+						// calculate the gradient of p at gauss-point
+						pt.m_gradp = el.gradient(el.pt(), n);
+					}
+
+					// calculate the stress at this material point
+					pt.s = pm->Stress(mp);
+
+					if (dynamic_cast<FEMicroMaterial*>(pme))
+					{
+						// the micro-material screws up the currently unpacked elements
+						// so I have to unpack the element data again
+						m_pMesh->UnpackElement(el);
+					}
+
+					if (bporo)
+					{
+						FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+						// for poroelastic materials also update the fluid flux
+						FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);
+						pt.m_w = pmat->Flux(mp);
+					}
+				}
+			}
+		}
+	}
 }

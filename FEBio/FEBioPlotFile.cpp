@@ -310,9 +310,10 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	}
 
 	// write truss element data
-	for (i=0; i<m.TrussElements(); ++i)
+	FETrussDomain& td = m.TrussDomain();
+	for (i=0; i<td.size(); ++i)
 	{
-		FETrussElement& el = m.TrussElement(i);
+		FETrussElement& el = td.Element(i);
 		el.m_nID = nid++;
 		n[0] = el.GetMatID()+1;
 		n[1] = el.m_node[0]+1;

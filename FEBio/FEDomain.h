@@ -32,12 +32,17 @@ public:
 	void create(int n) { m_Elem.create(n); }
 	int size() { return m_Elem.size(); }
 	FESolidElement& operator [] (int n) { return m_Elem[n]; }
+	
+	FESolidElement& Element(int n) { return m_Elem[n]; }
 
 	FESolidDomain& operator = (FESolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
 
 	void Reset();
+
+	// update stresses
+	void UpdateStresses(FEM& fem);
 
 	// --- S T I F F N E S S ---
 
@@ -88,6 +93,12 @@ public:
 	//! Calculates the internal fluid forces
 	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
 
+	// ---
+
+	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
+	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
+	double HexVolume(FESolidElement& el, int state = 0);
+
 protected:
 	vector<FESolidElement>	m_Elem;
 };
@@ -103,11 +114,16 @@ public:
 	int size() { return m_Elem.size(); }
 	FEShellElement& operator [] (int n) { return m_Elem[n]; }
 
+	FEShellElement& Element(int n) { return m_Elem[n]; }
+
 	FEShellDomain& operator = (FEShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
 
 	void Reset();
+
+	// update stresses
+	void UpdateStresses(FEM& fem);
 
 	// --- S T I F F N E S S --- 
 
@@ -140,17 +156,25 @@ public:
 	int size() { return m_Elem.size(); }
 	FETrussElement& operator [] (int n) { return m_Elem[n]; }
 
+	FETrussElement& Element(int i) { return m_Elem[i]; }
+
 	FETrussDomain& operator = (FETrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
 
 	void Reset();
 
+	//! Unpack truss element data
+	void UnpackElement(FETrussElement& el, unsigned int flag = FE_UNPACK_ALL);
+
 	//! calculates the truss element stiffness matrix
 	void ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke);
 
 	//! Calculates the internal stress vector for solid elements
 	void InternalForces(FETrussElement& el, vector<double>& fe);
+
+	//! update the truss stresses
+	void UpdateStresses(FEM& fem);
 
 protected:
 	vector<FETrussElement>	m_Elem;

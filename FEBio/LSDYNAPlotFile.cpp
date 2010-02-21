@@ -89,7 +89,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	plh.flagT = (m_nfield[3] == 0? 0 : 1);
 	plh.icode = 6;
 	plh.ndim  = 4;
-	plh.nel2  = fem.m_mesh.TrussElements();
+	plh.nel2  = fem.m_mesh.TrussDomain().size();
 	plh.nel4  = fem.m_mesh.ShellElements();
 	plh.nel8  = fem.m_mesh.SolidElements();
 	plh.nglbv = 0;
@@ -175,9 +175,10 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	}
 
 	// write truss element data
-	for (i=0; i<mesh.TrussElements(); ++i)
+	FETrussDomain& td = mesh.TrussDomain();
+	for (i=0; i<td.size(); ++i)
 	{
-		FETrussElement& el = mesh.TrussElement(i);
+		FETrussElement& el = td.Element(i);
 		el.m_nID = nid++;
 		n[0] = el.m_node[0]+1;
 		n[1] = el.m_node[1]+1;
@@ -388,10 +389,11 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 
 	// write truss element data
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
-	for (i=0; i<mesh.TrussElements(); ++i)
+	FETrussDomain& td = mesh.TrussDomain();
+	for (i=0; i<td.size(); ++i)
 	{
-		FETrussElement& el = mesh.TrussElement(i);
-		mesh.UnpackElement(el);
+		FETrussElement& el = td.Element(i);
+		td.UnpackElement(el);
 		FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
 		
 		double l = el.Length();
