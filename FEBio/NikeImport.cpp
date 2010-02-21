@@ -588,7 +588,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		node.m_rid = -1;
 	}
 
-	fem.m_RN.create(4*m_nrn);
+	fem.m_RN.resize(4*m_nrn);
 	int nrn = 0;
 
 	int rn[4], rb;
@@ -809,7 +809,7 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	/////////////// C O N C E N T R A T E D   N O D A L   F O R C E   D E C K ///////////////
 	if (m_ncnf>0)
 	{
-		fem.m_FC.create(m_ncnf);
+		fem.m_FC.resize(m_ncnf);
 		int bc;
 		for (i=0; i<m_ncnf; ++i)
 		{
@@ -833,7 +833,7 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	////////////////////// P R E S S U R E   B O U N D A R Y   D E C K //////////////////////
 	if (m_npr > 0)
 	{
-		fem.m_PC.create(m_npr);
+		fem.m_PC.resize(m_npr);
 		fem.m_psurf->Create(m_npr);
 		int n[4], N, j;
 		for (i=0; i<m_npr; ++i)
@@ -872,7 +872,7 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	////////////////// D I S P L A C E M E N T   B O U N D A R Y   D E C K //////////////////
 	if (m_ndis > 0)
 	{
-		fem.m_DC.create(m_ndis);
+		fem.m_DC.resize(m_ndis);
 		for (i=0; i<m_ndis; ++i)
 		{
 			if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);

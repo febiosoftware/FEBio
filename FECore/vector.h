@@ -36,7 +36,7 @@ public:
 	}
 	vector(const vector<T>& a);
 
-	virtual void create(int n, int nalloc=0) 
+	virtual void resize(int n, int nalloc=0) 
 	{ 
 		if (nalloc < n) nalloc = n;
 		alloc(nalloc);
@@ -198,7 +198,7 @@ template <class T> vector<T>::vector(const vector<T>& a)
 template <class T> vector<T>& vector<T>::operator = (const vector<T>& a)
 {
 	// allocate storage
-	create(a.m_nsize);
+	resize(a.m_nsize);
 
 	// copy data
 	for (int i=0; i<m_nsize; ++i) m_pdata[i] = a.m_pdata[i];

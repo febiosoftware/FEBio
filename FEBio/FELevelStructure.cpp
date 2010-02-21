@@ -55,7 +55,7 @@ void FELevelStructure::Create(FENodeNodeList& L, int nroot)
 	// for each node to which level it belongs. We initialize
 	// the array with -1 to indicate that no node has been
 	// assigned to a level
-	m_node.create(N);
+	m_node.resize(N);
 	m_node.set(-1);
 
 	// place all nodes in a level. We use a queue for this
@@ -103,9 +103,9 @@ void FELevelStructure::Create(FENodeNodeList& L, int nroot)
 	++nlevels;
 
 	// allocate levels data
-	m_lval.create(nlevels); m_lval.zero();
-	m_pl.create(nlevels);
-	m_nref.create(N);
+	m_lval.resize(nlevels); m_lval.zero();
+	m_pl.resize(nlevels);
+	m_nref.resize(N);
 
 	// At this point it is important to realize that
 	// there still may be nodes that are not assigned to 
@@ -194,10 +194,10 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 	int N = NL.Size();
 
 	// create the valence array
-	m_lval.create(k); m_lval.zero();
+	m_lval.resize(k); m_lval.zero();
 
 	// create the nodal array
-	m_node.create(N); m_node.set(-1);
+	m_node.resize(N); m_node.set(-1);
 
 	// In a moment nodes of the graph NL will be marked
 	// as "removed". This will split the graph into 
@@ -327,7 +327,7 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 		vector< vector<int> > Comp(nc);
 		for (i=0; i<nc; ++i) 
 		{
-			Comp[i].create(cc[i]);
+			Comp[i].resize(cc[i]);
 			cc[i] = 0;
 		}
 
@@ -439,8 +439,8 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 	// We can now finish allocating and initializing the rest of the level structure data
 
 	// allocate levels data
-	m_pl.create(k);
-	m_nref.create(N);
+	m_pl.resize(k);
+	m_nref.resize(N);
 
 	// set nref pointers
 	m_pl[0] = 0;

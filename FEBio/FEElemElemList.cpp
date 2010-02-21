@@ -19,7 +19,7 @@ void FEElemElemList::Init()
 	int NE = m.SolidElements() + m.ShellElements();
 
 	// allocate storage
-	m_ref.create(NE);
+	m_ref.resize(NE);
 
 	// count nr of neighbors
 	int NN = 0, n = 0, nf;
@@ -40,7 +40,7 @@ void FEElemElemList::Init()
 		NN += nf;
 	}
 
-	m_pel.create(NN);
+	m_pel.resize(NN);
 }
 
 void FEElemElemList::Create(FEMesh* pmesh)

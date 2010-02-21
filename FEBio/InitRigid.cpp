@@ -162,7 +162,7 @@ bool FEM::InitRigidBodies()
 
 	// Ok, we now know how many rigid bodies there are
 	// so let's create them
-	m_RB.create(m_nrb);
+	m_RB.resize(m_nrb);
 	for (i=0; i<m_nrb; ++i)
 	{
 		// attach the rigid body do this FEM

@@ -74,16 +74,16 @@ void FESlidingSurface::Init()
 	int nn = Nodes();
 
 	// allocate other surface data
-	gap.create(nn);		// gap funtion
-	nu.create(nn);		// node normal 
-	pme.create(nn);		// penetrated master element
-	rs.create(nn);		// natural coords of projected slave node on master element
-	rsp.create(nn);
-	Lm.create(nn);
-	M.create(nn);
-	Lt.create(nn);
-	off.create(nn);
-	eps.create(nn);
+	gap.resize(nn);		// gap funtion
+	nu.resize(nn);		// node normal 
+	pme.resize(nn);		// penetrated master element
+	rs.resize(nn);		// natural coords of projected slave node on master element
+	rsp.resize(nn);
+	Lm.resize(nn);
+	M.resize(nn);
+	Lt.resize(nn);
+	off.resize(nn);
+	eps.resize(nn);
 
 	// set initial values
 	gap.zero();
@@ -583,7 +583,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 					// calculate the degrees of freedom
 					nmeln = mel.Nodes();
 					ndof = 3*(nmeln+1);
-					fe.create(ndof);
+					fe.resize(ndof);
 
 					// calculate the nodal force
 					ContactNodalForce(m, ss, mel, fe);
@@ -592,7 +592,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 					for (l=0; l<ndof; ++l) fe[l] *= detJ[n]*w[n];
 					
 					// fill the lm array
-					lm.create(3*(nmeln+1));
+					lm.resize(3*(nmeln+1));
 					lm[0] = sLM[n*3  ];
 					lm[1] = sLM[n*3+1];
 					lm[2] = sLM[n*3+2];
@@ -605,7 +605,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 					}
 
 					// fill the en array
-					en.create(nmeln+1);
+					en.resize(nmeln+1);
 					en[0] = sel.m_node[n];
 					for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
@@ -959,7 +959,7 @@ void FESlidingInterface::ContactStiffness()
 					}
 
 					// create the en array
-					en.create(nmeln+1);
+					en.resize(nmeln+1);
 					en[0] = se.m_node[n];
 					for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 						

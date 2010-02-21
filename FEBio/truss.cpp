@@ -72,7 +72,7 @@ void FETrussDomain::InternalForces(FETrussElement& el, vector<double>& fe)
 	double l = el.Length();
 
 	// calculate nodal forces
-	fe.create(6);
+	fe.resize(6);
 	fe[0] = tau*V/l*n.x;
 	fe[1] = tau*V/l*n.y;
 	fe[2] = tau*V/l*n.z;

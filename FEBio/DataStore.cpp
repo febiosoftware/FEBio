@@ -178,7 +178,7 @@ void DataRecord::SetItemList(const char* szlist)
 
 	if (n != 0)
 	{
-		m_item.create(n);
+		m_item.resize(n);
 
 		sz = (char*) szlist;
 		n = 0;
@@ -247,7 +247,7 @@ double NodeDataRecord::Evaluate(int item, const char* szexpr)
 void NodeDataRecord::SelectAllItems()
 {
 	int n = m_pfem->m_mesh.Nodes();
-	m_item.create(n);
+	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }
 
@@ -255,7 +255,7 @@ void NodeDataRecord::SetItemList(FENodeSet* pns)
 {
 	int n = pns->size();
 	assert(n);
-	m_item.create(n);
+	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i];
 }
 
@@ -348,7 +348,7 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 void ElementDataRecord::SelectAllItems()
 {
 	int n = m_pfem->m_mesh.ShellElements() + m_pfem->m_mesh.SolidElements();
-	m_item.create(n);
+	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }
 
@@ -406,7 +406,7 @@ void RigidBodyDataRecord::SelectAllItems()
 
 	if (n > 0)
 	{
-		m_item.create(n);
+		m_item.resize(n);
 		n = 0;
 		for (i=0; i<m_pfem->Materials(); ++i)
 		{

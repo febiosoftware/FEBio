@@ -988,7 +988,7 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 
 	// create the pelem array
 	vector<FEElement*> pelem;
-	pelem.create(nbel + nsel + ntel);
+	pelem.resize(nbel + nsel + ntel);
 	pelem.zero();
 
 	for (i=0; i<nbel; ++i)
@@ -1444,7 +1444,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 			while (!t.isend()) { npr++; ++t; }
 
 			// allocate pressure data
-			fem.m_PC.create(npr);
+			fem.m_PC.resize(npr);
 			fem.m_psurf->Create(npr);
 
 			// read the pressure data

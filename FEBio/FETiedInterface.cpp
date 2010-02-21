@@ -455,7 +455,7 @@ void FETiedInterface::ContactForces(vector<double>& F)
 				}
 
 				// calculate force vector
-				fe.create(3*(nmeln+1));
+				fe.resize(3*(nmeln+1));
 				fe[0] = -detJ*w[n]*tc.x;
 				fe[1] = -detJ*w[n]*tc.y;
 				fe[2] = -detJ*w[n]*tc.z;
@@ -467,7 +467,7 @@ void FETiedInterface::ContactForces(vector<double>& F)
 				}
 	
 				// fill the lm array
-				lm.create(3*(nmeln+1));
+				lm.resize(3*(nmeln+1));
 				lm[0] = sLM[n*3  ];
 				lm[1] = sLM[n*3+1];
 				lm[2] = sLM[n*3+2];
@@ -480,7 +480,7 @@ void FETiedInterface::ContactForces(vector<double>& F)
 				}
 
 				// fill the en array
-				en.create(nmeln+1);
+				en.resize(nmeln+1);
 				en[0] = sel.m_node[n];
 				for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
@@ -653,7 +653,7 @@ void FETiedInterface::ContactStiffness()
 				}
 
 				// create the en array
-				en.create(nmeln+1);
+				en.resize(nmeln+1);
 				en[0] = se.m_node[n];
 				for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 						

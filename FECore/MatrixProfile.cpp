@@ -20,7 +20,7 @@ MatrixProfile::MatrixProfile(int n)
 		for (int i=0; i<n; ++i)
 		{
 			vector<int>& a = m_prof[i];
-			a.create(2);
+			a.resize(2);
 			a.setgrowsize(10);
 			a[0] = i;
 			a[1] = i;

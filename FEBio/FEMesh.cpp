@@ -58,7 +58,7 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 
 void FEMesh::Create(int nodes, int elems, int shells, int ntruss)
 {
-	if (nodes >0) m_Node.create (nodes);
+	if (nodes >0) m_Node.resize (nodes);
 	if (elems >0) m_Elem.create (elems);
 	if (shells>0) m_Shell.create(shells);
 	if (ntruss>0) m_Truss.create(ntruss);

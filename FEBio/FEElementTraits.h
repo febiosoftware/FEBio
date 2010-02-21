@@ -53,12 +53,12 @@ public:
 		neln = ne;
 		nint = ni;
 		
-		r0.create(ne);
-		rt.create(ne);
-		vt.create(ne);
-		pt.create(ne);
+		r0.resize(ne);
+		rt.resize(ne);
+		vt.resize(ne);
+		pt.resize(ne);
 
-		LM.create(MAX_NDOFS*ne);
+		LM.resize(MAX_NDOFS*ne);
 
 		H.Create(ni, ne);
 
@@ -111,22 +111,22 @@ class FESolidElementTraits : public FEElementTraits
 public:
 	FESolidElementTraits(int ni, int ne) : FEElementTraits(ni, ne) 
 	{
-		gr.create(ni);
-		gs.create(ni);
-		gt.create(ni);
-		gw.create(ni);
+		gr.resize(ni);
+		gs.resize(ni);
+		gt.resize(ni);
+		gw.resize(ni);
 
 		Gr.Create(ni, ne);
 		Gs.Create(ni, ne);
 		Gt.Create(ni, ne);
 
-		m_Jt.create(ni);
-		m_Jti.create(ni);
-		m_detJt.create(ni);
+		m_Jt.resize(ni);
+		m_Jti.resize(ni);
+		m_detJt.resize(ni);
 
-		m_J0.create(ni);
-		m_J0i.create(ni);
-		m_detJ0.create(ni);
+		m_J0.resize(ni);
+		m_J0i.resize(ni);
+		m_detJ0.resize(ni);
 	}
 
 	void UnpackData(int nflag);
@@ -245,9 +245,9 @@ class FESurfaceElementTraits : public FEElementTraits
 public:
 	FESurfaceElementTraits(int ni, int ne) : FEElementTraits(ni, ne) 
 	{
-		gr.create(ni);
-		gs.create(ni);
-		gw.create(ni);
+		gr.resize(ni);
+		gs.resize(ni);
+		gw.resize(ni);
 
 		Gr.Create(ni, ne);
 		Gs.Create(ni, ne);
@@ -343,24 +343,24 @@ class FEShellElementTraits : public FEElementTraits
 public:
 	FEShellElementTraits(int ni, int ne) : FEElementTraits(ni, ne) 
 	{
-		gr.create(ni);
-		gs.create(ni);
-		gt.create(ni);
-		gw.create(ni);
+		gr.resize(ni);
+		gs.resize(ni);
+		gt.resize(ni);
+		gw.resize(ni);
 
 		Hr.Create(ni, ne);
 		Hs.Create(ni, ne);
 
-		D0.create(ne);
-		Dt.create(ne);
+		D0.resize(ne);
+		Dt.resize(ne);
 
-		m_Jt.create(ni);
-		m_Jti.create(ni);
-		m_detJt.create(ni);
+		m_Jt.resize(ni);
+		m_Jti.resize(ni);
+		m_detJt.resize(ni);
 
-		m_J0.create(ni);
-		m_J0i.create(ni);
-		m_detJ0.create(ni);
+		m_J0.resize(ni);
+		m_J0i.resize(ni);
+		m_detJ0.resize(ni);
 	}
 
 	void UnpackData(int nflag);

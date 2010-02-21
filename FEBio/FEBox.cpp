@@ -31,7 +31,7 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 	int elems = nx*ny*nz;
 
 	// allocate data
-	m_Node.create(nodes);
+	m_Node.resize(nodes);
 	m_Elem.create(elems);
 
 	// create the nodes

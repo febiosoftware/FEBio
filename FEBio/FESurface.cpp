@@ -43,7 +43,7 @@ void FESurface::Init()
 	}
 
 	// allocate node index table
-	node.create(nn);
+	node.resize(nn);
 
 	// fill the node index table
 	for (i=0; i<mesh.Nodes(); ++i)

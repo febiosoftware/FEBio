@@ -17,7 +17,7 @@
 FEStiffnessMatrix::FEStiffnessMatrix(SparseMatrix* pK)
 {
 	m_pA = pK;
-	m_LM.create(MAX_LM_SIZE);
+	m_LM.resize(MAX_LM_SIZE);
 	m_pMP = 0;
 	m_nlm = 0;
 }
@@ -186,7 +186,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 									int ns = plc->slave.size();
 
-									lm.create(ne + ns);
+									lm.resize(ne + ns);
 									for (l=0; l<ne; ++l) lm[l] = el.LM()[l];
 
 									list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
@@ -208,7 +208,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				list<FELinearConstraint>::iterator ic = fem.m_LinC.begin();
 				n = 0;
 				for (i=0; i<nlin; ++i, ++ic) n += ic->slave.size();
-				lm.create(n);
+				lm.resize(n);
 				ic = fem.m_LinC.begin();
 				n = 0;
 				for (i=0; i<nlin; ++i, ++ic)
@@ -234,7 +234,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					for (i=0; i<N; ++i, ++it)
 					{
 						int n = (*it)->m_dof.size();
-						lm.create(n);
+						lm.resize(n);
 						FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
 						for (j=0; j<n; ++j, ++is) lm[j] = is->neq;
 	

@@ -33,7 +33,7 @@ public:
 	virtual ~FESurface(){}
 
 	//! creates surface
-	void Create(int n) { m_el.create(n); }
+	void Create(int n) { m_el.resize(n); }
 
 	//! return an element of the surface
 	FESurfaceElement& Element(int i) { return m_el[i]; }

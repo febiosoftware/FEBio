@@ -44,7 +44,7 @@ public:
 		int nint = GaussPoints();
 		int neln = Nodes();
 
-		m_node.create( neln );
+		m_node.resize( neln );
 	}
 
 	void UnpackTraitsData(int nflag) 
@@ -161,7 +161,7 @@ public:
 
 		int nint = GaussPoints();
 
-		m_State.create(nint);
+		m_State.resize(nint);
 		m_State.zero();
 	}
 
@@ -327,7 +327,7 @@ public:
 	virtual void SetTraits(FEElementTraits* pt)
 	{
 		FEElement::SetTraits(pt);
-		m_lnode.create(Nodes());
+		m_lnode.resize(Nodes());
 	}
 	double* GaussWeights() { return ((FESurfaceElementTraits*)(m_pT))->gw; }			// weights of integration points
 
@@ -519,11 +519,11 @@ public:
 	virtual void SetTraits(FEElementTraits* ptraits)
 	{
 		FEElement::SetTraits(ptraits);
-		m_h0.create(Nodes());
+		m_h0.resize(Nodes());
 
 		int nint = GaussPoints();
 
-		m_State.create(nint);
+		m_State.resize(nint);
 		m_State.zero();
 	}
 
@@ -689,7 +689,7 @@ public:
 	virtual void SetTraits(FEElementTraits* ptraits)
 	{
 		FEElement::SetTraits(ptraits);
-		m_State.create(1);
+		m_State.resize(1);
 		m_State.zero();
 	}
 

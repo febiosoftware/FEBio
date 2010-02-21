@@ -101,7 +101,7 @@ public:
 	{
 		int n;
 		fread(&n, sizeof(int), 1, m_fp);
-		v.create(n);
+		v.resize(n);
 		fread((T*) v, sizeof(T), n, m_fp);
 		return (*this);
 	}

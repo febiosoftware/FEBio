@@ -622,7 +622,7 @@ void FEAnalysis::Serialize(Archive& ar)
 		// boundary conditions
 		int n, nbc;
 		ar >> n;
-		if (n) m_BC.create(n);
+		if (n) m_BC.resize(n);
 		for (int i=0; i<n; ++i)
 		{
 			ar >> nbc;

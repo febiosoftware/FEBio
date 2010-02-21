@@ -278,7 +278,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 	// but we actually need the inverse permutation. That is, for
 	// each new node, the old node number that is associated with it.
 	// This array is stored in P.
-	P.create(N);
+	P.resize(N);
 	for (i=0; i<N; ++i)
 	{
 		P[Q[i]] = i;

@@ -20,10 +20,10 @@ bool FEHeatSolver::Init()
 	int neq = m_fem.m_neq;
 
 	// allocate data structures
-	m_R.create(neq);
-	m_T.create(neq);
-	m_u.create(neq);
-	m_Tp.create(neq); m_Tp.zero();
+	m_R.resize(neq);
+	m_T.resize(neq);
+	m_u.resize(neq);
+	m_Tp.resize(neq); m_Tp.zero();
 
 	return true;
 }

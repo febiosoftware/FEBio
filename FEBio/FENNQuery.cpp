@@ -70,7 +70,7 @@ void FENNQuery::Init()
 	}
 
 	// create the BK-"tree"
-	m_bk.create(N);
+	m_bk.resize(N);
 	for (i=0; i<N; ++i) 
 	{
 		r = m_ps->Node(i).m_rt;

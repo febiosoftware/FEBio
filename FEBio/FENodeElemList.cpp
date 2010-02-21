@@ -21,8 +21,8 @@ void FENodeElemList::Create(FESurface& s)
 	int ne = s.Elements();
 
 	// create nodal valence array
-	m_nval.create(nn);
-	m_pn.create(nn);
+	m_nval.resize(nn);
+	m_pn.resize(nn);
 
 	// clear valence table
 	m_nval.zero();
@@ -42,7 +42,7 @@ void FENodeElemList::Create(FESurface& s)
 	}
 
 	// create the element reference array
-	m_eref.create(nsize);
+	m_eref.resize(nsize);
 
 	// set eref pointers
 	m_pn[0] = 0;
@@ -83,8 +83,8 @@ void FENodeElemList::Create(FEMesh& mesh)
 	int NS = mesh.ShellElements();
 
 	// create nodal valence array
-	m_nval.create(NN);
-	m_pn.create(NN);
+	m_nval.resize(NN);
+	m_pn.resize(NN);
 
 	// clear valence table
 	m_nval.zero();
@@ -115,7 +115,7 @@ void FENodeElemList::Create(FEMesh& mesh)
 	}
 
 	// create the element reference array
-	m_eref.create(nsize);
+	m_eref.resize(nsize);
 
 	// set eref pointers
 	m_pn[0] = 0;

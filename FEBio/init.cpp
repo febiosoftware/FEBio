@@ -323,7 +323,7 @@ bool FEM::InitConstraints()
 	}
 
 	// create the linear constraint table
-	m_LCT.create(m_mesh.Nodes()*MAX_NDOFS);
+	m_LCT.resize(m_mesh.Nodes()*MAX_NDOFS);
 
 	// initialize it to -1
 	m_LCT.set(-1);
@@ -342,7 +342,7 @@ bool FEM::InitConstraints()
 	// we store all pointers in an array
 	// TODO: perhaps I should store the linear constraints that way
 	// anyways and get rid of the list
-	m_LCA.create(nlin);
+	m_LCA.resize(nlin);
 	ic = m_LinC.begin();
 	for (i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
 

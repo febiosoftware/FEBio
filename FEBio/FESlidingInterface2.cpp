@@ -29,19 +29,19 @@ void FESlidingSurface2::Init()
 	}
 
 	// allocate data structures
-	m_gap.create(nint);
-	m_nu.create(nint);
-	m_rs.create(nint);
-	m_Lmd.create(nint);
-	m_Lmp.create(nint);
-	m_pme.create(nint);
-	m_epsn.create(nint);
-	m_epsp.create(nint);
+	m_gap.resize(nint);
+	m_nu.resize(nint);
+	m_rs.resize(nint);
+	m_Lmd.resize(nint);
+	m_Lmp.resize(nint);
+	m_pme.resize(nint);
+	m_epsn.resize(nint);
+	m_epsp.resize(nint);
 
-	m_nn.create(Nodes());
+	m_nn.resize(Nodes());
 	m_nn.zero();
 
-	m_nei.create(Elements());
+	m_nei.resize(Elements());
 	nint = 0;
 	for (i=0; i<Elements(); ++i)
 	{
@@ -61,7 +61,7 @@ void FESlidingSurface2::Init()
 	// allocate biphasic stuff
 	if (m_pfem->m_pStep->m_nModule == FE_POROELASTIC)
 	{
-		m_pg.create(nint);
+		m_pg.resize(nint);
 		m_pg.zero();
 	}
 }
@@ -777,7 +777,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					int ndof = 3*(nseln + nmeln);
 
 					// build the LM vector
-					LM.create(ndof);
+					LM.resize(ndof);
 					for (k=0; k<nseln; ++k)
 					{
 						LM[3*k  ] = sLM[3*k  ];
@@ -793,7 +793,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					}
 
 					// build the en vector
-					en.create(nseln+nmeln);
+					en.resize(nseln+nmeln);
 					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
@@ -822,7 +822,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					tn = MBRACKET(tn);
 
 					// calculate the force vector
-					fe.create(ndof);
+					fe.resize(ndof);
 
 					for (k=0; k<nseln; ++k)
 					{
@@ -857,12 +857,12 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 						double wn = ss.m_Lmp[ni] + epsp*ss.m_pg[ni];
 
 						// fill the LM
-						LM.create(ndof);
+						LM.resize(ndof);
 						for (k=0; k<nseln; ++k) LM[k        ] = sLM[3*nseln+k];
 						for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[3*nmeln+k];
 
 						// fill the force array
-						fe.create(ndof);
+						fe.resize(ndof);
 						for (k=0; k<nseln; ++k) fe[k      ] =  Hs[k];
 						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
 
@@ -989,7 +989,7 @@ void FESlidingInterface2::ContactStiffness()
 					int ndof = 3*(nseln + nmeln);
 
 					// build the LM vector
-					LM.create(ndof);
+					LM.resize(ndof);
 					for (k=0; k<nseln; ++k)
 					{
 						LM[3*k  ] = sLM[3*k  ];
@@ -1005,7 +1005,7 @@ void FESlidingInterface2::ContactStiffness()
 					}
 
 					// build the en vector
-					en.create(nseln+nmeln);
+					en.resize(nseln+nmeln);
 					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
@@ -1216,7 +1216,7 @@ void FESlidingInterface2::ContactStiffness()
 						if (!m_bsymm)
 						{
 							int ndof = 4*(nseln+nmeln);
-							LM.create(ndof);
+							LM.resize(ndof);
 							for (k=0; k<nseln; ++k)
 							{
 								LM[4*k  ] = sLM[3*k  ];			// x-dof
@@ -1290,7 +1290,7 @@ void FESlidingInterface2::ContactStiffness()
 						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
 						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
 
-						LM.create(ndof);
+						LM.resize(ndof);
 						for (k=0; k<nseln; ++k) LM[k      ] = sLM[3*nseln+k];
 						for (k=0; k<nmeln; ++k) LM[k+nseln] = mLM[3*nmeln+k];
 

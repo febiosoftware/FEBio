@@ -201,8 +201,8 @@ void FELinearConstraintSet::Stiffness()
 			}
 		}
 
-		en.create(n);
-		elm.create(n);
+		en.resize(n);
+		elm.resize(n);
 		it = LC.m_dof.begin();
 		for (i=0; i<n; ++i, ++it)
 		{

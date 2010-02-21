@@ -725,7 +725,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 		// get the element force vector and initialize it to zero
 		ndof = 3*el.Nodes();
-		fe.create(ndof);
+		fe.resize(ndof);
 		fe.zero();
 
 		// skip rigid elements for internal force calculations
@@ -783,7 +783,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 		// create the element force vector and initialize to zero
 		ndof = 6*el.Nodes();
-		fe.create(ndof);
+		fe.resize(ndof);
 		fe.zero();
 
 		if (!el.IsRigid())
@@ -849,7 +849,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 			for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
 
 			ndof = 3*el.Nodes();
-			fe.create(ndof);
+			fe.resize(ndof);
 
 			if (pc.blinear) LinearPressureForce(el, fe); else PressureForce(el, fe);
 
@@ -1339,7 +1339,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 		ke.Create(3*neln, 3*neln);
 		ke.zero();
 
-		fe.create(3*neln);
+		fe.resize(3*neln);
 		
 		// create the element mass matrix
 		for (n=0; n<nint; ++n)

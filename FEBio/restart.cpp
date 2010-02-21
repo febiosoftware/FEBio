@@ -426,7 +426,7 @@ void FEM::SerializeGeometry(Archive &ar)
 
 		// rigid bodies
 		ar >> m_nreq >> m_nrm >> m_nrb;
-		if (m_nrb) m_RB.create(m_nrb);
+		if (m_nrb) m_RB.resize(m_nrb);
 		for (i=0; i<m_nrb; ++i)
 		{
 			FERigidBody& rb = m_RB[i];
@@ -581,7 +581,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		int n;
 		// displacements
 		ar >> n;
-		if (n) m_DC.create(n);
+		if (n) m_DC.resize(n);
 		for (i=0; i<n; ++i) 
 		{
 			FENodalDisplacement& dc = m_DC[i];
@@ -590,7 +590,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		
 		// nodal loads
 		ar >> n;
-		if (n) m_FC.create(n);
+		if (n) m_FC.resize(n);
 		for (i=0; i<n; ++i)
 		{
 			FENodalForce& fc = m_FC[i];
@@ -599,7 +599,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// pressure forces
 		ar >> n;
-		if (n) m_PC.create(n);
+		if (n) m_PC.resize(n);
 		for (i=0; i<n; ++i)
 		{
 			FEPressureLoad& pc = m_PC[i];
@@ -610,7 +610,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// rigid body displacements
 		ar >> n;
-		if (n) m_RDC.create(n);
+		if (n) m_RDC.resize(n);
 		for (i=0; i<n; ++i)
 		{
 			FERigidBodyDisplacement& dc = m_RDC[i];
@@ -619,7 +619,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// rigid body forces
 		ar >> n;
-		if (n) m_RFC.create(n);
+		if (n) m_RFC.resize(n);
 		for (i=0; i<n; ++i)
 		{
 			FERigidBodyForce& fc = m_RFC[i];
@@ -628,7 +628,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// rigid nodes
 		ar >> n;
-		if (n) m_RN.create(n);
+		if (n) m_RN.resize(n);
 		for (i=0; i<n; ++i)
 		{
 			FERigidNode& rn = m_RN[i];
@@ -648,7 +648,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// reset the pointer table
 		int nlin = m_LinC.size();
-		m_LCA.create(nlin);
+		m_LCA.resize(nlin);
 		list<FELinearConstraint>::iterator ic = m_LinC.begin();
 		for (i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
 

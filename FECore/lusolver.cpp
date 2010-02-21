@@ -20,7 +20,7 @@ bool LUSolver::Factor()
 
 	int n = a.Size();
 	// create index vector
-	indx.create(n);
+	indx.resize(n);
 
 	vector<double> vv(n);
 	for (i=0; i<n; ++i)

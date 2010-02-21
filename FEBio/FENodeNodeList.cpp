@@ -43,8 +43,8 @@ void FENodeNodeList::Create(FEMesh& mesh)
 	vector<int> tag(NN); tag.zero();
 
 	// calculate nodal valences
-	m_nval.create(NN); m_nval.zero();
-	m_pn.create(NN);
+	m_nval.resize(NN); m_nval.zero();
+	m_pn.resize(NN);
 
 	int nsize = 0;
 	int* en;
@@ -76,7 +76,7 @@ void FENodeNodeList::Create(FEMesh& mesh)
 	}
 
 	// create the node reference array
-	m_nref.create(nsize);
+	m_nref.resize(nsize);
 
 	// set nref pointers
 	m_pn[0] = 0;

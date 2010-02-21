@@ -20,9 +20,9 @@ void BFGSSolver::Init(int neq, LinearSolver* pls)
 	m_V.Create(m_maxups, neq);
 	m_W.Create(m_maxups, neq);
 
-	m_D.create(neq);
-	m_G.create(neq);
-	m_H.create(neq);
+	m_D.resize(neq);
+	m_G.resize(neq);
+	m_H.resize(neq);
 
 	m_plinsolve = pls;
 }

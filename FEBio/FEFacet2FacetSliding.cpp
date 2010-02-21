@@ -22,12 +22,12 @@ void FEFacetSlidingSurface::Init()
 	}
 
 	// allocate data structures
-	m_gap.create(nint);
-	m_nu.create(nint);
-	m_rs.create(nint);
-	m_Lm.create(nint);
-	m_pme.create(nint);
-	m_eps.create(nint);
+	m_gap.resize(nint);
+	m_nu.resize(nint);
+	m_rs.resize(nint);
+	m_Lm.resize(nint);
+	m_pme.resize(nint);
+	m_eps.resize(nint);
 
 	// set intial values
 	m_gap.zero();
@@ -329,7 +329,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 					int ndof = 3*(nseln + nmeln);
 
 					// build the LM vector
-					LM.create(ndof);
+					LM.resize(ndof);
 					for (k=0; k<nseln; ++k)
 					{
 						LM[3*k  ] = sLM[3*k  ];
@@ -345,7 +345,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 					}
 
 					// build the en vector
-					en.create(nseln+nmeln);
+					en.resize(nseln+nmeln);
 					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
@@ -379,7 +379,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 					tn = MBRACKET(tn);
 
 					// calculate the force vector
-					fe.create(ndof);
+					fe.resize(ndof);
 
 					for (k=0; k<nseln; ++k)
 					{
@@ -509,7 +509,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 					int ndof = 3*(nseln + nmeln);
 
 					// build the LM vector
-					LM.create(ndof);
+					LM.resize(ndof);
 					for (k=0; k<nseln; ++k)
 					{
 						LM[3*k  ] = sLM[3*k  ];
@@ -525,7 +525,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 					}
 
 					// build the en vector
-					en.create(nseln+nmeln);
+					en.resize(nseln+nmeln);
 					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
 					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 

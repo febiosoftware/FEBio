@@ -36,11 +36,11 @@ bool SuperLUSolver::PreProcess()
 
 
 	// allocate storage for the permutation matrices
-	perm_c.create(N);
-	perm_r.create(N);
+	perm_c.resize(N);
+	perm_r.resize(N);
 
 	// allocate storage for elimination tree
-	etree.create(N);
+	etree.resize(N);
 
 	m_balloc = true;
 
