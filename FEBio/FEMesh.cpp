@@ -12,6 +12,9 @@
 
 FEMesh::FEMesh()
 {
+	m_Elem.SetMesh(this);
+	m_Shell.SetMesh(this);
+	m_Truss.SetMesh(this);
 }
 
 FEMesh::~FEMesh()
@@ -421,10 +424,8 @@ void FEMesh::UnpackElement(FETrussElement &el, unsigned int nflag)
 
 void FEMesh::Reset()
 {
-	int i;
-
 	// reset nodal data
-	for (i=0; i<Nodes(); ++i) 
+	for (int i=0; i<Nodes(); ++i) 
 	{
 		FENode& node = Node(i);
 
@@ -441,25 +442,13 @@ void FEMesh::Reset()
 	UpdateBox();
 
 	// initialize solid element data
-	for (i=0; i<SolidElements(); ++i) 
-	{
-		FESolidElement& el = SolidElement(i);
-		el.Init(true);
-	}
+	m_Elem.Reset();
 
 	// initialize shell element data
-	for (i=0; i<ShellElements(); ++i)
-	{
-		FEShellElement& el = ShellElement(i);
-		el.Init(true);
-	}
+	m_Shell.Reset();
 
 	// initialize truss element data
-	for (i=0; i<TrussElements(); ++i)
-	{
-		FETrussElement& el = TrussElement(i);
-		el.Init(true);
-	}
+	m_Truss.Reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -884,19 +873,169 @@ int FEMesh::GetFace(FEElement& el, int n, int nf[4])
 
 FEElement* FEMesh::FindElementFromID(int nid)
 {
-	int i;
-	// search the solid elements
-	for (i=0; i<m_Elem.size(); ++i)
-		if (m_Elem[i].m_nID == nid) return &m_Elem[i];
+	FEElement* pe = 0;
 
-	// now do the shells
-	for (i=0; i<m_Shell.size(); ++i)
-		if (m_Shell[i].m_nID == nid) return &m_Shell[i];
+	// search solid elements
+	pe = m_Elem.FindElementFromID(nid);
 
-	// now to the trusses
-	for (i=0; i<m_Truss.size(); ++i)
-		if (m_Truss[i].m_nID == nid) return &m_Truss[i];
+	// search shell elements
+	if (pe == 0) m_Shell.FindElementFromID(nid);
 
-	// we could not find it
-	return 0;
+	// search truss elements
+	if (pe == 0) m_Truss.FindElementFromID(nid);
+
+	return pe;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the average Cartesian derivatives
+//! Note that we assume that the GX, GY and GX contain the averaged 
+//! Cartesian derivatives
+
+void FEMesh::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8])
+{
+	vec3d* rt = el.rt();
+
+	F.zero();
+	for (int i=0; i<8; ++i)
+	{
+		F[0][0] += rt[i].x*GX[i];
+		F[0][1] += rt[i].x*GY[i];
+		F[0][2] += rt[i].x*GZ[i];
+
+		F[1][0] += rt[i].y*GX[i];
+		F[1][1] += rt[i].y*GY[i];
+		F[1][2] += rt[i].y*GZ[i];
+
+		F[2][0] += rt[i].z*GX[i];
+		F[2][1] += rt[i].z*GY[i];
+		F[2][2] += rt[i].z*GZ[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the average Cartesian derivatives
+
+void FEMesh::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int nstate)
+{
+	// get the nodal coordinates
+	vec3d* r = (nstate == 0? el.r0() : el.rt());
+	double x1 = r[0].x, y1 = r[0].y, z1 = r[0].z;
+	double x2 = r[1].x, y2 = r[1].y, z2 = r[1].z;
+	double x3 = r[2].x, y3 = r[2].y, z3 = r[2].z;
+	double x4 = r[3].x, y4 = r[3].y, z4 = r[3].z;
+	double x5 = r[4].x, y5 = r[4].y, z5 = r[4].z;
+	double x6 = r[5].x, y6 = r[5].y, z6 = r[5].z;
+	double x7 = r[6].x, y7 = r[6].y, z7 = r[6].z;
+	double x8 = r[7].x, y8 = r[7].y, z8 = r[7].z;
+
+	const double f12 = 1.0/12.0;
+
+	// set up the B-matrix
+	// we use the G arrays to store the B-matrix
+	GX[0] = f12*(y2*((z6-z3)-(z4-z5))+y3*(z2-z4)+y4*((z3-z8)-(z5-z2))+y5*((z8-z6)-(z2-z4))+y6*(z5-z2)+y8*(z4-z5));
+	GY[0] = f12*(z2*((x6-x3)-(x4-x5))+z3*(x2-x4)+z4*((x3-x8)-(x5-x2))+z5*((x8-x6)-(x2-x4))+z6*(x5-x2)+z8*(x4-x5));
+	GZ[0] = f12*(x2*((y6-y3)-(y4-y5))+x3*(y2-y4)+x4*((y3-y8)-(y5-y2))+x5*((y8-y6)-(y2-y4))+x6*(y5-y2)+x8*(y4-y5));
+
+	GX[1] = f12*(y3*((z7-z4)-(z1-z6))+y4*(z3-z1)+y1*((z4-z5)-(z6-z3))+y6*((z5-z7)-(z3-z1))+y7*(z6-z3)+y5*(z1-z6));
+	GY[1] = f12*(z3*((x7-x4)-(x1-x6))+z4*(x3-x1)+z1*((x4-x5)-(x6-x3))+z6*((x5-x7)-(x3-x1))+z7*(x6-x3)+z5*(x1-x6));
+	GZ[1] = f12*(x3*((y7-y4)-(y1-y6))+x4*(y3-y1)+x1*((y4-y5)-(y6-y3))+x6*((y5-y7)-(y3-y1))+x7*(y6-y3)+x5*(y1-y6));
+
+	GX[2] = f12*(y4*((z8-z1)-(z2-z7))+y1*(z4-z2)+y2*((z1-z6)-(z7-z4))+y7*((z6-z8)-(z4-z2))+y8*(z7-z4)+y6*(z2-z7));
+	GY[2] = f12*(z4*((x8-x1)-(x2-x7))+z1*(x4-x2)+z2*((x1-x6)-(x7-x4))+z7*((x6-x8)-(x4-x2))+z8*(x7-x4)+z6*(x2-x7));
+	GZ[2] = f12*(x4*((y8-y1)-(y2-y7))+x1*(y4-y2)+x2*((y1-y6)-(y7-y4))+x7*((y6-y8)-(y4-y2))+x8*(y7-y4)+x6*(y2-y7));
+
+	GX[3] = f12*(y1*((z5-z2)-(z3-z8))+y2*(z1-z3)+y3*((z2-z7)-(z8-z1))+y8*((z7-z5)-(z1-z3))+y5*(z8-z1)+y7*(z3-z8));
+	GY[3] = f12*(z1*((x5-x2)-(x3-x8))+z2*(x1-x3)+z3*((x2-x7)-(x8-x1))+z8*((x7-x5)-(x1-x3))+z5*(x8-x1)+z7*(x3-x8));
+	GZ[3] = f12*(x1*((y5-y2)-(y3-y8))+x2*(y1-y3)+x3*((y2-y7)-(y8-y1))+x8*((y7-y5)-(y1-y3))+x5*(y8-y1)+x7*(y3-y8));
+
+	GX[4] = f12*(y8*((z4-z7)-(z6-z1))+y7*(z8-z6)+y6*((z7-z2)-(z1-z8))+y1*((z2-z4)-(z8-z6))+y4*(z1-z8)+y2*(z6-z1));
+	GY[4] = f12*(z8*((x4-x7)-(x6-x1))+z7*(x8-x6)+z6*((x7-x2)-(x1-x8))+z1*((x2-x4)-(x8-x6))+z4*(x1-x8)+z2*(x6-x1));
+	GZ[4] = f12*(x8*((y4-y7)-(y6-y1))+x7*(y8-y6)+x6*((y7-y2)-(y1-y8))+x1*((y2-y4)-(y8-y6))+x4*(y1-y8)+x2*(y6-y1));
+
+	GX[5] = f12*(y5*((z1-z8)-(z7-z2))+y8*(z5-z7)+y7*((z8-z3)-(z2-z5))+y2*((z3-z1)-(z5-z7))+y1*(z2-z5)+y3*(z7-z2));
+	GY[5] = f12*(z5*((x1-x8)-(x7-x2))+z8*(x5-x7)+z7*((x8-x3)-(x2-x5))+z2*((x3-x1)-(x5-x7))+z1*(x2-x5)+z3*(x7-x2));
+	GZ[5] = f12*(x5*((y1-y8)-(y7-y2))+x8*(y5-y7)+x7*((y8-y3)-(y2-y5))+x2*((y3-y1)-(y5-y7))+x1*(y2-y5)+x3*(y7-y2));
+
+	GX[6] = f12*(y6*((z2-z5)-(z8-z3))+y5*(z6-z8)+y8*((z5-z4)-(z3-z6))+y3*((z4-z2)-(z6-z8))+y2*(z3-z6)+y4*(z8-z3));
+	GY[6] = f12*(z6*((x2-x5)-(x8-x3))+z5*(x6-x8)+z8*((x5-x4)-(x3-x6))+z3*((x4-x2)-(x6-x8))+z2*(x3-x6)+z4*(x8-x3));
+	GZ[6] = f12*(x6*((y2-y5)-(y8-y3))+x5*(y6-y8)+x8*((y5-y4)-(y3-y6))+x3*((y4-y2)-(y6-y8))+x2*(y3-y6)+x4*(y8-y3));
+
+	GX[7] = f12*(y7*((z3-z6)-(z5-z4))+y6*(z7-z5)+y5*((z6-z1)-(z4-z7))+y4*((z1-z3)-(z7-z5))+y3*(z4-z7)+y1*(z5-z4));
+	GY[7] = f12*(z7*((x3-x6)-(x5-x4))+z6*(x7-x5)+z5*((x6-x1)-(x4-x7))+z4*((x1-x3)-(x7-x5))+z3*(x4-x7)+z1*(x5-x4));
+	GZ[7] = f12*(x7*((y3-y6)-(y5-y4))+x6*(y7-y5)+x5*((y6-y1)-(y4-y7))+x4*((y1-y3)-(y7-y5))+x3*(y4-y7)+x1*(y5-y4));
+
+	// calculate the volume
+	double Vi = 1./(x1*GX[0]+x2*GX[1]+x3*GX[2]+x4*GX[3]+x5*GX[4]+x6*GX[5]+x7*GX[6]+x8*GX[7]);
+
+	// divide the B-matrix by the volume
+	GX[0] *= Vi; GY[0] *= Vi; GZ[0] *= Vi;
+	GX[1] *= Vi; GY[1] *= Vi; GZ[1] *= Vi;
+	GX[2] *= Vi; GY[2] *= Vi; GZ[2] *= Vi;
+	GX[3] *= Vi; GY[3] *= Vi; GZ[3] *= Vi;
+	GX[4] *= Vi; GY[4] *= Vi; GZ[4] *= Vi;
+	GX[5] *= Vi; GY[5] *= Vi; GZ[5] *= Vi;
+	GX[6] *= Vi; GY[6] *= Vi; GZ[6] *= Vi;
+	GX[7] *= Vi; GY[7] *= Vi; GZ[7] *= Vi;
+}
+//-----------------------------------------------------------------------------
+//! Calculates the exact volume of a hexahedral element
+
+double FEMesh::HexVolume(FESolidElement& el, int state)
+{
+	// let's make sure this is indeed a hex element
+//	assert(el.Type() == FE_HEX);
+
+	// get the nodal coordinates
+	vec3d* r = (state == 0? el.r0() : el.rt());
+	double x1 = r[0].x, y1 = r[0].y, z1 = r[0].z;
+	double x2 = r[1].x, y2 = r[1].y, z2 = r[1].z;
+	double x3 = r[2].x, y3 = r[2].y, z3 = r[2].z;
+	double x4 = r[3].x, y4 = r[3].y, z4 = r[3].z;
+	double x5 = r[4].x, y5 = r[4].y, z5 = r[4].z;
+	double x6 = r[5].x, y6 = r[5].y, z6 = r[5].z;
+	double x7 = r[6].x, y7 = r[6].y, z7 = r[6].z;
+	double x8 = r[7].x, y8 = r[7].y, z8 = r[7].z;
+
+	// set up the B-matrix
+	double B1[8];
+//	double B2[8];
+//	double B3[8];
+
+	const double f12 = 1.0/12.0;
+
+	B1[0] = f12*(y2*((z6-z3)-(z4-z5))+y3*(z2-z4)+y4*((z3-z8)-(z5-z2))+y5*((z8-z6)-(z2-z4))+y6*(z5-z2)+y8*(z4-z5));
+//	B2[0] = f12*(z2*((x6-x3)-(x4-x5))+z3*(x2-x4)+z4*((x3-x8)-(x5-x2))+z5*((x8-x6)-(x2-x4))+z6*(x5-x2)+z8*(x4-x5));
+//	B3[0] = f12*(x2*((y6-y3)-(y4-y5))+x3*(y2-y4)+x4*((y3-y8)-(y5-y2))+x5*((y8-y6)-(y2-y4))+x6*(y5-y2)+x8*(y4-y5));
+
+	B1[1] = f12*(y3*((z7-z4)-(z1-z6))+y4*(z3-z1)+y1*((z4-z5)-(z6-z3))+y6*((z5-z7)-(z3-z1))+y7*(z6-z3)+y5*(z1-z6));
+//	B2[1] = f12*(z3*((x7-x4)-(x1-x6))+z4*(x3-x1)+z1*((x4-x5)-(x6-x3))+z6*((x5-x7)-(x3-x1))+z7*(x6-x3)+z5*(x1-x6));
+//	B3[1] = f12*(x3*((y7-y4)-(y1-y6))+x4*(y3-y1)+x1*((y4-y5)-(y6-y3))+x6*((y5-y7)-(y3-y1))+x7*(y6-y3)+x5*(y1-y6));
+
+	B1[2] = f12*(y4*((z8-z1)-(z2-z7))+y1*(z4-z2)+y2*((z1-z6)-(z7-z4))+y7*((z6-z8)-(z4-z2))+y8*(z7-z4)+y6*(z2-z7));
+//	B2[2] = f12*(z4*((x8-x1)-(x2-x7))+z1*(x4-x2)+z2*((x1-x6)-(x7-x4))+z7*((x6-x8)-(x4-x2))+z8*(x7-x4)+z6*(x2-x7));
+//	B3[2] = f12*(x4*((y8-y1)-(y2-y7))+x1*(y4-y2)+x2*((y1-y6)-(y7-y4))+x7*((y6-y8)-(y4-y2))+x8*(y7-y4)+x6*(y2-y7));
+
+	B1[3] = f12*(y1*((z5-z2)-(z3-z8))+y2*(z1-z3)+y3*((z2-z7)-(z8-z1))+y8*((z7-z5)-(z1-z3))+y5*(z8-z1)+y7*(z3-z8));
+//	B2[3] = f12*(z1*((x5-x2)-(x3-x8))+z2*(x1-x3)+z3*((x2-x7)-(x8-x1))+z8*((x7-x5)-(x1-x3))+z5*(x8-x1)+z7*(x3-x8));
+//	B3[3] = f12*(x1*((y5-y2)-(y3-y8))+x2*(y1-y3)+x3*((y2-y7)-(y8-y1))+x8*((y7-y5)-(y1-y3))+x5*(y8-y1)+x7*(y3-y8));
+
+	B1[4] = f12*(y8*((z4-z7)-(z6-z1))+y7*(z8-z6)+y6*((z7-z2)-(z1-z8))+y1*((z2-z4)-(z8-z6))+y4*(z1-z8)+y2*(z6-z1));
+//	B2[4] = f12*(z8*((x4-x7)-(x6-x1))+z7*(x8-x6)+z6*((x7-x2)-(x1-x8))+z1*((x2-x4)-(x8-x6))+z4*(x1-x8)+z2*(x6-x1));
+//	B3[4] = f12*(x8*((y4-y7)-(y6-y1))+x7*(y8-y6)+x6*((y7-y2)-(y1-y8))+x1*((y2-y4)-(y8-y6))+x4*(y1-y8)+x2*(y6-y1));
+
+	B1[5] = f12*(y5*((z1-z8)-(z7-z2))+y8*(z5-z7)+y7*((z8-z3)-(z2-z5))+y2*((z3-z1)-(z5-z7))+y1*(z2-z5)+y3*(z7-z2));
+//	B2[5] = f12*(z5*((x1-x8)-(x7-x2))+z8*(x5-x7)+z7*((x8-x3)-(x2-x5))+z2*((x3-x1)-(x5-x7))+z1*(x2-x5)+z3*(x7-x2));
+//	B3[5] = f12*(x5*((y1-y8)-(y7-y2))+x8*(y5-y7)+x7*((y8-y3)-(y2-y5))+x2*((y3-y1)-(y5-y7))+x1*(y2-y5)+x3*(y7-y2));
+
+	B1[6] = f12*(y6*((z2-z5)-(z8-z3))+y5*(z6-z8)+y8*((z5-z4)-(z3-z6))+y3*((z4-z2)-(z6-z8))+y2*(z3-z6)+y4*(z8-z3));
+//	B2[6] = f12*(z6*((x2-x5)-(x8-x3))+z5*(x6-x8)+z8*((x5-x4)-(x3-x6))+z3*((x4-x2)-(x6-x8))+z2*(x3-x6)+z4*(x8-x3));
+//	B3[6] = f12*(x6*((y2-y5)-(y8-y3))+x5*(y6-y8)+x8*((y5-y4)-(y3-y6))+x3*((y4-y2)-(y6-y8))+x2*(y3-y6)+x4*(y8-y3));
+
+	B1[7] = f12*(y7*((z3-z6)-(z5-z4))+y6*(z7-z5)+y5*((z6-z1)-(z4-z7))+y4*((z1-z3)-(z7-z5))+y3*(z4-z7)+y1*(z5-z4));
+//	B2[7] = f12*(z7*((x3-x6)-(x5-x4))+z6*(x7-x5)+z5*((x6-x1)-(x4-x7))+z4*((x1-x3)-(x7-x5))+z3*(x4-x7)+z1*(x5-x4));
+//	B3[7] = f12*(x7*((y3-y6)-(y5-y4))+x6*(y7-y5)+x5*((y6-y1)-(y4-y7))+x4*((y1-y3)-(y7-y5))+x3*(y4-y7)+x1*(y5-y4));
+
+	// calculate the volume V= xi*B1[i] = yi*B2[i] = zi*B3[i] (sum over i)
+	return (x1*B1[0]+x2*B1[1]+x3*B1[2]+x4*B1[3]+x5*B1[4]+x6*B1[5]+x7*B1[6]+x8*B1[7]);
 }

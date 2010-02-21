@@ -1,0 +1,157 @@
+#pragma once
+
+#include "FEElement.h"
+#include "FECore\vector.h"
+
+class FEMesh;
+
+//-----------------------------------------------------------------------------
+//! This class describes a physical domain that will be divided into elements
+//! of a specific type. All elements in the domain have to have the same type
+//!
+class FEDomain
+{
+public:
+	FEDomain() { m_pMesh = 0; }
+	virtual ~FEDomain() {}
+
+	void SetMesh(FEMesh* pm) { m_pMesh = pm; }
+
+protected:
+	FEMesh*	m_pMesh;
+};
+
+//-----------------------------------------------------------------------------
+//! domain described by Lagrange-type 3D volumetric elements
+//!
+class FESolidDomain : public FEDomain
+{
+public:
+	FESolidDomain(){}
+
+	void create(int n) { m_Elem.create(n); }
+	int size() { return m_Elem.size(); }
+	FESolidElement& operator [] (int n) { return m_Elem[n]; }
+
+	FESolidDomain& operator = (FESolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+
+	FEElement* FindElementFromID(int nid);
+
+	void Reset();
+
+	// --- S T I F F N E S S ---
+
+	//! calculates the solid element stiffness matrix
+	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! Dilatational stiffness component for nearly-incompressible materials
+	void DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke);
+
+	//! geometrical stiffness (i.e. initial stress)
+	void GeometricalStiffness(FESolidElement& el, matrix& ke);
+
+	//! material stiffness component
+	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! calculates the solid element inertial stiffness matrix
+	void ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! calculates the element biphasic stiffness matrix
+	bool ElementPoroStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! hourglass stiffness for UDG hex elements
+	void UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! dilatational stiffness for UDG hex elements
+	void UDGDilatationalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! geometrical stiffness for UDG hex elements
+	void UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! material stiffness for UDG hex elements
+	void UDGMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	// --- R E S I D U A L ---
+
+	//! Calculates the internal stress vector for solid elements
+	void InternalForces(FESolidElement& el, vector<double>& fe);
+
+	//! Calculates the internal stress vector for enhanced strain hex elements
+	void UDGInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+
+	//! calculates hourglass forces for the UDG element
+	void UDGHourglassForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+
+	//! Calculatess external body forces for solid elements
+	void BodyForces(FEM& fem, FESolidElement& elem, vector<double>& fe);
+
+	//! Calculates the internal fluid forces
+	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
+
+protected:
+	vector<FESolidElement>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+//! Domain described by 3D shell elements
+class FEShellDomain : public FEDomain
+{
+public:
+	FEShellDomain(){}
+
+	void create(int n) { m_Elem.create(n); }
+	int size() { return m_Elem.size(); }
+	FEShellElement& operator [] (int n) { return m_Elem[n]; }
+
+	FEShellDomain& operator = (FEShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+
+	FEElement* FindElementFromID(int nid);
+
+	void Reset();
+
+	// --- S T I F F N E S S --- 
+
+	//! calculates the shell element stiffness matrix
+	void ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke);
+
+	//! Dilatational stiffness component for nearly-incompressible materials
+	void DilatationalStiffness(FEM& fem, FEShellElement& elem, matrix& ke);
+
+	// --- R E S I D U A L ---
+
+	//! Calculates the internal stress vector for shell elements
+	void InternalForces(FEShellElement& el, vector<double>& fe);
+
+	//! Calculate extenral body forces for shell elements
+	void BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe);
+
+protected:
+	vector<FEShellElement>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+//! Domain described by 3D truss elements
+class FETrussDomain : public FEDomain
+{
+public:
+	FETrussDomain(){}
+
+	void create(int n) { m_Elem.create(n); }
+	int size() { return m_Elem.size(); }
+	FETrussElement& operator [] (int n) { return m_Elem[n]; }
+
+	FETrussDomain& operator = (FETrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+
+	FEElement* FindElementFromID(int nid);
+
+	void Reset();
+
+	//! calculates the truss element stiffness matrix
+	void ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke);
+
+	//! Calculates the internal stress vector for solid elements
+	void InternalForces(FETrussElement& el, vector<double>& fe);
+
+protected:
+	vector<FETrussElement>	m_Elem;
+};

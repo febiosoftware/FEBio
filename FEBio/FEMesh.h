@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEElement.h"
+#include "FEDomain.h"
 #include "Archive.h"
 #include "FENodeElemList.h"
 
@@ -248,12 +249,20 @@ public:
 		return m_NEL;
 	}
 
+	FESolidDomain& SolidDomain() { return m_Elem; }
+	FEShellDomain& ShellDomain() { return m_Shell; }
+	FETrussDomain& TrussDomain() { return m_Truss; }
+
+	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
+	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
+	double HexVolume(FESolidElement& el, int state = 0);
+
 protected:
 	vector<FENode>			m_Node;		//!< FE nodes array
 
-	vector<FESolidElement>	m_Elem;		//!< FE solid element array
-	vector<FEShellElement>	m_Shell;	//!< FE shell element array
-	vector<FETrussElement>	m_Truss;	//!< FE truss element array
+	FESolidDomain	m_Elem;		//!< FE solid element array
+	FEShellDomain	m_Shell;	//!< FE shell element array
+	FETrussDomain	m_Truss;	//!< FE truss element array
 
 	ptr_vector<FENodeSet>	m_NodeSet;	//!< node sets
 

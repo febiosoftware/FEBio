@@ -260,6 +260,8 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	// elasticity tensor
 	double D[6][6] = {0};
 
+	FESolidDomain& bd = m.SolidDomain();
+
 	// calculate the stiffness matrix
 	int NS = m.SolidElements(), i, j;
 	for (int n=0; n<NS; ++n)
@@ -274,7 +276,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 		ke.zero();
 
 		// calculate the element's stiffness matrix
-		ps->ElementStiffness(e, ke);
+		bd.ElementStiffness(m_rve, e, ke);
 
 		// loop over the element's nodes
 		for (i=0; i<ne; ++i)

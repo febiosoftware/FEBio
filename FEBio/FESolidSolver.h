@@ -58,45 +58,6 @@ public:
 
 	//{ --- Stiffness matrix routines ---
 
-		//! calculates the solid element stiffness matrix
-		void ElementStiffness(FESolidElement& el, matrix& ke);
-
-		//! calculates the shell element stiffness matrix
-		void ElementStiffness(FEShellElement& el, matrix& ke);
-
-		//! calculates the truss element stiffness matrix
-		void ElementStiffness(FETrussElement& el, matrix& ke);
-
-		//! calculates the solid element inertial stiffness matrix
-		void ElementInertialStiffness(FESolidElement& el, matrix& ke);
-
-		//! calculates the element biphasic stiffness matrix
-		bool ElementPoroStiffness(FESolidElement& el, matrix& ke);
-
-		//! material stiffness component
-		void MaterialStiffness(FESolidElement& el, matrix& ke);
-
-		//! material stiffness for UDG hex elements
-		void UDGMaterialStiffness(FESolidElement& el, matrix& ke);
-
-		//! geometrical stiffness (i.e. initial stress)
-		void GeometricalStiffness(FESolidElement& el, matrix& ke);
-
-		//! geometrical stiffness for UDG hex elements
-		void UDGGeometricalStiffness(FESolidElement& el, matrix& ke);
-
-		//! Dilatational stiffness component for nearly-incompressible materials
-		void DilatationalStiffness(FESolidElement& elem, matrix& ke);
-
-		//! dilatational stiffness for UDG hex elements
-		void UDGDilatationalStiffness(FESolidElement& el, matrix& ke);
-
-		//! hourglass stiffness for UDG hex elements
-		void UDGHourglassStiffness(FESolidElement& el, matrix& ke);
-
-		//! Dilatational stiffness component for nearly-incompressible materials
-		void DilatationalStiffness(FEShellElement& elem, matrix& ke);
-
 		//! Calculates pressure stiffness
 		bool PressureStiffness(FESurfaceElement& el, matrix& ke);
 
@@ -121,12 +82,6 @@ public:
 
 	//{ --- Residual routines ---
 
-		//! Calculatess external body forces for solid elements
-		void BodyForces(FESolidElement& elem, vector<double>& fe);
-
-		//! Calculate extenral body forces for shell elements
-		void BodyForces(FEShellElement& el, vector<double>& fe);
-
 		//! Calculates concentrated nodal forces
 		void NodalForces(vector<double>& F);
 
@@ -135,24 +90,6 @@ public:
 
 		//! Calculates the linear external pressure forces (ie. non-follower forces)
 		bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe);
-
-		//! Calculates the internal fluid forces
-		bool InternalFluidWork(FESolidElement& elem, vector<double>& fe);
-
-		//! Calculates the internal stress vector for solid elements
-		void InternalForces(FESolidElement& el, vector<double>& fe);
-
-		//! Calculates the internal stress vector for solid elements
-		void InternalForces(FETrussElement& el, vector<double>& fe);
-
-		//! Calculates the internal stress vector for enhanced strain hex elements
-		void UDGInternalForces(FESolidElement& el, vector<double>& fe);
-
-		//! calculates hourglass forces for the UDG element
-		void UDGHourglassForces(FESolidElement& el, vector<double>& fe);
-
-		//! Calculates the internal stress vector for shell elements
-		void InternalForces(FEShellElement& el, vector<double>& fe);
 
 		//! Calculate inertial forces for dynamic problems
 		void InertialForces(vector<double>& R);
@@ -171,10 +108,6 @@ public:
 	//}
 
 protected:
-	double HexVolume(FESolidElement& el, int state = 0);
-	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
-	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
-
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
 
 public:

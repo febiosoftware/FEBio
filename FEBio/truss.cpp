@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FETrussMaterial.h"
+#include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
-void FESolidSolver::ElementStiffness(FETrussElement& el, matrix& ke)
+void FETrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke)
 {
 	// get the material
-	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(m_fem.GetMaterial(el.GetMatID()));
+	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(fem.GetMaterial(el.GetMatID()));
 	assert(pm);
 
 	// intial length
@@ -53,7 +54,7 @@ void FESolidSolver::ElementStiffness(FETrussElement& el, matrix& ke)
 
 
 //-----------------------------------------------------------------------------
-void FESolidSolver::InternalForces(FETrussElement& el, vector<double>& fe)
+void FETrussDomain::InternalForces(FETrussElement& el, vector<double>& fe)
 {
 	FEMaterialPoint& mp = *el.m_State[0];
 	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());

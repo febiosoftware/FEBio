@@ -366,8 +366,8 @@ void FESolidSolver::UpdateStresses()
 
 				if (el.Type() == FE_UDGHEX)
 				{
-					v = HexVolume(el, 1);
-					V = HexVolume(el, 0);
+					v = mesh.HexVolume(el, 1);
+					V = mesh.HexVolume(el, 0);
 				}
 				else 
 				{
@@ -398,10 +398,10 @@ void FESolidSolver::UpdateStresses()
 
 				// get the average cartesian derivatives
 				double GX[8], GY[8], GZ[8];
-				this->AvgCartDerivs(el, GX, GY, GZ);
+				mesh.AvgCartDerivs(el, GX, GY, GZ);
 
 				// get the average deformation gradient and determinant
-				AvgDefGrad(el, pt.F, GX, GY, GZ);
+				mesh.AvgDefGrad(el, pt.F, GX, GY, GZ);
 				pt.J = pt.F.det();
 
 				// set the element variables

@@ -428,6 +428,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElemElemList.cpp"
 				>
 			</File>
@@ -800,6 +804,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\solid.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\solve.cpp"
 				>
 			</File>
@@ -959,6 +967,10 @@
 			</File>
 			<File
 				RelativePath=".\FEDiagnostic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDomain.h"
 				>
 			</File>
 			<File

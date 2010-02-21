@@ -94,7 +94,8 @@ bool FETangentDiagnostic::Run()
 	// set up the element stiffness matrix
 	matrix k0(24, 24);
 	k0.zero();
-	solver.ElementStiffness(el, k0);
+	FESolidDomain& bd = mesh.SolidDomain();
+	bd.ElementStiffness(fem, el, k0);
 
 	// print the element stiffness matrix
 	log.printf("\nActual stiffness matrix:\n");
@@ -154,7 +155,8 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	// first calculate the initial residual
 	vector<double> f0(24);
 	f0.zero();
-	solver.InternalForces(el, f0);
+	FESolidDomain& bd = mesh.SolidDomain();
+	bd.InternalForces(el, f0);
 
 	// now calculate the perturbed residuals
 	ke.Create(24, 24);
@@ -180,7 +182,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		mesh.UnpackElement(el);
 
 		f1.zero();
-		solver.InternalForces(el, f1);
+		bd.InternalForces(el, f1);
 
 		switch (nj)
 		{
@@ -222,7 +224,9 @@ double FETangentDiagnostic::residual(double d)
 	// get the residual
 	vector<double> R(24);
 	R.zero();
-	solver.InternalForces(el, R);
+
+	FESolidDomain& bd = mesh.SolidDomain();
+	bd.InternalForces(el, R);
 
 	double r = sqrt(R*R);
 
