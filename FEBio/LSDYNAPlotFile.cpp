@@ -405,16 +405,17 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 
 	// write shell element data
 	mat3ds E;
-	for (i=0; i<mesh.ShellElements(); ++i)
+	FEShellDomain& sd = mesh.ShellDomain();
+	for (i=0; i<sd.size(); ++i)
 	{
 		for (j=0; j<44; ++j) s[j] = 0;
 
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		if (!el.IsRigid())
 		{
 			try
 			{
-				mesh.UnpackElement(el);
+				sd.UnpackElement(el);
 
 				neln = el.Nodes();
 				f = 1.0 / (double) neln;

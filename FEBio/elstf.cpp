@@ -125,7 +125,7 @@ bool FESolidSolver::StiffnessMatrix()
 		FEShellElement& el = mesh.ShellElement(iel);
 		if (!el.IsRigid())
 		{
-			mesh.UnpackElement(el);
+			sd.UnpackElement(el);
 
 			// get the elements material
 			FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
@@ -786,7 +786,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 		if (!el.IsRigid())
 		{
-			mesh.UnpackElement(el);
+			sd.UnpackElement(el);
 
 			// skip rigid elements for internal force calculation
 			sd.InternalForces(el, fe);
@@ -802,7 +802,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 		}
 		else if (m_fem.UseBodyForces())
 		{
-			mesh.UnpackElement(el);
+			sd.UnpackElement(el);
 
 			// apply body forces to shells
 			sd.BodyForces(m_fem, el, fe);

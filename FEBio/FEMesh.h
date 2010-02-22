@@ -204,9 +204,6 @@ public:
 	//! Unpack solid element data
 	void UnpackElement(FESolidElement& el, unsigned int nflag = FE_UNPACK_ALL);
 
-	//! Unpack shell element data
-	void UnpackElement(FEShellElement& el, unsigned int nflag = FE_UNPACK_ALL);
-
 	//! Unpack surface element data
 	void UnpackElement(FESurfaceElement& el, unsigned int nflag = FE_UNPACK_ALL);
 

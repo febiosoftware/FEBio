@@ -122,6 +122,9 @@ public:
 
 	void Reset();
 
+	//! Unpack shell element data
+	void UnpackElement(FEShellElement& el, unsigned int nflag = FE_UNPACK_ALL);
+
 	// update stresses
 	void UpdateStresses(FEM& fem);
 

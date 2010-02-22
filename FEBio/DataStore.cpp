@@ -318,7 +318,7 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 		// this is a shell element
 		FEShellDomain& sd = mesh.ShellDomain();
 		FEShellElement& el = sd.Element(nel - EB);
-		mesh.UnpackElement(el);
+		sd.UnpackElement(el);
 
 		int nint = el.GaussPoints();
 		for (int i=0; i<nint; ++i)

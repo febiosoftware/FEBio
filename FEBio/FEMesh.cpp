@@ -209,85 +209,6 @@ void FEMesh::UnpackElement(FESolidElement& el, unsigned int nflag)
 
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
-//! Note that for the shell elements the lm order is different compared
-//! to the solid element ordering. This is because for shell elements the
-//! nodes have six degrees of freedom each, where for solids they only
-//! have 3 dofs.
-
-void FEMesh::UnpackElement(FEShellElement& el, unsigned int nflag)
-{
-	int i, n;
-
-	vec3d* rt = el.rt();
-	vec3d* r0 = el.r0();
-	vec3d* vt = el.vt();
-	vec3d* D0 = el.D0();
-	vec3d* Dt = el.Dt();
-	double* pt = el.pt();
-
-	int N = el.Nodes();
-	int* lm = el.LM();
-
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-		FENode& node = Node(n);
-
-		int* id = node.m_ID;
-
-		// first the displacement dofs
-		lm[6*i  ] = id[0];
-		lm[6*i+1] = id[1];
-		lm[6*i+2] = id[2];
-
-		// next the rotational dofs
-		lm[6*i+3] = id[3];
-		lm[6*i+4] = id[4];
-		lm[6*i+5] = id[5];
-
-		// now the pressure dofs
-		lm[6*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[7*N + 3*i  ] = id[7];
-		lm[7*N + 3*i+1] = id[8];
-		lm[7*N + 3*i+2] = id[9];
-
-		lm[10*N + i] = id[10];
-	}
-
-	// copy nodal data to element arrays
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-
-		FENode& node = Node(n);
-
-		// initial coordinates (= material coordinates)
-		r0[i] = node.m_r0;
-
-		// current coordinates (= spatial coordinates)
-		rt[i] = node.m_rt;
-
-		// current nodal pressures
-		pt[i] = node.m_pt;
-
-		// current nodal velocities
-		vt[i] = node.m_vt;
-
-		// intial director
-		D0[i] = node.m_D0;
-
-		// current director
-		Dt[i] = node.m_Dt;
-	}
-
-	// unpack the traits data
-	el.UnpackTraitsData(nflag);
-}
-
-//-----------------------------------------------------------------------------
-//! Unpack the element. That is, copy element data in traits structure
 
 void FEMesh::UnpackElement(FESurfaceElement& el, unsigned int nflag)
 {
@@ -437,10 +358,11 @@ bool FEMesh::Init()
 	for (i=0; i<Nodes(); ++i) Node(i).m_D0 = vec3d(0,0,0);
 
 	// initialize shell data
+	FEShellDomain& sd = ShellDomain();
 	for (i=0; i<ShellElements(); ++i)
 	{
-		FEShellElement& el = ShellElement(i);
-		UnpackElement(el, 0);
+		FEShellElement& el = sd.Element(i);
+		sd.UnpackElement(el, 0);
 
 		r0 = el.r0();
 
@@ -472,11 +394,11 @@ bool FEMesh::Init()
 	// check the connectivity of the shells
 	for (i=0; i<ShellElements(); ++i)
 	{
-		FEShellElement& el = ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 
 		try
 		{
-			if (!el.IsRigid()) UnpackElement(el);
+			if (!el.IsRigid()) sd.UnpackElement(el);
 		}
 		catch (NegativeJacobian e)
 		{
@@ -513,8 +435,8 @@ bool FEMesh::Init()
 	tag.zero();
 	for (i=0; i<ShellElements(); ++i)
 	{
-		FEShellElement& el = ShellElement(i);
-		if (!el.IsRigid()) UnpackElement(el);
+		FEShellElement& el = sd.Element(i);
+		if (!el.IsRigid()) sd.UnpackElement(el);
 
 		n = el.Nodes();
 		en = el.m_node;
@@ -566,7 +488,7 @@ double FEMesh::ElementVolume(FEElement& el)
 	FEShellElement* ps = dynamic_cast<FEShellElement*>(&el);
 	if (ps) 
 	{
-		UnpackElement(*ps);
+		m_Shell.UnpackElement(*ps);
 		int nint = ps->GaussPoints();
 		double *w = ps->GaussWeights();
 		for (int n=0; n<nint; ++n) V += ps->detJ0(n)*w[n];

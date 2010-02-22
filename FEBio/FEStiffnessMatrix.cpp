@@ -82,12 +82,13 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			}
 
 			// Add all shell elements to the profile
+			FEShellDomain& sd = mesh.ShellDomain();
 			for (i=0; i<mesh.ShellElements(); ++i)
 			{
-				FEShellElement& el = mesh.ShellElement(i);
+				FEShellElement& el = sd.Element(i);
 				if (!el.IsRigid())
 				{
-					mesh.UnpackElement(el, FE_UNPACK_LM);
+					sd.UnpackElement(el, FE_UNPACK_LM);
 					build_add(el.LM());
 				}
 			}
