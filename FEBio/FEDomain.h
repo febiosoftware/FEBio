@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FEElement.h"
-#include "FECore\vector.h"
+#include "FECore/vector.h"
 
 class FEMesh;
 
