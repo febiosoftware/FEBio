@@ -78,9 +78,12 @@ void FENodeElemList::Create(FEMesh& mesh)
 	// get the number of nodes
 	int NN = mesh.Nodes();
 
+	FESolidDomain& bd = mesh.SolidDomain();
+	FEShellDomain& sd = mesh.ShellDomain();
+
 	// get the number of elements
-	int NB = mesh.SolidElements();
-	int NS = mesh.ShellElements();
+	int NB = bd.Elements();
+	int NS = sd.Elements();
 
 	// create nodal valence array
 	m_nval.assign(NN, 0);
@@ -90,7 +93,7 @@ void FENodeElemList::Create(FEMesh& mesh)
 	int nsize = 0;
 	for (i=0; i<NB; ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		for (j=0; j<el.Nodes(); ++j)
 		{
@@ -101,7 +104,7 @@ void FENodeElemList::Create(FEMesh& mesh)
 	}
 	for (i=0; i<NS; ++i)
 	{
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 
 		for (j=0; j<el.Nodes(); ++j)
 		{
@@ -127,7 +130,7 @@ void FENodeElemList::Create(FEMesh& mesh)
 	// fill eref table
 	for (i=0; i<NB; ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		for (j=0; j<el.Nodes(); ++j)
 		{
@@ -138,7 +141,7 @@ void FENodeElemList::Create(FEMesh& mesh)
 	}
 	for (i=0; i<NS; ++i)
 	{
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 
 		for (j=0; j<el.Nodes(); ++j)
 		{

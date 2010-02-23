@@ -57,9 +57,12 @@ bool FESolidSolver::Augment()
 				double normL0 = 0, normL1 = 0, L0, L1;
 				double k = pmi->m_K;
 				FEMesh& mesh = m_fem.m_mesh;
-				for (n=0; n<mesh.SolidElements(); ++n)
+
+				// do solid elements
+				FESolidDomain& bd = mesh.SolidDomain();
+				for (n=0; n<bd.Elements(); ++n)
 				{
-					FESolidElement& el = mesh.SolidElement(n);
+					FESolidElement& el = bd.Element(n);
 
 					if (el.GetMatID() == i)
 					{
@@ -70,9 +73,12 @@ bool FESolidSolver::Augment()
 						normL1 += L1*L1;
 					}
 				}
-				for (n=0; n<mesh.ShellElements(); ++n)
+
+				// do shell elements
+				FEShellDomain& sd = mesh.ShellDomain();
+				for (n=0; n<sd.Elements(); ++n)
 				{
-					FEShellElement& el = mesh.ShellElement(n);
+					FEShellElement& el = sd.Element(n);
 
 					if (el.GetMatID() == i)
 					{
@@ -97,9 +103,10 @@ bool FESolidSolver::Augment()
 				if (pctn >= pmi->m_atol)
 				{
 					bconv = false;
-					for (n=0; n<mesh.SolidElements(); ++n)
+					FESolidDomain& bd = mesh.SolidDomain();
+					for (n=0; n<bd.Elements(); ++n)
 					{
-						FESolidElement& el = mesh.SolidElement(n);
+						FESolidElement& el = bd.Element(n);
 						if (el.GetMatID() == i) 
 						{
 							double hi = pmi->h(el.m_eJ);
@@ -107,9 +114,11 @@ bool FESolidSolver::Augment()
 							el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
 						}
 					}
-					for (n=0; n<mesh.ShellElements(); ++n)
+
+					FEShellDomain& sd = mesh.ShellDomain();
+					for (n=0; n<sd.Elements(); ++n)
 					{
-						FEShellElement& el = mesh.ShellElement(n);
+						FEShellElement& el = sd.Element(n);
 						if (el.GetMatID() == i) 
 						{
 							el.m_Lk += k*pmi->h(el.m_eJ);

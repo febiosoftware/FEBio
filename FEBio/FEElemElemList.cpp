@@ -15,8 +15,11 @@ void FEElemElemList::Init()
 	int i;
 	FEMesh& m = *m_pmesh;
 
+	FESolidDomain& bd = m.SolidDomain();
+	FEShellDomain& sd = m.ShellDomain();
+
 	// get total nr of elements
-	int NE = m.SolidElements() + m.ShellElements();
+	int NE = bd.Elements() + sd.Elements();
 
 	// allocate storage
 	m_ref.resize(NE);
@@ -24,17 +27,17 @@ void FEElemElemList::Init()
 	// count nr of neighbors
 	int NN = 0, n = 0, nf;
 	m_ref[0] = 0;
-	for (i=0; i<m.SolidElements(); ++i, ++n)
+	for (i=0; i<bd.Elements(); ++i, ++n)
 	{
-		FESolidElement& el = m.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		nf = m.Faces(el);
 		if (n != 0) m_ref[n] = m_ref[n-1] + nf;
 		NN += nf;
 	}
 
-	for (i=0; i<m.ShellElements(); ++i, ++n)
+	for (i=0; i<sd.Elements(); ++i, ++n)
 	{
-		FEShellElement& el = m.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		nf = m.Faces(el);
 		if (n != 0) m_ref[n] = m_ref[n-1] + nf;
 		NN += nf;
@@ -60,9 +63,10 @@ void FEElemElemList::Create(FEMesh* pmesh)
 	int i, j, k, l;
 	int n = 0, en0[4], en1[4], n0, n1, M = 0;
 	int nf0, nf1;
-	for (i=0; i<m.SolidElements(); ++i, ++n)
+	FESolidDomain& bd = m.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i, ++n)
 	{
-		FEElement& el = m.SolidElement(i);
+		FEElement& el = bd.Element(i);
 
 		// get the number of neighbors
 		nf0 = m.Faces(el);

@@ -91,9 +91,10 @@ void FESlidingSurface::Init()
 	FEMesh& m = *m_pmesh;
 	vector<double> tag(m.Nodes());
 	tag.zero();
-	for (i=0; i<m.ShellElements(); ++i)
+	FEShellDomain& sd = m.ShellDomain();
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEShellElement& el = m.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		n = el.Nodes();
 		for (j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
 	}

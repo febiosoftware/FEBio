@@ -266,8 +266,11 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
-	int EB = mesh.SolidElements();
-	int ES = mesh.ShellElements();
+	FESolidDomain& bd = mesh.SolidDomain();
+	FEShellDomain& sd = mesh.ShellDomain();
+
+	int EB = bd.Elements();
+	int ES = sd.Elements();
 
 	double val = 0;
 	int ierr;
@@ -281,7 +284,6 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 	if ((nel >= 0) && (nel < EB)) 
 	{
 		// this is a solid element
-		FESolidDomain& bd = mesh.SolidDomain();
 		FESolidElement& el = bd.Element(nel);
 		bd.UnpackElement(el);
 
@@ -317,7 +319,6 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 	else if ((nel >= EB) && (nel - EB < ES))
 	{
 		// this is a shell element
-		FEShellDomain& sd = mesh.ShellDomain();
 		FEShellElement& el = sd.Element(nel - EB);
 		sd.UnpackElement(el);
 
@@ -349,7 +350,8 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 
 void ElementDataRecord::SelectAllItems()
 {
-	int n = m_pfem->m_mesh.ShellElements() + m_pfem->m_mesh.SolidElements();
+	FEMesh& m = m_pfem->m_mesh;
+	int n = m.SolidDomain().Elements() + m.ShellDomain().Elements();
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }

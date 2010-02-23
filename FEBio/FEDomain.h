@@ -30,7 +30,7 @@ public:
 	FESolidDomain(){}
 
 	void create(int n) { m_Elem.resize(n); }
-	int size() { return m_Elem.size(); }
+	int Elements() { return m_Elem.size(); }
 	FESolidElement& operator [] (int n) { return m_Elem[n]; }
 	
 	FESolidElement& Element(int n) { return m_Elem[n]; }
@@ -114,7 +114,7 @@ public:
 	FEShellDomain(){}
 
 	void create(int n) { m_Elem.resize(n); }
-	int size() { return m_Elem.size(); }
+	int Elements() { return m_Elem.size(); }
 	FEShellElement& operator [] (int n) { return m_Elem[n]; }
 
 	FEShellElement& Element(int n) { return m_Elem[n]; }
@@ -159,7 +159,7 @@ public:
 	FETrussDomain(){}
 
 	void create(int n) { m_Elem.resize(n); }
-	int size() { return m_Elem.size(); }
+	int Elements() { return m_Elem.size(); }
 	FETrussElement& operator [] (int n) { return m_Elem[n]; }
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }

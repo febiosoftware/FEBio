@@ -169,16 +169,16 @@ public:
 	int Nodes() { return m_Node.size(); }
 
 	//! count the number of solid elements
-	int SolidElements() { return m_Elem.size(); }
+	int SolidElements() { return m_Elem.Elements(); }
 
 	//! count the number of shell elements
-	int ShellElements() { return m_Shell.size(); }
+	int ShellElements() { return m_Shell.Elements(); }
 
 	//! count the number of truss elements
-	int TrussElements() { return m_Truss.size(); }
+	int TrussElements() { return m_Truss.Elements(); }
 
 	//! return total nr of elements
-	int Elements() { return (m_Elem.size() + m_Shell.size() + m_Truss.size()); }
+	int Elements() { return (m_Elem.Elements() + m_Shell.Elements() + m_Truss.Elements()); }
 
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }

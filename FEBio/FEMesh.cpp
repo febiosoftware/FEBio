@@ -105,22 +105,22 @@ int FEMesh::RemoveIsolatedVertices()
 	val.zero();
 
 	// count the nodal valences
-	for (i=0; i<SolidElements(); ++i)
+	for (i=0; i<m_Elem.Elements(); ++i)
 	{
-		FEElement& el = SolidElement(i);
+		FEElement& el = m_Elem.Element(i);
 		n = el.Nodes();
 		for (j=0; j<n; ++j) ++val[el.m_node[j]];
 	}
 
-	for (i=0; i<ShellElements(); ++i)
+	for (i=0; i<m_Shell.Elements(); ++i)
 	{
-		FEElement& el = ShellElement(i);
+		FEElement& el = m_Shell.Element(i);
 		n = el.Nodes();
 		for (j=0; j<n; ++j) ++val[el.m_node[j]];
 	}
 
 	FETrussDomain& td = TrussDomain();
-	for (i=0; i<td.size(); ++i)
+	for (i=0; i<td.Elements(); ++i)
 	{
 		FEElement& el = td.Element(i);
 		n = el.Nodes();
@@ -258,9 +258,10 @@ bool FEMesh::Init()
 	int ninverted = 0;
 
 	// check all solid elements to see if they are not initially inverted
-	for (i=0; i<SolidElements(); ++i)
+	FESolidDomain& bd = SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = m_Elem.Element(i);
+		FESolidElement& el = bd.Element(i);
 
 		try
 		{
@@ -292,7 +293,7 @@ bool FEMesh::Init()
 
 	// initialize shell data
 	FEShellDomain& sd = ShellDomain();
-	for (i=0; i<ShellElements(); ++i)
+	for (i=0; i<sd.Elements(); ++i)
 	{
 		FEShellElement& el = sd.Element(i);
 		sd.UnpackElement(el, 0);
@@ -325,7 +326,7 @@ bool FEMesh::Init()
 	}
 
 	// check the connectivity of the shells
-	for (i=0; i<ShellElements(); ++i)
+	for (i=0; i<sd.Elements(); ++i)
 	{
 		FEShellElement& el = sd.Element(i);
 
@@ -366,7 +367,7 @@ bool FEMesh::Init()
 	// we turn of the rotational degrees of freedom
 	vector<int> tag(Nodes());
 	tag.zero();
-	for (i=0; i<ShellElements(); ++i)
+	for (i=0; i<sd.Elements(); ++i)
 	{
 		FEShellElement& el = sd.Element(i);
 		if (!el.IsRigid()) sd.UnpackElement(el);
@@ -439,9 +440,9 @@ double FEMesh::ElementVolume(FEElement& el)
 void FEMesh::SetMatID(int n)
 {
 	int i;
-	int N = SolidElements();
+	int N = m_Elem.Elements();
 	for (i=0; i<N; ++i) SolidElement(i).SetMatID(n);
-	N = ShellElements();
+	N = m_Shell.Elements();
 	for (i=0; i<N; ++i) ShellElement(i).SetMatID(n);
 }
 
@@ -479,9 +480,9 @@ void FEMesh::Serialize(Archive& ar)
 
 		// write mesh item counts
 		int nn   = Nodes();
-		int nbel = SolidElements();
-		int nsel = ShellElements();
-		int ntel = m_Truss.size();
+		int nbel = m_Elem.Elements();
+		int nsel = m_Shell.Elements();
+		int ntel = m_Truss.Elements();
 		ar << nn << nbel << nsel << ntel;
 
 		// write nodal data

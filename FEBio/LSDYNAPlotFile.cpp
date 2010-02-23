@@ -89,9 +89,9 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	plh.flagT = (m_nfield[3] == 0? 0 : 1);
 	plh.icode = 6;
 	plh.ndim  = 4;
-	plh.nel2  = fem.m_mesh.TrussDomain().size();
-	plh.nel4  = fem.m_mesh.ShellElements();
-	plh.nel8  = fem.m_mesh.SolidElements();
+	plh.nel2  = fem.m_mesh.TrussDomain().Elements();
+	plh.nel4  = fem.m_mesh.ShellDomain().Elements();
+	plh.nel8  = fem.m_mesh.SolidDomain().Elements();
 	plh.nglbv = 0;
 	plh.nummat2 = 0;
 	plh.nummat4 = 0;
@@ -134,9 +134,10 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	// write solid element data
 	// note that we reindex all elements so that the ID
 	// corresponds to the nr in the plot file
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		el.m_nID = nid++;
 
@@ -176,7 +177,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 
 	// write truss element data
 	FETrussDomain& td = mesh.TrussDomain();
-	for (i=0; i<td.size(); ++i)
+	for (i=0; i<td.Elements(); ++i)
 	{
 		FETrussElement& el = td.Element(i);
 		el.m_nID = nid++;
@@ -191,9 +192,10 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	}
 
 	// write shell element data
-	for (i=0; i<mesh.ShellElements(); ++i)
+	FEShellDomain& sd = mesh.ShellDomain();
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 
 		el.m_nID = nid++;
 
@@ -346,9 +348,10 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	float s[44] = {0};
 	double f;
 	int nint, neln;
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		for (j=0; j<7; ++j) s[j] = 0;
 
@@ -390,7 +393,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	// write truss element data
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
 	FETrussDomain& td = mesh.TrussDomain();
-	for (i=0; i<td.size(); ++i)
+	for (i=0; i<td.Elements(); ++i)
 	{
 		FETrussElement& el = td.Element(i);
 		td.UnpackElement(el);
@@ -406,7 +409,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	// write shell element data
 	mat3ds E;
 	FEShellDomain& sd = mesh.ShellDomain();
-	for (i=0; i<sd.size(); ++i)
+	for (i=0; i<sd.Elements(); ++i)
 	{
 		for (j=0; j<44; ++j) s[j] = 0;
 
@@ -545,9 +548,10 @@ void LSDYNAPlotFile::write_fluid_flux()
 
 	vec3d ew;
 	int n;
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		// calculate average flux
 		ew = vec3d(0,0,0);
@@ -762,9 +766,10 @@ void LSDYNAPlotFile::write_heat_flux()
 
 	vec3d ew;
 	int n;
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		// calculate average flux
 		ew = vec3d(0,0,0);
@@ -1013,16 +1018,18 @@ void LSDYNAPlotFile::write_material_fibers()
 	int i, j, n;
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
+	FESolidDomain& bd = mesh.SolidDomain();
+	FEShellDomain& sd = mesh.ShellDomain();
 	int N = mesh.Nodes();
-	int BE = mesh.SolidElements();
-	int SE = mesh.ShellElements();
+	int BE = bd.Elements();
+	int SE = sd.Elements();
 	vector<vec3d> v(N);
 	for (i=0; i<N; ++i) v[i] = vec3d(0,0,0);
 
 	vec3d r;
 	for (i=0; i<BE; ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		n = el.GaussPoints();
 		r = vec3d(0,0,0);
 		for (j=0; j<n; ++j)
@@ -1040,7 +1047,7 @@ void LSDYNAPlotFile::write_material_fibers()
 
 	for (i=0; i<SE; ++i)
 	{
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		n = el.GaussPoints();
 		r = vec3d(0,0,0);
 		for (j=0; j<n; ++j)

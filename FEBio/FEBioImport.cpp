@@ -896,24 +896,26 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	}
 
 	// assign material point data
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
 		assert(pmat);
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 	}
 
-	for (i=0; i<mesh.ShellElements(); ++i)
+	FEShellDomain& sd = mesh.ShellDomain();
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
 		assert(pmat);
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 	}
 
 	FETrussDomain& td = mesh.TrussDomain();
-	for (i=0; i<td.size(); ++i)
+	for (i=0; i<td.Elements(); ++i)
 	{
 		FETrussElement& el = td.Element(i);
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
@@ -978,9 +980,9 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
-	int nbel = mesh.SolidElements();
-	int nsel = mesh.ShellElements();
-	int ntel = mesh.TrussDomain().size();
+	int nbel = mesh.SolidDomain().Elements();
+	int nsel = mesh.ShellDomain().Elements();
+	int ntel = mesh.TrussDomain().Elements();
 
 	//make sure we've read the element section
 	int elems = nbel + nsel + ntel;

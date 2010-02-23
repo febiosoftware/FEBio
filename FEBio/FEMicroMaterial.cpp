@@ -57,9 +57,10 @@ void FEMicroMaterial::PrepRVE()
 
 	// use the E-E list to tag all exterior nodes
 	int fn[4], nf, M = 0;
-	for (int i=0; i<m.SolidElements(); ++i, ++M)
+	FESolidDomain& bd = m.SolidDomain();
+	for (int i=0; i<bd.Elements(); ++i, ++M)
 	{
-		FESolidElement& el = m.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		nf = m.Faces(el);
 		for (int j=0; j<nf; ++j)
 		{
@@ -113,8 +114,7 @@ void FEMicroMaterial::PrepRVE()
 	double ve;
 	int nint, n;
 	double* w, J;
-	FESolidDomain& bd = m.SolidDomain();
-	for (i=0; i<bd.size(); ++i)
+	for (i=0; i<bd.Elements(); ++i)
 	{
 		FESolidElement& el = bd.Element(i);
 		bd.UnpackElement(el);
@@ -205,9 +205,10 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	double V = 0, ve;
 	int nint, n, i;
 	double* w, J;
-	for (i=0; i<m.SolidElements(); ++i)
+	FESolidDomain& bd = m.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = m.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		m.UnpackElement(el);
 		nint = el.GaussPoints();
 		w = el.GaussWeights();
@@ -263,7 +264,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 
 	// calculate the stiffness matrix
 	FESolidDomain& bd = m.SolidDomain();
-	int NS = bd.size(), i, j;
+	int NS = bd.Elements(), i, j;
 	for (int n=0; n<NS; ++n)
 	{
 		FESolidElement& e = bd.Element(n);

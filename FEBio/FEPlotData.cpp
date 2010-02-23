@@ -69,9 +69,10 @@ void FEPlotElementStress::Save(FEM& fem, Archive& ar)
 	float s[6] = {0};
 	double f;
 	int nint;
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		for (j=0; j<6; ++j) s[j] = 0;
 
@@ -376,9 +377,10 @@ void FEPlotFluidFlux::Save(FEM &fem, Archive &ar)
 
 	float af[3];
 	vec3d ew;
-	for (i=0; i<mesh.SolidElements(); ++i)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		// calculate average flux
 		ew = vec3d(0,0,0);
@@ -405,13 +407,15 @@ void FEPlotFiberVector::Save(FEM &fem, Archive &ar)
 {
 	int i, j, n;
 	FEMesh& mesh = fem.m_mesh;
-	int BE = mesh.SolidElements();
+	FESolidDomain& bd = mesh.SolidDomain();
+
+	int BE = bd.Elements();
 
 	float a[3];
 	vec3d r;
 	for (i=0; i<BE; ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		n = el.GaussPoints();
 		r = vec3d(0,0,0);
 		for (j=0; j<n; ++j)

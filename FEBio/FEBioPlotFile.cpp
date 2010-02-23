@@ -191,8 +191,8 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	// setup the header
 	m_hdr.nsize = sizeof(HEADER);
 	m_hdr.nnodes = m.Nodes();
-	m_hdr.n3d    = m.SolidElements();
-	m_hdr.n2d    = m.ShellElements();
+	m_hdr.n3d    = m.SolidDomain().Elements();
+	m_hdr.n2d    = m.ShellDomain().Elements();
 	m_hdr.n1d    = fem.m_DE.size();
 	m_hdr.nmat   = fem.Materials();
 
@@ -240,9 +240,10 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	// write solid element data
 	// note that we reindex all elements so that the ID
 	// corresponds to the nr in the plot file
-	for (i=0; i<m.SolidElements(); ++i)
+	FESolidDomain& bd = m.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = m.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		el.m_nID = nid++;
 
@@ -280,9 +281,10 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	}
 
 	// write shell element data
-	for (i=0; i<m.ShellElements(); ++i)
+	FEShellDomain& sd = m.ShellDomain();
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEShellElement& el = m.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 
 		el.m_nID = nid++;
 
@@ -311,7 +313,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 
 	// write truss element data
 	FETrussDomain& td = m.TrussDomain();
-	for (i=0; i<td.size(); ++i)
+	for (i=0; i<td.Elements(); ++i)
 	{
 		FETrussElement& el = td.Element(i);
 		el.m_nID = nid++;

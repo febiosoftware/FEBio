@@ -41,9 +41,10 @@ bool FEM::InitRigidBodies()
 
 	// Next, we assign to all nodes a rigid node number
 	// This number is preliminary since rigid materials can be merged
-	for (i=0; i<m_mesh.SolidElements(); ++i)
+	FESolidDomain& bd = m_mesh.SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = m_mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
 		if (pm)
 		{
@@ -57,9 +58,11 @@ bool FEM::InitRigidBodies()
 		}
 		else el.m_nrigid = -1;
 	}
-	for (i=0; i<m_mesh.ShellElements(); ++i)
+
+	FEShellDomain& sd = m_mesh.ShellDomain();
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEShellElement& el = m_mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
 		if (pm)
 		{
@@ -81,9 +84,9 @@ bool FEM::InitRigidBodies()
 	do
 	{
 		bdone = true;
-		for (i=0; i<m_mesh.SolidElements(); ++i)
+		for (i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = m_mesh.SolidElement(i);
+			FESolidElement& el = bd.Element(i);
 			if (el.m_nrigid >= 0)
 			{
 				m = m_mesh.Node(el.m_node[0]).m_rid;
@@ -98,9 +101,9 @@ bool FEM::InitRigidBodies()
 				}
 			}
 		}
-		for (i=0; i<m_mesh.ShellElements(); ++i)
+		for (i=0; i<sd.Elements(); ++i)
 		{
-			FEShellElement& el = m_mesh.ShellElement(i);
+			FEShellElement& el = sd.Element(i);
 			if (el.m_nrigid >= 0)
 			{
 				m = m_mesh.Node(el.m_node[0]).m_rid;
@@ -134,18 +137,18 @@ bool FEM::InitRigidBodies()
 	}
 
 	// assign rigid body index to rigid elements
-	for (i=0; i<m_mesh.SolidElements(); ++i)
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FESolidElement& el = m_mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
 		if (pm)
 			el.m_nrigid = pm->m_nRB;
 		else
 			el.m_nrigid = -1;
 	}
-	for (i=0; i<m_mesh.ShellElements(); ++i)
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEShellElement& el = m_mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
 		if (pm)
 			el.m_nrigid = pm->m_nRB;
@@ -251,9 +254,9 @@ bool FEM::InitRigidBodies()
 	// get equation numbers assigned to them. Later we'll assign
 	// the rigid dofs equations numbers to these nodes
 	for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_bshell = false;
-	for (i=0; i<m_mesh.ShellElements(); ++i)
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEShellElement& el = m_mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		if (el.m_nrigid < 0)
 		{
 			int n = el.Nodes();

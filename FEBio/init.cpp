@@ -104,7 +104,7 @@ bool FEM::Init()
 	// intialize local coordinate data
 	bool bmerr = false;
 	FESolidDomain& bd = m_mesh.SolidDomain();
-	for (i=0; i<bd.size(); ++i)
+	for (i=0; i<bd.Elements(); ++i)
 	{
 		// unpack element data
 		FESolidElement& el = bd.Element(i);
@@ -164,10 +164,11 @@ bool FEM::Init()
 
 	// now do the same thing for shells
 	bmerr = false;
-	for (i=0; i<m_mesh.ShellElements(); ++i)
+	FEShellDomain& sd = m_mesh.ShellDomain();
+	for (i=0; i<sd.Elements(); ++i)
 	{
 		// unpack element data
-		FEShellElement& el = m_mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 
 		// get the elements material
 		FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());

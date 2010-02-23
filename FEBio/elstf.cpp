@@ -36,7 +36,7 @@ bool FESolidSolver::StiffnessMatrix()
 
 	// repeat over all solid elements
 	FESolidDomain& bd = mesh.SolidDomain();
-	int NE = bd.size();
+	int NE = bd.Elements();
 	for (iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = mesh.SolidElement(iel);
@@ -119,7 +119,7 @@ bool FESolidSolver::StiffnessMatrix()
 
 	// repeat over all shell elements
 	FEShellDomain& sd = mesh.ShellDomain();
-	int NS = sd.size();
+	int NS = sd.Elements();
 	for (iel=0; iel<NS; ++iel)
 	{
 		FEShellElement& el = mesh.ShellElement(iel);
@@ -157,7 +157,7 @@ bool FESolidSolver::StiffnessMatrix()
 
 	// repeat over truss elements
 	FETrussDomain& td = mesh.TrussDomain();
-	int NT = td.size();
+	int NT = td.Elements();
 	for (iel =0; iel<NT; ++iel)
 	{
 		FETrussElement& el = td.Element(iel);
@@ -712,7 +712,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 	// loop over solid elements
 	FESolidDomain& bd = mesh.SolidDomain();
-	int NE = bd.size();
+	int NE = bd.Elements();
 	for (i=0; i<NE; ++i)
 	{
 		// get the element
@@ -773,8 +773,8 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// loop over shell elements
-	int NS = mesh.ShellElements();
 	FEShellDomain& sd = mesh.ShellDomain();
+	int NS = sd.Elements();
 	for (i=0; i<NS; ++i)
 	{
 		// get the element
@@ -816,7 +816,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 	// loop over truss elements
 	FETrussDomain& td = mesh.TrussDomain();
-	int NT = td.size();
+	int NT = td.Elements();
 	for (i=0; i<NT; ++i)
 	{
 		FETrussElement& el = td.Element(i);
@@ -1322,7 +1322,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	// first do the solid elements
 	matrix ke;
 	FESolidDomain& bd = mesh.SolidDomain();
-	for (iel=0; iel<bd.size(); ++iel)
+	for (iel=0; iel<bd.Elements(); ++iel)
 	{
 		FESolidElement& el = bd.Element(iel);
 		bd.UnpackElement(el);

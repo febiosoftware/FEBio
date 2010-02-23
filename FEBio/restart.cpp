@@ -331,16 +331,18 @@ void FEM::SerializeGeometry(Archive &ar)
 		int i, j, n;
 
 		// write solid element state data
-		for (i=0; i<m_mesh.SolidElements(); ++i)
+		FESolidDomain& bd = m_mesh.SolidDomain();
+		for (i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = m_mesh.SolidElement(i);
+			FESolidElement& el = bd.Element(i);
 			for (j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
 		}
 
 		// write shell element state data
-		for (i=0; i<m_mesh.ShellElements(); ++i)
+		FEShellDomain& sd = m_mesh.ShellDomain();
+		for (i=0; i<sd.Elements(); ++i)
 		{
-			FEShellElement& el = m_mesh.ShellElement(i);
+			FEShellElement& el = sd.Element(i);
 			for (j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
 		}
 
@@ -380,9 +382,10 @@ void FEM::SerializeGeometry(Archive &ar)
 		int i, j, n, m, mat;
 
 		// read solid element state data
-		for (i=0; i<m_mesh.SolidElements(); ++i)
+		FESolidDomain& bd = m_mesh.SolidDomain();
+		for (i=0; i<bd.Elements(); ++i)
 		{
-			FESolidElement& el = m_mesh.SolidElement(i);
+			FESolidElement& el = bd.Element(i);
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				el.SetMaterialPointData(GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
@@ -391,9 +394,10 @@ void FEM::SerializeGeometry(Archive &ar)
 		}
 
 		// read shell element state data
-		for (i=0; i<m_mesh.ShellElements(); ++i)
+		FEShellDomain& sd = m_mesh.ShellDomain();
+		for (i=0; i<sd.Elements(); ++i)
 		{
-			FEShellElement& el = m_mesh.ShellElement(i);
+			FEShellElement& el = sd.Element(i);
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				el.SetMaterialPointData(GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);

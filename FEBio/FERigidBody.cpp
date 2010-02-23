@@ -51,7 +51,7 @@ void FERigidBody::Update()
 	// loop over all elements
 	// TODO: what if the rigid body has shells ?
 	FESolidDomain& bd = mesh.SolidDomain();
-	for (int iel=0; iel<bd.size(); ++iel)
+	for (int iel=0; iel<bd.Elements(); ++iel)
 	{
 		FESolidElement& el = bd.Element(iel);
 
