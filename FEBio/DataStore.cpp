@@ -281,8 +281,9 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 	if ((nel >= 0) && (nel < EB)) 
 	{
 		// this is a solid element
-		FESolidElement& el = mesh.SolidElement(nel);
-		mesh.UnpackElement(el);
+		FESolidDomain& bd = mesh.SolidDomain();
+		FESolidElement& el = bd.Element(nel);
+		bd.UnpackElement(el);
 
 		int nint = el.GaussPoints();
 		for (int i=0; i<nint; ++i)

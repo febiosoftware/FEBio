@@ -247,10 +247,11 @@ bool FEHeatSolver::StiffnessMatrix()
 	// zero the stiffness matrix
 	m_pK->Zero();
 
+	FESolidDomain& bd = mesh.SolidDomain();
 	for (i=0; i<mesh.SolidElements(); ++i)
 	{
 		FESolidElement& el = mesh.SolidElement(i);
-		mesh.UnpackElement(el);
+		bd.UnpackElement(el);
 
 		int ne = el.Nodes();
 

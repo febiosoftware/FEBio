@@ -41,6 +41,9 @@ public:
 
 	void Reset();
 
+	//! Unpack solid element data
+	void UnpackElement(FESolidElement& el, unsigned int nflag = FE_UNPACK_ALL);
+
 	// update stresses
 	void UpdateStresses(FEM& fem);
 

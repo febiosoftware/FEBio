@@ -201,9 +201,6 @@ public:
 	//! remove isolated vertices
 	int RemoveIsolatedVertices();
 
-	//! Unpack solid element data
-	void UnpackElement(FESolidElement& el, unsigned int nflag = FE_UNPACK_ALL);
-
 	//! Unpack surface element data
 	void UnpackElement(FESurfaceElement& el, unsigned int nflag = FE_UNPACK_ALL);
 

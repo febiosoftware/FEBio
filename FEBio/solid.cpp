@@ -607,7 +607,7 @@ void FESolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 		{
 			// the micro-material screws up the currently unpacked elements
 			// so I have to unpack the element data again
-			fem.m_mesh.UnpackElement(el);
+			UnpackElement(el);
 		}
 
 /*		if (m_fem.GetDebugFlag())
@@ -1513,7 +1513,7 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 		if (!el.IsRigid())
 		{
 			// unpack the element data
-			m_pMesh->UnpackElement(el);
+			UnpackElement(el);
 
 			// get the number of integration points
 			nint = el.GaussPoints();
@@ -1626,7 +1626,7 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 					{
 						// the micro-material screws up the currently unpacked elements
 						// so I have to unpack the element data again
-						m_pMesh->UnpackElement(el);
+						UnpackElement(el);
 					}
 
 					if (bporo)
@@ -1641,4 +1641,72 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 			}
 		}
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+//! Unpack the element. That is, copy element data in traits structure
+
+void FESolidDomain::UnpackElement(FESolidElement& el, unsigned int nflag)
+{
+	int i, n;
+
+	vec3d* rt = el.rt();
+	vec3d* r0 = el.r0();
+	vec3d* vt = el.vt();
+	double* pt = el.pt();
+
+	int N = el.Nodes();
+	int* lm = el.LM();
+
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+		FENode& node = m_pMesh->Node(n);
+
+		int* id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[0];
+		lm[3*i+1] = id[1];
+		lm[3*i+2] = id[2];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[6];
+
+		// rigid rotational dofs
+		lm[4*N + 3*i  ] = id[7];
+		lm[4*N + 3*i+1] = id[8];
+		lm[4*N + 3*i+2] = id[9];
+
+		// fill the rest with -1
+		lm[7*N + 3*i  ] = -1;
+		lm[7*N + 3*i+1] = -1;
+		lm[7*N + 3*i+2] = -1;
+
+		lm[10*N + i] = id[10];
+	}
+
+	// copy nodal data to element arrays
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+
+		FENode& node = m_pMesh->Node(n);
+
+		// initial coordinates (= material coordinates)
+		r0[i] = node.m_r0;
+
+		// current coordinates (= spatial coordinates)
+		rt[i] = node.m_rt;
+
+		// current nodal pressures
+		pt[i] = node.m_pt;
+
+		// current nodal velocities
+		vt[i] = node.m_vt;
+	}
+
+	// unpack the traits data
+	el.UnpackTraitsData(nflag);
 }

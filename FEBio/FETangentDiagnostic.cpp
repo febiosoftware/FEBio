@@ -87,14 +87,15 @@ bool FETangentDiagnostic::Run()
 	// solve the problem
 	solve();
 
+	FESolidDomain& bd = mesh.SolidDomain();
+
 	// get the one and only element
-	FESolidElement& el = mesh.SolidElement(0);
-	mesh.UnpackElement(el);
+	FESolidElement& el = bd.Element(0);
+	bd.UnpackElement(el);
 
 	// set up the element stiffness matrix
 	matrix k0(24, 24);
 	k0.zero();
-	FESolidDomain& bd = mesh.SolidDomain();
 	bd.ElementStiffness(fem, el, k0);
 
 	// print the element stiffness matrix
@@ -148,14 +149,15 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	// get the mesh
 	FEMesh& mesh = fem.m_mesh;
 
+	FESolidDomain& bd = mesh.SolidDomain();
+
 	// get the one and only element
-	FESolidElement& el = mesh.SolidElement(0);
-	mesh.UnpackElement(el);
+	FESolidElement& el = bd.Element(0);
+	bd.UnpackElement(el);
 
 	// first calculate the initial residual
 	vector<double> f0(24);
 	f0.zero();
-	FESolidDomain& bd = mesh.SolidDomain();
 	bd.InternalForces(el, f0);
 
 	// now calculate the perturbed residuals
@@ -179,7 +181,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 
 		solver.UpdateStresses();
-		mesh.UnpackElement(el);
+		bd.UnpackElement(el);
 
 		f1.zero();
 		bd.InternalForces(el, f1);
@@ -192,7 +194,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		}
 
 		solver.UpdateStresses();
-		mesh.UnpackElement(el);
+		bd.UnpackElement(el);
 
 		for (i=0; i<3*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
 	}
@@ -206,8 +208,10 @@ double FETangentDiagnostic::residual(double d)
 	FEMesh& mesh = fem.m_mesh;
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 
+	FESolidDomain& bd = mesh.SolidDomain();
+
 	FESolidElement& el = mesh.SolidElement(0);
-	mesh.UnpackElement(el);
+	bd.UnpackElement(el);
 
 	// set the deformation
 	for (int n=0; n<8; ++n)
@@ -225,7 +229,6 @@ double FETangentDiagnostic::residual(double d)
 	vector<double> R(24);
 	R.zero();
 
-	FESolidDomain& bd = mesh.SolidDomain();
 	bd.InternalForces(el, R);
 
 	double r = sqrt(R*R);

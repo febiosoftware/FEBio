@@ -42,7 +42,7 @@ bool FESolidSolver::StiffnessMatrix()
 		FESolidElement& el = mesh.SolidElement(iel);
 		if (!el.IsRigid())
 		{
-			mesh.UnpackElement(el);
+			bd.UnpackElement(el);
 
 			// get the elements material
 			FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
@@ -97,7 +97,7 @@ bool FESolidSolver::StiffnessMatrix()
 			// for dynamic analyses we do need to add the inertial stiffness of the rigid body
 			if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC)
 			{
-				mesh.UnpackElement(el);
+				bd.UnpackElement(el);
 
 				ndof = 3*el.Nodes();
 				ke.Create(ndof, ndof);
@@ -716,10 +716,10 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (i=0; i<NE; ++i)
 	{
 		// get the element
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		// unpack the element
-		if (!el.IsRigid()) mesh.UnpackElement(el);
+		if (!el.IsRigid()) bd.UnpackElement(el);
 
 		FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
 
@@ -746,7 +746,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 		else if (m_fem.UseBodyForces())
 		{
 			// unpack the element
-			mesh.UnpackElement(el);
+			bd.UnpackElement(el);
 
 			// apply body force to rigid elements
 			bd.BodyForces(m_fem, el, fe);
@@ -1325,7 +1325,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	for (iel=0; iel<bd.size(); ++iel)
 	{
 		FESolidElement& el = bd.Element(iel);
-		mesh.UnpackElement(el);
+		bd.UnpackElement(el);
 
 		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 

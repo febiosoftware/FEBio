@@ -103,14 +103,15 @@ bool FEM::Init()
 
 	// intialize local coordinate data
 	bool bmerr = false;
-	for (i=0; i<m_mesh.SolidElements(); ++i)
+	FESolidDomain& bd = m_mesh.SolidDomain();
+	for (i=0; i<bd.size(); ++i)
 	{
 		// unpack element data
-		FESolidElement& el = m_mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 
 		try
 		{
-			m_mesh.UnpackElement(el);
+			bd.UnpackElement(el);
 		}
 		catch (NegativeJacobian e)
 		{

@@ -71,12 +71,13 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			MP.clear();
 
 			// Add all solid elements to the profile
-			for (i=0; i<mesh.SolidElements(); ++i)
+			FESolidDomain& bd = mesh.SolidDomain();
+			for (i=0; i<bd.size(); ++i)
 			{
-				FESolidElement& el = mesh.SolidElement(i);
+				FESolidElement& el = bd.Element(i);
 				if (!el.IsRigid())
 				{
-					mesh.UnpackElement(el, FE_UNPACK_LM);
+					bd.UnpackElement(el, FE_UNPACK_LM);
 					build_add(el.LM());
 				}
 			}
@@ -162,12 +163,13 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				// keep a list that stores for each node the list of
 				// elements connected to that node.
 				// loop over all solid elements
-				for (i=0; i<mesh.SolidElements(); ++i)
+				FESolidDomain& bd = mesh.SolidDomain();
+				for (i=0; i<bd.size(); ++i)
 				{
-					FESolidElement& el = mesh.SolidElement(i);
+					FESolidElement& el = bd.Element(i);
 					if (!el.IsRigid())
 					{
-						mesh.UnpackElement(el, FE_UNPACK_LM);
+						bd.UnpackElement(el, FE_UNPACK_LM);
 						int ne = el.LM().size();
 
 						// see if this element connects to the 

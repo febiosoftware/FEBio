@@ -113,10 +113,11 @@ void FEMicroMaterial::PrepRVE()
 	double ve;
 	int nint, n;
 	double* w, J;
-	for (i=0; i<m.SolidElements(); ++i)
+	FESolidDomain& bd = m.SolidDomain();
+	for (i=0; i<bd.size(); ++i)
 	{
-		FESolidElement& el = m.SolidElement(i);
-		m.UnpackElement(el);
+		FESolidElement& el = bd.Element(i);
+		bd.UnpackElement(el);
 		nint = el.GaussPoints();
 		w = el.GaussWeights();
 		ve = 0;
@@ -260,14 +261,13 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	// elasticity tensor
 	double D[6][6] = {0};
 
-	FESolidDomain& bd = m.SolidDomain();
-
 	// calculate the stiffness matrix
-	int NS = m.SolidElements(), i, j;
+	FESolidDomain& bd = m.SolidDomain();
+	int NS = bd.size(), i, j;
 	for (int n=0; n<NS; ++n)
 	{
-		FESolidElement& e = m.SolidElement(n);
-		m.UnpackElement(e);
+		FESolidElement& e = bd.Element(n);
+		bd.UnpackElement(e);
 
 		// create the element's stiffness matrix
 		int ne = e.Nodes();

@@ -50,9 +50,10 @@ void FERigidBody::Update()
 	
 	// loop over all elements
 	// TODO: what if the rigid body has shells ?
-	for (int iel=0; iel<mesh.SolidElements(); ++iel)
+	FESolidDomain& bd = mesh.SolidDomain();
+	for (int iel=0; iel<bd.size(); ++iel)
 	{
-		FESolidElement& el = mesh.SolidElement(iel);
+		FESolidElement& el = bd.Element(iel);
 
 		FERigid* pm = dynamic_cast<FERigid*> (fem.GetMaterial(el.GetMatID()));
 
@@ -62,7 +63,7 @@ void FERigidBody::Update()
 			dens = pm->m_density;
 
 			// unpack the element
-			mesh.UnpackElement(el);
+			bd.UnpackElement(el);
 
 			// nr of integration points
 			int nint = el.GaussPoints();
