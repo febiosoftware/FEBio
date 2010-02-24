@@ -11,8 +11,6 @@
 
 bool FESolidSolver::StiffnessMatrix()
 {
-	int iel;
-
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
 
@@ -31,140 +29,8 @@ bool FESolidSolver::StiffnessMatrix()
 	// get the mesh
 	FEMesh& mesh = m_fem.m_mesh;
 
-	// total nr of elements
-	int TNE = mesh.Elements();
-
-	// repeat over all solid elements
-	FESolidDomain& bd = mesh.SolidDomain();
-	int NE = bd.Elements();
-	for (iel=0; iel<NE; ++iel)
-	{
-		FESolidElement& el = bd.Element(iel);
-		if (!el.IsRigid())
-		{
-			bd.UnpackElement(el);
-
-			// get the elements material
-			FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
-
-			// skip rigid elements and poro-elastic elements
-			if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
-			{
-				// create the element's stiffness matrix
-				ndof = 3*el.Nodes();
-				ke.Create(ndof, ndof);
-				ke.zero();
-
-				// calculate the element stiffness matrix
-				bd.ElementStiffness(m_fem, el, ke);
-
-				// add the inertial stiffness for dynamics
-				if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) bd.ElementInertialStiffness(m_fem, el, ke);
-
-				// assemble element matrix in global stiffness matrix
-				AssembleStiffness(el.m_node, el.LM(), ke);
-			}
-			else if (dynamic_cast<FEPoroElastic*>(pmat))
-			{
-				// allocate stiffness matrix
-				int neln = el.Nodes();
-				ndof = neln*4;
-				ke.Create(ndof, ndof);
-		
-				// calculate the element stiffness matrix
-				bd.ElementPoroStiffness(m_fem, el, ke);
-
-				// TODO: the problem here is that the LM array that is returned by the UnpackElement
-				// function does not give the equation numbers in the right order. For this reason we
-				// have to create a new lm array and place the equation numbers in the right order.
-				// What we really ought to do is fix the UnpackElement function so that it returns
-				// the LM vector in the right order for poroelastic elements.
-				vector<int> lm(ndof);
-				for (int i=0; i<neln; ++i)
-				{
-					lm[4*i  ] = el.LM()[3*i];
-					lm[4*i+1] = el.LM()[3*i+1];
-					lm[4*i+2] = el.LM()[3*i+2];
-					lm[4*i+3] = el.LM()[3*neln+i];
-				}
-				
-				// assemble element matrix in global stiffness matrix
-				AssembleStiffness(el.m_node, lm, ke);
-			}
-		}
-		else
-		{
-			// for dynamic analyses we do need to add the inertial stiffness of the rigid body
-			if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC)
-			{
-				bd.UnpackElement(el);
-
-				ndof = 3*el.Nodes();
-				ke.Create(ndof, ndof);
-				ke.zero();
-
-				// add the inertial stiffness for dynamics
-				bd.ElementInertialStiffness(m_fem, el, ke);
-
-				// assemble element matrix in global stiffness matrix
-				AssembleStiffness(el.m_node, el.LM(), ke);
-			}
-		}
-
-		if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
-		{
-			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*iel/ TNE);
-		}
-	}
-
-	// repeat over all shell elements
-	FEShellDomain& sd = mesh.ShellDomain();
-	int NS = sd.Elements();
-	for (iel=0; iel<NS; ++iel)
-	{
-		FEShellElement& el = sd.Element(iel);
-		if (!el.IsRigid())
-		{
-			sd.UnpackElement(el);
-
-			// get the elements material
-			FEMaterial* pmat = m_fem.GetMaterial(el.GetMatID());
-
-			// skip rigid elements and poro-elastic elements
-			if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
-			{
-				// create the element's stiffness matrix
-				ndof = 6*el.Nodes();
-				ke.Create(ndof, ndof);
-
-				// calculate the element stiffness matrix
-				sd.ElementStiffness(m_fem, el, ke);
-
-				// assemble element matrix in global stiffness matrix
-				AssembleStiffness(el.m_node, el.LM(), ke);
-			}
-			else if (dynamic_cast<FEPoroElastic*>(pmat))
-			{
-				// TODO: implement poro-elasticity for shells
-			}		
-		}
-
-		if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
-		{
-			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*(NE + iel)/ TNE);
-		}
-	}
-
-	// repeat over truss elements
-	FETrussDomain& td = mesh.TrussDomain();
-	int NT = td.Elements();
-	for (iel =0; iel<NT; ++iel)
-	{
-		FETrussElement& el = td.Element(iel);
-		td.UnpackElement(el);
-		td.ElementStiffness(m_fem, el, ke);
-		AssembleStiffness(el.m_node, el.LM(), ke);
-	}
+	// calculate the stiffness matrix for each domain
+	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).StiffnessMatrix(this);
 
 	// calculate contact stiffness
 	if (m_fem.m_bcontact) 
@@ -687,7 +553,7 @@ void FESolidSolver::ContactForces(vector<double>& R)
 
 bool FESolidSolver::Residual(vector<double>& R)
 {
-	int i, j, J, neln;
+	int i, j;
 	int neq = m_fem.m_neq;
 	int ndof;
 
@@ -710,120 +576,8 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// get the mesh
 	FEMesh& mesh = m_fem.m_mesh;
 
-	// loop over solid elements
-	FESolidDomain& bd = mesh.SolidDomain();
-	int NE = bd.Elements();
-	for (i=0; i<NE; ++i)
-	{
-		// get the element
-		FESolidElement& el = bd.Element(i);
-
-		// unpack the element
-		if (!el.IsRigid()) bd.UnpackElement(el);
-
-		FEMaterial* pm = m_fem.GetMaterial(el.GetMatID());
-
-		// get the element force vector and initialize it to zero
-		ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
-
-		// skip rigid elements for internal force calculations
-		if (!el.IsRigid())
-		{
-			// calculate internal force vector
-			if (el.Type() != FE_UDGHEX) bd.InternalForces(el, fe);
-			else bd.UDGInternalForces(m_fem, el, fe);
-
-			// apply body forces
-			if (m_fem.UseBodyForces())
-			{
-				bd.BodyForces(m_fem, el, fe);
-			}
-
-			// assemble element 'fe'-vector into global R vector
-			AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
-		else if (m_fem.UseBodyForces())
-		{
-			// unpack the element
-			bd.UnpackElement(el);
-
-			// apply body force to rigid elements
-			bd.BodyForces(m_fem, el, fe);
-
-			// assemble element 'fe'-vector into global R vector
-			AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
-
-		// do poro-elastic forces
-		if ((m_fem.m_pStep->m_nModule == FE_POROELASTIC)&&(dynamic_cast<FEPoroElastic*>(pm)))
-		{
-			// calculate fluid internal work
-			bd.InternalFluidWork(m_fem, el, fe);
-
-			// add fluid work to global residual
-			neln = el.Nodes();
-			int* lm = el.LM();
-			for (j=0; j<neln; ++j)
-			{
-				J = lm[3*neln+j];
-				if (J >= 0) R[J] += fe[j];
-			}
-		}
-	}
-
-	// loop over shell elements
-	FEShellDomain& sd = mesh.ShellDomain();
-	int NS = sd.Elements();
-	for (i=0; i<NS; ++i)
-	{
-		// get the element
-		FEShellElement& el = sd.Element(i);
-
-		// create the element force vector and initialize to zero
-		ndof = 6*el.Nodes();
-		fe.assign(ndof, 0);
-
-		if (!el.IsRigid())
-		{
-			sd.UnpackElement(el);
-
-			// skip rigid elements for internal force calculation
-			sd.InternalForces(el, fe);
-
-			// apply body forces to shells
-			if (m_fem.UseBodyForces())
-			{
-				sd.BodyForces(m_fem, el, fe);
-			}
-
-			// assemble the residual
-			AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
-		else if (m_fem.UseBodyForces())
-		{
-			sd.UnpackElement(el);
-
-			// apply body forces to shells
-			sd.BodyForces(m_fem, el, fe);
-
-			// assemble the residual
-			AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
-
-		// TODO: Do poro-elasticity for shells
-	}
-
-	// loop over truss elements
-	FETrussDomain& td = mesh.TrussDomain();
-	int NT = td.Elements();
-	for (i=0; i<NT; ++i)
-	{
-		FETrussElement& el = td.Element(i);
-		td.UnpackElement(el);
-		td.InternalForces(el, fe);
-		AssembleResidual(el.m_node, el.LM(), fe, R);
-	}
+	// loop over all domains
+	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Residual(this, R);
 
 	// calculate inertial forces for dynamic problems
 	if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) InertialForces(R);

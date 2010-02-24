@@ -142,6 +142,8 @@ protected:
 	char	m_szname[256];
 };
 
+class FEM;
+
 //-----------------------------------------------------------------------------
 //! Defines a finite element mesh
 
@@ -205,7 +207,7 @@ public:
 	FENodeSet* FindNodeSet(const char* szname);
 
 	//! serialize data to or from a binary archive
-	void Serialize(Archive& ar);
+	void Serialize(FEM& fem, Archive& ar);
 
 	//! Get the face nodes from a given element
 	int GetFace(FEElement& el, int n, int nf[4]);

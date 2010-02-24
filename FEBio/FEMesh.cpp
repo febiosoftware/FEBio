@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEMesh.h"
 #include "FEException.h"
+#include "fem.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -126,28 +127,15 @@ int FEMesh::RemoveIsolatedVertices()
 	val.zero();
 
 	// count the nodal valences
-	FESolidDomain& bd = SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (i=0; i<m_Domain.size(); ++i)
 	{
-		FEElement& el = bd.Element(i);
-		n = el.Nodes();
-		for (j=0; j<n; ++j) ++val[el.m_node[j]];
-	}
-
-	FEShellDomain& sd = ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		FEElement& el = sd.Element(i);
-		n = el.Nodes();
-		for (j=0; j<n; ++j) ++val[el.m_node[j]];
-	}
-
-	FETrussDomain& td = TrussDomain();
-	for (i=0; i<td.Elements(); ++i)
-	{
-		FEElement& el = td.Element(i);
-		n = el.Nodes();
-		for (j=0; j<n; ++j) ++val[el.m_node[j]];
+		FEDomain& d = Domain(i);
+		for (j=0; j<d.Elements(); ++j)
+		{
+			FEElement& el = d.ElementRef(j);
+			n = el.Nodes();
+			for (k=0; k<n; ++k) ++val[el.m_node[k]];
+		}
 	}
 
 	// see if there are any isolated nodes
@@ -427,123 +415,69 @@ FENodeSet* FEMesh::FindNodeSet(const char* szname)
 //! \sa Archive
 //! \todo serialize nodesets
 
-void FEMesh::Serialize(Archive& ar)
+void FEMesh::Serialize(FEM& fem, Archive& ar)
 {
 	if (ar.IsSaving())
 	{
 		int i;
 
-		FESolidDomain& bd = SolidDomain();
-		FEShellDomain& sd = ShellDomain();
-		FETrussDomain& td = TrussDomain();
-
-		// write mesh item counts
-		int nn   = Nodes();
-		int nbel = bd.Elements();
-		int nsel = sd.Elements();
-		int ntel = td.Elements();
-		ar << nn << nbel << nsel << ntel;
-
-		// write nodal data
-		for (i=0; i<nn; ++i) ar.write(&Node(i), sizeof(FENode), 1);
-
-		// write solid element data
-		int nmat;
-		for (i=0; i<nbel; ++i)
-		{
-			FESolidElement& el = bd.Element(i);
-			nmat = el.GetMatID();
-			ar << el.Type();
-			
-			ar << nmat;
-			ar << el.m_nrigid;
-			ar << el.m_nID;
-			ar << el.m_node;
-
-			ar << el.m_eJ;
-			ar << el.m_ep;
-			ar << el.m_Lk;
-		}
-
-		// write shell element data
-		for (i=0; i<nsel; ++i)
-		{
-			FEShellElement& el = sd.Element(i);
-			ar << el.Type();
-
-			ar << el.m_eJ;
-			ar << el.m_ep;
-
-			ar << el.GetMatID();
-			ar << el.m_nrigid;
-			ar << el.m_nID;
-			ar << el.m_node;
-
-			ar << el.m_h0;
-			ar << el.m_Lk;
-		}
-
 		// write bounding box data
 		FE_BOUNDING_BOX box = GetBoundingBox();
 		ar << box.r0 << box.r1;
+
+		// write nodal data
+		int nn   = Nodes();
+		ar << nn;
+		for (i=0; i<nn; ++i) ar.write(&Node(i), sizeof(FENode), 1);
+
+		// write domain data
+		int ND = Domains();
+		ar << ND;
+		for (i=0; i<ND; ++i)
+		{
+			FEDomain& d = Domain(i);
+			int ntype = d.Type();
+			int ne = d.Elements();
+			ar << ntype << nn;
+			d.Serialize(fem, ar);
+		}
 	}
 	else
 	{
-		int i, n, mat;
-
-		// read mesh item counts
-		int nn, nbel, nsel, ntel;
-		ar >> nn >> nbel >> nsel >> ntel;
-
-		// allocate storage for mesh data
-		Create(nn, nbel, nsel, ntel);
-
-		// read nodal data
-		for (i=0; i<nn; ++i) ar.read(&Node(i), sizeof(FENode), 1);
-
-		// read solid element data
-		FESolidDomain& bd = SolidDomain();
-		for (i=0; i<nbel; ++i)
-		{
-			FESolidElement& el = bd.Element(i);
-			ar >> n;
-
-			el.SetType(n);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nrigid;
-			ar >> el.m_nID;
-			ar >> el.m_node;
-
-			ar >> el.m_eJ;
-			ar >> el.m_ep;
-			ar >> el.m_Lk;
-		}
-
-		// read shell element data
-		FEShellDomain& sd = ShellDomain();
-		for (i=0; i<nsel; ++i)
-		{
-			FEShellElement& el = sd.Element(i);
-			ar >> n;
-
-			el.SetType(n);
-
-			ar >> el.m_eJ;
-			ar >> el.m_ep;
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nrigid;
-			ar >> el.m_nID;
-			ar >> el.m_node;
-
-			ar >> el.m_h0;
-			ar >> el.m_Lk;
-		}
+		int i;
 
 		// read bounding box data
 		FE_BOUNDING_BOX& box = GetBoundingBox();
 		ar >> box.r0 >> box.r1;
+
+		// read nodal data
+		int nn;
+		ar >> nn;
+		m_Node.resize(nn);
+		for (i=0; i<nn; ++i) ar.read(&Node(i), sizeof(FENode), 1);
+
+		// read domain data
+		int ND;
+		ar >> ND;
+		for (i=0; i<ND; ++i)
+		{
+			int ntype, ne;
+			ar >> ntype >> ne;
+			FEDomain* pd = 0;
+			switch (ntype)
+			{
+			case FE_SOLID_DOMAIN: pd = new FESolidDomain(this); break;
+			case FE_SHELL_DOMAIN: pd = new FEShellDomain(this); break;
+			case FE_TRUSS_DOMAIN: pd = new FETrussDomain(this); break;
+			default: assert(false);
+			}
+
+			assert(pd);
+			pd->create(ne);
+			pd->Serialize(fem, ar);
+
+			m_Domain.add(pd);
+		}
 	}
 }
 
@@ -627,18 +561,12 @@ FEElement* FEMesh::FindElementFromID(int nid)
 {
 	FEElement* pe = 0;
 
-	FESolidDomain& bd = SolidDomain();
-	FEShellDomain& sd = ShellDomain();
-	FETrussDomain& td = TrussDomain();
-
-	// search solid elements
-	pe = bd.FindElementFromID(nid);
-
-	// search shell elements
-	if (pe == 0) sd.FindElementFromID(nid);
-
-	// search truss elements
-	if (pe == 0) td.FindElementFromID(nid);
+	for (int i=0; i<Domains(); ++i)
+	{
+		FEDomain& d = Domain(i);
+		pe = d.FindElementFromID(nid);
+		if (pe) return pe;
+	}
 
 	return pe;
 }

@@ -115,7 +115,7 @@ int FESurface::FindElement(FESurfaceElement& el)
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 
-void FESurface::UnpackElement(FESurfaceElement& el, unsigned int nflag)
+void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 {
 	int i, n;
 

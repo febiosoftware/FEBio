@@ -319,17 +319,8 @@ void FESolidSolver::UpdateStresses()
 {
 	FEMesh& mesh = m_fem.m_mesh;
 
-	// loop over all solid elements
-	FESolidDomain& bd = mesh.SolidDomain();
-	bd.UpdateStresses(m_fem);
-
-	// loop over all shell elements
-	FEShellDomain& sd = mesh.ShellDomain();
-	sd.UpdateStresses(m_fem);
-
-	// update truss element stresses
-	FETrussDomain& td = mesh.TrussDomain();
-	td.UpdateStresses(m_fem);
+	// update the stresses on all domains
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).UpdateStresses(m_fem);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

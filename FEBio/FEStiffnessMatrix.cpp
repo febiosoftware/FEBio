@@ -70,37 +70,19 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 		{
 			MP.clear();
 
-			// Add all solid elements to the profile
-			FESolidDomain& bd = mesh.SolidDomain();
-			for (i=0; i<bd.Elements(); ++i)
+			// add all elements to the profile
+			for (i=0; i<mesh.Domains(); ++i)
 			{
-				FESolidElement& el = bd.Element(i);
-				if (!el.IsRigid())
+				FEDomain& d = mesh.Domain(i);
+				for (j=0; j<d.Elements(); ++j)
 				{
-					bd.UnpackElement(el, FE_UNPACK_LM);
-					build_add(el.LM());
+					FEElement& el = d.ElementRef(j);
+					if (!el.IsRigid())
+					{
+						d.UnpackElement(el, FE_UNPACK_LM);
+						build_add(el.LM());
+					}
 				}
-			}
-
-			// Add all shell elements to the profile
-			FEShellDomain& sd = mesh.ShellDomain();
-			for (i=0; i<sd.Elements(); ++i)
-			{
-				FEShellElement& el = sd.Element(i);
-				if (!el.IsRigid())
-				{
-					sd.UnpackElement(el, FE_UNPACK_LM);
-					build_add(el.LM());
-				}
-			}
-
-			// add truss elements to the profile
-			FETrussDomain& td = mesh.TrussDomain();
-			for (i=0; i<td.Elements(); ++i)
-			{
-				FETrussElement& el = td.Element(i);
-				td.UnpackElement(el, FE_UNPACK_LM);
-				build_add(el.LM());
 			}
 
 			// add rigid joint "elements" to the profile

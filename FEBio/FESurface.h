@@ -27,7 +27,7 @@ class FESurface : public FEDomain
 {
 public:
 	//! constructor
-	FESurface(FEMesh* pm) : FEDomain(pm) {}
+	FESurface(FEMesh* pm) : FEDomain(pm, FE_SURFACE_DOMAIN) {}
 
 	//! destructor
 	virtual ~FESurface(){}
@@ -38,6 +38,8 @@ public:
 	//! return an element of the surface
 	FESurfaceElement& Element(int i) { return m_el[i]; }
 
+	FEElement& ElementRef(int n) { return m_el[n]; }
+
 	//! return number of surface elements
 	int Elements() { return m_el.size(); }
 
@@ -45,7 +47,7 @@ public:
 	vec3d ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s);
 
 	//! Unpack surface element data
-	void UnpackElement(FESurfaceElement& el, unsigned int nflag = FE_UNPACK_ALL);
+	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
 
 	//! return the mesh to which this surface is attached
 	FEMesh* GetMesh() { return m_pMesh; }

@@ -23,7 +23,7 @@ void FESolidDomain::Reset()
 
 //-----------------------------------------------------------------------------
 
-bool FESolidDomain::Init(FEM &fem)
+bool FESolidDomain::Initialize(FEM &fem)
 {
 	bool bmerr = false;
 
@@ -91,6 +91,19 @@ bool FESolidDomain::Init(FEM &fem)
 }
 
 //-----------------------------------------------------------------------------
+
+void FESolidDomain::InitElements()
+{
+	int i, j, n;
+	for (i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		n = el.GaussPoints();
+		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FESolidDomain::Serialize(FEM& fem, Archive &ar)
 {
 	if (ar.IsSaving())
@@ -98,14 +111,40 @@ void FESolidDomain::Serialize(FEM& fem, Archive &ar)
 		for (int i=0; i<m_Elem.size(); ++i)
 		{
 			FESolidElement& el = m_Elem[i];
+			int nmat = el.GetMatID();
+			ar << el.Type();
+			
+			ar << nmat;
+			ar << el.m_nrigid;
+			ar << el.m_nID;
+			ar << el.m_node;
+
+			ar << el.m_eJ;
+			ar << el.m_ep;
+			ar << el.m_Lk;
+
 			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
 		}
 	}
 	else
 	{
+		int n, mat;
 		for (int i=0; i<m_Elem.size(); ++i)
 		{
 			FESolidElement& el = m_Elem[i];
+			ar >> n;
+
+			el.SetType(n);
+
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
+
+			ar >> el.m_eJ;
+			ar >> el.m_ep;
+			ar >> el.m_Lk;
+
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
@@ -133,7 +172,7 @@ void FEShellDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-bool FEShellDomain::Init(FEM& fem)
+bool FEShellDomain::Initialize(FEM& fem)
 {
 	bool bmerr = false;
 
@@ -194,20 +233,63 @@ void FEShellDomain::Serialize(FEM& fem, Archive &ar)
 		for (int i=0; i<m_Elem.size(); ++i)
 		{
 			FEShellElement& el = m_Elem[i];
+			ar << el.Type();
+
+			ar << el.m_eJ;
+			ar << el.m_ep;
+
+			ar << el.GetMatID();
+			ar << el.m_nrigid;
+			ar << el.m_nID;
+			ar << el.m_node;
+
+			ar << el.m_h0;
+			ar << el.m_Lk;
+
 			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
 		}
 	}
 	else
 	{
+		int n, mat;
+
 		for (int i=0; i<m_Elem.size(); ++i)
 		{
 			FEShellElement& el = m_Elem[i];
+			ar >> n;
+
+			el.SetType(n);
+
+			ar >> el.m_eJ;
+			ar >> el.m_ep;
+
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
+
+			ar >> el.m_h0;
+			ar >> el.m_Lk;
+
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
 				el.m_State[j]->Serialize(ar);
 			}
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEShellDomain::InitElements()
+{
+	int i, j, n;
+	for (i=0; i<m_Elem.size(); ++i)
+	{
+		FEShellElement& el = m_Elem[i];
+		n = el.GaussPoints();
+		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
 	}
 }
 
@@ -229,7 +311,7 @@ void FETrussDomain::Reset()
 }
 //-----------------------------------------------------------------------------
 
-void FETrussDomain::UnpackElement(FETrussElement &el, unsigned int nflag)
+void FETrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 {
 	int i, n;
 
@@ -291,4 +373,15 @@ void FETrussDomain::UnpackElement(FETrussElement &el, unsigned int nflag)
 
 	// unpack the traits data
 	el.UnpackTraitsData(nflag);
+}
+
+//-----------------------------------------------------------------------------
+
+void FETrussDomain::InitElements()
+{
+	for (int i=0; i<m_Elem.size(); ++i)
+	{
+		FETrussElement& el = m_Elem[i];
+		el.m_State[0]->Init(false);
+	}
 }

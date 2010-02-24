@@ -5,6 +5,12 @@
 #include "Archive.h"
 
 class FEMesh;
+class FESolidSolver;
+
+#define FE_SOLID_DOMAIN		1
+#define FE_SHELL_DOMAIN		2
+#define FE_SURFACE_DOMAIN	3
+#define FE_TRUSS_DOMAIN		4
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements
@@ -13,8 +19,10 @@ class FEMesh;
 class FEDomain
 {
 public:
-	FEDomain(FEMesh* pm) { m_pMesh = pm; }
+	FEDomain(FEMesh* pm, int ntype) { m_pMesh = pm; m_ntype = ntype; }
 	virtual ~FEDomain() {}
+
+	int Type() { return m_ntype; }
 
 	void SetMesh(FEMesh* pm) { m_pMesh = pm; }
 
@@ -26,8 +34,28 @@ public:
 
 	virtual void Serialize(FEM& fem, Archive& ar) {}
 
+	virtual bool Initialize(FEM& fem) { return true; }
+
+	// TODO: this is temporary and will be moved to a different class
+	virtual void UpdateStresses(FEM& fem) {}
+
+	virtual void InitElements() {}
+
+	virtual void StiffnessMatrix(FESolidSolver* psolver) {}
+
+	virtual void Residual(FESolidSolver* psolver, vector<double>& R) {}
+
+	// TODO: this is not the preferred interface but I've added it for now
+	virtual FEElement& ElementRef(int i) = 0;
+
+	FEElement* FindElementFromID(int nid) { return 0; }
+
+	virtual void UnpackElement(FEElement& el, unsigned int nflags = FE_UNPACK_ALL) = 0;
+
 protected:
 	FEMesh*	m_pMesh;
+
+	int	m_ntype;
 };
 
 //-----------------------------------------------------------------------------
@@ -36,7 +64,7 @@ protected:
 class FESolidDomain : public FEDomain
 {
 public:
-	FESolidDomain(FEMesh* pm) : FEDomain(pm) {}
+	FESolidDomain(FEMesh* pm) : FEDomain(pm, FE_SOLID_DOMAIN) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -44,23 +72,30 @@ public:
 	
 	FESolidElement& Element(int n) { return m_Elem[n]; }
 
+	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
 	FESolidDomain& operator = (FESolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
 
-	bool Init(FEM& fem);
+	bool Initialize(FEM& fem);
+
+	void InitElements();
 
 	void Reset();
 
 	void Serialize(FEM& fem, Archive& ar);
 
 	//! Unpack solid element data
-	void UnpackElement(FESolidElement& el, unsigned int nflag = FE_UNPACK_ALL);
+	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
 
 	// update stresses
 	void UpdateStresses(FEM& fem);
 
 	// --- S T I F F N E S S ---
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
 	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
@@ -94,6 +129,9 @@ public:
 
 	// --- R E S I D U A L ---
 
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
 	//! Calculates the internal stress vector for solid elements
 	void InternalForces(FESolidElement& el, vector<double>& fe);
 
@@ -124,7 +162,7 @@ protected:
 class FEShellDomain : public FEDomain
 {
 public:
-	FEShellDomain(FEMesh* pm) : FEDomain(pm) {}
+	FEShellDomain(FEMesh* pm) : FEDomain(pm, FE_SHELL_DOMAIN) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -132,23 +170,30 @@ public:
 
 	FEShellElement& Element(int n) { return m_Elem[n]; }
 
+	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
 	FEShellDomain& operator = (FEShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
 
 	void Reset();
 
+	void InitElements();
+
 	void Serialize(FEM& fem, Archive& ar);
 
-	bool Init(FEM& fem);
+	bool Initialize(FEM& fem);
 
 	//! Unpack shell element data
-	void UnpackElement(FEShellElement& el, unsigned int nflag = FE_UNPACK_ALL);
+	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
 
 	// update stresses
 	void UpdateStresses(FEM& fem);
 
 	// --- S T I F F N E S S --- 
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the shell element stiffness matrix
 	void ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke);
@@ -157,6 +202,9 @@ public:
 	void DilatationalStiffness(FEM& fem, FEShellElement& elem, matrix& ke);
 
 	// --- R E S I D U A L ---
+
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
 
 	//! Calculates the internal stress vector for shell elements
 	void InternalForces(FEShellElement& el, vector<double>& fe);
@@ -173,7 +221,7 @@ protected:
 class FETrussDomain : public FEDomain
 {
 public:
-	FETrussDomain(FEMesh* pm) : FEDomain(pm) {}
+	FETrussDomain(FEMesh* pm) : FEDomain(pm, FE_TRUSS_DOMAIN) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -181,19 +229,30 @@ public:
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }
 
+	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
+
 	FETrussDomain& operator = (FETrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
 
-	bool Init(FEM& fem) { return true; }
+	bool Initialize(FEM& fem) { return true; }
 
 	void Reset();
 
+	void InitElements();
+
 	//! Unpack truss element data
-	void UnpackElement(FETrussElement& el, unsigned int flag = FE_UNPACK_ALL);
+	void UnpackElement(FEElement& el, unsigned int flag = FE_UNPACK_ALL);
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the truss element stiffness matrix
 	void ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke);
+
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
 
 	//! Calculates the internal stress vector for solid elements
 	void InternalForces(FETrussElement& el, vector<double>& fe);

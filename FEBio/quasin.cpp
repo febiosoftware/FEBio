@@ -89,7 +89,7 @@ bool FESolidSolver::SolveStep(double time)
 
 void FESolidSolver::PrepStep(double time)
 {
-	int i, j;
+	int i;
 
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -252,26 +252,7 @@ void FESolidSolver::PrepStep(double time)
 	FEMaterialPoint::time = m_fem.m_ftime;
 
 	FEMesh& mesh = m_fem.m_mesh;
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
-	{
-		FESolidElement& el = bd.Element(i);
-		int n = el.GaussPoints();
-		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
-	}
-	FEShellDomain& sd = mesh.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		int n = el.GaussPoints();
-		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
-	}
-	FETrussDomain& td = mesh.TrussDomain();
-	for (i=0; i<td.Elements(); ++i)
-	{
-		FETrussElement& el = td.Element(i);
-		el.m_State[0]->Init(false);
-	}
+	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
 	// intialize the stresses
 	// TODO: is this a good place to update the stresses?

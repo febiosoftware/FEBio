@@ -4,6 +4,22 @@
 #include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
+
+void FETrussDomain::StiffnessMatrix(FESolidSolver* psolver)
+{
+	FEM& fem = psolver->m_fem;
+	matrix ke;
+	int NT = m_Elem.size();
+	for (int iel =0; iel<NT; ++iel)
+	{
+		FETrussElement& el = m_Elem[iel];
+		UnpackElement(el);
+		ElementStiffness(fem, el, ke);
+		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FETrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke)
 {
 	// get the material
@@ -52,6 +68,21 @@ void FETrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke)
 	ke[2][3] = ke[3][2] = -ke[2][0]; ke[2][4] = ke[4][2] = -ke[2][1]; ke[2][5] = ke[5][2] = -ke[2][2];
 }
 
+//-----------------------------------------------------------------------------
+
+void FETrussDomain::Residual(FESolidSolver* psolver, vector<double>& R)
+{
+	// element force vector
+	vector<double> fe;
+	int NT = m_Elem.size();
+	for (int i=0; i<NT; ++i)
+	{
+		FETrussElement& el = m_Elem[i];
+		UnpackElement(el);
+		InternalForces(el, fe);
+		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+	}
+}
 
 //-----------------------------------------------------------------------------
 void FETrussDomain::InternalForces(FETrussElement& el, vector<double>& fe)

@@ -102,16 +102,7 @@ bool FEM::Init()
 	if (m_mesh.Init() == false) return false;
 
 	// intialize domains
-	FESolidDomain& bd = m_mesh.SolidDomain();
-	if (bd.Init(*this) == false) return false;
-
-	// now do the same thing for shells
-	FEShellDomain& sd = m_mesh.ShellDomain();
-	if (sd.Init(*this) == false) return false;
-
-	// and trusses
-	FETrussDomain& td = m_mesh.TrussDomain();
-	if (td.Init(*this) == false) return false;
+	for (i=0; i<m_mesh.Domains(); ++i) m_mesh.Domain(i).Initialize(*this);
 
 	// initialize material data
 	if (InitMaterials() == false) return false;

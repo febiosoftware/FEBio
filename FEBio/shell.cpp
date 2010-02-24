@@ -5,6 +5,56 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
+
+void FEShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
+{
+	FEM& fem = psolver->m_fem;
+
+	// element force vector
+	vector<double> fe;
+
+	int NS = m_Elem.size();
+	for (int i=0; i<NS; ++i)
+	{
+		// get the element
+		FEShellElement& el = m_Elem[i];
+
+		// create the element force vector and initialize to zero
+		int ndof = 6*el.Nodes();
+		fe.assign(ndof, 0);
+
+		if (!el.IsRigid())
+		{
+			UnpackElement(el);
+
+			// skip rigid elements for internal force calculation
+			InternalForces(el, fe);
+
+			// apply body forces to shells
+			if (fem.UseBodyForces())
+			{
+				BodyForces(fem, el, fe);
+			}
+
+			// assemble the residual
+			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		}
+		else if (fem.UseBodyForces())
+		{
+			UnpackElement(el);
+
+			// apply body forces to shells
+			BodyForces(fem, el, fe);
+
+			// assemble the residual
+			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		}
+
+		// TODO: Do poro-elasticity for shells
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for shell elements
 //! Note that we use a one-point gauss integration rule for the thickness
 //! integration. This will integrate linear functions exactly.
@@ -90,6 +140,51 @@ void FEShellDomain::InternalForces(FEShellElement& el, vector<double>& fe)
 			fe[6*i+5] -= ( Mz*s.zz()  +
 				           My*s.yz() +
 					       Mx*s.xz() )*detJt;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEShellDomain::StiffnessMatrix(FESolidSolver* psolver)
+{
+	FEM& fem = psolver->m_fem;
+
+	matrix ke;
+
+	int NS = m_Elem.size();
+	for (int iel=0; iel<NS; ++iel)
+	{
+		FEShellElement& el = m_Elem[iel];
+		if (!el.IsRigid())
+		{
+			UnpackElement(el);
+
+			// get the elements material
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+
+			// skip rigid elements and poro-elastic elements
+			if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
+			{
+				// create the element's stiffness matrix
+				int ndof = 6*el.Nodes();
+				ke.Create(ndof, ndof);
+
+				// calculate the element stiffness matrix
+				ElementStiffness(fem, el, ke);
+
+				// assemble element matrix in global stiffness matrix
+				psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+			}
+			else if (dynamic_cast<FEPoroElastic*>(pmat))
+			{
+				// TODO: implement poro-elasticity for shells
+			}		
+		}
+
+		if (fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
+		{
+			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*(iel)/ NS);
 		}
 	}
 }
@@ -625,23 +720,25 @@ void FEShellDomain::UpdateStresses(FEM &fem)
 //! nodes have six degrees of freedom each, where for solids they only
 //! have 3 dofs.
 
-void FEShellDomain::UnpackElement(FEShellElement& el, unsigned int nflag)
+void FEShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 {
 	int i, n;
 
-	vec3d* rt = el.rt();
-	vec3d* r0 = el.r0();
-	vec3d* vt = el.vt();
-	vec3d* D0 = el.D0();
-	vec3d* Dt = el.Dt();
-	double* pt = el.pt();
+	FEShellElement& se = dynamic_cast<FEShellElement&>(el);
 
-	int N = el.Nodes();
-	int* lm = el.LM();
+	vec3d* rt = se.rt();
+	vec3d* r0 = se.r0();
+	vec3d* vt = se.vt();
+	vec3d* D0 = se.D0();
+	vec3d* Dt = se.Dt();
+	double* pt = se.pt();
+
+	int N = se.Nodes();
+	int* lm = se.LM();
 
 	for (i=0; i<N; ++i)
 	{
-		n = el.m_node[i];
+		n = se.m_node[i];
 		FENode& node = m_pMesh->Node(n);
 
 		int* id = node.m_ID;
@@ -670,7 +767,7 @@ void FEShellDomain::UnpackElement(FEShellElement& el, unsigned int nflag)
 	// copy nodal data to element arrays
 	for (i=0; i<N; ++i)
 	{
-		n = el.m_node[i];
+		n = se.m_node[i];
 
 		FENode& node = m_pMesh->Node(n);
 
@@ -694,5 +791,5 @@ void FEShellDomain::UnpackElement(FEShellElement& el, unsigned int nflag)
 	}
 
 	// unpack the traits data
-	el.UnpackTraitsData(nflag);
+	se.UnpackTraitsData(nflag);
 }

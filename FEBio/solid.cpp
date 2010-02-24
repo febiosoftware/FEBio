@@ -4,6 +4,78 @@
 #include "log.h"
 #include "FEPoroElastic.h"
 #include "FEMicroMaterial.h"
+#include "FESolidSolver.h"
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
+{
+	int i, j;
+
+	FEM& fem = psolver->m_fem;
+
+	// element force vector
+	vector<double> fe;
+
+	int NE = m_Elem.size();
+	for (i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+
+		// unpack the element
+		if (!el.IsRigid()) UnpackElement(el);
+
+		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+
+		// skip rigid elements for internal force calculations
+		if (!el.IsRigid())
+		{
+			// calculate internal force vector
+			if (el.Type() != FE_UDGHEX) InternalForces(el, fe);
+			else UDGInternalForces(fem, el, fe);
+
+			// apply body forces
+			if (fem.UseBodyForces())
+			{
+				BodyForces(fem, el, fe);
+			}
+
+			// assemble element 'fe'-vector into global R vector
+			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		}
+		else if (fem.UseBodyForces())
+		{
+			// unpack the element
+			UnpackElement(el);
+
+			// apply body force to rigid elements
+			BodyForces(fem, el, fe);
+
+			// assemble element 'fe'-vector into global R vector
+			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		}
+
+		// do poro-elastic forces
+		if ((fem.m_pStep->m_nModule == FE_POROELASTIC)&&(dynamic_cast<FEPoroElastic*>(pm)))
+		{
+			// calculate fluid internal work
+			InternalFluidWork(fem, el, fe);
+
+			// add fluid work to global residual
+			int neln = el.Nodes();
+			int *lm = el.LM() ,J;
+			for (j=0; j<neln; ++j)
+			{
+				J = lm[3*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
@@ -996,6 +1068,97 @@ void FESolidDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &k
 	}
 }
 
+//-----------------------------------------------------------------------------
+
+void FESolidDomain::StiffnessMatrix(FESolidSolver* psolver)
+{
+	FEM& fem = psolver->m_fem;
+
+	// element stiffness matrix
+	matrix ke;
+
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+		if (!el.IsRigid())
+		{
+			UnpackElement(el);
+
+			// get the elements material
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+
+			// skip rigid elements and poro-elastic elements
+			if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
+			{
+				// create the element's stiffness matrix
+				int ndof = 3*el.Nodes();
+				ke.Create(ndof, ndof);
+				ke.zero();
+
+				// calculate the element stiffness matrix
+				ElementStiffness(fem, el, ke);
+
+				// add the inertial stiffness for dynamics
+				if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
+
+				// assemble element matrix in global stiffness matrix
+				psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+			}
+			else if (dynamic_cast<FEPoroElastic*>(pmat))
+			{
+				// allocate stiffness matrix
+				int neln = el.Nodes();
+				int ndof = neln*4;
+				ke.Create(ndof, ndof);
+		
+				// calculate the element stiffness matrix
+				ElementPoroStiffness(fem, el, ke);
+
+				// TODO: the problem here is that the LM array that is returned by the UnpackElement
+				// function does not give the equation numbers in the right order. For this reason we
+				// have to create a new lm array and place the equation numbers in the right order.
+				// What we really ought to do is fix the UnpackElement function so that it returns
+				// the LM vector in the right order for poroelastic elements.
+				vector<int> lm(ndof);
+				for (int i=0; i<neln; ++i)
+				{
+					lm[4*i  ] = el.LM()[3*i];
+					lm[4*i+1] = el.LM()[3*i+1];
+					lm[4*i+2] = el.LM()[3*i+2];
+					lm[4*i+3] = el.LM()[3*neln+i];
+				}
+				
+				// assemble element matrix in global stiffness matrix
+				psolver->AssembleStiffness(el.m_node, lm, ke);
+			}
+		}
+		else
+		{
+			// for dynamic analyses we do need to add the inertial stiffness of the rigid body
+			if (fem.m_pStep->m_nanalysis == FE_DYNAMIC)
+			{
+				UnpackElement(el);
+
+				int ndof = 3*el.Nodes();
+				ke.Create(ndof, ndof);
+				ke.zero();
+
+				// add the inertial stiffness for dynamics
+				ElementInertialStiffness(fem, el, ke);
+
+				// assemble element matrix in global stiffness matrix
+				psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+			}
+		}
+
+		if (fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
+		{
+			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*iel/ NE);
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! This function calculates the element stiffness matrix. It calls the material
@@ -1647,7 +1810,7 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 
-void FESolidDomain::UnpackElement(FESolidElement& el, unsigned int nflag)
+void FESolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 {
 	int i, n;
 

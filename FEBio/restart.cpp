@@ -323,16 +323,12 @@ void FEM::SerializeMaterials(Archive& ar)
 void FEM::SerializeGeometry(Archive &ar)
 {
 	// serialize the mesh first 
-	m_mesh.Serialize(ar);
+	m_mesh.Serialize(*this, ar);
 
 	// serialize the other geometry data
 	if (ar.IsSaving())
 	{
 		int i, n;
-
-		// write domain data
-		n = m_mesh.Domains();
-		for (i=0; i<n; ++i) m_mesh.Domain(i).Serialize(*this, ar);
 
 		// surface elements
 		n = m_psurf->Elements();
@@ -359,10 +355,6 @@ void FEM::SerializeGeometry(Archive &ar)
 	else
 	{
 		int i, n;
-
-		// read solid element state data
-		n = m_mesh.Domains();
-		for (i=0; i<n; ++i) m_mesh.Domain(i).Serialize(*this, ar);
 
 		// surface elements
 		ar >> n;
