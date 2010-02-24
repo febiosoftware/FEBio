@@ -330,13 +330,9 @@ void FEM::SerializeGeometry(Archive &ar)
 	{
 		int i, n;
 
-		// write solid element state data
-		FESolidDomain& bd = m_mesh.SolidDomain();
-		bd.Serialize(*this, ar);
-
-		// write shell element state data
-		FEShellDomain& sd = m_mesh.ShellDomain();
-		sd.Serialize(*this, ar);
+		// write domain data
+		n = m_mesh.Domains();
+		for (i=0; i<n; ++i) m_mesh.Domain(i).Serialize(*this, ar);
 
 		// surface elements
 		n = m_psurf->Elements();
@@ -365,12 +361,8 @@ void FEM::SerializeGeometry(Archive &ar)
 		int i, n;
 
 		// read solid element state data
-		FESolidDomain& bd = m_mesh.SolidDomain();
-		bd.Serialize(*this, ar);
-
-		// read shell element state data
-		FEShellDomain& sd = m_mesh.ShellDomain();
-		sd.Serialize(*this, ar);
+		n = m_mesh.Domains();
+		for (i=0; i<n; ++i) m_mesh.Domain(i).Serialize(*this, ar);
 
 		// surface elements
 		ar >> n;

@@ -226,6 +226,9 @@ public:
 	FEShellDomain& ShellDomain() { return dynamic_cast<FEShellDomain&>(*m_Domain[1]); }
 	FETrussDomain& TrussDomain() { return dynamic_cast<FETrussDomain&>(*m_Domain[2]); }
 
+	int Domains() { return (int) m_Domain.size(); }
+	FEDomain& Domain(int n) { return *m_Domain[n]; }
+
 protected:
 	void ClearDomains();
 
