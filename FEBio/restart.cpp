@@ -409,7 +409,7 @@ void FEM::SerializeGeometry(Archive &ar)
 		ar >> n;
 		if (n) 
 		{
-			m_psurf->Create(n);
+			m_psurf->create(n);
 
 			for (i=0; i<n; ++i)
 			{

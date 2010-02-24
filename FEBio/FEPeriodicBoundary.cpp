@@ -211,7 +211,7 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 		{
 			// get the slave element
 			FESurfaceElement& sel = ss.Element(j);
-			mesh.UnpackElement(sel);
+			ss.UnpackElement(sel);
 
 			sLM = sel.LM();
 
@@ -249,12 +249,12 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 
 				// get the master element
 				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
-				mesh.UnpackElement(mel, FE_UNPACK_LM);
+				ms.UnpackElement(mel, FE_UNPACK_LM);
 
 				mLM = mel.LM();
 
 				// we must unpack the slave element again
-				mesh.UnpackElement(sel);
+				ss.UnpackElement(sel);
 
 				nmeln = mel.Nodes();
 
@@ -361,7 +361,7 @@ void FEPeriodicBoundary::ContactStiffness()
 		for (j=0; j<ne; ++j)
 		{
 			FESurfaceElement& se = ss.Element(j);
-			mesh.UnpackElement(se);
+			ss.UnpackElement(se);
 
 			sLM = se.LM();
 
@@ -396,7 +396,7 @@ void FEPeriodicBoundary::ContactStiffness()
 
 				// get the master element
 				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
-				mesh.UnpackElement(me, FE_UNPACK_LM);
+				ms.UnpackElement(me, FE_UNPACK_LM);
 
 				mLM = me.LM();
 				nmeln = me.Nodes();
@@ -405,7 +405,7 @@ void FEPeriodicBoundary::ContactStiffness()
 				for (k=0; k<nmeln; ++k) rtm[k] = me.rt()[k];
 
 				// we must unpack the slave element again
-				mesh.UnpackElement(se);
+				ss.UnpackElement(se);
 
 				// slave node natural coordinates in master element
 				r = ss.m_rs[m][0];
@@ -602,7 +602,7 @@ void FEPeriodicBoundary::Serialize(Archive &ar)
 
 			int ne=0;
 			ar >> ne;
-			s.Create(ne);
+			s.create(ne);
 
 			for (k=0; k<ne; ++k)
 			{

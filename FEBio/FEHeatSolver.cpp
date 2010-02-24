@@ -134,7 +134,7 @@ void FEHeatSolver::Residual()
 		if (pc.bc == 1)
 		{
 			FESurfaceElement& el = m_fem.m_psurf->Element(i);
-			mesh.UnpackElement(el);
+			m_fem.m_psurf->UnpackElement(el);
 
 			int ne = el.Nodes();
 			int ni = el.GaussPoints();

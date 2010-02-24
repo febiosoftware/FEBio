@@ -19,7 +19,7 @@
 FEElement* FERigidWallSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
 {
 	// get the mesh
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 
 	// see if we need to initialize the NQ structure
 	if (binit_nq) m_NQ.Init();
@@ -89,7 +89,7 @@ void FERigidWallSurface::Init()
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account
 	// note that we force rigid shells to have zero thickness
-	FEMesh& m = *m_pmesh;
+	FEMesh& m = *m_pMesh;
 	vector<double> tag(m.Nodes());
 	tag.zero();
 	FEShellDomain& sd = m.ShellDomain();
@@ -281,7 +281,7 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 	{
 		// get the slave element
 		FESurfaceElement& sel = m_ss.Element(j);
-		mesh.UnpackElement(sel);
+		m_ss.UnpackElement(sel);
 
 		sLM = sel.LM();
 
@@ -385,7 +385,7 @@ void FERigidWallInterface::ContactStiffness()
 	for (j=0; j<ne; ++j)
 	{
 		FESurfaceElement& se = m_ss.Element(j);
-		mesh.UnpackElement(se);
+		m_ss.UnpackElement(se);
 
 		sLM = se.LM();
 
@@ -595,7 +595,7 @@ void FERigidWallInterface::Serialize(Archive &ar)
 
 		int ne=0;
 		ar >> ne;
-		s.Create(ne);
+		s.create(ne);
 
 		for (k=0; k<ne; ++k)
 		{

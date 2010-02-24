@@ -23,17 +23,17 @@ class FEM;
 //! This class implements the basic functionality for an FE surface.
 //! More specialized surfaces are derived from this class
 
-class FESurface  
+class FESurface : public FEDomain
 {
 public:
 	//! constructor
-	FESurface(FEMesh* pmesh) : m_pmesh(pmesh){}
+	FESurface(FEMesh* pm) : FEDomain(pm) {}
 
 	//! destructor
 	virtual ~FESurface(){}
 
 	//! creates surface
-	void Create(int n) { m_el.resize(n); }
+	void create(int n) { m_el.resize(n); }
 
 	//! return an element of the surface
 	FESurfaceElement& Element(int i) { return m_el[i]; }
@@ -44,8 +44,11 @@ public:
 	//! Project a node onto a surface element
 	vec3d ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s);
 
+	//! Unpack surface element data
+	void UnpackElement(FESurfaceElement& el, unsigned int nflag = FE_UNPACK_ALL);
+
 	//! return the mesh to which this surface is attached
-	FEMesh* GetMesh() { return m_pmesh; }
+	FEMesh* GetMesh() { return m_pMesh; }
 
 	//! number of nodes on this surface
 	int Nodes() { return node.size(); }
@@ -54,7 +57,7 @@ public:
 	virtual void Init();
 
 	//! return the FENode object for local node n
-	FENode& Node(int n) { return m_pmesh->Node( node[n] ); }
+	FENode& Node(int n) { return m_pMesh->Node( node[n] ); }
 
 	//! calculate the surface area of a surface element
 	double FaceArea(FESurfaceElement& el);
@@ -109,8 +112,6 @@ public:
 	int FindElement(FESurfaceElement& el);
 
 protected:
-	FEMesh*	m_pmesh;			//!< pointer to parent mesh
-
 	vector<FESurfaceElement>	m_el;	//!< surface elements
 
 public:

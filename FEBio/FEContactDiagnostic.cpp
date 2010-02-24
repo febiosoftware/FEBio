@@ -162,8 +162,10 @@ bool FEContactDiagnostic::Init()
 		node.m_ID[10] = 0;
 	}
 
-	FESolidElement& el0 = mesh.SolidElement(0);
-	FESolidElement& el1 = mesh.SolidElement(1);
+	FESolidDomain& bd = mesh.SolidDomain();
+
+	FESolidElement& el0 = bd.Element(0);
+	FESolidElement& el1 = bd.Element(1);
 
 	el0.SetType(FE_HEX);
 	el0.m_nID = 1;
@@ -205,14 +207,14 @@ bool FEContactDiagnostic::Init()
 	ps->m_npass = 1;
 	ps->m_nsegup = 0;
 	FESlidingSurface& ms = ps->m_ms;
-	ms.Create(1);
+	ms.create(1);
 	ms.Element(0).SetType(FE_NIQUAD);
 	ms.Element(0).m_node[0] = 4;
 	ms.Element(0).m_node[1] = 5;
 	ms.Element(0).m_node[2] = 6;
 	ms.Element(0).m_node[3] = 7;
 	FESlidingSurface& ss = ps->m_ss;
-	ss.Create(1);
+	ss.create(1);
 	ss.Element(0).SetType(FE_NIQUAD);
 	ss.Element(0).m_node[0] = 11;
 	ss.Element(0).m_node[1] = 10;

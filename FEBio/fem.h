@@ -27,6 +27,7 @@
 #include "FEAnalysis.h"
 #include "FEAugLagLinearConstraint.h"
 #include "Timer.h"
+#include "FEPressureSurface.h"
 
 #include <list>
 using namespace std;
@@ -390,6 +391,9 @@ public:
 
 		//! Iniatialize linear constraint data
 		bool InitConstraints();
+
+		//! Initialize material data
+		bool InitMaterials();
 	//}
 
 
@@ -434,7 +438,7 @@ public:
 	//{
 		FEMesh	m_mesh;	//!< the FE mesh
 
-		FESurface*	m_psurf;	//!< surface element array
+		FEPressureSurface*	m_psurf;	//!< surface element array
 
 		// rigid body data
 		int						m_nreq;	//!< start of rigid body equations

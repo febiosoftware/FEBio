@@ -809,6 +809,10 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	// create elements
 	mesh.Create(0, nbel, nsel, ntel);
 
+	FESolidDomain& bd = mesh.SolidDomain();
+	FEShellDomain& sd = mesh.ShellDomain();
+	FETrussDomain& td = mesh.TrussDomain();
+
 	// read element data
 	++tag;
 	int n[8];
@@ -819,7 +823,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	{
 		if (tag == "hex8")
 		{
-			FESolidElement& el = mesh.SolidElement(nb++); pe = &el;
+			FESolidElement& el = bd.Element(nb++); pe = &el;
 			el.SetType(fem.m_nhex8);
 			el.m_nID = i+1;
 			tag.value(n,el.Nodes());
@@ -829,7 +833,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "penta6")
 		{
-			FESolidElement& el = mesh.SolidElement(nb++); pe = &el;
+			FESolidElement& el = bd.Element(nb++); pe = &el;
 			el.SetType(FE_PENTA);
 			el.m_nID = i+1;
 			tag.value(n,el.Nodes());
@@ -839,7 +843,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "tet4")
 		{
-			FESolidElement& el = mesh.SolidElement(nb++); pe = &el;
+			FESolidElement& el = bd.Element(nb++); pe = &el;
 			el.SetType(FE_TET);
 			el.m_nID = i+1;
 			tag.value(n,el.Nodes());
@@ -849,7 +853,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "quad4")
 		{
-			FEShellElement& el = mesh.ShellElement(ns++); pe = &el;
+			FEShellElement& el = sd.Element(ns++); pe = &el;
 			el.SetType(FE_SHELL_QUAD);
 			el.m_nID = i+1;
 			tag.value(n,el.Nodes());
@@ -862,7 +866,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "tri3")
 		{
-			FEShellElement& el = mesh.ShellElement(ns++); pe = &el;
+			FEShellElement& el = sd.Element(ns++); pe = &el;
 			el.SetType(FE_SHELL_TRI);
 			el.m_nID = i+1;
 			tag.value(n,el.Nodes());
@@ -875,7 +879,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "truss2")
 		{
-			FETrussElement& el = mesh.TrussElement(nt++); pe = &el;
+			FETrussElement& el = td.Element(nt++); pe = &el;
 			el.SetType(FE_TRUSS);
 			el.m_nID = i+1;
 			tag.value(n, el.Nodes());
@@ -896,7 +900,6 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	}
 
 	// assign material point data
-	FESolidDomain& bd = mesh.SolidDomain();
 	for (i=0; i<bd.Elements(); ++i)
 	{
 		FESolidElement& el = bd.Element(i);
@@ -905,7 +908,6 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 	}
 
-	FEShellDomain& sd = mesh.ShellDomain();
 	for (i=0; i<sd.Elements(); ++i)
 	{
 		FEShellElement& el = sd.Element(i);
@@ -914,7 +916,6 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 	}
 
-	FETrussDomain& td = mesh.TrussDomain();
 	for (i=0; i<td.Elements(); ++i)
 	{
 		FETrussElement& el = td.Element(i);
@@ -992,23 +993,26 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 	vector<FEElement*> pelem;
 	pelem.assign(nbel + nsel + ntel, 0);
 
+	FESolidDomain& bd = mesh.SolidDomain();
 	for (i=0; i<nbel; ++i)
 	{
-		FESolidElement& el = mesh.SolidElement(i);
+		FESolidElement& el = bd.Element(i);
 		assert(pelem[el.m_nID-1] == 0);
 		pelem[el.m_nID-1] = &el;
 	}
 
+	FEShellDomain& sd = mesh.ShellDomain();
 	for (i=0; i<nsel; ++i)
 	{
-		FEShellElement& el = mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		assert(pelem[el.m_nID-1] == 0);
 		pelem[el.m_nID-1] = &el;
 	}
 
+	FETrussDomain& td = mesh.TrussDomain();
 	for (i=0; i<ntel; ++i)
 	{
-		FETrussElement& el = mesh.TrussElement(i);
+		FETrussElement& el = td.Element(i);
 		assert(pelem[el.m_nID-1] == 0);
 		pelem[el.m_nID-1] = &el;
 	}
@@ -1446,7 +1450,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 
 			// allocate pressure data
 			fem.m_PC.resize(npr);
-			fem.m_psurf->Create(npr);
+			fem.m_psurf->create(npr);
 
 			// read the pressure data
 			++tag;
@@ -2508,7 +2512,7 @@ bool FEFEBioImport::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 	while (!t.isend()) { faces++; ++t; }
 
 	// allocate storage for faces
-	s.Create(faces);
+	s.create(faces);
 
 	// read faces
 	++tag;

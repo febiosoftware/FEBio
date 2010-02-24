@@ -16,7 +16,7 @@ void FESurface::Init()
 	int i, j, m;
 
 	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 
 	// This array is used to keep tags on each node
 	vector<int> tag(mesh.Nodes());
@@ -71,7 +71,7 @@ void FESurface::Init()
 int FESurface::FindElement(FESurfaceElement& el)
 {
 	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 	FENodeElemList& NEL = mesh.NodeElementList();
 
 	int* sf = el.m_node;
@@ -113,6 +113,73 @@ int FESurface::FindElement(FESurfaceElement& el)
 
 
 //-----------------------------------------------------------------------------
+//! Unpack the element. That is, copy element data in traits structure
+
+void FESurface::UnpackElement(FESurfaceElement& el, unsigned int nflag)
+{
+	int i, n;
+
+	vec3d* rt = el.rt();
+	vec3d* r0 = el.r0();
+	vec3d* vt = el.vt();
+	double* pt = el.pt();
+
+	int N = el.Nodes();
+	int* lm = el.LM();
+
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+		FENode& node = m_pMesh->Node(n);
+
+		int* id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[0];
+		lm[3*i+1] = id[1];
+		lm[3*i+2] = id[2];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[6];
+
+		// rigid rotational dofs
+		lm[4*N + 3*i  ] = id[7];
+		lm[4*N + 3*i+1] = id[8];
+		lm[4*N + 3*i+2] = id[9];
+
+		// fill the rest with -1
+		lm[7*N + 3*i  ] = -1;
+		lm[7*N + 3*i+1] = -1;
+		lm[7*N + 3*i+2] = -1;
+
+		lm[10*N + i] = id[10];
+	}
+
+	// copy nodal data to element arrays
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+
+		FENode& node = m_pMesh->Node(n);
+
+		// initial coordinates (= material coordinates)
+		r0[i] = node.m_r0;
+
+		// current coordinates (= spatial coordinates)
+		rt[i] = node.m_rt;
+
+		// current nodal pressures
+		pt[i] = node.m_pt;
+
+		// current nodal velocities
+		vt[i] = node.m_vt;
+	}
+
+	// unpack the traits data
+	el.UnpackTraitsData(nflag);
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the projection of x on the surface element el.
 //! It does this by finding the solution of the nonlinear equation (x-y)*y,[a]=0,
 //! where the comma denotes differentation and a ranges from 1 to 2.
@@ -137,7 +204,7 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 	int ne = el.Nodes();
 
 	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 
 	// get the elements nodal positions
 	for (i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
@@ -222,10 +289,10 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 double FESurface::FaceArea(FESurfaceElement& el)
 {
 	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 
 	// unpack surface element data
-	mesh.UnpackElement(el);
+	UnpackElement(el);
 
 	// get the number of nodes
 	int neln = el.Nodes();
@@ -282,7 +349,7 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 
 	// element nodes
 	vec3d r0[4];
-	for (int i=0; i<neln; ++i) r0[i] = m_pmesh->Node(el.m_node[i]).m_r0;
+	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
 	// shape function derivatives
 	double Hr[4], Hs[4];
@@ -332,7 +399,7 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 
 	// element nodes
 	vec3d rt[4];
-	for (int i=0; i<neln; ++i) rt[i] = m_pmesh->Node(el.m_node[i]).m_rt;
+	for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
 	// shape function derivatives
 	double Hr[4], Hs[4];
@@ -375,7 +442,7 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
 {
 	int l;
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
@@ -412,7 +479,7 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
 
 vec3d FESurface::Local2Global(FESurfaceElement &el, int n)
 {
-	FEMesh& m = *m_pmesh;
+	FEMesh& m = *m_pMesh;
 
 	// get the shape functions at this integration point
 	double* H = el.H(n);
@@ -432,7 +499,7 @@ vec3d FESurface::Local2Global(FESurfaceElement &el, int n)
 vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
 {
 	int i;
-	FEMesh& m = *m_pmesh;
+	FEMesh& m = *m_pMesh;
 
 	// get the shape function derivatives at this integration point
 	double* Hr = el.Gr(n);
@@ -465,7 +532,7 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
 vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s)
 {
 	int l;
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
@@ -546,7 +613,7 @@ vec3d FESurface::PointOnSurface(FESurfaceElement &el, double r, double s)
 	vec3d y[4];
 	double H[4];
 	int n = el.Nodes();
-	for (i=0; i<n; ++i) y[i] = m_pmesh->Node(el.m_node[i]).m_rt;
+	for (i=0; i<n; ++i) y[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 	if (n == 4)
 	{
 		H[0] = 0.25*(1-r)*(1-s);
@@ -572,7 +639,7 @@ vec3d FESurface::PointOnSurface(FESurfaceElement &el, double r, double s)
 
 void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[2])
 {
-	FEMesh& m = *m_pmesh;
+	FEMesh& m = *m_pMesh;
 
 	// get the nr of nodes
 	int n = el.Nodes();
@@ -596,7 +663,7 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[
 
 void FESurface::CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
 {
-	FEMesh& m = *m_pmesh;
+	FEMesh& m = *m_pMesh;
 
 	// get the nr of nodes
 	int n = el.Nodes();
@@ -623,7 +690,7 @@ void FESurface::CoBaseVectors0(FESurfaceElement &el, double r, double s, vec3d t
 	vec3d y[4];
 	double H0[4], H1[4];
 	int n = el.Nodes();
-	for (i=0; i<n; ++i) y[i] = m_pmesh->Node(el.m_node[i]).m_r0;
+	for (i=0; i<n; ++i) y[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 	if (n == 4)
 	{
 		H0[0] = -0.25*(1-s); H1[0] = -0.25*(1-r);
@@ -828,7 +895,7 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 	int N = el.Nodes();
 
 	// get the element nodes
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 	vec3d y[4];
 	for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 

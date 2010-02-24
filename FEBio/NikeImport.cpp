@@ -496,7 +496,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		if (nread != 9) return errf(szerr[ERR_HEX], i+1);
 
 		// see what type of element we are dealing with
-		FESolidElement& el = fem.m_mesh.SolidElement(i);
+		FESolidElement& el = fem.m_mesh.SolidDomain().Element(i);
 
 		// since arrays in C are zero-based we need do decrease the nodes and material number
 		if ((n[7]==n[3]) && (n[6]==n[3]) && (n[5]==n[3]) && (n[4]==n[3]))
@@ -534,6 +534,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 	//////////////////////////// S H E L L   E L E M E N T   D E C K ////////////////////////////
 	float f[5];
 	int N;
+	FEShellDomain& sd = fem.m_mesh.ShellDomain();
 	for (i=0; i<m_nsel; ++i)
 	{
 		// read the first shell card
@@ -549,7 +550,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		if (nread != 4) return errf(szerr[ERR_SHELL], i+1);
 
 		// get the element
-		FEShellElement& el = fem.m_mesh.ShellElement(i);
+		FEShellElement& el = sd.Element(i);
 		if (n[3] == n[2])
 			el.SetType(FE_SHELL_TRI);
 		else
@@ -572,7 +573,6 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
 	}
 
-	FEShellDomain& sd = mesh.ShellDomain();
 	for (i=0; i<sd.Elements(); ++i)
 	{
 		FEShellElement& el = sd.Element(i);
@@ -649,8 +649,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 			FESlidingInterface& si = *psi;
 
 			// allocate storage for contact surfaces
-			si.m_ss.Create(SI[i].nss);
-			si.m_ms.Create(SI[i].nms);
+			si.m_ss.create(SI[i].nss);
+			si.m_ms.create(SI[i].nms);
 
 			// set contact parameters
 			si.m_eps = SI[i].sfac;
@@ -836,7 +836,7 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	if (m_npr > 0)
 	{
 		fem.m_PC.resize(m_npr);
-		fem.m_psurf->Create(m_npr);
+		fem.m_psurf->create(m_npr);
 		int n[4], N, j;
 		for (i=0; i<m_npr; ++i)
 		{

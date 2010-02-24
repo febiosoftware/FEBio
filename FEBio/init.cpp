@@ -101,146 +101,20 @@ bool FEM::Init()
 	// TODO: perhaps I should not reset the mesh data during the initialization
 	if (m_mesh.Init() == false) return false;
 
-	// intialize local coordinate data
-	bool bmerr = false;
+	// intialize domains
 	FESolidDomain& bd = m_mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
-	{
-		// unpack element data
-		FESolidElement& el = bd.Element(i);
-
-		try
-		{
-			bd.UnpackElement(el);
-		}
-		catch (NegativeJacobian e)
-		{
-			log.printbox("F A T A L   E R R O R", "A negative jacobian was detected at\n integration point %d of element %d.\nDid you use the right node numbering?", e.m_iel, e.m_ng);
-			return false;
-		}
-
-		if (dynamic_cast<FESolidSolver*>(m_pStep->m_psolver))
-		{
-			// get the elements material
-			FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
-
-			// set the local element coordinates
-			if (pme)
-			{
-				if (pme->m_pmap)
-				{
-					for (int n=0; n<el.GaussPoints(); ++n)
-					{
-						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-						pt.Q = pme->m_pmap->LocalElementCoord(el, n);
-					}
-				}
-				else
-				{
-					if (GetDebugFlag())
-					{
-						// If we get here, then the element has a user-defined fiber axis
-						// we should check to see if it has indeed been specified.
-						// TODO: This assumes that pt.Q will not get intialized to
-						//		 a valid value. I should find another way for checking since I
-						//		 would like pt.Q always to be initialized to a decent value.
-						if (dynamic_cast<FETransverselyIsotropic*>(pme))
-						{
-							FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-							mat3d& m = pt.Q;
-							if (fabs(m.det() - 1) > 1e-7)
-							{
-								// this element did not get specified a user-defined fiber direction
-								log.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
-								bmerr = true;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	if (bmerr) return false;
+	if (bd.Init(*this) == false) return false;
 
 	// now do the same thing for shells
-	bmerr = false;
 	FEShellDomain& sd = m_mesh.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		// unpack element data
-		FEShellElement& el = sd.Element(i);
+	if (sd.Init(*this) == false) return false;
 
-		// get the elements material
-		FEElasticMaterial* pme = GetElasticMaterial(el.GetMatID());
-
-		// set the local element coordinates
-		if (pme)
-		{
-			if (pme->m_pmap)
-			{
-				for (int n=0; n<el.GaussPoints(); ++n)
-				{
-					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-					pt.Q = pme->m_pmap->LocalElementCoord(el, n);
-				}
-			}
-			else
-			{
-				if (GetDebugFlag())
-				{
-					// If we get here, then the element has a user-defined fiber direction
-					// we should check to see if it has indeed been specified.
-					// TODO: This assumes that pt.Q will not get intialized to
-					//		 a valid value. I should find another way for checking since I
-					//		 would like pt.Q always to be initialized to a decent value.
-					if (dynamic_cast<FETransverselyIsotropic*>(pme))
-					{
-						FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-						mat3d& m = pt.Q;
-						if (fabs(m.det() - 1) > 1e-7)
-						{
-							// this element did not get specified a user-defined fiber direction
-							log.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
-							bmerr = true;
-						}
-					}
-				}
-			}
-		}
-	}
-	if (bmerr) return false;
+	// and trusses
+	FETrussDomain& td = m_mesh.TrussDomain();
+	if (td.Init(*this) == false) return false;
 
 	// initialize material data
-	char szmat[256] = "Invalid value for material parameter \"%s\" of material %d";
-	for (i=0; i<Materials(); ++i)
-	{
-		// get the material
-		FEMaterial* pmat = GetMaterial(i);
-
-		// initialize material data
-		try
-		{
-			pmat->Init();
-		}
-		catch (MaterialError e)
-		{
-			log.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			log.printf("ERROR: %s\n\n", e.Error());
-			return false;
-		}
-		catch (...)
-		{
-			log.printf("A fatal error occured during material intialization\n\n");
-			return false;
-		}
-
-		// set the activation load curve
-		FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*> (pmat);
-		if (pm)
-		{
-			if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
-		}
-	}
+	if (InitMaterials() == false) return false;
 
 	// initialize contact data
 	if (InitContact() == false) return false;
@@ -289,6 +163,48 @@ bool FEM::Init()
 	DoCallback();
 
 	// Alright, all initialization is done, so let's get busy !
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize material data
+bool FEM::InitMaterials()
+{
+	// get the logfile
+	Logfile& log = GetLogfile();
+
+	// initialize material data
+	for (int i=0; i<Materials(); ++i)
+	{
+		// get the material
+		FEMaterial* pmat = GetMaterial(i);
+
+		// initialize material data
+		try
+		{
+			pmat->Init();
+		}
+		catch (MaterialError e)
+		{
+			log.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			log.printf("ERROR: %s\n\n", e.Error());
+			return false;
+		}
+		catch (...)
+		{
+			log.printf("A fatal error occured during material intialization\n\n");
+			return false;
+		}
+
+		// set the activation load curve
+		// TODO: can we remove this now that material parameters can have loadcurves?
+		FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*> (pmat);
+		if (pm)
+		{
+			if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
+		}
+	}
+
 	return true;
 }
 

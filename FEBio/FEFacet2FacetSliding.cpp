@@ -47,7 +47,7 @@ void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
 FEElement* FEFacetSlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
 {
 	// get the mesh
-	FEMesh& mesh = *m_pmesh;
+	FEMesh& mesh = *m_pMesh;
 
 	// see if we need to initialize the NQ structure
 	if (binit_nq) m_NQ.Init();
@@ -185,7 +185,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 	{
 		// get the slave element
 		FESurfaceElement& se = ss.Element(i);
-		pm->UnpackElement(se);
+		ss.UnpackElement(se);
 		vec3d* re = se.rt();
 		int nn = se.Nodes();
 
@@ -270,7 +270,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 		for (i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
-			pm->UnpackElement(se);
+			ss.UnpackElement(se);
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
@@ -316,7 +316,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
-					pm->UnpackElement(me);
+					ms.UnpackElement(me);
 
 					int nmeln = me.Nodes();
 					mLM = me.LM();
@@ -450,7 +450,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 		for (i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
-			pm->UnpackElement(se);
+			ss.UnpackElement(se);
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
@@ -496,7 +496,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
-					pm->UnpackElement(me);
+					ms.UnpackElement(me);
 
 					int nmeln = me.Nodes();
 					mLM = me.LM();

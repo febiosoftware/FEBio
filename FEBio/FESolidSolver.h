@@ -58,9 +58,6 @@ public:
 
 	//{ --- Stiffness matrix routines ---
 
-		//! Calculates pressure stiffness
-		bool PressureStiffness(FESurfaceElement& el, matrix& ke);
-
 		//! contact stiffness
 		void ContactStiffness();
 
@@ -84,12 +81,6 @@ public:
 
 		//! Calculates concentrated nodal forces
 		void NodalForces(vector<double>& F);
-
-		//! Calculates external pressure forces
-		bool PressureForce(FESurfaceElement& el, vector<double>& fe);
-
-		//! Calculates the linear external pressure forces (ie. non-follower forces)
-		bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe);
 
 		//! Calculate inertial forces for dynamic problems
 		void InertialForces(vector<double>& R);

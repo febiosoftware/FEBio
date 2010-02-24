@@ -168,29 +168,11 @@ public:
 	//! return number of nodes
 	int Nodes() { return m_Node.size(); }
 
-	//! count the number of solid elements
-	int SolidElements() { return m_Elem.Elements(); }
-
-	//! count the number of shell elements
-	int ShellElements() { return m_Shell.Elements(); }
-
-	//! count the number of truss elements
-	int TrussElements() { return m_Truss.Elements(); }
-
 	//! return total nr of elements
-	int Elements() { return (m_Elem.Elements() + m_Shell.Elements() + m_Truss.Elements()); }
+	int Elements();
 
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }
-
-	//! return reference to a solid element
-	FESolidElement& SolidElement(int i) { return m_Elem[i]; }
-
-	//! return reference to a shell element
-	FEShellElement& ShellElement(int i) { return m_Shell[i]; }
-
-	//! return a reference to a  truss element
-	FETrussElement& TrussElement(int i) { return m_Truss[i]; }
 
 	//! update bounding box
 	void UpdateBox();
@@ -200,9 +182,6 @@ public:
 
 	//! remove isolated vertices
 	int RemoveIsolatedVertices();
-
-	//! Unpack surface element data
-	void UnpackElement(FESurfaceElement& el, unsigned int nflag = FE_UNPACK_ALL);
 
 	//! Reset the mesh data
 	void Reset();
@@ -243,16 +222,16 @@ public:
 		return m_NEL;
 	}
 
-	FESolidDomain& SolidDomain() { return m_Elem; }
-	FEShellDomain& ShellDomain() { return m_Shell; }
-	FETrussDomain& TrussDomain() { return m_Truss; }
+	FESolidDomain& SolidDomain() { return dynamic_cast<FESolidDomain&>(*m_Domain[0]); }
+	FEShellDomain& ShellDomain() { return dynamic_cast<FEShellDomain&>(*m_Domain[1]); }
+	FETrussDomain& TrussDomain() { return dynamic_cast<FETrussDomain&>(*m_Domain[2]); }
 
 protected:
-	vector<FENode>			m_Node;		//!< FE nodes array
+	void ClearDomains();
 
-	FESolidDomain	m_Elem;		//!< FE solid element array
-	FEShellDomain	m_Shell;	//!< FE shell element array
-	FETrussDomain	m_Truss;	//!< FE truss element array
+protected:
+	vector<FENode>		m_Node;		//!< FE nodes array
+	vector<FEDomain*>	m_Domain;	//!< list of domains
 
 	ptr_vector<FENodeSet>	m_NodeSet;	//!< node sets
 

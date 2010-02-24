@@ -183,7 +183,7 @@ void OnSlidingInterface2Callback(FEM* pfem, void* pd)
 		{
 			// get the element
 			FESurfaceElement& e = s.Element(i);
-			mesh.UnpackElement(e);
+			s.UnpackElement(e);
 
 			// get the element's nodal coordinates
 			vec3d* rn = e.rt();
@@ -412,7 +412,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
-		mesh.UnpackElement(el);
+		ss.UnpackElement(el);
 
 		int ne = el.Nodes();
 		int nint = el.GaussPoints();
@@ -724,7 +724,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 		{
 			// get the surface element
 			FESurfaceElement& se = ss.Element(i);
-			pm->UnpackElement(se);
+			ss.UnpackElement(se);
 
 			// get the nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -758,7 +758,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 				{
 					// get the master element
 					FESurfaceElement& me = *pme;
-					pm->UnpackElement(me);
+					ms.UnpackElement(me);
 
 					// get the nr of master element nodes
 					int nmeln = me.Nodes();
@@ -928,7 +928,7 @@ void FESlidingInterface2::ContactStiffness()
 		{
 			// get ths slave element
 			FESurfaceElement& se = ss.Element(i);
-			pm->UnpackElement(se);
+			ss.UnpackElement(se);
 
 			// get nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -970,7 +970,7 @@ void FESlidingInterface2::ContactStiffness()
 					// --- S O L I D - S O L I D   C O N T A C T ---
 
 					FESurfaceElement& me = *pme;
-					pm->UnpackElement(me);
+					ms.UnpackElement(me);
 
 					// get the nr of master nodes
 					int nmeln = me.Nodes();

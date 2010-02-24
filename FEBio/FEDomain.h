@@ -12,10 +12,16 @@ class FEMesh;
 class FEDomain
 {
 public:
-	FEDomain() { m_pMesh = 0; }
+	FEDomain(FEMesh* pm) { m_pMesh = pm; }
 	virtual ~FEDomain() {}
 
 	void SetMesh(FEMesh* pm) { m_pMesh = pm; }
+
+	virtual void create(int n) = 0;
+
+	virtual int Elements() = 0;
+
+	virtual void Reset() {}
 
 protected:
 	FEMesh*	m_pMesh;
@@ -27,7 +33,7 @@ protected:
 class FESolidDomain : public FEDomain
 {
 public:
-	FESolidDomain(){}
+	FESolidDomain(FEMesh* pm) : FEDomain(pm) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -38,6 +44,8 @@ public:
 	FESolidDomain& operator = (FESolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
+
+	bool Init(FEM& fem);
 
 	void Reset();
 
@@ -111,7 +119,7 @@ protected:
 class FEShellDomain : public FEDomain
 {
 public:
-	FEShellDomain(){}
+	FEShellDomain(FEMesh* pm) : FEDomain(pm) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -124,6 +132,8 @@ public:
 	FEElement* FindElementFromID(int nid);
 
 	void Reset();
+
+	bool Init(FEM& fem);
 
 	//! Unpack shell element data
 	void UnpackElement(FEShellElement& el, unsigned int nflag = FE_UNPACK_ALL);
@@ -156,7 +166,7 @@ protected:
 class FETrussDomain : public FEDomain
 {
 public:
-	FETrussDomain(){}
+	FETrussDomain(FEMesh* pm) : FEDomain(pm) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -167,6 +177,8 @@ public:
 	FETrussDomain& operator = (FETrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEElement* FindElementFromID(int nid);
+
+	bool Init(FEM& fem) { return true; }
 
 	void Reset();
 

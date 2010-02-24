@@ -60,7 +60,7 @@ bool FETangentDiagnostic::Init()
 	// TODO: find an easier way to create material point data
 	for (int i=0; i<8; ++i)
 	{
-		mesh.SolidElement(0).SetMaterialPointData( m_fem.GetMaterial(0)->CreateMaterialPointData(), i);
+		mesh.SolidDomain().Element(0).SetMaterialPointData( m_fem.GetMaterial(0)->CreateMaterialPointData(), i);
 	}
 
 	return FEDiagnostic::Init();
@@ -210,7 +210,7 @@ double FETangentDiagnostic::residual(double d)
 
 	FESolidDomain& bd = mesh.SolidDomain();
 
-	FESolidElement& el = mesh.SolidElement(0);
+	FESolidElement& el = bd.Element(0);
 	bd.UnpackElement(el);
 
 	// set the deformation

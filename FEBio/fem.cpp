@@ -37,7 +37,8 @@ FEM::FEM()
 
 	m_bsymm = true;	// assume symmetric stiffness matrix
 
-	m_psurf = new FESurface(&m_mesh);
+	// create the surface for the pressure boundary condition
+	m_psurf = new FEPressureSurface(&m_mesh);
 
 	// --- Material Data ---
 	// (nothing to initialize yet)

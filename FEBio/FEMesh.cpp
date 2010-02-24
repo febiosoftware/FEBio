@@ -12,9 +12,10 @@
 
 FEMesh::FEMesh()
 {
-	m_Elem.SetMesh(this);
-	m_Shell.SetMesh(this);
-	m_Truss.SetMesh(this);
+	m_Domain.resize(3);
+	m_Domain[0] = new FESolidDomain(this);
+	m_Domain[1] = new FEShellDomain(this);
+	m_Domain[2] = new FETrussDomain(this);
 }
 
 FEMesh::~FEMesh()
@@ -22,15 +23,24 @@ FEMesh::~FEMesh()
 
 }
 
+void FEMesh::ClearDomains()
+{
+	for (int i=0; i<(int) m_Domain.size(); ++i) delete m_Domain[i];
+	m_Domain.clear();
+}
+
 FEMesh::FEMesh(FEMesh& m)
 {
 	// copy nodal data
 	m_Node = m.m_Node;
 
-	// copy element data
-	m_Elem  = m.m_Elem;
-	m_Shell = m.m_Shell;
-	m_Truss = m.m_Truss;
+	// clear the domains
+	ClearDomains();
+
+	// copy domains
+	m_Domain[0] = new FESolidDomain(this); *m_Domain[0] = *m.m_Domain[0];
+	m_Domain[1] = new FESolidDomain(this); *m_Domain[1] = *m.m_Domain[1];
+	m_Domain[2] = new FESolidDomain(this); *m_Domain[2] = *m.m_Domain[2];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -43,10 +53,13 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 	// copy nodal data
 	m_Node = m.m_Node;
 
-	// copy element data
-	m_Elem  = m.m_Elem;
-	m_Shell = m.m_Shell;
-	m_Truss = m.m_Truss;
+	// clear the domains
+	ClearDomains();
+
+	// copy domains
+	m_Domain[0] = new FESolidDomain(this); *m_Domain[0] = *m.m_Domain[0];
+	m_Domain[1] = new FESolidDomain(this); *m_Domain[1] = *m.m_Domain[1];
+	m_Domain[2] = new FESolidDomain(this); *m_Domain[2] = *m.m_Domain[2];
 
 	return (*this);
 }
@@ -59,9 +72,17 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 void FEMesh::Create(int nodes, int elems, int shells, int ntruss)
 {
 	if (nodes >0) m_Node.resize (nodes);
-	if (elems >0) m_Elem.create (elems);
-	if (shells>0) m_Shell.create(shells);
-	if (ntruss>0) m_Truss.create(ntruss);
+
+	if (elems >0) m_Domain[0]->create(elems);
+	if (shells>0) m_Domain[1]->create(shells);
+	if (ntruss>0) m_Domain[2]->create(ntruss);
+}
+
+int FEMesh::Elements()
+{
+	int N = 0;
+	for (int i=0; i<(int) m_Domain.size(); ++i) N += m_Domain[i]->Elements();
+	return N;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,16 +126,18 @@ int FEMesh::RemoveIsolatedVertices()
 	val.zero();
 
 	// count the nodal valences
-	for (i=0; i<m_Elem.Elements(); ++i)
+	FESolidDomain& bd = SolidDomain();
+	for (i=0; i<bd.Elements(); ++i)
 	{
-		FEElement& el = m_Elem.Element(i);
+		FEElement& el = bd.Element(i);
 		n = el.Nodes();
 		for (j=0; j<n; ++j) ++val[el.m_node[j]];
 	}
 
-	for (i=0; i<m_Shell.Elements(); ++i)
+	FEShellDomain& sd = ShellDomain();
+	for (i=0; i<sd.Elements(); ++i)
 	{
-		FEElement& el = m_Shell.Element(i);
+		FEElement& el = sd.Element(i);
 		n = el.Nodes();
 		for (j=0; j<n; ++j) ++val[el.m_node[j]];
 	}
@@ -141,73 +164,6 @@ int FEMesh::RemoveIsolatedVertices()
 }
 
 //-----------------------------------------------------------------------------
-//! Unpack the element. That is, copy element data in traits structure
-
-void FEMesh::UnpackElement(FESurfaceElement& el, unsigned int nflag)
-{
-	int i, n;
-
-	vec3d* rt = el.rt();
-	vec3d* r0 = el.r0();
-	vec3d* vt = el.vt();
-	double* pt = el.pt();
-
-	int N = el.Nodes();
-	int* lm = el.LM();
-
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-		FENode& node = Node(n);
-
-		int* id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-	}
-
-	// copy nodal data to element arrays
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-
-		FENode& node = Node(n);
-
-		// initial coordinates (= material coordinates)
-		r0[i] = node.m_r0;
-
-		// current coordinates (= spatial coordinates)
-		rt[i] = node.m_rt;
-
-		// current nodal pressures
-		pt[i] = node.m_pt;
-
-		// current nodal velocities
-		vt[i] = node.m_vt;
-	}
-
-	// unpack the traits data
-	el.UnpackTraitsData(nflag);
-}
-
-//-----------------------------------------------------------------------------
 //! Reset the mesh data. Return nodes to their intial position, reset their 
 //! attributes and zero all element stresses.
 
@@ -230,14 +186,8 @@ void FEMesh::Reset()
 	// update the mesh
 	UpdateBox();
 
-	// initialize solid element data
-	m_Elem.Reset();
-
-	// initialize shell element data
-	m_Shell.Reset();
-
-	// initialize truss element data
-	m_Truss.Reset();
+	// reset domain data
+	for (int n=0; n<(int) m_Domain.size(); ++n) m_Domain[n]->Reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -265,7 +215,7 @@ bool FEMesh::Init()
 
 		try
 		{
-			if (!el.IsRigid()) m_Elem.UnpackElement(el);
+			if (!el.IsRigid()) bd.UnpackElement(el);
 		}
 		catch (NegativeJacobian e)
 		{
@@ -411,18 +361,20 @@ double FEMesh::ElementVolume(FEElement& el)
 	double V = 0;
 
 	FESolidElement* ph = dynamic_cast<FESolidElement*>(&el);
+	FESolidDomain& bd = SolidDomain();
 	if (ph) 
 	{
-		m_Elem.UnpackElement(*ph);
+		bd.UnpackElement(*ph);
 		int nint = ph->GaussPoints();
 		double *w = ph->GaussWeights();
 		for (int n=0; n<nint; ++n) V += ph->detJ0(n)*w[n];
 	}
 
+	FEShellDomain& sd = ShellDomain();
 	FEShellElement* ps = dynamic_cast<FEShellElement*>(&el);
 	if (ps) 
 	{
-		m_Shell.UnpackElement(*ps);
+		sd.UnpackElement(*ps);
 		int nint = ps->GaussPoints();
 		double *w = ps->GaussWeights();
 		for (int n=0; n<nint; ++n) V += ps->detJ0(n)*w[n];
@@ -440,10 +392,13 @@ double FEMesh::ElementVolume(FEElement& el)
 void FEMesh::SetMatID(int n)
 {
 	int i;
-	int N = m_Elem.Elements();
-	for (i=0; i<N; ++i) SolidElement(i).SetMatID(n);
-	N = m_Shell.Elements();
-	for (i=0; i<N; ++i) ShellElement(i).SetMatID(n);
+	FESolidDomain& bd = SolidDomain();
+	int N = bd.Elements();
+	for (i=0; i<N; ++i) bd.Element(i).SetMatID(n);
+
+	FEShellDomain& sd = ShellDomain();
+	N = sd.Elements();
+	for (i=0; i<N; ++i) sd.Element(i).SetMatID(n);
 }
 
 //-----------------------------------------------------------------------------
@@ -478,11 +433,15 @@ void FEMesh::Serialize(Archive& ar)
 	{
 		int i;
 
+		FESolidDomain& bd = SolidDomain();
+		FEShellDomain& sd = ShellDomain();
+		FETrussDomain& td = TrussDomain();
+
 		// write mesh item counts
 		int nn   = Nodes();
-		int nbel = m_Elem.Elements();
-		int nsel = m_Shell.Elements();
-		int ntel = m_Truss.Elements();
+		int nbel = bd.Elements();
+		int nsel = sd.Elements();
+		int ntel = td.Elements();
 		ar << nn << nbel << nsel << ntel;
 
 		// write nodal data
@@ -492,7 +451,7 @@ void FEMesh::Serialize(Archive& ar)
 		int nmat;
 		for (i=0; i<nbel; ++i)
 		{
-			FESolidElement& el = SolidElement(i);
+			FESolidElement& el = bd.Element(i);
 			nmat = el.GetMatID();
 			ar << el.Type();
 			
@@ -509,7 +468,7 @@ void FEMesh::Serialize(Archive& ar)
 		// write shell element data
 		for (i=0; i<nsel; ++i)
 		{
-			FEShellElement& el = ShellElement(i);
+			FEShellElement& el = sd.Element(i);
 			ar << el.Type();
 
 			ar << el.m_eJ;
@@ -543,9 +502,10 @@ void FEMesh::Serialize(Archive& ar)
 		for (i=0; i<nn; ++i) ar.read(&Node(i), sizeof(FENode), 1);
 
 		// read solid element data
+		FESolidDomain& bd = SolidDomain();
 		for (i=0; i<nbel; ++i)
 		{
-			FESolidElement& el = SolidElement(i);
+			FESolidElement& el = bd.Element(i);
 			ar >> n;
 
 			el.SetType(n);
@@ -561,9 +521,10 @@ void FEMesh::Serialize(Archive& ar)
 		}
 
 		// read shell element data
+		FEShellDomain& sd = ShellDomain();
 		for (i=0; i<nsel; ++i)
 		{
-			FEShellElement& el = ShellElement(i);
+			FEShellElement& el = sd.Element(i);
 			ar >> n;
 
 			el.SetType(n);
@@ -666,14 +627,18 @@ FEElement* FEMesh::FindElementFromID(int nid)
 {
 	FEElement* pe = 0;
 
+	FESolidDomain& bd = SolidDomain();
+	FEShellDomain& sd = ShellDomain();
+	FETrussDomain& td = TrussDomain();
+
 	// search solid elements
-	pe = m_Elem.FindElementFromID(nid);
+	pe = bd.FindElementFromID(nid);
 
 	// search shell elements
-	if (pe == 0) m_Shell.FindElementFromID(nid);
+	if (pe == 0) sd.FindElementFromID(nid);
 
 	// search truss elements
-	if (pe == 0) m_Truss.FindElementFromID(nid);
+	if (pe == 0) td.FindElementFromID(nid);
 
 	return pe;
 }
