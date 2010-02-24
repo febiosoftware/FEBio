@@ -476,7 +476,7 @@ void FEMesh::Serialize(FEM& fem, Archive& ar)
 			pd->create(ne);
 			pd->Serialize(fem, ar);
 
-			m_Domain.add(pd);
+			m_Domain.push_back(pd);
 		}
 	}
 }

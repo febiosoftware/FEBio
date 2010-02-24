@@ -184,7 +184,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 		// numbered nodes in the previous level gets numbered next.
 		int nw;
 		Q[nv] = neq++;
-		Vi.add(nv);
+		Vi.push_back(nv);
 		for (l=0; l<L.Depth(); ++l)
 		{
 			// assign numbers to level l
@@ -206,7 +206,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 					if ((L.NodeLevel(m) == l) && (Q[m] < 0))
 					{
 						Q[m] = neq++;
-						Vi.add(m);
+						Vi.push_back(m);
 					}
 				}
 
@@ -225,7 +225,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 						{
 							// Aha, we found an unnumbered node in this level
 							// so place in the array an continue the loop over i
-							Vi.add(m);
+							Vi.push_back(m);
 							Q[m] = neq++;
 							break;
 						}
@@ -252,7 +252,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 						if ((L.NodeLevel(m) == l+1) && (Q[m] < 0))
 						{
 							Q[m] = neq++;
-							Vip1.add(m);
+							Vip1.push_back(m);
 						}
 					}
 				}

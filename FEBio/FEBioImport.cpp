@@ -585,7 +585,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 							DC.bc = bc;
 							DC.lc = lc;
 							tag.value(DC.sf);
-							fem.m_RDC.add(DC);
+							fem.m_RDC.push_back(DC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
@@ -604,7 +604,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 							FC.bc = bc;
 							FC.lc = lc-1;
 							tag.value(FC.sf);
-							fem.m_RFC.add(FC);
+							fem.m_RFC.push_back(FC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
@@ -640,7 +640,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 							DC.bc = bc;
 							DC.lc = lc;
 							tag.value(DC.sf);
-							fem.m_RDC.add(DC);
+							fem.m_RDC.push_back(DC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
@@ -659,7 +659,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 							FC.bc = bc;
 							FC.lc = lc-1;
 							tag.value(FC.sf);
-							fem.m_RFC.add(FC);
+							fem.m_RFC.push_back(FC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
@@ -1510,7 +1510,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 			}
 			while (!tag.isend());
 
-			fem.m_DE.add(de);
+			fem.m_DE.push_back(de);
 		}
 		else if (tag == "rigid_body")
 		{
@@ -1540,7 +1540,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 					DC.bc = bc;
 					DC.lc = lc+1;
 					tag.value(DC.sf);
-					fem.m_RDC.add(DC);
+					fem.m_RDC.push_back(DC);
 
 					// make sure to free the material BC
 					FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(id-1));

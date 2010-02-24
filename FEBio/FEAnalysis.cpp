@@ -628,7 +628,7 @@ void FEAnalysis::Serialize(Archive& ar)
 			ar >> nbc;
 			FEBoundaryCondition* pbc = m_fem.FindBC(nbc);
 			assert(pbc);
-			m_BC.add(pbc);
+			m_BC.push_back(pbc);
 		}
 	}
 

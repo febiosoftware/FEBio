@@ -118,7 +118,7 @@ public:
 
 	// append operation
 	// use only when copy operation is valid for class T
-	void add(T& a)
+	void push_back(T& a)
 	{
 		if (m_nsize + 1 > m_nbufsize) realloc(m_nbufsize + m_ngrowsize);
 		

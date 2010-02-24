@@ -44,7 +44,7 @@ public:
 	void Serialize(Archive& ar);
 
 	//! add a boundary condition to the analysis
-	void AddBoundaryCondition(FEBoundaryCondition* pbc) { m_BC.add(pbc); }
+	void AddBoundaryCondition(FEBoundaryCondition* pbc) { m_BC.push_back(pbc); }
 
 protected:
 	//! Do a running restart

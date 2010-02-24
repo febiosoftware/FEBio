@@ -173,9 +173,9 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 					// find the corresponding end row index
 					if (l<=i)
 					{
-						a.add(l);
+						a.push_back(l);
 						while ((pcol[l+1] == i) && (l<i)) ++l;
-						a.add(l);
+						a.push_back(l);
 						++l;
 					}
 				}
