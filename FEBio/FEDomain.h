@@ -2,6 +2,7 @@
 
 #include "FEElement.h"
 #include "FECore/vector.h"
+#include "Archive.h"
 
 class FEMesh;
 
@@ -22,6 +23,8 @@ public:
 	virtual int Elements() = 0;
 
 	virtual void Reset() {}
+
+	virtual void Serialize(FEM& fem, Archive& ar) {}
 
 protected:
 	FEMesh*	m_pMesh;
@@ -48,6 +51,8 @@ public:
 	bool Init(FEM& fem);
 
 	void Reset();
+
+	void Serialize(FEM& fem, Archive& ar);
 
 	//! Unpack solid element data
 	void UnpackElement(FESolidElement& el, unsigned int nflag = FE_UNPACK_ALL);
@@ -132,6 +137,8 @@ public:
 	FEElement* FindElementFromID(int nid);
 
 	void Reset();
+
+	void Serialize(FEM& fem, Archive& ar);
 
 	bool Init(FEM& fem);
 

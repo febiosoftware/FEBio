@@ -14,4 +14,6 @@ public:
 	//! Calculates the linear external pressure forces (ie. non-follower forces)
 	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe);
 
+	void Serialize(FEM& fem, Archive& ar);
+
 };

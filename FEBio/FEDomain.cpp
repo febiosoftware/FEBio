@@ -91,6 +91,31 @@ bool FESolidDomain::Init(FEM &fem)
 }
 
 //-----------------------------------------------------------------------------
+void FESolidDomain::Serialize(FEM& fem, Archive &ar)
+{
+	if (ar.IsSaving())
+	{
+		for (int i=0; i<m_Elem.size(); ++i)
+		{
+			FESolidElement& el = m_Elem[i];
+			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
+		}
+	}
+	else
+	{
+		for (int i=0; i<m_Elem.size(); ++i)
+		{
+			FESolidElement& el = m_Elem[i];
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.m_State[j]->Serialize(ar);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // FEShellDomain
 //-----------------------------------------------------------------------------
 FEElement* FEShellDomain::FindElementFromID(int nid)
@@ -159,6 +184,31 @@ bool FEShellDomain::Init(FEM& fem)
 		}
 	}
 	return (bmerr == false);
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::Serialize(FEM& fem, Archive &ar)
+{
+	if (ar.IsSaving())
+	{
+		for (int i=0; i<m_Elem.size(); ++i)
+		{
+			FEShellElement& el = m_Elem[i];
+			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
+		}
+	}
+	else
+	{
+		for (int i=0; i<m_Elem.size(); ++i)
+		{
+			FEShellElement& el = m_Elem[i];
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.m_State[j]->Serialize(ar);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

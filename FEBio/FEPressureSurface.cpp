@@ -214,3 +214,41 @@ bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+
+void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
+{
+	if (ar.IsSaving())
+	{
+		for (int i=0; i<m_el.size(); ++i)
+		{
+			FESurfaceElement& el = m_el[i];
+			ar << el.Type();
+			ar << el.GetMatID();
+			ar << el.m_nID;
+			ar << el.m_nrigid;
+			ar << el.m_node;
+			ar << el.m_lnode;
+		}
+	}
+	else
+	{
+		int m, mat;
+		for (int i=0; i<m_el.size(); ++i)
+		{
+			FESurfaceElement& el = m_el[i];
+			ar >> m;
+			el.SetType(m);
+
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nID;
+			ar >> el.m_nrigid;
+			ar >> el.m_node;
+			ar >> el.m_lnode;
+		}
+
+		// initialize surface data
+		Init();
+	}
+}

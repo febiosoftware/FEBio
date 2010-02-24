@@ -328,38 +328,21 @@ void FEM::SerializeGeometry(Archive &ar)
 	// serialize the other geometry data
 	if (ar.IsSaving())
 	{
-		int i, j, n;
+		int i, n;
 
 		// write solid element state data
 		FESolidDomain& bd = m_mesh.SolidDomain();
-		for (i=0; i<bd.Elements(); ++i)
-		{
-			FESolidElement& el = bd.Element(i);
-			for (j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
-		}
+		bd.Serialize(*this, ar);
 
 		// write shell element state data
 		FEShellDomain& sd = m_mesh.ShellDomain();
-		for (i=0; i<sd.Elements(); ++i)
-		{
-			FEShellElement& el = sd.Element(i);
-			for (j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
-		}
+		sd.Serialize(*this, ar);
 
 		// surface elements
 		n = m_psurf->Elements();
 		ar << n;
-		for (i=0; i<n; ++i)
-		{
-			FESurfaceElement& el = m_psurf->Element(i);
-			ar << el.Type();
-			ar << el.GetMatID();
-			ar << el.m_nID;
-			ar << el.m_nrigid;
-			ar << el.m_node;
-			ar << el.m_lnode;
-		}
-
+		m_psurf->Serialize(*this, ar);
+		
 		// rigid bodies
 		ar << m_nreq << m_nrm << m_nrb;
 		for (i=0; i<m_nrb; ++i) m_RB[i].Serialize(ar);
@@ -379,53 +362,22 @@ void FEM::SerializeGeometry(Archive &ar)
 	}
 	else
 	{
-		int i, j, n, m, mat;
+		int i, n;
 
 		// read solid element state data
 		FESolidDomain& bd = m_mesh.SolidDomain();
-		for (i=0; i<bd.Elements(); ++i)
-		{
-			FESolidElement& el = bd.Element(i);
-			for (j=0; j<el.GaussPoints(); ++j)
-			{
-				el.SetMaterialPointData(GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
-				el.m_State[j]->Serialize(ar);
-			}
-		}
+		bd.Serialize(*this, ar);
 
 		// read shell element state data
 		FEShellDomain& sd = m_mesh.ShellDomain();
-		for (i=0; i<sd.Elements(); ++i)
-		{
-			FEShellElement& el = sd.Element(i);
-			for (j=0; j<el.GaussPoints(); ++j)
-			{
-				el.SetMaterialPointData(GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
-				el.m_State[j]->Serialize(ar);
-			}
-		}
+		sd.Serialize(*this, ar);
 
 		// surface elements
 		ar >> n;
 		if (n) 
 		{
 			m_psurf->create(n);
-
-			for (i=0; i<n; ++i)
-			{
-				FESurfaceElement& el = m_psurf->Element(i);
-				ar >> m;
-				el.SetType(m);
-
-				ar >> mat; el.SetMatID(mat);
-				ar >> el.m_nID;
-				ar >> el.m_nrigid;
-				ar >> el.m_node;
-				ar >> el.m_lnode;
-			}
-
-			// initialize surface data
-			m_psurf->Init();
+			m_psurf->Serialize(*this, ar);
 		}
 
 		// rigid bodies
