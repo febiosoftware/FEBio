@@ -49,47 +49,52 @@ void FERigidBody::Update()
 
 	
 	// loop over all elements
-	// TODO: what if the rigid body has shells ?
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (int iel=0; iel<bd.Elements(); ++iel)
+	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(iel);
-
-		FERigid* pm = dynamic_cast<FERigid*> (fem.GetMaterial(el.GetMatID()));
-
-		// make sure this element belongs to the rigid body
-		if (pm && (pm->m_nRB == m_nID))
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			dens = pm->m_density;
+			for (int iel=0; iel<pbd->Elements(); ++iel)
+			{	
+				FESolidElement& el = pbd->Element(iel);
 
-			// unpack the element
-			bd.UnpackElement(el);
+				FERigid* pm = dynamic_cast<FERigid*> (fem.GetMaterial(el.GetMatID()));
 
-			// nr of integration points
-			int nint = el.GaussPoints();
-
-			// initial coordinates
-			vec3d* r0 = el.r0();
-
-			// integration weights
-			double* gw = el.GaussWeights();
-
-			// loop over integration points
-			for (int n=0; n<nint; ++n)
-			{
-				// calculate jacobian
-				detJ = el.detJ0(n);
-
-				// shape functions at integration point
-				H = el.H(n);
-
-				// add to total mass
-				m_mass += dens*detJ*gw[n];
-
-				// add to com
-				for (int i=0; i<el.Nodes(); ++i)
+				// make sure this element belongs to the rigid body
+				if (pm && (pm->m_nRB == m_nID))
 				{
-					rc += r0[i]*H[i]*detJ*gw[n]*dens;
+					dens = pm->m_density;
+
+					// unpack the element
+					pbd->UnpackElement(el);
+
+					// nr of integration points
+					int nint = el.GaussPoints();
+
+					// initial coordinates
+					vec3d* r0 = el.r0();
+
+					// integration weights
+					double* gw = el.GaussWeights();
+
+					// loop over integration points
+					for (int n=0; n<nint; ++n)
+					{
+						// calculate jacobian
+						detJ = el.detJ0(n);
+
+						// shape functions at integration point
+						H = el.H(n);
+
+						// add to total mass
+						m_mass += dens*detJ*gw[n];
+
+						// add to com
+						for (int i=0; i<el.Nodes(); ++i)
+						{
+							rc += r0[i]*H[i]*detJ*gw[n]*dens;
+						}
+					}
 				}
 			}
 		}
