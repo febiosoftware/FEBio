@@ -69,37 +69,43 @@ void FEPlotElementStress::Save(FEM& fem, Archive& ar)
 	float s[6] = {0};
 	double f;
 	int nint;
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		for (j=0; j<6; ++j) s[j] = 0;
-
-		nint = el.GaussPoints();
-
-		f = 1.0 / (double) nint;
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
-		for (j=0; j<nint; ++j)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
-			if (ppt)
+			for (i=0; i<pbd->Elements(); ++i)
 			{
-				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.s.xx());
-				s[1] += (float) (f*pt.s.yy());
-				s[2] += (float) (f*pt.s.zz());
-				s[3] += (float) (f*pt.s.xy());
-				s[4] += (float) (f*pt.s.yz());
-				s[5] += (float) (f*pt.s.xz());
+				FESolidElement& el = pbd->Element(i);
+
+				for (j=0; j<6; ++j) s[j] = 0;
+
+				nint = el.GaussPoints();
+
+				f = 1.0 / (double) nint;
+
+				// since the PLOT file requires floats we need to convert
+				// the doubles to single precision
+				// we output the average stress values of the gauss points
+				for (j=0; j<nint; ++j)
+				{
+					FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
+
+					if (ppt)
+					{
+						FEElasticMaterialPoint& pt = *ppt;
+						s[0] += (float) (f*pt.s.xx());
+						s[1] += (float) (f*pt.s.yy());
+						s[2] += (float) (f*pt.s.zz());
+						s[3] += (float) (f*pt.s.xy());
+						s[4] += (float) (f*pt.s.yz());
+						s[5] += (float) (f*pt.s.xz());
+					}
+				}
+
+				ar.write(s, sizeof(float), 6);
 			}
 		}
-
-		ar.write(s, sizeof(float), 6);
 	}
 }
 
@@ -377,28 +383,34 @@ void FEPlotFluidFlux::Save(FEM &fem, Archive &ar)
 
 	float af[3];
 	vec3d ew;
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		// calculate average flux
-		ew = vec3d(0,0,0);
-		for (j=0; j<el.GaussPoints(); ++j)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			FEMaterialPoint& mp = *el.m_State[j];
-			FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
 
-			if (pt) ew += pt->m_w;
+				// calculate average flux
+				ew = vec3d(0,0,0);
+				for (j=0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.m_State[j];
+					FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+					if (pt) ew += pt->m_w;
+				}
+
+				ew /= el.GaussPoints();
+
+				af[0] = (float) ew.x;
+				af[1] = (float) ew.y;
+				af[2] = (float) ew.z;
+
+				ar.write(af, sizeof(float), 3);
+			}
 		}
-
-		ew /= el.GaussPoints();
-
-		af[0] = (float) ew.x;
-		af[1] = (float) ew.y;
-		af[2] = (float) ew.z;
-
-		ar.write(af, sizeof(float), 3);
 	}
 }
 
@@ -407,29 +419,36 @@ void FEPlotFiberVector::Save(FEM &fem, Archive &ar)
 {
 	int i, j, n;
 	FEMesh& mesh = fem.m_mesh;
-	FESolidDomain& bd = mesh.SolidDomain();
 
-	int BE = bd.Elements();
 
 	float a[3];
 	vec3d r;
-	for (i=0; i<BE; ++i)
-	{
-		FESolidElement& el = bd.Element(i);
-		n = el.GaussPoints();
-		r = vec3d(0,0,0);
-		for (j=0; j<n; ++j)
-		{
-			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-			r.x += pt.Q[0][0];
-			r.y += pt.Q[1][0];
-			r.z += pt.Q[2][0];
-		}
-		r /= n;
 
-		a[0] = (float) r.x;
-		a[1] = (float) r.y;
-		a[2] = (float) r.z;
-		ar.write(a, sizeof(float), 3);
+	for (int nd=0; nd<mesh.Domains(); ++nd)
+	{
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
+		{
+			int BE = pbd->Elements();
+			for (i=0; i<BE; ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+				n = el.GaussPoints();
+				r = vec3d(0,0,0);
+				for (j=0; j<n; ++j)
+				{
+					FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+					r.x += pt.Q[0][0];
+					r.y += pt.Q[1][0];
+					r.z += pt.Q[2][0];
+				}
+				r /= n;
+
+				a[0] = (float) r.x;
+				a[1] = (float) r.y;
+				a[2] = (float) r.z;
+				ar.write(a, sizeof(float), 3);
+			}
+		}
 	}
 }

@@ -857,54 +857,61 @@ void FESolidSolver::InertialForces(vector<double>& R)
 
 	// now multiply F with the mass matrix
 	// first do the solid elements
+	// TODO: move this to the domain class (or the DomainIntegrator class)
 	matrix ke;
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (iel=0; iel<bd.Elements(); ++iel)
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(iel);
-		bd.UnpackElement(el);
-
-		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
-
-		double d = pme->Density();
-
-		nint = el.GaussPoints();
-		neln = el.Nodes();
-
-		ke.Create(3*neln, 3*neln);
-		ke.zero();
-
-		fe.resize(3*neln);
-		
-		// create the element mass matrix
-		for (n=0; n<nint; ++n)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			double detJ0 = el.detJ0(n)*el.GaussWeights()[n];
-
-			H = el.H(n);
-			for (i=0; i<neln; ++i)
-				for (j=0; j<neln; ++j)
-				{
-					kab = H[i]*H[j]*detJ0*d;
-					ke[3*i  ][3*j  ] += kab;
-					ke[3*i+1][3*j+1] += kab;
-					ke[3*i+2][3*j+2] += kab;
-				}	
-		}
-
-		// now, multiply M with F and add to R
-		int* en = el.m_node;
-		for (i=0; i<3*neln; ++i)
-		{
-			fe[i] = 0;
-			for (j=0; j<3*neln; ++j)
+			for (iel=0; iel<pbd->Elements(); ++iel)
 			{
-				fe[i] -= ke[i][j]*F[3*(en[j/3]) + j%3];
+				FESolidElement& el = pbd->Element(iel);
+				pbd->UnpackElement(el);
+
+				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
+
+				double d = pme->Density();
+
+				nint = el.GaussPoints();
+				neln = el.Nodes();
+
+				ke.Create(3*neln, 3*neln);
+				ke.zero();
+
+				fe.resize(3*neln);
+		
+				// create the element mass matrix
+				for (n=0; n<nint; ++n)
+				{
+					double detJ0 = el.detJ0(n)*el.GaussWeights()[n];
+
+					H = el.H(n);
+					for (i=0; i<neln; ++i)
+						for (j=0; j<neln; ++j)
+						{
+							kab = H[i]*H[j]*detJ0*d;
+							ke[3*i  ][3*j  ] += kab;
+							ke[3*i+1][3*j+1] += kab;
+							ke[3*i+2][3*j+2] += kab;
+						}	
+				}
+
+				// now, multiply M with F and add to R
+				int* en = el.m_node;
+				for (i=0; i<3*neln; ++i)
+				{
+					fe[i] = 0;
+					for (j=0; j<3*neln; ++j)
+					{
+						fe[i] -= ke[i][j]*F[3*(en[j/3]) + j%3];
+					}
+				}
+
+				// assemble fe into R
+				AssembleResidual(el.m_node, el.LM(), fe, R);
 			}
 		}
-
-		// assemble fe into R
-		AssembleResidual(el.m_node, el.LM(), fe, R);
 	}
 
 	// TODO: do dynamics for shell elements

@@ -82,7 +82,7 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 	// create the elements
 	int *en;
 	n = 0;
-	FESolidDomain& bd = SolidDomain();
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(Domain(0));
 	for (i=0; i<nx; ++i)
 	{
 		for (j=0; j<ny; ++j)

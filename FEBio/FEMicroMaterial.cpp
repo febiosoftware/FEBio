@@ -205,7 +205,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	double V = 0, ve;
 	int nint, n, i;
 	double* w, J;
-	FESolidDomain& bd = m.SolidDomain();
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
 	for (i=0; i<bd.Elements(); ++i)
 	{
 		FESolidElement& el = bd.Element(i);
@@ -263,7 +263,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	double D[6][6] = {0};
 
 	// calculate the stiffness matrix
-	FESolidDomain& bd = m.SolidDomain();
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
 	int NS = bd.Elements(), i, j;
 	for (int n=0; n<NS; ++n)
 	{

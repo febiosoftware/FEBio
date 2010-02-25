@@ -247,7 +247,7 @@ bool FEHeatSolver::StiffnessMatrix()
 	// zero the stiffness matrix
 	m_pK->Zero();
 
-	FESolidDomain& bd = mesh.SolidDomain();
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
 	for (i=0; i<bd.Elements(); ++i)
 	{
 		FESolidElement& el = bd.Element(i);
