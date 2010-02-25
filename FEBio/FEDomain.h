@@ -48,7 +48,7 @@ public:
 	// TODO: this is not the preferred interface but I've added it for now
 	virtual FEElement& ElementRef(int i) = 0;
 
-	FEElement* FindElementFromID(int nid) { return 0; }
+	virtual FEElement* FindElementFromID(int nid) { return 0; }
 
 	virtual void UnpackElement(FEElement& el, unsigned int nflags = FE_UNPACK_ALL) = 0;
 
