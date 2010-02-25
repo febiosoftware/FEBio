@@ -8,7 +8,7 @@
 
 bool FEM::InitPoro()
 {
-	int i, j;
+	int i, j, nd;
 
 	// see if there are any poro-elastic materials present
 	for (i=0; i<Materials(); ++i)
@@ -58,83 +58,117 @@ bool FEM::InitPoro()
 	// that is, that are not part of a poro-elastic element
 	// this is done in three steps
 	// step 1. mark all poro-elastic nodes
-	FESolidDomain& bd = m_mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-		if (pm)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
 		{
-			int N = el.Nodes();
-			int* n = el.m_node;
-			for (j=0; j<N; ++j) 
-				if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+				if (pm)
+				{
+					int N = el.Nodes();
+					int* n = el.m_node;
+					for (j=0; j<N; ++j) 
+						if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
+				}
+			}
 		}
-	}
 
-	FEShellDomain& sd = m_mesh.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-		if (pm)
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			int N = el.Nodes();
-			int* n = el.m_node;
-			for (j=0; j<N; ++j) 
-				if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+				if (pm)
+				{
+					int N = el.Nodes();
+					int* n = el.m_node;
+					for (j=0; j<N; ++j) 
+						if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
+				}
+			}
 		}
 	}
 
 	// step 2. fix pressure dofs of all unmarked nodes
-	for (i=0; i<bd.Elements(); ++i)
+	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-		if (pm == 0)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
 		{
-			int N = el.Nodes();
-			int* n = el.m_node;
-			for (j=0; j<N; ++j)
-				if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+				if (pm == 0)
+				{
+					int N = el.Nodes();
+					int* n = el.m_node;
+					for (j=0; j<N; ++j)
+						if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
+				}
+			}
 		}
-	}
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-		if (pm == 0)
+
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			int N = el.Nodes();
-			int* n = el.m_node;
-			for (j=0; j<N; ++j)
-				if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+				if (pm == 0)
+				{
+					int N = el.Nodes();
+					int* n = el.m_node;
+					for (j=0; j<N; ++j)
+						if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
+				}
+			}
 		}
 	}
 
 	// step 3. free all marked dofs
-	for (i=0; i<bd.Elements(); ++i)
+	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-		if (pm)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
 		{
-			int N = el.Nodes();
-			int* n = el.m_node;
-			for (j=0; j<N; ++j)
-				if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+				if (pm)
+				{
+					int N = el.Nodes();
+					int* n = el.m_node;
+					for (j=0; j<N; ++j)
+						if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
+				}
+			}
 		}
-	}
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-		if (pm)
+
+
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			int N = el.Nodes();
-			int* n = el.m_node;
-			for (j=0; j<N; ++j)
-				if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
+				if (pm)
+				{
+					int N = el.Nodes();
+					int* n = el.m_node;
+					for (j=0; j<N; ++j)
+						if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
+				}
+			}
 		}
 	}
 

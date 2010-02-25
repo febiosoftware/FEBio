@@ -54,13 +54,17 @@ bool FETangentDiagnostic::Init()
 {
 	FEMesh& mesh = m_fem.m_mesh;
 
-	// assign the material to the mesh
-	mesh.SetMatID(0);
+	// get the one-and-only solid domain
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
+
+	// assign the material to the domain
+	bd.SetMatID(0);
 
 	// TODO: find an easier way to create material point data
+	bd.Element(0).m_gid = 0;
 	for (int i=0; i<8; ++i)
 	{
-		mesh.SolidDomain().Element(0).SetMaterialPointData( m_fem.GetMaterial(0)->CreateMaterialPointData(), i);
+		bd.Element(0).SetMaterialPointData( m_fem.GetMaterial(0)->CreateMaterialPointData(), i);
 	}
 
 	return FEDiagnostic::Init();

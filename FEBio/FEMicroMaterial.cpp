@@ -57,7 +57,7 @@ void FEMicroMaterial::PrepRVE()
 
 	// use the E-E list to tag all exterior nodes
 	int fn[4], nf, M = 0;
-	FESolidDomain& bd = m.SolidDomain();
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
 	for (int i=0; i<bd.Elements(); ++i, ++M)
 	{
 		FESolidElement& el = bd.Element(i);

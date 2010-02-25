@@ -46,6 +46,7 @@ bool FESolidSolver::Augment()
 	}
 
 	// do incompressibility multipliers
+	int nd;
 	for (int i=0; i<m_fem.Materials(); ++i)
 	{
 		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(m_fem.GetMaterial(i));
@@ -58,37 +59,47 @@ bool FESolidSolver::Augment()
 				double k = pmi->m_K;
 				FEMesh& mesh = m_fem.m_mesh;
 
-				// do solid elements
-				FESolidDomain& bd = mesh.SolidDomain();
-				for (n=0; n<bd.Elements(); ++n)
+				for (nd = 0; nd < mesh.Domains(); ++nd)
 				{
-					FESolidElement& el = bd.Element(n);
-
-					if (el.GetMatID() == i)
+					// do solid elements
+					FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+					if (pbd)
 					{
-						L0 = el.m_Lk;
-						normL0 += L0*L0;
+						for (n=0; n<pbd->Elements(); ++n)
+						{
+							FESolidElement& el = pbd->Element(n);
 
-						L1 = L0 + k*pmi->h(el.m_eJ);
-						normL1 += L1*L1;
+							if (el.GetMatID() == i)
+							{
+								L0 = el.m_Lk;
+								normL0 += L0*L0;
+
+								L1 = L0 + k*pmi->h(el.m_eJ);
+								normL1 += L1*L1;
+							}
+						}
+					}
+
+					// do shell elements
+					FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
+					if (psd)
+					{
+						for (n=0; n<psd->Elements(); ++n)
+						{
+							FEShellElement& el = psd->Element(n);
+
+							if (el.GetMatID() == i)
+							{
+								L0 = el.m_Lk;
+								normL0 += L0*L0;
+
+								L1 = L0 + k*pmi->h(el.m_eJ);
+								normL1 += L1*L1;
+							}
+						}
 					}
 				}
 
-				// do shell elements
-				FEShellDomain& sd = mesh.ShellDomain();
-				for (n=0; n<sd.Elements(); ++n)
-				{
-					FEShellElement& el = sd.Element(n);
-
-					if (el.GetMatID() == i)
-					{
-						L0 = el.m_Lk;
-						normL0 += L0*L0;
-
-						L1 = L0 + k*pmi->h(el.m_eJ);
-						normL1 += L1*L1;
-					}
-				}
 				normL0 = sqrt(normL0);
 				normL1 = sqrt(normL1);
 
@@ -103,26 +114,35 @@ bool FESolidSolver::Augment()
 				if (pctn >= pmi->m_atol)
 				{
 					bconv = false;
-					FESolidDomain& bd = mesh.SolidDomain();
-					for (n=0; n<bd.Elements(); ++n)
+					for (nd = 0; nd < mesh.Domains(); ++nd)
 					{
-						FESolidElement& el = bd.Element(n);
-						if (el.GetMatID() == i) 
+						FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+						if (pbd)
 						{
-							double hi = pmi->h(el.m_eJ);
-							el.m_Lk += k*pmi->h(el.m_eJ);
-							el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
+							for (n=0; n<pbd->Elements(); ++n)
+							{
+								FESolidElement& el = pbd->Element(n);
+								if (el.GetMatID() == i) 
+								{
+									double hi = pmi->h(el.m_eJ);
+									el.m_Lk += k*pmi->h(el.m_eJ);
+									el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
+								}
+							}
 						}
-					}
-
-					FEShellDomain& sd = mesh.ShellDomain();
-					for (n=0; n<sd.Elements(); ++n)
-					{
-						FEShellElement& el = sd.Element(n);
-						if (el.GetMatID() == i) 
+	
+						FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
+						if (psd)
 						{
-							el.m_Lk += k*pmi->h(el.m_eJ);
-							el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
+							for (n=0; n<psd->Elements(); ++n)
+							{
+								FEShellElement& el = psd->Element(n);
+								if (el.GetMatID() == i) 
+								{
+									el.m_Lk += k*pmi->h(el.m_eJ);
+									el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
+								}
+							}
 						}
 					}
 				}

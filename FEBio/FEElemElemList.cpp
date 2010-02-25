@@ -16,10 +16,9 @@ void FEElemElemList::Init()
 	FEMesh& m = *m_pmesh;
 
 	FESolidDomain& bd = m.SolidDomain();
-	FEShellDomain& sd = m.ShellDomain();
 
 	// get total nr of elements
-	int NE = bd.Elements() + sd.Elements();
+	int NE = bd.Elements();
 
 	// allocate storage
 	m_ref.resize(NE);
@@ -35,15 +34,9 @@ void FEElemElemList::Init()
 		NN += nf;
 	}
 
-	for (i=0; i<sd.Elements(); ++i, ++n)
-	{
-		FEShellElement& el = sd.Element(i);
-		nf = m.Faces(el);
-		if (n != 0) m_ref[n] = m_ref[n-1] + nf;
-		NN += nf;
-	}
-
 	m_pel.resize(NN);
+
+	// TODO: do this for shells as well (if we have to)
 }
 
 void FEElemElemList::Create(FEMesh* pmesh)

@@ -498,6 +498,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		// see what type of element we are dealing with
 		FESolidElement& el = fem.m_mesh.SolidDomain().Element(i);
 
+		el.m_gid = 0;
+
 		// since arrays in C are zero-based we need do decrease the nodes and material number
 		if ((n[7]==n[3]) && (n[6]==n[3]) && (n[5]==n[3]) && (n[4]==n[3]))
 		{
@@ -555,6 +557,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 			el.SetType(FE_SHELL_TRI);
 		else
 			el.SetType(FE_SHELL_QUAD);
+
+		el.m_gid = 1;
 
 		N = el.Nodes();
 		for (j=0; j<N; ++j) el.m_node[j] = n[j]-1;

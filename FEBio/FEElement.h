@@ -28,7 +28,7 @@ public:
 	{ 
 		static int n = 1;
 		m_nID = n++;
-
+		m_gid = -1;
 		m_nrigid = -1; 
 	}
 
@@ -103,6 +103,8 @@ public:
 	vector<int>		m_node;	//!< connectivity
 
 	int	m_nID;				//!< element ID
+
+	int	m_gid;	// part ID (i.e. index of domain this element belongs to)
 };
 
 //-----------------------------------------------------------------------------

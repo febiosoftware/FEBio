@@ -73,17 +73,10 @@ void FENodeElemList::Create(FESurface& s)
 
 void FENodeElemList::Create(FEMesh& mesh)
 {
-	int i, j, n;
+	int i, j, n, nd;
 
 	// get the number of nodes
 	int NN = mesh.Nodes();
-
-	FESolidDomain& bd = mesh.SolidDomain();
-	FEShellDomain& sd = mesh.ShellDomain();
-
-	// get the number of elements
-	int NB = bd.Elements();
-	int NS = sd.Elements();
 
 	// create nodal valence array
 	m_nval.assign(NN, 0);
@@ -91,26 +84,18 @@ void FENodeElemList::Create(FEMesh& mesh)
 
 	// fill valence table
 	int nsize = 0;
-	for (i=0; i<NB; ++i)
+	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		for (j=0; j<el.Nodes(); ++j)
+		FEDomain& d = mesh.Domain(nd);
+		for (i=0; i<d.Elements(); ++i)
 		{
-			n = el.m_node[j];
-			m_nval[n]++;
-			nsize++;
-		}
-	}
-	for (i=0; i<NS; ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-
-		for (j=0; j<el.Nodes(); ++j)
-		{
-			n = el.m_node[j];
-			m_nval[n]++;
-			nsize++;
+			FEElement& el = d.ElementRef(i);
+			for (j=0; j<el.Nodes(); ++j)
+			{
+				n = el.m_node[j];
+				m_nval[n]++;
+				nsize++;
+			}
 		}
 	}
 
@@ -128,26 +113,18 @@ void FENodeElemList::Create(FEMesh& mesh)
 	for (i=0; i<NN; ++i) m_nval[i] = 0;
 
 	// fill eref table
-	for (i=0; i<NB; ++i)
+	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		for (j=0; j<el.Nodes(); ++j)
+		FEDomain& d = mesh.Domain(nd);
+		for (i=0; i<d.Elements(); ++i)
 		{
-			n = el.m_node[j];
-			m_eref[m_pn[n] + m_nval[n]] = &el;
-			m_nval[n]++;
-		}
-	}
-	for (i=0; i<NS; ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-
-		for (j=0; j<el.Nodes(); ++j)
-		{
-			n = el.m_node[j];
-			m_eref[m_pn[n] + m_nval[n]] = &el;
-			m_nval[n]++;
+			FEElement& el = d.ElementRef(i);
+			for (j=0; j<el.Nodes(); ++j)
+			{
+				n = el.m_node[j];
+				m_eref[m_pn[n] + m_nval[n]] = &el;
+				m_nval[n]++;
+			}
 		}
 	}
 }

@@ -173,6 +173,15 @@ public:
 	//! return total nr of elements
 	int Elements();
 
+	//! return the total nr of solid elements
+	int SolidElements();
+
+	//! return the total nr of shell elements
+	int ShellElements();
+
+	//! return the total nr of truss elements
+	int TrussElements();
+
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }
 
@@ -193,9 +202,6 @@ public:
 
 	//! Calculates an elements volume
 	double ElementVolume(FEElement& el);
-
-	//! assign a material ID to the entire mesh
-	void SetMatID(int n);
 
 	//! adds a node set to the mesh
 	void AddNodeSet(FENodeSet* pns) { m_NodeSet.add(pns); }

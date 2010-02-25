@@ -52,6 +52,11 @@ public:
 
 	virtual void UnpackElement(FEElement& el, unsigned int nflags = FE_UNPACK_ALL) = 0;
 
+	void SetMatID(int mid)
+	{
+		for (int i=0; i<Elements(); ++i) ElementRef(i).SetMatID(mid);
+	}
+
 protected:
 	FEMesh*	m_pMesh;
 

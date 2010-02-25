@@ -191,8 +191,8 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	// setup the header
 	m_hdr.nsize = sizeof(HEADER);
 	m_hdr.nnodes = m.Nodes();
-	m_hdr.n3d    = m.SolidDomain().Elements();
-	m_hdr.n2d    = m.ShellDomain().Elements();
+	m_hdr.n3d    = m.SolidElements();
+	m_hdr.n2d    = m.ShellElements();
 	m_hdr.n1d    = fem.m_DE.size();
 	m_hdr.nmat   = fem.Materials();
 
@@ -233,95 +233,113 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	// write the connectivity and material number
 	// Note that we increment all numbers by 1 since
 	// the plot database expects 1-based arrays
-	int n[9];
+	int n[9], nd;
 
 	int nid = 1;
 
 	// write solid element data
 	// note that we reindex all elements so that the ID
 	// corresponds to the nr in the plot file
-	FESolidDomain& bd = m.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (nd = 0; nd<m.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		el.m_nID = nid++;
-
-		// store material number
-		n[0] = el.GetMatID()+1;
-
-		N = el.Nodes();
-		switch (el.Type())
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m.Domain(nd));
+		if (pbd)
 		{
-		case FE_HEX:
-		case FE_RIHEX:
-		case FE_UDGHEX:
-			for (j=0; j<N; ++j) n[j+1] = el.m_node[j]+1;
-			break;
-		case FE_PENTA:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[2]+1;
-			n[5] = el.m_node[3]+1;
-			n[6] = el.m_node[4]+1;
-			n[7] = el.m_node[5]+1;
-			n[8] = el.m_node[5]+1;
-			break;
-		case FE_TET:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[2]+1;
-			n[5] = n[6] = n[7] = n[8] = el.m_node[3]+1;
-			break;
-		}
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
 
-		m_ar.write(n, sizeof(int), 9);
+				el.m_nID = nid++;
+
+				// store material number
+				n[0] = el.GetMatID()+1;
+
+				N = el.Nodes();
+				switch (el.Type())
+				{
+				case FE_HEX:
+				case FE_RIHEX:
+				case FE_UDGHEX:
+					for (j=0; j<N; ++j) n[j+1] = el.m_node[j]+1;
+					break;
+				case FE_PENTA:
+					n[1] = el.m_node[0]+1;
+					n[2] = el.m_node[1]+1;
+					n[3] = el.m_node[2]+1;
+					n[4] = el.m_node[2]+1;
+					n[5] = el.m_node[3]+1;
+					n[6] = el.m_node[4]+1;
+					n[7] = el.m_node[5]+1;
+					n[8] = el.m_node[5]+1;
+					break;
+				case FE_TET:
+					n[1] = el.m_node[0]+1;
+					n[2] = el.m_node[1]+1;
+					n[3] = el.m_node[2]+1;
+					n[4] = el.m_node[2]+1;
+					n[5] = n[6] = n[7] = n[8] = el.m_node[3]+1;
+					break;
+				}
+
+				m_ar.write(n, sizeof(int), 9);
+			}
+		}
 	}
 
 	// write shell element data
-	FEShellDomain& sd = m.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
+	for (nd = 0; nd<m.Domains(); ++nd)
 	{
-		FEShellElement& el = sd.Element(i);
-
-		el.m_nID = nid++;
-
-		// save material ID
-		n[0] = el.GetMatID()+1;
-
-		N = el.Nodes();
-		switch (el.Type())
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
+		if (psd)
 		{
-		case FE_SHELL_QUAD:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[3]+1;
-			break;
-		case FE_SHELL_TRI:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[2]+1;
-			break;
-		}
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
 
-		m_ar.write(n, sizeof(int), 5);
+				el.m_nID = nid++;
+
+				// save material ID
+				n[0] = el.GetMatID()+1;
+
+				N = el.Nodes();
+				switch (el.Type())
+				{
+				case FE_SHELL_QUAD:
+					n[1] = el.m_node[0]+1;
+					n[2] = el.m_node[1]+1;
+					n[3] = el.m_node[2]+1;
+					n[4] = el.m_node[3]+1;
+					break;
+				case FE_SHELL_TRI:
+					n[1] = el.m_node[0]+1;
+					n[2] = el.m_node[1]+1;
+					n[3] = el.m_node[2]+1;
+					n[4] = el.m_node[2]+1;
+					break;
+				}
+
+				m_ar.write(n, sizeof(int), 5);
+			}
+		}
 	}
 
 	// write truss element data
-	FETrussDomain& td = m.TrussDomain();
-	for (i=0; i<td.Elements(); ++i)
+	for (nd = 0; nd < m.Domains(); ++nd)
 	{
-		FETrussElement& el = td.Element(i);
-		el.m_nID = nid++;
-		n[0] = el.GetMatID()+1;
-		n[1] = el.m_node[0]+1;
-		n[2] = el.m_node[1]+1;
+		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&m.Domain(nd));
+		if (ptd)
+		{
+			for (i=0; i<ptd->Elements(); ++i)
+			{
+				FETrussElement& el = ptd->Element(i);
+				el.m_nID = nid++;
+				n[0] = el.GetMatID()+1;
+				n[1] = el.m_node[0]+1;
+				n[2] = el.m_node[1]+1;
 
-		m_ar.write(n, sizeof(int), 3);
+				m_ar.write(n, sizeof(int), 3);
+			}
+		}
 	}
 
 	return true;

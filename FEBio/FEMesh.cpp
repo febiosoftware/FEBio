@@ -86,6 +86,39 @@ int FEMesh::Elements()
 	return N;
 }
 
+int FEMesh::SolidElements()
+{
+	int N = 0;
+	for (int i=0; i<(int) m_Domain.size(); ++i)
+	{
+		FEDomain* pd = dynamic_cast<FESolidDomain*>(m_Domain[i]);
+		if (pd) N += pd->Elements();
+	}
+	return N;
+}
+
+int FEMesh::ShellElements()
+{
+	int N = 0;
+	for (int i=0; i<(int) m_Domain.size(); ++i)
+	{
+		FEDomain* pd = dynamic_cast<FEShellDomain*>(m_Domain[i]);
+		if (pd) N += pd->Elements();
+	}
+	return N;
+}
+
+int FEMesh::TrussElements()
+{
+	int N = 0;
+	for (int i=0; i<(int) m_Domain.size(); ++i)
+	{
+		FEDomain* pd = dynamic_cast<FETrussDomain*>(m_Domain[i]);
+		if (pd) N += pd->Elements();
+	}
+	return N;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEMesh::UpdateBox
 //  Updates the bounding box of the mesh (using current coordinates)
@@ -187,7 +220,7 @@ void FEMesh::Reset()
 
 bool FEMesh::Init()
 {
-	int i, j, n, m0, m1, m2;
+	int i, j, n, m0, m1, m2, nd;
 	int* en;
 	vec3d a, b, c;
 
@@ -195,63 +228,70 @@ bool FEMesh::Init()
 
 	int ninverted = 0;
 
-	// check all solid elements to see if they are not initially inverted
-	FESolidDomain& bd = SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
-	{
-		FESolidElement& el = bd.Element(i);
-
-		try
-		{
-			if (!el.IsRigid()) bd.UnpackElement(el);
-		}
-		catch (NegativeJacobian e)
-		{
-			fprintf(stderr, "**************************** E R R O R ****************************\n");
-			fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
-			fprintf(stderr, "Did you use the right node numbering?\n");
-			if (e.m_pel)
-			{
-				FEElement &el = *e.m_pel;
-				fprintf(stderr, "Nodes:");
-				for (int n=0; n<el.Nodes(); ++n)
-				{
-					fprintf(stderr, "%d", el.m_node[n]+1);
-					if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
-				}
-			}
-			fprintf(stderr, "*******************************************************************\n\n");
-			++ninverted;
-		}
-	}
-
-
 	// zero initial directors for shell nodes
 	for (i=0; i<Nodes(); ++i) Node(i).m_D0 = vec3d(0,0,0);
 
-	// initialize shell data
-	FEShellDomain& sd = ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
+	for (nd = 0; nd < Domains(); ++nd)
 	{
-		FEShellElement& el = sd.Element(i);
-		sd.UnpackElement(el, 0);
-
-		r0 = el.r0();
-
-		n = el.Nodes();
-		en = el.m_node;
-		for (j=0; j<n; ++j)
+		// check all solid elements to see if they are not initially inverted
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(m_Domain[nd]);
+		if (pbd)
 		{
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
 
-			m0 = j;
-			m1 = (j+1)%n;
-			m2 = (j==0? n-1: j-1);
+				try
+				{
+					if (!el.IsRigid()) pbd->UnpackElement(el);
+				}
+				catch (NegativeJacobian e)
+				{
+					fprintf(stderr, "**************************** E R R O R ****************************\n");
+					fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
+					fprintf(stderr, "Did you use the right node numbering?\n");
+					if (e.m_pel)
+					{
+						FEElement &el = *e.m_pel;
+						fprintf(stderr, "Nodes:");
+						for (int n=0; n<el.Nodes(); ++n)
+						{
+							fprintf(stderr, "%d", el.m_node[n]+1);
+							if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+						}
+					}
+					fprintf(stderr, "*******************************************************************\n\n");
+					++ninverted;
+				}
+			}
+		}
 
-			a = r0[m0];
-			b = r0[m1];
-			c = r0[m2];
+		// initialize shell data
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(m_Domain[nd]);
+		if (psd)
+		{
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				psd->UnpackElement(el, 0);
 
-			Node(en[m0]).m_D0 += (b-a)^(c-a);
+				r0 = el.r0();
+
+				n = el.Nodes();
+				en = el.m_node;
+				for (j=0; j<n; ++j)
+				{
+					m0 = j;
+					m1 = (j+1)%n;
+					m2 = (j==0? n-1: j-1);
+
+					a = r0[m0];
+					b = r0[m1];
+					c = r0[m2];
+
+					Node(en[m0]).m_D0 += (b-a)^(c-a);
+				}
+			}
 		}
 	}
 
@@ -263,32 +303,39 @@ bool FEMesh::Init()
 		node.m_Dt = node.m_D0;
 	}
 
-	// check the connectivity of the shells
-	for (i=0; i<sd.Elements(); ++i)
+	for (nd = 0; nd < Domains(); ++nd)
 	{
-		FEShellElement& el = sd.Element(i);
-
-		try
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(m_Domain[nd]);
+		if (psd)
 		{
-			if (!el.IsRigid()) sd.UnpackElement(el);
-		}
-		catch (NegativeJacobian e)
-		{
-			fprintf(stderr, "**************************** E R R O R ****************************\n");
-			fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
-			fprintf(stderr, "Did you use the right node numbering?\n");
-			if (e.m_pel)
+			// check the connectivity of the shells
+			for (i=0; i<psd->Elements(); ++i)
 			{
-				FEElement &el = *e.m_pel;
-				fprintf(stderr, "Nodes:");
-				for (int n=0; n<el.Nodes(); ++n)
+				FEShellElement& el = psd->Element(i);
+
+				try
 				{
-					fprintf(stderr, "%d", el.m_node[n]+1);
-					if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+					if (!el.IsRigid()) psd->UnpackElement(el);
+				}
+				catch (NegativeJacobian e)
+				{
+					fprintf(stderr, "**************************** E R R O R ****************************\n");
+					fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
+					fprintf(stderr, "Did you use the right node numbering?\n");
+					if (e.m_pel)
+					{
+						FEElement &el = *e.m_pel;
+						fprintf(stderr, "Nodes:");
+						for (int n=0; n<el.Nodes(); ++n)
+						{
+							fprintf(stderr, "%d", el.m_node[n]+1);
+							if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+						}
+					}
+					fprintf(stderr, "*******************************************************************\n\n");
+					++ninverted;
 				}
 			}
-			fprintf(stderr, "*******************************************************************\n\n");
-			++ninverted;
 		}
 	}
 
@@ -305,24 +352,31 @@ bool FEMesh::Init()
 	// we turn of the rotational degrees of freedom
 	vector<int> tag(Nodes());
 	tag.zero();
-	for (i=0; i<sd.Elements(); ++i)
+	for (nd = 0; nd < Domains(); ++nd)
 	{
-		FEShellElement& el = sd.Element(i);
-		if (!el.IsRigid()) sd.UnpackElement(el);
-
-		n = el.Nodes();
-		en = el.m_node;
-		for (j=0; j<n; ++j) tag[en[j]] = 1;
-	}
-
-	for (i=0; i<Nodes(); ++i) 
-	{
-		FENode& node = Node(i);
-		if (tag[i] == 0)
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(m_Domain[nd]);
+		if (psd)
 		{
-			node.m_ID[3] = -1;
-			node.m_ID[4] = -1;
-			node.m_ID[5] = -1;
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				if (!el.IsRigid()) psd->UnpackElement(el);
+
+				n = el.Nodes();
+				en = el.m_node;
+				for (j=0; j<n; ++j) tag[en[j]] = 1;
+			}
+
+			for (i=0; i<Nodes(); ++i) 
+			{
+				FENode& node = Node(i);
+				if (tag[i] == 0)
+				{
+					node.m_ID[3] = -1;
+					node.m_ID[4] = -1;
+					node.m_ID[5] = -1;
+				}
+			}
 		}
 	}
 
@@ -348,21 +402,24 @@ double FEMesh::ElementVolume(FEElement& el)
 	// determine the type of the element
 	double V = 0;
 
-	FESolidElement* ph = dynamic_cast<FESolidElement*>(&el);
-	FESolidDomain& bd = SolidDomain();
-	if (ph) 
+	// get the domain from the domain ID of the element
+	FEDomain* pd = m_Domain[el.m_gid];
+
+	if (dynamic_cast<FESolidDomain*>(pd))
 	{
-		bd.UnpackElement(*ph);
+		FESolidElement* ph = dynamic_cast<FESolidElement*>(&el);
+		FESolidDomain& bd = dynamic_cast<FESolidDomain&>(*pd);
+		pd->UnpackElement(*ph);
 		int nint = ph->GaussPoints();
 		double *w = ph->GaussWeights();
 		for (int n=0; n<nint; ++n) V += ph->detJ0(n)*w[n];
 	}
 
-	FEShellDomain& sd = ShellDomain();
-	FEShellElement* ps = dynamic_cast<FEShellElement*>(&el);
-	if (ps) 
+	if (dynamic_cast<FEShellDomain*>(pd))
 	{
-		sd.UnpackElement(*ps);
+		FEShellElement* ps = dynamic_cast<FEShellElement*>(&el);
+		FEShellDomain& sd = dynamic_cast<FEShellDomain&>(*pd);
+		pd->UnpackElement(*ps);
 		int nint = ps->GaussPoints();
 		double *w = ps->GaussWeights();
 		for (int n=0; n<nint; ++n) V += ps->detJ0(n)*w[n];
@@ -372,21 +429,6 @@ double FEMesh::ElementVolume(FEElement& el)
 	if (pf) V = 0;
 
 	return V;
-}
-
-//-----------------------------------------------------------------------------
-//! Assigns a material ID to the entire mesh
-
-void FEMesh::SetMatID(int n)
-{
-	int i;
-	FESolidDomain& bd = SolidDomain();
-	int N = bd.Elements();
-	for (i=0; i<N; ++i) bd.Element(i).SetMatID(n);
-
-	FEShellDomain& sd = ShellDomain();
-	N = sd.Elements();
-	for (i=0; i<N; ++i) sd.Element(i).SetMatID(n);
 }
 
 //-----------------------------------------------------------------------------

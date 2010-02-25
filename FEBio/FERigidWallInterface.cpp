@@ -92,12 +92,18 @@ void FERigidWallSurface::Init()
 	FEMesh& m = *m_pMesh;
 	vector<double> tag(m.Nodes());
 	tag.zero();
-	FEShellDomain& sd = m.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
+	for (int nd=0; nd<m.Domains(); ++nd)
 	{
-		FEShellElement& el = sd.Element(i);
-		n = el.Nodes();
-		for (j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
+		if (psd)
+		{
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				n = el.Nodes();
+				for (j=0; j<n; ++j) tag[el.m_node[j]] = 0.5*el.m_h0[j];
+			}
+		}
 	}
 	for (i=0; i<nn; ++i) off[i] = tag[node[i]];
 }

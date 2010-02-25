@@ -260,17 +260,12 @@ void NodeDataRecord::SetItemList(FENodeSet* pns)
 }
 
 //-----------------------------------------------------------------------------
-
+// TODO: this function will become very slow for a while
+//       I need to fix this as soon as possible
 double ElementDataRecord::Evaluate(int item, const char* szexpr)
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
-
-	FESolidDomain& bd = mesh.SolidDomain();
-	FEShellDomain& sd = mesh.ShellDomain();
-
-	int EB = bd.Elements();
-	int ES = sd.Elements();
 
 	double val = 0;
 	int ierr;
@@ -279,13 +274,15 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 	// note that currently item is an index into the element array. When shells
 	// are combined with solid elements, this may not result in the correct element as in the input file.
 	// However, in any case it should correspond to the correct element in the plot file
-	int nel = item - 1;
+	// TODO: THIS IS UNACCEPTABLY SLOW !!!
+	FEElement* pe = mesh.FindElementFromID(item);
 	mat3ds E;
-	if ((nel >= 0) && (nel < EB)) 
+	if (dynamic_cast<FESolidElement*>(pe)) 
 	{
 		// this is a solid element
-		FESolidElement& el = bd.Element(nel);
-		bd.UnpackElement(el);
+		FESolidElement& el = dynamic_cast<FESolidElement&>(*pe);
+		// TODO: do I need to unpack this element?
+//		bd.UnpackElement(el);
 
 		int nint = el.GaussPoints();
 		for (int i=0; i<nint; ++i)
@@ -316,11 +313,12 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 		}
 		val /= nint;
 	}
-	else if ((nel >= EB) && (nel - EB < ES))
+	else if (dynamic_cast<FEShellElement*>(pe))
 	{
 		// this is a shell element
-		FEShellElement& el = sd.Element(nel - EB);
-		sd.UnpackElement(el);
+		FEShellElement& el = dynamic_cast<FEShellElement&>(*pe);
+		// TODO: do I need to unpack this element?
+//		sd.UnpackElement(el);
 
 		int nint = el.GaussPoints();
 		for (int i=0; i<nint; ++i)
@@ -351,7 +349,7 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 void ElementDataRecord::SelectAllItems()
 {
 	FEMesh& m = m_pfem->m_mesh;
-	int n = m.SolidDomain().Elements() + m.ShellDomain().Elements();
+	int n = m.Elements();
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }

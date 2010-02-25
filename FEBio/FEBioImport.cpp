@@ -826,6 +826,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			FESolidElement& el = bd.Element(nb++); pe = &el;
 			el.SetType(fem.m_nhex8);
 			el.m_nID = i+1;
+			el.m_gid = 0;
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -836,6 +837,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			FESolidElement& el = bd.Element(nb++); pe = &el;
 			el.SetType(FE_PENTA);
 			el.m_nID = i+1;
+			el.m_gid = 0;
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -846,6 +848,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			FESolidElement& el = bd.Element(nb++); pe = &el;
 			el.SetType(FE_TET);
 			el.m_nID = i+1;
+			el.m_gid = 0;
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -856,6 +859,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			FEShellElement& el = sd.Element(ns++); pe = &el;
 			el.SetType(FE_SHELL_QUAD);
 			el.m_nID = i+1;
+			el.m_gid = 1;
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -869,6 +873,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			FEShellElement& el = sd.Element(ns++); pe = &el;
 			el.SetType(FE_SHELL_TRI);
 			el.m_nID = i+1;
+			el.m_gid = 1;
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -882,6 +887,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			FETrussElement& el = td.Element(nt++); pe = &el;
 			el.SetType(FE_TRUSS);
 			el.m_nID = i+1;
+			el.m_gid = 2;
 			tag.value(n, el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;

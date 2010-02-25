@@ -29,7 +29,7 @@ LSDYNAPlotFile::~LSDYNAPlotFile()
 
 bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 {
-	int i, j, N;
+	int i, j, N, nd;
 
 	// open the archive
 	if (m_ar.Create(szfile) == false) return false;
@@ -89,9 +89,9 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	plh.flagT = (m_nfield[3] == 0? 0 : 1);
 	plh.icode = 6;
 	plh.ndim  = 4;
-	plh.nel2  = fem.m_mesh.TrussDomain().Elements();
-	plh.nel4  = fem.m_mesh.ShellDomain().Elements();
-	plh.nel8  = fem.m_mesh.SolidDomain().Elements();
+	plh.nel2  = fem.m_mesh.TrussElements();
+	plh.nel4  = fem.m_mesh.ShellElements();
+	plh.nel8  = fem.m_mesh.SolidElements();
 	plh.nglbv = 0;
 	plh.nummat2 = 0;
 	plh.nummat4 = 0;
@@ -134,91 +134,109 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	// write solid element data
 	// note that we reindex all elements so that the ID
 	// corresponds to the nr in the plot file
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		el.m_nID = nid++;
-
-		N = el.Nodes();
-		switch (el.Type())
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-		case FE_HEX:
-		case FE_RIHEX:
-		case FE_UDGHEX:
-			for (j=0; j<N; ++j) n[j] = el.m_node[j]+1;
-			break;
-		case FE_PENTA:
-			// note the weird mapping. This is to be consistent
-			// with NIKE's wedge element
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[2]+1;
-			n[2] = el.m_node[5]+1;
-			n[3] = el.m_node[3]+1;
-			n[4] = el.m_node[1]+1;
-			n[5] = el.m_node[1]+1;
-			n[6] = el.m_node[4]+1;
-			n[7] = el.m_node[4]+1;
-			break;
-		case FE_TET:
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[1]+1;
-			n[2] = el.m_node[2]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = n[5] = n[6] = n[7] = el.m_node[3]+1;
-			break;
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+
+				el.m_nID = nid++;
+
+				N = el.Nodes();
+				switch (el.Type())
+				{
+				case FE_HEX:
+				case FE_RIHEX:
+				case FE_UDGHEX:
+					for (j=0; j<N; ++j) n[j] = el.m_node[j]+1;
+					break;
+				case FE_PENTA:
+					// note the weird mapping. This is to be consistent
+					// with NIKE's wedge element
+					n[0] = el.m_node[0]+1;
+					n[1] = el.m_node[2]+1;
+					n[2] = el.m_node[5]+1;
+					n[3] = el.m_node[3]+1;
+					n[4] = el.m_node[1]+1;
+					n[5] = el.m_node[1]+1;
+					n[6] = el.m_node[4]+1;
+					n[7] = el.m_node[4]+1;
+					break;
+				case FE_TET:
+					n[0] = el.m_node[0]+1;
+					n[1] = el.m_node[1]+1;
+					n[2] = el.m_node[2]+1;
+					n[3] = el.m_node[2]+1;
+					n[4] = n[5] = n[6] = n[7] = el.m_node[3]+1;
+					break;
+				}
+
+				n[8] = el.GetMatID()+1;
+
+				m_ar.write(n, sizeof(int), 9);
+			}
 		}
-
-		n[8] = el.GetMatID()+1;
-
-		m_ar.write(n, sizeof(int), 9);
 	}
 
 	// write truss element data
-	FETrussDomain& td = mesh.TrussDomain();
-	for (i=0; i<td.Elements(); ++i)
+	for (nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FETrussElement& el = td.Element(i);
-		el.m_nID = nid++;
-		n[0] = el.m_node[0]+1;
-		n[1] = el.m_node[1]+1;
-		n[2] = 0;
-		n[3] = 0;
-		n[4] = 0;
-		n[5] = el.GetMatID()+1;
+		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&mesh.Domain(nd));
+		if (ptd)
+		{
+			for (i=0; i<ptd->Elements(); ++i)
+			{
+				FETrussElement& el = ptd->Element(i);
+				el.m_nID = nid++;
+				n[0] = el.m_node[0]+1;
+				n[1] = el.m_node[1]+1;
+				n[2] = 0;
+				n[3] = 0;
+				n[4] = 0;
+				n[5] = el.GetMatID()+1;
 
-		m_ar.write(n, sizeof(int), 6);
+				m_ar.write(n, sizeof(int), 6);
+			}
+		}
 	}
 
 	// write shell element data
-	FEShellDomain& sd = mesh.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
+	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEShellElement& el = sd.Element(i);
-
-		el.m_nID = nid++;
-
-		N = el.Nodes();
-		switch (el.Type())
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
+		if (psd)
 		{
-		case FE_SHELL_QUAD:
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[1]+1;
-			n[2] = el.m_node[2]+1;
-			n[3] = el.m_node[3]+1;
-			break;
-		case FE_SHELL_TRI:
-			n[0] = el.m_node[0]+1;
-			n[1] = el.m_node[1]+1;
-			n[2] = el.m_node[2]+1;
-			n[3] = el.m_node[2]+1;
-			break;
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+
+				el.m_nID = nid++;
+
+				N = el.Nodes();
+				switch (el.Type())
+				{
+				case FE_SHELL_QUAD:
+					n[0] = el.m_node[0]+1;
+					n[1] = el.m_node[1]+1;
+					n[2] = el.m_node[2]+1;
+					n[3] = el.m_node[3]+1;
+					break;
+				case FE_SHELL_TRI:
+					n[0] = el.m_node[0]+1;
+					n[1] = el.m_node[1]+1;
+					n[2] = el.m_node[2]+1;
+					n[3] = el.m_node[2]+1;
+					break;
+				}
+		
+				n[4] = el.GetMatID()+1;
+		
+				m_ar.write(n, sizeof(int), 5);
+			}
 		}
-
-		n[4] = el.GetMatID()+1;
-
-		m_ar.write(n, sizeof(int), 5);
 	}
 
 	return true;
@@ -347,148 +365,167 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	// write solid element data
 	float s[44] = {0};
 	double f;
-	int nint, neln;
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	int nint, neln, nd;
+	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		for (j=0; j<7; ++j) s[j] = 0;
-
-		nint = el.GaussPoints();
-
-		f = 1.0 / (double) nint;
-
-		// since the PLOT file requires floats we need to convert
-		// the doubles to single precision
-		// we output the average stress values of the gauss points
-		for (j=0; j<nint; ++j)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
-			if (ppt)
+			for (i=0; i<pbd->Elements(); ++i)
 			{
-				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.s.xx());
-				s[1] += (float) (f*pt.s.yy());
-				s[2] += (float) (f*pt.s.zz());
-				s[3] += (float) (f*pt.s.xy());
-				s[4] += (float) (f*pt.s.yz());
-				s[5] += (float) (f*pt.s.xz());
+				FESolidElement& el = pbd->Element(i);
 
-				if (m_nfield[4] == PLOT_FIBER_STRAIN)
+				for (j=0; j<7; ++j) s[j] = 0;
+
+				nint = el.GaussPoints();
+
+				f = 1.0 / (double) nint;
+		
+				// since the PLOT file requires floats we need to convert
+				// the doubles to single precision
+				// we output the average stress values of the gauss points
+				for (j=0; j<nint; ++j)
 				{
-					s[6] += (float) f*fiber_strain(el, j);
+					FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
+
+					if (ppt)
+					{
+						FEElasticMaterialPoint& pt = *ppt;
+						s[0] += (float) (f*pt.s.xx());
+						s[1] += (float) (f*pt.s.yy());
+						s[2] += (float) (f*pt.s.zz());
+						s[3] += (float) (f*pt.s.xy());
+						s[4] += (float) (f*pt.s.yz());
+						s[5] += (float) (f*pt.s.xz());
+
+						if (m_nfield[4] == PLOT_FIBER_STRAIN)
+						{
+							s[6] += (float) f*fiber_strain(el, j);
+						}
+						else if (m_nfield[4] == PLOT_DEV_FIBER_STRAIN)
+						{
+							s[6] += (float) f*dev_fiber_strain(el, j);
+						}
+					}
 				}
-				else if (m_nfield[4] == PLOT_DEV_FIBER_STRAIN)
-				{
-					s[6] += (float) f*dev_fiber_strain(el, j);
-				}
+
+				m_ar.write(s, sizeof(float), 7);
 			}
 		}
-
-		m_ar.write(s, sizeof(float), 7);
 	}
 
 	// write truss element data
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
-	FETrussDomain& td = mesh.TrussDomain();
-	for (i=0; i<td.Elements(); ++i)
-	{
-		FETrussElement& el = td.Element(i);
-		td.UnpackElement(el);
-		FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
-		
-		double l = el.Length();
-		double V = el.Volume0();
-		s[0] = (float) (pt.m_tau*V/l);	// axial force
 
-		m_ar.write(s, sizeof(float), 6);
+	for (nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&mesh.Domain(nd));
+		if (ptd)
+		{
+			for (i=0; i<ptd->Elements(); ++i)
+			{
+				FETrussElement& el = ptd->Element(i);
+				ptd->UnpackElement(el);
+				FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
+		
+				double l = el.Length();
+				double V = el.Volume0();
+				s[0] = (float) (pt.m_tau*V/l);	// axial force
+
+				m_ar.write(s, sizeof(float), 6);
+			}
+		}
 	}
 
 	// write shell element data
 	mat3ds E;
-	FEShellDomain& sd = mesh.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
+	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
-		for (j=0; j<44; ++j) s[j] = 0;
-
-		FEShellElement& el = sd.Element(i);
-		if (!el.IsRigid())
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
+		if (psd)
 		{
-			try
+			for (i=0; i<psd->Elements(); ++i)
 			{
-				sd.UnpackElement(el);
+				for (j=0; j<44; ++j) s[j] = 0;
 
-				neln = el.Nodes();
-				f = 1.0 / (double) neln;
-
-				// output shell data
-				for (j=0; j<neln; ++j)
+				FEShellElement& el = psd->Element(i);
+				if (!el.IsRigid())
 				{
-					FEElasticMaterialPoint& ptm = *(el.m_State[j + neln]->ExtractData<FEElasticMaterialPoint>());
-					FEElasticMaterialPoint& pti = *(el.m_State[j       ]->ExtractData<FEElasticMaterialPoint>());
-					FEElasticMaterialPoint& pto = *(el.m_State[j+2*neln]->ExtractData<FEElasticMaterialPoint>());
-
-					// mid-surface stresses
-					s[ 0] += (float) (f*ptm.s.xx());
-					s[ 1] += (float) (f*ptm.s.yy());
-					s[ 2] += (float) (f*ptm.s.zz());
-					s[ 3] += (float) (f*ptm.s.xy());
-					s[ 4] += (float) (f*ptm.s.yz());
-					s[ 5] += (float) (f*ptm.s.xz());
-
-					// inner surface stresses
-					s[ 7] += (float) (f*pti.s.xx());
-					s[ 8] += (float) (f*pti.s.yy());
-					s[ 9] += (float) (f*pti.s.zz());
-					s[10] += (float) (f*pti.s.xy());
-					s[11] += (float) (f*pti.s.yz());
-					s[12] += (float) (f*pti.s.xz());
-
-					// outer surface stresses
-					s[14] += (float) (f*pto.s.xx());
-					s[15] += (float) (f*pto.s.yy());
-					s[16] += (float) (f*pto.s.zz());
-					s[17] += (float) (f*pto.s.xy());
-					s[18] += (float) (f*pto.s.yz());
-					s[19] += (float) (f*pto.s.xz());
-
-					// shell thicknesses
-					s[29] += (float) (el.m_h0[j]*f*mesh.Node(el.m_node[j]).m_Dt.norm());
-
-					if (m_bsstrn && (!el.IsRigid()))
+					try
 					{
-						// inner-surface strain
-						E = pti.Strain();
+						psd->UnpackElement(el);
 
-						s[32] += (float) (f*E.xx());
-						s[33] += (float) (f*E.yy());
-						s[34] += (float) (f*E.zz());
-						s[35] += (float) (f*E.xy());
-						s[36] += (float) (f*E.yz());
-						s[37] += (float) (f*E.xz());
+						neln = el.Nodes();
+						f = 1.0 / (double) neln;
 
-						// outer-surface strain
-						E = pto.Strain();
+						// output shell data
+						for (j=0; j<neln; ++j)
+						{
+							FEElasticMaterialPoint& ptm = *(el.m_State[j + neln]->ExtractData<FEElasticMaterialPoint>());
+							FEElasticMaterialPoint& pti = *(el.m_State[j       ]->ExtractData<FEElasticMaterialPoint>());
+							FEElasticMaterialPoint& pto = *(el.m_State[j+2*neln]->ExtractData<FEElasticMaterialPoint>());
 
-						s[38] += (float) (f*E.xx());
-						s[39] += (float) (f*E.yy());
-						s[40] += (float) (f*E.zz());
-						s[41] += (float) (f*E.xy());
-						s[42] += (float) (f*E.yz());
-						s[43] += (float) (f*E.xz());
+							// mid-surface stresses
+							s[ 0] += (float) (f*ptm.s.xx());
+							s[ 1] += (float) (f*ptm.s.yy());
+							s[ 2] += (float) (f*ptm.s.zz());
+							s[ 3] += (float) (f*ptm.s.xy());
+							s[ 4] += (float) (f*ptm.s.yz());
+							s[ 5] += (float) (f*ptm.s.xz());
+
+							// inner surface stresses
+							s[ 7] += (float) (f*pti.s.xx());
+							s[ 8] += (float) (f*pti.s.yy());
+							s[ 9] += (float) (f*pti.s.zz());
+							s[10] += (float) (f*pti.s.xy());
+							s[11] += (float) (f*pti.s.yz());
+							s[12] += (float) (f*pti.s.xz());
+
+							// outer surface stresses
+							s[14] += (float) (f*pto.s.xx());
+							s[15] += (float) (f*pto.s.yy());
+							s[16] += (float) (f*pto.s.zz());
+							s[17] += (float) (f*pto.s.xy());
+							s[18] += (float) (f*pto.s.yz());
+							s[19] += (float) (f*pto.s.xz());
+
+							// shell thicknesses
+							s[29] += (float) (el.m_h0[j]*f*mesh.Node(el.m_node[j]).m_Dt.norm());
+
+							if (m_bsstrn && (!el.IsRigid()))
+							{
+								// inner-surface strain
+								E = pti.Strain();
+
+								s[32] += (float) (f*E.xx());
+								s[33] += (float) (f*E.yy());
+								s[34] += (float) (f*E.zz());
+								s[35] += (float) (f*E.xy());
+								s[36] += (float) (f*E.yz());
+								s[37] += (float) (f*E.xz());
+
+								// outer-surface strain
+								E = pto.Strain();
+
+								s[38] += (float) (f*E.xx());
+								s[39] += (float) (f*E.yy());
+								s[40] += (float) (f*E.zz());
+								s[41] += (float) (f*E.xy());
+								s[42] += (float) (f*E.yz());
+								s[43] += (float) (f*E.xz());
+							}
+						}
 					}
-				}
-			}
-			catch (...)
-			{
-				// don't do anything
-			}
-		} // if (!el.isrigid())
+					catch (...)
+					{
+						// don't do anything
+					}
+				} // if (!el.isrigid())
 
-		// save data to file
-		m_ar.write(s, sizeof(float), (m_bsstrn?44:32));
+				// save data to file
+				m_ar.write(s, sizeof(float), (m_bsstrn?44:32));
+			}
+		}
 	}
 
 	// now flush the archive to make sure we don't loose any results
@@ -1015,52 +1052,59 @@ void LSDYNAPlotFile::write_reaction_forces()
 
 void LSDYNAPlotFile::write_material_fibers()
 {
-	int i, j, n;
+	int i, j, n, nd;
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
-	FESolidDomain& bd = mesh.SolidDomain();
-	FEShellDomain& sd = mesh.ShellDomain();
 	int N = mesh.Nodes();
-	int BE = bd.Elements();
-	int SE = sd.Elements();
 	vector<vec3d> v(N);
 	for (i=0; i<N; ++i) v[i] = vec3d(0,0,0);
 
 	vec3d r;
-	for (i=0; i<BE; ++i)
+	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		n = el.GaussPoints();
-		r = vec3d(0,0,0);
-		for (j=0; j<n; ++j)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-			r.x += pt.Q[0][0];
-			r.y += pt.Q[1][0];
-			r.z += pt.Q[2][0];
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+				n = el.GaussPoints();
+				r = vec3d(0,0,0);
+				for (j=0; j<n; ++j)
+				{
+					FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+					r.x += pt.Q[0][0];
+					r.y += pt.Q[1][0];
+					r.z += pt.Q[2][0];
+				}
+				r /= n;
+
+				n = el.Nodes();
+				for (j=0; j<n; ++j) v[el.m_node[j]] += r;
+			}
 		}
-		r /= n;
 
-		n = el.Nodes();
-		for (j=0; j<n; ++j) v[el.m_node[j]] += r;
-	}
-
-	for (i=0; i<SE; ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		n = el.GaussPoints();
-		r = vec3d(0,0,0);
-		for (j=0; j<n; ++j)
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
+		if (psd)
 		{
-			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-			r.x += pt.Q[0][0];
-			r.y += pt.Q[1][0];
-			r.z += pt.Q[2][0];
-		}
-		r /= n;
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				n = el.GaussPoints();
+				r = vec3d(0,0,0);
+				for (j=0; j<n; ++j)
+				{
+					FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+					r.x += pt.Q[0][0];
+					r.y += pt.Q[1][0];
+					r.z += pt.Q[2][0];
+				}
+				r /= n;
 
-		n = el.Nodes();
-		for (j=0; j<n; ++j) v[el.m_node[j]] += r;
+				n = el.Nodes();
+				for (j=0; j<n; ++j) v[el.m_node[j]] += r;
+			}
+		}
 	}
 
 	float vf[3];

@@ -11,7 +11,7 @@
 
 bool FEM::InitRigidBodies()
 {
-	int i, j, n, m;
+	int i, j, n, m, nd;
 	// count the number of rigid materials
 	m_nrm = 0;
 	for (i=0; i<Materials(); ++i)
@@ -41,40 +41,49 @@ bool FEM::InitRigidBodies()
 
 	// Next, we assign to all nodes a rigid node number
 	// This number is preliminary since rigid materials can be merged
-	FESolidDomain& bd = m_mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (nd = 0; nd < m_mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
-		if (pm)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
 		{
-			el.m_nrigid = el.GetMatID();
-			for (j=0; j<el.Nodes(); ++j)
+			for (i=0; i<pbd->Elements(); ++i)
 			{
-				n = el.m_node[j];
-				FENode& node = m_mesh.Node(n);
-				node.m_rid = el.GetMatID();
+				FESolidElement& el = pbd->Element(i);
+				FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
+				if (pm)
+				{
+					el.m_nrigid = el.GetMatID();
+					for (j=0; j<el.Nodes(); ++j)
+					{
+						n = el.m_node[j];
+						FENode& node = m_mesh.Node(n);
+						node.m_rid = el.GetMatID();
+					}
+				}
+				else el.m_nrigid = -1;
 			}
 		}
-		else el.m_nrigid = -1;
-	}
 
-	FEShellDomain& sd = m_mesh.ShellDomain();
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
-		if (pm)
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			el.m_nrigid = el.GetMatID();
-			for (j=0; j<el.Nodes(); ++j)
+			for (i=0; i<psd->Elements(); ++i)
 			{
-				n = el.m_node[j];
-				FENode& node = m_mesh.Node(n);
-				node.m_rid = el.GetMatID();
+				FEShellElement& el = psd->Element(i);
+				FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
+				if (pm)
+				{
+					el.m_nrigid = el.GetMatID();
+					for (j=0; j<el.Nodes(); ++j)
+					{
+						n = el.m_node[j];
+						FENode& node = m_mesh.Node(n);
+						node.m_rid = el.GetMatID();
+					}		
+				}
+				else el.m_nrigid = -1;
 			}
 		}
-		else el.m_nrigid = -1;
 	}
 
 	// now we can merge rigid materials
@@ -84,36 +93,48 @@ bool FEM::InitRigidBodies()
 	do
 	{
 		bdone = true;
-		for (i=0; i<bd.Elements(); ++i)
+		for (nd=0; nd<m_mesh.Domains(); ++nd)
 		{
-			FESolidElement& el = bd.Element(i);
-			if (el.m_nrigid >= 0)
+			FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+			if (pbd)
 			{
-				m = m_mesh.Node(el.m_node[0]).m_rid;
-				for (j=1; j<el.Nodes(); ++j)
+				for (i=0; i<pbd->Elements(); ++i)
 				{
-					n = m_mesh.Node(el.m_node[j]).m_rid;
-					if (mrb[n] != mrb[m])
+					FESolidElement& el = pbd->Element(i);
+					if (el.m_nrigid >= 0)
 					{
-						if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
-						bdone = false;
+						m = m_mesh.Node(el.m_node[0]).m_rid;
+						for (j=1; j<el.Nodes(); ++j)
+						{
+							n = m_mesh.Node(el.m_node[j]).m_rid;
+							if (mrb[n] != mrb[m])
+							{
+								if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
+								bdone = false;
+							}
+						}
 					}
 				}
 			}
-		}
-		for (i=0; i<sd.Elements(); ++i)
-		{
-			FEShellElement& el = sd.Element(i);
-			if (el.m_nrigid >= 0)
+
+			FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+			if (psd)
 			{
-				m = m_mesh.Node(el.m_node[0]).m_rid;
-				for (j=1; j<el.Nodes(); ++j)
+				for (i=0; i<psd->Elements(); ++i)
 				{
-					n = m_mesh.Node(el.m_node[j]).m_rid;
-					if (mrb[n] != mrb[m])
+					FEShellElement& el = psd->Element(i);
+					if (el.m_nrigid >= 0)
 					{
-						if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
-						bdone = false;
+						m = m_mesh.Node(el.m_node[0]).m_rid;
+						for (j=1; j<el.Nodes(); ++j)
+						{
+							n = m_mesh.Node(el.m_node[j]).m_rid;
+							if (mrb[n] != mrb[m])
+							{
+								if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
+								bdone = false;
+							}
+						}
 					}
 				}
 			}
@@ -137,23 +158,35 @@ bool FEM::InitRigidBodies()
 	}
 
 	// assign rigid body index to rigid elements
-	for (i=0; i<bd.Elements(); ++i)
+	for (nd=0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
-		if (pm)
-			el.m_nrigid = pm->m_nRB;
-		else
-			el.m_nrigid = -1;
-	}
-	for (i=0; i<sd.Elements(); ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
-		if (pm)
-			el.m_nrigid = pm->m_nRB;
-		else
-			el.m_nrigid = -1;
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
+		{
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+				FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
+				if (pm)
+					el.m_nrigid = pm->m_nRB;
+				else
+					el.m_nrigid = -1;
+			}
+		}
+
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
+		{
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
+				if (pm)
+					el.m_nrigid = pm->m_nRB;
+				else
+					el.m_nrigid = -1;
+			}
+		}
 	}
 
 	// assign rigid body index to nodes
@@ -254,13 +287,20 @@ bool FEM::InitRigidBodies()
 	// get equation numbers assigned to them. Later we'll assign
 	// the rigid dofs equations numbers to these nodes
 	for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_bshell = false;
-	for (i=0; i<sd.Elements(); ++i)
+	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FEShellElement& el = sd.Element(i);
-		if (el.m_nrigid < 0)
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			int n = el.Nodes();
-			for (j=0; j<n; ++j) m_mesh.Node(el.m_node[j]).m_bshell = true;
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				if (el.m_nrigid < 0)
+				{
+					int n = el.Nodes();
+					for (j=0; j<n; ++j) m_mesh.Node(el.m_node[j]).m_bshell = true;
+				}
+			}
 		}
 	}
 
