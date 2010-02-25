@@ -237,6 +237,8 @@ public:
 	int Domains() { return (int) m_Domain.size(); }
 	FEDomain& Domain(int n) { return *m_Domain[n]; }
 
+	void AddDomain(FEDomain* pd) { m_Domain.push_back(pd); }
+
 protected:
 	void ClearDomains();
 

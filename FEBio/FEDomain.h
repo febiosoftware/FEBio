@@ -30,6 +30,8 @@ public:
 
 	virtual int Elements() = 0;
 
+	virtual FEDomain* Clone() { assert(false); return 0; }
+
 	virtual void Reset() {}
 
 	virtual void Serialize(FEM& fem, Archive& ar) {}
@@ -80,6 +82,13 @@ public:
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
 	FESolidDomain& operator = (FESolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+
+	FEDomain* Clone()
+	{
+		FESolidDomain* pd = new FESolidDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
 
 	FEElement* FindElementFromID(int nid);
 
@@ -179,6 +188,13 @@ public:
 
 	FEShellDomain& operator = (FEShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
+	FEDomain* Clone()
+	{
+		FEShellDomain* pd = new FEShellDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
+
 	FEElement* FindElementFromID(int nid);
 
 	void Reset();
@@ -236,6 +252,12 @@ public:
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
+	FEDomain* Clone()
+	{
+		FETrussDomain* pd = new FETrussDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
 
 	FETrussDomain& operator = (FETrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 

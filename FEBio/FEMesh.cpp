@@ -39,9 +39,12 @@ FEMesh::FEMesh(FEMesh& m)
 	ClearDomains();
 
 	// copy domains
-	m_Domain[0] = new FESolidDomain(this); *m_Domain[0] = *m.m_Domain[0];
-	m_Domain[1] = new FESolidDomain(this); *m_Domain[1] = *m.m_Domain[1];
-	m_Domain[2] = new FESolidDomain(this); *m_Domain[2] = *m.m_Domain[2];
+	for (int i=0; i<m.Domains(); ++i)
+	{
+		FEDomain* pd = m.Domain(i).Clone();
+		pd->SetMesh(this);
+		m_Domain.push_back(pd);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -58,9 +61,12 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 	ClearDomains();
 
 	// copy domains
-	m_Domain[0] = new FESolidDomain(this); *m_Domain[0] = *m.m_Domain[0];
-	m_Domain[1] = new FESolidDomain(this); *m_Domain[1] = *m.m_Domain[1];
-	m_Domain[2] = new FESolidDomain(this); *m_Domain[2] = *m.m_Domain[2];
+	for (int i=0; i<m.Domains(); ++i)
+	{
+		FEDomain* pd = m.Domain(i).Clone();
+		pd->SetMesh(this);
+		m_Domain.push_back(pd);
+	}
 
 	return (*this);
 }
