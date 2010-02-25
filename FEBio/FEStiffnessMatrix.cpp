@@ -145,41 +145,47 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				// keep a list that stores for each node the list of
 				// elements connected to that node.
 				// loop over all solid elements
-				FESolidDomain& bd = mesh.SolidDomain();
-				for (i=0; i<bd.Elements(); ++i)
+				for (int nd=0; nd<mesh.Domains(); ++nd)
 				{
-					FESolidElement& el = bd.Element(i);
-					if (!el.IsRigid())
+					FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+					if (pbd)
 					{
-						bd.UnpackElement(el, FE_UNPACK_LM);
-						int ne = el.LM().size();
-
-						// see if this element connects to the 
-						// master node of a linear constraint ...
-						m = el.Nodes();
-						for (j=0; j<m; ++j)
+						for (i=0; i<pbd->Elements(); ++i)
 						{
-							for (k=0; k<MAX_NDOFS; ++k)
+							FESolidElement& el = pbd->Element(i);
+							if (!el.IsRigid())
 							{
-								n = fem.m_LCT[el.m_node[j]*MAX_NDOFS + k];
+								pbd->UnpackElement(el, FE_UNPACK_LM);
+								int ne = el.LM().size();
 
-								if (n >= 0)
+								// see if this element connects to the 
+								// master node of a linear constraint ...
+								m = el.Nodes();
+								for (j=0; j<m; ++j)
 								{
-									// ... it does so we need to connect the 
-									// element to the linear constraint
-									FELinearConstraint* plc = fem.m_LCA[n];
+									for (k=0; k<MAX_NDOFS; ++k)
+									{
+										n = fem.m_LCT[el.m_node[j]*MAX_NDOFS + k];
 
-									int ns = plc->slave.size();
+										if (n >= 0)
+										{
+											// ... it does so we need to connect the 
+											// element to the linear constraint
+											FELinearConstraint* plc = fem.m_LCA[n];
 
-									lm.resize(ne + ns);
-									for (l=0; l<ne; ++l) lm[l] = el.LM()[l];
+											int ns = plc->slave.size();
 
-									list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
-									for (l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
+											lm.resize(ne + ns);
+											for (l=0; l<ne; ++l) lm[l] = el.LM()[l];
 
-									build_add(lm);
+											list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
+											for (l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;
 
-									break;
+											build_add(lm);
+		
+											break;
+										}
+									}
 								}
 							}
 						}
