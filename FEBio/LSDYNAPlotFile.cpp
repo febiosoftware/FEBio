@@ -585,29 +585,35 @@ void LSDYNAPlotFile::write_fluid_flux()
 
 	vec3d ew;
 	int n;
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		// calculate average flux
-		ew = vec3d(0,0,0);
-		for (j=0; j<el.GaussPoints(); ++j)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			FEMaterialPoint& mp = *el.m_State[j];
-			FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
 
-			if (pt) ew += pt->m_w;
-		}
+				// calculate average flux
+				ew = vec3d(0,0,0);
+				for (j=0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.m_State[j];
+					FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
 
-		ew /= el.GaussPoints();
+					if (pt) ew += pt->m_w;
+				}
 
-		// project to nodes
-		for (j=0; j<el.Nodes(); ++j)
-		{
-			n = el.m_node[j];
-			wn[n] += ew;
-			++val[n];
+				ew /= el.GaussPoints();
+
+				// project to nodes
+				for (j=0; j<el.Nodes(); ++j)
+				{
+					n = el.m_node[j];
+					wn[n] += ew;
+					++val[n];
+				}
+			}
 		}
 	}
 	for (i=0; i<fem.m_mesh.Nodes(); ++i) if (val[i] != 0) wn[i] /= val[i];
@@ -803,29 +809,35 @@ void LSDYNAPlotFile::write_heat_flux()
 
 	vec3d ew;
 	int n;
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-
-		// calculate average flux
-		ew = vec3d(0,0,0);
-		for (j=0; j<el.GaussPoints(); ++j)
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		if (pbd)
 		{
-			FEMaterialPoint& mp = *el.m_State[j];
-			FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
+			for (i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
 
-			ew += pt->m_q;
-		}
+				// calculate average flux
+				ew = vec3d(0,0,0);
+				for (j=0; j<el.GaussPoints(); ++j)
+				{
+					FEMaterialPoint& mp = *el.m_State[j];
+					FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
 
-		ew /= el.GaussPoints();
+					ew += pt->m_q;
+				}
 
-		// project to nodes
-		for (j=0; j<el.Nodes(); ++j)
-		{
-			n = el.m_node[j];
-			qn[n] += ew;
-			++val[n];
+				ew /= el.GaussPoints();
+	
+				// project to nodes
+				for (j=0; j<el.Nodes(); ++j)
+				{
+					n = el.m_node[j];
+					qn[n] += ew;
+					++val[n];
+				}
+			}
 		}
 	}
 	for (i=0; i<fem.m_mesh.Nodes(); ++i) if (val[i] != 0) qn[i] /= val[i];
