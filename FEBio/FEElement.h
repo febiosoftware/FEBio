@@ -125,9 +125,21 @@ public:
 		// set the traits of the element
 		SetTraits(el.m_pT);
 
-		// we just copy the state information
+		// copy the state information
 		int nint = GaussPoints();
-		for (int i=0; i<nint; ++i) m_State[i] = el.m_State[i]->Copy();		
+		for (int i=0; i<nint; ++i) m_State[i] = el.m_State[i]->Copy();
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
+
+		// copy solid element data
+		m_eJ = el.m_eJ;
+		m_ep = el.m_ep;
+		m_Lk = el.m_Lk;
 	}
 
 	//! assignment operator
@@ -136,8 +148,6 @@ public:
 		// make sure the element type is the same
 		if (m_pT == 0) SetTraits(el.m_pT);
 		else assert(m_pT == el.m_pT);
-
-		m_node = el.m_node;
 
 		// copy the state data
 		int nint = GaussPoints();
@@ -151,6 +161,18 @@ public:
 
 			if (el.m_State[i]) m_State[i] = el.m_State[i]->Copy();
 		}
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
+
+		// copy solid element data
+		m_eJ = el.m_eJ;
+		m_ep = el.m_ep;
+		m_Lk = el.m_Lk;
 
 		return (*this);
 	}
@@ -325,6 +347,44 @@ class FESurfaceElement : public FEElement
 {
 public:
 	FESurfaceElement() { m_nelem = -1; }
+
+	FESurfaceElement(FESurfaceElement& el)
+	{
+		// set the traits of the element
+		SetTraits(el.m_pT);
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
+
+		// copy surface element data
+		m_nelem = el.m_nelem;
+		m_lnode = el.m_lnode;
+	}
+
+	FESurfaceElement& operator = (FESurfaceElement& el)
+	{
+		// make sure the element type is the same
+		if (m_pT == 0) SetTraits(el.m_pT);
+		else assert(m_pT == el.m_pT);
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
+
+		// copy surface element data
+		m_nelem = el.m_nelem;
+		m_lnode = el.m_lnode;
+
+		return (*this); 
+	}
+
 	virtual void SetTraits(FEElementTraits* pt)
 	{
 		FEElement::SetTraits(pt);
@@ -497,6 +557,13 @@ public:
 		// we just copy the state information
 		int nint = GaussPoints();
 		for (int i=0; i<nint; ++i) m_State[i]= el.m_State[i]->Copy();
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
 	}
 
 	//! assignment operator
@@ -513,6 +580,19 @@ public:
 			if (m_State[i]) delete m_State[i];
 			m_State[i] = el.m_State[i]->Copy();
 		}
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
+
+		// copy shell data
+		m_eJ = el.m_eJ;
+		m_ep = el.m_ep;
+		m_Lk = el.m_Lk;
+		m_h0 = el.m_h0;
 
 		return (*this);
 	}
@@ -645,6 +725,56 @@ public:
 class FETrussElement : public FEElement
 {
 public:
+	FETrussElement(){}
+	virtual ~FETrussElement();
+
+	FETrussElement(FETrussElement& el)
+	{
+		// set the traits of the element
+		SetTraits(el.m_pT);
+
+		// we just copy the state information
+		int nint = GaussPoints();
+		for (int i=0; i<nint; ++i) m_State[i]= el.m_State[i]->Copy();
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
+
+		// truss data
+		m_a0 = el.m_a0;
+	}
+
+	FETrussElement& operator = (FETrussElement& el) 
+	{
+		// make sure the element type is the same
+		if (m_pT == 0) SetTraits(el.m_pT);
+		else assert(m_pT == el.m_pT);
+
+		// copy the state data
+		int nint = GaussPoints();
+		for (int i=0; i<nint; ++i) 
+		{
+			if (m_State[i]) delete m_State[i];
+			m_State[i] = el.m_State[i]->Copy();
+		}
+
+		// copy base class data
+		m_mat = el.m_mat;
+		m_nrigid = el.m_nrigid;
+		m_node = el.m_node;
+		m_nID = el.m_nID;
+		m_gid = el.m_gid;
+
+		// copy truss data
+		m_a0 = el.m_a0;
+
+		return (*this); 
+	}
+
 	//! intialize element data
 	void Init(bool bflag)
 	{
