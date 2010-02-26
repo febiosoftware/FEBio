@@ -804,6 +804,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\rigid.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\shell.cpp"
 				>
 			</File>

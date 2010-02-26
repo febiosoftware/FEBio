@@ -106,13 +106,20 @@ public:
 	// update stresses
 	void UpdateStresses(FEM& fem);
 
-	// --- S T I F F N E S S ---
-
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
 	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+	//! Calculates the internal stress vector for solid elements
+	void InternalForces(FESolidElement& el, vector<double>& fe);
+
+protected:
+	// --- S T I F F N E S S ---
 
 	//! Dilatational stiffness component for nearly-incompressible materials
 	void DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke);
@@ -143,12 +150,6 @@ public:
 
 	// --- R E S I D U A L ---
 
-	//! calculates the residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
-
-	//! Calculates the internal stress vector for solid elements
-	void InternalForces(FESolidElement& el, vector<double>& fe);
-
 	//! Calculates the internal stress vector for enhanced strain hex elements
 	void UDGInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
 
@@ -169,6 +170,25 @@ public:
 
 protected:
 	vector<FESolidElement>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+//! domain class for 3D rigid elements
+//!
+class FERigidSolidDomain : public FESolidDomain
+{
+public:
+	//! constructor
+	FERigidSolidDomain(FEMesh* pm) : FESolidDomain(pm){}
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolidSolver* psolver);
+
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+	// update stresses
+	void UpdateStresses(FEM& fem);
 };
 
 //-----------------------------------------------------------------------------
@@ -235,6 +255,25 @@ public:
 
 protected:
 	vector<FEShellElement>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+//! domain class for 3D rigid shell elements
+//!
+class FERigidShellDomain : public FEShellDomain
+{
+public:
+	//! constructor
+	FERigidShellDomain(FEMesh* pm) : FEShellDomain(pm){}
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolidSolver* psolver);
+
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+	// update stresses
+	void UpdateStresses(FEM& fem);
 };
 
 //-----------------------------------------------------------------------------

@@ -22,8 +22,11 @@ void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		// get the element
 		FESolidElement& el = m_Elem[i];
 
+		// this element should not be rigid
+		assert(!el.IsRigid());
+
 		// unpack the element
-		if (!el.IsRigid()) UnpackElement(el);
+		UnpackElement(el);
 
 		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
 
@@ -31,33 +34,18 @@ void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		int ndof = 3*el.Nodes();
 		fe.assign(ndof, 0);
 
-		// skip rigid elements for internal force calculations
-		if (!el.IsRigid())
+		// calculate internal force vector
+		if (el.Type() != FE_UDGHEX) InternalForces(el, fe);
+		else UDGInternalForces(fem, el, fe);
+
+		// apply body forces
+		if (fem.UseBodyForces())
 		{
-			// calculate internal force vector
-			if (el.Type() != FE_UDGHEX) InternalForces(el, fe);
-			else UDGInternalForces(fem, el, fe);
-
-			// apply body forces
-			if (fem.UseBodyForces())
-			{
-				BodyForces(fem, el, fe);
-			}
-
-			// assemble element 'fe'-vector into global R vector
-			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
-		else if (fem.UseBodyForces())
-		{
-			// unpack the element
-			UnpackElement(el);
-
-			// apply body force to rigid elements
 			BodyForces(fem, el, fe);
-
-			// assemble element 'fe'-vector into global R vector
-			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
 		}
+
+		// assemble element 'fe'-vector into global R vector
+		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
 
 		// do poro-elastic forces
 		if ((fem.m_pStep->m_nModule == FE_POROELASTIC)&&(dynamic_cast<FEPoroElastic*>(pm)))
@@ -1082,75 +1070,58 @@ void FESolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
-		if (!el.IsRigid())
+
+		// this element should not be rigid
+		assert(!el.IsRigid());
+
+		UnpackElement(el);
+
+		// get the elements material
+		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+
+		// skip rigid elements and poro-elastic elements
+		if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
 		{
-			UnpackElement(el);
+			// create the element's stiffness matrix
+			int ndof = 3*el.Nodes();
+			ke.Create(ndof, ndof);
+			ke.zero();
 
-			// get the elements material
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			// calculate the element stiffness matrix
+			ElementStiffness(fem, el, ke);
 
-			// skip rigid elements and poro-elastic elements
-			if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
-			{
-				// create the element's stiffness matrix
-				int ndof = 3*el.Nodes();
-				ke.Create(ndof, ndof);
-				ke.zero();
+			// add the inertial stiffness for dynamics
+			if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
 
-				// calculate the element stiffness matrix
-				ElementStiffness(fem, el, ke);
-
-				// add the inertial stiffness for dynamics
-				if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
-
-				// assemble element matrix in global stiffness matrix
-				psolver->AssembleStiffness(el.m_node, el.LM(), ke);
-			}
-			else if (dynamic_cast<FEPoroElastic*>(pmat))
-			{
-				// allocate stiffness matrix
-				int neln = el.Nodes();
-				int ndof = neln*4;
-				ke.Create(ndof, ndof);
-		
-				// calculate the element stiffness matrix
-				ElementPoroStiffness(fem, el, ke);
-
-				// TODO: the problem here is that the LM array that is returned by the UnpackElement
-				// function does not give the equation numbers in the right order. For this reason we
-				// have to create a new lm array and place the equation numbers in the right order.
-				// What we really ought to do is fix the UnpackElement function so that it returns
-				// the LM vector in the right order for poroelastic elements.
-				vector<int> lm(ndof);
-				for (int i=0; i<neln; ++i)
-				{
-					lm[4*i  ] = el.LM()[3*i];
-					lm[4*i+1] = el.LM()[3*i+1];
-					lm[4*i+2] = el.LM()[3*i+2];
-					lm[4*i+3] = el.LM()[3*neln+i];
-				}
-				
-				// assemble element matrix in global stiffness matrix
-				psolver->AssembleStiffness(el.m_node, lm, ke);
-			}
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, el.LM(), ke);
 		}
-		else
+		else if (dynamic_cast<FEPoroElastic*>(pmat))
 		{
-			// for dynamic analyses we do need to add the inertial stiffness of the rigid body
-			if (fem.m_pStep->m_nanalysis == FE_DYNAMIC)
+			// allocate stiffness matrix
+			int neln = el.Nodes();
+			int ndof = neln*4;
+			ke.Create(ndof, ndof);
+		
+			// calculate the element stiffness matrix
+			ElementPoroStiffness(fem, el, ke);
+
+			// TODO: the problem here is that the LM array that is returned by the UnpackElement
+			// function does not give the equation numbers in the right order. For this reason we
+			// have to create a new lm array and place the equation numbers in the right order.
+			// What we really ought to do is fix the UnpackElement function so that it returns
+			// the LM vector in the right order for poroelastic elements.
+			vector<int> lm(ndof);
+			for (int i=0; i<neln; ++i)
 			{
-				UnpackElement(el);
-
-				int ndof = 3*el.Nodes();
-				ke.Create(ndof, ndof);
-				ke.zero();
-
-				// add the inertial stiffness for dynamics
-				ElementInertialStiffness(fem, el, ke);
-
-				// assemble element matrix in global stiffness matrix
-				psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+				lm[4*i  ] = el.LM()[3*i];
+				lm[4*i+1] = el.LM()[3*i+1];
+				lm[4*i+2] = el.LM()[3*i+2];
+				lm[4*i+3] = el.LM()[3*neln+i];
 			}
+				
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
 
 		if (fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
@@ -1672,140 +1643,137 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 
-		// we skip rigid elements
-		if (!el.IsRigid())
+		assert(!el.IsRigid());
+
+		// unpack the element data
+		UnpackElement(el);
+
+		// get the number of integration points
+		nint = el.GaussPoints();
+
+		// get the integration weights
+		gw = el.GaussWeights();
+
+		// get the material
+		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+
+		// extract the elastic component
+		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+
+		// see if we are dealing with a poroelastic material or not
+		bool bporo = false;
+		if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+
+		// see if the material is incompressible or not
+		// if the material is incompressible the element
+		// is a three-field element and we need to evaluate
+		// the average dilatation and pressure fields
+		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
+		if (pmi)
 		{
-			// unpack the element data
-			UnpackElement(el);
+			// get the material's bulk modulus
+			double K = pmi->BulkModulus();
 
-			// get the number of integration points
-			nint = el.GaussPoints();
+			// calculate the average dilatation and pressure
+			double v = 0, V = 0;
 
-			// get the integration weights
-			gw = el.GaussWeights();
-
-			// get the material
-			FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
-
-			// extract the elastic component
-			FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-
-			// see if we are dealing with a poroelastic material or not
-			bool bporo = false;
-			if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
-
-			// see if the material is incompressible or not
-			// if the material is incompressible the element
-			// is a three-field element and we need to evaluate
-			// the average dilatation and pressure fields
-			FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-			if (pmi)
-			{
-				// get the material's bulk modulus
-				double K = pmi->BulkModulus();
-
-				// calculate the average dilatation and pressure
-				double v = 0, V = 0;
-
-				if (el.Type() == FE_UDGHEX)
-				{
-					v = HexVolume(el, 1);
-					V = HexVolume(el, 0);
-				}
-				else 
-				{
-					for (n=0; n<nint; ++n)
-					{
-						v += el.detJt(n)*gw[n];
-						V += el.detJ0(n)*gw[n];
-					}
-				}
-
-				// calculate volume ratio
-				el.m_eJ = v / V;
-
-				// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
-				//        <----- Lag. mult. ----->   <------ penalty ----->
-//				el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
-				el.m_ep = pmi->Up(el.m_eJ);
-			}
-
-			// for the enhanced strain hex we need a slightly different procedure
-			// for calculating the element's stress. For this element, the stress
-			// is evaluated using an average deformation gradient.
 			if (el.Type() == FE_UDGHEX)
 			{
-				// get the material point data
-				FEMaterialPoint& mp = *el.m_State[0];
+				v = HexVolume(el, 1);
+				V = HexVolume(el, 0);
+			}
+			else 
+			{
+				for (n=0; n<nint; ++n)
+				{
+					v += el.detJt(n)*gw[n];
+					V += el.detJ0(n)*gw[n];
+				}
+			}
+
+			// calculate volume ratio
+			el.m_eJ = v / V;
+
+			// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
+			//        <----- Lag. mult. ----->   <------ penalty ----->
+//			el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
+			el.m_ep = pmi->Up(el.m_eJ);
+		}
+
+		// for the enhanced strain hex we need a slightly different procedure
+		// for calculating the element's stress. For this element, the stress
+		// is evaluated using an average deformation gradient.
+		if (el.Type() == FE_UDGHEX)
+		{
+			// get the material point data
+			FEMaterialPoint& mp = *el.m_State[0];
+			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+			// get the average cartesian derivatives
+			double GX[8], GY[8], GZ[8];
+			AvgCartDerivs(el, GX, GY, GZ);
+
+			// get the average deformation gradient and determinant
+			AvgDefGrad(el, pt.F, GX, GY, GZ);
+			pt.J = pt.F.det();
+
+			// set the element variables
+			pt.avgJ = el.m_eJ;
+			pt.avgp = el.m_ep;
+
+			// calculate the stress at this material point
+			pt.s = pm->Stress(mp);
+		}
+		else
+		{
+			// loop over the integration points and calculate
+			// the stress at the integration point
+			for (n=0; n<nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.m_State[n];
 				FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
-				// get the average cartesian derivatives
-				double GX[8], GY[8], GZ[8];
-				AvgCartDerivs(el, GX, GY, GZ);
+				// get the deformation gradient and determinant
+				pt.J = el.defgrad(pt.F, n);
 
-				// get the average deformation gradient and determinant
-				AvgDefGrad(el, pt.F, GX, GY, GZ);
-				pt.J = pt.F.det();
-
-				// set the element variables
+				// three-field element variables
 				pt.avgJ = el.m_eJ;
 				pt.avgp = el.m_ep;
 
+				// poroelasticity data
+				if (bporo)
+				{
+					FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+					// evaluate fluid pressure at gauss-point
+					pt.m_p = el.Evaluate(el.pt(), n);
+
+					// calculate the gradient of p at gauss-point
+					pt.m_gradp = el.gradient(el.pt(), n);
+				}
+
 				// calculate the stress at this material point
 				pt.s = pm->Stress(mp);
-			}
-			else
-			{
-				// loop over the integration points and calculate
-				// the stress at the integration point
-				for (n=0; n<nint; ++n)
+
+				if (dynamic_cast<FEMicroMaterial*>(pme))
 				{
-					FEMaterialPoint& mp = *el.m_State[n];
-					FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+					// the micro-material screws up the currently unpacked elements
+					// so I have to unpack the element data again
+					UnpackElement(el);
+				}
 
-					// get the deformation gradient and determinant
-					pt.J = el.defgrad(pt.F, n);
+				if (bporo)
+				{
+					FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
 
-					// three-field element variables
-					pt.avgJ = el.m_eJ;
-					pt.avgp = el.m_ep;
-
-					// poroelasticity data
-					if (bporo)
-					{
-						FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-						// evaluate fluid pressure at gauss-point
-						pt.m_p = el.Evaluate(el.pt(), n);
-
-						// calculate the gradient of p at gauss-point
-						pt.m_gradp = el.gradient(el.pt(), n);
-					}
-
-					// calculate the stress at this material point
-					pt.s = pm->Stress(mp);
-
-					if (dynamic_cast<FEMicroMaterial*>(pme))
-					{
-						// the micro-material screws up the currently unpacked elements
-						// so I have to unpack the element data again
-						UnpackElement(el);
-					}
-
-					if (bporo)
-					{
-						FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-						// for poroelastic materials also update the fluid flux
-						FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);
-						pt.m_w = pmat->Flux(mp);
-					}
+					// for poroelastic materials also update the fluid flux
+					FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);
+					pt.m_w = pmat->Flux(mp);
 				}
 			}
 		}
 	}
 }
-
 
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
