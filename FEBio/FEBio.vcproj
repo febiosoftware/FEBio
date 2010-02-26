@@ -872,6 +872,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\udghex.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\update.cpp"
 				>
 			</File>

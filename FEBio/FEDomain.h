@@ -136,25 +136,7 @@ protected:
 	//! calculates the element biphasic stiffness matrix
 	bool ElementPoroStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
-	//! hourglass stiffness for UDG hex elements
-	void UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-
-	//! dilatational stiffness for UDG hex elements
-	void UDGDilatationalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-
-	//! geometrical stiffness for UDG hex elements
-	void UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-
-	//! material stiffness for UDG hex elements
-	void UDGMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-
 	// --- R E S I D U A L ---
-
-	//! Calculates the internal stress vector for enhanced strain hex elements
-	void UDGInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
-
-	//! calculates hourglass forces for the UDG element
-	void UDGHourglassForces(FEM& fem, FESolidElement& el, vector<double>& fe);
 
 	//! Calculatess external body forces for solid elements
 	void BodyForces(FEM& fem, FESolidElement& elem, vector<double>& fe);
@@ -163,10 +145,6 @@ protected:
 	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
 
 	// ---
-
-	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
-	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
-	double HexVolume(FESolidElement& el, int state = 0);
 
 protected:
 	vector<FESolidElement>	m_Elem;
@@ -189,6 +167,53 @@ public:
 
 	// update stresses
 	void UpdateStresses(FEM& fem);
+};
+
+//-----------------------------------------------------------------------------
+//! domain class for uniform-deformation-gradient hex elements (UDG)
+class FEUDGHexDomain : public FESolidDomain
+{
+public:
+	//! constructor
+	FEUDGHexDomain(FEMesh* pm) : FESolidDomain(pm){}
+
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolidSolver* psolver);
+
+	// update stresses
+	void UpdateStresses(FEM& fem);
+
+protected:
+	//! Calculates the internal stress vector for enhanced strain hex elements
+	void UDGInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+
+	//! calculates hourglass forces for the UDG element
+	void UDGHourglassForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+
+protected:
+	//! calculate element stiffness
+	void UDGElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! hourglass stiffness for UDG hex elements
+	void UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! dilatational stiffness for UDG hex elements
+	void UDGDilatationalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! geometrical stiffness for UDG hex elements
+	void UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! material stiffness for UDG hex elements
+	void UDGMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+protected:
+	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
+	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
+	double HexVolume(FESolidElement& el, int state = 0);
 };
 
 //-----------------------------------------------------------------------------
