@@ -445,7 +445,17 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 
 	// create mesh
 	FEMesh& mesh = fem.m_mesh;
-	mesh.Create(m_nn, m_nbel, m_nsel, 0);
+	mesh.CreateNodes(m_nn);
+
+	FESolidDomain* pbd = (m_nbel>0 ? new FESolidDomain(&mesh) : 0);
+	FEShellDomain* psd = (m_nsel>0 ? new FEShellDomain(&mesh) : 0);
+
+	if (pbd) { pbd->create(m_nbel); mesh.AddDomain(pbd); }
+	if (psd) { psd->create(m_nsel); mesh.AddDomain(psd); }
+
+	int GID[2], nc=0;
+	if (pbd) GID[0] = nc++; else GID[0] = -1;
+	if (psd) GID[1] = nc++; else GID[1] = -1;
 
 	////////////////////// N O D A L   C O O R D I N A T E S   D E C K //////////////////////
 
@@ -496,7 +506,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		if (nread != 9) return errf(szerr[ERR_HEX], i+1);
 
 		// see what type of element we are dealing with
-		FESolidElement& el = fem.m_mesh.SolidDomain().Element(i);
+		assert(pbd);
+		FESolidElement& el = pbd->Element(i);
 
 		el.m_gid = 0;
 
@@ -536,7 +547,6 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 	//////////////////////////// S H E L L   E L E M E N T   D E C K ////////////////////////////
 	float f[5];
 	int N;
-	FEShellDomain& sd = fem.m_mesh.ShellDomain();
 	for (i=0; i<m_nsel; ++i)
 	{
 		// read the first shell card
@@ -552,7 +562,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		if (nread != 4) return errf(szerr[ERR_SHELL], i+1);
 
 		// get the element
-		FEShellElement& el = sd.Element(i);
+		assert(psd);
+		FEShellElement& el = psd->Element(i);
 		if (n[3] == n[2])
 			el.SetType(FE_SHELL_TRI);
 		else
@@ -568,21 +579,26 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 	}
 
 	// assign material point data
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<bd.Elements(); ++i)
+	if (pbd)
 	{
-		FESolidElement& el = bd.Element(i);
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-		assert(pmat);
-		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(pmat);
+			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		}
 	}
 
-	for (i=0; i<sd.Elements(); ++i)
+	if (psd)
 	{
-		FEShellElement& el = sd.Element(i);
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-		assert(pmat);
-		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FEShellElement& el = psd->Element(i);
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(pmat);
+			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		}
 	}
 
 	////////////////////// R I G I D   N O D E   A N D   F A C E T   D E C K ////////////////

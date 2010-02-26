@@ -115,7 +115,7 @@ bool FEContactDiagnostic::Init()
 	// currently we simply assume a two-element contact problem
 	// so we create two elements
 	const double eps = 0.5;
-	mesh.Create(16, 2, 0, 0);
+	mesh.CreateNodes(16);
 	mesh.Node( 0).m_r0 = vec3d(0,0,0);
 	mesh.Node( 1).m_r0 = vec3d(1,0,0);
 	mesh.Node( 2).m_r0 = vec3d(1,1,0);
@@ -163,10 +163,12 @@ bool FEContactDiagnostic::Init()
 	}
 
 	// get the one-and-only domain
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
+	FESolidDomain* pbd = new FESolidDomain(&mesh);
+	pbd->create(2);
+	mesh.AddDomain(pbd);
 
-	FESolidElement& el0 = bd.Element(0);
-	FESolidElement& el1 = bd.Element(1);
+	FESolidElement& el0 = pbd->Element(0);
+	FESolidElement& el1 = pbd->Element(1);
 
 	el0.SetType(FE_HEX);
 	el0.m_nID = 1;
@@ -201,7 +203,7 @@ bool FEContactDiagnostic::Init()
 	pm->m_v = 0.45;
 	fem.AddMaterial(pm);
 
-	bd.SetMatID(0);
+	pbd->SetMatID(0);
 
 	// --- create the sliding interface ---
 	FESlidingInterface* ps = new FESlidingInterface(&fem);

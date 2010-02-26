@@ -13,10 +13,6 @@
 
 FEMesh::FEMesh()
 {
-	m_Domain.resize(3);
-	m_Domain[0] = new FESolidDomain(this);
-	m_Domain[1] = new FEShellDomain(this);
-	m_Domain[2] = new FETrussDomain(this);
 }
 
 FEMesh::~FEMesh()
@@ -76,13 +72,10 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 //  Allocates storage for mesh data.
 //
 
-void FEMesh::Create(int nodes, int elems, int shells, int ntruss)
+void FEMesh::CreateNodes(int nodes)
 {
-	if (nodes >0) m_Node.resize (nodes);
-
-	if (elems >0) m_Domain[0]->create(elems);
-	if (shells>0) m_Domain[1]->create(shells);
-	if (ntruss>0) m_Domain[2]->create(ntruss);
+	assert(nodes);
+	m_Node.resize (nodes);
 }
 
 int FEMesh::Elements()
@@ -97,7 +90,7 @@ int FEMesh::SolidElements()
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEDomain* pd = dynamic_cast<FESolidDomain*>(m_Domain[i]);
+		FESolidDomain* pd = dynamic_cast<FESolidDomain*>(m_Domain[i]);
 		if (pd) N += pd->Elements();
 	}
 	return N;
@@ -108,7 +101,7 @@ int FEMesh::ShellElements()
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEDomain* pd = dynamic_cast<FEShellDomain*>(m_Domain[i]);
+		FEShellDomain* pd = dynamic_cast<FEShellDomain*>(m_Domain[i]);
 		if (pd) N += pd->Elements();
 	}
 	return N;
@@ -119,7 +112,7 @@ int FEMesh::TrussElements()
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEDomain* pd = dynamic_cast<FETrussDomain*>(m_Domain[i]);
+		FETrussDomain* pd = dynamic_cast<FETrussDomain*>(m_Domain[i]);
 		if (pd) N += pd->Elements();
 	}
 	return N;
@@ -372,17 +365,17 @@ bool FEMesh::Init()
 				en = el.m_node;
 				for (j=0; j<n; ++j) tag[en[j]] = 1;
 			}
+		}
+	}
 
-			for (i=0; i<Nodes(); ++i) 
-			{
-				FENode& node = Node(i);
-				if (tag[i] == 0)
-				{
-					node.m_ID[3] = -1;
-					node.m_ID[4] = -1;
-					node.m_ID[5] = -1;
-				}
-			}
+	for (i=0; i<Nodes(); ++i) 
+	{
+		FENode& node = Node(i);
+		if (tag[i] == 0)
+		{
+			node.m_ID[3] = -1;
+			node.m_ID[4] = -1;
+			node.m_ID[5] = -1;
 		}
 	}
 

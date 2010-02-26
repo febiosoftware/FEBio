@@ -165,7 +165,7 @@ public:
 	FEMesh& operator = (FEMesh& m);
 
 	//! allocate storage for mesh data
-	void Create(int nodes, int elems, int shells, int ntruss);
+	void CreateNodes(int nodes);
 
 	//! return number of nodes
 	int Nodes() { return m_Node.size(); }
@@ -229,10 +229,6 @@ public:
 		if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);
 		return m_NEL;
 	}
-
-	FESolidDomain& SolidDomain() { return dynamic_cast<FESolidDomain&>(*m_Domain[0]); }
-	FEShellDomain& ShellDomain() { return dynamic_cast<FEShellDomain&>(*m_Domain[1]); }
-	FETrussDomain& TrussDomain() { return dynamic_cast<FETrussDomain&>(*m_Domain[2]); }
 
 	int Domains() { return (int) m_Domain.size(); }
 	FEDomain& Domain(int n) { return *m_Domain[n]; }

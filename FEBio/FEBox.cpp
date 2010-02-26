@@ -31,7 +31,7 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 	int elems = nx*ny*nz;
 
 	// allocate data
-	FEMesh::Create(nodes, elems, 0, 0);
+	FEMesh::CreateNodes(nodes);
 
 	// create the nodes
 	double x, y, z;
@@ -82,14 +82,16 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 	// create the elements
 	int *en;
 	n = 0;
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(Domain(0));
+	FESolidDomain* pbd = new FESolidDomain(this);
+	pbd->create(elems);
+	AddDomain(pbd);
 	for (i=0; i<nx; ++i)
 	{
 		for (j=0; j<ny; ++j)
 		{
 			for (k=0; k<nz; ++k, ++n)
 			{
-				FESolidElement& el = bd.Element(n);
+				FESolidElement& el = pbd->Element(n);
 
 				el.SetType(nhex);
 				el.m_nID = n+1;

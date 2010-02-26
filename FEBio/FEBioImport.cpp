@@ -743,7 +743,7 @@ bool FEFEBioImport::ParseNodeSection(XMLTag& tag)
 	while (!t.isend()) { nodes++; ++t; }
 
 	// create nodes
-	mesh.Create(nodes, 0, 0, 0);
+	mesh.CreateNodes(nodes);
 
 	// read nodal coordinates
 	++tag;
@@ -806,12 +806,20 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		++t;
 	}
 
-	// create elements
-	mesh.Create(0, nbel, nsel, ntel);
+	// create domains
+	FESolidDomain* pbd = (nbel>0 ? new FESolidDomain(&mesh) : 0);
+	FEShellDomain* psd = (nsel>0 ? new FEShellDomain(&mesh) : 0);
+	FETrussDomain* ptd = (ntel>0 ? new FETrussDomain(&mesh) : 0);
 
-	FESolidDomain& bd = mesh.SolidDomain();
-	FEShellDomain& sd = mesh.ShellDomain();
-	FETrussDomain& td = mesh.TrussDomain();
+	// add domains to mesh
+	if (pbd) { pbd->create(nbel); mesh.AddDomain(pbd); }
+	if (psd) { psd->create(nsel); mesh.AddDomain(psd); }
+	if (ptd) { ptd->create(ntel); mesh.AddDomain(ptd); }
+
+	int GID[3], nc=0;
+	if (pbd) GID[0] = nc++; else GID[0] = -1;
+	if (psd) GID[1] = nc++; else GID[1] = -1;
+	if (ptd) GID[2] = nc++; else GID[2] = -1;
 
 	// read element data
 	++tag;
@@ -823,10 +831,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	{
 		if (tag == "hex8")
 		{
-			FESolidElement& el = bd.Element(nb++); pe = &el;
+			assert(pbd);
+			FESolidElement& el = pbd->Element(nb++); pe = &el;
 			el.SetType(fem.m_nhex8);
 			el.m_nID = i+1;
-			el.m_gid = 0;
+			el.m_gid = GID[0];
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -834,10 +843,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "penta6")
 		{
-			FESolidElement& el = bd.Element(nb++); pe = &el;
+			assert(pbd);
+			FESolidElement& el = pbd->Element(nb++); pe = &el;
 			el.SetType(FE_PENTA);
 			el.m_nID = i+1;
-			el.m_gid = 0;
+			el.m_gid = GID[0];
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -845,10 +855,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "tet4")
 		{
-			FESolidElement& el = bd.Element(nb++); pe = &el;
+			assert(pbd);
+			FESolidElement& el = pbd->Element(nb++); pe = &el;
 			el.SetType(FE_TET);
 			el.m_nID = i+1;
-			el.m_gid = 0;
+			el.m_gid = GID[0];
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -856,10 +867,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "quad4")
 		{
-			FEShellElement& el = sd.Element(ns++); pe = &el;
+			assert(psd);
+			FEShellElement& el = psd->Element(ns++); pe = &el;
 			el.SetType(FE_SHELL_QUAD);
 			el.m_nID = i+1;
-			el.m_gid = 1;
+			el.m_gid = GID[1];
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -870,10 +882,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "tri3")
 		{
-			FEShellElement& el = sd.Element(ns++); pe = &el;
+			assert(psd);
+			FEShellElement& el = psd->Element(ns++); pe = &el;
 			el.SetType(FE_SHELL_TRI);
 			el.m_nID = i+1;
-			el.m_gid = 1;
+			el.m_gid = GID[1];
 			tag.value(n,el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -884,10 +897,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		}
 		else if (tag == "truss2")
 		{
-			FETrussElement& el = td.Element(nt++); pe = &el;
+			assert(ptd);
+			FETrussElement& el = ptd->Element(nt++); pe = &el;
 			el.SetType(FE_TRUSS);
 			el.m_nID = i+1;
-			el.m_gid = 2;
+			el.m_gid = GID[2];
 			tag.value(n, el.Nodes());
 			for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 			nmat = atoi(tag.AttributeValue("mat"))-1;
@@ -906,28 +920,37 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	}
 
 	// assign material point data
-	for (i=0; i<bd.Elements(); ++i)
+	if (pbd)
 	{
-		FESolidElement& el = bd.Element(i);
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-		assert(pmat);
-		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(pmat);
+			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		}
 	}
 
-	for (i=0; i<sd.Elements(); ++i)
+	if (psd)
 	{
-		FEShellElement& el = sd.Element(i);
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-		assert(pmat);
-		for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FEShellElement& el = psd->Element(i);
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(pmat);
+			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		}
 	}
 
-	for (i=0; i<td.Elements(); ++i)
+	if (ptd)
 	{
-		FETrussElement& el = td.Element(i);
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-		assert(pmat);
-		el.SetMaterialPointData(pmat->CreateMaterialPointData(), 0);
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FETrussElement& el = ptd->Element(i);
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(pmat);
+			el.SetMaterialPointData(pmat->CreateMaterialPointData(), 0);
+		}
 	}
 
 	return true;
@@ -987,40 +1010,25 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
-	int nbel = mesh.SolidDomain().Elements();
-	int nsel = mesh.ShellDomain().Elements();
-	int ntel = mesh.TrussDomain().Elements();
+	// get the total nr of elements
+	int nelems = mesh.Elements();
 
 	//make sure we've read the element section
-	int elems = nbel + nsel + ntel;
-	if (elems == 0) throw XMLReader::InvalidTag(tag);
+	if (nelems == 0) throw XMLReader::InvalidTag(tag);
 
 	// create the pelem array
 	vector<FEElement*> pelem;
-	pelem.assign(nbel + nsel + ntel, 0);
+	pelem.assign(nelems, 0);
 
-	FESolidDomain& bd = mesh.SolidDomain();
-	for (i=0; i<nbel; ++i)
+	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		assert(pelem[el.m_nID-1] == 0);
-		pelem[el.m_nID-1] = &el;
-	}
-
-	FEShellDomain& sd = mesh.ShellDomain();
-	for (i=0; i<nsel; ++i)
-	{
-		FEShellElement& el = sd.Element(i);
-		assert(pelem[el.m_nID-1] == 0);
-		pelem[el.m_nID-1] = &el;
-	}
-
-	FETrussDomain& td = mesh.TrussDomain();
-	for (i=0; i<ntel; ++i)
-	{
-		FETrussElement& el = td.Element(i);
-		assert(pelem[el.m_nID-1] == 0);
-		pelem[el.m_nID-1] = &el;
+		FEDomain& d = mesh.Domain(nd);
+		for (i=0; i<d.Elements(); ++i)
+		{
+			FEElement& el = d.ElementRef(i);
+			assert(pelem[el.m_nID-1] == 0);
+			pelem[el.m_nID-1] = &el;
+		}
 	}
 
 	// read additional element data
@@ -1035,7 +1043,7 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 		int n = atoi(szid)-1;
 
 		// make sure the number is valid
-		if ((n<0) || (n>=elems)) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
+		if ((n<0) || (n>=nelems)) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
 
 		// get a pointer to the element
 		FEElement* pe = pelem[n];
