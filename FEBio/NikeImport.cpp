@@ -855,18 +855,19 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	////////////////////// P R E S S U R E   B O U N D A R Y   D E C K //////////////////////
 	if (m_npr > 0)
 	{
-		fem.m_PC.resize(m_npr);
-		fem.m_psurf->create(m_npr);
+		fem.m_psurf = new FEPressureSurface(&fem.m_mesh);
+		FEPressureSurface& ps = *fem.m_psurf;
+		ps.create(m_npr);
 		int n[4], N, j;
 		for (i=0; i<m_npr; ++i)
 		{
 			if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 
 			// create a surface element
-			FESurfaceElement& el = fem.m_psurf->Element(i);
+			FESurfaceElement& el = ps.Element(i);
 
 			// read the card data
-			FEPressureLoad& pc = fem.m_PC[i];
+			FEPressureLoad& pc = ps.PressureLoad(i);
 			double* s = pc.s;
 			pc.face = i;
 

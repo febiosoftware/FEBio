@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEPressureSurface.h"
+#include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
@@ -221,7 +222,8 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 {
 	if (ar.IsSaving())
 	{
-		for (int i=0; i<m_el.size(); ++i)
+		int i;
+		for (i=0; i<m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];
 			ar << el.Type();
@@ -231,11 +233,20 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 			ar << el.m_node;
 			ar << el.m_lnode;
 		}
+
+		// pressure forces
+		for (i=0; i<m_PC.size(); ++i)
+		{
+			FEPressureLoad& pc = m_PC[i];
+			ar << pc.blinear << pc.face << pc.lc;
+			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
+			ar << pc.bc;
+		}
 	}
 	else
 	{
-		int m, mat;
-		for (int i=0; i<m_el.size(); ++i)
+		int i, m, mat;
+		for (i=0; i<m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];
 			ar >> m;
@@ -248,7 +259,94 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 			ar >> el.m_lnode;
 		}
 
+		// pressure forces
+		for (i=0; i<m_PC.size(); ++i)
+		{
+			FEPressureLoad& pc = m_PC[i];
+			ar >> pc.blinear >> pc.face >> pc.lc;
+			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
+			ar >> pc.bc;
+		}
+
 		// initialize surface data
 		Init();
+	}
+}
+
+void FEPressureSurface::StiffnessMatrix(FESolidSolver* psolver)
+{
+	FEM& fem = psolver->m_fem;
+
+	matrix ke;
+
+	int npr = m_PC.size();
+	for (int m=0; m<npr; ++m)
+	{
+		FEPressureLoad& pc = m_PC[m];
+		if (pc.bc == 0)
+		{
+			// get the surface element
+			FESurfaceElement& el = m_el[m];
+
+			// skip rigid surface elements
+			// TODO: do we really need to skip rigid elements?
+			if (!el.IsRigid())
+			{
+				UnpackElement(el);
+
+				// calculate nodal pressures
+				double* pt = el.pt();
+
+				if (!pc.blinear)
+				{
+					double g = fem.GetLoadCurve(pc.lc)->Value();
+
+					for (int j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
+
+					// get the element stiffness matrix
+					int ndof = 3*el.Nodes();
+					ke.Create(ndof, ndof);
+
+					// calculate pressure stiffness
+					PressureStiffness(el, ke);
+
+					// assemble element matrix in global stiffness matrix
+					psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+				}
+			}
+		}
+	}
+}
+
+void FEPressureSurface::Residual(FESolidSolver* psolver, vector<double>& R)
+{
+	FEM& fem = psolver->m_fem;
+
+	vector<double> fe;
+
+	int npr = m_PC.size();
+	for (int i=0; i<npr; ++i)
+	{
+		FEPressureLoad& pc = m_PC[i];
+		if (pc.bc == 0)
+		{
+			FESurfaceElement& el = m_el[i];
+			UnpackElement(el);
+
+			// calculate nodal pressures
+			double* pt = el.pt();
+
+			double g = fem.GetLoadCurve(pc.lc)->Value();
+
+			for (int j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
+
+			int ndof = 3*el.Nodes();
+			fe.resize(ndof);
+
+			if (pc.blinear) LinearPressureForce(el, fe); else PressureForce(el, fe);
+
+			// add element force vector to global force vector
+			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		}
 	}
 }

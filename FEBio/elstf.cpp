@@ -24,7 +24,7 @@ bool FESolidSolver::StiffnessMatrix()
 	matrix ke;
 
 	// nodal degrees of freedom
-	int i, j, I, ndof;
+	int i, j, I;
 
 	// get the mesh
 	FEMesh& mesh = m_fem.m_mesh;
@@ -45,45 +45,9 @@ bool FESolidSolver::StiffnessMatrix()
 	}
 
 	// calculate pressure stiffness term
-	if (m_fem.m_pStep->m_istiffpr != 0) 
+	if (m_fem.m_psurf && (m_fem.m_pStep->m_istiffpr != 0))
 	{
-		int npr = m_fem.m_PC.size();
-		for (int m=0; m<npr; ++m)
-		{
-			FEPressureLoad& pc = m_fem.m_PC[m];
-			if (pc.bc == 0)
-			{
-				// get the surface element
-				FESurfaceElement& el = m_fem.m_psurf->Element(m);
-
-				// skip rigid surface elements
-				// TODO: do we really need to skip rigid elements?
-				if (!el.IsRigid())
-				{
-					m_fem.m_psurf->UnpackElement(el);
-
-					// calculate nodal pressures
-					double* pt = el.pt();
-
-					if (!pc.blinear)
-					{
-						double g = m_fem.GetLoadCurve(pc.lc)->Value();
-
-						for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
-
-						// get the element stiffness matrix
-						ndof = 3*el.Nodes();
-						ke.Create(ndof, ndof);
-
-						// calculate pressure stiffness
-						m_fem.m_psurf->PressureStiffness(el, ke);
-
-						// assemble element matrix in global stiffness matrix
-						AssembleStiffness(el.m_node, el.LM(), ke);
-					}
-				}
-			}
-		}
+		m_fem.m_psurf->StiffnessMatrix(this);
 	}
 
 	// discrete element stiffness
@@ -553,9 +517,8 @@ void FESolidSolver::ContactForces(vector<double>& R)
 
 bool FESolidSolver::Residual(vector<double>& R)
 {
-	int i, j;
+	int i;
 	int neq = m_fem.m_neq;
-	int ndof;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -584,30 +547,9 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 	// calculate forces due to pressure and add them to the residual
 	// loop over surface elements
-	int npr = m_fem.m_PC.size();
-	for (i=0; i<npr; ++i)
+	if (m_fem.m_psurf)
 	{
-		FEPressureLoad& pc = m_fem.m_PC[i];
-		if (pc.bc == 0)
-		{
-			FESurfaceElement& el = m_fem.m_psurf->Element(i);
-			m_fem.m_psurf->UnpackElement(el);
-
-			// calculate nodal pressures
-			double* pt = el.pt();
-
-			double g = m_fem.GetLoadCurve(pc.lc)->Value();
-
-			for (j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
-
-			ndof = 3*el.Nodes();
-			fe.resize(ndof);
-
-			if (pc.blinear) m_fem.m_psurf->LinearPressureForce(el, fe); else m_fem.m_psurf->PressureForce(el, fe);
-
-			// add element force vector to global force vector
-			AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
+		m_fem.m_psurf->Residual(this, R);
 	}
 
 	// rigid joint forces

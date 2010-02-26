@@ -331,9 +331,13 @@ void FEM::SerializeGeometry(Archive &ar)
 		int i, n;
 
 		// surface elements
-		n = m_psurf->Elements();
-		ar << n;
-		m_psurf->Serialize(*this, ar);
+		if (m_psurf)
+		{
+			n = m_psurf->Elements();
+			ar << n;
+			m_psurf->Serialize(*this, ar);
+		}
+		else ar << 0;
 		
 		// rigid bodies
 		ar << m_nreq << m_nrm << m_nrb;
@@ -360,6 +364,7 @@ void FEM::SerializeGeometry(Archive &ar)
 		ar >> n;
 		if (n) 
 		{
+			m_psurf = new FEPressureSurface(&m_mesh);
 			m_psurf->create(n);
 			m_psurf->Serialize(*this, ar);
 		}
@@ -470,15 +475,6 @@ void FEM::SerializeBoundaryData(Archive& ar)
 			ar << fc.bc << fc.lc << fc.node << fc.s;
 		}
 
-		// pressure forces
-		ar << m_PC.size();
-		for (i=0; i<m_PC.size(); ++i)
-		{
-			FEPressureLoad& pc = m_PC[i];
-			ar << pc.blinear << pc.face << pc.lc;
-			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
-			ar << pc.bc;
-		}
 
 		// rigid body displacements
 		ar << m_RDC.size();
@@ -535,17 +531,6 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		{
 			FENodalForce& fc = m_FC[i];
 			ar >> fc.bc >> fc.lc >> fc.node >> fc.s;
-		}
-
-		// pressure forces
-		ar >> n;
-		if (n) m_PC.resize(n);
-		for (i=0; i<n; ++i)
-		{
-			FEPressureLoad& pc = m_PC[i];
-			ar >> pc.blinear >> pc.face >> pc.lc;
-			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
-			ar >> pc.bc;
 		}
 
 		// rigid body displacements

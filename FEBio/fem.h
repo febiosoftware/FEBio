@@ -177,24 +177,6 @@ public:
 	int	rid;	// rigid body number
 };
 
-//-----------------------------------------------------------------------------
-//! This class describes a pressure load on a surface element
-//! bc = 0 for pressure loads
-//! bc = 1 for heat flux
-
-class FEPressureLoad : public FEBoundaryCondition
-{
-public:
-	FEPressureLoad() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; blinear = false; }
-
-public:
-	double	s[4];		// nodal scale factors
-	int		face;		// face number
-	int		lc;			// load curve
-	int		bc;			// degree of freedom
-	bool	blinear;	// linear or not (true is non-follower, false is follower)
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 // STRUCT: FE_BODYFORCE
 // body force data
@@ -438,8 +420,6 @@ public:
 	//{
 		FEMesh	m_mesh;	//!< the FE mesh
 
-		FEPressureSurface*	m_psurf;	//!< surface element array
-
 		// rigid body data
 		int						m_nreq;	//!< start of rigid body equations
 		int						m_nrm;	//!< nr of rigid materials
@@ -480,8 +460,8 @@ public:
 		// concentrated nodal loads data
 		vector<FENodalForce>	m_FC;		//!< concentrated nodal force cards
 
-		// pressure boundary data
-		vector<FEPressureLoad>	m_PC;		//!< pressure boundary cards
+		// pressure BC
+		FEPressureSurface*	m_psurf;	//!< pressure surface domain
 
 		// rigid displacements
 		vector<FERigidBodyDisplacement>	m_RDC;	//!< rigid body displacements

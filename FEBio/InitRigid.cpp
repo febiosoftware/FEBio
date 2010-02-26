@@ -333,18 +333,21 @@ bool FEM::InitRigidBodies()
 
 	// let's find all rigid surface elements
 	// a surface element is rigid when it has no free nodes
-	for (i=0; i<m_PC.size(); ++i)
+	if (m_psurf)
 	{
-		FESurfaceElement& el = m_psurf->Element(i);
-		int N = el.Nodes();
-		el.m_nrigid = 0;
-		for (j=0; j<N; ++j) 
+		for (i=0; i<m_psurf->Elements(); ++i)
 		{
-			FENode& node = m_mesh.Node(el.m_node[j]);
-			if (node.m_rid < 0) 
+			FESurfaceElement& el = m_psurf->Element(i);
+			int N = el.Nodes();
+			el.m_nrigid = 0;
+			for (j=0; j<N; ++j) 
 			{
-				el.m_nrigid = -1;
-				break;
+				FENode& node = m_mesh.Node(el.m_node[j]);
+				if (node.m_rid < 0) 
+				{
+					el.m_nrigid = -1;
+					break;
+				}
 			}
 		}
 	}

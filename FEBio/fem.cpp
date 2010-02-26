@@ -37,8 +37,8 @@ FEM::FEM()
 
 	m_bsymm = true;	// assume symmetric stiffness matrix
 
-	// create the surface for the pressure boundary condition
-	m_psurf = new FEPressureSurface(&m_mesh);
+	//surface for the pressure boundary condition
+	m_psurf = 0;
 
 	// --- Material Data ---
 	// (nothing to initialize yet)
@@ -419,7 +419,10 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 
 	for (i=0; i<m_FC.size(); ++i) if (m_FC[i].GetID() == nid) return &m_FC[i];
 
-	for (i=0; i<m_PC.size(); ++i) if (m_PC[i].GetID() == nid) return &m_PC[i];
+	if (m_psurf)
+	{
+		for (i=0; i<m_psurf->Elements(); ++i) if (m_psurf->PressureLoad(i).GetID() == nid) return &m_psurf->PressureLoad(i);
+	}
 
 	for (i=0; i<m_RDC.size(); ++i) if (m_RDC[i].GetID() == nid) return &m_RDC[i];
 

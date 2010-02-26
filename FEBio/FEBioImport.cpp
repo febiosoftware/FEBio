@@ -1576,8 +1576,9 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 			while (!t.isend()) { npr++; ++t; }
 
 			// allocate pressure data
-			fem.m_PC.resize(npr);
-			fem.m_psurf->create(npr);
+			fem.m_psurf = new FEPressureSurface(&fem.m_mesh);
+			FEPressureSurface& ps = *fem.m_psurf;
+			ps.create(npr);
 
 			// read the pressure data
 			++tag;
@@ -1585,7 +1586,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 			double s;
 			for (int i=0; i<npr; ++i)
 			{
-				FEPressureLoad& pc = fem.m_PC[i];
+				FEPressureLoad& pc = ps.PressureLoad(i);
 				FESurfaceElement& el = fem.m_psurf->Element(i);
 				pc.blinear = blinear;
 
