@@ -9,15 +9,16 @@
 //-----------------------------------------------------------------------------
 void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
-	int i, j;
-
 	FEM& fem = psolver->m_fem;
+
+	// make sure we are in poro-mode
+	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
 
 	// element force vector
 	vector<double> fe;
 
 	int NE = m_Elem.size();
-	for (i=0; i<NE; ++i)
+	for (int i=0; i<NE; ++i)
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];
@@ -30,8 +31,6 @@ void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 
 		// unpack the element
 		UnpackElement(el);
-
-		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
 
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
@@ -48,22 +47,6 @@ void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 
 		// assemble element 'fe'-vector into global R vector
 		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
-
-		// do poro-elastic forces
-		if ((fem.m_pStep->m_nModule == FE_POROELASTIC)&&(dynamic_cast<FEPoroElastic*>(pm)))
-		{
-			// calculate fluid internal work
-			InternalFluidWork(fem, el, fe);
-
-			// add fluid work to global residual
-			int neln = el.Nodes();
-			int *lm = el.LM() ,J;
-			for (j=0; j<neln; ++j)
-			{
-				J = lm[3*neln+j];
-				if (J >= 0) R[J] += fe[j];
-			}
-		}
 	}
 }
 
@@ -167,125 +150,6 @@ void FESolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<double>& fe)
 		}						
 	}
 }
-
-//-----------------------------------------------------------------------------
-//! calculates the internal equivalent nodal forces due to the fluid work
-//! Note that we only use the first n entries in fe, where n is the number
-//! of nodes
-
-bool FESolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<double>& fe)
-{
-	int i, n;
-
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-
-	// jacobian
-	double Ji[3][3], detJ, J0i[3][3];
-
-	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
-
-	vec3d* vt = el.vt();
-	double* pn = el.pt();
-
-	// Bp-matrix
-	vector<double[3]> B(neln);
-
-	// gauss-weights
-	double* wg = el.GaussWeights();
-
-	FEMesh& mesh = fem.m_mesh;
-	
-	vec3d rp[8];
-	for (i=0; i<neln; ++i) 
-	{
-		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-	}
-
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	// get the element's material
-	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (fem.GetMaterial(el.GetMatID()));
-	if (pm == 0)
-	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
-
-	fe.zero();
-
-	// get the time step value
-	double dt = fem.m_pStep->m_dt;
-
-	// loop over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
-
-		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
-
-		// we need to calculate the divergence of v. To do this we use
-		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		el.invjac0(J0i, n);
-		
-		// next we calculate the deformation gradient
-		mat3d Fp;
-		Fp.zero();
-		
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
-
-		H = el.H(n);
-
-		for (i=0; i<neln; ++i)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-
-			GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
-			GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
-			GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
-			
-			Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
-			Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
-			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
-			
-			// calculate Bp matrix
-			B[i][0] = Gx;
-			B[i][1] = Gy;
-			B[i][2] = Gz;
-		}
-
-		// next we get the determinant
-		double Jp = Fp.det();
-		double J = ept.J;
-		
-		// and then finally
-		double divv = ((J-Jp)/dt)/J;
-
-		// get the flux
-		vec3d& w = pt.m_w;
-
-		// update force vector
-		for (i=0; i<neln; ++i)
-		{
-			fe[i] -= dt*(B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - divv*H[i])*detJ*wg[n];
-		}
-	}
-
-	return true;
-}
-
 
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
@@ -448,6 +312,8 @@ void FESolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 
 void FESolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
+	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
+
 	int i, i3, j, j3, n;
 
 	// Get the current element's data
@@ -478,10 +344,7 @@ void FESolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	// see if this is a poroelastic material
 	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
-	bool bporo = false;
-	if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pmat))) bporo = true;
 
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -503,14 +366,6 @@ void FESolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 //		pt.J = el.detF(n);
 		pt.avgJ = el.m_eJ;
 		pt.avgp = el.m_ep;
-
-		if (bporo)
-		{
-			FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-			// evaluate fluid pressure at gauss-point
-			pt.m_p = el.Evaluate(el.pt(), n);
-		}
 
 		// get the 'D' matrix
 		tens4ds C = pmat->Tangent(mp);
@@ -607,6 +462,9 @@ void FESolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
 	FEM& fem = psolver->m_fem;
 
+	// make sure we are in poro-mode
+	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
+
 	// element stiffness matrix
 	matrix ke;
 
@@ -621,58 +479,19 @@ void FESolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 		UnpackElement(el);
 
-		// get the elements material
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.Create(ndof, ndof);
+		ke.zero();
 
-		// skip rigid elements and poro-elastic elements
-		if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
-		{
-			// create the element's stiffness matrix
-			int ndof = 3*el.Nodes();
-			ke.Create(ndof, ndof);
-			ke.zero();
+		// calculate the element stiffness matrix
+		ElementStiffness(fem, el, ke);
 
-			// calculate the element stiffness matrix
-			ElementStiffness(fem, el, ke);
+		// add the inertial stiffness for dynamics
+		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
 
-			// add the inertial stiffness for dynamics
-			if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
-
-			// assemble element matrix in global stiffness matrix
-			psolver->AssembleStiffness(el.m_node, el.LM(), ke);
-		}
-		else if (dynamic_cast<FEPoroElastic*>(pmat))
-		{
-			// allocate stiffness matrix
-			int neln = el.Nodes();
-			int ndof = neln*4;
-			ke.Create(ndof, ndof);
-		
-			// calculate the element stiffness matrix
-			ElementPoroStiffness(fem, el, ke);
-
-			// TODO: the problem here is that the LM array that is returned by the UnpackElement
-			// function does not give the equation numbers in the right order. For this reason we
-			// have to create a new lm array and place the equation numbers in the right order.
-			// What we really ought to do is fix the UnpackElement function so that it returns
-			// the LM vector in the right order for poroelastic elements.
-			vector<int> lm(ndof);
-			for (int i=0; i<neln; ++i)
-			{
-				lm[4*i  ] = el.LM()[3*i];
-				lm[4*i+1] = el.LM()[3*i+1];
-				lm[4*i+2] = el.LM()[3*i+2];
-				lm[4*i+3] = el.LM()[3*neln+i];
-			}
-				
-			// assemble element matrix in global stiffness matrix
-			psolver->AssembleStiffness(el.m_node, lm, ke);
-		}
-
-		if (fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
-		{
-			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*iel/ NE);
-		}
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
 	}
 }
 
@@ -762,256 +581,14 @@ void FESolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el, matri
 
 }
 
-
-//-----------------------------------------------------------------------------
-//! calculates element stiffness matrix for element iel
-
-bool FESolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matrix& ke)
-{
-	int i, j, n;
-
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-
-	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
-
-	// jacobian
-	double Ji[3][3], detJ, J0i[3][3];
-
-	// Bp-matrix
-	vector<double[3]> B(neln);
-	double tmp;
-
-	// permeability tensor
-	double k[3][3];
-
-	// zero stiffness matrix
-	ke.zero();
-
-	// calculate solid stiffness matrix
-	int ndof = 3*el.Nodes();
-	matrix ks(ndof, ndof); ks.zero();
-	ElementStiffness(fem, el, ks);
-
-	// copy solid stiffness matrix into ke
-	for (i=0; i<neln; ++i)
-		for (j=0; j<neln; ++j)
-		{
-			ke[4*i  ][4*j] = ks[3*i  ][3*j  ]; ke[4*i  ][4*j+1] = ks[3*i  ][3*j+1]; ke[4*i  ][4*j+2] = ks[3*i  ][3*j+2];
-			ke[4*i+1][4*j] = ks[3*i+1][3*j  ]; ke[4*i+1][4*j+1] = ks[3*i+1][3*j+1]; ke[4*i+1][4*j+2] = ks[3*i+1][3*j+2];
-			ke[4*i+2][4*j] = ks[3*i+2][3*j  ]; ke[4*i+2][4*j+1] = ks[3*i+2][3*j+1]; ke[4*i+2][4*j+2] = ks[3*i+2][3*j+2];
-		}
-
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	// get the element's material
-	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (fem.GetMaterial(el.GetMatID()));
-	if (pm == 0)
-	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
-
-	// if we use the symmetric version of the poro-implementation
-	// we have to multiply some stiffness terms with the time step
-	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.m_pStep->m_dt;
-
-	FEMesh& mesh = fem.m_mesh;
-
-	// gauss-weights
-	double* gw = el.GaussWeights();
-
-	vec3d rp[8], v[8];
-	for (i=0; i<neln; ++i) 
-	{
-		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		v[i] = mesh.Node(el.m_node[i]).m_vt;
-	}
-
-	// we'll need this later
-	const int T[3][3] = {{0, 3, 5}, {3, 1, 4}, {5, 4, 2}};
-
-	// loop over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
-		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
-
-		Gr = el.Gr(n);
-		Gs = el.Gs(n);
-		Gt = el.Gt(n);
-
-		H = el.H(n);
-
-		for (i=0; i<neln; ++i)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-
-			// calculate Bp matrix
-			B[i][0] = Gx;
-			B[i][1] = Gy;
-			B[i][2] = Gz;
-		}
-
-		// get the permeability tensor
-		pm->Permeability(k, mp);
-
-		// calculate the Q = Bt*k*B matrix
-		for (i=0; i<neln; ++i)
-			for (j=0; j<neln; ++j)
-			{
-				tmp = dt*detJ*gw[n];
-				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][0]+B[i][1]*k[1][0]+B[i][2]*k[2][0])*B[j][0];
-				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][1]+B[i][1]*k[1][1]+B[i][2]*k[2][1])*B[j][1];
-				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][2]+B[i][1]*k[1][2]+B[i][2]*k[2][2])*B[j][2];
-			}
-
-		// calculate the G-matrix
-		for (i=0; i<neln; ++i)
-			for (j=0; j<neln; ++j)
-			{
-				tmp = detJ*gw[n]*H[j];
-				ke[4*i  ][4*j+3] -= tmp*B[i][0];
-				ke[4*i+1][4*j+3] -= tmp*B[i][1];
-				ke[4*i+2][4*j+3] -= tmp*B[i][2];
-			}
-
-		if (bsymm)
-		{
-			for (i=0; i<neln; ++i)
-				for (j=0; j<neln; ++j)
-				{
-					tmp = detJ*gw[n]*H[j];
-					ke[4*j+3][4*i  ] -= tmp*B[i][0];
-					ke[4*j+3][4*i+1] -= tmp*B[i][1];
-					ke[4*j+3][4*i+2] -= tmp*B[i][2];
-				}
-		}
-		else
-		{
-			// we need to calculate the divergence of v. To do this we use
-			// the formula div(v) = 1/J*dJdt, where J = det(F)
-			el.invjac0(J0i, n);
-
-			// next we calculate the deformation gradient
-			mat3d Fp, gradv;
-			Fp.zero();
-			gradv.zero();
-
-			for (i=0; i<neln; ++i)
-			{
-				// calculate global gradient of shape functions
-				// note that we need the transposed of Ji, not Ji itself !
-				Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-				Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-				Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-
-				GX = J0i[0][0]*Gr[i]+J0i[1][0]*Gs[i]+J0i[2][0]*Gt[i];
-				GY = J0i[0][1]*Gr[i]+J0i[1][1]*Gs[i]+J0i[2][1]*Gt[i];
-				GZ = J0i[0][2]*Gr[i]+J0i[1][2]*Gs[i]+J0i[2][2]*Gt[i];
-
-				Fp[0][0] += rp[i].x*GX; Fp[1][0] += rp[i].y*GX; Fp[2][0] += rp[i].z*GX;
-				Fp[0][1] += rp[i].x*GY; Fp[1][1] += rp[i].y*GY; Fp[2][1] += rp[i].z*GY;
-				Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
-
-				gradv[0][0] += v[i].x*Gx; gradv[1][0] += v[i].y*Gx; gradv[2][0] += v[i].z*Gx;
-				gradv[0][1] += v[i].x*Gy; gradv[1][1] += v[i].y*Gy; gradv[2][1] += v[i].z*Gy;
-				gradv[0][2] += v[i].x*Gz; gradv[1][2] += v[i].y*Gz; gradv[2][2] += v[i].z*Gz;
-			}
-
-			// next we get the determinant
-			double Jp = Fp.det();
-			double J = pt.J;
-
-			// and then finally
-			double divv = ((J-Jp)/dt)/J;
-
-			for (i=0; i<neln; ++i)
-				for (j=0; j<neln; ++j)
-				{
-					tmp = dt*detJ*gw[n]*H[i];
-					ke[4*i+3][4*j  ] -= tmp*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
-					ke[4*i+3][4*j+1] -= tmp*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
-					ke[4*i+3][4*j+2] -= tmp*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
-				}
-
-			FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
-			vec3d Dp = pt.m_gradp;
-
-			tens4ds K = pm->Tangent_Permeability(mp);
-			double D[6][6]; K.extract(D);
-			double BKB[3][3];
-			for (i=0; i<neln; ++i)
-				for (j=0; j<neln; ++j)
-				{
-					// The multiplication BKB has been expanded since it was observed
-					// that this creates a significant boost in speed
-					{
-						BKB[0][0]  = B[i][0]*(B[j][0]*D[T[0][0]][T[0][0]] + B[j][1]*D[T[0][0]][T[0][1]] + B[j][2]*D[T[0][0]][T[0][2]]); 
-						BKB[0][0] += B[i][1]*(B[j][0]*D[T[1][0]][T[0][0]] + B[j][1]*D[T[1][0]][T[0][1]] + B[j][2]*D[T[1][0]][T[0][2]]); 
-						BKB[0][0] += B[i][2]*(B[j][0]*D[T[2][0]][T[0][0]] + B[j][1]*D[T[2][0]][T[0][1]] + B[j][2]*D[T[2][0]][T[0][2]]); 
-
-						BKB[0][1]  = B[i][0]*(B[j][0]*D[T[0][0]][T[1][0]] + B[j][1]*D[T[0][0]][T[1][1]] + B[j][2]*D[T[0][0]][T[1][2]]);
-						BKB[0][1] += B[i][1]*(B[j][0]*D[T[1][0]][T[1][0]] + B[j][1]*D[T[1][0]][T[1][1]] + B[j][2]*D[T[1][0]][T[1][2]]);
-						BKB[0][1] += B[i][2]*(B[j][0]*D[T[2][0]][T[1][0]] + B[j][1]*D[T[2][0]][T[1][1]] + B[j][2]*D[T[2][0]][T[1][2]]);
-
-						BKB[0][2]  = B[i][0]*(B[j][0]*D[T[0][0]][T[2][0]] + B[j][1]*D[T[0][0]][T[2][1]] + B[j][2]*D[T[0][0]][T[2][2]]);
-						BKB[0][2] += B[i][1]*(B[j][0]*D[T[1][0]][T[2][0]] + B[j][1]*D[T[1][0]][T[2][1]] + B[j][2]*D[T[1][0]][T[2][2]]);
-						BKB[0][2] += B[i][2]*(B[j][0]*D[T[2][0]][T[2][0]] + B[j][1]*D[T[2][0]][T[2][1]] + B[j][2]*D[T[2][0]][T[2][2]]);
-
-						BKB[1][0]  = B[i][0]*(B[j][0]*D[T[0][1]][T[0][0]] + B[j][1]*D[T[0][1]][T[0][1]] + B[j][2]*D[T[0][1]][T[0][2]]);
-						BKB[1][0] += B[i][1]*(B[j][0]*D[T[1][1]][T[0][0]] + B[j][1]*D[T[1][1]][T[0][1]] + B[j][2]*D[T[1][1]][T[0][2]]);
-						BKB[1][0] += B[i][2]*(B[j][0]*D[T[2][1]][T[0][0]] + B[j][1]*D[T[2][1]][T[0][1]] + B[j][2]*D[T[2][1]][T[0][2]]);
-
-						BKB[1][1]  = B[i][0]*(B[j][0]*D[T[0][1]][T[1][0]] + B[j][1]*D[T[0][1]][T[1][1]] + B[j][2]*D[T[0][1]][T[1][2]]);
-						BKB[1][1] += B[i][1]*(B[j][0]*D[T[1][1]][T[1][0]] + B[j][1]*D[T[1][1]][T[1][1]] + B[j][2]*D[T[1][1]][T[1][2]]);
-						BKB[1][1] += B[i][2]*(B[j][0]*D[T[2][1]][T[1][0]] + B[j][1]*D[T[2][1]][T[1][1]] + B[j][2]*D[T[2][1]][T[1][2]]);
-
-						BKB[1][2]  = B[i][0]*(B[j][0]*D[T[0][1]][T[2][0]] + B[j][1]*D[T[0][1]][T[2][1]] + B[j][2]*D[T[0][1]][T[2][2]]);
-						BKB[1][2] += B[i][1]*(B[j][0]*D[T[1][1]][T[2][0]] + B[j][1]*D[T[1][1]][T[2][1]] + B[j][2]*D[T[1][1]][T[2][2]]);
-						BKB[1][2] += B[i][2]*(B[j][0]*D[T[2][1]][T[2][0]] + B[j][1]*D[T[2][1]][T[2][1]] + B[j][2]*D[T[2][1]][T[2][2]]);
-
-						BKB[2][0]  = B[i][0]*(B[j][0]*D[T[0][2]][T[0][0]] + B[j][1]*D[T[0][2]][T[0][1]] + B[j][2]*D[T[0][2]][T[0][2]]);
-						BKB[2][0] += B[i][1]*(B[j][0]*D[T[1][2]][T[0][0]] + B[j][1]*D[T[1][2]][T[0][1]] + B[j][2]*D[T[1][2]][T[0][2]]);
-						BKB[2][0] += B[i][2]*(B[j][0]*D[T[2][2]][T[0][0]] + B[j][1]*D[T[2][2]][T[0][1]] + B[j][2]*D[T[2][2]][T[0][2]]);
-
-						BKB[2][1]  = B[i][0]*(B[j][0]*D[T[0][2]][T[1][0]] + B[j][1]*D[T[0][2]][T[1][1]] + B[j][2]*D[T[0][2]][T[1][2]]); 
-						BKB[2][1] += B[i][1]*(B[j][0]*D[T[1][2]][T[1][0]] + B[j][1]*D[T[1][2]][T[1][1]] + B[j][2]*D[T[1][2]][T[1][2]]); 
-						BKB[2][1] += B[i][2]*(B[j][0]*D[T[2][2]][T[1][0]] + B[j][1]*D[T[2][2]][T[1][1]] + B[j][2]*D[T[2][2]][T[1][2]]); 
-
-						BKB[2][2]  = B[i][0]*(B[j][0]*D[T[0][2]][T[2][0]] + B[j][1]*D[T[0][2]][T[2][1]] + B[j][2]*D[T[0][2]][T[2][2]]);
-						BKB[2][2] += B[i][1]*(B[j][0]*D[T[1][2]][T[2][0]] + B[j][1]*D[T[1][2]][T[2][1]] + B[j][2]*D[T[1][2]][T[2][2]]);
-						BKB[2][2] += B[i][2]*(B[j][0]*D[T[2][2]][T[2][0]] + B[j][1]*D[T[2][2]][T[2][1]] + B[j][2]*D[T[2][2]][T[2][2]]);
-					}
-
-					tmp = dt*detJ*gw[n];
-					ke[4*i+3][4*j  ] -= tmp*( BKB[0][0]*Dp.x + BKB[0][1]*Dp.y + BKB[0][2]*Dp.z);
-					ke[4*i+3][4*j+1] -= tmp*( BKB[1][0]*Dp.x + BKB[1][1]*Dp.y + BKB[1][2]*Dp.z);
-					ke[4*i+3][4*j+2] -= tmp*( BKB[2][0]*Dp.x + BKB[2][1]*Dp.y + BKB[2][2]*Dp.z);
-				}
-		}
-	}
-
-	return true;
-}
-
 //-----------------------------------------------------------------------------
 void FESolidDomain::UpdateStresses(FEM &fem)
 {
 	int i, n;
 	int nint;
 	double* gw;
+
+	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
 
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -1036,10 +613,6 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 
 		// extract the elastic component
 		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-
-		// see if we are dealing with a poroelastic material or not
-		bool bporo = false;
-		if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
 
 		// see if the material is incompressible or not
 		// if the material is incompressible the element
@@ -1083,18 +656,6 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 			pt.avgJ = el.m_eJ;
 			pt.avgp = el.m_ep;
 
-			// poroelasticity data
-			if (bporo)
-			{
-				FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-				// evaluate fluid pressure at gauss-point
-				pt.m_p = el.Evaluate(el.pt(), n);
-
-				// calculate the gradient of p at gauss-point
-				pt.m_gradp = el.gradient(el.pt(), n);
-			}
-
 			// calculate the stress at this material point
 			pt.s = pm->Stress(mp);
 
@@ -1103,15 +664,6 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 				// the micro-material screws up the currently unpacked elements
 				// so I have to unpack the element data again
 				UnpackElement(el);
-			}
-
-			if (bporo)
-			{
-				FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-				// for poroelastic materials also update the fluid flux
-				FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);
-				pt.m_w = pmat->Flux(mp);
 			}
 		}
 	}

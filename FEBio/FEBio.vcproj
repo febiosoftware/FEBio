@@ -792,6 +792,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\porosolid.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\quasin.cpp"
 				>
 			</File>

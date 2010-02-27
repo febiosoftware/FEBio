@@ -133,21 +133,46 @@ protected:
 	//! calculates the solid element inertial stiffness matrix
 	void ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
-	//! calculates the element biphasic stiffness matrix
-	bool ElementPoroStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-
 	// --- R E S I D U A L ---
 
 	//! Calculatess external body forces for solid elements
 	void BodyForces(FEM& fem, FESolidElement& elem, vector<double>& fe);
 
-	//! Calculates the internal fluid forces
-	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
-
 	// ---
 
 protected:
 	vector<FESolidElement>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+//! domain class for poro-elastic 3D solid elements
+class FEPoroSolidDomain : public FESolidDomain
+{
+public:
+	//! constructor
+	FEPoroSolidDomain(FEMesh* pm) : FESolidDomain(pm) {}
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolidSolver* psolver);
+
+	//! calculates the residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+	// update stresses
+	void UpdateStresses(FEM& fem);
+
+protected:
+	//! Calculates the internal fluid forces
+	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
+
+	//! calculates the element biphasic stiffness matrix
+	bool ElementPoroStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! calculates the solid element stiffness matrix
+	void SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! material stiffness component
+	void PoroMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 };
 
 //-----------------------------------------------------------------------------

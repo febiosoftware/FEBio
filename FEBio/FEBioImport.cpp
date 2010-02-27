@@ -16,6 +16,7 @@
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
+#include "FEPoroElastic.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -798,19 +799,26 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	int nmat;
 	int nbel = 0, nsel = 0, ntel = 0;
 	int nrbe = 0, nrse = 0;
-	int nudg = 0;
+	int nudg = 0, npse = 0;
 	while (!t.isend())
 	{
 		// get the material ID
 		nmat = atoi(t.AttributeValue("mat"))-1;
 
 		// get material class
-		FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(nmat));
+		FEMaterial* pmat = fem.GetMaterial(nmat);
+		FERigid* prigid = dynamic_cast<FERigid*>(pmat);
+		FEPoroElastic* pporo = dynamic_cast<FEPoroElastic*>(pmat);
 
-		if (pm)
+		if (prigid)
 		{
 			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++nrbe;
 			else if ((t == "quad4") || (t == "tri3")) ++nrse;
+			else throw XMLReader::InvalidTag(t);
+		}
+		else if (pporo)
+		{
+			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++npse;
 			else throw XMLReader::InvalidTag(t);
 		}
 		else
@@ -835,6 +843,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	FERigidSolidDomain* prb = (nrbe ? new FERigidSolidDomain(&mesh) : 0);
 	FERigidShellDomain* prs = (nrse ? new FERigidShellDomain(&mesh) : 0);
 	FEUDGHexDomain* pud = (nudg ? new FEUDGHexDomain(&mesh) : 0);
+	FEPoroSolidDomain* pps = (npse ? new FEPoroSolidDomain(&mesh) : 0);
 
 	// add domains to mesh
 	if (pbd) { pbd->create(nbel); mesh.AddDomain(pbd); }
@@ -843,20 +852,22 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	if (prb) { prb->create(nrbe); mesh.AddDomain(prb); }
 	if (prs) { prs->create(nrse); mesh.AddDomain(prs); }
 	if (pud) { pud->create(nudg); mesh.AddDomain(pud); }
+	if (pps) { pps->create(npse); mesh.AddDomain(pps); }
 
-	int GID[6], nc=0;
+	int GID[7], nc=0;
 	if (pbd) GID[0] = nc++; else GID[0] = -1;
 	if (psd) GID[1] = nc++; else GID[1] = -1;
 	if (ptd) GID[2] = nc++; else GID[2] = -1;
 	if (prb) GID[3] = nc++; else GID[3] = -1;
 	if (prs) GID[4] = nc++; else GID[4] = -1;
 	if (pud) GID[5] = nc++; else GID[5] = -1;
+	if (pps) GID[6] = nc++; else GID[6] = -1;
 
 	// read element data
 	++tag;
 	int n[8];
-	int elems = nbel + nsel + ntel + nrbe + nrse + nudg;
-	int nb = 0, ns = 0, nt = 0, nrb = 0, nrs = 0, nud = 0;
+	int elems = nbel + nsel + ntel + nrbe + nrse + nudg + npse;
+	int nb = 0, ns = 0, nt = 0, nrb = 0, nrs = 0, nud = 0, npe = 0;
 	FEElement* pe;
 	for (i=0; i<elems; ++i)
 	{
@@ -867,9 +878,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		if ((nmat<0) || (nmat >= fem.Materials())) throw InvalidMaterial(i+1);
 
 		// get the material class
-		FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(nmat));
+		FEMaterial* pmat = fem.GetMaterial(nmat);
+		FERigid* prigid = dynamic_cast<FERigid*>(pmat);
+		FEPoroElastic* pporo = dynamic_cast<FEPoroElastic*>(pmat);
 
-		if (pm)
+		if (prigid)
 		{
 			if (tag == "hex8")
 			{
@@ -933,6 +946,42 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 				el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = 0.0;
 			}
 			else throw XMLReader::InvalidTag(tag);
+		}
+		else if (pporo)
+		{
+			if (tag == "hex8")
+			{
+				assert(pps);
+				FESolidElement& el = pps->Element(npe++); pe = &el;
+				el.SetType(FE_HEX);
+				el.m_nID = i+1;
+				el.m_gid = GID[6];
+				tag.value(n,el.Nodes());
+				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+				el.SetMatID(nmat);
+			}
+			else if (tag == "penta6")
+			{
+				assert(pps);
+				FESolidElement& el = prb->Element(npe++); pe = &el;
+				el.SetType(FE_PENTA);
+				el.m_nID = i+1;
+				el.m_gid = GID[6];
+				tag.value(n,el.Nodes());
+				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+				el.SetMatID(nmat);
+			}
+			else if (tag == "tet4")
+			{
+				assert(pps);
+				FESolidElement& el = prb->Element(npe++); pe = &el;
+				el.SetType(FE_TET);
+				el.m_nID = i+1;
+				el.m_gid = GID[6];
+				tag.value(n,el.Nodes());
+				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+				el.SetMatID(nmat);
+			}
 		}
 		else
 		{
@@ -1038,6 +1087,17 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		for (i=0; i<pbd->Elements(); ++i)
 		{
 			FESolidElement& el = pbd->Element(i);
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(pmat);
+			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+		}
+	}
+
+	if (pps)
+	{
+		for (i=0; i<pps->Elements(); ++i)
+		{
+			FESolidElement& el = pps->Element(i);
 			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
 			assert(pmat);
 			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
