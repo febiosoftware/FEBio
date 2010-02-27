@@ -790,7 +790,7 @@ bool FEFEBioImport::ParseNodeSection(XMLTag& tag)
 bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
-	int i, j;
+	int i;
 
 	FEMesh& mesh = fem.m_mesh;
 
@@ -807,22 +807,23 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 		// get material class
 		FEMaterial* pmat = fem.GetMaterial(nmat);
-		FERigid* prigid = dynamic_cast<FERigid*>(pmat);
-		FEPoroElastic* pporo = dynamic_cast<FEPoroElastic*>(pmat);
 
-		if (prigid)
+		if (dynamic_cast<FERigid*>(pmat))
 		{
+			// rigid elements
 			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++nrbe;
 			else if ((t == "quad4") || (t == "tri3")) ++nrse;
 			else throw XMLReader::InvalidTag(t);
 		}
-		else if (pporo)
+		else if (dynamic_cast<FEPoroElastic*>(pmat))
 		{
+			// poro-elastic elements
 			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++npse;
 			else throw XMLReader::InvalidTag(t);
 		}
 		else
 		{
+			// structural elements
 			if (t == "hex8")
 			{
 				if (fem.m_nhex8 == FE_UDGHEX) ++nudg; else ++nbel;
@@ -865,10 +866,8 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 	// read element data
 	++tag;
-	int n[8];
 	int elems = nbel + nsel + ntel + nrbe + nrse + nudg + npse;
 	int nb = 0, ns = 0, nt = 0, nrb = 0, nrs = 0, nud = 0, npe = 0;
-	FEElement* pe;
 	for (i=0; i<elems; ++i)
 	{
 		// get the material ID
@@ -879,202 +878,103 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 		// get the material class
 		FEMaterial* pmat = fem.GetMaterial(nmat);
-		FERigid* prigid = dynamic_cast<FERigid*>(pmat);
-		FEPoroElastic* pporo = dynamic_cast<FEPoroElastic*>(pmat);
 
-		if (prigid)
-		{
-			if (tag == "hex8")
-			{
-				assert(prb);
-				FESolidElement& el = prb->Element(nrb++); pe = &el;
-				el.SetType(FE_HEX);
-				el.m_nID = i+1;
-				el.m_gid = GID[3];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-			else if (tag == "penta6")
-			{
-				assert(prb);
-				FESolidElement& el = prb->Element(nrb++); pe = &el;
-				el.SetType(FE_PENTA);
-				el.m_nID = i+1;
-				el.m_gid = GID[3];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-			else if (tag == "tet4")
-			{
-				assert(prb);
-				FESolidElement& el = prb->Element(nrb++); pe = &el;
-				el.SetType(FE_TET);
-				el.m_nID = i+1;
-				el.m_gid = GID[3];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-			else if (tag == "quad4")
-			{
-				assert(prs);
-				FEShellElement& el = prs->Element(nrs++); pe = &el;
-				el.SetType(FE_SHELL_QUAD);
-				el.m_nID = i+1;
-				el.m_gid = GID[1];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
+		// determine element class
+		int eclass = EC_STRUCT;
+		if      (dynamic_cast<FERigid*>      (pmat)) eclass = EC_RIGID;
+		else if (dynamic_cast<FEPoroElastic*>(pmat)) eclass = EC_PORO;
 
-				// thickness are read in the ElementData section
-				el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = el.m_h0[3] = 0.0;
-			}
-			else if (tag == "tri3")
-			{
-				assert(psd);
-				FEShellElement& el = psd->Element(ns++); pe = &el;
-				el.SetType(FE_SHELL_TRI);
-				el.m_nID = i+1;
-				el.m_gid = GID[1];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
+		// determine element type
+		int etype = -1;
+		if      (tag == "hex8"  ) etype = ET_HEX8;
+		else if (tag == "penta6") etype = ET_PENTA6;
+		else if (tag == "tet4"  ) etype = ET_TET4;
+		else if (tag == "quad4" ) etype = ET_QUAD4;
+		else if (tag == "tri3"  ) etype = ET_TRI3;
+		else if (tag == "truss2") etype = ET_TRUSS2;
+		else throw XMLReader::InvalidTag(tag);
 
-				// thickness are read in the ElementData section
-				el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = 0.0;
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-		else if (pporo)
+		switch (eclass)
 		{
-			if (tag == "hex8")
+		case EC_STRUCT: // --- structural elements ---
+			switch (etype)
 			{
-				assert(pps);
-				FESolidElement& el = pps->Element(npe++); pe = &el;
-				el.SetType(FE_HEX);
-				el.m_nID = i+1;
-				el.m_gid = GID[6];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-			else if (tag == "penta6")
-			{
-				assert(pps);
-				FESolidElement& el = prb->Element(npe++); pe = &el;
-				el.SetType(FE_PENTA);
-				el.m_nID = i+1;
-				el.m_gid = GID[6];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-			else if (tag == "tet4")
-			{
-				assert(pps);
-				FESolidElement& el = prb->Element(npe++); pe = &el;
-				el.SetType(FE_TET);
-				el.m_nID = i+1;
-				el.m_gid = GID[6];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-		}
-		else
-		{
-			if (tag == "hex8")
-			{
+			case ET_HEX8:
 				if ((fem.m_nhex8 == FE_HEX) || (fem.m_nhex8 == FE_RIHEX))
 				{
 					assert(pbd);
-					FESolidElement& el = pbd->Element(nb++); pe = &el;
-					el.SetType(fem.m_nhex8);
-					el.m_nID = i+1;
-					el.m_gid = GID[0];
-					tag.value(n,el.Nodes());
-					for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-					el.SetMatID(nmat);
+					ReadSolidElement(tag, pbd->Element(nb++), fem.m_nhex8, i+1, GID[0], nmat);
 				}
 				else if (fem.m_nhex8 == FE_UDGHEX)
 				{
 					assert(pud);
-					FESolidElement& el = pud->Element(nud++); pe = &el;
-					el.SetType(fem.m_nhex8);
-					el.m_nID = i+1;
-					el.m_gid = GID[5];
-					tag.value(n,el.Nodes());
-					for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-					el.SetMatID(nmat);
+					ReadSolidElement(tag, pud->Element(nud++), fem.m_nhex8, i+1, GID[5], nmat);
 				}
-			}
-			else if (tag == "penta6")
-			{
+				break;
+			case ET_PENTA6:
 				assert(pbd);
-				FESolidElement& el = pbd->Element(nb++); pe = &el;
-				el.SetType(FE_PENTA);
-				el.m_nID = i+1;
-				el.m_gid = GID[0];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-			else if (tag == "tet4")
-			{
+				ReadSolidElement(tag, pbd->Element(nb++), FE_PENTA, i+1, GID[0], nmat);
+				break;
+			case ET_TET4:
 				assert(pbd);
-				FESolidElement& el = pbd->Element(nb++); pe = &el;
-				el.SetType(FE_TET);
-				el.m_nID = i+1;
-				el.m_gid = GID[0];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-			}
-			else if (tag == "quad4")
-			{
+				ReadSolidElement(tag, pbd->Element(nb++), FE_TET, i+1, GID[0], nmat);
+				break;
+			case ET_QUAD4:
 				assert(psd);
-				FEShellElement& el = psd->Element(ns++); pe = &el;
-				el.SetType(FE_SHELL_QUAD);
-				el.m_nID = i+1;
-				el.m_gid = GID[1];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-
-				// thickness are read in the ElementData section
-				el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = el.m_h0[3] = 0.0;
-			}
-			else if (tag == "tri3")
-			{
+				ReadShellElement(tag, psd->Element(ns++), FE_SHELL_QUAD, i+1, GID[1], nmat);
+				break;
+			case ET_TRI3:
 				assert(psd);
-				FEShellElement& el = psd->Element(ns++); pe = &el;
-				el.SetType(FE_SHELL_TRI);
-				el.m_nID = i+1;
-				el.m_gid = GID[1];
-				tag.value(n,el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-
-				// thickness are read in the ElementData section
-				el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = 0.0;
-			}
-			else if (tag == "truss2")
-			{
+				ReadShellElement(tag, psd->Element(ns++), FE_SHELL_TRI, i+1, GID[1], nmat);
+				break;
+			case ET_TRUSS2:
 				assert(ptd);
-				FETrussElement& el = ptd->Element(nt++); pe = &el;
-				el.SetType(FE_TRUSS);
-				el.m_nID = i+1;
-				el.m_gid = GID[2];
-				tag.value(n, el.Nodes());
-				for (j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
-				el.SetMatID(nmat);
-
-				// area is read in the ElementData section
-				el.m_a0 = 0;
+				ReadTrussElement(tag, ptd->Element(nt++), FE_TRUSS, i+1, GID[2], nmat);
+				break;
 			}
-			else throw XMLReader::InvalidTag(tag);
+			break;
+		case EC_RIGID: // --- rigid elements ---
+			switch (etype)
+			{
+			case ET_HEX8:
+				assert(prb);
+				ReadSolidElement(tag, prb->Element(nrb++), FE_HEX, i+1, GID[3], nmat);
+				break;
+			case ET_PENTA6:
+				assert(prb);
+				ReadSolidElement(tag, prb->Element(nrb++), FE_PENTA, i+1, GID[3], nmat);
+				break;
+			case ET_TET4:
+				assert(prb);
+				ReadSolidElement(tag, prb->Element(nrb++), FE_TET, i+1, GID[3], nmat);
+				break;
+			case ET_QUAD4:
+				assert(prs);
+				ReadShellElement(tag, prs->Element(nrs++), FE_SHELL_QUAD, i+1, GID[4], nmat);
+				break;
+			case ET_TRI3:
+				assert(prs);
+				ReadShellElement(tag, prs->Element(nrs++), FE_SHELL_TRI, i+1, GID[4], nmat);
+				break;
+			}
+			break;
+		case EC_PORO: // --- poro elastic elements ---
+			switch (etype)
+			{
+			case ET_HEX8:
+				assert(pps);
+				ReadSolidElement(tag, pps->Element(npe++), FE_HEX, i+1, GID[6], nmat);
+				break;
+			case ET_PENTA6:
+				assert(pps);
+				ReadSolidElement(tag, pps->Element(npe++), FE_PENTA, i+1, GID[6], nmat);
+				break;
+			case ET_TET4:
+				assert(pps);
+				ReadSolidElement(tag, pps->Element(npe++), FE_TET, i+1, GID[6], nmat);
+				break;
+			}
+			break;
 		}
 
 		// go to next tag
@@ -1082,84 +982,61 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	}
 
 	// assign material point data
-	if (pbd)
+	for (i=0; i<mesh.Domains(); ++i)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
+		FEDomain& d = mesh.Domain(i);
+		for (int j=0; j<d.Elements(); ++j)
 		{
-			FESolidElement& el = pbd->Element(i);
+			FEElement& el = d.ElementRef(j);
 			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
 			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-		}
-	}
-
-	if (pps)
-	{
-		for (i=0; i<pps->Elements(); ++i)
-		{
-			FESolidElement& el = pps->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-		}
-	}
-
-	if (pud)
-	{
-		for (i=0; i<pud->Elements(); ++i)
-		{
-			FESolidElement& el = pud->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-		}
-	}
-
-	if (psd)
-	{
-		for (i=0; i<psd->Elements(); ++i)
-		{
-			FEShellElement& el = psd->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-		}
-	}
-
-	if (ptd)
-	{
-		for (i=0; i<ptd->Elements(); ++i)
-		{
-			FETrussElement& el = ptd->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			el.SetMaterialPointData(pmat->CreateMaterialPointData(), 0);
-		}
-	}
-
-	if (prb)
-	{
-		for (i=0; i<prb->Elements(); ++i)
-		{
-			FESolidElement& el = prb->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-		}
-	}
-
-	if (prs)
-	{
-		for (i=0; i<prs->Elements(); ++i)
-		{
-			FEShellElement& el = prs->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
+			for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
 		}
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype, int nid, int gid, int nmat)
+{
+	el.SetType(ntype);
+	el.m_nID = nid;
+	el.m_gid = gid;
+	int n[8];
+	tag.value(n,el.Nodes());
+	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+	el.SetMatID(nmat);
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype, int nid, int gid, int nmat)
+{
+	el.SetType(ntype);
+	el.m_nID = nid;
+	el.m_gid = gid;
+	int n[8];
+	tag.value(n,el.Nodes());
+	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+	el.SetMatID(nmat);
+
+	// thickness are read in the ElementData section
+	el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = el.m_h0[3] = 0.0;
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ReadTrussElement(XMLTag &tag, FETrussElement& el, int ntype, int nid, int gid, int nmat)
+{
+	el.SetType(ntype);
+	el.m_nID = nid;
+	el.m_gid = gid;
+	int n[8];
+	tag.value(n, el.Nodes());
+	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+	el.SetMatID(nmat);
+
+	// area is read in the ElementData section
+	el.m_a0 = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -90,6 +90,9 @@ public:
 		return false;
 	}
 */
+
+	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
+
 protected:
 	// pointer to element traits
 	FEElementTraits*	m_pT;
@@ -105,6 +108,10 @@ public:
 	int	m_nID;				//!< element ID
 
 	int	m_gid;	// part ID (i.e. index of domain this element belongs to)
+
+	//! \todo the element state data will be removed from the element
+	//! class in future versions of FEBio.
+	vector<FEMaterialPoint*>	m_State;	//!< vector of state variables
 };
 
 //-----------------------------------------------------------------------------
@@ -328,16 +335,10 @@ public:
 		m_Lk = 0;
 	}
 
-	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
-
 public:
 	double	m_eJ;	//!< average dilatation
 	double	m_ep;	//!< average pressure
 	double	m_Lk;	//!< Lagrangian multiplier for incompressibility
-
-	//! \todo the element state data will be removed from the element
-	//! class in future versions of FEBio.
-	vector<FEMaterialPoint*>	m_State;	//!< vector of state variables
 };
 
 //-----------------------------------------------------------------------------
@@ -708,16 +709,12 @@ public:
 		return V;
 	}
 
-	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
-
 public:
 	double	m_eJ;	//!< average dilatation
 	double	m_ep;	//!< average pressure
 	double	m_Lk;	//!< Lagrangian multiplier for incompressibility
 
 	vector<double>	m_h0;	//!< initial shell thicknesses
-
-	vector<FEMaterialPoint*>	m_State;
 };
 
 //-----------------------------------------------------------------------------
@@ -822,12 +819,8 @@ public:
 		m_State.assign(1, 0);
 	}
 
-	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
-
 public:
 	double	m_a0;	// cross-sectional area
-
-	vector<FEMaterialPoint*>	m_State;
 };
 
 #endif // !defined(AFX_FEELEMENT_H__2EE38101_58E2_4FEB_B214_BB71B6FB15FB__INCLUDED_)
