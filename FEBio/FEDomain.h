@@ -152,6 +152,13 @@ public:
 	//! constructor
 	FEPoroSolidDomain(FEMesh* pm) : FESolidDomain(pm) {}
 
+	FEDomain* Clone()
+	{
+		FEPoroSolidDomain* pd = new FEPoroSolidDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
+
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolidSolver* psolver);
 
@@ -184,6 +191,13 @@ public:
 	//! constructor
 	FERigidSolidDomain(FEMesh* pm) : FESolidDomain(pm){}
 
+	FEDomain* Clone()
+	{
+		FERigidSolidDomain* pd = new FERigidSolidDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
+
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolidSolver* psolver);
 
@@ -202,9 +216,15 @@ public:
 	//! constructor
 	FEUDGHexDomain(FEMesh* pm) : FESolidDomain(pm){}
 
+	FEDomain* Clone()
+	{
+		FEUDGHexDomain* pd = new FEUDGHexDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
+
 	//! calculates the residual
 	void Residual(FESolidSolver* psolver, vector<double>& R);
-
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolidSolver* psolver);
@@ -315,6 +335,13 @@ class FERigidShellDomain : public FEShellDomain
 public:
 	//! constructor
 	FERigidShellDomain(FEMesh* pm) : FEShellDomain(pm){}
+
+	FEDomain* Clone()
+	{
+		FERigidShellDomain* pd = new FERigidShellDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolidSolver* psolver);

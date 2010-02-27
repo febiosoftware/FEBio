@@ -827,7 +827,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			{
 				if (fem.m_nhex8 == FE_UDGHEX) ++nudg; else ++nbel;
 			}
-			else if ((t == "penta6") || (t == "tet4")) ++nrbe;
+			else if ((t == "penta6") || (t == "tet4")) ++nbel;
 			else if ((t == "quad4") || (t == "tri3")) ++nsel;
 			else if ((t == "truss2")) ++ntel;
 			else throw XMLReader::InvalidTag(t);
