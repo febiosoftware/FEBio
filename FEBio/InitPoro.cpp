@@ -60,7 +60,7 @@ bool FEM::InitPoro()
 	// step 1. mark all poro-elastic nodes
 	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -77,7 +77,7 @@ bool FEM::InitPoro()
 			}
 		}
 
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -98,7 +98,7 @@ bool FEM::InitPoro()
 	// step 2. fix pressure dofs of all unmarked nodes
 	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -115,7 +115,7 @@ bool FEM::InitPoro()
 			}
 		}
 
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -136,7 +136,7 @@ bool FEM::InitPoro()
 	// step 3. free all marked dofs
 	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -154,7 +154,7 @@ bool FEM::InitPoro()
 		}
 
 
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)

@@ -848,9 +848,9 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	}
 
 	// create domains
-	FESolidDomain* pbd = (nbel>0 ? new FESolidDomain(&mesh) : 0);
-	FEShellDomain* psd = (nsel>0 ? new FEShellDomain(&mesh) : 0);
-	FETrussDomain* ptd = (ntel>0 ? new FETrussDomain(&mesh) : 0);
+	FEElasticSolidDomain* pbd = (nbel>0 ? new FEElasticSolidDomain(&mesh) : 0);
+	FEElasticShellDomain* psd = (nsel>0 ? new FEElasticShellDomain(&mesh) : 0);
+	FEElasticTrussDomain* ptd = (ntel>0 ? new FEElasticTrussDomain(&mesh) : 0);
 	FERigidSolidDomain* prb = (nrbe ? new FERigidSolidDomain(&mesh) : 0);
 	FERigidShellDomain* prs = (nrse ? new FERigidShellDomain(&mesh) : 0);
 	FEUDGHexDomain* pud = (nudg ? new FEUDGHexDomain(&mesh) : 0);

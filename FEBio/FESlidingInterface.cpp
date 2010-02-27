@@ -93,7 +93,7 @@ void FESlidingSurface::Init()
 	tag.zero();
 	for (int nd=0; nd<m.Domains(); ++nd)
 	{
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)

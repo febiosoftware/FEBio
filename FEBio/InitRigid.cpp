@@ -43,7 +43,7 @@ bool FEM::InitRigidBodies()
 	// This number is preliminary since rigid materials can be merged
 	for (nd = 0; nd < m_mesh.Domains(); ++nd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -64,7 +64,7 @@ bool FEM::InitRigidBodies()
 			}
 		}
 
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -95,7 +95,7 @@ bool FEM::InitRigidBodies()
 		bdone = true;
 		for (nd=0; nd<m_mesh.Domains(); ++nd)
 		{
-			FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 			if (pbd)
 			{
 				for (i=0; i<pbd->Elements(); ++i)
@@ -117,7 +117,7 @@ bool FEM::InitRigidBodies()
 				}
 			}
 
-			FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 			if (psd)
 			{
 				for (i=0; i<psd->Elements(); ++i)
@@ -160,7 +160,7 @@ bool FEM::InitRigidBodies()
 	// assign rigid body index to rigid elements
 	for (nd=0; nd<m_mesh.Domains(); ++nd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m_mesh.Domain(nd));
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -174,7 +174,7 @@ bool FEM::InitRigidBodies()
 			}
 		}
 
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -289,7 +289,7 @@ bool FEM::InitRigidBodies()
 	for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_bshell = false;
 	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m_mesh.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)

@@ -51,7 +51,7 @@ void FERigidBody::Update()
 	// loop over all elements
 	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (int iel=0; iel<pbd->Elements(); ++iel)

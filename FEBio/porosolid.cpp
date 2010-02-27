@@ -38,7 +38,7 @@ void FEPoroSolidDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
-		// (This function is inherited from FESolidDomain)
+		// (This function is inherited from FEElasticSolidDomain)
 		InternalForces(el, fe);
 
 		// apply body forces

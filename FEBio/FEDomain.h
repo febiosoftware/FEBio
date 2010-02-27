@@ -74,10 +74,10 @@ protected:
 //-----------------------------------------------------------------------------
 //! domain described by Lagrange-type 3D volumetric elements
 //!
-class FESolidDomain : public FEDomain
+class FEElasticSolidDomain : public FEDomain
 {
 public:
-	FESolidDomain(FEMesh* pm) : FEDomain(pm, FE_SOLID_DOMAIN) {}
+	FEElasticSolidDomain(FEMesh* pm) : FEDomain(pm, FE_SOLID_DOMAIN) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -87,11 +87,11 @@ public:
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
-	FESolidDomain& operator = (FESolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEDomain* Clone()
 	{
-		FESolidDomain* pd = new FESolidDomain(m_pMesh);
+		FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
 		return pd;
 	}
@@ -152,11 +152,11 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! domain class for poro-elastic 3D solid elements
-class FEPoroSolidDomain : public FESolidDomain
+class FEPoroSolidDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEPoroSolidDomain(FEMesh* pm) : FESolidDomain(pm) { m_ntype = FE_PORO_SOLID_DOMAIN; }
+	FEPoroSolidDomain(FEMesh* pm) : FEElasticSolidDomain(pm) { m_ntype = FE_PORO_SOLID_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -191,11 +191,11 @@ protected:
 //-----------------------------------------------------------------------------
 //! domain class for 3D rigid elements
 //!
-class FERigidSolidDomain : public FESolidDomain
+class FERigidSolidDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FERigidSolidDomain(FEMesh* pm) : FESolidDomain(pm) { m_ntype = FE_RIGID_SOLID_DOMAIN; }
+	FERigidSolidDomain(FEMesh* pm) : FEElasticSolidDomain(pm) { m_ntype = FE_RIGID_SOLID_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -216,11 +216,11 @@ public:
 
 //-----------------------------------------------------------------------------
 //! domain class for uniform-deformation-gradient hex elements (UDG)
-class FEUDGHexDomain : public FESolidDomain
+class FEUDGHexDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEUDGHexDomain(FEMesh* pm) : FESolidDomain(pm) { m_ntype = FE_UDGHEX_DOMAIN; }
+	FEUDGHexDomain(FEMesh* pm) : FEElasticSolidDomain(pm) { m_ntype = FE_UDGHEX_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -269,10 +269,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
-class FEShellDomain : public FEDomain
+class FEElasticShellDomain : public FEDomain
 {
 public:
-	FEShellDomain(FEMesh* pm) : FEDomain(pm, FE_SHELL_DOMAIN) {}
+	FEElasticShellDomain(FEMesh* pm) : FEDomain(pm, FE_SHELL_DOMAIN) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -282,11 +282,11 @@ public:
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
-	FEShellDomain& operator = (FEShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEDomain* Clone()
 	{
-		FEShellDomain* pd = new FEShellDomain(m_pMesh);
+		FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
 		return pd;
 	}
@@ -334,11 +334,11 @@ protected:
 //-----------------------------------------------------------------------------
 //! domain class for 3D rigid shell elements
 //!
-class FERigidShellDomain : public FEShellDomain
+class FERigidShellDomain : public FEElasticShellDomain
 {
 public:
 	//! constructor
-	FERigidShellDomain(FEMesh* pm) : FEShellDomain(pm) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
+	FERigidShellDomain(FEMesh* pm) : FEElasticShellDomain(pm) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -359,10 +359,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D truss elements
-class FETrussDomain : public FEDomain
+class FEElasticTrussDomain : public FEDomain
 {
 public:
-	FETrussDomain(FEMesh* pm) : FEDomain(pm, FE_TRUSS_DOMAIN) {}
+	FEElasticTrussDomain(FEMesh* pm) : FEDomain(pm, FE_TRUSS_DOMAIN) {}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -374,12 +374,12 @@ public:
 
 	FEDomain* Clone()
 	{
-		FETrussDomain* pd = new FETrussDomain(m_pMesh);
+		FEElasticTrussDomain* pd = new FEElasticTrussDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
 		return pd;
 	}
 
-	FETrussDomain& operator = (FETrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+	FEElasticTrussDomain& operator = (FEElasticTrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	bool Initialize(FEM& fem) { return true; }
 

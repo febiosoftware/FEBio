@@ -55,7 +55,7 @@ bool FETangentDiagnostic::Init()
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// get the one-and-only solid domain
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// assign the material to the domain
 	bd.SetMatID(0);
@@ -91,7 +91,7 @@ bool FETangentDiagnostic::Run()
 	// solve the problem
 	solve();
 
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
 	FESolidElement& el = bd.Element(0);
@@ -153,7 +153,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	// get the mesh
 	FEMesh& mesh = fem.m_mesh;
 
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
 	FESolidElement& el = bd.Element(0);
@@ -212,7 +212,7 @@ double FETangentDiagnostic::residual(double d)
 	FEMesh& mesh = fem.m_mesh;
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	FESolidElement& el = bd.Element(0);
 	bd.UnpackElement(el);

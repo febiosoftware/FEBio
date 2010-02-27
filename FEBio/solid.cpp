@@ -7,7 +7,7 @@
 #include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
+void FEElasticSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
 	FEM& fem = psolver->m_fem;
 
@@ -53,7 +53,7 @@ void FESolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FESolidDomain::InternalForces(FESolidElement& el, vector<double>& fe)
+void FEElasticSolidDomain::InternalForces(FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -117,7 +117,7 @@ void FESolidDomain::InternalForces(FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FESolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<double>& fe)
+void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	double *H;
@@ -154,7 +154,7 @@ void FESolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
 
-void FESolidDomain::DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke)
+void FEElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke)
 {
 	int i, j, n;
 
@@ -237,7 +237,7 @@ void FESolidDomain::DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for integration point n
 
-void FESolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
 
@@ -310,7 +310,7 @@ void FESolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FESolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
 	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
 
@@ -458,7 +458,7 @@ void FESolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 
 //-----------------------------------------------------------------------------
 
-void FESolidDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
 	FEM& fem = psolver->m_fem;
 
@@ -502,7 +502,7 @@ void FESolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FESolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEElasticSolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
 	// see if the material is incompressible
 	FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
@@ -532,7 +532,7 @@ void FESolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
 
-void FESolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
 	int i, j, n;
 
@@ -582,7 +582,7 @@ void FESolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el, matri
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::UpdateStresses(FEM &fem)
+void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 {
 	int i, n;
 	int nint;
@@ -672,7 +672,7 @@ void FESolidDomain::UpdateStresses(FEM &fem)
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 
-void FESolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
+void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 {
 	int i, n;
 

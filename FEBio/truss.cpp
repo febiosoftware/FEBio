@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 
-void FETrussDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FEElasticTrussDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
 	FEM& fem = psolver->m_fem;
 	matrix ke;
@@ -20,7 +20,7 @@ void FETrussDomain::StiffnessMatrix(FESolidSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FETrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke)
+void FEElasticTrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke)
 {
 	// get the material
 	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(fem.GetMaterial(el.GetMatID()));
@@ -70,7 +70,7 @@ void FETrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke)
 
 //-----------------------------------------------------------------------------
 
-void FETrussDomain::Residual(FESolidSolver* psolver, vector<double>& R)
+void FEElasticTrussDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	// element force vector
 	vector<double> fe;
@@ -85,7 +85,7 @@ void FETrussDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
-void FETrussDomain::InternalForces(FETrussElement& el, vector<double>& fe)
+void FEElasticTrussDomain::InternalForces(FETrussElement& el, vector<double>& fe)
 {
 	FEMaterialPoint& mp = *el.m_State[0];
 	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
@@ -114,7 +114,7 @@ void FETrussDomain::InternalForces(FETrussElement& el, vector<double>& fe)
 
 //-----------------------------------------------------------------------------
 
-void FETrussDomain::UpdateStresses(FEM &fem)
+void FEElasticTrussDomain::UpdateStresses(FEM &fem)
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{

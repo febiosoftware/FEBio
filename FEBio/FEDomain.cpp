@@ -20,18 +20,18 @@ FEElement* FEDomain::FindElementFromID(int nid)
 
 
 //-----------------------------------------------------------------------------
-// FESolidDomain
+// FEElasticSolidDomain
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::Reset()
+void FEElasticSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 }
 
 //-----------------------------------------------------------------------------
 
-bool FESolidDomain::Initialize(FEM &fem)
+bool FEElasticSolidDomain::Initialize(FEM &fem)
 {
 	bool bmerr = false;
 
@@ -100,7 +100,7 @@ bool FESolidDomain::Initialize(FEM &fem)
 
 //-----------------------------------------------------------------------------
 
-void FESolidDomain::InitElements()
+void FEElasticSolidDomain::InitElements()
 {
 	int i, j, n;
 	for (i=0; i<m_Elem.size(); ++i)
@@ -112,7 +112,7 @@ void FESolidDomain::InitElements()
 }
 
 //-----------------------------------------------------------------------------
-void FESolidDomain::Serialize(FEM& fem, Archive &ar)
+void FEElasticSolidDomain::Serialize(FEM& fem, Archive &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -163,17 +163,17 @@ void FESolidDomain::Serialize(FEM& fem, Archive &ar)
 }
 
 //-----------------------------------------------------------------------------
-// FEShellDomain
+// FEElasticShellDomain
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-void FEShellDomain::Reset()
+void FEElasticShellDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 }
 
 //-----------------------------------------------------------------------------
-bool FEShellDomain::Initialize(FEM& fem)
+bool FEElasticShellDomain::Initialize(FEM& fem)
 {
 	bool bmerr = false;
 
@@ -227,7 +227,7 @@ bool FEShellDomain::Initialize(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEShellDomain::Serialize(FEM& fem, Archive &ar)
+void FEElasticShellDomain::Serialize(FEM& fem, Archive &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -283,7 +283,7 @@ void FEShellDomain::Serialize(FEM& fem, Archive &ar)
 
 //-----------------------------------------------------------------------------
 
-void FEShellDomain::InitElements()
+void FEElasticShellDomain::InitElements()
 {
 	int i, j, n;
 	for (i=0; i<m_Elem.size(); ++i)
@@ -295,17 +295,17 @@ void FEShellDomain::InitElements()
 }
 
 //-----------------------------------------------------------------------------
-// FETrussDomain
+// FEElasticTrussDomain
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-void FETrussDomain::Reset()
+void FEElasticTrussDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 }
 //-----------------------------------------------------------------------------
 
-void FETrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
+void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 {
 	int i, n;
 
@@ -371,7 +371,7 @@ void FETrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 //-----------------------------------------------------------------------------
 
-void FETrussDomain::InitElements()
+void FEElasticTrussDomain::InitElements()
 {
 	for (int i=0; i<m_Elem.size(); ++i)
 	{

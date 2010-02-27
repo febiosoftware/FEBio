@@ -6,7 +6,7 @@
 
 //-----------------------------------------------------------------------------
 
-void FEShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
+void FEElasticShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	FEM& fem = psolver->m_fem;
 
@@ -48,7 +48,7 @@ void FEShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 //! Note that we use a one-point gauss integration rule for the thickness
 //! integration. This will integrate linear functions exactly.
 
-void FEShellDomain::InternalForces(FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomain::InternalForces(FEShellElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -135,7 +135,7 @@ void FEShellDomain::InternalForces(FEShellElement& el, vector<double>& fe)
 
 //-----------------------------------------------------------------------------
 
-void FEShellDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
 	FEM& fem = psolver->m_fem;
 
@@ -181,7 +181,7 @@ void FEShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 //-----------------------------------------------------------------------------
 //! Calculates the shell element stiffness matrix
 
-void FEShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke)
+void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke)
 {
 	int i, i6, j, j6, n;
 
@@ -468,7 +468,7 @@ void FEShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates body forces for shells
 
-void FEShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe)
 {
 	// get the element's material
 	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
@@ -516,7 +516,7 @@ void FEShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
 
-void FEShellDomain::DilatationalStiffness(FEM& fem, FEShellElement& elem, matrix& ke)
+void FEElasticShellDomain::DilatationalStiffness(FEM& fem, FEShellElement& elem, matrix& ke)
 {
 	int i, j, n;
 
@@ -607,7 +607,7 @@ void FEShellDomain::DilatationalStiffness(FEM& fem, FEShellElement& elem, matrix
 }
 
 //-----------------------------------------------------------------------------
-void FEShellDomain::UpdateStresses(FEM &fem)
+void FEElasticShellDomain::UpdateStresses(FEM &fem)
 {
 	FEMesh& mesh = fem.m_mesh;
 
@@ -706,7 +706,7 @@ void FEShellDomain::UpdateStresses(FEM &fem)
 //! nodes have six degrees of freedom each, where for solids they only
 //! have 3 dofs.
 
-void FEShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
+void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 {
 	int i, n;
 

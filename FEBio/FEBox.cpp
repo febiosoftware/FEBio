@@ -82,7 +82,7 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 	// create the elements
 	int *en;
 	n = 0;
-	FESolidDomain* pbd = new FESolidDomain(this);
+	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(this);
 	pbd->create(elems);
 	AddDomain(pbd);
 	for (i=0; i<nx; ++i)

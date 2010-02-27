@@ -62,7 +62,7 @@ bool FESolidSolver::Augment()
 				for (nd = 0; nd < mesh.Domains(); ++nd)
 				{
 					// do solid elements
-					FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
 					if (pbd)
 					{
 						for (n=0; n<pbd->Elements(); ++n)
@@ -81,7 +81,7 @@ bool FESolidSolver::Augment()
 					}
 
 					// do shell elements
-					FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
+					FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
 					if (psd)
 					{
 						for (n=0; n<psd->Elements(); ++n)
@@ -116,7 +116,7 @@ bool FESolidSolver::Augment()
 					bconv = false;
 					for (nd = 0; nd < mesh.Domains(); ++nd)
 					{
-						FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+						FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
 						if (pbd)
 						{
 							for (n=0; n<pbd->Elements(); ++n)
@@ -131,7 +131,7 @@ bool FESolidSolver::Augment()
 							}
 						}
 	
-						FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
+						FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
 						if (psd)
 						{
 							for (n=0; n<psd->Elements(); ++n)

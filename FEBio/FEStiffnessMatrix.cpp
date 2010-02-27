@@ -147,7 +147,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				// loop over all solid elements
 				for (int nd=0; nd<mesh.Domains(); ++nd)
 				{
-					FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
 					if (pbd)
 					{
 						for (i=0; i<pbd->Elements(); ++i)

@@ -57,7 +57,7 @@ void FEMicroMaterial::PrepRVE()
 
 	// use the E-E list to tag all exterior nodes
 	int fn[4], nf, M = 0;
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
 	for (int i=0; i<bd.Elements(); ++i, ++M)
 	{
 		FESolidElement& el = bd.Element(i);
@@ -205,7 +205,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	double V = 0, ve;
 	int nint, n, i;
 	double* w, J;
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
 	for (i=0; i<bd.Elements(); ++i)
 	{
 		FESolidElement& el = bd.Element(i);
@@ -263,7 +263,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	double D[6][6] = {0};
 
 	// calculate the stiffness matrix
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
 	int NS = bd.Elements(), i, j;
 	for (int n=0; n<NS; ++n)
 	{

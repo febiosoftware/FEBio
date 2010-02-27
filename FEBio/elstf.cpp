@@ -803,7 +803,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	matrix ke;
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (iel=0; iel<pbd->Elements(); ++iel)
