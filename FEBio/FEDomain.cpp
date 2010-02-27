@@ -5,15 +5,23 @@
 #include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
-// FESolidDomain
+// FEDomain
 //-----------------------------------------------------------------------------
-FEElement* FESolidDomain::FindElementFromID(int nid)
+FEElement* FEDomain::FindElementFromID(int nid)
 {
-	for (int i=0; i<m_Elem.size(); ++i)
-		if (m_Elem[i].m_nID == nid) return &m_Elem[i];
+	for (int i=0; i<Elements(); ++i)
+	{
+		FEElement& el = ElementRef(i);
+		if (el.m_nID == nid) return &el;
+	}
 
 	return 0;
 }
+
+
+//-----------------------------------------------------------------------------
+// FESolidDomain
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 void FESolidDomain::Reset()
@@ -157,13 +165,6 @@ void FESolidDomain::Serialize(FEM& fem, Archive &ar)
 //-----------------------------------------------------------------------------
 // FEShellDomain
 //-----------------------------------------------------------------------------
-FEElement* FEShellDomain::FindElementFromID(int nid)
-{
-	for (int i=0; i<m_Elem.size(); ++i)
-		if (m_Elem[i].m_nID == nid) return &m_Elem[i];
-
-	return 0;
-}
 
 //-----------------------------------------------------------------------------
 void FEShellDomain::Reset()
@@ -296,13 +297,6 @@ void FEShellDomain::InitElements()
 //-----------------------------------------------------------------------------
 // FETrussDomain
 //-----------------------------------------------------------------------------
-FEElement* FETrussDomain::FindElementFromID(int nid)
-{
-	for (int i=0; i<m_Elem.size(); ++i)
-		if (m_Elem[i].m_nID == nid) return &m_Elem[i];
-
-	return 0;
-}
 
 //-----------------------------------------------------------------------------
 void FETrussDomain::Reset()
@@ -385,3 +379,7 @@ void FETrussDomain::InitElements()
 		el.m_State[0]->Init(false);
 	}
 }
+
+//-----------------------------------------------------------------------------
+// FEHeatSolidDomain
+//-----------------------------------------------------------------------------

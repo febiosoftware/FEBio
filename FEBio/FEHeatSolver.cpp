@@ -242,183 +242,18 @@ bool FEHeatSolver::ReformStiffness()
 //!
 bool FEHeatSolver::StiffnessMatrix()
 {
-	int i, j, k;
-	vector<int> lm(8);
-
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// zero the stiffness matrix
 	m_pK->Zero();
 
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(mesh.Domain(0));
-	for (i=0; i<bd.Elements(); ++i)
+	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FESolidElement& el = bd.Element(i);
-		bd.UnpackElement(el);
-
-		int ne = el.Nodes();
-
-		// build the element stiffness matrix
-		matrix ke(ne, ne);
-		ConductionStiffness(el, ke);
-
-		// set up the LM matrix
-		vector<int>& elm = el.LM();
-		for (j=0; j<ne; ++j) lm[j] = elm[10*ne + j];
-
-		if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) 
-		{
-			matrix kc(ne, ne);
-			CapacitanceStiffness(el, kc);
-
-			// add capacitance matrix to conduction stiffness
-			ke += kc;
-
-			// subtract from RHS
-			for (j=0; j<ne; ++j)
-			{
-				if (lm[j] >= 0)
-				{
-					double q = 0;
-					for (k=0; k<ne; ++k)
-					{
-						if (lm[k] >= 0) q += kc[j][k]*m_Tp[lm[k]];
-						else if (-lm[k]-2 >= 0) q += kc[j][k]*m_Tp[-lm[k]-2];
-					}
-
-					m_R[lm[j]] += q;
-				}
-			}
-		}
-
-		// assemble into global matrix
-		AssembleStiffness(ke, lm);
+		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(mesh.Domain(nd));
+		bd.StiffnessMatrix(this);
 	}
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! This function calculates the element stiffness matrix for a particular
-//! element.
-//!
-void FEHeatSolver::ConductionStiffness(FESolidElement& el, matrix& ke)
-{
-	int i, j, n;
-
-	int ne = el.Nodes();
-	int ni = el.GaussPoints();
-
-	// global derivatives of shape functions
-	// NOTE: hard-coding of hex elements!
-	// Gx = dH/dx
-	double Gx[8], Gy[8], Gz[8];
-	double Gr, Gs, Gt;
-	double Gi[3], Gj[3];
-	double DB[3];
-
-	// jacobian
-	double Ji[3][3], detJt;
-
-	// weights at gauss points
-	const double *gw = el.GaussWeights();
-
-	// zero stiffness matrix
-	ke.zero();
-
-	// conductivity matrix
-	double D[3][3];
-
-	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*m_fem.GetMaterial(el.GetMatID()));
-
-	// loop over all integration points
-	for (n=0; n<ni; ++n)
-	{
-		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n);
-
-		// evaluate the conductivity
-		mat.Conductivity(D);
-
-		for (i=0; i<ne; ++i)
-		{
-			Gr = el.Gr(n)[i];
-			Gs = el.Gs(n)[i];
-			Gt = el.Gt(n)[i];
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
-			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
-			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
-		}		
-
-		for (i=0; i<ne; ++i)
-		{
-			Gi[0] = Gx[i];
-			Gi[1] = Gy[i];
-			Gi[2] = Gz[i];
-
-			for (j=0; j<ne; ++j)
-			{
-				Gj[0] = Gx[j];
-				Gj[1] = Gy[j];
-				Gj[2] = Gz[j];
-
-				DB[0] = D[0][0]*Gj[0] + D[0][1]*Gj[1] + D[0][2]*Gj[2];
-				DB[1] = D[1][0]*Gj[0] + D[1][1]*Gj[1] + D[1][2]*Gj[2];
-				DB[2] = D[2][0]*Gj[0] + D[2][1]*Gj[1] + D[2][2]*Gj[2];
-
-				ke[i][j] += (Gi[0]*DB[0] + Gi[1]*DB[1] + Gi[2]*DB[2] )*detJt*gw[n];
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEHeatSolver::CapacitanceStiffness(FESolidElement &el, matrix &ke)
-{
-	int i, j, n;
-
-	int ne = el.Nodes();
-	int ni = el.GaussPoints();
-
-	// shape functions
-	// NOTE: hard-coding of hex elements!
-	double* H;
-
-	// jacobian
-	double Ji[3][3], detJt;
-
-	// weights at gauss points
-	const double *gw = el.GaussWeights();
-
-	// zero stiffness matrix
-	ke.zero();
-
-	double dt = m_fem.m_pStep->m_dt;
-
-	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*m_fem.GetMaterial(el.GetMatID()));
-	double alpha = mat.m_c*mat.m_rho / dt;
-
-	// loop over all integration points
-	for (n=0; n<ni; ++n)
-	{
-		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n);
-		H = el.H(n);
-
-		for (i=0; i<ne; ++i)
-		{
-			for (j=0; j<ne; ++j)
-			{
-				ke[i][j] += H[i]*H[j]*alpha*detJt*gw[n];
-			}
-		}
-	}
-
 }
 
 //-----------------------------------------------------------------------------

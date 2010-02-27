@@ -6,11 +6,17 @@
 
 class FEMesh;
 class FESolidSolver;
+class FEHeatSolver;
 
-#define FE_SOLID_DOMAIN		1
-#define FE_SHELL_DOMAIN		2
-#define FE_SURFACE_DOMAIN	3
-#define FE_TRUSS_DOMAIN		4
+#define FE_SOLID_DOMAIN			1
+#define FE_SHELL_DOMAIN			2
+#define FE_SURFACE_DOMAIN		3
+#define FE_TRUSS_DOMAIN			4
+#define FE_RIGID_SOLID_DOMAIN	5
+#define FE_RIGID_SHELL_DOMAIN	6
+#define FE_UDGHEX_DOMAIN		7
+#define FE_PORO_SOLID_DOMAIN	8
+#define FE_HEAT_SOLID_DOMAIN	9
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements
@@ -50,7 +56,7 @@ public:
 	// TODO: this is not the preferred interface but I've added it for now
 	virtual FEElement& ElementRef(int i) = 0;
 
-	virtual FEElement* FindElementFromID(int nid) { return 0; }
+	FEElement* FindElementFromID(int nid);
 
 	virtual void UnpackElement(FEElement& el, unsigned int nflags = FE_UNPACK_ALL) = 0;
 
@@ -150,7 +156,7 @@ class FEPoroSolidDomain : public FESolidDomain
 {
 public:
 	//! constructor
-	FEPoroSolidDomain(FEMesh* pm) : FESolidDomain(pm) {}
+	FEPoroSolidDomain(FEMesh* pm) : FESolidDomain(pm) { m_ntype = FE_PORO_SOLID_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -189,7 +195,7 @@ class FERigidSolidDomain : public FESolidDomain
 {
 public:
 	//! constructor
-	FERigidSolidDomain(FEMesh* pm) : FESolidDomain(pm){}
+	FERigidSolidDomain(FEMesh* pm) : FESolidDomain(pm) { m_ntype = FE_RIGID_SOLID_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -214,7 +220,7 @@ class FEUDGHexDomain : public FESolidDomain
 {
 public:
 	//! constructor
-	FEUDGHexDomain(FEMesh* pm) : FESolidDomain(pm){}
+	FEUDGHexDomain(FEMesh* pm) : FESolidDomain(pm) { m_ntype = FE_UDGHEX_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -285,8 +291,6 @@ public:
 		return pd;
 	}
 
-	FEElement* FindElementFromID(int nid);
-
 	void Reset();
 
 	void InitElements();
@@ -334,7 +338,7 @@ class FERigidShellDomain : public FEShellDomain
 {
 public:
 	//! constructor
-	FERigidShellDomain(FEMesh* pm) : FEShellDomain(pm){}
+	FERigidShellDomain(FEMesh* pm) : FEShellDomain(pm) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
 
 	FEDomain* Clone()
 	{
@@ -377,8 +381,6 @@ public:
 
 	FETrussDomain& operator = (FETrussDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
-	FEElement* FindElementFromID(int nid);
-
 	bool Initialize(FEM& fem) { return true; }
 
 	void Reset();
@@ -405,4 +407,39 @@ public:
 
 protected:
 	vector<FETrussElement>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+//! domain class for 3D heat elements
+class FEHeatSolidDomain : public FEDomain
+{
+public:
+	FEHeatSolidDomain(FEMesh* pm) : FEDomain(pm, FE_HEAT_SOLID_DOMAIN) {}
+
+	void create(int n) { m_Elem.resize(n); }
+	int Elements() { return m_Elem.size(); }
+	FEDomain* Clone()
+	{
+		FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
+	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
+	//! Unpack solid element data
+	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
+
+	void StiffnessMatrix(FEHeatSolver* psolver);
+
+	FESolidElement& Element(int i) { return m_Elem[i]; }
+
+protected:
+	//! calculate the conductive element stiffness matrix
+	void ConductionStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! calculate the capacitance element stiffness matrix
+	void CapacitanceStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+protected:
+	vector<FESolidElement>	m_Elem;
 };

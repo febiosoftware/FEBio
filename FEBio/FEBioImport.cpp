@@ -800,6 +800,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	int nbel = 0, nsel = 0, ntel = 0;
 	int nrbe = 0, nrse = 0;
 	int nudg = 0, npse = 0;
+	int nhbe = 0;
 	while (!t.isend())
 	{
 		// get the material ID
@@ -808,30 +809,39 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		// get material class
 		FEMaterial* pmat = fem.GetMaterial(nmat);
 
-		if (dynamic_cast<FERigid*>(pmat))
+		// get the module
+		if (fem.m_pStep->m_nModule == FE_HEAT)
 		{
-			// rigid elements
-			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++nrbe;
-			else if ((t == "quad4") || (t == "tri3")) ++nrse;
-			else throw XMLReader::InvalidTag(t);
-		}
-		else if (dynamic_cast<FEPoroElastic*>(pmat))
-		{
-			// poro-elastic elements
-			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++npse;
+			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++nhbe;
 			else throw XMLReader::InvalidTag(t);
 		}
 		else
 		{
-			// structural elements
-			if (t == "hex8")
+			if (dynamic_cast<FERigid*>(pmat))
 			{
-				if (fem.m_nhex8 == FE_UDGHEX) ++nudg; else ++nbel;
+				// rigid elements
+				if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++nrbe;
+				else if ((t == "quad4") || (t == "tri3")) ++nrse;
+				else throw XMLReader::InvalidTag(t);
 			}
-			else if ((t == "penta6") || (t == "tet4")) ++nbel;
-			else if ((t == "quad4") || (t == "tri3")) ++nsel;
-			else if ((t == "truss2")) ++ntel;
-			else throw XMLReader::InvalidTag(t);
+			else if (dynamic_cast<FEPoroElastic*>(pmat))
+			{
+				// poro-elastic elements
+				if ((t == "hex8") || (t == "penta6") || (t == "tet4")) ++npse;
+				else throw XMLReader::InvalidTag(t);
+			}
+			else
+			{
+				// structural elements
+				if (t == "hex8")
+				{
+					if (fem.m_nhex8 == FE_UDGHEX) ++nudg; else ++nbel;
+				}
+				else if ((t == "penta6") || (t == "tet4")) ++nbel;
+				else if ((t == "quad4") || (t == "tri3")) ++nsel;
+				else if ((t == "truss2")) ++ntel;
+				else throw XMLReader::InvalidTag(t);
+			}
 		}
 
 		++t;
@@ -845,6 +855,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	FERigidShellDomain* prs = (nrse ? new FERigidShellDomain(&mesh) : 0);
 	FEUDGHexDomain* pud = (nudg ? new FEUDGHexDomain(&mesh) : 0);
 	FEPoroSolidDomain* pps = (npse ? new FEPoroSolidDomain(&mesh) : 0);
+	FEHeatSolidDomain* phb = (nhbe ? new FEHeatSolidDomain(&mesh) : 0);
 
 	// add domains to mesh
 	if (pbd) { pbd->create(nbel); mesh.AddDomain(pbd); }
@@ -854,8 +865,9 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	if (prs) { prs->create(nrse); mesh.AddDomain(prs); }
 	if (pud) { pud->create(nudg); mesh.AddDomain(pud); }
 	if (pps) { pps->create(npse); mesh.AddDomain(pps); }
+	if (phb) { phb->create(nhbe); mesh.AddDomain(phb); }
 
-	int GID[7], nc=0;
+	int GID[8], nc=0;
 	if (pbd) GID[0] = nc++; else GID[0] = -1;
 	if (psd) GID[1] = nc++; else GID[1] = -1;
 	if (ptd) GID[2] = nc++; else GID[2] = -1;
@@ -863,11 +875,12 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	if (prs) GID[4] = nc++; else GID[4] = -1;
 	if (pud) GID[5] = nc++; else GID[5] = -1;
 	if (pps) GID[6] = nc++; else GID[6] = -1;
+	if (phb) GID[7] = nc++; else GID[7] = -1;
 
 	// read element data
 	++tag;
-	int elems = nbel + nsel + ntel + nrbe + nrse + nudg + npse;
-	int nb = 0, ns = 0, nt = 0, nrb = 0, nrs = 0, nud = 0, npe = 0;
+	int elems = nbel + nsel + ntel + nrbe + nrse + nudg + npse + nhbe;
+	int nb = 0, ns = 0, nt = 0, nrb = 0, nrs = 0, nud = 0, npe = 0, nhb = 0;
 	for (i=0; i<elems; ++i)
 	{
 		// get the material ID
@@ -881,8 +894,12 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 		// determine element class
 		int eclass = EC_STRUCT;
-		if      (dynamic_cast<FERigid*>      (pmat)) eclass = EC_RIGID;
-		else if (dynamic_cast<FEPoroElastic*>(pmat)) eclass = EC_PORO;
+		if (fem.m_pStep->m_nModule == FE_HEAT) eclass = EC_HEAT;
+		else
+		{
+			if      (dynamic_cast<FERigid*>      (pmat)) eclass = EC_RIGID;
+			else if (dynamic_cast<FEPoroElastic*>(pmat)) eclass = EC_PORO;
+		}
 
 		// determine element type
 		int etype = -1;
@@ -975,6 +992,22 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 				break;
 			}
 			break;
+		case EC_HEAT: // --- heat elements ---
+			switch (etype)
+			{
+			case ET_HEX8:
+				assert(phb);
+				ReadSolidElement(tag, phb->Element(nhb++), FE_HEX, i+1, GID[7], nmat);
+				break;
+			case ET_PENTA6:
+				assert(phb);
+				ReadSolidElement(tag, phb->Element(nhb++), FE_PENTA, i+1, GID[7], nmat);
+				break;
+			case ET_TET4:
+				assert(phb);
+				ReadSolidElement(tag, phb->Element(nhb++), FE_TET, i+1, GID[7], nmat);
+				break;
+			}
 		}
 
 		// go to next tag

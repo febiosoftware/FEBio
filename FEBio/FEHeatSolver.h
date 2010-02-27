@@ -31,19 +31,14 @@ protected:
 	//! form the stiffness matrix
 	bool ReformStiffness();
 
-	//! calculate the conductive element stiffness matrix
-	void ConductionStiffness(FESolidElement& el, matrix& ke);
-
-	//! calculate the capacitance element stiffness matrix
-	void CapacitanceStiffness(FESolidElement& el, matrix& ke);
-
 	//! update solution
 	void Update();
 
+public:
 	//! assemble element stiffness matrix
 	void AssembleStiffness(matrix& ke, vector<int>& lm);
 
-protected:
+public:
 	vector<double>	m_T;	//!< temperature array
 	vector<double>	m_Tp;	//!< previous temperatures
 	vector<double>	m_R;	//!< residual
