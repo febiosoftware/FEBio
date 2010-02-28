@@ -72,23 +72,40 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-//! domain described by Lagrange-type 3D volumetric elements
-//!
-class FEElasticSolidDomain : public FEDomain
+//! abstract base class for 3D volumetric elements
+class FESolidDomain : public FEDomain
 {
 public:
-	FEElasticSolidDomain(FEMesh* pm) : FEDomain(pm, FE_SOLID_DOMAIN) {}
+	//! constructor
+	FESolidDomain(FEMesh* pm, int ntype) : FEDomain(pm, ntype) {}
 
-	void create(int n) { m_Elem.resize(n); }
+	//! create storage for elements
+	void create(int nsize) { m_Elem.resize(nsize); }
+
+	//! return nr of elements
 	int Elements() { return m_Elem.size(); }
-	FESolidElement& operator [] (int n) { return m_Elem[n]; }
-	
+
+	//! element access
 	FESolidElement& Element(int n) { return m_Elem[n]; }
+	FESolidElement& ElementRef(int n) { return m_Elem[n]; }
 
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
+protected:
+	vector<FESolidElement>	m_Elem;	//!< array of elements
+};
 
+//-----------------------------------------------------------------------------
+//! domain described by Lagrange-type 3D volumetric elements
+//!
+class FEElasticSolidDomain : public FESolidDomain
+{
+public:
+	//! constructor
+	FEElasticSolidDomain(FEMesh* pm) : FESolidDomain(pm, FE_SOLID_DOMAIN) {}
+
+	//! TODO: do I really use this?
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
+	//! create a clone of this class
 	FEDomain* Clone()
 	{
 		FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh);
@@ -96,14 +113,16 @@ public:
 		return pd;
 	}
 
-	FEElement* FindElementFromID(int nid);
-
+	//! initialize class
 	bool Initialize(FEM& fem);
 
+	//! Init elements
 	void InitElements();
 
+	//! reset element data
 	void Reset();
 
+	//! serialize data to archive
 	void Serialize(FEM& fem, Archive& ar);
 
 	//! Unpack solid element data
@@ -145,13 +164,13 @@ protected:
 	void BodyForces(FEM& fem, FESolidElement& elem, vector<double>& fe);
 
 	// ---
-
-protected:
-	vector<FESolidElement>	m_Elem;
 };
 
 //-----------------------------------------------------------------------------
-//! domain class for poro-elastic 3D solid elements
+//! Domain class for poro-elastic 3D solid elements
+//! Note that this class inherits from FEElasticSolidDomain since the poro domain
+//! also needs to calculate elastic stiffness contributions.
+//!
 class FEPoroSolidDomain : public FEElasticSolidDomain
 {
 public:
@@ -268,20 +287,35 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-//! Domain described by 3D shell elements
-class FEElasticShellDomain : public FEDomain
+//! Abstract base class for shell elements
+class FEShellDomain : public FEDomain
 {
 public:
-	FEElasticShellDomain(FEMesh* pm) : FEDomain(pm, FE_SHELL_DOMAIN) {}
+	//! constructor
+	FEShellDomain(FEMesh* pm, int ntype) : FEDomain(pm, ntype) {}
 
-	void create(int n) { m_Elem.resize(n); }
+	//! create storage for elements
+	void create(int nsize) { m_Elem.resize(nsize); }
+
+	//! return nr of elements
 	int Elements() { return m_Elem.size(); }
-	FEShellElement& operator [] (int n) { return m_Elem[n]; }
 
+	//! element access
 	FEShellElement& Element(int n) { return m_Elem[n]; }
-
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
+protected:
+	vector<FEShellElement>	m_Elem;	//!< array of elements
+};
+
+//-----------------------------------------------------------------------------
+//! Domain described by 3D shell elements
+class FEElasticShellDomain : public FEShellDomain
+{
+public:
+	FEElasticShellDomain(FEMesh* pm) : FEShellDomain(pm, FE_SHELL_DOMAIN) {}
+
+	//! TODO: do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEDomain* Clone()
@@ -326,9 +360,6 @@ public:
 
 	//! Calculate extenral body forces for shell elements
 	void BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe);
-
-protected:
-	vector<FEShellElement>	m_Elem;
 };
 
 //-----------------------------------------------------------------------------
@@ -358,19 +389,29 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Domain described by 3D truss elements
-class FEElasticTrussDomain : public FEDomain
+//! Abstract base class for truss elements
+class FETrussDomain : public FEDomain
 {
 public:
-	FEElasticTrussDomain(FEMesh* pm) : FEDomain(pm, FE_TRUSS_DOMAIN) {}
+	FETrussDomain(FEMesh* pm, int ntype) : FEDomain(pm, ntype){}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
-	FETrussElement& operator [] (int n) { return m_Elem[n]; }
 
 	FETrussElement& Element(int i) { return m_Elem[i]; }
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
+protected:
+	vector<FETrussElement>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+//! Domain described by 3D truss elements
+class FEElasticTrussDomain : public FETrussDomain
+{
+public:
+	FEElasticTrussDomain(FEMesh* pm) : FETrussDomain(pm, FE_TRUSS_DOMAIN) {}
 
 	FEDomain* Clone()
 	{
@@ -404,34 +445,26 @@ public:
 
 	//! update the truss stresses
 	void UpdateStresses(FEM& fem);
-
-protected:
-	vector<FETrussElement>	m_Elem;
 };
 
 //-----------------------------------------------------------------------------
 //! domain class for 3D heat elements
-class FEHeatSolidDomain : public FEDomain
+class FEHeatSolidDomain : public FESolidDomain
 {
 public:
-	FEHeatSolidDomain(FEMesh* pm) : FEDomain(pm, FE_HEAT_SOLID_DOMAIN) {}
+	FEHeatSolidDomain(FEMesh* pm) : FESolidDomain(pm, FE_HEAT_SOLID_DOMAIN) {}
 
-	void create(int n) { m_Elem.resize(n); }
-	int Elements() { return m_Elem.size(); }
 	FEDomain* Clone()
 	{
 		FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
 		return pd;
 	}
-	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
 	//! Unpack solid element data
 	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
 
 	void StiffnessMatrix(FEHeatSolver* psolver);
-
-	FESolidElement& Element(int i) { return m_Elem[i]; }
 
 protected:
 	//! calculate the conductive element stiffness matrix
@@ -439,7 +472,4 @@ protected:
 
 	//! calculate the capacitance element stiffness matrix
 	void CapacitanceStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-
-protected:
-	vector<FESolidElement>	m_Elem;
 };

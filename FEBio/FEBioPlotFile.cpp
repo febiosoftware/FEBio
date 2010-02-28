@@ -242,7 +242,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	// corresponds to the nr in the plot file
 	for (nd = 0; nd<m.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -289,7 +289,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	// write shell element data
 	for (nd = 0; nd<m.Domains(); ++nd)
 	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -326,7 +326,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	// write truss element data
 	for (nd = 0; nd < m.Domains(); ++nd)
 	{
-		FEElasticTrussDomain* ptd = dynamic_cast<FEElasticTrussDomain*>(&m.Domain(nd));
+		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&m.Domain(nd));
 		if (ptd)
 		{
 			for (i=0; i<ptd->Elements(); ++i)

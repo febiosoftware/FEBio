@@ -71,7 +71,7 @@ void FEPlotElementStress::Save(FEM& fem, Archive& ar)
 	int nint;
 	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -385,7 +385,7 @@ void FEPlotFluidFlux::Save(FEM &fem, Archive &ar)
 	vec3d ew;
 	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -426,7 +426,7 @@ void FEPlotFiberVector::Save(FEM &fem, Archive &ar)
 
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			int BE = pbd->Elements();

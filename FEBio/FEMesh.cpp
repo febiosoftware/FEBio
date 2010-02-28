@@ -90,7 +90,7 @@ int FEMesh::SolidElements()
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEElasticSolidDomain* pd = dynamic_cast<FEElasticSolidDomain*>(m_Domain[i]);
+		FESolidDomain* pd = dynamic_cast<FESolidDomain*>(m_Domain[i]);
 		if (pd) N += pd->Elements();
 	}
 	return N;
@@ -101,7 +101,7 @@ int FEMesh::ShellElements()
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEElasticShellDomain* pd = dynamic_cast<FEElasticShellDomain*>(m_Domain[i]);
+		FEShellDomain* pd = dynamic_cast<FEShellDomain*>(m_Domain[i]);
 		if (pd) N += pd->Elements();
 	}
 	return N;
@@ -112,7 +112,7 @@ int FEMesh::TrussElements()
 	int N = 0;
 	for (int i=0; i<(int) m_Domain.size(); ++i)
 	{
-		FEElasticTrussDomain* pd = dynamic_cast<FEElasticTrussDomain*>(m_Domain[i]);
+		FETrussDomain* pd = dynamic_cast<FETrussDomain*>(m_Domain[i]);
 		if (pd) N += pd->Elements();
 	}
 	return N;
@@ -266,7 +266,7 @@ bool FEMesh::Init()
 		}
 
 		// initialize shell data
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(m_Domain[nd]);
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(m_Domain[nd]);
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -304,7 +304,7 @@ bool FEMesh::Init()
 
 	for (nd = 0; nd < Domains(); ++nd)
 	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(m_Domain[nd]);
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(m_Domain[nd]);
 		if (psd)
 		{
 			// check the connectivity of the shells
@@ -353,7 +353,7 @@ bool FEMesh::Init()
 	tag.zero();
 	for (nd = 0; nd < Domains(); ++nd)
 	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(m_Domain[nd]);
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(m_Domain[nd]);
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -404,20 +404,20 @@ double FEMesh::ElementVolume(FEElement& el)
 	// get the domain from the domain ID of the element
 	FEDomain* pd = m_Domain[el.m_gid];
 
-	if (dynamic_cast<FEElasticSolidDomain*>(pd))
+	if (dynamic_cast<FESolidDomain*>(pd))
 	{
 		FESolidElement* ph = dynamic_cast<FESolidElement*>(&el);
-		FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(*pd);
+		FESolidDomain& bd = dynamic_cast<FESolidDomain&>(*pd);
 		pd->UnpackElement(*ph);
 		int nint = ph->GaussPoints();
 		double *w = ph->GaussWeights();
 		for (int n=0; n<nint; ++n) V += ph->detJ0(n)*w[n];
 	}
 
-	if (dynamic_cast<FEElasticShellDomain*>(pd))
+	if (dynamic_cast<FEShellDomain*>(pd))
 	{
 		FEShellElement* ps = dynamic_cast<FEShellElement*>(&el);
-		FEElasticShellDomain& sd = dynamic_cast<FEElasticShellDomain&>(*pd);
+		FEShellDomain& sd = dynamic_cast<FEShellDomain&>(*pd);
 		pd->UnpackElement(*ps);
 		int nint = ps->GaussPoints();
 		double *w = ps->GaussWeights();

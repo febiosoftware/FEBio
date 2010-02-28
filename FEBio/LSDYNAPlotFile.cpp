@@ -136,7 +136,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	// corresponds to the nr in the plot file
 	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -184,7 +184,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	// write truss element data
 	for (nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticTrussDomain* ptd = dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd));
+		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&mesh.Domain(nd));
 		if (ptd)
 		{
 			for (i=0; i<ptd->Elements(); ++i)
@@ -206,7 +206,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	// write shell element data
 	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -368,7 +368,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	int nint, neln, nd;
 	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -419,7 +419,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 
 	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticTrussDomain* ptd = dynamic_cast<FEElasticTrussDomain*>(&mesh.Domain(nd));
+		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&mesh.Domain(nd));
 		if (ptd)
 		{
 			for (i=0; i<ptd->Elements(); ++i)
@@ -441,7 +441,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	mat3ds E;
 	for (nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
@@ -587,7 +587,7 @@ void LSDYNAPlotFile::write_fluid_flux()
 	int n;
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -811,7 +811,7 @@ void LSDYNAPlotFile::write_heat_flux()
 	int n;
 	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -1074,7 +1074,7 @@ void LSDYNAPlotFile::write_material_fibers()
 	vec3d r;
 	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
 			for (i=0; i<pbd->Elements(); ++i)
@@ -1096,7 +1096,7 @@ void LSDYNAPlotFile::write_material_fibers()
 			}
 		}
 
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
 		if (psd)
 		{
 			for (i=0; i<psd->Elements(); ++i)
