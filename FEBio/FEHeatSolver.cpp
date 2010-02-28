@@ -250,7 +250,7 @@ bool FEHeatSolver::StiffnessMatrix()
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(mesh.Domain(nd));
-		bd.StiffnessMatrix(this);
+		bd.HeatStiffnessMatrix(this);
 	}
 
 	return true;
