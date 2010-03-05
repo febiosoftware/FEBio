@@ -103,8 +103,8 @@ public:
 
 public:
 	// position 
-//	vec3d	r0;	//!< material position
-//	vec3d	rt;	//!< spatial position
+	vec3d	r0;	//!< material position
+	vec3d	rt;	//!< spatial position
 
 	// deformation data
 	mat3d	F;	//!< deformation gradient

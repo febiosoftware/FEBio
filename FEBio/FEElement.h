@@ -93,6 +93,28 @@ public:
 
 	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
 
+	//! evaluate scalar field at integration point
+	double Evaluate(double* fn, int n)
+	{
+		assert(m_pT->m_pel == this);
+		double* Hn = H(n);
+		double f = 0;
+		const int N = Nodes();
+		for (int i=0; i<N; ++i) f += Hn[i]*fn[i];
+		return f;
+	}
+
+	//! evaluate vector field at integration point
+	vec3d Evaluate(vec3d* vn, int n)
+	{
+		assert(m_pT->m_pel == this);
+		double* Hn = H(n);
+		vec3d v;
+		const int N = Nodes();
+		for (int i=0; i<N; ++i) v += vn[i]*Hn[i];
+		return v;
+	}
+
 protected:
 	// pointer to element traits
 	FEElementTraits*	m_pT;
@@ -282,16 +304,6 @@ public:
 		if (D <= 0) throw NegativeJacobian(m_nID, n, D, this);
 
 		return D;
-	}
-
-	//! evaluate scalar field at integration point
-	double Evaluate(double* fn, int n)
-	{
-		double* Hn = H(n);
-		double f = 0;
-		const int N = Nodes();
-		for (int i=0; i<N; ++i) f += Hn[i]*fn[i];
-		return f;
 	}
 
 	//! evaluate spatial gradient of scalar field at integration point

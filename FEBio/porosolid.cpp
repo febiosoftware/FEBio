@@ -735,6 +735,12 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 			FEMaterialPoint& mp = *el.m_State[n];
 			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
+			// material point coordinates
+			// TODO: I'm not entirly happy with this solution
+			//		 since the material point coordinates are used by most materials.
+			pt.r0 = el.Evaluate(el.r0(), n);
+			pt.rt = el.Evaluate(el.rt(), n);
+
 			// get the deformation gradient and determinant
 			pt.J = el.defgrad(pt.F, n);
 
