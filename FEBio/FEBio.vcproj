@@ -888,6 +888,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ut4.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\XMLReader.cpp"
 				>
 			</File>
@@ -1359,6 +1363,10 @@
 			</File>
 			<File
 				RelativePath=".\Timer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ut4.h"
 				>
 			</File>
 			<File

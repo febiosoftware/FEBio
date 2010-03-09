@@ -17,6 +17,7 @@
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
 #include "FEPoroElastic.h"
+#include "ut4.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,6 +44,9 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	assert(nsteps > 0);
 	m_pStep = &fem.m_Step[nsteps-1];
 	m_nsteps = 0; // reset step section counter
+
+	// default element type for tets
+	m_ntet4 = ET_TET4;
 
 	// get the logfile
 	Logfile& log = GetLogfile();
@@ -271,6 +275,12 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 						if (strcmp(szv, "GAUSS8") == 0) fem.m_nhex8 = FE_HEX;
 						else if (strcmp(szv, "POINT6") == 0) fem.m_nhex8 = FE_RIHEX;
 						else if (strcmp(szv, "UDG") == 0) fem.m_nhex8 = FE_UDGHEX;
+						else throw XMLReader::InvalidValue(tag);
+					}
+					else if (strcmp(sze, "tet4") == 0)
+					{
+						if (strcmp(szv, "GAUSS4") == 0) m_ntet4 = ET_TET4;
+						else if (strcmp(szv, "UT4") == 0) m_ntet4 = ET_UT4;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "elem", sze);
@@ -801,6 +811,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	int nrbe = 0, nrse = 0;
 	int nudg = 0, npse = 0;
 	int nhbe = 0;
+	int nut4 = 0;
 	while (!t.isend())
 	{
 		// get the material ID
@@ -837,7 +848,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 				{
 					if (fem.m_nhex8 == FE_UDGHEX) ++nudg; else ++nbel;
 				}
-				else if ((t == "penta6") || (t == "tet4")) ++nbel;
+				else if (t == "tet4")
+				{
+					if (m_ntet4 == ET_UT4) ++nut4; else ++nbel;
+				}
+				else if (t == "penta6") ++nbel;
 				else if ((t == "quad4") || (t == "tri3")) ++nsel;
 				else if ((t == "truss2")) ++ntel;
 				else throw XMLReader::InvalidTag(t);
@@ -848,14 +863,15 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	}
 
 	// create domains
-	FEElasticSolidDomain* pbd = (nbel>0 ? new FEElasticSolidDomain(&mesh) : 0);
-	FEElasticShellDomain* psd = (nsel>0 ? new FEElasticShellDomain(&mesh) : 0);
-	FEElasticTrussDomain* ptd = (ntel>0 ? new FEElasticTrussDomain(&mesh) : 0);
-	FERigidSolidDomain* prb = (nrbe ? new FERigidSolidDomain(&mesh) : 0);
-	FERigidShellDomain* prs = (nrse ? new FERigidShellDomain(&mesh) : 0);
-	FEUDGHexDomain* pud = (nudg ? new FEUDGHexDomain(&mesh) : 0);
-	FEPoroSolidDomain* pps = (npse ? new FEPoroSolidDomain(&mesh) : 0);
-	FEHeatSolidDomain* phb = (nhbe ? new FEHeatSolidDomain(&mesh) : 0);
+	FEElasticSolidDomain* pbd = (nbel ? new FEElasticSolidDomain(&mesh) : 0);
+	FEElasticShellDomain* psd = (nsel ? new FEElasticShellDomain(&mesh) : 0);
+	FEElasticTrussDomain* ptd = (ntel ? new FEElasticTrussDomain(&mesh) : 0);
+	FERigidSolidDomain*   prb = (nrbe ? new FERigidSolidDomain(&mesh) : 0);
+	FERigidShellDomain*   prs = (nrse ? new FERigidShellDomain(&mesh) : 0);
+	FEUDGHexDomain*       pud = (nudg ? new FEUDGHexDomain(&mesh) : 0);
+	FEUT4Domain*          pt4 = (nut4 ? new FEUT4Domain(&mesh) : 0);
+	FEPoroSolidDomain*    pps = (npse ? new FEPoroSolidDomain(&mesh) : 0);
+	FEHeatSolidDomain*    phb = (nhbe ? new FEHeatSolidDomain(&mesh) : 0);
 
 	// add domains to mesh
 	if (pbd) { pbd->create(nbel); mesh.AddDomain(pbd); }
@@ -864,23 +880,26 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 	if (prb) { prb->create(nrbe); mesh.AddDomain(prb); }
 	if (prs) { prs->create(nrse); mesh.AddDomain(prs); }
 	if (pud) { pud->create(nudg); mesh.AddDomain(pud); }
+	if (pt4) { pt4->create(nut4); mesh.AddDomain(pt4); }
 	if (pps) { pps->create(npse); mesh.AddDomain(pps); }
 	if (phb) { phb->create(nhbe); mesh.AddDomain(phb); }
 
-	int GID[8], nc=0;
+	int GID[9], nc=0;
 	if (pbd) GID[0] = nc++; else GID[0] = -1;
 	if (psd) GID[1] = nc++; else GID[1] = -1;
 	if (ptd) GID[2] = nc++; else GID[2] = -1;
 	if (prb) GID[3] = nc++; else GID[3] = -1;
 	if (prs) GID[4] = nc++; else GID[4] = -1;
 	if (pud) GID[5] = nc++; else GID[5] = -1;
-	if (pps) GID[6] = nc++; else GID[6] = -1;
-	if (phb) GID[7] = nc++; else GID[7] = -1;
+	if (pt4) GID[6] = nc++; else GID[6] = -1;
+	if (pps) GID[7] = nc++; else GID[7] = -1;
+	if (phb) GID[8] = nc++; else GID[8] = -1;
 
 	// read element data
 	++tag;
-	int elems = nbel + nsel + ntel + nrbe + nrse + nudg + npse + nhbe;
+	int elems = nbel + nsel + ntel + nrbe + nrse + nudg + npse + nhbe + nut4;
 	int nb = 0, ns = 0, nt = 0, nrb = 0, nrs = 0, nud = 0, npe = 0, nhb = 0;
+	nut4 = 0;
 	for (i=0; i<elems; ++i)
 	{
 		// get the material ID
@@ -905,7 +924,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		int etype = -1;
 		if      (tag == "hex8"  ) etype = ET_HEX8;
 		else if (tag == "penta6") etype = ET_PENTA6;
-		else if (tag == "tet4"  ) etype = ET_TET4;
+		else if (tag == "tet4"  ) etype = m_ntet4;
 		else if (tag == "quad4" ) etype = ET_QUAD4;
 		else if (tag == "tri3"  ) etype = ET_TRI3;
 		else if (tag == "truss2") etype = ET_TRUSS2;
@@ -935,6 +954,10 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			case ET_TET4:
 				assert(pbd);
 				ReadSolidElement(tag, pbd->Element(nb++), FE_TET, i+1, GID[0], nmat);
+				break;
+			case ET_UT4:
+				assert(pt4);
+				ReadSolidElement(tag, pt4->Element(nb++), FE_TET, i+1, GID[6], nmat);
 				break;
 			case ET_QUAD4:
 				assert(psd);
@@ -980,15 +1003,15 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			{
 			case ET_HEX8:
 				assert(pps);
-				ReadSolidElement(tag, pps->Element(npe++), FE_HEX, i+1, GID[6], nmat);
+				ReadSolidElement(tag, pps->Element(npe++), FE_HEX, i+1, GID[7], nmat);
 				break;
 			case ET_PENTA6:
 				assert(pps);
-				ReadSolidElement(tag, pps->Element(npe++), FE_PENTA, i+1, GID[6], nmat);
+				ReadSolidElement(tag, pps->Element(npe++), FE_PENTA, i+1, GID[7], nmat);
 				break;
 			case ET_TET4:
 				assert(pps);
-				ReadSolidElement(tag, pps->Element(npe++), FE_TET, i+1, GID[6], nmat);
+				ReadSolidElement(tag, pps->Element(npe++), FE_TET, i+1, GID[7], nmat);
 				break;
 			}
 			break;
@@ -997,15 +1020,15 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			{
 			case ET_HEX8:
 				assert(phb);
-				ReadSolidElement(tag, phb->Element(nhb++), FE_HEX, i+1, GID[7], nmat);
+				ReadSolidElement(tag, phb->Element(nhb++), FE_HEX, i+1, GID[8], nmat);
 				break;
 			case ET_PENTA6:
 				assert(phb);
-				ReadSolidElement(tag, phb->Element(nhb++), FE_PENTA, i+1, GID[7], nmat);
+				ReadSolidElement(tag, phb->Element(nhb++), FE_PENTA, i+1, GID[8], nmat);
 				break;
 			case ET_TET4:
 				assert(phb);
-				ReadSolidElement(tag, phb->Element(nhb++), FE_TET, i+1, GID[7], nmat);
+				ReadSolidElement(tag, phb->Element(nhb++), FE_TET, i+1, GID[8], nmat);
 				break;
 			}
 		}

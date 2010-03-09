@@ -11,7 +11,7 @@ void FEElasticSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
 	FEM& fem = psolver->m_fem;
 
-	// make sure we are in poro-mode
+	// make sure we are not in poro-mode
 	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
 
 	// element force vector

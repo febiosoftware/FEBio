@@ -15,8 +15,9 @@ class FEHeatSolver;
 #define FE_RIGID_SOLID_DOMAIN	5
 #define FE_RIGID_SHELL_DOMAIN	6
 #define FE_UDGHEX_DOMAIN		7
-#define FE_PORO_SOLID_DOMAIN	8
-#define FE_HEAT_SOLID_DOMAIN	9
+#define FE_UT4_DOMAIN			8
+#define FE_PORO_SOLID_DOMAIN	9
+#define FE_HEAT_SOLID_DOMAIN	10
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements
