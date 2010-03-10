@@ -2,6 +2,7 @@
 #include "ut4.h"
 #include "FEMesh.h"
 #include "FESolidSolver.h"
+#include "FEMicroMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
@@ -83,20 +84,71 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 	FEElasticSolidDomain::UpdateStresses(fem);
 
 	// next we update the nodal data
-	// first, let's calculate the new nodal volumes
 	int i, NE = Elements();
-	for (i=0; i<(int) m_Node.size(); ++i) m_Node[i].vi = 0;
-	double ve;
+	for (i=0; i<(int) m_Node.size(); ++i) { m_Node[i].vi = 0; m_Node[i].Fi.unit(); }
+	double Ve, ve;
+	mat3d Fe;
 	for (i=0; i<NE; ++i)
 	{
 		FESolidElement& el = m_Elem[i];
 		UnpackElement(el);
 
-		// calculate the current volume
+		// calculate the volume
+		Ve = TetVolume(el.r0());
 		ve = TetVolume(el.rt());
 
+		// calculate the deformation gradient
+		el.defgrad(Fe, 0);
+
 		// now assign one-quart to each node
-		for (int j=0; j<4; ++j) m_Node[ m_tag[el.m_node[j]]].vi += 0.25*ve;
+		for (int j=0; j<4; ++j) 
+		{
+			UT4NODE& n = m_Node[ m_tag[el.m_node[j]]];
+			n.vi += 0.25*ve;
+			n.Fi += Fe*(0.25*Ve / n.Vi);
+		}
+	}
+
+	// let's calculate the stresse
+	// TODO: I need to make sure that the domain has only one material
+	//       assigned to it. For now, we just pick the material of the
+	//		 first element
+	// get the elastic material
+	FEElasticMaterial* pme = fem.GetElasticMaterial(m_Elem[0].GetMatID());
+
+	// create a material point
+	// TODO: this will set the Q variable to a unit-matrix
+	//		 in other words, we loose the material axis orientation
+	FEElasticMaterialPoint pt;
+	pt.Init(true);
+
+	// loop over all the nodes
+	for (i=0; i<m_Node.size(); ++i)
+	{
+		UT4NODE& node = m_Node[i];
+
+		// set the material point data
+		pt.r0 = m_pMesh->Node(node.inode).m_r0;
+		pt.rt = m_pMesh->Node(node.inode).m_rt;
+
+		pt.F = node.Fi;
+		pt.J = node.Vi / node.vi;
+
+		// if the material is incompressible we need to some additional values
+		// since for tets the 3-field formulation is pointless, I really need to
+		// change this.
+		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
+		if (pmi)
+		{
+			// calculate volume ratio
+			pt.avgJ = pt.J;
+
+			// Calculate pressure. 
+			pt.avgp = pmi->Up(pt.J);
+		}
+
+		// calculate the stress
+		node.si = pme->Stress(pt);
 	}
 }
 
@@ -125,7 +177,7 @@ double FEUT4Domain::TetVolume(vec3d* r)
 void FEUT4Domain::Residual(FESolidSolver *psolver, vector<double> &R)
 {
 	// Calculate the nodal contribution
-	NodalResidual(psolver, R);
+//	NodalResidual(psolver, R);
 
 	// Calculate the element contribution
 	ElementResidual(psolver, R);
@@ -135,7 +187,76 @@ void FEUT4Domain::Residual(FESolidSolver *psolver, vector<double> &R)
 //! This function calculates the nodal contribution to the residual
 void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 {
+	// jacobian matrix, inverse jacobian matrix and determinants
+	double Ji[3][3];
 
+	// shape function derivatives
+	double Gx[4], Gy[4], Gz[4];
+
+	// loop over all the elements
+	int i, j;
+	double Ve;
+	vector<int> LM; LM.resize(3);
+	vector<int> en; en.resize(1);
+	vector<double> fe; fe.resize(3);
+	for (int n=0; n<m_Elem.size(); ++n)
+	{
+		FESolidElement& el = m_Elem[n];
+		UnpackElement(el);
+
+		// calculate element volume
+		// TODO: we should store this somewhere instead of recalculating it
+		Ve = TetVolume(el.r0());
+
+		// calculate the jacobian
+		el.invjact(Ji, 0);
+
+		// get the shape function derivatives
+		const double* Gr, *Gs, *Gt;
+		Gr = el.Gr(0);
+		Gs = el.Gs(0);
+		Gt = el.Gt(0);
+
+		for (i=0; i<4; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx[i] = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+			Gy[i] = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+			Gz[i] = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+		}
+
+		// setup the element B-matrix
+		double Be[6][3] = {0};
+		for (j=0; j<4; ++j)
+		{
+			Be[0][0] = Gx[j]; Be[1][1] = Gy[j]; Be[2][2] = Gz[j];
+			Be[3][0] = Gy[j]; Be[3][1] = Gx[j]; 
+			Be[4][1] = Gz[j]; Be[4][2] = Gy[j]; 
+			Be[5][0] = Gz[j]; Be[5][2] = Gx[j];
+
+			LM[0] = el.LM()[3*j  ];
+			LM[1] = el.LM()[3*j+1];
+			LM[2] = el.LM()[3*j+2];
+
+			en[0] = el.m_node[j];
+
+			for (i=0; i<4; ++i)
+			{
+				UT4NODE& node = m_Node[ m_tag[el.m_node[i]] ];
+				mat3ds S = node.si - node.si.dev()*m_alpha;
+				double w = 0.25* Ve*node.vi / node.Vi;
+
+				// calculate nodal force
+				fe[0] = w*(Be[0][0]*S.xx() + Be[1][0]*S.yy() + Be[2][0]*S.zz() + Be[3][0]*S.xy() + Be[4][0]*S.yz() + Be[5][0]*S.xz());
+				fe[1] = w*(Be[0][1]*S.xx() + Be[1][1]*S.yy() + Be[2][1]*S.zz() + Be[3][1]*S.xy() + Be[4][1]*S.yz() + Be[5][1]*S.xz());
+				fe[2] = w*(Be[0][2]*S.xx() + Be[1][2]*S.yy() + Be[2][2]*S.zz() + Be[3][2]*S.xy() + Be[4][2]*S.yz() + Be[5][2]*S.xz());
+
+				// assemble in global residual
+				psolver->AssembleResidual(en, LM, fe, R);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -240,6 +361,293 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 			fe[3*i+2] -= ( Gz*s.zz() +
 				           Gy*s.yz() +
 					       Gx*s.xz() )*detJt;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the stiffness matrix. The stiffness matrix is a sum of the
+//! nodal and element stiffness matrices
+void FEUT4Domain::StiffnessMatrix(FESolidSolver *psolver)
+{
+	// calculate nodal stiffness matrix
+	NodalStiffnessMatrix(psolver);
+
+	// calculate element stiffness matrix
+	ElementalStiffnessMatrix(psolver);
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the nodal contribution to the global stiffness matrix
+void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the element contribution to the global stiffness matrix
+void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
+{
+	FEM& fem = psolver->m_fem;
+
+	// element stiffness matrix
+	matrix ke;
+
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+
+		UnpackElement(el);
+
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.Create(ndof, ndof);
+		ke.zero();
+
+		// calculate the element stiffness matrix
+		ElementStiffness(fem, el, ke);
+
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEUT4Domain::ElementStiffness(FEM &fem, FESolidElement &el, matrix &ke)
+{
+	// TODO: I need to figure out how to deal with incompressible materials
+
+	// calculate material stiffness (i.e. constitutive component)
+	MaterialStiffness(fem, el, ke);
+
+	// calculate geometrical stiffness
+	GeometricalStiffness(el, ke);
+
+	// assign symmetic parts
+	// TODO: Can this be omitted by changing the Assemble routine so that it only
+	// grabs elements from the upper diagonal matrix?
+	int ndof = 3*el.Nodes();
+	int i, j;
+	for (i=0; i<ndof; ++i)
+		for (j=i+1; j<ndof; ++j)
+			ke[j][i] = ke[i][j];
+}
+
+//-----------------------------------------------------------------------------
+//! calculates element's geometrical stiffness component for integration point n
+
+void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
+{
+	int n, i, j;
+
+	double Gx[8], Gy[8], Gz[8];
+	double *Grn, *Gsn, *Gtn;
+	double Gr, Gs, Gt;
+
+	// nr of nodes
+	int neln = el.Nodes();
+
+	// nr of integration points
+	int nint = el.GaussPoints();
+
+	// jacobian
+	double Ji[3][3], detJt;
+
+	// weights at gauss points
+	const double *gw = el.GaussWeights();
+
+	// stiffness component for the initial stress component of stiffness matrix
+	double kab;
+
+	// calculate geometrical element stiffness matrix
+	for (n=0; n<nint; ++n)
+	{
+		// calculate jacobian
+		el.invjact(Ji, n);
+		detJt = el.detJt(n)*gw[n];
+
+		Grn = el.Gr(n);
+		Gsn = el.Gs(n);
+		Gtn = el.Gt(n);
+
+		for (i=0; i<neln; ++i)
+		{
+			Gr = Grn[i];
+			Gs = Gsn[i];
+			Gt = Gtn[i];
+
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
+			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
+			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
+		}
+
+		// get the material point data
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+		// element's Cauchy-stress tensor at gauss point n
+		// s is the voight vector
+		mat3ds s = pt.s;
+
+		// we work with the deviatoric component only
+//		s = s.det()*m_alpha;
+
+		for (i=0; i<neln; ++i)
+			for (j=i; j<neln; ++j)
+			{
+				kab = (Gx[i]*(s.xx()*Gx[j]+s.xy()*Gy[j]+s.xz()*Gz[j]) +
+					   Gy[i]*(s.xy()*Gx[j]+s.yy()*Gy[j]+s.yz()*Gz[j]) + 
+					   Gz[i]*(s.xz()*Gx[j]+s.yz()*Gy[j]+s.zz()*Gz[j]))*detJt;
+
+				ke[3*i  ][3*j  ] += kab;
+				ke[3*i+1][3*j+1] += kab;
+				ke[3*i+2][3*j+2] += kab;
+			}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates element material stiffness element matrix
+
+void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+{
+	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
+
+	int i, i3, j, j3, n;
+
+	// Get the current element's data
+	const int nint = el.GaussPoints();
+	const int neln = el.Nodes();
+	const int ndof = 3*neln;
+
+	// global derivatives of shape functions
+	// NOTE: hard-coding of hex elements!
+	// Gx = dH/dx
+	double Gx[8], Gy[8], Gz[8];
+
+	double Gxi, Gyi, Gzi;
+	double Gxj, Gyj, Gzj;
+
+	// The 'D' matrix
+	double D[6][6] = {0};	// The 'D' matrix
+
+	// The 'D*BL' matrix
+	double DBL[6][3];
+
+	double *Grn, *Gsn, *Gtn;
+	double Gr, Gs, Gt;
+
+	// jacobian
+	double Ji[3][3], detJt;
+	
+	// weights at gauss points
+	const double *gw = el.GaussWeights();
+
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+
+	// calculate element stiffness matrix
+	for (n=0; n<nint; ++n)
+	{
+		// calculate jacobian
+		el.invjact(Ji, n);
+		detJt = el.detJt(n)*gw[n];
+
+		Grn = el.Gr(n);
+		Gsn = el.Gs(n);
+		Gtn = el.Gt(n);
+
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+		// setup the material point
+		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
+//		el.defgrad(pt.F, n);
+//		pt.J = el.detF(n);
+		pt.avgJ = el.m_eJ;
+		pt.avgp = el.m_ep;
+
+		// get the 'D' matrix
+		tens4ds C = pmat->Tangent(mp);
+		C.extract(D);
+
+		// TODO: subtract Cvol
+
+		if (dynamic_cast<FEMicroMaterial*>(pmat))
+		{
+			// the micro-material screws up the currently unpacked elements
+			// so I have to unpack the element data again
+			UnpackElement(el);
+		}
+
+		for (i=0; i<neln; ++i)
+		{
+			Gr = Grn[i];
+			Gs = Gsn[i];
+			Gt = Gtn[i];
+
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx[i] = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
+			Gy[i] = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
+			Gz[i] = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
+		}
+
+		// we only calculate the upper triangular part
+		// since ke is symmetric. The other part is
+		// determined below using this symmetry.
+		for (i=0, i3=0; i<neln; ++i, i3 += 3)
+		{
+			Gxi = Gx[i];
+			Gyi = Gy[i];
+			Gzi = Gz[i];
+
+			for (j=i, j3 = i3; j<neln; ++j, j3 += 3)
+			{
+				Gxj = Gx[j];
+				Gyj = Gy[j];
+				Gzj = Gz[j];
+
+				// calculate D*BL matrices
+				DBL[0][0] = (D[0][0]*Gxj+D[0][3]*Gyj+D[0][5]*Gzj);
+				DBL[0][1] = (D[0][1]*Gyj+D[0][3]*Gxj+D[0][4]*Gzj);
+				DBL[0][2] = (D[0][2]*Gzj+D[0][4]*Gyj+D[0][5]*Gxj);
+
+				DBL[1][0] = (D[1][0]*Gxj+D[1][3]*Gyj+D[1][5]*Gzj);
+				DBL[1][1] = (D[1][1]*Gyj+D[1][3]*Gxj+D[1][4]*Gzj);
+				DBL[1][2] = (D[1][2]*Gzj+D[1][4]*Gyj+D[1][5]*Gxj);
+
+				DBL[2][0] = (D[2][0]*Gxj+D[2][3]*Gyj+D[2][5]*Gzj);
+				DBL[2][1] = (D[2][1]*Gyj+D[2][3]*Gxj+D[2][4]*Gzj);
+				DBL[2][2] = (D[2][2]*Gzj+D[2][4]*Gyj+D[2][5]*Gxj);
+
+				DBL[3][0] = (D[3][0]*Gxj+D[3][3]*Gyj+D[3][5]*Gzj);
+				DBL[3][1] = (D[3][1]*Gyj+D[3][3]*Gxj+D[3][4]*Gzj);
+				DBL[3][2] = (D[3][2]*Gzj+D[3][4]*Gyj+D[3][5]*Gxj);
+
+				DBL[4][0] = (D[4][0]*Gxj+D[4][3]*Gyj+D[4][5]*Gzj);
+				DBL[4][1] = (D[4][1]*Gyj+D[4][3]*Gxj+D[4][4]*Gzj);
+				DBL[4][2] = (D[4][2]*Gzj+D[4][4]*Gyj+D[4][5]*Gxj);
+
+				DBL[5][0] = (D[5][0]*Gxj+D[5][3]*Gyj+D[5][5]*Gzj);
+				DBL[5][1] = (D[5][1]*Gyj+D[5][3]*Gxj+D[5][4]*Gzj);
+				DBL[5][2] = (D[5][2]*Gzj+D[5][4]*Gyj+D[5][5]*Gxj);
+
+				ke[i3  ][j3  ] += (Gxi*DBL[0][0] + Gyi*DBL[3][0] + Gzi*DBL[5][0] )*detJt;
+				ke[i3  ][j3+1] += (Gxi*DBL[0][1] + Gyi*DBL[3][1] + Gzi*DBL[5][1] )*detJt;
+				ke[i3  ][j3+2] += (Gxi*DBL[0][2] + Gyi*DBL[3][2] + Gzi*DBL[5][2] )*detJt;
+
+				ke[i3+1][j3  ] += (Gyi*DBL[1][0] + Gxi*DBL[3][0] + Gzi*DBL[4][0] )*detJt;
+				ke[i3+1][j3+1] += (Gyi*DBL[1][1] + Gxi*DBL[3][1] + Gzi*DBL[4][1] )*detJt;
+				ke[i3+1][j3+2] += (Gyi*DBL[1][2] + Gxi*DBL[3][2] + Gzi*DBL[4][2] )*detJt;
+
+				ke[i3+2][j3  ] += (Gzi*DBL[2][0] + Gyi*DBL[4][0] + Gxi*DBL[5][0] )*detJt;
+				ke[i3+2][j3+1] += (Gzi*DBL[2][1] + Gyi*DBL[4][1] + Gxi*DBL[5][1] )*detJt;
+				ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*detJt;
+			}
 		}
 	}
 }
