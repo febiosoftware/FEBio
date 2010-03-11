@@ -71,6 +71,8 @@ bool FEUT4Domain::Initialize(FEM& fem)
 		for (int j=0; j<4; ++j) m_Node[ m_tag[el.m_node[j]]].Vi += 0.25*Ve;
 	}
 
+	// create the node-element list
+	m_NEL.Create(*this);
 
 	return true;
 }
@@ -177,7 +179,7 @@ double FEUT4Domain::TetVolume(vec3d* r)
 void FEUT4Domain::Residual(FESolidSolver *psolver, vector<double> &R)
 {
 	// Calculate the nodal contribution
-//	NodalResidual(psolver, R);
+	NodalResidual(psolver, R);
 
 	// Calculate the element contribution
 	ElementResidual(psolver, R);
@@ -193,67 +195,79 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 	// shape function derivatives
 	double Gx[4], Gy[4], Gz[4];
 
-	// loop over all the elements
-	int i, j;
+	int i, j, n;
 	double Ve;
 	vector<int> LM; LM.resize(3);
 	vector<int> en; en.resize(1);
 	vector<double> fe; fe.resize(3);
-	for (int n=0; n<m_Elem.size(); ++n)
+
+	// loop over all the nodes
+	for (i=0; i<m_pMesh->Nodes(); ++i)
 	{
-		FESolidElement& el = m_Elem[n];
-		UnpackElement(el);
+		// get the elements that belong to this list
+		int NE = m_NEL.Valence(i);
+		FEElement** ppel = m_NEL.ElementList(i);
 
-		// calculate element volume
-		// TODO: we should store this somewhere instead of recalculating it
-		Ve = TetVolume(el.r0());
-
-		// calculate the jacobian
-		el.invjact(Ji, 0);
-
-		// get the shape function derivatives
-		const double* Gr, *Gs, *Gt;
-		Gr = el.Gr(0);
-		Gs = el.Gs(0);
-		Gt = el.Gt(0);
-
-		for (i=0; i<4; ++i)
+		if (NE > 0)
 		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[i] = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy[i] = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz[i] = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-		}
+			assert(m_tag[i] >= 0);
 
-		// setup the element B-matrix
-		double Be[6][3] = {0};
-		for (j=0; j<4; ++j)
-		{
-			Be[0][0] = Gx[j]; Be[1][1] = Gy[j]; Be[2][2] = Gz[j];
-			Be[3][0] = Gy[j]; Be[3][1] = Gx[j]; 
-			Be[4][1] = Gz[j]; Be[4][2] = Gy[j]; 
-			Be[5][0] = Gz[j]; Be[5][2] = Gx[j];
+			UT4NODE& node = m_Node[ m_tag[i] ];
+			mat3ds S = node.si - node.si.dev()*m_alpha;
 
-			LM[0] = el.LM()[3*j  ];
-			LM[1] = el.LM()[3*j+1];
-			LM[2] = el.LM()[3*j+2];
-
-			en[0] = el.m_node[j];
-
-			for (i=0; i<4; ++i)
+			// loop over all elements that belong to this node
+			for (n=0; n<NE; ++n)
 			{
-				UT4NODE& node = m_Node[ m_tag[el.m_node[i]] ];
-				mat3ds S = node.si - node.si.dev()*m_alpha;
+				FESolidElement& el = dynamic_cast<FESolidElement&>(*ppel[n]);
+				UnpackElement(el);
+
+				// calculate element volume
+				// TODO: we should store this somewhere instead of recalculating it
+				Ve = TetVolume(el.r0());
+
 				double w = 0.25* Ve*node.vi / node.Vi;
 
-				// calculate nodal force
-				fe[0] = w*(Be[0][0]*S.xx() + Be[1][0]*S.yy() + Be[2][0]*S.zz() + Be[3][0]*S.xy() + Be[4][0]*S.yz() + Be[5][0]*S.xz());
-				fe[1] = w*(Be[0][1]*S.xx() + Be[1][1]*S.yy() + Be[2][1]*S.zz() + Be[3][1]*S.xy() + Be[4][1]*S.yz() + Be[5][1]*S.xz());
-				fe[2] = w*(Be[0][2]*S.xx() + Be[1][2]*S.yy() + Be[2][2]*S.zz() + Be[3][2]*S.xy() + Be[4][2]*S.yz() + Be[5][2]*S.xz());
+				// calculate the jacobian
+				el.invjact(Ji, 0);
 
-				// assemble in global residual
-				psolver->AssembleResidual(en, LM, fe, R);
+				// get the shape function derivatives
+				const double* Gr, *Gs, *Gt;
+				Gr = el.Gr(0);
+				Gs = el.Gs(0);
+				Gt = el.Gt(0);
+
+				for (j=0; j<4; ++j)
+				{
+					// calculate global gradient of shape functions
+					// note that we need the transposed of Ji, not Ji itself !
+					Gx[j] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+					Gy[j] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+					Gz[j] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+				}
+
+				// setup the element B-matrix
+				double Be[6][3] = {0};
+				for (j=0; j<4; ++j)
+				{
+					Be[0][0] = Gx[j]; Be[1][1] = Gy[j]; Be[2][2] = Gz[j];
+					Be[3][0] = Gy[j]; Be[3][1] = Gx[j]; 
+					Be[4][1] = Gz[j]; Be[4][2] = Gy[j]; 
+					Be[5][0] = Gz[j]; Be[5][2] = Gx[j];
+
+					LM[0] = el.LM()[3*j  ];
+					LM[1] = el.LM()[3*j+1];
+					LM[2] = el.LM()[3*j+2];
+
+					en[0] = el.m_node[j];
+		
+					// calculate nodal force
+					fe[0] = w*(Be[0][0]*S.xx() + Be[1][0]*S.yy() + Be[2][0]*S.zz() + Be[3][0]*S.xy() + Be[4][0]*S.yz() + Be[5][0]*S.xz());
+					fe[1] = w*(Be[0][1]*S.xx() + Be[1][1]*S.yy() + Be[2][1]*S.zz() + Be[3][1]*S.xy() + Be[4][1]*S.yz() + Be[5][1]*S.xz());
+					fe[2] = w*(Be[0][2]*S.xx() + Be[1][2]*S.yy() + Be[2][2]*S.zz() + Be[3][2]*S.xy() + Be[4][2]*S.yz() + Be[5][2]*S.xz());
+
+					// assemble in global residual
+					psolver->AssembleResidual(en, LM, fe, R);
+				}
 			}
 		}
 	}
@@ -333,7 +347,7 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 
 		// take the deviatoric component and multiply it
 		// with the stabilization factor
-//		s = s.dev()*m_alpha;
+		s = s.dev()*m_alpha;
 		
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -381,6 +395,44 @@ void FEUT4Domain::StiffnessMatrix(FESolidSolver *psolver)
 //! Calculates the nodal contribution to the global stiffness matrix
 void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 {
+	// loop over all the nodes
+	for (int i=0; i<m_pMesh->Nodes(); ++i)
+	{
+		// see if we need to process this node
+		if (m_tag[i] >= 0)
+		{
+			// calculate the geometry stiffness for this node
+			NodalGeometryStiffness(m_Node[m_tag[i]]);
+
+			// calculate the material stiffness for this node
+			NodalMaterialStiffness(m_Node[m_tag[i]]);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the nodal geometry stiffness contribution
+void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node)
+{
+	// get the global node index
+	int i = node.inode;
+
+	// get the element list 
+	int NE = m_NEL.Valence(i);
+	FEElement** pe = m_NEL.ElementList(i);
+
+	// loop over all the elements
+	for (int n=0; n<NE; ++n)
+	{
+		FESolidElement& el = dynamic_cast<FESolidElement&>(*pe[n]);
+		UnpackElement(el);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates the nodal material stiffness contribution
+void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node)
+{
 
 }
 
@@ -418,6 +470,9 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
 void FEUT4Domain::ElementStiffness(FEM &fem, FESolidElement &el, matrix &ke)
 {
 	// TODO: I need to figure out how to deal with incompressible materials
+	//       Incompressible materials require an additional dilatational 
+	//       stiffness which is calculated differently from the geometric and
+	//       material stiffnesses. 
 
 	// calculate material stiffness (i.e. constitutive component)
 	MaterialStiffness(fem, el, ke);
@@ -494,7 +549,7 @@ void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 		mat3ds s = pt.s;
 
 		// we work with the deviatoric component only
-//		s = s.det()*m_alpha;
+		s = s.dev()*m_alpha;
 
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
@@ -574,7 +629,24 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 		tens4ds C = pmat->Tangent(mp);
 		C.extract(D);
 
-		// TODO: subtract Cvol
+		// Next, we need to subtract the volumetric contribution Cvol
+		// TODO: For incompressible materials, there is a contribution
+		//		 coming from the dilatational stiffness matrix which is calculated
+		//       elsewhere. This might be a problem.
+		mat3ds S = pt.s;
+		double p = -S.tr()/3.0;
+
+		mat3dd I(1);	// Identity
+		tens4ds I4  = dyad4s(I);
+
+		mat3ds CI = C.dot(I); // = C:I
+
+		// Note the slightly different form than in the paper.
+		// This is because Cvol needs to have the proper symmetries
+		tens4ds Cvol = I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, CI)/3.0;
+
+		// subtract the volumetric tensor from C;
+		C -= Cvol;
 
 		if (dynamic_cast<FEMicroMaterial*>(pmat))
 		{

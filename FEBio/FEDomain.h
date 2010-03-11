@@ -32,6 +32,7 @@ public:
 	int Type() { return m_ntype; }
 
 	void SetMesh(FEMesh* pm) { m_pMesh = pm; }
+	FEMesh* GetMesh() { return m_pMesh; }
 
 	virtual void create(int n) = 0;
 

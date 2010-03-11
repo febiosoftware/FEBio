@@ -60,6 +60,9 @@ public:
 	tens4ds& operator *= (double g);
 	tens4ds& operator /= (double g);
 
+	// double contraction with tensor
+	mat3ds dot(const mat3ds& m);
+
 	// intialize to zero
 	void zero();
 

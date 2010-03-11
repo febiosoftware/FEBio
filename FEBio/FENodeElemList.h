@@ -14,6 +14,7 @@
 class FESurface;
 class FEMesh;
 class FEElement;
+class FEDomain;
 
 //-----------------------------------------------------------------------------
 //! The FENodeElemList class is a utility class that determines for each node 
@@ -33,6 +34,9 @@ public:
 
 	//! build the node-selement list for a mesh
 	void Create(FEMesh& mesh);
+
+	//! build the node-element list for a domain
+	void Create(FEDomain& dom);
 
 	int Valence(int n) { return m_nval[n]; }
 	FEElement** ElementList(int n) { return (FEElement**) m_eref + m_pn[n]; }

@@ -1,5 +1,6 @@
 #pragma once
 #include "FEDomain.h"
+#include "FENodeElemList.h"
 
 //-----------------------------------------------------------------------------
 //! Domain for nodally integrated tet elements 
@@ -71,6 +72,12 @@ protected:
 	//! material stiffness component
 	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
+	//! nodal geometry stiffness contribution
+	void NodalGeometryStiffness(UT4NODE& node);
+
+	//! nodal material stiffness contribution
+	void NodalMaterialStiffness(UT4NODE& node);
+
 protected:
 	//! calculate the volume of a tet element
 	double TetVolume(vec3d* r);
@@ -80,4 +87,6 @@ private:
 
 	vector<int>		m_tag;	//!< nodal tags
 	vector<UT4NODE>	m_Node;	//!< Nodal data
+
+	FENodeElemList	m_NEL;
 };

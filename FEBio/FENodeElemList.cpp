@@ -6,6 +6,7 @@
 #include "FENodeElemList.h"
 #include "FESurface.h"
 #include "FEMesh.h"
+#include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
 //! This function builds the node-element list for a surface
@@ -125,6 +126,62 @@ void FENodeElemList::Create(FEMesh& mesh)
 				m_eref[m_pn[n] + m_nval[n]] = &el;
 				m_nval[n]++;
 			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function builds the node-element list for a domain
+
+void FENodeElemList::Create(FEDomain& dom)
+{
+	int i, j, n;
+
+	// get the mesh
+	FEMesh& mesh = *dom.GetMesh();
+
+	// get the number of nodes
+	int NN = mesh.Nodes();
+
+	// create nodal valence array
+	m_nval.assign(NN, 0);
+	m_pn.resize(NN);
+
+	// fill valence table
+	int nsize = 0;
+	for (i=0; i<dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		for (j=0; j<el.Nodes(); ++j)
+		{
+			n = el.m_node[j];
+			m_nval[n]++;
+			nsize++;
+		}
+	}
+
+	// create the element reference array
+	m_eref.resize(nsize);
+
+	// set eref pointers
+	m_pn[0] = 0;
+	for (i=1; i<NN; ++i)
+	{
+		m_pn[i] = m_pn[i-1] + m_nval[i-1];
+	}
+
+	// reset valence pointers
+	for (i=0; i<NN; ++i) m_nval[i] = 0;
+
+	// fill eref table
+	for (i=0; i<dom.Elements(); ++i)
+	{
+		FEElement& el = dom.ElementRef(i);
+		for (j=0; j<el.Nodes(); ++j)
+		{
+			n = el.m_node[j];
+			m_eref[m_pn[n] + m_nval[n]] = &el;
+			m_nval[n]++;
 		}
 	}
 }
