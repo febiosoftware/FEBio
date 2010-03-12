@@ -1362,6 +1362,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tens4d.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Timer.h"
 				>
 			</File>

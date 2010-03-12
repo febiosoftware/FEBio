@@ -393,3 +393,17 @@ inline tens4ds dyad4s(const mat3ds& a, const mat3ds& b)
 	return c;
 
 }
+
+//-----------------------------------------------------------------------------
+// double contraction with a symmetric 2nd-order tensor
+inline mat3ds tens4ds::dot(const mat3ds &m)
+{
+	mat3ds a;
+	a.xx() = d[ 0]*m.xx() + d[ 1]*m.yy() + d[ 3]*m.zz() + 2*d[ 6]*m.xy() + 2*d[10]*m.yz() + 2*d[15]*m.xz();
+	a.yy() = d[ 1]*m.xx() + d[ 2]*m.yy() + d[ 4]*m.zz() + 2*d[ 7]*m.xy() + 2*d[11]*m.yz() + 2*d[16]*m.xz();
+	a.zz() = d[ 3]*m.xx() + d[ 4]*m.yy() + d[ 5]*m.zz() + 2*d[ 8]*m.xy() + 2*d[12]*m.yz() + 2*d[17]*m.xz();
+	a.xy() = d[ 6]*m.xx() + d[ 7]*m.yy() + d[ 8]*m.zz() + 2*d[ 9]*m.xy() + 2*d[13]*m.yz() + 2*d[18]*m.xz();
+	a.yz() = d[10]*m.xx() + d[11]*m.yy() + d[12]*m.zz() + 2*d[13]*m.xy() + 2*d[14]*m.yz() + 2*d[19]*m.xz();
+	a.xz() = d[15]*m.xx() + d[16]*m.yy() + d[17]*m.zz() + 2*d[18]*m.xy() + 2*d[19]*m.yz() + 2*d[20]*m.xz();
+	return a;
+}

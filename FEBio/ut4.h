@@ -1,7 +1,6 @@
 #pragma once
 #include "FEDomain.h"
 #include "FENodeElemList.h"
-#include "FENodeNodeList.h"
 
 //-----------------------------------------------------------------------------
 //! Domain for nodally integrated tet elements 
@@ -93,5 +92,4 @@ private:
 	vector<UT4NODE>	m_Node;	//!< Nodal data
 
 	FENodeElemList	m_NEL;
-	FENodeNodeList	m_NNL;
 };
