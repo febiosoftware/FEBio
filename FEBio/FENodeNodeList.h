@@ -12,6 +12,7 @@
 #include "FECore/vector.h"
 
 class FEMesh;
+class FEDomain;
 
 //-----------------------------------------------------------------------------
 //! The FENodeNodeList class is a utility class that determines for each node 
@@ -29,8 +30,11 @@ public:
 	//! desctructor
 	virtual ~FENodeNodeList();
 
-	//! create the node-node list
+	//! create the node-node list for a mesh
 	void Create(FEMesh& mesh);
+
+	//! create the node-node list for a domain
+	void Create(FEDomain& dom);
 
 	int Size() { return m_nval.size(); }
 

@@ -9,6 +9,7 @@
 #include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
+#include "ut4.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -71,16 +72,48 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			MP.clear();
 
 			// add all elements to the profile
+			// TODO: perhaps we should ask the domain the create the profile
 			for (i=0; i<mesh.Domains(); ++i)
 			{
 				FEDomain& d = mesh.Domain(i);
-				for (j=0; j<d.Elements(); ++j)
+				if (dynamic_cast<FEUT4Domain*>(&d) == 0)
 				{
-					FEElement& el = d.ElementRef(j);
-					if (!el.IsRigid())
+					for (j=0; j<d.Elements(); ++j)
 					{
-						d.UnpackElement(el, FE_UNPACK_LM);
-						build_add(el.LM());
+						FEElement& el = d.ElementRef(j);
+						if (!el.IsRigid())
+						{
+							d.UnpackElement(el, FE_UNPACK_LM);
+							build_add(el.LM());
+						}
+					}
+				}
+				else
+				{
+					// The UT4 Domain requires a slightly different form
+					FEUT4Domain& ut4 = dynamic_cast<FEUT4Domain&>(d);
+
+					// we'll need the node-element list
+					FENodeElemList& NEL = ut4.GetNodeElemList();
+					assert(NEL.Size() > 0);
+
+					vector<int> LM;
+					for (i=0; i<mesh.Nodes(); ++i)
+					{
+						int NE = NEL.Valence(i);
+						if (NE > 0)
+						{
+							LM.assign(NE*4*MAX_NDOFS, -1);
+							FEElement** ppe = NEL.ElementList(i);
+							for (int n=0; n<NE; ++n)
+							{
+								FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[n]);
+								ut4.UnpackElement(el);
+								vector<int>& elm = el.LM();
+								for (int j=0; j<4*MAX_NDOFS; ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
+							}
+							build_add(LM);
+						}
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 #pragma once
 #include "FEDomain.h"
 #include "FENodeElemList.h"
+#include "FENodeNodeList.h"
 
 //-----------------------------------------------------------------------------
 //! Domain for nodally integrated tet elements 
@@ -33,6 +34,9 @@ public:
 		pd->m_Node = m_Node;
 		return pd;
 	}
+
+	//! return the node-element list for this domain
+	FENodeElemList& GetNodeElemList() { return m_NEL; }
 
 	//! initialization function
 	bool Initialize(FEM& fem);
@@ -73,10 +77,10 @@ protected:
 	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
 	//! nodal geometry stiffness contribution
-	void NodalGeometryStiffness(UT4NODE& node);
+	void NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver);
 
 	//! nodal material stiffness contribution
-	void NodalMaterialStiffness(UT4NODE& node);
+	void NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver);
 
 protected:
 	//! calculate the volume of a tet element
@@ -89,4 +93,5 @@ private:
 	vector<UT4NODE>	m_Node;	//!< Nodal data
 
 	FENodeElemList	m_NEL;
+	FENodeNodeList	m_NNL;
 };
