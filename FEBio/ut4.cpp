@@ -4,15 +4,15 @@
 #include "FESolidSolver.h"
 #include "FEMicroMaterial.h"
 
+// set the default stabilization factor
+double FEUT4Domain::m_alpha = 0.05;
+
 //-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
 FEUT4Domain::FEUT4Domain(FEMesh*pm) : FEElasticSolidDomain(pm)
 {
 	// overwrite the domain type
 	m_ntype = FE_UT4_DOMAIN; 
-
-	// set the default stabilization factor
-	m_alpha = 0.05; 
 }
 
 //-----------------------------------------------------------------------------
@@ -218,7 +218,8 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 			UT4NODE& node = m_Node[ m_tag[i] ];
 			assert(node.inode == i);
 
-			mat3ds S = node.si - node.si.dev()*m_alpha;
+//			mat3ds S = node.si - node.si.dev()*m_alpha;
+			mat3ds S = node.si*(1 - m_alpha);
 
 			// loop over all elements that belong to this node
 			for (n=0; n<NE; ++n)
@@ -353,8 +354,9 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 
 		// take the deviatoric component and multiply it
 		// with the stabilization factor
-		s = s.dev()*m_alpha;
-		
+//		s = s.dev()*m_alpha;
+		s = s*m_alpha;
+
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
@@ -427,7 +429,8 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 	FEElement** ppe = m_NEL.ElementList(node.inode);
 
 	// get the nodal stress
-	mat3ds S = node.si - node.si.dev()*m_alpha;
+//	mat3ds S = node.si - node.si.dev()*m_alpha;
+	mat3ds S = node.si*(1 - m_alpha);
 
 	// create the LM and the en array
 	vector<int> LM; LM.resize(NE*4*3);
@@ -447,25 +450,12 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 		}
 	}
 
-	// stiffness matrices
-	double kij;
-	matrix ke; 
-	ke.Create(NE*4*3, NE*4*3); 
-	ke.zero();
-
-	// shape function derivatives
-	double Gi[4][3] = {0}, Gj[4][3] = {0};
-
-	// loop over all the elements
+	// calculate the gradN matrices
+	double (*Ge)[4][3] = new double [NE][4][3];
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
 		UnpackElement(ei);
-
-		// calculate element volume
-		// TODO: we should store this somewhere instead of recalculating it
-		double Vi = TetVolume(ei.r0());
-		double wi = 0.25* Vi*node.vi/ node.Vi;
 
 		// calculate the jacobian
 		double Ji[3][3];
@@ -481,10 +471,28 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Gi[j][0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
-			Gi[j][1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
-			Gi[j][2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+			Ge[ni][j][0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+			Ge[ni][j][1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+			Ge[ni][j][2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
 		}
+	}
+
+	// stiffness matrices
+	double kij;
+	matrix ke; 
+	ke.Create(NE*4*3, NE*4*3); 
+	ke.zero();
+
+	// loop over all the elements
+	for (ni=0; ni<NE; ++ni)
+	{
+		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
+		UnpackElement(ei);
+
+		// calculate element volume
+		// TODO: we should store this somewhere instead of recalculating it
+		double Vi = TetVolume(ei.r0());
+		double wi = 0.25* Vi*node.vi/ node.Vi;
 
 		// loop over the elements again
 		for (nj=0; nj<NE; ++nj)
@@ -497,34 +505,20 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 			double Vj = TetVolume(ej.r0());
 			double wj = 0.25* Vj / node.Vi;
 
-			// calculate the jacobian
-			double Ji[3][3];
-			ej.invjact(Ji, 0);
-
-			// get the shape function derivatives
-			Gr = ej.Gr(0);
-			Gs = ej.Gs(0);
-			Gt = ej.Gt(0);
-
-			for (j=0; j<4; ++j)
-			{
-				// calculate global gradient of shape functions
-				// note that we need the transposed of Ji, not Ji itself !
-				Gj[j][0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
-				Gj[j][1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
-				Gj[j][2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
-			}
 			// We're ready to rock and roll!
 			double sg[3];
 			for (i=0; i<4; ++i)
 			{
+				double (&Gi)[3] = *(Ge[ni] + i);
 				for (j=0; j<4; ++j)
 				{
-					sg[0] = S.xx()*Gj[j][0] + S.xy()*Gj[j][1] + S.xz()*Gj[j][2];
-					sg[1] = S.xy()*Gj[j][0] + S.yy()*Gj[j][1] + S.yz()*Gj[j][2];
-					sg[2] = S.xz()*Gj[j][0] + S.yz()*Gj[j][1] + S.zz()*Gj[j][2];
+					double (&Gj)[3] = *(Ge[nj] + j);
 
-					kij = wi*wj*(Gi[i][0]*sg[0]+Gi[i][1]*sg[1]+Gi[i][2]*sg[2]);
+					sg[0] = S.xx()*Gj[0] + S.xy()*Gj[1] + S.xz()*Gj[2];
+					sg[1] = S.xy()*Gj[0] + S.yy()*Gj[1] + S.yz()*Gj[2];
+					sg[2] = S.xz()*Gj[0] + S.yz()*Gj[1] + S.zz()*Gj[2];
+
+					kij = wi*wj*(Gi[0]*sg[0]+Gi[1]*sg[1]+Gi[2]*sg[2]);
 
 					// copy to element stiffness matrix
 					ke[ni*12+i*3  ][nj*12+j*3  ] = kij;
@@ -537,6 +531,9 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// assemble the stiffness
 	psolver->AssembleStiffness(en, LM, ke);
+
+	// clean up
+	delete [] Ge;
 }
 
 //-----------------------------------------------------------------------------
@@ -586,7 +583,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// TODO: For incompressible materials, there is a contribution
 	//		 coming from the dilatational stiffness matrix which is calculated
 	//       elsewhere. This might be a problem.
-	mat3ds S = pt.s;
+/*	mat3ds S = pt.s;
 	double p = -S.tr()/3.0;
 
 	mat3dd I(1);	// Identity
@@ -596,11 +593,13 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// Note the slightly different form than in the paper.
 	// This is because Cvol needs to have the proper symmetries
-	tens4ds Cvol = I4*(-2*p) + dyad1s(I, S)*(2.0/3.0) + dyad1s(I, CI)*(2.0/3.0);
+	tens4ds Cvol = I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, CI)/3.0;
 
 	// subtract the isochoric component from C;
 	// C = C - a*Ciso = C - (a*(C - Cvol)) = (1-a)*C + a*Cvol
-	C = C*(1 - m_alpha) + Cvol*m_alpha;
+//	C = C*(1 - m_alpha) + Cvol*m_alpha;
+*/
+	C = C*(1 - m_alpha);
 
 	// extract the 'D' matrix
 	double D[6][6] = {0};
@@ -612,7 +611,6 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// loop over all the elements
 	int i, j, ni, nj;
-	double Gx[4], Gy[4], Gz[4];
 	double DB[6][3];
 	double kij[3][3];
 
@@ -621,11 +619,14 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// create the LM and the en array
 	vector<int> LM; LM.resize(NE*4*3);
 	vector<int> en; en.resize(NE*4  );
+	vector<double> Ve; Ve.resize(NE);
 
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
 		UnpackElement(el);
+		Ve[ni] = TetVolume(el.r0());
+
 		for (i=0; i<4; ++i)
 		{
 			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
@@ -636,44 +637,49 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 		}
 	}
 
+	// calculate B-matrices
+	double (*Be)[6][3] = new double [NE*4][6][3];
+	for (ni=0; ni<NE; ++ni)
+	{
+		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
+		UnpackElement(el);
+
+		// calculate the jacobian
+		double Ji[3][3];
+		el.invjact(Ji, 0);
+
+		// get the shape function derivatives
+		const double* Gr, *Gs, *Gt;
+		Gr = el.Gr(0);
+		Gs = el.Gs(0);
+		Gt = el.Gt(0);
+
+		double Gx, Gy, Gz;
+		for (j=0; j<4; ++j)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+			Gy = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+			Gz = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+
+			Be[4*ni+j][0][0] = Gx; Be[4*ni+j][0][1] =  0; Be[4*ni+j][0][2] = 0;
+			Be[4*ni+j][1][0] =  0; Be[4*ni+j][1][1] = Gy; Be[4*ni+j][1][2] = 0;
+			Be[4*ni+j][2][0] =  0; Be[4*ni+j][2][1] =  0; Be[4*ni+j][2][2] = Gz;
+			Be[4*ni+j][3][0] = Gy; Be[4*ni+j][3][1] = Gx; Be[4*ni+j][3][2] = 0; 
+			Be[4*ni+j][4][0] =  0; Be[4*ni+j][4][1] = Gz; Be[4*ni+j][4][2] = Gy; 
+			Be[4*ni+j][5][0] = Gz; Be[4*ni+j][5][1] =  0; Be[4*ni+j][5][2] = Gx;
+		}
+	}
+
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
 		UnpackElement(ei);
 
 		// calculate element volume
-		// TODO: we should store this somewhere instead of recalculating it
-		double Vi = TetVolume(ei.r0());
+		double Vi = Ve[ni];
 		double wi = 0.25* Vi*node.vi/ node.Vi;
-
-		// calculate the jacobian
-		double Ji[3][3];
-		ei.invjact(Ji, 0);
-
-		// get the shape function derivatives
-		const double* Gr, *Gs, *Gt;
-		Gr = ei.Gr(0);
-		Gs = ei.Gs(0);
-		Gt = ei.Gt(0);
-
-		for (j=0; j<4; ++j)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[j] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
-			Gy[j] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
-			Gz[j] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
-		}
-
-		// setup the element B-matrix
-		double Bi[4][6][3] = {0};
-		for (j=0; j<4; ++j)
-		{
-			Bi[j][0][0] = Gx[j]; Bi[j][1][1] = Gy[j]; Bi[j][2][2] = Gz[j];
-			Bi[j][3][0] = Gy[j]; Bi[j][3][1] = Gx[j]; 
-			Bi[j][4][1] = Gz[j]; Bi[j][4][2] = Gy[j]; 
-			Bi[j][5][0] = Gz[j]; Bi[j][5][2] = Gx[j];
-		}
 
 		// loop over the elements again
 		for (nj=0; nj<NE; ++nj)
@@ -682,78 +688,53 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 			UnpackElement(ej);
 
 			// calculate element volume
-			// TODO: we should store this somewhere instead of recalculating it
-			double Vj = TetVolume(ej.r0());
+			double Vj = Ve[nj];
 			double wj = 0.25* Vj / node.Vi;
-
-			// calculate the jacobian
-			double Ji[3][3];
-			ej.invjact(Ji, 0);
-
-			// get the shape function derivatives
-			Gr = ej.Gr(0);
-			Gs = ej.Gs(0);
-			Gt = ej.Gt(0);
-
-			for (j=0; j<4; ++j)
-			{
-				// calculate global gradient of shape functions
-				// note that we need the transposed of Ji, not Ji itself !
-				Gx[j] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
-				Gy[j] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
-				Gz[j] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
-			}
-
-			// setup the element B-matrix
-			double Bj[4][6][3] = {0};
-			for (j=0; j<4; ++j)
-			{
-				Bj[j][0][0] = Gx[j]; Bj[j][1][1] = Gy[j]; Bj[j][2][2] = Gz[j];
-				Bj[j][3][0] = Gy[j]; Bj[j][3][1] = Gx[j]; 
-				Bj[j][4][1] = Gz[j]; Bj[j][4][2] = Gy[j]; 
-				Bj[j][5][0] = Gz[j]; Bj[j][5][2] = Gx[j];
-			}
 
 			// We're ready to rock and roll!
 			for (i=0; i<4; ++i)
 			{
+				double (&Bi)[6][3] = *(Be+(ni*4 + i));
+
 				for (j=0; j<4; ++j)
 				{
-					DB[0][0] = wj*(D[0][0]*Bj[j][0][0]+D[0][1]*Bj[j][1][0]+D[0][2]*Bj[j][2][0]+D[0][3]*Bj[j][3][0]+D[0][4]*Bj[j][4][0]+D[0][5]*Bj[j][5][0]);
-					DB[0][1] = wj*(D[0][0]*Bj[j][0][1]+D[0][1]*Bj[j][1][1]+D[0][2]*Bj[j][2][1]+D[0][3]*Bj[j][3][1]+D[0][4]*Bj[j][4][1]+D[0][5]*Bj[j][5][1]);
-					DB[0][2] = wj*(D[0][0]*Bj[j][0][2]+D[0][1]*Bj[j][1][2]+D[0][2]*Bj[j][2][2]+D[0][3]*Bj[j][3][2]+D[0][4]*Bj[j][4][2]+D[0][5]*Bj[j][5][2]);
+					double (&Bj)[6][3] = *(Be+(nj*4 + j));
 
-					DB[1][0] = wj*(D[1][0]*Bj[j][0][0]+D[1][1]*Bj[j][1][0]+D[1][2]*Bj[j][2][0]+D[1][3]*Bj[j][3][0]+D[1][4]*Bj[j][4][0]+D[1][5]*Bj[j][5][0]);
-					DB[1][1] = wj*(D[1][0]*Bj[j][0][1]+D[1][1]*Bj[j][1][1]+D[1][2]*Bj[j][2][1]+D[1][3]*Bj[j][3][1]+D[1][4]*Bj[j][4][1]+D[1][5]*Bj[j][5][1]);
-					DB[1][2] = wj*(D[1][0]*Bj[j][0][2]+D[1][1]*Bj[j][1][2]+D[1][2]*Bj[j][2][2]+D[1][3]*Bj[j][3][2]+D[1][4]*Bj[j][4][2]+D[1][5]*Bj[j][5][2]);
+					DB[0][0] = wj*(D[0][0]*Bj[0][0]+D[0][1]*Bj[1][0]+D[0][2]*Bj[2][0]+D[0][3]*Bj[3][0]+D[0][4]*Bj[4][0]+D[0][5]*Bj[5][0]);
+					DB[0][1] = wj*(D[0][0]*Bj[0][1]+D[0][1]*Bj[1][1]+D[0][2]*Bj[2][1]+D[0][3]*Bj[3][1]+D[0][4]*Bj[4][1]+D[0][5]*Bj[5][1]);
+					DB[0][2] = wj*(D[0][0]*Bj[0][2]+D[0][1]*Bj[1][2]+D[0][2]*Bj[2][2]+D[0][3]*Bj[3][2]+D[0][4]*Bj[4][2]+D[0][5]*Bj[5][2]);
 
-					DB[2][0] = wj*(D[2][0]*Bj[j][0][0]+D[2][1]*Bj[j][1][0]+D[2][2]*Bj[j][2][0]+D[2][3]*Bj[j][3][0]+D[2][4]*Bj[j][4][0]+D[2][5]*Bj[j][5][0]);
-					DB[2][1] = wj*(D[2][0]*Bj[j][0][1]+D[2][1]*Bj[j][1][1]+D[2][2]*Bj[j][2][1]+D[2][3]*Bj[j][3][1]+D[2][4]*Bj[j][4][1]+D[2][5]*Bj[j][5][1]);
-					DB[2][2] = wj*(D[2][0]*Bj[j][0][2]+D[2][1]*Bj[j][1][2]+D[2][2]*Bj[j][2][2]+D[2][3]*Bj[j][3][2]+D[2][4]*Bj[j][4][2]+D[2][5]*Bj[j][5][2]);
+					DB[1][0] = wj*(D[1][0]*Bj[0][0]+D[1][1]*Bj[1][0]+D[1][2]*Bj[2][0]+D[1][3]*Bj[3][0]+D[1][4]*Bj[4][0]+D[1][5]*Bj[5][0]);
+					DB[1][1] = wj*(D[1][0]*Bj[0][1]+D[1][1]*Bj[1][1]+D[1][2]*Bj[2][1]+D[1][3]*Bj[3][1]+D[1][4]*Bj[4][1]+D[1][5]*Bj[5][1]);
+					DB[1][2] = wj*(D[1][0]*Bj[0][2]+D[1][1]*Bj[1][2]+D[1][2]*Bj[2][2]+D[1][3]*Bj[3][2]+D[1][4]*Bj[4][2]+D[1][5]*Bj[5][2]);
 
-					DB[3][0] = wj*(D[3][0]*Bj[j][0][0]+D[3][1]*Bj[j][1][0]+D[3][2]*Bj[j][2][0]+D[3][3]*Bj[j][3][0]+D[3][4]*Bj[j][4][0]+D[3][5]*Bj[j][5][0]);
-					DB[3][1] = wj*(D[3][0]*Bj[j][0][1]+D[3][1]*Bj[j][1][1]+D[3][2]*Bj[j][2][1]+D[3][3]*Bj[j][3][1]+D[3][4]*Bj[j][4][1]+D[3][5]*Bj[j][5][1]);
-					DB[3][2] = wj*(D[3][0]*Bj[j][0][2]+D[3][1]*Bj[j][1][2]+D[3][2]*Bj[j][2][2]+D[3][3]*Bj[j][3][2]+D[3][4]*Bj[j][4][2]+D[3][5]*Bj[j][5][2]);
+					DB[2][0] = wj*(D[2][0]*Bj[0][0]+D[2][1]*Bj[1][0]+D[2][2]*Bj[2][0]+D[2][3]*Bj[3][0]+D[2][4]*Bj[4][0]+D[2][5]*Bj[5][0]);
+					DB[2][1] = wj*(D[2][0]*Bj[0][1]+D[2][1]*Bj[1][1]+D[2][2]*Bj[2][1]+D[2][3]*Bj[3][1]+D[2][4]*Bj[4][1]+D[2][5]*Bj[5][1]);
+					DB[2][2] = wj*(D[2][0]*Bj[0][2]+D[2][1]*Bj[1][2]+D[2][2]*Bj[2][2]+D[2][3]*Bj[3][2]+D[2][4]*Bj[4][2]+D[2][5]*Bj[5][2]);
 
-					DB[4][0] = wj*(D[4][0]*Bj[j][0][0]+D[4][1]*Bj[j][1][0]+D[4][2]*Bj[j][2][0]+D[4][3]*Bj[j][3][0]+D[4][4]*Bj[j][4][0]+D[4][5]*Bj[j][5][0]);
-					DB[4][1] = wj*(D[4][0]*Bj[j][0][1]+D[4][1]*Bj[j][1][1]+D[4][2]*Bj[j][2][1]+D[4][3]*Bj[j][3][1]+D[4][4]*Bj[j][4][1]+D[4][5]*Bj[j][5][1]);
-					DB[4][2] = wj*(D[4][0]*Bj[j][0][2]+D[4][1]*Bj[j][1][2]+D[4][2]*Bj[j][2][2]+D[4][3]*Bj[j][3][2]+D[4][4]*Bj[j][4][2]+D[4][5]*Bj[j][5][2]);
+					DB[3][0] = wj*(D[3][0]*Bj[0][0]+D[3][1]*Bj[1][0]+D[3][2]*Bj[2][0]+D[3][3]*Bj[3][0]+D[3][4]*Bj[4][0]+D[3][5]*Bj[5][0]);
+					DB[3][1] = wj*(D[3][0]*Bj[0][1]+D[3][1]*Bj[1][1]+D[3][2]*Bj[2][1]+D[3][3]*Bj[3][1]+D[3][4]*Bj[4][1]+D[3][5]*Bj[5][1]);
+					DB[3][2] = wj*(D[3][0]*Bj[0][2]+D[3][1]*Bj[1][2]+D[3][2]*Bj[2][2]+D[3][3]*Bj[3][2]+D[3][4]*Bj[4][2]+D[3][5]*Bj[5][2]);
 
-					DB[5][0] = wj*(D[5][0]*Bj[j][0][0]+D[5][1]*Bj[j][1][0]+D[5][2]*Bj[j][2][0]+D[5][3]*Bj[j][3][0]+D[5][4]*Bj[j][4][0]+D[5][5]*Bj[j][5][0]);
-					DB[5][1] = wj*(D[5][0]*Bj[j][0][1]+D[5][1]*Bj[j][1][1]+D[5][2]*Bj[j][2][1]+D[5][3]*Bj[j][3][1]+D[5][4]*Bj[j][4][1]+D[5][5]*Bj[j][5][1]);
-					DB[5][2] = wj*(D[5][0]*Bj[j][0][2]+D[5][1]*Bj[j][1][2]+D[5][2]*Bj[j][2][2]+D[5][3]*Bj[j][3][2]+D[5][4]*Bj[j][4][2]+D[5][5]*Bj[j][5][2]);
+					DB[4][0] = wj*(D[4][0]*Bj[0][0]+D[4][1]*Bj[1][0]+D[4][2]*Bj[2][0]+D[4][3]*Bj[3][0]+D[4][4]*Bj[4][0]+D[4][5]*Bj[5][0]);
+					DB[4][1] = wj*(D[4][0]*Bj[0][1]+D[4][1]*Bj[1][1]+D[4][2]*Bj[2][1]+D[4][3]*Bj[3][1]+D[4][4]*Bj[4][1]+D[4][5]*Bj[5][1]);
+					DB[4][2] = wj*(D[4][0]*Bj[0][2]+D[4][1]*Bj[1][2]+D[4][2]*Bj[2][2]+D[4][3]*Bj[3][2]+D[4][4]*Bj[4][2]+D[4][5]*Bj[5][2]);
 
-					kij[0][0] = wi*(Bi[i][0][0]*DB[0][0]+Bi[i][1][0]*DB[1][0]+Bi[i][2][0]*DB[2][0]+Bi[i][3][0]*DB[3][0]+Bi[i][4][0]*DB[4][0]+Bi[i][5][0]*DB[5][0]);
-					kij[0][1] = wi*(Bi[i][0][0]*DB[0][1]+Bi[i][1][0]*DB[1][1]+Bi[i][2][0]*DB[2][1]+Bi[i][3][0]*DB[3][1]+Bi[i][4][0]*DB[4][1]+Bi[i][5][0]*DB[5][1]);
-					kij[0][2] = wi*(Bi[i][0][0]*DB[0][2]+Bi[i][1][0]*DB[1][2]+Bi[i][2][0]*DB[2][2]+Bi[i][3][0]*DB[3][2]+Bi[i][4][0]*DB[4][2]+Bi[i][5][0]*DB[5][2]);
+					DB[5][0] = wj*(D[5][0]*Bj[0][0]+D[5][1]*Bj[1][0]+D[5][2]*Bj[2][0]+D[5][3]*Bj[3][0]+D[5][4]*Bj[4][0]+D[5][5]*Bj[5][0]);
+					DB[5][1] = wj*(D[5][0]*Bj[0][1]+D[5][1]*Bj[1][1]+D[5][2]*Bj[2][1]+D[5][3]*Bj[3][1]+D[5][4]*Bj[4][1]+D[5][5]*Bj[5][1]);
+					DB[5][2] = wj*(D[5][0]*Bj[0][2]+D[5][1]*Bj[1][2]+D[5][2]*Bj[2][2]+D[5][3]*Bj[3][2]+D[5][4]*Bj[4][2]+D[5][5]*Bj[5][2]);
 
-					kij[1][0] = wi*(Bi[i][0][1]*DB[0][0]+Bi[i][1][1]*DB[1][0]+Bi[i][2][1]*DB[2][0]+Bi[i][3][1]*DB[3][0]+Bi[i][4][1]*DB[4][0]+Bi[i][5][1]*DB[5][0]);
-					kij[1][1] = wi*(Bi[i][0][1]*DB[0][1]+Bi[i][1][1]*DB[1][1]+Bi[i][2][1]*DB[2][1]+Bi[i][3][1]*DB[3][1]+Bi[i][4][1]*DB[4][1]+Bi[i][5][1]*DB[5][1]);
-					kij[1][2] = wi*(Bi[i][0][1]*DB[0][2]+Bi[i][1][1]*DB[1][2]+Bi[i][2][1]*DB[2][2]+Bi[i][3][1]*DB[3][2]+Bi[i][4][1]*DB[4][2]+Bi[i][5][1]*DB[5][2]);
+					kij[0][0] = wi*(Bi[0][0]*DB[0][0]+Bi[1][0]*DB[1][0]+Bi[2][0]*DB[2][0]+Bi[3][0]*DB[3][0]+Bi[4][0]*DB[4][0]+Bi[5][0]*DB[5][0]);
+					kij[0][1] = wi*(Bi[0][0]*DB[0][1]+Bi[1][0]*DB[1][1]+Bi[2][0]*DB[2][1]+Bi[3][0]*DB[3][1]+Bi[4][0]*DB[4][1]+Bi[5][0]*DB[5][1]);
+					kij[0][2] = wi*(Bi[0][0]*DB[0][2]+Bi[1][0]*DB[1][2]+Bi[2][0]*DB[2][2]+Bi[3][0]*DB[3][2]+Bi[4][0]*DB[4][2]+Bi[5][0]*DB[5][2]);
 
-					kij[2][0] = wi*(Bi[i][0][2]*DB[0][0]+Bi[i][1][2]*DB[1][0]+Bi[i][2][2]*DB[2][0]+Bi[i][3][2]*DB[3][0]+Bi[i][4][2]*DB[4][0]+Bi[i][5][2]*DB[5][0]);
-					kij[2][1] = wi*(Bi[i][0][2]*DB[0][1]+Bi[i][1][2]*DB[1][1]+Bi[i][2][2]*DB[2][1]+Bi[i][3][2]*DB[3][1]+Bi[i][4][2]*DB[4][1]+Bi[i][5][2]*DB[5][1]);
-					kij[2][2] = wi*(Bi[i][0][2]*DB[0][2]+Bi[i][1][2]*DB[1][2]+Bi[i][2][2]*DB[2][2]+Bi[i][3][2]*DB[3][2]+Bi[i][4][2]*DB[4][2]+Bi[i][5][2]*DB[5][2]);
+					kij[1][0] = wi*(Bi[0][1]*DB[0][0]+Bi[1][1]*DB[1][0]+Bi[2][1]*DB[2][0]+Bi[3][1]*DB[3][0]+Bi[4][1]*DB[4][0]+Bi[5][1]*DB[5][0]);
+					kij[1][1] = wi*(Bi[0][1]*DB[0][1]+Bi[1][1]*DB[1][1]+Bi[2][1]*DB[2][1]+Bi[3][1]*DB[3][1]+Bi[4][1]*DB[4][1]+Bi[5][1]*DB[5][1]);
+					kij[1][2] = wi*(Bi[0][1]*DB[0][2]+Bi[1][1]*DB[1][2]+Bi[2][1]*DB[2][2]+Bi[3][1]*DB[3][2]+Bi[4][1]*DB[4][2]+Bi[5][1]*DB[5][2]);
+
+					kij[2][0] = wi*(Bi[0][2]*DB[0][0]+Bi[1][2]*DB[1][0]+Bi[2][2]*DB[2][0]+Bi[3][2]*DB[3][0]+Bi[4][2]*DB[4][0]+Bi[5][2]*DB[5][0]);
+					kij[2][1] = wi*(Bi[0][2]*DB[0][1]+Bi[1][2]*DB[1][1]+Bi[2][2]*DB[2][1]+Bi[3][2]*DB[3][1]+Bi[4][2]*DB[4][1]+Bi[5][2]*DB[5][1]);
+					kij[2][2] = wi*(Bi[0][2]*DB[0][2]+Bi[1][2]*DB[1][2]+Bi[2][2]*DB[2][2]+Bi[3][2]*DB[3][2]+Bi[4][2]*DB[4][2]+Bi[5][2]*DB[5][2]);
 
 					// copy to element stiffness matrix
 					ke[ni*12+i*3  ][nj*12+j*3  ] = kij[0][0]; ke[ni*12+i*3  ][nj*12+j*3+1] = kij[0][1]; ke[ni*12+i*3  ][nj*12+j*3+2] = kij[0][2];
@@ -766,6 +747,9 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// assemble the stiffness
 	psolver->AssembleStiffness(en, LM, ke);
+
+	// cleanup
+	delete [] Be;
 }
 
 //-----------------------------------------------------------------------------
@@ -881,7 +865,8 @@ void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 		mat3ds s = pt.s;
 
 		// we work with the deviatoric component only
-		s = s.dev()*m_alpha;
+//		s = s.dev()*m_alpha;
+		s = s*m_alpha;
 
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
@@ -959,7 +944,7 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 
 		// Calculate the tangent
 		tens4ds C = pmat->Tangent(mp);
-
+/*
 		// Next, we need to subtract the volumetric contribution Cvol
 		// TODO: For incompressible materials, there is a contribution
 		//		 coming from the dilatational stiffness matrix which is calculated
@@ -977,7 +962,9 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 		tens4ds Cvol = I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, CI)/3.0;
 
 		// subtract the volumetric tensor from C;
-		C = (C - Cvol)*m_alpha;
+//		C = (C - Cvol)*m_alpha;
+*/
+		C = C*m_alpha;
 
 		// extract the 'D' matrix
 		C.extract(D);
@@ -1042,17 +1029,17 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 				DBL[5][1] = (D[5][1]*Gyj+D[5][3]*Gxj+D[5][4]*Gzj);
 				DBL[5][2] = (D[5][2]*Gzj+D[5][4]*Gyj+D[5][5]*Gxj);
 
-				ke[i3  ][j3  ] += (Gxi*DBL[0][0] + Gyi*DBL[3][0] + Gzi*DBL[5][0] )*detJt*m_alpha;
-				ke[i3  ][j3+1] += (Gxi*DBL[0][1] + Gyi*DBL[3][1] + Gzi*DBL[5][1] )*detJt*m_alpha;
-				ke[i3  ][j3+2] += (Gxi*DBL[0][2] + Gyi*DBL[3][2] + Gzi*DBL[5][2] )*detJt*m_alpha;
+				ke[i3  ][j3  ] += (Gxi*DBL[0][0] + Gyi*DBL[3][0] + Gzi*DBL[5][0] )*detJt;
+				ke[i3  ][j3+1] += (Gxi*DBL[0][1] + Gyi*DBL[3][1] + Gzi*DBL[5][1] )*detJt;
+				ke[i3  ][j3+2] += (Gxi*DBL[0][2] + Gyi*DBL[3][2] + Gzi*DBL[5][2] )*detJt;
 
-				ke[i3+1][j3  ] += (Gyi*DBL[1][0] + Gxi*DBL[3][0] + Gzi*DBL[4][0] )*detJt*m_alpha;
-				ke[i3+1][j3+1] += (Gyi*DBL[1][1] + Gxi*DBL[3][1] + Gzi*DBL[4][1] )*detJt*m_alpha;
-				ke[i3+1][j3+2] += (Gyi*DBL[1][2] + Gxi*DBL[3][2] + Gzi*DBL[4][2] )*detJt*m_alpha;
+				ke[i3+1][j3  ] += (Gyi*DBL[1][0] + Gxi*DBL[3][0] + Gzi*DBL[4][0] )*detJt;
+				ke[i3+1][j3+1] += (Gyi*DBL[1][1] + Gxi*DBL[3][1] + Gzi*DBL[4][1] )*detJt;
+				ke[i3+1][j3+2] += (Gyi*DBL[1][2] + Gxi*DBL[3][2] + Gzi*DBL[4][2] )*detJt;
 
-				ke[i3+2][j3  ] += (Gzi*DBL[2][0] + Gyi*DBL[4][0] + Gxi*DBL[5][0] )*detJt*m_alpha;
-				ke[i3+2][j3+1] += (Gzi*DBL[2][1] + Gyi*DBL[4][1] + Gxi*DBL[5][1] )*detJt*m_alpha;
-				ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*detJt*m_alpha;
+				ke[i3+2][j3  ] += (Gzi*DBL[2][0] + Gyi*DBL[4][0] + Gxi*DBL[5][0] )*detJt;
+				ke[i3+2][j3+1] += (Gzi*DBL[2][1] + Gyi*DBL[4][1] + Gxi*DBL[5][1] )*detJt;
+				ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*detJt;
 			}
 		}
 	}

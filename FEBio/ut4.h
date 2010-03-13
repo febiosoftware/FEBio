@@ -29,7 +29,6 @@ public:
 		FEUT4Domain* pd = new FEUT4Domain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
 		pd->m_tag = m_tag;
-		pd->m_alpha = m_alpha;
 		pd->m_Node = m_Node;
 		pd->m_NEL.Create(*pd);
 		return pd;
@@ -86,9 +85,10 @@ protected:
 	//! calculate the volume of a tet element
 	double TetVolume(vec3d* r);
 
-private:
-	double	m_alpha;	//!< stabilization factor alpha
+public:
+	static double	m_alpha;	//!< stabilization factor alpha
 
+private:
 	vector<int>		m_tag;	//!< nodal tags
 	vector<UT4NODE>	m_Node;	//!< Nodal data
 

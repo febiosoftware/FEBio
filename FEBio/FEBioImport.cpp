@@ -279,9 +279,28 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 					}
 					else if (strcmp(sze, "tet4") == 0)
 					{
-						if (strcmp(szv, "GAUSS4") == 0) m_ntet4 = ET_TET4;
-						else if (strcmp(szv, "UT4") == 0) m_ntet4 = ET_UT4;
-						else throw XMLReader::InvalidValue(tag);
+						if (tag.isleaf())
+						{
+							if (strcmp(szv, "GAUSS4") == 0) m_ntet4 = ET_TET4;
+							else if (strcmp(szv, "UT4") == 0) m_ntet4 = ET_UT4;
+							else throw XMLReader::InvalidValue(tag);
+						}
+						else
+						{
+							const char* szt = tag.AttributeValue("type");
+							if (strcmp(szt, "GAUSS4") == 0) m_ntet4 = ET_TET4;
+							else if (strcmp(szt, "UT4") == 0) m_ntet4 = ET_UT4;
+							else throw XMLReader::InvalidAttributeValue(tag, "type", szv);
+
+							++tag;
+							do
+							{
+								if (tag == "alpha") tag.value(FEUT4Domain::m_alpha);
+								else throw XMLReader::InvalidTag(tag);
+								++tag;
+							}
+							while (!tag.isend());
+						}
 					}
 					else throw XMLReader::InvalidAttributeValue(tag, "elem", sze);
 				}
