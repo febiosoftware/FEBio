@@ -136,9 +136,9 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 		pt.F = node.Fi;
 		pt.J = node.vi / node.Vi;
 
-		// if the material is incompressible we need to some additional values
-		// since for tets the 3-field formulation is pointless, I really need to
-		// change this.
+		// if the material is incompressible we need to set some additional values
+		// TODO: since for tets the 3-field formulation is pointless, I really need to
+		//       change this.
 		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
 		if (pmi)
 		{
@@ -189,11 +189,14 @@ void FEUT4Domain::Residual(FESolidSolver *psolver, vector<double> &R)
 //! This function calculates the nodal contribution to the residual
 void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 {
-	// jacobian matrix, inverse jacobian matrix and determinants
+	// inverse jacobian matrix
 	double Ji[3][3];
 
 	// shape function derivatives
 	double Gx[4], Gy[4], Gz[4];
+
+	// B-matrix
+	double Be[6][3] = {0};
 
 	int i, j, n;
 	double Ve;
@@ -213,6 +216,8 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 			assert(m_tag[i] >= 0);
 
 			UT4NODE& node = m_Node[ m_tag[i] ];
+			assert(node.inode == i);
+
 			mat3ds S = node.si - node.si.dev()*m_alpha;
 
 			// loop over all elements that belong to this node
@@ -225,6 +230,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 				// TODO: we should store this somewhere instead of recalculating it
 				Ve = TetVolume(el.r0());
 
+				// The '-' sign is so that the internal forces get subtracted from the residual (R = Fext - Fint)
 				double w = -0.25* Ve*node.vi / node.Vi;
 
 				// calculate the jacobian
@@ -245,10 +251,10 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 					Gz[j] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
 				}
 
-				// setup the element B-matrix
-				double Be[6][3] = {0};
+				// loop over element nodes
 				for (j=0; j<4; ++j)
 				{
+					// setup the element B-matrix
 					Be[0][0] = Gx[j]; Be[1][1] = Gy[j]; Be[2][2] = Gz[j];
 					Be[3][0] = Gy[j]; Be[3][1] = Gx[j]; 
 					Be[4][1] = Gz[j]; Be[4][2] = Gy[j]; 
@@ -558,6 +564,8 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	pt.F = node.Fi;
 	pt.J = node.vi / node.Vi;
 
+	pt.s = node.si;
+
 	// if the material is incompressible we need to some additional values
 	// since for tets the 3-field formulation is pointless, I really need to
 	// change this.
@@ -588,7 +596,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// Note the slightly different form than in the paper.
 	// This is because Cvol needs to have the proper symmetries
-	tens4ds Cvol = I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, CI)/3.0;
+	tens4ds Cvol = I4*(-2*p) + dyad1s(I, S)*(2.0/3.0) + dyad1s(I, CI)*(2.0/3.0);
 
 	// subtract the isochoric component from C;
 	// C = C - a*Ciso = C - (a*(C - Cvol)) = (1-a)*C + a*Cvol
@@ -969,7 +977,7 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 		tens4ds Cvol = I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, CI)/3.0;
 
 		// subtract the volumetric tensor from C;
-		C -= Cvol;
+		C = (C - Cvol)*m_alpha;
 
 		// extract the 'D' matrix
 		C.extract(D);

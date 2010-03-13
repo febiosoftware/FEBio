@@ -31,6 +31,7 @@ public:
 		pd->m_tag = m_tag;
 		pd->m_alpha = m_alpha;
 		pd->m_Node = m_Node;
+		pd->m_NEL.Create(*pd);
 		return pd;
 	}
 
