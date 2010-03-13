@@ -814,8 +814,241 @@ bool FEFEBioImport::ParseNodeSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+//! find the domain type for the element and material type
+int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
+{
+	FEM& fem = *m_pfem;
+	FEMesh* pm = &fem.m_mesh;
+
+	// get the module
+	if (fem.m_pStep->m_nModule == FE_HEAT)
+	{
+		if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_HEAT_SOLID_DOMAIN;
+		else throw XMLReader::InvalidTag(t);
+	}
+	else
+	{
+		if (dynamic_cast<FERigid*>(pmat))
+		{
+			// rigid elements
+			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_RIGID_SOLID_DOMAIN;
+			else if ((t == "quad4") || (t == "tri3")) return FE_RIGID_SHELL_DOMAIN;
+			else throw XMLReader::InvalidTag(t);
+		}
+		else if (dynamic_cast<FEPoroElastic*>(pmat))
+		{
+			// poro-elastic elements
+			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_PORO_SOLID_DOMAIN;
+			else throw XMLReader::InvalidTag(t);
+		}
+		else
+		{
+			// structural elements
+			if (t == "hex8")
+			{
+				if (fem.m_nhex8 == FE_UDGHEX) return FE_UDGHEX_DOMAIN;
+				else return FE_SOLID_DOMAIN;
+			}
+			else if (t == "tet4")
+			{
+				if (m_ntet4 == ET_UT4) return FE_UT4_DOMAIN;
+				else return FE_SOLID_DOMAIN;
+			}
+			else if (t == "penta6") return FE_SOLID_DOMAIN;
+			else if ((t == "quad4") || (t == "tri3")) return FE_SHELL_DOMAIN;
+			else if ((t == "truss2")) return FE_TRUSS_DOMAIN;
+			else throw XMLReader::InvalidTag(t);
+		}
+	}
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Create a particular type of domain
+FEDomain* FEFEBioImport::CreateDomain(int ntype, FEMesh* pm)
+{
+	switch (ntype)
+	{
+	case FE_SOLID_DOMAIN      : return new FEElasticSolidDomain(pm); break;
+	case FE_SHELL_DOMAIN      : return new FEElasticShellDomain(pm); break;
+	case FE_TRUSS_DOMAIN      : return new FEElasticTrussDomain(pm); break;
+	case FE_RIGID_SOLID_DOMAIN: return new FERigidSolidDomain  (pm); break;
+	case FE_RIGID_SHELL_DOMAIN: return new FERigidShellDomain  (pm); break;
+	case FE_UDGHEX_DOMAIN     : return new FEUDGHexDomain      (pm); break;
+	case FE_UT4_DOMAIN        : return new FEUT4Domain         (pm); break;
+	case FE_PORO_SOLID_DOMAIN : return new FEPoroSolidDomain   (pm); break;
+	case FE_HEAT_SOLID_DOMAIN : return new FEHeatSolidDomain   (pm); break;
+	}
+
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Reads the Element section from the FEBio input file
 
+bool FEFEBioImport::ParseElementSection(XMLTag& tag)
+{
+	FEM& fem = *m_pfem;
+	int i;
+
+	FEMesh& mesh = fem.m_mesh;
+
+	// first we need to figure out how many elements 
+	// and how many domains there are
+	XMLTag t(tag); ++t;
+	int nmat;
+	int nel = 0;
+	FEDomain* pdom = 0;
+	while (!t.isend())
+	{
+		// get the material ID
+		nmat = atoi(t.AttributeValue("mat"))-1;
+
+		// get material class
+		FEMaterial* pmat = fem.GetMaterial(nmat);
+
+		// see if we have a domain
+		if (pdom == 0) 
+		{
+			// if we don't, create a domain for the current element and material type
+			// first, find the domain type
+			int ntype = DomainType(t, pmat);
+			if (ntype == 0) return errf("Invalid domain type.");
+
+			// create the new domain
+			pdom = CreateDomain(ntype, &mesh);
+			if (pdom == 0) return errf("Failed creating domain.");
+
+			// reset element counter
+			nel = 1;
+		}
+		else
+		{
+			// see if we can add this element to the domain
+			int ntype = DomainType(t, pmat);
+			if (ntype == pdom->Type())
+			{
+				// yes, we can so increase element counter
+				++nel;
+			}
+			else
+			{
+				// no we can't so finalize domain 
+				// and add it to the mesh
+				assert(nel);
+				pdom->create(nel);
+				mesh.AddDomain(pdom);
+
+				// create a new domain
+				pdom = CreateDomain(ntype, &mesh);
+				if (pdom == 0) return errf("Failed creating domain.");
+
+				// reset element counter
+				nel = 1;
+			}
+		}
+
+		++t;
+	}
+
+	// create the last domain
+	pdom->create(nel);
+	mesh.AddDomain(pdom);
+
+	// read element data
+	++tag;
+	int nid = 1;
+	for (int nd =0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+
+		for (i=0; i<dom.Elements(); ++i, ++nid)
+		{
+			// get the material ID
+			nmat = atoi(tag.AttributeValue("mat"))-1;
+
+			// make sure the material number is valid
+			if ((nmat<0) || (nmat >= fem.Materials())) throw InvalidMaterial(i+1);
+
+			// get the material class
+			FEMaterial* pmat = fem.GetMaterial(nmat);
+
+			// determine element type
+			int etype = -1;
+			if      (tag == "hex8"  ) etype = ET_HEX8;
+			else if (tag == "penta6") etype = ET_PENTA6;
+			else if (tag == "tet4"  ) etype = m_ntet4;
+			else if (tag == "quad4" ) etype = ET_QUAD4;
+			else if (tag == "tri3"  ) etype = ET_TRI3;
+			else if (tag == "truss2") etype = ET_TRUSS2;
+			else throw XMLReader::InvalidTag(tag);
+
+			switch (etype)
+			{
+			case ET_HEX8:
+				{
+					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+					ReadSolidElement(tag, bd.Element(i), fem.m_nhex8, nid, nd, nmat);
+				}
+				break;
+			case ET_PENTA6:
+				{
+					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+					ReadSolidElement(tag, bd.Element(i), FE_PENTA, nid, nd, nmat);
+				}
+				break;
+			case ET_TET4:
+			case ET_UT4:
+				{
+					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+					ReadSolidElement(tag, bd.Element(i), FE_TET, nid, nd, nmat);
+				}
+				break;
+			case ET_QUAD4:
+				{
+					FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
+					ReadShellElement(tag, sd.Element(i), FE_SHELL_QUAD, nid, nd, nmat);
+				}
+				break;
+			case ET_TRI3:
+				{
+					FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
+					ReadShellElement(tag, sd.Element(i), FE_SHELL_TRI, nid, nd, nmat);
+				}
+				break;
+			case ET_TRUSS2:
+				{
+					FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
+					ReadTrussElement(tag, td.Element(i), FE_TRUSS, nid, nd, nmat);
+				}
+				break;
+			default:
+				return errf("Invalid element type.");
+			}
+
+			// go to next tag
+			++tag;
+		}
+	}
+
+	// assign material point data
+	for (i=0; i<mesh.Domains(); ++i)
+	{
+		FEDomain& d = mesh.Domain(i);
+		for (int j=0; j<d.Elements(); ++j)
+		{
+			FEElement& el = d.ElementRef(j);
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(pmat);
+			for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(pmat->CreateMaterialPointData(), k);
+		}
+	}
+
+	return true;
+}
+
+/*
 bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
@@ -1071,6 +1304,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 	return true;
 }
+*/
 
 //-----------------------------------------------------------------------------
 void FEFEBioImport::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype, int nid, int gid, int nmat)

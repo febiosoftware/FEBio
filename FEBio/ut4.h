@@ -28,6 +28,7 @@ public:
 	{
 		FEUT4Domain* pd = new FEUT4Domain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		pd->m_tag = m_tag;
 		pd->m_Node = m_Node;
 		pd->m_NEL.Create(*pd);

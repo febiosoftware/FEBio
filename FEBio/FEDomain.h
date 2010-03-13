@@ -7,6 +7,7 @@
 class FEMesh;
 class FESolidSolver;
 class FEHeatSolver;
+class FEMaterial;
 
 #define FE_SOLID_DOMAIN			1
 #define FE_SHELL_DOMAIN			2
@@ -26,13 +27,16 @@ class FEHeatSolver;
 class FEDomain
 {
 public:
-	FEDomain(FEMesh* pm, int ntype) { m_pMesh = pm; m_ntype = ntype; }
+	FEDomain(FEMesh* pm, int ntype) { m_pMesh = pm; m_ntype = ntype; m_pMat = 0; }
 	virtual ~FEDomain() {}
 
 	int Type() { return m_ntype; }
 
 	void SetMesh(FEMesh* pm) { m_pMesh = pm; }
 	FEMesh* GetMesh() { return m_pMesh; }
+
+	void SetMaterial(FEMaterial* pmat) { m_pMat = pmat; }
+	FEMaterial* GetMaterial() { return m_pMat; }
 
 	virtual void create(int n) = 0;
 
@@ -68,7 +72,8 @@ public:
 	}
 
 protected:
-	FEMesh*	m_pMesh;
+	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
+	FEMaterial*	m_pMat;		//!< the material for this domain
 
 	int	m_ntype;
 };
@@ -112,6 +117,7 @@ public:
 	{
 		FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -183,6 +189,7 @@ public:
 	{
 		FEPoroSolidDomain* pd = new FEPoroSolidDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -222,6 +229,7 @@ public:
 	{
 		FERigidSolidDomain* pd = new FERigidSolidDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -247,6 +255,7 @@ public:
 	{
 		FEUDGHexDomain* pd = new FEUDGHexDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -324,6 +333,7 @@ public:
 	{
 		FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -377,6 +387,7 @@ public:
 	{
 		FERigidShellDomain* pd = new FERigidShellDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -419,6 +430,7 @@ public:
 	{
 		FEElasticTrussDomain* pd = new FEElasticTrussDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -460,6 +472,7 @@ public:
 	{
 		FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_pMat = m_pMat;
 		return pd;
 	}
 

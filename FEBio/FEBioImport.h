@@ -47,6 +47,10 @@ protected:
 	bool ParseStepSection       (XMLTag& tag);
 	bool ParseSurfaceSection    (XMLTag& tag, FESurface& s, int nfmt);
 
+protected:
+	int DomainType(XMLTag& tag, FEMaterial* pmat);
+	FEDomain* CreateDomain(int ntype, FEMesh* pm);
+
 	void ReadSolidElement(XMLTag& tag, FESolidElement& el, int ntype, int nid, int gid, int nmat);
 	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int gid, int nmat);
 	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int gid, int nmat);
