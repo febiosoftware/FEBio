@@ -414,19 +414,123 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 //! calculates the nodal geometry stiffness contribution
 void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 {
-	// get the global node index
-	int i = node.inode;
+	int i, j, ni, nj;
 
 	// get the element list 
-	int NE = m_NEL.Valence(i);
-	FEElement** pe = m_NEL.ElementList(i);
+	int NE = m_NEL.Valence(node.inode);
+	FEElement** ppe = m_NEL.ElementList(node.inode);
+
+	// get the nodal stress
+	mat3ds S = node.si - node.si.dev()*m_alpha;
+
+	// create the LM and the en array
+	vector<int> LM; LM.resize(NE*4*3);
+	vector<int> en; en.resize(NE*4  );
+
+	for (ni=0; ni<NE; ++ni)
+	{
+		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
+		UnpackElement(el);
+		for (i=0; i<4; ++i)
+		{
+			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
+			LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
+			LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
+
+			en[ni*4+i] = el.m_node[i];
+		}
+	}
+
+	// stiffness matrices
+	double kij;
+	matrix ke; 
+	ke.Create(NE*4*3, NE*4*3); 
+	ke.zero();
+
+	// shape function derivatives
+	double Gi[4][3] = {0}, Gj[4][3] = {0};
 
 	// loop over all the elements
-	for (int n=0; n<NE; ++n)
+	for (ni=0; ni<NE; ++ni)
 	{
-		FESolidElement& el = dynamic_cast<FESolidElement&>(*pe[n]);
-		UnpackElement(el);
+		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
+		UnpackElement(ei);
+
+		// calculate element volume
+		// TODO: we should store this somewhere instead of recalculating it
+		double Vi = TetVolume(ei.r0());
+		double wi = 0.25* Vi*node.vi/ node.Vi;
+
+		// calculate the jacobian
+		double Ji[3][3];
+		ei.invjact(Ji, 0);
+
+		// get the shape function derivatives
+		const double* Gr, *Gs, *Gt;
+		Gr = ei.Gr(0);
+		Gs = ei.Gs(0);
+		Gt = ei.Gt(0);
+
+		for (j=0; j<4; ++j)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gi[j][0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+			Gi[j][1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+			Gi[j][2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+		}
+
+		// loop over the elements again
+		for (nj=0; nj<NE; ++nj)
+		{
+			FESolidElement& ej = dynamic_cast<FESolidElement&>(*ppe[nj]);
+			UnpackElement(ej);
+
+			// calculate element volume
+			// TODO: we should store this somewhere instead of recalculating it
+			double Vj = TetVolume(ej.r0());
+			double wj = 0.25* Vj / node.Vi;
+
+			// calculate the jacobian
+			double Ji[3][3];
+			ej.invjact(Ji, 0);
+
+			// get the shape function derivatives
+			Gr = ej.Gr(0);
+			Gs = ej.Gs(0);
+			Gt = ej.Gt(0);
+
+			for (j=0; j<4; ++j)
+			{
+				// calculate global gradient of shape functions
+				// note that we need the transposed of Ji, not Ji itself !
+				Gj[j][0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+				Gj[j][1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+				Gj[j][2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+			}
+			// We're ready to rock and roll!
+			double sg[3];
+			for (i=0; i<4; ++i)
+			{
+				for (j=0; j<4; ++j)
+				{
+					sg[0] = S.xx()*Gj[j][0] + S.xy()*Gj[j][1] + S.xz()*Gj[j][2];
+					sg[1] = S.xy()*Gj[j][0] + S.yy()*Gj[j][1] + S.yz()*Gj[j][2];
+					sg[2] = S.xz()*Gj[j][0] + S.yz()*Gj[j][1] + S.zz()*Gj[j][2];
+
+					kij = wi*wj*(Gi[i][0]*sg[0]+Gi[i][1]*sg[1]+Gi[i][2]*sg[2]);
+
+					// copy to element stiffness matrix
+					ke[ni*12+i*3  ][nj*12+j*3  ] = kij;
+					ke[ni*12+i*3+1][nj*12+j*3+1] = kij;
+					ke[ni*12+i*3+2][nj*12+j*3+2] = kij;
+				}
+			}
+		}
 	}
+
+	// assemble the stiffness
+	psolver->AssembleStiffness(en, LM, ke);
 }
 
 //-----------------------------------------------------------------------------
