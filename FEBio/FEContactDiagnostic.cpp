@@ -163,7 +163,7 @@ bool FEContactDiagnostic::Init()
 	}
 
 	// get the one-and-only domain
-	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&mesh);
+	FEElasticSolidDomain* pbd = new FEElasticSolidDomain(&mesh, 0);
 	pbd->create(2);
 	mesh.AddDomain(pbd);
 
@@ -204,6 +204,7 @@ bool FEContactDiagnostic::Init()
 	fem.AddMaterial(pm);
 
 	pbd->SetMatID(0);
+	pbd->SetMaterial(pm);
 
 	// --- create the sliding interface ---
 	FESlidingInterface* ps = new FESlidingInterface(&fem);

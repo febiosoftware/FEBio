@@ -21,14 +21,13 @@ class FEUT4Domain : public FEElasticSolidDomain
 
 public:
 	//! constructor
-	FEUT4Domain(FEMesh* pm);
+	FEUT4Domain(FEMesh* pm, FEMaterial* pmat);
 
 	//! clone function
 	FEDomain* Clone()
 	{
-		FEUT4Domain* pd = new FEUT4Domain(m_pMesh);
+		FEUT4Domain* pd = new FEUT4Domain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		pd->m_tag = m_tag;
 		pd->m_Node = m_Node;
 		pd->m_NEL.Create(*pd);

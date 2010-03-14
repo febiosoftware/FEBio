@@ -49,7 +49,7 @@ protected:
 
 protected:
 	int DomainType(XMLTag& tag, FEMaterial* pmat);
-	FEDomain* CreateDomain(int ntype, FEMesh* pm);
+	FEDomain* CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat);
 
 	void ReadSolidElement(XMLTag& tag, FESolidElement& el, int ntype, int nid, int gid, int nmat);
 	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int gid, int nmat);

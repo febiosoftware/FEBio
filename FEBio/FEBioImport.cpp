@@ -866,27 +866,33 @@ int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! Create a particular type of domain
-FEDomain* FEFEBioImport::CreateDomain(int ntype, FEMesh* pm)
+FEDomain* FEFEBioImport::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
 {
+	// create a new domain based on the type
+	FEDomain* pd = 0;
 	switch (ntype)
 	{
-	case FE_SOLID_DOMAIN      : return new FEElasticSolidDomain(pm); break;
-	case FE_SHELL_DOMAIN      : return new FEElasticShellDomain(pm); break;
-	case FE_TRUSS_DOMAIN      : return new FEElasticTrussDomain(pm); break;
-	case FE_RIGID_SOLID_DOMAIN: return new FERigidSolidDomain  (pm); break;
-	case FE_RIGID_SHELL_DOMAIN: return new FERigidShellDomain  (pm); break;
-	case FE_UDGHEX_DOMAIN     : return new FEUDGHexDomain      (pm); break;
-	case FE_UT4_DOMAIN        : return new FEUT4Domain         (pm); break;
-	case FE_PORO_SOLID_DOMAIN : return new FEPoroSolidDomain   (pm); break;
-	case FE_HEAT_SOLID_DOMAIN : return new FEHeatSolidDomain   (pm); break;
+	case FE_SOLID_DOMAIN      : pd = new FEElasticSolidDomain(pm, pmat); break;
+	case FE_SHELL_DOMAIN      : pd = new FEElasticShellDomain(pm, pmat); break;
+	case FE_TRUSS_DOMAIN      : pd = new FEElasticTrussDomain(pm, pmat); break;
+	case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain  (pm, pmat); break;
+	case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain  (pm, pmat); break;
+	case FE_UDGHEX_DOMAIN     : pd = new FEUDGHexDomain      (pm, pmat); break;
+	case FE_UT4_DOMAIN        : pd = new FEUT4Domain         (pm, pmat); break;
+	case FE_PORO_SOLID_DOMAIN : pd = new FEPoroSolidDomain   (pm, pmat); break;
+	case FE_HEAT_SOLID_DOMAIN : pd = new FEHeatSolidDomain   (pm, pmat); break;
 	}
 
-	return 0;
+	// return the domain
+	return pd;
 }
 
 //-----------------------------------------------------------------------------
-//! Reads the Element section from the FEBio input file
-
+//! This function reads the Element section from the FEBio input file. It also
+//! creates the domain classes which store the element data. A domain is defined
+//! by the module (structural, poro, heat, etc), the element type (solid, shell,
+//! etc.) and the material. 
+//!
 bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
@@ -917,7 +923,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			if (ntype == 0) return errf("Invalid domain type.");
 
 			// create the new domain
-			pdom = CreateDomain(ntype, &mesh);
+			pdom = CreateDomain(ntype, &mesh, pmat);
 			if (pdom == 0) return errf("Failed creating domain.");
 
 			// reset element counter
@@ -926,8 +932,9 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		else
 		{
 			// see if we can add this element to the domain
+			// note that the domain type and material must match
 			int ntype = DomainType(t, pmat);
-			if (ntype == pdom->Type())
+			if ((ntype == pdom->Type()) && (pmat == pdom->GetMaterial()))
 			{
 				// yes, we can so increase element counter
 				++nel;
@@ -941,7 +948,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 				mesh.AddDomain(pdom);
 
 				// create a new domain
-				pdom = CreateDomain(ntype, &mesh);
+				pdom = CreateDomain(ntype, &mesh, pmat);
 				if (pdom == 0) return errf("Failed creating domain.");
 
 				// reset element counter
@@ -973,6 +980,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 			// get the material class
 			FEMaterial* pmat = fem.GetMaterial(nmat);
+			assert(pmat == dom.GetMaterial());
 
 			// determine element type
 			int etype = -1;

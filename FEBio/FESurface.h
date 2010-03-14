@@ -27,7 +27,7 @@ class FESurface : public FEDomain
 {
 public:
 	//! constructor
-	FESurface(FEMesh* pm) : FEDomain(pm, FE_SURFACE_DOMAIN) {}
+	FESurface(FEMesh* pm) : FEDomain(FE_SURFACE_DOMAIN, pm, 0) {}
 
 	//! destructor
 	virtual ~FESurface(){}

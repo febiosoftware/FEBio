@@ -9,7 +9,7 @@ double FEUT4Domain::m_alpha = 0.05;
 
 //-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
-FEUT4Domain::FEUT4Domain(FEMesh*pm) : FEElasticSolidDomain(pm)
+FEUT4Domain::FEUT4Domain(FEMesh *pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
 {
 	// overwrite the domain type
 	m_ntype = FE_UT4_DOMAIN; 
@@ -111,12 +111,9 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 		}
 	}
 
-	// let's calculate the stresse
-	// TODO: I need to make sure that the domain has only one material
-	//       assigned to it. For now, we just pick the material of the
-	//		 first element
+	// let's calculate the stresses
 	// get the elastic material
-	FEElasticMaterial* pme = fem.GetElasticMaterial(m_Elem[0].GetMatID());
+	FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
 
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
@@ -544,9 +541,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	FEM& fem = psolver->m_fem;
 
 	// Get the material for the domain
-	// TODO: for now we assume that all elements have the same material
-	//       but I should really check this
-	FEElasticMaterial* pme = fem.GetElasticMaterial(m_Elem[0].GetMatID());
+	FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
 
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix

@@ -507,9 +507,9 @@ void FEMesh::Serialize(FEM& fem, Archive& ar)
 			FEDomain* pd = 0;
 			switch (ntype)
 			{
-			case FE_SOLID_DOMAIN: pd = new FEElasticSolidDomain(this); break;
-			case FE_SHELL_DOMAIN: pd = new FEElasticShellDomain(this); break;
-			case FE_TRUSS_DOMAIN: pd = new FEElasticTrussDomain(this); break;
+			case FE_SOLID_DOMAIN: pd = new FEElasticSolidDomain(this, 0); break;
+			case FE_SHELL_DOMAIN: pd = new FEElasticShellDomain(this, 0); break;
+			case FE_TRUSS_DOMAIN: pd = new FEElasticTrussDomain(this, 0); break;
 			default: assert(false);
 			}
 

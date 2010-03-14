@@ -27,7 +27,7 @@ class FEMaterial;
 class FEDomain
 {
 public:
-	FEDomain(FEMesh* pm, int ntype) { m_pMesh = pm; m_ntype = ntype; m_pMat = 0; }
+	FEDomain(int ntype, FEMesh* pm, FEMaterial* pmat) { m_pMesh = pm; m_ntype = ntype; m_pMat = pmat; }
 	virtual ~FEDomain() {}
 
 	int Type() { return m_ntype; }
@@ -84,7 +84,7 @@ class FESolidDomain : public FEDomain
 {
 public:
 	//! constructor
-	FESolidDomain(FEMesh* pm, int ntype) : FEDomain(pm, ntype) {}
+	FESolidDomain(int ntype, FEMesh* pm, FEMaterial* pmat) : FEDomain(ntype, pm, pmat) {}
 
 	//! create storage for elements
 	void create(int nsize) { m_Elem.resize(nsize); }
@@ -107,7 +107,7 @@ class FEElasticSolidDomain : public FESolidDomain
 {
 public:
 	//! constructor
-	FEElasticSolidDomain(FEMesh* pm) : FESolidDomain(pm, FE_SOLID_DOMAIN) {}
+	FEElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_SOLID_DOMAIN, pm, pmat) {}
 
 	//! TODO: do I really use this?
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
@@ -115,9 +115,8 @@ public:
 	//! create a clone of this class
 	FEDomain* Clone()
 	{
-		FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh);
+		FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -183,13 +182,12 @@ class FEPoroSolidDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEPoroSolidDomain(FEMesh* pm) : FEElasticSolidDomain(pm) { m_ntype = FE_PORO_SOLID_DOMAIN; }
+	FEPoroSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_PORO_SOLID_DOMAIN; }
 
 	FEDomain* Clone()
 	{
-		FEPoroSolidDomain* pd = new FEPoroSolidDomain(m_pMesh);
+		FEPoroSolidDomain* pd = new FEPoroSolidDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -223,13 +221,12 @@ class FERigidSolidDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FERigidSolidDomain(FEMesh* pm) : FEElasticSolidDomain(pm) { m_ntype = FE_RIGID_SOLID_DOMAIN; }
+	FERigidSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_RIGID_SOLID_DOMAIN; }
 
 	FEDomain* Clone()
 	{
-		FERigidSolidDomain* pd = new FERigidSolidDomain(m_pMesh);
+		FERigidSolidDomain* pd = new FERigidSolidDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -249,13 +246,12 @@ class FEUDGHexDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEUDGHexDomain(FEMesh* pm) : FEElasticSolidDomain(pm) { m_ntype = FE_UDGHEX_DOMAIN; }
+	FEUDGHexDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_UDGHEX_DOMAIN; }
 
 	FEDomain* Clone()
 	{
-		FEUDGHexDomain* pd = new FEUDGHexDomain(m_pMesh);
+		FEUDGHexDomain* pd = new FEUDGHexDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -303,7 +299,7 @@ class FEShellDomain : public FEDomain
 {
 public:
 	//! constructor
-	FEShellDomain(FEMesh* pm, int ntype) : FEDomain(pm, ntype) {}
+	FEShellDomain(int ntype, FEMesh* pm, FEMaterial* pmat) : FEDomain(ntype, pm, pmat) {}
 
 	//! create storage for elements
 	void create(int nsize) { m_Elem.resize(nsize); }
@@ -324,16 +320,15 @@ protected:
 class FEElasticShellDomain : public FEShellDomain
 {
 public:
-	FEElasticShellDomain(FEMesh* pm) : FEShellDomain(pm, FE_SHELL_DOMAIN) {}
+	FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat) : FEShellDomain(FE_SHELL_DOMAIN, pm, pmat) {}
 
 	//! TODO: do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	FEDomain* Clone()
 	{
-		FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh);
+		FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -381,13 +376,12 @@ class FERigidShellDomain : public FEElasticShellDomain
 {
 public:
 	//! constructor
-	FERigidShellDomain(FEMesh* pm) : FEElasticShellDomain(pm) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
+	FERigidShellDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticShellDomain(pm, pmat) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
 
 	FEDomain* Clone()
 	{
-		FERigidShellDomain* pd = new FERigidShellDomain(m_pMesh);
+		FERigidShellDomain* pd = new FERigidShellDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -406,7 +400,7 @@ public:
 class FETrussDomain : public FEDomain
 {
 public:
-	FETrussDomain(FEMesh* pm, int ntype) : FEDomain(pm, ntype){}
+	FETrussDomain(int ntype, FEMesh* pm, FEMaterial* pmat) : FEDomain(ntype, pm, pmat){}
 
 	void create(int n) { m_Elem.resize(n); }
 	int Elements() { return m_Elem.size(); }
@@ -424,13 +418,12 @@ protected:
 class FEElasticTrussDomain : public FETrussDomain
 {
 public:
-	FEElasticTrussDomain(FEMesh* pm) : FETrussDomain(pm, FE_TRUSS_DOMAIN) {}
+	FEElasticTrussDomain(FEMesh* pm, FEMaterial* pmat) : FETrussDomain(FE_TRUSS_DOMAIN, pm, pmat) {}
 
 	FEDomain* Clone()
 	{
-		FEElasticTrussDomain* pd = new FEElasticTrussDomain(m_pMesh);
+		FEElasticTrussDomain* pd = new FEElasticTrussDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 
@@ -466,13 +459,12 @@ public:
 class FEHeatSolidDomain : public FESolidDomain
 {
 public:
-	FEHeatSolidDomain(FEMesh* pm) : FESolidDomain(pm, FE_HEAT_SOLID_DOMAIN) {}
+	FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_HEAT_SOLID_DOMAIN, pm, pmat) {}
 
 	FEDomain* Clone()
 	{
-		FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh);
+		FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_pMat = m_pMat;
 		return pd;
 	}
 

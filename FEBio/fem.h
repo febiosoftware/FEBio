@@ -280,6 +280,15 @@ public:
 		return pme;
 	}
 
+	//! return the elastic material
+	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm)
+	{
+		if (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+		assert(pme);
+		return pme;
+	}
+
 	//! Add a loadcurve to the model
 	void AddLoadCurve(FELoadCurve* plc) { m_LC.add(plc); }
 

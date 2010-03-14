@@ -447,8 +447,8 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 	FEMesh& mesh = fem.m_mesh;
 	mesh.CreateNodes(m_nn);
 
-	FEElasticSolidDomain* pbd = (m_nbel>0 ? new FEElasticSolidDomain(&mesh) : 0);
-	FEElasticShellDomain* psd = (m_nsel>0 ? new FEElasticShellDomain(&mesh) : 0);
+	FEElasticSolidDomain* pbd = (m_nbel>0 ? new FEElasticSolidDomain(&mesh, 0) : 0);
+	FEElasticShellDomain* psd = (m_nsel>0 ? new FEElasticShellDomain(&mesh, 0) : 0);
 
 	if (pbd) { pbd->create(m_nbel); mesh.AddDomain(pbd); }
 	if (psd) { psd->create(m_nsel); mesh.AddDomain(psd); }
