@@ -59,6 +59,9 @@ public:
 
 	virtual void Residual(FESolidSolver* psolver, vector<double>& R) {}
 
+	//!< Initialize material point data for the elements
+	void InitMaterialPointData();
+
 	// TODO: this is not the preferred interface but I've added it for now
 	virtual FEElement& ElementRef(int i) = 0;
 

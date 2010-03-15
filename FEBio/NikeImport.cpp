@@ -579,26 +579,10 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 	}
 
 	// assign material point data
-	if (pbd)
+	for (i=0; i<mesh.Domains(); ++i)
 	{
-		for (i=0; i<pbd->Elements(); ++i)
-		{
-			FESolidElement& el = pbd->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-		}
-	}
-
-	if (psd)
-	{
-		for (i=0; i<psd->Elements(); ++i)
-		{
-			FEShellElement& el = psd->Element(i);
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-			assert(pmat);
-			for (int j=0; j<el.GaussPoints(); ++j) el.SetMaterialPointData(pmat->CreateMaterialPointData(), j);
-		}
+		FEDomain& d = mesh.Domain(i);
+		d.InitMaterialPointData();
 	}
 
 	////////////////////// R I G I D   N O D E   A N D   F A C E T   D E C K ////////////////

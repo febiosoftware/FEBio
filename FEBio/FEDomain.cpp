@@ -18,6 +18,18 @@ FEElement* FEDomain::FindElementFromID(int nid)
 	return 0;
 }
 
+//-----------------------------------------------------------------------------
+
+void FEDomain::InitMaterialPointData()
+{
+	if (m_pMat == 0) return;
+
+	for (int i=0; i<Elements(); ++i)
+	{
+		FEElement& el = ElementRef(i);
+		for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(m_pMat->CreateMaterialPointData(), k);
+	}
+}
 
 //-----------------------------------------------------------------------------
 // FEElasticSolidDomain
