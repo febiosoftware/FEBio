@@ -296,6 +296,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 							do
 							{
 								if (tag == "alpha") tag.value(FEUT4Domain::m_alpha);
+								else if (tag == "iso_stab") tag.value(FEUT4Domain::m_bdev);
 								else throw XMLReader::InvalidTag(tag);
 								++tag;
 							}

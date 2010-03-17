@@ -1,6 +1,7 @@
 #pragma once
 #include "FEDomain.h"
 #include "FENodeElemList.h"
+#include "tens4d.h"
 
 //-----------------------------------------------------------------------------
 //! Domain for nodally integrated tet elements 
@@ -85,8 +86,11 @@ protected:
 	//! calculate the volume of a tet element
 	double TetVolume(vec3d* r);
 
+	tens4ds Cvol(const tens4ds& C, const mat3ds& S);
+
 public:
 	static double	m_alpha;	//!< stabilization factor alpha
+	static bool		m_bdev;		//!< use deviatoric components only for the element contribution
 
 private:
 	vector<int>		m_tag;	//!< nodal tags

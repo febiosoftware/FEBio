@@ -61,7 +61,7 @@ public:
 	tens4ds& operator /= (double g);
 
 	// double contraction with tensor
-	mat3ds dot(const mat3ds& m);
+	mat3ds dot(const mat3ds& m) const;
 
 	// intialize to zero
 	void zero();

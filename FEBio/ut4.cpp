@@ -6,6 +6,7 @@
 
 // set the default stabilization factor
 double FEUT4Domain::m_alpha = 0.05;
+bool FEUT4Domain::m_bdev = true;
 
 //-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
@@ -215,8 +216,15 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 			UT4NODE& node = m_Node[ m_tag[i] ];
 			assert(node.inode == i);
 
-//			mat3ds S = node.si - node.si.dev()*m_alpha;
-			mat3ds S = node.si*(1 - m_alpha);
+			mat3ds S;
+			if (m_bdev)
+			{
+				S = node.si - node.si.dev()*m_alpha;
+			}
+			else
+			{
+				S = node.si*(1 - m_alpha);
+			}
 
 			// loop over all elements that belong to this node
 			for (n=0; n<NE; ++n)
@@ -351,8 +359,14 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 
 		// take the deviatoric component and multiply it
 		// with the stabilization factor
-//		s = s.dev()*m_alpha;
-		s = s*m_alpha;
+		if (m_bdev)
+		{
+			s = s.dev()*m_alpha;
+		}
+		else
+		{
+			s = s*m_alpha;
+		}
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -426,8 +440,15 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 	FEElement** ppe = m_NEL.ElementList(node.inode);
 
 	// get the nodal stress
-//	mat3ds S = node.si - node.si.dev()*m_alpha;
-	mat3ds S = node.si*(1 - m_alpha);
+	mat3ds S;
+	if (m_bdev)
+	{
+		S = node.si - node.si.dev()*m_alpha;
+	}
+	else
+	{
+		S = node.si*(1 - m_alpha);
+	}
 
 	// create the LM and the en array
 	vector<int> LM; LM.resize(NE*4*3);
@@ -534,6 +555,21 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculate the volumetric contribution of the spatial tangent stiffness
+//!
+tens4ds FEUT4Domain::Cvol(const tens4ds& C, const mat3ds& S)
+{
+	double p = -S.tr()/3.0;
+
+	mat3dd I(1);	// Identity
+	tens4ds I4  = dyad4s(I);
+
+	// Note the slightly different form than in the paper.
+	// This is because Cvol needs to have the proper symmetries
+	return I4*(2*p) + dyad1s(I, S)/3.0;// + dyad1s(I, C.dot(I))/3.0;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the nodal material stiffness contribution
 void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 {
@@ -578,23 +614,16 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// TODO: For incompressible materials, there is a contribution
 	//		 coming from the dilatational stiffness matrix which is calculated
 	//       elsewhere. This might be a problem.
-/*	mat3ds S = pt.s;
-	double p = -S.tr()/3.0;
-
-	mat3dd I(1);	// Identity
-	tens4ds I4  = dyad4s(I);
-
-	mat3ds CI = C.dot(I); // = C:I
-
-	// Note the slightly different form than in the paper.
-	// This is because Cvol needs to have the proper symmetries
-	tens4ds Cvol = I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, CI)/3.0;
-
-	// subtract the isochoric component from C;
-	// C = C - a*Ciso = C - (a*(C - Cvol)) = (1-a)*C + a*Cvol
-//	C = C*(1 - m_alpha) + Cvol*m_alpha;
-*/
-	C = C*(1 - m_alpha);
+	if (m_bdev)
+	{
+		// subtract the isochoric component from C;
+		// C = C - a*Ciso = C - (a*(C - Cvol)) = (1-a)*C + a*Cvol
+		C = C*(1 - m_alpha) + Cvol(C, pt.s)*m_alpha;
+	}
+	else
+	{
+		C = C*(1 - m_alpha);
+	}
 
 	// extract the 'D' matrix
 	double D[6][6] = {0};
@@ -860,8 +889,14 @@ void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 		mat3ds s = pt.s;
 
 		// we work with the deviatoric component only
-//		s = s.dev()*m_alpha;
-		s = s*m_alpha;
+		if (m_bdev)
+		{
+			s = s.dev()*m_alpha;
+		}
+		else
+		{
+			s = s*m_alpha;
+		}
 
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
@@ -939,27 +974,20 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 
 		// Calculate the tangent
 		tens4ds C = pmat->Tangent(mp);
-/*
+
 		// Next, we need to subtract the volumetric contribution Cvol
 		// TODO: For incompressible materials, there is a contribution
 		//		 coming from the dilatational stiffness matrix which is calculated
 		//       elsewhere. This might be a problem.
-		mat3ds S = pt.s;
-		double p = -S.tr()/3.0;
-
-		mat3dd I(1);	// Identity
-		tens4ds I4  = dyad4s(I);
-
-		mat3ds CI = C.dot(I); // = C:I
-
-		// Note the slightly different form than in the paper.
-		// This is because Cvol needs to have the proper symmetries
-		tens4ds Cvol = I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, CI)/3.0;
-
-		// subtract the volumetric tensor from C;
-//		C = (C - Cvol)*m_alpha;
-*/
-		C = C*m_alpha;
+		if (m_bdev)
+		{
+			// subtract the volumetric tensor from C;
+			C = (C - Cvol(C, pt.s))*m_alpha;
+		}
+		else
+		{
+			C = C*m_alpha;
+		}
 
 		// extract the 'D' matrix
 		C.extract(D);

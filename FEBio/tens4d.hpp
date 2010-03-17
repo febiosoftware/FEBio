@@ -396,7 +396,7 @@ inline tens4ds dyad4s(const mat3ds& a, const mat3ds& b)
 
 //-----------------------------------------------------------------------------
 // double contraction with a symmetric 2nd-order tensor
-inline mat3ds tens4ds::dot(const mat3ds &m)
+inline mat3ds tens4ds::dot(const mat3ds &m) const
 {
 	mat3ds a;
 	a.xx() = d[ 0]*m.xx() + d[ 1]*m.yy() + d[ 3]*m.zz() + 2*d[ 6]*m.xy() + 2*d[10]*m.yz() + 2*d[15]*m.xz();
