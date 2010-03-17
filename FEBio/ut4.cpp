@@ -6,7 +6,7 @@
 
 // set the default stabilization factor
 double FEUT4Domain::m_alpha = 0.05;
-bool FEUT4Domain::m_bdev = true;
+bool FEUT4Domain::m_bdev = false;
 
 //-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain

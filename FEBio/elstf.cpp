@@ -546,10 +546,15 @@ bool FESolidSolver::Residual(vector<double>& R)
 	if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) InertialForces(R);
 
 	// calculate forces due to pressure and add them to the residual
-	// loop over surface elements
 	if (m_fem.m_psurf)
 	{
 		m_fem.m_psurf->Residual(this, R);
+	}
+
+	// calculate forces due to tractions and add them to the residual
+	if (m_fem.m_ptrac)
+	{
+		m_fem.m_ptrac->Residual(this, R);
 	}
 
 	// rigid joint forces

@@ -352,6 +352,25 @@ bool FEM::InitRigidBodies()
 		}
 	}
 
+	if (m_ptrac)
+	{
+		for (i=0; i<m_ptrac->Elements(); ++i)
+		{
+			FESurfaceElement& el = m_ptrac->Element(i);
+			int N = el.Nodes();
+			el.m_nrigid = 0;
+			for (j=0; j<N; ++j) 
+			{
+				FENode& node = m_mesh.Node(el.m_node[j]);
+				if (node.m_rid < 0) 
+				{
+					el.m_nrigid = -1;
+					break;
+				}
+			}
+		}
+	}
+
 	// the rigid body constraints are still associated with the rigid materials
 	// so we now associate them with the rigid bodies
 	for (i=0; i<m_RDC.size(); ++i)

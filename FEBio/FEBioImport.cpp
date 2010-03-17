@@ -1639,6 +1639,49 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				++tag;
 			}
 		}
+		else if (tag == "traction")
+		{
+			const char* sz;
+
+			// count how many traction cards there are
+			int ntc = 0;
+			XMLTag t(tag); ++t;
+			while (!t.isend()) { ntc++; ++t; }
+
+			// allocate traction data
+			fem.m_ptrac = new FEConstTractionSurface(&fem.m_mesh);
+			FEConstTractionSurface& pt = *fem.m_ptrac;
+			pt.create(ntc);
+
+			// read the traction data
+			++tag;
+			int nf[4], N;
+			vec3d s;
+			for (int i=0; i<ntc; ++i)
+			{
+				FETractionLoad& tc = pt.TractionLoad(i);
+				FESurfaceElement& el = fem.m_ptrac->Element(i);
+
+				sz = tag.AttributeValue("lc", true);
+				if (sz) tc.lc = atoi(sz); else tc.lc = 0;
+
+				s.x  = atof(tag.AttributeValue("tx"));
+				s.y  = atof(tag.AttributeValue("ty"));
+				s.z  = atof(tag.AttributeValue("tz"));
+
+				tc.s[0] = tc.s[1] = tc.s[2] = tc.s[3] = s;
+
+				if (tag == "quad4") el.SetType(FE_QUAD);
+				else if (tag == "tri3") el.SetType(FE_TRI);
+				else throw XMLReader::InvalidTag(tag);
+
+				N = el.Nodes();
+				tag.value(nf, N);
+				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+				++tag;
+			}
+		}
 		else if (tag == "contact") ParseContactSection(tag);
 		else if (tag == "linear_constraint") ParseConstraints(tag);
 		else if (tag == "spring")

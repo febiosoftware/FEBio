@@ -470,7 +470,8 @@ public:
 		vector<FENodalForce>	m_FC;		//!< concentrated nodal force cards
 
 		// pressure BC
-		FEPressureSurface*	m_psurf;	//!< pressure surface domain
+		FEPressureSurface*		m_psurf;	//!< pressure surface domain
+		FEConstTractionSurface*	m_ptrac;	//!< constant traction surface
 
 		// rigid displacements
 		vector<FERigidBodyDisplacement>	m_RDC;	//!< rigid body displacements

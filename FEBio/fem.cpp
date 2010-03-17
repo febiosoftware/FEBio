@@ -39,6 +39,7 @@ FEM::FEM()
 
 	//surface for the pressure boundary condition
 	m_psurf = 0;
+	m_ptrac = 0;
 
 	// --- Material Data ---
 	// (nothing to initialize yet)
@@ -422,6 +423,11 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 	if (m_psurf)
 	{
 		for (i=0; i<m_psurf->Elements(); ++i) if (m_psurf->PressureLoad(i).GetID() == nid) return &m_psurf->PressureLoad(i);
+	}
+
+	if (m_ptrac)
+	{
+		for (i=0; i<m_ptrac->Elements(); ++i) if (m_ptrac->TractionLoad(i).GetID() == nid) return &m_ptrac->TractionLoad(i);
 	}
 
 	for (i=0; i<m_RDC.size(); ++i) if (m_RDC[i].GetID() == nid) return &m_RDC[i];
