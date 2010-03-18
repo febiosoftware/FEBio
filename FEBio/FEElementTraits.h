@@ -219,6 +219,21 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// single Gauss point integrated tet element
+
+class FEG1TetElementTraits : public FESolidElementTraits
+{
+public:
+	enum { NINT = 1};
+	enum { NELN = 4};
+
+public:
+	FEG1TetElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_TETG1; init(); }
+
+	void init();
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // CLASS: FEPentaElementTraits
 // 6-node pentahedral elements with 6-point gaussian quadrature 
 //

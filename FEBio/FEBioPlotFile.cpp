@@ -273,6 +273,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 					n[8] = el.m_node[5]+1;
 					break;
 				case FE_TET:
+				case FE_TETG1:
 					n[1] = el.m_node[0]+1;
 					n[2] = el.m_node[1]+1;
 					n[3] = el.m_node[2]+1;

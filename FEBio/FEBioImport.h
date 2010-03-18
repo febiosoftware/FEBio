@@ -11,7 +11,7 @@
 class FEFEBioImport : public FEFileImport
 {
 	// Element types
-	enum { ET_HEX8, ET_PENTA6, ET_TET4, ET_UT4, ET_QUAD4, ET_TRI3, ET_TRUSS2 };
+	enum { ET_HEX8, ET_PENTA6, ET_TET4, ET_UT4, ET_TETG1, ET_QUAD4, ET_TRI3, ET_TRUSS2 };
 
 	// element classes
 	enum { EC_STRUCT, EC_RIGID, EC_PORO, EC_HEAT };

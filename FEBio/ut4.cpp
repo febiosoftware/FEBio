@@ -33,7 +33,7 @@ bool FEUT4Domain::Initialize(FEM& fem)
 	for (i=0; i<NE; ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		assert(el.Type() == FE_TET);
+		assert((el.Type() == FE_TET) || (el.Type() == FE_TETG1));
 		for (int j=0; j<4; ++j) m_tag[el.m_node[j]] = 1;
 	}
 

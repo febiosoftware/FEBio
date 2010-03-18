@@ -282,6 +282,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 						if (tag.isleaf())
 						{
 							if (strcmp(szv, "GAUSS4") == 0) m_ntet4 = ET_TET4;
+							else if (strcmp(szv, "GAUSS1") == 0) m_ntet4 = ET_TETG1;
 							else if (strcmp(szv, "UT4") == 0) m_ntet4 = ET_UT4;
 							else throw XMLReader::InvalidValue(tag);
 						}
@@ -289,6 +290,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 						{
 							const char* szt = tag.AttributeValue("type");
 							if (strcmp(szt, "GAUSS4") == 0) m_ntet4 = ET_TET4;
+							else if (strcmp(szt, "GAUSS1") == 0) m_ntet4 = ET_TETG1;
 							else if (strcmp(szt, "UT4") == 0) m_ntet4 = ET_UT4;
 							else throw XMLReader::InvalidAttributeValue(tag, "type", szv);
 
@@ -1012,6 +1014,12 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 				{
 					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 					ReadSolidElement(tag, bd.Element(i), FE_TET, nid, nd, nmat);
+				}
+				break;
+			case ET_TETG1:
+				{
+					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+					ReadSolidElement(tag, bd.Element(i), FE_TETG1, nid, nd, nmat);
 				}
 				break;
 			case ET_QUAD4:

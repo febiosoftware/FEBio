@@ -585,6 +585,42 @@ void FETetElementTraits::init()
 	}
 }
 
+
+//*****************************************************************************
+//                          F E G 1 T E T E L E M E N T
+//*****************************************************************************
+
+void FEG1TetElementTraits::init()
+{
+	// gaussian integration for tetrahedral elements
+	const double a = 0.25;
+	const double w = 1.0 / 6.0;
+
+	gr[0] = a; gs[0] = a; gt[0] = a; gw[0] = w;
+
+	// calculate shape function values at gauss points
+	H[0][0] = 1 - gr[0] - gs[0] - gt[0];
+	H[0][1] = gr[0];
+	H[0][2] = gs[0];
+	H[0][3] = gt[0];
+
+	// calculate local derivatives of shape functions at gauss points
+	Gr[0][0] = -1;
+	Gr[0][1] =  1;
+	Gr[0][2] =  0;
+	Gr[0][3] =  0;
+
+	Gs[0][0] = -1;
+	Gs[0][1] =  0;
+	Gs[0][2] =  1;
+	Gs[0][3] =  0;
+
+	Gt[0][0] = -1;
+	Gt[0][1] =  0;
+	Gt[0][2] =  0;
+	Gt[0][3] =  1;
+}
+
 //*****************************************************************************
 //                          F E P E N T A E L E M E N T
 //*****************************************************************************

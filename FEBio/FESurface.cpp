@@ -87,6 +87,7 @@ int FESurface::FindElement(FESurfaceElement& el)
 		case FE_HEX  : nfaces = 6; break;
 		case FE_PENTA: nfaces = 5; break;
 		case FE_TET  : nfaces = 4; break;
+		case FE_TETG1: nfaces = 4; break;
 		case FE_SHELL_QUAD : nfaces = 1; break;
 		case FE_SHELL_TRI  : nfaces = 1; break;
 		default:

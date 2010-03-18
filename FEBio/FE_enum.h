@@ -19,19 +19,20 @@ enum FE_Element_Type {
 	FE_UDGHEX,		// = 2
 	FE_TET,			// = 3
 	FE_PENTA,		// = 4
+	FE_TETG1,		// = 5
 
 	// 2.5D surface elements
-	FE_QUAD,		// = 5
-	FE_NIQUAD,		// = 6
-	FE_TRI,			// = 7
-	FE_NITRI,		// = 8
+	FE_QUAD,		// = 6
+	FE_NIQUAD,		// = 7
+	FE_TRI,			// = 8
+	FE_NITRI,		// = 9
 
 	// shell elements
-	FE_SHELL_QUAD,	// = 9
-	FE_SHELL_TRI,	// = 10
+	FE_SHELL_QUAD,	// = 10
+	FE_SHELL_TRI,	// = 11
 
 	// truss elements
-	FE_TRUSS		// = 11
+	FE_TRUSS		// = 12
 };
 
 /////////////////////////////////////////////////////////////////////////////
