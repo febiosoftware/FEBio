@@ -566,7 +566,7 @@ tens4ds FEUT4Domain::Cvol(const tens4ds& C, const mat3ds& S)
 
 	// Note the slightly different form than in the paper.
 	// This is because Cvol needs to have the proper symmetries
-	return I4*(2*p) + dyad1s(I, S)/3.0;// + dyad1s(I, C.dot(I))/3.0;
+	return I4*(2*p) + dyad1s(I, S)/3.0 + dyad1s(I, C.dot(I))/6.0;
 }
 
 //-----------------------------------------------------------------------------
