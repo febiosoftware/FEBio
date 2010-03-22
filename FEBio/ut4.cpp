@@ -610,10 +610,17 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// Calculate the tangent
 	tens4ds C = pme->Tangent(pt);
 
+	// if the material is incompressible we need to add
+	// the dilatational part since that part is not calculated in the
+	// Tangent function.
+	if (pmi)
+	{
+		double dpdJ = pmi->Upp(pt.J);
+		mat3dd I(1); // Identity
+		C += dyad1s(I)*(pt.J*dpdJ);
+	}
+
 	// Next, we need to subtract the volumetric contribution Cvol
-	// TODO: For incompressible materials, there is a contribution
-	//		 coming from the dilatational stiffness matrix which is calculated
-	//       elsewhere. This might be a problem.
 	if (m_bdev)
 	{
 		// subtract the isochoric component from C;
@@ -975,10 +982,18 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 		// Calculate the tangent
 		tens4ds C = pmat->Tangent(mp);
 
+		// if the material is incompressible we need to add
+		// the dilatational part since that part is not calculated in the
+		// Tangent function.
+		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pmat);
+		if (pmi)
+		{
+			double dpdJ = pmi->Upp(pt.J);
+			mat3dd I(1); // Identity
+			C += dyad1s(I)*(pt.J*dpdJ);
+		}
+
 		// Next, we need to subtract the volumetric contribution Cvol
-		// TODO: For incompressible materials, there is a contribution
-		//		 coming from the dilatational stiffness matrix which is calculated
-		//       elsewhere. This might be a problem.
 		if (m_bdev)
 		{
 			// subtract the volumetric tensor from C;
