@@ -9,15 +9,30 @@
 
 #include "FEMaterial.h"
 
-void FEEllipsoidalFiberDistributionInit(const double m_ksi[], const double m_beta[]);
+//-----------------------------------------------------------------------------
+//! Material class for the ellipsoidal fiber distribution
+//!
 
-mat3ds FEEllipsoidalFiberDistributionStress(const double m_ksi[], const double m_beta[], 
-											const int nint, const double m_cth[], const double m_sth[], 
-											const double m_cph[], const double m_sph[], const double m_w[], 
-											const double J, const mat3d F, const mat3d Q);
+class FEEllipsoidalFiberDistribution : public FEMaterial
+{
+public:
+	//! Initialization
+	void Init();
 
-tens4ds FEEllipsoidalFiberDistributionTangent(const double m_ksi[], const double m_beta[], 
-											  const int nint, const double m_cth[], const double m_sth[], 
-											  const double m_cph[], const double m_sph[], const double m_w[], 
-											  const double J, const mat3d F, const mat3d Q);
+	//! Cauchy stress
+	mat3ds Stress(FEMaterialPoint& mp);
 
+	// Spatial tangent
+	tens4ds Tangent(FEMaterialPoint& mp);
+
+public:
+	double	m_beta[3];	// power in power-law relation
+	double	m_ksi[3];	// coefficient in power-law relation
+
+	static int		m_nres;	// integration rule
+	static double	m_cth[];
+	static double	m_sth[];
+	static double	m_cph[];
+	static double	m_sph[];
+	static double	m_w[];
+};

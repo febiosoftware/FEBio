@@ -5,16 +5,14 @@
  *  Created by Gerard Ateshian on 2/17/10.
  *
  */
-
+#include "stdafx.h"
 #include "FEDonnanEquilibrium.h"
 
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 // FEDonnanEquilibrium
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 
-void FEDonnanEquilibriumInit(const double m_phiwr, const double m_cFr, 
-							 const double m_Rgas, const double m_Tabs, 
-							 const double m_bosm)
+void FEDonnanEquilibrium::Init()
 {
 	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
 	if (m_Rgas < 0) throw MaterialError("R must be positive.");
@@ -22,10 +20,13 @@ void FEDonnanEquilibriumInit(const double m_phiwr, const double m_cFr,
 	if (m_bosm < 0) throw MaterialError("bosm must be positive.");
 }
 
-mat3ds FEDonnanEquilibriumStress(const double m_phiwr, const double m_cFr, 
-								 const double m_Rgas, const double m_Tabs, 
-								 const double m_bosm, const double J)
+//-----------------------------------------------------------------------------
+mat3ds FEDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// jacobian
+	double J = pt.J;
 	
 	// calculate fixed charge density in current configuration
 	double cF = m_phiwr*m_cFr/(J-1+m_phiwr);
@@ -39,10 +40,13 @@ mat3ds FEDonnanEquilibriumStress(const double m_phiwr, const double m_cFr,
 	return s;
 }
 
-tens4ds FEDonnanEquilibriumTangent(const double m_phiwr, const double m_cFr, 
-								   const double m_Rgas, const double m_Tabs, 
-								   const double m_bosm, const double J)
+//-----------------------------------------------------------------------------
+tens4ds FEDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// jacobian
+	double J = pt.J;
 
 	// calculate fixed charge density in current configuration
 	double cF = m_phiwr*m_cFr/(J-1+m_phiwr);
@@ -64,9 +68,8 @@ tens4ds FEDonnanEquilibriumTangent(const double m_phiwr, const double m_cFr,
 	return c;
 }
 
-double FEDonnanEquilibriumBulkModulus(const double m_phiwr, const double m_cFr, 
-									  const double m_Rgas, const double m_Tabs, 
-									  const double m_bosm)
+//-----------------------------------------------------------------------------
+double FEDonnanEquilibrium::BulkModulus()
 {
 	// calculate osmotic pressure (assume J=1)
 	double tosm = sqrt(m_cFr*m_cFr+m_bosm*m_bosm);	// tissue osmolarity
@@ -77,4 +80,3 @@ double FEDonnanEquilibriumBulkModulus(const double m_phiwr, const double m_cFr,
 	
 	return -(pi/3.0 + bpi);
 }
-

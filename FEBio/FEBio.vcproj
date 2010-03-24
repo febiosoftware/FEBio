@@ -432,6 +432,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEDonnanEquilibrium.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElemElemList.cpp"
 				>
 			</File>
@@ -445,6 +449,10 @@
 			</File>
 			<File
 				RelativePath=".\FEElementTraits.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEllipsoidalFiberDistribution.cpp"
 				>
 			</File>
 			<File
@@ -998,6 +1006,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEDonnanEquilibrium.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElemElemList.h"
 				>
 			</File>
@@ -1011,6 +1023,10 @@
 			</File>
 			<File
 				RelativePath=".\FEElementTraits.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEllipsoidalFiberDistribution.h"
 				>
 			</File>
 			<File

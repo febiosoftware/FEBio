@@ -8,19 +8,28 @@
 
 #include "FEMaterial.h"
 
-void FEDonnanEquilibriumInit(const double m_phiwr, const double m_cFr, 
-							 const double m_Rgas, const double m_Tabs, 
-							 const double m_bosm);
+//-----------------------------------------------------------------------------
+//! Material class that implements Donnan equilibrium. 
+//
+class FEDonnanEquilibrium : public FEMaterial
+{
+public:
+	//! Initialization routine
+	void Init();
 
-mat3ds FEDonnanEquilibriumStress(const double m_phiwr, const double m_cFr, 
-								 const double m_Rgas, const double m_Tabs, 
-								 const double m_bosm, const double J);
+	//! Returns the Cauchy stress
+	mat3ds Stress(FEMaterialPoint& mp);
 
-tens4ds FEDonnanEquilibriumTangent(const double m_phiwr, const double m_cFr, 
-								   const double m_Rgas, const double m_Tabs, 
-								   const double m_bosm, const double J);
+	//! Returs the spatial tangent
+	tens4ds Tangent(FEMaterialPoint& mp);
 
-double FEDonnanEquilibriumBulkModulus(const double m_phiwr, const double m_cFr, 
-							 const double m_Rgas, const double m_Tabs, 
-							 const double m_bosm);
+	//! returns the bulkmodulus
+	double BulkModulus();
 
+public:
+	double	m_phiwr;	//!< fluid volume fraction in reference configuration
+	double	m_cFr;		//!< fixed charge density in reference configuration
+	double	m_Rgas;		//!< universal gas constant
+	double	m_Tabs;		//!< absolute temperature
+	double	m_bosm;		//!< bath osmolarity
+};

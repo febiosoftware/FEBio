@@ -6,18 +6,30 @@
  *  Copyright 2010 Columbia University. All rights reserved.
  *
  */
-
+#include "stdafx.h"
 #include "FEEllipsoidalFiberDistribution.h"
+
+// The following file contains the integration points and weights
+// for the integration over a unit sphere in spherical coordinates
+#include "geodesic.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
 #endif
 
-//////////////////////////////////////////////////////////////////////
-// FEEllipsoidalFiberDistribution
-//////////////////////////////////////////////////////////////////////
+// we store the cos and sin of the angles here
+int FEEllipsoidalFiberDistribution::m_nres = 0;
+double FEEllipsoidalFiberDistribution::m_cth[NSTH];
+double FEEllipsoidalFiberDistribution::m_sth[NSTH];
+double FEEllipsoidalFiberDistribution::m_cph[NSTH];
+double FEEllipsoidalFiberDistribution::m_sph[NSTH];
+double FEEllipsoidalFiberDistribution::m_w[NSTH];
 
-void FEEllipsoidalFiberDistributionInit(const double m_ksi[], const double m_beta[])
+//-----------------------------------------------------------------------------
+// FEEllipsoidalFiberDistribution
+//-----------------------------------------------------------------------------
+
+void FEEllipsoidalFiberDistribution::Init()
 {
 	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
 	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
@@ -25,21 +37,52 @@ void FEEllipsoidalFiberDistributionInit(const double m_ksi[], const double m_bet
 	if (m_beta[0] < 2) throw MaterialError("beta1 must be greater than 2.");
 	if (m_beta[1] < 2) throw MaterialError("beta1 must be greater than 2.");
 	if (m_beta[2] < 2) throw MaterialError("beta1 must be greater than 2.");
+
+	static bool bfirst = true;
+	
+	if (bfirst)
+	{
+		// select the integration rule
+		const int nint = (m_nres == 0? NSTL  : NSTH  );
+		const double* phi = (m_nres == 0? PHIL  : PHIH  );
+		const double* the = (m_nres == 0? THETAL: THETAH);
+		const double* w   = (m_nres == 0? AREAL : AREAH );
+		
+		for (int n=0; n<nint; ++n)
+		{
+			m_cth[n] = cos(the[n]);
+			m_sth[n] = sin(the[n]);
+			m_cph[n] = cos(phi[n]);
+			m_sph[n] = sin(phi[n]);
+			m_w[n] = w[n];
+		}
+		
+		bfirst = false;
+	}
 }
 
-mat3ds FEEllipsoidalFiberDistributionStress(const double m_ksi[], const double m_beta[], 
-											const int nint, const double m_cth[], const double m_sth[], 
-											const double m_cph[], const double m_sph[], const double m_w[], 
-											const double J, const mat3d F, const mat3d Q)
+//-----------------------------------------------------------------------------
+mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// deformation gradient
+	mat3d &F = pt.F;
+	double J = pt.J;
+
+	// get the element's local coordinate system
+	mat3d& Q = pt.Q;
+
 	// loop over all integration points
 	double ksi, beta;
 	vec3d n0e, n0a, nt;
 	double In, Wl;
 	const double eps = 0;
-	mat3ds C = (F.transpose()*F).sym();
+	mat3ds C = pt.RightCauchyGreen();
 	mat3ds s;
 	s.zero();
+
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
 
 	for (int n=0; n<nint; ++n)
 	{
@@ -78,11 +121,18 @@ mat3ds FEEllipsoidalFiberDistributionStress(const double m_ksi[], const double m
 	return s;
 }
 
-tens4ds FEEllipsoidalFiberDistributionTangent(const double m_ksi[], const double m_beta[], 
-											const int nint, const double m_cth[], const double m_sth[], 
-											const double m_cph[], const double m_sph[], const double m_w[], 
-											const double J, const mat3d F, const mat3d Q)
+//-----------------------------------------------------------------------------
+tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 {
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// deformation gradient
+	mat3d &F = pt.F;
+	double J = pt.J;
+
+	// get the element's local coordinate system
+	mat3d& Q = pt.Q;
+
 	// loop over all integration points
 	double ksi, beta;
 	vec3d n0e, n0a, nt;
@@ -96,6 +146,8 @@ tens4ds FEEllipsoidalFiberDistributionTangent(const double m_ksi[], const double
 	
 	// right Cauchy-Green tensor: C = Ft*F
 	mat3ds C = (F.transpose()*F).sym();
+
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
 	
 	for (int n=0; n<nint; ++n)
 	{
