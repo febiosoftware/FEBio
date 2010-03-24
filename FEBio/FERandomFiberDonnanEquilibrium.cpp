@@ -65,15 +65,8 @@ void FERandomFiberDonnanEquilibrium::Init()
 {
 	FEElasticMaterial::Init();
 	
-	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
-	if (m_Rgas < 0) throw MaterialError("R must be positive.");
-	if (m_Tabs < 0) throw MaterialError("T must be positive.");
-	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
-	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
-	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");
-	if (m_beta[0] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[1] < 2) throw MaterialError("beta1 must be greater than 2.");
-	if (m_beta[2] < 2) throw MaterialError("beta1 must be greater than 2.");
+	FEDonnanEquilibriumInit(m_phiwr, m_cFr, m_Rgas, m_Tabs, m_bosm);
+	FEEllipsoidalFiberDistributionInit(m_ksi, m_beta);
 }
 
 mat3ds FERandomFiberDonnanEquilibrium::Stress(FEMaterialPoint& mp)
@@ -88,15 +81,7 @@ mat3ds FERandomFiberDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 			
 	// --- M A T R I X   C O N T R I B U T I O N ---
 
-	// calculate fixed charge density in current configuration
-	double cF = m_phiwr*m_cFr/(J-1+m_phiwr);
-	
-	// calculate osmotic pressure
-	double p = m_Rgas*m_Tabs*(sqrt(cF*cF+m_bosm*m_bosm) - m_bosm);
-
-	// calculate T = -p*I
-	mat3dd I(1.0);	// identity tensor
-	mat3ds s = -p*I;
+	mat3ds s = FEDonnanEquilibriumStress(m_phiwr, m_cFr, m_Rgas, m_Tabs, m_bosm, J);
 	
 	// --- F I B E R   C O N T R I B U T I O N ---
 	
@@ -106,47 +91,9 @@ mat3ds FERandomFiberDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 	// get the element's local coordinate system
 	mat3d& Q = pt.Q;
 	
-	// loop over all integration points
-	double ksi, beta;
-	vec3d n0e, n0a, nt;
-	double In, Wl;
-	const double eps = 0;
-	for (int n=0; n<nint; ++n)
-	{
-		// set the global fiber direction in reference configuration
-		n0e.x = m_cth[n]*m_sph[n];
-		n0e.y = m_sth[n]*m_sph[n];
-		n0e.z = m_cph[n];
-		
-		// Calculate In = n0e*C*n0e
-		In = n0e*(C*n0e);
-		
-		// only take fibers in tension into consideration
-		if (In > 1. + eps)
-		{
-			// get the global spatial fiber direction in current configuration
-			nt = (F*n0e)/sqrt(In);
-			
-			// calculate the outer product of nt
-			mat3ds N = dyad(nt);
-			
-			// get the local material fiber direction in reference configuration
-			n0a = Q*n0e;
-			
-			// calculate material coefficients
-			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
-			
-			// calculate strain energy derivative
-			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
-			
-			// calculate the stress
-			s += N*(2.0/J*In*Wl*m_w[n]);
-		}
-		
-	}
-	
-	// --- END FIBER CONTRIBUTION --
+	// evaluate stress and add it to matrix contribution
+	s += FEEllipsoidalFiberDistributionStress(m_ksi, m_beta, nint, m_cth, m_sth, 
+											  m_cph, m_sph, m_w, J, F, Q);
 		
 	return s;
 }
@@ -160,94 +107,25 @@ tens4ds FERandomFiberDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 	double J = pt.J;
 	const int nint = (m_nres == 0? NSTL  : NSTH  );
 	
-	// right Cauchy-Green tensor: C = Ft*F
-	mat3ds C = pt.RightCauchyGreen();
-		
 	// --- M A T R I X   C O N T R I B U T I O N ---
-	
-	// calculate fixed charge density in current configuration
-	double cF = m_phiwr*m_cFr/(J-1+m_phiwr);
-	
-	// calculate osmotic pressure
-	double tosm = sqrt(cF*cF+m_bosm*m_bosm);	// tissue osmolarity
-	double p = m_Rgas*m_Tabs*(tosm - m_bosm);	// osmotic pressure
-	
-	// calculate derivative of osmotic pressure w.r.t. J
-	double bpi = m_Rgas*m_Tabs*J*cF*cF/(J-1+m_phiwr)/tosm;
 
-	mat3dd I(1.0);	// Identity
-	
-	tens4ds IxI = dyad1s(I);
-	tens4ds I4  = dyad4s(I);
-
-	// calculate tangent osmotic modulus
-	tens4ds c = bpi*IxI + p*(2.0*I4 - IxI);
+	tens4ds c = FEDonnanEquilibriumTangent(m_phiwr, m_cFr, m_Rgas, m_Tabs, m_bosm, J);
 	
 	// --- F I B E R   C O N T R I B U T I O N ---
 	
 	// get the element's local coordinate system
 	mat3d& Q = pt.Q;
 	
-	// loop over all integration points
-	double ksi, beta;
-	vec3d n0e, n0a, nt;
-	double In, Wll;
-	const double eps = 0;
-	tens4ds cf, cfw; cf.zero();
-	mat3ds N2;
-	tens4ds N4;
-	for (int n=0; n<nint; ++n)
-	{
-		// set the global fiber direction in reference configuration
-		n0e.x = m_cth[n]*m_sph[n];
-		n0e.y = m_sth[n]*m_sph[n];
-		n0e.z = m_cph[n];
-		
-		// Calculate In = n0e*C*n0e
-		In = n0e*(C*n0e);
-		
-		// only take fibers in tension into consideration
-		if (In > 1. + eps)
-		{
-			// get the global spatial fiber direction in current configuration
-			nt = (F*n0e)/sqrt(In);
-			
-			// calculate the outer product of nt
-			N2 = dyad(nt);
-			
-			// get the local material fiber direction in reference configuration
-			n0a = Q*n0e;
-			
-			// calculate material coefficients in local fiber direction
-			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
-			
-			// calculate strain energy derivative
-			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
-			
-			N2 = dyad(nt);
-			N4 = dyad1s(N2);
-						
-			c += N4*(4.0/J*In*In*Wll*m_w[n]);
-		}
-	}
-	
+	// evaluate stress and add it to matrix contribution
+	c += FEEllipsoidalFiberDistributionTangent(m_ksi, m_beta, nint, m_cth, m_sth, 
+											   m_cph, m_sph, m_w, J, F, Q);
+
 	return c;
 }
 
 double FERandomFiberDonnanEquilibrium::BulkModulus()
 {
 	// Evaluate bulk modulus in reference configuration
-
-	// --- M A T R I X   C O N T R I B U T I O N ---
-	
-	// calculate osmotic pressure (assume J=1)
-	double tosm = sqrt(m_cFr*m_cFr+m_bosm*m_bosm);	// tissue osmolarity
-	double pi = m_Rgas*m_Tabs*(tosm - m_bosm);	// osmotic pressure
-	
-	// calculate derivative of osmotic pressure w.r.t. J
-	double bpi = m_Rgas*m_Tabs*m_cFr*m_cFr/m_phiwr/tosm;
-	
-	return -(pi/3.0 + bpi);
-	
+	// Only the matrix contributes to the bulk modulus
+	return FEDonnanEquilibriumBulkModulus(m_phiwr, m_cFr, m_Rgas, m_Tabs, m_bosm);
 }

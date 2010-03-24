@@ -1,5 +1,7 @@
 #pragma once
 #include "FEMaterial.h"
+#include "FEDonnanEquilibrium.h"
+#include "FEEllipsoidalFiberDistribution.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a material that consists of a continuous ellipsoidal fiber distribution
