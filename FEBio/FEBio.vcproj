@@ -664,6 +664,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FESpectralPermeabilityIso.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FESpectralPermeabilityOrtho.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FESpectralPermeabilityTransIso.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEStiffnessMatrix.cpp"
 				>
 			</File>
@@ -1231,6 +1243,18 @@
 			</File>
 			<File
 				RelativePath=".\FESolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESpectralPermeabilityIso.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESpectralPermeabilityOrtho.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESpectralPermeabilityTransIso.h"
 				>
 			</File>
 			<File
