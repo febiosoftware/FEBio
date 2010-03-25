@@ -19,6 +19,9 @@ public:
 	//! Tangent of permeability
 	virtual tens4ds Tangent_Permeability(FEMaterialPoint& mp);
 
+	//! data initialization and checking
+	void Init();
+	
 public:
 	double	m_perm;			//!< permeability
 	double	m_permv[3];		//!< permeability for diagonal tensor

@@ -22,6 +22,13 @@ FEPoroConstPerm::FEPoroConstPerm()
 }
 
 //-----------------------------------------------------------------------------
+//! Initialization. 
+void FEPoroConstPerm::Init()
+{
+	if (m_perm < 0) throw MaterialError("perm must be >= 0");
+}
+
+//-----------------------------------------------------------------------------
 //! Fluid flux.
 
 vec3d FEPoroConstPerm::Flux(FEMaterialPoint& mp)

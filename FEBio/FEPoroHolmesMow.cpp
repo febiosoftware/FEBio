@@ -26,6 +26,16 @@ FEPoroHolmesMow::FEPoroHolmesMow()
 }
 
 //-----------------------------------------------------------------------------
+//! Initialization. 
+void FEPoroHolmesMow::Init()
+{
+	if (m_perm < 0) throw MaterialError("perm must be >= 0");
+	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
+	if (m_M < 0) throw MaterialError("M must be >= 0");
+	if (m_alpha < 0) throw MaterialError("alpha must be >= 0");
+}
+
+//-----------------------------------------------------------------------------
 //! Fluid flux.
 
 vec3d FEPoroHolmesMow::Flux(FEMaterialPoint& mp)
