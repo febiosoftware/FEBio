@@ -121,6 +121,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	vec3d nr, n0, nt;
 	double In, Wl;
 	const double eps = 0;
+	mat3ds Tf; Tf.zero();
 	for (int n=0; n<nint; ++n)
 	{
 		// set the local fiber direction
@@ -151,7 +152,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
 
 			// calculate the stress
-			T += N*(Wl*m_w[n]);
+			Tf += N*(Wl*m_w[n]);
 		}
 
 		// add active contraction stuff
@@ -162,6 +163,8 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 			T += N*at;
 		}
 	}
+
+	T += Tf;
 
 	// --- END FIBER CONTRIBUTION --
 

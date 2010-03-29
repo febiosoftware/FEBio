@@ -50,6 +50,14 @@ public:
 class FEElasticMaterialPoint : public FEMaterialPoint
 {
 public:
+	FEElasticMaterialPoint()
+	{
+		F.zero();
+		Q.unit();
+		J = 1;
+		s.zero();
+	}
+
 	FEMaterialPoint* Copy()
 	{
 		FEElasticMaterialPoint* pt = new FEElasticMaterialPoint(*this);
@@ -108,7 +116,7 @@ public:
 
 	// deformation data
 	mat3d	F;	//!< deformation gradient
-	double	J;			//!< determinant of F
+	double	J;			//!< determinant8 of F
 	mat3d	Q;			//!< local material orientation
 
 	// solid material data
