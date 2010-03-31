@@ -981,7 +981,8 @@ void LSDYNAPlotFile::write_contact_gaps()
 					ni = el.GaussPoints();
 					for (k=0; k<ni; ++k, ++nint)
 					{
-						gi[k] = s.m_gap[nint];
+						double gk = s.m_gap[nint];
+						gi[k] = (gk < 0 ? 0 : gk);
 					}
 
 					el.project_to_nodes(gi, gn);
@@ -989,7 +990,8 @@ void LSDYNAPlotFile::write_contact_gaps()
 					for (k=0; k<ne; ++k)
 					{
 						int m = el.m_node[k];
-						t[m] += (float) gn[k];
+						double gk = gn[k];
+						t[m] += (float) (gk < 0 ? 0 : gk);
 						val[m]++;
 					}
 				}
