@@ -55,6 +55,21 @@ void FELoadCurve::Add(double time, double value)
 // be zero, clamp to range, linear extrapolation, ...
 //
 
+
+inline double lerp(double t, double t0, double f0, double t1, double f1)
+{
+	return f0 + (f1 - f0)*(t - t0)/(t1 - t0);
+}
+
+inline double qerp(double t, double t0, double f0, double t1, double f1, double t2, double f2)
+{
+	double q0 = ((t2 - t )*(t1 - t ))/((t2 - t0)*(t1 - t0));
+	double q1 = ((t2 - t )*(t  - t0))/((t2 - t1)*(t1 - t0));
+	double q2 = ((t  - t1)*(t  - t0))/((t2 - t1)*(t2 - t0));
+
+	return f0*q0 + f1*q1 + f2*q2;
+}
+
 double FELoadCurve::Value(double t)
 {
 	int n = Points();
@@ -81,6 +96,75 @@ double FELoadCurve::Value(double t)
 		case LINEAR:
 			value = lp[l-1].value + (lp[l].value - lp[l-1].value)*(t - lp[l-1].time)/(lp[l].time - lp[l-1].time);
 			break;
+		case SMOOTH:
+			{
+				if (n == 2)
+				{
+					double t0 = lp[0].time;
+					double t1 = lp[1].time;
+
+					double f0 = lp[0].value;
+					double f1 = lp[1].value;
+
+					return lerp(t, t0, f0, t1, f1);
+				}
+				else if (n == 3)
+				{
+					double t0 = lp[0].time;
+					double t1 = lp[1].time;
+					double t2 = lp[2].time;
+
+					double f0 = lp[0].value;
+					double f1 = lp[1].value;
+					double f2 = lp[2].value;
+
+					return qerp(t, t0, f0, t1, f1, t2, f2);
+				}
+				else
+				{
+					if (l == 1)
+					{
+						double t0 = lp[0].time;
+						double t1 = lp[1].time;
+						double t2 = lp[2].time;
+
+						double f0 = lp[0].value;
+						double f1 = lp[1].value;
+						double f2 = lp[2].value;
+
+						return qerp(t, t0, f0, t1, f1, t2, f2);
+					}
+					else if (l == n-1)
+					{
+						double t0 = lp[l-2].time;
+						double t1 = lp[l-1].time;
+						double t2 = lp[l  ].time;
+
+						double f0 = lp[l-2].value;
+						double f1 = lp[l-1].value;
+						double f2 = lp[l  ].value;
+
+						return qerp(t, t0, f0, t1, f1, t2, f2);
+					}
+					else
+					{
+						double t0 = lp[l-2].time;
+						double t1 = lp[l-1].time;
+						double t2 = lp[l  ].time;
+						double t3 = lp[l+1].time;
+
+						double f0 = lp[l-2].value;
+						double f1 = lp[l-1].value;
+						double f2 = lp[l  ].value;
+						double f3 = lp[l+1].value;
+
+						double q1 = qerp(t, t0, f0, t1, f1, t2, f2);
+						double q2 = qerp(t, t1, f1, t2, f2, t3, f3);
+
+						return lerp(t, t1, q1, t2, q2);
+					}
+				}
+			}
 		}
 	}
 

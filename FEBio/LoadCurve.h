@@ -34,7 +34,7 @@ public:
 
 public:
 	//! Interpolation functions
-	enum INTFUNC { STEP=0, LINEAR=1 };
+	enum INTFUNC { STEP=0, LINEAR=1, SMOOTH=2 };
 
 public:
 	//! default constructor
