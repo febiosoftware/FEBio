@@ -36,9 +36,12 @@ public:
 	//! Interpolation functions
 	enum INTFUNC { STEP=0, LINEAR=1, SMOOTH=2 };
 
+	//! Extend mode
+	enum EXTMODE { CONSTANT, EXTRAPOLATE, REPEAT, REPEAT_OFFSET };
+
 public:
 	//! default constructor
-	FELoadCurve() : m_fnc(LINEAR) {}
+	FELoadCurve() : m_fnc(LINEAR), m_ext(CONSTANT) {}
 
 	//! destructor
 	virtual ~FELoadCurve() {}
@@ -68,6 +71,9 @@ public:
 	//! Set the type of interpolation
 	void SetInterpolation(INTFUNC fnc) { m_fnc = fnc; }
 
+	//! Set the extend mode
+	void SetExtendMode(EXTMODE mode) { m_ext = mode; }
+
 	//! returns point i
 	LOADPOINT& LoadPoint(int i) { return m_lp[i]; }
 
@@ -84,11 +90,15 @@ public:
 	void Serialize(Archive& ar);
 
 protected:
+	double ExtendValue(double t);
+
+protected:
 	vector<LOADPOINT>	m_lp;	//!< load time values
 
 	double			m_value;	//!< last calculated value
 
-	INTFUNC				m_fnc;	//!< interpolation function
+	INTFUNC		m_fnc;	//!< interpolation function
+	EXTMODE		m_ext;	//!< extend mode
 };
 
 typedef FELoadCurve::LOADPOINT LOADPOINT;

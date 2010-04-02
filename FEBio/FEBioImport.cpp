@@ -2441,6 +2441,7 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 		if (tag == "loadcurve")
 		{
 			FELoadCurve::INTFUNC ntype = FELoadCurve::LINEAR;
+			FELoadCurve::EXTMODE nextm = FELoadCurve::CONSTANT;
 
 			// get the (optional) type
 			const char* szt = tag.AttributeValue("type", true);
@@ -2452,6 +2453,17 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 				else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 			}
 
+			// get the optional extend mode
+			const char* szm = tag.AttributeValue("extend", true);
+			if (szm)
+			{
+				if      (strcmp(szm, "constant"     ) == 0) nextm = FELoadCurve::CONSTANT;
+				else if (strcmp(szm, "extrapolate"  ) == 0) nextm = FELoadCurve::EXTRAPOLATE;
+				else if (strcmp(szm, "repeat"       ) == 0) nextm = FELoadCurve::REPEAT;
+				else if (strcmp(szm, "repeat offset") == 0) nextm = FELoadCurve::REPEAT_OFFSET;
+				else throw XMLReader::InvalidAttributeValue(tag, "extend", szt);
+			}
+
 			// count how many points we have
 			XMLTag t(tag); ++t;
 			int nlp = 0;
@@ -2461,6 +2473,7 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 			FELoadCurve* plc = new FELoadCurve;
 			plc->Create(nlp);
 			plc->SetInterpolation(ntype);
+			plc->SetExtendMode(nextm);
 			fem.AddLoadCurve(plc);
 
 			// read the points

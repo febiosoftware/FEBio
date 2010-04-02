@@ -70,105 +70,185 @@ inline double qerp(double t, double t0, double f0, double t1, double f1, double 
 	return f0*q0 + f1*q1 + f2*q2;
 }
 
-double FELoadCurve::Value(double t)
+double FELoadCurve::Value(double time)
 {
-	int n = Points();
-
 	LOADPOINT* lp = m_lp;
 
-	double value = 0;
+	int nsize = Points();
+	if (nsize == 0) return 0;
+	if (nsize == 1) return lp[0].value;
 
-	if (t < lp[0].time) value = lp[0].value;
-	else if (t >= lp[n-1].time) value = lp[n-1].value;
-	else
+	int N = nsize - 1;
+
+	if (time == lp[0].time) return lp[0].value;
+	if (time == lp[N].time) return lp[N].value;
+
+	if (time < lp[0].time) return ExtendValue(time);
+	if (time > lp[N].time) return ExtendValue(time);
+
+
+	if (m_fnc == LINEAR)
 	{
-		// find interval where t lies in
-		// on break t lies in interval [l-1,l[
-		int l=0;
-		while (t >= lp[l].time) ++l;
+		int n = 0;
+		while (lp[n].time <= time) ++n;
+	
+		double t0 = lp[n-1].time;
+		double t1 = lp[n  ].time;
 
-		// calculate return value based on interpolation function
-		switch (m_fnc)
+		double f0 = lp[n-1].value;
+		double f1 = lp[n  ].value;
+
+		return lerp(time, t0, f0, t1, f1);
+	}
+	else if (m_fnc == STEP)
+	{
+		int n=0;
+		while (lp[n].time < time) ++n;
+
+		return lp[n].value;
+	}
+	else if (m_fnc == SMOOTH)
+	{
+		if (nsize == 2)
 		{
-		case STEP:
-			value = lp[l].value;
-			break;
-		case LINEAR:
-			value = lp[l-1].value + (lp[l].value - lp[l-1].value)*(t - lp[l-1].time)/(lp[l].time - lp[l-1].time);
-			break;
-		case SMOOTH:
+			double t0 = lp[0].time;
+			double t1 = lp[1].time;
+
+			double f0 = lp[0].value;
+			double f1 = lp[1].value;
+
+			return lerp(time, t0, f0, t1, f1);
+		}
+		else if (nsize == 3)
+		{
+			double t0 = lp[0].time;
+			double t1 = lp[1].time;
+			double t2 = lp[2].time;
+
+			double f0 = lp[0].value;
+			double f1 = lp[1].value;
+			double f2 = lp[2].value;
+
+			return qerp(time, t0, f0, t1, f1, t2, f2);
+		}
+		else
+		{
+			int n = 0;
+			while (lp[n].time <= time) ++n;
+
+			if (n == 1)
 			{
-				if (n == 2)
-				{
-					double t0 = lp[0].time;
-					double t1 = lp[1].time;
+				double t0 = lp[0].time;
+				double t1 = lp[1].time;
+				double t2 = lp[2].time;
 
-					double f0 = lp[0].value;
-					double f1 = lp[1].value;
+				double f0 = lp[0].value;
+				double f1 = lp[1].value;
+				double f2 = lp[2].value;
 
-					return lerp(t, t0, f0, t1, f1);
-				}
-				else if (n == 3)
-				{
-					double t0 = lp[0].time;
-					double t1 = lp[1].time;
-					double t2 = lp[2].time;
+				return qerp(time, t0, f0, t1, f1, t2, f2);
+			}
+			else if (n == nsize-1)
+			{
+				double t0 = lp[n-2].time;
+				double t1 = lp[n-1].time;
+				double t2 = lp[n  ].time;
 
-					double f0 = lp[0].value;
-					double f1 = lp[1].value;
-					double f2 = lp[2].value;
+				double f0 = lp[n-2].value;
+				double f1 = lp[n-1].value;
+				double f2 = lp[n  ].value;
 
-					return qerp(t, t0, f0, t1, f1, t2, f2);
-				}
-				else
-				{
-					if (l == 1)
-					{
-						double t0 = lp[0].time;
-						double t1 = lp[1].time;
-						double t2 = lp[2].time;
+				return qerp(time, t0, f0, t1, f1, t2, f2);
+			}
+			else
+			{
+				double t0 = lp[n-2].time;
+				double t1 = lp[n-1].time;
+				double t2 = lp[n  ].time;
+				double t3 = lp[n+1].time;
 
-						double f0 = lp[0].value;
-						double f1 = lp[1].value;
-						double f2 = lp[2].value;
+				double f0 = lp[n-2].value;
+				double f1 = lp[n-1].value;
+				double f2 = lp[n  ].value;
+				double f3 = lp[n+1].value;
 
-						return qerp(t, t0, f0, t1, f1, t2, f2);
-					}
-					else if (l == n-1)
-					{
-						double t0 = lp[l-2].time;
-						double t1 = lp[l-1].time;
-						double t2 = lp[l  ].time;
+				double q1 = qerp(time, t0, f0, t1, f1, t2, f2);
+				double q2 = qerp(time, t1, f1, t2, f2, t3, f3);
 
-						double f0 = lp[l-2].value;
-						double f1 = lp[l-1].value;
-						double f2 = lp[l  ].value;
-
-						return qerp(t, t0, f0, t1, f1, t2, f2);
-					}
-					else
-					{
-						double t0 = lp[l-2].time;
-						double t1 = lp[l-1].time;
-						double t2 = lp[l  ].time;
-						double t3 = lp[l+1].time;
-
-						double f0 = lp[l-2].value;
-						double f1 = lp[l-1].value;
-						double f2 = lp[l  ].value;
-						double f3 = lp[l+1].value;
-
-						double q1 = qerp(t, t0, f0, t1, f1, t2, f2);
-						double q2 = qerp(t, t1, f1, t2, f2, t3, f3);
-
-						return lerp(t, t1, q1, t2, q2);
-					}
-				}
+				return lerp(time, t1, q1, t2, q2);
 			}
 		}
 	}
 
-	return value;
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! This function determines the value of the load curve outside of its domain
+//!
+double FELoadCurve::ExtendValue(double t)
+{
+	LOADPOINT* lp = m_lp;
+
+	int nsize =Points();
+	int N = nsize - 1;
+
+	if (nsize == 0) return 0;
+	if (nsize == 1) return lp[0].value;
+
+	double Dt = (lp[N].time - lp[0].time);
+	double dt = 0.001*Dt;
+	if (dt == 0) return lp[0].value;
+
+	switch (m_ext)
+	{
+	case CONSTANT:
+		if (t < lp[0].time) return lp[0].value;
+		if (t > lp[N].time) return lp[N].value;
+		break;
+	case EXTRAPOLATE:
+		switch (m_fnc)
+		{
+		case STEP:
+			{
+				if (t < lp[0].time) return lp[0].value;
+				if (t > lp[N].time) return lp[N].value;
+			}
+			break;
+		case LINEAR:
+			{
+				if (t < lp[0].time) return lerp(t, lp[0].time, lp[0].value, lp[1].time, lp[1].value);
+				else return lerp(t, lp[N-1].time, lp[N-1].value, lp[N].time, lp[N].value);
+			}
+			break;
+		case SMOOTH:
+			{
+				if (t < lp[0].time) return lerp(t, lp[0].time, lp[0].value, lp[0].time + dt, Value(lp[0].time+dt));
+				else return lerp(t, lp[N].time - dt, Value(lp[N].time - dt), lp[N].time, lp[N].value);
+			}
+			return 0;
+		}
+		break;
+	case REPEAT:
+		{
+			if (t < lp[0].time) while (t < lp[0].time) t += Dt;
+			else while (t > lp[N].time) t -= Dt;
+			return Value(t);
+		}
+		break;
+	case REPEAT_OFFSET:
+		{
+			int n = 0;
+			if (t < lp[0].time) while (t < lp[0].time) { t += Dt; --n; }
+			else while (t > lp[N].time) { t -= Dt; ++n; }
+			double off = n*(lp[N].value - lp[0].value);
+
+			return Value(t)+off;
+		}
+		break;
+	}
+
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
