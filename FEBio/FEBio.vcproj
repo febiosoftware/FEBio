@@ -572,6 +572,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEOptimizer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEParameterList.cpp"
 				>
 			</File>
@@ -817,6 +821,10 @@
 			</File>
 			<File
 				RelativePath=".\porosolid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\powell.cpp"
 				>
 			</File>
 			<File
@@ -1151,6 +1159,10 @@
 			</File>
 			<File
 				RelativePath=".\FEOgdenMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEOptimizer.h"
 				>
 			</File>
 			<File

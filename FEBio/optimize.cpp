@@ -3,6 +3,8 @@
 //////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
 #include "fem.h"
+#include "FEOptimizer.h"
+#include "log.h"
 
 #ifdef NAGLIB
 
@@ -60,18 +62,6 @@ struct FE_OPTIMIZE
 		op.verify_grad    = Nag_NoCheck;
 	}
 };
-
-//-----------------------------------------------------------------------------
-// IO exceptions
-
-class InvalidVariableName
-{
-public:
-	InvalidVariableName(const char* sz) { strcpy(szname, sz); }
-	char szname[256];
-};
-
-class NothingToOptimize{};
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -476,8 +466,26 @@ bool ReadScript(FEM& fem, XMLReader& xml, XMLTag& tag, FE_OPTIMIZE& opt)
 
 bool optimize(FEM& fem, const char* szfile)
 {
-	fprintf(stderr, "FATAL ERROR: parameter optimization is not supported on this platform.");
-	return false;
+	// create an optimizer object
+	FEOptimizeData opt(fem);
+
+	// read the data from the xml input file
+	if (opt.Input(szfile) == false) return false;
+
+	// do initialization
+	if (opt.Init() == false) return false;
+
+	// solve the problem
+	bool bret = opt.Solve();
+
+	Logfile& log = GetLogfile();
+
+	if (bret)
+		log.printf(" N O R M A L   T E R M I N A T I O N\n\n");
+	else 
+		log.printf(" E R R O R   T E R M I N A T I O N\n\n");
+
+	return bret;
 }
 
 #endif // NAGLIB
