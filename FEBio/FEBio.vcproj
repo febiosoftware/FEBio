@@ -784,6 +784,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\levmar.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LoadCurve.cpp"
 				>
 			</File>

@@ -27,6 +27,22 @@ vector<double> operator / (vector<double>& b, matrix& m)
 	return x;
 }
 
+vector<double> operator * (matrix& m, vector<double>& b)
+{
+	int i, j;
+	int NR = m.rows();
+	int NC = m.columns();
+	assert(NC == b.size());
+	vector<double> r(NR);
+	for (i=0; i<NR; ++i)
+	{
+		r[i] = 0.0;
+		for (j=0; j<NC; ++j) r[i] += m[i][j]*b[j];
+	}
+
+	return r;
+}
+
 matrix matrix::operator * (const matrix& m)
 {
 	assert(m_nc == m.m_nr);

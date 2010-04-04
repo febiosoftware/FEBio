@@ -46,7 +46,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-//! Default optimization method using Powell's method
+//! Optimization method using Powell's method
 class FEPowellOptimizeMethod : public FEOptimizeMethod
 {
 public:
@@ -59,6 +59,27 @@ protected:
 	
 	static FEPowellOptimizeMethod*	m_pThis;
 	static double objfun(double* p) { return (m_pThis)->ObjFun(p); }
+};
+
+//----------------------------------------------------------------------------
+//! Optimization method using Levenberg-Marquardt method
+class FELMOptimizeMethod : public FEOptimizeMethod
+{
+public:
+	bool Solve(FEOptimizeData* pOpt);
+
+protected:
+	FEOptimizeData* m_pOpt;
+
+	void ObjFun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda);
+
+	bool FESolve(vector<double>& x, vector<double>& a, vector<double>& y);
+
+	static FELMOptimizeMethod* m_pThis;
+	static void objfun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda) { return m_pThis->ObjFun(x, a, y, dyda); }
+
+protected:
+	vector<double>	m_yopt;	// optimal y-values
 };
 
 //----------------------------------------------------------------------------

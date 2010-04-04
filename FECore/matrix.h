@@ -139,5 +139,6 @@ protected:
 };
 
 vector<double> operator / (vector<double>& b, matrix& m);
+vector<double> operator * (matrix& m, vector<double>& b);
 
 #endif // !defined(AFX_MATRIX_H__C0F2C6F6_AE26_4C7F_8C70_5A7BF5DD421E__INCLUDED_)

@@ -272,7 +272,7 @@ FEOptimizeData::~FEOptimizeData(void)
 //-----------------------------------------------------------------------------
 bool FEOptimizeData::Init()
 {
-	if (m_pSolver == 0) m_pSolver = new FEPowellOptimizeMethod;
+	if (m_pSolver == 0) m_pSolver = new FELMOptimizeMethod;
 
 	return true;
 }
