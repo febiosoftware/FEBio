@@ -28,6 +28,13 @@ void mrqcof(vector<double>& x,
 extern void fecb(FEM* pfem, void* pd);
 
 //-----------------------------------------------------------------------------
+FELMOptimizeMethod::FELMOptimizeMethod()
+{
+	m_objtol = 0.001;
+	m_fdiff  = 0.001;
+}
+
+//-----------------------------------------------------------------------------
 bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 {
 	m_pOpt = pOpt;
@@ -54,6 +61,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		x[i] = lc.LoadPoint(i).time;
 		y[i] = lc.LoadPoint(i).value;
 	}
+	m_y0 = y;
 
 	// set the sigma's
 	// for now we set them all to 1
@@ -83,7 +91,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	// do the first call with lamda to intialize the minimization
 	double alamda = -1.0;
-	log.printf("\n----- Iteration: %d -----\n", 0);
+	log.printf("\n----- Major Iteration: %d -----\n", 0);
 	mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
 
 	// repeat until converged
@@ -93,7 +101,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	int niter = 1;
 	do
 	{
-		printf("\n----- Iteration: %d -----\n", niter);
+		log.printf("\n----- Major Iteration: %d -----\n", niter);
 		mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
 
 		if (alamda < lam1)
@@ -101,14 +109,13 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 			if (niter != 1)
 			{
 				double df = (fprev - fret)/(fprev + fret + 1);
-				if ( df < 0.000001) bconv = true;
-				printf("objective value: %lg (diff = %lg)\n\n", fret, df);
+				if ( df < m_objtol) bconv = true;
+				log.printf("objective value: %lg (diff = %lg)\n\n", fret, df);
 			}
-
-			fprev = fret;
 		}
-		else printf("objective value: %lg\n\n", fret);
+		else log.printf("\n objective value: %lg\n\n", fret);
 
+		fprev = fret;
 		lam1 = alamda;
 
 		++niter;
@@ -165,7 +172,7 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	int ma = a.size();
 	for (int i=0; i<ma; ++i)
 	{
-		a1[i] = a1[i] + 0.001*(1.0 + a[i]);
+		a1[i] = a1[i] + m_fdiff*(1.0 + a[i]);
 
 		FESolve(x, a1, y1);
 		for (int j=0; j<ndata; ++j) dyda[j][i] = (y1[j] - y[j])/(a1[i] - a[i]);
@@ -202,23 +209,32 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 
 	// suppress output
 	Logfile& log = GetLogfile();
+
+	log.SetMode(Logfile::FILE_AND_SCREEN);
+	log.printf("\n----- Iteration: %d -----\n", opt.m_niter);
+	for (int i=0; i<nvar; ++i) 
+	{
+		OPT_VARIABLE& var = opt.Variable(i);
+		log.printf("%-15s = %lg\n", var.m_szname, a[i]);
+	}
+
+	// solve the FE problem
 	log.SetMode(Logfile::NEVER);
 	Console* pwnd = Console::GetHandle();
 	pwnd->Deactivate();
 
-	// solve the FE problem
 	bool bret = fem.Solve();
 
+	log.SetMode(Logfile::FILE_AND_SCREEN);
 	if (bret)
 	{
-		int i;
 		FELoadCurve& rlc = opt.ReactionLoad();
 		int ndata = x.size();
-		for (i=0; i<nvar; ++i) printf("var%d = %lg\n", i+1, a[i]);
-		for (i=0; i<ndata; ++i) 
+		log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+		for (int i=0; i<ndata; ++i) 
 		{
 			y[i] = rlc.Value(x[i]);
-			printf("%15lg, %15lg\n", x[i], y[i]);
+			log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
 		}
 	}
 

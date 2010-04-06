@@ -27,11 +27,11 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if		(tag == "Model"     ) bret = ParseModel    (tag, opt);
-			else if (tag == "Optimizer" ) bret = ParseOptimizer(tag, opt);
-			else if (tag == "Objectives") bret = ParseObjective(tag, opt);
-			else if (tag == "Variables" ) bret = ParseVariables(tag, opt);
-			else if (tag == "LoadData"  ) bret = ParseLoadData (tag, opt);
+			if		(tag == "Model"     ) bret = ParseModel     (tag, opt);
+			else if (tag == "Options"   ) bret = ParseOptions   (tag, opt);
+			else if (tag == "Objectives") bret = ParseObjective (tag, opt);
+			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
+			else if (tag == "LoadData"  ) bret = ParseLoadData  (tag, opt);
 			else throw XMLReader::InvalidTag(tag);
 
 			if (bret == false) return false;
@@ -92,8 +92,33 @@ bool FEOptimizeInput::ParseModel(XMLTag& tag, FEOptimizeData& opt)
 
 //-----------------------------------------------------------------------------
 //! Read the optimizer section of the input file
-bool FEOptimizeInput::ParseOptimizer(XMLTag& tag, FEOptimizeData& opt)
+bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 {
+	FELMOptimizeMethod* popt = 0;
+	const char* szt = tag.AttributeValue("type", true);
+	if (szt == 0) popt = new FELMOptimizeMethod;
+	else
+	{
+		if (strcmp(szt, "marquardt") == 0) popt = new FELMOptimizeMethod;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+	}
+
+	if (!tag.isleaf())
+	{
+		++tag;
+		do
+		{
+			if      (tag == "objtol"     ) tag.value(popt->m_objtol);
+			else if (tag == "fdiff_scale") tag.value(popt->m_fdiff );
+			else throw XMLReader::InvalidTag(tag);
+
+			++tag;
+		}
+		while (!tag.isend());
+	}
+
+	opt.SetSolver(popt);
+
 	return true;
 }
 
@@ -136,7 +161,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 
 //-----------------------------------------------------------------------------
 //! Read the variables section of the input file
-bool FEOptimizeInput::ParseVariables(XMLTag& tag, FEOptimizeData& opt)
+bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 {
 	FEM& fem = opt.GetFEM();
 
@@ -145,7 +170,7 @@ bool FEOptimizeInput::ParseVariables(XMLTag& tag, FEOptimizeData& opt)
 	++tag;
 	do
 	{
-		if (tag == "var")
+		if (tag == "param")
 		{
 			// get the variable name
 			const char* sz = tag.AttributeValue("name");

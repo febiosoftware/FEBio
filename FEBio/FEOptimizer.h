@@ -30,11 +30,11 @@ public:
 	bool Input(const char* szfile, FEOptimizeData* pOpt);
 
 protected:
-	bool ParseModel    (XMLTag& tag, FEOptimizeData& opt);
-	bool ParseOptimizer(XMLTag& tag, FEOptimizeData& opt);
-	bool ParseObjective(XMLTag& tag, FEOptimizeData& opt);
-	bool ParseVariables(XMLTag& tag, FEOptimizeData& opt);
-	bool ParseLoadData (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseModel     (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseOptions   (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseObjective (XMLTag& tag, FEOptimizeData& opt);
+	bool ParseParameters(XMLTag& tag, FEOptimizeData& opt);
+	bool ParseLoadData  (XMLTag& tag, FEOptimizeData& opt);
 };
 
 //=============================================================================
@@ -66,6 +66,7 @@ protected:
 class FELMOptimizeMethod : public FEOptimizeMethod
 {
 public:
+	FELMOptimizeMethod();
 	bool Solve(FEOptimizeData* pOpt);
 
 protected:
@@ -78,8 +79,13 @@ protected:
 	static FELMOptimizeMethod* m_pThis;
 	static void objfun(vector<double>& x, vector<double>& a, vector<double>& y, matrix& dyda) { return m_pThis->ObjFun(x, a, y, dyda); }
 
+public:
+	double	m_objtol;	// objective tolerance
+	double	m_fdiff;	// forward difference step size
+
 protected:
 	vector<double>	m_yopt;	// optimal y-values
+	vector<double>	m_y0;	// initial (target) y-values
 };
 
 //----------------------------------------------------------------------------
@@ -147,6 +153,8 @@ public:
 	FELoadCurve& ReactionLoad() { return m_rf; }
 
 	FELoadCurve& GetLoadCurve(int n) { return *m_LC[n]; }
+
+	void SetSolver(FEOptimizeMethod* po) { m_pSolver = po; }
 
 public:
 	int	m_niter;	// nr of minor iterations (i.e. FE solves)
