@@ -224,7 +224,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 				if (pdc)
 				{
 					lc = pdc->lc;
-					du[j] = (lc < 0? 0 : m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+					du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
 				}
 				else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
 			}
