@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEOptimizer.h"
 #include "log.h"
-#include "Console.h"
+#include "console.h"
 
 // forward declarations
 void linmin(double* p, double* xi, int n, double* fret, double (*fnc)(double[]));
