@@ -26,6 +26,8 @@ INC = -I..
 # We are using the Pardiso library contained in the MKL.
 
 # Uncomment the following lines for the SuperLU solver
+# SuperLU comes with a version of the BLAS library, but we recommend using a BLAS optimized
+# for your platform.  We are using the BLAS in the MKL.
 #DEF += -DSUPERLU
 #  Put the path to the SuperLU directory here
 #SUPERLU_PATH = 
@@ -35,10 +37,14 @@ INC = -I..
 #LIBS += $(SUPERLU_LIB)
 #INC += -I$(SUPERLU_PATH)/SRC
 
-# Both Pardiso and SuperLU use the Intel MKL.  Uncomment the following lines for the MKL
+# Linking Pardiso from the MKL depends on your machine architecture and the version of the MKL.
+# This example is for the MKL 10.2.3 on a 64bit linux machine.  See the MKL documentation
+# for your architecture and MKL version.
 # Put the path to the MKL directory here
 #MKL_PATH = 
-#MKL_LIB = -L$(MKL_PATH) -lmkl_lapack -lmkl_em64t -liomp5 -lpthread
+#MKL_LIB = -L$(MKL_PATH) -lmkl_intel_lp64
+#MKL_LIB += -Wl,--start-group -lmkl_intel_thread -lmkl_core -Wl,--end-group
+#MKL_LIB += -liomp5 -lpthread
 #LIBS += $(MKL_LIB)
 
 # Uncomment the following line for the MKL Pardiso solver
