@@ -238,9 +238,9 @@ void FEM::SerializeMaterials(Archive& ar)
 			}
 
 			// TODO: do we really need to store this data?
-			if (dynamic_cast<FERigid*>(pmat))
+			if (dynamic_cast<FERigidMaterial*>(pmat))
 			{
-				FERigid* pm = dynamic_cast<FERigid*>(pmat);
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
 				ar.write(pm->m_bc, sizeof(int), 6);
 				ar.write(pm->m_fc, sizeof(int), 6);
 				ar.write(pm->m_fs, sizeof(double), 6);
@@ -307,9 +307,9 @@ void FEM::SerializeMaterials(Archive& ar)
 				if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
 			}
 
-			if (dynamic_cast<FERigid*>(pmat))
+			if (dynamic_cast<FERigidMaterial*>(pmat))
 			{
-				FERigid* pm = dynamic_cast<FERigid*>(pmat);
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
 				ar.read(pm->m_bc, sizeof(int), 6);
 				ar.read(pm->m_fc, sizeof(int), 6);
 				ar.read(pm->m_fs, sizeof(double), 6);

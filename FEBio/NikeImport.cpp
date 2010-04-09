@@ -369,7 +369,7 @@ bool FENIKEImport::ReadMaterialDeck(FEM& fem)
 		case 20: // Rigid body
 			{
 				double E, v;
-				FERigid* pmat = new FERigid;
+				FERigidMaterial* pmat = new FERigidMaterial;
 				pmat->SetName(szname);
 				fem.AddMaterial(pmat);
 				E = mp[0][0];
@@ -540,7 +540,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		el.SetMatID(n[8] - 1);
 
 		// determine whether this element is rigid
-		FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(el.GetMatID()));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(el.GetMatID()));
 		if (pm) el.m_nrigid = 0;
 	}
 
@@ -603,7 +603,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 		nread = sscanf(szline, "%5d%8d%8d%8d%8d", &rb, rn,rn+1,rn+2,rn+3);
 
-		if (dynamic_cast<FERigid*>(fem.GetMaterial(rb-1)) == 0)
+		if (dynamic_cast<FERigidMaterial*>(fem.GetMaterial(rb-1)) == 0)
 		{
 			return errf(szerr[ERR_RB], rb);
 		}

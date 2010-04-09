@@ -590,9 +590,9 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 				}
 
 				// read rigid body data
-				if (!bfound && dynamic_cast<FERigid*>(pmat))
+				if (!bfound && dynamic_cast<FERigidMaterial*>(pmat))
 				{
-					FERigid* pm = dynamic_cast<FERigid*>(pmat);
+					FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
 
 					if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; bfound = true; }
 					else if (strncmp(tag.Name(), "trans_", 6) == 0)
@@ -831,7 +831,7 @@ int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
 	}
 	else
 	{
-		if (dynamic_cast<FERigid*>(pmat))
+		if (dynamic_cast<FERigidMaterial*>(pmat))
 		{
 			// rigid elements
 			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_RIGID_SOLID_DOMAIN;
@@ -1746,7 +1746,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 					fem.m_RDC.push_back(DC);
 
 					// make sure to free the material BC
-					FERigid* pm = dynamic_cast<FERigid*>(fem.GetMaterial(id-1));
+					FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(id-1));
 					assert(pm);
 					pm->m_bc[bc] = 0;
 

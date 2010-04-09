@@ -16,7 +16,7 @@ bool FEM::InitRigidBodies()
 	m_nrm = 0;
 	for (i=0; i<Materials(); ++i)
 	{
-		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(i));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(i));
 		if (pm) m_nrm++;
 	}
 	
@@ -35,7 +35,7 @@ bool FEM::InitRigidBodies()
 	n = 0;
 	for (i=0; i<Materials(); ++i)
 	{
-		if (dynamic_cast<FERigid*>(GetMaterial(i))) mrb[i] = n++;
+		if (dynamic_cast<FERigidMaterial*>(GetMaterial(i))) mrb[i] = n++;
 		else mrb[i] = -1;
 	}
 
@@ -49,7 +49,7 @@ bool FEM::InitRigidBodies()
 			for (i=0; i<pbd->Elements(); ++i)
 			{
 				FESolidElement& el = pbd->Element(i);
-				FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(el.GetMatID()));
 				if (pm)
 				{
 					el.m_nrigid = el.GetMatID();
@@ -70,7 +70,7 @@ bool FEM::InitRigidBodies()
 			for (i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-				FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(el.GetMatID()));
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(el.GetMatID()));
 				if (pm)
 				{
 					el.m_nrigid = el.GetMatID();
@@ -150,7 +150,7 @@ bool FEM::InitRigidBodies()
 	// set rigid body index for materials
 	for (i=0; i<Materials(); ++i)
 	{
-		FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(i));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (GetMaterial(i));
 		if (pm)	
 		{
 			pm->m_nRB = mrb[i];
@@ -166,7 +166,7 @@ bool FEM::InitRigidBodies()
 			for (i=0; i<pbd->Elements(); ++i)
 			{
 				FESolidElement& el = pbd->Element(i);
-				FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (GetMaterial(el.GetMatID()));
 				if (pm)
 					el.m_nrigid = pm->m_nRB;
 				else
@@ -180,7 +180,7 @@ bool FEM::InitRigidBodies()
 			for (i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-				FERigid* pm = dynamic_cast<FERigid*> (GetMaterial(el.GetMatID()));
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (GetMaterial(el.GetMatID()));
 				if (pm)
 					el.m_nrigid = pm->m_nRB;
 				else
@@ -220,10 +220,10 @@ bool FEM::InitRigidBodies()
 		// Since a rigid body may contain several rigid materials
 		// we find the first material that this body has and use
 		// that materials data to set up the rigid body data
-		FERigid* pm = 0;
+		FERigidMaterial* pm = 0;
 		for (j=0; j<Materials(); ++j)
 		{
-			pm = dynamic_cast<FERigid*> (GetMaterial(j));
+			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(j));
 
 			if (pm && (pm->m_nRB == i))	break;
 		}
@@ -255,13 +255,13 @@ bool FEM::InitRigidBodies()
 	// set up rigid joints
 	if (m_nrj > 0)
 	{
-		FERigid* pm;
+		FERigidMaterial* pm;
 		for (i=0; i<m_nrj; ++i)
 		{
 			FERigidJoint& rj = m_RJ[i];
 			rj.m_F = vec3d(0,0,0);
 
-			pm = dynamic_cast<FERigid*> (GetMaterial(rj.m_nRBa));
+			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
 			if (pm == 0)
 			{
 				log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
@@ -269,7 +269,7 @@ bool FEM::InitRigidBodies()
 			}
 			rj.m_nRBa = pm->m_nRB;
 
-			pm = dynamic_cast<FERigid*> (GetMaterial(rj.m_nRBb));
+			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBb));
 			if (pm == 0)
 			{
 				log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
@@ -376,13 +376,13 @@ bool FEM::InitRigidBodies()
 	for (i=0; i<m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = m_RDC[i];
-		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(DC.id-1));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(DC.id-1));
 		DC.id = pm->m_nRB;
 	}
 	for (i=0; i<m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = m_RFC[i];
-		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(FC.id-1));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(FC.id-1));
 		FC.id = pm->m_nRB;
 	}
 

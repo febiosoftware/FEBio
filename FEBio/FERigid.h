@@ -17,10 +17,10 @@
 //! Since rigid elements are skipped during the stiffness and residual calculations
 //! we don't implement the Stress and Tangent functions
 
-class FERigid : public FEElasticMaterial
+class FERigidMaterial : public FEElasticMaterial
 {
 public:
-	FERigid()
+	FERigidMaterial()
 	{
 		m_com = 0;
 		for (int i=0; i<6; ++i)
@@ -62,7 +62,7 @@ public:
 	double BulkModulus() { return m_E/(3.0*(1.0 - 2.0*m_v));}
 
 	// declare as registered
-	DECLARE_REGISTERED(FERigid);
+	DECLARE_REGISTERED(FERigidMaterial);
 
 	// declare a parameter list
 	DECLARE_PARAMETER_LIST();

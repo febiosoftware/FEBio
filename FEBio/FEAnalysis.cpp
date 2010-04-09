@@ -95,7 +95,7 @@ bool FEAnalysis::Init()
 	for (i=0; i<m_fem.m_RB.size(); ++i)
 	{
 		FERigidBody& RB = m_fem.m_RB[i];
-		FERigid* pm = dynamic_cast<FERigid*>(m_fem.GetMaterial(RB.m_mat));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
 			if (RB.m_pDC[j])
@@ -115,7 +115,7 @@ bool FEAnalysis::Init()
 		if (RB.m_bActive && DC.IsActive())
 		{
 			RB.m_pDC[DC.bc] = &DC;
-			FERigid* pm = dynamic_cast<FERigid*>(m_fem.GetMaterial(RB.m_mat));
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 			pm->m_bc[DC.bc] = 1;
 		}
 	}

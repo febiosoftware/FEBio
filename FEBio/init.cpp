@@ -319,7 +319,7 @@ bool FEM::InitEquations()
 	for (i=0; i<m_nrb; ++i)
 	{
 		FERigidBody& RB = m_RB[i];
-		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(RB.m_mat));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(RB.m_mat));
 		assert(pm);
 		for (j=0; j<6; ++j)
 			if (pm->m_bc[j] >= 0)
@@ -351,7 +351,7 @@ bool FEM::InitEquations()
 	for (i=0; i<m_nrb; ++i)
 	{
 		FERigidBody& RB = m_RB[i];
-		FERigid* pm = dynamic_cast<FERigid*>(GetMaterial(RB.m_mat));
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
 			n = RB.m_LM[j];
@@ -399,16 +399,16 @@ bool FEM::Reset()
 	// set up rigid joints
 	if (m_nrj > 0)
 	{
-		FERigid* pm;
+		FERigidMaterial* pm;
 		for (i=0; i<m_nrj; ++i)
 		{
 			FERigidJoint& rj = m_RJ[i];
 			rj.m_F = vec3d(0,0,0);
 
-			pm = dynamic_cast<FERigid*> (GetMaterial(rj.m_nRBa));
+			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
 			rj.m_nRBa = pm->m_nRB;
 
-			pm = dynamic_cast<FERigid*> (GetMaterial(rj.m_nRBb));
+			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBb));
 			rj.m_nRBb = pm->m_nRB;
 
 			rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;

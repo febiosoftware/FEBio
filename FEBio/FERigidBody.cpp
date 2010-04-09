@@ -58,7 +58,7 @@ void FERigidBody::Update()
 			{	
 				FESolidElement& el = pbd->Element(iel);
 
-				FERigid* pm = dynamic_cast<FERigid*> (fem.GetMaterial(el.GetMatID()));
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (fem.GetMaterial(el.GetMatID()));
 
 				// make sure this element belongs to the rigid body
 				if (pm && (pm->m_nRB == m_nID))

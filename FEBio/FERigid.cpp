@@ -6,10 +6,10 @@
 #include "FERigid.h"
 
 // register the material with the framework
-REGISTER_MATERIAL(FERigid, "rigid body");
+REGISTER_MATERIAL(FERigidMaterial, "rigid body");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERigid, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FERigidMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
 	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 END_PARAMETER_LIST();
@@ -18,7 +18,7 @@ END_PARAMETER_LIST();
 // FERigid
 //////////////////////////////////////////////////////////////////////
 
-void FERigid::Init()
+void FERigidMaterial::Init()
 {
 	FEElasticMaterial::Init();
 
