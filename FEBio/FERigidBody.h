@@ -75,8 +75,11 @@ public:
 	double	m_Up[6];	// previous displacement/rotation vector
 	double	m_Ut[6];	// total displacement/rotation vector
 	double	m_du[6];	// incremental displacement vector
+	double	m_dul[6];	// displacement in local coordinates system
 
 	FERigidBodyDisplacement*	m_pDC[6];	// active displacement constraints
+
+	FERigidBody*	m_prb;	//!< parent rigid body
 
 	bool	m_bActive;	// activation flag
 

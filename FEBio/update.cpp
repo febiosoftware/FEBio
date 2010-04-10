@@ -217,16 +217,20 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 			du = RB.m_du;
 
 			// first do the displacements
-			FERigidBodyDisplacement* pdc;
-			for (j=0; j<3; ++j)
+			if (RB.m_prb == 0)
 			{
-				pdc = RB.m_pDC[j];
-				if (pdc)
+				FERigidBodyDisplacement* pdc;
+				for (j=0; j<3; ++j)
 				{
-					lc = pdc->lc;
-					du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+					pdc = RB.m_pDC[j];
+					if (pdc)
+					{
+						lc = pdc->lc;
+						// TODO: do I need to take the line search step into account here?
+						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+					}
+					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
 				}
-				else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
 			}
 
 			RB.m_rt.x = RB.m_rp.x + du[0];
@@ -235,15 +239,20 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 
 			// next, we do the rotations. We do this seperatly since
 			// they need to be interpreted differently than displacements
-			for (j=3; j<6; ++j)
+			if (RB.m_prb == 0)
 			{
-				pdc = RB.m_pDC[j];
-				if (pdc)
+				FERigidBodyDisplacement* pdc;
+				for (j=3; j<6; ++j)
 				{
-					lc = pdc->lc;
-					du[j] = (lc < 0? 0 : m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+					pdc = RB.m_pDC[j];
+					if (pdc)
+					{
+						lc = pdc->lc;
+						// TODO: do I need to take the line search step into account here?
+						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
+					}
+					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
 				}
-				else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
 			}
 
 			r = vec3d(du[3], du[4], du[5]);
@@ -253,6 +262,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 			RB.m_qt = dq*RB.m_qp;
 			RB.m_qt.MakeUnit();
 
+			if (RB.m_prb) du = RB.m_dul;
 			RB.m_Ut[0] = RB.m_Up[0] + du[0];
 			RB.m_Ut[1] = RB.m_Up[1] + du[1];
 			RB.m_Ut[2] = RB.m_Up[2] + du[2];

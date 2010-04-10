@@ -89,7 +89,7 @@ bool FESolidSolver::SolveStep(double time)
 
 void FESolidSolver::PrepStep(double time)
 {
-	int i;
+	int i, j;
 
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -196,21 +196,106 @@ void FESolidSolver::PrepStep(double time)
 		RB.m_Up[3] = RB.m_Ut[3];
 		RB.m_Up[4] = RB.m_Ut[4];
 		RB.m_Up[5] = RB.m_Ut[5];
+
+		RB.m_du[0] = RB.m_dul[0] = 0.0;
+		RB.m_du[1] = RB.m_dul[1] = 0.0;
+		RB.m_du[2] = RB.m_dul[2] = 0.0;
+		RB.m_du[3] = RB.m_dul[3] = 0.0;
+		RB.m_du[4] = RB.m_dul[4] = 0.0;
+		RB.m_du[5] = RB.m_dul[5] = 0.0;
 	}
 
-	// apply rigid displacements
+	// calculate local rigid displacements
 	for (i=0; i<m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = m_fem.m_RDC[i];
 		FERigidBody& RB = m_fem.m_RB[DC.id];
 		if (RB.m_bActive && DC.IsActive())
 		{
-			int I = -RB.m_LM[DC.bc]-2;
+			int I = DC.bc;
 			int lc = DC.lc;
-			if ((I >= 0) && (lc > 0))
+			if (lc > 0)
 			{
-				m_ui[I] = DC.sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Ut[DC.bc];
+				RB.m_dul[I] = DC.sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Ut[DC.bc];
 			}
+		}
+	}
+
+	// calculate global rigid displacements
+	for (i=0; i<m_fem.m_RB.size(); ++i)
+	{
+		FERigidBody& RB = m_fem.m_RB[i];
+		if (RB.m_prb == 0)
+		{
+			for (j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
+		}
+		else
+		{
+			double* dul = RB.m_dul;
+			vec3d dr = vec3d(dul[0], dul[1], dul[2]);
+			
+			vec3d v = vec3d(dul[3], dul[4], dul[5]);
+			double w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+			quatd dq = quatd(w, v);
+
+			FERigidBody* pprb = RB.m_prb;
+
+			vec3d r0 = RB.m_rt;
+			quatd Q0 = RB.m_qt;
+
+			dr = Q0*dr;
+			dq = Q0*dq*Q0.Inverse();
+
+			while (pprb)
+			{
+				vec3d r1 = pprb->m_rt;
+				dul = pprb->m_dul;
+
+				quatd Q1 = pprb->m_qt;
+				
+				dr = r0 + dr - r1;
+
+				// grab the parent's local displacements
+				vec3d dR = vec3d(dul[0], dul[1], dul[2]);
+				v = vec3d(dul[3], dul[4], dul[5]);
+				w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+				quatd dQ = quatd(w, v);
+
+				dQ = Q1*dQ*Q1.Inverse();
+
+				// update global displacements
+				quatd Qi = Q1.Inverse();
+				dr = dR + r1 + dQ*dr - r0;
+				dq = dQ*dq;
+
+				// move up in the chain
+				pprb = pprb->m_prb;
+				Q0 = Q1;
+			}
+
+			// set global displacements
+			double* du = RB.m_du;
+
+			du[0] = dr.x;
+			du[1] = dr.y;
+			du[2] = dr.z;
+
+			v = dq.GetVector();
+			w = dq.GetAngle();
+			du[3] = w*v.x;
+			du[4] = w*v.y;
+			du[5] = w*v.z;
+		}
+	}
+
+	// store rigid displacements in Ui vector
+	for (i=0; i<m_fem.m_RB.size(); ++i)
+	{
+		FERigidBody& RB = m_fem.m_RB[i];
+		for (j=0; j<6; ++j)
+		{
+			int I = -RB.m_LM[j]-2;
+			if (I >= 0) m_ui[I] = RB.m_dul[j];
 		}
 	}
 

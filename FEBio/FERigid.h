@@ -31,6 +31,7 @@ public:
 		}
 		m_E = 1;
 		m_v = 0;
+		m_pmid = -1;
 	}
 
 public:
@@ -47,6 +48,7 @@ public:
 	double	m_fs[6];	//!< rigid force/torque scale factors
 
 	int		m_nRB;		//!< rigid body ID
+	int		m_pmid;		//!< parent material ID
 
 public:
 	//! calculate stress at material point

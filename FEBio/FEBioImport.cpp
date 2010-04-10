@@ -595,6 +595,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 					FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
 
 					if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; bfound = true; }
+					else if (tag == "parent_id") { tag.value(pm->m_pmid); bfound = true; }
 					else if (strncmp(tag.Name(), "trans_", 6) == 0)
 					{
 						const char* szt = tag.AttributeValue("type");
