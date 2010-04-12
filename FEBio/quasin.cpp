@@ -208,7 +208,7 @@ void FESolidSolver::PrepStep(double time)
 	// calculate local rigid displacements
 	for (i=0; i<m_fem.m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = m_fem.m_RDC[i];
+		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
 		FERigidBody& RB = m_fem.m_RB[DC.id];
 		if (RB.m_bActive && DC.IsActive())
 		{
@@ -302,7 +302,7 @@ void FESolidSolver::PrepStep(double time)
 	// apply prescribed rigid body forces
 	for (i=0; i<m_fem.m_RFC.size(); ++i)
 	{
-		FERigidBodyForce& FC = m_fem.m_RFC[i];
+		FERigidBodyForce& FC = *m_fem.m_RFC[i];
 		FERigidBody& RB = m_fem.m_RB[FC.id];
 		if (RB.m_bActive && FC.IsActive())
 		{

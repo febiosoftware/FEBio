@@ -65,16 +65,17 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 			++tag;
 			do
 			{
-				if		(tag == "Module"  ) ParseModuleSection  (tag);
-				else if (tag == "Control" ) ParseControlSection (tag);
-				else if (tag == "Material") ParseMaterialSection(tag);
-				else if (tag == "Geometry") ParseGeometrySection(tag);
-				else if (tag == "Boundary") ParseBoundarySection(tag);
-				else if (tag == "Initial" ) ParseInitialSection (tag);
-				else if (tag == "Globals" ) ParseGlobalsSection (tag);
-				else if (tag == "LoadData") ParseLoadSection    (tag);
-				else if (tag == "Output"  ) ParseOutputSection  (tag);
-				else if (tag == "Step"    ) ParseStepSection    (tag);
+				if		(tag == "Module"     ) ParseModuleSection    (tag);
+				else if (tag == "Control"    ) ParseControlSection   (tag);
+				else if (tag == "Material"   ) ParseMaterialSection  (tag);
+				else if (tag == "Geometry"   ) ParseGeometrySection  (tag);
+				else if (tag == "Boundary"   ) ParseBoundarySection  (tag);
+				else if (tag == "Constraints") ParseConstraintSection(tag);
+				else if (tag == "Initial"    ) ParseInitialSection   (tag);
+				else if (tag == "Globals"    ) ParseGlobalsSection   (tag);
+				else if (tag == "LoadData"   ) ParseLoadSection      (tag);
+				else if (tag == "Output"     ) ParseOutputSection    (tag);
+				else if (tag == "Step"       ) ParseStepSection      (tag);
 				else throw XMLReader::InvalidTag(tag);
 
 				// go to the next tag
@@ -614,18 +615,18 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 						else if (strcmp(szt, "prescribed") == 0)
 						{
 							pm->m_bc[bc] = lc;
-							FERigidBodyDisplacement DC;
-							DC.id = nmat;
-							DC.bc = bc;
-							DC.lc = lc;
-							tag.value(DC.sf);
-							fem.m_RDC.push_back(DC);
+							FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+							pDC->id = nmat;
+							pDC->bc = bc;
+							pDC->lc = lc;
+							tag.value(pDC->sf);
+							fem.m_RDC.push_back(pDC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
 							{
 								int n = fem.m_RDC.size()-1;
-								FERigidBodyDisplacement* pDC = &fem.m_RDC[n];
+								FERigidBodyDisplacement* pDC = fem.m_RDC[n];
 								m_pStep->AddBoundaryCondition(pDC);
 								pDC->Deactivate();
 							}
@@ -633,18 +634,18 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 						else if (strcmp(szt, "force") == 0)
 						{
 							pm->m_bc[bc] = 0;
-							FERigidBodyForce FC;
-							FC.id = nmat;
-							FC.bc = bc;
-							FC.lc = lc-1;
-							tag.value(FC.sf);
-							fem.m_RFC.push_back(FC);
+							FERigidBodyForce* pFC = new FERigidBodyForce;
+							pFC->id = nmat;
+							pFC->bc = bc;
+							pFC->lc = lc-1;
+							tag.value(pFC->sf);
+							fem.m_RFC.push_back(pFC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
 							{
 								int n = fem.m_RFC.size()-1;
-								FERigidBodyForce* pFC = &fem.m_RFC[n];
+								FERigidBodyForce* pFC = fem.m_RFC[n];
 								m_pStep->AddBoundaryCondition(pFC);
 								pFC->Deactivate();
 							}
@@ -669,18 +670,18 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 						else if (strcmp(szt, "prescribed") == 0)
 						{
 							pm->m_bc[bc] = lc;
-							FERigidBodyDisplacement DC;
-							DC.id = nmat;
-							DC.bc = bc;
-							DC.lc = lc;
-							tag.value(DC.sf);
-							fem.m_RDC.push_back(DC);
+							FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+							pDC->id = nmat;
+							pDC->bc = bc;
+							pDC->lc = lc;
+							tag.value(pDC->sf);
+							fem.m_RDC.push_back(pDC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
 							{
 								int n = fem.m_RDC.size()-1;
-								FERigidBodyDisplacement* pDC = &fem.m_RDC[n];
+								FERigidBodyDisplacement* pDC = fem.m_RDC[n];
 								m_pStep->AddBoundaryCondition(pDC);
 								pDC->Deactivate();
 							}
@@ -688,18 +689,18 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 						else if (strcmp(szt, "force") == 0)
 						{
 							pm->m_bc[bc] = 0;
-							FERigidBodyForce FC;
-							FC.id = nmat;
-							FC.bc = bc;
-							FC.lc = lc-1;
-							tag.value(FC.sf);
-							fem.m_RFC.push_back(FC);
+							FERigidBodyForce* pFC = new FERigidBodyForce;
+							pFC->id = nmat;
+							pFC->bc = bc;
+							pFC->lc = lc-1;
+							tag.value(pFC->sf);
+							fem.m_RFC.push_back(pFC);
 
 							// add this boundary condition to the current step
 							if (m_nsteps > 0)
 							{
 								int n = fem.m_RFC.size()-1;
-								FERigidBodyForce* pFC = &fem.m_RFC[n];
+								FERigidBodyForce* pFC = fem.m_RFC[n];
 								m_pStep->AddBoundaryCondition(pFC);
 								pFC->Deactivate();
 							}
@@ -1716,7 +1717,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 
 			fem.m_DE.push_back(de);
 		}
-		else if (tag == "rigid_body")
+/*		else if (tag == "rigid_body")
 		{
 			// currently we only allow this to be specified in the multistep feature
 			assert(m_nsteps);
@@ -1761,7 +1762,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
-		else throw XMLReader::InvalidTag(tag);
+*/		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
@@ -2718,8 +2719,9 @@ bool FEFEBioImport::ParseStepSection(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "Control") ParseControlSection(tag);
-		else if (tag == "Boundary") ParseBoundarySection(tag);
+		if      (tag == "Control"    ) ParseControlSection   (tag);
+		else if (tag == "Boundary"   ) ParseBoundarySection  (tag);
+		else if (tag == "Constraints") ParseConstraintSection(tag);
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
@@ -2778,5 +2780,137 @@ bool FEFEBioImport::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 
 		++tag;
 	}
+	return true;
+}
+
+//---------------------------------------------------------------------------------
+
+bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
+{
+	FEM& fem = *m_pfem;
+
+	++tag;
+	do
+	{
+		if (tag == "rigid_body")
+		{
+			const char* szm = tag.AttributeValue("id");
+			assert(szm);
+
+			int nmat = atoi(szm);
+
+			++tag;
+			do
+			{
+				if (strncmp(tag.Name(), "trans_", 6) == 0)
+				{
+					const char* szt = tag.AttributeValue("type");
+					const char* szlc = tag.AttributeValue("lc", true);
+					int lc = 0;
+					if (szlc) lc = atoi(szlc)+1;
+
+					int bc = -1;
+					if      (tag.Name()[6] == 'x') bc = 0;
+					else if (tag.Name()[6] == 'y') bc = 1;
+					else if (tag.Name()[6] == 'z') bc = 2;
+					assert(bc >= 0);
+					
+					if (strcmp(szt, "prescribed") == 0)
+					{
+						FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+						pDC->id = nmat;
+						pDC->bc = bc;
+						pDC->lc = lc;
+						tag.value(pDC->sf);
+						fem.m_RDC.push_back(pDC);
+
+						// add this boundary condition to the current step
+						if (m_nsteps > 0)
+						{
+							int n = fem.m_RDC.size()-1;
+							FERigidBodyDisplacement* pDC = fem.m_RDC[n];
+							m_pStep->AddBoundaryCondition(pDC);
+							pDC->Deactivate();
+						}
+					}
+					else if (strcmp(szt, "force") == 0)
+					{
+						FERigidBodyForce* pFC = new FERigidBodyForce;
+						pFC->id = nmat;
+						pFC->bc = bc;
+						pFC->lc = lc-1;
+						tag.value(pFC->sf);
+						fem.m_RFC.push_back(pFC);
+
+						// add this boundary condition to the current step
+						if (m_nsteps > 0)
+						{
+							int n = fem.m_RFC.size()-1;
+							FERigidBodyForce* pFC = fem.m_RFC[n];
+							m_pStep->AddBoundaryCondition(pFC);
+							pFC->Deactivate();
+						}
+					}
+				}
+				else if (strncmp(tag.Name(), "rot_", 4) == 0)
+				{
+					const char* szt = tag.AttributeValue("type");
+					const char* szlc = tag.AttributeValue("lc", true);
+					int lc = 0;
+					if (szlc) lc = atoi(szlc)+1;
+
+					int bc = -1;
+					if      (tag.Name()[4] == 'x') bc = 3;
+					else if (tag.Name()[4] == 'y') bc = 4;
+					else if (tag.Name()[4] == 'z') bc = 5;
+					assert(bc >= 0);
+
+					if (strcmp(szt, "prescribed") == 0)
+					{
+						FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+						pDC->id = nmat;
+						pDC->bc = bc;
+						pDC->lc = lc;
+						tag.value(pDC->sf);
+						fem.m_RDC.push_back(pDC);
+
+						// add this boundary condition to the current step
+						if (m_nsteps > 0)
+						{
+							int n = fem.m_RDC.size()-1;
+							FERigidBodyDisplacement* pDC = fem.m_RDC[n];
+							m_pStep->AddBoundaryCondition(pDC);
+							pDC->Deactivate();
+						}
+					}
+					else if (strcmp(szt, "force") == 0)
+					{
+						FERigidBodyForce* pFC = new FERigidBodyForce;
+						pFC->id = nmat;
+						pFC->bc = bc;
+						pFC->lc = lc-1;
+						tag.value(pFC->sf);
+						fem.m_RFC.push_back(pFC);
+
+						// add this boundary condition to the current step
+						if (m_nsteps > 0)
+						{
+							int n = fem.m_RFC.size()-1;
+							FERigidBodyForce* pFC = fem.m_RFC[n];
+							m_pStep->AddBoundaryCondition(pFC);
+							pFC->Deactivate();
+						}
+					}
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
 	return true;
 }

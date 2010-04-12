@@ -375,13 +375,13 @@ bool FEM::InitRigidBodies()
 	// so we now associate them with the rigid bodies
 	for (i=0; i<m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = m_RDC[i];
+		FERigidBodyDisplacement& DC = *m_RDC[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(DC.id-1));
 		DC.id = pm->m_nRB;
 	}
 	for (i=0; i<m_RFC.size(); ++i)
 	{
-		FERigidBodyForce& FC = m_RFC[i];
+		FERigidBodyForce& FC = *m_RFC[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(FC.id-1));
 		FC.id = pm->m_nRB;
 	}

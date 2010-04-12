@@ -474,10 +474,10 @@ public:
 		FEConstTractionSurface*	m_ptrac;	//!< constant traction surface
 
 		// rigid displacements
-		vector<FERigidBodyDisplacement>	m_RDC;	//!< rigid body displacements
+		vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 
 		// rigid forces
-		vector<FERigidBodyForce>	m_RFC;	//!< rigid body forces
+		vector<FERigidBodyForce*>	m_RFC;	//!< rigid body forces
 
 		// rigid nodes
 		vector<FERigidNode>		m_RN;		//!< rigid nodes

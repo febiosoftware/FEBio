@@ -430,9 +430,9 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 		for (i=0; i<m_ptrac->Elements(); ++i) if (m_ptrac->TractionLoad(i).GetID() == nid) return &m_ptrac->TractionLoad(i);
 	}
 
-	for (i=0; i<m_RDC.size(); ++i) if (m_RDC[i].GetID() == nid) return &m_RDC[i];
+	for (i=0; i<m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];
 
-	for (i=0; i<m_RFC.size(); ++i) if (m_RFC[i].GetID() == nid) return &m_RFC[i];
+	for (i=0; i<m_RFC.size(); ++i) if (m_RFC[i]->GetID() == nid) return m_RFC[i];
 
 	return 0;
 }

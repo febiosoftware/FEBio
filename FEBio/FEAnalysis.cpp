@@ -109,9 +109,9 @@ bool FEAnalysis::Init()
 	// set the active rigid bodies BC's
 	for (i=0; i<m_fem.m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = m_fem.m_RDC[i];
+		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
 		FERigidBody& RB = m_fem.m_RB[DC.id];
-		assert(RB.m_pDC[DC.bc] == 0);
+//		assert(RB.m_pDC[DC.bc] == 0);
 		if (RB.m_bActive && DC.IsActive())
 		{
 			RB.m_pDC[DC.bc] = &DC;

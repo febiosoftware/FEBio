@@ -58,7 +58,7 @@ bool FEM::Solve()
 	}
 
 	// close the plot file
-	m_plot->Close();
+	if (m_plot) m_plot->Close();
 
 	// stop total time tracker
 	m_TotalTime.stop();

@@ -38,6 +38,7 @@ protected:
 	bool ParseElementDataSection(XMLTag& tag);
 	bool ParseGroupSection      (XMLTag& tag);
 	bool ParseBoundarySection   (XMLTag& tag);
+	bool ParseConstraintSection (XMLTag& tag);
 	bool ParseInitialSection    (XMLTag& tag);
 	bool ParseConstraints       (XMLTag& tag);
 	bool ParseContactSection    (XMLTag& tag);

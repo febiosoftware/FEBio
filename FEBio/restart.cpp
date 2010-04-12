@@ -480,7 +480,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		ar << m_RDC.size();
 		for (i=0; i<m_RDC.size(); ++i)
 		{
-			FERigidBodyDisplacement& dc = m_RDC[i];
+			FERigidBodyDisplacement& dc = *m_RDC[i];
 			ar << dc.bc << dc.id << dc.lc << dc.sf;
 		}
 
@@ -488,7 +488,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		ar << m_RFC.size();
 		for (i=0; i<m_RFC.size(); ++i)
 		{
-			FERigidBodyForce& fc = m_RFC[i];
+			FERigidBodyForce& fc = *m_RFC[i];
 			ar << fc.bc << fc.id << fc.lc << fc.sf;
 		}
 
@@ -534,20 +534,22 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		}
 
 		// rigid body displacements
+		// TODO: this is not gonna work !!!!
 		ar >> n;
 		if (n) m_RDC.resize(n);
 		for (i=0; i<n; ++i)
 		{
-			FERigidBodyDisplacement& dc = m_RDC[i];
+			FERigidBodyDisplacement& dc = *m_RDC[i];
 			ar >> dc.bc >> dc.id >> dc.lc >> dc.sf;
 		}
 
 		// rigid body forces
+		// TODO: this is not gonna work !!!!
 		ar >> n;
 		if (n) m_RFC.resize(n);
 		for (i=0; i<n; ++i)
 		{
-			FERigidBodyForce& fc = m_RFC[i];
+			FERigidBodyForce& fc = *m_RFC[i];
 			ar >> fc.bc >> fc.id >> fc.lc >> fc.sf;
 		}
 

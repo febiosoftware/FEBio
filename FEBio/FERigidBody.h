@@ -36,10 +36,24 @@ public:
 class FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
+	virtual ~FERigidBodyDisplacement(){}
+
+public:
 	int		id;	// rigid body id
 	int		bc;	// displacement direction
 	int		lc;	// load curve number
 	double	sf;	// scale factor
+};
+
+//-----------------------------------------------------------------------------
+//! rigid body fixed constraint
+//! This constraint is used to fix a rigid body
+
+class FERigidFixedConstraint : public FEBoundaryCondition
+{
+public:
+	int		id;	// rigid body id
+	int		bc;	// displacement direction
 };
 
 //-----------------------------------------------------------------------------
