@@ -262,6 +262,13 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	// elasticity tensor
 	double D[6][6] = {0};
 
+	// get deformation gradient and its inverse
+	mat3d F = pt.F;
+	mat3d Fi = F.inverse();
+
+	// get the stress
+	mat3ds s = pt.s;
+
 	// calculate the stiffness matrix
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
 	int NS = bd.Elements(), i, j;
@@ -331,6 +338,37 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 					D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
 
 					D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
+/*
+					// add the stress contribution
+					D[0][0] -= s.xx()*Fi[0][0];
+					D[1][1] -= s.yy()*Fi[1][1];
+					D[2][2] -= s.zz()*Fi[2][2];
+
+					D[0][1] -= s.xx()*Fi[1][1];
+					D[0][2] -= s.xx()*Fi[2][2];
+					D[1][2] -= s.yy()*Fi[2][2];
+
+					D[0][3] -= 0.5*s.xx()*(Fi[0][1] + Fi[1][0]);
+					D[0][4] -= 0.5*s.xx()*(Fi[1][2] + Fi[2][1]);
+					D[0][5] -= 0.5*s.xx()*(Fi[0][2] + Fi[2][0]);
+
+					D[1][3] -= 0.5*s.yy()*(Fi[0][1] + Fi[1][0]);
+					D[1][4] -= 0.5*s.yy()*(Fi[1][2] + Fi[2][1]);
+					D[1][5] -= 0.5*s.yy()*(Fi[0][2] + Fi[2][0]);
+
+					D[2][3] -= 0.5*s.zz()*(Fi[0][1] + Fi[1][0]);
+					D[2][4] -= 0.5*s.zz()*(Fi[1][2] + Fi[2][1]);
+					D[2][5] -= 0.5*s.zz()*(Fi[0][2] + Fi[2][0]);
+
+					D[3][3] -= 0.5*s.xy()*(Fi[0][1] + Fi[1][0]);
+					D[3][4] -= 0.5*s.xy()*(Fi[1][2] + Fi[2][1]);
+					D[3][5] -= 0.5*s.xy()*(Fi[2][0] + Fi[0][2]);
+
+					D[4][4] -= 0.5*s.yz()*(Fi[1][2] + Fi[2][1]);
+					D[4][5] -= 0.5*s.yz()*(Fi[0][2] + Fi[2][0]);
+
+					D[5][5] -= 0.5*s.xz()*(Fi[0][2] + Fi[2][0]);
+*/
 				}
 			}
 		}
