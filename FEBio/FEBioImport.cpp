@@ -1082,11 +1082,8 @@ void FEFEBioImport::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype,
 	el.m_gid = gid;
 	int n[8];
 	tag.value(n,el.Nodes());
-	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
+	for (int j=0; j<el.Nodes(); ++j) { el.m_node[j] = n[j]-1; el.m_h0[j] = 0.0; }
 	el.SetMatID(nmat);
-
-	// thickness are read in the ElementData section
-	el.m_h0[0] = el.m_h0[1] = el.m_h0[2] = el.m_h0[3] = 0.0;
 }
 
 //-----------------------------------------------------------------------------
