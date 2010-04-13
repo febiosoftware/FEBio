@@ -194,6 +194,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "rtol"              ) tag.value(m_pStep->m_psolver->m_Rtol);
 		else if (tag == "lstol"             ) tag.value(m_pStep->m_psolver->m_LStol);
 		else if (tag == "lsmin"             ) tag.value(m_pStep->m_psolver->m_LSmin);
+		else if (tag == "min_residual"      ) tag.value(m_pStep->m_psolver->m_Rmin);
 		else if (tag == "lsiter"            ) tag.value(m_pStep->m_psolver->m_LSiter);
 		else if (tag == "max_refs"          ) tag.value(m_pStep->m_psolver->m_bfgs.m_maxref);
 		else if (tag == "max_ups"           ) tag.value(m_pStep->m_psolver->m_bfgs.m_maxups);

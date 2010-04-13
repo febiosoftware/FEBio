@@ -20,6 +20,8 @@ FESolver::FESolver(FEM& fem) : m_fem(fem)
 	// Stiffness matrix and linear solver are allocated in Init()
 	m_pK = 0;
 	m_plinsolve = 0;
+
+	m_Rmin = 1.0e-20;
 }
 
 

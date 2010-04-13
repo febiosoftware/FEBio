@@ -62,6 +62,7 @@ public:
 	double	m_LStol;		//!< line search tolerance
 	double	m_LSmin;		//!< minimum line search step
 	int		m_LSiter;		//!< max nr of line search iterations
+	double	m_Rmin;			//!< min residual value
 
 	// BFGS parameters
 	BFGSSolver	m_bfgs;		//!< BFGS solver parameters
