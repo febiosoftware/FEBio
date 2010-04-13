@@ -295,7 +295,7 @@ void FESolidSolver::PrepStep(double time)
 		for (j=0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j]-2;
-			if (I >= 0) m_ui[I] = RB.m_dul[j];
+			if (I >= 0) m_ui[I] = RB.m_du[j];
 		}
 	}
 

@@ -398,6 +398,14 @@ bool FEM::InitRigidBodies()
 			assert(ppm);
 			FERigidBody& prb = m_RB[ppm->m_nRB];
 			rb.m_prb = &prb;
+
+			// we also need to open up all the RB's degree of freedoms
+			pm->m_bc[0] = 1;
+			pm->m_bc[1] = 1;
+			pm->m_bc[2] = 1;
+			pm->m_bc[3] = 1;
+			pm->m_bc[4] = 1;
+			pm->m_bc[5] = 1;
 		}
 	}
 
