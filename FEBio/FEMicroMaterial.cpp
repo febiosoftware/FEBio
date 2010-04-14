@@ -259,6 +259,9 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	// the element's stiffness matrix
 	matrix ke;
 
+	// element's residual
+	vector<double> fe;
+
 	// elasticity tensor
 	double D[6][6] = {0};
 
@@ -269,7 +272,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	// get the stress
 	mat3ds s = pt.s;
 
-	// calculate the stiffness matrix
+	// calculate the stiffness matrix and residual
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
 	int NS = bd.Elements(), i, j;
 	for (int n=0; n<NS; ++n)
@@ -285,6 +288,12 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 
 		// calculate the element's stiffness matrix
 		bd.ElementStiffness(m_rve, e, ke);
+
+		// create the element's residual
+		fe.assign(ndof, 0);
+
+		// calculate the element's residual
+		bd.InternalForces(e, fe);
 
 		// loop over the element's nodes
 		for (i=0; i<ne; ++i)
@@ -338,39 +347,47 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 					D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
 
 					D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
-/*
-					// add the stress contribution
-					D[0][0] -= s.xx()*Fi[0][0];
-					D[1][1] -= s.yy()*Fi[1][1];
-					D[2][2] -= s.zz()*Fi[2][2];
-
-					D[0][1] -= s.xx()*Fi[1][1];
-					D[0][2] -= s.xx()*Fi[2][2];
-					D[1][2] -= s.yy()*Fi[2][2];
-
-					D[0][3] -= 0.5*s.xx()*(Fi[0][1] + Fi[1][0]);
-					D[0][4] -= 0.5*s.xx()*(Fi[1][2] + Fi[2][1]);
-					D[0][5] -= 0.5*s.xx()*(Fi[0][2] + Fi[2][0]);
-
-					D[1][3] -= 0.5*s.yy()*(Fi[0][1] + Fi[1][0]);
-					D[1][4] -= 0.5*s.yy()*(Fi[1][2] + Fi[2][1]);
-					D[1][5] -= 0.5*s.yy()*(Fi[0][2] + Fi[2][0]);
-
-					D[2][3] -= 0.5*s.zz()*(Fi[0][1] + Fi[1][0]);
-					D[2][4] -= 0.5*s.zz()*(Fi[1][2] + Fi[2][1]);
-					D[2][5] -= 0.5*s.zz()*(Fi[0][2] + Fi[2][0]);
-
-					D[3][3] -= 0.5*s.xy()*(Fi[0][1] + Fi[1][0]);
-					D[3][4] -= 0.5*s.xy()*(Fi[1][2] + Fi[2][1]);
-					D[3][5] -= 0.5*s.xy()*(Fi[2][0] + Fi[0][2]);
-
-					D[4][4] -= 0.5*s.yz()*(Fi[1][2] + Fi[2][1]);
-					D[4][5] -= 0.5*s.yz()*(Fi[0][2] + Fi[2][0]);
-
-					D[5][5] -= 0.5*s.xz()*(Fi[0][2] + Fi[2][0]);
-*/
 				}
 			}
+/*
+			if (ni.m_ID[0] < 0)
+			{
+				vec3d ri = ni.m_r0;
+
+				double Fi[3] = {fe[3*i], fe[3*i+1], fe[3*i+2] };
+				double Ri[3] = { ri.x, ri.y, ri.z };
+				double I[3][3] = {{1,0,0},{0,1,0},{0,0,1}};
+
+				D[0][0] += Fi[0]*Ri[0];
+				D[1][1] += Fi[1]*Ri[1];
+				D[2][2] += Fi[2]*Ri[2];
+
+//				D[0][1] += 0;
+//				D[0][2] += 0;
+//				D[1][2] += 0;
+
+				D[0][3] += 0.5*(Fi[0]*I[0][0]*Ri[1] + Fi[0]*I[0][1]*Ri[0]);
+				D[0][4] += 0.5*(Fi[0]*I[0][1]*Ri[2] + Fi[0]*I[0][2]*Ri[1]);
+				D[0][5] += 0.5*(Fi[0]*I[0][0]*Ri[2] + Fi[0]*I[0][2]*Ri[0]);
+
+				D[1][3] += 0.5*(Fi[1]*I[1][0]*Ri[1] + Fi[1]*I[1][1]*Ri[0]);
+				D[1][4] += 0.5*(Fi[1]*I[1][1]*Ri[2] + Fi[1]*I[1][2]*Ri[1]);
+				D[1][5] += 0.5*(Fi[1]*I[1][0]*Ri[2] + Fi[1]*I[1][2]*Ri[0]);
+
+				D[2][3] += 0.5*(Fi[2]*I[2][0]*Ri[1] + Fi[2]*I[2][1]*Ri[0]);
+				D[2][4] += 0.5*(Fi[2]*I[2][1]*Ri[2] + Fi[2]*I[2][2]*Ri[1]);
+				D[2][5] += 0.5*(Fi[2]*I[2][0]*Ri[2] + Fi[2]*I[2][2]*Ri[0]);
+
+				D[3][3] += 0.25*(Fi[0]*I[1][0]*Ri[1] + Fi[1]*I[0][0]*Ri[1] + Fi[0]*I[1][1]*Ri[0] + Fi[1]*I[0][1]*Ri[0]);
+				D[3][4] += 0.25*(Fi[0]*I[1][1]*Ri[2] + Fi[1]*I[0][1]*Ri[2] + Fi[0]*I[1][2]*Ri[1] + Fi[1]*I[0][2]*Ri[1]);
+				D[3][5] += 0.25*(Fi[0]*I[1][0]*Ri[2] + Fi[1]*I[0][0]*Ri[2] + Fi[0]*I[1][2]*Ri[0] + Fi[1]*I[0][2]*Ri[0]);
+
+				D[4][4] += 0.25*(Fi[1]*I[2][1]*Ri[2] + Fi[2]*I[1][1]*Ri[2] + Fi[1]*I[2][2]*Ri[1] + Fi[2]*I[1][2]*Ri[1]);
+				D[4][5] += 0.25*(Fi[1]*I[2][0]*Ri[2] + Fi[2]*I[1][0]*Ri[2] + Fi[1]*I[2][2]*Ri[0] + Fi[2]*I[1][2]*Ri[0]);
+
+				D[5][5] += 0.25*(Fi[0]*I[2][0]*Ri[2] + Fi[2]*I[0][0]*Ri[2] + Fi[0]*I[2][2]*Ri[0] + Fi[2]*I[0][2]*Ri[0]);
+			}
+*/
 		}
 	}
 
@@ -382,6 +399,37 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	D[3][3] *= Vi; D[3][4] *= Vi; D[3][5] *= Vi;
 	D[4][4] *= Vi; D[4][5] *= Vi;
 	D[5][5] *= Vi;
+/*
+	// add the stress contribution
+	D[0][0] -= s.xx()*Fi[0][0];
+	D[1][1] -= s.yy()*Fi[1][1];
+	D[2][2] -= s.zz()*Fi[2][2];
+
+	D[0][1] -= s.xx()*Fi[1][1];
+	D[0][2] -= s.xx()*Fi[2][2];
+	D[1][2] -= s.yy()*Fi[2][2];
+
+	D[0][3] -= 0.5*s.xx()*(Fi[0][1] + Fi[1][0]);
+	D[0][4] -= 0.5*s.xx()*(Fi[1][2] + Fi[2][1]);
+	D[0][5] -= 0.5*s.xx()*(Fi[0][2] + Fi[2][0]);
+
+	D[1][3] -= 0.5*s.yy()*(Fi[0][1] + Fi[1][0]);
+	D[1][4] -= 0.5*s.yy()*(Fi[1][2] + Fi[2][1]);
+	D[1][5] -= 0.5*s.yy()*(Fi[0][2] + Fi[2][0]);
+
+	D[2][3] -= 0.5*s.zz()*(Fi[0][1] + Fi[1][0]);
+	D[2][4] -= 0.5*s.zz()*(Fi[1][2] + Fi[2][1]);
+	D[2][5] -= 0.5*s.zz()*(Fi[0][2] + Fi[2][0]);
+
+	D[3][3] -= 0.5*s.xy()*(Fi[0][1] + Fi[1][0]);
+	D[3][4] -= 0.5*s.xy()*(Fi[1][2] + Fi[2][1]);
+	D[3][5] -= 0.5*s.xy()*(Fi[2][0] + Fi[0][2]);
+
+	D[4][4] -= 0.5*s.yz()*(Fi[1][2] + Fi[2][1]);
+	D[4][5] -= 0.5*s.yz()*(Fi[0][2] + Fi[2][0]);
+
+	D[5][5] -= 0.5*s.xz()*(Fi[0][2] + Fi[2][0]);
+*/
 
 	return tens4ds(D);
 }
