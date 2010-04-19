@@ -183,12 +183,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_31026927A2E94E348B5F6B1EFA0C2B1B"
-        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_33C58BCCAC8E400F8A114D30F01F7ABA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -537,12 +531,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_86C2E64CDE6143A1B62F55BB4C08A734"
-        "OwnerKey" = "8:_31026927A2E94E348B5F6B1EFA0C2B1B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_89429E23AA8346558EE30E5234999687"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -711,6 +699,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_ACE3EE2234EE4BE5B626DBEDAD1D802A"
+        "OwnerKey" = "8:_B8C47B170A4B47B099A9B49AE02D3F5F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_AF7409524E12451B8F7AF9AD77878FB6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -749,6 +743,12 @@
         {
         "MsmKey" = "8:_B7A9F7E572A34A679D9A0BD1E85B3942"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B8C47B170A4B47B099A9B49AE02D3F5F"
+        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -4979,14 +4979,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio"
-        "ProductCode" = "8:{BA458B9A-3BC4-43D5-A9BA-6A70CA252DD0}"
-        "PackageCode" = "8:{A4650F67-FD86-4AF3-A9CD-7FB7B7A7ACAA}"
+        "ProductCode" = "8:{A8BCF4F6-AD54-49A6-8698-2CF7890535D9}"
+        "PackageCode" = "8:{33C30AE9-324B-4C4E-AC6B-616B3F14C216}"
         "UpgradeCode" = "8:{C651D20C-DA37-45DD-B03F-85DB2BC7C551}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.2.0"
+        "ProductVersion" = "8:1.2.2"
         "Manufacturer" = "8:University of Utah"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -5509,11 +5509,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_31026927A2E94E348B5F6B1EFA0C2B1B"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_ACE3EE2234EE4BE5B626DBEDAD1D802A"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
                 "Properties"
                 {
                 }
@@ -5523,11 +5523,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_86C2E64CDE6143A1B62F55BB4C08A734"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_B8C47B170A4B47B099A9B49AE02D3F5F"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -5542,7 +5542,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B5DBEA9D13BD4A3299351E9AD71B980A"
             {
-            "SourcePath" = "8:..\\Release\\FEBio.exe"
+            "SourcePath" = "8:..\\Debug\\FEBio.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"

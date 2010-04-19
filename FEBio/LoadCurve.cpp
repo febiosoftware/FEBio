@@ -103,7 +103,7 @@ double FELoadCurve::Value(double time)
 	else if (m_fnc == STEP)
 	{
 		int n=0;
-		while (lp[n].time < time) ++n;
+		while (lp[n].time <= time) ++n;
 
 		return lp[n].value;
 	}
