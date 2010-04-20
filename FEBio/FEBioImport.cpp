@@ -51,13 +51,21 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// get the logfile
 	Logfile& log = GetLogfile();
 
+	// Find the root element
+	XMLTag tag;
+	try
+	{
+		if (m_xml.FindTag("febio_spec", tag) == false) return false;
+	}
+	catch (...)
+	{
+		log.printf("An error occured while finding the febio_spec tag.\nIs this a valid FEBio input file?\n\n");
+		return false;
+	}
+
 	// loop over all child tags
 	try
 	{
-		// Find the root element
-		XMLTag tag;
-		if (m_xml.FindTag("febio_spec", tag) == false) return false;
-
 		if (strcmp(tag.m_szatv[0], "1.0") == 0)
 		{
 			// Read version 1.0

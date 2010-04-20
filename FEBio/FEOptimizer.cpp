@@ -29,7 +29,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		{
 			if		(tag == "Model"     ) bret = ParseModel     (tag, opt);
 			else if (tag == "Options"   ) bret = ParseOptions   (tag, opt);
-			else if (tag == "Objectives") bret = ParseObjective (tag, opt);
+			else if (tag == "Function"  ) bret = ParseObjective (tag, opt);
 			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
 			else if (tag == "LoadData"  ) bret = ParseLoadData  (tag, opt);
 			else throw XMLReader::InvalidTag(tag);
@@ -108,8 +108,8 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 		++tag;
 		do
 		{
-			if      (tag == "objtol"     ) tag.value(popt->m_objtol);
-			else if (tag == "fdiff_scale") tag.value(popt->m_fdiff );
+			if      (tag == "obj_tol"     ) tag.value(popt->m_objtol);
+			else if (tag == "f_diff_scale") tag.value(popt->m_fdiff );
 			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
@@ -136,7 +136,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 	++tag;
 	do
 	{
-		if (tag == "obj")
+		if (tag == "fnc")
 		{
 			tag.value(obj.m_szname);
 

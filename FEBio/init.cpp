@@ -421,6 +421,10 @@ bool FEM::Reset()
 
 	// set first time step
 	m_pStep->m_dt = m_pStep->m_dt0;
+	m_pStep->m_ntotref    = 0;		// total nr of stiffness reformations
+	m_pStep->m_ntotiter   = 0;		// total nr of non-linear iterations
+	m_pStep->m_ntimesteps = 0;		// time steps completed
+	m_pStep->m_ntotrhs    = 0;		// total nr of right hand side evaluations
 
 	// get the logfile
 	Logfile& log = GetLogfile();

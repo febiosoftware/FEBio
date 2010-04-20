@@ -89,42 +89,52 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	Logfile& log = GetLogfile();
 	log.SetMode(Logfile::FILE_AND_SCREEN);
 
-	// do the first call with lamda to intialize the minimization
-	double alamda = -1.0;
-	log.printf("\n----- Major Iteration: %d -----\n", 0);
-	mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
-
-	// repeat until converged
-	double fprev = fret, lam1 = alamda;
-	bool bconv = false;
-	int NMAX = 100;
 	int niter = 1;
-	do
+
+	try
 	{
-		log.printf("\n----- Major Iteration: %d -----\n", niter);
+		// do the first call with lamda to intialize the minimization
+		double alamda = -1.0;
+		log.printf("\n----- Major Iteration: %d -----\n", 0);
 		mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
 
-		if (alamda < lam1)
+		// repeat until converged
+		double fprev = fret, lam1 = alamda;
+		bool bconv = false;
+		int NMAX = 100;
+		do
 		{
-			if (niter != 1)
+			log.printf("\n----- Major Iteration: %d -----\n", niter);
+			mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
+
+			if (alamda < lam1)
 			{
-				double df = (fprev - fret)/(fprev + fret + 1);
-				if ( df < m_objtol) bconv = true;
-				log.printf("objective value: %lg (diff = %lg)\n\n", fret, df);
+				if (niter != 1)
+				{
+					double df = (fprev - fret)/(fprev + fret + 1);
+					if ( df < m_objtol) bconv = true;
+					log.printf("objective value: %lg (diff = %lg)\n\n", fret, df);
+				}
 			}
+			else log.printf("\n objective value: %lg\n\n", fret);
+
+			fprev = fret;
+			lam1 = alamda;
+
+			++niter;
 		}
-		else log.printf("\n objective value: %lg\n\n", fret);
+		while ((bconv == false) && (niter < NMAX));
 
-		fprev = fret;
-		lam1 = alamda;
+		// do final call with lamda = 0
+		alamda = 0.0;
+		mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
 
-		++niter;
 	}
-	while ((bconv == false) && (niter < NMAX));
-
-	// do final call with lamda = 0
-	alamda = 0.0;
-	mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
+	catch (FEErrorTermination)
+	{
+		log.printbox("F A T A L   E R R O R", "FEBio error terminated. Parameter optimization cannot continue.");
+		return false;
+	}
 
 	log.SetMode(Logfile::FILE_AND_SCREEN);
 
@@ -162,7 +172,9 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	Logfile& log = GetLogfile();
 
 	// evaluate at a
-	FESolve(x, a, y);
+	bool bret = FESolve(x, a, y);
+	if (bret == false) throw FEErrorTermination();
+	
 	m_yopt = y;
 
 	// now calculate the derivatives using forward differences

@@ -19,6 +19,9 @@ public:
 //! there is nothing to optimize
 class NothingToOptimize{};
 
+//! FEBio error terminated during the optimization
+class FEErrorTermination{};
+
 //-----------------------------------------------------------------------------
 class FEOptimizeData;
 
