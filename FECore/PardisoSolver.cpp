@@ -42,7 +42,7 @@ PardisoSolver::PardisoSolver()
 	exit(1);
 #elif defined(WIN32) && defined(PARDISO_DLL)
 	HPARDISO_DLL = LoadLibraryA("libpardiso.dll");
-	if (HPARDISODLL)
+	if (HPARDISO_DLL)
 		fprintf(stderr, "Pardiso library loaded successfully.\n");
 	else
 	{
