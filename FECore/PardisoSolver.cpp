@@ -27,7 +27,7 @@ extern "C"
 		double *, int *, int *, int *, int *, int *,
 		int *, double *, double *, int *);
 }
-#endif // PARDISODLL
+#endif // PARDISO_DLL
 
 
 //////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ PardisoSolver::PardisoSolver()
 #ifndef PARDISO
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
-#elif defined(WIN32) && defined(PARDISODLL)
+#elif defined(WIN32) && defined(PARDISO_DLL)
 	HPARDISODLL = LoadLibraryA("libpardiso.dll");
 	if (HPARDISODLL)
 		fprintf(stderr, "Pardiso library loaded successfully.\n");
