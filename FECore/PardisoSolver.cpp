@@ -41,7 +41,7 @@ PardisoSolver::PardisoSolver()
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
 #elif defined(WIN32) && defined(PARDISO_DLL)
-	HPARDISODLL = LoadLibraryA("libpardiso.dll");
+	HPARDISO_DLL = LoadLibraryA("libpardiso.dll");
 	if (HPARDISODLL)
 		fprintf(stderr, "Pardiso library loaded successfully.\n");
 	else
@@ -50,9 +50,9 @@ PardisoSolver::PardisoSolver()
 		exit(1);
 	}
 
-	pardisoinit_ = (PARDISOINITFNC) GetProcAddress(HPARDISODLL, "pardisoinit_");
+	pardisoinit_ = (PARDISOINITFNC) GetProcAddress(HPARDISO_DLL, "pardisoinit_");
 	if (pardisoinit_ == 0) exit(1);
-	pardiso_ = (PARDISOFNC) GetProcAddress(HPARDISODLL, "pardiso_");
+	pardiso_ = (PARDISOFNC) GetProcAddress(HPARDISO_DLL, "pardiso_");
 	if (pardiso_ == 0) exit(1);
 
 #endif
