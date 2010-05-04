@@ -1,33 +1,9 @@
+#ifdef PARDISO
+
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "PardisoSolver.h"
-
-#if defined(WIN32) && defined(PARDISO_DLL)
-typedef int (*PARDISOINITFNC)(void*, int*, int*);
-typedef int (*PARDISOFNC)(void *, int *, int *, int *, int *, int *,
-		double *, int *, int *, int *, int *, int *,
-		int *, double *, double *, int *);
-
-PARDISOINITFNC pardisoinit_;
-PARDISOFNC pardiso_;
-
-#ifndef PARDISO
-#define PARDISO
-#endif
-
-#include "windows.h"
-HINSTANCE HPARDISO_DLL = 0;
-#elif defined PARDISO
-extern "C"
-{
-	int pardisoinit_(void *, int *, int *);
-
-	int pardiso_(void *, int *, int *, int *, int *, int *,
-		double *, int *, int *, int *, int *, int *,
-		int *, double *, double *, int *);
-}
-#endif // PARDISO_DLL
 
 
 //////////////////////////////////////////////////////////////
@@ -37,34 +13,14 @@ extern "C"
 PardisoSolver::PardisoSolver()
 {
 	/* Make sure the solver is available */
-#ifndef PARDISO
-	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
+#ifdef PARDISODL
+	fprintf(stderr, "WARNING: The MKL version of the Pardiso solver is being used\n\n");
 	exit(1);
-#elif defined(WIN32) && defined(PARDISO_DLL)
-	HPARDISO_DLL = LoadLibraryA("libpardiso.dll");
-	if (HPARDISO_DLL)
-		fprintf(stderr, "Pardiso library loaded successfully.\n");
-	else
-	{
-		fprintf(stderr, "Failed loading pardiso library.\n");
-		exit(1);
-	}
-
-	pardisoinit_ = (PARDISOINITFNC) GetProcAddress(HPARDISO_DLL, "pardisoinit_");
-	if (pardisoinit_ == 0) exit(1);
-	pardiso_ = (PARDISOFNC) GetProcAddress(HPARDISO_DLL, "pardiso_");
-	if (pardiso_ == 0) exit(1);
-
 #endif
 }
 
 bool PardisoSolver::PreProcess()
 {
-	/* Make sure the solver is available */
-#ifndef PARDISO
-	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
-	return false;
-#else
 	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
 	m_iparm[0] = 0;
 	pardisoinit_(m_pt, &m_mtype, m_iparm);
@@ -83,16 +39,11 @@ bool PardisoSolver::PreProcess()
 	m_error = 0;	/* Initialize m_error flag */
 
 	return LinearSolver::PreProcess();
-#endif
 }
 
 bool PardisoSolver::Factor()
 {
-	/* Make sure the solver is available */
-#ifndef PARDISO
-	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
-	return false;
-#else
+
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
 
 // ------------------------------------------------------------------------------
@@ -133,16 +84,11 @@ bool PardisoSolver::Factor()
 	}
 
 	return true;
-#endif
 }
 
 bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 {
-	/* Make sure the solver is available */
-#ifndef PARDISO
-	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
-	return false;
-#else
+
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
 
 	int phase = 33;
@@ -160,16 +106,11 @@ bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 	}
 
 	return true;
-#endif
 }
 
 void PardisoSolver::Destroy()
 {
-	/* Make sure the solver is available */
-#ifndef PARDISO
-	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
-	exit(1);
-#else
+
 	int phase = -1;
 
 	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, NULL, NULL,
@@ -177,5 +118,5 @@ void PardisoSolver::Destroy()
 
 	LinearSolver::Destroy();
 
-#endif
 }
+#endif

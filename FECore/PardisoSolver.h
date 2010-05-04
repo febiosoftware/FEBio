@@ -8,8 +8,8 @@
 
 #include "LinearSolver.h"
 
-	/* Pardiso Fortran prototypes */
-#ifndef WIN32
+#ifdef PARDISO
+	/* Pardiso prototypes for MKL version */
 extern "C"
 {
 	int pardisoinit_(void *, int *, int *);
@@ -17,6 +17,18 @@ extern "C"
 	int pardiso_(void *, int *, int *, int *, int *, int *,
 		double *, int *, int *, int *, int *, int *,
 		int *, double *, double *, int *);
+}
+
+#else
+
+/* Pardiso prototypes for dynamic library version */
+extern "C"
+{
+int pardisoinit_(void *, int *, int *, int *, double*, int*);
+
+int pardiso_(void *, int *, int *, int *, int *, int *,
+	double *, int *, int *, int *, int *, int *,
+	int *, double *, double *, int *, double*);
 }
 #endif
 
@@ -46,6 +58,7 @@ protected:
 	// Pardiso control parameters
 	int m_iparm[64];
 	int m_maxfct, m_mnum, m_error, m_msglvl;
+	double m_dparm[64];
 
 	// Matrix data
 	int m_mtype;
