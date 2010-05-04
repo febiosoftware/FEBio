@@ -1,9 +1,9 @@
-#ifndef PARDISO
-
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "PardisoSolver.h"
+
+#ifndef PARDISO
 
 /*
 #if defined(WIN32) && defined(PARDISO_DLL)

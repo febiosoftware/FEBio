@@ -310,6 +310,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PardisoSolverDL.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PSLDLTSolver.cpp"
 				>
 			</File>
