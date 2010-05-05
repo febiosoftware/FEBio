@@ -20,8 +20,15 @@ extern "C"
 }
 
 #else
+/* Pardiso prototypes for shared object library version */
 
-/* Pardiso prototypes for dynamic library version */
+#ifdef WIN32
+
+#define pardisoinit_ PARDISOINIT
+#define pardiso_ PARDISO
+
+#endif
+
 extern "C"
 {
 int pardisoinit_(void *, int *, int *, int *, double*, int*);

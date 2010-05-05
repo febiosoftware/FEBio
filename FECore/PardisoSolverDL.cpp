@@ -1,37 +1,12 @@
+//! This implementation of the Pardiso solver is for the shared object
+//! library available at http://www.pardiso-project.org
+
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "PardisoSolver.h"
 
 #ifndef PARDISO
-
-/*
-#if defined(WIN32) && defined(PARDISO_DLL)
-typedef int (*PARDISOINITFNC)(void*, int*, int*);
-typedef int (*PARDISOFNC)(void *, int *, int *, int *, int *, int *,
-		double *, int *, int *, int *, int *, int *,
-		int *, double *, double *, int *);
-
-PARDISOINITFNC pardisoinit_;
-PARDISOFNC pardiso_;
-
-#ifndef PARDISO
-#define PARDISO
-#endif
-
-#include "windows.h"
-HINSTANCE HPARDISO_DLL = 0;
-#elif defined PARDISO
-extern "C"
-{
-	int pardisoinit_(void *, int *, int *);
-
-	int pardiso_(void *, int *, int *, int *, int *, int *,
-		double *, int *, int *, int *, int *, int *,
-		int *, double *, double *, int *);
-}
-#endif // PARDISO_DLL
-*/
 
 //////////////////////////////////////////////////////////////
 // PardisoSolver
@@ -43,22 +18,6 @@ PardisoSolver::PardisoSolver()
 #ifndef PARDISODL
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
-/*
-#elif defined(WIN32) && defined(PARDISO_DLL)
-	HPARDISO_DLL = LoadLibraryA("libpardiso.dll");
-	if (HPARDISO_DLL)
-		fprintf(stderr, "Pardiso library loaded successfully.\n");
-	else
-	{
-		fprintf(stderr, "Failed loading pardiso library.\n");
-		exit(1);
-	}
-
-	pardisoinit_ = (PARDISOINITFNC) GetProcAddress(HPARDISO_DLL, "pardisoinit_");
-	if (pardisoinit_ == 0) exit(1);
-	pardiso_ = (PARDISOFNC) GetProcAddress(HPARDISO_DLL, "pardiso_");
-	if (pardiso_ == 0) exit(1);
-*/
 #endif
 }
 
