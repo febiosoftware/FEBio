@@ -1,8 +1,8 @@
  
 FEBio Makefile Guide
 
-FEBio comes with the default linear solver Skyline.  Instructions are included in the makefile Makefile to add the SuperLU and Pardiso linear solvers using the Intel Math Kernel Library.  In order to make FEBio from the source code, execute on the command line:
-make
+FEBio comes with the default linear solver Skyline.  Instructions are included in the Makefile to add the SuperLU and Pardiso linear solvers.  In order to make FEBio from the source code, the makefile must be edited to link to the proper libraries, and then execute on the command line:
+make.
 
 SuperLU
 
@@ -10,4 +10,4 @@ If you are using the MKL BLAS for SuperLU, edit the SuperLU Makefile and remove 
 
 febio.xml
 
-FEBio now requires a configuration file febio.xml.  This needs to be in the same directory as the executable or can be specified on the command line such as: febio.lnx -i inputfile.feb -cnf someconfig.xml.  The febio.xml file in this directory specifies Skyline as the linear solver.
+FEBio now requires a configuration file febio.xml.  This needs to be in the same directory as the executable or can be specified on the command line such as: febio.lnx -i inputfile.feb -cnf someconfig.xml.  The febio.xml file in the bin directory specifies Pardiso as the linear solver.  This can be edited to specify another linear solver.  For example, replace <linear_solver type="pardiso"></linear_solver> with <linear_solver type="skyline"></linear_solver> to use the skyline solver.
