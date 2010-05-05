@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\Release\FECore.lib superlu.lib cblas.lib mkl_intel_c.lib mkl_intel_thread.lib mkl_core.lib libiomp5mt.lib"
+				AdditionalDependencies="..\Release\FECore.lib superlu.lib mkl_intel_c.lib mkl_intel_thread.lib mkl_core.lib libiomp5mt.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -398,7 +398,6 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 			<Tool
