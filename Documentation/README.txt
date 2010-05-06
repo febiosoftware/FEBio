@@ -121,8 +121,13 @@ independent of the deformation.
 10. BUG: crash when using triangular shells
 -------------------------------------------
 A bug was found and fixed in the input routine for triangular shells. The bug was responsible
-for unexpected crashes that could occur anywhere during the run. 
+for unexpected crashes that could occur anywhere during the run.
 
+
+11. FEATURE: FEBio compiled on Vista 64bit and Win7 32bit
+---------------------------------------------------------
+Executables have been compiled on Windows Vista, 64 bit and Windows7 32bit.  If the executable
+is set to XP Comptability mode, it will not run correctly.
 
 
 ===========================================================================
