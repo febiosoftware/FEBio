@@ -120,7 +120,7 @@ Global
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-Pardisodl|x64.Build.0 = Release-Pardisodl
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|Win32.ActiveCfg = Release-Pardisodl
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|Win32.Build.0 = Release-Pardisodl
-		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|x64.ActiveCfg = Release-Pardisodl
+		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
