@@ -13,10 +13,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F158C65-5794-4156-8DF2-7FE96DDAF386}"
 EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - Skyline only|Win32 = Debug - Skyline only|Win32
 		Debug - Skyline only|x64 = Debug - Skyline only|x64
@@ -125,12 +121,15 @@ Global
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|Win32.ActiveCfg = Release-Pardisodl
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|Win32.Build.0 = Release-Pardisodl
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|x64.ActiveCfg = Release-Pardisodl
-		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|x64.Build.0 = Release-Pardisodl
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		AMDCaProjectFile = C:\Documents and Settings\Steve\My Documents\Visual Studio 2008\Projects\FEBio\CodeAnalyst\FEBio.caw
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal
