@@ -25,7 +25,7 @@ FEStiffnessMatrix::FEStiffnessMatrix(SparseMatrix* pK)
 
 FEStiffnessMatrix::~FEStiffnessMatrix()
 {
-	delete [] m_pA;
+	delete m_pA;
 	m_pA = 0;
 	if (m_pMP) delete m_pMP;
 }
