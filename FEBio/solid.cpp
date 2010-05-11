@@ -487,6 +487,14 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// calculate the element stiffness matrix
 		ElementStiffness(fem, el, ke);
 
+		FILE* fp = fopen("one_element.txt", "wt");
+		for (int i=0; i<24; ++i)
+		{
+			for (int j=0; j<24; ++j) fprintf(fp, "%15.9g", ke[i][j]);
+			fprintf(fp, "\n");
+		}
+		fclose(fp);
+
 		// add the inertial stiffness for dynamics
 		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
 

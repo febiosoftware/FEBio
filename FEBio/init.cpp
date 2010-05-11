@@ -399,17 +399,10 @@ bool FEM::Reset()
 	// set up rigid joints
 	if (m_nrj > 0)
 	{
-		FERigidMaterial* pm;
 		for (i=0; i<m_nrj; ++i)
 		{
 			FERigidJoint& rj = m_RJ[i];
 			rj.m_F = vec3d(0,0,0);
-
-			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
-			rj.m_nRBa = pm->m_nRB;
-
-			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBb));
-			rj.m_nRBb = pm->m_nRB;
 
 			rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;
 			rj.m_qb0 = rj.m_q0 - m_RB[ rj.m_nRBb ].m_r0;
