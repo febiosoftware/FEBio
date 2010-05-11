@@ -875,8 +875,23 @@ void LSDYNAPlotFile::write_contact_pressures()
 			FESlidingSurface& ms = psi->m_ms;
 			FESlidingSurface& ss = psi->m_ss;
 
-			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.Lm[j];
-			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
+			double tk;
+			double scale = psi->Penalty();
+			for (j=0; j<ms.Nodes(); ++j)
+			{
+				double eps = ms.eps[j]*scale;
+				tk = ms.Lm[j] + eps*ms.gap[j];
+				tk = MBRACKET(tk);
+				t[ms.node[j]] += (float) tk;
+			}
+
+			for (j=0; j<ss.Nodes(); ++j)
+			{
+				double eps = ss.eps[j]*scale;
+				tk = ss.Lm[j] + eps*ss.gap[j];
+				tk = MBRACKET(tk);
+				t[ss.node[j]] += (float) tk;
+			}
 		}
 
 		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&fem.m_CI[i]);
@@ -914,6 +929,44 @@ void LSDYNAPlotFile::write_contact_pressures()
 		{
 			FERigidWallSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
+		}
+
+		FEFacet2FacetSliding* pfs = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		if (pfs)
+		{
+			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			double Li[4], Ln[4];
+			int ni, ne, n, k;
+
+			for (n=0; n<pfs->m_npass; ++n)
+			{
+				FEFacetSlidingSurface& s = (n==0?pfs->m_ss:pfs->m_ms);
+
+				int nint = 0;
+				for (j=0; j<s.Elements(); ++j)
+				{
+					FESurfaceElement& el = s.Element(j);
+					ne = el.Nodes();
+					ni = el.GaussPoints();
+					for (k=0; k<ni; ++k, ++nint) 
+					{
+						double eps = pfs->m_epsn*s.m_eps[nint];
+						Li[k] = s.m_Lm[nint] + eps*s.m_gap[nint];
+						Li[k] =  MBRACKET(Li[k]);
+					}
+
+					el.project_to_nodes(Li, Ln);
+
+					for (k=0; k<ne; ++k)
+					{
+						int m = el.m_node[k];
+						t[m] += (float) MBRACKET(Ln[k]);
+						val[m]++;
+					}
+				}
+			}
+
+			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
 		}
 	}
 
