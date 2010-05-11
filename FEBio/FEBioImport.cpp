@@ -659,6 +659,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 								pFC->Deactivate();
 							}
 						}
+						else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 						bfound = true;
 					}
 					else if (strncmp(tag.Name(), "rot_", 4) == 0)
@@ -714,6 +715,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 								pFC->Deactivate();
 							}
 						}
+						else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 						bfound = true;
 					}
 				}
