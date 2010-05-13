@@ -2802,7 +2802,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 	{
 		if (tag == "rigid_body")
 		{
-			const char* szm = tag.AttributeValue("id");
+			const char* szm = tag.AttributeValue("mat");
 			assert(szm);
 
 			int nmat = atoi(szm);
