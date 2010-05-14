@@ -15,7 +15,7 @@
 
 PardisoSolver::PardisoSolver()
 {
-	/* Make sure the solver is available */
+	/* If both PARDISO AND PARDISODL are defined, print a warning */
 #ifdef PARDISODL
 	fprintf(stderr, "WARNING: The MKL version of the Pardiso solver is being used\n\n");
 	exit(1);
@@ -26,6 +26,9 @@ bool PardisoSolver::PreProcess()
 {
 	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
 	m_iparm[0] = 0;
+
+	//fprintf(stderr, "In PreProcess\n");
+
 	pardisoinit_(m_pt, &m_mtype, m_iparm);
 
 	m_n = m_pA->Size();
@@ -114,9 +117,13 @@ bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 void PardisoSolver::Destroy()
 {
 
+	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
+
 	int phase = -1;
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, NULL, NULL,
+	//fprintf(stderr, "In Destroy\n");
+
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, A->pointers(), A->indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
 
 	LinearSolver::Destroy();

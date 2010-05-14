@@ -40,7 +40,7 @@ bool PardisoSolver::PreProcess()
 		if (m_error == -12) fprintf(stderr, "Wrong username or hostname\n\n");
 		return false;
 	}
-	else fprintf(stderr, "PARDISO license check was successful\n\n");
+	//else fprintf(stderr, "PARDISO license check was successful\n\n");
 
 	m_n = m_pA->Size();
 	m_nnz = m_pA->NonZeroes();
@@ -144,7 +144,7 @@ void PardisoSolver::Destroy()
 #else
 	int phase = -1;
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, NULL, NULL,
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, A->pointers(), A->indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error, m_dparm);
 
 	LinearSolver::Destroy();
