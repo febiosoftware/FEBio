@@ -59,6 +59,9 @@ void FEAnalysis::Finish()
 {
 	// deactivate the boundary conditions
 	for (int i=0; i<m_BC.size(); ++i) m_BC[i]->Deactivate();
+
+	// clean up solver data (i.e. destroy linear solver)
+	m_psolver->Clean();
 }
 
 //-----------------------------------------------------------------------------

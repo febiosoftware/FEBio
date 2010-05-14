@@ -37,6 +37,7 @@ public:
 	virtual bool Init();
 	virtual bool SolveStep(double time) = 0;
 	virtual void Serialize(Archive& ar) = 0;
+	virtual void Clean();
 
 public:
 	//! recalculates the shape of the stiffness matrix

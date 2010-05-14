@@ -84,8 +84,13 @@ bool FESolver::Init()
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+void FESolver::Clean()
+{
+	if (m_plinsolve) m_plinsolve->Destroy();
+}
 
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 // FUNCTION: FESolver::CreateStiffness
 //  Creates the global stiffness matrix
 //
