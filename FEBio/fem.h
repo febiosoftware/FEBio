@@ -209,6 +209,7 @@ struct FE_DISCRETE_ELEMENT
 {
 	int			n1, n2;	//!< nodes that this spring connects
 	double		E;		//!< spring constant
+	bool		m_bto;	//!< tension only flag
 };
 
 //-----------------------------------------------------------------------------

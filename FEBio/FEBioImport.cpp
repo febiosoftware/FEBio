@@ -1705,6 +1705,8 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 		else if (tag == "spring")
 		{
 			FE_DISCRETE_ELEMENT de;
+			de.m_bto = false;
+
 			int n[2];
 
 			// read spring discrete elements

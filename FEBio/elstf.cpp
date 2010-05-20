@@ -895,24 +895,39 @@ void FESolidSolver::DiscreteElementForces(vector<double>& R)
 		u1 = rt1 - r01;
 		u2 = rt2 - r02;
 
-		fe[0] = -E*(u1.x - u2.x);
-		fe[1] = -E*(u1.y - u2.y);
-		fe[2] = -E*(u1.z - u2.z);
-		fe[3] = -E*(u2.x - u1.x);
-		fe[4] = -E*(u2.y - u1.y);
-		fe[5] = -E*(u2.z - u1.z);
+		// flag to see if wee need to assemble this spring
+		bool basm = true;
 
-		en[0] = el.n1;
-		en[1] = el.n2;
+		// if the spring is tension-only, we need to make 
+		// sure that the spring indeed is in tension
+		if (el.m_bto)
+		{
+			double L0 = (r02 - r01).norm();
+			double Lt = (rt2 - rt1).norm();
+			if (Lt < L0) basm = false;
+		}
 
-		lm[0] = n1.m_ID[0];
-		lm[1] = n1.m_ID[1];
-		lm[2] = n1.m_ID[2];
-		lm[3] = n2.m_ID[0];
-		lm[4] = n2.m_ID[1];
-		lm[5] = n2.m_ID[2];
+		if (basm)
+		{
+			fe[0] = -E*(u1.x - u2.x);
+			fe[1] = -E*(u1.y - u2.y);
+			fe[2] = -E*(u1.z - u2.z);
+			fe[3] = -E*(u2.x - u1.x);
+			fe[4] = -E*(u2.y - u1.y);
+			fe[5] = -E*(u2.z - u1.z);
 
-		AssembleResidual(en, lm, fe, R);
+			en[0] = el.n1;
+			en[1] = el.n2;
+
+			lm[0] = n1.m_ID[0];
+			lm[1] = n1.m_ID[1];
+			lm[2] = n1.m_ID[2];
+			lm[3] = n2.m_ID[0];
+			lm[4] = n2.m_ID[1];
+			lm[5] = n2.m_ID[2];
+
+			AssembleResidual(en, lm, fe, R);
+		}
 	}
 }
 
@@ -939,21 +954,44 @@ void FESolidSolver::DiscreteElementStiffness()
 		FENode& n1 = mesh.Node(el.n1);
 		FENode& n2 = mesh.Node(el.n2);
 
-		ke[0][0] = ke[1][1] = ke[2][2] =  E;
-		ke[0][3] = ke[1][4] = ke[2][5] =  0;
-		ke[3][3] = ke[4][4] = ke[5][5] =  E;
-		ke[3][0] = ke[4][1] = ke[5][2] =  0;
+		// flag to see if wee need to assemble this spring
+		bool basm = true;
 
-		en[0] = el.n1;
-		en[1] = el.n2;
+		// if the spring is tension-only, we need to make 
+		// sure that the spring indeed is in tension
+		if (el.m_bto)
+		{
+			vec3d& r01 = n1.m_r0;
+			vec3d& r02 = n2.m_r0;
+			vec3d& rt1 = n1.m_rt;
+			vec3d& rt2 = n2.m_rt;
 
-		lm[0] = n1.m_ID[0];
-		lm[1] = n1.m_ID[1];
-		lm[2] = n1.m_ID[2];
-		lm[3] = n2.m_ID[0];
-		lm[4] = n2.m_ID[1];
-		lm[5] = n2.m_ID[2];
+			vec3d u1 = rt1 - r01;
+			vec3d u2 = rt2 - r02;
 
-		AssembleStiffness(en, lm, ke);
+			double L0 = (r02 - r01).norm();
+			double Lt = (rt2 - rt1).norm();
+			if (Lt < L0) basm = false;
+		}
+
+		if (basm)
+		{
+			ke[0][0] = ke[1][1] = ke[2][2] =  E;
+			ke[0][3] = ke[1][4] = ke[2][5] =  0;
+			ke[3][3] = ke[4][4] = ke[5][5] =  E;
+			ke[3][0] = ke[4][1] = ke[5][2] =  0;
+
+			en[0] = el.n1;
+			en[1] = el.n2;
+
+			lm[0] = n1.m_ID[0];
+			lm[1] = n1.m_ID[1];
+			lm[2] = n1.m_ID[2];
+			lm[3] = n2.m_ID[0];
+			lm[4] = n2.m_ID[1];
+			lm[5] = n2.m_ID[2];
+
+			AssembleStiffness(en, lm, ke);
+		}
 	}
 }

@@ -354,6 +354,7 @@ void FEM::SerializeGeometry(Archive &ar)
 			FE_DISCRETE_ELEMENT& de = m_DE[i];
 			ar << de.n1 << de.n2;
 			ar << de.E;
+			ar << de.m_bto;
 		}
 	}
 	else
@@ -397,6 +398,7 @@ void FEM::SerializeGeometry(Archive &ar)
 			FE_DISCRETE_ELEMENT& de = m_DE[i];
 			ar >> de.n1 >> de.n2;
 			ar >> de.E;
+			ar >> de.m_bto;
 		}
 	}
 }
