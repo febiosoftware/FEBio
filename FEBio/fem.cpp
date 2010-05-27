@@ -27,6 +27,17 @@ FEM::FEM()
 
 	m_ftime = 0;
 
+	// add the "zero" loadcurve
+	// this is the loadcurve that will be used if a loadcurve is not
+	// specified for something that depends on time
+	FELoadCurve* plc = new FELoadCurve;
+	plc->Create(2);
+	plc->LoadPoint(0).time = 0;
+	plc->LoadPoint(0).value = 0;
+	plc->LoadPoint(1).time = m_pStep->m_ntime*m_pStep->m_dt0;
+	plc->LoadPoint(1).value = 1;
+	AddLoadCurve(plc);
+
 	// --- Geometry Data ---
 	m_nreq = 0;
 	m_nrb = 0;

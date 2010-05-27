@@ -376,19 +376,6 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 	}
 	while (!tag.isend());
 
-	// add the "zero" loadcurve
-	// this is the loadcurve that will be used if a loadcurve is not
-	// specified for something that depends on time
-	FELoadCurve* plc = new FELoadCurve;
-
-	plc->Create(2);
-	plc->LoadPoint(0).time = 0;
-	plc->LoadPoint(0).value = 0;
-	plc->LoadPoint(1).time = m_pStep->m_ntime*m_pStep->m_dt0;
-	plc->LoadPoint(1).value = 1;
-
-	fem.AddLoadCurve(plc);
-
 	return true;
 }
 
@@ -1654,6 +1641,13 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				tag.value(nf, N);
 				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					m_pStep->AddBoundaryCondition(&pc);
+					pc.Deactivate();
+				}
+
 				++tag;
 			}
 		}
@@ -1696,6 +1690,13 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				N = el.Nodes();
 				tag.value(nf, N);
 				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					m_pStep->AddBoundaryCondition(&tc);
+					tc.Deactivate();
+				}
 
 				++tag;
 			}
@@ -2797,6 +2798,8 @@ bool FEFEBioImport::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 
 bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 {
+	if (tag.isleaf()) return true;
+
 	FEM& fem = *m_pfem;
 
 	++tag;

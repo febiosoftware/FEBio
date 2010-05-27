@@ -283,7 +283,7 @@ void FEPressureSurface::StiffnessMatrix(FESolidSolver* psolver)
 	for (int m=0; m<npr; ++m)
 	{
 		FEPressureLoad& pc = m_PC[m];
-		if (pc.bc == 0)
+		if ((pc.bc == 0) && pc.IsActive())
 		{
 			// get the surface element
 			FESurfaceElement& el = m_el[m];
@@ -328,7 +328,7 @@ void FEPressureSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 	for (int i=0; i<npr; ++i)
 	{
 		FEPressureLoad& pc = m_PC[i];
-		if (pc.bc == 0)
+		if ((pc.bc == 0) && pc.IsActive())
 		{
 			FESurfaceElement& el = m_el[i];
 			UnpackElement(el);
@@ -364,64 +364,67 @@ void FEConstTractionSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 	for (int iel=0; iel<npr; ++iel)
 	{
 		FETractionLoad& pc = m_TC[iel];
-		FESurfaceElement& el = m_el[iel];
-		UnpackElement(el);
-
-		double g = fem.GetLoadCurve(pc.lc)->Value();
-
-		int ndof = 3*el.Nodes();
-		fe.resize(ndof);
-
-		// nr integration points
-		int nint = el.GaussPoints();
-
-		// nr of element nodes
-		int neln = el.Nodes();
-
-		// nodal coordinates
-		vec3d *r0 = el.r0();
-
-		double* Gr, *Gs;
-		double* N;
-		double* w  = el.GaussWeights();
-
-		vec3d dxr, dxs;
-
-		// repeat over integration points
-		fe.zero();
-		for (n=0; n<nint; ++n)
+		if (pc.IsActive())
 		{
-			N  = el.H(n);
-			Gr = el.Gr(n);
-			Gs = el.Gs(n);
+			FESurfaceElement& el = m_el[iel];
+			UnpackElement(el);
 
-			// calculate the traction at the integration point
-			vec3d t = el.eval(pc.s, n)*g;
+			double g = fem.GetLoadCurve(pc.lc)->Value();
 
-			// calculate the tangent vectors
-			dxr = dxs = vec3d(0,0,0);
-			for (i=0; i<neln; ++i) 
+			int ndof = 3*el.Nodes();
+			fe.resize(ndof);
+
+			// nr integration points
+			int nint = el.GaussPoints();
+
+			// nr of element nodes
+			int neln = el.Nodes();
+
+			// nodal coordinates
+			vec3d *r0 = el.r0();
+
+			double* Gr, *Gs;
+			double* N;
+			double* w  = el.GaussWeights();
+
+			vec3d dxr, dxs;
+
+			// repeat over integration points
+			fe.zero();
+			for (n=0; n<nint; ++n)
 			{
-				dxr.x += Gr[i]*r0[i].x;
-				dxr.y += Gr[i]*r0[i].y;
-				dxr.z += Gr[i]*r0[i].z;
+				N  = el.H(n);
+				Gr = el.Gr(n);
+				Gs = el.Gs(n);
 
-				dxs.x += Gs[i]*r0[i].x;
-				dxs.y += Gs[i]*r0[i].y;
-				dxs.z += Gs[i]*r0[i].z;
+				// calculate the traction at the integration point
+				vec3d t = el.eval(pc.s, n)*g;
+
+				// calculate the tangent vectors
+				dxr = dxs = vec3d(0,0,0);
+				for (i=0; i<neln; ++i) 
+				{
+					dxr.x += Gr[i]*r0[i].x;
+					dxr.y += Gr[i]*r0[i].y;
+					dxr.z += Gr[i]*r0[i].z;
+
+					dxs.x += Gs[i]*r0[i].x;
+					dxs.y += Gs[i]*r0[i].y;
+					dxs.z += Gs[i]*r0[i].z;
+				}
+
+				vec3d f = t*((dxr ^ dxs).norm()*w[n]);
+
+				for (i=0; i<neln; ++i)
+				{
+					fe[3*i  ] += N[i]*f.x;
+					fe[3*i+1] += N[i]*f.y;
+					fe[3*i+2] += N[i]*f.z;
+				}
 			}
 
-			vec3d f = t*((dxr ^ dxs).norm()*w[n]);
-
-			for (i=0; i<neln; ++i)
-			{
-				fe[3*i  ] += N[i]*f.x;
-				fe[3*i+1] += N[i]*f.y;
-				fe[3*i+2] += N[i]*f.z;
-			}
+			// add element force vector to global force vector
+			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
 		}
-
-		// add element force vector to global force vector
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
 	}
 }
