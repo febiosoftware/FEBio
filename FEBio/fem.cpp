@@ -23,7 +23,7 @@ FEM::FEM()
 	m_nStep = 0;
 	m_nhex8 = FE_HEX;
 	m_bsym_poro = true;			// use symmetric poro implementation
-	m_bplane_strain = false;	// don't use plain strain mode
+	m_nplane_strain = -1;	// don't use plain strain mode
 
 	m_ftime = 0;
 

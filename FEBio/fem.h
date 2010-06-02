@@ -416,7 +416,7 @@ public:
 		double					m_ftime;	//!< current time value
 		int	m_nhex8;						//!< element type for hex8
 		bool	m_bsym_poro;		//!< symmetric (old) poro-elastic flag
-		bool	m_bplane_strain;	//!< run analysis in plain strain mode
+		int		m_nplane_strain;	//!< run analysis in plain strain mode
 
 		// body force loads
 		FE_BODYFORCE	m_BF[3];		//!< body force data
