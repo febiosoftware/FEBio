@@ -2825,6 +2825,8 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 			assert(szm);
 
 			int nmat = atoi(szm);
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
+			if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 			++tag;
 			do
@@ -2850,6 +2852,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pDC->lc = lc;
 						tag.value(pDC->sf);
 						fem.m_RDC.push_back(pDC);
+						pm->m_bc[bc] = lc;
 
 						// add this boundary condition to the current step
 						if (m_nsteps > 0)
@@ -2868,6 +2871,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pFC->lc = lc-1;
 						tag.value(pFC->sf);
 						fem.m_RFC.push_back(pFC);
+						pm->m_bc[bc] = 0;
 
 						// add this boundary condition to the current step
 						if (m_nsteps > 0)
@@ -2878,6 +2882,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 							pFC->Deactivate();
 						}
 					}
+					else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
 				}
 				else if (strncmp(tag.Name(), "rot_", 4) == 0)
 				{
@@ -2900,6 +2905,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pDC->lc = lc;
 						tag.value(pDC->sf);
 						fem.m_RDC.push_back(pDC);
+						pm->m_bc[bc] = lc;
 
 						// add this boundary condition to the current step
 						if (m_nsteps > 0)
@@ -2918,6 +2924,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pFC->lc = lc-1;
 						tag.value(pFC->sf);
 						fem.m_RFC.push_back(pFC);
+						pm->m_bc[bc] = 0;
 
 						// add this boundary condition to the current step
 						if (m_nsteps > 0)
@@ -2928,6 +2935,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 							pFC->Deactivate();
 						}
 					}
+					else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
