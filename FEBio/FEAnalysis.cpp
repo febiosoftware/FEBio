@@ -317,10 +317,16 @@ bool FEAnalysis::Solve()
 	bool bconv = true;
 
 	// calculate end time value
+	double starttime = m_fem.m_ftime;
 	double endtime = m_fem.m_ftime + m_ntime*m_dt0;
 	const double eps = endtime*1e-7;
 
-	pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
+	int nsteps = m_fem.m_Step.size();
+
+	if (nsteps > 1)
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - FEBio", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title);
+	else
+		pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title);
 
 	// keep a stack for push/pop'ing
 	stack<FEM> state(1);
@@ -524,7 +530,10 @@ bool FEAnalysis::Solve()
 		// the next timestep goes wrong
 		log.flush();
 
-		pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime / endtime), m_fem.m_szfile_title);
+		if (nsteps>1)
+			pShell->SetTitle("(step %d/%d: %.f%%) %s - FEBio", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title);
+		else
+			pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title);
 	}
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
