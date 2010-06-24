@@ -599,6 +599,9 @@ bool FESolidSolver::Quasin(double time)
 
 			// update counter
 			++m_naug;
+
+			// we reset the reformations counter
+			m_nref = 0;
 	
 			// If we havn't converged we prepare for the next iteration
 			if (!bconv) 
