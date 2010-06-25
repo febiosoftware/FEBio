@@ -11,9 +11,6 @@ void FEElasticSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
 	FEM& fem = psolver->m_fem;
 
-	// make sure we are not in poro-mode
-	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
-
 	// element force vector
 	vector<double> fe;
 
@@ -312,8 +309,6 @@ void FEElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 
 void FEElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
-
 	int i, i3, j, j3, n;
 
 	// Get the current element's data
@@ -462,9 +457,6 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
 	FEM& fem = psolver->m_fem;
 
-	// make sure we are in poro-mode
-	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
-
 	// element stiffness matrix
 	matrix ke;
 
@@ -587,8 +579,6 @@ void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 	int i, n;
 	int nint;
 	double* gw;
-
-	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
 
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
