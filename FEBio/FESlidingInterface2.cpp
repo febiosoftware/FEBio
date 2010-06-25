@@ -725,6 +725,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 			// get the surface element
 			FESurfaceElement& se = ss.Element(i);
 			ss.UnpackElement(se);
+			bool sporo = PoroStatus(*pm, se);
 
 			// get the nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -759,6 +760,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					// get the master element
 					FESurfaceElement& me = *pme;
 					ms.UnpackElement(me);
+					bool mporo = PoroStatus(*pm, me);
 
 					// get the nr of master element nodes
 					int nmeln = me.Nodes();
@@ -839,7 +841,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					// do the biphasic stuff
 					// TODO: I should only do this when the node is actually in contact
 					//       in other words, when g >= 0
-					if (bporo && (tn > 0))
+					if (sporo && mporo && (tn > 0))
 					{
 						// calculate nr of pressure dofs
 						int ndof = nseln + nmeln;
@@ -929,6 +931,7 @@ void FESlidingInterface2::ContactStiffness()
 			// get ths slave element
 			FESurfaceElement& se = ss.Element(i);
 			ss.UnpackElement(se);
+			bool sporo = PoroStatus(*pm, se);
 
 			// get nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -971,6 +974,7 @@ void FESlidingInterface2::ContactStiffness()
 
 					FESurfaceElement& me = *pme;
 					ms.UnpackElement(me);
+					bool mporo = PoroStatus(*pm, me);
 
 					// get the nr of master nodes
 					int nmeln = me.Nodes();
@@ -1197,7 +1201,7 @@ void FESlidingInterface2::ContactStiffness()
 					psolver->AssembleStiffness(en, LM, ke);
 
 					// --- B I P H A S I C   S T I F F N E S S ---
-					if (bporo && (tn > 0))
+					if (sporo && mporo && (tn > 0))
 					{
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
@@ -1416,3 +1420,25 @@ void FESlidingInterface2::Serialize(Archive &ar)
 {
 
 }
+
+//-----------------------------------------------------------------------------
+
+bool FESlidingInterface2::PoroStatus(FEMesh& m, FESurfaceElement& el)
+{
+	bool status = false;
+
+	// get the solid element this surface element belongs to
+	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
+	if (pe)
+	{
+		// get the material
+		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+		
+		// see if this is a poro-elastic element
+		FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
+		if (poro) status = true;
+	}
+	
+	return status;
+}
+
