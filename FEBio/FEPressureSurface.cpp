@@ -42,8 +42,10 @@ void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke)
 		Gs = el.Gs(n);
 
 		// calculate pressure at integration point
+		// note the negative sign. This is because we use the 
+		// convention that a positive pressure is compressive
 		p = 0;
-		for (i=0; i<neln; ++i) p += N[i]*pn[i];
+		for (i=0; i<neln; ++i) p -= N[i]*pn[i];
 
 		// calculate jacobian
 		J[0][0] = J[0][1] = 0;
