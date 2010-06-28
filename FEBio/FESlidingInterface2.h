@@ -80,6 +80,8 @@ protected:
 	void CalcAutoPressurePenalty(FESlidingSurface2& s);
 	double AutoPressurePenalty(FESurfaceElement& el, FESlidingSurface2& s);
 
+	bool PoroStatus(FEMesh& m, FESurfaceElement& el);
+
 public:
 	FESlidingSurface2	m_ms;	//!< master surface
 	FESlidingSurface2	m_ss;	//!< slave surface
