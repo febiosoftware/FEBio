@@ -444,7 +444,7 @@ bool FEAnalysis::Solve()
 		}
 
 		// update counters
-		m_ntotref  += m_psolver->m_nref;
+		m_ntotref  += m_psolver->m_ntotref;
 		m_ntotiter += m_psolver->m_niter;
 		m_ntotrhs  += m_psolver->m_nrhs;
 

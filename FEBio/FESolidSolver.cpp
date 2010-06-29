@@ -34,7 +34,7 @@ void FESolidSolver::Serialize(Archive& ar)
 
 		ar << m_nrhs;
 		ar << m_niter;
-		ar << m_nref;
+		ar << m_nref << m_ntotref;
 		ar << m_bfgs.m_nups;
 		ar << m_naug;
 	}
@@ -47,7 +47,7 @@ void FESolidSolver::Serialize(Archive& ar)
 
 		ar >> m_nrhs;
 		ar >> m_niter;
-		ar >> m_nref;
+		ar >> m_nref >> m_ntotref;
 		ar >> m_bfgs.m_nups;
 		ar >> m_naug;
 	}

@@ -72,6 +72,7 @@ public:
 	int		m_nrhs;			//!< nr of right hand side evalutations
 	int		m_niter;		//!< nr of quasi-newton iterations
 	int		m_nref;			//!< nr of stiffness retormations
+	int		m_ntotref;
 	int		m_naug;			//!< nr of augmentations
 };
 

@@ -227,6 +227,7 @@ bool FEHeatSolver::ReformStiffness()
 
 		// increase total nr of reformations
 		m_nref++;
+		m_ntotref++;
 
 		// reset bfgs update counter
 		m_bfgs.m_nups = 0;

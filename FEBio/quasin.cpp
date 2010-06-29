@@ -95,6 +95,7 @@ void FESolidSolver::PrepStep(double time)
 	m_niter = 0;	// nr of iterations
 	m_nrhs  = 0;	// nr of RHS evaluations
 	m_nref  = 0;	// nr of stiffness reformations
+	m_ntotref = 0;
 	m_bfgs.m_nups	= 0;	// nr of stiffness updates between reformations
 	m_naug  = 0;	// nr of augmentations
 
@@ -715,6 +716,7 @@ bool FESolidSolver::ReformStiffness()
 
 		// increase total nr of reformations
 		m_nref++;
+		m_ntotref++;
 
 		// reset bfgs update counter
 		m_bfgs.m_nups = 0;
