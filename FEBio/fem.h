@@ -28,6 +28,7 @@
 #include "FEAugLagLinearConstraint.h"
 #include "Timer.h"
 #include "FEPressureSurface.h"
+#include "FEFluxSurface.h"
 
 #include <list>
 using namespace std;
@@ -473,6 +474,9 @@ public:
 		// pressure BC
 		FEPressureSurface*		m_psurf;	//!< pressure surface domain
 		FEConstTractionSurface*	m_ptrac;	//!< constant traction surface
+
+		// fluid flux BC
+		FEFluxSurface*			m_fsurf;	//!< fluid flux surface domain
 
 		// rigid displacements
 		vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements

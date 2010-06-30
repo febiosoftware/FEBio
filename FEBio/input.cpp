@@ -117,6 +117,7 @@ void FEM::EchoInput()
 	log.printf("\tNumber of displacement boundary conditions ..... : %d\n", m_DC.size());
 	log.printf("\tNumber of pressure boundary cards .............. : %d\n", (m_psurf ? m_psurf->Elements() : 0));
 	log.printf("\tNumber of constant traction boundary cards ..... : %d\n", (m_ptrac ? m_ptrac->Elements() : 0));
+	log.printf("\tNumber of fluid flux boundary cards .............: %d\n", (m_fsurf ? m_fsurf->Elements() : 0));
 	log.printf("\tNumber of concentrated nodal forces ............ : %d\n", m_FC.size());
 	log.printf("\tMax nr of stiffness reformations ............... : %d\n", m_pStep->m_psolver->m_bfgs.m_maxref);
 	log.printf("\tper time steps\n");

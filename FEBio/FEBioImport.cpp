@@ -1715,6 +1715,62 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				++tag;
 			}
 		}
+		else if (tag == "fluidflux")
+		{
+			const char* sz;
+			bool blinear = false;
+			sz = tag.AttributeValue("type", true);
+			if (sz)
+			{
+				if (strcmp(sz, "linear") == 0) blinear = true;
+				else if (strcmp(sz, "nonlinear") == 0) blinear = false;
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+			}
+			
+			// count how many fluid flux cards there are
+			int nfr = 0;
+			XMLTag t(tag); ++t;
+			while (!t.isend()) { nfr++; ++t; }
+			
+			// allocate fluid flux data
+			fem.m_fsurf = new FEFluxSurface(&fem.m_mesh);
+			FEFluxSurface& fs = *fem.m_fsurf;
+			fs.create(nfr);
+			
+			// read the fluid flux data
+			++tag;
+			int nf[4], N;
+			double s;
+			for (int i=0; i<nfr; ++i)
+			{
+				FEFluidFlux& fc = fs.FluidFlux(i);
+				FESurfaceElement& el = fem.m_fsurf->Element(i);
+				fc.blinear = blinear;
+				
+				sz = tag.AttributeValue("lc", true);
+				if (sz) fc.lc = atoi(sz); else fc.lc = 0;
+				
+				s  = atof(tag.AttributeValue("scale"));
+				fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
+				
+				if (tag == "quad4") el.SetType(FE_QUAD);
+				else if (tag == "tri3") el.SetType(FE_TRI);
+				else throw XMLReader::InvalidTag(tag);
+				
+				N = el.Nodes();
+				tag.value(nf, N);
+				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+				
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					m_pStep->AddBoundaryCondition(&fc);
+					fc.Deactivate();
+				}
+				
+				++tag;
+			}
+		}
 		else if (tag == "contact") ParseContactSection(tag);
 		else if (tag == "linear_constraint") ParseConstraints(tag);
 		else if (tag == "spring")

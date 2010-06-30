@@ -50,6 +50,12 @@ bool FESolidSolver::StiffnessMatrix()
 		m_fem.m_psurf->StiffnessMatrix(this);
 	}
 
+	// calculate fluid flux stiffness term
+	if (m_fem.m_fsurf)
+	{
+		m_fem.m_fsurf->StiffnessMatrix(this);
+	}
+	
 	// discrete element stiffness
 	if (m_fem.m_DE.size())
 	{
@@ -557,6 +563,12 @@ bool FESolidSolver::Residual(vector<double>& R)
 		m_fem.m_ptrac->Residual(this, R);
 	}
 
+	// calculate forces due to fluid flux and add them to the residual
+	if (m_fem.m_fsurf)
+	{
+		m_fem.m_fsurf->Residual(this, R);
+	}
+	
 	// rigid joint forces
 	if (m_fem.m_nrj)
 	{
