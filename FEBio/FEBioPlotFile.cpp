@@ -190,6 +190,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 
 	// setup the header
 	m_hdr.nsize = sizeof(HEADER);
+	m_hdr.nversion = 1;
 	m_hdr.nnodes = m.Nodes();
 	m_hdr.n3d    = m.SolidElements();
 	m_hdr.n2d    = m.ShellElements();

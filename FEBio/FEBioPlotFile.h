@@ -20,6 +20,7 @@ protected:
 	struct HEADER
 	{
 		int		nsize;			// sizeof(HEADER)
+		int		nversion;		// version number (must be 1)
 		int		nnodes;			// number of nodes
 		int		n3d;			// number of solid elements
 		int		n2d;			// number of shell elements
@@ -31,7 +32,7 @@ protected:
 		int		nv1d;			// number of variables for beam elements
 		int		nmat;			// number of parts
 		
-		int		nreserved[53];	// reverved for future use
+		int		nreserved[52];	// reverved for future use
 	};
 
 	// size of name variables

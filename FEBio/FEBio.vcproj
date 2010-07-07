@@ -1530,6 +1530,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEFluxSurface.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEFungOrthotropic.cpp"
 				>
 			</File>
@@ -2233,6 +2237,10 @@
 			</File>
 			<File
 				RelativePath=".\FEFiberNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEFluxSurface.h"
 				>
 			</File>
 			<File
