@@ -50,7 +50,7 @@ void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke, doub
 			for (j=0; j<neln; ++j)
 			{
 				kab = (dxr*(N[j]*Gs[i]-N[i]*Gs[j])
-					   +dxs*(N[j]*Gr[i]-N[i]*Gr[j]))*w[n]*0.5*tr;
+					   -dxs*(N[j]*Gr[i]-N[i]*Gr[j]))*w[n]*0.5*tr;
 
 				ke[3*i  ][3*j  ] +=      0;
 				ke[3*i  ][3*j+1] += -kab.z;
