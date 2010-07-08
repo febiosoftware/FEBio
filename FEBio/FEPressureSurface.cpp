@@ -5,18 +5,17 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 
-void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke)
+void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke, double* tn, bool effective)
 {
 	int i, j, n;
 
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
 
-	// pressure at nodes
-	double *pn = el.pt();
-
-	// pressure at integration point
-	double p;
+	// traction at integration point
+	double tr;
+	
+	vec3d dxr, dxs;
 
 	// gauss weights
 	double* w = el.GaussWeights();
@@ -24,11 +23,7 @@ void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke)
 	// nodal coordinates
 	vec3d* rt = el.rt();
 
-	// jacobian
-	double J[3][2];
-
-	double t1, t2;
-	double kab[3];
+	vec3d kab;
 
 	ke.zero();
 
@@ -41,53 +36,55 @@ void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke)
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 
-		// calculate pressure at integration point
-		// note the negative sign. This is because we use the 
-		// convention that a positive pressure is compressive
-		p = 0;
-		for (i=0; i<neln; ++i) p -= N[i]*pn[i];
-
-		// calculate jacobian
-		J[0][0] = J[0][1] = 0;
-		J[1][0] = J[1][1] = 0;
-		J[2][0] = J[2][1] = 0;
-		for (i=0; i<neln; ++i)
+		tr = 0;
+		dxr = dxs = vec3d(0,0,0);
+		for (i=0; i<neln; ++i) 
 		{
-			J[0][0] += Gr[i]*rt[i].x; J[0][1] += Gs[i]*rt[i].x;
-			J[1][0] += Gr[i]*rt[i].y; J[1][1] += Gs[i]*rt[i].y;
-			J[2][0] += Gr[i]*rt[i].z; J[2][1] += Gs[i]*rt[i].z;
+			tr += N[i]*tn[i];
+			dxr += rt[i]*Gr[i];
+			dxs += rt[i]*Gs[i];
 		}
-
+		
 		// calculate stiffness component
 		for (i=0; i<neln; ++i)
 			for (j=0; j<neln; ++j)
 			{
-				t1 = 0.5*(Gs[i]*N[j] - Gs[j]*N[i]);
-				t2 = 0.5*(Gr[i]*N[j] - Gr[j]*N[i]);
+				kab = (dxr*(N[j]*Gs[i]-N[i]*Gs[j])
+					   +dxs*(N[j]*Gr[i]-N[i]*Gr[j]))*w[n]*0.5*tr;
 
-				kab[0] = p*(J[0][0]*t1 - J[0][1]*t2)*w[n];
-				kab[1] = p*(J[1][0]*t1 - J[1][1]*t2)*w[n];
-				kab[2] = p*(J[2][0]*t1 - J[2][1]*t2)*w[n];
+				ke[3*i  ][3*j  ] +=      0;
+				ke[3*i  ][3*j+1] += -kab.z;
+				ke[3*i  ][3*j+2] +=  kab.y;
 
-				ke[3*i  ][3*j  ] +=       0; //(0,0,0)*kab[0]+(0,0,1)*kab[1]+(0,0,2)*kab[2];
-				ke[3*i  ][3*j+1] +=  kab[2]; //(0,1,0)*kab[0]+(0,1,1)*kab[1]+(0,1,2)*kab[2];
-				ke[3*i  ][3*j+2] += -kab[1]; //(0,2,0)*kab[0]+(0,2,1)*kab[1]+(0,2,2)*kab[2];
+				ke[3*i+1][3*j  ] +=  kab.z;
+				ke[3*i+1][3*j+1] +=      0;
+				ke[3*i+1][3*j+2] += -kab.x;
 
-				ke[3*i+1][3*j  ] += -kab[2]; //(1,0,0)*kab[0]+(1,0,1)*kab[1]+(1,0,2)*kab[2];
-				ke[3*i+1][3*j+1] +=       0; //(1,1,0)*kab[0]+(1,1,1)*kab[1]+(1,1,2)*kab[2];
-				ke[3*i+1][3*j+2] +=  kab[0]; //(1,2,0)*kab[0]+(1,2,1)*kab[1]+(1,2,2)*kab[2];
-
-				ke[3*i+2][3*j  ] +=  kab[1]; //(2,0,0)*kab[0]+(2,0,1)*kab[1]+(2,0,2)*kab[2];
-				ke[3*i+2][3*j+1] += -kab[0]; //(2,1,0)*kab[0]+(2,1,1)*kab[1]+(2,1,2)*kab[2];
-				ke[3*i+2][3*j+2] +=       0; //(2,2,0)*kab[0]+(2,2,1)*kab[1]+(2,2,2)*kab[2];
+				ke[3*i+2][3*j  ] += -kab.y;
+				ke[3*i+2][3*j+1] +=  kab.x;
+				ke[3*i+2][3*j+2] +=      0;
 			}
+		
+		// if prescribed traction is effective, add stiffness component
+		if (effective)
+		{
+			for (i=0; i<neln; ++i)
+				for (j=0; j<neln; ++j)
+				{
+					kab = (dxr ^ dxs)*w[n]*N[i]*N[j];
+					
+					ke[3*i  ][3*neln+j] += kab.x;
+					ke[3*i+1][3*neln+j] += kab.y;
+					ke[3*i+2][3*neln+j] += kab.z;
+				}
+		}
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe)
+bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe, double* tn)
 {
 	int i, n;
 
@@ -97,9 +94,6 @@ bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe)
 	// nr of element nodes
 	int neln = el.Nodes();
 
-	// pressure at nodes
-	double *pn = el.pt();
-
 	// nodal coordinates
 	vec3d *rt = el.rt();
 
@@ -107,8 +101,8 @@ bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe)
 	double* N;
 	double* w  = el.GaussWeights();
 
-	// pressure at integration points
-	double pr;
+	// traction at integration points
+	double tr;
 
 	vec3d dxr, dxs;
 
@@ -123,22 +117,16 @@ bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe)
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 
-		pr = 0;
+		tr = 0;
 		dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i) 
 		{
-			pr += N[i]*pn[i];
-
-			dxr.x += Gr[i]*rt[i].x;
-			dxr.y += Gr[i]*rt[i].y;
-			dxr.z += Gr[i]*rt[i].z;
-
-			dxs.x += Gs[i]*rt[i].x;
-			dxs.y += Gs[i]*rt[i].y;
-			dxs.z += Gs[i]*rt[i].z;
+			tr += N[i]*tn[i];
+			dxr += rt[i]*Gr[i];
+			dxs += rt[i]*Gs[i];
 		}
 
-		f = (dxr ^ dxs)*pr*w[n];
+		f = (dxr ^ dxs)*tr*w[n];
 
 		for (i=0; i<neln; ++i)
 		{
@@ -154,7 +142,7 @@ bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>& fe)
+bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>& fe, double* tn)
 {
 	int i, n;
 
@@ -164,9 +152,6 @@ bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>
 	// nr of element nodes
 	int neln = el.Nodes();
 
-	// pressure at nodes
-	double *pn = el.pt();
-
 	// nodal coordinates
 	vec3d *r0 = el.r0();
 
@@ -174,8 +159,8 @@ bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>
 	double* N;
 	double* w  = el.GaussWeights();
 
-	// pressure at integration points
-	double pr;
+	// traction at integration points
+	double tr;
 
 	vec3d dxr, dxs;
 
@@ -190,22 +175,16 @@ bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 
-		pr = 0;
+		tr = 0;
 		dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i) 
 		{
-			pr += N[i]*pn[i];
-
-			dxr.x += Gr[i]*r0[i].x;
-			dxr.y += Gr[i]*r0[i].y;
-			dxr.z += Gr[i]*r0[i].z;
-
-			dxs.x += Gs[i]*r0[i].x;
-			dxs.y += Gs[i]*r0[i].y;
-			dxs.z += Gs[i]*r0[i].z;
+			tr += N[i]*tn[i];
+			dxr += r0[i]*Gr[i];
+			dxs += r0[i]*Gs[i];
 		}
 
-		f = (dxr ^ dxs)*pr*w[n];
+		f = (dxr ^ dxs)*tr*w[n];
 
 		for (i=0; i<neln; ++i)
 		{
@@ -240,7 +219,7 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 		for (i=0; i<m_PC.size(); ++i)
 		{
 			FEPressureLoad& pc = m_PC[i];
-			ar << pc.blinear << pc.face << pc.lc;
+			ar << pc.blinear << pc.effective << pc.face << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
 			ar << pc.bc;
 		}
@@ -265,7 +244,7 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 		for (i=0; i<m_PC.size(); ++i)
 		{
 			FEPressureLoad& pc = m_PC[i];
-			ar >> pc.blinear >> pc.face >> pc.lc;
+			ar >> pc.blinear >> pc. effective >> pc.face >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
 			ar >> pc.bc;
 		}
@@ -296,21 +275,28 @@ void FEPressureSurface::StiffnessMatrix(FESolidSolver* psolver)
 			{
 				UnpackElement(el);
 
-				// calculate nodal pressures
+				// fluid pressure
 				double* pt = el.pt();
+				
+				// calculate nodal normal tractions
+				double tn[el.Nodes()];
 
 				if (!pc.blinear)
 				{
 					double g = fem.GetLoadCurve(pc.lc)->Value();
 
-					for (int j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
+					for (int j=0; j<el.Nodes(); ++j) tn[j] = -g*pc.s[j];
 
+					// if the prescribed traction is effective, evaluate the total traction
+					if (pc.effective)
+						for (int j=0; j<el.Nodes(); ++j) tn[j] -= pt[j];
+					
 					// get the element stiffness matrix
-					int ndof = 3*el.Nodes();
+					int ndof = pc.effective ? 4*el.Nodes() : 3*el.Nodes();
 					ke.Create(ndof, ndof);
 
 					// calculate pressure stiffness
-					PressureStiffness(el, ke);
+					PressureStiffness(el, ke, tn, pc.effective);
 
 					// assemble element matrix in global stiffness matrix
 					psolver->AssembleStiffness(el.m_node, el.LM(), ke);
@@ -335,17 +321,27 @@ void FEPressureSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 			FESurfaceElement& el = m_el[i];
 			UnpackElement(el);
 
-			// calculate nodal pressures
+			// fluid pressure
 			double* pt = el.pt();
+
+			// calculate nodal normal tractions
+			double tn[el.Nodes()];
 
 			double g = fem.GetLoadCurve(pc.lc)->Value();
 
-			for (int j=0; j<el.Nodes(); ++j) pt[j] = -g*pc.s[j];
+			// evaluate the prescribed traction.
+			// note the negative sign. This is because this boundary condition uses the 
+			// convention that a positive pressure is compressive
+			for (int j=0; j<el.Nodes(); ++j) tn[j] = -g*pc.s[j];
+			
+			// if the prescribed traction is effective, evaluate the total traction
+			if (pc.effective)
+				for (int j=0; j<el.Nodes(); ++j) tn[j] -= pt[j];
 
-			int ndof = 3*el.Nodes();
+			int ndof = pc.effective ? 4*el.Nodes() : 3*el.Nodes();
 			fe.resize(ndof);
 
-			if (pc.blinear) LinearPressureForce(el, fe); else PressureForce(el, fe);
+			if (pc.blinear) LinearPressureForce(el, fe, tn); else PressureForce(el, fe, tn);
 
 			// add element force vector to global force vector
 			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);

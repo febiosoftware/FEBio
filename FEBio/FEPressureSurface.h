@@ -10,7 +10,8 @@
 class FEPressureLoad : public FEBoundaryCondition
 {
 public:
-	FEPressureLoad() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; blinear = false; }
+	FEPressureLoad() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; 
+						blinear = false; effective = false;}
 
 public:
 	double	s[4];		// nodal scale factors
@@ -18,6 +19,7 @@ public:
 	int		lc;			// load curve
 	int		bc;			// degree of freedom
 	bool	blinear;	// linear or not (true is non-follower, false is follower)
+	bool	effective;	// effective or total (for poroelastic problems)
 };
 
 //-----------------------------------------------------------------------------
@@ -59,13 +61,13 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void PressureStiffness(FESurfaceElement& el, matrix& ke);
+	void PressureStiffness(FESurfaceElement& el, matrix& ke, double* tn, bool effective);
 
 	//! Calculates external pressure forces
-	bool PressureForce(FESurfaceElement& el, vector<double>& fe);
+	bool PressureForce(FESurfaceElement& el, vector<double>& fe, double* tn);
 
 	//! Calculates the linear external pressure forces (ie. non-follower forces)
-	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe);
+	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe, double* tn);
 
 protected:
 	// pressure boundary data
