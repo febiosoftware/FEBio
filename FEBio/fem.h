@@ -29,6 +29,7 @@
 #include "Timer.h"
 #include "FEPressureSurface.h"
 #include "FEFluxSurface.h"
+#include "FEElasticMixture.h"
 
 #include <list>
 using namespace std;

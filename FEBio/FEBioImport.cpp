@@ -770,6 +770,42 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 		}
 	}
 
+	// assign material pointers for solid mixtures
+	for (int i=0; i<fem.Materials(); ++i)
+	{
+		FEElasticMixture* pm = dynamic_cast<FEElasticMixture*>(fem.GetMaterial(i));
+		if (pm)
+		{
+			// loop over all solids in mixture
+			for (int i=0; i < pm->m_nMat; ++i)
+			{
+				// get the ID of the material
+				// note that m_iMat is a one-based variable!
+				int imat = pm->m_iMat[i] - 1;
+				
+				// make sure the base ID is valid
+				if ((imat < 0) || (imat >= fem.Materials()))
+				{
+					log.printbox("INPUT ERROR", "Invalid material ID for material i+1\n");
+					throw XMLReader::Error();
+					return false;
+				}
+				
+				// make sure the  material is a valid material (i.e. an elastic material)
+				FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(imat));
+				if (pme == 0)
+				{
+					log.printbox("INPUT ERROR", "Invalid elastic material for material i+1\n");
+					throw XMLReader::Error();
+					return false;
+				}
+				
+				// set the material pointer
+				pm->m_pMat[i] = pme;
+			}
+		}
+	}
+	
 	// all done!
 	return true;
 }
