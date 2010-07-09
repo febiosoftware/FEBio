@@ -1,5 +1,7 @@
 #pragma once
 #include "FEMaterial.h"
+#include "FENeoHookean.h"
+#include "FEEllipsoidalFiberDistribution.h"
 
 class FERandomFiberNeoHookean :	public FEElasticMaterial
 {
@@ -23,15 +25,12 @@ public:
 	void Init();
 
 	//! return bulk modulus
-	double BulkModulus() { return m_E/(3.0*(1.0 - 2.0*m_v));}
+	double BulkModulus();
 
 public:
-	static	int	m_nres;	// integration rule
-	static double	m_cth[];
-	static double	m_sth[];
-	static double	m_cph[];
-	static double	m_sph[];
 
+	FEEllipsoidalFiberDistribution	m_EFD;
+	FENeoHookean					m_NH;
 
 	// declare as registered
 	DECLARE_REGISTERED(FERandomFiberNeoHookean);

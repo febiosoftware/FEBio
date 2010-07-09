@@ -15,10 +15,6 @@ BEGIN_PARAMETER_LIST(FERandomFiberDonnanEquilibrium, FEElasticMaterial)
 	ADD_PARAMETERV(m_Fib.m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
 END_PARAMETER_LIST();
 
-#ifndef SQR
-#define SQR(x) ((x)*(x))
-#endif
-
 //-----------------------------------------------------------------------------
 // FERandomFiberDonnanEquilibrium
 //-----------------------------------------------------------------------------
@@ -31,8 +27,11 @@ FERandomFiberDonnanEquilibrium::FERandomFiberDonnanEquilibrium()
 void FERandomFiberDonnanEquilibrium::Init()
 {
 	FEElasticMaterial::Init();
-	
+	// Donnan equilibrium is stable when combined with fibers that can resist swelling
+	m_DEQ.m_unstable = false;
 	m_DEQ.Init();
+	// ellipsoidal fiber distribution is stable when combined with a ground matrix
+	m_Fib.m_unstable = false;
 	m_Fib.Init();
 }
 

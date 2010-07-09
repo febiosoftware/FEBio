@@ -11,21 +11,31 @@
 //-----------------------------------------------------------------------------
 //! Material class that implements Donnan equilibrium. 
 //
-class FEDonnanEquilibrium : public FEMaterial
+class FEDonnanEquilibrium : public FEElasticMaterial
 {
 public:
+	//! When used on its own (not in a solid mixture), this materials
+	//! is intrinsically unstable
+	FEDonnanEquilibrium() {m_unstable = true;}
+	
 	//! Initialization routine
 	void Init();
 
 	//! Returns the Cauchy stress
-	mat3ds Stress(FEMaterialPoint& mp);
+	virtual mat3ds Stress(FEMaterialPoint& mp);
 
 	//! Returs the spatial tangent
-	tens4ds Tangent(FEMaterialPoint& mp);
+	virtual tens4ds Tangent(FEMaterialPoint& mp);
 
 	//! returns the bulkmodulus
 	double BulkModulus();
 
+	// declare as registered
+	DECLARE_REGISTERED(FEDonnanEquilibrium);
+	
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
+	
 public:
 	double	m_phiwr;	//!< fluid volume fraction in reference configuration
 	double	m_cFr;		//!< fixed charge density in reference configuration

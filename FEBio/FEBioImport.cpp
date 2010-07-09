@@ -777,31 +777,37 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 		if (pm)
 		{
 			// loop over all solids in mixture
-			for (int i=0; i < pm->m_nMat; ++i)
+			for (int j=0; j < pm->m_nMat; ++j)
 			{
 				// get the ID of the material
 				// note that m_iMat is a one-based variable!
-				int imat = pm->m_iMat[i] - 1;
+				int imat = pm->m_iMat[j] - 1;
 				
-				// make sure the base ID is valid
-				if ((imat < 0) || (imat >= fem.Materials()))
+				// make sure the material ID is valid
+				if ((imat < 0) || (imat >= fem.Materials()) || (imat == i))
 				{
-					log.printbox("INPUT ERROR", "Invalid material ID for material i+1\n");
+					log.printbox("INPUT ERROR", "Invalid material ID %d in solid mixture %d\n",imat+1,i+1);
 					throw XMLReader::Error();
 					return false;
 				}
 				
-				// make sure the  material is a valid material (i.e. an elastic material)
+				// make sure the  material is a valid material (i.e. an elastic material, possibly incompressible)
 				FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(imat));
 				if (pme == 0)
 				{
-					log.printbox("INPUT ERROR", "Invalid elastic material for material i+1\n");
+					log.printbox("INPUT ERROR", "Invalid elastic material %d in solid mixture %d\n",imat+1,i+1);
 					throw XMLReader::Error();
 					return false;
 				}
+				else
+				{
+					// assume that the material becomes stable since it is combined with others
+					// in a solid mixture.  (This may not necessarily be true.)
+					pme->m_unstable = false;
+				}
 				
 				// set the material pointer
-				pm->m_pMat[i] = pme;
+				pm->m_pMat[j] = pme;
 			}
 		}
 	}

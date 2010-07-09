@@ -20,33 +20,34 @@ void FEElasticMixture::Init()
 	FEElasticMaterial::Init();
 
 	if (m_nMat < 1) throw MaterialError("nsolid must be greater than zero");
+	for (int i=0; i<m_nMat-1; ++i)
+		for (int j=i+1; j<m_nMat; ++j)
+			if (m_iMat[i] == m_iMat[j])
+				throw MaterialError("Duplicate material id specified in solid mixture.");
+	
 }
 
 mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	
 	mat3ds s;
-
+	
 	// calculate stress
-	s = m_pMat[0]->Stress(pt);
+	s = m_pMat[0]->Stress(mp);
 	for (int i=1; i < m_nMat; ++i)
-		s += m_pMat[i]->Stress(pt);
+		s += m_pMat[i]->Stress(mp);
 
 	return s;
 }
 
 tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	
 	tens4ds c;
-	
+
 	// calculate elasticity tensor
-	c = m_pMat[0]->Tangent(pt);
+	c = m_pMat[0]->Tangent(mp);
 	for (int i=1; i < m_nMat; ++i)
-		c += m_pMat[i]->Tangent(pt);
-	
+		c += m_pMat[i]->Tangent(mp);
+
 	return c;
 }
 

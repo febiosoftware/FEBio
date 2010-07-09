@@ -1,5 +1,7 @@
 #pragma once
 #include "FEMaterial.h"
+#include "FEVerondaWestmann.h"
+#include "FEEllipsoidalFiberDistribution.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a material that consists of a continuous fiber distribution
@@ -10,7 +12,7 @@
 class FERandomFiberVerondaWestmann:	public FEIncompressibleMaterial
 {
 public:
-	FERandomFiberVerondaWestmann(void);
+	FERandomFiberVerondaWestmann() {}
 
 public:
 	//! calculate stress at material point
@@ -22,19 +24,12 @@ public:
 	//! material parameter intialization and checking
 	void Init();
 
+	//! return bulk modulus
+	double BulkModulus();
+	
 public:
-	double	m_c1;	// Veronda-Westmann coefficient 1
-	double	m_c2;	// Veronda-Westmann coefficient 2
-
-	double	m_beta[3];
-	double	m_ksi[3];
-
-	static	int	m_nres;	// integration rule
-
-	static double	m_cth[];
-	static double	m_sth[];
-	static double	m_cph[];
-	static double	m_sph[];
+	FEEllipsoidalFiberDistribution	m_EFD;
+	FEVerondaWestmann				m_VW;
 
 	// declare as registered
 	DECLARE_REGISTERED(FERandomFiberVerondaWestmann);

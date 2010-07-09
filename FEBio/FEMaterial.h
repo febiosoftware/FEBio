@@ -95,7 +95,7 @@ public:
 class FEElasticMaterial : public FESolidMaterial
 {
 public:
-	FEElasticMaterial() { m_density = 1; m_pmap = 0;}
+	FEElasticMaterial() { m_density = 1; m_pmap = 0; m_unstable = false;}
 	~FEElasticMaterial(){ if(m_pmap) delete m_pmap; }
 
 	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }
@@ -106,6 +106,7 @@ public:
 
 public:
 	double	m_density;	//!< material density
+	bool	m_unstable;	//!< flag indicating whether material is unstable on its own
 
 	FECoordSysMap*	m_pmap;	//!< local material coordinate system
 

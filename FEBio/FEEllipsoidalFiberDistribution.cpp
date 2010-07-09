@@ -25,12 +25,22 @@ double FEEllipsoidalFiberDistribution::m_cph[NSTH];
 double FEEllipsoidalFiberDistribution::m_sph[NSTH];
 double FEEllipsoidalFiberDistribution::m_w[NSTH];
 
+// register the material with the framework
+REGISTER_MATERIAL(FEEllipsoidalFiberDistribution, "ellipsoidal fiber distribution");
+
+// define the material parameters
+BEGIN_PARAMETER_LIST(FEEllipsoidalFiberDistribution, FEElasticMaterial)
+	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
+	ADD_PARAMETERV(m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
+END_PARAMETER_LIST();
+
 //-----------------------------------------------------------------------------
 // FEEllipsoidalFiberDistribution
 //-----------------------------------------------------------------------------
 
 void FEEllipsoidalFiberDistribution::Init()
 {
+	if (m_unstable) throw MaterialError("This fibrous material is unstable (collapses on itself) when used alone.  Combine it in a solid mixture with a material that can serve as a ground matrix.");
 	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
 	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
 	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");
