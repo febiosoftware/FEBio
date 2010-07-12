@@ -258,7 +258,7 @@ void FEFluxSurface::StiffnessMatrix(FESolidSolver* psolver)
 				UnpackElement(el);
 
 				// calculate nodal normal fluid flux
-				double wn[el.Nodes()];
+				vector<double> wn(el.Nodes());
 
 				if (!fc.blinear)
 				{
@@ -299,7 +299,7 @@ void FEFluxSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 			UnpackElement(el);
 
 			// calculate nodal normal fluid flux
-			double wn[el.Nodes()];
+			vector<double> wn(el.Nodes());
 
 			double g = fem.GetLoadCurve(fc.lc)->Value();
 

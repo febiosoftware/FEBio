@@ -1494,6 +1494,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEElasticMixture.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElemElemList.cpp"
 				>
 			</File>
@@ -2205,6 +2209,10 @@
 			</File>
 			<File
 				RelativePath=".\FEDonnanEquilibrium.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEElasticMixture.h"
 				>
 			</File>
 			<File
