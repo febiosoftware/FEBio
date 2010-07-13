@@ -243,11 +243,15 @@ void XMLReader::NextTag(XMLTag& tag)
 
 	try
 	{
-		// read the value
-		ReadValue(tag);
+		// read value and end tag if tag is not empty
+		if (!tag.isempty())
+		{
+			// read the value
+			ReadValue(tag);
 
-		// read the end tag
-		ReadEndTag(tag);
+			// read the end tag
+			ReadEndTag(tag);
+		}
 	}
 	catch (UnexpectedEOF)
 	{
@@ -334,7 +338,14 @@ void XMLReader::ReadTag(XMLTag& tag)
 	{
 		// skip whitespace
 		while (isspace(ch)) ch = GetChar();
-		if (ch == '>') break;
+		if (ch == '/')
+		{
+			tag.m_bempty = true;
+			ch = GetChar();
+			if (ch != '>') throw XMLSyntaxError();
+			break;
+		}
+		else if (ch == '>') break;
 
 		// read the attribute's name
 		sz = tag.m_szatt[n];
@@ -360,7 +371,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 		++tag.m_natt;
 	}
 
-	if (!tag.isend())
+	if (!tag.isend() && !tag.isempty())
 	{
 		// keep a copy of the name
 		strcpy(tag.m_szroot[tag.m_nlevel], tag.m_sztag);

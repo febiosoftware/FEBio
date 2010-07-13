@@ -45,6 +45,7 @@ public:
 
 		bool	m_bend;		// end tag flag
 		bool	m_bleaf;	// this is a leaf (i.e. has no child elements)
+		bool	m_bempty;	// empty tag (i.e. no value)
 
 		void operator ++ () { m_preader->NextTag(*this); }
 
@@ -58,6 +59,7 @@ public:
 			m_natt = 0;
 			m_bend = false;
 			m_bleaf = true;
+			m_bempty = false;
 		}
 
 	public:
@@ -66,6 +68,7 @@ public:
 
 		bool isend() { return m_bend; }
 		bool isleaf() { return m_bleaf; }
+		bool isempty() { return m_bempty; }
 
 	public:
 		const char* AttributeValue(const char* szat, bool bopt = false);
