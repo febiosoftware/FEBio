@@ -42,11 +42,21 @@ protected:
 	bool ParseInitialSection    (XMLTag& tag);
 	bool ParseConstraints       (XMLTag& tag);
 	bool ParseContactSection    (XMLTag& tag);
+	void ParseSpringSection     (XMLTag& tag);
 	bool ParseGlobalsSection    (XMLTag& tag);
 	bool ParseLoadSection       (XMLTag& tag);
 	bool ParseOutputSection     (XMLTag& tag);
 	bool ParseStepSection       (XMLTag& tag);
 	bool ParseSurfaceSection    (XMLTag& tag, FESurface& s, int nfmt);
+
+protected: // boundary section
+	void ParseBCFix      (XMLTag& tag);
+	void ParseBCPrescribe(XMLTag& tag);
+	void ParseBCForce    (XMLTag& tag);
+	void ParseBCPressure (XMLTag& tag);
+	void ParseBCTraction (XMLTag& tag);
+	void ParseBCFluidFlux(XMLTag& tag);
+	void ParseBCHeatFlux (XMLTag& tag);
 
 protected:
 	int DomainType(XMLTag& tag, FEMaterial* pmat);

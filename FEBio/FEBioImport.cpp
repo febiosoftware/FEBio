@@ -1512,8 +1512,6 @@ bool FEFEBioImport::ParseGeometrySection(XMLTag& tag)
 bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
-	int n, bc, lc;
-	const char* sz;
 
 	// make sure this tag has children
 	if (tag.isleaf()) return true;
@@ -1521,423 +1519,418 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "fix")
-		{
-			// make sure this section does not appear in a step section
-			if (m_nsteps != 0) throw XMLReader::InvalidTag(tag);
-
-			// Read the fixed nodes
-			++tag;
-			do
-			{
-				n = atoi(tag.AttributeValue("id"))-1;
-				FENode& node = fem.m_mesh.Node(n);
-				sz = tag.AttributeValue("bc");
-				if      (strcmp(sz, "x") == 0) node.m_ID[0] = -1;
-				else if (strcmp(sz, "y") == 0) node.m_ID[1] = -1;
-				else if (strcmp(sz, "z") == 0) node.m_ID[2] = -1;
-				else if (strcmp(sz, "xy") == 0) { node.m_ID[0] = node.m_ID[1] = -1; }
-				else if (strcmp(sz, "yz") == 0) { node.m_ID[1] = node.m_ID[2] = -1; }
-				else if (strcmp(sz, "xz") == 0) { node.m_ID[0] = node.m_ID[2] = -1; }
-				else if (strcmp(sz, "xyz") == 0) { node.m_ID[0] = node.m_ID[1] = node.m_ID[2] = -1; }
-				else if (strcmp(sz, "p") == 0) { node.m_ID[6] = -1; }
-				else if (strcmp(sz, "u") == 0) node.m_ID[3] = -1;
-				else if (strcmp(sz, "v") == 0) node.m_ID[4] = -1;
-				else if (strcmp(sz, "w") == 0) node.m_ID[5] = -1;
-				else if (strcmp(sz, "uv") == 0) { node.m_ID[3] = node.m_ID[4] = -1; }
-				else if (strcmp(sz, "vw") == 0) { node.m_ID[4] = node.m_ID[5] = -1; }
-				else if (strcmp(sz, "uw") == 0) { node.m_ID[3] = node.m_ID[5] = -1; }
-				else if (strcmp(sz, "uvw") == 0) { node.m_ID[3] = node.m_ID[4] = node.m_ID[5] = -1; }
-				else if (strcmp(sz, "t") == 0) node.m_ID[10] = -1;
-				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-				++tag;
-			}
-			while (!tag.isend());
-		}
-		else if (tag == "prescribe")
-		{
-			// count how many prescibed nodes there are
-			int ndis = 0;
-			XMLTag t(tag); ++t;
-			while (!t.isend()) { ndis++; ++t; }
-
-			// allocate prescribed data
-			int nsize = fem.m_DC.size();
-			fem.m_DC.setsize(nsize + ndis);
-
-			// read the prescribed data
-			++tag;
-			for (int i=nsize; i<nsize+ndis; ++i)
-			{
-				n = atoi(tag.AttributeValue("id"))-1;
-				sz = tag.AttributeValue("bc");
-
-				if      (strcmp(sz, "x") == 0) bc = 0;
-				else if (strcmp(sz, "y") == 0) bc = 1;
-				else if (strcmp(sz, "z") == 0) bc = 2;
-				else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
-				else if (strcmp(sz, "t") == 0) bc = 10; 
-	
-				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-
-				sz = tag.AttributeValue("lc", true);
-				if (sz == 0) lc = 0;
-				else lc = atoi(sz);
-
-				fem.m_DC[i].node = n;
-				fem.m_DC[i].bc = bc;
-				fem.m_DC[i].lc = lc;
-				tag.value(fem.m_DC[i].s);
-
-				// add this boundary condition to the current step
-				if (m_nsteps > 0)
-				{
-					m_pStep->AddBoundaryCondition(&fem.m_DC[i]);
-					fem.m_DC[i].Deactivate();
-				}
-
-				++tag;
-			}
-		}
-		else if (tag == "force")
-		{
-			// count how many nodal forces there are
-			int ncnf = 0;
-			XMLTag t(tag); ++t;
-			while (!t.isend()) { ncnf++; ++t; }
-
-			// allocate prescribed data
-			int nsize = fem.m_FC.size();
-			fem.m_FC.setsize(nsize + ncnf);
-
-			// read the prescribed data
-			++tag;
-			for (int i=nsize; i<ncnf+nsize; ++i)
-			{
-				n = atoi(tag.AttributeValue("id"))-1;
-				sz = tag.AttributeValue("bc");
-
-				if      (strcmp(sz, "x") == 0) bc = 0;
-				else if (strcmp(sz, "y") == 0) bc = 1;
-				else if (strcmp(sz, "z") == 0) bc = 2;
-				else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
-				else if (strcmp(sz, "t") == 0) bc = 10;
-				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-
-				sz = tag.AttributeValue("lc", true);
-				if (sz == 0) lc = 0;
-				else lc = atoi(sz);
-
-				fem.m_FC[i].node = n;
-				fem.m_FC[i].bc = bc;
-				fem.m_FC[i].lc = lc;
-				tag.value(fem.m_FC[i].s);
-
-				// add this boundary condition to the current step
-				if (m_nsteps > 0)
-				{
-					m_pStep->AddBoundaryCondition(&fem.m_FC[i]);
-					fem.m_FC[i].Deactivate();
-				}
-
-				++tag;
-			}
-		}
-		else if (tag == "pressure")
-		{
-			const char* sz;
-			bool blinear = false;
-			bool effective = false;
-			sz = tag.AttributeValue("type", true);
-			if (sz)
-			{
-				if (strcmp(sz, "linear") == 0) blinear = true;
-				else if (strcmp(sz, "nonlinear") == 0) blinear = false;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
-			}
-
-			sz = tag.AttributeValue("traction", true);
-			if (sz)
-			{
-				if (strcmp(sz, "effective") == 0) effective = true;
-				else if (strcmp(sz, "total") == 0) effective = false;
-				else throw XMLReader::InvalidAttributeValue(tag, "traction", sz);
-			}
-			
-			// count how many pressure cards there are
-			int npr = 0;
-			XMLTag t(tag); ++t;
-			while (!t.isend()) { npr++; ++t; }
-
-			// allocate pressure data
-			fem.m_psurf = new FEPressureSurface(&fem.m_mesh);
-			FEPressureSurface& ps = *fem.m_psurf;
-			ps.create(npr);
-
-			// read the pressure data
-			++tag;
-			int nf[4], N;
-			double s;
-			for (int i=0; i<npr; ++i)
-			{
-				FEPressureLoad& pc = ps.PressureLoad(i);
-				FESurfaceElement& el = fem.m_psurf->Element(i);
-				pc.blinear = blinear;
-				pc.effective = effective;
-
-				sz = tag.AttributeValue("lc", true);
-				if (sz) pc.lc = atoi(sz); else pc.lc = 0;
-
-				s  = atof(tag.AttributeValue("scale"));
-				pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
-
-				if (tag == "quad4") el.SetType(FE_QUAD);
-				else if (tag == "tri3") el.SetType(FE_TRI);
-				else throw XMLReader::InvalidTag(tag);
-
-				N = el.Nodes();
-				tag.value(nf, N);
-				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-
-				// add this boundary condition to the current step
-				if (m_nsteps > 0)
-				{
-					m_pStep->AddBoundaryCondition(&pc);
-					pc.Deactivate();
-				}
-
-				++tag;
-			}
-		}
-		else if (tag == "traction")
-		{
-			const char* sz;
-
-			// count how many traction cards there are
-			int ntc = 0;
-			XMLTag t(tag); ++t;
-			while (!t.isend()) { ntc++; ++t; }
-
-			// allocate traction data
-			fem.m_ptrac = new FEConstTractionSurface(&fem.m_mesh);
-			FEConstTractionSurface& pt = *fem.m_ptrac;
-			pt.create(ntc);
-
-			// read the traction data
-			++tag;
-			int nf[4], N;
-			vec3d s;
-			for (int i=0; i<ntc; ++i)
-			{
-				FETractionLoad& tc = pt.TractionLoad(i);
-				FESurfaceElement& el = fem.m_ptrac->Element(i);
-
-				sz = tag.AttributeValue("lc", true);
-				if (sz) tc.lc = atoi(sz); else tc.lc = 0;
-
-				s.x  = atof(tag.AttributeValue("tx"));
-				s.y  = atof(tag.AttributeValue("ty"));
-				s.z  = atof(tag.AttributeValue("tz"));
-
-				tc.s[0] = tc.s[1] = tc.s[2] = tc.s[3] = s;
-
-				if (tag == "quad4") el.SetType(FE_QUAD);
-				else if (tag == "tri3") el.SetType(FE_TRI);
-				else throw XMLReader::InvalidTag(tag);
-
-				N = el.Nodes();
-				tag.value(nf, N);
-				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-
-				// add this boundary condition to the current step
-				if (m_nsteps > 0)
-				{
-					m_pStep->AddBoundaryCondition(&tc);
-					tc.Deactivate();
-				}
-
-				++tag;
-			}
-		}
-		else if (tag == "fluidflux")
-		{
-			const char* sz;
-			bool blinear = false;
-			sz = tag.AttributeValue("type", true);
-			if (sz)
-			{
-				if (strcmp(sz, "linear") == 0) blinear = true;
-				else if (strcmp(sz, "nonlinear") == 0) blinear = false;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
-			}
-			
-			// count how many fluid flux cards there are
-			int nfr = 0;
-			XMLTag t(tag); ++t;
-			while (!t.isend()) { nfr++; ++t; }
-			
-			// allocate fluid flux data
-			fem.m_fsurf = new FEFluxSurface(&fem.m_mesh);
-			FEFluxSurface& fs = *fem.m_fsurf;
-			fs.create(nfr);
-			
-			// read the fluid flux data
-			++tag;
-			int nf[4], N;
-			double s;
-			for (int i=0; i<nfr; ++i)
-			{
-				FEFluidFlux& fc = fs.FluidFlux(i);
-				FESurfaceElement& el = fem.m_fsurf->Element(i);
-				fc.blinear = blinear;
-				
-				sz = tag.AttributeValue("lc", true);
-				if (sz) fc.lc = atoi(sz); else fc.lc = 0;
-				
-				s  = atof(tag.AttributeValue("scale"));
-				fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
-				
-				if (tag == "quad4") el.SetType(FE_QUAD);
-				else if (tag == "tri3") el.SetType(FE_TRI);
-				else throw XMLReader::InvalidTag(tag);
-				
-				N = el.Nodes();
-				tag.value(nf, N);
-				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-				
-				// add this boundary condition to the current step
-				if (m_nsteps > 0)
-				{
-					m_pStep->AddBoundaryCondition(&fc);
-					fc.Deactivate();
-				}
-				
-				++tag;
-			}
-		}
-		else if (tag == "heatflux")
-		{
-			// count how many heatflux cards there are
-			int npr = 0;
-			XMLTag t(tag); ++t;
-			while (!t.isend()) { npr++; ++t; }
-
-			// allocate flux data
-			fem.m_phflux = new FEHeatFluxSurface(&fem.m_mesh);
-			FEHeatFluxSurface& ps = *fem.m_phflux;
-			ps.create(npr);
-
-			// read the flux data
-			++tag;
-			int nf[4], N;
-			double s;
-			for (int i=0; i<npr; ++i)
-			{
-				FEHeatFlux& pc = ps.HeatFlux(i);
-				FESurfaceElement& el = fem.m_phflux->Element(i);
-
-				sz = tag.AttributeValue("lc", true);
-				if (sz) pc.lc = atoi(sz); else pc.lc = 0;
-
-				s  = atof(tag.AttributeValue("scale"));
-				pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
-
-				if (tag == "quad4") el.SetType(FE_QUAD);
-				else if (tag == "tri3") el.SetType(FE_TRI);
-				else throw XMLReader::InvalidTag(tag);
-
-				N = el.Nodes();
-				tag.value(nf, N);
-				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-
-				// add this boundary condition to the current step
-				if (m_nsteps > 0)
-				{
-					m_pStep->AddBoundaryCondition(&pc);
-					pc.Deactivate();
-				}
-
-				++tag;
-			}
-		}
+		if      (tag == "fix"      ) ParseBCFix      (tag);
+		else if (tag == "prescribe") ParseBCPrescribe(tag);
+		else if (tag == "force"    ) ParseBCForce    (tag);
+		else if (tag == "pressure" ) ParseBCPressure (tag);
+		else if (tag == "traction" ) ParseBCTraction (tag);
+		else if (tag == "fluidflux") ParseBCFluidFlux(tag);
+		else if (tag == "heatflux" ) ParseBCHeatFlux (tag);
 		else if (tag == "contact") ParseContactSection(tag);
 		else if (tag == "linear_constraint") ParseConstraints(tag);
-		else if (tag == "spring")
-		{
-			FE_DISCRETE_ELEMENT de;
-			de.m_bto = false;
-
-			int n[2];
-
-			// read spring discrete elements
-			++tag;
-			do
-			{
-				if (tag == "node")
-				{
-					tag.value(n, 2);
-					de.n1 = n[0]-1;
-					de.n2 = n[1]-1;
-				}
-				else if (tag == "E") tag.value(de.E);
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-
-			fem.m_DE.push_back(de);
-		}
-/*		else if (tag == "rigid_body")
-		{
-			// currently we only allow this to be specified in the multistep feature
-			assert(m_nsteps);
-
-			int id;
-			tag.AttributeValue("id", id);
-
-			++tag;
-			do
-			{
-				if (tag == "translate")
-				{
-					const char* szbc = tag.AttributeValue("bc");
-					int bc;
-					if      (strcmp(szbc, "x") == 0) bc = 0;
-					else if (strcmp(szbc, "y") == 0) bc = 1;
-					else if (strcmp(szbc, "z") == 0) bc = 2;
-					else throw XMLReader::InvalidAttributeValue(tag, "bc", szbc);
-
-					int lc=-1;
-					tag.AttributeValue("lc", lc);
-
-					FERigidBodyDisplacement DC;
-					DC.id = id;
-					DC.bc = bc;
-					DC.lc = lc+1;
-					tag.value(DC.sf);
-					fem.m_RDC.push_back(DC);
-
-					// make sure to free the material BC
-					FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(id-1));
-					assert(pm);
-					pm->m_bc[bc] = 0;
-
-					int n = fem.m_RDC.size()-1;
-					FERigidBodyDisplacement* pDC = &fem.m_RDC[n];
-					pDC->Deactivate();
-					fem.m_pStep->AddBoundaryCondition(pDC);
-				}
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-		}
-*/		else throw XMLReader::InvalidTag(tag);
+		else if (tag == "spring") ParseSpringSection(tag);
+		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCFix(XMLTag &tag)
+{
+	FEM& fem = *m_pfem;
+
+	// make sure this section does not appear in a step section
+	if (m_nsteps != 0) throw XMLReader::InvalidTag(tag);
+
+	// Read the fixed nodes
+	++tag;
+	do
+	{
+		int n = atoi(tag.AttributeValue("id"))-1;
+		FENode& node = fem.m_mesh.Node(n);
+		const char* sz = tag.AttributeValue("bc");
+		if      (strcmp(sz, "x") == 0) node.m_ID[0] = -1;
+		else if (strcmp(sz, "y") == 0) node.m_ID[1] = -1;
+		else if (strcmp(sz, "z") == 0) node.m_ID[2] = -1;
+		else if (strcmp(sz, "xy") == 0) { node.m_ID[0] = node.m_ID[1] = -1; }
+		else if (strcmp(sz, "yz") == 0) { node.m_ID[1] = node.m_ID[2] = -1; }
+		else if (strcmp(sz, "xz") == 0) { node.m_ID[0] = node.m_ID[2] = -1; }
+		else if (strcmp(sz, "xyz") == 0) { node.m_ID[0] = node.m_ID[1] = node.m_ID[2] = -1; }
+		else if (strcmp(sz, "p") == 0) { node.m_ID[6] = -1; }
+		else if (strcmp(sz, "u") == 0) node.m_ID[3] = -1;
+		else if (strcmp(sz, "v") == 0) node.m_ID[4] = -1;
+		else if (strcmp(sz, "w") == 0) node.m_ID[5] = -1;
+		else if (strcmp(sz, "uv") == 0) { node.m_ID[3] = node.m_ID[4] = -1; }
+		else if (strcmp(sz, "vw") == 0) { node.m_ID[4] = node.m_ID[5] = -1; }
+		else if (strcmp(sz, "uw") == 0) { node.m_ID[3] = node.m_ID[5] = -1; }
+		else if (strcmp(sz, "uvw") == 0) { node.m_ID[3] = node.m_ID[4] = node.m_ID[5] = -1; }
+		else if (strcmp(sz, "t") == 0) node.m_ID[10] = -1;
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCPrescribe(XMLTag& tag)
+{
+	FEM& fem = *m_pfem;
+
+	// count how many prescibed nodes there are
+	int ndis = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { ndis++; ++t; }
+
+	// allocate prescribed data
+	int nsize = fem.m_DC.size();
+	fem.m_DC.setsize(nsize + ndis);
+
+	// read the prescribed data
+	++tag;
+	for (int i=nsize; i<nsize+ndis; ++i)
+	{
+		int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
+		const char* sz = tag.AttributeValue("bc");
+
+		if      (strcmp(sz, "x") == 0) bc = 0;
+		else if (strcmp(sz, "y") == 0) bc = 1;
+		else if (strcmp(sz, "z") == 0) bc = 2;
+		else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
+		else if (strcmp(sz, "t") == 0) bc = 10; 
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+		sz = tag.AttributeValue("lc", true);
+		if (sz == 0) lc = 0;
+		else lc = atoi(sz);
+
+		fem.m_DC[i].node = n;
+		fem.m_DC[i].bc = bc;
+		fem.m_DC[i].lc = lc;
+		tag.value(fem.m_DC[i].s);
+
+		// add this boundary condition to the current step
+		if (m_nsteps > 0)
+		{
+			m_pStep->AddBoundaryCondition(&fem.m_DC[i]);
+			fem.m_DC[i].Deactivate();
+		}
+		++tag;
+	}	
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCForce(XMLTag &tag)
+{
+	FEM& fem = *m_pfem;
+
+	// count how many nodal forces there are
+	int ncnf = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { ncnf++; ++t; }
+
+	// allocate prescribed data
+	int nsize = fem.m_FC.size();
+	fem.m_FC.setsize(nsize + ncnf);
+
+	// read the prescribed data
+	++tag;
+	for (int i=nsize; i<ncnf+nsize; ++i)
+	{
+		int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
+		const char* sz = tag.AttributeValue("bc");
+
+		if      (strcmp(sz, "x") == 0) bc = 0;
+		else if (strcmp(sz, "y") == 0) bc = 1;
+		else if (strcmp(sz, "z") == 0) bc = 2;
+		else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
+		else if (strcmp(sz, "t") == 0) bc = 10;
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+		sz = tag.AttributeValue("lc", true);
+		if (sz == 0) lc = 0;
+		else lc = atoi(sz);
+
+		fem.m_FC[i].node = n;
+		fem.m_FC[i].bc = bc;
+		fem.m_FC[i].lc = lc;
+		tag.value(fem.m_FC[i].s);
+
+		// add this boundary condition to the current step
+		if (m_nsteps > 0)
+		{
+			m_pStep->AddBoundaryCondition(&fem.m_FC[i]);
+			fem.m_FC[i].Deactivate();
+		}
+
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCPressure(XMLTag& tag)
+{
+	FEM& fem = *m_pfem;
+
+	const char* sz;
+	bool blinear = false;
+	bool effective = false;
+	sz = tag.AttributeValue("type", true);
+	if (sz)
+	{
+		if (strcmp(sz, "linear") == 0) blinear = true;
+		else if (strcmp(sz, "nonlinear") == 0) blinear = false;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+	}
+
+	sz = tag.AttributeValue("traction", true);
+	if (sz)
+	{
+		if (strcmp(sz, "effective") == 0) effective = true;
+		else if (strcmp(sz, "total") == 0) effective = false;
+		else throw XMLReader::InvalidAttributeValue(tag, "traction", sz);
+	}
+	
+	// count how many pressure cards there are
+	int npr = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { npr++; ++t; }
+
+	// allocate pressure data
+	fem.m_psurf = new FEPressureSurface(&fem.m_mesh);
+	FEPressureSurface& ps = *fem.m_psurf;
+	ps.create(npr);
+
+	// read the pressure data
+	++tag;
+	int nf[4], N;
+	double s;
+	for (int i=0; i<npr; ++i)
+	{
+		FEPressureLoad& pc = ps.PressureLoad(i);
+		FESurfaceElement& el = fem.m_psurf->Element(i);
+		pc.blinear = blinear;
+		pc.effective = effective;
+
+		sz = tag.AttributeValue("lc", true);
+		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+
+		s  = atof(tag.AttributeValue("scale"));
+		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+
+		if (tag == "quad4") el.SetType(FE_QUAD);
+		else if (tag == "tri3") el.SetType(FE_TRI);
+		else throw XMLReader::InvalidTag(tag);
+
+		N = el.Nodes();
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+		// add this boundary condition to the current step
+		if (m_nsteps > 0)
+		{
+			m_pStep->AddBoundaryCondition(&pc);
+			pc.Deactivate();
+		}
+
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCTraction(XMLTag &tag)
+{
+	FEM& fem = *m_pfem;
+
+	const char* sz;
+
+	// count how many traction cards there are
+	int ntc = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { ntc++; ++t; }
+
+	// allocate traction data
+	fem.m_ptrac = new FEConstTractionSurface(&fem.m_mesh);
+	FEConstTractionSurface& pt = *fem.m_ptrac;
+	pt.create(ntc);
+
+	// read the traction data
+	++tag;
+	int nf[4], N;
+	vec3d s;
+	for (int i=0; i<ntc; ++i)
+	{
+		FETractionLoad& tc = pt.TractionLoad(i);
+		FESurfaceElement& el = fem.m_ptrac->Element(i);
+
+		sz = tag.AttributeValue("lc", true);
+		if (sz) tc.lc = atoi(sz); else tc.lc = 0;
+
+		s.x  = atof(tag.AttributeValue("tx"));
+		s.y  = atof(tag.AttributeValue("ty"));
+		s.z  = atof(tag.AttributeValue("tz"));
+
+		tc.s[0] = tc.s[1] = tc.s[2] = tc.s[3] = s;
+
+		if (tag == "quad4") el.SetType(FE_QUAD);
+		else if (tag == "tri3") el.SetType(FE_TRI);
+		else throw XMLReader::InvalidTag(tag);
+
+		N = el.Nodes();
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+		// add this boundary condition to the current step
+		if (m_nsteps > 0)
+		{
+			m_pStep->AddBoundaryCondition(&tc);
+			tc.Deactivate();
+		}
+
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCFluidFlux(XMLTag &tag)
+{
+	FEM& fem = *m_pfem;
+
+	const char* sz;
+	bool blinear = false;
+	sz = tag.AttributeValue("type", true);
+	if (sz)
+	{
+		if (strcmp(sz, "linear") == 0) blinear = true;
+		else if (strcmp(sz, "nonlinear") == 0) blinear = false;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+	}
+	
+	// count how many fluid flux cards there are
+	int nfr = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { nfr++; ++t; }
+	
+	// allocate fluid flux data
+	fem.m_fsurf = new FEFluxSurface(&fem.m_mesh);
+	FEFluxSurface& fs = *fem.m_fsurf;
+	fs.create(nfr);
+	
+	// read the fluid flux data
+	++tag;
+	int nf[4], N;
+	double s;
+	for (int i=0; i<nfr; ++i)
+	{
+		FEFluidFlux& fc = fs.FluidFlux(i);
+		FESurfaceElement& el = fem.m_fsurf->Element(i);
+		fc.blinear = blinear;
+		
+		sz = tag.AttributeValue("lc", true);
+		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
+		
+		s  = atof(tag.AttributeValue("scale"));
+		fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
+		
+		if (tag == "quad4") el.SetType(FE_QUAD);
+		else if (tag == "tri3") el.SetType(FE_TRI);
+		else throw XMLReader::InvalidTag(tag);
+		
+		N = el.Nodes();
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+		
+		// add this boundary condition to the current step
+		if (m_nsteps > 0)
+		{
+			m_pStep->AddBoundaryCondition(&fc);
+			fc.Deactivate();
+		}
+		
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCHeatFlux(XMLTag& tag)
+{
+	FEM& fem = *m_pfem;
+
+	// count how many heatflux cards there are
+	int npr = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { npr++; ++t; }
+
+	// allocate flux data
+	fem.m_phflux = new FEHeatFluxSurface(&fem.m_mesh);
+	FEHeatFluxSurface& ps = *fem.m_phflux;
+	ps.create(npr);
+
+	const char* sz;
+
+	// read the flux data
+	++tag;
+	int nf[4], N;
+	double s;
+	for (int i=0; i<npr; ++i)
+	{
+		FEHeatFlux& pc = ps.HeatFlux(i);
+		FESurfaceElement& el = fem.m_phflux->Element(i);
+
+		sz = tag.AttributeValue("lc", true);
+		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+
+		s  = atof(tag.AttributeValue("scale"));
+		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+
+		if (tag == "quad4") el.SetType(FE_QUAD);
+		else if (tag == "tri3") el.SetType(FE_TRI);
+		else throw XMLReader::InvalidTag(tag);
+
+		N = el.Nodes();
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+		// add this boundary condition to the current step
+		if (m_nsteps > 0)
+		{
+			m_pStep->AddBoundaryCondition(&pc);
+			pc.Deactivate();
+		}
+
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseSpringSection(XMLTag &tag)
+{
+	FEM& fem = *m_pfem;
+
+	FE_DISCRETE_ELEMENT de;
+	de.m_bto = false;
+
+	int n[2];
+
+	// read spring discrete elements
+	++tag;
+	do
+	{
+		if (tag == "node")
+		{
+			tag.value(n, 2);
+			de.n1 = n[0]-1;
+			de.n2 = n[1]-1;
+		}
+		else if (tag == "E") tag.value(de.E);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	fem.m_DE.push_back(de);
 }
 
 //-----------------------------------------------------------------------------
