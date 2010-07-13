@@ -10,14 +10,13 @@
 class FEPressureLoad : public FEBoundaryCondition
 {
 public:
-	FEPressureLoad() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; 
+	FEPressureLoad() { s[0] = s[1] = s[2] = s[3] = 1.0;
 						blinear = false; effective = false;}
 
 public:
 	double	s[4];		// nodal scale factors
 	int		face;		// face number
 	int		lc;			// load curve
-	int		bc;			// degree of freedom
 	bool	blinear;	// linear or not (true is non-follower, false is follower)
 	bool	effective;	// effective or total (for poroelastic problems)
 };

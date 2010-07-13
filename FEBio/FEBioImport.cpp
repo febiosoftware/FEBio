@@ -1688,14 +1688,6 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 				sz = tag.AttributeValue("lc", true);
 				if (sz) pc.lc = atoi(sz); else pc.lc = 0;
 
-				const char* sbc = tag.AttributeValue("bc", true);
-				if (sbc)
-				{
-					if (strcmp(sbc, "p") == 0) pc.bc = 0;
-					else if (strcmp(sbc, "t") == 0) pc.bc = 1;
-					else throw XMLReader::InvalidAttributeValue(tag, "bc", sbc);
-				}
-
 				s  = atof(tag.AttributeValue("scale"));
 				pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
 
@@ -1820,6 +1812,51 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 					fc.Deactivate();
 				}
 				
+				++tag;
+			}
+		}
+		else if (tag == "heatflux")
+		{
+			// count how many heatflux cards there are
+			int npr = 0;
+			XMLTag t(tag); ++t;
+			while (!t.isend()) { npr++; ++t; }
+
+			// allocate flux data
+			fem.m_phflux = new FEHeatFluxSurface(&fem.m_mesh);
+			FEHeatFluxSurface& ps = *fem.m_phflux;
+			ps.create(npr);
+
+			// read the flux data
+			++tag;
+			int nf[4], N;
+			double s;
+			for (int i=0; i<npr; ++i)
+			{
+				FEHeatFlux& pc = ps.HeatFlux(i);
+				FESurfaceElement& el = fem.m_phflux->Element(i);
+
+				sz = tag.AttributeValue("lc", true);
+				if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+
+				s  = atof(tag.AttributeValue("scale"));
+				pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+
+				if (tag == "quad4") el.SetType(FE_QUAD);
+				else if (tag == "tri3") el.SetType(FE_TRI);
+				else throw XMLReader::InvalidTag(tag);
+
+				N = el.Nodes();
+				tag.value(nf, N);
+				for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					m_pStep->AddBoundaryCondition(&pc);
+					pc.Deactivate();
+				}
+
 				++tag;
 			}
 		}

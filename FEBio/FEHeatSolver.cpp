@@ -127,77 +127,73 @@ void FEHeatSolver::Residual()
 	}
 
 	// add surface fluxes
-	if (m_fem.m_psurf)
+	if (m_fem.m_phflux)
 	{
-		int npr = m_fem.m_psurf->Elements();
-		for (i=0; i<npr; ++i)
+		int nfc = m_fem.m_phflux->Elements();
+		for (i=0; i<nfc; ++i)
 		{
-			FEPressureLoad& pc = m_fem.m_psurf->PressureLoad(i);
-			if (pc.bc == 1)
+			FEHeatFlux& hf = m_fem.m_phflux->HeatFlux(i);
+			FESurfaceElement& el = m_fem.m_phflux->Element(i);
+			m_fem.m_phflux->UnpackElement(el);
+
+			int ne = el.Nodes();
+			int ni = el.GaussPoints();
+
+			double g = m_fem.GetLoadCurve(hf.lc)->Value();
+
+			// calculate nodal fluxes
+			double qn[4];
+			for (j=0; j<el.Nodes(); ++j) qn[j] = g*hf.s[j];
+
+			vector<double> fe(ne);
+
+			// nodal coordinates
+			vec3d *rt = el.rt();
+
+			double* Gr, *Gs;
+			double* N;
+			double* w  = el.GaussWeights();
+
+			// pressure at integration points
+			double q;
+
+			vec3d dxr, dxs;
+
+			vector<int> lm(ne);
+			for (j=0; j<ne; ++j) lm[j] = (el.LM())[ne*10 + j];
+
+			// force vector
+			// repeat over integration points
+			fe.zero();
+			for (n=0; n<ni; ++n)
 			{
-				FESurfaceElement& el = m_fem.m_psurf->Element(i);
-				m_fem.m_psurf->UnpackElement(el);
+				N  = el.H(n);
+				Gr = el.Gr(n);
+				Gs = el.Gs(n);
 
-				int ne = el.Nodes();
-				int ni = el.GaussPoints();
-
-				double g = m_fem.GetLoadCurve(pc.lc)->Value();
-
-				// calculate nodal fluxes
-				double qn[4];
-				for (j=0; j<el.Nodes(); ++j) qn[j] = g*pc.s[j];
-
-				vector<double> fe(ne);
-
-				// nodal coordinates
-				vec3d *rt = el.rt();
-
-				double* Gr, *Gs;
-				double* N;
-				double* w  = el.GaussWeights();
-
-				// pressure at integration points
-				double q;
-
-				vec3d dxr, dxs;
-
-				vector<int> lm(ne);
-				for (j=0; j<ne; ++j) lm[j] = (el.LM())[ne*10 + j];
-
-				// force vector
-				// repeat over integration points
-				fe.zero();
-				for (n=0; n<ni; ++n)
+				q = 0;
+				dxr = dxs = vec3d(0,0,0);
+				for (j=0; j<ne; ++j) 
 				{
-					N  = el.H(n);
-					Gr = el.Gr(n);
-					Gs = el.Gs(n);
+					q += N[j]*qn[j];
+					dxr.x += Gr[j]*rt[j].x;
+					dxr.y += Gr[j]*rt[j].y;
+					dxr.z += Gr[j]*rt[j].z;
 
-					q = 0;
-					dxr = dxs = vec3d(0,0,0);
-					for (j=0; j<ne; ++j) 
-					{
-						q += N[j]*qn[j];
-
-						dxr.x += Gr[j]*rt[j].x;
-						dxr.y += Gr[j]*rt[j].y;
-						dxr.z += Gr[j]*rt[j].z;
-
-						dxs.x += Gs[j]*rt[j].x;
-						dxs.y += Gs[j]*rt[j].y;
-						dxs.z += Gs[j]*rt[j].z;
-					}
+					dxs.x += Gs[j]*rt[j].x;
+					dxs.y += Gs[j]*rt[j].y;
+					dxs.z += Gs[j]*rt[j].z;
+				}
 		
-					double J = (dxr ^ dxs).norm();
+				double J = (dxr ^ dxs).norm();
 
-					for (j=0; j<ne; ++j) fe[j] += N[j]*q*J*w[n];
-				}
+				for (j=0; j<ne; ++j) fe[j] += N[j]*q*J*w[n];
+			}
 
-				// add element force vector to global force vector
-				for (j=0; j<ne; ++j)
-				{
-					if (lm[j] >= 0) m_R[lm[j]] += fe[j];
-				}
+			// add element force vector to global force vector
+			for (j=0; j<ne; ++j)
+			{
+				if (lm[j] >= 0) m_R[lm[j]] += fe[j];
 			}
 		}
 	}

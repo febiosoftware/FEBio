@@ -29,6 +29,7 @@
 #include "Timer.h"
 #include "FEPressureSurface.h"
 #include "FEFluxSurface.h"
+#include "FEHeatFlux.h"
 #include "FEElasticMixture.h"
 
 #include <list>
@@ -478,6 +479,9 @@ public:
 
 		// fluid flux BC
 		FEFluxSurface*			m_fsurf;	//!< fluid flux surface domain
+
+		// heat flux BC
+		FEHeatFluxSurface*		m_phflux;	//!< heat flux surface domain
 
 		// rigid displacements
 		vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements

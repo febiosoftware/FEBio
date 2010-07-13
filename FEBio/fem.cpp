@@ -52,6 +52,7 @@ FEM::FEM()
 	m_psurf = 0;
 	m_ptrac = 0;
 	m_fsurf = 0;
+	m_phflux = 0;
 
 	// --- Material Data ---
 	// (nothing to initialize yet)

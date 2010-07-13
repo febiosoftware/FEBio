@@ -1542,6 +1542,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEHeatFlux.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEHeatSolver.cpp"
 				>
 			</File>
@@ -2253,6 +2257,10 @@
 			</File>
 			<File
 				RelativePath=".\FEFungOrthotropic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEHeatFlux.h"
 				>
 			</File>
 			<File

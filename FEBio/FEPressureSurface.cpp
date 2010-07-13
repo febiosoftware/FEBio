@@ -221,7 +221,6 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 			FEPressureLoad& pc = m_PC[i];
 			ar << pc.blinear << pc.effective << pc.face << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
-			ar << pc.bc;
 		}
 	}
 	else
@@ -246,7 +245,6 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 			FEPressureLoad& pc = m_PC[i];
 			ar >> pc.blinear >> pc. effective >> pc.face >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
-			ar >> pc.bc;
 		}
 
 		// initialize surface data
@@ -264,7 +262,7 @@ void FEPressureSurface::StiffnessMatrix(FESolidSolver* psolver)
 	for (int m=0; m<npr; ++m)
 	{
 		FEPressureLoad& pc = m_PC[m];
-		if ((pc.bc == 0) && pc.IsActive())
+		if (pc.IsActive())
 		{
 			// get the surface element
 			FESurfaceElement& el = m_el[m];
@@ -316,7 +314,7 @@ void FEPressureSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 	for (int i=0; i<npr; ++i)
 	{
 		FEPressureLoad& pc = m_PC[i];
-		if ((pc.bc == 0) && pc.IsActive())
+		if (pc.IsActive())
 		{
 			FESurfaceElement& el = m_el[i];
 			UnpackElement(el);
