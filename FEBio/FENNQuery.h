@@ -15,7 +15,7 @@
 class FESurface;
 
 //-----------------------------------------------------------------------------
-//! This class is a helper class to locate the neirest neighbour on a surface
+//! This class is a helper class to locate the nearest neighbour on a surface
 
 class FENNQuery  
 {
