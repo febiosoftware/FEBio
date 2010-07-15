@@ -261,7 +261,7 @@ void FEPressureSurface::StiffnessMatrix(FESolidSolver* psolver)
 
 				// calculate nodal normal tractions
 				int neln = el.Nodes();
-				double tn[neln];
+				vector<double> tn(neln);
 
 				if (!pc.blinear)
 				{
@@ -304,7 +304,7 @@ void FEPressureSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 
 			// calculate nodal normal tractions
 			int neln = el.Nodes();
-			double tn[neln];
+			vector<double> tn(neln);
 
 			double g = fem.GetLoadCurve(pc.lc)->Value();
 

@@ -1650,6 +1650,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPerfectOsmometer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPeriodicBoundary.cpp"
 				>
 			</File>
@@ -1667,6 +1671,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPoroHolmesMow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPoroTraction.cpp"
 				>
 			</File>
 			<File
@@ -2368,6 +2376,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPerfectOsmometer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPeriodicBoundary.h"
 				>
 			</File>
@@ -2385,6 +2397,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPoroHolmesMow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPoroTraction.h"
 				>
 			</File>
 			<File
