@@ -55,6 +55,7 @@ protected: // boundary section
 	void ParseBCForce    (XMLTag& tag);
 	void ParseBCPressure (XMLTag& tag);
 	void ParseBCTraction (XMLTag& tag);
+	void ParseBCPoroNormalTraction(XMLTag& tag);
 	void ParseBCFluidFlux(XMLTag& tag);
 	void ParseBCHeatFlux (XMLTag& tag);
 

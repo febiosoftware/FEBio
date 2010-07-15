@@ -50,6 +50,12 @@ bool FESolidSolver::StiffnessMatrix()
 		m_fem.m_psurf->StiffnessMatrix(this);
 	}
 
+	// calculate normal traction on porous surface stiffness term
+	if (m_fem.m_ptsurf && (m_fem.m_pStep->m_istiffpr != 0))
+	{
+		m_fem.m_ptsurf->StiffnessMatrix(this);
+	}
+	
 	// calculate fluid flux stiffness term
 	if (m_fem.m_fsurf)
 	{
@@ -563,6 +569,12 @@ bool FESolidSolver::Residual(vector<double>& R)
 		m_fem.m_ptrac->Residual(this, R);
 	}
 
+	// calculate forces due to normal traction on porous surface and add them to the residual
+	if (m_fem.m_ptsurf)
+	{
+		m_fem.m_ptsurf->Residual(this, R);
+	}
+	
 	// calculate forces due to fluid flux and add them to the residual
 	if (m_fem.m_fsurf)
 	{

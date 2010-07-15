@@ -1524,6 +1524,7 @@ bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
 		else if (tag == "force"    ) ParseBCForce    (tag);
 		else if (tag == "pressure" ) ParseBCPressure (tag);
 		else if (tag == "traction" ) ParseBCTraction (tag);
+		else if (tag == "poro_normal_traction" ) ParseBCPoroNormalTraction (tag);
 		else if (tag == "fluidflux") ParseBCFluidFlux(tag);
 		else if (tag == "heatflux" ) ParseBCHeatFlux (tag);
 		else if (tag == "contact") ParseContactSection(tag);
@@ -1676,7 +1677,6 @@ void FEFEBioImport::ParseBCPressure(XMLTag& tag)
 
 	const char* sz;
 	bool blinear = false;
-	bool effective = false;
 	sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
@@ -1685,14 +1685,6 @@ void FEFEBioImport::ParseBCPressure(XMLTag& tag)
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 
-	sz = tag.AttributeValue("traction", true);
-	if (sz)
-	{
-		if (strcmp(sz, "effective") == 0) effective = true;
-		else if (strcmp(sz, "total") == 0) effective = false;
-		else throw XMLReader::InvalidAttributeValue(tag, "traction", sz);
-	}
-	
 	// count how many pressure cards there are
 	int npr = 0;
 	XMLTag t(tag); ++t;
@@ -1712,7 +1704,6 @@ void FEFEBioImport::ParseBCPressure(XMLTag& tag)
 		FEPressureLoad& pc = ps.PressureLoad(i);
 		FESurfaceElement& el = fem.m_psurf->Element(i);
 		pc.blinear = blinear;
-		pc.effective = effective;
 
 		sz = tag.AttributeValue("lc", true);
 		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
@@ -1789,6 +1780,76 @@ void FEFEBioImport::ParseBCTraction(XMLTag &tag)
 			tc.Deactivate();
 		}
 
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseBCPoroNormalTraction(XMLTag& tag)
+{
+	FEM& fem = *m_pfem;
+	
+	const char* sz;
+	bool blinear = false;
+	bool effective = false;
+	sz = tag.AttributeValue("type", true);
+	if (sz)
+	{
+		if (strcmp(sz, "linear") == 0) blinear = true;
+		else if (strcmp(sz, "nonlinear") == 0) blinear = false;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+	}
+	
+	sz = tag.AttributeValue("traction", true);
+	if (sz)
+	{
+		if (strcmp(sz, "effective") == 0) effective = true;
+		else if (strcmp(sz, "total") == 0) effective = false;
+		else throw XMLReader::InvalidAttributeValue(tag, "traction", sz);
+	}
+	
+	// count how many normal traction cards there are
+	int npr = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { npr++; ++t; }
+	
+	// allocate normal traction data
+	fem.m_ptsurf = new FEPoroTractionSurface(&fem.m_mesh);
+	FEPoroTractionSurface& ps = *fem.m_ptsurf;
+	ps.create(npr);
+	
+	// read the normal traction data
+	++tag;
+	int nf[4], N;
+	double s;
+	for (int i=0; i<npr; ++i)
+	{
+		FEPoroNormalTraction& pc = ps.NormalTraction(i);
+		FESurfaceElement& el = fem.m_ptsurf->Element(i);
+		pc.blinear = blinear;
+		pc.effective = effective;
+		
+		sz = tag.AttributeValue("lc", true);
+		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+		
+		s  = atof(tag.AttributeValue("scale"));
+		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		
+		if (tag == "quad4") el.SetType(FE_QUAD);
+		else if (tag == "tri3") el.SetType(FE_TRI);
+		else throw XMLReader::InvalidTag(tag);
+		
+		N = el.Nodes();
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+		
+		// add this boundary condition to the current step
+		if (m_nsteps > 0)
+		{
+			m_pStep->AddBoundaryCondition(&pc);
+			pc.Deactivate();
+		}
+		
 		++tag;
 	}
 }

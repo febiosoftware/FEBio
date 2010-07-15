@@ -258,16 +258,16 @@ void FEFluxSurface::StiffnessMatrix(FESolidSolver* psolver)
 				UnpackElement(el);
 
 				// calculate nodal normal fluid flux
-				vector<double> wn(el.Nodes());
+				int neln = el.Nodes();
+				double wn[neln];
 
 				if (!fc.blinear)
 				{
 					double g = fem.GetLoadCurve(fc.lc)->Value();
 
-					for (int j=0; j<el.Nodes(); ++j) wn[j] = g*fc.s[j]*dt;
+					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j]*dt;
 
 					// get the element stiffness matrix
-					int neln = el.Nodes();
 					int ndof = neln*4;
 					ke.Create(ndof, ndof);
 
@@ -299,13 +299,14 @@ void FEFluxSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 			UnpackElement(el);
 
 			// calculate nodal normal fluid flux
-			vector<double> wn(el.Nodes());
+			int neln = el.Nodes();
+			double wn[neln];
 
 			double g = fem.GetLoadCurve(fc.lc)->Value();
 
-			for (int j=0; j<el.Nodes(); ++j) wn[j] = g*fc.s[j]*dt;
+			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j]*dt;
 
-			int ndof = 4*el.Nodes();
+			int ndof = 4*neln;
 			fe.resize(ndof);
 
 			if (fc.blinear) LinearFlowRate(el, fe, wn); else FlowRate(el, fe, wn);

@@ -28,6 +28,7 @@
 #include "FEAugLagLinearConstraint.h"
 #include "Timer.h"
 #include "FEPressureSurface.h"
+#include "FEPoroTraction.h"
 #include "FEFluxSurface.h"
 #include "FEHeatFlux.h"
 #include "FEElasticMixture.h"
@@ -477,6 +478,9 @@ public:
 		FEPressureSurface*		m_psurf;	//!< pressure surface domain
 		FEConstTractionSurface*	m_ptrac;	//!< constant traction surface
 
+		// normal traction on porous surface BC
+		FEPoroTractionSurface*	m_ptsurf;	//!< normal traction surface domain
+	
 		// fluid flux BC
 		FEFluxSurface*			m_fsurf;	//!< fluid flux surface domain
 

@@ -51,6 +51,7 @@ FEM::FEM()
 	//surface for the pressure boundary condition
 	m_psurf = 0;
 	m_ptrac = 0;
+	m_ptsurf = 0;
 	m_fsurf = 0;
 	m_phflux = 0;
 
@@ -443,6 +444,11 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 		for (i=0; i<m_ptrac->Elements(); ++i) if (m_ptrac->TractionLoad(i).GetID() == nid) return &m_ptrac->TractionLoad(i);
 	}
 
+	if (m_ptsurf)
+	{
+		for (i=0; i<m_ptsurf->Elements(); ++i) if (m_ptsurf->NormalTraction(i).GetID() == nid) return &m_ptsurf->NormalTraction(i);
+	}
+	
 	if (m_fsurf)
 	{
 		for (i=0; i<m_fsurf->Elements(); ++i) if (m_fsurf->FluidFlux(i).GetID() == nid) return &m_fsurf->FluidFlux(i);
