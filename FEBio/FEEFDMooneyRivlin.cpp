@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FERandomFiberMaterial.h"
+#include "FEEFDMooneyRivlin.h"
 
 // TODO: there is a possible bug in the fiber stress and or fiber stiffness
 
@@ -8,18 +8,18 @@
 #include "geodesic.h"
 
 // we store the cos and sin of the angles here
-int FERandomFiberMooneyRivlin::m_nres = 0;
-double FERandomFiberMooneyRivlin::m_cth[NSTH];
-double FERandomFiberMooneyRivlin::m_sth[NSTH];
-double FERandomFiberMooneyRivlin::m_cph[NSTH];
-double FERandomFiberMooneyRivlin::m_sph[NSTH];
-double FERandomFiberMooneyRivlin::m_w[NSTH];
+int FEEFDMooneyRivlin::m_nres = 0;
+double FEEFDMooneyRivlin::m_cth[NSTH];
+double FEEFDMooneyRivlin::m_sth[NSTH];
+double FEEFDMooneyRivlin::m_cph[NSTH];
+double FEEFDMooneyRivlin::m_sph[NSTH];
+double FEEFDMooneyRivlin::m_w[NSTH];
 
 // register the material with the framework
-REGISTER_MATERIAL(FERandomFiberMooneyRivlin, "random fiber Mooney-Rivlin");
+REGISTER_MATERIAL(FEEFDMooneyRivlin, "EFD Mooney-Rivlin");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERandomFiberMooneyRivlin, FEIncompressibleMaterial)
+BEGIN_PARAMETER_LIST(FEEFDMooneyRivlin, FEIncompressibleMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
@@ -33,10 +33,10 @@ END_PARAMETER_LIST();
 #endif
 
 //////////////////////////////////////////////////////////////////////
-// FERandomFiberMooneyRivlin
+// FEEFDMooneyRivlin
 //////////////////////////////////////////////////////////////////////
 
-FERandomFiberMooneyRivlin::FERandomFiberMooneyRivlin()
+FEEFDMooneyRivlin::FEEFDMooneyRivlin()
 {
 	static bool bfirst = true;
 
@@ -64,7 +64,7 @@ FERandomFiberMooneyRivlin::FERandomFiberMooneyRivlin()
 	m_ac = 0;
 }
 
-void FERandomFiberMooneyRivlin::Init()
+void FEEFDMooneyRivlin::Init()
 {
 	FEElasticMaterial::Init();
 
@@ -76,7 +76,7 @@ void FERandomFiberMooneyRivlin::Init()
 	if (m_beta[2] <= 2) throw MaterialError("beta1 must be bigger than 2.");
 }
 
-mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
+mat3ds FEEFDMooneyRivlin::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -178,7 +178,7 @@ mat3ds FERandomFiberMooneyRivlin::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-tens4ds FERandomFiberMooneyRivlin::Tangent(FEMaterialPoint& mp)
+tens4ds FEEFDMooneyRivlin::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 

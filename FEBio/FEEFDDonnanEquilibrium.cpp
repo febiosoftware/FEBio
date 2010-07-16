@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "FERandomFiberDonnanEquilibrium.h"
+#include "FEEFDDonnanEquilibrium.h"
 
 // register the material with the framework
-REGISTER_MATERIAL(FERandomFiberDonnanEquilibrium, "EFD Donnan equilibrium");
+REGISTER_MATERIAL(FEEFDDonnanEquilibrium, "EFD Donnan equilibrium");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERandomFiberDonnanEquilibrium, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FEEFDDonnanEquilibrium, FEElasticMaterial)
 	ADD_PARAMETER(m_DEQ.m_phiwr, FE_PARAM_DOUBLE, "phiw0");
 	ADD_PARAMETER(m_DEQ.m_cFr, FE_PARAM_DOUBLE, "cF0");
 	ADD_PARAMETER(m_DEQ.m_bosm, FE_PARAM_DOUBLE, "bosm");
@@ -16,15 +16,11 @@ BEGIN_PARAMETER_LIST(FERandomFiberDonnanEquilibrium, FEElasticMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-// FERandomFiberDonnanEquilibrium
+// FEEFDDonnanEquilibrium
 //-----------------------------------------------------------------------------
 
-FERandomFiberDonnanEquilibrium::FERandomFiberDonnanEquilibrium()
-{
-}
-
 //-----------------------------------------------------------------------------
-void FERandomFiberDonnanEquilibrium::Init()
+void FEEFDDonnanEquilibrium::Init()
 {
 	FEElasticMaterial::Init();
 	// Donnan equilibrium is stable when combined with fibers that can resist swelling
@@ -36,7 +32,7 @@ void FERandomFiberDonnanEquilibrium::Init()
 }
 
 //-----------------------------------------------------------------------------
-mat3ds FERandomFiberDonnanEquilibrium::Stress(FEMaterialPoint& mp)
+mat3ds FEEFDDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 {
 	// --- M A T R I X   C O N T R I B U T I O N ---
 	mat3ds s = m_DEQ.Stress(mp);
@@ -50,7 +46,7 @@ mat3ds FERandomFiberDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-tens4ds FERandomFiberDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
+tens4ds FEEFDDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 {
 	// --- M A T R I X   C O N T R I B U T I O N ---
 	tens4ds c = m_DEQ.Tangent(mp);
@@ -64,7 +60,7 @@ tens4ds FERandomFiberDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
-double FERandomFiberDonnanEquilibrium::BulkModulus()
+double FEEFDDonnanEquilibrium::BulkModulus()
 {
 	// Evaluate bulk modulus in reference configuration
 	// Only the matrix contributes to the bulk modulus

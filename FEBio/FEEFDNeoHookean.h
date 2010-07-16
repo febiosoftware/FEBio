@@ -3,10 +3,10 @@
 #include "FENeoHookean.h"
 #include "FEEllipsoidalFiberDistribution.h"
 
-class FERandomFiberNeoHookean :	public FEElasticMaterial
+class FEEFDNeoHookean :	public FEElasticMaterial
 {
 public:
-	FERandomFiberNeoHookean() {}
+	FEEFDNeoHookean() {}
 
 public:
 	double	m_E;	//!< Young's modulus
@@ -33,7 +33,7 @@ public:
 	FENeoHookean					m_NH;
 
 	// declare as registered
-	DECLARE_REGISTERED(FERandomFiberNeoHookean);
+	DECLARE_REGISTERED(FEEFDNeoHookean);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

@@ -1,35 +1,35 @@
 #include "stdafx.h"
-#include "FERandomFiberNeoHookean.h"
+#include "FEEFDVerondaWestmann.h"
 
 // register the material with the framework
-REGISTER_MATERIAL(FERandomFiberNeoHookean, "random fiber neo-Hookean");
+REGISTER_MATERIAL(FEEFDVerondaWestmann, "EFD Veronda-Westmann");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERandomFiberNeoHookean, FEElasticMaterial)
-	ADD_PARAMETER(m_NH.m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_NH.m_v, FE_PARAM_DOUBLE, "v");
+BEGIN_PARAMETER_LIST(FEEFDVerondaWestmann, FEIncompressibleMaterial)
+	ADD_PARAMETER(m_VW.m_c1, FE_PARAM_DOUBLE, "c1");
+	ADD_PARAMETER(m_VW.m_c2, FE_PARAM_DOUBLE, "c2");
 	ADD_PARAMETERV(m_EFD.m_beta, FE_PARAM_DOUBLEV, 3, "beta");
 	ADD_PARAMETERV(m_EFD.m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////
-// FERandomFiberNeoHookean
+// FEEFDVerondaWestmann
 //////////////////////////////////////////////////////////////////////
 
-void FERandomFiberNeoHookean::Init()
+void FEEFDVerondaWestmann::Init()
 {
-	FEElasticMaterial::Init();
-
-	m_NH.Init();
+	FEIncompressibleMaterial::Init();
+	
+	m_VW.Init();
 	// ellipsoidal fiber distribution is stable when combined with a ground matrix
 	m_EFD.m_unstable = false;
 	m_EFD.Init();
 }
 
-mat3ds FERandomFiberNeoHookean::Stress(FEMaterialPoint& mp)
+mat3ds FEEFDVerondaWestmann::Stress(FEMaterialPoint& mp)
 {
 	// --- M A T R I X   C O N T R I B U T I O N ---
-	mat3ds s = m_NH.Stress(mp);
+	mat3ds s = m_VW.Stress(mp);
 	
 	// --- F I B E R   C O N T R I B U T I O N ---
 	
@@ -39,10 +39,10 @@ mat3ds FERandomFiberNeoHookean::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-tens4ds FERandomFiberNeoHookean::Tangent(FEMaterialPoint& mp)
+tens4ds FEEFDVerondaWestmann::Tangent(FEMaterialPoint& mp)
 {
 	// --- M A T R I X   C O N T R I B U T I O N ---
-	tens4ds c = m_NH.Tangent(mp);
+	tens4ds c = m_VW.Tangent(mp);
 	
 	// --- F I B E R   C O N T R I B U T I O N ---
 	
@@ -52,8 +52,8 @@ tens4ds FERandomFiberNeoHookean::Tangent(FEMaterialPoint& mp)
 	return c;
 }
 
-double FERandomFiberNeoHookean::BulkModulus()
+double FEEFDVerondaWestmann::BulkModulus()
 {
 	// Evaluate bulk modulus in reference configuration
-	return m_NH.BulkModulus() + m_EFD.BulkModulus();
+	return m_VW.BulkModulus() + m_EFD.BulkModulus();
 }

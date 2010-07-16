@@ -1494,6 +1494,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEEFDDonnanEquilibrium.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEFDMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEFDNeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEFDVerondaWestmann.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElasticMixture.cpp"
 				>
 			</File>
@@ -1687,22 +1703,6 @@
 			</File>
 			<File
 				RelativePath=".\FEPrintMatrixDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberDonnanEquilibrium.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -2224,6 +2224,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEEFDDonnanEquilibrium.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEFDMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEFDNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEEFDVerondaWestmann.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEElasticMixture.h"
 				>
 			</File>
@@ -2413,22 +2429,6 @@
 			</File>
 			<File
 				RelativePath=".\FEPrintMatrixDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberDonnanEquilibrium.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FERandomFiberVerondaWestmann.h"
 				>
 			</File>
 			<File
