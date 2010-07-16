@@ -70,15 +70,4 @@ public:
 	vec3d	m_a, m_d;
 };
 
-//-----------------------------------------------------------------------------
-
-class FERandom2DMap : public FECoordSysMap
-{
-public:
-	FERandom2DMap(){}
-
-	mat3d LocalElementCoord(FEElement& el, int n);
-};
-
-
 #endif // !defined(AFX_FECOORDSYSMAP_H__5BEAB9FF_6AAE_4CCE_876C_2A2866A8165C__INCLUDED_)

@@ -45,8 +45,7 @@ enum FE_Fiber_Type {
 	FE_FIBER_LOCAL		= 0,
 	FE_FIBER_SPHERICAL	= 1,
 	FE_FIBER_VECTOR		= 2,
-	FE_FIBER_RANDOM2D	= 3,
-	FE_FIBER_USER		= 4
+	FE_FIBER_USER		= 3
 };
 
 /////////////////////////////////////////////////////////////////////////////

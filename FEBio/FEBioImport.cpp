@@ -558,11 +558,6 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 
 							pmap->SetVectors(a, d);
 						}
-						else if (strcmp(szt, "random2d") == 0)
-						{
-							FERandom2DMap* pmap = new FERandom2DMap();
-							pm->m_pmap = pmap;
-						}
 						else if (strcmp(szt, "user") == 0)
 						{
 							// fibers are read in in the ElementData section
