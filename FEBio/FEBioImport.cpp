@@ -119,7 +119,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		const char* sza = e.szatt;
 		const char* szv = e.szval;
 		int l = e.tag.m_nstart_line;
-		log.printf("FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
+		log.printf("FATAL ERROR: invalid value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
 		return false;
 	}
 	catch (XMLReader::InvalidValue e)
@@ -3019,6 +3019,8 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 			assert(szm);
 
 			int nmat = atoi(szm);
+			if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+
 			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
 			if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
