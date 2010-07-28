@@ -716,6 +716,56 @@ void LSDYNAPlotFile::write_contact_tractions()
 			}
 		}
 
+		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		if (pf)
+		{
+			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
+			int ni, ne;
+
+			for (n=0; n<pf->m_npass; ++n)
+			{
+				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
+
+				int nint = 0;
+				for (j=0; j<s.Elements(); ++j)
+				{
+					FESurfaceElement& el = s.Element(j);
+					ne = el.Nodes();
+					ni = el.GaussPoints();
+					for (k=0; k<ni; ++k, ++nint)
+					{
+						li[k] = s.m_Lm[nint];
+						gi[k] = s.m_gap[nint];
+						ti[k] = li[k] + pf->m_epsn*gi[k];
+
+						gi[k] = (gi[k]>=0?gi[k] : 0);
+						ti[k] = (ti[k]>=0?ti[k] : 0);
+					}
+
+					el.project_to_nodes(li, ln);
+					el.project_to_nodes(gi, gn);
+					el.project_to_nodes(ti, tn);
+
+					for (k=0; k<ne; ++k)
+					{
+						int m = el.m_node[k];
+						acc[m][0] += (float) (ln[k]>=0?ln[k]:0);
+						acc[m][1] += (float) (gn[k]>=0?gn[k]:0);
+						acc[m][2] += (float) (tn[k]>=0?tn[k]:0);
+						val[m]++;
+					}
+				}
+			}
+
+			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
+			{ 
+				acc[j][0] /= (float) val[j]; 
+				acc[j][1] /= (float) val[j]; 
+				acc[j][2] /= (float) val[j]; 
+			}
+		}
+
 		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
 		if (ps2)
 		{
