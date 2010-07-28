@@ -296,6 +296,7 @@ double FESurface::FaceArea(FESurfaceElement& el)
 	UnpackElement(el);
 
 	// get the number of nodes
+	int nint = el.GaussPoints();
 	int neln = el.Nodes();
 
 	// get the initial nodes
@@ -313,7 +314,7 @@ double FESurface::FaceArea(FESurfaceElement& el)
 
 	int n, k;
 
-	for (n=0; n<neln; ++n)
+	for (n=0; n<nint; ++n)
 	{
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
