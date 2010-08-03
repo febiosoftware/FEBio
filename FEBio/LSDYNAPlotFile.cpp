@@ -15,10 +15,13 @@ LSDYNAPlotFile::LSDYNAPlotFile()
 	m_nfield[2] = -1;	// acceleration
 	m_nfield[3] = -1;	// temperature
 	m_nfield[4] = -1;	// plastic strain
+
+	m_fp = 0;
 }
 
 LSDYNAPlotFile::~LSDYNAPlotFile()
 {
+	if (m_fp) fclose(m_fp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,7 +35,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	int i, j, N, nd;
 
 	// open the archive
-	if (m_ar.Create(szfile) == false) return false;
+	if ((m_fp = fopen(szfile, "wb")) == 0) return false;
 
 	m_pfem = &fem;
 
@@ -107,7 +110,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	// store the header
 	m_ph = plh;
 
-	m_ar.write(&plh, sizeof(PLOTHEADER), 1);
+	fwrite(&plh, sizeof(PLOTHEADER), 1, m_fp);
 
 	// write the material coordinates
 	float xf[3];
@@ -119,7 +122,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 		xf[1] = (float) node.m_r0.y;
 		xf[2] = (float) node.m_r0.z;
 
-		m_ar.write(xf, sizeof(float), 3);
+		fwrite(xf, sizeof(float), 3, m_fp);
 	}
 
 	// write the connectivity and material number
@@ -177,7 +180,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 
 				n[8] = el.GetMatID()+1;
 
-				m_ar.write(n, sizeof(int), 9);
+				fwrite(n, sizeof(int), 9, m_fp);
 			}
 		}
 	}
@@ -199,7 +202,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 				n[4] = 0;
 				n[5] = el.GetMatID()+1;
 
-				m_ar.write(n, sizeof(int), 6);
+				fwrite(n, sizeof(int), 6, m_fp);
 			}
 		}
 	}
@@ -235,7 +238,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 		
 				n[4] = el.GetMatID()+1;
 		
-				m_ar.write(n, sizeof(int), 5);
+				fwrite(n, sizeof(int), 5, m_fp);
 			}
 		}
 	}
@@ -258,26 +261,27 @@ bool LSDYNAPlotFile::Append(FEM& fem, const char* szfile)
 	PLOTHEADER plh = {0};
 
 	// open the file
-	m_ar.Open(szfile);
-
+	if ((m_fp = fopen(szfile, "rb")) == 0) return false;
+	
 	// read the plot file header
-	m_ar.read(&plh, sizeof(PLOTHEADER), 1);
+	fread(&plh, sizeof(PLOTHEADER), 1, m_fp);
 
 	if (plh.nv2d == 32) m_bsstrn = false;
 	else if (plh.nv2d == 44) m_bsstrn = true;
 	else
 	{
-		m_ar.Close();
+		fclose(m_fp); m_fp = 0;
 		return false;
 	}
 
 	// close the file
-	m_ar.Close();
+	fclose(m_fp);
 
 	m_pfem = &fem;
 
 	// reopen the plot file for appending
-	return (m_ar.Append(szfile));
+	m_fp = fopen(szfile, "a+b");
+	return (m_fp != 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -289,14 +293,14 @@ bool LSDYNAPlotFile::Append(FEM& fem, const char* szfile)
 bool LSDYNAPlotFile::Write(FEM& fem)
 {
 	// make sure the archive is opened
-	if (!m_ar.IsValid()) return false;
+	if (m_fp == 0) return false;
 
 	// Ok, let's proceed
 	int i, j;
 
 	// write the time value
 	float time = (float) fem.m_ftime;
-	m_ar << time;
+	fwrite(&time, sizeof(float) ,1, m_fp);
 
 	FEMesh& mesh = fem.m_mesh;
 
@@ -410,7 +414,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 					}
 				}
 
-				m_ar.write(s, sizeof(float), 7);
+				fwrite(s, sizeof(float), 7, m_fp);
 			}
 		}
 	}
@@ -433,7 +437,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 				double V = el.Volume0();
 				s[0] = (float) (pt.m_tau*V/l);	// axial force
 
-				m_ar.write(s, sizeof(float), 6);
+				fwrite(s, sizeof(float), 6, m_fp);
 			}
 		}
 	}
@@ -524,13 +528,13 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 				} // if (!el.isrigid())
 
 				// save data to file
-				m_ar.write(s, sizeof(float), (m_bsstrn?44:32));
+				fwrite(s, sizeof(float), (m_bsstrn?44:32), m_fp);
 			}
 		}
 	}
 
 	// now flush the archive to make sure we don't loose any results
-	m_ar.Flush();
+	fflush(m_fp);
 
 	return true;
 }
@@ -551,7 +555,7 @@ void LSDYNAPlotFile::write_velocities()
 		vf[1] = (float) node.m_vt.y;
 		vf[2] = (float) node.m_vt.z;
 
-		m_ar.write(vf, sizeof(float), 3);
+		fwrite(vf, sizeof(float), 3, m_fp);
 	}
 }
 
@@ -569,7 +573,7 @@ void LSDYNAPlotFile::write_accelerations()
 		af[1] = (float) node.m_at.y;
 		af[2] = (float) node.m_at.z;
 
-		m_ar.write(af, sizeof(float), 3);
+		fwrite(af, sizeof(float), 3, m_fp);
 	}
 }
 
@@ -627,7 +631,7 @@ void LSDYNAPlotFile::write_fluid_flux()
 		af[1] = (float) wn[i].y;
 		af[2] = (float) wn[i].z;
 
-		m_ar.write(af, sizeof(float), 3);
+		fwrite(af, sizeof(float), 3, m_fp);
 	}
 }
 
@@ -817,7 +821,7 @@ void LSDYNAPlotFile::write_contact_tractions()
 		}
 	}
 
-	m_ar.write(acc, sizeof(float)*3, fem.m_mesh.Nodes() );
+	fwrite(acc, sizeof(float)*3, fem.m_mesh.Nodes(), m_fp);
 }
 
 //-----------------------------------------------------------------------------
@@ -829,7 +833,7 @@ void LSDYNAPlotFile::write_fluid_pressures()
 	{
 		FENode& node = fem.m_mesh.Node(i);
 		t = (float) node.m_pt;
-		m_ar << t;
+		fwrite(&t, sizeof(float),1, m_fp);
 	}
 }
 
@@ -842,7 +846,7 @@ void LSDYNAPlotFile::write_temperatures()
 	{
 		FENode& node = fem.m_mesh.Node(i);
 		t = (float) node.m_T;
-		m_ar << t;
+		fwrite(&t, sizeof(float), 1, m_fp);
 	}
 }
 
@@ -901,7 +905,7 @@ void LSDYNAPlotFile::write_heat_flux()
 		af[1] = (float) qn[i].y;
 		af[2] = (float) qn[i].z;
 
-		m_ar.write(af, sizeof(float), 3);
+		fwrite(af, sizeof(float), 3, m_fp);
 	}
 }
 
@@ -1020,10 +1024,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 		}
 	}
 
-	for (i=0; i<fem.m_mesh.Nodes(); ++i)
-	{
-		m_ar << t[i];
-	}
+	fwrite(t, sizeof(float), fem.m_mesh.Nodes(), m_fp);
 }
 
 void LSDYNAPlotFile::write_contact_gaps()
@@ -1140,10 +1141,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 		}
 	}
 
-	for (i=0; i<fem.m_mesh.Nodes(); ++i)
-	{
-		m_ar << t[i];
-	}
+	fwrite(t, sizeof(float), fem.m_mesh.Nodes(), m_fp);
 }
 
 void LSDYNAPlotFile::write_reaction_forces()
@@ -1165,7 +1163,7 @@ void LSDYNAPlotFile::write_reaction_forces()
 		R[i][2] = (float) (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
 	}
 
-	m_ar.write(R, sizeof(float)*3, N );
+	fwrite(R, sizeof(float)*3, N, m_fp);
 }
 
 void LSDYNAPlotFile::write_material_fibers()
@@ -1233,7 +1231,7 @@ void LSDYNAPlotFile::write_material_fibers()
 		vf[1] = (float) v[i].y;
 		vf[2] = (float) v[i].z;
 
-		m_ar.write(vf, sizeof(float)*3, 1);
+		fwrite(vf, sizeof(float)*3, 1, m_fp);
 	}
 }
 
@@ -1300,6 +1298,6 @@ void LSDYNAPlotFile::write_displacements()
 		xf[1] = (float) node.m_rt.y;
 		xf[2] = (float) node.m_rt.z;
 
-		m_ar.write(xf, sizeof(float), 3);
+		fwrite(xf, sizeof(float), 3, m_fp);
 	}
 }

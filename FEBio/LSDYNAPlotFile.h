@@ -89,4 +89,5 @@ public:
 
 protected:
 	PLOTHEADER	m_ph;	//!< The plot file header
+	FILE*		m_fp;	//!< the file pointer
 };
