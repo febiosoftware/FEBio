@@ -5,7 +5,7 @@
 #include "FEFacet2FacetSliding.h"
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeDisplacement::Save(FEM& fem, Archive& ar)
+void FEPlotNodeDisplacement::Save(FEM& fem, FILE* fp)
 {
 	float xf[3];
 	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
@@ -18,12 +18,12 @@ void FEPlotNodeDisplacement::Save(FEM& fem, Archive& ar)
 		xf[1] = (float) (node.m_rt.y - node.m_r0.y);
 		xf[2] = (float) (node.m_rt.z - node.m_r0.z);
 
-		ar.write(xf, sizeof(float), 3);
+		fwrite(xf, sizeof(float), 3, fp);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeVelocity::Save(FEM& fem, Archive& ar)
+void FEPlotNodeVelocity::Save(FEM& fem, FILE* fp)
 {
 	float xf[3];
 	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
@@ -36,12 +36,12 @@ void FEPlotNodeVelocity::Save(FEM& fem, Archive& ar)
 		xf[1] = (float) node.m_vt.y;
 		xf[2] = (float) node.m_vt.z;
 
-		ar.write(xf, sizeof(float), 3);
+		fwrite(xf, sizeof(float), 3, fp);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeAcceleration::Save(FEM& fem, Archive& ar)
+void FEPlotNodeAcceleration::Save(FEM& fem, FILE* fp)
 {
 	float xf[3];
 	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
@@ -54,12 +54,12 @@ void FEPlotNodeAcceleration::Save(FEM& fem, Archive& ar)
 		xf[1] = (float) node.m_at.y;
 		xf[2] = (float) node.m_at.z;
 
-		ar.write(xf, sizeof(float), 3);
+		fwrite(xf, sizeof(float), 3, fp);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotElementStress::Save(FEM& fem, Archive& ar)
+void FEPlotElementStress::Save(FEM& fem, FILE* fp)
 {
 	int i, j;
 
@@ -103,14 +103,14 @@ void FEPlotElementStress::Save(FEM& fem, Archive& ar)
 					}
 				}
 
-				ar.write(s, sizeof(float), 6);
+				fwrite(s, sizeof(float), 6, fp);
 			}
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotContactGap::Save(FEM &fem, Archive &ar)
+void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 {
 	FEMesh& mesh = fem.m_mesh;
 
@@ -223,11 +223,12 @@ void FEPlotContactGap::Save(FEM &fem, Archive &ar)
 
 	// store the data to file
 	// Note that we only save gap values of nodes that are actually in contact
-	for (i=0; i<mesh.Nodes(); ++i) ar << (t[i]<0? 0.f : t[i]);
+	for (i=0; i<mesh.Nodes(); ++i) t[i] = (t[i]<0? 0.f : t[i]);
+	fwrite(t, sizeof(float), mesh.Nodes(), fp);
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotContactTraction::Save(FEM &fem, Archive &ar)
+void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 {
 	int i, j, k, n;
 
@@ -359,23 +360,23 @@ void FEPlotContactTraction::Save(FEM &fem, Archive &ar)
 		}
 	}
 
-	ar.write(acc, sizeof(float)*3, fem.m_mesh.Nodes() );
+	fwrite(acc, sizeof(float)*3, fem.m_mesh.Nodes(), fp);
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotFluidPressure::Save(FEM &fem, Archive &ar)
+void FEPlotFluidPressure::Save(FEM &fem, FILE* fp)
 {
 	float t;
 	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
 	{
 		FENode& node = fem.m_mesh.Node(i);
 		t = (float) node.m_pt;
-		ar << t;
+		fwrite(&t, sizeof(float), 1, fp);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotFluidFlux::Save(FEM &fem, Archive &ar)
+void FEPlotFluidFlux::Save(FEM &fem, FILE* fp)
 {
 	FEMesh& mesh = fem.m_mesh;
 
@@ -408,14 +409,14 @@ void FEPlotFluidFlux::Save(FEM &fem, Archive &ar)
 				af[1] = (float) ew.y;
 				af[2] = (float) ew.z;
 
-				ar.write(af, sizeof(float), 3);
+				fwrite(af, sizeof(float), 3, fp);
 			}
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotFiberVector::Save(FEM &fem, Archive &ar)
+void FEPlotFiberVector::Save(FEM &fem, FILE* fp)
 {
 	int i, j, n;
 	FEMesh& mesh = fem.m_mesh;
@@ -447,7 +448,7 @@ void FEPlotFiberVector::Save(FEM &fem, Archive &ar)
 				a[0] = (float) r.x;
 				a[1] = (float) r.y;
 				a[2] = (float) r.z;
-				ar.write(a, sizeof(float), 3);
+				fwrite(a, sizeof(float), 3, fp);
 			}
 		}
 	}

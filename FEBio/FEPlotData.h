@@ -10,7 +10,7 @@ class FEM;
 class FEPlotData
 {
 public:
-	virtual void Save(FEM& fem, Archive& ar) = 0;
+	virtual void Save(FEM& fem, FILE* fp) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -19,7 +19,7 @@ public:
 class FEPlotNodeDisplacement : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ public:
 class FEPlotNodeVelocity : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ public:
 class FEPlotNodeAcceleration : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ public:
 class FEPlotElementStress : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ public:
 class FEPlotContactGap : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
@@ -64,26 +64,26 @@ public:
 class FEPlotContactTraction : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
 class FEPlotFluidPressure : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
 class FEPlotFluidFlux : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };
 
 //-----------------------------------------------------------------------------
 class FEPlotFiberVector : public FEPlotData
 {
 public:
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEM& fem, FILE* fp);
 };

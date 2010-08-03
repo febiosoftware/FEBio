@@ -56,7 +56,7 @@ protected:
 		void AddBeamVariable  (FEPlotData* ps, unsigned int ntype, const char* szname);
 
 	protected:
-		void Save(Archive& ar);
+		void Save(FILE* fp);
 		
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;
@@ -84,4 +84,5 @@ public:
 protected:
 	HEADER		m_hdr;	// plot file header
 	Dictionary	m_dic;	// dictionary
+	FILE*		m_fp;
 };

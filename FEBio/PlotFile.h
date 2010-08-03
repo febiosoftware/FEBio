@@ -9,7 +9,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "Archive.h"
 #include "FEMesh.h"
 #include "FEPlotData.h"
 
@@ -63,7 +62,6 @@ public:
 	virtual bool Write(FEM& fem) = 0;
 
 protected:
-	Archive	m_ar;		//!< the actual data archive
 	FEM*	m_pfem;		//!< pointer to FE model
 };
 

@@ -59,7 +59,7 @@ void FEBioPlotFile::Dictionary::AddBeamVariable(FEPlotData* ps, unsigned int nty
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::Save(Archive &ar)
+void FEBioPlotFile::Dictionary::Save(FILE* fp)
 {
 	// store global variables
 	if (m_Glob.size() > 0)
@@ -67,8 +67,8 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 		list<DICTIONARY_ITEM>::iterator pi = m_Glob.begin();
 		for (int i=0; i<(int) m_Glob.size(); ++i, ++pi)
 		{
-			ar << pi->m_ntype;
-			ar.write(pi->m_szname, sizeof(char), DI_NAME_SIZE);
+			fwrite(&pi->m_ntype, sizeof(pi->m_ntype), 1, fp);
+			fwrite(pi->m_szname, sizeof(char), DI_NAME_SIZE, fp);
 		}
 	}
 
@@ -78,8 +78,8 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 		list<DICTIONARY_ITEM>::iterator pi = m_Node.begin();
 		for (int i=0; i<(int) m_Node.size(); ++i, ++pi)
 		{
-			ar << pi->m_ntype;
-			ar.write(pi->m_szname, sizeof(char), DI_NAME_SIZE);
+			fwrite(&pi->m_ntype, sizeof(pi->m_ntype), 1, fp);
+			fwrite(pi->m_szname, sizeof(char), DI_NAME_SIZE, fp);
 		}
 	}
 
@@ -89,8 +89,8 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 		list<DICTIONARY_ITEM>::iterator pi = m_Elem.begin();
 		for (int i=0; i<(int) m_Elem.size(); ++i, ++pi)
 		{
-			ar << pi->m_ntype;
-			ar.write(pi->m_szname, sizeof(char), DI_NAME_SIZE);
+			fwrite(&pi->m_ntype, sizeof(pi->m_ntype), 1, fp);
+			fwrite(pi->m_szname, sizeof(char), DI_NAME_SIZE, fp);
 		}
 	}
 
@@ -100,8 +100,8 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 		list<DICTIONARY_ITEM>::iterator pi = m_Shell.begin();
 		for (int i=0; i<(int) m_Shell.size(); ++i, ++pi)
 		{
-			ar << pi->m_ntype;
-			ar.write(pi->m_szname, sizeof(char), DI_NAME_SIZE);
+			fwrite(&pi->m_ntype, sizeof(pi->m_ntype), 1, fp);
+			fwrite(pi->m_szname, sizeof(char), DI_NAME_SIZE, fp);
 		}
 	}
 
@@ -111,8 +111,8 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 		list<DICTIONARY_ITEM>::iterator pi = m_Beam.begin();
 		for (int i=0; i<(int) m_Beam.size(); ++i, ++pi)
 		{
-			ar << pi->m_ntype;
-			ar.write(pi->m_szname, sizeof(char), DI_NAME_SIZE);
+			fwrite(&pi->m_ntype, sizeof(pi->m_ntype), 1, fp);
+			fwrite(pi->m_szname, sizeof(char), DI_NAME_SIZE, fp);
 		}
 	}
 }
@@ -122,10 +122,13 @@ void FEBioPlotFile::Dictionary::Save(Archive &ar)
 
 FEBioPlotFile::FEBioPlotFile(void)
 {
+	m_fp = 0;
 }
 
 FEBioPlotFile::~FEBioPlotFile(void)
 {
+	if (m_fp) fclose(m_fp);
+
 	int i;
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Glob.begin();
 	for (i=0; i<(int) m_dic.m_Glob.size(); ++i, ++it) delete it->m_psave;
@@ -204,17 +207,17 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	m_hdr.nv1d = m_dic.m_Beam.size();
 
 	// open the archive
-	if (m_ar.Create(szfile) == false) return false;
+	if ((m_fp = fopen(szfile, "wb")) == 0) return false;
 
 	// write the tag
 	unsigned int tag = FEBIO_TAG;
-	m_ar << tag;
+	fwrite(&tag, sizeof(tag), 1, m_fp);
 
 	// --- save the header file ---
-	m_ar.write(&m_hdr, sizeof(HEADER), 1);
+	fwrite(&m_hdr, sizeof(HEADER), 1, m_fp);
 
 	// --- save the dictionary ---
-	m_dic.Save(m_ar);
+	m_dic.Save(m_fp);
 
 	// --- save the geometry ---
 	
@@ -228,7 +231,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 		xf[1] = (float) node.m_r0.y;
 		xf[2] = (float) node.m_r0.z;
 
-		m_ar.write(xf, sizeof(float), 3);
+		fwrite(xf, sizeof(float), 3, m_fp);
 	}
 
 	// write the connectivity and material number
@@ -283,7 +286,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 					break;
 				}
 
-				m_ar.write(n, sizeof(int), 9);
+				fwrite(n, sizeof(int), 9, m_fp);
 			}
 		}
 	}
@@ -320,7 +323,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 					break;
 				}
 
-				m_ar.write(n, sizeof(int), 5);
+				fwrite(n, sizeof(int), 5, m_fp);
 			}
 		}
 	}
@@ -339,7 +342,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 				n[1] = el.m_node[0]+1;
 				n[2] = el.m_node[1]+1;
 
-				m_ar.write(n, sizeof(int), 3);
+				fwrite(n, sizeof(int), 3, m_fp);
 			}
 		}
 	}
@@ -357,7 +360,7 @@ bool FEBioPlotFile::Append(FEM &fem, const char *szfile)
 bool FEBioPlotFile::Write(FEM &fem)
 {
 	// make sure the archive is opened
-	if (!m_ar.IsValid()) return false;
+	if (m_fp == 0) return false;
 
 	// store the fem pointer
 	m_pfem = &fem;
@@ -367,7 +370,7 @@ bool FEBioPlotFile::Write(FEM &fem)
 
 	// save the time stamp
 	float time = (float) fem.m_ftime;
-	m_ar << time;
+	fwrite(&time, sizeof(float), 1, m_fp);
 
 	// save the global variables
 	if (m_dic.m_Glob.size() > 0)
@@ -379,7 +382,7 @@ bool FEBioPlotFile::Write(FEM &fem)
 	{
 		list<DICTIONARY_ITEM>::iterator it = m_dic.m_Node.begin();
 		for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it)
-			if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+			if (it->m_psave) (it->m_psave)->Save(fem, m_fp);
 	}
 
 	// save the solid variables
@@ -387,7 +390,7 @@ bool FEBioPlotFile::Write(FEM &fem)
 	{
 		list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
 		for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
-			if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+			if (it->m_psave) (it->m_psave)->Save(fem, m_fp);
 	}
 
 	// save the shell variables
