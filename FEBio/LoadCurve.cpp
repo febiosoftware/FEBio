@@ -280,9 +280,13 @@ bool FELoadCurve::HasPoint(double t)
 
 void FELoadCurve::Serialize(Archive &ar)
 {
+	int j, n;
 	if (ar.IsSaving())
 	{
-		int n = Points();
+		n = (int) m_fnc; ar << n;
+		n = (int) m_ext; ar << n;
+		ar << m_value;
+		n = Points();
 		ar << n;
 		for (int j=0; j<n; ++j)
 		{
@@ -292,7 +296,9 @@ void FELoadCurve::Serialize(Archive &ar)
 	}
 	else
 	{
-		int j, n;
+		ar >> n; m_fnc = (INTFUNC) n;
+		ar >> n; m_ext = (EXTMODE) n;
+		ar >> m_value;
 		ar >> n;
 		Create(n);
 		for (j=0; j<n; ++j)

@@ -16,14 +16,36 @@
 
 bool FEM::Restart(const char* szfile)
 {
-	// Open the restart file
-	FERestartImport file;
-	if (file.Load(*this, szfile) == false)
+	// check the extension of the file
+	// if the extension is .dmp or not given it is assumed the file
+	// is a bindary archive (dump file). Otherwise it is assumed the
+	// file is a restart input file.
+	const char* ch = strrchr(szfile, '.');
+	if ((ch == 0) || (strcmp(ch, ".dmp") == 0) || (strcmp(ch, ".DMP") == 0))
 	{
-		char szerr[256];
-		file.GetErrorMessage(szerr);
-		fprintf(stderr, "%s", szerr);
-		return false;
+		// the file is binary so just read the dump file and return
+
+		// open the archive
+		Archive ar;
+		if (ar.Open(szfile) == false) { fprintf(stderr, "FATAL ERROR: failed opening restart archive\n"); return false; }
+
+		// read the archive
+		if (Serialize(ar) == false) { fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); return false; }
+
+		// we're done
+		return true;
+	}
+	else
+	{
+		// the file is assumed to be a xml-text input file
+		FERestartImport file;
+		if (file.Load(*this, szfile) == false)
+		{
+			char szerr[256];
+			file.GetErrorMessage(szerr);
+			fprintf(stderr, "%s", szerr);
+			return false;
+		}
 	}
 
 	// get the logfile
