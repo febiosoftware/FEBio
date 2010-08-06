@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "FELevelStructure.h"
-#include "queue.h"
 #include <stdlib.h>
+#include <queue>
 #include <stack>
 using namespace std;
 
@@ -63,15 +63,15 @@ void FELevelStructure::Create(FENodeNodeList& L, int nroot)
 	// first serve way. The root node is placed in level 0
 	// and then all nodes adjacent to processed nodes are
 	// placed in the next level.
-	queue<int> NQ(N);
+	queue<int> NQ;
 	int node = nroot;
-	NQ.Push(node);
+	NQ.push(node);
 	m_node[nroot] = 0;
 	int level;
-	while (NQ.Size() > 0)
+	while (NQ.size() > 0)
 	{
 		// get a node from the queue
-		NQ.Pop(node);
+		node = NQ.front(); NQ.pop();
 
 		// get the next level index
 		level = m_node[node] + 1;
@@ -91,7 +91,7 @@ void FELevelStructure::Create(FENodeNodeList& L, int nroot)
 				m_node[m] = level;
 
 				// push the node on the queue
-				NQ.Push(m);
+				NQ.push(m);
 			}
 		}
 	}
@@ -210,15 +210,15 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 	// the index of the component
 	// the nodes in the "0" component are the ones
 	// that are marked as "removed" from the graph
-	vector<int> comp(N); 
-	comp.set(-1);
+	std::vector<int> comp; 
+	comp.assign(N, -1);
 
 	// fill the level pair array G will store for each
 	// node the index of the level that it has in L1 and
 	// the reversed index of level L2.
 	// Note that l1 < 0 for nodes that are not part of L1
 	// and similar for l2.
-	vector<int[2]>	G(N);
+	::vector<int[2]>	G(N);
 	for (i=0; i<N; ++i)
 	{
 		l1 = L1.m_node[i];
@@ -298,9 +298,9 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 	{
 		// the vectors ni, hi and li will help us determine where to place
 		// a node of a component
-		vector<int> ni(k);
-		vector<int> hi(k);
-		vector<int> li(k);
+		std::vector<int> ni(k);
+		std::vector<int> hi(k);
+		std::vector<int> li(k);
 
 		// Next, we have to create the components explicitly. The Comp arrays
 		// will store for each component a list of nodes that belongs to this
@@ -311,8 +311,8 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 
 		// count the elements of the components
 		// and determing the maximum component size
-		vector<int> cc(nc);
-		cc.zero();
+		std::vector<int> cc;
+		cc.assign(nc, 0);
 		int ncmax = 0;
 		for (i=0; i<N; ++i) 
 		{
@@ -325,7 +325,7 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 		}
 
 		// create the component arrays
-		vector< vector<int> > Comp(nc);
+		std::vector< std::vector<int> > Comp(nc);
 		for (i=0; i<nc; ++i) 
 		{
 			Comp[i].resize(cc[i]);
@@ -374,15 +374,12 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 			// ni[i] = number of nodes in level i
 			// li[i] = ni + nodes that would be put in level i based on G[node][0]
 			// hi[i] = ni + nodes that would be put in level i based on G[node][1]
-			ni.zero();
-			hi.zero();
-			li.zero();
 			for (j=0; j<k; ++j)
 			{
 				li[j] = hi[j] = ni[j] = m_lval[j];
 			}
 
-			int* pn = (int*) Comp[ncomp];
+			std::vector<int>& pn = Comp[ncomp];
 			for (j=0; j<cc[ncomp]; ++j)
 			{
 				m = pn[j];
@@ -409,7 +406,7 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 			//   with smallest width
 			if ((h0 < l0) || ((h0 == l0) && (w1 <= w2)))
 			{
-				int* pn = (int*) Comp[ncomp];
+				std::vector<int>& pn = Comp[ncomp];
 				for (j=0; j<cc[ncomp]; ++j)
 				{
 					m = pn[j];
@@ -420,7 +417,7 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 			}
 			else if ((l0 < h0) || ((h0 == l0) && (w1 > w2)))
 			{
-				int* pn = (int*) Comp[ncomp];
+				std::vector<int>& pn = Comp[ncomp];
 				for (j=0; j<cc[ncomp]; ++j)
 				{
 					m = pn[j];

@@ -1914,10 +1914,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\queue.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\restart.cpp"
 				>
 			</File>
@@ -2597,10 +2593,6 @@
 			</File>
 			<File
 				RelativePath=".\quatd.h"
-				>
-			</File>
-			<File
-				RelativePath=".\queue.h"
 				>
 			</File>
 			<File

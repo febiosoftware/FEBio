@@ -201,7 +201,7 @@ template <class T> vector<T>::vector(const vector<T>& a)
 }
 
 // assignment operator
-template <class T> vector<T>& vector<T>::operator = (const vector<T>& a)
+template <class T> ::vector<T>& ::vector<T>::operator = (const ::vector<T>& a)
 {
 	// allocate storage
 	resize(a.m_nsize);

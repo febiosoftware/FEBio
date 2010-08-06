@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FENodeReorder.h"
-#include "queue.h"
 #include <stack>
 using namespace std;
 
