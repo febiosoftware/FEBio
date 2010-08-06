@@ -19,7 +19,6 @@
 #include "FETiedInterface.h"
 #include "FEMaterial.h"
 #include "FERigidBody.h"
-#include "stack.h"
 #include "version.h"
 #include "FESolver.h"
 #include "DataStore.h"
@@ -33,6 +32,7 @@
 #include "FEHeatFlux.h"
 #include "FEElasticMixture.h"
 
+#include <stack>
 #include <list>
 using namespace std;
 
@@ -347,16 +347,16 @@ public:
 	//! Set the sparse matrix symmetry flag
 	void SetSymmetryFlag(bool bsymm) { m_bsymm = bsymm; }
 
-protected:
-	// copy constructor and assignment operator are protected since they
-	// are reserved for a special purpose and cannot be used in a way
-	// that the user may think.
-	
+public:
 	//! copy constructor
-	FEM(FEM& fem);
+	FEM(const FEM& fem);
 
 	//! assignment operator
-	void operator = (FEM& fem);
+	void operator = (const FEM& fem);
+
+protected:
+	void ShallowCopy(FEM& fem);
+
 
 protected:
 	void SerializeMaterials   (Archive& ar);

@@ -2608,10 +2608,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stack.h"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>

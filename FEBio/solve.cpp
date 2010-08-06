@@ -2,7 +2,6 @@
 #include <math.h>
 #include "Timer.h"
 #include "PlotFile.h"
-#include "stack.h"
 #include "fem.h"
 #include "console.h"
 #include "log.h"

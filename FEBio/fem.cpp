@@ -108,13 +108,48 @@ FEM::~FEM()
 // The copy constructor and assignment operator are used for push/pop'ing.
 // Note that not all data is copied. We only copy the data that is relevant
 // for push/pop'ing
-//
-// TODO: apparently, the copy constructor never gets called. Maybe we should
-// make it private.
 
-FEM::FEM(FEM& fem)
+FEM::FEM(const FEM& fem)
 {
-	assert(false);
+	m_ftime = 0;
+
+	// --- Geometry Data ---
+	m_nreq = 0;
+	m_nrb = 0;
+	m_nrm = 0;
+	m_nrj = 0;
+
+	m_bcontact = false;		// assume no contact
+
+	m_bsymm = true;	// assume symmetric stiffness matrix
+
+	//surface for the pressure boundary condition
+	m_psurf = 0;
+	m_ptrac = 0;
+	m_ptsurf = 0;
+	m_fsurf = 0;
+	m_phflux = 0;
+
+	// --- Material Data ---
+	// (nothing to initialize yet)
+
+	// --- Load Curve Data ---
+	// (nothing to initialize yet)
+
+	// --- Direct Solver Data ---
+	// set the skyline solver as default
+	m_nsolver = SKYLINE_SOLVER;
+
+	// However, if available use the PSLDLT solver instead
+#ifdef PSLDLT
+	m_nsolver = PSLDLT_SOLVER;
+#endif
+
+	m_neq = 0;
+	m_npeq = 0;
+	m_bwopt = 0;
+
+	ShallowCopy(const_cast<FEM&>(fem));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -125,7 +160,12 @@ FEM::FEM(FEM& fem)
 // for push/pop'ing
 //
 
-void FEM::operator =(FEM& fem)
+void FEM::operator =(const FEM& fem)
+{
+	ShallowCopy(const_cast<FEM&>(fem));
+}
+
+void FEM::ShallowCopy(FEM& fem)
 {
 	int i;
 

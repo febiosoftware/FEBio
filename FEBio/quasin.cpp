@@ -2,7 +2,6 @@
 #include <math.h>
 #include "FESolver.h"
 #include "FERigid.h"
-#include "stack.h"
 #include "FESolidSolver.h"
 #include "log.h"
 

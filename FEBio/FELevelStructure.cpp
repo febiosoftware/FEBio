@@ -5,8 +5,9 @@
 #include "stdafx.h"
 #include "FELevelStructure.h"
 #include "queue.h"
-#include "stack.h"
 #include <stdlib.h>
+#include <stack>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 
@@ -249,7 +250,7 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 	// which are assigned to component 0 are considered as removed
 	// from the graph
 	int nc = 1;
-	stack<int> NS(N);
+	stack<int> NS;
 	do
 	{
 		// find a node that has not been assigned to a component
@@ -268,18 +269,19 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 		if (node == -1) break;
 
 		// assign the node and all adjacent nodes to a component
-		NS.Push(node);
+		NS.push(node);
 		comp[node] = nc;
-		while (!NS.IsEmpty())
+		while (!NS.empty())
 		{
-			NS.Pop(node);
+			node = NS.top(); NS.pop();
+
 			int n = NL.Valence(node);
 			int* pn = NL.NodeList(node);
 			for (i=0; i<n; ++i)
 				if (comp[pn[i]] == -1) 
 				{
 					comp[pn[i]] = nc;
-					NS.Push(pn[i]);
+					NS.push(pn[i]);
 				}
 		}
 

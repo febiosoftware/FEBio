@@ -329,7 +329,7 @@ bool FEAnalysis::Solve()
 		pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title);
 
 	// keep a stack for push/pop'ing
-	stack<FEM> state(1);
+	stack<FEM> state;
 
 	// print initial progress bar
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
@@ -360,8 +360,8 @@ bool FEAnalysis::Solve()
 		// we need to retry this time step
 		if (m_bautostep) 
 		{
-			state.Clear();
-			state.Push(m_fem);
+			while (!state.empty()) state.pop();
+			state.push(m_fem);
 		}
 
 		// update time
@@ -504,7 +504,7 @@ bool FEAnalysis::Solve()
 			if (m_bautostep && (m_nretries < m_maxretries))
 			{
 				// restore the previous state
-				state.Pop(m_fem);
+				m_fem = state.top(); state.pop();
 				
 				// let's try again
 				Retry();

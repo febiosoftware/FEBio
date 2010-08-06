@@ -4,8 +4,9 @@
 
 #include "stdafx.h"
 #include "FENodeReorder.h"
-#include "stack.h"
 #include "queue.h"
+#include <stack>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 
@@ -172,7 +173,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 
 		// the following stack and vectors will assist us in
 		// renumbering the nodes.
-		stack<int> NQ(lmax);
+		stack<int> NQ;
 		vector<int> Vi(0, lmax);
 		vector<int> Vip1(0, lmax);
 

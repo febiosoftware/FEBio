@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FERigid.h"
-#include "stack.h"
 #include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
