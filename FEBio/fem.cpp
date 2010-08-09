@@ -470,9 +470,9 @@ bool FEM::Configure(const char *szfile)
 FEBoundaryCondition* FEM::FindBC(int nid)
 {
 	int i;
-	for (i=0; i<m_DC.size(); ++i) if (m_DC[i].GetID() == nid) return &m_DC[i];
+	for (i=0; i<(int) m_DC.size(); ++i) if (m_DC[i].GetID() == nid) return &m_DC[i];
 
-	for (i=0; i<m_FC.size(); ++i) if (m_FC[i].GetID() == nid) return &m_FC[i];
+	for (i=0; i<(int) m_FC.size(); ++i) if (m_FC[i].GetID() == nid) return &m_FC[i];
 
 	if (m_psurf)
 	{
@@ -494,9 +494,9 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 		for (i=0; i<m_fsurf->Elements(); ++i) if (m_fsurf->FluidFlux(i).GetID() == nid) return &m_fsurf->FluidFlux(i);
 	}
 	
-	for (i=0; i<m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];
+	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];
 
-	for (i=0; i<m_RFC.size(); ++i) if (m_RFC[i]->GetID() == nid) return m_RFC[i];
+	for (i=0; i<(int) m_RFC.size(); ++i) if (m_RFC[i]->GetID() == nid) return m_RFC[i];
 
 	return 0;
 }

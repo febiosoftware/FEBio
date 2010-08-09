@@ -371,7 +371,7 @@ void FEM::SerializeGeometry(Archive &ar)
 
 		// discrete elements
 		ar << m_DE.size();
-		for (i=0; i<m_DE.size(); ++i)
+		for (i=0; i<(int) m_DE.size(); ++i)
 		{
 			FE_DISCRETE_ELEMENT& de = m_DE[i];
 			ar << de.n1 << de.n2;
@@ -414,7 +414,7 @@ void FEM::SerializeGeometry(Archive &ar)
 		// discrete elements
 		int nde;
 		ar >> nde;
-		if (nde > 0) m_DE.setsize(nde);
+		if (nde > 0) m_DE.resize(nde);
 		for (i=0; i<nde; ++i)
 		{
 			FE_DISCRETE_ELEMENT& de = m_DE[i];
@@ -485,7 +485,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 	{
 		// displacements
 		ar << m_DC.size();
-		for (i=0; i<m_DC.size(); ++i) 
+		for (i=0; i<(int) m_DC.size(); ++i) 
 		{
 			FENodalDisplacement& dc = m_DC[i];
 			ar << dc.bc << dc.lc << dc.node << dc.s;
@@ -493,7 +493,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// nodal loads
 		ar << m_FC.size();
-		for (i=0; i<m_FC.size(); ++i)
+		for (i=0; i<(int) m_FC.size(); ++i)
 		{
 			FENodalForce& fc = m_FC[i];
 			ar << fc.bc << fc.lc << fc.node << fc.s;
@@ -502,7 +502,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// rigid body displacements
 		ar << m_RDC.size();
-		for (i=0; i<m_RDC.size(); ++i)
+		for (i=0; i<(int) m_RDC.size(); ++i)
 		{
 			FERigidBodyDisplacement& dc = *m_RDC[i];
 			ar << dc.bc << dc.id << dc.lc << dc.sf;
@@ -510,7 +510,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// rigid body forces
 		ar << m_RFC.size();
-		for (i=0; i<m_RFC.size(); ++i)
+		for (i=0; i<(int) m_RFC.size(); ++i)
 		{
 			FERigidBodyForce& fc = *m_RFC[i];
 			ar << fc.bc << fc.id << fc.lc << fc.sf;
@@ -518,7 +518,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// rigid nodes
 		ar << m_RN.size();
-		for (i=0; i<m_RN.size(); ++i)
+		for (i=0; i<(int) m_RN.size(); ++i)
 		{
 			FERigidNode& rn = m_RN[i];
 			ar << rn.nid << rn.rid;

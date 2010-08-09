@@ -40,7 +40,7 @@ void FELoadCurve::Add(double time, double value)
 	LOADPOINT p = {time, value};
 
 	// insert loadpoint
-	m_lp.insert(p, n);
+	m_lp.insert(m_lp.begin() + n, p);
 }
 
 //-----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ inline double qerp(double t, double t0, double f0, double t1, double f1, double 
 
 double FELoadCurve::Value(double time)
 {
-	LOADPOINT* lp = m_lp;
+	LOADPOINT* lp = &m_lp[0];
 
 	int nsize = Points();
 	if (nsize == 0) return 0;
@@ -188,7 +188,7 @@ double FELoadCurve::Value(double time)
 //!
 double FELoadCurve::ExtendValue(double t)
 {
-	LOADPOINT* lp = m_lp;
+	LOADPOINT* lp = &m_lp[0];
 
 	int nsize =Points();
 	int N = nsize - 1;

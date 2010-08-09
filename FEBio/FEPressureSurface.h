@@ -59,13 +59,13 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void PressureStiffness(FESurfaceElement& el, matrix& ke, double* tn);
+	void PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
 
 	//! Calculates external pressure forces
-	bool PressureForce(FESurfaceElement& el, vector<double>& fe, double* tn);
+	bool PressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 	//! Calculates the linear external pressure forces (ie. non-follower forces)
-	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe, double* tn);
+	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 protected:
 	// pressure boundary data

@@ -2,6 +2,7 @@
 
 #include "FEContactInterface.h"
 #include "FESurface.h"
+#include "vec2d.h"
 
 //-----------------------------------------------------------------------------
 class FESurfaceConstraintSurface : public FESurface
@@ -29,7 +30,7 @@ public:
 public:
 	vector<vec3d>				m_gap;	//!< gap function at nodes
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-	vector<double[2]>			m_rs;	//!< natural coordinates of slave projection on master element
+	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
 	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
 
 	int		m_nref;	//!< reference node

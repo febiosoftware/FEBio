@@ -324,7 +324,7 @@ bool FEM::InitRigidBodies()
 	}
 
 	// assign correct rigid body ID's to rigid nodes
-	for (i=0; i<m_RN.size(); ++i)
+	for (i=0; i<(int) m_RN.size(); ++i)
 	{
 		FERigidNode& rn = m_RN[i];
 		rn.rid = mrb[rn.rid];
@@ -372,13 +372,13 @@ bool FEM::InitRigidBodies()
 
 	// the rigid body constraints are still associated with the rigid materials
 	// so we now associate them with the rigid bodies
-	for (i=0; i<m_RDC.size(); ++i)
+	for (i=0; i<(int) m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_RDC[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(DC.id-1));
 		DC.id = pm->m_nRB;
 	}
-	for (i=0; i<m_RFC.size(); ++i)
+	for (i=0; i<(int) m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *m_RFC[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(FC.id-1));
@@ -386,7 +386,7 @@ bool FEM::InitRigidBodies()
 	}
 
 	// set the rigid body parents
-	for (i=0; i<m_RB.size(); ++i)
+	for (i=0; i<(int) m_RB.size(); ++i)
 	{
 		FERigidBody& rb = m_RB[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(&m_MAT[rb.m_mat]);

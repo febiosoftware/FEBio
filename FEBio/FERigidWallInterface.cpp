@@ -91,7 +91,7 @@ void FERigidWallSurface::Init()
 	// note that we force rigid shells to have zero thickness
 	FEMesh& m = *m_pMesh;
 	vector<double> tag(m.Nodes());
-	tag.zero();
+	zero(tag);
 	for (int nd=0; nd<m.Domains(); ++nd)
 	{
 		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));

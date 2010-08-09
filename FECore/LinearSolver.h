@@ -1,8 +1,9 @@
 #pragma once
 
 #include "SparseMatrix.h"
-#include "vector.h"
 #include "matrix.h"
+#include <vector>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 // matrix types

@@ -167,7 +167,7 @@ void FEElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement& elem,
 
 	// average global derivatives
 	vector<double> gradN(3*neln);
-	gradN.zero();
+	zero(gradN);
 
 	// initial element volume
 	double Ve = 0;
@@ -678,7 +678,7 @@ void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	double* pt = el.pt();
 
 	int N = el.Nodes();
-	int* lm = el.LM();
+	vector<int>& lm = el.LM();
 
 	for (i=0; i<N; ++i)
 	{

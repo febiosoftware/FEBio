@@ -641,8 +641,7 @@ void LSDYNAPlotFile::write_contact_tractions()
 
 	int i, j, k, n;
 
-	vector<float[3]> acc(fem.m_mesh.Nodes());
-	for (i=0; i<fem.m_mesh.Nodes(); ++i) acc[i][0] = acc[i][1] = acc[i][2] = 0;
+	vector<float> acc(3*fem.m_mesh.Nodes()); zero(acc);
 	for (i=0; i<fem.m_CI.size(); ++i)
 	{
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (&fem.m_CI[i]);
@@ -657,9 +656,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 					int m = ss.node[j];
 					vec3d t = ss.traction(j);
 
-					acc[m][0] += (float) t.x;
-					acc[m][1] += (float) t.y;
-					acc[m][2] += (float) t.z;
+					acc[3*m  ] += (float) t.x;
+					acc[3*m+1] += (float) t.y;
+					acc[3*m+2] += (float) t.z;
 						
 //					acc[m][0] = (float) ss.Lt[j][0];
 //					acc[m][1] = (float) ss.Lt[j][1];
@@ -678,9 +677,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 				vec3d t = ss.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
 				int m = ss.node[j];
 
-				acc[m][0] += (float) t.x;
-				acc[m][1] += (float) t.y;
-				acc[m][2] += (float) t.z;
+				acc[3*m  ] += (float) t.x;
+				acc[3*m+1] += (float) t.y;
+				acc[3*m+2] += (float) t.z;
 			}
 
 			for (j=0; j<ms.Nodes(); ++j)
@@ -688,9 +687,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 				vec3d t = ms.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
 				int m = ms.node[j];
 
-				acc[m][0] += (float) t.x;
-				acc[m][1] += (float) t.y;
-				acc[m][2] += (float) t.z;
+				acc[3*m  ] += (float) t.x;
+				acc[3*m+1] += (float) t.y;
+				acc[3*m+2] += (float) t.z;
 			}
 		}
 
@@ -704,9 +703,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 				vec3d t = ss.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
 				int m = ss.node[j];
 
-				acc[m][0] += (float) t.x;
-				acc[m][1] += (float) t.y;
-				acc[m][2] += (float) t.z;
+				acc[3*m  ] += (float) t.x;
+				acc[3*m+1] += (float) t.y;
+				acc[3*m+2] += (float) t.z;
 			}
 
 			for (j=0; j<ms.Nodes(); ++j)
@@ -714,16 +713,16 @@ void LSDYNAPlotFile::write_contact_tractions()
 				vec3d t = ms.m_Lm[j];// + ss.m_gap[j]*pbi->m_eps;
 				int m = ms.node[j];
 
-				acc[m][0] += (float) t.x;
-				acc[m][1] += (float) t.y;
-				acc[m][2] += (float) t.z;
+				acc[3*m  ] += (float) t.x;
+				acc[3*m+1] += (float) t.y;
+				acc[3*m+2] += (float) t.z;
 			}
 		}
 
 		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
 		if (pf)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
 			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
 			int ni, ne;
 
@@ -754,9 +753,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 					for (k=0; k<ne; ++k)
 					{
 						int m = el.m_node[k];
-						acc[m][0] += (float) (ln[k]>=0?ln[k]:0);
-						acc[m][1] += (float) (gn[k]>=0?gn[k]:0);
-						acc[m][2] += (float) (tn[k]>=0?tn[k]:0);
+						acc[3*m  ] += (float) (ln[k]>=0?ln[k]:0);
+						acc[3*m+1] += (float) (gn[k]>=0?gn[k]:0);
+						acc[3*m+2] += (float) (tn[k]>=0?tn[k]:0);
 						val[m]++;
 					}
 				}
@@ -764,16 +763,16 @@ void LSDYNAPlotFile::write_contact_tractions()
 
 			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
 			{ 
-				acc[j][0] /= (float) val[j]; 
-				acc[j][1] /= (float) val[j]; 
-				acc[j][2] /= (float) val[j]; 
+				acc[3*j  ] /= (float) val[j]; 
+				acc[3*j+1] /= (float) val[j]; 
+				acc[3*j+2] /= (float) val[j]; 
 			}
 		}
 
 		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
 		if (ps2)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
 			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
 			int ni, ne;
 
@@ -804,9 +803,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 					for (k=0; k<ne; ++k)
 					{
 						int m = el.m_node[k];
-						acc[m][0] += (float) (ln[k]>=0?ln[k]:0);
-						acc[m][1] += (float) (gn[k]>=0?gn[k]:0);
-						acc[m][2] += (float) (tn[k]>=0?tn[k]:0);
+						acc[3*m  ] += (float) (ln[k]>=0?ln[k]:0);
+						acc[3*m+1] += (float) (gn[k]>=0?gn[k]:0);
+						acc[3*m+2] += (float) (tn[k]>=0?tn[k]:0);
 						val[m]++;
 					}
 				}
@@ -814,14 +813,14 @@ void LSDYNAPlotFile::write_contact_tractions()
 
 			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
 			{ 
-				acc[j][0] /= (float) val[j]; 
-				acc[j][1] /= (float) val[j]; 
-				acc[j][2] /= (float) val[j]; 
+				acc[3*j  ] /= (float) val[j]; 
+				acc[3*j+1] /= (float) val[j]; 
+				acc[3*j+2] /= (float) val[j]; 
 			}
 		}
 	}
 
-	fwrite(acc, sizeof(float)*3, fem.m_mesh.Nodes(), m_fp);
+	fwrite(&acc[0], sizeof(float)*3, fem.m_mesh.Nodes(), m_fp);
 }
 
 //-----------------------------------------------------------------------------
@@ -916,8 +915,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
-	vector<float> t(mesh.Nodes());
-	t.zero();
+	vector<float> t; t.assign(mesh.Nodes(), 0);
 
 	int i, j;
 
@@ -988,7 +986,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 		FEFacet2FacetSliding* pfs = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
 		if (pfs)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
 			double Li[4], Ln[4];
 			int ni, ne, n, k;
 
@@ -1024,7 +1022,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 		}
 	}
 
-	fwrite(t, sizeof(float), fem.m_mesh.Nodes(), m_fp);
+	fwrite(&t[0], sizeof(float), fem.m_mesh.Nodes(), m_fp);
 }
 
 void LSDYNAPlotFile::write_contact_gaps()
@@ -1032,8 +1030,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
-	vector<float> t(mesh.Nodes());
-	t.zero();
+	vector<float> t; t.assign(mesh.Nodes(), 0);
 
 	int i, j;
 
@@ -1069,7 +1066,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
 		if (pf)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
 			double gi[4], gn[4];
 			int ni, ne, n, k;
 
@@ -1107,7 +1104,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
 		if (ps2)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
 			double gi[4], gn[4];
 			int ni, ne, n, k;
 
@@ -1141,7 +1138,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 		}
 	}
 
-	fwrite(t, sizeof(float), fem.m_mesh.Nodes(), m_fp);
+	fwrite(&t[0], sizeof(float), fem.m_mesh.Nodes(), m_fp);
 }
 
 void LSDYNAPlotFile::write_reaction_forces()
@@ -1152,18 +1149,18 @@ void LSDYNAPlotFile::write_reaction_forces()
 	vector<double>& Fr = solver.m_Fr;
 
 	int N = mesh.Nodes(), i;
-	vector<float[3]> R(N);
+	vector<float> R(3*N);
 
 	for (i=0; i<N; ++i)
 	{
 		FENode& node = mesh.Node(i);
 		int* id = node.m_ID;
-		R[i][0] = (float) (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0);
-		R[i][1] = (float) (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
-		R[i][2] = (float) (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
+		R[3*i  ] = (float) (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0);
+		R[3*i+1] = (float) (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);
+		R[3*i+2] = (float) (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);
 	}
 
-	fwrite(R, sizeof(float)*3, N, m_fp);
+	fwrite(&R[0], sizeof(float)*3, N, m_fp);
 }
 
 void LSDYNAPlotFile::write_material_fibers()

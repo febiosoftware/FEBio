@@ -44,8 +44,6 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 	m_bDump = false;
 	m_nplot = FE_PLOT_MAJOR_ITRS;
 	m_nprint = FE_PRINT_MINOR_ITRS;
-
-	m_BC.setgrowsize(1024);
 }
 
 //-----------------------------------------------------------------------------
@@ -58,7 +56,7 @@ FEAnalysis::~FEAnalysis(void)
 void FEAnalysis::Finish()
 {
 	// deactivate the boundary conditions
-	for (int i=0; i<m_BC.size(); ++i) m_BC[i]->Deactivate();
+	for (size_t i=0; i<m_BC.size(); ++i) m_BC[i]->Deactivate();
 
 	// clean up solver data (i.e. destroy linear solver)
 	m_psolver->Clean();
@@ -92,10 +90,10 @@ bool FEAnalysis::Init()
 	m_fem.m_LC[m_nmplc].SetInterpolation(FELoadCurve::STEP);
 
 	// activate the boundary conditions
-	for (i=0; i<m_BC.size(); ++i) m_BC[i]->Activate();
+	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
 
 	// clear the active rigid body BC's
-	for (i=0; i<m_fem.m_RB.size(); ++i)
+	for (i=0; i<(int) m_fem.m_RB.size(); ++i)
 	{
 		FERigidBody& RB = m_fem.m_RB[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
@@ -110,7 +108,7 @@ bool FEAnalysis::Init()
 	}
 
 	// set the active rigid bodies BC's
-	for (i=0; i<m_fem.m_RDC.size(); ++i)
+	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
 		FERigidBody& RB = m_fem.m_RB[DC.id];
@@ -134,7 +132,7 @@ bool FEAnalysis::Init()
 	// set the rigid nodes
 	// Note that also the rotational degrees of freedom are fixed
 	// for rigid nodes that do not belong to a non-rigid shell element.
-	for (i=0; i<m_fem.m_RN.size(); ++i)
+	for (i=0; i<(int) m_fem.m_RN.size(); ++i)
 	{
 		FERigidNode& rn = m_fem.m_RN[i];
 		if (rn.IsActive())
@@ -162,7 +160,7 @@ bool FEAnalysis::Init()
 
 	// override prescribed displacements for rigid nodes
 	bool bdisp = false;
-	for (i=0; i<m_fem.m_DC.size(); ++i)
+	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
 		FENodalDisplacement& dc = m_fem.m_DC[i];
 
@@ -190,7 +188,7 @@ bool FEAnalysis::Init()
 	// Sometimes an (ignorant) user might have added a rigid body
 	// that is not being used. Since this can cause problems we need
 	// to find these rigid bodies.
-	vector<int> mec(m_fem.m_nrb); mec.zero();
+	vector<int> mec; mec.assign(m_fem.m_nrb, 0);
 	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
 	{
 		FENode& node = m_fem.m_mesh.Node(i);

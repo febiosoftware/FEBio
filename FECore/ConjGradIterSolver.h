@@ -1,6 +1,8 @@
 #pragma once
 
 #include "LinearSolver.h"
+#include <vector>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 //! this class implements an iterative solver that implements the

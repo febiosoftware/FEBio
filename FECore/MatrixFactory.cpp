@@ -110,7 +110,7 @@ bool MatrixFactory::CreateSkyline(SkylineMatrix* pA, vector< vector<int> >& LM, 
 	// repeat for all elements
 	for (i=0; i<M; ++i)
 	{
-		lm = LM[i];
+		lm = &(LM[i])[0];
 		N = LM[i].size();
 
 		for (j=0; j<N; ++j)
@@ -401,7 +401,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 
 	for (i=0; i<M; ++i)
 	{
-		pn = LM[i];
+		pn = &(LM[i])[0];
 		N = LM[i].size();
 		Ntot += N;
 		for (j=0; j<N; ++j)
@@ -423,7 +423,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 
 	for (i=0; i<M; ++i)
 	{
-		pn = LM[i];
+		pn = &(LM[i])[0];
 		N = LM[i].size();
 		for (j=0; j<N; ++j)
 		{
@@ -460,7 +460,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 		for (j=0; j<pval[i]; ++j)
 		{
 			iel = (ppelc[i])[j];
-			pn = LM[iel];
+			pn = &(LM[iel])[0];
 			N = LM[iel].size();
 			for (k=0; k<N; ++k)
 			{
@@ -493,7 +493,7 @@ bool MatrixFactory::CreateCompactUnSymm(CompactUnSymmMatrix* pA, vector< vector<
 		for (j=0; j<pval[i]; ++j)
 		{
 			iel = ppelc[i][j];
-			pn = LM[iel];
+			pn = &(LM[iel])[0];
 			N = LM[iel].size();
 			for (k=0; k<N; ++k)
 			{

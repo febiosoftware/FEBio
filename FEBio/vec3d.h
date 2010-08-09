@@ -8,6 +8,7 @@ class vec3d
 public:
 	// constructors
 	vec3d() : x(0), y(0), z(0) {}
+	vec3d(double a) : x(a), y(a), z(a) {}
 	vec3d(double X, double Y, double Z) : x(X), y(Y), z(Z) {}
 
 	// operators

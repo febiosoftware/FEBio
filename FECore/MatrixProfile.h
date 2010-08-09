@@ -45,7 +45,7 @@ public:
 	virtual ~MatrixProfile(){}
 
 	//! clears the matrix profile
-	void clear() { m_prof.setsize(0); }
+	void clear() { m_prof.clear(); }
 
 	//! copy constructor
 	MatrixProfile(MatrixProfile& mp);

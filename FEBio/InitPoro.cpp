@@ -26,7 +26,7 @@ bool FEM::InitPoro()
 		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[6] = -1;
 
 		// also remove prescribed pressures
-		for (i=0; i<m_DC.size(); ++i)
+		for (i=0; i<(int) m_DC.size(); ++i)
 		{
 			int& node = m_DC[i].node;
 			int& bc   = m_DC[i].bc;
@@ -70,7 +70,7 @@ bool FEM::InitPoro()
 				if (pm)
 				{
 					int N = el.Nodes();
-					int* n = el.m_node;
+					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j) 
 						if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
 				}
@@ -87,7 +87,7 @@ bool FEM::InitPoro()
 				if (pm)
 				{
 					int N = el.Nodes();
-					int* n = el.m_node;
+					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j) 
 						if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
 				}
@@ -108,7 +108,7 @@ bool FEM::InitPoro()
 				if (pm == 0)
 				{
 					int N = el.Nodes();
-					int* n = el.m_node;
+					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j)
 						if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
 				}
@@ -125,7 +125,7 @@ bool FEM::InitPoro()
 				if (pm == 0)
 				{
 					int N = el.Nodes();
-					int* n = el.m_node;
+					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j)
 						if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
 				}
@@ -146,7 +146,7 @@ bool FEM::InitPoro()
 				if (pm)
 				{
 					int N = el.Nodes();
-					int* n = el.m_node;
+					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j)
 						if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
 				}
@@ -164,7 +164,7 @@ bool FEM::InitPoro()
 				if (pm)
 				{
 					int N = el.Nodes();
-					int* n = el.m_node;
+					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j)
 						if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
 				}

@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to fluid flux
 
-void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, double* wn, double dt)
+void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt)
 {
 	int i, j, n;
 
@@ -67,7 +67,7 @@ void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, double* wn, 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to fluid flux
 
-bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, double* wn)
+bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
 {
 	int i, n;
 
@@ -93,7 +93,7 @@ bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, double* w
 	double f;
 
 	// repeat over integration points
-	fe.zero();
+	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
 		N  = el.H(n);
@@ -124,7 +124,7 @@ bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, double* w
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to fluid flux
 
-bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, double* wn)
+bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
 {
 	int i, n;
 
@@ -150,7 +150,7 @@ bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, dou
 	double f;
 
 	// repeat over integration points
-	fe.zero();
+	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
 		N  = el.H(n);
@@ -184,7 +184,7 @@ void FEFluxSurface::Serialize(FEM& fem, Archive& ar)
 {
 	if (ar.IsSaving())
 	{
-		int i;
+		size_t i;
 		for (i=0; i<m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];
@@ -207,7 +207,8 @@ void FEFluxSurface::Serialize(FEM& fem, Archive& ar)
 	}
 	else
 	{
-		int i, m, mat;
+		size_t i; 
+		int m, mat;
 		for (i=0; i<m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];

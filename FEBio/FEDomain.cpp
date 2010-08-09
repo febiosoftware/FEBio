@@ -50,7 +50,7 @@ bool FEElasticSolidDomain::Initialize(FEM &fem)
 	// get the logfile
 	Logfile& log = GetLogfile();
 
-	for (int i=0; i<m_Elem.size(); ++i)
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// unpack element data
 		FESolidElement& el = m_Elem[i];
@@ -114,12 +114,11 @@ bool FEElasticSolidDomain::Initialize(FEM &fem)
 
 void FEElasticSolidDomain::InitElements()
 {
-	int i, j, n;
-	for (i=0; i<m_Elem.size(); ++i)
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		n = el.GaussPoints();
-		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
 	}
 }
 
@@ -128,7 +127,7 @@ void FEElasticSolidDomain::Serialize(FEM& fem, Archive &ar)
 {
 	if (ar.IsSaving())
 	{
-		for (int i=0; i<m_Elem.size(); ++i)
+		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FESolidElement& el = m_Elem[i];
 			int nmat = el.GetMatID();
@@ -149,7 +148,7 @@ void FEElasticSolidDomain::Serialize(FEM& fem, Archive &ar)
 	else
 	{
 		int n, mat;
-		for (int i=0; i<m_Elem.size(); ++i)
+		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FESolidElement& el = m_Elem[i];
 			ar >> n;
@@ -192,7 +191,7 @@ bool FEElasticShellDomain::Initialize(FEM& fem)
 	// get the logfile
 	Logfile& log = GetLogfile();
 
-	for (int i=0; i<m_Elem.size(); ++i)
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// unpack element data
 		FEShellElement& el = m_Elem[i];
@@ -243,7 +242,7 @@ void FEElasticShellDomain::Serialize(FEM& fem, Archive &ar)
 {
 	if (ar.IsSaving())
 	{
-		for (int i=0; i<m_Elem.size(); ++i)
+		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FEShellElement& el = m_Elem[i];
 			ar << el.Type();
@@ -266,7 +265,7 @@ void FEElasticShellDomain::Serialize(FEM& fem, Archive &ar)
 	{
 		int n, mat;
 
-		for (int i=0; i<m_Elem.size(); ++i)
+		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FEShellElement& el = m_Elem[i];
 			ar >> n;
@@ -297,12 +296,11 @@ void FEElasticShellDomain::Serialize(FEM& fem, Archive &ar)
 
 void FEElasticShellDomain::InitElements()
 {
-	int i, j, n;
-	for (i=0; i<m_Elem.size(); ++i)
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FEShellElement& el = m_Elem[i];
-		n = el.GaussPoints();
-		for (j=0; j<n; ++j) el.m_State[j]->Init(false);
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
 	}
 }
 
@@ -327,7 +325,7 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 	double* pt = el.pt();
 
 	int N = el.Nodes();
-	int* lm = el.LM();
+	vector<int>& lm = el.LM();
 
 	for (i=0; i<N; ++i)
 	{
@@ -385,7 +383,7 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 void FEElasticTrussDomain::InitElements()
 {
-	for (int i=0; i<m_Elem.size(); ++i)
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FETrussElement& el = m_Elem[i];
 		el.m_State[0]->Init(false);

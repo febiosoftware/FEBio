@@ -26,8 +26,8 @@ void FEPeriodicSurface::Init()
 	m_Lm.resize(nn);		// Lagrangian multipliers
 
 	// set initial values
-	m_gap.zero();
-	m_Lm.zero();
+	zero(m_gap);
+	zero(m_Lm);
 }
 
 //-----------------------------------------------------------------------------

@@ -23,7 +23,7 @@ bool FEHeatSolver::Init()
 	m_R.resize(neq);
 	m_T.resize(neq);
 	m_u.resize(neq);
-	m_Tp.resize(neq); m_Tp.zero();
+	m_Tp.assign(neq, 0);
 
 	return true;
 }
@@ -33,8 +33,8 @@ bool FEHeatSolver::Init()
 bool FEHeatSolver::SolveStep(double time)
 {
 	// set up the prescribed temperatures vector
-	m_u.zero();
-	for (int i=0; i<m_fem.m_DC.size(); ++i)
+	zero(m_u);
+	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
 	{
 		if (m_fem.m_DC[i].IsActive())
 		{
@@ -95,7 +95,7 @@ void FEHeatSolver::Update()
 //! Calculate the residual
 void FEHeatSolver::Residual()
 {
-	m_R.zero();
+	zero(m_R);
 
 	// apply nodal fluxes
 	int i, j, id, bc, lc, n;
@@ -105,7 +105,7 @@ void FEHeatSolver::Residual()
 
 	// loop over nodal force cards
 	int ncnf = m_fem.m_FC.size();
-	FENodalForce* FC = m_fem.m_FC;
+	vector<FENodalForce>& FC = m_fem.m_FC;
 	for (i=0; i<ncnf; ++i)
 	{
 		if (FC[i].IsActive())
@@ -164,7 +164,7 @@ void FEHeatSolver::Residual()
 
 			// force vector
 			// repeat over integration points
-			fe.zero();
+			zero(fe);
 			for (n=0; n<ni; ++n)
 			{
 				N  = el.H(n);

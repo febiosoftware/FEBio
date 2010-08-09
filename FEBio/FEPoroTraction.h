@@ -58,13 +58,13 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void TractionStiffness(FESurfaceElement& el, matrix& ke, double* tn, bool effective);
+	void TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective);
 
 	//! Calculates external pressure forces
-	bool TractionForce(FESurfaceElement& el, vector<double>& fe, double* tn);
+	bool TractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 	//! Calculates the linear external pressure forces (ie. non-follower forces)
-	bool LinearTractionForce(FESurfaceElement& el, vector<double>& fe, double* tn);
+	bool LinearTractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 protected:
 	// pressure boundary data

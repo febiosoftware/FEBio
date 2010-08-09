@@ -63,7 +63,8 @@ void FEPoroSolidDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 
 		// add fluid work to global residual
 		int neln = el.Nodes();
-		int *lm = el.LM() ,J;
+		vector<int>& lm = el.LM();
+		int J;
 		for (j=0; j<neln; ++j)
 		{
 			J = lm[3*neln+j];
@@ -94,7 +95,7 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 	double* pn = el.pt();
 
 	// Bp-matrix
-	vector<double[3]> B(neln);
+	vector<double> B1(neln), B2(neln), B3(neln);
 
 	// gauss-weights
 	double* wg = el.GaussWeights();
@@ -118,7 +119,7 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 		return false;
 	}
 
-	fe.zero();
+	zero(fe);
 
 	// get the time step value
 	double dt = fem.m_pStep->m_dt;
@@ -165,9 +166,9 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
 			
 			// calculate Bp matrix
-			B[i][0] = Gx;
-			B[i][1] = Gy;
-			B[i][2] = Gz;
+			B1[i] = Gx;
+			B2[i] = Gy;
+			B3[i] = Gz;
 		}
 
 		// next we get the determinant
@@ -183,7 +184,7 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B[i][0]*w.x+B[i][1]*w.y+B[i][2]*w.z - divv*H[i])*detJ*wg[n];
+			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
 		}
 	}
 
@@ -259,7 +260,7 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 	double Ji[3][3], detJ, J0i[3][3];
 
 	// Bp-matrix
-	vector<double[3]> B(neln);
+	vector<double> B1(neln), B2(neln), B3(neln);
 	double tmp;
 
 	// permeability tensor
@@ -338,9 +339,9 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 
 			// calculate Bp matrix
-			B[i][0] = Gx;
-			B[i][1] = Gy;
-			B[i][2] = Gz;
+			B1[i] = Gx;
+			B2[i] = Gy;
+			B3[i] = Gz;
 		}
 
 		// get the permeability tensor
@@ -351,9 +352,9 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 			for (j=0; j<neln; ++j)
 			{
 				tmp = dt*detJ*gw[n];
-				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][0]+B[i][1]*k[1][0]+B[i][2]*k[2][0])*B[j][0];
-				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][1]+B[i][1]*k[1][1]+B[i][2]*k[2][1])*B[j][1];
-				ke[4*i+3][4*j+3] -= tmp*(B[i][0]*k[0][2]+B[i][1]*k[1][2]+B[i][2]*k[2][2])*B[j][2];
+				ke[4*i+3][4*j+3] -= tmp*(B1[i]*k[0][0]+B2[i]*k[1][0]+B3[i]*k[2][0])*B1[j];
+				ke[4*i+3][4*j+3] -= tmp*(B1[i]*k[0][1]+B2[i]*k[1][1]+B3[i]*k[2][1])*B2[j];
+				ke[4*i+3][4*j+3] -= tmp*(B1[i]*k[0][2]+B2[i]*k[1][2]+B3[i]*k[2][2])*B3[j];
 			}
 
 		// calculate the G-matrix
@@ -361,9 +362,9 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 			for (j=0; j<neln; ++j)
 			{
 				tmp = detJ*gw[n]*H[j];
-				ke[4*i  ][4*j+3] -= tmp*B[i][0];
-				ke[4*i+1][4*j+3] -= tmp*B[i][1];
-				ke[4*i+2][4*j+3] -= tmp*B[i][2];
+				ke[4*i  ][4*j+3] -= tmp*B1[i];
+				ke[4*i+1][4*j+3] -= tmp*B2[i];
+				ke[4*i+2][4*j+3] -= tmp*B3[i];
 			}
 
 		if (bsymm)
@@ -372,9 +373,9 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 				for (j=0; j<neln; ++j)
 				{
 					tmp = detJ*gw[n]*H[j];
-					ke[4*j+3][4*i  ] -= tmp*B[i][0];
-					ke[4*j+3][4*i+1] -= tmp*B[i][1];
-					ke[4*j+3][4*i+2] -= tmp*B[i][2];
+					ke[4*j+3][4*i  ] -= tmp*B1[i];
+					ke[4*j+3][4*i+1] -= tmp*B2[i];
+					ke[4*j+3][4*i+2] -= tmp*B3[i];
 				}
 		}
 		else
@@ -420,9 +421,9 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 				for (j=0; j<neln; ++j)
 				{
 					tmp = dt*detJ*gw[n]*H[i];
-					ke[4*i+3][4*j  ] -= tmp*(B[j][0]*(divv+1/dt) - (gradv[0][0]*B[j][0] + gradv[0][1]*B[j][1] + gradv[0][2]*B[j][2]));
-					ke[4*i+3][4*j+1] -= tmp*(B[j][1]*(divv+1/dt) - (gradv[1][0]*B[j][0] + gradv[1][1]*B[j][1] + gradv[1][2]*B[j][2]));
-					ke[4*i+3][4*j+2] -= tmp*(B[j][2]*(divv+1/dt) - (gradv[2][0]*B[j][0] + gradv[2][1]*B[j][1] + gradv[2][2]*B[j][2]));
+					ke[4*i+3][4*j  ] -= tmp*(B1[j]*(divv+1/dt) - (gradv[0][0]*B1[j] + gradv[0][1]*B2[j] + gradv[0][2]*B3[j]));
+					ke[4*i+3][4*j+1] -= tmp*(B2[j]*(divv+1/dt) - (gradv[1][0]*B1[j] + gradv[1][1]*B2[j] + gradv[1][2]*B3[j]));
+					ke[4*i+3][4*j+2] -= tmp*(B3[j]*(divv+1/dt) - (gradv[2][0]*B1[j] + gradv[2][1]*B2[j] + gradv[2][2]*B3[j]));
 				}
 
 			FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
@@ -437,41 +438,41 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 					// The multiplication BKB has been expanded since it was observed
 					// that this creates a significant boost in speed
 					{
-						BKB[0][0]  = B[i][0]*(B[j][0]*D[T[0][0]][T[0][0]] + B[j][1]*D[T[0][0]][T[0][1]] + B[j][2]*D[T[0][0]][T[0][2]]); 
-						BKB[0][0] += B[i][1]*(B[j][0]*D[T[1][0]][T[0][0]] + B[j][1]*D[T[1][0]][T[0][1]] + B[j][2]*D[T[1][0]][T[0][2]]); 
-						BKB[0][0] += B[i][2]*(B[j][0]*D[T[2][0]][T[0][0]] + B[j][1]*D[T[2][0]][T[0][1]] + B[j][2]*D[T[2][0]][T[0][2]]); 
+						BKB[0][0]  = B1[i]*(B1[j]*D[T[0][0]][T[0][0]] + B2[j]*D[T[0][0]][T[0][1]] + B3[j]*D[T[0][0]][T[0][2]]); 
+						BKB[0][0] += B2[i]*(B1[j]*D[T[1][0]][T[0][0]] + B2[j]*D[T[1][0]][T[0][1]] + B3[j]*D[T[1][0]][T[0][2]]); 
+						BKB[0][0] += B3[i]*(B1[j]*D[T[2][0]][T[0][0]] + B2[j]*D[T[2][0]][T[0][1]] + B3[j]*D[T[2][0]][T[0][2]]); 
 
-						BKB[0][1]  = B[i][0]*(B[j][0]*D[T[0][0]][T[1][0]] + B[j][1]*D[T[0][0]][T[1][1]] + B[j][2]*D[T[0][0]][T[1][2]]);
-						BKB[0][1] += B[i][1]*(B[j][0]*D[T[1][0]][T[1][0]] + B[j][1]*D[T[1][0]][T[1][1]] + B[j][2]*D[T[1][0]][T[1][2]]);
-						BKB[0][1] += B[i][2]*(B[j][0]*D[T[2][0]][T[1][0]] + B[j][1]*D[T[2][0]][T[1][1]] + B[j][2]*D[T[2][0]][T[1][2]]);
+						BKB[0][1]  = B1[i]*(B1[j]*D[T[0][0]][T[1][0]] + B2[j]*D[T[0][0]][T[1][1]] + B3[j]*D[T[0][0]][T[1][2]]);
+						BKB[0][1] += B2[i]*(B1[j]*D[T[1][0]][T[1][0]] + B2[j]*D[T[1][0]][T[1][1]] + B3[j]*D[T[1][0]][T[1][2]]);
+						BKB[0][1] += B3[i]*(B1[j]*D[T[2][0]][T[1][0]] + B2[j]*D[T[2][0]][T[1][1]] + B3[j]*D[T[2][0]][T[1][2]]);
 
-						BKB[0][2]  = B[i][0]*(B[j][0]*D[T[0][0]][T[2][0]] + B[j][1]*D[T[0][0]][T[2][1]] + B[j][2]*D[T[0][0]][T[2][2]]);
-						BKB[0][2] += B[i][1]*(B[j][0]*D[T[1][0]][T[2][0]] + B[j][1]*D[T[1][0]][T[2][1]] + B[j][2]*D[T[1][0]][T[2][2]]);
-						BKB[0][2] += B[i][2]*(B[j][0]*D[T[2][0]][T[2][0]] + B[j][1]*D[T[2][0]][T[2][1]] + B[j][2]*D[T[2][0]][T[2][2]]);
+						BKB[0][2]  = B1[i]*(B1[j]*D[T[0][0]][T[2][0]] + B2[j]*D[T[0][0]][T[2][1]] + B3[j]*D[T[0][0]][T[2][2]]);
+						BKB[0][2] += B2[i]*(B1[j]*D[T[1][0]][T[2][0]] + B2[j]*D[T[1][0]][T[2][1]] + B3[j]*D[T[1][0]][T[2][2]]);
+						BKB[0][2] += B3[i]*(B1[j]*D[T[2][0]][T[2][0]] + B2[j]*D[T[2][0]][T[2][1]] + B3[j]*D[T[2][0]][T[2][2]]);
 
-						BKB[1][0]  = B[i][0]*(B[j][0]*D[T[0][1]][T[0][0]] + B[j][1]*D[T[0][1]][T[0][1]] + B[j][2]*D[T[0][1]][T[0][2]]);
-						BKB[1][0] += B[i][1]*(B[j][0]*D[T[1][1]][T[0][0]] + B[j][1]*D[T[1][1]][T[0][1]] + B[j][2]*D[T[1][1]][T[0][2]]);
-						BKB[1][0] += B[i][2]*(B[j][0]*D[T[2][1]][T[0][0]] + B[j][1]*D[T[2][1]][T[0][1]] + B[j][2]*D[T[2][1]][T[0][2]]);
+						BKB[1][0]  = B1[i]*(B1[j]*D[T[0][1]][T[0][0]] + B2[j]*D[T[0][1]][T[0][1]] + B3[j]*D[T[0][1]][T[0][2]]);
+						BKB[1][0] += B2[i]*(B1[j]*D[T[1][1]][T[0][0]] + B2[j]*D[T[1][1]][T[0][1]] + B3[j]*D[T[1][1]][T[0][2]]);
+						BKB[1][0] += B3[i]*(B1[j]*D[T[2][1]][T[0][0]] + B2[j]*D[T[2][1]][T[0][1]] + B3[j]*D[T[2][1]][T[0][2]]);
 
-						BKB[1][1]  = B[i][0]*(B[j][0]*D[T[0][1]][T[1][0]] + B[j][1]*D[T[0][1]][T[1][1]] + B[j][2]*D[T[0][1]][T[1][2]]);
-						BKB[1][1] += B[i][1]*(B[j][0]*D[T[1][1]][T[1][0]] + B[j][1]*D[T[1][1]][T[1][1]] + B[j][2]*D[T[1][1]][T[1][2]]);
-						BKB[1][1] += B[i][2]*(B[j][0]*D[T[2][1]][T[1][0]] + B[j][1]*D[T[2][1]][T[1][1]] + B[j][2]*D[T[2][1]][T[1][2]]);
+						BKB[1][1]  = B1[i]*(B1[j]*D[T[0][1]][T[1][0]] + B2[j]*D[T[0][1]][T[1][1]] + B3[j]*D[T[0][1]][T[1][2]]);
+						BKB[1][1] += B2[i]*(B1[j]*D[T[1][1]][T[1][0]] + B2[j]*D[T[1][1]][T[1][1]] + B3[j]*D[T[1][1]][T[1][2]]);
+						BKB[1][1] += B3[i]*(B1[j]*D[T[2][1]][T[1][0]] + B2[j]*D[T[2][1]][T[1][1]] + B3[j]*D[T[2][1]][T[1][2]]);
 
-						BKB[1][2]  = B[i][0]*(B[j][0]*D[T[0][1]][T[2][0]] + B[j][1]*D[T[0][1]][T[2][1]] + B[j][2]*D[T[0][1]][T[2][2]]);
-						BKB[1][2] += B[i][1]*(B[j][0]*D[T[1][1]][T[2][0]] + B[j][1]*D[T[1][1]][T[2][1]] + B[j][2]*D[T[1][1]][T[2][2]]);
-						BKB[1][2] += B[i][2]*(B[j][0]*D[T[2][1]][T[2][0]] + B[j][1]*D[T[2][1]][T[2][1]] + B[j][2]*D[T[2][1]][T[2][2]]);
+						BKB[1][2]  = B1[i]*(B1[j]*D[T[0][1]][T[2][0]] + B2[j]*D[T[0][1]][T[2][1]] + B3[j]*D[T[0][1]][T[2][2]]);
+						BKB[1][2] += B2[i]*(B1[j]*D[T[1][1]][T[2][0]] + B2[j]*D[T[1][1]][T[2][1]] + B3[j]*D[T[1][1]][T[2][2]]);
+						BKB[1][2] += B3[i]*(B1[j]*D[T[2][1]][T[2][0]] + B2[j]*D[T[2][1]][T[2][1]] + B3[j]*D[T[2][1]][T[2][2]]);
 
-						BKB[2][0]  = B[i][0]*(B[j][0]*D[T[0][2]][T[0][0]] + B[j][1]*D[T[0][2]][T[0][1]] + B[j][2]*D[T[0][2]][T[0][2]]);
-						BKB[2][0] += B[i][1]*(B[j][0]*D[T[1][2]][T[0][0]] + B[j][1]*D[T[1][2]][T[0][1]] + B[j][2]*D[T[1][2]][T[0][2]]);
-						BKB[2][0] += B[i][2]*(B[j][0]*D[T[2][2]][T[0][0]] + B[j][1]*D[T[2][2]][T[0][1]] + B[j][2]*D[T[2][2]][T[0][2]]);
+						BKB[2][0]  = B1[i]*(B1[j]*D[T[0][2]][T[0][0]] + B2[j]*D[T[0][2]][T[0][1]] + B3[j]*D[T[0][2]][T[0][2]]);
+						BKB[2][0] += B2[i]*(B1[j]*D[T[1][2]][T[0][0]] + B2[j]*D[T[1][2]][T[0][1]] + B3[j]*D[T[1][2]][T[0][2]]);
+						BKB[2][0] += B3[i]*(B1[j]*D[T[2][2]][T[0][0]] + B2[j]*D[T[2][2]][T[0][1]] + B3[j]*D[T[2][2]][T[0][2]]);
 
-						BKB[2][1]  = B[i][0]*(B[j][0]*D[T[0][2]][T[1][0]] + B[j][1]*D[T[0][2]][T[1][1]] + B[j][2]*D[T[0][2]][T[1][2]]); 
-						BKB[2][1] += B[i][1]*(B[j][0]*D[T[1][2]][T[1][0]] + B[j][1]*D[T[1][2]][T[1][1]] + B[j][2]*D[T[1][2]][T[1][2]]); 
-						BKB[2][1] += B[i][2]*(B[j][0]*D[T[2][2]][T[1][0]] + B[j][1]*D[T[2][2]][T[1][1]] + B[j][2]*D[T[2][2]][T[1][2]]); 
+						BKB[2][1]  = B1[i]*(B1[j]*D[T[0][2]][T[1][0]] + B2[j]*D[T[0][2]][T[1][1]] + B3[j]*D[T[0][2]][T[1][2]]); 
+						BKB[2][1] += B2[i]*(B1[j]*D[T[1][2]][T[1][0]] + B2[j]*D[T[1][2]][T[1][1]] + B3[j]*D[T[1][2]][T[1][2]]); 
+						BKB[2][1] += B3[i]*(B1[j]*D[T[2][2]][T[1][0]] + B2[j]*D[T[2][2]][T[1][1]] + B3[j]*D[T[2][2]][T[1][2]]); 
 
-						BKB[2][2]  = B[i][0]*(B[j][0]*D[T[0][2]][T[2][0]] + B[j][1]*D[T[0][2]][T[2][1]] + B[j][2]*D[T[0][2]][T[2][2]]);
-						BKB[2][2] += B[i][1]*(B[j][0]*D[T[1][2]][T[2][0]] + B[j][1]*D[T[1][2]][T[2][1]] + B[j][2]*D[T[1][2]][T[2][2]]);
-						BKB[2][2] += B[i][2]*(B[j][0]*D[T[2][2]][T[2][0]] + B[j][1]*D[T[2][2]][T[2][1]] + B[j][2]*D[T[2][2]][T[2][2]]);
+						BKB[2][2]  = B1[i]*(B1[j]*D[T[0][2]][T[2][0]] + B2[j]*D[T[0][2]][T[2][1]] + B3[j]*D[T[0][2]][T[2][2]]);
+						BKB[2][2] += B2[i]*(B1[j]*D[T[1][2]][T[2][0]] + B2[j]*D[T[1][2]][T[2][1]] + B3[j]*D[T[1][2]][T[2][2]]);
+						BKB[2][2] += B3[i]*(B1[j]*D[T[2][2]][T[2][0]] + B2[j]*D[T[2][2]][T[2][1]] + B3[j]*D[T[2][2]][T[2][2]]);
 					}
 
 					tmp = dt*detJ*gw[n];

@@ -16,7 +16,7 @@ void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	double* pt = el.pt();
 
 	int N = el.Nodes();
-	int* lm = el.LM();
+	vector<int>& lm = el.LM();
 
 	for (i=0; i<N; ++i)
 	{

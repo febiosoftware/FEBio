@@ -115,7 +115,7 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 	FEMesh& mesh = fem.m_mesh;
 
 	vector<float> t(mesh.Nodes());
-	t.zero();
+	zero(t);
 
 	int i, j;
 
@@ -151,7 +151,7 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
 		if (pf)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val(fem.m_mesh.Nodes()); zero(val);
 			double gi[4], gn[4];
 			int ni, ne, n, k;
 
@@ -187,7 +187,7 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
 		if (ps2)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val(fem.m_mesh.Nodes()); zero(val);
 			double gi[4], gn[4];
 			int ni, ne, n, k;
 
@@ -224,7 +224,7 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 	// store the data to file
 	// Note that we only save gap values of nodes that are actually in contact
 	for (i=0; i<mesh.Nodes(); ++i) t[i] = (t[i]<0? 0.f : t[i]);
-	fwrite(t, sizeof(float), mesh.Nodes(), fp);
+	fwrite(&t[0], sizeof(float), mesh.Nodes(), fp);
 }
 
 //-----------------------------------------------------------------------------
@@ -232,8 +232,7 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 {
 	int i, j, k, n;
 
-	vector<float[3]> acc(fem.m_mesh.Nodes());
-	for (i=0; i<fem.m_mesh.Nodes(); ++i) acc[i][0] = acc[i][1] = acc[i][2] = 0;
+	vector<float> acc(3*fem.m_mesh.Nodes()); zero(acc);
 	for (i=0; i<fem.m_CI.size(); ++i)
 	{
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (&fem.m_CI[i]);
@@ -248,13 +247,9 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 					int m = ss.node[j];
 					vec3d t = ss.traction(j);
 
-					acc[m][0] += (float) t.x;
-					acc[m][1] += (float) t.y;
-					acc[m][2] += (float) t.z;
-						
-//					acc[m][0] = (float) ss.Lt[j][0];
-//					acc[m][1] = (float) ss.Lt[j][1];
-//					acc[m][2] = (float) ss.Lm[j];
+					acc[3*m  ] += (float) t.x;
+					acc[3*m+1] += (float) t.y;
+					acc[3*m+2] += (float) t.z;
 				}
 			}
 		}
@@ -262,7 +257,7 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
 		if (pf)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val(fem.m_mesh.Nodes()); zero(val);
 			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
 			int ni, ne;
 
@@ -293,9 +288,9 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 					for (k=0; k<ne; ++k)
 					{
 						int m = el.m_node[k];
-						acc[m][0] += (float) (ln[k]>=0?ln[k]:0);
-						acc[m][1] += (float) (gn[k]>=0?gn[k]:0);
-						acc[m][2] += (float) (tn[k]>=0?tn[k]:0);
+						acc[3*m  ] += (float) (ln[k]>=0?ln[k]:0);
+						acc[3*m+1] += (float) (gn[k]>=0?gn[k]:0);
+						acc[3*m+2] += (float) (tn[k]>=0?tn[k]:0);
 						val[m]++;
 					}
 				}
@@ -303,16 +298,16 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 
 			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
 			{ 
-				acc[j][0] /= (float) val[j]; 
-				acc[j][1] /= (float) val[j]; 
-				acc[j][2] /= (float) val[j]; 
+				acc[3*j  ] /= (float) val[j]; 
+				acc[3*j+1] /= (float) val[j]; 
+				acc[3*j+2] /= (float) val[j]; 
 			}
 		}
 
 		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
 		if (ps2)
 		{
-			vector<int> val(fem.m_mesh.Nodes()); val.zero();
+			vector<int> val(fem.m_mesh.Nodes()); zero(val);
 			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
 			int ni, ne;
 
@@ -343,9 +338,9 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 					for (k=0; k<ne; ++k)
 					{
 						int m = el.m_node[k];
-						acc[m][0] += (float) (ln[k]>=0?ln[k]:0);
-						acc[m][1] += (float) (gn[k]>=0?gn[k]:0);
-						acc[m][2] += (float) (tn[k]>=0?tn[k]:0);
+						acc[3*m  ] += (float) (ln[k]>=0?ln[k]:0);
+						acc[3*m+1] += (float) (gn[k]>=0?gn[k]:0);
+						acc[3*m+2] += (float) (tn[k]>=0?tn[k]:0);
 						val[m]++;
 					}
 				}
@@ -353,14 +348,14 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 
 			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
 			{ 
-				acc[j][0] /= (float) val[j]; 
-				acc[j][1] /= (float) val[j]; 
-				acc[j][2] /= (float) val[j]; 
+				acc[3*j  ] /= (float) val[j]; 
+				acc[3*j+1] /= (float) val[j]; 
+				acc[3*j+2] /= (float) val[j]; 
 			}
 		}
 	}
 
-	fwrite(acc, sizeof(float)*3, fem.m_mesh.Nodes(), fp);
+	fwrite(&acc[0], sizeof(float)*3, fem.m_mesh.Nodes(), fp);
 }
 
 //-----------------------------------------------------------------------------

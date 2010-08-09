@@ -23,6 +23,6 @@ void FETiedContactSurface::Init()
 	Lm.resize(nn);		// Lagrangian multipliers
 
 	// set initial values
-	gap.zero();
-	Lm.zero();
+	zero(gap);
+	zero(Lm);
 }

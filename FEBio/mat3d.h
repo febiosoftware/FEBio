@@ -229,6 +229,7 @@ public:
 	// assignment operators
 	mat3d& operator = (const mat3dd& m);
 	mat3d& operator = (const mat3ds& m);
+	mat3d& operator = (const double m[3][3]);
 
 	// access operators
 	double& operator () (int i, int j);
@@ -313,8 +314,6 @@ protected:
 	friend class mat3da;
 };
 
-typedef double MATRIX3[3][3];
-
 // outer product for vectors
 inline mat3d operator & (const vec3d& a, const vec3d& b)
 {
@@ -332,13 +331,6 @@ inline mat3ds dyad(const vec3d& a)
 inline mat3ds dyads(const vec3d& a, const vec3d& b)
 {
 	return mat3ds(2.0*a.x*b.x, 2.0*a.y*b.y, 2.0*a.z*b.z, a.x*b.y + a.y*b.x, a.y*b.z + a.z*b.y, a.x*b.z + a.y*b.z);
-}
-
-inline void matrix3_copy(MATRIX3& a, double b[3][3])
-{
-	a[0][0] = b[0][0]; a[0][1] = b[0][1]; a[0][2] = b[0][2];
-	a[1][0] = b[1][0]; a[1][1] = b[1][1]; a[1][2] = b[1][2];
-	a[2][0] = b[2][0]; a[2][1] = b[2][1]; a[2][2] = b[2][2];
 }
 
 // The following file contains the actual definition of the class functions

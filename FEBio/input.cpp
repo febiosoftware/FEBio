@@ -383,7 +383,7 @@ void FEM::EchoInput()
 		log.printf(" DISCRETE ELEMENT DATA\n");
 		log.printf("===========================================================================\n");
 		log.printf(" Nr of discrete elements : %d\n", m_DE.size());
-		for (i=0; i<m_DE.size(); ++i)
+		for (i=0; i<(int) m_DE.size(); ++i)
 		{
 			FE_DISCRETE_ELEMENT& de = m_DE[i];
 			log.printf(" discrete element %d:\n", i+1);

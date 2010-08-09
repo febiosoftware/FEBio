@@ -1,10 +1,19 @@
 #include "stdafx.h"
+#include <assert.h>
 #include "vector.h"
+#include <algorithm>
 
 double operator*(const vector<double>& a, const vector<double>& b)
 {
 	double sum = 0;
-	for (int i=0; i<a.size(); i++) sum += a[i]*b[i];
+	for (size_t i=0; i<a.size(); i++) sum += a[i]*b[i];
 
 	return sum;
+}
+
+vector<double>& operator += (vector<double>& a, const vector<double>& b)
+{
+	assert(a.size() == b.size());
+	for (size_t i = 0; i < a.size(); ++i) a[i] += b[i];
+	return a;
 }

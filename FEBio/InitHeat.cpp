@@ -16,7 +16,7 @@ bool FEM::InitHeat()
 		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[10] = -1;
 
 		// also remove prescribed temperatures
-		for (i=0; i<m_DC.size(); ++i)
+		for (i=0; i<(int) m_DC.size(); ++i)
 		{
 			int& node = m_DC[i].node;
 			int& bc   = m_DC[i].bc;

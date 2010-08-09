@@ -19,8 +19,7 @@ void FESurface::Init()
 	FEMesh& mesh = *m_pMesh;
 
 	// This array is used to keep tags on each node
-	vector<int> tag(mesh.Nodes());
-	tag.set(-1);
+	vector<int> tag; tag.assign(mesh.Nodes(), -1);
 
 	// let's find all nodes the surface needs
 	int nn = 0;
@@ -74,7 +73,7 @@ int FESurface::FindElement(FESurfaceElement& el)
 	FEMesh& mesh = *m_pMesh;
 	FENodeElemList& NEL = mesh.NodeElementList();
 
-	int* sf = el.m_node;
+	vector<int>& sf = el.m_node;
 	int node = el.m_node[0];
 	int nval = NEL.Valence(node);
 	FEElement** ppe = NEL.ElementList(node);
@@ -126,7 +125,7 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 	double* pt = el.pt();
 
 	int N = el.Nodes();
-	int* lm = el.LM();
+	vector<int>& lm = el.LM();
 
 	for (i=0; i<N; ++i)
 	{

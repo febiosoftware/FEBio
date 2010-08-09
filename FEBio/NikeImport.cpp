@@ -617,7 +617,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 	}
 	// since we may have read less than 4*m_nrn rigid nodes
 	// we need to make sure we have the correct size for m_RN
-	fem.m_RN.setsize(nrn);
+	fem.m_RN.resize(nrn);
 
 	/////////////////////////// S L I D I N G   S U R F A C E   D E C K /////////////////////
 

@@ -142,12 +142,12 @@ public:
 	matrix Gr, Gs, Gt;
 
 	// data used when unpacking
-	vector<MATRIX3> m_Jt;		// jacobian
-	vector<MATRIX3> m_Jti;		// inverse jacobian
+	vector<mat3d>	m_Jt;		// jacobian
+	vector<mat3d>	m_Jti;		// inverse jacobian
 	vector<double>	m_detJt;	// jacobian determinant
 
-	vector<MATRIX3> m_J0;		// jacobian
-	vector<MATRIX3> m_J0i;		// inverse jacobian
+	vector<mat3d>	m_J0;		// jacobian
+	vector<mat3d>	m_J0i;		// inverse jacobian
 	vector<double>	m_detJ0;	// jacobian determinant
 };
 
@@ -395,12 +395,12 @@ public:
 	matrix Hr, Hs;
 
 	// data used when unpacking
-	vector<MATRIX3> m_Jt;		// jacobian
-	vector<MATRIX3> m_Jti;		// inverse jacobian
+	vector<mat3d>	m_Jt;		// jacobian
+	vector<mat3d>	m_Jti;		// inverse jacobian
 	vector<double>	m_detJt;	// jacobian determinant
 
-	vector<MATRIX3> m_J0;		// jacobian
-	vector<MATRIX3> m_J0i;		// inverse jacobian
+	vector<mat3d>	m_J0;		// jacobian
+	vector<mat3d>	m_J0i;		// inverse jacobian
 	vector<double>	m_detJ0;	// jacobian determinant
 };
 

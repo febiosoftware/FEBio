@@ -156,10 +156,10 @@ int FEMesh::RemoveIsolatedVertices()
 
 	// create a valence array
 	vector<int> val(N);
-	val.zero();
+	zero(val);
 
 	// count the nodal valences
-	for (i=0; i<m_Domain.size(); ++i)
+	for (i=0; i<(int) m_Domain.size(); ++i)
 	{
 		FEDomain& d = Domain(i);
 		for (j=0; j<d.Elements(); ++j)
@@ -277,7 +277,7 @@ bool FEMesh::Init()
 				r0 = el.r0();
 
 				n = el.Nodes();
-				en = el.m_node;
+				en = &el.m_node[0];
 				for (j=0; j<n; ++j)
 				{
 					m0 = j;
@@ -350,7 +350,7 @@ bool FEMesh::Init()
 	// next if a node does not belong to a shell
 	// we turn of the rotational degrees of freedom
 	vector<int> tag(Nodes());
-	tag.zero();
+	zero(tag);
 	for (nd = 0; nd < Domains(); ++nd)
 	{
 		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(m_Domain[nd]);
@@ -362,7 +362,7 @@ bool FEMesh::Init()
 				if (!el.IsRigid()) psd->UnpackElement(el);
 
 				n = el.Nodes();
-				en = el.m_node;
+				en = &el.m_node[0];
 				for (j=0; j<n; ++j) tag[en[j]] = 1;
 			}
 		}
@@ -546,7 +546,7 @@ int FEMesh::Faces(FEElement& el)
 int FEMesh::GetFace(FEElement& el, int n, int nf[4])
 {
 	int nn = -1;
-	int* en = el.m_node;
+	int* en = &el.m_node[0];
 	switch (el.Type())
 	{
 	case FE_HEX:

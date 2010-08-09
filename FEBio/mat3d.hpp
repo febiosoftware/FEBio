@@ -412,6 +412,14 @@ inline mat3d& mat3d::operator = (const mat3ds& m)
 	return (*this);
 }
 
+inline mat3d& mat3d::operator = (const double m[3][3])
+{
+	d[0][0] = m[0][0]; d[0][1] = m[0][1]; d[0][2] = m[0][2];
+	d[1][0] = m[1][0]; d[1][1] = m[1][1]; d[1][2] = m[1][2];
+	d[2][0] = m[2][0]; d[2][1] = m[2][1]; d[2][2] = m[2][2];
+	return (*this);
+}
+
 // access operator
 inline double& mat3d::operator () (int i, int j) { return d[i][j]; }
 inline const double& mat3d::operator () (int i, int j) const { return d[i][j]; }

@@ -30,7 +30,7 @@ void FEFacetSlidingSurface::Init()
 	m_eps.assign(nint, 1.0);
 
 	// set intial values
-	m_nu.zero();
+	zero(m_nu);
 }
 
 //-----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
 {
 	m_Lm  = s.m_Lm;
 	m_gap = s.m_gap;
-	m_pme.zero();
+	zero(m_pme);
 }
 
 //-----------------------------------------------------------------------------

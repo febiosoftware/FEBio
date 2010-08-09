@@ -12,7 +12,7 @@ FESolidElement::~FESolidElement()
 	int nint = GaussPoints();
 	assert(m_State.size() == nint);
 	for (int i=0; i<nint; ++i) if (m_State[i]) delete m_State[i];
-	m_State.set(0);
+	zero(m_State);
 }
 
 FEShellElement::~FEShellElement()
@@ -21,7 +21,7 @@ FEShellElement::~FEShellElement()
 	int nint = GaussPoints();
 	assert(m_State.size() == nint);
 	for (int i=0; i<nint; ++i) if (m_State[i]) delete m_State[i];
-	m_State.set(0);
+	zero(m_State);
 }
 
 FETrussElement::~FETrussElement()
@@ -30,5 +30,5 @@ FETrussElement::~FETrussElement()
 	int nint = GaussPoints();
 	assert(m_State.size() == nint);
 	for (int i=0; i<nint; ++i) if (m_State[i]) delete m_State[i];
-	m_State.set(0);
+	zero(m_State);
 }

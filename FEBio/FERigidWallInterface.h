@@ -30,7 +30,7 @@ public:
 	{
 		Lm  = s.Lm;
 		gap = s.gap;
-		pme.zero();
+		zero(pme);
 		Lt  = s.Lt;
 	}
 

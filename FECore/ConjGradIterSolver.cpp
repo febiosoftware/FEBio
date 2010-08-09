@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "ConjGradIterSolver.h"
+#include <algorithm>
+#include "vector.h"
 
 //-----------------------------------------------------------------------------
 ConjGradIterSolver::ConjGradIterSolver()
@@ -59,7 +61,7 @@ bool ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
 	int N = x.size();
 
 	// intialize x to zero
-	x.zero();
+	fill(x.begin(), x.end(), 0);
 
 	// iteration counter
 	int k = 0;

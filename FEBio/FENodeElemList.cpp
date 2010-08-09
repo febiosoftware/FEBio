@@ -26,7 +26,7 @@ void FENodeElemList::Create(FESurface& s)
 	m_pn.resize(nn);
 
 	// clear valence table
-	m_nval.zero();
+	zero(m_nval);
 
 	// fill valence table
 	int nsize = 0;

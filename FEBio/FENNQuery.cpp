@@ -81,7 +81,7 @@ void FENNQuery::Init()
 	}
 
 	// sort the tree
-	qsort((NODE*) m_bk, N, sizeof(NODE), cmp_node);
+	qsort(&m_bk[0], N, sizeof(NODE), cmp_node);
 
 	// set the initial search item
 	m_imin = 0;
@@ -125,7 +125,7 @@ int FENNQuery::Find(vec3d x)
 	// find the first item that satisfies d(i, q1) >= rmin1
 	int i0 = FindRadius(rmin1s);
 
-	for (int i=i0; i<m_bk.size(); ++i)
+	for (int i=i0; i<(int) m_bk.size(); ++i)
 	{
 		NODE& n = m_bk[i];
 		if (n.d1 <= rmax1s)

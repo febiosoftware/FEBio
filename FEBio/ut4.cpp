@@ -123,7 +123,7 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 	pt.Init(true);
 
 	// loop over all the nodes
-	for (i=0; i<m_Node.size(); ++i)
+	for (i=0; i<(int) m_Node.size(); ++i)
 	{
 		UT4NODE& node = m_Node[i];
 

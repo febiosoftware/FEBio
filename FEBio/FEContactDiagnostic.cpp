@@ -247,7 +247,7 @@ void FEContactDiagnostic::deriv_residual(FullMatrix& K)
 	fem.UpdateContact();
 
 	// first calculate the initial residual
-	vector<double> R0(48); R0.zero();
+	vector<double> R0; R0.assign(48, 0);
 	solver.ContactForces(R0);
 //	solver.Residual(R0);
 
@@ -272,7 +272,7 @@ void FEContactDiagnostic::deriv_residual(FullMatrix& K)
 		solver.UpdateStresses();
 		fem.UpdateContact();
 
-		R1.zero();
+		zero(R1);
 		solver.ContactForces(R1);
 //		solver.Residual(R1);
 

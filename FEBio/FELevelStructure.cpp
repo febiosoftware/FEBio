@@ -131,7 +131,7 @@ void FELevelStructure::Create(FENodeNodeList& L, int nroot)
 	}
 
 	// reset the valence
-	m_lval.zero();
+	zero(m_lval);
 
 	// fill the nref list and recount the width of each level
 	// remember to see if the node is part of the level structure
@@ -218,7 +218,7 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 	// the reversed index of level L2.
 	// Note that l1 < 0 for nodes that are not part of L1
 	// and similar for l2.
-	::vector<int[2]>	G(N);
+	vector<int>	G1(N), G2(N);
 	for (i=0; i<N; ++i)
 	{
 		l1 = L1.m_node[i];
@@ -226,10 +226,10 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 
 		if ((l1>=0) && (l2>=0))
 		{
-			G[i][0] = l1;
-			G[i][1] = k-1-l2;
+			G1[i] = l1;
+			G2[i] = k-1-l2;
 
-			if (G[i][0] == G[i][1]) 
+			if (G1[i] == G2[i]) 
 			{
 				m_node[i] = l1;
 				++m_lval[l1];
@@ -239,8 +239,8 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 		else
 		{
 			// node i does not belong to L1 or L2
-			G[i][0] = -1;
-			G[i][1] = -1;
+			G1[i] = -1;
+			G2[i] = -1;
 		}
 	}
 
@@ -383,8 +383,8 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 			for (j=0; j<cc[ncomp]; ++j)
 			{
 				m = pn[j];
-				++hi[ G[m][0] ];
-				++li[ G[m][1] ];
+				++hi[ G1[m] ];
+				++li[ G2[m] ];
 			}
 
 			// next, we determint h0 and l0, where
@@ -410,8 +410,8 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 				for (j=0; j<cc[ncomp]; ++j)
 				{
 					m = pn[j];
-					m_node[m] = G[m][0];
-					++m_lval[ G[m][0] ];
+					m_node[m] = G1[m];
+					++m_lval[ G1[m] ];
 				}
 				if (i==1) bswap = false;
 			}
@@ -421,8 +421,8 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 				for (j=0; j<cc[ncomp]; ++j)
 				{
 					m = pn[j];
-					m_node[m] = G[m][1];
-					++m_lval[ G[m][1] ];
+					m_node[m] = G2[m];
+					++m_lval[ G2[m] ];
 				}
 				if (i==1) bswap = true;
 			}
@@ -450,7 +450,7 @@ void FELevelStructure::Merge(FELevelStructure& L1, FELevelStructure& L2, bool& b
 	}
 
 	// reset the valence
-	m_lval.zero();
+	zero(m_lval);
 
 	// fill the nref list
 	// Remember to check to see if the node belongs to the graph

@@ -56,11 +56,11 @@ public:
 	bool IsUnpacked() { return (m_pT->m_pel == this); }
 
 	// interface to traits members
-	vec3d* r0() { return m_pT->r0; }		// material coordintes
-	vec3d* rt() { return m_pT->rt; }		// spatial coordinates
-	vec3d* vt() { return m_pT->vt; }		// velocities
+	vec3d* r0() { return &m_pT->r0[0]; }		// material coordintes
+	vec3d* rt() { return &m_pT->rt[0]; }		// spatial coordinates
+	vec3d* vt() { return &m_pT->vt[0]; }		// velocities
 
-	double* pt() { return m_pT->pt;}		// nodal pressures
+	double* pt() { return &m_pT->pt[0];}		// nodal pressures
 
 	int GaussPoints() const { return m_pT->nint; } 
 	int Nodes() const { return m_pT->neln; } 
@@ -218,7 +218,7 @@ public:
 	}
 
 
-	double* GaussWeights() { return ((FESolidElementTraits*)(m_pT))->gw; }			// weights of integration points
+	double* GaussWeights() { return &((FESolidElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 
 	double* Gr(int n) { return ((FESolidElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 	double* Gs(int n) { return ((FESolidElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
@@ -226,7 +226,7 @@ public:
 
 	void jact(double J[3][3], int n)
 	{
-		MATRIX3& Jt = ((FESolidElementTraits*)(m_pT))->m_Jt[n];
+		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jt[n];
 		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
 		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
@@ -234,7 +234,7 @@ public:
 
 	void invjact(double J[3][3], int n)
 	{
-		MATRIX3& Jt = ((FESolidElementTraits*)(m_pT))->m_Jti[n];
+		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jti[n];
 		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
 		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
@@ -242,7 +242,7 @@ public:
 
 	void jac0(double J[3][3], int n)
 	{
-		MATRIX3& J0 = ((FESolidElementTraits*)(m_pT))->m_J0[n];
+		mat3d& J0 = ((FESolidElementTraits*)(m_pT))->m_J0[n];
 		J[0][0] = J0[0][0]; J[0][1] = J0[0][1]; J[0][2] = J0[0][2];
 		J[1][0] = J0[1][0]; J[1][1] = J0[1][1]; J[1][2] = J0[1][2];
 		J[2][0] = J0[2][0]; J[2][1] = J0[2][1]; J[2][2] = J0[2][2];
@@ -250,7 +250,7 @@ public:
 
 	void invjac0(double J[3][3], int n)
 	{
-		MATRIX3& J0 = ((FESolidElementTraits*)(m_pT))->m_J0i[n];
+		mat3d& J0 = ((FESolidElementTraits*)(m_pT))->m_J0i[n];
 		J[0][0] = J0[0][0]; J[0][1] = J0[0][1]; J[0][2] = J0[0][2];
 		J[1][0] = J0[1][0]; J[1][1] = J0[1][1]; J[1][2] = J0[1][2];
 		J[2][0] = J0[2][0]; J[2][1] = J0[2][1]; J[2][2] = J0[2][2];
@@ -361,7 +361,7 @@ class FESurfaceElement : public FEElement
 public:
 	FESurfaceElement() { m_nelem = -1; }
 
-	FESurfaceElement(FESurfaceElement& el)
+	FESurfaceElement(const FESurfaceElement& el)
 	{
 		// set the traits of the element
 		SetTraits(el.m_pT);
@@ -378,7 +378,7 @@ public:
 		m_lnode = el.m_lnode;
 	}
 
-	FESurfaceElement& operator = (FESurfaceElement& el)
+	FESurfaceElement& operator = (const FESurfaceElement& el)
 	{
 		// make sure the element type is the same
 		if (m_pT == 0) SetTraits(el.m_pT);
@@ -403,7 +403,7 @@ public:
 		FEElement::SetTraits(pt);
 		m_lnode.resize(Nodes());
 	}
-	double* GaussWeights() { return ((FESurfaceElementTraits*)(m_pT))->gw; }			// weights of integration points
+	double* GaussWeights() { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 
 	double* Gr(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 	double* Gs(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
@@ -620,13 +620,13 @@ public:
 		m_State.assign(nint, 0);
 	}
 
-	double* GaussWeights() { return ((FEShellElementTraits*)(m_pT))->gw; }	// weights of integration points
+	double* GaussWeights() { return &((FEShellElementTraits*)(m_pT))->gw[0]; }	// weights of integration points
 
 	double* Hr(int n) { return ((FEShellElementTraits*)(m_pT))->Hr[n]; }	// shape function derivative to r
 	double* Hs(int n) { return ((FEShellElementTraits*)(m_pT))->Hs[n]; }	// shape function derivative to s
 
-	vec3d* D0() { return ((FEShellElementTraits*)(m_pT))->D0; }
-	vec3d* Dt() { return ((FEShellElementTraits*)(m_pT))->Dt; }
+	vec3d* D0() { return &((FEShellElementTraits*)(m_pT))->D0[0]; }
+	vec3d* Dt() { return &((FEShellElementTraits*)(m_pT))->Dt[0]; }
 
 	void Init(bool bflag)
 	{
@@ -643,7 +643,7 @@ public:
 
 	void invjac0(double J[3][3], int n)
 	{
-		MATRIX3& Jt = ((FEShellElementTraits*)(m_pT))->m_J0i[n];
+		mat3d& Jt = ((FEShellElementTraits*)(m_pT))->m_J0i[n];
 		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
 		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
@@ -651,7 +651,7 @@ public:
 
 	void invjact(double J[3][3], int n)
 	{
-		MATRIX3& Jt = ((FEShellElementTraits*)(m_pT))->m_Jti[n];
+		mat3d& Jt = ((FEShellElementTraits*)(m_pT))->m_Jti[n];
 		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
 		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
@@ -737,7 +737,7 @@ public:
 	FETrussElement(){}
 	virtual ~FETrussElement();
 
-	FETrussElement(FETrussElement& el)
+	FETrussElement(const FETrussElement& el)
 	{
 		// set the traits of the element
 		SetTraits(el.m_pT);
@@ -757,7 +757,7 @@ public:
 		m_a0 = el.m_a0;
 	}
 
-	FETrussElement& operator = (FETrussElement& el) 
+	FETrussElement& operator = (const FETrussElement& el) 
 	{
 		// make sure the element type is the same
 		if (m_pT == 0) SetTraits(el.m_pT);

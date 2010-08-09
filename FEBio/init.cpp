@@ -112,7 +112,7 @@ bool FEM::Init()
 	if (InitContact() == false) return false;
 
 	// check discrete elements
-	for (i=0; i<m_DE.size(); ++i)
+	for (i=0; i<(int) m_DE.size(); ++i)
 	{
 		FE_DISCRETE_ELEMENT& el = m_DE[i];
 		if (el.n1 <0 || el.n1 >= m_mesh.Nodes() ||

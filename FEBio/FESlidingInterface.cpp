@@ -90,7 +90,7 @@ void FESlidingSurface::Init()
 	// note that we force rigid shells to have zero thickness
 	FEMesh& m = *m_pMesh;
 	vector<double> tag(m.Nodes());
-	tag.zero();
+	zero(tag);
 	for (int nd=0; nd<m.Domains(); ++nd)
 	{
 		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
@@ -206,7 +206,7 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 	int i, k, m;
 
 	// zero penalty values
-	s.eps.zero();
+	zero(s.eps);
 
 	// get the mesh
 	FEMesh& mesh = *s.GetMesh();
@@ -367,7 +367,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 					if (pme == 0)
 					{
 						// nope, if has genuinly left contact
-						int* n = pold->m_node;
+						int* n = &pold->m_node[0];
 //						log.printf("node %d has left element (%d, %d, %d, %d)\n", m+1, n[0]+1, n[1]+1, n[2]+1, n[3]+1);
 					}
 					else if (m_mu*m_epsf > 0)

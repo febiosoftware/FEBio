@@ -12,7 +12,8 @@
 #include <memory.h>
 #include <assert.h>
 #include <stdio.h>
-#include "vector.h"
+#include <vector>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 //! Base class for sparse matrices

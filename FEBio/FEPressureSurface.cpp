@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 
-void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke, double* tn)
+void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn)
 {
 	int i, j, n;
 
@@ -70,7 +70,7 @@ void FEPressureSurface::PressureStiffness(FESurfaceElement& el, matrix& ke, doub
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe, double* tn)
+bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
 {
 	int i, n;
 
@@ -96,7 +96,7 @@ bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe, 
 	vec3d f;
 
 	// repeat over integration points
-	fe.zero();
+	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
 		N  = el.H(n);
@@ -128,7 +128,7 @@ bool FEPressureSurface::PressureForce(FESurfaceElement& el, vector<double>& fe, 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>& fe, double* tn)
+bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
 {
 	int i, n;
 
@@ -154,7 +154,7 @@ bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>
 	vec3d f;
 
 	// repeat over integration points
-	fe.zero();
+	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
 		N  = el.H(n);
@@ -189,7 +189,7 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 {
 	if (ar.IsSaving())
 	{
-		int i;
+		size_t i;
 		for (i=0; i<m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];
@@ -212,7 +212,7 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 	else
 	{
 		int i, m, mat;
-		for (i=0; i<m_el.size(); ++i)
+		for (i=0; i<(int) m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];
 			ar >> m;
@@ -226,7 +226,7 @@ void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
 		}
 
 		// pressure forces
-		for (i=0; i<m_PC.size(); ++i)
+		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			FEPressureLoad& pc = m_PC[i];
 			ar >> pc.blinear >> pc.face >> pc.lc;
@@ -363,7 +363,7 @@ void FEConstTractionSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 			vec3d dxr, dxs;
 
 			// repeat over integration points
-			fe.zero();
+			zero(fe);
 			for (n=0; n<nint; ++n)
 			{
 				N  = el.H(n);

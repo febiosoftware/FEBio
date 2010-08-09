@@ -41,7 +41,7 @@ void FENodeNodeList::Create(FEMesh& mesh)
 	EL.Create(mesh);
 
 	// create the nodal tag array
-	vector<int> tag(NN); tag.zero();
+	vector<int> tag; tag.assign(NN, 0);
 
 	// calculate nodal valences
 	m_nval.assign(NN, 0);
@@ -60,7 +60,7 @@ void FENodeNodeList::Create(FEMesh& mesh)
 		{
 			FEElement* pel = pe[j];
 			m = pel->Nodes();
-			en = pel->m_node;
+			en = &pel->m_node[0];
 			for (k=0; k<m; ++k)
 				if ((en[k] != i) && (tag[ en[k] ] == 0))
 				{
@@ -99,7 +99,7 @@ void FENodeNodeList::Create(FEMesh& mesh)
 		{
 			FEElement* pel = pe[j];
 			m = pel->Nodes();
-			en = pel->m_node;
+			en = &pel->m_node[0];
 			for (k=0; k<m; ++k)
 				if ((en[k] != i) && (tag[ en[k] ] == 0))
 				{
@@ -134,7 +134,7 @@ void FENodeNodeList::Create(FEDomain& dom)
 	EL.Create(dom);
 
 	// create the nodal tag array
-	vector<int> tag(NN); tag.zero();
+	vector<int> tag; tag.assign(NN, 0);
 
 	// calculate nodal valences
 	m_nval.assign(NN, 0);
@@ -153,7 +153,7 @@ void FENodeNodeList::Create(FEDomain& dom)
 		{
 			FEElement* pel = pe[j];
 			m = pel->Nodes();
-			en = pel->m_node;
+			en = &pel->m_node[0];
 			for (k=0; k<m; ++k)
 				if ((en[k] != i) && (tag[ en[k] ] == 0))
 				{
@@ -192,7 +192,7 @@ void FENodeNodeList::Create(FEDomain& dom)
 		{
 			FEElement* pel = pe[j];
 			m = pel->Nodes();
-			en = pel->m_node;
+			en = &pel->m_node[0];
 			for (k=0; k<m; ++k)
 				if ((en[k] != i) && (tag[ en[k] ] == 0))
 				{

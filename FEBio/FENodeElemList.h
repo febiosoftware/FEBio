@@ -39,7 +39,7 @@ public:
 	void Create(FEDomain& dom);
 
 	int Valence(int n) { return m_nval[n]; }
-	FEElement** ElementList(int n) { return (FEElement**) m_eref + m_pn[n]; }
+	FEElement** ElementList(int n) { return &m_eref[0] + m_pn[n]; }
 
 	int Size() { return (int) m_nval.size(); }
 

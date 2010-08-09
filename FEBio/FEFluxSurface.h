@@ -58,13 +58,13 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void FluxStiffness(FESurfaceElement& el, matrix& ke, double* vn, double dt);
+	void FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& vn, double dt);
 
 	//! Calculates volumetric flow rate due to flux
-	bool FlowRate(FESurfaceElement& el, vector<double>& fe, double* vn);
+	bool FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn);
 
 	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower)
-	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, double* vn);
+	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn);
 
 protected:
 	// Fluid flux boundary data

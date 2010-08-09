@@ -97,7 +97,7 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 				el.m_nID = n+1;
 				el.SetMatID(-1);
 
-				en = el.m_node;
+				en = &el.m_node[0];
 
 				en[0] = (i  )*(ny+1)*(nz+1) + (j  )*(nz+1) + (k  );
 				en[1] = (i+1)*(ny+1)*(nz+1) + (j  )*(nz+1) + (k  );

@@ -35,8 +35,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 	// initialize the permutation vector
 	// Set all entries to -1 to indicate that
 	// no node has been given a new number yet.
-	vector<int> Q(N);
-	Q.set(-1);
+	vector<int> Q; Q.assign(N, -1);
 
 	// create the node-node list
 	// this list stores for each node of the mesh
@@ -193,7 +192,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 			// We loop over all these nodes and assign a 
 			// node number to unnumbered adjacent nodes until
 			// all nodes of level l have been numbered 
-			for(i=0; i<Vi.size(); ++i)
+			for(i=0; i<(int) Vi.size(); ++i)
 			{
 				nw = Vi[i];
 
@@ -241,7 +240,7 @@ void FENodeReorder::Apply(FEMesh& mesh, vector<int>& P)
 				Vip1.clear();
 
 				// assign numbers to the next level
-				for (i=0; i<Vi.size(); ++i)
+				for (i=0; i<(int) Vi.size(); ++i)
 				{
 					nw = Vi[i];
 					n = NL.Valence(nw);

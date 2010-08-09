@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include "SuperLUSolver.h"
+#include "math.h"
 
 //////////////////////////////////////////////////////////////////////
 // SUPERLUSolver
@@ -101,7 +102,7 @@ bool SuperLUSolver::Factor()
 
 	// factorize the matrix
 	options.Fact = DOFACT;
-    dgssvx(&options, &A, perm_c, perm_r, etree, equed, NULL, NULL,
+    dgssvx(&options, &A, &perm_c[0], &perm_r[0], &etree[0], equed, NULL, NULL,
            &L, &U, NULL, 0, &B, &X, &rpg, &rcond, &ferr, &berr,
            &mem_usage, &stat, &info);
 
@@ -144,12 +145,12 @@ bool SuperLUSolver::Solve(vector<double>& x, vector<double>& b)
 
 	// set the data in the B matrix
 	DNformat *Bstore = (DNformat*) B.Store;
-	Bstore->nzval = b;
+	Bstore->nzval = &b[0];
 	B.ncol = 1;
 
 	// set the data in the X matrix
 	DNformat *Xstore = (DNformat*) X.Store;
-	Xstore->nzval = x;
+	Xstore->nzval = &x[0];
 	X.ncol = 1;
 
 	// initialize stats
@@ -158,7 +159,7 @@ bool SuperLUSolver::Solve(vector<double>& x, vector<double>& b)
 
 	// solve the system
 	options.Fact = FACTORED;
-    dgssvx(&options, &A, perm_c, perm_r, etree, equed, NULL, NULL,
+    dgssvx(&options, &A, &perm_c[0], &perm_r[0], &etree[0], equed, NULL, NULL,
            &L, &U, NULL, 0, &B, &X, &rpg, &rcond, &ferr, &berr,
            &mem_usage, &stat, &info);
 

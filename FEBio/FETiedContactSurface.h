@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FESurface.h"
+#include "vec2d.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact slave or master surface used for 
@@ -31,6 +32,6 @@ public:
 public:
 	vector<vec3d>		gap;	//!< gap function at nodes
 	vector<FEElement*>	pme;	//!< master element a slave node penetrates
-	vector<double[2]>	rs;		//!< natural coordinates of slave projection on master element
+	vector<vec2d>		rs;		//!< natural coordinates of slave projection on master element
 	vector<vec3d>		Lm;		//!< Lagrange multipliers
 };

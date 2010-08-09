@@ -99,8 +99,8 @@ void FESolidSolver::PrepStep(double time)
 	m_naug  = 0;	// nr of augmentations
 
 	// zero total displacements/pressures
-	m_Ui.zero();
-	m_Pi.zero();
+	zero(m_Ui);
+	zero(m_Pi);
 
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
@@ -124,8 +124,8 @@ void FESolidSolver::PrepStep(double time)
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
-	m_ui.zero();
-	for (i=0; i<m_fem.m_DC.size(); ++i)
+	zero(m_ui);
+	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
 		if (m_fem.m_DC[i].IsActive())
 		{
@@ -206,7 +206,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate local rigid displacements
-	for (i=0; i<m_fem.m_RDC.size(); ++i)
+	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
 		FERigidBody& RB = m_fem.m_RB[DC.id];
@@ -222,7 +222,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate global rigid displacements
-	for (i=0; i<m_fem.m_RB.size(); ++i)
+	for (i=0; i<(int) m_fem.m_RB.size(); ++i)
 	{
 		FERigidBody& RB = m_fem.m_RB[i];
 		if (RB.m_prb == 0)
@@ -289,7 +289,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// store rigid displacements in Ui vector
-	for (i=0; i<m_fem.m_RB.size(); ++i)
+	for (i=0; i<(int) m_fem.m_RB.size(); ++i)
 	{
 		FERigidBody& RB = m_fem.m_RB[i];
 		for (j=0; j<6; ++j)
@@ -300,7 +300,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// apply prescribed rigid body forces
-	for (i=0; i<m_fem.m_RFC.size(); ++i)
+	for (i=0; i<(int) m_fem.m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *m_fem.m_RFC[i];
 		FERigidBody& RB = m_fem.m_RB[FC.id];
@@ -571,7 +571,7 @@ bool FESolidSolver::Quasin(double time)
 			// we must set this to zero before the reformation
 			// because we assume that the prescribed displacements are stored 
 			// in the m_ui vector.
-			m_ui.zero();
+			zero(m_ui);
 
 			// reform stiffness matrices if necessary
 			if (breform)
@@ -664,7 +664,7 @@ bool FESolidSolver::Quasin(double time)
 void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 {
 	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
-	pi.zero();
+	zero(pi);
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.m_mesh.Node(i);
@@ -673,7 +673,7 @@ void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
 			pi[m++] = ui[nid];
-			assert(m <= pi.size());
+			assert(m <= (int) pi.size());
 		}
 	}
 }

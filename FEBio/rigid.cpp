@@ -56,7 +56,7 @@ void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 	vector<double> fe;
 
 	// loop over all elements
-	for (int i=0; i<m_Elem.size(); ++i)
+	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];

@@ -49,7 +49,7 @@ void FEMicroMaterial::PrepRVE()
 	// first we need to find all the boundary nodes
 	FEMesh& m = m_rve.m_mesh;
 	int N = m.Nodes();
-	vector<int> tag(N); tag.zero();
+	vector<int> tag; tag.assign(N, 0);
 
 	// create the element-element list
 	FEElemElemList EEL;
@@ -84,7 +84,7 @@ void FEMicroMaterial::PrepRVE()
 	assert(NN > 0);
 
 	// create the DC's
-	m_rve.m_DC.setsize(NN*3);
+	m_rve.m_DC.resize(NN*3);
 	NN = 0;
 	for (i=0; i<N; ++i)
 		if (tag[i] == 1)

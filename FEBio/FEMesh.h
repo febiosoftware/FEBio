@@ -121,7 +121,7 @@ public:
 	void create(int n)
 	{
 		assert(n);
-		m_Node.setsize(n);
+		m_Node.resize(n);
 	}
 
 	int size() { return m_Node.size(); }

@@ -39,7 +39,7 @@ bool SkylineSolver::Solve(vector<double>& x, vector<double>& R)
 	// with the solution
 	int neq = pK->Size();
 	for (int i=0; i<neq; ++i) x[i] = R[i];
-	colsol_solve(pK->Size(), pK->values(), pK->pointers(), x);
+	colsol_solve(pK->Size(), pK->values(), pK->pointers(), &x[0]);
 
 	return true;
 }

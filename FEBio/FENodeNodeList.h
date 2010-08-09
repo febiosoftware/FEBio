@@ -39,7 +39,7 @@ public:
 	int Size() { return m_nval.size(); }
 
 	int Valence(int i) { return m_nval[i]; }
-	int* NodeList(int i) { return (int*) m_nref + m_pn[i]; }
+	int* NodeList(int i) { return &m_nref[0] + m_pn[i]; }
 
 	void Sort();
 

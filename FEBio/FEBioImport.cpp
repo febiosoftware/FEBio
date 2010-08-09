@@ -1347,7 +1347,7 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 				if (pse == 0) throw XMLReader::InvalidTag(tag);
 
 				// read shell thickness
-				tag.value(pse->m_h0,pse->Nodes());
+				tag.value(&pse->m_h0[0],pse->Nodes());
 			}
 			else if (tag == "area")
 			{
@@ -1582,7 +1582,7 @@ void FEFEBioImport::ParseBCPrescribe(XMLTag& tag)
 
 	// allocate prescribed data
 	int nsize = fem.m_DC.size();
-	fem.m_DC.setsize(nsize + ndis);
+	fem.m_DC.resize(nsize + ndis);
 
 	// read the prescribed data
 	++tag;
@@ -1629,7 +1629,7 @@ void FEFEBioImport::ParseBCForce(XMLTag &tag)
 
 	// allocate prescribed data
 	int nsize = fem.m_FC.size();
-	fem.m_FC.setsize(nsize + ncnf);
+	fem.m_FC.resize(nsize + ncnf);
 
 	// read the prescribed data
 	++tag;
@@ -2497,7 +2497,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 
 		// allocate rigid node data
 		int nsize = fem.m_RN.size();
-		fem.m_RN.setsize(nsize + nrn);
+		fem.m_RN.resize(nsize + nrn);
 
 		++tag;
 		int id, rb;

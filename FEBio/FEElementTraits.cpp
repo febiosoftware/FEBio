@@ -71,8 +71,8 @@ void FESolidElementTraits::UnpackData(int nflag)
 			}
 			else throw NegativeJacobian(m_pel->m_nID, n+1, det);
 
-			matrix3_copy(m_Jt [n],  J);
-			matrix3_copy(m_Jti[n],  Ji);
+			m_Jt [n] = J;
+			m_Jti[n] = Ji;
 			m_detJt[n] = det;
 		}
 
@@ -123,8 +123,8 @@ void FESolidElementTraits::UnpackData(int nflag)
 
 			if (nflag & FE_UNPACK_JAC0)
 			{
-				matrix3_copy(m_J0 [n],  J);
-				matrix3_copy(m_J0i[n],  Ji);
+				m_J0 [n] = J;
+				m_J0i[n] = Ji;
 				m_detJ0[n] = det;
 			}
 		}
@@ -185,7 +185,7 @@ void FEShellElementTraits::UnpackData(int nflag)
 //	double MX, MY, MZ;
 
 	FEShellElement* pe = dynamic_cast<FEShellElement*>(m_pel);
-	double* h0 = pe->m_h0;
+	vector<double>& h0 = pe->m_h0;
 	double za;
 
 	for (n=0; n<nint; ++n)
@@ -248,8 +248,8 @@ void FEShellElementTraits::UnpackData(int nflag)
 				throw NegativeJacobian(m_pel->m_nID, n+1, det, m_pel);
 			}
 
-			matrix3_copy(m_Jt [n],  J);
-			matrix3_copy(m_Jti[n],  Ji);
+			m_Jt [n] =  J;
+			m_Jti[n] =  Ji;
 			m_detJt[n] = det;
 		}
 
@@ -306,8 +306,8 @@ void FEShellElementTraits::UnpackData(int nflag)
 
 			if (nflag & FE_UNPACK_JAC0)
 			{
-				matrix3_copy(m_J0 [n],  J);
-				matrix3_copy(m_J0i[n],  Ji);
+				m_J0 [n] = J;
+				m_J0i[n] = Ji;
 				m_detJ0[n] = det;
 			}
 		}

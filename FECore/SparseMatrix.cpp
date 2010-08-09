@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "SparseMatrix.h"
+#include "vector.h"
 
 //////////////////////////////////////////////////////////////////////
 // SparseMatrix
@@ -150,7 +151,8 @@ void CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 	double* pv, rj;
 	int* pi;
 
-	r.zero();
+	::zero(r);
+
 	// loop over all columns
 	for (j=0; j<N; ++j)
 	{

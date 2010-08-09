@@ -152,7 +152,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			if (fem.m_DE.size() > 0)
 			{
 				vector<int> lm(6);
-				for (i=0; i<fem.m_DE.size(); ++i)
+				for (i=0; i<(int) fem.m_DE.size(); ++i)
 				{
 					FE_DISCRETE_ELEMENT& de = fem.m_DE[i];
 					lm[0] = mesh.Node(de.n1).m_ID[0];
@@ -305,7 +305,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 							if (pe != 0)
 							{
 								FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
-								int* en = me.m_node;
+								int* en = &me.m_node[0];
 
 								// Note that we need to grab the rigid degrees of freedom as well
 								// this is in case one of the nodes belongs to a rigid body.
@@ -360,16 +360,16 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 						{
 							FESurfaceElement& se = ss.Element(j);
 							int nint = se.GaussPoints();
-							int* sn = se.m_node;
+							int* sn = &se.m_node[0];
 							for (k=0; k<nint; ++k, ++ni)
 							{
 								FESurfaceElement* pe = ss.m_pme[ni];
 								if (pe != 0)
 								{
 									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
-									int* mn = me.m_node;
+									int* mn = &me.m_node[0];
 
-									lm.set(-1);
+									set(lm, -1);
 
 									int nseln = se.Nodes();
 									int nmeln = me.Nodes();
@@ -419,16 +419,16 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 						{
 							FESurfaceElement& se = ss.Element(j);
 							int nint = se.GaussPoints();
-							int* sn = se.m_node;
+							int* sn = &se.m_node[0];
 							for (k=0; k<nint; ++k, ++ni)
 							{
 								FESurfaceElement* pe = ss.m_pme[ni];
 								if (pe != 0)
 								{
 									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
-									int* mn = me.m_node;
+									int* mn = &me.m_node[0];
 
-									lm.set(-1);
+									set(lm, -1);
 
 									int nseln = se.Nodes();
 									int nmeln = me.Nodes();
@@ -480,7 +480,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 						if (pe != 0)
 						{
 							FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
-							int* en = me.m_node;
+							int* en = &me.m_node[0];
 
 							n = me.Nodes();
 							if (n == 3)
@@ -529,7 +529,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					for (j=0; j<ss.Nodes(); ++j)
 					{
 						FESurfaceElement& me = *ss.m_pme[j];
-						int* en = me.m_node;
+						int* en = &me.m_node[0];
 
 						n = me.Nodes();
 						if (n == 3)
@@ -581,7 +581,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					int nr0[4];
 					for (j=0; j<n0; ++j) nr0[j] = pref->m_node[j];
 
-					lm.set(-1);
+					set(lm, -1);
 
 					lm[0] = ss.Node(nref).m_ID[0];
 					lm[1] = ss.Node(nref).m_ID[1];
@@ -604,9 +604,9 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					for (j=0; j<ss.Nodes(); ++j)
 					{
 						FESurfaceElement& me = *ss.m_pme[j];
-						int* en = me.m_node;
+						int* en = &me.m_node[0];
 
-						lm.set(-1);
+						set(lm, -1);
 
 						n = me.Nodes();
 
@@ -700,7 +700,7 @@ void FEStiffnessMatrix::build_flush()
 	for (i=0; i<m_nlm; ++i)
 	{
 		n = m_LM[i].size();
-		lm = m_LM[i];
+		lm = &(m_LM[i])[0];
 		for (j=0; j<n; ++j) if (lm[j] < -1) lm[j] = -lm[j]-2;
 	}
 

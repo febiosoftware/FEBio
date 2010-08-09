@@ -14,14 +14,13 @@ MatrixProfile::MatrixProfile(int n)
 	if (n>0)
 	{
 		// allocate the profile array
-		m_prof.setsize(n);
+		m_prof.resize(n);
 
 		// initialize the profile
 		for (int i=0; i<n; ++i)
 		{
 			vector<int>& a = m_prof[i];
 			a.resize(2);
-			a.setgrowsize(10);
 			a[0] = i;
 			a[1] = i;
 		}
@@ -44,7 +43,7 @@ MatrixProfile& MatrixProfile::operator =(MatrixProfile& mp)
 	if (m_prof.size() != mp.m_prof.size()) m_prof = mp.m_prof;
 	else
 	{
-		for (int i=0; i<m_prof.size(); ++i) m_prof[i] = mp.m_prof[i];
+		for (size_t i=0; i<m_prof.size(); ++i) m_prof[i] = mp.m_prof[i];
 	}
 
 	return (*this);
@@ -75,7 +74,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	// fill the valence array
 	for (i=0; i<M; ++i)
 	{
-		lm = LM[i];
+		lm = &(LM[i])[0];
 		N = LM[i].size();
 		Ntot += N;
 		for (j=0; j<N; ++j)
@@ -102,7 +101,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	// fill the pelc array
 	for (i=0; i<M; ++i)
 	{
-		lm = LM[i];
+		lm = &(LM[i])[0];
 		N = LM[i].size();
 		for (j=0; j<N; ++j)
 		{
@@ -133,7 +132,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			// that are currently in use for this column.
 			nold = 0;
 			vector<int>& a = m_prof[i];
-			for (j=0; j<a.size(); j += 2)
+			for (j=0; j<(int) a.size(); j += 2)
 			{
 				nold += a[j+1] - a[j] + 1;
 				for (k=a[j]; k<=a[j+1]; ++k) pcol[k] = i;
@@ -147,7 +146,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			for (j=0; j<pval[i]; ++j)
 			{
 				iel = (ppelc[i])[j];
-				lm = LM[iel];
+				lm = &(LM[iel])[0];
 				N = LM[iel].size();
 				for (k=0; k<N; ++k)
 				{
@@ -162,7 +161,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			if (n > 0)
 			{
 				// initialize the packed array to zero
-				a.setsize(0);
+				a.clear();
 
 				l = 0;
 				do

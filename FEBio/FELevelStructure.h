@@ -73,7 +73,7 @@ public:
 	int Valence(int l) { return m_lval[l]; }
 
 	//! return a list of nodes in level l
-	int* NodeList(int l) { return (int*) m_nref + m_pl[l]; }
+	int* NodeList(int l) { return &m_nref[0] + m_pl[l]; }
 
 	//! return the level that node n is in
 	int NodeLevel(int n) { return m_node[n]; }

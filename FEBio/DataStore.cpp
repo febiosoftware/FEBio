@@ -115,7 +115,7 @@ bool DataRecord::Write()
 	}
 
 	// save the data
-	for (int i=0; i<m_item.size(); ++i)
+	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		fprintf(fp, "%d%s", m_item[i], m_szdelim);
 		sz = m_szdata;
@@ -198,7 +198,7 @@ void DataRecord::SetItemList(const char* szlist)
 			}
 
 			for (i=n0; i<=n1; i += nn) m_item[n++] = i;
-			assert(n <= m_item.size());
+			assert(n <= (int) m_item.size());
 
 			if (ch) *ch = ',';
 			sz = ch+1;

@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to normal traction
 
-void FEPoroTractionSurface::TractionStiffness(FESurfaceElement& el, matrix& ke, double* tn, bool effective)
+void FEPoroTractionSurface::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective)
 {
 	int i, j, n;
 
@@ -83,7 +83,7 @@ void FEPoroTractionSurface::TractionStiffness(FESurfaceElement& el, matrix& ke, 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPoroTractionSurface::TractionForce(FESurfaceElement& el, vector<double>& fe, double* tn)
+bool FEPoroTractionSurface::TractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
 {
 	int i, n;
 
@@ -109,7 +109,7 @@ bool FEPoroTractionSurface::TractionForce(FESurfaceElement& el, vector<double>& 
 	vec3d f;
 
 	// repeat over integration points
-	fe.zero();
+	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
 		N  = el.H(n);
@@ -141,7 +141,7 @@ bool FEPoroTractionSurface::TractionForce(FESurfaceElement& el, vector<double>& 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPoroTractionSurface::LinearTractionForce(FESurfaceElement& el, vector<double>& fe, double* tn)
+bool FEPoroTractionSurface::LinearTractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
 {
 	int i, n;
 
@@ -167,7 +167,7 @@ bool FEPoroTractionSurface::LinearTractionForce(FESurfaceElement& el, vector<dou
 	vec3d f;
 
 	// repeat over integration points
-	fe.zero();
+	zero(fe);
 	for (n=0; n<nint; ++n)
 	{
 		N  = el.H(n);
@@ -202,7 +202,7 @@ void FEPoroTractionSurface::Serialize(FEM& fem, Archive& ar)
 {
 	if (ar.IsSaving())
 	{
-		int i;
+		size_t i;
 		for (i=0; i<m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];
@@ -225,7 +225,7 @@ void FEPoroTractionSurface::Serialize(FEM& fem, Archive& ar)
 	else
 	{
 		int i, m, mat;
-		for (i=0; i<m_el.size(); ++i)
+		for (i=0; i<(int) m_el.size(); ++i)
 		{
 			FESurfaceElement& el = m_el[i];
 			ar >> m;
@@ -239,7 +239,7 @@ void FEPoroTractionSurface::Serialize(FEM& fem, Archive& ar)
 		}
 
 		// normal tractions
-		for (i=0; i<m_PC.size(); ++i)
+		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			FEPoroNormalTraction& pc = m_PC[i];
 			ar >> pc.blinear >> pc. effective >> pc.face >> pc.lc;

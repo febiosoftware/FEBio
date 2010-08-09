@@ -63,7 +63,7 @@ void FEElasticShellDomain::InternalForces(FEShellElement& el, vector<double>& fe
 	double*	gw = el.GaussWeights();
 	double gt;
 
-	double* h0 = el.m_h0;
+	double* h0 = &el.m_h0[0];
 	double za;
 
 	double Nx, Ny, Nz;
@@ -229,7 +229,7 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 	const double *gw = el.GaussWeights();
 
 	// calculate the average thickness
-	double* h0 = el.m_h0, gt, za;
+	double* h0 = &el.m_h0[0], gt, za;
 
 	// see if this is a poroelastic material
 	bool bporo = false;
@@ -488,7 +488,7 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 	double *Hn, detJ;
 
 	// calculate the average thickness
-	double* h0 = el.m_h0, gt, za;
+	double* h0 = &el.m_h0[0], gt, za;
 
 	// loop over integration points
 	for (int n=0; n<nint; ++n)
@@ -532,7 +532,7 @@ void FEElasticShellDomain::DilatationalStiffness(FEM& fem, FEShellElement& elem,
 
 	// average global derivatives
 	vector<double> gradN(6*neln);
-	gradN.zero();
+	zero(gradN);
 
 	// initial element volume
 	double Ve = 0;
@@ -547,7 +547,7 @@ void FEElasticShellDomain::DilatationalStiffness(FEM& fem, FEShellElement& elem,
 	double *Gr, *Gs, *H;
 
 	// calculate the average thickness
-	double* h0 = elem.m_h0, gt, za;
+	double* h0 = &elem.m_h0[0], gt, za;
 
 	// repeat over gauss-points
 	for (n=0; n<nint; ++n)
@@ -726,7 +726,7 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	double* pt = se.pt();
 
 	int N = se.Nodes();
-	int* lm = se.LM();
+	vector<int>& lm = se.LM();
 
 	for (i=0; i<N; ++i)
 	{

@@ -18,7 +18,7 @@ bool FESolidSolver::StiffnessMatrix()
 	K.zero();
 
 	// zero the residual adjustment vector
-	m_Fd.zero();
+	zero(m_Fd);
 
 	// element stiffness matrix
 	matrix ke;
@@ -536,7 +536,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	R = m_Fn;
 
 	// zero nodal reaction forces
-	m_Fr.zero();
+	zero(m_Fr);
 
 	// element force vector
 	vector<double> fe;
@@ -733,13 +733,13 @@ void FESolidSolver::NodalForces(vector<double>& F)
 	int* lm;
 
 	// zero nodal force vector
-	F.zero();
+	zero(F);
 
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over nodal force cards
 	int ncnf = m_fem.m_FC.size();
-	FENodalForce* FC = m_fem.m_FC;
+	FENodalForce* FC = &m_fem.m_FC[0];
 	for (i=0; i<ncnf; ++i)
 	{
 		if (FC[i].IsActive())
@@ -806,7 +806,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 
 	// allocate F
 	vector<double> F(3*mesh.Nodes());
-	F.zero();
+	zero(F);
 
 	vector<double> fe;
 
@@ -869,7 +869,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 				}
 
 				// now, multiply M with F and add to R
-				int* en = el.m_node;
+				int* en = &el.m_node[0];
 				for (i=0; i<3*neln; ++i)
 				{
 					fe[i] = 0;
@@ -903,7 +903,7 @@ void FESolidSolver::DiscreteElementForces(vector<double>& R)
 
 	vector<int> en(2), lm(6);
 
-	for (int i=0; i<m_fem.m_DE.size(); ++i)
+	for (size_t i=0; i<m_fem.m_DE.size(); ++i)
 	{
 		FE_DISCRETE_ELEMENT& el = m_fem.m_DE[i];
 		E = el.E;
@@ -970,7 +970,7 @@ void FESolidSolver::DiscreteElementStiffness()
 
 	vector<int> en(2), lm(6);
 
-	for (int i=0; i<m_fem.m_DE.size(); ++i)
+	for (size_t i=0; i<m_fem.m_DE.size(); ++i)
 	{
 		FE_DISCRETE_ELEMENT& el = m_fem.m_DE[i];
 		E = el.E;

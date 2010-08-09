@@ -38,8 +38,7 @@ void FESlidingSurface2::Init()
 	m_epsn.assign(nint, 1.0);
 	m_epsp.assign(nint, 1.0);
 
-	m_nn.resize(Nodes());
-	m_nn.zero();
+	m_nn.assign(Nodes(), 0);
 
 	m_nei.resize(Elements());
 	nint = 0;
@@ -50,7 +49,7 @@ void FESlidingSurface2::Init()
 	}
 
 	// set intial values
-	m_nu.zero();
+	zero(m_nu);
 
 	// allocate biphasic stuff
 	if (m_pfem->m_pStep->m_nModule == FE_POROELASTIC)
@@ -64,7 +63,7 @@ void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 {
 	m_Lmd = s.m_Lmd;
 	m_gap = s.m_gap;
-	m_pme.zero();
+	zero(m_pme);
 
 	if (m_pfem->m_pStep->m_nModule == FE_POROELASTIC)
 	{
@@ -85,7 +84,7 @@ void FESlidingSurface2::UpdateNodeNormals()
 	vec3d y[4], n;
 
 	// zero nodal normals
-	m_nn.zero();
+	zero(m_nn);
 
 	// loop over all elements
 	for (i=0; i<Elements(); ++i)

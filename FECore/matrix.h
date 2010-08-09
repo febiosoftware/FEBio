@@ -10,8 +10,10 @@
 #endif // _MSC_VER > 1000
 
 #include <memory.h>
-#include "vector.h"
 #include <assert.h>
+#include <vector>
+using namespace std;
+
 class matrix  
 {
 public:
