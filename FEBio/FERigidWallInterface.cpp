@@ -77,7 +77,7 @@ void FERigidWallSurface::Init()
 	// allocate other surface data
 	gap.assign(nn, 0);		// gap funtion
 	nu.resize(nn);		// node normal 
-	pme.assign(nn, 0);		// penetrated master element
+	pme.assign(nn, NULL);		// penetrated master element
 	rs.resize(nn);		// natural coords of projected slave node on master element
 	rsp.resize(nn);
 	Lm.assign(nn, 0);

@@ -1211,7 +1211,7 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 
 	// create the pelem array
 	vector<FEElement*> pelem;
-	pelem.assign(nelems, 0);
+	pelem.assign(nelems, NULL);
 
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{

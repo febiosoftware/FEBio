@@ -214,7 +214,7 @@ public:
 
 		int nint = GaussPoints();
 
-		m_State.assign(nint, 0);
+		m_State.assign(nint, NULL);
 	}
 
 
@@ -617,7 +617,7 @@ public:
 
 		int nint = GaussPoints();
 
-		m_State.assign(nint, 0);
+		m_State.assign(nint, NULL);
 	}
 
 	double* GaussWeights() { return &((FEShellElementTraits*)(m_pT))->gw[0]; }	// weights of integration points
@@ -828,7 +828,7 @@ public:
 	virtual void SetTraits(FEElementTraits* ptraits)
 	{
 		FEElement::SetTraits(ptraits);
-		m_State.assign(1, 0);
+		m_State.assign(1, NULL);
 	}
 
 public:

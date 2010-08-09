@@ -26,7 +26,7 @@ void FEFacetSlidingSurface::Init()
 	m_nu.resize(nint);
 	m_rs.resize(nint);
 	m_Lm.assign(nint, 0.0);
-	m_pme.assign(nint, 0);
+	m_pme.assign(nint, NULL);
 	m_eps.assign(nint, 1.0);
 
 	// set intial values
