@@ -739,7 +739,7 @@ void FESolidSolver::NodalForces(vector<double>& F)
 
 	// loop over nodal force cards
 	int ncnf = m_fem.m_FC.size();
-	FENodalForce* FC = &m_fem.m_FC[0];
+	vector<FENodalForce>& FC = m_fem.m_FC;
 	for (i=0; i<ncnf; ++i)
 	{
 		if (FC[i].IsActive())

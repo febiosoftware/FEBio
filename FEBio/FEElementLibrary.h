@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/vector.h"
+#include <vector>
 
 class FEElement;
 class FEElementTraits;
@@ -37,7 +37,7 @@ public:
 	static void SetElementTraits(FEElement& el, int id);
 
 protected:
-	static ptr_vector<FEElementTraits>	m_Traits;	//!< pointer to registered element traits
+	static std::vector<FEElementTraits*>	m_Traits;	//!< pointer to registered element traits
 };
 
 extern FEElementLibrary	elem_lib;

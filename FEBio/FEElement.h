@@ -152,11 +152,14 @@ public:
 	FESolidElement(const FESolidElement& el)
 	{
 		// set the traits of the element
-		SetTraits(el.m_pT);
+		if (el.m_pT)
+		{
+			SetTraits(el.m_pT);
 
-		// copy the state information
-		int nint = GaussPoints();
-		for (int i=0; i<nint; ++i) m_State[i] = el.m_State[i]->Copy();
+			// copy the state information
+			int nint = GaussPoints();
+			for (int i=0; i<nint; ++i) m_State[i] = el.m_State[i]->Copy();
+		}
 
 		// copy base class data
 		m_mat = el.m_mat;
@@ -364,7 +367,7 @@ public:
 	FESurfaceElement(const FESurfaceElement& el)
 	{
 		// set the traits of the element
-		SetTraits(el.m_pT);
+		if (el.m_pT) SetTraits(el.m_pT);
 
 		// copy base class data
 		m_mat = el.m_mat;
@@ -565,11 +568,14 @@ public:
 	FEShellElement(const FEShellElement& el)
 	{
 		// set the traits of the element
-		SetTraits(el.m_pT);
+		if (el.m_pT)
+		{
+			SetTraits(el.m_pT);
 
-		// we just copy the state information
-		int nint = GaussPoints();
-		for (int i=0; i<nint; ++i) m_State[i]= el.m_State[i]->Copy();
+			// we just copy the state information
+			int nint = GaussPoints();
+			for (int i=0; i<nint; ++i) m_State[i]= el.m_State[i]->Copy();
+		}
 
 		// copy base class data
 		m_mat = el.m_mat;
@@ -739,12 +745,15 @@ public:
 
 	FETrussElement(const FETrussElement& el)
 	{
-		// set the traits of the element
-		SetTraits(el.m_pT);
+		if (el.m_pT)
+		{
+			// set the traits of the element
+			SetTraits(el.m_pT);
 
-		// we just copy the state information
-		int nint = GaussPoints();
-		for (int i=0; i<nint; ++i) m_State[i]= el.m_State[i]->Copy();
+			// we just copy the state information
+			int nint = GaussPoints();
+			for (int i=0; i<nint; ++i) m_State[i]= el.m_State[i]->Copy();
+		}
 
 		// copy base class data
 		m_mat = el.m_mat;

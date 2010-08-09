@@ -5,9 +5,8 @@
 #include "stdafx.h"
 #include "FEElementLibrary.h"
 #include "FEElement.h"
-#include "FECore/vector.h"
 
-ptr_vector<FEElementTraits> FEElementLibrary::m_Traits;
+std::vector<FEElementTraits*> FEElementLibrary::m_Traits;
 
 FEElementLibrary	elem_lib;
 
@@ -42,16 +41,17 @@ FEElementLibrary::FEElementLibrary()
 
 FEElementLibrary::~FEElementLibrary()
 {
-
+	for (size_t i=0; i<m_Traits.size(); ++i) delete m_Traits[i];
+	m_Traits.clear();
 }
 
 int FEElementLibrary::RegisterTraits(FEElementTraits* ptrait) 
 { 
-	m_Traits.add(ptrait); 
+	m_Traits.push_back(ptrait); 
 	return (m_Traits.size()-1);
 }
 
 void FEElementLibrary::SetElementTraits(FEElement& el, int nid)
 {
-	el.SetTraits( &m_Traits[nid] );
+	el.SetTraits( m_Traits[nid] );
 }
