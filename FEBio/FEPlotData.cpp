@@ -121,7 +121,7 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 
 	for (i=0; i<fem.ContactInterfaces(); ++i)
 	{
-		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(fem.m_CI[i]);
 		if (psi)
 		{
 			FESlidingSurface& ms = psi->m_ms;
@@ -131,7 +131,7 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j];
 		}
 
-		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&fem.m_CI[i]);
+		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
 		if (pti)
 		{
 			FETiedContactSurface& ms = pti->ms;
@@ -141,14 +141,14 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j].norm();
 		}
 
-		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
+		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(fem.m_CI[i]);
 		if (pri)
 		{
 			FERigidWallSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j];
 		}
 
-		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
 		if (pf)
 		{
 			vector<int> val(fem.m_mesh.Nodes()); zero(val);
@@ -184,7 +184,7 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
 		}
 
-		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
+		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
 		if (ps2)
 		{
 			vector<int> val(fem.m_mesh.Nodes()); zero(val);
@@ -233,9 +233,9 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 	int i, j, k, n;
 
 	vector<float> acc(3*fem.m_mesh.Nodes()); zero(acc);
-	for (i=0; i<fem.m_CI.size(); ++i)
+	for (i=0; i<(int) fem.m_CI.size(); ++i)
 	{
-		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (&fem.m_CI[i]);
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (fem.m_CI[i]);
 		if (psi)
 		{
 			for (n=0; n<psi->m_npass; ++n)
@@ -254,7 +254,7 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 			}
 		}
 
-		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
 		if (pf)
 		{
 			vector<int> val(fem.m_mesh.Nodes()); zero(val);
@@ -304,7 +304,7 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 			}
 		}
 
-		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
+		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
 		if (ps2)
 		{
 			vector<int> val(fem.m_mesh.Nodes()); zero(val);

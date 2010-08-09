@@ -19,7 +19,7 @@ FEM::FEM()
 	// --- Analysis Data ---
 	// we create at least one step
 	m_pStep = new FEAnalysis(*this);
-	m_Step.add(m_pStep);
+	m_Step.push_back(m_pStep);
 	m_nStep = 0;
 	m_nhex8 = FE_HEX;
 	m_bsym_poro = true;			// use symmetric poro implementation
@@ -30,13 +30,13 @@ FEM::FEM()
 	// add the "zero" loadcurve
 	// this is the loadcurve that will be used if a loadcurve is not
 	// specified for something that depends on time
-	FELoadCurve* plc = new FELoadCurve;
-	plc->Create(2);
-	plc->LoadPoint(0).time = 0;
-	plc->LoadPoint(0).value = 0;
-	plc->LoadPoint(1).time = m_pStep->m_ntime*m_pStep->m_dt0;
-	plc->LoadPoint(1).value = 1;
-	AddLoadCurve(plc);
+	FELoadCurve lc;
+	lc.Create(2);
+	lc.LoadPoint(0).time = 0;
+	lc.LoadPoint(0).value = 0;
+	lc.LoadPoint(1).time = m_pStep->m_ntime*m_pStep->m_dt0;
+	lc.LoadPoint(1).value = 1;
+	AddLoadCurve(lc);
 
 	// --- Geometry Data ---
 	m_nreq = 0;
@@ -99,7 +99,12 @@ FEM::FEM()
 
 FEM::~FEM()
 {
-
+	size_t i;
+	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
+	for (i=0; i<m_RJ.size  (); ++i) delete m_RJ[i]  ; m_RJ.clear  ();
+	for (i=0; i<m_CI.size  (); ++i) delete m_CI[i]  ; m_CI.clear  ();
+	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
+	for (i=0; i<m_MPL.size (); ++i) delete m_MPL[i] ; m_MPL.clear ();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,11 +193,11 @@ void FEM::ShallowCopy(FEM& fem)
 	// copy rigid joint data
 	if (m_nrj == 0)
 	{
-		for (i=0; i<fem.m_nrj; ++i) m_RJ.add(new FERigidJoint(this));
+		for (i=0; i<fem.m_nrj; ++i) m_RJ.push_back(new FERigidJoint(this));
 		m_nrj = m_RJ.size();
 	}
 	assert(m_nrj == fem.m_nrj);
-	for (i=0; i<m_nrj; ++i) m_RJ[i].ShallowCopy(fem.m_RJ[i]);
+	for (i=0; i<m_nrj; ++i) m_RJ[i]->ShallowCopy(*fem.m_RJ[i]);
 
 	// copy contact data
 	if (ContactInterfaces() == 0)
@@ -200,7 +205,7 @@ void FEM::ShallowCopy(FEM& fem)
 		FEContactInterface* pci;
 		for (int i=0; i<fem.ContactInterfaces(); ++i)
 		{
-			switch (fem.m_CI[i].Type())
+			switch (fem.m_CI[i]->Type())
 			{
 			case FE_CONTACT_SLIDING:
 				pci = new FESlidingInterface(this);
@@ -227,11 +232,11 @@ void FEM::ShallowCopy(FEM& fem)
 				assert(false);
 			}
 
-			m_CI.add(pci);
+			m_CI.push_back(pci);
 		}
 	}
 	assert(ContactInterfaces() == fem.ContactInterfaces());
-	for (i=0; i<ContactInterfaces(); ++i) m_CI[i].ShallowCopy(fem.m_CI[i]);
+	for (i=0; i<ContactInterfaces(); ++i) m_CI[i]->ShallowCopy(*fem.m_CI[i]);
 }
 
 //-----------------------------------------------------------------------------

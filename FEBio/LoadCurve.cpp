@@ -6,6 +6,28 @@
 #include "LoadCurve.h"
 
 //-----------------------------------------------------------------------------
+// copy constructor
+FELoadCurve::FELoadCurve(const FELoadCurve &LC)
+{
+	m_lp = LC.m_lp;
+	m_value = LC.Value();
+	m_fnc = LC.m_fnc;
+	m_ext = LC.m_ext;
+}
+
+//-----------------------------------------------------------------------------
+// assignment operator
+FELoadCurve& FELoadCurve::operator = (const FELoadCurve& LC)
+{
+	m_lp = LC.m_lp;
+	m_value = LC.Value();
+	m_fnc = LC.m_fnc;
+	m_ext = LC.m_ext;
+
+	return (*this);
+}
+
+//-----------------------------------------------------------------------------
 // FUNCTION : LoadCurve::Create
 // Creates the time and data value arrays
 //
@@ -70,9 +92,9 @@ inline double qerp(double t, double t0, double f0, double t1, double f1, double 
 	return f0*q0 + f1*q1 + f2*q2;
 }
 
-double FELoadCurve::Value(double time)
+double FELoadCurve::Value(double time) const
 {
-	LOADPOINT* lp = &m_lp[0];
+	const LOADPOINT* lp = &m_lp[0];
 
 	int nsize = Points();
 	if (nsize == 0) return 0;
@@ -186,9 +208,9 @@ double FELoadCurve::Value(double time)
 //-----------------------------------------------------------------------------
 //! This function determines the value of the load curve outside of its domain
 //!
-double FELoadCurve::ExtendValue(double t)
+double FELoadCurve::ExtendValue(double t) const
 {
-	LOADPOINT* lp = &m_lp[0];
+	const LOADPOINT* lp = &m_lp[0];
 
 	int nsize =Points();
 	int N = nsize - 1;
@@ -266,7 +288,7 @@ int FELoadCurve::FindPoint(double t)
 
 //-----------------------------------------------------------------------------
 
-bool FELoadCurve::HasPoint(double t)
+bool FELoadCurve::HasPoint(double t) const
 {
 	const double tmax = m_lp[Points()-1].time;
 	const double eps = 1e-7 * tmax;

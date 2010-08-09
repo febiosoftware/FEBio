@@ -43,6 +43,12 @@ public:
 	//! default constructor
 	FELoadCurve() : m_fnc(LINEAR), m_ext(CONSTANT) {}
 
+	//! copy constructor
+	FELoadCurve(const FELoadCurve& LC);
+
+	//! assignment operator
+	FELoadCurve& operator = (const FELoadCurve& LC);
+
 	//! destructor
 	virtual ~FELoadCurve() {}
 
@@ -59,8 +65,8 @@ public:
 	void SetPoint(int i, double time, double val);
 
 	//! returns the value of the load curve at time
-	double Value(double time);
-	double Value() { return m_value; }
+	double Value(double time) const;
+	double Value() const { return m_value; }
 
 	//! evaluates the loadcurve at time
 	void Evaluate(double time)
@@ -81,16 +87,16 @@ public:
 	int FindPoint(double t);
 
 	//! return nr of points
-	int Points() { return m_lp.size(); }
+	int Points() const { return m_lp.size(); }
 
 	//! see if there is a point at time t
-	bool HasPoint(double t);
+	bool HasPoint(double t) const;
 
 	//! Serialize data to archive
 	void Serialize(Archive& ar);
 
 protected:
-	double ExtendValue(double t);
+	double ExtendValue(double t) const;
 
 protected:
 	vector<LOADPOINT>	m_lp;	//!< load time values

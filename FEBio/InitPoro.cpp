@@ -12,7 +12,7 @@ bool FEM::InitPoro()
 
 	// see if there are any poro-elastic materials present
 	for (i=0; i<Materials(); ++i)
-		if (dynamic_cast<FEPoroElastic*>(&m_MAT[i]))
+		if (dynamic_cast<FEPoroElastic*>(m_MAT[i]))
 		{
 			m_pStep->m_nModule = FE_POROELASTIC;
 			break;

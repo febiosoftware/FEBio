@@ -33,11 +33,11 @@ bool FEM::Solve()
 	// Note that we don't necessarily from step 0.
 	// This is because the user could have restarted
 	// the analysis. 
-	for (int nstep=m_nStep; nstep < m_Step.size(); ++nstep)
+	for (size_t nstep=m_nStep; nstep < m_Step.size(); ++nstep)
 	{
 		// set the current analysis step
 		m_nStep = nstep;
-		m_pStep = &m_Step[nstep];
+		m_pStep = m_Step[nstep];
 
 		// intitialize step data
 		if (m_pStep->Init() == false)

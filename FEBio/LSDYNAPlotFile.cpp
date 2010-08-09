@@ -642,9 +642,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 	int i, j, k, n;
 
 	vector<float> acc(3*fem.m_mesh.Nodes()); zero(acc);
-	for (i=0; i<fem.m_CI.size(); ++i)
+	for (i=0; i<(int) fem.m_CI.size(); ++i)
 	{
-		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (&fem.m_CI[i]);
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (fem.m_CI[i]);
 		if (psi)
 		{
 			for (n=0; n<psi->m_npass; ++n)
@@ -667,7 +667,7 @@ void LSDYNAPlotFile::write_contact_tractions()
 			}
 		}
 
-		FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(&fem.m_CI[i]);
+		FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(fem.m_CI[i]);
 		if (pbi)
 		{
 			FEPeriodicSurface& ss = pbi->m_ss;
@@ -693,7 +693,7 @@ void LSDYNAPlotFile::write_contact_tractions()
 			}
 		}
 
-		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(&fem.m_CI[i]);
+		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(fem.m_CI[i]);
 		if (psc)
 		{
 			FESurfaceConstraintSurface& ss = psc->m_ss;
@@ -719,7 +719,7 @@ void LSDYNAPlotFile::write_contact_tractions()
 			}
 		}
 
-		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
 		if (pf)
 		{
 			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
@@ -769,7 +769,7 @@ void LSDYNAPlotFile::write_contact_tractions()
 			}
 		}
 
-		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
+		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
 		if (ps2)
 		{
 			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
@@ -921,7 +921,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 
 	for (i=0; i<fem.ContactInterfaces(); ++i)
 	{
-		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(fem.m_CI[i]);
 		if (psi)
 		{
 			FESlidingSurface& ms = psi->m_ms;
@@ -946,7 +946,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 			}
 		}
 
-		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&fem.m_CI[i]);
+		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
 		if (pti)
 		{
 			FETiedContactSurface& ms = pti->ms;
@@ -956,7 +956,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j].norm();
 		}
 
-		FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(&fem.m_CI[i]);
+		FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(fem.m_CI[i]);
 		if (pbi)
 		{
 			FEPeriodicSurface& ms = pbi->m_ms;
@@ -966,7 +966,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.m_Lm[j].norm();
 		}
 
-		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(&fem.m_CI[i]);
+		FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(fem.m_CI[i]);
 		if (psc)
 		{
 			FESurfaceConstraintSurface& ms = psc->m_ms;
@@ -976,14 +976,14 @@ void LSDYNAPlotFile::write_contact_pressures()
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.m_Lm[j].norm();
 		}
 
-		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
+		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(fem.m_CI[i]);
 		if (pri)
 		{
 			FERigidWallSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.Lm[j];
 		}
 
-		FEFacet2FacetSliding* pfs = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		FEFacet2FacetSliding* pfs = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
 		if (pfs)
 		{
 			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
@@ -1036,7 +1036,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 
 	for (i=0; i<fem.ContactInterfaces(); ++i)
 	{
-		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(&fem.m_CI[i]);
+		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(fem.m_CI[i]);
 		if (psi)
 		{
 			FESlidingSurface& ms = psi->m_ms;
@@ -1046,7 +1046,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0 ? 0 : ss.gap[j]);
 		}
 
-		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(&fem.m_CI[i]);
+		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
 		if (pti)
 		{
 			FETiedContactSurface& ms = pti->ms;
@@ -1056,14 +1056,14 @@ void LSDYNAPlotFile::write_contact_gaps()
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j].norm();
 		}
 
-		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&fem.m_CI[i]);
+		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(fem.m_CI[i]);
 		if (pri)
 		{
 			FERigidWallSurface& ss = pri->m_ss;
 			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) (ss.gap[j] < 0? 0 : ss.gap[j]);
 		}
 
-		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(&fem.m_CI[i]);
+		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
 		if (pf)
 		{
 			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
@@ -1101,7 +1101,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
 		}
 
-		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(&fem.m_CI[i]);
+		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
 		if (ps2)
 		{
 			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);

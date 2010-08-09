@@ -649,7 +649,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		{
 			// create a new sliding interface and add it to the model
 			FESlidingInterface* psi = new FESlidingInterface(&fem);
-			fem.m_CI.add(psi);
+			fem.m_CI.push_back(psi);
 			FESlidingInterface& si = *psi;
 
 			// allocate storage for contact surfaces
@@ -676,7 +676,7 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		int en[4], k, N;
 		for (i=0; i<m_numsi; ++i)
 		{
-			FESlidingInterface& si = dynamic_cast<FESlidingInterface&>(fem.m_CI[i]);
+			FESlidingInterface& si = dynamic_cast<FESlidingInterface&>(*fem.m_CI[i]);
 
 			int nss = si.m_ss.Elements();
 			int nms = si.m_ms.Elements();
@@ -748,7 +748,6 @@ bool FENIKEImport::ReadCurveDeck(FEM& fem)
 
 	int lcs; // size of loadcurve
 	double time, val;
-	FELoadCurve* plc;
 	for (i=0; i<m_nlc; ++i)
 	{
 		// -------- load card 1 --------
@@ -757,8 +756,8 @@ bool FENIKEImport::ReadCurveDeck(FEM& fem)
 		nread = sscanf(szline, "%*5d%5d", &lcs);
 		if (nread != 1) return errf(szerr[ERR_LC], i+1);
 
-		plc = new FELoadCurve;
-		plc->Create(lcs);
+		FELoadCurve lc;
+		lc.Create(lcs);
 
 		// -------- load card 2 - n --------
 		for (j=0; j<lcs; ++j)
@@ -768,10 +767,10 @@ bool FENIKEImport::ReadCurveDeck(FEM& fem)
 			nread = sscanf(szline, "%10lg%10lg", &time, &val);
 			if (nread != 2) return errf(szerr[ERR_LC], i+1);
 
-			plc->SetPoint(j, time, val);
+			lc.SetPoint(j, time, val);
 		}
 
-		fem.AddLoadCurve(plc);
+		fem.AddLoadCurve(lc);
 	}
 
 	return true;

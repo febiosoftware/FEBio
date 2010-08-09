@@ -41,7 +41,7 @@ bool FESolidSolver::StiffnessMatrix()
 	// calculate joint stiffness 
 	if (m_fem.m_nrj)
 	{
-		for (int i=0; i<m_fem.m_nrj; ++i) m_fem.m_RJ[i].JointStiffness();
+		for (int i=0; i<m_fem.m_nrj; ++i) m_fem.m_RJ[i]->JointStiffness();
 	}
 
 	// calculate pressure stiffness term
@@ -118,7 +118,7 @@ void FESolidSolver::LinearConstraintStiffness()
 
 void FESolidSolver::ContactStiffness()
 {
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.m_CI[i].ContactStiffness();
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.m_CI[i]->ContactStiffness();
 }
 
 //-----------------------------------------------------------------------------
@@ -518,7 +518,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 //! Calculates the contact forces
 void FESolidSolver::ContactForces(vector<double>& R)
 {
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.m_CI[i].ContactForces(R);
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.m_CI[i]->ContactForces(R);
 }
 
 //-----------------------------------------------------------------------------
@@ -584,7 +584,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// rigid joint forces
 	if (m_fem.m_nrj)
 	{
-		for (int i=0; i<m_fem.m_nrj; ++i) m_fem.m_RJ[i].JointForces(R);
+		for (int i=0; i<m_fem.m_nrj; ++i) m_fem.m_RJ[i]->JointForces(R);
 	}
 
 	// calculate contact forces

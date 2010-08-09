@@ -27,14 +27,14 @@ bool FESolidSolver::Augment()
 	if (m_fem.m_nrj)
 	{
 		// loop over all rigid joints
-		for (int i=0; i<m_fem.m_nrj; ++i) bconv = m_fem.m_RJ[i].Augment() && bconv;
+		for (int i=0; i<m_fem.m_nrj; ++i) bconv = m_fem.m_RJ[i]->Augment() && bconv;
 	}
 
 	// Do contact augmentations
 	if (m_fem.m_bcontact)
 	{
 		// loop over all contact interfaces
-		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.m_CI[i].Augment(m_naug) && bconv;
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.m_CI[i]->Augment(m_naug) && bconv;
 	}
 
 	// do linear constraint augmentations

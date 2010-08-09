@@ -17,7 +17,8 @@ FEMesh::FEMesh()
 
 FEMesh::~FEMesh()
 {
-
+	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
+	m_NodeSet.clear();
 }
 
 void FEMesh::ClearDomains()
@@ -435,7 +436,7 @@ double FEMesh::ElementVolume(FEElement& el)
 
 FENodeSet* FEMesh::FindNodeSet(int nid)
 {
-	for (int i=0; i<m_NodeSet.size(); ++i) if (m_NodeSet[i].GetID() == nid) return &m_NodeSet[i];
+	for (size_t i=0; i<m_NodeSet.size(); ++i) if (m_NodeSet[i]->GetID() == nid) return m_NodeSet[i];
 	return 0;
 }
 
@@ -444,7 +445,7 @@ FENodeSet* FEMesh::FindNodeSet(int nid)
 
 FENodeSet* FEMesh::FindNodeSet(const char* szname)
 {
-	for (int i=0; i<m_NodeSet.size(); ++i) if (strcmp(m_NodeSet[i].GetName(), szname)) return &m_NodeSet[i];
+	for (size_t i=0; i<m_NodeSet.size(); ++i) if (strcmp(m_NodeSet[i]->GetName(), szname)) return m_NodeSet[i];
 	return 0;
 }
 

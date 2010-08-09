@@ -204,7 +204,7 @@ public:
 	double ElementVolume(FEElement& el);
 
 	//! adds a node set to the mesh
-	void AddNodeSet(FENodeSet* pns) { m_NodeSet.add(pns); }
+	void AddNodeSet(FENodeSet* pns) { m_NodeSet.push_back(pns); }
 
 	//! Find a nodeset by ID
 	FENodeSet* FindNodeSet(int nid);
@@ -241,8 +241,7 @@ protected:
 protected:
 	vector<FENode>		m_Node;		//!< FE nodes array
 	vector<FEDomain*>	m_Domain;	//!< list of domains
-
-	ptr_vector<FENodeSet>	m_NodeSet;	//!< node sets
+	vector<FENodeSet*>	m_NodeSet;	//!< node sets
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 

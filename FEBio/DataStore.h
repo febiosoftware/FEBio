@@ -10,8 +10,9 @@
 #endif // _MSC_VER > 1000
 
 #include <stdio.h>
-#include "FECore/vector.h"
 #include "MathParser.h"
+#include <vector>
+using namespace std;
 
 class FEM;
 class FENodeSet;
@@ -90,7 +91,7 @@ public:
 	void AddRecord(DataRecord* prec);
 
 protected:
-	ptr_vector<DataRecord>	m_data;	//!< the data records
+	vector<DataRecord*>	m_data;	//!< the data records
 };
 
 #endif // !defined(AFX_DATASTORE_H__FC7861A3_2B1A_438C_AC7D_7ADD2F8DE6F4__INCLUDED_)

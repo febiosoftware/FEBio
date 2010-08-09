@@ -257,7 +257,7 @@ bool FEM::InitRigidBodies()
 		FERigidMaterial* pm;
 		for (i=0; i<m_nrj; ++i)
 		{
-			FERigidJoint& rj = m_RJ[i];
+			FERigidJoint& rj = *m_RJ[i];
 			rj.m_F = vec3d(0,0,0);
 
 			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
@@ -389,11 +389,11 @@ bool FEM::InitRigidBodies()
 	for (i=0; i<(int) m_RB.size(); ++i)
 	{
 		FERigidBody& rb = m_RB[i];
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(&m_MAT[rb.m_mat]);
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_MAT[rb.m_mat]);
 		assert(pm);
 		if (pm->m_pmid > -1)
 		{
-			FERigidMaterial* ppm = dynamic_cast<FERigidMaterial*>(&m_MAT[pm->m_pmid-1]);
+			FERigidMaterial* ppm = dynamic_cast<FERigidMaterial*>(m_MAT[pm->m_pmid-1]);
 			assert(ppm);
 			FERigidBody& prb = m_RB[ppm->m_nRB];
 			rb.m_prb = &prb;

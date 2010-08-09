@@ -142,9 +142,9 @@ void FEM::SerializeLoadData(Archive& ar)
 		ar >> nlc;
 		for (int i=0; i<nlc; ++i)
 		{
-			FELoadCurve* plc = new FELoadCurve;
-			plc->Serialize(ar);
-			AddLoadCurve(plc);
+			FELoadCurve lc;
+			lc.Serialize(ar);
+			AddLoadCurve(lc);
 		}
 	}
 }
@@ -158,7 +158,7 @@ void FEM::SerializeAnalysisData(Archive &ar)
 		// analysis steps
 		int i;
 		ar << (int) m_Step.size();
-		for (i=0; i<(int) m_Step.size(); ++i) m_Step[i].Serialize(ar);
+		for (i=0; i<(int) m_Step.size(); ++i) m_Step[i]->Serialize(ar);
 		ar << m_nStep;
 		ar << m_ftime;
 		ar << m_nhex8;
@@ -185,7 +185,7 @@ void FEM::SerializeAnalysisData(Archive &ar)
 		{
 			FEAnalysis* pstep = new FEAnalysis(*this);
 			pstep->Serialize(ar);
-			m_Step.add(pstep);
+			m_Step.push_back(pstep);
 		}
 		ar >> m_nStep;
 		ar >> m_ftime;
@@ -367,7 +367,7 @@ void FEM::SerializeGeometry(Archive &ar)
 
 		// rigid joints
 		ar << m_nrj;
-		for (i=0; i<m_nrj; ++i) m_RJ[i].Serialize(ar);	
+		for (i=0; i<m_nrj; ++i) m_RJ[i]->Serialize(ar);	
 
 		// discrete elements
 		ar << m_DE.size();
@@ -408,7 +408,7 @@ void FEM::SerializeGeometry(Archive &ar)
 		{
 			FERigidJoint* prj = new FERigidJoint(this);
 			prj->Serialize(ar);
-			m_RJ.add(prj);
+			m_RJ.push_back(prj);
 		}
 
 		// discrete elements
@@ -435,8 +435,8 @@ void FEM::SerializeContactData(Archive &ar)
 		ar << ContactInterfaces();
 		for (int i=0; i<ContactInterfaces(); ++i)
 		{
-			ar << m_CI[i].Type();
-			m_CI[i].Serialize(ar);
+			ar << m_CI[i]->Type();
+			m_CI[i]->Serialize(ar);
 		}
 	}
 	else
@@ -469,7 +469,7 @@ void FEM::SerializeContactData(Archive &ar)
 			ps->Serialize(ar);
 
 			// add interface to list
-			m_CI.add(ps);
+			m_CI.push_back(ps);
 		}	
 	}
 }

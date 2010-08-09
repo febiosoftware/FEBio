@@ -16,7 +16,7 @@ bool FEM::InitContact()
 	for (int i=0; i<ContactInterfaces(); ++i)
 	{
 		// get the contact interface
-		FEContactInterface& ci = m_CI[i];
+		FEContactInterface& ci = *m_CI[i];
 
 		// initializes contact interface data
 		ci.Init();

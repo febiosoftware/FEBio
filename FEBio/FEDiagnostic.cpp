@@ -46,7 +46,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	// get the logfile
 	Logfile& log = GetLogfile();
 
-	m_pStep = &fem.m_Step[0];
+	m_pStep = fem.m_Step[0];
 
 	// loop over all child tags
 	try

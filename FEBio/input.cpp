@@ -267,11 +267,11 @@ void FEM::EchoInput()
 	{
 		log.printf(" CONTACT INTERFACE DATA\n");
 		log.printf("===========================================================================\n");
-		for (i=0; i<m_CI.size(); ++i)
+		for (i=0; i<(int) m_CI.size(); ++i)
 		{
 			if (i>0) log.printf("---------------------------------------------------------------------------\n");
 
-			FESlidingInterface *psi = dynamic_cast<FESlidingInterface*>(&m_CI[i]);
+			FESlidingInterface *psi = dynamic_cast<FESlidingInterface*>(m_CI[i]);
 			if (psi)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -286,7 +286,7 @@ void FEM::EchoInput()
 				log.printf("\tslave segments                 : %d\n", (psi->m_ss.Elements()));
 			}
 
-			FEFacet2FacetSliding* pf2f = dynamic_cast<FEFacet2FacetSliding*>(&m_CI[i]);
+			FEFacet2FacetSliding* pf2f = dynamic_cast<FEFacet2FacetSliding*>(m_CI[i]);
 			if (pf2f)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -301,7 +301,7 @@ void FEM::EchoInput()
 				log.printf("\tslave segments                 : %d\n", (pf2f->m_ss.Elements()));
 			}
 
-			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(&m_CI[i]);
+			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(m_CI[i]);
 			if (pti)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -310,7 +310,7 @@ void FEM::EchoInput()
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pti->m_atol);
 			}
 
-			FEPeriodicBoundary *pbi = dynamic_cast<FEPeriodicBoundary*>(&m_CI[i]);
+			FEPeriodicBoundary *pbi = dynamic_cast<FEPeriodicBoundary*>(m_CI[i]);
 			if (pbi)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -319,7 +319,7 @@ void FEM::EchoInput()
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pbi->m_atol);
 			}
 
-			FESurfaceConstraint *psc = dynamic_cast<FESurfaceConstraint*>(&m_CI[i]);
+			FESurfaceConstraint *psc = dynamic_cast<FESurfaceConstraint*>(m_CI[i]);
 			if (psc)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -328,7 +328,7 @@ void FEM::EchoInput()
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", psc->m_atol);
 			}
 
-			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(&m_CI[i]);
+			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(m_CI[i]);
 			if (pri)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -367,7 +367,7 @@ void FEM::EchoInput()
 		{
 			if (i>0) log.printf("---------------------------------------------------------------------------\n");
 
-			FERigidJoint& rj = m_RJ[i];
+			FERigidJoint& rj = *m_RJ[i];
 			log.printf("rigid joint %d:\n", i+1);
 			log.printf("\tRigid body A                   : %d\n", m_RB[rj.m_nRBa].m_mat + 1);
 			log.printf("\tRigid body B                   : %d\n", m_RB[rj.m_nRBb].m_mat + 1);

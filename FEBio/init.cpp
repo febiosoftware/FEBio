@@ -52,9 +52,9 @@ bool FEM::Init()
 	}
 
 	// check step data
-	for (int i=0; i<m_Step.size(); ++i)
+	for (i=0; i<(int) m_Step.size(); ++i)
 	{
-		FEAnalysis& step = m_Step[i];
+		FEAnalysis& step = *m_Step[i];
 		if (step.m_ntime <= 0) return err("Invalid number of time steps for analysis step %d", i+1);
 		if (step.m_dt0   <= 0) return err("Invalid time step size for analysis step %d", i+1);
 		if (step.m_bautostep)
@@ -402,7 +402,7 @@ bool FEM::Reset()
 	{
 		for (i=0; i<m_nrj; ++i)
 		{
-			FERigidJoint& rj = m_RJ[i];
+			FERigidJoint& rj = *m_RJ[i];
 			rj.m_F = vec3d(0,0,0);
 
 			rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;

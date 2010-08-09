@@ -19,16 +19,17 @@ DataStore::DataStore()
 
 DataStore::~DataStore()
 {
+	for (size_t i=0; i<m_data.size(); ++i) delete m_data[i];
+	m_data.clear();
 }
 
 //-----------------------------------------------------------------------------
 
 void DataStore::Write()
 {
-	int nrec = m_data.size();
-	for (int i=0; i<nrec; ++i)
+	for (size_t i=0; i<m_data.size(); ++i)
 	{
-		DataRecord& DR = m_data[i];
+		DataRecord& DR = *m_data[i];
 		DR.Write();
 	}
 }
@@ -39,7 +40,7 @@ void DataStore::AddRecord(DataRecord* prec)
 {
 	static int nid = 1;
 	prec->m_nid = nid++;
-	m_data.add(prec);
+	m_data.push_back(prec);
 }
 
 //////////////////////////////////////////////////////////////////////

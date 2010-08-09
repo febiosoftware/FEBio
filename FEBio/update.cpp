@@ -299,7 +299,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 
 		for (i=0; i<m_fem.m_nrj; ++i)
 		{
-			FERigidJoint& rj = m_fem.m_RJ[i];
+			FERigidJoint& rj = *m_fem.m_RJ[i];
 
 			FERigidBody& RBa = m_fem.m_RB[ rj.m_nRBa ];
 			FERigidBody& RBb = m_fem.m_RB[ rj.m_nRBb ];
@@ -341,5 +341,5 @@ void FESolidSolver::UpdateStresses()
 void FEM::UpdateContact()
 {
 	// loop over all contact interfaces
-	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i].Update();
+	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->Update();
 }

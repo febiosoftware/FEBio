@@ -82,7 +82,7 @@ bool FETangentDiagnostic::Run()
 	Logfile::MODE oldmode = log.SetMode(Logfile::FILE_ONLY);
 
 	// get and initialize the first step
-	fem.m_Step[0].Init();
+	fem.m_Step[0]->Init();
 
 	// get and initialize the solver
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);

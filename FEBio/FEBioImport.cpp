@@ -42,7 +42,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// at least one step defined
 	int nsteps = fem.m_Step.size();
 	assert(nsteps > 0);
-	m_pStep = &fem.m_Step[nsteps-1];
+	m_pStep = fem.m_Step[nsteps-1];
 	m_nsteps = 0; // reset step section counter
 
 	// default element type for tets
@@ -2063,7 +2063,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		// --- S L I D I N G   W I T H   G A P S ---
 
 		FESlidingInterface* ps = new FESlidingInterface(&fem);
-		fem.m_CI.add(ps);
+		fem.m_CI.push_back(ps);
 
 		ps->m_npass = 1;
 
@@ -2139,7 +2139,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		// --- F A C E T   T O   F A C E T   S L I D I N G ---
 
 		FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
-		fem.m_CI.add(ps);
+		fem.m_CI.push_back(ps);
 
 		++tag;
 		do
@@ -2201,7 +2201,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 	{
 		// --- S L I D I N G   I N T E R F A C E   2 ---
 		FESlidingInterface2* ps = new FESlidingInterface2(&fem);
-		fem.m_CI.add(ps);
+		fem.m_CI.push_back(ps);
 
 		++tag;
 		do
@@ -2273,7 +2273,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		// --- T I E D   C O N T A C T  ---
 
 		FETiedInterface* ps = new FETiedInterface(&fem);
-		fem.m_CI.add(ps);
+		fem.m_CI.push_back(ps);
 
 		++tag;
 		do
@@ -2318,7 +2318,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		// --- P E R I O D I C   B O U N D A R Y  ---
 
 		FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
-		fem.m_CI.add(ps);
+		fem.m_CI.push_back(ps);
 
 		++tag;
 		do
@@ -2365,7 +2365,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		// --- S U R F A C E   C O N S T R A I N T ---
 
 		FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
-		fem.m_CI.add(ps);
+		fem.m_CI.push_back(ps);
 
 		++tag;
 		do
@@ -2412,7 +2412,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		// --- R I G I D   W A L L   I N T E R F A C E ---
 
 		FERigidWallInterface* ps = new FERigidWallInterface(&fem);
-		fem.m_CI.add(ps);
+		fem.m_CI.push_back(ps);
 
 		++tag;
 		do
@@ -2540,7 +2540,7 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		while (!tag.isend());
 		prj->m_nRBa--;
 		prj->m_nRBb--;
-		fem.m_RJ.add(prj);
+		fem.m_RJ.push_back(prj);
 	}
 	else if (strcmp(szt, "linear constraint") == 0)
 	{
@@ -2691,11 +2691,10 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 			while (!t.isend()) { ++nlp; ++t; }
 
 			// create the loadcurve
-			FELoadCurve* plc = new FELoadCurve;
-			plc->Create(nlp);
-			plc->SetInterpolation(ntype);
-			plc->SetExtendMode(nextm);
-			fem.AddLoadCurve(plc);
+			FELoadCurve lc;
+			lc.Create(nlp);
+			lc.SetInterpolation(ntype);
+			lc.SetExtendMode(nextm);
 
 			// read the points
 			double d[2];
@@ -2703,11 +2702,14 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 			for (int i=0; i<nlp; ++i)
 			{
 				tag.value(d, 2);
-				plc->LoadPoint(i).time  = d[0];
-				plc->LoadPoint(i).value = d[1];
+				lc.LoadPoint(i).time  = d[0];
+				lc.LoadPoint(i).value = d[1];
 
 				++tag;
 			}
+
+			// add the loadcurve to FEM
+			fem.AddLoadCurve(lc);
 		}
 		else throw XMLReader::InvalidTag(tag);
 
@@ -2929,7 +2931,7 @@ bool FEFEBioImport::ParseStepSection(XMLTag& tag)
 	if (m_nsteps != 0)
 	{
 		m_pStep = new FEAnalysis(*m_pfem);
-		m_pfem->m_Step.add(m_pStep);
+		m_pfem->m_Step.push_back(m_pStep);
 	}
 
 	// increase the step section counter

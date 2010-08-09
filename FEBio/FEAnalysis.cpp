@@ -75,13 +75,13 @@ bool FEAnalysis::Init()
 	// init must point curve
 	if (m_nmplc < 0)
 	{
-		FELoadCurve* plc = new FELoadCurve;
-		plc->Create(2);
-		plc->LoadPoint(0).time  = m_fem.m_ftime;
-		plc->LoadPoint(0).value = 0;
-		plc->LoadPoint(1).time  = m_fem.m_ftime + m_dt*m_ntime;
-		plc->LoadPoint(1).value = m_dtmax;
-		m_fem.m_LC.add(plc);
+		FELoadCurve lc;
+		lc.Create(2);
+		lc.LoadPoint(0).time  = m_fem.m_ftime;
+		lc.LoadPoint(0).value = 0;
+		lc.LoadPoint(1).time  = m_fem.m_ftime + m_dt*m_ntime;
+		lc.LoadPoint(1).value = m_dtmax;
+		m_fem.AddLoadCurve(lc);
 		m_nmplc = m_fem.m_LC.size()-1;
 	}
 
@@ -273,14 +273,14 @@ bool FEAnalysis::Init()
 
 	// see if we need to do contact augmentations
 	m_baugment = (m_fem.m_nrj > 0 ? true : false);
-	for (i=0; i<m_fem.m_CI.size(); ++i)
+	for (i=0; i<(int) m_fem.m_CI.size(); ++i)
 	{
-		FEContactInterface& ci = m_fem.m_CI[i];
+		FEContactInterface& ci = *m_fem.m_CI[i];
 		if (ci.m_blaugon) m_baugment = true;
 	}
 
 	// see if we to do incompressible augmentations
-	for (i=0; i<m_fem.m_MAT.size(); ++i)
+	for (i=0; i<(int) m_fem.m_MAT.size(); ++i)
 	{
 		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(m_fem.GetMaterial(i));
 		if (pmi && pmi->m_blaugon) m_baugment = true;
@@ -371,9 +371,9 @@ bool FEAnalysis::Solve()
 		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(m_fem.m_ftime);
 
 		// evaluate parameter lists
-		for (i=0; i<m_fem.m_MPL.size(); ++i)
+		for (i=0; i<(int) m_fem.m_MPL.size(); ++i)
 		{
-			FEParameterList* pl = &m_fem.m_MPL[i];
+			FEParameterList* pl = m_fem.m_MPL[i];
 			list<FEParam>::iterator pi = pl->first();
 			for (j=0; j<pl->Parameters(); ++j, ++pi)
 			{

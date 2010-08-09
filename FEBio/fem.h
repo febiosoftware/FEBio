@@ -264,21 +264,21 @@ public:
 	void EchoInput();
 
 	//! Add a material to the model
-	void AddMaterial(FEMaterial* pm) { m_MAT.add(pm); }
+	void AddMaterial(FEMaterial* pm) { m_MAT.push_back(pm); }
 
 	//! Add a parameter list
-	void AddParameterList(FEParameterList* pl) { m_MPL.add(pl); }
+	void AddParameterList(FEParameterList* pl) { m_MPL.push_back(pl); }
 
 	//! get the number of materials
 	int Materials() { return m_MAT.size(); }
 
 	//! return a pointer to a material
-	FEMaterial* GetMaterial(int id) { return &m_MAT[id]; }
+	FEMaterial* GetMaterial(int id) { return m_MAT[id]; }
 
 	//! return the elastic material
 	FEElasticMaterial* GetElasticMaterial(int id)
 	{
-		FEMaterial* pm = &m_MAT[id];
+		FEMaterial* pm = m_MAT[id];
 		if (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 		assert(pme);
@@ -295,7 +295,7 @@ public:
 	}
 
 	//! Add a loadcurve to the model
-	void AddLoadCurve(FELoadCurve* plc) { m_LC.add(plc); }
+	void AddLoadCurve(FELoadCurve& lc) { m_LC.push_back(lc); }
 
 	//! get a loadcurve
 	FELoadCurve* GetLoadCurve(int i) { return &m_LC[i]; }
@@ -414,7 +414,7 @@ public:
 public:
 	// --- Analysis Data ---
 	//{
-		ptr_vector<FEAnalysis>	m_Step;		//!< array of analysis steps
+		vector<FEAnalysis*>		m_Step;		//!< array of analysis steps
 		int						m_nStep;	//!< current analysis step
 		FEAnalysis*				m_pStep;	//!< pointer to current analysis step
 		double					m_ftime;	//!< current time value
@@ -442,27 +442,27 @@ public:
 
 		// rigid joints
 		int							m_nrj;	//!< nr of rigid joints
-		ptr_vector<FERigidJoint>	m_RJ;	//!< rigid joint array
+		vector<FERigidJoint*>		m_RJ;	//!< rigid joint array
 
 		// discrete elements
 		vector<FE_DISCRETE_ELEMENT>	m_DE;	//!< discrete elements
 	//}
 
 	//{ --- Contact Data --
-		bool								m_bcontact;	//!< contact flag
-		ptr_vector<FEContactInterface>		m_CI;		//!< contact interface array
+		bool							m_bcontact;	//!< contact flag
+		vector<FEContactInterface*>		m_CI;		//!< contact interface array
 	//}
 
 protected:
 	// --- Material Data ---
 	//{
-		ptr_vector<FEMaterial>	m_MAT;		//!< array of materials
-		ptr_vector<FEParameterList>	m_MPL;	//!< material parameter lists
+		vector<FEMaterial*>			m_MAT;	//!< array of materials
+		vector<FEParameterList*>	m_MPL;	//!< material parameter lists
 	//}
 
 	// --- Load Curve Data ---
 	//{
-		ptr_vector<FELoadCurve>	m_LC;	//!< load curve data
+		vector<FELoadCurve>	m_LC;	//!< load curve data
 	//}
 
 public:

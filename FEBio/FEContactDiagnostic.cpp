@@ -226,7 +226,7 @@ bool FEContactDiagnostic::Init()
 	ss.Element(0).m_node[1] = 10;
 	ss.Element(0).m_node[2] = 9;
 	ss.Element(0).m_node[3] = 8;
-	fem.m_CI.add(ps);
+	fem.m_CI.push_back(ps);
 
 	// --- set fem data ---
 	fem.m_nsolver = LU_SOLVER;	// make sure we have the LU solver
