@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include "SuperLUSolver.h"
-#include "math.h"
+#include <math.h>
 
 //////////////////////////////////////////////////////////////////////
 // SUPERLUSolver

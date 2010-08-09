@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "LUSolver.h"
-#include "math.h"
+#include <math.h>
 
 //-----------------------------------------------------------------------------
 bool LUSolver::PreProcess()
