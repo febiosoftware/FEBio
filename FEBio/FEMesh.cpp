@@ -19,6 +19,7 @@ FEMesh::~FEMesh()
 {
 	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
 	m_NodeSet.clear();
+	ClearDomains();
 }
 
 void FEMesh::ClearDomains()

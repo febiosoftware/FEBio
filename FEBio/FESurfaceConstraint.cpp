@@ -22,7 +22,7 @@ void FESurfaceConstraintSurface::Init()
 
 	// allocate other surface data
 	m_gap.resize(nn);		// gap funtion
-	m_pme.assign(nn, NULL);	// penetrated master element
+	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));	// penetrated master element
 	m_rs.resize(nn);		// natural coords of projected slave node on master element
 	m_Lm.resize(nn);		// Lagrangian multipliers
 

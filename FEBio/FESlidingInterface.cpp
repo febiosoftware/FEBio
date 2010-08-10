@@ -76,7 +76,7 @@ void FESlidingSurface::Init()
 	// allocate other surface data
 	gap.assign(nn, 0.0);	// gap funtion
 	nu.resize(nn);			// node normal 
-	pme.assign(nn, NULL);		// penetrated master element
+	pme.assign(nn, static_cast<FEElement*>(0));		// penetrated master element
 	rs.resize(nn);			// natural coords of projected slave node on master element
 	rsp.resize(nn);
 	Lm.assign(nn, 0.0);

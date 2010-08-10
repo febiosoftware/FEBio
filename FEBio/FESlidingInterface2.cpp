@@ -34,7 +34,7 @@ void FESlidingSurface2::Init()
 	m_rs.resize(nint);
 	m_Lmd.assign(nint, 0.0);
 	m_Lmp.assign(nint, 0.0);
-	m_pme.assign(nint, NULL);
+	m_pme.assign(nint, static_cast<FESurfaceElement*>(0));
 	m_epsn.assign(nint, 1.0);
 	m_epsp.assign(nint, 1.0);
 

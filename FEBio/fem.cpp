@@ -93,21 +93,6 @@ FEM::FEM()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FEM::~FEM
-// destructor of FEM class
-//
-
-FEM::~FEM()
-{
-	size_t i;
-	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
-	for (i=0; i<m_RJ.size  (); ++i) delete m_RJ[i]  ; m_RJ.clear  ();
-	for (i=0; i<m_CI.size  (); ++i) delete m_CI[i]  ; m_CI.clear  ();
-	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
-	for (i=0; i<m_MPL.size (); ++i) delete m_MPL[i] ; m_MPL.clear ();
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEM::FEM(FEM& fem)
 // copy constructor.
 // The copy constructor and assignment operator are used for push/pop'ing.
@@ -170,6 +155,27 @@ void FEM::operator =(const FEM& fem)
 	ShallowCopy(const_cast<FEM&>(fem));
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// FUNCTION : FEM::~FEM
+// destructor of FEM class
+//
+
+FEM::~FEM()
+{
+	size_t i;
+	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
+	for (i=0; i<m_RJ.size  (); ++i) delete m_RJ[i]  ; m_RJ.clear  ();
+	for (i=0; i<m_CI.size  (); ++i) delete m_CI[i]  ; m_CI.clear  ();
+	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
+	for (i=0; i<m_MPL.size (); ++i) delete m_MPL[i] ; m_MPL.clear ();
+}
+
+
+//-----------------------------------------------------------------------------
+// This function is used when pushing the FEM to a stack. Since we don't need
+// to copy all the data, this function only copies the data that needs to be 
+// restored for a running restart.
+//
 void FEM::ShallowCopy(FEM& fem)
 {
 	int i;
