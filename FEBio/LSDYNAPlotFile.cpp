@@ -310,9 +310,6 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	// make sure the archive is opened
 	if (m_fp == 0) return false;
 
-	// Ok, let's proceed
-	int i, j;
-
 	// write the time value
 	float time = (float) fem.m_ftime;
 	fwrite(&time, sizeof(float) ,1, m_fp);
@@ -383,9 +380,28 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 	// or better, is always set to zero.
 
 	// write solid element data
-	float s[44] = {0};
+	write_solid_stress();
+
+	// write truss element data
+	write_truss_stress();
+
+	// write shell data
+	write_shell_stress();
+
+	// now flush the archive to make sure we don't loose any results
+	fflush(m_fp);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void LSDYNAPlotFile::write_solid_stress()
+{
+	int i, j;
+	float s[7] = {0};
 	double f;
-	int nint, neln, nd;
+	int nint, nd;
+	FEMesh& mesh = m_pfem->m_mesh;
 	for (nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
@@ -433,40 +449,19 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 			}
 		}
 	}
+}
 
-	// write truss element data
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
+//-----------------------------------------------------------------------------
 
-	for (nd = 0; nd < mesh.Domains(); ++nd)
-	{
-		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&mesh.Domain(nd));
-		if (ptd)
-		{
-			for (i=0; i<ptd->Elements(); ++i)
-			{
-				FETrussElement& el = ptd->Element(i);
-				ptd->UnpackElement(el);
-				FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
-		
-				double l = el.Length();
-				double V = el.Volume0();
-				s[0] = (float) (pt.m_tau*V/l);	// axial force
-
-				fwrite(s, sizeof(float), 6, m_fp);
-			}
-		}
-	}
-
-	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
-	for (i=0; i<(int) fem.m_DE.size(); ++i)
-	{
-		FE_DISCRETE_ELEMENT& e = fem.m_DE[i];
-		fwrite(s, sizeof(float), 6, m_fp);
-	}
+void LSDYNAPlotFile::write_shell_stress()
+{
+	int i, j, neln;
+	float s[44] = {0};
 
 	// write shell element data
 	mat3ds E;
-	for (nd=0; nd<mesh.Domains(); ++nd)
+	FEMesh& mesh = m_pfem->m_mesh;
+	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&mesh.Domain(nd));
 		if (psd)
@@ -483,7 +478,7 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 						psd->UnpackElement(el);
 
 						neln = el.Nodes();
-						f = 1.0 / (double) neln;
+						double f = 1.0 / (double) neln;
 
 						// output shell data
 						for (j=0; j<neln; ++j)
@@ -554,11 +549,39 @@ bool LSDYNAPlotFile::Write(FEM& fem)
 			}
 		}
 	}
+}
 
-	// now flush the archive to make sure we don't loose any results
-	fflush(m_fp);
+//----------------------------------------------------------------------------
+void LSDYNAPlotFile::write_truss_stress()
+{
+	float s[6] = {0};
+	FEMesh& mesh = m_pfem->m_mesh;
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
+	{
+		FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&mesh.Domain(nd));
+		if (ptd)
+		{
+			for (int i=0; i<ptd->Elements(); ++i)
+			{
+				FETrussElement& el = ptd->Element(i);
+				ptd->UnpackElement(el);
+				FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
+		
+				double l = el.Length();
+				double V = el.Volume0();
+				s[0] = (float) (pt.m_tau*V/l);	// axial force
 
-	return true;
+				fwrite(s, sizeof(float), 6, m_fp);
+			}
+		}
+	}
+
+	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
+	for (int i=0; i<(int) m_pfem->m_DE.size(); ++i)
+	{
+		FE_DISCRETE_ELEMENT& e = m_pfem->m_DE[i];
+		fwrite(s, sizeof(float), 6, m_fp);
+	}
 }
 
 //-----------------------------------------------------------------------------

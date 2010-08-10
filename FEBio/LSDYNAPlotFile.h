@@ -83,6 +83,11 @@ protected:
 	float fiber_strain(FESolidElement& el, int j);
 	float dev_fiber_strain(FESolidElement& el, int j);
 
+	// tensor fields
+	void write_solid_stress();
+	void write_shell_stress();
+	void write_truss_stress();
+
 public:
 	bool	m_bsstrn;		//!< shell strain flag
 	int		m_nfield[5];	//!< field maps
