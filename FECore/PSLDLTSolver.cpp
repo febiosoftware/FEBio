@@ -87,7 +87,7 @@ bool PSLDLTSolver::Solve(vector<double>& x, vector<double>& R)
 	}
 
 	// Let's roll !!
-	PSLDLT_Solve(0, x, R);
+	PSLDLT_Solve(0, &x[0], &R[0]);
 
 	return true;
 

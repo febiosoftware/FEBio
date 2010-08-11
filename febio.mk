@@ -33,6 +33,7 @@ lnx32:
 	( cd FEBio; $(MAKE) )
 
 test:
+	./includes.bash
 	( cd FECore; $(MAKE) )
 	( cd FEBio; $(MAKE) )
 
