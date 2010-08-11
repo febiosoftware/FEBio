@@ -6,7 +6,7 @@
 REGISTER_MATERIAL(FEFungOrthotropic, "Fung orthotropic");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEIncompressibleMaterial)
 ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
 ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
 ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
@@ -17,7 +17,6 @@ ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
 ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
 ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
 ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
-ADD_PARAMETER(m_K, FE_PARAM_DOUBLE, "K");
 END_PARAMETER_LIST();
 
 void FEFungOrthotropic::Init()
@@ -33,7 +32,7 @@ void FEFungOrthotropic::Init()
 	
 	if (m_c <= 0) throw MaterialError("c should be positive");
 	if (m_K < 0) throw MaterialError("K should be positive");
-
+	
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;
 	mu[1] = G12 - G31 + G23;
@@ -65,22 +64,22 @@ mat3ds FEFungOrthotropic::Stress(FEMaterialPoint& mp)
 	double L[3];		// La
 	double eQ;			// exp(Q)
 	mat3ds bmi;			// B - I
-	// Evaluate the strain and texture
+	// Evaluate the deformation gradient
 	mat3d &F = pt.F;
 	double detF = pt.J;
+	mat3d Fd = F*pow(detF,-1./3.);
 	
-	// calculate left and right Cauchy-Green tensor
-	mat3ds b = (F*F.transpose()).sym();
-	mat3ds c = (F.transpose()*F).sym();
+	// calculate deviatoric left and right Cauchy-Green tensor
+	mat3ds b = pt.DevLeftCauchyGreen();
+	mat3ds c = pt.DevRightCauchyGreen();
 	mat3ds c2 = c*c;
-	mat3ds identity(1.,1.,1.,0.,0.,0.);
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
 		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
-		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
+		a[i] = Fd*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
 		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 	
@@ -91,27 +90,29 @@ mat3ds FEFungOrthotropic::Stress(FEMaterialPoint& mp)
 		for (j=0; j<3; j++)
 			eQ += lam[i][j]*(K[i]-1)*(K[j]-1);
 	}
-	eQ = exp(eQ/(4.0*m_c));
+	eQ = exp(eQ/(4.*m_c));
 	
 	// Evaluate the stress
 	mat3ds s;
 	s.zero();		// Initialize for summation
-	bmi = b - identity;
+	bmi = b - mat3dd(1.);
 	for (i=0; i<3; i++) {
 		s += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
 		for (j=0; j<3; j++)
-			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2;
+			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
 	}
-	s /= 2.0*detF/eQ;
-	// bulk elasticity, to optionally enforce incompressibility
-	s += m_K*log(detF)/detF*identity;
+	s *= eQ/(2.0*detF);
+	// Add pressure term to enforce near-incompressibility
+	double avgJ = pt.avgJ;
+	double p = -m_K*log(avgJ)/avgJ;
+	s = mat3dd(-p) + s.dev();
 	return s;
 }
 
 tens4ds FEFungOrthotropic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
+	
 	int i,j;
 	vec3d a0[3];		// texture direction in reference configuration
 	vec3d a[3];			// texture direction in current configuration
@@ -123,22 +124,23 @@ tens4ds FEFungOrthotropic::Tangent(FEMaterialPoint& mp)
 	// Evaluate the strain and texture
 	mat3d &F = pt.F;
 	double detF = pt.J;
+	mat3d Fd = F*pow(detF,-1./3.);
 	
 	// calculate left and right Cauchy-Green tensor
-	mat3ds b = (F*F.transpose()).sym();
-	mat3ds c = (F.transpose()*F).sym();
+	mat3ds b = pt.DevLeftCauchyGreen();
+	mat3ds c = pt.DevRightCauchyGreen();
 	mat3ds c2 = c*c;
-	mat3ds identity(1.,1.,1.,0.,0.,0.);
-
+	mat3dd I(1.);
+	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
 		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
-		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
+		a[i] = Fd*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
 		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
-
+	
 	// Evaluate exp(Q)
 	eQ = 0;
 	for (i=0; i<3; i++) {
@@ -146,26 +148,34 @@ tens4ds FEFungOrthotropic::Tangent(FEMaterialPoint& mp)
 		for (j=0; j<3; j++)
 			eQ += lam[i][j]*(K[i]-1)*(K[j]-1);
 	}
-	eQ = exp(eQ/(4.0*m_c));
-
-	// Evaluate the stress
-	mat3ds s;
-	s.zero();		// Initialize for summation
+	eQ = exp(eQ/(4.*m_c));
+	
+	// Evaluate the distortional part of the Cauchy stress
+	mat3ds sd;
+	sd.zero();		// Initialize for summation
 	tens4ds C;
 	C.zero();
-	bmi = b - identity;
+	bmi = b - I;
 	for (i=0; i<3; i++) {
-		s += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
+		sd += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
 		for (j=0; j<3; j++)
-			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2;
+			sd += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
 		C += mu[i]*K[i]*dyad4s(A[i],b);
 		for (j=0; j<3; j++)
-			C += lam[i][j]*K[i]*K[j]*dyad1s(A[i],A[j])/2.0;
+			C += lam[i][j]*K[i]*K[j]*dyad1s(A[i],A[j])/2.;
 	}
-	s /= 2.0*detF/eQ;
-	C = (eQ/detF)*C + (2*detF/m_c/eQ)*dyad1s(s);
-	// bulk elasticity, to optionally enforce incompressibility
-	C += m_K/detF*(dyad1s(identity) - 2*log(detF)*dyad4s(identity));
+	sd *= eQ/(2.0*detF);
+	// This is the distortional part of the elasticity tensor
+	C = (eQ/detF)*C + (2*detF/m_c/eQ)*dyad1s(sd);
+	// This is the final value of the elasticity tensor
+	tens4ds IxI = dyad1s(I);
+	tens4ds I4  = dyad4s(I);
+	double avgJ = pt.avgJ;
+	double p = -m_K*log(avgJ)/avgJ;
+	double dpdJ = -m_K*(1-log(avgJ))/(avgJ*avgJ);
+	C += 2*p*I4-(p+pt.avgJ*dpdJ)*IxI
+	- 1./3.*(C.dot(IxI)+IxI.dot(C)-IxI*(C.dot(I)).tr()/3.)
+	+ 2./3.*((I4+IxI/3.)*sd.tr()-dyad1s(sd,I));
 	
 	return C;
 }
