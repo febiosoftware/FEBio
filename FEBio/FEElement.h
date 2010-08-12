@@ -520,40 +520,10 @@ public:
 	FEShellElement(){}
 
 	//! copy constructor
-	FEShellElement(const FEShellElement& el)
-	{
-		// set the traits of the element
-		if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
-
-		// copy base class data
-		m_mat = el.m_mat;
-		m_nrigid = el.m_nrigid;
-		m_node = el.m_node;
-		m_nID = el.m_nID;
-		m_gid = el.m_gid;
-	}
+	FEShellElement(const FEShellElement& el);
 
 	//! assignment operator
-	FEShellElement& operator = (const FEShellElement& el)
-	{
-		// set the traits of the element
-		if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
-
-		// copy base class data
-		m_mat = el.m_mat;
-		m_nrigid = el.m_nrigid;
-		m_node = el.m_node;
-		m_nID = el.m_nID;
-		m_gid = el.m_gid;
-
-		// copy shell data
-		m_eJ = el.m_eJ;
-		m_ep = el.m_ep;
-		m_Lk = el.m_Lk;
-		m_h0 = el.m_h0;
-
-		return (*this);
-	}
+	FEShellElement& operator = (const FEShellElement& el);
 
 	virtual void SetTraits(FEElementTraits* ptraits)
 	{
@@ -677,40 +647,9 @@ class FETrussElement : public FEElement
 public:
 	FETrussElement(){}
 
-	FETrussElement(const FETrussElement& el)
-	{
-		// set the traits of the element
-		if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+	FETrussElement(const FETrussElement& el);
 
-
-		// copy base class data
-		m_mat = el.m_mat;
-		m_nrigid = el.m_nrigid;
-		m_node = el.m_node;
-		m_nID = el.m_nID;
-		m_gid = el.m_gid;
-
-		// truss data
-		m_a0 = el.m_a0;
-	}
-
-	FETrussElement& operator = (const FETrussElement& el) 
-	{
-		// set the traits of the element
-		if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
-
-		// copy base class data
-		m_mat = el.m_mat;
-		m_nrigid = el.m_nrigid;
-		m_node = el.m_node;
-		m_nID = el.m_nID;
-		m_gid = el.m_gid;
-
-		// copy truss data
-		m_a0 = el.m_a0;
-
-		return (*this); 
-	}
+	FETrussElement& operator = (const FETrussElement& el);
 
 	//! intialize element data
 	void Init(bool bflag)
