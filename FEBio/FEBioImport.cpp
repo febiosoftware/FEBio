@@ -2691,10 +2691,10 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 			while (!t.isend()) { ++nlp; ++t; }
 
 			// create the loadcurve
-			FELoadCurve lc;
-			lc.Create(nlp);
-			lc.SetInterpolation(ntype);
-			lc.SetExtendMode(nextm);
+			FELoadCurve* plc = new FELoadCurve;
+			plc->Create(nlp);
+			plc->SetInterpolation(ntype);
+			plc->SetExtendMode(nextm);
 
 			// read the points
 			double d[2];
@@ -2702,14 +2702,14 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 			for (int i=0; i<nlp; ++i)
 			{
 				tag.value(d, 2);
-				lc.LoadPoint(i).time  = d[0];
-				lc.LoadPoint(i).value = d[1];
+				plc->LoadPoint(i).time  = d[0];
+				plc->LoadPoint(i).value = d[1];
 
 				++tag;
 			}
 
 			// add the loadcurve to FEM
-			fem.AddLoadCurve(lc);
+			fem.AddLoadCurve(plc);
 		}
 		else throw XMLReader::InvalidTag(tag);
 

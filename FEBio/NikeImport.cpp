@@ -756,8 +756,8 @@ bool FENIKEImport::ReadCurveDeck(FEM& fem)
 		nread = sscanf(szline, "%*5d%5d", &lcs);
 		if (nread != 1) return errf(szerr[ERR_LC], i+1);
 
-		FELoadCurve lc;
-		lc.Create(lcs);
+		FELoadCurve* plc = new FELoadCurve();
+		plc->Create(lcs);
 
 		// -------- load card 2 - n --------
 		for (j=0; j<lcs; ++j)
@@ -767,10 +767,10 @@ bool FENIKEImport::ReadCurveDeck(FEM& fem)
 			nread = sscanf(szline, "%10lg%10lg", &time, &val);
 			if (nread != 2) return errf(szerr[ERR_LC], i+1);
 
-			lc.SetPoint(j, time, val);
+			plc->SetPoint(j, time, val);
 		}
 
-		fem.AddLoadCurve(lc);
+		fem.AddLoadCurve(plc);
 	}
 
 	return true;

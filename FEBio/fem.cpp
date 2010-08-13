@@ -30,13 +30,13 @@ FEM::FEM()
 	// add the "zero" loadcurve
 	// this is the loadcurve that will be used if a loadcurve is not
 	// specified for something that depends on time
-	FELoadCurve lc;
-	lc.Create(2);
-	lc.LoadPoint(0).time = 0;
-	lc.LoadPoint(0).value = 0;
-	lc.LoadPoint(1).time = m_pStep->m_ntime*m_pStep->m_dt0;
-	lc.LoadPoint(1).value = 1;
-	AddLoadCurve(lc);
+	FELoadCurve* plc = new FELoadCurve();
+	plc->Create(2);
+	plc->LoadPoint(0).time = 0;
+	plc->LoadPoint(0).value = 0;
+	plc->LoadPoint(1).time = m_pStep->m_ntime*m_pStep->m_dt0;
+	plc->LoadPoint(1).value = 1;
+	AddLoadCurve(plc);
 
 	// --- Geometry Data ---
 	m_nreq = 0;
@@ -168,8 +168,8 @@ FEM::~FEM()
 	for (i=0; i<m_CI.size  (); ++i) delete m_CI[i]  ; m_CI.clear  ();
 	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
 	for (i=0; i<m_MPL.size (); ++i) delete m_MPL[i] ; m_MPL.clear ();
+	for (i=0; i<m_LC.size  (); ++i) delete m_LC[i]  ; m_LC.clear  ();
 }
-
 
 //-----------------------------------------------------------------------------
 // This function is used when pushing the FEM to a stack. Since we don't need

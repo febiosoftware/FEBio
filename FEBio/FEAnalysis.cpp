@@ -75,19 +75,19 @@ bool FEAnalysis::Init()
 	// init must point curve
 	if (m_nmplc < 0)
 	{
-		FELoadCurve lc;
-		lc.Create(2);
-		lc.LoadPoint(0).time  = m_fem.m_ftime;
-		lc.LoadPoint(0).value = 0;
-		lc.LoadPoint(1).time  = m_fem.m_ftime + m_dt*m_ntime;
-		lc.LoadPoint(1).value = m_dtmax;
-		m_fem.AddLoadCurve(lc);
+		FELoadCurve* plc = new FELoadCurve();
+		plc->Create(2);
+		plc->LoadPoint(0).time  = m_fem.m_ftime;
+		plc->LoadPoint(0).value = 0;
+		plc->LoadPoint(1).time  = m_fem.m_ftime + m_dt*m_ntime;
+		plc->LoadPoint(1).value = m_dtmax;
+		m_fem.AddLoadCurve(plc);
 		m_nmplc = m_fem.m_LC.size()-1;
 	}
 
 	// the must point load curve must be evaluated
 	// using a step interpolation
-	m_fem.m_LC[m_nmplc].SetInterpolation(FELoadCurve::STEP);
+	m_fem.m_LC[m_nmplc]->SetInterpolation(FELoadCurve::STEP);
 
 	// activate the boundary conditions
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
@@ -466,7 +466,7 @@ bool FEAnalysis::Solve()
 			{
 				if ((m_nplot == FE_PLOT_MUST_POINTS) && (m_nmplc >= 0))
 				{
-					FELoadCurve& lc = m_fem.m_LC[m_nmplc];
+					FELoadCurve& lc = *m_fem.m_LC[m_nmplc];
 					if (lc.HasPoint(m_fem.m_ftime)) m_fem.m_plot->Write(m_fem);
 				}
 				else m_fem.m_plot->Write(m_fem);
@@ -688,7 +688,7 @@ void FEAnalysis::AutoTimeStep(int niter)
 	if (dtn < m_dtmin) dtn = m_dtmin;
 
 	// get the must point load curve
-	FELoadCurve& lc = m_fem.m_LC[ m_nmplc ];
+	FELoadCurve& lc = *m_fem.m_LC[ m_nmplc ];
 
 	double dtmax = lc.Value(told);
 

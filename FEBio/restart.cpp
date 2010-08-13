@@ -142,9 +142,9 @@ void FEM::SerializeLoadData(Archive& ar)
 		ar >> nlc;
 		for (int i=0; i<nlc; ++i)
 		{
-			FELoadCurve lc;
-			lc.Serialize(ar);
-			AddLoadCurve(lc);
+			FELoadCurve* plc = new FELoadCurve();
+			plc->Serialize(ar);
+			AddLoadCurve(plc);
 		}
 	}
 }

@@ -65,7 +65,7 @@ bool FEM::Init()
 	}
 
 	// evaluate all loadcurves at the initial time
-	for (i=0; i<LoadCurves(); ++i) m_LC[i].Evaluate(0);
+	for (i=0; i<LoadCurves(); ++i) m_LC[i]->Evaluate(0);
 
 	// if the analysis is run in plain-strain mode we fix all the z-dofs of all nodes
 	if (m_nplane_strain >= 0)

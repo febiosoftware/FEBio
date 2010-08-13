@@ -295,10 +295,10 @@ public:
 	}
 
 	//! Add a loadcurve to the model
-	void AddLoadCurve(FELoadCurve& lc) { m_LC.push_back(lc); }
+	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }
 
 	//! get a loadcurve
-	FELoadCurve* GetLoadCurve(int i) { return &m_LC[i]; }
+	FELoadCurve* GetLoadCurve(int i) { return m_LC[i]; }
 
 	//! get the number of loadcurves
 	int LoadCurves() { return m_LC.size(); }
@@ -462,7 +462,7 @@ protected:
 
 	// --- Load Curve Data ---
 	//{
-		vector<FELoadCurve>	m_LC;	//!< load curve data
+		vector<FELoadCurve*>	m_LC;	//!< load curve data
 	//}
 
 public:
