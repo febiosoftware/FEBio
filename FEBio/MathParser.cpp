@@ -14,7 +14,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-MathParser::MathParser() : m_table(111)
+MathParser::MathParser()
 {
 	// add default constants to map
 	m_table["pi"] = 3.1415926535897932385;
@@ -114,9 +114,10 @@ double MathParser::prim()
 		}
 	case NAME:
 		{
-			if (m_table.Find(string_value) != -1)
+			map<string, double>::iterator it = m_table.find(string_value);
+			if (it != m_table.end())
 			{
-				double& v = m_table[string_value];
+				double v = it->second;
 				get_token();
 				return v;
 			}

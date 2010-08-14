@@ -9,7 +9,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "MyMap.h"
+#include <map>
+#include <string>
+using namespace std;
 
 class MathParser  
 {
@@ -45,7 +47,7 @@ protected:
 
 	const char* m_szexpr;
 
-	CMyMap<double>	m_table;	// table that stores variables and constants
+	map<std::string, double> m_table;	// table that stores variables and constants
 
 	double	number_value;
 	char	string_value[256];

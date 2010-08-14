@@ -1886,10 +1886,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MyMap.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\NikeImport.cpp"
 				>
 			</File>
@@ -2577,10 +2573,6 @@
 			</File>
 			<File
 				RelativePath=".\MathParser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MyMap.h"
 				>
 			</File>
 			<File
