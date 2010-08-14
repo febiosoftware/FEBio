@@ -216,52 +216,8 @@ public:
 	double detJt(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJt[n]; }
 	double detJ0(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJ0[n]; }
 
-	double defgrad(mat3d& F, int n)
-	{
-		// make sure this element is unpacked
-		assert(m_pT->m_pel == this);
-
-		double *Grn = Gr(n);
-		double *Gsn = Gs(n);
-		double *Gtn = Gt(n);
-
-		vec3d* r = rt();
-
-		double GX, GY, GZ;
-		double Ji[3][3];
-		invjac0(Ji, n);
-
-		F[0][0] = F[0][1] = F[0][2] = 0;
-		F[1][0] = F[1][1] = F[1][2] = 0;
-		F[2][0] = F[2][1] = F[2][2] = 0;
-		int neln = Nodes();
-		for (int i=0; i<neln; ++i)
-		{
-			const double& Gri = Grn[i];
-			const double& Gsi = Gsn[i];
-			const double& Gti = Gtn[i];
-
-			const double& x = r[i].x;
-			const double& y = r[i].y;
-			const double& z = r[i].z;
-
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
-			GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
-			GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
-	
-			// calculate deformation gradient F
-			F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
-			F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
-			F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
-		}
-
-		double D = F.det();
-		if (D <= 0) throw NegativeJacobian(m_nID, n, D, this);
-
-		return D;
-	}
+	//! calculate deformation gradient at integration point n
+	double defgrad(mat3d& F, int n);
 
 	//! evaluate spatial gradient of scalar field at integration point
 	vec3d gradient(double* fn, int n)

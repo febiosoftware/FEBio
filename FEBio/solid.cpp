@@ -58,6 +58,7 @@ void FEElasticSolidDomain::InternalForces(FESolidElement& el, vector<double>& fe
 	double Ji[3][3], detJt;
 
 	double Gx, Gy, Gz;
+	mat3ds s;
 
 	const double* Gr, *Gs, *Gt;
 
@@ -79,7 +80,7 @@ void FEElasticSolidDomain::InternalForces(FESolidElement& el, vector<double>& fe
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-		mat3ds& s = pt.s;
+		s = pt.s;
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);

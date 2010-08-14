@@ -60,6 +60,55 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	return (*this);
 }
 
+double FESolidElement::defgrad(mat3d& F, int n)
+{
+	// make sure this element is unpacked
+	assert(m_pT->m_pel == this);
+
+	double *Grn = Gr(n);
+	double *Gsn = Gs(n);
+	double *Gtn = Gt(n);
+
+	vec3d* r = rt();
+
+	double GX, GY, GZ;
+	double x, y, z;
+	double Gri, Gsi, Gti;
+	double Ji[3][3];
+	invjac0(Ji, n);
+
+	F[0][0] = F[0][1] = F[0][2] = 0;
+	F[1][0] = F[1][1] = F[1][2] = 0;
+	F[2][0] = F[2][1] = F[2][2] = 0;
+	int neln = Nodes();
+	for (int i=0; i<neln; ++i)
+	{
+		Gri = Grn[i];
+		Gsi = Gsn[i];
+		Gti = Gtn[i];
+
+		x = r[i].x;
+		y = r[i].y;
+		z = r[i].z;
+
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
+		GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
+		GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
+	
+		// calculate deformation gradient F
+		F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
+		F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
+		F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
+	}
+
+	double D = F.det();
+	if (D <= 0) throw NegativeJacobian(m_nID, n, D, this);
+
+	return D;
+}
+
 //-----------------------------------------------------------------------------
 FEShellElement::FEShellElement(const FEShellElement& el)
 {
