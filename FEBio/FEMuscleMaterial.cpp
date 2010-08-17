@@ -23,6 +23,15 @@ BEGIN_PARAMETER_LIST(FEMuscleMaterial, FETransverselyIsotropic)
 	ADD_PARAMETER(m_smax, FE_PARAM_DOUBLE, "smax");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+#ifdef WIN32
+inline double acosh(double x)
+{
+	if (x <= 1) return 0;
+	return log(x + sqrt(x*x - 1));
+}
+#endif
+
 /////////////////////////////////////////////////////////////////////////
 // FEMuscleMaterial
 /////////////////////////////////////////////////////////////////////////

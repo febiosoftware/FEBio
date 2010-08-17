@@ -68,6 +68,9 @@ public:
 	double Value(double time) const;
 	double Value() const { return m_value; }
 
+	//! returns the derivative value at time
+	double Deriv(double time) const;
+
 	//! evaluates the loadcurve at time
 	void Evaluate(double time)
 	{

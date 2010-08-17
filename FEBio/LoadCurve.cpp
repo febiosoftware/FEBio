@@ -330,3 +330,27 @@ void FELoadCurve::Serialize(Archive &ar)
 		}
 	}
 }
+
+//-----------------------------------------------------------------------------
+double FELoadCurve::Deriv(double time) const
+{
+	int N = m_lp.size();
+	if (N <= 1) return 0;
+
+	double Dt = m_lp[N-1].time - m_lp[0].time;
+	double dt = Dt*0.001;
+	double t0 = time - dt;
+	double t1 = time + dt;
+
+	double eps = 2*dt;
+
+	if (t0 <= m_lp[0].time) { t0 = m_lp[0].time; eps = dt; }
+	if (t1 >= m_lp[N-1].time) { t1 = m_lp[N-1].time; eps = dt; }
+
+	double v1 = Value(t1);
+	double v0 = Value(t0);
+
+	double D = (v1 - v0)/eps;
+
+	return D;
+}

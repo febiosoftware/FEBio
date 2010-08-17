@@ -652,4 +652,14 @@ public:
 	double	m_a0;	// cross-sectional area
 };
 
+//-----------------------------------------------------------------------------
+//! Discrete element class
+
+class FEDiscreteElement
+{
+public:
+	int			n1, n2;	//!< nodes that this spring connects
+	int			nmat;	//!< discrete material index
+};
+
 #endif // !defined(AFX_FEELEMENT_H__2EE38101_58E2_4FEB_B214_BB71B6FB15FB__INCLUDED_)

@@ -154,7 +154,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				vector<int> lm(6);
 				for (i=0; i<(int) fem.m_DE.size(); ++i)
 				{
-					FE_DISCRETE_ELEMENT& de = fem.m_DE[i];
+					FEDiscreteElement& de = fem.m_DE[i];
 					lm[0] = mesh.Node(de.n1).m_ID[0];
 					lm[1] = mesh.Node(de.n1).m_ID[1];
 					lm[2] = mesh.Node(de.n1).m_ID[2];

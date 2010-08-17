@@ -385,11 +385,9 @@ void FEM::EchoInput()
 		log.printf(" Nr of discrete elements : %d\n", m_DE.size());
 		for (i=0; i<(int) m_DE.size(); ++i)
 		{
-			FE_DISCRETE_ELEMENT& de = m_DE[i];
+			FEDiscreteElement& de = m_DE[i];
 			log.printf(" discrete element %d:\n", i+1);
 			log.printf("\tnodes       : %d, %d\n", de.n1+1, de.n2+1);
-			log.printf("\tE           : %lg\n", de.E);
-			log.printf("\ttension only: %s\n", (de.m_bto?"yes":"no"));
 		}
 		log.printf("\n\n");
 	}

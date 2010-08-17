@@ -31,6 +31,7 @@
 #include "FEFluxSurface.h"
 #include "FEHeatFlux.h"
 #include "FEElasticMixture.h"
+#include "FEDiscreteMaterial.h"
 
 #include <stack>
 #include <list>
@@ -204,16 +205,6 @@ typedef void (*FEBIO_CB_FNC)(FEM*,void*);
 struct FEBIO_CALLBACK {
 	FEBIO_CB_FNC	m_pcb;
 	void*	m_pd;
-};
-
-//-----------------------------------------------------------------------------
-//! Discrete element
-
-struct FE_DISCRETE_ELEMENT
-{
-	int			n1, n2;	//!< nodes that this spring connects
-	double		E;		//!< spring constant
-	bool		m_bto;	//!< tension only flag
 };
 
 //-----------------------------------------------------------------------------
@@ -445,7 +436,8 @@ public:
 		vector<FERigidJoint*>		m_RJ;	//!< rigid joint array
 
 		// discrete elements
-		vector<FE_DISCRETE_ELEMENT>	m_DE;	//!< discrete elements
+		vector<FEDiscreteElement>		m_DE;	//!< discrete elements
+		vector<FEDiscreteMaterial*>		m_DMAT;	//!< discrete materials
 	//}
 
 	//{ --- Contact Data --

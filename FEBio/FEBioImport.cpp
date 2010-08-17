@@ -18,6 +18,7 @@
 #include "FEBioPlotFile.h"
 #include "FEPoroElastic.h"
 #include "ut4.h"
+#include "FEDiscreteMaterial.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1965,8 +1966,22 @@ void FEFEBioImport::ParseSpringSection(XMLTag &tag)
 {
 	FEM& fem = *m_pfem;
 
-	FE_DISCRETE_ELEMENT de;
-	de.m_bto = false;
+	FEDiscreteElement de;
+
+	// determine the spring type
+	FEDiscreteMaterial* pm = 0;
+	const char* szt = tag.AttributeValue("type", true);
+	if (szt)
+	{
+		if (strcmp(szt, "linear") == 0) pm = new FELinearSpring;
+		else if (strcmp(szt, "tension-only linear") == 0) pm = new FETensionOnlyLinearSpring;
+		else if (strcmp(szt, "nonlinear") == 0) pm = new FENonLinearSpring;
+	}
+	else pm = new FELinearSpring;
+	
+	// add a new material for each spring
+	fem.m_DMAT.push_back(pm);
+	de.nmat = fem.m_DMAT.size()-1;
 
 	int n[2];
 
@@ -1980,7 +1995,19 @@ void FEFEBioImport::ParseSpringSection(XMLTag &tag)
 			de.n1 = n[0]-1;
 			de.n2 = n[1]-1;
 		}
-		else if (tag == "E") tag.value(de.E);
+		else if (tag == "E") 
+		{
+			if (dynamic_cast<FELinearSpring*>(pm)) tag.value((dynamic_cast<FELinearSpring*>(pm))->m_E);
+			else if (dynamic_cast<FETensionOnlyLinearSpring*>(pm)) tag.value((dynamic_cast<FETensionOnlyLinearSpring*>(pm))->m_E);
+			else if (dynamic_cast<FENonLinearSpring*>(pm))
+			{
+				FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
+				tag.value(ps->m_F);
+				const char* szl = tag.AttributeValue("lc");
+				int lc = atoi(szl);
+				ps->m_nlc = lc;
+			}
+		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

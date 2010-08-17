@@ -211,7 +211,7 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	int nmat = fem.Materials()+1;
 	for (i=0; i < (int) fem.m_DE.size(); ++i)
 	{
-		FE_DISCRETE_ELEMENT& e = fem.m_DE[i];
+		FEDiscreteElement& e = fem.m_DE[i];
 		n[0] = e.n1+1;
 		n[1] = e.n2+1;
 		n[2] = 0;
@@ -579,7 +579,7 @@ void LSDYNAPlotFile::write_truss_stress()
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
 	for (int i=0; i<(int) m_pfem->m_DE.size(); ++i)
 	{
-		FE_DISCRETE_ELEMENT& e = m_pfem->m_DE[i];
+		FEDiscreteElement& e = m_pfem->m_DE[i];
 		fwrite(s, sizeof(float), 6, m_fp);
 	}
 }

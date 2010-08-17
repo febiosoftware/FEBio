@@ -114,17 +114,11 @@ bool FEM::Init()
 	// check discrete elements
 	for (i=0; i<(int) m_DE.size(); ++i)
 	{
-		FE_DISCRETE_ELEMENT& el = m_DE[i];
+		FEDiscreteElement& el = m_DE[i];
 		if (el.n1 <0 || el.n1 >= m_mesh.Nodes() ||
 			el.n2 <0 || el.n2 >= m_mesh.Nodes() )
 		{
 			log.printf("Invalid node number for discrete element %d\n", i+1);
-			return false;
-		}
-
-		if (el.E < 0)
-		{
-			log.printbox("INPUT ERROR", "Invalide value for sping constant of discrete element %d", i+1);
 			return false;
 		}
 	}
@@ -162,11 +156,13 @@ bool FEM::Init()
 //! Initialize material data
 bool FEM::InitMaterials()
 {
+	int i;
+
 	// get the logfile
 	Logfile& log = GetLogfile();
 
 	// initialize material data
-	for (int i=0; i<Materials(); ++i)
+	for (i=0; i<Materials(); ++i)
 	{
 		// get the material
 		FEMaterial* pmat = GetMaterial(i);
@@ -195,6 +191,25 @@ bool FEM::InitMaterials()
 		{
 			if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
 		}
+	}
+
+	// initialize discrete materials
+	try
+	{
+		for (i=0; i<(int) m_DMAT.size(); ++i)
+		{
+			FEDiscreteMaterial* pm = m_DMAT[i];
+			if (dynamic_cast<FENonLinearSpring*>(pm))
+			{
+				FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
+				ps->m_plc = GetLoadCurve(ps->m_nlc);
+			}
+			pm->Init();
+		}
+	}
+	catch (...)
+	{
+		return false;
 	}
 
 	return true;

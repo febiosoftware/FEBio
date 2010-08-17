@@ -373,10 +373,8 @@ void FEM::SerializeGeometry(Archive &ar)
 		ar << m_DE.size();
 		for (i=0; i<(int) m_DE.size(); ++i)
 		{
-			FE_DISCRETE_ELEMENT& de = m_DE[i];
-			ar << de.n1 << de.n2;
-			ar << de.E;
-			ar << de.m_bto;
+			FEDiscreteElement& de = m_DE[i];
+			ar << de.n1 << de.n2 << de.nmat;
 		}
 	}
 	else
@@ -417,10 +415,8 @@ void FEM::SerializeGeometry(Archive &ar)
 		if (nde > 0) m_DE.resize(nde);
 		for (i=0; i<nde; ++i)
 		{
-			FE_DISCRETE_ELEMENT& de = m_DE[i];
-			ar >> de.n1 >> de.n2;
-			ar >> de.E;
-			ar >> de.m_bto;
+			FEDiscreteElement& de = m_DE[i];
+			ar >> de.n1 >> de.n2 >> de.nmat;
 		}
 	}
 }

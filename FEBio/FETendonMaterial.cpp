@@ -20,6 +20,15 @@ BEGIN_PARAMETER_LIST(FETendonMaterial, FETransverselyIsotropic)
 	ADD_PARAMETER(m_L2, FE_PARAM_DOUBLE, "l2");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+#ifdef WIN32
+inline double acosh(double x)
+{
+	if (x <= 1) return 0;
+	return log(x + sqrt(x*x - 1));
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // FETendonMaterial
 //////////////////////////////////////////////////////////////////////

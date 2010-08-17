@@ -1414,6 +1414,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\discrete.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\elstf.cpp"
 				>
 			</File>
@@ -1483,6 +1487,10 @@
 			</File>
 			<File
 				RelativePath=".\FEDiagnostic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiscreteMaterial.cpp"
 				>
 			</File>
 			<File
@@ -2205,6 +2213,10 @@
 			</File>
 			<File
 				RelativePath=".\FEDiagnostic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiscreteMaterial.h"
 				>
 			</File>
 			<File

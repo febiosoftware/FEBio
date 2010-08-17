@@ -254,13 +254,4 @@ public:
 	DECLARE_PARAMETER_LIST();
 };
 
-//-----------------------------------------------------------------------------
-#ifdef WIN32
-inline double acosh(double x)
-{
-	if (x <= 1) return 0;
-	return log(x + sqrt(x*x - 1));
-}
-#endif
-
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)
