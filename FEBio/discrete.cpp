@@ -1,28 +1,29 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
+#include "FEDomain.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)
 
-void FESolidSolver::DiscreteElementForces(vector<double>& R)
+void FEDiscreteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
-	if (m_fem.m_DE.size() == 0) return;
-
-	FEMesh& mesh = m_fem.m_mesh;
+	FEM& fem = psolver->m_fem;
+	FEMesh& mesh = *m_pMesh;
 
 	vector<double> fe(6);
 	vec3d u1, u2;
 
 	vector<int> en(2), lm(6);
 
-	for (size_t i=0; i<m_fem.m_DE.size(); ++i)
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// get the discrete element
-		FEDiscreteElement& el = m_fem.m_DE[i];
+		FEDiscreteElement& el = m_Elem[i];
 
 		// get the nodes
-		FENode& n1 = mesh.Node(el.n1);
-		FENode& n2 = mesh.Node(el.n2);
+		FENode& n1 = mesh.Node(el.m_node[0]);
+		FENode& n2 = mesh.Node(el.m_node[1]);
 
 		// get the nodal positions
 		vec3d& r01 = n1.m_r0;
@@ -38,7 +39,7 @@ void FESolidSolver::DiscreteElementForces(vector<double>& R)
 		double DL = Lt - L0;
 		
 		// evaluate the spring stiffness
-		FEDiscreteMaterial* pm = m_fem.m_DMAT[el.nmat];
+		FEDiscreteMaterial* pm = fem.m_DMAT[el.GetMatID()];
 		double F = pm->force(DL);
 
 		// set up the force vector
@@ -50,8 +51,8 @@ void FESolidSolver::DiscreteElementForces(vector<double>& R)
 		fe[5] =  -F*e.z;
 
 		// setup the node vector
-		en[0] = el.n1;
-		en[1] = el.n2;
+		en[0] = el.m_node[0];
+		en[1] = el.m_node[1];
 
 		// set up the LM vector
 		lm[0] = n1.m_ID[0];
@@ -62,18 +63,17 @@ void FESolidSolver::DiscreteElementForces(vector<double>& R)
 		lm[5] = n2.m_ID[2];
 
 		// assemble element
-		AssembleResidual(en, lm, fe, R);
+		psolver->AssembleResidual(en, lm, fe, R);
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
-void FESolidSolver::DiscreteElementStiffness()
+void FEDiscreteDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	if (m_fem.m_DE.size() == 0) return;
-
-	FEMesh& mesh = m_fem.m_mesh;
+	FEM& fem = psolver->m_fem;
+	FEMesh& mesh = *m_pMesh;
 
 	matrix ke(6,6);
 	ke.zero();
@@ -81,14 +81,14 @@ void FESolidSolver::DiscreteElementStiffness()
 	vector<int> en(2), lm(6);
 
 	// loop over all discrete elements
-	for (size_t i=0; i<m_fem.m_DE.size(); ++i)
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// get the discrete element
-		FEDiscreteElement& el = m_fem.m_DE[i];
+		FEDiscreteElement& el = m_Elem[i];
 
 		// get the nodes of the element
-		FENode& n1 = mesh.Node(el.n1);
-		FENode& n2 = mesh.Node(el.n2);
+		FENode& n1 = mesh.Node(el.m_node[0]);
+		FENode& n2 = mesh.Node(el.m_node[1]);
 
 		// get the nodal positions
 		vec3d& r01 = n1.m_r0;
@@ -108,11 +108,11 @@ void FESolidSolver::DiscreteElementStiffness()
 		double DL = Lt - L0;
 
 		// evaluate the stiffness
-		FEDiscreteMaterial* pm = m_fem.m_DMAT[el.nmat];
+		FEDiscreteMaterial* pm = fem.m_DMAT[el.GetMatID()];
 		double F = pm->force(DL);
 		double E = pm->stiffness(DL);
 
-		if (Lt == 0) { F = 0; Lt = 1; }
+		if (Lt == 0) { F = 0; Lt = 1; e = vec3d(1,1,1); }
 
 		double A[3][3] = {0};
 		A[0][0] = (E - F/Lt)*e.x*e.x + F/Lt;
@@ -140,8 +140,8 @@ void FESolidSolver::DiscreteElementStiffness()
 		ke[5][3] = A[2][0]; ke[5][4] = A[2][1]; ke[5][5] = A[2][2];
 
 		// setup the node vector
-		en[0] = el.n1;
-		en[1] = el.n2;
+		en[0] = el.m_node[0];
+		en[1] = el.m_node[1];
 
 		// set up the LM vector
 		lm[0] = n1.m_ID[0];
@@ -152,6 +152,6 @@ void FESolidSolver::DiscreteElementStiffness()
 		lm[5] = n2.m_ID[2];
 
 		// assemble the element into the global system
-		AssembleStiffness(en, lm, ke);
+		psolver->AssembleStiffness(en, lm, ke);
 	}
 }

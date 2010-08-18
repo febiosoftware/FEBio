@@ -19,6 +19,7 @@ class FEMaterial;
 #define FE_UT4_DOMAIN			8
 #define FE_PORO_SOLID_DOMAIN	9
 #define FE_HEAT_SOLID_DOMAIN	10
+#define FE_DISCRETE_DOMAIN		11
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements
@@ -482,4 +483,32 @@ protected:
 
 	//! calculate the capacitance element stiffness matrix
 	void CapacitanceStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+};
+
+//-----------------------------------------------------------------------------
+//! domain for discrete elements
+class FEDiscreteDomain : public FEDomain
+{
+public:
+	FEDiscreteDomain(FEMesh* pm, FEMaterial* pmat) : FEDomain(FE_DISCRETE_DOMAIN, pm, pmat) {}
+
+	FEDomain* Clone()
+	{
+		FEDiscreteDomain* pd = new FEDiscreteDomain(m_pMesh, m_pMat);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
+
+	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
+
+	void create(int n) { m_Elem.resize(n); }
+	int Elements() { return (int) m_Elem.size(); }
+	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
+	void StiffnessMatrix(FESolidSolver* psolver);
+
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+protected:
+	vector<FEDiscreteElement>	m_Elem;
 };

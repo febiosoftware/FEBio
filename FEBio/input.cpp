@@ -378,20 +378,6 @@ void FEM::EchoInput()
 		log.printf("\n\n");
 	}
 
-	if (m_DE.size())
-	{
-		log.printf(" DISCRETE ELEMENT DATA\n");
-		log.printf("===========================================================================\n");
-		log.printf(" Nr of discrete elements : %d\n", m_DE.size());
-		for (i=0; i<(int) m_DE.size(); ++i)
-		{
-			FEDiscreteElement& de = m_DE[i];
-			log.printf(" discrete element %d:\n", i+1);
-			log.printf("\tnodes       : %d, %d\n", de.n1+1, de.n2+1);
-		}
-		log.printf("\n\n");
-	}
-
 	log.printf(" LINEAR SOLVER DATA\n");
 	log.printf("===========================================================================\n");
 	log.printf("\tSolver type ............................... : ");

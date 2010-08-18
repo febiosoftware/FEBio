@@ -8,6 +8,8 @@ class FEDiscreteMaterial : public FEMaterial
 public:
 	virtual double force    (double dl) = 0;
 	virtual double stiffness(double dl) = 0;
+
+	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEDiscreteMaterialPoint; }
 };
 
 //-----------------------------------------------------------------------------

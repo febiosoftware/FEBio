@@ -453,4 +453,19 @@ public:
 	void UnpackData(int nflag) {}
 };
 
+///////////////////////////////////////////////////////////////////////////////
+class FEDiscreteElementTraits : public FEElementTraits
+{
+public:
+	enum { NINT = 1 };
+	enum { NELN = 2 };
+
+public:
+	FEDiscreteElementTraits() : FEElementTraits(NINT, NELN) { m_ntype = FE_DISCRETE; init(); }
+
+	void init() {}
+
+	void UnpackData(int nflag) {}
+};
+
 #endif // !defined(AFX_FEELEMENTTRAITS_H__5AE1C578_7EC7_4C11_AC98_EBCCFD68B00C__INCLUDED_)

@@ -32,7 +32,10 @@ enum FE_Element_Type {
 	FE_SHELL_TRI,	// = 11
 
 	// truss elements
-	FE_TRUSS		// = 12
+	FE_TRUSS,		// = 12
+
+	// discrete elements
+	FE_DISCRETE		// = 13
 };
 
 /////////////////////////////////////////////////////////////////////////////

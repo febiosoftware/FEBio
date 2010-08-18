@@ -182,6 +182,9 @@ public:
 	//! return the total nr of truss elements
 	int TrussElements();
 
+	//! return the total nr of discrete elements
+	int DiscreteElements();
+
 	//! return reference to a node
 	FENode& Node(int i) { return m_Node[i]; }
 

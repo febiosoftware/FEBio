@@ -185,3 +185,32 @@ FETrussElement& FETrussElement::operator = (const FETrussElement& el)
 
 	return (*this); 
 }
+
+//-----------------------------------------------------------------------------
+FEDiscreteElement::FEDiscreteElement(const FEDiscreteElement& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nrigid = el.m_nrigid;
+	m_node = el.m_node;
+	m_nID = el.m_nID;
+	m_gid = el.m_gid;
+}
+
+FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
+{
+	// set the traits of the element
+	if (el.m_pT) { SetTraits(el.m_pT); m_State = el.m_State; }
+
+	// copy base class data
+	m_mat = el.m_mat;
+	m_nrigid = el.m_nrigid;
+	m_node = el.m_node;
+	m_nID = el.m_nID;
+	m_gid = el.m_gid;
+
+	return (*this);
+}

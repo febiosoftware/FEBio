@@ -120,6 +120,18 @@ int FEMesh::TrussElements()
 	return N;
 }
 
+int FEMesh::DiscreteElements()
+{
+	int N = 0;
+	for (int i=0; i<(int) m_Domain.size(); ++i)
+	{
+		FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(m_Domain[i]);
+		if (pd) N += pd->Elements();
+	}
+	return N;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FEMesh::UpdateBox
 //  Updates the bounding box of the mesh (using current coordinates)

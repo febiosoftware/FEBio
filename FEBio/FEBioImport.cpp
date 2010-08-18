@@ -1965,8 +1965,7 @@ void FEFEBioImport::ParseBCHeatFlux(XMLTag& tag)
 void FEFEBioImport::ParseSpringSection(XMLTag &tag)
 {
 	FEM& fem = *m_pfem;
-
-	FEDiscreteElement de;
+	FEMesh& mesh = fem.m_mesh;
 
 	// determine the spring type
 	FEDiscreteMaterial* pm = 0;
@@ -1978,10 +1977,18 @@ void FEFEBioImport::ParseSpringSection(XMLTag &tag)
 		else if (strcmp(szt, "nonlinear") == 0) pm = new FENonLinearSpring;
 	}
 	else pm = new FELinearSpring;
+
+	// create a new spring "domain"
+	FEDiscreteDomain* pd = new FEDiscreteDomain(&mesh, pm);
+	mesh.AddDomain(pd);
+
+	pd->create(1);
+	FEDiscreteElement& de = dynamic_cast<FEDiscreteElement&>(pd->ElementRef(0));
+	de.SetType(FE_DISCRETE);
 	
 	// add a new material for each spring
 	fem.m_DMAT.push_back(pm);
-	de.nmat = fem.m_DMAT.size()-1;
+	de.SetMatID(fem.m_DMAT.size()-1);
 
 	int n[2];
 
@@ -1992,14 +1999,18 @@ void FEFEBioImport::ParseSpringSection(XMLTag &tag)
 		if (tag == "node")
 		{
 			tag.value(n, 2);
-			de.n1 = n[0]-1;
-			de.n2 = n[1]-1;
+			de.m_node[0] = n[0]-1;
+			de.m_node[1] = n[1]-1;
 		}
 		else if (tag == "E") 
 		{
 			if (dynamic_cast<FELinearSpring*>(pm)) tag.value((dynamic_cast<FELinearSpring*>(pm))->m_E);
 			else if (dynamic_cast<FETensionOnlyLinearSpring*>(pm)) tag.value((dynamic_cast<FETensionOnlyLinearSpring*>(pm))->m_E);
-			else if (dynamic_cast<FENonLinearSpring*>(pm))
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else if (tag == "force")
+		{
+			if (dynamic_cast<FENonLinearSpring*>(pm))
 			{
 				FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
 				tag.value(ps->m_F);
@@ -2007,13 +2018,14 @@ void FEFEBioImport::ParseSpringSection(XMLTag &tag)
 				int lc = atoi(szl);
 				ps->m_nlc = lc;
 			}
+			else throw XMLReader::InvalidTag(tag);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
 
-	fem.m_DE.push_back(de);
+	pd->InitMaterialPointData();
 }
 
 //-----------------------------------------------------------------------------

@@ -436,7 +436,6 @@ public:
 		vector<FERigidJoint*>		m_RJ;	//!< rigid joint array
 
 		// discrete elements
-		vector<FEDiscreteElement>		m_DE;	//!< discrete elements
 		vector<FEDiscreteMaterial*>		m_DMAT;	//!< discrete materials
 	//}
 

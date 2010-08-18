@@ -62,12 +62,6 @@ bool FESolidSolver::StiffnessMatrix()
 		m_fem.m_fsurf->StiffnessMatrix(this);
 	}
 	
-	// discrete element stiffness
-	if (m_fem.m_DE.size())
-	{
-		DiscreteElementStiffness();
-	}
-
 	// calculate linear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
@@ -597,12 +591,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
 	LinearConstraintForces(R);
-
-	// add discrete element forces
-	if (m_fem.m_DE.size())
-	{
-		DiscreteElementForces(R);
-	}
 
 	// increase RHS counter
 	m_nrhs++;

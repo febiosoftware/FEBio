@@ -655,11 +655,12 @@ public:
 //-----------------------------------------------------------------------------
 //! Discrete element class
 
-class FEDiscreteElement
+class FEDiscreteElement : public FEElement
 {
 public:
-	int			n1, n2;	//!< nodes that this spring connects
-	int			nmat;	//!< discrete material index
+	FEDiscreteElement(){}
+	FEDiscreteElement(const FEDiscreteElement& e);
+	FEDiscreteElement& operator = (const FEDiscreteElement& e);
 };
 
 #endif // !defined(AFX_FEELEMENT_H__2EE38101_58E2_4FEB_B214_BB71B6FB15FB__INCLUDED_)

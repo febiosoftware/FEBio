@@ -35,6 +35,7 @@ FEElementLibrary::FEElementLibrary()
 		n = RegisterTraits(new FEShellQuadElementTraits ); assert(n==FE_SHELL_QUAD);
 		n = RegisterTraits(new FEShellTriElementTraits  ); assert(n==FE_SHELL_TRI);
 		n = RegisterTraits(new FETrussElementTraits     ); assert(n==FE_TRUSS);
+		n = RegisterTraits(new FEDiscreteElementTraits  ); assert(n==FE_DISCRETE);
 		bfirst = false;
 	}
 }

@@ -111,18 +111,6 @@ bool FEM::Init()
 	// initialize contact data
 	if (InitContact() == false) return false;
 
-	// check discrete elements
-	for (i=0; i<(int) m_DE.size(); ++i)
-	{
-		FEDiscreteElement& el = m_DE[i];
-		if (el.n1 <0 || el.n1 >= m_mesh.Nodes() ||
-			el.n2 <0 || el.n2 >= m_mesh.Nodes() )
-		{
-			log.printf("Invalid node number for discrete element %d\n", i+1);
-			return false;
-		}
-	}
-
 	// intitialize time
 	m_ftime = 0;
 

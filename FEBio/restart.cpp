@@ -368,14 +368,6 @@ void FEM::SerializeGeometry(Archive &ar)
 		// rigid joints
 		ar << m_nrj;
 		for (i=0; i<m_nrj; ++i) m_RJ[i]->Serialize(ar);	
-
-		// discrete elements
-		ar << m_DE.size();
-		for (i=0; i<(int) m_DE.size(); ++i)
-		{
-			FEDiscreteElement& de = m_DE[i];
-			ar << de.n1 << de.n2 << de.nmat;
-		}
 	}
 	else
 	{
@@ -407,16 +399,6 @@ void FEM::SerializeGeometry(Archive &ar)
 			FERigidJoint* prj = new FERigidJoint(this);
 			prj->Serialize(ar);
 			m_RJ.push_back(prj);
-		}
-
-		// discrete elements
-		int nde;
-		ar >> nde;
-		if (nde > 0) m_DE.resize(nde);
-		for (i=0; i<nde; ++i)
-		{
-			FEDiscreteElement& de = m_DE[i];
-			ar >> de.n1 >> de.n2 >> de.nmat;
 		}
 	}
 }

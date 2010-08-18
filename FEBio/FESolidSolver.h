@@ -70,9 +70,6 @@ public:
 		//! calculate the rigid stiffnes matrices
 		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
-		//! calculates the discrete element stiffness
-		void DiscreteElementStiffness();
-
 		//! calculates stiffness contributon of linear constraints
 		void LinearConstraintStiffness();
 	//}
@@ -87,9 +84,6 @@ public:
 
 		//! Calculate the contact forces
 		void ContactForces(vector<double>& R);
-
-		//! Calculates discrete element forces
-		void DiscreteElementForces(vector<double>& R);
 
 		//! Calculates residual
 		bool Residual(vector<double>& R);

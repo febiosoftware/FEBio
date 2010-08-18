@@ -92,11 +92,11 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	plh.flagT = (m_nfield[3] == 0? 0 : 1);
 	plh.icode = 6;
 	plh.ndim  = 4;
-	plh.nel2  = fem.m_mesh.TrussElements() + fem.m_DE.size();
+	plh.nel2  = fem.m_mesh.TrussElements() + fem.m_mesh.DiscreteElements();
 	plh.nel4  = fem.m_mesh.ShellElements();
 	plh.nel8  = fem.m_mesh.SolidElements();
 	plh.nglbv = 0;
-	plh.nummat2 = (fem.m_DE.size()>0? 1 : 0);
+	plh.nummat2 = (fem.m_mesh.DiscreteElements()>0? 1 : 0);
 	plh.nummat4 = 0;
 	plh.nummat8 = fem.Materials();
 	plh.nump    = fem.m_mesh.Nodes();
@@ -209,17 +209,24 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 
 	// all springs are assigned the same material for now
 	int nmat = fem.Materials()+1;
-	for (i=0; i < (int) fem.m_DE.size(); ++i)
+	for (nd=0; nd < mesh.Domains(); ++nd)
 	{
-		FEDiscreteElement& e = fem.m_DE[i];
-		n[0] = e.n1+1;
-		n[1] = e.n2+1;
-		n[2] = 0;
-		n[3] = 0;
-		n[4] = 0;
-		n[5] = nmat;
+		FEDiscreteDomain* psd = dynamic_cast<FEDiscreteDomain*>(&mesh.Domain(nd));
+		if (psd)
+		{
+			for (i=0; i<psd->Elements(); ++i)
+			{
+				FEDiscreteElement& e = dynamic_cast<FEDiscreteElement&>(psd->ElementRef(i));
+				n[0] = e.m_node[0]+1;
+				n[1] = e.m_node[1]+1;
+				n[2] = 0;
+				n[3] = 0;
+				n[4] = 0;
+				n[5] = nmat;
 
-		fwrite(n, sizeof(int), 6, m_fp);
+				fwrite(n, sizeof(int), 6, m_fp);
+			}
+		}
 	}
 
 	// write shell element data
@@ -577,10 +584,17 @@ void LSDYNAPlotFile::write_truss_stress()
 	}
 
 	s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = 0;
-	for (int i=0; i<(int) m_pfem->m_DE.size(); ++i)
+	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEDiscreteElement& e = m_pfem->m_DE[i];
-		fwrite(s, sizeof(float), 6, m_fp);
+		FEDiscreteDomain* psd = dynamic_cast<FEDiscreteDomain*>(&mesh.Domain(nd));
+		if (psd)
+		{
+			for (int i=0; i<psd->Elements(); ++i)
+			{
+				FEDiscreteElement& e = dynamic_cast<FEDiscreteElement&>(psd->ElementRef(i));
+				fwrite(s, sizeof(float), 6, m_fp);
+			}
+		}
 	}
 }
 

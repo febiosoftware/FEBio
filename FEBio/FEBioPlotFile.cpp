@@ -197,8 +197,8 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	m_hdr.nnodes = m.Nodes();
 	m_hdr.n3d    = m.SolidElements();
 	m_hdr.n2d    = m.ShellElements();
-	m_hdr.n1d    = fem.m_DE.size();
-	m_hdr.nmat   = fem.Materials();
+	m_hdr.n1d    = m.DiscreteElements();
+	m_hdr.nmat   = fem.Materials() + fem.m_DMAT.size();
 
 	m_hdr.nglv = m_dic.m_Glob.size();
 	m_hdr.nnv  = m_dic.m_Node.size();

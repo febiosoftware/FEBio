@@ -295,3 +295,26 @@ public:
 	double	m_l;	// strech
 	double	m_tau;	// Kirchoff stress
 };
+
+//-----------------------------------------------------------------------------
+
+class FEDiscreteMaterialPoint : public FEMaterialPoint
+{
+public:
+	FEMaterialPoint* Copy()
+	{
+		FEDiscreteMaterialPoint* pt = new FEDiscreteMaterialPoint(*this);
+		if (m_pt) pt->m_pt = m_pt->Copy();
+		return pt;
+	}
+
+	void Serialize(Archive& ar)
+	{
+		if (m_pt) m_pt->Serialize(ar);
+	}
+
+	void Init(bool bflag)
+	{
+		if (m_pt) m_pt->Init(bflag);
+	}
+};
