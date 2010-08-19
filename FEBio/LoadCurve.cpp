@@ -342,15 +342,10 @@ double FELoadCurve::Deriv(double time) const
 	double t0 = time - dt;
 	double t1 = time + dt;
 
-	double eps = 2*dt;
-
-	if (t0 <= m_lp[0].time) { t0 = m_lp[0].time; eps = dt; }
-	if (t1 >= m_lp[N-1].time) { t1 = m_lp[N-1].time; eps = dt; }
-
 	double v1 = Value(t1);
 	double v0 = Value(t0);
 
-	double D = (v1 - v0)/eps;
+	double D = (v1 - v0)/(2*dt);
 
 	return D;
 }
