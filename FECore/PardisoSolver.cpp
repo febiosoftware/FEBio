@@ -25,7 +25,7 @@ PardisoSolver::PardisoSolver()
 bool PardisoSolver::PreProcess()
 {
 	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
-	m_iparm[0] = 0;
+	m_iparm[0] = 0; /* Use default values for parameters */
 
 	//fprintf(stderr, "In PreProcess\n");
 
@@ -35,8 +35,9 @@ bool PardisoSolver::PreProcess()
 	m_nnz = m_pA->NonZeroes();
 	m_nrhs = 1;
 
-	// number of processors: use value of OMP_NUM_THREADS
-	m_iparm[2] = m_numthreads;
+	// number of processors: This parameter is no longer used.
+	// Use OMP_NUM_THREADS
+	// m_iparm[2] = m_numthreads;
 
 	m_maxfct = 1;	/* Maximum number of numerical factorizations */
 	m_mnum = 1;	/* Which factorization to use */
