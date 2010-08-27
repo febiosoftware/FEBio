@@ -71,6 +71,12 @@ public:
 	//! serialize data to archive
 	void Serialize(Archive& ar);
 
+	//! mark free-draining condition 
+	void MarkFreeDraining();
+	
+	//! set free-draining condition 
+	void SetFreeDraining();
+	
 protected:
 	void ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms);
 

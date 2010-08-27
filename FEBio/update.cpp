@@ -340,6 +340,10 @@ void FESolidSolver::UpdateStresses()
 
 void FEM::UpdateContact()
 {
+	// mark all free-draining surfaces
+	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->MarkFreeDraining();
 	// loop over all contact interfaces
 	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->Update();
+	// set free-draining boundary conditions
+	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->SetFreeDraining();
 }

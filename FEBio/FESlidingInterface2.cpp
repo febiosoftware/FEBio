@@ -535,30 +535,10 @@ void FESlidingInterface2::Update()
 
 	// Now that the nodes have been projected, we need to figure out
 	// if we need to modify the constraints on the pressure dofs.
-	// If the nodes are not in contact, then we have to make them free
-	// draining, or in other words we have to fix the degree of freedom
-	// has to be fixed. We do this by applying a prescribed zero-pressure BC
-	// To prescribe a dof, we simply make the corresponding equation nr
-	// negative. 
-	// First, we mark all nodes as free-draining
-	for (np=0; np<2; ++np)
-	{
-		FESlidingSurface2& s = (np == 0? m_ss : m_ms);
-
-		// first, mark all nodes as free-draining (= neg. ID)
-		// this is done by setting the dof's equation number
-		// to a negative number
-		for (i=0; i<s.Nodes(); ++i) 
-		{
-			id = s.Node(i).m_ID[6];
-			if (id >= 0) 
-			{
-				FENode& node = s.Node(i);
-				// mark node as free-draining
-				node.m_ID[6] = -id-2;
-			}
-		}
-	}
+	// If the nodes are not in contact, they must be free
+	// draining. Since all nodes have been previously marked to be
+	// free-draining in MarkFreeDraining(), we just need to reverse
+	// this setting here, for nodes that are in contact.
 
 	// Next, we loop over each surface, visiting the nodes
 	// and finding out if that node is in contact or not
@@ -654,23 +634,6 @@ void FESlidingInterface2::Update()
 						node.m_ID[6] = -id-2;
 					}
 				}
-			}
-		}
-	}
-
-	// finally we set the pressure to zero for the free-draining nodes
-	for (np=0; np<2; ++np)
-	{
-		FESlidingSurface2& s = (np == 0? m_ss : m_ms);
-
-		// loop over all nodes
-		for (i=0; i<s.Nodes(); ++i) 
-		{
-			if (s.Node(i).m_ID[6] < -1)
-			{
-				FENode& node = s.Node(i);
-				// set the fluid pressure to zero
-				node.m_pt = 0;
 			}
 		}
 	}
@@ -1441,3 +1404,70 @@ bool FESlidingInterface2::PoroStatus(FEMesh& m, FESurfaceElement& el)
 	return status;
 }
 
+//-----------------------------------------------------------------------------
+
+void FESlidingInterface2::MarkFreeDraining()
+{	
+	int i, id, np;
+
+	// set poro flag
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	
+	// only continue if we are doing a poro-elastic simulation
+	if (bporo == false) return;
+	
+	// Mark all nodes as free-draining.  This needs to be done for ALL
+	// contact interfaces prior to executing Update(), where nodes that are
+	// in contact are subsequently marked as non free-draining.  This ensures
+	// that for surfaces involved in more than one contact interface, nodes
+	// that have been marked as non free-draining are not reset to 
+	// free-draining.
+	for (np=0; np<2; ++np)
+	{
+		FESlidingSurface2& s = (np == 0? m_ss : m_ms);
+		
+		// first, mark all nodes as free-draining (= neg. ID)
+		// this is done by setting the dof's equation number
+		// to a negative number
+		for (i=0; i<s.Nodes(); ++i) 
+		{
+			id = s.Node(i).m_ID[6];
+			if (id >= 0) 
+			{
+				FENode& node = s.Node(i);
+				// mark node as free-draining
+				node.m_ID[6] = -id-2;
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FESlidingInterface2::SetFreeDraining()
+{	
+	int i, np;
+	
+	// set poro flag
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	
+	// only continue if we are doing a poro-elastic simulation
+	if (bporo == false) return;
+	
+	// Set the pressure to zero for the free-draining nodes
+	for (np=0; np<2; ++np)
+	{
+		FESlidingSurface2& s = (np == 0? m_ss : m_ms);
+		
+		// loop over all nodes
+		for (i=0; i<s.Nodes(); ++i) 
+		{
+			if (s.Node(i).m_ID[6] < -1)
+			{
+				FENode& node = s.Node(i);
+				// set the fluid pressure to zero
+				node.m_pt = 0;
+			}
+		}
+	}
+}

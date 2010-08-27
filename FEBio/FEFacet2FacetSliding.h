@@ -66,6 +66,12 @@ public:
 	//! serialize data to archive
 	void Serialize(Archive& ar);
 
+	//! mark free-draining condition 
+	void MarkFreeDraining() {}
+	
+	//! set free-draining condition 
+	void SetFreeDraining() {}
+	
 protected:
 	//! project slave surface onto master
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms);

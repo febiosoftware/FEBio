@@ -51,6 +51,12 @@ public:
 	//! serialize data to archive
 	virtual void Serialize(Archive& ar) = 0;
 
+	//! mark free-draining condition 
+	virtual void MarkFreeDraining() = 0;
+	
+	//! set free-draining condition 
+	virtual void SetFreeDraining() = 0;
+	
 protected:
 	//! don't call the default constructor
 	FEContactInterface() {m_pfem=0;}
