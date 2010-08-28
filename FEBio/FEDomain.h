@@ -20,6 +20,7 @@ class FEMaterial;
 #define FE_PORO_SOLID_DOMAIN	9
 #define FE_HEAT_SOLID_DOMAIN	10
 #define FE_DISCRETE_DOMAIN		11
+#define FE_3F_SOLID_DOMAIN		12
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements
@@ -146,7 +147,7 @@ public:
 	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	virtual void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the residual
 	void Residual(FESolidSolver* psolver, vector<double>& R);
@@ -175,6 +176,46 @@ protected:
 	void BodyForces(FEM& fem, FESolidElement& elem, vector<double>& fe);
 
 	// ---
+};
+
+//-----------------------------------------------------------------------------
+//! The following domain implements the finite element formulation for a three-field
+//! volume element. 
+class FE3FieldElasticSolidDomain : public FEElasticSolidDomain
+{
+public:
+	//! constructor
+	FE3FieldElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_3F_SOLID_DOMAIN; }
+
+	//! TODO: do I really use this?
+	FE3FieldElasticSolidDomain& operator = (FE3FieldElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
+
+	//! create a clone of this class
+	FEDomain* Clone()
+	{
+		FE3FieldElasticSolidDomain* pd = new FE3FieldElasticSolidDomain(m_pMesh, m_pMat);
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		return pd;
+	}
+
+	//! initialize class
+	bool Initialize(FEM& fem);
+
+	// update stresses
+	void UpdateStresses(FEM& fem);
+
+	//! calculates the solid element stiffness matrix
+	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+protected:
+	//! Dilatational stiffness component for nearly-incompressible materials
+	void DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke);
+
+	//! material stiffness component
+	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
+	//! geometrical stiffness (i.e. initial stress)
+	void GeometricalStiffness(FESolidElement& el, matrix& ke);
 };
 
 //-----------------------------------------------------------------------------
@@ -281,9 +322,6 @@ protected:
 
 	//! hourglass stiffness for UDG hex elements
 	void UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& ke);
-
-	//! dilatational stiffness for UDG hex elements
-	void UDGDilatationalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
 	//! geometrical stiffness for UDG hex elements
 	void UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matrix& ke);

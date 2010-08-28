@@ -242,19 +242,11 @@ void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 void FEUDGHexDomain::UDGElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
-	// see if the material is incompressible
-	FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-	bool bdilst = false;
-	if (dynamic_cast<FEIncompressibleMaterial*>(pme)) bdilst = true;
-
 	// calculate material stiffness
 	UDGMaterialStiffness(fem, el, ke);
 
 	// calculate geometrical stiffness
 	UDGGeometricalStiffness(fem, el, ke);
-
-	// Calculate dilatational stiffness, if necessary
-	if (bdilst) UDGDilatationalStiffness(fem, el, ke);
 
 	// add hourglass stiffness
 	UDGHourglassStiffness(fem, el, ke);
@@ -268,7 +260,6 @@ void FEUDGHexDomain::UDGElementStiffness(FEM& fem, FESolidElement& el, matrix& k
 		for (j=i+1; j<ndof; ++j)
 			ke[j][i] = ke[i][j];
 }
-
 
 //-----------------------------------------------------------------------------
 //! calculates the hourglass stiffness for UDG hex elements
@@ -337,64 +328,6 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix&
 			ke[3*i+2][3*j+2] += kab;
 		}
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-
-void FEUDGHexDomain::UDGDilatationalStiffness(FEM& fem, FESolidElement& el, matrix& ke)
-{
-	int i, j;
-
-	const int nint = el.GaussPoints();
-	const int neln = el.Nodes();
-	const int ndof = 3*neln;
-
-	// get the elements material
-	FEElasticMaterial* pm = fem.GetElasticMaterial(el.GetMatID());
-
-	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pm);
-	assert(pmi);
-
-	FEMesh& mesh = fem.m_mesh;
-
-	// calculate the average cartesian derivatives
-	double Gx[8], Gy[8], Gz[8];
-	AvgCartDerivs(el, Gx, Gy, Gz, 1);
-
-	// calculate element volume
-	double ve = HexVolume(el, 1);
-	double Ve = HexVolume(el, 0);
-
-	// get effective modulus
-	double k = pmi->Upp(el.m_eJ);
-
-	// next, we add the Lagrangian contribution
-	// note that this term will always be zero if the material does not
-	// use the augmented lagrangian
-	k += el.m_Lk*pmi->hpp(el.m_eJ);
-
-	// multiply with volume
-	k *= (ve*ve)/Ve;
-
-	// calculate dilatational stiffness component
-	// we only calculate the upper triangular part
-	// since ke is symmetric.
-	for (i=0; i<8; ++i)
-		for (j=i; j<8; ++j)
-		{
-			ke[3*i  ][3*j  ] += k*Gx[i]*Gx[j];
-			ke[3*i  ][3*j+1] += k*Gx[i]*Gy[j];
-			ke[3*i  ][3*j+2] += k*Gx[i]*Gz[j];
-
-			ke[3*i+1][3*j  ] += k*Gy[i]*Gx[j];
-			ke[3*i+1][3*j+1] += k*Gy[i]*Gy[j];
-			ke[3*i+1][3*j+2] += k*Gy[i]*Gz[j];
-
-			ke[3*i+2][3*j  ] += k*Gz[i]*Gx[j];
-			ke[3*i+2][3*j+1] += k*Gz[i]*Gy[j];
-			ke[3*i+2][3*j+2] += k*Gz[i]*Gz[j];
-		}
 }
 
 
@@ -599,31 +532,6 @@ void FEUDGHexDomain::UpdateStresses(FEM &fem)
 
 		// extract the elastic component
 		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-
-		// see if the material is incompressible or not
-		// if the material is incompressible the element
-		// is a three-field element and we need to evaluate
-		// the average dilatation and pressure fields
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-		if (pmi)
-		{
-			// get the material's bulk modulus
-			double K = pmi->BulkModulus();
-
-			// calculate the average dilatation and pressure
-			double v = 0, V = 0;
-
-			v = HexVolume(el, 1);
-			V = HexVolume(el, 0);
-
-			// calculate volume ratio
-			el.m_eJ = v / V;
-
-			// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
-			//        <----- Lag. mult. ----->   <------ penalty ----->
-//			el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
-			el.m_ep = pmi->Up(el.m_eJ);
-		}
 
 		// for the enhanced strain hex we need a slightly different procedure
 		// for calculating the element's stress. For this element, the stress

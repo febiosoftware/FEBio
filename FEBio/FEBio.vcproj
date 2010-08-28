@@ -1814,6 +1814,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEUncoupledMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEVerondaWestmann.cpp"
 				>
 			</File>
@@ -1931,6 +1935,10 @@
 			</File>
 			<File
 				RelativePath=".\solid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\solid3f.cpp"
 				>
 			</File>
 			<File
@@ -2533,6 +2541,10 @@
 			</File>
 			<File
 				RelativePath=".\FETrussMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEUncoupledMaterial.h"
 				>
 			</File>
 			<File

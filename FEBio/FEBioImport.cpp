@@ -19,6 +19,7 @@
 #include "FEPoroElastic.h"
 #include "ut4.h"
 #include "FEDiscreteMaterial.h"
+#include "FEUncoupledMaterial.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -901,15 +902,25 @@ int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
 			// structural elements
 			if (t == "hex8")
 			{
-				if (fem.m_nhex8 == FE_UDGHEX) return FE_UDGHEX_DOMAIN;
-				else return FE_SOLID_DOMAIN;
+				// three-field implementation for uncoupled materials
+				if (dynamic_cast<FEUncoupledMaterial*>(pmat)) return FE_3F_SOLID_DOMAIN;
+				else
+				{
+					if (fem.m_nhex8 == FE_UDGHEX) return FE_UDGHEX_DOMAIN;
+					else return FE_SOLID_DOMAIN;
+				}
 			}
 			else if (t == "tet4")
 			{
 				if (m_ntet4 == ET_UT4) return FE_UT4_DOMAIN;
 				else return FE_SOLID_DOMAIN;
 			}
-			else if (t == "penta6") return FE_SOLID_DOMAIN;
+			else if (t == "penta6") 
+			{
+				// three-field implementation for uncoupled materials
+				if (dynamic_cast<FEUncoupledMaterial*>(pmat)) return FE_3F_SOLID_DOMAIN;
+				else return FE_SOLID_DOMAIN;
+			}
 			else if ((t == "quad4") || (t == "tri3")) return FE_SHELL_DOMAIN;
 			else if ((t == "truss2")) return FE_TRUSS_DOMAIN;
 			else throw XMLReader::InvalidTag(t);
@@ -927,15 +938,16 @@ FEDomain* FEFEBioImport::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
 	FEDomain* pd = 0;
 	switch (ntype)
 	{
-	case FE_SOLID_DOMAIN      : pd = new FEElasticSolidDomain(pm, pmat); break;
-	case FE_SHELL_DOMAIN      : pd = new FEElasticShellDomain(pm, pmat); break;
-	case FE_TRUSS_DOMAIN      : pd = new FEElasticTrussDomain(pm, pmat); break;
-	case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain  (pm, pmat); break;
-	case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain  (pm, pmat); break;
-	case FE_UDGHEX_DOMAIN     : pd = new FEUDGHexDomain      (pm, pmat); break;
-	case FE_UT4_DOMAIN        : pd = new FEUT4Domain         (pm, pmat); break;
-	case FE_PORO_SOLID_DOMAIN : pd = new FEPoroSolidDomain   (pm, pmat); break;
-	case FE_HEAT_SOLID_DOMAIN : pd = new FEHeatSolidDomain   (pm, pmat); break;
+	case FE_SOLID_DOMAIN      : pd = new FEElasticSolidDomain      (pm, pmat); break;
+	case FE_SHELL_DOMAIN      : pd = new FEElasticShellDomain      (pm, pmat); break;
+	case FE_TRUSS_DOMAIN      : pd = new FEElasticTrussDomain      (pm, pmat); break;
+	case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain        (pm, pmat); break;
+	case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain        (pm, pmat); break;
+	case FE_UDGHEX_DOMAIN     : pd = new FEUDGHexDomain            (pm, pmat); break;
+	case FE_UT4_DOMAIN        : pd = new FEUT4Domain               (pm, pmat); break;
+	case FE_PORO_SOLID_DOMAIN : pd = new FEPoroSolidDomain         (pm, pmat); break;
+	case FE_HEAT_SOLID_DOMAIN : pd = new FEHeatSolidDomain         (pm, pmat); break;
+	case FE_3F_SOLID_DOMAIN   : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
 	}
 
 	// return the domain

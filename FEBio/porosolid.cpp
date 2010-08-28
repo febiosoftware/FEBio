@@ -495,19 +495,11 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 
 void FEPoroSolidDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
-	// see if the material is incompressible
-	FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-	bool bdilst = false;
-	if (dynamic_cast<FEIncompressibleMaterial*>(pme)) bdilst = true;
-
 	// calculate material stiffness (i.e. constitutive component)
 	PoroMaterialStiffness(fem, el, ke);
 
 	// calculate geometrical stiffness
 	GeometricalStiffness(el, ke);
-
-	// Calculate dilatational stiffness, if necessary
-	if (bdilst) DilatationalStiffness(fem, el, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -700,34 +692,6 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
 
 		assert(dynamic_cast<FEPoroElastic*>(pm) != 0);
-
-		// see if the material is incompressible or not
-		// if the material is incompressible the element
-		// is a three-field element and we need to evaluate
-		// the average dilatation and pressure fields
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-		if (pmi)
-		{
-			// get the material's bulk modulus
-			double K = pmi->BulkModulus();
-
-			// calculate the average dilatation and pressure
-			double v = 0, V = 0;
-
-			for (n=0; n<nint; ++n)
-			{
-				v += el.detJt(n)*gw[n];
-				V += el.detJ0(n)*gw[n];
-			}
-
-			// calculate volume ratio
-			el.m_eJ = v / V;
-
-			// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
-			//        <----- Lag. mult. ----->   <------ penalty ----->
-//			el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
-			el.m_ep = pmi->Up(el.m_eJ);
-		}
 
 		// loop over the integration points and calculate
 		// the stress at the integration point

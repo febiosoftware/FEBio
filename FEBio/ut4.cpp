@@ -134,19 +134,6 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 		pt.F = node.Fi;
 		pt.J = node.vi / node.Vi;
 
-		// if the material is incompressible we need to set some additional values
-		// TODO: since for tets the 3-field formulation is pointless, I really need to
-		//       change this.
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-		if (pmi)
-		{
-			// calculate volume ratio
-			pt.avgJ = pt.J;
-
-			// Calculate pressure. 
-			pt.avgp = pmi->Up(pt.J);
-		}
-
 		// calculate the stress
 		node.si = pme->Stress(pt);
 	}
@@ -594,31 +581,8 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	pt.s = node.si;
 
-	// if the material is incompressible we need to some additional values
-	// since for tets the 3-field formulation is pointless, I really need to
-	// change this.
-	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-	if (pmi)
-	{
-		// calculate volume ratio
-		pt.avgJ = pt.J;
-
-		// Calculate pressure. 
-		pt.avgp = pmi->Up(pt.J);
-	}
-
 	// Calculate the tangent
 	tens4ds C = pme->Tangent(pt);
-
-	// if the material is incompressible we need to add
-	// the dilatational part since that part is not calculated in the
-	// Tangent function.
-	if (pmi)
-	{
-		double dpdJ = pmi->Upp(pt.J);
-		mat3dd I(1); // Identity
-		C += dyad1s(I)*(pt.J*dpdJ);
-	}
 
 	// Next, we need to subtract the volumetric contribution Cvol
 	if (m_bdev)
@@ -981,17 +945,6 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 
 		// Calculate the tangent
 		tens4ds C = pmat->Tangent(mp);
-
-		// if the material is incompressible we need to add
-		// the dilatational part since that part is not calculated in the
-		// Tangent function.
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pmat);
-		if (pmi)
-		{
-			double dpdJ = pmi->Upp(pt.J);
-			mat3dd I(1); // Identity
-			C += dyad1s(I)*(pt.J*dpdJ);
-		}
 
 		// Next, we need to subtract the volumetric contribution Cvol
 		if (m_bdev)

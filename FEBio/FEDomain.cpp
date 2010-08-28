@@ -3,6 +3,7 @@
 #include "FEMesh.h"
 #include "log.h"
 #include "FESolidSolver.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 // FEDomain
@@ -171,6 +172,18 @@ void FEElasticSolidDomain::Serialize(FEM& fem, Archive &ar)
 			}
 		}
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+// FE3FieldElasticSolidDomain
+//-----------------------------------------------------------------------------
+
+bool FE3FieldElasticSolidDomain::Initialize(FEM &fem)
+{
+	// make sure the domain material uses an uncoupled formulation
+	if (dynamic_cast<FEUncoupledMaterial*>(m_pMat) == 0) return false;
+	return FEElasticSolidDomain::Initialize(fem);
 }
 
 //-----------------------------------------------------------------------------

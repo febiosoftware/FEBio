@@ -9,7 +9,7 @@
 REGISTER_MATERIAL(FEMooneyRivlin, "Mooney-Rivlin");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMooneyRivlin, FEIncompressibleMaterial)
+BEGIN_PARAMETER_LIST(FEMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
 END_PARAMETER_LIST();
@@ -20,12 +20,12 @@ END_PARAMETER_LIST();
 
 void FEMooneyRivlin::Init()
 {
-	FEIncompressibleMaterial::Init();
+	FEUncoupledMaterial::Init();
 
 	if (m_K <= 0) throw MaterialError("Invalid value for k");
 }
 
-mat3ds FEMooneyRivlin::Stress(FEMaterialPoint& mp)
+mat3ds FEMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -57,13 +57,10 @@ mat3ds FEMooneyRivlin::Stress(FEMaterialPoint& mp)
 	// T = F*dW/dC*Ft
 	mat3ds T = B*(W1 + W2*I1) - B2*W2;
 
-	// calculate stress: s = pI + (2/J)dev[T]
-	mat3ds s = mat3dd(pt.avgp) + T.dev()*(2.0/J);
-
-	return s;
+	return T.dev()*(2.0/J);
 }
 
-tens4ds FEMooneyRivlin::Tangent(FEMaterialPoint& mp)
+tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -115,7 +112,7 @@ tens4ds FEMooneyRivlin::Tangent(FEMaterialPoint& mp)
 
 	tens4ds cw = (BxB - B4)*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
-	tens4ds c = (IxI - I4*2)*p - dyad1s(devs, I)*(2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
+	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	return c;
 }
