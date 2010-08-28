@@ -1285,15 +1285,9 @@ bool FESlidingInterface2::Augment(int naug)
 
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
-	double normL0 = 0, normP0 = 0;
+	double normL0 = 0, normP = 0, normDP = 0;
 	for (i=0; i<NS; ++i) normL0 += m_ss.m_Lmd[i]*m_ss.m_Lmd[i];
 	for (i=0; i<NM; ++i) normL0 += m_ms.m_Lmd[i]*m_ms.m_Lmd[i];
-
-	if (bporo)
-	{
-		for (i=0; i<NS; ++i) normP0 += m_ss.m_Lmp[i]*m_ss.m_Lmp[i];
-		for (i=0; i<NM; ++i) normP0 += m_ms.m_Lmp[i]*m_ms.m_Lmp[i];
-	}
 
 	// b. gap component
 	// (is calculated during update)
@@ -1301,7 +1295,7 @@ bool FESlidingInterface2::Augment(int naug)
 	double maxpg = 0;
 
 	// update Lagrange multipliers
-	double normL1 = 0, normP1 = 0, eps, epsp;
+	double normL1 = 0, eps, epsp;
 	for (i=0; i<NS; ++i)
 	{
 		// update Lagrange multipliers on slave surface
@@ -1317,10 +1311,9 @@ bool FESlidingInterface2::Augment(int naug)
 				epsp = m_epsp*m_ss.m_epsp[i];
 				Lp = m_ss.m_Lmp[i] + epsp*m_ss.m_pg[i];
 				maxpg = max(maxpg,fabs(m_ss.m_pg[i]));
+				normDP += m_ss.m_pg[i]*m_ss.m_pg[i];
 			}
 			m_ss.m_Lmp[i] = Lp;
-
-			normP1 += Lp*Lp;
 		}
 		
 		if (Ln > 0) maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
@@ -1341,18 +1334,22 @@ bool FESlidingInterface2::Augment(int naug)
 				epsp = m_epsp*m_ms.m_epsp[i];
 				Lp = m_ms.m_Lmp[i] + epsp*m_ms.m_pg[i];
 				maxpg = max(maxpg,fabs(m_ms.m_pg[i]));
+				normDP += m_ms.m_pg[i]*m_ms.m_pg[i];
 			}
 			m_ms.m_Lmp[i] = Lp;
-
-			normP1 += Lp*Lp;
 		}
 		
 		if (Ln > 0) maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
 	}
 
+	// Ideally normP should be evaluated from the fluid pressure at the
+	// contact interface (not easily accessible).  The next best thing
+	// is to use the contact traction.
+	normP = normL1;
+	
 	// calculate relative norms
 	double lnorm = (normL1 != 0 ? fabs((normL1 - normL0) / normL1) : fabs(normL1 - normL0)); 
-	double pnorm = (normP1 != 0 ? fabs((normP1 - normP0) / normP1) : fabs(normP1 - normP0)); 
+	double pnorm = (normP != 0 ? (normDP/normP) : normDP); 
 
 	// check convergence
 	if ((m_gtol > 0) && (maxgap > m_gtol)) bconv = false;
@@ -1365,7 +1362,7 @@ bool FESlidingInterface2::Augment(int naug)
 	log.printf(" sliding interface # %d\n", m_nID);
 	log.printf("                        CURRENT        REQUIRED\n");
 	log.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
-	if (bporo) { log.printf("    P multiplier : %15le", pnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n"); }
+	if (bporo) { log.printf("    P gap       : %15le", pnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n"); }
 
 	log.printf("    maximum gap  : %15le", maxgap);
 	if (m_gtol > 0) log.printf("%15le\n", m_gtol); else log.printf("       ***\n");
