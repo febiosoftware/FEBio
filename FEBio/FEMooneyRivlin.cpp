@@ -21,10 +21,10 @@ END_PARAMETER_LIST();
 void FEMooneyRivlin::Init()
 {
 	FEUncoupledMaterial::Init();
-
-	if (m_K <= 0) throw MaterialError("Invalid value for k");
 }
 
+//-----------------------------------------------------------------------------
+//! Calculate the deviatoric stress
 mat3ds FEMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -60,6 +60,8 @@ mat3ds FEMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	return T.dev()*(2.0/J);
 }
 
+//-----------------------------------------------------------------------------
+//! Calculate the deviatoric tangent
 tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -100,7 +102,7 @@ tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	// mean pressure
 	double p = pt.avgp;
 
-	mat3dd I(1);	// Identity
+	mat3ds I(1,1,1,0,0,0);	// Identity
 
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);

@@ -9,12 +9,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //!  Veronda-Westmann material model
 
-class FEVerondaWestmann : public FEIncompressibleMaterial
+class FEVerondaWestmann : public FEUncoupledMaterial
 {
 public:
 	FEVerondaWestmann() {}
@@ -24,11 +24,11 @@ public:
 	double	m_c2;	//!< Veronda-Westmann coefficient C2;
 
 public:
-	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	//! calculate deviatoric stress at material point
+	mat3ds DevStress(FEMaterialPoint& pt);
 
-	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	//! calculate deviatoric tangent stiffness at material point
+	tens4ds DevTangent(FEMaterialPoint& pt);
 
 	//! initialize
 	void Init();

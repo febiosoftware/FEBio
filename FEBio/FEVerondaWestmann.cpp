@@ -9,7 +9,7 @@
 REGISTER_MATERIAL(FEVerondaWestmann, "Veronda-Westmann");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEVerondaWestmann, FEIncompressibleMaterial)
+BEGIN_PARAMETER_LIST(FEVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
 END_PARAMETER_LIST();
@@ -20,17 +20,17 @@ END_PARAMETER_LIST();
 
 void FEVerondaWestmann::Init()
 {
-	FEIncompressibleMaterial::Init();
+	FEUncoupledMaterial::Init();
 
 	if (m_c1 <= 0) throw MaterialError("c1 must be positive.");
 	if (m_c2 <= 0) throw MaterialError("c2 must be positive.");
 }
 
-mat3ds FEVerondaWestmann::Stress(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+//! Calculate deviatoric stress
+mat3ds FEVerondaWestmann::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	const double third = 1.0/3.0;
 
 	// deformation gradient and its determinant
 	mat3d &F = pt.F;
@@ -59,17 +59,14 @@ mat3ds FEVerondaWestmann::Stress(FEMaterialPoint& mp)
 	// calculate T = F*dW/dC*Ft
 	mat3ds T = B*(W1 + W2*I1) - B2*W2;
 
-	// calculate stress: s = pI + (2/J)dev[T]
-	mat3ds s = mat3dd(pt.avgp) + T.dev()*(2.0/J);
-
-	return s;
+	return T.dev()*(2.0/J);
 }
 
-tens4ds FEVerondaWestmann::Tangent(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+//! Calculate deviatoric tangent
+tens4ds FEVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	const double third = 1.0 / 3.0;
 
 	// deformation gradient
 	mat3d &F = pt.F;
@@ -103,10 +100,7 @@ tens4ds FEVerondaWestmann::Tangent(FEMaterialPoint& mp)
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
 
-	// mean pressure
-	double p = pt.avgp;
-
-	mat3dd I(1);	// Identity
+	mat3ds I(1,1,1,0,0,0);	// Identity
 
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
@@ -118,7 +112,7 @@ tens4ds FEVerondaWestmann::Tangent(FEMaterialPoint& mp)
 
 	tens4ds cw = BxB*((W11 + W2)*4.0*Ji) - B4*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
-	tens4ds c = (IxI - I4*2)*p - dyad1s(devs, I)*(2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
+	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	return c;
 }

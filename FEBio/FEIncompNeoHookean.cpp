@@ -9,7 +9,7 @@
 REGISTER_MATERIAL(FEIncompNeoHookean, "incomp neo-Hookean");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEIncompNeoHookean, FEIncompressibleMaterial)
+BEGIN_PARAMETER_LIST(FEIncompNeoHookean, FEUncoupledMaterial)
 	ADD_PARAMETER(m_G, FE_PARAM_DOUBLE, "G");
 END_PARAMETER_LIST();
 
@@ -17,94 +17,52 @@ END_PARAMETER_LIST();
 // IncompNeoHookean
 //////////////////////////////////////////////////////////////////////
 
-mat3ds FEIncompNeoHookean::Stress(FEMaterialPoint& mp)
+void FEIncompNeoHookean::Init()
 {
-	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	double muJ, Ib;
-
-	mat3d &F = pt.F;
-	double detF = pt.J;
-
-	double p = pt.avgp;
-
-	// calculate left Cauchy-Green tensor
-	// (we commented out the matrix components we do not need)
-	double b[3][3];
-	b[0][0] = F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2];
-	b[0][1] = F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2];
-	b[0][2] = F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2];
-
-//	b[1][0] = F[1][0]*F[0][0]+F[1][1]*F[0][1]+F[1][2]*F[0][2];
-	b[1][1] = F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2];
-	b[1][2] = F[1][0]*F[2][0]+F[1][1]*F[2][1]+F[1][2]*F[2][2];
-
-//	b[2][0] = F[2][0]*F[0][0]+F[2][1]*F[0][1]+F[2][2]*F[0][2];
-//	b[2][1] = F[2][0]*F[1][0]+F[2][1]*F[1][1]+F[2][2]*F[1][2];
-	b[2][2] = F[2][0]*F[2][0]+F[2][1]*F[2][1]+F[2][2]*F[2][2];
-
-	// first invariant of b = trace of b
-	Ib = b[0][0]+b[1][1]+b[2][2];
-
-	// calculate stress
-	mat3ds s;
-
-	muJ = m_G/pow(detF, 5.0/3.0);
-
-	s.xx() = muJ*(b[0][0] - Ib/3.) + p;
-	s.yy() = muJ*(b[1][1] - Ib/3.) + p;
-	s.zz() = muJ*(b[2][2] - Ib/3.) + p;
-	s.xy() = muJ*b[0][1];
-	s.yz() = muJ*b[1][2];
-	s.xz() = muJ*b[0][2];
-
-	return s;
+	FEUncoupledMaterial::Init();
+	if (m_G <= 0) throw MaterialError("G must be positive.");
 }
 
-tens4ds FEIncompNeoHookean::Tangent(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+//! Calculate deviatoric stress
+mat3ds FEIncompNeoHookean::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
 	mat3d &F = pt.F;
-	double detF = pt.J;
+	double J = pt.J;
+
+	// calculate left Cauchy-Green tensor
+	mat3ds B = pt.LeftCauchyGreen();
+
+	// calculate deviatoric stress
+	return (B - mat3dd(B.tr()/3.))*(m_G/pow(J, 5.0/3.0));
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate deviatoric tangent
+tens4ds FEIncompNeoHookean::DevTangent(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// deformation gradient
+	mat3d &F = pt.F;
+	double J = pt.J;
 
 	// left cauchy-green matrix (i.e. the 'b' matrix)
-	// (we commented out the matrix components we do not need)
-	double b[3][3];
-	b[0][0] = F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2];
-	b[0][1] = F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2];
-	b[0][2] = F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2];
-
-//	b[1][0] = F[1][0]*F[0][0]+F[1][1]*F[0][1]+F[1][2]*F[0][2];
-	b[1][1] = F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2];
-	b[1][2] = F[1][0]*F[2][0]+F[1][1]*F[2][1]+F[1][2]*F[2][2];
-
-//	b[2][0] = F[2][0]*F[0][0]+F[2][1]*F[0][1]+F[2][2]*F[0][2];
-//	b[2][1] = F[2][0]*F[1][0]+F[2][1]*F[1][1]+F[2][2]*F[1][2];
-	b[2][2] = F[2][0]*F[2][0]+F[2][1]*F[2][1]+F[2][2]*F[2][2];
+	mat3ds B = pt.LeftCauchyGreen();
 
 	// trace of b
-	double Ib = b[0][0]+b[1][1]+b[2][2];
+	double Ib = B.tr();
 
-	double muJ = m_G/pow(detF, 5.0/3.0);
+	double muJ = m_G/pow(J, 5.0/3.0);
 
-	double p = pt.avgp; // average element pressure
+	mat3ds I(1,1,1,0,0,0);	// Identity
 
-	double D[6][6] = {0};
-	D[0][0] = 2.*muJ*(4.*Ib/9. - 2.*b[0][0]/3.) - p;
-	D[1][1] = 2.*muJ*(4.*Ib/9. - 2.*b[1][1]/3.) - p;
-	D[2][2] = 2.*muJ*(4.*Ib/9. - 2.*b[2][2]/3.) - p;
+	tens4ds IxI = dyad1s(I);
+	tens4ds I4  = dyad4s(I);
+	tens4ds BxI = dyad1s(B, I); // = BxI + IxB
 
-	D[1][0] = D[0][1] = 2.*muJ*(Ib/9. - (1./3.)*b[0][0] - (1./3.)*b[1][1]) + p;
-	D[2][0] = D[0][2] = 2.*muJ*(Ib/9. - (1./3.)*b[0][0] - (1./3.)*b[2][2]) + p;
-	D[2][1] = D[1][2] = 2.*muJ*(Ib/9. - (1./3.)*b[1][1] - (1./3.)*b[2][2]) + p;
-
-	D[3][0] = D[0][3] = D[3][1] = D[1][3] = D[3][2] = D[2][3] = -2.*muJ/3.*b[0][1];
-	D[4][0] = D[0][4] = D[4][1] = D[1][4] = D[4][2] = D[2][4] = -2.*muJ/3.*b[1][2];
-	D[5][0] = D[0][5] = D[5][1] = D[1][5] = D[5][2] = D[2][5] = -2.*muJ/3.*b[0][2];
-
-	D[3][3] = D[4][4] = D[5][5] = muJ*Ib/3. - p;
-
-	return tens4ds(D);
+	return (I4*Ib -BxI + IxI*(Ib/3))*(2.0*muJ/3.0);
 }

@@ -19,6 +19,12 @@ FEUncoupledMaterial::FEUncoupledMaterial(void)
 }
 
 //-----------------------------------------------------------------------------
+void FEUncoupledMaterial::Init()
+{
+	if (m_K < 0) throw MaterialError("k must be positive.");
+}
+
+//-----------------------------------------------------------------------------
 //! The stress function calculates the total Cauchy stress as a sum of 
 //! two terms, namely the deviatoric stress and the pressure. 
 mat3ds FEUncoupledMaterial::Stress(FEMaterialPoint &mp)

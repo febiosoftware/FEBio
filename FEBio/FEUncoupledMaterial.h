@@ -52,6 +52,9 @@ public:
 	//! total spatial tangent (do not overload!)
 	tens4ds Tangent(FEMaterialPoint& mp);
 
+	//! material initialization
+	void Init();
+
 	//! return bulk modulus
 	double BulkModulus() { return m_K; }
 
