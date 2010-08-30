@@ -1,5 +1,5 @@
 #pragma once
-#include "fematerial.h"
+#include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for uncoupled hyperelastic material formulations.
