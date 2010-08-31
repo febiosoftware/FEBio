@@ -172,9 +172,6 @@ tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 	// This is the final value of the elasticity tensor
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
-	double avgJ = pt.avgJ;
-	double p = -m_K*log(avgJ)/avgJ;
-	double dpdJ = -m_K*(1-log(avgJ))/(avgJ*avgJ);
 
 	C += - 1./3.*(C.dot(IxI)+IxI.dot(C)-IxI*(C.dot(I)).tr()/3.)
 		 + 2./3.*((I4+IxI/3.)*sd.tr()-dyad1s(sd,I));
