@@ -9,26 +9,26 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Arruda-Boyce material
 
-class FEArrudaBoyce : public FEIncompressibleMaterial
+class FEArrudaBoyce : public FEUncoupledMaterial
 {
 public:
 	FEArrudaBoyce() {}
 
 public:
-	double	c1;	//!< Arruda-Boyce coefficient C1 (mu)
-	double	c2;	//!< Arruda-Boyce coefficient C2 (N)
+	double	m_mu;	//!< shear modulus
+	double	m_N;	//!< Locking stretch
 
 public:
-	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	//! calculate deviatoric stress at material point
+	virtual mat3ds DevStress(FEMaterialPoint& pt);
 
-	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	//! calculate deviatoric tangent stiffness at material point
+	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
 	//! data initialization
 	void Init();

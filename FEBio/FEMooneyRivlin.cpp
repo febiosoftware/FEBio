@@ -29,8 +29,7 @@ mat3ds FEMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// deformation gradient and its determinant
-	mat3d &F = pt.F;
+	// determinant of deformation gradient
 	double J = pt.J;
 
 	// calculate deviatoric left Cauchy-Green tensor
@@ -66,10 +65,7 @@ tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	const double third = 1.0 / 3.0;
-
-	// deformation gradient
-	mat3d &F = pt.F;
+	// determinant of deformation gradient
 	double J = pt.J;
 	double Ji = 1.0/J;
 
@@ -99,10 +95,8 @@ tens4ds FEMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
 
-	// mean pressure
-	double p = pt.avgp;
-
-	mat3ds I(1,1,1,0,0,0);	// Identity
+	// Identity tensor
+	mat3ds I(1,1,1,0,0,0);
 
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);

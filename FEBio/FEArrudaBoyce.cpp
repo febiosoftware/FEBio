@@ -10,255 +10,103 @@
 REGISTER_MATERIAL(FEArrudaBoyce, "Arruda-Boyce");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEArrudaBoyce, FEIncompressibleMaterial)
-	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");
-	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
+BEGIN_PARAMETER_LIST(FEArrudaBoyce, FEUncoupledMaterial)
+	ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
+	ADD_PARAMETER(m_N, FE_PARAM_DOUBLE, "N");
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////
 // FEArrudaBoyce
 //////////////////////////////////////////////////////////////////////
 
-// rename material parameters
-#define mu c1
-#define N c2
-
+//-----------------------------------------------------------------------------
+//! Material initialization
 void FEArrudaBoyce::Init()
 {
-	FEIncompressibleMaterial::Init();
+	FEUncoupledMaterial::Init();
 
-	if (m_K <= 0.0) throw MaterialError("Invalid value for k");
+	// Check the value for N is >0
+	if (m_N <= 0.0) throw MaterialError("Invalid value for N");
 }
 
-mat3ds FEArrudaBoyce::Stress(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-        // Check the value for N is >0
-        if (c2 <= 0.0) throw MaterialError("Invalid value for N");
-
-	const double third = 1.0/3.0;
+	const double a[] = {0.5, 0.1, 11.0/350.0, 19.0/1750.0, 519.0/134750.0};
 
 	// deformation gradient
-	mat3d &F = pt.F;
 	double J = pt.J;
-	double Ji = 1.0/J;
-	double Jm13 = pow(J, -1.0/3.0);
-	double Jm23 = Jm13*Jm13;
-	double twoJi = 2.0*Ji;
 
 	// left Cauchy-Green tensor and its square
-	double B[3][3];
+	mat3ds B = pt.DevLeftCauchyGreen();
 
-	// calculate deviatoric left Cauchy-Green tensor
-	B[0][0] = Jm23*(F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2]);
-	B[0][1] = Jm23*(F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2]);
-	B[0][2] = Jm23*(F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2]);
+	// Invariants of B_tilde
+	double I1 = B.tr();
 
-	B[1][0] = Jm23*(F[1][0]*F[0][0]+F[1][1]*F[0][1]+F[1][2]*F[0][2]);
-	B[1][1] = Jm23*(F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2]);
-	B[1][2] = Jm23*(F[1][0]*F[2][0]+F[1][1]*F[2][1]+F[1][2]*F[2][2]);
+	// strain energy derivative
+	double IoN = I1/m_N;
+	double W1 = m_mu*(a[0] + (a[1] + (a[2] + (a[3] + a[4]*IoN)*IoN)*IoN)*IoN);
 
-	B[2][0] = Jm23*(F[2][0]*F[0][0]+F[2][1]*F[0][1]+F[2][2]*F[0][2]);
-	B[2][1] = Jm23*(F[2][0]*F[1][0]+F[2][1]*F[1][1]+F[2][2]*F[1][2]);
-	B[2][2] = Jm23*(F[2][0]*F[2][0]+F[2][1]*F[2][1]+F[2][2]*F[2][2]);
+	// T = FdW/dCFt
+	mat3ds T = B*W1;
 
-	// Invariants of B (= invariants of C)
-	// Note that these are the invariants of Btilde, not of B!
-	double I1 = B[0][0]+B[1][1]+B[2][2];
-
-	// T = a1.B; called tau_tilde by Kalliske
-	double T[3][3];
-	double IoN=I1/N;
-	double IoN2=IoN*IoN;
-	double a1 = 2.0*mu*(0.5+0.1*IoN+11.0*IoN2/350.0+19.0*IoN2*IoN/1750.0+519.0*IoN2*IoN2/134750.0);
-
-	T[0][0] = a1*B[0][0];
-	T[0][1] = a1*B[0][1];
-	T[0][2] = a1*B[0][2];
-
-	T[1][1] = a1*B[1][1];
-	T[1][2] = a1*B[1][2];
-
-	T[2][2] = a1*B[2][2];
-
-	// trT = tr(T)/3
-	double trT = (T[0][0] + T[1][1] + T[2][2])*third;
-
-	// get pressure at material point
-	double p = pt.avgp;
-
-	// calculate stress: s = pI + (1/J)dev[T]
-	mat3ds s;
-
-	s.xx() = p + Ji*(T[0][0] - trT);
-	s.yy() = p + Ji*(T[1][1] - trT);
-	s.zz() = p + Ji*(T[2][2] - trT);
-	s.xy() = Ji*T[0][1];
-	s.yz() = Ji*T[1][2];
-	s.xz() = Ji*T[0][2];
-
-	return s;
+	// deviatoric Cauchy stress is 2/J*dev(T)
+	return T.dev()*(2.0/J);
 }
 
-tens4ds FEArrudaBoyce::Tangent(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	const double third = 1.0 / 3.0;
-        const double fn=4.0/9.0;
+	const double a[] = {0.5, 0.1, 11.0/350.0, 19.0/1750.0, 519.0/134750.0};
 
 	// deformation gradient
 	mat3d &F = pt.F;
 	double J = pt.J;
-	double Jm13 = pow(J, -1.0/3.0);
-	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
 	// calculate deviatoric left Cauchy-Green tensor: B = F*Ft
-	double B[3][3];
-	B[0][0] = Jm23*(F[0][0]*F[0][0]+F[0][1]*F[0][1]+F[0][2]*F[0][2]);
-	B[0][1] = Jm23*(F[0][0]*F[1][0]+F[0][1]*F[1][1]+F[0][2]*F[1][2]);
-	B[0][2] = Jm23*(F[0][0]*F[2][0]+F[0][1]*F[2][1]+F[0][2]*F[2][2]);
+	mat3ds B = pt.DevLeftCauchyGreen();
 
-	B[1][0] = Jm23*(F[1][0]*F[0][0]+F[1][1]*F[0][1]+F[1][2]*F[0][2]);
-	B[1][1] = Jm23*(F[1][0]*F[1][0]+F[1][1]*F[1][1]+F[1][2]*F[1][2]);
-	B[1][2] = Jm23*(F[1][0]*F[2][0]+F[1][1]*F[2][1]+F[1][2]*F[2][2]);
+	// calculate square of B
+	mat3ds B2 = B*B;
 
-	B[2][0] = Jm23*(F[2][0]*F[0][0]+F[2][1]*F[0][1]+F[2][2]*F[0][2]);
-	B[2][1] = Jm23*(F[2][0]*F[1][0]+F[2][1]*F[1][1]+F[2][2]*F[1][2]);
-	B[2][2] = Jm23*(F[2][0]*F[2][0]+F[2][1]*F[2][1]+F[2][2]*F[2][2]);
+	// Invariants of B (= invariants of C)
+	double I1 = B.tr();
 
-      	double I1 = B[0][0]+B[1][1]+B[2][2];  // first invariant of B
+	// --- TODO: put strain energy derivatives here ---
+	// Wi = dW/dIi
+	double IoN = I1/m_N;
+	double W1 = m_mu*(a[0] + (a[1] + (a[2] + (a[3] + a[4]*IoN)*IoN)*IoN)*IoN);
+	double W11 = (m_mu/m_N)*(a[1] + (2*a[2] + (3*a[3] + 4*a[4]*IoN)*IoN)*IoN);
+	// ---
 
-        // calculate tau_tilde (called T here)
-	double T[3][3];
-        double IoN=I1/N;
-        double IoN2=IoN*IoN;
-	double a1 = 2.0*mu*(0.5+0.1*IoN+11.0*IoN2/350.0+19.0*IoN2*IoN/1750.0+519.0*IoN2*IoN2/134750.0);
+	// calculate dWdC:C
+	double WC = W1*I1;
 
-	T[0][0] = a1*B[0][0];
-	T[0][1] = a1*B[0][1];
-	T[0][2] = a1*B[0][2];
+	// calculate C:d2WdCdC:C
+	double CWWC = W11*I1*I1;
 
-	T[1][0] = a1*B[1][0];
-	T[1][1] = a1*B[1][1];
-	T[1][2] = a1*B[1][2];
+	// deviatoric cauchy-stress, trs = trace[s]/3
+	mat3ds devs = pt.s.dev();
 
-	T[2][0] = a1*B[2][0];
-	T[2][1] = a1*B[2][1];
-	T[2][2] = a1*B[2][2];
+	// Identity tensor
+	mat3ds I(1,1,1,0,0,0);
 
-	// trT = tr(T)/3
-	double trT = (T[0][0] + T[1][1] + T[2][2])*third;
+	tens4ds IxI = dyad1s(I);
+	tens4ds I4  = dyad4s(I);
+	tens4ds BxB = dyad1s(B);
+	tens4ds B4  = dyad4s(B);
 
-        // Only the deviatoric part of T is needed from now on...
-        T[0][0]-=trT;
-        T[1][1]-=trT;
-        T[2][2]-=trT;
+	// d2W/dCdC:C
+	mat3ds WCCxC = B*(W11*I1);
 
-	// calculate a_tilde (called A here)
-	// only the three diagonal components need to be found now
-	double b1 = 4.0*mu*(0.1/N+22.0*IoN/(350.0*N)+57.0*IoN2/(1750.0*N)+2076.0*IoN*IoN2/(134750.0*N));
+	tens4ds cw = (BxB - B4)*(W11*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
-	double At0000=b1*B[0][0]*B[0][0];
-	double At1111=b1*B[1][1]*B[1][1];
-	double At2222=b1*B[2][2]*B[2][2];
-	double trA=third*(At0000+At1111+At2222); // volumetric part, to be subtracted
+	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
-	// calculate the constitutive tensor ...
-
-	double D[6][6] = {0};
-
-	// D[0][0] = c(0,0,0,0)
-	D[0][0] = Ji*(fn*trT-4.0*third*T[0][0]+At0000-trA);
-
-	// D[1][1] = c(1,1,1,1)
-	D[1][1] = Ji*(fn*trT-4.0*third*T[1][1]+At1111-trA);
-
-	// D[2][2] = c(2,2,2,2)
-	D[2][2] = Ji*(fn*trT-4.0*third*T[2][2]+At2222-trA);
-
-
-	// D[0][1] = D[1][0] = c(0,0,1,1)
-	D[0][1] = Ji*(-0.5*fn*trT-2.0*third*(T[0][0]+T[1][1]));
-        D[0][1] += Ji*b1*B[0][0]*B[1][1];
-
-	// D[1][2] = D[2][1] = c(1,1,2,2)
-	D[1][2] = Ji*(-0.5*fn*trT-2.0*third*(T[1][1]+T[2][2]));
-        D[1][2] += Ji*b1*B[1][1]*B[2][2];
-
-	// D[0][2] = D[2][0] = c(0,0,2,2)
-	D[0][2] = Ji*(-0.5*fn*trT-2.0*third*(T[0][0]+T[2][2]));
-        D[0][2] += Ji*b1*B[0][0]*B[2][2];
-
-
-	// D[3][3] = 0.5*(c(0,1,0,1) + c(0,1,1,0))
-        D[3][3] = Ji*third*trT;
-        D[3][3] += Ji*0.5*b1*(B[0][1]*B[0][1]+B[0][1]*B[1][0]);
-
-	// D[4][4] = 0.5*(c(1,2,1,2) + c(1,2,2,1))
-        D[4][4]=Ji*third*trT;
-        D[4][4] += Ji*0.5*b1*(B[1][2]*B[1][2]+B[1][2]*B[2][1]);
-
-	// D[5][5] = 0.5*(c(0,2,0,2) + c(0,2,2,0))
-        D[5][5] = Ji*third*trT;
-        D[5][5] += Ji*0.5*b1*(B[0][2]*B[0][2]+B[0][2]*B[2][0]);
-
-
-	// D[0][3] = 0.5*(c(0,0,0,1) + c(0,0,1,0))
-	D[0][3] = -Ji*third*(T[0][1]+T[1][0]);
-        D[0][3] += Ji*0.5*b1*(B[0][0]*B[0][1]+B[0][0]*B[1][0]);
-
-	// D[0][4] = 0.5*(c(0,0,1,2) + c(0,0,2,1))
-	D[0][4] = -Ji*third*(T[1][2]+T[2][1]);
-        D[0][4] += Ji*0.5*b1*(B[0][0]*B[1][2]+B[0][0]*B[2][1]);
-
-	// D[0][5] = 0.5*(c(0,0,0,2) + c(0,0,2,0))
-	D[0][5] = -Ji*third*(T[0][2]+T[2][0]);
-        D[0][5] += Ji*0.5*b1*(B[0][0]*B[0][2]+B[0][0]*B[2][0]);
-
-	// D[1][3] = 0.5*(c(1,1,0,1) + c(1,1,1,0))
-	D[1][3] = -Ji*third*(T[0][1]+T[1][0]);
-        D[1][3] += Ji*0.5*b1*(B[1][1]*B[0][1]+B[1][1]*B[1][0]);
-
-	// D[1][4] = 0.5*(c(1,1,1,2) + c(1,1,2,1))
-	D[1][4] = -Ji*third*(T[1][2]+T[2][1]);
-        D[1][4] += Ji*0.5*b1*(B[1][1]*B[1][2]+B[1][1]*B[2][1]);
-
-	// D[1][5] = 0.5*(c(1,1,0,2) + c(1,1,2,0))
-	D[1][5] = -Ji*third*(T[0][2]+T[2][0]);
-        D[1][5] += Ji*0.5*b1*(B[1][1]*B[0][2]+B[1][1]*B[2][0]);
-
-	// D[2][3] = 0.5*(c(2,2,0,1) + c(2,2,1,0))
-	D[2][3] = -Ji*third*(T[0][1]+T[1][0]);
-        D[2][3] += Ji*0.5*b1*(B[2][2]*B[0][1]+B[2][2]*B[1][0]);
-
-	// D[2][4] = 0.5*(c(2,2,1,2) + c(2,2,2,1))
-	D[2][4] = -Ji*third*(T[1][2]+T[2][1]);
-        D[2][4] += Ji*0.5*b1*(B[2][2]*B[1][2]+B[2][2]*B[2][1]);
-
-	// D[2][5] = 0.5*(c(2,2,0,2) + c(2,2,2,0))
-	D[2][5] = -Ji*third*(T[0][2]+T[2][0]);
-        D[2][5] += Ji*0.5*b1*(B[2][2]*B[0][2]+B[2][2]*B[2][0]);
-
-
-	// D[3][4] = 0.5*(c(0,1,1,2) + c(0,1,2,1))
-        D[3][4] = Ji*0.5*b1*(B[0][1]*B[1][2]+B[0][1]*B[2][1]);
-
-	// D[3][5] = 0.5*(c(0,1,0,2) + c(0,1,2,0))
-        D[3][5] = Ji*0.5*b1*(B[0][1]*B[0][2]+B[0][1]*B[2][0]);
-
-	// D[4][5] = 0.5*(c(1,2,0,2) + c(1,2,2,0))
-        D[4][5] = Ji*0.5*b1*(B[1][2]*B[0][2]+B[1][2]*B[2][0]);
-
-
-	// set symmetric components
-	D[1][0] = D[0][1]; D[2][0] = D[0][2]; D[3][0] = D[0][3]; D[4][0] = D[0][4]; D[5][0] = D[0][5];
-	D[2][1] = D[1][2]; D[3][1] = D[1][3]; D[4][1] = D[1][4]; D[5][1] = D[1][5];
-	D[3][2] = D[2][3]; D[4][2] = D[2][4]; D[5][2] = D[2][5];
-	D[4][3] = D[3][4]; D[5][3] = D[3][5];
-	D[5][4] = D[4][5];
-
-	return tens4ds(D);
+	return c;
 }
