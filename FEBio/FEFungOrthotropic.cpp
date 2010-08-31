@@ -6,7 +6,7 @@
 REGISTER_MATERIAL(FEFungOrthotropic, "Fung orthotropic");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEIncompressibleMaterial)
+BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEUncoupledMaterial)
 ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
 ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
 ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
@@ -19,9 +19,12 @@ ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
 ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+//! Data initialization
 void FEFungOrthotropic::Init()
 {
-	FEElasticMaterial::Init();
+	FEUncoupledMaterial::Init();
+
 	if (E1 <= 0) throw MaterialError("E1 should be positive");
 	if (E2 <= 0) throw MaterialError("E2 should be positive");
 	if (E3 <= 0) throw MaterialError("E3 should be positive");
@@ -51,8 +54,8 @@ void FEFungOrthotropic::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the stress for a linear orthotropic material
-mat3ds FEFungOrthotropic::Stress(FEMaterialPoint& mp)
+//! Calculates the deviatoric stress
+mat3ds FEFungOrthotropic::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -102,14 +105,13 @@ mat3ds FEFungOrthotropic::Stress(FEMaterialPoint& mp)
 			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
 	}
 	s *= eQ/(2.0*detF);
-	// Add pressure term to enforce near-incompressibility
-	double avgJ = pt.avgJ;
-	double p = -m_K*log(avgJ)/avgJ;
-	s = mat3dd(-p) + s.dev();
-	return s;
+
+	return s.dev();
 }
 
-tens4ds FEFungOrthotropic::Tangent(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+//! Calculates the deviatoric tangent
+tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -173,9 +175,9 @@ tens4ds FEFungOrthotropic::Tangent(FEMaterialPoint& mp)
 	double avgJ = pt.avgJ;
 	double p = -m_K*log(avgJ)/avgJ;
 	double dpdJ = -m_K*(1-log(avgJ))/(avgJ*avgJ);
-	C += 2*p*I4-(p+pt.avgJ*dpdJ)*IxI
-	- 1./3.*(C.dot(IxI)+IxI.dot(C)-IxI*(C.dot(I)).tr()/3.)
-	+ 2./3.*((I4+IxI/3.)*sd.tr()-dyad1s(sd,I));
+
+	C += - 1./3.*(C.dot(IxI)+IxI.dot(C)-IxI*(C.dot(I)).tr()/3.)
+		 + 2./3.*((I4+IxI/3.)*sd.tr()-dyad1s(sd,I));
 	
 	return C;
 }
