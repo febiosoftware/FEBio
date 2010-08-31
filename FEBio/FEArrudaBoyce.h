@@ -21,7 +21,7 @@ public:
 
 public:
 	double	m_mu;	//!< shear modulus
-	double	m_N;	//!< Locking stretch
+	double	m_N;	//!< Nr of links in chain
 
 public:
 	//! calculate deviatoric stress at material point

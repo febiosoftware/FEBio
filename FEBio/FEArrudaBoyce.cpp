@@ -26,6 +26,7 @@ void FEArrudaBoyce::Init()
 	FEUncoupledMaterial::Init();
 
 	// Check the value for N is >0
+	if (m_mu <= 0.0) throw MaterialError("Invalid value for mu");
 	if (m_N <= 0.0) throw MaterialError("Invalid value for N");
 }
 
