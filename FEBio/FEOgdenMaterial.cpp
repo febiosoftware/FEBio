@@ -3,7 +3,7 @@
 
 REGISTER_MATERIAL(FEOgdenMaterial, "Ogden");
 
-BEGIN_PARAMETER_LIST(FEOgdenMaterial, FEIncompressibleMaterial);
+BEGIN_PARAMETER_LIST(FEOgdenMaterial, FEUncoupledMaterial);
 	ADD_PARAMETER(m_c[0], FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c[1], FE_PARAM_DOUBLE, "c2");
 	ADD_PARAMETER(m_c[2], FE_PARAM_DOUBLE, "c3");
@@ -35,6 +35,7 @@ FEOgdenMaterial::FEOgdenMaterial()
 //! data initialization and checking
 void FEOgdenMaterial::Init()
 {
+	FEUncoupledMaterial::Init();
 	for (int i=0; i<MAX_TERMS; ++i) 
 		if (m_m[i] == 0) throw MaterialError("Invalid value for m%d", i+1);
 }
@@ -72,7 +73,7 @@ void FEOgdenMaterial::EigenValues(mat3ds& A, double l[3], vec3d r[3], const doub
 
 //-----------------------------------------------------------------------------
 //! Calculates the Cauchy stress
-mat3ds FEOgdenMaterial::Stress(FEMaterialPoint &mp)
+mat3ds FEOgdenMaterial::DevStress(FEMaterialPoint &mp)
 {
 	double beta, beta1, beta3, D;
 	int i, j, k, l;
@@ -81,9 +82,6 @@ mat3ds FEOgdenMaterial::Stress(FEMaterialPoint &mp)
 
 	// extract elastic material data
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
-	// average pressure
-	double p = pt.avgp;
 
 	// jacobian
 	double J = pt.J;
@@ -160,12 +158,12 @@ mat3ds FEOgdenMaterial::Stress(FEMaterialPoint &mp)
 		sd += I*(beta1/J) + m*((beta3 - beta1)/J);
 	}
 
-	return (I*p+sd.dev());
+	return sd.dev();
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the spatial tangent
-tens4ds FEOgdenMaterial::Tangent(FEMaterialPoint& mp)
+tens4ds FEOgdenMaterial::DevTangent(FEMaterialPoint& mp)
 {
 	int i, j, k, l, n, i0, i1, j0, j1;
 	double Di, Dpi, beta, gab;
@@ -460,12 +458,6 @@ tens4ds FEOgdenMaterial::Tangent(FEMaterialPoint& mp)
 					+ (g13/J)*(MxI[j][k] - MxM[j][k] + IxM[j][k] - MxM[j][k]);
 			}
 	}
-
-	// Add the volumetric contribution
-	double p = pt.avgp;
-	for (j=0; j<6; ++j)
-		for (k=j; k<6; ++k)
-			D[j][k] += p*(IxI[j][k] - 2.0*I4[j][k]);
 
 	// set symmetric components 
 	for (j=0; j<6; ++j)

@@ -1,7 +1,7 @@
 #pragma once
-#include "FEMaterial.h"
+#include "FEUncoupledMaterial.h"
 
-class FEOgdenMaterial :	public FEIncompressibleMaterial
+class FEOgdenMaterial :	public FEUncoupledMaterial
 {
 public:
 	enum { MAX_TERMS = 6 };
@@ -11,11 +11,11 @@ public:
 	//! data initialization and checking
 	void Init();
 
-	//! calculate the stress
-	mat3ds Stress(FEMaterialPoint& pt);
+	//! calculate the deviatoric stress
+	mat3ds DevStress(FEMaterialPoint& pt);
 
-	//! calculate the tangent
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	//! calculate the deviatoric tangent
+	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
 protected:
 	void EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps = 0);
