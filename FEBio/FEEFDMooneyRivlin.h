@@ -1,5 +1,5 @@
 #pragma once
-#include "FEMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a material that consists of a continuous fiber distribution
@@ -7,17 +7,17 @@
 //! This material is orignally due to Gerard Ateshian and is used to model
 //! articular cartilage. The only difference is that it uses a Mooney-Rivlin matrix.
 
-class FEEFDMooneyRivlin :	public FEIncompressibleMaterial
+class FEEFDMooneyRivlin :	public FEUncoupledMaterial
 {
 public:
 	FEEFDMooneyRivlin(void);
 
 public:
-	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	//! calculate deviatoric stress at material point
+	virtual mat3ds DevStress(FEMaterialPoint& pt);
 
-	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	//! calculate deviatoric tangent stiffness at material point
+	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
 	//! material parameter intialization and checking
 	void Init();
