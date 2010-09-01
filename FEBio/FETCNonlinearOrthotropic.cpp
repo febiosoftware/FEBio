@@ -9,7 +9,7 @@
 REGISTER_MATERIAL(FETCNonlinearOrthotropic, "TC nonlinear orthotropic");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FETCNonlinearOrthotropic, FEIncompressibleMaterial)
+BEGIN_PARAMETER_LIST(FETCNonlinearOrthotropic, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
@@ -22,7 +22,7 @@ END_PARAMETER_LIST();
 
 void FETCNonlinearOrthotropic::Init()
 {
-	FEIncompressibleMaterial::Init();
+	FEUncoupledMaterial::Init();
 
 	if (m_ksi[0] < 0) throw MaterialError("Invalid value for ksi1");
 	if (m_ksi[1] < 0) throw MaterialError("Invalid value for ksi2");
@@ -33,7 +33,9 @@ void FETCNonlinearOrthotropic::Init()
 	if (m_beta[2] < 2) throw MaterialError("Invalid value for beta3");
 }
 
-mat3ds FETCNonlinearOrthotropic::Stress(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+// Calculate the deviatoric Cauchy stress
+mat3ds FETCNonlinearOrthotropic::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -47,9 +49,6 @@ mat3ds FETCNonlinearOrthotropic::Stress(FEMaterialPoint& mp)
 
 	// left Cauchy-Green tensor and its square
 	double B[3][3], B2[3][3];
-
-	// average element pressure
-	double p = pt.avgp;
 
 	// invariants of B
 	double I1, I2, I4a, I4b, I4c;
@@ -198,9 +197,9 @@ mat3ds FETCNonlinearOrthotropic::Stress(FEMaterialPoint& mp)
 	// calculate stress: 
 	mat3ds s;
 
-	s.xx() = p + twoJi*(T[0][0] - trT);
-	s.yy() = p + twoJi*(T[1][1] - trT);
-	s.zz() = p + twoJi*(T[2][2] - trT);
+	s.xx() = twoJi*(T[0][0] - trT);
+	s.yy() = twoJi*(T[1][1] - trT);
+	s.zz() = twoJi*(T[2][2] - trT);
 	s.xy() = twoJi*T[0][1];
 	s.yz() = twoJi*T[1][2];
 	s.xz() = twoJi*T[0][2];
@@ -208,7 +207,9 @@ mat3ds FETCNonlinearOrthotropic::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+//! Calculate the deviatoric tangent
+tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -235,9 +236,6 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 	s[0][0] -= trs;	
 	s[1][1] -= trs;	
 	s[2][2] -= trs;
-
-	// mean pressure
-	double p = pt.avgp;
 
 	// current material axis lam*a = F*a0;
 	vec3d a, b, c, a0, b0, c0;
@@ -402,7 +400,7 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 	double CWWC = 2*I2*W2 + W44a*I4a*I4a + W44b*I4b*I4b + W44c*I4c*I4c;
 
 	// D[0][0] = c(0,0,0,0)
-	D[0][0] = -p - (4.0/3.0)*s[0][0] + (8.0/9.0)*Ji*WC;
+	D[0][0] =  -(4.0/3.0)*s[0][0] + (8.0/9.0)*Ji*WC;
 	D[0][0] += 4.0*Ji*W44a*I4a*I4a*a.x*a.x*a.x*a.x;
 	D[0][0] += 4.0*Ji*W44b*I4b*I4b*b.x*b.x*b.x*b.x;
 	D[0][0] += 4.0*Ji*W44c*I4c*I4c*c.x*c.x*c.x*c.x;
@@ -410,7 +408,7 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 	D[0][0] -= (8.0/3.0)*Ji*(W2*I1*B[0][0] - W2*B2[0][0] + W44a*I4a*I4a*a.x*a.x + W44b*I4b*I4b*b.x*b.x + W44c*I4c*I4c*c.x*c.x);
 
 	// D[1][1] = c(1,1,1,1)
-	D[1][1] = -p - (4.0/3.0)*s[1][1] + 8.0/9.0*Ji*WC;
+	D[1][1] = -(4.0/3.0)*s[1][1] + 8.0/9.0*Ji*WC;
 	D[1][1] += 4.0*Ji*W44a*I4a*I4a*a.y*a.y*a.y*a.y;
 	D[1][1] += 4.0*Ji*W44b*I4b*I4b*b.y*b.y*b.y*b.y;
 	D[1][1] += 4.0*Ji*W44c*I4c*I4c*c.y*c.y*c.y*c.y;
@@ -418,7 +416,7 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 	D[1][1] -= (8.0/3.0)*Ji*(W2*I1*B[1][1] - W2*B2[1][1] + W44a*I4a*I4a*a.y*a.y + W44b*I4b*I4b*b.y*b.y + W44c*I4c*I4c*c.y*c.y);
 
 	// D[2][2] = c(2,2,2,2)
-	D[2][2] = -p - (4.0/3.0)*s[2][2] + (8.0/9.0)*Ji*WC;
+	D[2][2] = -(4.0/3.0)*s[2][2] + (8.0/9.0)*Ji*WC;
 	D[2][2] += 4.0*Ji*W44a*I4a*I4a*a.z*a.z*a.z*a.z;
 	D[2][2] += 4.0*Ji*W44b*I4b*I4b*b.z*b.z*b.z*b.z;
 	D[2][2] += 4.0*Ji*W44c*I4c*I4c*c.z*c.z*c.z*c.z;
@@ -428,7 +426,7 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 
 
 	// D[0][1] = D[1][0] = c(0,0,1,1)
-	D[0][1] = p - (2.0/3.0)*(s[0][0] + s[1][1]) - (4.0/9.0)*Ji*WC;
+	D[0][1] = -(2.0/3.0)*(s[0][0] + s[1][1]) - (4.0/9.0)*Ji*WC;
 	D[0][1] += 4.0*Ji*W44a*I4a*I4a*a.x*a.x*a.y*a.y;
 	D[0][1] += 4.0*Ji*W44b*I4b*I4b*b.x*b.x*b.y*b.y;
 	D[0][1] += 4.0*Ji*W44c*I4c*I4c*c.x*c.x*c.y*c.y;
@@ -438,7 +436,7 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 	D[0][1] -= (4.0/3.0)*Ji*(W2*(I1*B[1][1] - B2[1][1]) + W44a*I4a*I4a*a.y*a.y + W44b*I4b*I4b*b.y*b.y + W44c*I4c*I4c*c.y*c.y);
 
 	// D[1][2] = D[2][1] = c(1,1,2,2)
-	D[1][2] = p - (2.0/3.0)*(s[1][1] + s[2][2]) - (4.0/9.0)*Ji*WC;
+	D[1][2] = -(2.0/3.0)*(s[1][1] + s[2][2]) - (4.0/9.0)*Ji*WC;
 	D[1][2] += 4.0*Ji*W44a*I4a*I4a*a.y*a.y*a.z*a.z;
 	D[1][2] += 4.0*Ji*W44b*I4b*I4b*b.y*b.y*b.z*b.z;
 	D[1][2] += 4.0*Ji*W44c*I4c*I4c*c.y*c.y*c.z*c.z;
@@ -448,7 +446,7 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 	D[1][2] -= (4.0/3.0)*Ji*(W2*(I1*B[2][2] - B2[2][2]) + W44a*I4a*I4a*a.z*a.z + W44b*I4b*I4b*b.z*b.z + W44c*I4c*I4c*c.z*c.z);
 
 	// D[0][2] = D[2][0] = c(0,0,2,2)
-	D[0][2] = p - (2.0/3.0)*(s[0][0] + s[2][2]) - (4.0/9.0)*Ji*WC;
+	D[0][2] = -(2.0/3.0)*(s[0][0] + s[2][2]) - (4.0/9.0)*Ji*WC;
 	D[0][2] += 4.0*Ji*W44a*I4a*I4a*a.x*a.x*a.z*a.z;
 	D[0][2] += 4.0*Ji*W44b*I4b*I4b*b.x*b.x*b.z*b.z;
 	D[0][2] += 4.0*Ji*W44c*I4c*I4c*c.x*c.x*c.z*c.z;
@@ -460,21 +458,21 @@ tens4ds FETCNonlinearOrthotropic::Tangent(FEMaterialPoint& mp)
 
 
 	// D[3][3] = 0.5*(c(0,1,0,1) + c(0,1,1,0))
-	D[3][3] = -p + (2.0/3.0)*Ji*WC;
+	D[3][3] = (2.0/3.0)*Ji*WC;
 	D[3][3] += 4.0*Ji*W44a*I4a*I4a*a.x*a.y*a.x*a.y;
 	D[3][3] += 4.0*Ji*W44b*I4b*I4b*b.x*b.y*b.x*b.y;
 	D[3][3] += 4.0*Ji*W44c*I4c*I4c*c.x*c.y*c.x*c.y;
 	D[3][3] += 2.0*Ji*W2*(B[0][1]*B[0][1] - B[0][0]*B[1][1]);
 
 	// D[4][4] = 0.5*(c(1,2,1,2) + c(1,2,2,1))
-	D[4][4] = -p + (2.0/3.0)*Ji*WC;
+	D[4][4] = (2.0/3.0)*Ji*WC;
 	D[4][4] += 4.0*Ji*W44a*I4a*I4a*a.y*a.z*a.y*a.z;
 	D[4][4] += 4.0*Ji*W44b*I4b*I4b*b.y*b.z*b.y*b.z;
 	D[4][4] += 4.0*Ji*W44c*I4c*I4c*c.y*c.z*c.y*c.z;
 	D[4][4] += 2.0*Ji*W2*(B[1][2]*B[1][2] - B[1][1]*B[2][2]);
 
 	// D[5][5] = 0.5*(c(0,2,0,2) + c(0,2,2,0))
-	D[5][5] = -p + (2.0/3.0)*Ji*WC;
+	D[5][5] = (2.0/3.0)*Ji*WC;
 	D[5][5] += 4.0*Ji*W44a*I4a*I4a*a.x*a.z*a.x*a.z;
 	D[5][5] += 4.0*Ji*W44b*I4b*I4b*b.x*b.z*b.x*b.z;
 	D[5][5] += 4.0*Ji*W44c*I4c*I4c*c.x*c.z*c.x*c.z;

@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Tension-compression nonlinear orthrotropic
@@ -18,17 +18,17 @@
 //! TODO: make an orthotropic material base class where we 
 //! can derive this material from.
 
-class FETCNonlinearOrthotropic : public FEIncompressibleMaterial
+class FETCNonlinearOrthotropic : public FEUncoupledMaterial
 {
 public:
 	FETCNonlinearOrthotropic() {}
 
 public:
-	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	//! calculate deviatoric stress at material point
+	virtual mat3ds DevStress(FEMaterialPoint& pt);
 
-	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	//! calculate deviatoric tangent stiffness at material point
+	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
 	//! data initialization and checking
 	void Init();
