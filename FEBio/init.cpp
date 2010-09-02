@@ -10,6 +10,7 @@
 #include "log.h"
 #include "FESolidSolver.h"
 #include "LSDYNAPlotFile.h"
+#include "FETransverselyIsotropic.h"
 
 // Forward declarations
 void Hello(FILE* fp);

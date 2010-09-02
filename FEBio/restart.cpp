@@ -7,6 +7,7 @@
 #include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
+#include "FETransverselyIsotropic.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

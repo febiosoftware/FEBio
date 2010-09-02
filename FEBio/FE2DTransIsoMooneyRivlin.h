@@ -1,5 +1,5 @@
 #pragma once
-#include "FEMaterial.h"
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 //! 2D transversely isotropic Mooney-Rivlin
@@ -27,11 +27,11 @@ public:
 	//! constructor
 	FE2DTransIsoMooneyRivlin();
 	
-	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	//! calculate deviatoric stress at material point
+	virtual mat3ds DevStress(FEMaterialPoint& pt);
 
-	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	//! calculate deviatoric tangent stiffness at material point
+	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
 	// declare as registered
 	DECLARE_REGISTERED(FE2DTransIsoMooneyRivlin);

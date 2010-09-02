@@ -20,6 +20,7 @@
 #include "ut4.h"
 #include "FEDiscreteMaterial.h"
 #include "FEUncoupledMaterial.h"
+#include "FETransverselyIsotropic.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////

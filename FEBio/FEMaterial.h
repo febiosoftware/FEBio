@@ -228,30 +228,4 @@ public:
 	FELoadCurve* m_plc;	//!< pointer to current load curve values
 };
 
-
-//-----------------------------------------------------------------------------
-//! Base class for transversely isotropic materials.
-
-//! This class was created to simplify the implementation of the TransIso Mooney-
-//! Rivlin and Veronda-Westmann models.
-//! This class only stores some data
-
-// TODO: don't derive it from FEIncompressibleMaterial. Materials that are both
-// incompressible and have a fiber distribution should derive from 
-// FEIncompressibleMaterial and from a fiber material class. Or perhaps they should
-// have a fiber (or material axis) class as a member.
-
-class FETransverselyIsotropic : public FEIncompressibleMaterial
-{
-public:
-	//! constructor
-	FETransverselyIsotropic() {}
-
-public:
-	FEFiberMaterial	m_fib;
-
-	// declare parameter list
-	DECLARE_PARAMETER_LIST();
-};
-
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

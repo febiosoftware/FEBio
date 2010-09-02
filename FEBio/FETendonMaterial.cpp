@@ -34,9 +34,9 @@ inline double acosh(double x)
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-//! Calculates the stress at a material point.
+//! Calculates the deviatoric stress at a material point.
 //!
-mat3ds FETendonMaterial::Stress(FEMaterialPoint& mp)
+mat3ds FETendonMaterial::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -46,9 +46,6 @@ mat3ds FETendonMaterial::Stress(FEMaterialPoint& mp)
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
-
-	// average element pressure
-	double p = pt.avgp;
 
 	// get the initial fiber direction
 	vec3d a0;
@@ -161,16 +158,13 @@ mat3ds FETendonMaterial::Stress(FEMaterialPoint& mp)
 	// calculate T 
 	mat3ds T = B*(W1 + W2*I1) - B2*W2 + AxA*(I4*W4) + ABA*(I4*W5);
 
-	// calculate stress
-	mat3ds s = mat3dd(pt.avgp) + T.dev()*(2.0/J);
-
-	return s;
+	return T.dev()*(2.0/J);
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the spatial tangent at a material point
+//! Calculates the spatial deviatoric tangent at a material point
 //!
-tens4ds FETendonMaterial::Tangent(FEMaterialPoint& mp)
+tens4ds FETendonMaterial::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -180,9 +174,6 @@ tens4ds FETendonMaterial::Tangent(FEMaterialPoint& mp)
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
-
-	// mean pressure
-	double p = pt.avgp;	
 
 	vec3d a0;
 	a0.x = pt.Q[0][0];
@@ -362,7 +353,5 @@ tens4ds FETendonMaterial::Tangent(FEMaterialPoint& mp)
 	tens4ds cw =  IxI*((4.0/(9.0*J))*(CW2CCC)) + W2CC*(4/J) - dyad1s(WCCC, ID)*(4.0/(3.0*J));
 
 	// elasticity tensor
-	tens4ds c = (IxI - I*2)*p - dyad1s(devs, ID)*(2.0/3.0) + (I - IxI/3.0)*(4.0*WCC/(3.0*J)) + cw;
-
-	return tens4ds(c);
+	return dyad1s(devs, ID)*(-2.0/3.0) + (I - IxI/3.0)*(4.0*WCC/(3.0*J)) + cw;
 }

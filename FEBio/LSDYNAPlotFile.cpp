@@ -6,6 +6,7 @@
 #include "FESurfaceConstraint.h"
 #include "FESlidingInterface2.h"
 #include "FEFacet2FacetSliding.h"
+#include "FETransverselyIsotropic.h"
 
 LSDYNAPlotFile::LSDYNAPlotFile()
 {

@@ -4,6 +4,7 @@
 #include "log.h"
 #include "FESolidSolver.h"
 #include "FEUncoupledMaterial.h"
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 // FEDomain

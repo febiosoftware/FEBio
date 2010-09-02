@@ -18,7 +18,7 @@ END_PARAMETER_LIST();
 // FETransIsoMooneyRivlin
 //////////////////////////////////////////////////////////////////////
 
-mat3ds FETransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
+mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -47,7 +47,7 @@ mat3ds FETransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	mat3ds T = B*(W1 + W2*I1) - B2*W2;
 
 	// calculate stress s = pI + 2/J * dev(T) 
-	mat3ds s = mat3dd(pt.avgp) + T.dev()*(2.0/J);
+	mat3ds s = T.dev()*(2.0/J);
 
 	// add the fiber stress
 	s += m_fib.Stress(mp);
@@ -55,7 +55,9 @@ mat3ds FETransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
-tens4ds FETransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
+//-----------------------------------------------------------------------------
+//! Calculate deviatoric tangent
+tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -103,7 +105,7 @@ tens4ds FETransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 	mat3ds WCCxC = B*(W2*I1) - B2*W2;
 
 	tens4ds cw = (BxB - B4)*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
-	tens4ds c = (IxI - I4*2)*p - dyad1s(devs, I)*(2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
+	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	return c + m_fib.Tangent(mp);
 }

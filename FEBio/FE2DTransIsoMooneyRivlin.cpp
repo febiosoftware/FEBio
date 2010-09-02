@@ -51,9 +51,9 @@ FE2DTransIsoMooneyRivlin::FE2DTransIsoMooneyRivlin()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the stress for this material.
+//! Calculates the deviatoric stress for this material.
 //! \param pt material point at which to evaluate the stress
-mat3ds FE2DTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
+mat3ds FE2DTransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -156,21 +156,14 @@ mat3ds FE2DTransIsoMooneyRivlin::Stress(FEMaterialPoint& mp)
 	// add fiber to total
 	T += Tf/wtot;
 
-	// average element pressure
-	double p = pt.avgp;
-
-	// set the stress
-	mat3dd I(1);
-	mat3ds s = I*p + T.dev()*(2.0/J);
-
-	return s;
+	return T.dev()*(2.0/J);
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the elasticity tensor for this material.
+//! Calculates the deviatoric elasticity tensor for this material.
 //! \param D elasticity tensor
 //! \param pt material point at which to evaulate the elasticity tensor
-tens4ds FE2DTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
+tens4ds FE2DTransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -183,9 +176,6 @@ tens4ds FE2DTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
-
-	// mean pressure
-	double p = pt.avgp;
 
 	// deviatoric right Cauchy-Green tensor: C = Ft*F
 	mat3ds C = pt.DevRightCauchyGreen();
@@ -228,7 +218,7 @@ tens4ds FE2DTransIsoMooneyRivlin::Tangent(FEMaterialPoint& mp)
 
 	tens4ds cw = (BxB - B4)*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
-	tens4ds c = (IxI - I4*2)*p - dyad1s(devs, I)*(2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
+	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	// --- F I B E R   C O N T R I B U T I O N ---
 

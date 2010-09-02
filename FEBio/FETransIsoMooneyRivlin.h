@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEMaterial.h"
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Mooney-Rivlin material
@@ -27,11 +27,11 @@ public:
 	double	c2;	//!< Mooney-Rivlin coefficient C2
 
 public:
-	//! calculate stress at material point
-	virtual mat3ds Stress(FEMaterialPoint& pt);
+	//! calculate deviatoric stress at material point
+	virtual mat3ds DevStress(FEMaterialPoint& pt);
 
-	//! calculate tangent stiffness at material point
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	//! calculate deviatoric tangent stiffness at material point
+	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
 	// declare as registered
 	DECLARE_REGISTERED(FETransIsoMooneyRivlin);

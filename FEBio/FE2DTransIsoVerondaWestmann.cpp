@@ -39,9 +39,9 @@ FE2DTransIsoVerondaWestmann::FE2DTransIsoVerondaWestmann()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the stress for this material.
+//! Calculates the deviatoric stress for this material.
 //! \param pt material point at which to evaluate the stress
-mat3ds FE2DTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
+mat3ds FE2DTransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -52,9 +52,6 @@ mat3ds FE2DTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double twoJi = 2.0*Ji;
-
-	// average element pressure
-	double p = pt.avgp;
 
 	// calculate deviatoric left Cauchy-Green tensor
 	mat3ds B = pt.DevLeftCauchyGreen();
@@ -141,18 +138,14 @@ mat3ds FE2DTransIsoVerondaWestmann::Stress(FEMaterialPoint& mp)
 	// normalize fiber stress and add to total
 	T += Tf/wtot;
 
-	// calculate stress
-	mat3dd I(1);
-	mat3ds s = I*p + T.dev()*twoJi;
-
-	return s;
+	return T.dev()*twoJi;
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the elasticity tensor for this material.
+//! Calculates the deviatoric elasticity tensor for this material.
 //! \param D elasticity tensor
 //! \param pt material point at which to evaulate the elasticity tensor
-tens4ds FE2DTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
+tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
@@ -165,9 +158,6 @@ tens4ds FE2DTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
-
-	// mean pressure
-	double p = pt.avgp;
 
 	// deviatoric right Cauchy-Green tensor: C = Ft*F
 	mat3ds C = pt.DevRightCauchyGreen();
@@ -212,7 +202,7 @@ tens4ds FE2DTransIsoVerondaWestmann::Tangent(FEMaterialPoint& mp)
 
 	tens4ds cw = BxB*((W11+W2)*4.0*Ji) - B4*(W2*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
-	tens4ds c = (IxI - I4*2)*p - dyad1s(devs, I)*(2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
+	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
 	double D[6][6];
 	c.extract(D);
