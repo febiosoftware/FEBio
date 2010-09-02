@@ -25,7 +25,6 @@ public:
 	
 public:
 	double	m_perm;			//!< permeability
-	double	m_permv[3];		//!< permeability for diagonal tensor
 	double	m_phi0;			//!< solid volume fraction in reference state
 	double	m_M;			//!< nonlinear exponential coefficient
 	double	m_alpha;		//!< nonlinear power exponent
