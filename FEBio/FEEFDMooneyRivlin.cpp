@@ -84,13 +84,8 @@ mat3ds FEEFDMooneyRivlin::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	const double third = 1.0/3.0;
-	const int nint = (m_nres == 0? NSTL  : NSTH  );
-
-	// deformation gradient
-	mat3d &F = pt.F;
+	// deformation gradient's determinant
 	double J = pt.J;
-	double Jm13 = pow(J, -1.0/3.0);
 
 	// calculate deviatoric left Cauchy-Green tensor
 	mat3ds B = pt.DevLeftCauchyGreen();
@@ -114,6 +109,24 @@ mat3ds FEEFDMooneyRivlin::DevStress(FEMaterialPoint& mp)
 
 	// --- F I B E R   C O N T R I B U T I O N ---
 
+	T += FiberStress(mp);
+
+	// --- END FIBER CONTRIBUTION --
+
+	return T.dev()*(2.0/J);
+}
+
+//-----------------------------------------------------------------------------
+//! calculate the fiber contribution to the deviatoric stress
+mat3ds FEEFDMooneyRivlin::FiberStress(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// deformation gradient
+	mat3d &F = pt.F;
+	double J = pt.J;
+	double Jm13 = pow(J, -1.0/3.0);
+
 	// calculate deviatoric right Cauchy-Green tensor
 	mat3ds C = pt.DevRightCauchyGreen();
 
@@ -125,6 +138,7 @@ mat3ds FEEFDMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	vec3d nr, n0, nt;
 	double In, Wl;
 	const double eps = 0;
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
 	mat3ds Tf; Tf.zero();
 	for (int n=0; n<nint; ++n)
 	{
@@ -164,15 +178,11 @@ mat3ds FEEFDMooneyRivlin::DevStress(FEMaterialPoint& mp)
 		{
 			// The .5 is to compensate for the 2 multiplier later.
 			double at = 0.5*m_w[n]*m_ac /sqrt(SQR(nr.x/m_a[0]) + SQR(nr.y / m_a[1]) + SQR(nr.z / m_a[2]));
-			T += N*at;
+			Tf += N*at;
 		}
 	}
 
-	T += Tf;
-
-	// --- END FIBER CONTRIBUTION --
-
-	return T.dev()*(2.0/J);
+	return Tf;
 }
 
 //-----------------------------------------------------------------------------
@@ -182,36 +192,25 @@ tens4ds FEEFDMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
 	double J = pt.J;
-	double Jm13 = pow(J, -1.0/3.0);
-	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
-	const int nint = (m_nres == 0? NSTL  : NSTH  );
-
-	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.s.dev();
-
-	// deviatoric right Cauchy-Green tensor: C = Ft*F
-	mat3ds C = pt.DevRightCauchyGreen();
-
-	// square of C
-	mat3ds C2 = C*C;
-
-	// Invariants of C
-	double I1 = C.tr();
-	double I2 = 0.5*(I1*I1 - C2.tr());
 
 	// calculate left Cauchy-Green tensor: B = F*Ft
 	mat3ds B = pt.DevLeftCauchyGreen();
 
 	// calculate square of B
-	// (we commented out the components we don't need)
 	mat3ds B2 = B*B;
+
+	// Invariants of B (=Invariants of C)
+	double I1 = B.tr();
+	double I2 = 0.5*(I1*I1 - B2.tr());
 
 	// strain energy derivatives
 	double W1 = m_c1;
 	double W2 = m_c2;
+
+	// deviatoric cauchy-stress
+	mat3ds devs = pt.s.dev();
 
 	// --- M A T R I X   C O N T R I B U T I O N ---
 
@@ -237,8 +236,31 @@ tens4ds FEEFDMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 
 	// --- F I B E R   C O N T R I B U T I O N ---
 
+	// add fiber contribution to total tangent
+	c += FiberTangent(mp);
+
+	return c;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate fiber tangent
+tens4ds FEEFDMooneyRivlin::FiberTangent(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// deformation gradient
+	mat3d &F = pt.F;
+	double J = pt.J;
+	double Jm13 = pow(J, -1.0/3.0);
+	double Ji = 1.0/J;
+
 	// get the element's local coordinate system
 	mat3d& Q = pt.Q;
+
+	mat3dd I(1);	// Identity
+
+	tens4ds IxI = dyad1s(I);
+	tens4ds I4  = dyad4s(I);
 
 	// loop over all integration points
 	double ksi, beta;
@@ -249,6 +271,7 @@ tens4ds FEEFDMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	mat3ds N2;
 	tens4ds N4;
 	tens4ds I4mIxId3 = I4 - IxI/3.0;
+	const int nint = (m_nres == 0? NSTL  : NSTH  );
 	for (int n=0; n<nint; ++n)
 	{
 		// set the local fiber direction
@@ -286,7 +309,7 @@ tens4ds FEEFDMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 			N2 = dyad(nt);
 			N4 = dyad1s(N2);
 
-			WCCxC = N2*(Wll*In);
+			mat3ds WCCxC = N2*(Wll*In);
 
 			cfw = N4*(4.0*Wll) - dyad1s(WCCxC, I)*(4.0/3.0) + IxI*(4.0/9.0*CWWC);
 
@@ -294,8 +317,5 @@ tens4ds FEEFDMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 		}
 	}
 
-	// add fiber contribution to total tangent
-	c += cf;
-
-	return c;
+	return cf;
 }

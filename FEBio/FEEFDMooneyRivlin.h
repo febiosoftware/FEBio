@@ -14,13 +14,20 @@ public:
 
 public:
 	//! calculate deviatoric stress at material point
-	virtual mat3ds DevStress(FEMaterialPoint& pt);
+	mat3ds DevStress(FEMaterialPoint& pt);
 
 	//! calculate deviatoric tangent stiffness at material point
-	virtual tens4ds DevTangent(FEMaterialPoint& pt);
+	tens4ds DevTangent(FEMaterialPoint& pt);
 
 	//! material parameter intialization and checking
 	void Init();
+
+protected:
+	//! Calculate (deviatoric) fiber stress
+	mat3ds FiberStress(FEMaterialPoint& mp);
+
+	//! Calculate (deviatoric) fiber tangent
+	tens4ds FiberTangent(FEMaterialPoint& mp);
 
 public:
 	double	m_c1;	// Mooney-Rivlin coefficient 1

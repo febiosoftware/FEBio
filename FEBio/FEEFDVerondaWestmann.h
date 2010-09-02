@@ -12,7 +12,7 @@
 class FEEFDVerondaWestmann:	public FEUncoupledMaterial
 {
 public:
-	FEEFDVerondaWestmann() {}
+	FEEFDVerondaWestmann();
 
 public:
 	//! calculate deviatoric stress at material point
@@ -24,12 +24,32 @@ public:
 	//! material parameter intialization and checking
 	void Init();
 
-	//! return bulk modulus
-	double BulkModulus();
+protected:
+	//! Calculate (deviatoric) fiber stress
+	mat3ds FiberStress(FEMaterialPoint& mp);
+
+	//! Calculate (deviatoric) fiber tangent
+	tens4ds FiberTangent(FEMaterialPoint& mp);
 	
 public:
-	FEEllipsoidalFiberDistribution	m_EFD;
-	FEVerondaWestmann				m_VW;
+	double	m_c1;	// Mooney-Rivlin coefficient 1
+	double	m_c2;	// Mooney-Rivlin coefficient 2
+
+	double	m_beta[3];
+	double	m_ksi[3];
+
+	//--- active contraction stuff ---
+	double	m_a[3];
+	double	m_ac;
+	// -------------------------------
+
+	static	int	m_nres;	// integration rule
+
+	static double	m_cth[];
+	static double	m_sth[];
+	static double	m_cph[];
+	static double	m_sph[];
+	static double	m_w[];
 
 	// declare as registered
 	DECLARE_REGISTERED(FEEFDVerondaWestmann);
