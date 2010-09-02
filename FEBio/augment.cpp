@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
+#include "FEUncoupledMaterial.h"
 #include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,7 +50,7 @@ bool FESolidSolver::Augment()
 	int nd;
 	for (int i=0; i<m_fem.Materials(); ++i)
 	{
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(m_fem.GetMaterial(i));
+		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
 		if (pmi)
 		{
 			if (pmi->m_blaugon)

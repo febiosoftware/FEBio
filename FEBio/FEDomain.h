@@ -158,9 +158,6 @@ public:
 protected:
 	// --- S T I F F N E S S ---
 
-	//! Dilatational stiffness component for nearly-incompressible materials
-	void DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke);
-
 	//! geometrical stiffness (i.e. initial stress)
 	void GeometricalStiffness(FESolidElement& el, matrix& ke);
 
@@ -395,9 +392,6 @@ public:
 
 	//! calculates the shell element stiffness matrix
 	void ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke);
-
-	//! Dilatational stiffness component for nearly-incompressible materials
-	void DilatationalStiffness(FEM& fem, FEShellElement& elem, matrix& ke);
 
 	// --- R E S I D U A L ---
 

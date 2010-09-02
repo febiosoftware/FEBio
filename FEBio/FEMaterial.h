@@ -139,55 +139,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Base class for incompressible materials
-
-//! In FEBio a decoupled strain energy function is defined for incompressible
-//! materials and a slightly different stress calculation is therefor required.
-//! All materials who use this formulation need to derive from this class
-//!
-//! \todo I'm not happy with this class. I need to figure out a different
-//! way to identify a material as incompressible
-
-class FEIncompressibleMaterial : public FEElasticMaterial
-{
-public:
-	//! constructor
-	/*! \param ntype the unique material ID */
-	FEIncompressibleMaterial() { m_blaugon = false; m_atol = 0.01; }
-
-	// dilatational component U and derivs
-	// use these to obtain similar results than NIKE3D
-//	double U  (double J) { return 0.5*m_K*log(J)*log(J); }
-	double Up (double J) { return m_K*log(J)/J; }
-	double Upp(double J) { return m_K*(1-log(J))/(J*J); }
-
-	// use these for NIKE3D's Ogden material
-//	double U  (double J) { return 0.25*m_K*(J*J - 2.0*log(J) - 1.0); }
-//	double Up (double J) { return 0.5*m_K*(J - 1.0/J); }
-//	double Upp(double J) { return 0.5*m_K*(1 + 1.0/(J*J)); }
-
-	// Use these to obtain similar results than ABAQUS
-//	double U  (double J) { return 0.5*m_K*(J-1)*(J-1); }
-//	double Up (double J) { return m_K*(J-1); }
-//	double Upp(double J) { return m_K; }
-
-	// incompressibility constraint fnc and derivs
-	double h  (double J) { return log(J); }
-	double hp (double J) { return 1.0 / J; }
-	double hpp(double J) { return -1.0 / (J*J); }
-
-	//! return bulk modulus
-	double BulkModulus() { return m_K; }
-
-public:
-	bool	m_blaugon;	//!< augmented lagrangian flag
-	double	m_atol;		//!< augmented lagrangian tolerance
-	double	m_K;		//!< bulk modulus
-
-	DECLARE_PARAMETER_LIST();
-};
-
-//-----------------------------------------------------------------------------
 // Base class for fiber materials.
 //
 class FEFiberMaterial : public FEMaterial

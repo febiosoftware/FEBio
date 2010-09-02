@@ -150,89 +150,6 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 }
 
 //-----------------------------------------------------------------------------
-//! calculates dilatational element stiffness component for element iel
-
-void FEElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke)
-{
-	int i, j, n;
-
-	const int nint = elem.GaussPoints();
-	const int neln = elem.Nodes();
-	const int ndof = 3*neln;
-
-	// get the elements material
-	FEElasticMaterial* pm = fem.GetElasticMaterial(elem.GetMatID());
-
-	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pm);
-	assert(pmi);
-
-	// average global derivatives
-	vector<double> gradN(3*neln);
-	zero(gradN);
-
-	// initial element volume
-	double Ve = 0;
-
-	// global derivatives of shape functions
-	double Gx, Gy, Gz;
-	const double *gw = elem.GaussWeights();
-
-	// jacobian
-	double Ji[3][3], detJt, detJ0;
-
-	double *Gr, *Gs, *Gt;
-
-	// repeat over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		// calculate jacobian
-		detJ0 = elem.detJ0(n);
-		detJt = elem.detJt(n);
-		elem.invjact(Ji, n);
-
-		detJt *= gw[n];
-
-		Ve += detJ0*gw[n];
-
-		Gr = elem.Gr(n);
-		Gs = elem.Gs(n);
-		Gt = elem.Gt(n);
-
-		// calculate global gradient of shape functions
-		// note that we need the transposed of Ji, not Ji itself !
-		for (i=0; i<neln; ++i)
-		{
-			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
-			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
-			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
-
-			gradN[3*i  ] += Gx*detJt;
-			gradN[3*i+1] += Gy*detJt;
-			gradN[3*i+2] += Gz*detJt;
-		}
-	}
-
-	// get effective modulus
-	double k = pmi->Upp(elem.m_eJ);
-
-	// next, we add the Lagrangian contribution
-	// note that this term will always be zero if the material does not
-	// use the augmented lagrangian
-	k += elem.m_Lk*pmi->hpp(elem.m_eJ);
-
-	// divide by initial volume
-	k /= Ve;
-
-	// calculate dilatational stiffness component
-	// we only calculate the upper triangular part
-	// since ke is symmetric.
-	for (i=0; i<ndof; ++i)
-		for (j=i; j<ndof; ++j)
-			ke[i][j] += k*gradN[i]*gradN[j];
-}
-
-
-//-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for integration point n
 
 void FEElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
@@ -497,19 +414,11 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 void FEElasticSolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
-	// see if the material is incompressible
-	FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-	bool bdilst = false;
-	if (dynamic_cast<FEIncompressibleMaterial*>(pme)) bdilst = true;
-
 	// calculate material stiffness (i.e. constitutive component)
 	MaterialStiffness(fem, el, ke);
 
 	// calculate geometrical stiffness
 	GeometricalStiffness(el, ke);
-
-	// Calculate dilatational stiffness, if necessary
-	if (bdilst) DilatationalStiffness(fem, el, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -521,10 +430,8 @@ void FEElasticSolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, matrix
 			ke[j][i] = ke[i][j];
 }
 
-
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-
 void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
 	int i, j, n;
@@ -604,34 +511,6 @@ void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 
 		// extract the elastic component
 		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-
-		// see if the material is incompressible or not
-		// if the material is incompressible the element
-		// is a three-field element and we need to evaluate
-		// the average dilatation and pressure fields
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-		if (pmi)
-		{
-			// get the material's bulk modulus
-			double K = pmi->BulkModulus();
-
-			// calculate the average dilatation and pressure
-			double v = 0, V = 0;
-
-			for (n=0; n<nint; ++n)
-			{
-				v += el.detJt(n)*gw[n];
-				V += el.detJ0(n)*gw[n];
-			}
-
-			// calculate volume ratio
-			el.m_eJ = v / V;
-
-			// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
-			//        <----- Lag. mult. ----->   <------ penalty ----->
-//			el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
-			el.m_ep = pmi->Up(el.m_eJ);
-		}
 
 		// loop over the integration points and calculate
 		// the stress at the integration point

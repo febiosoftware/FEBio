@@ -3,6 +3,7 @@
 #include "fem.h"
 #include "console.h"
 #include "FERigid.h"
+#include "FEUncoupledMaterial.h"
 #include "log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
@@ -282,7 +283,7 @@ bool FEAnalysis::Init()
 	// see if we to do incompressible augmentations
 	for (i=0; i<(int) m_fem.m_MAT.size(); ++i)
 	{
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(m_fem.GetMaterial(i));
+		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
 		if (pmi && pmi->m_blaugon) m_baugment = true;
 	}
 

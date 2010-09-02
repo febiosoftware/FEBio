@@ -453,10 +453,6 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 
 	} // end loop over gauss-points
 
-	// Dilatational stiffness component
-	// Only for (nearly) incompressible materials
-	if (dynamic_cast<FEIncompressibleMaterial*>(pme)) DilatationalStiffness(fem, el, ke);
-
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
 	// grabs elements from the upper diagonal matrix?
@@ -512,100 +508,6 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-//! calculates dilatational element stiffness component for element iel
-
-void FEElasticShellDomain::DilatationalStiffness(FEM& fem, FEShellElement& elem, matrix& ke)
-{
-	int i, j, n;
-
-	const int nint = elem.GaussPoints();
-	const int neln = elem.Nodes();
-	const int ndof = 6*neln;
-
-	// get the elements material
-	FEElasticMaterial* pm = fem.GetElasticMaterial(elem.GetMatID());
-
-	FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pm);
-	assert(pmi);
-
-	// average global derivatives
-	vector<double> gradN(6*neln);
-	zero(gradN);
-
-	// initial element volume
-	double Ve = 0;
-
-	// global derivatives of shape functions
-	double Nx, Ny, Nz, Mx, My, Mz;
-	const double *gw = elem.GaussWeights();
-
-	// jacobian
-	double Ji[3][3], detJt, detJ0;
-
-	double *Gr, *Gs, *H;
-
-	// calculate the average thickness
-	double* h0 = &elem.m_h0[0], gt, za;
-
-	// repeat over gauss-points
-	for (n=0; n<nint; ++n)
-	{
-		// calculate jacobian
-		detJ0 = elem.detJ0(n);
-		detJt = elem.detJt(n);
-		elem.invjact(Ji, n);
-
-		detJt *= gw[n];
-
-		Ve += detJ0*gw[n];
-
-		Gr = elem.Hr(n);
-		Gs = elem.Hs(n);
-		H = elem.H(n);
-		gt = elem.gt(n);
-
-		// calculate global gradient of shape functions
-		// note that we need the transposed of Ji, not Ji itself !
-		for (i=0; i<neln; ++i)
-		{
-			za = 0.5*gt*h0[i];
-
-			Nx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i];
-			Ny = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i];
-			Nz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i];
-
-			Mx = za*Ji[0][0]*Gr[i] + za*Ji[1][0]*Gs[i] + Ji[2][0]*0.5*h0[i]*H[i];
-			My = za*Ji[0][1]*Gr[i] + za*Ji[1][1]*Gs[i] + Ji[2][1]*0.5*h0[i]*H[i];
-			Mz = za*Ji[0][2]*Gr[i] + za*Ji[1][2]*Gs[i] + Ji[2][2]*0.5*h0[i]*H[i];
-
-			gradN[6*i  ] += Nx*detJt;
-			gradN[6*i+1] += Ny*detJt;
-			gradN[6*i+2] += Nz*detJt;
-
-			gradN[6*i+3] += Mx*detJt;
-			gradN[6*i+4] += My*detJt;
-			gradN[6*i+5] += Mz*detJt;
-		}
-	}
-
-	// get bulk modulus
-	double k = pmi->m_K;
-
-	// next, we add the Lagrangian contribution
-	// note that this term will always be zero if the material does not
-	// use the augmented lagrangian
-	k += elem.m_Lk*pmi->hpp(elem.m_eJ);
-
-	// divide by initial volume
-	k /= Ve;
-
-	for (i=0; i<ndof; ++i)
-		for (j=i; j<ndof; ++j)
-			ke[i][j] += k*gradN[i]*gradN[j];
-}
-
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::UpdateStresses(FEM &fem)
 {
@@ -631,34 +533,6 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 		// get the material
 		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
 
-		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-
-		// see if we are dealing with a poroelastic material or not
-		bool bporo = false;
-		if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
-
-		// see if the material is incompressible or not
-		// if the material is incompressible the element
-		// is a three-field element and we need to evaluate
-		// the average dilatation and pressure fields
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-		if (pmi)
-		{
-			// get the material's bulk modulus
-			double K = pmi->m_K;
-
-			// calculate the average dilatation and pressure
-			double v = 0, V = 0;
-			for (n=0; n<nint; ++n)
-			{
-				v += el.detJt(n)*gw[n];
-				V += el.detJ0(n)*gw[n];
-			}
-			el.m_eJ = v / V;
-			el.m_ep = pmi->Up(el.m_eJ);
-		}
-
 		// loop over the integration points and calculate
 		// the stress at the integration point
 		for (n=0; n<nint; ++n)
@@ -674,33 +548,14 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 
 			// get the deformation gradient and determinant
 			el.defgrad(pt.F, n);
-//			pt.J = el.detF(n);
 			pt.J = pt.F.det();
 
 			// three-field element variables
 			pt.avgJ = el.m_eJ;
 			pt.avgp = el.m_ep;
 
-			// fiber direction
-//			pt.a0 = el.m_a0[n];
-
-			// poroelasticity data
-			if (bporo)
-			{
-				// evaluate fluid pressure at gauss-point
-//				pt.p = el.Evaluate(el.pt(), n);
-
-				// calculate the gradient of p at gauss-point
-//				pt.gradp = el.gradient(el.pt(), n);
-			}
-
 			// calculate the stress at this material point
 			pt.s = pm->Stress(mp);
-
-			if (bporo)
-			{
-				// TODO: implement poro-stuff for shells
-			}
 		}
 	}
 }

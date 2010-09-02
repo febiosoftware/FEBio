@@ -43,7 +43,22 @@ public:
 
 	//! second derivative of U(J) 
 	virtual double UJJ(double J) { return m_K*(1-log(J))/(J*J); }
+
+	// use these for NIKE3D's Ogden material
+//	double U  (double J) { return 0.25*m_K*(J*J - 2.0*log(J) - 1.0); }
+//	double UJ (double J) { return 0.5*m_K*(J - 1.0/J); }
+//	double UJJ(double J) { return 0.5*m_K*(1 + 1.0/(J*J)); }
+
+	// Use these to obtain similar results than ABAQUS
+//	double U  (double J) { return 0.5*m_K*(J-1)*(J-1); }
+//	double UJ (double J) { return m_K*(J-1); }
+//	double UJJ(double J) { return m_K; }
 //----------------->
+
+	// incompressibility constraint fnc and derivs
+	double h  (double J) { return log(J); }
+	double hp (double J) { return 1.0 / J; }
+	double hpp(double J) { return -1.0 / (J*J); }
 
 public:
 	//! total Cauchy stress (do not overload!)

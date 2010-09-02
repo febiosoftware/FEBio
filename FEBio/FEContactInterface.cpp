@@ -62,17 +62,6 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 		// get the upper 3x3
 		mat3d T(mat3ds(C(0,0), C(1,1), C(2,2), C(0,1), C(1,2), C(0,2)));
 
-		// see if the material is incompressible
-		FEIncompressibleMaterial* pmi = dynamic_cast<FEIncompressibleMaterial*>(pme);
-		if (pmi)
-		{
-			// if the material is incompressible, the elasticity tensor returned by Tangent()
-			// does not contain the dilatational term, se we need to it.
-			// This term is simply D2U/DJ2(J=1)1x1
-			double K = pmi->Upp(1);
-			T += mat3ds(K, K, K, K, K, K);
-		}
-
 		// invert the matrix
 		mat3d Ti = T.inverse();
 
