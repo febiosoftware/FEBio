@@ -163,6 +163,7 @@ void FEM::SerializeAnalysisData(Archive &ar)
 		ar << m_nStep;
 		ar << m_ftime;
 		ar << m_nhex8;
+		ar << m_b3field;
 
 		// body forces
 		ar.write(m_BF  ,sizeof(FE_BODYFORCE), 1);
@@ -191,6 +192,7 @@ void FEM::SerializeAnalysisData(Archive &ar)
 		ar >> m_nStep;
 		ar >> m_ftime;
 		ar >> m_nhex8;
+		ar >> m_b3field;
 
 		// body forces
 		ar.read(m_BF  ,sizeof(FE_BODYFORCE), 1);

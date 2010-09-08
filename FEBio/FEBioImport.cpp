@@ -287,6 +287,7 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 			else if (strcmp(szval, "PRINT_MINOR_ITRS_EXP") == 0) m_pStep->SetPrintLevel(FE_PRINT_MINOR_ITRS_EXP);
 			else throw XMLReader::InvalidTag(tag);
 		}
+		else if (tag == "use_three_field_hex") tag.value(fem.m_b3field);
 		else if (tag == "integration")
 		{
 			++tag;
@@ -904,7 +905,7 @@ int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
 			if (t == "hex8")
 			{
 				// three-field implementation for uncoupled materials
-				if (dynamic_cast<FEUncoupledMaterial*>(pmat)) return FE_3F_SOLID_DOMAIN;
+				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && fem.m_b3field) return FE_3F_SOLID_DOMAIN;
 				else
 				{
 					if (fem.m_nhex8 == FE_UDGHEX) return FE_UDGHEX_DOMAIN;
