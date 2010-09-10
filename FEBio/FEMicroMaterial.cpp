@@ -36,9 +36,6 @@ void FEMicroMaterial::Init()
 	// make sure the RVE problem doesn't output anything to a plot file
 	m_rve.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
 
-	// make sure we are using the same linear solver as the parent FEM
-	m_rve.m_nsolver = SKYLINE_SOLVER;
-
 	// create the DC's for this RVE
 	PrepRVE();
 }

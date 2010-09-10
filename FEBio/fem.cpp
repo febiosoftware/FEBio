@@ -70,12 +70,13 @@ FEM::FEM()
 	}
 
 	// --- Direct Solver Data ---
-	// set the skyline solver as default
-	m_nsolver = SKYLINE_SOLVER;
-
-	// However, if available use the PSLDLT solver instead
-#ifdef PSLDLT
+	// set the default linear solver
+#ifdef PARDISO
+	m_nsolver = PARDISO_SOLVER;
+#elif PSLDLT
 	m_nsolver = PSLDLT_SOLVER;
+#else
+	m_nsolver = SKYLINE_SOLVER;
 #endif
 
 	m_neq = 0;
