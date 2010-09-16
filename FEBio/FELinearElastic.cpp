@@ -18,6 +18,7 @@ END_PARAMETER_LIST();
 // FELinearElastic
 //////////////////////////////////////////////////////////////////////
 
+//-----------------------------------------------------------------------------
 void FELinearElastic::Init()
 {
 	// intialize base class
@@ -27,6 +28,7 @@ void FELinearElastic::Init()
 	if (!INRANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
 }
 
+//-----------------------------------------------------------------------------
 mat3ds FELinearElastic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -42,9 +44,6 @@ mat3ds FELinearElastic::Stress(FEMaterialPoint& mp)
 	// small strain voigt vector
 	mat3ds e;
 
-	// trace of e
-	double tre;
-
 	// caculate small strain tensor
 	e.xx() = F[0][0] - 1.0;
 	e.yy() = F[1][1] - 1.0;
@@ -53,52 +52,11 @@ mat3ds FELinearElastic::Stress(FEMaterialPoint& mp)
 	e.xz() = 0.5*(F[0][2] + F[2][0]);
 	e.yz() = 0.5*(F[1][2] + F[2][1]);
 
-	// calculate trace of e
-	tre = e.xx() + e.yy() + e.zz();
-
-	// calculate stress
-	mat3ds s;
-	s.xx() = lam*tre + 2.0*mu*e.xx();
-	s.yy() = lam*tre + 2.0*mu*e.yy();
-	s.zz() = lam*tre + 2.0*mu*e.zz();
-	s.xy() = 2.0*mu*e.xy();
-	s.yz() = 2.0*mu*e.yz();
-	s.xz() = 2.0*mu*e.xz();
-
-	return s;
+	// return stress
+	return mat3ds(1,1,1,0,0,0)*(lam*e.tr()) + e*(2.0*mu);
 }
 
-/*
-mat3ds FELinearElastic::Stress(FEMaterialPoint& mp)
-{
-	FEElasticMaterialPoint& pt = mp.ExtractData<FEElasticMaterialPoint>();
-
-	// deformation gradient
-	mat3d F(pt.F);
-	double detF = pt.J;
-
-	// lame parameters
-	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-	double mu  = 0.5*m_E/(1+m_v);
-
-	// Identity tensor
-	diag3d I(1.0);
-
-	// we don't use this, but let's calculate it anyway
-	m_K   = lam + 2.0/3.0*mu;
-
-	// strain tensor
-	mat3ds e = F.sym() - I;
-
-	// stress tensor
-	mat3ds s = I*(lam*e.tr()) + e*(2.0*mu);
-
-	// stress voigth vector
-	return mat3ds(s.xx(), s.yy(), s.zz(), s.xy(), s.yz(), s.xz());
-}
-*/
-
-
+//-----------------------------------------------------------------------------
 tens4ds FELinearElastic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
