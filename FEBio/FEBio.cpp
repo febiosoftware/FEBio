@@ -94,6 +94,10 @@ void init_framework(FEM& fem);
 
 int get_app_path (char *pname, size_t pathsize);
 
+#ifdef FEBIO_LICENSE
+	bool validate_license();
+#endif
+
 //-----------------------------------------------------------------------------
 // The starting point of the application
 
@@ -112,6 +116,10 @@ int main(int argc, char* argv[])
 		Hello(stdout);
 //#endif
 	}
+
+#ifdef FEBIO_LICENSE
+	if (!validate_license()) return 1;
+#endif
 
 	// if there are no arguments, ask for an input file
 	if (argc == 1)
