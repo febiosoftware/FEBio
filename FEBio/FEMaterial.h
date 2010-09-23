@@ -133,7 +133,7 @@ public:
 
 public:
 	int					m_nBaseMat;	//!< material ID of base material (one-based!)
-	FEElasticMaterial*	m_pBase;	//!< pointer to base material
+	FESolidMaterial*	m_pBase;	//!< pointer to base material
 
 	DECLARE_PARAMETER_LIST();
 };

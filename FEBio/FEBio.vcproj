@@ -2647,18 +2647,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FESpectralPermeabilityIso.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FESpectralPermeabilityOrtho.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FESpectralPermeabilityTransIso.h"
-				>
-			</File>
-			<File
 				RelativePath=".\FEStiffnessMatrix.h"
 				>
 			</File>
