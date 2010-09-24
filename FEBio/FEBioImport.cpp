@@ -750,16 +750,16 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 			// make sure the base ID is valid
 			if ((nbase < 0) || (nbase >= fem.Materials()))
 			{
-				log.printbox("INPUT ERROR", "Invalid base material ID for material i+1\n");
+				log.printbox("INPUT ERROR", "Invalid base material ID for material %d\n", i+1);
 				throw XMLReader::Error();
 				return false;
 			}
 
 			// make sure the base material is a valid material (i.e. an elastic material)
-			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(nbase));
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(nbase));
 			if (pme == 0)
 			{
-				log.printbox("INPUT ERROR", "Invalid base material for material i+1\n");
+				log.printbox("INPUT ERROR", "Invalid base material for material %d\n", i+1);
 				throw XMLReader::Error();
 				return false;
 			}

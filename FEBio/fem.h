@@ -270,7 +270,7 @@ public:
 	FEElasticMaterial* GetElasticMaterial(int id)
 	{
 		FEMaterial* pm = m_MAT[id];
-		if (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 		assert(pme);
 		return pme;
@@ -279,7 +279,7 @@ public:
 	//! return the elastic material
 	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm)
 	{
-		if (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 		assert(pme);
 		return pme;

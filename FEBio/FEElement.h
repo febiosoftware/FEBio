@@ -181,6 +181,25 @@ public:
 	double* Gs(int n) { return ((FESolidElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
 	double* Gt(int n) { return ((FESolidElementTraits*)(m_pT))->Gt[n]; }	// shape function derivative to t
 
+	//! calculate shape function derivatives w.r.t to x
+	void shape_derivt(double* Gx, double* Gy, double* Gz, int n)
+	{
+		double Ji[3][3];
+		invjact(Ji, n);
+		double* gr = Gr(n);
+		double* gs = Gs(n);
+		double* gt = Gt(n);
+		int N = Nodes();
+		for (int j=0; j<N; ++j)
+		{
+			// calculate gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx[j] = Ji[0][0]*gr[j]+Ji[1][0]*gs[j]+Ji[2][0]*gt[j];
+			Gy[j] = Ji[0][1]*gr[j]+Ji[1][1]*gs[j]+Ji[2][1]*gt[j];
+			Gz[j] = Ji[0][2]*gr[j]+Ji[1][2]*gs[j]+Ji[2][2]*gt[j];
+		}
+	}
+
 	void jact(double J[3][3], int n)
 	{
 		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jt[n];
