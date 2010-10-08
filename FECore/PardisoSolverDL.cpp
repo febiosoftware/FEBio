@@ -122,7 +122,7 @@ bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 	m_iparm[7] = 1;	/* Maximum number of iterative refinement steps */
 
 	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
-		 NULL, &m_nrhs, m_iparm, &m_msglvl, b, x, &m_error, m_dparm);
+		 NULL, &m_nrhs, m_iparm, &m_msglvl, &b[0], &x[0], &m_error, m_dparm);
 
 	if (m_error)
 	{
