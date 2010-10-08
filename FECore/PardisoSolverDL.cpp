@@ -142,6 +142,9 @@ void PardisoSolver::Destroy()
 	fprintf(stderr, "FATAL ERROR: The Pardiso solver is not available on this platform\n\n");
 	exit(1);
 #else
+
+	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
+
 	int phase = -1;
 
 	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, A->pointers(), A->indices(),
