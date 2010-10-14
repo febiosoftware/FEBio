@@ -25,7 +25,7 @@ public:
 		m_com = 0;
 		for (int i=0; i<6; ++i)
 		{
-			m_bc[i] = -1;
+			m_bc[i] =  0;	// rigid bodies are initially free
 			m_fc[i] = -1;
 			m_fs[i] =  0;
 		}
