@@ -3134,6 +3134,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						}
 					}
 					else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
+					else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 				}
 				else if (strncmp(tag.Name(), "rot_", 4) == 0)
 				{
@@ -3187,6 +3188,7 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						}
 					}
 					else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
+					else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
