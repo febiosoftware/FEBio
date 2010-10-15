@@ -2,6 +2,8 @@
 
 #include "FileImport.h"
 #include "XMLReader.h"
+#include "FETransverselyIsotropic.h"
+#include "FERigid.h"
 
 //-----------------------------------------------------------------------------
 //! Implements a class to import FEBio input files
@@ -29,6 +31,7 @@ public:
 	bool Load(FEM& fem, const char* szfile);
 
 protected:
+	void ParseVersion			(XMLTag& tag);
 	bool ParseModuleSection     (XMLTag& tag);
 	bool ParseControlSection    (XMLTag& tag);
 	bool ParseMaterialSection   (XMLTag& tag);
@@ -59,6 +62,12 @@ protected: // boundary section
 	void ParseBCFluidFlux(XMLTag& tag);
 	void ParseBCHeatFlux (XMLTag& tag);
 
+protected: // material section
+	void ParseMaterial        (XMLTag& tag, FEMaterial* pm);
+	bool ParseElasticMaterial (XMLTag& tag, FEElasticMaterial* pm);
+	bool ParseTransIsoMaterial(XMLTag& tag, FETransverselyIsotropic* pm);
+	bool ParseRigidMaterial   (XMLTag& tag, FERigidMaterial* pm);
+
 protected:
 	int DomainType(XMLTag& tag, FEMaterial* pmat);
 	FEDomain* CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat);
@@ -75,4 +84,7 @@ protected:
 
 	int	m_ntet4;	// tetrahedral integration rule
 	int m_nsteps;	// nr of step sections read
+	int	m_nmat;		// nr of materials
+
+	int	m_nversion;	// version of file
 };

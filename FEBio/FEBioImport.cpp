@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FEBioImport.h"
-#include "FERigid.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
@@ -20,7 +19,6 @@
 #include "ut4.h"
 #include "FEDiscreteMaterial.h"
 #include "FEUncoupledMaterial.h"
-#include "FETransverselyIsotropic.h"
 #include <string.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,6 +45,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	assert(nsteps > 0);
 	m_pStep = fem.m_Step[nsteps-1];
 	m_nsteps = 0; // reset step section counter
+	m_nversion = -1;
 
 	// default element type for tets
 	m_ntet4 = ET_TET4;
@@ -69,32 +68,36 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// loop over all child tags
 	try
 	{
-		if (strcmp(tag.m_szatv[0], "1.0") == 0)
+		// get the version number
+		ParseVersion(tag);
+		if ((m_nversion != 0x0100) && (m_nversion != 0x0101)) throw InvalidVersion();
+
+		// parse the file
+		++tag;
+		do
 		{
-			// Read version 1.0
-
-			++tag;
-			do
+			if		(tag == "Module"     ) ParseModuleSection    (tag);
+			else if (tag == "Control"    ) ParseControlSection   (tag);
+			else if (tag == "Material"   ) ParseMaterialSection  (tag);
+			else if (tag == "Geometry"   ) ParseGeometrySection  (tag);
+			else if (tag == "Boundary"   ) ParseBoundarySection  (tag);
+			else if (tag == "Constraints") 
 			{
-				if		(tag == "Module"     ) ParseModuleSection    (tag);
-				else if (tag == "Control"    ) ParseControlSection   (tag);
-				else if (tag == "Material"   ) ParseMaterialSection  (tag);
-				else if (tag == "Geometry"   ) ParseGeometrySection  (tag);
-				else if (tag == "Boundary"   ) ParseBoundarySection  (tag);
-				else if (tag == "Constraints") ParseConstraintSection(tag);
-				else if (tag == "Initial"    ) ParseInitialSection   (tag);
-				else if (tag == "Globals"    ) ParseGlobalsSection   (tag);
-				else if (tag == "LoadData"   ) ParseLoadSection      (tag);
-				else if (tag == "Output"     ) ParseOutputSection    (tag);
-				else if (tag == "Step"       ) ParseStepSection      (tag);
-				else throw XMLReader::InvalidTag(tag);
-
-				// go to the next tag
-				++tag;
+				// The Constraints section is only allowed for file versions 1.1 and higher
+				if (m_nversion < 0x0101) throw XMLReader::InvalidTag(tag);
+				else ParseConstraintSection(tag);
 			}
-			while (!tag.isend());
+			else if (tag == "Initial"    ) ParseInitialSection   (tag);
+			else if (tag == "Globals"    ) ParseGlobalsSection   (tag);
+			else if (tag == "LoadData"   ) ParseLoadSection      (tag);
+			else if (tag == "Output"     ) ParseOutputSection    (tag);
+			else if (tag == "Step"       ) ParseStepSection      (tag);
+			else throw XMLReader::InvalidTag(tag);
+
+			// go to the next tag
+			++tag;
 		}
-		else throw InvalidVersion();
+		while (!tag.isend());
 	}
 	catch (InvalidVersion)
 	{
@@ -152,6 +155,20 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 
 	// we're done!
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! This function parses the febio_spec tag for the version number
+void FEFEBioImport::ParseVersion(XMLTag &tag)
+{
+	const char* szv = tag.AttributeValue("version");
+	assert(szv);
+	int n1, n2;
+	int nr = sscanf(szv, "%d.%d", &n1, &n2);
+	if (nr != 2) throw InvalidVersion();
+	if ((n1 < 1) || (n1 > 0xFF)) throw InvalidVersion();
+	if ((n2 < 0) || (n2 > 0xFF)) throw InvalidVersion();
+	m_nversion = (n1 << 8) + n2;
 }
 
 //-----------------------------------------------------------------------------
@@ -397,10 +414,11 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 	return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEFEBioImport::ParseMaterialSection
-//  This function parses the material section from the xml file
+//=============================================================================
 //
+//                     M A T E R I A L   S E C T I O N
+//
+//=============================================================================
 
 bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 {
@@ -409,7 +427,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 	const char* sztype = 0;
 	const char* szname = 0;
 
-	int nmat = 0;
+	m_nmat = 0;
 
 	++tag;
 	do
@@ -424,310 +442,34 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
+		// IMPORTANT: depending on the format version number we need to process 
+		// rigid bodies differently. For versions <= 0x0100 rigid degrees of 
+		// freedom are initially constrained and can be defined in the material
+		// section. For versions >= 0x0101 rigid degrees of freedom are free and
+		// can be constrained in the Constraints section.
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
+		if (pm)
+		{
+			if (m_nversion <= 0x0100)
+			{
+				// older versions have the rigid degrees of freedom constrained
+				for (int i=0; i<6; ++i) pm->m_bc[i] = -1;
+			}
+			else
+			{
+				// newer versions have the rigid degrees of freedom unconstrained
+				for (int i=0; i<6; ++i) pm->m_bc[i] = 0;
+			}
+		}
+
 		// add the material
 		fem.AddMaterial(pmat);
-		++nmat;
+		++m_nmat;
 
 		// set the material's name
 		if (szname) pmat->SetName(szname);
 
-		// get the material's parameter list
-		FEParameterList* pl = pmat->GetParameterList();
-		fem.AddParameterList(pl);
-
-		// loop over all parameters
-		++tag;
-		do
-		{
-			// see if we can find this parameter
-			FEParam* pp = pl->Find(tag.Name());
-			if (pp)
-			{
-				switch (pp->m_itype)
-				{
-				case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
-				case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
-				case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
-				case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
-				case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
-				case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
-				default:
-					assert(false);
-				}
-
-				int lc = -1;
-				tag.AttributeValue("lc", lc, true);
-				if (lc != -1) pp->m_nlc = lc;
-			}
-			else
-			{
-				// if we get here the parameter was not part of the parameter list
-				// however, not all parameters can be read from the parameter lists yet
-				// so we have to read in the other parameters the hard way
-				// TODO: this option will become obselete
-				bool bfound = false;
-
-				// additional elastic material parameters
-				if (!bfound && dynamic_cast<FEElasticMaterial*>(pmat))
-				{
-					FEElasticMaterial* pm = dynamic_cast<FEElasticMaterial*>(pmat);
-
-					// read the material axis
-					if (tag == "mat_axis")
-					{
-						const char* szt = tag.AttributeValue("type");
-						if (strcmp(szt, "local") == 0)
-						{
-							FELocalMap* pmap = new FELocalMap();
-							pm->m_pmap = pmap;
-
-							int n[3];
-							tag.value(n, 3);
-							if ((n[0] == 0) && (n[1] == 0) && (n[2] == 0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
-
-							pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
-						}
-						else if (strcmp(szt, "vector") == 0)
-						{
-							FEVectorMap* pmap = new FEVectorMap();
-							pm->m_pmap = pmap;
-
-							vec3d a(1,0,0), d(0,1,0);
-							++tag;
-							do
-							{
-								if (tag == "a") tag.value(a);
-								else if (tag == "d") tag.value(d);
-								else throw XMLReader::InvalidTag(tag);
-
-								++tag;
-							}
-							while (!tag.isend());
-							pmap->SetVectors(a, d);
-						}
-						else if (strcmp(szt, "user") == 0)
-						{
-							// material axis are read in from the ElementData section
-						}
-						else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-
-						bfound = true;
-					}
-				}
-
-				// additional transversely isotropic material parameters
-				if (!bfound && dynamic_cast<FETransverselyIsotropic*>(pmat))
-				{
-					// read the transversely isotropic materials data
-					FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
-
-					// read material fibers
-					if (tag == "fiber")
-					{
-						const char* szt = tag.AttributeValue("type");
-						if (strcmp(szt, "local") == 0)
-						{
-							FELocalMap* pmap = new FELocalMap();
-							pm->m_pmap = pmap;
-
-							int n[3] = {0};
-							tag.value(n, 2);
-
-							if ((n[0]==0)&&(n[1]==0)&&(n[2]==0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
-							if (n[2] == 0) n[2] = n[1];
-
-							pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
-						}
-						else if (strcmp(szt, "spherical") == 0)
-						{
-							FESphericalMap* pmap = new FESphericalMap();
-							pm->m_pmap = pmap;
-
-							vec3d c;
-							tag.value(c);
-
-							pmap->SetSphereCenter(c);
-						}
-						else if (strcmp(szt, "vector") == 0)
-						{
-							FEVectorMap* pmap = new FEVectorMap;
-							pm->m_pmap = pmap;
-
-							vec3d a, d;
-							tag.value(a);
-							a.unit();
-
-							d = vec3d(1,0,0);
-							if (a*d > .999) d = vec3d(0,1,0);
-
-							pmap->SetVectors(a, d);
-						}
-						else if (strcmp(szt, "user") == 0)
-						{
-							// fibers are read in in the ElementData section
-						}
-						else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-
-						// mark the tag as read
-						bfound = true;
-					}
-					else if (tag == "active_contraction")
-					{
-						const char* szlc = tag.AttributeValue("lc", true);
-						int lc = 0;
-						if (szlc) lc = atoi(szlc);
-						pm->m_fib.m_lcna = lc;
-						tag.value(pm->m_fib.m_ascl);
-
-						if (!tag.isleaf())
-						{
-							++tag;
-							do
-							{
-								if (tag == "ca0") tag.value(pm->m_fib.m_ca0);
-								else if (tag == "beta") tag.value(pm->m_fib.m_beta);
-								else if (tag == "l0") tag.value(pm->m_fib.m_l0);
-								else if (tag == "refl") tag.value(pm->m_fib.m_refl);
-								else throw XMLReader::InvalidTag(tag);
-								++tag;
-							}
-							while (!tag.isend());
-						}
-
-						// mark tag as read
-						bfound = true;
-					}
-				}
-
-				// read rigid body data
-				if (!bfound && dynamic_cast<FERigidMaterial*>(pmat))
-				{
-					FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
-
-					if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; bfound = true; }
-					else if (tag == "parent_id") { tag.value(pm->m_pmid); bfound = true; }
-					else if (strncmp(tag.Name(), "trans_", 6) == 0)
-					{
-						const char* szt = tag.AttributeValue("type");
-						const char* szlc = tag.AttributeValue("lc", true);
-						int lc = 0;
-						if (szlc) lc = atoi(szlc)+1;
-
-						int bc = -1;
-						if      (tag.Name()[6] == 'x') bc = 0;
-						else if (tag.Name()[6] == 'y') bc = 1;
-						else if (tag.Name()[6] == 'z') bc = 2;
-						assert(bc >= 0);
-
-						if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
-						else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-						else if (strcmp(szt, "prescribed") == 0)
-						{
-							pm->m_bc[bc] = lc;
-							FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
-							pDC->id = nmat;
-							pDC->bc = bc;
-							pDC->lc = lc;
-							tag.value(pDC->sf);
-							fem.m_RDC.push_back(pDC);
-
-							// add this boundary condition to the current step
-							if (m_nsteps > 0)
-							{
-								int n = fem.m_RDC.size()-1;
-								FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-								m_pStep->AddBoundaryCondition(pDC);
-								pDC->Deactivate();
-							}
-						}
-						else if (strcmp(szt, "force") == 0)
-						{
-							pm->m_bc[bc] = 0;
-							FERigidBodyForce* pFC = new FERigidBodyForce;
-							pFC->id = nmat;
-							pFC->bc = bc;
-							pFC->lc = lc-1;
-							tag.value(pFC->sf);
-							fem.m_RFC.push_back(pFC);
-
-							// add this boundary condition to the current step
-							if (m_nsteps > 0)
-							{
-								int n = fem.m_RFC.size()-1;
-								FERigidBodyForce* pFC = fem.m_RFC[n];
-								m_pStep->AddBoundaryCondition(pFC);
-								pFC->Deactivate();
-							}
-						}
-						else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-						bfound = true;
-					}
-					else if (strncmp(tag.Name(), "rot_", 4) == 0)
-					{
-						const char* szt = tag.AttributeValue("type");
-						const char* szlc = tag.AttributeValue("lc", true);
-						int lc = 0;
-						if (szlc) lc = atoi(szlc)+1;
-
-						int bc = -1;
-						if      (tag.Name()[4] == 'x') bc = 3;
-						else if (tag.Name()[4] == 'y') bc = 4;
-						else if (tag.Name()[4] == 'z') bc = 5;
-						assert(bc >= 0);
-
-						if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
-						else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-						else if (strcmp(szt, "prescribed") == 0)
-						{
-							pm->m_bc[bc] = lc;
-							FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
-							pDC->id = nmat;
-							pDC->bc = bc;
-							pDC->lc = lc;
-							tag.value(pDC->sf);
-							fem.m_RDC.push_back(pDC);
-
-							// add this boundary condition to the current step
-							if (m_nsteps > 0)
-							{
-								int n = fem.m_RDC.size()-1;
-								FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-								m_pStep->AddBoundaryCondition(pDC);
-								pDC->Deactivate();
-							}
-						}
-						else if (strcmp(szt, "force") == 0)
-						{
-							pm->m_bc[bc] = 0;
-							FERigidBodyForce* pFC = new FERigidBodyForce;
-							pFC->id = nmat;
-							pFC->bc = bc;
-							pFC->lc = lc-1;
-							tag.value(pFC->sf);
-							fem.m_RFC.push_back(pFC);
-
-							// add this boundary condition to the current step
-							if (m_nsteps > 0)
-							{
-								int n = fem.m_RFC.size()-1;
-								FERigidBodyForce* pFC = fem.m_RFC[n];
-								m_pStep->AddBoundaryCondition(pFC);
-								pFC->Deactivate();
-							}
-						}
-						else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-						bfound = true;
-					}
-				}
-
-				// see if we have processed the tag
-				if (bfound == false) throw XMLReader::InvalidTag(tag);
-			}
-
-			// get the next tag
-			++tag;
-		}
-		while (!tag.isend());
+		ParseMaterial(tag, pmat);
 
 		// read next tag
 		++tag;
@@ -814,6 +556,335 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 	// all done!
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
+{
+	FEM& fem = *m_pfem;
+
+	// get the material's parameter list
+	FEParameterList* pl = pmat->GetParameterList();
+	fem.AddParameterList(pl);
+
+	// loop over all parameters
+	++tag;
+	do
+	{
+		// see if we can find this parameter
+		FEParam* pp = pl->Find(tag.Name());
+		if (pp)
+		{
+			switch (pp->m_itype)
+			{
+			case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
+			case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
+			case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
+			case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
+			case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
+			case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+			default:
+				assert(false);
+			}
+
+			int lc = -1;
+			tag.AttributeValue("lc", lc, true);
+			if (lc != -1) pp->m_nlc = lc;
+		}
+		else
+		{
+			// if we get here the parameter was not part of the parameter list
+			// however, not all parameters can be read from the parameter lists yet
+			// so we have to read in the other parameters the hard way
+			// TODO: this option will become obselete
+			bool bfound = false;
+
+			// additional elastic material parameters
+			if (!bfound && dynamic_cast<FEElasticMaterial*>(pmat)) bfound = ParseElasticMaterial(tag, dynamic_cast<FEElasticMaterial*>(pmat));
+
+			// additional transversely isotropic material parameters
+			if (!bfound && dynamic_cast<FETransverselyIsotropic*>(pmat)) bfound = ParseTransIsoMaterial(tag, dynamic_cast<FETransverselyIsotropic*>(pmat));
+
+			// read rigid body data
+			if (!bfound && dynamic_cast<FERigidMaterial*>(pmat)) bfound = ParseRigidMaterial(tag, dynamic_cast<FERigidMaterial*>(pmat));
+
+			// see if we have processed the tag
+			if (bfound == false) throw XMLReader::InvalidTag(tag);
+		}
+
+		// get the next tag
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+// Parse FEElasticMaterial 
+//
+bool FEFEBioImport::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *pm)
+{
+	// read the material axis
+	if (tag == "mat_axis")
+	{
+		const char* szt = tag.AttributeValue("type");
+		if (strcmp(szt, "local") == 0)
+		{
+			FELocalMap* pmap = new FELocalMap();
+			pm->m_pmap = pmap;
+
+			int n[3];
+			tag.value(n, 3);
+			if ((n[0] == 0) && (n[1] == 0) && (n[2] == 0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
+
+			pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
+		}
+		else if (strcmp(szt, "vector") == 0)
+		{
+			FEVectorMap* pmap = new FEVectorMap();
+			pm->m_pmap = pmap;
+
+			vec3d a(1,0,0), d(0,1,0);
+			++tag;
+			do
+			{
+				if (tag == "a") tag.value(a);
+				else if (tag == "d") tag.value(d);
+				else throw XMLReader::InvalidTag(tag);
+
+				++tag;
+			}
+			while (!tag.isend());
+			pmap->SetVectors(a, d);
+		}
+		else if (strcmp(szt, "user") == 0)
+		{
+			// material axis are read in from the ElementData section
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Parse FETransverselyIsotropic
+//
+bool FEFEBioImport::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsotropic *pm)
+{
+	// read material fibers
+	if (tag == "fiber")
+	{
+		const char* szt = tag.AttributeValue("type");
+		if (strcmp(szt, "local") == 0)
+		{
+			FELocalMap* pmap = new FELocalMap();
+			pm->m_pmap = pmap;
+
+			int n[3] = {0};
+			tag.value(n, 2);
+
+			if ((n[0]==0)&&(n[1]==0)&&(n[2]==0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
+			if (n[2] == 0) n[2] = n[1];
+
+			pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
+		}
+		else if (strcmp(szt, "spherical") == 0)
+		{
+			FESphericalMap* pmap = new FESphericalMap();
+			pm->m_pmap = pmap;
+
+			vec3d c;
+			tag.value(c);
+
+			pmap->SetSphereCenter(c);
+		}
+		else if (strcmp(szt, "vector") == 0)
+		{
+			FEVectorMap* pmap = new FEVectorMap;
+			pm->m_pmap = pmap;
+
+			vec3d a, d;
+			tag.value(a);
+			a.unit();
+
+			d = vec3d(1,0,0);
+			if (a*d > .999) d = vec3d(0,1,0);
+
+			pmap->SetVectors(a, d);
+		}
+		else if (strcmp(szt, "user") == 0)
+		{
+			// fibers are read in in the ElementData section
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+
+		// mark the tag as read
+		return true;
+	}
+	else if (tag == "active_contraction")
+	{
+		const char* szlc = tag.AttributeValue("lc", true);
+		int lc = 0;
+		if (szlc) lc = atoi(szlc);
+		pm->m_fib.m_lcna = lc;
+		tag.value(pm->m_fib.m_ascl);
+
+		if (!tag.isleaf())
+		{
+			++tag;
+			do
+			{
+				if (tag == "ca0") tag.value(pm->m_fib.m_ca0);
+				else if (tag == "beta") tag.value(pm->m_fib.m_beta);
+				else if (tag == "l0") tag.value(pm->m_fib.m_l0);
+				else if (tag == "refl") tag.value(pm->m_fib.m_refl);
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
+
+		// mark tag as read
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Read rigid materials
+//
+bool FEFEBioImport::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
+{
+	FEM& fem = *m_pfem;
+
+	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
+	else if (tag == "parent_id") { tag.value(pm->m_pmid); return true; }
+	else if (m_nversion <= 0x0100)
+	{
+		// The following tags are only allowed in older version of FEBio
+		// Newer versions defined the rigid body constraints in the Constraints section
+		if (strncmp(tag.Name(), "trans_", 6) == 0)
+		{
+			const char* szt = tag.AttributeValue("type");
+			const char* szlc = tag.AttributeValue("lc", true);
+			int lc = 0;
+			if (szlc) lc = atoi(szlc)+1;
+
+			int bc = -1;
+			if      (tag.Name()[6] == 'x') bc = 0;
+			else if (tag.Name()[6] == 'y') bc = 1;
+			else if (tag.Name()[6] == 'z') bc = 2;
+			assert(bc >= 0);
+
+			if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
+			else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
+			else if (strcmp(szt, "prescribed") == 0)
+			{
+				pm->m_bc[bc] = lc;
+				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+				pDC->id = m_nmat;
+				pDC->bc = bc;
+				pDC->lc = lc;
+				tag.value(pDC->sf);
+				fem.m_RDC.push_back(pDC);
+
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					int n = fem.m_RDC.size()-1;
+					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
+					m_pStep->AddBoundaryCondition(pDC);
+					pDC->Deactivate();
+				}
+			}
+			else if (strcmp(szt, "force") == 0)
+			{
+				pm->m_bc[bc] = 0;
+				FERigidBodyForce* pFC = new FERigidBodyForce;
+				pFC->id = m_nmat;
+				pFC->bc = bc;
+				pFC->lc = lc-1;
+				tag.value(pFC->sf);
+				fem.m_RFC.push_back(pFC);
+
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					int n = fem.m_RFC.size()-1;
+					FERigidBodyForce* pFC = fem.m_RFC[n];
+					m_pStep->AddBoundaryCondition(pFC);
+					pFC->Deactivate();
+				}
+			}
+			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+			return true;
+		}
+		else if (strncmp(tag.Name(), "rot_", 4) == 0)
+		{
+			const char* szt = tag.AttributeValue("type");
+			const char* szlc = tag.AttributeValue("lc", true);
+			int lc = 0;
+			if (szlc) lc = atoi(szlc)+1;
+
+			int bc = -1;
+			if      (tag.Name()[4] == 'x') bc = 3;
+			else if (tag.Name()[4] == 'y') bc = 4;
+			else if (tag.Name()[4] == 'z') bc = 5;
+			assert(bc >= 0);
+
+			if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
+			else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
+			else if (strcmp(szt, "prescribed") == 0)
+			{
+				pm->m_bc[bc] = lc;
+				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+				pDC->id = m_nmat;
+				pDC->bc = bc;
+				pDC->lc = lc;
+				tag.value(pDC->sf);
+				fem.m_RDC.push_back(pDC);
+
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					int n = fem.m_RDC.size()-1;
+					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
+					m_pStep->AddBoundaryCondition(pDC);
+					pDC->Deactivate();
+				}
+			}
+			else if (strcmp(szt, "force") == 0)
+			{
+				pm->m_bc[bc] = 0;
+				FERigidBodyForce* pFC = new FERigidBodyForce;
+				pFC->id = m_nmat;
+				pFC->bc = bc;
+				pFC->lc = lc-1;
+				tag.value(pFC->sf);
+				fem.m_RFC.push_back(pFC);
+
+				// add this boundary condition to the current step
+				if (m_nsteps > 0)
+				{
+					int n = fem.m_RFC.size()-1;
+					FERigidBodyForce* pFC = fem.m_RFC[n];
+					m_pStep->AddBoundaryCondition(pFC);
+					pFC->Deactivate();
+				}
+			}
+			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+			return true;
+		}
+	}
+	return false;
+}
+
+//=============================================================================
+//
+//                     N O D E   S E C T I O N
+//
+//=============================================================================
+
 
 //-----------------------------------------------------------------------------
 //! Reads the Nodes section of the FEBio input file
