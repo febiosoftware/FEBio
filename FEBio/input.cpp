@@ -12,9 +12,6 @@
 #include "LSDYNAPlotFile.h"
 #include <string.h>
 
-// Forward declarations
-void Hello(FILE* fp);
-
 //-----------------------------------------------------------------------------
 //! This routine reads in an input file and performs some initialization stuff.
 //! The rest of the initialization is done in Init

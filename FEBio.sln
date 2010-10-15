@@ -18,8 +18,6 @@ Global
 		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug - license|Win32 = Debug - license|Win32
-		Debug - license|x64 = Debug - license|x64
 		Debug - Skyline only|Win32 = Debug - Skyline only|Win32
 		Debug - Skyline only|x64 = Debug - Skyline only|x64
 		Debug|Win32 = Debug|Win32
@@ -38,10 +36,6 @@ Global
 		Release-x64|x64 = Release-x64|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - license|Win32.ActiveCfg = Debug - license|Win32
-		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - license|Win32.Build.0 = Debug - license|Win32
-		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - license|x64.ActiveCfg = Debug - license|x64
-		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - license|x64.Build.0 = Debug - license|x64
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - Skyline only|Win32.ActiveCfg = Debug - Skyline only|Win32
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - Skyline only|Win32.Build.0 = Debug - Skyline only|Win32
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Debug - Skyline only|x64.ActiveCfg = Debug - Skyline only|x64
@@ -74,10 +68,6 @@ Global
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release-x64|Win32.Build.0 = Release-x64|Win32
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release-x64|x64.ActiveCfg = Release-x64|x64
 		{17C93AA1-E742-49A5-89CD-7591F915F151}.Release-x64|x64.Build.0 = Release-x64|x64
-		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - license|Win32.ActiveCfg = Debug - license|Win32
-		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - license|Win32.Build.0 = Debug - license|Win32
-		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - license|x64.ActiveCfg = Debug - license|x64
-		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - license|x64.Build.0 = Debug - license|x64
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - Skyline only|Win32.ActiveCfg = Debug - Skyline only|Win32
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - Skyline only|Win32.Build.0 = Debug - Skyline only|Win32
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Debug - Skyline only|x64.ActiveCfg = Debug - Skyline only|x64
@@ -110,9 +100,6 @@ Global
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release-x64|Win32.Build.0 = Release-x64|Win32
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release-x64|x64.ActiveCfg = Release-x64|x64
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431}.Release-x64|x64.Build.0 = Release-x64|x64
-		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug - license|Win32.ActiveCfg = Debug - license
-		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug - license|x64.ActiveCfg = Debug - license
-		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug - license|x64.Build.0 = Debug - license
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug - Skyline only|Win32.ActiveCfg = Debug - Skyline only
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug - Skyline only|x64.ActiveCfg = Debug - Skyline only
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Debug - Skyline only|x64.Build.0 = Debug - Skyline only

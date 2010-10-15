@@ -46,6 +46,7 @@
 #include "fem.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
+#include "validate.h"
 
 #define MAXFILE 256
 
@@ -94,10 +95,6 @@ void init_framework(FEM& fem);
 
 int get_app_path (char *pname, size_t pathsize);
 
-#ifdef FEBIO_LICENSE
-	bool validate_license();
-#endif
-
 //-----------------------------------------------------------------------------
 // The starting point of the application
 
@@ -106,6 +103,9 @@ int main(int argc, char* argv[])
 	// parse the command line
 	CMDOPTIONS ops;
 	if (ParseCmdLine(argc, argv, ops) == false) return 0;
+
+	// load the license file
+	LoadLicenseFile();
 
 	// print welcome message
 	if (ops.bsplash)
@@ -116,10 +116,6 @@ int main(int argc, char* argv[])
 		Hello(stdout);
 //#endif
 	}
-
-#ifdef FEBIO_LICENSE
-	if (!validate_license()) return 1;
-#endif
 
 	// if there are no arguments, ask for an input file
 	if (argc == 1)
@@ -326,7 +322,6 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 }
 
 //-----------------------------------------------------------------------------
-
 void init_framework(FEM& fem)
 {
 	FEBioCommand::SetFEM(&fem);

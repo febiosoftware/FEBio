@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "version.h"
+#include "validate.h"
 
 unsigned char banner[] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -68,6 +69,8 @@ void print_banner() {}
 
 void Hello(FILE* fp)
 {
+	int nlic = GetLicenseKeyStatus();
+
 	fprintf(fp,"===========================================================================\n");
 	fprintf(fp,"         ________    _________   _________     __     _________            \n");
 	fprintf(fp,"        |        |\\ |        |\\ |        |\\   |  |\\  /         \\\\          \n");
@@ -95,6 +98,33 @@ void Hello(FILE* fp)
 	fprintf(fp,"  http://mrl.sci.utah.edu                                                  \n");
 	fprintf(fp,"                                                                           \n");
 	fprintf(fp,"  copyright (c) 2006-2010 - All rights reserved                            \n");
+	if(nlic == 0)
+	{
+		fprintf(fp,"                                                                           \n");
+		fprintf(fp," This is an UNLICENSED version of FEBio or the license file could not be   \n");
+		fprintf(fp," found. If you have a license file make sure it is placed in the same      \n");
+		fprintf(fp," directory as the executable. This version may only be used for            \n");
+		fprintf(fp," non-commercial purposes as described in the license agreement. The        \n");
+		fprintf(fp," functionality of this version may be limited. If you wish to obtain a     \n");
+		fprintf(fp," valid license file, please contact the developers.                        \n");
+	}
+	else if (nlic == 1)
+	{
+		fprintf(fp,"                                                                           \n");
+		fprintf(fp,"  This version is licensed to:                                              \n");
+		fprintf(fp,"  \t%s\n", GetLicenseUser());
+		fprintf(fp,"  \t%s\n", GetLicenseCompany());
+	}
+	else if(nlic == 2)
+	{
+		fprintf(fp,"                                                                           \n");
+		fprintf(fp," The license file is INVALID. You may continue to use FEBio as an          \n");
+		fprintf(fp," unlicensed version. This implies that this version of FEBio may only be   \n");
+		fprintf(fp," used for non-commercial purposes as described in the license agreement and\n");
+		fprintf(fp," the functionality may be limited. If you wish to obtain a valid license   \n");
+		fprintf(fp," file or if you think your license is valid, please contact the developers.\n");
+	}
+
 	fprintf(fp,"                                                                           \n");
 	fprintf(fp,"===========================================================================\n");
 	fprintf(fp,"\n\n");
