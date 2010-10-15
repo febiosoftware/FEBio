@@ -117,12 +117,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2480D72EA35D43329756A7A214727C7E"
-        "OwnerKey" = "8:_E81B22EEDBFA41B6B1C2016BBEA58532"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_2584B164E4C14F8EBFA2B0920BDCDB5C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -155,6 +149,12 @@
         {
         "MsmKey" = "8:_2C1884B6F39C466FA3341B41C2EA3405"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_322E01B061444E0FB93C26C3798140E7"
+        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -311,6 +311,12 @@
         {
         "MsmKey" = "8:_6EF49E59F7924C3CAEFA2AE9F51938BC"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_705CBD90A4D241BB9AAC924ECCBED3CA"
+        "OwnerKey" = "8:_322E01B061444E0FB93C26C3798140E7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -641,12 +647,6 @@
         {
         "MsmKey" = "8:_E7E24C22683A4FA8A410B4EC313EAED5"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E81B22EEDBFA41B6B1C2016BBEA58532"
-        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -3313,7 +3313,7 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_BCB3F49C79F24378B1A64ABDDCA71505"
                     {
-                    "Name" = "8:FEBio 1.2.0"
+                    "Name" = "8:FEBio 1.3"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -3326,7 +3326,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_A9F30665B9534E439753127ACED5EF05"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder]\\[ProductName]1p2"
+            "DefaultLocation" = "8:[ProgramFilesFolder]\\[ProductName]1p3"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -3374,14 +3374,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio"
-        "ProductCode" = "8:{A8BCF4F6-AD54-49A6-8698-2CF7890535D9}"
-        "PackageCode" = "8:{DA5221C4-A9C0-43BC-98FE-94DB6C93B093}"
+        "ProductCode" = "8:{9CD2A583-07D9-40EC-A652-956CD430A13A}"
+        "PackageCode" = "8:{06DBB935-E60F-417E-8B90-68312C7C5818}"
         "UpgradeCode" = "8:{C651D20C-DA37-45DD-B03F-85DB2BC7C551}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.2.2"
+        "ProductVersion" = "8:1.3.0"
         "Manufacturer" = "8:University of Utah"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -3496,7 +3496,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8FDB5C2951F0402EB8218C329706F317"
             {
-            "Name" = "8:FEBio 1.2.0"
+            "Name" = "8:FEBio 1.3"
             "Arguments" = "8:"
             "Description" = "8:Finite Elements for Biomechanics"
             "ShowCmd" = "3:1"
@@ -3904,11 +3904,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_2480D72EA35D43329756A7A214727C7E"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_322E01B061444E0FB93C26C3798140E7"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -3918,11 +3918,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_E81B22EEDBFA41B6B1C2016BBEA58532"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_705CBD90A4D241BB9AAC924ECCBED3CA"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
                 "Properties"
                 {
                 }
@@ -3937,7 +3937,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B5DBEA9D13BD4A3299351E9AD71B980A"
             {
-            "SourcePath" = "8:..\\Debug - license\\FEBio.exe"
+            "SourcePath" = "8:..\\Release\\FEBio.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"
