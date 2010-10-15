@@ -197,7 +197,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;SUPERLU;_CRT_SECURE_NO_WARNINGS;PARDISO"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;SUPERLU;_CRT_SECURE_NO_WARNINGS;PARDISO; FEBIO_LICENSE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
