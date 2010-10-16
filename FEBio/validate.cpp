@@ -126,7 +126,7 @@ void FEBioLicenseKey::Load()
 	fclose(fp);
 
 	// validate the key
-	validatedType ret = validateKey(szkey, szname, szcomp, "0001");
+	ValidationResult ret = validateKey(szkey, szname, szcomp, "0001");
 	if (ret != Passed) return validate_error();
 
 	// if we make it here, all is well
