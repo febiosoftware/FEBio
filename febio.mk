@@ -1,12 +1,12 @@
 FEBIO = /home/sci/rawlins/FEBio
-lnx: INCLUDE = $(FEBIO)/make.lnx
+lnx64: INCLUDE = $(FEBIO)/make.lnx64
 lnxdl: INCLUDE = $(FEBIO)/make.lnxdl
 lnx32: INCLUDE = $(FEBIO)/make.lnx32
 test: INCLUDE = $(FEBIO)/make.test
 osx: INCLUDE = $(FEBIO)/make.osx
 alt: INCLUDE = $(FEBIO)/make.alt
 win: INCLUDE = $(FEBIO)/make.win
-lnxclean: INCLUDE = $(FEBIO)/make.lnx
+lnx64clean: INCLUDE = $(FEBIO)/make.lnx64
 lnxdlclean: INCLUDE = $(FEBIO)/make.lnxdl
 lnx32clean: INCLUDE = $(FEBIO)/make.lnx32
 testclean: INCLUDE = $(FEBIO)/make.test
@@ -16,7 +16,7 @@ winclean: INCLUDE = $(FEBIO)/make.win
 
 export INCLUDE
 
-lnx:
+lnx64:
 	./includes.bash
 	./svnrev.bash
 	( cd FECore; $(MAKE) )
@@ -50,7 +50,7 @@ win:
 	( cd FEBio; $(MAKE) -f Makefile.win )
 
 
-lnxclean:
+lnx64clean:
 
 	( cd FECore; $(MAKE) clean)
 	( cd FEBio;  $(MAKE) clean) 

@@ -3,12 +3,12 @@
 #include "validate.h"
 #include <string>
 #include <iostream>
-#include <string>
+#include <cstring>
 using namespace std;
 
 // load the key generator
 #ifdef FEBIO_LICENSE
-	#include <KeyGen\validate.h>
+	#include "KeyGen/validate.h"
 #endif
 
 //-----------------------------------------------------------------------------
