@@ -499,7 +499,9 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 
 			// make sure the base material is a valid material (i.e. an elastic material)
 			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(nbase));
-			if (pme == 0)
+
+			// don't allow rigid bodies
+			if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
 			{
 				log.printbox("INPUT ERROR", "Invalid base material for material %d\n", i+1);
 				throw XMLReader::Error();
