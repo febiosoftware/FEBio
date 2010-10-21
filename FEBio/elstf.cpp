@@ -83,13 +83,13 @@ bool FESolidSolver::StiffnessMatrix()
 	// let's check the stiffness matrix for zero diagonal elements
 	if (m_fem.GetDebugFlag())
 	{
+		vector<int> zd;
 		for (i=0; i<m_fem.m_neq; ++i)
 		{
-			if (K.diag(i) == 0) 
-			{
-				throw ZeroDiagonal(i, m_fem);
-			}
+			if (K.diag(i) == 0) zd.push_back(i);
 		}
+
+		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);
 	}
 
 	return true;

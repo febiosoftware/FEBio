@@ -12,6 +12,9 @@
 class FEElement;
 class FEM;
 
+#include <vector>
+using namespace std;
+
 class FEException  
 {
 public:
@@ -39,8 +42,15 @@ public:
 
 class ZeroDiagonal : public FEException
 {
+private:
+	struct EQUATION
+	{
+		int	node;	// node
+		int	dof;	// degree of node
+	};
+
 public:
-	ZeroDiagonal(int i, FEM& fem);
+	ZeroDiagonal(vector<int>& l, FEM& fem);
 
 	char m_szerr[256];	// the error message
 };
