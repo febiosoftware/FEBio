@@ -27,6 +27,14 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+// class that manages file section parsers
+class FileSectionMap : public map<string, FileSection*>
+{
+public:
+	~FileSectionMap();
+};
+
+//-----------------------------------------------------------------------------
 // Module Section
 class FEBioModuleSection : public FileSection
 {
@@ -186,10 +194,6 @@ public:
 	class InvalidElementType{};
 
 public:
-	FEFEBioImport();
-	virtual ~FEFEBioImport();
-
-public:
 	bool Load(FEM& fem, const char* szfile);
 
 	FEM* GetFEM() { return m_pfem; }
@@ -214,6 +218,4 @@ public:
 
 protected:
 	int	m_nversion;	// version of file
-
-	map<string, FileSection*>	m_map;
 };

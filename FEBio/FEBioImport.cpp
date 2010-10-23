@@ -26,37 +26,18 @@ FEM* FileSection::GetFEM() { return m_pim->GetFEM(); }
 FEAnalysis* FileSection::GetStep() { return m_pim->GetStep(); }
 
 //-----------------------------------------------------------------------------
-// FEFEBioImport constructor
-FEFEBioImport::FEFEBioImport()
-{
-	// define the file section map
-	m_map["Module"     ] = new FEBioModuleSection     (this);
-	m_map["Control"    ] = new FEBioControlSection    (this);
-	m_map["Material"   ] = new FEBioMaterialSection   (this);
-	m_map["Geometry"   ] = new FEBioGeometrySection   (this);
-	m_map["Boundary"   ] = new FEBioBoundarySection   (this);
-	m_map["Initial"    ] = new FEBioInitialSection    (this);
-	m_map["LoadData"   ] = new FEBioLoadSection       (this);
-	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
-	m_map["Output"     ] = new FEBioOutputSection     (this);
-	m_map["Constraints"] = new FEBioConstraintsSection(this);
-	m_map["Step"       ] = new FEBioStepSection       (this);
-}
-
-//-----------------------------------------------------------------------------
-// FEFEBioImport destructor
-FEFEBioImport::~FEFEBioImport()
+FileSectionMap::~FileSectionMap()
 {
 	// clear the map
-	std::map<string, FileSection*>::iterator is;
-	for (is = m_map.begin(); is != m_map.end(); ++is)
+	FileSectionMap::iterator is;
+	for (is = begin(); is != end(); ++is)
 	{
 		FileSection* ps = is->second; delete ps;
 	}
-	m_map.clear();
+	clear();
 }
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // FUNCTION : FEFEBioImport::Load
 //  Imports an XML input file.
 //  The actual file is parsed using the XMLReader class.
@@ -99,6 +80,20 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		return false;
 	}
 
+	// define the file structure
+	FileSectionMap map;
+	map["Module"     ] = new FEBioModuleSection     (this);
+	map["Control"    ] = new FEBioControlSection    (this);
+	map["Material"   ] = new FEBioMaterialSection   (this);
+	map["Geometry"   ] = new FEBioGeometrySection   (this);
+	map["Boundary"   ] = new FEBioBoundarySection   (this);
+	map["Initial"    ] = new FEBioInitialSection    (this);
+	map["LoadData"   ] = new FEBioLoadSection       (this);
+	map["Globals"    ] = new FEBioGlobalsSection    (this);
+	map["Output"     ] = new FEBioOutputSection     (this);
+	map["Constraints"] = new FEBioConstraintsSection(this);
+	map["Step"       ] = new FEBioStepSection       (this);
+
 	// loop over all child tags
 	try
 	{
@@ -111,10 +106,10 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		do
 		{
 			// try to find a section parser
-			std::map<string, FileSection*>::iterator is = m_map.find(tag.Name());
+			FileSectionMap::iterator is = map.find(tag.Name());
 
 			// if found, parse it otherwise throw a fit
-			if (is != m_map.end()) is->second->Parse(tag);
+			if (is != map.end()) is->second->Parse(tag);
 			else throw XMLReader::InvalidTag(tag);
 
 			// go to the next tag
@@ -3296,7 +3291,7 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	// increase the step section counter
 	++m_pim->m_nsteps;
 
-	std::map<string, FileSection*> Map;
+	FileSectionMap Map;
 	Map["Control"    ] = new FEBioControlSection    (m_pim);
 	Map["Constraints"] = new FEBioConstraintsSection(m_pim);
 	Map["Boundary"   ] = new FEBioBoundarySection   (m_pim);

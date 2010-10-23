@@ -48,6 +48,11 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 
 	m_pStep = fem.m_Step[0];
 
+	// define file structure
+	FileSectionMap map;
+	map["Control" ] = new FEBioControlSection (this);
+	map["Material"] = new FEBioMaterialSection(this);
+
 	// loop over all child tags
 	try
 	{
@@ -69,15 +74,12 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 		++tag;
 		do
 		{
-/*			if (tag == "Control") ParseControlSection(tag);
-			if (tag == "Material") ParseMaterialSection(tag);
-			else 
-			{
-				if (m_pdia->ParseSection(tag) == false)
-					throw XMLReader::InvalidTag(tag);
-			}
+			// parse the file
+			FileSectionMap::iterator is = map.find(tag.Name());
+			if (is != map.end()) is->second->Parse(tag);
+			else throw XMLReader::InvalidTag(tag);
 
-*/			// go to the next tag
+			// go to the next tag
 			++tag;
 		}
 		while (!tag.isend());
