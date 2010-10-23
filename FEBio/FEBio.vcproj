@@ -2277,10 +2277,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\string.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\tens4d.cpp"
 				>
 			</File>
@@ -2796,10 +2792,6 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\string.h"
 				>
 			</File>
 			<File

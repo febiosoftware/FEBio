@@ -1,6 +1,6 @@
 #pragma once
 
-#include "string.h"
+#include <string.h>
 
 class Command
 {

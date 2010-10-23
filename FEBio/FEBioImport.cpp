@@ -21,12 +21,46 @@
 #include "FEUncoupledMaterial.h"
 #include <string.h>
 
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+FEM* FileSection::GetFEM() { return m_pim->GetFEM(); }
+FEAnalysis* FileSection::GetStep() { return m_pim->GetStep(); }
+
+//-----------------------------------------------------------------------------
+// FEFEBioImport constructor
+FEFEBioImport::FEFEBioImport()
+{
+	// define the file section map
+	m_map["Module"     ] = new FEBioModuleSection     (this);
+	m_map["Control"    ] = new FEBioControlSection    (this);
+	m_map["Material"   ] = new FEBioMaterialSection   (this);
+	m_map["Geometry"   ] = new FEBioGeometrySection   (this);
+	m_map["Boundary"   ] = new FEBioBoundarySection   (this);
+	m_map["Initial"    ] = new FEBioInitialSection    (this);
+	m_map["LoadData"   ] = new FEBioLoadSection       (this);
+	m_map["Globals"    ] = new FEBioGlobalsSection    (this);
+	m_map["Output"     ] = new FEBioOutputSection     (this);
+	m_map["Constraints"] = new FEBioConstraintsSection(this);
+	m_map["Step"       ] = new FEBioStepSection       (this);
+}
+
+//-----------------------------------------------------------------------------
+// FEFEBioImport destructor
+FEFEBioImport::~FEFEBioImport()
+{
+	// clear the map
+	std::map<string, FileSection*>::iterator is;
+	for (is = m_map.begin(); is != m_map.end(); ++is)
+	{
+		FileSection* ps = is->second; delete ps;
+	}
+	m_map.clear();
+}
+
+//-----------------------------------------------------------------------------
 // FUNCTION : FEFEBioImport::Load
 //  Imports an XML input file.
 //  The actual file is parsed using the XMLReader class.
 //
-
 bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 {
 	// store a copy of the file name
@@ -76,22 +110,11 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		++tag;
 		do
 		{
-			if		(tag == "Module"     ) ParseModuleSection    (tag);
-			else if (tag == "Control"    ) ParseControlSection   (tag);
-			else if (tag == "Material"   ) ParseMaterialSection  (tag);
-			else if (tag == "Geometry"   ) ParseGeometrySection  (tag);
-			else if (tag == "Boundary"   ) ParseBoundarySection  (tag);
-			else if (tag == "Constraints") 
-			{
-				// The Constraints section is only allowed for file versions 1.1 and higher
-				if (m_nversion < 0x0101) throw XMLReader::InvalidTag(tag);
-				else ParseConstraintSection(tag);
-			}
-			else if (tag == "Initial"    ) ParseInitialSection   (tag);
-			else if (tag == "Globals"    ) ParseGlobalsSection   (tag);
-			else if (tag == "LoadData"   ) ParseLoadSection      (tag);
-			else if (tag == "Output"     ) ParseOutputSection    (tag);
-			else if (tag == "Step"       ) ParseStepSection      (tag);
+			// try to find a section parser
+			std::map<string, FileSection*>::iterator is = m_map.find(tag.Name());
+
+			// if found, parse it otherwise throw a fit
+			if (is != m_map.end()) is->second->Parse(tag);
 			else throw XMLReader::InvalidTag(tag);
 
 			// go to the next tag
@@ -99,24 +122,10 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		}
 		while (!tag.isend());
 	}
-	catch (InvalidVersion)
-	{
-		log.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
-		return false;
-	}
-	catch (InvalidMaterial e)
-	{
-		log.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
-		return false;
-	}
+	// --- XML Reader Exceptions ---
 	catch (XMLReader::XMLSyntaxError)
 	{
 		log.printf("FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
-		return false;
-	}
-	catch (XMLReader::InvalidTag e)
-	{
-		log.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::InvalidAttributeValue e)
@@ -144,6 +153,38 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		log.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
 		return false;
 	}
+	// --- FEBio Exceptions ---
+	catch (InvalidVersion)
+	{
+		log.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
+		return false;
+	}
+	catch (InvalidMaterial e)
+	{
+		log.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
+		return false;
+	}
+	catch (XMLReader::InvalidTag e)
+	{
+		log.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (InvalidDomainType)	
+	{
+		log.printf("Fatal Error: Invalid domain type\n");
+		return false;
+	}
+	catch (FailedCreatingDomain)
+	{
+		log.printf("Fatal Error: Failed creating domain\n");
+		return false;
+	}
+	catch (InvalidElementType)
+	{
+		log.printf("Fatal Error: Invalid element type\n");
+		return false;
+	}
+	// --- Unknown exceptions ---
 	catch (...)
 	{
 		log.printf("FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
@@ -171,42 +212,47 @@ void FEFEBioImport::ParseVersion(XMLTag &tag)
 	m_nversion = (n1 << 8) + n2;
 }
 
-//-----------------------------------------------------------------------------
+//=============================================================================
+//
+//                     M O D U L E   S E C T I O N
+//
+//=============================================================================
+//
 //! This function parses the Module section.
 //! The Module defines the type of problem the user wants to solve (solid, heat, ...)
 //!
-
-bool FEFEBioImport::ParseModuleSection(XMLTag &tag)
+void FEBioModuleSection::Parse(XMLTag &tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
+	FEAnalysis* pstep = GetStep();
 
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
 
-	assert(m_pStep && (m_pStep->m_psolver == 0));
+	assert(pstep && (pstep->m_psolver == 0));
 
-	if (strcmp(szt, "solid") == 0) m_pStep->m_psolver = new FESolidSolver(fem);
+	if (strcmp(szt, "solid") == 0) pstep->m_psolver = new FESolidSolver(fem);
 	else if (strcmp(szt, "heat") == 0)
 	{
-		m_pStep->m_psolver = new FEHeatSolver(fem);
-		m_pStep->m_nModule = FE_HEAT;
+		pstep->m_psolver = new FEHeatSolver(fem);
+		pstep->m_nModule = FE_HEAT;
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-
-	return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEFEBioImport::ParseControlSection
-//  This function parses the control section from the xml file
+//=============================================================================
 //
+//                     C O N T R O L   S E C T I O N
+//
+//=============================================================================
 
-bool FEFEBioImport::ParseControlSection(XMLTag& tag)
+void FEBioControlSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
+	FEAnalysis* pstep = GetStep();
 
 	// make sure we have a solver defined
-	if (m_pStep->m_psolver == 0) m_pStep->m_psolver = new FESolidSolver(fem);
+	if (pstep->m_psolver == 0) pstep->m_psolver = new FESolidSolver(fem);
 
 	char sztitle[256];
 
@@ -214,22 +260,22 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 	do
 	{
 		if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }
-		else if (tag == "time_steps"        ) tag.value(m_pStep->m_ntime);
-		else if (tag == "step_size"         ) tag.value(m_pStep->m_dt0);
-		else if (tag == "dtol"              ) tag.value(m_pStep->m_psolver->m_Dtol);
-		else if (tag == "ptol"              ) tag.value(m_pStep->m_psolver->m_Ptol);
-		else if (tag == "etol"              ) tag.value(m_pStep->m_psolver->m_Etol);
-		else if (tag == "rtol"              ) tag.value(m_pStep->m_psolver->m_Rtol);
-		else if (tag == "lstol"             ) tag.value(m_pStep->m_psolver->m_LStol);
-		else if (tag == "lsmin"             ) tag.value(m_pStep->m_psolver->m_LSmin);
-		else if (tag == "min_residual"      ) tag.value(m_pStep->m_psolver->m_Rmin);
-		else if (tag == "lsiter"            ) tag.value(m_pStep->m_psolver->m_LSiter);
-		else if (tag == "max_refs"          ) tag.value(m_pStep->m_psolver->m_bfgs.m_maxref);
-		else if (tag == "max_ups"           ) tag.value(m_pStep->m_psolver->m_bfgs.m_maxups);
-		else if (tag == "cmax"              ) tag.value(m_pStep->m_psolver->m_bfgs.m_cmax);
+		else if (tag == "time_steps"        ) tag.value(pstep->m_ntime);
+		else if (tag == "step_size"         ) tag.value(pstep->m_dt0);
+		else if (tag == "dtol"              ) tag.value(pstep->m_psolver->m_Dtol);
+		else if (tag == "ptol"              ) tag.value(pstep->m_psolver->m_Ptol);
+		else if (tag == "etol"              ) tag.value(pstep->m_psolver->m_Etol);
+		else if (tag == "rtol"              ) tag.value(pstep->m_psolver->m_Rtol);
+		else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_LStol);
+		else if (tag == "lsmin"             ) tag.value(pstep->m_psolver->m_LSmin);
+		else if (tag == "min_residual"      ) tag.value(pstep->m_psolver->m_Rmin);
+		else if (tag == "lsiter"            ) tag.value(pstep->m_psolver->m_LSiter);
+		else if (tag == "max_refs"          ) tag.value(pstep->m_psolver->m_bfgs.m_maxref);
+		else if (tag == "max_ups"           ) tag.value(pstep->m_psolver->m_bfgs.m_maxups);
+		else if (tag == "cmax"              ) tag.value(pstep->m_psolver->m_bfgs.m_cmax);
 		else if (tag == "optimize_bw"       ) tag.value(fem.m_bwopt);
-		else if (tag == "pressure_stiffness") tag.value(m_pStep->m_istiffpr);
-		else if (tag == "hourglass"         ) tag.value(m_pStep->m_hg);
+		else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
+		else if (tag == "hourglass"         ) tag.value(pstep->m_hg);
 		else if (tag == "symmetric_biphasic") tag.value(fem.m_bsym_poro);
 		else if (tag == "plane_strain"      )
 		{
@@ -249,32 +295,32 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "analysis")
 		{
 			const char* szt = tag.AttributeValue("type");
-			if      (strcmp(szt, "static" ) == 0) m_pStep->m_nanalysis = FE_STATIC;
-			else if (strcmp(szt, "dynamic") == 0) m_pStep->m_nanalysis = FE_DYNAMIC;
+			if      (strcmp(szt, "static" ) == 0) pstep->m_nanalysis = FE_STATIC;
+			else if (strcmp(szt, "dynamic") == 0) pstep->m_nanalysis = FE_DYNAMIC;
 			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 		}
 		else if (tag == "restart" )
 		{
 			const char* szf = tag.AttributeValue("file", true);
 			if (szf) fem.SetDumpFilename(szf);
-			tag.value(m_pStep->m_bDump);
+			tag.value(pstep->m_bDump);
 		}
 		else if (tag == "time_stepper")
 		{
-			m_pStep->m_bautostep = true;
+			pstep->m_bautostep = true;
 			++tag;
 			do
 			{
-				if      (tag == "max_retries") tag.value(m_pStep->m_maxretries);
-				else if (tag == "opt_iter"   ) tag.value(m_pStep->m_iteopt);
-				else if (tag == "dtmin"      ) tag.value(m_pStep->m_dtmin);
+				if      (tag == "max_retries") tag.value(pstep->m_maxretries);
+				else if (tag == "opt_iter"   ) tag.value(pstep->m_iteopt);
+				else if (tag == "dtmin"      ) tag.value(pstep->m_dtmin);
 				else if (tag == "dtmax"      )
 				{
-					tag.value(m_pStep->m_dtmax);
+					tag.value(pstep->m_dtmax);
 					const char* sz = tag.AttributeValue("lc", true);
-					if (sz) sscanf(sz,"%d", &m_pStep->m_nmplc);
+					if (sz) sscanf(sz,"%d", &pstep->m_nmplc);
 				}
-				else if (tag == "aggressiveness") tag.value(m_pStep->m_naggr);
+				else if (tag == "aggressiveness") tag.value(pstep->m_naggr);
 				else throw XMLReader::InvalidTag(tag);
 
 				++tag;
@@ -286,10 +332,10 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 			char szval[256];
 			tag.value(szval);
 			if		(strcmp(szval, "PLOT_DEFAULT"    ) == 0) {} // don't change the plot level
-			else if (strcmp(szval, "PLOT_NEVER"      ) == 0) m_pStep->SetPlotLevel(FE_PLOT_NEVER);
-			else if (strcmp(szval, "PLOT_MAJOR_ITRS" ) == 0) m_pStep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
-			else if (strcmp(szval, "PLOT_MINOR_ITRS" ) == 0) m_pStep->SetPlotLevel(FE_PLOT_MINOR_ITRS);
-			else if (strcmp(szval, "PLOT_MUST_POINTS") == 0) m_pStep->SetPlotLevel(FE_PLOT_MUST_POINTS);
+			else if (strcmp(szval, "PLOT_NEVER"      ) == 0) pstep->SetPlotLevel(FE_PLOT_NEVER);
+			else if (strcmp(szval, "PLOT_MAJOR_ITRS" ) == 0) pstep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
+			else if (strcmp(szval, "PLOT_MINOR_ITRS" ) == 0) pstep->SetPlotLevel(FE_PLOT_MINOR_ITRS);
+			else if (strcmp(szval, "PLOT_MUST_POINTS") == 0) pstep->SetPlotLevel(FE_PLOT_MUST_POINTS);
 			else throw XMLReader::InvalidValue(tag);
 		}
 		else if (tag == "print_level")
@@ -297,11 +343,11 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 			char szval[256];
 			tag.value(szval);
 			if      (strcmp(szval, "PRINT_DEFAULT"       ) == 0) {} // don't change the default print level
-			else if (strcmp(szval, "PRINT_NEVER"         ) == 0) m_pStep->SetPrintLevel(FE_PRINT_NEVER);
-			else if (strcmp(szval, "PRINT_PROGRESS"      ) == 0) m_pStep->SetPrintLevel(FE_PRINT_PROGRESS);
-			else if (strcmp(szval, "PRINT_MAJOR_ITRS"    ) == 0) m_pStep->SetPrintLevel(FE_PRINT_MAJOR_ITRS);
-			else if (strcmp(szval, "PRINT_MINOR_ITRS"    ) == 0) m_pStep->SetPrintLevel(FE_PRINT_MINOR_ITRS);
-			else if (strcmp(szval, "PRINT_MINOR_ITRS_EXP") == 0) m_pStep->SetPrintLevel(FE_PRINT_MINOR_ITRS_EXP);
+			else if (strcmp(szval, "PRINT_NEVER"         ) == 0) pstep->SetPrintLevel(FE_PRINT_NEVER);
+			else if (strcmp(szval, "PRINT_PROGRESS"      ) == 0) pstep->SetPrintLevel(FE_PRINT_PROGRESS);
+			else if (strcmp(szval, "PRINT_MAJOR_ITRS"    ) == 0) pstep->SetPrintLevel(FE_PRINT_MAJOR_ITRS);
+			else if (strcmp(szval, "PRINT_MINOR_ITRS"    ) == 0) pstep->SetPrintLevel(FE_PRINT_MINOR_ITRS);
+			else if (strcmp(szval, "PRINT_MINOR_ITRS_EXP") == 0) pstep->SetPrintLevel(FE_PRINT_MINOR_ITRS_EXP);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		else if (tag == "use_three_field_hex") tag.value(fem.m_b3field);
@@ -326,17 +372,17 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 					{
 						if (tag.isleaf())
 						{
-							if (strcmp(szv, "GAUSS4") == 0) m_ntet4 = ET_TET4;
-							else if (strcmp(szv, "GAUSS1") == 0) m_ntet4 = ET_TETG1;
-							else if (strcmp(szv, "UT4") == 0) m_ntet4 = ET_UT4;
+							if (strcmp(szv, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
+							else if (strcmp(szv, "GAUSS1") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TETG1;
+							else if (strcmp(szv, "UT4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
 							else throw XMLReader::InvalidValue(tag);
 						}
 						else
 						{
 							const char* szt = tag.AttributeValue("type");
-							if (strcmp(szt, "GAUSS4") == 0) m_ntet4 = ET_TET4;
-							else if (strcmp(szt, "GAUSS1") == 0) m_ntet4 = ET_TETG1;
-							else if (strcmp(szt, "UT4") == 0) m_ntet4 = ET_UT4;
+							if (strcmp(szt, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
+							else if (strcmp(szt, "GAUSS1") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TETG1;
+							else if (strcmp(szt, "UT4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
 							else throw XMLReader::InvalidAttributeValue(tag, "type", szv);
 
 							++tag;
@@ -410,8 +456,6 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-
-	return true;
 }
 
 //=============================================================================
@@ -420,9 +464,9 @@ bool FEFEBioImport::ParseControlSection(XMLTag& tag)
 //
 //=============================================================================
 
-bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
+void FEBioMaterialSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	const char* sztype = 0;
 	const char* szname = 0;
@@ -450,7 +494,7 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
 		if (pm)
 		{
-			if (m_nversion <= 0x0100)
+			if (m_pim->Version() <= 0x0100)
 			{
 				// older versions have the rigid degrees of freedom constrained
 				for (int i=0; i<6; ++i) pm->m_bc[i] = -1;
@@ -494,7 +538,6 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 			{
 				log.printbox("INPUT ERROR", "Invalid base material ID for material %d\n", i+1);
 				throw XMLReader::Error();
-				return false;
 			}
 
 			// make sure the base material is a valid material (i.e. an elastic material)
@@ -505,7 +548,6 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 			{
 				log.printbox("INPUT ERROR", "Invalid base material for material %d\n", i+1);
 				throw XMLReader::Error();
-				return false;
 			}
 
 			// set the base material pointer
@@ -531,7 +573,6 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 				{
 					log.printbox("INPUT ERROR", "Invalid material ID %d in solid mixture %d\n",imat+1,i+1);
 					throw XMLReader::Error();
-					return false;
 				}
 				
 				// make sure the  material is a valid material (i.e. an elastic material, possibly incompressible)
@@ -540,7 +581,6 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 				{
 					log.printbox("INPUT ERROR", "Invalid elastic material %d in solid mixture %d\n",imat+1,i+1);
 					throw XMLReader::Error();
-					return false;
 				}
 				else
 				{
@@ -554,15 +594,12 @@ bool FEFEBioImport::ParseMaterialSection(XMLTag& tag)
 			}
 		}
 	}
-	
-	// all done!
-	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
+void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	// get the material's parameter list
 	FEParameterList* pl = pmat->GetParameterList();
@@ -622,7 +659,7 @@ void FEFEBioImport::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 //-----------------------------------------------------------------------------
 // Parse FEElasticMaterial 
 //
-bool FEFEBioImport::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *pm)
+bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *pm)
 {
 	// read the material axis
 	if (tag == "mat_axis")
@@ -671,7 +708,7 @@ bool FEFEBioImport::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *pm)
 //-----------------------------------------------------------------------------
 // Parse FETransverselyIsotropic
 //
-bool FEFEBioImport::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsotropic *pm)
+bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsotropic *pm)
 {
 	// read material fibers
 	if (tag == "fiber")
@@ -755,13 +792,14 @@ bool FEFEBioImport::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsotropic *
 //-----------------------------------------------------------------------------
 // Read rigid materials
 //
-bool FEFEBioImport::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
+bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
+	FEAnalysis* pStep = GetStep();
 
 	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
 	else if (tag == "parent_id") { tag.value(pm->m_pmid); return true; }
-	else if (m_nversion <= 0x0100)
+	else if (m_pim->Version() <= 0x0100)
 	{
 		// The following tags are only allowed in older version of FEBio
 		// Newer versions defined the rigid body constraints in the Constraints section
@@ -791,11 +829,11 @@ bool FEFEBioImport::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 				fem.m_RDC.push_back(pDC);
 
 				// add this boundary condition to the current step
-				if (m_nsteps > 0)
+				if (m_pim->m_nsteps > 0)
 				{
 					int n = fem.m_RDC.size()-1;
 					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-					m_pStep->AddBoundaryCondition(pDC);
+					pStep->AddBoundaryCondition(pDC);
 					pDC->Deactivate();
 				}
 			}
@@ -810,11 +848,11 @@ bool FEFEBioImport::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 				fem.m_RFC.push_back(pFC);
 
 				// add this boundary condition to the current step
-				if (m_nsteps > 0)
+				if (m_pim->m_nsteps > 0)
 				{
 					int n = fem.m_RFC.size()-1;
 					FERigidBodyForce* pFC = fem.m_RFC[n];
-					m_pStep->AddBoundaryCondition(pFC);
+					pStep->AddBoundaryCondition(pFC);
 					pFC->Deactivate();
 				}
 			}
@@ -847,11 +885,11 @@ bool FEFEBioImport::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 				fem.m_RDC.push_back(pDC);
 
 				// add this boundary condition to the current step
-				if (m_nsteps > 0)
+				if (m_pim->m_nsteps > 0)
 				{
 					int n = fem.m_RDC.size()-1;
 					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-					m_pStep->AddBoundaryCondition(pDC);
+					pStep->AddBoundaryCondition(pDC);
 					pDC->Deactivate();
 				}
 			}
@@ -866,11 +904,11 @@ bool FEFEBioImport::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 				fem.m_RFC.push_back(pFC);
 
 				// add this boundary condition to the current step
-				if (m_nsteps > 0)
+				if (m_pim->m_nsteps > 0)
 				{
 					int n = fem.m_RFC.size()-1;
 					FERigidBodyForce* pFC = fem.m_RFC[n];
-					m_pStep->AddBoundaryCondition(pFC);
+					pStep->AddBoundaryCondition(pFC);
 					pFC->Deactivate();
 				}
 			}
@@ -883,17 +921,32 @@ bool FEFEBioImport::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 
 //=============================================================================
 //
-//                     N O D E   S E C T I O N
+//                       G E O M E T R Y   S E C T I O N
 //
 //=============================================================================
+//!  Parses the geometry section from the xml file
+//!
+void FEBioGeometrySection::Parse(XMLTag& tag)
+{
+	++tag;
+	do
+	{
+		if      (tag == "Nodes"      ) ParseNodeSection       (tag);
+		else if (tag == "Elements"   ) ParseElementSection    (tag);
+		else if (tag == "ElementData") ParseElementDataSection(tag);
+		else if (tag == "Groups"     ) ParseGroupSection      (tag);
+		else throw XMLReader::InvalidTag(tag);
 
+		++tag;
+	}
+	while (!tag.isend());
+}
 
 //-----------------------------------------------------------------------------
 //! Reads the Nodes section of the FEBio input file
-
-bool FEFEBioImport::ParseNodeSection(XMLTag& tag)
+void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	int i;
 	FEMesh& mesh = fem.m_mesh;
 
@@ -940,15 +993,13 @@ bool FEFEBioImport::ParseNodeSection(XMLTag& tag)
 
 		++tag;
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! find the domain type for the element and material type
-int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
+int FEBioGeometrySection::DomainType(XMLTag& t, FEMaterial* pmat)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	FEMesh* pm = &fem.m_mesh;
 
 	// get the module
@@ -987,7 +1038,7 @@ int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
 			}
 			else if (t == "tet4")
 			{
-				if (m_ntet4 == ET_UT4) return FE_UT4_DOMAIN;
+				if (m_pim->m_ntet4 == FEFEBioImport::ET_UT4) return FE_UT4_DOMAIN;
 				else return FE_SOLID_DOMAIN;
 			}
 			else if (t == "penta6") 
@@ -1007,7 +1058,7 @@ int FEFEBioImport::DomainType(XMLTag& t, FEMaterial* pmat)
 
 //-----------------------------------------------------------------------------
 //! Create a particular type of domain
-FEDomain* FEFEBioImport::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
+FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
 {
 	// create a new domain based on the type
 	FEDomain* pd = 0;
@@ -1035,9 +1086,9 @@ FEDomain* FEFEBioImport::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
 //! by the module (structural, poro, heat, etc), the element type (solid, shell,
 //! etc.) and the material. 
 //!
-bool FEFEBioImport::ParseElementSection(XMLTag& tag)
+void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	int i;
 
 	FEMesh& mesh = fem.m_mesh;
@@ -1062,11 +1113,11 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			// if we don't, create a domain for the current element and material type
 			// first, find the domain type
 			int ntype = DomainType(t, pmat);
-			if (ntype == 0) return errf("Invalid domain type.");
+			if (ntype == 0) throw FEFEBioImport::InvalidDomainType();
 
 			// create the new domain
 			pdom = CreateDomain(ntype, &mesh, pmat);
-			if (pdom == 0) return errf("Failed creating domain.");
+			if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
 
 			// reset element counter
 			nel = 1;
@@ -1091,7 +1142,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 				// create a new domain
 				pdom = CreateDomain(ntype, &mesh, pmat);
-				if (pdom == 0) return errf("Failed creating domain.");
+				if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
 
 				// reset element counter
 				nel = 1;
@@ -1118,7 +1169,7 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 			nmat = atoi(tag.AttributeValue("mat"))-1;
 
 			// make sure the material number is valid
-			if ((nmat<0) || (nmat >= fem.Materials())) throw InvalidMaterial(i+1);
+			if ((nmat<0) || (nmat >= fem.Materials())) throw FEFEBioImport::InvalidMaterial(i+1);
 
 			// get the material class
 			FEMaterial* pmat = fem.GetMaterial(nmat);
@@ -1126,61 +1177,61 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 
 			// determine element type
 			int etype = -1;
-			if      (tag == "hex8"  ) etype = ET_HEX8;
-			else if (tag == "penta6") etype = ET_PENTA6;
-			else if (tag == "tet4"  ) etype = m_ntet4;
-			else if (tag == "quad4" ) etype = ET_QUAD4;
-			else if (tag == "tri3"  ) etype = ET_TRI3;
-			else if (tag == "truss2") etype = ET_TRUSS2;
+			if      (tag == "hex8"  ) etype = FEFEBioImport::ET_HEX8;
+			else if (tag == "penta6") etype = FEFEBioImport::ET_PENTA6;
+			else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
+			else if (tag == "quad4" ) etype = FEFEBioImport::ET_QUAD4;
+			else if (tag == "tri3"  ) etype = FEFEBioImport::ET_TRI3;
+			else if (tag == "truss2") etype = FEFEBioImport::ET_TRUSS2;
 			else throw XMLReader::InvalidTag(tag);
 
 			switch (etype)
 			{
-			case ET_HEX8:
+			case FEFEBioImport::ET_HEX8:
 				{
 					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 					ReadSolidElement(tag, bd.Element(i), fem.m_nhex8, nid, nd, nmat);
 				}
 				break;
-			case ET_PENTA6:
+			case FEFEBioImport::ET_PENTA6:
 				{
 					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 					ReadSolidElement(tag, bd.Element(i), FE_PENTA, nid, nd, nmat);
 				}
 				break;
-			case ET_TET4:
-			case ET_UT4:
+			case FEFEBioImport::ET_TET4:
+			case FEFEBioImport::ET_UT4:
 				{
 					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 					ReadSolidElement(tag, bd.Element(i), FE_TET, nid, nd, nmat);
 				}
 				break;
-			case ET_TETG1:
+			case FEFEBioImport::ET_TETG1:
 				{
 					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 					ReadSolidElement(tag, bd.Element(i), FE_TETG1, nid, nd, nmat);
 				}
 				break;
-			case ET_QUAD4:
+			case FEFEBioImport::ET_QUAD4:
 				{
 					FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 					ReadShellElement(tag, sd.Element(i), FE_SHELL_QUAD, nid, nd, nmat);
 				}
 				break;
-			case ET_TRI3:
+			case FEFEBioImport::ET_TRI3:
 				{
 					FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 					ReadShellElement(tag, sd.Element(i), FE_SHELL_TRI, nid, nd, nmat);
 				}
 				break;
-			case ET_TRUSS2:
+			case FEFEBioImport::ET_TRUSS2:
 				{
 					FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
 					ReadTrussElement(tag, td.Element(i), FE_TRUSS, nid, nd, nmat);
 				}
 				break;
 			default:
-				return errf("Invalid element type.");
+				throw FEFEBioImport::InvalidElementType();
 			}
 
 			// go to next tag
@@ -1194,12 +1245,10 @@ bool FEFEBioImport::ParseElementSection(XMLTag& tag)
 		FEDomain& d = mesh.Domain(i);
 		d.InitMaterialPointData();
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype, int nid, int gid, int nmat)
+void FEBioGeometrySection::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype, int nid, int gid, int nmat)
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
@@ -1211,7 +1260,7 @@ void FEFEBioImport::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype,
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype, int nid, int gid, int nmat)
+void FEBioGeometrySection::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype, int nid, int gid, int nmat)
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
@@ -1223,7 +1272,7 @@ void FEFEBioImport::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype,
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ReadTrussElement(XMLTag &tag, FETrussElement& el, int ntype, int nid, int gid, int nmat)
+void FEBioGeometrySection::ReadTrussElement(XMLTag &tag, FETrussElement& el, int ntype, int nid, int gid, int nmat)
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
@@ -1237,58 +1286,15 @@ void FEFEBioImport::ReadTrussElement(XMLTag &tag, FETrussElement& el, int ntype,
 	el.m_a0 = 0;
 }
 
-//-----------------------------------------------------------------------------
-//! Read the NodeData section from the FEBio input file
-
-bool FEFEBioImport::ParseInitialSection(XMLTag& tag)
-{
-	if (tag.isleaf()) return true;
-
-	FEM& fem = *m_pfem;
-	FEMesh& mesh = fem.m_mesh;
-
-	// make sure we've read the nodes section
-	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
-
-	for (int i=0; i<mesh.Nodes(); ++i) mesh.Node(i).m_v0 = vec3d(0,0,0);
-
-	// read nodal data
-	++tag;
-	do
-	{
-		if (tag == "velocity")
-		{
-			++tag;
-			do
-			{
-				if (tag == "node")
-				{
-					int nid = atoi(tag.AttributeValue("id"))-1;
-					vec3d v;
-					tag.value(v);
-					mesh.Node(nid).m_v0 += v;
-				}
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
-		}
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
-
-	return true;
-}
 
 //-----------------------------------------------------------------------------
 //! Reads the ElementData section from the FEBio input file
 
-bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
+void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 {
 	int i;
 
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	FEMesh& mesh = fem.m_mesh;
 
 	// get the total nr of elements
@@ -1453,19 +1459,17 @@ bool FEFEBioImport::ParseElementDataSection(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Reads the Geometry::Groups section of the FEBio input file
 
-bool FEFEBioImport::ParseGroupSection(XMLTag& tag)
+void FEBioGeometrySection::ParseGroupSection(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	FEMesh &mesh = fem.m_mesh;
 
-	if (tag.isleaf()) return true;
+	if (tag.isleaf()) return;
 
 	++tag;
 	do
@@ -1560,74 +1564,100 @@ bool FEFEBioImport::ParseGroupSection(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-
-	return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEFEBioImport::ParseGeometrySection
-//  Parses the geometry section from the xml file
+//---------------------------------------------------------------------------------
+// parse a surface section for contact definitions
 //
-
-bool FEFEBioImport::ParseGeometrySection(XMLTag& tag)
+bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 {
+	FEM& fem = *GetFEM();
+	FEMesh& m = fem.m_mesh;
+
+	// count nr of faces
+	int faces = 0, N, nf[4];
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { faces++; ++t; }
+
+	// allocate storage for faces
+	s.create(faces);
+
+	// read faces
 	++tag;
-	do
+	for (int i=0; i<faces; ++i)
 	{
-		if (tag == "Nodes") ParseNodeSection(tag);
-		else if (tag == "Elements") ParseElementSection(tag);
-		else if (tag == "ElementData") ParseElementDataSection(tag);
-		else if (tag == "Groups") ParseGroupSection(tag);
+		FESurfaceElement& el = s.Element(i);
+
+		if (tag == "quad4") el.SetType(FE_NIQUAD);
+		else if (tag == "tri3") el.SetType(FE_NITRI);
 		else throw XMLReader::InvalidTag(tag);
+
+		N = el.Nodes();
+
+		if (nfmt == 0)
+		{
+			tag.value(nf, N);
+			for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+		}
+		else if (nfmt == 1)
+		{
+			tag.value(nf, 2);
+			FEElement* pe = m.FindElementFromID(nf[0]);
+			if (pe)
+			{
+				int ne[4];
+				int nn = m.GetFace(*pe, nf[1]-1, ne);
+				if (nn != N) throw XMLReader::InvalidValue(tag);
+				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
+				el.m_nelem = nf[0];
+			}
+			else throw XMLReader::InvalidValue(tag);
+		}
 
 		++tag;
 	}
-	while (!tag.isend());
-
 	return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEFEBioImport::ParseBoundarySection
-//  Parses the boundary section from the xml file
+//=============================================================================
 //
-
-bool FEFEBioImport::ParseBoundarySection(XMLTag& tag)
+//                       B O U N D A R Y   S E C T I O N
+//
+//=============================================================================
+//!  Parses the boundary section from the xml file
+//!
+void FEBioBoundarySection::Parse(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
-
 	// make sure this tag has children
-	if (tag.isleaf()) return true;
+	if (tag.isleaf()) return;
 
 	++tag;
 	do
 	{
-		if      (tag == "fix"      ) ParseBCFix      (tag);
-		else if (tag == "prescribe") ParseBCPrescribe(tag);
-		else if (tag == "force"    ) ParseBCForce    (tag);
-		else if (tag == "pressure" ) ParseBCPressure (tag);
-		else if (tag == "traction" ) ParseBCTraction (tag);
-		else if (tag == "poro_normal_traction" ) ParseBCPoroNormalTraction (tag);
-		else if (tag == "fluidflux") ParseBCFluidFlux(tag);
-		else if (tag == "heatflux" ) ParseBCHeatFlux (tag);
-		else if (tag == "contact") ParseContactSection(tag);
-		else if (tag == "linear_constraint") ParseConstraints(tag);
-		else if (tag == "spring") ParseSpringSection(tag);
+		if      (tag == "fix"                  ) ParseBCFix               (tag);
+		else if (tag == "prescribe"            ) ParseBCPrescribe         (tag);
+		else if (tag == "force"                ) ParseBCForce             (tag);
+		else if (tag == "pressure"             ) ParseBCPressure          (tag);
+		else if (tag == "traction"             ) ParseBCTraction          (tag);
+		else if (tag == "poro_normal_traction" ) ParseBCPoroNormalTraction(tag);
+		else if (tag == "fluidflux"            ) ParseBCFluidFlux         (tag);
+		else if (tag == "heatflux"             ) ParseBCHeatFlux          (tag);
+		else if (tag == "contact"              ) ParseContactSection      (tag);
+		else if (tag == "linear_constraint"    ) ParseConstraints         (tag);
+		else if (tag == "spring"               ) ParseSpringSection       (tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCFix(XMLTag &tag)
+void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	// make sure this section does not appear in a step section
-	if (m_nsteps != 0) throw XMLReader::InvalidTag(tag);
+	if (m_pim->m_nsteps != 0) throw XMLReader::InvalidTag(tag);
 
 	// Read the fixed nodes
 	++tag;
@@ -1659,9 +1689,9 @@ void FEFEBioImport::ParseBCFix(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCPrescribe(XMLTag& tag)
+void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	// count how many prescibed nodes there are
 	int ndis = 0;
@@ -1696,9 +1726,9 @@ void FEFEBioImport::ParseBCPrescribe(XMLTag& tag)
 		tag.value(fem.m_DC[i].s);
 
 		// add this boundary condition to the current step
-		if (m_nsteps > 0)
+		if (m_pim->m_nsteps > 0)
 		{
-			m_pStep->AddBoundaryCondition(&fem.m_DC[i]);
+			GetStep()->AddBoundaryCondition(&fem.m_DC[i]);
 			fem.m_DC[i].Deactivate();
 		}
 		++tag;
@@ -1706,9 +1736,9 @@ void FEFEBioImport::ParseBCPrescribe(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCForce(XMLTag &tag)
+void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	// count how many nodal forces there are
 	int ncnf = 0;
@@ -1743,9 +1773,9 @@ void FEFEBioImport::ParseBCForce(XMLTag &tag)
 		tag.value(fem.m_FC[i].s);
 
 		// add this boundary condition to the current step
-		if (m_nsteps > 0)
+		if (m_pim->m_nsteps > 0)
 		{
-			m_pStep->AddBoundaryCondition(&fem.m_FC[i]);
+			GetStep()->AddBoundaryCondition(&fem.m_FC[i]);
 			fem.m_FC[i].Deactivate();
 		}
 
@@ -1754,9 +1784,9 @@ void FEFEBioImport::ParseBCForce(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCPressure(XMLTag& tag)
+void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	const char* sz;
 	bool blinear = false;
@@ -1803,9 +1833,9 @@ void FEFEBioImport::ParseBCPressure(XMLTag& tag)
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 
 		// add this boundary condition to the current step
-		if (m_nsteps > 0)
+		if (m_pim->m_nsteps > 0)
 		{
-			m_pStep->AddBoundaryCondition(&pc);
+			GetStep()->AddBoundaryCondition(&pc);
 			pc.Deactivate();
 		}
 
@@ -1814,9 +1844,9 @@ void FEFEBioImport::ParseBCPressure(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCTraction(XMLTag &tag)
+void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	const char* sz;
 
@@ -1857,9 +1887,9 @@ void FEFEBioImport::ParseBCTraction(XMLTag &tag)
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 
 		// add this boundary condition to the current step
-		if (m_nsteps > 0)
+		if (m_pim->m_nsteps > 0)
 		{
-			m_pStep->AddBoundaryCondition(&tc);
+			GetStep()->AddBoundaryCondition(&tc);
 			tc.Deactivate();
 		}
 
@@ -1868,9 +1898,9 @@ void FEFEBioImport::ParseBCTraction(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCPoroNormalTraction(XMLTag& tag)
+void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	
 	const char* sz;
 	bool blinear = false;
@@ -1927,9 +1957,9 @@ void FEFEBioImport::ParseBCPoroNormalTraction(XMLTag& tag)
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 		
 		// add this boundary condition to the current step
-		if (m_nsteps > 0)
+		if (m_pim->m_nsteps > 0)
 		{
-			m_pStep->AddBoundaryCondition(&pc);
+			GetStep()->AddBoundaryCondition(&pc);
 			pc.Deactivate();
 		}
 		
@@ -1938,9 +1968,9 @@ void FEFEBioImport::ParseBCPoroNormalTraction(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCFluidFlux(XMLTag &tag)
+void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	const char* sz;
 	bool blinear = false;
@@ -1987,9 +2017,9 @@ void FEFEBioImport::ParseBCFluidFlux(XMLTag &tag)
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 		
 		// add this boundary condition to the current step
-		if (m_nsteps > 0)
+		if (m_pim->m_nsteps > 0)
 		{
-			m_pStep->AddBoundaryCondition(&fc);
+			GetStep()->AddBoundaryCondition(&fc);
 			fc.Deactivate();
 		}
 		
@@ -1998,9 +2028,9 @@ void FEFEBioImport::ParseBCFluidFlux(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseBCHeatFlux(XMLTag& tag)
+void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	// count how many heatflux cards there are
 	int npr = 0;
@@ -2038,9 +2068,9 @@ void FEFEBioImport::ParseBCHeatFlux(XMLTag& tag)
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 
 		// add this boundary condition to the current step
-		if (m_nsteps > 0)
+		if (m_pim->m_nsteps > 0)
 		{
-			m_pStep->AddBoundaryCondition(&pc);
+			GetStep()->AddBoundaryCondition(&pc);
 			pc.Deactivate();
 		}
 
@@ -2049,9 +2079,9 @@ void FEFEBioImport::ParseBCHeatFlux(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEFEBioImport::ParseSpringSection(XMLTag &tag)
+void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	FEMesh& mesh = fem.m_mesh;
 
 	// determine the spring type
@@ -2119,12 +2149,12 @@ void FEFEBioImport::ParseSpringSection(XMLTag &tag)
 //! Parse the linear constraints section of the xml input file
 //! This section is a subsection of the Boundary section
 
-bool FEFEBioImport::ParseConstraints(XMLTag& tag)
+void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	// make sure there is a constraint defined
-	if (tag.isleaf()) return true;
+	if (tag.isleaf()) return;
 
 	// read the master node
 	FELinearConstraint LC;
@@ -2168,8 +2198,6 @@ bool FEFEBioImport::ParseConstraints(XMLTag& tag)
 
 	// add the linear constraint to the system
 	fem.m_LinC.push_back(LC);
-
-	return true;
 }
 
 
@@ -2177,9 +2205,9 @@ bool FEFEBioImport::ParseConstraints(XMLTag& tag)
 //! Parses the contact section of the xml input file
 //! The contact section is a subsection of the boundary section
 
-bool FEFEBioImport::ParseContactSection(XMLTag& tag)
+void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	FEMesh& m = fem.m_mesh;
 
 	const char* szt = tag.AttributeValue("type");
@@ -2635,9 +2663,9 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 			fem.m_RN[i].nid = id;
 			fem.m_RN[i].rid = rb;
 
-			if (m_nsteps > 0)
+			if (m_pim->m_nsteps > 0)
 			{
-				m_pStep->AddBoundaryCondition(&fem.m_RN[i]);
+				GetStep()->AddBoundaryCondition(&fem.m_RN[i]);
 				fem.m_RN[i].Deactivate();
 			}
 
@@ -2670,10 +2698,10 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 	}
 	else if (strcmp(szt, "linear constraint") == 0)
 	{
-		FEM& fem = *m_pfem;
+		FEM& fem = *GetFEM();
 
 		// make sure there is a constraint defined
-		if (tag.isleaf()) return true;
+		if (tag.isleaf()) return;
 
 		// create a new linear constraint manager
 		FELinearConstraintSet* pLCS = new FELinearConstraintSet(&fem);
@@ -2723,18 +2751,65 @@ bool FEFEBioImport::ParseContactSection(XMLTag& tag)
 		while (!tag.isend());
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-
-	return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEFEBioImport::ParseGlobalsSection
-//  This function reads the global variables from the xml file
+//=============================================================================
 //
-
-bool FEFEBioImport::ParseGlobalsSection(XMLTag& tag)
+//                     I N I T I A L   S E C T I O N
+//
+//=============================================================================
+//! Read the Initial from the FEBio input file
+//!
+void FEBioInitialSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	if (tag.isleaf()) return;
+
+	FEM& fem = *GetFEM();
+	FEMesh& mesh = fem.m_mesh;
+
+	// make sure we've read the nodes section
+	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
+
+	for (int i=0; i<mesh.Nodes(); ++i) mesh.Node(i).m_v0 = vec3d(0,0,0);
+
+	// read nodal data
+	++tag;
+	do
+	{
+		if (tag == "velocity")
+		{
+			++tag;
+			do
+			{
+				if (tag == "node")
+				{
+					int nid = atoi(tag.AttributeValue("id"))-1;
+					vec3d v;
+					tag.value(v);
+					mesh.Node(nid).m_v0 += v;
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//=============================================================================
+//
+//                       G L O B A L S   S E C T I O N
+//
+//=============================================================================
+//
+//!  This function reads the global variables from the xml file
+//!
+void FEBioGlobalsSection::Parse(XMLTag& tag)
+{
+	FEM& fem = *GetFEM();
 
 	fem.m_BF[0].lc = -1;
 	fem.m_BF[1].lc = -1;
@@ -2769,18 +2844,19 @@ bool FEFEBioImport::ParseGlobalsSection(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-
-	return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEFEBioImport::ParseLoadSection
-//  This function reads the load data section from the xml file
+//=============================================================================
 //
-
-bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
+//                     L O A D D A T A   S E C T I O N
+//
+//=============================================================================
+//
+//!  This function reads the load data section from the xml file
+//!
+void FEBioLoadSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 
 	++tag;
 	do
@@ -2842,15 +2918,16 @@ bool FEFEBioImport::ParseLoadSection(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-
-	return true;
 }
 
-//-----------------------------------------------------------------------------
-
-bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
+//=============================================================================
+//
+//                        O U T P U T   S E C T I O N
+//
+//=============================================================================
+void FEBioOutputSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
 	FEMesh& mesh = fem.m_mesh;
 
 	const char* sz;
@@ -2867,7 +2944,7 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 				{
 					sz = tag.AttributeValue("file", true);
 
-					NodeDataRecord* prec = new NodeDataRecord(m_pfem, sz);
+					NodeDataRecord* prec = new NodeDataRecord(&fem, sz);
 					sz = tag.AttributeValue("data");
 					strcpy(prec->m_szdata, sz);
 
@@ -2914,7 +2991,7 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 				{
 					sz = tag.AttributeValue("file", true);
 
-					ElementDataRecord* prec = new ElementDataRecord(m_pfem, sz);
+					ElementDataRecord* prec = new ElementDataRecord(&fem, sz);
 					sz = tag.AttributeValue("data");
 					strcpy(prec->m_szdata, sz);
 
@@ -2940,7 +3017,7 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 				{
 					sz = tag.AttributeValue("file", true);
 
-					RigidBodyDataRecord* prec = new RigidBodyDataRecord(m_pfem, sz);
+					RigidBodyDataRecord* prec = new RigidBodyDataRecord(&fem, sz);
 					sz = tag.AttributeValue("data");
 					strcpy(prec->m_szdata, sz);
 
@@ -3042,101 +3119,24 @@ bool FEFEBioImport::ParseOutputSection(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-
-	return  true;
 }
 
-//-----------------------------------------------------------------------------
+//=============================================================================
+//
+//                  C O N S T R A I N T S   S E C T I O N
+//
+//=============================================================================
 
-bool FEFEBioImport::ParseStepSection(XMLTag& tag)
+void FEBioConstraintsSection::Parse(XMLTag &tag)
 {
-	// We assume that the FEM object will already have at least one step
-	// defined. Therefor the first time we find a "step" section we
-	// do not create a new step. If more steps are required
-	// we need to create new FEAnalysis steps and add them to fem
-	if (m_nsteps != 0)
-	{
-		m_pStep = new FEAnalysis(*m_pfem);
-		m_pfem->m_Step.push_back(m_pStep);
-	}
+	// This section is only allowed in the new format
+	if (m_pim->Version() < 0x0101) throw XMLReader::InvalidTag(tag);
 
-	// increase the step section counter
-	++m_nsteps;
+	// make sure there is something to read
+	if (tag.isleaf()) return;
 
-	++tag;
-	do
-	{
-		if      (tag == "Control"    ) ParseControlSection   (tag);
-		else if (tag == "Boundary"   ) ParseBoundarySection  (tag);
-		else if (tag == "Constraints") ParseConstraintSection(tag);
-		else throw XMLReader::InvalidTag(tag);
-
-		++tag;
-	}
-	while (!tag.isend());
-
-	return true;
-}
-
-//---------------------------------------------------------------------------------
-
-bool FEFEBioImport::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
-{
-	FEM& fem = *m_pfem;
-	FEMesh& m = fem.m_mesh;
-
-	// count nr of faces
-	int faces = 0, N, nf[4];
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { faces++; ++t; }
-
-	// allocate storage for faces
-	s.create(faces);
-
-	// read faces
-	++tag;
-	for (int i=0; i<faces; ++i)
-	{
-		FESurfaceElement& el = s.Element(i);
-
-		if (tag == "quad4") el.SetType(FE_NIQUAD);
-		else if (tag == "tri3") el.SetType(FE_NITRI);
-		else throw XMLReader::InvalidTag(tag);
-
-		N = el.Nodes();
-
-		if (nfmt == 0)
-		{
-			tag.value(nf, N);
-			for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
-		}
-		else if (nfmt == 1)
-		{
-			tag.value(nf, 2);
-			FEElement* pe = m.FindElementFromID(nf[0]);
-			if (pe)
-			{
-				int ne[4];
-				int nn = m.GetFace(*pe, nf[1]-1, ne);
-				if (nn != N) throw XMLReader::InvalidValue(tag);
-				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
-				el.m_nelem = nf[0];
-			}
-			else throw XMLReader::InvalidValue(tag);
-		}
-
-		++tag;
-	}
-	return true;
-}
-
-//---------------------------------------------------------------------------------
-
-bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
-{
-	if (tag.isleaf()) return true;
-
-	FEM& fem = *m_pfem;
+	FEM& fem = *GetFEM();
+	FEAnalysis* pStep = GetStep();
 
 	++tag;
 	do
@@ -3179,11 +3179,11 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pm->m_bc[bc] = lc;
 
 						// add this boundary condition to the current step
-						if (m_nsteps > 0)
+						if (m_pim->m_nsteps > 0)
 						{
 							int n = fem.m_RDC.size()-1;
 							FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-							m_pStep->AddBoundaryCondition(pDC);
+							pStep->AddBoundaryCondition(pDC);
 							pDC->Deactivate();
 						}
 					}
@@ -3198,11 +3198,11 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pm->m_bc[bc] = 0;
 
 						// add this boundary condition to the current step
-						if (m_nsteps > 0)
+						if (m_pim->m_nsteps > 0)
 						{
 							int n = fem.m_RFC.size()-1;
 							FERigidBodyForce* pFC = fem.m_RFC[n];
-							m_pStep->AddBoundaryCondition(pFC);
+							pStep->AddBoundaryCondition(pFC);
 							pFC->Deactivate();
 						}
 					}
@@ -3233,11 +3233,11 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pm->m_bc[bc] = lc;
 
 						// add this boundary condition to the current step
-						if (m_nsteps > 0)
+						if (m_pim->m_nsteps > 0)
 						{
 							int n = fem.m_RDC.size()-1;
 							FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-							m_pStep->AddBoundaryCondition(pDC);
+							pStep->AddBoundaryCondition(pDC);
 							pDC->Deactivate();
 						}
 					}
@@ -3252,11 +3252,11 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 						pm->m_bc[bc] = 0;
 
 						// add this boundary condition to the current step
-						if (m_nsteps > 0)
+						if (m_pim->m_nsteps > 0)
 						{
 							int n = fem.m_RFC.size()-1;
 							FERigidBodyForce* pFC = fem.m_RFC[n];
-							m_pStep->AddBoundaryCondition(pFC);
+							pStep->AddBoundaryCondition(pFC);
 							pFC->Deactivate();
 						}
 					}
@@ -3272,6 +3272,43 @@ bool FEFEBioImport::ParseConstraintSection(XMLTag &tag)
 		++tag;
 	}
 	while (!tag.isend());
+}
 
-	return true;
+
+//=============================================================================
+//
+//                         S T E P   S E C T I O N
+//
+//=============================================================================
+
+void FEBioStepSection::Parse(XMLTag& tag)
+{
+	// We assume that the FEM object will already have at least one step
+	// defined. Therefor the first time we find a "step" section we
+	// do not create a new step. If more steps are required
+	// we need to create new FEAnalysis steps and add them to fem
+	if (m_pim->m_nsteps != 0)
+	{
+		m_pim->m_pStep = new FEAnalysis(*m_pim->m_pfem);
+		m_pim->m_pfem->m_Step.push_back(m_pim->m_pStep);
+	}
+
+	// increase the step section counter
+	++m_pim->m_nsteps;
+
+	std::map<string, FileSection*> Map;
+	Map["Control"    ] = new FEBioControlSection    (m_pim);
+	Map["Constraints"] = new FEBioConstraintsSection(m_pim);
+	Map["Boundary"   ] = new FEBioBoundarySection   (m_pim);
+
+	++tag;
+	do
+	{
+		std::map<string, FileSection*>::iterator is = Map.find(tag.Name());
+		if (is != Map.end()) is->second->Parse(tag);
+		else throw XMLReader::InvalidTag(tag);
+
+		++tag;
+	}
+	while (!tag.isend());
 }

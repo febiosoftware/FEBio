@@ -69,15 +69,15 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 		++tag;
 		do
 		{
-			if (tag == "Control") ParseControlSection(tag);
-			else if (tag == "Material") ParseMaterialSection(tag);
+/*			if (tag == "Control") ParseControlSection(tag);
+			if (tag == "Material") ParseMaterialSection(tag);
 			else 
 			{
 				if (m_pdia->ParseSection(tag) == false)
 					throw XMLReader::InvalidTag(tag);
 			}
 
-			// go to the next tag
+*/			// go to the next tag
 			++tag;
 		}
 		while (!tag.isend());
