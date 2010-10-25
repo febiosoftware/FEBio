@@ -74,8 +74,8 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 	}
 
 	const int NMAX = 128;
-	int N = (nz > NMAX? nz : NMAX), n;
-	for (i=0; i<NMAX; ++i)
+	int N = (nz < NMAX? nz : NMAX), n;
+	for (i=0; i<N; ++i)
 	{
 		n = l[i];
 		EQUATION& q = EQT[n];
