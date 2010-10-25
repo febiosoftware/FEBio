@@ -840,7 +840,7 @@ void FESlidingInterface2::ContactStiffness()
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
 	double detJ[4], w[4], *Hs, Hm[4], pt[4], dpr[4], dps[4];
-	double N[24];
+	double N[32];
 	matrix ke;
 
 	// set the poro flag
@@ -932,8 +932,6 @@ void FESlidingInterface2::ContactStiffness()
 				FESurfaceElement* pme = ss.m_pme[ni];
 				if (pme)
 				{
-					// --- S O L I D - S O L I D   C O N T A C T ---
-
 					FESurfaceElement& me = *pme;
 					ms.UnpackElement(me);
 					bool mporo = PoroStatus(*pm, me);
@@ -943,26 +941,57 @@ void FESlidingInterface2::ContactStiffness()
 
 					// copy the LM vector
 					mLM = me.LM();
+					
+					int ndpn;	// number of dofs per node
+					int ndof;	// number of dofs in stiffness matrix
 
-					// calculate degrees of freedom
-					int ndof = 3*(nseln + nmeln);
-
-					// build the LM vector
-					LM.resize(ndof);
-					for (k=0; k<nseln; ++k)
-					{
-						LM[3*k  ] = sLM[3*k  ];
-						LM[3*k+1] = sLM[3*k+1];
-						LM[3*k+2] = sLM[3*k+2];
+					if (sporo && mporo) {
+						// calculate degrees of freedom for biphasic-on-biphasic contact
+						ndpn = 4;
+						ndof = ndpn*(nseln+nmeln);
+						
+						// build the LM vector
+						LM.resize(ndof);
+						
+						for (k=0; k<nseln; ++k)
+						{
+							LM[4*k  ] = sLM[3*k  ];			// x-dof
+							LM[4*k+1] = sLM[3*k+1];			// y-dof
+							LM[4*k+2] = sLM[3*k+2];			// z-dof
+							LM[4*k+3] = sLM[3*nseln+k];		// p-dof
+						}
+						for (k=0; k<nmeln; ++k)
+						{
+							LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
+							LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
+							LM[4*(k+nseln)+2] = mLM[3*k+2];			// z-dof
+							LM[4*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
+						}
 					}
-
-					for (k=0; k<nmeln; ++k)
-					{
-						LM[3*(k+nseln)  ] = mLM[3*k  ];
-						LM[3*(k+nseln)+1] = mLM[3*k+1];
-						LM[3*(k+nseln)+2] = mLM[3*k+2];
+					
+					else {
+						// calculate degrees of freedom for biphasic-on-elastic or elastic-on-elastic contact
+						ndpn = 3;
+						ndof = ndpn*(nseln + nmeln);
+						
+						// build the LM vector
+						LM.resize(ndof);
+						
+						for (k=0; k<nseln; ++k)
+						{
+							LM[3*k  ] = sLM[3*k  ];
+							LM[3*k+1] = sLM[3*k+1];
+							LM[3*k+2] = sLM[3*k+2];
+						}
+						
+						for (k=0; k<nmeln; ++k)
+						{
+							LM[3*(k+nseln)  ] = mLM[3*k  ];
+							LM[3*(k+nseln)+1] = mLM[3*k+1];
+							LM[3*(k+nseln)+2] = mLM[3*k+2];
+						}
 					}
-
+					
 					// build the en vector
 					en.resize(nseln+nmeln);
 					for (k=0; k<nseln; ++k) en[k      ] = se.m_node[k];
@@ -994,66 +1023,75 @@ void FESlidingInterface2::ContactStiffness()
 
 //					double dtn = m_eps*HEAVYSIDE(Lm + eps*g);
 					double dtn = (tn > 0.? eps :0.);
-
+					
+					// create the stiffness matrix
+					ke.Create(ndof, ndof); ke.zero();
+					
+					// --- S O L I D - S O L I D   C O N T A C T ---
+					
 					// a. NxN-term
 					//------------------------------------
-
+					
 					// calculate the N-vector
 					for (k=0; k<nseln; ++k)
 					{
-						N[3*k  ] = Hs[k]*nu.x;
-						N[3*k+1] = Hs[k]*nu.y;
-						N[3*k+2] = Hs[k]*nu.z;
+						N[ndpn*k  ] = Hs[k]*nu.x;
+						N[ndpn*k+1] = Hs[k]*nu.y;
+						N[ndpn*k+2] = Hs[k]*nu.z;
 					}
-
+					
 					for (k=0; k<nmeln; ++k)
 					{
-						N[3*(k+nseln)  ] = -Hm[k]*nu.x;
-						N[3*(k+nseln)+1] = -Hm[k]*nu.y;
-						N[3*(k+nseln)+2] = -Hm[k]*nu.z;
+						N[ndpn*(k+nseln)  ] = -Hm[k]*nu.x;
+						N[ndpn*(k+nseln)+1] = -Hm[k]*nu.y;
+						N[ndpn*(k+nseln)+2] = -Hm[k]*nu.z;
 					}
-
-					// create the stiffness matrix
-					ke.Create(ndof, ndof);
-
+					
+					if (ndpn == 4) {
+						for (k=0; k<nseln; ++k)
+							N[ndpn*k+3] = 0;
+						for (k=0; k<nmeln; ++k)
+							N[ndpn*(k+nseln)+3] = 0;
+					}
+					
 					for (k=0; k<ndof; ++k)
 						for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
-
+					
 					// b. A-term
 					//-------------------------------------
-
+					
 					for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
 					for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-
+					
 					double* Gr = se.Gr(j);
 					double* Gs = se.Gs(j);
 					vec3d gs[2];
 					ss.CoBaseVectors(se, j, gs);
-
+					
 					mat3d S1, S2;
 					S1.skew(gs[0]);
 					S2.skew(gs[1]);
 					mat3d As[4];
 					for (l=0; l<nseln; ++l)
 						As[l] = S2*Gr[l] - S1*Gs[l];
-						
+					
 					if (!m_bsymm)
 					{	// non-symmetric
 						for (l=0; l<nseln; ++l)
 						{
 							for (k=0; k<nseln+nmeln; ++k)
 							{
-								ke[k*3  ][l*3  ] -= knmult*tn*w[j]*N[k]*As[l][0][0];
-								ke[k*3  ][l*3+1] -= knmult*tn*w[j]*N[k]*As[l][0][1];
-								ke[k*3  ][l*3+2] -= knmult*tn*w[j]*N[k]*As[l][0][2];
+								ke[k*ndpn  ][l*ndpn  ] -= knmult*tn*w[j]*N[k]*As[l][0][0];
+								ke[k*ndpn  ][l*ndpn+1] -= knmult*tn*w[j]*N[k]*As[l][0][1];
+								ke[k*ndpn  ][l*ndpn+2] -= knmult*tn*w[j]*N[k]*As[l][0][2];
 								
-								ke[k*3+1][l*3  ] -= knmult*tn*w[j]*N[k]*As[l][1][0];
-								ke[k*3+1][l*3+1] -= knmult*tn*w[j]*N[k]*As[l][1][1];
-								ke[k*3+1][l*3+2] -= knmult*tn*w[j]*N[k]*As[l][1][2];
+								ke[k*ndpn+1][l*ndpn  ] -= knmult*tn*w[j]*N[k]*As[l][1][0];
+								ke[k*ndpn+1][l*ndpn+1] -= knmult*tn*w[j]*N[k]*As[l][1][1];
+								ke[k*ndpn+1][l*ndpn+2] -= knmult*tn*w[j]*N[k]*As[l][1][2];
 								
-								ke[k*3+2][l*3  ] -= knmult*tn*w[j]*N[k]*As[l][2][0];
-								ke[k*3+2][l*3+1] -= knmult*tn*w[j]*N[k]*As[l][2][1];
-								ke[k*3+2][l*3+2] -= knmult*tn*w[j]*N[k]*As[l][2][2];
+								ke[k*ndpn+2][l*ndpn  ] -= knmult*tn*w[j]*N[k]*As[l][2][0];
+								ke[k*ndpn+2][l*ndpn+1] -= knmult*tn*w[j]*N[k]*As[l][2][1];
+								ke[k*ndpn+2][l*ndpn+2] -= knmult*tn*w[j]*N[k]*As[l][2][2];
 							}
 						}
 					} 
@@ -1063,66 +1101,66 @@ void FESlidingInterface2::ContactStiffness()
 						{
 							for (k=0; k<nseln+nmeln; ++k)
 							{
-								ke[k*3  ][l*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
-								ke[k*3  ][l*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
-								ke[k*3  ][l*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
+								ke[k*ndpn  ][l*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
+								ke[k*ndpn  ][l*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
+								ke[k*ndpn  ][l*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
 								
-								ke[k*3+1][l*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
-								ke[k*3+1][l*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
-								ke[k*3+1][l*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
+								ke[k*ndpn+1][l*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
+								ke[k*ndpn+1][l*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
+								ke[k*ndpn+1][l*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
 								
-								ke[k*3+2][l*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
-								ke[k*3+2][l*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
-								ke[k*3+2][l*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
-
-								ke[l*3  ][k*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
-								ke[l*3+1][k*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
-								ke[l*3+2][k*3  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
+								ke[k*ndpn+2][l*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
+								ke[k*ndpn+2][l*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
+								ke[k*ndpn+2][l*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
 								
-								ke[l*3  ][k*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
-								ke[l*3+1][k*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
-								ke[l*3+2][k*3+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
+								ke[l*ndpn  ][k*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][0];
+								ke[l*ndpn+1][k*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][1];
+								ke[l*ndpn+2][k*ndpn  ] -= 0.5*knmult*tn*w[j]*N[k]*As[l][0][2];
 								
-								ke[l*3  ][k*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
-								ke[l*3+1][k*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
-								ke[l*3+2][k*3+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
+								ke[l*ndpn  ][k*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][0];
+								ke[l*ndpn+1][k*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][1];
+								ke[l*ndpn+2][k*ndpn+1] -= 0.5*knmult*tn*w[j]*N[k]*As[l][1][2];
+								
+								ke[l*ndpn  ][k*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][0];
+								ke[l*ndpn+1][k*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][1];
+								ke[l*ndpn+2][k*ndpn+2] -= 0.5*knmult*tn*w[j]*N[k]*As[l][2][2];
 							}
 						}
 					}
 					
 					// c. M-term
 					//---------------------------------------
-
+					
 					vec3d Gm[2];
 					ms.ContraBaseVectors(me, r, s, Gm);
 					
 					// evaluate master surface normal
 					vec3d mnu = Gm[0] ^ Gm[1];
 					mnu.unit();
-
+					
 					double Hmr[4], Hms[4];
 					me.shape_deriv(Hmr, Hms, r, s);
 					vec3d mm[4];
 					for (k=0; k<nmeln; ++k) 
 						mm[k] = Gm[0]*Hmr[k] + Gm[1]*Hms[k];
-						
+					
 					if (!m_bsymm)
 					{	// non-symmetric
 						for (k=0; k<nmeln; ++k) 
 						{
 							for (l=0; l<nseln+nmeln; ++l)
 							{
-								ke[(k+nseln)*3  ][l*3  ] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[(k+nseln)*3  ][l*3+1] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[(k+nseln)*3  ][l*3+2] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
+								ke[(k+nseln)*ndpn  ][l*ndpn  ] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
+								ke[(k+nseln)*ndpn  ][l*ndpn+1] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
+								ke[(k+nseln)*ndpn  ][l*ndpn+2] += tn*knmult*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+1][l*3  ] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[(k+nseln)*3+1][l*3+1] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[(k+nseln)*3+1][l*3+2] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
+								ke[(k+nseln)*ndpn+1][l*ndpn  ] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
+								ke[(k+nseln)*ndpn+1][l*ndpn+1] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
+								ke[(k+nseln)*ndpn+1][l*ndpn+2] += tn*knmult*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+2][l*3  ] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
-								ke[(k+nseln)*3+2][l*3+1] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
-								ke[(k+nseln)*3+2][l*3+2] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
+								ke[(k+nseln)*ndpn+2][l*ndpn  ] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
+								ke[(k+nseln)*ndpn+2][l*ndpn+1] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
+								ke[(k+nseln)*ndpn+2][l*ndpn+2] += tn*knmult*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
 							}
 						}
 					}
@@ -1132,80 +1170,55 @@ void FESlidingInterface2::ContactStiffness()
 						{
 							for (l=0; l<nseln+nmeln; ++l)
 							{
-								ke[(k+nseln)*3  ][l*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[(k+nseln)*3  ][l*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[(k+nseln)*3  ][l*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
+								ke[(k+nseln)*ndpn  ][l*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
+								ke[(k+nseln)*ndpn  ][l*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
+								ke[(k+nseln)*ndpn  ][l*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+1][l*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[(k+nseln)*3+1][l*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[(k+nseln)*3+1][l*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
+								ke[(k+nseln)*ndpn+1][l*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
+								ke[(k+nseln)*ndpn+1][l*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
+								ke[(k+nseln)*ndpn+1][l*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
 								
-								ke[(k+nseln)*3+2][l*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
-								ke[(k+nseln)*3+2][l*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
-								ke[(k+nseln)*3+2][l*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
+								ke[(k+nseln)*ndpn+2][l*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
+								ke[(k+nseln)*ndpn+2][l*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
+								ke[(k+nseln)*ndpn+2][l*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
 								
-								ke[l*3  ][(k+nseln)*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
-								ke[l*3+1][(k+nseln)*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
-								ke[l*3+2][(k+nseln)*3  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
+								ke[l*ndpn  ][(k+nseln)*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].x*N[l];
+								ke[l*ndpn+1][(k+nseln)*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].x*N[l];
+								ke[l*ndpn+2][(k+nseln)*ndpn  ] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].x*N[l];
 								
-								ke[l*3  ][(k+nseln)*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
-								ke[l*3+1][(k+nseln)*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
-								ke[l*3+2][(k+nseln)*3+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
+								ke[l*ndpn  ][(k+nseln)*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].y*N[l];
+								ke[l*ndpn+1][(k+nseln)*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].y*N[l];
+								ke[l*ndpn+2][(k+nseln)*ndpn+1] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].y*N[l];
 								
-								ke[l*3  ][(k+nseln)*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
-								ke[l*3+1][(k+nseln)*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
-								ke[l*3+2][(k+nseln)*3+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
+								ke[l*ndpn  ][(k+nseln)*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.x*mm[k].z*N[l];
+								ke[l*ndpn+1][(k+nseln)*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.y*mm[k].z*N[l];
+								ke[l*ndpn+2][(k+nseln)*ndpn+2] += 0.5*knmult*tn*detJ[j]*w[j]*mnu.z*mm[k].z*N[l];
 							}
 						}
 					}
 					
-					// assemble the global stiffness
-					psolver->AssembleStiffness(en, LM, ke);
-
 					// --- B I P H A S I C   S T I F F N E S S ---
-					if (sporo && mporo && (tn > 0))
+					if (sporo && mporo)
 					{
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
 						// poro version or not.
 						double dt = m_pfem->m_pStep->m_dt;
-
+						
 						// --- S O L I D - P R E S S U R E   C O N T A C T ---
-
+						
 						if (!m_bsymm)
 						{
-							int ndof = 4*(nseln+nmeln);
-							LM.resize(ndof);
-							for (k=0; k<nseln; ++k)
-							{
-								LM[4*k  ] = sLM[3*k  ];			// x-dof
-								LM[4*k+1] = sLM[3*k+1];			// y-dof
-								LM[4*k+2] = sLM[3*k+2];			// z-dof
-								LM[4*k+3] = sLM[3*nseln+k];		// p-dof
-							}
-							for (k=0; k<nmeln; ++k)
-							{
-								LM[4*(k+nseln)  ] = mLM[3*k  ];			// x-dof
-								LM[4*(k+nseln)+1] = mLM[3*k+1];			// y-dof
-								LM[4*(k+nseln)+2] = mLM[3*k+2];			// z-dof
-								LM[4*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
-							}
-
-							for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-							for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-
-							ke.Create(ndof, ndof);
-							ke.zero();
-
+							
 							// a. q-term
 							//-------------------------------------
-						
+							
 							double dpmr, dpms;
 							dpmr = me.eval_deriv1(me.pt(), r, s);
 							dpms = me.eval_deriv2(me.pt(), r, s);
-
+							
 							double epsp = m_epsp*ss.m_epsp[ni];
-
+							
 							for (k=0; k<nseln+nmeln; ++k)
 								for (l=0; l<nseln+nmeln; ++l)
 								{
@@ -1213,9 +1226,9 @@ void FESlidingInterface2::ContactStiffness()
 									ke[4*k + 3][4*l+1] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
 									ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
 								}
-
+							
 							double wn = ss.m_Lmp[ni] + epsp*ss.m_pg[ni];
-
+							
 							// b. A-term
 							//-------------------------------------
 							
@@ -1226,10 +1239,10 @@ void FESlidingInterface2::ContactStiffness()
 									ke[4*k + 3][4*l+1] -= dt*w[j]*wn*N[k]*(As[l][1][0]*nu.x + As[l][1][1]*nu.y + As[l][1][2]*nu.z);
 									ke[4*k + 3][4*l+2] -= dt*w[j]*wn*N[k]*(As[l][2][0]*nu.x + As[l][2][1]*nu.y + As[l][2][2]*nu.z);
 								}
-	
+							
 							// c. m-term
 							//---------------------------------------
-								
+							
 							for (k=0; k<nmeln; ++k)
 								for (l=0; l<nseln+nmeln; ++l)
 								{
@@ -1237,32 +1250,37 @@ void FESlidingInterface2::ContactStiffness()
 									ke[4*(k+nseln) + 3][4*l+1] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].y;
 									ke[4*(k+nseln) + 3][4*l+2] += dt*w[j]*detJ[j]*wn*N[l]*mm[k].z;
 								}
-							
-							psolver->AssembleStiffness(en, LM, ke);
 						}
-
-
+						
+						
 						// --- P R E S S U R E - P R E S S U R E   C O N T A C T ---
-
-						ndof = nseln+nmeln;
-
-						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
-						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
-
-						LM.resize(ndof);
-						for (k=0; k<nseln; ++k) LM[k      ] = sLM[3*nseln+k];
-						for (k=0; k<nmeln; ++k) LM[k+nseln] = mLM[3*nmeln+k];
-
+						
+						// calculate the N-vector
+						for (k=0; k<nseln; ++k)
+						{
+							N[ndpn*k  ] = 0;
+							N[ndpn*k+1] = 0;
+							N[ndpn*k+2] = 0;
+							N[ndpn*k+3] = Hs[k];
+						}
+						
+						for (k=0; k<nmeln; ++k)
+						{
+							N[ndpn*(k+nseln)  ] = 0;
+							N[ndpn*(k+nseln)+1] = 0;
+							N[ndpn*(k+nseln)+2] = 0;
+							N[ndpn*(k+nseln)+3] = -Hm[k];
+						}
+						
 						double epsp = m_epsp*ss.m_epsp[ni];
-
-						// build the "element" stiffness
-						ke.Create(ndof, ndof);
+						
 						for (k=0; k<ndof; ++k)
-							for (l=0; l<ndof; ++l) ke[k][l] = -dt*epsp*w[j]*detJ[j]*N[k]*N[l];
-
-						// assemble the global stiffness
-						psolver->AssembleStiffness(en, LM, ke);
+							for (l=0; l<ndof; ++l) ke[k][l] -= dt*epsp*w[j]*detJ[j]*N[k]*N[l];
+						
 					}
+					
+					// assemble the global stiffness
+					psolver->AssembleStiffness(en, LM, ke);
 				}
 			}
 		}
