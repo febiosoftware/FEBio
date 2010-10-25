@@ -13,7 +13,7 @@
 #include "quatd.h"
 #include "tens4d.h"
 #include "LoadCurve.h"
-#include "string.h"
+#include <string.h>
 #include "FE_enum.h"
 #include "FECoordSysMap.h"
 #include "FEMaterialFactory.h"
