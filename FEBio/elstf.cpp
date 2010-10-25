@@ -468,7 +468,11 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 	}
 
 	// adjust stiffness matrix for prescribed degrees of freedom
-	if (m_fem.m_DC.size() > 0)
+	// NOTE: I had to comment this if statement out since otherwise
+	//       poroelastic DOF's that are set as free-draining in the
+	//       sliding2 contact code are skipt and zeroes will appear
+	//       on the diagonal of the stiffness matrix.
+//	if (m_fem.m_DC.size() > 0)
 	{
 		int i, j;
 		int I, J;
