@@ -78,7 +78,7 @@ public:
 	void SetFreeDraining();
 	
 protected:
-	void ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms);
+	void ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms, bool bupseg);
 
 	//! calculate penalty factor
 	void CalcAutoPenalty(FESlidingSurface2& s);
@@ -102,6 +102,7 @@ public:
 	double			m_srad;		//!< contact search radius
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations
+	int				m_nsegup;	//!< segment update parameter
 
 	double			m_epsn;		//!< normal penalty factor
 	bool			m_bautopen;	//!< use autopenalty factor

@@ -392,7 +392,7 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms)
+void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms, bool bupseg)
 {
 	FEMesh& mesh = m_pfem->m_mesh;
 	FESurfaceElement* pme;
@@ -449,7 +449,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 			}
 
 			// find the intersection point with the master surface
-			if (pme == 0) pme = ms.FindIntersection(r, nu, rs, m_stol);
+			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, m_stol);
 
 			ss.m_pme[n] = pme;
 			ss.m_nu[n] = nu;
@@ -518,10 +518,29 @@ void FESlidingInterface2::Update()
 
 	double R = m_srad*m_pfem->m_mesh.GetBoundingBox().radius();
 
+	static int naug = 0;
+	static int biter = 0;
+	
+	// get the iteration number
+	// we need this number to see if we can do segment updates or not
+	// also reset number of iterations after each augmentation
+	if (m_pfem->m_pStep->m_psolver->m_niter == 0) {
+		biter = 0;
+		naug = m_pfem->m_pStep->m_psolver->m_naug;
+	} else if (m_pfem->m_pStep->m_psolver->m_naug > naug) {
+		biter = m_pfem->m_pStep->m_psolver->m_niter;
+		naug = m_pfem->m_pStep->m_psolver->m_naug;
+	}
+	int niter = m_pfem->m_pStep->m_psolver->m_niter - biter;
+	bool bupseg = ((m_nsegup == 0)? true : (niter <= m_nsegup));
+	// get the logfile
+//	Logfile& log = GetLogfile();
+//	log.printf("seg_up iteration # %d\n", niter+1);
+	
 	// project the surfaces onto each other
 	// this will update the gap functions as well
-	ProjectSurface(m_ss, m_ms);
-	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
+	ProjectSurface(m_ss, m_ms, bupseg);
+	if (m_npass == 2) ProjectSurface(m_ms, m_ss, bupseg);
 
 	// set poro flag
 	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
@@ -1388,7 +1407,7 @@ bool FESlidingInterface2::Augment(int naug)
 		log.printf("    maximum pgap : %15le", maxpg);
 		if (m_ptol > 0) log.printf("%15le\n", m_ptol); else log.printf("       ***\n");
 	}
-
+	
 	return bconv;
 }
 

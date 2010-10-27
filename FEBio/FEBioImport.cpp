@@ -2366,6 +2366,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			else if (tag == "pressure_penalty"   ) tag.value(ps->m_epsp);
 			else if (tag == "symmetric_stiffness") tag.value(ps->m_bsymm);
 			else if (tag == "search_radius"      ) tag.value(ps->m_srad);
+			else if (tag == "seg_up"             ) tag.value(ps->m_nsegup);
 			else if (tag == "debug")
 			{
 				tag.value(ps->m_bdebug);
