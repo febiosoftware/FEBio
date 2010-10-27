@@ -673,6 +673,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
 	double detJ[4], w[4], *Hs, Hm[4];
+	double N[32];
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -799,22 +800,23 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 					// calculate the force vector
 					fe.resize(ndof);
+					zero(fe);
 
 					for (k=0; k<nseln; ++k)
 					{
-						fe[3*k  ] = -Hs[k]*nu.x;
-						fe[3*k+1] = -Hs[k]*nu.y;
-						fe[3*k+2] = -Hs[k]*nu.z;
+						N[3*k  ] = -Hs[k]*nu.x;
+						N[3*k+1] = -Hs[k]*nu.y;
+						N[3*k+2] = -Hs[k]*nu.z;
 					}
 
 					for (k=0; k<nmeln; ++k)
 					{
-						fe[3*(k+nseln)  ] = Hm[k]*nu.x;
-						fe[3*(k+nseln)+1] = Hm[k]*nu.y;
-						fe[3*(k+nseln)+2] = Hm[k]*nu.z;
+						N[3*(k+nseln)  ] = Hm[k]*nu.x;
+						N[3*(k+nseln)+1] = Hm[k]*nu.y;
+						N[3*(k+nseln)+2] = Hm[k]*nu.z;
 					}
 
-					for (k=0; k<ndof; ++k) fe[k] *= tn*detJ[j]*w[j];
+					for (k=0; k<ndof; ++k) fe[k] += tn*N[k]*detJ[j]*w[j];
 
 					// assemble the global residual
 					psolver->AssembleResidual(en, LM, fe, F);
@@ -839,10 +841,11 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 						// fill the force array
 						fe.resize(ndof);
-						for (k=0; k<nseln; ++k) fe[k      ] =  Hs[k];
-						for (k=0; k<nmeln; ++k) fe[k+nseln] = -Hm[k];
+						zero(fe);
+						for (k=0; k<nseln; ++k) N[k      ] =  Hs[k];
+						for (k=0; k<nmeln; ++k) N[k+nseln] = -Hm[k];
 
-						for (k=0; k<ndof; ++k) fe[k] *= dt*wn*detJ[j]*w[j];
+						for (k=0; k<ndof; ++k) fe[k] += dt*wn*N[k]*detJ[j]*w[j];
 
 						// assemble residual
 						psolver->AssembleResidual(en, LM, fe, F);
@@ -936,7 +939,7 @@ void FESlidingInterface2::ContactStiffness()
 				w[j] = se.GaussWeights()[j];
 
 				// pressure
-				if (bporo)
+				if (sporo)
 				{
 					pt[j] = se.eval(se.pt(), j);
 					dpr[j] = se.eval_deriv1(se.pt(), j);
@@ -1074,7 +1077,7 @@ void FESlidingInterface2::ContactStiffness()
 					}
 					
 					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
+						for (l=0; l<ndof; ++l) ke[k][l] += dtn*N[k]*N[l]*detJ[j]*w[j];
 					
 					// b. A-term
 					//-------------------------------------
@@ -1224,6 +1227,8 @@ void FESlidingInterface2::ContactStiffness()
 						// poro version or not.
 						double dt = m_pfem->m_pStep->m_dt;
 						
+						double epsp = (tn > 0) ? m_epsp*ss.m_epsp[ni] : 0.;
+						
 						// --- S O L I D - P R E S S U R E   C O N T A C T ---
 						
 						if (!m_bsymm)
@@ -1235,8 +1240,6 @@ void FESlidingInterface2::ContactStiffness()
 							double dpmr, dpms;
 							dpmr = me.eval_deriv1(me.pt(), r, s);
 							dpms = me.eval_deriv2(me.pt(), r, s);
-							
-							double epsp = m_epsp*ss.m_epsp[ni];
 							
 							for (k=0; k<nseln+nmeln; ++k)
 								for (l=0; l<nseln+nmeln; ++l)
@@ -1290,8 +1293,6 @@ void FESlidingInterface2::ContactStiffness()
 							N[ndpn*(k+nseln)+2] = 0;
 							N[ndpn*(k+nseln)+3] = -Hm[k];
 						}
-						
-						double epsp = m_epsp*ss.m_epsp[ni];
 						
 						for (k=0; k<ndof; ++k)
 							for (l=0; l<ndof; ++l) ke[k][l] -= dt*epsp*w[j]*detJ[j]*N[k]*N[l];

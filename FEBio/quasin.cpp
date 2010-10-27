@@ -486,7 +486,7 @@ bool FESolidSolver::Quasin(double time)
 			m_normp = (m_pi*m_pi)*(s*s);
 
 			// check convergence
-			if (m_normp > (m_Ptol*m_Ptol)*m_normP) bconv = false;
+			if ((m_Ptol > 0) && (m_normp > (m_Ptol*m_Ptol)*m_normP)) bconv = false;
 		}
 
 		// print convergence summary
