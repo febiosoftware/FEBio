@@ -1097,7 +1097,9 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 	while (!t.isend())
 	{
 		// get the material ID
-		nmat = atoi(t.AttributeValue("mat"))-1;
+		const char* szmat = t.AttributeValue("mat");
+		nmat = atoi(szmat)-1;
+		if ((nmat < 0) || (nmat >= fem.Materials())) throw XMLReader::InvalidAttributeValue(t, "mat", szmat);
 
 		// get material class
 		FEMaterial* pmat = fem.GetMaterial(nmat);
