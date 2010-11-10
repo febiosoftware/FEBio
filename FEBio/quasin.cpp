@@ -534,6 +534,7 @@ bool FESolidSolver::Quasin(double time)
 				m_normEm = m_normE1;
 				m_normEi = m_normE1;
 				m_normRi = m_normR1;
+				m_normPi = m_normp;
 				breform = true;
 			}
 			else
