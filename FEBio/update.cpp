@@ -4,6 +4,7 @@
 #include "FEPoroElastic.h"
 #include "FEMicroMaterial.h"
 #include "FETrussMaterial.h"
+#include "FESlidingInterface2.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FESolidSolver::Update
@@ -340,10 +341,30 @@ void FESolidSolver::UpdateStresses()
 
 void FEM::UpdateContact()
 {
-	// mark all free-draining surfaces
-	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->MarkFreeDraining();
-	// loop over all contact interfaces
+	// If this analysis is a poroelastic analysis that uses
+	// a biphasic contact interface, we need to make sure that
+	// the free draining dof's are processed properly
+	bool bporo = m_pStep->m_nModule == FE_POROELASTIC;
+	if (bporo)
+	{
+		// mark all free-draining surfaces
+		for (int i=0; i<ContactInterfaces(); ++i) 
+		{
+			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(m_CI[i]);
+			if (psi2) psi2->MarkFreeDraining();
+		}
+	}
+
+	// Update all contact interfaces
 	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->Update();
-	// set free-draining boundary conditions
-	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->SetFreeDraining();
+
+	if (bporo)
+	{
+		// set free-draining boundary conditions
+		for (int i=0; i<ContactInterfaces(); ++i) 
+		{
+			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(m_CI[i]);
+			if (psi2) psi2->SetFreeDraining();
+		}
+	}
 }

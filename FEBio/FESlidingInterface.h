@@ -106,12 +106,6 @@ public:
 	//! serialize data to archive
 	void Serialize(Archive& ar);
 
-	//! mark free-draining condition 
-	void MarkFreeDraining() {}
-	
-	//! set free-draining condition 
-	void SetFreeDraining() {}
-	
 protected:
 	//! calculate auto penalty factor
 	void CalcAutoPenalty(FESlidingSurface& s);
