@@ -72,13 +72,14 @@ bool ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
 	for (i=0; i<N; ++i) r[i] = b[i] - r[i];
 
 	// initial norms
-	double rho1 = r*r, rho2;
+	double rho1 = r*r;
+	double rho2 = rho1;
 	double normb = 0;
 	for (i=0; i<N; ++i) normb += (b[i])*(b[i]);
 	normb = sqrt(normb);
 
 	// search direction
-	vector<double> p(N);
+	vector<double> p; p.assign(N, 0.0);
 
 	// work vector
 	vector<double> w(N);
@@ -94,15 +95,9 @@ bool ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
 		++k;
 
 		// calculate search direction
-		if (k==1)
-		{
-			p = r;
-		}
-		else
-		{
-			beta = rho1/rho2;
-			for (i=0; i<N; ++i) p[i] = r[i] + p[i]*beta;
-		}
+		beta = rho1/rho2;
+		for (i=0; i<N; ++i) p[i] = r[i] + p[i]*beta;
+
 		A.mult_vector(p, w);
 		alpha = rho1 / (p*w);
 
