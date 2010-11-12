@@ -210,6 +210,7 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 	for (i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 
 	// loop until converged
+	bool bconv;
 	do
 	{
 		if (ne == 4)
@@ -243,22 +244,24 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		double A[2][2] = {0};
 		for (i=0; i<ne; ++i)
 		{
-			R[0] -= (x*y[i])*Hr[i];
-			R[1] -= (x*y[i])*Hs[i];
+			double xyi = x*y[i];
+			R[0] -= (xyi)*Hr[i];
+			R[1] -= (xyi)*Hs[i];
 
-			A[0][1] += (x*y[i])*Hrs[i];
-			A[1][0] += (x*y[i])*Hrs[i];
+			A[0][1] += (xyi)*Hrs[i];
+			A[1][0] += (xyi)*Hrs[i];
 
 			for (j=0; j<ne; ++j)
 			{
-				R[0] -= -H[j]*Hr[i]*(y[i]*y[j]);
-				R[1] -= -H[j]*Hs[i]*(y[i]*y[j]);
+				double yij = y[i]*y[j];
+				R[0] -= -H[j]*Hr[i]*(yij);
+				R[1] -= -H[j]*Hs[i]*(yij);
 
-				A[0][0] += -(y[i]*y[j])*(Hr[i]*Hr[j]);
-				A[1][1] += -(y[i]*y[j])*(Hs[i]*Hs[j]);
+				A[0][0] += -(yij)*(Hr[i]*Hr[j]);
+				A[1][1] += -(yij)*(Hs[i]*Hs[j]);
 
-				A[0][1] += -(y[i]*y[j])*(Hs[j]*Hr[i]+H[i]*Hrs[j]);
-				A[1][0] += -(y[i]*y[j])*(Hr[j]*Hs[i]+H[i]*Hrs[j]);
+				A[0][1] += -(yij)*(Hs[i]*Hr[j]+H[i]*Hrs[j]);
+				A[1][0] += -(yij)*(Hr[i]*Hs[j]+H[i]*Hrs[j]);
 			}
 		
 			q += y[i]*H[i];
@@ -272,13 +275,26 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		u[1] = (A[0][0]*R[1] - A[1][0]*R[0])/D;
 
 		normu = sqrt(u[0]*u[0]+u[1]*u[1]);
-	
-		r += u[0];
-		s += u[1];
-
-		++n;
+		bconv = (normu < 1e-5);
+		if (!bconv)
+		{
+			// Don't update if converged otherwise the point q
+			// does not correspond with these values for (r,s)
+			r += u[0];
+			s += u[1];
+			++n;
+		}
 	}
-	while ((normu > 1e-5) && (n < NMAX));
+	while ((bconv == false) && (n < NMAX));
+
+	if (bconv == false)
+	{
+		// We have to somehow identify if this test has
+		// failed. Until we find a better way, we
+		// set the r,s to values outside the element
+		// to make sure that the InsideElement test will fail.
+		r = s = -10;
+	}
 
 	return q;
 }
