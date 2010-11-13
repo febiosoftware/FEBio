@@ -16,7 +16,7 @@ public:
 	void Init();
 
 	//! Find element that contains the projection of x
-	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol);
+	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol, double srad);
 
 	void ShallowCopy(FEFacetSlidingSurface& s);
 
@@ -79,6 +79,7 @@ public:
 	double	m_stol;		//!< search tolerance
 	int		m_npass;	//!< nr of passes
 	bool	m_bautopen;	//!< auto-penalty flag
+	double	m_srad;		//!< search radius (%)
 
 	double	m_atol;		//!< aug lag tolernace
 	double	m_gtol;		//!< gap tolerance

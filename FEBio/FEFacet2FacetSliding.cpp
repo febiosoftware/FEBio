@@ -44,7 +44,7 @@ void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
 //-----------------------------------------------------------------------------
 //! Finds the (master) element that contains the projection of a (slave) node
 
-FEElement* FEFacetSlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
+FEElement* FEFacetSlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol, double srad)
 {
 	// get the mesh
 	FEMesh& mesh = *m_pMesh;
@@ -61,6 +61,11 @@ FEElement* FEFacetSlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r
 
 	// get the nodal position
 	vec3d r0 = mesh.Node(m).m_rt;
+
+	// see if this node is within an acceptable distance for contact
+	FE_BOUNDING_BOX box = mesh.GetBoundingBox();
+	double R = srad*box.radius();
+	if ((r0-x).norm() > R) return 0;
 
 	// now that we found the closest master node, lets see if we can find 
 	// the best master element
@@ -107,6 +112,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEM* pfem) : FEContactInterface(pfem)
 	m_gtol = 0;
 	m_naugmin = 0;
 	m_naugmax = 10;
+	m_srad = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -201,7 +207,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 
 			// find the master segment this element belongs to
 			ss.m_rs[ni] = vec2d(0,0);
-			FESurfaceElement* pme = dynamic_cast<FESurfaceElement*>(ms.FindMasterSegment(x, q, ss.m_rs[ni], bfirst, m_stol));
+			FESurfaceElement* pme = dynamic_cast<FESurfaceElement*>(ms.FindMasterSegment(x, q, ss.m_rs[ni], bfirst, m_stol, m_srad));
 			ss.m_pme[ni] = pme;
 
 			if (pme)

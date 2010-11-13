@@ -180,91 +180,106 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 }
 
 //-----------------------------------------------------------------------------
-//! This function calculates the projection of x on the surface element el.
-//! It does this by finding the solution of the nonlinear equation (x-y)*y,[a]=0,
-//! where the comma denotes differentation and a ranges from 1 to 2.
-//! The system is solved using the Newton-Raphson method.
-//! The surface element may be either a quad or a triangular element.
+// project onto a triangular face
+vec3d project2tri(vec3d* y, vec3d x, double& r, double& s)
+{
+	// calculate base vectors 
+	vec3d e1 = y[1] - y[0];
+	vec3d e2 = y[2] - y[0];
 
-vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s)
+	// calculate plane normal
+	vec3d n = e1^e2; n.unit();
+
+	// project x onto the plane
+	vec3d q = x - n*((x-y[0])*n);
+
+	// set up metric tensor
+	double G[2][2];
+	G[0][0] = e1*e1;
+	G[0][1] = G[1][0] = e1*e2;
+	G[1][1] = e2*e2;
+
+	// invert metric tensor
+	double D = G[0][0]*G[1][1] - G[0][1]*G[1][0];
+	double Gi[2][2];
+	Gi[0][0] = G[1][1]/D;
+	Gi[1][1] = G[0][0]/D;
+	Gi[0][1] = Gi[1][0] = -G[0][1]/D;
+
+	// calculate dual base vectors
+	vec3d E1 = e1*Gi[0][0] + e2*Gi[0][1];
+	vec3d E2 = e1*Gi[1][0] + e2*Gi[1][1];
+
+	// now we can calculate r and s
+	vec3d t = q - y[0];
+	r = t*E1;
+	s = t*E2;
+
+	return q;
+}
+
+//-----------------------------------------------------------------------------
+// project onto a quadrilateral surface.
+bool project2quad(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 {
 	double R[2], u[2], D;
-
-	vec3d q(0,0,0), y[4];
-
 	double gr[4] = {-1, +1, +1, -1};
 	double gs[4] = {-1, -1, +1, +1};
 	double H[4], Hr[4], Hs[4], Hrs[4];
-	double normu;
 
 	int i, j;
-	int NMAX = 5, n=0;
+	int NMAX = 50, n=0;
 
-	// number of element nodes
-	int ne = el.Nodes();
-
-	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pMesh;
-
-	// get the elements nodal positions
-	for (i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+	// evaulate scalar products
+	double xy[4] = {x*y[0], x*y[1], x*y[2], x*y[3]};
+	double yy[4][4];
+	yy[0][0] = y[0]*y[0]; yy[1][1] = y[1]*y[1]; yy[2][2] = y[2]*y[2]; yy[3][3] = y[3]*y[3];
+	yy[0][1] = yy[1][0] = y[0]*y[1];
+	yy[0][2] = yy[2][0] = y[0]*y[2];
+	yy[0][3] = yy[3][0] = y[0]*y[3];
+	yy[1][2] = yy[2][1] = y[1]*y[2];
+	yy[1][3] = yy[3][1] = y[1]*y[3];
+	yy[2][3] = yy[3][2] = y[2]*y[3];
 
 	// loop until converged
-	bool bconv;
+	bool bconv = false;
+	double normu;
 	do
 	{
-		if (ne == 4)
+		// evaluate shape functions and shape function derivatives.
+		for (i=0; i<4; ++i)
 		{
-			// do quadrilaterals
-			for (i=0; i<4; ++i)
-			{
-				H[i] = 0.25*(1+gr[i]*r)*(1+gs[i]*s);
+			H[i] = 0.25*(1+gr[i]*r)*(1+gs[i]*s);
 	
-				Hr[i] = 0.25*gr[i]*( 1 + gs[i]*s );
-				Hs[i] = 0.25*gs[i]*( 1 + gr[i]*r );
+			Hr[i] = 0.25*gr[i]*( 1 + gs[i]*s );
+			Hs[i] = 0.25*gs[i]*( 1 + gr[i]*r );
 
-				Hrs[i] = 0.25*gr[i]*gs[i];
-			}
-		}
-		else
-		{
-			// do triangles
-			H[0] = 1 - r - s;
-			H[1] = r;
-			H[2] = s;
-			Hr[0] = -1; Hs[0] = -1;
-			Hr[1] =  1; Hs[1] =  0;
-			Hr[2] =  0; Hs[2] =  1;
-			Hrs[0] = Hrs[1] = Hrs[2] = 0;
+			Hrs[i] = 0.25*gr[i]*gs[i];
 		}
 
 		// set up the system of equations
-		q = vec3d(0,0,0);
 		R[0] = R[1] = 0;
 		double A[2][2] = {0};
-		for (i=0; i<ne; ++i)
+		for (i=0; i<4; ++i)
 		{
-			double xyi = x*y[i];
-			R[0] -= (xyi)*Hr[i];
-			R[1] -= (xyi)*Hs[i];
+			R[0] -= (xy[i])*Hr[i];
+			R[1] -= (xy[i])*Hs[i];
 
-			A[0][1] += (xyi)*Hrs[i];
-			A[1][0] += (xyi)*Hrs[i];
+			A[0][1] += (xy[i])*Hrs[i];
+			A[1][0] += (xy[i])*Hrs[i];
 
-			for (j=0; j<ne; ++j)
+			for (j=0; j<4; ++j)
 			{
-				double yij = y[i]*y[j];
+				double yij = yy[i][j];
 				R[0] -= -H[j]*Hr[i]*(yij);
 				R[1] -= -H[j]*Hs[i]*(yij);
 
-				A[0][0] += -(yij)*(Hr[i]*Hr[j]);
-				A[1][1] += -(yij)*(Hs[i]*Hs[j]);
+				A[0][0] -= (yij)*(Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(Hs[i]*Hs[j]);
 
-				A[0][1] += -(yij)*(Hs[i]*Hr[j]+H[i]*Hrs[j]);
-				A[1][0] += -(yij)*(Hr[i]*Hs[j]+H[i]*Hrs[j]);
+				A[0][1] -= (yij)*(Hr[i]*Hs[j]+Hrs[i]*H[j]);
+				A[1][0] -= (yij)*(Hs[i]*Hr[j]+Hrs[i]*H[j]);
 			}
-		
-			q += y[i]*H[i];
 		}
 	
 		// determinant of A
@@ -274,26 +289,83 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 		u[0] = (A[1][1]*R[0] - A[0][1]*R[1])/D;
 		u[1] = (A[0][0]*R[1] - A[1][0]*R[0])/D;
 
-		normu = sqrt(u[0]*u[0]+u[1]*u[1]);
-		bconv = (normu < 1e-5);
-		if (!bconv)
+		// calculate displacement norm
+		normu = u[0]*u[0]+u[1]*u[1];
+
+		// check for convergence
+		bconv = ((normu < 1e-10));
+		if (!bconv && (n <= NMAX))
 		{
 			// Don't update if converged otherwise the point q
-			// does not correspond with these values for (r,s)
+			// does not correspond with the current values for (r,s)
 			r += u[0];
 			s += u[1];
 			++n;
 		}
+		else break;
 	}
-	while ((bconv == false) && (n < NMAX));
+	while (1);
 
-	if (bconv == false)
+	// evaluate q
+	q = y[0]*H[0] + y[1]*H[1] + y[2]*H[2] + y[3]*H[3];
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the projection of x on the surface element el.
+//! It does this by finding the solution of the nonlinear equation (x-y)*y,[a]=0,
+//! where the comma denotes differentation and a ranges from 1 to 2.
+//! The system is solved using the Newton-Raphson method.
+//! The surface element may be either a quad or a triangular element.
+
+vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s)
+{
+	// get the mesh to which this surface belongs
+	FEMesh& mesh = *m_pMesh;
+
+	// number of element nodes
+	int ne = el.Nodes();
+
+	// get the elements nodal positions
+	vec3d y[4];
+	for (int i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
+
+	// calculate normal projection of x onto element
+	vec3d q;
+	if (ne == 3) q = project2tri(y, x, r, s);
+	else
 	{
-		// We have to somehow identify if this test has
-		// failed. Until we find a better way, we
-		// set the r,s to values outside the element
-		// to make sure that the InsideElement test will fail.
-		r = s = -10;
+		// see if we get lucky
+		if (project2quad(y, x, r, s, q) == false)
+		{
+			// the direct projection failed, so we'll try it more incrementally
+			vec3d x0 = (y[0]+y[1]+y[2]+y[3])*0.25;
+			r = s = 0;
+			bool b = project2quad(y, x0, r, s, q);
+			assert(b);
+
+			double w = 0.5;
+			int l = 1, N = 0, NMAX = 20;
+			do
+			{
+				vec3d xi = x0*(1.0 - w) + x*w;
+				b = project2quad(y, xi, r, s, q);
+				if (b)
+				{
+					--l;
+					if (l == 0) { x0 = xi; w = 1.0; }
+					else w *= 2.0;
+				}
+				else 
+				{
+					++l;
+					w *= 0.5;
+				}
+				++N;
+			}
+			while ((l >= 0) && (N<=NMAX) && (w>0.1));
+		}
 	}
 
 	return q;
