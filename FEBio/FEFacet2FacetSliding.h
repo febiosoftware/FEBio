@@ -86,6 +86,8 @@ public:
 	int		m_naugmin;	//!< min nr of augmentations
 	int		m_naugmax;	//!< max nr of augmentations
 
+	bool	m_bhack;
+
 	FEFacetSlidingSurface	m_ms;	//!< master surface
 	FEFacetSlidingSurface	m_ss;	//!< slave surface
 };

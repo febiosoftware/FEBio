@@ -113,6 +113,8 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEM* pfem) : FEContactInterface(pfem)
 	m_naugmin = 0;
 	m_naugmax = 10;
 	m_srad = 1.0;
+
+	m_bhack = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -565,7 +567,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 					double tn = Lm + eps*g;
 					tn = MBRACKET(tn);
 
-					double dtn = eps*HEAVYSIDE(Lm + eps*g);
+					double dtn = (m_bhack ? eps : eps*HEAVYSIDE(Lm + eps*g));
 
 					// calculate the N-vector
 					for (k=0; k<nseln; ++k)

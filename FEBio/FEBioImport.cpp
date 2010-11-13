@@ -2305,6 +2305,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			else if (tag == "knmult") tag.value(ps->m_knmult);
 			else if (tag == "search_tol") tag.value(ps->m_stol);
 			else if (tag == "search_radius") tag.value(ps->m_srad);
+			else if (tag == "hack") tag.value(ps->m_bhack);
 			else if (tag == "two_pass")
 			{
 				int n;
