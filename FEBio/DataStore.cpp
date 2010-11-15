@@ -306,10 +306,13 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 			val += m_calc.eval(szexpr, ierr);
 			if (fem.m_pStep->m_nModule == FE_POROELASTIC)
 			{
-				FEPoroElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
-				m_calc.SetVariable("wx", pt.m_w.x);
-				m_calc.SetVariable("wy", pt.m_w.y);
-				m_calc.SetVariable("wz", pt.m_w.z);
+				FEPoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
+				if (ppt)
+				{
+					m_calc.SetVariable("wx", ppt->m_w.x);
+					m_calc.SetVariable("wy", ppt->m_w.y);
+					m_calc.SetVariable("wz", ppt->m_w.z);
+				}
 			}
 		}
 		val /= nint;
