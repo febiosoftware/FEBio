@@ -114,7 +114,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEM* pfem) : FEContactInterface(pfem)
 	m_naugmax = 10;
 	m_srad = 1.0;
 
-	m_bhack = false;
+	m_dxtol = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -433,6 +433,11 @@ void FEFacet2FacetSliding::ContactStiffness()
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;
 
+	// get the "size" of the model
+	// We need this to scale the insertion distance
+	double R = m_pfem->m_mesh.GetBoundingBox().radius();
+	double dxtol = R*m_dxtol;
+
 	// set higher order stiffness mutliplier
 	double knmult = m_knmult;
 	if (m_knmult < 0)
@@ -567,7 +572,14 @@ void FEFacet2FacetSliding::ContactStiffness()
 					double tn = Lm + eps*g;
 					tn = MBRACKET(tn);
 
-					double dtn = (m_bhack ? eps : eps*HEAVYSIDE(Lm + eps*g));
+					double dtn = eps*HEAVYSIDE(Lm + eps*g);
+
+					// define buffer layer for penalty insertion
+					if ((dtn < 1e-7) && (g < 0) && (dxtol != 0))
+					{
+						if (dxtol < 0) dtn = eps*exp(-g/dxtol);
+						else if (-g<=dxtol) dtn = eps*(1 + g/dxtol);
+					}
 
 					// calculate the N-vector
 					for (k=0; k<nseln; ++k)

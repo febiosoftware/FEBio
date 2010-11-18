@@ -706,9 +706,9 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 				}
 */
 				// add to global force vector
-				n = lm[0]; if (n >= 0) R[n] += F.x; RB.m_Fr.x -= F.x;
-				n = lm[1]; if (n >= 0) R[n] += F.y; RB.m_Fr.y -= F.y;
-				n = lm[2]; if (n >= 0) R[n] += F.z; RB.m_Fr.z -= F.z;
+				n = lm[0]; if (n >= 0) R[n] += F.x; RB.m_Fr.x += F.x;
+				n = lm[1]; if (n >= 0) R[n] += F.y; RB.m_Fr.y += F.y;
+				n = lm[2]; if (n >= 0) R[n] += F.z; RB.m_Fr.z += F.z;
 			}
 		}
 	}

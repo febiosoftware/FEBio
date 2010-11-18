@@ -300,6 +300,8 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// apply prescribed rigid body forces
+	// TODO: I don't think this does anything since
+	//       the reaction forces are zeroed in the FESolidSolver::Residual function
 	for (i=0; i<(int) m_fem.m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *m_fem.m_RFC[i];
@@ -315,12 +317,12 @@ void FESolidSolver::PrepStep(double time)
 
 				switch (FC.bc)
 				{
-				case 0: RB.m_Fr.x += f; break;
-				case 1: RB.m_Fr.y += f; break;
-				case 2: RB.m_Fr.z += f; break;
-				case 3: RB.m_Mr.x += f; break;
-				case 4: RB.m_Mr.y += f; break;
-				case 5: RB.m_Mr.z += f; break;
+				case 0: RB.m_Fr.x -= f; break;
+				case 1: RB.m_Fr.y -= f; break;
+				case 2: RB.m_Fr.z -= f; break;
+				case 3: RB.m_Mr.x -= f; break;
+				case 4: RB.m_Mr.y -= f; break;
+				case 5: RB.m_Mr.z -= f; break;
 				}
 			}
 		}
