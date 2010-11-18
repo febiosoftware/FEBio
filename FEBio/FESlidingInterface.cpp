@@ -122,6 +122,9 @@ vec3d FESlidingSurface::traction(int inode)
 		double T2 = Lt[inode][1];
 		double r = rs[inode][0];
 		double s = rs[inode][1];
+		double g = gap[inode];
+		double epsilon = eps[inode];
+		Tn = MBRACKET(Tn + epsilon*g);
 
 		vec3d tn = nu[inode]*Tn, tt;
 		vec3d e[2];

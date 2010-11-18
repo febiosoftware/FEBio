@@ -15,6 +15,12 @@
 
 class FEM;
 
+// Macauley bracket
+#define MBRACKET(x) ((x)>=0? (x): 0)
+
+// Heavyside function
+#define HEAVYSIDE(x) ((x)>=0?1:0)
+
 //-----------------------------------------------------------------------------
 //! This is the base class for contact interfaces
 

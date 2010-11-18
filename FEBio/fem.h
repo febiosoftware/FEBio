@@ -39,40 +39,6 @@ using namespace std;
 
 #define MAX_STRING	256
 
-
-// Macauley bracket
-#define MBRACKET(x) ((x)>=0? (x): 0)
-
-// Heavyside function
-#define HEAVYSIDE(x) ((x)>=0?1:0)
-
-// Heavyside function
-inline double Heavyside(double x)
-{
-	const double eps = -1e-07;
-	return (x >= eps ? 1 : 0);
-}
-
-// smooth step function
-inline double smooth_step(double x, double a, double b)
-{
-	if (b==a) return Heavyside(x);
-
-	double f = (x-a)/(b-a);
-	f = (f<0?0:(f>1?1:f));
-	return f*f*(3.0-2.0*f);
-}
-
-// ramp function
-inline double ramp(double x, double a, double b)
-{
-	if (b==a) return Heavyside(x);
-
-	double f = (x-a)/(b-a);
-	return (f<0?0:(f>1?1:f));
-}
-
-
 //-----------------------------------------------------------------------------
 //! A degree of freedom structure
 
