@@ -148,6 +148,7 @@ int main(int argc, char* argv[])
 	fem.SetDebugFlag(ops.bdebug);
 
 	// set the default plot and print levels
+/*
 	if (ops.bdebug)
 	{
 		fem.m_pStep->SetPrintLevel(FE_PRINT_MINOR_ITRS_EXP);
@@ -158,7 +159,7 @@ int main(int argc, char* argv[])
 		fem.m_pStep->SetPrintLevel(FE_PRINT_MINOR_ITRS);
 		fem.m_pStep->SetPlotLevel (FE_PLOT_MAJOR_ITRS);
 	}
-
+*/
 	// check for parameter optimization
 	if (ops.boptim) optimize(fem, ops.szfile);
 	else if (ops.bdiag) diagnose(fem, ops.szfile);

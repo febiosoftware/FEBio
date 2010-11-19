@@ -9,6 +9,8 @@
 #include "FESurfaceConstraint.h"
 #include "FETransverselyIsotropic.h"
 #include "log.h"
+#include "LSDYNAPlotFile.h"
+#include "FEBioPlotFile.h"
 
 //-----------------------------------------------------------------------------
 //!  This routine reads a binary archive that stores a restart point and prepares
@@ -32,9 +34,6 @@ bool FEM::Restart(const char* szfile)
 
 		// read the archive
 		if (Serialize(ar) == false) { fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); return false; }
-
-		// we're done
-		return true;
 	}
 	else
 	{
@@ -58,16 +57,6 @@ bool FEM::Restart(const char* szfile)
 		printf("WARNING: Could not reopen log file. A new log file is created\n");
 		log.open(m_szlog);
 		return false;
-	}
-
-	// Open the plot file for appending
-	if (m_szplot)
-	{
-		if (m_plot->Append(*this, m_szplot) == false)
-		{
-			printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
-			return false;
-		}
 	}
 
 	// inform the user from where the problem is restarted
@@ -161,7 +150,7 @@ void FEM::SerializeAnalysisData(Archive &ar)
 		ar << (int) m_Step.size();
 		for (i=0; i<(int) m_Step.size(); ++i) m_Step[i]->Serialize(ar);
 		ar << m_nStep;
-		ar << m_ftime;
+		ar << m_ftime << m_ftime0;
 		ar << m_nhex8;
 		ar << m_b3field;
 
@@ -190,7 +179,7 @@ void FEM::SerializeAnalysisData(Archive &ar)
 			m_Step.push_back(pstep);
 		}
 		ar >> m_nStep;
-		ar >> m_ftime;
+		ar >> m_ftime >> m_ftime0;
 		ar >> m_nhex8;
 		ar >> m_b3field;
 
@@ -205,6 +194,9 @@ void FEM::SerializeAnalysisData(Archive &ar)
 		ar >> m_nsolver;
 		ar >> m_neq;
 		ar >> m_bwopt;
+
+		// set the correct step
+		m_pStep = m_Step[m_nStep];
 	}
 }
 
@@ -611,8 +603,19 @@ void FEM::SerializeIOData(Archive &ar)
 		ar << m_sztitle;
 
 		// plot file
-//		int* n = m_plot.m_nfield;
-//		ar << n[0] << n[1] << n[2] << n[3] << n[4];
+		int npltfmt = 0;
+		if (dynamic_cast<LSDYNAPlotFile*>(m_plot)) npltfmt = 1;
+		else if (dynamic_cast<FEBioPlotFile*>(m_plot)) npltfmt = 2;
+		assert(npltfmt != 0);
+		ar << npltfmt;
+
+		if (npltfmt == 1)
+		{
+			LSDYNAPlotFile* plt = dynamic_cast<LSDYNAPlotFile*>(m_plot);
+
+			int* n = plt->m_nfield;
+			ar << n[0] << n[1] << n[2] << n[3] << n[4];
+		}
 	}
 	else
 	{
@@ -624,8 +627,41 @@ void FEM::SerializeIOData(Archive &ar)
 		// that m_szfile_title gets initialized
 		SetInputFilename(m_szfile);
 
-		// plot file
-//		int* n = m_plot.m_nfield;
-//		ar >> n[0] >> n[1] >> n[2] >> n[3] >> n[4];
+		// get the plot file format
+		int npltfmt = 0;
+		ar >> npltfmt;
+		assert(m_plot == 0);
+
+		switch (npltfmt)
+		{
+		case 1:
+			{
+				// Open the plot file for appending
+				// TODO: We need a better way to create a plotfile
+				//		 what if the user created a different output format?
+				LSDYNAPlotFile* plt = new LSDYNAPlotFile;
+				m_plot = plt;
+				if (m_plot->Append(*this, m_szplot) == false)
+				{
+					printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
+					throw "FATAL ERROR";
+				}
+
+				// plot file
+				int* n = plt->m_nfield;
+				ar >> n[0] >> n[1] >> n[2] >> n[3] >> n[4];
+			}
+			break;
+		case 2:
+			{
+				m_plot = new FEBioPlotFile;
+				if (m_plot->Append(*this, m_szplot) == false)
+				{
+					printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
+					throw "FATAL ERROR";
+				}
+			}
+			break;
+		};
 	}
 }

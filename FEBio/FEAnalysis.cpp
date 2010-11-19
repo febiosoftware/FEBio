@@ -5,6 +5,8 @@
 #include "FERigid.h"
 #include "FEUncoupledMaterial.h"
 #include "log.h"
+#include "FESolidSolver.h"
+#include "FEHeatSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -71,16 +73,16 @@ bool FEAnalysis::Init()
 	// set first time step
 	m_dt = m_dt0;
 
-	m_tend = m_fem.m_ftime + m_dt0*m_ntime;
+	m_tend = m_fem.m_ftime0 + m_dt0*m_ntime;
 
 	// init must point curve
 	if (m_nmplc < 0)
 	{
 		FELoadCurve* plc = new FELoadCurve();
 		plc->Create(2);
-		plc->LoadPoint(0).time  = m_fem.m_ftime;
+		plc->LoadPoint(0).time  = m_fem.m_ftime0;
 		plc->LoadPoint(0).value = 0;
-		plc->LoadPoint(1).time  = m_fem.m_ftime + m_dt*m_ntime;
+		plc->LoadPoint(1).time  = m_fem.m_ftime0 + m_dt*m_ntime;
 		plc->LoadPoint(1).value = m_dtmax;
 		m_fem.AddLoadCurve(plc);
 		m_nmplc = m_fem.m_LC.size()-1;
@@ -316,8 +318,8 @@ bool FEAnalysis::Solve()
 	bool bconv = true;
 
 	// calculate end time value
-	double starttime = m_fem.m_ftime;
-	double endtime = m_fem.m_ftime + m_ntime*m_dt0;
+	double starttime = m_fem.m_ftime0;
+	double endtime = m_fem.m_ftime0 + m_ntime*m_dt0;
 	const double eps = endtime*1e-7;
 
 	int nsteps = m_fem.m_Step.size();
@@ -538,6 +540,8 @@ bool FEAnalysis::Solve()
 			pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
 	}
 
+	m_fem.m_ftime0 = m_fem.m_ftime;
+
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
 	{
 		log.SetMode(Logfile::FILE_AND_SCREEN);
@@ -566,6 +570,7 @@ void FEAnalysis::Serialize(Archive& ar)
 	if (ar.IsSaving())
 	{
 		// --- analysis data ---
+		ar << m_nModule;
 		ar << m_nanalysis;
 		ar << m_istiffpr;
 		ar << m_baugment;
@@ -603,6 +608,7 @@ void FEAnalysis::Serialize(Archive& ar)
 	else
 	{
 		// --- analysis data ---
+		ar >> m_nModule;
 		ar >> m_nanalysis;
 		ar >> m_istiffpr;
 		ar >> m_baugment;
@@ -644,9 +650,24 @@ void FEAnalysis::Serialize(Archive& ar)
 			assert(pbc);
 			m_BC.push_back(pbc);
 		}
+
+		// create a solver
+		assert(m_psolver == 0);
+		switch (m_nModule)
+		{
+		case FE_SOLID: 
+		case FE_POROELASTIC:
+			m_psolver = new FESolidSolver(m_fem); 
+			break;
+		case FE_HEAT:
+			m_psolver = new FEHeatSolver(m_fem);
+			break;
+		default:
+			throw "Unknown module type in FEAnalysis::Serialize";
+		}
 	}
 
-	// serialize solver data
+	// Seriaize solver data
 	m_psolver->Serialize(ar);
 }
 

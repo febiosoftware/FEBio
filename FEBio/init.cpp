@@ -114,6 +114,7 @@ bool FEM::Init()
 
 	// intitialize time
 	m_ftime = 0;
+	m_ftime0 = 0;
 
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
@@ -416,6 +417,7 @@ bool FEM::Reset()
 
 	// set the start time
 	m_ftime = 0;
+	m_ftime0 = 0;
 
 	// set first time step
 	m_pStep->m_dt = m_pStep->m_dt0;

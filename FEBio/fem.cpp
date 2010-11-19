@@ -17,26 +17,27 @@
 FEM::FEM()
 {
 	// --- Analysis Data ---
-	// we create at least one step
-	m_pStep = new FEAnalysis(*this);
-	m_Step.push_back(m_pStep);
-	m_nStep = 0;
+	m_pStep = 0;
+	m_nStep = -1;
 	m_nhex8 = FE_HEX;
 	m_b3field = true;
 	m_bsym_poro = true;			// use symmetric poro implementation
 	m_nplane_strain = -1;	// don't use plain strain mode
 
 	m_ftime = 0;
+	m_ftime0 = 0;
 
 	// add the "zero" loadcurve
 	// this is the loadcurve that will be used if a loadcurve is not
 	// specified for something that depends on time
+	// TODO: I want to get rid of this 
 	FELoadCurve* plc = new FELoadCurve();
 	plc->Create(2);
 	plc->LoadPoint(0).time = 0;
 	plc->LoadPoint(0).value = 0;
-	plc->LoadPoint(1).time = m_pStep->m_ntime*m_pStep->m_dt0;
+	plc->LoadPoint(1).time = 1;
 	plc->LoadPoint(1).value = 1;
+	plc->SetExtendMode(FELoadCurve::EXTRAPOLATE);
 	AddLoadCurve(plc);
 
 	// --- Geometry Data ---
@@ -104,6 +105,7 @@ FEM::FEM()
 FEM::FEM(const FEM& fem)
 {
 	m_ftime = 0;
+	m_ftime0 = 0;
 
 	// --- Geometry Data ---
 	m_nreq = 0;
@@ -198,6 +200,7 @@ void FEM::ShallowCopy(FEM& fem)
 	m_RB = fem.m_RB;
 
 	m_ftime = fem.m_ftime;
+	m_ftime0 = fem.m_ftime0;
 
 	// copy rigid joint data
 	if (m_nrj == 0)

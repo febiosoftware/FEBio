@@ -280,17 +280,14 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 
 bool LSDYNAPlotFile::Append(FEM& fem, const char* szfile)
 {
-	// write the header
-	PLOTHEADER plh = {0};
-
 	// open the file
 	if ((m_fp = fopen(szfile, "rb")) == 0) return false;
 	
 	// read the plot file header
-	fread(&plh, sizeof(PLOTHEADER), 1, m_fp);
+	fread(&m_ph, sizeof(PLOTHEADER), 1, m_fp);
 
-	if (plh.nv2d == 32) m_bsstrn = false;
-	else if (plh.nv2d == 44) m_bsstrn = true;
+	if (m_ph.nv2d == 32) m_bsstrn = false;
+	else if (m_ph.nv2d == 44) m_bsstrn = true;
 	else
 	{
 		fclose(m_fp); m_fp = 0;

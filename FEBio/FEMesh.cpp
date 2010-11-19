@@ -493,7 +493,7 @@ void FEMesh::Serialize(FEM& fem, Archive& ar)
 			FEDomain& d = Domain(i);
 			int ntype = d.Type();
 			int ne = d.Elements();
-			ar << ntype << nn;
+			ar << ntype << ne;
 			d.Serialize(fem, ar);
 		}
 	}
