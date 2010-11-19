@@ -44,7 +44,6 @@ void Interruptable::interrupt()
 	char* argv[32];
 
 	// enter command loop
-	printf("Enter command:\n");
 	while (1)
 	{
 		// get a command from the shell

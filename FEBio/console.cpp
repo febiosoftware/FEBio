@@ -62,7 +62,7 @@ void Console::GetCommand(int& nargs, char **argv)
 	static char szcmd[512] = {0};
 
 	// print the command prompt
-	printf("\n>");
+	printf("\nfebio>");
 
 	// you must flush the input buffer before using gets
 	fflush(stdin);

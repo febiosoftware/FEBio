@@ -322,10 +322,12 @@ bool FEAnalysis::Solve()
 
 	int nsteps = m_fem.m_Step.size();
 
+	bool bdebug = m_fem.GetDebugFlag();
+
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - FEBio", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title);
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
 	else
-		pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title);
+		pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
 
 	// keep a stack for push/pop'ing
 	stack<FEM> state;
@@ -529,10 +531,11 @@ bool FEAnalysis::Solve()
 		// the next timestep goes wrong
 		log.flush();
 
+		bool bdebug = m_fem.GetDebugFlag();
 		if (nsteps>1)
-			pShell->SetTitle("(step %d/%d: %.f%%) %s - FEBio", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title);
+			pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
 		else
-			pShell->SetTitle("(%.f%%) %s - FEBio", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title);
+			pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
 	}
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)

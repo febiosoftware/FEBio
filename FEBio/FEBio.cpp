@@ -47,6 +47,7 @@
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
 #include "validate.h"
+#include "console.h"
 
 #define MAXFILE 256
 
@@ -95,6 +96,8 @@ void init_framework(FEM& fem);
 
 int get_app_path (char *pname, size_t pathsize);
 
+int prompt(CMDOPTIONS& ops);
+
 //-----------------------------------------------------------------------------
 // The starting point of the application
 
@@ -117,11 +120,11 @@ int main(int argc, char* argv[])
 //#endif
 	}
 
-	// if there are no arguments, ask for an input file
+	// if there are no arguments, print the FEBio prompt
 	if (argc == 1)
 	{
-		printf("Enter input file: ");
-		scanf("%s", ops.szfile);
+		 int nret = prompt(ops);
+		 if (nret == 0) return 0;
 	}
 
 	// create the one and only FEM object
@@ -325,4 +328,50 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 void init_framework(FEM& fem)
 {
 	FEBioCommand::SetFEM(&fem);
+}
+
+//-----------------------------------------------------------------------------
+int prompt(CMDOPTIONS& ops)
+{
+	// get a pointer to the console window
+	Console* pShell = Console::GetHandle();
+
+	int nargs;
+	char* argv[32];
+
+	fprintf(stderr, "Type help for an overview of commands.\n");
+
+	while (1)
+	{
+		// get a command from the shell
+		pShell->GetCommand(nargs, argv);
+		if (nargs > 0)
+		{
+			if (strcmp(argv[0], "quit") == 0) return 0;
+			else if (strcmp(argv[0], "help") == 0)
+			{
+				fprintf(stderr, "\n");
+				fprintf(stderr, "help - print this info\n");
+				fprintf(stderr, "quit - exits the application\n");
+				fprintf(stderr, "run [-i,-s] <file> [OPTIONS] - run an FEBio input file\n");
+				fprintf(stderr, "version - print version information\n");
+			}
+			else if (strcmp(argv[0], "run") == 0)
+			{
+				ParseCmdLine(nargs, argv, ops);
+				return 1;
+			}
+			else if (strcmp(argv[0], "version") == 0)
+			{
+				fprintf(stderr, "\nFEBio version %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+				fprintf(stderr, "compiled on " __DATE__ "\n");
+				fprintf(stderr, "using FECore version %s\n\n", FECore::get_version_string());
+			}
+			else
+			{
+				printf("Unknown command: %s\n", argv[0]);
+			}
+		}
+	}
+	return 0;
 }
