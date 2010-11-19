@@ -72,7 +72,7 @@ public:
 	{
 		int n = v.size();
 		fwrite(&n, sizeof(int), 1, m_fp);
-		fwrite((T*) &v[0], sizeof(T), v.size(), m_fp);
+		if (n>0) fwrite((T*) &v[0], sizeof(T), v.size(), m_fp);
 		return (*this);
 	}
 	//@}
@@ -101,8 +101,12 @@ public:
 	{
 		int n;
 		fread(&n, sizeof(int), 1, m_fp);
-		v.resize(n);
-		fread((T*) &v[0], sizeof(T), n, m_fp);
+		if (n>0)
+		{
+			v.resize(n);
+			fread((T*) &v[0], sizeof(T), n, m_fp);
+		}
+		else v.clear();
 		return (*this);
 	}
 	//@}

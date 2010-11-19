@@ -460,7 +460,7 @@ void FEM::SerializeContactData(Archive &ar)
 //
 void FEM::SerializeBoundaryData(Archive& ar)
 {
-	int i;
+	int i, n;
 
 	if (ar.IsSaving())
 	{
@@ -513,9 +513,13 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		ar << m_LCT;
 
 		// aug lag linear constraints
-		ar << (int) m_LCSet.size();
-		list<FELinearConstraintSet*>::iterator ic = m_LCSet.begin();
-		for (i=0; i< (int) m_LCSet.size(); ++i, ++ic) (*ic)->Serialize(ar);
+		n = (int) m_LCSet.size();
+		ar << n;
+		if (m_LCSet.empty() == false)
+		{
+			list<FELinearConstraintSet*>::iterator ic = m_LCSet.begin();
+			for (i=0; i<n; ++i, ++ic) (*ic)->Serialize(ar);
+		}
 	}
 	else
 	{
