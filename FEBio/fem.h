@@ -453,7 +453,7 @@ public:
 		vector<FERigidBodyForce*>	m_RFC;	//!< rigid body forces
 
 		// rigid nodes
-		vector<FERigidNode>		m_RN;		//!< rigid nodes
+		vector<FERigidNode*>		m_RN;		//!< rigid nodes
 
 		// linear constraint data
 		list<FELinearConstraint>	m_LinC;		//!< linear constraints data

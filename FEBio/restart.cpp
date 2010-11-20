@@ -503,7 +503,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		ar << m_RN.size();
 		for (i=0; i<(int) m_RN.size(); ++i)
 		{
-			FERigidNode& rn = m_RN[i];
+			FERigidNode& rn = *m_RN[i];
 			ar << rn.nid << rn.rid;
 		}
 
@@ -567,11 +567,12 @@ void FEM::SerializeBoundaryData(Archive& ar)
 
 		// rigid nodes
 		ar >> n;
-		if (n) m_RN.resize(n);
+		m_RN.clear();
 		for (i=0; i<n; ++i)
 		{
-			FERigidNode& rn = m_RN[i];
-			ar >> rn.nid >> rn.rid;
+			FERigidNode* prn = new FERigidNode;
+			ar >> prn->nid >> prn->rid;
+			m_RN.push_back(prn);
 		}
 
 		// linear constraints

@@ -594,7 +594,6 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 		node.m_rid = -1;
 	}
 
-	fem.m_RN.resize(4*m_nrn);
 	int nrn = 0;
 
 	int rn[4], rb;
@@ -610,9 +609,10 @@ bool FENIKEImport::ReadGeometry(FEM& fem)
 
 		for (j=0; j<nread-1; ++j, ++N, ++nrn)
 		{
-			FERigidNode& rin = fem.m_RN[nrn];
-			rin.nid = rn[j]-1;
-			rin.rid = rb-1;
+			FERigidNode* prn = new FERigidNode;
+			prn->nid = rn[j]-1;
+			prn->rid = rb-1;
+			fem.m_RN.push_back(prn);
 		}
 	}
 	// since we may have read less than 4*m_nrn rigid nodes

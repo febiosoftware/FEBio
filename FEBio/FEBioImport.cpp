@@ -2652,24 +2652,23 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		XMLTag t(tag); ++t;
 		while (!t.isend()) { nrn++; ++t; }
 
-		// allocate rigid node data
-		int nsize = fem.m_RN.size();
-		fem.m_RN.resize(nsize + nrn);
-
 		++tag;
 		int id, rb;
-		for (int i=nsize; i<nsize+nrn; ++i)
+		for (int i=0; i<nrn; ++i)
 		{
 			id = atoi(tag.AttributeValue("id"))-1;
 			rb = atoi(tag.AttributeValue("rb"))-1;
 
-			fem.m_RN[i].nid = id;
-			fem.m_RN[i].rid = rb;
+			FERigidNode* prn = new FERigidNode;
+
+			prn->nid = id;
+			prn->rid = rb;
+			fem.m_RN.push_back(prn);
 
 			if (m_pim->m_nsteps > 0)
 			{
-				GetStep()->AddBoundaryCondition(&fem.m_RN[i]);
-				fem.m_RN[i].Deactivate();
+				GetStep()->AddBoundaryCondition(prn);
+				prn->Deactivate();
 			}
 
 			++tag;

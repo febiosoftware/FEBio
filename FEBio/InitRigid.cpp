@@ -326,7 +326,7 @@ bool FEM::InitRigidBodies()
 	// assign correct rigid body ID's to rigid nodes
 	for (i=0; i<(int) m_RN.size(); ++i)
 	{
-		FERigidNode& rn = m_RN[i];
+		FERigidNode& rn = *m_RN[i];
 		rn.rid = mrb[rn.rid];
 	}
 

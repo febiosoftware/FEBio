@@ -138,7 +138,7 @@ bool FEAnalysis::Init()
 	// for rigid nodes that do not belong to a non-rigid shell element.
 	for (i=0; i<(int) m_fem.m_RN.size(); ++i)
 	{
-		FERigidNode& rn = m_fem.m_RN[i];
+		FERigidNode& rn = *m_fem.m_RN[i];
 		if (rn.IsActive())
 		{
 			FENode& node = m_fem.m_mesh.Node(rn.nid);
