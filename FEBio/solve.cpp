@@ -7,6 +7,19 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+bool solve(FEM& fem, const char* szfile)
+{
+	// read input data
+	if (fem.Input(szfile) == false) return false;
+
+	// initialize and check data
+	if (fem.Init() == false) return false;
+
+	// run the analysis
+	return fem.Solve();
+}
+
+//-----------------------------------------------------------------------------
 //! This is the main solve method. This function loops over all analysis steps
 //! and solves each one in turn. 
 //! \sa FEAnalysis

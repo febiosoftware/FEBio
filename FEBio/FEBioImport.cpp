@@ -55,7 +55,6 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 
 	// Create one step
 	assert(fem.m_Step.empty());
-	fem.m_Step.clear();
 	FEAnalysis* pstep = new FEAnalysis(fem);
 	fem.m_Step.push_back(pstep);
 	fem.m_nStep = 0;

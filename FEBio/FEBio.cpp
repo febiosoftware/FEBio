@@ -49,58 +49,55 @@
 #include "validate.h"
 #include "console.h"
 
-#define MAXFILE 256
+#define MAXFILE 512
+
+//-----------------------------------------------------------------------------
+// FEBio analysis modes
+enum FEBIO_MODE {
+	FE_UNKNOWN,
+	FE_ANALYZE,
+	FE_RESTART,
+	FE_DIAGNOSE,
+	FE_OPTIMIZE
+};
 
 //-----------------------------------------------------------------------------
 //!  Command line options
 
 //! This structures stores the command line options that were input by the user
-
 struct CMDOPTIONS
 {
-	char	szfile[MAXFILE];	//!< input file name
-
-	bool	blog;
-	char	szlog[MAXFILE];		//!< log file name
-
-	bool	bplt;
-	char	szplt[MAXFILE];		//!< plot file name
-
-	bool	bdmp;				//!< dump flag
-	char	szdmp[MAXFILE];		//!< dump file name
-
-	char	szcnf[MAXFILE];		//!< configuration file
-
-	bool	bdiag;				//!< run diagnostic file
-	bool	brun;				//!< run the problem or just check data?
-	bool	brstrt;				//!< restart flag
-	bool	boptim;				//!< optimization flag
-	bool	bdebug;				//!< debug flag
+	FEBIO_MODE	nmode;			//!< FEBio analysis mode
+	bool		bdebug;			//!< debug flag
 
 	bool	bsplash;			//!< show splash screen or not
+
+	char	szfile[MAXFILE];	//!< input file name
+	char	szlog [MAXFILE];	//!< log file name
+	char	szplt [MAXFILE];	//!< plot file name
+	char	szdmp [MAXFILE];	//!< dump file name
+	char	szcnf [MAXFILE];	//!< configuration file
 };
 
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 // forward declarations
 //
-
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
 void Hello(FILE* fp);
-void print_banner();
+int prompt(CMDOPTIONS& ops);
 
 bool optimize(FEM& fem, const char* szfile);
-
 bool diagnose(FEM& fem, const char* szfile);
+bool restart (FEM& fem, const char* szfile);
+bool solve   (FEM& fem, const char* szfile);
 
 void init_framework(FEM& fem);
 
 int get_app_path (char *pname, size_t pathsize);
 
-int prompt(CMDOPTIONS& ops);
-
 //-----------------------------------------------------------------------------
 // The starting point of the application
-
+//
 int main(int argc, char* argv[])
 {
 	// parse the command line
@@ -111,20 +108,12 @@ int main(int argc, char* argv[])
 	LoadLicenseFile();
 
 	// print welcome message
-	if (ops.bsplash)
-	{
-//#ifdef WIN32
-//		print_banner();
-//#else
-		Hello(stdout);
-//#endif
-	}
+	if (ops.bsplash) Hello(stdout);
 
 	// if there are no arguments, print the FEBio prompt
 	if (argc == 1)
 	{
-		 int nret = prompt(ops);
-		 if (nret == 0) return 0;
+		 if (prompt(ops) == 0) return 0;
 	}
 
 	// create the one and only FEM object
@@ -139,7 +128,7 @@ int main(int argc, char* argv[])
 		if (fem.Configure(ops.szcnf) == false) return 1;
 	}
 
-	// set the filenames
+	// set the output filenames
 	fem.SetLogFilename (ops.szlog);
 	fem.SetPlotFilename(ops.szplt);
 	fem.SetDumpFilename(ops.szdmp);
@@ -147,71 +136,32 @@ int main(int argc, char* argv[])
 	// set options that were passed on the command line
 	fem.SetDebugFlag(ops.bdebug);
 
-	// set the default plot and print levels
-/*
-	if (ops.bdebug)
+	// run the FEBio analysis
+	bool bret = false;
+	switch (ops.nmode)
 	{
-		fem.m_pStep->SetPrintLevel(FE_PRINT_MINOR_ITRS_EXP);
-		fem.m_pStep->SetPlotLevel (FE_PLOT_MINOR_ITRS);
-	}
-	else
-	{
-		fem.m_pStep->SetPrintLevel(FE_PRINT_MINOR_ITRS);
-		fem.m_pStep->SetPlotLevel (FE_PLOT_MAJOR_ITRS);
-	}
-*/
-	// check for parameter optimization
-	if (ops.boptim) optimize(fem, ops.szfile);
-	else if (ops.bdiag) diagnose(fem, ops.szfile);
-	else
-	{
-		// input data
-		if (ops.brstrt)
-		{
-			// do a restart
-			if (fem.Restart(ops.szfile) == false) return 1;
-		}
-		else
-		{
-			// read input data
-			if (fem.Input(ops.szfile) == false) return 1;
+	case FE_ANALYZE : bret = solve   (fem, ops.szfile); break;
+	case FE_OPTIMIZE: bret = optimize(fem, ops.szfile); break;
+	case FE_DIAGNOSE: bret = diagnose(fem, ops.szfile); break;
+	case FE_RESTART : bret = restart (fem, ops.szfile); break;
+	};
 
-			// initialize and check data
-			if (fem.Init() == false) return 1;
-		}
-
-		// solve the problem
-		if (ops.brun)
-		{
-			bool bret = fem.Solve();
-			return (int) (bret?0:1);
-		}
-		else
-		{
-			printf("\nData check complete\n\n");
-		}
-	}
-
-	return 0;
+	return (bret?0:1);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : ParseCmdLine
-//  Parses the command line and returns a CMDOPTIONS structure
+//-----------------------------------------------------------------------------
+//!  Parses the command line and returns a CMDOPTIONS structure
 //
-
 bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 {
 	// set default options
-	ops.brstrt = false;
-	ops.boptim = false;
+	ops.nmode = FE_UNKNOWN;
 	ops.bdebug = false;
-	ops.bdmp = false;
-	ops.bplt = false;
-	ops.blog = false;
-	ops.brun = true;
-	ops.bdiag = false;
 	ops.bsplash = true;
+
+	bool blog = false;
+	bool bplt = false;
+	bool bdmp = false;
 
 	ops.szfile[0] = 0;
 
@@ -233,47 +183,42 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 
 		if (strcmp(sz,"-r") == 0)
 		{
-			ops.brstrt = true;
+			ops.nmode = FE_RESTART;
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-d") == 0)
 		{
-			ops.bdiag = true;
+			ops.nmode = FE_DIAGNOSE;
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-p") == 0)
 		{
-			ops.bplt = true;
+			bplt = true;
 			strcpy(ops.szplt, argv[++i]);
 		}
 		else if (strcmp(sz, "-a") == 0)
 		{
-			ops.bdmp = true;
+			bdmp = true;
 			strcpy(ops.szdmp, argv[++i]);
 		}
 		else if (strcmp(sz, "-o") == 0)
 		{
-			ops.blog = true;
+			blog = true;
 			strcpy(ops.szlog, argv[++i]);
 		}
 		else if (strcmp(sz, "-i") == 0)
 		{
+			ops.nmode = FE_ANALYZE;
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-s") == 0)
 		{
-			ops.boptim = true;
+			ops.nmode = FE_OPTIMIZE;
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-g") == 0)
 		{
 			ops.bdebug = true;
-		}
-		else if (strcmp(sz, "-c") == 0)
-		{
-			// don't run the problem.
-			// just do a data check
-			ops.brun = false;
 		}
 		else if (strcmp(sz, "-nosplash") == 0)
 		{
@@ -311,27 +256,31 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 				  (strcmp(szext, "xml")==0) ||
 				  (strcmp(szext, "XML")==0)))
 	{
-		if (!ops.blog) sprintf(ops.szlog, "%s.log", szbase);
-		if (!ops.bplt) sprintf(ops.szplt, "%s.plt", szbase);
-		if (!ops.bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
+		if (!blog) sprintf(ops.szlog, "%s.log", szbase);
+		if (!bplt) sprintf(ops.szplt, "%s.plt", szbase);
+		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
 	}
 	else
 	{
-		if (!ops.blog) sprintf(ops.szlog, "%sf3log.txt", szpath);
-		if (!ops.bplt) sprintf(ops.szplt, "%sf3plot"   , szpath);
-		if (!ops.bdmp) sprintf(ops.szdmp, "%sf3dmp"    , szpath);
+		if (!blog) sprintf(ops.szlog, "%sf3log.txt", szpath);
+		if (!bplt) sprintf(ops.szplt, "%sf3plot"   , szpath);
+		if (!bdmp) sprintf(ops.szdmp, "%sf3dmp"    , szpath);
 	}
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
+//! Initializes the framework
 void init_framework(FEM& fem)
 {
 	FEBioCommand::SetFEM(&fem);
 }
 
 //-----------------------------------------------------------------------------
+//! Prints the FEBio prompt. If the user did not enter anything on the command
+//! line when running FEBio then commands can be entered at the FEBio prompt.
+//! This function returns the command arguments as a CMDOPTIONS structure.
 int prompt(CMDOPTIONS& ops)
 {
 	// get a pointer to the console window

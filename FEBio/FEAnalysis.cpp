@@ -45,8 +45,9 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 
 	// --- I/O Data ---
 	m_bDump = false;
-	m_nplot = FE_PLOT_MAJOR_ITRS;
-	m_nprint = FE_PRINT_MINOR_ITRS;
+	bool bdebug = fem.GetDebugFlag();
+	m_nplot  = (bdebug?FE_PLOT_MINOR_ITRS     : FE_PLOT_MAJOR_ITRS );
+	m_nprint = (bdebug?FE_PRINT_MINOR_ITRS_EXP: FE_PRINT_MINOR_ITRS);
 }
 
 //-----------------------------------------------------------------------------

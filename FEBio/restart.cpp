@@ -13,6 +13,16 @@
 #include "FEBioPlotFile.h"
 
 //-----------------------------------------------------------------------------
+bool restart(FEM& fem, const char* szfile)
+{
+	// load restart data
+	if (fem.Restart(szfile) == false) return false;
+
+	// continue the analysis
+	return fem.Solve();
+}
+
+//-----------------------------------------------------------------------------
 //!  This routine reads a binary archive that stores a restart point and prepares
 //!  the FEM data to be restarted from this point
 //!	\param[in] szfile name of the file
