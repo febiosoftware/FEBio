@@ -1702,13 +1702,9 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { ndis++; ++t; }
 
-	// allocate prescribed data
-	int nsize = fem.m_DC.size();
-	fem.m_DC.resize(nsize + ndis);
-
 	// read the prescribed data
 	++tag;
-	for (int i=nsize; i<nsize+ndis; ++i)
+	for (int i=0; i<ndis; ++i)
 	{
 		int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
 		const char* sz = tag.AttributeValue("bc");
@@ -1724,16 +1720,18 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		if (sz == 0) lc = 0;
 		else lc = atoi(sz);
 
-		fem.m_DC[i].node = n;
-		fem.m_DC[i].bc = bc;
-		fem.m_DC[i].lc = lc;
-		tag.value(fem.m_DC[i].s);
+		FENodalDisplacement* pdc = new FENodalDisplacement;
+		pdc->node = n;
+		pdc->bc = bc;
+		pdc->lc = lc;
+		tag.value(pdc->s);
+		fem.m_DC.push_back(pdc);
 
 		// add this boundary condition to the current step
 		if (m_pim->m_nsteps > 0)
 		{
-			GetStep()->AddBoundaryCondition(&fem.m_DC[i]);
-			fem.m_DC[i].Deactivate();
+			GetStep()->AddBoundaryCondition(pdc);
+			pdc->Deactivate();
 		}
 		++tag;
 	}	
@@ -1749,13 +1747,9 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { ncnf++; ++t; }
 
-	// allocate prescribed data
-	int nsize = fem.m_FC.size();
-	fem.m_FC.resize(nsize + ncnf);
-
 	// read the prescribed data
 	++tag;
-	for (int i=nsize; i<ncnf+nsize; ++i)
+	for (int i=0; i<ncnf; ++i)
 	{
 		int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
 		const char* sz = tag.AttributeValue("bc");
@@ -1771,16 +1765,18 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 		if (sz == 0) lc = 0;
 		else lc = atoi(sz);
 
-		fem.m_FC[i].node = n;
-		fem.m_FC[i].bc = bc;
-		fem.m_FC[i].lc = lc;
-		tag.value(fem.m_FC[i].s);
+		FENodalForce* pfc = new FENodalForce;
+		pfc->node = n;
+		pfc->bc = bc;
+		pfc->lc = lc;
+		tag.value(pfc->s);
+		fem.m_FC.push_back(pfc);
 
 		// add this boundary condition to the current step
 		if (m_pim->m_nsteps > 0)
 		{
-			GetStep()->AddBoundaryCondition(&fem.m_FC[i]);
-			fem.m_FC[i].Deactivate();
+			GetStep()->AddBoundaryCondition(pfc);
+			pfc->Deactivate();
 		}
 
 		++tag;

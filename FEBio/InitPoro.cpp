@@ -28,8 +28,8 @@ bool FEM::InitPoro()
 		// also remove prescribed pressures
 		for (i=0; i<(int) m_DC.size(); ++i)
 		{
-			int& node = m_DC[i].node;
-			int& bc   = m_DC[i].bc;
+			int& node = m_DC[i]->node;
+			int& bc   = m_DC[i]->bc;
 
 			if (bc == 6) bc = -1;
 		}

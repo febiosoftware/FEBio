@@ -166,8 +166,7 @@ bool FEAnalysis::Init()
 	bool bdisp = false;
 	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
-		FENodalDisplacement& dc = m_fem.m_DC[i];
-
+		FENodalDisplacement& dc = *m_fem.m_DC[i];
 		if (dc.IsActive())
 		{
 			// if the node is not free we don't use this prescribed displacement
@@ -222,7 +221,7 @@ bool FEAnalysis::Init()
 	int ndis = m_fem.m_DC.size();
 	for (i=0; i<ndis; ++i)
 	{
-		FENodalDisplacement& DC = m_fem.m_DC[i];
+		FENodalDisplacement& DC = *m_fem.m_DC[i];
 		int nid = DC.node;
 		int bc  = DC.bc;
 

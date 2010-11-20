@@ -36,12 +36,13 @@ bool FEHeatSolver::SolveStep(double time)
 	zero(m_u);
 	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
 	{
-		if (m_fem.m_DC[i].IsActive())
+		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		if (dc.IsActive())
 		{
-			int n    = m_fem.m_DC[i].node;
-			int lc   = m_fem.m_DC[i].lc;
-			int bc   = m_fem.m_DC[i].bc;
-			double s = m_fem.m_DC[i].s;
+			int n    = dc.node;
+			int lc   = dc.lc;
+			int bc   = dc.bc;
+			double s = dc.s;
 
 			double T = s*m_fem.GetLoadCurve(lc)->Value();
 
@@ -105,15 +106,15 @@ void FEHeatSolver::Residual()
 
 	// loop over nodal force cards
 	int ncnf = m_fem.m_FC.size();
-	vector<FENodalForce>& FC = m_fem.m_FC;
 	for (i=0; i<ncnf; ++i)
 	{
-		if (FC[i].IsActive())
+		FENodalForce& fc = *m_fem.m_FC[i];
+		if (fc.IsActive())
 		{
-			id	 = FC[i].node;	// node ID
-			bc   = FC[i].bc;	// direction of force
-			lc   = FC[i].lc;	// loadcurve number
-			s    = FC[i].s;		// force scale factor
+			id	 = fc.node;	// node ID
+			bc   = fc.bc;	// direction of force
+			lc   = fc.lc;	// loadcurve number
+			s    = fc.s;		// force scale factor
 
 			FENode& node = mesh.Node(id);
 

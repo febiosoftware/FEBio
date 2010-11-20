@@ -18,8 +18,8 @@ bool FEM::InitHeat()
 		// also remove prescribed temperatures
 		for (i=0; i<(int) m_DC.size(); ++i)
 		{
-			int& node = m_DC[i].node;
-			int& bc   = m_DC[i].bc;
+			int& node = m_DC[i]->node;
+			int& bc   = m_DC[i]->bc;
 
 			if (bc == 10) bc = -1;
 		}

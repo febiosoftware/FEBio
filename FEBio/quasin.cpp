@@ -127,12 +127,13 @@ void FESolidSolver::PrepStep(double time)
 	zero(m_ui);
 	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
-		if (m_fem.m_DC[i].IsActive())
+		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		if (dc.IsActive())
 		{
-			int n    = m_fem.m_DC[i].node;
-			int lc   = m_fem.m_DC[i].lc;
-			int bc   = m_fem.m_DC[i].bc;
-			double s = m_fem.m_DC[i].s;
+			int n    = dc.node;
+			int lc   = dc.lc;
+			int bc   = dc.bc;
+			double s = dc.s;
 
 			double dq = s*m_fem.GetLoadCurve(lc)->Value();
 

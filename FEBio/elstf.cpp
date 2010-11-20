@@ -731,15 +731,15 @@ void FESolidSolver::NodalForces(vector<double>& F)
 
 	// loop over nodal force cards
 	int ncnf = m_fem.m_FC.size();
-	vector<FENodalForce>& FC = m_fem.m_FC;
 	for (i=0; i<ncnf; ++i)
 	{
-		if (FC[i].IsActive())
+		FENodalForce& fc = *m_fem.m_FC[i];
+		if (fc.IsActive())
 		{
-			id	 = FC[i].node;	// node ID
-			bc   = FC[i].bc;	// direction of force
-			lc   = FC[i].lc;	// loadcurve number
-			s    = FC[i].s;		// force scale factor
+			id	 = fc.node;	// node ID
+			bc   = fc.bc;	// direction of force
+			lc   = fc.lc;	// loadcurve number
+			s    = fc.s;		// force scale factor
 
 			FENode& node = mesh.Node(id);
 

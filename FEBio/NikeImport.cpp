@@ -814,24 +814,26 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	/////////////// C O N C E N T R A T E D   N O D A L   F O R C E   D E C K ///////////////
 	if (m_ncnf>0)
 	{
-		fem.m_FC.resize(m_ncnf);
 		int bc;
 		for (i=0; i<m_ncnf; ++i)
 		{
 			if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 
-			nread = sscanf(szline, "%8d%5d%5d%10lg", &(fem.m_FC[i].node), &bc, &(fem.m_FC[i].lc), &(fem.m_FC[i].s));
+			FENodalForce* pfc = new FENodalForce;
+
+			nread = sscanf(szline, "%8d%5d%5d%10lg", &(pfc->node), &bc, &(pfc->lc), &(pfc->s));
 			if (nread != 4) return errf(szerr[ERR_CFORCE]);
 
 			if ((bc < 1) || (bc > 3)) return errf(szerr[ERR_CFORCE_BC]);
 
 			// make indices zero-based
-			fem.m_FC[i].node--;	// node point number
-			fem.m_FC[i].bc = bc-1;	// direction of load
-			fem.m_FC[i].lc--;	// load curve number
+			pfc->node--;	// node point number
+			pfc->bc = bc-1;	// direction of load
+			pfc->lc--;	// load curve number
 
 			// set default scale factor if requested
-			if (fem.m_FC[i].s == 0.0) fem.m_FC[i].s = 1.0;
+			if (pfc->s == 0.0) pfc->s = 1.0;
+			fem.m_FC.push_back(pfc);
 		}
 	}
 
@@ -878,12 +880,14 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	////////////////// D I S P L A C E M E N T   B O U N D A R Y   D E C K //////////////////
 	if (m_ndis > 0)
 	{
-		fem.m_DC.resize(m_ndis);
+		fem.m_DC;
 		for (i=0; i<m_ndis; ++i)
 		{
 			if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 
-			FENodalDisplacement& dc = fem.m_DC[i];
+			FENodalDisplacement* pdc = new FENodalDisplacement;
+			fem.m_DC.push_back(pdc);
+			FENodalDisplacement& dc = *pdc;
 
 			nread = sscanf(szline, "%8d%5d%5d%10lg", &(dc.node), &(dc.bc), &(dc.lc), &(dc.s));
 			if (nread != 4) return errf(szerr[ERR_DISP]);

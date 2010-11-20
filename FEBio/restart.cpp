@@ -470,7 +470,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		ar << m_DC.size();
 		for (i=0; i<(int) m_DC.size(); ++i) 
 		{
-			FENodalDisplacement& dc = m_DC[i];
+			FENodalDisplacement& dc = *m_DC[i];
 			ar << dc.bc << dc.lc << dc.node << dc.s;
 		}
 
@@ -478,7 +478,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		ar << m_FC.size();
 		for (i=0; i<(int) m_FC.size(); ++i)
 		{
-			FENodalForce& fc = m_FC[i];
+			FENodalForce& fc = *m_FC[i];
 			ar << fc.bc << fc.lc << fc.node << fc.s;
 		}
 
@@ -528,20 +528,21 @@ void FEM::SerializeBoundaryData(Archive& ar)
 		int n;
 		// displacements
 		ar >> n;
-		if (n) m_DC.resize(n);
+		m_DC.clear();
 		for (i=0; i<n; ++i) 
 		{
-			FENodalDisplacement& dc = m_DC[i];
-			ar >> dc.bc >> dc.lc >> dc.node >> dc.s;
+			FENodalDisplacement* pdc = new FENodalDisplacement;
+			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s;
+			m_DC.push_back(pdc);
 		}
 		
 		// nodal loads
 		ar >> n;
-		if (n) m_FC.resize(n);
 		for (i=0; i<n; ++i)
 		{
-			FENodalForce& fc = m_FC[i];
-			ar >> fc.bc >> fc.lc >> fc.node >> fc.s;
+			FENodalForce* pfc = new FENodalForce;
+			ar >> pfc->bc >> pfc->lc >> pfc->node >> pfc->s;
+			m_FC.push_back(pfc);
 		}
 
 		// rigid body displacements

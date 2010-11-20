@@ -487,9 +487,9 @@ bool FEM::Configure(const char *szfile)
 FEBoundaryCondition* FEM::FindBC(int nid)
 {
 	int i;
-	for (i=0; i<(int) m_DC.size(); ++i) if (m_DC[i].GetID() == nid) return &m_DC[i];
+	for (i=0; i<(int) m_DC.size(); ++i) if (m_DC[i]->GetID() == nid) return m_DC[i];
 
-	for (i=0; i<(int) m_FC.size(); ++i) if (m_FC[i].GetID() == nid) return &m_FC[i];
+	for (i=0; i<(int) m_FC.size(); ++i) if (m_FC[i]->GetID() == nid) return m_FC[i];
 
 	if (m_psurf)
 	{
