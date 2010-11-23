@@ -5,12 +5,52 @@
 #include "FEFacet2FacetSliding.h"
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeDisplacement::Save(FEM& fem, FILE* fp)
+void FENodeData::Save(FEM &fem, FILE *fp)
+{
+	// loop over all node sets
+	// write now there is only one, namely the master node set
+	// so we just pass the mesh
+	Save(fem.m_mesh, fp);
+}
+
+//-----------------------------------------------------------------------------
+void FEElementData::Save(FEM &fem, FILE *fp)
+{
+	// loop over all domains
+	FEMesh& m = fem.m_mesh;
+	int ND = m.Domains();
+	for (int i=0; i<ND; ++i)
+	{
+		FEDomain& D = m.Domain(i);
+		Save(D, fp);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFaceData::Save(FEM &fem, FILE *fp)
+{
+	// loop over all surfaces
+	FEMesh& m = fem.m_mesh;
+	int NS = m.Surfaces();
+	for (int i=0; i<NS; ++i)
+	{
+		FESurface& S = m.Surface(i);
+		Save(S, fp);
+	}
+}
+
+//=============================================================================
+//                            N O D E   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Store the nodal displacements
+void FEPlotNodeDisplacement::Save(FEMesh& m, FILE* fp)
 {
 	float xf[3];
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<m.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = m.Node(i);
 
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision
@@ -23,12 +63,12 @@ void FEPlotNodeDisplacement::Save(FEM& fem, FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeVelocity::Save(FEM& fem, FILE* fp)
+void FEPlotNodeVelocity::Save(FEMesh& m, FILE* fp)
 {
 	float xf[3];
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<m.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = m.Node(i);
 
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision
@@ -41,12 +81,12 @@ void FEPlotNodeVelocity::Save(FEM& fem, FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeAcceleration::Save(FEM& fem, FILE* fp)
+void FEPlotNodeAcceleration::Save(FEMesh& m, FILE* fp)
 {
 	float xf[3];
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<m.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = m.Node(i);
 
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision
@@ -59,59 +99,142 @@ void FEPlotNodeAcceleration::Save(FEM& fem, FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotElementStress::Save(FEM& fem, FILE* fp)
+void FEPlotFluidPressure::Save(FEMesh &m, FILE* fp)
+{
+	float t;
+	for (int i=0; i<m.Nodes(); ++i)
+	{
+		FENode& node = m.Node(i);
+		t = (float) node.m_pt;
+		fwrite(&t, sizeof(float), 1, fp);
+	}
+}
+
+//=============================================================================
+//                           E L E M E N T   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEPlotElementStress::Save(FEDomain& dom, FILE* fp)
 {
 	int i, j;
-
-	FEMesh& mesh = fem.m_mesh;
 
 	// write solid element data
 	float s[6] = {0};
 	double f;
 	int nint;
-	for (int nd=0; nd < mesh.Domains(); ++nd)
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
 	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
-		if (pbd)
+		for (i=0; i<pbd->Elements(); ++i)
 		{
-			for (i=0; i<pbd->Elements(); ++i)
+			FESolidElement& el = pbd->Element(i);
+
+			for (j=0; j<6; ++j) s[j] = 0;
+
+			nint = el.GaussPoints();
+
+			f = 1.0 / (double) nint;
+
+			// since the PLOT file requires floats we need to convert
+			// the doubles to single precision
+			// we output the average stress values of the gauss points
+			for (j=0; j<nint; ++j)
 			{
-				FESolidElement& el = pbd->Element(i);
+				FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
 
-				for (j=0; j<6; ++j) s[j] = 0;
-
-				nint = el.GaussPoints();
-
-				f = 1.0 / (double) nint;
-
-				// since the PLOT file requires floats we need to convert
-				// the doubles to single precision
-				// we output the average stress values of the gauss points
-				for (j=0; j<nint; ++j)
+				if (ppt)
 				{
-					FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
-					if (ppt)
-					{
-						FEElasticMaterialPoint& pt = *ppt;
-						s[0] += (float) (f*pt.s.xx());
-						s[1] += (float) (f*pt.s.yy());
-						s[2] += (float) (f*pt.s.zz());
-						s[3] += (float) (f*pt.s.xy());
-						s[4] += (float) (f*pt.s.yz());
-						s[5] += (float) (f*pt.s.xz());
-					}
+					FEElasticMaterialPoint& pt = *ppt;
+					s[0] += (float) (f*pt.s.xx());
+					s[1] += (float) (f*pt.s.yy());
+					s[2] += (float) (f*pt.s.zz());
+					s[3] += (float) (f*pt.s.xy());
+					s[4] += (float) (f*pt.s.yz());
+					s[5] += (float) (f*pt.s.xz());
 				}
-
-				fwrite(s, sizeof(float), 6, fp);
 			}
+
+			fwrite(s, sizeof(float), 6, fp);
 		}
 	}
 }
 
+
 //-----------------------------------------------------------------------------
-void FEPlotContactGap::Save(FEM &fem, FILE* fp)
+void FEPlotFluidFlux::Save(FEDomain &dom, FILE* fp)
 {
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+
+				if (pt) ew += pt->m_w;
+			}
+
+			ew /= el.GaussPoints();
+
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+
+			fwrite(af, sizeof(float), 3, fp);
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+void FEPlotFiberVector::Save(FEDomain &dom, FILE* fp)
+{
+	int i, j, n;
+	float a[3];
+	vec3d r;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		int BE = pbd->Elements();
+		for (i=0; i<BE; ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			n = el.GaussPoints();
+			r = vec3d(0,0,0);
+			for (j=0; j<n; ++j)
+			{
+				FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				r.x += pt.Q[0][0];
+				r.y += pt.Q[1][0];
+				r.z += pt.Q[2][0];
+			}
+			r /= n;
+			a[0] = (float) r.x;
+			a[1] = (float) r.y;
+			a[2] = (float) r.z;
+			fwrite(a, sizeof(float), 3, fp);
+		}
+	}
+}
+
+//=============================================================================
+//                           S U R F A C E   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEPlotContactGap::Save(FESurface& surf, FILE* fp)
+{
+/*
 	FEMesh& mesh = fem.m_mesh;
 
 	vector<float> t(mesh.Nodes());
@@ -225,11 +348,13 @@ void FEPlotContactGap::Save(FEM &fem, FILE* fp)
 	// Note that we only save gap values of nodes that are actually in contact
 	for (i=0; i<mesh.Nodes(); ++i) t[i] = (t[i]<0? 0.f : t[i]);
 	fwrite(&t[0], sizeof(float), mesh.Nodes(), fp);
+*/
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
+void FEPlotContactTraction::Save(FESurface &surf, FILE* fp)
 {
+/*
 	int i, j, k, n;
 
 	vector<float> acc(3*fem.m_mesh.Nodes()); zero(acc);
@@ -356,95 +481,5 @@ void FEPlotContactTraction::Save(FEM &fem, FILE* fp)
 	}
 
 	fwrite(&acc[0], sizeof(float)*3, fem.m_mesh.Nodes(), fp);
-}
-
-//-----------------------------------------------------------------------------
-void FEPlotFluidPressure::Save(FEM &fem, FILE* fp)
-{
-	float t;
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
-	{
-		FENode& node = fem.m_mesh.Node(i);
-		t = (float) node.m_pt;
-		fwrite(&t, sizeof(float), 1, fp);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEPlotFluidFlux::Save(FEM &fem, FILE* fp)
-{
-	FEMesh& mesh = fem.m_mesh;
-
-	int i, j;
-
-	float af[3];
-	vec3d ew;
-	for (int nd=0; nd < mesh.Domains(); ++nd)
-	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
-		if (pbd)
-		{
-			for (i=0; i<pbd->Elements(); ++i)
-			{
-				FESolidElement& el = pbd->Element(i);
-
-				// calculate average flux
-				ew = vec3d(0,0,0);
-				for (j=0; j<el.GaussPoints(); ++j)
-				{
-					FEMaterialPoint& mp = *el.m_State[j];
-					FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-					if (pt) ew += pt->m_w;
-				}
-
-				ew /= el.GaussPoints();
-
-				af[0] = (float) ew.x;
-				af[1] = (float) ew.y;
-				af[2] = (float) ew.z;
-
-				fwrite(af, sizeof(float), 3, fp);
-			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEPlotFiberVector::Save(FEM &fem, FILE* fp)
-{
-	int i, j, n;
-	FEMesh& mesh = fem.m_mesh;
-
-
-	float a[3];
-	vec3d r;
-
-	for (int nd=0; nd<mesh.Domains(); ++nd)
-	{
-		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
-		if (pbd)
-		{
-			int BE = pbd->Elements();
-			for (i=0; i<BE; ++i)
-			{
-				FESolidElement& el = pbd->Element(i);
-				n = el.GaussPoints();
-				r = vec3d(0,0,0);
-				for (j=0; j<n; ++j)
-				{
-					FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-					r.x += pt.Q[0][0];
-					r.y += pt.Q[1][0];
-					r.z += pt.Q[2][0];
-				}
-				r /= n;
-
-				a[0] = (float) r.x;
-				a[1] = (float) r.y;
-				a[2] = (float) r.z;
-				fwrite(a, sizeof(float), 3, fp);
-			}
-		}
-	}
+*/
 }

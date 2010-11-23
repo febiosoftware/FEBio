@@ -233,10 +233,16 @@ public:
 		return m_NEL;
 	}
 
+	// --- SOLID DOMAINS ---
 	int Domains() { return (int) m_Domain.size(); }
 	FEDomain& Domain(int n) { return *m_Domain[n]; }
 
 	void AddDomain(FEDomain* pd) { m_Domain.push_back(pd); }
+
+	// --- SURFACES ---
+	int Surfaces() { return (int) m_Surf.size(); }
+	FESurface& Surface(int n) { return *m_Surf[n]; }
+	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
 
 protected:
 	void ClearDomains();
@@ -245,6 +251,7 @@ protected:
 	vector<FENode>		m_Node;		//!< FE nodes array
 	vector<FEDomain*>	m_Domain;	//!< list of domains
 	vector<FENodeSet*>	m_NodeSet;	//!< node sets
+	vector<FESurface*>	m_Surf;		//!< surfaces
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 

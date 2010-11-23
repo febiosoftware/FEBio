@@ -2270,6 +2270,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 				FESlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				m.AddSurface(&s);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
