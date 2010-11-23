@@ -69,7 +69,7 @@ public:
 	bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 	//! mark free-draining condition 
 	void MarkFreeDraining();

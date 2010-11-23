@@ -125,7 +125,7 @@ void FEElasticSolidDomain::InitElements()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::Serialize(FEM& fem, Archive &ar)
+void FEElasticSolidDomain::Serialize(FEM& fem, DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -252,7 +252,7 @@ bool FEElasticShellDomain::Initialize(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticShellDomain::Serialize(FEM& fem, Archive &ar)
+void FEElasticShellDomain::Serialize(FEM& fem, DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{

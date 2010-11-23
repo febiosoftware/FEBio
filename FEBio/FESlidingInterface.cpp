@@ -1644,7 +1644,7 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::Serialize(Archive& ar)
+void FESlidingInterface::Serialize(DumpFile& ar)
 {
 	int j, k, n, mat;
 

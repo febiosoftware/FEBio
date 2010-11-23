@@ -542,7 +542,7 @@ bool FERigidWallInterface::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 
-void FERigidWallInterface::Serialize(Archive &ar)
+void FERigidWallInterface::Serialize(DumpFile &ar)
 {
 	int k, n, mat;
 	if (ar.IsSaving())

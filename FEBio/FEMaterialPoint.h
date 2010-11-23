@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mat3d.h"
-#include "Archive.h"
+#include "DumpFile.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class
@@ -23,7 +23,7 @@ public:
 
 	virtual FEMaterialPoint* Copy() = 0;
 
-	virtual void Serialize(Archive& ar) = 0;
+	virtual void Serialize(DumpFile& ar) = 0;
 
 	template <class T>
 	T* ExtractData()
@@ -65,7 +65,7 @@ public:
 		return pt;
 	}
 
-	void Serialize(Archive& ar)
+	void Serialize(DumpFile& ar)
 	{
 		if (ar.IsSaving())
 		{
@@ -141,7 +141,7 @@ public:
 		return pt;
 	}
 
-	void Serialize(Archive& ar)
+	void Serialize(DumpFile& ar)
 	{
 		if (ar.IsSaving())
 		{
@@ -215,7 +215,7 @@ public:
 		if (m_pt) m_pt->Init(bflag);
 	}
 
-	void Serialize(Archive& ar)
+	void Serialize(DumpFile& ar)
 	{
 		if (ar.IsSaving())
 		{
@@ -253,7 +253,7 @@ public:
 		return pt;
 	}
 
-	void Serialize(Archive& ar)
+	void Serialize(DumpFile& ar)
 	{
 		if (m_pt) m_pt->Serialize(ar);
 	}
@@ -279,7 +279,7 @@ public:
 		return pt;
 	}
 
-	void Serialize(Archive& ar)
+	void Serialize(DumpFile& ar)
 	{
 		if (m_pt) m_pt->Serialize(ar);
 	}
@@ -308,7 +308,7 @@ public:
 		return pt;
 	}
 
-	void Serialize(Archive& ar)
+	void Serialize(DumpFile& ar)
 	{
 		if (m_pt) m_pt->Serialize(ar);
 	}

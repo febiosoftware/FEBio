@@ -110,7 +110,7 @@ void FERigidBody::Update()
 
 //-----------------------------------------------------------------------------
 
-void FERigidBody::Serialize(Archive& ar)
+void FERigidBody::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

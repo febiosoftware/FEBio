@@ -19,7 +19,7 @@ public:
 	bool SolveStep(double time);
 
 	//! serialize data
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 protected:
 	//! calculate the residual

@@ -180,7 +180,7 @@ bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vec
 
 //-----------------------------------------------------------------------------
 
-void FEFluxSurface::Serialize(FEM& fem, Archive& ar)
+void FEFluxSurface::Serialize(FEM& fem, DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
-#include "Archive.h"
+#include "DumpFile.h"
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "log.h"
@@ -561,7 +561,7 @@ bool FEPeriodicBoundary::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::Serialize(Archive &ar)
+void FEPeriodicBoundary::Serialize(DumpFile &ar)
 {
 	int j, k, n, mat;
 

@@ -97,7 +97,7 @@ protected:
 
 public:
 	//! serialize data to/from dump file
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector

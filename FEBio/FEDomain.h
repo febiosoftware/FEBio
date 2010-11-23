@@ -2,7 +2,7 @@
 
 #include "FEElement.h"
 #include "FECore/vector.h"
-#include "Archive.h"
+#include "DumpFile.h"
 
 class FEMesh;
 class FESolidSolver;
@@ -48,7 +48,7 @@ public:
 
 	virtual void Reset() {}
 
-	virtual void Serialize(FEM& fem, Archive& ar) {}
+	virtual void Serialize(FEM& fem, DumpFile& ar) {}
 
 	virtual bool Initialize(FEM& fem) { return true; }
 
@@ -135,7 +135,7 @@ public:
 	void Reset();
 
 	//! serialize data to archive
-	void Serialize(FEM& fem, Archive& ar);
+	void Serialize(FEM& fem, DumpFile& ar);
 
 	//! Unpack solid element data
 	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
@@ -375,7 +375,7 @@ public:
 
 	void InitElements();
 
-	void Serialize(FEM& fem, Archive& ar);
+	void Serialize(FEM& fem, DumpFile& ar);
 
 	bool Initialize(FEM& fem);
 

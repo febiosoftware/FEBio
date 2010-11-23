@@ -11,7 +11,7 @@
 
 #include "vec3d.h"
 #include "FECore/vector.h"
-#include "Archive.h"
+#include "DumpFile.h"
 
 class FEM;
 
@@ -55,7 +55,7 @@ public:
 	bool Augment();
 
 	//! serialize data to archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 public:
 	int	m_nRBa;		//!< rigid body A that the joint connects

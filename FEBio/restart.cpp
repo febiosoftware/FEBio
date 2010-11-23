@@ -39,7 +39,7 @@ bool FEM::Restart(const char* szfile)
 		// the file is binary so just read the dump file and return
 
 		// open the archive
-		Archive ar;
+		DumpFile ar;
 		if (ar.Open(szfile) == false) { fprintf(stderr, "FATAL ERROR: failed opening restart archive\n"); return false; }
 
 		// read the archive
@@ -82,9 +82,9 @@ bool FEM::Restart(const char* szfile)
 //!  A version number is written to file to make sure the same
 //!  format is used for reading and writing.
 //! \param[in] ar the archive to which the data is serialized
-//! \sa Archive
+//! \sa DumpFile
 
-bool FEM::Serialize(Archive& ar)
+bool FEM::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -127,7 +127,7 @@ bool FEM::Serialize(Archive& ar)
 
 //-----------------------------------------------------------------------------
 
-void FEM::SerializeLoadData(Archive& ar)
+void FEM::SerializeLoadData(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -151,7 +151,7 @@ void FEM::SerializeLoadData(Archive& ar)
 
 //-----------------------------------------------------------------------------
 
-void FEM::SerializeAnalysisData(Archive &ar)
+void FEM::SerializeAnalysisData(DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -212,7 +212,7 @@ void FEM::SerializeAnalysisData(Archive &ar)
 
 //-----------------------------------------------------------------------------
 
-void FEM::SerializeMaterials(Archive& ar)
+void FEM::SerializeMaterials(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -347,7 +347,7 @@ void FEM::SerializeMaterials(Archive& ar)
 
 //-----------------------------------------------------------------------------
 
-void FEM::SerializeGeometry(Archive &ar)
+void FEM::SerializeGeometry(DumpFile &ar)
 {
 	// serialize the mesh first 
 	m_mesh.Serialize(*this, ar);
@@ -410,7 +410,7 @@ void FEM::SerializeGeometry(Archive &ar)
 
 //-----------------------------------------------------------------------------
 
-void FEM::SerializeContactData(Archive &ar)
+void FEM::SerializeContactData(DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{
@@ -460,7 +460,7 @@ void FEM::SerializeContactData(Archive &ar)
 //-----------------------------------------------------------------------------
 // TODO: do we need to store the m_bActive flag of the boundary conditions?
 //
-void FEM::SerializeBoundaryData(Archive& ar)
+void FEM::SerializeBoundaryData(DumpFile& ar)
 {
 	int i, n;
 
@@ -606,7 +606,7 @@ void FEM::SerializeBoundaryData(Archive& ar)
 //-----------------------------------------------------------------------------
 // TODO: serialize data records
 
-void FEM::SerializeIOData(Archive &ar)
+void FEM::SerializeIOData(DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{

@@ -11,7 +11,7 @@
 
 #include "FEMesh.h"
 #include "FESurface.h"
-#include "Archive.h"
+#include "DumpFile.h"
 
 class FEM;
 
@@ -55,7 +55,7 @@ public:
 	virtual bool Augment(int naug) = 0;
 
 	//! serialize data to archive
-	virtual void Serialize(Archive& ar) = 0;
+	virtual void Serialize(DumpFile& ar) = 0;
 
 
 protected:

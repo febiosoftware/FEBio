@@ -300,7 +300,7 @@ bool FELoadCurve::HasPoint(double t) const
 
 //-----------------------------------------------------------------------------
 
-void FELoadCurve::Serialize(Archive &ar)
+void FELoadCurve::Serialize(DumpFile &ar)
 {
 	int j, n;
 	if (ar.IsSaving())

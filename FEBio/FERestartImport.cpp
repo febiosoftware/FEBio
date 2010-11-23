@@ -41,12 +41,12 @@ bool FERestartImport::Load(FEM& fem, const char* szfile)
 
 		// the next tag has to be the archive
 		++tag;
-		if (tag != "Archive") return errf("FATAL ERROR: The first element must be the archive name\n");
+		if (tag != "DumpFile") return errf("FATAL ERROR: The first element must be the archive name\n");
 		char szar[256];
 		tag.value(szar);
 
 		// open the archive
-		Archive ar;
+		DumpFile ar;
 		if (ar.Open(szar) == false) return errf("FATAL ERROR: failed opening restart archive\n");
 
 		// read the archive

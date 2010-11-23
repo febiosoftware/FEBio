@@ -857,7 +857,7 @@ bool FEFacet2FacetSliding::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::Serialize(Archive &ar)
+void FEFacet2FacetSliding::Serialize(DumpFile &ar)
 {
 
 }

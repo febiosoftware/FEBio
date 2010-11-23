@@ -54,7 +54,7 @@ public:
 	void Residual(FESolidSolver* psolver, vector<double>& R);
 
 	//! serialize data
-	void Serialize(FEM& fem, Archive& ar);
+	void Serialize(FEM& fem, DumpFile& ar);
 
 protected:
 	//! calculate stiffness for an element

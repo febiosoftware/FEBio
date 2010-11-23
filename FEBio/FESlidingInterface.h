@@ -104,7 +104,7 @@ public:
 	virtual bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 protected:
 	//! calculate auto penalty factor

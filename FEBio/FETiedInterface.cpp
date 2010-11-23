@@ -733,7 +733,7 @@ bool FETiedInterface::Augment(int naug)
 
 //-----------------------------------------------------------------------------
 
-void FETiedInterface::Serialize(Archive &ar)
+void FETiedInterface::Serialize(DumpFile &ar)
 {
 	int j, k, n, mat;
 

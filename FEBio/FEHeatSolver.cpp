@@ -306,7 +306,7 @@ void FEHeatSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
 //! Serializes data to the archive.
 //! Still need to implement this.
 //!
-void FEHeatSolver::Serialize(Archive &ar)
+void FEHeatSolver::Serialize(DumpFile &ar)
 {
 
 }

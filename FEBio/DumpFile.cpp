@@ -1,25 +1,25 @@
-// Archive.cpp: implementation of the Archive class.
+// DumpFile.cpp: implementation of the DumpFile class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "Archive.h"
+#include "DumpFile.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-Archive::Archive()
+DumpFile::DumpFile()
 {
 	m_fp = 0;
 }
 
-Archive::~Archive()
+DumpFile::~DumpFile()
 {
 	Close();
 }
 
-bool Archive::Open(const char* szfile)
+bool DumpFile::Open(const char* szfile)
 {
 	m_fp = fopen(szfile, "rb");
 	if (m_fp == 0) return false;
@@ -29,7 +29,7 @@ bool Archive::Open(const char* szfile)
 	return true;
 }
 
-bool Archive::Create(const char* szfile)
+bool DumpFile::Create(const char* szfile)
 {
 	m_fp = fopen(szfile, "wb");
 	if (m_fp == 0) return false;
@@ -39,7 +39,7 @@ bool Archive::Create(const char* szfile)
 	return true;
 }
 
-bool Archive::Append(const char* szfile)
+bool DumpFile::Append(const char* szfile)
 {
 	m_fp = fopen(szfile, "a+b");
 	if (m_fp == 0) return false;
@@ -49,7 +49,7 @@ bool Archive::Append(const char* szfile)
 	return true;
 }
 
-void Archive::Close()
+void DumpFile::Close()
 {
 	if (m_fp) fclose(m_fp); 
 	m_fp = 0;

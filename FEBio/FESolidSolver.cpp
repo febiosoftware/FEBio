@@ -23,7 +23,7 @@ FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FESolidSolver::Serialize(Archive& ar)
+void FESolidSolver::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

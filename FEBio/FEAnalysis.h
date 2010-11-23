@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Archive.h"
+#include "DumpFile.h"
 #include "FEBoundaryCondition.h"
 
 // forward declaration of FEM
@@ -41,7 +41,7 @@ public:
 	void Finish();
 
 	//! Serialize data from and to a binary archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 	//! add a boundary condition to the analysis
 	void AddBoundaryCondition(FEBoundaryCondition* pbc) { m_BC.push_back(pbc); }

@@ -185,7 +185,7 @@ bool FEPressureSurface::LinearPressureForce(FESurfaceElement& el, vector<double>
 
 //-----------------------------------------------------------------------------
 
-void FEPressureSurface::Serialize(FEM& fem, Archive& ar)
+void FEPressureSurface::Serialize(FEM& fem, DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

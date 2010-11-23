@@ -480,7 +480,7 @@ bool FEAnalysis::Solve()
 			// Dump converged state to the archive
 			if (m_bDump)
 			{
-				Archive ar;
+				DumpFile ar;
 				if (ar.Create(m_fem.m_szdump) == false)
 				{
 					log.printf("WARNING: Failed creating restart point.\n");
@@ -488,7 +488,7 @@ bool FEAnalysis::Solve()
 				else 
 				{
 					m_fem.Serialize(ar);
-					log.printf("\nRestart point created. Archive name is %s\n", m_fem.m_szdump);
+					log.printf("\nRestart point created. DumpFile name is %s\n", m_fem.m_szdump);
 				}
 			}
 
@@ -565,7 +565,7 @@ bool FEAnalysis::Solve()
 }
 
 //-----------------------------------------------------------------------------
-void FEAnalysis::Serialize(Archive& ar)
+void FEAnalysis::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

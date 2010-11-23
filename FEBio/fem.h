@@ -10,7 +10,7 @@
 #include "FEElementLibrary.h"
 #include "FECore/matrix.h"
 #include "quatd.h"
-#include "Archive.h"
+#include "DumpFile.h"
 #include "FEMesh.h"
 #include "FESurface.h"
 #include "FEContactInterface.h"
@@ -84,7 +84,7 @@ public:
 		return 0;
 	}
 
-	void Serialize(Archive& ar)
+	void Serialize(DumpFile& ar)
 	{
 		if (ar.IsSaving())
 		{
@@ -212,7 +212,7 @@ public:
 	bool Solve();
 
 	//! Serialize the current state to/from restart file
-	bool Serialize(Archive& ar);
+	bool Serialize(DumpFile& ar);
 
 	//! input data from file
 	bool Input(const char* szfile);
@@ -316,13 +316,13 @@ protected:
 
 
 protected:
-	void SerializeMaterials   (Archive& ar);
-	void SerializeAnalysisData(Archive& ar);
-	void SerializeGeometry    (Archive& ar);
-	void SerializeContactData (Archive& ar);
-	void SerializeBoundaryData(Archive& ar);
-	void SerializeIOData      (Archive& ar);
-	void SerializeLoadData    (Archive& ar);
+	void SerializeMaterials   (DumpFile& ar);
+	void SerializeAnalysisData(DumpFile& ar);
+	void SerializeGeometry    (DumpFile& ar);
+	void SerializeContactData (DumpFile& ar);
+	void SerializeBoundaryData(DumpFile& ar);
+	void SerializeIOData      (DumpFile& ar);
+	void SerializeLoadData    (DumpFile& ar);
 
 public:
 	//{ --- Initialization routines ---

@@ -13,7 +13,7 @@
 #include "vec3d.h"
 #include "quatd.h"
 #include "FEBoundaryCondition.h"
-#include "Archive.h"
+#include "DumpFile.h"
 
 class FEM;
 
@@ -70,7 +70,7 @@ public:
 	void Update();
 
 	//! serialize data to archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 public:
 	int		m_nID;		// ID of rigid body

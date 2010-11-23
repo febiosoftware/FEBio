@@ -1413,7 +1413,7 @@ bool FESlidingInterface2::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::Serialize(Archive &ar)
+void FESlidingInterface2::Serialize(DumpFile &ar)
 {
 
 }

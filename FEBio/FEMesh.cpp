@@ -467,10 +467,10 @@ FENodeSet* FEMesh::FindNodeSet(const char* szname)
 //! the mesh data to or from the binary archive
 //! \param[in] ar the archive to which the data is serialized
 //! \sa FEM::Serialize()
-//! \sa Archive
+//! \sa DumpFile
 //! \todo serialize nodesets
 
-void FEMesh::Serialize(FEM& fem, Archive& ar)
+void FEMesh::Serialize(FEM& fem, DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

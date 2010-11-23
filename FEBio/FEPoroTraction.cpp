@@ -198,7 +198,7 @@ bool FEPoroTractionSurface::LinearTractionForce(FESurfaceElement& el, vector<dou
 
 //-----------------------------------------------------------------------------
 
-void FEPoroTractionSurface::Serialize(FEM& fem, Archive& ar)
+void FEPoroTractionSurface::Serialize(FEM& fem, DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

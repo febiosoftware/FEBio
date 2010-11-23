@@ -64,7 +64,7 @@ public:
 	bool Augment(int naug);
 
 	//! serialize data to archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 protected:
 	//! project slave surface onto master

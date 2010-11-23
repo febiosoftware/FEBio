@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/vector.h"
-#include "Archive.h"
+#include "DumpFile.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements the concept of a loadcurve.
@@ -96,7 +96,7 @@ public:
 	bool HasPoint(double t) const;
 
 	//! Serialize data to archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 protected:
 	double ExtendValue(double t) const;

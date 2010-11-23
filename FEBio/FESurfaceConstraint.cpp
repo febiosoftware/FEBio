@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FESurfaceConstraint.h"
-#include "Archive.h"
+#include "DumpFile.h"
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "log.h"
@@ -654,7 +654,7 @@ bool FESurfaceConstraint::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::Serialize(Archive &ar)
+void FESurfaceConstraint::Serialize(DumpFile &ar)
 {
 	int j, k, n, mat;
 

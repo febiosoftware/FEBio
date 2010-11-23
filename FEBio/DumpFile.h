@@ -1,4 +1,4 @@
-// Archive.h: interface for the Archive class.
+// DumpFile.h: interface for the DumpFile class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -24,11 +24,11 @@
 //! simplify in- and output.
 //! \sa FEM::Serialize()
 
-class Archive  
+class DumpFile  
 {
 public:
-	Archive();
-	virtual ~Archive();
+	DumpFile();
+	virtual ~DumpFile();
 
 	//! Open archive for reading
 	bool Open(const char* szfile);
@@ -53,22 +53,22 @@ public:
 
 	//@{ 
 	//! output operators
-	Archive& operator << (const char* sz) 
+	DumpFile& operator << (const char* sz) 
 	{ 
 		int n = strlen(sz); 
 		fwrite(&n, sizeof(int), 1, m_fp);
 		fwrite(sz, sizeof(char), n, m_fp);
 		return (*this);
 	}
-	Archive& operator << (const double a[3][3])
+	DumpFile& operator << (const double a[3][3])
 	{
 		fwrite(a, sizeof(double), 9, m_fp);
 		return (*this);
 	}
 
-	template <class T> Archive& operator << (const T& o) { fwrite(&o, sizeof(T), 1, m_fp); return (*this); }
+	template <class T> DumpFile& operator << (const T& o) { fwrite(&o, sizeof(T), 1, m_fp); return (*this); }
 
-	template <class T> Archive& operator << (vector<T>& v)
+	template <class T> DumpFile& operator << (vector<T>& v)
 	{
 		int n = v.size();
 		fwrite(&n, sizeof(int), 1, m_fp);
@@ -80,7 +80,7 @@ public:
 
 	//@{
 	//! input operators
-	Archive& operator >> (char* sz) 
+	DumpFile& operator >> (char* sz) 
 	{ 
 		int n;
 		fread(&n, sizeof(int), 1, m_fp);
@@ -89,15 +89,15 @@ public:
 		return (*this);
 	}
 
-	Archive& operator >> (double a[3][3])
+	DumpFile& operator >> (double a[3][3])
 	{
 		fread(a, sizeof(double), 9, m_fp);
 		return (*this);
 	}
 
-	template <class T> Archive& operator >> (T& o) { fread(&o, sizeof(T), 1, m_fp); return (*this); }
+	template <class T> DumpFile& operator >> (T& o) { fread(&o, sizeof(T), 1, m_fp); return (*this); }
 
-	template <class T> Archive& operator >> (vector<T>& v)
+	template <class T> DumpFile& operator >> (vector<T>& v)
 	{
 		int n;
 		fread(&n, sizeof(int), 1, m_fp);

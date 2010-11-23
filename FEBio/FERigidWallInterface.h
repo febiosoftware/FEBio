@@ -107,7 +107,7 @@ public:
 	void SetMasterSurface(FERigidSurface* prs) { assert(m_mp == 0); m_mp = prs; }
 
 	//! serialize data to archive
-	void Serialize(Archive& ar);
+	void Serialize(DumpFile& ar);
 
 private:
 	//! copy constructor hidden

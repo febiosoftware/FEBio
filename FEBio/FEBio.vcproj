@@ -1533,10 +1533,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Archive.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\augment.cpp"
 				>
 			</File>
@@ -1566,6 +1562,10 @@
 			</File>
 			<File
 				RelativePath=".\discrete.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DumpFile.cpp"
 				>
 			</File>
 			<File
@@ -2315,10 +2315,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Archive.h"
-				>
-			</File>
-			<File
 				RelativePath=".\BFGSSolver.h"
 				>
 			</File>
@@ -2336,6 +2332,10 @@
 			</File>
 			<File
 				RelativePath=".\DataStore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DumpFile.h"
 				>
 			</File>
 			<File

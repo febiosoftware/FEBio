@@ -223,7 +223,7 @@ bool FERigidJoint::Augment()
 
 //-----------------------------------------------------------------------------
 
-void FERigidJoint::Serialize(Archive& ar)
+void FERigidJoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{

@@ -5,7 +5,7 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-void FEAugLagLinearConstraint::Serialize(Archive& ar)
+void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -216,7 +216,7 @@ void FELinearConstraintSet::Stiffness()
 
 //-----------------------------------------------------------------------------
 
-void FELinearConstraintSet::Serialize(Archive& ar)
+void FELinearConstraintSet::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
