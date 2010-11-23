@@ -5,16 +5,16 @@
 #include "FEFacet2FacetSliding.h"
 
 //-----------------------------------------------------------------------------
-void FENodeData::Save(FEM &fem, FILE *fp)
+void FENodeData::Save(FEM &fem, Archive& ar)
 {
 	// loop over all node sets
 	// write now there is only one, namely the master node set
 	// so we just pass the mesh
-	Save(fem.m_mesh, fp);
+	Save(fem.m_mesh, ar);
 }
 
 //-----------------------------------------------------------------------------
-void FEElementData::Save(FEM &fem, FILE *fp)
+void FEElementData::Save(FEM &fem, Archive& ar)
 {
 	// loop over all domains
 	FEMesh& m = fem.m_mesh;
@@ -22,12 +22,12 @@ void FEElementData::Save(FEM &fem, FILE *fp)
 	for (int i=0; i<ND; ++i)
 	{
 		FEDomain& D = m.Domain(i);
-		Save(D, fp);
+		Save(D, ar);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEFaceData::Save(FEM &fem, FILE *fp)
+void FEFaceData::Save(FEM &fem, Archive& ar)
 {
 	// loop over all surfaces
 	FEMesh& m = fem.m_mesh;
@@ -35,7 +35,7 @@ void FEFaceData::Save(FEM &fem, FILE *fp)
 	for (int i=0; i<NS; ++i)
 	{
 		FESurface& S = m.Surface(i);
-		Save(S, fp);
+		Save(S, ar);
 	}
 }
 
@@ -45,7 +45,7 @@ void FEFaceData::Save(FEM &fem, FILE *fp)
 
 //-----------------------------------------------------------------------------
 //! Store the nodal displacements
-void FEPlotNodeDisplacement::Save(FEMesh& m, FILE* fp)
+void FEPlotNodeDisplacement::Save(FEMesh& m, Archive& ar)
 {
 	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
@@ -58,12 +58,12 @@ void FEPlotNodeDisplacement::Save(FEMesh& m, FILE* fp)
 		xf[1] = (float) (node.m_rt.y - node.m_r0.y);
 		xf[2] = (float) (node.m_rt.z - node.m_r0.z);
 
-		fwrite(xf, sizeof(float), 3, fp);
+		ar << xf[0] << xf[1] << xf[2];
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeVelocity::Save(FEMesh& m, FILE* fp)
+void FEPlotNodeVelocity::Save(FEMesh& m, Archive& ar)
 {
 	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
@@ -76,12 +76,12 @@ void FEPlotNodeVelocity::Save(FEMesh& m, FILE* fp)
 		xf[1] = (float) node.m_vt.y;
 		xf[2] = (float) node.m_vt.z;
 
-		fwrite(xf, sizeof(float), 3, fp);
+		ar << xf[0] << xf[1] << xf[2];
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeAcceleration::Save(FEMesh& m, FILE* fp)
+void FEPlotNodeAcceleration::Save(FEMesh& m, Archive& ar)
 {
 	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
@@ -94,19 +94,19 @@ void FEPlotNodeAcceleration::Save(FEMesh& m, FILE* fp)
 		xf[1] = (float) node.m_at.y;
 		xf[2] = (float) node.m_at.z;
 
-		fwrite(xf, sizeof(float), 3, fp);
+		ar << xf[0] << xf[1] << xf[2];
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotFluidPressure::Save(FEMesh &m, FILE* fp)
+void FEPlotFluidPressure::Save(FEMesh &m, Archive& ar)
 {
 	float t;
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
 		t = (float) node.m_pt;
-		fwrite(&t, sizeof(float), 1, fp);
+		ar << t;
 	}
 }
 
@@ -115,7 +115,7 @@ void FEPlotFluidPressure::Save(FEMesh &m, FILE* fp)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-void FEPlotElementStress::Save(FEDomain& dom, FILE* fp)
+void FEPlotElementStress::Save(FEDomain& dom, Archive& ar)
 {
 	int i, j;
 
@@ -155,14 +155,14 @@ void FEPlotElementStress::Save(FEDomain& dom, FILE* fp)
 				}
 			}
 
-			fwrite(s, sizeof(float), 6, fp);
+			ar << s[0] << s[1] << s[2] << s[3] << s[4] << s[5];
 		}
 	}
 }
 
 
 //-----------------------------------------------------------------------------
-void FEPlotFluidFlux::Save(FEDomain &dom, FILE* fp)
+void FEPlotFluidFlux::Save(FEDomain &dom, Archive& ar)
 {
 	int i, j;
 	float af[3];
@@ -190,14 +190,13 @@ void FEPlotFluidFlux::Save(FEDomain &dom, FILE* fp)
 			af[1] = (float) ew.y;
 			af[2] = (float) ew.z;
 
-			fwrite(af, sizeof(float), 3, fp);
+			ar << af[0] << af[1] << af[2];
 		}
 	}
 }
 
-
 //-----------------------------------------------------------------------------
-void FEPlotFiberVector::Save(FEDomain &dom, FILE* fp)
+void FEPlotFiberVector::Save(FEDomain &dom, Archive& ar)
 {
 	int i, j, n;
 	float a[3];
@@ -222,7 +221,8 @@ void FEPlotFiberVector::Save(FEDomain &dom, FILE* fp)
 			a[0] = (float) r.x;
 			a[1] = (float) r.y;
 			a[2] = (float) r.z;
-			fwrite(a, sizeof(float), 3, fp);
+
+			ar << a[0] << a[1] << a[2];
 		}
 	}
 }
@@ -232,7 +232,7 @@ void FEPlotFiberVector::Save(FEDomain &dom, FILE* fp)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-void FEPlotContactGap::Save(FESurface& surf, FILE* fp)
+void FEPlotContactGap::Save(FESurface& surf, Archive& ar)
 {
 /*
 	FEMesh& mesh = fem.m_mesh;
@@ -352,7 +352,7 @@ void FEPlotContactGap::Save(FESurface& surf, FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotContactTraction::Save(FESurface &surf, FILE* fp)
+void FEPlotContactTraction::Save(FESurface &surf, Archive& ar)
 {
 /*
 	int i, j, k, n;

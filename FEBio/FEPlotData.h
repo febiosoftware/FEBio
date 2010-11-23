@@ -2,6 +2,7 @@
 
 #include "DumpFile.h"
 #include "FEMesh.h"
+#include "Archive.h"
 class FEM;
 
 //-----------------------------------------------------------------------------
@@ -13,7 +14,7 @@ class FEM;
 class FEPlotData
 {
 public:
-	virtual void Save(FEM& fem, FILE* fp) = 0;
+	virtual void Save(FEM& fem, Archive& ar) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -22,8 +23,8 @@ public:
 class FENodeData : public FEPlotData
 {
 public:
-	void Save(FEM& fem, FILE* fp);
-	virtual void Save(FEMesh& m, FILE* fp) = 0;
+	void Save(FEM& fem, Archive& ar);
+	virtual void Save(FEMesh& m, Archive& ar) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -32,8 +33,8 @@ public:
 class FEElementData : public FEPlotData
 {
 public:
-	void Save(FEM& fem, FILE* fp);
-	virtual void Save(FEDomain& D, FILE* fp) = 0;
+	void Save(FEM& fem, Archive& ar);
+	virtual void Save(FEDomain& D, Archive& ar) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -42,8 +43,8 @@ public:
 class FEFaceData : public FEPlotData
 {
 public:
-	void Save(FEM& fem, FILE* fp);
-	virtual void Save(FESurface& S, FILE* fp) = 0;
+	void Save(FEM& fem, Archive& ar);
+	virtual void Save(FESurface& S, Archive& ar) = 0;
 };
 
 //=============================================================================
@@ -56,7 +57,7 @@ public:
 class FEPlotNodeDisplacement : public FENodeData
 {
 public:
-	void Save(FEMesh& m, FILE* fp);
+	void Save(FEMesh& m, Archive& ar);
 };
 
 //-----------------------------------------------------------------------------
@@ -65,7 +66,7 @@ public:
 class FEPlotNodeVelocity : public FENodeData
 {
 public:
-	void Save(FEMesh& m, FILE* fp);
+	void Save(FEMesh& m, Archive& ar);
 };
 
 //-----------------------------------------------------------------------------
@@ -74,14 +75,14 @@ public:
 class FEPlotNodeAcceleration : public FENodeData
 {
 public:
-	void Save(FEMesh& m, FILE* fp);
+	void Save(FEMesh& m, Archive& ar);
 };
 
 //-----------------------------------------------------------------------------
 class FEPlotFluidPressure : public FENodeData
 {
 public:
-	void Save(FEMesh& m, FILE* fp);
+	void Save(FEMesh& m, Archive& ar);
 };
 
 //=============================================================================
@@ -93,7 +94,7 @@ public:
 class FEPlotElementStress : public FEElementData
 {
 public:
-	void Save(FEDomain& dom, FILE* fp);
+	void Save(FEDomain& dom, Archive& ar);
 };
 
 //-----------------------------------------------------------------------------
@@ -101,7 +102,7 @@ public:
 class FEPlotFluidFlux : public FEElementData
 {
 public:
-	void Save(FEDomain& dom, FILE* fp);
+	void Save(FEDomain& dom, Archive& ar);
 };
 
 //-----------------------------------------------------------------------------
@@ -109,7 +110,7 @@ public:
 class FEPlotFiberVector : public FEElementData
 {
 public:
-	void Save(FEDomain& dom, FILE* fp);
+	void Save(FEDomain& dom, Archive& ar);
 };
 
 //=============================================================================
@@ -122,7 +123,7 @@ public:
 class FEPlotContactGap : public FEFaceData
 {
 public:
-	void Save(FESurface& surf, FILE* fp);
+	void Save(FESurface& surf, Archive& ar);
 };
 
 //-----------------------------------------------------------------------------
@@ -131,5 +132,5 @@ public:
 class FEPlotContactTraction : public FEFaceData
 {
 public:
-	void Save(FESurface& surf, FILE* fp);
+	void Save(FESurface& surf, Archive& ar);
 };
