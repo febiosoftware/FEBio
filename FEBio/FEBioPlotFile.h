@@ -20,11 +20,10 @@ protected:
 		PLT_HEADER					= 0x00100000,
 			PLT_HDR_VERSION			= 0x00100001,
 		PLT_DICTIONARY				= 0x00200000,
-			PLT_DIC_ENTRIES			= 0x00200001,
-			PLT_DIC_ITEM			= 0x00200002,
-			PLT_DIC_ITEM_TYPE		= 0x00200003,
-			PLT_DIC_ITEM_FMT		= 0x00200004,
-			PLT_DIC_ITEM_NAME		= 0x00200005,
+			PLT_DIC_ITEM			= 0x00200001,
+			PLT_DIC_ITEM_TYPE		= 0x00200002,
+			PLT_DIC_ITEM_FMT		= 0x00200003,
+			PLT_DIC_ITEM_NAME		= 0x00200004,
 			PLT_DIC_GLOBAL			= 0x00201000,
 			PLT_DIC_MATERIAL		= 0x00202000,
 			PLT_DIC_NODAL			= 0x00203000,
@@ -39,12 +38,18 @@ protected:
 				PLT_NODE_COORDS		= 0x00401001,
 			PLT_DOMAIN_SECTION		= 0x00402000,
 				PLT_DOMAIN			= 0x00402001,
+				PLT_DOM_ELEM_TYPE	= 0x00402002,
+				PLT_DOM_MAT_ID		= 0x00402003,
+				PLT_DOM_ELEM_LIST	= 0x00402004,
 			PLT_SURFACE_SECTION		= 0x00403000,
 		PLT_STATE					= 0x00500000,
 			PLT_STATE_HEADER		= 0x00501000,
 				PLT_STATE_HDR_ID	= 0x00501001,
 				PLT_STATE_HDR_TIME	= 0x00501002,
 			PLT_STATE_DATA			= 0x00502000,
+				PLT_STATE_VARIABLE	= 0x00502001,
+				PLT_STATE_VAR_ID	= 0x00502002,
+				PLT_STATE_VAR_DATA	= 0x00502003,
 				PLT_GLOBAL_DATA		= 0x00502100,
 				PLT_MATERIAL_DATA	= 0x00502200,
 				PLT_NODE_DATA		= 0x00502300,
@@ -52,27 +57,11 @@ protected:
 				PLT_FACE_DATA		= 0x00502500
 	};
 
-	// header tags
-	enum {
-		PLT_HDR_SIZE
-	};
-
-	// --- data types ---
-	enum Var_Type { FLOAT, VEC3F, MAT3FS };
-
-	// --- storage format ---
-	// ITEM_DATA : one data stored for each item
-	// NODE_DATA : data stored for each node of each item
-	enum Storage_Fmt { ITEM_DATA, NODE_DATA };
+	// --- element types ---
+	enum Elem_Type { PLT_ELEM_HEX, PLT_ELEM_PENTA, PLT_ELEM_TET, PLT_ELEM_QUAD, PLT_ELEM_TRI, PLT_ELEM_TRUSS };
 
 	// size of name variables
 	enum { STR_SIZE = 64 };
-
-	// HEADER structure
-	struct HEADER
-	{
-		unsigned int nversion;				// version number (must be 1)
-	};
 
 	// Dictionary entry
 	struct DICTIONARY_ITEM
@@ -86,11 +75,11 @@ protected:
 	class Dictionary
 	{
 	public:
-		void AddGlobalVariable  (FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname);
-		void AddMaterialVariable(FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname);
-		void AddNodalVariable   (FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname);
-		void AddElementVariable (FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname);
-		void AddFaceVariable    (FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname);
+		void AddGlobalVariable  (FEPlotData* ps, const char* szname);
+		void AddMaterialVariable(FEPlotData* ps, const char* szname);
+		void AddNodalVariable   (FEPlotData* ps, const char* szname);
+		void AddElementVariable (FEPlotData* ps, const char* szname);
+		void AddFaceVariable    (FEPlotData* ps, const char* szname);
 
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
@@ -138,7 +127,6 @@ protected:
 	void WriteFaceData    (FEM& fem);
 
 protected:
-	HEADER		m_hdr;	// plot file header
 	Dictionary	m_dic;	// dictionary
 	Archive		m_ar;	// the data archive
 };

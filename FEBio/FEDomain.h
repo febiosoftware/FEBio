@@ -101,6 +101,8 @@ public:
 	FESolidElement& Element(int n) { return m_Elem[n]; }
 	FESolidElement& ElementRef(int n) { return m_Elem[n]; }
 
+	int GetElementType() { return m_Elem[0].Type(); }
+
 protected:
 	vector<FESolidElement>	m_Elem;	//!< array of elements
 };
@@ -349,6 +351,8 @@ public:
 	//! element access
 	FEShellElement& Element(int n) { return m_Elem[n]; }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
+	int GetElementType() { return m_Elem[0].Type(); }
 
 protected:
 	vector<FEShellElement>	m_Elem;	//!< array of elements

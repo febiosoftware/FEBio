@@ -5,37 +5,70 @@
 #include "FEFacet2FacetSliding.h"
 
 //-----------------------------------------------------------------------------
+int FEPlotData::VarSize(Var_Type t)
+{
+	int ndata = 0;
+	switch (DataType())
+	{
+	case FLOAT: ndata = sizeof(float); break;
+	case VEC3F: ndata = 3*sizeof(float); break;
+	case MAT3FS: ndata = 6*sizeof(float); break;
+	}
+	assert(ndata);
+	return ndata;
+}
+
+//-----------------------------------------------------------------------------
 void FENodeData::Save(FEM &fem, Archive& ar)
 {
 	// loop over all node sets
 	// write now there is only one, namely the master node set
 	// so we just pass the mesh
-	Save(fem.m_mesh, ar);
+	int ndata = VarSize(DataType());
+
+	int N = fem.m_mesh.Nodes();
+	ar.BeginChunk(0, N*ndata);
+	{
+		Save(fem.m_mesh, ar);
+	}
+	ar.EndChunk();
 }
 
 //-----------------------------------------------------------------------------
 void FEElementData::Save(FEM &fem, Archive& ar)
 {
+	int ndata = VarSize(DataType());
+
 	// loop over all domains
 	FEMesh& m = fem.m_mesh;
 	int ND = m.Domains();
 	for (int i=0; i<ND; ++i)
 	{
 		FEDomain& D = m.Domain(i);
-		Save(D, ar);
+		ar.BeginChunk(i+1, ndata*D.Elements());
+		{
+			Save(D, ar);
+		}
+		ar.EndChunk();
 	}
 }
 
 //-----------------------------------------------------------------------------
 void FEFaceData::Save(FEM &fem, Archive& ar)
 {
+	int ndata = VarSize(DataType());
+
 	// loop over all surfaces
 	FEMesh& m = fem.m_mesh;
 	int NS = m.Surfaces();
 	for (int i=0; i<NS; ++i)
 	{
 		FESurface& S = m.Surface(i);
-		Save(S, ar);
+		ar.BeginChunk(i+1, ndata*m.Elements());
+		{
+			Save(S, ar);
+		}
+		ar.EndChunk();
 	}
 }
 

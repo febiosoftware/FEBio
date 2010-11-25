@@ -20,6 +20,14 @@ MaterialError::MaterialError(const char* szfmt, ...)
 }
 
 //-----------------------------------------------------------------------------
+FEMaterial::FEMaterial()
+{
+	static int n = 1;
+	m_szname[0] = 0;
+	m_nID = n++;
+}
+
+//-----------------------------------------------------------------------------
 FEParameterList* FEMaterial::GetParameterList()
 {
 	FEParameterList* pl = new FEParameterList;

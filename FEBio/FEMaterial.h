@@ -44,7 +44,7 @@ protected:
 class FEMaterial  
 {
 public:
-	FEMaterial() { m_szname[0] = 0; }
+	FEMaterial();
 	virtual ~FEMaterial() {}
 
 	//! set/get material name
@@ -57,6 +57,8 @@ public:
 	//! performs initialization and parameter checking
 	virtual void Init(){}
 
+	int GetID() { return m_nID; }
+
 public:
 	// this is the first GetParameterList function
 	// so we have to declare it explicitly
@@ -67,6 +69,7 @@ public:
 
 protected:
 	char	m_szname[128];	//!< name of material
+	int		m_nID;			//!< material ID
 };
 
 //-----------------------------------------------------------------------------

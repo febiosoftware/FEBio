@@ -32,10 +32,10 @@ bool Archive::Create(const char* sz)
 	return true;
 }
 
-void Archive::BeginChunk(unsigned int id)
+void Archive::BeginChunk(unsigned int id, int nsize)
 {
 	// write the chunk ID
-	unsigned int n[2] = {id, 0};
+	unsigned int n[2] = {id, nsize};
 	fwrite(n, sizeof(unsigned int), 2, m_fp);
 	m_tag.push(id);
 }

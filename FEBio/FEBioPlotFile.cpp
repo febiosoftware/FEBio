@@ -4,33 +4,33 @@
 #include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname)
+void FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, const char* szname)
 {
 	DICTIONARY_ITEM it;
-	it.m_ntype = ntype;
-	it.m_nfmt  = nfmt;
+	it.m_ntype = ps->DataType();
+	it.m_nfmt  = ps->StorageFormat();
 	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Glob.push_back(it);
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::AddMaterialVariable(FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname)
+void FEBioPlotFile::Dictionary::AddMaterialVariable(FEPlotData* ps, const char* szname)
 {
 	DICTIONARY_ITEM it;
-	it.m_ntype = ntype;
-	it.m_nfmt  = nfmt;
+	it.m_ntype = ps->DataType();
+	it.m_nfmt  = ps->StorageFormat();
 	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Glob.push_back(it);
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname)
+void FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname)
 {
 	DICTIONARY_ITEM it;
-	it.m_ntype = ntype;
-	it.m_nfmt  = nfmt;
+	it.m_ntype = ps->DataType();
+	it.m_nfmt  = ps->StorageFormat();
 	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Node.push_back(it);
@@ -38,11 +38,11 @@ void FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, unsigned int nt
 
 //-----------------------------------------------------------------------------
 
-void FEBioPlotFile::Dictionary::AddElementVariable(FEPlotData* ps, unsigned int ntype, unsigned int nfmt, const char* szname)
+void FEBioPlotFile::Dictionary::AddElementVariable(FEPlotData* ps, const char* szname)
 {
 	DICTIONARY_ITEM it;
-	it.m_ntype = ntype;
-	it.m_nfmt  = nfmt;
+	it.m_ntype = ps->DataType();
+	it.m_nfmt  = ps->StorageFormat();
 	it.m_psave = ps;
 	strcpy(it.m_szname, szname);
 	m_Elem.push_back(it);
@@ -86,16 +86,32 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	m_ar.BeginChunk(PLT_ROOT);
 	{
 		// --- save the header file ---
-		if (WriteHeader(fem) == false) return false;
+		m_ar.BeginChunk(PLT_HEADER);
+		{
+			if (WriteHeader(fem) == false) return false;
+		}
+		m_ar.EndChunk();
 
 		// --- save the dictionary ---
-		if (WriteDictionary(fem) == false) return false;
+		m_ar.BeginChunk(PLT_DICTIONARY);
+		{
+			if (WriteDictionary(fem) == false) return false;
+		}
+		m_ar.EndChunk();
 
 		// --- save the materials
-		if (WriteMaterials(fem) == false) return false;
+		m_ar.BeginChunk(PLT_MATERIALS);
+		{
+			if (WriteMaterials(fem) == false) return false;
+		}
+		m_ar.EndChunk();
 
 		// --- save the geometry ---
-		if (WriteGeometry(fem) == false) return false;
+		m_ar.BeginChunk(PLT_GEOMETRY);
+		{
+			if (WriteGeometry(fem) == false) return false;
+		}
+		m_ar.EndChunk();
 	}
 	// Don't call EndChunk yet since we still 
 	// need to write state data
@@ -105,17 +121,19 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 }
 
 //-----------------------------------------------------------------------------
+bool FEBioPlotFile::Append(FEM &fem, const char *szfile)
+{
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEBioPlotFile::WriteHeader(FEM& fem)
 {
 	// setup the header
-	m_hdr.nversion = PLT_VERSION;
+	unsigned int nversion = PLT_VERSION;
 
 	// output header
-	m_ar.BeginChunk(PLT_HEADER);
-	{
-		m_ar.WriteChunk(PLT_HDR_VERSION, m_hdr.nversion);
-	}
-	m_ar.EndChunk();
+	m_ar.WriteChunk(PLT_HDR_VERSION, nversion);
 
 	return true;
 }
@@ -123,10 +141,7 @@ bool FEBioPlotFile::WriteHeader(FEM& fem)
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::WriteDictionary(FEM& fem)
 {
-	int i;
-
 	// First we build the dictionary
-
 	// get the mesh
 	FEMesh& m = fem.m_mesh;
 
@@ -134,78 +149,89 @@ bool FEBioPlotFile::WriteDictionary(FEM& fem)
 	int ntype = fem.m_pStep->m_nanalysis;
 
 	// setup the dictionary
-	m_dic.AddNodalVariable  (new FEPlotNodeDisplacement,  VEC3F, ITEM_DATA, "Displacement");
-	m_dic.AddElementVariable(new FEPlotElementStress   , MAT3FS, ITEM_DATA, "Stress");
+	m_dic.AddNodalVariable  (new FEPlotNodeDisplacement, "Displacement");
+	m_dic.AddElementVariable(new FEPlotElementStress   , "Stress");
 
 	// store dynamic analysis data
-	if ((ntype == FE_DYNAMIC) || (nmode == FE_POROELASTIC)) m_dic.AddNodalVariable(new FEPlotNodeVelocity    , VEC3F, ITEM_DATA, "Velocity");
-	if (ntype == FE_DYNAMIC) m_dic.AddNodalVariable(new FEPlotNodeAcceleration, VEC3F, ITEM_DATA, "Acceleration");
+	if ((ntype == FE_DYNAMIC) || (nmode == FE_POROELASTIC)) m_dic.AddNodalVariable(new FEPlotNodeVelocity    , "Velocity");
+	if (ntype == FE_DYNAMIC) m_dic.AddNodalVariable(new FEPlotNodeAcceleration, "Acceleration");
 
 	// store contact data
 	if (fem.m_CI.size() > 0)
 	{
-		m_dic.AddNodalVariable(new FEPlotContactGap     , FLOAT, ITEM_DATA, "Contact gap");
-		m_dic.AddNodalVariable(new FEPlotContactTraction, VEC3F, ITEM_DATA, "Contact traction");
+		m_dic.AddNodalVariable(new FEPlotContactGap     , "Contact gap");
+		m_dic.AddNodalVariable(new FEPlotContactTraction, "Contact traction");
 	}
 
 	// store poro data
 	if (nmode == FE_POROELASTIC)
 	{
-		m_dic.AddNodalVariable  (new FEPlotFluidPressure, FLOAT, ITEM_DATA, "Fluid Pressure");
-		m_dic.AddElementVariable(new FEPlotFluidFlux    , VEC3F, ITEM_DATA, "Fluid Flux");
+		m_dic.AddNodalVariable  (new FEPlotFluidPressure, "Fluid Pressure");
+		m_dic.AddElementVariable(new FEPlotFluidFlux    , "Fluid Flux");
 	}
 
 	// if any material is trans-iso we store material fibers and strain
 	int ntiso = 0;
-	for (i=0; i<fem.Materials(); ++i)
+	for (int i=0; i<fem.Materials(); ++i)
 	{
 		FEElasticMaterial* pm = fem.GetElasticMaterial(i);
 		if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
 	}
 	if (ntiso)
 	{
-		m_dic.AddElementVariable(new FEPlotFiberVector, VEC3F, ITEM_DATA, "Fiber vector");
+		m_dic.AddElementVariable(new FEPlotFiberVector, "Fiber vector");
 	}
 
 	// Next, we save the dictionary
-	m_ar.BeginChunk(PLT_DICTIONARY);
+	// Global variables
+	if (!m_dic.m_Glob.empty())
 	{
-		// Global variables
 		m_ar.BeginChunk(PLT_DIC_GLOBAL);
 		{
 			WriteDicList(m_dic.m_Glob);
 		}
 		m_ar.EndChunk();
+	}
 
-		// store material variables
+	// store material variables
+	if (!m_dic.m_Mat.empty())
+	{
 		m_ar.BeginChunk(PLT_DIC_MATERIAL);
 		{
 			WriteDicList(m_dic.m_Mat);
 		}
 		m_ar.EndChunk();
+	}
 
-		// store nodal variables
+	// store nodal variables
+	if (!m_dic.m_Node.empty())
+	{
 		m_ar.BeginChunk(PLT_DIC_NODAL);
 		{
 			WriteDicList(m_dic.m_Node);
 		}
 		m_ar.EndChunk();
+	}
 
-		// store element variables
+	// store element variables
+	if (!m_dic.m_Elem.empty())
+	{
 		m_ar.BeginChunk(PLT_DIC_DOMAIN);
 		{
 			WriteDicList(m_dic.m_Elem);
 		}
 		m_ar.EndChunk();
+	}
 
-		// store surface data
+	// store surface data
+	if (!m_dic.m_Face.empty())
+	{
 		m_ar.BeginChunk(PLT_DIC_SURFACE);
 		{
 			WriteDicList(m_dic.m_Face);
 		}
 		m_ar.EndChunk();
 	}
-	m_ar.EndChunk();
 
 	return true;
 }
@@ -214,7 +240,6 @@ bool FEBioPlotFile::WriteDictionary(FEM& fem)
 void FEBioPlotFile::WriteDicList(list<FEBioPlotFile::DICTIONARY_ITEM>& dic)
 {
 	int N = (int) dic.size();
-	m_ar.WriteChunk(PLT_DIC_ENTRIES, N);
 	list<DICTIONARY_ITEM>::iterator pi = dic.begin();
 	for (int i=0; i<N; ++i, ++pi)
 	{
@@ -237,7 +262,7 @@ bool FEBioPlotFile::WriteMaterials(FEM& fem)
 		FEMaterial* pm = fem.GetMaterial(i);
 		m_ar.BeginChunk(PLT_DIC_MATERIAL);
 		{
-			unsigned int nid = i+1;
+			unsigned int nid = (unsigned int) pm->GetID();
 			char szname[STR_SIZE] = {0};
 			strcpy(szname, pm->GetName());
 			m_ar.WriteChunk(PLT_MAT_ID, nid);
@@ -269,11 +294,14 @@ bool FEBioPlotFile::WriteGeometry(FEM& fem)
 	m_ar.EndChunk();
 
 	// surface section
-	m_ar.BeginChunk(PLT_SURFACE_SECTION);
+	if (m.Surfaces() > 0)
 	{
-		WriteSurfaceSection(m);
+		m_ar.BeginChunk(PLT_SURFACE_SECTION);
+		{
+			WriteSurfaceSection(m);
+		}
+		m_ar.EndChunk();
 	}
-	m_ar.EndChunk();
 
 	return true;
 }
@@ -319,92 +347,90 @@ void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 {
+	int mid = dom.GetMaterial()->GetID();
+	int etype = dom.GetElementType();
+
 	int n[9], i, j;
 	int NE = dom.Elements();
-	for (i=0; i<NE; ++i)
+
+	// figure out element type
+	int ne = 0;
+	int dtype = 0;
+	switch (etype)
 	{
-		FESolidElement& el = dom.Element(i);
-		n[0] = el.m_nID;
-		switch (el.Type())
-		{
 		case FE_HEX:
 		case FE_RIHEX:
-		case FE_UDGHEX:
-			for (j=0; j<8; ++j) n[j+1] = el.m_node[j]+1;
-			break;
-		case FE_PENTA:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[2]+1;
-			n[5] = el.m_node[3]+1;
-			n[6] = el.m_node[4]+1;
-			n[7] = el.m_node[5]+1;
-			n[8] = el.m_node[5]+1;
-			break;
+		case FE_UDGHEX: ne = 8; dtype = PLT_ELEM_HEX; break;
+		case FE_PENTA: ne = 6; dtype = PLT_ELEM_PENTA; break;
 		case FE_TET:
-		case FE_TETG1:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[2]+1;
-			n[5] = n[6] = n[7] = n[8] = el.m_node[3]+1;
-			break;
+		case FE_TETG1: ne = 4; dtype = PLT_ELEM_TET; break;
+	}
+
+	// write the header
+	m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
+	m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
+
+	// write the element list
+	m_ar.BeginChunk(PLT_DOM_ELEM_LIST, NE*(ne+1));
+	{
+		for (i=0; i<NE; ++i)
+		{
+			FESolidElement& el = dom.Element(i);
+			n[0] = el.m_nID;
+			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j]+1;
+
+			for (j=0; j<=ne; ++j) m_ar << n[j];
 		}
 	}
+	m_ar.EndChunk();
 }
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 {
-	int n[5];
+	int mid = dom.GetMaterial()->GetID();
+	int etype = dom.GetElementType();
+
+	int n[5], i, j;
 	int NE = dom.Elements();
-	for (int i=0; i<NE; ++i)
+
+	// figure out element type
+	int ne = 0;
+	int dtype = 0;
+	switch (etype)
 	{
-		FEShellElement& el = dom.Element(i);
-		n[0] = el.m_nID;
-		switch (el.Type())
+		case FE_SHELL_QUAD: ne = 4; dtype = PLT_ELEM_QUAD; break;
+		case FE_SHELL_TRI : ne = 3; dtype = PLT_ELEM_TRI; break;
+	}
+
+	// write the header
+	m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
+	m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
+
+	// write the element list
+	m_ar.BeginChunk(PLT_DOM_ELEM_LIST, NE*(ne+1));
+	{
+		for (i=0; i<NE; ++i)
 		{
-		case FE_SHELL_QUAD:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[3]+1;
-			break;
-		case FE_SHELL_TRI:
-			n[1] = el.m_node[0]+1;
-			n[2] = el.m_node[1]+1;
-			n[3] = el.m_node[2]+1;
-			n[4] = el.m_node[2]+1;
-			break;
+			FEShellElement& el = dom.Element(i);
+			n[0] = el.m_nID;
+			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j]+1;
+			for (j=0; j<=ne; ++j) m_ar << n[j];
 		}
 	}
+	m_ar.EndChunk();
 }
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 {
-	int n[3];
-	int NE = dom.Elements();
-	for (int i=0; i<NE; ++i)
-	{
-		FETrussElement& el = dom.Element(i);
-		n[0] = el.m_nID;
-		n[1] = el.m_node[0]+1;
-		n[2] = el.m_node[1]+1;
-	}
+	assert(false);
 }
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 {
-
-}
-
-//-----------------------------------------------------------------------------
-bool FEBioPlotFile::Append(FEM &fem, const char *szfile)
-{
-	return false;
+	assert(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -418,41 +444,61 @@ bool FEBioPlotFile::Write(FEM &fem)
 		// state header
 		m_ar.BeginChunk(PLT_STATE_HEADER);
 		{
-
+			m_ar.WriteChunk(PLT_STATE_HDR_TIME, fem.m_ftime);
 		}
 		m_ar.EndChunk();
 
 		m_ar.BeginChunk(PLT_STATE_DATA);
 		{
-			m_ar.BeginChunk(PLT_GLOBAL_DATA);
+			// Global Data
+			if (!m_dic.m_Glob.empty())
 			{
-				WriteGlobalData(fem);
+				m_ar.BeginChunk(PLT_GLOBAL_DATA);
+				{
+					WriteGlobalData(fem);
+				}
+				m_ar.EndChunk();
 			}
-			m_ar.EndChunk();
 
-			m_ar.BeginChunk(PLT_MATERIAL_DATA);
+			// Material Data
+			if (!m_dic.m_Mat.empty())
 			{
-				WriteMaterialData(fem);
+				m_ar.BeginChunk(PLT_MATERIAL_DATA);
+				{
+					WriteMaterialData(fem);
+				}
+				m_ar.EndChunk();
 			}
-			m_ar.EndChunk();
 
-			m_ar.BeginChunk(PLT_NODE_DATA);
+			// Node Data
+			if (!m_dic.m_Node.empty())
 			{
-				WriteNodeData(fem);
+				m_ar.BeginChunk(PLT_NODE_DATA);
+				{
+					WriteNodeData(fem);
+				}
+				m_ar.EndChunk();
 			}
-			m_ar.EndChunk();
 
-			m_ar.BeginChunk(PLT_ELEMENT_DATA);
+			// Element Data
+			if (!m_dic.m_Elem.empty())
 			{
-				WriteElementData(fem);
+				m_ar.BeginChunk(PLT_ELEMENT_DATA);
+				{
+					WriteElementData(fem);
+				}
+				m_ar.EndChunk();
 			}
-			m_ar.EndChunk();
 
-			m_ar.BeginChunk(PLT_FACE_DATA);
+			// surface data
+			if (!m_dic.m_Face.empty())
 			{
-				WriteFaceData(fem);
+				m_ar.BeginChunk(PLT_FACE_DATA);
+				{
+					WriteFaceData(fem);
+				}
+				m_ar.EndChunk();
 			}
-			m_ar.EndChunk();
 		}
 		m_ar.EndChunk();
 	}
@@ -476,24 +522,40 @@ void FEBioPlotFile::WriteMaterialData(FEM& fem)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteNodeData(FEM& fem)
 {
-	// save the nodal variables
-	if (m_dic.m_Node.size() > 0)
+	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Node.begin();
+	for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it)
 	{
-		list<DICTIONARY_ITEM>::iterator it = m_dic.m_Node.begin();
-		for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it)
-			if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+		m_ar.BeginChunk(PLT_STATE_VARIABLE);
+		{
+			unsigned int nid = i+1;
+			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
+			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
+			{
+				if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
 	}
 }
 
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteElementData(FEM& fem)
 {
-	// save the solid variables
-	if (m_dic.m_Elem.size() > 0)
+	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
+	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
 	{
-		list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
-		for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
-			if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+		m_ar.BeginChunk(PLT_STATE_VARIABLE);
+		{
+			unsigned int nid = i+1;
+			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
+			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
+			{
+				if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
 	}
 }
 
