@@ -113,9 +113,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 		}
 		m_ar.EndChunk();
 	}
-	// Don't call EndChunk yet since we still 
-	// need to write state data
-//	m_ar.EndChunk();
+	m_ar.EndChunk();
 
 	return true;
 }
@@ -134,6 +132,9 @@ bool FEBioPlotFile::WriteHeader(FEM& fem)
 
 	// output header
 	m_ar.WriteChunk(PLT_HDR_VERSION, nversion);
+
+	int N = fem.m_mesh.Nodes();
+	m_ar.WriteChunk(PLT_HDR_NODES, N);
 
 	return true;
 }
@@ -260,7 +261,7 @@ bool FEBioPlotFile::WriteMaterials(FEM& fem)
 	for (int i=0; i<NMAT; ++i)
 	{
 		FEMaterial* pm = fem.GetMaterial(i);
-		m_ar.BeginChunk(PLT_DIC_MATERIAL);
+		m_ar.BeginChunk(PLT_MATERIAL);
 		{
 			unsigned int nid = (unsigned int) pm->GetID();
 			char szname[STR_SIZE] = {0};
@@ -350,7 +351,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	int mid = dom.GetMaterial()->GetID();
 	int etype = dom.GetElementType();
 
-	int n[9], i, j;
+	int i, j;
 	int NE = dom.Elements();
 
 	// figure out element type
@@ -367,19 +368,24 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	}
 
 	// write the header
-	m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
-	m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
+	m_ar.BeginChunk(PLT_DOMAIN_HDR);
+	{
+		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
+		m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
+		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+	}
+	m_ar.EndChunk();
 
 	// write the element list
-	m_ar.BeginChunk(PLT_DOM_ELEM_LIST, NE*(ne+1));
+	int n[9];
+	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
 		for (i=0; i<NE; ++i)
 		{
 			FESolidElement& el = dom.Element(i);
 			n[0] = el.m_nID;
-			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j]+1;
-
-			for (j=0; j<=ne; ++j) m_ar << n[j];
+			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
+			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
 		}
 	}
 	m_ar.EndChunk();
@@ -391,7 +397,7 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 	int mid = dom.GetMaterial()->GetID();
 	int etype = dom.GetElementType();
 
-	int n[5], i, j;
+	int i, j;
 	int NE = dom.Elements();
 
 	// figure out element type
@@ -408,14 +414,15 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 	m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
 
 	// write the element list
-	m_ar.BeginChunk(PLT_DOM_ELEM_LIST, NE*(ne+1));
+	int n[5];
+	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
 		for (i=0; i<NE; ++i)
 		{
 			FEShellElement& el = dom.Element(i);
 			n[0] = el.m_nID;
-			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j]+1;
-			for (j=0; j<=ne; ++j) m_ar << n[j];
+			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
+			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
 		}
 	}
 	m_ar.EndChunk();
@@ -444,7 +451,8 @@ bool FEBioPlotFile::Write(FEM &fem)
 		// state header
 		m_ar.BeginChunk(PLT_STATE_HEADER);
 		{
-			m_ar.WriteChunk(PLT_STATE_HDR_TIME, fem.m_ftime);
+			float f = (float) fem.m_ftime;
+			m_ar.WriteChunk(PLT_STATE_HDR_TIME, f);
 		}
 		m_ar.EndChunk();
 

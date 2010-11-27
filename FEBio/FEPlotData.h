@@ -43,7 +43,7 @@ class FENodeData : public FEPlotData
 public:
 	FENodeData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEM& fem, Archive& ar);
-	virtual void Save(FEMesh& m, Archive& ar) = 0;
+	virtual void Save(FEMesh& m, vector<float>& a) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ class FEElementData : public FEPlotData
 public:
 	FEElementData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEM& fem, Archive& ar);
-	virtual void Save(FEDomain& D, Archive& ar) = 0;
+	virtual void Save(FEDomain& D, vector<float>& a) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ class FEFaceData : public FEPlotData
 public:
 	FEFaceData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEM& fem, Archive& ar);
-	virtual void Save(FESurface& S, Archive& ar) = 0;
+	virtual void Save(FESurface& S, vector<float>& a) = 0;
 };
 
 //=============================================================================
@@ -79,7 +79,7 @@ class FEPlotNodeDisplacement : public FENodeData
 {
 public:
 	FEPlotNodeDisplacement() : FENodeData(VEC3F, ITEM_DATA){}
-	void Save(FEMesh& m, Archive& ar);
+	void Save(FEMesh& m, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class FEPlotNodeVelocity : public FENodeData
 {
 public:
 	FEPlotNodeVelocity() : FENodeData(VEC3F, ITEM_DATA){}
-	void Save(FEMesh& m, Archive& ar);
+	void Save(FEMesh& m, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ class FEPlotNodeAcceleration : public FENodeData
 {
 public:
 	FEPlotNodeAcceleration() : FENodeData(VEC3F, ITEM_DATA){}
-	void Save(FEMesh& m, Archive& ar);
+	void Save(FEMesh& m, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ class FEPlotFluidPressure : public FENodeData
 {
 public:
 	FEPlotFluidPressure() : FENodeData(FLOAT, ITEM_DATA){}
-	void Save(FEMesh& m, Archive& ar);
+	void Save(FEMesh& m, vector<float>& a);
 };
 
 //=============================================================================
@@ -120,7 +120,7 @@ class FEPlotElementStress : public FEElementData
 {
 public:
 	FEPlotElementStress() : FEElementData(MAT3FS, ITEM_DATA){}
-	void Save(FEDomain& dom, Archive& ar);
+	void Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -129,7 +129,7 @@ class FEPlotFluidFlux : public FEElementData
 {
 public:
 	FEPlotFluidFlux() : FEElementData(VEC3F, ITEM_DATA){}
-	void Save(FEDomain& dom, Archive& ar);
+	void Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ class FEPlotFiberVector : public FEElementData
 {
 public:
 	FEPlotFiberVector() : FEElementData(VEC3F, ITEM_DATA){}
-	void Save(FEDomain& dom, Archive& ar);
+	void Save(FEDomain& dom, vector<float>& a);
 };
 
 //=============================================================================
@@ -152,7 +152,7 @@ class FEPlotContactGap : public FEFaceData
 {
 public:
 	FEPlotContactGap() : FEFaceData(FLOAT, ITEM_DATA){}
-	void Save(FESurface& surf, Archive& ar);
+	void Save(FESurface& surf, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -162,5 +162,5 @@ class FEPlotContactTraction : public FEFaceData
 {
 public:
 	FEPlotContactTraction() : FEFaceData(VEC3F, ITEM_DATA){}
-	void Save(FESurface& surf, Archive& ar);
+	void Save(FESurface& surf, vector<float>& a);
 };
