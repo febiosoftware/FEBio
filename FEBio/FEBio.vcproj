@@ -1841,6 +1841,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPlotDataFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPoroConstPerm.cpp"
 				>
 			</File>
@@ -2604,6 +2608,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPlotData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPlotDataFactory.h"
 				>
 			</File>
 			<File

@@ -79,11 +79,20 @@ protected:
 	class Dictionary
 	{
 	public:
-		void AddGlobalVariable  (FEPlotData* ps, const char* szname);
-		void AddMaterialVariable(FEPlotData* ps, const char* szname);
-		void AddNodalVariable   (FEPlotData* ps, const char* szname);
-		void AddElementVariable (FEPlotData* ps, const char* szname);
-		void AddFaceVariable    (FEPlotData* ps, const char* szname);
+		bool AddVariable(const char* szname);
+
+		int NodalVariables  () { return m_Node.size(); }
+		int ElementVarialbes() { return m_Elem.size(); }
+		int FaceVariables   () { return m_Face.size(); }
+
+		void Defaults(FEM& fem);
+
+	protected:
+		bool AddGlobalVariable  (FEPlotData* ps, const char* szname);
+		bool AddMaterialVariable(FEPlotData* ps, const char* szname);
+		bool AddNodalVariable   (FEPlotData* ps, const char* szname);
+		bool AddElementVariable (FEPlotData* ps, const char* szname);
+		bool AddFaceVariable    (FEPlotData* ps, const char* szname);
 
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
@@ -107,6 +116,9 @@ public:
 
 	//! Write current FE state to plot database
 	bool Write(FEM& fem);
+
+	//! Add a variable to the dictionary
+	bool AddVariable(const char* sz) { return m_dic.AddVariable(sz); }
 
 protected:
 	bool WriteHeader    (FEM& fem);

@@ -149,6 +149,10 @@ class FEBioOutputSection : public FileSection
 public:
 	FEBioOutputSection(FEFEBioImport* pim) : FileSection(pim){}
 	void Parse(XMLTag& tag);
+
+protected:
+	void ParseLogfile (XMLTag& tag);
+	void ParsePlotfile(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------

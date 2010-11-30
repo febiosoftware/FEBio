@@ -2930,6 +2930,20 @@ void FEBioLoadSection::Parse(XMLTag& tag)
 //=============================================================================
 void FEBioOutputSection::Parse(XMLTag& tag)
 {
+	++tag;
+	do
+	{
+		if (tag == "logfile") ParseLogfile(tag);
+		else if (tag == "plotfile") ParsePlotfile(tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioOutputSection::ParseLogfile(XMLTag &tag)
+{
 	FEM& fem = *GetFEM();
 	FEMesh& mesh = fem.m_mesh;
 
@@ -2938,190 +2952,202 @@ void FEBioOutputSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if (tag == "logfile")
+		if (tag == "node_data")
 		{
-			++tag;
-			do
+			sz = tag.AttributeValue("file", true);
+
+			NodeDataRecord* prec = new NodeDataRecord(&fem, sz);
+			sz = tag.AttributeValue("data");
+			strcpy(prec->m_szdata, sz);
+
+			sz = tag.AttributeValue("name", true);
+			if (sz != 0) strcpy(prec->m_szname, sz);
+
+			sz = tag.AttributeValue("delim", true);
+			if (sz != 0) strcpy(prec->m_szdelim, sz);
+
+			sz = tag.AttributeValue("comments", true);
+			if (sz != 0)
 			{
-				if (tag == "node_data")
+				if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
+				else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+			}
+
+			if (tag.isleaf()) prec->DataRecord::SetItemList(tag.szvalue());
+			else
+			{
+				++tag;
+				if (tag == "node_set")
 				{
-					sz = tag.AttributeValue("file", true);
-
-					NodeDataRecord* prec = new NodeDataRecord(&fem, sz);
-					sz = tag.AttributeValue("data");
-					strcpy(prec->m_szdata, sz);
-
-					sz = tag.AttributeValue("name", true);
-					if (sz != 0) strcpy(prec->m_szname, sz);
-
-					sz = tag.AttributeValue("delim", true);
-					if (sz != 0) strcpy(prec->m_szdelim, sz);
-
-					sz = tag.AttributeValue("comments", true);
-					if (sz != 0)
+					FENodeSet* pns = 0;
+					const char* szid = tag.AttributeValue("id", true);
+					if (szid == 0)
 					{
-						if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
-						else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+						const char* szname = tag.AttributeValue("name");
+						pns = mesh.FindNodeSet(szname);
 					}
+					else pns = mesh.FindNodeSet(atoi(szid));
 
-					if (tag.isleaf()) prec->DataRecord::SetItemList(tag.szvalue());
-					else
-					{
-						++tag;
-						if (tag == "node_set")
-						{
-							FENodeSet* pns = 0;
-							const char* szid = tag.AttributeValue("id", true);
-							if (szid == 0)
-							{
-								const char* szname = tag.AttributeValue("name");
-								pns = mesh.FindNodeSet(szname);
-							}
-							else pns = mesh.FindNodeSet(atoi(szid));
+					if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
 
-							if (pns == 0) throw XMLReader::InvalidAttributeValue(tag, "id", szid);
-
-							prec->SetItemList(pns);
-						}
-						else throw XMLReader::InvalidTag(tag);
-						++tag;
-						assert(tag.isend());
-					}
-
-					fem.m_Data.AddRecord(prec);
-				}
-				else if (tag == "element_data")
-				{
-					sz = tag.AttributeValue("file", true);
-
-					ElementDataRecord* prec = new ElementDataRecord(&fem, sz);
-					sz = tag.AttributeValue("data");
-					strcpy(prec->m_szdata, sz);
-
-					sz = tag.AttributeValue("name", true);
-					if (sz != 0) strcpy(prec->m_szname, sz);
-
-
-					sz = tag.AttributeValue("delim", true);
-					if (sz != 0) strcpy(prec->m_szdelim, sz);
-
-					sz = tag.AttributeValue("comments", true);
-					if (sz != 0)
-					{
-						if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
-						else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
-					}
-
-					prec->SetItemList(tag.szvalue());
-
-					fem.m_Data.AddRecord(prec);
-				}
-				else if (tag == "rigid_body_data")
-				{
-					sz = tag.AttributeValue("file", true);
-
-					RigidBodyDataRecord* prec = new RigidBodyDataRecord(&fem, sz);
-					sz = tag.AttributeValue("data");
-					strcpy(prec->m_szdata, sz);
-
-					sz = tag.AttributeValue("name", true);
-					if (sz != 0) strcpy(prec->m_szname, sz);
-
-					sz = tag.AttributeValue("delim", true);
-					if (sz != 0) strcpy(prec->m_szdelim, sz);
-
-					sz = tag.AttributeValue("comments", true);
-					if (sz != 0)
-					{
-						if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
-						else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
-					}
-
-					prec->SetItemList(tag.szvalue());
-
-					fem.m_Data.AddRecord(prec);
+					prec->SetItemList(pns);
 				}
 				else throw XMLReader::InvalidTag(tag);
-
 				++tag;
+				assert(tag.isend());
 			}
-			while (!tag.isend());
+
+			fem.m_Data.AddRecord(prec);
 		}
-		else if (tag == "plotfile")
+		else if (tag == "element_data")
 		{
-			const char* sz = tag.AttributeValue("type", true);
-			if (sz)
-			{
-				if (strcmp(sz, "febio") == 0) fem.m_plot = new FEBioPlotFile;
-				else if (strcmp(sz, "lsdyna") == 0) fem.m_plot = new LSDYNAPlotFile;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
-			}
-			else fem.m_plot = new LSDYNAPlotFile;
+			sz = tag.AttributeValue("file", true);
 
-			if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot) && !tag.isleaf())
-			{
-				LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(fem.m_plot);
+			ElementDataRecord* prec = new ElementDataRecord(&fem, sz);
+			sz = tag.AttributeValue("data");
+			strcpy(prec->m_szdata, sz);
 
-				++tag;
-				do
-				{
-					if (tag == "shell_strain") tag.value(plt.m_bsstrn);
-					else if (tag == "map")
-					{
-						const char* szfield = tag.AttributeValue("field");
-						const char* szval = tag.szvalue();
-						if (strcmp(szfield, "displacement") == 0)
-						{
-							if (strcmp(szval, "DISPLACEMENT") == 0) plt.m_nfield[0] = PLOT_DISPLACEMENT;
-							else throw XMLReader::InvalidValue(tag);
-						}
-						else if (strcmp(szfield, "velocity") == 0)
-						{
-							if (strcmp(szval, "NONE") == 0) plt.m_nfield[1] = PLOT_NONE;
-							else if (strcmp(szval, "VELOCITY") == 0) plt.m_nfield[1] = PLOT_VELOCITY;
-							else if (strcmp(szval, "FLUID_FLUX") == 0) plt.m_nfield[1] = PLOT_FLUID_FLUX;
-							else if (strcmp(szval, "CONTACT_TRACTION") == 0) plt.m_nfield[1] = PLOT_CONTACT_TRACTION;
-							else if (strcmp(szval, "REACTION_FORCE") == 0) plt.m_nfield[1] = PLOT_REACTION_FORCE;
-							else if (strcmp(szval, "MATERIAL_FIBER") == 0) plt.m_nfield[1] = PLOT_MATERIAL_FIBER;
-							else throw XMLReader::InvalidValue(tag);
-						}
-						else if (strcmp(szfield, "acceleration") == 0)
-						{
-							if (strcmp(szval, "NONE") == 0) plt.m_nfield[2] = PLOT_NONE;
-							else if (strcmp(szval, "ACCELERATION") == 0) plt.m_nfield[2] = PLOT_ACCELERATION;
-							else if (strcmp(szval, "FLUID_FLUX") == 0) plt.m_nfield[2] = PLOT_FLUID_FLUX;
-							else if (strcmp(szval, "CONTACT_TRACTION") == 0) plt.m_nfield[2] = PLOT_CONTACT_TRACTION;
-							else if (strcmp(szval, "REACTION_FORCE") == 0) plt.m_nfield[2] = PLOT_REACTION_FORCE;
-							else if (strcmp(szval, "MATERIAL_FIBER") == 0) plt.m_nfield[2] = PLOT_MATERIAL_FIBER;
-							else throw XMLReader::InvalidValue(tag);
-						}
-						else if (strcmp(szfield, "temperature") == 0)
-						{
-							if (strcmp(szval, "NONE") == 0) plt.m_nfield[3] = PLOT_NONE;
-							else if (strcmp(szval, "FLUID_PRESSURE") == 0) plt.m_nfield[3] = PLOT_FLUID_PRESSURE;
-							else if (strcmp(szval, "CONTACT_PRESSURE") == 0) plt.m_nfield[3] = PLOT_CONTACT_PRESSURE;
-							else if (strcmp(szval, "CONTACT_GAP") == 0) plt.m_nfield[3] = PLOT_CONTACT_GAP;
-							else throw XMLReader::InvalidValue(tag);
-						}
-						else if (strcmp(szfield, "plastic strain") == 0)
-						{
-							if      (strcmp(szval, "PLASTIC_STRAIN"  ) == 0) plt.m_nfield[4] = PLOT_PLASTIC_STRAIN;
-							else if (strcmp(szval, "FIBER_STRAIN"    ) == 0) plt.m_nfield[4] = PLOT_FIBER_STRAIN;
-							else if (strcmp(szval, "DEV_FIBER_STRAIN") == 0) plt.m_nfield[4] = PLOT_DEV_FIBER_STRAIN;
-							else throw XMLReader::InvalidValue(tag);
-						}
-						else throw XMLReader::InvalidAttributeValue(tag, "field", szfield);
-					}
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
+			sz = tag.AttributeValue("name", true);
+			if (sz != 0) strcpy(prec->m_szname, sz);
+
+
+			sz = tag.AttributeValue("delim", true);
+			if (sz != 0) strcpy(prec->m_szdelim, sz);
+
+			sz = tag.AttributeValue("comments", true);
+			if (sz != 0)
+			{
+				if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
+				else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
 			}
+
+			prec->SetItemList(tag.szvalue());
+
+			fem.m_Data.AddRecord(prec);
+		}
+		else if (tag == "rigid_body_data")
+		{
+			sz = tag.AttributeValue("file", true);
+
+			RigidBodyDataRecord* prec = new RigidBodyDataRecord(&fem, sz);
+			sz = tag.AttributeValue("data");
+			strcpy(prec->m_szdata, sz);
+
+			sz = tag.AttributeValue("name", true);
+			if (sz != 0) strcpy(prec->m_szname, sz);
+
+			sz = tag.AttributeValue("delim", true);
+			if (sz != 0) strcpy(prec->m_szdelim, sz);
+
+			sz = tag.AttributeValue("comments", true);
+			if (sz != 0)
+			{
+				if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
+				else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+			}
+
+			prec->SetItemList(tag.szvalue());
+
+			fem.m_Data.AddRecord(prec);
 		}
 		else throw XMLReader::InvalidTag(tag);
+
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
+{
+	FEM& fem = *GetFEM();
+	FEMesh& mesh = fem.m_mesh;
+
+	const char* sz = tag.AttributeValue("type", true);
+	if (sz)
+	{
+		if (strcmp(sz, "febio") == 0) fem.m_plot = new FEBioPlotFile;
+		else if (strcmp(sz, "lsdyna") == 0) fem.m_plot = new LSDYNAPlotFile;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+	}
+	else fem.m_plot = new LSDYNAPlotFile;
+
+	if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot) && !tag.isleaf())
+	{
+		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(fem.m_plot);
+
+		++tag;
+		do
+		{
+			if (tag == "shell_strain") tag.value(plt.m_bsstrn);
+			else if (tag == "map")
+			{
+				const char* szfield = tag.AttributeValue("field");
+				const char* szval = tag.szvalue();
+				if (strcmp(szfield, "displacement") == 0)
+				{
+					if (strcmp(szval, "DISPLACEMENT") == 0) plt.m_nfield[0] = PLOT_DISPLACEMENT;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (strcmp(szfield, "velocity") == 0)
+				{
+					if (strcmp(szval, "NONE") == 0) plt.m_nfield[1] = PLOT_NONE;
+					else if (strcmp(szval, "VELOCITY") == 0) plt.m_nfield[1] = PLOT_VELOCITY;
+					else if (strcmp(szval, "FLUID_FLUX") == 0) plt.m_nfield[1] = PLOT_FLUID_FLUX;
+					else if (strcmp(szval, "CONTACT_TRACTION") == 0) plt.m_nfield[1] = PLOT_CONTACT_TRACTION;
+					else if (strcmp(szval, "REACTION_FORCE") == 0) plt.m_nfield[1] = PLOT_REACTION_FORCE;
+					else if (strcmp(szval, "MATERIAL_FIBER") == 0) plt.m_nfield[1] = PLOT_MATERIAL_FIBER;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (strcmp(szfield, "acceleration") == 0)
+				{
+					if (strcmp(szval, "NONE") == 0) plt.m_nfield[2] = PLOT_NONE;
+					else if (strcmp(szval, "ACCELERATION") == 0) plt.m_nfield[2] = PLOT_ACCELERATION;
+					else if (strcmp(szval, "FLUID_FLUX") == 0) plt.m_nfield[2] = PLOT_FLUID_FLUX;
+					else if (strcmp(szval, "CONTACT_TRACTION") == 0) plt.m_nfield[2] = PLOT_CONTACT_TRACTION;
+					else if (strcmp(szval, "REACTION_FORCE") == 0) plt.m_nfield[2] = PLOT_REACTION_FORCE;
+					else if (strcmp(szval, "MATERIAL_FIBER") == 0) plt.m_nfield[2] = PLOT_MATERIAL_FIBER;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (strcmp(szfield, "temperature") == 0)
+				{
+					if (strcmp(szval, "NONE") == 0) plt.m_nfield[3] = PLOT_NONE;
+					else if (strcmp(szval, "FLUID_PRESSURE") == 0) plt.m_nfield[3] = PLOT_FLUID_PRESSURE;
+					else if (strcmp(szval, "CONTACT_PRESSURE") == 0) plt.m_nfield[3] = PLOT_CONTACT_PRESSURE;
+					else if (strcmp(szval, "CONTACT_GAP") == 0) plt.m_nfield[3] = PLOT_CONTACT_GAP;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (strcmp(szfield, "plastic strain") == 0)
+				{
+					if      (strcmp(szval, "PLASTIC_STRAIN"  ) == 0) plt.m_nfield[4] = PLOT_PLASTIC_STRAIN;
+					else if (strcmp(szval, "FIBER_STRAIN"    ) == 0) plt.m_nfield[4] = PLOT_FIBER_STRAIN;
+					else if (strcmp(szval, "DEV_FIBER_STRAIN") == 0) plt.m_nfield[4] = PLOT_DEV_FIBER_STRAIN;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else throw XMLReader::InvalidAttributeValue(tag, "field", szfield);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (dynamic_cast<FEBioPlotFile*>(fem.m_plot) && !tag.isleaf())
+	{
+		FEBioPlotFile& plt = *dynamic_cast<FEBioPlotFile*>(fem.m_plot);
+
+		++tag;
+		do
+		{
+			if (tag == "add_var")
+			{
+				const char* szt = tag.AttributeValue("type");
+				if (plt.AddVariable(szt) == false) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+			}
+			++tag;
+		}
+		while (!tag.isend());
+
+	}
 }
 
 //=============================================================================

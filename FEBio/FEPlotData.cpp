@@ -3,6 +3,18 @@
 #include "fem.h"
 #include "FESlidingInterface2.h"
 #include "FEFacet2FacetSliding.h"
+#include "FEPlotDataFactory.h"
+
+//-----------------------------------------------------------------------------
+REGISTER_PLOTDATA(FEPlotNodeDisplacement, "displacement"    );
+REGISTER_PLOTDATA(FEPlotNodeVelocity    , "velocity"        );
+REGISTER_PLOTDATA(FEPlotNodeAcceleration, "acceleration"    );
+REGISTER_PLOTDATA(FEPlotFluidPressure   , "fluid pressure"  );
+REGISTER_PLOTDATA(FEPlotElementStress   , "stress"          );
+REGISTER_PLOTDATA(FEPlotFluidFlux       , "fluid flux"      );
+REGISTER_PLOTDATA(FEPlotFiberVector     , "fiber vector"    );
+REGISTER_PLOTDATA(FEPlotContactGap      , "contact gap"     );
+REGISTER_PLOTDATA(FEPlotContactTraction , "contact traction");
 
 //-----------------------------------------------------------------------------
 int FEPlotData::VarSize(Var_Type t)
@@ -28,10 +40,11 @@ void FENodeData::Save(FEM &fem, Archive& ar)
 
 	int N = fem.m_mesh.Nodes();
 	vector<float> a; a.reserve(ndata*N);
-	Save(fem.m_mesh, a);
-	assert(a.size() == N*ndata);
-
-	ar.WriteChunk(0, a);
+	if (Save(fem.m_mesh, a))
+	{
+		assert(a.size() == N*ndata);
+		ar.WriteChunk(0, a);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -47,9 +60,11 @@ void FEElementData::Save(FEM &fem, Archive& ar)
 		FEDomain& D = m.Domain(i);
 		int nsize = ndata*D.Elements();
 		vector<float> a; a.reserve(nsize);
-		Save(D, a);
-		assert(a.size() == nsize);
-		ar.WriteChunk(i+1, a);
+		if (Save(D, a))
+		{
+			assert(a.size() == nsize);
+			ar.WriteChunk(i+1, a);
+		}
 	}
 }
 
@@ -66,9 +81,11 @@ void FEFaceData::Save(FEM &fem, Archive& ar)
 		FESurface& S = m.Surface(i);
 		int nsize = ndata*S.Elements();
 		vector<float> a; a.reserve(nsize);
-		Save(S, a);
-		assert(a.size() == nsize);
-		ar.WriteChunk(i+1, a);
+		if (Save(S, a))
+		{
+			assert(a.size() == nsize);
+			ar.WriteChunk(i+1, a);
+		}
 	}
 }
 
@@ -78,7 +95,7 @@ void FEFaceData::Save(FEM &fem, Archive& ar)
 
 //-----------------------------------------------------------------------------
 //! Store the nodal displacements
-void FEPlotNodeDisplacement::Save(FEMesh& m, vector<float>& a)
+bool FEPlotNodeDisplacement::Save(FEMesh& m, vector<float>& a)
 {
 	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
@@ -95,10 +112,11 @@ void FEPlotNodeDisplacement::Save(FEMesh& m, vector<float>& a)
 		a.push_back(xf[1]);
 		a.push_back(xf[2]);
 	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeVelocity::Save(FEMesh& m, vector<float>& a)
+bool FEPlotNodeVelocity::Save(FEMesh& m, vector<float>& a)
 {
 	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
@@ -115,10 +133,11 @@ void FEPlotNodeVelocity::Save(FEMesh& m, vector<float>& a)
 		a.push_back(xf[1]);
 		a.push_back(xf[2]);
 	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotNodeAcceleration::Save(FEMesh& m, vector<float>& a)
+bool FEPlotNodeAcceleration::Save(FEMesh& m, vector<float>& a)
 {
 	float xf[3];
 	for (int i=0; i<m.Nodes(); ++i)
@@ -135,16 +154,18 @@ void FEPlotNodeAcceleration::Save(FEMesh& m, vector<float>& a)
 		a.push_back(xf[1]);
 		a.push_back(xf[2]);
 	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotFluidPressure::Save(FEMesh &m, vector<float>& a)
+bool FEPlotFluidPressure::Save(FEMesh &m, vector<float>& a)
 {
 	for (int i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);
 		a.push_back((float) node.m_pt);
 	}
+	return true;
 }
 
 //=============================================================================
@@ -152,7 +173,7 @@ void FEPlotFluidPressure::Save(FEMesh &m, vector<float>& a)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-void FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
+bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 {
 	int i, j;
 
@@ -199,11 +220,13 @@ void FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 			a.push_back(s[4]);
 			a.push_back(s[5]);
 		}
+		return true;
 	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
 	float af[3];
@@ -235,11 +258,13 @@ void FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 			a.push_back(af[1]);
 			a.push_back(af[2]);
 		}
+		return true;
 	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j, n;
 	float f[3];
@@ -269,7 +294,9 @@ void FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 			a.push_back(a[1]);
 			a.push_back(a[2]);
 		}
+		return true;
 	}
+	return false;
 }
 
 //=============================================================================
@@ -277,7 +304,7 @@ void FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-void FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
+bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 {
 /*
 	FEMesh& mesh = fem.m_mesh;
@@ -394,10 +421,11 @@ void FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 	for (i=0; i<mesh.Nodes(); ++i) t[i] = (t[i]<0? 0.f : t[i]);
 	fwrite(&t[0], sizeof(float), mesh.Nodes(), fp);
 */
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotContactTraction::Save(FESurface &surf, vector<float>& a)
+bool FEPlotContactTraction::Save(FESurface &surf, vector<float>& a)
 {
 /*
 	int i, j, k, n;
@@ -527,4 +555,5 @@ void FEPlotContactTraction::Save(FESurface &surf, vector<float>& a)
 
 	fwrite(&acc[0], sizeof(float)*3, fem.m_mesh.Nodes(), fp);
 */
+	return false;
 }

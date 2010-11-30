@@ -2,50 +2,126 @@
 #include "FEBioPlotFile.h"
 #include "fem.h"
 #include "FETransverselyIsotropic.h"
+#include "FEPlotDataFactory.h"
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddVariable(const char* szname)
 {
-	DICTIONARY_ITEM it;
-	it.m_ntype = ps->DataType();
-	it.m_nfmt  = ps->StorageFormat();
-	it.m_psave = ps;
-	strcpy(it.m_szname, szname);
-	m_Glob.push_back(it);
+	FEPlotData* ps = FEPlotDataFactory::Create(szname);
+	if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname);
+	else if (dynamic_cast<FEElementData*>(ps)) return AddElementVariable(ps, szname);
+	else if (dynamic_cast<FEFaceData*   >(ps)) return AddFaceVariable   (ps, szname);
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::AddMaterialVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddGlobalVariable(FEPlotData* ps, const char* szname)
 {
-	DICTIONARY_ITEM it;
-	it.m_ntype = ps->DataType();
-	it.m_nfmt  = ps->StorageFormat();
-	it.m_psave = ps;
-	strcpy(it.m_szname, szname);
-	m_Glob.push_back(it);
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddMaterialVariable(FEPlotData* ps, const char* szname)
 {
-	DICTIONARY_ITEM it;
-	it.m_ntype = ps->DataType();
-	it.m_nfmt  = ps->StorageFormat();
-	it.m_psave = ps;
-	strcpy(it.m_szname, szname);
-	m_Node.push_back(it);
+	return false;
 }
 
 //-----------------------------------------------------------------------------
-
-void FEBioPlotFile::Dictionary::AddElementVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname)
 {
-	DICTIONARY_ITEM it;
-	it.m_ntype = ps->DataType();
-	it.m_nfmt  = ps->StorageFormat();
-	it.m_psave = ps;
-	strcpy(it.m_szname, szname);
-	m_Elem.push_back(it);
+	if (dynamic_cast<FENodeData*>(ps))
+	{
+		DICTIONARY_ITEM it;
+		it.m_ntype = ps->DataType();
+		it.m_nfmt  = ps->StorageFormat();
+		it.m_psave = ps;
+		strcpy(it.m_szname, szname);
+		m_Node.push_back(it);
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::Dictionary::AddElementVariable(FEPlotData* ps, const char* szname)
+{
+	if (dynamic_cast<FEElementData*>(ps))
+	{
+		DICTIONARY_ITEM it;
+		it.m_ntype = ps->DataType();
+		it.m_nfmt  = ps->StorageFormat();
+		it.m_psave = ps;
+		strcpy(it.m_szname, szname);
+		m_Elem.push_back(it);
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::Dictionary::AddFaceVariable(FEPlotData* ps, const char* szname)
+{
+	if (dynamic_cast<FEFaceData*>(ps))
+	{
+		DICTIONARY_ITEM it;
+		it.m_ntype = ps->DataType();
+		it.m_nfmt  = ps->StorageFormat();
+		it.m_psave = ps;
+		strcpy(it.m_szname, szname);
+		m_Face.push_back(it);
+		return true;
+	}
+	return false;
+}
+
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
+{
+	// First we build the dictionary
+	// get the mesh
+	FEMesh& m = fem.m_mesh;
+
+	int nmode = fem.m_pStep->m_nModule;
+	int ntype = fem.m_pStep->m_nanalysis;
+
+	// Define nodal variables
+	if (m_Node.empty())
+	{
+		AddVariable("displacement");
+
+		// store dynamic analysis data
+		if ((ntype == FE_DYNAMIC) || (nmode == FE_POROELASTIC)) AddVariable("velocity");
+		if (ntype == FE_DYNAMIC) AddVariable("acceleration");
+
+		// store poro data
+		if (nmode == FE_POROELASTIC) AddVariable  ("fluid pressure");
+
+		// store contact data
+		if (fem.m_CI.size() > 0)
+		{
+			AddVariable("contact gap");
+			AddVariable("contact traction");
+		}
+	}
+
+	// Define element variables
+	if (m_Elem.empty())
+	{
+		AddVariable("stress");
+
+		// store poro data
+		if (nmode == FE_POROELASTIC) AddVariable("fluid flux");
+	
+		// if any material is trans-iso we store material fibers and strain
+		int ntiso = 0;
+		for (int i=0; i<fem.Materials(); ++i)
+		{
+			FEElasticMaterial* pm = fem.GetElasticMaterial(i);
+			if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
+		}
+		if (ntiso) AddVariable("fiber vector");
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -142,46 +218,8 @@ bool FEBioPlotFile::WriteHeader(FEM& fem)
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::WriteDictionary(FEM& fem)
 {
-	// First we build the dictionary
-	// get the mesh
-	FEMesh& m = fem.m_mesh;
-
-	int nmode = fem.m_pStep->m_nModule;
-	int ntype = fem.m_pStep->m_nanalysis;
-
-	// setup the dictionary
-	m_dic.AddNodalVariable  (new FEPlotNodeDisplacement, "Displacement");
-	m_dic.AddElementVariable(new FEPlotElementStress   , "Stress");
-
-	// store dynamic analysis data
-	if ((ntype == FE_DYNAMIC) || (nmode == FE_POROELASTIC)) m_dic.AddNodalVariable(new FEPlotNodeVelocity    , "Velocity");
-	if (ntype == FE_DYNAMIC) m_dic.AddNodalVariable(new FEPlotNodeAcceleration, "Acceleration");
-
-	// store contact data
-	if (fem.m_CI.size() > 0)
-	{
-		m_dic.AddNodalVariable(new FEPlotContactGap     , "Contact gap");
-		m_dic.AddNodalVariable(new FEPlotContactTraction, "Contact traction");
-	}
-
-	// store poro data
-	if (nmode == FE_POROELASTIC)
-	{
-		m_dic.AddNodalVariable  (new FEPlotFluidPressure, "Fluid Pressure");
-		m_dic.AddElementVariable(new FEPlotFluidFlux    , "Fluid Flux");
-	}
-
-	// if any material is trans-iso we store material fibers and strain
-	int ntiso = 0;
-	for (int i=0; i<fem.Materials(); ++i)
-	{
-		FEElasticMaterial* pm = fem.GetElasticMaterial(i);
-		if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
-	}
-	if (ntiso)
-	{
-		m_dic.AddElementVariable(new FEPlotFiberVector, "Fiber vector");
-	}
+	// setup defaults for the dictionary
+	m_dic.Defaults(fem);
 
 	// Next, we save the dictionary
 	// Global variables
