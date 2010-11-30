@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEPlotDataFactory.h"
 
 FEPlotDataFactory* FEPlotDataFactory::m_pThis = 0;
