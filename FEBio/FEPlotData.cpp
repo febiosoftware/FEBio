@@ -306,6 +306,23 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 {
+	FESlidingSurface* ps = dynamic_cast<FESlidingSurface*>(&surf);
+	if (ps)
+	{
+		FESlidingSurface& s = *ps;
+		int NF = s.Elements();
+		a.assign(NF, 0.f);
+		for (int i=0; i<NF; ++i)
+		{
+			FESurfaceElement& f = s.Element(i);
+			int nf = f.Nodes();
+			for (int j=0; j<nf; ++j) a[i] += (float) s.gap[f.m_lnode[j]];
+			a[i] /= nf;
+		}
+		
+	}
+
+	return true;
 /*
 	FEMesh& mesh = fem.m_mesh;
 
@@ -421,7 +438,6 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 	for (i=0; i<mesh.Nodes(); ++i) t[i] = (t[i]<0? 0.f : t[i]);
 	fwrite(&t[0], sizeof(float), mesh.Nodes(), fp);
 */
-	return false;
 }
 
 //-----------------------------------------------------------------------------

@@ -3131,22 +3131,26 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		}
 		while (!tag.isend());
 	}
-	else if (dynamic_cast<FEBioPlotFile*>(fem.m_plot) && !tag.isleaf())
+	else if (dynamic_cast<FEBioPlotFile*>(fem.m_plot))
 	{
-		FEBioPlotFile& plt = *dynamic_cast<FEBioPlotFile*>(fem.m_plot);
+		// change the extension of the plot file to .xplt
+		fem.SetPlotFileNameExtension(".xplt");
 
-		++tag;
-		do
+		if (!tag.isleaf())
 		{
-			if (tag == "add_var")
-			{
-				const char* szt = tag.AttributeValue("type");
-				if (plt.AddVariable(szt) == false) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-			}
+			FEBioPlotFile& plt = *dynamic_cast<FEBioPlotFile*>(fem.m_plot);
 			++tag;
+			do
+			{
+				if (tag == "add_var")
+				{
+					const char* szt = tag.AttributeValue("type");
+					if (plt.AddVariable(szt) == false) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+				}
+				++tag;
+			}
+			while (!tag.isend());
 		}
-		while (!tag.isend());
-
 	}
 }
 

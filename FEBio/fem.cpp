@@ -517,3 +517,11 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+void FEM::SetPlotFileNameExtension(const char *szext)
+{
+	char* ch = strrchr(m_szplot, '.');
+	if (ch) *ch = 0;
+	strcat(m_szplot, szext);
+}

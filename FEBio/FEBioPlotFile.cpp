@@ -96,13 +96,6 @@ void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
 
 		// store poro data
 		if (nmode == FE_POROELASTIC) AddVariable  ("fluid pressure");
-
-		// store contact data
-		if (fem.m_CI.size() > 0)
-		{
-			AddVariable("contact gap");
-			AddVariable("contact traction");
-		}
 	}
 
 	// Define element variables
@@ -121,6 +114,17 @@ void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
 			if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
 		}
 		if (ntiso) AddVariable("fiber vector");
+	}
+
+	// Define face variables
+	if (m_Face.empty())
+	{
+		// store contact data
+		if (fem.m_CI.size() > 0)
+		{
+			AddVariable("contact gap");
+//			AddVariable("contact traction");
+		}
 	}
 }
 
@@ -448,8 +452,13 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 	}
 
 	// write the header
-	m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
-	m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
+	m_ar.BeginChunk(PLT_DOMAIN_HDR);
+	{
+		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
+		m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
+		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+	}
+	m_ar.EndChunk();
 
 	// write the element list
 	int n[5];
@@ -475,7 +484,39 @@ void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 {
-	assert(false);
+	for (int ns = 0; ns<m.Surfaces(); ++ns)
+	{
+		FESurface& s = m.Surface(ns);
+		int NF = s.Elements();
+		m_ar.BeginChunk(PLT_SURFACE);
+		{
+			m_ar.BeginChunk(PLT_SURFACE_HDR);
+			{
+				int sid = ns+1;
+				m_ar.WriteChunk(PLT_SURFACE_ID, sid);
+				m_ar.WriteChunk(PLT_SURFACE_FACES, NF);
+			}
+			m_ar.EndChunk();
+
+			m_ar.BeginChunk(PLT_FACE_LIST);
+			{
+				int n[5];
+				for (int i=0; i<NF; ++i)
+				{
+					FESurfaceElement& f = s.Element(i);
+					int nf = f.Nodes();
+					n[0] = i+1;
+					n[1] = f.m_node[0];
+					n[2] = f.m_node[1];
+					n[3] = f.m_node[2];
+					n[4] = (nf==4?f.m_node[3]:n[3]);
+					m_ar.WriteChunk(PLT_FACE, n, nf+1);
+				}
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -608,5 +649,19 @@ void FEBioPlotFile::WriteElementData(FEM& fem)
 //-----------------------------------------------------------------------------
 void FEBioPlotFile::WriteFaceData(FEM& fem)
 {
-
+	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Face.begin();
+	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it)
+	{
+		m_ar.BeginChunk(PLT_STATE_VARIABLE);
+		{
+			unsigned int nid = i+1;
+			m_ar.WriteChunk(PLT_STATE_VAR_ID, nid);
+			m_ar.BeginChunk(PLT_STATE_VAR_DATA);
+			{
+				if (it->m_psave) (it->m_psave)->Save(fem, m_ar);
+			}
+			m_ar.EndChunk();
+		}
+		m_ar.EndChunk();
+	}
 }

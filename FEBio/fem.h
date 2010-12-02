@@ -283,6 +283,8 @@ public:
 	void SetPlotFilename (const char* szfile) { strcpy(m_szplot, szfile); }
 	void SetDumpFilename (const char* szfile) { strcpy(m_szdump, szfile); }
 
+	void SetPlotFileNameExtension(const char* szext);
+
 	const char* GetLogfileName () { return m_szlog; }
 	const char* GetPlotFileName() { return m_szplot; }
 
