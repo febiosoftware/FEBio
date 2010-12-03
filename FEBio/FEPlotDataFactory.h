@@ -44,4 +44,4 @@ private:
 };
 
 #define REGISTER_PLOTDATA(theClass, theName) \
-	FEPlotDataFactory::ClassDescriptor_T<theClass> _CD_##theClass##(theName);
+	FEPlotDataFactory::ClassDescriptor_T<theClass> _CD_##theClass##_(theName);
