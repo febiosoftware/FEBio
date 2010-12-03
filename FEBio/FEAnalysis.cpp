@@ -7,6 +7,7 @@
 #include "log.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
+#include "FEPoroElastic.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -204,6 +205,16 @@ bool FEAnalysis::Init()
 		{
 			log.printbox("WARNING", "Rigid body %d is not being used.", m_fem.m_RB[i].m_mat+1);
 			m_fem.m_RB[i].m_bActive = false;
+		}
+
+	// Initialize poroelasticity
+	// TODO: can I call FEM::InitPoro() here
+	// see if there are any poro-elastic materials present
+	for (i=0; i<m_fem.Materials(); ++i)
+		if (dynamic_cast<FEPoroElastic*>(m_fem.m_MAT[i]))
+		{
+			m_nModule = FE_POROELASTIC;
+			break;
 		}
 
 	// initialize equations
