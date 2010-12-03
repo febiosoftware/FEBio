@@ -72,6 +72,7 @@ void FEElementData::Save(FEM &fem, Archive& ar)
 void FEFaceData::Save(FEM &fem, Archive& ar)
 {
 	int ndata = VarSize(DataType());
+	if (m_sfmt == FMT_MULT) ndata *= 4;
 
 	// loop over all surfaces
 	FEMesh& m = fem.m_mesh;
@@ -311,15 +312,19 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 	{
 		FESlidingSurface& s = *ps;
 		int NF = s.Elements();
-		a.assign(NF, 0.f);
+		a.assign(4*NF, 0.f);
 		for (int i=0; i<NF; ++i)
 		{
 			FESurfaceElement& f = s.Element(i);
 			int nf = f.Nodes();
-			for (int j=0; j<nf; ++j) a[i] += (float) s.gap[f.m_lnode[j]];
-			a[i] /= nf;
+			float g = 0.f;
+			for (int j=0; j<nf; ++j) g += (float) s.gap[f.m_lnode[j]];
+			g /= nf;
+			a[4*i  ] = g;
+			a[4*i+1] = g;
+			a[4*i+2] = g;
+			a[4*i+3] = g;
 		}
-		
 	}
 
 	return true;

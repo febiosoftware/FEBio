@@ -9,9 +9,10 @@ class FEM;
 enum Var_Type { FLOAT, VEC3F, MAT3FS };
 
 // --- storage format ---
-// ITEM_DATA : one data stored for each item
-// NODE_DATA : data stored for each node of each item
-enum Storage_Fmt { ITEM_DATA, NODE_DATA };
+// FMT_NODE : one value stored for each node of a region
+// FMT_ITEM : one value stored for each item (e.g. element) of a region
+// FMT_MULT : one value for each node of each item of a region
+enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT };
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all classes that wish to store data to the 
@@ -78,7 +79,7 @@ public:
 class FEPlotNodeDisplacement : public FENodeData
 {
 public:
-	FEPlotNodeDisplacement() : FENodeData(VEC3F, ITEM_DATA){}
+	FEPlotNodeDisplacement() : FENodeData(VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
@@ -88,7 +89,7 @@ public:
 class FEPlotNodeVelocity : public FENodeData
 {
 public:
-	FEPlotNodeVelocity() : FENodeData(VEC3F, ITEM_DATA){}
+	FEPlotNodeVelocity() : FENodeData(VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
@@ -98,7 +99,7 @@ public:
 class FEPlotNodeAcceleration : public FENodeData
 {
 public:
-	FEPlotNodeAcceleration() : FENodeData(VEC3F, ITEM_DATA){}
+	FEPlotNodeAcceleration() : FENodeData(VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
@@ -107,7 +108,7 @@ public:
 class FEPlotFluidPressure : public FENodeData
 {
 public:
-	FEPlotFluidPressure() : FENodeData(FLOAT, ITEM_DATA){}
+	FEPlotFluidPressure() : FENodeData(FLOAT, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
@@ -120,7 +121,7 @@ public:
 class FEPlotElementStress : public FEElementData
 {
 public:
-	FEPlotElementStress() : FEElementData(MAT3FS, ITEM_DATA){}
+	FEPlotElementStress() : FEElementData(MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -129,7 +130,7 @@ public:
 class FEPlotFluidFlux : public FEElementData
 {
 public:
-	FEPlotFluidFlux() : FEElementData(VEC3F, ITEM_DATA){}
+	FEPlotFluidFlux() : FEElementData(VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -138,7 +139,7 @@ public:
 class FEPlotFiberVector : public FEElementData
 {
 public:
-	FEPlotFiberVector() : FEElementData(VEC3F, ITEM_DATA){}
+	FEPlotFiberVector() : FEElementData(VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -152,7 +153,7 @@ public:
 class FEPlotContactGap : public FEFaceData
 {
 public:
-	FEPlotContactGap() : FEFaceData(FLOAT, ITEM_DATA){}
+	FEPlotContactGap() : FEFaceData(FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, vector<float>& a);
 };
 
@@ -162,6 +163,6 @@ public:
 class FEPlotContactTraction : public FEFaceData
 {
 public:
-	FEPlotContactTraction() : FEFaceData(VEC3F, ITEM_DATA){}
+	FEPlotContactTraction() : FEFaceData(VEC3F, FMT_ITEM){}
 	bool Save(FESurface& surf, vector<float>& a);
 };
