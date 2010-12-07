@@ -318,12 +318,12 @@ void FESolidSolver::PrepStep(double time)
 
 				switch (FC.bc)
 				{
-				case 0: RB.m_Fr.x -= f; break;
-				case 1: RB.m_Fr.y -= f; break;
-				case 2: RB.m_Fr.z -= f; break;
-				case 3: RB.m_Mr.x -= f; break;
-				case 4: RB.m_Mr.y -= f; break;
-				case 5: RB.m_Mr.z -= f; break;
+				case 0: RB.m_Fr.x += f; break;
+				case 1: RB.m_Fr.y += f; break;
+				case 2: RB.m_Fr.z += f; break;
+				case 3: RB.m_Mr.x += f; break;
+				case 4: RB.m_Mr.y += f; break;
+				case 5: RB.m_Mr.z += f; break;
 				}
 			}
 		}
