@@ -3,6 +3,9 @@
 #include <string.h>
 #include "DumpFile.h"
 #include "XMLReader.h"
+#include "FESlidingInterface.h"
+#include "FETiedInterface.h"
+#include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
@@ -62,13 +65,6 @@ FEM::FEM()
 
 	// --- Load Curve Data ---
 	// (nothing to initialize yet)
-
-	// --- Boundary Condition Data ---
-	for (int i=0; i<3; ++i)
-	{
-		m_BF[i].lc = -1;
-		m_BF[i].s = 0.0;
-	}
 
 	// --- Direct Solver Data ---
 	// set the default linear solver

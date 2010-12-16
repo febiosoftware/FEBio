@@ -50,7 +50,7 @@ void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
 	FEM& fem = psolver->m_fem;
 
-	if (!fem.UseBodyForces()) return;
+	if (fem.m_BF.empty()) return;
 
 	// element force vector
 	vector<double> fe;
@@ -122,7 +122,7 @@ void FERigidShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	FEM& fem = psolver->m_fem;
 
-	if (!fem.UseBodyForces()) return;
+	if (fem.m_BF.empty()) return;
 
 	// element force vector
 	vector<double> fe;

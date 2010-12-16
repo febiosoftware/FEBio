@@ -35,10 +35,7 @@ void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		UDGInternalForces(fem, el, fe);
 
 		// apply body forces
-		if (fem.UseBodyForces())
-		{
-			BodyForces(fem, el, fe);
-		}
+		if (!fem.m_BF.empty()) BodyForces(fem, el, fe);
 
 		// assemble element 'fe'-vector into global R vector
 		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);

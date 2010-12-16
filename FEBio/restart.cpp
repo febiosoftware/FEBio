@@ -3,6 +3,9 @@
 #include "fem.h"
 #include "FERigid.h"
 #include "FERestartImport.h"
+#include "FESlidingInterface.h"
+#include "FETiedInterface.h"
+#include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
@@ -11,6 +14,7 @@
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
+#include "version.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)
@@ -165,11 +169,9 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		ar << m_b3field;
 
 		// body forces
-		ar.write(m_BF  ,sizeof(FE_BODYFORCE), 1);
-		ar.write(m_BF+1,sizeof(FE_BODYFORCE), 1);
-		ar.write(m_BF+2,sizeof(FE_BODYFORCE), 1);
-
-		ar << m_acc;
+//		ar.write(m_BF  ,sizeof(FE_BODYFORCE), 1);
+//		ar.write(m_BF+1,sizeof(FE_BODYFORCE), 1);
+//		ar.write(m_BF+2,sizeof(FE_BODYFORCE), 1);
 
 		// direct solver data
 		ar << m_nsolver;
@@ -194,11 +196,9 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		ar >> m_b3field;
 
 		// body forces
-		ar.read(m_BF  ,sizeof(FE_BODYFORCE), 1);
-		ar.read(m_BF+1,sizeof(FE_BODYFORCE), 1);
-		ar.read(m_BF+2,sizeof(FE_BODYFORCE), 1);
-
-		ar >> m_acc;
+//		ar.read(m_BF  ,sizeof(FE_BODYFORCE), 1);
+//		ar.read(m_BF+1,sizeof(FE_BODYFORCE), 1);
+//		ar.read(m_BF+2,sizeof(FE_BODYFORCE), 1);
 
 		// direct solver data
 		ar >> m_nsolver;

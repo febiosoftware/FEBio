@@ -116,12 +116,6 @@ void FESolidSolver::PrepStep(double time)
 	// we can do this once outside the NR loop.
 	NodalForces(m_Fn);
 
-	// update the body acceleration values
-	// the "-" sign is to be consistent with NIKE3D's convention
-	if (m_fem.m_BF[0].lc >= 0) m_fem.m_acc.x = -m_fem.GetLoadCurve(m_fem.m_BF[0].lc)->Value()*m_fem.m_BF[0].s;
-	if (m_fem.m_BF[1].lc >= 0) m_fem.m_acc.y = -m_fem.GetLoadCurve(m_fem.m_BF[1].lc)->Value()*m_fem.m_BF[1].s;
-	if (m_fem.m_BF[2].lc >= 0) m_fem.m_acc.z = -m_fem.GetLoadCurve(m_fem.m_BF[2].lc)->Value()*m_fem.m_BF[2].s;
-
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
 	zero(m_ui);

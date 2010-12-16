@@ -44,6 +44,7 @@
 
 #include "stdafx.h"
 #include "fem.h"
+#include "version.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
 #include "validate.h"

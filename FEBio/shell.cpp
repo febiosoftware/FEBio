@@ -31,10 +31,7 @@ void FEElasticShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		InternalForces(el, fe);
 
 		// apply body forces to shells
-		if (fem.UseBodyForces())
-		{
-			BodyForces(fem, el, fe);
-		}
+		if (!fem.m_BF.empty()) BodyForces(fem, el, fe);
 
 		// assemble the residual
 		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
@@ -466,44 +463,50 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 
 void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe)
 {
-	// get the element's material
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
-
-	// material density
-	double dens = pme->Density();
-
-	// "gravity" force
-	vec3d g = fem.m_acc*dens;
-
-	// integration weights
-	double* gw = el.GaussWeights();
-
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-
-	double *Hn, detJ;
-
-	// calculate the average thickness
-	double* h0 = &el.m_h0[0], gt, za;
-
-	// loop over integration points
-	for (int n=0; n<nint; ++n)
+	int NF = fem.m_BF.size();
+	for (int nf = 0; nf < NF; ++nf)
 	{
-		detJ = el.detJ0(n)*gw[n];
-		Hn  = el.H(n);
-		gt = el.gt(n);
+		FEBodyForce& BF = *fem.m_BF[nf];
+		vec3d g;
+		// calculate force scale values
+		// the "-" sign is to be consistent with NIKE3D's convention
+		if (BF.lc[0] >= 0) g.x = -fem.GetLoadCurve(BF.lc[0])->Value()*BF.s[0];
+		if (BF.lc[1] >= 0) g.y = -fem.GetLoadCurve(BF.lc[1])->Value()*BF.s[1];
+		if (BF.lc[2] >= 0) g.z = -fem.GetLoadCurve(BF.lc[2])->Value()*BF.s[2];
 
-		for (int i=0; i<neln; ++i)
+		// don't forget to multiply with the density
+		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		double dens = pme->Density();
+		g *= dens;
+
+		// calculate the average thickness
+		double* h0 = &el.m_h0[0], gt, za;
+
+		// integration weights
+		double* gw = el.GaussWeights();
+		double *Hn, detJ;
+
+		// loop over integration points
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+		for (int n=0; n<nint; ++n)
 		{
-			za = 0.5*gt*h0[i];
+			detJ = el.detJ0(n)*gw[n];
+			Hn  = el.H(n);
+			gt = el.gt(n);
 
-			fe[6*i  ] += Hn[i]*g.x*detJ;
-			fe[6*i+1] += Hn[i]*g.y*detJ;
-			fe[6*i+2] += Hn[i]*g.z*detJ;
+			for (int i=0; i<neln; ++i)
+			{
+				za = 0.5*gt*h0[i];
 
-			fe[6*i+3] += za*Hn[i]*g.x*detJ;
-			fe[6*i+4] += za*Hn[i]*g.y*detJ;
-			fe[6*i+5] += za*Hn[i]*g.z*detJ;
+				fe[6*i  ] += Hn[i]*g.x*detJ;
+				fe[6*i+1] += Hn[i]*g.y*detJ;
+				fe[6*i+2] += Hn[i]*g.z*detJ;
+
+				fe[6*i+3] += za*Hn[i]*g.x*detJ;
+				fe[6*i+4] += za*Hn[i]*g.y*detJ;
+				fe[6*i+5] += za*Hn[i]*g.z*detJ;
+			}
 		}
 	}
 }

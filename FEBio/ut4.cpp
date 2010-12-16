@@ -298,7 +298,7 @@ void FEUT4Domain::ElementResidual(FESolidSolver* psolver, vector<double>& R)
 		ElementInternalForces(el, fe);
 
 		// apply body forces
-		if (fem.UseBodyForces())
+		if (!fem.m_BF.empty())
 		{
 			// Note that this function is in the base class
 			// I'm not sure, but I don't think I have to overwrite this one

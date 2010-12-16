@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "FEBioCommand.h"
 #include "fem.h"
+#include "version.h"
 #include "FEException.h"
 #include "FECore/FECore.h"
 

@@ -9,6 +9,7 @@
 #include "FETransIsoMooneyRivlin.h"
 #include "FERigid.h"
 #include "FESolidSolver.h"
+#include "FESlidingInterface.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -139,9 +140,14 @@ bool FENIKEImport::ReadControlDeck(FEM& fem)
 	nread = sscanf(szline, "%5d%*5d%5d%5d%5d%*5d%*5d%5d%5d%5d", &m_nlc, &m_ncnf, &m_npr, &m_ndis, &ax, &ay, &az);
 	if (nread != 7) return errf(szerr[ERR_CC], 4);
 
-	if (ax != 0) fem.m_BF[0].lc = 1; else fem.m_BF[0].lc = -1;
-	if (ay != 0) fem.m_BF[1].lc = 1; else fem.m_BF[1].lc = -1;
-	if (az != 0) fem.m_BF[2].lc = 1; else fem.m_BF[2].lc = -1;
+	if ((ax!=0)||(ay!=0)||(az!=0))
+	{
+		FEBodyForce* pbf = new FEBodyForce;
+		if (ax != 0) pbf->lc[0] = 1; else pbf->lc[0] = -1;
+		if (ay != 0) pbf->lc[1] = 1; else pbf->lc[1] = -1;
+		if (az != 0) pbf->lc[2] = 1; else pbf->lc[2] = -1;
+		fem.m_BF.push_back(pbf);
+	}
 
 	// -------- control card 5 --------
 	if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
@@ -907,17 +913,21 @@ bool FENIKEImport::ReadBCDecks(FEM& fem)
 	}
 
 	/////////// B A S E   A C C E L E R A T I O N   B O D Y   F O R C E   D E C K ///////////
-	for (i=0; i<3; ++i)
+	if (!fem.m_BF.empty())
 	{
-		// the card is only present if the according flag on CC4 was not zero
-		if (fem.m_BF[i].lc >= 0)
+		FEBodyForce& BF = *fem.m_BF[0];
+		for (i=0; i<3; ++i)
 		{
-			if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
+			// the card is only present if the according flag on CC4 was not zero
+			if (BF.lc[i] >= 0)
+			{
+				if (read_line(m_fp, szline, MAX_LINE) == NULL) return errf(szerr[ERR_EOF], m_szfile);
 
-			nread = sscanf(szline, "%5d%10lg", &(fem.m_BF[i].lc), &(fem.m_BF[i].s));
-			if (nread != 2) return errf(szerr[ERR_BFORCE]);
-			fem.m_BF[i].lc--;
-			if (fem.m_BF[i].s == 0) fem.m_BF[i].s = 1.0;
+				nread = sscanf(szline, "%5d%10lg", &(BF.lc[i]), &(BF.s[i]));
+				if (nread != 2) return errf(szerr[ERR_BFORCE]);
+				BF.lc[i]--;
+				if (BF.s[i] == 0) BF.s[i] = 1.0;
+			}
 		}
 	}
 

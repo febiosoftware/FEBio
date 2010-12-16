@@ -19,6 +19,10 @@
 #include "ut4.h"
 #include "FEDiscreteMaterial.h"
 #include "FEUncoupledMaterial.h"
+#include "FEElasticMixture.h"
+#include "FESlidingInterface.h"
+#include "FETiedInterface.h"
+#include "FERigidWallInterface.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -2814,15 +2818,13 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
 
-	fem.m_BF[0].lc = -1;
-	fem.m_BF[1].lc = -1;
-	fem.m_BF[2].lc = -1;
-
 	++tag;
 	do
 	{
 		if (tag == "body_force")
 		{
+			FEBodyForce* pbf = new FEBodyForce;
+
 			++tag;
 			int n;
 			const char* szlc;
@@ -2836,12 +2838,14 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 				if (n == -1) throw XMLReader::InvalidTag(tag);
 
 				szlc = tag.AttributeValue("lc");
-				fem.m_BF[n].lc = atoi(szlc);
-				tag.value(fem.m_BF[n].s);
+				pbf->lc[n] = atoi(szlc);
+				tag.value(pbf->s[n]);
 
 				++tag;
 			}
 			while (!tag.isend());
+
+			fem.m_BF.push_back(pbf);
 		}
 
 		++tag;

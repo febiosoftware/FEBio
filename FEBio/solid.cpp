@@ -37,10 +37,7 @@ void FEElasticSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		InternalForces(el, fe);
 
 		// apply body forces
-		if (fem.UseBodyForces())
-		{
-			BodyForces(fem, el, fe);
-		}
+		if (!fem.m_BF.empty()) BodyForces(fem, el, fe);
 
 		// assemble element 'fe'-vector into global R vector
 		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
@@ -117,35 +114,44 @@ void FEElasticSolidDomain::InternalForces(FESolidElement& el, vector<double>& fe
 
 void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
-	int i, n;
-	double *H;
-
-	// jacobian
-	double detJ, dens;
-
-	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
-
-	dens = pme->Density();
-
-	int nint = el.GaussPoints();
-	int neln = el.Nodes();
-
-	double* gw = el.GaussWeights();
-
-	// loop over integration points
-	vec3d g = fem.m_acc*dens;
-	for (n=0; n<nint; ++n)
+	int NF = fem.m_BF.size();
+	for (int nf = 0; nf < NF; ++nf)
 	{
-		detJ = el.detJ0(n)*gw[n];
+		FEBodyForce& BF = *fem.m_BF[nf];
 
-		H = el.H(n);
+		// calculate force scale values
+		// the "-" sign is to be consistent with NIKE3D's convention
+		vec3d g;
+		if (BF.lc[0] >= 0) g.x = -fem.GetLoadCurve(BF.lc[0])->Value()*BF.s[0];
+		if (BF.lc[1] >= 0) g.y = -fem.GetLoadCurve(BF.lc[1])->Value()*BF.s[1];
+		if (BF.lc[2] >= 0) g.z = -fem.GetLoadCurve(BF.lc[2])->Value()*BF.s[2];
 
-		for (i=0; i<neln; ++i)
+		// don't forget to multiply with the density
+		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		double dens = pme->Density();
+		g *= dens;
+
+		// jacobian
+		double detJ;
+		double *H;
+		double* gw = el.GaussWeights();
+
+		// loop over integration points
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+		for (int n=0; n<nint; ++n)
 		{
-			fe[3*i  ] += H[i]*g.x*detJ;
-			fe[3*i+1] += H[i]*g.y*detJ;
-			fe[3*i+2] += H[i]*g.z*detJ;
-		}						
+			detJ = el.detJ0(n)*gw[n];
+
+			H = el.H(n);
+
+			for (int i=0; i<neln; ++i)
+			{
+				fe[3*i  ] += H[i]*g.x*detJ;
+				fe[3*i+1] += H[i]*g.y*detJ;
+				fe[3*i+2] += H[i]*g.z*detJ;
+			}						
+		}
 	}
 }
 

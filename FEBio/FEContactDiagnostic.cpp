@@ -6,6 +6,7 @@
 #include "FEContactDiagnostic.h"
 #include "FENeoHookean.h"
 #include "FESolidSolver.h"
+#include "FESlidingInterface.h"
 #include "log.h"
 
 void print_matrix(Logfile& log, FullMatrix& m)

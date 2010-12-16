@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEPlotData.h"
 #include "fem.h"
+#include "FESlidingInterface.h"
 #include "FESlidingInterface2.h"
 #include "FEFacet2FacetSliding.h"
 #include "FEPlotDataFactory.h"

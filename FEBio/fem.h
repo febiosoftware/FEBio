@@ -8,18 +8,11 @@
 #include "PlotFile.h"
 #include "LoadCurve.h"
 #include "FEElementLibrary.h"
-#include "FECore/matrix.h"
-#include "quatd.h"
 #include "DumpFile.h"
 #include "FEMesh.h"
-#include "FESurface.h"
 #include "FEContactInterface.h"
-#include "FESlidingInterface.h"
-#include "FERigidWallInterface.h"
-#include "FETiedInterface.h"
 #include "FEMaterial.h"
 #include "FERigidBody.h"
-#include "version.h"
 #include "FESolver.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
@@ -30,8 +23,8 @@
 #include "FEPoroTraction.h"
 #include "FEFluxSurface.h"
 #include "FEHeatFlux.h"
-#include "FEElasticMixture.h"
 #include "FEDiscreteMaterial.h"
+#include "FEBodyForce.h"
 
 #include <stack>
 #include <list>
@@ -148,20 +141,11 @@ public:
 	int	rid;	// rigid body number
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// STRUCT: FE_BODYFORCE
-// body force data
-//
-
-struct FE_BODYFORCE
-{
-	double	s;		// scale factor
-	int		lc;		// load curve number
-};
-
+//-----------------------------------------------------------------------------
 // forward declaration of FESolidSolver class
 class FESolidSolver;
 
+//-----------------------------------------------------------------------------
 // forward declaration of the FEM class
 class FEM;
 
@@ -351,7 +335,6 @@ public:
 		bool InitMaterials();
 	//}
 
-
 	//{ --- Update routines ---
 
 		//! Update contact data
@@ -359,9 +342,6 @@ public:
 	//}
 
 	//{ --- Miscellaneous routines ---
-
-		//! see if body forces are present
-		bool UseBodyForces() { return ((m_BF[0].lc>=0) || (m_BF[1].lc>=0) || (m_BF[2].lc>=0)); }
 
 		//! set callback function
 		void AddCallback(FEBIO_CB_FNC pcb, void* pd);
@@ -384,8 +364,7 @@ public:
 		int		m_nplane_strain;	//!< run analysis in plain strain mode
 
 		// body force loads
-		FE_BODYFORCE	m_BF[3];		//!< body force data
-		vec3d			m_acc;			//!< acceleration due to bodyforces
+		vector<FEBodyForce*>	m_BF;		//!< body force data
 
 		// Create timer to track total running time
 		Timer	m_TotalTime;
