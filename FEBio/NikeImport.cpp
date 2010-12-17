@@ -142,7 +142,7 @@ bool FENIKEImport::ReadControlDeck(FEM& fem)
 
 	if ((ax!=0)||(ay!=0)||(az!=0))
 	{
-		FEBodyForce* pbf = new FEBodyForce;
+		FEBodyForce* pbf = new FEConstBodyForce;
 		if (ax != 0) pbf->lc[0] = 1; else pbf->lc[0] = -1;
 		if (ay != 0) pbf->lc[1] = 1; else pbf->lc[1] = -1;
 		if (az != 0) pbf->lc[2] = 1; else pbf->lc[2] = -1;

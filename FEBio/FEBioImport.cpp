@@ -2823,29 +2823,61 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 	{
 		if (tag == "body_force")
 		{
-			FEBodyForce* pbf = new FEBodyForce;
-
-			++tag;
-			int n;
-			const char* szlc;
-			do
+			const char* szt = tag.AttributeValue("type", true);
+			if ((szt == 0) ||(strcmp(szt, "const")==0))
 			{
-				n = -1;
-				if (tag == "x") n = 0;
-				else if (tag == "y") n = 1;
-				else if (tag == "z") n = 2;
-
-				if (n == -1) throw XMLReader::InvalidTag(tag);
-
-				szlc = tag.AttributeValue("lc");
-				pbf->lc[n] = atoi(szlc);
-				tag.value(pbf->s[n]);
+				FEConstBodyForce* pbf = new FEConstBodyForce;
 
 				++tag;
-			}
-			while (!tag.isend());
+				int n;
+				const char* szlc;
+				do
+				{
+					n = -1;
+					if (tag == "x") n = 0;
+					else if (tag == "y") n = 1;
+					else if (tag == "z") n = 2;
 
-			fem.m_BF.push_back(pbf);
+					if (n == -1) throw XMLReader::InvalidTag(tag);
+
+					szlc = tag.AttributeValue("lc");
+					pbf->lc[n] = atoi(szlc);
+					tag.value(pbf->s[n]);
+
+					++tag;
+				}
+				while (!tag.isend());
+
+				fem.m_BF.push_back(pbf);
+			}
+			else if (strcmp(szt, "non-const") == 0)
+			{
+				FENonConstBodyForce* pbf = new FENonConstBodyForce;
+
+				++tag;
+				int n;
+				const char* szlc;
+				do
+				{
+					n = -1;
+					if (tag == "x") n = 0;
+					else if (tag == "y") n = 1;
+					else if (tag == "z") n = 2;
+					if (n == -1) throw XMLReader::InvalidTag(tag);
+
+					const char* szd = tag.AttributeValue("data");
+					strcpy(pbf->m_sz[n], szd);
+
+					szlc = tag.AttributeValue("lc");
+					pbf->lc[n] = atoi(szlc);
+					tag.value(pbf->s[n]);
+
+					++tag;
+				}
+				while (!tag.isend());
+
+				fem.m_BF.push_back(pbf);
+			}
 		}
 
 		++tag;

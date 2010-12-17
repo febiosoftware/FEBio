@@ -1617,6 +1617,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBodyForce.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBoundaryCondition.cpp"
 				>
 			</File>

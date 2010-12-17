@@ -169,6 +169,9 @@ protected:
 	//! calculates the solid element inertial stiffness matrix
 	void ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
+	//! calculates the stiffness matrix due to body forces 
+	void BodyForceStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+
 	// --- R E S I D U A L ---
 
 	//! Calculatess external body forces for solid elements

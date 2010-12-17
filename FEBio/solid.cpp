@@ -135,23 +135,94 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 		double detJ;
 		double *H;
 		double* gw = el.GaussWeights();
+		vec3d f;
 
 		// loop over integration points
 		int nint = el.GaussPoints();
 		int neln = el.Nodes();
 		for (int n=0; n<nint; ++n)
 		{
+			FEMaterialPoint& mp = *el.m_State[n];
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			pt.r0 = el.Evaluate(el.r0(), n);
+			pt.rt = el.Evaluate(el.rt(), n);
+
 			detJ = el.detJ0(n)*gw[n];
+
+			// get the force
+			f = BF.force(mp);
 
 			H = el.H(n);
 
 			for (int i=0; i<neln; ++i)
 			{
-				fe[3*i  ] += H[i]*g.x*detJ;
-				fe[3*i+1] += H[i]*g.y*detJ;
-				fe[3*i+2] += H[i]*g.z*detJ;
+				fe[3*i  ] += H[i]*g.x*f.x*detJ;
+				fe[3*i+1] += H[i]*g.y*f.y*detJ;
+				fe[3*i+2] += H[i]*g.z*f.z*detJ;
 			}						
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function calculates the stiffness due to body forces
+void FEElasticSolidDomain::BodyForceStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+{
+	int neln = el.Nodes();
+	int ndof = ke.columns()/neln;
+
+	int NF = fem.m_BF.size();
+	for (int nf =0; nf < NF; ++nf)
+	{
+		FEBodyForce& BF = *fem.m_BF[nf];
+
+		// calculate force scale values
+		// the "-" sign is to be consistent with NIKE3D's convention
+		vec3d g;
+		if (BF.lc[0] >= 0) g.x = -fem.GetLoadCurve(BF.lc[0])->Value()*BF.s[0];
+		if (BF.lc[1] >= 0) g.y = -fem.GetLoadCurve(BF.lc[1])->Value()*BF.s[1];
+		if (BF.lc[2] >= 0) g.z = -fem.GetLoadCurve(BF.lc[2])->Value()*BF.s[2];
+
+		// don't forget to multiply with the density
+		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		double dens = pme->Density();
+		g *= dens;
+
+		// jacobian
+		double detJ;
+		double *H;
+		double* gw = el.GaussWeights();
+		mat3ds K;
+
+		// loop over integration points
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+		for (int n=0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.m_State[n];
+			detJ = el.detJ0(n)*gw[n];
+
+			// get the stiffness
+			K = BF.stiffness(mp);
+
+			H = el.H(n);
+
+			for (int i=0; i<neln; ++i)
+				for (int j=0; j<neln; ++j)
+				{
+					ke[ndof*i  ][ndof*j  ] += H[i]*H[j]*g.x*K(0,0)*detJ;
+					ke[ndof*i  ][ndof*j+1] += H[i]*H[j]*g.x*K(0,1)*detJ;
+					ke[ndof*i  ][ndof*j+2] += H[i]*H[j]*g.x*K(0,2)*detJ;
+
+					ke[ndof*i+1][ndof*j  ] += H[i]*H[j]*g.y*K(1,0)*detJ;
+					ke[ndof*i+1][ndof*j+1] += H[i]*H[j]*g.y*K(1,1)*detJ;
+					ke[ndof*i+1][ndof*j+2] += H[i]*H[j]*g.y*K(1,2)*detJ;
+
+					ke[ndof*i+2][ndof*j  ] += H[i]*H[j]*g.z*K(2,0)*detJ;
+					ke[ndof*i+2][ndof*j+1] += H[i]*H[j]*g.z*K(2,1)*detJ;
+					ke[ndof*i+2][ndof*j+2] += H[i]*H[j]*g.z*K(2,2)*detJ;
+				}
+		}	
 	}
 }
 
@@ -405,6 +476,9 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 		// add the inertial stiffness for dynamics
 		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
+
+		// add body force stiffness
+		if (!fem.m_BF.empty()) BodyForceStiffness(fem, el, ke);
 
 		// assemble element matrix in global stiffness matrix
 		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
