@@ -759,48 +759,45 @@ void qsort(int n, int* arr, int* indx);
 //
 void MatrixFactory::AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int>& LM)
 {
-	int i, j, k, m, I, J;
-
+	// get the number of degrees of freedom
 	const int N = ke.rows();
 
+	// find the permutation array that sorts LM in ascending order
+	// we can use this to speed up the row search (i.e. loop over n below)
+	vector<int> P(N);
+	qsort(N, &LM[0], &P[0]);
+
+	// get the data pointers 
 	int* indices = K.indices();
 	int* pointers = K.pointers();
 	double* pd = K.values();
 	int offset = K.offset();
 
-	int *pi, l, n;
+	// find the starting index
+	int N0 = 0;
+	while ((N0<N-1) && (LM[P[N0]]<0)) ++N0;
 
-	// find the permutation array that sorts LM in ascending order
-	// we can use this to speed up the row search (i.e. loop over n)
-	vector<int> P(N);
-	qsort(N, &LM[0], &P[0]);
-
-	for (m=0; m<N; ++m)
+	// assemble element stiffness
+	for (int m=N0; m<N; ++m)
 	{
-		j = P[m];
-		J = LM[j];
-		if (J >= 0)
+		int j = P[m];
+		int J = LM[j];
+		int n = 0;
+		double* pm = pd+pointers[J]-offset;
+		int* pi = indices + pointers[J] - offset;
+		int l = pointers[J+1] - pointers[J];
+		int M0 = m;
+		while ((M0>N0) && (LM[P[M0-1]] == J)) M0--;
+		for (int k=M0; k<N; ++k)
 		{
-			n = 0;
-			double* pm = pd+pointers[J]-offset;
-			pi = indices + pointers[J] - offset;
-			l = pointers[J+1] - pointers[J];
-			for (k=0; k<N; ++k)
-			{
-				i = P[k];
-				I = LM[i];
-
-				// only add values to lower-diagonal part of stiffness matrix
-				if (I>=J)
+			int i = P[k];
+			int I = LM[i] + offset;
+			for (;n<l; ++n) 
+				if (pi[n] == I)
 				{
-					for (;n<l; ++n) 
-						if (pi[n] == I + offset)
-						{
-							pm[n] += ke[i][j];
-							break;
-						}
+					pm[n] += ke[i][j];
+					break;
 				}
-			}
 		}
 	}
 }

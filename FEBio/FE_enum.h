@@ -107,8 +107,12 @@ enum FE_Unpack_Flags {
 	FE_UNPACK_JAC0		= 1,
 	FE_UNPACK_JACT		= 2,
 	FE_UNPACK_DEFGRAD	= 4,
+	FE_UNPACK_TRAITS	= 7,
 	FE_UNPACK_LM		= 8,
-	FE_UNPACK_ALL		= 15
+	FE_UNPACK_R0		= 16,
+	FE_UNPACK_RT		= 32,
+	FE_UNPACK_DATA		= 64,
+	FE_UNPACK_ALL		= 127
 };
 
 ///////////////////////////////////////////////////////////////////////////////

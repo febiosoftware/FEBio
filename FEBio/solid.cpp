@@ -630,64 +630,91 @@ void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 
 void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 {
-	int i, n;
-
-	vec3d* rt = el.rt();
-	vec3d* r0 = el.r0();
-	vec3d* vt = el.vt();
-	double* pt = el.pt();
-
-	int N = el.Nodes();
-	vector<int>& lm = el.LM();
-
-	for (i=0; i<N; ++i)
+	if (nflag & FE_UNPACK_LM)
 	{
-		n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
+		int N = el.Nodes();
+		vector<int>& lm = el.LM();
+		for (int i=0; i<N; ++i)
+		{
+			int n = el.m_node[i];
+			FENode& node = m_pMesh->Node(n);
 
-		int* id = node.m_ID;
+			int* id = node.m_ID;
 
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
+			// first the displacement dofs
+			lm[3*i  ] = id[0];
+			lm[3*i+1] = id[1];
+			lm[3*i+2] = id[2];
 
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
+			// now the pressure dofs
+			lm[3*N+i] = id[6];
 
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
+			// rigid rotational dofs
+			lm[4*N + 3*i  ] = id[7];
+			lm[4*N + 3*i+1] = id[8];
+			lm[4*N + 3*i+2] = id[9];
 
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
+			// fill the rest with -1
+			lm[7*N + 3*i  ] = -1;
+			lm[7*N + 3*i+1] = -1;
+			lm[7*N + 3*i+2] = -1;
 
-		lm[10*N + i] = id[10];
+			lm[10*N + i] = id[10];
+		}
+	}
+
+	// copy initial nodal coordinates
+	// (also needed for traits data)
+	if ((nflag & FE_UNPACK_R0) || (nflag & FE_UNPACK_TRAITS))
+	{
+		int N = el.Nodes();
+		vec3d* r0 = el.r0();
+		for (int i=0; i<N; ++i)
+		{
+			int n = el.m_node[i];
+
+			FENode& node = m_pMesh->Node(n);
+
+			r0[i] = node.m_r0;
+		}
+	}
+
+	// copy current nodal coordinates
+	// (also needed for traits data)
+	if ((nflag & FE_UNPACK_RT) || (nflag & FE_UNPACK_TRAITS))
+	{
+		int N = el.Nodes();
+		vec3d* rt = el.rt();
+		for (int i=0; i<N; ++i)
+		{
+			int n = el.m_node[i];
+
+			FENode& node = m_pMesh->Node(n);
+
+			rt[i] = node.m_rt;
+		}
 	}
 
 	// copy nodal data to element arrays
-	for (i=0; i<N; ++i)
+	if (nflag & FE_UNPACK_DATA)
 	{
-		n = el.m_node[i];
+		int N = el.Nodes();
+		vec3d* vt = el.vt();
+		double* pt = el.pt();
+		for (int i=0; i<N; ++i)
+		{
+			int n = el.m_node[i];
 
-		FENode& node = m_pMesh->Node(n);
+			FENode& node = m_pMesh->Node(n);
 
-		// initial coordinates (= material coordinates)
-		r0[i] = node.m_r0;
+			// current nodal pressures
+			pt[i] = node.m_pt;
 
-		// current coordinates (= spatial coordinates)
-		rt[i] = node.m_rt;
-
-		// current nodal pressures
-		pt[i] = node.m_pt;
-
-		// current nodal velocities
-		vt[i] = node.m_vt;
+			// current nodal velocities
+			vt[i] = node.m_vt;
+		}
 	}
 
 	// unpack the traits data
-	el.UnpackTraitsData(nflag);
+	if (nflag & FE_UNPACK_TRAITS) el.UnpackTraitsData(nflag);
 }
