@@ -749,13 +749,17 @@ void MatrixFactory::AssembleSkyline(SkylineMatrix& K, matrix& ke, vector<int>& L
 }
 
 //-----------------------------------------------------------------------------
+// this sort function is defined in qsort.cpp
+void qsort(int n, int* arr, int* indx);
+
+//-----------------------------------------------------------------------------
 // FUNCTION : MatrixFactory::AssembleCompact
 // This function assembles the local stiffness matrix
 // into the global stiffness matrix which is in compact column storage
 //
 void MatrixFactory::AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int>& LM)
 {
-	int i, j, I, J;
+	int i, j, k, m, I, J;
 
 	const int N = ke.rows();
 
@@ -766,23 +770,35 @@ void MatrixFactory::AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int
 
 	int *pi, l, n;
 
-	for (i=0; i<N; ++i)
+	// find the permutation array that sorts LM in ascending order
+	// we can use this to speed up the row search (i.e. loop over n)
+	vector<int> P(N);
+	qsort(N, &LM[0], &P[0]);
+
+	for (m=0; m<N; ++m)
 	{
-		I = LM[i];
-
-		for (j=0; j<N; ++j)
+		j = P[m];
+		J = LM[j];
+		if (J >= 0)
 		{
-			J = LM[j];
-
-			// only add values to lower-diagonal part of stiffness matrix
-			if ((I>=J) && (J>=0))
+			n = 0;
+			double* pm = pd+pointers[J]-offset;
+			pi = indices + pointers[J] - offset;
+			l = pointers[J+1] - pointers[J];
+			for (k=0; k<N; ++k)
 			{
-				pi = indices + pointers[J] - offset;
-				l = pointers[J+1] - pointers[J];
-				for (n=0; n<l; ++n) if (pi[n] == I + offset)
+				i = P[k];
+				I = LM[i];
+
+				// only add values to lower-diagonal part of stiffness matrix
+				if (I>=J)
 				{
-					pd[pointers[J] + n - offset] += ke[i][j];
-					break;
+					for (;n<l; ++n) 
+						if (pi[n] == I + offset)
+						{
+							pm[n] += ke[i][j];
+							break;
+						}
 				}
 			}
 		}

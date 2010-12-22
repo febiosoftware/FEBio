@@ -9,6 +9,118 @@ double FEUT4Domain::m_alpha = 0.05;
 bool FEUT4Domain::m_bdev = false;
 
 //-----------------------------------------------------------------------------
+// This function converts the Cauchy stress to a 2nd-PK stress
+mat3ds cauchy_to_pk2(mat3ds& s, mat3d& F)
+{
+	mat3d Fi = F.inverse();
+	mat3d Fit = Fi.transpose();
+	double J = F.det();
+
+	mat3d S = (Fi*s*Fit)*J;
+	return S.sym();
+}
+
+//-----------------------------------------------------------------------------
+// This function converts the 2nd-PK stress to a Cauchy stress
+mat3ds pk2_to_cauchy(mat3ds& S, mat3d& F)
+{
+	mat3d Ft = F.transpose();
+	double Ji = 1/F.det();
+
+	mat3d s = (F*S*Ft)*Ji;
+	return s.sym();
+}
+
+//-----------------------------------------------------------------------------
+// This function converts the spatial tangent to the material tangent
+tens4ds spatial_to_material(tens4ds& c, mat3d& F)
+{
+	mat3d Fi = F.inverse();
+	double J = F.det();
+
+	double C[6][6] = {0};
+
+	for (int i=0; i<3; ++i)
+		for (int j=0; j<3; ++j)
+			for (int k=0; k<3; ++k)
+				for (int l=0; l<3; ++l)
+				{
+					C[0][0] += J*Fi[0][i]*Fi[0][j]*Fi[0][k]*Fi[0][l]*c(i,j,k,l);
+					C[0][1] += J*Fi[0][i]*Fi[0][j]*Fi[1][k]*Fi[1][l]*c(i,j,k,l);
+					C[0][2] += J*Fi[0][i]*Fi[0][j]*Fi[2][k]*Fi[2][l]*c(i,j,k,l);
+					C[0][3] += J*Fi[0][i]*Fi[0][j]*Fi[0][k]*Fi[1][l]*c(i,j,k,l);
+					C[0][4] += J*Fi[0][i]*Fi[0][j]*Fi[1][k]*Fi[2][l]*c(i,j,k,l);
+					C[0][5] += J*Fi[0][i]*Fi[0][j]*Fi[0][k]*Fi[2][l]*c(i,j,k,l);
+
+					C[1][1] += J*Fi[1][i]*Fi[1][j]*Fi[1][k]*Fi[1][l]*c(i,j,k,l);
+					C[1][2] += J*Fi[1][i]*Fi[1][j]*Fi[2][k]*Fi[2][l]*c(i,j,k,l);
+					C[1][3] += J*Fi[1][i]*Fi[1][j]*Fi[0][k]*Fi[1][l]*c(i,j,k,l);
+					C[1][4] += J*Fi[1][i]*Fi[1][j]*Fi[1][k]*Fi[2][l]*c(i,j,k,l);
+					C[1][5] += J*Fi[1][i]*Fi[1][j]*Fi[0][k]*Fi[2][l]*c(i,j,k,l);
+
+					C[2][2] += J*Fi[2][i]*Fi[2][j]*Fi[2][k]*Fi[2][l]*c(i,j,k,l);
+					C[2][3] += J*Fi[2][i]*Fi[2][j]*Fi[0][k]*Fi[1][l]*c(i,j,k,l);
+					C[2][4] += J*Fi[2][i]*Fi[2][j]*Fi[1][k]*Fi[2][l]*c(i,j,k,l);
+					C[2][5] += J*Fi[2][i]*Fi[2][j]*Fi[0][k]*Fi[2][l]*c(i,j,k,l);
+
+					C[3][3] += J*Fi[0][i]*Fi[1][j]*Fi[0][k]*Fi[1][l]*c(i,j,k,l);
+					C[3][4] += J*Fi[0][i]*Fi[1][j]*Fi[1][k]*Fi[2][l]*c(i,j,k,l);
+					C[3][5] += J*Fi[0][i]*Fi[1][j]*Fi[0][k]*Fi[2][l]*c(i,j,k,l);
+
+					C[4][4] += J*Fi[1][i]*Fi[2][j]*Fi[1][k]*Fi[2][l]*c(i,j,k,l);
+					C[4][5] += J*Fi[1][i]*Fi[2][j]*Fi[0][k]*Fi[2][l]*c(i,j,k,l);
+
+					C[5][5] += J*Fi[0][i]*Fi[2][j]*Fi[0][k]*Fi[2][l]*c(i,j,k,l);
+				}
+
+	return tens4ds(C);
+}
+
+//-----------------------------------------------------------------------------
+// This function converts the material tangent to the spatial tangent
+tens4ds material_to_spatial(tens4ds& C, mat3d& F)
+{
+	double Ji = 1/F.det();
+
+	double c[6][6] = {0};
+
+	for (int i=0; i<3; ++i)
+		for (int j=0; j<3; ++j)
+			for (int k=0; k<3; ++k)
+				for (int l=0; l<3; ++l)
+				{
+					c[0][0] += Ji*F[0][i]*F[0][j]*F[0][k]*F[0][l]*C(i,j,k,l);
+					c[0][1] += Ji*F[0][i]*F[0][j]*F[1][k]*F[1][l]*C(i,j,k,l);
+					c[0][2] += Ji*F[0][i]*F[0][j]*F[2][k]*F[2][l]*C(i,j,k,l);
+					c[0][3] += Ji*F[0][i]*F[0][j]*F[0][k]*F[1][l]*C(i,j,k,l);
+					c[0][4] += Ji*F[0][i]*F[0][j]*F[1][k]*F[2][l]*C(i,j,k,l);
+					c[0][5] += Ji*F[0][i]*F[0][j]*F[0][k]*F[2][l]*C(i,j,k,l);
+
+					c[1][1] += Ji*F[1][i]*F[1][j]*F[1][k]*F[1][l]*C(i,j,k,l);
+					c[1][2] += Ji*F[1][i]*F[1][j]*F[2][k]*F[2][l]*C(i,j,k,l);
+					c[1][3] += Ji*F[1][i]*F[1][j]*F[0][k]*F[1][l]*C(i,j,k,l);
+					c[1][4] += Ji*F[1][i]*F[1][j]*F[1][k]*F[2][l]*C(i,j,k,l);
+					c[1][5] += Ji*F[1][i]*F[1][j]*F[0][k]*F[2][l]*C(i,j,k,l);
+
+					c[2][2] += Ji*F[2][i]*F[2][j]*F[2][k]*F[2][l]*C(i,j,k,l);
+					c[2][3] += Ji*F[2][i]*F[2][j]*F[0][k]*F[1][l]*C(i,j,k,l);
+					c[2][4] += Ji*F[2][i]*F[2][j]*F[1][k]*F[2][l]*C(i,j,k,l);
+					c[2][5] += Ji*F[2][i]*F[2][j]*F[0][k]*F[2][l]*C(i,j,k,l);
+
+					c[3][3] += Ji*F[0][i]*F[1][j]*F[0][k]*F[1][l]*C(i,j,k,l);
+					c[3][4] += Ji*F[0][i]*F[1][j]*F[1][k]*F[2][l]*C(i,j,k,l);
+					c[3][5] += Ji*F[0][i]*F[1][j]*F[0][k]*F[2][l]*C(i,j,k,l);
+
+					c[4][4] += Ji*F[1][i]*F[2][j]*F[1][k]*F[2][l]*C(i,j,k,l);
+					c[4][5] += Ji*F[1][i]*F[2][j]*F[0][k]*F[2][l]*C(i,j,k,l);
+
+					c[5][5] += Ji*F[0][i]*F[2][j]*F[0][k]*F[2][l]*C(i,j,k,l);
+				}
+
+	return tens4ds(c);
+}
+
+//-----------------------------------------------------------------------------
 //! Constructor for the UT4Domain
 FEUT4Domain::FEUT4Domain(FEMesh *pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
 {
@@ -203,6 +315,9 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 			UT4NODE& node = m_Node[ m_tag[i] ];
 			assert(node.inode == i);
 
+			// get the nodal deformation gradient
+			mat3d FI = node.Fi;
+
 			mat3ds S;
 			if (m_bdev)
 			{
@@ -212,6 +327,9 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 			{
 				S = node.si*(1 - m_alpha);
 			}
+
+			// convert the Cauchy stress to a PK2-stress
+			S = cauchy_to_pk2(S, FI);
 
 			// loop over all elements that belong to this node
 			for (n=0; n<NE; ++n)
@@ -224,10 +342,10 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 				Ve = TetVolume(el.r0());
 
 				// The '-' sign is so that the internal forces get subtracted from the residual (R = Fext - Fint)
-				double w = -0.25* Ve*node.vi / node.Vi;
+				double w = -0.25* Ve;
 
 				// calculate the jacobian
-				el.invjact(Ji, 0);
+				el.invjac0(Ji, 0);
 
 				// get the shape function derivatives
 				const double* Gr, *Gs, *Gt;
@@ -244,14 +362,19 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 					Gz[j] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
 				}
 
+				// get the element deformation gradient
+				mat3d Fe = FI;
+
 				// loop over element nodes
 				for (j=0; j<4; ++j)
 				{
-					// setup the element B-matrix
-					Be[0][0] = Gx[j]; Be[1][1] = Gy[j]; Be[2][2] = Gz[j];
-					Be[3][0] = Gy[j]; Be[3][1] = Gx[j]; 
-					Be[4][1] = Gz[j]; Be[4][2] = Gy[j]; 
-					Be[5][0] = Gz[j]; Be[5][2] = Gx[j];
+					// setup nonlinear element B-matrix
+					Be[0][0] = Fe[0][0]*Gx[j]; Be[0][1] = Fe[1][0]*Gx[j]; Be[0][2] = Fe[2][0]*Gx[j];
+					Be[1][0] = Fe[0][1]*Gy[j]; Be[1][1] = Fe[1][1]*Gy[j]; Be[1][2] = Fe[2][1]*Gy[j];
+					Be[2][0] = Fe[0][2]*Gz[j]; Be[2][1] = Fe[1][2]*Gz[j]; Be[2][2] = Fe[2][2]*Gz[j];
+					Be[3][0] = Fe[0][0]*Gy[j] + Fe[0][1]*Gx[j]; Be[3][1] = Fe[1][0]*Gy[j] + Fe[1][1]*Gx[j]; Be[3][2] = Fe[2][0]*Gy[j] + Fe[2][1]*Gx[j];
+					Be[4][0] = Fe[0][1]*Gz[j] + Fe[0][2]*Gy[j]; Be[4][1] = Fe[1][1]*Gz[j] + Fe[1][2]*Gy[j]; Be[4][2] = Fe[2][1]*Gz[j] + Fe[2][2]*Gy[j];
+					Be[5][0] = Fe[0][2]*Gx[j] + Fe[0][0]*Gz[j]; Be[5][1] = Fe[1][2]*Gx[j] + Fe[1][0]*Gz[j]; Be[5][2] = Fe[2][2]*Gx[j] + Fe[2][0]*Gz[j];
 
 					LM[0] = el.LM()[3*j  ];
 					LM[1] = el.LM()[3*j+1];
@@ -437,6 +560,9 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 		S = node.si*(1 - m_alpha);
 	}
 
+	// convert Cauchy stress to PK2 stress
+	S = cauchy_to_pk2(S, node.Fi);
+
 	// create the LM and the en array
 	vector<int> LM; LM.resize(NE*4*3);
 	vector<int> en; en.resize(NE*4  );
@@ -464,7 +590,7 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 		// calculate the jacobian
 		double Ji[3][3];
-		ei.invjact(Ji, 0);
+		ei.invjac0(Ji, 0);
 
 		// get the shape function derivatives
 		const double* Gr, *Gs, *Gt;
@@ -497,7 +623,7 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 		// calculate element volume
 		// TODO: we should store this somewhere instead of recalculating it
 		double Vi = TetVolume(ei.r0());
-		double wi = 0.25* Vi*node.vi/ node.Vi;
+		double wi = 0.25* Vi*node.Vi/ node.Vi;
 
 		// loop over the elements again
 		for (nj=0; nj<NE; ++nj)
@@ -596,6 +722,9 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 		C = C*(1 - m_alpha);
 	}
 
+	// convert spatial matrix to material
+	C = spatial_to_material(C, pt.F);
+
 	// extract the 'D' matrix
 	double D[6][6] = {0};
 	C.extract(D);
@@ -641,13 +770,16 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 		// calculate the jacobian
 		double Ji[3][3];
-		el.invjact(Ji, 0);
+		el.invjac0(Ji, 0);
 
 		// get the shape function derivatives
 		const double* Gr, *Gs, *Gt;
 		Gr = el.Gr(0);
 		Gs = el.Gs(0);
 		Gt = el.Gt(0);
+
+		// get element deformation gradient
+		mat3d Fe = node.Fi;
 
 		double Gx, Gy, Gz;
 		for (j=0; j<4; ++j)
@@ -658,29 +790,27 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 			Gy = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
 			Gz = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
 
-			Be[4*ni+j][0][0] = Gx; Be[4*ni+j][0][1] =  0; Be[4*ni+j][0][2] = 0;
-			Be[4*ni+j][1][0] =  0; Be[4*ni+j][1][1] = Gy; Be[4*ni+j][1][2] = 0;
-			Be[4*ni+j][2][0] =  0; Be[4*ni+j][2][1] =  0; Be[4*ni+j][2][2] = Gz;
-			Be[4*ni+j][3][0] = Gy; Be[4*ni+j][3][1] = Gx; Be[4*ni+j][3][2] = 0; 
-			Be[4*ni+j][4][0] =  0; Be[4*ni+j][4][1] = Gz; Be[4*ni+j][4][2] = Gy; 
-			Be[4*ni+j][5][0] = Gz; Be[4*ni+j][5][1] =  0; Be[4*ni+j][5][2] = Gx;
+			Be[4*ni+j][0][0] = Fe[0][0]*Gx; Be[4*ni+j][0][1] = Fe[1][0]*Gx; Be[4*ni+j][0][2] = Fe[2][0]*Gx;
+			Be[4*ni+j][1][0] = Fe[0][1]*Gy; Be[4*ni+j][1][1] = Fe[1][1]*Gy; Be[4*ni+j][1][2] = Fe[2][1]*Gy;
+			Be[4*ni+j][2][0] = Fe[0][2]*Gz; Be[4*ni+j][2][1] = Fe[1][2]*Gz; Be[4*ni+j][2][2] = Fe[2][2]*Gz;
+			Be[4*ni+j][3][0] = Fe[0][0]*Gy + Fe[0][1]*Gx; Be[4*ni+j][3][1] = Fe[1][0]*Gy + Fe[1][1]*Gx; Be[4*ni+j][3][2] = Fe[2][0]*Gy + Fe[2][1]*Gx;
+			Be[4*ni+j][4][0] = Fe[0][1]*Gz + Fe[0][2]*Gy; Be[4*ni+j][4][1] = Fe[1][1]*Gz + Fe[1][2]*Gy; Be[4*ni+j][4][2] = Fe[2][1]*Gz + Fe[2][2]*Gy;
+			Be[4*ni+j][5][0] = Fe[0][2]*Gx + Fe[0][0]*Gz; Be[4*ni+j][5][1] = Fe[1][2]*Gx + Fe[1][0]*Gz; Be[4*ni+j][5][2] = Fe[2][2]*Gx + Fe[2][0]*Gz;
 		}
 	}
 
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(ei);
 
 		// calculate element volume
 		double Vi = Ve[ni];
-		double wi = 0.25* Vi*node.vi/ node.Vi;
+		double wi = 0.25* Vi*node.Vi/ node.Vi;
 
 		// loop over the elements again
 		for (nj=0; nj<NE; ++nj)
 		{
 			FESolidElement& ej = dynamic_cast<FESolidElement&>(*ppe[nj]);
-			UnpackElement(ej);
 
 			// calculate element volume
 			double Vj = Ve[nj];
@@ -732,9 +862,11 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 					kij[2][2] = wi*(Bi[0][2]*DB[0][2]+Bi[1][2]*DB[1][2]+Bi[2][2]*DB[2][2]+Bi[3][2]*DB[3][2]+Bi[4][2]*DB[4][2]+Bi[5][2]*DB[5][2]);
 
 					// copy to element stiffness matrix
-					ke[ni*12+i*3  ][nj*12+j*3  ] = kij[0][0]; ke[ni*12+i*3  ][nj*12+j*3+1] = kij[0][1]; ke[ni*12+i*3  ][nj*12+j*3+2] = kij[0][2];
-					ke[ni*12+i*3+1][nj*12+j*3  ] = kij[1][0]; ke[ni*12+i*3+1][nj*12+j*3+1] = kij[1][1]; ke[ni*12+i*3+1][nj*12+j*3+2] = kij[1][2];
-					ke[ni*12+i*3+2][nj*12+j*3  ] = kij[2][0]; ke[ni*12+i*3+2][nj*12+j*3+1] = kij[2][1]; ke[ni*12+i*3+2][nj*12+j*3+2] = kij[2][2];
+					int mi = ni*12+i*3;
+					int mj = nj*12+j*3;
+					ke[mi][mj  ] = kij[0][0]; ke[mi][mj+1] = kij[0][1]; ke[mi][mj+2] = kij[0][2]; ++mi;
+					ke[mi][mj  ] = kij[1][0]; ke[mi][mj+1] = kij[1][1]; ke[mi][mj+2] = kij[1][2]; ++mi;
+					ke[mi][mj  ] = kij[2][0]; ke[mi][mj+1] = kij[2][1]; ke[mi][mj+2] = kij[2][2];
 				}
 			}
 		}

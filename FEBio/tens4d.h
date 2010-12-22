@@ -36,6 +36,13 @@ public:
 		d[15] = m[0][5]; d[16] = m[1][5]; d[17] = m[2][5]; d[18] = m[3][5]; d[19] = m[4][5]; d[20] = m[5][5];
 	}
 
+	double& operator () (int i, int j, int k, int l)
+	{
+		const int m[3][3] = {{0,3,5},{3,1,4},{5,4,2}};
+		tens4ds& T = (*this);
+		return T(m[i][j], m[k][l]);
+	}
+
 	double& operator () (int i, int j)
 	{
 		const int m[6] = {0, 1, 3, 6, 10, 15};

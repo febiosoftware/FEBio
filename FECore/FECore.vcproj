@@ -1323,6 +1323,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\qsort.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SkylineSolver.cpp"
 				>
 			</File>
