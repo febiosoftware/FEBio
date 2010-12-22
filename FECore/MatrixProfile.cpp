@@ -132,10 +132,11 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			// that are currently in use for this column.
 			nold = 0;
 			vector<int>& a = m_prof[i];
+			int lmin = i;
 			for (j=0; j<(int) a.size(); j += 2)
 			{
 				nold += a[j+1] - a[j] + 1;
-				for (k=a[j]; k<=a[j+1]; ++k) pcol[k] = i;
+				for (k=a[j]; k<=a[j+1]; ++k) { pcol[k] = i; if (k<lmin) lmin = i; }
 			}
 		
 			// loop over all elements in the plec, flagging
@@ -150,7 +151,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 				N = LM[iel].size();
 				for (k=0; k<N; ++k)
 				{
-					if ((lm[k] >= 0) && (lm[k] < i) && (pcol[ lm[k] ] != i)) { ++n; pcol[ lm[k] ] = i; }
+					if ((lm[k] >= 0) && (lm[k] < i) && (pcol[ lm[k] ] != i)) { ++n; pcol[ lm[k] ] = i; if (lm[k]<lmin) lmin = lm[k]; }
 				}
 			}
 
@@ -163,7 +164,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 				// initialize the packed array to zero
 				a.clear();
 
-				l = 0;
+				l = lmin;
 				do
 				{
 					// find a start row index
