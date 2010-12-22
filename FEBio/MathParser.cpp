@@ -133,6 +133,7 @@ double MathParser::prim()
 				if (strcmp(string_value, "ln"  )==0) fnc = log;
 				if (strcmp(string_value, "log" )==0) fnc = log10;
 				if (strcmp(string_value, "sqrt")==0) fnc = sqrt;
+				if (strcmp(string_value, "exp" )==0) fnc = exp;
 
 				get_token();
 
