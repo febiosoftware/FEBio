@@ -775,7 +775,7 @@ void MatrixFactory::AssembleCompact(CompactSymmMatrix& K, matrix& ke, vector<int
 
 	// find the starting index
 	int N0 = 0;
-	while ((N0<N-1) && (LM[P[N0]]<0)) ++N0;
+	while ((N0<N) && (LM[P[N0]]<0)) ++N0;
 
 	// assemble element stiffness
 	for (int m=N0; m<N; ++m)
