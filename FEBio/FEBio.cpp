@@ -163,6 +163,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	bool blog = false;
 	bool bplt = false;
 	bool bdmp = false;
+	bool brun = true;
 
 	ops.szfile[0] = 0;
 
@@ -234,6 +235,24 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			ops.szcnf[0] = 0;
 		}
+		else if (strcmp(sz, "-info")==0)
+		{
+			FILE* fp = stdout;
+			if ((i<nargs-1) && (argv[i+1][0] != '-'))
+			{
+				fp = fopen(argv[++i], "wt");
+				if (fp == 0) fp = stdout;
+			}
+			fprintf(fp, "compiled on " __DATE__ "\n");
+			fprintf(fp, "FEBio version  = %d.%d.%d\n", VERSION, SUBVERSION, SUBSUBVERSION);
+			fprintf(fp, "FECore version = %s\n", FECore::get_version_string());
+			fprintf(fp, "SVN revision   = %d\n", SVNREVISION);
+			if (fp != stdout) fclose(fp);
+		}
+		else if (strcmp(sz, "-norun") == 0)
+		{
+			brun = false;
+		}
 		else
 		{
 			fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
@@ -268,7 +287,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		if (!bdmp) sprintf(ops.szdmp, "%sf3dmp"    , szpath);
 	}
 
-	return true;
+	return brun;
 }
 
 //-----------------------------------------------------------------------------
