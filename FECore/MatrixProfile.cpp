@@ -132,11 +132,12 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 			// that are currently in use for this column.
 			nold = 0;
 			vector<int>& a = m_prof[i];
-			int lmin = i;
+			int lmin = neq;
 			for (j=0; j<(int) a.size(); j += 2)
 			{
 				nold += a[j+1] - a[j] + 1;
-				for (k=a[j]; k<=a[j+1]; ++k) { pcol[k] = i; if (k<lmin) lmin = i; }
+				if (a[j] < lmin) lmin = a[j];
+				for (k=a[j]; k<=a[j+1]; ++k) pcol[k] = i;
 			}
 		
 			// loop over all elements in the plec, flagging
