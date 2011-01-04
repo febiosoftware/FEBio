@@ -49,6 +49,7 @@
 #include "FECore/FECore.h"
 #include "validate.h"
 #include "console.h"
+#include "log.h"
 
 #define MAXFILE 512
 
@@ -72,6 +73,7 @@ struct CMDOPTIONS
 	bool		bdebug;			//!< debug flag
 
 	bool	bsplash;			//!< show splash screen or not
+	bool	bsilent;			//!< run FEBio in silent mode (no output to screen)
 
 	char	szfile[MAXFILE];	//!< input file name
 	char	szlog [MAXFILE];	//!< log file name
@@ -109,7 +111,10 @@ int main(int argc, char* argv[])
 	LoadLicenseFile();
 
 	// print welcome message
-	if (ops.bsplash) Hello(stdout);
+	if (ops.bsplash && (!ops.bsilent)) Hello(stdout);
+
+	// if silent mode only output to file
+	if (ops.bsilent) GetLogfile().SetMode(Logfile::FILE_ONLY);
 
 	// if there are no arguments, print the FEBio prompt
 	if (argc == 1)
@@ -159,6 +164,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ops.nmode = FE_UNKNOWN;
 	ops.bdebug = false;
 	ops.bsplash = true;
+	ops.bsilent = false;
 
 	bool blog = false;
 	bool bplt = false;
@@ -226,6 +232,11 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			// don't show the welcome message
 			ops.bsplash = false;
+		}
+		else if (strcmp(sz, "-silent") == 0)
+		{
+			// no output to screen
+			ops.bsilent = true;
 		}
 		else if (strcmp(sz, "-cnf") == 0)
 		{
