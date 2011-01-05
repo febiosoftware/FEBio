@@ -123,6 +123,10 @@ class FEPlotElementStress : public FEElementData
 public:
 	FEPlotElementStress() : FEElementData(MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
+
+protected:
+	void WriteSolidStress(FESolidDomain& d, vector<float>& a);
+	void WriteShellStress(FEShellDomain& d, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -140,6 +144,15 @@ class FEPlotFiberVector : public FEElementData
 {
 public:
 	FEPlotFiberVector() : FEElementData(VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Shell thicknesses
+class FEPlotShellThickness : public FEElementData
+{
+public:
+	FEPlotShellThickness() : FEElementData(FLOAT, FMT_MULT){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 

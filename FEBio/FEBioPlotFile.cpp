@@ -114,6 +114,9 @@ void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
 			if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
 		}
 		if (ntiso) AddVariable("fiber vector");
+
+		// write shell thicknesses
+//		AddVariable("shell thickness");
 	}
 
 	// Define face variables

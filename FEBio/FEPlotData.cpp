@@ -16,6 +16,7 @@ REGISTER_PLOTDATA(FEPlotFluidFlux       , "fluid flux"      );
 REGISTER_PLOTDATA(FEPlotFiberVector     , "fiber vector"    );
 REGISTER_PLOTDATA(FEPlotContactGap      , "contact gap"     );
 REGISTER_PLOTDATA(FEPlotContactTraction , "contact traction");
+REGISTER_PLOTDATA(FEPlotShellThickness  , "shell thickness" );
 
 //-----------------------------------------------------------------------------
 int FEPlotData::VarSize(Var_Type t)
@@ -52,6 +53,7 @@ void FENodeData::Save(FEM &fem, Archive& ar)
 void FEElementData::Save(FEM &fem, Archive& ar)
 {
 	int ndata = VarSize(DataType());
+	int fmt = m_sfmt;
 
 	// loop over all domains
 	FEMesh& m = fem.m_mesh;
@@ -60,7 +62,19 @@ void FEElementData::Save(FEM &fem, Archive& ar)
 	{
 		FEDomain& D = m.Domain(i);
 		int nsize = ndata*D.Elements();
-		vector<float> a; a.reserve(nsize);
+		vector<float> a; 
+
+		if (fmt == FMT_MULT)
+		{
+			// since all elements have the same type
+			// we just grab the number of nodes of the 
+			// first element to figure out how much storage we need
+			FEElement& e = D.ElementRef(0);
+			int n = e.Nodes();
+			nsize *= n;
+		}
+	
+		a.reserve(nsize);
 		if (Save(D, a))
 		{
 			assert(a.size() == nsize);
@@ -177,54 +191,95 @@ bool FEPlotFluidPressure::Save(FEMesh &m, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 {
-	int i, j;
-
-	// write solid element data
-	float s[6] = {0};
-	double f;
-	int nint;
+	// write solid stresses
 	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if (pbd)
-	{
-		for (i=0; i<pbd->Elements(); ++i)
-		{
-			FESolidElement& el = pbd->Element(i);
+	if (pbd) { WriteSolidStress(*pbd, a); return true; }
 
-			for (j=0; j<6; ++j) s[j] = 0;
+	// write shell stresses
+	FEShellDomain* pbs = dynamic_cast<FEShellDomain*>(&dom);
+	if (pbs) { WriteShellStress(*pbs, a); return true; }
 
-			nint = el.GaussPoints();
-
-			f = 1.0 / (double) nint;
-
-			// since the PLOT file requires floats we need to convert
-			// the doubles to single precision
-			// we output the average stress values of the gauss points
-			for (j=0; j<nint; ++j)
-			{
-				FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
-
-				if (ppt)
-				{
-					FEElasticMaterialPoint& pt = *ppt;
-					s[0] += (float) (f*pt.s.xx());
-					s[1] += (float) (f*pt.s.yy());
-					s[2] += (float) (f*pt.s.zz());
-					s[3] += (float) (f*pt.s.xy());
-					s[4] += (float) (f*pt.s.yz());
-					s[5] += (float) (f*pt.s.xz());
-				}
-			}
-
-			a.push_back(s[0]);
-			a.push_back(s[1]);
-			a.push_back(s[2]);
-			a.push_back(s[3]);
-			a.push_back(s[4]);
-			a.push_back(s[5]);
-		}
-		return true;
-	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+void FEPlotElementStress::WriteSolidStress(FESolidDomain& d, vector<float>& a)
+{
+	// write solid element data
+	for (int i=0; i<d.Elements(); ++i)
+	{
+		FESolidElement& el = d.Element(i);
+
+		float s[6] = {0};
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
+
+			if (ppt)
+			{
+				FEElasticMaterialPoint& pt = *ppt;
+				s[0] += (float) (f*pt.s.xx());
+				s[1] += (float) (f*pt.s.yy());
+				s[2] += (float) (f*pt.s.zz());
+				s[3] += (float) (f*pt.s.xy());
+				s[4] += (float) (f*pt.s.yz());
+				s[5] += (float) (f*pt.s.xz());
+			}
+		}
+
+		a.push_back(s[0]);
+		a.push_back(s[1]);
+		a.push_back(s[2]);
+		a.push_back(s[3]);
+		a.push_back(s[4]);
+		a.push_back(s[5]);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPlotElementStress::WriteShellStress(FEShellDomain& d, vector<float>& a)
+{
+	// write shell element data
+	for (int i=0; i<d.Elements(); ++i)
+	{
+		FEShellElement& el = d.Element(i);
+
+		float s[6] = {0};
+		int nint = el.GaussPoints();
+		double f = 1.0 / (double) nint;
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		// we output the average stress values of the gauss points
+		for (int j=0; j<nint; ++j)
+		{
+			FEElasticMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEElasticMaterialPoint>());
+
+			if (ppt)
+			{
+				FEElasticMaterialPoint& pt = *ppt;
+				s[0] += (float) (f*pt.s.xx());
+				s[1] += (float) (f*pt.s.yy());
+				s[2] += (float) (f*pt.s.zz());
+				s[3] += (float) (f*pt.s.xy());
+				s[4] += (float) (f*pt.s.yz());
+				s[5] += (float) (f*pt.s.xz());
+			}
+		}
+
+		a.push_back(s[0]);
+		a.push_back(s[1]);
+		a.push_back(s[2]);
+		a.push_back(s[3]);
+		a.push_back(s[4]);
+		a.push_back(s[5]);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -295,6 +350,25 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 			a.push_back(a[0]);
 			a.push_back(a[1]);
 			a.push_back(a[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+//! Store shell thicknesses
+bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
+{
+	FEShellDomain* pbs = dynamic_cast<FEShellDomain*>(&dom);
+	if (pbs)
+	{
+		int NS = pbs->Elements();
+		for (int i=0; i<NS; ++i)
+		{
+			FEShellElement& e = pbs->Element(i);
+			int n = e.Nodes();
+			for (int j=0; j<n; ++j) a.push_back((float) i);
 		}
 		return true;
 	}
