@@ -166,7 +166,7 @@ public:
 class FEPlotContactGap : public FEFaceData
 {
 public:
-	FEPlotContactGap() : FEFaceData(FLOAT, FMT_MULT){}
+	FEPlotContactGap() : FEFaceData(FLOAT, FMT_NODE){}
 	bool Save(FESurface& surf, vector<float>& a);
 };
 

@@ -66,9 +66,9 @@ void FEElementData::Save(FEM &fem, Archive& ar)
 
 		if (fmt == FMT_MULT)
 		{
-			// since all elements have the same type
-			// we just grab the number of nodes of the 
-			// first element to figure out how much storage we need
+			// since all elements have the same type within a domain
+			// we just grab the number of nodes of the first element 
+			// to figure out how much storage we need
 			FEElement& e = D.ElementRef(0);
 			int n = e.Nodes();
 			nsize *= n;
@@ -86,16 +86,25 @@ void FEElementData::Save(FEM &fem, Archive& ar)
 //-----------------------------------------------------------------------------
 void FEFaceData::Save(FEM &fem, Archive& ar)
 {
-	int ndata = VarSize(DataType());
-	if (m_sfmt == FMT_MULT) ndata *= 4;
-
 	// loop over all surfaces
 	FEMesh& m = fem.m_mesh;
 	int NS = m.Surfaces();
 	for (int i=0; i<NS; ++i)
 	{
 		FESurface& S = m.Surface(i);
-		int nsize = ndata*S.Elements();
+
+		// determine data size
+		int nsize = VarSize(DataType());
+		switch (m_sfmt)
+		{
+		case FMT_NODE: nsize *= S.Nodes(); break;
+		case FMT_ITEM: nsize *= S.Elements(); break;
+		case FMT_MULT: nsize *= 4*S.Elements(); break;
+		default:
+			assert(false);
+		}
+
+		// save data
 		vector<float> a; a.reserve(nsize);
 		if (Save(S, a))
 		{
@@ -367,8 +376,14 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 		for (int i=0; i<NS; ++i)
 		{
 			FEShellElement& e = pbs->Element(i);
+			dom.UnpackElement(e);
 			int n = e.Nodes();
-			for (int j=0; j<n; ++j) a.push_back((float) i);
+			vec3d* D = e.Dt();
+			for (int j=0; j<n; ++j)
+			{
+				double h = e.m_h0[j] * D[j].norm();
+				a.push_back((float) h);
+			}
 		}
 		return true;
 	}
@@ -385,24 +400,12 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 	FESlidingSurface* ps = dynamic_cast<FESlidingSurface*>(&surf);
 	if (ps)
 	{
-		FESlidingSurface& s = *ps;
-		int NF = s.Elements();
-		a.assign(4*NF, 0.f);
-		for (int i=0; i<NF; ++i)
-		{
-			FESurfaceElement& f = s.Element(i);
-			int nf = f.Nodes();
-			float g = 0.f;
-			for (int j=0; j<nf; ++j) g += (float) s.gap[f.m_lnode[j]];
-			g /= nf;
-			a[4*i  ] = g;
-			a[4*i+1] = g;
-			a[4*i+2] = g;
-			a[4*i+3] = g;
-		}
+		int NN = ps->Nodes();
+		a.assign(NN, 0.f);
+		for (int i=0; i<NN; ++i) a[i] = (float) ps->gap[i];
+		return true;
 	}
 
-	return true;
 /*
 	FEMesh& mesh = fem.m_mesh;
 
@@ -518,6 +521,7 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 	for (i=0; i<mesh.Nodes(); ++i) t[i] = (t[i]<0? 0.f : t[i]);
 	fwrite(&t[0], sizeof(float), mesh.Nodes(), fp);
 */
+	return false;
 }
 
 //-----------------------------------------------------------------------------

@@ -116,7 +116,7 @@ void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
 		if (ntiso) AddVariable("fiber vector");
 
 		// write shell thicknesses
-//		AddVariable("shell thickness");
+		AddVariable("shell thickness");
 	}
 
 	// Define face variables
