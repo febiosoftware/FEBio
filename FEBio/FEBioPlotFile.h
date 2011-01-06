@@ -88,8 +88,8 @@ protected:
 		bool AddVariable(const char* szname);
 
 		int NodalVariables  () { return m_Node.size(); }
-		int ElementVarialbes() { return m_Elem.size(); }
-		int FaceVariables   () { return m_Face.size(); }
+		int DomainVarialbes () { return m_Elem.size(); }
+		int SurfaceVariables() { return m_Face.size(); }
 
 		void Defaults(FEM& fem);
 
@@ -97,15 +97,15 @@ protected:
 		bool AddGlobalVariable  (FEPlotData* ps, const char* szname);
 		bool AddMaterialVariable(FEPlotData* ps, const char* szname);
 		bool AddNodalVariable   (FEPlotData* ps, const char* szname);
-		bool AddElementVariable (FEPlotData* ps, const char* szname);
-		bool AddFaceVariable    (FEPlotData* ps, const char* szname);
+		bool AddDomainVariable  (FEPlotData* ps, const char* szname);
+		bool AddSurfaceVariable (FEPlotData* ps, const char* szname);
 
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
 		list<DICTIONARY_ITEM>	m_Mat;		// Material variables
 		list<DICTIONARY_ITEM>	m_Node;		// Node variables
-		list<DICTIONARY_ITEM>	m_Elem;		// Element variables
-		list<DICTIONARY_ITEM>	m_Face;		// Face variables
+		list<DICTIONARY_ITEM>	m_Elem;		// Domain variables
+		list<DICTIONARY_ITEM>	m_Face;		// Surface variables
 
 		friend class FEBioPlotFile;
 	};
@@ -145,8 +145,8 @@ protected:
 	void WriteGlobalData  (FEM& fem);
 	void WriteMaterialData(FEM& fem);
 	void WriteNodeData    (FEM& fem);
-	void WriteElementData (FEM& fem);
-	void WriteFaceData    (FEM& fem);
+	void WriteDomainData  (FEM& fem);
+	void WriteSurfaceData (FEM& fem);
 
 protected:
 	Dictionary	m_dic;	// dictionary

@@ -2330,6 +2330,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 				FEFacetSlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				m.AddSurface(&s);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
@@ -2401,6 +2402,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 				FESlidingSurface2& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				m.AddSurface(&s);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
@@ -2457,6 +2459,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 				FETiedContactSurface& s = (ntype == 1? ps->ms : ps->ss);
+				m.AddSurface(&s);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
@@ -2504,6 +2507,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 				FEPeriodicSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				m.AddSurface(&s);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
@@ -2551,6 +2555,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 				FESurfaceConstraintSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				m.AddSurface(&s);
 
 				int nfmt = 0;
 				const char* szfmt = tag.AttributeValue("format", true);
@@ -3178,7 +3183,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 			++tag;
 			do
 			{
-				if (tag == "add_var")
+				if (tag == "var")
 				{
 					const char* szt = tag.AttributeValue("type");
 					if (plt.AddVariable(szt) == false) throw XMLReader::InvalidAttributeValue(tag, "type", szt);

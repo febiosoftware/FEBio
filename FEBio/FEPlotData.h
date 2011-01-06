@@ -3,6 +3,10 @@
 #include "DumpFile.h"
 #include "FEMesh.h"
 #include "Archive.h"
+#include "FESlidingInterface.h"
+#include "FESlidingInterface2.h"
+#include "FEFacet2FacetSliding.h"
+#include "FETiedInterface.h"
 class FEM;
 
 // --- data types ---
@@ -48,23 +52,23 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! This is the base class for element data. Classes that wish to store data
-//! associated with each element of a domain, will use this base class.
-class FEElementData : public FEPlotData
+//! This is the base class for domain data. Classes that wish to store data
+//! associated with each element or node of a domain, will use this base class.
+class FEDomainData : public FEPlotData
 {
 public:
-	FEElementData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
+	FEDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEM& fem, Archive& ar);
 	virtual bool Save(FEDomain& D, vector<float>& a) = 0;
 };
 
 //-----------------------------------------------------------------------------
-//! This is the base class for facet data. Classes that wish to store data
-//! associated with each facet of a surface, will use this base class.
-class FEFaceData : public FEPlotData
+//! This is the base class for surface data. Classes that wish to store data
+//! associated with each node or facet of a surface, will use this base class.
+class FESurfaceData : public FEPlotData
 {
 public:
-	FEFaceData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
+	FESurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
 	void Save(FEM& fem, Archive& ar);
 	virtual bool Save(FESurface& S, vector<float>& a) = 0;
 };
@@ -104,15 +108,15 @@ public:
 };
 
 //=============================================================================
-//                         E L E M E N T   D A T A
+//                        D O M A I N   D A T A
 //=============================================================================
 
 //-----------------------------------------------------------------------------
 //! Element stresses
-class FEPlotElementStress : public FEElementData
+class FEPlotElementStress : public FEDomainData
 {
 public:
-	FEPlotElementStress() : FEElementData(MAT3FS, FMT_ITEM){}
+	FEPlotElementStress() : FEDomainData(MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 
 protected:
@@ -122,37 +126,37 @@ protected:
 
 //-----------------------------------------------------------------------------
 //! Fluid flux
-class FEPlotFluidFlux : public FEElementData
+class FEPlotFluidFlux : public FEDomainData
 {
 public:
-	FEPlotFluidFlux() : FEElementData(VEC3F, FMT_ITEM){}
+	FEPlotFluidFlux() : FEDomainData(VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Material fibers
-class FEPlotFiberVector : public FEElementData
+class FEPlotFiberVector : public FEDomainData
 {
 public:
-	FEPlotFiberVector() : FEElementData(VEC3F, FMT_ITEM){}
+	FEPlotFiberVector() : FEDomainData(VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Shell thicknesses
-class FEPlotShellThickness : public FEElementData
+class FEPlotShellThickness : public FEDomainData
 {
 public:
-	FEPlotShellThickness() : FEElementData(FLOAT, FMT_MULT){}
+	FEPlotShellThickness() : FEDomainData(FLOAT, FMT_MULT){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal fluid pressures
-class FEPlotFluidPressure : public FEElementData
+class FEPlotFluidPressure : public FEDomainData
 {
 public:
-	FEPlotFluidPressure() : FEElementData(FLOAT, FMT_NODE){}
+	FEPlotFluidPressure() : FEDomainData(FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
 
@@ -163,19 +167,30 @@ public:
 //-----------------------------------------------------------------------------
 //! Contact gap
 //!
-class FEPlotContactGap : public FEFaceData
+class FEPlotContactGap : public FESurfaceData
 {
 public:
-	FEPlotContactGap() : FEFaceData(FLOAT, FMT_NODE){}
+	FEPlotContactGap() : FESurfaceData(FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, vector<float>& a);
+
+protected:
+	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
+	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
+	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
+	bool SaveTied        (FETiedContactSurface&	 s, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
-//! Contact traction
+//! Contact pressure
 //!
-class FEPlotContactTraction : public FEFaceData
+class FEPlotContactPressure : public FESurfaceData
 {
 public:
-	FEPlotContactTraction() : FEFaceData(VEC3F, FMT_ITEM){}
+	FEPlotContactPressure() : FESurfaceData(FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, vector<float>& a);
+
+protected:
+	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
+	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
+	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
 };

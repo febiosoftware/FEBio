@@ -9,8 +9,8 @@ bool FEBioPlotFile::Dictionary::AddVariable(const char* szname)
 {
 	FEPlotData* ps = FEPlotDataFactory::Create(szname);
 	if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname);
-	else if (dynamic_cast<FEElementData*>(ps)) return AddElementVariable(ps, szname);
-	else if (dynamic_cast<FEFaceData*   >(ps)) return AddFaceVariable   (ps, szname);
+	else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname);
+	else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname);
 	return false;
 }
 
@@ -43,9 +43,9 @@ bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szn
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Dictionary::AddElementVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* szname)
 {
-	if (dynamic_cast<FEElementData*>(ps))
+	if (dynamic_cast<FEDomainData*>(ps))
 	{
 		DICTIONARY_ITEM it;
 		it.m_ntype = ps->DataType();
@@ -59,9 +59,9 @@ bool FEBioPlotFile::Dictionary::AddElementVariable(FEPlotData* ps, const char* s
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Dictionary::AddFaceVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* szname)
 {
-	if (dynamic_cast<FEFaceData*>(ps))
+	if (dynamic_cast<FESurfaceData*>(ps))
 	{
 		DICTIONARY_ITEM it;
 		it.m_ntype = ps->DataType();
@@ -85,52 +85,11 @@ void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
 	int nmode = fem.m_pStep->m_nModule;
 	int ntype = fem.m_pStep->m_nanalysis;
 
-	// Define nodal variables
-	if (m_Node.empty())
+	// Define default variables
+	if (m_Node.empty() && m_Elem.empty() && m_Face.empty())
 	{
 		AddVariable("displacement");
-
-		// store dynamic analysis data
-		if ((ntype == FE_DYNAMIC) || (nmode == FE_POROELASTIC)) AddVariable("velocity");
-		if (ntype == FE_DYNAMIC) AddVariable("acceleration");
-
-		// store poro data
-		if (nmode == FE_POROELASTIC) AddVariable  ("fluid pressure");
-	}
-
-	// Define element variables
-	if (m_Elem.empty())
-	{
 		AddVariable("stress");
-
-		// store poro data
-		if (nmode == FE_POROELASTIC) AddVariable("fluid flux");
-	
-		// if any material is trans-iso we store material fibers and strain
-		int ntiso = 0;
-		for (int i=0; i<fem.Materials(); ++i)
-		{
-			FEElasticMaterial* pm = fem.GetElasticMaterial(i);
-			if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
-		}
-//		if (ntiso) AddVariable("fiber vector");
-		AddVariable("fiber vector");
-
-		// write shell thicknesses
-		AddVariable("shell thickness");
-
-		AddVariable("fluid pressure");
-	}
-
-	// Define face variables
-	if (m_Face.empty())
-	{
-		// store contact data
-		if (fem.m_CI.size() > 0)
-		{
-			AddVariable("contact gap");
-//			AddVariable("contact traction");
-		}
 	}
 }
 
@@ -578,7 +537,7 @@ bool FEBioPlotFile::Write(FEM &fem)
 			{
 				m_ar.BeginChunk(PLT_ELEMENT_DATA);
 				{
-					WriteElementData(fem);
+					WriteDomainData(fem);
 				}
 				m_ar.EndChunk();
 			}
@@ -588,7 +547,7 @@ bool FEBioPlotFile::Write(FEM &fem)
 			{
 				m_ar.BeginChunk(PLT_FACE_DATA);
 				{
-					WriteFaceData(fem);
+					WriteSurfaceData(fem);
 				}
 				m_ar.EndChunk();
 			}
@@ -633,7 +592,7 @@ void FEBioPlotFile::WriteNodeData(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteElementData(FEM& fem)
+void FEBioPlotFile::WriteDomainData(FEM& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
 	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
@@ -653,7 +612,7 @@ void FEBioPlotFile::WriteElementData(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteFaceData(FEM& fem)
+void FEBioPlotFile::WriteSurfaceData(FEM& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Face.begin();
 	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it)

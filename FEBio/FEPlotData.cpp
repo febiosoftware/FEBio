@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEPlotData.h"
 #include "fem.h"
-#include "FESlidingInterface.h"
-#include "FESlidingInterface2.h"
-#include "FEFacet2FacetSliding.h"
 #include "FEPlotDataFactory.h"
 
 //-----------------------------------------------------------------------------
@@ -15,7 +12,7 @@ REGISTER_PLOTDATA(FEPlotElementStress   , "stress"          );
 REGISTER_PLOTDATA(FEPlotFluidFlux       , "fluid flux"      );
 REGISTER_PLOTDATA(FEPlotFiberVector     , "fiber vector"    );
 REGISTER_PLOTDATA(FEPlotContactGap      , "contact gap"     );
-REGISTER_PLOTDATA(FEPlotContactTraction , "contact traction");
+REGISTER_PLOTDATA(FEPlotContactPressure , "contact pressure");
 REGISTER_PLOTDATA(FEPlotShellThickness  , "shell thickness" );
 
 //-----------------------------------------------------------------------------
@@ -50,7 +47,7 @@ void FENodeData::Save(FEM &fem, Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEElementData::Save(FEM &fem, Archive& ar)
+void FEDomainData::Save(FEM &fem, Archive& ar)
 {
 	// loop over all domains
 	FEMesh& m = fem.m_mesh;
@@ -92,7 +89,7 @@ void FEElementData::Save(FEM &fem, Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEFaceData::Save(FEM &fem, Archive& ar)
+void FESurfaceData::Save(FEM &fem, Archive& ar)
 {
 	// loop over all surfaces
 	FEMesh& m = fem.m_mesh;
@@ -427,262 +424,196 @@ bool FEPlotFluidPressure::Save(FEDomain &dom, vector<float>& a)
 bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 {
 	FESlidingSurface* ps = dynamic_cast<FESlidingSurface*>(&surf);
-	if (ps)
-	{
-		int NN = ps->Nodes();
-		a.assign(NN, 0.f);
-		for (int i=0; i<NN; ++i) a[i] = (float) ps->gap[i];
-		return true;
-	}
+	if (ps) return SaveSliding(*ps, a);
 
-/*
-	FEMesh& mesh = fem.m_mesh;
+	FEFacetSlidingSurface* pf = dynamic_cast<FEFacetSlidingSurface*>(&surf);
+	if (pf) return SaveFacetSliding(*pf, a);
 
-	vector<float> t(mesh.Nodes());
-	zero(t);
+	FESlidingSurface2* ps2 = dynamic_cast<FESlidingSurface2*>(&surf);
+	if (ps2) return SaveSliding2(*ps2, a);
 
-	int i, j;
+	FETiedContactSurface* pt = dynamic_cast<FETiedContactSurface*>(&surf);
+	if (pt) return SaveTied(*pt, a);
 
-	for (i=0; i<fem.ContactInterfaces(); ++i)
-	{
-		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(fem.m_CI[i]);
-		if (psi)
-		{
-			FESlidingSurface& ms = psi->m_ms;
-			FESlidingSurface& ss = psi->m_ss;
-
-			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.gap[j];
-			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j];
-		}
-
-		FETiedInterface* pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
-		if (pti)
-		{
-			FETiedContactSurface& ms = pti->ms;
-			FETiedContactSurface& ss = pti->ss;
-
-			for (j=0; j<ms.Nodes(); ++j) t[ms.node[j]] += (float) ms.gap[j].norm();
-			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j].norm();
-		}
-
-		FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(fem.m_CI[i]);
-		if (pri)
-		{
-			FERigidWallSurface& ss = pri->m_ss;
-			for (j=0; j<ss.Nodes(); ++j) t[ss.node[j]] += (float) ss.gap[j];
-		}
-
-		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
-		if (pf)
-		{
-			vector<int> val(fem.m_mesh.Nodes()); zero(val);
-			double gi[4], gn[4];
-			int ni, ne, n, k;
-
-			for (n=0; n<pf->m_npass; ++n)
-			{
-				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
-
-				int nint = 0;
-				for (j=0; j<s.Elements(); ++j)
-				{
-					FESurfaceElement& el = s.Element(j);
-					ne = el.Nodes();
-					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint)
-					{
-						gi[k] = s.m_gap[nint];
-					}
-
-					el.project_to_nodes(gi, gn);
-
-					for (k=0; k<ne; ++k)
-					{
-						int m = el.m_node[k];
-						t[m] += (float) gn[k];
-						val[m]++;
-					}
-				}
-			}
-
-			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
-		}
-
-		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
-		if (ps2)
-		{
-			vector<int> val(fem.m_mesh.Nodes()); zero(val);
-			double gi[4], gn[4];
-			int ni, ne, n, k;
-
-			for (n=0; n<ps2->m_npass; ++n)
-			{
-				FESlidingSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
-
-				int nint = 0;
-				for (j=0; j<s.Elements(); ++j)
-				{
-					FESurfaceElement& el = s.Element(j);
-					ne = el.Nodes();
-					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint)
-					{
-						gi[k] = s.m_gap[nint];
-					}
-
-					el.project_to_nodes(gi, gn);
-
-					for (k=0; k<ne; ++k)
-					{
-						int m = el.m_node[k];
-						t[m] += (float) gn[k];
-						val[m]++;
-					}
-				}
-			}
-
-			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
-		}
-	}
-
-	// store the data to file
-	// Note that we only save gap values of nodes that are actually in contact
-	for (i=0; i<mesh.Nodes(); ++i) t[i] = (t[i]<0? 0.f : t[i]);
-	fwrite(&t[0], sizeof(float), mesh.Nodes(), fp);
-*/
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotContactTraction::Save(FESurface &surf, vector<float>& a)
+// Store the gap values for a sliding surface. Although the gap values are
+// stored at the nodes, we use the FMT_MULT format to be consistent with
+// the other contact surfaces.
+bool FEPlotContactGap::SaveSliding(FESlidingSurface& s, vector<float>& a)
 {
-/*
-	int i, j, k, n;
-
-	vector<float> acc(3*fem.m_mesh.Nodes()); zero(acc);
-	for (i=0; i<(int) fem.m_CI.size(); ++i)
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	for (int i=0; i<NF; ++i) 
 	{
-		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (fem.m_CI[i]);
-		if (psi)
+		FESurfaceElement& f = s.Element(i);
+		a[4*i  ] = (float) s.gap[f.m_lnode[0]];
+		a[4*i+1] = (float) s.gap[f.m_lnode[1]];
+		a[4*i+2] = (float) s.gap[f.m_lnode[2]];
+		a[4*i+3] = (float) s.gap[f.m_lnode[3]];
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Store the gap values for a tied surface. Although the gap values are
+// stored at the nodes, we use the FMT_MULT format to be consistent with
+// the other contact surfaces.
+bool FEPlotContactGap::SaveTied(FETiedContactSurface& s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	for (int i=0; i<NF; ++i) 
+	{
+		FESurfaceElement& f = s.Element(i);
+		a[4*i  ] = (float) s.gap[f.m_lnode[0]].norm();
+		a[4*i+1] = (float) s.gap[f.m_lnode[1]].norm();
+		a[4*i+2] = (float) s.gap[f.m_lnode[2]].norm();
+		a[4*i+3] = (float) s.gap[f.m_lnode[3]].norm();
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactGap::SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	int nint = 0;
+	double gi[4], gn[4];
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+		for (int k=0; k<ni; ++k, ++nint) gi[k] = s.m_gap[nint];
+
+		el.project_to_nodes(gi, gn);
+
+		a[4*i  ] = (float) gn[0];
+		a[4*i+1] = (float) gn[1];
+		a[4*i+2] = (float) gn[2];
+		a[4*i+3] = (float) (ne == 4? gn[3] : gn[2]);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactGap::SaveSliding2(FESlidingSurface2& s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	int nint = 0;
+	double gi[4], gn[4];
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+		for (int k=0; k<ni; ++k, ++nint) gi[k] = s.m_gap[nint];
+
+		el.project_to_nodes(gi, gn);
+
+		a[4*i  ] = (float) gn[0];
+		a[4*i+1] = (float) gn[1];
+		a[4*i+2] = (float) gn[2];
+		a[4*i+3] = (float) (ne == 4? gn[3] : gn[2]);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Store the contact pressures
+bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
+{
+	FESlidingSurface* ps = dynamic_cast<FESlidingSurface*>(&surf);
+	if (ps) return SaveSliding(*ps, a);
+
+	FEFacetSlidingSurface* pf = dynamic_cast<FEFacetSlidingSurface*>(&surf);
+	if (pf) return SaveFacetSliding(*pf, a);
+
+	FESlidingSurface2* ps2 = dynamic_cast<FESlidingSurface2*>(&surf);
+	if (ps2) return SaveSliding2(*ps2, a);
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactPressure::SaveSliding(FESlidingSurface &s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	for (int i=0; i<NF; ++i) 
+	{
+		FESurfaceElement& f = s.Element(i);
+		for (int j=0; j<4; ++j)
 		{
-			for (n=0; n<psi->m_npass; ++n)
-			{
-				FESlidingSurface& ss = (n==0?psi->m_ss:psi->m_ms);
-				FESlidingSurface& ms = (n==0?psi->m_ms:psi->m_ss);
-				for (j=0; j<ss.Nodes(); ++j)
-				{
-					int m = ss.node[j];
-					vec3d t = ss.traction(j);
-
-					acc[3*m  ] += (float) t.x;
-					acc[3*m+1] += (float) t.y;
-					acc[3*m+2] += (float) t.z;
-				}
-			}
-		}
-
-		FEFacet2FacetSliding* pf = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
-		if (pf)
-		{
-			vector<int> val(fem.m_mesh.Nodes()); zero(val);
-			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
-			int ni, ne;
-
-			for (n=0; n<pf->m_npass; ++n)
-			{
-				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
-
-				int nint = 0;
-				for (j=0; j<s.Elements(); ++j)
-				{
-					FESurfaceElement& el = s.Element(j);
-					ne = el.Nodes();
-					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint)
-					{
-						li[k] = s.m_Lm[nint];
-						gi[k] = s.m_gap[nint];
-						ti[k] = li[k] + pf->m_epsn*gi[k];
-
-						gi[k] = (gi[k]>=0?gi[k] : 0);
-						ti[k] = (ti[k]>=0?ti[k] : 0);
-					}
-
-					el.project_to_nodes(li, ln);
-					el.project_to_nodes(gi, gn);
-					el.project_to_nodes(ti, tn);
-
-					for (k=0; k<ne; ++k)
-					{
-						int m = el.m_node[k];
-						acc[3*m  ] += (float) (ln[k]>=0?ln[k]:0);
-						acc[3*m+1] += (float) (gn[k]>=0?gn[k]:0);
-						acc[3*m+2] += (float) (tn[k]>=0?tn[k]:0);
-						val[m]++;
-					}
-				}
-			}
-
-			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
-			{ 
-				acc[3*j  ] /= (float) val[j]; 
-				acc[3*j+1] /= (float) val[j]; 
-				acc[3*j+2] /= (float) val[j]; 
-			}
-		}
-
-		FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
-		if (ps2)
-		{
-			vector<int> val(fem.m_mesh.Nodes()); zero(val);
-			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
-			int ni, ne;
-
-			for (n=0; n<ps2->m_npass; ++n)
-			{
-				FESlidingSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
-
-				int nint = 0;
-				for (j=0; j<s.Elements(); ++j)
-				{
-					FESurfaceElement& el = s.Element(j);
-					ne = el.Nodes();
-					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint)
-					{
-						li[k] = s.m_Lmd[nint];
-						gi[k] = s.m_gap[nint];
-						ti[k] = li[k] + ps2->m_epsn*gi[k];
-
-						gi[k] = (gi[k]>=0?gi[k] : 0);
-						ti[k] = (ti[k]>=0?ti[k] : 0);
-					}
-
-					el.project_to_nodes(li, ln);
-					el.project_to_nodes(gi, gn);
-					el.project_to_nodes(ti, tn);
-
-					for (k=0; k<ne; ++k)
-					{
-						int m = el.m_node[k];
-						acc[3*m  ] += (float) (ln[k]>=0?ln[k]:0);
-						acc[3*m+1] += (float) (gn[k]>=0?gn[k]:0);
-						acc[3*m+2] += (float) (tn[k]>=0?tn[k]:0);
-						val[m]++;
-					}
-				}
-			}
-
-			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
-			{ 
-				acc[3*j  ] /= (float) val[j]; 
-				acc[3*j+1] /= (float) val[j]; 
-				acc[3*j+2] /= (float) val[j]; 
-			}
+			double g = s.gap[f.m_lnode[j]];
+			double L = s.Lm[f.m_lnode[j]];
+			double e = s.eps[f.m_lnode[j]];
+			double t = MBRACKET(L + g*e);
+			a[4*i+j] = (float) t;
 		}
 	}
+	return true;
+}
 
-	fwrite(&acc[0], sizeof(float)*3, fem.m_mesh.Nodes(), fp);
-*/
-	return false;
+//-----------------------------------------------------------------------------
+bool FEPlotContactPressure::SaveFacetSliding(FEFacetSlidingSurface &s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	int nint = 0;
+	double ti[4], tn[4];
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+		for (int k=0; k<ni; ++k, ++nint)
+		{
+			double L = s.m_Lm[nint];
+			ti[k] = L;// + pf->m_epsn*gi[k];
+			ti[k] = (ti[k]>=0?ti[k] : 0);		
+		}
+
+		el.project_to_nodes(ti, tn);
+
+		a[4*i  ] = (float) tn[0];
+		a[4*i+1] = (float) tn[1];
+		a[4*i+2] = (float) tn[2];
+		a[4*i+3] = (float) (ne == 4? tn[3] : tn[2]);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactPressure::SaveSliding2(FESlidingSurface2 &s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	int nint = 0;
+	double ti[4], tn[4];
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+		for (int k=0; k<ni; ++k, ++nint)
+		{
+			double L = s.m_Lmd[nint];
+			ti[k] = L;// + pf->m_epsn*gi[k];
+			ti[k] = (ti[k]>=0?ti[k] : 0);		
+		}
+
+		el.project_to_nodes(ti, tn);
+
+		a[4*i  ] = (float) tn[0];
+		a[4*i+1] = (float) tn[1];
+		a[4*i+2] = (float) tn[2];
+		a[4*i+3] = (float) (ne == 4? tn[3] : tn[2]);
+	}
+	return true;
 }
