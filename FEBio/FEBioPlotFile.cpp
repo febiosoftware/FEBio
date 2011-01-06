@@ -113,10 +113,13 @@ void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
 			FEElasticMaterial* pm = fem.GetElasticMaterial(i);
 			if (dynamic_cast<FETransverselyIsotropic*>(pm)) ntiso++;
 		}
-		if (ntiso) AddVariable("fiber vector");
+//		if (ntiso) AddVariable("fiber vector");
+		AddVariable("fiber vector");
 
 		// write shell thicknesses
 		AddVariable("shell thickness");
+
+		AddVariable("fluid pressure");
 	}
 
 	// Define face variables

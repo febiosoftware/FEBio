@@ -103,15 +103,6 @@ public:
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
-//-----------------------------------------------------------------------------
-//! Nodal fluid pressures
-class FEPlotFluidPressure : public FENodeData
-{
-public:
-	FEPlotFluidPressure() : FENodeData(FLOAT, FMT_NODE){}
-	bool Save(FEMesh& m, vector<float>& a);
-};
-
 //=============================================================================
 //                         E L E M E N T   D A T A
 //=============================================================================
@@ -125,8 +116,8 @@ public:
 	bool Save(FEDomain& dom, vector<float>& a);
 
 protected:
-	void WriteSolidStress(FESolidDomain& d, vector<float>& a);
-	void WriteShellStress(FEShellDomain& d, vector<float>& a);
+	bool WriteSolidStress(FEElasticSolidDomain& d, vector<float>& a);
+	bool WriteShellStress(FEElasticShellDomain& d, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
@@ -154,6 +145,15 @@ class FEPlotShellThickness : public FEElementData
 public:
 	FEPlotShellThickness() : FEElementData(FLOAT, FMT_MULT){}
 	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal fluid pressures
+class FEPlotFluidPressure : public FEElementData
+{
+public:
+	FEPlotFluidPressure() : FEElementData(FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, vector<float>& a);
 };
 
 //=============================================================================

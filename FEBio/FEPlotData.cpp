@@ -52,28 +52,36 @@ void FENodeData::Save(FEM &fem, Archive& ar)
 //-----------------------------------------------------------------------------
 void FEElementData::Save(FEM &fem, Archive& ar)
 {
-	int ndata = VarSize(DataType());
-	int fmt = m_sfmt;
-
 	// loop over all domains
 	FEMesh& m = fem.m_mesh;
 	int ND = m.Domains();
 	for (int i=0; i<ND; ++i)
 	{
+		// get the domain
 		FEDomain& D = m.Domain(i);
-		int nsize = ndata*D.Elements();
-		vector<float> a; 
 
-		if (fmt == FMT_MULT)
+		// calculate the size of the data vector
+		int nsize = VarSize(DataType());
+		switch (m_sfmt)
 		{
-			// since all elements have the same type within a domain
-			// we just grab the number of nodes of the first element 
-			// to figure out how much storage we need
-			FEElement& e = D.ElementRef(0);
-			int n = e.Nodes();
-			nsize *= n;
+		case FMT_NODE: nsize *= D.Nodes(); break;
+		case FMT_ITEM: nsize *= D.Elements(); break;
+		case FMT_MULT:
+			{
+				// since all elements have the same type within a domain
+				// we just grab the number of nodes of the first element 
+				// to figure out how much storage we need
+				FEElement& e = D.ElementRef(0);
+				int n = e.Nodes();
+				nsize *= n*D.Elements();
+			}
+			break;
+		default:
+			assert(false);
 		}
-	
+
+		// fill data vector and save
+		vector<float> a; 
 		a.reserve(nsize);
 		if (Save(D, a))
 		{
@@ -93,7 +101,12 @@ void FEFaceData::Save(FEM &fem, Archive& ar)
 	{
 		FESurface& S = m.Surface(i);
 
-		// determine data size
+		// Determine data size.
+		// Note that for the FMT_MULT case we are 
+		// assuming four data entries per facet
+		// regardless of the nr of nodes a facet really has
+		// this is because for surfaces, all elements are not
+		// necessarily of the same type
 		int nsize = VarSize(DataType());
 		switch (m_sfmt)
 		{
@@ -182,17 +195,6 @@ bool FEPlotNodeAcceleration::Save(FEMesh& m, vector<float>& a)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-bool FEPlotFluidPressure::Save(FEMesh &m, vector<float>& a)
-{
-	for (int i=0; i<m.Nodes(); ++i)
-	{
-		FENode& node = m.Node(i);
-		a.push_back((float) node.m_pt);
-	}
-	return true;
-}
-
 //=============================================================================
 //                           E L E M E N T   D A T A
 //=============================================================================
@@ -201,19 +203,22 @@ bool FEPlotFluidPressure::Save(FEMesh &m, vector<float>& a)
 bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 {
 	// write solid stresses
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
-	if (pbd) { WriteSolidStress(*pbd, a); return true; }
+	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
+	if (pbd) return WriteSolidStress(*pbd, a);
 
 	// write shell stresses
-	FEShellDomain* pbs = dynamic_cast<FEShellDomain*>(&dom);
-	if (pbs) { WriteShellStress(*pbs, a); return true; }
+	FEElasticShellDomain* pbs = dynamic_cast<FEElasticShellDomain*>(&dom);
+	if (pbs) return WriteShellStress(*pbs, a);
 
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotElementStress::WriteSolidStress(FESolidDomain& d, vector<float>& a)
+bool FEPlotElementStress::WriteSolidStress(FEElasticSolidDomain& d, vector<float>& a)
 {
+	// make sure this is not a rigid body
+	if (dynamic_cast<FERigidSolidDomain*>(&d)) return false;
+
 	// write solid element data
 	for (int i=0; i<d.Elements(); ++i)
 	{
@@ -249,11 +254,16 @@ void FEPlotElementStress::WriteSolidStress(FESolidDomain& d, vector<float>& a)
 		a.push_back(s[4]);
 		a.push_back(s[5]);
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
-void FEPlotElementStress::WriteShellStress(FEShellDomain& d, vector<float>& a)
+bool FEPlotElementStress::WriteShellStress(FEElasticShellDomain& d, vector<float>& a)
 {
+	// make sure this is not a rigid body
+	if (dynamic_cast<FERigidShellDomain*>(&d)) return false;
+
 	// write shell element data
 	for (int i=0; i<d.Elements(); ++i)
 	{
@@ -289,6 +299,8 @@ void FEPlotElementStress::WriteShellStress(FEShellDomain& d, vector<float>& a)
 		a.push_back(s[4]);
 		a.push_back(s[5]);
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -335,7 +347,7 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 	int i, j, n;
 	float f[3];
 	vec3d r;
-	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
 	if (pbd)
 	{
 		int BE = pbd->Elements();
@@ -356,9 +368,9 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 			f[1] = (float) r.y;
 			f[2] = (float) r.z;
 
-			a.push_back(a[0]);
-			a.push_back(a[1]);
-			a.push_back(a[2]);
+			a.push_back(f[0]);
+			a.push_back(f[1]);
+			a.push_back(f[2]);
 		}
 		return true;
 	}
@@ -384,6 +396,23 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 				double h = e.m_h0[j] * D[j].norm();
 				a.push_back((float) h);
 			}
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFluidPressure::Save(FEDomain &dom, vector<float>& a)
+{
+	FEPoroSolidDomain* pd = dynamic_cast<FEPoroSolidDomain*>(&dom);
+	if (pd)
+	{
+		int N = pd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pd->Node(i);
+			a.push_back((float) node.m_pt);
 		}
 		return true;
 	}

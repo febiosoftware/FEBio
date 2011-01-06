@@ -21,7 +21,6 @@ FEElement* FEDomain::FindElementFromID(int nid)
 }
 
 //-----------------------------------------------------------------------------
-
 void FEDomain::InitMaterialPointData()
 {
 	if (m_pMat == 0) return;
@@ -34,9 +33,41 @@ void FEDomain::InitMaterialPointData()
 }
 
 //-----------------------------------------------------------------------------
-// FEElasticSolidDomain
+// FESolidDomain
 //-----------------------------------------------------------------------------
+bool FESolidDomain::Initialize(FEM &fem)
+{
+	int i, j;
+	FEMesh& m = fem.m_mesh;
+	int N = m.Nodes();
+	vector<int> tag; tag.assign(N, -1);
 
+	int NE = Elements();
+	int n = 0;
+	for (i=0; i<NE; ++i)
+	{
+		FESolidElement& e = Element(i);
+		int ne = e.Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			int nj = e.m_node[j];
+			if (tag[nj] == -1) tag[nj] = n++;
+		}
+	}
+	m_Node.reserve(n);
+	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
+	assert(m_Node.size() == n);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+FENode& FESolidDomain::Node(int i) 
+{
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
+// FEElasticSolidDomain
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Reset()
 {
@@ -44,9 +75,11 @@ void FEElasticSolidDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
-
 bool FEElasticSolidDomain::Initialize(FEM &fem)
 {
+	// initialize base class
+	FESolidDomain::Initialize(fem);
+
 	bool bmerr = false;
 
 	// get the logfile
@@ -113,7 +146,6 @@ bool FEElasticSolidDomain::Initialize(FEM &fem)
 }
 
 //-----------------------------------------------------------------------------
-
 void FEElasticSolidDomain::InitElements()
 {
 	for (size_t i=0; i<m_Elem.size(); ++i)
@@ -175,22 +207,55 @@ void FEElasticSolidDomain::Serialize(FEM& fem, DumpFile &ar)
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 // FE3FieldElasticSolidDomain
 //-----------------------------------------------------------------------------
-
 bool FE3FieldElasticSolidDomain::Initialize(FEM &fem)
 {
+	// initialize base class
+	FESolidDomain::Initialize(fem);
+
 	// make sure the domain material uses an uncoupled formulation
 	if (dynamic_cast<FEUncoupledMaterial*>(m_pMat) == 0) return false;
 	return FEElasticSolidDomain::Initialize(fem);
 }
 
 //-----------------------------------------------------------------------------
-// FEElasticShellDomain
+// FEShellDomain
 //-----------------------------------------------------------------------------
+bool FEShellDomain::Initialize(FEM &fem)
+{
+	int i, j;
+	FEMesh& m = fem.m_mesh;
+	int N = m.Nodes();
+	vector<int> tag; tag.assign(N, -1);
 
+	int NE = Elements();
+	int n = 0;
+	for (i=0; i<NE; ++i)
+	{
+		FEShellElement& e = Element(i);
+		int ne = e.Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			int nj = e.m_node[j];
+			if (tag[nj] == -1) tag[nj] = n++;
+		}
+	}
+	m_Node.reserve(n);
+	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
+	assert(m_Node.size() == n);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+FENode& FEShellDomain::Node(int i) 
+{
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
+// FEElasticShellDomain
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::Reset()
 {
@@ -200,6 +265,9 @@ void FEElasticShellDomain::Reset()
 //-----------------------------------------------------------------------------
 bool FEElasticShellDomain::Initialize(FEM& fem)
 {
+	// initialize base class
+	FEShellDomain::Initialize(fem);
+
 	bool bmerr = false;
 
 	// get the logfile
@@ -307,7 +375,6 @@ void FEElasticShellDomain::Serialize(FEM& fem, DumpFile &ar)
 }
 
 //-----------------------------------------------------------------------------
-
 void FEElasticShellDomain::InitElements()
 {
 	for (size_t i=0; i<m_Elem.size(); ++i)
@@ -319,6 +386,40 @@ void FEElasticShellDomain::InitElements()
 }
 
 //-----------------------------------------------------------------------------
+// FETrussDomain
+//-----------------------------------------------------------------------------
+bool FETrussDomain::Initialize(FEM &fem)
+{
+	int i, j;
+	FEMesh& m = fem.m_mesh;
+	int N = m.Nodes();
+	vector<int> tag; tag.assign(N, -1);
+
+	int NE = Elements();
+	int n = 0;
+	for (i=0; i<NE; ++i)
+	{
+		FETrussElement& e = Element(i);
+		int ne = e.Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			int nj = e.m_node[j];
+			if (tag[nj] == -1) tag[nj] = n++;
+		}
+	}
+	m_Node.reserve(n);
+	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
+	assert(m_Node.size() == n);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+FENode& FETrussDomain::Node(int i) 
+{
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
 // FEElasticTrussDomain
 //-----------------------------------------------------------------------------
 
@@ -327,8 +428,8 @@ void FEElasticTrussDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 }
-//-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
 void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 {
 	int i, n;
@@ -394,7 +495,6 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 }
 
 //-----------------------------------------------------------------------------
-
 void FEElasticTrussDomain::InitElements()
 {
 	for (size_t i=0; i<m_Elem.size(); ++i)
@@ -408,6 +508,38 @@ void FEElasticTrussDomain::InitElements()
 // FEDiscreteDomain
 //-----------------------------------------------------------------------------
 
+bool FEDiscreteDomain::Initialize(FEM &fem)
+{
+	int i, j;
+	FEMesh& m = fem.m_mesh;
+	int N = m.Nodes();
+	vector<int> tag; tag.assign(N, -1);
+
+	int NE = Elements();
+	int n = 0;
+	for (i=0; i<NE; ++i)
+	{
+		FEDiscreteElement& e = m_Elem[i];
+		int ne = e.Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			int nj = e.m_node[j];
+			if (tag[nj] == -1) tag[nj] = n++;
+		}
+	}
+	m_Node.reserve(n);
+	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
+	assert(m_Node.size() == n);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+FENode& FEDiscreteDomain::Node(int i) 
+{
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
 void FEDiscreteDomain::UnpackElement(FEElement &el, unsigned int nflag)
 {
 	int i, n;

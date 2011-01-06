@@ -4,6 +4,7 @@
 #include "FECore/vector.h"
 #include "DumpFile.h"
 
+class FENode;
 class FEMesh;
 class FESolidSolver;
 class FEHeatSolver;
@@ -76,6 +77,9 @@ public:
 		for (int i=0; i<Elements(); ++i) ElementRef(i).SetMatID(mid);
 	}
 
+	virtual int Nodes() = 0;
+	virtual FENode& Node(int i) = 0;
+
 protected:
 	FEMesh*		m_pMesh;	//!< the mesh that this domain is a part of
 	FEMaterial*	m_pMat;		//!< the material for this domain
@@ -103,8 +107,14 @@ public:
 
 	int GetElementType() { return m_Elem[0].Type(); }
 
+	bool Initialize(FEM& fem);
+
+	int Nodes() { return (int) m_Node.size(); }
+	FENode& Node(int i);
+
 protected:
-	vector<FESolidElement>	m_Elem;	//!< array of elements
+	vector<int>				m_Node;		//!< node list
+	vector<FESolidElement>	m_Elem;		//!< array of elements
 };
 
 //-----------------------------------------------------------------------------
@@ -357,7 +367,13 @@ public:
 
 	int GetElementType() { return m_Elem[0].Type(); }
 
+	bool Initialize(FEM& fem);
+
+	int Nodes() { return (int) m_Node.size(); }
+	FENode& Node(int i);
+
 protected:
+	vector<int>				m_Node;	//!< node list
 	vector<FEShellElement>	m_Elem;	//!< array of elements
 };
 
@@ -452,7 +468,13 @@ public:
 
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
+	bool Initialize(FEM& fem);
+
+	int Nodes() { return (int) m_Node.size(); }
+	FENode& Node(int i);
+
 protected:
+	vector<int>				m_Node;
 	vector<FETrussElement>	m_Elem;
 };
 
@@ -548,6 +570,12 @@ public:
 
 	void Residual(FESolidSolver* psolver, vector<double>& R);
 
+	bool Initialize(FEM& fem);
+
+	int Nodes() { return (int) m_Node.size(); }
+	FENode& Node(int i);
+
 protected:
+	vector<int>					m_Node;
 	vector<FEDiscreteElement>	m_Elem;
 };
