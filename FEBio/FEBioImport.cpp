@@ -2883,6 +2883,40 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 
 				fem.m_BF.push_back(pbf);
 			}
+			else if (strcmp(szt, "centrifugal") == 0)
+			{
+				FECentrifugalBodyForce* pbf = new FECentrifugalBodyForce;
+				
+				++tag;
+				const char* szlc;
+				do
+				{
+					if (tag == "angular_speed") 
+					{
+						szlc = tag.AttributeValue("lc");
+						pbf->lc[0] = pbf->lc[1] = pbf->lc[2] = atoi(szlc);
+						double omega;
+						tag.value(omega);
+						pbf->s[0] = pbf->s[1] = pbf->s[2] = -omega*omega;
+					}
+					else if (tag == "rotation_axis")
+					{
+						vec3d n;
+						tag.value(n);
+						n.unit();
+						pbf->I_nxn = mat3dd(1) - dyad(n);
+					}
+					else if (tag == "rotation_center")
+					{
+						tag.value(pbf->c);
+					}
+					
+					++tag;
+				}
+				while (!tag.isend());
+				
+				fem.m_BF.push_back(pbf);
+			}
 		}
 
 		++tag;

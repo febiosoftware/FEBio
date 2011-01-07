@@ -49,3 +49,21 @@ public:
 public:
 	char	m_sz[3][256];
 };
+
+//-----------------------------------------------------------------------------
+//! This class defines a centrigufal force
+
+class FECentrifugalBodyForce : public FEBodyForce
+{
+public:
+	vec3d force(FEMaterialPoint& mp) {
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		return I_nxn*(pt.rt - c);
+	}
+	mat3ds stiffness(FEMaterialPoint& mp) { return I_nxn; }
+	
+public:
+	mat3ds	I_nxn;	// stiffness matrix
+	vec3d	c;		// point on axis of rotation (e.g., center of rotation)
+};
+
