@@ -1921,7 +1921,7 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	if (sz)
 	{
 		if (strcmp(sz, "effective") == 0) effective = true;
-		else if (strcmp(sz, "total") == 0) effective = false;
+		else if ((strcmp(sz, "total") == 0) || (strcmp(sz, "mixture") == 0)) effective = false;
 		else throw XMLReader::InvalidAttributeValue(tag, "traction", sz);
 	}
 	
