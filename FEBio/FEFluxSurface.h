@@ -9,7 +9,7 @@
 class FEFluidFlux : public FEBoundaryCondition
 {
 public:
-	FEFluidFlux() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; blinear = false; }
+	FEFluidFlux() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; blinear = false; mixture = false; }
 
 public:
 	double	s[4];		// nodal scale factors
@@ -17,6 +17,7 @@ public:
 	int		lc;			// load curve
 	int		bc;			// degree of freedom
 	bool	blinear;	// linear or not (true is non-follower, false is follower)
+	bool	mixture;	// mixture velocity or relative fluid flux
 };
 
 //-----------------------------------------------------------------------------
@@ -58,13 +59,13 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& vn, double dt);
+	void FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& vn, double dt, bool mixture);
 
 	//! Calculates volumetric flow rate due to flux
-	bool FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn);
+	bool FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt, bool mixture);
 
 	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower)
-	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn);
+	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt, bool mixture);
 
 protected:
 	// Fluid flux boundary data

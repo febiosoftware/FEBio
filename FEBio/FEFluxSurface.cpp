@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to fluid flux
 
-void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt)
+void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt, bool mixture)
 {
 	int i, j, n;
 
@@ -14,14 +14,18 @@ void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<doubl
 
 	// normal fluid flux at integration point
 	double wr;
+	
+	// solid velocity at integration point
+	vec3d vr;
 
-	vec3d dxr, dxs;
+	vec3d dxr, dxs, dxt;
 
 	// gauss weights
 	double* w = el.GaussWeights();
 
-	// nodal coordinates
+	// nodal coordinates and velocities
 	vec3d* rt = el.rt();
+	vec3d* vt = el.vt();
 	
 	vec3d kab, t1, t2;
 
@@ -38,24 +42,26 @@ void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<doubl
 
 		// calculate velocities and covariant basis vectors at integration point
 		wr = 0;
-		dxr = dxs = vec3d(0,0,0);
+		vr = dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i)
 		{
 			wr += N[i]*wn[i];
+			vr += vt[i]*N[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
 		
 		// calculate surface normal
-		vec3d dxt = dxr ^ dxs;
+		dxt = dxr ^ dxs;
 
 		// calculate stiffness component
 		for (i=0; i<neln; ++i)
 			for (j=0; j<neln; ++j)
 			{
-				t1 = dxt/dxt.norm()*wr;
+				t1 = (dxt/dxt.norm())*wr - vr*mixture;
 				t2 = dxs*Gr[j] - dxr*Gs[j];
-				kab = (t1 ^ t2)*(N[i]*w[n]);
+				kab = ((t1^t2)*(!mixture) + dxt*mixture*N[j]/dt)*N[i]*w[n]*dt;
+//				kab = (t1^t2 + dxt*mixture*N[j]/dt)*N[i]*w[n]*dt;
 
 				ke[3*neln+i][3*j  ] += kab.x;
 				ke[3*neln+i][3*j+1] += kab.y;
@@ -67,7 +73,7 @@ void FEFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<doubl
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to fluid flux
 
-bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
+bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn, double dt, bool mixture)
 {
 	int i, n;
 
@@ -77,9 +83,10 @@ bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<do
 	// nr of element nodes
 	int neln = el.Nodes();
 
-	// nodal coordinates
-	vec3d *rt = el.rt();
-
+	// nodal coordinates and velocities
+	vec3d* rt = el.rt();
+	vec3d* vt = el.vt();
+	
 	double* Gr, *Gs;
 	double* N;
 	double* w  = el.GaussWeights();
@@ -87,6 +94,9 @@ bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<do
 	// normal fluid flux at integration points
 	double wr;
 
+	// solid velocity at integration point
+	vec3d vr;
+	
 	vec3d dxr, dxs, dxt;
 
 	// volumetric flow rate
@@ -101,16 +111,17 @@ bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<do
 		Gs = el.Gs(n);
 
 		wr = 0;
-		dxr = dxs = vec3d(0,0,0);
+		vr = dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i) 
 		{
 			wr += N[i]*wn[i];
+			vr += vt[i]*N[i];
 			dxr += rt[i]*Gr[i];
 			dxs += rt[i]*Gs[i];
 		}
 		dxt = dxr ^ dxs;
 
-		f = dxt.norm()*wr*w[n];
+		f = (dxt.norm()*wr - (vr*dxt)*mixture)*w[n]*dt;
 
 		for (i=0; i<neln; ++i)
 		{
@@ -124,7 +135,7 @@ bool FEFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<do
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to fluid flux
 
-bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
+bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn, double dt, bool mixture)
 {
 	int i, n;
 
@@ -134,17 +145,23 @@ bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vec
 	// nr of element nodes
 	int neln = el.Nodes();
 
-	// nodal coordinates
+	// nodal coordinates and velocity
 	vec3d *r0 = el.r0();
+	vec3d *rt = el.rt();
+	vec3d *vt = el.vt();
 
 	double* Gr, *Gs;
 	double* N;
 	double* w  = el.GaussWeights();
 
 	// normal fluid flux at integration points
-	double wr;
+	double Wr;
 
-	vec3d dxr, dxs, dxt, vs;
+	// solid velocity at integration points
+	vec3d vr;
+	
+	vec3d dXr, dXs, dXt;
+	vec3d dxr, dxs, dxt;
 
 	// volumetric flow rate
 	double f;
@@ -157,17 +174,22 @@ bool FEFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vec
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 
-		wr = 0;
-		dxr = dxs = vec3d(0,0,0);
+		Wr = 0;
+		dXr = dXs = vec3d(0,0,0);
+		vr = dxr = dxs = vec3d(0,0,0);
 		for (i=0; i<neln; ++i) 
 		{
-			wr += N[i]*wn[i];
-			dxr += r0[i]*Gr[i];
-			dxs += r0[i]*Gs[i];
+			Wr += N[i]*wn[i];
+			vr += vt[i]*N[i];
+			dXr += r0[i]*Gr[i];
+			dXs += r0[i]*Gs[i];
+			dxr += rt[i]*Gr[i];
+			dxs += rt[i]*Gs[i];
 		}
+		dXt = dXr ^ dXs;
 		dxt = dxr ^ dxs;
 		
-		f = dxt.norm()*wr*w[n];
+		f = (dXt.norm()*Wr - (vr*dxt)*mixture)*w[n]*dt;
 
 		for (i=0; i<neln; ++i)
 		{
@@ -200,7 +222,7 @@ void FEFluxSurface::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<m_PC.size(); ++i)
 		{
 			FEFluidFlux& fc = m_PC[i];
-			ar << fc.blinear << fc.face << fc.lc;
+			ar << fc.blinear << fc.mixture << fc.face << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
 			ar << fc.bc;
 		}
@@ -226,7 +248,7 @@ void FEFluxSurface::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<m_PC.size(); ++i)
 		{
 			FEFluidFlux& fc = m_PC[i];
-			ar >> fc.blinear >> fc.face >> fc.lc;
+			ar >> fc.blinear  >> fc.mixture >> fc.face >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.bc;
 		}
@@ -266,14 +288,14 @@ void FEFluxSurface::StiffnessMatrix(FESolidSolver* psolver)
 				{
 					double g = fem.GetLoadCurve(fc.lc)->Value();
 
-					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j]*dt;
-
+					for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
+					
 					// get the element stiffness matrix
 					int ndof = neln*4;
 					ke.Create(ndof, ndof);
 
 					// calculate pressure stiffness
-					FluxStiffness(el, ke, wn, dt);
+					FluxStiffness(el, ke, wn, dt, fc.mixture);
 
 					// assemble element matrix in global stiffness matrix
 					psolver->AssembleStiffness(el.m_node, el.LM(), ke);
@@ -305,12 +327,15 @@ void FEFluxSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 
 			double g = fem.GetLoadCurve(fc.lc)->Value();
 
-			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j]*dt;
+			for (int j=0; j<neln; ++j) wn[j] = g*fc.s[j];
 
 			int ndof = 4*neln;
 			fe.resize(ndof);
 
-			if (fc.blinear) LinearFlowRate(el, fe, wn); else FlowRate(el, fe, wn);
+			if (fc.blinear) 
+				LinearFlowRate(el, fe, wn, dt, fc.mixture);
+			else
+				FlowRate(el, fe, wn, dt, fc.mixture);
 
 			// add element force vector to global force vector
 			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);

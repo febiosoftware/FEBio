@@ -705,7 +705,7 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 			//		 since the material point coordinates are used by most materials.
 			pt.r0 = el.Evaluate(el.r0(), n);
 			pt.rt = el.Evaluate(el.rt(), n);
-
+			
 			// get the deformation gradient and determinant
 			pt.J = el.defgrad(pt.F, n);
 

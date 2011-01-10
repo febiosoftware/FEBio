@@ -1647,7 +1647,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 		else if (tag == "force"                ) ParseBCForce             (tag);
 		else if (tag == "pressure"             ) ParseBCPressure          (tag);
 		else if (tag == "traction"             ) ParseBCTraction          (tag);
-		else if (tag == "poro_normal_traction" ) ParseBCPoroNormalTraction(tag);
+		else if (tag == "normal_traction" ) ParseBCPoroNormalTraction(tag);
 		else if (tag == "fluidflux"            ) ParseBCFluidFlux         (tag);
 		else if (tag == "heatflux"             ) ParseBCHeatFlux          (tag);
 		else if (tag == "contact"              ) ParseContactSection      (tag);
@@ -1978,12 +1978,21 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 
 	const char* sz;
 	bool blinear = false;
+	bool mixture = false;
 	sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
 		if (strcmp(sz, "linear") == 0) blinear = true;
 		else if (strcmp(sz, "nonlinear") == 0) blinear = false;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+	}
+	
+	sz = tag.AttributeValue("flux", true);
+	if (sz)
+	{
+		if (strcmp(sz, "mixture") == 0) mixture = true;
+		else if (strcmp(sz, "fluid") == 0) mixture = false;
+		else throw XMLReader::InvalidAttributeValue(tag, "flux", sz);
 	}
 	
 	// count how many fluid flux cards there are
@@ -2005,6 +2014,7 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 		FEFluidFlux& fc = fs.FluidFlux(i);
 		FESurfaceElement& el = fem.m_fsurf->Element(i);
 		fc.blinear = blinear;
+		fc.mixture = mixture;
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
