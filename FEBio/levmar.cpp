@@ -53,7 +53,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	// set the data
 	OPT_OBJECTIVE& obj = opt.GetObjective();
-	FELoadCurve& lc = opt.GetLoadCurve(obj.m_nlc);
+	FELoadCurve& lc = opt.GetLoadCurve(obj.m_nlc - 1);
 	int ndata = lc.Points();
 	vector<double> x(ndata), y(ndata);
 	for (i=0; i<ndata; ++i) 
