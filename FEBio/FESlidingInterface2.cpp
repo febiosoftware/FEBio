@@ -361,7 +361,8 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 
 		// see if this is a poro-elastic element
 		FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
-		if (poro)
+		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
+		if (poro || biph)
 		{
 			// get a material point
 			FEMaterialPoint& mp = *pe->m_State[0];
@@ -375,14 +376,13 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			ept.s.zero();
 
 			// if this is a poroelastic element, then get the permeability tensor
-			double k = 0;
-
 			FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
 			pt.m_p = 0;
 			pt.m_w = vec3d(0,0,0);
 					
 			double K[3][3];
-			poro->Permeability(K, mp);
+			if (poro) poro->Permeability(K, mp);
+			else biph->Permeability(K, mp);
 
 			eps = (K[0][0] + K[1][1] + K[2][2])/3;
 		}
@@ -1433,7 +1433,8 @@ bool FESlidingInterface2::PoroStatus(FEMesh& m, FESurfaceElement& el)
 		
 		// see if this is a poro-elastic element
 		FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
-		if (poro) status = true;
+		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
+		if (poro || biph) status = true;
 	}
 	
 	return status;

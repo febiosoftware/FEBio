@@ -12,7 +12,7 @@ bool FEM::InitPoro()
 
 	// see if there are any poro-elastic materials present
 	for (i=0; i<Materials(); ++i)
-		if (dynamic_cast<FEPoroElastic*>(m_MAT[i]))
+		if ((dynamic_cast<FEPoroElastic*>(m_MAT[i])) || (dynamic_cast<FEBiphasic*>(m_MAT[i])))
 		{
 			m_pStep->m_nModule = FE_POROELASTIC;
 			break;
@@ -67,7 +67,8 @@ bool FEM::InitPoro()
 			{
 				FESolidElement& el = pbd->Element(i);
 				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-				if (pm)
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				if (pm || bm)
 				{
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
@@ -84,7 +85,8 @@ bool FEM::InitPoro()
 			{
 				FEShellElement& el = psd->Element(i);
 				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-				if (pm)
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				if (pm || bm)
 				{
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
@@ -105,7 +107,8 @@ bool FEM::InitPoro()
 			{
 				FESolidElement& el = pbd->Element(i);
 				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-				if (pm == 0)
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				if ((pm == 0) && (bm == 0))
 				{
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
@@ -122,7 +125,8 @@ bool FEM::InitPoro()
 			{
 				FEShellElement& el = psd->Element(i);
 				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-				if (pm == 0)
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				if ((pm == 0) && (bm == 0))
 				{
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
@@ -143,7 +147,8 @@ bool FEM::InitPoro()
 			{
 				FESolidElement& el = pbd->Element(i);
 				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-				if (pm)
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				if (pm || bm)
 				{
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
@@ -161,7 +166,8 @@ bool FEM::InitPoro()
 			{
 				FEShellElement& el = psd->Element(i);
 				FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-				if (pm)
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				if (pm || bm)
 				{
 					int N = el.Nodes();
 					int* n = &el.m_node[0];

@@ -182,4 +182,85 @@ public:
 	FELoadCurve* m_plc;	//!< pointer to current load curve values
 };
 
+//-----------------------------------------------------------------------------
+//! Base class for hydraulic permeability of porous materials.
+//! These materials need to define the permeability and tangent permeability functions.
+//!
+class FEHydraulicPermeability : public FEMaterial
+	{
+	public:
+		FEHydraulicPermeability() {m_phi0 = -1; }
+		virtual ~FEHydraulicPermeability(){}
+		
+		//! hydraulic permeability
+		virtual mat3ds Permeability(FEMaterialPoint& pt) = 0;
+		
+		//! tangent of hydraulic permeability with respect to strain
+		virtual tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp) = 0;
+		
+		//! tangent of hydraulic permeability with respect to concentration
+		mat3ds Tangent_Permeability_Concentration(FEMaterialPoint& mp);
+		
+		void Init();
+		
+	public:
+		double	m_phi0;			//!< solid volume fraction in reference state
+		
+		// declare parameter list
+		DECLARE_PARAMETER_LIST();
+	};
+
+//-----------------------------------------------------------------------------
+//! Base class for biphasic materials.
+
+class FEBiphasic : public FEMaterial
+	{
+	public:
+		FEBiphasic();
+		
+		// returns a pointer to a new material point object
+		FEMaterialPoint* CreateMaterialPointData() 
+		{ 
+			return new FEPoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData());
+		}
+		
+	public:
+		void Init();
+		
+		//! calculate stress at material point
+		mat3ds Stress(FEMaterialPoint& pt);
+		
+		//! calculate tangent stiffness at material point
+		tens4ds Tangent(FEMaterialPoint& pt);
+		
+		//! calculate fluid flux
+		vec3d Flux(FEMaterialPoint& pt);
+		
+		//! calculate actual fluid pressure
+		double Pressure(FEMaterialPoint& pt);
+		
+		//! permeability
+		void Permeability(double k[3][3], FEMaterialPoint& pt);
+		
+		//! tangent of permeability
+		tens4ds Tangent_Permeability_Strain(FEMaterialPoint& pt);
+		
+		//! porosity
+		double Porosity(FEMaterialPoint& pt);
+		
+		//! fluid density
+		double FluidDensity() { return m_rhoTw; } 
+		
+	public:
+		double						m_rhoTw;	//!< true fluid density
+		FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
+		FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
+		
+		// declare as registered
+		DECLARE_REGISTERED(FEBiphasic);
+		
+		DECLARE_PARAMETER_LIST();
+		
+	};
+
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

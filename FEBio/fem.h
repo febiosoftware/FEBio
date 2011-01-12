@@ -221,6 +221,7 @@ public:
 	{
 		FEMaterial* pm = m_MAT[id];
 		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+		while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 		assert(pme);
 		return pme;
@@ -230,6 +231,7 @@ public:
 	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm)
 	{
 		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+		while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 		assert(pme);
 		return pme;

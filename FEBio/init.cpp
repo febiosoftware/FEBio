@@ -173,7 +173,7 @@ bool FEM::InitMaterials()
 			log.printf("A fatal error occured during material intialization\n\n");
 			return false;
 		}
-
+		
 		// set the activation load curve
 		// TODO: can we remove this now that material parameters can have loadcurves?
 		FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*> (pmat);

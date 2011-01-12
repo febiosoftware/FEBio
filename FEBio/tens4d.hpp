@@ -467,3 +467,19 @@ inline tens4ds tens4ds::dot(const tens4ds &m) const
 	+ 2*(d[18]*m.d[18] + d[19]*m.d[19] + d[20]*m.d[20]);
 	return a;
 }
+
+//-----------------------------------------------------------------------------
+// vdotTdotv_jk = a_i T_ijkl b_l
+inline mat3d vdotTdotv(const vec3d a, const tens4ds T, const vec3d b)
+{
+	return mat3d(a.x*(b.x*T.d[0] + b.y*T.d[6] + b.z*T.d[15]) + a.y*(b.x*T.d[6] + b.y*T.d[9] + b.z*T.d[18]) + a.z*(b.x*T.d[15] + b.y*T.d[18] + b.z*T.d[20]),
+				 a.x*(b.y*T.d[1] + b.x*T.d[6] + b.z*T.d[10]) + a.y*(b.y*T.d[7] + b.x*T.d[9] + b.z*T.d[13]) + a.z*(b.y*T.d[16] + b.x*T.d[18] + b.z*T.d[19]),
+				 a.x*(b.z*T.d[3] + b.y*T.d[10] + b.x*T.d[15]) + a.y*(b.z*T.d[8] + b.y*T.d[13] + b.x*T.d[18]) + a.z*(b.z*T.d[17] + b.y*T.d[19] + b.x*T.d[20]),
+				 a.y*(b.x*T.d[1] + b.y*T.d[7] + b.z*T.d[16]) + a.x*(b.x*T.d[6] + b.y*T.d[9] + b.z*T.d[18]) + a.z*(b.x*T.d[10] + b.y*T.d[13] + b.z*T.d[19]),
+				 a.y*(b.y*T.d[2] + b.x*T.d[7] + b.z*T.d[11]) + a.x*(b.y*T.d[7] + b.x*T.d[9] + b.z*T.d[13]) + a.z*(b.y*T.d[11] + b.x*T.d[13] + b.z*T.d[14]),
+				 a.y*(b.z*T.d[4] + b.y*T.d[11] + b.x*T.d[16]) + a.x*(b.z*T.d[8] + b.y*T.d[13] + b.x*T.d[18]) + a.z*(b.z*T.d[12] + b.y*T.d[14] + b.x*T.d[19]),
+				 a.z*(b.x*T.d[3] + b.y*T.d[8] + b.z*T.d[17]) + a.y*(b.x*T.d[10] + b.y*T.d[13] + b.z*T.d[19]) + a.x*(b.x*T.d[15] + b.y*T.d[18] + b.z*T.d[20]),
+				 a.z*(b.y*T.d[4] + b.x*T.d[8] + b.z*T.d[12]) + a.y*(b.y*T.d[11] + b.x*T.d[13] + b.z*T.d[14]) + a.x*(b.y*T.d[16] + b.x*T.d[18] + b.z*T.d[19]),
+				 a.z*(b.z*T.d[5] + b.y*T.d[12] + b.x*T.d[17]) + a.y*(b.z*T.d[12] + b.y*T.d[14] + b.x*T.d[19]) + a.x*(b.z*T.d[17] + b.y*T.d[19] + b.x*T.d[20]));
+}
+

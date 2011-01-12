@@ -65,6 +65,7 @@ protected:
 	bool ParseElasticMaterial (XMLTag& tag, FEElasticMaterial* pm);
 	bool ParseTransIsoMaterial(XMLTag& tag, FETransverselyIsotropic* pm);
 	bool ParseRigidMaterial   (XMLTag& tag, FERigidMaterial* pm);
+	bool ParseBiphasicMaterial(XMLTag& tag, FEBiphasic* pm);
 
 protected:
 	int	m_nmat;

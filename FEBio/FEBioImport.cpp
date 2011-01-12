@@ -600,6 +600,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 			}
 		}
 	}
+
 }
 
 //-----------------------------------------------------------------------------
@@ -652,6 +653,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// read rigid body data
 			if (!bfound && dynamic_cast<FERigidMaterial*>(pmat)) bfound = ParseRigidMaterial(tag, dynamic_cast<FERigidMaterial*>(pmat));
 
+			// additional elastic material parameters
+			if (!bfound && dynamic_cast<FEBiphasic*>(pmat)) bfound = ParseBiphasicMaterial(tag, dynamic_cast<FEBiphasic*>(pmat));
+			
 			// see if we have processed the tag
 			if (bfound == false) throw XMLReader::InvalidTag(tag);
 		}
@@ -925,6 +929,88 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Parse FEBiphasic material 
+//
+bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	
+	// get the logfile
+	Logfile& log = GetLogfile();
+	
+	// read the solid material
+	if (tag == "solid")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an elastic material)
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			log.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solid material pointer
+		pm->m_pSolid = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "permeability")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a permeability material)
+		FEHydraulicPermeability* pme = dynamic_cast<FEHydraulicPermeability*>(pmat);
+		
+		if (pme == 0)
+		{
+			log.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the permeability pointer
+		pm->m_pPerm = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
+}
+
 //=============================================================================
 //
 //                       G E O M E T R Y   S E C T I O N
@@ -1029,6 +1115,12 @@ int FEBioGeometrySection::DomainType(XMLTag& t, FEMaterial* pmat)
 			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_PORO_SOLID_DOMAIN;
 			else throw XMLReader::InvalidTag(t);
 		}
+		else if (dynamic_cast<FEBiphasic*>(pmat))
+		{
+			// biphasic elements
+			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_BIPHASIC_DOMAIN;
+			else throw XMLReader::InvalidTag(t);
+		}
 		else
 		{
 			// structural elements
@@ -1080,6 +1172,7 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 	case FE_PORO_SOLID_DOMAIN : pd = new FEPoroSolidDomain         (pm, pmat); break;
 	case FE_HEAT_SOLID_DOMAIN : pd = new FEHeatSolidDomain         (pm, pmat); break;
 	case FE_3F_SOLID_DOMAIN   : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
+	case FE_BIPHASIC_DOMAIN   : pd = new FEBiphasicDomain          (pm, pmat); break;
 	}
 
 	// return the domain

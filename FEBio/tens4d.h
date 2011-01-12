@@ -25,6 +25,15 @@ public:
 
 	// default constructor
 	tens4ds(){}
+	tens4ds(const double g)
+	{
+		d[ 0] = g;
+		d[ 1] = g; d[ 2] = g;
+		d[ 3] = g; d[ 4] = g; d[ 5] = g;
+		d[ 6] = g; d[ 7] = g; d[ 8] = g; d[ 9] = g;
+		d[10] = g; d[11] = g; d[12] = g; d[13] = g; d[14] = g;
+		d[15] = g; d[16] = g; d[17] = g; d[18] = g; d[19] = g; d[20] = g;
+	}
 
 	tens4ds(double m[6][6])
 	{
@@ -91,6 +100,7 @@ tens4ds dyad1s(const mat3ds& a);
 tens4ds dyad1s(const mat3ds& a, const mat3ds& b);
 tens4ds dyad4s(const mat3ds& a);
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
+mat3d vdotTdotv(const vec3d a, const tens4ds T, const vec3d b);
 
 inline tens4ds operator * (const double g, const tens4ds& a) { return a*g; }
 

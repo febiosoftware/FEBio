@@ -145,11 +145,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_p << m_gradp << m_w;
+			ar << m_p << m_gradp << m_w << m_pa;
 		}
 		else
 		{
-			ar >> m_p >> m_gradp >> m_w;
+			ar >> m_p >> m_gradp >> m_w >> m_pa;
 		}
 
 		if (m_pt) m_pt->Serialize(ar);
@@ -159,7 +159,7 @@ public:
 	{
 		if (bflag)
 		{
-			m_p = 0;
+			m_p = m_pa = 0;
 			m_gradp = vec3d(0,0,0);
 			m_w = vec3d(0,0,0);
 		}
@@ -169,9 +169,15 @@ public:
 
 public:
 	// poro-elastic material data
+	// The actual fluid pressure is the same as the effective fluid pressure
+	// in a poroelastic material without solute(s).  The actual fluid pressure
+	// is included here so that models that include both poroelastic and
+	// solute-poroelastic domains produce plotfiles with consistent fluid
+	// pressure fields.
 	double		m_p;		//!< fluid pressure
 	vec3d		m_gradp;	//!< spatial gradient of p
 	vec3d		m_w;		//!< fluid flux
+	double		m_pa;		//!< actual fluid pressure
 };
 
 //-----------------------------------------------------------------------------

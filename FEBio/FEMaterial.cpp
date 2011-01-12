@@ -54,3 +54,17 @@ void FEElasticMaterial::Init()
 BEGIN_PARAMETER_LIST(FENestedMaterial, FEMaterial)
 	ADD_PARAMETER(m_nBaseMat, FE_PARAM_INT, "solid_id");
 END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+// Material parameters for FEHydraulicPermeability
+BEGIN_PARAMETER_LIST(FEHydraulicPermeability, FEMaterial)
+	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
+END_PARAMETER_LIST();
+
+void FEHydraulicPermeability::Init()
+{
+	FEMaterial::Init();
+	
+	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
+}
+

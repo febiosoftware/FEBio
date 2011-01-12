@@ -155,8 +155,9 @@ tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 	// Evaluate the distortional part of the Cauchy stress
 	mat3ds sd;
 	sd.zero();		// Initialize for summation
-	tens4ds C;
-	C.zero();
+//	tens4ds C;
+//	C.zero();
+	tens4ds C(0.0);
 	bmi = b - I;
 	for (i=0; i<3; i++) {
 		sd += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
@@ -174,7 +175,7 @@ tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 	tens4ds I4  = dyad4s(I);
 
 	C += - 1./3.*(C.dot(IxI)+IxI.dot(C)-IxI*(C.dot(I)).tr()/3.)
-		 + 2./3.*((I4+IxI/3.)*sd.tr()-dyad1s(sd,I));
+		+ 2./3.*((I4-IxI/3.)*sd.tr()-dyad1s(sd,I));
 	
 	return C;
 }

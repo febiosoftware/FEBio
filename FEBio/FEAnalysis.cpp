@@ -211,7 +211,7 @@ bool FEAnalysis::Init()
 	// TODO: can I call FEM::InitPoro() here
 	// see if there are any poro-elastic materials present
 	for (i=0; i<m_fem.Materials(); ++i)
-		if (dynamic_cast<FEPoroElastic*>(m_fem.m_MAT[i]))
+		if ((dynamic_cast<FEPoroElastic*>(m_fem.m_MAT[i])) || (dynamic_cast<FEBiphasic*>(m_fem.m_MAT[i])))
 		{
 			m_nModule = FE_POROELASTIC;
 			break;
