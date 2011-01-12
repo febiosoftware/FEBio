@@ -115,8 +115,8 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 
 	// The pcol array is used to store the non-zero row indices
 	// for a particular column.
-	vector<int> pcol(neq);
-	//if (pcol == 0) throw MemException(sizeof(int)*neq);
+	int* pcol = new int[neq];
+	if (pcol == 0) throw MemException(sizeof(int)*neq);
 
 	// zero the row indices for the column
 	for (j=0; j<neq; ++j) pcol[j] = -1;
@@ -175,7 +175,6 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 					if (l<=i)
 					{
 						a.push_back(l);
-						int l1 = l;
 						while ((l<i) && (pcol[l+1] == i)) ++l;
 						a.push_back(l);
 						++l;
@@ -187,7 +186,7 @@ void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 	}
 
 	// cleanup temp data structures
-	//delete [] pcol;
+	delete [] pcol;
 	delete [] ppelc;
 	delete [] pelc;
 	delete [] pval;
