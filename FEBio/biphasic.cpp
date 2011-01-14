@@ -263,7 +263,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 	
 	// Bp-matrix
 	vector<double> B1(neln), B2(neln), B3(neln);
-	vec3d gradN[neln];
+	vector<vec3d> gradN(neln);
 	double tmp;
 	
 	// gauss-weights
