@@ -483,14 +483,18 @@ bool FEPlotContactGap::SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>&
 	a.assign(4*NF, 0.f);
 	int nint = 0;
 	double gi[4], gn[4];
-	for (int i=0; i<NF; ++i)
+	int i, k;
+	for (i=0; i<NF; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
-		for (int k=0; k<ni; ++k, ++nint) gi[k] = s.m_gap[nint];
+		for (k=0; k<ni; ++k, ++nint) gi[k] = s.m_gap[nint];
 
+		for (k=0; k<ni; ++k) if (gi[k] < 0) gi[k] = 0;
 		el.project_to_nodes(gi, gn);
+
+		for (k=0; k<ni; ++k) if (gn[k] < 0) gn[k] = 0;
 
 		a[4*i  ] = (float) gn[0];
 		a[4*i+1] = (float) gn[1];
