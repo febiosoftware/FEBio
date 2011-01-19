@@ -1977,6 +1977,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FESurfaceData.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FETangentDiagnostic.cpp"
 				>
 			</File>
@@ -2728,6 +2732,10 @@
 			</File>
 			<File
 				RelativePath=".\FESurfaceConstraint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESurfaceData.h"
 				>
 			</File>
 			<File
