@@ -43,7 +43,11 @@ bool FEM::Init()
 	// Open the logfile
 	if (!log.is_valid()) 
 	{
-		log.open(m_szlog);
+		if (log.open(m_szlog) == false)
+		{
+			log.printbox("FATAL ERROR", "Failed creating log file");
+			return false;
+		}
 
 		// if we don't want to output anything we only output to the logfile
 		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
