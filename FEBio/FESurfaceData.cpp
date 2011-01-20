@@ -189,6 +189,8 @@ bool FEPlotContactPressure::SaveFacetSliding(FEFacetSlidingSurface &s, vector<fl
 		}
 
 		el.project_to_nodes(ti, tn);
+		for (int k=0; k<ni; ++k)
+			tn[k] = (tn[k]>=0?tn[k] : 0);		
 
 		a[4*i  ] = (float) tn[0];
 		a[4*i+1] = (float) tn[1];
