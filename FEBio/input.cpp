@@ -13,6 +13,7 @@
 #include "FEFacet2FacetSliding.h"
 #include "log.h"
 #include "LSDYNAPlotFile.h"
+#include "FEBioPlotFile.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -59,8 +60,7 @@ bool FEM::Input(const char* szfile)
 
 //------------------------------------------------------------------------------
 //! This function outputs the input data to the log file.
-
-void FEM::EchoInput()
+void echo_input(FEM& fem)
 {
 	// echo input
 	int i, j;
@@ -78,64 +78,75 @@ void FEM::EchoInput()
 		return;
 	}
 
-	bool bporo = m_pStep->m_nModule == FE_POROELASTIC;
+	// get the analysis step
+	FEAnalysis& step = *fem.m_pStep;
 
-	log.printf("%s\n\n", m_sztitle);
+	// get the FE mesh
+	FEMesh& mesh = fem.m_mesh;
 
+	// poro-elasticity flag
+	bool bporo = fem.m_pStep->m_nModule == FE_POROELASTIC;
+
+	// print title
+	log.printf("%s\n\n", fem.GetTitle());
+
+	// print file info
 	log.printf(" FILES USED\n");
 	log.printf("===========================================================================\n");
-	log.printf("\tInput file : %s\n", m_szfile);
-	log.printf("\tPlot file  : %s\n", m_szplot);
-	log.printf("\tLog file   : %s\n", m_szlog);
+	log.printf("\tInput file : %s\n", fem.GetInputFileName());
+	log.printf("\tPlot file  : %s\n", fem.GetPlotFileName());
+	log.printf("\tLog file   : %s\n", fem.GetLogfileName());
 	log.printf("\n\n");
 
+	// print control info
 	log.printf(" CONTROL DATA\n");
 	log.printf("===========================================================================\n");
-	log.printf("Module type ...................................... : %d\n", m_pStep->m_nModule);
+	log.printf("Module type ...................................... : %d\n", step.m_nModule);
 	log.printf("\t   eq.%2d: solid mechanics\n", FE_SOLID);
 	log.printf("\t   eq.%2d: poroelastic\n", FE_POROELASTIC);
 	log.printf("\t   eq.%2d: heat transfer\n", FE_HEAT);
-	log.printf("\tAnalysis type .................................. : %d\n", m_pStep->m_nanalysis);
+	log.printf("\tAnalysis type .................................. : %d\n", step.m_nanalysis);
 	log.printf("\t   eq.%2d: quasi-static\n", FE_STATIC);
 	log.printf("\t   eq.%2d: dynamic\n", FE_DYNAMIC);
-	log.printf("\tPlane strain mode .............................. : %s\n", (m_nplane_strain != -1? "yes" : "no"));
-	log.printf("\tNumber of materials ............................ : %d\n", Materials());
-	log.printf("\tNumber of nodes ................................ : %d\n", m_mesh.Nodes() );
-	log.printf("\tNumber of solid elements ....................... : %d\n", m_mesh.SolidElements());
-	log.printf("\tNumber of shell elements ....................... : %d\n", m_mesh.ShellElements());
-	log.printf("\tNumber of truss elements ....................... : %d\n", m_mesh.TrussElements());
-	log.printf("\tNumber of timesteps ............................ : %d\n", m_pStep->m_ntime);
-	log.printf("\tTime step size ................................. : %lg\n", m_pStep->m_dt0);
-	log.printf("\tAuto time stepper activated .................... : %s\n", (m_pStep->m_bautostep ? "yes" : "no"));
-	if (m_pStep->m_bautostep)
+	log.printf("\tPlane strain mode .............................. : %s\n", (fem.m_nplane_strain != -1? "yes" : "no"));
+	log.printf("\tNumber of materials ............................ : %d\n", fem.Materials());
+	log.printf("\tNumber of nodes ................................ : %d\n", mesh.Nodes() );
+	log.printf("\tNumber of solid elements ....................... : %d\n", mesh.SolidElements());
+	log.printf("\tNumber of shell elements ....................... : %d\n", mesh.ShellElements());
+	log.printf("\tNumber of truss elements ....................... : %d\n", mesh.TrussElements());
+	log.printf("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
+	log.printf("\tTime step size ................................. : %lg\n", step.m_dt0);
+	log.printf("\tAuto time stepper activated .................... : %s\n", (step.m_bautostep ? "yes" : "no"));
+	if (step.m_bautostep)
 	{
-		log.printf("\t  Optimal nr of iterations ..................... : %d\n", m_pStep->m_iteopt);
-		log.printf("\t  Minimum allowable step size .................. : %lg\n", m_pStep->m_dtmin);
-		log.printf("\t  Maximum allowable step size .................. : %lg\n", m_pStep->m_dtmax);
+		log.printf("\t  Optimal nr of iterations ..................... : %d\n", step.m_iteopt);
+		log.printf("\t  Minimum allowable step size .................. : %lg\n", step.m_dtmin);
+		log.printf("\t  Maximum allowable step size .................. : %lg\n", step.m_dtmax);
 	}
-	log.printf("\tNumber of loadcurves ........................... : %d\n", LoadCurves());
-	log.printf("\tNumber of displacement boundary conditions ..... : %d\n", m_DC.size());
-	log.printf("\tNumber of pressure boundary cards .............. : %d\n", (m_psurf ? m_psurf->Elements() : 0));
-	log.printf("\tNumber of constant traction boundary cards ..... : %d\n", (m_ptrac ? m_ptrac->Elements() : 0));
-	log.printf("\tNumber of fluid flux boundary cards .............: %d\n", (m_fsurf ? m_fsurf->Elements() : 0));
-	log.printf("\tNumber of concentrated nodal forces ............ : %d\n", m_FC.size());
-	log.printf("\tMax nr of stiffness reformations ............... : %d\n", m_pStep->m_psolver->m_bfgs.m_maxref);
+	log.printf("\tNumber of loadcurves ........................... : %d\n", fem.LoadCurves());
+	log.printf("\tNumber of displacement boundary conditions ..... : %d\n", fem.m_DC.size());
+	log.printf("\tNumber of pressure boundary cards .............. : %d\n", (fem.m_psurf ? fem.m_psurf->Elements() : 0));
+	log.printf("\tNumber of constant traction boundary cards ..... : %d\n", (fem.m_ptrac ? fem.m_ptrac->Elements() : 0));
+	log.printf("\tNumber of fluid flux boundary cards .............: %d\n", (fem.m_fsurf ? fem.m_fsurf->Elements() : 0));
+	log.printf("\tNumber of concentrated nodal forces ............ : %d\n", fem.m_FC.size());
+	log.printf("\tMax nr of stiffness reformations ............... : %d\n", step.m_psolver->m_bfgs.m_maxref);
 	log.printf("\tper time steps\n");
-	log.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", m_pStep->m_psolver->m_bfgs.m_maxups);
+	log.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", step.m_psolver->m_bfgs.m_maxups);
 	log.printf("\tbetween stiffness matrix reformations\n");
-	log.printf("\tDisplacement convergence tolerance ............. : %lg\n", m_pStep->m_psolver->m_Dtol);
-	log.printf("\tEnergy convergence tolerance ................... : %lg\n", m_pStep->m_psolver->m_Etol);
-	log.printf("\tResidual convergence tolerance ................. : %lg\n", m_pStep->m_psolver->m_Rtol);
-	if (bporo) log.printf("\tFluid pressure convergence tolernace ........... : %lg\n", m_pStep->m_psolver->m_Ptol);
-	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", m_pStep->m_psolver->m_LStol);
-	log.printf("\tMinimum line search size ....................... : %lg\n", m_pStep->m_psolver->m_LSmin);
-	log.printf("\tMaximum number of line search iterations ....... : %d\n", m_pStep->m_psolver->m_LSiter);
-	log.printf("\tMax condition number ........................... : %lg\n", m_pStep->m_psolver->m_bfgs.m_cmax);
+	log.printf("\tDisplacement convergence tolerance ............. : %lg\n", step.m_psolver->m_Dtol);
+	log.printf("\tEnergy convergence tolerance ................... : %lg\n", step.m_psolver->m_Etol);
+	log.printf("\tResidual convergence tolerance ................. : %lg\n", step.m_psolver->m_Rtol);
+	if (bporo) log.printf("\tFluid pressure convergence tolernace ........... : %lg\n", step.m_psolver->m_Ptol);
+	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_LStol);
+	log.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_LSmin);
+	log.printf("\tMaximum number of line search iterations ....... : %d\n", step.m_psolver->m_LSiter);
+	log.printf("\tMax condition number ........................... : %lg\n", step.m_psolver->m_bfgs.m_cmax);
 	log.printf("\n\n");
 
+	// print output data
 	log.printf(" OUTPUT DATA\n");
 	log.printf("===========================================================================\n");
-	switch (m_pStep->m_nplot)
+	switch (step.m_nplot)
 	{
 	case FE_PLOT_NEVER      : log.printf("\tplot level ................................ : never\n"); break;
 	case FE_PLOT_MAJOR_ITRS : log.printf("\tplot level ................................ : major iterations\n"); break;
@@ -143,9 +154,11 @@ void FEM::EchoInput()
 	case FE_PLOT_MUST_POINTS: log.printf("\tplot level ................................ : must points only\n"); break;
 	}
 
-	if (dynamic_cast<LSDYNAPlotFile*>(m_plot))
+	if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot))
 	{
-		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(m_plot);
+		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(fem.m_plot);
+
+		log.printf("\tplotfile format ........................... : LSDYNA\n");
 		log.printf("\tshell strains included .................... : %s\n", (plt.m_bsstrn? "Yes" : "No"));
 
 		log.printf("\tplot file field data:\n");
@@ -186,16 +199,65 @@ void FEM::EchoInput()
 		}
 	}
 
+	if (dynamic_cast<FEBioPlotFile*>(fem.m_plot))
+	{
+		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(fem.m_plot);
+		log.printf("\tplotfile format ........................... : FEBIO\n");
+
+		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();
+
+		for (int i=0; i<5; ++i)
+		{
+			const list<FEBioPlotFile::DICTIONARY_ITEM>* pl=0;
+			const char* szn = 0;
+			switch (i)
+			{
+			case 0: pl = &dic.GlobalVariableList  (); szn = "Global Variables"  ; break;
+			case 1: pl = &dic.MaterialVariableList(); szn = "Material Variables"; break;
+			case 2: pl = &dic.NodalVariableList   (); szn = "Nodal Variables"   ; break;
+			case 3: pl = &dic.DomainVariableList  (); szn = "Domain Variables"  ; break;
+			case 4: pl = &dic.SurfaceVariableList (); szn = "Surface Variables" ; break;
+			}
+
+			if (!pl->empty())
+			{
+				log.printf("\t\t%s:\n", szn);
+				list<FEBioPlotFile::DICTIONARY_ITEM>::const_iterator it;
+				for (it = pl->begin(); it != pl->end(); ++it)
+				{
+					const char* szt = 0;
+					switch (it->m_ntype)
+					{
+					case FLOAT : szt = "float"; break;
+					case VEC3F : szt = "vec3f"; break;
+					case MAT3FS: szt = "mat3f"; break;
+					}
+
+					const char* szf = 0;
+					switch (it->m_nfmt)
+					{
+					case FMT_NODE: szf = "NODE"; break;
+					case FMT_ITEM: szf = "ITEM"; break;
+					case FMT_MULT: szf = "COMP"; break;
+					}
+
+					log.printf("\t\t\t%-20s (type = %5s, format = %4s)\n", it->m_szname, szt, szf);
+				}
+			}
+		}
+	}
+
+	// material data
 	log.printf("\n\n");
 	log.printf(" MATERIAL DATA\n");
 	log.printf("===========================================================================\n");
-	for (i=0; i<Materials(); ++i)
+	for (i=0; i<fem.Materials(); ++i)
 	{
 		if (i>0) log.printf("---------------------------------------------------------------------------\n");
 		log.printf("%3d - ", i+1);
 
 		// get the material
-		FEMaterial* pmat = GetMaterial(i);
+		FEMaterial* pmat = fem.GetMaterial(i);
 
 		// get the material name and type string
 		const char* szname = pmat->GetName();
@@ -250,11 +312,11 @@ void FEM::EchoInput()
 
 	log.printf(" LOADCURVE DATA\n");
 	log.printf("===========================================================================\n");
-	for (i=0; i<LoadCurves(); ++i)
+	for (i=0; i<fem.LoadCurves(); ++i)
 	{
 		if (i>0) log.printf("---------------------------------------------------------------------------\n");
 		log.printf("%3d\n", i+1);
-		FELoadCurve* plc = GetLoadCurve(i);
+		FELoadCurve* plc = fem.GetLoadCurve(i);
 		for (j=0; j<plc->Points(); ++j)
 		{
 			LOADPOINT& pt = plc->LoadPoint(j);
@@ -263,15 +325,15 @@ void FEM::EchoInput()
 	}
 	log.printf("\n\n");
 
-	if (m_CI.size() > 0)
+	if (fem.m_CI.size() > 0)
 	{
 		log.printf(" CONTACT INTERFACE DATA\n");
 		log.printf("===========================================================================\n");
-		for (i=0; i<(int) m_CI.size(); ++i)
+		for (i=0; i<(int) fem.m_CI.size(); ++i)
 		{
 			if (i>0) log.printf("---------------------------------------------------------------------------\n");
 
-			FESlidingInterface *psi = dynamic_cast<FESlidingInterface*>(m_CI[i]);
+			FESlidingInterface *psi = dynamic_cast<FESlidingInterface*>(fem.m_CI[i]);
 			if (psi)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -286,7 +348,7 @@ void FEM::EchoInput()
 				log.printf("\tslave segments                 : %d\n", (psi->m_ss.Elements()));
 			}
 
-			FEFacet2FacetSliding* pf2f = dynamic_cast<FEFacet2FacetSliding*>(m_CI[i]);
+			FEFacet2FacetSliding* pf2f = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
 			if (pf2f)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -301,7 +363,7 @@ void FEM::EchoInput()
 				log.printf("\tslave segments                 : %d\n", (pf2f->m_ss.Elements()));
 			}
 
-			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(m_CI[i]);
+			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
 			if (pti)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -310,7 +372,7 @@ void FEM::EchoInput()
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pti->m_atol);
 			}
 
-			FEPeriodicBoundary *pbi = dynamic_cast<FEPeriodicBoundary*>(m_CI[i]);
+			FEPeriodicBoundary *pbi = dynamic_cast<FEPeriodicBoundary*>(fem.m_CI[i]);
 			if (pbi)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -319,7 +381,7 @@ void FEM::EchoInput()
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", pbi->m_atol);
 			}
 
-			FESurfaceConstraint *psc = dynamic_cast<FESurfaceConstraint*>(m_CI[i]);
+			FESurfaceConstraint *psc = dynamic_cast<FESurfaceConstraint*>(fem.m_CI[i]);
 			if (psc)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -328,7 +390,7 @@ void FEM::EchoInput()
 				log.printf("\tAugmented Lagrangian tolerance : %lg\n", psc->m_atol);
 			}
 
-			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(m_CI[i]);
+			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(fem.m_CI[i]);
 			if (pri)
 			{
 				log.printf("contact interface %d:\n", i+1);
@@ -359,18 +421,18 @@ void FEM::EchoInput()
 		log.printf("\n\n");
 	}
 
-	if (m_nrj > 0)
+	if (fem.m_nrj > 0)
 	{
 		log.printf(" RIGID JOINT DATA\n");
 		log.printf("===========================================================================\n");
-		for (i=0; i<m_nrj; ++i)
+		for (i=0; i<fem.m_nrj; ++i)
 		{
 			if (i>0) log.printf("---------------------------------------------------------------------------\n");
 
-			FERigidJoint& rj = *m_RJ[i];
+			FERigidJoint& rj = *fem.m_RJ[i];
 			log.printf("rigid joint %d:\n", i+1);
-			log.printf("\tRigid body A                   : %d\n", m_RB[rj.m_nRBa].m_mat + 1);
-			log.printf("\tRigid body B                   : %d\n", m_RB[rj.m_nRBb].m_mat + 1);
+			log.printf("\tRigid body A                   : %d\n", fem.m_RB[rj.m_nRBa].m_mat + 1);
+			log.printf("\tRigid body B                   : %d\n", fem.m_RB[rj.m_nRBb].m_mat + 1);
 			log.printf("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
 			log.printf("\tPenalty factor                 : %lg\n", rj.m_eps );
 			log.printf("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
@@ -381,14 +443,20 @@ void FEM::EchoInput()
 	log.printf(" LINEAR SOLVER DATA\n");
 	log.printf("===========================================================================\n");
 	log.printf("\tSolver type ............................... : ");
-	if (m_nsolver == SKYLINE_SOLVER     ) log.printf("Skyline\n");
-	if (m_nsolver == PSLDLT_SOLVER      ) log.printf("PSLDLT\n");
-	if (m_nsolver == SUPERLU_SOLVER     ) log.printf("SuperLU\n");
-	if (m_nsolver == SUPERLU_MT_SOLVER  ) log.printf("SuperLU_MT\n");
-	if (m_nsolver == PARDISO_SOLVER     ) log.printf("Pardiso\n");
-	if (m_nsolver == WSMP_SOLVER        ) log.printf("WSMP\n");
-	if (m_nsolver == LU_SOLVER          ) log.printf("LUSolver\n");
-	if (m_nsolver == CG_ITERATIVE_SOLVER) log.printf("Conjugate gradient\n");
+	switch (fem.m_nsolver)
+	{
+	case SKYLINE_SOLVER     : log.printf("Skyline\n"           ); break;
+	case PSLDLT_SOLVER      : log.printf("PSLDLT\n"            ); break;
+	case SUPERLU_SOLVER     : log.printf("SuperLU\n"           ); break;
+	case SUPERLU_MT_SOLVER  : log.printf("SuperLU_MT\n"        ); break;
+	case PARDISO_SOLVER     : log.printf("Pardiso\n"           ); break;
+	case WSMP_SOLVER        : log.printf("WSMP\n"              ); break;
+	case LU_SOLVER          : log.printf("LUSolver\n"          ); break;
+	case CG_ITERATIVE_SOLVER: log.printf("Conjugate gradient\n"); break;
+	default:
+		assert(false);
+		log.printf("Unknown solver\n");
+	}
 	log.printf("\n\n");
 
 	// reset log mode

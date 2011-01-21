@@ -7,6 +7,10 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+// echo the input data to the log file
+extern void echo_input(FEM& fem);
+
+//-----------------------------------------------------------------------------
 bool solve(FEM& fem, const char* szfile)
 {
 	// read input data
@@ -30,7 +34,7 @@ bool FEM::Solve()
 	// we do this here (and not e.g. directly after input)
 	// since the data can be changed after input, which is the case,
 	// for instance, in the parameter optimization module
-	EchoInput();
+	echo_input(*this);
 
 	// obtain a pointer to the console window. We'll use this to 
 	// set the title of the window

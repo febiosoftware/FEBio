@@ -73,6 +73,7 @@ protected:
 	// size of name variables
 	enum { STR_SIZE = 64 };
 
+public:
 	// Dictionary entry
 	struct DICTIONARY_ITEM
 	{
@@ -92,6 +93,13 @@ protected:
 		int SurfaceVariables() { return m_Face.size(); }
 
 		void Defaults(FEM& fem);
+
+	public:
+		const list<DICTIONARY_ITEM>& GlobalVariableList  () const { return m_Glob; }
+		const list<DICTIONARY_ITEM>& MaterialVariableList() const { return m_Mat;  }
+		const list<DICTIONARY_ITEM>& NodalVariableList   () const { return m_Node; }
+		const list<DICTIONARY_ITEM>& DomainVariableList  () const { return m_Elem; }
+		const list<DICTIONARY_ITEM>& SurfaceVariableList () const { return m_Face; }
 
 	protected:
 		bool AddGlobalVariable  (FEPlotData* ps, const char* szname);
@@ -125,6 +133,9 @@ public:
 
 	//! Add a variable to the dictionary
 	bool AddVariable(const char* sz) { return m_dic.AddVariable(sz); }
+
+public:
+	const Dictionary& GetDictionary() const { return m_dic; }
 
 protected:
 	bool WriteHeader    (FEM& fem);

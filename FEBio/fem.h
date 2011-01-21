@@ -201,9 +201,6 @@ public:
 	//! input data from file
 	bool Input(const char* szfile);
 
-	//! echoes the input data to the logfile
-	void EchoInput();
-
 	//! Add a material to the model
 	void AddMaterial(FEMaterial* pm) { m_MAT.push_back(pm); }
 
@@ -271,6 +268,7 @@ public:
 
 	void SetPlotFileNameExtension(const char* szext);
 
+	const char* GetInputFileName () { return m_szfile; }
 	const char* GetLogfileName () { return m_szlog; }
 	const char* GetPlotFileName() { return m_szplot; }
 
