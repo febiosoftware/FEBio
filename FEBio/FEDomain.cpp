@@ -44,6 +44,7 @@ bool FESolidDomain::Initialize(FEM &fem)
 
 	int NE = Elements();
 	int n = 0;
+	m_Node.reserve(N);
 	for (i=0; i<NE; ++i)
 	{
 		FESolidElement& e = Element(i);
@@ -51,11 +52,13 @@ bool FESolidDomain::Initialize(FEM &fem)
 		for (j=0; j<ne; ++j)
 		{
 			int nj = e.m_node[j];
-			if (tag[nj] == -1) tag[nj] = n++;
+			if (tag[nj] == -1) 
+			{
+				tag[nj] = n++;
+				m_Node.push_back(nj);
+			}
 		}
 	}
-	m_Node.reserve(n);
-	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
 	assert(m_Node.size() == n);
 	return true;
 }
