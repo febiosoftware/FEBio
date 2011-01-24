@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FESolidSolver.h"
+#include "FECore/CompactMatrix.h"
+using namespace FECore;
 
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEM& fem) : FEDiagnostic(fem)
 {
@@ -55,11 +57,16 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	// calculate the stiffness matrices
 	solver.StiffnessMatrix();
 
-	// print the matrix
+	// get the matrix
 	SparseMatrix* psm = solver.GetStiffnessMatrix()->GetSparseMatrixPtr();
 	CompactSymmMatrix* pcm = dynamic_cast<CompactSymmMatrix*>(psm);
 	if (pcm == 0) return false;
-	if (!pcm->print_hb()) return false;
 
-	return true;
+	// print the matrix to file
+	FILE* fout = fopen("hb_matrix.out", "wb");
+	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
+	bool bret = print_hb(*pcm, fout);
+	fclose(fout);
+
+	return bret;
 }

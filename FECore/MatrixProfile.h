@@ -11,6 +11,8 @@
 
 #include "vector.h"
 
+namespace FECore {
+
 //-----------------------------------------------------------------------------
 // Memory exception class
 // TODO: move this to a seperate file
@@ -35,23 +37,23 @@ public:
 //! in an efficient way.
 //! It is currently assumed that the sparse matrix is square and symmetric
 
-class MatrixProfile  
+class SparseMatrixProfile
 {
 public:
 	//! Constructor. Takes the nr of equations as the input argument
-	MatrixProfile(int n = 0);
+	SparseMatrixProfile(int n = 0);
 
 	//! destructor
-	virtual ~MatrixProfile(){}
+	virtual ~SparseMatrixProfile(){}
 
 	//! clears the matrix profile
 	void clear() { m_prof.clear(); }
 
 	//! copy constructor
-	MatrixProfile(MatrixProfile& mp);
+	SparseMatrixProfile(SparseMatrixProfile& mp);
 
 	//! assignment operator
-	MatrixProfile& operator = (MatrixProfile& mp);
+	SparseMatrixProfile& operator = (SparseMatrixProfile& mp);
 
 	//! updates the profile for an array of elements
 	void UpdateProfile(vector< vector<int> >& LM, int N);
@@ -66,4 +68,7 @@ protected:
 	vector< vector<int> >	m_prof;	//!< the actual profile in condensed format
 };
 
+} // namespace FECore
+
 #endif // !defined(AFX_MATRIXPROFILE_H__F83C6F4F_AB5B_445F_AD8C_9C0CBAD26D09__INCLUDED_)
+

@@ -8,12 +8,12 @@
 
 #ifdef PARDISO
 
-
 //////////////////////////////////////////////////////////////
 // PardisoSolver
 //////////////////////////////////////////////////////////////
 
-PardisoSolver::PardisoSolver()
+//-----------------------------------------------------------------------------
+FECore::PardisoSolver::PardisoSolver()
 {
 	/* If both PARDISO AND PARDISODL are defined, print a warning */
 #ifdef PARDISODL
@@ -22,7 +22,8 @@ PardisoSolver::PardisoSolver()
 #endif
 }
 
-bool PardisoSolver::PreProcess()
+//-----------------------------------------------------------------------------
+bool FECore::PardisoSolver::PreProcess()
 {
 	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
 	m_iparm[0] = 0; /* Use default values for parameters */
@@ -48,7 +49,8 @@ bool PardisoSolver::PreProcess()
 	return LinearSolver::PreProcess();
 }
 
-bool PardisoSolver::Factor()
+//-----------------------------------------------------------------------------
+bool FECore::PardisoSolver::Factor()
 {
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
@@ -60,7 +62,7 @@ bool PardisoSolver::Factor()
 
 	int phase = 11;
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->Values(), A->Pointers(), A->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
 
 	if (m_error)
@@ -80,7 +82,7 @@ bool PardisoSolver::Factor()
 	A->print_hb();
 #endif
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->Values(), A->Pointers(), A->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
 
 	if (m_error)
@@ -93,7 +95,8 @@ bool PardisoSolver::Factor()
 	return true;
 }
 
-bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
+//-----------------------------------------------------------------------------
+bool FECore::PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 {
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
@@ -102,7 +105,7 @@ bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 
 	m_iparm[7] = 1;	/* Maximum number of iterative refinement steps */
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->values(), A->pointers(), A->indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, A->Values(), A->Pointers(), A->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, &b[0], &x[0], &m_error);
 
 	if (m_error)
@@ -115,7 +118,8 @@ bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 	return true;
 }
 
-void PardisoSolver::Destroy()
+//-----------------------------------------------------------------------------
+void FECore::PardisoSolver::Destroy()
 {
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
@@ -124,7 +128,7 @@ void PardisoSolver::Destroy()
 
 	//fprintf(stderr, "In Destroy\n");
 
-	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, A->pointers(), A->indices(),
+	pardiso_(m_pt, &m_maxfct, &m_mnum, &m_mtype, &phase, &m_n, NULL, A->Pointers(), A->Indices(),
 		 NULL, &m_nrhs, m_iparm, &m_msglvl, NULL, NULL, &m_error);
 
 	LinearSolver::Destroy();

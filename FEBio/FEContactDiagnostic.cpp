@@ -9,7 +9,7 @@
 #include "FESlidingInterface.h"
 #include "log.h"
 
-void print_matrix(Logfile& log, FullMatrix& m)
+void print_matrix(Logfile& log, DenseMatrix& m)
 {
 	int i, j;
 	int N = m.Size();
@@ -61,7 +61,7 @@ bool FEContactDiagnostic::Run()
 	// get the stiffness matrix
 	FEStiffnessMatrix& K = *solver.m_pK;
 	SparseMatrix *pA = (SparseMatrix*)K;
-	FullMatrix& K0 = dynamic_cast<FullMatrix&>(*pA);
+	DenseMatrix& K0 = dynamic_cast<DenseMatrix&>(*pA);
 
 	// build the stiffness matrix
 	K0.zero();
@@ -74,14 +74,14 @@ bool FEContactDiagnostic::Run()
 	print_matrix(log, K0);
 
 	// calculate the derivative of the residual
-	FullMatrix K1;
+	DenseMatrix K1;
 	deriv_residual(K1);
 
 	print_matrix(log, K1);
 
 	// calculate difference matrix
 	const int N = 48;
-	FullMatrix Kd; Kd.Create(N);
+	DenseMatrix Kd; Kd.Create(N);
 	double kij, kmax = 0, k0;
 	int i0=-1, j0=-1;
 	for (int i=0; i<N; ++i)
@@ -235,7 +235,7 @@ bool FEContactDiagnostic::Init()
 	return FEDiagnostic::Init();
 }
 
-void FEContactDiagnostic::deriv_residual(FullMatrix& K)
+void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 {
 	FEM& fem = m_fem;
 

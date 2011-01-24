@@ -4,7 +4,7 @@
 #include "vector.h"
 
 //-----------------------------------------------------------------------------
-ConjGradIterSolver::ConjGradIterSolver()
+FECore::ConjGradIterSolver::ConjGradIterSolver()
 {
 	m_tol = 0.01;
 	m_kmax = 200;
@@ -12,14 +12,14 @@ ConjGradIterSolver::ConjGradIterSolver()
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::PreProcess()
+bool FECore::ConjGradIterSolver::PreProcess()
 {
 	assert(m_pA);
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::Factor()
+bool FECore::ConjGradIterSolver::Factor()
 {
 /*	CompactMatrix& C = dynamic_cast<CompactMatrix&>(*m_pA);
 	int neq = K.Size();
@@ -52,7 +52,7 @@ bool ConjGradIterSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
 {
 	int i;
 
@@ -126,7 +126,7 @@ bool ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-void ConjGradIterSolver::Destroy()
+void FECore::ConjGradIterSolver::Destroy()
 {
 
 }

@@ -7,7 +7,7 @@
 // SUPERLUSolver
 //////////////////////////////////////////////////////////////////////
 
-bool SuperLUSolver::PreProcess()
+bool FECore::SuperLUSolver::PreProcess()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -29,7 +29,7 @@ bool SuperLUSolver::PreProcess()
 	options.Equil			= NO;		// no equilibration
 
 	// create the supermatrix A
-    dCreate_CompCol_Matrix(&A, N, N, nnz, rK.values(), rK.indices(), rK.pointers(), SLU_NC, SLU_D, SLU_GE);
+    dCreate_CompCol_Matrix(&A, N, N, nnz, rK.Values(), rK.Indices(), rK.Pointers(), SLU_NC, SLU_D, SLU_GE);
 
 	// since we don't have any values yet, we don't supply any data to the matrix B and X
 	dCreate_Dense_Matrix(&B, N, 0, NULL, N, SLU_DN, SLU_D, SLU_GE);
@@ -50,7 +50,7 @@ bool SuperLUSolver::PreProcess()
 }
 
 #ifdef SUPERLU
-double SuperLUSolver::norm(SparseMatrix& K)
+double FECore::SuperLUSolver::norm(SparseMatrix& K)
 {
 	double n = 0, nc;
 	int l;
@@ -58,8 +58,8 @@ double SuperLUSolver::norm(SparseMatrix& K)
 	// get a reference to the correct matrix type
 	CompactUnSymmMatrix& A = dynamic_cast<CompactUnSymmMatrix&> (K);
 
-	int* ptr = A.pointers();
-	double* pval = A.values(), *pv;
+	int* ptr = A.Pointers();
+	double* pval = A.Values(), *pv;
 
 	for (int i=0; i<A.Size(); ++i)
 	{
@@ -75,7 +75,7 @@ double SuperLUSolver::norm(SparseMatrix& K)
 }
 #endif
 
-bool SuperLUSolver::Factor()
+bool FECore::SuperLUSolver::Factor()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -133,7 +133,7 @@ bool SuperLUSolver::Factor()
 #endif
 }
 
-bool SuperLUSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::SuperLUSolver::Solve(vector<double>& x, vector<double>& b)
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -170,7 +170,7 @@ bool SuperLUSolver::Solve(vector<double>& x, vector<double>& b)
 #endif
 }
 
-void SuperLUSolver::Destroy()
+void FECore::SuperLUSolver::Destroy()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU

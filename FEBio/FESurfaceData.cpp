@@ -19,7 +19,7 @@ bool FETestData ::Save(FEDomain& dom, vector<float>& a)
 	if (dynamic_cast<FERigidSolidDomain*>(&dom) == 0)
 	{
 		int N = dom.Nodes();
-		for (int i=0; i<N; ++i) a.push_back(i);
+		for (int i=0; i<N; ++i) a.push_back((float) i);
 		return true;
 	}
 	return false;

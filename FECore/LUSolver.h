@@ -1,6 +1,9 @@
 #pragma once
 
 #include "LinearSolver.h"
+#include "DenseMatrix.h"
+
+namespace FECore {
 
 //-----------------------------------------------------------------------------
 //! LU decomposition solver
@@ -19,8 +22,10 @@ public:
 	bool Solve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(int ntype) { return (m_pA = new FullMatrix()); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = new DenseMatrix()); }
 
 protected:
 	vector<int>	indx;
 };
+
+} // namespace FECore

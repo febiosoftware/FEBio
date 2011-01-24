@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! constructor
 
-SuperLU_MT_Solver::SuperLU_MT_Solver()
+FECore::SuperLU_MT_Solver::SuperLU_MT_Solver()
 {
 #ifdef SUPERLU_MT
 	m_bfact = false;
@@ -16,7 +16,7 @@ SuperLU_MT_Solver::SuperLU_MT_Solver()
 //-----------------------------------------------------------------------------
 //! Solver preprocessing
 
-bool SuperLU_MT_Solver::PreProcess()
+bool FECore::SuperLU_MT_Solver::PreProcess()
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -72,7 +72,7 @@ bool SuperLU_MT_Solver::PreProcess()
 //-----------------------------------------------------------------------------
 //! Factor the sparse matrix
 
-bool SuperLU_MT_Solver::Factor()
+bool FECore::SuperLU_MT_Solver::Factor()
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -122,7 +122,7 @@ bool SuperLU_MT_Solver::Factor()
 //-----------------------------------------------------------------------------
 //! Solve the linear system
 
-bool SuperLU_MT_Solver::Solve(vector<double> &x, vector<double> &b)
+bool FECore::SuperLU_MT_Solver::Solve(vector<double> &x, vector<double> &b)
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");
@@ -169,7 +169,7 @@ bool SuperLU_MT_Solver::Solve(vector<double> &x, vector<double> &b)
 //-----------------------------------------------------------------------------
 //! Clean up
 
-void SuperLU_MT_Solver::Destroy()
+void FECore::SuperLU_MT_Solver::Destroy()
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");

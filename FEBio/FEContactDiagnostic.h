@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEDiagnostic.h"
+#include "FECore/DenseMatrix.h"
 
 class FEContactDiagnostic : public FEDiagnostic  
 {
@@ -22,7 +23,7 @@ public:
 	bool Init();
 
 protected:
-	void deriv_residual(FullMatrix& K);
+	void deriv_residual(DenseMatrix& K);
 };
 
 #endif // !defined(AFX_FECONTACTDIAGNOSTIC_H__6DAAF8C6_9D08_49F7_955B_08201F1A48C9__INCLUDED_)

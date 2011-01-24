@@ -7,6 +7,7 @@
 #pragma once
 
 #include "LinearSolver.h"
+#include "CompactMatrix.h"
 
 #ifdef PARDISO
 	/* Pardiso prototypes for MKL version */
@@ -39,6 +40,8 @@ int pardiso_(void *, int *, int *, int *, int *, int *,
 }
 #endif
 
+namespace FECore {
+
 class PardisoSolver : public LinearSolver
 {
 public:
@@ -47,7 +50,7 @@ public:
 	bool Solve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(int ntype)
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype)
 	{
 		m_bsymm = (ntype == SPARSE_SYMMETRIC);
 		if (m_bsymm) m_pA = new CompactSymmMatrix(1);
@@ -89,3 +92,4 @@ protected:
 	}
 };
 
+} // namespace FECore

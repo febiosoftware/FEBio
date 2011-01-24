@@ -3,17 +3,17 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-bool LUSolver::PreProcess()
+bool FECore::LUSolver::PreProcess()
 {
 	// We don't need to do any preprocessing for this solver
 	return LinearSolver::PreProcess();
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::Factor()
+bool FECore::LUSolver::Factor()
 {
 	// convert to a FullMatrix
-	FullMatrix& a = dynamic_cast<FullMatrix&> (*m_pA);
+	DenseMatrix& a = dynamic_cast<DenseMatrix&> (*m_pA);
 
 	const double TINY = 1.0e-20;
 	int i, imax, j, k;
@@ -79,9 +79,9 @@ bool LUSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::LUSolver::Solve(vector<double>& x, vector<double>& b)
 {
-	FullMatrix& a = dynamic_cast<FullMatrix&> (*m_pA);
+	DenseMatrix& a = dynamic_cast<DenseMatrix&> (*m_pA);
 
 	x = b;
 
@@ -112,7 +112,7 @@ bool LUSolver::Solve(vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-void LUSolver::Destroy()
+void FECore::LUSolver::Destroy()
 {
 	// nothing to destroy
 	LinearSolver::Destroy();

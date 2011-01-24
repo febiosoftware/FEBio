@@ -1,13 +1,13 @@
 #pragma once
 
 #include "LinearSolver.h"
+#include "CompactMatrix.h"
 #include <vector>
 using namespace std;
 
+namespace FECore {
 //-----------------------------------------------------------------------------
-//! this class implements an iterative solver that implements the
-//! conjugate gradient method
-
+//! this class implements an iterative conjugate gradient solver 
 class ConjGradIterSolver : public LinearSolver
 {
 public:
@@ -19,7 +19,7 @@ public:
 
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(int ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); }
 
 public:
 	double	m_tol;		// convergence tolerance
@@ -28,3 +28,5 @@ public:
 
 	vector<double>	m_P;	// preconditioning vector
 };
+
+} // namespace FECore

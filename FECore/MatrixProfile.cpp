@@ -9,7 +9,7 @@
 //! MatrixProfile constructor. Takes the nr of equations as input argument.
 //! If n is larger than zero a default profile is constructor for a diagonal
 //! matrix.
-MatrixProfile::MatrixProfile(int n)
+FECore::SparseMatrixProfile::SparseMatrixProfile(int n)
 {
 	if (n>0)
 	{
@@ -30,7 +30,7 @@ MatrixProfile::MatrixProfile(int n)
 //-----------------------------------------------------------------------------
 //! Copy constructor. Simply copies the profile
 
-MatrixProfile::MatrixProfile(MatrixProfile& mp)
+FECore::SparseMatrixProfile::SparseMatrixProfile(SparseMatrixProfile& mp)
 {
 	m_prof = mp.m_prof;
 }
@@ -38,7 +38,7 @@ MatrixProfile::MatrixProfile(MatrixProfile& mp)
 //-----------------------------------------------------------------------------
 //! Assignment operator. Copies the profile.
  
-MatrixProfile& MatrixProfile::operator =(MatrixProfile& mp)
+FECore::SparseMatrixProfile& FECore::SparseMatrixProfile::operator =(SparseMatrixProfile& mp)
 {
 	if (m_prof.size() != mp.m_prof.size()) m_prof = mp.m_prof;
 	else
@@ -55,7 +55,7 @@ MatrixProfile& MatrixProfile::operator =(MatrixProfile& mp)
 //! are somehow connected. Each pair of dofs that are connected contributes to
 //! the global stiffness matrix and therefor also to the matrix profile.
 
-void MatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
+void FECore::SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 {
 	int i, j, k, l, iel, n, *lm, N, Ntot = 0;
 

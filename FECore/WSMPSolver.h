@@ -8,6 +8,7 @@
 
 #include "SparseMatrix.h"
 #include "LinearSolver.h"
+#include "CompactMatrix.h"
 #include "vector.h"
 #include "matrix.h"
 
@@ -26,6 +27,8 @@ extern "C"
 }
 #endif //WSMP
 
+namespace FECore {
+
 class WSMPSolver : public LinearSolver
 {
 public:
@@ -34,7 +37,7 @@ public:
 	bool Solve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(int ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix(1) : 0)); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix(1) : 0)); }
 
 protected:
 	/* WSMP control parameters */
@@ -46,3 +49,5 @@ protected:
 	vector<int> m_perm, m_invp;
 	vector<double> m_b;
 };
+
+} // namespace FECore

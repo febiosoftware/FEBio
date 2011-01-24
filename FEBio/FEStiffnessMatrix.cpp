@@ -56,7 +56,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 	// for instance contact elements which can change connectivity in between
 	// calls to the Create() function. Storing the static profile instead of
 	// reconstructing it every time we come here saves us a lot of time.
-	static MatrixProfile MP;
+	static SparseMatrixProfile MP;
 
 	// begin building the profile
 	build_begin();
@@ -656,7 +656,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 void FEStiffnessMatrix::build_begin()
 {
 	if (m_pMP) delete m_pMP;
-	m_pMP = new MatrixProfile(m_pfem->m_neq);
+	m_pMP = new SparseMatrixProfile(m_pfem->m_neq);
 	m_nlm = 0;
 }
 
@@ -700,7 +700,5 @@ void FEStiffnessMatrix::build_flush()
 void FEStiffnessMatrix::build_end()
 {
 	if (m_nlm > 0) build_flush();
-
-	MatrixFactory mf;
-	mf.CreateMatrix(m_pA, *m_pMP);
+	m_pA->Create(*m_pMP);
 }

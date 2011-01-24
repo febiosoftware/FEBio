@@ -24,6 +24,7 @@
 #include "FETiedInterface.h"
 #include "FERigidWallInterface.h"
 #include <string.h>
+using namespace FECore;
 
 //-----------------------------------------------------------------------------
 FEM* FileSection::GetFEM() { return m_pim->GetFEM(); }

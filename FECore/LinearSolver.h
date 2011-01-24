@@ -5,10 +5,14 @@
 #include <vector>
 using namespace std;
 
+namespace FECore {
+
 //-----------------------------------------------------------------------------
 // matrix types
-#define SPARSE_SYMMETRIC	0
-#define SPARSE_UNSYMMETRIC	1
+enum Matrix_Type {
+	SPARSE_SYMMETRIC,
+	SPARSE_UNSYMMETRIC
+};
 
 //-----------------------------------------------------------------------------
 //! base class for the linear solver classes
@@ -34,7 +38,7 @@ public:
 	static void SetNumThreads(int n) { m_numthreads = (n>0? n : 1); }
 
 	// create the sparse matrix
-	virtual SparseMatrix* CreateSparseMatrix(int ntype) = 0;
+	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) = 0;
 
 protected:
 	bool	m_bvalid;	// flag indication wether a valid matrix structure is ready
@@ -43,3 +47,5 @@ protected:
 
 	static int	m_numthreads;	// nr of threads to create
 };
+
+} // namespace FECore

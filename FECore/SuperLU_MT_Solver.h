@@ -1,5 +1,6 @@
 #pragma once
 #include "LinearSolver.h"
+#include "CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a wrapper class for the SuperLU_MT solver
@@ -7,6 +8,8 @@
 #ifdef SUPERLU_MT
 	#include "pdsp_defs.h"
 #endif
+
+namespace FECore {
 
 class SuperLU_MT_Solver : public LinearSolver
 {
@@ -16,7 +19,7 @@ public:
 	bool Solve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(int ntype) { return (m_pA = new CompactUnSymmMatrix()); }
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = new CompactUnSymmMatrix()); }
 
 	SuperLU_MT_Solver();
 
@@ -42,3 +45,5 @@ protected:
 
 #endif // SUPERLU_MT
 };
+
+} // namespace FECore

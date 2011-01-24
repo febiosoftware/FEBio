@@ -1283,7 +1283,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CompactMatrix.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ConjGradIterSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DenseMatrix.cpp"
 				>
 			</File>
 			<File
@@ -1300,10 +1308,6 @@
 			</File>
 			<File
 				RelativePath=".\matrix.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MatrixFactory.cpp"
 				>
 			</File>
 			<File
@@ -1324,6 +1328,10 @@
 			</File>
 			<File
 				RelativePath=".\qsort.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkylineMatrix.cpp"
 				>
 			</File>
 			<File
@@ -1521,7 +1529,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\CompactMatrix.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ConjGradIterSolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DenseMatrix.h"
 				>
 			</File>
 			<File
@@ -1541,10 +1557,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MatrixFactory.h"
-				>
-			</File>
-			<File
 				RelativePath=".\MatrixProfile.h"
 				>
 			</File>
@@ -1554,6 +1566,10 @@
 			</File>
 			<File
 				RelativePath=".\PSLDLTSolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkylineMatrix.h"
 				>
 			</File>
 			<File

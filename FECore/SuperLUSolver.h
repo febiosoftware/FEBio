@@ -1,6 +1,6 @@
 #pragma once
-
 #include "LinearSolver.h"
+#include "CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
 //! Implements a wrapper class for the SuperLU library
@@ -14,6 +14,8 @@
 		#include "slu_ddefs.h"
 #endif
 
+namespace FECore {
+
 class SuperLUSolver : public LinearSolver
 {
 public:
@@ -22,7 +24,7 @@ public:
 	bool Solve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
-	SparseMatrix* CreateSparseMatrix(int ntype)
+	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype)
 	{
 		m_bsymm = (ntype == SPARSE_SYMMETRIC);
 		return (m_pA = new CompactUnSymmMatrix()); 
@@ -63,3 +65,5 @@ protected:
 
 #endif // SUPERLU
 };
+
+} // namespace FECore

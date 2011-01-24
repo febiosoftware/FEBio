@@ -9,7 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/MatrixFactory.h"
+#include "FECore/SparseMatrix.h"
+using namespace FECore;
 
 class FEM;
 
@@ -34,18 +35,10 @@ public:
 	bool Create(FEM& fem, bool breset);
 
 	//! assemble an element stiffness matrix into the global stiffness matrix
-	void Assemble(matrix& ke, vector<int>& lm)
-	{
-		MatrixFactory mf;
-		mf.Assemble(*m_pA, ke, lm);
-	}
+	void Assemble(matrix& ke, vector<int>& lm) { m_pA->Assemble(ke, lm); }
 
 	//! more general assembly routine
-	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj)
-	{
-		MatrixFactory mf;
-		mf.Assemble(*m_pA, ke, lmi, lmj);
-	}
+	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) { m_pA->Assemble(ke, lmi, lmj); }
 
 	//! return the nonzeroes in the sparse matrix
 	int NonZeroes() { return m_pA->NonZeroes(); }
@@ -75,7 +68,7 @@ protected:
 	// The following data structures are used to incrementally
 	// build the profile of the sparse matrix
 	FEM*	m_pfem;					//!< pointer to the FEM object
-	MatrixProfile*	m_pMP;			//!< profile of sparse matrix
+	SparseMatrixProfile*	m_pMP;			//!< profile of sparse matrix
 	vector< vector<int> >	m_LM;	//!< used for building the stiffness matrix
 	int	m_nlm;						//!< nr of elements in m_LM array
 };

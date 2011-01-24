@@ -3,6 +3,7 @@
 #include "FECore/matrix.h"
 #include "FECore/vector.h"
 #include "FECore/LinearSolver.h"
+using namespace FECore;
 
 //-----------------------------------------------------------------------------
 //! The BFGSSolver solves a nonlinear system of equations using the BFGS method.
