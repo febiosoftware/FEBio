@@ -65,8 +65,8 @@ bool FEPrintHBMatrixDiagnostic::Run()
 	// print the matrix to file
 	FILE* fout = fopen("hb_matrix.out", "wb");
 	if (fout == 0) { fprintf(stderr, "Failed creating output file."); return false; }
-	bool bret = print_hb(*pcm, fout);
+	write_hb(*pcm, fout);
 	fclose(fout);
 
-	return bret;
+	return true;
 }

@@ -25,21 +25,6 @@ void FECore::CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
 	m_nsize = nz;
 }
 
-//-----------------------------------------------------------------------------
-bool FECore::print_hb(CompactMatrix& m, FILE* fp)
-{
-	int nsize = m.Size();
-	int nnz = m.NonZeroes();
-
-	fwrite(&nsize, sizeof(nsize), 1, fp);
-	fwrite(&nnz, sizeof(nnz), 1, fp);
-	fwrite(m.Pointers(), sizeof(int)   , nsize+1, fp);
-	fwrite(m.Indices (), sizeof(int)   , nnz, fp);
-	fwrite(m.Values  (), sizeof(double), nnz, fp);
-
-	return true;
-}
-
 //=============================================================================
 // CompactSymmMatrix
 //=============================================================================
@@ -258,6 +243,37 @@ void FECore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<in
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FECore::write_hb(CompactMatrix& m, FILE* fp)
+{
+	int neq = m.Size();
+	int nnz = m.NonZeroes();
+
+	fwrite(&neq, sizeof(neq), 1, fp);
+	fwrite(&nnz, sizeof(nnz), 1, fp);
+	fwrite(m.Pointers(), sizeof(int)   , neq+1, fp);
+	fwrite(m.Indices (), sizeof(int)   , nnz, fp);
+	fwrite(m.Values  (), sizeof(double), nnz, fp);
+}
+
+//-----------------------------------------------------------------------------
+void FECore::read_hb(CompactSymmMatrix& m, FILE* fp)
+{
+	int neq, nnz;
+	fread(&neq, sizeof(neq), 1, fp);
+	fread(&nnz, sizeof(nnz), 1, fp);
+
+	int* pptr = new int[neq+1];
+	int* pind = new int[nnz];
+	double* pval = new double[nnz];
+
+	fread(pptr, sizeof(int)   , neq+1, fp);
+	fread(pind, sizeof(int)   , nnz, fp);
+	fread(pval, sizeof(double), nnz, fp);
+
+	m.Create(neq, nnz, pval, pind, pptr);
 }
 
 //=============================================================================

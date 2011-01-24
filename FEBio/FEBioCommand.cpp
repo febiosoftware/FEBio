@@ -164,13 +164,13 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 				CompactMatrix* pK = dynamic_cast<FECore::CompactMatrix*>(psolver->m_pK->GetSparseMatrixPtr());
 				if (pK)
 				{
-					printf("Writing stiffness matrix to %s ...", argv[2]);
+					printf("Writing sparse matrix to %s ...", argv[2]);
 					FILE* fp = fopen(argv[2], "wb");
-					print_hb(*pK, fp);
+					write_hb(*pK, fp);
 					fclose(fp);
 					printf("done!\n");
 				}
-				else printf("Don't know how to write sparse matrix K\n");
+				else printf("Don't know how to write sparse matrix type\n");
 			}
 			else printf("Incorrect number of arguments for print command\n");
 		}

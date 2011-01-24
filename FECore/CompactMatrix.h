@@ -21,7 +21,7 @@ public:
 		if (m_ppointers) delete [] m_ppointers; m_ppointers = 0;
 	}
 
-	void Create(int N, int nz, double* pv, int *pi, int* pp);
+	virtual void Create(int N, int nz, double* pv, int *pi, int* pp);
 
 	virtual void add(int i, int j, double v) = 0;
 
@@ -43,10 +43,6 @@ protected:
 	int		m_offset; // adjust array indices for fortran arrays
 };
 
-//-----------------------------------------------------------------------------
-//! Output Harwell-Boeing compact matrix
-bool print_hb(CompactMatrix& m, FILE* fp); 
-
 //=============================================================================
 //! This class stores a sparse matrix in Harwell-Boeing format.
 
@@ -59,6 +55,8 @@ public:
 	CompactSymmMatrix( int offset = 0 );
 
 	void Create(SparseMatrixProfile& mp);
+
+	void Create(int N, int nz, double* pv, int *pi, int* pp) { CompactMatrix::Create(N, nz, pv, pi, pp); }
 
 	void Assemble(matrix& ke, vector<int>& lm);
 
@@ -244,5 +242,13 @@ protected:
 	bool m_brow_based;
 
 };
+
+//-----------------------------------------------------------------------------
+//! Output Harwell-Boeing compact matrix
+void write_hb(CompactMatrix& m, FILE* fp); 
+
+//-----------------------------------------------------------------------------
+//! read Symmetric compact matrix data
+void read_hb(CompactSymmMatrix& m, FILE* fp);
 
 } // namespace FECore
