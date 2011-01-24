@@ -9,13 +9,13 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/LinearSolver.h"
+#include "FECore/BFGSSolver.h"
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
 #include "Timer.h"
 #include "FEException.h"
 #include "Interrupt.h"
-#include "BFGSSolver.h"
+using namespace FECore;
 
 //-----------------------------------------------------------------------------
 //! The solver class.

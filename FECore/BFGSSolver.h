@@ -1,9 +1,10 @@
 #pragma once
 
-#include "FECore/matrix.h"
-#include "FECore/vector.h"
-#include "FECore/LinearSolver.h"
-using namespace FECore;
+#include "matrix.h"
+#include "vector.h"
+#include "LinearSolver.h"
+
+namespace FECore {
 
 //-----------------------------------------------------------------------------
 //! The BFGSSolver solves a nonlinear system of equations using the BFGS method.
@@ -40,3 +41,5 @@ public:
 	matrix			m_W;
 	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
 };
+
+} // namespace FECore

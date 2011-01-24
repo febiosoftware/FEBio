@@ -1545,10 +1545,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\BFGSSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\biphasic.cpp"
 				>
 			</File>
@@ -2352,10 +2348,6 @@
 			>
 			<File
 				RelativePath=".\Archive.h"
-				>
-			</File>
-			<File
-				RelativePath=".\BFGSSolver.h"
 				>
 			</File>
 			<File

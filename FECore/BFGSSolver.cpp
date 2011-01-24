@@ -5,7 +5,7 @@
 // BFGSSolver
 //-----------------------------------------------------------------------------
 
-BFGSSolver::BFGSSolver()
+FECore::BFGSSolver::BFGSSolver()
 {
 	m_maxups = 10;
 	m_maxref = 15;
@@ -14,7 +14,7 @@ BFGSSolver::BFGSSolver()
 }
 
 //-----------------------------------------------------------------------------
-void BFGSSolver::Init(int neq, LinearSolver* pls)
+void FECore::BFGSSolver::Init(int neq, LinearSolver* pls)
 {
 	// allocate storage for BFGS update vectors
 	m_V.Create(m_maxups, neq);
@@ -37,7 +37,7 @@ void BFGSSolver::Init(int neq, LinearSolver* pls)
 //! be an indication of an ill-conditioned matrix and the update should
 //! not be performed.
 
-bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
+bool FECore::BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
 	int i;
 	double dg, dh,dgi, c, r;
@@ -92,7 +92,7 @@ bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector
 // The variable m_nups keeps track of how many updates have been made so far.
 // 
 
-void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
+void FECore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 {
 	int i, j;
 	double *vi, *wi, vr, wr;
