@@ -5,6 +5,7 @@
 #include "version.h"
 #include "FEException.h"
 #include "FECore/FECore.h"
+#include "FECore/CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_COMMAND(FEBioCmd_Cont   , "cont"   , "continues run");
@@ -140,7 +141,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 	assert(m_pfem);
 	FESolver* psolver = m_pfem->m_pStep->m_psolver;
 
-	if (nargs == 2)
+	if (nargs > 2)
 	{
 		if (strcmp(argv[1], "nnz") == 0)
 		{
@@ -154,6 +155,24 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 		else if (strcmp(argv[1], "time") == 0)
 		{
 			printf("Time : %lg\n", m_pfem->m_ftime);
+		}
+		else if (strcmp(argv[1], "K") == 0)
+		{
+			// print the stiffness matrix to file
+			if (nargs == 3)
+			{
+				CompactMatrix* pK = dynamic_cast<FECore::CompactMatrix*>(psolver->m_pK->GetSparseMatrixPtr());
+				if (pK)
+				{
+					printf("Writing stiffness matrix to %s ...", argv[2]);
+					FILE* fp = fopen(argv[2], "wb");
+					print_hb(*pK, fp);
+					fclose(fp);
+					printf("done!\n");
+				}
+				else printf("Don't know how to write sparse matrix K\n");
+			}
+			else printf("Incorrect number of arguments for print command\n");
 		}
 		else
 		{
