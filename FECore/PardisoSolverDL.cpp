@@ -12,7 +12,7 @@
 // PardisoSolver
 //////////////////////////////////////////////////////////////
 
-PardisoSolver::PardisoSolver()
+FECore::PardisoSolver::PardisoSolver()
 {
 	/* Make sure the solver is available */
 #ifndef PARDISODL
@@ -21,7 +21,7 @@ PardisoSolver::PardisoSolver()
 #endif
 }
 
-bool PardisoSolver::PreProcess()
+bool FECore::PardisoSolver::PreProcess()
 {
 	/* Make sure the solver is available */
 #ifndef PARDISODL
@@ -58,7 +58,7 @@ bool PardisoSolver::PreProcess()
 #endif
 }
 
-bool PardisoSolver::Factor()
+bool FECore::PardisoSolver::Factor()
 {
 	/* Make sure the solver is available */
 #ifndef PARDISODL
@@ -108,7 +108,7 @@ bool PardisoSolver::Factor()
 #endif
 }
 
-bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 {
 	/* Make sure the solver is available */
 #ifndef PARDISODL
@@ -135,7 +135,7 @@ bool PardisoSolver::Solve(vector<double>& x, vector<double>& b)
 #endif
 }
 
-void PardisoSolver::Destroy()
+void FECore::PardisoSolver::Destroy()
 {
 	/* Make sure the solver is available */
 #ifndef PARDISODL
