@@ -11,6 +11,9 @@ FECore::BFGSSolver::BFGSSolver()
 	m_maxref = 15;
 	m_cmax   = 1e5;
 	m_plinsolve = 0;
+
+	//------------------
+	m_pNLS = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -25,6 +28,26 @@ void FECore::BFGSSolver::Init(int neq, LinearSolver* pls)
 	m_H.resize(neq);
 
 	m_plinsolve = pls;
+}
+
+//-----------------------------------------------------------------------------
+// New initialization method
+void FECore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls)
+{
+	// allocate storage for BFGS update vectors
+	m_V.Create(m_maxups, neq);
+	m_W.Create(m_maxups, neq);
+
+	m_D.resize(neq);
+	m_G.resize(neq);
+	m_H.resize(neq);
+
+	m_neq = neq;
+	m_nups = 0;
+
+	m_plinsolve = pls;
+
+	m_pNLS = pNLS;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,4 +151,41 @@ void FECore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 		for (j=0; j<neq; ++j) vr += vi[j]*x[j];
 		for (j=0; j<neq; ++j) x[j] += wi[j]*vr;
 	}
+}
+
+//-----------------------------------------------------------------------------
+// New Solve routine
+void FECore::BFGSSolver::Solve()
+{
+	// create the initial jacobian matrix
+	SparseMatrix* pK = m_plinsolve->CreateSparseMatrix(SPARSE_SYMMETRIC);
+	m_pNLS->Jacobian(*pK);
+	m_plinsolve->PreProcess();
+	m_plinsolve->Factor();
+
+	// create the initial RHS vector
+	vector<double> F1(m_neq), F2(m_neq);
+	m_pNLS->Evaluate(F1);
+	for (int i=0; i<m_neq; ++i) F1[i] *= -1;
+
+	// solution increment vector
+	vector<double> u(m_neq);
+
+	// repeat until converged
+	do
+	{
+		// solve the equations
+		SolveEquations(u, F1);
+
+		if (m_pNLS->Update(u) == false)
+		{
+			m_pNLS->Evaluate(F2);
+			for (int i=0; i<m_neq; ++i) F2[i] *= -1;
+
+			Update(1.0, u, F1, F2);
+			F1 = F2;
+		}
+		else break;
+	}
+	while (true);
 }

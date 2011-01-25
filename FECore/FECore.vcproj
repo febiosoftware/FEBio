@@ -1319,6 +1319,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NonLinearSystem.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PardisoSolver.cpp"
 				>
 			</File>
@@ -1566,6 +1570,10 @@
 			</File>
 			<File
 				RelativePath=".\MatrixProfile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NonLinearSystem.h"
 				>
 			</File>
 			<File
