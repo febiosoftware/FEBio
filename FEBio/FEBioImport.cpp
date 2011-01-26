@@ -1089,8 +1089,21 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+//! Get the element type from a XML tag
+int FEBioGeometrySection::ElementType(XMLTag& t)
+{
+	if (t=="hex8"  ) return ET_HEX;
+	if (t=="penta6") return ET_PENTA;
+	if (t=="tet4"  ) return ET_TET;
+	if (t=="quad4" ) return ET_QUAD;
+	if (t=="tri3"  ) return ET_TRI;
+	if (t=="truss2") return ET_TRUSS;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
 //! find the domain type for the element and material type
-int FEBioGeometrySection::DomainType(XMLTag& t, FEMaterial* pmat)
+int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 {
 	FEM& fem = *GetFEM();
 	FEMesh* pm = &fem.m_mesh;
@@ -1098,34 +1111,34 @@ int FEBioGeometrySection::DomainType(XMLTag& t, FEMaterial* pmat)
 	// get the module
 	if (fem.m_pStep->m_nModule == FE_HEAT)
 	{
-		if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_HEAT_SOLID_DOMAIN;
-		else throw XMLReader::InvalidTag(t);
+		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
+		else return 0;
 	}
 	else
 	{
 		if (dynamic_cast<FERigidMaterial*>(pmat))
 		{
 			// rigid elements
-			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_RIGID_SOLID_DOMAIN;
-			else if ((t == "quad4") || (t == "tri3")) return FE_RIGID_SHELL_DOMAIN;
-			else throw XMLReader::InvalidTag(t);
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_RIGID_SOLID_DOMAIN;
+			else if ((etype == ET_QUAD) || (etype == ET_TRI)) return FE_RIGID_SHELL_DOMAIN;
+			else return 0;
 		}
 		else if (dynamic_cast<FEPoroElastic*>(pmat))
 		{
 			// poro-elastic elements
-			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_PORO_SOLID_DOMAIN;
-			else throw XMLReader::InvalidTag(t);
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_PORO_SOLID_DOMAIN;
+			else return 0;
 		}
 		else if (dynamic_cast<FEBiphasic*>(pmat))
 		{
 			// biphasic elements
-			if ((t == "hex8") || (t == "penta6") || (t == "tet4")) return FE_BIPHASIC_DOMAIN;
-			else throw XMLReader::InvalidTag(t);
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_BIPHASIC_DOMAIN;
+			else return 0;
 		}
 		else
 		{
 			// structural elements
-			if (t == "hex8")
+			if (etype == ET_HEX)
 			{
 				// three-field implementation for uncoupled materials
 				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && fem.m_b3field) return FE_3F_SOLID_DOMAIN;
@@ -1135,20 +1148,20 @@ int FEBioGeometrySection::DomainType(XMLTag& t, FEMaterial* pmat)
 					else return FE_SOLID_DOMAIN;
 				}
 			}
-			else if (t == "tet4")
+			else if (etype == ET_TET)
 			{
 				if (m_pim->m_ntet4 == FEFEBioImport::ET_UT4) return FE_UT4_DOMAIN;
 				else return FE_SOLID_DOMAIN;
 			}
-			else if (t == "penta6") 
+			else if (etype == ET_PENTA) 
 			{
 				// three-field implementation for uncoupled materials
 				if (dynamic_cast<FEUncoupledMaterial*>(pmat)) return FE_3F_SOLID_DOMAIN;
 				else return FE_SOLID_DOMAIN;
 			}
-			else if ((t == "quad4") || (t == "tri3")) return FE_SHELL_DOMAIN;
-			else if ((t == "truss2")) return FE_TRUSS_DOMAIN;
-			else throw XMLReader::InvalidTag(t);
+			else if ((etype == ET_QUAD) || (etype == ET_TRI)) return FE_SHELL_DOMAIN;
+			else if ((etype == ET_TRUSS)) return FE_TRUSS_DOMAIN;
+			else return 0;
 		}
 	}
 
@@ -1199,6 +1212,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 	int nmat;
 	int nel = 0;
 	FEDomain* pdom = 0;
+	int etype;
 	while (!t.isend())
 	{
 		// get the material ID
@@ -1213,8 +1227,13 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		if (pdom == 0) 
 		{
 			// if we don't, create a domain for the current element and material type
-			// first, find the domain type
-			int ntype = DomainType(t, pmat);
+			// first, get the element type
+			etype = ElementType(t);
+			if (etype < 0) throw XMLReader::InvalidTag(t);
+
+			// then, find the domain type depending on the 
+			// element and material types
+			int ntype = DomainType(etype, pmat);
 			if (ntype == 0) throw FEFEBioImport::InvalidDomainType();
 
 			// create the new domain
@@ -1227,9 +1246,12 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		else
 		{
 			// see if we can add this element to the domain
-			// note that the domain type and material must match
-			int ntype = DomainType(t, pmat);
-			if ((ntype == pdom->Type()) && (pmat == pdom->GetMaterial()))
+			// note that the element type, domain type and material must match
+			int et = ElementType(t);
+			if (et < 0) throw XMLReader::InvalidTag(t);
+
+			int ntype = DomainType(et, pmat);
+			if ((et == etype) && (ntype == pdom->Type()) && (pmat == pdom->GetMaterial()))
 			{
 				// yes, we can so increase element counter
 				++nel;
@@ -1243,6 +1265,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 				mesh.AddDomain(pdom);
 
 				// create a new domain
+				etype = et;
 				pdom = CreateDomain(ntype, &mesh, pmat);
 				if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
 

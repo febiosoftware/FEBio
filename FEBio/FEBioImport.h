@@ -75,6 +75,16 @@ protected:
 // Geometry Section
 class FEBioGeometrySection : public FileSection
 {
+private:
+	enum {
+		ET_HEX,
+		ET_PENTA,
+		ET_TET,
+		ET_QUAD,
+		ET_TRI,
+		ET_TRUSS
+	};
+
 public:
 	FEBioGeometrySection(FEFEBioImport* pim) : FileSection(pim){}
 	void Parse(XMLTag& tag);
@@ -89,7 +99,8 @@ protected:
 	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int gid, int nmat);
 	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int gid, int nmat);
 
-	int DomainType(XMLTag& tag, FEMaterial* pmat);
+	int ElementType(XMLTag& tag);
+	int DomainType(int etype, FEMaterial* pmat);
 	FEDomain* CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat);
 };
 
