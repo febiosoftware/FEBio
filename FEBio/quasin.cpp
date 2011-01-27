@@ -354,7 +354,19 @@ bool FESolidSolver::Quasin(double time)
 	double s;
 
 	// convergence norms
-	double normR1, normE1, normU, normu;
+	double	normR1;		// residual norm
+	double	normE1;		// energy norm
+	double	normU;		// displacement norm
+	double	normu;		// displacement increment norm
+	double	normRi;		// initial residual norm
+	double	normEi;		// initial energy norm
+	double	normEm;		// max energy norm
+	double	normUi;		// initial displacement norm
+
+	// poro convergence norms data
+	double	normPi;		// initial pressure norm
+	double	normP;		// current pressure norm
+	double	normp;		// incremement pressure norm
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
@@ -422,10 +434,10 @@ bool FESolidSolver::Quasin(double time)
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
-			m_normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
-			m_normEi = fabs(m_bfgs.m_ui*m_bfgs.m_R0);
-			m_normUi = fabs(m_bfgs.m_ui*m_bfgs.m_ui);
-			m_normEm = m_normEi;
+			normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
+			normEi = fabs(m_bfgs.m_ui*m_bfgs.m_R0);
+			normUi = fabs(m_bfgs.m_ui*m_bfgs.m_ui);
+			normEm = normEi;
 		}
 
 		// perform a linesearch
@@ -452,19 +464,19 @@ bool FESolidSolver::Quasin(double time)
 		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
 
 		// check residual norm
-		if ((m_Rtol > 0) && (normR1 > m_Rtol*m_normRi)) bconv = false;	
+		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
 
 		// check displacement norm
 		if ((m_Dtol > 0) && (normu  > (m_Dtol*m_Dtol)*normU )) bconv = false;
 
 		// check energy norm
-		if ((m_Etol > 0) && (normE1 > m_Etol*m_normEi)) bconv = false;
+		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
 
 		// check linestep size
 		if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
 
 		// check energy divergence
-		if (normE1 > m_normEm) bconv = false;
+		if (normE1 > normEm) bconv = false;
 
 		// check poroelastic convergence
 		if (bporo)
@@ -473,17 +485,17 @@ bool FESolidSolver::Quasin(double time)
 			GetPressureData(m_pi, m_bfgs.m_ui);
 
 			// set initial norm
-			if (m_niter == 0) m_normPi = fabs(m_pi*m_pi);
+			if (m_niter == 0) normPi = fabs(m_pi*m_pi);
 
 			// update total pressure
 			for (i=0; i<m_fem.m_npeq; ++i) m_Pi[i] += s*m_pi[i];
 
 			// calculate norms
-			m_normP = m_Pi*m_Pi;
-			m_normp = (m_pi*m_pi)*(s*s);
+			normP = m_Pi*m_Pi;
+			normp = (m_pi*m_pi)*(s*s);
 
 			// check convergence
-			if ((m_Ptol > 0) && (m_normp > (m_Ptol*m_Ptol)*m_normP)) bconv = false;
+			if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
 		}
 
 		// print convergence summary
@@ -497,12 +509,12 @@ bool FESolidSolver::Quasin(double time)
 		clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
 		clog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		clog.printf("\t   residual         %15le %15le %15le \n", m_normRi, normR1, m_Rtol*m_normRi);
-		clog.printf("\t   energy           %15le %15le %15le \n", m_normEi, normE1, m_Etol*m_normEi);
-		clog.printf("\t   displacement     %15le %15le %15le \n", m_normUi, normu ,(m_Dtol*m_Dtol)*normU );
+		clog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
+		clog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
+		clog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
 		if (bporo)
 		{
-			clog.printf("\t   fluid pressure   %15le %15le %15le \n", m_normPi, m_normp ,(m_Ptol*m_Ptol)*m_normP );
+			clog.printf("\t   fluid pressure   %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
 		}
 
 		clog.SetMode(oldmode);
@@ -524,14 +536,14 @@ bool FESolidSolver::Quasin(double time)
 				clog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
-			else if (normE1 > m_normEm)
+			else if (normE1 > normEm)
 			{
 				// check for diverging
 				clog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
-				m_normEm = normE1;
-				m_normEi = normE1;
-				m_normRi = normR1;
-				m_normPi = m_normp;
+				normEm = normE1;
+				normEi = normE1;
+				normRi = normR1;
+				normPi = normp;
 				breform = true;
 			}
 			else

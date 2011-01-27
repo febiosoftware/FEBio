@@ -117,17 +117,6 @@ public:
 	vector<double>	m_ci;	//!< concentration increment vector
 	vector<double>	m_Ci;	//!< Total concentration vector for iteration
 
-	// convergence norms
-	double		m_normRi;	//!< initial residual norm
-	double		m_normEi;	//!< initial energy norm
-	double		m_normEm;	//!< max energy norm
-	double		m_normUi;	//!< initial displacement norm
-
-	// poro data
-	double		m_normPi;	//!< initial pressure norm
-	double		m_normP;	//!< current pressure norm
-	double		m_normp;	//!< incremement pressure norm
-
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag
 };
