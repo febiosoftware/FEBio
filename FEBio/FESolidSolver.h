@@ -98,6 +98,7 @@ public:
 
 protected:
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
+	void GetConcentrationData(vector<double>& pi, vector<double>& ui);
 
 public:
 	//! serialize data to/from dump file

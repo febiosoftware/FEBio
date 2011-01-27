@@ -99,6 +99,7 @@ void FESolidSolver::PrepStep(double time)
 	// zero total displacements/pressures
 	zero(m_Ui);
 	zero(m_Pi);
+	zero(m_Ci);
 
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
@@ -107,6 +108,7 @@ void FESolidSolver::PrepStep(double time)
 		m_fem.m_mesh.Node(i).m_rp = m_fem.m_mesh.Node(i).m_rt;
 		m_fem.m_mesh.Node(i).m_vp = m_fem.m_mesh.Node(i).m_vt;
 		m_fem.m_mesh.Node(i).m_ap = m_fem.m_mesh.Node(i).m_at;
+		m_fem.m_mesh.Node(i).m_cp = m_fem.m_mesh.Node(i).m_ct;
 	}
 
 	// apply concentrated nodal forces
@@ -155,6 +157,11 @@ void FESolidSolver::PrepStep(double time)
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_fem.m_neq) 
 					ui[I] = dq - node.m_pt; 
+				break;
+			case 11: 
+				I = -node.m_ID[bc]-2;
+				if (I>=0 && I<m_fem.m_neq) 
+					ui[I] = dq - node.m_ct; 
 				break;
 			case 20:
 				{
@@ -368,12 +375,18 @@ bool FESolidSolver::Quasin(double time)
 	double	normP;		// current pressure norm
 	double	normp;		// incremement pressure norm
 
+	// solute convergence data
+	double	normCi;	// initial concentration norm
+	double	normC;	// current concentration norm
+	double	normc;	// incremement concentration norm
+
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
 
 	// poroelasticity flag
-	bool bporo = m_fem.m_pStep->m_nModule == FE_POROELASTIC;
+	bool bporo = (m_fem.m_pStep->m_nModule == FE_POROELASTIC) || (m_fem.m_pStep->m_nModule == FE_POROSOLUTE);
+	bool bsolu = m_fem.m_pStep->m_nModule == FE_POROSOLUTE;
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -498,6 +511,26 @@ bool FESolidSolver::Quasin(double time)
 			if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
 		}
 
+		// check solute convergence
+		if (bsolu)
+		{
+			// extract the pressure increments
+			GetConcentrationData(m_ci, m_bfgs.m_ui);
+			
+			// set initial norm
+			if (m_niter == 0) normCi = fabs(m_ci*m_ci);
+			
+			// update total pressure
+			for (i=0; i<m_fem.m_npeq; ++i) m_Ci[i] += s*m_ci[i];
+			
+			// calculate norms
+			normC = m_Ci*m_Ci;
+			normc = (m_ci*m_ci)*(s*s);
+			
+			// check convergence
+			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normC)) bconv = false;
+		}
+
 		// print convergence summary
 		oldmode = clog.GetMode();
 		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
@@ -515,6 +548,10 @@ bool FESolidSolver::Quasin(double time)
 		if (bporo)
 		{
 			clog.printf("\t   fluid pressure   %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
+		}
+		if (bsolu)
+		{
+			clog.printf("\t   solute concentration   %15le %15le %15le \n", normCi, normc ,(m_Ctol*m_Ctol)*normC );
 		}
 
 		clog.SetMode(oldmode);
@@ -544,6 +581,7 @@ bool FESolidSolver::Quasin(double time)
 				normEi = normE1;
 				normRi = normR1;
 				normPi = normp;
+				normCi = normc;
 				breform = true;
 			}
 			else
@@ -684,6 +722,24 @@ void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 			nid = (nid < -1 ? -nid-2 : nid);
 			pi[m++] = ui[nid];
 			assert(m <= (int) pi.size());
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FESolidSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui)
+{
+	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
+	zero(ci);
+	for (int i=0; i<N; ++i)
+	{
+		FENode& n = m_fem.m_mesh.Node(i);
+		nid = n.m_ID[11];
+		if (nid != -1)
+		{
+			nid = (nid < -1 ? -nid-2 : nid);
+			ci[m++] = ui[nid];
+			assert(m <= (int) ci.size());
 		}
 	}
 }
