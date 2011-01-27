@@ -2097,10 +2097,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\InitPoro.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\InitPoroSolute.cpp"
 				>
 			</File>
