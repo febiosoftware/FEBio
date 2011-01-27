@@ -88,11 +88,12 @@ void FEMicroMaterial::PrepRVE()
 		{
 			for (int j=0; j<3; ++j, ++NN)
 			{
-				FENodalDisplacement& dc = *m_rve.m_DC[NN];
-				dc.bc = j;
-				dc.lc = 0;	// we use the zeroth loadcurve
-				dc.node = i;
-				dc.s = 0;
+				FENodalDisplacement* pdc = new FENodalDisplacement();
+				pdc->bc = j;
+				pdc->lc = 0;	// we use the zeroth loadcurve
+				pdc->node = i;
+				pdc->s = 0;
+				m_rve.m_DC[NN] = pdc;
 			}
 		}
 
