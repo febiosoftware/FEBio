@@ -173,7 +173,7 @@ void FECore::BFGSSolver::Solve()
 
 		// update solution
 		if (m_LStol > 0) LineSearch();
-		else m_pNLS->Update(m_ui, 1.0);
+		else m_pNLS->Update(m_ui);
 
 		// check for convergence
 		bool bconv = true;
@@ -232,10 +232,14 @@ double FECore::BFGSSolver::LineSearch()
 		log.printf("       STEPSIZE     INITIAL        CURRENT         REQUIRED\n");
 	}
 */
+
+	// ul = ls*ui
+	vector<double> ul(m_ui.size());
 	do
 	{
 		// Update geometry
-		m_pNLS->Update(m_ui, s);
+		vcopys(ul, m_ui, s);
+		m_pNLS->Update(ul);
 
 		// calculate residual at this point
 		m_pNLS->Evaluate(m_R1);
@@ -250,7 +254,8 @@ double FECore::BFGSSolver::LineSearch()
 			s = 0.5;
 
 			// reupdate  
-			m_pNLS->Update(m_ui, s);
+			vcopys(ul, m_ui, s);
+			m_pNLS->Update(ul);
 
 			// recalculate residual at this point
 			m_pNLS->Evaluate(m_R1);
@@ -309,7 +314,8 @@ double FECore::BFGSSolver::LineSearch()
 		// max nr of iterations reached.
 		// we choose the line step that reached the smallest energy
 		s = smin;
-		m_pNLS->Update(m_ui, s);
+		vcopys(ul, m_ui, s);
+		m_pNLS->Update(ul);
 		m_pNLS->Evaluate(m_R1);
 	}
 /*

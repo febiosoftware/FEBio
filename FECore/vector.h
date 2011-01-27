@@ -19,5 +19,9 @@ double operator*(const vector<double>& a, const vector<double>& b);
 template<typename T> void zero(vector<T>& a) { fill(a.begin(), a.end(), T(0)); }
 template<typename T> void set(vector<T>& a, const T& v) { fill(a.begin(), a.end(), v); }
 vector<double>& operator += (vector<double>& a, const vector<double>& b);
+vector<double>& operator *= (vector<double>& a, double b);
+
+// copy vector and scale
+void vcopys(vector<double>& a, const vector<double>& b, double s);
 
 #endif // AFX_VECTOR_H__9F132D73_20B9_4AE9_A40B_EE4FB9D0FABD__INCLUDED_

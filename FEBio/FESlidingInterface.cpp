@@ -324,9 +324,6 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// loop over all slave nodes
 	for (i=0; i<ss.Nodes(); ++i)
 	{
@@ -1469,20 +1466,17 @@ bool FESlidingInterface::Augment(int naug)
 
 	if (naug == 0) normg0 = 0;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// calculate and print convergence norms
 	double lnorm = 0, gnorm = 0;
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
 	if (normg1 != 0) gnorm = fabs(normg1 - normg0)/normg1; else gnorm = fabs(normg1 - normg0);
 
-	log.printf(" sliding interface # %d\n", m_nID);
-	log.printf("                        CURRENT        REQUIRED\n");
-	log.printf("    normal force : %15le", lnorm);
-	if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
-	log.printf("    gap function : %15le", gnorm);
-	if (m_gtol > 0) log.printf("%15le\n", m_gtol); else log.printf("       ***\n");
+	clog.printf(" sliding interface # %d\n", m_nID);
+	clog.printf("                        CURRENT        REQUIRED\n");
+	clog.printf("    normal force : %15le", lnorm);
+	if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n");
+	clog.printf("    gap function : %15le", gnorm);
+	if (m_gtol > 0) clog.printf("%15le\n", m_gtol); else clog.printf("       ***\n");
 
 	// check convergence
 	bconv = true;

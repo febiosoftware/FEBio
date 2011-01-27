@@ -62,19 +62,16 @@ bool FEM::Restart(const char* szfile)
 		}
 	}
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// Open the log file for appending
-	if (log.append(m_szlog) == false)
+	if (clog.append(m_szlog) == false)
 	{
 		printf("WARNING: Could not reopen log file. A new log file is created\n");
-		log.open(m_szlog);
+		clog.open(m_szlog);
 		return false;
 	}
 
 	// inform the user from where the problem is restarted
-	log.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", m_ftime);
+	clog.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", m_ftime);
 
 	return true;
 }

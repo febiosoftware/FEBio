@@ -58,9 +58,6 @@ bool FEM::InitPoroSolute()
 		// let's go back
 		return true;
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// see if we are using the symmetric version or not
 	if (m_bsym_poro == false) 
 	{
@@ -70,7 +67,7 @@ bool FEM::InitPoroSolute()
 //		if (m_pStep->m_psolver->m_bfgs.m_maxups != 0)
 //		{
 //			m_pStep->m_psolver->m_bfgs.m_maxups = 0;
-//			log.printbox("WARNING", "The non-symmetric solver algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+//			clog.printbox("WARNING", "The non-symmetric solver algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 //		}
 	}
 	

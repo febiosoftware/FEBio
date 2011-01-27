@@ -13,7 +13,7 @@
 // displacements
 //
 
-void FESolidSolver::Update(vector<double>& ui, double s)
+void FESolidSolver::Update(vector<double>& ui)
 {
 	int i, n;
 
@@ -21,7 +21,7 @@ void FESolidSolver::Update(vector<double>& ui, double s)
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// update rigid bodies
-	UpdateRigidBodies(ui, s);
+	UpdateRigidBodies(ui);
 
 	// update flexible nodes
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -30,14 +30,14 @@ void FESolidSolver::Update(vector<double>& ui, double s)
 
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment  
-		if ((n = node.m_ID[0]) >= 0) node.m_rt.x = node.m_r0.x + m_Ut[n] + m_Ui[n] + s*ui[n];
-		if ((n = node.m_ID[1]) >= 0) node.m_rt.y = node.m_r0.y + m_Ut[n] + m_Ui[n] + s*ui[n];
-		if ((n = node.m_ID[2]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + s*ui[n];
+		if ((n = node.m_ID[0]) >= 0) node.m_rt.x = node.m_r0.x + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[1]) >= 0) node.m_rt.y = node.m_r0.y + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[2]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + ui[n];
 
 		// rotational dofs
-		if ((n = node.m_ID[3]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + s*ui[n];
-		if ((n = node.m_ID[4]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + s*ui[n];
-		if ((n = node.m_ID[5]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + s*ui[n];
+		if ((n = node.m_ID[3]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[4]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[5]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 
 	// make sure the prescribed displacements are fullfilled
@@ -134,10 +134,10 @@ void FESolidSolver::Update(vector<double>& ui, double s)
 	}
 
 	// update poroelastic data
-	if (m_fem.m_pStep->m_nModule == FE_POROELASTIC) UpdatePoro(ui, s);
+	if (m_fem.m_pStep->m_nModule == FE_POROELASTIC) UpdatePoro(ui);
 
 	// update solute-poroelastic data
-	if (m_fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui, s); UpdateSolute(ui, s); }
+	if (m_fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
 	
 	// update contact
 	if (m_fem.m_bcontact) m_fem.UpdateContact();
@@ -153,7 +153,7 @@ void FESolidSolver::Update(vector<double>& ui, double s)
 ///////////////////////////////////////////////////////////////////////////////
 //! Updates the poroelastic data
 
-void FESolidSolver::UpdatePoro(vector<double>& ui, double s)
+void FESolidSolver::UpdatePoro(vector<double>& ui)
 {
 	int i, n;
 
@@ -166,7 +166,7 @@ void FESolidSolver::UpdatePoro(vector<double>& ui, double s)
 
 		// update nodal pressures
 		n = node.m_ID[6];
-		if (n >= 0) node.m_pt = 0 + m_Ut[n] + m_Ui[n] + s*ui[n];
+		if (n >= 0) node.m_pt = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 
 	// update poro-elasticity data
@@ -200,7 +200,7 @@ void FESolidSolver::UpdatePoro(vector<double>& ui, double s)
 ///////////////////////////////////////////////////////////////////////////////
 //! Updates the rigid body data
 
-void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
+void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
 	int i, j, lc;
 
@@ -235,7 +235,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 						// TODO: do I need to take the line search step into account here?
 						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
 					}
-					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
+					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
 				}
 			}
 
@@ -257,7 +257,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 						// TODO: do I need to take the line search step into account here?
 						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
 					}
-					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + s*ui[lm[j]] : 0);
+					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
 				}
 			}
 
@@ -329,7 +329,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 ///////////////////////////////////////////////////////////////////////////////
 //! Updates the solute data
 
-void FESolidSolver::UpdateSolute(vector<double>& ui, double s)
+void FESolidSolver::UpdateSolute(vector<double>& ui)
 {
 	int i, n;
 	
@@ -342,7 +342,7 @@ void FESolidSolver::UpdateSolute(vector<double>& ui, double s)
 		
 		// update nodal concentration
 		n = node.m_ID[11];
-		if (n >= 0) node.m_ct = 0 + m_Ut[n] + m_Ui[n] + s*ui[n];
+		if (n >= 0) node.m_ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 	
 	// update solute data

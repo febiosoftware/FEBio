@@ -108,14 +108,11 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// get the element's material
 	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 
@@ -283,14 +280,11 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 			ke[4*i+2][4*j] = ks[3*i+2][3*j  ]; ke[4*i+2][4*j+1] = ks[3*i+2][3*j+1]; ke[4*i+2][4*j+2] = ks[3*i+2][3*j+2];
 		}
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// get the element's material
 	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 

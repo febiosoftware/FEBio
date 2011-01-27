@@ -17,3 +17,15 @@ vector<double>& operator += (vector<double>& a, const vector<double>& b)
 	for (size_t i = 0; i < a.size(); ++i) a[i] += b[i];
 	return a;
 }
+
+vector<double>& operator *= (vector<double>& a, double b)
+{
+	for (size_t i=0; i<a.size(); ++i) a[i] *= b;
+	return a;
+}
+
+void vcopys(vector<double>& a, const vector<double>& b, double s)
+{
+	a = b;
+	a *= s;
+}

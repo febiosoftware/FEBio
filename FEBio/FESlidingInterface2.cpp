@@ -214,9 +214,6 @@ void FESlidingInterface2::Init()
 
 	bool bporo = m_pfem->m_pStep->m_nModule == FE_POROELASTIC;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
@@ -228,7 +225,7 @@ void FESlidingInterface2::Init()
 		if (bporo && (m_pfem->m_pStep->m_psolver->m_bfgs.m_maxups != 0))
 		{
 			m_pfem->m_pStep->m_psolver->m_bfgs.m_maxups = 0;
-			log.printbox("WARNING", "The non-symmetric biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+			clog.printbox("WARNING", "The non-symmetric biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}
 
@@ -250,8 +247,7 @@ void FESlidingInterface2::Init()
 		m_fp = fopen(m_szdebug, "wt");
 		if (m_fp == 0) 
 		{
-			Logfile& log = GetLogfile();
-			log.printf("WARNING: unable to create debug file. No debug data will be stored.\n");
+			clog.printf("WARNING: unable to create debug file. No debug data will be stored.\n");
 			m_bdebug = false;
 		}
 		else
@@ -880,9 +876,6 @@ void FESlidingInterface2::ContactStiffness()
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// set higher order stiffness mutliplier
 	// NOTE: this algrotihm doesn't really need this
 	// but I've added this functionality to compare with the other contact 
@@ -894,7 +887,7 @@ void FESlidingInterface2::ContactStiffness()
 		if (nref >= ni)
 		{
 			knmult = 1; 
-			log.printf("Higher order stiffness terms included.\n");
+			clog.printf("Higher order stiffness terms included.\n");
 		}
 		else knmult = 0;
 	}
@@ -1396,17 +1389,16 @@ bool FESlidingInterface2::Augment(int naug)
 	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
 	if ((m_atol > 0) && (pnorm > m_atol)) bconv = false;
 
-	Logfile& log = GetLogfile();
-	log.printf(" sliding interface # %d\n", m_nID);
-	log.printf("                        CURRENT        REQUIRED\n");
-	log.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n");
-	if (bporo) { log.printf("    P gap       : %15le", pnorm); if (m_atol > 0) log.printf("%15le\n", m_atol); else log.printf("       ***\n"); }
+	clog.printf(" sliding interface # %d\n", m_nID);
+	clog.printf("                        CURRENT        REQUIRED\n");
+	clog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n");
+	if (bporo) { clog.printf("    P gap       : %15le", pnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n"); }
 
-	log.printf("    maximum gap  : %15le", maxgap);
-	if (m_gtol > 0) log.printf("%15le\n", m_gtol); else log.printf("       ***\n");
+	clog.printf("    maximum gap  : %15le", maxgap);
+	if (m_gtol > 0) clog.printf("%15le\n", m_gtol); else clog.printf("       ***\n");
 	if (bporo) {
-		log.printf("    maximum pgap : %15le", maxpg);
-		if (m_ptol > 0) log.printf("%15le\n", m_ptol); else log.printf("       ***\n");
+		clog.printf("    maximum pgap : %15le", maxpg);
+		if (m_ptol > 0) clog.printf("%15le\n", m_ptol); else clog.printf("       ***\n");
 	}
 	
 	return bconv;

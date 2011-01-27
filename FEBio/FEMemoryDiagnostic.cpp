@@ -38,9 +38,8 @@ bool FEMemoryDiagnostic::Run()
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
-	Logfile& log = GetLogfile();
-	Logfile::MODE nmode = log.GetMode();
-	GetLogfile().SetMode(Logfile::NEVER);
+	Logfile::MODE nmode = clog.GetMode();
+	clog.SetMode(Logfile::NEVER);
 
 	// turn the console off
 	Console::GetHandle()->Deactivate();

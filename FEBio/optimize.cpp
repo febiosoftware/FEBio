@@ -466,9 +466,7 @@ bool ReadScript(FEM& fem, XMLReader& xml, XMLTag& tag, FE_OPTIMIZE& opt)
 
 bool optimize(FEM& fem, const char* szfile)
 {
-	Logfile& log = GetLogfile();
-
-	log.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
+	clog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
 
 	// create an optimizer object
 	FEOptimizeData opt(fem);
@@ -483,9 +481,9 @@ bool optimize(FEM& fem, const char* szfile)
 	bool bret = opt.Solve();
 
 	if (bret)
-		log.printf(" N O R M A L   T E R M I N A T I O N\n\n");
+		clog.printf(" N O R M A L   T E R M I N A T I O N\n\n");
 	else 
-		log.printf(" E R R O R   T E R M I N A T I O N\n\n");
+		clog.printf(" E R R O R   T E R M I N A T I O N\n\n");
 
 	return bret;
 }

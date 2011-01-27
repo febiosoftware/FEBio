@@ -85,9 +85,6 @@ bool FEElasticSolidDomain::Initialize(FEM &fem)
 
 	bool bmerr = false;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// unpack element data
@@ -99,7 +96,7 @@ bool FEElasticSolidDomain::Initialize(FEM &fem)
 		}
 		catch (NegativeJacobian e)
 		{
-			log.printbox("F A T A L   E R R O R", "A negative jacobian was detected at\n integration point %d of element %d.\nDid you use the right node numbering?", e.m_iel, e.m_ng);
+			clog.printbox("F A T A L   E R R O R", "A negative jacobian was detected at\n integration point %d of element %d.\nDid you use the right node numbering?", e.m_iel, e.m_ng);
 			return false;
 		}
 
@@ -135,7 +132,7 @@ bool FEElasticSolidDomain::Initialize(FEM &fem)
 							if (fabs(m.det() - 1) > 1e-7)
 							{
 								// this element did not get specified a user-defined fiber direction
-								log.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+								clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
 								bmerr = true;
 							}
 						}
@@ -273,9 +270,6 @@ bool FEElasticShellDomain::Initialize(FEM& fem)
 
 	bool bmerr = false;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// unpack element data
@@ -311,7 +305,7 @@ bool FEElasticShellDomain::Initialize(FEM& fem)
 						if (fabs(m.det() - 1) > 1e-7)
 						{
 							// this element did not get specified a user-defined fiber direction
-							log.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
+							clog.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
 							bmerr = true;
 						}
 					}
@@ -441,7 +435,6 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 	vec3d* r0 = el.r0();
 	vec3d* vt = el.vt();
 	double* pt = el.pt();
-	double* ct = el.ct();
 
 	int N = el.Nodes();
 	vector<int>& lm = el.LM();
@@ -472,9 +465,6 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 		lm[7*N + 3*i+2] = -1;
 
 		lm[10*N + i] = id[10];
-		
-		// concentration dofs
-		lm[11*N + i] = id[11];
 	}
 
 	// copy nodal data to element arrays
@@ -495,9 +485,6 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 		// current nodal velocities
 		vt[i] = node.m_vt;
-		
-		// current nodal concentrations
-		ct[i] = node.m_ct;
 	}
 
 	// unpack the traits data
@@ -558,7 +545,6 @@ void FEDiscreteDomain::UnpackElement(FEElement &el, unsigned int nflag)
 	vec3d* r0 = el.r0();
 	vec3d* vt = el.vt();
 	double* pt = el.pt();
-	double* ct = el.ct();
 
 	int N = el.Nodes();
 	vector<int>& lm = el.LM();
@@ -589,9 +575,6 @@ void FEDiscreteDomain::UnpackElement(FEElement &el, unsigned int nflag)
 		lm[7*N + 3*i+2] = -1;
 
 		lm[10*N + i] = id[10];
-		
-		// concentration dofs
-		lm[11*N + i] = id[11];
 	}
 
 	// copy nodal data to element arrays
@@ -612,9 +595,6 @@ void FEDiscreteDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 		// current nodal velocities
 		vt[i] = node.m_vt;
-		
-		// current nodal concentrations
-		ct[i] = node.m_ct;
 	}
 
 	// unpack the traits data

@@ -323,6 +323,7 @@ public:
 		bool InitRigidBodies();
 
 		//! Initialize poroelastic/biphasic and solute data
+		bool InitPoro();
 		bool InitPoroSolute();
 
 		//! Initialize heat-conduction data

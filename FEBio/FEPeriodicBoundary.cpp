@@ -531,16 +531,13 @@ bool FEPeriodicBoundary::Augment(int naug)
 	normL1 = sqrt(normL1);
 	normgc = sqrt(normgc / N);
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// check convergence of constraints
-	log.printf(" tied interface # %d\n", m_nID);
-	log.printf("                        CURRENT        REQUIRED\n");
+	clog.printf(" tied interface # %d\n", m_nID);
+	clog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
-	log.printf("    normal force : %15le %15le\n", pctn, m_atol);
-	log.printf("    gap function : %15le       ***\n", normgc);
+	clog.printf("    normal force : %15le %15le\n", pctn, m_atol);
+	clog.printf("    gap function : %15le       ***\n", normgc);
 
 	if (pctn >= m_atol)
 	{

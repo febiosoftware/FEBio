@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 	if (ops.bsplash && (!ops.bsilent)) Hello(stdout);
 
 	// if silent mode only output to file
-	if (ops.bsilent) GetLogfile().SetMode(Logfile::FILE_ONLY);
+	if (ops.bsilent) clog.SetMode(Logfile::FILE_ONLY);
 
 	// if there are no arguments, print the FEBio prompt
 	if (argc == 1)

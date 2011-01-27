@@ -184,10 +184,7 @@ bool FEAnalysis::Init()
 		}
 	}
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	if (bdisp) log.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
+	if (bdisp) clog.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
 
 	// Sometimes an (ignorant) user might have added a rigid body
 	// that is not being used. Since this can cause problems we need
@@ -203,7 +200,7 @@ bool FEAnalysis::Init()
 	for (i=0; i<m_fem.m_nrb; ++i)
 		if (mec[i] == 0)
 		{
-			log.printbox("WARNING", "Rigid body %d is not being used.", m_fem.m_RB[i].m_mat+1);
+			clog.printbox("WARNING", "Rigid body %d is not being used.", m_fem.m_RB[i].m_mat+1);
 			m_fem.m_RB[i].m_bActive = false;
 		}
 
@@ -315,13 +312,10 @@ bool FEAnalysis::Init()
 //-----------------------------------------------------------------------------
 bool FEAnalysis::Solve()
 {
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)
 	{
-		log.printbox("FATAL ERROR","Initialization has failed.\nAborting run.\n");
+		clog.printbox("FATAL ERROR","Initialization has failed.\nAborting run.\n");
 		return false;
 	}
 
@@ -356,7 +350,7 @@ bool FEAnalysis::Solve()
 	{
 		printf("\nProgress:\n");
 		for (int i=0; i<50; ++i) printf("\xB0"); printf("\r");
-		log.SetMode(Logfile::FILE_ONLY);
+		clog.SetMode(Logfile::FILE_ONLY);
 	}
 
 	// if we restarted we need to update the timestep
@@ -423,43 +417,43 @@ bool FEAnalysis::Solve()
 		catch (ExitRequest)
 		{
 			bconv = false;
-			log.printbox("WARNING", "Early termination on user's request");
+			clog.printbox("WARNING", "Early termination on user's request");
 			break;
 		}
 		catch (ZeroDiagonal e)
 		{
 			bconv = false;
-			log.printbox("FATAL ERROR", "%s", e.m_szerr);
+			clog.printbox("FATAL ERROR", "%s", e.m_szerr);
 			break;
 		}
 		catch (NANDetected)
 		{
 			bconv = false;
-			log.printbox("FATAL ERROR", "NAN Detected. Run aborted.");
+			clog.printbox("FATAL ERROR", "NAN Detected. Run aborted.");
 			break;
 		}
 		catch (MemException e)
 		{
 			bconv = false;
 			if (e.m_falloc < 1024*1024)
-				log.printbox("FATAL ERROR", "Failed allocating %lg bytes", e.m_falloc);
+				clog.printbox("FATAL ERROR", "Failed allocating %lg bytes", e.m_falloc);
 			else
 			{
 				double falloc = e.m_falloc / (1024.0*1024.0);
-				log.printbox("FATAL ERROR", "Failed allocating %lg MB", falloc);
+				clog.printbox("FATAL ERROR", "Failed allocating %lg MB", falloc);
 			}
 			break;
 		}
 		catch (std::bad_alloc e)
 		{
 			bconv = false;
-			log.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
+			clog.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
 			break;
 		}
 		catch (...)
 		{
 			bconv = false;
-			log.printbox("FATAL ERROR", "An unknown exception has occured.\nThe program will now be terminated.");
+			clog.printbox("FATAL ERROR", "An unknown exception has occured.\nThe program will now be terminated.");
 			break;
 		}
 
@@ -472,7 +466,7 @@ bool FEAnalysis::Solve()
 		if (bconv)
 		{
 			// Yes! We have converged!
-			log.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
+			clog.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
@@ -500,12 +494,12 @@ bool FEAnalysis::Solve()
 				DumpFile ar;
 				if (ar.Create(m_fem.m_szdump) == false)
 				{
-					log.printf("WARNING: Failed creating restart point.\n");
+					clog.printf("WARNING: Failed creating restart point.\n");
 				}
 				else 
 				{
 					m_fem.Serialize(ar);
-					log.printf("\nRestart point created. DumpFile name is %s\n", m_fem.m_szdump);
+					clog.printf("\nRestart point created. DumpFile name is %s\n", m_fem.m_szdump);
 				}
 			}
 
@@ -518,7 +512,7 @@ bool FEAnalysis::Solve()
 		else 
 		{
 			// Report the sad news to the user.
-			log.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
+			clog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_nretries < m_maxretries))
@@ -532,7 +526,7 @@ bool FEAnalysis::Solve()
 			else 
 			{
 				// can't retry, so abort
-				if (m_nretries >= m_maxretries)	log.printf("Max. nr of retries reached.\n\n");
+				if (m_nretries >= m_maxretries)	clog.printf("Max. nr of retries reached.\n\n");
 
 				break;
 			}
@@ -548,7 +542,7 @@ bool FEAnalysis::Solve()
 
 		// flush the m_log file, so we don't loose anything if 
 		// the next timestep goes wrong
-		log.flush();
+		clog.flush();
 
 		bool bdebug = m_fem.GetDebugFlag();
 		if (nsteps>1)
@@ -561,22 +555,22 @@ bool FEAnalysis::Solve()
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
 	{
-		log.SetMode(Logfile::FILE_AND_SCREEN);
+		clog.SetMode(Logfile::FILE_AND_SCREEN);
 	}
 
 	// output report
-	log.printf("\n\nN O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
-	log.printf("\tNumber of time steps completed .................... : %d\n\n", m_ntimesteps);
-	log.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotiter);
-	log.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double) m_ntotiter / (double) m_ntimesteps);
-	log.printf("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotrhs);
-	log.printf("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotref);
+	clog.printf("\n\nN O N L I N E A R   I T E R A T I O N   I N F O R M A T I O N\n\n");
+	clog.printf("\tNumber of time steps completed .................... : %d\n\n", m_ntimesteps);
+	clog.printf("\tTotal number of equilibrium iterations ............ : %d\n\n", m_ntotiter);
+	clog.printf("\tAverage number of equilibrium iterations .......... : %lg\n\n", (double) m_ntotiter / (double) m_ntimesteps);
+	clog.printf("\tTotal number of right hand evaluations ............ : %d\n\n", m_ntotrhs);
+	clog.printf("\tTotal number of stiffness reformations ............ : %d\n\n", m_ntotref);
 
 	// get and print elapsed time
 	char sztime[64];
 
 	m_psolver->m_SolverTime.time_str(sztime);
-	log.printf("\tTime in solver: %s\n\n", sztime);
+	clog.printf("\tTime in solver: %s\n\n", sztime);
 
 	return bconv;
 }
@@ -694,10 +688,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 
 void FEAnalysis::Retry()
 {
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	log.printf("Retrying time step. Retry attempt %d of max %d\n\n", m_nretries+1, m_maxretries);
+	clog.printf("Retrying time step. Retry attempt %d of max %d\n\n", m_nretries+1, m_maxretries);
 
 	// adjust time step
 	static double ddt = 0;
@@ -708,7 +699,7 @@ void FEAnalysis::Retry()
 	if (m_naggr == 0) dtn = m_dt - ddt;
 	else dtn = m_dt*0.5;
 
-	log.printf("\nAUTO STEPPER: retry step, dt = %lg\n\n", dtn);
+	clog.printf("\nAUTO STEPPER: retry step, dt = %lg\n\n", dtn);
 
 	// increase retry counter
 	m_nretries++;
@@ -735,9 +726,6 @@ void FEAnalysis::AutoTimeStep(int niter)
 
 	double dtmax = lc.Value(told);
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	if (niter > 0)
 	{
 		double scale = sqrt((double) m_iteopt / (double) niter);
@@ -758,9 +746,9 @@ void FEAnalysis::AutoTimeStep(int niter)
 
 		// Report new time step size
 		if (dtn > m_dt)
-			log.printf("\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
+			clog.printf("\nAUTO STEPPER: increasing time step, dt = %lg\n\n", dtn);
 		else if (dtn < m_dt)
-			log.printf("\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
+			clog.printf("\nAUTO STEPPER: decreasing time step, dt = %lg\n\n", dtn);
 	}
 
 	// check for mustpoints
@@ -776,12 +764,12 @@ void FEAnalysis::AutoTimeStep(int niter)
 		if (tnew > tmust)
 		{
 			dtn = tmust - told;
-			log.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
+			clog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
 		}
 		else if (tnew > m_tend)
 		{
 			dtn = m_tend - told;
-			log.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
+			clog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
 		}
 	}
 

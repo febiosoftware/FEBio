@@ -86,8 +86,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	// return value
 	double fret = 0.0;
 
-	Logfile& log = GetLogfile();
-	log.SetMode(Logfile::FILE_AND_SCREEN);
+	clog.SetMode(Logfile::FILE_AND_SCREEN);
 
 	int niter = 1;
 
@@ -95,7 +94,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	{
 		// do the first call with lamda to intialize the minimization
 		double alamda = -1.0;
-		log.printf("\n----- Major Iteration: %d -----\n", 0);
+		clog.printf("\n----- Major Iteration: %d -----\n", 0);
 		mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
 
 		// repeat until converged
@@ -104,7 +103,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		int NMAX = 100;
 		do
 		{
-			log.printf("\n----- Major Iteration: %d -----\n", niter);
+			clog.printf("\n----- Major Iteration: %d -----\n", niter);
 			mrqmin(x, y, sig, a, covar, alpha, fret, objfun, alamda);
 
 			if (alamda < lam1)
@@ -113,10 +112,10 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 				{
 					double df = (fprev - fret)/(fprev + fret + 1);
 					if ( df < m_objtol) bconv = true;
-					log.printf("objective value: %lg (diff = %lg)\n\n", fret, df);
+					clog.printf("objective value: %lg (diff = %lg)\n\n", fret, df);
 				}
 			}
-			else log.printf("\n objective value: %lg\n\n", fret);
+			else clog.printf("\n objective value: %lg\n\n", fret);
 
 			fprev = fret;
 			lam1 = alamda;
@@ -132,33 +131,33 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	}
 	catch (FEErrorTermination)
 	{
-		log.printbox("F A T A L   E R R O R", "FEBio error terminated. Parameter optimization cannot continue.");
+		clog.printbox("F A T A L   E R R O R", "FEBio error terminated. Parameter optimization cannot continue.");
 		return false;
 	}
 
-	log.SetMode(Logfile::FILE_AND_SCREEN);
+	clog.SetMode(Logfile::FILE_AND_SCREEN);
 
-	log.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
+	clog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
-	log.printf("\tMajor iterations ....................... : %d\n\n", niter);
-	log.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
+	clog.printf("\tMajor iterations ....................... : %d\n\n", niter);
+	clog.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
 
-	log.printf("\tVariables:\n\n");
+	clog.printf("\tVariables:\n\n");
 	for (i=0; i<ma; ++i)
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
-		log.printf("\t\t%-15s : %.16lg\n", var.m_szname, a[i]);
+		clog.printf("\t\t%-15s : %.16lg\n", var.m_szname, a[i]);
 	}
 
 	// print reaction forces
-	log.printf("\n\tFunction values:\n\n");
-	log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+	clog.printf("\n\tFunction values:\n\n");
+	clog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 	for (i=0; i<ndata; ++i)
 	{
-		log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, m_yopt[i], y[i], fabs(m_yopt[i] - y[i]));
+		clog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, m_yopt[i], y[i], fabs(m_yopt[i] - y[i]));
 	}
 
-	log.printf("\n\tFinal objective value: %15lg\n\n", fret);
+	clog.printf("\n\tFinal objective value: %15lg\n\n", fret);
 
 	return true;
 }
@@ -168,8 +167,6 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 {
 	// get the optimization data
 	FEOptimizeData& opt = *m_pOpt;
-
-	Logfile& log = GetLogfile();
 
 	// evaluate at a
 	bool bret = FESolve(x, a, y);
@@ -219,34 +216,31 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 		*(var.m_pd) = a[i];
 	}
 
-	// suppress output
-	Logfile& log = GetLogfile();
-
-	log.SetMode(Logfile::FILE_AND_SCREEN);
-	log.printf("\n----- Iteration: %d -----\n", opt.m_niter);
+	clog.SetMode(Logfile::FILE_AND_SCREEN);
+	clog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 	for (int i=0; i<nvar; ++i) 
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
-		log.printf("%-15s = %lg\n", var.m_szname, a[i]);
+		clog.printf("%-15s = %lg\n", var.m_szname, a[i]);
 	}
 
 	// solve the FE problem
-	log.SetMode(Logfile::NEVER);
+	clog.SetMode(Logfile::NEVER);
 	Console* pwnd = Console::GetHandle();
 	pwnd->Deactivate();
 
 	bool bret = fem.Solve();
 
-	log.SetMode(Logfile::FILE_AND_SCREEN);
+	clog.SetMode(Logfile::FILE_AND_SCREEN);
 	if (bret)
 	{
 		FELoadCurve& rlc = opt.ReactionLoad();
 		int ndata = x.size();
-		log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+		clog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 		for (int i=0; i<ndata; ++i) 
 		{
 			y[i] = rlc.Value(x[i]);
-			log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
+			clog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, y[i], m_y0[i], fabs(y[i] - m_y0[i]));
 		}
 	}
 

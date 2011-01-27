@@ -100,9 +100,8 @@ void FEMicroMaterial::PrepRVE()
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
-	Logfile& log = GetLogfile();
-	Logfile::MODE nmode = log.GetMode();
-	GetLogfile().SetMode(Logfile::NEVER);
+	Logfile::MODE nmode = clog.GetMode();
+	clog.SetMode(Logfile::NEVER);
 
 	// initialize RVE
 	m_rve.Init();
@@ -130,7 +129,7 @@ void FEMicroMaterial::PrepRVE()
 	}
 
 	// reset the logfile mode
-	log.SetMode(nmode);
+	clog.SetMode(nmode);
 }
 
 //-----------------------------------------------------------------------------
@@ -143,9 +142,8 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
-	Logfile& log = GetLogfile();
-	Logfile::MODE nmode = log.GetMode();
-	GetLogfile().SetMode(Logfile::NEVER);
+	Logfile::MODE nmode = clog.GetMode();
+	clog.SetMode(Logfile::NEVER);
 
 	// reset the RVE
 	m_rve.Reset();
@@ -178,7 +176,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	m_rve.Solve();
 
 	// reset the logfile mode
-	log.SetMode(nmode);
+	clog.SetMode(nmode);
 
 	// reactivate the console
 	Console::GetHandle()->Activate();

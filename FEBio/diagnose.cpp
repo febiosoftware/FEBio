@@ -43,10 +43,8 @@ bool diagnose(FEM& fem, const char* szfile)
 	// the return value will designate that pass/fail result
 	bool bret = pdia->Run();
 
-	Logfile& log = GetLogfile();
-
-	if (bret) log.printf("Diagnostic passed\n");
-	else log.printf("Diagnostic failed\n");
+	if (bret) clog.printf("Diagnostic passed\n");
+	else clog.printf("Diagnostic failed\n");
 
 	return bret;
 }

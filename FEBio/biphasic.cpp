@@ -107,14 +107,11 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// get the element's material
 	FEBiphasic* pm = dynamic_cast<FEBiphasic*> (fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 	
@@ -297,14 +294,11 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 			ke[4*i+2][4*j] = ks[3*i+2][3*j  ]; ke[4*i+2][4*j+1] = ks[3*i+2][3*j+1]; ke[4*i+2][4*j+2] = ks[3*i+2][3*j+2];
 		}
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// get the element's material
 	FEBiphasic* pm = dynamic_cast<FEBiphasic*> (fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 	

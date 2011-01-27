@@ -37,23 +37,20 @@ bool FEM::Init()
 {
 	int i;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// Open the logfile
-	if (!log.is_valid()) 
+	if (!clog.is_valid()) 
 	{
-		if (log.open(m_szlog) == false)
+		if (clog.open(m_szlog) == false)
 		{
-			log.printbox("FATAL ERROR", "Failed creating log file");
+			clog.printbox("FATAL ERROR", "Failed creating log file");
 			return false;
 		}
 
 		// if we don't want to output anything we only output to the logfile
-		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
+		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) clog.SetMode(Logfile::FILE_ONLY);
 
 		// print welcome message to file
-		Hello(log);
+		Hello(clog);
 	}
 
 	// check step data
@@ -84,9 +81,9 @@ bool FEM::Init()
 	if (ni != 0) 
 	{
 		if (ni == 1)
-			log.printbox("WARNING", "%d isolated vertex removed.", ni);
+			clog.printbox("WARNING", "%d isolated vertex removed.", ni);
 		else
-			log.printbox("WARNING", "%d isolated vertices removed.", ni);
+			clog.printbox("WARNING", "%d isolated vertices removed.", ni);
 	}
 
 	// initialize rigid body data
@@ -127,7 +124,7 @@ bool FEM::Init()
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
-			log.printf("ERROR : Failed creating PLOT database\n");
+			clog.printf("ERROR : Failed creating PLOT database\n");
 			return false;
 		}
 	}
@@ -152,9 +149,6 @@ bool FEM::InitMaterials()
 {
 	int i;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// initialize material data
 	for (i=0; i<Materials(); ++i)
 	{
@@ -168,13 +162,13 @@ bool FEM::InitMaterials()
 		}
 		catch (MaterialError e)
 		{
-			log.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			log.printf("ERROR: %s\n\n", e.Error());
+			clog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			clog.printf("ERROR: %s\n\n", e.Error());
 			return false;
 		}
 		catch (...)
 		{
-			log.printf("A fatal error occured during material intialization\n\n");
+			clog.printf("A fatal error occured during material intialization\n\n");
 			return false;
 		}
 		
@@ -430,9 +424,6 @@ bool FEM::Reset()
 	m_pStep->m_ntimesteps = 0;		// time steps completed
 	m_pStep->m_ntotrhs    = 0;		// total nr of right hand side evaluations
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
@@ -440,7 +431,7 @@ bool FEM::Reset()
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
-			log.printf("ERROR : Failed creating PLOT database\n");
+			clog.printf("ERROR : Failed creating PLOT database\n");
 			return false;
 		}
 	}

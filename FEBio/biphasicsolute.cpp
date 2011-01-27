@@ -114,14 +114,11 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// get the element's material
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 	
@@ -238,14 +235,11 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		cp[i] = mesh.Node(el.m_node[i]).m_cp;
 	}
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// get the element's material
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 	
@@ -477,14 +471,11 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 			ke[5*i+2][5*j] = ks[3*i+2][3*j  ]; ke[5*i+2][5*j+1] = ks[3*i+2][3*j+1]; ke[5*i+2][5*j+2] = ks[3*i+2][3*j+2];
 		}
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// get the element's material
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (fem.GetMaterial(el.GetMatID()));
 	if (pm == 0)
 	{
-		log.printbox("FATAL ERROR", "Incorrect material type\n");
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
 	

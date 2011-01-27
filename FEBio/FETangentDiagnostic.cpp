@@ -76,10 +76,7 @@ bool FETangentDiagnostic::Run()
 
 	FEMesh& mesh = fem.m_mesh;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	Logfile::MODE oldmode = log.SetMode(Logfile::FILE_ONLY);
+	Logfile::MODE oldmode = clog.SetMode(Logfile::FILE_ONLY);
 
 	// get and initialize the first step
 	fem.m_Step[0]->Init();
@@ -103,19 +100,19 @@ bool FETangentDiagnostic::Run()
 	bd.ElementStiffness(fem, el, k0);
 
 	// print the element stiffness matrix
-	log.printf("\nActual stiffness matrix:\n");
-	print_matrix(log, k0);
+	clog.printf("\nActual stiffness matrix:\n");
+	print_matrix(clog, k0);
 
 	// now calculate the derivative of the residual
 	matrix k1;
 	deriv_residual(k1);
 
 	// print the approximate element stiffness matrix
-	log.printf("\nApproximate stiffness matrix:\n");
-	print_matrix(log, k1);
+	clog.printf("\nApproximate stiffness matrix:\n");
+	print_matrix(clog, k1);
 
 	// finally calculate the difference matrix
-	log.printf("\n");
+	clog.printf("\n");
 	matrix kd(24, 24);
 	double kmax = 0, kij;
 	int i0 = -1, j0 = -1, i, j;
@@ -133,12 +130,12 @@ bool FETangentDiagnostic::Run()
 		}
 
 	// print the difference
-	log.printf("\ndifference matrix:\n");
-	print_matrix(log, kd);
+	clog.printf("\ndifference matrix:\n");
+	print_matrix(clog, kd);
 
-	log.SetMode(oldmode);
+	clog.SetMode(oldmode);
 
-	log.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	clog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
 
 	return (kmax < 1e-3);
 }

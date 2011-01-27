@@ -67,14 +67,14 @@ bool FEHeatSolver::SolveStep(double time)
 
 	// update solution
 	// NOTE: m_u is not being used in Update!
-	Update(m_u, 1.0);
+	Update(m_u);
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! update solution
-void FEHeatSolver::Update(vector<double>& u, double s)
+void FEHeatSolver::Update(vector<double>& u)
 {
 	FEMesh& mesh = m_fem.m_mesh;
 

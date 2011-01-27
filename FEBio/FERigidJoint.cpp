@@ -196,16 +196,13 @@ bool FERigidJoint::Augment()
 
 	normF1 = sqrt(Lm*Lm);
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// check convergence of constraints
-	log.printf(" rigid joint # %d\n", m_nID);
-	log.printf("                  CURRENT        REQUIRED\n");
+	clog.printf(" rigid joint # %d\n", m_nID);
+	clog.printf("                  CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normF1) > 1e-10) pctn = fabs((normF1 - normF0)/normF1);
-	log.printf("    force : %15le %15le\n", pctn, m_atol);
-	log.printf("    gap   : %15le       ***\n", c.norm());
+	clog.printf("    force : %15le %15le\n", pctn, m_atol);
+	clog.printf("    gap   : %15le       ***\n", c.norm());
 		
 	if (pctn >= m_atol)
 	{

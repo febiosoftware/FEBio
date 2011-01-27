@@ -33,9 +33,6 @@ bool FESolidSolver::SolveStep(double time)
 {
 	bool bret;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	try
 	{
 		// let's try to call Quasin
@@ -44,38 +41,38 @@ bool FESolidSolver::SolveStep(double time)
 	catch (NegativeJacobian e)
 	{
 		// A negative jacobian was detected
-		log.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+		clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
 		if (m_fem.m_debug) m_fem.m_plot->Write(m_fem);
 		return false;
 	}
 	catch (MaxStiffnessReformations)
 	{
 		// max nr of reformations is reached
-		log.printbox("ERROR", "Max nr of reformations reached.");
+		clog.printbox("ERROR", "Max nr of reformations reached.");
 		return false;
 	}
 	catch (ForceConversion)
 	{
 		// user forced conversion of problem
-		log.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
+		clog.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
 		return true;
 	}
 	catch (IterationFailure)
 	{
 		// user caused a forced iteration failure
-		log.printbox("WARNING", "User forced iteration failure.");
+		clog.printbox("WARNING", "User forced iteration failure.");
 		return false;
 	}
 	catch (ZeroLinestepSize)
 	{
 		// a zero line step size was detected
-		log.printbox("ERROR", "Zero line step size.");
+		clog.printbox("ERROR", "Zero line step size.");
 		return false;
 	}
 	catch (EnergyDiverging)
 	{
 		// problem was diverging after stiffness reformation
-		log.printbox("ERROR", "Problem diverging uncontrollably.");
+		clog.printbox("ERROR", "Problem diverging uncontrollably.");
 		return false;
 	}
 
@@ -102,7 +99,6 @@ void FESolidSolver::PrepStep(double time)
 	// zero total displacements/pressures
 	zero(m_Ui);
 	zero(m_Pi);
-	zero(m_Ci);
 
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
@@ -111,7 +107,6 @@ void FESolidSolver::PrepStep(double time)
 		m_fem.m_mesh.Node(i).m_rp = m_fem.m_mesh.Node(i).m_rt;
 		m_fem.m_mesh.Node(i).m_vp = m_fem.m_mesh.Node(i).m_vt;
 		m_fem.m_mesh.Node(i).m_ap = m_fem.m_mesh.Node(i).m_at;
-		m_fem.m_mesh.Node(i).m_cp = m_fem.m_mesh.Node(i).m_ct;
 	}
 
 	// apply concentrated nodal forces
@@ -160,11 +155,6 @@ void FESolidSolver::PrepStep(double time)
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_fem.m_neq) 
 					ui[I] = dq - node.m_pt; 
-				break;
-			case 11: 
-				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_fem.m_neq) 
-					ui[I] = dq - node.m_ct; 
 				break;
 			case 20:
 				{
@@ -370,10 +360,9 @@ bool FESolidSolver::Quasin(double time)
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
 
-	// poroelasticity and solute flags
-	bool bporo = (m_fem.m_pStep->m_nModule == FE_POROELASTIC) || (m_fem.m_pStep->m_nModule == FE_POROSOLUTE);
-	bool bsolu = (m_fem.m_pStep->m_nModule == FE_POROSOLUTE);
-	
+	// poroelasticity flag
+	bool bporo = m_fem.m_pStep->m_nModule == FE_POROELASTIC;
+
 	// prepare for the first iteration
 	PrepStep(time);
 
@@ -401,20 +390,17 @@ bool FESolidSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	log.printf("\n===== beginning time step %d : %lg =====\n", m_fem.m_pStep->m_ntimesteps+1, m_fem.m_ftime);
+	clog.printf("\n===== beginning time step %d : %lg =====\n", m_fem.m_pStep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
 	{
-		oldmode = log.GetMode();
+		oldmode = clog.GetMode();
 		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) log.SetMode(Logfile::FILE_ONLY);
+			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
-		log.printf(" %d\n", m_niter+1);
-		log.SetMode(oldmode);
+		clog.printf(" %d\n", m_niter+1);
+		clog.SetMode(oldmode);
 
 		// assume we'll converge. 
 		bconv = true;
@@ -450,7 +436,7 @@ bool FESolidSolver::Quasin(double time)
 			s = 1;
 
 			// Update geometry
-			Update(m_bfgs.m_ui, s);
+			Update(m_bfgs.m_ui);
 
 			// calculate residual at this point
 			Residual(m_bfgs.m_R1);
@@ -500,50 +486,26 @@ bool FESolidSolver::Quasin(double time)
 			if ((m_Ptol > 0) && (m_normp > (m_Ptol*m_Ptol)*m_normP)) bconv = false;
 		}
 
-		// check solute convergence
-		if (bsolu)
-		{
-			// extract the concentration increments
-			GetSoluteData(m_ci, m_bfgs.m_ui);
-			
-			// set initial norm
-			if (m_niter == 0) m_normCi = fabs(m_ci*m_ci);
-			
-			// update total concentration
-			for (i=0; i<m_fem.m_nceq; ++i) m_Ci[i] += s*m_ci[i];
-			
-			// calculate norms
-			m_normC = m_Ci*m_Ci;
-			m_normc = (m_ci*m_ci)*(s*s);
-			
-			// check convergence
-			if ((m_Ctol > 0) && (m_normc > (m_Ctol*m_Ctol)*m_normC)) bconv = false;
-		}
-		
 		// print convergence summary
-		oldmode = log.GetMode();
+		oldmode = clog.GetMode();
 		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) log.SetMode(Logfile::FILE_ONLY);
+			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
-		log.printf(" Nonlinear solution status: time= %lg\n", time); 
-		log.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
-		log.printf("\tright hand side evaluations   = %d\n", m_nrhs);
-		log.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_bfgs.m_LStol > 0) log.printf("\tstep from line search         = %lf\n", s);
-		log.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		log.printf("\t   residual         %15le %15le %15le \n", m_normRi, normR1, m_Rtol*m_normRi);
-		log.printf("\t   energy           %15le %15le %15le \n", m_normEi, normE1, m_Etol*m_normEi);
-		log.printf("\t   displacement     %15le %15le %15le \n", m_normUi, normu ,(m_Dtol*m_Dtol)*normU );
+		clog.printf(" Nonlinear solution status: time= %lg\n", time); 
+		clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
+		clog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
+		clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
+		if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
+		clog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+		clog.printf("\t   residual         %15le %15le %15le \n", m_normRi, normR1, m_Rtol*m_normRi);
+		clog.printf("\t   energy           %15le %15le %15le \n", m_normEi, normE1, m_Etol*m_normEi);
+		clog.printf("\t   displacement     %15le %15le %15le \n", m_normUi, normu ,(m_Dtol*m_Dtol)*normU );
 		if (bporo)
 		{
-			log.printf("\t   fluid pressure   %15le %15le %15le \n", m_normPi, m_normp ,(m_Ptol*m_Ptol)*m_normP );
+			clog.printf("\t   fluid pressure   %15le %15le %15le \n", m_normPi, m_normp ,(m_Ptol*m_Ptol)*m_normP );
 		}
-		if (bsolu)
-		{
-			log.printf("\t   solute concentration %15le %15le %15le \n", m_normCi, m_normc ,(m_Ctol*m_Ctol)*m_normC );
-		}
-		
-		log.SetMode(oldmode);
+
+		clog.SetMode(oldmode);
 
 		// check if we have converged. 
 		// If not, calculate the BFGS update vectors
@@ -553,19 +515,19 @@ bool FESolidSolver::Quasin(double time)
 			{
 				// check for almost zero-residual on the first iteration
 				// this might be an indication that there is no force on the system
-				log.printbox("WARNING", "No force acting on the system.");
+				clog.printbox("WARNING", "No force acting on the system.");
 				bconv = true;
 			}
 			else if (s < m_bfgs.m_LSmin)
 			{
 				// check for zero linestep size
-				log.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
+				clog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
 			else if (normE1 > m_normEm)
 			{
 				// check for diverging
-				log.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
+				clog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
 				m_normEm = normE1;
 				m_normEi = normE1;
 				m_normRi = normR1;
@@ -585,7 +547,7 @@ bool FESolidSolver::Quasin(double time)
 							// Stiffness update has failed.
 							// this might be due a too large condition number
 							// or the update was no longer positive definite.
-							log.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
+							clog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
 							breform = true;
 						}
 					}
@@ -597,7 +559,7 @@ bool FESolidSolver::Quasin(double time)
 
 						// print a warning only if the user did not intent full-Newton
 						if (m_bfgs.m_maxups > 0)
-							log.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+							clog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 
 					}
 				}
@@ -612,7 +574,7 @@ bool FESolidSolver::Quasin(double time)
 			// reform stiffness matrices if necessary
 			if (breform)
 			{
-				log.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+				clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
 				// reform the matrix
 				if (ReformStiffness() == false) break;
@@ -628,7 +590,7 @@ bool FESolidSolver::Quasin(double time)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
 
-			log.printf("\n........................ augmentation # %d\n", m_naug+1);
+			clog.printf("\n........................ augmentation # %d\n", m_naug+1);
 
 			// do the augmentations
 			bconv = Augment();
@@ -652,7 +614,7 @@ bool FESolidSolver::Quasin(double time)
 				// reform the matrix if we are using full-Newton
 				if (m_fem.m_pStep->m_psolver->m_bfgs.m_maxups == 0)
 				{
-					log.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness() == false) break;
 				}
 			}
@@ -662,7 +624,7 @@ bool FESolidSolver::Quasin(double time)
 		m_niter++;
 
 		// let's flush the logfile to make sure the last output will not get lost
-		log.flush();
+		clog.flush();
 
 		// check for CTRL+C interruption
 		if (itr.m_bsig)
@@ -674,17 +636,17 @@ bool FESolidSolver::Quasin(double time)
 	while (bconv == false);
 
 	// when converged, 
-	// print a convergence summary to the log file
+	// print a convergence summary to the clog file
 	if (bconv)
 	{
-		Logfile::MODE mode = log.SetMode(Logfile::FILE_ONLY);
+		Logfile::MODE mode = clog.SetMode(Logfile::FILE_ONLY);
 		if (mode != Logfile::NEVER)
 		{
-			log.printf("\nconvergence summary\n");
-			log.printf("    number of iterations   : %d\n", m_niter);
-			log.printf("    number of reformations : %d\n", m_nref);
+			clog.printf("\nconvergence summary\n");
+			clog.printf("    number of iterations   : %d\n", m_niter);
+			clog.printf("    number of reformations : %d\n", m_nref);
 		}
-		log.SetMode(mode);
+		clog.SetMode(mode);
 	}
 
 	// if converged we update the total displacements
@@ -710,24 +672,6 @@ void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 			nid = (nid < -1 ? -nid-2 : nid);
 			pi[m++] = ui[nid];
 			assert(m <= (int) pi.size());
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FESolidSolver::GetSoluteData(vector<double> &ci, vector<double> &ui)
-{
-	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
-	zero(ci);
-	for (int i=0; i<N; ++i)
-	{
-		FENode& n = m_fem.m_mesh.Node(i);
-		nid = n.m_ID[11];
-		if (nid != -1)
-		{
-			nid = (nid < -1 ? -nid-2 : nid);
-			ci[m++] = ui[nid];
-			assert(m <= (int) ci.size());
 		}
 	}
 }
@@ -777,3 +721,4 @@ bool FESolidSolver::ReformStiffness()
 
 	return bret;
 }
+

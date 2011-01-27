@@ -122,10 +122,7 @@ bool FELinearConstraintSet::Augment(int naug)
 		p = fabs((L1 - L0)/L1);
 	else p = fabs(L1 - L0);
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	log.printf("linear constraint set %d: %15.7lg %15.7lg %15.7lg", m_nID, L0, fabs(L1 - L0), fabs(m_tol*L1));
+	clog.printf("linear constraint set %d: %15.7lg %15.7lg %15.7lg", m_nID, L0, fabs(L1 - L0), fabs(m_tol*L1));
 
 	if ((m_naugmax >= 0) && (naug >= m_naugmax)) return true;
 

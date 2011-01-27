@@ -204,38 +204,3 @@ public:
 	FEPlotShellThickness() : FEDomainData(FLOAT, FMT_MULT){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
-
-//=============================================================================
-//                         S U R F A C E   D A T A
-//=============================================================================
-
-//-----------------------------------------------------------------------------
-//! Contact gap
-//!
-class FEPlotContactGap : public FESurfaceData
-{
-public:
-	FEPlotContactGap() : FESurfaceData(FLOAT, FMT_MULT){}
-	bool Save(FESurface& surf, vector<float>& a);
-
-protected:
-	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
-	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
-	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
-	bool SaveTied        (FETiedContactSurface&	 s, vector<float>& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Contact pressure
-//!
-class FEPlotContactPressure : public FESurfaceData
-{
-public:
-	FEPlotContactPressure() : FESurfaceData(FLOAT, FMT_MULT){}
-	bool Save(FESurface& surf, vector<float>& a);
-
-protected:
-	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
-	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
-	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
-};

@@ -248,9 +248,6 @@ bool FEM::InitRigidBodies()
 		}
 	}
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// set up rigid joints
 	if (m_nrj > 0)
 	{
@@ -263,7 +260,7 @@ bool FEM::InitRigidBodies()
 			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
 			if (pm == 0)
 			{
-				log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+				clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
 				return false;
 			}
 			rj.m_nRBa = pm->m_nRB;
@@ -271,7 +268,7 @@ bool FEM::InitRigidBodies()
 			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBb));
 			if (pm == 0)
 			{
-				log.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+				clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
 				return false;
 			}
 			rj.m_nRBb = pm->m_nRB;

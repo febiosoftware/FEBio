@@ -77,9 +77,6 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// default element type for tets
 	m_ntet4 = ET_TET4;
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// Find the root element
 	XMLTag tag;
 	try
@@ -88,7 +85,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	}
 	catch (...)
 	{
-		log.printf("An error occured while finding the febio_spec tag.\nIs this a valid FEBio input file?\n\n");
+		clog.printf("An error occured while finding the febio_spec tag.\nIs this a valid FEBio input file?\n\n");
 		return false;
 	}
 
@@ -132,7 +129,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// --- XML Reader Exceptions ---
 	catch (XMLReader::XMLSyntaxError)
 	{
-		log.printf("FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
+		clog.printf("FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
 		return false;
 	}
 	catch (XMLReader::InvalidAttributeValue e)
@@ -141,65 +138,65 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		const char* sza = e.szatt;
 		const char* szv = e.szval;
 		int l = e.tag.m_nstart_line;
-		log.printf("FATAL ERROR: invalid value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
+		clog.printf("FATAL ERROR: invalid value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
 		return false;
 	}
 	catch (XMLReader::InvalidValue e)
 	{
-		log.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		clog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::MissingAttribute e)
 	{
-		log.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
+		clog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::UnmatchedEndTag e)
 	{
 		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
-		log.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+		clog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::EndOfBuffer e)
 	{
-		log.printf("FATAL ERROR: end of internal buffer reached.\n Value of %s is too big (line %d).\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		clog.printf("FATAL ERROR: end of internal buffer reached.\n Value of %s is too big (line %d).\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	// --- FEBio Exceptions ---
 	catch (InvalidVersion)
 	{
-		log.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
+		clog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
 		return false;
 	}
 	catch (InvalidMaterial e)
 	{
-		log.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
+		clog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
 		return false;
 	}
 	catch (XMLReader::InvalidTag e)
 	{
-		log.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		clog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (InvalidDomainType)	
 	{
-		log.printf("Fatal Error: Invalid domain type\n");
+		clog.printf("Fatal Error: Invalid domain type\n");
 		return false;
 	}
 	catch (FailedCreatingDomain)
 	{
-		log.printf("Fatal Error: Failed creating domain\n");
+		clog.printf("Fatal Error: Failed creating domain\n");
 		return false;
 	}
 	catch (InvalidElementType)
 	{
-		log.printf("Fatal Error: Invalid element type\n");
+		clog.printf("Fatal Error: Invalid element type\n");
 		return false;
 	}
 		// --- Unknown exceptions ---
 	catch (...)
 	{
-		log.printf("FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
+		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
 		return false;
 	}
 
@@ -533,9 +530,6 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 	}
 	while (!tag.isend());
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	// assign material pointers for nested materials
 	for (int i=0; i<fem.Materials(); ++i)
 	{
@@ -549,7 +543,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 			// make sure the base ID is valid
 			if ((nbase < 0) || (nbase >= fem.Materials()))
 			{
-				log.printbox("INPUT ERROR", "Invalid base material ID for material %d\n", i+1);
+				clog.printbox("INPUT ERROR", "Invalid base material ID for material %d\n", i+1);
 				throw XMLReader::Error();
 			}
 
@@ -559,7 +553,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 			// don't allow rigid bodies
 			if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
 			{
-				log.printbox("INPUT ERROR", "Invalid base material for material %d\n", i+1);
+				clog.printbox("INPUT ERROR", "Invalid base material for material %d\n", i+1);
 				throw XMLReader::Error();
 			}
 
@@ -584,7 +578,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 				// make sure the material ID is valid
 				if ((imat < 0) || (imat >= fem.Materials()) || (imat == i))
 				{
-					log.printbox("INPUT ERROR", "Invalid material ID %d in solid mixture %d\n",imat+1,i+1);
+					clog.printbox("INPUT ERROR", "Invalid material ID %d in solid mixture %d\n",imat+1,i+1);
 					throw XMLReader::Error();
 				}
 				
@@ -592,7 +586,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 				FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(fem.GetMaterial(imat));
 				if (pme == 0)
 				{
-					log.printbox("INPUT ERROR", "Invalid elastic material %d in solid mixture %d\n",imat+1,i+1);
+					clog.printbox("INPUT ERROR", "Invalid elastic material %d in solid mixture %d\n",imat+1,i+1);
 					throw XMLReader::Error();
 				}
 				else
@@ -947,9 +941,6 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 	const char* sztype = 0;
 	const char* szname = 0;
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// read the solid material
 	if (tag == "solid")
 	{
@@ -969,7 +960,7 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 		// don't allow rigid bodies
 		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
 		{
-			log.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		
@@ -1001,7 +992,7 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 		
 		if (pme == 0)
 		{
-			log.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		
@@ -1029,9 +1020,6 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 	const char* sztype = 0;
 	const char* szname = 0;
 	
-	// get the logfile
-	Logfile& log = GetLogfile();
-	
 	// read the solid material
 	if (tag == "solid")
 	{
@@ -1051,7 +1039,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		// don't allow rigid bodies
 		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
 		{
-			log.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		
@@ -1083,7 +1071,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		
 		if (pme == 0)
 		{
-			log.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		
@@ -1115,7 +1103,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		
 		if (pme == 0)
 		{
-			log.printbox("INPUT ERROR", "Invalid diffusivity %s in biphasic-solute material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid diffusivity %s in biphasic-solute material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		
@@ -1147,7 +1135,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		
 		if (pme == 0)
 		{
-			log.printbox("INPUT ERROR", "Invalid solubility %s in biphasic-solute material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid solubility %s in biphasic-solute material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		
@@ -1179,7 +1167,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		
 		if (pme == 0)
 		{
-			log.printbox("INPUT ERROR", "Invalid osmotic coefficient %s in biphasic-solute material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid osmotic coefficient %s in biphasic-solute material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		

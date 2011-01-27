@@ -2,5 +2,6 @@
 
 #include "Logfile.h"
 
-//! helper function to obtain a reference to the logfile
-inline Logfile& GetLogfile() { return *Logfile::GetInstance(); }
+//! get the one-and-only log file
+extern Logfile& clog;
+

@@ -29,13 +29,13 @@ public:
 
 public:
 	//{ --- NonLinearSystem overrides ---
-	//! Perform an update
-	void Update(vector<double>& ui, double s);
-	
-	//! Evaluate system, i.e. calculate residual
-	void Evaluate(vector<double>& R) { Residual(R); }
+		//! Perform an update
+		void Update(vector<double>& ui);
+
+		//! Evaluate system, i.e. calculate residual
+		void Evaluate(vector<double>& R) { Residual(R); }
 	//}
-	
+
 	//{ --- Solution functions ---
 
 		//! prepares the data for the first QN iteration
@@ -48,14 +48,14 @@ public:
 		void UpdateStresses();
 
 		//! Update poroelastic data
-		void UpdatePoro(vector<double>& ui, double s);
+		void UpdatePoro(vector<double>& ui);
 
 		//! Update rigid body data
-		void UpdateRigidBodies(vector<double>& ui, double s);
+		void UpdateRigidBodies(vector<double>& ui);
 
 		//! Update solute data
-		void UpdateSolute(vector<double>& ui, double s);
-	
+		void UpdateSolute(vector<double>& ui);
+
 		//! Lagrangian augmentation
 		bool Augment();
 	//}
@@ -98,7 +98,6 @@ public:
 
 protected:
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
-	void GetSoluteData(vector<double>& ci, vector<double>& ui);
 
 public:
 	//! serialize data to/from dump file
@@ -115,10 +114,9 @@ public:
 	vector<double>	m_pi;	//!< pressure increment vector
 	vector<double>	m_Pi;	//!< Total pressure vector for iteration
 
-	// concentration data
 	vector<double>	m_ci;	//!< concentration increment vector
 	vector<double>	m_Ci;	//!< Total concentration vector for iteration
-	
+
 	// convergence norms
 	double		m_normRi;	//!< initial residual norm
 	double		m_normEi;	//!< initial energy norm
@@ -130,11 +128,6 @@ public:
 	double		m_normP;	//!< current pressure norm
 	double		m_normp;	//!< incremement pressure norm
 
-	// solute data
-	double		m_normCi;	//!< initial concentration norm
-	double		m_normC;	//!< current concentration norm
-	double		m_normc;	//!< incremement concentration norm
-	
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag
 };

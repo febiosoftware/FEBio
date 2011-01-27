@@ -1549,6 +1549,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\biphasicsolute.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\colsol.cpp"
 				>
 			</File>
@@ -1625,6 +1629,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBiphasicSolute.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBodyForce.cpp"
 				>
 			</File>
@@ -1654,6 +1662,18 @@
 			</File>
 			<File
 				RelativePath=".\FEDiagnostic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiffConstIso.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiffConstOrtho.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiffRefIso.cpp"
 				>
 			</File>
 			<File
@@ -1725,7 +1745,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEFluxSurface.cpp"
+				RelativePath=".\FEFluidFluxSurface.cpp"
 				>
 			</File>
 			<File
@@ -1837,6 +1857,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEOsmCoefConst.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEParameterList.cpp"
 				>
 			</File>
@@ -1854,6 +1878,18 @@
 			</File>
 			<File
 				RelativePath=".\FEPermHolmesMow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPermRefIso.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPermRefOrtho.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPermRefTransIso.cpp"
 				>
 			</File>
 			<File
@@ -1950,6 +1986,14 @@
 			</File>
 			<File
 				RelativePath=".\FESolidSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FESolubConst.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FESoluteFluxSurface.cpp"
 				>
 			</File>
 			<File
@@ -2054,6 +2098,10 @@
 			</File>
 			<File
 				RelativePath=".\InitPoro.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InitPoroSolute.cpp"
 				>
 			</File>
 			<File
@@ -2443,6 +2491,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEDiffConstIso.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiffConstOrtho.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiffRefIso.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEDiscreteMaterial.h"
 				>
 			</File>
@@ -2507,11 +2567,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEFluxSurface.h"
+				RelativePath=".\FEFluidFluxSurface.h"
 				>
 			</File>
 			<File
 				RelativePath=".\FEFungOrthotropic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEGasserOgdenHolzapfel.h"
 				>
 			</File>
 			<File
@@ -2619,6 +2683,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEOsmCoefConst.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEParameterList.h"
 				>
 			</File>
@@ -2632,6 +2700,22 @@
 			</File>
 			<File
 				RelativePath=".\FEPermConstIso.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPermHolmesMow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPermRefIso.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPermRefOrtho.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPermRefTransIso.h"
 				>
 			</File>
 			<File
@@ -2704,6 +2788,14 @@
 			</File>
 			<File
 				RelativePath=".\FESolidSolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESolubConst.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESoluteFluxSurface.h"
 				>
 			</File>
 			<File

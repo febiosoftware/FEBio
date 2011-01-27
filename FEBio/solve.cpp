@@ -82,19 +82,16 @@ bool FEM::Solve()
 	// get and print elapsed time
 	char sztime[64];
 
-	// get the logfile
-	Logfile& log = GetLogfile();
-
 	m_TotalTime.time_str(sztime);
-	log.printf("\n Elapsed time : %s\n\n", sztime);
+	clog.printf("\n Elapsed time : %s\n\n", sztime);
 
 	if (bconv)
 	{
-		log.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
+		clog.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
 	}
 	else
 	{
-		log.printf("\n E R R O R   T E R M I N A T I O N\n\n");
+		clog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
 	}
 
 	pShell->SetTitle("(%s) %s - FEBio", (bconv?"NT":"ET"), m_szfile_title);
