@@ -382,10 +382,15 @@ void XMLReader::ReadTag(XMLTag& tag)
 void XMLReader::ReadValue(XMLTag& tag)
 {
 	char ch;
+	int n = 0;
 	if (!tag.isend())
 	{
 		char *sz = tag.m_szval;
-		while ((ch=GetChar())!='<') *sz++ = ch;
+		while ((ch=GetChar())!='<') 
+		{ 
+			*sz++ = ch; n++; 
+			if (n > MAX_TAG) throw EndOfBuffer(tag);
+		}
 		*sz=0;
 	}
 	else while ((ch=GetChar())!='<');

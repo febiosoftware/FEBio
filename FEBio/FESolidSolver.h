@@ -113,13 +113,9 @@ public:
 
 	// convergence norms
 	double		m_normRi;	//!< initial residual norm
-	double		m_normR1;	//!< current residual norm
 	double		m_normEi;	//!< initial energy norm
-	double		m_normE1;	//!< current energy norm
 	double		m_normEm;	//!< max energy norm
 	double		m_normUi;	//!< initial displacement norm
-	double		m_normU;	//!< current displacement norm
-	double		m_normu;	//!< incremement displacement norm
 
 	// poro data
 	double		m_normPi;	//!< initial pressure norm

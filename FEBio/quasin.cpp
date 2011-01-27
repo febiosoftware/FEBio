@@ -356,6 +356,9 @@ bool FESolidSolver::Quasin(double time)
 	int i;
 	double s;
 
+	// convergence norms
+	double normR1, normE1, normU, normu;
+
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
@@ -449,25 +452,25 @@ bool FESolidSolver::Quasin(double time)
 		for (i=0; i<m_fem.m_neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
 
 		// calculate norms
-		m_normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
-		m_normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
-		m_normU  = m_Ui*m_Ui;
-		m_normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
+		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
+		normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
+		normU  = m_Ui*m_Ui;
+		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
 
 		// check residual norm
-		if ((m_Rtol > 0) && (m_normR1 > m_Rtol*m_normRi)) bconv = false;	
+		if ((m_Rtol > 0) && (normR1 > m_Rtol*m_normRi)) bconv = false;	
 
 		// check displacement norm
-		if ((m_Dtol > 0) && (m_normu  > (m_Dtol*m_Dtol)*m_normU )) bconv = false;
+		if ((m_Dtol > 0) && (normu  > (m_Dtol*m_Dtol)*normU )) bconv = false;
 
 		// check energy norm
-		if ((m_Etol > 0) && (m_normE1 > m_Etol*m_normEi)) bconv = false;
+		if ((m_Etol > 0) && (normE1 > m_Etol*m_normEi)) bconv = false;
 
 		// check linestep size
 		if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
 
 		// check energy divergence
-		if (m_normE1 > m_normEm) bconv = false;
+		if (normE1 > m_normEm) bconv = false;
 
 		// check poroelastic convergence
 		if (bporo)
@@ -500,9 +503,9 @@ bool FESolidSolver::Quasin(double time)
 		log.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_bfgs.m_LStol > 0) log.printf("\tstep from line search         = %lf\n", s);
 		log.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		log.printf("\t   residual         %15le %15le %15le \n", m_normRi, m_normR1, m_Rtol*m_normRi);
-		log.printf("\t   energy           %15le %15le %15le \n", m_normEi, m_normE1, m_Etol*m_normEi);
-		log.printf("\t   displacement     %15le %15le %15le \n", m_normUi, m_normu ,(m_Dtol*m_Dtol)*m_normU );
+		log.printf("\t   residual         %15le %15le %15le \n", m_normRi, normR1, m_Rtol*m_normRi);
+		log.printf("\t   energy           %15le %15le %15le \n", m_normEi, normE1, m_Etol*m_normEi);
+		log.printf("\t   displacement     %15le %15le %15le \n", m_normUi, normu ,(m_Dtol*m_Dtol)*normU );
 		if (bporo)
 		{
 			log.printf("\t   fluid pressure   %15le %15le %15le \n", m_normPi, m_normp ,(m_Ptol*m_Ptol)*m_normP );
@@ -514,7 +517,7 @@ bool FESolidSolver::Quasin(double time)
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			if ((m_normR1 < m_Rmin))
+			if ((normR1 < m_Rmin))
 			{
 				// check for almost zero-residual on the first iteration
 				// this might be an indication that there is no force on the system
@@ -527,13 +530,13 @@ bool FESolidSolver::Quasin(double time)
 				log.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
-			else if (m_normE1 > m_normEm)
+			else if (normE1 > m_normEm)
 			{
 				// check for diverging
 				log.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
-				m_normEm = m_normE1;
-				m_normEi = m_normE1;
-				m_normRi = m_normR1;
+				m_normEm = normE1;
+				m_normEi = normE1;
+				m_normRi = normR1;
 				m_normPi = m_normp;
 				breform = true;
 			}

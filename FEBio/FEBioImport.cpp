@@ -160,6 +160,11 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		log.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
 		return false;
 	}
+	catch (XMLReader::EndOfBuffer e)
+	{
+		log.printf("FATAL ERROR: end of internal buffer reached.\n Value of %s is too big (line %d).\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
 	// --- FEBio Exceptions ---
 	catch (InvalidVersion)
 	{
@@ -191,7 +196,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		log.printf("Fatal Error: Invalid element type\n");
 		return false;
 	}
-	// --- Unknown exceptions ---
+		// --- Unknown exceptions ---
 	catch (...)
 	{
 		log.printf("FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());

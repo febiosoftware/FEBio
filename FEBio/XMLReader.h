@@ -106,6 +106,13 @@ public:
 		UnmatchedEndTag(XMLTag& t) : tag(t) {}
 	};
 
+	class EndOfBuffer
+	{
+	public:
+		XMLTag tag;
+		EndOfBuffer(XMLTag& t) : tag(t) {}
+	};
+
 	class InvalidTag
 	{
 	public:
