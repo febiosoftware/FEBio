@@ -151,7 +151,9 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
 
 		// skip rigid elements and poro-elastic elements
-		if (dynamic_cast<FEPoroElastic*>(pmat) == 0)
+		if ((dynamic_cast<FEPoroElastic*>(pmat) == 0) && 
+			(dynamic_cast<FEBiphasic*>(pmat) == 0) &&
+			(dynamic_cast<FEBiphasicSolute*>(pmat) == 0))
 		{
 			// create the element's stiffness matrix
 			int ndof = 6*el.Nodes();
@@ -230,7 +232,10 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 
 	// see if this is a poroelastic material
 	bool bporo = false;
-	if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && (dynamic_cast<FEPoroElastic*>(pm))) bporo = true;
+	if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && 
+		((dynamic_cast<FEPoroElastic*>(pm)) ||
+		(dynamic_cast<FEBiphasic*>(pm)) ||
+		(dynamic_cast<FEBiphasicSolute*>(pm)))) bporo = true;
 
 	// calculate element stiffness matrix
 	ke.zero();
@@ -582,6 +587,7 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	vec3d* D0 = se.D0();
 	vec3d* Dt = se.Dt();
 	double* pt = se.pt();
+	double* ct = se.ct();
 
 	int N = se.Nodes();
 	vector<int>& lm = se.LM();
@@ -612,6 +618,9 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 		lm[7*N + 3*i+2] = id[9];
 
 		lm[10*N + i] = id[10];
+		
+		// concentration dof
+		lm[11*N + i] = id[11];
 	}
 
 	// copy nodal data to element arrays
@@ -633,6 +642,9 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 		// current nodal velocities
 		vt[i] = node.m_vt;
 
+		// current nodal concentrations
+		ct[i] = node.m_ct;
+		
 		// intial director
 		D0[i] = node.m_D0;
 

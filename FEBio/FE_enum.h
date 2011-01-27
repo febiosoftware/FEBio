@@ -74,7 +74,8 @@ enum FE_Linear_Solver_Type {
 enum FE_Module_Type {
 	FE_SOLID,
 	FE_POROELASTIC,
-	FE_HEAT
+	FE_HEAT,
+	FE_POROSOLUTE
 };
 
 ///////////////////////////////////////////////////////////////////////////////

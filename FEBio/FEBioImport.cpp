@@ -276,6 +276,7 @@ void FEBioControlSection::Parse(XMLTag& tag)
 		else if (tag == "step_size"         ) tag.value(pstep->m_dt0);
 		else if (tag == "dtol"              ) tag.value(pstep->m_psolver->m_Dtol);
 		else if (tag == "ptol"              ) tag.value(pstep->m_psolver->m_Ptol);
+		else if (tag == "ctol"              ) tag.value(pstep->m_psolver->m_Ctol);
 		else if (tag == "etol"              ) tag.value(pstep->m_psolver->m_Etol);
 		else if (tag == "rtol"              ) tag.value(pstep->m_psolver->m_Rtol);
 		else if (tag == "min_residual"      ) tag.value(pstep->m_psolver->m_Rmin);
@@ -659,8 +660,11 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// read rigid body data
 			if (!bfound && dynamic_cast<FERigidMaterial*>(pmat)) bfound = ParseRigidMaterial(tag, dynamic_cast<FERigidMaterial*>(pmat));
 
-			// additional elastic material parameters
+			// biphasic material parameters
 			if (!bfound && dynamic_cast<FEBiphasic*>(pmat)) bfound = ParseBiphasicMaterial(tag, dynamic_cast<FEBiphasic*>(pmat));
+			
+			// biphasic-solute material parameters
+			if (!bfound && dynamic_cast<FEBiphasicSolute*>(pmat)) bfound = ParseBiphasicSoluteMaterial(tag, dynamic_cast<FEBiphasicSolute*>(pmat));
 			
 			// see if we have processed the tag
 			if (bfound == false) throw XMLReader::InvalidTag(tag);
@@ -1017,6 +1021,184 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Parse FEBiphasicSolute material 
+//
+bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSolute *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	
+	// get the logfile
+	Logfile& log = GetLogfile();
+	
+	// read the solid material
+	if (tag == "solid")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an elastic material)
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			log.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solid material pointer
+		pm->m_pSolid = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "permeability")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a permeability material)
+		FEHydraulicPermeability* pme = dynamic_cast<FEHydraulicPermeability*>(pmat);
+		
+		if (pme == 0)
+		{
+			log.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the permeability pointer
+		pm->m_pPerm = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "diffusivity")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a diffusivity material)
+		FESoluteDiffusivity* pme = dynamic_cast<FESoluteDiffusivity*>(pmat);
+		
+		if (pme == 0)
+		{
+			log.printbox("INPUT ERROR", "Invalid diffusivity %s in biphasic-solute material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the diffusivity pointer
+		pm->m_pDiff = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "solubility")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a solubility material)
+		FESoluteSolubility* pme = dynamic_cast<FESoluteSolubility*>(pmat);
+		
+		if (pme == 0)
+		{
+			log.printbox("INPUT ERROR", "Invalid solubility %s in biphasic-solute material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solubility pointer
+		pm->m_pSolub = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "osmotic_coefficient")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
+		FEOsmoticCoefficient* pme = dynamic_cast<FEOsmoticCoefficient*>(pmat);
+		
+		if (pme == 0)
+		{
+			log.printbox("INPUT ERROR", "Invalid osmotic coefficient %s in biphasic-solute material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the osmotic coefficient pointer
+		pm->m_pOsmC = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
+}
+
 //=============================================================================
 //
 //                       G E O M E T R Y   S E C T I O N
@@ -1140,6 +1322,12 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_BIPHASIC_DOMAIN;
 			else return 0;
 		}
+		else if (dynamic_cast<FEBiphasicSolute*>(pmat))
+		{
+			// biphasic elements
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_BIPHASIC_SOLUTE_DOMAIN;
+			else return 0;
+		}
 		else
 		{
 			// structural elements
@@ -1181,17 +1369,18 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 	FEDomain* pd = 0;
 	switch (ntype)
 	{
-	case FE_SOLID_DOMAIN      : pd = new FEElasticSolidDomain      (pm, pmat); break;
-	case FE_SHELL_DOMAIN      : pd = new FEElasticShellDomain      (pm, pmat); break;
-	case FE_TRUSS_DOMAIN      : pd = new FEElasticTrussDomain      (pm, pmat); break;
-	case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain        (pm, pmat); break;
-	case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain        (pm, pmat); break;
-	case FE_UDGHEX_DOMAIN     : pd = new FEUDGHexDomain            (pm, pmat); break;
-	case FE_UT4_DOMAIN        : pd = new FEUT4Domain               (pm, pmat); break;
-	case FE_PORO_SOLID_DOMAIN : pd = new FEPoroSolidDomain         (pm, pmat); break;
-	case FE_HEAT_SOLID_DOMAIN : pd = new FEHeatSolidDomain         (pm, pmat); break;
-	case FE_3F_SOLID_DOMAIN   : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
-	case FE_BIPHASIC_DOMAIN   : pd = new FEBiphasicDomain          (pm, pmat); break;
+	case FE_SOLID_DOMAIN          : pd = new FEElasticSolidDomain      (pm, pmat); break;
+	case FE_SHELL_DOMAIN          : pd = new FEElasticShellDomain      (pm, pmat); break;
+	case FE_TRUSS_DOMAIN          : pd = new FEElasticTrussDomain      (pm, pmat); break;
+	case FE_RIGID_SOLID_DOMAIN    : pd = new FERigidSolidDomain        (pm, pmat); break;
+	case FE_RIGID_SHELL_DOMAIN    : pd = new FERigidShellDomain        (pm, pmat); break;
+	case FE_UDGHEX_DOMAIN         : pd = new FEUDGHexDomain            (pm, pmat); break;
+	case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (pm, pmat); break;
+	case FE_PORO_SOLID_DOMAIN     : pd = new FEPoroSolidDomain         (pm, pmat); break;
+	case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (pm, pmat); break;
+	case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
+	case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicDomain          (pm, pmat); break;
+	case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (pm, pmat); break;
 	}
 
 	// return the domain
@@ -1769,8 +1958,9 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 		else if (tag == "force"                ) ParseBCForce             (tag);
 		else if (tag == "pressure"             ) ParseBCPressure          (tag);
 		else if (tag == "traction"             ) ParseBCTraction          (tag);
-		else if (tag == "normal_traction" ) ParseBCPoroNormalTraction(tag);
+		else if (tag == "normal_traction"      ) ParseBCPoroNormalTraction(tag);
 		else if (tag == "fluidflux"            ) ParseBCFluidFlux         (tag);
+		else if (tag == "soluteflux"           ) ParseBCSoluteFlux        (tag);
 		else if (tag == "heatflux"             ) ParseBCHeatFlux          (tag);
 		else if (tag == "contact"              ) ParseContactSection      (tag);
 		else if (tag == "linear_constraint"    ) ParseConstraints         (tag);
@@ -1812,6 +2002,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		else if (strcmp(sz, "uw") == 0) { node.m_ID[3] = node.m_ID[5] = -1; }
 		else if (strcmp(sz, "uvw") == 0) { node.m_ID[3] = node.m_ID[4] = node.m_ID[5] = -1; }
 		else if (strcmp(sz, "t") == 0) node.m_ID[10] = -1;
+		else if (strcmp(sz, "c") == 0) { node.m_ID[11] = -1; }
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 		++tag;
 	}
@@ -1838,8 +2029,9 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		if      (strcmp(sz, "x") == 0) bc = 0;
 		else if (strcmp(sz, "y") == 0) bc = 1;
 		else if (strcmp(sz, "z") == 0) bc = 2;
-		else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
+		else if (strcmp(sz, "p") == 0) bc = 6;
 		else if (strcmp(sz, "t") == 0) bc = 10; 
+		else if (strcmp(sz, "c") == 0) bc = 11;
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 		sz = tag.AttributeValue("lc", true);
@@ -1883,8 +2075,9 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 		if      (strcmp(sz, "x") == 0) bc = 0;
 		else if (strcmp(sz, "y") == 0) bc = 1;
 		else if (strcmp(sz, "z") == 0) bc = 2;
-		else if (strcmp(sz, "p") == 0) bc = 6;	// GAA
+		else if (strcmp(sz, "p") == 0) bc = 6;
 		else if (strcmp(sz, "t") == 0) bc = 10;
+		else if (strcmp(sz, "c") == 0) bc = 11;
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 		sz = tag.AttributeValue("lc", true);
@@ -2123,8 +2316,8 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	while (!t.isend()) { nfr++; ++t; }
 	
 	// allocate fluid flux data
-	fem.m_fsurf = new FEFluxSurface(&fem.m_mesh);
-	FEFluxSurface& fs = *fem.m_fsurf;
+	fem.m_fsurf = new FEFluidFluxSurface(&fem.m_mesh);
+	FEFluidFluxSurface& fs = *fem.m_fsurf;
 	fs.create(nfr);
 	
 	// read the fluid flux data
@@ -2137,6 +2330,66 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 		FESurfaceElement& el = fem.m_fsurf->Element(i);
 		fc.blinear = blinear;
 		fc.mixture = mixture;
+		
+		sz = tag.AttributeValue("lc", true);
+		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
+		
+		s  = atof(tag.AttributeValue("scale"));
+		fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
+		
+		if (tag == "quad4") el.SetType(FE_QUAD);
+		else if (tag == "tri3") el.SetType(FE_TRI);
+		else throw XMLReader::InvalidTag(tag);
+		
+		N = el.Nodes();
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+		
+		// add this boundary condition to the current step
+		if (m_pim->m_nsteps > 0)
+		{
+			GetStep()->AddBoundaryCondition(&fc);
+			fc.Deactivate();
+		}
+		
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
+{
+	FEM& fem = *GetFEM();
+	
+	const char* sz;
+	bool blinear = false;
+	sz = tag.AttributeValue("type", true);
+	if (sz)
+	{
+		if (strcmp(sz, "linear") == 0) blinear = true;
+		else if (strcmp(sz, "nonlinear") == 0) blinear = false;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+	}
+	
+	// count how many fluid flux cards there are
+	int nfr = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { nfr++; ++t; }
+	
+	// allocate fluid flux data
+	fem.m_ssurf = new FESoluteFluxSurface(&fem.m_mesh);
+	FESoluteFluxSurface& fs = *fem.m_ssurf;
+	fs.create(nfr);
+	
+	// read the fluid flux data
+	++tag;
+	int nf[4], N;
+	double s;
+	for (int i=0; i<nfr; ++i)
+	{
+		FESoluteFlux& fc = fs.SoluteFlux(i);
+		FESurfaceElement& el = fem.m_ssurf->Element(i);
+		fc.blinear = blinear;
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
@@ -2931,6 +3184,23 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					vec3d v;
 					tag.value(v);
 					mesh.Node(nid).m_v0 += v;
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else if (tag == "concentration")
+		{
+			++tag;
+			do
+			{
+				if (tag == "node")
+				{
+					int nid = atoi(tag.AttributeValue("id"))-1;
+					double c;
+					tag.value(c);
+					mesh.Node(nid).m_c0 += c;
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;

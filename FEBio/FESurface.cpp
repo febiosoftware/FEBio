@@ -123,6 +123,7 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 	vec3d* r0 = el.r0();
 	vec3d* vt = el.vt();
 	double* pt = el.pt();
+	double* ct = el.ct();
 
 	int N = el.Nodes();
 	vector<int>& lm = el.LM();
@@ -153,6 +154,9 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 		lm[7*N + 3*i+2] = -1;
 
 		lm[10*N + i] = id[10];
+		
+		// concentration dofs
+		lm[11*N+i] = id[11];
 	}
 
 	// copy nodal data to element arrays
@@ -173,6 +177,9 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 
 		// current nodal velocities
 		vt[i] = node.m_vt;
+		
+		// current nodal concentrations
+		ct[i] = node.m_ct;
 	}
 
 	// unpack the traits data

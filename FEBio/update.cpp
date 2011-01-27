@@ -136,6 +136,9 @@ void FESolidSolver::Update(vector<double>& ui, double s)
 	// update poroelastic data
 	if (m_fem.m_pStep->m_nModule == FE_POROELASTIC) UpdatePoro(ui, s);
 
+	// update solute-poroelastic data
+	if (m_fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui, s); UpdateSolute(ui, s); }
+	
 	// update contact
 	if (m_fem.m_bcontact) m_fem.UpdateContact();
 
@@ -319,6 +322,53 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui, double s)
 			c = ra + qa - rb - qb;
 
 			rj.m_F = rj.m_L + c*rj.m_eps;
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//! Updates the solute data
+
+void FESolidSolver::UpdateSolute(vector<double>& ui, double s)
+{
+	int i, n;
+	
+	FEMesh& mesh = m_fem.m_mesh;
+	
+	// update solute data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		
+		// update nodal concentration
+		n = node.m_ID[11];
+		if (n >= 0) node.m_ct = 0 + m_Ut[n] + m_Ui[n] + s*ui[n];
+	}
+	
+	// update solute data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		
+		// update velocities
+		node.m_vt  = (node.m_rt - node.m_rp) / m_fem.m_pStep->m_dt;
+	}
+	
+	// make sure the prescribed concentrations are fullfilled
+	int ndis = m_fem.m_DC.size();
+	for (i=0; i<ndis; ++i)
+	{
+		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		if (dc.IsActive())
+		{
+			int n    = dc.node;
+			int lc   = dc.lc;
+			int bc   = dc.bc;
+			double s = dc.s;
+			
+			FENode& node = mesh.Node(n);
+			
+			if (bc == 11) node.m_ct = s*m_fem.GetLoadCurve(lc)->Value();
 		}
 	}
 }

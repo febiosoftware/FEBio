@@ -85,7 +85,8 @@ void echo_input(FEM& fem)
 	FEMesh& mesh = fem.m_mesh;
 
 	// poro-elasticity flag
-	bool bporo = fem.m_pStep->m_nModule == FE_POROELASTIC;
+	bool bporo = (fem.m_pStep->m_nModule == FE_POROELASTIC) || (fem.m_pStep->m_nModule == FE_POROSOLUTE);
+	bool bsolu = (fem.m_pStep->m_nModule == FE_POROSOLUTE);
 
 	// print title
 	log.printf("%s\n\n", fem.GetTitle());
@@ -104,6 +105,7 @@ void echo_input(FEM& fem)
 	log.printf("Module type ...................................... : %d\n", step.m_nModule);
 	log.printf("\t   eq.%2d: solid mechanics\n", FE_SOLID);
 	log.printf("\t   eq.%2d: poroelastic\n", FE_POROELASTIC);
+	log.printf("\t   eq.%2d: biphasic-solute\n", FE_POROELASTIC);
 	log.printf("\t   eq.%2d: heat transfer\n", FE_HEAT);
 	log.printf("\tAnalysis type .................................. : %d\n", step.m_nanalysis);
 	log.printf("\t   eq.%2d: quasi-static\n", FE_STATIC);
@@ -137,10 +139,11 @@ void echo_input(FEM& fem)
 	log.printf("\tEnergy convergence tolerance ................... : %lg\n", step.m_psolver->m_Etol);
 	log.printf("\tResidual convergence tolerance ................. : %lg\n", step.m_psolver->m_Rtol);
 	if (bporo) log.printf("\tFluid pressure convergence tolernace ........... : %lg\n", step.m_psolver->m_Ptol);
-	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_bfgs.m_LStol );
-	log.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_bfgs.m_LSmin );
-	log.printf("\tMaximum number of line search iterations ....... : %d\n" , step.m_psolver->m_bfgs.m_LSiter);
-	log.printf("\tMax condition number ........................... : %lg\n", step.m_psolver->m_bfgs.m_cmax  );
+	if (bsolu) log.printf("\tSolute concentration convergence tolernace ........... : %lg\n", step.m_psolver->m_Ctol);
+	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_bfgs.m_LStol);
+	log.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_bfgs.m_LSmin);
+	log.printf("\tMaximum number of line search iterations ....... : %d\n", step.m_psolver->m_bfgs.m_LSiter);
+	log.printf("\tMax condition number ........................... : %lg\n", step.m_psolver->m_bfgs.m_cmax);
 	log.printf("\n\n");
 
 	// print output data

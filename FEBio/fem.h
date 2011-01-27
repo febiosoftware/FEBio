@@ -21,7 +21,8 @@
 #include "Timer.h"
 #include "FEPressureSurface.h"
 #include "FEPoroTraction.h"
-#include "FEFluxSurface.h"
+#include "FEFluidFluxSurface.h"
+#include "FESoluteFluxSurface.h"
 #include "FEHeatFlux.h"
 #include "FEDiscreteMaterial.h"
 #include "FEBodyForce.h"
@@ -219,6 +220,7 @@ public:
 		FEMaterial* pm = m_MAT[id];
 		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
 		while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
+		while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 		assert(pme);
 		return pme;
@@ -229,6 +231,7 @@ public:
 	{
 		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
 		while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
+		while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 		assert(pme);
 		return pme;
@@ -319,8 +322,8 @@ public:
 		//! Initialize rigid bodies
 		bool InitRigidBodies();
 
-		//! Initialize poro-elastic data
-		bool InitPoro();
+		//! Initialize poroelastic/biphasic and solute data
+		bool InitPoroSolute();
 
 		//! Initialize heat-conduction data
 		bool InitHeat();
@@ -422,8 +425,11 @@ public:
 		FEPoroTractionSurface*	m_ptsurf;	//!< normal traction surface domain
 	
 		// fluid flux BC
-		FEFluxSurface*			m_fsurf;	//!< fluid flux surface domain
+		FEFluidFluxSurface*		m_fsurf;	//!< fluid flux surface domain
 
+		// solute flux BC
+		FESoluteFluxSurface*	m_ssurf;	//!< solute flux surface domain
+	
 		// heat flux BC
 		FEHeatFluxSurface*		m_phflux;	//!< heat flux surface domain
 
@@ -450,6 +456,7 @@ public:
 		int		m_nsolver;	//!< type of solver selected
 		int		m_neq;		//!< number of equations
 		int		m_npeq;		//!< number of equations related to pressure dofs
+		int		m_nceq;		//!< number of equations related to concentration dofs
 		int		m_bwopt;	//!< bandwidth optimization flag
 		bool	m_bsymm;	//!< symmetric flag
 	//}

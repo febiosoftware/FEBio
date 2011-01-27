@@ -66,6 +66,7 @@ protected:
 	bool ParseTransIsoMaterial(XMLTag& tag, FETransverselyIsotropic* pm);
 	bool ParseRigidMaterial   (XMLTag& tag, FERigidMaterial* pm);
 	bool ParseBiphasicMaterial(XMLTag& tag, FEBiphasic* pm);
+	bool ParseBiphasicSoluteMaterial(XMLTag& tag, FEBiphasicSolute* pm);
 
 protected:
 	int	m_nmat;
@@ -84,7 +85,7 @@ private:
 		ET_TRI,
 		ET_TRUSS
 	};
-
+	
 public:
 	FEBioGeometrySection(FEFEBioImport* pim) : FileSection(pim){}
 	void Parse(XMLTag& tag);
@@ -120,6 +121,7 @@ protected:
 	void ParseBCTraction          (XMLTag& tag);
 	void ParseBCPoroNormalTraction(XMLTag& tag);
 	void ParseBCFluidFlux         (XMLTag& tag);
+	void ParseBCSoluteFlux        (XMLTag &tag);
 	void ParseBCHeatFlux          (XMLTag& tag);
 	void ParseContactSection      (XMLTag& tag);
 	void ParseConstraints         (XMLTag& tag);

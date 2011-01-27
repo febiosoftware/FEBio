@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Max nr of nodal degrees of freedom
 
-#define MAX_NDOFS	11
+#define MAX_NDOFS	12
 
 // At this point the 7 nodal dofs are used as follows:
 //  1: x-displacement
@@ -32,12 +32,14 @@
 //  9: rigid y-rotation
 // 10: rigid z-rotation
 // 11: temperature
+// 12: solute concentration
 //
 // The rotational degrees of freedom are only used for rigid nodes and shells.
 // The fluid pressure is only used for poroelastic problems.
 // The rigid rotational degrees of freedom are only used for rigid nodes
 // and only during the creation of the stiffenss matrix
 // The temperature is only used during heat-conduction problems
+// The solute concentration is only used in solute transport problems.
 
 class FEElement;
 
@@ -57,6 +59,7 @@ public:
 		rt.resize(ne);
 		vt.resize(ne);
 		pt.resize(ne);
+		ct.resize(ne);
 
 		LM.resize(MAX_NDOFS*ne);
 
@@ -77,6 +80,7 @@ public:
 	vector<vec3d>  rt;	//!< current coordinates
 	vector<vec3d>  vt;	//!< nodal velocities
 	vector<double> pt;	//!< nodal pressures
+	vector<double> ct;	//!< nodal concentrations
 
 	vector<int> LM; //!< nodal equation numbers
 
@@ -120,6 +124,18 @@ public:
 		Gs.Create(ni, ne);
 		Gt.Create(ni, ne);
 
+		Grr.Create(ni, ne);
+		Gsr.Create(ni, ne);
+		Gtr.Create(ni, ne);
+		
+		Grs.Create(ni, ne);
+		Gss.Create(ni, ne);
+		Gts.Create(ni, ne);
+		
+		Grt.Create(ni, ne);
+		Gst.Create(ni, ne);
+		Gtt.Create(ni, ne);
+		
 		m_Jt.resize(ni);
 		m_Jti.resize(ni);
 		m_detJt.resize(ni);
@@ -141,6 +157,9 @@ public:
 	// local derivatives of shape functions at gauss points
 	matrix Gr, Gs, Gt;
 
+	// local second derivatives of shape functions at gauss points
+	matrix Grr, Gsr, Gtr, Grs, Gss, Gts, Grt, Gst, Gtt;
+	
 	// data used when unpacking
 	vector<mat3d>	m_Jt;		// jacobian
 	vector<mat3d>	m_Jti;		// inverse jacobian

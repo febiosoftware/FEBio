@@ -62,6 +62,12 @@ bool FESolidSolver::StiffnessMatrix()
 		m_fem.m_fsurf->StiffnessMatrix(this);
 	}
 	
+	// calculate solute flux stiffness term
+	if (m_fem.m_ssurf)
+	{
+		m_fem.m_ssurf->StiffnessMatrix(this);
+	}
+	
 	// calculate linear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian

@@ -29,6 +29,13 @@ bool FESolidSolver::Init()
 		m_Pi.assign(m_fem.m_npeq, 0);
 	}
 
+	// allocate concentration-vectors
+	if (m_fem.m_nceq > 0)
+	{
+		m_ci.assign(m_fem.m_nceq, 0);
+		m_Ci.assign(m_fem.m_nceq, 0);
+	}
+	
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
 	FEMesh& mesh = m_fem.m_mesh;
@@ -49,6 +56,9 @@ bool FESolidSolver::Init()
 
 		// pressure dofs
 		n = node.m_ID[6]; if (n >= 0) m_Ut[n] = node.m_pt;
+		
+		// concentration dofs
+		n = node.m_ID[11]; if (n >= 0) m_Ut[n] = node.m_ct;
 	}
 
 	// initialize BFGS data

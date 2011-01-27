@@ -90,6 +90,8 @@ public:
 
 	double* pt() { return &m_pT->pt[0];}		// nodal pressures
 
+	double* ct() { return &m_pT->ct[0];}		// nodal concentrations
+	
 	int GaussPoints() const { return m_pT->nint; } 
 	int Nodes() const { return m_pT->neln; } 
 
@@ -181,6 +183,18 @@ public:
 	double* Gs(int n) { return ((FESolidElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s
 	double* Gt(int n) { return ((FESolidElementTraits*)(m_pT))->Gt[n]; }	// shape function derivative to t
 
+	double* Grr(int n) { return ((FESolidElementTraits*)(m_pT))->Grr[n]; }	// shape function 2nd derivative to rr
+	double* Gsr(int n) { return ((FESolidElementTraits*)(m_pT))->Gsr[n]; }	// shape function 2nd derivative to sr
+	double* Gtr(int n) { return ((FESolidElementTraits*)(m_pT))->Gtr[n]; }	// shape function 2nd derivative to tr
+	
+	double* Grs(int n) { return ((FESolidElementTraits*)(m_pT))->Grs[n]; }	// shape function 2nd derivative to rs
+	double* Gss(int n) { return ((FESolidElementTraits*)(m_pT))->Gss[n]; }	// shape function 2nd derivative to ss
+	double* Gts(int n) { return ((FESolidElementTraits*)(m_pT))->Gts[n]; }	// shape function 2nd derivative to ts
+	
+	double* Grt(int n) { return ((FESolidElementTraits*)(m_pT))->Grt[n]; }	// shape function 2nd derivative to rt
+	double* Gst(int n) { return ((FESolidElementTraits*)(m_pT))->Gst[n]; }	// shape function 2nd derivative to st
+	double* Gtt(int n) { return ((FESolidElementTraits*)(m_pT))->Gtt[n]; }	// shape function 2nd derivative to tt
+	
 	//! calculate shape function derivatives w.r.t to x
 	void shape_derivt(double* Gx, double* Gy, double* Gz, int n)
 	{

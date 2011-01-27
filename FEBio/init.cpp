@@ -92,8 +92,8 @@ bool FEM::Init()
 	// initialize rigid body data
 	if (InitRigidBodies() == false) return false;
 
-	// initialize poro-elastic data
-	if (InitPoro() == false) return false;
+	// initialize poroelastic/biphasic and solute data
+	if (InitPoroSolute() == false) return false;
 
 	// initialize heat condition data
 	if (InitHeat() == false) return false;

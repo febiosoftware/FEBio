@@ -37,6 +37,14 @@ FEParameterList* FEMaterial::GetParameterList()
 const char* FEMaterial::GetTypeString() { return "material base"; }
 
 //-----------------------------------------------------------------------------
+// Derivative of stress w.r.t. solute concentration at material point
+// Set this to zero by default because elasticity problems do not require it
+mat3ds FESolidMaterial::Tangent_Concentration(FEMaterialPoint& pt)
+{
+	return mat3ds(0,0,0,0,0,0);
+}
+
+//-----------------------------------------------------------------------------
 // Material parameters for FEElasticMaterial
 BEGIN_PARAMETER_LIST(FEElasticMaterial, FEMaterial)
 	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE, "density");
@@ -68,3 +76,10 @@ void FEHydraulicPermeability::Init()
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
 }
 
+//-----------------------------------------------------------------------------
+// Derivative of permeability w.r.t. solute concentration at material point
+// Set this to zero by default because poroelasticity problems do not require it
+mat3ds FEHydraulicPermeability::Tangent_Permeability_Concentration(FEMaterialPoint& pt)
+{
+	return mat3ds(0,0,0,0,0,0);
+}

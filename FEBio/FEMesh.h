@@ -76,6 +76,8 @@ struct FE_BOUNDING_BOX
 class FENode
 {
 public:
+	FENode() : m_p0(0), m_c0(0) {}
+	
 	// geometry data
 	vec3d	m_r0;	//!< initial position
 	vec3d	m_v0;	//!< initial velocity
@@ -94,11 +96,17 @@ public:
 	vec3d	m_Dt;	//!< current director
 
 	// poroelasticity-data
+	double	m_p0;	//!< initial pressure
 	double	m_pt;	//!< current pressure
 
 	// heat-conduction data
 	double	m_T;	//!< temperature
 
+	// solute-data
+	double	m_c0;	//!< initial effective concentration
+	double	m_ct;	//!< current effective concentration
+	double	m_cp;	//!< effective concentration at previous time step
+	
 	// rigid body data
 	int		m_rid;	//!< rigid body number
 

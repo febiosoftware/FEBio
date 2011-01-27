@@ -76,6 +76,9 @@ public:
 	tens4ds& operator *= (double g);
 	tens4ds& operator /= (double g);
 
+	// unary operators
+	tens4ds operator - () const;
+	
 	// double contraction with tensor
 	mat3ds dot(const mat3ds& m) const;
 
@@ -98,8 +101,11 @@ bool IsPositiveDefinite(const tens4ds& t);
 // outer (dyadic) products for symmetric matrices
 tens4ds dyad1s(const mat3ds& a);
 tens4ds dyad1s(const mat3ds& a, const mat3ds& b);
+tens4ds dyad2s(const mat3ds& a);
+tens4ds dyad2s(const mat3ds& a, const mat3ds& b);
 tens4ds dyad4s(const mat3ds& a);
 tens4ds dyad4s(const mat3ds& a, const mat3ds& b);
+tens4ds ddots(const tens4ds& a, const tens4ds& b);
 mat3d vdotTdotv(const vec3d a, const tens4ds T, const vec3d b);
 
 inline tens4ds operator * (const double g, const tens4ds& a) { return a*g; }

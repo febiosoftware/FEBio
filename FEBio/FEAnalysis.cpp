@@ -171,8 +171,8 @@ bool FEAnalysis::Init()
 		if (dc.IsActive())
 		{
 			// if the node is not free we don't use this prescribed displacement
-			// note that we don't do this for prescribed pressures
-			if (dc.bc != 6)
+			// note that we don't do this for prescribed pressures and concentrations
+			if ((dc.bc != 6) && (dc.bc != 11))
 			{
 				FENode& node = m_fem.m_mesh.Node(dc.node);
 				if (node.m_rid >= 0) 
@@ -208,14 +208,19 @@ bool FEAnalysis::Init()
 		}
 
 	// Initialize poroelasticity
-	// TODO: can I call FEM::InitPoro() here
-	// see if there are any poro-elastic materials present
-	for (i=0; i<m_fem.Materials(); ++i)
-		if ((dynamic_cast<FEPoroElastic*>(m_fem.m_MAT[i])) || (dynamic_cast<FEBiphasic*>(m_fem.m_MAT[i])))
-		{
-			m_nModule = FE_POROELASTIC;
-			break;
-		}
+	// TODO: can I call FEM::InitPoroSolute() here
+	// see if there are any poroelastic, biphasic, or biphasic-solute materials present
+	bool bporo, bsolu;
+	bporo = bsolu = false;
+	for (i=0; i<m_fem.Materials(); ++i) {
+		if (dynamic_cast<FEPoroElastic*>(m_fem.m_MAT[i])) bporo = true;
+		if (dynamic_cast<FEBiphasic*>(m_fem.m_MAT[i])) bporo = true;
+		if (dynamic_cast<FEBiphasicSolute*>(m_fem.m_MAT[i])) {bporo = true; bsolu = true;}
+	}
+	if (bporo && bsolu)
+		m_nModule = FE_POROSOLUTE;
+	else if (bporo)
+		m_nModule = FE_POROELASTIC;
 
 	// initialize equations
 	// ----->
@@ -250,6 +255,7 @@ bool FEAnalysis::Init()
 			case 5: // z-rotation
 			case 6: // prescribed pressure
 			case 10: // precribed temperature
+			case 11: // precribed concentration
 				n = node.m_ID[bc];
 				node.m_ID[bc] = (n<0?n:-n-2);
 				break;
@@ -668,6 +674,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		{
 		case FE_SOLID: 
 		case FE_POROELASTIC:
+		case FE_POROSOLUTE:
 			m_psolver = new FESolidSolver(m_fem); 
 			break;
 		case FE_HEAT:

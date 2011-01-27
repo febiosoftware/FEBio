@@ -212,8 +212,10 @@ void FEMesh::Reset()
 		node.m_vp = node.m_vt = node.m_v0;
 		node.m_ap = node.m_at = vec3d(0,0,0);
 
-		node.m_pt = 0;
-
+		node.m_pt = node.m_p0;
+		
+		node.m_ct = node.m_cp = node.m_c0;
+		
 		node.m_T = 0;
 	}
 

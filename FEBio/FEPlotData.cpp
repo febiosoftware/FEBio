@@ -4,13 +4,18 @@
 #include "FEPlotDataFactory.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_PLOTDATA(FEPlotNodeDisplacement, "displacement"    );
-REGISTER_PLOTDATA(FEPlotNodeVelocity    , "velocity"        );
-REGISTER_PLOTDATA(FEPlotNodeAcceleration, "acceleration"    );
-REGISTER_PLOTDATA(FEPlotFluidPressure   , "fluid pressure"  );
-REGISTER_PLOTDATA(FEPlotElementStress   , "stress"          );
-REGISTER_PLOTDATA(FEPlotFluidFlux       , "fluid flux"      );
-REGISTER_PLOTDATA(FEPlotFiberVector     , "fiber vector"    );
+REGISTER_PLOTDATA(FEPlotNodeDisplacement             , "displacement"                  );
+REGISTER_PLOTDATA(FEPlotNodeVelocity                 , "velocity"                      );
+REGISTER_PLOTDATA(FEPlotNodeAcceleration             , "acceleration"                  );
+REGISTER_PLOTDATA(FEPlotEffectiveFluidPressure       , "effective fluid pressure"      );
+REGISTER_PLOTDATA(FEPlotActualFluidPressure          , "fluid pressure"                );
+REGISTER_PLOTDATA(FEPlotElementStress                , "stress"                        );
+REGISTER_PLOTDATA(FEPlotRelativeVolume               , "relative volume"               );
+REGISTER_PLOTDATA(FEPlotFluidFlux                    , "fluid flux"                    );
+REGISTER_PLOTDATA(FEPlotFiberVector                  , "fiber vector"                  );
+REGISTER_PLOTDATA(FEPlotEffectiveSoluteConcentration , "effective solute concentration");
+REGISTER_PLOTDATA(FEPlotActualSoluteConcentration    , "solute concentration"          );
+REGISTER_PLOTDATA(FEPlotSoluteFlux                   , "solute flux"                   );
 
 //-----------------------------------------------------------------------------
 int FEPlotData::VarSize(Var_Type t)
@@ -189,6 +194,62 @@ bool FEPlotNodeAcceleration::Save(FEMesh& m, vector<float>& a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
+{
+	FEPoroSolidDomain* pe = dynamic_cast<FEPoroSolidDomain*>(&dom);
+	FEBiphasicDomain* pd = dynamic_cast<FEBiphasicDomain*>(&dom);
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	if (pe)
+	{
+		int N = pd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pe->Node(i);
+			a.push_back((float) node.m_pt);
+		}
+		return true;
+	}
+	else if (pd)
+	{
+		int N = pd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pd->Node(i);
+			a.push_back((float) node.m_pt);
+		}
+		return true;
+	}
+	else if (psd)
+	{
+		int N = psd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = psd->Node(i);
+			a.push_back((float) node.m_pt);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	FEBiphasicSoluteDomain* pd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	if (pd)
+	{
+		int N = pd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pd->Node(i);
+			a.push_back((float) node.m_ct);
+		}
+		return true;
+	}
+	return false;
+}
+
 //=============================================================================
 //                           E L E M E N T   D A T A
 //=============================================================================
@@ -298,6 +359,68 @@ bool FEPlotElementStress::WriteShellStress(FEElasticShellDomain& d, vector<float
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average flux
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
+				
+				if (pt) ew += pt->J;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+				
+				if (pt) ew += pt->m_pa;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
@@ -326,6 +449,75 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 			af[1] = (float) ew.y;
 			af[2] = (float) ew.z;
 
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutePoroElasticMaterialPoint* pt = (mp.ExtractData<FESolutePoroElasticMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSoluteFlux::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutePoroElasticMaterialPoint* pt = (mp.ExtractData<FESolutePoroElasticMaterialPoint>());
+				
+				if (pt) ew += pt->m_j;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
 			a.push_back(af[0]);
 			a.push_back(af[1]);
 			a.push_back(af[2]);
@@ -396,19 +588,3 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 	return false;
 }
 
-//-----------------------------------------------------------------------------
-bool FEPlotFluidPressure::Save(FEDomain &dom, vector<float>& a)
-{
-	FEPoroSolidDomain* pd = dynamic_cast<FEPoroSolidDomain*>(&dom);
-	if (pd)
-	{
-		int N = pd->Nodes();
-		for (int i=0; i<N; ++i)
-		{
-			FENode& node = pd->Node(i);
-			a.push_back((float) node.m_pt);
-		}
-		return true;
-	}
-	return false;
-}

@@ -216,6 +216,12 @@ inline mat3ds mat3ds::operator / (double g) const
 	return mat3ds(m[XX]*g, m[YY]*g, m[ZZ]*g, m[XY]*g, m[YZ]*g, m[XZ]*g);
 }
 
+// unary operator -
+inline mat3ds mat3ds::operator - () const
+{
+	return mat3ds(-m[XX], -m[YY], -m[ZZ], -m[XY], -m[YZ], -m[XZ]);
+}
+
 // assignment operator +=
 inline mat3ds& mat3ds::operator += (const mat3ds& t)
 {
@@ -317,6 +323,21 @@ inline mat3ds mat3ds::dev() const
 {
 	double t = (m[XX]+m[YY]+m[ZZ])/3.0;
 	return mat3ds(m[XX]-t, m[YY]-t, m[ZZ]-t, m[XY], m[YZ], m[XZ]);
+}
+
+// inverse
+inline mat3ds mat3ds::inverse() const
+{
+	double D = det();
+	assert(D != 0);
+	D = 1/D;
+	
+	return mat3ds(D*(m[YY]*m[ZZ]-m[YZ]*m[YZ]), 
+				  D*(m[XX]*m[ZZ]-m[XZ]*m[XZ]), 
+				  D*(m[XX]*m[YY]-m[XY]*m[XY]),
+				  D*(m[XZ]*m[YZ]-m[XY]*m[ZZ]), 
+				  D*(m[XY]*m[XZ]-m[XX]*m[YZ]), 
+				  D*(m[XY]*m[YZ]-m[YY]*m[XZ]));
 }
 
 //-----------------------------------------------------------------------------

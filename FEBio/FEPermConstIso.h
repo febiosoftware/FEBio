@@ -1,5 +1,5 @@
 #pragma once
-#include "FEPoroElastic.h"
+#include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 // This class implements a poroelastic material that has a constant permeability

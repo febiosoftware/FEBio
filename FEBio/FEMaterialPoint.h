@@ -324,3 +324,60 @@ public:
 		if (m_pt) m_pt->Init(bflag);
 	}
 };
+
+//-----------------------------------------------------------------------------
+
+class FESolutePoroElasticMaterialPoint : public FEMaterialPoint
+	{
+	public:
+		FESolutePoroElasticMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+		
+		FEMaterialPoint* Copy()
+		{
+			FESolutePoroElasticMaterialPoint* pt = new FESolutePoroElasticMaterialPoint(*this);
+			if (m_pt) pt->m_pt = m_pt->Copy();
+			return pt;
+		}
+		
+		void Serialize(DumpFile& ar)
+		{
+			if (ar.IsSaving())
+			{
+				ar << m_p << m_gradp << m_w << m_pa << m_c << m_gradc << m_j << m_ca;
+			}
+			else
+			{
+				ar >> m_p >> m_gradp >> m_w >> m_pa >> m_c >> m_gradc >> m_j >> m_ca;
+			}
+			
+			if (m_pt) m_pt->Serialize(ar);
+		}
+		
+		void Init(bool bflag)
+		{
+			if (bflag)
+			{
+				m_p = m_pa = 0;
+				m_gradp = vec3d(0,0,0);
+				m_w = vec3d(0,0,0);
+				m_c = m_ca = 0;
+				m_gradc = vec3d(0,0,0);
+				m_j = vec3d(0,0,0);
+			}
+			
+			if (m_pt) m_pt->Init(bflag);
+		}
+		
+	public:
+		// biphasic-solute material data
+		double		m_p;		//!< effective fluid pressure
+		vec3d		m_gradp;	//!< spatial gradient of p
+		vec3d		m_w;		//!< fluid flux
+		double		m_pa;		//!< actual fluid pressure
+		// solute material data
+		double		m_c;		//!< effective solute concentration
+		vec3d		m_gradc;	//!< spatial gradient of c
+		vec3d		m_j;		//!< solute molar flux
+		double		m_ca;		//!< actual solute concentration
+	};
+

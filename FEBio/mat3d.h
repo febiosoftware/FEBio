@@ -142,6 +142,9 @@ public:
 	mat3ds operator * (double g) const;
 	mat3ds operator / (double g) const;
 
+	// unary operators
+	mat3ds operator - () const;
+	
 	// arithmetic assignment operators
 	mat3ds& operator += (const mat3ds& t);
 	mat3ds& operator -= (const mat3ds& t);
@@ -168,6 +171,9 @@ public:
 	// deviator
 	mat3ds dev() const;
 
+	// calculates the inverse
+	mat3ds inverse() const;
+	
 	// determine eigen values and vectors
 	void eigen(double d[3], vec3d r[3] = 0);
 

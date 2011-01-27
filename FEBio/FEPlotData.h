@@ -107,6 +107,24 @@ public:
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Nodal effective fluid pressures
+class FEPlotEffectiveFluidPressure : public FEDomainData
+	{
+	public:
+		FEPlotEffectiveFluidPressure() : FEDomainData(FLOAT, FMT_NODE){}
+		bool Save(FEDomain& m, vector<float>& a);
+	};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute concentrations
+class FEPlotEffectiveSoluteConcentration : public FEDomainData
+	{
+	public:
+		FEPlotEffectiveSoluteConcentration() : FEDomainData(FLOAT, FMT_NODE){}
+		bool Save(FEDomain& m, vector<float>& a);
+	};
+
 //=============================================================================
 //                        D O M A I N   D A T A
 //=============================================================================
@@ -125,6 +143,24 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Relative volume
+class FEPlotRelativeVolume : public FEDomainData
+	{
+	public:
+		FEPlotRelativeVolume() : FEDomainData(FLOAT, FMT_ITEM){}
+		bool Save(FEDomain& dom, vector<float>& a);
+	};
+
+//-----------------------------------------------------------------------------
+//! Actual fluid pressure
+class FEPlotActualFluidPressure : public FEDomainData
+	{
+	public:
+		FEPlotActualFluidPressure() : FEDomainData(FLOAT, FMT_ITEM){}
+		bool Save(FEDomain& dom, vector<float>& a);
+	};
+
+//-----------------------------------------------------------------------------
 //! Fluid flux
 class FEPlotFluidFlux : public FEDomainData
 {
@@ -132,6 +168,24 @@ public:
 	FEPlotFluidFlux() : FEDomainData(VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Actual solute concentration
+class FEPlotActualSoluteConcentration : public FEDomainData
+	{
+	public:
+		FEPlotActualSoluteConcentration() : FEDomainData(FLOAT, FMT_ITEM){}
+		bool Save(FEDomain& dom, vector<float>& a);
+	};
+
+//-----------------------------------------------------------------------------
+//! Solute flux
+class FEPlotSoluteFlux : public FEDomainData
+	{
+	public:
+		FEPlotSoluteFlux() : FEDomainData(VEC3F, FMT_ITEM){}
+		bool Save(FEDomain& dom, vector<float>& a);
+	};
 
 //-----------------------------------------------------------------------------
 //! Material fibers
@@ -151,11 +205,37 @@ public:
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
+//=============================================================================
+//                         S U R F A C E   D A T A
+//=============================================================================
+
 //-----------------------------------------------------------------------------
-//! Nodal fluid pressures
-class FEPlotFluidPressure : public FEDomainData
+//! Contact gap
+//!
+class FEPlotContactGap : public FESurfaceData
 {
 public:
-	FEPlotFluidPressure() : FEDomainData(FLOAT, FMT_NODE){}
-	bool Save(FEDomain& m, vector<float>& a);
+	FEPlotContactGap() : FESurfaceData(FLOAT, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+
+protected:
+	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
+	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
+	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
+	bool SaveTied        (FETiedContactSurface&	 s, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Contact pressure
+//!
+class FEPlotContactPressure : public FESurfaceData
+{
+public:
+	FEPlotContactPressure() : FESurfaceData(FLOAT, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+
+protected:
+	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
+	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
+	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
 };

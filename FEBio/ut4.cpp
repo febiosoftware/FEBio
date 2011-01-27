@@ -1044,6 +1044,7 @@ void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
 	assert(fem.m_pStep->m_nModule != FE_POROELASTIC);
+	assert(fem.m_pStep->m_nModule != FE_POROSOLUTE);
 
 	int i, i3, j, j3, n;
 

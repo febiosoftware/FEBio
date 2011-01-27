@@ -24,11 +24,11 @@ public:
 //! The flux surface is a surface domain that sustains a fluid flux boundary
 //! condition
 //!
-class FEFluxSurface : public FESurface
+class FEFluidFluxSurface : public FESurface
 {
 public:
 	//! constructor
-	FEFluxSurface(FEMesh* pm) : FESurface(pm) {}
+	FEFluidFluxSurface(FEMesh* pm) : FESurface(pm) {}
 
 	//! allocate storage
 	void create(int n)
@@ -40,7 +40,7 @@ public:
 	//! clone
 	FEDomain* Clone()
 	{
-		FEFluxSurface* ps = new FEFluxSurface(m_pMesh);
+		FEFluidFluxSurface* ps = new FEFluidFluxSurface(m_pMesh);
 		ps->m_PC = m_PC;
 		return ps;
 	}

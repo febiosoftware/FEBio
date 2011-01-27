@@ -58,6 +58,7 @@ FEM::FEM()
 	m_ptrac = 0;
 	m_ptsurf = 0;
 	m_fsurf = 0;
+	m_ssurf = 0;
 	m_phflux = 0;
 
 	// --- Material Data ---
@@ -78,6 +79,7 @@ FEM::FEM()
 
 	m_neq = 0;
 	m_npeq = 0;
+	m_nceq = 0;
 	m_bwopt = 0;
 
 	// --- I/O-Data ---
@@ -118,6 +120,7 @@ FEM::FEM(const FEM& fem)
 	m_ptrac = 0;
 	m_ptsurf = 0;
 	m_fsurf = 0;
+	m_ssurf = 0;
 	m_phflux = 0;
 
 	// --- Material Data ---
@@ -137,6 +140,7 @@ FEM::FEM(const FEM& fem)
 
 	m_neq = 0;
 	m_npeq = 0;
+	m_nceq = 0;
 	m_bwopt = 0;
 
 	ShallowCopy(const_cast<FEM&>(fem));
@@ -505,6 +509,11 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 	if (m_fsurf)
 	{
 		for (i=0; i<m_fsurf->Elements(); ++i) if (m_fsurf->FluidFlux(i).GetID() == nid) return &m_fsurf->FluidFlux(i);
+	}
+	
+	if (m_ssurf)
+	{
+		for (i=0; i<m_ssurf->Elements(); ++i) if (m_ssurf->SoluteFlux(i).GetID() == nid) return &m_ssurf->SoluteFlux(i);
 	}
 	
 	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];

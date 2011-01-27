@@ -168,6 +168,7 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "step_size"         ) tag.value(fem.m_pStep->m_dt0);
 		else if (tag == "dtol"              ) tag.value(fem.m_pStep->m_psolver->m_Dtol);
 		else if (tag == "ptol"              ) tag.value(fem.m_pStep->m_psolver->m_Ptol);
+		else if (tag == "ctol"              ) tag.value(fem.m_pStep->m_psolver->m_Ctol);
 		else if (tag == "etol"              ) tag.value(fem.m_pStep->m_psolver->m_Etol);
 		else if (tag == "rtol"              ) tag.value(fem.m_pStep->m_psolver->m_Rtol);
 		else if (tag == "lstol"             ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_LStol);

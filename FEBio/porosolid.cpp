@@ -735,6 +735,7 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 			// for poroelastic materials also update the fluid flux
 			FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);
 			ppt.m_w = pmat->Flux(mp);
+			ppt.m_pa = ppt.m_p;		// for consistency with biphasic material
 		}
 	}
 }

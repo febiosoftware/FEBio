@@ -13,6 +13,7 @@ FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
 	m_Dtol = 0.001;
 	m_Etol = 0.01;
 	m_Ptol = 0.01;
+	m_Ctol = 0.01;
 
 	m_niter = 0;
 }
@@ -24,7 +25,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_Dtol << m_Etol << m_Rtol << m_Ptol;
+		ar << m_Dtol << m_Etol << m_Rtol << m_Ptol << m_Ctol;
 		ar << m_bfgs.m_LStol << m_bfgs.m_LSiter << m_bfgs.m_LSmin;
 		ar << m_bfgs.m_maxups;
 		ar << m_bfgs.m_maxref;
@@ -38,7 +39,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 	}
 	else
 	{
-		ar >> m_Dtol >> m_Etol >> m_Rtol >> m_Ptol;
+		ar >> m_Dtol >> m_Etol >> m_Rtol >> m_Ptol >> m_Ctol;
 		ar >> m_bfgs.m_LStol >> m_bfgs.m_LSiter >> m_bfgs.m_LSmin;
 		ar >> m_bfgs.m_maxups;
 		ar >> m_bfgs.m_maxref;
