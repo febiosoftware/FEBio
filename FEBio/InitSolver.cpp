@@ -19,11 +19,8 @@ bool FESolidSolver::Init()
 	m_Fn.assign(neq, 0);
 	m_Fd.assign(neq, 0);
 	m_Fr.assign(neq, 0);
-	m_ui.assign(neq, 0);
 	m_Ui.assign(neq, 0);
 	m_Ut.assign(neq, 0);
-	m_R0.assign(neq, 0);
-	m_R1.assign(neq, 0);
 
 	// allocate poro-vectors
 	if (m_fem.m_npeq > 0)
@@ -55,7 +52,7 @@ bool FESolidSolver::Init()
 	}
 
 	// initialize BFGS data
-	m_bfgs.Init(neq, m_plinsolve);
+	m_bfgs.Init(neq, this, m_plinsolve);
 
 	// set the create stiffness matrix flag
 	m_breshape = true;

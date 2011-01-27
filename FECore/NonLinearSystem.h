@@ -23,7 +23,7 @@ public:
 	virtual void Jacobian(SparseMatrix& K) = 0;
 
 	// override function to update state of system
-	virtual bool Update(std::vector<double>& u) = 0;
+	virtual void Update(std::vector<double>& u, double ls) = 0;
 };
 
 }

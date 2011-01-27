@@ -17,9 +17,6 @@ public:
 	//! constructor
 	BFGSSolver();
 
-	//! initialization
-	void Init(int neq, LinearSolver* pls);
-
 	//! New initialization method
 	void Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls);
 
@@ -31,6 +28,9 @@ public:
 
 	//! Solve the system
 	void Solve();
+
+	//! Performs a linesearch
+	double LineSearch();
 
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
@@ -46,6 +46,17 @@ public:
 	// counters
 	int		m_nups;			//!< nr of stiffness updates
 	double	m_cmax;			//!< maximum value for the condition number
+
+	// line search options
+	double	m_LSmin;		//!< minimum line search step
+	double	m_LStol;		//!< line search tolerance
+	int		m_LSiter;		//!< max nr of line search iterations
+
+	vector<double> m_ui;	//!< displacement increment vector
+
+	// residuals
+	vector<double> m_R0;	//!< residual at iteration i-1
+	vector<double> m_R1;	//!< residual at iteration i
 
 	// BFGS update vectors
 	matrix			m_V;

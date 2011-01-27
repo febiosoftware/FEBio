@@ -10,11 +10,11 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/BFGSSolver.h"
+#include "FECore/NonLinearSystem.h"
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
 #include "Timer.h"
 #include "FEException.h"
-#include "Interrupt.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
@@ -25,10 +25,7 @@ using namespace FECore;
 //! In the future this class might become a base-class for different FE solvers.
 //! For instances there could be a different solver for quasi-static, dynamic and
 //! eigenvalue problems.
-//! This class is derived from Interruptable, because we want to be able to capture
-//! the CTRL+C interruptions
-
-class FESolver : public Interruptable
+class FESolver : public NonLinearSystem
 {
 public:
 	FESolver(FEM& fem);
@@ -38,6 +35,12 @@ public:
 	virtual bool SolveStep(double time) = 0;
 	virtual void Serialize(DumpFile& ar) = 0;
 	virtual void Clean();
+
+private:
+	// These functions have to be overwritten from NonLinearSystem
+	// but are not yet used.
+	void Evaluate(vector<double>& R) { assert(false); }
+	void Jacobian(SparseMatrix& K) { assert(false); }
 
 public:
 	//! recalculates the shape of the stiffness matrix
@@ -60,9 +63,6 @@ public:
 	double	m_Dtol;			//!< displacement tolerance
 	double	m_Etol;			//!< energy tolerance
 	double	m_Ptol;			//!< pressure tolerance
-	double	m_LStol;		//!< line search tolerance
-	double	m_LSmin;		//!< minimum line search step
-	int		m_LSiter;		//!< max nr of line search iterations
 	double	m_Rmin;			//!< min residual value
 
 	// BFGS parameters

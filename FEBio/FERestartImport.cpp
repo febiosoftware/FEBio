@@ -170,7 +170,7 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "ptol"              ) tag.value(fem.m_pStep->m_psolver->m_Ptol);
 		else if (tag == "etol"              ) tag.value(fem.m_pStep->m_psolver->m_Etol);
 		else if (tag == "rtol"              ) tag.value(fem.m_pStep->m_psolver->m_Rtol);
-		else if (tag == "lstol"             ) tag.value(fem.m_pStep->m_psolver->m_LStol);
+		else if (tag == "lstol"             ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_LStol);
 		else if (tag == "max_refs"          ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_maxref);
 		else if (tag == "max_ups"           ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_maxups);
 		else if (tag == "cmax"              ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_cmax);

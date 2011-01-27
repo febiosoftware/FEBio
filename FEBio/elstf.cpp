@@ -135,6 +135,8 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 
 	int ndof = ke.columns() / n;
 
+	vector<double>& ui = m_bfgs.m_ui;
+
 	// loop over columns
 	for (j=0; j<n; ++j)
 	{
@@ -237,7 +239,7 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 
 							if (I >= 0)
 							{
-								if (J < -1) m_Fd[I] -= KR[l][k]*m_ui[-J-2];
+								if (J < -1) m_Fd[I] -= KR[l][k]*ui[-J-2];
 								else if (J >= 0) K.add(I,J, KR[l][k]);
 							}
 						}
@@ -259,7 +261,7 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 
 							if (I >= 0)
 							{
-								if (J < -1) m_Fd[I] -= KF[l][k]*m_ui[-J-2];
+								if (J < -1) m_Fd[I] -= KF[l][k]*ui[-J-2];
 								else if (J >= 0) K.add(I,J, KF[l][k]);
 							}
 						}
@@ -286,7 +288,7 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 
 							if (I >= 0)
 							{
-								if (J < -1) m_Fd[I] -= KF[l][k]*m_ui[-J-2];
+								if (J < -1) m_Fd[I] -= KF[l][k]*ui[-J-2];
 								else if (J >= 0) K.add(I,J, KF[l][k]);
 							}
 						}
@@ -338,7 +340,7 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 
 							if (I >= 0)
 							{
-								if (J < -1) m_Fd[I] -= KF[l][k]*m_ui[-J-2];
+								if (J < -1) m_Fd[I] -= KF[l][k]*ui[-J-2];
 								else if (J >= 0) K.add(I,J, KF[l][k]);
 							}
 						}
@@ -362,6 +364,8 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 {
 	// assemble into global stiffness matrix
 	m_pK->Assemble(ke, elm);
+
+	vector<double>& ui = m_bfgs.m_ui;
 
 	// adjust for linear constraints
 	if (m_fem.m_LinC.size() > 0)
@@ -405,7 +409,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 						{
 							// adjust for prescribed dofs
 							J = -J-2;
-							if ((J>=0) && (J<m_fem.m_nreq) && (I>=0)) m_Fd[I] -= kij*m_ui[J];
+							if ((J>=0) && (J<m_fem.m_nreq) && (I>=0)) m_Fd[I] -= kij*ui[J];
 						}
 					}
 				}
@@ -428,7 +432,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 						{
 							// adjust for prescribed dofs
 							J = -J-2;
-							if ((J>=0) && (J<m_fem.m_nreq) && (I>=0)) m_Fd[I] -= kij*m_ui[J];
+							if ((J>=0) && (J<m_fem.m_nreq) && (I>=0)) m_Fd[I] -= kij*ui[J];
 						}
 					}
 				}
@@ -458,7 +462,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 							{
 								// adjust for prescribed dofs
 								J = -J-2;
-								if ((J>=0) && (J<m_fem.m_nreq) && (I>=0)) m_Fd[I] -= kij*m_ui[J];
+								if ((J>=0) && (J<m_fem.m_nreq) && (I>=0)) m_Fd[I] -= kij*ui[J];
 							}
 						}
 					}
@@ -498,7 +502,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 					if (I >= 0)
 					{
 						// dof i is not a prescribed degree of freedom
-						m_Fd[I] -= ke[i][j]*m_ui[J];
+						m_Fd[I] -= ke[i][j]*ui[J];
 					}
 				}
 

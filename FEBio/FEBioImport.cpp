@@ -273,10 +273,10 @@ void FEBioControlSection::Parse(XMLTag& tag)
 		else if (tag == "ptol"              ) tag.value(pstep->m_psolver->m_Ptol);
 		else if (tag == "etol"              ) tag.value(pstep->m_psolver->m_Etol);
 		else if (tag == "rtol"              ) tag.value(pstep->m_psolver->m_Rtol);
-		else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_LStol);
-		else if (tag == "lsmin"             ) tag.value(pstep->m_psolver->m_LSmin);
 		else if (tag == "min_residual"      ) tag.value(pstep->m_psolver->m_Rmin);
-		else if (tag == "lsiter"            ) tag.value(pstep->m_psolver->m_LSiter);
+		else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_bfgs.m_LStol);
+		else if (tag == "lsmin"             ) tag.value(pstep->m_psolver->m_bfgs.m_LSmin);
+		else if (tag == "lsiter"            ) tag.value(pstep->m_psolver->m_bfgs.m_LSiter);
 		else if (tag == "max_refs"          ) tag.value(pstep->m_psolver->m_bfgs.m_maxref);
 		else if (tag == "max_ups"           ) tag.value(pstep->m_psolver->m_bfgs.m_maxups);
 		else if (tag == "cmax"              ) tag.value(pstep->m_psolver->m_bfgs.m_cmax);

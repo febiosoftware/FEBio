@@ -10,24 +10,17 @@ FECore::BFGSSolver::BFGSSolver()
 	m_maxups = 10;
 	m_maxref = 15;
 	m_cmax   = 1e5;
+
+	// default line search parameters
+	m_LSmin  = 0.01;
+	m_LStol = 0.9;
+	m_LSiter = 5;
+
+	// pointer to linear solver
 	m_plinsolve = 0;
 
-	//------------------
+	// pointer to non-linear system
 	m_pNLS = 0;
-}
-
-//-----------------------------------------------------------------------------
-void FECore::BFGSSolver::Init(int neq, LinearSolver* pls)
-{
-	// allocate storage for BFGS update vectors
-	m_V.Create(m_maxups, neq);
-	m_W.Create(m_maxups, neq);
-
-	m_D.resize(neq);
-	m_G.resize(neq);
-	m_H.resize(neq);
-
-	m_plinsolve = pls;
 }
 
 //-----------------------------------------------------------------------------
@@ -42,11 +35,16 @@ void FECore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls)
 	m_G.resize(neq);
 	m_H.resize(neq);
 
+	m_ui.assign(neq, 0);
+	m_R0.assign(neq, 0);
+	m_R1.assign(neq, 0);
+
 	m_neq = neq;
 	m_nups = 0;
 
 	m_plinsolve = pls;
 
+	assert(pNLS);
 	m_pNLS = pNLS;
 }
 
@@ -164,28 +162,169 @@ void FECore::BFGSSolver::Solve()
 	m_plinsolve->Factor();
 
 	// create the initial RHS vector
-	vector<double> F1(m_neq), F2(m_neq);
-	m_pNLS->Evaluate(F1);
-	for (int i=0; i<m_neq; ++i) F1[i] *= -1;
-
-	// solution increment vector
-	vector<double> u(m_neq);
+	m_pNLS->Evaluate(m_R0);
+	for (int i=0; i<m_neq; ++i) m_R0[i] *= -1;
 
 	// repeat until converged
 	do
 	{
 		// solve the equations
-		SolveEquations(u, F1);
+		SolveEquations(m_ui, m_R0);
 
-		if (m_pNLS->Update(u) == false)
+		// update solution
+		if (m_LStol > 0) LineSearch();
+		else m_pNLS->Update(m_ui, 1.0);
+
+		// check for convergence
+		bool bconv = true;
+		for (int i=0; i<m_neq; ++i) 
+			if (fabs(m_ui[i]) > 1e-3)
+			{
+				bconv = false;
+				break;
+			}
+
+		if (bconv == false)
 		{
-			m_pNLS->Evaluate(F2);
-			for (int i=0; i<m_neq; ++i) F2[i] *= -1;
+			m_pNLS->Evaluate(m_R1);
+			for (int i=0; i<m_neq; ++i) m_R1[i] *= -1;
 
-			Update(1.0, u, F1, F2);
-			F1 = F2;
+			Update(1.0, m_ui, m_R0, m_R1);
+			m_R0 = m_R1;
 		}
 		else break;
 	}
 	while (true);
+}
+
+//-----------------------------------------------------------------------------
+// Performs a linesearch on a NR iteration
+// The description of this method can be found in:
+//    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.
+//
+// TODO: Find a different way to update the deformation based on the ls.
+// For instance, define a di so that ui = s*di. Also, define the 
+// position of the nodes at the previous iteration.
+
+double FECore::BFGSSolver::LineSearch()
+{
+	double s = 1.0;
+	double smin = s;
+
+	double a, A, B, D;
+	double r0, r1, r;
+
+	// max nr of line search iterations
+	int nmax = m_LSiter;
+	int n = 0;
+
+	// initial energy
+	r0 = m_ui*m_R0;
+
+	double rmin = fabs(r0);
+
+/*	// get the logfile
+	Logfile& log = GetLogfile();
+
+	if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
+	{
+		log.printf("\nEntering line search\n");
+		log.printf("       STEPSIZE     INITIAL        CURRENT         REQUIRED\n");
+	}
+*/
+	do
+	{
+		// Update geometry
+		m_pNLS->Update(m_ui, s);
+
+		// calculate residual at this point
+		m_pNLS->Evaluate(m_R1);
+
+		// make sure we are still in a valid range
+		if (s < m_LSmin) 
+		{
+			// it appears that we are not converging
+			// I found in the NIKE3D code that when this happens,
+			// the line search step is simply set to 0.5.
+			// so let's try it here too
+			s = 0.5;
+
+			// reupdate  
+			m_pNLS->Update(m_ui, s);
+
+			// recalculate residual at this point
+			m_pNLS->Evaluate(m_R1);
+
+			// return and hope for the best
+			break;
+		}
+
+		// calculate energies
+		r1 = m_ui*m_R1;
+
+		if ((n==0) || (fabs(r1) < rmin))
+		{
+			smin = s;
+			rmin = fabs(r1);
+		}
+
+		// make sure that r1 does not happen to be really close to zero,
+		// since in that case we won't find any better solution.
+		if (fabs(r1) < 1.e-20) r = 0;
+		else r = fabs(r1/r0);
+
+/*		if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
+		{
+			log.printf("%15lf%15lg%15lg%15lg\n", s, fabs(r0), fabs(r1), fabs(r0*m_bfgs.m_LStol));
+		}
+*/
+		if (r > m_LStol)
+		{
+			// calculate the line search step
+			a = r0/r1;
+
+			A = 1 + a*(s-1);
+			B = a*(s*s);
+			D = B*B - 4*A*B;
+
+			// update the line step
+			if (D >= 0) 
+			{
+				s = (B + sqrt(D))/(2*A);
+				if (s < 0) s = (B - sqrt(D))/(2*A);
+				if (s < 0) s = 0;
+			}
+			else 
+			{
+				s = 0.5*B/A;
+			}
+
+			++n;
+		}
+	}
+	while ((r > m_LStol) && (n < nmax));
+
+	if (n >= nmax)
+	{
+		// max nr of iterations reached.
+		// we choose the line step that reached the smallest energy
+		s = smin;
+		m_pNLS->Update(m_ui, s);
+		m_pNLS->Evaluate(m_R1);
+	}
+/*
+	if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
+	{
+		if ((r < m_bfgs.m_LStol) && (n < nmax))
+		{
+			log.printf("------------------------------------------------------------\n");
+			log.printf("%15lf%15lg%15lg%15lg\n\n", s, fabs(r0), fabs(r1), fabs(r0*m_bfgs.m_LStol));
+		}
+		else if (n >= nmax)
+		{
+			log.printf("Line search failed: max iterations reached.\n\n");
+		}
+	}
+*/
+	return s;
 }

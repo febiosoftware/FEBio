@@ -66,14 +66,15 @@ bool FEHeatSolver::SolveStep(double time)
 	m_plinsolve->Solve(m_T, m_R);
 
 	// update solution
-	Update();
+	// NOTE: m_u is not being used in Update!
+	Update(m_u, 1.0);
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! update solution
-void FEHeatSolver::Update()
+void FEHeatSolver::Update(vector<double>& u, double s)
 {
 	FEMesh& mesh = m_fem.m_mesh;
 

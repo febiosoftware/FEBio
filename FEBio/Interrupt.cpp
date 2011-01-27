@@ -8,31 +8,31 @@
 #include "console.h"
 #include <signal.h>
 
-bool Interruptable::m_bsig = false;
+bool Interruption::m_bsig = false;
 
-Interruptable::Interruptable()
+Interruption::Interruption()
 {
 	static bool binit = false;
 
 	if (!binit) 
 	{
-		signal(SIGINT, Interruptable::handler);
+		signal(SIGINT, Interruption::handler);
 		binit = true;
 	}
 }
 
-Interruptable::~Interruptable()
+Interruption::~Interruption()
 {
 	// TODO: restore original interruption handler
 }
 
-void Interruptable::handler(int sig)
+void Interruption::handler(int sig)
 {
 	m_bsig = true;
-	signal(SIGINT, Interruptable::handler);
+	signal(SIGINT, Interruption::handler);
 }
 
-void Interruptable::interrupt()
+void Interruption::interrupt()
 {
 	// get a pointer to the console window
 	Console* pShell = Console::GetHandle();

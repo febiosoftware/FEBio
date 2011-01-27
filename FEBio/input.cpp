@@ -137,10 +137,10 @@ void echo_input(FEM& fem)
 	log.printf("\tEnergy convergence tolerance ................... : %lg\n", step.m_psolver->m_Etol);
 	log.printf("\tResidual convergence tolerance ................. : %lg\n", step.m_psolver->m_Rtol);
 	if (bporo) log.printf("\tFluid pressure convergence tolernace ........... : %lg\n", step.m_psolver->m_Ptol);
-	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_LStol);
-	log.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_LSmin);
-	log.printf("\tMaximum number of line search iterations ....... : %d\n", step.m_psolver->m_LSiter);
-	log.printf("\tMax condition number ........................... : %lg\n", step.m_psolver->m_bfgs.m_cmax);
+	log.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_bfgs.m_LStol );
+	log.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_bfgs.m_LSmin );
+	log.printf("\tMaximum number of line search iterations ....... : %d\n" , step.m_psolver->m_bfgs.m_LSiter);
+	log.printf("\tMax condition number ........................... : %lg\n", step.m_psolver->m_bfgs.m_cmax  );
 	log.printf("\n\n");
 
 	// print output data

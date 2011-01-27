@@ -9,11 +9,11 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class Interruptable  
+class Interruption
 {
 public:
-	Interruptable();
-	virtual ~Interruptable();
+	Interruption();
+	virtual ~Interruption();
 
 	static void handler(int sig);
 	static bool	m_bsig;

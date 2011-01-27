@@ -32,7 +32,7 @@ protected:
 	bool ReformStiffness();
 
 	//! update solution
-	void Update();
+	void Update(vector<double>& u, double s);
 
 public:
 	//! assemble element stiffness matrix

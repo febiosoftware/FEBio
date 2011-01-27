@@ -4,6 +4,7 @@
 #include "FERigid.h"
 #include "FESolidSolver.h"
 #include "log.h"
+#include "Interrupt.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -118,7 +119,8 @@ void FESolidSolver::PrepStep(double time)
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
-	zero(m_ui);
+	vector<double>& ui = m_bfgs.m_ui;
+	zero(ui);
 	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
 		FENodalDisplacement& dc = *m_fem.m_DC[i];
@@ -140,22 +142,22 @@ void FESolidSolver::PrepStep(double time)
 			case 0: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_fem.m_neq) 
-					m_ui[I] = dq - (node.m_rt.x - node.m_r0.x);
+					ui[I] = dq - (node.m_rt.x - node.m_r0.x);
 				break;
 			case 1: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_fem.m_neq) 
-					m_ui[I] = dq - (node.m_rt.y - node.m_r0.y); 
+					ui[I] = dq - (node.m_rt.y - node.m_r0.y); 
 				break;
 			case 2: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_fem.m_neq) 
-					m_ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
+					ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
 				break;
 			case 6: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_fem.m_neq) 
-					m_ui[I] = dq - node.m_pt; 
+					ui[I] = dq - node.m_pt; 
 				break;
 			case 20:
 				{
@@ -164,10 +166,10 @@ void FESolidSolver::PrepStep(double time)
 
 					I = -node.m_ID[1]-2;
 					if (I>=0 && I<m_fem.m_neq) 
-						m_ui[I] = dr.y - (node.m_rt.y - node.m_r0.y); 
+						ui[I] = dr.y - (node.m_rt.y - node.m_r0.y); 
 					I = -node.m_ID[2]-2;
 					if (I>=0 && I<m_fem.m_neq) 
-						m_ui[I] = dr.z - (node.m_rt.z - node.m_r0.z); 
+						ui[I] = dr.z - (node.m_rt.z - node.m_r0.z); 
 				}
 				break;
 			}
@@ -290,7 +292,7 @@ void FESolidSolver::PrepStep(double time)
 		for (j=0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j]-2;
-			if (I >= 0) m_ui[I] = RB.m_du[j];
+			if (I >= 0) ui[I] = RB.m_du[j];
 		}
 	}
 
@@ -365,19 +367,20 @@ bool FESolidSolver::Quasin(double time)
 	PrepStep(time);
 
 	// check for CTRL+C interruption before we do any work
-	if (m_bsig)
+	Interruption itr;
+	if (itr.m_bsig)
 	{
-		m_bsig = false;
-		interrupt();
+		itr.m_bsig = false;
+		itr.interrupt();
 	}
 
 	// calculate initial stiffness matrix
 	if (ReformStiffness() == false) return false;
 
 	// calculate initial residual
-	if (Residual(m_R0) == false) return false;
+	if (Residual(m_bfgs.m_R0) == false) return false;
 
-	m_R0 += m_Fd;
+	m_bfgs.m_R0 += m_Fd;
 
 	// TODO: I can check here if the residual is zero.
 	// If it is than there is probably no force acting on the system
@@ -408,48 +411,48 @@ bool FESolidSolver::Quasin(double time)
 		// solve the equations
 		m_SolverTime.start();
 		{
-			m_bfgs.SolveEquations(m_ui, m_R0);
+			m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
 		}
 		m_SolverTime.stop();
 
 		// check for nans
 		if (m_fem.GetDebugFlag())
 		{
-			double du = m_ui*m_ui;
+			double du = m_bfgs.m_ui*m_bfgs.m_ui;
 			if (ISNAN(du)) throw NANDetected();
 		}
 
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
-			m_normRi = fabs(m_R0*m_R0);
-			m_normEi = fabs(m_ui*m_R0);
-			m_normUi = fabs(m_ui*m_ui);
+			m_normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
+			m_normEi = fabs(m_bfgs.m_ui*m_bfgs.m_R0);
+			m_normUi = fabs(m_bfgs.m_ui*m_bfgs.m_ui);
 			m_normEm = m_normEi;
 		}
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
-		if (m_LStol > 0) s = LineSearch();
+		if (m_bfgs.m_LStol > 0) s = m_bfgs.LineSearch();
 		else
 		{
 			s = 1;
 
 			// Update geometry
-			Update(m_ui, s);
+			Update(m_bfgs.m_ui, s);
 
 			// calculate residual at this point
-			Residual(m_R1);
+			Residual(m_bfgs.m_R1);
 		}
 
 		// update total displacements
-		for (i=0; i<m_fem.m_neq; ++i) m_Ui[i] += s*m_ui[i];
+		for (i=0; i<m_fem.m_neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
 
 		// calculate norms
-		m_normR1 = m_R1*m_R1;
-		m_normu  = (m_ui*m_ui)*(s*s);
+		m_normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
+		m_normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
 		m_normU  = m_Ui*m_Ui;
-		m_normE1 = s*fabs(m_ui*m_R1);
+		m_normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
 
 		// check residual norm
 		if ((m_Rtol > 0) && (m_normR1 > m_Rtol*m_normRi)) bconv = false;	
@@ -461,7 +464,7 @@ bool FESolidSolver::Quasin(double time)
 		if ((m_Etol > 0) && (m_normE1 > m_Etol*m_normEi)) bconv = false;
 
 		// check linestep size
-		if ((m_LStol > 0) && (s < m_LSmin)) bconv = false;
+		if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
 
 		// check energy divergence
 		if (m_normE1 > m_normEm) bconv = false;
@@ -470,7 +473,7 @@ bool FESolidSolver::Quasin(double time)
 		if (bporo)
 		{
 			// extract the pressure increments
-			GetPressureData(m_pi, m_ui);
+			GetPressureData(m_pi, m_bfgs.m_ui);
 
 			// set initial norm
 			if (m_niter == 0) m_normPi = fabs(m_pi*m_pi);
@@ -495,7 +498,7 @@ bool FESolidSolver::Quasin(double time)
 		log.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
 		log.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		log.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_LStol > 0) log.printf("\tstep from line search         = %lf\n", s);
+		if (m_bfgs.m_LStol > 0) log.printf("\tstep from line search         = %lf\n", s);
 		log.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
 		log.printf("\t   residual         %15le %15le %15le \n", m_normRi, m_normR1, m_Rtol*m_normRi);
 		log.printf("\t   energy           %15le %15le %15le \n", m_normEi, m_normE1, m_Etol*m_normEi);
@@ -518,7 +521,7 @@ bool FESolidSolver::Quasin(double time)
 				log.printbox("WARNING", "No force acting on the system.");
 				bconv = true;
 			}
-			else if (s < m_LSmin)
+			else if (s < m_bfgs.m_LSmin)
 			{
 				// check for zero linestep size
 				log.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
@@ -542,7 +545,7 @@ bool FESolidSolver::Quasin(double time)
 				{
 					if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
 					{
-						if (m_bfgs.Update(s, m_ui, m_R0, m_R1) == false)
+						if (m_bfgs.Update(s, m_bfgs.m_ui, m_bfgs.m_R0, m_bfgs.m_R1) == false)
 						{
 							// Stiffness update has failed.
 							// this might be due a too large condition number
@@ -569,7 +572,7 @@ bool FESolidSolver::Quasin(double time)
 			// we must set this to zero before the reformation
 			// because we assume that the prescribed displacements are stored 
 			// in the m_ui vector.
-			zero(m_ui);
+			zero(m_bfgs.m_ui);
 
 			// reform stiffness matrices if necessary
 			if (breform)
@@ -584,7 +587,7 @@ bool FESolidSolver::Quasin(double time)
 			}
 
 			// copy last calculated residual
-			m_R0 = m_R1;
+			m_bfgs.m_R0 = m_bfgs.m_R1;
 		}
 		else if (m_fem.m_pStep->m_baugment)
 		{
@@ -609,7 +612,7 @@ bool FESolidSolver::Quasin(double time)
 				// we also recalculate the stresses in case we are doing augmentations
 				// for incompressible materials
 				UpdateStresses();
-				Residual(m_R0);
+				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
 				if (m_fem.m_pStep->m_psolver->m_bfgs.m_maxups == 0)
@@ -627,10 +630,10 @@ bool FESolidSolver::Quasin(double time)
 		log.flush();
 
 		// check for CTRL+C interruption
-		if (m_bsig)
+		if (itr.m_bsig)
 		{
-			m_bsig = false;
-			interrupt();
+			itr.m_bsig = false;
+			itr.interrupt();
 		}
 	}
 	while (bconv == false);
@@ -722,135 +725,3 @@ bool FESolidSolver::ReformStiffness()
 	return bret;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FESolidSolver::LineSearch
-// Performs a linesearch on a NR iteration
-// The description of this method can be found in:
-//    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.
-//
-// TODO: Find a different way to update the deformation based on the ls.
-// For instance, define a di so that ui = s*di. Also, define the 
-// position of the nodes at the previous iteration.
-
-double FESolidSolver::LineSearch()
-{
-	double s = 1.0;
-	double smin = s;
-
-	double a, A, B, D;
-	double r0, r1, r;
-
-	// max nr of line search iterations
-	int nmax = m_LSiter;
-	int n = 0;
-
-	// initial energy
-	r0 = m_ui*m_R0;
-
-	double rmin = fabs(r0);
-
-	// get the logfile
-	Logfile& log = GetLogfile();
-
-	if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
-	{
-		log.printf("\nEntering line search\n");
-		log.printf("       STEPSIZE     INITIAL        CURRENT         REQUIRED\n");
-	}
-
-	do
-	{
-		// Update geometry
-		Update(m_ui, s);
-
-		// calculate residual at this point
-		Residual(m_R1);
-
-		// make sure we are still in a valid range
-		if (s < m_LSmin) 
-		{
-			// it appears that we are not converging
-			// I found in the NIKE3D code that when this happens,
-			// the line search step is simply set to 0.5.
-			// so let's try it here too
-			s = 0.5;
-
-			// reupdate  
-			Update(m_ui, s);
-
-			// recalculate residual at this point
-			Residual(m_R1);
-
-			// return and hope for the best
-			break;
-		}
-
-		// calculate energies
-		r1 = m_ui*m_R1;
-
-		if ((n==0) || (fabs(r1) < rmin))
-		{
-			smin = s;
-			rmin = fabs(r1);
-		}
-
-		// make sure that r1 does not happen to be really close to zero,
-		// since in that case we won't find any better solution.
-		if (fabs(r1) < 1.e-20) r = 0;
-		else r = fabs(r1/r0);
-
-		if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
-		{
-			log.printf("%15lf%15lg%15lg%15lg\n", s, fabs(r0), fabs(r1), fabs(r0*m_LStol));
-		}
-
-		if (r > m_LStol)
-		{
-			// calculate the line search step
-			a = r0/r1;
-
-			A = 1 + a*(s-1);
-			B = a*(s*s);
-			D = B*B - 4*A*B;
-
-			// update the line step
-			if (D >= 0) 
-			{
-				s = (B + sqrt(D))/(2*A);
-				if (s < 0) s = (B - sqrt(D))/(2*A);
-				if (s < 0) s = 0;
-			}
-			else 
-			{
-				s = 0.5*B/A;
-			}
-
-			++n;
-		}
-	}
-	while ((r > m_LStol) && (n < nmax));
-
-	if (n >= nmax)
-	{
-		// max nr of iterations reached.
-		// we choose the line step that reached the smallest energy
-		s = smin;
-		Update(m_ui, s);
-		Residual(m_R1);
-	}
-
-	if (m_fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
-	{
-		if ((r < m_LStol) && (n < nmax))
-		{
-			log.printf("------------------------------------------------------------\n");
-			log.printf("%15lf%15lg%15lg%15lg\n\n", s, fabs(r0), fabs(r1), fabs(r0*m_LStol));
-		}
-		else if (n >= nmax)
-		{
-			log.printf("Line search failed: max iterations reached.\n\n");
-		}
-	}
-
-	return s;
-}

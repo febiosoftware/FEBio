@@ -28,6 +28,13 @@ public:
 	FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
 
 public:
+	//{ --- NonLinearSystem overrides ---
+		//! Perform an update
+		void Update(vector<double>& ui, double s);
+
+		//! Evaluate system, i.e. calculate residual
+		void Evaluate(vector<double>& R) { Residual(R); }
+	//}
 
 	//{ --- Solution functions ---
 
@@ -37,9 +44,6 @@ public:
 		//! Performs a Newton-Raphson iteration
 		bool Quasin(double time);
 
-		//! Perform an update
-		void Update(vector<double>& ui, double s);
-
 		//! Update Stresses
 		void UpdateStresses();
 
@@ -48,9 +52,6 @@ public:
 
 		//! Update rigid body data
 		void UpdateRigidBodies(vector<double>& ui, double s);
-
-		//! Performs a linesearch
-		double LineSearch();
 
 		//! Lagrangian augmentation
 		bool Augment();
@@ -102,12 +103,9 @@ public:
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
-	vector<double> m_ui;	//!< displacement increment vector
 	vector<double> m_Ui;	//!< Total displacement vector for iteration
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
-	vector<double> m_R0;	//!< residual at iteration i-1
-	vector<double> m_R1;	//!< residual at iteration i
 
 	// poro data
 	vector<double>	m_pi;	//!< pressure increment vector
