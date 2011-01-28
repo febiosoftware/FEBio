@@ -1259,6 +1259,9 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		// open temperature dof
 		node.m_ID[10] = 0;
 
+		// open concentration dof
+		node.m_ID[11] = 0;
+		
 		++tag;
 	}
 }
@@ -3172,6 +3175,23 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					vec3d v;
 					tag.value(v);
 					mesh.Node(nid).m_v0 += v;
+				}
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+		}
+		else if (tag == "pressure")
+		{
+			++tag;
+			do
+			{
+				if (tag == "node")
+				{
+					int nid = atoi(tag.AttributeValue("id"))-1;
+					double p;
+					tag.value(p);
+					mesh.Node(nid).m_p0 += p;
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;
