@@ -407,8 +407,10 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+				FESolutePoroElasticMaterialPoint* ps = (mp.ExtractData<FESolutePoroElasticMaterialPoint>());
 				
 				if (pt) ew += pt->m_pa;
+				else if (ps) ew += ps->m_pa;
 			}
 			
 			ew /= el.GaussPoints();
