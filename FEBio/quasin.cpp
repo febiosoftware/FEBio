@@ -98,8 +98,10 @@ void FESolidSolver::PrepStep(double time)
 
 	// zero total displacements/pressures
 	zero(m_Ui);
+	// ---> TODO: move to the FEPoroSolidSolver
 	zero(m_Pi);
 	zero(m_Ci);
+	// --->
 
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
@@ -153,6 +155,7 @@ void FESolidSolver::PrepStep(double time)
 				if (I>=0 && I<m_fem.m_neq) 
 					ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
 				break;
+			// ---> TODO: move to the FEPoroSolidSolver
 			case 6: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_fem.m_neq) 
@@ -163,6 +166,7 @@ void FESolidSolver::PrepStep(double time)
 				if (I>=0 && I<m_fem.m_neq) 
 					ui[I] = dq - node.m_ct; 
 				break;
+			// --->
 			case 20:
 				{
 					vec3d dr = node.m_r0;
@@ -348,13 +352,11 @@ void FESolidSolver::PrepStep(double time)
 	UpdateStresses();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FESolidSolver::Quasin
-// Implements the BFGS algorithm to solve the nonlinear FE equations.
-// The details of this implementation of the BFGS method can be found in:
-//   "Finite Element Procedures", K.J. Bathe, p759 and following
+//-----------------------------------------------------------------------------
+//! Implements the BFGS algorithm to solve the nonlinear FE equations.
+//! The details of this implementation of the BFGS method can be found in:
+//!   "Finite Element Procedures", K.J. Bathe, p759 and following
 //
-
 bool FESolidSolver::Quasin(double time)
 {
 	int i;
@@ -370,6 +372,7 @@ bool FESolidSolver::Quasin(double time)
 	double	normEm;		// max energy norm
 	double	normUi;		// initial displacement norm
 
+// ---> TODO: move to the FEPoroSolidSolver
 	// poro convergence norms data
 	double	normPi;		// initial pressure norm
 	double	normP;		// current pressure norm
@@ -379,14 +382,17 @@ bool FESolidSolver::Quasin(double time)
 	double	normCi;	// initial concentration norm
 	double	normC;	// current concentration norm
 	double	normc;	// incremement concentration norm
+// --->
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
 
 	// poroelasticity flag
+// ---> TODO: move to the FEPoroSolidSolver
 	bool bporo = (m_fem.m_pStep->m_nModule == FE_POROELASTIC) || (m_fem.m_pStep->m_nModule == FE_POROSOLUTE);
 	bool bsolu = m_fem.m_pStep->m_nModule == FE_POROSOLUTE;
+// --->
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -492,6 +498,7 @@ bool FESolidSolver::Quasin(double time)
 		if (normE1 > normEm) bconv = false;
 
 		// check poroelastic convergence
+// ---> TODO: move to the FEPoroSolidSolver
 		if (bporo)
 		{
 			// extract the pressure increments
@@ -510,7 +517,6 @@ bool FESolidSolver::Quasin(double time)
 			// check convergence
 			if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
 		}
-
 		// check solute convergence
 		if (bsolu)
 		{
@@ -530,6 +536,7 @@ bool FESolidSolver::Quasin(double time)
 			// check convergence
 			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normC)) bconv = false;
 		}
+// --->
 
 		// print convergence summary
 		oldmode = clog.GetMode();
@@ -545,6 +552,7 @@ bool FESolidSolver::Quasin(double time)
 		clog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		clog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
 		clog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
+// ---> TODO: move to the FEPoroSolidSolver
 		if (bporo)
 		{
 			clog.printf("\t   fluid pressure   %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
@@ -553,7 +561,7 @@ bool FESolidSolver::Quasin(double time)
 		{
 			clog.printf("\t   solute concentration   %15le %15le %15le \n", normCi, normc ,(m_Ctol*m_Ctol)*normC );
 		}
-
+// --->
 		clog.SetMode(oldmode);
 
 		// check if we have converged. 
@@ -580,8 +588,10 @@ bool FESolidSolver::Quasin(double time)
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
+				// ---> TODO: move to the FEPoroSolidSolver
 				normPi = normp;
 				normCi = normc;
+				// --->
 				breform = true;
 			}
 			else

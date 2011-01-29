@@ -1753,6 +1753,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEGasserOgdenHolzapfel.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEHeatFlux.cpp"
 				>
 			</File>
@@ -1910,6 +1914,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPoroHolmesMow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPoroSolidSolver.cpp"
 				>
 			</File>
 			<File
@@ -2090,10 +2098,6 @@
 			</File>
 			<File
 				RelativePath=".\InitContact.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\InitHeat.cpp"
 				>
 			</File>
 			<File
@@ -2732,6 +2736,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPoroHolmesMow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPoroSolidSolver.h"
 				>
 			</File>
 			<File

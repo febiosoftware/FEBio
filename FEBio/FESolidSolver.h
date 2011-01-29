@@ -11,6 +11,7 @@ class FESolidSolver : public FESolver
 public:
 	//! constructor
 	FESolidSolver(FEM& fem);
+	virtual ~FESolidSolver(){}
 
 	//! Initializes data structures
 	bool Init();
@@ -42,19 +43,21 @@ public:
 		void PrepStep(double time);
 
 		//! Performs a Newton-Raphson iteration
-		bool Quasin(double time);
+		virtual bool Quasin(double time);
 
 		//! Update Stresses
 		void UpdateStresses();
 
+		// ---> TODO: move to the FEPoroSolidSolver
 		//! Update poroelastic data
 		void UpdatePoro(vector<double>& ui);
 
-		//! Update rigid body data
-		void UpdateRigidBodies(vector<double>& ui);
-
 		//! Update solute data
 		void UpdateSolute(vector<double>& ui);
+		// --->
+
+		//! Update rigid body data
+		void UpdateRigidBodies(vector<double>& ui);
 
 		//! Lagrangian augmentation
 		bool Augment();
@@ -97,8 +100,10 @@ public:
 	//}
 
 protected:
+	// ---> TODO: move to the FEPoroSolidSolver
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
 	void GetConcentrationData(vector<double>& pi, vector<double>& ui);
+	// --->
 
 public:
 	//! serialize data to/from dump file
@@ -111,12 +116,14 @@ public:
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
 
+	// ---> TODO: move to the FEPoroSolidSolver
 	// poro data
 	vector<double>	m_pi;	//!< pressure increment vector
 	vector<double>	m_Pi;	//!< Total pressure vector for iteration
 
 	vector<double>	m_ci;	//!< concentration increment vector
 	vector<double>	m_Ci;	//!< Total concentration vector for iteration
+	// --->
 
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag

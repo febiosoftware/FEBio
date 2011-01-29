@@ -1256,13 +1256,25 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		node.m_ID[8] = -1;
 		node.m_ID[9] = -1;
 
-		// open temperature dof
-		node.m_ID[10] = 0;
+		// fix temperature dof
+		node.m_ID[10] = -1;
 
 		// open concentration dof
 		node.m_ID[11] = 0;
 		
 		++tag;
+	}
+
+	if (fem.m_pStep->m_nModule == FE_HEAT)
+	{
+		// open temperature dofs for heat-transfer problems
+		// and fix non-temperature dofs
+		for (i=0; i<nodes; ++i) 
+		{
+			FENode& n = fem.m_mesh.Node(i);
+			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
+			n.m_ID[10] = 0;
+		}
 	}
 }
 
