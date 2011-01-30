@@ -212,9 +212,6 @@ void FEElasticSolidDomain::Serialize(FEM& fem, DumpFile &ar)
 //-----------------------------------------------------------------------------
 bool FE3FieldElasticSolidDomain::Initialize(FEM &fem)
 {
-	// initialize base class
-	FESolidDomain::Initialize(fem);
-
 	// make sure the domain material uses an uncoupled formulation
 	if (dynamic_cast<FEUncoupledMaterial*>(m_pMat) == 0) return false;
 	return FEElasticSolidDomain::Initialize(fem);
