@@ -396,7 +396,7 @@ void FEM::UpdateContact()
 	// If this analysis is a poroelastic analysis that uses
 	// a biphasic contact interface, we need to make sure that
 	// the free draining dof's are processed properly
-	bool bporo = m_pStep->m_nModule == FE_POROELASTIC;
+	bool bporo = (m_pStep->m_nModule == FE_POROELASTIC) || (m_pStep->m_nModule == FE_POROSOLUTE);
 	if (bporo)
 	{
 		// mark all free-draining surfaces

@@ -52,7 +52,7 @@ void FESlidingSurface2::Init()
 	zero(m_nu);
 
 	// allocate biphasic stuff
-	if (m_pfem->m_pStep->m_nModule == FE_POROELASTIC)
+	assert((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE));
 	{
 		m_pg.assign(nint, 0);
 	}
@@ -65,7 +65,7 @@ void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 	m_gap = s.m_gap;
 	zero(m_pme);
 
-	if (m_pfem->m_pStep->m_nModule == FE_POROELASTIC)
+	assert((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE));
 	{
 		m_pg  = s.m_pg;
 		m_Lmp = s.m_Lmp;
@@ -168,7 +168,7 @@ void OnSlidingInterface2Callback(FEM* pfem, void* pd)
 	fprintf(fp, "step: %d\n", nt);
 	fprintf(fp, "--1-|2|------3-------|------4-------|------5-------|------6-------|------7-------|------8-------|------9-------|\n");
 
-	bool bporo = pfem->m_pStep->m_nModule == FE_POROELASTIC;
+	bool bporo = (pfem->m_pStep->m_nModule == FE_POROELASTIC) || (pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 
 	// export data
 	for (int n=0; n<pi->m_npass; ++n)
@@ -212,7 +212,7 @@ void FESlidingInterface2::Init()
 	m_ss.Init();
 	m_ms.Init();
 
-	bool bporo = m_pfem->m_pStep->m_nModule == FE_POROELASTIC;
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
@@ -396,7 +396,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 	double rs[2];
 	double Ln;
 
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 
 	double ps[4], p1;
 
@@ -539,7 +539,7 @@ void FESlidingInterface2::Update()
 	if (m_npass == 2) ProjectSurface(m_ms, m_ss, bupseg);
 
 	// set poro flag
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 
 	// only continue if we are doing a poro-elastic simulation
 	if (bporo == false) return;
@@ -678,7 +678,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
 
 	// set poro flag
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 	
 	// get the poro-elasticity symmetry flag
 	bool bsymm = m_pfem->m_bsym_poro;
@@ -862,7 +862,7 @@ void FESlidingInterface2::ContactStiffness()
 	matrix ke;
 
 	// set the poro flag
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 
 	// get the poroelasticity symmetry flag
 	bool bsymm = m_pfem->m_bsym_poro;
@@ -1310,7 +1310,7 @@ bool FESlidingInterface2::Augment(int naug)
 	double Ln, Lp;
 	bool bconv = true;
 
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 	int NS = m_ss.m_Lmd.size();
 	int NM = m_ms.m_Lmd.size();
 
@@ -1439,7 +1439,7 @@ void FESlidingInterface2::MarkFreeDraining()
 	int i, id, np;
 
 	// set poro flag
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 	
 	// only continue if we are doing a poro-elastic simulation
 	if (bporo == false) return;
@@ -1477,7 +1477,7 @@ void FESlidingInterface2::SetFreeDraining()
 	int i, np;
 	
 	// set poro flag
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC);
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 	
 	// only continue if we are doing a poro-elastic simulation
 	if (bporo == false) return;

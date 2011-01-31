@@ -12,7 +12,7 @@ void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	FEM& fem = psolver->m_fem;
 	
 	// make sure we are in poro-mode
-	assert(fem.m_pStep->m_nModule == FE_POROELASTIC);
+	assert((fem.m_pStep->m_nModule == FE_POROELASTIC) || (fem.m_pStep->m_nModule == FE_POROSOLUTE));
 	
 	// element force vector
 	vector<double> fe;
@@ -473,7 +473,7 @@ void FEBiphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matri
 
 void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert(fem.m_pStep->m_nModule == FE_POROELASTIC);
+	assert((fem.m_pStep->m_nModule == FE_POROELASTIC) || (fem.m_pStep->m_nModule == FE_POROSOLUTE));
 	
 	int i, i3, j, j3, n;
 	
@@ -622,7 +622,7 @@ void FEBiphasicDomain::UpdateStresses(FEM &fem)
 	int nint;
 	double* gw;
 	
-	assert(fem.m_pStep->m_nModule == FE_POROELASTIC);
+	assert((fem.m_pStep->m_nModule == FE_POROELASTIC) || (fem.m_pStep->m_nModule == FE_POROSOLUTE));
 	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{

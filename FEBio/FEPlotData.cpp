@@ -202,7 +202,7 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	if (pe)
 	{
-		int N = pd->Nodes();
+		int N = pe->Nodes();
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = pe->Node(i);
@@ -441,8 +441,10 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+				FESolutePoroElasticMaterialPoint* ps = (mp.ExtractData<FESolutePoroElasticMaterialPoint>());
 
 				if (pt) ew += pt->m_w;
+				else if (ps) ew += ps->m_w;
 			}
 
 			ew /= el.GaussPoints();

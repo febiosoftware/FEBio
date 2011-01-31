@@ -234,9 +234,13 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 	bool bporo = false;
 	if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && 
 		((dynamic_cast<FEPoroElastic*>(pm)) ||
-		(dynamic_cast<FEBiphasic*>(pm)) ||
-		(dynamic_cast<FEBiphasicSolute*>(pm)))) bporo = true;
+		(dynamic_cast<FEBiphasic*>(pm)))) bporo = true;
 
+	// see if this is a biphasic-solute material
+	bool bsolu = false;
+	if ((fem.m_pStep->m_nModule == FE_POROSOLUTE) && 
+		 (dynamic_cast<FEBiphasicSolute*>(pm))) bsolu = true;
+	
 	// calculate element stiffness matrix
 	ke.zero();
 	for (n=0; n<nint; ++n)
@@ -272,7 +276,18 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 			// evaluate fluid pressure at gauss-point
 //			pt.p = el.Evaluate(el.pt(), n);
 		}
-
+		else if (bsolu)
+		{
+			FESolutePoroElasticMaterialPoint& pt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
+			
+			pt.m_p = 0;
+			pt.m_c = 0;
+			
+			// evaluate fluid pressure at gauss-point
+			//			pt.p = el.Evaluate(el.pt(), n);
+			//			pt.c = el.Evaluate(el.ct(), n);
+		}
+		
 		// get the 'D' matrix
 		tens4ds C = pm->Tangent(mp);
 		C.extract(D);
