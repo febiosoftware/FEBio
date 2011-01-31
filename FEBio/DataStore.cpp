@@ -311,12 +311,12 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 			m_calc.SetVariable("Exy", E.xy());
 			m_calc.SetVariable("Eyz", E.yz());
 			m_calc.SetVariable("Exz", E.xz());
-			val += m_calc.eval(szexpr, ierr);
 			if (fem.m_pStep->m_nModule == FE_POROELASTIC)
 			{
 				FEPoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
 				if (ppt)
 				{
+					m_calc.SetVariable("p", ppt->m_pa);
 					m_calc.SetVariable("wx", ppt->m_w.x);
 					m_calc.SetVariable("wy", ppt->m_w.y);
 					m_calc.SetVariable("wz", ppt->m_w.z);
@@ -327,14 +327,17 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 				FESolutePoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutePoroElasticMaterialPoint>();
 				if (ppt)
 				{
+					m_calc.SetVariable("p", ppt->m_pa);
 					m_calc.SetVariable("wx", ppt->m_w.x);
 					m_calc.SetVariable("wy", ppt->m_w.y);
 					m_calc.SetVariable("wz", ppt->m_w.z);
+					m_calc.SetVariable("c", ppt->m_ca);
 					m_calc.SetVariable("jx", ppt->m_j.x);
 					m_calc.SetVariable("jy", ppt->m_j.y);
 					m_calc.SetVariable("jz", ppt->m_j.z);
 				}
 			}
+			val += m_calc.eval(szexpr, ierr);
 		}
 		val /= nint;
 	}
