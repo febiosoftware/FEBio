@@ -1,12 +1,11 @@
 #include "stdafx.h"
-#include "FESurfaceData.h"
+#include "FEplotSurfaceData.h"
 #include "fem.h"
 #include "FEPlotDataFactory.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_PLOTDATA(FEPlotContactGap      , "contact gap"     );
 REGISTER_PLOTDATA(FEPlotContactPressure , "contact pressure");
-REGISTER_PLOTDATA(FEPlotShellThickness  , "shell thickness" );
 REGISTER_PLOTDATA(FETestData , "_test_data" );
 
 //=============================================================================

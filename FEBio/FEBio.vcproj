@@ -1905,6 +1905,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPlotDomainData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPlotNodeData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPlotSurfaceData.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPoroConstPerm.cpp"
 				>
 			</File>
@@ -2022,10 +2034,6 @@
 			</File>
 			<File
 				RelativePath=".\FESurfaceConstraint.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FESurfaceData.cpp"
 				>
 			</File>
 			<File
@@ -2727,6 +2735,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPlotDomainData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPlotNodeData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPlotSurfaceData.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPoroConstPerm.h"
 				>
 			</File>
@@ -2820,10 +2840,6 @@
 			</File>
 			<File
 				RelativePath=".\FESurfaceConstraint.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FESurfaceData.h"
 				>
 			</File>
 			<File
