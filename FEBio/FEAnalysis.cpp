@@ -8,6 +8,7 @@
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
 #include "FEPoroElastic.h"
+#include "FEPoroSolidSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -203,21 +204,6 @@ bool FEAnalysis::Init()
 			clog.printbox("WARNING", "Rigid body %d is not being used.", m_fem.m_RB[i].m_mat+1);
 			m_fem.m_RB[i].m_bActive = false;
 		}
-
-	// Initialize poroelasticity
-	// TODO: can I call FEM::InitPoroSolute() here
-	// see if there are any poroelastic, biphasic, or biphasic-solute materials present
-	bool bporo, bsolu;
-	bporo = bsolu = false;
-	for (i=0; i<m_fem.Materials(); ++i) {
-		if (dynamic_cast<FEPoroElastic*>(m_fem.m_MAT[i])) bporo = true;
-		if (dynamic_cast<FEBiphasic*>(m_fem.m_MAT[i])) bporo = true;
-		if (dynamic_cast<FEBiphasicSolute*>(m_fem.m_MAT[i])) {bporo = true; bsolu = true;}
-	}
-	if (bporo && bsolu)
-		m_nModule = FE_POROSOLUTE;
-	else if (bporo)
-		m_nModule = FE_POROELASTIC;
 
 	// initialize equations
 	// ----->
@@ -667,9 +653,11 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		switch (m_nModule)
 		{
 		case FE_SOLID: 
+			m_psolver = new FESolidSolver(m_fem); 
+			break;
 		case FE_POROELASTIC:
 		case FE_POROSOLUTE:
-			m_psolver = new FESolidSolver(m_fem); 
+			m_psolver = new FEPoroSolidSolver(m_fem);
 			break;
 		case FE_HEAT:
 			m_psolver = new FEHeatSolver(m_fem);

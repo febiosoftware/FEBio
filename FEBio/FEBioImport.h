@@ -50,6 +50,11 @@ class FEBioControlSection : public FileSection
 public:
 	FEBioControlSection(FEFEBioImport* pim) : FileSection(pim) {}
 	void Parse(XMLTag& tag);
+
+protected:
+	bool ParseCommonParams(XMLTag& tag);
+	bool ParsePoroParams  (XMLTag& tag);
+	bool ParseSoluteParams(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------

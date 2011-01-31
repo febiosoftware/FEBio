@@ -40,7 +40,7 @@ public:
 	//{ --- Solution functions ---
 
 		//! prepares the data for the first QN iteration
-		void PrepStep(double time);
+		virtual void PrepStep(double time);
 
 		//! Performs a Newton-Raphson iteration
 		virtual bool Quasin(double time);
@@ -99,12 +99,6 @@ public:
 		void LinearConstraintForces(vector<double>& R);
 	//}
 
-protected:
-	// ---> TODO: move to the FEPoroSolidSolver
-	void GetPressureData(vector<double>& pi, vector<double>& ui);
-	void GetConcentrationData(vector<double>& pi, vector<double>& ui);
-	// --->
-
 public:
 	//! serialize data to/from dump file
 	void Serialize(DumpFile& ar);
@@ -115,15 +109,6 @@ public:
 	vector<double> m_Ui;	//!< Total displacement vector for iteration
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
-
-	// ---> TODO: move to the FEPoroSolidSolver
-	// poro data
-	vector<double>	m_pi;	//!< pressure increment vector
-	vector<double>	m_Pi;	//!< Total pressure vector for iteration
-
-	vector<double>	m_ci;	//!< concentration increment vector
-	vector<double>	m_Ci;	//!< Total concentration vector for iteration
-	// --->
 
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag

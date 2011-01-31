@@ -96,12 +96,8 @@ void FESolidSolver::PrepStep(double time)
 	m_bfgs.m_nups	= 0;	// nr of stiffness updates between reformations
 	m_naug  = 0;	// nr of augmentations
 
-	// zero total displacements/pressures
+	// zero total displacements
 	zero(m_Ui);
-	// ---> TODO: move to the FEPoroSolidSolver
-	zero(m_Pi);
-	zero(m_Ci);
-	// --->
 
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
@@ -372,27 +368,9 @@ bool FESolidSolver::Quasin(double time)
 	double	normEm;		// max energy norm
 	double	normUi;		// initial displacement norm
 
-// ---> TODO: move to the FEPoroSolidSolver
-	// poro convergence norms data
-	double	normPi;		// initial pressure norm
-	double	normP;		// current pressure norm
-	double	normp;		// incremement pressure norm
-
-	// solute convergence data
-	double	normCi;	// initial concentration norm
-	double	normC;	// current concentration norm
-	double	normc;	// incremement concentration norm
-// --->
-
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
-
-	// poroelasticity flag
-// ---> TODO: move to the FEPoroSolidSolver
-	bool bporo = (m_fem.m_pStep->m_nModule == FE_POROELASTIC) || (m_fem.m_pStep->m_nModule == FE_POROSOLUTE);
-	bool bsolu = m_fem.m_pStep->m_nModule == FE_POROSOLUTE;
-// --->
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -497,47 +475,6 @@ bool FESolidSolver::Quasin(double time)
 		// check energy divergence
 		if (normE1 > normEm) bconv = false;
 
-		// check poroelastic convergence
-// ---> TODO: move to the FEPoroSolidSolver
-		if (bporo)
-		{
-			// extract the pressure increments
-			GetPressureData(m_pi, m_bfgs.m_ui);
-
-			// set initial norm
-			if (m_niter == 0) normPi = fabs(m_pi*m_pi);
-
-			// update total pressure
-			for (i=0; i<m_fem.m_npeq; ++i) m_Pi[i] += s*m_pi[i];
-
-			// calculate norms
-			normP = m_Pi*m_Pi;
-			normp = (m_pi*m_pi)*(s*s);
-
-			// check convergence
-			if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
-		}
-		// check solute convergence
-		if (bsolu)
-		{
-			// extract the pressure increments
-			GetConcentrationData(m_ci, m_bfgs.m_ui);
-			
-			// set initial norm
-			if (m_niter == 0) normCi = fabs(m_ci*m_ci);
-			
-			// update total pressure
-			for (i=0; i<m_fem.m_npeq; ++i) m_Ci[i] += s*m_ci[i];
-			
-			// calculate norms
-			normC = m_Ci*m_Ci;
-			normc = (m_ci*m_ci)*(s*s);
-			
-			// check convergence
-			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normC)) bconv = false;
-		}
-// --->
-
 		// print convergence summary
 		oldmode = clog.GetMode();
 		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
@@ -552,16 +489,7 @@ bool FESolidSolver::Quasin(double time)
 		clog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		clog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
 		clog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
-// ---> TODO: move to the FEPoroSolidSolver
-		if (bporo)
-		{
-			clog.printf("\t   fluid pressure   %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
-		}
-		if (bsolu)
-		{
-			clog.printf("\t   solute concentration   %15le %15le %15le \n", normCi, normc ,(m_Ctol*m_Ctol)*normC );
-		}
-// --->
+
 		clog.SetMode(oldmode);
 
 		// check if we have converged. 
@@ -588,10 +516,6 @@ bool FESolidSolver::Quasin(double time)
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
-				// ---> TODO: move to the FEPoroSolidSolver
-				normPi = normp;
-				normCi = normc;
-				// --->
 				breform = true;
 			}
 			else
@@ -716,42 +640,6 @@ bool FESolidSolver::Quasin(double time)
 	}
 
 	return bconv;
-}
-
-//-----------------------------------------------------------------------------
-void FESolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
-{
-	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
-	zero(pi);
-	for (int i=0; i<N; ++i)
-	{
-		FENode& n = m_fem.m_mesh.Node(i);
-		nid = n.m_ID[6];
-		if (nid != -1)
-		{
-			nid = (nid < -1 ? -nid-2 : nid);
-			pi[m++] = ui[nid];
-			assert(m <= (int) pi.size());
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FESolidSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui)
-{
-	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
-	zero(ci);
-	for (int i=0; i<N; ++i)
-	{
-		FENode& n = m_fem.m_mesh.Node(i);
-		nid = n.m_ID[11];
-		if (nid != -1)
-		{
-			nid = (nid < -1 ? -nid-2 : nid);
-			ci[m++] = ui[nid];
-			assert(m <= (int) ci.size());
-		}
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

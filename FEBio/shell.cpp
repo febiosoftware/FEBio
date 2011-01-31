@@ -230,16 +230,8 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 	// calculate the average thickness
 	double* h0 = &el.m_h0[0], gt, za;
 
-	// see if this is a poroelastic material
-	bool bporo = false;
-	if ((fem.m_pStep->m_nModule == FE_POROELASTIC) && 
-		((dynamic_cast<FEPoroElastic*>(pm)) ||
-		(dynamic_cast<FEBiphasic*>(pm)))) bporo = true;
-
-	// see if this is a biphasic-solute material
-	bool bsolu = false;
-	if ((fem.m_pStep->m_nModule == FE_POROSOLUTE) && 
-		 (dynamic_cast<FEBiphasicSolute*>(pm))) bsolu = true;
+	// make sure that this is the struct mech module.
+	assert(fem.m_pStep->m_nModule == FE_SOLID);
 	
 	// calculate element stiffness matrix
 	ke.zero();
@@ -267,27 +259,6 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 		pt.avgJ = el.m_eJ;
 		pt.avgp = el.m_ep;
 
-		if (bporo)
-		{
-			FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-
-			pt.m_p = 0;
-
-			// evaluate fluid pressure at gauss-point
-//			pt.p = el.Evaluate(el.pt(), n);
-		}
-		else if (bsolu)
-		{
-			FESolutePoroElasticMaterialPoint& pt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
-			
-			pt.m_p = 0;
-			pt.m_c = 0;
-			
-			// evaluate fluid pressure at gauss-point
-			//			pt.p = el.Evaluate(el.pt(), n);
-			//			pt.c = el.Evaluate(el.ct(), n);
-		}
-		
 		// get the 'D' matrix
 		tens4ds C = pm->Tangent(mp);
 		C.extract(D);

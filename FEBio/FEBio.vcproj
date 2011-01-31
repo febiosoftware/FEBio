@@ -1933,6 +1933,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPoroSoluteSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPoroTraction.cpp"
 				>
 			</File>
@@ -2114,10 +2118,6 @@
 			</File>
 			<File
 				RelativePath=".\InitRigid.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\InitSolver.cpp"
 				>
 			</File>
 			<File
@@ -2760,6 +2760,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPoroSolidSolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPoroSoluteSolver.h"
 				>
 			</File>
 			<File

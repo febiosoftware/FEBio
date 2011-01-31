@@ -14,6 +14,8 @@
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
+#include "FEPoroSolidSolver.h"
+#include "FEPoroSoluteSolver.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -81,10 +83,6 @@ void echo_input(FEM& fem)
 	// get the FE mesh
 	FEMesh& mesh = fem.m_mesh;
 
-	// poro-elasticity flag
-	bool bporo = (fem.m_pStep->m_nModule == FE_POROELASTIC) || (fem.m_pStep->m_nModule == FE_POROSOLUTE);
-	bool bsolu = fem.m_pStep->m_nModule == FE_POROSOLUTE;
-
 	// print title
 	clog.printf("%s\n\n", fem.GetTitle());
 
@@ -135,8 +133,10 @@ void echo_input(FEM& fem)
 	clog.printf("\tDisplacement convergence tolerance ............. : %lg\n", step.m_psolver->m_Dtol);
 	clog.printf("\tEnergy convergence tolerance ................... : %lg\n", step.m_psolver->m_Etol);
 	clog.printf("\tResidual convergence tolerance ................. : %lg\n", step.m_psolver->m_Rtol);
-	if (bporo) clog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", step.m_psolver->m_Ptol);
-	if (bsolu) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", step.m_psolver->m_Ctol);
+	FEPoroSolidSolver* pps = dynamic_cast<FEPoroSolidSolver*>(step.m_psolver);
+	if (pps) clog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
+	FEPoroSoluteSolver* pss = dynamic_cast<FEPoroSoluteSolver*>(step.m_psolver);
+	if (pss) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pss->m_Ctol);
 	clog.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_bfgs.m_LStol );
 	clog.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_bfgs.m_LSmin );
 	clog.printf("\tMaximum number of line search iterations ....... : %d\n" , step.m_psolver->m_bfgs.m_LSiter);

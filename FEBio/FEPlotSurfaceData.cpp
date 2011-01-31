@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEplotSurfaceData.h"
+#include "FEPlotSurfaceData.h"
 #include "fem.h"
 #include "FEPlotDataFactory.h"
 

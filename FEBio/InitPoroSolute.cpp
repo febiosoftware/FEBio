@@ -10,19 +10,10 @@
 bool FEM::InitPoroSolute()
 {
 	int i, j, nd;
-	bool bporo, bsolu;
-	
-	// see if there are any poroelastic, biphasic, or biphasic-solute materials present
-	bporo = bsolu = false;
-	for (i=0; i<Materials(); ++i) {
-		if (dynamic_cast<FEPoroElastic*>(m_MAT[i])) bporo = true;
-		if (dynamic_cast<FEBiphasic*>(m_MAT[i])) bporo = true;
-		if (dynamic_cast<FEBiphasicSolute*>(m_MAT[i])) {bporo = true; bsolu = true;}
-	}
-	if (bporo && bsolu)
-		m_pStep->m_nModule = FE_POROSOLUTE;
-	else if (bporo)
-		m_pStep->m_nModule = FE_POROELASTIC;
+
+	// make sure this is the poro-solute module
+	bool bporo = (m_pStep->m_nModule == FE_POROELASTIC) || (m_pStep->m_nModule == FE_POROSOLUTE);
+	bool bsolu = (m_pStep->m_nModule == FE_POROSOLUTE);
 	
 	if (!bporo)
 	{
