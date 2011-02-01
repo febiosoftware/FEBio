@@ -135,7 +135,7 @@ public:
 	FEDomain* Clone()
 	{
 		FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -208,7 +208,7 @@ public:
 	FEDomain* Clone()
 	{
 		FE3FieldElasticSolidDomain* pd = new FE3FieldElasticSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -246,7 +246,7 @@ public:
 	FEDomain* Clone()
 	{
 		FEPoroSolidDomain* pd = new FEPoroSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -285,7 +285,7 @@ public:
 	FEDomain* Clone()
 	{
 		FERigidSolidDomain* pd = new FERigidSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -310,7 +310,7 @@ public:
 	FEDomain* Clone()
 	{
 		FEUDGHexDomain* pd = new FEUDGHexDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -392,7 +392,7 @@ public:
 	FEDomain* Clone()
 	{
 		FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -442,7 +442,7 @@ public:
 	FEDomain* Clone()
 	{
 		FERigidShellDomain* pd = new FERigidShellDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -490,7 +490,7 @@ public:
 	FEDomain* Clone()
 	{
 		FEElasticTrussDomain* pd = new FEElasticTrussDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -531,7 +531,7 @@ public:
 	FEDomain* Clone()
 	{
 		FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -558,7 +558,7 @@ public:
 	FEDomain* Clone()
 	{
 		FEDiscreteDomain* pd = new FEDiscreteDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
 
@@ -596,7 +596,7 @@ class FEBiphasicDomain : public FEElasticSolidDomain
 		FEDomain* Clone()
 		{
 			FEBiphasicDomain* pd = new FEBiphasicDomain(m_pMesh, m_pMat);
-			pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+			pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 			return pd;
 		}
 		
@@ -637,7 +637,7 @@ class FEBiphasicSoluteDomain : public FEElasticSolidDomain
 		FEDomain* Clone()
 		{
 			FEBiphasicSoluteDomain* pd = new FEBiphasicSoluteDomain(m_pMesh, m_pMat);
-			pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+			pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 			return pd;
 		}
 		

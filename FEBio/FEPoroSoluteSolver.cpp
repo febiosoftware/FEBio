@@ -229,7 +229,7 @@ bool FEPoroSoluteSolver::Quasin(double time)
 			if (m_niter == 0) normCi = fabs(m_ci*m_ci);
 			
 			// update total pressure
-			for (i=0; i<m_fem.m_npeq; ++i) m_Ci[i] += s*m_ci[i];
+			for (i=0; i<m_fem.m_nceq; ++i) m_Ci[i] += s*m_ci[i];
 			
 			// calculate norms
 			normC = m_Ci*m_Ci;

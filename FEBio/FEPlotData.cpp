@@ -63,6 +63,7 @@ void FEDomainData::Save(FEM &fem, Archive& ar)
 		default:
 			assert(false);
 		}
+		assert(nsize > 0);
 
 		// fill data vector and save
 		vector<float> a; 

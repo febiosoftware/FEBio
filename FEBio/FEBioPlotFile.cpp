@@ -356,6 +356,7 @@ void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
+	assert(mid > 0);
 	int etype = dom.GetElementType();
 
 	int i, j;
@@ -402,6 +403,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 {
 	int mid = dom.GetMaterial()->GetID();
+	assert(mid > 0);
 	int etype = dom.GetElementType();
 
 	int i, j;

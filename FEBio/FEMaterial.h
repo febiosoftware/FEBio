@@ -58,6 +58,7 @@ public:
 	virtual void Init(){}
 
 	int GetID() { return m_nID; }
+	void SetID(int nid) { m_nID = nid; }
 
 public:
 	// this is the first GetParameterList function

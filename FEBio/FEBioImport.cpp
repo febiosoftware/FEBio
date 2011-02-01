@@ -596,6 +596,9 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 		// set the material's name
 		if (szname) pmat->SetName(szname);
 
+		// set the material's ID
+		pmat->SetID(m_nmat);
+
 		ParseMaterial(tag, pmat);
 
 		// read next tag
