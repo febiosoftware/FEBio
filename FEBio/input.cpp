@@ -3,7 +3,6 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FileImport.h"
-#include "NikeImport.h"
 #include "FEBioImport.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
@@ -24,33 +23,14 @@
 
 bool FEM::Input(const char* szfile)
 {
-	// create file readers
-	FEFileImport* pin = 0;
-	FENIKEImport  in_nike;
-	FEFEBioImport in_febio;
-
-	// check the extension of the filename
-	// to determine what file reader we need.
-	const char* szext = strrchr(szfile, '.');
-
-	if (szext && ((strcmp(szext, ".xml")== 0) ||
-		          (strcmp(szext, ".XML")== 0) ||
-				  (strcmp(szext, ".feb")== 0) ))
-	{
-		// It's an FEBio file
-		pin = &in_febio;
-	}
-	else
-	{
-		// It's a NIKE file
-		pin = &in_nike;
-	}
+	// create file reader
+	FEFEBioImport fim;
 
 	// Load the file
-	if (pin->Load(*this, szfile) == false)
+	if (fim.Load(*this, szfile) == false)
 	{
 		char szerr[256];
-		pin->GetErrorMessage(szerr);
+		fim.GetErrorMessage(szerr);
 		fprintf(stderr, szerr);
 
 		return false;

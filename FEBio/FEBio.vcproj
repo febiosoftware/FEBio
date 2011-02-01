@@ -2153,10 +2153,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\NikeImport.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\optimize.cpp"
 				>
 			</File>
@@ -2936,10 +2932,6 @@
 			</File>
 			<File
 				RelativePath=".\MathParser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\NikeImport.h"
 				>
 			</File>
 			<File
