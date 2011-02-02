@@ -244,22 +244,18 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 
 	if      (strcmp(szt, "solid") == 0) 
 	{
-		pstep->m_psolver = new FESolidSolver(fem);
 		pstep->m_nModule = FE_SOLID;
 	}
 	else if (strcmp(szt, "poro" ) == 0) 
 	{
-		pstep->m_psolver = new FEPoroSolidSolver(fem);
 		pstep->m_nModule = FE_POROELASTIC;
 	}
 	else if (strcmp(szt, "solute") == 0)
 	{
-		pstep->m_psolver = new FEPoroSoluteSolver(fem);
 		pstep->m_nModule = FE_POROSOLUTE;
 	}
 	else if (strcmp(szt, "heat" ) == 0)
 	{
-		pstep->m_psolver = new FEHeatSolver(fem);
 		pstep->m_nModule = FE_HEAT;
 	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
@@ -271,13 +267,27 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 //
 //=============================================================================
 
+FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
+{
+	switch (nmod)
+	{
+	case FE_SOLID      : return new FESolidSolver(fem);
+	case FE_POROELASTIC: return new FEPoroSolidSolver(fem);
+	case FE_POROSOLUTE : return new FEPoroSoluteSolver(fem);
+	case FE_HEAT       : return new FEHeatSolver(fem);
+	default:
+		assert(false);
+		return 0;
+	}
+}
+
 void FEBioControlSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
 	FEAnalysis* pstep = GetStep();
 
 	// make sure we have a solver defined
-	if (pstep->m_psolver == 0) pstep->m_psolver = new FESolidSolver(fem);
+	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(pstep->m_nModule, fem);
 
 	++tag;
 	do
@@ -3895,14 +3905,19 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	// we need to create new FEAnalysis steps and add them to fem
 	if (m_pim->m_nsteps != 0)
 	{
+		// copy the module ID
+		assert(m_pim->m_pStep);
+		int nmod = m_pim->m_pStep->m_nModule;
 		m_pim->m_pStep = new FEAnalysis(*m_pim->m_pfem);
 		m_pim->m_pfem->m_Step.push_back(m_pim->m_pStep);
+		m_pim->m_pStep->m_nModule = nmod;
 	}
 
 	// increase the step section counter
 	++m_pim->m_nsteps;
 
 	FileSectionMap Map;
+	Map["Module"     ] = new FEBioModuleSection     (m_pim);
 	Map["Control"    ] = new FEBioControlSection    (m_pim);
 	Map["Constraints"] = new FEBioConstraintsSection(m_pim);
 	Map["Boundary"   ] = new FEBioBoundarySection   (m_pim);

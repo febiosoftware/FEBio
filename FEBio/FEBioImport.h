@@ -52,6 +52,8 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
+	FESolver* BuildSolver(int nmod, FEM& fem);
+
 	bool ParseCommonParams(XMLTag& tag);
 	bool ParsePoroParams  (XMLTag& tag);
 	bool ParseSoluteParams(XMLTag& tag);
