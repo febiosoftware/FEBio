@@ -353,7 +353,7 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 	if (pe)
 	{
 		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 
 		// see if this is a poro-elastic element
 		FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
@@ -1421,7 +1421,7 @@ bool FESlidingInterface2::PoroStatus(FEMesh& m, FESurfaceElement& el)
 	if (pe)
 	{
 		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a poro-elastic element
 		FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
