@@ -52,10 +52,12 @@ FETangentDiagnostic::~FETangentDiagnostic()
 
 bool FETangentDiagnostic::Init()
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	// create the mesh
+	FEBox box;
+	box.Create(1, 1, 1, vec3d(0,0,0), vec3d(1,1,1), m_fem.m_nhex8);
 
 	// get the one-and-only solid domain
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
+	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(box.Domain(0));
 
 	// assign the material to the domain
 	bd.SetMatID(0);
@@ -66,6 +68,9 @@ bool FETangentDiagnostic::Init()
 	{
 		bd.Element(0).SetMaterialPointData( m_fem.GetMaterial(0)->CreateMaterialPointData(), i);
 	}
+
+	// set the geometry
+	m_fem.m_mesh = box;
 
 	return FEDiagnostic::Init();
 }
@@ -270,13 +275,6 @@ bool FETangentDiagnostic::ParseSection(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name");
 	if (strcmp(szname, "uni-axial") == 0)
 	{
-		// create the mesh
-		FEBox box;
-		box.Create(1, 1, 1, vec3d(0,0,0), vec3d(1,1,1), fem.m_nhex8);
-
-		// set the geometry
-		fem.m_mesh = box;
-
 		++tag;
 		while (!tag.isend())
 		{

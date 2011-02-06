@@ -26,7 +26,21 @@ FEDiagnostic::~FEDiagnostic()
 }
 
 //-----------------------------------------------------------------------------
+void FEBioScenarioSection::Parse(XMLTag &tag)
+{
+	FEDiagnosticImport& dim = dynamic_cast<FEDiagnosticImport&>(*m_pim);
+	FETangentDiagnostic& td = dynamic_cast<FETangentDiagnostic&>(*dim.m_pdia);
 
+	++tag;
+	do
+	{
+		if (tag == "strain") tag.value(td.m_strain);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
 FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 {
 	// store a copy of the file name
@@ -43,12 +57,17 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	m_pfem = &fem;
 	m_pdia = 0;
 
-	m_pStep = fem.m_Step[0];
+	FEAnalysis* pstep = new FEAnalysis(fem);
+	fem.m_Step.push_back(pstep);
+	fem.m_nStep = 0;
+	fem.m_pStep = pstep;
+	m_pStep = pstep;
 
 	// define file structure
 	FileSectionMap map;
 	map["Control" ] = new FEBioControlSection (this);
 	map["Material"] = new FEBioMaterialSection(this);
+	map["Scenario"] = new FEBioScenarioSection(this);
 
 	// loop over all child tags
 	try

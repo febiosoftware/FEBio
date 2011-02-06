@@ -31,12 +31,14 @@ public:
 protected:
 	static double residual(double d);
 
+public:
+	double	m_strain;
+
 protected:
 	void solve();
 
 	void deriv_residual(matrix& ke);
 
-	double	m_strain;
 	double	m_stretch;
 
 	static FETangentDiagnostic* m_pthis;

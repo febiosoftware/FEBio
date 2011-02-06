@@ -40,6 +40,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// Scenario Section parser
+class FEBioScenarioSection : public FileSection
+{
+public:
+	FEBioScenarioSection(FEFEBioImport* pim) : FileSection(pim){}
+	void Parse(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
 //! The FEDiagnosticImport class creates a specific diagnostic test. Currently
 //! the only way to create a diagnostic is to load a diagnostic from file
 
@@ -50,6 +59,8 @@ public:
 
 protected:
 	FEDiagnostic* m_pdia;
+
+	friend FEBioScenarioSection;
 };
 
 #endif // !defined(AFX_FEDIAGNOSTIC_H__75EB5A08_CE16_45BD_A223_7BD93BF0837A__INCLUDED_)
