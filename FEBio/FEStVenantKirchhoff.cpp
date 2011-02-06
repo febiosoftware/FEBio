@@ -64,7 +64,7 @@ tens4ds FEStVenantKirchhoff::Tangent(FEMaterialPoint& mp)
 	double mu  = 0.5*m_E/(1+m_v);
 
 	double lam1 = lam / J;
-	double mu1  = 2.0*mu / J;
+	double mu1  = mu / J;
 
 	// left cauchy-green matrix (i.e. the 'b' matrix)
 	mat3ds b = pt.LeftCauchyGreen();
