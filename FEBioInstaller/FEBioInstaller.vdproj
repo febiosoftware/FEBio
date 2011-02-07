@@ -105,6 +105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_20981A4AA4774B969FBA1CCBE50B33A4"
+        "OwnerKey" = "8:_B1EA40EBCFE3492189085783BEC23D52"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_23B14FFFC88948E4BDCB15EE39893C9F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -201,18 +207,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_40785803F5FF4D5991CDF9DE2DE1F7AB"
-        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_40DA568CA1A94C9EA6D25FC73AE8B91D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4143D3B49F9B403882645C66A2B04BB3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -274,6 +268,12 @@
         "Entry"
         {
         "MsmKey" = "8:_58637D50A31147C380ED3E5AFF16B5D6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5B8CB2E08E23413B93B4F1D7C39F2ECA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -507,6 +507,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B1EA40EBCFE3492189085783BEC23D52"
+        "OwnerKey" = "8:_B5DBEA9D13BD4A3299351E9AD71B980A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B20AC55CEF1442F3ABCF8FAE4D6D3141"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -563,12 +569,6 @@
         {
         "MsmKey" = "8:_BCF5CA72D2DC4D3D9A0B405B1FFB38B3"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C0509D15E86643C7BEFFA1C488CC7952"
-        "OwnerKey" = "8:_40785803F5FF4D5991CDF9DE2DE1F7AB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1644,26 +1644,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_40DA568CA1A94C9EA6D25FC73AE8B91D"
-            {
-            "SourcePath" = "8:..\\..\\..\\..\\FEBio Documents\\Documentation\\license_receipt.pdf"
-            "TargetName" = "8:license_receipt.pdf"
-            "Tag" = "8:"
-            "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4143D3B49F9B403882645C66A2B04BB3"
             {
             "SourcePath" = "8:..\\Testing\\Verify\\co30.feb"
@@ -1870,6 +1850,26 @@
             "TargetName" = "8:co29.feb"
             "Tag" = "8:"
             "Folder" = "8:_699C404767DE4207B119782F46461B67"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5B8CB2E08E23413B93B4F1D7C39F2ECA"
+            {
+            "SourcePath" = "8:..\\Documentation\\license_receipt.pdf"
+            "TargetName" = "8:license_receipt.pdf"
+            "Tag" = "8:"
+            "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -3852,11 +3852,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_40785803F5FF4D5991CDF9DE2DE1F7AB"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_20981A4AA4774B969FBA1CCBE50B33A4"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
                 "Properties"
                 {
                 }
@@ -3866,11 +3866,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C0509D15E86643C7BEFFA1C488CC7952"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_B1EA40EBCFE3492189085783BEC23D52"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -3885,7 +3885,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B5DBEA9D13BD4A3299351E9AD71B980A"
             {
-            "SourcePath" = "8:..\\Release\\FEBio.exe"
+            "SourcePath" = "8:..\\Debug\\FEBio.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A9F30665B9534E439753127ACED5EF05"
