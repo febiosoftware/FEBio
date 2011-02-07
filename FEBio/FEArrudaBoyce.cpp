@@ -47,8 +47,8 @@ mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)
 	double I1 = B.tr();
 
 	// strain energy derivative
-	double IoN = I1/m_N;
-	double W1 = m_mu*(a[0] + (a[1] + (a[2] + (a[3] + a[4]*IoN)*IoN)*IoN)*IoN);
+	double f = I1/m_N;
+	double W1 = m_mu*(a[0] + (2.0*a[1] + (3*a[2] + (4*a[3] + 5*a[4]*f)*f)*f)*f);
 
 	// T = FdW/dCFt
 	mat3ds T = B*W1;
@@ -79,10 +79,11 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	double I1 = B.tr();
 
 	// --- TODO: put strain energy derivatives here ---
-	// Wi = dW/dIi
-	double IoN = I1/m_N;
-	double W1 = m_mu*(a[0] + (a[1] + (a[2] + (a[3] + a[4]*IoN)*IoN)*IoN)*IoN);
-	double W11 = (m_mu/m_N)*(a[1] + (2*a[2] + (3*a[3] + 4*a[4]*IoN)*IoN)*IoN);
+	// W1 = dW/dI1
+	// W11 = d2W/dI1^2
+	const double f = I1/m_N;
+	double W1  = m_mu*(a[0] + (2*a[1] + (3*a[2] + (4*a[3] + 5*a[4]*f)*f)*f)*f);
+	double W11 = 2.0*m_mu*(a[1] + (3*a[2] + (6*a[3] + 10*a[4]*f)*f)*f)/m_N;
 	// ---
 
 	// calculate dWdC:C
@@ -105,7 +106,7 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	// d2W/dCdC:C
 	mat3ds WCCxC = B*(W11*I1);
 
-	tens4ds cw = (BxB - B4)*(W11*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
+	tens4ds cw = BxB*(W11*4.0*Ji) - dyad1s(WCCxC, I)*(4.0/3.0*Ji) + IxI*(4.0/9.0*Ji*CWWC);
 
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
