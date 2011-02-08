@@ -60,7 +60,7 @@ public:
 protected:
 	FEDiagnostic* m_pdia;
 
-	friend FEBioScenarioSection;
+	friend class FEBioScenarioSection;
 };
 
 #endif // !defined(AFX_FEDIAGNOSTIC_H__75EB5A08_CE16_45BD_A223_7BD93BF0837A__INCLUDED_)
