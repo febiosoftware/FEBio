@@ -6,6 +6,7 @@
 REGISTER_PLOTDATA(FEPlotNodeDisplacement, "displacement");
 REGISTER_PLOTDATA(FEPlotNodeVelocity    , "velocity"    );
 REGISTER_PLOTDATA(FEPlotNodeAcceleration, "acceleration");
+REGISTER_PLOTDATA(FEPlotNodeTemperature , "temperature" );
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -68,6 +69,22 @@ bool FEPlotNodeAcceleration::Save(FEMesh& m, vector<float>& a)
 		a.push_back(xf[0]);
 		a.push_back(xf[1]);
 		a.push_back(xf[2]);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store the nodal displacements
+bool FEPlotNodeTemperature::Save(FEMesh& m, vector<float>& a)
+{
+	for (int i=0; i<m.Nodes(); ++i)
+	{
+		FENode& node = m.Node(i);
+
+		// since the PLOT file requires floats we need to convert
+		// the doubles to single precision
+		float f = (float) node.m_T;
+		a.push_back(f);
 	}
 	return true;
 }

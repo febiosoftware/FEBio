@@ -34,3 +34,12 @@ public:
 	FEPlotNodeAcceleration() : FENodeData(VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Nodal temperatures
+class FEPlotNodeTemperature : public FENodeData
+{
+public:
+	FEPlotNodeTemperature() : FENodeData(FLOAT, FMT_NODE){}
+	bool Save(FEMesh& m, vector<float>& a);
+};
