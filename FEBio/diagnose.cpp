@@ -38,8 +38,18 @@ bool diagnose(FEM& fem, const char* szfile)
 
 	// --- run the diagnostic ---
 
-	// the return value will designate that pass/fail result
-	bool bret = pdia->Run();
+	// the return value will designate the pass/fail result
+	bool bret = false;
+	try
+	{
+		bret = pdia->Run();
+	}
+	catch (...)
+	{
+		clog.SetMode(Logfile::FILE_AND_SCREEN);
+		clog.printf("Exception thrown. Aborting diagnostic.\n");
+		bret = false;
+	}
 
 	if (bret) clog.printf("Diagnostic passed\n");
 	else clog.printf("Diagnostic failed\n");
