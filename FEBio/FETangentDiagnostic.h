@@ -19,29 +19,28 @@
 class FETangentDiagnostic : public FEDiagnostic  
 {
 public:
+	enum TD_Scenario {
+		TDS_UNIAXIAL,
+		TDS_SIMPLE_SHEAR
+	};
+
+public:
 	FETangentDiagnostic(FEM& fem);
-	virtual ~FETangentDiagnostic();
+	virtual ~FETangentDiagnostic(){}
 
 	bool Init();
 
 	bool Run();
 
-	bool ParseSection(XMLTag& tag);
-
 protected:
-	static double residual(double d);
-
-public:
-	double	m_strain;
-
-protected:
-	void solve();
+	void BuildUniaxial();
+	void BuildSimpleShear();
 
 	void deriv_residual(matrix& ke);
 
-	double	m_stretch;
-
-	static FETangentDiagnostic* m_pthis;
+public:
+	TD_Scenario	m_scn;
+	double		m_strain;
 };
 
 #endif // !defined(AFX_FETANGENTDIAGNOSTIC_H__C41CFF58_F916_4835_9993_7B461D9F282B__INCLUDED_)

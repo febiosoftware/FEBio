@@ -61,11 +61,14 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	m_pfem = &fem;
 
 	// Create one step
-	assert(fem.m_Step.empty());
-	FEAnalysis* pstep = new FEAnalysis(fem);
-	fem.m_Step.push_back(pstep);
-	fem.m_nStep = 0;
-	fem.m_pStep = pstep;
+	if (fem.m_Step.empty())
+	{
+		FEAnalysis* pstep = new FEAnalysis(fem);
+		fem.m_Step.push_back(pstep);
+		fem.m_nStep = 0;
+		fem.m_pStep = pstep;
+	}
+	assert(fem.m_pStep);
 
 	// get a pointer to the first step
 	// since we assume that the FEM object will always have

@@ -8,91 +8,203 @@
 #include "FESolidSolver.h"
 #include "log.h"
 
-void print_matrix(Logfile& log, matrix& m)
+//-----------------------------------------------------------------------------
+// Helper function to print a matrix
+void print_matrix(matrix& m)
 {
 	int i, j;
 	int N = m.rows();
 	int M = m.columns();
 
-	log.printf("\n    ");
-	for (i=0; i<N; ++i) log.printf("%15d ", i);
-	log.printf("\n----");
-	for (i=0; i<N; ++i) log.printf("----------------", i);
+	clog.printf("\n    ");
+	for (i=0; i<N; ++i) clog.printf("%15d ", i);
+	clog.printf("\n----");
+	for (i=0; i<N; ++i) clog.printf("----------------", i);
 
 	for (i=0; i<N; ++i)
 	{
-		log.printf("\n%2d: ", i);
+		clog.printf("\n%2d: ", i);
 		for (j=0; j<M; ++j)
 		{
-			log.printf("%15lg ", m[i][j]);
+			clog.printf("%15lg ", m[i][j]);
 		}
 	}
-	log.printf("\n");
+	clog.printf("\n");
 }
-
-void mnbrak(double* pa, double* pb, double* pc, double* pfa, double* pfb, double* pfc, double (*func)(double));
-double golden(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FETangentDiagnostic* FETangentDiagnostic::m_pthis = 0;
-
-
+//-----------------------------------------------------------------------------
+// Constructor
 FETangentDiagnostic::FETangentDiagnostic(FEM& fem) : FEDiagnostic(fem)
 {
 	m_strain = 0;
 }
 
-FETangentDiagnostic::~FETangentDiagnostic()
-{
-
-}
-
+//-----------------------------------------------------------------------------
+// Initialize the diagnostic. In this function we build the FE model depending
+// on the scenario.
 bool FETangentDiagnostic::Init()
 {
-	// create the mesh
-	FEBox box;
-	box.Create(1, 1, 1, vec3d(0,0,0), vec3d(1,1,1), m_fem.m_nhex8);
-
-	// get the one-and-only solid domain
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(box.Domain(0));
-
-	// assign the material to the domain
-	bd.SetMatID(0);
-
-	// TODO: find an easier way to create material point data
-	bd.Element(0).m_gid = 0;
-	for (int i=0; i<8; ++i)
+	switch (m_scn)
 	{
-		bd.Element(0).SetMaterialPointData( m_fem.GetMaterial(0)->CreateMaterialPointData(), i);
+	case TDS_UNIAXIAL: BuildUniaxial(); break;
+	case TDS_SIMPLE_SHEAR: BuildSimpleShear(); break;
+	default:
+		return false;
 	}
-
-	// set the geometry
-	m_fem.m_mesh = box;
-
 	return FEDiagnostic::Init();
 }
 
+//-----------------------------------------------------------------------------
+// Build the uni-axial scenario
+void FETangentDiagnostic::BuildUniaxial()
+{
+	int i, j;
+	vec3d r[8] = {
+		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
+		vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
+	};
+
+	int BC[8][3] = {
+		{-1,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, {-1, 0,-1},
+		{-1,-1, 0},{ 0,-1, 0},{ 0, 0, 0}, {-1, 0, 0}
+	};
+
+	// --- create the FE problem ---
+	// create the mesh
+	FEMesh& m = m_fem.m_mesh;
+	m.CreateNodes(8);
+	for (i=0; i<8; ++i)
+	{
+		FENode& n = m.Node(i);
+		n.m_rt = n.m_r0 = r[i];
+		n.m_rid = -1;
+
+		// set displacement BC's
+		n.m_ID[0] = BC[i][0];
+		n.m_ID[1] = BC[i][1];
+		n.m_ID[2] = BC[i][2];
+
+		// fix all DOFS
+		for (j=3; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
+	}
+
+	// get the material
+	FEMaterial* pmat = m_fem.GetMaterial(0);
+
+	// create a solid domain
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m, pmat);
+	pd->create(1);
+	m.AddDomain(pd);
+	FESolidElement& el = pd->Element(0);
+	el.SetType(FE_HEX);
+	el.m_nID = 1;
+	el.m_gid = 0;
+	el.SetMatID(0);
+	for (i=0; i<8; ++i) el.m_node[i] = i;
+
+	pd->InitMaterialPointData();
+
+	// convert strain to a displacement
+	double d = sqrt(2*m_strain+1) - 1;
+
+	// Add a prescribed BC
+	int nd[4] = {1, 2, 5, 6};
+	for (i=0; i<4; ++i)
+	{
+		FENodalDisplacement* pdc = new FENodalDisplacement;
+		pdc->node = nd[i];
+		pdc->bc = 0;
+		pdc->lc = 0;
+		pdc->s = d;
+		m_fem.m_DC.push_back(pdc);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Build the simple shear scenario
+void FETangentDiagnostic::BuildSimpleShear()
+{
+	int i, j;
+	vec3d r[8] = {
+		vec3d(0,0,0), vec3d(1,0,0), vec3d(1,1,0), vec3d(0,1,0),
+		vec3d(0,0,1), vec3d(1,0,1), vec3d(1,1,1), vec3d(0,1,1)
+	};
+
+	int BC[8][3] = {
+		{-1,-1,-1},{-1,-1,-1},{-1, 0,-1}, {-1, 0,-1},
+		{ 0,-1,-1},{ 0,-1,-1},{ 0, 0,-1}, { 0, 0,-1}
+	};
+
+	// --- create the FE problem ---
+	// create the mesh
+	FEMesh& m = m_fem.m_mesh;
+	m.CreateNodes(8);
+	for (i=0; i<8; ++i)
+	{
+		FENode& n = m.Node(i);
+		n.m_rt = n.m_r0 = r[i];
+		n.m_rid = -1;
+
+		// set displacement BC's
+		n.m_ID[0] = BC[i][0];
+		n.m_ID[1] = BC[i][1];
+		n.m_ID[2] = BC[i][2];
+
+		// fix all DOFS
+		for (j=3; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
+	}
+
+	// get the material
+	FEMaterial* pmat = m_fem.GetMaterial(0);
+
+	// create a solid domain
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(&m, pmat);
+	pd->create(1);
+	m.AddDomain(pd);
+	FESolidElement& el = pd->Element(0);
+	el.SetType(FE_HEX);
+	el.m_nID = 1;
+	el.m_gid = 0;
+	el.SetMatID(0);
+	for (i=0; i<8; ++i) el.m_node[i] = i;
+
+	pd->InitMaterialPointData();
+
+	// convert strain to a displacement
+	double d = 2*m_strain;
+
+	// Add a prescribed BC
+	int nd[4] = {4, 5, 6, 7};
+	for (i=0; i<4; ++i)
+	{
+		FENodalDisplacement* pdc = new FENodalDisplacement;
+		pdc->node = nd[i];
+		pdc->bc = 0;
+		pdc->lc = 0;
+		pdc->s = d;
+		m_fem.m_DC.push_back(pdc);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Run the tangent diagnostic. After we run the FE model, we calculate 
+// the element stiffness matrix and compare that to a finite difference
+// of the element residual.
 bool FETangentDiagnostic::Run()
 {
 	FEM& fem = m_fem;
 
-	FEMesh& mesh = fem.m_mesh;
 
 	Logfile::MODE oldmode = clog.SetMode(Logfile::FILE_ONLY);
 
-	// get and initialize the first step
-	fem.m_Step[0]->Init();
-
-	// get and initialize the solver
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
-	solver.Init();
-
 	// solve the problem
-	solve();
+	m_fem.Solve();
 
+	FEMesh& mesh = fem.m_mesh;
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
@@ -106,7 +218,7 @@ bool FETangentDiagnostic::Run()
 
 	// print the element stiffness matrix
 	clog.printf("\nActual stiffness matrix:\n");
-	print_matrix(clog, k0);
+	print_matrix(k0);
 
 	// now calculate the derivative of the residual
 	matrix k1;
@@ -114,7 +226,7 @@ bool FETangentDiagnostic::Run()
 
 	// print the approximate element stiffness matrix
 	clog.printf("\nApproximate stiffness matrix:\n");
-	print_matrix(clog, k1);
+	print_matrix(k1);
 
 	// finally calculate the difference matrix
 	clog.printf("\n");
@@ -125,7 +237,7 @@ bool FETangentDiagnostic::Run()
 		for (j=0; j<24; ++j)
 		{
 			kd[i][j] = k0[i][j] - k1[i][j];
-			kij = 100.0*fabs(kd[i][j] / k0[i][j]);
+			kij = 100.0*fabs(kd[i][j] / k0[0][0]);
 			if (kij > kmax) 
 			{
 				kmax = kij;
@@ -136,15 +248,18 @@ bool FETangentDiagnostic::Run()
 
 	// print the difference
 	clog.printf("\ndifference matrix:\n");
-	print_matrix(clog, kd);
+	print_matrix(kd);
 
 	clog.SetMode(oldmode);
 
 	clog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
 
-	return (kmax < 1e-3);
+	return (kmax < 1e-4);
 }
 
+//-----------------------------------------------------------------------------
+// Calculate a finite difference approximation of the derivative of the
+// element residual.
 void FETangentDiagnostic::deriv_residual(matrix& ke)
 {
 	FEM& fem = m_fem;
@@ -203,221 +318,5 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		bd.UnpackElement(el);
 
 		for (i=0; i<3*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
-	}
-}
-
-double FETangentDiagnostic::residual(double d)
-{
-	FETangentDiagnostic& dia = *m_pthis;
-
-	FEM& fem = dia.m_fem;
-	FEMesh& mesh = fem.m_mesh;
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
-
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
-
-	FESolidElement& el = bd.Element(0);
-	bd.UnpackElement(el);
-
-	// set the deformation
-	for (int n=0; n<8; ++n)
-	{
-		FENode& node = mesh.Node(n);
-		node.m_rt.x = node.m_r0.x*(1+dia.m_stretch);
-		node.m_rt.y = node.m_r0.y*(1 + d);
-		node.m_rt.z = node.m_r0.z*(1 + d);
-	}
-
-	// update stresses
-	solver.UpdateStresses();
-
-	// get the residual
-	vector<double> R(24);
-	zero(R);
-
-	bd.InternalForces(el, R);
-
-	double r = sqrt(R*R);
-
-	return r;
-}
-
-void FETangentDiagnostic::solve()
-{
-	FEM& fem = m_fem;
-	FEMesh& mesh = fem.m_mesh;
-
-	// calculate stretch
-	m_stretch = sqrt(2.0*m_strain + 1) - 1;
-
-	// set the static this pointer
-	m_pthis = this;
-
-	double a = -0.046;
-	double b = -0.045;
-	double c, fa, fb, fc;
-	mnbrak(&a, &b, &c, &fa, &fb, &fc, FETangentDiagnostic::residual);
-
-	double beta = 0;
-	double res = golden(a, b, c, FETangentDiagnostic::residual, 1e-5, &beta);
-
-	double d = residual(beta);
-
-	if (fem.m_pStep->m_nplot != FE_PLOT_NEVER) fem.m_plot->Write(fem);
-}
-
-bool FETangentDiagnostic::ParseSection(XMLTag& tag)
-{
-	if (tag != "Scenario") return false;
-
-	FEM& fem = m_fem;
-
-	const char* szname = tag.AttributeValue("name");
-	if (strcmp(szname, "uni-axial") == 0)
-	{
-		++tag;
-		while (!tag.isend())
-		{
-			if (tag == "strain") tag.value(m_strain);
-			else throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-	}
-	else throw XMLReader::InvalidAttributeValue(tag, "name", szname);
-
-	return true;
-}
-
-#define SHFT2(a, b, c) (a)=(b);(b)=(c);
-#define SHFT(a, b, c, d) (a)=(b);(b)=(c);(c)=(d);
-#define SIGN(a, b) ((b)>=0?fabs(a):(-fabs(a)))
-#define FMAX(a, b) ((a)>(b)?(a):(b))
-
-void mnbrak(double* pa, double* pb, double* pc, double* pfa, double* pfb, double* pfc, double (*func)(double))
-{
-	const double GOLD = 1.618034;
-	const double TINY = 1.0e-20;
-	const double GLIMIT = 100;
-
-	double& a = *pa;
-	double& b = *pb;
-	double& c = *pc;
-
-	double& fa = *pfa;
-	double& fb = *pfb;
-	double& fc = *pfc;
-
-	double ulim, u, r, q, fu, dum;
-
-	fa = func(a);
-	fb = func(b);
-	if (fb>fa)
-	{
-		SHFT(dum, a, b, dum);
-		SHFT(dum, fb, fa, dum);
-	}
-
-	c = b+GOLD*(b - a);
-	fc = func(c);
-	while (fb > fc)
-	{
-		r = (b - a)*(fb - fc);
-		q = (b - c)*(fb - fa);
-		u = b - ((b - c)*q - (b - a)*r) / (2.0*SIGN(FMAX(fabs(q-r), TINY), q-r));
-
-		ulim = b + GLIMIT*(c - b);
-
-		if ((b - u)*(u - c) > 0)
-		{
-			fu = func(u);
-			if (fu < fc)
-			{
-				a = b;
-				b = u;
-				fa = fb;
-				fb = fu;
-				return;
-			}
-			else if (fu > fb)
-			{
-				c = u;
-				fc = fu;
-				return;
-			}
-
-			u = c + GOLD*(c - b);
-			fu = func(u);
-		}
-		else if ((c - u)*(u - ulim) > 0)
-		{
-			fu = func(u);
-			if (fu < fc)
-			{
-				SHFT(b, c, u, c + GOLD*(c - b));
-				SHFT(fb, fc, fu, func(u));
-			}
-		}
-		else if ((u-ulim)*(ulim - c) >= 0)
-		{
-			u = ulim;
-			fu = func(u);
-		}
-		else
-		{
-			u = c + GOLD*(c - b);
-			fu = func(u);
-		}
-
-		SHFT(a, b, c, u);
-		SHFT(fa, fb, fc, fu);
-	}
-}
-
-double golden(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin)
-{
-	const double R = 0.61803399;
-	const double C = 1 - R;
-
-	double f1, f2, x0, x1, x2, x3;
-
-	x0 = ax;
-	x3 = cx;
-
-	if (fabs(cx - bx) > fabs(bx - ax))
-	{
-		x1 = bx;
-		x2 = bx + C*(cx - bx);
-	}
-	else
-	{
-		x2 = bx;
-		x1 = bx - C*(bx - ax);
-	}
-	f1 = f(x1);
-	f2 = f(x2);
-
-	while (fabs(x3 - x0) > tol*(fabs(x1) + fabs(x2)))
-	{
-		if (f2 < f1)
-		{
-			SHFT(x0, x1, x2, R*x1 + C*x3);
-			SHFT2(f1, f2, f(x2));
-		}
-		else
-		{
-			SHFT(x3, x2, x1, R*x2 + C*x0);
-			SHFT2(f2, f1, f(x1));
-		}
-	}
-
-	if (f1 < f2)
-	{
-		*xmin = x1;
-		return f1;
-	}
-	else
-	{
-		*xmin = x2;
-		return f2;
 	}
 }

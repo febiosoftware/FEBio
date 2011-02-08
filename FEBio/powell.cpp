@@ -8,8 +8,8 @@ void linmin(double* p, double* xi, int n, double* fret, double (*fnc)(double[]))
 void powell(double* p, double* xi, int n, double ftol, int* iter, double* fret, double (*fnc)(double[]));
 double brent(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin);
 void fecb(FEM* pfem, void* pd);
-
-extern void mnbrak(double* ax, double* bx, double* cx, double* fa, double* fb, double* fc, double (*fnc)(double));
+void mnbrak(double* ax, double* bx, double* cx, double* fa, double* fb, double* fc, double (*fnc)(double));
+double golden(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin);
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -398,3 +398,138 @@ double brent(double ax, double bx, double cx, double (*f)(double), double tol, d
 	*xmin = x;
 	return fx;
 }
+
+
+#define SHFT2(a, b, c) (a)=(b);(b)=(c);
+#define SHFT(a, b, c, d) (a)=(b);(b)=(c);(c)=(d);
+#define SIGN2(a, b) ((b)>=0?fabs(a):(-fabs(a)))
+
+void mnbrak(double* pa, double* pb, double* pc, double* pfa, double* pfb, double* pfc, double (*func)(double))
+{
+	const double GOLD = 1.618034;
+	const double TINY = 1.0e-20;
+	const double GLIMIT = 100;
+
+	double& a = *pa;
+	double& b = *pb;
+	double& c = *pc;
+
+	double& fa = *pfa;
+	double& fb = *pfb;
+	double& fc = *pfc;
+
+	double ulim, u, r, q, fu, dum;
+
+	fa = func(a);
+	fb = func(b);
+	if (fb>fa)
+	{
+		SHFT(dum, a, b, dum);
+		SHFT(dum, fb, fa, dum);
+	}
+
+	c = b+GOLD*(b - a);
+	fc = func(c);
+	while (fb > fc)
+	{
+		r = (b - a)*(fb - fc);
+		q = (b - c)*(fb - fa);
+		u = b - ((b - c)*q - (b - a)*r) / (2.0*SIGN2(FMAX(fabs(q-r), TINY), q-r));
+
+		ulim = b + GLIMIT*(c - b);
+
+		if ((b - u)*(u - c) > 0)
+		{
+			fu = func(u);
+			if (fu < fc)
+			{
+				a = b;
+				b = u;
+				fa = fb;
+				fb = fu;
+				return;
+			}
+			else if (fu > fb)
+			{
+				c = u;
+				fc = fu;
+				return;
+			}
+
+			u = c + GOLD*(c - b);
+			fu = func(u);
+		}
+		else if ((c - u)*(u - ulim) > 0)
+		{
+			fu = func(u);
+			if (fu < fc)
+			{
+				SHFT(b, c, u, c + GOLD*(c - b));
+				SHFT(fb, fc, fu, func(u));
+			}
+		}
+		else if ((u-ulim)*(ulim - c) >= 0)
+		{
+			u = ulim;
+			fu = func(u);
+		}
+		else
+		{
+			u = c + GOLD*(c - b);
+			fu = func(u);
+		}
+
+		SHFT(a, b, c, u);
+		SHFT(fa, fb, fc, fu);
+	}
+}
+
+double golden(double ax, double bx, double cx, double (*f)(double), double tol, double* xmin)
+{
+	const double R = 0.61803399;
+	const double C = 1 - R;
+
+	double f1, f2, x0, x1, x2, x3;
+
+	x0 = ax;
+	x3 = cx;
+
+	if (fabs(cx - bx) > fabs(bx - ax))
+	{
+		x1 = bx;
+		x2 = bx + C*(cx - bx);
+	}
+	else
+	{
+		x2 = bx;
+		x1 = bx - C*(bx - ax);
+	}
+	f1 = f(x1);
+	f2 = f(x2);
+
+	while (fabs(x3 - x0) > tol*(fabs(x1) + fabs(x2)))
+	{
+		if (f2 < f1)
+		{
+			SHFT(x0, x1, x2, R*x1 + C*x3);
+			SHFT2(f1, f2, f(x2));
+		}
+		else
+		{
+			SHFT(x3, x2, x1, R*x2 + C*x0);
+			SHFT2(f2, f1, f(x1));
+		}
+	}
+
+	if (f1 < f2)
+	{
+		*xmin = x1;
+		return f1;
+	}
+	else
+	{
+		*xmin = x2;
+		return f2;
+	}
+}
+

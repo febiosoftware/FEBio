@@ -26,21 +26,6 @@ FEDiagnostic::~FEDiagnostic()
 }
 
 //-----------------------------------------------------------------------------
-void FEBioScenarioSection::Parse(XMLTag &tag)
-{
-	FEDiagnosticImport& dim = dynamic_cast<FEDiagnosticImport&>(*m_pim);
-	FETangentDiagnostic& td = dynamic_cast<FETangentDiagnostic&>(*dim.m_pdia);
-
-	++tag;
-	do
-	{
-		if (tag == "strain") tag.value(td.m_strain);
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
 FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 {
 	// store a copy of the file name
@@ -157,4 +142,23 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	// we're done!
 	return m_pdia;
 
+}
+
+//-----------------------------------------------------------------------------
+void FEBioScenarioSection::Parse(XMLTag &tag)
+{
+	FEDiagnosticImport& dim = dynamic_cast<FEDiagnosticImport&>(*m_pim);
+	FETangentDiagnostic& td = dynamic_cast<FETangentDiagnostic&>(*dim.m_pdia);
+
+	const char* sztype = tag.AttributeValue("type");
+	if      (strcmp(sztype, "uni-axial"   ) == 0) td.m_scn = FETangentDiagnostic::TDS_UNIAXIAL;
+	else if (strcmp(sztype, "simple shear") == 0) td.m_scn = FETangentDiagnostic::TDS_SIMPLE_SHEAR;
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	++tag;
+	do
+	{
+		if (tag == "strain") tag.value(td.m_strain);
+		++tag;
+	}
+	while (!tag.isend());
 }

@@ -12,8 +12,6 @@
 
 bool diagnose(FEM& fem, const char* szfile)
 {
-	// --- initialize diagnostic ---
-
 	// read the diagnostic file
 	// this will also create a specific diagnostic test
 	FEDiagnosticImport im;
