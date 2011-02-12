@@ -15,10 +15,7 @@ public:
 	FEElasticMixture() {}
 		
 public:
-	enum				{NMAT = 6};		//!< maximum allowable number of materials
-	int					m_nMat;			//!< number of elastic materials in mixture
-	int					m_iMat[NMAT];	//!< material ID of elastic materials (one-based!)
-	FEElasticMaterial*	m_pMat[NMAT];	//!< pointers to elastic materials
+	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials
 		
 public:
 	//! calculate stress at material point
@@ -37,5 +34,5 @@ public:
 	DECLARE_REGISTERED(FEElasticMixture);
 		
 	// declare the parameter list
-	DECLARE_PARAMETER_LIST();
+//	DECLARE_PARAMETER_LIST();
 };

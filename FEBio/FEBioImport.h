@@ -4,6 +4,7 @@
 #include "XMLReader.h"
 #include "FETransverselyIsotropic.h"
 #include "FERigid.h"
+#include "FEElasticMixture.h"
 #include <map>
 #include <string>
 using namespace std;
@@ -72,6 +73,7 @@ protected:
 	bool ParseElasticMaterial (XMLTag& tag, FEElasticMaterial* pm);
 	bool ParseTransIsoMaterial(XMLTag& tag, FETransverselyIsotropic* pm);
 	bool ParseRigidMaterial   (XMLTag& tag, FERigidMaterial* pm);
+	bool ParseElasticMixture  (XMLTag& tag, FEElasticMixture* pm);
 	bool ParseBiphasicMaterial(XMLTag& tag, FEBiphasic* pm);
 	bool ParseBiphasicSoluteMaterial(XMLTag& tag, FEBiphasicSolute* pm);
 
