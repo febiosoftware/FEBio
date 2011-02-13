@@ -13,6 +13,10 @@
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 
+// --- Global Constants Data ---
+// m_Const needs a definition, since static
+map<string, double> FEM::m_Const;
+
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
 //! Initializes default variables
@@ -526,4 +530,17 @@ void FEM::SetPlotFileNameExtension(const char *szext)
 	char* ch = strrchr(m_szplot, '.');
 	if (ch) *ch = 0;
 	strcat(m_szplot, szext);
+}
+
+//-----------------------------------------------------------------------------
+void FEM::SetGlobalConstant(const string& s, double v)
+{
+	m_Const[s] = v;
+	return;
+}
+
+//-----------------------------------------------------------------------------
+double FEM::GetGlobalConstant(const string& s)
+{
+	return m_Const.find(s)->second;
 }

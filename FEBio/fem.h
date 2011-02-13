@@ -293,6 +293,10 @@ public:
 	//! Set the sparse matrix symmetry flag
 	void SetSymmetryFlag(bool bsymm) { m_bsymm = bsymm; }
 
+	static map<string, double> m_Const;
+	static void SetGlobalConstant(const string& s, double v);
+	static double GetGlobalConstant(const string& s);
+	
 public:
 	//! copy constructor
 	FEM(const FEM& fem);

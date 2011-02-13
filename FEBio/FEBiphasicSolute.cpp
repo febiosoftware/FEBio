@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FEMaterial.h"
+#include "fem.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEBiphasicSolute, "biphasic-solute");
@@ -13,8 +14,6 @@ BEGIN_PARAMETER_LIST(FEBiphasicSolute, FEMaterial)
 	ADD_PARAMETER(m_rhoTw, FE_PARAM_DOUBLE, "fluid_density");
 	ADD_PARAMETER(m_rhoTu, FE_PARAM_DOUBLE, "solute_density");
 	ADD_PARAMETER(m_Mu, FE_PARAM_DOUBLE, "solute_molecular_weight");
-	ADD_PARAMETER(m_Rgas, FE_PARAM_DOUBLE, "R");
-	ADD_PARAMETER(m_Tabs, FE_PARAM_DOUBLE, "T");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -22,7 +21,7 @@ END_PARAMETER_LIST();
 
 FEBiphasicSolute::FEBiphasicSolute()
 {	m_pPerm = 0; m_pDiff = 0; m_pSolub = 0; m_pOsmC= 0; 
-	m_rhoTw = 0; m_rhoTu = 0; m_Mu = 0; }
+	m_rhoTw = 0; m_rhoTu = 0; m_Mu = 0; m_Rgas = 0; m_Tabs = 0; }
 
 //-----------------------------------------------------------------------------
 void FEBiphasicSolute::Init()
@@ -37,6 +36,13 @@ void FEBiphasicSolute::Init()
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	if (m_rhoTu < 0) throw MaterialError("solute_density must be positive");
 	if (m_Mu < 0) throw MaterialError("solute_molecular_weight must be positive");
+	
+	m_Rgas = FEM::GetGlobalConstant("R");
+	m_Tabs = FEM::GetGlobalConstant("T");
+	
+	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
+	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
+	
 }
 
 //-----------------------------------------------------------------------------

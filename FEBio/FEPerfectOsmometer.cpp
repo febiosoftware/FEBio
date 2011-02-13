@@ -7,6 +7,7 @@
  */
 #include "stdafx.h"
 #include "FEPerfectOsmometer.h"
+#include "fem.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEPerfectOsmometer, "perfect osmometer");
@@ -16,8 +17,6 @@ BEGIN_PARAMETER_LIST(FEPerfectOsmometer, FEElasticMaterial)
 	ADD_PARAMETER(m_phiwr, FE_PARAM_DOUBLE, "phiw0");
 	ADD_PARAMETER(m_iosm, FE_PARAM_DOUBLE, "iosm");
 	ADD_PARAMETER(m_bosm, FE_PARAM_DOUBLE, "bosm");
-	ADD_PARAMETER(m_Rgas, FE_PARAM_DOUBLE, "R");
-	ADD_PARAMETER(m_Tabs, FE_PARAM_DOUBLE, "T");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -29,9 +28,14 @@ void FEPerfectOsmometer::Init()
 	if (m_unstable) throw MaterialError("This material is unstable (cannot sustain shear) when used alone.  Combine it in a solid mixture with a material that can resist tension.");
 	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
 	if (m_iosm < 0) throw MaterialError("iosm must be positive.");
-	if (m_Rgas < 0) throw MaterialError("R must be positive.");
-	if (m_Tabs < 0) throw MaterialError("T must be positive.");
 	if (m_bosm < 0) throw MaterialError("bosm must be positive.");
+	
+	m_Rgas = FEM::GetGlobalConstant("R");
+	m_Tabs = FEM::GetGlobalConstant("T");
+	
+	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
+	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
+	
 }
 
 //-----------------------------------------------------------------------------

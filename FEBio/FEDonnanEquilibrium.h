@@ -16,7 +16,7 @@ class FEDonnanEquilibrium : public FEElasticMaterial
 public:
 	//! When used on its own (not in a solid mixture), this materials
 	//! is intrinsically unstable
-	FEDonnanEquilibrium() {m_unstable = true;}
+	FEDonnanEquilibrium() {m_unstable = true; m_Rgas = 0; m_Tabs = 0; }
 	
 	//! Initialization routine
 	void Init();

@@ -3442,6 +3442,21 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 				fem.m_BF.push_back(pbf);
 			}
 		}
+		
+		else if (tag == "Constants")
+		{
+			++tag;
+			string s;
+			double v;
+			do
+			{
+				s = string(tag.Name());
+				tag.value(v);
+				FEM::SetGlobalConstant(s, v);
+				++tag;
+			}
+			while (!tag.isend());
+		}
 
 		++tag;
 	}
