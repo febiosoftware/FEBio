@@ -299,6 +299,9 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
 
 			E = pt.Strain();
+			m_calc.SetVariable("x", pt.rt.x);
+			m_calc.SetVariable("y", pt.rt.y);
+			m_calc.SetVariable("z", pt.rt.z);
 			m_calc.SetVariable("sx", pt.s.xx());
 			m_calc.SetVariable("sy", pt.s.yy());
 			m_calc.SetVariable("sz", pt.s.zz());
