@@ -141,10 +141,21 @@ bool FEM::InitRigidBodies()
 	}
 	while (!bdone);
 
-	// now let's count how many rigid bodies we have
-	m_nrb = -1;
-	for (i=0; i<Materials(); ++i) if (mrb[i] > m_nrb) m_nrb = mrb[i];
-	m_nrb++;
+	// since we may have lost a rigid body in the merge process
+	// we reindex the RB's.
+	int nmat = Materials();
+	vector<int> mrc; mrc.assign(nmat, -1);
+	for (i=0; i<nmat; ++i) if (mrb[i] >= 0) mrc[mrb[i]] = 0;
+	m_nrb = 0;
+	for (i=0; i<nmat; ++i)
+	{
+		if (mrc[i] == 0) mrc[i] = m_nrb++;
+	}
+
+	for (i=0; i<nmat; ++i) 
+	{
+		if (mrb[i] >= 0) mrb[i] = mrc[mrb[i]];
+	}
 
 	// set rigid body index for materials
 	for (i=0; i<Materials(); ++i)
@@ -226,7 +237,7 @@ bool FEM::InitRigidBodies()
 
 			if (pm && (pm->m_nRB == i))	break;
 		}
-
+		assert(j<Materials());
 		m_RB[i].m_mat = j;
 
 /*		// initialize constraints
