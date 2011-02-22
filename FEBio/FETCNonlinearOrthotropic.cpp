@@ -142,8 +142,8 @@ mat3ds FETCNonlinearOrthotropic::DevStress(FEMaterialPoint& mp)
 
 	// calculate T = F*dW/dC*Ft
 	// (we commented out the matrix components we do not need)
-	w1pw2i1 = W1 + W2*I1; // TODO: is there a term missing ???? (W4*I4 for a, b and c ??)
-
+	w1pw2i1 = W1 + W2*I1;
+	
 	mat3ds AxA = dyad(a);
 	mat3ds BxB = dyad(b);
 	mat3ds CxC = dyad(c);

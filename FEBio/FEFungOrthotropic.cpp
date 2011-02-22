@@ -29,9 +29,9 @@ void FEFungOrthotropic::Init()
 	if (E2 <= 0) throw MaterialError("E2 should be positive");
 	if (E3 <= 0) throw MaterialError("E3 should be positive");
 	
-	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 > sqrt(E1/E2)");
-	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 > sqrt(E2/E3)");
-	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 > sqrt(E3/E1)");
+	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
+	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
+	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
 	
 	if (m_c <= 0) throw MaterialError("c should be positive");
 	if (m_K < 0) throw MaterialError("K should be positive");
