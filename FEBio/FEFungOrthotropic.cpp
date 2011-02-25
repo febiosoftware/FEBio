@@ -7,16 +7,16 @@ REGISTER_MATERIAL(FEFungOrthotropic, "Fung orthotropic");
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEUncoupledMaterial)
-ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
-ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
-ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
-ADD_PARAMETER(G12, FE_PARAM_DOUBLE, "G12");
-ADD_PARAMETER(G23, FE_PARAM_DOUBLE, "G23");
-ADD_PARAMETER(G31, FE_PARAM_DOUBLE, "G31");
-ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
-ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
-ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
-ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
+	ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
+	ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
+	ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
+	ADD_PARAMETER(G12, FE_PARAM_DOUBLE, "G12");
+	ADD_PARAMETER(G23, FE_PARAM_DOUBLE, "G23");
+	ADD_PARAMETER(G31, FE_PARAM_DOUBLE, "G31");
+	ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
+	ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
+	ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
+	ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -155,8 +155,6 @@ tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 	// Evaluate the distortional part of the Cauchy stress
 	mat3ds sd;
 	sd.zero();		// Initialize for summation
-//	tens4ds C;
-//	C.zero();
 	tens4ds C(0.0);
 	bmi = b - I;
 	for (i=0; i<3; i++) {
@@ -174,8 +172,8 @@ tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
 
-	C += - 1./3.*(C.dot(IxI)+IxI.dot(C)-IxI*(C.dot(I)).tr()/3.)
-		+ 2./3.*((I4-IxI/3.)*sd.tr()-dyad1s(sd,I));
+	C += - 1./3.*(ddots(C,IxI) - IxI*(C.tr()/3.))
+	+ 2./3.*((I4-IxI/3.)*sd.tr()-dyad1s(sd.dev(),I));
 	
 	return C;
 }

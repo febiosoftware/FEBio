@@ -266,6 +266,13 @@ inline tens4ds tens4ds::operator - () const
 	return s;
 }
 
+// trace
+// C.tr() = I:C:I
+inline double tens4ds::tr() const
+{
+	return (d[0]+d[2]+d[5]+2*(d[1]+d[3]+d[4]));
+}
+
 // intialize to zero
 inline void tens4ds::zero()
 {
@@ -579,6 +586,7 @@ inline mat3ds tens4ds::dot(const mat3ds &m) const
 
 //-----------------------------------------------------------------------------
 // double contraction with a symmetric 4th-order tensor
+// TODO: This routine seems to be in error, may need to be fixed.
 inline tens4ds tens4ds::dot(const tens4ds &m) const
 {
 	tens4ds a;
@@ -651,4 +659,3 @@ inline mat3d vdotTdotv(const vec3d a, const tens4ds T, const vec3d b)
 				 a.z*(b.y*T.d[4] + b.x*T.d[8] + b.z*T.d[12]) + a.y*(b.y*T.d[11] + b.x*T.d[13] + b.z*T.d[14]) + a.x*(b.y*T.d[16] + b.x*T.d[18] + b.z*T.d[19]),
 				 a.z*(b.z*T.d[5] + b.y*T.d[12] + b.x*T.d[17]) + a.y*(b.z*T.d[12] + b.y*T.d[14] + b.x*T.d[19]) + a.x*(b.z*T.d[17] + b.y*T.d[19] + b.x*T.d[20]));
 }
-

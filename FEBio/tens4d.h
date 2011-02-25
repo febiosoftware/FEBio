@@ -79,11 +79,14 @@ public:
 	// unary operators
 	tens4ds operator - () const;
 	
-	// double contraction with tensor
+	// double dot product with tensor
 	mat3ds dot(const mat3ds& m) const;
 
-	// double contraction with 4-th order symmetric tensor
+	// double dot product with 4-th order symmetric tensor
 	tens4ds dot(const tens4ds& m) const;
+	
+	// trace
+	double tr() const;
 	
 	// intialize to zero
 	void zero();
