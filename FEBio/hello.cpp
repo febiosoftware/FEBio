@@ -100,18 +100,19 @@ void Hello(FILE* fp)
 	fprintf(fp,"  copyright (c) 2006-2011 - All rights reserved                            \n");
 	if(nlic == 0)
 	{
-		fprintf(fp,"                                                                           \n");
-		fprintf(fp," This is an UNLICENSED version of FEBio or the license file could not be   \n");
-		fprintf(fp," found. If you have a license file make sure it is placed in the same      \n");
-		fprintf(fp," directory as the executable. This version may only be used for            \n");
-		fprintf(fp," non-commercial purposes as described in the license agreement. The        \n");
-		fprintf(fp," functionality of this version may be limited. If you wish to obtain a     \n");
-		fprintf(fp," valid license file, please contact the developers.                        \n");
+		fprintf(fp,"                                                                              \n");
+		fprintf(fp," This is the NON-COMMERCIAL version of FEBio or the commercial license        \n");
+		fprintf(fp," key file could not be found. If you have a key file make sure it is          \n");
+		fprintf(fp," placed in the same directory as the executable. This version may only        \n");
+		fprintf(fp," be used for non-commercial purposes as described in the license agreement.   \n");
+		fprintf(fp," The functionality of this version may be limited compared to the commercial  \n");
+		fprintf(fp," version. If you wish to obtain a valid commercial license file, please       \n");
+		fprintf(fp," contact the developers.                                                      \n");
 	}
 	else if (nlic == 1)
 	{
 		fprintf(fp,"                                                                           \n");
-		fprintf(fp,"  This version is licensed to:                                              \n");
+		fprintf(fp,"  This version is licensed to:                                             \n");
 		fprintf(fp,"  \t%s\n", GetLicenseUser());
 		fprintf(fp,"  \t%s\n", GetLicenseCompany());
 	}
