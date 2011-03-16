@@ -34,74 +34,58 @@ FEViscoElasticMaterial::FEViscoElasticMaterial()
 
 //-----------------------------------------------------------------------------
 //! Stress function
-
 mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 {
 	// get the elastic part
 	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	// get the viscoelsatic point data
+	// get the viscoelastic point data
 	FEViscoElasticMaterialPoint& pt = *mp.ExtractData<FEViscoElasticMaterialPoint>();
 
-	// get the new elastic stress
+	// Calculate the new elastic Cauchy stress
 	pt.m_se = m_pBase->Stress(mp);
 
-	double dt = mp.dt;
+	// pull-back to get PK2 stress
+	mat3ds Se = ep.pull_back(pt.m_se);
 
-	double g, h;
+	// get elastic PK2 stress of previous timestep
+	mat3ds Sep = pt.m_Sep;
 
-	int i;
-	m_g0 = 1;
-//	for (i=0; i<MAX_TERMS; ++i) m_g0 -= m_g[i];
-
-	// calculate the new visco-elastic stress
-	mat3ds s = pt.m_se*m_g0;
-
-	// "Cauchy" stress of previous timestep
-	mat3ds sp = ep.push_forward(pt.m_Sep);
-
-	for (i=0; i<MAX_TERMS; ++i)
+	// calculate new history variables
+	// terms are accumulated in S, the total PK2-stress
+	mat3ds S = Se*m_g0;
+	double dt = mp.dt, g, h;
+	for (int i=0; i<MAX_TERMS; ++i)
 	{
 		g = exp(-dt/m_t[i]);
 		h = (1 - g)/(dt/m_t[i]);
 
-		pt.m_H[i] = pt.m_Hp[i]*g + (pt.m_se - sp)*h;
-		s += pt.m_H[i]*m_g[i];
+		pt.m_H[i] = pt.m_Hp[i]*g + (Se - Sep)*h;
+		S += pt.m_H[i]*m_g[i];
 	}
 
-	return s;
+	// return the total Cauchy stress,
+	// which is the push-forward of S
+	return ep.push_forward(S);
 }
 
 //-----------------------------------------------------------------------------
-
+//! Material tangent
 tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 {
-	// calculate the elastic tangent
+	// calculate the spatial elastic tangent
 	tens4ds C = m_pBase->Tangent(pt);
-	double D[6][6] = {0};
-	C.extract(D);
 
+	// calculate the visco scale factor
 	double dt = pt.dt;
-
-	int i;
-	m_g0 = 1;
-//	for (i=0; i<MAX_TERMS; ++i) m_g0 -= m_g[i];
-
-	// multiply with visco-factor
 	double f = m_g0, g, h;
-	for (i=0; i<MAX_TERMS; ++i)
+	for (int i=0; i<MAX_TERMS; ++i)
 	{
 		g = exp(-dt/m_t[i]);
 		h = ( 1 - exp(-dt/m_t[i]) )/( dt/m_t[i] );
 		f += m_g[i]*h; 
 	}
 
-	D[0][0] *= f; D[0][1] *= f; D[0][2] *= f; D[0][3] *= f; D[0][4] *= f; D[0][5] *= f;
-	D[1][0] *= f; D[1][1] *= f; D[1][2] *= f; D[1][3] *= f; D[1][4] *= f; D[1][5] *= f;
-	D[2][0] *= f; D[2][1] *= f; D[2][2] *= f; D[2][3] *= f; D[2][4] *= f; D[2][5] *= f;
-	D[3][0] *= f; D[3][1] *= f; D[3][2] *= f; D[3][3] *= f; D[3][4] *= f; D[3][5] *= f;
-	D[4][0] *= f; D[4][1] *= f; D[4][2] *= f; D[4][3] *= f; D[4][4] *= f; D[4][5] *= f;
-	D[5][0] *= f; D[5][1] *= f; D[5][2] *= f; D[5][3] *= f; D[5][4] *= f; D[5][5] *= f;
-
-	return tens4ds(D);
+	// multiply tangent with visco-factor
+	return C*f;
 }
