@@ -257,6 +257,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="subversion revision number"
+				CommandLine="subwcrev . svnrev_tpl.txt svnrev.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -1310,6 +1312,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="subversion revision number"
+				CommandLine="subwcrev .. svnrev_tpl.txt svnrev.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -1328,7 +1332,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;SUPERLU;_CRT_SECURE_NO_WARNINGS;PARDISO"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;SUPERLU;_CRT_SECURE_NO_WARNINGS;PARDISO;FEBIO_LICENSE;SVN"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -1346,7 +1350,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\x64\Release-x64\FECore.lib superlu.lib mkl_intel_lp64.lib mkl_intel_thread.lib mkl_core.lib libiomp5mt.lib"
+				AdditionalDependencies="..\x64\Release-x64\FECore.lib superlu.lib KeyGen64.lib mkl_intel_lp64.lib mkl_intel_thread.lib mkl_core.lib libiomp5mt.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
