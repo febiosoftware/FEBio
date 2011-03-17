@@ -1665,6 +1665,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEDamageNeoHookean.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEDiagnostic.cpp"
 				>
 			</File>
@@ -2496,6 +2500,10 @@
 			</File>
 			<File
 				RelativePath=".\FECoordSysMap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDamageNeoHookean.h"
 				>
 			</File>
 			<File

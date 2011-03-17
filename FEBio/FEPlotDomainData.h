@@ -99,3 +99,12 @@ public:
 	FEPlotEffectiveSoluteConcentration() : FEDomainData(FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Damage reduction factor
+class FEPlotDamage : public FEDomainData
+{
+public:
+	FEPlotDamage() : FEDomainData(FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& m, vector<float>& a);
+};

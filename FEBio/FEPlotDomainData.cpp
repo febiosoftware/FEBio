@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEPlotDomainData.h"
 #include "FEPlotDataFactory.h"
+#include "FEDamageNeoHookean.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_PLOTDATA(FEPlotEffectiveFluidPressure       , "effective fluid pressure"      );
@@ -13,8 +14,8 @@ REGISTER_PLOTDATA(FEPlotEffectiveSoluteConcentration , "effective solute concent
 REGISTER_PLOTDATA(FEPlotShellThickness               , "shell thickness"               );
 REGISTER_PLOTDATA(FEPlotActualSoluteConcentration    , "solute concentration"          );
 REGISTER_PLOTDATA(FEPlotSoluteFlux                   , "solute flux"                   );
+REGISTER_PLOTDATA(FEPlotDamage                       , "damage"                        );
 //-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
@@ -452,6 +453,37 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
 		{
 			FENode& node = pd->Node(i);
 			a.push_back((float) node.m_ct);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
+{
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&m);
+	if (pbd)
+	{
+		FESolidDomain& d = *pbd;
+		for (int i=0; i<d.Elements(); ++i)
+		{
+			FESolidElement& el = d.Element(i);
+
+			float D = 0.f;
+			int nint = el.GaussPoints();
+			for (int j=0; j<nint; ++j)
+			{
+				FEDamageMaterialPoint* ppt = (el.m_State[j]->ExtractData<FEDamageMaterialPoint>());
+
+				if (ppt)
+				{
+					FEDamageMaterialPoint& pt = *ppt;
+					D += (float) pt.m_D;
+				}
+			}
+			D /= (float) nint;
+			a.push_back(1.f - D);
 		}
 		return true;
 	}
