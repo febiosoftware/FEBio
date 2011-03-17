@@ -2959,6 +2959,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\svnrev.h"
+				>
+			</File>
+			<File
 				RelativePath=".\targetver.h"
 				>
 			</File>
