@@ -245,30 +245,30 @@ tens4ds FEEFDVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 tens4ds FEEFDVerondaWestmann::FiberTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
+	
 	// deformation gradient
 	mat3d &F = pt.F;
 	double J = pt.J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double Ji = 1.0/J;
-
+	
 	// get the element's local coordinate system
 	mat3d& Q = pt.Q;
-
+	
 	mat3dd I(1);	// Identity
-
+	mat3ds s; s.zero();
+	
 	tens4ds IxI = dyad1s(I);
 	tens4ds I4  = dyad4s(I);
-
+	
 	// loop over all integration points
 	double ksi, beta;
 	vec3d nr, n0, nt;
 	double In, Wl, Wll;
 	const double eps = 0;
-	tens4ds cf, cfw; cf.zero();
+	tens4ds c; c.zero();
 	mat3ds N2;
 	tens4ds N4;
-	tens4ds I4mIxId3 = I4 - IxI/3.0;
 	const int nint = (m_nres == 0? NSTL  : NSTH  );
 	for (int n=0; n<nint; ++n)
 	{
@@ -276,44 +276,40 @@ tens4ds FEEFDVerondaWestmann::FiberTangent(FEMaterialPoint& mp)
 		nr.x = m_cth[n]*m_sph[n];
 		nr.y = m_sth[n]*m_sph[n];
 		nr.z = m_cph[n];
-
+		
 		// get the global material fiber direction
 		n0 = Q*nr;
-
+		
 		// get the global spatial fiber direction
 		nt = (F*n0)*Jm13;
-
+		
 		// Calculate In = nr*C*nr
 		In = nt*nt;
-
+		
 		// only take fibers in tension into consideration
 		if (In > 1. + eps)
 		{
 			// calculate material coefficients
 			ksi  = 1.0 / sqrt(SQR(nr.x / m_ksi [0]) + SQR(nr.y / m_ksi [1]) + SQR(nr.z / m_ksi [2]));
 			beta = 1.0 / sqrt(SQR(nr.x / m_beta[0]) + SQR(nr.y / m_beta[1]) + SQR(nr.z / m_beta[2]));
-
+			
 			// calculate strain energy derivative
 			Wl  = beta*ksi*pow(In - 1.0, beta - 1.0);
 			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
-
-			// calculate dWdC:C
-			// TODO: is this correct? the nt vector is not normalized!!!
-			double WC = Wl*In;
-
-			// calculate C:d2WdCdC:C
-			double CWWC = Wll*In*In;
-
+			
 			N2 = dyad(nt);
 			N4 = dyad1s(N2);
-
-			mat3ds WCCxC = N2*(Wll*In);
-
-			cfw = N4*(4.0*Wll) - dyad1s(WCCxC, I)*(4.0/3.0) + IxI*(4.0/9.0*CWWC);
-
-			cf += (I4mIxId3)*(4.0/3.0*Ji*WC*m_w[n]) + cfw*(Ji*m_w[n]);
+			
+			s += N2*(Wl*m_w[n]);
+			c += N4*(Wll*m_w[n]);
 		}
 	}
-
-	return cf;
+	
+	s *= 2*Ji;
+	c *= 4*Ji;
+	
+	c += - 1./3.*(ddots(c,IxI) - IxI*(c.tr()/3.))
+	+ 2./3.*((I4-IxI/3.)*s.tr()-dyad1s(s.dev(),I));
+	
+	return c;
 }
