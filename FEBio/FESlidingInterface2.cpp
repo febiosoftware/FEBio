@@ -52,7 +52,7 @@ void FESlidingSurface2::Init()
 	zero(m_nu);
 
 	// allocate biphasic stuff
-	assert((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE));
+	if ((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE))
 	{
 		m_pg.assign(nint, 0);
 	}
@@ -65,7 +65,7 @@ void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 	m_gap = s.m_gap;
 	zero(m_pme);
 
-	assert((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE));
+	if ((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE))
 	{
 		m_pg  = s.m_pg;
 		m_Lmp = s.m_Lmp;

@@ -705,6 +705,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// elastic mixtures
 			if (!bfound && dynamic_cast<FEElasticMixture*>(pmat)) bfound = ParseElasticMixture(tag, dynamic_cast<FEElasticMixture*>(pmat));
 			
+			// uncoupled elastic mixtures
+			if (!bfound && dynamic_cast<FEUncoupledElasticMixture*>(pmat)) bfound = ParseUncoupledElasticMixture(tag, dynamic_cast<FEUncoupledElasticMixture*>(pmat));
+			
 			// biphasic material parameters
 			if (!bfound && dynamic_cast<FEBiphasic*>(pmat)) bfound = ParseBiphasicMaterial(tag, dynamic_cast<FEBiphasic*>(pmat));
 			
@@ -1011,7 +1014,7 @@ bool FEBioMaterialSection::ParseElasticMixture(XMLTag &tag, FEElasticMixture *pm
 		// don't allow rigid bodies
 		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
 		{
-			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in solid mixture material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 		
@@ -1025,6 +1028,57 @@ bool FEBioMaterialSection::ParseElasticMixture(XMLTag &tag, FEElasticMixture *pm
 		// in a solid mixture.  (This may not necessarily be true.)
 		pme->m_unstable = false;
 
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Parse FEUncoupledElasticMixture material 
+//
+bool FEBioMaterialSection::ParseUncoupledElasticMixture(XMLTag &tag, FEUncoupledElasticMixture *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	
+	// read the solid material
+	if (tag == "solid")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = FEMaterialFactory::CreateMaterial(sztype);
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an uncoupled elastic material)
+		FEUncoupledMaterial* pme = dynamic_cast<FEUncoupledMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			clog.printbox("INPUT ERROR", "Invalid uncoupled elastic solid %s in uncoupled solid mixture material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solid material pointer
+		pm->m_pMat.push_back(pme);
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// TODO: assume that the material becomes stable since it is combined with others
+		// in a solid mixture.  (This may not necessarily be true.)
+		pme->m_unstable = false;
+		
 		// parse the solid
 		ParseMaterial(tag, pme);
 		
