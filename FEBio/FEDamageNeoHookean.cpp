@@ -131,5 +131,7 @@ tens4ds FEDamageNeoHookean::Tangent(FEMaterialPoint& mp)
 	D[4][4] = mu1;
 	D[5][5] = mu1;
 
-	return tens4ds(D);
+	double g = Damage(mp);
+
+	return tens4ds(D)*g;
 }

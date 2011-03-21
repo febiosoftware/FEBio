@@ -1665,6 +1665,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEDamageMooneyRivlin.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEDamageNeoHookean.cpp"
 				>
 			</File>
@@ -2500,6 +2504,10 @@
 			</File>
 			<File
 				RelativePath=".\FECoordSysMap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDamageMooneyRivlin.h"
 				>
 			</File>
 			<File
