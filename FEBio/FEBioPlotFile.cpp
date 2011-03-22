@@ -477,7 +477,7 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 					n[2] = f.m_node[1];
 					n[3] = f.m_node[2];
 					n[4] = (nf==4?f.m_node[3]:n[3]);
-					m_ar.WriteChunk(PLT_FACE, n, nf+1);
+					m_ar.WriteChunk(PLT_FACE, n, 5);
 				}
 			}
 			m_ar.EndChunk();
