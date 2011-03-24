@@ -19,8 +19,8 @@ FEDamageMooneyRivlin::FEDamageMooneyRivlin(void)
 	c1 = 0;
 	c2 = 0;
 	m_beta = 0.1;
-	m_smin = 0.1635;
-	m_smax = 0.2974;
+	m_smin = 0.0;
+	m_smax = 0.5;
 }
 
 //-----------------------------------------------------------------------------
@@ -122,7 +122,10 @@ tens4ds FEDamageMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 
 	tens4ds c = dyad1s(devs, I)*(-2.0/3.0) + (I4 - IxI/3.0)*(4.0/3.0*Ji*WC) + cw;
 
-	return c;
+	// calculate reduction factor at this point
+	double g = Damage(mp);
+
+	return c*g;
 }
 
 
@@ -133,7 +136,7 @@ double FEDamageMooneyRivlin::Damage(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// calculate right Cauchy-Green tensor
-	mat3ds C = pt.RightCauchyGreen();
+	mat3ds C = pt.DevRightCauchyGreen();
 	mat3ds C2 = C*C;
 
 	// Invariants

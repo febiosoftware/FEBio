@@ -1673,6 +1673,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEDamageTransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEDiagnostic.cpp"
 				>
 			</File>
@@ -2512,6 +2516,10 @@
 			</File>
 			<File
 				RelativePath=".\FEDamageNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDamageTransIsoMooneyRivlin.h"
 				>
 			</File>
 			<File
