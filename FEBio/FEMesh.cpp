@@ -264,6 +264,7 @@ bool FEMesh::Init()
 				{
 					fprintf(stderr, "**************************** E R R O R ****************************\n");
 					fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
+					fprintf(stderr, "Jacobian = %lg\n", e.m_vol);
 					fprintf(stderr, "Did you use the right node numbering?\n");
 					if (e.m_pel)
 					{
@@ -336,6 +337,7 @@ bool FEMesh::Init()
 				{
 					fprintf(stderr, "**************************** E R R O R ****************************\n");
 					fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
+					fprintf(stderr, "Jacobian = %lg\n", e.m_vol);
 					fprintf(stderr, "Did you use the right node numbering?\n");
 					if (e.m_pel)
 					{
