@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
 
 // register the material with the framework
