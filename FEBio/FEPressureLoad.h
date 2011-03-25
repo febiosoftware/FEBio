@@ -1,6 +1,4 @@
 #pragma once
-#include "FESurface.h"
-#include "FEBoundaryCondition.h"
 #include "FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
@@ -74,55 +72,4 @@ protected:
 	int				m_ntype;	//!< pressure load type (linear or nonlinear)
 	FESurface		m_surf;		//!< surface to which this BC is applied
 	vector<LOAD>	m_PC;		//!< pressure load cards
-};
-
-//-----------------------------------------------------------------------------
-//! FEConstTractionSurface is a surface that has a constant (deformation independant)
-//! traction force on it.
-//!
-
-class FETractionLoad : public FEBoundaryCondition
-{
-public:
-	FETractionLoad() { nface = -1; }
-
-public:
-	vec3d	s[4];		// nodal scale factors
-	int		nface;		// face number
-	int		lc;			// load curve
-};
-
-class FEConstTractionSurface : public FESurface
-{
-public:
-	//! constructor
-	FEConstTractionSurface(FEMesh* pm) : FESurface(pm) {}
-
-	//! allocate storage
-	void create(int n)
-	{
-		FESurface::create(n);
-		m_TC.resize(n);
-	}
-
-	//! clone
-	FEDomain* Clone()
-	{
-		FEConstTractionSurface* ps = new FEConstTractionSurface(m_pMesh);
-		ps->m_TC = m_TC;
-		return ps;
-	}
-
-	//! get a traction load BC
-	FETractionLoad& TractionLoad(int n) { return m_TC[n]; }
-
-	//! calculate pressure stiffness
-	void StiffnessMatrix(FESolidSolver* psolver) {}
-
-	//! calculate residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
-
-protected:
-	// traction boundary data
-	vector<FETractionLoad>	m_TC;	//!< traction boundary cards
 };

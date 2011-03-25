@@ -1,5 +1,6 @@
 #pragma once
 #include "FEBoundaryCondition.h"
+#include "FESurface.h"
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all loads that are applied to surfaces

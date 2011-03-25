@@ -103,7 +103,7 @@ void echo_input(FEM& fem)
 	clog.printf("\tNumber of loadcurves ........................... : %d\n", fem.LoadCurves());
 	clog.printf("\tNumber of displacement boundary conditions ..... : %d\n", fem.m_DC.size());
 	clog.printf("\tNumber of pressure boundary cards .............. : %d\n", (fem.m_psurf ? fem.m_psurf->Surface().Elements() : 0));
-	clog.printf("\tNumber of constant traction boundary cards ..... : %d\n", (fem.m_ptrac ? fem.m_ptrac->Elements() : 0));
+	clog.printf("\tNumber of constant traction boundary cards ..... : %d\n", (fem.m_ptrac ? fem.m_ptrac->Surface().Elements() : 0));
 	clog.printf("\tNumber of fluid flux boundary cards .............: %d\n", (fem.m_fsurf ? fem.m_fsurf->Elements() : 0));
 	clog.printf("\tNumber of concentrated nodal forces ............ : %d\n", fem.m_FC.size());
 	clog.printf("\tMax nr of stiffness reformations ............... : %d\n", step.m_psolver->m_bfgs.m_maxref);

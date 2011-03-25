@@ -20,6 +20,7 @@
 #include "FEAugLagLinearConstraint.h"
 #include "Timer.h"
 #include "FEPressureLoad.h"
+#include "FETractionLoad.h"
 #include "FEPoroTraction.h"
 #include "FEFluidFluxSurface.h"
 #include "FESoluteFluxSurface.h"
@@ -419,8 +420,8 @@ public:
 		vector<FENodalForce*>	m_FC;		//!< concentrated nodal force cards
 
 		// pressure BC
-		FEPressureLoad*		m_psurf;	//!< pressure surface domain
-		FEConstTractionSurface*	m_ptrac;	//!< constant traction surface
+		FEPressureLoad*			m_psurf;	//!< pressure surface domain
+		FETractionLoad*	m_ptrac;	//!< constant traction surface
 
 		// normal traction on porous surface BC
 		FEPoroTractionSurface*	m_ptsurf;	//!< normal traction surface domain

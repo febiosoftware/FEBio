@@ -2334,8 +2334,8 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 	while (!t.isend()) { ntc++; ++t; }
 
 	// allocate traction data
-	fem.m_ptrac = new FEConstTractionSurface(&fem.m_mesh);
-	FEConstTractionSurface& pt = *fem.m_ptrac;
+	fem.m_ptrac = new FETractionLoad(&fem.m_mesh);
+	FETractionLoad& pt = *fem.m_ptrac;
 	pt.create(ntc);
 
 	// read the traction data
@@ -2344,8 +2344,8 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 	vec3d s;
 	for (int i=0; i<ntc; ++i)
 	{
-		FETractionLoad& tc = pt.TractionLoad(i);
-		FESurfaceElement& el = fem.m_ptrac->Element(i);
+		FETractionLoad::LOAD& tc = pt.TractionLoad(i);
+		FESurfaceElement& el = fem.m_ptrac->Surface().Element(i);
 
 		sz = tag.AttributeValue("lc", true);
 		if (sz) tc.lc = atoi(sz); else tc.lc = 0;
@@ -2364,14 +2364,23 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 		tag.value(nf, N);
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 
+/*
+		// TODO: delete this
 		// add this boundary condition to the current step
 		if (m_pim->m_nsteps > 0)
 		{
 			GetStep()->AddBoundaryCondition(&tc);
 			tc.Deactivate();
 		}
-
+*/
 		++tag;
+	}
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(fem.m_ptrac);
+		fem.m_ptrac->Deactivate();
 	}
 }
 

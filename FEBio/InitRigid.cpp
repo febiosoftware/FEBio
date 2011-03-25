@@ -361,9 +361,9 @@ bool FEM::InitRigidBodies()
 
 	if (m_ptrac)
 	{
-		for (i=0; i<m_ptrac->Elements(); ++i)
+		for (i=0; i<m_ptrac->Surface().Elements(); ++i)
 		{
-			FESurfaceElement& el = m_ptrac->Element(i);
+			FESurfaceElement& el = m_ptrac->Surface().Element(i);
 			int N = el.Nodes();
 			el.m_nrigid = 0;
 			for (j=0; j<N; ++j) 

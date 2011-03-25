@@ -500,7 +500,8 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 
 	if (m_ptrac)
 	{
-		for (i=0; i<m_ptrac->Elements(); ++i) if (m_ptrac->TractionLoad(i).GetID() == nid) return &m_ptrac->TractionLoad(i);
+		if (m_ptrac->GetID() == nid) return m_ptrac;
+//		for (i=0; i<m_ptrac->Surface().Elements(); ++i) if (m_ptrac->TractionLoad(i).GetID() == nid) return &m_ptrac->TractionLoad(i);
 	}
 
 	if (m_ptsurf)

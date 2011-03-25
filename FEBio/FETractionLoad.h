@@ -1,0 +1,54 @@
+#pragma once
+#include "FESurfaceLoad.h"
+
+//-----------------------------------------------------------------------------
+//! FETractionLoad is a surface that has a constant (deformation independant)
+//! traction force on it.
+//!
+class FETractionLoad : public FESurfaceLoad
+{
+public:
+	struct LOAD
+	{
+		vec3d	s[4];		// nodal scale factors
+		int		nface;		// face number
+		int		lc;			// load curve
+
+		LOAD() { nface = -1; }
+	};
+
+public:
+	//! constructor
+	FETractionLoad(FEMesh* pm) : m_surf(pm) {}
+
+	//! allocate storage
+	void create(int n)
+	{
+		m_surf.create(n);
+		m_TC.resize(n);
+	}
+
+	//! clone
+/*	FEDomain* Clone()
+	{
+		FETractionLoad* ps = new FETractionLoad(m_surf.GetMesh());
+		ps->m_TC = m_TC;
+		return ps;
+	}
+*/
+	//! get a traction load BC
+	LOAD& TractionLoad(int n) { return m_TC[n]; }
+
+	//! calculate pressure stiffness
+	void StiffnessMatrix(FESolidSolver* psolver) {}
+
+	//! calculate residual
+	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+	//! Get the surface
+	FESurface& Surface() { return m_surf; }
+
+protected:
+	FESurface		m_surf;		//!< surface to which load is applied
+	vector<LOAD>	m_TC;		//!< traction boundary cards
+};
