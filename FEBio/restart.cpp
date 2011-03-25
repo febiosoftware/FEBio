@@ -271,15 +271,6 @@ void FEM::SerializeGeometry(DumpFile &ar)
 	{
 		int i, n;
 
-		// surface elements
-		if (m_psurf)
-		{
-			n = m_psurf->Surface().Elements();
-			ar << n;
-			m_psurf->Serialize(*this, ar);
-		}
-		else ar << 0;
-		
 		// rigid bodies
 		ar << m_nreq << m_nrm << m_nrb;
 		for (i=0; i<m_nrb; ++i) m_RB[i].Serialize(ar);
@@ -291,15 +282,6 @@ void FEM::SerializeGeometry(DumpFile &ar)
 	else
 	{
 		int i, n;
-
-		// surface elements
-		ar >> n;
-		if (n) 
-		{
-			m_psurf = new FEPressureLoad(&m_mesh);
-			m_psurf->create(n);
-			m_psurf->Serialize(*this, ar);
-		}
 
 		// rigid bodies
 		ar >> m_nreq >> m_nrm >> m_nrb;

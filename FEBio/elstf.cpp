@@ -5,6 +5,7 @@
 #include "FEMicroMaterial.h"
 #include "tens4d.h"
 #include "log.h"
+#include "FEPressureLoad.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
@@ -44,10 +45,14 @@ bool FESolidSolver::StiffnessMatrix()
 		for (int i=0; i<m_fem.m_nrj; ++i) m_fem.m_RJ[i]->JointStiffness();
 	}
 
-	// calculate pressure stiffness term
-	if (m_fem.m_psurf && (m_fem.m_pStep->m_istiffpr != 0))
+	// calculate stiffness matrices for surface loads
+	int nsl = (int) m_fem.m_SL.size();
+	for (i=0; i<nsl; ++i)
 	{
-		m_fem.m_psurf->StiffnessMatrix(this);
+		FESurfaceLoad* psl = m_fem.m_SL[i];
+
+		// respect the pressure stiffness flag
+		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.m_pStep->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
 	}
 
 	// calculate normal traction on porous surface stiffness term
@@ -565,16 +570,12 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// calculate inertial forces for dynamic problems
 	if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) InertialForces(R);
 
-	// calculate forces due to pressure and add them to the residual
-	if (m_fem.m_psurf)
+	// calculate forces due to surface loads
+	int nsl = (int) m_fem.m_SL.size();
+	for (i=0; i<nsl; ++i)
 	{
-		m_fem.m_psurf->Residual(this, R);
-	}
-
-	// calculate forces due to tractions and add them to the residual
-	if (m_fem.m_ptrac)
-	{
-		m_fem.m_ptrac->Residual(this, R);
+		FESurfaceLoad* psl = m_fem.m_SL[i];
+		psl->Residual(this, R);
 	}
 
 	// calculate forces due to normal traction on porous surface and add them to the residual

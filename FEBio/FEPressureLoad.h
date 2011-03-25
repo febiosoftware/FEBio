@@ -22,7 +22,7 @@ public:
 
 public:
 	//! constructor
-	FEPressureLoad(FEMesh* pm) : m_surf(pm) { m_ntype = NONLINEAR; }
+	FEPressureLoad(FEMesh* pm) : FESurfaceLoad(pm) { m_ntype = NONLINEAR; }
 
 	//! allocate storage
 	void create(int n)
@@ -52,9 +52,6 @@ public:
 	//! serialize data
 	void Serialize(FEM& fem, DumpFile& ar);
 
-	//! Surface data
-	FESurface& Surface() { return m_surf; }
-
 	//! Set the load type
 	void SetType(int ntype) { m_ntype = ntype; }
 
@@ -70,6 +67,5 @@ protected:
 
 protected:
 	int				m_ntype;	//!< pressure load type (linear or nonlinear)
-	FESurface		m_surf;		//!< surface to which this BC is applied
 	vector<LOAD>	m_PC;		//!< pressure load cards
 };

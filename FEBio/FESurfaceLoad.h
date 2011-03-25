@@ -7,6 +7,18 @@
 class FESurfaceLoad : public FEBoundaryCondition
 {
 public:
-	FESurfaceLoad(void);
-	~FESurfaceLoad(void);
+	FESurfaceLoad(FEMesh* pm);
+	virtual ~FESurfaceLoad(void);
+
+	//! Get the surface
+	FESurface& Surface() { return m_surf; }
+
+	//! calculate stiffness matrix
+	virtual void StiffnessMatrix(FESolidSolver* psolver) = 0;
+
+	//! calculate residual
+	virtual void Residual(FESolidSolver* psolver, vector<double>& R) = 0;
+
+protected:
+	FESurface	m_surf;
 };

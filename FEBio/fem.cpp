@@ -58,8 +58,6 @@ FEM::FEM()
 	m_bsymm = true;	// assume symmetric stiffness matrix
 
 	//surface for the pressure boundary condition
-	m_psurf = 0;
-	m_ptrac = 0;
 	m_ptsurf = 0;
 	m_fsurf = 0;
 	m_ssurf = 0;
@@ -120,8 +118,6 @@ FEM::FEM(const FEM& fem)
 	m_bsymm = true;	// assume symmetric stiffness matrix
 
 	//surface for the pressure boundary condition
-	m_psurf = 0;
-	m_ptrac = 0;
 	m_ptsurf = 0;
 	m_fsurf = 0;
 	m_ssurf = 0;
@@ -492,17 +488,7 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 
 	for (i=0; i<(int) m_FC.size(); ++i) if (m_FC[i]->GetID() == nid) return m_FC[i];
 
-	if (m_psurf)
-	{
-		if (m_psurf->GetID() == nid) return m_psurf;
-//		for (i=0; i<m_psurf->Surface().Elements(); ++i) if (m_psurf->PressureLoad(i).GetID() == nid) return &m_psurf->PressureLoad(i);
-	}
-
-	if (m_ptrac)
-	{
-		if (m_ptrac->GetID() == nid) return m_ptrac;
-//		for (i=0; i<m_ptrac->Surface().Elements(); ++i) if (m_ptrac->TractionLoad(i).GetID() == nid) return &m_ptrac->TractionLoad(i);
-	}
+	for (i=0; i<(int) m_SL.size(); ++i) if (m_SL[i]->GetID() == nid) return m_SL[i];
 
 	if (m_ptsurf)
 	{

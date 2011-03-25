@@ -19,7 +19,7 @@ public:
 
 public:
 	//! constructor
-	FETractionLoad(FEMesh* pm) : m_surf(pm) {}
+	FETractionLoad(FEMesh* pm) : FESurfaceLoad(pm) {}
 
 	//! allocate storage
 	void create(int n)
@@ -45,10 +45,6 @@ public:
 	//! calculate residual
 	void Residual(FESolidSolver* psolver, vector<double>& R);
 
-	//! Get the surface
-	FESurface& Surface() { return m_surf; }
-
 protected:
-	FESurface		m_surf;		//!< surface to which load is applied
 	vector<LOAD>	m_TC;		//!< traction boundary cards
 };
