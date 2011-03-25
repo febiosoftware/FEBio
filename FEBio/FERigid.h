@@ -60,6 +60,9 @@ public:
 	//! data initialization
 	void Init();
 
+	//! serialization
+	void Serialize(DumpFile& ar);
+
 	//! return bulk modulus
 	double BulkModulus() { return m_E/(3.0*(1.0 - 2.0*m_v));}
 

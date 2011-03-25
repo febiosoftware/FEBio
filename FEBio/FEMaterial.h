@@ -19,6 +19,7 @@
 #include "FEMaterialFactory.h"
 #include "FEParameterList.h"
 #include "FEMaterialPoint.h"
+#include "DumpFile.h"
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 
@@ -59,6 +60,9 @@ public:
 
 	int GetID() { return m_nID; }
 	void SetID(int nid) { m_nID = nid; }
+
+	//! Serialize material data to archive
+	virtual void Serialize(DumpFile& ar);
 
 public:
 	// this is the first GetParameterList function

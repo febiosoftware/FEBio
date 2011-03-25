@@ -2282,9 +2282,10 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 
 	// allocate pressure data
-	fem.m_psurf = new FEPressureSurface(&fem.m_mesh);
-	FEPressureSurface& ps = *fem.m_psurf;
+	fem.m_psurf = new FEPressureLoad(&fem.m_mesh);
+	FEPressureLoad& ps = *fem.m_psurf;
 	ps.create(npr);
+	if (blinear) fem.m_psurf->SetType(FEPressureLoad::LINEAR); else fem.m_psurf->SetType(FEPressureLoad::NONLINEAR);
 
 	// read the pressure data
 	++tag;
@@ -2292,9 +2293,8 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	double s;
 	for (int i=0; i<npr; ++i)
 	{
-		FEPressureLoad& pc = ps.PressureLoad(i);
-		FESurfaceElement& el = fem.m_psurf->Element(i);
-		pc.blinear = blinear;
+		FEPressureLoad::LOAD& pc = ps.PressureLoad(i);
+		FESurfaceElement& el = fem.m_psurf->Surface().Element(i);
 
 		sz = tag.AttributeValue("lc", true);
 		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
@@ -2310,14 +2310,14 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 		tag.value(nf, N);
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 
-		// add this boundary condition to the current step
-		if (m_pim->m_nsteps > 0)
-		{
-			GetStep()->AddBoundaryCondition(&pc);
-			pc.Deactivate();
-		}
-
 		++tag;
+	}
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(fem.m_psurf);
+		fem.m_psurf->Deactivate();
 	}
 }
 

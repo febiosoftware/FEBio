@@ -20,6 +20,9 @@ public:
 	//! constructor
 	FETransverselyIsotropic() {}
 
+	//! serialize material data
+	void Serialize(DumpFile& ar);
+
 public:
 	FEFiberMaterial	m_fib;
 

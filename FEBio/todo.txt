@@ -1,0 +1,10 @@
+* Fix the restart feature:
+check the following routines:
+-FEMaterial::Save: Need to call AddParameterList
+-FETransverselyIsotropic: need to remove m_plc parameter.
+
+* define an INRANGE macro that allows you to specify whether the bounds are included or not
+
+* I should probably split the FEPressureLoad into two separate classes, one for the linear pressures and one for the nonlinear.
+
+* Is the FEPressureLoad::Clone function needed?

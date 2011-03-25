@@ -1961,7 +1961,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEPressureSurface.cpp"
+				RelativePath=".\FEPressureLoad.cpp"
 				>
 			</File>
 			<File
@@ -2058,6 +2058,10 @@
 			</File>
 			<File
 				RelativePath=".\FESurfaceConstraint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FESurfaceLoad.cpp"
 				>
 			</File>
 			<File
@@ -2803,7 +2807,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEPressureSurface.h"
+				RelativePath=".\FEPressureLoad.h"
 				>
 			</File>
 			<File
@@ -2876,6 +2880,10 @@
 			</File>
 			<File
 				RelativePath=".\FESurfaceConstraint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESurfaceLoad.h"
 				>
 			</File>
 			<File
@@ -3047,6 +3055,10 @@
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
+			>
+		</File>
+		<File
+			RelativePath=".\todo.txt"
 			>
 		</File>
 		<File

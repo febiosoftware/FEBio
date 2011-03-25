@@ -494,7 +494,8 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 
 	if (m_psurf)
 	{
-		for (i=0; i<m_psurf->Elements(); ++i) if (m_psurf->PressureLoad(i).GetID() == nid) return &m_psurf->PressureLoad(i);
+		if (m_psurf->GetID() == nid) return m_psurf;
+//		for (i=0; i<m_psurf->Surface().Elements(); ++i) if (m_psurf->PressureLoad(i).GetID() == nid) return &m_psurf->PressureLoad(i);
 	}
 
 	if (m_ptrac)

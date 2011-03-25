@@ -1,52 +1,49 @@
 #pragma once
 #include "FESurface.h"
 #include "FEBoundaryCondition.h"
-
-//-----------------------------------------------------------------------------
-//! This class describes a pressure load on a surface element
-//! bc = 0 for pressure loads
-//! bc = 1 for heat flux
-
-class FEPressureLoad : public FEBoundaryCondition
-{
-public:
-	FEPressureLoad() { s[0] = s[1] = s[2] = s[3] = 1.0;
-						blinear = false;}
-
-public:
-	double	s[4];		// nodal scale factors
-	int		face;		// face number
-	int		lc;			// load curve
-	bool	blinear;	// linear or not (true is non-follower, false is follower)
-};
+#include "FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! The pressure surface is a surface domain that sustains pressure boundary
 //! conditions
 //!
-class FEPressureSurface : public FESurface
+class FEPressureLoad : public FESurfaceLoad
 {
 public:
+	struct LOAD
+	{
+		double	s[4];		// nodal scale factors
+		int		face;		// face number
+		int		lc;			// load curve
+
+		LOAD() { s[0] = s[1] = s[2] = s[3] = 1.0; }
+	};
+
+	// pressure load types
+	enum { LINEAR, NONLINEAR };
+
+public:
 	//! constructor
-	FEPressureSurface(FEMesh* pm) : FESurface(pm) {}
+	FEPressureLoad(FEMesh* pm) : m_surf(pm) { m_ntype = NONLINEAR; }
 
 	//! allocate storage
 	void create(int n)
 	{
-		FESurface::create(n);
+		m_surf.create(n);
 		m_PC.resize(n);
 	}
 
 	//! clone
-	FEDomain* Clone()
+/*	FEDomain* Clone()
 	{
-		FEPressureSurface* ps = new FEPressureSurface(m_pMesh);
+		FEPressureLoad* ps = new FEPressureLoad(m_surf.GetMesh());
 		ps->m_PC = m_PC;
 		return ps;
 	}
+*/
 
 	//! get a pressure load BC
-	FEPressureLoad& PressureLoad(int n) { return m_PC[n]; }
+	LOAD& PressureLoad(int n) { return m_PC[n]; }
 
 	//! calculate pressure stiffness
 	void StiffnessMatrix(FESolidSolver* psolver);
@@ -56,6 +53,12 @@ public:
 
 	//! serialize data
 	void Serialize(FEM& fem, DumpFile& ar);
+
+	//! Surface data
+	FESurface& Surface() { return m_surf; }
+
+	//! Set the load type
+	void SetType(int ntype) { m_ntype = ntype; }
 
 protected:
 	//! calculate stiffness for an element
@@ -68,8 +71,9 @@ protected:
 	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 protected:
-	// pressure boundary data
-	vector<FEPressureLoad>	m_PC;		//!< pressure boundary cards
+	int				m_ntype;	//!< pressure load type (linear or nonlinear)
+	FESurface		m_surf;		//!< surface to which this BC is applied
+	vector<LOAD>	m_PC;		//!< pressure load cards
 };
 
 //-----------------------------------------------------------------------------

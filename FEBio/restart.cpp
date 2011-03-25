@@ -132,7 +132,7 @@ void FEM::SerializeLoadData(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		// load curve data
+		// save curve data
 		ar << LoadCurves();
 		for (int i=0; i<LoadCurves(); ++i) GetLoadCurve(i)->Serialize(ar);
 	}
@@ -213,7 +213,10 @@ void FEM::SerializeMaterials(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
+		// store the nr of materials
 		ar << Materials();
+
+		// store the materials
 		for (int i=0; i<Materials(); ++i)
 		{
 			FEMaterial* pmat = GetMaterial(i);
@@ -224,58 +227,18 @@ void FEM::SerializeMaterials(DumpFile& ar)
 			// store the name
 			ar << pmat->GetName();
 
-			// store all parameters
-			auto_ptr<FEParameterList> pl(pmat->GetParameterList());
-			int n = pl->Parameters();
-			ar << n;
-			list<FEParam>::iterator it = pl->first();
-			for (int j=0; j<n; ++j, ++it)
-			{
-				// store the value
-				switch (it->m_itype)
-				{
-				case FE_PARAM_INT    : ar << it->value<int   >(); break;
-				case FE_PARAM_BOOL   : ar << it->value<bool  >(); break;
-				case FE_PARAM_DOUBLE : ar << it->value<double>(); break;
-				case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<double>()[k]; } break;
-				case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<int   >()[k]; } break;
-				default:
-					assert(false);
-				}
-
-				// store parameter data
-				ar << it->m_nlc;
-			}
-
-			// not all parameters can be serialized through the parameter lists
-			// so we have to save those parameters the hard way
-
-			if (dynamic_cast<FETransverselyIsotropic*>(pmat))
-			{
-				FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
-				ar << pm->m_fib.m_lcna;
-				ar << pm->m_fib.m_ascl;
-				ar << pm->m_fib.m_ca0;
-				ar << pm->m_fib.m_beta;
-				ar << pm->m_fib.m_l0;
-				ar << pm->m_fib.m_refl;
-			}
-
-			// TODO: do we really need to store this data?
-			if (dynamic_cast<FERigidMaterial*>(pmat))
-			{
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
-				ar.write(pm->m_bc, sizeof(int), 6);
-				ar.write(pm->m_fc, sizeof(int), 6);
-				ar.write(pm->m_fs, sizeof(double), 6);
-			}
+			// store material parameters
+			pmat->Serialize(ar);
 		}
 	}
 	else
 	{
+		// read the number of materials
 		int nmat;
-		char szmat[256] = {0}, szvar[256] = {0};
 		ar >> nmat;
+
+		// read the material data
+		char szmat[256] = {0}, szvar[256] = {0};
 		for (int i=0; i<nmat; ++i)
 		{
 			// read the type string
@@ -291,53 +254,7 @@ void FEM::SerializeMaterials(DumpFile& ar)
 			pmat->SetName(szmat);
 
 			// read all parameters
-			FEParameterList* pl = pmat->GetParameterList();
-			AddParameterList(pl);
-			int n = 0;
-			ar >> n;
-			assert(n == pl->Parameters());
-			list<FEParam>::iterator it = pl->first();
-			for (int j=0; j<n; ++j, ++it)
-			{
-				// read the value
-				switch (it->m_itype)
-				{
-				case FE_PARAM_INT    : ar >> it->value<int   >(); break;
-				case FE_PARAM_BOOL   : ar >> it->value<bool  >(); break;
-				case FE_PARAM_DOUBLE : ar >> it->value<double>(); break;
-				case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<double>()[k]; } break;
-				case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<int   >()[k]; } break;
-				default:
-					assert(false);
-				}
-
-				// read parameter data
-				ar >> it->m_nlc;
-			}
-
-			// not all parameters can be serialized through the parameter lists
-			// so we have to save those parameters the hard way
-
-			if (dynamic_cast<FETransverselyIsotropic*>(pmat))
-			{
-				FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*>(pmat);
-				ar >> pm->m_fib.m_lcna;
-				ar >> pm->m_fib.m_ascl;
-				ar >> pm->m_fib.m_ca0;
-				ar >> pm->m_fib.m_beta;
-				ar >> pm->m_fib.m_l0;
-				ar >> pm->m_fib.m_refl;
-
-				if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
-			}
-
-			if (dynamic_cast<FERigidMaterial*>(pmat))
-			{
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
-				ar.read(pm->m_bc, sizeof(int), 6);
-				ar.read(pm->m_fc, sizeof(int), 6);
-				ar.read(pm->m_fs, sizeof(double), 6);
-			}
+			pmat->Serialize(ar);
 		}
 	}
 }
@@ -357,7 +274,7 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		// surface elements
 		if (m_psurf)
 		{
-			n = m_psurf->Elements();
+			n = m_psurf->Surface().Elements();
 			ar << n;
 			m_psurf->Serialize(*this, ar);
 		}
@@ -379,7 +296,7 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		ar >> n;
 		if (n) 
 		{
-			m_psurf = new FEPressureSurface(&m_mesh);
+			m_psurf = new FEPressureLoad(&m_mesh);
 			m_psurf->create(n);
 			m_psurf->Serialize(*this, ar);
 		}

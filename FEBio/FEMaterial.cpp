@@ -37,6 +37,66 @@ FEParameterList* FEMaterial::GetParameterList()
 const char* FEMaterial::GetTypeString() { return "material base"; }
 
 //-----------------------------------------------------------------------------
+//! Store the material data to the archive
+void FEMaterial::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		// store all parameters
+		auto_ptr<FEParameterList> pl(GetParameterList());
+		int n = pl->Parameters();
+		ar << n;
+		list<FEParam>::iterator it = pl->first();
+		for (int j=0; j<n; ++j, ++it)
+		{
+			// store the value
+			switch (it->m_itype)
+			{
+			case FE_PARAM_INT    : ar << it->value<int   >(); break;
+			case FE_PARAM_BOOL   : ar << it->value<bool  >(); break;
+			case FE_PARAM_DOUBLE : ar << it->value<double>(); break;
+			case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<double>()[k]; } break;
+			case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<int   >()[k]; } break;
+			default:
+				assert(false);
+			}
+
+			// store parameter loadcurve data
+			ar << it->m_nlc;
+		}
+	}
+	else
+	{
+		FEParameterList* pl = GetParameterList();
+
+		// TODO: not sure how to add the parameter list back to the FEM
+//		AddParameterList(pl);
+
+		int n = 0;
+		ar >> n;
+		assert(n == pl->Parameters());
+		list<FEParam>::iterator it = pl->first();
+		for (int j=0; j<n; ++j, ++it)
+		{
+			// read the value
+			switch (it->m_itype)
+			{
+			case FE_PARAM_INT    : ar >> it->value<int   >(); break;
+			case FE_PARAM_BOOL   : ar >> it->value<bool  >(); break;
+			case FE_PARAM_DOUBLE : ar >> it->value<double>(); break;
+			case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<double>()[k]; } break;
+			case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<int   >()[k]; } break;
+			default:
+				assert(false);
+			}
+
+			// read parameter data
+			ar >> it->m_nlc;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Derivative of stress w.r.t. solute concentration at material point
 // Set this to zero by default because elasticity problems do not require it
 mat3ds FESolidMaterial::Tangent_Concentration(FEMaterialPoint& pt)
