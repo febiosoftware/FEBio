@@ -44,10 +44,10 @@ public:
 	LOAD& PressureLoad(int n) { return m_PC[n]; }
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(FESolidSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	//! calculate residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
+	void Residual(FESolver* psolver, vector<double>& R);
 
 	//! serialize data
 	void Serialize(FEM& fem, DumpFile& ar);

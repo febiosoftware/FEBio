@@ -1,47 +1,49 @@
 #pragma once
-#include "FESurface.h"
-#include "FEBoundaryCondition.h"
-
-//-----------------------------------------------------------------------------
-//! This class describes a heat flux card
-//!
-class FEHeatFlux : public FEBoundaryCondition
-{
-public:
-	FEHeatFlux()  { s[0] = s[1] = s[2] = s[3] = 1.0; lc = -1; face = -1; }
-
-public:
-	double	s[4];		// nodal scale factors
-	int		face;		// face number
-	int		lc;			// load curve
-};
+#include "FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! Surface that sustains a heat flux boundary condition
 //!
-class FEHeatFluxSurface : public FESurface
+class FEHeatFlux : public FESurfaceLoad
 {
 public:
-	FEHeatFluxSurface(FEMesh* pm) : FESurface(pm){}
+	struct LOAD
+	{
+		double	s[4];		// nodal scale factors
+		int		face;		// face number
+		int		lc;			// load curve
+
+		LOAD()  { s[0] = s[1] = s[2] = s[3] = 1.0; lc = -1; face = -1; }
+	};
+
+public:
+	FEHeatFlux(FEMesh* pm) : FESurfaceLoad(pm){}
 
 	//! allocate storage
 	void create(int n)
 	{
-		FESurface::create(n);
+		m_surf.create(n);
 		m_FC.resize(n);
 	}
 
 	//! clone
-	FEDomain* Clone()
+/*	FEDomain* Clone()
 	{
-		FEHeatFluxSurface* ps = new FEHeatFluxSurface(m_pMesh);
+		FEHeatFlux* ps = new FEHeatFlux(m_pMesh);
 		ps->m_FC = m_FC;
 		return ps;
 	}
+*/
 
 	//! get a heat flux load BC
-	FEHeatFlux& HeatFlux(int n) { return m_FC[n]; }
+	LOAD& HeatFlux(int n) { return m_FC[n]; }
+
+	//! stiffness matrix
+	void StiffnessMatrix(FESolver* psolver) {}
+	
+	//! residual
+	void Residual(FESolver* psolver, vector<double>& R);
 
 protected:
-	vector<FEHeatFlux>	m_FC;
+	vector<LOAD>	m_FC;
 };

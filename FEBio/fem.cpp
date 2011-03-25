@@ -61,7 +61,6 @@ FEM::FEM()
 	m_ptsurf = 0;
 	m_fsurf = 0;
 	m_ssurf = 0;
-	m_phflux = 0;
 
 	// --- Material Data ---
 	// (nothing to initialize yet)
@@ -121,7 +120,6 @@ FEM::FEM(const FEM& fem)
 	m_ptsurf = 0;
 	m_fsurf = 0;
 	m_ssurf = 0;
-	m_phflux = 0;
 
 	// --- Material Data ---
 	// (nothing to initialize yet)

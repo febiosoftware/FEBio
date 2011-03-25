@@ -26,6 +26,7 @@
 #include "FEPoroSoluteSolver.h"
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
+#include "FEHeatFlux.h"
 #include <string.h>
 using namespace FECore;
 
@@ -2589,9 +2590,9 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 
 	// allocate flux data
-	fem.m_phflux = new FEHeatFluxSurface(&fem.m_mesh);
-	FEHeatFluxSurface& ps = *fem.m_phflux;
-	ps.create(npr);
+	FEHeatFlux* ph = new FEHeatFlux(&fem.m_mesh);
+	ph->create(npr);
+	fem.m_SL.push_back(ph);
 
 	const char* sz;
 
@@ -2601,8 +2602,8 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 	double s;
 	for (int i=0; i<npr; ++i)
 	{
-		FEHeatFlux& pc = ps.HeatFlux(i);
-		FESurfaceElement& el = fem.m_phflux->Element(i);
+		FEHeatFlux::LOAD& pc = ph->HeatFlux(i);
+		FESurfaceElement& el = ph->Surface().Element(i);
 
 		sz = tag.AttributeValue("lc", true);
 		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
@@ -2618,14 +2619,14 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 		tag.value(nf, N);
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 
-		// add this boundary condition to the current step
-		if (m_pim->m_nsteps > 0)
-		{
-			GetStep()->AddBoundaryCondition(&pc);
-			pc.Deactivate();
-		}
-
 		++tag;
+	}
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(ph);
+		ph->Deactivate();
 	}
 }
 

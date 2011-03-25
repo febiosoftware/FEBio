@@ -232,9 +232,10 @@ void FEPressureLoad::Serialize(FEM& fem, DumpFile& ar)
 	}
 }
 
-void FEPressureLoad::StiffnessMatrix(FESolidSolver* psolver)
+void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
+	FEM& fem = solver.m_fem;
 
 	matrix ke;
 
@@ -274,16 +275,17 @@ void FEPressureLoad::StiffnessMatrix(FESolidSolver* psolver)
 					PressureStiffness(el, ke, tn);
 
 					// assemble element matrix in global stiffness matrix
-					psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+					solver.AssembleStiffness(el.m_node, el.LM(), ke);
 				}
 			}
 		}
 	}
 }
 
-void FEPressureLoad::Residual(FESolidSolver* psolver, vector<double>& R)
+void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
+	FEM& fem = solver.m_fem;
 
 	vector<double> fe;
 
@@ -313,7 +315,7 @@ void FEPressureLoad::Residual(FESolidSolver* psolver, vector<double>& R)
 			if (m_ntype == LINEAR) LinearPressureForce(el, fe, tn); else PressureForce(el, fe, tn);
 
 			// add element force vector to global force vector
-			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+			solver.AssembleResidual(el.m_node, el.LM(), fe, R);
 		}
 	}
 }

@@ -23,7 +23,6 @@
 #include "FEPoroTraction.h"
 #include "FEFluidFluxSurface.h"
 #include "FESoluteFluxSurface.h"
-#include "FEHeatFlux.h"
 #include "FEDiscreteMaterial.h"
 #include "FEBodyForce.h"
 
@@ -421,9 +420,6 @@ public:
 		// surface loads
 		vector<FESurfaceLoad*>	m_SL;		//!< surface loads
 
-//		FEPressureLoad*		m_psurf;	//!< pressure surface domain
-//		FETractionLoad*		m_ptrac;	//!< constant traction surface
-
 		// normal traction on porous surface BC
 		FEPoroTractionSurface*	m_ptsurf;	//!< normal traction surface domain
 	
@@ -433,9 +429,6 @@ public:
 		// solute flux BC
 		FESoluteFluxSurface*	m_ssurf;	//!< solute flux surface domain
 	
-		// heat flux BC
-		FEHeatFluxSurface*		m_phflux;	//!< heat flux surface domain
-
 		// rigid displacements
 		vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 

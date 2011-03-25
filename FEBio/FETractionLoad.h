@@ -40,10 +40,10 @@ public:
 	LOAD& TractionLoad(int n) { return m_TC[n]; }
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(FESolidSolver* psolver) {}
+	void StiffnessMatrix(FESolver* psolver) {}
 
 	//! calculate residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
+	void Residual(FESolver* psolver, vector<double>& R);
 
 protected:
 	vector<LOAD>	m_TC;		//!< traction boundary cards

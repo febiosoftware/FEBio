@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEHeatSolver.h"
 #include "FEIsotropicFourier.h"
+#include "FEHeatFlux.h"
 
 //-----------------------------------------------------------------------------
 //! constructor for the class
@@ -100,7 +101,7 @@ void FEHeatSolver::Residual()
 	zero(m_R);
 
 	// apply nodal fluxes
-	int i, j, id, bc, lc, n;
+	int i, id, bc, lc, n;
 	double s, f;
 
 	FEMesh& mesh = m_fem.m_mesh;
@@ -115,7 +116,7 @@ void FEHeatSolver::Residual()
 			id	 = fc.node;	// node ID
 			bc   = fc.bc;	// direction of force
 			lc   = fc.lc;	// loadcurve number
-			s    = fc.s;		// force scale factor
+			s    = fc.s;	// force scale factor
 
 			FENode& node = mesh.Node(id);
 
@@ -129,75 +130,10 @@ void FEHeatSolver::Residual()
 	}
 
 	// add surface fluxes
-	if (m_fem.m_phflux)
+	for (i=0; i<(int) m_fem.m_SL.size(); ++i)
 	{
-		int nfc = m_fem.m_phflux->Elements();
-		for (i=0; i<nfc; ++i)
-		{
-			FEHeatFlux& hf = m_fem.m_phflux->HeatFlux(i);
-			FESurfaceElement& el = m_fem.m_phflux->Element(i);
-			m_fem.m_phflux->UnpackElement(el);
-
-			int ne = el.Nodes();
-			int ni = el.GaussPoints();
-
-			double g = m_fem.GetLoadCurve(hf.lc)->Value();
-
-			// calculate nodal fluxes
-			double qn[4];
-			for (j=0; j<el.Nodes(); ++j) qn[j] = g*hf.s[j];
-
-			vector<double> fe(ne);
-
-			// nodal coordinates
-			vec3d *rt = el.rt();
-
-			double* Gr, *Gs;
-			double* N;
-			double* w  = el.GaussWeights();
-
-			// pressure at integration points
-			double q;
-
-			vec3d dxr, dxs;
-
-			vector<int> lm(ne);
-			for (j=0; j<ne; ++j) lm[j] = (el.LM())[ne*10 + j];
-
-			// force vector
-			// repeat over integration points
-			zero(fe);
-			for (n=0; n<ni; ++n)
-			{
-				N  = el.H(n);
-				Gr = el.Gr(n);
-				Gs = el.Gs(n);
-
-				q = 0;
-				dxr = dxs = vec3d(0,0,0);
-				for (j=0; j<ne; ++j) 
-				{
-					q += N[j]*qn[j];
-					dxr.x += Gr[j]*rt[j].x;
-					dxr.y += Gr[j]*rt[j].y;
-					dxr.z += Gr[j]*rt[j].z;
-
-					dxs.x += Gs[j]*rt[j].x;
-					dxs.y += Gs[j]*rt[j].y;
-					dxs.z += Gs[j]*rt[j].z;
-				}
-		
-				double J = (dxr ^ dxs).norm();
-
-				for (j=0; j<ne; ++j) fe[j] += N[j]*q*J*w[n];
-			}
-
-			// add element force vector to global force vector
-			for (j=0; j<ne; ++j)
-			{
-				if (lm[j] >= 0) m_R[lm[j]] += fe[j];
-			}
-		}
+		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.m_SL[i]);
+		if (phf) phf->Residual(this, m_R);
 	}
 }
 
