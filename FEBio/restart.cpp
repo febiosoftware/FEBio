@@ -269,7 +269,7 @@ void FEM::SerializeGeometry(DumpFile &ar)
 	// serialize the other geometry data
 	if (ar.IsSaving())
 	{
-		int i, n;
+		int i;
 
 		// rigid bodies
 		ar << m_nreq << m_nrm << m_nrb;
@@ -281,7 +281,7 @@ void FEM::SerializeGeometry(DumpFile &ar)
 	}
 	else
 	{
-		int i, n;
+		int i;
 
 		// rigid bodies
 		ar >> m_nreq >> m_nrm >> m_nrb;

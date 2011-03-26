@@ -21,7 +21,6 @@
 #include "Timer.h"
 #include "FESurfaceLoad.h"
 #include "FEPoroTraction.h"
-#include "FEFluidFluxSurface.h"
 #include "FESoluteFluxSurface.h"
 #include "FEDiscreteMaterial.h"
 #include "FEBodyForce.h"
@@ -423,9 +422,6 @@ public:
 		// normal traction on porous surface BC
 		FEPoroTractionSurface*	m_ptsurf;	//!< normal traction surface domain
 	
-		// fluid flux BC
-		FEFluidFluxSurface*		m_fsurf;	//!< fluid flux surface domain
-
 		// solute flux BC
 		FESoluteFluxSurface*	m_ssurf;	//!< solute flux surface domain
 	

@@ -1761,7 +1761,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEFluidFluxSurface.cpp"
+				RelativePath=".\FEFluidFlux.cpp"
 				>
 			</File>
 			<File
@@ -2611,7 +2611,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEFluidFluxSurface.h"
+				RelativePath=".\FEFluidFlux.h"
 				>
 			</File>
 			<File

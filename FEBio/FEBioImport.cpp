@@ -2479,9 +2479,9 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	while (!t.isend()) { nfr++; ++t; }
 	
 	// allocate fluid flux data
-	fem.m_fsurf = new FEFluidFluxSurface(&fem.m_mesh);
-	FEFluidFluxSurface& fs = *fem.m_fsurf;
-	fs.create(nfr);
+	FEFluidFlux* pfs = new FEFluidFlux(&fem.m_mesh);
+	pfs->create(nfr);
+	fem.m_SL.push_back(pfs);
 	
 	// read the fluid flux data
 	++tag;
@@ -2489,8 +2489,8 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	double s;
 	for (int i=0; i<nfr; ++i)
 	{
-		FEFluidFlux& fc = fs.FluidFlux(i);
-		FESurfaceElement& el = fem.m_fsurf->Element(i);
+		FEFluidFlux::LOAD& fc = pfs->FluidFlux(i);
+		FESurfaceElement& el = pfs->Surface().Element(i);
 		fc.blinear = blinear;
 		fc.mixture = mixture;
 		
@@ -2508,14 +2508,14 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 		tag.value(nf, N);
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 		
-		// add this boundary condition to the current step
-		if (m_pim->m_nsteps > 0)
-		{
-			GetStep()->AddBoundaryCondition(&fc);
-			fc.Deactivate();
-		}
-		
 		++tag;
+	}
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(pfs);
+		pfs->Deactivate();
 	}
 }
 
