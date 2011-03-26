@@ -218,7 +218,7 @@ void FEPoroNormalTraction::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& pc = m_PC[i];
-			ar << pc.blinear << pc.effective << pc.face << pc.lc;
+			ar << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
 		}
 	}
@@ -242,7 +242,7 @@ void FEPoroNormalTraction::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& pc = m_PC[i];
-			ar >> pc.blinear >> pc. effective >> pc.face >> pc.lc;
+			ar >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
 		}
 
@@ -251,6 +251,7 @@ void FEPoroNormalTraction::Serialize(FEM& fem, DumpFile& ar)
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
@@ -262,50 +263,47 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 	for (int m=0; m<npr; ++m)
 	{
 		LOAD& pc = m_PC[m];
-//		if (pc.IsActive())
+		// get the surface element
+		FESurfaceElement& el = m_surf.Element(m);
+
+		// skip rigid surface elements
+		// TODO: do we really need to skip rigid elements?
+		if (!el.IsRigid())
 		{
-			// get the surface element
-			FESurfaceElement& el = m_surf.Element(m);
+			m_surf.UnpackElement(el);
 
-			// skip rigid surface elements
-			// TODO: do we really need to skip rigid elements?
-			if (!el.IsRigid())
+			// fluid pressure
+			double* pt = el.pt();
+			
+			// calculate nodal normal tractions
+			int neln = el.Nodes();
+			vector<double> tn(neln);
+
+			if (m_blinear == false)
 			{
-				m_surf.UnpackElement(el);
+				double g = fem.GetLoadCurve(pc.lc)->Value();
 
-				// fluid pressure
-				double* pt = el.pt();
+				// evaluate the prescribed traction.
+				for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
+
+				// if the prescribed traction is effective, evaluate the total traction
+				if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
 				
-				// calculate nodal normal tractions
-				int neln = el.Nodes();
-				vector<double> tn(neln);
+				// get the element stiffness matrix
+				int ndof = (m_beffective ? 4*neln : 3*neln);
+				ke.Create(ndof, ndof);
 
-				if (!pc.blinear)
-				{
-					double g = fem.GetLoadCurve(pc.lc)->Value();
+				// calculate pressure stiffness
+				TractionStiffness(el, ke, tn, m_beffective);
 
-					// evaluate the prescribed traction.
-					for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
-
-					// if the prescribed traction is effective, evaluate the total traction
-					if (pc.effective)
-						for (int j=0; j<neln; ++j) tn[j] -= pt[j];
-					
-					// get the element stiffness matrix
-					int ndof = pc.effective ? 4*neln : 3*neln;
-					ke.Create(ndof, ndof);
-
-					// calculate pressure stiffness
-					TractionStiffness(el, ke, tn, pc.effective);
-
-					// assemble element matrix in global stiffness matrix
-					solver.AssembleStiffness(el.m_node, el.LM(), ke);
-				}
+				// assemble element matrix in global stiffness matrix
+				solver.AssembleStiffness(el.m_node, el.LM(), ke);
 			}
 		}
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
@@ -317,35 +315,30 @@ void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
 	for (int i=0; i<npr; ++i)
 	{
 		LOAD& pc = m_PC[i];
-//		if (pc.IsActive())
-		{
-			FESurfaceElement& el = m_surf.Element(i);
-			m_surf.UnpackElement(el);
+		FESurfaceElement& el = m_surf.Element(i);
+		m_surf.UnpackElement(el);
 
-			// fluid pressure
-			double* pt = el.pt();
+		// fluid pressure
+		double* pt = el.pt();
 
-			// calculate nodal normal tractions
-			int neln = el.Nodes();
-			vector<double> tn(neln);
+		// calculate nodal normal tractions
+		int neln = el.Nodes();
+		vector<double> tn(neln);
 
-			double g = fem.GetLoadCurve(pc.lc)->Value();
+		double g = fem.GetLoadCurve(pc.lc)->Value();
 
-			// evaluate the prescribed traction.
-			for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
-			
-			// if the prescribed traction is effective, evaluate the total traction
-			if (pc.effective)
-				for (int j=0; j<neln; ++j) tn[j] -= pt[j];
+		// evaluate the prescribed traction.
+		for (int j=0; j<neln; ++j) tn[j] = g*pc.s[j];
+		
+		// if the prescribed traction is effective, evaluate the total traction
+		if (m_beffective) for (int j=0; j<neln; ++j) tn[j] -= pt[j];
 
-			int ndof = pc.effective ? 4*neln : 3*neln;
-			fe.resize(ndof);
+		int ndof = (m_beffective? 4*neln : 3*neln);
+		fe.resize(ndof);
 
-			if (pc.blinear) LinearTractionForce(el, fe, tn); else TractionForce(el, fe, tn);
+		if (m_blinear) LinearTractionForce(el, fe, tn); else TractionForce(el, fe, tn);
 
-			// add element force vector to global force vector
-			solver.AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
+		// add element force vector to global force vector
+		solver.AssembleResidual(el.m_node, el.LM(), fe, R);
 	}
 }
-

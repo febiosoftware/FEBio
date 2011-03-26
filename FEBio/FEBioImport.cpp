@@ -2288,11 +2288,9 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 
 	// allocate pressure data
-	FEPressureLoad* ps = new FEPressureLoad(&fem.m_mesh);
-	fem.m_SL.push_back(ps);
-
+	FEPressureLoad* ps = new FEPressureLoad(&fem.m_mesh, blinear);
 	ps->create(npr);
-	if (blinear) ps->SetType(FEPressureLoad::LINEAR); else ps->SetType(FEPressureLoad::NONLINEAR);
+	fem.m_SL.push_back(ps);
 
 	// read the pressure data
 	++tag;
@@ -2389,7 +2387,6 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	
 	const char* sz;
 	bool blinear = false;
-	bool effective = false;
 	sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
@@ -2398,11 +2395,12 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	
+	bool beffective = false;
 	sz = tag.AttributeValue("traction", true);
 	if (sz)
 	{
-		if (strcmp(sz, "effective") == 0) effective = true;
-		else if ((strcmp(sz, "total") == 0) || (strcmp(sz, "mixture") == 0)) effective = false;
+		if (strcmp(sz, "effective") == 0) beffective = true;
+		else if ((strcmp(sz, "total") == 0) || (strcmp(sz, "mixture") == 0)) beffective = false;
 		else throw XMLReader::InvalidAttributeValue(tag, "traction", sz);
 	}
 	
@@ -2412,7 +2410,7 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 	
 	// allocate normal traction data
-	FEPoroNormalTraction* ps = new FEPoroNormalTraction(&fem.m_mesh);
+	FEPoroNormalTraction* ps = new FEPoroNormalTraction(&fem.m_mesh, blinear, beffective);
 	ps->create(npr);
 	fem.m_SL.push_back(ps);
 	
@@ -2424,8 +2422,6 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	{
 		FEPoroNormalTraction::LOAD& pc = ps->NormalTraction(i);
 		FESurfaceElement& el = ps->Surface().Element(i);
-		pc.blinear = blinear;
-		pc.effective = effective;
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
@@ -2459,7 +2455,6 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 
 	const char* sz;
 	bool blinear = false;
-	bool mixture = false;
 	sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
@@ -2468,11 +2463,12 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	
+	bool bmixture = false;
 	sz = tag.AttributeValue("flux", true);
 	if (sz)
 	{
-		if (strcmp(sz, "mixture") == 0) mixture = true;
-		else if (strcmp(sz, "fluid") == 0) mixture = false;
+		if (strcmp(sz, "mixture") == 0) bmixture = true;
+		else if (strcmp(sz, "fluid") == 0) bmixture = false;
 		else throw XMLReader::InvalidAttributeValue(tag, "flux", sz);
 	}
 	
@@ -2482,10 +2478,8 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	while (!t.isend()) { nfr++; ++t; }
 	
 	// allocate fluid flux data
-	FEFluidFlux* pfs = new FEFluidFlux(&fem.m_mesh);
+	FEFluidFlux* pfs = new FEFluidFlux(&fem.m_mesh, blinear, bmixture);
 	pfs->create(nfr);
-	pfs->SetLinear(blinear);
-	pfs->SetMixture(mixture);
 	fem.m_SL.push_back(pfs);
 	
 	// read the fluid flux data
@@ -2543,7 +2537,7 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	while (!t.isend()) { nfr++; ++t; }
 	
 	// allocate fluid flux data
-	FESoluteFlux* pfs = new FESoluteFlux(&fem.m_mesh);
+	FESoluteFlux* pfs = new FESoluteFlux(&fem.m_mesh, blinear);
 	pfs->create(nfr);
 	fem.m_SL.push_back(pfs);
 	
@@ -2555,7 +2549,6 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	{
 		FESoluteFlux::LOAD& fc = pfs->SoluteFlux(i);
 		FESurfaceElement& el = pfs->Surface().Element(i);
-		fc.blinear = blinear;
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) fc.lc = atoi(sz); else fc.lc = 0;

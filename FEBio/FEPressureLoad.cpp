@@ -196,7 +196,7 @@ void FEPressureLoad::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<m_PC.size(); ++i)
 		{
 			LOAD& pc = m_PC[i];
-			ar << pc.face << pc.lc;
+			ar << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
 		}
 	}
@@ -223,7 +223,7 @@ void FEPressureLoad::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& pc = m_PC[i];
-			ar >> pc.face >> pc.lc;
+			ar >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
 		}
 
@@ -243,45 +243,43 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 	for (int m=0; m<npr; ++m)
 	{
 		LOAD& pc = m_PC[m];
-//		if (pc.IsActive())
+		// get the surface element
+		FESurfaceElement& el = m_surf.Element(m);
+
+		// skip rigid surface elements
+		// TODO: do we really need to skip rigid elements?
+		if (!el.IsRigid())
 		{
-			// get the surface element
-			FESurfaceElement& el = m_surf.Element(m);
+			m_surf.UnpackElement(el);
 
-			// skip rigid surface elements
-			// TODO: do we really need to skip rigid elements?
-			if (!el.IsRigid())
+			// calculate nodal normal tractions
+			int neln = el.Nodes();
+			vector<double> tn(neln);
+
+			if (m_blinear == false)
 			{
-				m_surf.UnpackElement(el);
+				double g = fem.GetLoadCurve(pc.lc)->Value();
 
-				// calculate nodal normal tractions
-				int neln = el.Nodes();
-				vector<double> tn(neln);
+				// evaluate the prescribed traction.
+				// note the negative sign. This is because this boundary condition uses the 
+				// convention that a positive pressure is compressive
+				for (int j=0; j<neln; ++j) tn[j] = -g*pc.s[j];
 
-				if (m_ntype == NONLINEAR)
-				{
-					double g = fem.GetLoadCurve(pc.lc)->Value();
+				// get the element stiffness matrix
+				int ndof = 3*neln;
+				ke.Create(ndof, ndof);
 
-					// evaluate the prescribed traction.
-					// note the negative sign. This is because this boundary condition uses the 
-					// convention that a positive pressure is compressive
-					for (int j=0; j<neln; ++j) tn[j] = -g*pc.s[j];
+				// calculate pressure stiffness
+				PressureStiffness(el, ke, tn);
 
-					// get the element stiffness matrix
-					int ndof = 3*neln;
-					ke.Create(ndof, ndof);
-
-					// calculate pressure stiffness
-					PressureStiffness(el, ke, tn);
-
-					// assemble element matrix in global stiffness matrix
-					solver.AssembleStiffness(el.m_node, el.LM(), ke);
-				}
+				// assemble element matrix in global stiffness matrix
+				solver.AssembleStiffness(el.m_node, el.LM(), ke);
 			}
 		}
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
@@ -293,29 +291,26 @@ void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 	for (int i=0; i<npr; ++i)
 	{
 		LOAD& pc = m_PC[i];
-//		if (pc.IsActive())
-		{
-			FESurfaceElement& el = m_surf.Element(i);
-			m_surf.UnpackElement(el);
+		FESurfaceElement& el = m_surf.Element(i);
+		m_surf.UnpackElement(el);
 
-			// calculate nodal normal tractions
-			int neln = el.Nodes();
-			vector<double> tn(neln);
+		// calculate nodal normal tractions
+		int neln = el.Nodes();
+		vector<double> tn(neln);
 
-			double g = fem.GetLoadCurve(pc.lc)->Value();
+		double g = fem.GetLoadCurve(pc.lc)->Value();
 
-			// evaluate the prescribed traction.
-			// note the negative sign. This is because this boundary condition uses the 
-			// convention that a positive pressure is compressive
-			for (int j=0; j<el.Nodes(); ++j) tn[j] = -g*pc.s[j];
-			
-			int ndof = 3*neln;
-			fe.resize(ndof);
+		// evaluate the prescribed traction.
+		// note the negative sign. This is because this boundary condition uses the 
+		// convention that a positive pressure is compressive
+		for (int j=0; j<el.Nodes(); ++j) tn[j] = -g*pc.s[j];
+		
+		int ndof = 3*neln;
+		fe.resize(ndof);
 
-			if (m_ntype == LINEAR) LinearPressureForce(el, fe, tn); else PressureForce(el, fe, tn);
+		if (m_blinear) LinearPressureForce(el, fe, tn); else PressureForce(el, fe, tn);
 
-			// add element force vector to global force vector
-			solver.AssembleResidual(el.m_node, el.LM(), fe, R);
-		}
+		// add element force vector to global force vector
+		solver.AssembleResidual(el.m_node, el.LM(), fe, R);
 	}
 }

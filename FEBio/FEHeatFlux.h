@@ -10,10 +10,8 @@ public:
 	struct LOAD
 	{
 		double	s[4];		// nodal scale factors
-		int		face;		// face number
 		int		lc;			// load curve
-
-		LOAD()  { s[0] = s[1] = s[2] = s[3] = 1.0; lc = -1; face = -1; }
+		LOAD()  { s[0] = s[1] = s[2] = s[3] = 1.0; lc = -1; }
 	};
 
 public:

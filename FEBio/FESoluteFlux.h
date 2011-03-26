@@ -10,18 +10,16 @@ class FESoluteFlux : public FESurfaceLoad
 public:
 	struct LOAD
 	{
-		LOAD() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; blinear = false; }
+		LOAD() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; }
 		
 		double	s[4];		// nodal scale factors
-		int		face;		// face number
 		int		lc;			// load curve
 		int		bc;			// degree of freedom
-		bool	blinear;	// linear or not (true is non-follower, false is follower)
 	};
 
 public:
 	//! constructor
-	FESoluteFlux(FEMesh* pm) : FESurfaceLoad(pm) {}
+	FESoluteFlux(FEMesh* pm, bool blinear = false) : FESurfaceLoad(pm) { m_blinear = blinear; }
 	
 	//! allocate storage
 	void create(int n)
@@ -50,7 +48,7 @@ public:
 	
 	//! serialize data
 	void Serialize(FEM& fem, DumpFile& ar);
-	
+
 protected:
 	//! calculate stiffness for an element
 	void FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& vn);
@@ -62,6 +60,8 @@ protected:
 	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn);
 	
 protected:
+	bool	m_blinear;	//!< linear or not (true is non-follower, false is follower)
+
 	// solute flux boundary data
 	vector<LOAD>	m_PC;		//!< solute flux boundary cards
 };

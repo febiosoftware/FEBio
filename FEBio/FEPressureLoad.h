@@ -11,18 +11,14 @@ public:
 	struct LOAD
 	{
 		double	s[4];		// nodal scale factors
-		int		face;		// face number
 		int		lc;			// load curve
 
 		LOAD() { s[0] = s[1] = s[2] = s[3] = 1.0; }
 	};
 
-	// pressure load types
-	enum { LINEAR, NONLINEAR };
-
 public:
 	//! constructor
-	FEPressureLoad(FEMesh* pm) : FESurfaceLoad(pm) { m_ntype = NONLINEAR; }
+	FEPressureLoad(FEMesh* pm, bool blinear = false) : FESurfaceLoad(pm) { m_blinear = false; }
 
 	//! allocate storage
 	void create(int n)
@@ -52,9 +48,6 @@ public:
 	//! serialize data
 	void Serialize(FEM& fem, DumpFile& ar);
 
-	//! Set the load type
-	void SetType(int ntype) { m_ntype = ntype; }
-
 protected:
 	//! calculate stiffness for an element
 	void PressureStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn);
@@ -66,6 +59,6 @@ protected:
 	bool LinearPressureForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);
 
 protected:
-	int				m_ntype;	//!< pressure load type (linear or nonlinear)
+	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
 	vector<LOAD>	m_PC;		//!< pressure load cards
 };

@@ -11,10 +11,7 @@ public:
 	struct LOAD
 	{
 		vec3d	s[4];		// nodal scale factors
-		int		nface;		// face number
 		int		lc;			// load curve
-
-		LOAD() { nface = -1; }
 	};
 
 public:

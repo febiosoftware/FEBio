@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to solute flux
-
+//!
 void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn)
 {
 	int i, j, n;
@@ -66,7 +66,7 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
-
+//!
 bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
 {
 	int i, n;
@@ -123,7 +123,7 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
-
+//!
 bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
 {
 	int i, n;
@@ -179,7 +179,7 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 }
 
 //-----------------------------------------------------------------------------
-
+//!
 void FESoluteFlux::Serialize(FEM& fem, DumpFile& ar)
 {
 	if (ar.IsSaving())
@@ -200,7 +200,7 @@ void FESoluteFlux::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& fc = m_PC[i];
-			ar << fc.blinear << fc.face << fc.lc;
+			ar << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
 			ar << fc.bc;
 		}
@@ -226,7 +226,7 @@ void FESoluteFlux::Serialize(FEM& fem, DumpFile& ar)
 		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& fc = m_PC[i];
-			ar >> fc.blinear >> fc.face >> fc.lc;
+			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.bc;
 		}
@@ -236,6 +236,7 @@ void FESoluteFlux::Serialize(FEM& fem, DumpFile& ar)
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
@@ -262,7 +263,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 				int neln = el.Nodes();
 				vector<double> wn(neln);
 				
-				if (!fc.blinear)
+				if (m_blinear == false)
 				{
 					double g = fem.GetLoadCurve(fc.lc)->Value();
 					
@@ -297,6 +298,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
@@ -324,7 +326,7 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 			int ndof = neln;
 			fe.resize(ndof);
 			
-			if (fc.blinear) LinearFlowRate(el, fe, wn); else FlowRate(el, fe, wn);
+			if (m_blinear) LinearFlowRate(el, fe, wn); else FlowRate(el, fe, wn);
 			
 			// TODO: the problem here is that the LM array that is returned by the UnpackElement
 			// function does not give the equation numbers in the right order. For this reason we

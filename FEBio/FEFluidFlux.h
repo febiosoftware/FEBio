@@ -18,7 +18,7 @@ public:
 
 public:
 	//! constructor
-	FEFluidFlux(FEMesh* pm) : FESurfaceLoad(pm) { m_blinear = false; m_bmixture = false; }
+	FEFluidFlux(FEMesh* pm, bool blinear = false, bool bmixture = false) : FESurfaceLoad(pm) { m_blinear = blinear; m_bmixture = bmixture; }
 
 	//! allocate storage
 	void create(int n)
@@ -47,12 +47,6 @@ public:
 
 	//! serialize data
 	void Serialize(FEM& fem, DumpFile& ar);
-
-	//! Set the type of BC
-	void SetLinear(bool blin) { m_blinear = blin; }
-
-	//! mixture velocity or relative fluid flux
-	void SetMixture(bool bmix) { m_bmixture = bmix; }
 
 protected:
 	//! calculate stiffness for an element
