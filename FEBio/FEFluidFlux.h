@@ -10,18 +10,15 @@ public:
 	struct LOAD
 	{
 		double	s[4];		// nodal scale factors
-		int		face;		// face number
 		int		lc;			// load curve
 		int		bc;			// degree of freedom
-		bool	blinear;	// linear or not (true is non-follower, false is follower)
-		bool	mixture;	// mixture velocity or relative fluid flux
 
-		LOAD() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; blinear = false; mixture = false; }
+		LOAD() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; }
 	};
 
 public:
 	//! constructor
-	FEFluidFlux(FEMesh* pm) : FESurfaceLoad(pm) {}
+	FEFluidFlux(FEMesh* pm) : FESurfaceLoad(pm) { m_blinear = false; m_bmixture = false; }
 
 	//! allocate storage
 	void create(int n)
@@ -51,6 +48,12 @@ public:
 	//! serialize data
 	void Serialize(FEM& fem, DumpFile& ar);
 
+	//! Set the type of BC
+	void SetLinear(bool blin) { m_blinear = blin; }
+
+	//! mixture velocity or relative fluid flux
+	void SetMixture(bool bmix) { m_bmixture = bmix; }
+
 protected:
 	//! calculate stiffness for an element
 	void FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& vn, double dt, bool mixture);
@@ -62,6 +65,9 @@ protected:
 	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt, bool mixture);
 
 protected:
+	bool	m_bmixture;		//!< mixture velocity or relative fluid flux
+	bool	m_blinear;		//!< type (linear or nonlinear)
+
 	// Fluid flux boundary data
 	vector<LOAD>	m_PC;		//!< fluid flux boundary cards
 };

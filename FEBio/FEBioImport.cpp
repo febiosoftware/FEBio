@@ -2484,6 +2484,8 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	// allocate fluid flux data
 	FEFluidFlux* pfs = new FEFluidFlux(&fem.m_mesh);
 	pfs->create(nfr);
+	pfs->SetLinear(blinear);
+	pfs->SetMixture(mixture);
 	fem.m_SL.push_back(pfs);
 	
 	// read the fluid flux data
@@ -2494,8 +2496,6 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	{
 		FEFluidFlux::LOAD& fc = pfs->FluidFlux(i);
 		FESurfaceElement& el = pfs->Surface().Element(i);
-		fc.blinear = blinear;
-		fc.mixture = mixture;
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) fc.lc = atoi(sz); else fc.lc = 0;

@@ -218,11 +218,13 @@ void FEFluidFlux::Serialize(FEM& fem, DumpFile& ar)
 			ar << el.m_lnode;
 		}
 
+		ar << m_blinear << m_bmixture;
+
 		// fluid fluxes
 		for (i=0; i< (int) m_PC.size(); ++i)
 		{
 			LOAD& fc = m_PC[i];
-			ar << fc.blinear << fc.mixture << fc.face << fc.lc;
+			ar << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
 			ar << fc.bc;
 		}
@@ -244,11 +246,13 @@ void FEFluidFlux::Serialize(FEM& fem, DumpFile& ar)
 			ar >> el.m_lnode;
 		}
 
+		ar >> m_blinear >> m_bmixture;
+
 		// fluid fluxes
 		for (i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& fc = m_PC[i];
-			ar >> fc.blinear  >> fc.mixture >> fc.face >> fc.lc;
+			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.bc;
 		}
@@ -286,7 +290,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 				int neln = el.Nodes();
 				vector<double> wn(neln);
 
-				if (!fc.blinear)
+				if (m_blinear == false)
 				{
 					double g = fem.GetLoadCurve(fc.lc)->Value();
 
@@ -297,7 +301,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 					ke.Create(ndof, ndof);
 
 					// calculate pressure stiffness
-					FluxStiffness(el, ke, wn, dt, fc.mixture);
+					FluxStiffness(el, ke, wn, dt, m_bmixture);
 
 					// assemble element matrix in global stiffness matrix
 					solver.AssembleStiffness(el.m_node, el.LM(), ke);
@@ -336,14 +340,13 @@ void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 			int ndof = 4*neln;
 			fe.resize(ndof);
 
-			if (fc.blinear) 
-				LinearFlowRate(el, fe, wn, dt, fc.mixture);
+			if (m_blinear == true) 
+				LinearFlowRate(el, fe, wn, dt, m_bmixture);
 			else
-				FlowRate(el, fe, wn, dt, fc.mixture);
+				FlowRate(el, fe, wn, dt, m_bmixture);
 
 			// add element force vector to global force vector
 			solver.AssembleResidual(el.m_node, el.LM(), fe, R);
 		}
 	}
 }
-
