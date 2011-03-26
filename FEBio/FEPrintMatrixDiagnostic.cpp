@@ -58,7 +58,7 @@ bool FEPrintMatrixDiagnostic::Run()
 
 	// build the stiffness matrix
 	// recalculate the shape of the stiffness matrix if necessary
-	if (m_fem.m_bcontact) m_fem.UpdateContact();
+	if (m_fem.ContactInterfaces() > 0) m_fem.UpdateContact();
 
 	// reshape the stiffness matrix
 	if (!solver.CreateStiffness(true)) return false;

@@ -6,12 +6,6 @@
 
 bool FEM::InitContact()
 {
-	// set contact flag
-	m_bcontact = (ContactInterfaces() > 0);
-
-	// only proceed if there is contact
-	if (!m_bcontact) return true;
-
 	// loop over all contact interfaces
 	for (int i=0; i<ContactInterfaces(); ++i)
 	{

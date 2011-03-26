@@ -1801,6 +1801,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FELinearConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FELinearElastic.cpp"
 				>
 			</File>
@@ -2431,6 +2435,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BC.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Command.h"
 				>
 			</File>
@@ -2648,6 +2656,10 @@
 			</File>
 			<File
 				RelativePath=".\FELevelStructure.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FELinearConstraint.h"
 				>
 			</File>
 			<File

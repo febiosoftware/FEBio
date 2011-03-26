@@ -162,8 +162,6 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		for (i=0; i<(int) m_Step.size(); ++i) m_Step[i]->Serialize(ar);
 		ar << m_nStep;
 		ar << m_ftime << m_ftime0;
-		ar << m_nhex8;
-		ar << m_b3field;
 
 		// body forces
 //		ar.write(m_BF  ,sizeof(FE_BODYFORCE), 1);
@@ -189,8 +187,6 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		}
 		ar >> m_nStep;
 		ar >> m_ftime >> m_ftime0;
-		ar >> m_nhex8;
-		ar >> m_b3field;
 
 		// body forces
 //		ar.read(m_BF  ,sizeof(FE_BODYFORCE), 1);
@@ -310,7 +306,6 @@ void FEM::SerializeContactData(DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_bcontact;
 		ar << ContactInterfaces();
 		for (int i=0; i<ContactInterfaces(); ++i)
 		{
@@ -321,7 +316,6 @@ void FEM::SerializeContactData(DumpFile &ar)
 	else
 	{
 		int numci, ntype;
-		ar >> m_bcontact;
 		ar >> numci;
 		for (int i=0; i<numci; ++i)
 		{

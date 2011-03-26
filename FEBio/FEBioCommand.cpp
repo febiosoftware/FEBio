@@ -6,6 +6,7 @@
 #include "FEException.h"
 #include "FECore/FECore.h"
 #include "FECore/CompactMatrix.h"
+#include "FESolver.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_COMMAND(FEBioCmd_Cont   , "cont"   , "continues run");

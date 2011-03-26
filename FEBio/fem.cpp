@@ -26,8 +26,6 @@ FEM::FEM()
 	// --- Analysis Data ---
 	m_pStep = 0;
 	m_nStep = -1;
-	m_nhex8 = FE_HEX;
-	m_b3field = true;
 	m_bsym_poro = true;			// use symmetric poro implementation
 	m_nplane_strain = -1;	// don't use plain strain mode
 
@@ -52,8 +50,6 @@ FEM::FEM()
 	m_nrb = 0;
 	m_nrm = 0;
 	m_nrj = 0;
-
-	m_bcontact = false;		// assume no contact
 
 	m_bsymm = true;	// assume symmetric stiffness matrix
 
@@ -106,8 +102,6 @@ FEM::FEM(const FEM& fem)
 	m_nrb = 0;
 	m_nrm = 0;
 	m_nrj = 0;
-
-	m_bcontact = false;		// assume no contact
 
 	m_bsymm = true;	// assume symmetric stiffness matrix
 

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FERigidJoint.h"
 #include "fem.h"
+#include "FESolver.h"
 #include "log.h"
 
 //////////////////////////////////////////////////////////////////////

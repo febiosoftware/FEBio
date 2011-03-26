@@ -34,7 +34,7 @@ bool FESolidSolver::StiffnessMatrix()
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).StiffnessMatrix(this);
 
 	// calculate contact stiffness
-	if (m_fem.m_bcontact) 
+	if (m_fem.ContactInterfaces() > 0) 
 	{
 		ContactStiffness();
 	}
@@ -567,7 +567,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// calculate contact forces
-	if (m_fem.m_bcontact)
+	if (m_fem.ContactInterfaces() > 0)
 	{
 		ContactForces(R);
 	}

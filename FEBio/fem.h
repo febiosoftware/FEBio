@@ -7,140 +7,27 @@
 
 #include "PlotFile.h"
 #include "LoadCurve.h"
-#include "FEElementLibrary.h"
 #include "DumpFile.h"
 #include "FEMesh.h"
 #include "FEContactInterface.h"
 #include "FEMaterial.h"
 #include "FERigidBody.h"
-#include "FESolver.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
 #include "FEAnalysis.h"
+#include "FELinearConstraint.h"
 #include "FEAugLagLinearConstraint.h"
 #include "Timer.h"
 #include "FESurfaceLoad.h"
 #include "FEDiscreteMaterial.h"
 #include "FEBodyForce.h"
+#include "BC.h"
 
 #include <stack>
 #include <list>
 using namespace std;
 
 #define MAX_STRING	256
-
-//-----------------------------------------------------------------------------
-//! A degree of freedom structure
-
-class DOF
-{
-public:
-	DOF() { node = bc = neq = -1; }
-public:
-	int	node;	// the node to which this dof belongs to
-	int	bc;		// the degree of freedom
-	int	neq;	// the equation number (or -1 if none)
-};
-
-//-----------------------------------------------------------------------------
-//! linear constraint
-
-class FELinearConstraint
-{
-public:
-	class SlaveDOF : public DOF
-	{
-	public:
-		SlaveDOF() : val(0){}
-		double	val;	// coefficient value
-	};
-
-public:
-	FELinearConstraint(){}
-	FELinearConstraint(const FELinearConstraint& LC)
-	{
-		master = LC.master;
-		int n = (int) LC.slave.size();
-		list<SlaveDOF>::const_iterator it = LC.slave.begin();
-		for (int i=0; i<n; ++i) slave.push_back(*it);
-	}
-
-	double FindDOF(int n)
-	{
-		int N = slave.size();
-		list<SlaveDOF>::iterator it = slave.begin();
-		for (int i=0; i<N; ++i, ++it) if (it->neq == n) return it->val;
-
-		return 0;
-	}
-
-	void Serialize(DumpFile& ar)
-	{
-		if (ar.IsSaving())
-		{
-			ar.write(&master, sizeof(DOF), 1);
-			int n = (int) slave.size();
-			ar << n;
-			list<SlaveDOF>::iterator it = slave.begin();
-			for (int i=0; i<n; ++i, ++it) ar << it->val << it->node << it->bc << it->neq;
-		}
-		else
-		{
-			slave.clear();
-			ar.read(&master, sizeof(DOF), 1);
-			int n;
-			ar >> n;
-			for (int i=0; i<n; ++i)
-			{
-				SlaveDOF dof;
-				ar >> dof.val >> dof.node >> dof.bc >> dof.neq;
-				slave.push_back(dof);
-			}
-		}
-	}
-
-public:
-	DOF			master;	// master degree of freedom
-	list<SlaveDOF>	slave;	// list of slave nodes
-};
-
-//-----------------------------------------------------------------------------
-//! concentrated nodal force boundary condition
-
-class FENodalForce : public FEBoundaryCondition
-{
-public:
-	double	s;		// scale factor
-	int		node;	// node number
-	int		bc;		// force direction
-	int		lc;		// load curve
-};
-
-//-----------------------------------------------------------------------------
-//! prescribed nodal displacement data
-
-class FENodalDisplacement : public FEBoundaryCondition
-{
-public:
-	double	s;		// scale factor
-	int		node;	// node number
-	int		bc;		// displacement direction
-	int		lc;		// load curve
-};
-
-//-----------------------------------------------------------------------------
-//! rigid node
-
-class FERigidNode : public FEBoundaryCondition
-{
-public:
-	int	nid;	// node number
-	int	rid;	// rigid body number
-};
-
-//-----------------------------------------------------------------------------
-// forward declaration of FESolidSolver class
-class FESolidSolver;
 
 //-----------------------------------------------------------------------------
 // forward declaration of the FEM class
@@ -163,7 +50,7 @@ struct FEBIO_CALLBACK {
 //! data is collected here in this class. This class also provides
 //! routines to initalize, input, output and update the FE data. Although this
 //! class provides the main solve routine it does not really solve anything.
-//! The actual solving is done by the FESolidSolver class.
+//! The actual solving is done by one of the classes derived from the FESolver class.
 
 class FEM
 {
@@ -182,9 +69,6 @@ public:
 
 	//! Initializes data structures
 	bool Init();
-
-	//! check data
-	bool Check();
 
 	//! Resets data structures
 	bool Reset();
@@ -247,7 +131,6 @@ public:
 
 	//! get the debug level
 	bool GetDebugFlag() { return m_debug; }
-
 
 	// set the i/o files
 	void SetInputFilename(const char* szfile)
@@ -358,8 +241,6 @@ public:
 		FEAnalysis*				m_pStep;	//!< pointer to current analysis step
 		double					m_ftime;	//!< current time value
 		double					m_ftime0;	//!< start time of current step
-		int		m_nhex8;					//!< element type for hex8
-		bool	m_b3field;					//!< use three-field implementation 
 		bool	m_bsym_poro;		//!< symmetric (old) poro-elastic flag
 		int		m_nplane_strain;	//!< run analysis in plain strain mode
 
@@ -389,7 +270,6 @@ public:
 	//}
 
 	//{ --- Contact Data --
-		bool							m_bcontact;	//!< contact flag
 		vector<FEContactInterface*>		m_CI;		//!< contact interface array
 	//}
 
@@ -467,7 +347,6 @@ protected:
 
 	// some friends of this class
 	friend class FEAnalysis;
-	friend class FESolidSolver;
 	friend class stack<FEM>;
 };
 

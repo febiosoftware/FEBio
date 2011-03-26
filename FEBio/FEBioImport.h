@@ -245,6 +245,9 @@ public:
 	int m_nsteps;	// nr of step sections read
 	int	m_nmat;		// nr of materials
 
+	bool	m_b3field;	// three-field element flag
+	int		m_nhex8;	// hex integration rule
+
 protected:
 	int	m_nversion;	// version of file
 };

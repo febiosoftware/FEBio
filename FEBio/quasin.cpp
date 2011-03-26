@@ -42,7 +42,7 @@ bool FESolidSolver::SolveStep(double time)
 	{
 		// A negative jacobian was detected
 		clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
-		if (m_fem.m_debug) m_fem.m_plot->Write(m_fem);
+		if (m_fem.GetDebugFlag()) m_fem.m_plot->Write(m_fem);
 		return false;
 	}
 	catch (MaxStiffnessReformations)
@@ -330,7 +330,7 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// initialize contact
-	if (m_fem.m_bcontact) m_fem.UpdateContact();
+	if (m_fem.ContactInterfaces() > 0) m_fem.UpdateContact();
 
 	// intialize material point data
 	// NOTE: do this before the stresses are updated
@@ -662,7 +662,7 @@ bool FESolidSolver::ReformStiffness()
 		if (!CreateStiffness(m_niter == 0)) return false;
 
 		// reset reshape flag, except for contact
-		m_breshape = (m_fem.m_bcontact ? true : false);
+		m_breshape = (m_fem.ContactInterfaces() > 0? true : false);
 	}
 
 	// calculate the stiffness matrices

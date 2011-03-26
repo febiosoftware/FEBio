@@ -140,7 +140,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	if (m_fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
 	
 	// update contact
-	if (m_fem.m_bcontact) m_fem.UpdateContact();
+	if (m_fem.ContactInterfaces() > 0) m_fem.UpdateContact();
 
 	// update element stresses
 	UpdateStresses();

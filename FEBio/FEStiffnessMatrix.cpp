@@ -267,7 +267,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 		// All following "elements" are nonstatic. That is, they can change
 		// connectivity between calls to this function. All of these elements
 		// are related to contact analysis (at this point).
-		if (fem.m_bcontact)
+		if (fem.ContactInterfaces() > 0)
 		{
 			int *id;
 			// Add all contact interface elements

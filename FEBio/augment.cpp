@@ -29,7 +29,7 @@ bool FESolidSolver::Augment()
 	}
 
 	// Do contact augmentations
-	if (m_fem.m_bcontact)
+	if (m_fem.ContactInterfaces() > 0)
 	{
 		// loop over all contact interfaces
 		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.m_CI[i]->Augment(m_naug) && bconv;

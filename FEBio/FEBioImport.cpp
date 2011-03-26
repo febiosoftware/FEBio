@@ -84,8 +84,12 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	m_nsteps = 0; // reset step section counter
 	m_nversion = -1;
 
-	// default element type for tets
+	// default element type
 	m_ntet4 = ET_TET4;
+	m_nhex8 = FE_HEX;
+
+	// 3-field formulation on by default
+	m_b3field = true;
 
 	// Find the root element
 	XMLTag tag;
@@ -453,7 +457,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		else if (strcmp(szval, "PRINT_MINOR_ITRS_EXP") == 0) pstep->SetPrintLevel(FE_PRINT_MINOR_ITRS_EXP);
 		else throw XMLReader::InvalidTag(tag);
 	}
-	else if (tag == "use_three_field_hex") tag.value(fem.m_b3field);
+	else if (tag == "use_three_field_hex") tag.value(m_pim->m_b3field);
 	else if (tag == "integration")
 	{
 		++tag;
@@ -466,9 +470,9 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 
 				if (strcmp(sze, "hex8") == 0)
 				{
-					if (strcmp(szv, "GAUSS8") == 0) fem.m_nhex8 = FE_HEX;
-					else if (strcmp(szv, "POINT6") == 0) fem.m_nhex8 = FE_RIHEX;
-					else if (strcmp(szv, "UDG") == 0) fem.m_nhex8 = FE_UDGHEX;
+					if (strcmp(szv, "GAUSS8") == 0) m_pim->m_nhex8 = FE_HEX;
+					else if (strcmp(szv, "POINT6") == 0) m_pim->m_nhex8 = FE_RIHEX;
+					else if (strcmp(szv, "UDG") == 0) m_pim->m_nhex8 = FE_UDGHEX;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (strcmp(sze, "tet4") == 0)
@@ -1499,10 +1503,10 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 			if (etype == ET_HEX)
 			{
 				// three-field implementation for uncoupled materials
-				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && fem.m_b3field) return FE_3F_SOLID_DOMAIN;
+				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && m_pim->m_b3field) return FE_3F_SOLID_DOMAIN;
 				else
 				{
-					if (fem.m_nhex8 == FE_UDGHEX) return FE_UDGHEX_DOMAIN;
+					if (m_pim->m_nhex8 == FE_UDGHEX) return FE_UDGHEX_DOMAIN;
 					else return FE_SOLID_DOMAIN;
 				}
 			}
@@ -1674,7 +1678,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 			case FEFEBioImport::ET_HEX8:
 				{
 					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-					ReadSolidElement(tag, bd.Element(i), fem.m_nhex8, nid, nd, nmat);
+					ReadSolidElement(tag, bd.Element(i), m_pim->m_nhex8, nid, nd, nmat);
 				}
 				break;
 			case FEFEBioImport::ET_PENTA6:
