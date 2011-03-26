@@ -27,6 +27,9 @@
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
 #include "FEHeatFlux.h"
+#include "FEFluidFlux.h"
+#include "FEPoroTraction.h"
+#include "FESoluteFlux.h"
 #include <string.h>
 using namespace FECore;
 
@@ -2409,9 +2412,9 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 	
 	// allocate normal traction data
-	fem.m_ptsurf = new FEPoroTractionSurface(&fem.m_mesh);
-	FEPoroTractionSurface& ps = *fem.m_ptsurf;
-	ps.create(npr);
+	FEPoroNormalTraction* ps = new FEPoroNormalTraction(&fem.m_mesh);
+	ps->create(npr);
+	fem.m_SL.push_back(ps);
 	
 	// read the normal traction data
 	++tag;
@@ -2419,8 +2422,8 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	double s;
 	for (int i=0; i<npr; ++i)
 	{
-		FEPoroNormalTraction& pc = ps.NormalTraction(i);
-		FESurfaceElement& el = fem.m_ptsurf->Element(i);
+		FEPoroNormalTraction::LOAD& pc = ps->NormalTraction(i);
+		FESurfaceElement& el = ps->Surface().Element(i);
 		pc.blinear = blinear;
 		pc.effective = effective;
 		
@@ -2438,14 +2441,14 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 		tag.value(nf, N);
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 		
-		// add this boundary condition to the current step
-		if (m_pim->m_nsteps > 0)
-		{
-			GetStep()->AddBoundaryCondition(&pc);
-			pc.Deactivate();
-		}
-		
 		++tag;
+	}
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(ps);
+		ps->Deactivate();
 	}
 }
 
@@ -2540,9 +2543,9 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	while (!t.isend()) { nfr++; ++t; }
 	
 	// allocate fluid flux data
-	fem.m_ssurf = new FESoluteFluxSurface(&fem.m_mesh);
-	FESoluteFluxSurface& fs = *fem.m_ssurf;
-	fs.create(nfr);
+	FESoluteFlux* pfs = new FESoluteFlux(&fem.m_mesh);
+	pfs->create(nfr);
+	fem.m_SL.push_back(pfs);
 	
 	// read the fluid flux data
 	++tag;
@@ -2550,8 +2553,8 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	double s;
 	for (int i=0; i<nfr; ++i)
 	{
-		FESoluteFlux& fc = fs.SoluteFlux(i);
-		FESurfaceElement& el = fem.m_ssurf->Element(i);
+		FESoluteFlux::LOAD& fc = pfs->SoluteFlux(i);
+		FESurfaceElement& el = pfs->Surface().Element(i);
 		fc.blinear = blinear;
 		
 		sz = tag.AttributeValue("lc", true);
@@ -2568,14 +2571,14 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 		tag.value(nf, N);
 		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
 		
-		// add this boundary condition to the current step
-		if (m_pim->m_nsteps > 0)
-		{
-			GetStep()->AddBoundaryCondition(&fc);
-			fc.Deactivate();
-		}
-		
 		++tag;
+	}
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(pfs);
+		pfs->Deactivate();
 	}
 }
 

@@ -11,3 +11,5 @@ check the following routines:
 * Is the FETractionLoad::Clone function needed?
 
 * I think the pressure stiffness flag can be removed since the linear pressure loads basically ignores the stiffness as well.
+
+* Should I move the FESolidSolver::AssembleResidual and AssembleStiffness to the FESolver class?

@@ -55,19 +55,6 @@ bool FESolidSolver::StiffnessMatrix()
 		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.m_pStep->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
 	}
 
-	// calculate normal traction on porous surface stiffness term
-	if (m_fem.m_ptsurf && (m_fem.m_pStep->m_istiffpr != 0))
-	{
-		m_fem.m_ptsurf->StiffnessMatrix(this);
-	}
-	
-
-	// calculate solute flux stiffness term
-	if (m_fem.m_ssurf)
-	{
-		m_fem.m_ssurf->StiffnessMatrix(this);
-	}
-	
 	// calculate linear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
@@ -573,12 +560,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 		psl->Residual(this, R);
 	}
 
-	// calculate forces due to normal traction on porous surface and add them to the residual
-	if (m_fem.m_ptsurf)
-	{
-		m_fem.m_ptsurf->Residual(this, R);
-	}
-	
 	// rigid joint forces
 	if (m_fem.m_nrj)
 	{

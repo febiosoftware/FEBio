@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to normal traction
 
-void FEPoroTractionSurface::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective)
+void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective)
 {
 	int i, j, n;
 
@@ -83,7 +83,7 @@ void FEPoroTractionSurface::TractionStiffness(FESurfaceElement& el, matrix& ke, 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPoroTractionSurface::TractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
+bool FEPoroNormalTraction::TractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
 {
 	int i, n;
 
@@ -141,7 +141,7 @@ bool FEPoroTractionSurface::TractionForce(FESurfaceElement& el, vector<double>& 
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal forces due to hydrostatic pressure
 
-bool FEPoroTractionSurface::LinearTractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
+bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn)
 {
 	int i, n;
 
@@ -198,14 +198,14 @@ bool FEPoroTractionSurface::LinearTractionForce(FESurfaceElement& el, vector<dou
 
 //-----------------------------------------------------------------------------
 
-void FEPoroTractionSurface::Serialize(FEM& fem, DumpFile& ar)
+void FEPoroNormalTraction::Serialize(FEM& fem, DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		size_t i;
-		for (i=0; i<m_el.size(); ++i)
+		int i;
+		for (i=0; i<m_surf.Elements(); ++i)
 		{
-			FESurfaceElement& el = m_el[i];
+			FESurfaceElement& el = m_surf.Element(i);
 			ar << el.Type();
 			ar << el.GetMatID();
 			ar << el.m_nID;
@@ -215,9 +215,9 @@ void FEPoroTractionSurface::Serialize(FEM& fem, DumpFile& ar)
 		}
 
 		// normal tractions
-		for (i=0; i<m_PC.size(); ++i)
+		for (i=0; i<(int) m_PC.size(); ++i)
 		{
-			FEPoroNormalTraction& pc = m_PC[i];
+			LOAD& pc = m_PC[i];
 			ar << pc.blinear << pc.effective << pc.face << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
 		}
@@ -225,9 +225,9 @@ void FEPoroTractionSurface::Serialize(FEM& fem, DumpFile& ar)
 	else
 	{
 		int i, m, mat;
-		for (i=0; i<(int) m_el.size(); ++i)
+		for (i=0; i<m_surf.Elements(); ++i)
 		{
-			FESurfaceElement& el = m_el[i];
+			FESurfaceElement& el = m_surf.Element(i);
 			ar >> m;
 			el.SetType(m);
 
@@ -241,36 +241,37 @@ void FEPoroTractionSurface::Serialize(FEM& fem, DumpFile& ar)
 		// normal tractions
 		for (i=0; i<(int) m_PC.size(); ++i)
 		{
-			FEPoroNormalTraction& pc = m_PC[i];
+			LOAD& pc = m_PC[i];
 			ar >> pc.blinear >> pc. effective >> pc.face >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
 		}
 
 		// initialize surface data
-		Init();
+		m_surf.Init();
 	}
 }
 
-void FEPoroTractionSurface::StiffnessMatrix(FESolidSolver* psolver)
+void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
+	FEM& fem = solver.m_fem;
 
 	matrix ke;
 
 	int npr = m_PC.size();
 	for (int m=0; m<npr; ++m)
 	{
-		FEPoroNormalTraction& pc = m_PC[m];
-		if (pc.IsActive())
+		LOAD& pc = m_PC[m];
+//		if (pc.IsActive())
 		{
 			// get the surface element
-			FESurfaceElement& el = m_el[m];
+			FESurfaceElement& el = m_surf.Element(m);
 
 			// skip rigid surface elements
 			// TODO: do we really need to skip rigid elements?
 			if (!el.IsRigid())
 			{
-				UnpackElement(el);
+				m_surf.UnpackElement(el);
 
 				// fluid pressure
 				double* pt = el.pt();
@@ -298,27 +299,28 @@ void FEPoroTractionSurface::StiffnessMatrix(FESolidSolver* psolver)
 					TractionStiffness(el, ke, tn, pc.effective);
 
 					// assemble element matrix in global stiffness matrix
-					psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+					solver.AssembleStiffness(el.m_node, el.LM(), ke);
 				}
 			}
 		}
 	}
 }
 
-void FEPoroTractionSurface::Residual(FESolidSolver* psolver, vector<double>& R)
+void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
+	FEM& fem = solver.m_fem;
 
 	vector<double> fe;
 
 	int npr = m_PC.size();
 	for (int i=0; i<npr; ++i)
 	{
-		FEPoroNormalTraction& pc = m_PC[i];
-		if (pc.IsActive())
+		LOAD& pc = m_PC[i];
+//		if (pc.IsActive())
 		{
-			FESurfaceElement& el = m_el[i];
-			UnpackElement(el);
+			FESurfaceElement& el = m_surf.Element(i);
+			m_surf.UnpackElement(el);
 
 			// fluid pressure
 			double* pt = el.pt();
@@ -342,7 +344,7 @@ void FEPoroTractionSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 			if (pc.blinear) LinearTractionForce(el, fe, tn); else TractionForce(el, fe, tn);
 
 			// add element force vector to global force vector
-			psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+			solver.AssembleResidual(el.m_node, el.LM(), fe, R);
 		}
 	}
 }

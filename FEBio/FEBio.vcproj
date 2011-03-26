@@ -2037,7 +2037,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FESoluteFluxSurface.cpp"
+				RelativePath=".\FESoluteFlux.cpp"
 				>
 			</File>
 			<File
@@ -2863,7 +2863,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FESoluteFluxSurface.h"
+				RelativePath=".\FESoluteFlux.h"
 				>
 			</File>
 			<File

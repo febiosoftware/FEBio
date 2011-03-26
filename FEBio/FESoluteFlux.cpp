@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "FESoluteFluxSurface.h"
+#include "FESoluteFlux.h"
 #include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to solute flux
 
-void FESoluteFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn)
+void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn)
 {
 	int i, j, n;
 	
@@ -67,7 +67,7 @@ void FESoluteFluxSurface::FluxStiffness(FESurfaceElement& el, matrix& ke, vector
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
 
-bool FESoluteFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
+bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
 {
 	int i, n;
 	
@@ -124,7 +124,7 @@ bool FESoluteFluxSurface::FlowRate(FESurfaceElement& el, vector<double>& fe, vec
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
 
-bool FESoluteFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
+bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
 {
 	int i, n;
 	
@@ -180,14 +180,14 @@ bool FESoluteFluxSurface::LinearFlowRate(FESurfaceElement& el, vector<double>& f
 
 //-----------------------------------------------------------------------------
 
-void FESoluteFluxSurface::Serialize(FEM& fem, DumpFile& ar)
+void FESoluteFlux::Serialize(FEM& fem, DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		size_t i;
-		for (i=0; i<m_el.size(); ++i)
+		int i;
+		for (i=0; i<m_surf.Elements(); ++i)
 		{
-			FESurfaceElement& el = m_el[i];
+			FESurfaceElement& el = m_surf.Element(i);
 			ar << el.Type();
 			ar << el.GetMatID();
 			ar << el.m_nID;
@@ -197,9 +197,9 @@ void FESoluteFluxSurface::Serialize(FEM& fem, DumpFile& ar)
 		}
 		
 		// solute fluxes
-		for (i=0; i<m_PC.size(); ++i)
+		for (i=0; i<(int) m_PC.size(); ++i)
 		{
-			FESoluteFlux& fc = m_PC[i];
+			LOAD& fc = m_PC[i];
 			ar << fc.blinear << fc.face << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
 			ar << fc.bc;
@@ -207,11 +207,11 @@ void FESoluteFluxSurface::Serialize(FEM& fem, DumpFile& ar)
 	}
 	else
 	{
-		size_t i; 
+		int i; 
 		int m, mat;
-		for (i=0; i<m_el.size(); ++i)
+		for (i=0; i<m_surf.Elements(); ++i)
 		{
-			FESurfaceElement& el = m_el[i];
+			FESurfaceElement& el = m_surf.Element(i);
 			ar >> m;
 			el.SetType(m);
 			
@@ -223,39 +223,40 @@ void FESoluteFluxSurface::Serialize(FEM& fem, DumpFile& ar)
 		}
 		
 		// solute fluxes
-		for (i=0; i<m_PC.size(); ++i)
+		for (i=0; i<(int) m_PC.size(); ++i)
 		{
-			FESoluteFlux& fc = m_PC[i];
+			LOAD& fc = m_PC[i];
 			ar >> fc.blinear >> fc.face >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.bc;
 		}
 		
 		// initialize surface data
-		Init();
+		m_surf.Init();
 	}
 }
 
-void FESoluteFluxSurface::StiffnessMatrix(FESolidSolver* psolver)
+void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
+	FEM& fem = solver.m_fem;
 	
 	matrix ke;
 	
 	int nfr = m_PC.size();
 	for (int m=0; m<nfr; ++m)
 	{
-		FESoluteFlux& fc = m_PC[m];
-		if ((fc.bc == 0) && fc.IsActive())
+		LOAD& fc = m_PC[m];
+		if (fc.bc == 0)
 		{
 			// get the surface element
-			FESurfaceElement& el = m_el[m];
+			FESurfaceElement& el = m_surf.Element(m);
 			
 			// skip rigid surface elements
 			// TODO: do we really need to skip rigid elements?
 			if (!el.IsRigid())
 			{
-				UnpackElement(el);
+				m_surf.UnpackElement(el);
 				
 				// calculate nodal normal solute flux
 				int neln = el.Nodes();
@@ -289,27 +290,28 @@ void FESoluteFluxSurface::StiffnessMatrix(FESolidSolver* psolver)
 					}
 					
 					// assemble element matrix in global stiffness matrix
-					psolver->AssembleStiffness(el.m_node, lm, ke);
+					solver.AssembleStiffness(el.m_node, lm, ke);
 				}
 			}
 		}
 	}
 }
 
-void FESoluteFluxSurface::Residual(FESolidSolver* psolver, vector<double>& R)
+void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
+	FEM& fem = solver.m_fem;
 	
 	vector<double> fe;
 	
 	int nfr = m_PC.size();
 	for (int i=0; i<nfr; ++i)
 	{
-		FESoluteFlux& fc = m_PC[i];
-		if ((fc.bc == 0) && fc.IsActive())
+		LOAD& fc = m_PC[i];
+		if (fc.bc == 0)
 		{
-			FESurfaceElement& el = m_el[i];
-			UnpackElement(el);
+			FESurfaceElement& el = m_surf.Element(i);
+			m_surf.UnpackElement(el);
 			
 			// calculate nodal normal solute flux
 			int neln = el.Nodes();
@@ -334,8 +336,7 @@ void FESoluteFluxSurface::Residual(FESolidSolver* psolver, vector<double>& R)
 				lm[i] = el.LM()[11*neln+i];
 			
 			// add element force vector to global force vector
-			psolver->AssembleResidual(el.m_node, lm, fe, R);
+			solver.AssembleResidual(el.m_node, lm, fe, R);
 		}
 	}
 }
-
