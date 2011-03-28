@@ -6,10 +6,11 @@ namespace FECore {
 
 //-----------------------------------------------------------------------------
 // The NonLinearSystem describes the interface for all non-linear systems.
-// Each non-linear system has three responsibilities:
+// Each non-linear system has four responsibilities:
 // 1. Evaluate its current state
 // 2. Calculate its current jacobian
 // 3. Update its current state given a solution increment
+// 4. Decide whether the current state is considered converged
 class NonLinearSystem
 {
 public:
@@ -24,6 +25,9 @@ public:
 
 	// override function to update state of system
 	virtual void Update(std::vector<double>& u) = 0;
+
+	// override to decide whether solution is converged
+	virtual bool Converged() = 0;
 };
 
 }

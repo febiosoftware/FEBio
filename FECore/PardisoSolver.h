@@ -47,7 +47,7 @@ class PardisoSolver : public LinearSolver
 public:
 	bool PreProcess();
 	bool Factor();
-	bool Solve(vector<double>& x, vector<double>& b);
+	bool BackSolve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype)

@@ -41,6 +41,7 @@ private:
 	// but are not yet used.
 	void Evaluate(vector<double>& R) { assert(false); }
 	void Jacobian(SparseMatrix& K) { assert(false); }
+	bool Converged() { assert(false); return false; }
 
 public:
 	//! recalculates the shape of the stiffness matrix

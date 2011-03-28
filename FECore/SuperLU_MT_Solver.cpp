@@ -122,7 +122,7 @@ bool FECore::SuperLU_MT_Solver::Factor()
 //-----------------------------------------------------------------------------
 //! Solve the linear system
 
-bool FECore::SuperLU_MT_Solver::Solve(vector<double> &x, vector<double> &b)
+bool FECore::SuperLU_MT_Solver::BackSolve(vector<double> &x, vector<double> &b)
 {
 #ifndef SUPERLU_MT
 	fprintf(stderr, "FATAL ERROR: The SuperLU_MT solver is not supported on this platform.\n\n");

@@ -147,7 +147,7 @@ bool FECore::WSMPSolver::Factor()
 #endif
 }
 
-bool FECore::WSMPSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::WSMPSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	/* Make sure the solver is available */
 #ifndef WSMP

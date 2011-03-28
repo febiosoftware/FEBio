@@ -28,7 +28,7 @@ public:
 
 	virtual bool PreProcess() { m_bvalid = true; return true; }
 	virtual bool Factor() = 0;
-	virtual bool Solve(vector<double>& x, vector<double>& b) = 0;
+	virtual bool BackSolve(vector<double>& x, vector<double>& b) = 0;
 	virtual void Destroy() { m_bvalid = false; };
 
 	//! returns a pointer to the sparse matrix

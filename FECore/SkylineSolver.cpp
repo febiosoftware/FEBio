@@ -24,7 +24,7 @@ bool FECore::SkylineSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::SkylineSolver::Solve(vector<double>& x, vector<double>& R)
+bool FECore::SkylineSolver::BackSolve(vector<double>& x, vector<double>& R)
 {
 	// Let's make sure the matrix K is of the correct type
 	SkylineMatrix* pK = dynamic_cast<SkylineMatrix*> (m_pA);

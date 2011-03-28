@@ -133,7 +133,7 @@ bool FECore::SuperLUSolver::Factor()
 #endif
 }
 
-bool FECore::SuperLUSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::SuperLUSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	// Make sure the solver is available
 #ifndef SUPERLU

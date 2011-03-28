@@ -64,7 +64,7 @@ bool FEHeatSolver::SolveStep(double time)
 	ReformStiffness();
 
 	// solve the equations
-	m_plinsolve->Solve(m_T, m_R);
+	m_plinsolve->BackSolve(m_T, m_R);
 
 	// update solution
 	// NOTE: m_u is not being used in Update!

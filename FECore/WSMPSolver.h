@@ -34,7 +34,7 @@ class WSMPSolver : public LinearSolver
 public:
 	bool PreProcess();
 	bool Factor();
-	bool Solve(vector<double>& x, vector<double>& b);
+	bool BackSolve(vector<double>& x, vector<double>& b);
 	void Destroy();
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix(1) : 0)); }

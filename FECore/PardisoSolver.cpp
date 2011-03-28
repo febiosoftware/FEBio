@@ -96,7 +96,7 @@ bool FECore::PardisoSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::PardisoSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);

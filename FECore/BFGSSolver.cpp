@@ -137,7 +137,7 @@ void FECore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 	}
 
 	// perform a backsubstitution
-	m_plinsolve->Solve(x, tmp);
+	m_plinsolve->BackSolve(x, tmp);
 
 	// loop again over all update vectors
 	for (i=0; i<m_nups; ++i)

@@ -70,7 +70,7 @@ bool FECore::PSLDLTSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::PSLDLTSolver::Solve(vector<double>& x, vector<double>& R)
+bool FECore::PSLDLTSolver::BackSolve(vector<double>& x, vector<double>& R)
 {
 	// First, make sure the PSLDLT solver is available on this platform
 #ifndef PSLDLT

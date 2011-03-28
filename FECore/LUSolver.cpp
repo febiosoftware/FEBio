@@ -79,7 +79,7 @@ bool FECore::LUSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::LUSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::LUSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	DenseMatrix& a = dynamic_cast<DenseMatrix&> (*m_pA);
 

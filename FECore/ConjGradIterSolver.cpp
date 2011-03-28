@@ -52,7 +52,7 @@ bool FECore::ConjGradIterSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::ConjGradIterSolver::Solve(vector<double>& x, vector<double>& b)
+bool FECore::ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	int i;
 
