@@ -64,7 +64,7 @@ void FEFiberNeoHookean::Init()
 	FEElasticMaterial::Init();
 
 	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!INRANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
+	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
 }
 
 mat3ds FEFiberNeoHookean::Stress(FEMaterialPoint& mp)

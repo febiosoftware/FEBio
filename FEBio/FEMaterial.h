@@ -22,9 +22,10 @@
 #include "DumpFile.h"
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
+#define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))
 
 //-----------------------------------------------------------------------------
-//! class to throw during the material initialization phase
+//! exception to throw during the material initialization phase
 
 class MaterialError
 {
@@ -35,6 +36,24 @@ public:
 
 protected:
 	char	m_szerr[512];
+};
+
+//-----------------------------------------------------------------------------
+//! exception to throw during material initialization phase
+class MaterialRangeError
+{
+public:
+	// szvar = name of variable
+	// vmin  = inf value
+	// vmax  = sup value
+	// bl    = inf is allowed
+	// br    = sup is allowed
+	MaterialRangeError(const char* szvar, double vmin, double vmax, bool bl, bool br) : m_szvar(szvar), m_vmin(vmin), m_vmax(vmax), m_bl(bl), m_br(br) {}
+
+public:
+	const char*	m_szvar;
+	double	m_vmin, m_vmax;
+	bool	m_bl, m_br;
 };
 
 //-----------------------------------------------------------------------------

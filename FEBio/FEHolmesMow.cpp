@@ -21,7 +21,7 @@ void FEHolmesMow::Init()
 	FEElasticMaterial::Init();
 	
 	if (m_E <= 0) throw MaterialError("E must be positive");
-	if (!INRANGE(m_v, -1.0, 0.5)) throw MaterialError("Valid range for v is -1 <= v <= 0.5");
+	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Valid range for v is -1 <= v < 0.5");
 	if (m_b < 0) throw MaterialError("beta must be positive");
 
 	// Lame coefficients

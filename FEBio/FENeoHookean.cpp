@@ -11,7 +11,7 @@ BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial)
 END_PARAMETER_LIST();
 
 //////////////////////////////////////////////////////////////////////
-// CompNeoHookean
+// FENeoHookean
 //////////////////////////////////////////////////////////////////////
 
 void FENeoHookean::Init()
@@ -19,7 +19,7 @@ void FENeoHookean::Init()
 	FEElasticMaterial::Init();
 
 	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!INRANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
+	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialRangeError("v", -1.0, 0.5, true, false);
 }
 
 mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)

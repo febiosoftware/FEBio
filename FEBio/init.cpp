@@ -163,6 +163,16 @@ bool FEM::InitMaterials()
 			clog.printf("ERROR: %s\n\n", e.Error());
 			return false;
 		}
+		catch (MaterialRangeError e)
+		{
+			clog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			clog.printf("ERROR: parameter \"%s\" out of range ", e.m_szvar);
+			if (e.m_bl) clog.printf("["); else clog.printf("(");
+			clog.printf("%lg, %lg", e.m_vmin, e.m_vmax);
+			if (e.m_br) clog.printf("]"); else clog.printf(")");
+			clog.printf("\n\n");
+			return false;
+		}
 		catch (...)
 		{
 			clog.printf("A fatal error occured during material intialization\n\n");

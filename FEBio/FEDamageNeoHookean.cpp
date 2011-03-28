@@ -29,7 +29,7 @@ FEDamageNeoHookean::FEDamageNeoHookean(void)
 void FEDamageNeoHookean::Init()
 {
 	if (m_E <= 0) throw MaterialError("Invalid value for E");
-	if (!INRANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
+	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
 	if (!INRANGE(m_beta, 0.0, 1.0)) throw MaterialError("Invalid value for b: must be in range [0,1]");
 	if (m_alpha < 0) throw MaterialError("Invalid value of a: must be a non-negative number");
 

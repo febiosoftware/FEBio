@@ -20,6 +20,7 @@ END_PARAMETER_LIST();
 
 void FEMooneyRivlin::Init()
 {
+	if (c1 <= 0) throw MaterialError("c1 must be positive");
 	FEUncoupledMaterial::Init();
 }
 
