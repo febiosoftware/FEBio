@@ -110,9 +110,14 @@ void echo_input(FEM& fem)
 	clog.printf("\tper time steps\n");
 	clog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", step.m_psolver->m_bfgs.m_maxups);
 	clog.printf("\tbetween stiffness matrix reformations\n");
-	clog.printf("\tDisplacement convergence tolerance ............. : %lg\n", step.m_psolver->m_Dtol);
-	clog.printf("\tEnergy convergence tolerance ................... : %lg\n", step.m_psolver->m_Etol);
-	clog.printf("\tResidual convergence tolerance ................. : %lg\n", step.m_psolver->m_Rtol);
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(step.m_psolver);
+	if (ps)
+	{
+		clog.printf("\tDisplacement convergence tolerance ............. : %lg\n", ps->m_Dtol);
+		clog.printf("\tEnergy convergence tolerance ................... : %lg\n", ps->m_Etol);
+		clog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
+		clog.printf("\tMinimal residual value ......................... : %lg\n", ps->m_Rmin);
+	}
 	FEPoroSolidSolver* pps = dynamic_cast<FEPoroSolidSolver*>(step.m_psolver);
 	if (pps) clog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
 	FEPoroSoluteSolver* pss = dynamic_cast<FEPoroSoluteSolver*>(step.m_psolver);

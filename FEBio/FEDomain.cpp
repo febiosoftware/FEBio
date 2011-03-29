@@ -157,8 +157,9 @@ void FEElasticSolidDomain::InitElements()
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::Serialize(FEM& fem, DumpFile &ar)
+void FEElasticSolidDomain::Serialize(DumpFile &ar)
 {
+	FEM& fem = *ar.GetFEM();
 	if (ar.IsSaving())
 	{
 		for (size_t i=0; i<m_Elem.size(); ++i)
@@ -314,8 +315,9 @@ bool FEElasticShellDomain::Initialize(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticShellDomain::Serialize(FEM& fem, DumpFile &ar)
+void FEElasticShellDomain::Serialize(DumpFile &ar)
 {
+	FEM& fem = *ar.GetFEM();
 	if (ar.IsSaving())
 	{
 		for (size_t i=0; i<m_Elem.size(); ++i)

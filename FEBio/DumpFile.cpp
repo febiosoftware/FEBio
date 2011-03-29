@@ -9,9 +9,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-DumpFile::DumpFile()
+DumpFile::DumpFile(FEM* pfem)
 {
 	m_fp = 0;
+	m_pfem = pfem;
 }
 
 DumpFile::~DumpFile()

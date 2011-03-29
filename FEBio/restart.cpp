@@ -15,6 +15,12 @@
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
 #include "version.h"
+#include "FEPressureLoad.h"
+#include "FETractionLoad.h"
+#include "FEFluidFlux.h"
+#include "FEPoroTraction.h"
+#include "FESoluteFlux.h"
+#include "FEHeatFlux.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)
@@ -43,11 +49,19 @@ bool FEM::Restart(const char* szfile)
 		// the file is binary so just read the dump file and return
 
 		// open the archive
-		DumpFile ar;
+		DumpFile ar(this);
 		if (ar.Open(szfile) == false) { fprintf(stderr, "FATAL ERROR: failed opening restart archive\n"); return false; }
 
 		// read the archive
-		if (Serialize(ar) == false) { fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); return false; }
+		try
+		{
+			if (Serialize(ar) == false) { fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); return false; }
+		}
+		catch (...)
+		{
+			fprintf(stderr, "FATAL ERROR: failed reading restart data from archive %s\n", szfile); 
+			return false;
+		}
 	}
 	else
 	{
@@ -157,29 +171,27 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 	if (ar.IsSaving())
 	{
 		// analysis steps
-		int i;
 		ar << (int) m_Step.size();
-		for (i=0; i<(int) m_Step.size(); ++i) m_Step[i]->Serialize(ar);
+		for (int i=0; i<(int) m_Step.size(); ++i) m_Step[i]->Serialize(ar);
 		ar << m_nStep;
 		ar << m_ftime << m_ftime0;
-
-		// body forces
-//		ar.write(m_BF  ,sizeof(FE_BODYFORCE), 1);
-//		ar.write(m_BF+1,sizeof(FE_BODYFORCE), 1);
-//		ar.write(m_BF+2,sizeof(FE_BODYFORCE), 1);
 
 		// direct solver data
 		ar << m_nsolver;
 		ar << m_neq;
+		ar << m_npeq;
+		ar << m_nceq;
 		ar << m_bwopt;
+		ar << m_bsymm;
 	}
 	else
 	{
 		m_Step.clear();
+
 		// analysis steps
-		int nsteps, i;
+		int nsteps;
 		ar >> nsteps;
-		for (i=0; i<nsteps; ++i)
+		for (int i=0; i<nsteps; ++i)
 		{
 			FEAnalysis* pstep = new FEAnalysis(*this);
 			pstep->Serialize(ar);
@@ -188,15 +200,13 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		ar >> m_nStep;
 		ar >> m_ftime >> m_ftime0;
 
-		// body forces
-//		ar.read(m_BF  ,sizeof(FE_BODYFORCE), 1);
-//		ar.read(m_BF+1,sizeof(FE_BODYFORCE), 1);
-//		ar.read(m_BF+2,sizeof(FE_BODYFORCE), 1);
-
 		// direct solver data
 		ar >> m_nsolver;
 		ar >> m_neq;
+		ar >> m_npeq;
+		ar >> m_nceq;
 		ar >> m_bwopt;
+		ar >> m_bsymm;
 
 		// set the correct step
 		m_pStep = m_Step[m_nStep];
@@ -243,7 +253,6 @@ void FEM::SerializeMaterials(DumpFile& ar)
 			// create a material
 			FEMaterial* pmat = FEMaterialFactory::CreateMaterial(szmat);
 			assert(pmat);
-			AddMaterial(pmat);
 
 			// read the name
 			ar >> szmat;
@@ -251,6 +260,10 @@ void FEM::SerializeMaterials(DumpFile& ar)
 
 			// read all parameters
 			pmat->Serialize(ar);
+
+			// Add material and parameter list to FEM
+			AddMaterial(pmat);
+			AddParameterList(pmat->GetParameterList());
 		}
 	}
 }
@@ -260,7 +273,7 @@ void FEM::SerializeMaterials(DumpFile& ar)
 void FEM::SerializeGeometry(DumpFile &ar)
 {
 	// serialize the mesh first 
-	m_mesh.Serialize(*this, ar);
+	m_mesh.Serialize(ar);
 
 	// serialize the other geometry data
 	if (ar.IsSaving())
@@ -281,7 +294,7 @@ void FEM::SerializeGeometry(DumpFile &ar)
 
 		// rigid bodies
 		ar >> m_nreq >> m_nrm >> m_nrb;
-		if (m_nrb) m_RB.resize(m_nrb);
+		if (m_nrb) m_RB.resize(m_nrb); else m_RB.clear();
 		for (i=0; i<m_nrb; ++i)
 		{
 			FERigidBody& rb = m_RB[i];
@@ -357,7 +370,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		// displacements
-		ar << m_DC.size();
+		ar << (int) m_DC.size();
 		for (i=0; i<(int) m_DC.size(); ++i) 
 		{
 			FENodalDisplacement& dc = *m_DC[i];
@@ -365,13 +378,35 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		}
 
 		// nodal loads
-		ar << m_FC.size();
+		ar << (int) m_FC.size();
 		for (i=0; i<(int) m_FC.size(); ++i)
 		{
 			FENodalForce& fc = *m_FC[i];
 			ar << fc.bc << fc.lc << fc.node << fc.s;
 		}
 
+		// surface loads
+		ar << (int) m_SL.size();
+		for (i=0; i<(int) m_SL.size(); ++i)
+		{
+			FESurfaceLoad* psl = m_SL[i];
+
+			// get the surface
+			FESurface& s = psl->Surface();
+			s.Serialize(ar);
+
+			// save the load data
+			int ntype = -1;
+			if (dynamic_cast<FEPressureLoad*      >(psl)) ntype = FE_PRESSURE_LOAD;
+			if (dynamic_cast<FETractionLoad*      >(psl)) ntype = FE_TRACTION_LOAD;
+			if (dynamic_cast<FEFluidFlux*         >(psl)) ntype = FE_FLUID_FLUX;
+			if (dynamic_cast<FEPoroNormalTraction*>(psl)) ntype = FE_PORO_TRACTION;
+			if (dynamic_cast<FESoluteFlux*        >(psl)) ntype = FE_SOLUTE_FLUX;
+			if (dynamic_cast<FEHeatFlux*          >(psl)) ntype = FE_HEAT_FLUX;
+			assert(ntype != -1);
+			ar << ntype;
+			psl->Serialize(ar);
+		}
 
 		// rigid body displacements
 		ar << m_RDC.size();
@@ -428,6 +463,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		
 		// nodal loads
 		ar >> n;
+		m_FC.clear();
 		for (i=0; i<n; ++i)
 		{
 			FENodalForce* pfc = new FENodalForce;
@@ -435,24 +471,52 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 			m_FC.push_back(pfc);
 		}
 
-		// rigid body displacements
-		// TODO: this is not gonna work !!!!
+		// surface loads
 		ar >> n;
-		if (n) m_RDC.resize(n);
+		m_SL.clear();
 		for (i=0; i<n; ++i)
 		{
-			FERigidBodyDisplacement& dc = *m_RDC[i];
-			ar >> dc.bc >> dc.id >> dc.lc >> dc.sf;
+			// create a new surface
+			FESurface* psurf = new FESurface(&m_mesh);
+			psurf->Serialize(ar);
+
+			// read load data
+			int ntype;
+			ar >> ntype;
+			FESurfaceLoad* ps = 0;
+			switch (ntype)
+			{
+			case FE_PRESSURE_LOAD: ps = new FEPressureLoad      (psurf); break;
+			case FE_TRACTION_LOAD: ps = new FETractionLoad      (psurf); break;
+			case FE_FLUID_FLUX   : ps = new FEFluidFlux         (psurf); break;
+			case FE_PORO_TRACTION: ps = new FEPoroNormalTraction(psurf); break;
+			case FE_SOLUTE_FLUX  : ps = new FESoluteFlux        (psurf); break;
+			case FE_HEAT_FLUX    : ps = new FEHeatFlux          (psurf); break;
+			default:
+				assert(false);
+			}
+			assert(ps);
+			ps->Serialize(ar);
+		}
+
+		// rigid body displacements
+		ar >> n;
+		m_RDC.clear();
+		for (i=0; i<n; ++i)
+		{
+			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement;
+			ar >> pdc->bc >> pdc->id >> pdc->lc >> pdc->sf;
+			m_RDC.push_back(pdc);
 		}
 
 		// rigid body forces
-		// TODO: this is not gonna work !!!!
 		ar >> n;
-		if (n) m_RFC.resize(n);
+		m_RFC.clear();
 		for (i=0; i<n; ++i)
 		{
-			FERigidBodyForce& fc = *m_RFC[i];
-			ar >> fc.bc >> fc.id >> fc.lc >> fc.sf;
+			FERigidBodyForce* pfc = new FERigidBodyForce;
+			ar >> pfc->bc >> pfc->id >> pfc->lc >> pfc->sf;
+			m_RFC.push_back(pfc);
 		}
 
 		// rigid nodes

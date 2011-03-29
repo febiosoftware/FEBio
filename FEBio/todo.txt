@@ -1,9 +1,12 @@
 * Fix the restart feature:
-check the following routines:
--FEMaterial::Save: Need to call FEM::AddParameterList
--FETransverselyIsotropic: need to remove m_plc parameter.
-
-* define an INRANGE macro that allows you to specify whether the bounds are included or not
+- FETransverselyIsotropic: need to remove m_plc parameter.
+- serialize data records
+- support for FEBio plot file
+- serialize surface loads
+- serialize body forces 
+- how to serialize FERigidBody::m_pDC + FERigidBody::m_prb
+- surface load should call FESurface::Serialize instead of serialzing surface data
+  actually, they should not even serialize surface data at all since the mesh takes care of that
 
 * I should probably split the FEPressureLoad into two separate classes, one for the linear pressures and one for the nonlinear.
 

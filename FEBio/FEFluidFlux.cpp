@@ -201,27 +201,13 @@ bool FEFluidFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vecto
 }
 
 //-----------------------------------------------------------------------------
-
-void FEFluidFlux::Serialize(FEM& fem, DumpFile& ar)
+void FEFluidFlux::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		int i;
-		for (i=0; i<m_surf.Elements(); ++i)
-		{
-			FESurfaceElement& el = m_surf.Element(i);
-			ar << el.Type();
-			ar << el.GetMatID();
-			ar << el.m_nID;
-			ar << el.m_nrigid;
-			ar << el.m_node;
-			ar << el.m_lnode;
-		}
-
 		ar << m_blinear << m_bmixture;
-
-		// fluid fluxes
-		for (i=0; i< (int) m_PC.size(); ++i)
+		ar << (int) m_PC.size();
+		for (int i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& fc = m_PC[i];
 			ar << fc.lc;
@@ -231,37 +217,21 @@ void FEFluidFlux::Serialize(FEM& fem, DumpFile& ar)
 	}
 	else
 	{
-		int i; 
-		int m, mat;
-		for (i=0; i<m_surf.Elements(); ++i)
-		{
-			FESurfaceElement& el = m_surf.Element(i);
-			ar >> m;
-			el.SetType(m);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nID;
-			ar >> el.m_nrigid;
-			ar >> el.m_node;
-			ar >> el.m_lnode;
-		}
-
+		int n;
 		ar >> m_blinear >> m_bmixture;
-
-		// fluid fluxes
-		for (i=0; i<(int) m_PC.size(); ++i)
+		ar >> n;
+		m_PC.resize(n);
+		for (int i=0; i<n; ++i)
 		{
 			LOAD& fc = m_PC[i];
 			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
 			ar >> fc.bc;
 		}
-
-		// initialize surface data
-		m_surf.Init();
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
@@ -278,13 +248,13 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 		if (fc.bc == 0)
 		{
 			// get the surface element
-			FESurfaceElement& el = m_surf.Element(m);
+			FESurfaceElement& el = m_psurf->Element(m);
 
 			// skip rigid surface elements
 			// TODO: do we really need to skip rigid elements?
 			if (!el.IsRigid())
 			{
-				m_surf.UnpackElement(el);
+				m_psurf->UnpackElement(el);
 
 				// calculate nodal normal fluid flux
 				int neln = el.Nodes();
@@ -326,8 +296,8 @@ void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 		LOAD& fc = m_PC[i];
 		if (fc.bc == 0)
 		{
-			FESurfaceElement& el = m_surf.Element(i);
-			m_surf.UnpackElement(el);
+			FESurfaceElement& el = m_psurf->Element(i);
+			m_psurf->UnpackElement(el);
 
 			// calculate nodal normal fluid flux
 			int neln = el.Nodes();

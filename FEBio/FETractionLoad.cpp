@@ -16,8 +16,8 @@ void FETractionLoad::Residual(FESolver* psolver, vector<double>& R)
 	for (int iel=0; iel<npr; ++iel)
 	{
 		LOAD& pc = m_TC[iel];
-		FESurfaceElement& el = m_surf.Element(iel);
-		m_surf.UnpackElement(el);
+		FESurfaceElement& el = m_psurf->Element(iel);
+		m_psurf->UnpackElement(el);
 
 		double g = fem.GetLoadCurve(pc.lc)->Value();
 
@@ -75,5 +75,32 @@ void FETractionLoad::Residual(FESolver* psolver, vector<double>& R)
 
 		// add element force vector to global force vector
 		solver.AssembleResidual(el.m_node, el.LM(), fe, R);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FETractionLoad::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << (int) m_TC.size();
+		for (int i=0; i < (int) m_TC.size(); ++i)
+		{
+			LOAD& d = m_TC[i];
+			ar << d.lc;
+			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
+		}
+	}
+	else
+	{
+		int n;
+		ar >> n;
+		m_TC.resize(n);
+		for (int i=0; i<n; ++i)
+		{
+			LOAD& d = m_TC[i];
+			ar >> d.lc;
+			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
+		}
 	}
 }

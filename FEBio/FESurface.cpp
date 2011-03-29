@@ -1045,3 +1045,47 @@ FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], do
 	// return the intersected element (or zero if none)
 	return pme;
 }
+
+//-----------------------------------------------------------------------------
+void FESurface::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		int ne = Elements();
+		ar << ne;
+
+		for (int k=0; k<ne; ++k)
+		{
+			FESurfaceElement& el = Element(k);
+			ar << el.Type();
+			ar << el.GetMatID() << el.m_nID << el.m_nrigid;
+			ar << el.m_node;
+			ar << el.m_lnode;
+			ar << el.m_nelem;
+		}
+	}
+	else
+	{
+		int ne=0;
+		ar >> ne;
+		create(ne);
+
+		for (int k=0; k<ne; ++k)
+		{
+			FESurfaceElement& el = Element(k);
+
+			int n, mat;
+			ar >> n;
+			el.SetType(n);
+
+			ar >> mat >> el.m_nID >> el.m_nrigid;
+			ar >> el.m_node;
+			ar >> el.m_lnode;
+			ar >> el.m_nelem;
+			el.SetMatID(mat);
+		}
+
+		// initialize surface
+		Init();
+	}
+}

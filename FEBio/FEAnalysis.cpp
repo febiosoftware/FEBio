@@ -477,7 +477,7 @@ bool FEAnalysis::Solve()
 			// Dump converged state to the archive
 			if (m_bDump)
 			{
-				DumpFile ar;
+				DumpFile ar(&m_fem);
 				if (ar.Create(m_fem.m_szdump) == false)
 				{
 					clog.printf("WARNING: Failed creating restart point.\n");

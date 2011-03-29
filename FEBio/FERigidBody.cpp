@@ -115,21 +115,23 @@ void FERigidBody::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_nID << m_mat << m_mass << m_Fr << m_Mr;
-		ar << m_r0 << m_rt << m_qt;
-//		ar.write(m_bc, sizeof(int), 6);
-		ar.write(m_LM, sizeof(int), 6);
-		ar.write(m_Up, sizeof(double), 6);
-		ar.write(m_Ut, sizeof(double), 6);
-		ar.write(m_du, sizeof(double), 6);
+		ar << m_r0 << m_rt << m_rp << m_qt << m_qp;
+		ar << m_bActive;
+		ar.write(m_LM , sizeof(int), 6);
+		ar.write(m_Up , sizeof(double), 6);
+		ar.write(m_Ut , sizeof(double), 6);
+		ar.write(m_du , sizeof(double), 6);
+		ar.write(m_dul, sizeof(double), 6);
 	}
 	else
 	{
 		ar >> m_nID >> m_mat >> m_mass >> m_Fr >> m_Mr;
-		ar >> m_r0 >> m_rt >> m_qt;
-//		ar.read(m_bc, sizeof(int), 6);
-		ar.read(m_LM, sizeof(int), 6);
-		ar.read(m_Up, sizeof(double), 6);
-		ar.read(m_Ut, sizeof(double), 6);
-		ar.read(m_du, sizeof(double), 6);
+		ar >> m_r0 >> m_rt >> m_rp >> m_qt >> m_qp;
+		ar >> m_bActive;
+		ar.read(m_LM , sizeof(int   ), 6);
+		ar.read(m_Up , sizeof(double), 6);
+		ar.read(m_Ut , sizeof(double), 6);
+		ar.read(m_du , sizeof(double), 6);
+		ar.read(m_dul, sizeof(double), 6);
 	}
 }

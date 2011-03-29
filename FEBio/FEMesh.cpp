@@ -474,8 +474,9 @@ FENodeSet* FEMesh::FindNodeSet(const char* szname)
 //! \sa DumpFile
 //! \todo serialize nodesets
 
-void FEMesh::Serialize(FEM& fem, DumpFile& ar)
+void FEMesh::Serialize(DumpFile& ar)
 {
+	FEM& fem = *ar.GetFEM();
 	if (ar.IsSaving())
 	{
 		int i;
@@ -498,7 +499,7 @@ void FEMesh::Serialize(FEM& fem, DumpFile& ar)
 			int ntype = d.Type();
 			int ne = d.Elements();
 			ar << ntype << ne;
-			d.Serialize(fem, ar);
+			d.Serialize(ar);
 		}
 	}
 	else
@@ -525,15 +526,18 @@ void FEMesh::Serialize(FEM& fem, DumpFile& ar)
 			FEDomain* pd = 0;
 			switch (ntype)
 			{
-			case FE_SOLID_DOMAIN: pd = new FEElasticSolidDomain(this, 0); break;
-			case FE_SHELL_DOMAIN: pd = new FEElasticShellDomain(this, 0); break;
-			case FE_TRUSS_DOMAIN: pd = new FEElasticTrussDomain(this, 0); break;
+			case FE_SOLID_DOMAIN      : pd = new FEElasticSolidDomain(this, 0); break;
+			case FE_SHELL_DOMAIN      : pd = new FEElasticShellDomain(this, 0); break;
+			case FE_TRUSS_DOMAIN      : pd = new FEElasticTrussDomain(this, 0); break;
+			case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain  (this, 0); break;
+			case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain  (this, 0); break;
+			case FE_3F_SOLID_DOMAIN   : pd = new FE3FieldElasticSolidDomain(this, 0); break;
 			default: assert(false);
 			}
 
 			assert(pd);
 			pd->create(ne);
-			pd->Serialize(fem, ar);
+			pd->Serialize(ar);
 
 			m_Domain.push_back(pd);
 		}

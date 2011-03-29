@@ -57,6 +57,7 @@ protected:
 	FESolver* BuildSolver(int nmod, FEM& fem);
 
 	bool ParseCommonParams(XMLTag& tag);
+	bool ParseSolidParams (XMLTag& tag);
 	bool ParsePoroParams  (XMLTag& tag);
 	bool ParseSoluteParams(XMLTag& tag);
 };

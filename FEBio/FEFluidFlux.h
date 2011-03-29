@@ -18,14 +18,10 @@ public:
 
 public:
 	//! constructor
-	FEFluidFlux(FEMesh* pm, bool blinear = false, bool bmixture = false) : FESurfaceLoad(pm) { m_blinear = blinear; m_bmixture = bmixture; }
+	FEFluidFlux(FESurface* ps, bool blinear = false, bool bmixture = false) : FESurfaceLoad(ps) { m_blinear = blinear; m_bmixture = bmixture; }
 
 	//! allocate storage
-	void create(int n)
-	{
-		m_surf.create(n);
-		m_PC.resize(n);
-	}
+	void create(int n) { m_PC.resize(n); }
 
 	//! clone
 /*	FEDomain* Clone()
@@ -46,7 +42,7 @@ public:
 	void Residual(FESolver* psolver, vector<double>& R);
 
 	//! serialize data
-	void Serialize(FEM& fem, DumpFile& ar);
+	void Serialize(DumpFile& ar);
 
 protected:
 	//! calculate stiffness for an element

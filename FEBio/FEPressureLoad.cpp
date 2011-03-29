@@ -185,15 +185,13 @@ bool FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
 
 //-----------------------------------------------------------------------------
 
-void FEPressureLoad::Serialize(FEM& fem, DumpFile& ar)
+void FEPressureLoad::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		m_surf.Serialize(fem, ar);
-
-		// pressure forces
-		size_t i;
-		for (i=0; i<m_PC.size(); ++i)
+		ar << m_blinear;
+		ar << (int) m_PC.size();
+		for (int i=0; i< (int) m_PC.size(); ++i)
 		{
 			LOAD& pc = m_PC[i];
 			ar << pc.lc;
@@ -202,33 +200,17 @@ void FEPressureLoad::Serialize(FEM& fem, DumpFile& ar)
 	}
 	else
 	{
-		int i, m, mat;
-		m_surf.Serialize(fem, ar);
-/*
-		for (i=0; i<(int) m_el.size(); ++i)
-		{
-			FESurfaceElement& el = m_el[i];
-			ar >> m;
-			el.SetType(m);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nID;
-			ar >> el.m_nrigid;
-			ar >> el.m_node;
-			ar >> el.m_lnode;
-		}
-*/
-
+		int n;
+		ar >> m_blinear;
+		ar >> n;
+		m_PC.resize(n);
 		// pressure forces
-		for (i=0; i<(int) m_PC.size(); ++i)
+		for (int i=0; i<n; ++i)
 		{
 			LOAD& pc = m_PC[i];
 			ar >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
 		}
-
-		// initialize surface data
-		m_surf.Init();
 	}
 }
 
@@ -244,13 +226,13 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 	{
 		LOAD& pc = m_PC[m];
 		// get the surface element
-		FESurfaceElement& el = m_surf.Element(m);
+		FESurfaceElement& el = m_psurf->Element(m);
 
 		// skip rigid surface elements
 		// TODO: do we really need to skip rigid elements?
 		if (!el.IsRigid())
 		{
-			m_surf.UnpackElement(el);
+			m_psurf->UnpackElement(el);
 
 			// calculate nodal normal tractions
 			int neln = el.Nodes();
@@ -291,8 +273,8 @@ void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 	for (int i=0; i<npr; ++i)
 	{
 		LOAD& pc = m_PC[i];
-		FESurfaceElement& el = m_surf.Element(i);
-		m_surf.UnpackElement(el);
+		FESurfaceElement& el = m_psurf->Element(i);
+		m_psurf->UnpackElement(el);
 
 		// calculate nodal normal tractions
 		int neln = el.Nodes();

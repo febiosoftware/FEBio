@@ -15,14 +15,10 @@ public:
 	};
 
 public:
-	FEHeatFlux(FEMesh* pm) : FESurfaceLoad(pm){}
+	FEHeatFlux(FESurface* ps) : FESurfaceLoad(ps){}
 
 	//! allocate storage
-	void create(int n)
-	{
-		m_surf.create(n);
-		m_FC.resize(n);
-	}
+	void create(int n) { m_FC.resize(n); }
 
 	//! clone
 /*	FEDomain* Clone()
@@ -41,6 +37,9 @@ public:
 	
 	//! residual
 	void Residual(FESolver* psolver, vector<double>& R);
+
+	//! serialization
+	void Serialize(DumpFile& ar);
 
 protected:
 	vector<LOAD>	m_FC;

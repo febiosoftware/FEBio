@@ -224,7 +224,7 @@ public:
 	FENodeSet* FindNodeSet(const char* szname);
 
 	//! serialize data to or from a binary archive
-	void Serialize(FEM& fem, DumpFile& ar);
+	void Serialize(DumpFile& ar);
 
 	//! Get the face nodes from a given element
 	int GetFace(FEElement& el, int n, int nf[4]);

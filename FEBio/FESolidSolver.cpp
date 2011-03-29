@@ -11,6 +11,7 @@ FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
 	m_Rtol = 0;	// deactivate residual convergence 
 	m_Dtol = 0.001;
 	m_Etol = 0.01;
+	m_Rmin = 1.0e-20;
 
 	m_niter = 0;
 }
@@ -68,31 +69,30 @@ void FESolidSolver::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << m_Dtol << m_Etol << m_Rtol;
+		ar << m_Dtol << m_Etol << m_Rtol << m_Rmin;
+		ar << m_nrhs;
+		ar << m_niter;
+		ar << m_nref << m_ntotref;
+		ar << m_naug;
+
 		ar << m_bfgs.m_LStol << m_bfgs.m_LSiter << m_bfgs.m_LSmin;
 		ar << m_bfgs.m_maxups;
 		ar << m_bfgs.m_maxref;
 		ar << m_bfgs.m_cmax;
-
-		ar << m_nrhs;
-		ar << m_niter;
-		ar << m_nref << m_ntotref;
 		ar << m_bfgs.m_nups;
-		ar << m_naug;
 	}
 	else
 	{
-		ar >> m_Dtol >> m_Etol >> m_Rtol;
+		ar >> m_Dtol >> m_Etol >> m_Rtol >> m_Rmin;
+		ar >> m_nrhs;
+		ar >> m_niter;
+		ar >> m_nref >> m_ntotref;
+		ar >> m_naug;
+
 		ar >> m_bfgs.m_LStol >> m_bfgs.m_LSiter >> m_bfgs.m_LSmin;
 		ar >> m_bfgs.m_maxups;
 		ar >> m_bfgs.m_maxref;
 		ar >> m_bfgs.m_cmax;
-
-		ar >> m_nrhs;
-		ar >> m_niter;
-		ar >> m_nref >> m_ntotref;
 		ar >> m_bfgs.m_nups;
-		ar >> m_naug;
 	}
 }
-

@@ -156,4 +156,30 @@ enum FE_Print_Level {
 	FE_PRINT_MINOR_ITRS_EXP,
 };
 
+//-----------------------------------------------------------------------------
+//! Domain Types
+#define FE_SOLID_DOMAIN				1
+#define FE_SHELL_DOMAIN				2
+#define FE_SURFACE_DOMAIN			3
+#define FE_TRUSS_DOMAIN				4
+#define FE_RIGID_SOLID_DOMAIN		5
+#define FE_RIGID_SHELL_DOMAIN		6
+#define FE_UDGHEX_DOMAIN			7
+#define FE_UT4_DOMAIN				8
+#define FE_PORO_SOLID_DOMAIN		9
+#define FE_HEAT_SOLID_DOMAIN		10
+#define FE_DISCRETE_DOMAIN			11
+#define FE_3F_SOLID_DOMAIN			12
+#define FE_BIPHASIC_DOMAIN			13
+#define FE_BIPHASIC_SOLUTE_DOMAIN	14
+
+//-----------------------------------------------------------------------------
+//! surface load types
+#define FE_PRESSURE_LOAD		1
+#define FE_TRACTION_LOAD		2
+#define FE_FLUID_FLUX			3
+#define FE_PORO_TRACTION		4
+#define FE_SOLUTE_FLUX			5
+#define FE_HEAT_FLUX			6
+
 #endif // _FE_ENUM_H_05132007_

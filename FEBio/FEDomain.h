@@ -3,27 +3,13 @@
 #include "FEElement.h"
 #include "FECore/vector.h"
 #include "DumpFile.h"
+#include "FE_enum.h"
 
 class FENode;
 class FEMesh;
 class FESolidSolver;
 class FEHeatSolver;
 class FEMaterial;
-
-#define FE_SOLID_DOMAIN			1
-#define FE_SHELL_DOMAIN			2
-#define FE_SURFACE_DOMAIN		3
-#define FE_TRUSS_DOMAIN			4
-#define FE_RIGID_SOLID_DOMAIN	5
-#define FE_RIGID_SHELL_DOMAIN	6
-#define FE_UDGHEX_DOMAIN		7
-#define FE_UT4_DOMAIN			8
-#define FE_PORO_SOLID_DOMAIN	9
-#define FE_HEAT_SOLID_DOMAIN	10
-#define FE_DISCRETE_DOMAIN		11
-#define FE_3F_SOLID_DOMAIN		12
-#define FE_BIPHASIC_DOMAIN		13
-#define FE_BIPHASIC_SOLUTE_DOMAIN		14
 
 //-----------------------------------------------------------------------------
 //! This class describes a physical domain that will be divided into elements
@@ -51,7 +37,7 @@ public:
 
 	virtual void Reset() {}
 
-	virtual void Serialize(FEM& fem, DumpFile& ar) {}
+	virtual void Serialize(DumpFile& ar) {}
 
 	virtual bool Initialize(FEM& fem) { return true; }
 
@@ -149,7 +135,7 @@ public:
 	void Reset();
 
 	//! serialize data to archive
-	void Serialize(FEM& fem, DumpFile& ar);
+	void Serialize(DumpFile& ar);
 
 	//! Unpack solid element data
 	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
@@ -400,7 +386,7 @@ public:
 
 	void InitElements();
 
-	void Serialize(FEM& fem, DumpFile& ar);
+	void Serialize(DumpFile& ar);
 
 	bool Initialize(FEM& fem);
 

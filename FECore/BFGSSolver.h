@@ -35,7 +35,14 @@ public:
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations
 	int		m_maxref;		//!< max nr of reformations per time step
+	double	m_cmax;			//!< maximum value for the condition number
 
+	// line search options
+	double	m_LSmin;		//!< minimum line search step
+	double	m_LStol;		//!< line search tolerance
+	int		m_LSiter;		//!< max nr of line search iterations
+
+public:
 	// keep a pointer to the linear solver
 	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 
@@ -45,12 +52,6 @@ public:
 
 	// counters
 	int		m_nups;			//!< nr of stiffness updates
-	double	m_cmax;			//!< maximum value for the condition number
-
-	// line search options
-	double	m_LSmin;		//!< minimum line search step
-	double	m_LStol;		//!< line search tolerance
-	int		m_LSiter;		//!< max nr of line search iterations
 
 	vector<double> m_ui;	//!< displacement increment vector
 

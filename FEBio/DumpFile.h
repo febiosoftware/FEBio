@@ -16,6 +16,8 @@
 #include "quatd.h"
 #include "FECore/vector.h"
 
+class FEM;
+
 //-----------------------------------------------------------------------------
 //! Class for serializing data to a binary archive.
 
@@ -27,7 +29,7 @@
 class DumpFile  
 {
 public:
-	DumpFile();
+	DumpFile(FEM* pfem);
 	virtual ~DumpFile();
 
 	//! Open archive for reading
@@ -124,9 +126,12 @@ public:
 		return fread(pd, size, count, m_fp);
 	}
 
+	//! get FEM model
+	FEM* GetFEM() { return m_pfem; }
 
 protected:
 	FILE*	m_fp;		//!< The actual file pointer
+	FEM*	m_pfem;		//!< FEM data that will be serialized
 	bool	m_bsave;	//!< Save flag
 };
 

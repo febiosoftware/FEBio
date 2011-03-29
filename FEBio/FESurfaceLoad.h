@@ -1,6 +1,7 @@
 #pragma once
 #include "FEBoundaryCondition.h"
 #include "FESurface.h"
+#include "DumpFile.h"
 
 class FESolver;
 
@@ -9,11 +10,11 @@ class FESolver;
 class FESurfaceLoad : public FEBoundaryCondition
 {
 public:
-	FESurfaceLoad(FEMesh* pm);
+	FESurfaceLoad(FESurface* ps);
 	virtual ~FESurfaceLoad(void);
 
 	//! Get the surface
-	FESurface& Surface() { return m_surf; }
+	FESurface& Surface() { return *m_psurf; }
 
 	//! calculate stiffness matrix
 	virtual void StiffnessMatrix(FESolver* psolver) = 0;
@@ -21,6 +22,9 @@ public:
 	//! calculate residual
 	virtual void Residual(FESolver* psolver, vector<double>& R) = 0;
 
+	//! serialization
+	virtual void Serialize(DumpFile& ar) = 0;
+
 protected:
-	FESurface	m_surf;
+	FESurface*	m_psurf;
 };

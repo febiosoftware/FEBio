@@ -104,6 +104,13 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
+	// convergence tolerances
+	double	m_Rtol;			//!< residual tolerance
+	double	m_Dtol;			//!< displacement tolerance
+	double	m_Etol;			//!< energy tolerance
+	double	m_Rmin;			//!< min residual value
+
+public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
 	vector<double> m_Fr;	//!< nodal reaction forces
 	vector<double> m_Ui;	//!< Total displacement vector for iteration

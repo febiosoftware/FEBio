@@ -59,12 +59,6 @@ public:
 	// global stiffness matrix
 	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
 
-	// convergence tolerances
-	double	m_Rtol;			//!< residual tolerance
-	double	m_Dtol;			//!< displacement tolerance
-	double	m_Etol;			//!< energy tolerance
-	double	m_Rmin;			//!< min residual value
-
 	// BFGS parameters
 	BFGSSolver	m_bfgs;		//!< BFGS solver parameters
 

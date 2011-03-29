@@ -67,11 +67,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 	}
 	else
 	{
-		FEParameterList* pl = GetParameterList();
-
-		// TODO: not sure how to add the parameter list back to the FEM
-//		AddParameterList(pl);
-
+		auto_ptr<FEParameterList> pl(GetParameterList());
 		int n = 0;
 		ar >> n;
 		assert(n == pl->Parameters());

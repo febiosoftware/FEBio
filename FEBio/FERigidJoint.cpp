@@ -225,10 +225,16 @@ void FERigidJoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		ar.write(this, sizeof(FERigidJoint), 1);
+		ar << m_nID;
+		ar << m_nRBa << m_nRBb;
+		ar << m_q0 << m_qa0 << m_qb0;
+		ar << m_F << m_L << m_eps << m_atol;
 	}
 	else
 	{
-		ar.read(this, sizeof(FERigidJoint), 1);
+		ar >> m_nID;
+		ar >> m_nRBa >> m_nRBb;
+		ar >> m_q0 >> m_qa0 >> m_qb0;
+		ar >> m_F >> m_L >> m_eps >> m_atol;
 	}
 }

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESurfaceLoad.h"
 
-FESurfaceLoad::FESurfaceLoad(FEMesh* pm) : m_surf(pm)
+FESurfaceLoad::FESurfaceLoad(FESurface* ps) : m_psurf(ps)
 {
 }
 

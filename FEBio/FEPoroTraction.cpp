@@ -198,24 +198,13 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 
 //-----------------------------------------------------------------------------
 
-void FEPoroNormalTraction::Serialize(FEM& fem, DumpFile& ar)
+void FEPoroNormalTraction::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
-		int i;
-		for (i=0; i<m_surf.Elements(); ++i)
-		{
-			FESurfaceElement& el = m_surf.Element(i);
-			ar << el.Type();
-			ar << el.GetMatID();
-			ar << el.m_nID;
-			ar << el.m_nrigid;
-			ar << el.m_node;
-			ar << el.m_lnode;
-		}
-
-		// normal tractions
-		for (i=0; i<(int) m_PC.size(); ++i)
+		ar << m_blinear << m_beffective;
+		ar << (int) m_PC.size();
+		for (int i=0; i<(int) m_PC.size(); ++i)
 		{
 			LOAD& pc = m_PC[i];
 			ar << pc.lc;
@@ -224,30 +213,16 @@ void FEPoroNormalTraction::Serialize(FEM& fem, DumpFile& ar)
 	}
 	else
 	{
-		int i, m, mat;
-		for (i=0; i<m_surf.Elements(); ++i)
-		{
-			FESurfaceElement& el = m_surf.Element(i);
-			ar >> m;
-			el.SetType(m);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nID;
-			ar >> el.m_nrigid;
-			ar >> el.m_node;
-			ar >> el.m_lnode;
-		}
-
-		// normal tractions
-		for (i=0; i<(int) m_PC.size(); ++i)
+		int n;
+		ar >> m_blinear >> m_beffective;
+		ar >> n;
+		m_PC.resize(n);
+		for (int i=0; i<n; ++i)
 		{
 			LOAD& pc = m_PC[i];
 			ar >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
 		}
-
-		// initialize surface data
-		m_surf.Init();
 	}
 }
 
@@ -264,13 +239,13 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 	{
 		LOAD& pc = m_PC[m];
 		// get the surface element
-		FESurfaceElement& el = m_surf.Element(m);
+		FESurfaceElement& el = m_psurf->Element(m);
 
 		// skip rigid surface elements
 		// TODO: do we really need to skip rigid elements?
 		if (!el.IsRigid())
 		{
-			m_surf.UnpackElement(el);
+			m_psurf->UnpackElement(el);
 
 			// fluid pressure
 			double* pt = el.pt();
@@ -315,8 +290,8 @@ void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
 	for (int i=0; i<npr; ++i)
 	{
 		LOAD& pc = m_PC[i];
-		FESurfaceElement& el = m_surf.Element(i);
-		m_surf.UnpackElement(el);
+		FESurfaceElement& el = m_psurf->Element(i);
+		m_psurf->UnpackElement(el);
 
 		// fluid pressure
 		double* pt = el.pt();

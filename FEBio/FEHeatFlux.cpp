@@ -9,12 +9,12 @@ void FEHeatFlux::Residual(FESolver* psolver, vector<double>& R)
 	int i, j, n;
 	FEM& fem = psolver->m_fem;
 
-	int nfc = m_surf.Elements();
+	int nfc = m_psurf->Elements();
 	for (i=0; i<nfc; ++i)
 	{
 		LOAD& hf = HeatFlux(i);
-		FESurfaceElement& el = m_surf.Element(i);
-		m_surf.UnpackElement(el);
+		FESurfaceElement& el = m_psurf->Element(i);
+		m_psurf->UnpackElement(el);
 
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
@@ -74,6 +74,33 @@ void FEHeatFlux::Residual(FESolver* psolver, vector<double>& R)
 		for (j=0; j<ne; ++j)
 		{
 			if (lm[j] >= 0) R[lm[j]] += fe[j];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEHeatFlux::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << (int) m_FC.size();
+		for (int i=0; i<(int) m_FC.size(); ++i)
+		{
+			LOAD& d = m_FC[i];
+			ar << d.lc;
+			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
+		}
+	}
+	else
+	{
+		int n;
+		ar >> n;
+		m_FC.resize(n);
+		for (int i=0; i<n; ++i)
+		{
+			LOAD& d = m_FC[i];
+			ar >> d.lc;
+			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
 		}
 	}
 }

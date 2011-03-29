@@ -308,13 +308,20 @@ void FEBioControlSection::Parse(XMLTag& tag)
 		if (ParseCommonParams(tag) == false)
 		{
 			// next, parse solver specific control parameters
-			if (dynamic_cast<FEPoroSolidSolver*>(pstep->m_psolver))
+			if (dynamic_cast<FESolidSolver*>(pstep->m_psolver))
 			{
-				if (ParsePoroParams(tag) == false)
+				if (ParseSolidParams(tag) == false)
 				{
-					if (dynamic_cast<FEPoroSoluteSolver*>(pstep->m_psolver))
+					if (dynamic_cast<FEPoroSolidSolver*>(pstep->m_psolver))
 					{
-						if (ParseSoluteParams(tag) == false) throw XMLReader::InvalidTag(tag);
+						if (ParsePoroParams(tag) == false)
+						{
+							if (dynamic_cast<FEPoroSoluteSolver*>(pstep->m_psolver))
+							{
+								if (ParseSoluteParams(tag) == false) throw XMLReader::InvalidTag(tag);
+							}
+							else throw XMLReader::InvalidTag(tag);
+						}
 					}
 					else throw XMLReader::InvalidTag(tag);
 				}
@@ -325,6 +332,25 @@ void FEBioControlSection::Parse(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+// Parse parameters specific to solid solver
+bool FEBioControlSection::ParseSolidParams(XMLTag& tag)
+{
+	FEM& fem = *GetFEM();
+	FEAnalysis* pstep = GetStep();
+
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	assert(ps);
+
+	if      (tag == "dtol"        ) tag.value(ps->m_Dtol);
+	else if (tag == "etol"        ) tag.value(ps->m_Etol);
+	else if (tag == "rtol"        ) tag.value(ps->m_Rtol);
+	else if (tag == "min_residual") tag.value(ps->m_Rmin);
+	else return false;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -371,10 +397,6 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }
 	else if (tag == "time_steps"        ) tag.value(pstep->m_ntime);
 	else if (tag == "step_size"         ) tag.value(pstep->m_dt0);
-	else if (tag == "dtol"              ) tag.value(pstep->m_psolver->m_Dtol);
-	else if (tag == "etol"              ) tag.value(pstep->m_psolver->m_Etol);
-	else if (tag == "rtol"              ) tag.value(pstep->m_psolver->m_Rtol);
-	else if (tag == "min_residual"      ) tag.value(pstep->m_psolver->m_Rmin);
 	else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_bfgs.m_LStol);
 	else if (tag == "lsmin"             ) tag.value(pstep->m_psolver->m_bfgs.m_LSmin);
 	else if (tag == "lsiter"            ) tag.value(pstep->m_psolver->m_bfgs.m_LSiter);
@@ -2291,8 +2313,13 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { npr++; ++t; }
 
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.m_mesh);
+	psurf->create(npr);
+	fem.m_mesh.AddSurface(psurf);
+
 	// allocate pressure data
-	FEPressureLoad* ps = new FEPressureLoad(&fem.m_mesh, blinear);
+	FEPressureLoad* ps = new FEPressureLoad(psurf, blinear);
 	ps->create(npr);
 	fem.m_SL.push_back(ps);
 
@@ -2303,7 +2330,7 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	for (int i=0; i<npr; ++i)
 	{
 		FEPressureLoad::LOAD& pc = ps->PressureLoad(i);
-		FESurfaceElement& el = ps->Surface().Element(i);
+		FESurfaceElement& el = psurf->Element(i);
 
 		sz = tag.AttributeValue("lc", true);
 		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
@@ -2342,8 +2369,13 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { ntc++; ++t; }
 
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.m_mesh);
+	psurf->create(ntc);
+	fem.m_mesh.AddSurface(psurf);
+
 	// allocate traction data
-	FETractionLoad* pt = new FETractionLoad(&fem.m_mesh);
+	FETractionLoad* pt = new FETractionLoad(psurf);
 	fem.m_SL.push_back(pt);
 	pt->create(ntc);
 
@@ -2354,7 +2386,7 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 	for (int i=0; i<ntc; ++i)
 	{
 		FETractionLoad::LOAD& tc = pt->TractionLoad(i);
-		FESurfaceElement& el = pt->Surface().Element(i);
+		FESurfaceElement& el = psurf->Element(i);
 
 		sz = tag.AttributeValue("lc", true);
 		if (sz) tc.lc = atoi(sz); else tc.lc = 0;
@@ -2412,9 +2444,14 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	int npr = 0;
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { npr++; ++t; }
+
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.m_mesh);
+	psurf->create(npr);
+	fem.m_mesh.AddSurface(psurf);
 	
 	// allocate normal traction data
-	FEPoroNormalTraction* ps = new FEPoroNormalTraction(&fem.m_mesh, blinear, beffective);
+	FEPoroNormalTraction* ps = new FEPoroNormalTraction(psurf, blinear, beffective);
 	ps->create(npr);
 	fem.m_SL.push_back(ps);
 	
@@ -2425,7 +2462,7 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	for (int i=0; i<npr; ++i)
 	{
 		FEPoroNormalTraction::LOAD& pc = ps->NormalTraction(i);
-		FESurfaceElement& el = ps->Surface().Element(i);
+		FESurfaceElement& el = psurf->Element(i);
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
@@ -2480,9 +2517,14 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	int nfr = 0;
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { nfr++; ++t; }
+
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.m_mesh);
+	psurf->create(nfr);
+	fem.m_mesh.AddSurface(psurf);
 	
 	// allocate fluid flux data
-	FEFluidFlux* pfs = new FEFluidFlux(&fem.m_mesh, blinear, bmixture);
+	FEFluidFlux* pfs = new FEFluidFlux(psurf, blinear, bmixture);
 	pfs->create(nfr);
 	fem.m_SL.push_back(pfs);
 	
@@ -2493,7 +2535,7 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	for (int i=0; i<nfr; ++i)
 	{
 		FEFluidFlux::LOAD& fc = pfs->FluidFlux(i);
-		FESurfaceElement& el = pfs->Surface().Element(i);
+		FESurfaceElement& el = psurf->Element(i);
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
@@ -2539,9 +2581,14 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	int nfr = 0;
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { nfr++; ++t; }
+
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.m_mesh);
+	psurf->create(nfr);
+	fem.m_mesh.AddSurface(psurf);
 	
 	// allocate fluid flux data
-	FESoluteFlux* pfs = new FESoluteFlux(&fem.m_mesh, blinear);
+	FESoluteFlux* pfs = new FESoluteFlux(psurf, blinear);
 	pfs->create(nfr);
 	fem.m_SL.push_back(pfs);
 	
@@ -2552,7 +2599,7 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	for (int i=0; i<nfr; ++i)
 	{
 		FESoluteFlux::LOAD& fc = pfs->SoluteFlux(i);
-		FESurfaceElement& el = pfs->Surface().Element(i);
+		FESurfaceElement& el = psurf->Element(i);
 		
 		sz = tag.AttributeValue("lc", true);
 		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
@@ -2589,8 +2636,13 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { npr++; ++t; }
 
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.m_mesh);
+	psurf->create(npr);
+	fem.m_mesh.AddSurface(psurf);
+
 	// allocate flux data
-	FEHeatFlux* ph = new FEHeatFlux(&fem.m_mesh);
+	FEHeatFlux* ph = new FEHeatFlux(psurf);
 	ph->create(npr);
 	fem.m_SL.push_back(ph);
 
@@ -2603,7 +2655,7 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 	for (int i=0; i<npr; ++i)
 	{
 		FEHeatFlux::LOAD& pc = ph->HeatFlux(i);
-		FESurfaceElement& el = ph->Surface().Element(i);
+		FESurfaceElement& el = psurf->Element(i);
 
 		sz = tag.AttributeValue("lc", true);
 		if (sz) pc.lc = atoi(sz); else pc.lc = 0;

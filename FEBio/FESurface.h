@@ -35,6 +35,9 @@ public:
 	//! creates surface
 	void create(int n) { m_el.resize(n); }
 
+	//! serialization
+	void Serialize(DumpFile& ar);
+
 	//! return an element of the surface
 	FESurfaceElement& Element(int i) { return m_el[i]; }
 

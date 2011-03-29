@@ -16,14 +16,10 @@ public:
 
 public:
 	//! constructor
-	FETractionLoad(FEMesh* pm) : FESurfaceLoad(pm) {}
+	FETractionLoad(FESurface* ps) : FESurfaceLoad(ps) {}
 
 	//! allocate storage
-	void create(int n)
-	{
-		m_surf.create(n);
-		m_TC.resize(n);
-	}
+	void create(int n) { m_TC.resize(n); }
 
 	//! clone
 /*	FEDomain* Clone()
@@ -41,6 +37,9 @@ public:
 
 	//! calculate residual
 	void Residual(FESolver* psolver, vector<double>& R);
+
+	//! serialize data to archive
+	void Serialize(DumpFile& ar);
 
 protected:
 	vector<LOAD>	m_TC;		//!< traction boundary cards
