@@ -538,6 +538,7 @@ void FEMesh::Serialize(DumpFile& ar)
 			case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain  (this, pm); break;
 			case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain  (this, pm); break;
 			case FE_3F_SOLID_DOMAIN   : pd = new FE3FieldElasticSolidDomain(this, pm); break;
+			case FE_HEAT_SOLID_DOMAIN : pd = new FEHeatSolidDomain   (this, pm); break;
 			default: assert(false);
 			}
 

@@ -97,6 +97,9 @@ public:
 
 	bool Initialize(FEM& fem);
 
+	//! serialize data to archive
+	void Serialize(DumpFile& ar);
+
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 
@@ -133,9 +136,6 @@ public:
 
 	//! reset element data
 	void Reset();
-
-	//! serialize data to archive
-	void Serialize(DumpFile& ar);
 
 	//! Unpack solid element data
 	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
@@ -357,6 +357,8 @@ public:
 
 	bool Initialize(FEM& fem);
 
+	void Serialize(DumpFile& ar);
+
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 
@@ -385,8 +387,6 @@ public:
 	void Reset();
 
 	void InitElements();
-
-	void Serialize(DumpFile& ar);
 
 	bool Initialize(FEM& fem);
 

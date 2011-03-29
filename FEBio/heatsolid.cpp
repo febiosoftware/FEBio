@@ -77,6 +77,7 @@ void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	el.UnpackTraitsData(nflag);
 }
 
+//-----------------------------------------------------------------------------
 void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 {
 	int i, j, k;
