@@ -497,6 +497,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 			}
 			assert(ps);
 			ps->Serialize(ar);
+			m_SL.push_back(ps);
 		}
 
 		// rigid body displacements

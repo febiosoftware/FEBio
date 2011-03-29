@@ -498,6 +498,7 @@ void FEMesh::Serialize(DumpFile& ar)
 			FEDomain& d = Domain(i);
 			int ntype = d.Type();
 			int ne = d.Elements();
+			ar << (int) d.GetMaterial()->GetID() - 1;
 			ar << ntype << ne;
 			d.Serialize(ar);
 		}
@@ -521,17 +522,22 @@ void FEMesh::Serialize(DumpFile& ar)
 		ar >> ND;
 		for (i=0; i<ND; ++i)
 		{
+			int nmat;
+			ar >> nmat;
+			FEMaterial* pm = fem.GetMaterial(nmat);
+			assert(pm);
+
 			int ntype, ne;
 			ar >> ntype >> ne;
 			FEDomain* pd = 0;
 			switch (ntype)
 			{
-			case FE_SOLID_DOMAIN      : pd = new FEElasticSolidDomain(this, 0); break;
-			case FE_SHELL_DOMAIN      : pd = new FEElasticShellDomain(this, 0); break;
-			case FE_TRUSS_DOMAIN      : pd = new FEElasticTrussDomain(this, 0); break;
-			case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain  (this, 0); break;
-			case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain  (this, 0); break;
-			case FE_3F_SOLID_DOMAIN   : pd = new FE3FieldElasticSolidDomain(this, 0); break;
+			case FE_SOLID_DOMAIN      : pd = new FEElasticSolidDomain(this, pm); break;
+			case FE_SHELL_DOMAIN      : pd = new FEElasticShellDomain(this, pm); break;
+			case FE_TRUSS_DOMAIN      : pd = new FEElasticTrussDomain(this, pm); break;
+			case FE_RIGID_SOLID_DOMAIN: pd = new FERigidSolidDomain  (this, pm); break;
+			case FE_RIGID_SHELL_DOMAIN: pd = new FERigidShellDomain  (this, pm); break;
+			case FE_3F_SOLID_DOMAIN   : pd = new FE3FieldElasticSolidDomain(this, pm); break;
 			default: assert(false);
 			}
 
