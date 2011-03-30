@@ -485,7 +485,7 @@ bool FEAnalysis::Solve()
 				else 
 				{
 					m_fem.Serialize(ar);
-					clog.printf("\nRestart point created. DumpFile name is %s\n", m_fem.m_szdump);
+					clog.printf("\nRestart point created. Archive name is %s\n", m_fem.m_szdump);
 				}
 			}
 
@@ -635,6 +635,9 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		ar >> m_nplot;
 		ar >> m_nprint;
 		ar >> m_bDump;
+#ifdef _DEBUG
+		m_bDump = false;
+#endif
 
 		// boundary conditions
 		int n, nbc;

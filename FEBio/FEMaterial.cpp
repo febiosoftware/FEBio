@@ -42,6 +42,9 @@ void FEMaterial::Serialize(DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{
+		ar << m_nID;
+		ar << m_szname;
+
 		// store all parameters
 		auto_ptr<FEParameterList> pl(GetParameterList());
 		int n = pl->Parameters();
@@ -67,6 +70,9 @@ void FEMaterial::Serialize(DumpFile &ar)
 	}
 	else
 	{
+		ar >> m_nID;
+		ar >> m_szname;
+
 		auto_ptr<FEParameterList> pl(GetParameterList());
 		int n = 0;
 		ar >> n;
@@ -138,4 +144,25 @@ void FEHydraulicPermeability::Init()
 mat3ds FEHydraulicPermeability::Tangent_Permeability_Concentration(FEMaterialPoint& pt)
 {
 	return mat3ds(0,0,0,0,0,0);
+}
+
+//-----------------------------------------------------------------------------
+void FENestedMaterial::Serialize(DumpFile &ar)
+{
+	// serialize base class
+	FESolidMaterial::Serialize(ar);
+
+	// serialize nested material data
+	if (ar.IsSaving())
+	{
+		ar << m_nBaseMat;
+		assert(m_pBase && (m_pBase->GetID() == m_nBaseMat));
+	}
+	else
+	{
+		ar >> m_nBaseMat;
+
+		// We can't set the base material here since it may not have been loaded yet
+		m_pBase = 0;
+	}
 }

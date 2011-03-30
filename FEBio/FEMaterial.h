@@ -161,6 +161,9 @@ public:
 	//! return solid component's density
 	double Density () { return m_pBase->Density(); }
 
+	//! serialization
+	void Serialize(DumpFile& ar);
+
 public:
 	int					m_nBaseMat;	//!< material ID of base material (one-based!)
 	FESolidMaterial*	m_pBase;	//!< pointer to base material

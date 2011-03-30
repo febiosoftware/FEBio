@@ -301,6 +301,17 @@ void FEM::SerializeMaterials(DumpFile& ar)
 			AddMaterial(pmat);
 			AddParameterList(pmat->GetParameterList());
 		}
+
+		// we still need to reset the material pointers for the nested materials
+		for (int i=0; i<nmat; ++i)
+		{
+			FENestedMaterial* pmat = dynamic_cast<FENestedMaterial*>(m_MAT[i]);
+			if (pmat)
+			{
+				pmat->m_pBase = dynamic_cast<FESolidMaterial*>(m_MAT[pmat->m_nBaseMat-1]);
+				assert(pmat->m_pBase);
+			}
+		}
 	}
 }
 
