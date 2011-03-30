@@ -121,6 +121,8 @@ bool FECore::PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 //-----------------------------------------------------------------------------
 void FECore::PardisoSolver::Destroy()
 {
+	// make sure we actually initialized the matrix data.
+	if (m_bvalid == false) return;
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
 
