@@ -169,8 +169,9 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Base class for fiber materials.
-//
+//! Base class for fiber materials.
+
+//! \todo I want to get rid if the m_plc variable and replace it by a material parameter
 class FEFiberMaterial : public FEMaterial
 {
 public:
