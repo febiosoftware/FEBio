@@ -94,6 +94,16 @@ void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioPlotFile::Dictionary::Clear()
+{
+	m_Glob.clear();
+	m_Mat.clear();
+	m_Node.clear();
+	m_Elem.clear();
+	m_Face.clear();
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
 FEBioPlotFile::FEBioPlotFile(void)
@@ -161,12 +171,6 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 	m_ar.EndChunk();
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool FEBioPlotFile::Append(FEM &fem, const char *szfile)
-{
-	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -631,4 +635,87 @@ void FEBioPlotFile::WriteSurfaceData(FEM& fem)
 		}
 		m_ar.EndChunk();
 	}
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::Append(FEM &fem, const char *szfile)
+{
+	// try to open the file
+	if (m_ar.Open(szfile) == false) return false;
+
+	// open the root element
+	m_ar.OpenChunk();
+	unsigned int nid = m_ar.GetChunkID();
+	if (nid != PLT_ROOT) return false;
+
+	bool bok = false;
+	while (m_ar.OpenChunk() == IO_OK)
+	{
+		nid = m_ar.GetChunkID();
+		if (nid == PLT_DICTIONARY)
+		{
+			// read the dictionary
+			bok = ReadDictionary();
+			break;
+		}
+		m_ar.CloseChunk();
+	}
+
+	// close it again ...
+	m_ar.Close();
+
+	// ... and open for appending
+	if (bok) return m_ar.Append(szfile);
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::ReadDictionary()
+{
+	m_dic.Clear();
+
+	while (m_ar.OpenChunk() == IO_OK)
+	{
+		unsigned int nid = m_ar.GetChunkID();
+		switch (nid)
+		{
+		case PLT_DIC_GLOBAL: assert(false); return false;
+		case PLT_DIC_MATERIAL: assert(false); return false; 
+		case PLT_DIC_NODAL: ReadDicList(); break;
+		case PLT_DIC_DOMAIN: ReadDicList(); break;
+		case PLT_DIC_SURFACE: ReadDicList(); break;
+		default:
+			assert(false);
+			return false;
+		}
+		m_ar.CloseChunk();
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::ReadDicList()
+{
+	while (m_ar.OpenChunk() == IO_OK)
+	{
+		unsigned int nid = m_ar.GetChunkID();
+		if (nid == PLT_DIC_ITEM)
+		{
+			while (m_ar.OpenChunk() == IO_OK)
+			{
+				unsigned int nid = m_ar.GetChunkID();
+				if (nid == PLT_DIC_ITEM_NAME)
+				{
+					char sz[STR_SIZE];
+					m_ar.read(sz, STR_SIZE);
+					AddVariable(sz);
+				}
+				m_ar.CloseChunk();
+			}
+		}
+		else return false;
+		m_ar.CloseChunk();
+	}
+	return true;
 }

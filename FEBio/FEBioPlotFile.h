@@ -94,6 +94,8 @@ public:
 
 		void Defaults(FEM& fem);
 
+		void Clear();
+
 	public:
 		const list<DICTIONARY_ITEM>& GlobalVariableList  () const { return m_Glob; }
 		const list<DICTIONARY_ITEM>& MaterialVariableList() const { return m_Mat;  }
@@ -158,6 +160,10 @@ protected:
 	void WriteNodeData    (FEM& fem);
 	void WriteDomainData  (FEM& fem);
 	void WriteSurfaceData (FEM& fem);
+
+protected:
+	bool ReadDictionary();
+	bool ReadDicList();
 
 protected:
 	Dictionary	m_dic;	// dictionary

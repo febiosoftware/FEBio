@@ -5,6 +5,7 @@
 #include <string.h>
 #include <list>
 #include <vector>
+#include <stack>
 using namespace std;
 
 //----------------------
@@ -168,8 +169,19 @@ protected:
 	int		m_nsize;
 };
 
+enum IOResult { IO_ERROR, IO_OK, IO_END };
+
 class Archive  
 {
+protected:
+	// CHUNK data structure for reading
+	struct CHUNK
+	{
+		unsigned int	id;		// chunk ID
+		long			lpos;	// file position of size field
+		unsigned int	nsize;	// size of chunk
+	};
+
 public:
 	Archive();
 	virtual ~Archive();
@@ -179,6 +191,8 @@ public:
 
 	// flush data to file
 	void Flush();
+
+	// --- Writing ---
 
 	// Open for writing
 	bool Create(const char* szfile);
@@ -209,9 +223,55 @@ public:
 		m_pChunk->AddChild(new OLeaf<vector<T> >(nid, a));
 	}
 
+	// --- Reading ---
+
+	// Open for reading
+	bool Open(const char* sfile);
+	bool Append(const char* szfile);
+
+	// Open a chunk
+	int OpenChunk();
+
+	// Get the current chunk ID
+	unsigned int GetChunkID();
+
+	// Close a chunk
+	void CloseChunk();
+
+	// input functions
+	IOResult read(char&   c) { int nr = (int) fread(&c, sizeof(char  ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(int&    n) { int nr = (int) fread(&n, sizeof(int   ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(bool&   b) { int nr = (int) fread(&b, sizeof(bool  ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(float&  f) { int nr = (int) fread(&f, sizeof(float ), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+	IOResult read(double& g) { int nr = (int) fread(&g, sizeof(double), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+
+	IOResult read(unsigned int& n) { size_t nr = fread(&n, sizeof(unsigned int), 1, m_fp); if (nr != 1) return IO_ERROR; return IO_OK; }
+
+	IOResult read(char*   pc, int n) { int nr = (int) fread(pc, sizeof(char  ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(int*    pi, int n) { int nr = (int) fread(pi, sizeof(int   ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(bool*   pb, int n) { int nr = (int) fread(pb, sizeof(bool  ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(float*  pf, int n) { int nr = (int) fread(pf, sizeof(float ), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
+	IOResult read(double* pg, int n) { int nr = (int) fread(pg, sizeof(double), n, m_fp); if (nr != n) return IO_ERROR; return IO_OK; }
+
+	IOResult read(char* sz)
+	{
+		IOResult ret;
+		int l, nr;
+		ret = read(l); if (ret != IO_OK) return ret;
+		nr = (int) fread(sz, 1, l, m_fp); if (nr != l) return IO_ERROR;
+		sz[l] = 0;
+		return IO_OK;
+	}
+
 protected:
 	FILE*	m_fp;		// the file pointer
+	bool	m_bSaving;	// read or write mode?
 
+	// write data
 	OBranch*	m_pRoot;	// chunk tree root
 	OBranch*	m_pChunk;	// current chunk
+
+	// read data
+	bool			m_bend;		// chunk end flag
+	stack<CHUNK*>	m_Chunk;
 };
