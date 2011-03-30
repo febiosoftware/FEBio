@@ -3538,7 +3538,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 						vec3d n;
 						tag.value(n);
 						n.unit();
-						pbf->I_nxn = mat3dd(1) - dyad(n);
+						pbf->n = n;
 					}
 					else if (tag == "rotation_center")
 					{

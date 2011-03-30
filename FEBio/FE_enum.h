@@ -182,4 +182,10 @@ enum FE_Print_Level {
 #define FE_SOLUTE_FLUX			5
 #define FE_HEAT_FLUX			6
 
+//-----------------------------------------------------------------------------
+//! body loads
+#define FE_CONST_BODY_FORCE			1
+#define FE_NONCONST_BODY_FORCE		2
+#define FE_CENTRIFUGAL_BODY_FORCE	3
+
 #endif // _FE_ENUM_H_05132007_

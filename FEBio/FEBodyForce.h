@@ -1,6 +1,7 @@
 #pragma once
 #include "FEMaterialPoint.h"
 #include "MathParser.h"
+#include "DumpFile.h"
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for body forces
@@ -18,6 +19,8 @@ public:
 	//! calculate the body force at a material point
 	virtual vec3d force(FEMaterialPoint& pt) = 0;
 	virtual mat3ds stiffness(FEMaterialPoint& pt) = 0;
+
+	virtual void Serialize(DumpFile& ar);
 
 public:
 	double	s[3];		// scale factor
@@ -45,6 +48,7 @@ public:
 	FENonConstBodyForce();
 	vec3d force(FEMaterialPoint& pt);
 	mat3ds stiffness(FEMaterialPoint& pt);
+	void Serialize(DumpFile& ar);
 
 public:
 	char	m_sz[3][256];
@@ -58,12 +62,13 @@ class FECentrifugalBodyForce : public FEBodyForce
 public:
 	vec3d force(FEMaterialPoint& mp) {
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		return I_nxn*(pt.rt - c);
+		mat3ds K = stiffness(mp);
+		return K*(pt.rt - c);
 	}
-	mat3ds stiffness(FEMaterialPoint& mp) { return I_nxn; }
+	mat3ds stiffness(FEMaterialPoint& mp) { return mat3dd(1) - dyad(n); }
+	void Serialize(DumpFile& ar);
 	
 public:
-	mat3ds	I_nxn;	// stiffness matrix
-	vec3d	c;		// point on axis of rotation (e.g., center of rotation)
+	vec3d	n;	// rotation axis
+	vec3d	c;	// point on axis of rotation (e.g., center of rotation)
 };
-

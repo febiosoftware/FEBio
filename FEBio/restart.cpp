@@ -183,6 +183,20 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		ar << m_nceq;
 		ar << m_bwopt;
 		ar << m_bsymm;
+
+		// body loads
+		ar << (int) m_BF.size();
+		for (int i=0; i<(int) m_BF.size(); ++i)
+		{
+			FEBodyForce* pbf = m_BF[i];
+			int ntype = -1;
+			if (dynamic_cast<FEConstBodyForce*>(pbf)) ntype = FE_CONST_BODY_FORCE;
+			if (dynamic_cast<FENonConstBodyForce*>(pbf)) ntype = FE_NONCONST_BODY_FORCE;
+			if (dynamic_cast<FECentrifugalBodyForce*>(pbf)) ntype = FE_CENTRIFUGAL_BODY_FORCE;
+			assert(ntype);
+			ar << ntype;
+			pbf->Serialize(ar);
+		}
 	}
 	else
 	{
@@ -207,6 +221,28 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		ar >> m_nceq;
 		ar >> m_bwopt;
 		ar >> m_bsymm;
+
+		// body loads
+		int nbl;
+		ar >> nbl;
+		m_BF.clear();
+		for (int i=0; i<nbl; ++i)
+		{
+			int ntype = -1;
+			ar >> ntype;
+			FEBodyForce* pbl = 0;
+			switch (ntype)
+			{
+			case FE_CONST_BODY_FORCE: pbl = new FEConstBodyForce; break;
+			case FE_NONCONST_BODY_FORCE: pbl = new FENonConstBodyForce; break;
+			case FE_CENTRIFUGAL_BODY_FORCE: pbl = new FECentrifugalBodyForce; break;
+			default:
+				assert(false);
+			}
+			assert(pbl);
+			pbl->Serialize(ar);
+			m_BF.push_back(pbl);
+		}
 
 		// set the correct step
 		m_pStep = m_Step[m_nStep];
