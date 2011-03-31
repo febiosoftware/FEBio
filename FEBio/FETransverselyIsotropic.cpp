@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FETransverselyIsotropic.h"
-#include "FEM.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
 // Material parameters for FETransverselyIsotropic
