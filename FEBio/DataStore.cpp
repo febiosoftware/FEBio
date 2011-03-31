@@ -19,6 +19,10 @@ DataStore::DataStore()
 
 DataStore::~DataStore()
 {
+}
+
+void DataStore::Clear()
+{
 	for (size_t i=0; i<m_data.size(); ++i) delete m_data[i];
 	m_data.clear();
 }
@@ -43,6 +47,52 @@ void DataStore::AddRecord(DataRecord* prec)
 	m_data.push_back(prec);
 }
 
+//-----------------------------------------------------------------------------
+
+void DataStore::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << (int) m_data.size();
+		for (int i=0; i<(int) m_data.size(); ++i)
+		{
+			DataRecord* pd = m_data[i];
+
+			int ntype = -1;
+			if (dynamic_cast<NodeDataRecord*>(pd)) ntype = FE_DATA_NODE;
+			if (dynamic_cast<ElementDataRecord*>(pd)) ntype = FE_DATA_ELEM;
+			if (dynamic_cast<RigidBodyDataRecord*>(pd)) ntype = FE_DATA_RB;
+			assert(ntype != -1);
+			ar << ntype;
+			pd->Serialize(ar);
+		}
+	}
+	else
+	{
+		FEM* pfem = ar.GetFEM();
+
+		int ndr;
+		Clear();
+		ar >> ndr;
+		for (int i=0; i<ndr; ++i)
+		{
+			int ntype;
+			ar >> ntype;
+
+			DataRecord* pd = 0;
+			switch(ntype)
+			{
+			case FE_DATA_NODE: pd = new NodeDataRecord(pfem, 0); break;
+			case FE_DATA_ELEM: pd = new ElementDataRecord(pfem, 0); break;
+			case FE_DATA_RB  : pd = new RigidBodyDataRecord(pfem, 0); break;
+			}
+			assert(pd);
+			pd->Serialize(ar);
+			AddRecord(pd);
+		}
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // DataRecord
 //////////////////////////////////////////////////////////////////////
@@ -50,9 +100,14 @@ void DataStore::AddRecord(DataRecord* prec)
 DataRecord::DataRecord(FEM* pfem, const char* szfile)
 {
 	m_pfem = pfem;
+	m_nid = 0;
+	m_szdata[0] = 0;
+	m_szname[0] = 0;
+	strcpy(m_szdelim," ");
+	m_bcomm = true;
+
 	m_fp = 0;
 	m_szfile[0] = 0;
-	m_bcomm = true;
 
 	if (szfile)
 	{
@@ -60,12 +115,6 @@ DataRecord::DataRecord(FEM* pfem, const char* szfile)
 		m_fp = fopen(szfile, "wt");
 		fprintf(m_fp, "*Title:%s\n", pfem->GetTitle());
 	}
-
-	m_nid = 0;
-	m_szdata[0] = 0;
-	m_szname[0] = 0;
-	m_szfile[0] = 0;
-	strcpy(m_szdelim," ");
 }
 
 DataRecord::~DataRecord()
@@ -210,6 +259,40 @@ void DataRecord::SetItemList(const char* szlist)
 }
 
 //-----------------------------------------------------------------------------
+
+void DataRecord::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_nid;
+		ar << m_szdata;
+		ar << m_szname;
+		ar << m_szdelim;
+		ar << m_szfile;
+		ar << m_bcomm;
+		ar << m_item;
+	}
+	else
+	{
+		ar >> m_nid;
+		ar >> m_szdata;
+		ar >> m_szname;
+		ar >> m_szdelim;
+		ar >> m_szfile;
+		ar >> m_bcomm;
+		ar >> m_item;
+
+		if (m_fp) fclose(m_fp);
+		m_fp = 0;
+		if (m_szfile[0] != 0)
+		{
+			// reopen data file for appending
+			m_fp = fopen(m_szfile, "a+");
+		}
+	}
+}
+
+//=============================================================================
 
 double NodeDataRecord::Evaluate(int item, const char* szexpr)
 {

@@ -11,11 +11,16 @@
 
 #include <stdio.h>
 #include "MathParser.h"
+#include "DumpFile.h"
 #include <vector>
 using namespace std;
 
 class FEM;
 class FENodeSet;
+
+#define FE_DATA_NODE	1
+#define FE_DATA_ELEM	2
+#define FE_DATA_RB		3
 
 //-----------------------------------------------------------------------------
 
@@ -34,6 +39,8 @@ public:
 	virtual double Evaluate(int item, const char* szexpr) = 0;
 
 	virtual void SelectAllItems() = 0;
+
+	virtual void Serialize(DumpFile& ar);
 
 public:
 	int		m_nid;					//!< ID of data record
@@ -86,9 +93,13 @@ public:
 	DataStore();
 	virtual ~DataStore();
 
+	void Clear();
+
 	void Write();
 
 	void AddRecord(DataRecord* prec);
+
+	void Serialize(DumpFile& ar);
 
 protected:
 	vector<DataRecord*>	m_data;	//!< the data records

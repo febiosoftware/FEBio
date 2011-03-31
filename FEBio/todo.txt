@@ -1,5 +1,4 @@
 * Fix the restart feature:
-- serialize data records
 - how to serialize FERigidBody::m_pDC + FERigidBody::m_prb
 
 * I should probably split the FEPressureLoad into two separate classes, one for the linear pressures and one for the nonlinear.

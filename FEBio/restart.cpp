@@ -607,8 +607,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-// TODO: serialize data records
-
+//! Serialization of FEM data
 void FEM::SerializeIOData(DumpFile &ar)
 {
 	if (ar.IsSaving())
@@ -631,6 +630,9 @@ void FEM::SerializeIOData(DumpFile &ar)
 			int* n = plt->m_nfield;
 			ar << n[0] << n[1] << n[2] << n[3] << n[4];
 		}
+
+		// data records
+		m_Data.Serialize(ar);
 	}
 	else
 	{
@@ -678,5 +680,8 @@ void FEM::SerializeIOData(DumpFile &ar)
 			}
 			break;
 		};
+
+		// data records
+		m_Data.Serialize(ar);
 	}
 }
