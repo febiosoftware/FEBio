@@ -155,6 +155,7 @@ void FEM::SerializeLoadData(DumpFile& ar)
 		// loadcurve data
 		int nlc;
 		ar >> nlc;
+		m_LC.clear();
 		for (int i=0; i<nlc; ++i)
 		{
 			FELoadCurve* plc = new FELoadCurve();
