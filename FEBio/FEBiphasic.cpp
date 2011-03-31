@@ -153,3 +153,35 @@ tens4ds FEBiphasic::Tangent_Permeability_Strain(FEMaterialPoint& pt)
 	return m_pPerm->Tangent_Permeability_Strain(pt);
 }
 
+
+//-----------------------------------------------------------------------------
+//! serialization
+void FEBiphasic::Serialize(DumpFile &ar)
+{
+	// serialize material parameters
+	FEMaterial::Serialize(ar);
+
+	// serialize sub-materials
+	if (ar.IsSaving())
+	{
+		ar << m_pSolid->GetTypeString();
+		m_pSolid->Serialize(ar);
+
+		ar << m_pPerm->GetTypeString();
+		m_pPerm->Serialize(ar);
+	}
+	else
+	{
+		char sz[256] = {0};
+
+		ar >> sz;
+		m_pSolid = dynamic_cast<FEElasticMaterial*>(FEMaterialFactory::CreateMaterial(sz));
+		assert(m_pSolid);
+		m_pSolid->Serialize(ar);
+
+		ar >> sz;
+		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(FEMaterialFactory::CreateMaterial(sz));
+		assert(m_pPerm);
+		m_pPerm->Serialize(ar);
+	}
+}

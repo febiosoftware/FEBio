@@ -245,54 +245,57 @@ class FEHydraulicPermeability : public FEMaterial
 //! Base class for biphasic materials.
 
 class FEBiphasic : public FEMaterial
-	{
-	public:
-		FEBiphasic();
-		
-		// returns a pointer to a new material point object
-		FEMaterialPoint* CreateMaterialPointData() 
-		{ 
-			return new FEPoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData());
-		}
-		
-	public:
-		void Init();
-		
-		//! calculate stress at material point
-		mat3ds Stress(FEMaterialPoint& pt);
-		
-		//! calculate tangent stiffness at material point
-		tens4ds Tangent(FEMaterialPoint& pt);
-		
-		//! calculate fluid flux
-		vec3d Flux(FEMaterialPoint& pt);
-		
-		//! calculate actual fluid pressure
-		double Pressure(FEMaterialPoint& pt);
-		
-		//! permeability
-		void Permeability(double k[3][3], FEMaterialPoint& pt);
-		
-		//! tangent of permeability
-		tens4ds Tangent_Permeability_Strain(FEMaterialPoint& pt);
-		
-		//! porosity
-		double Porosity(FEMaterialPoint& pt);
-		
-		//! fluid density
-		double FluidDensity() { return m_rhoTw; } 
-		
-	public:
-		double						m_rhoTw;	//!< true fluid density
-		FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
-		FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
-		
-		// declare as registered
-		DECLARE_REGISTERED(FEBiphasic);
-		
-		DECLARE_PARAMETER_LIST();
-		
-	};
+{
+public:
+	FEBiphasic();
+	
+	// returns a pointer to a new material point object
+	FEMaterialPoint* CreateMaterialPointData() 
+	{ 
+		return new FEPoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData());
+	}
+	
+public:
+	void Init();
+	
+	//! calculate stress at material point
+	mat3ds Stress(FEMaterialPoint& pt);
+	
+	//! calculate tangent stiffness at material point
+	tens4ds Tangent(FEMaterialPoint& pt);
+	
+	//! calculate fluid flux
+	vec3d Flux(FEMaterialPoint& pt);
+	
+	//! calculate actual fluid pressure
+	double Pressure(FEMaterialPoint& pt);
+	
+	//! permeability
+	void Permeability(double k[3][3], FEMaterialPoint& pt);
+	
+	//! tangent of permeability
+	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& pt);
+	
+	//! porosity
+	double Porosity(FEMaterialPoint& pt);
+	
+	//! fluid density
+	double FluidDensity() { return m_rhoTw; } 
+
+	//! Serialization
+	void Serialize(DumpFile& ar);
+	
+public:
+	double						m_rhoTw;	//!< true fluid density
+	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
+	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
+	
+	// declare as registered
+	DECLARE_REGISTERED(FEBiphasic);
+	
+	DECLARE_PARAMETER_LIST();
+	
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusivity.
@@ -361,66 +364,69 @@ class FEOsmoticCoefficient : public FEMaterial
 //! Base class for solute diffusion in biphasic materials.
 
 class FEBiphasicSolute : public FEMaterial
-	{
-	public:
-		FEBiphasicSolute();
-		
-		// returns a pointer to a new material point object
-		FEMaterialPoint* CreateMaterialPointData() 
-		{ 
-			return new FESolutePoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData());
-		}
-		
-	public:
-		void Init();
-		
-		//! calculate stress at material point
-		mat3ds Stress(FEMaterialPoint& pt);
-		
-		//! calculate tangent stiffness at material point
-		tens4ds Tangent(FEMaterialPoint& pt);
-		
-		//! calculate fluid (solvent) flux
-		vec3d FluidFlux(FEMaterialPoint& pt);
-		
-		//! calculate solute molar flux
-		vec3d SoluteFlux(FEMaterialPoint& pt);
-		
-		//! actual fluid pressure (as opposed to effective pressure)
-		double Pressure(FEMaterialPoint& pt);
-		
-		//! actual concentration (as opposed to effective concentration)
-		double Concentration(FEMaterialPoint& pt);
-		
-		//! porosity
-		double Porosity(FEMaterialPoint& pt);
-		
-		//! fluid density
-		double FluidDensity() { return m_rhoTw; }
-		
-		//! solute density
-		double SoluteDensity() { return m_rhoTu; }
-		
-		//! solute molecular weight
-		double SoluteMolecularWeight() { return m_Mu; }
-		
-	public:
-		double						m_rhoTw;		//!< true fluid density
-		double						m_rhoTu;		//!< true solute density
-		double						m_Mu;			//!< solute molecular weight
-		FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
-		FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
-		FESoluteDiffusivity*		m_pDiff;		//!< pointer to diffusivity material
-		FESoluteSolubility*			m_pSolub;		//!< pointer to solubility material
-		FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-		double						m_Rgas;			//!< universal gas constant
-		double						m_Tabs;			//!< absolute temperature
-		
-		// declare as registered
-		DECLARE_REGISTERED(FEBiphasicSolute);
-		
-		DECLARE_PARAMETER_LIST();
-		
-	};
+{
+public:
+	FEBiphasicSolute();
+	
+	// returns a pointer to a new material point object
+	FEMaterialPoint* CreateMaterialPointData() 
+	{ 
+		return new FESolutePoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData());
+	}
+	
+public:
+	void Init();
+	
+	//! calculate stress at material point
+	mat3ds Stress(FEMaterialPoint& pt);
+	
+	//! calculate tangent stiffness at material point
+	tens4ds Tangent(FEMaterialPoint& pt);
+	
+	//! calculate fluid (solvent) flux
+	vec3d FluidFlux(FEMaterialPoint& pt);
+	
+	//! calculate solute molar flux
+	vec3d SoluteFlux(FEMaterialPoint& pt);
+	
+	//! actual fluid pressure (as opposed to effective pressure)
+	double Pressure(FEMaterialPoint& pt);
+	
+	//! actual concentration (as opposed to effective concentration)
+	double Concentration(FEMaterialPoint& pt);
+	
+	//! porosity
+	double Porosity(FEMaterialPoint& pt);
+	
+	//! fluid density
+	double FluidDensity() { return m_rhoTw; }
+	
+	//! solute density
+	double SoluteDensity() { return m_rhoTu; }
+	
+	//! solute molecular weight
+	double SoluteMolecularWeight() { return m_Mu; }
+
+	//! Serialization
+	void Serialize(DumpFile& ar);
+	
+public:
+	double						m_rhoTw;		//!< true fluid density
+	double						m_rhoTu;		//!< true solute density
+	double						m_Mu;			//!< solute molecular weight
+	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
+	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
+	FESoluteDiffusivity*		m_pDiff;		//!< pointer to diffusivity material
+	FESoluteSolubility*			m_pSolub;		//!< pointer to solubility material
+	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
+	double						m_Rgas;			//!< universal gas constant
+	double						m_Tabs;			//!< absolute temperature
+	
+	// declare as registered
+	DECLARE_REGISTERED(FEBiphasicSolute);
+	
+	DECLARE_PARAMETER_LIST();
+	
+};
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

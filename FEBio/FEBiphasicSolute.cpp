@@ -251,3 +251,47 @@ double FEBiphasicSolute::Concentration(FEMaterialPoint& pt)
 	
 	return ca;
 }
+
+//-----------------------------------------------------------------------------
+//! Data serialization
+void FEBiphasicSolute::Serialize(DumpFile& ar)
+{
+	FEMaterial::Serialize(ar);
+
+	if (ar.IsSaving())
+	{
+		ar << m_Rgas << m_Tabs;
+
+		ar << m_pSolid->GetTypeString(); m_pSolid->Serialize(ar);
+		ar << m_pPerm ->GetTypeString(); m_pPerm ->Serialize(ar);
+		ar << m_pDiff ->GetTypeString(); m_pDiff ->Serialize(ar);
+		ar << m_pSolub->GetTypeString(); m_pSolub->Serialize(ar);
+		ar << m_pOsmC ->GetTypeString(); m_pOsmC ->Serialize(ar);
+
+	}
+	else
+	{
+		ar >> m_Rgas >> m_Tabs;
+
+		char sz[256] = {0};
+		ar >> sz;
+		m_pSolid = dynamic_cast<FEElasticMaterial*>(FEMaterialFactory::CreateMaterial(sz));
+		assert(m_pSolid); m_pSolid->Serialize(ar);
+
+		ar >> sz;
+		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(FEMaterialFactory::CreateMaterial(sz));
+		assert(m_pPerm); m_pPerm->Serialize(ar);
+
+		ar >> sz;
+		m_pDiff = dynamic_cast<FESoluteDiffusivity*>(FEMaterialFactory::CreateMaterial(sz));
+		assert(m_pDiff); m_pDiff->Serialize(ar);
+
+		ar >> sz;
+		m_pSolub = dynamic_cast<FESoluteSolubility*>(FEMaterialFactory::CreateMaterial(sz));
+		assert(m_pSolub); m_pSolub->Serialize(ar);
+
+		ar >> sz;
+		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(FEMaterialFactory::CreateMaterial(sz));
+		assert(m_pOsmC); m_pOsmC->Serialize(ar);
+	}
+}
