@@ -29,6 +29,8 @@ public:
 	//! Update the surface data
 	void Update();
 
+	void Serialize(DumpFile& ar);
+
 public:
 	vector<vec3d>		gap;	//!< gap function at nodes
 	vector<FEElement*>	pme;	//!< master element a slave node penetrates

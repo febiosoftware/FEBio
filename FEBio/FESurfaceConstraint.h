@@ -27,6 +27,8 @@ public:
 	//! calculates the center of mass of the surface
 	vec3d CenterOfMass();
 
+	void Serialize(DumpFile& ar);
+
 public:
 	vector<vec3d>				m_gap;	//!< gap function at nodes
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates

@@ -45,6 +45,8 @@ public:
 
 	void UpdateNormals();
 
+	void Serialize(DumpFile& ar);
+
 public:
 	vector<double>		gap;	//!< gap function at nodes
 	vector<vec3d>		nu;		//!< master normal at slave node

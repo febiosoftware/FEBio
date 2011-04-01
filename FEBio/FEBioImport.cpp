@@ -396,7 +396,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 
 	if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }
 	else if (tag == "time_steps"        ) tag.value(pstep->m_ntime);
-	else if (tag == "step_size"         ) tag.value(pstep->m_dt0);
+	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; }
 	else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_bfgs.m_LStol);
 	else if (tag == "lsmin"             ) tag.value(pstep->m_psolver->m_bfgs.m_LSmin);
 	else if (tag == "lsiter"            ) tag.value(pstep->m_psolver->m_bfgs.m_LSiter);

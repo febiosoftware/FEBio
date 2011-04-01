@@ -732,8 +732,7 @@ bool FETiedInterface::Augment(int naug)
 
 void FETiedInterface::Serialize(DumpFile &ar)
 {
-	int j, k, n, mat;
-
+	FEContactInterface::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_eps;
@@ -742,26 +741,8 @@ void FETiedInterface::Serialize(DumpFile &ar)
 		ar << nse;
 		ar << nme;
 
-		for (j=0; j<2; ++j)
-		{
-			FETiedContactSurface& s = (j==0? ss : ms);
-
-			int ne = s.Elements();
-			ar << ne;
-
-			for (k=0; k<ne; ++k)
-			{
-				FESurfaceElement& el = s.Element(k);
-				ar << el.Type();
-				ar << el.GetMatID() << el.m_nID << el.m_nrigid;
-				ar << el.m_node;
-				ar << el.m_lnode;
-			}
-
-			ar << s.gap;
-			ar << s.rs;
-			ar << s.Lm;
-		}
+		ms.Serialize(ar);
+		ss.Serialize(ar);
 	}
 	else
 	{
@@ -773,38 +754,7 @@ void FETiedInterface::Serialize(DumpFile &ar)
 
 		if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 
-		for (j=0; j<2; ++j)
-		{
-			FETiedContactSurface& s = (j==0? ss : ms);
-
-			int ne=0;
-			ar >> ne;
-			s.create(ne);
-
-			for (k=0; k<ne; ++k)
-			{
-				FESurfaceElement& el = s.Element(k);
-
-				ar >> n;
-				el.SetType(n);
-
-				ar >> mat >> el.m_nID >> el.m_nrigid;
-				ar >> el.m_node;
-				ar >> el.m_lnode;
-
-				el.SetMatID(mat);
-			}
-
-			// initialize surface
-			s.Init();
-
-			// read the contact data
-			// Note that we do this after Init() since this data gets 
-			// initialized to zero there
-			ar >> s.gap;
-			ar >> s.rs;
-			ar >> s.Lm;
-		}
-
+		ms.Serialize(ar);
+		ss.Serialize(ar);
 	}
 }

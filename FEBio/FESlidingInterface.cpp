@@ -167,6 +167,38 @@ void FESlidingSurface::UpdateNormals()
 	for (i=0; i<N; ++i) nu[i].unit();
 }
 
+//-----------------------------------------------------------------------------
+void FESlidingSurface::Serialize(DumpFile& ar)
+{
+	FESurface::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << gap;
+		ar << nu;
+		ar << rs;
+		ar << rsp;
+		ar << Lm;
+		ar << M;
+		ar << Lt;
+		ar << off;
+		ar << eps;
+	}
+	else
+	{
+		// read the contact data
+		// Note that we do this after Init() (called in FESurface::Serialize) since this data gets 
+		// initialized to zero there
+		ar >> gap;
+		ar >> nu;
+		ar >> rs;
+		ar >> rsp;
+		ar >> Lm;
+		ar >> M;
+		ar >> Lt;
+		ar >> off;
+		ar >> eps;
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // FESlidingInterface
@@ -1640,8 +1672,7 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 
 void FESlidingInterface::Serialize(DumpFile& ar)
 {
-	int j, k, n, mat;
-
+	FEContactInterface::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_npass;
@@ -1660,32 +1691,8 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 		ar << m_nsegup;
 		ar << m_nplc;
 
-		for (j=0; j<2; ++j)
-		{
-			FESlidingSurface& s = (j==0? m_ss : m_ms);
-
-			int ne = s.Elements();
-			ar << ne;
-
-			for (k=0; k<ne; ++k)
-			{
-				FESurfaceElement& el = s.Element(k);
-				ar << el.Type();
-				ar << el.GetMatID() << el.m_nID << el.m_nrigid;
-				ar << el.m_node;
-				ar << el.m_lnode;
-			}
-
-			ar << s.gap;
-			ar << s.nu;
-			ar << s.rs;
-			ar << s.rsp;
-			ar << s.Lm;
-			ar << s.M;
-			ar << s.Lt;
-			ar << s.off;
-			ar << s.eps;
-		}
+		m_ms.Serialize(ar);
+		m_ss.Serialize(ar);
 	}
 	else
 	{
@@ -1707,43 +1714,7 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 
 		if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 
-		for (j=0; j<2; ++j)
-		{
-			FESlidingSurface& s = (j==0? m_ss : m_ms);
-
-			int ne=0;
-			ar >> ne;
-			s.create(ne);
-
-			for (k=0; k<ne; ++k)
-			{
-				FESurfaceElement& el = s.Element(k);
-
-				ar >> n;
-				el.SetType(n);
-
-				ar >> mat >> el.m_nID >> el.m_nrigid;
-				ar >> el.m_node;
-				ar >> el.m_lnode;
-
-				el.SetMatID(mat);
-			}
-
-			// initialize surface
-			s.Init();
-
-			// read the contact data
-			// Note that we do this after Init() since this data gets 
-			// initialized to zero there
-			ar >> s.gap;
-			ar >> s.nu;
-			ar >> s.rs;
-			ar >> s.rsp;
-			ar >> s.Lm;
-			ar >> s.M;
-			ar >> s.Lt;
-			ar >> s.off;
-			ar >> s.eps;
-		}
+		m_ms.Serialize(ar);
+		m_ss.Serialize(ar);
 	}
 }

@@ -44,6 +44,26 @@ vec3d FESurfaceConstraintSurface::CenterOfMass()
 }
 
 //-----------------------------------------------------------------------------
+void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
+{
+	FESurface::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_gap;
+		ar << m_rs;
+		ar << m_Lm;
+		ar << m_nref;
+	}
+	else
+	{
+		ar >> m_gap;
+		ar >> m_rs;
+		ar >> m_Lm;
+		ar >> m_nref;
+	}
+}
+
+//-----------------------------------------------------------------------------
 // FESurfaceConstraint
 //-----------------------------------------------------------------------------
 
@@ -653,72 +673,24 @@ bool FESurfaceConstraint::Augment(int naug)
 //-----------------------------------------------------------------------------
 void FESurfaceConstraint::Serialize(DumpFile &ar)
 {
-	int j, k, n, mat;
-
 	if (ar.IsSaving())
 	{
 		ar << m_eps;
 		ar << m_atol;
+		ar << m_stol;
+		ar << m_npass;
 
-		for (j=0; j<2; ++j)
-		{
-			FESurfaceConstraintSurface& s = (j==0? m_ss : m_ms);
-
-			int ne = s.Elements();
-			ar << ne;
-
-			for (k=0; k<ne; ++k)
-			{
-				FESurfaceElement& el = s.Element(k);
-				ar << el.Type();
-				ar << el.GetMatID() << el.m_nID << el.m_nrigid;
-				ar << el.m_node;
-				ar << el.m_lnode;
-			}
-
-			ar << s.m_gap;
-			ar << s.m_rs;
-			ar << s.m_Lm;
-			ar << s.m_nref;
-		}
+		m_ms.Serialize(ar);
+		m_ss.Serialize(ar);
 	}
 	else
 	{
 		ar >> m_eps;
 		ar >> m_atol;
+		ar >> m_stol;
+		ar >> m_npass;
 
-		for (j=0; j<2; ++j)
-		{
-			FESurfaceConstraintSurface& s = (j==0? m_ss : m_ms);
-
-			int ne=0;
-			ar >> ne;
-			s.create(ne);
-
-			for (k=0; k<ne; ++k)
-			{
-				FESurfaceElement& el = s.Element(k);
-
-				ar >> n;
-				el.SetType(n);
-
-				ar >> mat >> el.m_nID >> el.m_nrigid;
-				ar >> el.m_node;
-				ar >> el.m_lnode;
-
-				el.SetMatID(mat);
-			}
-
-			// initialize surface
-			s.Init();
-
-			// read the contact data
-			// Note that we do this after Init() since this data gets
-			// initialized to zero there
-			ar >> s.m_gap;
-			ar >> s.m_rs;
-			ar >> s.m_Lm;
-			ar >> s.m_nref;
-		}
+		m_ms.Serialize(ar);
+		m_ss.Serialize(ar);
 	}
 }

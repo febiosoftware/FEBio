@@ -26,3 +26,21 @@ void FETiedContactSurface::Init()
 	zero(gap);
 	zero(Lm);
 }
+
+//-----------------------------------------------------------------------------
+void FETiedContactSurface::Serialize(DumpFile &ar)
+{
+	FESurface::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << gap;
+		ar << rs;
+		ar << Lm;
+	}
+	else
+	{
+		ar >> gap;
+		ar >> rs;
+		ar >> Lm;
+	}
+}

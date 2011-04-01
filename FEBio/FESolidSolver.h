@@ -13,6 +13,9 @@ public:
 	FESolidSolver(FEM& fem);
 	virtual ~FESolidSolver(){}
 
+	//! serialize data to/from dump file
+	void Serialize(DumpFile& ar);
+
 	//! Initializes data structures
 	bool Init();
 
@@ -98,10 +101,6 @@ public:
 		//! Calculate linear constraint forces
 		void LinearConstraintForces(vector<double>& R);
 	//}
-
-public:
-	//! serialize data to/from dump file
-	void Serialize(DumpFile& ar);
 
 public:
 	// convergence tolerances

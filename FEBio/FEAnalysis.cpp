@@ -74,7 +74,8 @@ bool FEAnalysis::Init()
 	int i, j, n;
 
 	// set first time step
-	m_dt = m_dt0;
+	// We can't do this since it will mess up the value from a restart
+//	m_dt = m_dt0;
 
 	m_tend = m_fem.m_ftime0 + m_dt0*m_ntime;
 
@@ -454,15 +455,6 @@ bool FEAnalysis::Solve()
 			// Yes! We have converged!
 			clog.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
 
-			// update nr of completed timesteps
-			m_ntimesteps++;
-
-			// update time step
-			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
-
-			// reset retry counter
-			m_nretries = 0;
-
 			// output results to plot database
 			if (m_nplot != FE_PLOT_NEVER)
 			{
@@ -491,6 +483,15 @@ bool FEAnalysis::Solve()
 
 			// store additional data to the logfile
 			m_fem.m_Data.Write();
+
+			// update nr of completed timesteps
+			m_ntimesteps++;
+
+			// update time step
+			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
+
+			// reset retry counter
+			m_nretries = 0;
 
 			// call callback function
 			m_fem.DoCallback();

@@ -19,6 +19,8 @@ public:
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 
+	void Serialize(DumpFile& ar);
+
 protected:
 	FEM*	m_pfem;
 

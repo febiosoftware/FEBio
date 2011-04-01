@@ -20,6 +20,8 @@ public:
 
 	void ShallowCopy(FEFacetSlidingSurface& s);
 
+	void Serialize(DumpFile& ar);
+
 public:
 	vector<double>				m_gap;	//!< gap function at integration points
 	vector<vec3d>				m_nu;	//!< master normal at integration points

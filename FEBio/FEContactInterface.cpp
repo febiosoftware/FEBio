@@ -71,3 +71,18 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 
 	return eps;
 }
+
+//-----------------------------------------------------------------------------
+void FEContactInterface::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_nID;
+		ar << m_blaugon;
+	}
+	else
+	{
+		ar >> m_nID;
+		ar >> m_blaugon;
+	}
+}

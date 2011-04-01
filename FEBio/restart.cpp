@@ -388,13 +388,13 @@ void FEM::SerializeContactData(DumpFile &ar)
 			// create a new interface
 			switch (ntype)
 			{
-			case FE_CONTACT_SLIDING  : ps = new FESlidingInterface(this); break;
+			case FE_CONTACT_SLIDING    : ps = new FESlidingInterface(this); break;
 			case FE_FACET2FACET_SLIDING: ps = new FEFacet2FacetSliding(this); break;
-			case FE_CONTACT_TIED     : ps = new FETiedInterface(this); break;
-			case FE_CONTACT_RIGIDWALL: ps = new FERigidWallInterface(this); break;
-			case FE_CONTACT_SLIDING2 : ps = new FESlidingInterface2(this); break;
-			case FE_PERIODIC_BOUNDARY: ps = new FEPeriodicBoundary(this); break;
-			case FE_SURFACE_CONSTRAINT: ps = new FESurfaceConstraint(this); break;
+			case FE_CONTACT_TIED       : ps = new FETiedInterface(this); break;
+			case FE_CONTACT_RIGIDWALL  : ps = new FERigidWallInterface(this); break;
+			case FE_CONTACT_SLIDING2   : ps = new FESlidingInterface2(this); break;
+			case FE_PERIODIC_BOUNDARY  : ps = new FEPeriodicBoundary(this); break;
+			case FE_SURFACE_CONSTRAINT : ps = new FESurfaceConstraint(this); break;
 			default:
 				assert(false);
 			}

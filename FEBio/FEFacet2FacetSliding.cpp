@@ -92,6 +92,29 @@ FEElement* FEFacetSlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r
 }
 
 //-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::Serialize(DumpFile& ar)
+{
+	FESurface::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_gap;
+		ar << m_nu;
+		ar << m_rs;
+		ar << m_Lm;
+		ar << m_eps;
+	}
+	else
+	{
+		ar >> m_gap;
+		ar >> m_nu;
+		ar >> m_rs;
+		ar >> m_Lm;
+		ar >> m_eps;
+		// TODO: Do I need to call Init here?
+	}
+}
+
+//-----------------------------------------------------------------------------
 // FEFacet2FacetSliding
 //-----------------------------------------------------------------------------
 
@@ -853,5 +876,40 @@ bool FEFacet2FacetSliding::Augment(int naug)
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::Serialize(DumpFile &ar)
 {
+	FEContactInterface::Serialize(ar);
 
+	if (ar.IsSaving())
+	{
+		ar << m_epsn;
+		ar << m_knmult;
+		ar << m_stol;
+		ar << m_npass;
+		ar << m_bautopen;
+		ar << m_srad;
+		ar << m_atol;
+		ar << m_gtol;
+		ar << m_naugmin;
+		ar << m_naugmax;
+		ar << m_dxtol;
+
+		m_ms.Serialize(ar);
+		m_ss.Serialize(ar);
+	}
+	else
+	{
+		ar >> m_epsn;
+		ar >> m_knmult;
+		ar >> m_stol;
+		ar >> m_npass;
+		ar >> m_bautopen;
+		ar >> m_srad;
+		ar >> m_atol;
+		ar >> m_gtol;
+		ar >> m_naugmin;
+		ar >> m_naugmax;
+		ar >> m_dxtol;
+
+		m_ms.Serialize(ar);
+		m_ss.Serialize(ar);
+	}
 }

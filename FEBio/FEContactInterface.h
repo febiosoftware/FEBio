@@ -55,8 +55,7 @@ public:
 	virtual bool Augment(int naug) = 0;
 
 	//! serialize data to archive
-	virtual void Serialize(DumpFile& ar) = 0;
-
+	virtual void Serialize(DumpFile& ar);
 
 protected:
 	//! don't call the default constructor
