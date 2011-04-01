@@ -643,7 +643,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		// boundary conditions
 		int n, nbc;
 		ar >> n;
-		if (n) m_BC.resize(n);
+		m_BC.clear();
 		for (int i=0; i<n; ++i)
 		{
 			ar >> nbc;

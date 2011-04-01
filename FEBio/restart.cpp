@@ -477,6 +477,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		for (i=0; i<(int) m_RN.size(); ++i)
 		{
 			FERigidNode& rn = *m_RN[i];
+			ar << rn.GetID() << rn.IsActive();
 			ar << rn.nid << rn.rid;
 		}
 
@@ -573,8 +574,12 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		m_RN.clear();
 		for (i=0; i<n; ++i)
 		{
+			int nid; bool bactive;
 			FERigidNode* prn = new FERigidNode;
+			ar >> nid >> bactive;
 			ar >> prn->nid >> prn->rid;
+			prn->SetID(nid);
+			if (bactive) prn->Activate(); else prn->Deactivate();
 			m_RN.push_back(prn);
 		}
 
