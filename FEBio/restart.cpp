@@ -119,6 +119,9 @@ bool FEM::Serialize(DumpFile& ar)
 	// --- Load Data ---
 	SerializeLoadData(ar);
 
+	// --- Serialize global constants ---
+	SerializeConstants(ar);
+
 	// --- Material Data ---
 	SerializeMaterials(ar);
 
@@ -161,6 +164,40 @@ void FEM::SerializeLoadData(DumpFile& ar)
 			FELoadCurve* plc = new FELoadCurve();
 			plc->Serialize(ar);
 			AddLoadCurve(plc);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEM::SerializeConstants(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		int NC = (int) m_Const.size();
+		ar << NC;
+		if (NC > 0)
+		{
+			char sz[256] = {0};
+			map<string, double>::iterator it;
+			for (it = m_Const.begin(); it != m_Const.end(); ++it)
+			{
+				strcpy(sz, it->first.c_str());
+				ar << sz;
+				ar << it->second;
+			}
+		}
+	}
+	else
+	{
+		char sz[256] = {0};
+		double v;
+		int NC;
+		ar >> NC;
+		m_Const.clear();
+		for (int i=0; i<NC; ++i)
+		{
+			ar >> sz >> v;
+			SetGlobalConstant(string(sz), v);
 		}
 	}
 }
@@ -297,6 +334,9 @@ void FEM::SerializeMaterials(DumpFile& ar)
 
 			// read all parameters
 			pmat->Serialize(ar);
+
+			// call init in case this function initializes other data
+			pmat->Init();
 
 			// Add material and parameter list to FEM
 			AddMaterial(pmat);

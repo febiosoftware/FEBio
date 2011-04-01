@@ -178,10 +178,12 @@ void FEBiphasic::Serialize(DumpFile &ar)
 		m_pSolid = dynamic_cast<FEElasticMaterial*>(FEMaterialFactory::CreateMaterial(sz));
 		assert(m_pSolid);
 		m_pSolid->Serialize(ar);
+		m_pSolid->Init();
 
 		ar >> sz;
 		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(FEMaterialFactory::CreateMaterial(sz));
 		assert(m_pPerm);
 		m_pPerm->Serialize(ar);
+		m_pPerm->Init();
 	}
 }

@@ -9,6 +9,7 @@
 #include "FEHeatSolver.h"
 #include "FEPoroElastic.h"
 #include "FEPoroSolidSolver.h"
+#include "FEPoroSoluteSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -660,8 +661,10 @@ void FEAnalysis::Serialize(DumpFile& ar)
 			m_psolver = new FESolidSolver(m_fem); 
 			break;
 		case FE_POROELASTIC:
-		case FE_POROSOLUTE:
 			m_psolver = new FEPoroSolidSolver(m_fem);
+			break;
+		case FE_POROSOLUTE:
+			m_psolver = new FEPoroSoluteSolver(m_fem);
 			break;
 		case FE_HEAT:
 			m_psolver = new FEHeatSolver(m_fem);

@@ -277,21 +277,26 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 		ar >> sz;
 		m_pSolid = dynamic_cast<FEElasticMaterial*>(FEMaterialFactory::CreateMaterial(sz));
 		assert(m_pSolid); m_pSolid->Serialize(ar);
+		m_pSolid->Init();
 
 		ar >> sz;
 		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(FEMaterialFactory::CreateMaterial(sz));
 		assert(m_pPerm); m_pPerm->Serialize(ar);
+		m_pPerm->Init();
 
 		ar >> sz;
 		m_pDiff = dynamic_cast<FESoluteDiffusivity*>(FEMaterialFactory::CreateMaterial(sz));
 		assert(m_pDiff); m_pDiff->Serialize(ar);
+		m_pDiff->Init();
 
 		ar >> sz;
 		m_pSolub = dynamic_cast<FESoluteSolubility*>(FEMaterialFactory::CreateMaterial(sz));
 		assert(m_pSolub); m_pSolub->Serialize(ar);
+		m_pSolub->Init();
 
 		ar >> sz;
 		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(FEMaterialFactory::CreateMaterial(sz));
 		assert(m_pOsmC); m_pOsmC->Serialize(ar);
+		m_pOsmC->Init();
 	}
 }

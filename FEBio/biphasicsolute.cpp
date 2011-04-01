@@ -982,7 +982,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			ppt.m_pa = pmb->Pressure(mp);
 			ppt.m_j = pmb->SoluteFlux(mp);
 			ppt.m_ca = pmb->Concentration(mp);
-			
+
 			// calculate the stress at this material point (must be done after evaluating m_pa)
 			pt.s = pmb->Stress(mp);
 		}

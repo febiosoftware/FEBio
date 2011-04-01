@@ -69,6 +69,8 @@ void FESolidDomain::Serialize(DumpFile &ar)
 	FEM& fem = *ar.GetFEM();
 	if (ar.IsSaving())
 	{
+		ar << m_Node;
+
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
 			FESolidElement& el = m_Elem[i];
@@ -89,6 +91,8 @@ void FESolidDomain::Serialize(DumpFile &ar)
 	}
 	else
 	{
+		ar >> m_Node;
+
 		int n, mat;
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{

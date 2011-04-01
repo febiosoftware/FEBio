@@ -195,6 +195,7 @@ protected:
 	void SerializeBoundaryData(DumpFile& ar);
 	void SerializeIOData      (DumpFile& ar);
 	void SerializeLoadData    (DumpFile& ar);
+	void SerializeConstants   (DumpFile& ar);
 
 public:
 	//{ --- Initialization routines ---
