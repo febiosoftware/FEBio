@@ -455,6 +455,9 @@ bool FEAnalysis::Solve()
 			// Yes! We have converged!
 			clog.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
 
+			// update nr of completed timesteps
+			m_ntimesteps++;
+
 			// output results to plot database
 			if (m_nplot != FE_PLOT_NEVER)
 			{
@@ -483,9 +486,6 @@ bool FEAnalysis::Solve()
 
 			// store additional data to the logfile
 			m_fem.m_Data.Write();
-
-			// update nr of completed timesteps
-			m_ntimesteps++;
 
 			// update time step
 			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);

@@ -1680,12 +1680,12 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 		ar << m_naugmin;
 		ar << m_gtol;
 		ar << m_atol;
-		ar << m_blaugon;
 		ar << m_ktmult;
 		ar << m_knmult;
 		ar << m_stol;
 		ar << m_nautopen;
 		ar << m_eps;
+		ar << m_breloc;
 		ar << m_mu;
 		ar << m_epsf;
 		ar << m_nsegup;
@@ -1701,12 +1701,12 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 		ar >> m_naugmin;
 		ar >> m_gtol;
 		ar >> m_atol;
-		ar >> m_blaugon;
 		ar >> m_ktmult;
 		ar >> m_knmult;
 		ar >> m_stol;
 		ar >> m_nautopen;
 		ar >> m_eps;
+		ar >> m_breloc;
 		ar >> m_mu;
 		ar >> m_epsf;
 		ar >> m_nsegup;
