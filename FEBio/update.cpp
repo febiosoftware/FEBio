@@ -44,7 +44,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	int ndis = m_fem.m_DC.size();
 	for (i=0; i<ndis; ++i)
 	{
-		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
 		if (dc.IsActive())
 		{
 			int n    = dc.node;
@@ -182,7 +182,7 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 	int ndis = m_fem.m_DC.size();
 	for (i=0; i<ndis; ++i)
 	{
-		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
 		if (dc.IsActive())
 		{
 			int n    = dc.node;
@@ -358,7 +358,7 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 	int ndis = m_fem.m_DC.size();
 	for (i=0; i<ndis; ++i)
 	{
-		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
 		if (dc.IsActive())
 		{
 			int n    = dc.node;

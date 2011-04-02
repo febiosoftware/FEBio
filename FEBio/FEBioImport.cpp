@@ -2229,7 +2229,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		if (sz == 0) lc = 0;
 		else lc = atoi(sz);
 
-		FENodalDisplacement* pdc = new FENodalDisplacement;
+		FEPrescribedBC* pdc = new FEPrescribedBC;
 		pdc->node = n;
 		pdc->bc = bc;
 		pdc->lc = lc;

@@ -37,7 +37,7 @@ bool FEHeatSolver::SolveStep(double time)
 	zero(m_u);
 	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
 	{
-		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
 		if (dc.IsActive())
 		{
 			int n    = dc.node;

@@ -14,14 +14,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! prescribed nodal displacement data
+//! prescribed boundary condition data
 
-class FENodalDisplacement : public FEBoundaryCondition
+class FEPrescribedBC : public FEBoundaryCondition
 {
 public:
 	double	s;		// scale factor
 	int		node;	// node number
-	int		bc;		// displacement direction
+	int		bc;		// dof
 	int		lc;		// load curve
 };
 

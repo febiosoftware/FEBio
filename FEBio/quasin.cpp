@@ -120,7 +120,7 @@ void FESolidSolver::PrepStep(double time)
 	zero(ui);
 	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
-		FENodalDisplacement& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
 		if (dc.IsActive())
 		{
 			int n    = dc.node;

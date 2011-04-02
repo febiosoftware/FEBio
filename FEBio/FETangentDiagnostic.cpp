@@ -115,7 +115,7 @@ void FETangentDiagnostic::BuildUniaxial()
 	int nd[4] = {1, 2, 5, 6};
 	for (i=0; i<4; ++i)
 	{
-		FENodalDisplacement* pdc = new FENodalDisplacement;
+		FEPrescribedBC* pdc = new FEPrescribedBC;
 		pdc->node = nd[i];
 		pdc->bc = 0;
 		pdc->lc = 0;
@@ -181,7 +181,7 @@ void FETangentDiagnostic::BuildSimpleShear()
 	int nd[4] = {4, 5, 6, 7};
 	for (i=0; i<4; ++i)
 	{
-		FENodalDisplacement* pdc = new FENodalDisplacement;
+		FEPrescribedBC* pdc = new FEPrescribedBC;
 		pdc->node = nd[i];
 		pdc->bc = 0;
 		pdc->lc = 0;

@@ -290,7 +290,7 @@ public:
 	// --- Boundary Condition Data ---
 	//{
 		// displacement boundary data
-		vector<FENodalDisplacement*>		m_DC;	//!< prescribed displacement cards
+		vector<FEPrescribedBC*>		m_DC;	//!< prescribed displacement cards
 
 		// concentrated nodal loads data
 		vector<FENodalForce*>	m_FC;		//!< concentrated nodal force cards

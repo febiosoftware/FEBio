@@ -461,7 +461,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		ar << (int) m_DC.size();
 		for (i=0; i<(int) m_DC.size(); ++i) 
 		{
-			FENodalDisplacement& dc = *m_DC[i];
+			FEPrescribedBC& dc = *m_DC[i];
 			ar << dc.bc << dc.lc << dc.node << dc.s;
 		}
 
@@ -545,7 +545,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		m_DC.clear();
 		for (i=0; i<n; ++i) 
 		{
-			FENodalDisplacement* pdc = new FENodalDisplacement;
+			FEPrescribedBC* pdc = new FEPrescribedBC;
 			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s;
 			m_DC.push_back(pdc);
 		}

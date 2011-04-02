@@ -88,7 +88,7 @@ void FEMicroMaterial::PrepRVE()
 		{
 			for (int j=0; j<3; ++j, ++NN)
 			{
-				FENodalDisplacement* pdc = new FENodalDisplacement();
+				FEPrescribedBC* pdc = new FEPrescribedBC();
 				pdc->bc = j;
 				pdc->lc = 0;	// we use the zeroth loadcurve
 				pdc->node = i;
@@ -155,9 +155,9 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	int N = m_rve.m_DC.size()/3, i;
 	for (i=0; i<N; ++i)
 	{
-		FENodalDisplacement& dx = *m_rve.m_DC[3*i  ];
-		FENodalDisplacement& dy = *m_rve.m_DC[3*i+1];
-		FENodalDisplacement& dz = *m_rve.m_DC[3*i+2];
+		FEPrescribedBC& dx = *m_rve.m_DC[3*i  ];
+		FEPrescribedBC& dy = *m_rve.m_DC[3*i+1];
+		FEPrescribedBC& dz = *m_rve.m_DC[3*i+2];
 
 		FENode& node = m.Node(dx.node);
 
@@ -228,7 +228,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	mat3ds s(0);
 	for (int i=0; i<(int) m_rve.m_DC.size()/3; ++i)
 	{
-		FENodalDisplacement& dc = *m_rve.m_DC[3*i];
+		FEPrescribedBC& dc = *m_rve.m_DC[3*i];
 		FENode& n = m.Node(dc.node);
 		vec3d f;
 		f.x = R[-n.m_ID[0]-2];
