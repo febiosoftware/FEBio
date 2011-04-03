@@ -618,7 +618,7 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 				ar >> pl.m_nplc;
 				if (pl.m_nplc >= 0) pl.m_pplc = m_pfem->GetLoadCurve(pl.m_nplc);
 				double* a = pl.GetEquation();
-				ar >> a[0] >> a[1] >> a[2] >> a[4];
+				ar >> a[0] >> a[1] >> a[2] >> a[3];
 			}
 			break;
 		case FE_RIGID_SPHERE:
