@@ -265,9 +265,6 @@ public:
 		// rigid joints
 		int							m_nrj;	//!< nr of rigid joints
 		vector<FERigidJoint*>		m_RJ;	//!< rigid joint array
-
-		// discrete elements
-		vector<FEDiscreteMaterial*>		m_DMAT;	//!< discrete materials
 	//}
 
 	//{ --- Contact Data --

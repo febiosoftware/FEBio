@@ -39,7 +39,8 @@ void FEDiscreteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		double DL = Lt - L0;
 		
 		// evaluate the spring stiffness
-		FEDiscreteMaterial* pm = fem.m_DMAT[el.GetMatID()];
+		FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fem.GetMaterial(el.GetMatID()));
+		assert(pm);
 		double F = pm->force(DL);
 
 		// set up the force vector
@@ -108,7 +109,8 @@ void FEDiscreteDomain::StiffnessMatrix(FESolidSolver* psolver)
 		double DL = Lt - L0;
 
 		// evaluate the stiffness
-		FEDiscreteMaterial* pm = fem.m_DMAT[el.GetMatID()];
+		FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fem.GetMaterial(el.GetMatID()));
+		assert(pm);
 		double F = pm->force(DL);
 		double E = pm->stiffness(DL);
 

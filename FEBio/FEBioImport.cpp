@@ -2708,8 +2708,9 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	de.SetType(FE_DISCRETE);
 	
 	// add a new material for each spring
-	fem.m_DMAT.push_back(pm);
-	de.SetMatID(fem.m_DMAT.size()-1);
+	fem.AddMaterial(pm);
+	pm->SetID(fem.Materials());
+	de.SetMatID(fem.Materials()-1);
 
 	int n[2];
 

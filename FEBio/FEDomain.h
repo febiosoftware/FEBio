@@ -563,6 +563,8 @@ public:
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 
+	void Serialize(DumpFile& ar);
+
 protected:
 	vector<int>					m_Node;
 	vector<FEDiscreteElement>	m_Elem;

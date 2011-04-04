@@ -191,15 +191,18 @@ bool FEM::InitMaterials()
 	// initialize discrete materials
 	try
 	{
-		for (i=0; i<(int) m_DMAT.size(); ++i)
+		for (i=0; i<(int) m_MAT.size(); ++i)
 		{
-			FEDiscreteMaterial* pm = m_DMAT[i];
-			if (dynamic_cast<FENonLinearSpring*>(pm))
+			FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(m_MAT[i]);
+			if (pm)
 			{
-				FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
-				ps->m_plc = GetLoadCurve(ps->m_nlc);
+				if (dynamic_cast<FENonLinearSpring*>(pm))
+				{
+					FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
+					ps->m_plc = GetLoadCurve(ps->m_nlc);
+				}
+				pm->Init();
 			}
-			pm->Init();
 		}
 	}
 	catch (...)

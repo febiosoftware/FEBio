@@ -23,6 +23,12 @@ public:
 
 public:
 	double m_E;	//!< spring constant
+
+	// declare as registered
+	DECLARE_REGISTERED(FELinearSpring);
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -36,6 +42,12 @@ public:
 
 public:
 	double m_E;	//!< spring constant
+
+	// declare as registered
+	DECLARE_REGISTERED(FETensionOnlyLinearSpring);
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -49,8 +61,16 @@ public:
 	double stiffness(double dl);
 	void Init();
 
+	void Serialize(DumpFile& ar);
+
 public:
 	double			m_F;	// force scale factor
 	int				m_nlc; // load curve ID
 	FELoadCurve*	m_plc; // force-displacement curve
+
+	// declare as registered
+	DECLARE_REGISTERED(FENonLinearSpring);
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };

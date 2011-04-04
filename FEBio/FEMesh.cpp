@@ -498,7 +498,8 @@ void FEMesh::Serialize(DumpFile& ar)
 			FEDomain& d = Domain(i);
 			int ntype = d.Type();
 			int ne = d.Elements();
-			ar << (int) d.GetMaterial()->GetID() - 1;
+			int nmat = (int) d.GetMaterial()->GetID() - 1; 
+			ar << nmat;
 			ar << ntype << ne;
 			d.Serialize(ar);
 		}

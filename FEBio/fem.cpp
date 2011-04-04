@@ -155,7 +155,6 @@ FEM::~FEM()
 	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
 	for (i=0; i<m_MPL.size (); ++i) delete m_MPL[i] ; m_MPL.clear ();
 	for (i=0; i<m_LC.size  (); ++i) delete m_LC[i]  ; m_LC.clear  ();
-	for (i=0; i<m_DMAT.size(); ++i) delete m_DMAT[i]; m_DMAT.clear();
 }
 
 //-----------------------------------------------------------------------------
