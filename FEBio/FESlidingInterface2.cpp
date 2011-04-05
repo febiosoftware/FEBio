@@ -11,6 +11,7 @@
 
 FESlidingSurface2::FESlidingSurface2(FEM* pfem) : FESurface(&pfem->m_mesh)
 { 
+	m_bporo = false;
 	m_pfem = pfem; 
 }
 
@@ -52,7 +53,8 @@ void FESlidingSurface2::Init()
 	zero(m_nu);
 
 	// allocate biphasic stuff
-	if ((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE))
+	if (m_bporo)
+//	if ((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE))
 	{
 		m_pg.assign(nint, 0);
 	}
@@ -64,8 +66,10 @@ void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 	m_Lmd = s.m_Lmd;
 	m_gap = s.m_gap;
 	zero(m_pme);
+	m_bporo = s.m_bporo;
 
-	if ((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE))
+//	if ((m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE))
+	if (m_bporo)
 	{
 		m_pg  = s.m_pg;
 		m_Lmp = s.m_Lmp;
@@ -112,7 +116,21 @@ void FESlidingSurface2::UpdateNodeNormals()
 //-----------------------------------------------------------------------------
 void FESlidingSurface2::Serialize(DumpFile& ar)
 {
+	// We need to store the m_bporo flag first 
+	// since we need it before we initialize the surface data
+	if (ar.IsSaving())
+	{
+		ar << m_bporo;
+	}
+	else
+	{
+		ar >> m_bporo;
+	}
+
+	// Next, we can serialize the base-class data
 	FESurface::Serialize(ar);
+
+	// And finally, we serialize the surface data
 	if (ar.IsSaving())
 	{
 		ar << m_gap;
@@ -125,6 +143,7 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar << m_epsp;
 		ar << m_nn;
 		ar << m_pg;
+		ar << m_bporo;
 	}
 	else
 	{
@@ -138,6 +157,7 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar >> m_epsp;
 		ar >> m_nn;
 		ar >> m_pg;
+		ar >> m_bporo;
 	}
 }
 
@@ -240,11 +260,15 @@ void OnSlidingInterface2Callback(FEM* pfem, void* pd)
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::Init()
 {
+	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
+
+	// note that we first need to set the "mode" 
+	m_ss.SetPoroMode(bporo);
+	m_ms.SetPoroMode(bporo);
+
 	// initialize surface data
 	m_ss.Init();
 	m_ms.Init();
-
-	bool bporo = (m_pfem->m_pStep->m_nModule == FE_POROELASTIC) || (m_pfem->m_pStep->m_nModule == FE_POROSOLUTE);
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class

@@ -21,10 +21,14 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	void SetPoroMode(bool bporo) { m_bporo = bporo; }
+
 protected:
 	FEM*	m_pfem;
 
 public:
+	bool				m_bporo;	//!< set poro-mode
+
 	vector<double>				m_gap;	//!< gap function at integration points
 	vector<vec3d>				m_nu;	//!< normal at integration points
 	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
