@@ -3406,7 +3406,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
-		else if (tag == "pressure")
+		else if (tag == "fluid_pressure")
 		{
 			++tag;
 			do

@@ -391,6 +391,7 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 			m_calc.SetVariable("sxy", pt.s.xy());
 			m_calc.SetVariable("syz", pt.s.yz());
 			m_calc.SetVariable("sxz", pt.s.xz());
+			m_calc.SetVariable("J", pt.J);
 			m_calc.SetVariable("Ex", E.xx());
 			m_calc.SetVariable("Ey", E.yy());
 			m_calc.SetVariable("Ez", E.zz());
@@ -440,12 +441,16 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
 
 			E = pt.Strain();
+			m_calc.SetVariable("x", pt.rt.x);
+			m_calc.SetVariable("y", pt.rt.y);
+			m_calc.SetVariable("z", pt.rt.z);
 			m_calc.SetVariable("sx", pt.s.xx());
 			m_calc.SetVariable("sy", pt.s.yy());
 			m_calc.SetVariable("sz", pt.s.zz());
 			m_calc.SetVariable("sxy", pt.s.xy());
 			m_calc.SetVariable("syz", pt.s.yz());
 			m_calc.SetVariable("sxz", pt.s.xz());
+			m_calc.SetVariable("J", pt.J);
 			m_calc.SetVariable("Ex", E.xx());
 			m_calc.SetVariable("Ey", E.yy());
 			m_calc.SetVariable("Ez", E.zz());
