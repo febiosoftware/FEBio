@@ -6,6 +6,7 @@
 #include "FEMesh.h"
 #include "FEException.h"
 #include "fem.h"
+#include "ut4.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -545,6 +546,7 @@ void FEMesh::Serialize(DumpFile& ar)
 			case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(this, pm); break;
 			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicDomain          (this, pm); break;
 			case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (this, pm); break;
+			case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (this, pm); break;
 			default: assert(false);
 			}
 

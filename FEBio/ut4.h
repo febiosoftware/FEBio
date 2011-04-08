@@ -35,6 +35,9 @@ public:
 		return pd;
 	}
 
+	//! data serialization
+	void Serialize(DumpFile& ar);
+
 	//! return the node-element list for this domain
 	FENodeElemList& GetNodeElemList() { return m_NEL; }
 

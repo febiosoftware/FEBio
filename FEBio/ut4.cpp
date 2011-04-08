@@ -129,6 +129,40 @@ FEUT4Domain::FEUT4Domain(FEMesh *pm, FEMaterial* pmat) : FEElasticSolidDomain(pm
 }
 
 //-----------------------------------------------------------------------------
+void FEUT4Domain::Serialize(DumpFile& ar)
+{
+	FEElasticSolidDomain::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_alpha << m_bdev;
+		ar << m_tag;
+		ar << (int) m_Node.size();
+		for (int i=0; i<(int) m_Node.size(); ++i)
+		{
+			UT4NODE& n = m_Node[i];
+			ar << n.inode << n.Vi << n.vi << n.Fi << n.si;
+		}
+	}
+	else
+	{
+		ar >> m_alpha >> m_bdev;
+		ar >> m_tag;
+		int nodes;
+		ar >> nodes;
+		m_Node.clear();
+		if (nodes > 0) m_Node.resize(nodes);
+		for (int i=0; i<nodes; ++i)
+		{
+			UT4NODE& n = m_Node[i];
+			ar >> n.inode >> n.Vi >> n.vi >> n.Fi >> n.si;
+		}
+
+		// create the node-element list
+		m_NEL.Create(*this);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
 bool FEUT4Domain::Initialize(FEM& fem)
