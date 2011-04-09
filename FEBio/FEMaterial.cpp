@@ -120,6 +120,39 @@ void FEElasticMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticMaterial::Serialize(DumpFile& ar)
+{
+	FEMaterial::Serialize(ar);
+	if (ar.IsSaving())
+	{
+		ar << m_density << m_unstable;
+		int ntype = -1;
+		if (m_pmap) ntype = m_pmap->m_ntype;
+		else ntype = FE_MAP_NONE;
+		assert(ntype != -1);
+		ar << ntype;
+		if (m_pmap) m_pmap->Serialize(ar);
+	}
+	else
+	{
+		ar >> m_density >> m_unstable;
+		int ntype;
+		ar >> ntype;
+		if (m_pmap) delete m_pmap;
+		m_pmap = 0;
+		assert(ntype != -1);
+		switch (ntype)
+		{
+		case FE_MAP_NONE  : m_pmap = 0; break;
+		case FE_MAP_LOCAL : m_pmap = new FELocalMap    (); break;
+		case FE_MAP_SPHERE: m_pmap = new FESphericalMap(); break;
+		case FE_MAP_VECTOR: m_pmap = new FEVectorMap   (); break;
+		}
+		if (m_pmap) m_pmap->Serialize(ar);
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Material parameters for the FENestedMaterial
 BEGIN_PARAMETER_LIST(FENestedMaterial, FEMaterial)
 	ADD_PARAMETER(m_nBaseMat, FE_PARAM_INT, "solid_id");

@@ -462,6 +462,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		for (i=0; i<(int) m_DC.size(); ++i) 
 		{
 			FEPrescribedBC& dc = *m_DC[i];
+			ar << dc.GetID() << dc.IsActive();
 			ar << dc.bc << dc.lc << dc.node << dc.s;
 		}
 
@@ -470,6 +471,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		for (i=0; i<(int) m_FC.size(); ++i)
 		{
 			FENodalForce& fc = *m_FC[i];
+			ar << fc.GetID() << fc.IsActive();
 			ar << fc.bc << fc.lc << fc.node << fc.s;
 		}
 
@@ -493,6 +495,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 			if (dynamic_cast<FEHeatFlux*          >(psl)) ntype = FE_HEAT_FLUX;
 			assert(ntype != -1);
 			ar << ntype;
+			ar << psl->GetID() << psl->IsActive();
 			psl->Serialize(ar);
 		}
 
@@ -542,13 +545,18 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 	else
 	{
 		int n;
+		int nid; bool bactive;
+
 		// displacements
 		ar >> n;
 		m_DC.clear();
 		for (i=0; i<n; ++i) 
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC;
+			ar >> nid >> bactive;
 			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s;
+			pdc->SetID(nid);
+			if (bactive) pdc->Activate(); else pdc->Deactivate();
 			m_DC.push_back(pdc);
 		}
 		
@@ -558,7 +566,10 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		for (i=0; i<n; ++i)
 		{
 			FENodalForce* pfc = new FENodalForce;
+			ar >> nid >> bactive;
 			ar >> pfc->bc >> pfc->lc >> pfc->node >> pfc->s;
+			pfc->SetID(nid);
+			if (bactive) pfc->Activate(); else pfc->Deactivate();
 			m_FC.push_back(pfc);
 		}
 
@@ -587,6 +598,11 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 				assert(false);
 			}
 			assert(ps);
+
+			ar >> nid >> bactive;
+			ps->SetID(nid);
+			if (bactive) ps->Activate(); else ps->Deactivate();
+
 			ps->Serialize(ar);
 			m_SL.push_back(ps);
 		}
@@ -596,7 +612,6 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		m_RDC.clear();
 		for (i=0; i<n; ++i)
 		{
-			int nid; bool bactive;
 			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement;
 			ar >> nid >> bactive;
 			ar >> pdc->bc >> pdc->id >> pdc->lc >> pdc->sf;
@@ -610,7 +625,6 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		m_RFC.clear();
 		for (i=0; i<n; ++i)
 		{
-			int nid; bool bactive;
 			FERigidBodyForce* pfc = new FERigidBodyForce;
 			ar >> nid >> bactive;
 			ar >> pfc->bc >> pfc->id >> pfc->lc >> pfc->sf;
@@ -624,7 +638,6 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		m_RN.clear();
 		for (i=0; i<n; ++i)
 		{
-			int nid; bool bactive;
 			FERigidNode* prn = new FERigidNode;
 			ar >> nid >> bactive;
 			ar >> prn->nid >> prn->rid;

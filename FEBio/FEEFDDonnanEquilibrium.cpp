@@ -30,6 +30,14 @@ void FEEFDDonnanEquilibrium::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEEFDDonnanEquilibrium::Serialize(DumpFile& ar)
+{
+	FEElasticMaterial::Serialize(ar);
+	m_Fib.Serialize(ar);
+	m_DEQ.Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEEFDDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 {
 	// --- M A T R I X   C O N T R I B U T I O N ---

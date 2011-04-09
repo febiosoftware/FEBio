@@ -9,7 +9,7 @@
 // FELocalMap
 //////////////////////////////////////////////////////////////////////
 
-FELocalMap::FELocalMap()
+FELocalMap::FELocalMap() : FECoordSysMap(FE_MAP_LOCAL)
 {
 	m_n[0] = 0;
 	m_n[1] = 1;
@@ -56,6 +56,18 @@ mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 	return Q;
 }
 
+void FELocalMap::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_n[0] << m_n[1] << m_n[2];
+	}
+	else
+	{
+		ar >> m_n[0] >> m_n[1] >> m_n[2];
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // FESphericalMap
 //////////////////////////////////////////////////////////////////////
@@ -92,6 +104,18 @@ mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 	return Q;
 }
 
+void FESphericalMap::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_c;
+	}
+	else
+	{
+		ar >> m_c;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // FEVectorMap
 //////////////////////////////////////////////////////////////////////
@@ -114,4 +138,16 @@ mat3d FEVectorMap::LocalElementCoord(FEElement& el, int n)
 	Q[2][0] = a.z; Q[2][1] = b.z; Q[2][2] = c.z;
 
 	return Q;
+}
+
+void FEVectorMap::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_a << m_d;
+	}
+	else
+	{
+		ar >> m_a >> m_d;
+	}
 }

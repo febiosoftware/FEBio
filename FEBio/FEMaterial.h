@@ -134,6 +134,8 @@ public:
 
 	double Density() { return m_density; } 
 
+	void Serialize(DumpFile& ar);
+
 public:
 	double	m_density;	//!< material density
 	bool	m_unstable;	//!< flag indicating whether material is unstable on its own

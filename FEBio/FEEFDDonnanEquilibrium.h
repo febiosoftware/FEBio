@@ -27,6 +27,9 @@ public:
 
 	//! return bulk modulus
 	virtual double BulkModulus();
+
+	//! serialization
+	void Serialize(DumpFile& ar);
 		
 public:
 		
