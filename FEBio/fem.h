@@ -11,6 +11,7 @@
 #include "FEMesh.h"
 #include "FEContactInterface.h"
 #include "FEMaterial.h"
+#include "FEBiphasic.h"
 #include "FERigidBody.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
@@ -84,9 +85,6 @@ public:
 
 	//! Add a material to the model
 	void AddMaterial(FEMaterial* pm) { m_MAT.push_back(pm); }
-
-	//! Add a parameter list
-	void AddParameterList(FEParameterList* pl) { m_MPL.push_back(pl); }
 
 	//! get the number of materials
 	int Materials() { return m_MAT.size(); }
@@ -275,7 +273,6 @@ protected:
 	// --- Material Data ---
 	//{
 		vector<FEMaterial*>			m_MAT;	//!< array of materials
-		vector<FEParameterList*>	m_MPL;	//!< material parameter lists
 	//}
 
 	// --- Load Curve Data ---

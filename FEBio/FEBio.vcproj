@@ -2499,6 +2499,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBiphasic.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBodyForce.h"
 				>
 			</File>

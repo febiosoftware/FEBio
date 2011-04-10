@@ -1,5 +1,5 @@
 #pragma once
-#include "FEMaterial.h"
+#include "FEBiphasic.h"
 
 //-----------------------------------------------------------------------------
 // This class implements a material that has a constant diffusivity

@@ -690,15 +690,14 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 	FEM& fem = *GetFEM();
 
 	// get the material's parameter list
-	FEParameterList* pl = pmat->GetParameterList();
-	fem.AddParameterList(pl);
+	FEParameterList& pl = pmat->GetParameterList();
 
 	// loop over all parameters
 	++tag;
 	do
 	{
 		// see if we can find this parameter
-		FEParam* pp = pl->Find(tag.Name());
+		FEParam* pp = pl.Find(tag.Name());
 		if (pp)
 		{
 			switch (pp->m_itype)

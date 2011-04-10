@@ -25,13 +25,25 @@ FEMaterial::FEMaterial()
 	static int n = 1;
 	m_szname[0] = 0;
 	m_nID = -1;
+	m_pParam = 0;
 }
 
 //-----------------------------------------------------------------------------
-FEParameterList* FEMaterial::GetParameterList()
+FEMaterial::~FEMaterial()
 {
-	FEParameterList* pl = new FEParameterList;
-	return pl;
+	if (m_pParam) delete m_pParam;
+	m_pParam = 0;
+}
+
+//-----------------------------------------------------------------------------
+FEParameterList& FEMaterial::GetParameterList()
+{
+	if (m_pParam == 0) 
+	{
+		m_pParam = new FEParameterList;
+		BuildParamList();
+	}
+	return *m_pParam;
 }
 
 const char* FEMaterial::GetTypeString() { return "material base"; }
@@ -46,10 +58,10 @@ void FEMaterial::Serialize(DumpFile &ar)
 		ar << m_szname;
 
 		// store all parameters
-		auto_ptr<FEParameterList> pl(GetParameterList());
-		int n = pl->Parameters();
+		FEParameterList& pl = GetParameterList();
+		int n = pl.Parameters();
 		ar << n;
-		list<FEParam>::iterator it = pl->first();
+		list<FEParam>::iterator it = pl.first();
 		for (int j=0; j<n; ++j, ++it)
 		{
 			// store the value
@@ -73,11 +85,11 @@ void FEMaterial::Serialize(DumpFile &ar)
 		ar >> m_nID;
 		ar >> m_szname;
 
-		auto_ptr<FEParameterList> pl(GetParameterList());
+		FEParameterList& pl = GetParameterList();
 		int n = 0;
 		ar >> n;
-		assert(n == pl->Parameters());
-		list<FEParam>::iterator it = pl->first();
+		assert(n == pl.Parameters());
+		list<FEParam>::iterator it = pl.first();
 		for (int j=0; j<n; ++j, ++it)
 		{
 			// read the value
@@ -157,27 +169,6 @@ void FEElasticMaterial::Serialize(DumpFile& ar)
 BEGIN_PARAMETER_LIST(FENestedMaterial, FEMaterial)
 	ADD_PARAMETER(m_nBaseMat, FE_PARAM_INT, "solid_id");
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-// Material parameters for FEHydraulicPermeability
-BEGIN_PARAMETER_LIST(FEHydraulicPermeability, FEMaterial)
-	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
-END_PARAMETER_LIST();
-
-void FEHydraulicPermeability::Init()
-{
-	FEMaterial::Init();
-	
-	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
-}
-
-//-----------------------------------------------------------------------------
-// Derivative of permeability w.r.t. solute concentration at material point
-// Set this to zero by default because poroelasticity problems do not require it
-mat3ds FEHydraulicPermeability::Tangent_Permeability_Concentration(FEMaterialPoint& pt)
-{
-	return mat3ds(0,0,0,0,0,0);
-}
 
 //-----------------------------------------------------------------------------
 void FENestedMaterial::Serialize(DumpFile &ar)

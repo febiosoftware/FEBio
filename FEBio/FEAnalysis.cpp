@@ -375,11 +375,12 @@ bool FEAnalysis::Solve()
 		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(m_fem.m_ftime);
 
 		// evaluate parameter lists
-		for (i=0; i<(int) m_fem.m_MPL.size(); ++i)
+		for (i=0; i<m_fem.Materials(); ++i)
 		{
-			FEParameterList* pl = m_fem.m_MPL[i];
-			list<FEParam>::iterator pi = pl->first();
-			for (j=0; j<pl->Parameters(); ++j, ++pi)
+			FEParameterList& pl = m_fem.m_MAT[i]->GetParameterList();
+
+			list<FEParam>::iterator pi = pl.first();
+			for (j=0; j<pl.Parameters(); ++j, ++pi)
 			{
 				if (pi->m_nlc >= 0)
 				{

@@ -255,12 +255,12 @@ void echo_input(FEM& fem)
 		clog.printf("\n");
 
 		// print the parameter list
-		auto_ptr<FEParameterList> pl(pmat->GetParameterList());
-		int n = pl->Parameters();
+		FEParameterList& pl = pmat->GetParameterList();
+		int n = pl.Parameters();
 		if (n > 0)
 		{
 			char sz[256];
-			list<FEParam>::iterator it = pl->first();
+			list<FEParam>::iterator it = pl.first();
 			for (int j=0; j<n; ++j, ++it)
 			{
 				int l = strlen(it->m_szname);

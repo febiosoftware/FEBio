@@ -75,23 +75,23 @@ protected:
 
 // the following macro declares the parameter list for a material
 #define DECLARE_PARAMETER_LIST() \
-public: \
-	virtual FEParameterList* GetParameterList();
+protected: \
+	virtual void BuildParamList();
 
 // the BEGIN_PARAMETER_LIST defines the beginning of a parameter list
 #define BEGIN_PARAMETER_LIST(theClass, baseClass) \
-	FEParameterList* theClass::GetParameterList() { \
-		FEParameterList* pl = baseClass::GetParameterList(); \
+	void theClass::BuildParamList() { \
+			baseClass::BuildParamList(); \
 
 // the ADD_PARAMETER macro adds a parameter to the parameter list
 #define ADD_PARAMETER(theParam, theType, theName) \
-	pl->AddParameter(&theParam, theType, 1, theName);
+	m_pParam->AddParameter(&theParam, theType, 1, theName);
 
 // the ADD_PARAMETERV macro adds a parameter to the paramter list
 // that is an array
 #define ADD_PARAMETERV(theParam, theType, theDim, theName) \
-	pl->AddParameter(theParam, theType, theDim, theName);
+	m_pParam->AddParameter(theParam, theType, theDim, theName);
 
 // the END_PARAMETER_LIST defines the end of a parameter list
 #define END_PARAMETER_LIST() \
-	return pl; }
+	}

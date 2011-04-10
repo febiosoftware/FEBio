@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "FEMaterial.h"
+#include "FEBiphasic.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEBiphasic, "biphasic");
@@ -186,4 +186,26 @@ void FEBiphasic::Serialize(DumpFile &ar)
 		m_pPerm->Serialize(ar);
 		m_pPerm->Init();
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Material parameters for FEHydraulicPermeability
+BEGIN_PARAMETER_LIST(FEHydraulicPermeability, FEMaterial)
+	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
+END_PARAMETER_LIST();
+
+void FEHydraulicPermeability::Init()
+{
+	FEMaterial::Init();
+	
+	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
+}
+
+//-----------------------------------------------------------------------------
+// Derivative of permeability w.r.t. solute concentration at material point
+// Set this to zero by default because poroelasticity problems do not require it
+mat3ds FEHydraulicPermeability::Tangent_Permeability_Concentration(FEMaterialPoint& pt)
+{
+	return mat3ds(0,0,0,0,0,0);
 }

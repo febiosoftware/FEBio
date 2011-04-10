@@ -153,7 +153,6 @@ FEM::~FEM()
 	for (i=0; i<m_RJ.size  (); ++i) delete m_RJ[i]  ; m_RJ.clear  ();
 	for (i=0; i<m_CI.size  (); ++i) delete m_CI[i]  ; m_CI.clear  ();
 	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
-	for (i=0; i<m_MPL.size (); ++i) delete m_MPL[i] ; m_MPL.clear ();
 	for (i=0; i<m_LC.size  (); ++i) delete m_LC[i]  ; m_LC.clear  ();
 }
 
@@ -313,10 +312,10 @@ double* FEM::FindParameter(const char* szparam)
 	}
 
 	// get the material's parameter list
-	auto_ptr<FEParameterList> pl(pmat->GetParameterList());
+	FEParameterList& pl = pmat->GetParameterList();
 
 	// find the parameter
-	FEParam* pp = pl->Find(szvar);
+	FEParam* pp = pl.Find(szvar);
 
 	if (pp)
 	{

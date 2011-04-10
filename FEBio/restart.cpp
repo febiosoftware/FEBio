@@ -340,7 +340,6 @@ void FEM::SerializeMaterials(DumpFile& ar)
 
 			// Add material and parameter list to FEM
 			AddMaterial(pmat);
-			AddParameterList(pmat->GetParameterList());
 		}
 
 		// we still need to reset the material pointers for the nested materials
