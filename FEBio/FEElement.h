@@ -305,7 +305,7 @@ public:
 class FESurfaceElement : public FEElement
 {
 public:
-	FESurfaceElement() { m_nelem = -1; }
+	FESurfaceElement() { m_nelem = -1; m_lid = -1; }
 
 	FESurfaceElement(const FESurfaceElement& el)
 	{
@@ -318,6 +318,7 @@ public:
 		m_node = el.m_node;
 		m_nID = el.m_nID;
 		m_gid = el.m_gid;
+		m_lid = el.m_lid;
 
 		// copy surface element data
 		m_nelem = el.m_nelem;
@@ -336,6 +337,7 @@ public:
 		m_node = el.m_node;
 		m_nID = el.m_nID;
 		m_gid = el.m_gid;
+		m_lid = el.m_lid;
 
 		// copy surface element data
 		m_nelem = el.m_nelem;
@@ -493,6 +495,7 @@ public:
 	}
 
 public:
+	int		m_lid;			//!< local ID
 	int		m_nelem;		//!< index of solid or shell element this surface element is a face of
 	vector<int>	m_lnode;	//!< local node numbering (compared to m_node which is a global numbering)
 };

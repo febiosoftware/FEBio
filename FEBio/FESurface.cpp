@@ -27,6 +27,7 @@ void FESurface::Init()
 	for (i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
+		el.m_lid = i;
 
 		for (j=0; j<el.Nodes(); ++j)
 		{

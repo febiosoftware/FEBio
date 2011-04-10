@@ -70,6 +70,9 @@ void FESlidingSurface::Init()
 	// always intialize base class first!
 	FESurface::Init();
 
+	// make sure the sibling surface has been set
+	assert(m_pSibling);
+
 	// get the number of nodes
 	int nn = Nodes();
 
@@ -182,6 +185,14 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		ar << Lt;
 		ar << off;
 		ar << eps;
+
+		int ne = (int) pme.size();
+		ar << ne;
+		for (int i=0; i<ne; ++i)
+		{
+			FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pme[i]);
+			if (pe) ar << pe->m_lid; else ar << -1;
+		}
 	}
 	else
 	{
@@ -197,6 +208,17 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		ar >> Lt;
 		ar >> off;
 		ar >> eps;
+
+		assert(m_pSibling);
+
+		int ne = 0, id;
+		ar >> ne;
+		assert(ne == pme.size());
+		for (int i=0; i<ne; ++i)
+		{
+			ar >> id;
+			if (id < 0) pme[i] = 0; else pme[i] = &m_pSibling->Element(id);
+		}
 	}
 }
 
@@ -231,6 +253,10 @@ FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_
 	m_nsegup = 0;	// always do segment updates
 	m_nautopen = 0;	// don't use auto-penalty
 	m_nID = count++;
+
+	// set the siblings
+	m_ms.SetSibling(&m_ss);
+	m_ss.SetSibling(&m_ms);
 };
 
 //-----------------------------------------------------------------------------

@@ -18,7 +18,10 @@ class FESlidingSurface : public FESurface
 {
 public:
 	//! constructor
-	FESlidingSurface(FEMesh* pm=0) : FESurface(pm) { m_NQ.Attach(this); }
+	FESlidingSurface(FEMesh* pm=0) : FESurface(pm) { m_NQ.Attach(this); m_pSibling = 0; }
+
+	//! Set the sibling surface
+	void SetSibling(FESlidingSurface* ps) { m_pSibling = ps; }
 
 	//! Initializes data structures
 	void Init();
@@ -56,6 +59,8 @@ public:
 	vector<vec2d>		Lt;		//!< Lagrange multipliers for friction
 	vector<double>		off;	//!< gap offset (= shell thickness)
 	vector<double>		eps;	//!< normal penalty factors
+
+	FESlidingSurface*	m_pSibling;	//!< sibling surface, i.e. other surface in contact pair
 
 	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node
 };
