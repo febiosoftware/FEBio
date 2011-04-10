@@ -213,6 +213,7 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		for (int i=0; i<(int) m_Step.size(); ++i) m_Step[i]->Serialize(ar);
 		ar << m_nStep;
 		ar << m_ftime << m_ftime0;
+		ar << m_bsym_poro << m_nplane_strain;
 
 		// direct solver data
 		ar << m_nsolver;
@@ -251,6 +252,7 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		}
 		ar >> m_nStep;
 		ar >> m_ftime >> m_ftime0;
+		ar >> m_bsym_poro >> m_nplane_strain;
 
 		// direct solver data
 		ar >> m_nsolver;
