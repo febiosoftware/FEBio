@@ -15,7 +15,7 @@
 void FESurfaceConstraintSurface::Init()
 {
 	// always intialize base class first!
-	FESurface::Init();
+	FEContactSurface::Init();
 
 	// get the number of nodes
 	int nn = Nodes();
@@ -46,13 +46,21 @@ vec3d FESurfaceConstraintSurface::CenterOfMass()
 //-----------------------------------------------------------------------------
 void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
 {
-	FESurface::Serialize(ar);
+	FEContactSurface::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_gap;
 		ar << m_rs;
 		ar << m_Lm;
 		ar << m_nref;
+
+		int ne = (int) m_pme.size();
+		ar << ne;
+		for (int i=0; i<ne; ++i)
+		{
+			FESurfaceElement* pe = m_pme[i];
+			if (pe) ar << pe->m_lid; else ar << -1;
+		}
 	}
 	else
 	{
@@ -60,6 +68,22 @@ void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
 		ar >> m_rs;
 		ar >> m_Lm;
 		ar >> m_nref;
+
+		assert(m_pSibling);
+
+		int ne = 0, id;
+		ar >> ne;
+		assert(ne == m_pme.size());
+		for (int i=0; i<ne; ++i)
+		{
+			ar >> id;
+			if (id < 0) m_pme[i] = 0; 
+			else 
+			{
+				m_pme[i] = &m_pSibling->Element(id);
+				assert(m_pme[i]->m_lid == id);
+			}
+		}
 	}
 }
 
@@ -78,6 +102,9 @@ FESurfaceConstraint::FESurfaceConstraint(FEM* pfem) : FEContactInterface(pfem), 
 	m_npass = 1;
 
 	m_nID = count++;
+
+	m_ss.SetSibling(&m_ms);
+	m_ms.SetSibling(&m_ss);
 }
 
 //-----------------------------------------------------------------------------
@@ -91,7 +118,6 @@ void FESurfaceConstraint::Init()
 	ProjectSurface(m_ss, m_ms, false);
 	ProjectSurface(m_ms, m_ss, false);
 }
-
 
 //-----------------------------------------------------------------------------
 //! project surface

@@ -5,11 +5,11 @@
 #include "vec2d.h"
 
 //-----------------------------------------------------------------------------
-class FEPeriodicSurface : public FESurface
+class FEPeriodicSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FEPeriodicSurface(FEMesh* pm = 0) : FESurface(pm) {}
+	FEPeriodicSurface(FEMesh* pm = 0) : FEContactSurface(pm) {}
 
 	//! initializes data
 	void Init();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FESurface.h"
+#include "FEContactSurface.h"
 #include "vec2d.h"
 
 //-----------------------------------------------------------------------------
@@ -10,11 +10,11 @@
 //!	this class is used in contact analyses to describe a contacting
 //! surface in a tied contact interface.
 
-class FETiedContactSurface : public FESurface
+class FETiedContactSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FETiedContactSurface(FEMesh* pm=0) : FESurface(pm) {}
+	FETiedContactSurface(FEMesh* pm=0) : FEContactSurface(pm) {}
 
 	//! Initializes data structures
 	void Init();
@@ -32,8 +32,8 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
-	vector<vec3d>		gap;	//!< gap function at nodes
-	vector<FEElement*>	pme;	//!< master element a slave node penetrates
-	vector<vec2d>		rs;		//!< natural coordinates of slave projection on master element
-	vector<vec3d>		Lm;		//!< Lagrange multipliers
+	vector<vec3d>				gap;	//!< gap function at nodes
+	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
+	vector<vec2d>				rs;		//!< natural coordinates of slave projection on master element
+	vector<vec3d>				Lm;		//!< Lagrange multipliers
 };

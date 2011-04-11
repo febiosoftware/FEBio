@@ -286,11 +286,11 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 						for (j=0; j<ss.Nodes(); ++j)
 						{
-							FEElement* pe = ss.pme[j];
+							FESurfaceElement* pe = ss.m_pme[j];
 
 							if (pe != 0)
 							{
-								FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+								FESurfaceElement& me = *pe;
 								int* en = &me.m_node[0];
 
 								// Note that we need to grab the rigid degrees of freedom as well
@@ -461,7 +461,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 					for (j=0; j<ss.Nodes(); ++j)
 					{
-						FEElement* pe = ss.pme[j];
+						FEElement* pe = ss.m_pme[j];
 
 						if (pe != 0)
 						{

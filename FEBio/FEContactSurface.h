@@ -13,8 +13,12 @@ class FEContactSurface : public FESurface
 {
 public:
 	//! constructor
-	FEContactSurface(FEMesh* pm=0) : FESurface(pm) {}
+	FEContactSurface(FEMesh* pm=0) : FESurface(pm) { m_pSibling = 0; }
 
-	//! data initialization
-	void Init();
+	~FEContactSurface() { m_pSibling = 0; }
+
+	void SetSibling(FEContactSurface* ps) { m_pSibling = ps; }
+
+protected:
+	FEContactSurface* m_pSibling;
 };

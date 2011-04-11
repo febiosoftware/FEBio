@@ -68,7 +68,7 @@ void FESlidingSurface::Init()
 	int i, j, n;
 
 	// always intialize base class first!
-	FESurface::Init();
+	FEContactSurface::Init();
 
 	// make sure the sibling surface has been set
 	assert(m_pSibling);
@@ -79,7 +79,7 @@ void FESlidingSurface::Init()
 	// allocate other surface data
 	gap.assign(nn, 0.0);	// gap funtion
 	nu.resize(nn);			// node normal 
-	pme.assign(nn, static_cast<FEElement*>(0));		// penetrated master element
+	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated master element
 	rs.resize(nn);			// natural coords of projected slave node on master element
 	rsp.resize(nn);
 	Lm.assign(nn, 0.0);
@@ -116,10 +116,9 @@ void FESlidingSurface::Init()
 vec3d FESlidingSurface::traction(int inode)
 {
 	vec3d t(0,0,0);
-	FEElement* pe = pme[inode];
-	if (pe)
+	if (m_pme[inode])
 	{
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&>(*pe);
+		FESurfaceElement& el = *m_pme[inode];
 		double Tn = Lm[inode];
 		double T1 = Lt[inode][0];
 		double T2 = Lt[inode][1];
@@ -173,7 +172,7 @@ void FESlidingSurface::UpdateNormals()
 //-----------------------------------------------------------------------------
 void FESlidingSurface::Serialize(DumpFile& ar)
 {
-	FESurface::Serialize(ar);
+	FEContactSurface::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << gap;
@@ -186,11 +185,11 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		ar << off;
 		ar << eps;
 
-		int ne = (int) pme.size();
+		int ne = (int) m_pme.size();
 		ar << ne;
 		for (int i=0; i<ne; ++i)
 		{
-			FESurfaceElement* pe = dynamic_cast<FESurfaceElement*>(pme[i]);
+			FESurfaceElement* pe = m_pme[i];
 			if (pe) ar << pe->m_lid; else ar << -1;
 		}
 	}
@@ -213,11 +212,16 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 
 		int ne = 0, id;
 		ar >> ne;
-		assert(ne == pme.size());
+		assert(ne == m_pme.size());
 		for (int i=0; i<ne; ++i)
 		{
 			ar >> id;
-			if (id < 0) pme[i] = 0; else pme[i] = &m_pSibling->Element(id);
+			if (id < 0) m_pme[i] = 0; 
+			else 
+			{
+				m_pme[i] = &m_pSibling->Element(id);
+				assert(m_pme[i]->m_lid == id);
+			}
 		}
 	}
 }
@@ -395,7 +399,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 		int m = ss.node[i];
 
 		// get the previous master element (if any)
-		pme = ss.pme[i];
+		pme = ss.m_pme[i];
 
 		// If the node is in contact, let's see if the node still is 
 		// on the same master element
@@ -455,10 +459,10 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 		}
 
 		// if we found a master element, update the gap and normal data
-		ss.pme[i] = pme;
+		ss.m_pme[i] = dynamic_cast<FESurfaceElement*>(pme);
 		if (pme != 0)
 		{
-			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&>(*pme);
+			FESurfaceElement& mel =  *ss.m_pme[i];
 
 			r = ss.rs[i][0];
 			s = ss.rs[i][1];
@@ -629,12 +633,12 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 				// that is, if it has a master element associated with it
 				// TODO: is this a good way to test for an active constraint
 				// The rigid wall criteria seems to work much better.
-				if (ss.pme[m] != 0)
+				if (ss.m_pme[m] != 0)
 				{
 					// This node is active and could lead to a non-zero
 					// contact force.
 					// get the master element
-					FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.pme[m]);
+					FESurfaceElement& mel = *ss.m_pme[m];
 					ms.UnpackElement(mel, FE_UNPACK_LM);
 					mLM = mel.LM();
 
@@ -985,10 +989,10 @@ void FESlidingInterface::ContactStiffness()
 
 				// see if this node's constraint is active
 				// that is, if it has a master element associated with it
-				if (ss.pme[m] != 0)
+				if (ss.m_pme[m] != 0)
 				{
 					// get the master element
-					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.pme[m]);
+					FESurfaceElement& me = *ss.m_pme[m];
 					ms.UnpackElement(me);
 
 					// get the masters' LM array
@@ -1391,7 +1395,7 @@ bool FESlidingInterface::Augment(int naug)
 	{
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
-			if (m_ss.pme[i])
+			if (m_ss.m_pme[i])
 			{
 				Lt[0] = m_ss.Lt[i][0];
 				Lt[1] = m_ss.Lt[i][1];
@@ -1403,7 +1407,7 @@ bool FESlidingInterface::Augment(int naug)
 
 		for (i=0; i<m_ms.Nodes(); ++i)
 		{
-			if (m_ms.pme[i])
+			if (m_ms.m_pme[i])
 			{
 				Lt[0] = m_ms.Lt[i][0];
 				Lt[1] = m_ms.Lt[i][1];
@@ -1460,7 +1464,7 @@ bool FESlidingInterface::Augment(int naug)
 		double r, s, rp, sp;
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
-			if (m_ss.pme[i])
+			if (m_ss.m_pme[i])
 			{
 				r = m_ss.rs[i][0];
 				s = m_ss.rs[i][1];
@@ -1490,7 +1494,7 @@ bool FESlidingInterface::Augment(int naug)
 
 		for (i=0; i<m_ms.Nodes(); ++i)
 		{
-			if (m_ms.pme[i])
+			if (m_ms.m_pme[i])
 			{
 				r = m_ms.rs[i][0];
 				s = m_ms.rs[i][1];
@@ -1554,10 +1558,10 @@ bool FESlidingInterface::Augment(int naug)
 			Ln = m_ss.Lm[i] + eps*m_ss.gap[i];
 			m_ss.Lm[i] = MBRACKET(Ln);
 
-			if ((m_mu*m_epsf > 0) && (m_ss.pme[i]))
+			if ((m_mu*m_epsf > 0) && (m_ss.m_pme[i]))
 			{
 				// update the metrics
-				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&>(*m_ss.pme[i]);
+				FESurfaceElement& mel = *m_ss.m_pme[i];
 				m_ms.UnpackElement(mel);
 
 				double r = m_ss.rs[i][0], s = m_ss.rs[i][1];
@@ -1602,10 +1606,10 @@ bool FESlidingInterface::Augment(int naug)
 			Ln = m_ms.Lm[i] + eps*m_ms.gap[i];
 			m_ms.Lm[i] = MBRACKET(Ln);
 
-			if ((m_mu*m_epsf > 0) && (m_ms.pme[i]))
+			if ((m_mu*m_epsf > 0) && (m_ms.m_pme[i]))
 			{
 				// update the metrics
-				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&>(*m_ms.pme[i]);
+				FESurfaceElement& mel = *m_ms.m_pme[i];
 				m_ms.UnpackElement(mel);
 
 				double r = m_ms.rs[i][0], s = m_ms.rs[i][1];

@@ -6,11 +6,11 @@
 
 //-----------------------------------------------------------------------------
 
-class FEFacetSlidingSurface : public FESurface
+class FEFacetSlidingSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FEFacetSlidingSurface(FEMesh* pm) : FESurface(pm) { m_NQ.Attach(this); }
+	FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm) { m_NQ.Attach(this); }
 
 	//! initialization
 	void Init();

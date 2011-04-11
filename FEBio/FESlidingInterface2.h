@@ -4,7 +4,7 @@
 #include "vec2d.h"
 
 //-----------------------------------------------------------------------------
-class FESlidingSurface2 : public FESurface
+class FESlidingSurface2 : public FEContactSurface
 {
 public:
 	//! constructor

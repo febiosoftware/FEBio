@@ -9,7 +9,7 @@
 // FESlidingSurface2
 //-----------------------------------------------------------------------------
 
-FESlidingSurface2::FESlidingSurface2(FEM* pfem) : FESurface(&pfem->m_mesh)
+FESlidingSurface2::FESlidingSurface2(FEM* pfem) : FEContactSurface(&pfem->m_mesh)
 { 
 	m_bporo = false;
 	m_pfem = pfem; 
@@ -19,7 +19,7 @@ FESlidingSurface2::FESlidingSurface2(FEM* pfem) : FESurface(&pfem->m_mesh)
 void FESlidingSurface2::Init()
 {
 	// initialize surface data first
-	FESurface::Init();
+	FEContactSurface::Init();
 
 	// count how many integration points we have
 	int nint = 0, i;
@@ -128,7 +128,7 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 	}
 
 	// Next, we can serialize the base-class data
-	FESurface::Serialize(ar);
+	FEContactSurface::Serialize(ar);
 
 	// And finally, we serialize the surface data
 	if (ar.IsSaving())
@@ -144,6 +144,14 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar << m_nn;
 		ar << m_pg;
 		ar << m_bporo;
+
+		int ne = (int) m_pme.size();
+		ar << ne;
+		for (int i=0; i<ne; ++i)
+		{
+			FESurfaceElement* pe = m_pme[i];
+			if (pe) ar << pe->m_lid; else ar << -1;
+		}
 	}
 	else
 	{
@@ -158,6 +166,22 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar >> m_nn;
 		ar >> m_pg;
 		ar >> m_bporo;
+
+		assert(m_pSibling);
+
+		int ne = 0, id;
+		ar >> ne;
+		assert(ne == m_pme.size());
+		for (int i=0; i<ne; ++i)
+		{
+			ar >> id;
+			if (id < 0) m_pme[i] = 0; 
+			else 
+			{
+				m_pme[i] = &m_pSibling->Element(id);
+				assert(m_pme[i]->m_lid == id);
+			}
+		}
 	}
 }
 
@@ -190,6 +214,9 @@ FESlidingInterface2::FESlidingInterface2(FEM* pfem) : FEContactInterface(pfem), 
 	m_bdebug = false;
 	m_szdebug[0] = 0;
 	m_fp = 0;
+
+	m_ss.SetSibling(&m_ms);
+	m_ms.SetSibling(&m_ss);
 }
 
 //-----------------------------------------------------------------------------

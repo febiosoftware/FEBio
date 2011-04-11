@@ -5,11 +5,11 @@
 #include "vec2d.h"
 
 //-----------------------------------------------------------------------------
-class FESurfaceConstraintSurface : public FESurface
+class FESurfaceConstraintSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FESurfaceConstraintSurface(FEMesh* pm = 0) : FESurface(pm) { m_nref = -1; }
+	FESurfaceConstraintSurface(FEMesh* pm = 0) : FEContactSurface(pm) { m_nref = -1; }
 
 	//! initializes data
 	void Init();

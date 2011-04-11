@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEMesh.h"
-#include "FESurface.h"
+#include "FEContactSurface.h"
 #include "DumpFile.h"
 
 class FEM;
@@ -20,6 +20,7 @@ class FEM;
 
 // Heavyside function
 #define HEAVYSIDE(x) ((x)>=0?1:0)
+
 
 //-----------------------------------------------------------------------------
 //! This is the base class for contact interfaces

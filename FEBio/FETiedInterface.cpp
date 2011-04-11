@@ -25,6 +25,9 @@ FETiedInterface::FETiedInterface(FEM* pfem) : FEContactInterface(pfem), ss(&pfem
 	m_nplc = -1;
 	m_pplc = 0;
 
+	ss.SetSibling(&ms);
+	ms.SetSibling(&ss);
+
 	m_nID = count++;
 }
 
@@ -61,7 +64,7 @@ void FETiedInterface::Update()
 	FEElement* pme;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		pme = ss.pme[i];
+		pme = ss.m_pme[i];
 		if (pme)
 		{
 			// get the nodal position
@@ -236,7 +239,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 			}
 		}
 
-		ss.pme[i] = pme;
+		ss.m_pme[i] = dynamic_cast<FESurfaceElement*>(pme);
 		if (pme != 0)
 		{
 			// If we found a master element, we calculate the intersection
@@ -401,7 +404,7 @@ void FETiedInterface::ContactForces(vector<double>& F)
 			// that is, if it has a master element associated with it
 			// TODO: is this a good way to test for an active constraint
 			// The rigid wall criteria seems to work much better.
-			if (ss.pme[m] != 0)
+			if (ss.m_pme[m] != 0)
 			{
 				// calculate jacobian
 				dxr = dxs = vec3d(0,0,0);
@@ -422,7 +425,7 @@ void FETiedInterface::ContactForces(vector<double>& F)
 				tc = ss.Lm[m] + ss.gap[m]*m_eps;
 
 				// get the master element
-				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.pme[m]);
+				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
 				ms.UnpackElement(mel, FE_UNPACK_LM);
 
 				mLM = mel.LM();
@@ -554,7 +557,7 @@ void FETiedInterface::ContactStiffness()
 
 			// see if this node's constraint is active
 			// that is, if it has a master element associated with it
-			if (ss.pme[m] != 0)
+			if (ss.m_pme[m] != 0)
 			{
 				// calculate jacobian
 				dxr = dxs = vec3d(0,0,0);
@@ -572,7 +575,7 @@ void FETiedInterface::ContactStiffness()
 				detJ = (dxr ^ dxs).norm();
 
 				// get the master element
-				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.pme[m]);
+				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
 				ms.UnpackElement(me, FE_UNPACK_LM);
 
 				mLM = me.LM();
@@ -695,7 +698,7 @@ bool FETiedInterface::Augment(int naug)
 		lm = ss.Lm[i] + ss.gap[i]*eps;
 
 		normL1 += lm*lm;
-		if (ss.pme[i] != 0)
+		if (ss.m_pme[i] != 0)
 		{
 			g = ss.gap[i].norm();
 			normgc += g*g;
