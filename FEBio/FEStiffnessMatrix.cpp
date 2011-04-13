@@ -122,10 +122,10 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			}
 
 			// add rigid joint "elements" to the profile
-			if (fem.m_nrj)
+			if (!fem.m_RJ.empty())
 			{
 				vector<int> lm(12);
-				for (i=0; i<fem.m_nrj; ++i)
+				for (i=0; i<(int) fem.m_RJ.size(); ++i)
 				{
 					FERigidJoint& rj = *fem.m_RJ[i];
 			

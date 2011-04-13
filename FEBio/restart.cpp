@@ -374,8 +374,9 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		for (i=0; i<m_nrb; ++i) m_RB[i].Serialize(ar);
 
 		// rigid joints
-		ar << m_nrj;
-		for (i=0; i<m_nrj; ++i) m_RJ[i]->Serialize(ar);	
+		int nrj = (int) m_RJ.size();
+		ar << nrj;
+		for (i=0; i<nrj; ++i) m_RJ[i]->Serialize(ar);	
 	}
 	else
 	{
@@ -392,8 +393,9 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		}
 
 		// rigid joints
-		ar >> m_nrj;
-		for (i=0; i<m_nrj; ++i)
+		int nrj;
+		ar >> nrj;
+		for (i=0; i<nrj; ++i)
 		{
 			FERigidJoint* prj = new FERigidJoint(this);
 			prj->Serialize(ar);

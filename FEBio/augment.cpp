@@ -22,10 +22,10 @@ bool FESolidSolver::Augment()
 	bool bconv = true;
 
 	// Do rigid joint augmentations
-	if (m_fem.m_nrj)
+	if (!m_fem.m_RJ.empty())
 	{
 		// loop over all rigid joints
-		for (int i=0; i<m_fem.m_nrj; ++i) bconv = m_fem.m_RJ[i]->Augment() && bconv;
+		for (int i=0; i<(int) m_fem.m_RJ.size(); ++i) bconv = m_fem.m_RJ[i]->Augment() && bconv;
 	}
 
 	// Do contact augmentations

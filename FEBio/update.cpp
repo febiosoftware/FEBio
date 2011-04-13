@@ -299,11 +299,11 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	}
 
 	// update rigid joints
-	if (m_fem.m_nrj)
+	if (!m_fem.m_RJ.empty())
 	{
 		vec3d c, ra, rb, qa, qb;
 
-		for (i=0; i<m_fem.m_nrj; ++i)
+		for (i=0; i<(int) m_fem.m_RJ.size(); ++i)
 		{
 			FERigidJoint& rj = *m_fem.m_RJ[i];
 

@@ -260,10 +260,10 @@ bool FEM::InitRigidBodies()
 	}
 
 	// set up rigid joints
-	if (m_nrj > 0)
+	if (!m_RJ.empty())
 	{
 		FERigidMaterial* pm;
-		for (i=0; i<m_nrj; ++i)
+		for (i=0; i<(int) m_RJ.size(); ++i)
 		{
 			FERigidJoint& rj = *m_RJ[i];
 			rj.m_F = vec3d(0,0,0);

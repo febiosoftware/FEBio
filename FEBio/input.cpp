@@ -406,11 +406,11 @@ void echo_input(FEM& fem)
 		clog.printf("\n\n");
 	}
 
-	if (fem.m_nrj > 0)
+	if (!fem.m_RJ.empty())
 	{
 		clog.printf(" RIGID JOINT DATA\n");
 		clog.printf("===========================================================================\n");
-		for (i=0; i<fem.m_nrj; ++i)
+		for (i=0; i<(int) fem.m_RJ.size(); ++i)
 		{
 			if (i>0) clog.printf("---------------------------------------------------------------------------\n");
 

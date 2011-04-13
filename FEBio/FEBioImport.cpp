@@ -3288,9 +3288,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- R I G I D   J O I N T   I N T E R F A C E ---
 
-		fem.m_nrj++;
 		FERigidJoint* prj = new FERigidJoint(&fem);
-
 		++tag;
 		do
 		{

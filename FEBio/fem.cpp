@@ -50,7 +50,6 @@ FEM::FEM()
 	m_nreq = 0;
 	m_nrb = 0;
 	m_nrm = 0;
-	m_nrj = 0;
 
 	m_bsymm = true;	// assume symmetric stiffness matrix
 
@@ -95,7 +94,6 @@ FEM::FEM()
 
 FEM::FEM(const FEM& fem)
 {
-	m_nrj = 0;
 	ShallowCopy(const_cast<FEM&>(fem));
 }
 
@@ -158,16 +156,15 @@ void FEM::ShallowCopy(FEM& fem)
 	m_RB = fem.m_RB;
 
 	// copy rigid joint data
-	if (m_nrj == 0)
+	if (m_RJ.empty())
 	{
-		for (i=0; i<fem.m_nrj; ++i) m_RJ.push_back(new FERigidJoint(this));
-		m_nrj = m_RJ.size();
+		for (i=0; i<(int) fem.m_RJ.size(); ++i) m_RJ.push_back(new FERigidJoint(this));
 	}
-	assert(m_nrj == fem.m_nrj);
-	for (i=0; i<m_nrj; ++i) m_RJ[i]->ShallowCopy(*fem.m_RJ[i]);
+	assert(m_RJ.size() == fem.m_RJ.size());
+	for (i=0; i<(int) m_RJ.size(); ++i) m_RJ[i]->ShallowCopy(*fem.m_RJ[i]);
 
 	// copy contact data
-	if (ContactInterfaces() == 0)
+	if (m_CI.empty())
 	{
 		FEContactInterface* pci;
 		for (int i=0; i<fem.ContactInterfaces(); ++i)

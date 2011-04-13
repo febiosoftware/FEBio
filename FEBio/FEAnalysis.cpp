@@ -277,7 +277,7 @@ bool FEAnalysis::Init()
 	}
 
 	// see if we need to do contact augmentations
-	m_baugment = (m_fem.m_nrj > 0 ? true : false);
+	m_baugment = (m_fem.m_RJ.empty()? false : true);
 	for (i=0; i<(int) m_fem.m_CI.size(); ++i)
 	{
 		FEContactInterface& ci = *m_fem.m_CI[i];

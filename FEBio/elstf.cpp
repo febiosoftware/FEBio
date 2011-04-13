@@ -40,9 +40,9 @@ bool FESolidSolver::StiffnessMatrix()
 	}
 
 	// calculate joint stiffness 
-	if (m_fem.m_nrj)
+	if (!m_fem.m_RJ.empty())
 	{
-		for (int i=0; i<m_fem.m_nrj; ++i) m_fem.m_RJ[i]->JointStiffness();
+		for (int i=0; i<(int) m_fem.m_RJ.size(); ++i) m_fem.m_RJ[i]->JointStiffness();
 	}
 
 	// calculate stiffness matrices for surface loads
@@ -561,9 +561,9 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// rigid joint forces
-	if (m_fem.m_nrj)
+	if (!m_fem.m_RJ.empty())
 	{
-		for (int i=0; i<m_fem.m_nrj; ++i) m_fem.m_RJ[i]->JointForces(R);
+		for (int i=0; i<(int) m_fem.m_RJ.size(); ++i) m_fem.m_RJ[i]->JointForces(R);
 	}
 
 	// calculate contact forces

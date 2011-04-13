@@ -234,7 +234,6 @@ public:
 		vector<FERigidBody>		m_RB;	//!< rigid body array
 
 		// rigid joints
-		int							m_nrj;	//!< nr of rigid joints
 		vector<FERigidJoint*>		m_RJ;	//!< rigid joint array
 	//}
 
