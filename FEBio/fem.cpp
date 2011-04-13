@@ -147,22 +147,14 @@ void FEM::ShallowCopy(FEM& fem)
 {
 	int i;
 
-	// keep a pointer to the current analysis step
-	// note that we do not keep the entire analysis history
-	// since that would be waste of space and time
-	// however, that does imply that for *this fem object
-	// the m_Step array remains empty!
-	m_pStep = fem.m_pStep;
-	m_nStep = m_nStep;
+	// copy time data
+	m_ftime = fem.m_ftime;
 
 	// copy the mesh
 	m_mesh = fem.m_mesh;
 
-	m_nrb = fem.m_nrb;
+	// copy rigid body data
 	m_RB = fem.m_RB;
-
-	m_ftime = fem.m_ftime;
-	m_ftime0 = fem.m_ftime0;
 
 	// copy rigid joint data
 	if (m_nrj == 0)
@@ -181,31 +173,16 @@ void FEM::ShallowCopy(FEM& fem)
 		{
 			switch (fem.m_CI[i]->Type())
 			{
-			case FE_CONTACT_SLIDING:
-				pci = new FESlidingInterface(this);
-				break;
-			case FE_FACET2FACET_SLIDING:
-				pci = new FEFacet2FacetSliding(this);
-				break;
-			case FE_CONTACT_TIED:
-				pci = new FETiedInterface(this);
-				break;
-			case FE_CONTACT_RIGIDWALL:
-				pci = new FERigidWallInterface(this);
-				break;
-			case FE_CONTACT_SLIDING2:
-				pci = new FESlidingInterface2(this);
-				break;
-			case FE_PERIODIC_BOUNDARY:
-				pci = new FEPeriodicBoundary(this);
-				break;
-			case FE_SURFACE_CONSTRAINT:
-				pci = new FESurfaceConstraint(this);
-				break;
+			case FE_CONTACT_SLIDING    : pci = new FESlidingInterface  (this); break;
+			case FE_FACET2FACET_SLIDING: pci = new FEFacet2FacetSliding(this); break;
+			case FE_CONTACT_TIED       : pci = new FETiedInterface     (this); break;
+			case FE_CONTACT_RIGIDWALL  : pci = new FERigidWallInterface(this); break;
+			case FE_CONTACT_SLIDING2   : pci = new FESlidingInterface2 (this); break;
+			case FE_PERIODIC_BOUNDARY  : pci = new FEPeriodicBoundary  (this); break;
+			case FE_SURFACE_CONSTRAINT : pci = new FESurfaceConstraint (this); break;
 			default:
 				assert(false);
 			}
-
 			m_CI.push_back(pci);
 		}
 	}
@@ -505,4 +482,18 @@ FEElasticMaterial* FEM::GetElasticMaterial(FEMaterial* pm)
 	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 	assert(pme);
 	return pme;
+}
+
+//-----------------------------------------------------------------------------
+//! Sets the name of the FEBio input file
+void FEM::SetInputFilename(const char* szfile)
+{ 
+	strcpy(m_szfile, szfile); 
+	m_szfile_title = strrchr(m_szfile, '/');
+	if (m_szfile_title == 0) 
+	{
+		m_szfile_title = strchr(m_szfile, '\\'); 
+		if (m_szfile_title == 0) m_szfile_title = m_szfile; else ++m_szfile_title;
+	}
+	else ++m_szfile_title;
 }

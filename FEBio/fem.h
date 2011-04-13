@@ -113,23 +113,14 @@ public:
 	bool GetDebugFlag() { return m_debug; }
 
 	// set the i/o files
-	void SetInputFilename(const char* szfile)
-	{ 
-		strcpy(m_szfile, szfile); 
-		m_szfile_title = strrchr(m_szfile, '/');
-		if (m_szfile_title == 0) 
-		{
-			m_szfile_title = strchr(m_szfile, '\\'); 
-			if (m_szfile_title == 0) m_szfile_title = m_szfile; else ++m_szfile_title;
-		}
-		else ++m_szfile_title;
-	}
+	void SetInputFilename(const char* szfile);
 	void SetLogFilename  (const char* szfile) { strcpy(m_szlog , szfile); }
 	void SetPlotFilename (const char* szfile) { strcpy(m_szplot, szfile); }
 	void SetDumpFilename (const char* szfile) { strcpy(m_szdump, szfile); }
 
 	void SetPlotFileNameExtension(const char* szext);
 
+	// Get the I/O files
 	const char* GetInputFileName () { return m_szfile; }
 	const char* GetLogfileName () { return m_szlog; }
 	const char* GetPlotFileName() { return m_szplot; }
