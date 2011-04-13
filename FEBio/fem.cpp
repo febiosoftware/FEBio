@@ -12,6 +12,7 @@
 #include "FESurfaceConstraint.h"
 #include "log.h"
 #include "LSDYNAPlotFile.h"
+#include "FEBiphasic.h"
 
 // --- Global Constants Data ---
 // m_Const needs a definition, since static
@@ -85,75 +86,56 @@ FEM::FEM()
 	m_plot = 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEM::FEM(FEM& fem)
-// copy constructor.
-// The copy constructor and assignment operator are used for push/pop'ing.
-// Note that not all data is copied. We only copy the data that is relevant
-// for push/pop'ing
+//-----------------------------------------------------------------------------
+//! copy constructor for FEM class.
+//! The copy constructor and assignment operator are only used for push/pop'ing
+//! to a stack. This is used by the running restart feature. Note that not all 
+//! data is copied. We only copy the data that changes during iterations.
+//! for push/pop'ing
 
 FEM::FEM(const FEM& fem)
 {
-	m_ftime = 0;
-	m_ftime0 = 0;
-
-	// --- Geometry Data ---
-	m_nreq = 0;
-	m_nrb = 0;
-	m_nrm = 0;
-	m_nrj = 0;
-
-	m_bsymm = true;	// assume symmetric stiffness matrix
-
-	// --- Material Data ---
-	// (nothing to initialize yet)
-
-	// --- Load Curve Data ---
-	// (nothing to initialize yet)
-
-	// --- Direct Solver Data ---
-	// set the skyline solver as default
-	m_nsolver = SKYLINE_SOLVER;
-
-	// However, if available use the PSLDLT solver instead
-#ifdef PSLDLT
-	m_nsolver = PSLDLT_SOLVER;
-#endif
-
-	m_neq = 0;
-	m_npeq = 0;
-	m_nceq = 0;
-	m_bwopt = 0;
-
 	ShallowCopy(const_cast<FEM&>(fem));
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEM::operator = (FEM& fem)
-// assignment operator
-// The copy constructor and assignment operator are used for push/pop'ing.
-// Note that not all data is copied. We only copy the data that is relevant
-// for push/pop'ing
-//
+//-----------------------------------------------------------------------------
+//! assignment operator for FEM class.
+//! The copy constructor and assignment operator are only used for push/pop'ing
+//! to a stack. This is used by the running restart feature. Note that not all 
+//! data is copied. We only copy the data that changes during iterations.
+//! for push/pop'ing
 
 void FEM::operator =(const FEM& fem)
 {
 	ShallowCopy(const_cast<FEM&>(fem));
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FEM::~FEM
-// destructor of FEM class
-//
+//-----------------------------------------------------------------------------
+//! destructor of FEM class.
+//! Delete all dynamically allocated data
 
 FEM::~FEM()
 {
 	size_t i;
 	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
-	for (i=0; i<m_RJ.size  (); ++i) delete m_RJ[i]  ; m_RJ.clear  ();
-	for (i=0; i<m_CI.size  (); ++i) delete m_CI[i]  ; m_CI.clear  ();
+	for (i=0; i<m_RJ.size  (); ++i) delete m_RJ [i] ; m_RJ.clear  ();
+	for (i=0; i<m_CI.size  (); ++i) delete m_CI [i] ; m_CI.clear  ();
 	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
-	for (i=0; i<m_LC.size  (); ++i) delete m_LC[i]  ; m_LC.clear  ();
+	for (i=0; i<m_LC.size  (); ++i) delete m_LC [i] ; m_LC.clear  ();
+	for (i=0; i<m_BF.size  (); ++i) delete m_BF [i] ; m_BF.clear  ();
+	for (i=0; i<m_DC.size  (); ++i) delete m_DC [i] ; m_DC.clear  ();
+	for (i=0; i<m_FC.size  (); ++i) delete m_FC [i] ; m_FC.clear  ();
+	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();
+	for (i=0; i<m_RDC.size (); ++i) delete m_RDC[i] ; m_RDC.clear ();
+	for (i=0; i<m_RFC.size (); ++i) delete m_RFC[i] ; m_RFC.clear ();
+	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
+
+	if (!m_LCSet.empty())
+	{
+		list<FELinearConstraintSet*>::iterator pi;
+		for (pi = m_LCSet.begin(); pi != m_LCSet.end(); ++pi) delete (*pi); 
+		m_LCSet.clear();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -498,4 +480,29 @@ void FEM::SetGlobalConstant(const string& s, double v)
 double FEM::GetGlobalConstant(const string& s)
 {
 	return m_Const.find(s)->second;
+}
+
+//-----------------------------------------------------------------------------
+//! Returns the elastic component of the material, identified by id
+FEElasticMaterial* FEM::GetElasticMaterial(int id)
+{
+	FEMaterial* pm = m_MAT[id];
+	while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+	while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
+	while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+	assert(pme);
+	return pme;
+}
+
+//-----------------------------------------------------------------------------
+//! Returns the elastic component of the material pm
+FEElasticMaterial* FEM::GetElasticMaterial(FEMaterial* pm)
+{
+	while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
+	while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
+	while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+	assert(pme);
+	return pme;
 }

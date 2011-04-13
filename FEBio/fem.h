@@ -11,7 +11,6 @@
 #include "FEMesh.h"
 #include "FEContactInterface.h"
 #include "FEMaterial.h"
-#include "FEBiphasic.h"
 #include "FERigidBody.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
@@ -93,27 +92,10 @@ public:
 	FEMaterial* GetMaterial(int id) { return m_MAT[id]; }
 
 	//! return the elastic material
-	FEElasticMaterial* GetElasticMaterial(int id)
-	{
-		FEMaterial* pm = m_MAT[id];
-		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
-		while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
-		while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-		assert(pme);
-		return pme;
-	}
+	FEElasticMaterial* GetElasticMaterial(int id);
 
 	//! return the elastic material
-	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm)
-	{
-		while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
-		while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
-		while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-		assert(pme);
-		return pme;
-	}
+	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm);
 
 	//! Add a loadcurve to the model
 	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }

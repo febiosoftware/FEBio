@@ -2,6 +2,7 @@
 #include "fem.h"
 #include "FEPoroElastic.h"
 #include "FEMaterial.h"
+#include "FEBiphasic.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

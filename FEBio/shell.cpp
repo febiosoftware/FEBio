@@ -2,6 +2,7 @@
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 #include "FEDomain.h"
+#include "FEBiphasic.h"
 #include <math.h>
 
 //-----------------------------------------------------------------------------

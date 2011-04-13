@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "FEMaterial.h"
+#include "FEBiphasic.h"
 #include "fem.h"
 
 // register the material with the framework

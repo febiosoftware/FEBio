@@ -1,9 +1,10 @@
 #include "stdafx.h"
-#include "FESlidingInterface2.h"
 #include "fem.h"
+#include "FESlidingInterface2.h"
 #include "FESolidSolver.h"
-#include "log.h"
 #include "FEPoroElastic.h"
+#include "FEBiphasic.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // FESlidingSurface2

@@ -6,6 +6,7 @@
 #include "FERigid.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
+#include "FEBiphasic.h"
 #include <map>
 #include <string>
 using namespace std;
