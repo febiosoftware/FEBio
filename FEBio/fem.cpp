@@ -95,6 +95,7 @@ FEM::FEM()
 
 FEM::FEM(const FEM& fem)
 {
+	m_nrj = 0;
 	ShallowCopy(const_cast<FEM&>(fem));
 }
 
