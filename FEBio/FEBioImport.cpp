@@ -3549,6 +3549,28 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 				
 				fem.m_BF.push_back(pbf);
 			}
+			else if (strcmp(szt, "point") == 0)
+			{
+				FEPointBodyForce* pf = new FEPointBodyForce;
+				++tag;
+				do
+				{
+					if (tag == "alpha")
+					{
+						const char* szlc = tag.AttributeValue("lc");
+						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
+						tag.value(pf->m_a);
+					}
+					else if (tag == "beta") tag.value(pf->m_b);
+					else if (tag == "r0") tag.value(pf->m_r0);
+					else if (tag == "rlc") tag.value(pf->m_rlc, 3);
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+
+				fem.m_BF.push_back(pf);
+			}
 		}
 		
 		else if (tag == "Constants")

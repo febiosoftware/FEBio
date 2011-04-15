@@ -131,6 +131,16 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 		double dens = pme->Density();
 		g *= dens;
 
+		// TODO: I don't like this but for now I'll hard-code the modification of the
+		//       force center position
+		if (dynamic_cast<FEPointBodyForce*>(&BF))
+		{
+			FEPointBodyForce* pf = dynamic_cast<FEPointBodyForce*>(&BF);
+			if (pf->m_rlc[0] >= 0) pf->m_r0.x = fem.GetLoadCurve(pf->m_rlc[0])->Value();
+			if (pf->m_rlc[1] >= 0) pf->m_r0.y = fem.GetLoadCurve(pf->m_rlc[1])->Value();
+			if (pf->m_rlc[2] >= 0) pf->m_r0.z = fem.GetLoadCurve(pf->m_rlc[2])->Value();
+		}
+
 		// jacobian
 		double detJ;
 		double *H;

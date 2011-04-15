@@ -72,3 +72,20 @@ public:
 	vec3d	n;	// rotation axis
 	vec3d	c;	// point on axis of rotation (e.g., center of rotation)
 };
+
+//-----------------------------------------------------------------------------
+class FEPointBodyForce : public FEBodyForce
+{
+public:
+	FEPointBodyForce() { s[0] = s[1] = s[2] = 1.0; m_rlc[0] = m_rlc[1] = m_rlc[2] = -1; }
+
+	vec3d force(FEMaterialPoint& mp);
+	mat3ds stiffness(FEMaterialPoint& mp);
+
+	void Serialize(DumpFile& ar);
+
+public:
+	double	m_a, m_b;
+	vec3d	m_r0;
+	int		m_rlc[3];
+};

@@ -84,3 +84,55 @@ void FECentrifugalBodyForce::Serialize(DumpFile &ar)
 		ar >> c >> n;
 	}
 }
+
+//=============================================================================
+vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+	vec3d x = pt.rt;
+	vec3d n = x - m_r0;
+	double l = n.unit();
+
+	double g = m_a*exp(-m_b*l);
+	return n*g;
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FEPointBodyForce::stiffness(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	vec3d x = pt.rt;
+	vec3d n = x - m_r0;
+	double l = n.unit();
+
+	mat3ds k;
+	if (l == 0.0)
+	{
+		k.zero();
+	}
+	else
+	{
+		double g = m_a*exp(-m_b*l);
+
+		mat3ds nxn = dyad(n);
+		mat3ds I = mat3dd(1.0);
+
+		k = (nxn*m_b - (I - nxn)/l)*g;
+	}
+
+	return k;
+}
+
+//-----------------------------------------------------------------------------
+void FEPointBodyForce::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_a << m_b << m_r0;
+	}
+	else
+	{
+		ar >> m_a >> m_b >> m_r0;
+	}
+}
