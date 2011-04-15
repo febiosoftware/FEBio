@@ -62,6 +62,15 @@ public:
 		fwrite(sz, sizeof(char), n, m_fp);
 		return (*this);
 	}
+
+	DumpFile& operator << (char* sz) 
+	{ 
+		int n = strlen(sz); 
+		fwrite(&n, sizeof(int), 1, m_fp);
+		fwrite(sz, sizeof(char), n, m_fp);
+		return (*this);
+	}
+
 	DumpFile& operator << (const double a[3][3])
 	{
 		fwrite(a, sizeof(double), 9, m_fp);
