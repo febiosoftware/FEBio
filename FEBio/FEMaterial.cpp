@@ -55,7 +55,6 @@ void FEMaterial::Serialize(DumpFile &ar)
 	if (ar.IsSaving())
 	{
 		ar << m_nID;
-		ar << m_szname;
 
 		// store all parameters
 		FEParameterList& pl = GetParameterList();
@@ -83,7 +82,6 @@ void FEMaterial::Serialize(DumpFile &ar)
 	else
 	{
 		ar >> m_nID;
-		ar >> m_szname;
 
 		FEParameterList& pl = GetParameterList();
 		int n = 0;
