@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBodyForce.h"
+#include "fem.h"
 
 //=============================================================================
 void FEBodyForce::Serialize(DumpFile& ar)
@@ -86,6 +87,11 @@ void FECentrifugalBodyForce::Serialize(DumpFile &ar)
 }
 
 //=============================================================================
+// FEPointBodyForce
+//=============================================================================
+
+
+//-----------------------------------------------------------------------------
 vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -134,5 +140,48 @@ void FEPointBodyForce::Serialize(DumpFile &ar)
 	else
 	{
 		ar >> m_a >> m_b >> m_r0;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEPointBodyForce::Init()
+{
+	assert(m_pfem);
+
+	if (!m_brigid)
+	{
+		// make sure we don't move the point
+		m_rlc[0] = m_rlc[1] = m_rlc[2] = -1;
+
+		// find the element in which point r0 lies
+		FEMesh& m = m_pfem->m_mesh;
+		m_pel = m.FindSolidElement(m_r0, m_rs);
+	}
+	else m_pel = 0;
+}
+
+//-----------------------------------------------------------------------------
+// Update the position of the body force
+void FEPointBodyForce::Update()
+{
+	if (m_pel)
+	{
+		FEMesh& m = m_pfem->m_mesh;
+		vec3d x[8];
+		for (int i=0; i<8; ++i) x[i] = m.Node(m_pel->m_node[i]).m_rt;
+
+		double* r = m_rs;
+		double H[8];
+		H[0] = 0.125*(1 - r[0])*(1 - r[1])*(1 - r[2]);
+		H[1] = 0.125*(1 + r[0])*(1 - r[1])*(1 - r[2]);
+		H[2] = 0.125*(1 + r[0])*(1 + r[1])*(1 - r[2]);
+		H[3] = 0.125*(1 - r[0])*(1 + r[1])*(1 - r[2]);
+		H[4] = 0.125*(1 - r[0])*(1 - r[1])*(1 + r[2]);
+		H[5] = 0.125*(1 + r[0])*(1 - r[1])*(1 + r[2]);
+		H[6] = 0.125*(1 + r[0])*(1 + r[1])*(1 + r[2]);
+		H[7] = 0.125*(1 - r[0])*(1 + r[1])*(1 + r[2]);
+
+		m_r0 = vec3d(0,0,0);
+		for (int i=0; i<8; ++i) m_r0 += x[i]*H[i];
 	}
 }

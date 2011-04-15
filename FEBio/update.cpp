@@ -145,6 +145,13 @@ void FESolidSolver::Update(vector<double>& ui)
 	// update element stresses
 	UpdateStresses();
 
+	// update other stuff that may depend on the deformation
+	for (i=0; i<(int) m_fem.m_BF.size(); ++i)
+	{
+		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.m_BF[i]);
+		if (pbf) pbf->Update();
+	}
+
 	// dump all states to the plot file
 	// when requested
 	if (m_fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.m_plot->Write(m_fem);

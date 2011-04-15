@@ -2,6 +2,9 @@
 #include "FEMaterialPoint.h"
 #include "MathParser.h"
 #include "DumpFile.h"
+#include "FEMesh.h"
+
+class FEM;
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for body forces
@@ -21,6 +24,9 @@ public:
 	virtual mat3ds stiffness(FEMaterialPoint& pt) = 0;
 
 	virtual void Serialize(DumpFile& ar);
+
+	virtual void Init(){}
+	virtual void Update(){}
 
 public:
 	double	s[3];		// scale factor
@@ -77,15 +83,24 @@ public:
 class FEPointBodyForce : public FEBodyForce
 {
 public:
-	FEPointBodyForce() { s[0] = s[1] = s[2] = 1.0; m_rlc[0] = m_rlc[1] = m_rlc[2] = -1; }
+	FEPointBodyForce(FEM* pfem) { s[0] = s[1] = s[2] = 1.0; m_rlc[0] = m_rlc[1] = m_rlc[2] = -1; m_pel = 0; m_pfem = pfem; m_brigid = true; }
 
 	vec3d force(FEMaterialPoint& mp);
 	mat3ds stiffness(FEMaterialPoint& mp);
 
 	void Serialize(DumpFile& ar);
 
+	void Init();
+	void Update();
+
 public:
+	FEM*	m_pfem;
 	double	m_a, m_b;
 	vec3d	m_r0;
 	int		m_rlc[3];
+
+	bool	m_brigid;
+
+	FESolidElement* m_pel;	// element in which point m_r0 lies
+	double			m_rs[3];	// isoparametric coordinates
 };

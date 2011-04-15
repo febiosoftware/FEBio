@@ -114,6 +114,13 @@ bool FEM::Init()
 	m_ftime = 0;
 	m_ftime0 = 0;
 
+	// init some other stuff
+	for (i=0; i<(int) m_BF.size(); ++i)
+	{
+		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_BF[i]);
+		if (pbf) pbf->Init();
+	}
+
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{

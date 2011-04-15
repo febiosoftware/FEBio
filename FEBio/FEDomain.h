@@ -103,6 +103,9 @@ public:
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 
+	//! find the element in which point y lies
+	FESolidElement* FindElement(vec3d y, double r[3]);
+
 protected:
 	vector<int>				m_Node;		//!< node list
 	vector<FESolidElement>	m_Elem;		//!< array of elements

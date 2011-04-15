@@ -650,3 +650,20 @@ FEElement* FEMesh::FindElementFromID(int nid)
 
 	return pe;
 }
+
+//-----------------------------------------------------------------------------
+// Find the element in which point y lies
+FESolidElement* FEMesh::FindSolidElement(vec3d y, double r[3])
+{
+	int ND = (int) m_Domain.size();
+	for (int i=0; i<ND; ++i)
+	{
+		FESolidDomain* pd = dynamic_cast<FESolidDomain*>(m_Domain[i]);
+		if (pd)
+		{
+			FESolidElement* pe = pd->FindElement(y, r);
+			if (pe) return pe;
+		}
+	}
+	return 0;
+}

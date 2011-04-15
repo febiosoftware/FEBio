@@ -235,6 +235,9 @@ public:
 	//! Finds an element from a given ID
 	FEElement* FindElementFromID(int nid);
 
+	//! Finds the solid element in which y lies
+	FESolidElement* FindSolidElement(vec3d y, double r[3]);
+
 	FENodeElemList& NodeElementList()
 	{
 		if (m_NEL.Size() != m_Node.size()) m_NEL.Create(*this);

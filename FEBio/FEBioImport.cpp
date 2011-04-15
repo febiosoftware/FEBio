@@ -3551,7 +3551,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 			}
 			else if (strcmp(szt, "point") == 0)
 			{
-				FEPointBodyForce* pf = new FEPointBodyForce;
+				FEPointBodyForce* pf = new FEPointBodyForce(&fem);
 				++tag;
 				do
 				{
@@ -3564,6 +3564,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 					else if (tag == "beta") tag.value(pf->m_b);
 					else if (tag == "r0") tag.value(pf->m_r0);
 					else if (tag == "rlc") tag.value(pf->m_rlc, 3);
+					else if (tag == "rigid") tag.value(pf->m_brigid);
 					else throw XMLReader::InvalidTag(tag);
 					++tag;
 				}
