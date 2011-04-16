@@ -60,6 +60,9 @@ bool FESolidSolver::StiffnessMatrix()
 	// constrainst enforced with augmented lagrangian
 	LinearConstraintStiffness();
 
+	// point constraints
+	for (i=0; i<(int) m_fem.m_PC.size(); ++i) m_fem.m_PC[i].Stiffness();
+
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
 	for (i=0; i<m_fem.m_nrb; ++i)
@@ -576,6 +579,9 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
 	LinearConstraintForces(R);
+
+	// forces due to point constraints
+	for (i=0; i<(int) m_fem.m_PC.size(); ++i) m_fem.m_PC[i].Residual(R);
 
 	// increase RHS counter
 	m_nrhs++;

@@ -120,6 +120,7 @@ bool FEM::Init()
 		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_BF[i]);
 		if (pbf) pbf->Init();
 	}
+	for (i=0; i<(int) m_PC.size(); ++i) m_PC[i].Init();
 
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)

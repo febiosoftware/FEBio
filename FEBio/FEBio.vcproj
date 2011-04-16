@@ -1941,6 +1941,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEPointConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEPoroConstPerm.cpp"
 				>
 			</File>
@@ -2800,6 +2804,10 @@
 			</File>
 			<File
 				RelativePath=".\FEPlotSurfaceData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEPointConstraint.h"
 				>
 			</File>
 			<File

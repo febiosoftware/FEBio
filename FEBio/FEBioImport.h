@@ -189,6 +189,10 @@ class FEBioConstraintsSection : public FileSection
 public:
 	FEBioConstraintsSection(FEFEBioImport* pim) : FileSection(pim){}
 	void Parse(XMLTag& tag);
+
+protected:
+	void ParseRigidConstraint(XMLTag& tag);
+	void ParsePointConstraint(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------

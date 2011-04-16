@@ -22,6 +22,7 @@
 #include "FEDiscreteMaterial.h"
 #include "FEBodyForce.h"
 #include "BC.h"
+#include "FEPointConstraint.h"
 
 #include <stack>
 #include <list>
@@ -280,6 +281,9 @@ public:
 
 		// Augmented Lagrangian linear constraint data
 		list<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
+
+		// Point constriant data
+		vector<FEPointConstraint>	m_PC;		//!< point constraint data
 	//}
 
 	// --- Direct Solver Data ---

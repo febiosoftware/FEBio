@@ -228,6 +228,25 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					for (j=0; j<ni; ++j, ++is) lm[n++] = is->neq;
 				}
 				build_add(lm);
+
+				// add point constraints
+				lm.resize(3*9);
+				for (i=0; i<(int) fem.m_PC.size(); ++i)
+				{
+					FEPointConstraint& pc = fem.m_PC[i];
+					FENode& n0 = mesh.Node(pc.m_node);
+					lm[0] = n0.m_ID[0];
+					lm[1] = n0.m_ID[1];
+					lm[2] = n0.m_ID[2];
+					for (j=0; i<8; ++i)
+					{
+						FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
+						lm[3*(j+1)  ] = nj.m_ID[0];
+						lm[3*(j+1)+1] = nj.m_ID[1];
+						lm[3*(j+1)+2] = nj.m_ID[2];
+					}
+					build_add(lm);
+				}
 			}
 
 			// do the aug lag linear constraints

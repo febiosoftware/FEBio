@@ -3913,138 +3913,142 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 	// make sure there is something to read
 	if (tag.isleaf()) return;
 
+	++tag;
+	do
+	{
+		if (tag == "rigid_body") ParseRigidConstraint(tag);
+		else if (tag == "point") ParsePointConstraint(tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
+{
 	FEM& fem = *GetFEM();
 	FEAnalysis* pStep = GetStep();
+
+	const char* szm = tag.AttributeValue("mat");
+	assert(szm);
+
+	int nmat = atoi(szm);
+	if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
+
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
+	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
 
 	++tag;
 	do
 	{
-		if (tag == "rigid_body")
+		if (strncmp(tag.Name(), "trans_", 6) == 0)
 		{
-			const char* szm = tag.AttributeValue("mat");
-			assert(szm);
+			const char* szt = tag.AttributeValue("type");
+			const char* szlc = tag.AttributeValue("lc", true);
+			int lc = 0;
+			if (szlc) lc = atoi(szlc)+1;
 
-			int nmat = atoi(szm);
-			if ((nmat <= 0) || (nmat > fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
-			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nmat-1));
-			if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "mat", szm);
-
-			++tag;
-			do
+			int bc = -1;
+			if      (tag.Name()[6] == 'x') bc = 0;
+			else if (tag.Name()[6] == 'y') bc = 1;
+			else if (tag.Name()[6] == 'z') bc = 2;
+			assert(bc >= 0);
+			
+			if (strcmp(szt, "prescribed") == 0)
 			{
-				if (strncmp(tag.Name(), "trans_", 6) == 0)
+				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+				pDC->id = nmat;
+				pDC->bc = bc;
+				pDC->lc = lc;
+				tag.value(pDC->sf);
+				fem.m_RDC.push_back(pDC);
+				pm->m_bc[bc] = lc;
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
 				{
-					const char* szt = tag.AttributeValue("type");
-					const char* szlc = tag.AttributeValue("lc", true);
-					int lc = 0;
-					if (szlc) lc = atoi(szlc)+1;
-
-					int bc = -1;
-					if      (tag.Name()[6] == 'x') bc = 0;
-					else if (tag.Name()[6] == 'y') bc = 1;
-					else if (tag.Name()[6] == 'z') bc = 2;
-					assert(bc >= 0);
-					
-					if (strcmp(szt, "prescribed") == 0)
-					{
-						FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
-						pDC->id = nmat;
-						pDC->bc = bc;
-						pDC->lc = lc;
-						tag.value(pDC->sf);
-						fem.m_RDC.push_back(pDC);
-						pm->m_bc[bc] = lc;
-
-						// add this boundary condition to the current step
-						if (m_pim->m_nsteps > 0)
-						{
-							int n = fem.m_RDC.size()-1;
-							FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-							pStep->AddBoundaryCondition(pDC);
-							pDC->Deactivate();
-						}
-					}
-					else if (strcmp(szt, "force") == 0)
-					{
-						FERigidBodyForce* pFC = new FERigidBodyForce;
-						pFC->id = nmat;
-						pFC->bc = bc;
-						pFC->lc = lc-1;
-						tag.value(pFC->sf);
-						fem.m_RFC.push_back(pFC);
-						pm->m_bc[bc] = 0;
-
-						// add this boundary condition to the current step
-						if (m_pim->m_nsteps > 0)
-						{
-							int n = fem.m_RFC.size()-1;
-							FERigidBodyForce* pFC = fem.m_RFC[n];
-							pStep->AddBoundaryCondition(pFC);
-							pFC->Deactivate();
-						}
-					}
-					else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
-					else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+					int n = fem.m_RDC.size()-1;
+					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
+					pStep->AddBoundaryCondition(pDC);
+					pDC->Deactivate();
 				}
-				else if (strncmp(tag.Name(), "rot_", 4) == 0)
-				{
-					const char* szt = tag.AttributeValue("type");
-					const char* szlc = tag.AttributeValue("lc", true);
-					int lc = 0;
-					if (szlc) lc = atoi(szlc)+1;
-
-					int bc = -1;
-					if      (tag.Name()[4] == 'x') bc = 3;
-					else if (tag.Name()[4] == 'y') bc = 4;
-					else if (tag.Name()[4] == 'z') bc = 5;
-					assert(bc >= 0);
-
-					if (strcmp(szt, "prescribed") == 0)
-					{
-						FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
-						pDC->id = nmat;
-						pDC->bc = bc;
-						pDC->lc = lc;
-						tag.value(pDC->sf);
-						fem.m_RDC.push_back(pDC);
-						pm->m_bc[bc] = lc;
-
-						// add this boundary condition to the current step
-						if (m_pim->m_nsteps > 0)
-						{
-							int n = fem.m_RDC.size()-1;
-							FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-							pStep->AddBoundaryCondition(pDC);
-							pDC->Deactivate();
-						}
-					}
-					else if (strcmp(szt, "force") == 0)
-					{
-						FERigidBodyForce* pFC = new FERigidBodyForce;
-						pFC->id = nmat;
-						pFC->bc = bc;
-						pFC->lc = lc-1;
-						tag.value(pFC->sf);
-						fem.m_RFC.push_back(pFC);
-						pm->m_bc[bc] = 0;
-
-						// add this boundary condition to the current step
-						if (m_pim->m_nsteps > 0)
-						{
-							int n = fem.m_RFC.size()-1;
-							FERigidBodyForce* pFC = fem.m_RFC[n];
-							pStep->AddBoundaryCondition(pFC);
-							pFC->Deactivate();
-						}
-					}
-					else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
-					else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-				}
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
 			}
-			while (!tag.isend());
+			else if (strcmp(szt, "force") == 0)
+			{
+				FERigidBodyForce* pFC = new FERigidBodyForce;
+				pFC->id = nmat;
+				pFC->bc = bc;
+				pFC->lc = lc-1;
+				tag.value(pFC->sf);
+				fem.m_RFC.push_back(pFC);
+				pm->m_bc[bc] = 0;
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					int n = fem.m_RFC.size()-1;
+					FERigidBodyForce* pFC = fem.m_RFC[n];
+					pStep->AddBoundaryCondition(pFC);
+					pFC->Deactivate();
+				}
+			}
+			else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
+			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		}
+		else if (strncmp(tag.Name(), "rot_", 4) == 0)
+		{
+			const char* szt = tag.AttributeValue("type");
+			const char* szlc = tag.AttributeValue("lc", true);
+			int lc = 0;
+			if (szlc) lc = atoi(szlc)+1;
+
+			int bc = -1;
+			if      (tag.Name()[4] == 'x') bc = 3;
+			else if (tag.Name()[4] == 'y') bc = 4;
+			else if (tag.Name()[4] == 'z') bc = 5;
+			assert(bc >= 0);
+
+			if (strcmp(szt, "prescribed") == 0)
+			{
+				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+				pDC->id = nmat;
+				pDC->bc = bc;
+				pDC->lc = lc;
+				tag.value(pDC->sf);
+				fem.m_RDC.push_back(pDC);
+				pm->m_bc[bc] = lc;
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					int n = fem.m_RDC.size()-1;
+					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
+					pStep->AddBoundaryCondition(pDC);
+					pDC->Deactivate();
+				}
+			}
+			else if (strcmp(szt, "force") == 0)
+			{
+				FERigidBodyForce* pFC = new FERigidBodyForce;
+				pFC->id = nmat;
+				pFC->bc = bc;
+				pFC->lc = lc-1;
+				tag.value(pFC->sf);
+				fem.m_RFC.push_back(pFC);
+				pm->m_bc[bc] = 0;
+
+				// add this boundary condition to the current step
+				if (m_pim->m_nsteps > 0)
+				{
+					int n = fem.m_RFC.size()-1;
+					FERigidBodyForce* pFC = fem.m_RFC[n];
+					pStep->AddBoundaryCondition(pFC);
+					pFC->Deactivate();
+				}
+			}
+			else if (strcmp(szt, "fixed") == 0) pm->m_bc[bc] = -1;
+			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
@@ -4052,6 +4056,32 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 	while (!tag.isend());
 }
 
+//-----------------------------------------------------------------------------
+void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
+{
+	FEM& fem = *GetFEM();
+	int node = -1;
+	double	eps;
+
+	++tag;
+	do
+	{
+		if (tag == "node") 
+		{
+			tag.value(node);
+			if (node <= 0) throw XMLReader::InvalidValue(tag);
+		}
+		else if (tag == "penalty") tag.value(eps);
+		++tag;
+	}
+	while (!tag.isend());
+	if (node == -1) throw XMLReader::Error();
+
+	FEPointConstraint pc(&fem);
+	pc.m_eps = eps;
+	pc.m_node = node-1;
+	fem.m_PC.push_back(pc);
+}
 
 //=============================================================================
 //
