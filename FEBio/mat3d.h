@@ -142,6 +142,11 @@ public:
 	mat3ds operator * (double g) const;
 	mat3ds operator / (double g) const;
 
+	// arithmetic operators for mat3d objects
+	mat3d operator + (const mat3d& t) const;
+	mat3d operator - (const mat3d& t) const;
+	mat3d operator * (const mat3d& t) const;
+	
 	// unary operators
 	mat3ds operator - () const;
 	

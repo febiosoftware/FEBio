@@ -216,6 +216,37 @@ inline mat3ds mat3ds::operator / (double g) const
 	return mat3ds(m[XX]*g, m[YY]*g, m[ZZ]*g, m[XY]*g, m[YZ]*g, m[XZ]*g);
 }
 
+// operator + for mat3d objects
+inline mat3d mat3ds::operator + (const mat3d& d) const
+{
+	return mat3d(m[XX]+d.d[0][0], m[XY]+d.d[0][1], m[XZ]+d.d[0][2],
+				 m[XY]+d.d[1][0], m[YY]+d.d[1][1], m[YZ]+d.d[1][2],
+				 m[XZ]+d.d[2][0], m[YZ]+d.d[2][1], m[ZZ]+d.d[2][2]);
+}
+
+// operator - for mat3d objects
+inline mat3d mat3ds::operator - (const mat3d& d) const
+{
+	return mat3d(m[XX]-d.d[0][0], m[XY]-d.d[0][1], m[XZ]-d.d[0][2],
+				 m[XY]-d.d[1][0], m[YY]-d.d[1][1], m[YZ]-d.d[1][2],
+				 m[XZ]-d.d[2][0], m[YZ]-d.d[2][1], m[ZZ]-d.d[2][2]);
+}
+
+// operator * for mat3d objects
+inline mat3d mat3ds::operator * (const mat3d& d) const
+{
+	return mat3d(d.d[0][0]*m[XX] + d.d[1][0]*m[XY] + d.d[2][0]*m[XZ], 
+				 d.d[0][1]*m[XX] + d.d[1][1]*m[XY] + d.d[2][1]*m[XZ], 
+				 d.d[0][2]*m[XX] + d.d[1][2]*m[XY] + d.d[2][2]*m[XZ],
+				 d.d[0][0]*m[XY] + d.d[1][0]*m[YY] + d.d[2][0]*m[YZ], 
+				 d.d[0][1]*m[XY] + d.d[1][1]*m[YY] + d.d[2][1]*m[YZ], 
+				 d.d[0][2]*m[XY] + d.d[1][2]*m[YY] + d.d[2][2]*m[YZ],
+				 d.d[0][0]*m[XZ] + d.d[1][0]*m[YZ] + d.d[2][0]*m[ZZ], 
+				 d.d[0][1]*m[XZ] + d.d[1][1]*m[YZ] + d.d[2][1]*m[ZZ], 
+				 d.d[0][2]*m[XZ] + d.d[1][2]*m[YZ] + d.d[2][2]*m[ZZ]);
+}
+
+
 // unary operator -
 inline mat3ds mat3ds::operator - () const
 {

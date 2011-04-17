@@ -573,13 +573,16 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		
 		// evaluate the porosity and its derivative
 		double phiw = pm->Porosity(mp);
-		double dpdJ = (1. - phiw)/J;
+		double phis = 1. - phiw;
+		double dpdJ = phis/J;
+		double dpdJJ = -2*phis/(J*J);
 		
 		// evaluate the solubility and its derivatives
 		double kappa = pm->m_pSolub->Solubility(mp);
 		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
 		double dkdJJ = pm->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
 		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp);
+		double dkdcc = 0;	// TODO: temporary, until I implent it in FESoluteSolubility
 		double dkdJc = pm->m_pSolub->Tangent_Solubility_Strain_Concentration(mp);
 		
 		// evaluate the diffusivity tensor and its derivatives
@@ -589,11 +592,14 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		
 		// evaluate the solute free diffusivity
 		double D0 = pm->m_pDiff->Free_Diffusivity(mp);
-		double dD0dc = 0;	// temporary, until I implement it in FESoluteDiffusivity
+		double dD0dc = 0;	// TODO: temporary, until I implement it in FESoluteDiffusivity
 		
 		// evaluate the osmotic coefficient and its derivatives
 		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
 		double dodc = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp);
+		
+		// evaluate the stress tangent with concentration
+		mat3ds dTdc = pm->m_pSolid->Tangent_Concentration(mp);
 		
 		// Miscellaneous constants
 		mat3dd I(1);
@@ -612,104 +618,81 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		+R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
 		mat3ds dKedc = -Ke*Gc*Ke;
 		
-		// calculate the kpp matrix
-		tmp = dt*detJ*gw[n];
+		// calculate all the matrices
+		vec3d vtmp,gp,gc,qpu,qcu,wc,jc,vc;
+		mat3d wu,ju,vu;
+		double qcc;
+		tmp = detJ*gw[n];
 		for (i=0; i<neln; ++i)
+		{
 			for (j=0; j<neln; ++j)
 			{
-				ke[5*i+3][5*j+3] -= gradN[i]*(Ke*gradN[j])*tmp;
-			}
-		
-		// calculate the kcc matrix
-		tmp = dt*detJ*gw[n];
-		for (i=0; i<neln; ++i)
-			for (j=0; j<neln; ++j)
-			{
-				ke[5*i+4][5*j+4] += (H[j]*(gradN[i]*((D*dkdc+dDdc*kappa)*(w*c/D0-gradc*phiw)))
-									 -phiw*kappa*(gradN[i]*(D*gradN[j]))
-									 -H[j]*kappa*c/D0*(gradN[i]*((D*dKdc)*(gradp+D*gradc*(R*T*kappa/D0))))
-									 -R*T*kappa*c/D0*(gradN[i]*((D*Ke)*(H[j]*(D*(dkdc-kappa/D0*dD0dc)/D0+dDdc*kappa/D0)*gradc+D*gradN[j]*kappa/D0)))
-									 +H[j]*phiw*(kappa+c*dkdc)*(vs*gradN[i])
-									 -H[i]*H[j]*divv*(phiw*kappa+J*dpdJ*kappa+J*phiw*dkdJ+c*(phiw*dkdc+J*dpdJ*dkdc+J*phiw*dkdJc))
-									 -phiw*H[i]*H[j]*(dkdc*dcdt+kappa/dt))*tmp;
-			}
-		
-		// calculate the kup matrix
-		for (i=0; i<neln; ++i) {
-			for (j=0; j<neln; ++j)
-			{
-				tmp = detJ*gw[n]*H[j];
-				ke[5*i  ][5*j+3] -= tmp*gradN[i].x;
-				ke[5*i+1][5*j+3] -= tmp*gradN[i].y;
-				ke[5*i+2][5*j+3] -= tmp*gradN[i].z;
-			}
-		}
-		
-		// calculate the kpu matrix
-		tmp = dt*detJ*gw[n];
-		for (i=0; i<neln; ++i) {
-			for (j=0; j<neln; ++j)
-			{
-				vec3d vt = (-(vdotTdotv(gradN[i], dKedE, gradN[j])*(gradp+(D*gradc)*(R*T*kappa/D0)))
-							-gradN[j]*(gradN[i]*((Ke*D)*gradc))*(R*T/D0*(J*dkdJ-kappa))
-							-(Ke*gradN[i])*(gradN[j]*(D*gradc))*(2*R*T*kappa/D0)
-							-vdotTdotv(gradc, dDdE, gradN[j])*(Ke*gradN[i])*(R*T*kappa/D0)
-							-(I*(divv+1./dt) - gradv.transpose())*gradN[j]*H[i])*tmp;
-				ke[5*i+3][5*j  ] += vt.x;
-				ke[5*i+3][5*j+1] += vt.y;
-				ke[5*i+3][5*j+2] += vt.z;
-			}
-		}
-		
-		// calculate the kuc matrix
-		mat3ds dTdc = pm->m_pSolid->Tangent_Concentration(mp);
-		for (i=0; i<neln; ++i) {
-			vec3d vt = dTdc*gradN[i]-gradN[i]*(R*T*(dodc*kappa*c+osmc*dkdc*c+osmc*kappa));
-			for (j=0; j<neln; ++j)
-			{
-				tmp = detJ*gw[n]*H[j];
-				ke[5*i  ][5*j+4] += tmp*vt.x;
-				ke[5*i+1][5*j+4] += tmp*vt.y;
-				ke[5*i+2][5*j+4] += tmp*vt.z;
-			}
-		}
-		
-		// calculate the kcu matrix
-		tmp = dt*detJ*gw[n];
-		for (i=0; i<neln; ++i) {
-			for (j=0; j<neln; ++j)
-			{
-				vec3d vt = (D*gradN[i])*(gradc*gradN[j]) 
-				+ ((vdotTdotv(gradN[i], dDdE, gradN[j])).transpose()*gradc)*kappa;
-				vt += (gradN[j]*(kappa+J*dkdJ)*(vs*gradN[i])
-					   +gradN[i]*kappa*(H[j]/dt-(vs*gradN[j])))*c;
-				double s = (kappa+3*J*dkdJ+J*J*dkdJJ)*c*divv+(kappa+J*dkdJ)*(dcdt+c/dt);
-				ke[5*i+4][5*j  ] += tmp*(vt.x-H[i]*s*gradN[j].x);
-				ke[5*i+4][5*j+1] += tmp*(vt.y-H[i]*s*gradN[j].y);
-				ke[5*i+4][5*j+2] += tmp*(vt.z-H[i]*s*gradN[j].z);
+				// calculate the kpu matrix
+				gp = gradp+(D*gradc)*R*T*kappa/D0;
+				wu = vdotTdotv(-gp, dKedE, gradN[j])
+				-(((Ke*(D*gradc)) & gradN[j])*(J*dkdJ - kappa)
+				  +Ke*(2*kappa*(gradN[j]*(D*gradc))))*R*T/D0
+				- Ke*vdotTdotv(gradc, dDdE, gradN[j])*(kappa*R*T/D0);
+				qpu = -gradN[j]*(divv+1/dt)-gradv.transpose()*gradN[j];
+				vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(tmp*dt);
+				ke[5*i+3][5*j  ] += vtmp.x;
+				ke[5*i+3][5*j+1] += vtmp.y;
+				ke[5*i+3][5*j+2] += vtmp.z;
+				
+				// calculate the kcu matrix
+				gc = -gradc*phiw + w*c/D0;
+				ju = ((D*gc) & gradN[j])*(J*dkdJ) 
+				+ vdotTdotv(gc, dDdE, gradN[j])*kappa
+				+ (((D*gradc) & gradN[j])*(-phis)
+				   +(D*((gradN[j]*w)*2) - ((D*w) & gradN[j]))*c/D0
+				   )*kappa
+				+D*wu*(kappa*c/D0);
+				vu = (vs & gradN[j])*(c*(phiw*kappa + J*(kappa*dpdJ + phiw*dkdJ)))
+				+I*(phiw*kappa*c*(H[j]/dt - gradN[j]*vs));
+				qcu = -gradN[j]*(c*dJdt*(2*(dpdJ*kappa+phiw*dkdJ+J*dpdJ*dkdJ)
+										 +J*(dpdJJ*kappa+phiw*dkdJJ))
+								 +dcdt*((phiw+J*dpdJ)*(kappa+dkdc*c)
+										+J*phiw*(dkdJ+dkdJc*c)))
+				+qpu*(c*(phiw*kappa+J*dpdJ*kappa+J*phiw*dkdJ));
+				vtmp = ((ju+vu).transpose()*gradN[i] + qcu*H[i])*(tmp*dt);
+				ke[5*i+4][5*j  ] += vtmp.x;
+				ke[5*i+4][5*j+1] += vtmp.y;
+				ke[5*i+4][5*j+2] += vtmp.z;
+				
+				// calculate the kup matrix
+				vtmp = -gradN[i]*H[j]*tmp;
+				ke[5*i  ][5*j+3] += vtmp.x;
+				ke[5*i+1][5*j+3] += vtmp.y;
+				ke[5*i+2][5*j+3] += vtmp.z;
+				
+				// calculate the kpp matrix
+				ke[5*i+3][5*j+3] -= gradN[i]*(Ke*gradN[j])*(tmp*dt);
+				
+				// calculate the kcp matrix
+				ke[5*i+4][5*j+3] -= (gradN[i]*((D*Ke)*gradN[j]))*(kappa*c/D0)*(tmp*dt);
+
+				// calculate the kuc matrix
+				vtmp = (dTdc*gradN[i] - gradN[i]*(R*T*(dodc*kappa*c+osmc*dkdc*c+osmc*kappa)))*H[j]*tmp;
+				ke[5*i  ][5*j+4] += vtmp.x;
+				ke[5*i+1][5*j+4] += vtmp.y;
+				ke[5*i+2][5*j+4] += vtmp.z;
+				
+				// calculate the kpc matrix
+				wc = (dKedc*gp)*(-H[j])
+				-Ke*((((D*(dkdc-kappa*dD0dc/D0)+dDdc*(kappa/D0))*gradc)*H[j]
+					  +(D*gradN[j])*kappa)*(R*T/D0));
+				ke[5*i+3][5*j+4] += (gradN[i]*wc)*(tmp*dt);
+				
+				// calculate the kcc matrix
+				jc = ((D*dkdc+dDdc*kappa)*gc)*H[j]
+				+D*((-gradN[j]*phiw+wc*(c/D0))*kappa);
+				vc = vs*(H[j]*phiw*(kappa+c*dkdc));
+				qcc = -H[j]*((phiw+J*dpdJ)*divv*(kappa+c*dkdc)
+				+phiw*((2*dkdc+c*dkdcc)*dcdt+(kappa+c*dkdc)/dt+dJdt*(dkdJ+c*dkdJc)));
+				ke[5*i+4][5*j+4] += (gradN[i]*(jc+vc) + H[i]*qcc)*(tmp*dt);
+				
 			}
 		}
-		
-		// calculate the kcp matrix
-		tmp = dt*detJ*gw[n];
-		for (i=0; i<neln; ++i) {
-			for (j=0; j<neln; ++j)
-			{
-				ke[5*i+4][5*j+3] -= (gradN[i]*((D*Ke)*gradN[j]))*(kappa*c/D0)*tmp;
-			}
-		}
-		
-		// calculate the kpc matrix
-		tmp = dt*detJ*gw[n];
-		for (i=0; i<neln; ++i) {
-			for (j=0; j<neln; ++j)
-			{
-				ke[5*i+3][5*j+4] -= (gradN[i]*(dKedc*(gradp+(D*gradc)*(R*T*kappa/D0)))*H[j]
-									 +(gradN[i]*((Ke*(D*(dkdc-kappa*dD0dc/D0)/D0+dDdc*(kappa/D0)))*gradc))*(R*T*H[j])
-									 +(gradN[i]*((Ke*D)*gradN[j]))*R*T*kappa/D0)*tmp;
-			}
-		}
-		
 	}
 	
 	// Enforce symmetry by averaging top-right and bottom-left corners of stiffness matrix
