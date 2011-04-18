@@ -3562,7 +3562,22 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 						tag.value(pf->m_a);
 					}
 					else if (tag == "beta") tag.value(pf->m_b);
-					else if (tag == "r0") tag.value(pf->m_r0);
+					else if (tag == "r0")
+					{
+						const char* szt = tag.AttributeValue("type", true);
+						if (szt)
+						{
+							if (strcmp(szt, "node") == 0) pf->m_ntype = FEPointBodyForce::NODE;
+							else if (strcmp(szt, "point") == 0) pf->m_ntype = FEPointBodyForce::POINT;
+							else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+						}
+
+						switch (pf->m_ntype)
+						{
+						case FEPointBodyForce::POINT: tag.value(pf->m_rc); break;
+						case FEPointBodyForce::NODE: tag.value(pf->m_inode); pf->m_inode -= 1; break;
+						}
+					}
 					else if (tag == "rlc") tag.value(pf->m_rlc, 3);
 					else if (tag == "rigid") tag.value(pf->m_brigid);
 					else throw XMLReader::InvalidTag(tag);

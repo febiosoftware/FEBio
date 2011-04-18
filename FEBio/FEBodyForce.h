@@ -83,7 +83,13 @@ public:
 class FEPointBodyForce : public FEBodyForce
 {
 public:
-	FEPointBodyForce(FEM* pfem) { s[0] = s[1] = s[2] = 1.0; m_rlc[0] = m_rlc[1] = m_rlc[2] = -1; m_pel = 0; m_pfem = pfem; m_brigid = true; }
+	// type of force center:
+	// POINT = a global point, rigid or not
+	// NODE = a node of the mesh
+	enum { POINT, NODE };
+
+public:
+	FEPointBodyForce(FEM* pfem);
 
 	vec3d force(FEMaterialPoint& mp);
 	mat3ds stiffness(FEMaterialPoint& mp);
@@ -96,8 +102,10 @@ public:
 public:
 	FEM*	m_pfem;
 	double	m_a, m_b;
-	vec3d	m_r0;
+	vec3d	m_rc;
 	int		m_rlc[3];
+	int		m_ntype;
+	int		m_inode;
 
 	bool	m_brigid;
 

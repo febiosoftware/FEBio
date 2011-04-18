@@ -136,9 +136,9 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 		if (dynamic_cast<FEPointBodyForce*>(&BF))
 		{
 			FEPointBodyForce* pf = dynamic_cast<FEPointBodyForce*>(&BF);
-			if (pf->m_rlc[0] >= 0) pf->m_r0.x = fem.GetLoadCurve(pf->m_rlc[0])->Value();
-			if (pf->m_rlc[1] >= 0) pf->m_r0.y = fem.GetLoadCurve(pf->m_rlc[1])->Value();
-			if (pf->m_rlc[2] >= 0) pf->m_r0.z = fem.GetLoadCurve(pf->m_rlc[2])->Value();
+			if (pf->m_rlc[0] >= 0) pf->m_rc.x = fem.GetLoadCurve(pf->m_rlc[0])->Value();
+			if (pf->m_rlc[1] >= 0) pf->m_rc.y = fem.GetLoadCurve(pf->m_rlc[1])->Value();
+			if (pf->m_rlc[2] >= 0) pf->m_rc.z = fem.GetLoadCurve(pf->m_rlc[2])->Value();
 		}
 
 		// jacobian
