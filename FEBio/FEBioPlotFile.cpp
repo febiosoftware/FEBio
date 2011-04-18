@@ -351,6 +351,9 @@ void FEBioPlotFile::WriteDomainSection(FEMesh& m)
 
 			FETrussDomain* ptd = dynamic_cast<FETrussDomain*>(&m.Domain(nd));
 			if (ptd) WriteTrussDomain(*ptd);
+
+			FEDiscreteDomain* pdd = dynamic_cast<FEDiscreteDomain*>(&m.Domain(nd));
+			if (pdd) WriteDiscreteDomain(*pdd);
 		}
 		m_ar.EndChunk();
 	}
@@ -450,6 +453,43 @@ void FEBioPlotFile::WriteShellDomain(FEShellDomain& dom)
 void FEBioPlotFile::WriteTrussDomain(FETrussDomain& dom)
 {
 	assert(false);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::WriteDiscreteDomain(FEDiscreteDomain& dom)
+{
+	int mid = dom.GetMaterial()->GetID();
+	assert(mid > 0);
+
+	int i, j;
+	int NE = dom.Elements();
+
+	// figure out element type
+	int ne = 2;
+	int dtype = PLT_ELEM_TRUSS;
+
+	// write the header
+	m_ar.BeginChunk(PLT_DOMAIN_HDR);
+	{
+		m_ar.WriteChunk(PLT_DOM_ELEM_TYPE, dtype);
+		m_ar.WriteChunk(PLT_DOM_MAT_ID   ,   mid);
+		m_ar.WriteChunk(PLT_DOM_ELEMS    ,    NE);
+	}
+	m_ar.EndChunk();
+
+	// write the element list
+	int n[5];
+	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
+	{
+		for (i=0; i<NE; ++i)
+		{
+			FEDiscreteElement& el = dynamic_cast<FEDiscreteElement&>(dom.ElementRef(i));
+			n[0] = el.m_nID;
+			for (j=0; j<ne; ++j) n[j+1] = el.m_node[j];
+			m_ar.WriteChunk(PLT_ELEMENT, n, ne+1);
+		}
+	}
+	m_ar.EndChunk();
 }
 
 //-----------------------------------------------------------------------------

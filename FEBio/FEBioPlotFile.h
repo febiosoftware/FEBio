@@ -151,9 +151,10 @@ protected:
 	void WriteDomainSection (FEMesh& m);
 	void WriteSurfaceSection(FEMesh& m);
 
-	void WriteSolidDomain(FESolidDomain& dom);
-	void WriteShellDomain(FEShellDomain& dom);
-	void WriteTrussDomain(FETrussDomain& dom);
+	void WriteSolidDomain   (FESolidDomain&    dom);
+	void WriteShellDomain   (FEShellDomain&    dom);
+	void WriteTrussDomain   (FETrussDomain&    dom);
+	void WriteDiscreteDomain(FEDiscreteDomain& dom);
 
 	void WriteGlobalData  (FEM& fem);
 	void WriteMaterialData(FEM& fem);
