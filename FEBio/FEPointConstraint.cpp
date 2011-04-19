@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPointConstraint.h"
-#include "FEM.h"
+#include "fem.h"
 #include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
