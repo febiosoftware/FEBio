@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FEPointConstraint.h"
 #include "FEM.h"
 #include "FESolidSolver.h"
