@@ -229,7 +229,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(m_rve.m_pStep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
-	mat3ds s(0);
+	mat3d T; T.zero();
 	for (int i=0; i<(int) m_rve.m_DC.size()/3; ++i)
 	{
 		FEPrescribedBC& dc = *m_rve.m_DC[3*i];
@@ -238,10 +238,9 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 		f.x = R[-n.m_ID[0]-2];
 		f.y = R[-n.m_ID[1]-2];
 		f.z = R[-n.m_ID[2]-2];
-		s += (f & n.m_rt).sym();
+		T += f & n.m_rt;
 	}
-	s /= (J / m_V0);
-
+	mat3ds s = T.sym() / (J*m_V0);
 	return s;
 }
 
@@ -392,7 +391,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	}
 
 	// divide by volume
-	double Vi = pt.J / m_V0;
+	double Vi = 1.0/(pt.J * m_V0);
 	D[0][0] *= Vi; D[0][1] *= Vi; D[0][2] *= Vi; D[0][3] *= Vi; D[0][4] *= Vi; D[0][5] *= Vi;
 	D[1][1] *= Vi; D[1][2] *= Vi; D[1][3] *= Vi; D[1][4] *= Vi; D[1][5] *= Vi;
 	D[2][2] *= Vi; D[2][3] *= Vi; D[2][4] *= Vi; D[2][5] *= Vi;
