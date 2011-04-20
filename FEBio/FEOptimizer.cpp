@@ -126,9 +126,6 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 //! Read the objectives section of the input file
 bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 {
-	// get the variable name
-	char szval[256];
-
 	FEM& fem = opt.GetFEM();
 
 	OPT_OBJECTIVE obj;
@@ -146,7 +143,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 
 			// find the variable
 			obj.m_pd = fem.FindParameter(obj.m_szname);
-			if (obj.m_pd == 0) throw InvalidVariableName(szval);
+			if (obj.m_pd == 0) throw InvalidVariableName(obj.m_szname);
 
 			opt.SetObjective(obj);
 		}
