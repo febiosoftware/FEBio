@@ -103,11 +103,14 @@ bool FEPoroSolidSolver::Quasin(double time)
 	PrepStep(time);
 
 	// check for CTRL+C interruption before we do any work
-	Interruption itr;
-	if (itr.m_bsig)
+	if (m_fem.m_bInterruptable)
 	{
-		itr.m_bsig = false;
-		itr.interrupt();
+		Interruption itr;
+		if (itr.m_bsig)
+		{
+			itr.m_bsig = false;
+			itr.interrupt();
+		}
 	}
 
 	// calculate initial stiffness matrix
@@ -359,10 +362,14 @@ bool FEPoroSolidSolver::Quasin(double time)
 		clog.flush();
 
 		// check for CTRL+C interruption
-		if (itr.m_bsig)
+		if (m_fem.m_bInterruptable)
 		{
-			itr.m_bsig = false;
-			itr.interrupt();
+			Interruption itr;
+			if (itr.m_bsig)
+			{
+				itr.m_bsig = false;
+				itr.interrupt();
+			}
 		}
 	}
 	while (bconv == false);

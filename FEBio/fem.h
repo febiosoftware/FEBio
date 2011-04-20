@@ -300,6 +300,8 @@ public:
 	//{
 		PlotFile*	m_plot;		//!< the plot file
 		DataStore	m_Data;		//!< the data store used for data logging
+		
+		bool		m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
 
 protected:
 		// file names
@@ -311,7 +313,7 @@ protected:
 
 		char	m_sztitle[MAX_STRING];	//!< problem title
 
-		bool	m_debug;	//!< debug flag
+		bool	m_debug;			//!< debug flag
 
 		list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
 	//}

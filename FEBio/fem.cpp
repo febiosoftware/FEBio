@@ -52,6 +52,7 @@ FEM::FEM()
 	m_nrm = 0;
 
 	m_bsymm = true;	// assume symmetric stiffness matrix
+	m_bInterruptable = true;
 
 	// --- Material Data ---
 	// (nothing to initialize yet)
