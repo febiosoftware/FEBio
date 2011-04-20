@@ -26,7 +26,8 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 	m_hg = 1.0;
 
 	// --- Time Step Data ---
-	m_ntime = 0;
+	m_ntime = -1;
+	m_final_time = 0.0;
 	m_dt = 0;
 	m_dt0 = 0;
 	m_bautostep = false;
@@ -78,7 +79,10 @@ bool FEAnalysis::Init()
 	// We can't do this since it will mess up the value from a restart
 //	m_dt = m_dt0;
 
-	m_tend = m_fem.m_ftime0 + m_dt0*m_ntime;
+	double Dt;
+	if (m_ntime == -1) Dt = m_final_time; else Dt = m_dt0*m_ntime;
+
+	m_tend = m_fem.m_ftime0 + Dt;
 
 	// init must point curve
 	if (m_nmplc < 0)
@@ -87,7 +91,7 @@ bool FEAnalysis::Init()
 		plc->Create(2);
 		plc->LoadPoint(0).time  = m_fem.m_ftime0;
 		plc->LoadPoint(0).value = 0;
-		plc->LoadPoint(1).time  = m_fem.m_ftime0 + m_dt*m_ntime;
+		plc->LoadPoint(1).time  = m_tend;
 		plc->LoadPoint(1).value = m_dtmax;
 		m_fem.AddLoadCurve(plc);
 		m_nmplc = m_fem.m_LC.size()-1;
@@ -318,7 +322,8 @@ bool FEAnalysis::Solve()
 
 	// calculate end time value
 	double starttime = m_fem.m_ftime0;
-	double endtime = m_fem.m_ftime0 + m_ntime*m_dt0;
+//	double endtime = m_fem.m_ftime0 + m_ntime*m_dt0;
+	double endtime = m_tend;
 	const double eps = endtime*1e-7;
 
 	int nsteps = m_fem.m_Step.size();
@@ -578,6 +583,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 
 		// --- Time Step Data ---
 		ar << m_ntime;
+		ar << m_final_time;
 		ar << m_dt;
 		ar << m_dt0;
 		ar << m_tend;
@@ -616,6 +622,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 
 		// --- Time Step Data ---
 		ar >> m_ntime;
+		ar >> m_final_time;
 		ar >> m_dt;
 		ar >> m_dt0;
 		ar >> m_tend;

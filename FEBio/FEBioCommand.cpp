@@ -234,7 +234,7 @@ int FEBioCmd_Time::run(int nargs, char **argv)
 	nsec  = (int) (sec);
 	printf("Elapsed time       :  %d:%02d:%02d\n", nhour, nmin, nsec);
 
-	double endtime = m_pfem->m_pStep->m_dt0*m_pfem->m_pStep->m_ntime;
+	double endtime = m_pfem->m_pStep->m_tend;
 
 	double pct = (m_pfem->m_ftime - m_pfem->m_pStep->m_dt) / endtime;
 	if ((pct != 0) && (m_pfem->m_pStep->m_ntimesteps != 0))

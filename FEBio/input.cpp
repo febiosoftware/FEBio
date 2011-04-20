@@ -91,7 +91,11 @@ void echo_input(FEM& fem)
 	clog.printf("\tNumber of solid elements ....................... : %d\n", mesh.SolidElements());
 	clog.printf("\tNumber of shell elements ....................... : %d\n", mesh.ShellElements());
 	clog.printf("\tNumber of truss elements ....................... : %d\n", mesh.TrussElements());
-	clog.printf("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
+	if (step.m_ntime > 0)
+		clog.printf("\tNumber of timesteps ............................ : %d\n", step.m_ntime);
+	else
+		clog.printf("\tFinal time ..................................... : %lg\n", step.m_final_time);
+
 	clog.printf("\tTime step size ................................. : %lg\n", step.m_dt0);
 	clog.printf("\tAuto time stepper activated .................... : %s\n", (step.m_bautostep ? "yes" : "no"));
 	if (step.m_bautostep)

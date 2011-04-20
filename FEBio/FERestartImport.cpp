@@ -166,6 +166,7 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 	do
 	{
 		if      (tag == "time_steps"        ) tag.value(fem.m_pStep->m_ntime);
+		if      (tag == "final_time"        ) tag.value(fem.m_pStep->m_final_time);
 		else if (tag == "step_size"         ) tag.value(fem.m_pStep->m_dt0);
 //		else if (tag == "dtol"              ) tag.value(fem.m_pStep->m_psolver->m_Dtol);
 //		else if (tag == "ptol"              ) tag.value(fem.m_pStep->m_psolver->m_Ptol);
