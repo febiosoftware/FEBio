@@ -115,6 +115,9 @@ protected:
 	// calculate damage reduction factor for fibers
 	double FiberDamage(FEMaterialPoint& pt);
 
+	double MatrixDamageDerive(FEMaterialPoint& pt);
+	double FiberDamageDerive(FEMaterialPoint& pt);
+
 public:
 	// declare as registered
 	DECLARE_REGISTERED(FEDamageTransIsoMooneyRivlin);

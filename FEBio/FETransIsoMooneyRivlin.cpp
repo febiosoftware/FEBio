@@ -50,9 +50,8 @@ mat3ds FETransIsoMooneyRivlin::DevStress(FEMaterialPoint& mp)
 	mat3ds s = T.dev()*(2.0/J);
 
 	// add the fiber stress
-	s += m_fib.Stress(mp);
-
-	return s;
+	mat3ds fs = m_fib.Stress(mp);
+	return s + fs;
 }
 
 //-----------------------------------------------------------------------------

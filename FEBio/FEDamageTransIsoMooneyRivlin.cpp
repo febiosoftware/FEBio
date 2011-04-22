@@ -249,6 +249,15 @@ tens4ds FEDamageTransIsoMooneyRivlin::FiberTangent(FEMaterialPoint &mp)
 
 	tens4ds c = (Id4 - IxI/3.0)*(4.0/3.0*Ji*WC) + IxI*(4.0/9.0*Ji*CWWC) + cw;
 
+	// see if we need to add the stress
+	FETIMRDamageMaterialPoint& dp = *mp.ExtractData<FETIMRDamageMaterialPoint>();
+	if (dp.m_FEtrial > dp.m_FEmax)
+	{
+		mat3ds devs = pt.s.dev();
+		double dg = FiberDamageDerive(mp);
+		c += dyad1s(devs)*(J*dg/dp.m_FEtrial);
+	}
+
 	return c;
 }
 
@@ -291,6 +300,47 @@ double FEDamageTransIsoMooneyRivlin::MatrixDamage(FEMaterialPoint &mp)
 	dp.m_Dm = g;
 	return g;
 }
+
+//-----------------------------------------------------------------------------
+// Calculate damage reduction factor for matrix
+double FEDamageTransIsoMooneyRivlin::MatrixDamageDerive(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// calculate right Cauchy-Green tensor
+	mat3ds C = pt.DevRightCauchyGreen();
+	mat3ds C2 = C*C;
+
+	// Invariants
+	double I1 = C.tr();
+	double I2 = 0.5*(I1*I1 - C2.tr());
+
+	// strain-energy value
+	double SEF = m_c1*(I1 - 3) + m_c2*(I2 - 3);
+
+	// get the damage material point data
+	FETIMRDamageMaterialPoint& dp = *mp.ExtractData<FETIMRDamageMaterialPoint>();
+
+	// calculate trial-damage parameter
+	dp.m_MEtrial = sqrt(2.0*fabs(SEF));
+
+	// calculate damage parameter
+	double Es = max(dp.m_MEtrial, dp.m_MEmax);
+
+	// calculate reduction parameter
+	double dg = 0.0;
+	if (Es < m_Msmin) dg = 0.0;
+	else if (Es > m_Msmax) dg = 0.0;
+	else 
+	{
+		double h = m_Msmax - m_Msmin;
+		double F = (Es - m_Msmin)/h;
+		dg = -2.0*F/h*(1 - m_Mbeta + m_Mbeta*F*F)-(F*F)*(2.0*m_Mbeta*F/h);
+	}
+
+	return dg;
+}
+
 
 //-----------------------------------------------------------------------------
 // Calculate damage reduction factor for fibers
@@ -344,4 +394,59 @@ double FEDamageTransIsoMooneyRivlin::FiberDamage(FEMaterialPoint &mp)
 
 	dp.m_Df = g;
 	return g;
+}
+
+
+//-----------------------------------------------------------------------------
+// Calculate damage reduction factor for fibers
+double FEDamageTransIsoMooneyRivlin::FiberDamageDerive(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// deformation gradient
+	mat3d& F = pt.F;
+	double J = pt.J;
+	double Jm13 = pow(J, -1.0/3.0);
+
+	// get the initial fiber direction
+	vec3d a0;
+	a0.x = pt.Q[0][0];
+	a0.y = pt.Q[1][0];
+	a0.z = pt.Q[2][0];
+
+	// calculate the current material axis lam*a = F*a0;
+	vec3d a = F*a0;
+
+	// normalize material axis and store fiber stretch
+	double lam, lamd;
+	lam = a.unit();
+	lamd = lam*Jm13; // i.e. lambda tilde
+
+	// invariant I4
+	double I4 = lamd*lamd;
+
+	// strain energy value
+	double SEF = 0.5*m_c3/m_c4*(exp(m_c4*(I4-1)*(I4-1))-1);
+
+	// get the damage material point data
+	FETIMRDamageMaterialPoint& dp = *mp.ExtractData<FETIMRDamageMaterialPoint>();
+
+	// calculate trial-damage parameter
+	dp.m_FEtrial = sqrt(2.0*fabs(SEF));
+
+	// calculate damage parameter
+	double Es = max(dp.m_FEtrial, dp.m_FEmax);
+
+	// calculate reduction parameter
+	double dg = 0.0;
+	if (Es < m_Fsmin) dg = 0.0;
+	else if (Es > m_Fsmax) dg = 0.0;
+	else 
+	{
+		double h = m_Fsmin - m_Fsmax;
+		double F = (Es - m_Fsmin)/h;
+		dg = -2.0*F/h*(1 - m_Fbeta + m_Fbeta*F*F)-(F*F)*(2.0*m_Fbeta*F/h);
+	}
+
+	return dg;
 }

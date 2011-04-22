@@ -2,6 +2,7 @@
 #include "FEPlotDomainData.h"
 #include "FEPlotDataFactory.h"
 #include "FEDamageNeoHookean.h"
+#include "FEDamageTransIsoMooneyRivlin.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_PLOTDATA(FEPlotEffectiveFluidPressure       , "effective fluid pressure"      );
@@ -480,6 +481,12 @@ bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 				{
 					FEDamageMaterialPoint& pt = *ppt;
 					D += (float) pt.m_D;
+				}
+
+				FETIMRDamageMaterialPoint* pt2 = (el.m_State[j]->ExtractData<FETIMRDamageMaterialPoint>());
+				if (pt2)
+				{
+					D += (float) pt2->m_Df;
 				}
 			}
 			D /= (float) nint;
