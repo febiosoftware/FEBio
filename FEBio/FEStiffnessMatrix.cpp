@@ -76,12 +76,13 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 			// add all elements to the profile
 			// TODO: perhaps we should ask the domain the create the profile
-			for (i=0; i<mesh.Domains(); ++i)
+			for (int nd=0; nd<mesh.Domains(); ++nd)
 			{
-				FEDomain& d = mesh.Domain(i);
+				FEDomain& d = mesh.Domain(nd);
+
 				if (dynamic_cast<FEUT4Domain*>(&d) == 0)
 				{
-					for (j=0; j<d.Elements(); ++j)
+					for (int j=0; j<d.Elements(); ++j)
 					{
 						FEElement& el = d.ElementRef(j);
 						if (!el.IsRigid())
@@ -101,7 +102,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					assert(NEL.Size() > 0);
 
 					vector<int> LM;
-					for (i=0; i<mesh.Nodes(); ++i)
+					for (int i=0; i<mesh.Nodes(); ++i)
 					{
 						int NE = NEL.Valence(i);
 						if (NE > 0)
@@ -125,7 +126,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			if (!fem.m_RJ.empty())
 			{
 				vector<int> lm(12);
-				for (i=0; i<(int) fem.m_RJ.size(); ++i)
+				for (int i=0; i<(int) fem.m_RJ.size(); ++i)
 				{
 					FERigidJoint& rj = *fem.m_RJ[i];
 			
@@ -143,10 +144,10 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			if (fem.m_nrb)
 			{
 				vector<int> lm(6);
-				for (i=0; i<fem.m_nrb; ++i)
+				for (int i=0; i<fem.m_nrb; ++i)
 				{
 					FERigidBody& rb = fem.m_RB[i];
-					for (j=0; j<6; ++j) lm[j] = rb.m_LM[j];
+					for (int j=0; j<6; ++j) lm[j] = rb.m_LM[j];
 					build_add(lm);
 				}
 			}
