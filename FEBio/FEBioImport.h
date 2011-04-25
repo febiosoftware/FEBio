@@ -98,6 +98,13 @@ private:
 		ET_TRI,
 		ET_TRUSS
 	};
+
+	struct FEDOMAIN 
+	{
+		int		mat;	// material ID
+		int		elem;	// element type
+		int		nel;	// number of elements
+	};
 	
 public:
 	FEBioGeometrySection(FEFEBioImport* pim) : FileSection(pim){}

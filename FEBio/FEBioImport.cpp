@@ -1587,166 +1587,159 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	int i;
-
 	FEMesh& mesh = fem.m_mesh;
 
 	// first we need to figure out how many elements 
 	// and how many domains there are
+	vector<FEDOMAIN> dom;
+	vector<int>	ED; ED.reserve(1000);
 	XMLTag t(tag); ++t;
-	int nmat;
-	int nel = 0;
-	FEDomain* pdom = 0;
-	int etype;
+	int elems = 0, i;
 	while (!t.isend())
 	{
 		// get the material ID
 		const char* szmat = t.AttributeValue("mat");
-		nmat = atoi(szmat)-1;
-		if ((nmat < 0) || (nmat >= fem.Materials())) throw XMLReader::InvalidAttributeValue(t, "mat", szmat);
+		int nmat = atoi(szmat)-1;
+		if ((nmat < 0) || (nmat >= fem.Materials())) throw FEFEBioImport::InvalidMaterial(elems+1);
 
-		// get material class
-		FEMaterial* pmat = fem.GetMaterial(nmat);
+		// get the element type
+		int etype = ElementType(t);
+		if (etype < 0) throw XMLReader::InvalidTag(t);
 
-		// see if we have a domain
-		if (pdom == 0) 
+		// find a domain for this element
+		int ndom = -1;
+		for (i=0; i<(int) dom.size(); ++i)
 		{
-			// if we don't, create a domain for the current element and material type
-			// first, get the element type
-			etype = ElementType(t);
-			if (etype < 0) throw XMLReader::InvalidTag(t);
-
-			// then, find the domain type depending on the 
-			// element and material types
-			int ntype = DomainType(etype, pmat);
-			if (ntype == 0) throw FEFEBioImport::InvalidDomainType();
-
-			// create the new domain
-			pdom = CreateDomain(ntype, &mesh, pmat);
-			if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
-
-			// reset element counter
-			nel = 1;
-		}
-		else
-		{
-			// see if we can add this element to the domain
-			// note that the element type, domain type and material must match
-			int et = ElementType(t);
-			if (et < 0) throw XMLReader::InvalidTag(t);
-
-			int ntype = DomainType(et, pmat);
-			if ((et == etype) && (ntype == pdom->Type()) && (pmat == pdom->GetMaterial()))
+			FEDOMAIN& d = dom[i];
+			if ((d.mat == nmat) && (d.elem == etype))
 			{
-				// yes, we can so increase element counter
-				++nel;
-			}
-			else
-			{
-				// no we can't so finalize domain 
-				// and add it to the mesh
-				assert(nel);
-				pdom->create(nel);
-				mesh.AddDomain(pdom);
-
-				// create a new domain
-				etype = et;
-				pdom = CreateDomain(ntype, &mesh, pmat);
-				if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
-
-				// reset element counter
-				nel = 1;
+				ndom = i;
+				d.nel++;
+				break;
 			}
 		}
+		if (ndom == -1)
+		{
+			FEDOMAIN d;
+			d.mat = nmat;
+			d.elem = etype;
+			d.nel = 1;
+			ndom = (int) dom.size();
+			dom.push_back(d);
+		}
 
+		ED.push_back(ndom);
+		elems++;
 		++t;
 	}
 
-	// create the last domain
-	pdom->create(nel);
-	mesh.AddDomain(pdom);
+	// create the domains
+	for (i=0; i<(int) dom.size(); ++i)
+	{
+		FEDOMAIN& d = dom[i];
+
+		// get material class
+		FEMaterial* pmat = fem.GetMaterial(d.mat);
+
+		// then, find the domain type depending on the 
+		// element and material types
+		int ntype = DomainType(d.elem, pmat);
+		if (ntype == 0) throw FEFEBioImport::InvalidDomainType();
+
+		// create the new domain
+		FEDomain* pdom = CreateDomain(ntype, &mesh, pmat);
+		if (pdom == 0) throw FEFEBioImport::FailedCreatingDomain();
+
+
+		// add it to the mesh
+		assert(d.nel);
+		pdom->create(d.nel);
+		mesh.AddDomain(pdom);
+
+		// we reset the nr of elements since we'll be using 
+		// that variable is a counter in the next loop
+		d.nel = 0;
+	}
 
 	// read element data
 	++tag;
 	int nid = 1;
-	for (int nd =0; nd<mesh.Domains(); ++nd)
+	for (i=0; i<elems; ++i)
 	{
+		int nd = ED[i];
+		int ne = dom[nd].nel++;
+
+		// get the domain to which this element belongs
 		FEDomain& dom = mesh.Domain(nd);
 
-		for (i=0; i<dom.Elements(); ++i, ++nid)
+		// get the material ID
+		int nmat = atoi(tag.AttributeValue("mat"))-1;
+
+		// get the material class
+		FEMaterial* pmat = fem.GetMaterial(nmat);
+		assert(pmat == dom.GetMaterial());
+
+		// determine element type
+		int etype = -1;
+		if      (tag == "hex8"  ) etype = FEFEBioImport::ET_HEX8;
+		else if (tag == "penta6") etype = FEFEBioImport::ET_PENTA6;
+		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
+		else if (tag == "quad4" ) etype = FEFEBioImport::ET_QUAD4;
+		else if (tag == "tri3"  ) etype = FEFEBioImport::ET_TRI3;
+		else if (tag == "truss2") etype = FEFEBioImport::ET_TRUSS2;
+		else throw XMLReader::InvalidTag(tag);
+
+		switch (etype)
 		{
-			// get the material ID
-			nmat = atoi(tag.AttributeValue("mat"))-1;
-
-			// make sure the material number is valid
-			if ((nmat<0) || (nmat >= fem.Materials())) throw FEFEBioImport::InvalidMaterial(i+1);
-
-			// get the material class
-			FEMaterial* pmat = fem.GetMaterial(nmat);
-			assert(pmat == dom.GetMaterial());
-
-			// determine element type
-			int etype = -1;
-			if      (tag == "hex8"  ) etype = FEFEBioImport::ET_HEX8;
-			else if (tag == "penta6") etype = FEFEBioImport::ET_PENTA6;
-			else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
-			else if (tag == "quad4" ) etype = FEFEBioImport::ET_QUAD4;
-			else if (tag == "tri3"  ) etype = FEFEBioImport::ET_TRI3;
-			else if (tag == "truss2") etype = FEFEBioImport::ET_TRUSS2;
-			else throw XMLReader::InvalidTag(tag);
-
-			switch (etype)
+		case FEFEBioImport::ET_HEX8:
 			{
-			case FEFEBioImport::ET_HEX8:
-				{
-					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-					ReadSolidElement(tag, bd.Element(i), m_pim->m_nhex8, nid, nd, nmat);
-				}
-				break;
-			case FEFEBioImport::ET_PENTA6:
-				{
-					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-					ReadSolidElement(tag, bd.Element(i), FE_PENTA, nid, nd, nmat);
-				}
-				break;
-			case FEFEBioImport::ET_TET4:
-			case FEFEBioImport::ET_UT4:
-				{
-					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-					ReadSolidElement(tag, bd.Element(i), FE_TET, nid, nd, nmat);
-				}
-				break;
-			case FEFEBioImport::ET_TETG1:
-				{
-					FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-					ReadSolidElement(tag, bd.Element(i), FE_TETG1, nid, nd, nmat);
-				}
-				break;
-			case FEFEBioImport::ET_QUAD4:
-				{
-					FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
-					ReadShellElement(tag, sd.Element(i), FE_SHELL_QUAD, nid, nd, nmat);
-				}
-				break;
-			case FEFEBioImport::ET_TRI3:
-				{
-					FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
-					ReadShellElement(tag, sd.Element(i), FE_SHELL_TRI, nid, nd, nmat);
-				}
-				break;
-			case FEFEBioImport::ET_TRUSS2:
-				{
-					FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
-					ReadTrussElement(tag, td.Element(i), FE_TRUSS, nid, nd, nmat);
-				}
-				break;
-			default:
-				throw FEFEBioImport::InvalidElementType();
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nd, nmat);
 			}
-
-			// go to next tag
-			++tag;
+			break;
+		case FEFEBioImport::ET_PENTA6:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_PENTA, nid, nd, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_TET4:
+		case FEFEBioImport::ET_UT4:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET, nid, nd, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_TETG1:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_TETG1, nid, nd, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_QUAD4:
+			{
+				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
+				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, nd, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_TRI3:
+			{
+				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
+				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, nd, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_TRUSS2:
+			{
+				FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
+				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, nd, nmat);
+			}
+			break;
+		default:
+			throw FEFEBioImport::InvalidElementType();
 		}
+
+		// go to next tag
+		++tag;
 	}
 
 	// assign material point data
