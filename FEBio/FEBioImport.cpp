@@ -87,6 +87,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// default element type
 	m_ntet4 = ET_TET4;
 	m_nhex8 = FE_HEX;
+	m_nut4  = FE_TETG1;
 
 	// 3-field formulation on by default
 	m_b3field = true;
@@ -520,6 +521,12 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 						{
 							if (tag == "alpha") tag.value(FEUT4Domain::m_alpha);
 							else if (tag == "iso_stab") tag.value(FEUT4Domain::m_bdev);
+							else if (tag == "stab_int")
+							{
+								const char* sz = tag.szvalue();
+								if (strcmp(sz, "GAUSS4") == 0) m_pim->m_nut4 = FE_TET;
+								else if (strcmp(sz, "GAUSS1") == 0) m_pim->m_nut4 = FE_TETG1;
+							}
 							else throw XMLReader::InvalidTag(tag);
 							++tag;
 						}
@@ -1704,10 +1711,15 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 			}
 			break;
 		case FEFEBioImport::ET_TET4:
-		case FEFEBioImport::ET_UT4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_TET, nid, nd, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_UT4:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nut4, nid, nd, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TETG1:

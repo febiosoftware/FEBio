@@ -255,6 +255,7 @@ protected:
 
 public:
 	int	m_ntet4;	// tetrahedral integration rule
+	int	m_nut4;		// integration rule for stabilization of UT4
 	int m_nsteps;	// nr of step sections read
 	int	m_nmat;		// nr of materials
 
