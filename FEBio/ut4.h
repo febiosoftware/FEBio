@@ -32,6 +32,7 @@ public:
 		pd->m_tag = m_tag;
 		pd->m_Node = m_Node;
 		pd->m_NEL.Create(*pd);
+		pd->m_Ve0 = m_Ve0;
 		return pd;
 	}
 
