@@ -162,6 +162,7 @@ void FENodeElemList::Create(FEDomain& dom)
 
 	// create the element reference array
 	m_eref.resize(nsize);
+	m_iref.resize(nsize);
 
 	// set eref pointers
 	m_pn[0] = 0;
@@ -181,6 +182,7 @@ void FENodeElemList::Create(FEDomain& dom)
 		{
 			n = el.m_node[j];
 			m_eref[m_pn[n] + m_nval[n]] = &el;
+			m_iref[m_pn[n] + m_nval[n]] = i;
 			m_nval[n]++;
 		}
 	}

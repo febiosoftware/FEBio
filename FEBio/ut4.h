@@ -98,6 +98,7 @@ public:
 private:
 	vector<int>		m_tag;	//!< nodal tags
 	vector<UT4NODE>	m_Node;	//!< Nodal data
+	vector<double>	m_Ve0;	//!< initial element volumes
 
 	FENodeElemList	m_NEL;
 };

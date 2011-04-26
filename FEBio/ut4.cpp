@@ -205,6 +205,7 @@ bool FEUT4Domain::Initialize(FEM& fem)
 
 	// calculate the reference nodal volume
 	// we do this here since this volume never changes
+	m_Ve0.resize(NE);
 	double Ve;
 	for (i=0; i<NE; ++i)
 	{
@@ -212,7 +213,7 @@ bool FEUT4Domain::Initialize(FEM& fem)
 		UnpackElement(el, FE_UNPACK_R0);
 
 		// calculate the initial volume
-		Ve = TetVolume(el.r0());
+		m_Ve0[i] = Ve = TetVolume(el.r0());
 
 		// now assign one-quart to each node
 		for (int j=0; j<4; ++j) m_Node[ m_tag[el.m_node[j]]].Vi += 0.25*Ve;
@@ -243,7 +244,7 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 		UnpackElement(el, FE_UNPACK_TRAITS);
 
 		// calculate the volume
-		Ve = TetVolume(el.r0());
+		Ve = m_Ve0[i]; //TetVolume(el.r0());
 		ve = TetVolume(el.rt());
 
 		// calculate the deformation gradient
@@ -341,6 +342,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 		// get the elements that belong to this list
 		int NE = m_NEL.Valence(i);
 		FEElement** ppel = m_NEL.ElementList(i);
+		int* peli = m_NEL.ElementIndexList(i);
 
 		if (NE > 0)
 		{
@@ -373,7 +375,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 
 				// calculate element volume
 				// TODO: we should store this somewhere instead of recalculating it
-				Ve = TetVolume(el.r0());
+				Ve = m_Ve0[peli[n]]; // TetVolume(el.r0());
 
 				// The '-' sign is so that the internal forces get subtracted from the residual (R = Fext - Fint)
 				double w = -0.25* Ve;
@@ -582,6 +584,7 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// get the element list 
 	int NE = m_NEL.Valence(node.inode);
 	FEElement** ppe = m_NEL.ElementList(node.inode);
+	int* peli = m_NEL.ElementIndexList(node.inode);
 
 	// get the nodal stress
 	mat3ds S;
@@ -648,43 +651,49 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 	ke.Create(NE*4*3, NE*4*3); 
 	ke.zero();
 
+	double Sv[6] = {S.xx(), S.yy(), S.zz(), S.xy(), S.yz(), S.xz()};
+
 	// loop over all the elements
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(ei, FE_UNPACK_R0);
+//		UnpackElement(ei, FE_UNPACK_R0);
 
 		// calculate element volume
-		// TODO: we should store this somewhere instead of recalculating it
-		double Vi = TetVolume(ei.r0());
+		double Vi = m_Ve0[peli[ni]]; // TetVolume(ei.r0());
 		double wi = 0.25* Vi*node.Vi/ node.Vi;
 
 		// loop over the elements again
 		for (nj=0; nj<NE; ++nj)
 		{
 			FESolidElement& ej = dynamic_cast<FESolidElement&>(*ppe[nj]);
-			UnpackElement(ej, FE_UNPACK_R0);
+//			UnpackElement(ej, FE_UNPACK_R0);
 
 			// calculate element volume
-			// TODO: we should store this somewhere instead of recalculating it
-			double Vj = TetVolume(ej.r0());
+			double Vj = m_Ve0[peli[nj]]; // TetVolume(ej.r0());
 			double wj = 0.25* Vj / node.Vi;
 
 			// We're ready to rock and roll!
 			double sg[3];
 			for (i=0; i<4; ++i)
 			{
-				double (&Gi)[3] = *(Ge[ni] + i);
+//				double (&Gi)[3] = *(Ge[ni] + i);
+				double Gi[3] = {Ge[ni][i][0], Ge[ni][i][1], Ge[ni][i][2]};
 				int mi = ni*12+i*3;
 				for (j=0; j<4; ++j)
 				{
-					double (&Gj)[3] = *(Ge[nj] + j);
+//					double (&Gj)[3] = *(Ge[nj] + j);
+					double Gj[3] = {Ge[nj][j][0], Ge[nj][j][1], Ge[nj][j][2]};
 					int mj = nj*12+j*3;
 
-					sg[0] = S.xx()*Gj[0] + S.xy()*Gj[1] + S.xz()*Gj[2];
+					sg[0] = Sv[0]*Gj[0] + Sv[3]*Gj[1] + Sv[5]*Gj[2];
+					sg[1] = Sv[3]*Gj[0] + Sv[1]*Gj[1] + Sv[4]*Gj[2];
+					sg[2] = Sv[5]*Gj[0] + Sv[4]*Gj[1] + Sv[2]*Gj[2];
+
+/*					sg[0] = S.xx()*Gj[0] + S.xy()*Gj[1] + S.xz()*Gj[2];
 					sg[1] = S.xy()*Gj[0] + S.yy()*Gj[1] + S.yz()*Gj[2];
 					sg[2] = S.xz()*Gj[0] + S.yz()*Gj[1] + S.zz()*Gj[2];
-
+*/
 					kij = wi*wj*(Gi[0]*sg[0]+Gi[1]*sg[1]+Gi[2]*sg[2]);
 
 					// copy to element stiffness matrix
@@ -767,12 +776,10 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// get the number of elements this nodes connects
 	int NE = m_NEL.Valence(node.inode);
 	FEElement** ppe = m_NEL.ElementList(node.inode);
+	int* peli = m_NEL.ElementIndexList(node.inode);
 
 	// loop over all the elements
 	int i, j, ni, nj;
-	double kij[3][3];
-
-	matrix ke; ke.Create(NE*4*3, NE*4*3);
 
 	// create the LM and the en array
 	vector<int> LM; LM.resize(NE*4*3);
@@ -782,8 +789,9 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(el, FE_UNPACK_LM | FE_UNPACK_R0);
-		Ve[ni] = TetVolume(el.r0());
+//		UnpackElement(el, FE_UNPACK_LM | FE_UNPACK_R0);
+		UnpackElement(el, FE_UNPACK_LM);
+		Ve[ni] = m_Ve0[peli[ni]]; // TetVolume(el.r0());
 
 		for (i=0; i<4; ++i)
 		{
@@ -862,6 +870,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// loop over the elements again
 	// (we only build the upper-triangular (block) matrix
+	matrix ke(NE*4*3, NE*4*3);
 	for (ni=0; ni<NE; ++ni)
 	{
 		// calculate element volume
@@ -888,22 +897,17 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 					double (&DBj)[6][3] = *(DB+(nj*4 + j));
 					int mj = nj*12+j*3;
 
-					kij[0][0] = wij*(Bi[0][0]*DBj[0][0]+Bi[1][0]*DBj[1][0]+Bi[2][0]*DBj[2][0]+Bi[3][0]*DBj[3][0]+Bi[4][0]*DBj[4][0]+Bi[5][0]*DBj[5][0]);
-					kij[0][1] = wij*(Bi[0][0]*DBj[0][1]+Bi[1][0]*DBj[1][1]+Bi[2][0]*DBj[2][1]+Bi[3][0]*DBj[3][1]+Bi[4][0]*DBj[4][1]+Bi[5][0]*DBj[5][1]);
-					kij[0][2] = wij*(Bi[0][0]*DBj[0][2]+Bi[1][0]*DBj[1][2]+Bi[2][0]*DBj[2][2]+Bi[3][0]*DBj[3][2]+Bi[4][0]*DBj[4][2]+Bi[5][0]*DBj[5][2]);
+					ke[mi  ][mj  ] = wij*(Bi[0][0]*DBj[0][0]+Bi[1][0]*DBj[1][0]+Bi[2][0]*DBj[2][0]+Bi[3][0]*DBj[3][0]+Bi[4][0]*DBj[4][0]+Bi[5][0]*DBj[5][0]);
+					ke[mi  ][mj+1] = wij*(Bi[0][0]*DBj[0][1]+Bi[1][0]*DBj[1][1]+Bi[2][0]*DBj[2][1]+Bi[3][0]*DBj[3][1]+Bi[4][0]*DBj[4][1]+Bi[5][0]*DBj[5][1]);
+					ke[mi  ][mj+2] = wij*(Bi[0][0]*DBj[0][2]+Bi[1][0]*DBj[1][2]+Bi[2][0]*DBj[2][2]+Bi[3][0]*DBj[3][2]+Bi[4][0]*DBj[4][2]+Bi[5][0]*DBj[5][2]);
 
-					kij[1][0] = wij*(Bi[0][1]*DBj[0][0]+Bi[1][1]*DBj[1][0]+Bi[2][1]*DBj[2][0]+Bi[3][1]*DBj[3][0]+Bi[4][1]*DBj[4][0]+Bi[5][1]*DBj[5][0]);
-					kij[1][1] = wij*(Bi[0][1]*DBj[0][1]+Bi[1][1]*DBj[1][1]+Bi[2][1]*DBj[2][1]+Bi[3][1]*DBj[3][1]+Bi[4][1]*DBj[4][1]+Bi[5][1]*DBj[5][1]);
-					kij[1][2] = wij*(Bi[0][1]*DBj[0][2]+Bi[1][1]*DBj[1][2]+Bi[2][1]*DBj[2][2]+Bi[3][1]*DBj[3][2]+Bi[4][1]*DBj[4][2]+Bi[5][1]*DBj[5][2]);
+					ke[mi+1][mj  ] = wij*(Bi[0][1]*DBj[0][0]+Bi[1][1]*DBj[1][0]+Bi[2][1]*DBj[2][0]+Bi[3][1]*DBj[3][0]+Bi[4][1]*DBj[4][0]+Bi[5][1]*DBj[5][0]);
+					ke[mi+1][mj+1] = wij*(Bi[0][1]*DBj[0][1]+Bi[1][1]*DBj[1][1]+Bi[2][1]*DBj[2][1]+Bi[3][1]*DBj[3][1]+Bi[4][1]*DBj[4][1]+Bi[5][1]*DBj[5][1]);
+					ke[mi+1][mj+2] = wij*(Bi[0][1]*DBj[0][2]+Bi[1][1]*DBj[1][2]+Bi[2][1]*DBj[2][2]+Bi[3][1]*DBj[3][2]+Bi[4][1]*DBj[4][2]+Bi[5][1]*DBj[5][2]);
 
-					kij[2][0] = wij*(Bi[0][2]*DBj[0][0]+Bi[1][2]*DBj[1][0]+Bi[2][2]*DBj[2][0]+Bi[3][2]*DBj[3][0]+Bi[4][2]*DBj[4][0]+Bi[5][2]*DBj[5][0]);
-					kij[2][1] = wij*(Bi[0][2]*DBj[0][1]+Bi[1][2]*DBj[1][1]+Bi[2][2]*DBj[2][1]+Bi[3][2]*DBj[3][1]+Bi[4][2]*DBj[4][1]+Bi[5][2]*DBj[5][1]);
-					kij[2][2] = wij*(Bi[0][2]*DBj[0][2]+Bi[1][2]*DBj[1][2]+Bi[2][2]*DBj[2][2]+Bi[3][2]*DBj[3][2]+Bi[4][2]*DBj[4][2]+Bi[5][2]*DBj[5][2]);
-
-					// copy to element stiffness matrix
-					ke[mi  ][mj  ] = kij[0][0]; ke[mi  ][mj+1] = kij[0][1]; ke[mi  ][mj+2] = kij[0][2];
-					ke[mi+1][mj  ] = kij[1][0]; ke[mi+1][mj+1] = kij[1][1]; ke[mi+1][mj+2] = kij[1][2];
-					ke[mi+2][mj  ] = kij[2][0]; ke[mi+2][mj+1] = kij[2][1]; ke[mi+2][mj+2] = kij[2][2];
+					ke[mi+2][mj  ] = wij*(Bi[0][2]*DBj[0][0]+Bi[1][2]*DBj[1][0]+Bi[2][2]*DBj[2][0]+Bi[3][2]*DBj[3][0]+Bi[4][2]*DBj[4][0]+Bi[5][2]*DBj[5][0]);
+					ke[mi+2][mj+1] = wij*(Bi[0][2]*DBj[0][1]+Bi[1][2]*DBj[1][1]+Bi[2][2]*DBj[2][1]+Bi[3][2]*DBj[3][1]+Bi[4][2]*DBj[4][1]+Bi[5][2]*DBj[5][1]);
+					ke[mi+2][mj+2] = wij*(Bi[0][2]*DBj[0][2]+Bi[1][2]*DBj[1][2]+Bi[2][2]*DBj[2][2]+Bi[3][2]*DBj[3][2]+Bi[4][2]*DBj[4][2]+Bi[5][2]*DBj[5][2]);
 				}
 			}
 		}

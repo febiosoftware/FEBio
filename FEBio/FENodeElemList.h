@@ -40,12 +40,14 @@ public:
 
 	int Valence(int n) { return m_nval[n]; }
 	FEElement** ElementList(int n) { return &m_eref[0] + m_pn[n]; }
+	int* ElementIndexList(int n) { return &m_iref[0] + m_pn[n]; }
 
 	int Size() { return (int) m_nval.size(); }
 
 protected:
 	vector<int>			m_nval;	// nodal valences
 	vector<FEElement*>	m_eref;	// element pointers
+	vector<int>			m_iref;	// element indices
 	vector<int>			m_pn;	// start index into the eref array
 };
 
