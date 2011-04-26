@@ -1671,7 +1671,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 	// read element data
 	++tag;
 	int nid = 1;
-	for (i=0; i<elems; ++i)
+	for (i=0; i<elems; ++i, ++nid)
 	{
 		int nd = ED[i];
 		int ne = dom[nd].nel++;
