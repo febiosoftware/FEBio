@@ -173,7 +173,7 @@ void FECore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 
 	// find the permutation array that sorts LM in ascending order
 	// we can use this to speed up the row search (i.e. loop over n below)
-	vector<int> P(N);
+	static vector<int> P; P.resize(N);
 	qsort(N, &LM[0], &P[0]);
 
 	// get the data pointers 

@@ -38,6 +38,7 @@ public:
 	//! build the node-element list for a domain
 	void Create(FEDomain& dom);
 
+	int MaxValence();
 	int Valence(int n) { return m_nval[n]; }
 	FEElement** ElementList(int n) { return &m_eref[0] + m_pn[n]; }
 	int* ElementIndexList(int n) { return &m_iref[0] + m_pn[n]; }

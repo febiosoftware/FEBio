@@ -24,17 +24,11 @@ public:
 	//! constructor
 	FEUT4Domain(FEMesh* pm, FEMaterial* pmat);
 
+	//! destructor
+	~FEUT4Domain();
+
 	//! clone function
-	FEDomain* Clone()
-	{
-		FEUT4Domain* pd = new FEUT4Domain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
-		pd->m_tag = m_tag;
-		pd->m_Node = m_Node;
-		pd->m_NEL.Create(*pd);
-		pd->m_Ve0 = m_Ve0;
-		return pd;
-	}
+	FEDomain* Clone();
 
 	//! data serialization
 	void Serialize(DumpFile& ar);
@@ -100,6 +94,10 @@ private:
 	vector<int>		m_tag;	//!< nodal tags
 	vector<UT4NODE>	m_Node;	//!< Nodal data
 	vector<double>	m_Ve0;	//!< initial element volumes
+
+	double	(*m_Be)[6][3];
+	double	(*m_DB)[6][3];
+	double	(*m_Ge)[4][3];
 
 	FENodeElemList	m_NEL;
 };

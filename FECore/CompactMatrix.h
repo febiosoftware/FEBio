@@ -138,7 +138,6 @@ public:
 
 
 	void mult_vector(const vector<double>& x, vector<double>& r);
-
 };
 
 //=============================================================================

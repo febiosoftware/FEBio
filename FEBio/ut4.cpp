@@ -163,6 +163,31 @@ void FEUT4Domain::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+FEUT4Domain::~FEUT4Domain()
+{
+	delete [] m_DB;
+	delete [] m_Be;
+	delete [] m_Ge;
+}
+
+//-----------------------------------------------------------------------------
+//! clone function
+FEDomain* FEUT4Domain::Clone()
+{
+	FEUT4Domain* pd = new FEUT4Domain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+	pd->m_tag = m_tag;
+	pd->m_Node = m_Node;
+	pd->m_Ve0 = m_Ve0;
+	pd->m_NEL.Create(*pd);
+	int Nmax = pd->m_NEL.MaxValence();
+	m_Ge = new double[Nmax*4][4][3];
+	m_Be = new double[Nmax*4][6][3];
+	m_DB = new double[Nmax*4][6][3];
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization for the UT4Domain.
 //! Note that we first initialize the base class before initializing the domain.
 bool FEUT4Domain::Initialize(FEM& fem)
@@ -221,6 +246,14 @@ bool FEUT4Domain::Initialize(FEM& fem)
 
 	// create the node-element list
 	m_NEL.Create(*this);
+
+	// find the largest valence
+	int Nmax = m_NEL.MaxValence();
+
+	// allocate buffers
+	m_Ge = new double[Nmax*4][4][3];
+	m_Be = new double[Nmax*4][6][3];
+	m_DB = new double[Nmax*4][6][3];
 
 	return true;
 }
@@ -332,9 +365,9 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 
 	int i, j, n;
 	double Ve;
-	vector<int> LM; LM.resize(3);
-	vector<int> en; en.resize(1);
-	vector<double> fe; fe.resize(3);
+	static vector<int> LM(3);
+	static vector<int> en(1);
+	static vector<double> fe(3);
 
 	// loop over all the nodes
 	for (i=0; i<m_pMesh->Nodes(); ++i)
@@ -600,26 +633,7 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// convert Cauchy stress to PK2 stress
 	S = cauchy_to_pk2(S, node.Fi);
 
-	// create the LM and the en array
-	vector<int> LM; LM.resize(NE*4*3);
-	vector<int> en; en.resize(NE*4  );
-
-	for (ni=0; ni<NE; ++ni)
-	{
-		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(el, FE_UNPACK_LM);
-		for (i=0; i<4; ++i)
-		{
-			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
-			LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
-			LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
-
-			en[ni*4+i] = el.m_node[i];
-		}
-	}
-
 	// calculate the gradN matrices
-	double (*Ge)[4][3] = new double [NE][4][3];
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
@@ -639,9 +653,9 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 		{
 			// calculate global gradient of shape functions
 			// note that we need the transposed of Ji, not Ji itself !
-			Ge[ni][j][0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
-			Ge[ni][j][1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
-			Ge[ni][j][2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
+			m_Ge[ni][j][0] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+			m_Ge[ni][j][1] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+			m_Ge[ni][j][2] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
 		}
 	}
 
@@ -650,8 +664,6 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 	matrix ke; 
 	ke.Create(NE*4*3, NE*4*3); 
 	ke.zero();
-
-	double Sv[6] = {S.xx(), S.yy(), S.zz(), S.xy(), S.yz(), S.xz()};
 
 	// loop over all the elements
 	for (ni=0; ni<NE; ++ni)
@@ -677,23 +689,17 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 			double sg[3];
 			for (i=0; i<4; ++i)
 			{
-//				double (&Gi)[3] = *(Ge[ni] + i);
-				double Gi[3] = {Ge[ni][i][0], Ge[ni][i][1], Ge[ni][i][2]};
+				double (&Gi)[3] = *(m_Ge[ni] + i);
 				int mi = ni*12+i*3;
 				for (j=0; j<4; ++j)
 				{
-//					double (&Gj)[3] = *(Ge[nj] + j);
-					double Gj[3] = {Ge[nj][j][0], Ge[nj][j][1], Ge[nj][j][2]};
+					double (&Gj)[3] = *(m_Ge[nj] + j);
 					int mj = nj*12+j*3;
 
-					sg[0] = Sv[0]*Gj[0] + Sv[3]*Gj[1] + Sv[5]*Gj[2];
-					sg[1] = Sv[3]*Gj[0] + Sv[1]*Gj[1] + Sv[4]*Gj[2];
-					sg[2] = Sv[5]*Gj[0] + Sv[4]*Gj[1] + Sv[2]*Gj[2];
-
-/*					sg[0] = S.xx()*Gj[0] + S.xy()*Gj[1] + S.xz()*Gj[2];
+					sg[0] = S.xx()*Gj[0] + S.xy()*Gj[1] + S.xz()*Gj[2];
 					sg[1] = S.xy()*Gj[0] + S.yy()*Gj[1] + S.yz()*Gj[2];
 					sg[2] = S.xz()*Gj[0] + S.yz()*Gj[1] + S.zz()*Gj[2];
-*/
+
 					kij = wi*wj*(Gi[0]*sg[0]+Gi[1]*sg[1]+Gi[2]*sg[2]);
 
 					// copy to element stiffness matrix
@@ -703,11 +709,25 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 		}
 	}
 
+	// create the LM and the en array
+	static vector<int> LM; LM.resize(NE*4*3);
+	static vector<int> en; en.resize(NE*4  );
+	for (ni=0; ni<NE; ++ni)
+	{
+		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
+		UnpackElement(el, FE_UNPACK_LM);
+		for (i=0; i<4; ++i)
+		{
+			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
+			LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
+			LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
+
+			en[ni*4+i] = el.m_node[i];
+		}
+	}
+
 	// assemble the stiffness
 	psolver->AssembleStiffness(en, LM, ke);
-
-	// clean up
-	delete [] Ge;
 }
 
 //-----------------------------------------------------------------------------
@@ -781,31 +801,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	// loop over all the elements
 	int i, j, ni, nj;
 
-	// create the LM and the en array
-	vector<int> LM; LM.resize(NE*4*3);
-	vector<int> en; en.resize(NE*4  );
-	vector<double> Ve; Ve.resize(NE);
-
-	for (ni=0; ni<NE; ++ni)
-	{
-		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
-//		UnpackElement(el, FE_UNPACK_LM | FE_UNPACK_R0);
-		UnpackElement(el, FE_UNPACK_LM);
-		Ve[ni] = m_Ve0[peli[ni]]; // TetVolume(el.r0());
-
-		for (i=0; i<4; ++i)
-		{
-			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
-			LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
-			LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
-
-			en[ni*4+i] = el.m_node[i];
-		}
-	}
-
 	// calculate B-matrices
-	double (*Be)[6][3] = new double [NE*4][6][3];
-	double (*DB)[6][3] = new double [NE*4][6][3];
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
@@ -833,7 +829,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 			Gy = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
 			Gz = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
 
-			double (&Bi)[6][3] = *(Be+(4*ni+j));
+			double (&Bi)[6][3] = *(m_Be+(4*ni+j));
 			Bi[0][0] = Fe[0][0]*Gx; Bi[0][1] = Fe[1][0]*Gx; Bi[0][2] = Fe[2][0]*Gx;
 			Bi[1][0] = Fe[0][1]*Gy; Bi[1][1] = Fe[1][1]*Gy; Bi[1][2] = Fe[2][1]*Gy;
 			Bi[2][0] = Fe[0][2]*Gz; Bi[2][1] = Fe[1][2]*Gz; Bi[2][2] = Fe[2][2]*Gz;
@@ -841,7 +837,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 			Bi[4][0] = Fe[0][1]*Gz + Fe[0][2]*Gy; Bi[4][1] = Fe[1][1]*Gz + Fe[1][2]*Gy; Bi[4][2] = Fe[2][1]*Gz + Fe[2][2]*Gy;
 			Bi[5][0] = Fe[0][2]*Gx + Fe[0][0]*Gz; Bi[5][1] = Fe[1][2]*Gx + Fe[1][0]*Gz; Bi[5][2] = Fe[2][2]*Gx + Fe[2][0]*Gz;
 
-			double (&DBi)[6][3] = *(DB+(4*ni+j));
+			double (&DBi)[6][3] = *(m_DB+(4*ni+j));
 			DBi[0][0] = (D[0][0]*Bi[0][0]+D[0][1]*Bi[1][0]+D[0][2]*Bi[2][0]+D[0][3]*Bi[3][0]+D[0][4]*Bi[4][0]+D[0][5]*Bi[5][0]);
 			DBi[0][1] = (D[0][0]*Bi[0][1]+D[0][1]*Bi[1][1]+D[0][2]*Bi[2][1]+D[0][3]*Bi[3][1]+D[0][4]*Bi[4][1]+D[0][5]*Bi[5][1]);
 			DBi[0][2] = (D[0][0]*Bi[0][2]+D[0][1]*Bi[1][2]+D[0][2]*Bi[2][2]+D[0][3]*Bi[3][2]+D[0][4]*Bi[4][2]+D[0][5]*Bi[5][2]);
@@ -874,13 +870,13 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	for (ni=0; ni<NE; ++ni)
 	{
 		// calculate element volume
-		double Vi = Ve[ni];
+		double Vi = m_Ve0[peli[ni]];
 		double wi = 0.25* Vi*node.Vi/ node.Vi;
 
 		for (nj=ni; nj<NE; ++nj)
 		{
 			// calculate element volume
-			double Vj = Ve[nj];
+			double Vj = m_Ve0[peli[nj]];
 			double wj = 0.25* Vj / node.Vi;
 
 			double wij = wi*wj;
@@ -888,13 +884,13 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 			// We're ready to rock and roll!
 			for (i=0; i<4; ++i)
 			{
-				double (&Bi)[6][3] = *(Be+(ni*4 + i));
+				double (&Bi)[6][3] = *(m_Be+(ni*4 + i));
 				int mi = ni*12+i*3;
 
 				for (j=0; j<4; ++j)
 				{
 					// calculate the Bi*D*Bj term
-					double (&DBj)[6][3] = *(DB+(nj*4 + j));
+					double (&DBj)[6][3] = *(m_DB+(nj*4 + j));
 					int mj = nj*12+j*3;
 
 					ke[mi  ][mj  ] = wij*(Bi[0][0]*DBj[0][0]+Bi[1][0]*DBj[1][0]+Bi[2][0]*DBj[2][0]+Bi[3][0]*DBj[3][0]+Bi[4][0]*DBj[4][0]+Bi[5][0]*DBj[5][0]);
@@ -932,12 +928,25 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 		}
 	}
 
+	// create the LM and the en array
+	static vector<int> LM; LM.resize(NE*4*3);
+	static vector<int> en; en.resize(NE*4  );
+	for (ni=0; ni<NE; ++ni)
+	{
+		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
+		UnpackElement(el, FE_UNPACK_LM);
+		for (i=0; i<4; ++i)
+		{
+			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
+			LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
+			LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
+
+			en[ni*4+i] = el.m_node[i];
+		}
+	}
+
 	// assemble the stiffness
 	psolver->AssembleStiffness(en, LM, ke);
-
-	// cleanup
-	delete [] DB;
-	delete [] Be;
 }
 
 //-----------------------------------------------------------------------------

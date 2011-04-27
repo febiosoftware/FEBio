@@ -9,6 +9,15 @@
 #include "FEDomain.h"
 
 //-----------------------------------------------------------------------------
+int FENodeElemList::MaxValence()
+{
+	int nmax = 0;
+	int N = (int) m_nval.size();
+	for (int i=0; i<N; ++i) if (m_nval[i] > nmax) nmax = m_nval[i];
+	return nmax;
+}
+
+//-----------------------------------------------------------------------------
 //! This function builds the node-element list for a surface
 
 void FENodeElemList::Create(FESurface& s)
