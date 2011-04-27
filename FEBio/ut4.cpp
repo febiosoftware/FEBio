@@ -594,17 +594,16 @@ void FEUT4Domain::StiffnessMatrix(FESolidSolver *psolver)
 void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 {
 	// loop over all the nodes
-	for (int i=0; i<m_pMesh->Nodes(); ++i)
+	int NN = (int) m_Node.size();
+	for (int i=0; i<NN; ++i)
 	{
-		// see if we need to process this node
-		if (m_tag[i] >= 0)
-		{
-			// calculate the geometry stiffness for this node
-			NodalGeometryStiffness(m_Node[m_tag[i]], psolver);
+		UT4NODE& n = m_Node[i];
 
-			// calculate the material stiffness for this node
-			NodalMaterialStiffness(m_Node[m_tag[i]], psolver);
-		}
+		// calculate the geometry stiffness for this node
+		NodalGeometryStiffness(n, psolver);
+
+		// calculate the material stiffness for this node
+		NodalMaterialStiffness(n, psolver);
 	}
 }
 
