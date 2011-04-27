@@ -886,8 +886,9 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 			{
 				double (&Bi)[6][3] = *(m_Be+(ni*4 + i));
 				int mi = ni*12+i*3;
+				int j0 = (nj==ni?i:0);
 
-				for (j=0; j<4; ++j)
+				for (j=j0; j<4; ++j)
 				{
 					// calculate the Bi*D*Bj term
 					double (&DBj)[6][3] = *(m_DB+(nj*4 + j));
@@ -910,21 +911,11 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 	}
 
 	// build the lower-triangular by copying it from the upper-triangular part
-	for (nj=0; nj<NE; ++nj)
+	for (ni=0; ni<NE*12; ++ni)
 	{
-		for (ni=nj+1; ni<NE; ++ni)
+		for (nj=0; nj<ni; ++nj)
 		{
-			for (i=0; i<4; ++i)
-			{
-				int mi = ni*12+i*3;
-				for (j=0; j<4; ++j)
-				{
-					int mj = nj*12+j*3;
-					ke[mi  ][mj  ] = ke[mj  ][mi  ]; ke[mi  ][mj+1] = ke[mj+1][mi  ]; ke[mi  ][mj+2] = ke[mj+2][mi  ];
-					ke[mi+1][mj  ] = ke[mj  ][mi+1]; ke[mi+1][mj+1] = ke[mj+1][mi+1]; ke[mi+1][mj+2] = ke[mj+2][mi+1];
-					ke[mi+2][mj  ] = ke[mj  ][mi+2]; ke[mi+2][mj+1] = ke[mj+1][mi+2]; ke[mi+2][mj+2] = ke[mj+2][mi+2];
-				}
-			}
+			ke[ni][nj] = ke[nj][ni];
 		}
 	}
 
