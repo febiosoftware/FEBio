@@ -181,9 +181,9 @@ FEDomain* FEUT4Domain::Clone()
 	pd->m_Ve0 = m_Ve0;
 	pd->m_NEL.Create(*pd);
 	int Nmax = pd->m_NEL.MaxValence();
-	m_Ge = new double[Nmax*4][4][3];
-	m_Be = new double[Nmax*4][6][3];
-	m_DB = new double[Nmax*4][6][3];
+	pd->m_Ge = new double[Nmax*4][4][3];
+	pd->m_Be = new double[Nmax*4][6][3];
+	pd->m_DB = new double[Nmax*4][6][3];
 	return pd;
 }
 
