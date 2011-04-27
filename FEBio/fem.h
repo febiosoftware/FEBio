@@ -96,7 +96,7 @@ public:
 	FEElasticMaterial* GetElasticMaterial(int id);
 
 	//! return the elastic material
-	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm);
+	static FEElasticMaterial* GetElasticMaterial(FEMaterial* pm);
 
 	//! Add a loadcurve to the model
 	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }

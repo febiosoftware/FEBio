@@ -593,23 +593,64 @@ void FEUT4Domain::StiffnessMatrix(FESolidSolver *psolver)
 //! Calculates the nodal contribution to the global stiffness matrix
 void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 {
+	vector<int> LM;
+	vector<int> en;
+
 	// loop over all the nodes
-	int NN = (int) m_Node.size();
+	int NN = (int) m_Node.size(), ni, nj;
 	for (int i=0; i<NN; ++i)
 	{
-		UT4NODE& n = m_Node[i];
+		// get the next node
+		UT4NODE& node = m_Node[i];
+		FEElement** ppe = m_NEL.ElementList(node.inode);
+
+		// get its valence
+		int NE = m_NEL.Valence(node.inode);
+
+		// allocate an element stiffness matrix
+		matrix ke(NE*4*3, NE*4*3); ke.zero();
 
 		// calculate the geometry stiffness for this node
-		NodalGeometryStiffness(n, psolver);
+		NodalGeometryStiffness(node, ke);
 
 		// calculate the material stiffness for this node
-		NodalMaterialStiffness(n, psolver);
+		NodalMaterialStiffness(node, ke);
+
+		// it is assumed that the previous function only build the upper-triangular part
+		// so now we build the lower-triangular by copying it from the upper-triangular part
+		for (ni=0; ni<NE*12; ++ni)
+		{
+			for (nj=0; nj<ni; ++nj)
+			{
+				ke[ni][nj] = ke[nj][ni];
+			}
+		}
+
+		// create the LM and the en array
+		LM.resize(NE*4*3);
+		en.resize(NE*4  );
+		for (ni=0; ni<NE; ++ni)
+		{
+			FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
+			UnpackElement(el, FE_UNPACK_LM);
+			for (int i=0; i<4; ++i)
+			{
+				LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
+				LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
+				LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
+
+				en[ni*4+i] = el.m_node[i];
+			}
+		}
+	
+		// assemble the stiffness
+		psolver->AssembleStiffness(en, LM, ke);
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! calculates the nodal geometry stiffness contribution
-void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
+void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 {
 	int i, j, ni, nj;
 
@@ -660,9 +701,6 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// stiffness matrices
 	double kij;
-	matrix ke; 
-	ke.Create(NE*4*3, NE*4*3); 
-	ke.zero();
 
 	// loop over all the elements
 	for (ni=0; ni<NE; ++ni)
@@ -702,31 +740,11 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, FESolidSolver* psolver)
 					kij = wi*wj*(Gi[0]*sg[0]+Gi[1]*sg[1]+Gi[2]*sg[2]);
 
 					// copy to element stiffness matrix
-					ke[mi][mj] = ke[mi+1][mj+1] = ke[mi+2][mj+2] = kij;
+					ke[mi][mj] += ke[mi+1][mj+1] = ke[mi+2][mj+2] = kij;
 				}
 			}
 		}
 	}
-
-	// create the LM and the en array
-	static vector<int> LM; LM.resize(NE*4*3);
-	static vector<int> en; en.resize(NE*4  );
-	for (ni=0; ni<NE; ++ni)
-	{
-		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(el, FE_UNPACK_LM);
-		for (i=0; i<4; ++i)
-		{
-			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
-			LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
-			LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
-
-			en[ni*4+i] = el.m_node[i];
-		}
-	}
-
-	// assemble the stiffness
-	psolver->AssembleStiffness(en, LM, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -746,13 +764,10 @@ tens4ds FEUT4Domain::Cvol(const tens4ds& C, const mat3ds& S)
 
 //-----------------------------------------------------------------------------
 //! Calculates the nodal material stiffness contribution
-void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
+void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke)
 {
-	// get the FE data
-	FEM& fem = psolver->m_fem;
-
 	// Get the material for the domain
-	FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+	FEElasticMaterial* pme = FEM::GetElasticMaterial(m_pMat);
 
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
@@ -865,7 +880,6 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 
 	// loop over the elements again
 	// (we only build the upper-triangular (block) matrix
-	matrix ke(NE*4*3, NE*4*3);
 	for (ni=0; ni<NE; ++ni)
 	{
 		// calculate element volume
@@ -893,50 +907,21 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, FESolidSolver* psolver)
 					double (&DBj)[6][3] = *(m_DB+(nj*4 + j));
 					int mj = nj*12+j*3;
 
-					ke[mi  ][mj  ] = wij*(Bi[0][0]*DBj[0][0]+Bi[1][0]*DBj[1][0]+Bi[2][0]*DBj[2][0]+Bi[3][0]*DBj[3][0]+Bi[4][0]*DBj[4][0]+Bi[5][0]*DBj[5][0]);
-					ke[mi  ][mj+1] = wij*(Bi[0][0]*DBj[0][1]+Bi[1][0]*DBj[1][1]+Bi[2][0]*DBj[2][1]+Bi[3][0]*DBj[3][1]+Bi[4][0]*DBj[4][1]+Bi[5][0]*DBj[5][1]);
-					ke[mi  ][mj+2] = wij*(Bi[0][0]*DBj[0][2]+Bi[1][0]*DBj[1][2]+Bi[2][0]*DBj[2][2]+Bi[3][0]*DBj[3][2]+Bi[4][0]*DBj[4][2]+Bi[5][0]*DBj[5][2]);
+					ke[mi  ][mj  ] += wij*(Bi[0][0]*DBj[0][0]+Bi[1][0]*DBj[1][0]+Bi[2][0]*DBj[2][0]+Bi[3][0]*DBj[3][0]+Bi[4][0]*DBj[4][0]+Bi[5][0]*DBj[5][0]);
+					ke[mi  ][mj+1] += wij*(Bi[0][0]*DBj[0][1]+Bi[1][0]*DBj[1][1]+Bi[2][0]*DBj[2][1]+Bi[3][0]*DBj[3][1]+Bi[4][0]*DBj[4][1]+Bi[5][0]*DBj[5][1]);
+					ke[mi  ][mj+2] += wij*(Bi[0][0]*DBj[0][2]+Bi[1][0]*DBj[1][2]+Bi[2][0]*DBj[2][2]+Bi[3][0]*DBj[3][2]+Bi[4][0]*DBj[4][2]+Bi[5][0]*DBj[5][2]);
 
-					ke[mi+1][mj  ] = wij*(Bi[0][1]*DBj[0][0]+Bi[1][1]*DBj[1][0]+Bi[2][1]*DBj[2][0]+Bi[3][1]*DBj[3][0]+Bi[4][1]*DBj[4][0]+Bi[5][1]*DBj[5][0]);
-					ke[mi+1][mj+1] = wij*(Bi[0][1]*DBj[0][1]+Bi[1][1]*DBj[1][1]+Bi[2][1]*DBj[2][1]+Bi[3][1]*DBj[3][1]+Bi[4][1]*DBj[4][1]+Bi[5][1]*DBj[5][1]);
-					ke[mi+1][mj+2] = wij*(Bi[0][1]*DBj[0][2]+Bi[1][1]*DBj[1][2]+Bi[2][1]*DBj[2][2]+Bi[3][1]*DBj[3][2]+Bi[4][1]*DBj[4][2]+Bi[5][1]*DBj[5][2]);
+					ke[mi+1][mj  ] += wij*(Bi[0][1]*DBj[0][0]+Bi[1][1]*DBj[1][0]+Bi[2][1]*DBj[2][0]+Bi[3][1]*DBj[3][0]+Bi[4][1]*DBj[4][0]+Bi[5][1]*DBj[5][0]);
+					ke[mi+1][mj+1] += wij*(Bi[0][1]*DBj[0][1]+Bi[1][1]*DBj[1][1]+Bi[2][1]*DBj[2][1]+Bi[3][1]*DBj[3][1]+Bi[4][1]*DBj[4][1]+Bi[5][1]*DBj[5][1]);
+					ke[mi+1][mj+2] += wij*(Bi[0][1]*DBj[0][2]+Bi[1][1]*DBj[1][2]+Bi[2][1]*DBj[2][2]+Bi[3][1]*DBj[3][2]+Bi[4][1]*DBj[4][2]+Bi[5][1]*DBj[5][2]);
 
-					ke[mi+2][mj  ] = wij*(Bi[0][2]*DBj[0][0]+Bi[1][2]*DBj[1][0]+Bi[2][2]*DBj[2][0]+Bi[3][2]*DBj[3][0]+Bi[4][2]*DBj[4][0]+Bi[5][2]*DBj[5][0]);
-					ke[mi+2][mj+1] = wij*(Bi[0][2]*DBj[0][1]+Bi[1][2]*DBj[1][1]+Bi[2][2]*DBj[2][1]+Bi[3][2]*DBj[3][1]+Bi[4][2]*DBj[4][1]+Bi[5][2]*DBj[5][1]);
-					ke[mi+2][mj+2] = wij*(Bi[0][2]*DBj[0][2]+Bi[1][2]*DBj[1][2]+Bi[2][2]*DBj[2][2]+Bi[3][2]*DBj[3][2]+Bi[4][2]*DBj[4][2]+Bi[5][2]*DBj[5][2]);
+					ke[mi+2][mj  ] += wij*(Bi[0][2]*DBj[0][0]+Bi[1][2]*DBj[1][0]+Bi[2][2]*DBj[2][0]+Bi[3][2]*DBj[3][0]+Bi[4][2]*DBj[4][0]+Bi[5][2]*DBj[5][0]);
+					ke[mi+2][mj+1] += wij*(Bi[0][2]*DBj[0][1]+Bi[1][2]*DBj[1][1]+Bi[2][2]*DBj[2][1]+Bi[3][2]*DBj[3][1]+Bi[4][2]*DBj[4][1]+Bi[5][2]*DBj[5][1]);
+					ke[mi+2][mj+2] += wij*(Bi[0][2]*DBj[0][2]+Bi[1][2]*DBj[1][2]+Bi[2][2]*DBj[2][2]+Bi[3][2]*DBj[3][2]+Bi[4][2]*DBj[4][2]+Bi[5][2]*DBj[5][2]);
 				}
 			}
 		}
 	}
-
-	// build the lower-triangular by copying it from the upper-triangular part
-	for (ni=0; ni<NE*12; ++ni)
-	{
-		for (nj=0; nj<ni; ++nj)
-		{
-			ke[ni][nj] = ke[nj][ni];
-		}
-	}
-
-	// create the LM and the en array
-	static vector<int> LM; LM.resize(NE*4*3);
-	static vector<int> en; en.resize(NE*4  );
-	for (ni=0; ni<NE; ++ni)
-	{
-		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(el, FE_UNPACK_LM);
-		for (i=0; i<4; ++i)
-		{
-			LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
-			LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
-			LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
-
-			en[ni*4+i] = el.m_node[i];
-		}
-	}
-
-	// assemble the stiffness
-	psolver->AssembleStiffness(en, LM, ke);
 }
 
 //-----------------------------------------------------------------------------
