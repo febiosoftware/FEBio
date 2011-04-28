@@ -713,7 +713,7 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 		double wi = 0.25* Vi*node.Vi/ node.Vi;
 
 		// loop over the elements again
-		for (nj=0; nj<NE; ++nj)
+		for (nj=ni; nj<NE; ++nj)
 		{
 			FESolidElement& ej = dynamic_cast<FESolidElement&>(*ppe[nj]);
 //			UnpackElement(ej, FE_UNPACK_R0);
@@ -728,7 +728,8 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 			{
 				double (&Gi)[3] = *(m_Ge[ni] + i);
 				int mi = ni*12+i*3;
-				for (j=0; j<4; ++j)
+				int j0 = (ni==nj?i:0);
+				for (j=j0; j<4; ++j)
 				{
 					double (&Gj)[3] = *(m_Ge[nj] + j);
 					int mj = nj*12+j*3;
