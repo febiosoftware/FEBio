@@ -740,7 +740,9 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 					kij = wi*wj*(Gi[0]*sg[0]+Gi[1]*sg[1]+Gi[2]*sg[2]);
 
 					// copy to element stiffness matrix
-					ke[mi][mj] += ke[mi+1][mj+1] = ke[mi+2][mj+2] = kij;
+					ke[mi  ][mj  ] += kij;
+					ke[mi+1][mj+1] += kij;
+					ke[mi+2][mj+2] += kij;
 				}
 			}
 		}
