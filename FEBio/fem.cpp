@@ -8,6 +8,7 @@
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "log.h"
@@ -179,6 +180,7 @@ void FEM::ShallowCopy(FEM& fem)
 			case FE_CONTACT_SLIDING2   : pci = new FESlidingInterface2 (this); break;
 			case FE_PERIODIC_BOUNDARY  : pci = new FEPeriodicBoundary  (this); break;
 			case FE_SURFACE_CONSTRAINT : pci = new FESurfaceConstraint (this); break;
+			case FE_CONTACT_SLIDING3   : pci = new FESlidingInterface3 (this); break;
 			default:
 				assert(false);
 			}

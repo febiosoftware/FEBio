@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "FEBioImport.h"
-#include "FEFacet2FacetSliding.h"
-#include "FESlidingInterface2.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "FECore/ConjGradIterSolver.h"
@@ -19,7 +17,10 @@
 #include "ut4.h"
 #include "FEDiscreteMaterial.h"
 #include "FEUncoupledMaterial.h"
+#include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface.h"
+#include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 #include "FETiedInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEPoroSolidSolver.h"
@@ -3034,6 +3035,93 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			}
 			else throw XMLReader::InvalidTag(tag);
 
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (strcmp(szt, "sliding3") == 0)
+	{
+		// --- S L I D I N G   I N T E R F A C E   3 ---
+		FESlidingInterface3* ps = new FESlidingInterface3(&fem);
+		fem.m_CI.push_back(ps);
+		
+		++tag;
+		do
+		{
+			if      (tag == "laugon"             ) tag.value(ps->m_blaugon);
+			else if (tag == "tolerance"          ) tag.value(ps->m_atol);
+			else if (tag == "gaptol"             ) tag.value(ps->m_gtol);
+			else if (tag == "ptol"               ) tag.value(ps->m_ptol);
+			else if (tag == "ctol"               ) tag.value(ps->m_ctol);
+			else if (tag == "penalty"            ) tag.value(ps->m_epsn);
+			else if (tag == "auto_penalty"       ) tag.value(ps->m_bautopen);
+			else if (tag == "knmult"             ) tag.value(ps->m_knmult);
+			else if (tag == "search_tol"         ) tag.value(ps->m_stol);
+			else if (tag == "pressure_penalty"   ) tag.value(ps->m_epsp);
+			else if (tag == "concentration_penalty") tag.value(ps->m_epsc);
+			else if (tag == "symmetric_stiffness") tag.value(ps->m_bsymm);
+			else if (tag == "search_radius"      ) tag.value(ps->m_srad);
+			else if (tag == "seg_up"             ) tag.value(ps->m_nsegup);
+			else if (tag == "ambient_pressure"   )
+			{
+				tag.value(ps->m_ambp);
+				const char* sz = tag.AttributeValue("lc", true);
+				if (sz) sscanf(sz,"%d", &ps->m_aplc);
+			}
+			else if (tag == "ambient_concentration")
+			{
+				tag.value(ps->m_ambc);
+				const char* sz = tag.AttributeValue("lc", true);
+				if (sz) sscanf(sz,"%d", &ps->m_aclc);
+			}
+			else if (tag == "debug")
+			{
+				tag.value(ps->m_bdebug);
+				const char* sz = tag.AttributeValue("file");
+				if (sz) strcpy(ps->m_szdebug, sz);
+			}
+			else if (tag == "two_pass"  ) 
+			{
+				int n;
+				tag.value(n);
+				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
+				
+				ps->m_npass = n+1;
+			}
+			else if (tag == "surface")
+			{
+				const char* sztype = tag.AttributeValue("type");
+				int ntype;
+				if (strcmp(sztype, "master") == 0) ntype = 1;
+				else if (strcmp(sztype, "slave") == 0) ntype = 2;
+				
+				FESlidingSurface3& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				m.AddSurface(&s);
+				
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
+				{
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+				}
+				
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt);
+				
+				// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
+				// For this type of contact we want gaussian quadrature,
+				// so we have to modify those elements to FE_QUAD and FE_TRI
+				// TODO: we need a better way of doing this!
+				for (int i=0; i<s.Elements(); ++i)
+				{
+					FESurfaceElement& e = s.Element(i);
+					if (e.Nodes() == 4) e.SetType(FE_QUAD); 
+					else e.SetType(FE_TRI);
+				}
+			}
+			else throw XMLReader::InvalidTag(tag);
+			
 			++tag;
 		}
 		while (!tag.isend());

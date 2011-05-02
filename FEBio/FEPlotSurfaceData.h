@@ -27,6 +27,7 @@ protected:
 	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
 	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
 	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
+	bool SaveSliding3    (FESlidingSurface3&	 s, vector<float>& a);
 	bool SaveTied        (FETiedContactSurface&	 s, vector<float>& a);
 };
 
@@ -43,4 +44,5 @@ protected:
 	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
 	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
 	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
+	bool SaveSliding3    (FESlidingSurface3&	 s, vector<float>& a);
 };

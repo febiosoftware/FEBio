@@ -10,6 +10,7 @@
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "ut4.h"
@@ -409,7 +410,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					}
 				}
 
-				// facet-to-facet sliding interfaces
+				// sliding2 interfaces
 				FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
 				if (ps2)
 				{
@@ -470,6 +471,69 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					}
 				}
 
+				// sliding3 interfaces
+				FESlidingInterface3* ps3 = dynamic_cast<FESlidingInterface3*>(fem.m_CI[i]);
+				if (ps3)
+				{
+					vector<int> lm(8*8);
+					
+					for (int np=0; np<ps3->m_npass; ++np)
+					{
+						FESlidingSurface3& ss = (np == 0? ps3->m_ss : ps3->m_ms);
+						FESlidingSurface3& ms = (np == 0? ps3->m_ms : ps3->m_ss);
+						
+						int ni = 0, k, l;
+						for (j=0; j<ss.Elements(); ++j)
+						{
+							FESurfaceElement& se = ss.Element(j);
+							int nint = se.GaussPoints();
+							int* sn = &se.m_node[0];
+							for (k=0; k<nint; ++k, ++ni)
+							{
+								FESurfaceElement* pe = ss.m_pme[ni];
+								if (pe != 0)
+								{
+									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+									int* mn = &me.m_node[0];
+									
+									set(lm, -1);
+									
+									int nseln = se.Nodes();
+									int nmeln = me.Nodes();
+									
+									for (l=0; l<nseln; ++l)
+									{
+										id = fem.m_mesh.Node(sn[l]).m_ID;
+										lm[8*l  ] = id[ 0];
+										lm[8*l+1] = id[ 1];
+										lm[8*l+2] = id[ 2];
+										lm[8*l+3] = id[ 6];
+										lm[8*l+4] = id[ 7];
+										lm[8*l+5] = id[ 8];
+										lm[8*l+6] = id[ 9];
+										lm[8*l+7] = id[11];
+									}
+									
+									for (l=0; l<nmeln; ++l)
+									{
+										id = fem.m_mesh.Node(mn[l]).m_ID;
+										lm[8*(l+nseln)  ] = id[ 0];
+										lm[8*(l+nseln)+1] = id[ 1];
+										lm[8*(l+nseln)+2] = id[ 2];
+										lm[8*(l+nseln)+3] = id[ 6];
+										lm[8*(l+nseln)+4] = id[ 7];
+										lm[8*(l+nseln)+5] = id[ 8];
+										lm[8*(l+nseln)+6] = id[ 9];
+										lm[8*(l+nseln)+7] = id[11];
+									}
+									
+									build_add(lm);
+								}
+							}
+						}
+					}
+				}
+				
 				// add tied interface elements
 				FETiedInterface* pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
 				if (pti)

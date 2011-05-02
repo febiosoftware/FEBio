@@ -36,6 +36,9 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 	FESlidingSurface2* ps2 = dynamic_cast<FESlidingSurface2*>(&surf);
 	if (ps2) return SaveSliding2(*ps2, a);
 
+	FESlidingSurface3* ps3 = dynamic_cast<FESlidingSurface3*>(&surf);
+	if (ps3) return SaveSliding3(*ps3, a);
+	
 	FETiedContactSurface* pt = dynamic_cast<FETiedContactSurface*>(&surf);
 	if (pt) return SaveTied(*pt, a);
 
@@ -133,6 +136,30 @@ bool FEPlotContactGap::SaveSliding2(FESlidingSurface2& s, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotContactGap::SaveSliding3(FESlidingSurface3& s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	int nint = 0;
+	double gi[4], gn[4];
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+		for (int k=0; k<ni; ++k, ++nint) gi[k] = s.m_gap[nint];
+		
+		el.project_to_nodes(gi, gn);
+		
+		a[4*i  ] = (float) gn[0];
+		a[4*i+1] = (float) gn[1];
+		a[4*i+2] = (float) gn[2];
+		a[4*i+3] = (float) (ne == 4? gn[3] : gn[2]);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 // Store the contact pressures
 bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
 {
@@ -145,6 +172,9 @@ bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
 	FESlidingSurface2* ps2 = dynamic_cast<FESlidingSurface2*>(&surf);
 	if (ps2) return SaveSliding2(*ps2, a);
 
+	FESlidingSurface3* ps3 = dynamic_cast<FESlidingSurface3*>(&surf);
+	if (ps3) return SaveSliding3(*ps3, a);
+	
 	return false;
 }
 
@@ -220,6 +250,35 @@ bool FEPlotContactPressure::SaveSliding2(FESlidingSurface2 &s, vector<float>& a)
 
 		el.project_to_nodes(ti, tn);
 
+		a[4*i  ] = (float) tn[0];
+		a[4*i+1] = (float) tn[1];
+		a[4*i+2] = (float) tn[2];
+		a[4*i+3] = (float) (ne == 4? tn[3] : tn[2]);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactPressure::SaveSliding3(FESlidingSurface3 &s, vector<float>& a)
+{
+	int NF = s.Elements();
+	a.assign(4*NF, 0.f);
+	int nint = 0;
+	double ti[4], tn[4];
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+		for (int k=0; k<ni; ++k, ++nint)
+		{
+			double L = s.m_Lmd[nint];
+			ti[k] = L;// + pf->m_epsn*gi[k];
+			ti[k] = (ti[k]>=0?ti[k] : 0);		
+		}
+		
+		el.project_to_nodes(ti, tn);
+		
 		a[4*i  ] = (float) tn[0];
 		a[4*i+1] = (float) tn[1];
 		a[4*i+2] = (float) tn[2];

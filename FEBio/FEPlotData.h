@@ -5,6 +5,7 @@
 #include "Archive.h"
 #include "FESlidingInterface.h"
 #include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 #include "FEFacet2FacetSliding.h"
 #include "FETiedInterface.h"
 class FEM;

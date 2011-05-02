@@ -5,6 +5,7 @@
 #include "FEMicroMaterial.h"
 #include "FETrussMaterial.h"
 #include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FESolidSolver::Update
@@ -411,6 +412,8 @@ void FEM::UpdateContact()
 		{
 			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(m_CI[i]);
 			if (psi2) psi2->MarkFreeDraining();
+			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(m_CI[i]);
+			if (psi3) psi3->MarkAmbient();
 		}
 	}
 
@@ -424,6 +427,8 @@ void FEM::UpdateContact()
 		{
 			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(m_CI[i]);
 			if (psi2) psi2->SetFreeDraining();
+			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(m_CI[i]);
+			if (psi3) psi3->SetAmbient();
 		}
 	}
 }

@@ -8,6 +8,7 @@
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "FETransverselyIsotropic.h"
@@ -438,6 +439,7 @@ void FEM::SerializeContactData(DumpFile &ar)
 			case FE_CONTACT_SLIDING2   : ps = new FESlidingInterface2(this); break;
 			case FE_PERIODIC_BOUNDARY  : ps = new FEPeriodicBoundary(this); break;
 			case FE_SURFACE_CONSTRAINT : ps = new FESurfaceConstraint(this); break;
+			case FE_CONTACT_SLIDING3   : ps = new FESlidingInterface3(this); break;
 			default:
 				assert(false);
 			}

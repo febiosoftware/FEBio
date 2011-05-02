@@ -8,6 +8,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 #include "FEFacet2FacetSliding.h"
 #include "FETransverselyIsotropic.h"
 
@@ -878,6 +879,56 @@ void LSDYNAPlotFile::write_contact_tractions()
 				acc[3*j+2] /= (float) val[j]; 
 			}
 		}
+
+		FESlidingInterface3* ps3 = dynamic_cast<FESlidingInterface3*>(fem.m_CI[i]);
+		if (ps3)
+		{
+			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
+			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
+			int ni, ne;
+			
+			for (n=0; n<ps3->m_npass; ++n)
+			{
+				FESlidingSurface3& s = (n==0?ps3->m_ss:ps3->m_ms);
+				
+				int nint = 0;
+				for (j=0; j<s.Elements(); ++j)
+				{
+					FESurfaceElement& el = s.Element(j);
+					ne = el.Nodes();
+					ni = el.GaussPoints();
+					for (k=0; k<ni; ++k, ++nint)
+					{
+						li[k] = s.m_Lmd[nint];
+						gi[k] = s.m_gap[nint];
+						ti[k] = li[k] + ps3->m_epsn*gi[k];
+						
+						gi[k] = (gi[k]>=0?gi[k] : 0);
+						ti[k] = (ti[k]>=0?ti[k] : 0);
+					}
+					
+					el.project_to_nodes(li, ln);
+					el.project_to_nodes(gi, gn);
+					el.project_to_nodes(ti, tn);
+					
+					for (k=0; k<ne; ++k)
+					{
+						int m = el.m_node[k];
+						acc[3*m  ] += (float) (ln[k]>=0?ln[k]:0);
+						acc[3*m+1] += (float) (gn[k]>=0?gn[k]:0);
+						acc[3*m+2] += (float) (tn[k]>=0?tn[k]:0);
+						val[m]++;
+					}
+				}
+			}
+			
+			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) 
+			{ 
+				acc[3*j  ] /= (float) val[j]; 
+				acc[3*j+1] /= (float) val[j]; 
+				acc[3*j+2] /= (float) val[j]; 
+			}
+		}
 	}
 
 	fwrite(&acc[0], sizeof(float)*3, fem.m_mesh.Nodes(), m_fp);
@@ -1194,6 +1245,42 @@ void LSDYNAPlotFile::write_contact_gaps()
 				}
 			}
 
+			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
+		}
+
+		FESlidingInterface3* ps3 = dynamic_cast<FESlidingInterface3*>(fem.m_CI[i]);
+		if (ps3)
+		{
+			vector<int> val; val.assign(fem.m_mesh.Nodes(), 0);
+			double gi[4], gn[4];
+			int ni, ne, n, k;
+			
+			for (n=0; n<ps3->m_npass; ++n)
+			{
+				FESlidingSurface3& s = (n==0?ps3->m_ss:ps3->m_ms);
+				
+				int nint = 0;
+				for (j=0; j<s.Elements(); ++j)
+				{
+					FESurfaceElement& el = s.Element(j);
+					ne = el.Nodes();
+					ni = el.GaussPoints();
+					for (k=0; k<ni; ++k, ++nint)
+					{
+						gi[k] = s.m_gap[nint];
+					}
+					
+					el.project_to_nodes(gi, gn);
+					
+					for (k=0; k<ne; ++k)
+					{
+						int m = el.m_node[k];
+						t[m] += (float) gn[k];
+						val[m]++;
+					}
+				}
+			}
+			
 			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
 		}
 	}
