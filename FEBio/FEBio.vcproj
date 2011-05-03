@@ -1874,6 +1874,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEEFDUncoupled.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEEFDVerondaWestmann.cpp"
 				>
 			</File>
@@ -2194,6 +2198,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FESlidingInterface3.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FESolidSolver.cpp"
 				>
 			</File>
@@ -2267,6 +2275,10 @@
 			</File>
 			<File
 				RelativePath=".\FETrussMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEUncoupledElasticMixture.cpp"
 				>
 			</File>
 			<File
@@ -2760,6 +2772,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEEFDUncoupled.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEEFDVerondaWestmann.h"
 				>
 			</File>
@@ -3052,6 +3068,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FESlidingInterface3.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FESolidSolver.h"
 				>
 			</File>
@@ -3125,6 +3145,10 @@
 			</File>
 			<File
 				RelativePath=".\FETrussMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEUncoupledElasticMixture.h"
 				>
 			</File>
 			<File

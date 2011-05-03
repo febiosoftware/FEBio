@@ -2226,6 +2226,9 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		if      (strcmp(sz, "x") == 0) bc = 0;
 		else if (strcmp(sz, "y") == 0) bc = 1;
 		else if (strcmp(sz, "z") == 0) bc = 2;
+		else if (strcmp(sz, "u") == 0) bc = 3;
+		else if (strcmp(sz, "v") == 0) bc = 4;
+		else if (strcmp(sz, "w") == 0) bc = 5;
 		else if (strcmp(sz, "p") == 0) bc = 6;
 		else if (strcmp(sz, "t") == 0) bc = 10; 
 		else if (strcmp(sz, "c") == 0) bc = 11;
