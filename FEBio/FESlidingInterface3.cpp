@@ -384,7 +384,9 @@ void FESlidingInterface3::Init()
 		CalcAutoPenalty(m_ss);
 		CalcAutoPenalty(m_ms);
 		if (m_ss.m_bporo) CalcAutoPressurePenalty(m_ss);
-		if (m_ss.m_bsolu) CalcAutoPressurePenalty(m_ms);
+		if (m_ss.m_bsolu) CalcAutoConcentrationPenalty(m_ss);
+		if (m_ms.m_bporo) CalcAutoPressurePenalty(m_ms);
+		if (m_ms.m_bsolu) CalcAutoConcentrationPenalty(m_ms);
 	}
 	
 	// update sliding interface data
@@ -611,8 +613,8 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 			pt.m_c = 0;
 			pt.m_j = vec3d(0,0,0);
 			
-			mat3ds D;
-			if (bsolu) bsolu->m_pDiff->Diffusivity(mp);
+			mat3ds D = bsolu->m_pDiff->Diffusivity(mp)
+			*(bsolu->Porosity(mp)*bsolu->m_pSolub->Solubility(mp));
 			
 			eps = D.tr()/3;
 		}
@@ -894,7 +896,7 @@ void FESlidingInterface3::Update()
 					// now evaluate the traction at the intersection point
 					double tp = pse->eval(tn, rs[0], rs[1]);
 					
-					// if tp > 0, mark node as non-free-draining. (= pos ID)
+					// if tp > 0, mark node as non-ambient. (= pos ID)
 					if (tp > 0)  {
 						id = node.m_ID[6];
 						if (id < -1)
@@ -1555,6 +1557,10 @@ void FESlidingInterface3::ContactStiffness()
 							dpmr = me.eval_deriv1(me.pt(), r, s);
 							dpms = me.eval_deriv2(me.pt(), r, s);
 							
+							double dcmr, dcms;
+							dcmr = me.eval_deriv1(me.ct(), r, s);
+							dcms = me.eval_deriv2(me.ct(), r, s);
+							
 							for (k=0; k<nseln+nmeln; ++k)
 								for (l=0; l<nseln+nmeln; ++l)
 								{
@@ -1562,9 +1568,9 @@ void FESlidingInterface3::ContactStiffness()
 									ke[ndpn*k + 3][ndpn*l+1] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
 									ke[ndpn*k + 3][ndpn*l+2] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
 
-									ke[ndpn*k + 4][ndpn*l  ] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dpmr*Gm[0].x + dpms*Gm[1].x);
-									ke[ndpn*k + 4][ndpn*l+1] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dpmr*Gm[0].y + dpms*Gm[1].y);
-									ke[ndpn*k + 4][ndpn*l+2] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
+									ke[ndpn*k + 4][ndpn*l  ] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dcmr*Gm[0].x + dcms*Gm[1].x);
+									ke[ndpn*k + 4][ndpn*l+1] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dcmr*Gm[0].y + dcms*Gm[1].y);
+									ke[ndpn*k + 4][ndpn*l+2] += dt*w[j]*detJ[j]*epsc*N[k]*N[l]*(dcmr*Gm[0].z + dcms*Gm[1].z);
 								}
 							
 							double wn = ss.m_Lmp[ni] + epsp*ss.m_pg[ni];
