@@ -31,21 +31,22 @@
 #include "FEFluidFlux.h"
 #include "FEPoroTraction.h"
 #include "FESoluteFlux.h"
+#include "plugin.h"
 #include <string.h>
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
-FEM* FileSection::GetFEM() { return m_pim->GetFEM(); }
-FEAnalysis* FileSection::GetStep() { return m_pim->GetStep(); }
+FEM* FEBioFileSection::GetFEM() { return m_pim->GetFEM(); }
+FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 
 //-----------------------------------------------------------------------------
-FileSectionMap::~FileSectionMap()
+FEBioFileSectionMap::~FEBioFileSectionMap()
 {
 	// clear the map
-	FileSectionMap::iterator is;
+	FEBioFileSectionMap::iterator is;
 	for (is = begin(); is != end(); ++is)
 	{
-		FileSection* ps = is->second; delete ps;
+		FEBioFileSection* ps = is->second; delete ps;
 	}
 	clear();
 }
@@ -106,7 +107,8 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	}
 
 	// define the file structure
-	FileSectionMap map;
+	FEBioFileSectionMap map;
+	map["Import"     ] = new FEBioImportSection     (this);
 	map["Module"     ] = new FEBioModuleSection     (this);
 	map["Control"    ] = new FEBioControlSection    (this);
 	map["Material"   ] = new FEBioMaterialSection   (this);
@@ -131,7 +133,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		do
 		{
 			// try to find a section parser
-			FileSectionMap::iterator is = map.find(tag.Name());
+			FEBioFileSectionMap::iterator is = map.find(tag.Name());
 
 			// if found, parse it otherwise throw a fit
 			if (is != map.end()) is->second->Parse(tag);
@@ -209,6 +211,11 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		clog.printf("Fatal Error: Invalid element type\n");
 		return false;
 	}
+	catch (FailedLoadingPlugin e)
+	{
+		clog.printf("Fatal Error: failed loading plugin %s\n", e.FileName());
+		return false;
+	}
 		// --- Unknown exceptions ---
 	catch (...)
 	{
@@ -235,6 +242,21 @@ void FEFEBioImport::ParseVersion(XMLTag &tag)
 	if ((n1 < 1) || (n1 > 0xFF)) throw InvalidVersion();
 	if ((n2 < 0) || (n2 > 0xFF)) throw InvalidVersion();
 	m_nversion = (n1 << 8) + n2;
+}
+
+//=============================================================================
+//
+//                     M O D U L E   S E C T I O N
+//
+//=============================================================================
+
+//! This function parses the Import section which allows a user to load custom
+//! dll's. 
+void FEBioImportSection::Parse(XMLTag &tag)
+{
+	const char* szfile = tag.szvalue();
+	if (LoadPlugin(szfile) == false) throw FEFEBioImport::FailedLoadingPlugin(szfile);
+	clog.printf("Plugin \"%s\" loaded successfully\n", szfile);
 }
 
 //=============================================================================
@@ -4220,7 +4242,7 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	// increase the step section counter
 	++m_pim->m_nsteps;
 
-	FileSectionMap Map;
+	FEBioFileSectionMap Map;
 	Map["Module"     ] = new FEBioModuleSection     (m_pim);
 	Map["Control"    ] = new FEBioControlSection    (m_pim);
 	Map["Constraints"] = new FEBioConstraintsSection(m_pim);
@@ -4229,7 +4251,7 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		std::map<string, FileSection*>::iterator is = Map.find(tag.Name());
+		std::map<string, FEBioFileSection*>::iterator is = Map.find(tag.Name());
 		if (is != Map.end()) is->second->Parse(tag);
 		else throw XMLReader::InvalidTag(tag);
 

@@ -49,7 +49,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	m_pStep = pstep;
 
 	// define file structure
-	FileSectionMap map;
+	FEBioFileSectionMap map;
 	map["Control" ] = new FEBioControlSection (this);
 	map["Material"] = new FEBioMaterialSection(this);
 	map["Scenario"] = new FEBioScenarioSection(this);
@@ -76,7 +76,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 		do
 		{
 			// parse the file
-			FileSectionMap::iterator is = map.find(tag.Name());
+			FEBioFileSectionMap::iterator is = map.find(tag.Name());
 			if (is != map.end()) is->second->Parse(tag);
 			else throw XMLReader::InvalidTag(tag);
 

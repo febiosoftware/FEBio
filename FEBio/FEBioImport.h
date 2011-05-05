@@ -15,10 +15,10 @@ class FEFEBioImport;
 
 //-----------------------------------------------------------------------------
 // Base class for XML sections parsers
-class FileSection
+class FEBioFileSection
 {
 public:
-	FileSection(FEFEBioImport* pim) { m_pim = pim; }
+	FEBioFileSection(FEFEBioImport* pim) { m_pim = pim; }
 
 	virtual void Parse(XMLTag& tag) = 0;
 
@@ -31,27 +31,36 @@ protected:
 
 //-----------------------------------------------------------------------------
 // class that manages file section parsers
-class FileSectionMap : public map<string, FileSection*>
+class FEBioFileSectionMap : public map<string, FEBioFileSection*>
 {
 public:
-	~FileSectionMap();
+	~FEBioFileSectionMap();
+};
+
+//-----------------------------------------------------------------------------
+// Import section
+class FEBioImportSection : public FEBioFileSection
+{
+public:
+	FEBioImportSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
+	void Parse(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // Module Section
-class FEBioModuleSection : public FileSection
+class FEBioModuleSection : public FEBioFileSection
 {
 public:
-	FEBioModuleSection(FEFEBioImport* pim) : FileSection(pim) {}
+	FEBioModuleSection(FEFEBioImport* pim) : FEBioFileSection(pim) {}
 	void Parse(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // Control Section
-class FEBioControlSection : public FileSection
+class FEBioControlSection : public FEBioFileSection
 {
 public:
-	FEBioControlSection(FEFEBioImport* pim) : FileSection(pim) {}
+	FEBioControlSection(FEFEBioImport* pim) : FEBioFileSection(pim) {}
 	void Parse(XMLTag& tag);
 
 protected:
@@ -65,10 +74,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 // Material Section
-class FEBioMaterialSection : public FileSection
+class FEBioMaterialSection : public FEBioFileSection
 {
 public:
-	FEBioMaterialSection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioMaterialSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:
@@ -87,7 +96,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 // Geometry Section
-class FEBioGeometrySection : public FileSection
+class FEBioGeometrySection : public FEBioFileSection
 {
 private:
 	enum {
@@ -107,7 +116,7 @@ private:
 	};
 	
 public:
-	FEBioGeometrySection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioGeometrySection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:
@@ -127,10 +136,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 // Boundary Section
-class FEBioBoundarySection : public FileSection
+class FEBioBoundarySection : public FEBioFileSection
 {
 public:
-	FEBioBoundarySection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioBoundarySection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:
@@ -151,37 +160,37 @@ protected:
 
 //-----------------------------------------------------------------------------
 // Initial Section
-class FEBioInitialSection : public FileSection
+class FEBioInitialSection : public FEBioFileSection
 {
 public:
-	FEBioInitialSection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioInitialSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // Globals Section
-class FEBioGlobalsSection : public FileSection
+class FEBioGlobalsSection : public FEBioFileSection
 {
 public:
-	FEBioGlobalsSection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioGlobalsSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // LoadData Section
-class FEBioLoadSection : public FileSection
+class FEBioLoadSection : public FEBioFileSection
 {
 public:
-	FEBioLoadSection(FEFEBioImport* pim) : FileSection(pim) {}
+	FEBioLoadSection(FEFEBioImport* pim) : FEBioFileSection(pim) {}
 	void Parse(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // Output Section
-class FEBioOutputSection : public FileSection
+class FEBioOutputSection : public FEBioFileSection
 {
 public:
-	FEBioOutputSection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioOutputSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:
@@ -191,10 +200,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 // Constraints Section
-class FEBioConstraintsSection : public FileSection
+class FEBioConstraintsSection : public FEBioFileSection
 {
 public:
-	FEBioConstraintsSection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioConstraintsSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 
 protected:
@@ -204,10 +213,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 // Step Section
-class FEBioStepSection : public FileSection
+class FEBioStepSection : public FEBioFileSection
 {
 public:
-	FEBioStepSection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioStepSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 };
 
@@ -234,6 +243,14 @@ public:
 	class InvalidDomainType{};
 	class FailedCreatingDomain{};
 	class InvalidElementType{};
+	class FailedLoadingPlugin
+	{
+	public:
+		FailedLoadingPlugin(const char* sz) : m_szfile(sz) {}
+		const char* FileName() { return m_szfile.c_str(); }
+	public:
+		string	m_szfile;
+	};
 
 public:
 	bool Load(FEM& fem, const char* szfile);

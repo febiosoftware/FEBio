@@ -41,10 +41,10 @@ public:
 
 //-----------------------------------------------------------------------------
 // Scenario Section parser
-class FEBioScenarioSection : public FileSection
+class FEBioScenarioSection : public FEBioFileSection
 {
 public:
-	FEBioScenarioSection(FEFEBioImport* pim) : FileSection(pim){}
+	FEBioScenarioSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse(XMLTag& tag);
 };
 

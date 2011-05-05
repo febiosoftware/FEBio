@@ -2366,6 +2366,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\plugin.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\porosolid.cpp"
 				>
 			</File>
@@ -2673,6 +2677,10 @@
 			</File>
 			<File
 				RelativePath=".\FEAugLagLinearConstraint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\febio.h"
 				>
 			</File>
 			<File
@@ -3209,6 +3217,10 @@
 			</File>
 			<File
 				RelativePath=".\PlotFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\plugin.h"
 				>
 			</File>
 			<File
