@@ -6,11 +6,12 @@
 #include "fem.h"
 #include "FEException.h"
 #include "FENodeReorder.h"
-#include "FERigid.h"
 #include "log.h"
 #include "FESolidSolver.h"
 #include "LSDYNAPlotFile.h"
 #include "FETransverselyIsotropic.h"
+#include "FEDiscreteMaterial.h"
+#include "FERigid.h"
 
 // Forward declarations
 void Hello(FILE* fp);

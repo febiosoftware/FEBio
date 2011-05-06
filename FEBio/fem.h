@@ -19,7 +19,6 @@
 #include "FEAugLagLinearConstraint.h"
 #include "Timer.h"
 #include "FESurfaceLoad.h"
-#include "FEDiscreteMaterial.h"
 #include "FEBodyForce.h"
 #include "BC.h"
 #include "FEPointConstraint.h"

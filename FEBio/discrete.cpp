@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEDomain.h"
+#include "FEDiscreteMaterial.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
