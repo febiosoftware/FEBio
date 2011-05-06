@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "plugin.h"
 #include "febio.h"
-#include "fematerial.h"
+#include "FEMaterial.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
