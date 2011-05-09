@@ -9,8 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/vector.h"
 #include "DumpFile.h"
+#include <vector>
 
 //-----------------------------------------------------------------------------
 //! This class implements the concept of a loadcurve.
@@ -102,7 +102,7 @@ protected:
 	double ExtendValue(double t) const;
 
 protected:
-	vector<LOADPOINT>	m_lp;	//!< load time values
+	std::vector<LOADPOINT>	m_lp;	//!< load time values
 
 	double			m_value;	//!< last calculated value
 

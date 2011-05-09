@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "plugin.h"
-#include "febio.h"
-#include "FEMaterial.h"
+#include "FEBioLib/febio.h"
+#include "fematerial.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -10,31 +10,23 @@ bool LoadPlugin(const char* szfile) { return false; }
 #else
 #include "windows.h"
 
-typedef IFEBioPlugin* (_cdecl *FEBIO_PLUGIN_FNC)();
+typedef void (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
+
+extern FEBioKernel FEBio;
 
 //-----------------------------------------------------------------------------
 bool LoadPlugin(const char* szfile)
 {
+	// load the library
 	HMODULE hm = LoadLibraryA(szfile);
 	if (hm == NULL) return false;
 
-	FEBIO_PLUGIN_FNC pfnc = (FEBIO_PLUGIN_FNC) GetProcAddress(hm, "CreatePlugin");
+	// find the plugin's registration function
+	FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) GetProcAddress(hm, "RegisterPlugin");
 	if (pfnc == 0) return false;
 
-	// get the plugin's class descriptor
-	IFEBioPlugin* pcd = pfnc();
-	if (pcd == 0) return false;
-
-	switch (pcd->GetPluginType())
-	{
-	case FEBIO_MATERIAL:
-		{
-			clog.printf("Inside switch\n");
-		};
-		break;
-	default:
-		return false;
-	}
+	// allow the plugin to register itself with the framework
+	pfnc(FEBio);
 
 	// a-ok!
 	return true;

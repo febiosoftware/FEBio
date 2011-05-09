@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 #include "FEMesh.h"
 #include "Archive.h"
 #include "FESlidingInterface.h"

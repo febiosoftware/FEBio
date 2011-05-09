@@ -11,7 +11,7 @@
 
 #include "FEBioLib/vec3d.h"
 #include "FECore/vector.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 
 class FEM;
 

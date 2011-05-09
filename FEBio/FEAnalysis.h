@@ -1,7 +1,9 @@
 #pragma once
 
-#include "DumpFile.h"
-#include "FEBoundaryCondition.h"
+#include "FEBioLib/DumpFile.h"
+#include "FEBioLib/FEBoundaryCondition.h"
+#include <vector>
+using namespace std;
 
 // forward declaration of FEM
 class FEM;

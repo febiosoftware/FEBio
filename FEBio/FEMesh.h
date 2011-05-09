@@ -11,7 +11,7 @@
 
 #include "FEElement.h"
 #include "FEDomain.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 #include "FENodeElemList.h"
 
 ///////////////////////////////////////////////////////////////////////////////

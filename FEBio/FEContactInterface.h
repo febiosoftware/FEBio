@@ -11,7 +11,7 @@
 
 #include "FEMesh.h"
 #include "FEContactSurface.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 
 class FEM;
 

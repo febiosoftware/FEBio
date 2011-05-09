@@ -2,7 +2,7 @@
 
 #include "FEElement.h"
 #include "FECore/vector.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 #include "FE_enum.h"
 
 class FENode;

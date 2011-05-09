@@ -12,14 +12,14 @@
 #include "FEElement.h"
 #include "FEBioLib/quatd.h"
 #include "FEBioLib/tens4d.h"
-#include "LoadCurve.h"
+#include "FEBioLib/LoadCurve.h"
 #include <string.h>
 #include "FE_enum.h"
 #include "FECoordSysMap.h"
 #include "FEMaterialFactory.h"
 #include "FEParameterList.h"
 #include "FEMaterialPoint.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 #define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))

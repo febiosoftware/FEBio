@@ -12,8 +12,8 @@
 #include "FE_enum.h"
 #include "FEBioLib/vec3d.h"
 #include "FEBioLib/quatd.h"
-#include "FEBoundaryCondition.h"
-#include "DumpFile.h"
+#include "FEBioLib/FEBoundaryCondition.h"
+#include "FEBioLib/DumpFile.h"
 
 class FEM;
 

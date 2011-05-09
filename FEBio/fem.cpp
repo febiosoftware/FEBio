@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include <string.h>
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 #include "XMLReader.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
@@ -12,6 +12,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "log.h"
+#include "plugin.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBiphasic.h"
 
@@ -358,6 +359,12 @@ bool FEM::Configure(const char *szfile)
 						else if (strcmp(szt, "superlu_mt"        ) == 0) m_nsolver = SUPERLU_MT_SOLVER;
 						else if (strcmp(szt, "pardiso"           ) == 0) m_nsolver = PARDISO_SOLVER;
 						else if (strcmp(szt, "wsmp"              ) == 0) m_nsolver = WSMP_SOLVER;
+					}
+					else if (tag == "import")
+					{
+						const char* szfile = tag.szvalue();
+						if (LoadPlugin(szfile) == false) throw XMLReader::InvalidValue(tag);
+						printf("Plugin \"%s\" loaded successfully\n", szfile);
 					}
 					else throw XMLReader::InvalidTag(tag);
 

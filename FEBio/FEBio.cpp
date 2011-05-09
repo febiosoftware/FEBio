@@ -50,18 +50,14 @@
 #include "validate.h"
 #include "console.h"
 #include "log.h"
+#include "FEBioStdSolver.h"
+#include "FEBioLib/febio.h"
 
 #define MAXFILE 512
 
 //-----------------------------------------------------------------------------
-// FEBio analysis modes
-enum FEBIO_MODE {
-	FE_UNKNOWN,
-	FE_ANALYZE,
-	FE_RESTART,
-	FE_DIAGNOSE,
-	FE_OPTIMIZE
-};
+// FEBio kernel
+FEBioKernel FEBio;
 
 //-----------------------------------------------------------------------------
 //!  Command line options
@@ -69,7 +65,6 @@ enum FEBIO_MODE {
 //! This structures stores the command line options that were input by the user
 struct CMDOPTIONS
 {
-	FEBIO_MODE	nmode;			//!< FEBio analysis mode
 	bool		bdebug;			//!< debug flag
 
 	bool	bsplash;			//!< show splash screen or not
@@ -80,6 +75,7 @@ struct CMDOPTIONS
 	char	szplt [MAXFILE];	//!< plot file name
 	char	szdmp [MAXFILE];	//!< dump file name
 	char	szcnf [MAXFILE];	//!< configuration file
+	char	sztask[MAXFILE];	//!< task name
 };
 
 //-----------------------------------------------------------------------------
@@ -88,14 +84,7 @@ struct CMDOPTIONS
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
 void Hello(FILE* fp);
 int prompt(CMDOPTIONS& ops);
-
-bool optimize(FEM& fem, const char* szfile);
-bool diagnose(FEM& fem, const char* szfile);
-bool restart (FEM& fem, const char* szfile);
-bool solve   (FEM& fem, const char* szfile);
-
 void init_framework(FEM& fem);
-
 int get_app_path (char *pname, size_t pathsize);
 
 //-----------------------------------------------------------------------------
@@ -142,16 +131,18 @@ int main(int argc, char* argv[])
 	// set options that were passed on the command line
 	fem.SetDebugFlag(ops.bdebug);
 
-	// run the FEBio analysis
-	bool bret = false;
-	switch (ops.nmode)
+	// find a task
+	FEBioTask* ptask = FEBio.CreateTask(ops.sztask);
+	if (ptask == 0)
 	{
-	case FE_ANALYZE : bret = solve   (fem, ops.szfile); break;
-	case FE_OPTIMIZE: bret = optimize(fem, ops.szfile); break;
-	case FE_DIAGNOSE: bret = diagnose(fem, ops.szfile); break;
-	case FE_RESTART : bret = restart (fem, ops.szfile); break;
-	};
+		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
+		return 1;
+	}
 
+	// run the FEBio analysis
+	bool bret = ptask->Run(fem, ops.szfile);
+
+	// return the error code of the run
 	return (bret?0:1);
 }
 
@@ -161,7 +152,6 @@ int main(int argc, char* argv[])
 bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 {
 	// set default options
-	ops.nmode = FE_UNKNOWN;
 	ops.bdebug = false;
 	ops.bsplash = true;
 	ops.bsilent = false;
@@ -172,6 +162,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	bool brun = true;
 
 	ops.szfile[0] = 0;
+	ops.sztask[0] = 0;
 
 	// set the location of the configuration file
 	char szpath[1024] = {0};
@@ -191,12 +182,14 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 
 		if (strcmp(sz,"-r") == 0)
 		{
-			ops.nmode = FE_RESTART;
+			if (ops.sztask[0] != 0) { fprintf(stderr, "-r is incompatible with other command line option.\n"); return false; }
+			strcpy(ops.sztask, "restart");
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-d") == 0)
 		{
-			ops.nmode = FE_DIAGNOSE;
+			if (ops.sztask[0] != 0) { fprintf(stderr, "-d is incompatible with other command line option.\n"); return false; }
+			strcpy(ops.sztask, "diagnose");
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-p") == 0)
@@ -216,12 +209,12 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		}
 		else if (strcmp(sz, "-i") == 0)
 		{
-			ops.nmode = FE_ANALYZE;
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-s") == 0)
 		{
-			ops.nmode = FE_OPTIMIZE;
+			if (ops.sztask[0] != 0) { fprintf(stderr, "-s is incompatible with other command line option.\n"); return false; }
+			strcpy(ops.sztask, "optimize");
 			strcpy(ops.szfile, argv[++i]);
 		}
 		else if (strcmp(sz, "-g") == 0)
@@ -245,6 +238,11 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		else if (strcmp(sz, "-noconfig") == 0)
 		{
 			ops.szcnf[0] = 0;
+		}
+		else if (strncmp(sz, "-task", 5) == 0)
+		{
+			if (sz[5] != '=') { fprintf(stderr, "command line error when parsing task\n"); return false; }
+			strcpy(ops.sztask, sz+6);
 		}
 		else if (strcmp(sz, "-info")==0)
 		{
@@ -270,6 +268,9 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 			return false;
 		}
 	}
+
+	// if no task is defined, we assume a std solve is wanted
+	if (ops.sztask[0] == 0) strcpy(ops.sztask, "solve");
 
 	// derive the other filenames
 	char szbase[256]; strcpy(szbase, ops.szfile);
@@ -306,6 +307,11 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 void init_framework(FEM& fem)
 {
 	FEBioCommand::SetFEM(&fem);
+
+	FEBio.RegisterTask(new FEBioStdSolverFactory , "solve");
+	FEBio.RegisterTask(new FEBioRestartFactory   , "restart");
+	FEBio.RegisterTask(new FEBioDiagnosticFactory, "diagnose");
+	FEBio.RegisterTask(new FEBioOptimizeFactory  , "optimize");
 }
 
 //-----------------------------------------------------------------------------

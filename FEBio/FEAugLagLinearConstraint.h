@@ -3,7 +3,7 @@
 #include "FECore/vector.h"
 #include "FECore/matrix.h"
 #include "FEStiffnessMatrix.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 #include <list>
 using namespace std;
 

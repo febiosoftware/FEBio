@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include "MathParser.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 #include <vector>
 using namespace std;
 

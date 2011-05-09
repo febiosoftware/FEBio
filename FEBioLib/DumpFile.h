@@ -11,10 +11,10 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "FEBioLib/vec3d.h"
-#include "FEBioLib/mat3d.h"
-#include "FEBioLib/quatd.h"
-#include "FECore/vector.h"
+#include "vec3d.h"
+#include "mat3d.h"
+#include "quatd.h"
+#include <vector>
 
 class FEM;
 
@@ -79,7 +79,7 @@ public:
 
 	template <class T> DumpFile& operator << (const T& o) { fwrite(&o, sizeof(T), 1, m_fp); return (*this); }
 
-	template <class T> DumpFile& operator << (vector<T>& v)
+	template <class T> DumpFile& operator << (std::vector<T>& v)
 	{
 		int n = v.size();
 		fwrite(&n, sizeof(int), 1, m_fp);
@@ -108,7 +108,7 @@ public:
 
 	template <class T> DumpFile& operator >> (T& o) { fread(&o, sizeof(T), 1, m_fp); return (*this); }
 
-	template <class T> DumpFile& operator >> (vector<T>& v)
+	template <class T> DumpFile& operator >> (std::vector<T>& v)
 	{
 		int n;
 		fread(&n, sizeof(int), 1, m_fp);

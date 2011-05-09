@@ -6,8 +6,8 @@
 #define _FEM_H_07012006_
 
 #include "PlotFile.h"
-#include "LoadCurve.h"
-#include "DumpFile.h"
+#include "FEBioLib/LoadCurve.h"
+#include "FEBioLib/DumpFile.h"
 #include "FEMesh.h"
 #include "FEContactInterface.h"
 #include "FEMaterial.h"
@@ -20,8 +20,8 @@
 #include "Timer.h"
 #include "FESurfaceLoad.h"
 #include "FEBodyForce.h"
-#include "BC.h"
 #include "FEPointConstraint.h"
+#include "FEBioLib/FEModel.h"
 
 #include <stack>
 #include <list>
@@ -52,7 +52,7 @@ struct FEBIO_CALLBACK {
 //! class provides the main solve routine it does not really solve anything.
 //! The actual solving is done by one of the classes derived from the FESolver class.
 
-class FEM
+class FEM : public FEModel
 {
 public:
 	//! constructor - sets default variables
@@ -96,15 +96,6 @@ public:
 
 	//! return the elastic material
 	static FEElasticMaterial* GetElasticMaterial(FEMaterial* pm);
-
-	//! Add a loadcurve to the model
-	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }
-
-	//! get a loadcurve
-	FELoadCurve* GetLoadCurve(int i) { return m_LC[i]; }
-
-	//! get the number of loadcurves
-	int LoadCurves() { return m_LC.size(); }
 
 	//! set the debug level
 	void SetDebugFlag(bool b) { m_debug = b; }
@@ -247,20 +238,9 @@ protected:
 		vector<FEMaterial*>			m_MAT;	//!< array of materials
 	//}
 
-	// --- Load Curve Data ---
-	//{
-		vector<FELoadCurve*>	m_LC;	//!< load curve data
-	//}
-
 public:
 	// --- Boundary Condition Data ---
 	//{
-		// displacement boundary data
-		vector<FEPrescribedBC*>		m_DC;	//!< prescribed displacement cards
-
-		// concentrated nodal loads data
-		vector<FENodalForce*>	m_FC;		//!< concentrated nodal force cards
-
 		// surface loads
 		vector<FESurfaceLoad*>	m_SL;		//!< surface loads
 
@@ -269,9 +249,6 @@ public:
 
 		// rigid forces
 		vector<FERigidBodyForce*>	m_RFC;	//!< rigid body forces
-
-		// rigid nodes
-		vector<FERigidNode*>		m_RN;		//!< rigid nodes
 
 		// linear constraint data
 		list<FELinearConstraint>	m_LinC;		//!< linear constraints data

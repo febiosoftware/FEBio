@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FEBioLib/mat3d.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class

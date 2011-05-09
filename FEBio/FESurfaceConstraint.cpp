@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FESurfaceConstraint.h"
-#include "DumpFile.h"
+#include "FEBioLib/DumpFile.h"
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "log.h"

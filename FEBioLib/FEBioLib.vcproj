@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,6 +60,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\$(ProjectName)d.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -149,6 +150,30 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\DumpFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBioTask.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBoundaryCondition.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\kernel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LoadCurve.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mat3d.cpp"
 				>
 			</File>
@@ -182,6 +207,34 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\BC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DumpFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\febio.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBioTask.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBoundaryCondition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LoadCurve.h"
+				>
+			</File>
 			<File
 				RelativePath=".\mat2d.h"
 				>

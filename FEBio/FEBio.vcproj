@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\Debug\fecored.lib mkl_intel_c.lib  mkl_intel_thread.lib mkl_core.lib libiomp5mt.lib superlud.lib  KeyGend.lib"
+				AdditionalDependencies="..\Debug\fecored.lib ..\Debug\FEBioLibd.lib mkl_intel_c.lib  mkl_intel_thread.lib mkl_core.lib libiomp5mt.lib superlud.lib  KeyGend.lib"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
@@ -1738,10 +1738,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DumpFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\elstf.cpp"
 				>
 			</File>
@@ -1786,6 +1782,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBioStdSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBiphasic.cpp"
 				>
 			</File>
@@ -1795,10 +1795,6 @@
 			</File>
 			<File
 				RelativePath=".\FEBodyForce.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FEBoundaryCondition.cpp"
 				>
 			</File>
 			<File
@@ -2338,10 +2334,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\LoadCurve.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Logfile.cpp"
 				>
 			</File>
@@ -2620,10 +2612,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\BC.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Command.h"
 				>
 			</File>
@@ -2637,10 +2625,6 @@
 			</File>
 			<File
 				RelativePath=".\DataStore.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DumpFile.h"
 				>
 			</File>
 			<File
@@ -2688,15 +2672,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBioStdSolver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBiphasic.h"
 				>
 			</File>
 			<File
 				RelativePath=".\FEBodyForce.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FEBoundaryCondition.h"
 				>
 			</File>
 			<File
@@ -3173,10 +3157,6 @@
 			</File>
 			<File
 				RelativePath=".\Interrupt.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LoadCurve.h"
 				>
 			</File>
 			<File
