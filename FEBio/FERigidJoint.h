@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/vec3d.h"
+#include "FECore/vec3d.h"
 #include "FECore/vector.h"
 #include "FEBioLib/DumpFile.h"
 

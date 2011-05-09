@@ -13,7 +13,7 @@
 #include "FENodeElemList.h"
 #include "FEBioLib/LoadCurve.h"
 #include "FENNQuery.h"
-#include "FEBioLib/mat2d.h"
+#include "FECore/mat2d.h"
 
 class FEM;
 

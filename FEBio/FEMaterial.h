@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/tens4d.h"
+#include "FECore/tens4d.h"
 #include "FEBioLib/LoadCurve.h"
 #include <string.h>
 #include "FECoordSysMap.h"

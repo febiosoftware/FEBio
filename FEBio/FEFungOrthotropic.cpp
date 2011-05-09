@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEFungOrthotropic.h"
-#include "FEBioLib/tens4d.h"
+#include "FECore/tens4d.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEFungOrthotropic, "Fung orthotropic");

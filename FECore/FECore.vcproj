@@ -1436,6 +1436,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mat3d.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\matrix.cpp"
 				>
 			</File>
@@ -1664,6 +1668,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tens4d.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\vector.cpp"
 				>
 			</File>
@@ -1706,6 +1714,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mat2d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mat3d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mat3d.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\matrix.h"
 				>
 			</File>
@@ -1723,6 +1743,10 @@
 			</File>
 			<File
 				RelativePath=".\PSLDLTSolver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\quatd.h"
 				>
 			</File>
 			<File
@@ -1751,6 +1775,18 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tens4d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vec2d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vec3d.h"
 				>
 			</File>
 			<File

@@ -1,7 +1,7 @@
 #pragma once
 #include "FEDomain.h"
 #include "FENodeElemList.h"
-#include "FEBioLib/tens4d.h"
+#include "FECore/tens4d.h"
 
 //-----------------------------------------------------------------------------
 //! Domain for nodally integrated tet elements 

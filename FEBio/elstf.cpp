@@ -3,7 +3,7 @@
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 #include "FEMicroMaterial.h"
-#include "FEBioLib/tens4d.h"
+#include "FECore/tens4d.h"
 #include "log.h"
 #include "FEPressureLoad.h"
 

@@ -10,9 +10,9 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/vector.h"
-#include "FEBioLib/vec3d.h"
+#include "FECore/vec3d.h"
 #include "FECore/matrix.h"
-#include "FEBioLib/mat3d.h"
+#include "FECore/mat3d.h"
 #include "FEBioLib/FE_enum.h"
 
 ///////////////////////////////////////////////////////////////////////////////

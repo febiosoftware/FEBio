@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEBioLib/tens4d.h"
+#include "FECore/tens4d.h"
 #include "FEHolmesMow.h"
 
 // register the material with the framework

@@ -182,10 +182,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mat3d.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -204,10 +200,6 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\tens4d.cpp"
-				>
 			</File>
 		</Filter>
 		<Filter
@@ -256,43 +248,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mat2d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mat3d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mat3d.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\quatd.h"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
 				RelativePath=".\targetver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\tens4d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\tens4d.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vec2d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vec3d.h"
 				>
 			</File>
 		</Filter>
