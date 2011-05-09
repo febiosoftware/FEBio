@@ -2,7 +2,7 @@
 #include "PSLDLTSolver.h"
 
 //-----------------------------------------------------------------------------
-bool FECore::PSLDLTSolver::PreProcess()
+bool PSLDLTSolver::PreProcess()
 {
 	// First, make sure the PSLDLT solver is available on this platform
 #ifndef PSLDLT
@@ -29,7 +29,7 @@ bool FECore::PSLDLTSolver::PreProcess()
 
 
 //-----------------------------------------------------------------------------
-bool FECore::PSLDLTSolver::Factor()
+bool PSLDLTSolver::Factor()
 {
 	// First, make sure the PSLDLT solver is available on this platform
 #ifndef PSLDLT
@@ -70,7 +70,7 @@ bool FECore::PSLDLTSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::PSLDLTSolver::BackSolve(vector<double>& x, vector<double>& R)
+bool PSLDLTSolver::BackSolve(vector<double>& x, vector<double>& R)
 {
 	// First, make sure the PSLDLT solver is available on this platform
 #ifndef PSLDLT
@@ -95,7 +95,7 @@ bool FECore::PSLDLTSolver::BackSolve(vector<double>& x, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::PSLDLTSolver::Destroy()
+void PSLDLTSolver::Destroy()
 {
 #ifndef PSLDLT
 	fprintf(stderr, "FATAL ERROR : The PSLDLT solver is not available on this platform\n\n");

@@ -11,7 +11,7 @@
 
 #include "FECore/mat3d.h"
 #include "FEElement.h"
-#include "FEBioLib/DumpFile.h"
+#include "FECore/DumpFile.h"
 
 #define FE_MAP_NONE		0
 #define FE_MAP_LOCAL	1

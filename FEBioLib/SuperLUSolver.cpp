@@ -7,7 +7,7 @@
 // SUPERLUSolver
 //////////////////////////////////////////////////////////////////////
 
-bool FECore::SuperLUSolver::PreProcess()
+bool SuperLUSolver::PreProcess()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -50,7 +50,7 @@ bool FECore::SuperLUSolver::PreProcess()
 }
 
 #ifdef SUPERLU
-double FECore::SuperLUSolver::norm(SparseMatrix& K)
+double SuperLUSolver::norm(SparseMatrix& K)
 {
 	double n = 0, nc;
 	int l;
@@ -75,7 +75,7 @@ double FECore::SuperLUSolver::norm(SparseMatrix& K)
 }
 #endif
 
-bool FECore::SuperLUSolver::Factor()
+bool SuperLUSolver::Factor()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -133,7 +133,7 @@ bool FECore::SuperLUSolver::Factor()
 #endif
 }
 
-bool FECore::SuperLUSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool SuperLUSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	// Make sure the solver is available
 #ifndef SUPERLU
@@ -170,7 +170,7 @@ bool FECore::SuperLUSolver::BackSolve(vector<double>& x, vector<double>& b)
 #endif
 }
 
-void FECore::SuperLUSolver::Destroy()
+void SuperLUSolver::Destroy()
 {
 	// Make sure the solver is available
 #ifndef SUPERLU

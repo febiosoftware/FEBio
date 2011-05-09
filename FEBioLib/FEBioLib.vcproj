@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;PARDISO;SUPERLU"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -150,35 +150,47 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\DumpFile.cpp"
+				RelativePath=".\colsol.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\FEBioTask.cpp"
+				RelativePath=".\CompactMatrix.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\FEBoundaryCondition.cpp"
+				RelativePath=".\ConjGradIterSolver.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\FEMaterialFactory.cpp"
+				RelativePath=".\DenseMatrix.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\FEModel.cpp"
+				RelativePath=".\LUSolver.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\FEParameterList.cpp"
+				RelativePath=".\PardisoSolver.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\kernel.cpp"
+				RelativePath=".\PardisoSolverDL.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\LoadCurve.cpp"
+				RelativePath=".\PSLDLTSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\qsort.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkylineMatrix.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkylineSolver.cpp"
 				>
 			</File>
 			<File
@@ -201,6 +213,18 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\SuperLU_MT_Solver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SuperLUSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WSMPSolver.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -208,43 +232,35 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\BC.h"
+				RelativePath=".\CompactMatrix.h"
 				>
 			</File>
 			<File
-				RelativePath=".\DumpFile.h"
+				RelativePath=".\ConjGradIterSolver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\FE_enum.h"
+				RelativePath=".\DenseMatrix.h"
 				>
 			</File>
 			<File
-				RelativePath=".\febio.h"
+				RelativePath=".\LUSolver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\FEBioTask.h"
+				RelativePath=".\PardisoSolver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\FEBoundaryCondition.h"
+				RelativePath=".\PSLDLTSolver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\FEMaterialFactory.h"
+				RelativePath=".\SkylineMatrix.h"
 				>
 			</File>
 			<File
-				RelativePath=".\FEModel.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FEParameterList.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LoadCurve.h"
+				RelativePath=".\SkylineSolver.h"
 				>
 			</File>
 			<File
@@ -252,7 +268,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SuperLU_MT_Solver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SuperLUSolver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WSMPSolver.h"
 				>
 			</File>
 		</Filter>

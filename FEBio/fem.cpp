@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include <string.h>
-#include "FEBioLib/DumpFile.h"
+#include "FECore/DumpFile.h"
 #include "XMLReader.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"

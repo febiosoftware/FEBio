@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;PARDISO;SUPERLU"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -1408,19 +1408,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\colsol.cpp"
+				RelativePath=".\DumpFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\CompactMatrix.cpp"
+				RelativePath=".\FEBioTask.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ConjGradIterSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DenseMatrix.cpp"
+				RelativePath=".\FEBoundaryCondition.cpp"
 				>
 			</File>
 			<File
@@ -1428,11 +1424,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEMaterialFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEParameterList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\kernel.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LinearSolver.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\LUSolver.cpp"
+				RelativePath=".\LoadCurve.cpp"
 				>
 			</File>
 			<File
@@ -1449,30 +1461,6 @@
 			</File>
 			<File
 				RelativePath=".\NonLinearSystem.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PardisoSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PardisoSolverDL.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PSLDLTSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\qsort.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SkylineMatrix.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SkylineSolver.cpp"
 				>
 			</File>
 			<File
@@ -1660,23 +1648,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\SuperLU_MT_Solver.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SuperLUSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\tens4d.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\vector.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WSMPSolver.cpp"
 				>
 			</File>
 		</Filter>
@@ -1686,19 +1662,31 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\BC.h"
+				>
+			</File>
+			<File
 				RelativePath=".\BFGSSolver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\CompactMatrix.h"
+				RelativePath=".\DumpFile.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ConjGradIterSolver.h"
+				RelativePath=".\FE_enum.h"
 				>
 			</File>
 			<File
-				RelativePath=".\DenseMatrix.h"
+				RelativePath=".\febio.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBioTask.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBoundaryCondition.h"
 				>
 			</File>
 			<File
@@ -1706,11 +1694,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEMaterialFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEParameterList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LinearSolver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\LUSolver.h"
+				RelativePath=".\LoadCurve.h"
 				>
 			</File>
 			<File
@@ -1738,23 +1738,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\PardisoSolver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PSLDLTSolver.h"
-				>
-			</File>
-			<File
 				RelativePath=".\quatd.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SkylineMatrix.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SkylineSolver.h"
 				>
 			</File>
 			<File
@@ -1766,19 +1750,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SuperLU_MT_Solver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SuperLUSolver.h"
-				>
-			</File>
-			<File
 				RelativePath=".\targetver.h"
 				>
 			</File>
 			<File
 				RelativePath=".\tens4d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tens4d.hpp"
 				>
 			</File>
 			<File
@@ -1791,10 +1771,6 @@
 			</File>
 			<File
 				RelativePath=".\vector.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WSMPSolver.h"
 				>
 			</File>
 		</Filter>

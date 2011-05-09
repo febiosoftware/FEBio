@@ -5,7 +5,7 @@
 #include "version.h"
 #include "FEException.h"
 #include "FECore/FECore.h"
-#include "FECore/CompactMatrix.h"
+#include "FEBioLib/CompactMatrix.h"
 #include "FESolver.h"
 
 //-----------------------------------------------------------------------------
@@ -162,7 +162,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 			// print the stiffness matrix to file
 			if (nargs == 3)
 			{
-				CompactMatrix* pK = dynamic_cast<FECore::CompactMatrix*>(psolver->m_pK->GetSparseMatrixPtr());
+				CompactMatrix* pK = dynamic_cast<CompactMatrix*>(psolver->m_pK->GetSparseMatrixPtr());
 				if (pK)
 				{
 					printf("Writing sparse matrix to %s ...", argv[2]);

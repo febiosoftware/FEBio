@@ -1,6 +1,7 @@
 #pragma once
-#include "LinearSolver.h"
+#include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
+using namespace FECore;
 
 //-----------------------------------------------------------------------------
 //! This class implements a wrapper class for the SuperLU_MT solver
@@ -9,7 +10,6 @@
 	#include "pdsp_defs.h"
 #endif
 
-namespace FECore {
 
 class SuperLU_MT_Solver : public LinearSolver
 {
@@ -45,5 +45,3 @@ protected:
 
 #endif // SUPERLU_MT
 };
-
-} // namespace FECore

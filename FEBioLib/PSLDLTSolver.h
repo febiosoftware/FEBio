@@ -1,7 +1,8 @@
 #pragma once
 
-#include "LinearSolver.h"
+#include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
+using namespace FECore;
 
 //-----------------------------------------------------------------------------
 //! Implements a linear solver that uses a compact column storage format.
@@ -19,8 +20,6 @@ extern "C" {
 }
 #endif // PSLDLT
 
-namespace FECore {
-
 class PSLDLTSolver : public LinearSolver
 {
 public:
@@ -31,5 +30,3 @@ public:
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new CompactSymmMatrix() : 0)); }
 };
-
-} // namespace FECore

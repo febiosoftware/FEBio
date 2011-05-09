@@ -11,7 +11,7 @@
 
 #include "FEMesh.h"
 #include "FENodeElemList.h"
-#include "FEBioLib/LoadCurve.h"
+#include "FECore/LoadCurve.h"
 #include "FENNQuery.h"
 #include "FECore/mat2d.h"
 

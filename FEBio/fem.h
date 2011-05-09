@@ -6,8 +6,8 @@
 #define _FEM_H_07012006_
 
 #include "PlotFile.h"
-#include "FEBioLib/LoadCurve.h"
-#include "FEBioLib/DumpFile.h"
+#include "FECore/LoadCurve.h"
+#include "FECore/DumpFile.h"
 #include "FEMesh.h"
 #include "FEContactInterface.h"
 #include "FEMaterial.h"
@@ -21,7 +21,7 @@
 #include "FESurfaceLoad.h"
 #include "FEBodyForce.h"
 #include "FEPointConstraint.h"
-#include "FEBioLib/FEModel.h"
+#include "FECore/FEModel.h"
 
 #include <stack>
 #include <list>

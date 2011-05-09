@@ -1,11 +1,11 @@
 #pragma once
 
-#include "LinearSolver.h"
+#include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
 #include <vector>
 using namespace std;
+using namespace FECore;
 
-namespace FECore {
 //-----------------------------------------------------------------------------
 //! this class implements an iterative conjugate gradient solver 
 class ConjGradIterSolver : public LinearSolver
@@ -28,5 +28,3 @@ public:
 
 	vector<double>	m_P;	// preconditioning vector
 };
-
-} // namespace FECore

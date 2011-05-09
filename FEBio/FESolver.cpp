@@ -6,14 +6,14 @@
 #include "FESolver.h"
 #include "fem.h"
 #include "log.h"
-#include "FECore/SkylineSolver.h"
-#include "FECore/PSLDLTSolver.h"
-#include "FECore/SuperLUSolver.h"
-#include "FECore/SuperLU_MT_Solver.h"
-#include "FECore/LUSolver.h"
-#include "FECore/PardisoSolver.h"
-#include "FECore/WSMPSolver.h"
-#include "FECore/ConjGradIterSolver.h"
+#include "FEBioLib/SkylineSolver.h"
+#include "FEBioLib/PSLDLTSolver.h"
+#include "FEBioLib/SuperLUSolver.h"
+#include "FEBioLib/SuperLU_MT_Solver.h"
+#include "FEBioLib/LUSolver.h"
+#include "FEBioLib/PardisoSolver.h"
+#include "FEBioLib/WSMPSolver.h"
+#include "FEBioLib/ConjGradIterSolver.h"
 
 FESolver::FESolver(FEM& fem) : m_fem(fem)
 {

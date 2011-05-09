@@ -10,13 +10,13 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/tens4d.h"
-#include "FEBioLib/LoadCurve.h"
+#include "FECore/LoadCurve.h"
 #include <string.h>
 #include "FECoordSysMap.h"
-#include "FEBioLib/FEMaterialFactory.h"
-#include "FEBioLib/FEParameterList.h"
+#include "FECore/FEMaterialFactory.h"
+#include "FECore/FEParameterList.h"
 #include "FEMaterialPoint.h"
-#include "FEBioLib/DumpFile.h"
+#include "FECore/DumpFile.h"
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))
 #define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))

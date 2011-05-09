@@ -51,7 +51,7 @@
 #include "console.h"
 #include "log.h"
 #include "FEBioStdSolver.h"
-#include "FEBioLib/febio.h"
+#include "FECore/febio.h"
 
 #define MAXFILE 512
 

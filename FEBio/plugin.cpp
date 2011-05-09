@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "plugin.h"
-#include "FEBioLib/febio.h"
+#include "FECore/febio.h"
 #include "fematerial.h"
 #include "log.h"
 

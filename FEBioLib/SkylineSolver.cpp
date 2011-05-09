@@ -6,14 +6,14 @@ void colsol_factor(int N, double* values, int* pointers);
 void colsol_solve (int N, double* values, int* pointers, double* R);
 
 //-----------------------------------------------------------------------------
-bool FECore::SkylineSolver::PreProcess()
+bool SkylineSolver::PreProcess()
 {
 	// We don't need to do any preprocessing for this solver
 	return LinearSolver::PreProcess();
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::SkylineSolver::Factor()
+bool SkylineSolver::Factor()
 {
 	// Let's make sure the matrix K is of the correct type
 	SkylineMatrix* pK = dynamic_cast<SkylineMatrix*> (m_pA);
@@ -24,7 +24,7 @@ bool FECore::SkylineSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::SkylineSolver::BackSolve(vector<double>& x, vector<double>& R)
+bool SkylineSolver::BackSolve(vector<double>& x, vector<double>& R)
 {
 	// Let's make sure the matrix K is of the correct type
 	SkylineMatrix* pK = dynamic_cast<SkylineMatrix*> (m_pA);
@@ -45,7 +45,7 @@ bool FECore::SkylineSolver::BackSolve(vector<double>& x, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::SkylineSolver::Destroy()
+void SkylineSolver::Destroy()
 {
 	// Nothing to destroy
 	LinearSolver::Destroy();

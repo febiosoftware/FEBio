@@ -1,7 +1,6 @@
 #pragma once
-#include "SparseMatrix.h"
-
-namespace FECore {
+#include "FECore/SparseMatrix.h"
+using namespace FECore;
 
 //=============================================================================
 //! This class stores a sparse matrix in Harwell-Boeing format.
@@ -249,5 +248,3 @@ void write_hb(CompactMatrix& m, FILE* fp);
 //-----------------------------------------------------------------------------
 //! read Symmetric compact matrix data
 void read_hb(CompactSymmMatrix& m, FILE* fp);
-
-} // namespace FECore

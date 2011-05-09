@@ -1,7 +1,7 @@
 #pragma once
 #include "FEMaterialPoint.h"
 #include "MathParser.h"
-#include "FEBioLib/DumpFile.h"
+#include "FECore/DumpFile.h"
 #include "FEMesh.h"
 
 class FEM;

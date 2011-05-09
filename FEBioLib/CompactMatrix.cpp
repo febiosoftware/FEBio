@@ -1,13 +1,12 @@
 #include "stdafx.h"
 #include "CompactMatrix.h"
 
-
 //=============================================================================
 // CompactMatrix
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FECore::CompactMatrix::CompactMatrix(int offset)
+CompactMatrix::CompactMatrix(int offset)
 {
 	m_pindices = 0;
 	m_ppointers = 0;
@@ -15,7 +14,7 @@ FECore::CompactMatrix::CompactMatrix(int offset)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
+void CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
 {
 	if (m_pd  ) delete [] m_pd; m_pd = pv;
 	if (m_pindices ) delete [] m_pindices; m_pindices = pi;
@@ -31,10 +30,10 @@ void FECore::CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FECore::CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
+CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
 
 //-----------------------------------------------------------------------------
-void FECore::CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
+void CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 {
 	int j, i, n;
 	int N = x.size();
@@ -93,7 +92,7 @@ void FECore::CompactSymmMatrix::mult_vector(const vector<double>& x, vector<doub
 
 
 //-----------------------------------------------------------------------------
-void FECore::CompactSymmMatrix::Create(SparseMatrixProfile& mp)
+void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 {
 	int i, j, k, n;
 
@@ -166,7 +165,7 @@ void qsort(int n, int* arr, int* indx);
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in compact column storage
 //!
-void FECore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
+void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 {
 	// get the number of degrees of freedom
 	const int N = ke.rows();
@@ -213,7 +212,7 @@ void FECore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 
 
 //-----------------------------------------------------------------------------
-void FECore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 
@@ -250,7 +249,7 @@ void FECore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<in
 }
 
 //-----------------------------------------------------------------------------
-void FECore::write_hb(CompactMatrix& m, FILE* fp)
+void write_hb(CompactMatrix& m, FILE* fp)
 {
 	int neq = m.Size();
 	int nnz = m.NonZeroes();
@@ -263,7 +262,7 @@ void FECore::write_hb(CompactMatrix& m, FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::read_hb(CompactSymmMatrix& m, FILE* fp)
+void read_hb(CompactSymmMatrix& m, FILE* fp)
 {
 	int neq, nnz;
 	fread(&neq, sizeof(neq), 1, fp);
@@ -286,13 +285,13 @@ void FECore::read_hb(CompactSymmMatrix& m, FILE* fp)
 
 //-----------------------------------------------------------------------------
 //! Constructor for CompactUnSymmMatrix class 
-FECore::CompactUnSymmMatrix::CompactUnSymmMatrix(int offset, bool row_based) : CompactMatrix(offset)
+CompactUnSymmMatrix::CompactUnSymmMatrix(int offset, bool row_based) : CompactMatrix(offset)
 {
 	m_brow_based = row_based;
 }
 
 //-----------------------------------------------------------------------------
-void FECore::CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
+void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 {
 	int i, j, k, n;
 
@@ -377,7 +376,7 @@ void FECore::CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 //! into the global stiffness matrix which is in compact column storage and
 //! the matrix is unsymmetric
 //!
-void FECore::CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
+void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 {
 	int i, j, I, J;
 
@@ -396,7 +395,7 @@ void FECore::CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 

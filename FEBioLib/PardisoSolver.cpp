@@ -13,7 +13,7 @@
 //////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-FECore::PardisoSolver::PardisoSolver()
+PardisoSolver::PardisoSolver()
 {
 	/* If both PARDISO AND PARDISODL are defined, print a warning */
 #ifdef PARDISODL
@@ -23,7 +23,7 @@ FECore::PardisoSolver::PardisoSolver()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::PardisoSolver::PreProcess()
+bool PardisoSolver::PreProcess()
 {
 	m_mtype = (m_bsymm ? -2 : 11); /* Real symmetric matrix */
 	m_iparm[0] = 0; /* Use default values for parameters */
@@ -50,7 +50,7 @@ bool FECore::PardisoSolver::PreProcess()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::PardisoSolver::Factor()
+bool PardisoSolver::Factor()
 {
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
@@ -96,7 +96,7 @@ bool FECore::PardisoSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 
 	CompactMatrix* A = dynamic_cast<CompactMatrix*> (m_pA);
@@ -119,7 +119,7 @@ bool FECore::PardisoSolver::BackSolve(vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::PardisoSolver::Destroy()
+void PardisoSolver::Destroy()
 {
 	// make sure we actually initialized the matrix data.
 	if (m_bvalid == false) return;

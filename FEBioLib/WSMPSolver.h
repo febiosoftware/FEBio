@@ -6,11 +6,14 @@
 
 #pragma once
 
-#include "SparseMatrix.h"
-#include "LinearSolver.h"
+#include "FECore/SparseMatrix.h"
+#include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
-#include "vector.h"
-#include "matrix.h"
+#include "FECore/vector.h"
+#include "FECore/matrix.h"
+
+using namespace FECore;
+
 
 	/* WSMP Fortran prototypes */
 #ifdef WSMP
@@ -26,8 +29,6 @@ extern "C"
 	void wsmp_clear_();
 }
 #endif //WSMP
-
-namespace FECore {
 
 class WSMPSolver : public LinearSolver
 {
@@ -49,5 +50,3 @@ protected:
 	vector<int> m_perm, m_invp;
 	vector<double> m_b;
 };
-
-} // namespace FECore

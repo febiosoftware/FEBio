@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
-#include "FEBioLib/DumpFile.h"
+#include "FECore/DumpFile.h"
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "log.h"

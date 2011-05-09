@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "ConjGradIterSolver.h"
 #include <algorithm>
-#include "vector.h"
+#include "FECore/vector.h"
 
 //-----------------------------------------------------------------------------
-FECore::ConjGradIterSolver::ConjGradIterSolver()
+ConjGradIterSolver::ConjGradIterSolver()
 {
 	m_tol = 0.01;
 	m_kmax = 200;
@@ -12,14 +12,14 @@ FECore::ConjGradIterSolver::ConjGradIterSolver()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::ConjGradIterSolver::PreProcess()
+bool ConjGradIterSolver::PreProcess()
 {
 	assert(m_pA);
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::ConjGradIterSolver::Factor()
+bool ConjGradIterSolver::Factor()
 {
 /*	CompactMatrix& C = dynamic_cast<CompactMatrix&>(*m_pA);
 	int neq = K.Size();
@@ -52,7 +52,7 @@ bool FECore::ConjGradIterSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool FECore::ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	int i;
 
@@ -126,7 +126,7 @@ bool FECore::ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::ConjGradIterSolver::Destroy()
+void ConjGradIterSolver::Destroy()
 {
 
 }

@@ -2,13 +2,13 @@
 #include "DenseMatrix.h"
 
 //-----------------------------------------------------------------------------
-FECore::DenseMatrix::DenseMatrix()
+DenseMatrix::DenseMatrix()
 {
 	m_pr = 0;
 }
 
 //-----------------------------------------------------------------------------
-FECore::DenseMatrix::~DenseMatrix()
+DenseMatrix::~DenseMatrix()
 {
 	delete [] m_pd; m_pd = 0;
 	delete [] m_pr; m_pr = 0;
@@ -16,7 +16,7 @@ FECore::DenseMatrix::~DenseMatrix()
 
 //-----------------------------------------------------------------------------
 // Creat a dense matrix of size N x N
-void FECore::DenseMatrix::Create(int N)
+void DenseMatrix::Create(int N)
 {
 	if (N != m_ndim)
 	{
@@ -38,7 +38,7 @@ void FECore::DenseMatrix::Create(int N)
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in dense format
 //!
-void FECore::DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
+void DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
 {
 	int i, j, I, J;
 
@@ -57,7 +57,7 @@ void FECore::DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FECore::DenseMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void DenseMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 

@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FESolidSolver.h"
-#include "FECore/CompactMatrix.h"
+#include "FEBioLib/CompactMatrix.h"
 using namespace FECore;
 
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEM& fem) : FEDiagnostic(fem)

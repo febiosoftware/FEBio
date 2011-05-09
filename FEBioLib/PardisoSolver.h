@@ -6,8 +6,9 @@
 
 #pragma once
 
-#include "LinearSolver.h"
+#include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
+using namespace FECore;
 
 #ifdef PARDISO
 	/* Pardiso prototypes for MKL version */
@@ -39,8 +40,6 @@ int pardiso_(void *, int *, int *, int *, int *, int *,
 	int *, double *, double *, int *, double*);
 }
 #endif
-
-namespace FECore {
 
 class PardisoSolver : public LinearSolver
 {
@@ -91,5 +90,3 @@ protected:
 		}
 	}
 };
-
-} // namespace FECore

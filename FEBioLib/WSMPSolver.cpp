@@ -7,7 +7,7 @@
 // WSMPSolver
 //////////////////////////////////////////////////////////////
 
-bool FECore::WSMPSolver::PreProcess()
+bool WSMPSolver::PreProcess()
 {
 	// Make sure the solver is available
 #ifndef WSMP
@@ -60,7 +60,7 @@ bool FECore::WSMPSolver::PreProcess()
 #endif
 }
 
-bool FECore::WSMPSolver::Factor()
+bool WSMPSolver::Factor()
 {
 	// Make sure the solver is available
 #ifndef WSMP
@@ -147,7 +147,7 @@ bool FECore::WSMPSolver::Factor()
 #endif
 }
 
-bool FECore::WSMPSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool WSMPSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	/* Make sure the solver is available */
 #ifndef WSMP
@@ -183,7 +183,7 @@ bool FECore::WSMPSolver::BackSolve(vector<double>& x, vector<double>& b)
 #endif
 }
 
-void FECore::WSMPSolver::Destroy()
+void WSMPSolver::Destroy()
 {
 	/* Make sure the solver is available */
 #ifndef WSMP

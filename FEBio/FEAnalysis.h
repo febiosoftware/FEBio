@@ -1,7 +1,7 @@
 #pragma once
 
-#include "FEBioLib/DumpFile.h"
-#include "FEBioLib/FEBoundaryCondition.h"
+#include "FECore/DumpFile.h"
+#include "FECore/FEBoundaryCondition.h"
 #include <vector>
 using namespace std;
 

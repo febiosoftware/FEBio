@@ -12,7 +12,7 @@
 #include "FEElementLibrary.h"
 #include "FEElementTraits.h"
 #include "FEMaterialPoint.h"
-#include "FEBioLib/FE_enum.h"
+#include "FECore/FE_enum.h"
 #include "FEException.h"
 
 //-----------------------------------------------------------------------------

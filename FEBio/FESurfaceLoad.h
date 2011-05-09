@@ -1,7 +1,7 @@
 #pragma once
-#include "FEBioLib/FEBoundaryCondition.h"
+#include "FECore/FEBoundaryCondition.h"
 #include "FESurface.h"
-#include "FEBioLib/DumpFile.h"
+#include "FECore/DumpFile.h"
 
 class FESolver;
 
