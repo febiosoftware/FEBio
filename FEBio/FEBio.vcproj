@@ -1978,10 +1978,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEMaterialFactory.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\FEMaterialPoint.cpp"
 				>
 			</File>
@@ -2043,10 +2039,6 @@
 			</File>
 			<File
 				RelativePath=".\FEOsmCoefConst.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FEParameterList.cpp"
 				>
 			</File>
 			<File
@@ -2640,10 +2632,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FE_enum.h"
-				>
-			</File>
-			<File
 				RelativePath=".\FEAnalysis.h"
 				>
 			</File>
@@ -2653,10 +2641,6 @@
 			</File>
 			<File
 				RelativePath=".\FEAugLagLinearConstraint.h"
-				>
-			</File>
-			<File
-				RelativePath=".\febio.h"
 				>
 			</File>
 			<File
@@ -2860,10 +2844,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEMaterialFactory.h"
-				>
-			</File>
-			<File
 				RelativePath=".\FEMaterialPoint.h"
 				>
 			</File>
@@ -2925,10 +2905,6 @@
 			</File>
 			<File
 				RelativePath=".\FEOsmCoefConst.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FEParameterList.h"
 				>
 			</File>
 			<File

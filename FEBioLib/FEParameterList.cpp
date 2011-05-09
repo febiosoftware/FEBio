@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEParameterList.h"
 #include <cstring>
+#include <assert.h>
 
 //-----------------------------------------------------------------------------
 // This function adds a parameter to the parameter list

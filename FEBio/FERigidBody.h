@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FE_enum.h"
+#include "FEBioLib/FE_enum.h"
 #include "FEBioLib/vec3d.h"
 #include "FEBioLib/quatd.h"
 #include "FEBioLib/FEBoundaryCondition.h"

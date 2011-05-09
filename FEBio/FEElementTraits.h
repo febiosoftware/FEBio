@@ -13,7 +13,7 @@
 #include "FEBioLib/vec3d.h"
 #include "FECore/matrix.h"
 #include "FEBioLib/mat3d.h"
-#include "FE_enum.h"
+#include "FEBioLib/FE_enum.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Max nr of nodal degrees of freedom

@@ -3,7 +3,7 @@
 #include "FEElement.h"
 #include "FECore/vector.h"
 #include "FEBioLib/DumpFile.h"
-#include "FE_enum.h"
+#include "FEBioLib/FE_enum.h"
 
 class FENode;
 class FEMesh;

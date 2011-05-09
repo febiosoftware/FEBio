@@ -12,7 +12,6 @@ FEMaterialFactory*	FEMaterialFactory::m_pMF = 0;
 FEMaterialFactory* FEMaterialFactory::GetInstance()
 {
 	if (m_pMF == 0) m_pMF = new FEMaterialFactory;
-	assert(m_pMF);
 	return m_pMF;
 }
 

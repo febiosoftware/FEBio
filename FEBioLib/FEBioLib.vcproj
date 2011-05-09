@@ -162,7 +162,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEMaterialFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEParameterList.cpp"
 				>
 			</File>
 			<File
@@ -216,6 +224,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FE_enum.h"
+				>
+			</File>
+			<File
 				RelativePath=".\febio.h"
 				>
 			</File>
@@ -228,7 +240,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEMaterialFactory.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEParameterList.h"
 				>
 			</File>
 			<File

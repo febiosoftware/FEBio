@@ -9,15 +9,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEElement.h"
-#include "FEBioLib/quatd.h"
 #include "FEBioLib/tens4d.h"
 #include "FEBioLib/LoadCurve.h"
 #include <string.h>
-#include "FE_enum.h"
 #include "FECoordSysMap.h"
-#include "FEMaterialFactory.h"
-#include "FEParameterList.h"
+#include "FEBioLib/FEMaterialFactory.h"
+#include "FEBioLib/FEParameterList.h"
 #include "FEMaterialPoint.h"
 #include "FEBioLib/DumpFile.h"
 
