@@ -1,9 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBio", "FEBio\FEBio.vcproj", "{17C93AA1-E742-49A5-89CD-7591F915F151}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBio2", "FEBio\FEBio.vcproj", "{17C93AA1-E742-49A5-89CD-7591F915F151}"
 	ProjectSection(ProjectDependencies) = postProject
 		{21488E61-A11D-4DFA-9D2F-D9FD85578431} = {21488E61-A11D-4DFA-9D2F-D9FD85578431}
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757} = {A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FECore", "FECore\FECore.vcproj", "{21488E61-A11D-4DFA-9D2F-D9FD85578431}"
@@ -11,6 +12,8 @@ EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FEBioInstaller", "FEBioInstaller\FEBioInstaller.vdproj", "{964358CC-0F33-42CE-BFCA-F9213F982292}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F158C65-5794-4156-8DF2-7FE96DDAF386}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBioLib", "FEBioLib\FEBioLib.vcproj", "{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
@@ -125,6 +128,30 @@ Global
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|Win32.ActiveCfg = Release-Pardisodl
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|Win32.Build.0 = Release-Pardisodl
 		{964358CC-0F33-42CE-BFCA-F9213F982292}.Release-x64|x64.ActiveCfg = Release
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug - Skyline only|Win32.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug - Skyline only|Win32.Build.0 = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug - Skyline only|x64.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug|Win32.Build.0 = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug|x64.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug-Pardisodl|Win32.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug-Pardisodl|Win32.Build.0 = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug-Pardisodl|x64.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug-x64|Win32.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug-x64|Win32.Build.0 = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Debug-x64|x64.ActiveCfg = Debug|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release - Skyline only|Win32.ActiveCfg = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release - Skyline only|Win32.Build.0 = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release - Skyline only|x64.ActiveCfg = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release|Win32.ActiveCfg = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release|Win32.Build.0 = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release|x64.ActiveCfg = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release-Pardisodl|Win32.ActiveCfg = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release-Pardisodl|Win32.Build.0 = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release-Pardisodl|x64.ActiveCfg = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release-x64|Win32.ActiveCfg = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release-x64|Win32.Build.0 = Release|Win32
+		{A2BFC197-831A-4FF5-ACD1-BAF8A3A6E757}.Release-x64|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

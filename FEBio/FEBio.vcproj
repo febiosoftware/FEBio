@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="FEBio"
+	Name="FEBio2"
 	ProjectGUID="{17C93AA1-E742-49A5-89CD-7591F915F151}"
 	RootNamespace="FEBio"
 	Keyword="Win32Proj"
