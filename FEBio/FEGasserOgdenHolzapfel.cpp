@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEGasserOgdenHolzapfel.h"
-#include "tens4d.h"
+#include "FEBioLib/tens4d.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEGasserOgdenHolzapfel, "Gasser-Ogden-Holzapfel");

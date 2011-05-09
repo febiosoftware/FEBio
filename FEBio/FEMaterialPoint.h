@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mat3d.h"
+#include "FEBioLib/mat3d.h"
 #include "DumpFile.h"
 
 //-----------------------------------------------------------------------------

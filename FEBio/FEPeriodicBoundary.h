@@ -2,7 +2,7 @@
 
 #include "FEContactInterface.h"
 #include "FESurface.h"
-#include "vec2d.h"
+#include "FEBioLib/vec2d.h"
 
 //-----------------------------------------------------------------------------
 class FEPeriodicSurface : public FEContactSurface

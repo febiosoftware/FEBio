@@ -10,8 +10,8 @@
 #endif // _MSC_VER > 1000
 
 #include "FE_enum.h"
-#include "vec3d.h"
-#include "quatd.h"
+#include "FEBioLib/vec3d.h"
+#include "FEBioLib/quatd.h"
 #include "FEBoundaryCondition.h"
 #include "DumpFile.h"
 

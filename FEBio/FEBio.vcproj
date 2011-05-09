@@ -2350,10 +2350,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mat3d.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MathParser.cpp"
 				>
 			</File>
@@ -2584,10 +2580,6 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\tens4d.cpp"
-				>
 			</File>
 			<File
 				RelativePath=".\Timer.cpp"
@@ -3200,18 +3192,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mat2d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mat3d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mat3d.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MathParser.h"
 				>
 			</File>
@@ -3221,10 +3201,6 @@
 			</File>
 			<File
 				RelativePath=".\plugin.h"
-				>
-			</File>
-			<File
-				RelativePath=".\quatd.h"
 				>
 			</File>
 			<File
@@ -3244,14 +3220,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\tens4d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\tens4d.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Timer.h"
 				>
 			</File>
@@ -3261,14 +3229,6 @@
 			</File>
 			<File
 				RelativePath=".\validate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vec2d.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vec3d.h"
 				>
 			</File>
 			<File

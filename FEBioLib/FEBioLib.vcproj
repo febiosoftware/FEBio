@@ -149,6 +149,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\mat3d.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -168,6 +172,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\tens4d.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -175,11 +183,43 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\mat2d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mat3d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mat3d.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\quatd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tens4d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tens4d.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vec2d.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vec3d.h"
 				>
 			</File>
 		</Filter>

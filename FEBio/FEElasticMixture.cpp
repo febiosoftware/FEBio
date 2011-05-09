@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "tens4d.h"
+#include "FEBioLib/tens4d.h"
 #include "FEElasticMixture.h"
 
 // register the material with the framework

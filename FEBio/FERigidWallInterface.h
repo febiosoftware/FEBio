@@ -12,8 +12,8 @@
 #include "FEContactInterface.h"
 #include "FERigidSurface.h"
 #include "FESurface.h"
-#include "vec3d.h"
-#include "vec2d.h"
+#include "FEBioLib/vec3d.h"
+#include "FEBioLib/vec2d.h"
 
 //-----------------------------------------------------------------------------
 class FERigidWallSurface : public FESurface

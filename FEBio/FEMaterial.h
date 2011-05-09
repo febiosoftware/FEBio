@@ -10,8 +10,8 @@
 #endif // _MSC_VER > 1000
 
 #include "FEElement.h"
-#include "quatd.h"
-#include "tens4d.h"
+#include "FEBioLib/quatd.h"
+#include "FEBioLib/tens4d.h"
 #include "LoadCurve.h"
 #include <string.h>
 #include "FE_enum.h"

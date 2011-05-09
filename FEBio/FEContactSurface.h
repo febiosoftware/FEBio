@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FESurface.h"
-#include "vec2d.h"
+#include "FEBioLib/vec2d.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact slave or master surface

@@ -11,9 +11,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "vec3d.h"
-#include "mat3d.h"
-#include "quatd.h"
+#include "FEBioLib/vec3d.h"
+#include "FEBioLib/mat3d.h"
+#include "FEBioLib/quatd.h"
 #include "FECore/vector.h"
 
 class FEM;

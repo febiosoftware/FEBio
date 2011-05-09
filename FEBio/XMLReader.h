@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "vec3d.h"
+#include "FEBioLib/vec3d.h"
 
 class XMLReader  
 {

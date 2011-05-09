@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 // we'll need the vector class
+#include <assert.h>
 #include "vec3d.h"
 
 //-----------------------------------------------------------------------------
