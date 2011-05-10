@@ -33,6 +33,11 @@
 #include "FESoluteFlux.h"
 #include "plugin.h"
 #include <string.h>
+#include "FEBiphasicDomain.h"
+#include "FEBiphasicSoluteDomain.h"
+#include "FEHeatSolidDomain.h"
+#include "FETrussDomain.h"
+#include "FEShellDomain.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------

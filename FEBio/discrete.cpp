@@ -1,8 +1,156 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
-#include "FEDomain.h"
+#include "FEDiscreteDomain.h"
 #include "FEDiscreteMaterial.h"
 #include "log.h"
+
+
+//-----------------------------------------------------------------------------
+// FEDiscreteDomain
+//-----------------------------------------------------------------------------
+
+bool FEDiscreteDomain::Initialize(FEM &fem)
+{
+	int i, j;
+	FEMesh& m = fem.m_mesh;
+	int N = m.Nodes();
+	vector<int> tag; tag.assign(N, -1);
+
+	int NE = Elements();
+	int n = 0;
+	for (i=0; i<NE; ++i)
+	{
+		FEDiscreteElement& e = m_Elem[i];
+		int ne = e.Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			int nj = e.m_node[j];
+			if (tag[nj] == -1) tag[nj] = n++;
+		}
+	}
+	m_Node.reserve(n);
+	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
+	assert(m_Node.size() == n);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteDomain::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_Node;
+		int nel = (int) m_Elem.size();
+		for (int i=0; i<nel; ++i)
+		{
+			FEDiscreteElement& el = m_Elem[i];
+			int nmat = el.GetMatID();
+			ar << (int) el.Type();
+			
+			ar << nmat;
+			ar << el.m_nrigid;
+			ar << el.m_nID;
+			ar << el.m_node;
+
+			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
+		}
+	}
+	else
+	{
+		FEM& fem = *ar.GetFEM();
+		ar >> m_Node;
+		int n, mat;
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FEDiscreteElement& el = m_Elem[i];
+			ar >> n;
+
+			el.SetType(n);
+
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
+
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.m_State[j]->Serialize(ar);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+FENode& FEDiscreteDomain::Node(int i) 
+{
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
+void FEDiscreteDomain::UnpackElement(FEElement &el, unsigned int nflag)
+{
+	int i, n;
+
+	vec3d* rt = el.rt();
+	vec3d* r0 = el.r0();
+	vec3d* vt = el.vt();
+	double* pt = el.pt();
+
+	int N = el.Nodes();
+	vector<int>& lm = el.LM();
+
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+		FENode& node = m_pMesh->Node(n);
+
+		int* id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[0];
+		lm[3*i+1] = id[1];
+		lm[3*i+2] = id[2];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[6];
+
+		// rigid rotational dofs
+		lm[4*N + 3*i  ] = id[7];
+		lm[4*N + 3*i+1] = id[8];
+		lm[4*N + 3*i+2] = id[9];
+
+		// fill the rest with -1
+		lm[7*N + 3*i  ] = -1;
+		lm[7*N + 3*i+1] = -1;
+		lm[7*N + 3*i+2] = -1;
+
+		lm[10*N + i] = id[10];
+	}
+
+	// copy nodal data to element arrays
+	for (i=0; i<N; ++i)
+	{
+		n = el.m_node[i];
+
+		FENode& node = m_pMesh->Node(n);
+
+		// initial coordinates (= material coordinates)
+		r0[i] = node.m_r0;
+
+		// current coordinates (= spatial coordinates)
+		rt[i] = node.m_rt;
+
+		// current nodal pressures
+		pt[i] = node.m_pt;
+
+		// current nodal velocities
+		vt[i] = node.m_vt;
+	}
+
+	// unpack the traits data
+	el.UnpackTraitsData(nflag);
+}
 
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)

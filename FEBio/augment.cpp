@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEUncoupledMaterial.h"
+#include "FESolidDomain.h"
+#include "FEShellDomain.h"
 #include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////

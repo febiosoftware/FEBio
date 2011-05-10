@@ -1,5 +1,5 @@
 #pragma once
-#include "FEDomain.h"
+#include "FESolidDomain.h"
 #include "FENodeElemList.h"
 #include "FECore/tens4d.h"
 

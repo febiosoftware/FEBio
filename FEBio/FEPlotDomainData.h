@@ -1,5 +1,7 @@
 #pragma once
 #include "FEPlotData.h"
+#include "FEShellDomain.h"
+#include "FESolidDomain.h"
 
 //=============================================================================
 // The following classes define data fields for domains. 

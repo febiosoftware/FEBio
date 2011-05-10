@@ -1,6 +1,10 @@
 #pragma once
 #include "PlotFile.h"
 #include "Archive.h"
+#include "FESolidDomain.h"
+#include "FEShellDomain.h"
+#include "FETrussDomain.h"
+#include "FEDiscreteDomain.h"
 #include <list>
 using namespace std;
 

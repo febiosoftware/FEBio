@@ -2644,6 +2644,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEBiphasicDomain.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEBiphasicSoluteDomain.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEBodyForce.h"
 				>
 			</File>
@@ -2693,6 +2701,10 @@
 			</File>
 			<File
 				RelativePath=".\FEDiffRefIso.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEDiscreteDomain.h"
 				>
 			</File>
 			<File
@@ -2761,6 +2773,10 @@
 			</File>
 			<File
 				RelativePath=".\FEHeatFlux.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEHeatSolidDomain.h"
 				>
 			</File>
 			<File
@@ -2980,6 +2996,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEShellDomain.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FESlidingInterface.h"
 				>
 			</File>
@@ -2989,6 +3009,10 @@
 			</File>
 			<File
 				RelativePath=".\FESlidingInterface3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FESolidDomain.h"
 				>
 			</File>
 			<File
@@ -3061,6 +3085,10 @@
 			</File>
 			<File
 				RelativePath=".\FETransverselyIsotropic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FETrussDomain.h"
 				>
 			</File>
 			<File

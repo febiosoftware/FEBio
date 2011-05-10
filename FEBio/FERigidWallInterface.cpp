@@ -8,6 +8,7 @@
 #include "FESolidSolver.h"
 #include "FENNQuery.h"
 #include "log.h"
+#include "FEShellDomain.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FERigidWallSurface

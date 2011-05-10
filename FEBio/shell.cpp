@@ -1,9 +1,174 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
-#include "FEDomain.h"
+#include "FEShellDomain.h"
 #include "FEBiphasic.h"
+#include "FETransverselyIsotropic.h"
+#include "log.h"
 #include <math.h>
+
+//-----------------------------------------------------------------------------
+// FEShellDomain
+//-----------------------------------------------------------------------------
+bool FEShellDomain::Initialize(FEM &fem)
+{
+	int i, j;
+	FEMesh& m = fem.m_mesh;
+	int N = m.Nodes();
+	vector<int> tag; tag.assign(N, -1);
+
+	int NE = Elements();
+	int n = 0;
+	for (i=0; i<NE; ++i)
+	{
+		FEShellElement& e = Element(i);
+		int ne = e.Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			int nj = e.m_node[j];
+			if (tag[nj] == -1) tag[nj] = n++;
+		}
+	}
+	m_Node.reserve(n);
+	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
+	assert(m_Node.size() == n);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+FENode& FEShellDomain::Node(int i) 
+{
+	return m_pMesh->Node(m_Node[i]); 
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::Serialize(DumpFile &ar)
+{
+	FEM& fem = *ar.GetFEM();
+	if (ar.IsSaving())
+	{
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FEShellElement& el = m_Elem[i];
+			ar << el.Type();
+
+			ar << el.m_eJ;
+			ar << el.m_ep;
+
+			ar << el.GetMatID();
+			ar << el.m_nrigid;
+			ar << el.m_nID;
+			ar << el.m_node;
+
+			ar << el.m_h0;
+			ar << el.m_Lk;
+
+			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
+		}
+	}
+	else
+	{
+		int n, mat;
+
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FEShellElement& el = m_Elem[i];
+			ar >> n;
+
+			el.SetType(n);
+
+			ar >> el.m_eJ;
+			ar >> el.m_ep;
+
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
+
+			ar >> el.m_h0;
+			ar >> el.m_Lk;
+
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.m_State[j]->Serialize(ar);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// FEElasticShellDomain
+//-----------------------------------------------------------------------------
+void FEElasticShellDomain::Reset()
+{
+	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+}
+
+//-----------------------------------------------------------------------------
+bool FEElasticShellDomain::Initialize(FEM& fem)
+{
+	// initialize base class
+	FEShellDomain::Initialize(fem);
+
+	bool bmerr = false;
+
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		// unpack element data
+		FEShellElement& el = m_Elem[i];
+
+		// get the elements material
+		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+
+		// set the local element coordinates
+		if (pme)
+		{
+			if (pme->m_pmap)
+			{
+				for (int n=0; n<el.GaussPoints(); ++n)
+				{
+					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+					pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+				}
+			}
+			else
+			{
+				if (fem.GetDebugFlag())
+				{
+					// If we get here, then the element has a user-defined fiber direction
+					// we should check to see if it has indeed been specified.
+					// TODO: This assumes that pt.Q will not get intialized to
+					//		 a valid value. I should find another way for checking since I
+					//		 would like pt.Q always to be initialized to a decent value.
+					if (dynamic_cast<FETransverselyIsotropic*>(pme))
+					{
+						FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+						mat3d& m = pt.Q;
+						if (fabs(m.det() - 1) > 1e-7)
+						{
+							// this element did not get specified a user-defined fiber direction
+							clog.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
+							bmerr = true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return (bmerr == false);
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticShellDomain::InitElements()
+{
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FEShellElement& el = m_Elem[i];
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
+	}
+}
 
 //-----------------------------------------------------------------------------
 

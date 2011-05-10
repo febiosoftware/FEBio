@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FEBox.h"
+#include "FESolidDomain.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

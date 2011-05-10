@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEDomain.h"
+#include "FEBiphasicDomain.h"
 #include "FESolidSolver.h"
 #include "FEMicroMaterial.h"
 #include "FEBiphasic.h"

@@ -2,6 +2,7 @@
 #include "FEHeatSolver.h"
 #include "FEIsotropicFourier.h"
 #include "FEHeatFlux.h"
+#include "FEHeatSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! constructor for the class

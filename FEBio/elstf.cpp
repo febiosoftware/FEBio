@@ -6,6 +6,7 @@
 #include "FECore/tens4d.h"
 #include "log.h"
 #include "FEPressureLoad.h"
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.

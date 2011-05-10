@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEElemElemList.h"
 #include "FENodeElemList.h"
+#include "FESolidDomain.h"
 
 FEElemElemList::FEElemElemList(void)
 {

@@ -2,6 +2,7 @@
 #include "FEPlotSurfaceData.h"
 #include "fem.h"
 #include "FEPlotDataFactory.h"
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_PLOTDATA(FEPlotContactGap      , "contact gap"     );

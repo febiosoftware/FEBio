@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FERigid.h"
+#include "FEShellDomain.h"
+#include "FESolidDomain.h"
 #include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////

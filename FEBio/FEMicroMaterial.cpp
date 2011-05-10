@@ -4,6 +4,7 @@
 #include "log.h"
 #include "console.h"
 #include "FESolidSolver.h"
+#include "FESolidDomain.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEMicroMaterial, "micro-material");

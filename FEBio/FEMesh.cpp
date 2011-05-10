@@ -8,6 +8,11 @@
 #include "fem.h"
 #include "ut4.h"
 
+#include "FEDiscreteDomain.h"
+#include "FETrussDomain.h"
+#include "FEShellDomain.h"
+#include "FESolidDomain.h"
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -536,16 +541,16 @@ void FEMesh::Serialize(DumpFile& ar)
 			{
 			case FE_SOLID_DOMAIN          : pd = new FEElasticSolidDomain      (this, pm); break;
 			case FE_SHELL_DOMAIN          : pd = new FEElasticShellDomain      (this, pm); break;
-			case FE_TRUSS_DOMAIN          : pd = new FEElasticTrussDomain      (this, pm); break;
+//			case FE_TRUSS_DOMAIN          : pd = new FEElasticTrussDomain      (this, pm); break;
 			case FE_RIGID_SOLID_DOMAIN    : pd = new FERigidSolidDomain        (this, pm); break;
 			case FE_RIGID_SHELL_DOMAIN    : pd = new FERigidShellDomain        (this, pm); break;
 			case FE_UDGHEX_DOMAIN         : pd = new FEUDGHexDomain            (this, pm); break;
 			case FE_PORO_SOLID_DOMAIN     : pd = new FEPoroSolidDomain         (this, pm); break;
-			case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (this, pm); break;
+//			case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (this, pm); break;
 			case FE_DISCRETE_DOMAIN       : pd = new FEDiscreteDomain          (this, pm); break;
 			case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(this, pm); break;
-			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicDomain          (this, pm); break;
-			case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (this, pm); break;
+//			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicDomain          (this, pm); break;
+//			case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (this, pm); break;
 			case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (this, pm); break;
 			default: assert(false);
 			}

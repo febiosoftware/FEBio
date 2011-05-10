@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEDomain.h"
+#include "FEHeatSolidDomain.h"
 #include "FEHeatSolver.h"
 #include "FEIsotropicFourier.h"
 

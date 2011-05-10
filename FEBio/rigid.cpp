@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FEDomain.h"
 #include "FESolidSolver.h"
+#include "FEShellDomain.h"
+#include "FESolidDomain.h"
 
 //=============================================================================
 // Rigid Solid

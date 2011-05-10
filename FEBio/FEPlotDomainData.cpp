@@ -3,6 +3,8 @@
 #include "FEPlotDataFactory.h"
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
+#include "FEBiphasicSoluteDomain.h"
+#include "FEBiphasicDomain.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_PLOTDATA(FEPlotEffectiveFluidPressure       , "effective fluid pressure"      );

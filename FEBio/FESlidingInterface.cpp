@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "log.h"
+#include "FEShellDomain.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FESlidingSurface

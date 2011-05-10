@@ -11,6 +11,10 @@
 #include "FESlidingInterface3.h"
 #include "FEFacet2FacetSliding.h"
 #include "FETransverselyIsotropic.h"
+#include "FEDiscreteDomain.h"
+#include "FETrussDomain.h"
+#include "FEShellDomain.h"
+#include "FESolidDomain.h"
 
 LSDYNAPlotFile::LSDYNAPlotFile()
 {

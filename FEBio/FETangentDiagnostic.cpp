@@ -6,6 +6,7 @@
 #include "FETangentDiagnostic.h"
 #include "FEBox.h"
 #include "FESolidSolver.h"
+#include "FESolidDomain.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

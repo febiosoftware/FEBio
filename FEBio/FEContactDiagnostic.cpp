@@ -7,6 +7,7 @@
 #include "FENeoHookean.h"
 #include "FESolidSolver.h"
 #include "FESlidingInterface.h"
+#include "FESolidDomain.h"
 #include "log.h"
 
 void print_matrix(Logfile& log, DenseMatrix& m)
