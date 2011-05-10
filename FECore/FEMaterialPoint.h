@@ -1,7 +1,7 @@
 #pragma once
 
-#include "FECore/mat3d.h"
-#include "FECore/DumpFile.h"
+#include "mat3d.h"
+#include "DumpFile.h"
 
 //-----------------------------------------------------------------------------
 //! Material point class

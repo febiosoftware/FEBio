@@ -85,7 +85,8 @@ bool FESolidSolver::StiffnessMatrix()
 			if (K.diag(i) == 0) zd.push_back(i);
 		}
 
-		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);
+//		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);
+		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
 	}
 
 	return true;

@@ -14,7 +14,7 @@
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
 #include "Timer.h"
-#include "FEException.h"
+#include "FECore/FEException.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------

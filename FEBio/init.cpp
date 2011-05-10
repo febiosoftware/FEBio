@@ -4,7 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include "fem.h"
-#include "FEException.h"
+#include "FECore/FEException.h"
 #include "FENodeReorder.h"
 #include "log.h"
 #include "FESolidSolver.h"

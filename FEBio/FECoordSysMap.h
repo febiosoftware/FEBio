@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/mat3d.h"
-#include "FEElement.h"
+#include "FECore/FEElement.h"
 #include "FECore/DumpFile.h"
 
 #define FE_MAP_NONE		0

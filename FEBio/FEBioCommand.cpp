@@ -3,7 +3,7 @@
 #include "FEBioCommand.h"
 #include "fem.h"
 #include "version.h"
-#include "FEException.h"
+#include "FECore/FEException.h"
 #include "FECore/FECore.h"
 #include "FEBioLib/CompactMatrix.h"
 #include "FESolver.h"

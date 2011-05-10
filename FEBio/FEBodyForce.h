@@ -1,5 +1,5 @@
 #pragma once
-#include "FEMaterialPoint.h"
+#include "FECore/FEMaterialPoint.h"
 #include "MathParser.h"
 #include "FECore/DumpFile.h"
 #include "FEMesh.h"

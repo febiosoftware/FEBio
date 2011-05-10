@@ -171,7 +171,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;SUPERLU;PARDISO"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -1424,7 +1424,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEElementLibrary.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEElementTraits.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEException.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FEMaterialFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FEMaterialPoint.cpp"
 				>
 			</File>
 			<File
@@ -1694,7 +1714,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEElementLibrary.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEElementTraits.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEException.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FEMaterialFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEMaterialPoint.h"
 				>
 			</File>
 			<File

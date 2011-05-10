@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "FEMesh.h"
-#include "FEException.h"
+#include "FECore/FEException.h"
 #include "fem.h"
 #include "ut4.h"
 

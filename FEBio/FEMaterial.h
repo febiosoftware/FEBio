@@ -15,7 +15,7 @@
 #include "FECoordSysMap.h"
 #include "FECore/FEMaterialFactory.h"
 #include "FECore/FEParameterList.h"
-#include "FEMaterialPoint.h"
+#include "FECore/FEMaterialPoint.h"
 #include "FECore/DumpFile.h"
 
 #define INRANGE(x, a, b) ((x)>=(a) && (x)<=(b))

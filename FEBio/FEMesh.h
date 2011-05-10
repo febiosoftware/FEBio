@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEElement.h"
+#include "FECore/FEElement.h"
 #include "FEDomain.h"
 #include "FECore/DumpFile.h"
 #include "FENodeElemList.h"

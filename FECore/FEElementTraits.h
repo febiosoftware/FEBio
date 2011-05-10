@@ -9,11 +9,11 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/vector.h"
-#include "FECore/vec3d.h"
-#include "FECore/matrix.h"
-#include "FECore/mat3d.h"
-#include "FECore/FE_enum.h"
+#include "vec3d.h"
+#include "matrix.h"
+#include "mat3d.h"
+#include "FE_enum.h"
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Max nr of nodal degrees of freedom
@@ -76,13 +76,13 @@ public:
 
 public:
 	// These variables are filled when unpacking the element
-	vector<vec3d>  r0;	//!< initial coordinates
-	vector<vec3d>  rt;	//!< current coordinates
-	vector<vec3d>  vt;	//!< nodal velocities
-	vector<double> pt;	//!< nodal pressures
-	vector<double> ct;	//!< nodal concentrations
+	std::vector<vec3d>  r0;	//!< initial coordinates
+	std::vector<vec3d>  rt;	//!< current coordinates
+	std::vector<vec3d>  vt;	//!< nodal velocities
+	std::vector<double> pt;	//!< nodal pressures
+	std::vector<double> ct;	//!< nodal concentrations
 
-	vector<int> LM; //!< nodal equation numbers
+	std::vector<int> LM; //!< nodal equation numbers
 
 	int nint;	//!< number of integration points
 	int	neln;	//!< number of element nodes
@@ -149,10 +149,10 @@ public:
 
 public:
 	// gauss-point coordinates and weights
-	vector<double> gr;
-	vector<double> gs;
-	vector<double> gt;
-	vector<double> gw;
+	std::vector<double> gr;
+	std::vector<double> gs;
+	std::vector<double> gt;
+	std::vector<double> gw;
 
 	// local derivatives of shape functions at gauss points
 	matrix Gr, Gs, Gt;
@@ -291,9 +291,9 @@ public:
 
 public:
 	// gauss-point coordinates and weights
-	vector<double> gr;
-	vector<double> gs;
-	vector<double> gw;
+	std::vector<double> gr;
+	std::vector<double> gs;
+	std::vector<double> gw;
 
 	// local derivatives of shape functions at gauss points
 	matrix Gr, Gs;
@@ -401,26 +401,26 @@ public:
 
 public:
 	// gauss-point coordinates and weights
-	vector<double> gr;
-	vector<double> gs;
-	vector<double> gt;
-	vector<double> gw;
+	std::vector<double> gr;
+	std::vector<double> gs;
+	std::vector<double> gt;
+	std::vector<double> gw;
 
 	// directors
-	vector<vec3d>	D0;	//!< initial directors
-	vector<vec3d>	Dt;	//!< current directors
+	std::vector<vec3d>	D0;	//!< initial directors
+	std::vector<vec3d>	Dt;	//!< current directors
 
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;
 
 	// data used when unpacking
-	vector<mat3d>	m_Jt;		// jacobian
-	vector<mat3d>	m_Jti;		// inverse jacobian
-	vector<double>	m_detJt;	// jacobian determinant
+	std::vector<mat3d>	m_Jt;		// jacobian
+	std::vector<mat3d>	m_Jti;		// inverse jacobian
+	std::vector<double>	m_detJt;	// jacobian determinant
 
-	vector<mat3d>	m_J0;		// jacobian
-	vector<mat3d>	m_J0i;		// inverse jacobian
-	vector<double>	m_detJ0;	// jacobian determinant
+	std::vector<mat3d>	m_J0;		// jacobian
+	std::vector<mat3d>	m_J0i;		// inverse jacobian
+	std::vector<double>	m_detJ0;	// jacobian determinant
 };
 
 ///////////////////////////////////////////////////////////////////////////////

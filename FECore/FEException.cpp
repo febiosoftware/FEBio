@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "FEException.h"
-#include "fem.h"
-#include "log.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -21,6 +19,12 @@ FEException::~FEException()
 
 }
 
+ZeroDiagonal::ZeroDiagonal(int node, int ndof)
+{
+	// TODO: implement error handling
+}
+
+/*
 ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 {
 	// let's find what dof this equation belonges to
@@ -83,4 +87,6 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 
 	// print error message
 	sprintf(m_szerr, "FATAL ERROR: %d zero(s) found on diagonal.", l.size());
+
 }
+*/

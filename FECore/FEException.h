@@ -9,11 +9,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class FEElement;
-class FEM;
-
 #include <vector>
 using namespace std;
+
+class FEElement;
 
 class FEException  
 {
@@ -50,7 +49,7 @@ private:
 	};
 
 public:
-	ZeroDiagonal(vector<int>& l, FEM& fem);
+	ZeroDiagonal(int node, int dof);
 
 	char m_szerr[256];	// the error message
 };
