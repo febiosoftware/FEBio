@@ -1,0 +1,133 @@
+#include "stdafx.h"
+#include "FERefIsoPerm.h"
+
+
+// register the material with the framework
+REGISTER_MATERIAL(FERefIsoPerm, "ref iso perm");
+
+// define the material parameters
+BEGIN_PARAMETER_LIST(FERefIsoPerm, FEPoroElastic)
+ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
+ADD_PARAMETER(m_perm1, FE_PARAM_DOUBLE, "perm1");
+ADD_PARAMETER(m_perm2, FE_PARAM_DOUBLE, "perm2");
+ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
+ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "M");
+ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! Constructor. 
+FERefIsoPerm::FERefIsoPerm()
+{
+	m_perm0 = 1;
+	m_perm1 = 0;
+	m_perm2 = 0;
+	m_phi0 = m_M = m_alpha = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialization. 
+void FERefIsoPerm::Init()
+{
+	if (m_perm0 < 0) throw MaterialError("perm0 must be >= 0");
+	if (m_perm1 < 0) throw MaterialError("perm1 must be >= 0");
+	if (m_perm2 < 0) throw MaterialError("perm2 must be >= 0");
+	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
+	if (m_M < 0) throw MaterialError("M must be >= 0");
+	if (m_alpha < 0) throw MaterialError("alpha must be >= 0");
+}
+
+//-----------------------------------------------------------------------------
+//! Fluid flux.
+
+vec3d FERefIsoPerm::Flux(FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// Identity
+	mat3dd I(1);
+	
+	// left cauchy-green matrix
+	mat3ds b = et.LeftCauchyGreen();
+	
+	// relative volume
+	double J = et.J;
+	
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	
+	// pressure gradient
+	vec3d gradp = pt.m_gradp;
+	
+	// fluid flux w = -k*grad(p)
+	vec3d w;
+	double f = pow((J-m_phi0)/(1-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double k0 = m_perm0*f;
+	double k1 = m_perm1/(J*J)*f;
+	double k2 = 0.5*m_perm2/pow(J,4)*f;
+	w = (-k0*I-k1*b-2*k2*b*b)*gradp;
+	
+	return w;
+}
+
+//-----------------------------------------------------------------------------
+//! Permeability tensor.
+void FERefIsoPerm::Permeability(double k[3][3], FEMaterialPoint& mp)
+{
+	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// Identity
+	mat3dd I(1);
+	
+	// left cauchy-green matrix
+	mat3ds b = et.LeftCauchyGreen();
+	
+	// relative volume
+	double J = et.J;
+	
+	// --- strain-dependent permeability ---
+	
+	double f = pow((J-m_phi0)/(1-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double k0 = m_perm0*f;
+	double k1 = m_perm1/(J*J)*f;
+	double k2 = 0.5*m_perm2/pow(J,4)*f;
+	mat3ds kt = k0*I+k1*b+2*k2*b*b;
+	k[0][0] = kt.xx();
+	k[1][1] = kt.yy();
+	k[2][2] = kt.zz();
+	k[0][1] = k[1][0] = kt.xy();
+	k[1][2] = k[2][1] = kt.yz();
+	k[2][0] = k[0][2] = kt.xz();
+}
+
+//-----------------------------------------------------------------------------
+//! Tangent of permeability
+tens4ds FERefIsoPerm::Tangent_Permeability(FEMaterialPoint &mp)
+{
+	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	
+	// Identity
+	mat3dd I(1);
+	
+	// left cauchy-green matrix
+	mat3ds b = et.LeftCauchyGreen();
+	
+	// relative volume
+	double J = et.J;
+	
+	double f = pow((J-m_phi0)/(1-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double k0 = m_perm0*f;
+	double k1 = m_perm1/(J*J)*f;
+	double k2 = 0.5*m_perm2/pow(J,4)*f;
+	double K0prime = (J*J*m_M+(J*(m_alpha+1)-m_phi0)/(J-m_phi0))*k0;
+	double K1prime = (J*J*m_M+(J*(m_alpha-1)+m_phi0)/(J-m_phi0))*k1;
+	double K2prime = (J*J*m_M+(J*(m_alpha-3)+3*m_phi0)/(J-m_phi0))*k2;
+	mat3ds k0hat = I*K0prime;
+	mat3ds k1hat = I*K1prime;
+	mat3ds k2hat = I*K2prime;
+	
+	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0
+	+ dyad1s(b,k1hat)/2.0
+	+ dyad1s(b*b,k2hat)+dyad4s(b)*4*k2;
+	
+	return K4;
+}
