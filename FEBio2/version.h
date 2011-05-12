@@ -19,8 +19,8 @@
 // IMPORTANT NOTE: License files can only be used for FEBio versions 1.3.0 and up
 //
 
-#define VERSION			1
-#define SUBVERSION		3
+#define VERSION			2
+#define SUBVERSION		0
 #define SUBSUBVERSION	0
 #ifdef SVN
 #include "svnrev.h"

@@ -111,12 +111,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_63121A3DB95A48E7B6E9317A21F2BDD0"
-        "OwnerKey" = "8:_5F85932F5BA749ED8AC24C2FCC4CA99B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_69A8CA5F359340728A07E2765C908A33"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -231,6 +225,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_C777EB37DC5143E39F6860F83B86BDA3"
+        "OwnerKey" = "8:_5F85932F5BA749ED8AC24C2FCC4CA99B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_CA86355B4F444F37A287AA9B7C98887E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -325,6 +325,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -341,6 +349,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -1392,7 +1421,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FEBio2"
         "ProductCode" = "8:{F2DC6832-6689-4239-AF84-E29B1273D284}"
-        "PackageCode" = "8:{2ABB8EFB-30E1-49DC-946E-8E25D384FCF2}"
+        "PackageCode" = "8:{84EBD8BF-A1D7-454D-9056-BEE547C12F7F}"
         "UpgradeCode" = "8:{355EC1F5-9826-415A-82E5-28E1CBE65F9C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1922,11 +1951,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_63121A3DB95A48E7B6E9317A21F2BDD0"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C777EB37DC5143E39F6860F83B86BDA3"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC100_DebugCRT_x86.msm"
+            "SourcePath" = "8:Microsoft_VC100_CRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -1941,7 +1970,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F85932F5BA749ED8AC24C2FCC4CA99B"
             {
-            "SourcePath" = "8:..\\Debug\\FEBio2.exe"
+            "SourcePath" = "8:..\\Release\\FEBio2.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_529ABCE5344A48FB8387D60260816A83"
