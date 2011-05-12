@@ -1,0 +1,397 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{448F4A28-A0DA-42F8-8D30-ED583D612E49}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FEBio2</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+    <LibraryPath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\Debug;C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;PARDISO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>fecored.lib;febiolib.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FEBio2\Archive.h" />
+    <ClInclude Include="..\..\FEBio2\Command.h" />
+    <ClInclude Include="..\..\FEBio2\CommandManager.h" />
+    <ClInclude Include="..\..\FEBio2\console.h" />
+    <ClInclude Include="..\..\FEBio2\DataStore.h" />
+    <ClInclude Include="..\..\FEBio2\FE2DFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBio2\FE2DTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBio2\FE2DTransIsoVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBio2\FEAnalysis.h" />
+    <ClInclude Include="..\..\FEBio2\FEArrudaBoyce.h" />
+    <ClInclude Include="..\..\FEBio2\FEAugLagLinearConstraint.h" />
+    <ClInclude Include="..\..\FEBio2\FEBioCommand.h" />
+    <ClInclude Include="..\..\FEBio2\FEBioImport.h" />
+    <ClInclude Include="..\..\FEBio2\FEBioPlotFile.h" />
+    <ClInclude Include="..\..\FEBio2\FEBioStdSolver.h" />
+    <ClInclude Include="..\..\FEBio2\FEBiphasic.h" />
+    <ClInclude Include="..\..\FEBio2\FEBiphasicDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEBiphasicSoluteDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEBox.h" />
+    <ClInclude Include="..\..\FEBio2\FEConstBodyForce.h" />
+    <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
+    <ClInclude Include="..\..\FEBio2\FEContactInterface.h" />
+    <ClInclude Include="..\..\FEBio2\FEContactSurface.h" />
+    <ClInclude Include="..\..\FEBio2\FEDamageMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBio2\FEDamageNeoHookean.h" />
+    <ClInclude Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBio2\FEDiagnostic.h" />
+    <ClInclude Include="..\..\FEBio2\FEDiffConstIso.h" />
+    <ClInclude Include="..\..\FEBio2\FEDiffConstOrtho.h" />
+    <ClInclude Include="..\..\FEBio2\FEDiffRefIso.h" />
+    <ClInclude Include="..\..\FEBio2\FEDiscreteMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FEDiscreteSpringDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEDonnanEquilibrium.h" />
+    <ClInclude Include="..\..\FEBio2\FEEFDDonnanEquilibrium.h" />
+    <ClInclude Include="..\..\FEBio2\FEEFDMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBio2\FEEFDNeoHookean.h" />
+    <ClInclude Include="..\..\FEBio2\FEEFDUncoupled.h" />
+    <ClInclude Include="..\..\FEBio2\FEEFDVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBio2\FEElasticMixture.h" />
+    <ClInclude Include="..\..\FEBio2\FEElasticShellDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEElasticSolidDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEElasticTrussDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEElemElemList.h" />
+    <ClInclude Include="..\..\FEBio2\FEEllipsoidalFiberDistribution.h" />
+    <ClInclude Include="..\..\FEBio2\FEFacet2FacetSliding.h" />
+    <ClInclude Include="..\..\FEBio2\FEFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBio2\FEFluidFlux.h" />
+    <ClInclude Include="..\..\FEBio2\FEFungOrthotropic.h" />
+    <ClInclude Include="..\..\FEBio2\FEGasserOgdenHolzapfel.h" />
+    <ClInclude Include="..\..\FEBio2\FEHeatFlux.h" />
+    <ClInclude Include="..\..\FEBio2\FEHeatSolidDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEHeatSolver.h" />
+    <ClInclude Include="..\..\FEBio2\FEHolmesMow.h" />
+    <ClInclude Include="..\..\FEBio2\FEIncompNeoHookean.h" />
+    <ClInclude Include="..\..\FEBio2\FEIsotropicElastic.h" />
+    <ClInclude Include="..\..\FEBio2\FEIsotropicFourier.h" />
+    <ClInclude Include="..\..\FEBio2\FELevelStructure.h" />
+    <ClInclude Include="..\..\FEBio2\FELinearConstraint.h" />
+    <ClInclude Include="..\..\FEBio2\FELinearElastic.h" />
+    <ClInclude Include="..\..\FEBio2\FELinearOrthotropic.h" />
+    <ClInclude Include="..\..\FEBio2\fem.h" />
+    <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
+    <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FEMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBio2\FEMuscleMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FENeoHookean.h" />
+    <ClInclude Include="..\..\FEBio2\FENeoHookeanTransIso.h" />
+    <ClInclude Include="..\..\FEBio2\FENodeNodeList.h" />
+    <ClInclude Include="..\..\FEBio2\FENodeReorder.h" />
+    <ClInclude Include="..\..\FEBio2\FEOgdenMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FEOgdenUnconstrained.h" />
+    <ClInclude Include="..\..\FEBio2\FEOptimizer.h" />
+    <ClInclude Include="..\..\FEBio2\FEOsmCoefConst.h" />
+    <ClInclude Include="..\..\FEBio2\FEPerfectOsmometer.h" />
+    <ClInclude Include="..\..\FEBio2\FEPeriodicBoundary.h" />
+    <ClInclude Include="..\..\FEBio2\FEPermConstIso.h" />
+    <ClInclude Include="..\..\FEBio2\FEPermHolmesMow.h" />
+    <ClInclude Include="..\..\FEBio2\FEPermRefIso.h" />
+    <ClInclude Include="..\..\FEBio2\FEPermRefOrtho.h" />
+    <ClInclude Include="..\..\FEBio2\FEPermRefTransIso.h" />
+    <ClInclude Include="..\..\FEBio2\FEPlotData.h" />
+    <ClInclude Include="..\..\FEBio2\FEPlotDataFactory.h" />
+    <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h" />
+    <ClInclude Include="..\..\FEBio2\FEPlotNodeData.h" />
+    <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h" />
+    <ClInclude Include="..\..\FEBio2\FEPointBodyForce.h" />
+    <ClInclude Include="..\..\FEBio2\FEPointConstraint.h" />
+    <ClInclude Include="..\..\FEBio2\FEPoroConstPerm.h" />
+    <ClInclude Include="..\..\FEBio2\FEPoroElastic.h" />
+    <ClInclude Include="..\..\FEBio2\FEPoroHolmesMow.h" />
+    <ClInclude Include="..\..\FEBio2\FEPoroSolidSolver.h" />
+    <ClInclude Include="..\..\FEBio2\FEPoroSoluteSolver.h" />
+    <ClInclude Include="..\..\FEBio2\FEPoroTraction.h" />
+    <ClInclude Include="..\..\FEBio2\FEPressureLoad.h" />
+    <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
+    <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
+    <ClInclude Include="..\..\FEBio2\FERefIsoPerm.h" />
+    <ClInclude Include="..\..\FEBio2\FERefOrthoPerm.h" />
+    <ClInclude Include="..\..\FEBio2\FERefTransIsoPerm.h" />
+    <ClInclude Include="..\..\FEBio2\FERestartImport.h" />
+    <ClInclude Include="..\..\FEBio2\FERigid.h" />
+    <ClInclude Include="..\..\FEBio2\FERigidBody.h" />
+    <ClInclude Include="..\..\FEBio2\FERigidJoint.h" />
+    <ClInclude Include="..\..\FEBio2\FERigidSurface.h" />
+    <ClInclude Include="..\..\FEBio2\FERigidWallInterface.h" />
+    <ClInclude Include="..\..\FEBio2\FESlidingInterface.h" />
+    <ClInclude Include="..\..\FEBio2\FESlidingInterface2.h" />
+    <ClInclude Include="..\..\FEBio2\FESlidingInterface3.h" />
+    <ClInclude Include="..\..\FEBio2\FESolidSolver.h" />
+    <ClInclude Include="..\..\FEBio2\FESolubConst.h" />
+    <ClInclude Include="..\..\FEBio2\FESoluteFlux.h" />
+    <ClInclude Include="..\..\FEBio2\FESolver.h" />
+    <ClInclude Include="..\..\FEBio2\FEStiffnessMatrix.h" />
+    <ClInclude Include="..\..\FEBio2\FEStVenantKirchhoff.h" />
+    <ClInclude Include="..\..\FEBio2\FESurfaceConstraint.h" />
+    <ClInclude Include="..\..\FEBio2\FESurfaceLoad.h" />
+    <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
+    <ClInclude Include="..\..\FEBio2\FETCNonlinearOrthotropic.h" />
+    <ClInclude Include="..\..\FEBio2\FETendonMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FETiedContactSurface.h" />
+    <ClInclude Include="..\..\FEBio2\FETiedInterface.h" />
+    <ClInclude Include="..\..\FEBio2\FETractionLoad.h" />
+    <ClInclude Include="..\..\FEBio2\FETransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBio2\FETransIsoVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBio2\FETransverselyIsotropic.h" />
+    <ClInclude Include="..\..\FEBio2\FETrussMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FEUncoupledElasticMixture.h" />
+    <ClInclude Include="..\..\FEBio2\FEUncoupledMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FEVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBio2\FEViscoElasticMaterial.h" />
+    <ClInclude Include="..\..\FEBio2\FileImport.h" />
+    <ClInclude Include="..\..\FEBio2\geodesic.h" />
+    <ClInclude Include="..\..\FEBio2\Interrupt.h" />
+    <ClInclude Include="..\..\FEBio2\log.h" />
+    <ClInclude Include="..\..\FEBio2\Logfile.h" />
+    <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h" />
+    <ClInclude Include="..\..\FEBio2\MathParser.h" />
+    <ClInclude Include="..\..\FEBio2\PlotFile.h" />
+    <ClInclude Include="..\..\FEBio2\plugin.h" />
+    <ClInclude Include="..\..\FEBio2\stdafx.h" />
+    <ClInclude Include="..\..\FEBio2\Timer.h" />
+    <ClInclude Include="..\..\FEBio2\ut4.h" />
+    <ClInclude Include="..\..\FEBio2\validate.h" />
+    <ClInclude Include="..\..\FEBio2\version.h" />
+    <ClInclude Include="..\..\FEBio2\XMLReader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\FEBio2\Archive.cpp" />
+    <ClCompile Include="..\..\FEBio2\augment.cpp" />
+    <ClCompile Include="..\..\FEBio2\biphasic.cpp" />
+    <ClCompile Include="..\..\FEBio2\biphasicsolute.cpp" />
+    <ClCompile Include="..\..\FEBio2\colsol.cpp" />
+    <ClCompile Include="..\..\FEBio2\CommandManager.cpp" />
+    <ClCompile Include="..\..\FEBio2\console.cpp" />
+    <ClCompile Include="..\..\FEBio2\DataStore.cpp" />
+    <ClCompile Include="..\..\FEBio2\diagnose.cpp" />
+    <ClCompile Include="..\..\FEBio2\discrete.cpp" />
+    <ClCompile Include="..\..\FEBio2\elstf.cpp" />
+    <ClCompile Include="..\..\FEBio2\FE2DFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBio2\FE2DTransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBio2\FE2DTransIsoVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEAnalysis.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEArrudaBoyce.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEAugLagLinearConstraint.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBioCommand.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBioImport.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBioPlotFile.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBioStdSolver.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBiphasic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBiphasicSolute.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBox.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEConstBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEContactInterface.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDamageMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDamageNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDiffConstIso.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDiffConstOrtho.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDiffRefIso.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDiscreteMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEDonnanEquilibrium.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEEFDDonnanEquilibrium.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEEFDMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEEFDNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEEFDUncoupled.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEEFDVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEElasticMixture.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEElemElemList.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEEllipsoidalFiberDistribution.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEFacet2FacetSliding.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEFiberMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEFluidFlux.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEFungOrthotropic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEGasserOgdenHolzapfel.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEHeatFlux.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEHeatSolver.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEIncompNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEIsotropicElastic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEIsotropicFourier.cpp" />
+    <ClCompile Include="..\..\FEBio2\FELevelStructure.cpp" />
+    <ClCompile Include="..\..\FEBio2\FELinearConstraint.cpp" />
+    <ClCompile Include="..\..\FEBio2\FELinearElastic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FELinearOrthotropic.cpp" />
+    <ClCompile Include="..\..\FEBio2\fem.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEMuscleMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FENeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBio2\FENeoHookeanTransIso.cpp" />
+    <ClCompile Include="..\..\FEBio2\FENodeNodeList.cpp" />
+    <ClCompile Include="..\..\FEBio2\FENodeReorder.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEOgdenMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEOgdenUnconstrained.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEOptimizer.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEOsmCoefConst.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPerfectOsmometer.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPeriodicBoundary.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPermConstIso.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPermHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPermRefIso.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPermRefOrtho.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPermRefTransIso.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPlotData.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPlotDataFactory.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPlotNodeData.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPointBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPointConstraint.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPoroConstPerm.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPoroElastic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPoroHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPoroSolidSolver.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPoroSoluteSolver.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPoroTraction.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPressureLoad.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERefIsoPerm.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERefOrthoPerm.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERefTransIsoPerm.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERigid.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERigidBody.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERigidJoint.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERigidSurface.cpp" />
+    <ClCompile Include="..\..\FEBio2\FERigidWallInterface.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESlidingInterface.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESlidingInterface2.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESlidingInterface3.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESolidSolver.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESolubConst.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESoluteFlux.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESolver.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEStiffnessMatrix.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEStVenantKirchhoff.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESurfaceConstraint.cpp" />
+    <ClCompile Include="..\..\FEBio2\FESurfaceLoad.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETCNonlinearOrthotropic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETendonMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETiedContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETiedInterface.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETractionLoad.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETransIsoVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETransverselyIsotropic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FETrussMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEUncoupledElasticMixture.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEUncoupledMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEViscoElasticMaterial.cpp" />
+    <ClCompile Include="..\..\FEBio2\FileImport.cpp" />
+    <ClCompile Include="..\..\FEBio2\getapppath.cpp" />
+    <ClCompile Include="..\..\FEBio2\heatsolid.cpp" />
+    <ClCompile Include="..\..\FEBio2\hello.cpp" />
+    <ClCompile Include="..\..\FEBio2\init.cpp" />
+    <ClCompile Include="..\..\FEBio2\InitContact.cpp" />
+    <ClCompile Include="..\..\FEBio2\InitPoroSolute.cpp" />
+    <ClCompile Include="..\..\FEBio2\InitRigid.cpp" />
+    <ClCompile Include="..\..\FEBio2\input.cpp" />
+    <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
+    <ClCompile Include="..\..\FEBio2\levmar.cpp" />
+    <ClCompile Include="..\..\FEBio2\Logfile.cpp" />
+    <ClCompile Include="..\..\FEBio2\LSDYNAPlotFile.cpp" />
+    <ClCompile Include="..\..\FEBio2\MathParser.cpp" />
+    <ClCompile Include="..\..\FEBio2\optimize.cpp" />
+    <ClCompile Include="..\..\FEBio2\PlotFile.cpp" />
+    <ClCompile Include="..\..\FEBio2\plugin.cpp" />
+    <ClCompile Include="..\..\FEBio2\porosolid.cpp" />
+    <ClCompile Include="..\..\FEBio2\powell.cpp" />
+    <ClCompile Include="..\..\FEBio2\quasin.cpp" />
+    <ClCompile Include="..\..\FEBio2\restart.cpp" />
+    <ClCompile Include="..\..\FEBio2\rigid.cpp" />
+    <ClCompile Include="..\..\FEBio2\shell.cpp" />
+    <ClCompile Include="..\..\FEBio2\solid.cpp" />
+    <ClCompile Include="..\..\FEBio2\solid3f.cpp" />
+    <ClCompile Include="..\..\FEBio2\solve.cpp" />
+    <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
+    <ClCompile Include="..\..\FEBio2\Timer.cpp" />
+    <ClCompile Include="..\..\FEBio2\truss.cpp" />
+    <ClCompile Include="..\..\FEBio2\udghex.cpp" />
+    <ClCompile Include="..\..\FEBio2\update.cpp" />
+    <ClCompile Include="..\..\FEBio2\ut4.cpp" />
+    <ClCompile Include="..\..\FEBio2\validate.cpp" />
+    <ClCompile Include="..\..\FEBio2\XMLReader.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
