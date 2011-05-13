@@ -1,8 +1,8 @@
 #pragma once
-
+#include "febio.h"
 #include <list>
 using namespace std;
-
+/*
 // forward declaration of the material class
 class FEMaterial;
 
@@ -55,8 +55,7 @@ protected:
 
 private:
 	//! default constructor
-	/*! The constructor is declared as private so
-	    that the user cannot instantiate it       */
+	//! The constructor is declared as private so
 	FEMaterialFactory(void) {}
 
 	friend class FERegisterMaterial;
@@ -75,6 +74,7 @@ public:
 	}
 };
 
+
 // The following macros should be used to register a material with the material factory.
 // To register a material, take the following steps.
 // 1) add the DECLARE_REGISTERED macro to the material class declaration
@@ -92,3 +92,28 @@ public: \
 	FERegisterMaterial theClass::m_##theClass##_rm(theName, theClass::CreateMaterial); \
 	const char* theClass::GetTypeString() { return theName; }
 
+*/
+
+//! This class helps with the registration of a material with the FEMaterialFactory
+template <typename M> class FERegisterMaterial_T : public FEMaterialFactory
+{
+public:
+	FERegisterMaterial_T(const char* sz)
+	{
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		febio.RegisterMaterial(this, sz);
+	}
+
+	M* Create(FEModel*) { return new M; }
+};
+
+// The DECLARE_REGISTERED macro sets up the mechanism to do the material registration
+#define DECLARE_REGISTERED(theClass) \
+public: \
+	const char* GetTypeString();
+
+
+// the REGISTER_MATERIAL does the actual material registration
+#define REGISTER_MATERIAL(theClass, theName) \
+	static FERegisterMaterial_T<theClass> _##theClass##_rm(theName); \
+	const char* theClass::GetTypeString() { return theName; }

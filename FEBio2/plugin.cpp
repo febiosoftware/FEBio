@@ -11,11 +11,11 @@ bool LoadPlugin(const char* szfile) { return false; }
 
 typedef void (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 
-extern FEBioKernel FEBio;
-
 //-----------------------------------------------------------------------------
 bool LoadPlugin(const char* szfile)
 {
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	// load the library
 	HMODULE hm = LoadLibraryA(szfile);
 	if (hm == NULL) return false;
@@ -25,7 +25,7 @@ bool LoadPlugin(const char* szfile)
 	if (pfnc == 0) return false;
 
 	// allow the plugin to register itself with the framework
-	pfnc(FEBio);
+	pfnc(febio);
 
 	// a-ok!
 	return true;

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FEBiphasic.h"
+#include "fem.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEBiphasic, "biphasic");
@@ -174,14 +175,16 @@ void FEBiphasic::Serialize(DumpFile &ar)
 	{
 		char sz[256] = {0};
 
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+
 		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(FEMaterialFactory::CreateMaterial(sz));
+		m_pSolid = dynamic_cast<FEElasticMaterial*>(febio.CreateMaterial(sz, ar.GetFEM()));
 		assert(m_pSolid);
 		m_pSolid->Serialize(ar);
 		m_pSolid->Init();
 
 		ar >> sz;
-		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(FEMaterialFactory::CreateMaterial(sz));
+		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.CreateMaterial(sz, ar.GetFEM()));
 		assert(m_pPerm);
 		m_pPerm->Serialize(ar);
 		m_pPerm->Init();

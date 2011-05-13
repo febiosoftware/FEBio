@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEMaterialFactory.h"
 #include <cstring>
-
+/*
 // This is the one and only instance of the material factory
 // You can retrieve this pointer by calling FEMaterialFactory::GetInstance()
 FEMaterialFactory*	FEMaterialFactory::m_pMF = 0;
@@ -84,3 +84,4 @@ FEMaterial* FEMaterialFactory::CreateMaterial(const char *szmat)
 	// if we get here then the material was not found
 	return 0;
 }
+*/

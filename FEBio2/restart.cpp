@@ -332,6 +332,8 @@ void FEM::SerializeMaterials(DumpFile& ar)
 		int nmat;
 		ar >> nmat;
 
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+
 		// read the material data
 		char szmat[256] = {0}, szvar[256] = {0};
 		for (int i=0; i<nmat; ++i)
@@ -340,7 +342,7 @@ void FEM::SerializeMaterials(DumpFile& ar)
 			ar >> szmat;
 
 			// create a material
-			FEMaterial* pmat = FEMaterialFactory::CreateMaterial(szmat);
+			FEMaterial* pmat = febio.CreateMaterial(szmat, this);
 			assert(pmat);
 
 			// read the name

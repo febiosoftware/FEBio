@@ -57,10 +57,6 @@
 #define MAXFILE 512
 
 //-----------------------------------------------------------------------------
-// FEBio kernel
-FEBioKernel FEBio;
-
-//-----------------------------------------------------------------------------
 //!  Command line options
 
 //! This structures stores the command line options that were input by the user
@@ -132,8 +128,11 @@ int main(int argc, char* argv[])
 	// set options that were passed on the command line
 	fem.SetDebugFlag(ops.bdebug);
 
+	// get the FEBio kernel
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	// find a task
-	FEBioTask* ptask = FEBio.CreateTask(ops.sztask, &fem);
+	FEBioTask* ptask = febio.CreateTask(ops.sztask, &fem);
 	if (ptask == 0)
 	{
 		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
@@ -309,12 +308,14 @@ void init_framework(FEM& fem)
 {
 	FEBioCommand::SetFEM(&fem);
 
-	FEBio.RegisterTask(new FEBioStdSolverFactory , "solve");
-	FEBio.RegisterTask(new FEBioRestartFactory   , "restart");
-	FEBio.RegisterTask(new FEBioDiagnosticFactory, "diagnose");
-	FEBio.RegisterTask(new FEBioOptimizeFactory  , "optimize");
+	FEBioKernel& febio = FEBioKernel::GetInstance();
 
-	FEBio.RegisterBodyForce(new FEPointBodyForceFactory, "point");
+	febio.RegisterTask(new FEBioStdSolverFactory , "solve");
+	febio.RegisterTask(new FEBioRestartFactory   , "restart");
+	febio.RegisterTask(new FEBioDiagnosticFactory, "diagnose");
+	febio.RegisterTask(new FEBioOptimizeFactory  , "optimize");
+
+	febio.RegisterBodyForce(new FEPointBodyForceFactory, "point");
 }
 
 //-----------------------------------------------------------------------------
