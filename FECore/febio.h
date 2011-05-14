@@ -14,7 +14,7 @@ public:
 	static FEBioKernel& GetInstance();
 
 public:
-	void RegisterClass(FEBioFactory* ptf);
+	void RegisterClass(FEBioFactory* ptf) { m_Fac.push_back(ptf); }
 	template <typename T> T* Create(const char* sztag, FEModel* pfem);
 
 	template <typename T> const char* GetTypeStr(T* po);
