@@ -8,60 +8,35 @@
 class FEBioStdSolver : public FEBioTask
 {
 public:
+	FEBioStdSolver(FEModel* pfem) : FEBioTask(pfem){}
+
 	//! Run the FE model
-	virtual bool Run(FEModel& fem, const char* szfile);
+	virtual bool Run(const char* szfile);
 };
-
-//-----------------------------------------------------------------------------
-class FEBioStdSolverFactory : public FEBioTaskFactory
-{
-public:
-	FEBioTask* Create(FEModel* pfem) { return new FEBioStdSolver(); }
-};
-
 
 //-----------------------------------------------------------------------------
 class FEBioOptimize : public FEBioTask
 {
 public:
+	FEBioOptimize(FEModel* pfem) : FEBioTask(pfem){}
 	//! Run the FE model
-	virtual bool Run(FEModel& fem, const char* szfile);
-};
-
-//-----------------------------------------------------------------------------
-class FEBioOptimizeFactory : public FEBioTaskFactory
-{
-public:
-	FEBioTask* Create(FEModel* pfem) { return new FEBioOptimize(); }
+	virtual bool Run(const char* szfile);
 };
 
 //-----------------------------------------------------------------------------
 class FEBioDiagnostic : public FEBioTask
 {
 public:
+	FEBioDiagnostic(FEModel* pfem) : FEBioTask(pfem){}
 	//! Run the FE model
-	virtual bool Run(FEModel& fem, const char* szfile);
+	virtual bool Run(const char* szfile);
 };
-
-//-----------------------------------------------------------------------------
-class FEBioDiagnosticFactory : public FEBioTaskFactory
-{
-public:
-	FEBioTask* Create(FEModel* pfem) { return new FEBioDiagnostic(); }
-};
-
 
 //-----------------------------------------------------------------------------
 class FEBioRestart : public FEBioTask
 {
 public:
+	FEBioRestart(FEModel* pfem) : FEBioTask(pfem){}
 	//! Run the FE model
-	virtual bool Run(FEModel& fem, const char* szfile);
-};
-
-//-----------------------------------------------------------------------------
-class FEBioRestartFactory : public FEBioTaskFactory
-{
-public:
-	FEBioTask* Create(FEModel* pfem) { return new FEBioRestart(); }
+	virtual bool Run(const char* szfile);
 };

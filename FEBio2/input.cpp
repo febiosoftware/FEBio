@@ -236,6 +236,8 @@ void echo_input(FEM& fem)
 		}
 	}
 
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	// material data
 	clog.printf("\n\n");
 	clog.printf(" MATERIAL DATA\n");
@@ -250,12 +252,12 @@ void echo_input(FEM& fem)
 
 		// get the material name and type string
 		const char* szname = pmat->GetName();
-		const char* sztype = pmat->GetTypeString();
+		const char* sztype = febio.GetTypeStr<FEMaterial>(pmat);
 		if (szname[0] == 0) szname = 0;
 
 		// print type and name
-		clog.printf("%s", sztype);
-		if (szname) clog.printf(" (%s)", szname);
+		clog.printf("%s", (szname?szname:"unknown"));
+		clog.printf(" (type: %s)", sztype);
 		clog.printf("\n");
 
 		// print the parameter list

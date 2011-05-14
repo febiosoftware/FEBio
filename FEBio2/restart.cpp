@@ -306,6 +306,8 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 
 void FEM::SerializeMaterials(DumpFile& ar)
 {
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	if (ar.IsSaving())
 	{
 		// store the nr of materials
@@ -317,7 +319,7 @@ void FEM::SerializeMaterials(DumpFile& ar)
 			FEMaterial* pmat = GetMaterial(i);
 
 			// store the type string
-			ar << pmat->GetTypeString();
+			ar << febio.GetTypeStr<FEMaterial>(pmat);
 
 			// store the name
 			ar << pmat->GetName();
@@ -332,8 +334,6 @@ void FEM::SerializeMaterials(DumpFile& ar)
 		int nmat;
 		ar >> nmat;
 
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-
 		// read the material data
 		char szmat[256] = {0}, szvar[256] = {0};
 		for (int i=0; i<nmat; ++i)
@@ -342,7 +342,7 @@ void FEM::SerializeMaterials(DumpFile& ar)
 			ar >> szmat;
 
 			// create a material
-			FEMaterial* pmat = febio.CreateMaterial(szmat, this);
+			FEMaterial* pmat = febio.Create<FEMaterial>(szmat, this);
 			assert(pmat);
 
 			// read the name

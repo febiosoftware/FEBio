@@ -33,9 +33,6 @@ FEMaterial::~FEMaterial()
 }
 
 //-----------------------------------------------------------------------------
-const char* FEMaterial::GetTypeString() { return "material base"; }
-
-//-----------------------------------------------------------------------------
 //! Store the material data to the archive
 void FEMaterial::Serialize(DumpFile &ar)
 {

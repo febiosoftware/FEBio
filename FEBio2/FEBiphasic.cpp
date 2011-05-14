@@ -162,29 +162,29 @@ void FEBiphasic::Serialize(DumpFile &ar)
 	// serialize material parameters
 	FEMaterial::Serialize(ar);
 
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	// serialize sub-materials
 	if (ar.IsSaving())
 	{
-		ar << m_pSolid->GetTypeString();
+		ar << febio.GetTypeStr<FEMaterial>(m_pSolid);
 		m_pSolid->Serialize(ar);
 
-		ar << m_pPerm->GetTypeString();
+		ar << febio.GetTypeStr<FEMaterial>(m_pPerm);
 		m_pPerm->Serialize(ar);
 	}
 	else
 	{
 		char sz[256] = {0};
 
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-
 		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(febio.CreateMaterial(sz, ar.GetFEM()));
+		m_pSolid = dynamic_cast<FEElasticMaterial*>(febio.Create<FEMaterial>(sz, ar.GetFEM()));
 		assert(m_pSolid);
 		m_pSolid->Serialize(ar);
 		m_pSolid->Init();
 
 		ar >> sz;
-		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.CreateMaterial(sz, ar.GetFEM()));
+		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.Create<FEMaterial>(sz, ar.GetFEM()));
 		assert(m_pPerm);
 		m_pPerm->Serialize(ar);
 		m_pPerm->Init();

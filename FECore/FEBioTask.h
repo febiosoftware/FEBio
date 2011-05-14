@@ -14,9 +14,12 @@ class FEBioTask;
 class FEBioTask
 {
 public:
-	FEBioTask(void){}
+	FEBioTask(FEModel* pfem) { m_pfem = pfem; }
 	virtual ~FEBioTask(void){}
 
 	//! Run the task.
-	virtual bool Run (FEModel& fem, const char* szfile) = 0;
+	virtual bool Run (const char* szfile) = 0;
+
+protected:
+	FEModel*	m_pfem;
 };

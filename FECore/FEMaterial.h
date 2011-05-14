@@ -80,10 +80,6 @@ public:
 	//! Serialize material data to archive
 	virtual void Serialize(DumpFile& ar);
 
-public:
-	// returns the type string of the material
-	virtual const char* GetTypeString();
-
 protected:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID

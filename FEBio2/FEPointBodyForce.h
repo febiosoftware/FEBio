@@ -1,6 +1,5 @@
 #include "FECore/FEBodyForce.h"
-#include "FECore/FEBioFactory.h"
-#include "FECore/febio.h"
+#include "FECore/FEParameterList.h"
 
 //-----------------------------------------------------------------------------
 class FEPointBodyForce : public FEBodyForce
@@ -35,11 +34,4 @@ public:
 	double			m_rs[3];	//!< isoparametric coordinates
 
 	DECLARE_PARAMETER_LIST();
-};
-
-//-----------------------------------------------------------------------------
-class FEPointBodyForceFactory : public FEBodyForceFactory
-{
-public:
-	FEBodyForce* Create(FEModel* pfem) { return new FEPointBodyForce(pfem); }
 };

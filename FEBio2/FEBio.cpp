@@ -54,14 +54,14 @@
 #include "FECore/febio.h"
 #include "FEPointBodyForce.h"
 
-#define MAXFILE 512
-
 //-----------------------------------------------------------------------------
 //!  Command line options
 
 //! This structures stores the command line options that were input by the user
 struct CMDOPTIONS
 {
+	enum {MAXFILE=512};
+
 	bool		bdebug;			//!< debug flag
 
 	bool	bsplash;			//!< show splash screen or not
@@ -81,7 +81,6 @@ struct CMDOPTIONS
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
 void Hello(FILE* fp);
 int prompt(CMDOPTIONS& ops);
-void init_framework(FEM& fem);
 int get_app_path (char *pname, size_t pathsize);
 
 //-----------------------------------------------------------------------------
@@ -112,7 +111,7 @@ int main(int argc, char* argv[])
 	FEM fem;
 
 	// intialize the framework
-	init_framework(fem);
+	FEBioCommand::SetFEM(&fem);
 
 	// read the configration file if specified
 	if (ops.szcnf[0])
@@ -132,7 +131,7 @@ int main(int argc, char* argv[])
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	// find a task
-	FEBioTask* ptask = febio.CreateTask(ops.sztask, &fem);
+	FEBioTask* ptask = febio.Create<FEBioTask>(ops.sztask, &fem);
 	if (ptask == 0)
 	{
 		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
@@ -140,7 +139,7 @@ int main(int argc, char* argv[])
 	}
 
 	// run the FEBio analysis
-	bool bret = ptask->Run(fem, ops.szfile);
+	bool bret = ptask->Run(ops.szfile);
 
 	// return the error code of the run
 	return (bret?0:1);
@@ -300,22 +299,6 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	}
 
 	return brun;
-}
-
-//-----------------------------------------------------------------------------
-//! Initializes the framework
-void init_framework(FEM& fem)
-{
-	FEBioCommand::SetFEM(&fem);
-
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-
-	febio.RegisterTask(new FEBioStdSolverFactory , "solve");
-	febio.RegisterTask(new FEBioRestartFactory   , "restart");
-	febio.RegisterTask(new FEBioDiagnosticFactory, "diagnose");
-	febio.RegisterTask(new FEBioOptimizeFactory  , "optimize");
-
-	febio.RegisterBodyForce(new FEPointBodyForceFactory, "point");
 }
 
 //-----------------------------------------------------------------------------

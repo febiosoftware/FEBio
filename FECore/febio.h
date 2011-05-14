@@ -3,14 +3,6 @@
 #include <vector>
 
 class FEModel;
-class FEBioTask;
-class FEBodyForce;
-class FEMaterial;
-
-//-----------------------------------------------------------------------------
-typedef FEBioFactory_T<FEBioTask>		FEBioTaskFactory;
-typedef FEBioFactory_T<FEBodyForce>		FEBodyForceFactory;
-typedef FEBioFactory_T<FEMaterial>		FEMaterialFactory;
 
 //-----------------------------------------------------------------------------
 // This is the FEBio kernel class which manages the interactions between the 
@@ -18,44 +10,69 @@ typedef FEBioFactory_T<FEMaterial>		FEMaterialFactory;
 // which are responsible for the life of different classes
 class FEBioKernel
 {
-	struct TASK_DESCR
-	{
-		const char*			sztag;
-		FEBioTaskFactory*	pfac;
-	};
-
-	struct BODY_FORCE_DESCR
-	{
-		const char*			sztag;
-		FEBodyForceFactory*	pfac;
-	};
-
-	struct MATERIAL_DESCR
-	{
-		const char* sztag;
-		FEMaterialFactory* pfac;
-	};
-
 public:
 	static FEBioKernel& GetInstance();
 
 public:
-	void RegisterTask(FEBioTaskFactory* ptf, const char* sztag);
-	FEBioTask* CreateTask(const char* sztag, FEModel* pfem);
+	void RegisterClass(FEBioFactory* ptf);
+	template <typename T> T* Create(const char* sztag, FEModel* pfem);
 
-	void RegisterBodyForce(FEBodyForceFactory* ptf, const char* sztag);
-	FEBodyForce* CreateBodyForce(const char* sztag, FEModel* pfem);
-
-	void RegisterMaterial(FEMaterialFactory* pmf, const char* stag);
-	FEMaterial* CreateMaterial(const char* sztag, FEModel* pfem);
+	template <typename T> const char* GetTypeStr(T* po);
 
 protected:
-	std::vector<TASK_DESCR>				m_Task;
-	std::vector<BODY_FORCE_DESCR>		m_BF;
-	std::vector<MATERIAL_DESCR>			m_Mat;
+	std::vector<FEBioFactory*>	m_Fac;
 
 private:
 	FEBioKernel(){}
 	FEBioKernel(const FEBioKernel&){}
 	static FEBioKernel* m_pKernel;
 };
+
+//-----------------------------------------------------------------------------
+template <typename T> inline T* FEBioKernel::Create(const char* sztag, FEModel* pfem)
+{
+	std::vector<FEBioFactory*>::iterator pf;
+	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
+	{
+		FEBioFactory_T<T>* pfac = dynamic_cast<FEBioFactory_T<T>*>(*pf);
+		if (pfac)
+		{
+			if (strcmp(pfac->GetTypeStr(), sztag) == 0) return pfac->Create(pfem);
+		}
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+template <typename T> inline const char* FEBioKernel::GetTypeStr(T* po)
+{
+	std::vector<FEBioFactory*>::iterator pf;
+	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
+	{
+		FEBioFactory_T<T>* pfac = dynamic_cast<FEBioFactory_T<T>*>(*pf);
+		if (pfac)
+		{
+			if (pfac->IsType(po) == true) return pfac->GetTypeStr();
+		}
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! This class helps with the registration of a class with the FEBio framework
+template <typename TDerived, typename TBase> class FERegisterClass_T : public FEBioFactory_T<TBase>
+{
+public:
+	FERegisterClass_T(const char* sz) : FEBioFactory_T<TBase>(sz)
+	{
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		febio.RegisterClass(this);
+	}
+
+	TDerived* Create(FEModel* pfem) { return new TDerived(pfem); }
+	bool IsType(TBase* po) { return (dynamic_cast<TDerived*>(po) != 0); }
+};
+
+//-----------------------------------------------------------------------------
+#define REGISTER_FEBIO_CLASS(theClass, theBase, theName) \
+	static FERegisterClass_T<theClass, theBase> _##theClass##_rc(theName);

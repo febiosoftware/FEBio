@@ -206,10 +206,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\FEMaterialFactory.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\FEMaterialPoint.cpp"
 				>
 			</File>

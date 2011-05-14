@@ -651,7 +651,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 		szname = tag.AttributeValue("name", true);
 
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, &fem);
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, &fem);
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 		// IMPORTANT: depending on the format version number we need to process 
@@ -1079,7 +1079,7 @@ bool FEBioMaterialSection::ParseElasticMixture(XMLTag &tag, FEElasticMixture *pm
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -1132,7 +1132,7 @@ bool FEBioMaterialSection::ParseUncoupledElasticMixture(XMLTag &tag, FEUncoupled
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an uncoupled elastic material)
@@ -1185,7 +1185,7 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -1218,7 +1218,7 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a permeability material)
@@ -1266,7 +1266,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -1299,7 +1299,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a permeability material)
@@ -1331,7 +1331,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a diffusivity material)
@@ -1363,7 +1363,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a solubility material)
@@ -1395,7 +1395,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.CreateMaterial(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
