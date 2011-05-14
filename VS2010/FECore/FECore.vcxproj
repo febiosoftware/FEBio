@@ -113,6 +113,7 @@
     <ClInclude Include="..\..\FECore\FEBioTask.h" />
     <ClInclude Include="..\..\FECore\FEBodyForce.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
+    <ClInclude Include="..\..\FECore\FEContactInterface.h" />
     <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
@@ -158,6 +159,7 @@
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyForce.cpp" />
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
+    <ClCompile Include="..\..\FECore\FEContactInterface.cpp" />
     <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />
     <ClCompile Include="..\..\FECore\FECore.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
