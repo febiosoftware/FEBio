@@ -53,6 +53,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 			case FE_PARAM_INT    : ar << it->value<int   >(); break;
 			case FE_PARAM_BOOL   : ar << it->value<bool  >(); break;
 			case FE_PARAM_DOUBLE : ar << it->value<double>(); break;
+			case FE_PARAM_VEC3D  : ar << it->value<vec3d >(); break;
 			case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<double>()[k]; } break;
 			case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<int   >()[k]; } break;
 			default:
@@ -80,6 +81,7 @@ void FEMaterial::Serialize(DumpFile &ar)
 			case FE_PARAM_INT    : ar >> it->value<int   >(); break;
 			case FE_PARAM_BOOL   : ar >> it->value<bool  >(); break;
 			case FE_PARAM_DOUBLE : ar >> it->value<double>(); break;
+			case FE_PARAM_VEC3D  : ar >> it->value<vec3d >(); break;
 			case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<double>()[k]; } break;
 			case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<int   >()[k]; } break;
 			default:

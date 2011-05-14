@@ -18,6 +18,46 @@
 #include <string.h>
 
 //-----------------------------------------------------------------------------
+// helper function to print a parameter to the logfile
+void print_parameter(FEParam& p)
+{
+	char sz[512] = {0};
+	int l = strlen(p.m_szname);
+	sprintf(sz, "\t%-*s %.*s", l, p.m_szname, 50-l, "..................................................");
+	switch (p.m_itype)
+	{
+	case FE_PARAM_DOUBLE : clog.printf("%s : %lg\n", sz, p.value<double>()); break;
+	case FE_PARAM_INT    : clog.printf("%s : %d\n" , sz, p.value<int   >()); break;
+	case FE_PARAM_BOOL   : clog.printf("%s : %d\n" , sz, p.value<bool  >()); break;
+	case FE_PARAM_STRING : clog.printf("%s : %s\n" , sz, p.cvalue()); break;
+	case FE_PARAM_VEC3D  :
+		{
+			vec3d v = p.value<vec3d>();
+			clog.printf("%s : %lg,%lg,%lg\n", sz, v.x, v.y, v.z);
+		}
+		break;
+	case FE_PARAM_INTV   :
+	case FE_PARAM_DOUBLEV:
+		{
+			int n = p.m_ndim;
+			clog.printf("%s : ", sz);
+			for (int k=0; k<n; ++k)
+			{
+				switch (p.m_itype)
+				{
+				case FE_PARAM_INTV   : clog.printf("%d", p.pvalue<int   >()[k]); break;
+				case FE_PARAM_DOUBLEV: clog.printf("%lg", p.pvalue<double>()[k]); break;
+				}
+				if (k!=n-1) clog.printf(","); else clog.printf("\n");
+			}
+		}
+		break;
+	default:
+		assert(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! This routine reads in an input file and performs some initialization stuff.
 //! The rest of the initialization is done in Init
 
@@ -77,14 +117,30 @@ void echo_input(FEM& fem)
 	// print control info
 	clog.printf(" CONTROL DATA\n");
 	clog.printf("===========================================================================\n");
-	clog.printf("Module type ...................................... : %d\n", step.m_nModule);
-	clog.printf("\t   eq.%2d: solid mechanics\n", FE_SOLID);
-	clog.printf("\t   eq.%2d: poroelastic\n", FE_POROELASTIC);
-	clog.printf("\t   eq.%2d: heat transfer\n", FE_HEAT);
-	clog.printf("\t   eq.%2d: biphasic-solute\n", FE_POROSOLUTE);
-	clog.printf("\tAnalysis type .................................. : %d\n", step.m_nanalysis);
-	clog.printf("\t   eq.%2d: quasi-static\n", FE_STATIC);
-	clog.printf("\t   eq.%2d: dynamic\n", FE_DYNAMIC);
+	const char* szmod = 0;
+	switch (step.m_nModule)
+	{
+	case FE_SOLID       : szmod = "solid mechanics"; break;
+	case FE_POROELASTIC : szmod = "poroelastic"    ; break;
+	case FE_HEAT        : szmod = "heat transfer"  ; break;
+	case FE_POROSOLUTE  : szmod = "biphasic-solute"; break;
+	default:
+		szmod = "unknown";
+		assert(false);
+	}
+	clog.printf("\tModule type .................................... : %s\n", szmod);
+
+	const char* szan = 0;
+	switch (step.m_nanalysis)
+	{
+	case FE_STATIC : szan = "quasi-static"; break;
+	case FE_DYNAMIC: szan = "dynamic"     ; break;
+	default:
+		szan = "unknown";
+		assert(false);
+	}
+	clog.printf("\tAnalysis type .................................. : %s\n", szan);
+
 	clog.printf("\tPlane strain mode .............................. : %s\n", (fem.m_nplane_strain != -1? "yes" : "no"));
 	clog.printf("\tNumber of materials ............................ : %d\n", fem.Materials());
 	clog.printf("\tNumber of nodes ................................ : %d\n", mesh.Nodes() );
@@ -265,56 +321,40 @@ void echo_input(FEM& fem)
 		int n = pl.Parameters();
 		if (n > 0)
 		{
-			char sz[256];
 			list<FEParam>::iterator it = pl.first();
-			for (int j=0; j<n; ++j, ++it)
-			{
-				int l = strlen(it->m_szname);
-				sprintf(sz, "\t%-*s %.*s : ", l, it->m_szname, 50-l, "..................................................");
-				switch (it->m_itype)
-				{
-				case FE_PARAM_DOUBLE : clog.printf("%s : %lg\n", sz, it->value<double>()); break;
-				case FE_PARAM_INT    : clog.printf("%s : %d\n" , sz, it->value<int   >()); break;
-				case FE_PARAM_BOOL   : clog.printf("%s : %d\n" , sz, it->value<bool  >()); break;
-				case FE_PARAM_STRING : clog.printf("%s : %s\n" , sz, it->cvalue()); break;
-				case FE_PARAM_INTV   :
-				case FE_PARAM_DOUBLEV:
-					{
-						int n = it->m_ndim;
-						clog.printf("%s : ", sz);
-						for (int k=0; k<n; ++k)
-						{
-							switch (it->m_itype)
-							{
-							case FE_PARAM_INTV   : clog.printf("%d", it->pvalue<int   >()[k]); break;
-							case FE_PARAM_DOUBLEV: clog.printf("%lg", it->pvalue<double>()[k]); break;
-							}
-							if (k!=n-1) clog.printf(","); else clog.printf("\n");
-						}
-					}
-					break;
-				default:
-					assert(false);
-				}
-			}
+			for (int j=0; j<n; ++j, ++it) print_parameter(*it);
 		}
 	}
 	clog.printf("\n\n");
 
-	clog.printf(" LOADCURVE DATA\n");
-	clog.printf("===========================================================================\n");
-	for (i=0; i<fem.LoadCurves(); ++i)
+	if (fem.HasBodyForces())
 	{
-		if (i>0) clog.printf("---------------------------------------------------------------------------\n");
-		clog.printf("%3d\n", i+1);
-		FELoadCurve* plc = fem.GetLoadCurve(i);
-		for (j=0; j<plc->Points(); ++j)
+		clog.printf(" BODYFORCE DATA\n");
+		clog.printf("===========================================================================\n");
+		for (i=0; i<fem.BodyForces(); ++i)
 		{
-			LOADPOINT& pt = plc->LoadPoint(j);
-			clog.printf("%10lg%10lg\n", pt.time, pt.value);
+			if (i>0) clog.printf("---------------------------------------------------------------------------\n");
+			clog.printf("%3d - ", i+1);
+
+			// get the body force
+			FEBodyForce* pbf = fem.GetBodyForce(i);
+
+			// get the type string
+			const char* sztype = febio.GetTypeStr<FEBodyForce>(pbf);
+
+			clog.printf(" Type: %s\n", sztype);
+
+			// print the parameter list
+			FEParameterList& pl = pbf->GetParameterList();
+			int n = pl.Parameters();
+			if (n > 0)
+			{
+				list<FEParam>::iterator it = pl.first();
+				for (int j=0; j<n; ++j, ++it) print_parameter(*it);
+			}
 		}
+		clog.printf("\n\n");
 	}
-	clog.printf("\n\n");
 
 	if (fem.m_CI.size() > 0)
 	{
@@ -430,6 +470,21 @@ void echo_input(FEM& fem)
 		}
 		clog.printf("\n\n");
 	}
+
+	clog.printf(" LOADCURVE DATA\n");
+	clog.printf("===========================================================================\n");
+	for (i=0; i<fem.LoadCurves(); ++i)
+	{
+		if (i>0) clog.printf("---------------------------------------------------------------------------\n");
+		clog.printf("%3d\n", i+1);
+		FELoadCurve* plc = fem.GetLoadCurve(i);
+		for (j=0; j<plc->Points(); ++j)
+		{
+			LOADPOINT& pt = plc->LoadPoint(j);
+			clog.printf("%10lg%10lg\n", pt.time, pt.value);
+		}
+	}
+	clog.printf("\n\n");
 
 	clog.printf(" LINEAR SOLVER DATA\n");
 	clog.printf("===========================================================================\n");

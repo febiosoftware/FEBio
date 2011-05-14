@@ -260,6 +260,8 @@ public:
 
 	int Version() { return m_nversion; }
 
+	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
+
 protected:
 	void ParseVersion			(XMLTag& tag);
 

@@ -252,6 +252,38 @@ void FEFEBioImport::ParseVersion(XMLTag &tag)
 	m_nversion = (n1 << 8) + n2;
 }
 
+//-----------------------------------------------------------------------------
+//! This function parese a parameter list
+bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
+{
+	// see if we can find this parameter
+	FEParam* pp = pl.Find(tag.Name());
+	if (pp)
+	{
+		switch (pp->m_itype)
+		{
+		case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
+		case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
+		case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
+		case FE_PARAM_VEC3D  : tag.value(pp->value<vec3d >() ); break;
+		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
+		case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
+		case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+		default:
+			assert(false);
+			return false;
+		}
+
+		int lc = -1;
+		tag.AttributeValue("lc", lc, true);
+		if (lc != -1) pp->m_nlc = lc;
+
+		return true;
+	}
+	
+	return false;
+}
+
 //=============================================================================
 //
 //                     M O D U L E   S E C T I O N
@@ -738,26 +770,7 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 	do
 	{
 		// see if we can find this parameter
-		FEParam* pp = pl.Find(tag.Name());
-		if (pp)
-		{
-			switch (pp->m_itype)
-			{
-			case FE_PARAM_DOUBLE : tag.value(pp->value<double>() ); break;
-			case FE_PARAM_INT    : tag.value(pp->value<int   >() ); break;
-			case FE_PARAM_BOOL   : tag.value(pp->value<bool  >() ); break;
-			case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
-			case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
-			case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
-			default:
-				assert(false);
-			}
-
-			int lc = -1;
-			tag.AttributeValue("lc", lc, true);
-			if (lc != -1) pp->m_nlc = lc;
-		}
-		else
+		if (m_pim->ReadParameter(tag, pl) == false)
 		{
 			// if we get here the parameter was not part of the parameter list
 			// however, not all parameters can be read from the parameter lists yet
@@ -3689,35 +3702,23 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 			else if (strcmp(szt, "point") == 0)
 			{
 				FEPointBodyForce* pf = new FEPointBodyForce(&fem);
+				FEParameterList& pl = pf->GetParameterList();
 				++tag;
 				do
 				{
-					if (tag == "alpha")
+					if (tag == "a")
 					{
 						const char* szlc = tag.AttributeValue("lc");
 						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
 						tag.value(pf->m_a);
 					}
-					else if (tag == "beta") tag.value(pf->m_b);
-					else if (tag == "r0")
+					else if (tag == "node")
 					{
-						const char* szt = tag.AttributeValue("type", true);
-						if (szt)
-						{
-							if (strcmp(szt, "node") == 0) pf->m_ntype = FEPointBodyForce::NODE;
-							else if (strcmp(szt, "point") == 0) pf->m_ntype = FEPointBodyForce::POINT;
-							else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-						}
-
-						switch (pf->m_ntype)
-						{
-						case FEPointBodyForce::POINT: tag.value(pf->m_rc); break;
-						case FEPointBodyForce::NODE: tag.value(pf->m_inode); pf->m_inode -= 1; break;
-						}
+						pf->m_ntype = FEPointBodyForce::NODE;
+						tag.value(pf->m_inode); 
+						pf->m_inode -= 1;
 					}
-					else if (tag == "rlc") tag.value(pf->m_rlc, 3);
-					else if (tag == "rigid") tag.value(pf->m_brigid);
-					else throw XMLReader::InvalidTag(tag);
+					else if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 					++tag;
 				}
 				while (!tag.isend());
