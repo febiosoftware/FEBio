@@ -281,10 +281,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEContactInterface.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEContactSurface.cpp"
 				>
 			</File>
@@ -924,10 +920,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEContactInterface.h"
 				>
 			</File>
 			<File

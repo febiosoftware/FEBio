@@ -241,9 +241,10 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 	vector<int> sLM;
 	vector<int> mLM;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	for (int np=0; np<m_npass; ++np)
 	{
@@ -392,9 +393,10 @@ void FEPeriodicBoundary::ContactStiffness()
 	vector<int> sLM;
 	vector<int> mLM;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	for (int np=0; np<m_npass; ++np)
 	{

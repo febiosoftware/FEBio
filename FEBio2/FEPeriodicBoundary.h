@@ -1,8 +1,7 @@
 #pragma once
 
-#include "FEContactInterface.h"
-#include "FECore/FESurface.h"
-#include "FECore/vec2d.h"
+#include "FECore/FEContactInterface.h"
+#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 class FEPeriodicSurface : public FEContactSurface

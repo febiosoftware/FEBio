@@ -44,6 +44,8 @@ public: // material functions
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int id) { return m_MAT[id]; }
 
+	virtual FEElasticMaterial* GetElasticMaterial(int id) = 0;
+
 public: // body force functions
 
 	//! Add a body force to the model

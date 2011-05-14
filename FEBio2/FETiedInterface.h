@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEContactInterface.h"
+#include "FECore/FEContactInterface.h"
 #include "FETiedContactSurface.h"
 
 //-----------------------------------------------------------------------------

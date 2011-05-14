@@ -304,9 +304,10 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 
 	vector<int> sLM;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	// penalty value
 	double pen = Penalty(), eps;
@@ -409,9 +410,10 @@ void FERigidWallInterface::ContactStiffness()
 
 	vector<int> sLM;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	// penalty value
 	double pen = Penalty(), eps;
@@ -607,6 +609,8 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 
 		m_ss.Serialize(ar);
 
+		FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+
 		// plane data
 		int ntype;
 		ar >> ntype;
@@ -614,7 +618,7 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 		{
 		case FE_RIGID_PLANE:
 			{
-				SetMasterSurface(new FEPlane(m_pfem));
+				SetMasterSurface(new FEPlane(&fem));
 				FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
 				ar >> pl.m_nplc;
 				if (pl.m_nplc >= 0) pl.m_pplc = m_pfem->GetLoadCurve(pl.m_nplc);
@@ -624,7 +628,7 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 			break;
 		case FE_RIGID_SPHERE:
 			{
-				SetMasterSurface(new FERigidSphere(m_pfem));
+				SetMasterSurface(new FERigidSphere(&fem));
 				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
 				ar >> s.m_rc;
 				ar >> s.m_R;

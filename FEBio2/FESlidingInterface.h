@@ -9,10 +9,11 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEContactInterface.h"
+#include "FECore/FEContactInterface.h"
 #include "FECore/FESurface.h"
 #include "FECore/vec2d.h"
 #include "FECore/vector.h"
+#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 class FESlidingSurface : public FEContactSurface

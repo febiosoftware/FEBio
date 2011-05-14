@@ -285,9 +285,10 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 	vector<int> mLM;
 	vector<int> LM0;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	for (int np=0; np<m_npass; ++np)
 	{
@@ -444,9 +445,10 @@ void FESurfaceConstraint::ContactStiffness()
 
 	int n0[4];
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	for (int np=0; np<m_npass; ++np)
 	{

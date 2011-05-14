@@ -352,10 +352,12 @@ void FESlidingInterface3::Init()
 {
 	m_Rgas = FEM::GetGlobalConstant("R");
 	m_Tabs = FEM::GetGlobalConstant("T");
+
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	
 	// set ambient condition load curves
-	if (m_aplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_aplc);
-	if (m_aclc >= 0) m_pclc = m_pfem->GetLoadCurve(m_aclc);
+	if (m_aplc >= 0) m_pplc = fem.GetLoadCurve(m_aplc);
+	if (m_aclc >= 0) m_pclc = fem.GetLoadCurve(m_aclc);
 	
 	// initialize surface data
 	m_ss.Init();
@@ -368,12 +370,12 @@ void FESlidingInterface3::Init()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		m_pfem->SetSymmetryFlag(false);
+		fem.SetSymmetryFlag(false);
 		
 		// make sure we are using full-Newton
-		if (bporo && (m_pfem->m_pStep->m_psolver->m_bfgs.m_maxups != 0))
+		if (bporo && (fem.m_pStep->m_psolver->m_bfgs.m_maxups != 0))
 		{
-			m_pfem->m_pStep->m_psolver->m_bfgs.m_maxups = 0;
+			fem.m_pStep->m_psolver->m_bfgs.m_maxups = 0;
 			clog.printbox("WARNING", "The non-symmetric biphasic-solute contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}
@@ -404,8 +406,7 @@ void FESlidingInterface3::Init()
 		else
 		{
 			// add a callback function
-			m_pfem->AddCallback(OnSlidingInterface3Callback, this);
-			
+			fem.AddCallback(OnSlidingInterface3Callback, this);
 			
 			fprintf(m_fp, "[ 1] element ID\n");
 			fprintf(m_fp, "[ 2] integration point\n");
@@ -762,6 +763,8 @@ void FESlidingInterface3::Update()
 {	
 	int i, n, id, np;
 	double rs[2];
+
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	
 	double R = m_srad*m_pfem->m_mesh.GetBoundingBox().radius();
 	
@@ -771,14 +774,14 @@ void FESlidingInterface3::Update()
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
 	// also reset number of iterations after each augmentation
-	if (m_pfem->m_pStep->m_psolver->m_niter == 0) {
+	if (fem.m_pStep->m_psolver->m_niter == 0) {
 		biter = 0;
-		naug = m_pfem->m_pStep->m_psolver->m_naug;
-	} else if (m_pfem->m_pStep->m_psolver->m_naug > naug) {
-		biter = m_pfem->m_pStep->m_psolver->m_niter;
-		naug = m_pfem->m_pStep->m_psolver->m_naug;
+		naug = fem.m_pStep->m_psolver->m_naug;
+	} else if (fem.m_pStep->m_psolver->m_naug > naug) {
+		biter = fem.m_pStep->m_psolver->m_niter;
+		naug = fem.m_pStep->m_psolver->m_naug;
 	}
-	int niter = m_pfem->m_pStep->m_psolver->m_niter - biter;
+	int niter = fem.m_pStep->m_psolver->m_niter - biter;
 	bool bupseg = ((m_nsegup == 0)? true : (niter <= m_nsegup));
 	// get the logfile
 	//	Logfile& log = GetLogfile();
@@ -929,14 +932,16 @@ void FESlidingInterface3::ContactForces(vector<double> &F)
 	vector<double> fe;
 	double detJ[4], w[4], *Hs, Hm[4];
 	double N[40];
-	
+
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
 	
 	// get the solver
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 	
-	double dt = m_pfem->m_pStep->m_dt;
+	double dt = fem.m_pStep->m_dt;
 	
 	// loop over the nr of passes
 	for (int np=0; np<m_npass; ++np)
@@ -1144,12 +1149,14 @@ void FESlidingInterface3::ContactStiffness()
 	double ct[4], dcr[4], dcs[4];
 	double N[40];
 	matrix ke;
-	
+
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
 	
 	// get the solver
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 	
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;
@@ -1540,7 +1547,7 @@ void FESlidingInterface3::ContactStiffness()
 					// --- B I P H A S I C - S O L U T E  S T I F F N E S S ---
 					if (ssolu && msolu)
 					{
-						double dt = m_pfem->m_pStep->m_dt;
+						double dt = fem.m_pStep->m_dt;
 						
 						double epsp = (tn > 0) ? m_epsp*ss.m_epsp[ni] : 0.;
 						double epsc = (tn > 0) ? m_epsc*ss.m_epsc[ni] : 0.;
@@ -1639,7 +1646,7 @@ void FESlidingInterface3::ContactStiffness()
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
 						// poro version or not.
-						double dt = m_pfem->m_pStep->m_dt;
+						double dt = fem.m_pStep->m_dt;
 						
 						double epsp = (tn > 0) ? m_epsp*ss.m_epsp[ni] : 0.;
 						

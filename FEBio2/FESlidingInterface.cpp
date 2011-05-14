@@ -514,9 +514,11 @@ void FESlidingInterface::Update()
 {
 	static bool bfirst = true;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
-	int niter = m_pfem->m_pStep->m_psolver->m_niter;
+	int niter = fem.m_pStep->m_psolver->m_niter;
 
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;
@@ -561,11 +563,13 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 	vector<int> sLM;
 	vector<int> mLM;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+
 	// get the mesh
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = fem.m_mesh;
 
 	// get the solver
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	vec3d* r0;
 	double w[4];
@@ -934,9 +938,10 @@ void FESlidingInterface::ContactStiffness()
 	vector<int> sLM;
 	vector<int> mLM;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	// do two-pass
 	for (np=0; np<m_npass; ++np)
