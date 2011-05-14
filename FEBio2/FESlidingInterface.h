@@ -14,6 +14,7 @@
 #include "FECore/vec2d.h"
 #include "FECore/vector.h"
 #include "FEContactSurface.h"
+#include "FECore/FEParameterList.h"
 
 //-----------------------------------------------------------------------------
 class FESlidingSurface : public FEContactSurface
@@ -73,7 +74,7 @@ class FESlidingInterface : public FEContactInterface
 {
 public:
 	//! constructor
-	FESlidingInterface(FEM* pfem);
+	FESlidingInterface(FEModel* pfem);
 
 	//! destructor
 	virtual ~FESlidingInterface(){}
@@ -153,6 +154,8 @@ public:
 	int				m_nsegup;	//!< segment update parameter
 	int				m_nplc;		//!< penalty load curve number
 	FELoadCurve*	m_pplc;		//!< pointer to penalty load curve
+
+	DECLARE_PARAMETER_LIST();
 };
 
 #endif // !defined(AFX_FESLIDINGINTERFACE_H__742CFDED_B4BF_47AF_B673_1D26FE03F934__INCLUDED_)

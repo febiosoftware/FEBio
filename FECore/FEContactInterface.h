@@ -11,6 +11,7 @@
 
 #include "FEMesh.h"
 #include "DumpFile.h"
+#include "FEParameterList.h"
 
 class FEModel;
 
@@ -24,7 +25,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! This is the base class for contact interfaces
 
-class FEContactInterface
+class FEContactInterface : public FEParamContainer
 {
 public:
 	//! constructor

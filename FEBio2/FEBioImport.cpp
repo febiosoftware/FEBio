@@ -2886,71 +2886,65 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		FESlidingInterface* ps = new FESlidingInterface(&fem);
 		fem.m_CI.push_back(ps);
 
+		FEParameterList& pl = ps->GetParameterList();
+
 		ps->m_npass = 1;
 
 		++tag;
 		do
 		{
-			if (tag == "tolerance") tag.value(ps->m_atol);
-			else if (tag == "gaptol") tag.value(ps->m_gtol);
-			else if (tag == "fric_coeff") tag.value(ps->m_mu);
-			else if (tag == "fric_penalty") tag.value(ps->m_epsf);
-			else if (tag == "minaug") tag.value(ps->m_naugmin);
-			else if (tag == "maxaug") tag.value(ps->m_naugmax);
-			else if (tag == "search_tol") tag.value(ps->m_stol);
-			else if (tag == "ktmult") tag.value(ps->m_ktmult);
-			else if (tag == "knmult") tag.value(ps->m_knmult);
-			else if (tag == "node_reloc") tag.value(ps->m_breloc);
-			else if (tag == "penalty")
+			// read parameters
+			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				const char* sz = tag.AttributeValue("lc", true);
-				if (sz)	ps->m_nplc = atoi(sz);
-
-				sz = tag.AttributeValue("auto", true);
-				if (sz)
+				if (tag == "penalty")
 				{
-					if (strcmp(sz, "on") == 0) ps->m_nautopen = 1;
+					const char* sz = tag.AttributeValue("lc", true);
+					if (sz)	ps->m_nplc = atoi(sz);
+
+					sz = tag.AttributeValue("auto", true);
+					if (sz)
+					{
+						if (strcmp(sz, "on") == 0) ps->m_nautopen = 1;
+					}
+
+					tag.value(ps->m_eps);
 				}
-
-				tag.value(ps->m_eps);
-			}
-			else if (tag == "auto_penalty")
-			{
-				bool b; tag.value(b);
-				if (b) ps->m_nautopen = 2;
-			}
-			else if (tag == "two_pass")
-			{
-				int n;
-				tag.value(n);
-				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-				ps->m_npass = n+1;
-			}
-			else if (tag == "seg_up") tag.value(ps->m_nsegup);
-			else if (tag == "laugon") tag.value(ps->m_blaugon);
-			else if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FESlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
+				else if (tag == "auto_penalty")
 				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					bool b; tag.value(b);
+					if (b) ps->m_nautopen = 2;
 				}
+				else if (tag == "two_pass")
+				{
+					int n;
+					tag.value(n);
+					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
 
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt);
+					ps->m_npass = n+1;
+				}
+				else if (tag == "surface")
+				{
+					const char* sztype = tag.AttributeValue("type");
+					int ntype;
+					if (strcmp(sztype, "master") == 0) ntype = 1;
+					else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+					FESlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+					m.AddSurface(&s);
+
+					int nfmt = 0;
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					}
+
+					// read the surface section
+					ParseSurfaceSection(tag, s, nfmt);
+				}
+				else throw XMLReader::InvalidTag(tag);
 			}
-			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
 		}

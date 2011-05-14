@@ -8,10 +8,28 @@
 #include "FESolidSolver.h"
 #include "log.h"
 #include "FEElasticShellDomain.h"
+#include "FECore/febio.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// FESlidingSurface
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// Register the class with the framework
+REGISTER_FEBIO_CLASS(FESlidingInterface, FEContactInterface, "sliding_with_gaps");
+
+//-----------------------------------------------------------------------------
+// Define sliding interface parameters
+BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
+	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_gtol   , FE_PARAM_DOUBLE, "gaptol"      );
+	ADD_PARAMETER(m_mu     , FE_PARAM_DOUBLE, "fric_coeff"  );
+	ADD_PARAMETER(m_epsf   , FE_PARAM_DOUBLE, "fric_penalty");
+	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug"      );
+	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug"      );
+	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tol"  );
+	ADD_PARAMETER(m_ktmult , FE_PARAM_DOUBLE, "ktmult"      );
+	ADD_PARAMETER(m_knmult , FE_PARAM_DOUBLE, "knmult"      );
+	ADD_PARAMETER(m_breloc , FE_PARAM_BOOL  , "node_reloc"  );
+	ADD_PARAMETER(m_nsegup , FE_PARAM_INT   , "seg_up"      );
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Finds the (master) element that contains the projection of a (slave) node
@@ -233,7 +251,7 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FESlidingInterface::FESlidingInterface(FEM* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
 {
 	static int count = 1;
 	m_ntype = FE_CONTACT_SLIDING;
