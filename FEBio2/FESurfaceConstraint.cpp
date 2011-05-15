@@ -5,6 +5,17 @@
 #include "FESolidSolver.h"
 #include "log.h"
 
+//-----------------------------------------------------------------------------
+// Register the class with the framework
+REGISTER_FEBIO_CLASS(FESurfaceConstraint, FEContactInterface, "surface constraint");
+
+//-----------------------------------------------------------------------------
+// Define sliding interface parameters
+BEGIN_PARAMETER_LIST(FESurfaceConstraint, FEContactInterface)
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with an FESurfaceConstraint interface. All surface data
@@ -91,7 +102,7 @@ void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
 // FESurfaceConstraint
 //-----------------------------------------------------------------------------
 
-FESurfaceConstraint::FESurfaceConstraint(FEM* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
 {
 	static int count = 1;
 	m_ntype = FE_SURFACE_CONSTRAINT;

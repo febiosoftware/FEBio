@@ -43,7 +43,7 @@ class FESurfaceConstraint : public FEContactInterface
 {
 public:
 	//! constructor
-	FESurfaceConstraint(FEM* pfem);
+	FESurfaceConstraint(FEModel* pfem);
 
 	//! destructor
 	virtual ~FESurfaceConstraint(void) {}
@@ -80,4 +80,6 @@ public:
 	double	m_eps;	//!< penalty scale factor
 	double	m_stol;	//!< search tolerance
 	int		m_npass;	//!< nr of passes
+
+	DECLARE_PARAMETER_LIST();
 };

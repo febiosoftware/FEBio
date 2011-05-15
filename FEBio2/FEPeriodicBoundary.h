@@ -41,7 +41,7 @@ class FEPeriodicBoundary : public FEContactInterface
 {
 public:
 	//! constructor
-	FEPeriodicBoundary(FEM* pfem);
+	FEPeriodicBoundary(FEModel* pfem);
 
 	//! destructor
 	virtual ~FEPeriodicBoundary(void) {}
@@ -79,4 +79,6 @@ public:
 	double	m_eps;	//!< penalty scale factor
 	double	m_stol;	//!< search tolerance
 	int		m_npass;	//!< nr of passes
+
+	DECLARE_PARAMETER_LIST();
 };

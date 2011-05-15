@@ -8,7 +8,7 @@
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework
-REGISTER_FEBIO_CLASS(FESlidingInterface3, FEContactInterface, "sliding_with_gaps");
+REGISTER_FEBIO_CLASS(FESlidingInterface3, FEContactInterface, "sliding3");
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

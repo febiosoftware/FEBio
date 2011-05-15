@@ -6,6 +6,18 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+// Register the class with the framework
+REGISTER_FEBIO_CLASS(FEPeriodicBoundary, FEContactInterface, "periodic boundary");
+
+//-----------------------------------------------------------------------------
+// Define sliding interface parameters
+BEGIN_PARAMETER_LIST(FEPeriodicBoundary, FEContactInterface)
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"   );
+	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance");
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"  );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data
 //! structures are allocated.
 //! Note that it is assumed that the element array is already created
@@ -88,7 +100,7 @@ void FEPeriodicSurface::Serialize(DumpFile& ar)
 // FEPeriodicBoundary
 //-----------------------------------------------------------------------------
 
-FEPeriodicBoundary::FEPeriodicBoundary(FEM* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
 {
 	static int count = 1;
 	m_ntype = FE_PERIODIC_BOUNDARY;

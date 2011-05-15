@@ -3213,42 +3213,44 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
 		fem.m_CI.push_back(ps);
 
+		FEParameterList& pl = ps->GetParameterList();
+
 		++tag;
 		do
 		{
-			if (tag == "tolerance") tag.value(ps->m_atol);
-			else if (tag == "laugon") tag.value(ps->m_blaugon);
-			else if (tag == "penalty") tag.value(ps->m_eps);
-			else if (tag == "two_pass"  ) 
+			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				int n;
-				tag.value(n);
-				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-				ps->m_npass = n+1;
-			}
-			else if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FEPeriodicSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
+				if (tag == "two_pass"  ) 
 				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
+					int n;
+					tag.value(n);
+					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
 
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt);
+					ps->m_npass = n+1;
+				}
+				else if (tag == "surface")
+				{
+					const char* sztype = tag.AttributeValue("type");
+					int ntype;
+					if (strcmp(sztype, "master") == 0) ntype = 1;
+					else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+					FEPeriodicSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+					m.AddSurface(&s);
+
+					int nfmt = 0;
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					}
+
+					// read the surface section
+					ParseSurfaceSection(tag, s, nfmt);
+				}
+				else throw XMLReader::InvalidTag(tag);
 			}
-			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
 		}
@@ -3261,42 +3263,44 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
 		fem.m_CI.push_back(ps);
 
+		FEParameterList& pl = ps->GetParameterList();
+
 		++tag;
 		do
 		{
-			if (tag == "tolerance") tag.value(ps->m_atol);
-			else if (tag == "laugon") tag.value(ps->m_blaugon);
-			else if (tag == "penalty") tag.value(ps->m_eps);
-			else if (tag == "two_pass"  ) 
+			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				int n;
-				tag.value(n);
-				if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-				ps->m_npass = n+1;
-			}
-			else if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FESurfaceConstraintSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
+				if (tag == "two_pass"  ) 
 				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
+					int n;
+					tag.value(n);
+					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
 
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt);
+					ps->m_npass = n+1;
+				}
+				else if (tag == "surface")
+				{
+					const char* sztype = tag.AttributeValue("type");
+					int ntype;
+					if (strcmp(sztype, "master") == 0) ntype = 1;
+					else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+					FESurfaceConstraintSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+					m.AddSurface(&s);
+
+					int nfmt = 0;
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					}
+
+					// read the surface section
+					ParseSurfaceSection(tag, s, nfmt);
+				}
+				else throw XMLReader::InvalidTag(tag);
 			}
-			else throw XMLReader::InvalidTag(tag);
 
 			++tag;
 		}
