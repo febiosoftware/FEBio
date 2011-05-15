@@ -16,18 +16,25 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBioLib", "FEBioLib\FEBioL
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug - Skyline|Win32 = Debug - Skyline|Win32
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ADD639E0-BC3D-4FEA-8BFF-24DED2B1DAAB}.Debug - Skyline|Win32.ActiveCfg = Debug - Skyline|Win32
+		{ADD639E0-BC3D-4FEA-8BFF-24DED2B1DAAB}.Debug - Skyline|Win32.Build.0 = Debug - Skyline|Win32
 		{ADD639E0-BC3D-4FEA-8BFF-24DED2B1DAAB}.Debug|Win32.ActiveCfg = Debug|Win32
 		{ADD639E0-BC3D-4FEA-8BFF-24DED2B1DAAB}.Debug|Win32.Build.0 = Debug|Win32
 		{ADD639E0-BC3D-4FEA-8BFF-24DED2B1DAAB}.Release|Win32.ActiveCfg = Release|Win32
 		{ADD639E0-BC3D-4FEA-8BFF-24DED2B1DAAB}.Release|Win32.Build.0 = Release|Win32
+		{108FC563-0CDD-47CB-AFFB-57A780C9E3D6}.Debug - Skyline|Win32.ActiveCfg = Debug - Skyline|Win32
+		{108FC563-0CDD-47CB-AFFB-57A780C9E3D6}.Debug - Skyline|Win32.Build.0 = Debug - Skyline|Win32
 		{108FC563-0CDD-47CB-AFFB-57A780C9E3D6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{108FC563-0CDD-47CB-AFFB-57A780C9E3D6}.Debug|Win32.Build.0 = Debug|Win32
 		{108FC563-0CDD-47CB-AFFB-57A780C9E3D6}.Release|Win32.ActiveCfg = Release|Win32
 		{108FC563-0CDD-47CB-AFFB-57A780C9E3D6}.Release|Win32.Build.0 = Release|Win32
+		{F9B2D9CF-98E7-41FB-A58B-345C55781C3F}.Debug - Skyline|Win32.ActiveCfg = Debug - Skyline|Win32
+		{F9B2D9CF-98E7-41FB-A58B-345C55781C3F}.Debug - Skyline|Win32.Build.0 = Debug - Skyline|Win32
 		{F9B2D9CF-98E7-41FB-A58B-345C55781C3F}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F9B2D9CF-98E7-41FB-A58B-345C55781C3F}.Debug|Win32.Build.0 = Debug|Win32
 		{F9B2D9CF-98E7-41FB-A58B-345C55781C3F}.Release|Win32.ActiveCfg = Release|Win32
