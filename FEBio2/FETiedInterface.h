@@ -19,7 +19,7 @@ class FETiedInterface : public FEContactInterface
 {
 public:
 	//! constructor
-	FETiedInterface(FEM* pfem);
+	FETiedInterface(FEModel* pfem);
 
 	//! destructor
 	virtual ~FETiedInterface(){}
@@ -72,6 +72,8 @@ public:
 	double			m_eps;	//!< penalty scale factor
 	int				m_nplc;	//!< penalty load curve number
 	FELoadCurve*	m_pplc;	//!< pointer to penalty load curve
+
+	DECLARE_PARAMETER_LIST();
 };
 
 #endif // !defined(AFX_FETIEDINTERFACE_H__2D0F2799_9B2D_463F_B42E_C6924D6BCD6E__INCLUDED_)

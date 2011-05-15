@@ -44,7 +44,7 @@ class FEFacet2FacetSliding : public FEContactInterface
 {
 public:
 	//! constructor
-	FEFacet2FacetSliding(FEM* pfem);
+	FEFacet2FacetSliding(FEModel* pfem);
 
 	//! initialization routine
 	void Init();
@@ -91,4 +91,6 @@ public:
 
 	FEFacetSlidingSurface	m_ms;	//!< master surface
 	FEFacetSlidingSurface	m_ss;	//!< slave surface
+
+	DECLARE_PARAMETER_LIST();
 };

@@ -7,10 +7,33 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+// Register the class with the framework
+REGISTER_FEBIO_CLASS(FESlidingInterface3, FEContactInterface, "sliding_with_gaps");
+
+//-----------------------------------------------------------------------------
+// Define sliding interface parameters
+BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
+	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"               ); 
+	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"            );
+	ADD_PARAMETER(m_gtol    , FE_PARAM_DOUBLE, "gaptol"               );
+	ADD_PARAMETER(m_ptol    , FE_PARAM_DOUBLE, "ptol"                 );
+	ADD_PARAMETER(m_ctol    , FE_PARAM_DOUBLE, "ctol"                 );
+	ADD_PARAMETER(m_epsn    , FE_PARAM_DOUBLE, "penalty"              );
+	ADD_PARAMETER(m_bautopen, FE_PARAM_BOOL  , "auto_penalty"         );
+	ADD_PARAMETER(m_knmult  , FE_PARAM_DOUBLE, "knmult"               );
+	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tol"           );
+	ADD_PARAMETER(m_epsp    , FE_PARAM_DOUBLE, "pressure_penalty"     );
+	ADD_PARAMETER(m_epsc    , FE_PARAM_DOUBLE, "concentration_penalty");
+	ADD_PARAMETER(m_bsymm   , FE_PARAM_BOOL  , "symmetric_stiffness"  );
+	ADD_PARAMETER(m_srad    , FE_PARAM_DOUBLE, "search_radius"        );
+	ADD_PARAMETER(m_nsegup  , FE_PARAM_INT   , "seg_up"               );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 // FESlidingSurface3
 //-----------------------------------------------------------------------------
 
-FESlidingSurface3::FESlidingSurface3(FEM* pfem) : FEContactSurface(&pfem->m_mesh)
+FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEContactSurface(&pfem->m_mesh)
 { 
 	m_bporo = m_bsolu = false;
 	m_pfem = pfem; 
@@ -248,7 +271,7 @@ void FESlidingSurface3::Serialize(DumpFile& ar)
 // FESlidingInterface3
 //-----------------------------------------------------------------------------
 
-FESlidingInterface3::FESlidingInterface3(FEM* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
+FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
 	m_ntype = FE_CONTACT_SLIDING3;
 	static int count = 1;

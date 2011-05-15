@@ -17,6 +17,7 @@ REGISTER_FEBIO_CLASS(FESlidingInterface, FEContactInterface, "sliding_with_gaps"
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
 	ADD_PARAMETER(m_gtol   , FE_PARAM_DOUBLE, "gaptol"      );
 	ADD_PARAMETER(m_mu     , FE_PARAM_DOUBLE, "fric_coeff"  );
@@ -28,7 +29,6 @@ BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_knmult , FE_PARAM_DOUBLE, "knmult"      );
 	ADD_PARAMETER(m_breloc , FE_PARAM_BOOL  , "node_reloc"  );
 	ADD_PARAMETER(m_nsegup , FE_PARAM_INT   , "seg_up"      );
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

@@ -7,7 +7,7 @@ class FESlidingSurface2 : public FEContactSurface
 {
 public:
 	//! constructor
-	FESlidingSurface2(FEM* pfem);
+	FESlidingSurface2(FEModel* pfem);
 
 	//! initialization
 	void Init();
@@ -23,7 +23,7 @@ public:
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 
 protected:
-	FEM*	m_pfem;
+	FEModel*	m_pfem;
 
 public:
 	bool				m_bporo;	//!< set poro-mode
@@ -50,7 +50,7 @@ class FESlidingInterface2 :	public FEContactInterface
 {
 public:
 	//! constructor
-	FESlidingInterface2(FEM* pfem);
+	FESlidingInterface2(FEModel* pfem);
 
 	//! destructor
 	~FESlidingInterface2();
@@ -118,4 +118,6 @@ public:
 	
 	// biphasic contact parameters
 	double	m_epsp;		//!< flow rate penalty
+
+	DECLARE_PARAMETER_LIST();
 };

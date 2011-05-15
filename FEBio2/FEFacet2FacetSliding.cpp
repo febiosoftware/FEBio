@@ -5,6 +5,26 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+// Register the class with the framework
+REGISTER_FEBIO_CLASS(FEFacet2FacetSliding, FEContactInterface, "facet-to-facet sliding");
+
+//-----------------------------------------------------------------------------
+// Define sliding interface parameters
+BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
+	ADD_PARAMETER(m_epsn    , FE_PARAM_DOUBLE, "penalty"      );
+	ADD_PARAMETER(m_bautopen, FE_PARAM_BOOL  , "auto_penalty" );
+	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"       );
+	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"    );
+	ADD_PARAMETER(m_gtol    , FE_PARAM_DOUBLE, "gaptol"       );
+	ADD_PARAMETER(m_naugmin , FE_PARAM_INT   , "minaug"       );
+	ADD_PARAMETER(m_naugmax , FE_PARAM_INT   , "maxaug"       );
+	ADD_PARAMETER(m_knmult  , FE_PARAM_DOUBLE, "knmult"       );
+	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tol"   );
+	ADD_PARAMETER(m_srad    , FE_PARAM_DOUBLE, "search_radius");
+	ADD_PARAMETER(m_dxtol   , FE_PARAM_DOUBLE, "dxtol"        );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 // FEFacetSlidingSurface
 //-----------------------------------------------------------------------------
 
@@ -141,7 +161,7 @@ void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 // FEFacet2FacetSliding
 //-----------------------------------------------------------------------------
 
-FEFacet2FacetSliding::FEFacet2FacetSliding(FEM* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
 {
 	m_ntype = FE_FACET2FACET_SLIDING;
 	static int ncount = 1;

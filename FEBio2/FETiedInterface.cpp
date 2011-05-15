@@ -9,15 +9,21 @@
 #include "FECore/FENNQuery.h"
 #include "log.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// FETiedInterface
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// Register the class with the framework
+REGISTER_FEBIO_CLASS(FETiedInterface, FEContactInterface, "sliding_with_gaps");
 
+//-----------------------------------------------------------------------------
+// Define sliding interface parameters
+BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
 
-FETiedInterface::FETiedInterface(FEM* pfem) : FEContactInterface(pfem), ss(&pfem->m_mesh), ms(&pfem->m_mesh)
+FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->m_mesh), ms(&pfem->m_mesh)
 {
 	static int count = 1;
 	m_ntype = FE_CONTACT_TIED;

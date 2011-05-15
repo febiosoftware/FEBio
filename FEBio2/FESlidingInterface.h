@@ -10,11 +10,8 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEContactInterface.h"
-#include "FECore/FESurface.h"
-#include "FECore/vec2d.h"
-#include "FECore/vector.h"
 #include "FEContactSurface.h"
-#include "FECore/FEParameterList.h"
+#include "FECore/vector.h"
 
 //-----------------------------------------------------------------------------
 class FESlidingSurface : public FEContactSurface

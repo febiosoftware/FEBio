@@ -7,7 +7,7 @@ class FESlidingSurface3 : public FEContactSurface
 {
 public:
 	//! constructor
-	FESlidingSurface3(FEM* pfem);
+	FESlidingSurface3(FEModel* pfem);
 	
 	//! destructor
 	~FESlidingSurface3() {}
@@ -26,7 +26,7 @@ public:
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 	
 protected:
-	FEM*	m_pfem;
+	FEModel*	m_pfem;
 	
 public:
 	bool						m_bporo;	//!< set poro-mode
@@ -57,7 +57,7 @@ class FESlidingInterface3 :	public FEContactInterface
 {
 public:
 	//! constructor
-	FESlidingInterface3(FEM* pfem);
+	FESlidingInterface3(FEModel* pfem);
 	
 	//! destructor
 	~FESlidingInterface3();
@@ -138,4 +138,6 @@ public:
 	int		m_aclc;		//!< ambient concentration load curve
 	FELoadCurve* m_pplc;	//!< pointer to ambient pressure load curve
 	FELoadCurve* m_pclc;	//!< pointer to ambient concentration load curve
+
+	DECLARE_PARAMETER_LIST();
 };

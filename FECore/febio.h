@@ -69,7 +69,7 @@ public:
 		febio.RegisterClass(this);
 	}
 
-	TDerived* Create(FEModel* pfem) { return new TDerived(pfem); }
+	TBase* Create(FEModel* pfem) { return new TDerived(pfem); }
 	bool IsType(TBase* po) { return (dynamic_cast<TDerived*>(po) != 0); }
 };
 
