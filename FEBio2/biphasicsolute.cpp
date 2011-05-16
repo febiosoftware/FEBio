@@ -1,7 +1,7 @@
 #include "stdafx.h"
+#include "FECore/FEMaterial.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FESolidSolver.h"
-#include "FECore/FEMaterial.h"
 #include "FEMicroMaterial.h"
 #include "FEBiphasic.h"
 #include "log.h"
@@ -353,7 +353,6 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		{
 			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z 
 						 - H[i]*(dpdt*kappa*c+phiw*dkdt*c+phiw*kappa*dcdt
-								 +vs*(gradp*kappa*c+gradk*phiw*c+gradc*phiw*kappa)
 								 +phiw*kappa*c*divv)
 						 )*detJ*wg[n];
 		}
@@ -619,8 +618,8 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		mat3ds dKedc = -Ke*Gc*Ke;
 		
 		// calculate all the matrices
-		vec3d vtmp,gp,gc,qpu,qcu,wc,jc,vc;
-		mat3d wu,ju,vu;
+		vec3d vtmp,gp,gc,qpu,qcu,wc,jc;
+		mat3d wu,ju;
 		double qcc;
 		tmp = detJ*gw[n];
 		for (i=0; i<neln; ++i)
@@ -647,14 +646,12 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 				   +(D*((gradN[j]*w)*2) - ((D*w) & gradN[j]))*c/D0
 				   )*kappa
 				+D*wu*(kappa*c/D0);
-				vu = (vs & gradN[j])*(c*(phiw*kappa + J*(kappa*dpdJ + phiw*dkdJ)))
-				+I*(phiw*kappa*c*(H[j]/dt - gradN[j]*vs));
 				qcu = -gradN[j]*(c*dJdt*(2*(dpdJ*kappa+phiw*dkdJ+J*dpdJ*dkdJ)
 										 +J*(dpdJJ*kappa+phiw*dkdJJ))
 								 +dcdt*((phiw+J*dpdJ)*(kappa+dkdc*c)
 										+J*phiw*(dkdJ+dkdJc*c)))
 				+qpu*(c*(phiw*kappa+J*dpdJ*kappa+J*phiw*dkdJ));
-				vtmp = ((ju+vu).transpose()*gradN[i] + qcu*H[i])*(tmp*dt);
+				vtmp = (ju.transpose()*gradN[i] + qcu*H[i])*(tmp*dt);
 				ke[5*i+4][5*j  ] += vtmp.x;
 				ke[5*i+4][5*j+1] += vtmp.y;
 				ke[5*i+4][5*j+2] += vtmp.z;
@@ -686,10 +683,9 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 				// calculate the kcc matrix
 				jc = ((D*dkdc+dDdc*kappa)*gc)*H[j]
 				+D*((-gradN[j]*phiw+wc*(c/D0))*kappa);
-				vc = vs*(H[j]*phiw*(kappa+c*dkdc));
 				qcc = -H[j]*((phiw+J*dpdJ)*divv*(kappa+c*dkdc)
 				+phiw*((2*dkdc+c*dkdcc)*dcdt+(kappa+c*dkdc)/dt+dJdt*(dkdJ+c*dkdJc)));
-				ke[5*i+4][5*j+4] += (gradN[i]*(jc+vc) + H[i]*qcc)*(tmp*dt);
+				ke[5*i+4][5*j+4] += (gradN[i]*jc + H[i]*qcc)*(tmp*dt);
 				
 			}
 		}
