@@ -438,6 +438,12 @@ bool FEAnalysis::Solve()
 			}
 			break;
 		}
+		catch (FEMultiScaleException)
+		{
+			bconv = false;
+			clog.printbox("FATAL ERROR", "The RVE problem has failed. Aborting macro run.");
+			break;
+		}
 		catch (std::bad_alloc e)
 		{
 			bconv = false;

@@ -178,13 +178,15 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	Console::GetHandle()->Deactivate();
 
 	// solve the RVE
-	m_rve.Solve();
+	bool bret = m_rve.Solve();
 
 	// reset the logfile mode
 	clog.SetMode(nmode);
 
 	// reactivate the console
 	Console::GetHandle()->Activate();
+
+	if (bret == false) throw FEMultiScaleException();
 
 	// calculate the averaged stress
 	return AveragedStress(pt);

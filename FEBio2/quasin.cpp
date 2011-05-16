@@ -75,6 +75,12 @@ bool FESolidSolver::SolveStep(double time)
 		clog.printbox("ERROR", "Problem diverging uncontrollably.");
 		return false;
 	}
+	catch (FEMultiScaleException)
+	{
+		// the RVE problem didn't solve
+		clog.printbox("ERROR", "The RVE problem has failed. Aborting macro run.");
+		return false;
+	}
 
 	return bret;
 }
