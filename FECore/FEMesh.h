@@ -174,6 +174,9 @@ public:
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);
 
+	//! add nodes to the mesh
+	void AddNode(vec3d r);
+
 	//! return number of nodes
 	int Nodes() { return m_Node.size(); }
 

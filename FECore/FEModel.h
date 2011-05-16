@@ -22,6 +22,9 @@ public:
 	// solve the model
 	virtual bool Solve() = 0;
 
+	// get the FE mesh
+	FEMesh& GetMesh() { return m_mesh; }
+
 public:	// Load curve functions
 
 	//! Add a loadcurve to the model

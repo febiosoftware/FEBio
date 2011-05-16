@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\colsol.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\DumpFile.cpp"
 				>
 			</File>

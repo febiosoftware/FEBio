@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <febio_config version="1.0">
+	<import>C:\Documents and Settings\Steve\My Documents\Visual Studio 2008\Projects\FEBioDll\Debug\FEBioDll.dll</import>
 	<linear_solver type="pardiso"></linear_solver>
 </febio_config>

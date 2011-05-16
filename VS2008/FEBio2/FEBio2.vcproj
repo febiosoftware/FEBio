@@ -260,10 +260,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\colsol.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\CommandManager.cpp"
 				>
 			</File>

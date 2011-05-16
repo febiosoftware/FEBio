@@ -83,6 +83,42 @@ void FEMesh::CreateNodes(int nodes)
 	m_Node.resize (nodes);
 }
 
+void FEMesh::AddNode(vec3d r)
+{
+	FENode node;
+	node.m_r0 = r;
+	node.m_rt = node.m_r0;
+
+	// set rigid body id
+	node.m_rid = -1;
+
+	// open displacement dofs
+	node.m_ID[0] = 0;
+	node.m_ID[1] = 0;
+	node.m_ID[2] = 0;
+
+	// open rotational dofs
+	node.m_ID[3] = 0;
+	node.m_ID[4] = 0;
+	node.m_ID[5] = 0;
+
+	// open pressure dof
+	node.m_ID[6] = 0;
+
+	// close the rigid rotational dofs
+	node.m_ID[7] = -1;
+	node.m_ID[8] = -1;
+	node.m_ID[9] = -1;
+
+	// fix temperature dof
+	node.m_ID[10] = -1;
+
+	// open concentration dof
+	node.m_ID[11] = 0;
+
+	m_Node.push_back(node);
+}
+
 int FEMesh::Elements()
 {
 	int N = 0;
