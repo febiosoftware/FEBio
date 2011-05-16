@@ -73,7 +73,7 @@ class FERigidWallInterface : public FEContactInterface
 {
 public:
 	//! constructor
-	FERigidWallInterface(FEM* pfem);
+	FERigidWallInterface(FEModel* pfem);
 
 	//! destructor
 	virtual ~FERigidWallInterface() { if (m_mp) delete m_mp; }
@@ -127,6 +127,8 @@ public:
 	double			m_eps;	//!< penalty scale factor
 	int				m_nplc;	//!< penalty load curve number
 	FELoadCurve*	m_pplc;	//!< pointer to penalty load curve
+
+	DECLARE_PARAMETER_LIST();
 };
 
 

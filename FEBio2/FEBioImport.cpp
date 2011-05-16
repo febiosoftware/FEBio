@@ -3313,74 +3313,76 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		FERigidWallInterface* ps = new FERigidWallInterface(&fem);
 		fem.m_CI.push_back(ps);
 
+		FEParameterList& pl = ps->GetParameterList();
+
 		++tag;
 		do
 		{
-			if (tag == "tolerance") tag.value(ps->m_atol);
-			else if (tag == "laugon") tag.value(ps->m_blaugon);
-			else if (tag == "penalty")
+			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				const char* sz = tag.AttributeValue("lc", true);
-				if (sz)	ps->m_nplc = atoi(sz);
-
-				tag.value(ps->m_eps);
-			}
-			else if (tag == "plane")
-			{
-				ps->SetMasterSurface(new FEPlane(&fem));
-				FEPlane& pl = dynamic_cast<FEPlane&>(*ps->m_mp);
-				const char* sz = tag.AttributeValue("lc", true);
-				if (sz)	pl.m_nplc = atoi(sz);
-
-				double* a = pl.GetEquation();
-				tag.value(a, 4);
-			}
-			else if (tag == "sphere")
-			{
-				ps->SetMasterSurface(new FERigidSphere(&fem));
-				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*ps->m_mp);
-				++tag;
-				do
+				if (tag == "penalty")
 				{
-					if      (tag == "center") tag.value(s.m_rc);
-					else if (tag == "radius") tag.value(s.m_R);
-					else if (tag == "xtrans")
-					{
-						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[0] = atoi(szlc);
-					}
-					else if (tag == "ytrans")
-					{
-						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[1] = atoi(szlc);
-					}
-					else if (tag == "ztrans")
-					{
-						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[2] = atoi(szlc);
-					}
-					else throw XMLReader::InvalidTag(tag);
+					const char* sz = tag.AttributeValue("lc", true);
+					if (sz)	ps->m_nplc = atoi(sz);
+
+					tag.value(ps->m_eps);
+				}
+				else if (tag == "plane")
+				{
+					ps->SetMasterSurface(new FEPlane(&fem));
+					FEPlane& pl = dynamic_cast<FEPlane&>(*ps->m_mp);
+					const char* sz = tag.AttributeValue("lc", true);
+					if (sz)	pl.m_nplc = atoi(sz);
+
+					double* a = pl.GetEquation();
+					tag.value(a, 4);
+				}
+				else if (tag == "sphere")
+				{
+					ps->SetMasterSurface(new FERigidSphere(&fem));
+					FERigidSphere& s = dynamic_cast<FERigidSphere&>(*ps->m_mp);
 					++tag;
+					do
+					{
+						if      (tag == "center") tag.value(s.m_rc);
+						else if (tag == "radius") tag.value(s.m_R);
+						else if (tag == "xtrans")
+						{
+							const char* szlc = tag.AttributeValue("lc");
+							s.m_nplc[0] = atoi(szlc);
+						}
+						else if (tag == "ytrans")
+						{
+							const char* szlc = tag.AttributeValue("lc");
+							s.m_nplc[1] = atoi(szlc);
+						}
+						else if (tag == "ztrans")
+						{
+							const char* szlc = tag.AttributeValue("lc");
+							s.m_nplc[2] = atoi(szlc);
+						}
+						else throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while (!tag.isend());
 				}
-				while (!tag.isend());
-			}
-			else if (tag == "surface")
-			{
-				FERigidWallSurface& s = ps->m_ss;
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
+				else if (tag == "surface")
 				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					FERigidWallSurface& s = ps->m_ss;
+
+					int nfmt = 0;
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					}
+
+					// read the surface section
+					ParseSurfaceSection(tag, s, nfmt);
 				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt);
+				else throw XMLReader::InvalidTag(tag);
 			}
-			else throw XMLReader::InvalidTag(tag);
-
 			++tag;
 		}
 		while (!tag.isend());

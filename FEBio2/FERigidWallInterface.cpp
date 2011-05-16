@@ -10,6 +10,17 @@
 #include "log.h"
 #include "FEElasticShellDomain.h"
 
+//-----------------------------------------------------------------------------
+// Register the class with the framework
+REGISTER_FEBIO_CLASS(FERigidWallInterface, FEContactInterface, "rigid_wall");
+
+//-----------------------------------------------------------------------------
+// Define sliding interface parameters
+BEGIN_PARAMETER_LIST(FERigidWallInterface, FEContactInterface)
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
+END_PARAMETER_LIST();
+
 ///////////////////////////////////////////////////////////////////////////////
 // FERigidWallSurface
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,7 +213,7 @@ void FERigidWallSurface::Serialize(DumpFile &ar)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FERigidWallInterface::FERigidWallInterface(FEM* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh)
+FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh)
 {
 	static int count = 1;
 	m_ntype = FE_CONTACT_RIGIDWALL;
