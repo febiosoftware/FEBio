@@ -28,7 +28,7 @@ void print_parameter(FEParam& p)
 	{
 	case FE_PARAM_DOUBLE : clog.printf("%s : %lg\n", sz, p.value<double>()); break;
 	case FE_PARAM_INT    : clog.printf("%s : %d\n" , sz, p.value<int   >()); break;
-	case FE_PARAM_BOOL   : clog.printf("%s : %d\n" , sz, p.value<bool  >()); break;
+	case FE_PARAM_BOOL   : clog.printf("%s : %d\n" , sz, (int) p.value<bool  >()); break;
 	case FE_PARAM_STRING : clog.printf("%s : %s\n" , sz, p.cvalue()); break;
 	case FE_PARAM_VEC3D  :
 		{
@@ -54,6 +54,18 @@ void print_parameter(FEParam& p)
 		break;
 	default:
 		assert(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// print the parameter list to the log file
+void print_parameter_list(FEParameterList& pl)
+{
+	int n = pl.Parameters();
+	if (n > 0)
+	{
+		list<FEParam>::iterator it = pl.first();
+		for (int j=0; j<n; ++j, ++it) print_parameter(*it);
 	}
 }
 
@@ -319,12 +331,7 @@ void echo_input(FEM& fem)
 
 		// print the parameter list
 		FEParameterList& pl = pmat->GetParameterList();
-		int n = pl.Parameters();
-		if (n > 0)
-		{
-			list<FEParam>::iterator it = pl.first();
-			for (int j=0; j<n; ++j, ++it) print_parameter(*it);
-		}
+		print_parameter_list(pl);
 	}
 	clog.printf("\n\n");
 
@@ -342,17 +349,12 @@ void echo_input(FEM& fem)
 
 			// get the type string
 			const char* sztype = febio.GetTypeStr<FEBodyForce>(pbf);
-
+			if (sztype == 0) sztype = "unknown";
 			clog.printf(" Type: %s\n", sztype);
 
 			// print the parameter list
 			FEParameterList& pl = pbf->GetParameterList();
-			int n = pl.Parameters();
-			if (n > 0)
-			{
-				list<FEParam>::iterator it = pl.first();
-				for (int j=0; j<n; ++j, ++it) print_parameter(*it);
-			}
+			print_parameter_list(pl);
 		}
 		clog.printf("\n\n");
 	}
@@ -365,90 +367,12 @@ void echo_input(FEM& fem)
 		{
 			if (i>0) clog.printf("---------------------------------------------------------------------------\n");
 
-			FESlidingInterface *psi = dynamic_cast<FESlidingInterface*>(fem.m_CI[i]);
-			if (psi)
-			{
-				clog.printf("contact interface %d:\n", i+1);
-				clog.printf("\tType                           : sliding with gaps\n");
-				clog.printf("\tPenalty factor                 : %lg\n", psi->m_eps);
-				clog.printf("\tAuto-penalty                   : %s\n", (psi->m_nautopen==2? "on" : "off"));
-				clog.printf("\tTwo-pass algorithm             : %s\n", (psi->m_npass==1? "off":"on"));
-				clog.printf("\tAugmented Lagrangian           : %s\n", (psi->m_blaugon? "on" : "off"));
-				if (psi->m_blaugon)
-					clog.printf("\tAugmented Lagrangian tolerance : %lg\n", psi->m_atol);
-				clog.printf("\tmaster segments                : %d\n", (psi->m_ms.Elements()));
-				clog.printf("\tslave segments                 : %d\n", (psi->m_ss.Elements()));
-			}
-
-			FEFacet2FacetSliding* pf2f = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
-			if (pf2f)
-			{
-				clog.printf("contact interface %d:\n", i+1);
-				clog.printf("\tType                           : facet-to-facet sliding\n");
-				clog.printf("\tPenalty factor                 : %lg\n", pf2f->m_epsn);
-				clog.printf("\tAuto-penalty                   : %s\n", (pf2f->m_bautopen? "on" : "off"));
-				clog.printf("\tTwo-pass algorithm             : %s\n", (pf2f->m_npass==1? "off": "on" ));
-				clog.printf("\tAugmented Lagrangian           : %s\n", (pf2f->m_blaugon ? "on" : "off"));
-				if (pf2f->m_blaugon)
-					clog.printf("\tAugmented Lagrangian tolerance : %lg\n", pf2f->m_atol);
-				clog.printf("\tmaster segments                : %d\n", (pf2f->m_ms.Elements()));
-				clog.printf("\tslave segments                 : %d\n", (pf2f->m_ss.Elements()));
-			}
-
-			FETiedInterface *pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
-			if (pti)
-			{
-				clog.printf("contact interface %d:\n", i+1);
-				clog.printf("\tType                           : tied\n");
-				clog.printf("\tPenalty factor                 : %lg\n", pti->m_eps);
-				clog.printf("\tAugmented Lagrangian tolerance : %lg\n", pti->m_atol);
-			}
-
-			FEPeriodicBoundary *pbi = dynamic_cast<FEPeriodicBoundary*>(fem.m_CI[i]);
-			if (pbi)
-			{
-				clog.printf("contact interface %d:\n", i+1);
-				clog.printf("\tType                           : periodic\n");
-				clog.printf("\tPenalty factor                 : %lg\n", pbi->m_eps);
-				clog.printf("\tAugmented Lagrangian tolerance : %lg\n", pbi->m_atol);
-			}
-
-			FESurfaceConstraint *psc = dynamic_cast<FESurfaceConstraint*>(fem.m_CI[i]);
-			if (psc)
-			{
-				clog.printf("contact interface %d:\n", i+1);
-				clog.printf("\tType                           : surface constraint\n");
-				clog.printf("\tPenalty factor                 : %lg\n", psc->m_eps);
-				clog.printf("\tAugmented Lagrangian tolerance : %lg\n", psc->m_atol);
-			}
-
-			FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(fem.m_CI[i]);
-			if (pri)
-			{
-				clog.printf("contact interface %d:\n", i+1);
-				clog.printf("\tType                           : rigid wall\n");
-				clog.printf("\tPenalty factor                 : %lg\n", pri->m_eps);
-				clog.printf("\tAugmented Lagrangian tolerance : %lg\n", pri->m_atol);
-				if (dynamic_cast<FEPlane*>(pri->m_mp))
-				{
-					FEPlane* pp = dynamic_cast<FEPlane*>(pri->m_mp);
-					clog.printf("\tPlane equation:\n");
-					double* a = pp->GetEquation();
-					clog.printf("\t\ta = %lg\n", a[0]);
-					clog.printf("\t\tb = %lg\n", a[1]);
-					clog.printf("\t\tc = %lg\n", a[2]);
-					clog.printf("\t\td = %lg\n", a[3]);
-				}
-				else if (dynamic_cast<FERigidSphere*>(pri->m_mp))
-				{
-					FERigidSphere* ps = dynamic_cast<FERigidSphere*>(pri->m_mp);
-					clog.printf("\trigid sphere:\n");
-					clog.printf("\t\tx ............... : %lg\n", ps->m_rc.x);
-					clog.printf("\t\ty ............... : %lg\n", ps->m_rc.y);
-					clog.printf("\t\tz ............... : %lg\n", ps->m_rc.z);
-					clog.printf("\t\tR ............... : %lg\n", ps->m_R);
-				}
-			}
+			FEContactInterface* pi = fem.m_CI[i];
+			const char* sztype = febio.GetTypeStr<FEContactInterface>(pi);
+			if (sztype == 0) sztype = "unknown";
+			clog.printf("contact interface %d - Type: %s\n", i+1, sztype);
+			FEParameterList& pl = pi->GetParameterList();
+			print_parameter_list(pl);
 		}
 		clog.printf("\n\n");
 	}
