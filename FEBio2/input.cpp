@@ -197,6 +197,7 @@ void echo_input(FEM& fem)
 	case FE_PLOT_MAJOR_ITRS : clog.printf("\tplot level ................................ : major iterations\n"); break;
 	case FE_PLOT_MINOR_ITRS : clog.printf("\tplot level ................................ : minor iterations\n"); break;
 	case FE_PLOT_MUST_POINTS: clog.printf("\tplot level ................................ : must points only\n"); break;
+	case FE_PLOT_FINAL      : clog.printf("\tplot level ................................ : final state\n"); break;
 	}
 
 	if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot))

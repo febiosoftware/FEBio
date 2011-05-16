@@ -144,7 +144,8 @@ enum FE_Plot_Level {
 	FE_PLOT_NEVER,
 	FE_PLOT_MAJOR_ITRS,
 	FE_PLOT_MINOR_ITRS,
-	FE_PLOT_MUST_POINTS
+	FE_PLOT_MUST_POINTS,
+	FE_PLOT_FINAL
 };
 
 ///////////////////////////////////////////////////////////////////////////////

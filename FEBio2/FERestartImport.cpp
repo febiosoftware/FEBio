@@ -213,6 +213,7 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 			else if (strcmp(szval, "PLOT_MAJOR_ITRS" ) == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
 			else if (strcmp(szval, "PLOT_MINOR_ITRS" ) == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_MINOR_ITRS);
 			else if (strcmp(szval, "PLOT_MUST_POINTS") == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_MUST_POINTS);
+			else if (strcmp(szval, "PLOT_FINAL"      ) == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_FINAL);
 			else throw XMLReader::InvalidValue(tag);
 		}
 		else throw XMLReader::InvalidTag(tag);

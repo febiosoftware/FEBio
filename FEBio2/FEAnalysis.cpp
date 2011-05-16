@@ -466,7 +466,7 @@ bool FEAnalysis::Solve()
 			m_ntimesteps++;
 
 			// output results to plot database
-			if (m_nplot != FE_PLOT_NEVER)
+			if ((m_nplot != FE_PLOT_NEVER) && (m_nplot != FE_PLOT_FINAL))
 			{
 				if ((m_nplot == FE_PLOT_MUST_POINTS) && (m_nmplc >= 0))
 				{
@@ -544,6 +544,8 @@ bool FEAnalysis::Solve()
 		else
 			pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
 	}
+
+	if ((m_nplot == FE_PLOT_FINAL) && bconv) m_fem.m_plot->Write(m_fem);
 
 	m_fem.m_ftime0 = m_fem.m_ftime;
 
