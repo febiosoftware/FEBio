@@ -128,7 +128,6 @@
     <ClInclude Include="..\..\FEBioLib\WSMPSolver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioLib\colsol.cpp" />
     <ClCompile Include="..\..\FEBioLib\CompactMatrix.cpp" />
     <ClCompile Include="..\..\FEBioLib\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\DenseMatrix.cpp" />

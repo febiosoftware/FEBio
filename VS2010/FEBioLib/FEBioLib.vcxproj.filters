@@ -59,9 +59,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioLib\colsol.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioLib\CompactMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

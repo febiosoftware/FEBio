@@ -203,9 +203,6 @@
     <ClCompile Include="..\..\FECore\FEMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FEMaterialFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -270,6 +267,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEContactInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\colsol.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -464,9 +464,6 @@
     <ClCompile Include="..\..\FEBio2\biphasicsolute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\colsol.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\CommandManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

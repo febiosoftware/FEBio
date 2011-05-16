@@ -267,7 +267,6 @@
     <ClCompile Include="..\..\FEBio2\augment.cpp" />
     <ClCompile Include="..\..\FEBio2\biphasic.cpp" />
     <ClCompile Include="..\..\FEBio2\biphasicsolute.cpp" />
-    <ClCompile Include="..\..\FEBio2\colsol.cpp" />
     <ClCompile Include="..\..\FEBio2\CommandManager.cpp" />
     <ClCompile Include="..\..\FEBio2\console.cpp" />
     <ClCompile Include="..\..\FEBio2\DataStore.cpp" />
