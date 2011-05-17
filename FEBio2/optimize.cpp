@@ -11,7 +11,7 @@
 #include <nag.h>
 #include <nage04.h>
 #include <time.h>
-#include "XMLReader.h"
+#include "FECore/XMLReader.h"
 #include "Timer.h"
 #include "console.h"
 

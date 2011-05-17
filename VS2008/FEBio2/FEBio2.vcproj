@@ -895,10 +895,6 @@
 				RelativePath="..\..\FEBio2\validate.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\FEBio2\XMLReader.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1479,10 +1475,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\version.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\XMLReader.h"
 				>
 			</File>
 		</Filter>

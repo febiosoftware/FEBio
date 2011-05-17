@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FileImport.h"
-#include "XMLReader.h"
+#include "FECore/XMLReader.h"
 
 class FERestartImport : public FEFileImport  
 {

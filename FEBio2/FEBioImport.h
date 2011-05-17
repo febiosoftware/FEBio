@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FileImport.h"
-#include "XMLReader.h"
+#include "FECore/XMLReader.h"
 #include "FETransverselyIsotropic.h"
 #include "FERigid.h"
 #include "FEElasticMixture.h"

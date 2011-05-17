@@ -359,6 +359,10 @@
 				RelativePath="..\..\FECore\vector.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\FECore\XMLReader.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -551,6 +555,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\vector.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\XMLReader.h"
 				>
 			</File>
 		</Filter>

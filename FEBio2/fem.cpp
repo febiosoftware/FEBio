@@ -2,7 +2,7 @@
 #include "fem.h"
 #include <string.h>
 #include "FECore/DumpFile.h"
-#include "XMLReader.h"
+#include "FECore/XMLReader.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
 #include "FERigidWallInterface.h"

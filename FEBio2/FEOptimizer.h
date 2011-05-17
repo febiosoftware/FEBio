@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string.h>
-#include "XMLReader.h"
+#include "FECore/XMLReader.h"
 #include "fem.h"
 #include "FECore/vector.h"
 

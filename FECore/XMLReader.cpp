@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "XMLReader.h"
+#include <assert.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
