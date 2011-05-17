@@ -53,6 +53,7 @@
 #include "FEBioStdSolver.h"
 #include "FECore/febio.h"
 #include "FEPointBodyForce.h"
+#include "plugin.h"
 
 //-----------------------------------------------------------------------------
 //!  Command line options
@@ -260,6 +261,18 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		else if (strcmp(sz, "-norun") == 0)
 		{
 			brun = false;
+		}
+		else if (strcmp(sz, "-import") == 0)
+		{
+			char* szfile = argv[++i];
+			if (LoadPlugin(szfile) == false)
+			{
+				fprintf(stderr, "Failed loading plugin %s\n\n", szfile);
+			}
+			else
+			{
+				fprintf(stderr, "Success loading plugin %s\n\n", szfile);
+			}
 		}
 		else
 		{
