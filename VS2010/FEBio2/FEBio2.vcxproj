@@ -259,7 +259,6 @@
     <ClInclude Include="..\..\FEBio2\ut4.h" />
     <ClInclude Include="..\..\FEBio2\validate.h" />
     <ClInclude Include="..\..\FEBio2\version.h" />
-    <ClInclude Include="..\..\FEBio2\XMLReader.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -426,7 +425,6 @@
     <ClCompile Include="..\..\FEBio2\update.cpp" />
     <ClCompile Include="..\..\FEBio2\ut4.cpp" />
     <ClCompile Include="..\..\FEBio2\validate.cpp" />
-    <ClCompile Include="..\..\FEBio2\XMLReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FEBio2.rc" />
