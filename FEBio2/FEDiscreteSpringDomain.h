@@ -16,6 +16,7 @@ public:
 	}
 
 	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
+	void UnpackLM(FEElement& el);
 
 	void StiffnessMatrix(FESolidSolver* psolver);
 

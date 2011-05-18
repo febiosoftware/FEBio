@@ -49,6 +49,7 @@ public:
 
 	//! Unpack surface element data
 	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
+	void UnpackLM(FEElement& el);
 
 	//! return the mesh to which this surface is attached
 	FEMesh* GetMesh() { return m_pMesh; }

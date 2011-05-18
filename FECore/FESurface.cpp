@@ -111,6 +111,42 @@ int FESurface::FindElement(FESurfaceElement& el)
 	return -1;
 }
 
+//-----------------------------------------------------------------------------
+void FESurface::UnpackLM(FEElement& el)
+{
+	vector<int>& lm = el.m_LM;
+	int N = el.Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		int n = el.m_node[i];
+
+		FENode& node = m_pMesh->Node(n);
+		int* id = node.m_ID;
+
+		// first the displacement dofs
+		lm[3*i  ] = id[0];
+		lm[3*i+1] = id[1];
+		lm[3*i+2] = id[2];
+
+		// now the pressure dofs
+		lm[3*N+i] = id[6];
+
+		// rigid rotational dofs
+		lm[4*N + 3*i  ] = id[7];
+		lm[4*N + 3*i+1] = id[8];
+		lm[4*N + 3*i+2] = id[9];
+
+		// fill the rest with -1
+		lm[7*N + 3*i  ] = -1;
+		lm[7*N + 3*i+1] = -1;
+		lm[7*N + 3*i+2] = -1;
+
+		lm[10*N + i] = id[10];
+		
+		// concentration dofs
+		lm[11*N+i] = id[11];
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
@@ -386,15 +422,13 @@ double FESurface::FaceArea(FESurfaceElement& el)
 	// get the mesh to which this surface belongs
 	FEMesh& mesh = *m_pMesh;
 
-	// unpack surface element data
-	UnpackElement(el);
-
 	// get the number of nodes
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
 
 	// get the initial nodes
-	vec3d* r0 = el.r0();
+	vec3d r0[4];
+	for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 	// get the integration weights
 	double* w = el.GaussWeights();

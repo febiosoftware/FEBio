@@ -571,6 +571,14 @@ bool FEM::InitEquations()
 		}
 	}
 
+	// set the Element's LM data
+	for (i=0; i<m_mesh.Domains(); ++i)
+	{
+		FEDomain& D = m_mesh.Domain(i);
+		int NE = D.Elements();
+		for (j=0; j<NE; ++j) D.UnpackLM(D.ElementRef(j));
+	}
+
 	// All initialization is done
 	return true;
 }

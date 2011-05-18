@@ -689,6 +689,53 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 	}
 }
 
+
+//-----------------------------------------------------------------------------
+//! Unpack the element. That is, copy element data in traits structure
+//! Note that for the shell elements the lm order is different compared
+//! to the solid element ordering. This is because for shell elements the
+//! nodes have six degrees of freedom each, where for solids they only
+//! have 3 dofs.
+
+void FEElasticShellDomain::UnpackLM(FEElement& el)
+{
+	FEShellElement& se = dynamic_cast<FEShellElement&>(el);
+
+	int N = se.Nodes();
+	vector<int>& lm = se.m_LM;
+
+	for (int i=0; i<N; ++i)
+	{
+		int n = se.m_node[i];
+		FENode& node = m_pMesh->Node(n);
+
+		int* id = node.m_ID;
+
+		// first the displacement dofs
+		lm[6*i  ] = id[0];
+		lm[6*i+1] = id[1];
+		lm[6*i+2] = id[2];
+
+		// next the rotational dofs
+		lm[6*i+3] = id[3];
+		lm[6*i+4] = id[4];
+		lm[6*i+5] = id[5];
+
+		// now the pressure dofs
+		lm[6*N+i] = id[6];
+
+		// rigid rotational dofs
+		lm[7*N + 3*i  ] = id[7];
+		lm[7*N + 3*i+1] = id[8];
+		lm[7*N + 3*i+2] = id[9];
+
+		lm[10*N + i] = id[10];
+		
+		// concentration dof
+		lm[11*N + i] = id[11];
+	}
+}
+
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 //! Note that for the shell elements the lm order is different compared

@@ -202,7 +202,8 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 	int NN = m_pMesh->Nodes();
 	m_tag.assign(NN, 0);
 
-	int i, NE = Elements();
+	int i, j;
+	int NE = Elements();
 	for (i=0; i<NE; ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -234,16 +235,19 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 	// we do this here since this volume never changes
 	m_Ve0.resize(NE);
 	double Ve;
+	vec3d r0[4];
 	for (i=0; i<NE; ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		UnpackElement(el, FE_UNPACK_R0);
+
+		// get the current element coordinates
+		for (j=0; j<4; ++j) r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
 
 		// calculate the initial volume
-		m_Ve0[i] = Ve = TetVolume(el.r0());
+		m_Ve0[i] = Ve = TetVolume(r0);
 
 		// now assign one-quart to each node
-		for (int j=0; j<4; ++j) m_Node[ m_tag[el.m_node[j]]].Vi += 0.25*Ve;
+		for (j=0; j<4; ++j) m_Node[ m_tag[el.m_node[j]]].Vi += 0.25*Ve;
 	}
 
 	// create the node-element list
