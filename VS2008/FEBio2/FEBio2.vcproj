@@ -424,6 +424,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FEFiberExpPow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEFiberExpPowUncoupled.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEFiberMaterial.cpp"
 				>
 			</File>
@@ -1075,6 +1083,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFacet2FacetSliding.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEFiberExpPow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEFiberExpPowUncoupled.h"
 				>
 			</File>
 			<File
