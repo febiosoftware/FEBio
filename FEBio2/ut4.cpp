@@ -283,7 +283,7 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 		UnpackElement(el, FE_UNPACK_TRAITS);
 
 		// calculate the volume
-		Ve = m_Ve0[i]; //TetVolume(el.r0());
+		Ve = m_Ve0[i];
 		ve = TetVolume(el.rt());
 
 		// calculate the deformation gradient
@@ -416,7 +416,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 
 				// calculate element volume
 				// TODO: we should store this somewhere instead of recalculating it
-				Ve = m_Ve0[peli[n]]; // TetVolume(el.r0());
+				Ve = m_Ve0[peli[n]];
 
 				// The '-' sign is so that the internal forces get subtracted from the residual (R = Fext - Fint)
 				double w = -0.25* Ve;
@@ -731,7 +731,7 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 			FESolidElement& ej = dynamic_cast<FESolidElement&>(*ppe[nj]);
 
 			// calculate element volume
-			double Vj = m_Ve0[peli[nj]]; // TetVolume(ej.r0());
+			double Vj = m_Ve0[peli[nj]];
 			double wj = 0.25* Vj / node.Vi;
 
 			// We're ready to rock and roll!

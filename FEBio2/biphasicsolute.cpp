@@ -219,8 +219,6 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 	double *Grr, *Gsr, *Gtr, *Grs, *Gss, *Gts, *Grt, *Gst, *Gtt;
 	double Gx, Gy, Gz, GX, GY, GZ;
 	
-	vec3d* vt = el.vt();
-	
 	// Bp-matrix
 	vector<double> B1(neln), B2(neln), B3(neln);
 	
@@ -229,7 +227,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 	
 	FEMesh& mesh = fem.m_mesh;
 	
-	vec3d r0[8], rt[8], rp[8];
+	vec3d r0[8], rt[8], rp[8], vt[8];
 	double cp[8];
 	for (i=0; i<neln; ++i) 
 	{
@@ -237,6 +235,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 		cp[i] = mesh.Node(el.m_node[i]).m_cp;
+		vt[i] = mesh.Node(el.m_node[i]).m_vt;
 	}
 	
 	// get the element's material
@@ -437,8 +436,6 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 	// jacobian
 	double Ji[3][3], detJ, J0i[3][3];
 	
-	vec3d* vt = el.vt();
-	
 	// Bp-matrix
 	vector<double> B1(neln), B2(neln), B3(neln);
 	vector<vec3d> gradN(neln);
@@ -449,15 +446,15 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 	
 	FEMesh& mesh = fem.m_mesh;
 	
-	vec3d r0[8], rt[8], rp[8], v[8];
+	vec3d r0[8], rt[8], rp[8], vt[8];
 	double cp[8];
 	for (i=0; i<neln; ++i) 
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
+		vt[i] = mesh.Node(el.m_node[i]).m_vt;
 		cp[i] = mesh.Node(el.m_node[i]).m_cp;
-		v[i]  = mesh.Node(el.m_node[i]).m_vt;
 	}
 	
 	// zero stiffness matrix
@@ -540,10 +537,10 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
 			
 			// calculate solid velocity and its gradient
-			vs += v[i]*H[i];
-			gradv[0][0] += v[i].x*Gx; gradv[1][0] += v[i].y*Gx; gradv[2][0] += v[i].z*Gx;
-			gradv[0][1] += v[i].x*Gy; gradv[1][1] += v[i].y*Gy; gradv[2][1] += v[i].z*Gy;
-			gradv[0][2] += v[i].x*Gz; gradv[1][2] += v[i].y*Gz; gradv[2][2] += v[i].z*Gz;
+			vs += vt[i]*H[i];
+			gradv[0][0] += vt[i].x*Gx; gradv[1][0] += vt[i].y*Gx; gradv[2][0] += vt[i].z*Gx;
+			gradv[0][1] += vt[i].x*Gy; gradv[1][1] += vt[i].y*Gy; gradv[2][1] += vt[i].z*Gy;
+			gradv[0][2] += vt[i].x*Gz; gradv[1][2] += vt[i].y*Gz; gradv[2][2] += vt[i].z*Gz;
 			
 			// calculate Bp matrix
 			B1[i] = Gx;
@@ -887,8 +884,12 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 {
 	int i, n;
-	int nint;
+	int nint, neln;
 	double* gw;
+	vec3d r0[8];
+	vec3d rt[8];
+
+	FEMesh& mesh = *m_pMesh;
 	
 	assert(fem.m_pStep->m_nModule == FE_POROSOLUTE);
 	
@@ -906,9 +907,20 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 		
 		// get the number of integration points
 		nint = el.GaussPoints();
+
+		// get the number of nodes
+		neln = el.Nodes();
+		assert(neln <= 8);
 		
 		// get the integration weights
 		gw = el.GaussWeights();
+
+		// get the nodal coordinates
+		for (int j=0; j<neln; ++j)
+		{
+			r0[j] = mesh.Node(el.m_node[j]).m_r0;
+			rt[j] = mesh.Node(el.m_node[j]).m_rt;
+		}
 		
 		// get the material
 		FEMaterial* pm = dynamic_cast<FEMaterial*>(fem.GetMaterial(el.GetMatID()));
@@ -931,8 +943,8 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(el.r0(), n);
-			pt.rt = el.Evaluate(el.rt(), n);
+			pt.r0 = el.Evaluate(r0, n);
+			pt.rt = el.Evaluate(rt, n);
 			
 			// get the deformation gradient and determinant
 			pt.J = el.defgrad(pt.F, n);

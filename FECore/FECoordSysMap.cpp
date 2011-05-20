@@ -4,12 +4,13 @@
 
 #include "stdafx.h"
 #include "FECoordSysMap.h"
+#include "FEMesh.h"
 
 //////////////////////////////////////////////////////////////////////
 // FELocalMap
 //////////////////////////////////////////////////////////////////////
 
-FELocalMap::FELocalMap() : FECoordSysMap(FE_MAP_LOCAL)
+FELocalMap::FELocalMap(FEMesh& mesh) : FECoordSysMap(FE_MAP_LOCAL), m_mesh(mesh)
 {
 	m_n[0] = 0;
 	m_n[1] = 1;
@@ -25,7 +26,8 @@ void FELocalMap::SetLocalNodes(int n1, int n2, int n3)
 
 mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 {
-	vec3d* r0 = el.r0();
+	vec3d r0[8];
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
 
 	vec3d a, b, c, d;
 	mat3d Q;
@@ -74,7 +76,9 @@ void FELocalMap::Serialize(DumpFile& ar)
 
 mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 {
-	vec3d* r0 = el.r0();
+	vec3d r0[8];
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
+
 	double* H = el.H(n);
 	vec3d a;
 	for (int i=0; i<el.Nodes(); ++i) a += r0[i]*H[i];

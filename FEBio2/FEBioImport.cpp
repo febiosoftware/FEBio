@@ -815,13 +815,14 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 //
 bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *pm)
 {
+	FEMesh& mesh = m_pim->GetFEM()->GetMesh();
 	// read the material axis
 	if (tag == "mat_axis")
 	{
 		const char* szt = tag.AttributeValue("type");
 		if (strcmp(szt, "local") == 0)
 		{
-			FELocalMap* pmap = new FELocalMap();
+			FELocalMap* pmap = new FELocalMap(mesh);
 			pm->m_pmap = pmap;
 
 			int n[3];
@@ -864,13 +865,15 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 //
 bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsotropic *pm)
 {
+	FEMesh& mesh = m_pim->GetFEM()->GetMesh();
+
 	// read material fibers
 	if (tag == "fiber")
 	{
 		const char* szt = tag.AttributeValue("type");
 		if (strcmp(szt, "local") == 0)
 		{
-			FELocalMap* pmap = new FELocalMap();
+			FELocalMap* pmap = new FELocalMap(mesh);
 			pm->m_pmap = pmap;
 
 			int n[3] = {0};
@@ -883,7 +886,7 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 		}
 		else if (strcmp(szt, "spherical") == 0)
 		{
-			FESphericalMap* pmap = new FESphericalMap();
+			FESphericalMap* pmap = new FESphericalMap(mesh);
 			pm->m_pmap = pmap;
 
 			vec3d c;

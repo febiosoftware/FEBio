@@ -27,7 +27,7 @@ void FEDiscreteSpringDomain::Serialize(DumpFile& ar)
 	}
 	else
 	{
-		FEM& fem = *ar.GetFEM();
+		FEM& fem = dynamic_cast<FEM&>(*ar.GetFEM());
 		ar >> m_Node;
 		int n, mat;
 		for (size_t i=0; i<m_Elem.size(); ++i)
@@ -94,7 +94,6 @@ void FEDiscreteSpringDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 	vec3d* rt = el.rt();
 	vec3d* r0 = el.r0();
-	vec3d* vt = el.vt();
 	double* pt = el.pt();
 
 	int N = el.Nodes();
@@ -114,9 +113,6 @@ void FEDiscreteSpringDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 		// current nodal pressures
 		pt[i] = node.m_pt;
-
-		// current nodal velocities
-		vt[i] = node.m_vt;
 	}
 
 	// unpack the traits data

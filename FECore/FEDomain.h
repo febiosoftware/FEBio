@@ -5,6 +5,7 @@
 #include "FE_enum.h"
 
 class FEModel;
+class FEM;
 class FENode;
 class FEMesh;
 class FESolidSolver;

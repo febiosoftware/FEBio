@@ -101,7 +101,7 @@ void FEElasticSolidDomain::InitElements()
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Serialize(DumpFile &ar)
 {
-	FEM& fem = *ar.GetFEM();
+	FEM& fem = dynamic_cast<FEM&>(*ar.GetFEM());
 	if (ar.IsSaving())
 	{
 		ar << m_Node;
@@ -310,15 +310,25 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 		double* gw = el.GaussWeights();
 		vec3d f;
 
+		// number of nodes
+		int neln = el.Nodes();
+
+		// nodal coordinates
+		vec3d r0[8], rt[8];
+		for (int i=0; i<neln; ++i)
+		{
+			r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+			rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+		}
+
 		// loop over integration points
 		int nint = el.GaussPoints();
-		int neln = el.Nodes();
 		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			pt.r0 = el.Evaluate(el.r0(), n);
-			pt.rt = el.Evaluate(el.rt(), n);
+			pt.r0 = el.Evaluate(r0, n);
+			pt.rt = el.Evaluate(rt, n);
 
 			detJ = el.detJ0(n)*gw[n];
 
@@ -743,7 +753,7 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el
 void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 {
 	int i, n;
-	int nint;
+	int nint, neln;
 	double* gw;
 
 	for (i=0; i<(int) m_Elem.size(); ++i)
@@ -760,6 +770,17 @@ void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 
 		// get the number of integration points
 		nint = el.GaussPoints();
+
+		// number of nodes
+		neln = el.Nodes();
+
+		// nodall coordinates
+		vec3d r0[8], rt[8];
+		for (int j=0; j<neln; ++j)
+		{
+			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
+			rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+		}
 
 		// get the integration weights
 		gw = el.GaussWeights();
@@ -780,8 +801,8 @@ void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(el.r0(), n);
-			pt.rt = el.Evaluate(el.rt(), n);
+			pt.r0 = el.Evaluate(r0, n);
+			pt.rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
 			pt.J = el.defgrad(pt.F, n);
@@ -883,7 +904,6 @@ void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	if (nflag & FE_UNPACK_DATA)
 	{
 		int N = el.Nodes();
-		vec3d* vt = el.vt();
 		double* pt = el.pt();
 		double* ct = el.ct();
 		for (int i=0; i<N; ++i)
@@ -895,9 +915,6 @@ void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 			// current nodal pressures
 			pt[i] = node.m_pt;
 
-			// current nodal velocities
-			vt[i] = node.m_vt;
-			
 			// current nodal concentrations
 			ct[i] = node.m_ct;
 		}

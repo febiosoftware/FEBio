@@ -1,6 +1,8 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
 
+class FEM;
+
 //-----------------------------------------------------------------------------
 //! domain described by Lagrange-type 3D volumetric elements
 //!

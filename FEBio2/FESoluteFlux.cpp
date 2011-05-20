@@ -135,7 +135,8 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 	int neln = el.Nodes();
 	
 	// nodal coordinates
-	vec3d *r0 = el.r0();
+	vec3d r0[4];
+	for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
 	
 	double* Gr, *Gs;
 	double* N;

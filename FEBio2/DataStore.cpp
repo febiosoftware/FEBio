@@ -69,7 +69,7 @@ void DataStore::Serialize(DumpFile &ar)
 	}
 	else
 	{
-		FEM* pfem = ar.GetFEM();
+		FEM* pfem = dynamic_cast<FEM*>(ar.GetFEM());
 
 		int ndr;
 		Clear();

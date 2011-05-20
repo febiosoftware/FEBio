@@ -577,9 +577,18 @@ void LSDYNAPlotFile::write_truss_stress()
 				FETrussElement& el = ptd->Element(i);
 				ptd->UnpackElement(el);
 				FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
-		
-				double l = el.Length();
-				double V = el.Volume0();
+
+				vec3d r0[2], rt[2];
+				for (int j=0; j<2; ++j)
+				{
+					r0[j] = mesh.Node(el.m_node[j]).m_r0;
+					rt[j] = mesh.Node(el.m_node[j]).m_rt;
+				}
+
+				double l = (rt[1] - rt[0]).norm();
+				double L = (r0[1] - r0[0]).norm();
+				double V = L*el.m_a0;
+
 				s[0] = (float) (pt.m_tau*V/l);	// axial force
 
 				fwrite(s, sizeof(float), 6, m_fp);

@@ -49,6 +49,8 @@ void FERigidBody::Update()
 	// material density
 	double dens;
 
+	// nodal coordinates
+	vec3d r0[8];
 	
 	// loop over all elements
 	for (int nd=0; nd < mesh.Domains(); ++nd)
@@ -73,8 +75,12 @@ void FERigidBody::Update()
 					// nr of integration points
 					int nint = el.GaussPoints();
 
+					// number of nodes
+					int neln = el.Nodes();
+					assert(neln <= 8);
+
 					// initial coordinates
-					vec3d* r0 = el.r0();
+					for (int i=0; i<neln; ++i) r0[i] = pbd->GetMesh()->Node(el.m_node[i]).m_r0;
 
 					// integration weights
 					double* gw = el.GaussWeights();

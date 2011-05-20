@@ -108,8 +108,14 @@ void FEUDGHexDomain::UDGHourglassForces(FEM& fem, FESolidElement &el, vector<dou
 	const double h6[8] = { 1, 1,-1,-1,-1,-1, 1, 1 };
 	const double h7[8] = {-1, 1,-1, 1, 1,-1, 1,-1 };
 
-	vec3d* r0 = el.r0();
-	vec3d* rt = el.rt();
+	int neln = el.Nodes();
+
+	vec3d r0[8], rt[8];
+	for (i=0; i<neln; ++i)
+	{
+		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+	}
 
 	double x4 = 0, x5 = 0, x6 = 0, x7 = 0;
 	double y4 = 0, y5 = 0, y6 = 0, y7 = 0;
@@ -280,8 +286,14 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix&
 	const double h6[8] = { 1, 1,-1,-1,-1,-1, 1, 1 };
 	const double h7[8] = {-1, 1,-1, 1, 1,-1, 1,-1 };
 
-	vec3d* r0 = el.r0();
-	vec3d* rt = el.rt();
+	int neln = el.Nodes();
+
+	vec3d r0[8], rt[8];
+	for (i=0; i<neln; ++i)
+	{
+		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+	}
 
 	double x4 = 0, x5 = 0, x6 = 0, x7 = 0;
 	double y4 = 0, y5 = 0, y6 = 0, y7 = 0;
@@ -513,8 +525,9 @@ void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::UpdateStresses(FEM &fem)
 {
-	int nint;
+	int nint, neln;
 	double* gw;
+	vec3d r0[8], rt[8];
 
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -530,6 +543,16 @@ void FEUDGHexDomain::UpdateStresses(FEM &fem)
 
 		// get the number of integration points
 		nint = el.GaussPoints();
+
+		// number of nodes
+		neln = el.Nodes();
+
+		// nodal coordinates
+		for (int j=0; j<neln; ++j)
+		{
+			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
+			rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+		}
 
 		// get the integration weights
 		gw = el.GaussWeights();
@@ -551,8 +574,8 @@ void FEUDGHexDomain::UpdateStresses(FEM &fem)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.r0 = el.Evaluate(el.r0(), 0);
-		pt.rt = el.Evaluate(el.rt(), 0);
+		pt.r0 = el.Evaluate(r0, 0);
+		pt.rt = el.Evaluate(rt, 0);
 
 		// get the average cartesian derivatives
 		double GX[8], GY[8], GZ[8];
@@ -603,7 +626,17 @@ void FEUDGHexDomain::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], doub
 void FEUDGHexDomain::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int nstate)
 {
 	// get the nodal coordinates
-	vec3d* r = (nstate == 0? el.r0() : el.rt());
+	int neln = el.Nodes();
+	vec3d r[8];
+	if (nstate == 0)
+	{
+		for (int i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+	}
+	else
+	{
+		for (int i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+	}
+
 	double x1 = r[0].x, y1 = r[0].y, z1 = r[0].z;
 	double x2 = r[1].x, y2 = r[1].y, z2 = r[1].z;
 	double x3 = r[2].x, y3 = r[2].y, z3 = r[2].z;
@@ -670,8 +703,18 @@ double FEUDGHexDomain::HexVolume(FESolidElement& el, int state)
 	// let's make sure this is indeed a hex element
 //	assert(el.Type() == FE_HEX);
 
+	int neln = el.Nodes();
+	vec3d r[8];
+	if (state == 0)
+	{
+		for (int i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+	}
+	else
+	{
+		for (int i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+	}
+
 	// get the nodal coordinates
-	vec3d* r = (state == 0? el.r0() : el.rt());
 	double x1 = r[0].x, y1 = r[0].y, z1 = r[0].z;
 	double x2 = r[1].x, y2 = r[1].y, z2 = r[1].z;
 	double x3 = r[2].x, y3 = r[2].y, z3 = r[2].z;

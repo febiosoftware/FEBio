@@ -95,8 +95,13 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 	double *Gr, *Gs, *Gt, *H;
 	double Gx, Gy, Gz, GX, GY, GZ;
 
-	vec3d* vt = el.vt();
-	double* pn = el.pt();
+	vec3d vt[8];
+	double pn[8];
+	for (i=0; i<neln; ++i)
+	{
+		vt[i] = m_pMesh->Node(el.m_node[i]).m_vt;
+		pn[i] = m_pMesh->Node(el.m_node[i]).m_pt;
+	}
 
 	// Bp-matrix
 	vector<double> B1(neln), B2(neln), B3(neln);
@@ -665,10 +670,12 @@ void FEPoroSolidDomain::PoroMaterialStiffness(FEM& fem, FESolidElement &el, matr
 void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 {
 	int i, n;
-	int nint;
+	int nint, neln;
 	double* gw;
+	vec3d r0[8], rt[8];
 
 	assert(fem.m_pStep->m_nModule == FE_POROELASTIC);
+	FEMesh& mesh = *m_pMesh;
 
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -684,6 +691,16 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 
 		// get the number of integration points
 		nint = el.GaussPoints();
+
+		// number of nodes
+		neln = el.Nodes();
+
+		// nodal coordinates
+		for (int j=0; j<neln; ++j)
+		{
+			r0[j] = mesh.Node(el.m_node[j]).m_r0;
+			rt[j] = mesh.Node(el.m_node[j]).m_rt;
+		}
 
 		// get the integration weights
 		gw = el.GaussWeights();
@@ -706,8 +723,8 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(el.r0(), n);
-			pt.rt = el.Evaluate(el.rt(), n);
+			pt.r0 = el.Evaluate(r0, n);
+			pt.rt = el.Evaluate(rt, n);
 			
 			// get the deformation gradient and determinant
 			pt.J = el.defgrad(pt.F, n);

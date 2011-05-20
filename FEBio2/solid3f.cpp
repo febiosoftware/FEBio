@@ -335,7 +335,7 @@ void FE3FieldElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix
 void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 {
 	int i, n;
-	int nint;
+	int nint, neln;
 	double* gw;
 
 	// get the material
@@ -354,6 +354,17 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 
 		// get the integration weights
 		gw = el.GaussWeights();
+
+		// number of nodes
+		neln = el.Nodes();
+
+		// nodal coordinates
+		vec3d r0[8], rt[8];
+		for (int j=0; j<neln; ++j)
+		{
+			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
+			rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+		}
 
 		// calculate the average dilatation and pressure
 		double v = 0, V = 0;
@@ -382,8 +393,8 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are not used by most materials.
-			pt.r0 = el.Evaluate(el.r0(), n);
-			pt.rt = el.Evaluate(el.rt(), n);
+			pt.r0 = el.Evaluate(r0, n);
+			pt.rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
 			pt.J = el.defgrad(pt.F, n);

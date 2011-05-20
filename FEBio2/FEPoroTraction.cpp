@@ -150,9 +150,11 @@ bool FEPoroNormalTraction::LinearTractionForce(FESurfaceElement& el, vector<doub
 
 	// nr of element nodes
 	int neln = el.Nodes();
+	assert(neln <= 4);
 
 	// nodal coordinates
-	vec3d *r0 = el.r0();
+	vec3d r0[4];
+	for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
 
 	double* Gr, *Gs;
 	double* N;

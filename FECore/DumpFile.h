@@ -16,7 +16,7 @@
 #include "quatd.h"
 #include <vector>
 
-class FEM;
+class FEModel;
 
 //-----------------------------------------------------------------------------
 //! Class for serializing data to a binary archive.
@@ -29,7 +29,7 @@ class FEM;
 class DumpFile  
 {
 public:
-	DumpFile(FEM* pfem);
+	DumpFile(FEModel* pfem);
 	virtual ~DumpFile();
 
 	//! Open archive for reading
@@ -136,12 +136,12 @@ public:
 	}
 
 	//! get FEM model
-	FEM* GetFEM() { return m_pfem; }
+	FEModel* GetFEM() { return m_pfem; }
 
 protected:
-	FILE*	m_fp;		//!< The actual file pointer
-	FEM*	m_pfem;		//!< FEM data that will be serialized
-	bool	m_bsave;	//!< Save flag
+	FILE*		m_fp;		//!< The actual file pointer
+	FEModel*	m_pfem;		//!< FEM data that will be serialized
+	bool		m_bsave;	//!< Save flag
 };
 
 #endif // !defined(AFX_ARCHIVE_H__B95A81B1_BBFB_46E5_B9B3_7675ED8A6029__INCLUDED_)

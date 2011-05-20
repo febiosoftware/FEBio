@@ -229,7 +229,6 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 	double detJ;
 
 	vec3d dxr, dxs;
-	vec3d* rt, *r0;
 	double* w;
 
 	// natural coordinates of slave node in master element
@@ -253,6 +252,8 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 	vector<int> sLM;
 	vector<int> mLM;
 
+	vec3d r0[4], rt[4];
+
 	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
@@ -275,9 +276,13 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 			ss.UnpackLM(sel, sLM);
 
 			nseln = sel.Nodes();
+			assert(nseln <= 4);
 
-			rt = sel.rt();
-			r0 = sel.r0();
+			for (int i=0; i<nseln; ++i)
+			{
+				r0[i] = ss.GetMesh()->Node(sel.m_node[i]).m_r0;
+				rt[i] = ss.GetMesh()->Node(sel.m_node[i]).m_rt;
+			}
 			w = sel.GaussWeights();
 
 			// loop over slave element nodes (which are the integration points as well)
@@ -387,7 +392,7 @@ void FEPeriodicBoundary::ContactStiffness()
 	vector<int> en(5);
 
 	double *Gr, *Gs, *w;
-	vec3d *rt, *r0;
+	vec3d rt[4], r0[4];
 
 	vec3d rtm[4];
 
@@ -426,9 +431,14 @@ void FEPeriodicBoundary::ContactStiffness()
 			ss.UnpackLM(se, sLM);
 
 			nseln = se.Nodes();
+			assert(nseln <= 4);
 
-			r0 = se.r0();
-			rt = se.rt();
+			for (int i=0; i<nseln; ++i)
+			{
+				r0[i] = ss.GetMesh()->Node(se.m_node[i]).m_r0;
+				rt[i] = ss.GetMesh()->Node(se.m_node[i]).m_rt;
+			}
+
 			w = se.GaussWeights();
 
 			// loop over all integration points (that is nodes)

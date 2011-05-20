@@ -158,7 +158,6 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 
 	vec3d* rt = el.rt();
 	vec3d* r0 = el.r0();
-	vec3d* vt = el.vt();
 	double* pt = el.pt();
 	double* ct = el.ct();
 
@@ -180,9 +179,6 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 		// current nodal pressures
 		pt[i] = node.m_pt;
 
-		// current nodal velocities
-		vt[i] = node.m_vt;
-		
 		// current nodal concentrations
 		ct[i] = node.m_ct;
 	}

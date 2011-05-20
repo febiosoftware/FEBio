@@ -6,6 +6,7 @@
 #include "FEMaterial.h"
 #include <math.h>
 #include <stdarg.h>
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 MaterialError::MaterialError(const char* szfmt, ...)
@@ -137,11 +138,12 @@ void FEElasticMaterial::Serialize(DumpFile& ar)
 		if (m_pmap) delete m_pmap;
 		m_pmap = 0;
 		assert(ntype != -1);
+		FEMesh& mesh = ar.GetFEM()->GetMesh();
 		switch (ntype)
 		{
 		case FE_MAP_NONE  : m_pmap = 0; break;
-		case FE_MAP_LOCAL : m_pmap = new FELocalMap    (); break;
-		case FE_MAP_SPHERE: m_pmap = new FESphericalMap(); break;
+		case FE_MAP_LOCAL : m_pmap = new FELocalMap    (mesh); break;
+		case FE_MAP_SPHERE: m_pmap = new FESphericalMap(mesh); break;
 		case FE_MAP_VECTOR: m_pmap = new FEVectorMap   (); break;
 		}
 		if (m_pmap) m_pmap->Serialize(ar);

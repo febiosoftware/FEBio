@@ -86,7 +86,7 @@ void FEElasticShellDomain::InitElements()
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::Serialize(DumpFile &ar)
 {
-	FEM& fem = *ar.GetFEM();
+	FEM& fem = dynamic_cast<FEM&>(*ar.GetFEM());
 	if (ar.IsSaving())
 	{
 		for (size_t i=0; i<m_Elem.size(); ++i)
@@ -649,6 +649,7 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 void FEElasticShellDomain::UpdateStresses(FEM &fem)
 {
 	FEMesh& mesh = fem.m_mesh;
+	vec3d r0[8], rt[8];
 
 	int n;
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -663,6 +664,16 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 
 		// get the number of integration points
 		int nint = el.GaussPoints();
+
+		// number of nodes
+		int neln = el.Nodes();
+
+		// nodal coordinates
+		for (int j=0; j<neln; ++j)
+		{
+			r0[j] = mesh.Node(el.m_node[j]).m_r0;
+			rt[j] = mesh.Node(el.m_node[j]).m_rt;
+		}
 
 		// get the integration weights
 		double* gw = el.GaussWeights();
@@ -680,8 +691,8 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(el.r0(), n);
-			pt.rt = el.Evaluate(el.rt(), n);
+			pt.r0 = el.Evaluate(r0, n);
+			pt.rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
 			el.defgrad(pt.F, n);
@@ -759,7 +770,6 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 
 	vec3d* rt = se.rt();
 	vec3d* r0 = se.r0();
-	vec3d* vt = se.vt();
 	vec3d* D0 = se.D0();
 	vec3d* Dt = se.Dt();
 	double* pt = se.pt();
@@ -782,9 +792,6 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 
 		// current nodal pressures
 		pt[i] = node.m_pt;
-
-		// current nodal velocities
-		vt[i] = node.m_vt;
 
 		// current nodal concentrations
 		ct[i] = node.m_ct;

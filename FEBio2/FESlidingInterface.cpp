@@ -589,7 +589,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 	// get the solver
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
-	vec3d* r0;
+	vec3d r0[4];
 	double w[4];
 	double* Gr, *Gs;
 	double detJ[4];
@@ -615,7 +615,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 			ss.UnpackLM(sel, sLM);
 
 			// nodal coordinates
-			r0 = sel.r0();
+			for (int i=0; i<nseln; ++i) r0[i] = ss.GetMesh()->Node(sel.m_node[i]).m_r0;
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
@@ -948,7 +948,7 @@ void FESlidingInterface::ContactStiffness()
 	vector<int> en(5);
 
 	double *Gr, *Gs, w[4];
-	vec3d *r0;
+	vec3d r0[4];
 
 	double detJ[4];
 	vec3d dxr, dxs;
@@ -981,7 +981,7 @@ void FESlidingInterface::ContactStiffness()
 			ss.UnpackLM(se, sLM);
 
 			// get the nodal coordinates
-			r0 = se.r0();
+			for (int i=0; i<nseln; ++i) r0[i] = ss.GetMesh()->Node(se.m_node[i]).m_r0;
 
 			// get all the metrics we need 
 			for (n=0; n<nseln; ++n)

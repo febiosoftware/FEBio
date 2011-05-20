@@ -338,6 +338,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	double detJ[4], w[4], *Hs, Hm[4];
+	vec3d r0[4];
 
 	for (int np=0; np<m_npass; ++np)
 	{
@@ -357,7 +358,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 			ss.UnpackLM(se, sLM);
 
 			// nodal coordinates
-			vec3d* r0 = se.r0();
+			for (j=0; j<nseln; ++j) r0[j] = ss.GetMesh()->Node(se.m_node[j]).m_r0;
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
@@ -524,6 +525,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 	}
 
 	double detJ[4], w[4], *Hs, Hm[4], Hmr[4], Hms[4];
+	vec3d r0[4];
 
 	for (int np=0; np < m_npass; ++np)
 	{
@@ -543,7 +545,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 			ss.UnpackLM(se, sLM);
 
 			// nodal coordinates
-			vec3d* r0 = se.r0();
+			for (j=0; j<nseln; ++j) r0[j] = ss.GetMesh()->Node(se.m_node[j]).m_r0;
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces

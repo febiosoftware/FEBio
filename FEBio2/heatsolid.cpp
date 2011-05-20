@@ -51,8 +51,6 @@ void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	int i, n;
 
 	vec3d* rt = el.rt();
-	vec3d* r0 = el.r0();
-	vec3d* vt = el.vt();
 	double* pt = el.pt();
 	double* ct = el.ct();
 
@@ -65,18 +63,12 @@ void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 
 		FENode& node = m_pMesh->Node(n);
 
-		// initial coordinates (= material coordinates)
-		r0[i] = node.m_r0;
-
 		// current coordinates (= spatial coordinates)
 		rt[i] = node.m_rt;
 
 		// current nodal pressures
 		pt[i] = node.m_pt;
 
-		// current nodal velocities
-		vt[i] = node.m_vt;
-		
 		// current nodal concentrations
 		ct[i] = node.m_ct;
 	}

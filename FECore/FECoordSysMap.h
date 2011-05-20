@@ -13,6 +13,8 @@
 #include "FEElement.h"
 #include "DumpFile.h"
 
+class FEMesh;
+
 #define FE_MAP_NONE		0
 #define FE_MAP_LOCAL	1
 #define FE_MAP_SPHERE	2
@@ -41,7 +43,7 @@ public:
 class FELocalMap : public FECoordSysMap
 {
 public:
-	FELocalMap();
+	FELocalMap(FEMesh& m);
 
 	void SetLocalNodes(int n1, int n2, int n3);
 
@@ -50,7 +52,8 @@ public:
 	virtual void Serialize(DumpFile& ar);
 
 protected:
-	int	m_n[3];	// local element nodes
+	FEMesh&		m_mesh;
+	int			m_n[3];	// local element nodes
 };
 
 //-----------------------------------------------------------------------------
@@ -58,7 +61,7 @@ protected:
 class FESphericalMap : public FECoordSysMap
 {
 public:
-	FESphericalMap() : FECoordSysMap(FE_MAP_SPHERE) {}
+	FESphericalMap(FEMesh& mesh) : FECoordSysMap(FE_MAP_SPHERE), m_mesh(mesh) {}
 
 	void SetSphereCenter(vec3d c) { m_c = c; }
 
@@ -67,7 +70,8 @@ public:
 	virtual void Serialize(DumpFile& ar);
 
 protected:
-	vec3d	m_c;	// center of map
+	FEMesh&		m_mesh;
+	vec3d		m_c;	// center of map
 };
 
 //-----------------------------------------------------------------------------
