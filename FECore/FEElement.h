@@ -72,7 +72,6 @@ public:
 	{
 		m_pT = ptraits;
 		m_node.resize(Nodes());
-		m_LM.resize(Nodes()*MAX_NDOFS);
 		m_State.Create(GaussPoints());
 	}
 
@@ -154,10 +153,9 @@ public:
 	int		m_nID;			//!< element ID
 	int		m_gid;			//!< part ID (i.e. index of domain this element belongs to)
 
-	vector<int>		m_node;		//!< connectivity
-	vector<int>		m_LM;		//!< element's LM vector (stores nodal equation numbers)
-	FEElementState	m_State;	//!< element state data
-	FEElementTraits*	m_pT;	//!< pointer to element traits
+	vector<int>			m_node;		//!< connectivity
+	FEElementState		m_State;	//!< element state data
+	FEElementTraits*	m_pT;		//!< pointer to element traits
 };
 
 //-----------------------------------------------------------------------------

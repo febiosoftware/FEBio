@@ -58,7 +58,7 @@ public:
 	FEElement* FindElementFromID(int nid);
 
 	virtual void UnpackElement(FEElement& el, unsigned int nflags = FE_UNPACK_ALL) = 0;
-	virtual void UnpackLM(FEElement& el) = 0;
+	virtual void UnpackLM(FEElement& el, vector<int>& lm) = 0;
 
 	void SetMatID(int mid)
 	{

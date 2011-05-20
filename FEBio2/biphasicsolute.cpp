@@ -18,6 +18,8 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	
 	// element force vector
 	vector<double> fe;
+
+	vector<int> lm;
 	
 	int NE = m_Elem.size();
 	for (i=0; i<NE; ++i)
@@ -63,7 +65,7 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		
 		// add fluid work to global residual
 		int neln = el.Nodes();
-		vector<int>& lm = el.LM();
+		UnpackLM(el, lm);
 		int J;
 		for (j=0; j<neln; ++j)
 		{
@@ -370,6 +372,8 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 	
 	// element stiffness matrix
 	matrix ke;
+
+	vector<int> elm;
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
@@ -399,14 +403,15 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackElement function so that it returns
 		// the LM vector in the right order for solute-solid elements.
+		UnpackLM(el, elm);
 		vector<int> lm(ndof);
 		for (int i=0; i<neln; ++i)
 		{
-			lm[5*i  ] = el.LM()[3*i];
-			lm[5*i+1] = el.LM()[3*i+1];
-			lm[5*i+2] = el.LM()[3*i+2];
-			lm[5*i+3] = el.LM()[3*neln+i];
-			lm[5*i+4] = el.LM()[11*neln+i];
+			lm[5*i  ] = elm[3*i];
+			lm[5*i+1] = elm[3*i+1];
+			lm[5*i+2] = elm[3*i+2];
+			lm[5*i+3] = elm[3*neln+i];
+			lm[5*i+4] = elm[11*neln+i];
 		}
 		
 		// assemble element matrix in global stiffness matrix
@@ -802,6 +807,7 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 		{
 			// the micro-material screws up the currently unpacked elements
 			// so I have to unpack the element data again
+			// TODO: Do I still need this?
 			UnpackElement(el);
 		}
 		
@@ -952,6 +958,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			{
 				// the micro-material screws up the currently unpacked elements
 				// so I have to unpack the element data again
+				// TODO: Do I still need this?
 				UnpackElement(el);
 			}
 			

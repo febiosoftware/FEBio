@@ -18,6 +18,8 @@ void FEPoroSolidDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	// element force vector
 	vector<double> fe;
 
+	vector<int> elm;
+
 	int NE = m_Elem.size();
 	for (i=0; i<NE; ++i)
 	{
@@ -51,8 +53,11 @@ void FEPoroSolidDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		}
 		*/
 
+		// get element equation numbers
+		UnpackLM(el, elm);
+
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		psolver->AssembleResidual(el.m_node, elm, fe, R);
 
 		// do poro-elastic forces
 		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
@@ -63,11 +68,10 @@ void FEPoroSolidDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 
 		// add fluid work to global residual
 		int neln = el.Nodes();
-		vector<int>& lm = el.LM();
 		int J;
 		for (j=0; j<neln; ++j)
 		{
-			J = lm[3*neln+j];
+			J = elm[3*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}

@@ -166,8 +166,6 @@ bool FEM::InitMesh()
 	int* en;
 	vec3d a, b, c;
 
-	vec3d* r0;
-
 	int ninverted = 0;
 
 	FEMesh& m = m_mesh;
@@ -215,15 +213,17 @@ bool FEM::InitMesh()
 		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
+			vec3d r0[4];
 			for (i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-				psd->UnpackElement(el, 0);
-
-				r0 = el.r0();
 
 				n = el.Nodes();
 				en = &el.m_node[0];
+
+				// get the nodes
+				for (j=0; j<n; ++j) r0[j] = psd->GetMesh()->Node(en[j]).m_r0;
+
 				for (j=0; j<n; ++j)
 				{
 					m0 = j;
@@ -569,14 +569,6 @@ bool FEM::InitEquations()
 			n = RB.m_LM[j];
 			if (pm->m_bc[j] > 0) RB.m_LM[j] = -n-2;
 		}
-	}
-
-	// set the Element's LM data
-	for (i=0; i<m_mesh.Domains(); ++i)
-	{
-		FEDomain& D = m_mesh.Domain(i);
-		int NE = D.Elements();
-		for (j=0; j<NE; ++j) D.UnpackLM(D.ElementRef(j));
 	}
 
 	// All initialization is done

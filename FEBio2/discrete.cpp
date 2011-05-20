@@ -53,10 +53,10 @@ void FEDiscreteSpringDomain::Serialize(DumpFile& ar)
 
 
 //-----------------------------------------------------------------------------
-void FEDiscreteSpringDomain::UnpackLM(FEElement &el)
+void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	vector<int>& lm = el.LM();
+	lm.resize(N*MAX_NDOFS);
 
 	for (int i=0; i<N; ++i)
 	{

@@ -791,6 +791,8 @@ void FESolidSolver::InertialForces(vector<double>& R)
 
 	vector<double> fe;
 
+	vector<int> lm;
+
 	// calculate F
 	double a = 4.0 / m_fem.m_pStep->m_dt;
 	double b = a / m_fem.m_pStep->m_dt;
@@ -860,8 +862,11 @@ void FESolidSolver::InertialForces(vector<double>& R)
 					}
 				}
 
+				// get the element degrees of freedom
+				pbd->UnpackLM(el, lm);
+
 				// assemble fe into R
-				AssembleResidual(el.m_node, el.LM(), fe, R);
+				AssembleResidual(el.m_node, lm, fe, R);
 			}
 		}
 	}

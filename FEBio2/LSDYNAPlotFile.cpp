@@ -488,8 +488,6 @@ void LSDYNAPlotFile::write_shell_stress()
 				{
 					try
 					{
-						psd->UnpackElement(el);
-
 						neln = el.Nodes();
 						double f = 1.0 / (double) neln;
 

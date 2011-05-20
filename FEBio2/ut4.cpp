@@ -371,6 +371,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 
 	int i, j, n;
 	double Ve;
+	vector<int> elm;
 	static vector<int> LM(3);
 	static vector<int> en(1);
 	static vector<double> fe(3);
@@ -410,7 +411,8 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 			for (n=0; n<NE; ++n)
 			{
 				FESolidElement& el = dynamic_cast<FESolidElement&>(*ppel[n]);
-				UnpackElement(el, FE_UNPACK_TRAITS | FE_UNPACK_LM);
+				UnpackElement(el, FE_UNPACK_TRAITS);
+				UnpackLM(el, elm);
 
 				// calculate element volume
 				// TODO: we should store this somewhere instead of recalculating it
@@ -451,9 +453,9 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 					Be[4][0] = Fe[0][1]*Gz[j] + Fe[0][2]*Gy[j]; Be[4][1] = Fe[1][1]*Gz[j] + Fe[1][2]*Gy[j]; Be[4][2] = Fe[2][1]*Gz[j] + Fe[2][2]*Gy[j];
 					Be[5][0] = Fe[0][2]*Gx[j] + Fe[0][0]*Gz[j]; Be[5][1] = Fe[1][2]*Gx[j] + Fe[1][0]*Gz[j]; Be[5][2] = Fe[2][2]*Gx[j] + Fe[2][0]*Gz[j];
 
-					LM[0] = el.LM()[3*j  ];
-					LM[1] = el.LM()[3*j+1];
-					LM[2] = el.LM()[3*j+2];
+					LM[0] = elm[3*j  ];
+					LM[1] = elm[3*j+1];
+					LM[2] = elm[3*j+2];
 
 					en[0] = el.m_node[j];
 		
@@ -599,6 +601,7 @@ void FEUT4Domain::StiffnessMatrix(FESolidSolver *psolver)
 //! Calculates the nodal contribution to the global stiffness matrix
 void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 {
+	vector<int> elm;
 	vector<int> LM;
 	vector<int> en;
 
@@ -638,12 +641,12 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 		for (ni=0; ni<NE; ++ni)
 		{
 			FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
-			UnpackElement(el, FE_UNPACK_LM);
+			UnpackLM(el, elm);
 			for (int i=0; i<4; ++i)
 			{
-				LM[ni*4*3+3*i  ] = el.LM()[3*i  ];
-				LM[ni*4*3+3*i+1] = el.LM()[3*i+1];
-				LM[ni*4*3+3*i+2] = el.LM()[3*i+2];
+				LM[ni*4*3+3*i  ] = elm[3*i  ];
+				LM[ni*4*3+3*i+1] = elm[3*i+1];
+				LM[ni*4*3+3*i+2] = elm[3*i+2];
 
 				en[ni*4+i] = el.m_node[i];
 			}
@@ -712,17 +715,15 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
-//		UnpackElement(ei, FE_UNPACK_R0);
 
 		// calculate element volume
-		double Vi = m_Ve0[peli[ni]]; // TetVolume(ei.r0());
+		double Vi = m_Ve0[peli[ni]];
 		double wi = 0.25* Vi*node.Vi/ node.Vi;
 
 		// loop over the elements again
 		for (nj=ni; nj<NE; ++nj)
 		{
 			FESolidElement& ej = dynamic_cast<FESolidElement&>(*ppe[nj]);
-//			UnpackElement(ej, FE_UNPACK_R0);
 
 			// calculate element volume
 			double Vj = m_Ve0[peli[nj]]; // TetVolume(ej.r0());
@@ -942,6 +943,8 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
 	// element stiffness matrix
 	matrix ke;
 
+	vector<int> elm;
+
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
@@ -958,8 +961,11 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
 		// calculate the element stiffness matrix
 		ElementStiffness(fem, el, ke);
 
+		// get the element equation numbers
+		UnpackLM(el, elm);
+
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+		psolver->AssembleStiffness(el.m_node, elm, ke);
 	}
 }
 
@@ -1151,6 +1157,7 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 		{
 			// the micro-material screws up the currently unpacked elements
 			// so I have to unpack the element data again
+			// TODO: Do I still need this?
 			UnpackElement(el);
 		}
 

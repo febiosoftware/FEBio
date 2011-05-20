@@ -433,11 +433,10 @@ void FETiedInterface::ContactForces(vector<double>& F)
 
 				// get the master element
 				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
-				ms.UnpackElement(mel, FE_UNPACK_LM);
-
-				mLM = mel.LM();
+				ms.UnpackLM(mel, mLM);
 
 				// we must unpack the slave element again
+				// TODO: Do we need to this still?
 				ss.UnpackElement(sel);
 
 				nmeln = mel.Nodes();
@@ -584,15 +583,15 @@ void FETiedInterface::ContactStiffness()
 
 				// get the master element
 				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
-				ms.UnpackElement(me, FE_UNPACK_LM);
+				ms.UnpackLM(me, mLM);
 
-				mLM = me.LM();
 				nmeln = me.Nodes();
 
 				// get the master element node positions
-				for (k=0; k<nmeln; ++k) rtm[k] = me.rt()[k];
+				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
 				// we must unpack the slave element again
+				// TODO: Do I still need this?
 				ss.UnpackElement(se);
 
 				// slave node natural coordinates in master element

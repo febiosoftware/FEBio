@@ -6,10 +6,10 @@
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 
-void FEHeatSolidDomain::UnpackLM(FEElement& el)
+void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	vector<int>& lm = el.m_LM;
+	lm.resize(N*MAX_NDOFS);
 
 	for (int i=0; i<N; ++i)
 	{

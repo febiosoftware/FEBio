@@ -75,6 +75,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 		{
 			MP.clear();
 
+			vector<int> elm;
+
 			// add all elements to the profile
 			// TODO: perhaps we should ask the domain the create the profile
 			for (int nd=0; nd<mesh.Domains(); ++nd)
@@ -88,8 +90,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 						FEElement& el = d.ElementRef(j);
 						if (!el.IsRigid())
 						{
-							d.UnpackElement(el, FE_UNPACK_LM);
-							build_add(el.LM());
+							d.UnpackLM(el, elm);
+							build_add(elm);
 						}
 					}
 				}
@@ -113,8 +115,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 							for (int n=0; n<NE; ++n)
 							{
 								FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[n]);
-								ut4.UnpackElement(el);
-								vector<int>& elm = el.LM();
+								ut4.UnpackLM(el, elm);
 								for (int j=0; j<4*MAX_NDOFS; ++j) LM[n*4*MAX_NDOFS + j] = elm[j];
 							}
 							build_add(LM);
@@ -159,7 +160,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			if (fem.m_LinC.size() > 0)
 			{
 				int nlin = fem.m_LinC.size();
-				vector<int> lm;
+				vector<int> lm, elm;
 				
 				// do the cross-term
 				// TODO: I have to make this easier. For instance,
@@ -176,8 +177,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 							FESolidElement& el = pbd->Element(i);
 							if (!el.IsRigid())
 							{
-								pbd->UnpackElement(el, FE_UNPACK_LM);
-								int ne = el.LM().size();
+								pbd->UnpackLM(el, elm);
+								int ne = elm.size();
 
 								// see if this element connects to the 
 								// master node of a linear constraint ...
@@ -197,7 +198,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 											int ns = plc->slave.size();
 
 											lm.resize(ne + ns);
-											for (l=0; l<ne; ++l) lm[l] = el.LM()[l];
+											for (l=0; l<ne; ++l) lm[l] = elm[l];
 
 											list<FELinearConstraint::SlaveDOF>::iterator is = plc->slave.begin();
 											for (l=ne; l<ne+ns; ++l, ++is) lm[l] = is->neq;

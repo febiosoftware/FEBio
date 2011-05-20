@@ -662,8 +662,8 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 					// contact force.
 					// get the master element
 					FESurfaceElement& mel = *ss.m_pme[m];
-					ms.UnpackElement(mel, FE_UNPACK_LM);
-					mLM = mel.LM();
+					ms.UnpackElement(mel, FE_UNPACK_LM);		// can't delete yet since it is used in ContactNodalForce
+					ms.UnpackLM(mel, mLM);
 
 					// calculate the degrees of freedom
 					nmeln = mel.Nodes();

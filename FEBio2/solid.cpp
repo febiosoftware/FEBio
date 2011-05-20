@@ -795,10 +795,11 @@ void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 
 //-----------------------------------------------------------------------------
 //! Unpack the element LM data. 
-void FEElasticSolidDomain::UnpackLM(FEElement& el)
+void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	vector<int>& lm = el.m_LM;
+	lm.resize(N*MAX_NDOFS);
+	
 	for (int i=0; i<N; ++i)
 	{
 		int n = el.m_node[i];

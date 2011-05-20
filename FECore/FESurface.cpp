@@ -112,10 +112,11 @@ int FESurface::FindElement(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
-void FESurface::UnpackLM(FEElement& el)
+void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 {
-	vector<int>& lm = el.m_LM;
 	int N = el.Nodes();
+	lm.resize(N*MAX_NDOFS);
+
 	for (int i=0; i<N; ++i)
 	{
 		int n = el.m_node[i];

@@ -697,12 +697,12 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 //! nodes have six degrees of freedom each, where for solids they only
 //! have 3 dofs.
 
-void FEElasticShellDomain::UnpackLM(FEElement& el)
+void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	FEShellElement& se = dynamic_cast<FEShellElement&>(el);
 
 	int N = se.Nodes();
-	vector<int>& lm = se.m_LM;
+	lm.resize(N*MAX_NDOFS);
 
 	for (int i=0; i<N; ++i)
 	{
