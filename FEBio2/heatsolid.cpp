@@ -57,38 +57,6 @@ void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	double* ct = el.ct();
 
 	int N = el.Nodes();
-	vector<int>& lm = el.LM();
-
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
-		int* id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-		
-		// concentration dofs
-		lm[11*N+i] = id[11];
-	}
 
 	// copy nodal data to element arrays
 	for (i=0; i<N; ++i)
@@ -122,6 +90,7 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 {
 	int i, j, k;
 	vector<int> lm(8);
+	vector<int> elm;
 
 	FEM& fem = psolver->m_fem;
 
@@ -137,7 +106,7 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 		ConductionStiffness(fem, el, ke);
 
 		// set up the LM matrix
-		vector<int>& elm = el.LM();
+		UnpackLM(el, elm);
 		for (j=0; j<ne; ++j) lm[j] = elm[10*ne + j];
 
 		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) 

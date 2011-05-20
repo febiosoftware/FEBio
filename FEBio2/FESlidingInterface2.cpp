@@ -821,8 +821,8 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			// copy the LM vector; we'll need it later
-			sLM = se.LM();
+			// get the element's LM vector
+			ss.UnpackLM(se, sLM);
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
@@ -855,8 +855,8 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 					// get the nr of master element nodes
 					int nmeln = me.Nodes();
 
-					// copy LM vector
-					mLM = me.LM();
+					// get the element's LM vector
+					ms.UnpackLM(me, mLM);
 
 					// calculate degrees of freedom
 					int ndof = 3*(nseln + nmeln);
@@ -1022,8 +1022,8 @@ void FESlidingInterface2::ContactStiffness()
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			// copy the LM vector
-			sLM = se.LM();
+			// get the element's LM vector
+			ss.UnpackLM(se, sLM);
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
@@ -1062,8 +1062,8 @@ void FESlidingInterface2::ContactStiffness()
 					// get the nr of master nodes
 					int nmeln = me.Nodes();
 
-					// copy the LM vector
-					mLM = me.LM();
+					// get the element's LM vector
+					ms.UnpackLM(me, mLM);
 					
 					int ndpn;	// number of dofs per node
 					int ndof;	// number of dofs in stiffness matrix

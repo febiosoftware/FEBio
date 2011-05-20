@@ -10,6 +10,7 @@ void FETractionLoad::Residual(FESolver* psolver, vector<double>& R)
 	FEM& fem = solver.m_fem;
 
 	vector<double> fe;
+	vector<int> lm;
 
 	int i, n;
 	int npr = m_TC.size();
@@ -73,8 +74,11 @@ void FETractionLoad::Residual(FESolver* psolver, vector<double>& R)
 			}
 		}
 
+		// get the element's LM vector
+		m_psurf->UnpackLM(el, lm);
+
 		// add element force vector to global force vector
-		solver.AssembleResidual(el.m_node, el.LM(), fe, R);
+		solver.AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 

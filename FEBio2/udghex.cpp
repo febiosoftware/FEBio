@@ -10,6 +10,8 @@ void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 	// element force vector
 	vector<double> fe;
 
+	vector<int> lm;
+
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
@@ -37,8 +39,11 @@ void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		// apply body forces
 		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 
@@ -200,6 +205,8 @@ void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 	// element stiffness matrix
 	matrix ke;
 
+	vector<int> lm;
+
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
@@ -225,8 +232,11 @@ void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// add the inertial stiffness for dynamics
 		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 

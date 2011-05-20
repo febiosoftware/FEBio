@@ -98,35 +98,6 @@ void FEDiscreteSpringDomain::UnpackElement(FEElement &el, unsigned int nflag)
 	double* pt = el.pt();
 
 	int N = el.Nodes();
-	vector<int>& lm = el.LM();
-
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
-		int* id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-	}
 
 	// copy nodal data to element arrays
 	for (i=0; i<N; ++i)

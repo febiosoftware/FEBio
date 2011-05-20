@@ -172,6 +172,8 @@ void FEElasticSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 	// element force vector
 	vector<double> fe;
 
+	vector<int> lm;
+
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
@@ -197,8 +199,11 @@ void FEElasticSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		// apply body forces
 		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 
@@ -623,6 +628,8 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 	// element stiffness matrix
 	matrix ke;
 
+	vector<int> lm;
+
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
@@ -648,8 +655,11 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// add body force stiffness
 		if (fem.HasBodyForces()) BodyForceStiffness(fem, el, ke);
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
@@ -837,42 +847,6 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 {
-	if (nflag & FE_UNPACK_LM)
-	{
-		int N = el.Nodes();
-		vector<int>& lm = el.LM();
-		for (int i=0; i<N; ++i)
-		{
-			int n = el.m_node[i];
-			FENode& node = m_pMesh->Node(n);
-
-			int* id = node.m_ID;
-
-			// first the displacement dofs
-			lm[3*i  ] = id[0];
-			lm[3*i+1] = id[1];
-			lm[3*i+2] = id[2];
-
-			// now the pressure dofs
-			lm[3*N+i] = id[6];
-
-			// rigid rotational dofs
-			lm[4*N + 3*i  ] = id[7];
-			lm[4*N + 3*i+1] = id[8];
-			lm[4*N + 3*i+2] = id[9];
-
-			// fill the rest with -1
-			lm[7*N + 3*i  ] = -1;
-			lm[7*N + 3*i+1] = -1;
-			lm[7*N + 3*i+2] = -1;
-
-			lm[10*N + i] = id[10];
-			
-			// concentration dofs
-			lm[11*N + i] = id[11];
-		}
-	}
-
 	// copy initial nodal coordinates
 	// (also needed for traits data)
 	if ((nflag & FE_UNPACK_R0) || (nflag & FE_UNPACK_TRAITS))

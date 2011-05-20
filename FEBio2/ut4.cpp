@@ -481,6 +481,8 @@ void FEUT4Domain::ElementResidual(FESolidSolver* psolver, vector<double>& R)
 	// element force vector
 	vector<double> fe;
 
+	vector<int> lm;
+
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
 	{
@@ -505,8 +507,11 @@ void FEUT4Domain::ElementResidual(FESolidSolver* psolver, vector<double>& R)
 			BodyForces(fem, el, fe);
 		}
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 

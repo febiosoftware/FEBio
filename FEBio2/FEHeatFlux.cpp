@@ -9,6 +9,8 @@ void FEHeatFlux::Residual(FESolver* psolver, vector<double>& R)
 	int i, j, n;
 	FEM& fem = psolver->m_fem;
 
+	vector<int> elm;
+
 	int nfc = m_psurf->Elements();
 	for (i=0; i<nfc; ++i)
 	{
@@ -39,8 +41,11 @@ void FEHeatFlux::Residual(FESolver* psolver, vector<double>& R)
 
 		vec3d dxr, dxs;
 
+		// get the element's LM vector
+		m_psurf->UnpackLM(el, elm);
+
 		vector<int> lm(ne);
-		for (j=0; j<ne; ++j) lm[j] = (el.LM())[ne*10 + j];
+		for (j=0; j<ne; ++j) lm[j] = elm[ne*10 + j];
 
 		// force vector
 		// repeat over integration points

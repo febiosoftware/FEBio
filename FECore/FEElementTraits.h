@@ -61,8 +61,6 @@ public:
 		pt.resize(ne);
 		ct.resize(ne);
 
-		LM.resize(MAX_NDOFS*ne);
-
 		H.Create(ni, ne);
 
 		m_pel = 0;
@@ -81,8 +79,6 @@ public:
 	std::vector<vec3d>  vt;	//!< nodal velocities
 	std::vector<double> pt;	//!< nodal pressures
 	std::vector<double> ct;	//!< nodal concentrations
-
-	std::vector<int> LM; //!< nodal equation numbers
 
 	int nint;	//!< number of integration points
 	int	neln;	//!< number of element nodes

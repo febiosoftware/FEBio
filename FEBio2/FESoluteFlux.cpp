@@ -219,6 +219,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 	FEM& fem = solver.m_fem;
 	
 	matrix ke;
+	vector<int> elm;
 	
 	int nfr = m_PC.size();
 	for (int m=0; m<nfr; ++m)
@@ -251,6 +252,9 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 					
 					// calculate pressure stiffness
 					FluxStiffness(el, ke, wn);
+
+					// get the element's LM vector
+					m_psurf->UnpackLM(el, elm);
 					
 					// TODO: the problem here is that the LM array that is returned by the UnpackElement
 					// function does not give the equation numbers in the right order. For this reason we
@@ -260,10 +264,10 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 					vector<int> lm(ndof);
 					for (int i=0; i<neln; ++i)
 					{
-						lm[4*i  ] = el.LM()[3*i];
-						lm[4*i+1] = el.LM()[3*i+1];
-						lm[4*i+2] = el.LM()[3*i+2];
-						lm[4*i+3] = el.LM()[11*neln+i];
+						lm[4*i  ] = elm[3*i];
+						lm[4*i+1] = elm[3*i+1];
+						lm[4*i+2] = elm[3*i+2];
+						lm[4*i+3] = elm[11*neln+i];
 					}
 					
 					// assemble element matrix in global stiffness matrix
@@ -281,7 +285,8 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 	FEM& fem = solver.m_fem;
 	
 	vector<double> fe;
-	
+	vector<int> elm;
+
 	int nfr = m_PC.size();
 	for (int i=0; i<nfr; ++i)
 	{
@@ -303,6 +308,9 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 			fe.resize(ndof);
 			
 			if (m_blinear) LinearFlowRate(el, fe, wn); else FlowRate(el, fe, wn);
+
+			// get the element's LM vector
+			m_psurf->UnpackLM(el, elm);
 			
 			// TODO: the problem here is that the LM array that is returned by the UnpackElement
 			// function does not give the equation numbers in the right order. For this reason we
@@ -311,7 +319,7 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 			// the LM vector in the right order for solute-solid elements.
 			vector<int> lm(ndof);
 			for (int i=0; i<neln; ++i)
-				lm[i] = el.LM()[11*neln+i];
+				lm[i] = elm[11*neln+i];
 			
 			// add element force vector to global force vector
 			solver.AssembleResidual(el.m_node, lm, fe, R);

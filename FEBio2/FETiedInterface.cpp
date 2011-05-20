@@ -391,7 +391,8 @@ void FETiedInterface::ContactForces(vector<double>& F)
 		FESurfaceElement& sel = ss.Element(j);
 		ss.UnpackElement(sel);
 
-		sLM = sel.LM();
+		// get the element's LM vector
+		ss.UnpackLM(sel, sLM);
 
 		nseln = sel.Nodes();
 
@@ -546,7 +547,8 @@ void FETiedInterface::ContactStiffness()
 		FESurfaceElement& se = ss.Element(j);
 		ss.UnpackElement(se);
 
-		sLM = se.LM();
+		// get the element's LM vector
+		ss.UnpackLM(se, sLM);
 
 		nseln = se.Nodes();
 

@@ -59,35 +59,6 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 	double* pt = el.pt();
 
 	int N = el.Nodes();
-	vector<int>& lm = el.LM();
-
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
-		int* id = node.m_ID;
-
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-	}
 
 	// copy nodal data to element arrays
 	for (i=0; i<N; ++i)
@@ -130,12 +101,14 @@ void FEElasticTrussDomain::StiffnessMatrix(FESolidSolver* psolver)
 	FEM& fem = psolver->m_fem;
 	matrix ke;
 	int NT = m_Elem.size();
+	vector<int> lm;
 	for (int iel =0; iel<NT; ++iel)
 	{
 		FETrussElement& el = m_Elem[iel];
 		UnpackElement(el);
 		ElementStiffness(fem, el, ke);
-		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+		UnpackLM(el, lm);
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
@@ -194,13 +167,15 @@ void FEElasticTrussDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	// element force vector
 	vector<double> fe;
+	vector<int> lm;
 	int NT = m_Elem.size();
 	for (int i=0; i<NT; ++i)
 	{
 		FETrussElement& el = m_Elem[i];
 		UnpackElement(el);
 		InternalForces(el, fe);
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		UnpackLM(el, lm);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 

@@ -148,6 +148,8 @@ void FEElasticShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	// element force vector
 	vector<double> fe;
 
+	vector<int> lm;
+
 	int NS = m_Elem.size();
 	for (int i=0; i<NS; ++i)
 	{
@@ -168,10 +170,11 @@ void FEElasticShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		// apply body forces to shells
 		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
 
-		// assemble the residual
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		// get the element's LM vector
+		UnpackLM(el, lm);
 
-		// TODO: Do poro-elasticity for shells
+		// assemble the residual
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 
@@ -273,6 +276,8 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 	matrix ke;
 
+	vector<int> lm;
+
 	int NS = m_Elem.size();
 	for (int iel=0; iel<NS; ++iel)
 	{
@@ -297,8 +302,11 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 			// calculate the element stiffness matrix
 			ElementStiffness(fem, el, ke);
 
+			// get the element's LM vector
+			UnpackLM(el, lm);
+
 			// assemble element matrix in global stiffness matrix
-			psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
 		else if (dynamic_cast<FEPoroElastic*>(pmat))
 		{
@@ -758,38 +766,6 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	double* ct = se.ct();
 
 	int N = se.Nodes();
-	vector<int>& lm = se.LM();
-
-	for (i=0; i<N; ++i)
-	{
-		n = se.m_node[i];
-		FENode& node = m_pMesh->Node(n);
-
-		int* id = node.m_ID;
-
-		// first the displacement dofs
-		lm[6*i  ] = id[0];
-		lm[6*i+1] = id[1];
-		lm[6*i+2] = id[2];
-
-		// next the rotational dofs
-		lm[6*i+3] = id[3];
-		lm[6*i+4] = id[4];
-		lm[6*i+5] = id[5];
-
-		// now the pressure dofs
-		lm[6*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[7*N + 3*i  ] = id[7];
-		lm[7*N + 3*i+1] = id[8];
-		lm[7*N + 3*i+2] = id[9];
-
-		lm[10*N + i] = id[10];
-		
-		// concentration dof
-		lm[11*N + i] = id[11];
-	}
 
 	// copy nodal data to element arrays
 	for (i=0; i<N; ++i)

@@ -331,7 +331,8 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 		FESurfaceElement& sel = m_ss.Element(j);
 		m_ss.UnpackElement(sel);
 
-		sLM = sel.LM();
+		// get the element's LM vector
+		m_ss.UnpackLM(sel, sLM);
 
 		nseln = sel.Nodes();
 
@@ -436,7 +437,8 @@ void FERigidWallInterface::ContactStiffness()
 		FESurfaceElement& se = m_ss.Element(j);
 		m_ss.UnpackElement(se);
 
-		sLM = se.LM();
+		// get the element's LM vector
+		m_ss.UnpackLM(se, sLM);
 
 		nseln = se.Nodes();
 

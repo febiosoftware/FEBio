@@ -353,8 +353,8 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			// copy the LM vector
-			sLM = se.LM();
+			// get the element's LM vector
+			ss.UnpackLM(se, sLM);
 
 			// nodal coordinates
 			vec3d* r0 = se.r0();
@@ -398,7 +398,9 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 					ms.UnpackElement(me);
 
 					int nmeln = me.Nodes();
-					mLM = me.LM();
+
+					// get the element's LM vector
+					ms.UnpackLM(me, mLM);
 
 					// calculate degrees of freedom
 					int ndof = 3*(nseln + nmeln);
@@ -537,8 +539,8 @@ void FEFacet2FacetSliding::ContactStiffness()
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			// copy the LM vector
-			sLM = se.LM();
+			// get the element's LM vector
+			ss.UnpackLM(se, sLM);
 
 			// nodal coordinates
 			vec3d* r0 = se.r0();
@@ -582,7 +584,9 @@ void FEFacet2FacetSliding::ContactStiffness()
 					ms.UnpackElement(me);
 
 					int nmeln = me.Nodes();
-					mLM = me.LM();
+
+					// get the element's LM vector
+					ms.UnpackLM(me, mLM);
 
 					// calculate degrees of freedom
 					int ndof = 3*(nseln + nmeln);

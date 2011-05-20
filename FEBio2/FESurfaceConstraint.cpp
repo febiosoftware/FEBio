@@ -319,7 +319,8 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 			FESurfaceElement& sel = ss.Element(j);
 			ss.UnpackElement(sel);
 
-			sLM = sel.LM();
+			// get the element's LM vector
+			ss.UnpackLM(sel, sLM);
 
 			nseln = sel.Nodes();
 
@@ -471,7 +472,7 @@ void FESurfaceConstraint::ContactStiffness()
 		ms.UnpackElement(*pref);
 
 		// grab the data we'll need for this element
-		LM0 = pref->LM();
+		ms.UnpackLM(*pref, LM0);
 		int ne0 = pref->Nodes();
 		for (j=0; j<ne0; ++j) n0[j] = pref->m_node[j];
 		r = ss.m_rs[nref][0];
@@ -522,7 +523,8 @@ void FESurfaceConstraint::ContactStiffness()
 			FESurfaceElement& se = ss.Element(j);
 			ss.UnpackElement(se);
 
-			sLM = se.LM();
+			// get the element's LM vector
+			ss.UnpackLM(se, sLM);
 
 			nseln = se.Nodes();
 

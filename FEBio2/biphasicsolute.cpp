@@ -53,9 +53,12 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		 BodyForces(fem, el, fe);
 		 }
 		 */
+
+		// Get the element's equation numbers
+		UnpackLM(el, lm);
 		
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 		
 		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
 		assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
@@ -65,7 +68,6 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		
 		// add fluid work to global residual
 		int neln = el.Nodes();
-		UnpackLM(el, lm);
 		int J;
 		for (j=0; j<neln; ++j)
 		{

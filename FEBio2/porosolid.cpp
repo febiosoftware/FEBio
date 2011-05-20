@@ -202,6 +202,8 @@ void FEPoroSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 	// element stiffness matrix
 	matrix ke;
 
+	vector<int> elm;
+
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
@@ -225,6 +227,9 @@ void FEPoroSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// calculate the element stiffness matrix
 		ElementPoroStiffness(fem, el, ke);
 
+		// get the element's LM vector
+		UnpackLM(el, elm);
+
 		// TODO: the problem here is that the LM array that is returned by the UnpackElement
 		// function does not give the equation numbers in the right order. For this reason we
 		// have to create a new lm array and place the equation numbers in the right order.
@@ -233,10 +238,10 @@ void FEPoroSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		vector<int> lm(ndof);
 		for (int i=0; i<neln; ++i)
 		{
-			lm[4*i  ] = el.LM()[3*i];
-			lm[4*i+1] = el.LM()[3*i+1];
-			lm[4*i+2] = el.LM()[3*i+2];
-			lm[4*i+3] = el.LM()[3*neln+i];
+			lm[4*i  ] = elm[3*i];
+			lm[4*i+1] = elm[3*i+1];
+			lm[4*i+2] = elm[3*i+2];
+			lm[4*i+3] = elm[3*neln+i];
 		}
 				
 		// assemble element matrix in global stiffness matrix

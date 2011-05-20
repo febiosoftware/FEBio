@@ -220,6 +220,7 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 	FEM& fem = solver.m_fem;
 
 	matrix ke;
+	vector<int> lm;
 
 	int npr = m_PC.size();
 	for (int m=0; m<npr; ++m)
@@ -254,8 +255,11 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 				// calculate pressure stiffness
 				PressureStiffness(el, ke, tn);
 
+				// get the element's LM vector
+				m_psurf->UnpackLM(el, lm);
+
 				// assemble element matrix in global stiffness matrix
-				solver.AssembleStiffness(el.m_node, el.LM(), ke);
+				solver.AssembleStiffness(el.m_node, lm, ke);
 			}
 		}
 	}
@@ -268,6 +272,7 @@ void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 	FEM& fem = solver.m_fem;
 
 	vector<double> fe;
+	vector<int> lm;
 
 	int npr = m_PC.size();
 	for (int i=0; i<npr; ++i)
@@ -292,7 +297,10 @@ void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 
 		if (m_blinear) LinearPressureForce(el, fe, tn); else PressureForce(el, fe, tn);
 
+		// get the element's LM vector
+		m_psurf->UnpackLM(el, lm);
+
 		// add element force vector to global force vector
-		solver.AssembleResidual(el.m_node, el.LM(), fe, R);
+		solver.AssembleResidual(el.m_node, lm, fe, R);
 	}
 }

@@ -241,6 +241,8 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 
 	matrix ke;
 
+	vector<int> lm;
+
 	int nfr = m_PC.size();
 	for (int m=0; m<nfr; ++m)
 	{
@@ -273,8 +275,11 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 					// calculate pressure stiffness
 					FluxStiffness(el, ke, wn, dt, m_bmixture);
 
+					// get the element's LM vector
+					m_psurf->UnpackLM(el, lm);
+
 					// assemble element matrix in global stiffness matrix
-					solver.AssembleStiffness(el.m_node, el.LM(), ke);
+					solver.AssembleStiffness(el.m_node, lm, ke);
 				}
 			}
 		}
@@ -289,6 +294,8 @@ void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 	double dt = fem.m_pStep->m_dt;
 
 	vector<double> fe;
+
+	vector<int> lm;
 
 	int nfr = m_PC.size();
 	for (int i=0; i<nfr; ++i)
@@ -315,8 +322,11 @@ void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 			else
 				FlowRate(el, fe, wn, dt, m_bmixture);
 
+			// get element's LM vector
+			m_psurf->UnpackLM(el, lm);
+
 			// add element force vector to global force vector
-			solver.AssembleResidual(el.m_node, el.LM(), fe, R);
+			solver.AssembleResidual(el.m_node, lm, fe, R);
 		}
 	}
 }

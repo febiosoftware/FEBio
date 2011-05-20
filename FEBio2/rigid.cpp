@@ -23,6 +23,8 @@ void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 	// element stiffness matrix
 	matrix ke;
 
+	vector<int> lm;
+
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
@@ -39,8 +41,11 @@ void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// add the inertial stiffness for dynamics
 		ElementInertialStiffness(fem, el, ke);
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, el.LM(), ke);
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
@@ -56,6 +61,8 @@ void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 
 	// element force vector
 	vector<double> fe;
+
+	vector<int> lm;
 
 	// loop over all elements
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -76,8 +83,11 @@ void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		// apply body force to rigid elements
 		BodyForces(fem, el, fe);
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 
@@ -129,6 +139,8 @@ void FERigidShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	// element force vector
 	vector<double> fe;
 
+	vector<int> lm;
+
 	int NS = m_Elem.size();
 	for (int i=0; i<NS; ++i)
 	{
@@ -146,8 +158,11 @@ void FERigidShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		// apply body forces to shells
 		BodyForces(fem, el, fe);
 
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
 		// assemble the residual
-		psolver->AssembleResidual(el.m_node, el.LM(), fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 

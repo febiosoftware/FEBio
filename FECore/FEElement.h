@@ -99,8 +99,6 @@ public:
 
 	int Type() const { return m_pT->m_ntype; } 
 
-	vector<int>& LM() { return m_pT->LM; }
-
 	//! Get the element's material ID
 	int GetMatID() const { return m_mat; } 
 

@@ -611,8 +611,8 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 			ss.UnpackElement(sel);
 			nseln = sel.Nodes();
 
-			// get the LM array
-			sLM = sel.LM();
+			// get the element's LM array
+			ss.UnpackLM(sel, sLM);
 
 			// nodal coordinates
 			r0 = sel.r0();
@@ -662,7 +662,7 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 					// contact force.
 					// get the master element
 					FESurfaceElement& mel = *ss.m_pme[m];
-					ms.UnpackElement(mel, FE_UNPACK_LM);		// can't delete yet since it is used in ContactNodalForce
+					ms.UnpackElement(mel);		// can't delete yet since it is used in ContactNodalForce
 					ms.UnpackLM(mel, mLM);
 
 					// calculate the degrees of freedom
@@ -977,8 +977,8 @@ void FESlidingInterface::ContactStiffness()
 			ss.UnpackElement(se);
 			nseln = se.Nodes();
 
-			// get the LM array
-			sLM = se.LM();
+			// get the element's LM array
+			ss.UnpackLM(se, sLM);
 
 			// get the nodal coordinates
 			r0 = se.r0();
@@ -1019,8 +1019,9 @@ void FESlidingInterface::ContactStiffness()
 					FESurfaceElement& me = *ss.m_pme[m];
 					ms.UnpackElement(me);
 
-					// get the masters' LM array
-					mLM = me.LM();
+					// get the masters element's LM array
+					ms.UnpackLM(me, mLM);
+
 					nmeln = me.Nodes();
 					ndof = 3*(nmeln+1);
 
