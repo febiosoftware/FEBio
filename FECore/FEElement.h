@@ -87,8 +87,6 @@ public:
 	vec3d* r0() { return &m_pT->r0[0]; }		// material coordintes
 	vec3d* rt() { return &m_pT->rt[0]; }		// spatial coordinates
 
-	double* pt() { return &m_pT->pt[0];}		// nodal pressures
-
 	double* ct() { return &m_pT->ct[0];}		// nodal concentrations
 	
 	int GaussPoints() const { return m_pT->nint; } 

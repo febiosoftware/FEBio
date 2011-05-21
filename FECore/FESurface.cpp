@@ -158,7 +158,6 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 
 	vec3d* rt = el.rt();
 	vec3d* r0 = el.r0();
-	double* pt = el.pt();
 	double* ct = el.ct();
 
 	int N = el.Nodes();
@@ -175,9 +174,6 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 
 		// current coordinates (= spatial coordinates)
 		rt[i] = node.m_rt;
-
-		// current nodal pressures
-		pt[i] = node.m_pt;
 
 		// current nodal concentrations
 		ct[i] = node.m_ct;

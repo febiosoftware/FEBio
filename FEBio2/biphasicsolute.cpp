@@ -888,6 +888,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 	double* gw;
 	vec3d r0[8];
 	vec3d rt[8];
+	double p[8];
 
 	FEMesh& mesh = *m_pMesh;
 	
@@ -920,6 +921,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 		{
 			r0[j] = mesh.Node(el.m_node[j]).m_r0;
 			rt[j] = mesh.Node(el.m_node[j]).m_rt;
+			p[j] = mesh.Node(el.m_node[j]).m_pt;
 		}
 		
 		// get the material
@@ -957,10 +959,10 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			FESolutePoroElasticMaterialPoint& ppt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
 			
 			// evaluate fluid pressure at gauss-point
-			ppt.m_p = el.Evaluate(el.pt(), n);
+			ppt.m_p = el.Evaluate(p, n);
 			
 			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = el.gradient(el.pt(), n);
+			ppt.m_gradp = el.gradient(p, n);
 			
 			// evaluate effective solute concentration at gauss-point
 			ppt.m_c = el.Evaluate(el.ct(), n);

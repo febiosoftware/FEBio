@@ -556,6 +556,10 @@ void FEPoroSolidDomain::PoroMaterialStiffness(FEM& fem, FESolidElement &el, matr
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
+	// nodal pressures
+	double pn[8];
+	for (i=0; i<neln; ++i) pn[i] = m_pMesh->Node(el.m_node[i]).m_pt;
+
 	// see if this is a poroelastic material
 	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
 	assert(dynamic_cast<FEPoroElastic*>(pmat));
@@ -583,7 +587,7 @@ void FEPoroSolidDomain::PoroMaterialStiffness(FEM& fem, FESolidElement &el, matr
 
 		// evaluate fluid pressure at gauss-point
 		FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-		ppt.m_p = el.Evaluate(el.pt(), n);
+		ppt.m_p = el.Evaluate(pn, n);
 
 		// get the 'D' matrix
 		tens4ds C = pmat->Tangent(mp);
@@ -673,6 +677,7 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 	int nint, neln;
 	double* gw;
 	vec3d r0[8], rt[8];
+	double pn[8];
 
 	assert(fem.m_pStep->m_nModule == FE_POROELASTIC);
 	FEMesh& mesh = *m_pMesh;
@@ -700,6 +705,7 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 		{
 			r0[j] = mesh.Node(el.m_node[j]).m_r0;
 			rt[j] = mesh.Node(el.m_node[j]).m_rt;
+			pn[j] = mesh.Node(el.m_node[j]).m_pt;
 		}
 
 		// get the integration weights
@@ -737,10 +743,10 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 			FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
 
 			// evaluate fluid pressure at gauss-point
-			ppt.m_p = el.Evaluate(el.pt(), n);
+			ppt.m_p = el.Evaluate(pn, n);
 
 			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = el.gradient(el.pt(), n);
+			ppt.m_gradp = el.gradient(pn, n);
 
 			// calculate the stress at this material point
 			pt.s = pm->Stress(mp);

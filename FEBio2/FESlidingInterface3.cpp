@@ -676,7 +676,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 		// get the nodal pressures
 		if (sporo)
 		{
-			for (int j=0; j<ne; ++j) ps[j] = el.pt()[j];
+			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).m_pt;
 		}
 		
 		// get the nodal concentrations
@@ -1222,6 +1222,9 @@ void FESlidingInterface3::ContactStiffness()
 			// get nr of nodes and integration points
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
+
+			double pn[4];
+			for (j=0; j<4; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
 			
 			// get the element's LM vector
 			ss.UnpackLM(se, sLM);
@@ -1243,9 +1246,9 @@ void FESlidingInterface3::ContactStiffness()
 				// pressure
 				if (sporo)
 				{
-					pt[j] = se.eval(se.pt(), j);
-					dpr[j] = se.eval_deriv1(se.pt(), j);
-					dps[j] = se.eval_deriv2(se.pt(), j);
+					pt[j] = se.eval(pn, j);
+					dpr[j] = se.eval_deriv1(pn, j);
+					dps[j] = se.eval_deriv2(pn, j);
 				}
 				// concentration
 				if (ssolu)
@@ -1270,6 +1273,10 @@ void FESlidingInterface3::ContactStiffness()
 					
 					// get the nr of master nodes
 					int nmeln = me.Nodes();
+
+					// nodal pressures
+					double pm[4];
+					for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
 					
 					// get the element's LM vector
 					ms.UnpackLM(me, mLM);
@@ -1584,8 +1591,8 @@ void FESlidingInterface3::ContactStiffness()
 							//-------------------------------------
 							
 							double dpmr, dpms;
-							dpmr = me.eval_deriv1(me.pt(), r, s);
-							dpms = me.eval_deriv2(me.pt(), r, s);
+							dpmr = me.eval_deriv1(pm, r, s);
+							dpms = me.eval_deriv2(pm, r, s);
 							
 							double dcmr, dcms;
 							dcmr = me.eval_deriv1(me.ct(), r, s);
@@ -1682,8 +1689,8 @@ void FESlidingInterface3::ContactStiffness()
 							//-------------------------------------
 							
 							double dpmr, dpms;
-							dpmr = me.eval_deriv1(me.pt(), r, s);
-							dpms = me.eval_deriv2(me.pt(), r, s);
+							dpmr = me.eval_deriv1(pm, r, s);
+							dpms = me.eval_deriv2(pm, r, s);
 							
 							for (k=0; k<nseln+nmeln; ++k)
 								for (l=0; l<nseln+nmeln; ++l)

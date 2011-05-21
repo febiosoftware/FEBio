@@ -904,16 +904,12 @@ void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	if (nflag & FE_UNPACK_DATA)
 	{
 		int N = el.Nodes();
-		double* pt = el.pt();
 		double* ct = el.ct();
 		for (int i=0; i<N; ++i)
 		{
 			int n = el.m_node[i];
 
 			FENode& node = m_pMesh->Node(n);
-
-			// current nodal pressures
-			pt[i] = node.m_pt;
 
 			// current nodal concentrations
 			ct[i] = node.m_ct;

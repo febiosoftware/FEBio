@@ -55,7 +55,6 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 	vec3d* rt = el.rt();
 	vec3d* r0 = el.r0();
-	double* pt = el.pt();
 
 	int N = el.Nodes();
 
@@ -71,9 +70,6 @@ void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
 
 		// current coordinates (= spatial coordinates)
 		rt[i] = node.m_rt;
-
-		// current nodal pressures
-		pt[i] = node.m_pt;
 	}
 
 	// unpack the traits data

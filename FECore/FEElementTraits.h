@@ -57,7 +57,6 @@ public:
 		
 		r0.resize(ne);
 		rt.resize(ne);
-		pt.resize(ne);
 		ct.resize(ne);
 
 		H.Create(ni, ne);
@@ -75,7 +74,6 @@ public:
 	// These variables are filled when unpacking the element
 	std::vector<vec3d>  r0;	//!< initial coordinates
 	std::vector<vec3d>  rt;	//!< current coordinates
-	std::vector<double> pt;	//!< nodal pressures
 	std::vector<double> ct;	//!< nodal concentrations
 
 	int nint;	//!< number of integration points

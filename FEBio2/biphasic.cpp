@@ -513,6 +513,10 @@ void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, m
 	// see if this is a biphasic material
 	FEBiphasic* pmat = dynamic_cast<FEBiphasic*>(fem.GetMaterial(el.GetMatID()));
 	assert(pmat);
+
+	// nodal pressures
+	double pn[8];
+	for (i=0; i<neln; ++i) pn[i] = m_pMesh->Node(el.m_node[i]).m_pt;
 	
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -537,7 +541,7 @@ void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, m
 		
 		// evaluate fluid pressure at gauss-point
 		FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
-		ppt.m_p = el.Evaluate(el.pt(), n);
+		ppt.m_p = el.Evaluate(pn, n);
 		
 		// get the 'D' matrix
 		tens4ds C = pmat->Tangent(mp);
@@ -630,6 +634,7 @@ void FEBiphasicDomain::UpdateStresses(FEM &fem)
 
 	vec3d r0[8];
 	vec3d rt[8];
+	double pn[8];
 
 	FEMesh& mesh = *m_pMesh;
 
@@ -662,6 +667,7 @@ void FEBiphasicDomain::UpdateStresses(FEM &fem)
 		{
 			r0[j] = mesh.Node(el.m_node[j]).m_r0;
 			rt[j] = mesh.Node(el.m_node[j]).m_rt;
+			pn[j] = mesh.Node(el.m_node[j]).m_pt;
 		}
 		
 		// get the material
@@ -699,10 +705,10 @@ void FEBiphasicDomain::UpdateStresses(FEM &fem)
 			FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
 			
 			// evaluate fluid pressure at gauss-point
-			ppt.m_p = el.Evaluate(el.pt(), n);
+			ppt.m_p = el.Evaluate(pn, n);
 			
 			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = el.gradient(el.pt(), n);
+			ppt.m_gradp = el.gradient(pn, n);
 			
 			if (dynamic_cast<FEMicroMaterial*>(pme))
 			{

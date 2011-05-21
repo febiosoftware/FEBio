@@ -250,12 +250,13 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 		if (!el.IsRigid())
 		{
 			m_psurf->UnpackElement(el);
+			int neln = el.Nodes();
 
 			// fluid pressure
-			double* pt = el.pt();
+			double pt[4];
+			for (int i=0; i<neln; ++i) pt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_pt;
 			
 			// calculate nodal normal tractions
-			int neln = el.Nodes();
 			vector<double> tn(neln);
 
 			if (m_blinear == false)
@@ -301,12 +302,13 @@ void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
 		LOAD& pc = m_PC[i];
 		FESurfaceElement& el = m_psurf->Element(i);
 		m_psurf->UnpackElement(el);
+		int neln = el.Nodes();
 
 		// fluid pressure
-		double* pt = el.pt();
+		double pt[4];
+		for (int j=0; j<neln; ++j) pt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_pt;
 
 		// calculate nodal normal tractions
-		int neln = el.Nodes();
 		vector<double> tn(neln);
 
 		double g = fem.GetLoadCurve(pc.lc)->Value();
