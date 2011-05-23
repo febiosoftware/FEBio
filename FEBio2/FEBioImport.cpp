@@ -3702,7 +3702,6 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 					}
 					else if (tag == "node")
 					{
-						pf->m_ntype = FEPointBodyForce::NODE;
 						tag.value(pf->m_inode); 
 						pf->m_inode -= 1;
 					}

@@ -11,7 +11,7 @@ BEGIN_PARAMETER_LIST(FEPointBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_a, FE_PARAM_DOUBLE, "a");
 	ADD_PARAMETER(m_b, FE_PARAM_DOUBLE, "b");
 	ADD_PARAMETER(m_rc, FE_PARAM_VEC3D, "rc");
-//	ADD_PARAMETER(m_inode, FE_PARAM_INT, "node");
+	ADD_PARAMETER(m_inode, FE_PARAM_INT, "node");
 	ADD_PARAMETER(m_brigid, FE_PARAM_BOOL, "rigid");
 	ADD_PARAMETERV(m_rlc, FE_PARAM_INTV, 3, "rlc");
 END_PARAMETER_LIST();
@@ -23,7 +23,6 @@ FEPointBodyForce::FEPointBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 	m_rlc[0] = m_rlc[1] = m_rlc[2] = -1; 
 	m_pel = 0; 
 	m_brigid = true; 
-	m_ntype = POINT; 
 	m_inode = -1; 
 }
 
@@ -73,13 +72,13 @@ void FEPointBodyForce::Serialize(DumpFile &ar)
 	{
 		ar << m_a << m_b << m_rc;
 		ar << m_rlc[0] << m_rlc[1] << m_rlc[2];
-		ar << m_ntype << m_inode << m_brigid;
+		ar << m_inode << m_brigid;
 	}
 	else
 	{
 		ar >> m_a >> m_b >> m_rc;
 		ar >> m_rlc[0] >> m_rlc[1] >> m_rlc[2];
-		ar >> m_ntype >> m_inode >> m_brigid;
+		ar >> m_inode >> m_brigid;
 	}
 }
 
@@ -88,7 +87,7 @@ void FEPointBodyForce::Init()
 {
 	assert(m_pfem);
 
-	if (m_ntype == POINT)
+	if (m_inode == -1)
 	{
 		if (!m_brigid)
 		{
@@ -106,7 +105,6 @@ void FEPointBodyForce::Init()
 		// make sure we don't move the point
 		m_rlc[0] = m_rlc[1] = m_rlc[2] = -1;
 
-		assert(m_inode >= 0);
 		FEMesh& m = m_pfem->m_mesh;
 		m_rc = m.Node(m_inode).m_r0;
 	}
@@ -116,7 +114,7 @@ void FEPointBodyForce::Init()
 // Update the position of the body force
 void FEPointBodyForce::Update()
 {
-	if (m_ntype == POINT)
+	if (m_inode == -1)
 	{
 		if (m_pel)
 		{

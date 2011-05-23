@@ -5,12 +5,6 @@
 class FEPointBodyForce : public FEBodyForce
 {
 public:
-	// type of force center:
-	// POINT = a global point, rigid or not
-	// NODE = a node of the mesh
-	enum { POINT, NODE };
-
-public:
 	FEPointBodyForce(FEModel* pfem);
 
 	vec3d force(FEMaterialPoint& mp);
@@ -25,7 +19,7 @@ public:
 	double	m_a, m_b;
 	vec3d	m_rc;
 	int		m_rlc[3];
-	int		m_ntype;
+	
 	int		m_inode;
 
 	bool	m_brigid;
