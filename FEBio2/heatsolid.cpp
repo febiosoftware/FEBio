@@ -51,7 +51,6 @@ void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	int i, n;
 
 	vec3d* rt = el.rt();
-	double* ct = el.ct();
 
 	int N = el.Nodes();
 
@@ -64,9 +63,6 @@ void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 
 		// current coordinates (= spatial coordinates)
 		rt[i] = node.m_rt;
-
-		// current nodal concentrations
-		ct[i] = node.m_ct;
 	}
 
 	// unpack the traits data

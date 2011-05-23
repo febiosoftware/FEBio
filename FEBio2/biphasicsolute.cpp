@@ -765,7 +765,11 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 	
 	// jacobian
 	double Ji[3][3], detJt;
-	
+
+	// nodal concentrations
+	double ct[8];
+	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).m_ct;
+
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 	
@@ -796,7 +800,7 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 		
 		// evaluate concentration at gauss-point
 		FESolutePoroElasticMaterialPoint& ppt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
-		ppt.m_c = el.Evaluate(el.ct(), n);
+		ppt.m_c = el.Evaluate(ct, n);
 		
 		// get the 'D' matrix
 		tens4ds C = pmat->Tangent(mp);
@@ -888,7 +892,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 	double* gw;
 	vec3d r0[8];
 	vec3d rt[8];
-	double p[8];
+	double pn[8], ct[8];
 
 	FEMesh& mesh = *m_pMesh;
 	
@@ -921,7 +925,8 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 		{
 			r0[j] = mesh.Node(el.m_node[j]).m_r0;
 			rt[j] = mesh.Node(el.m_node[j]).m_rt;
-			p[j] = mesh.Node(el.m_node[j]).m_pt;
+			pn[j] = mesh.Node(el.m_node[j]).m_pt;
+			ct[j] = mesh.Node(el.m_node[j]).m_ct;
 		}
 		
 		// get the material
@@ -959,16 +964,16 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			FESolutePoroElasticMaterialPoint& ppt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
 			
 			// evaluate fluid pressure at gauss-point
-			ppt.m_p = el.Evaluate(p, n);
+			ppt.m_p = el.Evaluate(pn, n);
 			
 			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = el.gradient(p, n);
+			ppt.m_gradp = el.gradient(pn, n);
 			
 			// evaluate effective solute concentration at gauss-point
-			ppt.m_c = el.Evaluate(el.ct(), n);
+			ppt.m_c = el.Evaluate(ct, n);
 			
 			// calculate the gradient of c at gauss-point
-			ppt.m_gradc = el.gradient(el.ct(), n);
+			ppt.m_gradc = el.gradient(ct, n);
 			
 			if (dynamic_cast<FEMicroMaterial*>(pme))
 			{

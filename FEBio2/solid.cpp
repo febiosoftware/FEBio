@@ -900,22 +900,6 @@ void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 		}
 	}
 
-	// copy nodal data to element arrays
-	if (nflag & FE_UNPACK_DATA)
-	{
-		int N = el.Nodes();
-		double* ct = el.ct();
-		for (int i=0; i<N; ++i)
-		{
-			int n = el.m_node[i];
-
-			FENode& node = m_pMesh->Node(n);
-
-			// current nodal concentrations
-			ct[i] = node.m_ct;
-		}
-	}
-
 	// unpack the traits data
 	if (nflag & FE_UNPACK_TRAITS) el.UnpackTraitsData(nflag);
 }

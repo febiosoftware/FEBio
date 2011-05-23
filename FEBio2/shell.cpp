@@ -772,7 +772,6 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	vec3d* r0 = se.r0();
 	vec3d* D0 = se.D0();
 	vec3d* Dt = se.Dt();
-	double* ct = se.ct();
 
 	int N = se.Nodes();
 
@@ -789,9 +788,6 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 		// current coordinates (= spatial coordinates)
 		rt[i] = node.m_rt;
 
-		// current nodal concentrations
-		ct[i] = node.m_ct;
-		
 		// intial director
 		D0[i] = node.m_D0;
 

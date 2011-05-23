@@ -682,7 +682,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 		// get the nodal concentrations
 		if (ssolu)
 		{
-			for (int j=0; j<ne; ++j) cs[j] = el.ct()[j];
+			for (int j=0; j<ne; ++j) cs[j] = mesh.Node(el.m_node[j]).m_ct;
 		}
 		
 		for (int j=0; j<nint; ++j, ++n)
@@ -1223,8 +1223,12 @@ void FESlidingInterface3::ContactStiffness()
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			double pn[4];
-			for (j=0; j<4; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
+			double pn[4], cn[4];
+			for (j=0; j<4; ++j)
+			{
+				pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
+				cn[j] = ss.GetMesh()->Node(se.m_node[j]).m_ct;
+			}
 			
 			// get the element's LM vector
 			ss.UnpackLM(se, sLM);
@@ -1253,9 +1257,9 @@ void FESlidingInterface3::ContactStiffness()
 				// concentration
 				if (ssolu)
 				{
-					ct[j] = se.eval(se.ct(), j);
-					dcr[j] = se.eval_deriv1(se.ct(), j);
-					dcs[j] = se.eval_deriv2(se.ct(), j);
+					ct[j] = se.eval(cn, j);
+					dcr[j] = se.eval_deriv1(cn, j);
+					dcs[j] = se.eval_deriv2(cn, j);
 				}
 			}
 			
@@ -1275,8 +1279,12 @@ void FESlidingInterface3::ContactStiffness()
 					int nmeln = me.Nodes();
 
 					// nodal pressures
-					double pm[4];
-					for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
+					double pm[4], cm[4];
+					for (k=0; k<nmeln; ++k) 
+					{
+						pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
+						cm[k] = ms.GetMesh()->Node(me.m_node[k]).m_ct;
+					}
 					
 					// get the element's LM vector
 					ms.UnpackLM(me, mLM);
@@ -1595,8 +1603,8 @@ void FESlidingInterface3::ContactStiffness()
 							dpms = me.eval_deriv2(pm, r, s);
 							
 							double dcmr, dcms;
-							dcmr = me.eval_deriv1(me.ct(), r, s);
-							dcms = me.eval_deriv2(me.ct(), r, s);
+							dcmr = me.eval_deriv1(cm, r, s);
+							dcms = me.eval_deriv2(cm, r, s);
 							
 							for (k=0; k<nseln+nmeln; ++k)
 								for (l=0; l<nseln+nmeln; ++l)
