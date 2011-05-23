@@ -458,8 +458,6 @@ void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &
 
 	// setup the material point
 	// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-//	el.defgrad(pt.F, n);
-//	pt.J = el.detF(n);
 	pt.avgJ = el.m_eJ;
 	pt.avgp = el.m_ep;
 

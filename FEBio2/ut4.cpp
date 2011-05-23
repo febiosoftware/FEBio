@@ -287,7 +287,7 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 		ve = TetVolume(el.rt());
 
 		// calculate the deformation gradient
-		el.defgrad(Fe, 0);
+		defgrad(el, Fe, 0);
 
 		// now assign one-quart to each node
 		for (int j=0; j<4; ++j) 
@@ -1136,8 +1136,6 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-//		el.defgrad(pt.F, n);
-//		pt.J = el.detF(n);
 		pt.avgJ = el.m_eJ;
 		pt.avgp = el.m_ep;
 

@@ -238,9 +238,6 @@ public:
 	double detJt(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJt[n]; }
 	double detJ0(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJ0[n]; }
 
-	//! calculate deformation gradient at integration point n
-	double defgrad(mat3d& F, int n);
-
 	//! evaluate spatial gradient of scalar field at integration point
 	vec3d gradient(double* fn, int n)
 	{
@@ -551,8 +548,6 @@ public:
 
 	double detJ0(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJ0[n]; }
 	double detJt(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJt[n]; }
-
-	double defgrad(mat3d& F, int n);
 
 public:
 	double	m_eJ;	//!< average dilatation

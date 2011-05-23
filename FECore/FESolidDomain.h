@@ -29,6 +29,9 @@ public:
 	//! find the element in which point y lies
 	FESolidElement* FindElement(vec3d y, double r[3]);
 
+	//! Calculate deformation gradient at integration point n
+	double defgrad(FESolidElement& el, mat3d& F, int n);
+
 protected:
 	vector<int>				m_Node;		//!< node list
 	vector<FESolidElement>	m_Elem;		//!< array of elements

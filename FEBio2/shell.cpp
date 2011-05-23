@@ -396,9 +396,7 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 		// ------------ constitutive component --------------
 
 		// setup the material point
-//		el.defgrad(pt.F, n);
-//		pt.J = el.detF(n);
-
+		// NOTE: deformation gradient has already been calculated in stress routine
 		pt.avgJ = el.m_eJ;
 		pt.avgp = el.m_ep;
 
@@ -695,8 +693,7 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 			pt.rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
-			el.defgrad(pt.F, n);
-			pt.J = pt.F.det();
+			pt.J = defgrad(el, pt.F, n);
 
 			// three-field element variables
 			pt.avgJ = el.m_eJ;

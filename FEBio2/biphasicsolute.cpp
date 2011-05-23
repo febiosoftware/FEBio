@@ -793,8 +793,6 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 		
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		//		el.defgrad(pt.F, n);
-		//		pt.J = el.detF(n);
 		pt.avgJ = el.m_eJ;
 		pt.avgp = el.m_ep;
 		
@@ -954,7 +952,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			pt.rt = el.Evaluate(rt, n);
 			
 			// get the deformation gradient and determinant
-			pt.J = el.defgrad(pt.F, n);
+			pt.J = defgrad(el, pt.F, n);
 			
 			// three-field element variables
 			pt.avgJ = el.m_eJ;
