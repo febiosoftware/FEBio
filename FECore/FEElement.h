@@ -183,7 +183,7 @@ public:
 	double* Grt(int n) { return ((FESolidElementTraits*)(m_pT))->Grt[n]; }	// shape function 2nd derivative to rt
 	double* Gst(int n) { return ((FESolidElementTraits*)(m_pT))->Gst[n]; }	// shape function 2nd derivative to st
 	double* Gtt(int n) { return ((FESolidElementTraits*)(m_pT))->Gtt[n]; }	// shape function 2nd derivative to tt
-
+/*
 	void jact(double J[3][3], int n)
 	{
 		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jt[n];
@@ -191,7 +191,7 @@ public:
 		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
 	}
-
+*/
 /*	void invjact(double J[3][3], int n)
 	{
 		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jti[n];
@@ -200,6 +200,7 @@ public:
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
 	}
 */
+/*
 	void jac0(double J[3][3], int n)
 	{
 		mat3d& J0 = ((FESolidElementTraits*)(m_pT))->m_J0[n];
@@ -207,9 +208,9 @@ public:
 		J[1][0] = J0[1][0]; J[1][1] = J0[1][1]; J[1][2] = J0[1][2];
 		J[2][0] = J0[2][0]; J[2][1] = J0[2][1]; J[2][2] = J0[2][2];
 	}
-
-	double detJt(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJt[n]; }
-	double detJ0(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJ0[n]; }
+*/
+//	double detJt(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJt[n]; }
+//	double detJ0(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJ0[n]; }
 
 /*	//! evaluate spatial gradient of scalar field at integration point
 	vec3d gradient(double* fn, int n)
@@ -511,8 +512,8 @@ public:
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
 	}
 */
-	double detJ0(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJ0[n]; }
-	double detJt(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJt[n]; }
+//	double detJ0(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJ0[n]; }
+//	double detJt(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJt[n]; }
 
 public:
 	double	m_eJ;	//!< average dilatation

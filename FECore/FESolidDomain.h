@@ -32,14 +32,20 @@ public:
 	//! Calculate deformation gradient at integration point n
 	double defgrad(FESolidElement& el, mat3d& F, int n);
 
-	//! calculate inverse jacobian w.r.t. reference frame
+	//! calculate inverse jacobian matrix w.r.t. reference frame
 	double invjac0(FESolidElement& el, double J[3][3], int n);
 
-	//! calculate inverse jacobian w.r.t. current frame
+	//! calculate inverse jacobian matrix w.r.t. current frame
 	double invjact(FESolidElement& el, double J[3][3], int n);
 
 	//! calculate gradient of function at integration points
 	vec3d gradient(FESolidElement& el, double* fn, int n);
+
+	//! calculate jacobian in reference frame
+	double detJ0(FESolidElement& el, int n);
+
+	//! calculate jacobian in current frame
+	double detJt(FESolidElement& el, int n);
 
 protected:
 	vector<int>				m_Node;		//!< node list

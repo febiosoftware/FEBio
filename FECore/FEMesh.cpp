@@ -284,7 +284,7 @@ double FEMesh::ElementVolume(FEElement& el)
 		pd->UnpackElement(*ph);
 		int nint = ph->GaussPoints();
 		double *w = ph->GaussWeights();
-		for (int n=0; n<nint; ++n) V += ph->detJ0(n)*w[n];
+		for (int n=0; n<nint; ++n) V += bd.detJ0(*ph, n)*w[n];
 	}
 
 	if (dynamic_cast<FEShellDomain*>(pd))
@@ -294,7 +294,7 @@ double FEMesh::ElementVolume(FEElement& el)
 		pd->UnpackElement(*ps);
 		int nint = ps->GaussPoints();
 		double *w = ps->GaussWeights();
-		for (int n=0; n<nint; ++n) V += ps->detJ0(n)*w[n];
+		for (int n=0; n<nint; ++n) V += sd.detJ0(*ps, n)*w[n];
 	}
 
 	FESurfaceElement* pf = dynamic_cast<FESurfaceElement*>(&el);

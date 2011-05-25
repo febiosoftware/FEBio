@@ -621,7 +621,7 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 		int neln = el.Nodes();
 		for (int n=0; n<nint; ++n)
 		{
-			detJ = el.detJ0(n)*gw[n];
+			detJ = detJ0(el, n)*gw[n];
 			Hn  = el.H(n);
 			gt = el.gt(n);
 

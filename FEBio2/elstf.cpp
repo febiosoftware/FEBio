@@ -838,7 +838,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 				// create the element mass matrix
 				for (n=0; n<nint; ++n)
 				{
-					double detJ0 = el.detJ0(n)*el.GaussWeights()[n];
+					double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
 
 					H = el.H(n);
 					for (i=0; i<neln; ++i)

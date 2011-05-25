@@ -125,15 +125,9 @@ public:
 		Grt.Create(ni, ne);
 		Gst.Create(ni, ne);
 		Gtt.Create(ni, ne);
-		
-		m_Jt.resize(ni);
-		m_detJt.resize(ni);
-
-		m_J0.resize(ni);
-		m_detJ0.resize(ni);
 	}
 
-	void UnpackData(int nflag);
+	void UnpackData(int nflag) {}
 
 public:
 	// gauss-point coordinates and weights
@@ -147,13 +141,6 @@ public:
 
 	// local second derivatives of shape functions at gauss points
 	matrix Grr, Gsr, Gtr, Grs, Gss, Gts, Grt, Gst, Gtt;
-	
-	// data used when unpacking
-	vector<mat3d>	m_Jt;		// jacobian
-	vector<double>	m_detJt;	// jacobian determinant
-
-	vector<mat3d>	m_J0;		// jacobian
-	vector<double>	m_detJ0;	// jacobian determinant
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -373,15 +360,9 @@ public:
 
 		D0.resize(ne);
 		Dt.resize(ne);
-
-		m_Jt.resize(ni);
-		m_detJt.resize(ni);
-
-		m_J0.resize(ni);
-		m_detJ0.resize(ni);
 	}
 
-	void UnpackData(int nflag);
+	void UnpackData(int nflag) {}
 
 public:
 	// gauss-point coordinates and weights
@@ -396,13 +377,6 @@ public:
 
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;
-
-	// data used when unpacking
-	std::vector<mat3d>	m_Jt;		// jacobian
-	std::vector<double>	m_detJt;	// jacobian determinant
-
-	std::vector<mat3d>	m_J0;		// jacobian
-	std::vector<double>	m_detJ0;	// jacobian determinant
 };
 
 ///////////////////////////////////////////////////////////////////////////////

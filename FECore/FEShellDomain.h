@@ -35,6 +35,9 @@ public:
 	// inverse jacobian with respect to current frame
 	double invjact(FEShellElement& el, double J[3][3], int n);
 
+	// jacobian with respect to reference frame
+	double detJ0(FEShellElement& el, int n);
+
 protected:
 	vector<int>				m_Node;	//!< node list
 	vector<FEShellElement>	m_Elem;	//!< array of elements

@@ -60,7 +60,7 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement&
 	const double *gw = elem.GaussWeights();
 
 	// jacobian
-	double Ji[3][3], detJt, detJ0;
+	double Ji[3][3], Jt, J0;
 
 	double *Gr, *Gs, *Gt;
 
@@ -68,12 +68,12 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement&
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		detJ0 = elem.detJ0(n);
-		detJt = invjact(elem, Ji, n);
+		J0 = detJ0(elem, n);
+		Jt = invjact(elem, Ji, n);
 
-		detJt *= gw[n];
+		Jt *= gw[n];
 
-		Ve += detJ0*gw[n];
+		Ve += J0*gw[n];
 
 		Gr = elem.Gr(n);
 		Gs = elem.Gs(n);
@@ -87,9 +87,9 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement&
 			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
 			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 
-			gradN[3*i  ] += Gx*detJt;
-			gradN[3*i+1] += Gy*detJt;
-			gradN[3*i+2] += Gz*detJt;
+			gradN[3*i  ] += Gx*Jt;
+			gradN[3*i+1] += Gy*Jt;
+			gradN[3*i+2] += Gz*Jt;
 		}
 	}
 
@@ -366,8 +366,8 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 
 		for (n=0; n<nint; ++n)
 		{
-			v += el.detJt(n)*gw[n];
-			V += el.detJ0(n)*gw[n];
+			v += detJt(el, n)*gw[n];
+			V += detJ0(el, n)*gw[n];
 		}
 
 		// calculate volume ratio

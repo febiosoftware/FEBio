@@ -126,7 +126,7 @@ void FEMicroMaterial::PrepRVE()
 		for (n=0; n<nint; ++n)
 		{
 			FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-			J = el.detJt(n);
+			J = bd.detJt(el, n);
 
 			ve += J*w[n];
 		}
@@ -219,7 +219,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 		for (n=0; n<nint; ++n)
 		{
 			FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-			J = el.detJt(n);
+			J = bd.detJt(el, n);
 
 			ve += J*w[n];
 			s += pt.s*(J*w[n]);

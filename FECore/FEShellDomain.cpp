@@ -239,3 +239,53 @@ double FEShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
 
 	return det;
 }
+
+//-----------------------------------------------------------------------------
+//! Calculate jacobian with respect to reference frame
+double FEShellDomain::detJ0(FEShellElement &el, int n)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d r0[4], D0[4];
+	for (i=0; i<neln; ++i)
+	{
+		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+		D0[i] = m_pMesh->Node(el.m_node[i]).m_D0;
+	}
+
+	// jacobian matrix
+	double* h0 = &el.m_h0[0];
+	double gt = el.gt(n);
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Hri = el.Hr(n)[i];
+		const double& Hsi = el.Hs(n)[i];
+		const double& Hi = el.H(n)[i];
+		
+		const double& x = r0[i].x;
+		const double& y = r0[i].y;
+		const double& z = r0[i].z;
+		
+		const double& dx = D0[i].x;
+		const double& dy = D0[i].y;
+		const double& dz = D0[i].z;
+		
+		double za = 0.5*gt*h0[i];
+		
+		J[0][0] += Hri*x + Hri*za*dx; J[0][1] += Hsi*x + Hsi*za*dx; J[0][2] += 0.5*h0[i]*Hi*dx;
+		J[1][0] += Hri*y + Hri*za*dy; J[1][1] += Hsi*y + Hsi*za*dy; J[1][2] += 0.5*h0[i]*Hi*dy;
+		J[2][0] += Hri*z + Hri*za*dz; J[2][1] += Hsi*z + Hsi*za*dz; J[2][2] += 0.5*h0[i]*Hi*dz;
+	}
+			
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+	return det;			
+}

@@ -363,3 +363,89 @@ vec3d FESolidDomain::gradient(FESolidElement& el, double* fn, int n)
 
 	return gradf;
 }
+
+//-----------------------------------------------------------------------------
+//! Calculate jacobian with respect to current frame
+double FESolidDomain::detJt(FESolidElement &el, int n)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	vec3d rt[8];
+	for (i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+
+	// shape function derivatives
+	double* Grn = el.Gr(n);
+	double* Gsn = el.Gs(n);
+	double* Gtn = el.Gt(n);
+	
+	// jacobian matrix
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Gri = Grn[i];
+		const double& Gsi = Gsn[i];
+		const double& Gti = Gtn[i];
+		
+		const double& x = rt[i].x;
+		const double& y = rt[i].y;
+		const double& z = rt[i].z;
+		
+		J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+		J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+		J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+	}
+		
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+	return det;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate jacobian with respect to reference frame
+double FESolidDomain::detJ0(FESolidElement &el, int n)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	vec3d r0[8];
+	for (i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+
+	// shape function derivatives
+	double* Grn = el.Gr(n);
+	double* Gsn = el.Gs(n);
+	double* Gtn = el.Gt(n);
+	
+	// jacobian matrix
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Gri = Grn[i];
+		const double& Gsi = Gsn[i];
+		const double& Gti = Gtn[i];
+		
+		const double& x = r0[i].x;
+		const double& y = r0[i].y;
+		const double& z = r0[i].z;
+		
+		J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+		J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+		J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+	}
+		
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+	return det;
+}

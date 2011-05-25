@@ -329,7 +329,7 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 			pt.r0 = el.Evaluate(r0, n);
 			pt.rt = el.Evaluate(rt, n);
 
-			detJ = el.detJ0(n)*gw[n];
+			detJ = detJ0(el, n)*gw[n];
 
 			// get the force
 			f = BF.force(mp);
@@ -382,7 +382,7 @@ void FEElasticSolidDomain::BodyForceStiffness(FEM& fem, FESolidElement &el, matr
 		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
-			detJ = el.detJ0(n)*gw[n];
+			detJ = detJ0(el, n)*gw[n];
 
 			// get the stiffness
 			K = BF.stiffness(mp);
@@ -703,7 +703,7 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el
 	double* H;
 
 	// jacobian
-	double detJ0;
+	double J0;
 
 	// get the material
 	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
@@ -724,11 +724,11 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el
 	for (n=0; n<nint; ++n)
 	{
 		H = el.H(n);
-		detJ0 = el.detJ0(n)*gw[n];
+		J0 = detJ0(el, n)*gw[n];
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
 			{
-				kab = a*H[i]*H[j]*detJ0*d;
+				kab = a*H[i]*H[j]*J0*d;
 				ke[3*i  ][3*j  ] += kab;
 				ke[3*i+1][3*j+1] += kab;
 				ke[3*i+2][3*j+2] += kab;

@@ -89,7 +89,7 @@ void FERigidBody::Update()
 					for (int n=0; n<nint; ++n)
 					{
 						// calculate jacobian
-						detJ = el.detJ0(n);
+						detJ = pbd->detJ0(el, n);
 
 						// shape functions at integration point
 						H = el.H(n);
