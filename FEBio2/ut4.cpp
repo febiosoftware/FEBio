@@ -422,7 +422,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 				double w = -0.25* Ve;
 
 				// calculate the jacobian
-				el.invjac0(Ji, 0);
+				invjac0(el, Ji, 0);
 
 				// get the shape function derivatives
 				const double* Gr, *Gs, *Gt;
@@ -695,7 +695,7 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 
 		// calculate the jacobian
 		double Ji[3][3];
-		ei.invjac0(Ji, 0);
+		invjac0(ei, Ji, 0);
 
 		// get the shape function derivatives
 		const double* Gr, *Gs, *Gt;
@@ -838,7 +838,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke)
 
 		// calculate the jacobian
 		double Ji[3][3];
-		el.invjac0(Ji, 0);
+		invjac0(el, Ji, 0);
 
 		// get the shape function derivatives
 		const double* Gr, *Gs, *Gt;

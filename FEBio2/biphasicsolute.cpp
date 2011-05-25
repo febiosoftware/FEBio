@@ -145,7 +145,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 		
 		// we need to calculate the divergence of v. To do this we use
 		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		el.invjac0(J0i, n);
+		invjac0(el, J0i, n);
 		
 		// next we calculate the deformation gradient
 		mat3d Fp;
@@ -267,7 +267,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		
 		// we need to calculate the divergence of v. To do this we use
 		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		el.invjac0(J0i, n);
+		invjac0(el, J0i, n);
 		vec3d G1(J0i[0][0],J0i[0][1],J0i[0][2]);
 		vec3d G2(J0i[1][0],J0i[1][1],J0i[1][2]);
 		vec3d G3(J0i[2][0],J0i[2][1],J0i[2][2]);
@@ -502,7 +502,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		
 		// we need to calculate the divergence of v. To do this we use
 		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		el.invjac0(J0i, n);
+		invjac0(el, J0i, n);
 		vec3d G1(J0i[0][0],J0i[0][1],J0i[0][2]);
 		vec3d G2(J0i[1][0],J0i[1][1],J0i[1][2]);
 		vec3d G3(J0i[2][0],J0i[2][1],J0i[2][2]);

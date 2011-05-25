@@ -105,7 +105,7 @@ void FESolidElementTraits::UnpackData(int nflag)
 			// if det(J) > 0 calculate the inverse of the jacobian
 			if (det > 0)
 			{
-				deti = 1.0 / det;
+/*				deti = 1.0 / det;
 				
 				Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
 				Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
@@ -118,55 +118,17 @@ void FESolidElementTraits::UnpackData(int nflag)
 				Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
 				Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
 				Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+*/
 			}
 			else throw NegativeJacobian(m_pel->m_nID, n+1, det);
 			
 			if (nflag & FE_UNPACK_JAC0)
 			{
 				m_J0 [n] = J;
-				m_J0i[n] = Ji;
+//				m_J0i[n] = Ji;
 				m_detJ0[n] = det;
 			}
 		}
-		
-		// --- calculate deformation gradient F ---
-		// note that we need Ji0 for the deformation gradient!
-		
-		/*		if (nflag & FE_UNPACK_DEFGRAD)
-		 {
-		 F[0][0] = F[0][1] = F[0][2] = 0;
-		 F[1][0] = F[1][1] = F[1][2] = 0;
-		 F[2][0] = F[2][1] = F[2][2] = 0;
-		 for (i=0; i<neln; ++i)
-		 {
-		 const double& Gri = Grn[i];
-		 const double& Gsi = Gsn[i];
-		 const double& Gti = Gtn[i];
-		 
-		 const double& x = rt[i].x;
-		 const double& y = rt[i].y;
-		 const double& z = rt[i].z;
-		 
-		 // calculate global gradient of shape functions
-		 // note that we need the transposed of Ji, not Ji itself !
-		 GX = Ji[0][0]*Gri+Ji[1][0]*Gsi+Ji[2][0]*Gti;
-		 GY = Ji[0][1]*Gri+Ji[1][1]*Gsi+Ji[2][1]*Gti;
-		 GZ = Ji[0][2]*Gri+Ji[1][2]*Gsi+Ji[2][2]*Gti;
-		 
-		 // calculate deformation gradient F
-		 F[0][0] += GX*x; F[0][1] += GY*x; F[0][2] += GZ*x;
-		 F[1][0] += GX*y; F[1][1] += GY*y; F[1][2] += GZ*y;
-		 F[2][0] += GX*z; F[2][1] += GY*z; F[2][2] += GZ*z;
-		 }
-		 
-		 det =	(F[0][0]*(F[1][1]*F[2][2] - F[1][2]*F[2][1]) + 
-		 F[0][1]*(F[1][2]*F[2][0] - F[2][2]*F[1][0]) + 
-		 F[0][2]*(F[1][0]*F[2][1] - F[1][1]*F[2][0]));
-		 
-		 matrix3_copy(m_F[n],  F);
-		 m_detF[n] = det;
-		 }
-		 */
 	}
 }
 
@@ -288,7 +250,7 @@ void FEShellElementTraits::UnpackData(int nflag)
 			// if det(J) > 0 calculate the inverse of the jacobian
 			if (det > 0)
 			{
-				deti = 1.0 / det;
+/*				deti = 1.0 / det;
 				
 				Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
 				Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
@@ -301,65 +263,16 @@ void FEShellElementTraits::UnpackData(int nflag)
 				Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
 				Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
 				Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
-			}
+*/			}
 			else throw NegativeJacobian(m_pel->m_nID, n+1, det);
 			
 			if (nflag & FE_UNPACK_JAC0)
 			{
 				m_J0 [n] = J;
-				m_J0i[n] = Ji;
+//				m_J0i[n] = Ji;
 				m_detJ0[n] = det;
 			}
 		}
-		
-		// --- calculate deformation gradient F ---
-		// note that we need Ji0 for the deformation gradient!
-		
-		/*		if (nflag & FE_UNPACK_DEFGRAD)
-		 {
-		 F[0][0] = F[0][1] = F[0][2] = 0;
-		 F[1][0] = F[1][1] = F[1][2] = 0;
-		 F[2][0] = F[2][1] = F[2][2] = 0;
-		 for (i=0; i<neln; ++i)
-		 {
-		 const double& Hri = Hrn[i];
-		 const double& Hsi = Hsn[i];
-		 const double& Hi  = Hn[i];
-		 
-		 const double& x = rt[i].x;
-		 const double& y = rt[i].y;
-		 const double& z = rt[i].z;
-		 
-		 const double& dx = Dt[i].x;
-		 const double& dy = Dt[i].y;
-		 const double& dz = Dt[i].z;
-		 
-		 za = 0.5*gt[n]*h0[i];
-		 
-		 // calculate global gradient of shape functions
-		 // note that we need the transposed of Ji, not Ji itself !
-		 NX = Ji[0][0]*Hri+Ji[1][0]*Hsi;
-		 NY = Ji[0][1]*Hri+Ji[1][1]*Hsi;
-		 NZ = Ji[0][2]*Hri+Ji[1][2]*Hsi;
-		 
-		 MX = za*Ji[0][0]*Hri + za*Ji[1][0]*Hsi + Ji[2][0]*0.5*h0[i]*Hi;
-		 MY = za*Ji[0][1]*Hri + za*Ji[1][1]*Hsi + Ji[2][1]*0.5*h0[i]*Hi;
-		 MZ = za*Ji[0][2]*Hri + za*Ji[1][2]*Hsi + Ji[2][2]*0.5*h0[i]*Hi;
-		 
-		 // calculate deformation gradient F
-		 F[0][0] += NX*x + MX*dx; F[0][1] += NY*x + MY*dx; F[0][2] += NZ*x + MZ*dx;
-		 F[1][0] += NX*y + MX*dy; F[1][1] += NY*y + MY*dy; F[1][2] += NZ*y + MZ*dy;
-		 F[2][0] += NX*z + MX*dz; F[2][1] += NY*z + MY*dz; F[2][2] += NZ*z + MZ*dz;
-		 }
-		 
-		 det =	(F[0][0]*(F[1][1]*F[2][2] - F[1][2]*F[2][1]) + 
-		 F[0][1]*(F[1][2]*F[2][0] - F[2][2]*F[1][0]) + 
-		 F[0][2]*(F[1][0]*F[2][1] - F[1][1]*F[2][0]));
-		 
-		 matrix3_copy(m_F[n],  F);
-		 m_detF[n] = det;
-		 }
-		 */
 	}
 }
 

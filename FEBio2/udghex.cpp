@@ -143,23 +143,7 @@ void FEUDGHexDomain::UDGHourglassForces(FEM& fem, FESolidElement &el, vector<dou
 
 	mat3d F;
 	AvgDefGrad(el, F, GX, GY, GZ);
-/*
-	double Ji0[3][3], Jt[3][3];
-	el.invjac0(Ji0, 0);
-	el.jact(Jt, 0);
 
-	F[0][0] = Ji0[0][0]*Jt[0][0]+Ji0[0][1]*Jt[1][0]+Ji0[0][2]*Jt[2][0];
-	F[0][1] = Ji0[0][0]*Jt[0][1]+Ji0[0][1]*Jt[1][1]+Ji0[0][2]*Jt[2][1];
-	F[0][2] = Ji0[0][0]*Jt[0][2]+Ji0[0][1]*Jt[1][2]+Ji0[0][2]*Jt[2][2];
-
-	F[1][0] = Ji0[1][0]*Jt[0][0]+Ji0[1][1]*Jt[1][0]+Ji0[1][2]*Jt[2][0];
-	F[1][1] = Ji0[1][0]*Jt[0][1]+Ji0[1][1]*Jt[1][1]+Ji0[1][2]*Jt[2][1];
-	F[1][2] = Ji0[1][0]*Jt[0][2]+Ji0[1][1]*Jt[1][2]+Ji0[1][2]*Jt[2][2];
-
-	F[2][0] = Ji0[2][0]*Jt[0][0]+Ji0[2][1]*Jt[1][0]+Ji0[2][2]*Jt[2][0];
-	F[2][1] = Ji0[2][0]*Jt[0][1]+Ji0[2][1]*Jt[1][1]+Ji0[2][2]*Jt[2][1];
-	F[2][2] = Ji0[2][0]*Jt[0][2]+Ji0[2][1]*Jt[1][2]+Ji0[2][2]*Jt[2][2];
-*/
 	double u4 = 0, u5 = 0, u6 = 0, u7 = 0;
 	double v4 = 0, v5 = 0, v6 = 0, v7 = 0;
 	double w4 = 0, w5 = 0, w6 = 0, w7 = 0;

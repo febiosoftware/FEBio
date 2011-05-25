@@ -143,7 +143,7 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 
 		// we need to calculate the divergence of v. To do this we use
 		// the formula div(v) = 1/J*dJdt, where J = det(F)
-		el.invjac0(J0i, n);
+		invjac0(el, J0i, n);
 		
 		// next we calculate the deformation gradient
 		mat3d Fp;
@@ -390,7 +390,7 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 		{
 			// we need to calculate the divergence of v. To do this we use
 			// the formula div(v) = 1/J*dJdt, where J = det(F)
-			el.invjac0(J0i, n);
+			invjac0(el, J0i, n);
 
 			// next we calculate the deformation gradient
 			mat3d Fp, gradv;

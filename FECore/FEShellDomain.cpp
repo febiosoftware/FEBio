@@ -37,6 +37,8 @@ FENode& FEShellDomain::Node(int i)
 //-----------------------------------------------------------------------------
 double FEShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 {
+	int i;
+
 	int neln = el.Nodes();
 
 	double* Hrn = el.Hr(n);
@@ -45,18 +47,23 @@ double FEShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 	double NX, NY, NZ, MX, MY, MZ;
 	double za;
 
-	vec3d* r = el.rt();
-	vec3d* D = el.Dt();
+	// current nodal coordinates and directors
+	vec3d r[4], D[4];
+	for (i=0; i<neln; ++i)
+	{
+		r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+		D[i] = m_pMesh->Node(el.m_node[i]).m_Dt;
+	}
 
 	double g = el.gt(n);
 
 	double Ji[3][3];
-	el.invjac0(Ji, n);
+	invjac0(el, Ji, n);
 
 	F[0][0] = F[0][1] = F[0][2] = 0;
 	F[1][0] = F[1][1] = F[1][2] = 0;
 	F[2][0] = F[2][1] = F[2][2] = 0;
-	for (int i=0; i<neln; ++i)
+	for (i=0; i<neln; ++i)
 	{
 		const double& Hri = Hrn[i];
 		const double& Hsi = Hsn[i];
@@ -92,4 +99,73 @@ double FEShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 	if (V <= 0) throw NegativeJacobian(el.m_nID, n, V, &el);
 
 	return V;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the reference frame at 
+//! integration point n. The inverse jacobian is return in Ji. The return value
+//! is the determinant of the inverse jacobian
+double FEShellDomain::invjac0(FEShellElement& el, double Ji[3][3], int n)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d r0[4], D0[4];
+	for (i=0; i<neln; ++i)
+	{
+		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+		D0[i] = m_pMesh->Node(el.m_node[i]).m_D0;
+	}
+
+	// calculate jacobian
+	double* h0 = &el.m_h0[0];
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Hri = el.Hr(n)[i];
+		const double& Hsi = el.Hs(n)[i];
+		const double& Hi = el.H(n)[i];
+		
+		const double& x = r0[i].x;
+		const double& y = r0[i].y;
+		const double& z = r0[i].z;
+		
+		const double& dx = D0[i].x;
+		const double& dy = D0[i].y;
+		const double& dz = D0[i].z;
+			
+		double za = 0.5*el.gt(n)*h0[i];
+			
+		J[0][0] += Hri*x + Hri*za*dx; J[0][1] += Hsi*x + Hsi*za*dx; J[0][2] += 0.5*h0[i]*Hi*dx;
+		J[1][0] += Hri*y + Hri*za*dy; J[1][1] += Hsi*y + Hsi*za*dy; J[1][2] += 0.5*h0[i]*Hi*dy;
+		J[2][0] += Hri*z + Hri*za*dz; J[2][1] += Hsi*z + Hsi*za*dz; J[2][2] += 0.5*h0[i]*Hi*dz;
+	}
+		
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+	// make sure the determinant is positive
+	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+		
+	// calculate the inverse of the jacobian
+	det = 1.0 / det;
+			
+	Ji[0][0] =  det*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+	Ji[1][0] =  det*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+	Ji[2][0] =  det*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+	
+	Ji[0][1] =  det*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+	Ji[1][1] =  det*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+	Ji[2][1] =  det*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+	
+	Ji[0][2] =  det*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+	Ji[1][2] =  det*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+	Ji[2][2] =  det*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+
+	return det;
 }

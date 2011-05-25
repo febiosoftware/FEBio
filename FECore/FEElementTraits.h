@@ -131,7 +131,6 @@ public:
 		m_detJt.resize(ni);
 
 		m_J0.resize(ni);
-		m_J0i.resize(ni);
 		m_detJ0.resize(ni);
 	}
 
@@ -156,7 +155,6 @@ public:
 	vector<double>	m_detJt;	// jacobian determinant
 
 	vector<mat3d>	m_J0;		// jacobian
-	vector<mat3d>	m_J0i;		// inverse jacobian
 	vector<double>	m_detJ0;	// jacobian determinant
 };
 
@@ -383,7 +381,6 @@ public:
 		m_detJt.resize(ni);
 
 		m_J0.resize(ni);
-		m_J0i.resize(ni);
 		m_detJ0.resize(ni);
 	}
 
@@ -409,7 +406,6 @@ public:
 	std::vector<double>	m_detJt;	// jacobian determinant
 
 	std::vector<mat3d>	m_J0;		// jacobian
-	std::vector<mat3d>	m_J0i;		// inverse jacobian
 	std::vector<double>	m_detJ0;	// jacobian determinant
 };
 

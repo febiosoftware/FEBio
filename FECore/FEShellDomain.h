@@ -29,6 +29,9 @@ public:
 	// calculate deformation gradient
 	double defgrad(FEShellElement& el, mat3d& F, int n);
 
+	// inverse jacobian with respect to reference frame
+	double invjac0(FEShellElement& el, double J[3][3], int n);
+
 protected:
 	vector<int>				m_Node;	//!< node list
 	vector<FEShellElement>	m_Elem;	//!< array of elements
