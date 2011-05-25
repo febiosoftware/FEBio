@@ -863,22 +863,6 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 void FEElasticSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
 {
-	// copy initial nodal coordinates
-	// (also needed for traits data)
-	if ((nflag & FE_UNPACK_R0) || (nflag & FE_UNPACK_TRAITS))
-	{
-		int N = el.Nodes();
-		vec3d* r0 = el.r0();
-		for (int i=0; i<N; ++i)
-		{
-			int n = el.m_node[i];
-
-			FENode& node = m_pMesh->Node(n);
-
-			r0[i] = node.m_r0;
-		}
-	}
-
 	// copy current nodal coordinates
 	// (also needed for traits data)
 	if ((nflag & FE_UNPACK_RT) || (nflag & FE_UNPACK_TRAITS))

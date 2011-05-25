@@ -157,7 +157,6 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 	int i, n;
 
 	vec3d* rt = el.rt();
-	vec3d* r0 = el.r0();
 
 	int N = el.Nodes();
 
@@ -167,9 +166,6 @@ void FESurface::UnpackElement(FEElement& el, unsigned int nflag)
 		n = el.m_node[i];
 
 		FENode& node = m_pMesh->Node(n);
-
-		// initial coordinates (= material coordinates)
-		r0[i] = node.m_r0;
 
 		// current coordinates (= spatial coordinates)
 		rt[i] = node.m_rt;

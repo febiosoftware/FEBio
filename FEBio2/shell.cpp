@@ -764,7 +764,6 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 	FEShellElement& se = dynamic_cast<FEShellElement&>(el);
 
 	vec3d* rt = se.rt();
-	vec3d* r0 = se.r0();
 	vec3d* D0 = se.D0();
 	vec3d* Dt = se.Dt();
 
@@ -776,9 +775,6 @@ void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
 		n = se.m_node[i];
 
 		FENode& node = m_pMesh->Node(n);
-
-		// initial coordinates (= material coordinates)
-		r0[i] = node.m_r0;
 
 		// current coordinates (= spatial coordinates)
 		rt[i] = node.m_rt;

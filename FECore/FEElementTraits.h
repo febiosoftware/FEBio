@@ -55,7 +55,6 @@ public:
 		neln = ne;
 		nint = ni;
 		
-		r0.resize(ne);
 		rt.resize(ne);
 
 		H.Create(ni, ne);
@@ -66,12 +65,8 @@ public:
 	//! destructor
 	virtual ~FEElementTraits(){}
 
-	//! Unpack traits data
-	virtual void UnpackData(int nflag) = 0;
-
 public:
 	// These variables are filled when unpacking the element
-	std::vector<vec3d>  r0;	//!< initial coordinates
 	std::vector<vec3d>  rt;	//!< current coordinates
 
 	int nint;	//!< number of integration points
@@ -126,8 +121,6 @@ public:
 		Gst.Create(ni, ne);
 		Gtt.Create(ni, ne);
 	}
-
-	void UnpackData(int nflag) {}
 
 public:
 	// gauss-point coordinates and weights
@@ -260,8 +253,6 @@ public:
 		Gs.Create(ni, ne);
 	}
 
-	void UnpackData(int nflag) {}
-
 public:
 	// gauss-point coordinates and weights
 	std::vector<double> gr;
@@ -362,8 +353,6 @@ public:
 		Dt.resize(ne);
 	}
 
-	void UnpackData(int nflag) {}
-
 public:
 	// gauss-point coordinates and weights
 	std::vector<double> gr;
@@ -424,8 +413,6 @@ public:
 	FETrussElementTraits() : FEElementTraits(NINT, NELN) { m_ntype = FE_TRUSS; init(); }
 
 	void init();
-
-	void UnpackData(int nflag) {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -439,8 +426,6 @@ public:
 	FEDiscreteElementTraits() : FEElementTraits(NINT, NELN) { m_ntype = FE_DISCRETE; init(); }
 
 	void init() {}
-
-	void UnpackData(int nflag) {}
 };
 
 #endif // !defined(AFX_FEELEMENTTRAITS_H__5AE1C578_7EC7_4C11_AC98_EBCCFD68B00C__INCLUDED_)

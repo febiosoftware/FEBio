@@ -78,13 +78,9 @@ public:
 	void UnpackTraitsData(int nflag) 
 	{ 
 		m_pT->m_pel = this;
-		m_pT->UnpackData(nflag);
 	}
 
-	bool IsUnpacked() { return (m_pT->m_pel == this); }
-
 	// interface to traits members
-	vec3d* r0() { return &m_pT->r0[0]; }		// material coordintes
 	vec3d* rt() { return &m_pT->rt[0]; }		// spatial coordinates
 
 	int GaussPoints() const { return m_pT->nint; } 
@@ -183,66 +179,7 @@ public:
 	double* Grt(int n) { return ((FESolidElementTraits*)(m_pT))->Grt[n]; }	// shape function 2nd derivative to rt
 	double* Gst(int n) { return ((FESolidElementTraits*)(m_pT))->Gst[n]; }	// shape function 2nd derivative to st
 	double* Gtt(int n) { return ((FESolidElementTraits*)(m_pT))->Gtt[n]; }	// shape function 2nd derivative to tt
-/*
-	void jact(double J[3][3], int n)
-	{
-		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jt[n];
-		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
-		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
-		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
-	}
-*/
-/*	void invjact(double J[3][3], int n)
-	{
-		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jti[n];
-		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
-		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
-		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
-	}
-*/
-/*
-	void jac0(double J[3][3], int n)
-	{
-		mat3d& J0 = ((FESolidElementTraits*)(m_pT))->m_J0[n];
-		J[0][0] = J0[0][0]; J[0][1] = J0[0][1]; J[0][2] = J0[0][2];
-		J[1][0] = J0[1][0]; J[1][1] = J0[1][1]; J[1][2] = J0[1][2];
-		J[2][0] = J0[2][0]; J[2][1] = J0[2][1]; J[2][2] = J0[2][2];
-	}
-*/
-//	double detJt(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJt[n]; }
-//	double detJ0(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJ0[n]; }
 
-/*	//! evaluate spatial gradient of scalar field at integration point
-	vec3d gradient(double* fn, int n)
-	{
-		double Ji[3][3];
-		invjact(Ji, n);
-					
-		double* Grn = Gr(n);
-		double* Gsn = Gs(n);
-		double* Gtn = Gt(n);
-
-		double Gx, Gy, Gz;
-
-		vec3d gradf;
-		int N = Nodes();
-		for (int i=0; i<N; ++i)
-		{
-			// calculate global gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx = Ji[0][0]*Grn[i]+Ji[1][0]*Gsn[i]+Ji[2][0]*Gtn[i];
-			Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i]+Ji[2][1]*Gtn[i];
-			Gz = Ji[0][2]*Grn[i]+Ji[1][2]*Gsn[i]+Ji[2][2]*Gtn[i];
-
-			// calculate pressure gradient
-			gradf.x += Gx*fn[i];
-			gradf.y += Gy*fn[i];
-			gradf.z += Gz*fn[i];
-		}
-
-		return gradf;
-	}
-*/
 	//! intialize element data
 	void Init(bool bflag)
 	{
@@ -504,17 +441,6 @@ public:
 	double gs(int n) { return ((FEShellElementTraits*)(m_pT))->gs[n]; }
 	double gt(int n) { return ((FEShellElementTraits*)(m_pT))->gt[n]; }
 
-/*	void invjact(double J[3][3], int n)
-	{
-		mat3d& Jt = ((FEShellElementTraits*)(m_pT))->m_Jti[n];
-		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
-		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
-		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
-	}
-*/
-//	double detJ0(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJ0[n]; }
-//	double detJt(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJt[n]; }
-
 public:
 	double	m_eJ;	//!< average dilatation
 	double	m_ep;	//!< average pressure
@@ -542,7 +468,6 @@ public:
 
 	vec3d Normal()
 	{
-		assert(m_pT->m_pel == this);
 		assert(m_pT->m_pel == this);
 		vec3d a = rt()[0];
 		vec3d b = rt()[1];
