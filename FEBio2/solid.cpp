@@ -234,8 +234,7 @@ void FEElasticSolidDomain::InternalForces(FESolidElement& el, vector<double>& fe
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n);
+		detJt = invjact(el, Ji, n);
 
 		detJt *= gw[n];
 
@@ -439,8 +438,7 @@ void FEElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
@@ -523,8 +521,7 @@ void FEElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matri
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);

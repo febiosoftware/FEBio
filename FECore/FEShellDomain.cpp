@@ -104,7 +104,7 @@ double FEShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 //-----------------------------------------------------------------------------
 //! Calculate the inverse jacobian with respect to the reference frame at 
 //! integration point n. The inverse jacobian is return in Ji. The return value
-//! is the determinant of the inverse jacobian
+//! is the determinant of the jacobian (not the inverse!)
 double FEShellDomain::invjac0(FEShellElement& el, double Ji[3][3], int n)
 {
 	int i;
@@ -153,19 +153,89 @@ double FEShellDomain::invjac0(FEShellElement& el, double Ji[3][3], int n)
 	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
 		
 	// calculate the inverse of the jacobian
-	det = 1.0 / det;
+	double deti = 1.0 / det;
 			
-	Ji[0][0] =  det*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
-	Ji[1][0] =  det*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
-	Ji[2][0] =  det*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+	Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+	Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+	Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 	
-	Ji[0][1] =  det*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
-	Ji[1][1] =  det*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
-	Ji[2][1] =  det*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+	Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+	Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+	Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
 	
-	Ji[0][2] =  det*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
-	Ji[1][2] =  det*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
-	Ji[2][2] =  det*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+	Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+	Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+	Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+
+	return det;
+}
+
+
+//-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the current frame at 
+//! integration point n. The inverse jacobian is return in Ji. The return value
+//! is the determinant of the jacobian (not the inverse!)
+double FEShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d rt[4], Dt[4];
+	for (i=0; i<neln; ++i)
+	{
+		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+		Dt[i] = m_pMesh->Node(el.m_node[i]).m_Dt;
+	}
+
+	// calculate jacobian
+	double* h0 = &el.m_h0[0];
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Hri = el.Hr(n)[i];
+		const double& Hsi = el.Hs(n)[i];
+		const double& Hi = el.H(n)[i];
+		
+		const double& x = rt[i].x;
+		const double& y = rt[i].y;
+		const double& z = rt[i].z;
+		
+		const double& dx = Dt[i].x;
+		const double& dy = Dt[i].y;
+		const double& dz = Dt[i].z;
+			
+		double za = 0.5*el.gt(n)*h0[i];
+			
+		J[0][0] += Hri*x + Hri*za*dx; J[0][1] += Hsi*x + Hsi*za*dx; J[0][2] += 0.5*h0[i]*Hi*dx;
+		J[1][0] += Hri*y + Hri*za*dy; J[1][1] += Hsi*y + Hsi*za*dy; J[1][2] += 0.5*h0[i]*Hi*dy;
+		J[2][0] += Hri*z + Hri*za*dz; J[2][1] += Hsi*z + Hsi*za*dz; J[2][2] += 0.5*h0[i]*Hi*dz;
+	}
+		
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+	// make sure the determinant is positive
+	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+		
+	// calculate the inverse of the jacobian
+	double deti = 1.0 / det;
+			
+	Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+	Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+	Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+	
+	Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+	Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+	Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+	
+	Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+	Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+	Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
 
 	return det;
 }

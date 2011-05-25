@@ -210,8 +210,7 @@ void FEElasticShellDomain::InternalForces(FEShellElement& el, vector<double>& fe
 		FEElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n);
+		detJt = invjact(el, Ji, n);
 
 		detJt *= gw[n];
 
@@ -384,8 +383,7 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 
 		Grn = el.Hr(n);
 		Gsn = el.Hs(n);

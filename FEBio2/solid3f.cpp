@@ -69,8 +69,7 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement&
 	{
 		// calculate jacobian
 		detJ0 = elem.detJ0(n);
-		detJt = elem.detJt(n);
-		elem.invjact(Ji, n);
+		detJt = invjact(elem, Ji, n);
 
 		detJt *= gw[n];
 
@@ -161,8 +160,7 @@ void FE3FieldElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el,
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
@@ -284,8 +282,7 @@ void FE3FieldElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);

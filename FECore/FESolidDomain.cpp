@@ -218,7 +218,7 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
 //-----------------------------------------------------------------------------
 //! Calculate the inverse jacobian with respect to the reference frame at  
 //! integration point n. The inverse jacobian is retured in Ji
-//! The return value is the determinant of the inverse Jacobian
+//! The return value is the determinant of the Jacobian (not the inverse!)
 double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], int n)
 {
 	int i;
@@ -256,19 +256,110 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], int n)
 	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
 
 	// calculate the inverse jacobian
-	det = 1.0 / det;
+	double deti = 1.0 / det;
 			
-	Ji[0][0] =  det*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
-	Ji[1][0] =  det*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
-	Ji[2][0] =  det*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+	Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+	Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+	Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 	
-	Ji[0][1] =  det*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
-	Ji[1][1] =  det*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
-	Ji[2][1] =  det*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+	Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+	Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+	Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
 	
-	Ji[0][2] =  det*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
-	Ji[1][2] =  det*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
-	Ji[2][2] =  det*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+	Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+	Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+	Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
 
 	return det;
+}
+
+
+//-----------------------------------------------------------------------------
+//! Calculate the inverse jacobian with respect to the current frame at  
+//! integration point n. The inverse jacobian is retured in Ji
+//! The return value is the determinant of the Jacobian (not the inverse!)
+double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n)
+{
+	int i;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	vec3d rt[8];
+	for (i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+
+	// calculate jacobian
+	double J[3][3] = {0};
+	for (i=0; i<neln; ++i)
+	{
+		const double& Gri = el.Gr(n)[i];
+		const double& Gsi = el.Gs(n)[i];
+		const double& Gti = el.Gt(n)[i];
+		
+		const double& x = rt[i].x;
+		const double& y = rt[i].y;
+		const double& z = rt[i].z;
+		
+		J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+		J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+		J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+	}
+			
+	// calculate the determinant
+	double det =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+				+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+	// make sure the determinant is positive
+	if (det <= 0) throw NegativeJacobian(el.m_nID, n+1, det);
+
+	// calculate inverse jacobian
+	double deti = 1.0 / det;
+				
+	Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+	Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
+	Ji[2][0] =  deti*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+	
+	Ji[0][1] =  deti*(J[0][2]*J[2][1] - J[0][1]*J[2][2]);
+	Ji[1][1] =  deti*(J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+	Ji[2][1] =  deti*(J[0][1]*J[2][0] - J[0][0]*J[2][1]);
+	
+	Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
+	Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
+	Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+
+	return det;
+}
+
+//-----------------------------------------------------------------------------
+//! calculate gradient of function at integration points
+vec3d FESolidDomain::gradient(FESolidElement& el, double* fn, int n)
+{
+	double Ji[3][3];
+	invjact(el, Ji, n);
+				
+	double* Grn = el.Gr(n);
+	double* Gsn = el.Gs(n);
+	double* Gtn = el.Gt(n);
+
+	double Gx, Gy, Gz;
+
+	vec3d gradf;
+	int N = el.Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		// calculate global gradient of shape functions
+		// note that we need the transposed of Ji, not Ji itself !
+		Gx = Ji[0][0]*Grn[i]+Ji[1][0]*Gsn[i]+Ji[2][0]*Gtn[i];
+		Gy = Ji[0][1]*Grn[i]+Ji[1][1]*Gsn[i]+Ji[2][1]*Gtn[i];
+		Gz = Ji[0][2]*Grn[i]+Ji[1][2]*Gsn[i]+Ji[2][2]*Gtn[i];
+
+		// calculate pressure gradient
+		gradf.x += Gx*fn[i];
+		gradf.y += Gy*fn[i];
+		gradf.z += Gz*fn[i];
+	}
+
+	return gradf;
 }

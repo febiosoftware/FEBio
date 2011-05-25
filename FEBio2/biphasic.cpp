@@ -132,8 +132,7 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
 		
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
+		detJ = invjact(el, Ji, n);
 		
 		// we need to calculate the divergence of v. To do this we use
 		// the formula div(v) = 1/J*dJdt, where J = det(F)
@@ -319,8 +318,8 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
 		
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
+		detJ = invjact(el, Ji, n);
+
 		vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
 		vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
@@ -522,8 +521,7 @@ void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, m
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 		
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
@@ -706,7 +704,7 @@ void FEBiphasicDomain::UpdateStresses(FEM &fem)
 			ppt.m_p = el.Evaluate(pn, n);
 			
 			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = el.gradient(pn, n);
+			ppt.m_gradp = gradient(el, pn, n);
 			
 			if (dynamic_cast<FEMicroMaterial*>(pme))
 			{

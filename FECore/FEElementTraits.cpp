@@ -12,8 +12,8 @@
 
 void FESolidElementTraits::UnpackData(int nflag)
 {
-	double J[3][3], Ji[3][3];//, F[3][3];
-	double det, deti;
+	double J[3][3];
+	double det;
 	
 	int i, n;
 	
@@ -55,7 +55,7 @@ void FESolidElementTraits::UnpackData(int nflag)
 			// if det(J) > 0 calculate the inverse of the jacobian
 			if (det > 0)
 			{
-				deti = 1.0 / det;
+/*				deti = 1.0 / det;
 				
 				Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
 				Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
@@ -68,11 +68,11 @@ void FESolidElementTraits::UnpackData(int nflag)
 				Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
 				Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
 				Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
-			}
+*/			}
 			else throw NegativeJacobian(m_pel->m_nID, n+1, det);
 			
 			m_Jt [n] = J;
-			m_Jti[n] = Ji;
+//			m_Jti[n] = Ji;
 			m_detJt[n] = det;
 		}
 		
@@ -137,8 +137,8 @@ void FESolidElementTraits::UnpackData(int nflag)
 
 void FEShellElementTraits::UnpackData(int nflag)
 {
-	double J[3][3], Ji[3][3];//, F[3][3];
-	double det, deti;
+	double J[3][3];
+	double det;
 	
 	int i, n;
 	
@@ -191,7 +191,7 @@ void FEShellElementTraits::UnpackData(int nflag)
 			// if det(J) > 0 calculate the inverse of the jacobian
 			if (det > 0)
 			{
-				deti = 1.0 / det;
+/*				deti = 1.0 / det;
 				
 				Ji[0][0] =  deti*(J[1][1]*J[2][2] - J[1][2]*J[2][1]);
 				Ji[1][0] =  deti*(J[1][2]*J[2][0] - J[1][0]*J[2][2]);
@@ -204,14 +204,14 @@ void FEShellElementTraits::UnpackData(int nflag)
 				Ji[0][2] =  deti*(J[0][1]*J[1][2] - J[1][1]*J[0][2]);
 				Ji[1][2] =  deti*(J[0][2]*J[1][0] - J[0][0]*J[1][2]);
 				Ji[2][2] =  deti*(J[0][0]*J[1][1] - J[0][1]*J[1][0]);
-			}
+*/			}
 			else 
 			{
 				throw NegativeJacobian(m_pel->m_nID, n+1, det, m_pel);
 			}
 			
 			m_Jt [n] =  J;
-			m_Jti[n] =  Ji;
+//			m_Jti[n] =  Ji;
 			m_detJt[n] = det;
 		}
 		

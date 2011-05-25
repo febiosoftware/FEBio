@@ -160,8 +160,7 @@ void FEHeatSolidDomain::ConductionStiffness(FEM& fem, FESolidElement& el, matrix
 	for (n=0; n<ni; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n);
+		detJt = invjact(el, Ji, n);
 
 		// evaluate the conductivity
 		mat.Conductivity(D);
@@ -231,8 +230,8 @@ void FEHeatSolidDomain::CapacitanceStiffness(FEM& fem, FESolidElement &el, matri
 	for (n=0; n<ni; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n);
+		detJt = invjact(el, Ji, n);
+
 		H = el.H(n);
 
 		for (i=0; i<ne; ++i)

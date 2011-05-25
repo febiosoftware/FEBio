@@ -140,8 +140,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
 		
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
+		detJ = invjact(el, Ji, n);
 		
 		// we need to calculate the divergence of v. To do this we use
 		// the formula div(v) = 1/J*dJdt, where J = det(F)
@@ -259,8 +258,8 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
 		
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
+		detJ = invjact(el, Ji, n);
+
 		vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
 		vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
@@ -494,8 +493,8 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
 		
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
+		detJ = invjact(el, Ji, n);
+
 		vec3d g1(Ji[0][0],Ji[0][1],Ji[0][2]);
 		vec3d g2(Ji[1][0],Ji[1][1],Ji[1][2]);
 		vec3d g3(Ji[2][0],Ji[2][1],Ji[2][2]);
@@ -781,8 +780,7 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 		
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
@@ -965,13 +963,13 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			ppt.m_p = el.Evaluate(pn, n);
 			
 			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = el.gradient(pn, n);
+			ppt.m_gradp = gradient(el, pn, n);
 			
 			// evaluate effective solute concentration at gauss-point
 			ppt.m_c = el.Evaluate(ct, n);
 			
 			// calculate the gradient of c at gauss-point
-			ppt.m_gradc = el.gradient(ct, n);
+			ppt.m_gradc = gradient(el, ct, n);
 			
 			if (dynamic_cast<FEMicroMaterial*>(pme))
 			{

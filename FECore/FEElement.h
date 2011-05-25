@@ -183,25 +183,6 @@ public:
 	double* Grt(int n) { return ((FESolidElementTraits*)(m_pT))->Grt[n]; }	// shape function 2nd derivative to rt
 	double* Gst(int n) { return ((FESolidElementTraits*)(m_pT))->Gst[n]; }	// shape function 2nd derivative to st
 	double* Gtt(int n) { return ((FESolidElementTraits*)(m_pT))->Gtt[n]; }	// shape function 2nd derivative to tt
-	
-	//! calculate shape function derivatives w.r.t to x
-	void shape_derivt(double* Gx, double* Gy, double* Gz, int n)
-	{
-		double Ji[3][3];
-		invjact(Ji, n);
-		double* gr = Gr(n);
-		double* gs = Gs(n);
-		double* gt = Gt(n);
-		int N = Nodes();
-		for (int j=0; j<N; ++j)
-		{
-			// calculate gradient of shape functions
-			// note that we need the transposed of Ji, not Ji itself !
-			Gx[j] = Ji[0][0]*gr[j]+Ji[1][0]*gs[j]+Ji[2][0]*gt[j];
-			Gy[j] = Ji[0][1]*gr[j]+Ji[1][1]*gs[j]+Ji[2][1]*gt[j];
-			Gz[j] = Ji[0][2]*gr[j]+Ji[1][2]*gs[j]+Ji[2][2]*gt[j];
-		}
-	}
 
 	void jact(double J[3][3], int n)
 	{
@@ -211,14 +192,14 @@ public:
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
 	}
 
-	void invjact(double J[3][3], int n)
+/*	void invjact(double J[3][3], int n)
 	{
 		mat3d& Jt = ((FESolidElementTraits*)(m_pT))->m_Jti[n];
 		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
 		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
 	}
-
+*/
 	void jac0(double J[3][3], int n)
 	{
 		mat3d& J0 = ((FESolidElementTraits*)(m_pT))->m_J0[n];
@@ -230,7 +211,7 @@ public:
 	double detJt(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJt[n]; }
 	double detJ0(int n) { return ((FESolidElementTraits*)(m_pT))->m_detJ0[n]; }
 
-	//! evaluate spatial gradient of scalar field at integration point
+/*	//! evaluate spatial gradient of scalar field at integration point
 	vec3d gradient(double* fn, int n)
 	{
 		double Ji[3][3];
@@ -260,7 +241,7 @@ public:
 
 		return gradf;
 	}
-
+*/
 	//! intialize element data
 	void Init(bool bflag)
 	{
@@ -522,14 +503,14 @@ public:
 	double gs(int n) { return ((FEShellElementTraits*)(m_pT))->gs[n]; }
 	double gt(int n) { return ((FEShellElementTraits*)(m_pT))->gt[n]; }
 
-	void invjact(double J[3][3], int n)
+/*	void invjact(double J[3][3], int n)
 	{
 		mat3d& Jt = ((FEShellElementTraits*)(m_pT))->m_Jti[n];
 		J[0][0] = Jt[0][0]; J[0][1] = Jt[0][1]; J[0][2] = Jt[0][2];
 		J[1][0] = Jt[1][0]; J[1][1] = Jt[1][1]; J[1][2] = Jt[1][2];
 		J[2][0] = Jt[2][0]; J[2][1] = Jt[2][1]; J[2][2] = Jt[2][2];
 	}
-
+*/
 	double detJ0(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJ0[n]; }
 	double detJt(int n) { return ((FEShellElementTraits*)(m_pT))->m_detJt[n]; }
 

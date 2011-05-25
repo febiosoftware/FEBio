@@ -138,8 +138,7 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
 
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
+		detJ = invjact(el, Ji, n);
 
 		// we need to calculate the divergence of v. To do this we use
 		// the formula div(v) = 1/J*dJdt, where J = det(F)
@@ -329,8 +328,7 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJ = el.detJt(n);
+		detJ = invjact(el, Ji, n);
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -568,8 +566,7 @@ void FEPoroSolidDomain::PoroMaterialStiffness(FEM& fem, FESolidElement &el, matr
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		el.invjact(Ji, n);
-		detJt = el.detJt(n)*gw[n];
+		detJt = invjact(el, Ji, n)*gw[n];
 
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
@@ -744,7 +741,7 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 			ppt.m_p = el.Evaluate(pn, n);
 
 			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = el.gradient(pn, n);
+			ppt.m_gradp = gradient(el, pn, n);
 
 			// calculate the stress at this material point
 			pt.s = pm->Stress(mp);

@@ -127,7 +127,6 @@ public:
 		Gtt.Create(ni, ne);
 		
 		m_Jt.resize(ni);
-		m_Jti.resize(ni);
 		m_detJt.resize(ni);
 
 		m_J0.resize(ni);
@@ -151,7 +150,6 @@ public:
 	
 	// data used when unpacking
 	vector<mat3d>	m_Jt;		// jacobian
-	vector<mat3d>	m_Jti;		// inverse jacobian
 	vector<double>	m_detJt;	// jacobian determinant
 
 	vector<mat3d>	m_J0;		// jacobian
@@ -377,7 +375,6 @@ public:
 		Dt.resize(ne);
 
 		m_Jt.resize(ni);
-		m_Jti.resize(ni);
 		m_detJt.resize(ni);
 
 		m_J0.resize(ni);
@@ -402,7 +399,6 @@ public:
 
 	// data used when unpacking
 	std::vector<mat3d>	m_Jt;		// jacobian
-	std::vector<mat3d>	m_Jti;		// inverse jacobian
 	std::vector<double>	m_detJt;	// jacobian determinant
 
 	std::vector<mat3d>	m_J0;		// jacobian
