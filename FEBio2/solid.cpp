@@ -29,10 +29,6 @@ bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-
-		// TODO: check the initial jacobian to make sure 
-		//       that element have right numbering
-
 		if (dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver))
 		{
 			// get the elements material

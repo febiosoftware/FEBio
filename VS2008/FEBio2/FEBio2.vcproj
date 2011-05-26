@@ -118,6 +118,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;SUPERLU;PARDISO"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				OpenMP="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"

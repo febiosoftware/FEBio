@@ -13,7 +13,7 @@
 #include "FEDiscreteMaterial.h"
 #include "FERigid.h"
 #include "FEElasticSolidDomain.h"
-#include "FECore/FEShellDomain.h"
+#include "FEElasticShellDomain.h"
 #include "FEPointBodyForce.h"
 
 // Forward declarations
@@ -106,9 +106,6 @@ bool FEM::Init()
 	// TODO: perhaps I should not reset the mesh data during the initialization
 	if (InitMesh() == false) return false;
 
-	// intialize domains
-	for (i=0; i<m_mesh.Domains(); ++i) m_mesh.Domain(i).Initialize(*this);
-
 	// initialize material data
 	if (InitMaterials() == false) return false;
 
@@ -183,32 +180,26 @@ bool FEM::InitMesh()
 			{
 				FESolidElement& el = pbd->Element(i);
 
-/*
-				try
+				int nint = el.GaussPoints();
+				for (int n=0; n<nint; ++n)
 				{
-					// TODO: Add a check for the initial jacobian to
-					//       see if elements are using the right node numbering
-				}
-				catch (NegativeJacobian e)
-				{
-					fprintf(stderr, "**************************** E R R O R ****************************\n");
-					fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
-					fprintf(stderr, "Jacobian = %lg\n", e.m_vol);
-					fprintf(stderr, "Did you use the right node numbering?\n");
-					if (e.m_pel)
+					double J0 = pbd->detJ0(el, n);
+					if (J0 <= 0)
 					{
-						FEElement &el = *e.m_pel;
+						fprintf(stderr, "**************************** E R R O R ****************************\n");
+						fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+						fprintf(stderr, "Jacobian = %lg\n", J0);
+						fprintf(stderr, "Did you use the right node numbering?\n");
 						fprintf(stderr, "Nodes:");
-						for (int n=0; n<el.Nodes(); ++n)
+						for (int l=0; l<el.Nodes(); ++l)
 						{
-							fprintf(stderr, "%d", el.m_node[n]+1);
-							if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+							fprintf(stderr, "%d", el.m_node[l]+1);
+							if (l+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
 						}
+						fprintf(stderr, "*******************************************************************\n\n");
+						++ninverted;
 					}
-					fprintf(stderr, "*******************************************************************\n\n");
-					++ninverted;
 				}
-*/
 			}
 		}
 
@@ -253,39 +244,37 @@ bool FEM::InitMesh()
 
 	for (nd = 0; nd < m.Domains(); ++nd)
 	{
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
 			// check the connectivity of the shells
 			for (i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-/*
-				try
+				if (!el.IsRigid())
 				{
-					// TODO: Add a check for the initial jacobian to
-					//       see if elements are using the right node numbering
-				}
-				catch (NegativeJacobian e)
-				{
-					fprintf(stderr, "**************************** E R R O R ****************************\n");
-					fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", e.m_ng, e.m_iel);
-					fprintf(stderr, "Jacobian = %lg\n", e.m_vol);
-					fprintf(stderr, "Did you use the right node numbering?\n");
-					if (e.m_pel)
+					int nint = el.GaussPoints();
+					for (int n=0; n<nint; ++n)
 					{
-						FEElement &el = *e.m_pel;
-						fprintf(stderr, "Nodes:");
-						for (int n=0; n<el.Nodes(); ++n)
+						double J0 = psd->detJ0(el, n);
+						if (J0 <= 0)
 						{
-							fprintf(stderr, "%d", el.m_node[n]+1);
-							if (n+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+							fprintf(stderr, "**************************** E R R O R ****************************\n");
+							fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+							fprintf(stderr, "Jacobian = %lg\n", J0);
+							fprintf(stderr, "Did you use the right node numbering?\n");
+							fprintf(stderr, "Nodes:");
+							for (int l=0; l<el.Nodes(); ++l)
+							{
+								fprintf(stderr, "%d", el.m_node[l]+1);
+								if (l+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+							}
+							fprintf(stderr, "*******************************************************************\n\n");
+							++ninverted;
 						}
 					}
-					fprintf(stderr, "*******************************************************************\n\n");
-					++ninverted;
 				}
-*/			}
+			}
 		}
 	}
 
@@ -336,6 +325,9 @@ bool FEM::InitMesh()
 
 	// reset data
 	m.Reset();
+
+	// intialize domains
+	for (i=0; i<m_mesh.Domains(); ++i) m_mesh.Domain(i).Initialize(*this);
 
 	return true;
 }
