@@ -166,13 +166,10 @@ void FE3FieldElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el,
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);
 
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		pt.avgJ = el.m_eJ;
-		pt.avgp = el.m_ep;
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// get the material's tangent
 		// Note that we are only grabbing the deviatoric tangent. 
@@ -390,10 +387,6 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 
 			// get the deformation gradient and determinant
 			pt.J = defgrad(el, pt.F, n);
-
-			// three-field element variables
-			pt.avgJ = el.m_eJ;
-			pt.avgp = el.m_ep;
 
 			// calculate the stress at this material point
 			// Note that we don't call the material's Stress member function.

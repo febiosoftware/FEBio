@@ -69,11 +69,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << F << J << Q << s << avgJ << avgp;
+			ar << F << J << Q << s;
 		}
 		else
 		{
-			ar >> F >> J >> Q >> s >> avgJ >> avgp;
+			ar >> F >> J >> Q >> s;
 		}
 
 		if (m_pt) m_pt->Serialize(ar);
@@ -101,8 +101,6 @@ public:
 
 			s.zero();
 
-			avgJ = avgp = 0;
-
 //			Q.unit();
 		}
 
@@ -121,10 +119,6 @@ public:
 
 	// solid material data
 	mat3ds		s;			//!< Cauchy stress
-
-	// three-field element material data
-	double		avgJ;		//!< average Jacobian (for three-field elements)
-	double		avgp;		//!< average pressure (for three-field elements)
 };
 
 //-----------------------------------------------------------------------------

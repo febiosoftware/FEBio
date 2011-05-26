@@ -407,8 +407,6 @@ void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &
 	double DBL[6][3];
 
 	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
-	FEMaterialPoint& mp = *el.m_State[0];
-	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	FEMesh& mesh = fem.m_mesh;
 
@@ -437,8 +435,8 @@ void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &
 
 	// setup the material point
 	// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-	pt.avgJ = el.m_eJ;
-	pt.avgp = el.m_ep;
+	FEMaterialPoint& mp = *el.m_State[0];
+	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 	// get the 'D' matrix
 	tens4ds C = pmat->Tangent(mp);
@@ -558,10 +556,6 @@ void FEUDGHexDomain::UpdateStresses(FEM &fem)
 		// get the average deformation gradient and determinant
 		AvgDefGrad(el, pt.F, GX, GY, GZ);
 		pt.J = pt.F.det();
-
-		// set the element variables
-		pt.avgJ = el.m_eJ;
-		pt.avgp = el.m_ep;
 
 		// calculate the stress at this material point
 		pt.s = pm->Stress(mp);

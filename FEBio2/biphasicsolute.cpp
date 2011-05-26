@@ -781,13 +781,10 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);
 		
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		pt.avgJ = el.m_eJ;
-		pt.avgp = el.m_ep;
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 		
 		// evaluate concentration at gauss-point
 		FESolutePoroElasticMaterialPoint& ppt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
@@ -935,10 +932,6 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEM &fem)
 			
 			// get the deformation gradient and determinant
 			pt.J = defgrad(el, pt.F, n);
-			
-			// three-field element variables
-			pt.avgJ = el.m_eJ;
-			pt.avgp = el.m_ep;
 			
 			// solute-poroelastic data
 			FESolutePoroElasticMaterialPoint& ppt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());

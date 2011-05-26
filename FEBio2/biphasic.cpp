@@ -522,14 +522,11 @@ void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, m
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);
 		
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-		
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		pt.avgJ = el.m_eJ;
-		pt.avgp = el.m_ep;
-		
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
 		// evaluate fluid pressure at gauss-point
 		FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
 		ppt.m_p = el.Evaluate(pn, n);
@@ -676,10 +673,6 @@ void FEBiphasicDomain::UpdateStresses(FEM &fem)
 			
 			// get the deformation gradient and determinant
 			pt.J = defgrad(el, pt.F, n);
-			
-			// three-field element variables
-			pt.avgJ = el.m_eJ;
-			pt.avgp = el.m_ep;
 			
 			// poroelasticity data
 			FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());

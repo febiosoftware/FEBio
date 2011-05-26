@@ -516,13 +516,10 @@ void FEElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matri
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);
 
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		pt.avgJ = el.m_eJ;
-		pt.avgp = el.m_ep;
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// get the 'D' matrix
 		tens4ds C = pmat->Tangent(mp);
@@ -769,10 +766,6 @@ void FEElasticSolidDomain::UpdateStresses(FEM &fem)
 
 			// get the deformation gradient and determinant
 			pt.J = defgrad(el, pt.F, n);
-
-			// three-field element variables
-			pt.avgJ = el.m_eJ;
-			pt.avgp = el.m_ep;
 
 			// calculate the stress at this material point
 			pt.s = pm->Stress(mp);

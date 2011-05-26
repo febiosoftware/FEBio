@@ -52,8 +52,6 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 		// setup the material point
 		pt.F = mat3dd(1.0);
 		pt.J = 1;
-		pt.avgJ = 1;
-		pt.avgp = 0;
 		pt.s.zero();
 
 		// get the tangent at this point

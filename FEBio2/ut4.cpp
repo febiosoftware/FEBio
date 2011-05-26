@@ -1123,13 +1123,10 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 		Gsn = el.Gs(n);
 		Gtn = el.Gt(n);
 
-		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
-		pt.avgJ = el.m_eJ;
-		pt.avgp = el.m_ep;
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// Calculate the tangent
 		tens4ds C = pmat->Tangent(mp);

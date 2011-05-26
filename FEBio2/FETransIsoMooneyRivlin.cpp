@@ -97,9 +97,6 @@ tens4ds FETransIsoMooneyRivlin::DevTangent(FEMaterialPoint& mp)
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	mat3ds devs = pt.s.dev();
 
-	// mean pressure
-	double p = pt.avgp;
-
 	// d2W/dCdC:C
 	mat3ds WCCxC = B*(W2*I1) - B2*W2;
 

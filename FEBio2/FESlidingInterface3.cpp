@@ -544,8 +544,6 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			// setup the material point
 			ept.F = mat3dd(1.0);
 			ept.J = 1;
-			ept.avgJ = 1;
-			ept.avgp = 0;
 			ept.s.zero();
 			
 			// if this is a poroelastic element, then get the permeability tensor
@@ -626,8 +624,6 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 			// setup the material point
 			ept.F = mat3dd(1.0);
 			ept.J = 1;
-			ept.avgJ = 1;
-			ept.avgp = 0;
 			ept.s.zero();
 			
 			// if this is a biphasic-solute element, then get the diffusivity tensor
