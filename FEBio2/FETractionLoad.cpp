@@ -20,7 +20,6 @@ void FETractionLoad::Residual(FESolver* psolver, vector<double>& R)
 	{
 		LOAD& pc = m_TC[iel];
 		FESurfaceElement& el = m_psurf->Element(iel);
-		m_psurf->UnpackElement(el);
 
 		double g = fem.GetLoadCurve(pc.lc)->Value();
 

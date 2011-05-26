@@ -183,9 +183,11 @@ bool FEM::InitMesh()
 			{
 				FESolidElement& el = pbd->Element(i);
 
+/*
 				try
 				{
-					if (!el.IsRigid()) pbd->UnpackElement(el);
+					// TODO: Add a check for the initial jacobian to
+					//       see if elements are using the right node numbering
 				}
 				catch (NegativeJacobian e)
 				{
@@ -206,6 +208,7 @@ bool FEM::InitMesh()
 					fprintf(stderr, "*******************************************************************\n\n");
 					++ninverted;
 				}
+*/
 			}
 		}
 
@@ -257,10 +260,11 @@ bool FEM::InitMesh()
 			for (i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-
+/*
 				try
 				{
-					if (!el.IsRigid()) psd->UnpackElement(el);
+					// TODO: Add a check for the initial jacobian to
+					//       see if elements are using the right node numbering
 				}
 				catch (NegativeJacobian e)
 				{
@@ -281,7 +285,7 @@ bool FEM::InitMesh()
 					fprintf(stderr, "*******************************************************************\n\n");
 					++ninverted;
 				}
-			}
+*/			}
 		}
 	}
 
@@ -306,8 +310,6 @@ bool FEM::InitMesh()
 			for (i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
-				if (!el.IsRigid()) psd->UnpackElement(el);
-
 				n = el.Nodes();
 				en = &el.m_node[0];
 				for (j=0; j<n; ++j) tag[en[j]] = 1;

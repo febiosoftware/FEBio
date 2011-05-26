@@ -21,7 +21,8 @@ void FEPressureLoad::PressureStiffness(FESurfaceElement& el, matrix& ke, vector<
 	double* w = el.GaussWeights();
 
 	// nodal coordinates
-	vec3d* rt = el.rt();
+	vec3d rt[4];
+	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 
 	vec3d kab;
 
@@ -81,7 +82,8 @@ bool FEPressureLoad::PressureForce(FESurfaceElement& el, vector<double>& fe, vec
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d *rt = el.rt();
+	vec3d rt[4];
+	for (int j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 
 	double* Gr, *Gs;
 	double* N;
@@ -234,8 +236,6 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 		// TODO: do we really need to skip rigid elements?
 		if (!el.IsRigid())
 		{
-			m_psurf->UnpackElement(el);
-
 			// calculate nodal normal tractions
 			int neln = el.Nodes();
 			vector<double> tn(neln);
@@ -280,7 +280,6 @@ void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 	{
 		LOAD& pc = m_PC[i];
 		FESurfaceElement& el = m_psurf->Element(i);
-		m_psurf->UnpackElement(el);
 
 		// calculate nodal normal tractions
 		int neln = el.Nodes();

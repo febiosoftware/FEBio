@@ -49,30 +49,6 @@ void FEElasticTrussDomain::UnpackLM(FEElement &el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticTrussDomain::UnpackElement(FEElement &el, unsigned int nflag)
-{
-	int i, n;
-
-	vec3d* rt = el.rt();
-
-	int N = el.Nodes();
-
-	// copy nodal data to element arrays
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-
-		FENode& node = m_pMesh->Node(n);
-
-		// current coordinates (= spatial coordinates)
-		rt[i] = node.m_rt;
-	}
-
-	// unpack the traits data
-	el.UnpackTraitsData(nflag);
-}
-
-//-----------------------------------------------------------------------------
 void FEElasticTrussDomain::InitElements()
 {
 	for (size_t i=0; i<m_Elem.size(); ++i)
@@ -93,7 +69,6 @@ void FEElasticTrussDomain::StiffnessMatrix(FESolidSolver* psolver)
 	for (int iel =0; iel<NT; ++iel)
 	{
 		FETrussElement& el = m_Elem[iel];
-		UnpackElement(el);
 		ElementStiffness(fem, el, ke);
 		UnpackLM(el, lm);
 		psolver->AssembleStiffness(el.m_node, lm, ke);
@@ -139,7 +114,7 @@ void FEElasticTrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix
 	double T = tau*V/l;
 
 	// element normal
-	vec3d n = el.Normal();
+	vec3d n = TrussNormal(el);
 
 	// calculate the tangent matrix
 	ke.Create(6, 6);
@@ -168,7 +143,6 @@ void FEElasticTrussDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	for (int i=0; i<NT; ++i)
 	{
 		FETrussElement& el = m_Elem[i];
-		UnpackElement(el);
 		InternalForces(el, fe);
 		UnpackLM(el, lm);
 		psolver->AssembleResidual(el.m_node, lm, fe, R);
@@ -182,7 +156,7 @@ void FEElasticTrussDomain::InternalForces(FETrussElement& el, vector<double>& fe
 	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());
 
 	// get the element's normal
-	vec3d n = el.Normal();
+	vec3d n = TrussNormal(el);
 
 	// get the element's Kirchhoff stress
 	double tau = pt.m_tau;
@@ -223,7 +197,6 @@ void FEElasticTrussDomain::UpdateStresses(FEM &fem)
 	{
 		// unpack the element
 		FETrussElement& el = m_Elem[i];
-		UnpackElement(el);
 
 		// get the material
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());

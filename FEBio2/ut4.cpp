@@ -273,24 +273,27 @@ void FEUT4Domain::UpdateStresses(FEM &fem)
 	FEElasticSolidDomain::UpdateStresses(fem);
 
 	// next we update the nodal data
-	int i, NE = Elements();
+	int i, j, NE = Elements();
 	for (i=0; i<(int) m_Node.size(); ++i) { m_Node[i].vi = 0; m_Node[i].Fi.zero(); }
 	double Ve, ve;
 	mat3d Fe;
+	vec3d rt[4];
 	for (i=0; i<NE; ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		UnpackElement(el, FE_UNPACK_TRAITS);
+
+		// nodal coordinates
+		for (j=0; j<4; ++j) rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
 
 		// calculate the volume
 		Ve = m_Ve0[i];
-		ve = TetVolume(el.rt());
+		ve = TetVolume(rt);
 
 		// calculate the deformation gradient
 		defgrad(el, Fe, 0);
 
 		// now assign one-quart to each node
-		for (int j=0; j<4; ++j) 
+		for (j=0; j<4; ++j) 
 		{
 			UT4NODE& n = m_Node[ m_tag[el.m_node[j]]];
 			n.vi += 0.25*ve;
@@ -411,7 +414,6 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 			for (n=0; n<NE; ++n)
 			{
 				FESolidElement& el = dynamic_cast<FESolidElement&>(*ppel[n]);
-				UnpackElement(el, FE_UNPACK_TRAITS);
 				UnpackLM(el, elm);
 
 				// calculate element volume
@@ -488,9 +490,6 @@ void FEUT4Domain::ElementResidual(FESolidSolver* psolver, vector<double>& R)
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];
-
-		// unpack the element
-		UnpackElement(el);
 
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
@@ -690,7 +689,6 @@ void FEUT4Domain::NodalGeometryStiffness(UT4NODE& node, matrix& ke)
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& ei = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(ei, FE_UNPACK_JAC0);
 
 		// calculate the jacobian
 		double Ji[3][3];
@@ -833,7 +831,6 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke)
 	for (ni=0; ni<NE; ++ni)
 	{
 		FESolidElement& el = dynamic_cast<FESolidElement&>(*ppe[ni]);
-		UnpackElement(el, FE_UNPACK_JAC0);
 
 		// calculate the jacobian
 		double Ji[3][3];
@@ -954,8 +951,6 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
-
-		UnpackElement(el);
 
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
@@ -1152,14 +1147,6 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 
 		// extract the 'D' matrix
 		C.extract(D);
-
-		if (dynamic_cast<FEMicroMaterial*>(pmat))
-		{
-			// the micro-material screws up the currently unpacked elements
-			// so I have to unpack the element data again
-			// TODO: Do I still need this?
-			UnpackElement(el);
-		}
 
 		for (i=0; i<neln; ++i)
 		{

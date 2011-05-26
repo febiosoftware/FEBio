@@ -24,9 +24,6 @@ void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		// this element should not be rigid
 		assert(!el.IsRigid());
 
-		// unpack the element
-		UnpackElement(el);
-
 		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
 
 		// get the element force vector and initialize it to zero
@@ -208,8 +205,6 @@ void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 		// this element should be UDG
 		assert(el.Type() == FE_UDGHEX);
-
-		UnpackElement(el);
 
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
@@ -520,9 +515,6 @@ void FEUDGHexDomain::UpdateStresses(FEM &fem)
 
 		assert(el.Type() == FE_UDGHEX);
 
-		// unpack the element data
-		UnpackElement(el);
-
 		// get the number of integration points
 		nint = el.GaussPoints();
 
@@ -583,7 +575,8 @@ void FEUDGHexDomain::UpdateStresses(FEM &fem)
 
 void FEUDGHexDomain::AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8])
 {
-	vec3d* rt = el.rt();
+	vec3d rt[8];
+	for (int j=0; j<8; ++j) rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
 
 	F.zero();
 	for (int i=0; i<8; ++i)

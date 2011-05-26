@@ -44,32 +44,6 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-//! Unpack the element. That is, copy element data in traits structure
-
-void FEHeatSolidDomain::UnpackElement(FEElement& el, unsigned int nflag)
-{
-	int i, n;
-
-	vec3d* rt = el.rt();
-
-	int N = el.Nodes();
-
-	// copy nodal data to element arrays
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-
-		FENode& node = m_pMesh->Node(n);
-
-		// current coordinates (= spatial coordinates)
-		rt[i] = node.m_rt;
-	}
-
-	// unpack the traits data
-	el.UnpackTraitsData(nflag);
-}
-
-//-----------------------------------------------------------------------------
 void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 {
 	int i, j, k;
@@ -81,7 +55,6 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		UnpackElement(el);
 
 		int ne = el.Nodes();
 

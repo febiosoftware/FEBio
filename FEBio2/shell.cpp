@@ -162,8 +162,6 @@ void FEElasticShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		int ndof = 6*el.Nodes();
 		fe.assign(ndof, 0);
 
-		UnpackElement(el);
-
 		// skip rigid elements for internal force calculation
 		InternalForces(el, fe);
 
@@ -283,8 +281,6 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 		FEShellElement& el = m_Elem[iel];
 
 		assert(!el.IsRigid());
-
-		UnpackElement(el);
 
 		// get the elements material
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
@@ -655,9 +651,6 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 
 		assert(!el.IsRigid());
 
-		// unpack the element data
-		UnpackElement(el);
-
 		// get the number of integration points
 		int nint = el.GaussPoints();
 
@@ -748,44 +741,4 @@ void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		// concentration dof
 		lm[11*N + i] = id[11];
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! Unpack the element. That is, copy element data in traits structure
-//! Note that for the shell elements the lm order is different compared
-//! to the solid element ordering. This is because for shell elements the
-//! nodes have six degrees of freedom each, where for solids they only
-//! have 3 dofs.
-
-void FEElasticShellDomain::UnpackElement(FEElement& el, unsigned int nflag)
-{
-	int i, n;
-
-	FEShellElement& se = dynamic_cast<FEShellElement&>(el);
-
-	vec3d* rt = se.rt();
-	vec3d* D0 = se.D0();
-	vec3d* Dt = se.Dt();
-
-	int N = se.Nodes();
-
-	// copy nodal data to element arrays
-	for (i=0; i<N; ++i)
-	{
-		n = se.m_node[i];
-
-		FENode& node = m_pMesh->Node(n);
-
-		// current coordinates (= spatial coordinates)
-		rt[i] = node.m_rt;
-
-		// intial director
-		D0[i] = node.m_D0;
-
-		// current director
-		Dt[i] = node.m_Dt;
-	}
-
-	// unpack the traits data
-	se.UnpackTraitsData(nflag);
 }

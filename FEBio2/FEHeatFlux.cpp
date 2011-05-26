@@ -16,7 +16,6 @@ void FEHeatFlux::Residual(FESolver* psolver, vector<double>& R)
 	{
 		LOAD& hf = HeatFlux(i);
 		FESurfaceElement& el = m_psurf->Element(i);
-		m_psurf->UnpackElement(el);
 
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
@@ -30,7 +29,8 @@ void FEHeatFlux::Residual(FESolver* psolver, vector<double>& R)
 		vector<double> fe(ne);
 
 		// nodal coordinates
-		vec3d *rt = el.rt();
+		vec3d rt[4];
+		for (j=0; j<ne; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 
 		double* Gr, *Gs;
 		double* N;

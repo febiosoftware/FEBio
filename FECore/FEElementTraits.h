@@ -55,20 +55,13 @@ public:
 		neln = ne;
 		nint = ni;
 		
-		rt.resize(ne);
-
 		H.Create(ni, ne);
-
-		m_pel = 0;
 	}
 
 	//! destructor
 	virtual ~FEElementTraits(){}
 
 public:
-	// These variables are filled when unpacking the element
-	std::vector<vec3d>  rt;	//!< current coordinates
-
 	int nint;	//!< number of integration points
 	int	neln;	//!< number of element nodes
 
@@ -81,8 +74,6 @@ public:
 
 
 	int m_ntype;	//!< type of element
-
-	FEElement*	m_pel;	//!< pointer to unpacked element
 
 private:
 
@@ -348,9 +339,6 @@ public:
 
 		Hr.Create(ni, ne);
 		Hs.Create(ni, ne);
-
-		D0.resize(ne);
-		Dt.resize(ne);
 	}
 
 public:
@@ -359,10 +347,6 @@ public:
 	std::vector<double> gs;
 	std::vector<double> gt;
 	std::vector<double> gw;
-
-	// directors
-	std::vector<vec3d>	D0;	//!< initial directors
-	std::vector<vec3d>	Dt;	//!< current directors
 
 	// local derivatives of shape functions at gauss points
 	matrix Hr, Hs;

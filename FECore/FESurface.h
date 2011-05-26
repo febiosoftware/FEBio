@@ -48,7 +48,6 @@ public:
 	vec3d ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s);
 
 	//! Unpack surface element data
-	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! return the mesh to which this surface is attached

@@ -119,7 +119,6 @@ void FEMicroMaterial::PrepRVE()
 	for (i=0; i<bd.Elements(); ++i)
 	{
 		FESolidElement& el = bd.Element(i);
-		bd.UnpackElement(el);
 		nint = el.GaussPoints();
 		w = el.GaussWeights();
 		ve = 0;
@@ -280,7 +279,6 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	for (int n=0; n<NS; ++n)
 	{
 		FESolidElement& e = bd.Element(n);
-		bd.UnpackElement(e);
 
 		// create the element's stiffness matrix
 		int ne = e.Nodes();

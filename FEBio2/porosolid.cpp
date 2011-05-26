@@ -32,9 +32,6 @@ void FEPoroSolidDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		//! this element should not be UDG
 		assert(el.Type() != FE_UDGHEX);
 
-		// unpack the element
-		UnpackElement(el);
-
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
 		fe.assign(ndof, 0);
@@ -216,8 +213,6 @@ void FEPoroSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 		// this element should not be rigid
 		assert(!el.IsRigid());
-
-		UnpackElement(el);
 
 		// get the elements material
 		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
@@ -588,13 +583,6 @@ void FEPoroSolidDomain::PoroMaterialStiffness(FEM& fem, FESolidElement &el, matr
 		tens4ds C = pmat->Tangent(mp);
 		C.extract(D);
 
-		if (dynamic_cast<FEMicroMaterial*>(pmat))
-		{
-			// the micro-material screws up the currently unpacked elements
-			// so I have to unpack the element data again
-			UnpackElement(el);
-		}
-
 		for (i=0; i<neln; ++i)
 		{
 			Gr = Grn[i];
@@ -686,9 +674,6 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 
 		assert(el.Type() != FE_UDGHEX);
 
-		// unpack the element data
-		UnpackElement(el);
-
 		// get the number of integration points
 		nint = el.GaussPoints();
 
@@ -745,13 +730,6 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 
 			// calculate the stress at this material point
 			pt.s = pm->Stress(mp);
-
-			if (dynamic_cast<FEMicroMaterial*>(pme))
-			{
-				// the micro-material screws up the currently unpacked elements
-				// so I have to unpack the element data again
-				UnpackElement(el);
-			}
 
 			// for poroelastic materials also update the fluid flux
 			FEPoroElastic* pmat = dynamic_cast<FEPoroElastic*>(pm);

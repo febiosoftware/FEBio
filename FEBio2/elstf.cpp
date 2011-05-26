@@ -821,7 +821,6 @@ void FESolidSolver::InertialForces(vector<double>& R)
 			for (iel=0; iel<pbd->Elements(); ++iel)
 			{
 				FESolidElement& el = pbd->Element(iel);
-				pbd->UnpackElement(el);
 
 				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
 

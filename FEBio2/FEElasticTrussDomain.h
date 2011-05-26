@@ -22,7 +22,6 @@ public:
 	void InitElements();
 
 	//! Unpack truss element data
-	void UnpackElement(FEElement& el, unsigned int flag = FE_UNPACK_ALL);
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	//! calculates the global stiffness matrix for this domain

@@ -608,7 +608,6 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 		{
 			// get the slave element
 			FESurfaceElement& sel = ss.Element(j);
-			ss.UnpackElement(sel);
 			nseln = sel.Nodes();
 
 			// get the element's LM array
@@ -662,7 +661,6 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 					// contact force.
 					// get the master element
 					FESurfaceElement& mel = *ss.m_pme[m];
-					ms.UnpackElement(mel);		// can't delete yet since it is used in ContactNodalForce
 					ms.UnpackLM(mel, mLM);
 
 					// calculate the degrees of freedom
@@ -764,7 +762,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	mat2d Mki = Mk.inverse();
 
 	// get the master element node positions
-	for (k=0; k<nmeln; ++k) rtm[k] = mel.rt()[k];
+	for (k=0; k<nmeln; ++k) rtm[k] = mesh.Node(mel.m_node[k]).m_rt;
 
 	// isoparametric coordinates of the projected slave node
 	// onto the master element
@@ -974,7 +972,6 @@ void FESlidingInterface::ContactStiffness()
 		{
 			// unpack the slave element
 			FESurfaceElement& se = ss.Element(j);
-			ss.UnpackElement(se);
 			nseln = se.Nodes();
 
 			// get the element's LM array
@@ -1017,7 +1014,6 @@ void FESlidingInterface::ContactStiffness()
 				{
 					// get the master element
 					FESurfaceElement& me = *ss.m_pme[m];
-					ms.UnpackElement(me);
 
 					// get the masters element's LM array
 					ms.UnpackLM(me, mLM);
@@ -1082,8 +1078,9 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	double scale = Penalty();
 	double eps = ss.eps[m]*scale;
 
-	// get the master element node positions
-	vec3d* rt = mel.rt();
+	// nodal coordinates
+	vec3d rt[4];
+	for (j=0; j<nmeln; ++j) rt[j] = mesh.Node(mel.m_node[j]).m_rt;
 
 	// slave node natural coordinates in master element
 	double r = ss.rs[m][0];
@@ -1587,7 +1584,6 @@ bool FESlidingInterface::Augment(int naug)
 			{
 				// update the metrics
 				FESurfaceElement& mel = *m_ss.m_pme[i];
-				m_ms.UnpackElement(mel);
 
 				double r = m_ss.rs[i][0], s = m_ss.rs[i][1];
 				double rp = m_ss.rsp[i][0], sp = m_ss.rsp[i][1];
@@ -1635,7 +1631,6 @@ bool FESlidingInterface::Augment(int naug)
 			{
 				// update the metrics
 				FESurfaceElement& mel = *m_ms.m_pme[i];
-				m_ms.UnpackElement(mel);
 
 				double r = m_ms.rs[i][0], s = m_ms.rs[i][1];
 				double rp = m_ms.rsp[i][0], sp = m_ms.rsp[i][1];

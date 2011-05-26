@@ -17,7 +17,6 @@ public:
 	}
 
 	//! Unpack solid element data
-	void UnpackElement(FEElement& el, unsigned int nflag = FE_UNPACK_ALL);
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	void HeatStiffnessMatrix(FEHeatSolver* psolver);

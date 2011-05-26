@@ -20,8 +20,9 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 	// gauss weights
 	double* w = el.GaussWeights();
 	
-	// nodal coordinates
-	vec3d* rt = el.rt();
+	// get the element's nodal coordinates
+	vec3d rt[4];
+	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 	
 	vec3d kab, t1, t2;
 	
@@ -77,8 +78,9 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 	// nr of element nodes
 	int neln = el.Nodes();
 	
-	// nodal coordinates
-	vec3d *rt = el.rt();
+	// get the element's nodal coordinates
+	vec3d rt[4];
+	for (int j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 	
 	double* Gr, *Gs;
 	double* N;
@@ -235,8 +237,6 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 			// TODO: do we really need to skip rigid elements?
 			if (!el.IsRigid())
 			{
-				m_psurf->UnpackElement(el);
-				
 				// calculate nodal normal solute flux
 				int neln = el.Nodes();
 				vector<double> wn(neln);
@@ -295,7 +295,6 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 		if (fc.bc == 0)
 		{
 			FESurfaceElement& el = m_psurf->Element(i);
-			m_psurf->UnpackElement(el);
 			
 			// calculate nodal normal solute flux
 			int neln = el.Nodes();

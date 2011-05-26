@@ -20,6 +20,9 @@ public:
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 
+	//! Calculate the truss normal
+	vec3d TrussNormal(FETrussElement& el);
+
 protected:
 	vector<int>				m_Node;
 	vector<FETrussElement>	m_Elem;

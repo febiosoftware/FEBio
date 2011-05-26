@@ -83,7 +83,7 @@ void FESlidingSurface3::Init()
 	while (!m_bporo && (i<Elements())) {
 		// get the surface element
 		FESurfaceElement& se = Element(i);
-		UnpackElement(se);
+
 		// get the solid element this surface element belongs to
 		FESolidElement* pe = dynamic_cast<FESolidElement*>(m_pMesh->FindElementFromID(se.m_nelem));
 		if (pe)
@@ -105,7 +105,7 @@ void FESlidingSurface3::Init()
 	while (!m_bsolu && (i<Elements())) {
 		// get the surface element
 		FESurfaceElement& se = Element(i);
-		UnpackElement(se);
+
 		// get the solid element this surface element belongs to
 		FESolidElement* pe = dynamic_cast<FESolidElement*>(m_pMesh->FindElementFromID(se.m_nelem));
 		if (pe)
@@ -345,10 +345,10 @@ void OnSlidingInterface3Callback(FEM* pfem, void* pd)
 		{
 			// get the element
 			FESurfaceElement& e = s.Element(i);
-			s.UnpackElement(e);
 			
 			// get the element's nodal coordinates
-			vec3d* rn = e.rt();
+			vec3d rn[4];
+			for (int j=0; j<e.Nodes(); ++j) rn[j] = s.GetMesh()->Node(e.m_node[j]).m_rt;
 			
 			// loop over the integration points
 			int ni = e.GaussPoints();
@@ -666,7 +666,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
-		ss.UnpackElement(el);
+
 		bool sporo, ssolu;
 		BiphasicSoluteStatus(mesh, el, sporo, ssolu);
 		
@@ -981,7 +981,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F)
 		{
 			// get the surface element
 			FESurfaceElement& se = ss.Element(i);
-			ss.UnpackElement(se);
+
 			bool sporo, ssolu;
 			BiphasicSoluteStatus(*pm, se, sporo, ssolu);
 			
@@ -1017,7 +1017,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F)
 				{
 					// get the master element
 					FESurfaceElement& me = *pme;
-					ms.UnpackElement(me);
+
 					bool mporo, msolu;
 					BiphasicSoluteStatus(*pm, me, mporo, msolu);
 					
@@ -1215,7 +1215,7 @@ void FESlidingInterface3::ContactStiffness()
 		{
 			// get ths slave element
 			FESurfaceElement& se = ss.Element(i);
-			ss.UnpackElement(se);
+
 			bool sporo, ssolu;
 			BiphasicSoluteStatus(*pm, se, sporo, ssolu);
 			
@@ -1271,7 +1271,7 @@ void FESlidingInterface3::ContactStiffness()
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
-					ms.UnpackElement(me);
+
 					bool mporo, msolu;
 					BiphasicSoluteStatus(*pm, me, mporo, msolu);
 					

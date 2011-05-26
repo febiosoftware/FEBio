@@ -271,8 +271,6 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 			// TODO: do we really need to skip rigid elements?
 			if (!el.IsRigid())
 			{
-				m_psurf->UnpackElement(el);
-
 				// calculate nodal normal fluid flux
 				int neln = el.Nodes();
 				vector<double> wn(neln);
@@ -319,7 +317,6 @@ void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 		if (fc.bc == 0)
 		{
 			FESurfaceElement& el = m_psurf->Element(i);
-			m_psurf->UnpackElement(el);
 
 			// calculate nodal normal fluid flux
 			int neln = el.Nodes();

@@ -102,20 +102,6 @@ enum FE_Node_Type {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// ENUM: Unpack flags
-
-enum FE_Unpack_Flags {
-	FE_UNPACK_JAC0		= 1,
-	FE_UNPACK_JACT		= 2,
-	FE_UNPACK_DEFGRAD	= 4,
-	FE_UNPACK_TRAITS	= 7,
-	FE_UNPACK_R0		= 8,
-	FE_UNPACK_RT		= 16,
-	FE_UNPACK_DATA		= 32,
-	FE_UNPACK_ALL		= 127
-};
-
-///////////////////////////////////////////////////////////////////////////////
 // ENUM: Contact interface types
 
 enum FE_Contact_Types {

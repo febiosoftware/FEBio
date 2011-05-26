@@ -75,14 +75,6 @@ public:
 		m_State.Create(GaussPoints());
 	}
 
-	void UnpackTraitsData(int nflag) 
-	{ 
-		m_pT->m_pel = this;
-	}
-
-	// interface to traits members
-	vec3d* rt() { return &m_pT->rt[0]; }		// spatial coordinates
-
 	int GaussPoints() const { return m_pT->nint; } 
 	int Nodes() const { return m_pT->neln; } 
 
@@ -101,21 +93,12 @@ public:
 	{
 		FEElementLibrary::SetElementTraits(*this, ntype);
 	}
-/*
-	bool HasNode(int n)
-	{
-		int m = m_node.size();
-		for (int i=0; i<m; ++i) if (m[i] == n) return true;
-		return false;
-	}
-*/
 
 	void SetMaterialPointData(FEMaterialPoint* pmp, int n) { m_State[n] = pmp; }
 
 	//! evaluate scalar field at integration point
 	double Evaluate(double* fn, int n)
 	{
-		assert(m_pT->m_pel == this);
 		double* Hn = H(n);
 		double f = 0;
 		const int N = Nodes();
@@ -126,7 +109,6 @@ public:
 	//! evaluate vector field at integration point
 	vec3d Evaluate(vec3d* vn, int n)
 	{
-		assert(m_pT->m_pel == this);
 		double* Hn = H(n);
 		vec3d v;
 		const int N = Nodes();
@@ -425,9 +407,6 @@ public:
 	double* Hr(int n) { return ((FEShellElementTraits*)(m_pT))->Hr[n]; }	// shape function derivative to r
 	double* Hs(int n) { return ((FEShellElementTraits*)(m_pT))->Hs[n]; }	// shape function derivative to s
 
-	vec3d* D0() { return &((FEShellElementTraits*)(m_pT))->D0[0]; }
-	vec3d* Dt() { return &((FEShellElementTraits*)(m_pT))->Dt[0]; }
-
 	void Init(bool bflag)
 	{
 		int nint = GaussPoints();
@@ -464,16 +443,6 @@ public:
 	void Init(bool bflag)
 	{
 		m_State[0]->Init(bflag);
-	}
-
-	vec3d Normal()
-	{
-		assert(m_pT->m_pel == this);
-		vec3d a = rt()[0];
-		vec3d b = rt()[1];
-		vec3d n = b - a;
-		n.unit();
-		return n;
 	}
 
 public:

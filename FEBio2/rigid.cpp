@@ -32,8 +32,6 @@ void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		FESolidElement& el = m_Elem[iel];
 		assert(el.IsRigid());
 
-		UnpackElement(el);
-
 		int ndof = 3*el.Nodes();
 		ke.Create(ndof, ndof);
 		ke.zero();
@@ -70,9 +68,6 @@ void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		// get the element
 		FESolidElement& el = m_Elem[i];
 		assert(el.IsRigid());
-
-		// unpack the element
-		UnpackElement(el);
 
 		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
 
@@ -152,8 +147,6 @@ void FERigidShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		// create the element force vector and initialize to zero
 		int ndof = 6*el.Nodes();
 		fe.assign(ndof, 0);
-
-		UnpackElement(el);
 
 		// apply body forces to shells
 		BodyForces(fem, el, fe);

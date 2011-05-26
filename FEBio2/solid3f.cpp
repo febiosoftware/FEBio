@@ -341,9 +341,6 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 
-		// unpack the element data
-		UnpackElement(el);
-
 		// get the number of integration points
 		nint = el.GaussPoints();
 

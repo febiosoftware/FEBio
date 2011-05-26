@@ -392,12 +392,11 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 		for (int i=0; i<NS; ++i)
 		{
 			FEShellElement& e = pbs->Element(i);
-			dom.UnpackElement(e);
 			int n = e.Nodes();
-			vec3d* D = e.Dt();
 			for (int j=0; j<n; ++j)
 			{
-				double h = e.m_h0[j] * D[j].norm();
+				vec3d D = pbs->GetMesh()->Node(e.m_node[j]).m_Dt;
+				double h = e.m_h0[j] * D.norm();
 				a.push_back((float) h);
 			}
 		}

@@ -281,7 +281,6 @@ double FEMesh::ElementVolume(FEElement& el)
 	{
 		FESolidElement* ph = dynamic_cast<FESolidElement*>(&el);
 		FESolidDomain& bd = dynamic_cast<FESolidDomain&>(*pd);
-		pd->UnpackElement(*ph);
 		int nint = ph->GaussPoints();
 		double *w = ph->GaussWeights();
 		for (int n=0; n<nint; ++n) V += bd.detJ0(*ph, n)*w[n];
@@ -291,7 +290,6 @@ double FEMesh::ElementVolume(FEElement& el)
 	{
 		FEShellElement* ps = dynamic_cast<FEShellElement*>(&el);
 		FEShellDomain& sd = dynamic_cast<FEShellDomain&>(*pd);
-		pd->UnpackElement(*ps);
 		int nint = ps->GaussPoints();
 		double *w = ps->GaussWeights();
 		for (int n=0; n<nint; ++n) V += sd.detJ0(*ps, n)*w[n];

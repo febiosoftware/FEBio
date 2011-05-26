@@ -575,7 +575,6 @@ void LSDYNAPlotFile::write_truss_stress()
 			for (int i=0; i<ptd->Elements(); ++i)
 			{
 				FETrussElement& el = ptd->Element(i);
-				ptd->UnpackElement(el);
 				FETrussMaterialPoint& pt = *(el.m_State[0]->ExtractData<FETrussMaterialPoint>());
 
 				vec3d r0[2], rt[2];

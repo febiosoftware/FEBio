@@ -262,9 +262,11 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 	{
 		// get the slave element
 		FESurfaceElement& se = ss.Element(i);
-		ss.UnpackElement(se);
-		vec3d* re = se.rt();
 		int nn = se.Nodes();
+
+		// get nodal coordinates
+		vec3d re[4];
+		for (int l=0; l<nn; ++l) re[l] = ss.GetMesh()->Node(se.m_node[l]).m_rt;
 
 		// loop over all its integration points
 		int nint = se.GaussPoints();
@@ -350,7 +352,6 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 		for (i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
-			ss.UnpackElement(se);
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
@@ -396,7 +397,6 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
-					ms.UnpackElement(me);
 
 					int nmeln = me.Nodes();
 
@@ -537,7 +537,6 @@ void FEFacet2FacetSliding::ContactStiffness()
 		for (i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
-			ss.UnpackElement(se);
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
@@ -583,7 +582,6 @@ void FEFacet2FacetSliding::ContactStiffness()
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
-					ms.UnpackElement(me);
 
 					int nmeln = me.Nodes();
 
@@ -700,7 +698,8 @@ void FEFacet2FacetSliding::ContactStiffness()
 						}
 
 						// get the master nodes
-						vec3d* rt = me.rt();
+						vec3d rt[4];
+						for (k=0; k<nmeln; ++k) rt[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
 						// get the tangent vectors
 						vec3d tau1(0,0,0), tau2(0,0,0);

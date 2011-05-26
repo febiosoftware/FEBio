@@ -87,29 +87,6 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 	}
 }
 
-//-----------------------------------------------------------------------------
-void FEDiscreteSpringDomain::UnpackElement(FEElement &el, unsigned int nflag)
-{
-	int i, n;
-
-	vec3d* rt = el.rt();
-
-	int N = el.Nodes();
-
-	// copy nodal data to element arrays
-	for (i=0; i<N; ++i)
-	{
-		n = el.m_node[i];
-
-		FENode& node = m_pMesh->Node(n);
-
-		// current coordinates (= spatial coordinates)
-		rt[i] = node.m_rt;
-	}
-
-	// unpack the traits data
-	el.UnpackTraitsData(nflag);
-}
 
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)

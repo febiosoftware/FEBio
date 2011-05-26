@@ -270,7 +270,6 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 		{
 			// get the slave element
 			FESurfaceElement& sel = ss.Element(j);
-			ss.UnpackElement(sel);
 			
 			// get the elements LM vector
 			ss.UnpackLM(sel, sLM);
@@ -316,10 +315,6 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 				ms.UnpackLM(mel, mLM);
 
 				nmeln = mel.Nodes();
-
-				// we must unpack the slave element again
-				// TODO: I think I can delete this
-				ss.UnpackElement(sel);
 
 				// isoparametric coordinates of the projected slave node
 				// onto the master element
@@ -425,7 +420,6 @@ void FEPeriodicBoundary::ContactStiffness()
 		for (j=0; j<ne; ++j)
 		{
 			FESurfaceElement& se = ss.Element(j);
-			ss.UnpackElement(se);
 
 			// get the element's LM vector
 			ss.UnpackLM(se, sLM);
@@ -472,10 +466,6 @@ void FEPeriodicBoundary::ContactStiffness()
 
 				// get the master element node positions
 				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
-
-				// we must unpack the slave element again
-				// TODO: Do we still need to do this?
-				ss.UnpackElement(se);
 
 				// slave node natural coordinates in master element
 				r = ss.m_rs[m][0];

@@ -309,7 +309,6 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 		// get the reference element
 		int nref = ss.m_nref;
 		FESurfaceElement* pref = ss.m_pme[nref];
-		ms.UnpackElement(*pref);
 
 		// loop over all slave facets
 		int ne = ss.Elements();
@@ -317,7 +316,6 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 		{
 			// get the slave element
 			FESurfaceElement& sel = ss.Element(j);
-			ss.UnpackElement(sel);
 
 			// get the element's LM vector
 			ss.UnpackLM(sel, sLM);
@@ -361,10 +359,6 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 				// get the master element
 				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
 				ms.UnpackLM(mel, mLM);
-
-				// we must unpack the slave element again
-				// TODO: Do we still need to do this?
-				ss.UnpackElement(sel);
 
 				nmeln = mel.Nodes();
 
@@ -473,7 +467,6 @@ void FESurfaceConstraint::ContactStiffness()
 		// get the reference element
 		int nref = ss.m_nref;
 		FESurfaceElement* pref = ss.m_pme[nref];
-		ms.UnpackElement(*pref);
 
 		// grab the data we'll need for this element
 		ms.UnpackLM(*pref, LM0);
@@ -525,7 +518,6 @@ void FESurfaceConstraint::ContactStiffness()
 		for (j=0; j<ne; ++j)
 		{
 			FESurfaceElement& se = ss.Element(j);
-			ss.UnpackElement(se);
 
 			// get the element's LM vector
 			ss.UnpackLM(se, sLM);
@@ -571,10 +563,6 @@ void FESurfaceConstraint::ContactStiffness()
 
 				// get the master element node positions
 				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
-
-				// we must unpack the slave element again
-				// TODO: Do I still need this?
-				ss.UnpackElement(se);
 
 				// slave node natural coordinates in master element
 				r = ss.m_rs[m][0];

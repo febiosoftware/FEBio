@@ -69,9 +69,6 @@ void FERigidBody::Update()
 				{
 					dens = pm->m_density;
 
-					// unpack the element
-					pbd->UnpackElement(el);
-
 					// nr of integration points
 					int nint = el.GaussPoints();
 

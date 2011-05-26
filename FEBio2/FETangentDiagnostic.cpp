@@ -210,7 +210,6 @@ bool FETangentDiagnostic::Run()
 
 	// get the one and only element
 	FESolidElement& el = bd.Element(0);
-	bd.UnpackElement(el);
 
 	// set up the element stiffness matrix
 	matrix k0(24, 24);
@@ -275,7 +274,6 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 	// get the one and only element
 	FESolidElement& el = bd.Element(0);
-	bd.UnpackElement(el);
 
 	// first calculate the initial residual
 	vector<double> f0(24);
@@ -303,7 +301,6 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 
 
 		solver.UpdateStresses();
-		bd.UnpackElement(el);
 
 		zero(f1);
 		bd.InternalForces(el, f1);
@@ -316,7 +313,6 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		}
 
 		solver.UpdateStresses();
-		bd.UnpackElement(el);
 
 		for (i=0; i<3*N; ++i) ke[i][j] = -(f1[i] - f0[i])/dx;
 	}
