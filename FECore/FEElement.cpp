@@ -33,11 +33,6 @@ FESolidElement::FESolidElement(const FESolidElement& el)
 	m_node = el.m_node;
 	m_nID = el.m_nID;
 	m_gid = el.m_gid;
-
-	// copy solid element data
-	m_eJ = el.m_eJ;
-	m_ep = el.m_ep;
-	m_Lk = el.m_Lk;
 }
 
 FESolidElement& FESolidElement::operator = (const FESolidElement& el)
@@ -51,11 +46,6 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	m_node = el.m_node;
 	m_nID = el.m_nID;
 	m_gid = el.m_gid;
-
-	// copy solid element data
-	m_eJ = el.m_eJ;
-	m_ep = el.m_ep;
-	m_Lk = el.m_Lk;
 
 	return (*this);
 }

@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
-#include "FEUncoupledMaterial.h"
 #include "FEElasticSolidDomain.h"
-#include "FEElasticShellDomain.h"
 #include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,76 +43,13 @@ bool FESolidSolver::Augment()
 		for (int i=0; i<n; ++i, ++im) bconv = (*im)->Augment(m_naug) && bconv;
 	}
 
-	// do incompressibility multipliers
-	int nd;
-	for (int i=0; i<m_fem.Materials(); ++i)
+	// do incompressibility multipliers for 3Field domains
+	FEMesh& mesh = m_fem.GetMesh();
+	int ND = mesh.Domains();
+	for (int i=0; i<ND; ++i)
 	{
-		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
-		if (pmi)
-		{
-			if (pmi->m_blaugon)
-			{
-				int n;
-				double normL0 = 0, normL1 = 0, L0, L1;
-				double k = pmi->m_K;
-				FEMesh& mesh = m_fem.m_mesh;
-
-				for (nd = 0; nd < mesh.Domains(); ++nd)
-				{
-					// do solid elements
-					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
-					if (pbd)
-					{
-						for (n=0; n<pbd->Elements(); ++n)
-						{
-							FESolidElement& el = pbd->Element(n);
-
-							if (el.GetMatID() == i)
-							{
-								L0 = el.m_Lk;
-								normL0 += L0*L0;
-
-								L1 = L0 + k*pmi->h(el.m_eJ);
-								normL1 += L1*L1;
-							}
-						}
-					}
-				}
-
-				normL0 = sqrt(normL0);
-				normL1 = sqrt(normL1);
-
-				// check convergence
-				double pctn = 0;
-				if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
-
-				clog.printf(" material %d\n", i+1);
-				clog.printf("                        CURRENT         CHANGE        REQUIRED\n");
-				clog.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
-
-				if (pctn >= pmi->m_atol)
-				{
-					bconv = false;
-					for (nd = 0; nd < mesh.Domains(); ++nd)
-					{
-						FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
-						if (pbd)
-						{
-							for (n=0; n<pbd->Elements(); ++n)
-							{
-								FESolidElement& el = pbd->Element(n);
-								if (el.GetMatID() == i) 
-								{
-									double hi = pmi->h(el.m_eJ);
-									el.m_Lk += k*pmi->h(el.m_eJ);
-									el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		FE3FieldElasticSolidDomain* pd = dynamic_cast<FE3FieldElasticSolidDomain*>(&mesh.Domain(i));
+		if (pd) bconv = (pd->Augment() && bconv);
 	}
 
 	return bconv;

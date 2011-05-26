@@ -69,15 +69,17 @@ void FEElasticTrussDomain::StiffnessMatrix(FESolidSolver* psolver)
 	for (int iel =0; iel<NT; ++iel)
 	{
 		FETrussElement& el = m_Elem[iel];
-		ElementStiffness(fem, el, ke);
+		ElementStiffness(fem, iel, ke);
 		UnpackLM(el, lm);
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticTrussDomain::ElementStiffness(FEM& fem, FETrussElement& el, matrix& ke)
+void FEElasticTrussDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 {
+	FETrussElement& el = Element(iel);
+
 	// get the material
 	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(fem.GetMaterial(el.GetMatID()));
 	assert(pm);

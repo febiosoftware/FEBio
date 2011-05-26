@@ -287,7 +287,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 		ke.zero();
 
 		// calculate the element's stiffness matrix
-		bd.ElementStiffness(m_rve, e, ke);
+		bd.ElementStiffness(m_rve, n, ke);
 
 		// create the element's residual
 		fe.assign(ndof, 0);

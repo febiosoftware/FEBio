@@ -167,15 +167,7 @@ public:
 	{
 		int nint = GaussPoints();
 		for (int i=0; i<nint; ++i) m_State[i]->Init(bflag);
-		m_eJ = 1;
-		m_ep = 0;
-		m_Lk = 0;
 	}
-
-public:
-	double	m_eJ;	//!< average dilatation
-	double	m_ep;	//!< average pressure
-	double	m_Lk;	//!< Lagrangian multiplier for incompressibility
 };
 
 //-----------------------------------------------------------------------------

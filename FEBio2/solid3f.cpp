@@ -2,6 +2,31 @@
 #include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
 #include "FEUncoupledMaterial.h"
+#include "log.h"
+
+//-----------------------------------------------------------------------------
+//! Initialize the 3-field domain data
+bool FE3FieldElasticSolidDomain::Initialize(FEModel &fem)
+{
+	// make sure the domain material uses an uncoupled formulation
+	if (dynamic_cast<FEUncoupledMaterial*>(m_pMat) == 0) return false;
+	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+
+	// allocate element data
+	int NE = Elements();
+	m_Data.resize(NE);
+
+	// initialize element data
+	for (int i=0; i<NE; ++i)
+	{
+		ELEM_DATA& d = m_Data[i];
+		d.eJ = 1.0;
+		d.ep = 0.0;
+		d.Lk = 0.0;
+	}
+
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 //! This function calculates the element stiffness matrix. It calls the material
@@ -10,20 +35,21 @@
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FE3FieldElasticSolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FE3FieldElasticSolidDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
-	MaterialStiffness(fem, el, ke);
+	MaterialStiffness(fem, iel, ke);
 
 	// calculate geometrical stiffness
-	GeometricalStiffness(el, ke);
+	GeometricalStiffness(iel, ke);
 
 	// Calculate dilatational stiffness
-	DilatationalStiffness(fem, el, ke);
+	DilatationalStiffness(fem, iel, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
 	// grabs elements from the upper diagonal matrix?
+	FESolidElement& el = Element(iel);
 	int ndof = 3*el.Nodes();
 	int i, j;
 	for (i=0; i<ndof; ++i)
@@ -34,9 +60,12 @@ void FE3FieldElasticSolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, 
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
 
-void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke)
+void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, int iel, matrix& ke)
 {
 	int i, j, n;
+
+	FESolidElement& elem = Element(iel);
+	ELEM_DATA& ed = m_Data[iel];
 
 	const int nint = elem.GaussPoints();
 	const int neln = elem.Nodes();
@@ -94,12 +123,14 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement&
 	}
 
 	// get effective modulus
-	double k = pmi->UJJ(elem.m_eJ);
+//	double k = pmi->UJJ(elem.m_eJ);
+	double k = pmi->UJJ(ed.eJ);
 
 	// next, we add the Lagrangian contribution
 	// note that this term will always be zero if the material does not
 	// use the augmented lagrangian
 //	k += elem.m_Lk*pmi->hpp(elem.m_eJ);
+//	k += ed.Lk*pmi->hpp(ed.eJ);
 
 	// divide by initial volume
 	k /= Ve;
@@ -115,9 +146,12 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, FESolidElement&
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FE3FieldElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FE3FieldElasticSolidDomain::MaterialStiffness(FEM& fem, int iel, matrix &ke)
 {
 	int i, i3, j, j3, n;
+
+	FESolidElement &el = Element(iel);
+	ELEM_DATA& ed = m_Data[iel];
 
 	// Get the current element's data
 	const int nint = el.GaussPoints();
@@ -175,7 +209,7 @@ void FE3FieldElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el,
 		// Note that we are only grabbing the deviatoric tangent. 
 		// The other tangent terms depend on the pressure p
 		// which we seperately
-		tens4ds C = Cp*el.m_ep + mat.DevTangent(mp);
+		tens4ds C = Cp*ed.ep + mat.DevTangent(mp);
 
 		// get the 'D' matrix
 		C.extract(D);
@@ -252,9 +286,11 @@ void FE3FieldElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el,
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for each integration point
 
-void FE3FieldElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
+void FE3FieldElasticSolidDomain::GeometricalStiffness(int iel, matrix &ke)
 {
 	int n, i, j;
+
+	FESolidElement &el = Element(iel);
 
 	double Gx[8], Gy[8], Gz[8];
 	double *Grn, *Gsn, *Gtn;
@@ -333,10 +369,12 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 	// get the material
 	FEUncoupledMaterial& mat = *(dynamic_cast<FEUncoupledMaterial*>(m_pMat));
 
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	int NE = (int) m_Elem.size();
+	for (i=0; i<NE; ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
+		ELEM_DATA& ed = m_Data[i];
 
 		// get the number of integration points
 		nint = el.GaussPoints();
@@ -365,12 +403,12 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 		}
 
 		// calculate volume ratio
-		el.m_eJ = v / V;
+		ed.eJ = v / V;
 
 		// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
 		//        <----- Lag. mult. ----->   <------ penalty ----->
 //		el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
-		el.m_ep = mat.UJ(el.m_eJ);
+		ed.ep = mat.UJ(ed.eJ);
 
 		// loop over the integration points and calculate
 		// the stress at the integration point
@@ -394,7 +432,93 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
 			// and the Stress function uses the pointwise pressure. 
 			// Therefore we call the DevStress function and add the pressure term
 			// seperately. 
-			pt.s = mat3dd(el.m_ep) + mat.DevStress(mp);
+			pt.s = mat3dd(ed.ep) + mat.DevStress(mp);
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//! Do augmentation
+bool FE3FieldElasticSolidDomain::Augment()
+{
+	FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_pMat);
+	assert(pmi);
+
+	// make sure Augmented Lagrangian flag is on
+	if (pmi->m_blaugon == false) return true;
+
+	// do the augmentation
+	int n;
+	double normL0 = 0, normL1 = 0, L0, L1;
+	double k = pmi->m_K;
+	FEMesh& mesh = *m_pMesh;
+	int NE = Elements();
+
+	for (n=0; n<NE; ++n)
+	{
+		ELEM_DATA& ed = m_Data[n];
+
+		L0 = ed.Lk;
+		normL0 += L0*L0;
+
+		L1 = L0 + k*pmi->h(ed.eJ);
+		normL1 += L1*L1;
+	}
+
+	normL0 = sqrt(normL0);
+	normL1 = sqrt(normL1);
+
+	// check convergence
+	double pctn = 0;
+	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
+
+	clog.printf(" material %d\n", pmi->GetID());
+	clog.printf("                        CURRENT         CHANGE        REQUIRED\n");
+	clog.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
+
+	bool bconv = true;
+	if (pctn >= pmi->m_atol)
+	{
+		bconv = false;
+		for (n=0; n<NE; ++n)
+		{
+			ELEM_DATA& ed = m_Data[n];
+
+			double hi = pmi->h(ed.eJ);
+			ed.Lk += k*pmi->h(ed.eJ);
+			ed.ep = ed.Lk*pmi->hp(ed.eJ) + k*log(ed.eJ)/ed.eJ;
+		}
+	}
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! Data serialization
+void FE3FieldElasticSolidDomain::Serialize(DumpFile &ar)
+{
+	FEElasticSolidDomain::Serialize(ar);
+
+	if (ar.IsSaving())
+	{
+		int NE = Elements();
+		ar << NE;
+		for (int i=0; i<NE; ++i)
+		{
+			ELEM_DATA& ed = m_Data[i];
+			ar << ed.eJ << ed.ep << ed.Lk;
+		}
+	}
+	else
+	{
+		int NE;
+		ar >> NE;
+		assert(NE == Elements());
+		for (int i=0; i<NE; ++i)
+		{
+			ELEM_DATA& ed = m_Data[i];
+			ar >> ed.eJ >> ed.ep >> ed.Lk;
 		}
 	}
 }

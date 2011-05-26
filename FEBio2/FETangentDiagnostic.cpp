@@ -214,7 +214,7 @@ bool FETangentDiagnostic::Run()
 	// set up the element stiffness matrix
 	matrix k0(24, 24);
 	k0.zero();
-	bd.ElementStiffness(fem, el, k0);
+	bd.ElementStiffness(fem, 0, k0);
 
 	// print the element stiffness matrix
 	clog.printf("\nActual stiffness matrix:\n");

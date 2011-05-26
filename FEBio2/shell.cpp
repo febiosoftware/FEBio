@@ -287,7 +287,7 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 			ke.Create(ndof, ndof);
 
 			// calculate the element stiffness matrix
-			ElementStiffness(fem, el, ke);
+			ElementStiffness(fem, iel, ke);
 
 			// get the element's LM vector
 			UnpackLM(el, lm);
@@ -310,8 +310,10 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 //-----------------------------------------------------------------------------
 //! Calculates the shell element stiffness matrix
 
-void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke)
+void FEElasticShellDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 {
+	FEShellElement& el = Element(iel);
+
 	int i, i6, j, j6, n;
 
 	// Get the current element's data

@@ -45,7 +45,7 @@ public:
 	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
-	virtual void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	virtual void ElementStiffness(FEM& fem, int iel, matrix& ke);
 
 	//! calculates the residual
 	void Residual(FESolidSolver* psolver, vector<double>& R);
@@ -81,6 +81,14 @@ protected:
 //! volume element. 
 class FE3FieldElasticSolidDomain : public FEElasticSolidDomain
 {
+protected:
+	struct ELEM_DATA
+	{
+		double	eJ;		// average element jacobian
+		double	ep;		// average pressure
+		double	Lk;		// Lagrangian multiplier
+	};
+
 public:
 	//! constructor
 	FE3FieldElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_3F_SOLID_DOMAIN; }
@@ -93,6 +101,7 @@ public:
 	{
 		FE3FieldElasticSolidDomain* pd = new FE3FieldElasticSolidDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+		pd->m_Data = m_Data;
 		return pd;
 	}
 
@@ -103,17 +112,26 @@ public:
 	void UpdateStresses(FEM& fem);
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ElementStiffness(FEM& fem, int iel, matrix& ke);
+
+	//! augmentation
+	bool Augment();
+
+	//! serialize data to archive
+	void Serialize(DumpFile& ar);
 
 protected:
 	//! Dilatational stiffness component for nearly-incompressible materials
-	void DilatationalStiffness(FEM& fem, FESolidElement& elem, matrix& ke);
+	void DilatationalStiffness(FEM& fem, int iel, matrix& ke);
 
 	//! material stiffness component
-	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void MaterialStiffness(FEM& fem, int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
-	void GeometricalStiffness(FESolidElement& el, matrix& ke);
+	void GeometricalStiffness(int iel, matrix& ke);
+
+protected:
+	vector<ELEM_DATA>	m_Data;
 };
 
 //-----------------------------------------------------------------------------

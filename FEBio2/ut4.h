@@ -63,7 +63,7 @@ protected:
 	void ElementalStiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ElementStiffness(FEM& fem, int iel, matrix& ke);
 
 	//! Calculates the nodal stiffness matrix
 	void NodalStiffnessMatrix(FESolidSolver* psolver);

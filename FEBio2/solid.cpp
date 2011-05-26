@@ -109,10 +109,6 @@ void FEElasticSolidDomain::Serialize(DumpFile &ar)
 			ar << el.m_nID;
 			ar << el.m_node;
 
-			ar << el.m_eJ;
-			ar << el.m_ep;
-			ar << el.m_Lk;
-
 			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
 		}
 	}
@@ -133,10 +129,6 @@ void FEElasticSolidDomain::Serialize(DumpFile &ar)
 			ar >> el.m_nID;
 			ar >> el.m_node;
 
-			ar >> el.m_eJ;
-			ar >> el.m_ep;
-			ar >> el.m_Lk;
-
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
 				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
@@ -144,16 +136,6 @@ void FEElasticSolidDomain::Serialize(DumpFile &ar)
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-// FE3FieldElasticSolidDomain
-//-----------------------------------------------------------------------------
-bool FE3FieldElasticSolidDomain::Initialize(FEModel &fem)
-{
-	// make sure the domain material uses an uncoupled formulation
-	if (dynamic_cast<FEUncoupledMaterial*>(m_pMat) == 0) return false;
-	return FEElasticSolidDomain::Initialize(fem);
 }
 
 //-----------------------------------------------------------------------------
@@ -620,7 +602,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		ke.zero();
 
 		// calculate the element stiffness matrix
-		ElementStiffness(fem, el, ke);
+		ElementStiffness(fem, iel, ke);
 
 		// add the inertial stiffness for dynamics
 		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
@@ -643,8 +625,10 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEElasticSolidDomain::ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEElasticSolidDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 {
+	FESolidElement& el = Element(iel);
+
 	// calculate material stiffness (i.e. constitutive component)
 	MaterialStiffness(fem, el, ke);
 

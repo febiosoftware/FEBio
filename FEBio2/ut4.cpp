@@ -958,7 +958,7 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
 		ke.zero();
 
 		// calculate the element stiffness matrix
-		ElementStiffness(fem, el, ke);
+		ElementStiffness(fem, iel, ke);
 
 		// get the element equation numbers
 		UnpackLM(el, elm);
@@ -969,8 +969,10 @@ void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEUT4Domain::ElementStiffness(FEM &fem, FESolidElement &el, matrix &ke)
+void FEUT4Domain::ElementStiffness(FEM &fem, int iel, matrix &ke)
 {
+	FESolidElement& el = Element(iel);
+
 	// TODO: I need to figure out how to deal with incompressible materials
 	//       Incompressible materials require an additional dilatational 
 	//       stiffness which is calculated differently from the geometric and

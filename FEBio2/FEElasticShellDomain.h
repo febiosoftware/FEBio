@@ -38,7 +38,7 @@ public:
 	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the shell element stiffness matrix
-	void ElementStiffness(FEM& fem, FEShellElement& el, matrix& ke);
+	void ElementStiffness(FEM& fem, int iel, matrix& ke);
 
 	// --- R E S I D U A L ---
 
