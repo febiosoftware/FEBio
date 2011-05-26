@@ -74,9 +74,6 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	m_gid = el.m_gid;
 
 	// copy shell data
-	m_eJ = el.m_eJ;
-	m_ep = el.m_ep;
-	m_Lk = el.m_Lk;
 	m_h0 = el.m_h0;
 }
 
@@ -94,9 +91,6 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	m_gid = el.m_gid;
 
 	// copy shell data
-	m_eJ = el.m_eJ;
-	m_ep = el.m_ep;
-	m_Lk = el.m_Lk;
 	m_h0 = el.m_h0;
 
 	return (*this);

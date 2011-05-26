@@ -94,16 +94,12 @@ void FEElasticShellDomain::Serialize(DumpFile &ar)
 			FEShellElement& el = m_Elem[i];
 			ar << el.Type();
 
-			ar << el.m_eJ;
-			ar << el.m_ep;
-
 			ar << el.GetMatID();
 			ar << el.m_nrigid;
 			ar << el.m_nID;
 			ar << el.m_node;
 
 			ar << el.m_h0;
-			ar << el.m_Lk;
 
 			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
 		}
@@ -119,16 +115,12 @@ void FEElasticShellDomain::Serialize(DumpFile &ar)
 
 			el.SetType(n);
 
-			ar >> el.m_eJ;
-			ar >> el.m_ep;
-
 			ar >> mat; el.SetMatID(mat);
 			ar >> el.m_nrigid;
 			ar >> el.m_nID;
 			ar >> el.m_node;
 
 			ar >> el.m_h0;
-			ar >> el.m_Lk;
 
 			for (int j=0; j<el.GaussPoints(); ++j)
 			{
@@ -391,8 +383,6 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, FEShellElement& el, matrix
 
 		// setup the material point
 		// NOTE: deformation gradient has already been calculated in stress routine
-		pt.avgJ = el.m_eJ;
-		pt.avgp = el.m_ep;
 
 		// get the 'D' matrix
 		tens4ds C = pm->Tangent(mp);
@@ -685,10 +675,6 @@ void FEElasticShellDomain::UpdateStresses(FEM &fem)
 
 			// get the deformation gradient and determinant
 			pt.J = defgrad(el, pt.F, n);
-
-			// three-field element variables
-			pt.avgJ = el.m_eJ;
-			pt.avgp = el.m_ep;
 
 			// calculate the stress at this material point
 			pt.s = pm->Stress(mp);

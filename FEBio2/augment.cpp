@@ -79,25 +79,6 @@ bool FESolidSolver::Augment()
 							}
 						}
 					}
-
-					// do shell elements
-					FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
-					if (psd)
-					{
-						for (n=0; n<psd->Elements(); ++n)
-						{
-							FEShellElement& el = psd->Element(n);
-
-							if (el.GetMatID() == i)
-							{
-								L0 = el.m_Lk;
-								normL0 += L0*L0;
-
-								L1 = L0 + k*pmi->h(el.m_eJ);
-								normL1 += L1*L1;
-							}
-						}
-					}
 				}
 
 				normL0 = sqrt(normL0);
@@ -125,20 +106,6 @@ bool FESolidSolver::Augment()
 								if (el.GetMatID() == i) 
 								{
 									double hi = pmi->h(el.m_eJ);
-									el.m_Lk += k*pmi->h(el.m_eJ);
-									el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
-								}
-							}
-						}
-	
-						FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&mesh.Domain(nd));
-						if (psd)
-						{
-							for (n=0; n<psd->Elements(); ++n)
-							{
-								FEShellElement& el = psd->Element(n);
-								if (el.GetMatID() == i) 
-								{
 									el.m_Lk += k*pmi->h(el.m_eJ);
 									el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + k*log(el.m_eJ)/el.m_eJ;
 								}
