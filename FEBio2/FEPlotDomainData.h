@@ -12,7 +12,7 @@
 class FEPlotElementStress : public FEDomainData
 {
 public:
-	FEPlotElementStress(FEModel* pfem) : FEDomainData(MAT3FS, FMT_ITEM){}
+	FEPlotElementStress(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 
 protected:
@@ -25,7 +25,7 @@ protected:
 class FEPlotRelativeVolume : public FEDomainData
 	{
 	public:
-		FEPlotRelativeVolume(FEModel* pfem) : FEDomainData(FLOAT, FMT_ITEM){}
+		FEPlotRelativeVolume(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 		bool Save(FEDomain& dom, vector<float>& a);
 	};
 
@@ -34,7 +34,7 @@ class FEPlotRelativeVolume : public FEDomainData
 class FEPlotActualFluidPressure : public FEDomainData
 	{
 	public:
-		FEPlotActualFluidPressure(FEModel* pfem) : FEDomainData(FLOAT, FMT_ITEM){}
+		FEPlotActualFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 		bool Save(FEDomain& dom, vector<float>& a);
 	};
 
@@ -43,7 +43,7 @@ class FEPlotActualFluidPressure : public FEDomainData
 class FEPlotFluidFlux : public FEDomainData
 {
 public:
-	FEPlotFluidFlux(FEModel* pfem) : FEDomainData(VEC3F, FMT_ITEM){}
+	FEPlotFluidFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -52,7 +52,7 @@ public:
 class FEPlotActualSoluteConcentration : public FEDomainData
 	{
 	public:
-		FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(FLOAT, FMT_ITEM){}
+		FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 		bool Save(FEDomain& dom, vector<float>& a);
 	};
 
@@ -61,7 +61,7 @@ class FEPlotActualSoluteConcentration : public FEDomainData
 class FEPlotSoluteFlux : public FEDomainData
 	{
 	public:
-		FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(VEC3F, FMT_ITEM){}
+		FEPlotSoluteFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
 		bool Save(FEDomain& dom, vector<float>& a);
 	};
 
@@ -70,7 +70,7 @@ class FEPlotSoluteFlux : public FEDomainData
 class FEPlotFiberVector : public FEDomainData
 {
 public:
-	FEPlotFiberVector(FEModel* pfem) : FEDomainData(VEC3F, FMT_ITEM){}
+	FEPlotFiberVector(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -79,7 +79,7 @@ public:
 class FEPlotShellThickness : public FEDomainData
 {
 public:
-	FEPlotShellThickness(FEModel* pfem) : FEDomainData(FLOAT, FMT_MULT){}
+	FEPlotShellThickness(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_MULT){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -89,7 +89,7 @@ public:
 class FEPlotEffectiveFluidPressure : public FEDomainData
 {
 public:
-	FEPlotEffectiveFluidPressure(FEModel* pfem) : FEDomainData(FLOAT, FMT_NODE){}
+	FEPlotEffectiveFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
 
@@ -98,7 +98,7 @@ public:
 class FEPlotEffectiveSoluteConcentration : public FEDomainData
 {
 public:
-	FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEDomainData(FLOAT, FMT_NODE){}
+	FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
 
@@ -107,6 +107,6 @@ public:
 class FEPlotDamage : public FEDomainData
 {
 public:
-	FEPlotDamage(FEModel* pfem) : FEDomainData(FLOAT, FMT_ITEM){}
+	FEPlotDamage(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& m, vector<float>& a);
 };

@@ -286,9 +286,9 @@ void echo_input(FEM& fem)
 					const char* szt = 0;
 					switch (it->m_ntype)
 					{
-					case FLOAT : szt = "float"; break;
-					case VEC3F : szt = "vec3f"; break;
-					case MAT3FS: szt = "mat3f"; break;
+					case PLT_FLOAT : szt = "float"; break;
+					case PLT_VEC3F : szt = "vec3f"; break;
+					case PLT_MAT3FS: szt = "mat3f"; break;
 					}
 
 					const char* szf = 0;

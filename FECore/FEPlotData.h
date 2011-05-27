@@ -9,7 +9,7 @@
 class FEModel;
 
 // --- data types ---
-enum Var_Type { FLOAT, VEC3F, MAT3FS };
+enum Var_Type { PLT_FLOAT, PLT_VEC3F, PLT_MAT3FS };
 
 // --- storage format ---
 // FMT_NODE : one value stored for each node of a region
