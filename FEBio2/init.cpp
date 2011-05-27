@@ -119,9 +119,9 @@ bool FEM::Init()
 	// init some other stuff
 	for (i=0; i<(int) m_BF.size(); ++i)
 	{
-		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_BF[i]);
-		if (pbf) pbf->Init();
+		if (m_BF[i]->Init() == false) return false;
 	}
+
 	for (i=0; i<(int) m_PC.size(); ++i) m_PC[i].Init();
 
 	// open plot database file

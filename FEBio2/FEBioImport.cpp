@@ -3712,8 +3712,30 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 
 				fem.AddBodyForce(pf);
 			}
+			else
+			{
+				// see if the kernel knows this force
+				FEBioKernel& febio = FEBioKernel::GetInstance();
+				FEBodyForce* pf = febio.Create<FEBodyForce>(szt, &fem);
+				if (pf)
+				{
+					if (!tag.isleaf())
+					{
+						FEParameterList& pl = pf->GetParameterList();
+						++tag;
+						do
+						{
+							if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+							++tag;
+						}
+						while (!tag.isend());
+					}
+
+					fem.AddBodyForce(pf);
+				}
+				else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+			}
 		}
-		
 		else if (tag == "Constants")
 		{
 			++tag;

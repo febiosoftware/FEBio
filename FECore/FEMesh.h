@@ -123,13 +123,9 @@ class FEMesh;
 class FENodeSet
 {
 public:
-	FENodeSet(FEMesh* pm) : m_pmesh(pm), m_nID(-1) { m_szname[0] = 0; }
+	FENodeSet(FEMesh* pm);
 
-	void create(int n)
-	{
-		assert(n);
-		m_Node.resize(n);
-	}
+	void create(int n);
 
 	int size() { return m_Node.size(); }
 
@@ -138,7 +134,7 @@ public:
 	void SetID(int n) { m_nID = n; }
 	int GetID() { return m_nID; }
 
-	void SetName(const char* sz) { strcpy(m_szname, sz); }
+	void SetName(const char* sz);
 	const char* GetName() { return m_szname; }
 
 protected:

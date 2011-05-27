@@ -12,7 +12,7 @@ public:
 
 	void Serialize(DumpFile& ar);
 
-	void Init();
+	bool Init();
 	void Update();
 
 public:

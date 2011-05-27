@@ -83,7 +83,7 @@ void FEPointBodyForce::Serialize(DumpFile &ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointBodyForce::Init()
+bool FEPointBodyForce::Init()
 {
 	assert(m_pfem);
 
@@ -108,6 +108,8 @@ void FEPointBodyForce::Init()
 		FEMesh& m = m_pfem->m_mesh;
 		m_rc = m.Node(m_inode).m_r0;
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

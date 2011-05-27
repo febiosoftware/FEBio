@@ -250,7 +250,7 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 
 		// calculate force scale values
 		// the "-" sign is to be consistent with NIKE3D's convention
-		vec3d g;
+		vec3d g(-1, -1, -1);
 		if (BF.lc[0] >= 0) g.x = -fem.GetLoadCurve(BF.lc[0])->Value()*BF.s[0];
 		if (BF.lc[1] >= 0) g.y = -fem.GetLoadCurve(BF.lc[1])->Value()*BF.s[1];
 		if (BF.lc[2] >= 0) g.z = -fem.GetLoadCurve(BF.lc[2])->Value()*BF.s[2];

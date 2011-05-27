@@ -28,7 +28,7 @@ public:
 	virtual void Serialize(DumpFile& ar);
 
 	//! initialization
-	virtual void Init(){}
+	virtual bool Init() { return true; }
 
 	//! update
 	virtual void Update(){}
