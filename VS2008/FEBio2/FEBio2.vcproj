@@ -245,10 +245,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\FEBio2\Archive.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\augment.cpp"
 				>
 			</File>
@@ -570,10 +566,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPermRefTransIso.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotData.cpp"
 				>
 			</File>
 			<File
@@ -911,10 +903,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\FEBio2\Archive.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\Command.h"
 				>
 			</File>
@@ -1232,10 +1220,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPermRefTransIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotData.h"
 				>
 			</File>
 			<File

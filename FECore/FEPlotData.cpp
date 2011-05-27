@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPlotData.h"
-#include "fem.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 int FEPlotData::VarSize(Var_Type t)
@@ -17,7 +17,7 @@ int FEPlotData::VarSize(Var_Type t)
 }
 
 //-----------------------------------------------------------------------------
-void FENodeData::Save(FEM &fem, Archive& ar)
+void FENodeData::Save(FEModel &fem, Archive& ar)
 {
 	// loop over all node sets
 	// write now there is only one, namely the master node set
@@ -34,7 +34,7 @@ void FENodeData::Save(FEM &fem, Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEDomainData::Save(FEM &fem, Archive& ar)
+void FEDomainData::Save(FEModel &fem, Archive& ar)
 {
 	// loop over all domains
 	FEMesh& m = fem.m_mesh;
@@ -77,7 +77,7 @@ void FEDomainData::Save(FEM &fem, Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FESurfaceData::Save(FEM &fem, Archive& ar)
+void FESurfaceData::Save(FEModel &fem, Archive& ar)
 {
 	// loop over all surfaces
 	FEMesh& m = fem.m_mesh;

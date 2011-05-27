@@ -1,5 +1,5 @@
 #pragma once
-#include "FEPlotData.h"
+#include "FECore/FEPlotData.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticSolidDomain.h"
 

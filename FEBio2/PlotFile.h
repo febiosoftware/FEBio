@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEMesh.h"
-#include "FEPlotData.h"
+#include "FECore/FEPlotData.h"
 
 class FEM;
 

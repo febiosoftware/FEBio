@@ -1,5 +1,10 @@
 #pragma once
-#include "FEPlotData.h"
+#include "FECore/FEPlotData.h"
+#include "FESlidingInterface.h"
+#include "FEFacet2FacetSliding.h"
+#include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
+#include "FETiedInterface.h"
 
 //=============================================================================
 //                         S U R F A C E   D A T A

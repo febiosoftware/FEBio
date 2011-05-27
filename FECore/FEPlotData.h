@@ -1,14 +1,12 @@
 #pragma once
 
-#include "FECore/DumpFile.h"
-#include "FECore/FEMesh.h"
+#include "FEMesh.h"
+#include "FESurface.h"
 #include "Archive.h"
-#include "FESlidingInterface.h"
-#include "FESlidingInterface2.h"
-#include "FESlidingInterface3.h"
-#include "FEFacet2FacetSliding.h"
-#include "FETiedInterface.h"
-class FEM;
+
+//-----------------------------------------------------------------------------
+// forward declaration of model class
+class FEModel;
 
 // --- data types ---
 enum Var_Type { FLOAT, VEC3F, MAT3FS };
@@ -29,7 +27,7 @@ class FEPlotData
 {
 public:
 	FEPlotData(Var_Type t, Storage_Fmt s) { m_ntype = t; m_sfmt = s; }
-	virtual void Save(FEM& fem, Archive& ar) = 0;
+	virtual void Save(FEModel& fem, Archive& ar) = 0;
 
 	Var_Type DataType() { return m_ntype; }
 	Storage_Fmt StorageFormat() { return m_sfmt; }
@@ -48,7 +46,7 @@ class FENodeData : public FEPlotData
 {
 public:
 	FENodeData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FEMesh& m, vector<float>& a) = 0;
 };
 
@@ -59,7 +57,7 @@ class FEDomainData : public FEPlotData
 {
 public:
 	FEDomainData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FEDomain& D, vector<float>& a) = 0;
 };
 
@@ -70,6 +68,6 @@ class FESurfaceData : public FEPlotData
 {
 public:
 	FESurfaceData(Var_Type t, Storage_Fmt s) : FEPlotData(t, s) {}
-	void Save(FEM& fem, Archive& ar);
+	void Save(FEModel& fem, Archive& ar);
 	virtual bool Save(FESurface& S, vector<float>& a) = 0;
 };

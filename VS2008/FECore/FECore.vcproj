@@ -212,6 +212,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\FECore\Archive.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\BFGSSolver.cpp"
 				>
 			</File>
@@ -300,6 +304,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEPlotData.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEShellDomain.cpp"
 				>
 			</File>
@@ -369,6 +377,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\FECore\Archive.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\FECore\BC.h"
 				>
@@ -471,6 +483,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEParameterList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEPlotData.h"
 				>
 			</File>
 			<File

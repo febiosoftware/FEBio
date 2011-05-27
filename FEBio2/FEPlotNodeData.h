@@ -1,5 +1,5 @@
 #pragma once
-#include "FEPlotData.h"
+#include "FECore/FEPlotData.h"
 
 //=============================================================================
 //                            N O D E   D A T A
