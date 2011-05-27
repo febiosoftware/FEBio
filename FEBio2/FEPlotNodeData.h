@@ -11,7 +11,7 @@
 class FEPlotNodeDisplacement : public FENodeData
 {
 public:
-	FEPlotNodeDisplacement() : FENodeData(VEC3F, FMT_NODE){}
+	FEPlotNodeDisplacement(FEModel* pfem) : FENodeData(VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
@@ -21,7 +21,7 @@ public:
 class FEPlotNodeVelocity : public FENodeData
 {
 public:
-	FEPlotNodeVelocity() : FENodeData(VEC3F, FMT_NODE){}
+	FEPlotNodeVelocity(FEModel* pfem) : FENodeData(VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
@@ -31,7 +31,7 @@ public:
 class FEPlotNodeAcceleration : public FENodeData
 {
 public:
-	FEPlotNodeAcceleration() : FENodeData(VEC3F, FMT_NODE){}
+	FEPlotNodeAcceleration(FEModel* pfem) : FENodeData(VEC3F, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
@@ -40,6 +40,6 @@ public:
 class FEPlotNodeTemperature : public FENodeData
 {
 public:
-	FEPlotNodeTemperature() : FENodeData(FLOAT, FMT_NODE){}
+	FEPlotNodeTemperature(FEModel* pfem) : FENodeData(FLOAT, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };

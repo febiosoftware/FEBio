@@ -2,12 +2,14 @@
 #include "FEBioPlotFile.h"
 #include "fem.h"
 #include "FETransverselyIsotropic.h"
-#include "FEPlotDataFactory.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::Dictionary::AddVariable(const char* szname)
 {
-	FEPlotData* ps = FEPlotDataFactory::Create(szname);
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
+	FEPlotData* ps = febio.Create<FEPlotData>(szname, 0);
 	if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname);
 	else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname);
 	else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname);

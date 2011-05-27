@@ -15,7 +15,7 @@
 class FETestData : public FEDomainData
 {
 public:
-	FETestData() : FEDomainData(FLOAT, FMT_NODE){}
+	FETestData(FEModel* pfem) : FEDomainData(FLOAT, FMT_NODE){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -25,7 +25,7 @@ public:
 class FEPlotContactGap : public FESurfaceData
 {
 public:
-	FEPlotContactGap() : FESurfaceData(FLOAT, FMT_MULT){}
+	FEPlotContactGap(FEModel* pfem) : FESurfaceData(FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, vector<float>& a);
 
 protected:
@@ -42,7 +42,7 @@ protected:
 class FEPlotContactPressure : public FESurfaceData
 {
 public:
-	FEPlotContactPressure() : FESurfaceData(FLOAT, FMT_MULT){}
+	FEPlotContactPressure(FEModel* pfem) : FESurfaceData(FLOAT, FMT_MULT){}
 	bool Save(FESurface& surf, vector<float>& a);
 
 protected:

@@ -1,13 +1,12 @@
 #include "stdafx.h"
 #include "FEPlotSurfaceData.h"
-#include "fem.h"
-#include "FEPlotDataFactory.h"
 #include "FEElasticSolidDomain.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_PLOTDATA(FEPlotContactGap      , "contact gap"     );
-REGISTER_PLOTDATA(FEPlotContactPressure , "contact pressure");
-REGISTER_PLOTDATA(FETestData , "_test_data" );
+REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );
+REGISTER_FEBIO_CLASS(FEPlotContactPressure , FEPlotData, "contact pressure");
+REGISTER_FEBIO_CLASS(FETestData			   , FEPlotData, "_test_data" );
 
 //=============================================================================
 //                           S U R F A C E   D A T A

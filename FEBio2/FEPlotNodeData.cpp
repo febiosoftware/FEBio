@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "FEPlotNodeData.h"
-#include "FEPlotDataFactory.h"
+#include "FECore/FEMesh.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_PLOTDATA(FEPlotNodeDisplacement, "displacement");
-REGISTER_PLOTDATA(FEPlotNodeVelocity    , "velocity"    );
-REGISTER_PLOTDATA(FEPlotNodeAcceleration, "acceleration");
-REGISTER_PLOTDATA(FEPlotNodeTemperature , "temperature" );
+REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement, FEPlotData, "displacement");
+REGISTER_FEBIO_CLASS(FEPlotNodeVelocity    , FEPlotData, "velocity"    );
+REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration, FEPlotData, "acceleration");
+REGISTER_FEBIO_CLASS(FEPlotNodeTemperature , FEPlotData, "temperature" );
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------

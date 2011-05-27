@@ -569,10 +569,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPlotDataFactory.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPlotDomainData.cpp"
 				>
 			</File>
@@ -1220,10 +1216,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPermRefTransIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotDataFactory.h"
 				>
 			</File>
 			<File

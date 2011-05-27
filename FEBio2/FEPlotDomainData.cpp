@@ -1,23 +1,22 @@
 #include "stdafx.h"
 #include "FEPlotDomainData.h"
-#include "FEPlotDataFactory.h"
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_PLOTDATA(FEPlotEffectiveFluidPressure       , "effective fluid pressure"      );
-REGISTER_PLOTDATA(FEPlotActualFluidPressure          , "fluid pressure"                );
-REGISTER_PLOTDATA(FEPlotElementStress                , "stress"                        );
-REGISTER_PLOTDATA(FEPlotRelativeVolume               , "relative volume"               );
-REGISTER_PLOTDATA(FEPlotFluidFlux                    , "fluid flux"                    );
-REGISTER_PLOTDATA(FEPlotFiberVector                  , "fiber vector"                  );
-REGISTER_PLOTDATA(FEPlotEffectiveSoluteConcentration , "effective solute concentration");
-REGISTER_PLOTDATA(FEPlotShellThickness               , "shell thickness"               );
-REGISTER_PLOTDATA(FEPlotActualSoluteConcentration    , "solute concentration"          );
-REGISTER_PLOTDATA(FEPlotSoluteFlux                   , "solute flux"                   );
-REGISTER_PLOTDATA(FEPlotDamage                       , "damage"                        );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"      );
+REGISTER_FEBIO_CLASS(FEPlotActualFluidPressure          , FEPlotData, "fluid pressure"                );
+REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPlotData, "stress"                        );
+REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPlotData, "relative volume"               );
+REGISTER_FEBIO_CLASS(FEPlotFluidFlux                    , FEPlotData, "fluid flux"                    );
+REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vector"                  );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSoluteConcentration , FEPlotData, "effective solute concentration");
+REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"               );
+REGISTER_FEBIO_CLASS(FEPlotActualSoluteConcentration    , FEPlotData, "solute concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                        );
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
