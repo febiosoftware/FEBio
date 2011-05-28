@@ -124,6 +124,9 @@ public:
 	static map<string, double> m_Const;
 	static void SetGlobalConstant(const string& s, double v);
 	static double GetGlobalConstant(const string& s);
+
+	//! Evaluate parameter list
+	void EvalParameterList(FEParameterList& pl);
 	
 public:
 	//! copy constructor

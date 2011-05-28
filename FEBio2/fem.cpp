@@ -323,6 +323,28 @@ double* FEM::FindParameter(const char* szparam)
 }
 
 //-----------------------------------------------------------------------------
+//! Evaluate a parameter list
+void FEM::EvalParameterList(FEParameterList &pl)
+{
+	list<FEParam>::iterator pi = pl.first();
+	for (int j=0; j<pl.Parameters(); ++j, ++pi)
+	{
+		if (pi->m_nlc >= 0)
+		{
+			double v = GetLoadCurve(pi->m_nlc)->Value();
+			switch (pi->m_itype)
+			{
+			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
+			case FE_PARAM_DOUBLE: pi->value<double>() = v; break;
+			case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
+			default: 
+				assert(false);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Reads the FEBio configuration file. This file contains some default settings.
 
 bool FEM::Configure(const char *szfile)

@@ -374,32 +374,23 @@ bool FEAnalysis::Solve()
 		// update time
 		m_fem.m_ftime += m_dt;
 
-		int i, j;
+		int i;
 
 		// evaluate load curve values at current time
 		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(m_fem.m_ftime);
 
-		// evaluate parameter lists
+		// evaluate material parameter lists
 		for (i=0; i<m_fem.Materials(); ++i)
 		{
 			FEParameterList& pl = m_fem.m_MAT[i]->GetParameterList();
+			m_fem.EvalParameterList(pl);
+		}
 
-			list<FEParam>::iterator pi = pl.first();
-			for (j=0; j<pl.Parameters(); ++j, ++pi)
-			{
-				if (pi->m_nlc >= 0)
-				{
-					double v = m_fem.GetLoadCurve(pi->m_nlc)->Value();
-					switch (pi->m_itype)
-					{
-					case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
-					case FE_PARAM_DOUBLE: pi->value<double>() = v; break;
-					case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
-					default: 
-						assert(false);
-					}
-				}
-			}
+		// evaluate body-force parameter lists
+		for (i=0; i<m_fem.BodyForces(); ++i)
+		{
+			FEParameterList& pl = m_fem.GetBodyForce(i)->GetParameterList();
+			m_fem.EvalParameterList(pl);
 		}
 
 		// solve this timestep,
