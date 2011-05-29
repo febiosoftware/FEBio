@@ -27,6 +27,7 @@ public:
 	const char*	m_szname;	// name of the parameter
 	int			m_ndim;		// dimension of array
 	int			m_nlc;		// load curve number for dynamic parameters (-1 for static)
+	double		m_scl;		// load curve scale factor
 
 	FEParam()
 	{
@@ -34,6 +35,7 @@ public:
 		m_itype = FE_PARAM_DOUBLE;
 		m_ndim = 1;
 		m_nlc = -1;
+		m_scl = 1.0;
 	}
 
 public:

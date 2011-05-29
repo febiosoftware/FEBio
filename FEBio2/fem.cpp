@@ -335,7 +335,7 @@ void FEM::EvalParameterList(FEParameterList &pl)
 			switch (pi->m_itype)
 			{
 			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
-			case FE_PARAM_DOUBLE: pi->value<double>() = v; break;
+			case FE_PARAM_DOUBLE: pi->value<double>() = pi->m_scl*v; break;
 			case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
 			default: 
 				assert(false);

@@ -4,15 +4,17 @@
 
 //-----------------------------------------------------------------------------
 //! This class defines a deformation-independent constant force (e.g. gravity)
-
-//! Note that the returned force is constanct. Use the scale factors and load
-//! curves to define the intensity
 class FEConstBodyForce : public FEBodyForce
 {
 public:
-	FEConstBodyForce(FEModel* pfem) : FEBodyForce(pfem) {}
-	vec3d force(FEMaterialPoint& pt) { return vec3d(1,1,1); }
+	FEConstBodyForce(FEModel* pfem) : FEBodyForce(pfem) { m_f = vec3d(0,0,0); }
+	vec3d force(FEMaterialPoint& pt) { return m_f; }
 	mat3ds stiffness(FEMaterialPoint& pt) { return mat3ds(0,0,0,0,0,0); }
+
+protected:
+	vec3d	m_f;
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -28,6 +30,8 @@ public:
 
 public:
 	char	m_sz[3][256];
+
+	DECLARE_PARAMETER_LIST();
 };
 
 //-----------------------------------------------------------------------------
@@ -40,12 +44,15 @@ public:
 	vec3d force(FEMaterialPoint& mp) {
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 		mat3ds K = stiffness(mp);
-		return K*(pt.rt - c);
+		return K*((pt.rt - c)*(w*w));
 	}
-	mat3ds stiffness(FEMaterialPoint& mp) { return mat3dd(1) - dyad(n); }
+	mat3ds stiffness(FEMaterialPoint& mp) { return (mat3dd(1) - dyad(n))*(-w*w); }
 	void Serialize(DumpFile& ar);
 	
 public:
 	vec3d	n;	// rotation axis
 	vec3d	c;	// point on axis of rotation (e.g., center of rotation)
+	double	w;	// angular speed
+
+	DECLARE_PARAMETER_LIST();
 };

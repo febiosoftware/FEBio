@@ -248,17 +248,9 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 	{
 		FEBodyForce& BF = *fem.GetBodyForce(nf);
 
-		// calculate force scale values
-		// the "-" sign is to be consistent with NIKE3D's convention
-		vec3d g;
-		if (BF.lc[0] >= 0) g.x = -fem.GetLoadCurve(BF.lc[0])->Value()*BF.s[0];
-		if (BF.lc[1] >= 0) g.y = -fem.GetLoadCurve(BF.lc[1])->Value()*BF.s[1];
-		if (BF.lc[2] >= 0) g.z = -fem.GetLoadCurve(BF.lc[2])->Value()*BF.s[2];
-
 		// don't forget to multiply with the density
 		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
 		double dens = pme->Density();
-		g *= dens;
 
 		// TODO: I don't like this but for now I'll hard-code the modification of the
 		//       force center position
@@ -305,9 +297,9 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 
 			for (int i=0; i<neln; ++i)
 			{
-				fe[3*i  ] += H[i]*g.x*f.x*detJ;
-				fe[3*i+1] += H[i]*g.y*f.y*detJ;
-				fe[3*i+2] += H[i]*g.z*f.z*detJ;
+				fe[3*i  ] -= H[i]*dens*f.x*detJ;
+				fe[3*i+1] -= H[i]*dens*f.y*detJ;
+				fe[3*i+2] -= H[i]*dens*f.z*detJ;
 			}						
 		}
 	}
@@ -325,17 +317,9 @@ void FEElasticSolidDomain::BodyForceStiffness(FEM& fem, FESolidElement &el, matr
 	{
 		FEBodyForce& BF = *fem.GetBodyForce(nf);
 
-		// calculate force scale values
-		// the "-" sign is to be consistent with NIKE3D's convention
-		vec3d g;
-		if (BF.lc[0] >= 0) g.x = -fem.GetLoadCurve(BF.lc[0])->Value()*BF.s[0];
-		if (BF.lc[1] >= 0) g.y = -fem.GetLoadCurve(BF.lc[1])->Value()*BF.s[1];
-		if (BF.lc[2] >= 0) g.z = -fem.GetLoadCurve(BF.lc[2])->Value()*BF.s[2];
-
 		// don't forget to multiply with the density
 		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
 		double dens = pme->Density();
-		g *= dens;
 
 		// jacobian
 		double detJ;
@@ -359,17 +343,17 @@ void FEElasticSolidDomain::BodyForceStiffness(FEM& fem, FESolidElement &el, matr
 			for (int i=0; i<neln; ++i)
 				for (int j=0; j<neln; ++j)
 				{
-					ke[ndof*i  ][ndof*j  ] += H[i]*H[j]*g.x*K(0,0)*detJ;
-					ke[ndof*i  ][ndof*j+1] += H[i]*H[j]*g.x*K(0,1)*detJ;
-					ke[ndof*i  ][ndof*j+2] += H[i]*H[j]*g.x*K(0,2)*detJ;
+					ke[ndof*i  ][ndof*j  ] -= H[i]*H[j]*dens*K(0,0)*detJ;
+					ke[ndof*i  ][ndof*j+1] -= H[i]*H[j]*dens*K(0,1)*detJ;
+					ke[ndof*i  ][ndof*j+2] -= H[i]*H[j]*dens*K(0,2)*detJ;
 
-					ke[ndof*i+1][ndof*j  ] += H[i]*H[j]*g.y*K(1,0)*detJ;
-					ke[ndof*i+1][ndof*j+1] += H[i]*H[j]*g.y*K(1,1)*detJ;
-					ke[ndof*i+1][ndof*j+2] += H[i]*H[j]*g.y*K(1,2)*detJ;
+					ke[ndof*i+1][ndof*j  ] -= H[i]*H[j]*dens*K(1,0)*detJ;
+					ke[ndof*i+1][ndof*j+1] -= H[i]*H[j]*dens*K(1,1)*detJ;
+					ke[ndof*i+1][ndof*j+2] -= H[i]*H[j]*dens*K(1,2)*detJ;
 
-					ke[ndof*i+2][ndof*j  ] += H[i]*H[j]*g.z*K(2,0)*detJ;
-					ke[ndof*i+2][ndof*j+1] += H[i]*H[j]*g.z*K(2,1)*detJ;
-					ke[ndof*i+2][ndof*j+2] += H[i]*H[j]*g.z*K(2,2)*detJ;
+					ke[ndof*i+2][ndof*j  ] -= H[i]*H[j]*dens*K(2,0)*detJ;
+					ke[ndof*i+2][ndof*j+1] -= H[i]*H[j]*dens*K(2,1)*detJ;
+					ke[ndof*i+2][ndof*j+2] -= H[i]*H[j]*dens*K(2,2)*detJ;
 				}
 		}	
 	}

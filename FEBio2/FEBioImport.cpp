@@ -276,7 +276,14 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
 
 		int lc = -1;
 		tag.AttributeValue("lc", lc, true);
-		if (lc != -1) pp->m_nlc = lc;
+		if (lc != -1) 
+		{
+			pp->m_nlc = lc;
+			switch (pp->m_itype)
+			{
+			case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+			}
+		}
 
 		return true;
 	}
@@ -286,7 +293,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
 
 //=============================================================================
 //
-//                     M O D U L E   S E C T I O N
+//                     I M P O R T   S E C T I O N
 //
 //=============================================================================
 
@@ -3599,95 +3606,9 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 		if (tag == "body_force")
 		{
 			const char* szt = tag.AttributeValue("type", true);
-			if ((szt == 0) ||(strcmp(szt, "const")==0))
-			{
-				FEConstBodyForce* pbf = new FEConstBodyForce(&fem);
+			if (szt == 0) szt = "const";
 
-				++tag;
-				int n;
-				const char* szlc;
-				do
-				{
-					n = -1;
-					if (tag == "x") n = 0;
-					else if (tag == "y") n = 1;
-					else if (tag == "z") n = 2;
-
-					if (n == -1) throw XMLReader::InvalidTag(tag);
-
-					szlc = tag.AttributeValue("lc");
-					pbf->lc[n] = atoi(szlc);
-					tag.value(pbf->s[n]);
-
-					++tag;
-				}
-				while (!tag.isend());
-
-				fem.AddBodyForce(pbf);
-			}
-			else if (strcmp(szt, "non-const") == 0)
-			{
-				FENonConstBodyForce* pbf = new FENonConstBodyForce(&fem);
-
-				++tag;
-				int n;
-				const char* szlc;
-				do
-				{
-					n = -1;
-					if (tag == "x") n = 0;
-					else if (tag == "y") n = 1;
-					else if (tag == "z") n = 2;
-					if (n == -1) throw XMLReader::InvalidTag(tag);
-
-					const char* szd = tag.AttributeValue("data");
-					strcpy(pbf->m_sz[n], szd);
-
-					szlc = tag.AttributeValue("lc");
-					pbf->lc[n] = atoi(szlc);
-					tag.value(pbf->s[n]);
-
-					++tag;
-				}
-				while (!tag.isend());
-
-				fem.AddBodyForce(pbf);
-			}
-			else if (strcmp(szt, "centrifugal") == 0)
-			{
-				FECentrifugalBodyForce* pbf = new FECentrifugalBodyForce(&fem);
-				
-				++tag;
-				const char* szlc;
-				do
-				{
-					if (tag == "angular_speed") 
-					{
-						szlc = tag.AttributeValue("lc");
-						pbf->lc[0] = pbf->lc[1] = pbf->lc[2] = atoi(szlc);
-						double omega;
-						tag.value(omega);
-						pbf->s[0] = pbf->s[1] = pbf->s[2] = -omega*omega;
-					}
-					else if (tag == "rotation_axis")
-					{
-						vec3d n;
-						tag.value(n);
-						n.unit();
-						pbf->n = n;
-					}
-					else if (tag == "rotation_center")
-					{
-						tag.value(pbf->c);
-					}
-					
-					++tag;
-				}
-				while (!tag.isend());
-				
-				fem.AddBodyForce(pbf);
-			}
-			else if (strcmp(szt, "point") == 0)
+			if (strcmp(szt, "point") == 0)
 			{
 				FEPointBodyForce* pf = new FEPointBodyForce(&fem);
 				FEParameterList& pl = pf->GetParameterList();
@@ -3697,7 +3618,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 					if (tag == "a")
 					{
 						const char* szlc = tag.AttributeValue("lc");
-						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
+//						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
 						tag.value(pf->m_a);
 					}
 					else if (tag == "node")

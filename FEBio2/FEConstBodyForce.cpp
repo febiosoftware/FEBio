@@ -1,5 +1,30 @@
 #include "stdafx.h"
 #include "FEConstBodyForce.h"
+#include "FECore/febio.h"
+
+//-----------------------------------------------------------------------------
+// Register body force class
+REGISTER_FEBIO_CLASS(FEConstBodyForce      , FEBodyForce, "const");
+REGISTER_FEBIO_CLASS(FENonConstBodyForce   , FEBodyForce, "non-const");
+REGISTER_FEBIO_CLASS(FECentrifugalBodyForce, FEBodyForce, "centrifugal");
+
+//=============================================================================
+// FEConstBodyForce
+//-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEConstBodyForce, FEBodyForce);
+	ADD_PARAMETER(m_f.x, FE_PARAM_DOUBLE, "x");
+	ADD_PARAMETER(m_f.y, FE_PARAM_DOUBLE, "y");
+	ADD_PARAMETER(m_f.z, FE_PARAM_DOUBLE, "z");
+END_PARAMETER_LIST();
+
+//=============================================================================
+// FENonConstBodyForce
+//-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FENonConstBodyForce, FEBodyForce);
+	ADD_PARAMETER(m_sz[0], FE_PARAM_STRING, "x");
+	ADD_PARAMETER(m_sz[1], FE_PARAM_STRING, "y");
+	ADD_PARAMETER(m_sz[2], FE_PARAM_STRING, "z");
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 FENonConstBodyForce::FENonConstBodyForce(FEModel* pfem) : FEBodyForce(pfem)
@@ -54,16 +79,24 @@ void FENonConstBodyForce::Serialize(DumpFile &ar)
 }
 
 //=============================================================================
+// FECentrifugalBodyForce
+//-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FECentrifugalBodyForce, FEBodyForce);
+	ADD_PARAMETER(w, FE_PARAM_DOUBLE, "angular_speed");
+	ADD_PARAMETER(n, FE_PARAM_VEC3D, "rotation_axis");
+	ADD_PARAMETER(c, FE_PARAM_VEC3D, "rotation_center");
+END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
 void FECentrifugalBodyForce::Serialize(DumpFile &ar)
 {
 	FEBodyForce::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << c << n;
+		ar << w << c << n;
 	}
 	else
 	{
-		ar >> c >> n;
+		ar >> w >> c >> n;
 	}
 }

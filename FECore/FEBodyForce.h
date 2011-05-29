@@ -35,6 +35,4 @@ public:
 
 public:
 	FEModel*	m_pfem;	//!< point to model class
-	double	s[3];		// force scale factor
-	int		lc[3];		// load curve number
 };

@@ -585,17 +585,10 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 	for (int nf = 0; nf < NF; ++nf)
 	{
 		FEBodyForce& BF = *fem.GetBodyForce(nf);
-		vec3d g;
-		// calculate force scale values
-		// the "-" sign is to be consistent with NIKE3D's convention
-		if (BF.lc[0] >= 0) g.x = -fem.GetLoadCurve(BF.lc[0])->Value()*BF.s[0];
-		if (BF.lc[1] >= 0) g.y = -fem.GetLoadCurve(BF.lc[1])->Value()*BF.s[1];
-		if (BF.lc[2] >= 0) g.z = -fem.GetLoadCurve(BF.lc[2])->Value()*BF.s[2];
 
 		// don't forget to multiply with the density
 		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
 		double dens = pme->Density();
-		g *= dens;
 
 		// calculate the average thickness
 		double* h0 = &el.m_h0[0], gt, za;
@@ -607,23 +600,40 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 		// loop over integration points
 		int nint = el.GaussPoints();
 		int neln = el.Nodes();
+
+		// nodal coordinates
+		vec3d r0[4], rt[4];
+		for (int i=0; i<neln; ++i)
+		{
+			r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+			rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+		}
+
 		for (int n=0; n<nint; ++n)
 		{
+			FEMaterialPoint& mp = *el.m_State[n];
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			pt.r0 = el.Evaluate(r0, n);
+			pt.rt = el.Evaluate(rt, n);
+
 			detJ = detJ0(el, n)*gw[n];
 			Hn  = el.H(n);
 			gt = el.gt(n);
+
+			// get the force
+			vec3d f = BF.force(mp);
 
 			for (int i=0; i<neln; ++i)
 			{
 				za = 0.5*gt*h0[i];
 
-				fe[6*i  ] += Hn[i]*g.x*detJ;
-				fe[6*i+1] += Hn[i]*g.y*detJ;
-				fe[6*i+2] += Hn[i]*g.z*detJ;
+				fe[6*i  ] -= Hn[i]*f.x*dens*detJ;
+				fe[6*i+1] -= Hn[i]*f.y*dens*detJ;
+				fe[6*i+2] -= Hn[i]*f.z*dens*detJ;
 
-				fe[6*i+3] += za*Hn[i]*g.x*detJ;
-				fe[6*i+4] += za*Hn[i]*g.y*detJ;
-				fe[6*i+5] += za*Hn[i]*g.z*detJ;
+				fe[6*i+3] -= za*Hn[i]*dens*f.x*detJ;
+				fe[6*i+4] -= za*Hn[i]*dens*f.y*detJ;
+				fe[6*i+5] -= za*Hn[i]*dens*f.z*detJ;
 			}
 		}
 	}

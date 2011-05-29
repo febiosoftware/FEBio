@@ -19,7 +19,6 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 FEPointBodyForce::FEPointBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 {
-	s[0] = s[1] = s[2] = 1.0; 
 	m_rlc[0] = m_rlc[1] = m_rlc[2] = -1; 
 	m_pel = 0; 
 	m_brigid = true; 
