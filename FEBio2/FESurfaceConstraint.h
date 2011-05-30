@@ -76,10 +76,10 @@ public:
 	FESurfaceConstraintSurface	m_ss;	//!< slave surface
 	FESurfaceConstraintSurface	m_ms;	//!< master surface
 
-	double	m_atol;	//!< augmentation tolerance
-	double	m_eps;	//!< penalty scale factor
-	double	m_stol;	//!< search tolerance
-	int		m_npass;	//!< nr of passes
+	double	m_atol;			//!< augmentation tolerance
+	double	m_eps;			//!< penalty scale factor
+	double	m_stol;			//!< search tolerance
+	bool	m_btwo_pass;	//!< nr of passes
 
 	DECLARE_PARAMETER_LIST();
 };

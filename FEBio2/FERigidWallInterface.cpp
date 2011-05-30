@@ -19,6 +19,7 @@ REGISTER_FEBIO_CLASS(FERigidWallInterface, FEContactInterface, "rigid_wall");
 BEGIN_PARAMETER_LIST(FERigidWallInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
 END_PARAMETER_LIST();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -220,8 +221,9 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(p
 
 	m_mp = 0;
 
-	m_nplc = -1;
-	m_pplc = 0;
+	m_eps = 0;
+	m_atol = 0;
+
 	m_nID = count++;
 };
 
@@ -233,9 +235,6 @@ void FERigidWallInterface::Init()
 {
 	// create the surface
 	m_ss.Init();
-
-	// set the penalty load curve
-	if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 
 	// initialize rigid surface
 	m_mp->Init();
@@ -321,7 +320,7 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	// penalty value
-	double pen = Penalty(), eps;
+	double pen = m_eps, eps;
 	
 	// loop over all slave facets
 	int ne = m_ss.Elements();
@@ -430,7 +429,7 @@ void FERigidWallInterface::ContactStiffness()
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	// penalty value
-	double pen = Penalty(), eps;
+	double pen = m_eps, eps;
 
 	// loop over all slave elements
 	int ne = m_ss.Elements();
@@ -533,7 +532,7 @@ bool FERigidWallInterface::Augment(int naug)
 	bool bconv = true;
 
 	// penalty value
-	double pen = Penalty(), eps;
+	double pen = m_eps, eps;
 
 	// calculate initial norms
 	double normL0 = 0;
@@ -595,7 +594,6 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 	{
 		ar << m_eps;
 		ar << m_atol;
-		ar << m_nplc;
 
 		m_ss.Serialize(ar);
 		
@@ -621,9 +619,6 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 	{
 		ar >> m_eps;
 		ar >> m_atol;
-		ar >> m_nplc;
-
-		if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 
 		m_ss.Serialize(ar);
 

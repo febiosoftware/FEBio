@@ -12,9 +12,10 @@ REGISTER_FEBIO_CLASS(FESurfaceConstraint, FEContactInterface, "surface constrain
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESurfaceConstraint, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -110,7 +111,7 @@ FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfe
 	m_stol = 0.01;
 	m_atol = 0;
 	m_eps = 0;
-	m_npass = 1;
+	m_btwo_pass = false;
 
 	m_nID = count++;
 
@@ -198,7 +199,8 @@ void FESurfaceConstraint::Update()
 	vec3d umi[4];
 
 	// update gap functions
-	for (int np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
 	{
 		FESurfaceConstraintSurface& ss = (np == 0? m_ss : m_ms);
 		FESurfaceConstraintSurface& ms = (np == 0? m_ms : m_ss);
@@ -301,7 +303,8 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
-	for (int np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
 	{
 		FESurfaceConstraintSurface& ss = (np == 0? m_ss : m_ms);
 		FESurfaceConstraintSurface& ms = (np == 0? m_ms : m_ss);
@@ -459,7 +462,8 @@ void FESurfaceConstraint::ContactStiffness()
 
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
-	for (int np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
 	{
 		FESurfaceConstraintSurface& ss = (np == 0? m_ss : m_ms);
 		FESurfaceConstraintSurface& ms = (np == 0? m_ms : m_ss);
@@ -714,7 +718,7 @@ void FESurfaceConstraint::Serialize(DumpFile &ar)
 		ar << m_eps;
 		ar << m_atol;
 		ar << m_stol;
-		ar << m_npass;
+		ar << m_btwo_pass;
 
 		m_ms.Serialize(ar);
 		m_ss.Serialize(ar);
@@ -724,7 +728,7 @@ void FESurfaceConstraint::Serialize(DumpFile &ar)
 		ar >> m_eps;
 		ar >> m_atol;
 		ar >> m_stol;
-		ar >> m_npass;
+		ar >> m_btwo_pass;
 
 		m_ms.Serialize(ar);
 		m_ss.Serialize(ar);

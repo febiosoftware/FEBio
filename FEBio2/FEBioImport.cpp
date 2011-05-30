@@ -3111,14 +3111,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		{
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "penalty")
-				{
-					const char* sz = tag.AttributeValue("lc", true);
-					if (sz)	ps->m_nplc = atoi(sz);
-
-					tag.value(ps->m_eps);
-				}
-				else if (tag == "surface")
+				if (tag == "surface")
 				{
 					const char* sztype = tag.AttributeValue("type");
 					int ntype;
@@ -3160,15 +3153,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		{
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "two_pass"  ) 
-				{
-					int n;
-					tag.value(n);
-					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-					ps->m_npass = n+1;
-				}
-				else if (tag == "surface")
+				if (tag == "surface")
 				{
 					const char* sztype = tag.AttributeValue("type");
 					int ntype;
@@ -3210,15 +3195,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		{
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "two_pass"  ) 
-				{
-					int n;
-					tag.value(n);
-					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-					ps->m_npass = n+1;
-				}
-				else if (tag == "surface")
+				if (tag == "surface")
 				{
 					const char* sztype = tag.AttributeValue("type");
 					int ntype;
@@ -3260,14 +3237,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		{
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "penalty")
-				{
-					const char* sz = tag.AttributeValue("lc", true);
-					if (sz)	ps->m_nplc = atoi(sz);
-
-					tag.value(ps->m_eps);
-				}
-				else if (tag == "plane")
+				if (tag == "plane")
 				{
 					ps->SetMasterSurface(new FEPlane(&fem));
 					FEPlane& pl = dynamic_cast<FEPlane&>(*ps->m_mp);

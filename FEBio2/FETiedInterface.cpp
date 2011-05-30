@@ -18,6 +18,7 @@ REGISTER_FEBIO_CLASS(FETiedInterface, FEContactInterface, "tied");
 BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -27,9 +28,6 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&
 {
 	static int count = 1;
 	m_ntype = FE_CONTACT_TIED;
-
-	m_nplc = -1;
-	m_pplc = 0;
 
 	ss.SetSibling(&ms);
 	ms.SetSibling(&ss);
@@ -48,9 +46,6 @@ void FETiedInterface::Init()
 
 	// project slave surface onto master surface
 	ProjectSurface(ss, ms, false);
-
-	// set penalty load curve
-	if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 }
 
 //-----------------------------------------------------------------------------
@@ -523,9 +518,6 @@ void FETiedInterface::ContactStiffness()
 
 	vec3d gap, Lm, tc;
 
-	// penalty factor
-	double eps = Penalty();
-
 	// curvature tensor K
 	double K[2][2] = {0};
 
@@ -605,7 +597,7 @@ void FETiedInterface::ContactStiffness()
 				Lm = ss.Lm[m];
 
 				// get slave node normal force
-				tc = ss.Lm[m] + ss.gap[m]*eps; //ss.T[m];
+				tc = ss.Lm[m] + ss.gap[m]*m_eps; //ss.T[m];
 
 				// get the master shape function values at this slave node
 				if (nmeln == 4)
@@ -629,25 +621,25 @@ void FETiedInterface::ContactStiffness()
 
 				// fill stiffness matrix
 				ke.Create(ndof, ndof); ke.zero();
-				ke[0][0] = w[n]*detJ*eps;
-				ke[1][1] = w[n]*detJ*eps;
-				ke[2][2] = w[n]*detJ*eps;
+				ke[0][0] = w[n]*detJ*m_eps;
+				ke[1][1] = w[n]*detJ*m_eps;
+				ke[2][2] = w[n]*detJ*m_eps;
 				for (k=0; k<nmeln; ++k)
 				{
-					ke[0][3+3*k  ] = -w[n]*detJ*eps*H[k];
-					ke[1][3+3*k+1] = -w[n]*detJ*eps*H[k];
-					ke[2][3+3*k+2] = -w[n]*detJ*eps*H[k];
+					ke[0][3+3*k  ] = -w[n]*detJ*m_eps*H[k];
+					ke[1][3+3*k+1] = -w[n]*detJ*m_eps*H[k];
+					ke[2][3+3*k+2] = -w[n]*detJ*m_eps*H[k];
 
-					ke[3+3*k  ][0] = -w[n]*detJ*eps*H[k];
-					ke[3+3*k+1][1] = -w[n]*detJ*eps*H[k];
-					ke[3+3*k+2][2] = -w[n]*detJ*eps*H[k];
+					ke[3+3*k  ][0] = -w[n]*detJ*m_eps*H[k];
+					ke[3+3*k+1][1] = -w[n]*detJ*m_eps*H[k];
+					ke[3+3*k+2][2] = -w[n]*detJ*m_eps*H[k];
 				}
 				for (k=0; k<nmeln; ++k)
 					for (l=0; l<nmeln; ++l)
 					{
-						ke[3+3*k  ][3+3*l  ] = w[n]*detJ*eps*H[k]*H[l];
-						ke[3+3*k+1][3+3*l+1] = w[n]*detJ*eps*H[k]*H[l];
-						ke[3+3*k+2][3+3*l+2] = w[n]*detJ*eps*H[k]*H[l];
+						ke[3+3*k  ][3+3*l  ] = w[n]*detJ*m_eps*H[k]*H[l];
+						ke[3+3*k+1][3+3*l+1] = w[n]*detJ*m_eps*H[k]*H[l];
+						ke[3+3*k+2][3+3*l+2] = w[n]*detJ*m_eps*H[k]*H[l];
 					}
 
 				// create lm array
@@ -681,9 +673,6 @@ bool FETiedInterface::Augment(int naug)
 	int i;
 	bool bconv = true;
 
-	// penalty factor
-	double eps = Penalty();
-
 	double g;
 	vec3d lm;
 
@@ -702,7 +691,7 @@ bool FETiedInterface::Augment(int naug)
 	int N = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		lm = ss.Lm[i] + ss.gap[i]*eps;
+		lm = ss.Lm[i] + ss.gap[i]*m_eps;
 
 		normL1 += lm*lm;
 		if (ss.m_pme[i] != 0)
@@ -731,7 +720,7 @@ bool FETiedInterface::Augment(int naug)
 		for (i=0; i<ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			ss.Lm[i] = ss.Lm[i] + ss.gap[i]*eps;
+			ss.Lm[i] = ss.Lm[i] + ss.gap[i]*m_eps;
 		}	
 	}
 
@@ -747,7 +736,6 @@ void FETiedInterface::Serialize(DumpFile &ar)
 	{
 		ar << m_eps;
 		ar << m_atol;
-		ar << m_nplc;
 		ar << nse;
 		ar << nme;
 
@@ -758,11 +746,8 @@ void FETiedInterface::Serialize(DumpFile &ar)
 	{
 		ar >> m_eps;
 		ar >> m_atol;
-		ar >> m_nplc;
 		ar >> nse;
 		ar >> nme;
-
-		if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 
 		ms.Serialize(ar);
 		ss.Serialize(ar);

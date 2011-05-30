@@ -41,9 +41,6 @@ public:
 		ms.ShallowCopy(si.ms);
 	}
 
-	//! calculate penalty value
-	double Penalty() { return (m_pplc?m_eps*m_pplc->Value():m_eps);}
-
 	//! calculate contact forces
 	virtual void ContactForces(vector<double>& F);
 
@@ -67,11 +64,8 @@ public:
 	int nse;	//!< number of slave elements
 	int nme;	//!< number of master elements
 
-	double	m_atol;	//!< augmentation tolerance
-
-	double			m_eps;	//!< penalty scale factor
-	int				m_nplc;	//!< penalty load curve number
-	FELoadCurve*	m_pplc;	//!< pointer to penalty load curve
+	double		m_atol;		//!< augmentation tolerance
+	double		m_eps;		//!< penalty scale factor
 
 	DECLARE_PARAMETER_LIST();
 };
