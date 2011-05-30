@@ -17,20 +17,21 @@ REGISTER_FEBIO_CLASS(FESlidingInterface, FEContactInterface, "sliding_with_gaps"
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"      ); 
-	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"   );
-	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"     );
-	ADD_PARAMETER(m_bautopen, FE_PARAM_BOOL  , "auto_penalty");
-	ADD_PARAMETER(m_gtol    , FE_PARAM_DOUBLE, "gaptol"      );
-	ADD_PARAMETER(m_mu      , FE_PARAM_DOUBLE, "fric_coeff"  );
-	ADD_PARAMETER(m_epsf    , FE_PARAM_DOUBLE, "fric_penalty");
-	ADD_PARAMETER(m_naugmin , FE_PARAM_INT   , "minaug"      );
-	ADD_PARAMETER(m_naugmax , FE_PARAM_INT   , "maxaug"      );
-	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tol"  );
-	ADD_PARAMETER(m_ktmult  , FE_PARAM_DOUBLE, "ktmult"      );
-	ADD_PARAMETER(m_knmult  , FE_PARAM_DOUBLE, "knmult"      );
-	ADD_PARAMETER(m_breloc  , FE_PARAM_BOOL  , "node_reloc"  );
-	ADD_PARAMETER(m_nsegup  , FE_PARAM_INT   , "seg_up"      );
+	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty");
+	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"    );
+	ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"      );
+	ADD_PARAMETER(m_mu       , FE_PARAM_DOUBLE, "fric_coeff"  );
+	ADD_PARAMETER(m_epsf     , FE_PARAM_DOUBLE, "fric_penalty");
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"      );
+	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"      );
+	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"  );
+	ADD_PARAMETER(m_ktmult   , FE_PARAM_DOUBLE, "ktmult"      );
+	ADD_PARAMETER(m_knmult   , FE_PARAM_DOUBLE, "knmult"      );
+	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"  );
+	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"      );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -275,6 +276,7 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 
 	m_nsegup = 0;	// always do segment updates
 	m_bautopen = false;	// don't use auto-penalty
+	m_btwo_pass = false; // don't use two-pass
 	m_nID = count++;
 
 	// set the siblings
@@ -348,7 +350,7 @@ void FESlidingInterface::Init()
 
 	// for two-pass algorithms we repeat the previous
 	// two steps with master and slave switched
-	if (m_npass == 2)
+	if (m_btwo_pass)
 	{
 //		m_ss.UpdateNormals();
 		ProjectSurface(m_ms, m_ss, true);
@@ -530,7 +532,7 @@ void FESlidingInterface::Update()
 	// this also calculates the nodal gap functions
 	ProjectSurface(m_ss, m_ms, bupdate);
 
-	if (m_npass == 2)
+	if (m_btwo_pass)
 	{
 		m_ss.Update();
 		ProjectSurface(m_ms, m_ss, bupdate);
@@ -575,7 +577,8 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 	vec3d dxr, dxs;
 
 	// do two-pass
-	for (np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (np=0; np<npass; ++np)
 	{
 		// pick the slave and master surfaces
 		FESlidingSurface& ss = (np==0? m_ss : m_ms);
@@ -939,7 +942,8 @@ void FESlidingInterface::ContactStiffness()
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
 
 	// do two-pass
-	for (np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (np=0; np<npass; ++np)
 	{
 		// get the master and slave surface
 		FESlidingSurface& ss = (np==0?m_ss:m_ms);	
@@ -1704,7 +1708,7 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 	FEContactInterface::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_npass;
+		ar << m_btwo_pass;
 		ar << m_naugmax;
 		ar << m_naugmin;
 		ar << m_gtol;
@@ -1724,7 +1728,7 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 	}
 	else
 	{
-		ar >> m_npass;
+		ar >> m_btwo_pass;
 		ar >> m_naugmax;
 		ar >> m_naugmin;
 		ar >> m_gtol;

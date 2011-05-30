@@ -718,7 +718,8 @@ void LSDYNAPlotFile::write_contact_tractions()
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (fem.m_CI[i]);
 		if (psi)
 		{
-			for (n=0; n<psi->m_npass; ++n)
+			int npass = (psi->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FESlidingSurface& ss = (n==0?psi->m_ss:psi->m_ms);
 				FESlidingSurface& ms = (n==0?psi->m_ms:psi->m_ss);

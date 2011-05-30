@@ -212,7 +212,7 @@ bool FEContactDiagnostic::Init()
 	FESlidingInterface* ps = new FESlidingInterface(&fem);
 	ps->m_atol = 0.1;
 	ps->m_eps = 1;
-	ps->m_npass = 1;
+	ps->m_btwo_pass = false;
 	ps->m_nsegup = 0;
 	FESlidingSurface& ms = ps->m_ms;
 	ms.create(1);

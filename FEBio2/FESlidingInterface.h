@@ -129,7 +129,7 @@ public:
 	FESlidingSurface	m_ss;	//!< slave surface
 	FESlidingSurface	m_ms;	//!< master surface
 
-	int				m_npass;	//!< nr of passes (1 or 2)
+	bool			m_btwo_pass;	//!< two pass algorithm flag
 
 	int				m_naugmax;	//!< maximum nr of augmentations
 	int				m_naugmin;	//!< minimum nr of augmentations

@@ -2904,23 +2904,13 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 		FEParameterList& pl = ps->GetParameterList();
 
-		ps->m_npass = 1;
-
 		++tag;
 		do
 		{
 			// read parameters
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "two_pass")
-				{
-					int n;
-					tag.value(n);
-					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-					ps->m_npass = n+1;
-				}
-				else if (tag == "surface")
+				if (tag == "surface")
 				{
 					const char* sztype = tag.AttributeValue("type");
 					int ntype;
