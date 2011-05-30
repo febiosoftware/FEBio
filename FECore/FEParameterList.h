@@ -1,5 +1,7 @@
 #pragma once
 
+#include "FECore/vec3d.h"
+#include <assert.h>
 #include <list>
 #include <memory>
 using namespace std;
@@ -45,6 +47,12 @@ public:
 	//! retrieves the value for an array item
 	template <class T> T* pvalue() { return (T*) m_pv; }
 
+	//! assignment operators
+	void operator = (double g) { assert(m_itype == FE_PARAM_DOUBLE); value<double>() = g; }
+	void operator = (int    n) { assert(m_itype == FE_PARAM_INT   ); value<int   >() = n; }
+	void operator = (bool   b) { assert(m_itype == FE_PARAM_BOOL  ); value<bool  >() = b; }
+	void operator = (vec3d  v) { assert(m_itype == FE_PARAM_VEC3D ); value<vec3d >() = v; }
+
 	//! override the template for char pointers
 	char* cvalue() { return (char*) m_pv; }
 };
@@ -57,8 +65,11 @@ public:
 	//! Add a parameter to the list
 	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
 
-	//! find a parameter using it's name
+	//! find a parameter using it's name (the safe way)
 	FEParam* Find(const char* sz);
+
+	//! get a parameter (the dangerous way)
+	FEParam& operator [] (const char* sz) { return *Find(sz); }
 
 	//! returs the first parameter
 	list<FEParam>::iterator first() { return m_pl.begin(); }
