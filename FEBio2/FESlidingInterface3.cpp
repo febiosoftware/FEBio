@@ -470,10 +470,10 @@ void FESlidingInterface3::CalcAutoPenalty(FESlidingSurface3& s)
 		double V = m.ElementVolume(*pe);
 		
 		// calculate a modulus
-		double E = AutoPenalty(el, s);
+		double K = BulkModulus(el, s);
 		
 		// calculate penalty
-		double eps = E*A/V;
+		double eps = K*A/V;
 		
 		// assign to integation points of surface element
 		int nint = el.GaussPoints();

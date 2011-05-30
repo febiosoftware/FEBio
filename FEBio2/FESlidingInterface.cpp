@@ -17,19 +17,20 @@ REGISTER_FEBIO_CLASS(FESlidingInterface, FEContactInterface, "sliding_with_gaps"
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
-	ADD_PARAMETER(m_gtol   , FE_PARAM_DOUBLE, "gaptol"      );
-	ADD_PARAMETER(m_mu     , FE_PARAM_DOUBLE, "fric_coeff"  );
-	ADD_PARAMETER(m_epsf   , FE_PARAM_DOUBLE, "fric_penalty");
-	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug"      );
-	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug"      );
-	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tol"  );
-	ADD_PARAMETER(m_ktmult , FE_PARAM_DOUBLE, "ktmult"      );
-	ADD_PARAMETER(m_knmult , FE_PARAM_DOUBLE, "knmult"      );
-	ADD_PARAMETER(m_breloc , FE_PARAM_BOOL  , "node_reloc"  );
-	ADD_PARAMETER(m_nsegup , FE_PARAM_INT   , "seg_up"      );
+	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps     , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_bautopen, FE_PARAM_BOOL  , "auto_penalty");
+	ADD_PARAMETER(m_gtol    , FE_PARAM_DOUBLE, "gaptol"      );
+	ADD_PARAMETER(m_mu      , FE_PARAM_DOUBLE, "fric_coeff"  );
+	ADD_PARAMETER(m_epsf    , FE_PARAM_DOUBLE, "fric_penalty");
+	ADD_PARAMETER(m_naugmin , FE_PARAM_INT   , "minaug"      );
+	ADD_PARAMETER(m_naugmax , FE_PARAM_INT   , "maxaug"      );
+	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tol"  );
+	ADD_PARAMETER(m_ktmult  , FE_PARAM_DOUBLE, "ktmult"      );
+	ADD_PARAMETER(m_knmult  , FE_PARAM_DOUBLE, "knmult"      );
+	ADD_PARAMETER(m_breloc  , FE_PARAM_BOOL  , "node_reloc"  );
+	ADD_PARAMETER(m_nsegup  , FE_PARAM_INT   , "seg_up"      );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -273,7 +274,7 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_breloc = true;
 
 	m_nsegup = 0;	// always do segment updates
-	m_nautopen = 0;	// don't use auto-penalty
+	m_bautopen = false;	// don't use auto-penalty
 	m_nID = count++;
 
 	// set the siblings
@@ -306,25 +307,7 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 		assert(pe);
 
 		// we need a measure for the modulus
-		double K = 1;
-
-		switch (m_nautopen)
-		{
-		case 1: // use the old algorithm
-			{
-				// get the element's material
-				FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
-
-				// grab its bulk-modulus
-				K = pm->BulkModulus();
-			}
-			break;
-		case 2: // use the new algorithm
-			{
-				K = AutoPenalty(face, s);
-			}
-			break;
-		}
+		double K = BulkModulus(face, s);
 
 		// calculate the facet area
 		double area = s.FaceArea(face);
@@ -361,7 +344,7 @@ void FESlidingInterface::Init()
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, m_breloc);
-	if (m_nautopen != 0) CalcAutoPenalty(m_ss);
+	if (m_bautopen) CalcAutoPenalty(m_ss);
 
 	// for two-pass algorithms we repeat the previous
 	// two steps with master and slave switched
@@ -369,7 +352,7 @@ void FESlidingInterface::Init()
 	{
 //		m_ss.UpdateNormals();
 		ProjectSurface(m_ms, m_ss, true);
-		if (m_nautopen != 0) CalcAutoPenalty(m_ms);
+		if (m_bautopen) CalcAutoPenalty(m_ms);
 	}
 }
 
@@ -1729,7 +1712,7 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 		ar << m_ktmult;
 		ar << m_knmult;
 		ar << m_stol;
-		ar << m_nautopen;
+		ar << m_bautopen;
 		ar << m_eps;
 		ar << m_breloc;
 		ar << m_mu;
@@ -1749,7 +1732,7 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 		ar >> m_ktmult;
 		ar >> m_knmult;
 		ar >> m_stol;
-		ar >> m_nautopen;
+		ar >> m_bautopen;
 		ar >> m_eps;
 		ar >> m_breloc;
 		ar >> m_mu;

@@ -274,20 +274,25 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
 			return false;
 		}
 
-		int lc = -1;
-		tag.AttributeValue("lc", lc, true);
-		if (lc != -1) 
+		int nattr = tag.m_natt;
+		for (int i=0; i<nattr; ++i)
 		{
-			pp->m_nlc = lc;
-			switch (pp->m_itype)
+			const char* szat = tag.m_szatt[i];
+			if (strcmp(szat, "lc") == 0)
 			{
-			case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+				int lc = atoi(tag.m_szatv[i]);
+				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_szatv[i]);
+				pp->m_nlc = lc;
+				switch (pp->m_itype)
+				{
+				case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+				}
 			}
+			else clog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}
 
 		return true;
 	}
-	
 	return false;
 }
 
@@ -2907,12 +2912,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			// read parameters
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "auto_penalty")
-				{
-					bool b; tag.value(b);
-					if (b) ps->m_nautopen = 2;
-				}
-				else if (tag == "two_pass")
+				if (tag == "two_pass")
 				{
 					int n;
 					tag.value(n);

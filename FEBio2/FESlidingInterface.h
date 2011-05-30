@@ -94,7 +94,7 @@ public:
 	}
 
 	//! calculate penalty value
-	double Penalty() { return m_eps; } //{ return (m_pplc?m_eps*m_pplc->Value():m_eps);}
+	double Penalty() { return m_eps; }
 
 	//! calculate contact forces
 	virtual void ContactForces(vector<double>& F);
@@ -140,7 +140,7 @@ public:
 
 	double			m_stol;		//!< search tolerance
 
-	int				m_nautopen;	//!< auto penalty calculation factor (0=none, 1=old, 2=new)
+	bool			m_bautopen;	//!< auto penalty calculation
 	double			m_eps;		//!< penalty scale factor 
 
 	bool			m_breloc;	//!< initial node relocation

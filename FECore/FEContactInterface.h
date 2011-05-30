@@ -62,8 +62,8 @@ protected:
 	//! don't call the default constructor
 	FEContactInterface() {m_pfem=0;}
 
-	//! auto-penalty calculation
-	double AutoPenalty(FESurfaceElement& el, FESurface& s);
+	//! estimate bulk-modulus of a surface element
+	double BulkModulus(FESurfaceElement& el, FESurface& s);
 
 public:
 	bool	m_blaugon;	//!< augmented lagrangian flag
