@@ -19,6 +19,7 @@ REGISTER_FEBIO_CLASS(FESlidingInterface, FEContactInterface, "sliding_with_gaps"
 BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
 	ADD_PARAMETER(m_gtol   , FE_PARAM_DOUBLE, "gaptol"      );
 	ADD_PARAMETER(m_mu     , FE_PARAM_DOUBLE, "fric_coeff"  );
 	ADD_PARAMETER(m_epsf   , FE_PARAM_DOUBLE, "fric_penalty");
@@ -271,8 +272,6 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 
 	m_breloc = true;
 
-	m_nplc = -1;
-	m_pplc = 0;
 	m_nsegup = 0;	// always do segment updates
 	m_nautopen = 0;	// don't use auto-penalty
 	m_nID = count++;
@@ -363,9 +362,6 @@ void FESlidingInterface::Init()
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, m_breloc);
 	if (m_nautopen != 0) CalcAutoPenalty(m_ss);
-
-	// set penalty load curve
-	if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 
 	// for two-pass algorithms we repeat the previous
 	// two steps with master and slave switched
@@ -1739,7 +1735,6 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 		ar << m_mu;
 		ar << m_epsf;
 		ar << m_nsegup;
-		ar << m_nplc;
 
 		m_ms.Serialize(ar);
 		m_ss.Serialize(ar);
@@ -1760,9 +1755,6 @@ void FESlidingInterface::Serialize(DumpFile& ar)
 		ar >> m_mu;
 		ar >> m_epsf;
 		ar >> m_nsegup;
-		ar >> m_nplc;
-
-		if (m_nplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_nplc);
 
 		m_ms.Serialize(ar);
 		m_ss.Serialize(ar);

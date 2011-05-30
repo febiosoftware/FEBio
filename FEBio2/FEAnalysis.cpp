@@ -393,6 +393,13 @@ bool FEAnalysis::Solve()
 			m_fem.EvalParameterList(pl);
 		}
 
+		// evaluate contact interface parameter lists
+		for (i=0; i<m_fem.ContactInterfaces(); ++i)
+		{
+			FEParameterList& pl = m_fem.m_CI[i]->GetParameterList();
+			m_fem.EvalParameterList(pl);
+		}
+
 		// solve this timestep,
 		try
 		{

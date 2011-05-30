@@ -94,7 +94,7 @@ public:
 	}
 
 	//! calculate penalty value
-	double Penalty() { return (m_pplc?m_eps*m_pplc->Value():m_eps);}
+	double Penalty() { return m_eps; } //{ return (m_pplc?m_eps*m_pplc->Value():m_eps);}
 
 	//! calculate contact forces
 	virtual void ContactForces(vector<double>& F);
@@ -149,8 +149,6 @@ public:
 	double			m_epsf;		//!< penalty scale factor for friction
 
 	int				m_nsegup;	//!< segment update parameter
-	int				m_nplc;		//!< penalty load curve number
-	FELoadCurve*	m_pplc;		//!< pointer to penalty load curve
 
 	DECLARE_PARAMETER_LIST();
 };

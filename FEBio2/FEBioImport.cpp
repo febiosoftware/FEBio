@@ -2907,20 +2907,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			// read parameters
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "penalty")
-				{
-					const char* sz = tag.AttributeValue("lc", true);
-					if (sz)	ps->m_nplc = atoi(sz);
-
-					sz = tag.AttributeValue("auto", true);
-					if (sz)
-					{
-						if (strcmp(sz, "on") == 0) ps->m_nautopen = 1;
-					}
-
-					tag.value(ps->m_eps);
-				}
-				else if (tag == "auto_penalty")
+				if (tag == "auto_penalty")
 				{
 					bool b; tag.value(b);
 					if (b) ps->m_nautopen = 2;
