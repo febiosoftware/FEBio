@@ -2953,15 +2953,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			// read parameters
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "two_pass")
-				{
-					int n;
-					tag.value(n);
-					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-					ps->m_npass = n+1;
-				}
-				else if (tag == "surface")
+				if (tag == "surface")
 				{
 					const char* sztype = tag.AttributeValue("type");
 					int ntype;
@@ -3013,21 +3005,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			// read parameters
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "debug")
-				{
-					tag.value(ps->m_bdebug);
-					const char* sz = tag.AttributeValue("file");
-					if (sz) strcpy(ps->m_szdebug, sz);
-				}
-				else if (tag == "two_pass"  ) 
-				{
-					int n;
-					tag.value(n);
-					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-
-					ps->m_npass = n+1;
-				}
-				else if (tag == "surface")
+				if (tag == "surface")
 				{
 					const char* sztype = tag.AttributeValue("type");
 					int ntype;
@@ -3091,20 +3069,6 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					tag.value(ps->m_ambc);
 					const char* sz = tag.AttributeValue("lc", true);
 					if (sz) sscanf(sz,"%d", &ps->m_aclc);
-				}
-				else if (tag == "debug")
-				{
-					tag.value(ps->m_bdebug);
-					const char* sz = tag.AttributeValue("file");
-					if (sz) strcpy(ps->m_szdebug, sz);
-				}
-				else if (tag == "two_pass"  ) 
-				{
-					int n;
-					tag.value(n);
-					if ((n<0) || (n>1)) throw XMLReader::InvalidValue(tag);
-					
-					ps->m_npass = n+1;
 				}
 				else if (tag == "surface")
 				{

@@ -11,17 +11,18 @@ REGISTER_FEBIO_CLASS(FEFacet2FacetSliding, FEContactInterface, "facet-to-facet s
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
-	ADD_PARAMETER(m_epsn    , FE_PARAM_DOUBLE, "penalty"      );
-	ADD_PARAMETER(m_bautopen, FE_PARAM_BOOL  , "auto_penalty" );
-	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"       );
-	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"    );
-	ADD_PARAMETER(m_gtol    , FE_PARAM_DOUBLE, "gaptol"       );
-	ADD_PARAMETER(m_naugmin , FE_PARAM_INT   , "minaug"       );
-	ADD_PARAMETER(m_naugmax , FE_PARAM_INT   , "maxaug"       );
-	ADD_PARAMETER(m_knmult  , FE_PARAM_DOUBLE, "knmult"       );
-	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tol"   );
-	ADD_PARAMETER(m_srad    , FE_PARAM_DOUBLE, "search_radius");
-	ADD_PARAMETER(m_dxtol   , FE_PARAM_DOUBLE, "dxtol"        );
+	ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"      );
+	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty" );
+	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"       );
+	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"    );
+	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"     );
+	ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"       );
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"       );
+	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"       );
+	ADD_PARAMETER(m_knmult   , FE_PARAM_DOUBLE, "knmult"       );
+	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"   );
+	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius");
+	ADD_PARAMETER(m_dxtol    , FE_PARAM_DOUBLE, "dxtol"        );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -171,7 +172,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	m_epsn = 1.0;
 	m_knmult = 1.0;
 	m_stol = 0.01;
-	m_npass = 1;
+	m_btwo_pass = false;
 	m_bautopen = false;
 
 	m_atol = 0.01;
@@ -200,7 +201,7 @@ void FEFacet2FacetSliding::Init()
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms);
 
-	if (m_npass == 2) 
+	if (m_btwo_pass) 
 	{
 		ProjectSurface(m_ms, m_ss);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
@@ -310,7 +311,7 @@ void FEFacet2FacetSliding::Update()
 {
 	// project slave surface to master surface
 	ProjectSurface(m_ss, m_ms);
-	if (m_npass == 2) ProjectSurface(m_ms, m_ss);
+	if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
 }
 
 //-----------------------------------------------------------------------------
@@ -342,7 +343,8 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 	double detJ[4], w[4], *Hs, Hm[4];
 	vec3d r0[4];
 
-	for (int np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
 	{
 		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
@@ -527,7 +529,8 @@ void FEFacet2FacetSliding::ContactStiffness()
 	double detJ[4], w[4], *Hs, Hm[4], Hmr[4], Hms[4];
 	vec3d r0[4];
 
-	for (int np=0; np < m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np < npass; ++np)
 	{
 		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
@@ -938,7 +941,7 @@ void FEFacet2FacetSliding::Serialize(DumpFile &ar)
 		ar << m_epsn;
 		ar << m_knmult;
 		ar << m_stol;
-		ar << m_npass;
+		ar << m_btwo_pass;
 		ar << m_bautopen;
 		ar << m_srad;
 		ar << m_atol;
@@ -955,7 +958,7 @@ void FEFacet2FacetSliding::Serialize(DumpFile &ar)
 		ar >> m_epsn;
 		ar >> m_knmult;
 		ar >> m_stol;
-		ar >> m_npass;
+		ar >> m_btwo_pass;
 		ar >> m_bautopen;
 		ar >> m_srad;
 		ar >> m_atol;

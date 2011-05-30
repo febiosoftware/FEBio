@@ -798,7 +798,8 @@ void LSDYNAPlotFile::write_contact_tractions()
 			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
 			int ni, ne;
 
-			for (n=0; n<pf->m_npass; ++n)
+			int npass = (pf->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
 
@@ -848,7 +849,8 @@ void LSDYNAPlotFile::write_contact_tractions()
 			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
 			int ni, ne;
 
-			for (n=0; n<ps2->m_npass; ++n)
+			int npass = (ps2->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FESlidingSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
 
@@ -898,7 +900,8 @@ void LSDYNAPlotFile::write_contact_tractions()
 			double ti[4], tn[4], gi[4], gn[4], li[4], ln[4];
 			int ni, ne;
 			
-			for (n=0; n<ps3->m_npass; ++n)
+			int npass = (ps3->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FESlidingSurface3& s = (n==0?ps3->m_ss:ps3->m_ms);
 				
@@ -1112,7 +1115,8 @@ void LSDYNAPlotFile::write_contact_pressures()
 			double Li[4], Ln[4];
 			int ni, ne, n, k;
 
-			for (n=0; n<pfs->m_npass; ++n)
+			int npass = (pfs->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FEFacetSlidingSurface& s = (n==0?pfs->m_ss:pfs->m_ms);
 
@@ -1192,7 +1196,8 @@ void LSDYNAPlotFile::write_contact_gaps()
 			double gi[4], gn[4];
 			int ni, ne, n, k;
 
-			for (n=0; n<pf->m_npass; ++n)
+			int npass = (pf->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
 
@@ -1230,7 +1235,8 @@ void LSDYNAPlotFile::write_contact_gaps()
 			double gi[4], gn[4];
 			int ni, ne, n, k;
 
-			for (n=0; n<ps2->m_npass; ++n)
+			int npass = (ps2->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FESlidingSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
 
@@ -1266,7 +1272,8 @@ void LSDYNAPlotFile::write_contact_gaps()
 			double gi[4], gn[4];
 			int ni, ne, n, k;
 			
-			for (n=0; n<ps3->m_npass; ++n)
+			int npass = (ps3->m_btwo_pass?2:1);
+			for (n=0; n<npass; ++n)
 			{
 				FESlidingSurface3& s = (n==0?ps3->m_ss:ps3->m_ms);
 				

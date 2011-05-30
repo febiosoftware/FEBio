@@ -75,12 +75,12 @@ protected:
 	void CalcAutoPenalty(FEFacetSlidingSurface& s);
 
 public:
-	double	m_epsn;		//!< normal penalty factor
-	double	m_knmult;	//!< normal stiffness multiplier
-	double	m_stol;		//!< search tolerance
-	int		m_npass;	//!< nr of passes
-	bool	m_bautopen;	//!< auto-penalty flag
-	double	m_srad;		//!< search radius (%)
+	double	m_epsn;			//!< normal penalty factor
+	double	m_knmult;		//!< normal stiffness multiplier
+	double	m_stol;			//!< search tolerance
+	bool	m_btwo_pass;	//!< two-pass flag
+	bool	m_bautopen;		//!< auto-penalty flag
+	double	m_srad;			//!< search radius (% of model size)
 
 	double	m_atol;		//!< aug lag tolernace
 	double	m_gtol;		//!< gap tolerance

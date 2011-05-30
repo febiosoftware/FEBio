@@ -97,25 +97,21 @@ public:
 	FESlidingSurface2	m_ms;	//!< master surface
 	FESlidingSurface2	m_ss;	//!< slave surface
 
-	int				m_knmult;	//!< higher order stiffness multiplier
-	int				m_npass;	//!< nr of passes
-	double			m_atol;		//!< augmentation tolerance
-	double			m_gtol;		//!< gap tolerance
-	double			m_ptol;		//!< pressure gap tolerance
-	double			m_stol;		//!< search tolerance
-	bool			m_bsymm;	//!< use symmetric stiffness components only
-	double			m_srad;		//!< contact search radius
-	int				m_naugmax;	//!< maximum nr of augmentations
-	int				m_naugmin;	//!< minimum nr of augmentations
-	int				m_nsegup;	//!< segment update parameter
+	int				m_knmult;		//!< higher order stiffness multiplier
+	bool			m_btwo_pass;	//!< two-pass flag
+	double			m_atol;			//!< augmentation tolerance
+	double			m_gtol;			//!< gap tolerance
+	double			m_ptol;			//!< pressure gap tolerance
+	double			m_stol;			//!< search tolerance
+	bool			m_bsymm;		//!< use symmetric stiffness components only
+	double			m_srad;			//!< contact search radius
+	int				m_naugmax;		//!< maximum nr of augmentations
+	int				m_naugmin;		//!< minimum nr of augmentations
+	int				m_nsegup;		//!< segment update parameter
 
 	double			m_epsn;		//!< normal penalty factor
 	bool			m_bautopen;	//!< use autopenalty factor
 
-	bool	m_bdebug;		// debug flag
-	char	m_szdebug[256];	// debug file name
-	FILE*	m_fp;			// debug file
-	
 	// biphasic contact parameters
 	double	m_epsp;		//!< flow rate penalty
 

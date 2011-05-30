@@ -359,7 +359,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				{
 					vector<int> lm(6*8);
 
-					for (int np=0; np<pfi->m_npass; ++np)
+					int npass = (pfi->m_btwo_pass?2:1);
+					for (int np=0; np<npass; ++np)
 					{
 						FEFacetSlidingSurface& ss = (np == 0? pfi->m_ss : pfi->m_ms);
 						FEFacetSlidingSurface& ms = (np == 0? pfi->m_ms : pfi->m_ss);
@@ -418,7 +419,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				{
 					vector<int> lm(7*8);
 
-					for (int np=0; np<ps2->m_npass; ++np)
+					int npass = (ps2->m_btwo_pass?2:1);
+					for (int np=0; np<npass; ++np)
 					{
 						FESlidingSurface2& ss = (np == 0? ps2->m_ss : ps2->m_ms);
 						FESlidingSurface2& ms = (np == 0? ps2->m_ms : ps2->m_ss);
@@ -479,7 +481,8 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				{
 					vector<int> lm(8*8);
 					
-					for (int np=0; np<ps3->m_npass; ++np)
+					int npass = (ps3->m_btwo_pass?2:1);
+					for (int np=0; np<npass; ++np)
 					{
 						FESlidingSurface3& ss = (np == 0? ps3->m_ss : ps3->m_ms);
 						FESlidingSurface3& ms = (np == 0? ps3->m_ms : ps3->m_ss);

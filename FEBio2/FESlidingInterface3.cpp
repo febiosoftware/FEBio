@@ -13,20 +13,21 @@ REGISTER_FEBIO_CLASS(FESlidingInterface3, FEContactInterface, "sliding3");
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
-	ADD_PARAMETER(m_blaugon , FE_PARAM_BOOL  , "laugon"               ); 
-	ADD_PARAMETER(m_atol    , FE_PARAM_DOUBLE, "tolerance"            );
-	ADD_PARAMETER(m_gtol    , FE_PARAM_DOUBLE, "gaptol"               );
-	ADD_PARAMETER(m_ptol    , FE_PARAM_DOUBLE, "ptol"                 );
-	ADD_PARAMETER(m_ctol    , FE_PARAM_DOUBLE, "ctol"                 );
-	ADD_PARAMETER(m_epsn    , FE_PARAM_DOUBLE, "penalty"              );
-	ADD_PARAMETER(m_bautopen, FE_PARAM_BOOL  , "auto_penalty"         );
-	ADD_PARAMETER(m_knmult  , FE_PARAM_DOUBLE, "knmult"               );
-	ADD_PARAMETER(m_stol    , FE_PARAM_DOUBLE, "search_tol"           );
-	ADD_PARAMETER(m_epsp    , FE_PARAM_DOUBLE, "pressure_penalty"     );
-	ADD_PARAMETER(m_epsc    , FE_PARAM_DOUBLE, "concentration_penalty");
-	ADD_PARAMETER(m_bsymm   , FE_PARAM_BOOL  , "symmetric_stiffness"  );
-	ADD_PARAMETER(m_srad    , FE_PARAM_DOUBLE, "search_radius"        );
-	ADD_PARAMETER(m_nsegup  , FE_PARAM_INT   , "seg_up"               );
+	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"               ); 
+	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"            );
+	ADD_PARAMETER(m_gtol     , FE_PARAM_DOUBLE, "gaptol"               );
+	ADD_PARAMETER(m_ptol     , FE_PARAM_DOUBLE, "ptol"                 );
+	ADD_PARAMETER(m_ctol     , FE_PARAM_DOUBLE, "ctol"                 );
+	ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"              );
+	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty"         );
+	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"             );
+	ADD_PARAMETER(m_knmult   , FE_PARAM_DOUBLE, "knmult"               );
+	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"           );
+	ADD_PARAMETER(m_epsp     , FE_PARAM_DOUBLE, "pressure_penalty"     );
+	ADD_PARAMETER(m_epsc     , FE_PARAM_DOUBLE, "concentration_penalty");
+	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness"  );
+	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"        );
+	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"               );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -283,7 +284,7 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_epsn = 1;
 	m_epsp = 1;
 	m_epsc = 1;
-	m_npass = 1;
+	m_btwo_pass = false;
 	m_stol = 0.01;
 	m_bsymm = true;
 	m_srad = 0.1;
@@ -299,10 +300,6 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_naugmin = 0;
 	m_naugmax = 10;
 	
-	m_bdebug = false;
-	m_szdebug[0] = 0;
-	m_fp = 0;
-	
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }
@@ -311,63 +308,6 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 
 FESlidingInterface3::~FESlidingInterface3()
 {
-	if (m_fp) fclose(m_fp);
-	m_fp = 0;
-}
-
-//-----------------------------------------------------------------------------
-
-void OnSlidingInterface3Callback(FEM* pfem, void* pd)
-{
-	// get the sliding interface pointer
-	FESlidingInterface3* pi = (FESlidingInterface3*) (pd);
-	
-	// see if there is a valid file pointer
-	FILE* fp = pi->m_fp;
-	if (fp == 0) return;
-	
-	double t = pfem->m_ftime;
-	int nt = pfem->m_pStep->m_ntimesteps;
-	fprintf(fp, "----------------------------------------------------------------------------------------------------------------\n");
-	fprintf(fp, "time: %lg\n", t);
-	fprintf(fp, "step: %d\n", nt);
-	fprintf(fp, "--1-|2|------3-------|------4-------|------5-------|------6-------|------7-------|------8-------|------9-------|\n");
-	
-	// export data
-	for (int n=0; n<pi->m_npass; ++n)
-	{
-		// get the surface
-		FESlidingSurface3& s = (n == 0? pi->m_ss : pi->m_ms);
-		
-		// loop over all elements
-		int l = 0;
-		for (int i=0; i<s.Elements(); ++i)
-		{
-			// get the element
-			FESurfaceElement& e = s.Element(i);
-			
-			// get the element's nodal coordinates
-			vec3d rn[4];
-			for (int j=0; j<e.Nodes(); ++j) rn[j] = s.GetMesh()->Node(e.m_node[j]).m_rt;
-			
-			// loop over the integration points
-			int ni = e.GaussPoints();
-			for (int j=0; j<ni; ++j, ++l)
-			{
-				// evaluate the integration's point initial location
-				vec3d r = e.eval(rn, j); 
-				
-				double Ld = s.m_Lmd[l];
-				double Lp = (s.m_bporo? s.m_Lmp[l] : 0);
-				double Lc = (s.m_bsolu? s.m_Lmc[l] : 0);
-				double g  = s.m_gap[l];
-				double dp = (s.m_bporo? s.m_pg[l] : 0); 
-				double dc = (s.m_bsolu? s.m_cg[l] : 0); 
-				
-				fprintf(fp, "%5d%2d%15lg%15lg%15lg%15lg%15lg%15lg%15lg%15lg%15lg\n", i+1, j+1, r.x, r.y, r.z, Ld, Lp, Lc, g, dp, dc);
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -416,34 +356,6 @@ void FESlidingInterface3::Init()
 	
 	// update sliding interface data
 	Update();
-	
-	// create debug file
-	if (m_bdebug)
-	{
-		m_fp = fopen(m_szdebug, "wt");
-		if (m_fp == 0) 
-		{
-			clog.printf("WARNING: unable to create debug file. No debug data will be stored.\n");
-			m_bdebug = false;
-		}
-		else
-		{
-			// add a callback function
-			fem.AddCallback(OnSlidingInterface3Callback, this);
-			
-			fprintf(m_fp, "[ 1] element ID\n");
-			fprintf(m_fp, "[ 2] integration point\n");
-			fprintf(m_fp, "[ 3] x-coord of integration point\n");
-			fprintf(m_fp, "[ 4] y-coord of integration point\n");
-			fprintf(m_fp, "[ 5] z-coord of integration point\n");
-			fprintf(m_fp, "[ 6] traction multiplier\n");
-			fprintf(m_fp, "[ 7] pressure multiplier\n");
-			fprintf(m_fp, "[ 8] concentration multiplier\n");
-			fprintf(m_fp, "[ 9] displacement gap\n");
-			fprintf(m_fp, "[10] pressure difference\n");
-			fprintf(m_fp, "[11] concentration difference\n");
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -809,7 +721,7 @@ void FESlidingInterface3::Update()
 	// project the surfaces onto each other
 	// this will update the gap functions as well
 	ProjectSurface(m_ss, m_ms, bupseg);
-	if (m_npass == 2) ProjectSurface(m_ms, m_ss, bupseg);
+	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupseg);
 	
 	// set poro flag
 	bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
@@ -830,7 +742,8 @@ void FESlidingInterface3::Update()
 	
 	// Next, we loop over each surface, visiting the nodes
 	// and finding out if that node is in contact or not
-	for (np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (np=0; np<npass; ++np)
 	{
 		FESlidingSurface3& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface3& ms = (np == 0? m_ms : m_ss);
@@ -963,7 +876,8 @@ void FESlidingInterface3::ContactForces(vector<double> &F)
 	double dt = fem.m_pStep->m_dt;
 	
 	// loop over the nr of passes
-	for (int np=0; np<m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
 	{
 		// get slave and master surface
 		FESlidingSurface3& ss = (np == 0? m_ss : m_ms);
@@ -1197,7 +1111,8 @@ void FESlidingInterface3::ContactStiffness()
 	}
 	
 	// do single- or two-pass
-	for (int np=0; np < m_npass; ++np)
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np < npass; ++np)
 	{
 		// get the slave and master surface
 		FESlidingSurface3& ss = (np == 0? m_ss : m_ms);
@@ -1886,7 +1801,7 @@ void FESlidingInterface3::Serialize(DumpFile &ar)
 	if (ar.IsSaving())
 	{
 		ar << m_knmult;
-		ar << m_npass;
+		ar << m_btwo_pass;
 		ar << m_atol;
 		ar << m_gtol;
 		ar << m_ptol;
@@ -1908,7 +1823,7 @@ void FESlidingInterface3::Serialize(DumpFile &ar)
 	else
 	{
 		ar >> m_knmult;
-		ar >> m_npass;
+		ar >> m_btwo_pass;
 		ar >> m_atol;
 		ar >> m_gtol;
 		ar >> m_ptol;
