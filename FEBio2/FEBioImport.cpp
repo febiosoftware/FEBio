@@ -3058,19 +3058,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			// read parameters
 			if (m_pim->ReadParameter(tag, pl) == false)
 			{
-				if (tag == "ambient_pressure"   )
-				{
-					tag.value(ps->m_ambp);
-					const char* sz = tag.AttributeValue("lc", true);
-					if (sz) sscanf(sz,"%d", &ps->m_aplc);
-				}
-				else if (tag == "ambient_concentration")
-				{
-					tag.value(ps->m_ambc);
-					const char* sz = tag.AttributeValue("lc", true);
-					if (sz) sscanf(sz,"%d", &ps->m_aclc);
-				}
-				else if (tag == "surface")
+				if (tag == "surface")
 				{
 					const char* sztype = tag.AttributeValue("type");
 					int ntype;

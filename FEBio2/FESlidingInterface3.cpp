@@ -28,6 +28,8 @@ BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
 	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness"  );
 	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"        );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"               );
+	ADD_PARAMETER(m_ambp     , FE_PARAM_DOUBLE, "ambient_pressure"     );
+	ADD_PARAMETER(m_ambc     , FE_PARAM_DOUBLE, "ambient_concentration");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -294,8 +296,6 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_ambp = 0;
 	m_ambc = 0;
 	m_bautopen = false;
-	m_aplc = -1;
-	m_aclc = -1;
 	
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -317,10 +317,6 @@ void FESlidingInterface3::Init()
 	m_Tabs = FEM::GetGlobalConstant("T");
 
 	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	
-	// set ambient condition load curves
-	if (m_aplc >= 0) m_pplc = fem.GetLoadCurve(m_aplc);
-	if (m_aclc >= 0) m_pclc = fem.GetLoadCurve(m_aclc);
 	
 	// initialize surface data
 	m_ss.Init();
@@ -1923,10 +1919,6 @@ void FESlidingInterface3::SetAmbient()
 {	
 	int i, np;
 	
-	// Extract ambient conditions
-	double ambp = m_pplc ? m_ambp*m_pplc->Value() : m_ambp;
-	double ambc = m_pclc ? m_ambc*m_pclc->Value() : m_ambc;
-
 	// Set the pressure to zero for the free-draining nodes
 	for (np=0; np<2; ++np)
 	{
@@ -1940,7 +1932,7 @@ void FESlidingInterface3::SetAmbient()
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition
-					node.m_pt = ambp;
+					node.m_pt = m_ambp;
 				}
 			}
 		}
@@ -1952,7 +1944,7 @@ void FESlidingInterface3::SetAmbient()
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition
-					node.m_ct = ambc;
+					node.m_ct = m_ambc;
 				}
 			}
 		}
