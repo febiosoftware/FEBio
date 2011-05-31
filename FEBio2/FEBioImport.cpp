@@ -3333,16 +3333,11 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- R I G I D   J O I N T   I N T E R F A C E ---
 
 		FERigidJoint* prj = new FERigidJoint(&fem);
+		FEParameterList& pl = prj->GetParameterList();
 		++tag;
 		do
 		{
-			if (tag == "tolerance") tag.value(prj->m_atol);
-			else if (tag == "penalty") tag.value(prj->m_eps);
-			else if (tag =="body_a") tag.value(prj->m_nRBa);
-			else if (tag =="body_b") tag.value(prj->m_nRBb);
-			else if (tag == "joint") tag.value(prj->m_q0);
-			else throw XMLReader::InvalidTag(tag);
-
+			if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
 		while (!tag.isend());

@@ -12,6 +12,7 @@
 #include "FECore/vec3d.h"
 #include "FECore/vector.h"
 #include "FECore/DumpFile.h"
+#include "FECore/FEParameterList.h"
 
 class FEM;
 
@@ -19,7 +20,7 @@ class FEM;
 //! The FERigidJoint class implements a rigid joint. The rigid joint allows the
 //! user to connect two rigid bodies at a point in space.
 
-class FERigidJoint  
+class FERigidJoint : public FEParamContainer
 {
 public:
 	//! constructor
@@ -74,6 +75,8 @@ protected:
 	FEM*	m_pfem;	//!< FEM class to which this rigid joint belongs
 
 	int	m_nID;	//!< ID of rigid joint
+
+	DECLARE_PARAMETER_LIST();
 };
 
 #endif // !defined(AFX_FERIGIDJOINT_H__22EBB207_A1C7_465E_B985_A2140CBA9BDB__INCLUDED_)

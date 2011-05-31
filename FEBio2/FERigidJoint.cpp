@@ -8,10 +8,16 @@
 #include "FESolver.h"
 #include "log.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FERigidJoint, FEParamContainer);
+	ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance");
+	ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "penalty"  );
+	ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"   );
+	ADD_PARAMETER(m_nRBb, FE_PARAM_INT   , "body_b"   );
+	ADD_PARAMETER(m_q0  , FE_PARAM_VEC3D , "joint"    );
+END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
 FERigidJoint::FERigidJoint(FEM* pfem)
 {
 	static int count = 1;
@@ -19,11 +25,13 @@ FERigidJoint::FERigidJoint(FEM* pfem)
 	m_nID = count++;
 }
 
+//-----------------------------------------------------------------------------
 FERigidJoint::~FERigidJoint()
 {
 	m_pfem = 0;
 }
 
+//-----------------------------------------------------------------------------
 void FERigidJoint::JointForces(vector<double>& R)
 {
 	int i;
@@ -59,6 +67,7 @@ void FERigidJoint::JointForces(vector<double>& R)
 	for (i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fe[i];
 }
 
+//-----------------------------------------------------------------------------
 void FERigidJoint::JointStiffness()
 {
 	int j, k;
@@ -170,6 +179,7 @@ void FERigidJoint::JointStiffness()
 	m_pfem->m_pStep->m_psolver->m_pK->Assemble(ke, LM);
 }
 
+//-----------------------------------------------------------------------------
 bool FERigidJoint::Augment()
 {
 	vec3d ra, rb, qa, qb, c,  Lm;
@@ -220,7 +230,6 @@ bool FERigidJoint::Augment()
 }
 
 //-----------------------------------------------------------------------------
-
 void FERigidJoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
