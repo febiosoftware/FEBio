@@ -224,7 +224,7 @@ void objfun(Integer m,
 	opt.lc.Clear();
 
 	// set the FEM callback function
-	fem.SetCallback(fecb, &opt);
+	fem.AddCallback(fecb, &opt);
 
 	// reset the FEM data
 	fem.Reset();
@@ -233,7 +233,7 @@ void objfun(Integer m,
 	for (i=0; i<n; ++i) *(opt.pvar[i]) = x[i];
 
 	// suppress output to the screen
-	fem.m_log.SetMode(Logfile::FILE_ONLY);
+	clog.SetMode(Logfile::FILE_ONLY);
 	Console* pwnd = Console::GetHandle();
 	pwnd->Deactivate();
 

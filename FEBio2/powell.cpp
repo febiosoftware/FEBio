@@ -98,7 +98,7 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	return true;
 }
 
-//------------------------------------------------------------------
+//-------------------------------------------------------------------
 void fecb(FEM* pfem, void* pd)
 {
 	// get the optimizaton data
