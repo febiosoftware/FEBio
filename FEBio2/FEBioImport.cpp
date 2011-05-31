@@ -224,7 +224,12 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		clog.printf("Fatal Error: failed loading plugin %s\n", e.FileName());
 		return false;
 	}
-		// --- Unknown exceptions ---
+	catch (UnknownDataField e)
+	{
+		clog.printf("Fatal Error: syntax error in data attribute (line %d)\n", m_xml.GetCurrentLine()-1);
+		return false;
+	}
+	// --- Unknown exceptions ---
 	catch (...)
 	{
 		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
@@ -3684,20 +3689,20 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			sz = tag.AttributeValue("file", true);
 
 			NodeDataRecord* prec = new NodeDataRecord(&fem, sz);
-			sz = tag.AttributeValue("data");
-			strcpy(prec->m_szdata, sz);
+			const char* szdata = tag.AttributeValue("data");
+			prec->Parse(szdata);
 
-			sz = tag.AttributeValue("name", true);
-			if (sz != 0) strcpy(prec->m_szname, sz);
+			const char* szname = tag.AttributeValue("name", true);
+			if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
 
 			sz = tag.AttributeValue("delim", true);
-			if (sz != 0) strcpy(prec->m_szdelim, sz);
+			if (sz != 0) prec->SetDelim(sz);
 
 			sz = tag.AttributeValue("comments", true);
 			if (sz != 0)
 			{
-				if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
-				else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+				if      (strcmp(sz, "on") == 0) prec->SetComments(true);
+				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
 			}
 
 			if (tag.isleaf()) prec->DataRecord::SetItemList(tag.szvalue());
@@ -3731,21 +3736,20 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			sz = tag.AttributeValue("file", true);
 
 			ElementDataRecord* prec = new ElementDataRecord(&fem, sz);
-			sz = tag.AttributeValue("data");
-			strcpy(prec->m_szdata, sz);
+			const char* szdata = tag.AttributeValue("data");
+			prec->Parse(szdata);
 
-			sz = tag.AttributeValue("name", true);
-			if (sz != 0) strcpy(prec->m_szname, sz);
-
+			const char* szname = tag.AttributeValue("name", true);
+			if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
 
 			sz = tag.AttributeValue("delim", true);
-			if (sz != 0) strcpy(prec->m_szdelim, sz);
+			if (sz != 0) prec->SetDelim(sz);
 
 			sz = tag.AttributeValue("comments", true);
 			if (sz != 0)
 			{
-				if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
-				else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+				if      (strcmp(sz, "on") == 0) prec->SetComments(true);
+				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
 			}
 
 			prec->SetItemList(tag.szvalue());
@@ -3757,20 +3761,20 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 			sz = tag.AttributeValue("file", true);
 
 			RigidBodyDataRecord* prec = new RigidBodyDataRecord(&fem, sz);
-			sz = tag.AttributeValue("data");
-			strcpy(prec->m_szdata, sz);
+			const char* szdata = tag.AttributeValue("data");
+			prec->Parse(szdata);
 
-			sz = tag.AttributeValue("name", true);
-			if (sz != 0) strcpy(prec->m_szname, sz);
+			const char* szname = tag.AttributeValue("name", true);
+			if (szname != 0) prec->SetName(szname); else prec->SetName(szdata);
 
 			sz = tag.AttributeValue("delim", true);
-			if (sz != 0) strcpy(prec->m_szdelim, sz);
+			if (sz != 0) prec->SetDelim(sz);
 
 			sz = tag.AttributeValue("comments", true);
 			if (sz != 0)
 			{
-				if      (strcmp(sz, "on") == 0) prec->m_bcomm = true;
-				else if (strcmp(sz, "off") == 0) prec->m_bcomm = false; 
+				if      (strcmp(sz, "on") == 0) prec->SetComments(true);
+				else if (strcmp(sz, "off") == 0) prec->SetComments(false); 
 			}
 
 			prec->SetItemList(tag.szvalue());

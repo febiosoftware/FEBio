@@ -97,13 +97,15 @@ void DataStore::Serialize(DumpFile &ar)
 // DataRecord
 //////////////////////////////////////////////////////////////////////
 
+//-----------------------------------------------------------------------------
 DataRecord::DataRecord(FEM* pfem, const char* szfile)
 {
 	m_pfem = pfem;
 	m_nid = 0;
-	m_szdata[0] = 0;
 	m_szname[0] = 0;
-	strcpy(m_szdelim," ");
+
+	strcpy(m_szdelim, " ");
+	
 	m_bcomm = true;
 
 	m_fp = 0;
@@ -117,6 +119,7 @@ DataRecord::DataRecord(FEM* pfem, const char* szfile)
 	}
 }
 
+//-----------------------------------------------------------------------------
 DataRecord::~DataRecord()
 {
 	if (m_fp)
@@ -126,14 +129,25 @@ DataRecord::~DataRecord()
 	}
 }
 
+//-----------------------------------------------------------------------------
+void DataRecord::SetName(const char* sz)
+{
+	strcpy(m_szname, sz);
+}
+
+//-----------------------------------------------------------------------------
+void DataRecord::SetDelim(const char* sz)
+{
+	strcpy(m_szdelim, sz);
+}
+
+//-----------------------------------------------------------------------------
 bool DataRecord::Write()
 {
 	FEM& fem = *m_pfem;
 
 	int nstep = fem.m_pStep->m_ntimesteps;
 	double ftime = fem.m_ftime;
-	char* sz, *ch;
-	if (strlen(m_szname) == 0) sz = m_szdata; else sz = m_szname;
 	double val;
 
 	FILE* fplog = (FILE*) clog;
@@ -143,7 +157,7 @@ bool DataRecord::Write()
 	fprintf(fplog, "===========================================================================\n");
 	fprintf(fplog, "Step = %d\n", nstep);
 	fprintf(fplog, "Time = %.9lg\n", ftime);
-	fprintf(fplog, "Data = %s\n", sz);
+	fprintf(fplog, "Data = %s\n", m_szname);
 
 	// see if we are saving the data to the logfile or to a 
 	// seperate data file
@@ -161,29 +175,21 @@ bool DataRecord::Write()
 		// make a note in the data file
 		fprintf(fp,"*Step  = %d\n", nstep);
 		fprintf(fp,"*Time  = %.9lg\n", ftime);
-		fprintf(fp,"*Data  = %s\n", sz);
+		fprintf(fp,"*Data  = %s\n", m_szname);
 	}
 
 	// save the data
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		fprintf(fp, "%d%s", m_item[i], m_szdelim);
-		sz = m_szdata;
-		do
+		int nd = (int) m_data.size();
+		for (int j=0; j<nd; ++j)
 		{
-			ch = strchr(sz, ';');
-			if (ch) *ch = 0;
-			val = Evaluate(m_item[i], sz);
+			val = Evaluate(m_item[i], m_data[j]);
 			fprintf(fp, "%lg", val);
-			if (ch) 
-			{
-				*ch = ';';
-				sz = ch+1;
-				fprintf(fp, "%s", m_szdelim);
-			}
+			if (j!=nd-1) fprintf(fp, "%s", m_szdelim);
 			else fprintf(fp, "\n");
 		}
-		while (ch != 0);
 	}
 
 	return true;
@@ -265,7 +271,6 @@ void DataRecord::Serialize(DumpFile &ar)
 	if (ar.IsSaving())
 	{
 		ar << m_nid;
-		ar << m_szdata;
 		ar << m_szname;
 		ar << m_szdelim;
 		ar << m_szfile;
@@ -275,7 +280,6 @@ void DataRecord::Serialize(DumpFile &ar)
 	else
 	{
 		ar >> m_nid;
-		ar >> m_szdata;
 		ar >> m_szname;
 		ar >> m_szdelim;
 		ar >> m_szfile;
@@ -293,49 +297,72 @@ void DataRecord::Serialize(DumpFile &ar)
 }
 
 //=============================================================================
+// NodeDataRecord
+//-----------------------------------------------------------------------------
+void NodeDataRecord::Parse(const char* szexpr)
+{
+	char szcopy[MAX_STRING] = {0};
+	strcpy(szcopy, szexpr);
+	char* sz = szcopy, *ch;
+	m_data.clear();
+	do
+	{
+		ch = strchr(sz, ';');
+		if (ch) *ch = 0;
+		if      (strcmp(sz, "x" ) == 0) m_data.push_back(X );
+		else if (strcmp(sz, "y" ) == 0) m_data.push_back(Y );
+		else if (strcmp(sz, "z" ) == 0) m_data.push_back(Z );
+		else if (strcmp(sz, "ux") == 0) m_data.push_back(UX);
+		else if (strcmp(sz, "uy") == 0) m_data.push_back(UY);
+		else if (strcmp(sz, "uz") == 0) m_data.push_back(UZ);
+		else if (strcmp(sz, "vx") == 0) m_data.push_back(VX);
+		else if (strcmp(sz, "vy") == 0) m_data.push_back(VY);
+		else if (strcmp(sz, "vz") == 0) m_data.push_back(VZ);
+		else if (strcmp(sz, "Rx") == 0) m_data.push_back(RX);
+		else if (strcmp(sz, "Ry") == 0) m_data.push_back(RY);
+		else if (strcmp(sz, "Rz") == 0) m_data.push_back(RZ);
+		else if (strcmp(sz, "p" ) == 0) m_data.push_back(P );
+		else if (strcmp(sz, "c" ) == 0) m_data.push_back(C );
+		else throw UnknownDataField();
+		sz = ch;
+	}
+	while (ch);
+}
 
-double NodeDataRecord::Evaluate(int item, const char* szexpr)
+//-----------------------------------------------------------------------------
+double NodeDataRecord::Evaluate(int item, int ndata)
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 	int nnode = item - 1;
+	if ((nnode < 0) || (nnode >= mesh.Nodes())) return 0;
+	FENode& node = mesh.Node(nnode);
+	int* id = node.m_ID;
+
 	double val = 0;
-	int ierr;
-	if ((nnode >= 0) && (nnode < mesh.Nodes()))
+	switch (ndata)
 	{
-		FENode& node = mesh.Node(nnode);
-		int* id = node.m_ID;
-		m_calc.SetVariable("x", node.m_rt.x);
-		m_calc.SetVariable("y", node.m_rt.y);
-		m_calc.SetVariable("z", node.m_rt.z);
-		m_calc.SetVariable("ux", node.m_rt.x - node.m_r0.x);
-		m_calc.SetVariable("uy", node.m_rt.y - node.m_r0.y);
-		m_calc.SetVariable("uz", node.m_rt.z - node.m_r0.z);
-		m_calc.SetVariable("Rx", (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0));
-		m_calc.SetVariable("Ry", (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0));
-		m_calc.SetVariable("Rz", (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0));
-		if (fem.m_pStep->m_nModule == FE_POROELASTIC)
-		{
-			m_calc.SetVariable("p", node.m_pt);
-			m_calc.SetVariable("vx", node.m_vt.x);
-			m_calc.SetVariable("vy", node.m_vt.y);
-			m_calc.SetVariable("vz", node.m_vt.z);
-		}
-		else if (fem.m_pStep->m_nModule == FE_POROSOLUTE)
-		{
-			m_calc.SetVariable("p", node.m_pt);
-			m_calc.SetVariable("c", node.m_ct);
-			m_calc.SetVariable("vx", node.m_vt.x);
-			m_calc.SetVariable("vy", node.m_vt.y);
-			m_calc.SetVariable("vz", node.m_vt.z);
-		}
-		val = m_calc.eval(szexpr, ierr);
+	case X : val = node.m_rt.x; break;
+	case Y : val = node.m_rt.y; break;
+	case Z : val = node.m_rt.z; break;
+	case UX: val = node.m_rt.x - node.m_r0.x; break;
+	case UY: val = node.m_rt.y - node.m_r0.y; break;
+	case UZ: val = node.m_rt.z - node.m_r0.z; break;
+	case VX: val = node.m_vt.x; break;
+	case VY: val = node.m_vt.y; break;
+	case VZ: val = node.m_vt.z; break;
+	case RX: val = (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0);  break;
+	case RY: val = (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);  break;
+	case RZ: val = (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);  break;
+	case P : val = node.m_pt; break;
+	case C : val = node.m_ct; break;
 	}
 	return val;
 }
 
+//-----------------------------------------------------------------------------
 void NodeDataRecord::SelectAllItems()
 {
 	int n = m_pfem->m_mesh.Nodes();
@@ -343,6 +370,7 @@ void NodeDataRecord::SelectAllItems()
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }
 
+//-----------------------------------------------------------------------------
 void NodeDataRecord::SetItemList(FENodeSet* pns)
 {
 	int n = pns->size();
@@ -351,62 +379,112 @@ void NodeDataRecord::SetItemList(FENodeSet* pns)
 	for (int i=0; i<n; ++i) m_item[i] = (*pns)[i];
 }
 
+//=============================================================================
+// ElementDataRecord
+//-----------------------------------------------------------------------------
+void ElementDataRecord::Parse(const char *szexpr)
+{
+	char szcopy[MAX_STRING] = {0};
+	strcpy(szcopy, szexpr);
+	char* sz = szcopy, *ch;
+	m_data.clear();
+	do
+	{
+		ch = strchr(sz, ';');
+		if (ch) *ch++ = 0;
+		if      (strcmp(sz, "x"  ) == 0) m_data.push_back(X  );
+		else if (strcmp(sz, "y"  ) == 0) m_data.push_back(Y  );
+		else if (strcmp(sz, "z"  ) == 0) m_data.push_back(Z  );
+		else if (strcmp(sz, "J"  ) == 0) m_data.push_back(J  );
+		else if (strcmp(sz, "Ex" ) == 0) m_data.push_back(EX );
+		else if (strcmp(sz, "Ey" ) == 0) m_data.push_back(EY );
+		else if (strcmp(sz, "Ez" ) == 0) m_data.push_back(EZ );
+		else if (strcmp(sz, "Exy") == 0) m_data.push_back(EXY);
+		else if (strcmp(sz, "Eyz") == 0) m_data.push_back(EYZ);
+		else if (strcmp(sz, "Exz") == 0) m_data.push_back(EXZ);
+		else if (strcmp(sz, "sx" ) == 0) m_data.push_back(SX );
+		else if (strcmp(sz, "sy" ) == 0) m_data.push_back(SY );
+		else if (strcmp(sz, "sz" ) == 0) m_data.push_back(SZ );
+		else if (strcmp(sz, "sxy") == 0) m_data.push_back(SXY);
+		else if (strcmp(sz, "syz") == 0) m_data.push_back(SYZ);
+		else if (strcmp(sz, "sxz") == 0) m_data.push_back(SXZ);
+		else if (strcmp(sz, "p"  ) == 0) m_data.push_back(P  );
+		else if (strcmp(sz, "wx" ) == 0) m_data.push_back(WX );
+		else if (strcmp(sz, "wy" ) == 0) m_data.push_back(WY );
+		else if (strcmp(sz, "wz" ) == 0) m_data.push_back(WZ );
+		else if (strcmp(sz, "c"  ) == 0) m_data.push_back(C  );
+		else if (strcmp(sz, "jx" ) == 0) m_data.push_back(JX );
+		else if (strcmp(sz, "jy" ) == 0) m_data.push_back(JY );
+		else if (strcmp(sz, "jz" ) == 0) m_data.push_back(JZ );
+		else throw UnknownDataField();
+		sz = ch;
+	}
+	while (ch);
+}
+
 //-----------------------------------------------------------------------------
 // TODO: this function will become very slow for a while
 //       I need to fix this as soon as possible
-double ElementDataRecord::Evaluate(int item, const char* szexpr)
+double ElementDataRecord::Evaluate(int item, int ndata)
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
-	double val = 0;
-	int ierr;
+	// make sure we have an ELT
+	if (m_ELT.empty()) BuildELT();
 
 	// find the element
-	// note that currently item is an index into the element array. When shells
-	// are combined with solid elements, this may not result in the correct element as in the input file.
-	// However, in any case it should correspond to the correct element in the plot file
-	// TODO: THIS IS UNACCEPTABLY SLOW !!!
-	FEElement* pe = mesh.FindElementFromID(item);
+	assert((item >= 1) && (item <= mesh.Elements()));
+	ELEMREF e = m_ELT[item-1];
+	assert((e.ndom != -1) && (e.nid != -1));
+	FEElement* pe = &mesh.Domain(e.ndom).ElementRef(e.nid);
+
+	// calculate the return val
+	double val = 0;
 	mat3ds E;
 	if (dynamic_cast<FESolidElement*>(pe)) 
 	{
 		// this is a solid element
 		FESolidElement& el = dynamic_cast<FESolidElement&>(*pe);
-		// TODO: do I need to unpack this element?
-//		bd.UnpackElement(el);
 
 		int nint = el.GaussPoints();
 		for (int i=0; i<nint; ++i)
 		{
 			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
-
 			E = pt.Strain();
-			m_calc.SetVariable("x", pt.rt.x);
-			m_calc.SetVariable("y", pt.rt.y);
-			m_calc.SetVariable("z", pt.rt.z);
-			m_calc.SetVariable("sx", pt.s.xx());
-			m_calc.SetVariable("sy", pt.s.yy());
-			m_calc.SetVariable("sz", pt.s.zz());
-			m_calc.SetVariable("sxy", pt.s.xy());
-			m_calc.SetVariable("syz", pt.s.yz());
-			m_calc.SetVariable("sxz", pt.s.xz());
-			m_calc.SetVariable("J", pt.J);
-			m_calc.SetVariable("Ex", E.xx());
-			m_calc.SetVariable("Ey", E.yy());
-			m_calc.SetVariable("Ez", E.zz());
-			m_calc.SetVariable("Exy", E.xy());
-			m_calc.SetVariable("Eyz", E.yz());
-			m_calc.SetVariable("Exz", E.xz());
+
+			switch (ndata)
+			{
+			case X: val += pt.rt.x; break;
+			case Y: val += pt.rt.y; break;
+			case Z: val += pt.rt.z; break;
+			case J: val += pt.J; break;
+			case EX: val += E.xx(); break;
+			case EY: val += E.yy(); break;
+			case EZ: val += E.zz(); break;
+			case EXY: val += E.xy(); break;
+			case EYZ: val += E.yz(); break;
+			case EXZ: val += E.xz(); break;
+			case SX: val += pt.s.xx(); break;
+			case SY: val += pt.s.yy(); break;
+			case SZ: val += pt.s.zz(); break;
+			case SXY: val += pt.s.xy(); break;
+			case SYZ: val += pt.s.yz(); break;
+			case SXZ: val += pt.s.xz(); break;
+			}
+
 			if (fem.m_pStep->m_nModule == FE_POROELASTIC)
 			{
 				FEPoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
 				if (ppt)
 				{
-					m_calc.SetVariable("p", ppt->m_pa);
-					m_calc.SetVariable("wx", ppt->m_w.x);
-					m_calc.SetVariable("wy", ppt->m_w.y);
-					m_calc.SetVariable("wz", ppt->m_w.z);
+					switch (ndata)
+					{
+					case P: val += ppt->m_pa; break;
+					case WX: val += ppt->m_w.x; break;
+					case WY: val += ppt->m_w.y; break;
+					case WZ: val += ppt->m_w.z; break;
+					}
 				}
 			}
 			else if (fem.m_pStep->m_nModule == FE_POROSOLUTE)
@@ -414,17 +492,19 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 				FESolutePoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutePoroElasticMaterialPoint>();
 				if (ppt)
 				{
-					m_calc.SetVariable("p", ppt->m_pa);
-					m_calc.SetVariable("wx", ppt->m_w.x);
-					m_calc.SetVariable("wy", ppt->m_w.y);
-					m_calc.SetVariable("wz", ppt->m_w.z);
-					m_calc.SetVariable("c", ppt->m_ca);
-					m_calc.SetVariable("jx", ppt->m_j.x);
-					m_calc.SetVariable("jy", ppt->m_j.y);
-					m_calc.SetVariable("jz", ppt->m_j.z);
+					switch (ndata)
+					{
+					case P: val += ppt->m_pa; break;
+					case WX: val += ppt->m_w.x; break;
+					case WY: val += ppt->m_w.y; break;
+					case WZ: val += ppt->m_w.z; break;
+					case C: val += ppt->m_ca; break;
+					case JX: val += ppt->m_j.x; break;
+					case JY: val += ppt->m_j.y; break;
+					case JZ: val += ppt->m_j.z; break;
+					}
 				}
 			}
-			val += m_calc.eval(szexpr, ierr);
 		}
 		val /= nint;
 	}
@@ -432,39 +512,65 @@ double ElementDataRecord::Evaluate(int item, const char* szexpr)
 	{
 		// this is a shell element
 		FEShellElement& el = dynamic_cast<FEShellElement&>(*pe);
-		// TODO: do I need to unpack this element?
-//		sd.UnpackElement(el);
-
 		int nint = el.GaussPoints();
 		for (int i=0; i<nint; ++i)
 		{
 			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
 
 			E = pt.Strain();
-			m_calc.SetVariable("x", pt.rt.x);
-			m_calc.SetVariable("y", pt.rt.y);
-			m_calc.SetVariable("z", pt.rt.z);
-			m_calc.SetVariable("sx", pt.s.xx());
-			m_calc.SetVariable("sy", pt.s.yy());
-			m_calc.SetVariable("sz", pt.s.zz());
-			m_calc.SetVariable("sxy", pt.s.xy());
-			m_calc.SetVariable("syz", pt.s.yz());
-			m_calc.SetVariable("sxz", pt.s.xz());
-			m_calc.SetVariable("J", pt.J);
-			m_calc.SetVariable("Ex", E.xx());
-			m_calc.SetVariable("Ey", E.yy());
-			m_calc.SetVariable("Ez", E.zz());
-			m_calc.SetVariable("Exy", E.xy());
-			m_calc.SetVariable("Eyz", E.yz());
-			m_calc.SetVariable("Exz", E.xz());
-			val += m_calc.eval(szexpr, ierr);
+			switch (ndata)
+			{
+			case X: val += pt.rt.x; break;
+			case Y: val += pt.rt.y; break;
+			case Z: val += pt.rt.z; break;
+			case J: val += pt.J; break;
+			case EX: val += E.xx(); break;
+			case EY: val += E.yy(); break;
+			case EZ: val += E.zz(); break;
+			case EXY: val += E.xy(); break;
+			case EYZ: val += E.yz(); break;
+			case EXZ: val += E.xz(); break;
+			case SX: val += pt.s.xx(); break;
+			case SY: val += pt.s.yy(); break;
+			case SZ: val += pt.s.zz(); break;
+			case SXY: val += pt.s.xy(); break;
+			case SYZ: val += pt.s.yz(); break;
+			case SXZ: val += pt.s.xz(); break;
+			}
 		}
 		val /= nint;
 	}
-
 	return val;
 }
 
+//-----------------------------------------------------------------------------
+void ElementDataRecord::BuildELT()
+{
+	int i, j;
+	m_ELT.clear();
+	FEMesh& m = m_pfem->m_mesh;
+	int NE = m.Elements();
+	m_ELT.resize(NE);
+	for (i=0; i<NE; ++i) 
+	{
+		m_ELT[i].ndom = -1;
+		m_ELT[i].nid  = -1;
+	}
+
+	for (i=0; i<m.Domains(); ++i)
+	{
+		FEDomain& d = m.Domain(i);
+		int ne = d.Elements();
+		for (j=0; j<ne; ++j)
+		{
+			FEElement& el = d.ElementRef(j);
+			m_ELT[el.m_nID-1].ndom = i;
+			m_ELT[el.m_nID-1].nid  = j;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void ElementDataRecord::SelectAllItems()
 {
 	FEMesh& m = m_pfem->m_mesh;
@@ -473,42 +579,71 @@ void ElementDataRecord::SelectAllItems()
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }
 
+//=============================================================================
+// RigidBodyDataRecord
 //-----------------------------------------------------------------------------
-
-double RigidBodyDataRecord::Evaluate(int item, const char* szexpr)
+void RigidBodyDataRecord::Parse(const char* szexpr)
+{
+	char szcopy[MAX_STRING] = {0};
+	strcpy(szcopy, szexpr);
+	char* sz = szcopy, *ch;
+	m_data.clear();
+	do
+	{
+		ch = strchr(sz, ';');
+		if (ch) *ch = 0;
+		if      (strcmp(sz, "x" ) == 0) m_data.push_back(X );
+		else if (strcmp(sz, "y" ) == 0) m_data.push_back(Y );
+		else if (strcmp(sz, "z" ) == 0) m_data.push_back(Z );
+		else if (strcmp(sz, "qx") == 0) m_data.push_back(QX);
+		else if (strcmp(sz, "qy") == 0) m_data.push_back(QY);
+		else if (strcmp(sz, "qz") == 0) m_data.push_back(QZ);
+		else if (strcmp(sz, "qw") == 0) m_data.push_back(QW);
+		else if (strcmp(sz, "Fx") == 0) m_data.push_back(FX);
+		else if (strcmp(sz, "Fy") == 0) m_data.push_back(FY);
+		else if (strcmp(sz, "Fz") == 0) m_data.push_back(FZ);
+		else if (strcmp(sz, "Mx") == 0) m_data.push_back(MX);
+		else if (strcmp(sz, "My") == 0) m_data.push_back(MY);
+		else if (strcmp(sz, "Mz") == 0) m_data.push_back(MZ);
+		else throw UnknownDataField();
+		sz = ch;
+	}
+	while (ch);
+}
+//-----------------------------------------------------------------------------
+double RigidBodyDataRecord::Evaluate(int item, int ndata)
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 	int nrb = item - 1;
+	if ((nrb < 0) || (nrb >= fem.Materials())) return 0;
+
 	double val = 0;
-	int ierr;
-	if ((nrb >= 0) && (nrb < fem.Materials()))
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nrb));
+	assert(pm);
+	if (pm == 0) return 0;
+
+	// find the rigid body that has this material
+	for (int i=0; i<fem.m_nrb; ++i)
 	{
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nrb));
-		if (pm)
+		FERigidBody& RB = fem.m_RB[i];
+		if (RB.m_mat == nrb)
 		{
-			// find the rigid body that has this material
-			for (int i=0; i<fem.m_nrb; ++i)
+			switch (ndata)
 			{
-				FERigidBody& RB = fem.m_RB[i];
-				if (RB.m_mat == nrb)
-				{
-					m_calc.SetVariable("x", RB.m_rt.x);
-					m_calc.SetVariable("y", RB.m_rt.y);
-					m_calc.SetVariable("z", RB.m_rt.z);
-					m_calc.SetVariable("qx", RB.m_qt.x);
-					m_calc.SetVariable("qy", RB.m_qt.y);
-					m_calc.SetVariable("qz", RB.m_qt.z);
-					m_calc.SetVariable("qw", RB.m_qt.w);
-					m_calc.SetVariable("Fx", RB.m_Fr.x);
-					m_calc.SetVariable("Fy", RB.m_Fr.y);
-					m_calc.SetVariable("Fz", RB.m_Fr.z);
-					m_calc.SetVariable("Mx", RB.m_Mr.x);
-					m_calc.SetVariable("My", RB.m_Mr.y);
-					m_calc.SetVariable("Mz", RB.m_Mr.z);
-					val = m_calc.eval(szexpr, ierr);
-					break;
-				}
+			case X: val = RB.m_rt.x; break;
+			case Y: val = RB.m_rt.y; break;
+			case Z: val = RB.m_rt.z; break;
+			case QX: val = RB.m_qt.x; break;
+			case QY: val = RB.m_qt.y; break;
+			case QZ: val = RB.m_qt.z; break;
+			case QW: val = RB.m_qt.w; break;
+			case FX: val = RB.m_Fr.x; break;
+			case FY: val = RB.m_Fr.y; break;
+			case FZ: val = RB.m_Fr.z; break;
+			case MX: val = RB.m_Mr.x; break;
+			case MY: val = RB.m_Mr.y; break;
+			case MZ: val = RB.m_Mr.z; break;
 			}
 		}
 	}
@@ -516,6 +651,7 @@ double RigidBodyDataRecord::Evaluate(int item, const char* szexpr)
 	return val;
 }
 
+//-----------------------------------------------------------------------------
 void RigidBodyDataRecord::SelectAllItems()
 {
 	int n = 0, i;

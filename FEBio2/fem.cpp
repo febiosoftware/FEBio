@@ -15,10 +15,11 @@
 #include "plugin.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBiphasic.h"
+#include "MathParser.h"
 
 // --- Global Constants Data ---
 // m_Const needs a definition, since static
-map<string, double> FEM::m_Const;
+map<std::string, double> FEM::m_Const;
 
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class

@@ -21,6 +21,7 @@
 
 #include <stack>
 #include <list>
+#include <map>
 using namespace std;
 
 #define MAX_STRING	256

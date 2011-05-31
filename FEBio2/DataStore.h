@@ -10,7 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include <stdio.h>
-#include "MathParser.h"
 #include "FECore/DumpFile.h"
 #include <vector>
 using namespace std;
@@ -21,6 +20,8 @@ class FENodeSet;
 #define FE_DATA_NODE	1
 #define FE_DATA_ELEM	2
 #define FE_DATA_RB		3
+
+class UnknownDataField {};
 
 //-----------------------------------------------------------------------------
 
@@ -36,20 +37,27 @@ public:
 
 	void SetItemList(const char* szlist);
 
-	virtual double Evaluate(int item, const char* szexpr) = 0;
+	virtual double Evaluate(int item, int ndata) = 0;
 
 	virtual void SelectAllItems() = 0;
 
 	virtual void Serialize(DumpFile& ar);
 
+	virtual void Parse(const char* sz) = 0;
+
+	void SetName(const char* sz);
+	void SetDelim(const char* sz);
+	void SetComments(bool b) { m_bcomm = b; }
+
 public:
 	int		m_nid;					//!< ID of data record
-	char	m_szdata[MAX_STRING];	//!< expression of data record
-	char	m_szname[MAX_STRING];	//!< name of expression
-	char	m_szdelim[MAX_DELIM];	//!< delimiter used
 	vector<int>	m_item;				//!< item list
-	MathParser	m_calc;
-	bool	m_bcomm;			//!< export comments or not
+	vector<int>	m_data;				//!< data list
+
+protected:
+	bool	m_bcomm;				//!< export comments or not
+	char	m_szname[MAX_STRING];	//!< name of expression
+	char	m_szdelim[MAX_DELIM];	//!< data delimitor
 
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
@@ -62,26 +70,47 @@ protected:
 
 class NodeDataRecord : public DataRecord
 {
+	enum { X, Y, Z, UX, UY, UZ, VX, VY, VZ, RX, RY, RZ, P, C };
+
 public:
 	NodeDataRecord(FEM* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
-	double Evaluate(int item, const char* szexpr);
+	double Evaluate(int item, int ndata);
+	void Parse(const char* sz);
 	void SelectAllItems();
 	void SetItemList(FENodeSet* pns);
 };
 
 class ElementDataRecord : public DataRecord
 {
+	enum {X, Y, Z, J, EX, EY, EZ, EXY, EYZ, EXZ, SX, SY, SZ, SXY, SYZ, SXZ, P, WX, WY, WZ, C, JX, JY, JZ};
+
+	struct ELEMREF
+	{
+		int	ndom;
+		int	nid;
+	};
+
 public:
 	ElementDataRecord(FEM* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
-	double Evaluate(int item, const char* szexpr);
+	double Evaluate(int item, int ndata);
+	void Parse(const char* sz);
 	void SelectAllItems();
+
+protected:
+	void BuildELT();
+
+protected:
+	vector<ELEMREF>	m_ELT;
 };
 
 class RigidBodyDataRecord : public DataRecord
 {
+	enum {X, Y, Z, QX, QY, QZ, QW, FX, FY, FZ, MX, MY, MZ};
+
 public:
 	RigidBodyDataRecord(FEM* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
-	double Evaluate(int item, const char* szexpr);
+	double Evaluate(int item, int ndata);
+	void Parse(const char* sz);
 	void SelectAllItems();
 };
 
