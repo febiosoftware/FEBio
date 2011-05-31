@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FECore/vec3d.h"
+#include "vec3d.h"
 #include <assert.h>
 #include <list>
 #include <memory>
