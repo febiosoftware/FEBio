@@ -116,7 +116,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FEBio2\Archive.h" />
     <ClInclude Include="..\..\FEBio2\Command.h" />
     <ClInclude Include="..\..\FEBio2\CommandManager.h" />
     <ClInclude Include="..\..\FEBio2\console.h" />
@@ -197,7 +196,6 @@
     <ClInclude Include="..\..\FEBio2\FEPermRefIso.h" />
     <ClInclude Include="..\..\FEBio2\FEPermRefOrtho.h" />
     <ClInclude Include="..\..\FEBio2\FEPermRefTransIso.h" />
-    <ClInclude Include="..\..\FEBio2\FEPlotData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotDataFactory.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotNodeData.h" />
@@ -264,7 +262,6 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBio2\Archive.cpp" />
     <ClCompile Include="..\..\FEBio2\augment.cpp" />
     <ClCompile Include="..\..\FEBio2\biphasic.cpp" />
     <ClCompile Include="..\..\FEBio2\biphasicsolute.cpp" />
@@ -346,7 +343,6 @@
     <ClCompile Include="..\..\FEBio2\FEPermRefIso.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPermRefOrtho.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPermRefTransIso.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPlotData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotDataFactory.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotNodeData.cpp" />

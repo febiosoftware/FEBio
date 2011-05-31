@@ -105,6 +105,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\DumpFile.h" />
@@ -130,6 +131,7 @@
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
+    <ClInclude Include="..\..\FECore\FEPlotData.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
@@ -155,6 +157,7 @@
     <ClInclude Include="..\..\FECore\XMLReader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
     <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />
@@ -177,6 +180,7 @@
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
+    <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
