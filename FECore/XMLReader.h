@@ -14,6 +14,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "vec3d.h"
+#include <string>
 
 class XMLReader  
 {
@@ -29,9 +30,10 @@ public:
 	// does not have a parent
 	public:
 		char	m_sztag[MAX_TAG];			// tag name
-		char	m_szval[MAX_TAG];			// tag value
 		char	m_szatt[MAX_ATT][MAX_TAG];	// tag attributes
 		char	m_szatv[MAX_ATT][MAX_TAG];	// value of attributes
+
+		std::string m_szval;	// tag value
 
 		int		m_nlevel;	// depth level
 		char	m_szroot[MAX_LEVEL][MAX_TAG];	// name tag of parent's
@@ -78,17 +80,19 @@ public:
 		
 		const char* Name() { return m_sztag; }
 
-		void value(char* szstr) { strcpy(szstr, m_szval); }
-		void value(double& val) { val = atof(m_szval); } 
-		void value(float& val)  { val = (float) atof(m_szval); }
-		void value(bool& val) { int n=0; sscanf(m_szval, "%d", &n); val = (n != 0); }
-		void value(int& val) { val = atoi(m_szval); }
+		void value(char* szstr) { strcpy(szstr, m_szval.c_str()); }
+		void value(double& val) { val = atof(m_szval.c_str()); } 
+		void value(float& val)  { val = (float) atof(m_szval.c_str()); }
+		void value(bool& val) { int n=0; sscanf(m_szval.c_str(), "%d", &n); val = (n != 0); }
+		void value(int& val) { val = atoi(m_szval.c_str()); }
+		void value(long& val) { val = (long) atoi(m_szval.c_str()); }
+		void value(short& val) { val = (short) atoi(m_szval.c_str()); }
 		void value(double* pf, int n);
 		void value(float* pf, int n);
 		void value(int* pi, int n);
 		void value(vec3d& v);
 
-		const char* szvalue() { return m_szval; }
+		const char* szvalue() { return m_szval.c_str(); }
 	};
 
 	// exceptions -----------
@@ -104,13 +108,6 @@ public:
 	public:
 		XMLTag tag;
 		UnmatchedEndTag(XMLTag& t) : tag(t) {}
-	};
-
-	class EndOfBuffer
-	{
-	public:
-		XMLTag tag;
-		EndOfBuffer(XMLTag& t) : tag(t) {}
 	};
 
 	class InvalidTag

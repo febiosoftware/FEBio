@@ -183,11 +183,6 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		clog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
 		return false;
 	}
-	catch (XMLReader::EndOfBuffer e)
-	{
-		clog.printf("FATAL ERROR: end of internal buffer reached.\n Value of %s is too big (line %d).\n", e.tag.m_sztag, e.tag.m_nstart_line);
-		return false;
-	}
 	// --- FEBio Exceptions ---
 	catch (InvalidVersion)
 	{

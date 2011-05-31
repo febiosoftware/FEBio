@@ -22,7 +22,6 @@ XMLTag::XMLTag()
 	m_bend = false;
 
 	m_sztag[0] = 0;
-	m_szval[0] = 0;
 	m_nlevel = 0;
 
 	m_natt = 0;
@@ -40,18 +39,16 @@ XMLTag::XMLTag()
 
 void XMLTag::value(double* pf, int n)
 {
-	char* sz = m_szval;
+	const char* sz = m_szval.c_str();
 
 	for (int i=0; i<n; ++i)
 	{
-		char* sze = strchr(sz, ',');
-		if (sze) *sze = 0;
+		const char* sze = strchr(sz, ',');
 
 		pf[i] = atof(sz);
 
 		if (sze)
 		{
-			*sze = ',';
 			sz = sze+1;
 		}
 	}
@@ -61,18 +58,16 @@ void XMLTag::value(double* pf, int n)
 
 void XMLTag::value(float* pf, int n)
 {
-	char* sz = m_szval;
+	const char* sz = m_szval.c_str();
 
 	for (int i=0; i<n; ++i)
 	{
-		char* sze = strchr(sz, ',');
-		if (sze) *sze = 0;
+		const char* sze = strchr(sz, ',');
 
 		pf[i] = (float) atof(sz);
 
 		if (sze)
 		{
-			*sze = ',';
 			sz = sze+1;
 		}
 	}
@@ -82,18 +77,16 @@ void XMLTag::value(float* pf, int n)
 
 void XMLTag::value(int* pi, int n)
 {
-	char* sz = m_szval;
+	const char* sz = m_szval.c_str();
 
 	for (int i=0; i<n; ++i)
 	{
-		char* sze = strchr(sz, ',');
-		if (sze) *sze = 0;
+		const char* sze = strchr(sz, ',');
 
 		pi[i] = atoi(sz);
 
 		if (sze)
 		{
-			*sze = ',';
 			sz = sze+1;
 		}
 	}
@@ -103,7 +96,7 @@ void XMLTag::value(int* pi, int n)
 
 void XMLTag::value(vec3d& v)
 {
-	int n = sscanf(m_szval, "%lg,%lg,%lg", &v.x, &v.y, &v.z);
+	int n = sscanf(m_szval.c_str(), "%lg,%lg,%lg", &v.x, &v.y, &v.z);
 	if (n != 3) throw XMLReader::XMLSyntaxError();
 }
 
@@ -383,16 +376,14 @@ void XMLReader::ReadTag(XMLTag& tag)
 void XMLReader::ReadValue(XMLTag& tag)
 {
 	char ch;
-	int n = 0;
 	if (!tag.isend())
 	{
-		char *sz = tag.m_szval;
+		tag.m_szval.clear();
 		while ((ch=GetChar())!='<') 
 		{ 
-			*sz++ = ch; n++; 
-			if (n > MAX_TAG) throw EndOfBuffer(tag);
+			tag.m_szval.push_back(ch);
 		}
-		*sz=0;
+		tag.m_szval.push_back(0);
 	}
 	else while ((ch=GetChar())!='<');
 }
