@@ -21,7 +21,14 @@ class FENodeSet;
 #define FE_DATA_ELEM	2
 #define FE_DATA_RB		3
 
-class UnknownDataField {};
+//-----------------------------------------------------------------------------
+// Exception thrown when parsing fails
+class UnknownDataField 
+{
+public:
+	UnknownDataField(const char* sz);
+	char	m_szdata[64];
+};
 
 //-----------------------------------------------------------------------------
 

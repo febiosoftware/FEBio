@@ -9,6 +9,15 @@
 #include "FESolidSolver.h"
 #include "log.h"
 
+//-----------------------------------------------------------------------------
+UnknownDataField::UnknownDataField(const char* sz)
+{
+	m_szdata[0] = 0;
+	int l = strlen(sz);
+	if (l > 63) l = 63;
+	if (l>0) strncpy(m_szdata, sz, l);
+}
+
 //////////////////////////////////////////////////////////////////////
 // DataStore
 //////////////////////////////////////////////////////////////////////
@@ -308,7 +317,7 @@ void NodeDataRecord::Parse(const char* szexpr)
 	do
 	{
 		ch = strchr(sz, ';');
-		if (ch) *ch = 0;
+		if (ch) *ch++ = 0;
 		if      (strcmp(sz, "x" ) == 0) m_data.push_back(X );
 		else if (strcmp(sz, "y" ) == 0) m_data.push_back(Y );
 		else if (strcmp(sz, "z" ) == 0) m_data.push_back(Z );
@@ -323,7 +332,7 @@ void NodeDataRecord::Parse(const char* szexpr)
 		else if (strcmp(sz, "Rz") == 0) m_data.push_back(RZ);
 		else if (strcmp(sz, "p" ) == 0) m_data.push_back(P );
 		else if (strcmp(sz, "c" ) == 0) m_data.push_back(C );
-		else throw UnknownDataField();
+		else throw UnknownDataField(sz);
 		sz = ch;
 	}
 	while (ch);
@@ -416,15 +425,13 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "jx" ) == 0) m_data.push_back(JX );
 		else if (strcmp(sz, "jy" ) == 0) m_data.push_back(JY );
 		else if (strcmp(sz, "jz" ) == 0) m_data.push_back(JZ );
-		else throw UnknownDataField();
+		else throw UnknownDataField(sz);
 		sz = ch;
 	}
 	while (ch);
 }
 
 //-----------------------------------------------------------------------------
-// TODO: this function will become very slow for a while
-//       I need to fix this as soon as possible
 double ElementDataRecord::Evaluate(int item, int ndata)
 {
 	FEM& fem = *m_pfem;
@@ -591,7 +598,7 @@ void RigidBodyDataRecord::Parse(const char* szexpr)
 	do
 	{
 		ch = strchr(sz, ';');
-		if (ch) *ch = 0;
+		if (ch) *ch++ = 0;
 		if      (strcmp(sz, "x" ) == 0) m_data.push_back(X );
 		else if (strcmp(sz, "y" ) == 0) m_data.push_back(Y );
 		else if (strcmp(sz, "z" ) == 0) m_data.push_back(Z );
@@ -605,7 +612,7 @@ void RigidBodyDataRecord::Parse(const char* szexpr)
 		else if (strcmp(sz, "Mx") == 0) m_data.push_back(MX);
 		else if (strcmp(sz, "My") == 0) m_data.push_back(MY);
 		else if (strcmp(sz, "Mz") == 0) m_data.push_back(MZ);
-		else throw UnknownDataField();
+		else throw UnknownDataField(sz);
 		sz = ch;
 	}
 	while (ch);

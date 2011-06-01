@@ -221,7 +221,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	}
 	catch (UnknownDataField e)
 	{
-		clog.printf("Fatal Error: syntax error in data attribute (line %d)\n", m_xml.GetCurrentLine()-1);
+		clog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, m_xml.GetCurrentLine()-1);
 		return false;
 	}
 	// --- Unknown exceptions ---
