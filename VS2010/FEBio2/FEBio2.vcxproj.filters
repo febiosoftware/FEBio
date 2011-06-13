@@ -69,9 +69,6 @@
     <ClInclude Include="..\..\FEBio2\FEBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEConstBodyForce.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -249,9 +246,6 @@
     <ClInclude Include="..\..\FEBio2\FEPermRefTransIso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPlotDataFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -259,9 +253,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPointBodyForce.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPointConstraint.h">
@@ -414,9 +405,6 @@
     <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\MathParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\PlotFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -516,9 +504,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEConstBodyForce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp">
@@ -686,9 +671,6 @@
     <ClCompile Include="..\..\FEBio2\FEPermRefTransIso.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPlotDataFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -696,9 +678,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPointBodyForce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPointConstraint.cpp">
@@ -870,9 +849,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\LSDYNAPlotFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\MathParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\optimize.cpp">

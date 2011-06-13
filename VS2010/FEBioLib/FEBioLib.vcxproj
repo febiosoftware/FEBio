@@ -116,6 +116,8 @@
     <ClInclude Include="..\..\FEBioLib\CompactMatrix.h" />
     <ClInclude Include="..\..\FEBioLib\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\FEBioLib\DenseMatrix.h" />
+    <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
+    <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\LUSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
@@ -131,6 +133,8 @@
     <ClCompile Include="..\..\FEBioLib\CompactMatrix.cpp" />
     <ClCompile Include="..\..\FEBioLib\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\DenseMatrix.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\LUSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />

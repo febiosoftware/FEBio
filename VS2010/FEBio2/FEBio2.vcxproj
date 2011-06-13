@@ -134,7 +134,6 @@
     <ClInclude Include="..\..\FEBio2\FEBiphasicDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEBiphasicSoluteDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEBox.h" />
-    <ClInclude Include="..\..\FEBio2\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEContactSurface.h" />
     <ClInclude Include="..\..\FEBio2\FEDamageMooneyRivlin.h" />
@@ -196,11 +195,9 @@
     <ClInclude Include="..\..\FEBio2\FEPermRefIso.h" />
     <ClInclude Include="..\..\FEBio2\FEPermRefOrtho.h" />
     <ClInclude Include="..\..\FEBio2\FEPermRefTransIso.h" />
-    <ClInclude Include="..\..\FEBio2\FEPlotDataFactory.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotNodeData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h" />
-    <ClInclude Include="..\..\FEBio2\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBio2\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FEPoroConstPerm.h" />
     <ClInclude Include="..\..\FEBio2\FEPoroElastic.h" />
@@ -251,7 +248,6 @@
     <ClInclude Include="..\..\FEBio2\log.h" />
     <ClInclude Include="..\..\FEBio2\Logfile.h" />
     <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h" />
-    <ClInclude Include="..\..\FEBio2\MathParser.h" />
     <ClInclude Include="..\..\FEBio2\PlotFile.h" />
     <ClInclude Include="..\..\FEBio2\plugin.h" />
     <ClInclude Include="..\..\FEBio2\stdafx.h" />
@@ -285,7 +281,6 @@
     <ClCompile Include="..\..\FEBio2\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBiphasicSolute.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBox.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactSurface.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDamageMooneyRivlin.cpp" />
@@ -343,11 +338,9 @@
     <ClCompile Include="..\..\FEBio2\FEPermRefIso.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPermRefOrtho.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPermRefTransIso.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPlotDataFactory.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotNodeData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPoroConstPerm.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPoroElastic.cpp" />
@@ -405,7 +398,6 @@
     <ClCompile Include="..\..\FEBio2\levmar.cpp" />
     <ClCompile Include="..\..\FEBio2\Logfile.cpp" />
     <ClCompile Include="..\..\FEBio2\LSDYNAPlotFile.cpp" />
-    <ClCompile Include="..\..\FEBio2\MathParser.cpp" />
     <ClCompile Include="..\..\FEBio2\optimize.cpp" />
     <ClCompile Include="..\..\FEBio2\PlotFile.cpp" />
     <ClCompile Include="..\..\FEBio2\plugin.cpp" />
