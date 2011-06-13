@@ -465,10 +465,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEIsotropicFourier.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FELevelStructure.cpp"
 				>
 			</File>
@@ -1100,10 +1096,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEIsotropicElastic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEIsotropicFourier.h"
 				>
 			</File>
 			<File

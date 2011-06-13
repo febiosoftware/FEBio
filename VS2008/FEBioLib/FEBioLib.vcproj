@@ -226,6 +226,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicFourier.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.cpp"
 				>
 			</File>
@@ -293,6 +297,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicFourier.h"
 				>
 			</File>
 			<File

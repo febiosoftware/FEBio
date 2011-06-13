@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEHeatSolidDomain.h"
 #include "FEHeatSolver.h"
-#include "FEIsotropicFourier.h"
+#include "FEBioLib/FEIsotropicFourier.h"
 
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
