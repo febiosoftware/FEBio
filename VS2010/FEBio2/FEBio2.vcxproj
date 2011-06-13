@@ -120,11 +120,7 @@
     <ClInclude Include="..\..\FEBio2\CommandManager.h" />
     <ClInclude Include="..\..\FEBio2\console.h" />
     <ClInclude Include="..\..\FEBio2\DataStore.h" />
-    <ClInclude Include="..\..\FEBio2\FE2DFiberNeoHookean.h" />
-    <ClInclude Include="..\..\FEBio2\FE2DTransIsoMooneyRivlin.h" />
-    <ClInclude Include="..\..\FEBio2\FE2DTransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBio2\FEAnalysis.h" />
-    <ClInclude Include="..\..\FEBio2\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBio2\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FEBioCommand.h" />
     <ClInclude Include="..\..\FEBio2\FEBioImport.h" />
@@ -135,7 +131,6 @@
     <ClInclude Include="..\..\FEBio2\FEBiphasicSoluteDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEBox.h" />
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEContactSurface.h" />
     <ClInclude Include="..\..\FEBio2\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBio2\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.h" />
@@ -169,7 +164,6 @@
     <ClInclude Include="..\..\FEBio2\FEHeatSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBio2\FEIncompNeoHookean.h" />
-    <ClInclude Include="..\..\FEBio2\FEIsotropicElastic.h" />
     <ClInclude Include="..\..\FEBio2\FELevelStructure.h" />
     <ClInclude Include="..\..\FEBio2\FELinearConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FELinearElastic.h" />
@@ -177,13 +171,10 @@
     <ClInclude Include="..\..\FEBio2\fem.h" />
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
-    <ClInclude Include="..\..\FEBio2\FEMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBio2\FEMuscleMaterial.h" />
-    <ClInclude Include="..\..\FEBio2\FENeoHookean.h" />
     <ClInclude Include="..\..\FEBio2\FENeoHookeanTransIso.h" />
     <ClInclude Include="..\..\FEBio2\FENodeNodeList.h" />
     <ClInclude Include="..\..\FEBio2\FENodeReorder.h" />
-    <ClInclude Include="..\..\FEBio2\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEOgdenUnconstrained.h" />
     <ClInclude Include="..\..\FEBio2\FEOptimizer.h" />
     <ClInclude Include="..\..\FEBio2\FEOsmCoefConst.h" />
@@ -224,7 +215,6 @@
     <ClInclude Include="..\..\FEBio2\FESoluteFlux.h" />
     <ClInclude Include="..\..\FEBio2\FESolver.h" />
     <ClInclude Include="..\..\FEBio2\FEStiffnessMatrix.h" />
-    <ClInclude Include="..\..\FEBio2\FEStVenantKirchhoff.h" />
     <ClInclude Include="..\..\FEBio2\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
@@ -235,11 +225,8 @@
     <ClInclude Include="..\..\FEBio2\FETractionLoad.h" />
     <ClInclude Include="..\..\FEBio2\FETransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBio2\FETransIsoVerondaWestmann.h" />
-    <ClInclude Include="..\..\FEBio2\FETransverselyIsotropic.h" />
     <ClInclude Include="..\..\FEBio2\FETrussMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEUncoupledElasticMixture.h" />
-    <ClInclude Include="..\..\FEBio2\FEUncoupledMaterial.h" />
-    <ClInclude Include="..\..\FEBio2\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBio2\FEViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FileImport.h" />
     <ClInclude Include="..\..\FEBio2\geodesic.h" />
@@ -266,11 +253,7 @@
     <ClCompile Include="..\..\FEBio2\diagnose.cpp" />
     <ClCompile Include="..\..\FEBio2\discrete.cpp" />
     <ClCompile Include="..\..\FEBio2\elstf.cpp" />
-    <ClCompile Include="..\..\FEBio2\FE2DFiberNeoHookean.cpp" />
-    <ClCompile Include="..\..\FEBio2\FE2DTransIsoMooneyRivlin.cpp" />
-    <ClCompile Include="..\..\FEBio2\FE2DTransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBio2\FEAnalysis.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBio2\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioCommand.cpp" />
@@ -281,7 +264,6 @@
     <ClCompile Include="..\..\FEBio2\FEBiphasicSolute.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBox.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEContactSurface.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDamageMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.cpp" />
@@ -311,7 +293,6 @@
     <ClCompile Include="..\..\FEBio2\FEHeatSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBio2\FEIncompNeoHookean.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEIsotropicElastic.cpp" />
     <ClCompile Include="..\..\FEBio2\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearElastic.cpp" />
@@ -319,13 +300,10 @@
     <ClCompile Include="..\..\FEBio2\fem.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMuscleMaterial.cpp" />
-    <ClCompile Include="..\..\FEBio2\FENeoHookean.cpp" />
     <ClCompile Include="..\..\FEBio2\FENeoHookeanTransIso.cpp" />
     <ClCompile Include="..\..\FEBio2\FENodeNodeList.cpp" />
     <ClCompile Include="..\..\FEBio2\FENodeReorder.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOgdenUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOptimizer.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOsmCoefConst.cpp" />
@@ -366,7 +344,6 @@
     <ClCompile Include="..\..\FEBio2\FESoluteFlux.cpp" />
     <ClCompile Include="..\..\FEBio2\FESolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEStiffnessMatrix.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEStVenantKirchhoff.cpp" />
     <ClCompile Include="..\..\FEBio2\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
@@ -377,11 +354,8 @@
     <ClCompile Include="..\..\FEBio2\FETractionLoad.cpp" />
     <ClCompile Include="..\..\FEBio2\FETransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBio2\FETransIsoVerondaWestmann.cpp" />
-    <ClCompile Include="..\..\FEBio2\FETransverselyIsotropic.cpp" />
     <ClCompile Include="..\..\FEBio2\FETrussMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEUncoupledElasticMixture.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEUncoupledMaterial.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBio2\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FileImport.cpp" />
     <ClCompile Include="..\..\FEBio2\getapppath.cpp" />
