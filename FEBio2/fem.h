@@ -100,15 +100,19 @@ public:
 	void SetPlotFileNameExtension(const char* szext);
 
 	// Get the I/O files
-	const char* GetInputFileName () { return m_szfile; }
-	const char* GetLogfileName () { return m_szlog; }
-	const char* GetPlotFileName() { return m_szplot; }
+	const char* GetInputFileName() { return m_szfile; }
+	const char* GetLogfileName  () { return m_szlog;  }
+	const char* GetPlotFileName () { return m_szplot; }
+	const char* GetDumpFileName () { return m_szdump; }
 
 	//! set the problem title
 	void SetTitle(const char* sz) { strcpy(m_sztitle, sz); }
 
 	//! get the problem title
 	const char* GetTitle() { return m_sztitle; }
+
+	//! get the file title
+	const char* GetFileTitle() { return m_szfile_title; }
 
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);
@@ -276,10 +280,6 @@ protected:
 
 		list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
 	//}
-
-	// some friends of this class
-	friend class FEAnalysis;
-	friend class stack<FEM>;
 };
 
 #endif // _FEM_H_07012006_

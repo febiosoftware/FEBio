@@ -95,12 +95,12 @@ bool FEAnalysis::Init()
 		plc->LoadPoint(1).time  = m_tend;
 		plc->LoadPoint(1).value = m_dtmax;
 		m_fem.AddLoadCurve(plc);
-		m_nmplc = m_fem.m_LC.size()-1;
+		m_nmplc = m_fem.LoadCurves()-1;
 	}
 
 	// the must point load curve must be evaluated
 	// using a step interpolation
-	m_fem.m_LC[m_nmplc]->SetInterpolation(FELoadCurve::STEP);
+	m_fem.GetLoadCurve(m_nmplc)->SetInterpolation(FELoadCurve::STEP);
 
 	// activate the boundary conditions
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
@@ -290,7 +290,8 @@ bool FEAnalysis::Init()
 	}
 
 	// see if we need to do incompressible augmentations
-	for (i=0; i<(int) m_fem.m_MAT.size(); ++i)
+	int nmat = m_fem.Materials();
+	for (i=0; i<nmat; ++i)
 	{
 		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
 		if (pmi && pmi->m_blaugon) m_baugment = true;
@@ -332,9 +333,9 @@ bool FEAnalysis::Solve()
 	bool bdebug = m_fem.GetDebugFlag();
 
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 	else
-		pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
+		pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 
 	// keep a stack for push/pop'ing
 	stack<FEM> state;
@@ -384,7 +385,7 @@ bool FEAnalysis::Solve()
 		for (i=0; i<m_fem.Materials(); ++i)
 		{
 			// get the material
-			FEMaterial* pm = m_fem.m_MAT[i];
+			FEMaterial* pm = m_fem.GetMaterial(i);
 
 			// evaluate its parameter list
 			m_fem.EvalParameterList(pm->GetParameterList());
@@ -497,7 +498,7 @@ bool FEAnalysis::Solve()
 			{
 				if ((m_nplot == FE_PLOT_MUST_POINTS) && (m_nmplc >= 0))
 				{
-					FELoadCurve& lc = *m_fem.m_LC[m_nmplc];
+					FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
 					if (lc.HasPoint(m_fem.m_ftime)) m_fem.m_plot->Write(m_fem);
 				}
 				else m_fem.m_plot->Write(m_fem);
@@ -507,14 +508,14 @@ bool FEAnalysis::Solve()
 			if (m_bDump)
 			{
 				DumpFile ar(&m_fem);
-				if (ar.Create(m_fem.m_szdump) == false)
+				if (ar.Create(m_fem.GetDumpFileName()) == false)
 				{
 					clog.printf("WARNING: Failed creating restart point.\n");
 				}
 				else 
 				{
 					m_fem.Serialize(ar);
-					clog.printf("\nRestart point created. Archive name is %s\n", m_fem.m_szdump);
+					clog.printf("\nRestart point created. Archive name is %s\n", m_fem.GetDumpFileName());
 				}
 			}
 
@@ -567,9 +568,9 @@ bool FEAnalysis::Solve()
 
 		bool bdebug = m_fem.GetDebugFlag();
 		if (nsteps>1)
-			pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
+			pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 		else
-			pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.m_szfile_title, (bdebug?"FEBio (debug mode)": "FEBio"));
+			pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 	}
 
 	if ((m_nplot == FE_PLOT_FINAL) && bconv) m_fem.m_plot->Write(m_fem);
@@ -754,7 +755,7 @@ void FEAnalysis::AutoTimeStep(int niter)
 	if (dtn < m_dtmin) dtn = m_dtmin;
 
 	// get the must point load curve
-	FELoadCurve& lc = *m_fem.m_LC[ m_nmplc ];
+	FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
 
 	double dtmax = lc.Value(told);
 
