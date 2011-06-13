@@ -258,6 +258,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEMuscleMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FENeoHookean.cpp"
 				>
 			</File>
@@ -270,7 +274,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FERigid.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETendonMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransIsoVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -384,6 +404,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEMuscleMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FENeoHookean.h"
 				>
 			</File>
@@ -396,7 +420,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FERigid.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETendonMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransIsoMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransIsoVerondaWestmann.h"
 				>
 			</File>
 			<File

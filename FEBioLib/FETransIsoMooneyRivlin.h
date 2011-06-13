@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FETransverselyIsotropic.h"
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Mooney-Rivlin material
