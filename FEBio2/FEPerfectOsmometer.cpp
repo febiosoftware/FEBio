@@ -25,7 +25,6 @@ END_PARAMETER_LIST();
 
 void FEPerfectOsmometer::Init()
 {
-	if (m_unstable) throw MaterialError("This material is unstable (cannot sustain shear) when used alone.  Combine it in a solid mixture with a material that can resist tension.");
 	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
 	if (m_iosm < 0) throw MaterialError("iosm must be positive.");
 	if (m_bosm < 0) throw MaterialError("bosm must be positive.");

@@ -288,7 +288,7 @@ bool FEAnalysis::Init()
 		if (ci.m_blaugon) m_baugment = true;
 	}
 
-	// see if we to do incompressible augmentations
+	// see if we need to do incompressible augmentations
 	for (i=0; i<(int) m_fem.m_MAT.size(); ++i)
 	{
 		FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_fem.GetMaterial(i));
