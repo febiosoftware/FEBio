@@ -337,10 +337,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEConstBodyForce.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.cpp"
 				>
 			</File>
@@ -581,10 +577,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPointBodyForce.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPointConstraint.cpp"
 				>
 			</File>
@@ -813,10 +805,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\MathParser.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\optimize.cpp"
 				>
 			</File>
@@ -968,10 +956,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEBox.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEConstBodyForce.h"
 				>
 			</File>
 			<File
@@ -1231,10 +1215,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPointBodyForce.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPointConstraint.h"
 				>
 			</File>
@@ -1432,10 +1412,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\LSDYNAPlotFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\MathParser.h"
 				>
 			</File>
 			<File

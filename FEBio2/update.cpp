@@ -6,7 +6,7 @@
 #include "FETrussMaterial.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
-#include "FEPointBodyForce.h"
+#include "FEBioLib/FEPointBodyForce.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION : FESolidSolver::Update

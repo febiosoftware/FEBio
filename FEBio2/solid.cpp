@@ -6,7 +6,7 @@
 #include "FEMicroMaterial.h"
 #include "FETransverselyIsotropic.h"
 #include "FESolidSolver.h"
-#include "FEPointBodyForce.h"
+#include "FEBioLib/FEPointBodyForce.h"
 
 //-----------------------------------------------------------------------------
 // FEElasticSolidDomain

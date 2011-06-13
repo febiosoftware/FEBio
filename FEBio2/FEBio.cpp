@@ -52,7 +52,7 @@
 #include "log.h"
 #include "FEBioStdSolver.h"
 #include "FECore/febio.h"
-#include "FEPointBodyForce.h"
+#include "FEBioLib/FEPointBodyForce.h"
 #include "plugin.h"
 
 //-----------------------------------------------------------------------------

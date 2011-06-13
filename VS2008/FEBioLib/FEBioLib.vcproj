@@ -222,6 +222,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEConstBodyForce.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPointBodyForce.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\LUSolver.cpp"
 				>
 			</File>
@@ -281,6 +289,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\DenseMatrix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEConstBodyForce.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPointBodyForce.h"
 				>
 			</File>
 			<File

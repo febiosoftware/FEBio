@@ -31,8 +31,7 @@
 #include "FEBiphasicDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "ut4.h"
-
-#include "FEConstBodyForce.h"
+#include "FEBioLib/FEConstBodyForce.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)

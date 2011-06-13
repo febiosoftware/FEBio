@@ -14,7 +14,7 @@
 #include "FERigid.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
-#include "FEPointBodyForce.h"
+#include "FEBioLib/FEPointBodyForce.h"
 
 // Forward declarations
 void Hello(FILE* fp);

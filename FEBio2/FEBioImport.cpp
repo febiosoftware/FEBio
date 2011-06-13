@@ -39,8 +39,8 @@
 #include "FEElasticTrussDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"
-#include "FEConstBodyForce.h"
-#include "FEPointBodyForce.h"
+#include "FEBioLib/FEConstBodyForce.h"
+#include "FEBioLib/FEPointBodyForce.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
