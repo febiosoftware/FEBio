@@ -10,8 +10,8 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="C:\Documents and Settings\Steve\My Documents\FEBio Documents\Examples\Warp"
-				CommandArguments="-i test01.feb"
+				WorkingDirectory="C:\Documents and Settings\Steve\My Documents\Visual Studio 2008\Projects\FEBio\Testing\Verify"
+				CommandArguments="-i sh14.feb"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"
@@ -39,7 +39,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory="C:\Documents and Settings\Steve\My Documents\Visual Studio 2008\Projects\FEBio\Testing\Verify"
-				CommandArguments="-i sh01.feb"
+				CommandArguments="-i co12.feb"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"
