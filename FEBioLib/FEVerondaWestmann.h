@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //!  Veronda-Westmann material model

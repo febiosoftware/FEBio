@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;SUPERLU;PARDISO"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;SUPERLU;PARDISO;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -234,6 +234,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEArrudaBoyce.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.cpp"
 				>
 			</File>
@@ -242,11 +246,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicElastic.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicFourier.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FENeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOgdenMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
 				>
 			</File>
 			<File
@@ -255,6 +279,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -332,6 +360,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEArrudaBoyce.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.h"
 				>
 			</File>
@@ -340,11 +372,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicElastic.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicFourier.h"
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FENeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOgdenMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.h"
 				>
 			</File>
 			<File
@@ -353,6 +405,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEVerondaWestmann.h"
 				>
 			</File>
 			<File

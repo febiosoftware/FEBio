@@ -285,10 +285,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEArrudaBoyce.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEAugLagLinearConstraint.cpp"
 				>
 			</File>
@@ -445,10 +441,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEIsotropicElastic.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FELevelStructure.cpp"
 				>
 			</File>
@@ -477,15 +469,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEMooneyRivlin.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEMuscleMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FENeoHookean.cpp"
 				>
 			</File>
 			<File
@@ -498,10 +482,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FENodeReorder.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEOgdenMaterial.cpp"
 				>
 			</File>
 			<File
@@ -665,10 +645,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEStVenantKirchhoff.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESurfaceConstraint.cpp"
 				>
 			</File>
@@ -714,10 +690,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEUncoupledElasticMixture.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -876,10 +848,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEAnalysis.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEArrudaBoyce.h"
 				>
 			</File>
 			<File
@@ -1055,10 +1023,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEIsotropicElastic.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FELevelStructure.h"
 				>
 			</File>
@@ -1087,15 +1051,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEMooneyRivlin.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEMuscleMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FENeoHookean.h"
 				>
 			</File>
 			<File
@@ -1108,10 +1064,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FENodeReorder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEOgdenMaterial.h"
 				>
 			</File>
 			<File
@@ -1275,10 +1227,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEStVenantKirchhoff.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESurfaceConstraint.h"
 				>
 			</File>
@@ -1324,10 +1272,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEUncoupledElasticMixture.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEVerondaWestmann.h"
 				>
 			</File>
 			<File

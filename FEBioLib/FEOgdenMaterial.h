@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 class FEOgdenMaterial :	public FEUncoupledMaterial
 {
