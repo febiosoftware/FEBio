@@ -360,7 +360,7 @@ void FE3FieldElasticSolidDomain::GeometricalStiffness(int iel, matrix &ke)
 //! This function updates the stresses for elements using the three-field formulation.
 //! For such elements, the stress is a sum of a deviatoric stress, calculate by the
 //! material and a dilatational term.
-void FE3FieldElasticSolidDomain::UpdateStresses(FEM &fem)
+void FE3FieldElasticSolidDomain::UpdateStresses(FEModel &fem)
 {
 	int i, n;
 	int nint, neln;

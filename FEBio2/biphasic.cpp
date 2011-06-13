@@ -606,7 +606,7 @@ void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, m
 
 
 //-----------------------------------------------------------------------------
-void FEBiphasicDomain::UpdateStresses(FEM &fem)
+void FEBiphasicDomain::UpdateStresses(FEModel &fem)
 {
 	int i, n;
 	int nint, neln;
@@ -618,8 +618,6 @@ void FEBiphasicDomain::UpdateStresses(FEM &fem)
 
 	FEMesh& mesh = *m_pMesh;
 
-	assert((fem.m_pStep->m_nModule == FE_POROELASTIC) || (fem.m_pStep->m_nModule == FE_POROSOLUTE));
-	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element

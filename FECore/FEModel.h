@@ -47,7 +47,10 @@ public: // material functions
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int id) { return m_MAT[id]; }
 
+	//! return the elastic material
+	// TODO: this is only a temp solution
 	virtual FEElasticMaterial* GetElasticMaterial(int id) = 0;
+	virtual FEElasticMaterial* GetElasticMaterial(FEMaterial* pm) = 0;
 
 public: // body force functions
 

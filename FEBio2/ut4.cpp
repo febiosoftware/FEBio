@@ -266,7 +266,7 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 
 //-----------------------------------------------------------------------------
 //! Update the nodal and element stresses
-void FEUT4Domain::UpdateStresses(FEM &fem)
+void FEUT4Domain::UpdateStresses(FEModel &fem)
 {
 	// updating the element stresses is easy, since we only
 	// need to call the base class
@@ -608,6 +608,10 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 	vector<int> LM;
 	vector<int> en;
 
+	// Get the material for the domain
+	FEModel& fem = psolver->m_fem;
+	FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+
 	// loop over all the nodes
 	int NN = (int) m_Node.size(), ni, nj;
 	for (int i=0; i<NN; ++i)
@@ -626,7 +630,7 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 		NodalGeometryStiffness(node, ke);
 
 		// calculate the material stiffness for this node
-		NodalMaterialStiffness(node, ke);
+		NodalMaterialStiffness(node, ke, pme);
 
 		// it is assumed that the previous function only build the upper-triangular part
 		// so now we build the lower-triangular by copying it from the upper-triangular part
@@ -776,11 +780,8 @@ tens4ds FEUT4Domain::Cvol(const tens4ds& C, const mat3ds& S)
 
 //-----------------------------------------------------------------------------
 //! Calculates the nodal material stiffness contribution
-void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke)
+void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMaterial* pme)
 {
-	// Get the material for the domain
-	FEElasticMaterial* pme = FEM::GetElasticMaterial(m_pMat);
-
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
 	//		 in other words, we loose the material axis orientation

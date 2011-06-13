@@ -2,6 +2,7 @@
 #include "FEElasticSolidDomain.h"
 #include "FECore/FENodeElemList.h"
 #include "FECore/tens4d.h"
+#include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Domain for nodally integrated tet elements 
@@ -40,7 +41,7 @@ public:
 	bool Initialize(FEModel& fem);
 
 	//! Update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 
 	//! calculates the total residual
 	void Residual(FESolidSolver* psolver, vector<double>& R);
@@ -78,7 +79,7 @@ protected:
 	void NodalGeometryStiffness(UT4NODE& node, matrix& ke);
 
 	//! nodal material stiffness contribution
-	void NodalMaterialStiffness(UT4NODE& node, matrix& ke);
+	void NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMaterial* pme);
 
 protected:
 	//! calculate the volume of a tet element

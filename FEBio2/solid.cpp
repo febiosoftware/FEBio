@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
-#include "log.h"
 #include "FEPoroElastic.h"
 #include "FEMicroMaterial.h"
 #include "FETransverselyIsotropic.h"
@@ -61,7 +60,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 							if (fabs(m.det() - 1) > 1e-7)
 							{
 								// this element did not get specified a user-defined fiber direction
-								clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+//								clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
 								bmerr = true;
 							}
 						}
@@ -677,7 +676,7 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::UpdateStresses(FEM &fem)
+void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 {
 	int i, n;
 	int nint, neln;

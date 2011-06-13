@@ -192,7 +192,7 @@ void FEElasticTrussDomain::InternalForces(FETrussElement& el, vector<double>& fe
 
 //-----------------------------------------------------------------------------
 
-void FEElasticTrussDomain::UpdateStresses(FEM &fem)
+void FEElasticTrussDomain::UpdateStresses(FEModel &fem)
 {
 	vec3d r0[2], rt[2];
 	for (int i=0; i<(int) m_Elem.size(); ++i)

@@ -651,7 +651,7 @@ void FEPoroSolidDomain::PoroMaterialStiffness(FEM& fem, FESolidElement &el, matr
 
 
 //-----------------------------------------------------------------------------
-void FEPoroSolidDomain::UpdateStresses(FEM &fem)
+void FEPoroSolidDomain::UpdateStresses(FEModel &fem)
 {
 	int i, n;
 	int nint, neln;
@@ -659,7 +659,6 @@ void FEPoroSolidDomain::UpdateStresses(FEM &fem)
 	vec3d r0[8], rt[8];
 	double pn[8];
 
-	assert(fem.m_pStep->m_nModule == FE_POROELASTIC);
 	FEMesh& mesh = *m_pMesh;
 
 	for (i=0; i<(int) m_Elem.size(); ++i)

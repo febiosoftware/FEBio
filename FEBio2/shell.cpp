@@ -640,7 +640,7 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticShellDomain::UpdateStresses(FEM &fem)
+void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 {
 	FEMesh& mesh = fem.m_mesh;
 	vec3d r0[8], rt[8];

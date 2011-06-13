@@ -39,7 +39,7 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolidSolver* psolver);
@@ -109,7 +109,7 @@ public:
 	bool Initialize(FEModel& fem);
 
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 
 	//! calculates the solid element stiffness matrix
 	void ElementStiffness(FEM& fem, int iel, matrix& ke);
@@ -159,7 +159,7 @@ public:
 	void Residual(FESolidSolver* psolver, vector<double>& R);
 
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 
 protected:
 	//! Calculates the internal fluid forces
@@ -198,7 +198,7 @@ public:
 	void Residual(FESolidSolver* psolver, vector<double>& R);
 
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 };
 
 //-----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ public:
 	void StiffnessMatrix(FESolidSolver* psolver);
 
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 
 protected:
 	//! Calculates the internal stress vector for enhanced strain hex elements

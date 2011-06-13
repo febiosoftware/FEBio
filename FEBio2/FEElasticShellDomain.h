@@ -30,7 +30,7 @@ public:
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 
 	// --- S T I F F N E S S --- 
 
@@ -75,5 +75,5 @@ public:
 	void Residual(FESolidSolver* psolver, vector<double>& R);
 
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 };

@@ -384,7 +384,6 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : FEM::UpdateStresses
 //  Updates the element stresses
 //
 

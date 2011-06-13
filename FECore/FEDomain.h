@@ -5,7 +5,6 @@
 #include "FE_enum.h"
 
 class FEModel;
-class FEM;
 class FENode;
 class FEMesh;
 class FESolidSolver;
@@ -42,7 +41,7 @@ public:
 	virtual bool Initialize(FEModel& fem) { return true; }
 
 	// TODO: this is temporary and will be moved to a different class
-	virtual void UpdateStresses(FEM& fem) {}
+	virtual void UpdateStresses(FEModel& fem) {}
 
 	virtual void InitElements() {}
 

@@ -89,7 +89,7 @@ void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 //! We don't need to update the stresses for rigid elements
 //!
-void FERigidSolidDomain::UpdateStresses(FEM &fem)
+void FERigidSolidDomain::UpdateStresses(FEModel &fem)
 {
 	// Nothing to see here. Please move on.
 }
@@ -162,7 +162,7 @@ void FERigidShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 //! update stresses for rigid shells.
 //!
-void FERigidShellDomain::UpdateStresses(FEM &fem)
+void FERigidShellDomain::UpdateStresses(FEModel &fem)
 {
 	// Nothing to see here. Please move on.
 }

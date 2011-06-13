@@ -37,5 +37,5 @@ public:
 	void InternalForces(FETrussElement& el, vector<double>& fe);
 
 	//! update the truss stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 };

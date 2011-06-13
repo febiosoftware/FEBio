@@ -498,7 +498,7 @@ void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &
 }
 
 //-----------------------------------------------------------------------------
-void FEUDGHexDomain::UpdateStresses(FEM &fem)
+void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 {
 	int nint, neln;
 	double* gw;

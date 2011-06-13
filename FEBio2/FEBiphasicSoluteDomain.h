@@ -26,7 +26,7 @@ public:
 	void Residual(FESolidSolver* psolver, vector<double>& R);
 	
 	// update stresses
-	void UpdateStresses(FEM& fem);
+	void UpdateStresses(FEModel& fem);
 	
 protected:
 	//! Calculates the internal fluid forces
