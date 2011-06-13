@@ -171,9 +171,6 @@
     <ClInclude Include="..\..\FEBio2\FEIsotropicElastic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEIsotropicFourier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FELevelStructure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -594,9 +591,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEIsotropicElastic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEIsotropicFourier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FELevelStructure.cpp">

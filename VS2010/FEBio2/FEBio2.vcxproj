@@ -170,7 +170,6 @@
     <ClInclude Include="..\..\FEBio2\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBio2\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBio2\FEIsotropicElastic.h" />
-    <ClInclude Include="..\..\FEBio2\FEIsotropicFourier.h" />
     <ClInclude Include="..\..\FEBio2\FELevelStructure.h" />
     <ClInclude Include="..\..\FEBio2\FELinearConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FELinearElastic.h" />
@@ -313,7 +312,6 @@
     <ClCompile Include="..\..\FEBio2\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBio2\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBio2\FEIsotropicElastic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEIsotropicFourier.cpp" />
     <ClCompile Include="..\..\FEBio2\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearElastic.cpp" />
