@@ -1,5 +1,5 @@
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a material that consists of a continuous fiber distribution

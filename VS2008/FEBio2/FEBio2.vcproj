@@ -281,18 +281,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FE2DFiberNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoVerondaWestmann.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEAnalysis.cpp"
 				>
 			</File>
@@ -721,19 +709,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FETransverselyIsotropic.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETrussMaterial.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEUncoupledElasticMixture.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEUncoupledMaterial.cpp"
 				>
 			</File>
 			<File
@@ -892,18 +872,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\DataStore.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DFiberNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoVerondaWestmann.h"
 				>
 			</File>
 			<File
@@ -1351,19 +1319,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FETransverselyIsotropic.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETrussMaterial.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEUncoupledElasticMixture.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEUncoupledMaterial.h"
 				>
 			</File>
 			<File

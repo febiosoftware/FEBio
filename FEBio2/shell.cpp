@@ -2,7 +2,7 @@
 #include "FESolidSolver.h"
 #include "FEElasticShellDomain.h"
 #include "FEBiphasic.h"
-#include "FETransverselyIsotropic.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEPoroElastic.h"
 #include "log.h"
 #include <math.h>

@@ -11,7 +11,7 @@
 #include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
-#include "FETransverselyIsotropic.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"

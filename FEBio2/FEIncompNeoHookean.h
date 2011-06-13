@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Incompressible Neo-Hookean material

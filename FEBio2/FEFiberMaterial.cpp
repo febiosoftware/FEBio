@@ -65,9 +65,9 @@ mat3ds FEFiberMaterial::Stress(FEMaterialPoint &mp)
 	mat3ds s = T.dev()*twoJi;
 
 	// --- active contraction contribution ---
-	if (m_lcna >= 0)
+	if (m_ascl > 0)
 	{
-		double ctenslm = m_plc->Value();
+		double ctenslm = m_ascl;
 
 		// current sarcomere length
 		double strl = m_refl*lamd;

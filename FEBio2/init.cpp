@@ -9,7 +9,7 @@
 #include "log.h"
 #include "FESolidSolver.h"
 #include "LSDYNAPlotFile.h"
-#include "FETransverselyIsotropic.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEDiscreteMaterial.h"
 #include "FERigid.h"
 #include "FEElasticSolidDomain.h"
@@ -369,14 +369,6 @@ bool FEM::InitMaterials()
 		{
 			clog.printf("A fatal error occured during material intialization\n\n");
 			return false;
-		}
-		
-		// set the activation load curve
-		// TODO: can we remove this now that material parameters can have loadcurves?
-		FETransverselyIsotropic* pm = dynamic_cast<FETransverselyIsotropic*> (pmat);
-		if (pm)
-		{
-			if (pm->m_fib.m_lcna >= 0) pm->m_fib.m_plc = GetLoadCurve(pm->m_fib.m_lcna);
 		}
 	}
 

@@ -3,7 +3,7 @@
 #include "FEElasticSolidDomain.h"
 #include "FEPoroElastic.h"
 #include "FEMicroMaterial.h"
-#include "FETransverselyIsotropic.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 #include "FESolidSolver.h"
 #include "FEBioLib/FEPointBodyForce.h"
 

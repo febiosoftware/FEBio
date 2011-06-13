@@ -222,6 +222,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.cpp"
 				>
 			</File>
@@ -235,6 +247,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.cpp"
 				>
 			</File>
 			<File
@@ -300,6 +320,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.h"
 				>
 			</File>
@@ -313,6 +345,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
 				>
 			</File>
 			<File

@@ -165,7 +165,7 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 	}
 
 	// activation level
-	double alpha = m_fib.m_ascl*(m_fib.m_plc ? m_fib.m_plc->Value():1);
+	double alpha = m_fib.m_ascl;
 
 	// calculate total fiber force
 	double FfDl = m_smax*(Fp + alpha*Fa)/m_Lofl;
@@ -340,7 +340,7 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 	}
 
 	// activation level
-	double alpha = m_fib.m_ascl*(m_fib.m_plc ? m_fib.m_plc->Value():1);
+	double alpha = m_fib.m_ascl;
 
 	// calculate total fiber force
 	double FfDl = m_smax*(Fp + alpha*Fa)/m_Lofl;

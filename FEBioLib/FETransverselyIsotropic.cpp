@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FETransverselyIsotropic.h"
-#include "fem.h"
 
 //-----------------------------------------------------------------------------
 // Material parameters for FETransverselyIsotropic
@@ -21,7 +20,6 @@ void FETransverselyIsotropic::Serialize(DumpFile &ar)
 
 	if (ar.IsSaving())
 	{
-		ar << m_fib.m_lcna;
 		ar << m_fib.m_ascl;
 		ar << m_fib.m_ca0;
 		ar << m_fib.m_beta;
@@ -30,16 +28,10 @@ void FETransverselyIsotropic::Serialize(DumpFile &ar)
 	}
 	else
 	{
-		ar >> m_fib.m_lcna;
 		ar >> m_fib.m_ascl;
 		ar >> m_fib.m_ca0;
 		ar >> m_fib.m_beta;
 		ar >> m_fib.m_l0;
 		ar >> m_fib.m_refl;
-
-		// reset the loadcurve
-		// TODO: I really want to get rid of this load curve
-		m_fib.m_plc = 0;
-		if (m_fib.m_lcna >= 0) m_fib.m_plc = ar.GetFEM()->GetLoadCurve(m_fib.m_lcna);
 	}
 }

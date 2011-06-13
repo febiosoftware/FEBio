@@ -1,4 +1,4 @@
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only

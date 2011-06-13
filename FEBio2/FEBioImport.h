@@ -2,7 +2,7 @@
 
 #include "FileImport.h"
 #include "FECore/XMLReader.h"
-#include "FETransverselyIsotropic.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 #include "FERigid.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"

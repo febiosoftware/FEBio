@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "tens4d.h"
-#include "LoadCurve.h"
+#include "LoadCurve.h"		//---> can we delete this?
 #include "FECoordSysMap.h"
 #include "FEMaterialFactory.h"
 #include "FEParameterList.h"
@@ -171,10 +171,7 @@ class FEFiberMaterial : public FEMaterial
 public:
 	FEFiberMaterial()
 	{
-		m_plc = 0;
-		m_lcna = -1;
 		m_ascl = 0;
-
 		m_c3 = m_c4 = m_c5 = 0;
 		m_lam1 = 1;
 	}
@@ -193,15 +190,11 @@ public:
 	double	m_lam1;		//!< fiber stretch for straightened fibers
 
 	//--- time varying elastance active contraction data ---
-	int		m_lcna;		//!< use active contraction or not
 	double	m_ascl;		//!< activation scale factor
 	double	m_ca0;		//!< intracellular calcium concentration
 	double	m_beta;		//!< shape of peak isometric tension-sarcomere length relation
 	double	m_l0;		//!< unloaded length
 	double	m_refl;		//!< sarcomere length
-
-	// we need load curve data for active contraction
-	FELoadCurve* m_plc;	//!< pointer to current load curve values
 };
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

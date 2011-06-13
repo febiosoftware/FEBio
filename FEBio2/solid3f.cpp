@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 
 class FEOgdenUnconstrained : public FEElasticMaterial
 	{

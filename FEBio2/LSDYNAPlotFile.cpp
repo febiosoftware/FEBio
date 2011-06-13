@@ -10,7 +10,7 @@
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEFacet2FacetSliding.h"
-#include "FETransverselyIsotropic.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 #include "FECore/FEDiscreteDomain.h"
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEShellDomain.h"

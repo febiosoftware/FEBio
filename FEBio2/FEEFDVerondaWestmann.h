@@ -1,5 +1,5 @@
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 #include "FEVerondaWestmann.h"
 #include "FEEllipsoidalFiberDistribution.h"
 

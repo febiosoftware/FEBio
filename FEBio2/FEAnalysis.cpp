@@ -3,7 +3,7 @@
 #include "fem.h"
 #include "console.h"
 #include "FERigid.h"
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 #include "log.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"

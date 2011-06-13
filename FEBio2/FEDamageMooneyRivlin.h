@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 #include "FEDamageNeoHookean.h"
 
 class FEDamageMooneyRivlin : public FEUncoupledMaterial

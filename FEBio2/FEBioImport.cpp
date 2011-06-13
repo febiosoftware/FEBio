@@ -16,7 +16,7 @@
 #include "FEPoroElastic.h"
 #include "ut4.h"
 #include "FEDiscreteMaterial.h"
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface.h"
 #include "FESlidingInterface2.h"
@@ -931,12 +931,12 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 	}
 	else if (tag == "active_contraction")
 	{
-		const char* szlc = tag.AttributeValue("lc", true);
+/*		const char* szlc = tag.AttributeValue("lc", true);
 		int lc = 0;
 		if (szlc) lc = atoi(szlc);
 		pm->m_fib.m_lcna = lc;
 		tag.value(pm->m_fib.m_ascl);
-
+*/
 		if (!tag.isleaf())
 		{
 			++tag;
