@@ -10,6 +10,7 @@
 #include "FEPoroElastic.h"
 #include "FEPoroSolidSolver.h"
 #include "FEPoroSoluteSolver.h"
+#include "FEBiphasic.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -382,8 +383,30 @@ bool FEAnalysis::Solve()
 		// evaluate material parameter lists
 		for (i=0; i<m_fem.Materials(); ++i)
 		{
-			FEParameterList& pl = m_fem.m_MAT[i]->GetParameterList();
-			m_fem.EvalParameterList(pl);
+			// get the material
+			FEMaterial* pm = m_fem.m_MAT[i];
+
+			// evaluate its parameter list
+			m_fem.EvalParameterList(pm->GetParameterList());
+
+			// for biphasic and biphasic-solute materials we also need to evaluate
+			// the sub-materials
+			FEBiphasic* pb = dynamic_cast<FEBiphasic*>(pm);
+			if (pb)
+			{
+				m_fem.EvalParameterList(pb->m_pSolid->GetParameterList());
+				m_fem.EvalParameterList(pb->m_pPerm->GetParameterList());
+			}
+
+			FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*>(pm);
+			if (pbs)
+			{
+				m_fem.EvalParameterList(pbs->m_pSolid->GetParameterList());
+				m_fem.EvalParameterList(pbs->m_pPerm ->GetParameterList());
+				m_fem.EvalParameterList(pbs->m_pDiff ->GetParameterList());
+				m_fem.EvalParameterList(pbs->m_pSolub->GetParameterList());
+				m_fem.EvalParameterList(pbs->m_pOsmC ->GetParameterList());
+			}
 		}
 
 		// evaluate body-force parameter lists
