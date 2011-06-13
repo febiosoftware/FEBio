@@ -341,10 +341,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEContactSurface.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEDamageMooneyRivlin.cpp"
 				>
 			</File>
@@ -956,10 +952,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEContactSurface.h"
 				>
 			</File>
 			<File

@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEContactInterface.h"
-#include "FEContactSurface.h"
+#include "FEBioLib/FEContactSurface.h"
 #include "FECore/vector.h"
 
 //-----------------------------------------------------------------------------

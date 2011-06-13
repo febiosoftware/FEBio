@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEContactInterface.h"
-#include "FEContactSurface.h"
+#include "FEBioLib/FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 class FESlidingSurface3 : public FEContactSurface
