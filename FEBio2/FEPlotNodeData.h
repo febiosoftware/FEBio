@@ -43,3 +43,12 @@ public:
 	FEPlotNodeTemperature(FEModel* pfem) : FENodeData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEMesh& m, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Nodal reaction forces
+class FEPlotNodeReactionForces : public FENodeData
+{
+public:
+	FEPlotNodeReactionForces(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE){}
+	bool Save(FEMesh& m, vector<float>& a);
+};

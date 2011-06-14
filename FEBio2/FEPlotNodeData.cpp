@@ -4,10 +4,11 @@
 #include "fem.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement, FEPlotData, "displacement");
-REGISTER_FEBIO_CLASS(FEPlotNodeVelocity    , FEPlotData, "velocity"    );
-REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration, FEPlotData, "acceleration");
-REGISTER_FEBIO_CLASS(FEPlotNodeTemperature , FEPlotData, "temperature" );
+REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );
+REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPlotData, "acceleration"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeTemperature   , FEPlotData, "temperature"    );
+REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -86,6 +87,21 @@ bool FEPlotNodeTemperature::Save(FEMesh& m, vector<float>& a)
 		// the doubles to single precision
 		float f = (float) node.m_T;
 		a.push_back(f);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Store nodal reaction forces
+bool FEPlotNodeReactionForces::Save(FEMesh& m, vector<float>& a)
+{
+	int N = m.Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		FENode& node = m.Node(i);
+		a.push_back((float) node.m_Fr.x);
+		a.push_back((float) node.m_Fr.y);
+		a.push_back((float) node.m_Fr.z);
 	}
 	return true;
 }

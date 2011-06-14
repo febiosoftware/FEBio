@@ -89,6 +89,7 @@ public:
 	vec3d	m_vp;	//!< previous velocity
 	vec3d	m_ap;	//!< previous acceleration
 
+	vec3d	m_Fr;	//!< nodal reaction forces
 
 	// shell data
 	vec3d	m_D0;	//!< initial director

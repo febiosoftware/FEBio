@@ -155,6 +155,20 @@ void FESolidSolver::Update(vector<double>& ui)
 		if (pbf) pbf->Update();
 	}
 
+	// set the nodal reaction forces
+	// TODO: Is this the best place to do this? I think yes, since the 
+	//       reaction forces are evaluated in the residual, which is
+	//       always evaluated before this function is called.
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.m_Fr = vec3d(0,0,0);
+
+		if ((n = -node.m_ID[0]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[1]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[2]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+	}
+
 	// dump all states to the plot file
 	// when requested
 	if (m_fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.m_plot->Write(m_fem);
