@@ -1,5 +1,5 @@
 #pragma once
-#include "FEUncoupledMaterial.h"
+#include "FEBioLib/FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 // We first define a material point that stores the damage variable.

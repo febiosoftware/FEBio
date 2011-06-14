@@ -11,7 +11,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory="C:\Documents and Settings\Steve\My Documents\Visual Studio 2008\Projects\FEBio\Testing\Verify"
-				CommandArguments="-i sh14.feb"
+				CommandArguments="-i co02.feb"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"

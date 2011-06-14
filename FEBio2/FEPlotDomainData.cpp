@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEPlotDomainData.h"
-#include "FEBioLib/FEDamageNeoHookean.h"
-#include "FEBioLib/FEDamageTransIsoMooneyRivlin.h"
+#include "FEDamageNeoHookean.h"
+#include "FEDamageTransIsoMooneyRivlin.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
 

@@ -222,63 +222,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEArrudaBoyce.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEContactSurface.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDamageMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDamageNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEIsotropicElastic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEIsotropicFourier.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEMuscleMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FENeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEOgdenMaterial.cpp"
 				>
 			</File>
 			<File
@@ -290,31 +238,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETendonMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETransIsoVerondaWestmann.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -380,63 +308,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEArrudaBoyce.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEContactSurface.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDamageMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDamageNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEIsotropicElastic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEIsotropicFourier.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEMuscleMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FENeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEOgdenMaterial.h"
 				>
 			</File>
 			<File
@@ -448,31 +324,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETendonMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETransIsoVerondaWestmann.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEVerondaWestmann.h"
 				>
 			</File>
 			<File

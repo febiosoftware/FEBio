@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FETransverselyIsotropic.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 //! Muscle Material
