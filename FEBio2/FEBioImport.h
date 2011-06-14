@@ -3,7 +3,7 @@
 #include "FileImport.h"
 #include "FECore/XMLReader.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "FERigid.h"
+#include "FEBioLib/FERigid.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
 #include "FEBiphasic.h"

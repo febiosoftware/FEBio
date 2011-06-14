@@ -6,7 +6,7 @@
 #include "fem.h"
 #include "FERigidBody.h"
 #include "FECore/FEMaterial.h"
-#include "FERigid.h"
+#include "FEBioLib/FERigid.h"
 #include "FEElasticSolidDomain.h"
 
 //////////////////////////////////////////////////////////////////////

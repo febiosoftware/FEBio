@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <math.h>
 #include "FESolver.h"
-#include "FERigid.h"
+#include "FEBioLib/FERigid.h"
 #include "FESolidSolver.h"
 #include "log.h"
 #include "Interrupt.h"

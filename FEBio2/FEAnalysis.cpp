@@ -2,7 +2,7 @@
 #include "FEAnalysis.h"
 #include "fem.h"
 #include "console.h"
-#include "FERigid.h"
+#include "FEBioLib/FERigid.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
 #include "log.h"
 #include "FESolidSolver.h"

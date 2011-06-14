@@ -11,7 +11,7 @@
 #include "LSDYNAPlotFile.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEDiscreteMaterial.h"
-#include "FERigid.h"
+#include "FEBioLib/FERigid.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEBioLib/FEPointBodyForce.h"

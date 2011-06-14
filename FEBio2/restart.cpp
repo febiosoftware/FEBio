@@ -1,7 +1,7 @@
 // restart module
 #include "stdafx.h"
 #include "fem.h"
-#include "FERigid.h"
+#include "FEBioLib/FERigid.h"
 #include "FERestartImport.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
