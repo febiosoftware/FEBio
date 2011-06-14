@@ -174,9 +174,6 @@
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEMuscleMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FENeoHookeanTransIso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -267,9 +264,6 @@
     <ClInclude Include="..\..\FEBio2\FERestartImport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FERigid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FERigidBody.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -318,9 +312,6 @@
     <ClInclude Include="..\..\FEBio2\FETCNonlinearOrthotropic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FETendonMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FETiedContactSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -328,12 +319,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FETractionLoad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FETransIsoMooneyRivlin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FETransIsoVerondaWestmann.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FETrussMaterial.h">
@@ -557,9 +542,6 @@
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEMuscleMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FENeoHookeanTransIso.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -650,9 +632,6 @@
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FERigid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FERigidBody.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -701,9 +680,6 @@
     <ClCompile Include="..\..\FEBio2\FETCNonlinearOrthotropic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FETendonMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FETiedContactSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -711,12 +687,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FETractionLoad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FETransIsoMooneyRivlin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FETransIsoVerondaWestmann.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FETrussMaterial.cpp">
