@@ -11,6 +11,8 @@
 #include "FEPoroSolidSolver.h"
 #include "FEPoroSoluteSolver.h"
 #include "FEBiphasic.h"
+#include "FEElasticMixture.h"
+#include "FEUncoupledElasticMixture.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -390,8 +392,23 @@ bool FEAnalysis::Solve()
 			// evaluate its parameter list
 			m_fem.EvalParameterList(pm->GetParameterList());
 
-			// for biphasic and biphasic-solute materials we also need to evaluate
+			// for elastic and uncoupled elastic mixtures, as well as biphasic
+			// and biphasic-solute materials we also need to evaluate
 			// the sub-materials
+			FEElasticMixture* pem = dynamic_cast<FEElasticMixture*>(pm);
+			if (pem)
+			{
+				for (int i=0; i < (int) pem->m_pMat.size(); ++i)
+					m_fem.EvalParameterList(pem->m_pMat[i]->GetParameterList());
+			}
+			
+			FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pm);
+			if (pum)
+			{
+				for (int i=0; i < (int) pum->m_pMat.size(); ++i)
+					m_fem.EvalParameterList(pum->m_pMat[i]->GetParameterList());
+			}
+
 			FEBiphasic* pb = dynamic_cast<FEBiphasic*>(pm);
 			if (pb)
 			{
