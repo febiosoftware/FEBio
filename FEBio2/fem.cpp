@@ -14,8 +14,10 @@
 #include "log.h"
 #include "plugin.h"
 #include "LSDYNAPlotFile.h"
-#include "FEBiphasic.h"
 #include "FECore/MathParser.h"
+#include "FEBiphasic.h"
+#include "FEElasticMixture.h"
+#include "FEUncoupledElasticMixture.h"
 
 // --- Global Constants Data ---
 // m_Const needs a definition, since static
@@ -325,7 +327,7 @@ double* FEM::FindParameter(const char* szparam)
 
 //-----------------------------------------------------------------------------
 //! Evaluate a parameter list
-void FEM::EvalParameterList(FEParameterList &pl)
+void FEM::EvaluateParameterList(FEParameterList &pl)
 {
 	list<FEParam>::iterator pi = pl.first();
 	for (int j=0; j<pl.Parameters(); ++j, ++pi)
@@ -342,6 +344,50 @@ void FEM::EvalParameterList(FEParameterList &pl)
 				assert(false);
 			}
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function evaluates material parameter lists. Since some of the materials
+//! can have other materials as sub-componenents, we need to set up a recursive
+//! call to evaluate the parameter lists of the sub-materials.
+void FEM::EvaluateMaterialParameters(FEMaterial* pm)
+{
+	// evaluate the materials' parameter list
+	EvaluateParameterList(pm->GetParameterList());
+
+	// for elastic and uncoupled elastic mixtures, as well as biphasic
+	// and biphasic-solute materials we also need to evaluate
+	// the sub-materials
+	FEElasticMixture* pem = dynamic_cast<FEElasticMixture*>(pm);
+	if (pem)
+	{
+		for (int i=0; i < (int) pem->m_pMat.size(); ++i)
+			EvaluateMaterialParameters(pem->m_pMat[i]);
+	}
+	
+	FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pm);
+	if (pum)
+	{
+		for (int i=0; i < (int) pum->m_pMat.size(); ++i)
+			EvaluateMaterialParameters(pum->m_pMat[i]);
+	}
+	
+	FEBiphasic* pb = dynamic_cast<FEBiphasic*>(pm);
+	if (pb)
+	{
+		EvaluateMaterialParameters(pb->m_pSolid);
+		EvaluateMaterialParameters(pb->m_pPerm);
+	}
+
+	FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*>(pm);
+	if (pbs)
+	{
+		EvaluateMaterialParameters(pbs->m_pSolid);
+		EvaluateMaterialParameters(pbs->m_pPerm );
+		EvaluateMaterialParameters(pbs->m_pDiff );
+		EvaluateMaterialParameters(pbs->m_pSolub);
+		EvaluateMaterialParameters(pbs->m_pOsmC );
 	}
 }
 

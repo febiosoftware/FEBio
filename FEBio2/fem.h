@@ -131,7 +131,8 @@ public:
 	static double GetGlobalConstant(const string& s);
 
 	//! Evaluate parameter list
-	void EvalParameterList(FEParameterList& pl);
+	void EvaluateParameterList(FEParameterList& pl);
+	void EvaluateMaterialParameters(FEMaterial* pm);
 	
 public:
 	//! copy constructor
