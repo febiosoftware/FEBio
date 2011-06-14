@@ -325,18 +325,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEDamageMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDamageNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEDiagnostic.cpp"
 				>
 			</File>
@@ -868,18 +856,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDamageMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDamageNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.h"
 				>
 			</File>
 			<File

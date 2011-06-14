@@ -246,6 +246,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEDamageMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDamageNeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicElastic.cpp"
 				>
 			</File>
@@ -389,6 +401,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEContactSurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDamageMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDamageNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.h"
 				>
 			</File>
 			<File
