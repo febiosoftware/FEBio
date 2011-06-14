@@ -121,6 +121,9 @@
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
+    <ClInclude Include="..\..\FEBioLib\FEDamageMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioLib\FEDamageNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FEIsotropicElastic.h" />
     <ClInclude Include="..\..\FEBioLib\FEIsotropicFourier.h" />
     <ClInclude Include="..\..\FEBioLib\FEMooneyRivlin.h" />
@@ -156,6 +159,9 @@
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEDamageMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEDamageNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicElastic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicFourier.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMooneyRivlin.cpp" />
