@@ -585,6 +585,19 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// forces due to point constraints
 	for (i=0; i<(int) m_fem.m_PC.size(); ++i) m_fem.m_PC[i].Residual(R);
 
+	// set the nodal reaction forces
+	// TODO: Is this a good place to do this?
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.m_Fr = vec3d(0,0,0);
+
+		int n;
+		if ((n = -node.m_ID[0]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[1]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[2]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+	}
+
 	// increase RHS counter
 	m_nrhs++;
 
