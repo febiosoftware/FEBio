@@ -308,6 +308,8 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
 	//		 in other words, we loose the material axis orientation
+	//		 For now, I solve this by copying the Q parameter
+	//       from the first element that the node connects to
 	FEElasticMaterialPoint pt;
 	pt.Init(true);
 
@@ -322,6 +324,11 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 
 		pt.F = node.Fi;
 		pt.J = pt.F.det();
+
+		// copy the orientation data of the first element adjacent to this node
+		// TODO: This will only really work when the fiber orientation field is
+		//       constant or sufficiently smooth.
+		pt.Q = m_NEL.ElementList(node.inode)[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->Q;
 
 		// calculate the stress
 		node.si = pme->Stress(pt);
@@ -782,11 +789,19 @@ tens4ds FEUT4Domain::Cvol(const tens4ds& C, const mat3ds& S)
 //! Calculates the nodal material stiffness contribution
 void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMaterial* pme)
 {
+	// get the number of elements this nodes connects
+	int NE = m_NEL.Valence(node.inode);
+	FEElement** ppe = m_NEL.ElementList(node.inode);
+	int* peli = m_NEL.ElementIndexList(node.inode);
+
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
 	//		 in other words, we loose the material axis orientation
+	//		 We solve this for now by copying the Q data from the
+	//       first element that connects to this node
 	FEElasticMaterialPoint pt;
 	pt.Init(true);
+	pt.Q = ppe[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->Q;
 
 	// set the material point data
 	pt.r0 = m_pMesh->Node(node.inode).m_r0;
@@ -819,11 +834,6 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMat
 	// extract the 'D' matrix
 	double D[6][6] = {0};
 	C.extract(D);
-
-	// get the number of elements this nodes connects
-	int NE = m_NEL.Valence(node.inode);
-	FEElement** ppe = m_NEL.ElementList(node.inode);
-	int* peli = m_NEL.ElementIndexList(node.inode);
 
 	// loop over all the elements
 	int i, j, ni, nj;
