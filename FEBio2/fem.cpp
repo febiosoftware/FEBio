@@ -18,6 +18,7 @@
 #include "FEBiphasic.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 
 // --- Global Constants Data ---
 // m_Const needs a definition, since static
@@ -355,6 +356,13 @@ void FEM::EvaluateMaterialParameters(FEMaterial* pm)
 {
 	// evaluate the materials' parameter list
 	EvaluateParameterList(pm->GetParameterList());
+
+	// evaluate fiber material properties for trans-iso materials
+	FETransverselyIsotropic* pti = dynamic_cast<FETransverselyIsotropic*>(pm);
+	if (pti)
+	{
+		EvaluateMaterialParameters(&pti->m_fib);
+	}
 
 	// for elastic and uncoupled elastic mixtures, as well as biphasic
 	// and biphasic-solute materials we also need to evaluate

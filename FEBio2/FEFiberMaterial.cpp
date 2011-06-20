@@ -2,6 +2,11 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEFiberMaterial, FEMaterial);
+	ADD_PARAMETER(m_ascl, FE_PARAM_DOUBLE, "ascl");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 // Fiber material stress
 //
 mat3ds FEFiberMaterial::Stress(FEMaterialPoint &mp)

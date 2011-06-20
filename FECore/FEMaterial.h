@@ -195,6 +195,8 @@ public:
 	double	m_beta;		//!< shape of peak isometric tension-sarcomere length relation
 	double	m_l0;		//!< unloaded length
 	double	m_refl;		//!< sarcomere length
+
+	DECLARE_PARAMETER_LIST();
 };
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

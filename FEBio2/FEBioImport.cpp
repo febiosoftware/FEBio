@@ -931,26 +931,24 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 	}
 	else if (tag == "active_contraction")
 	{
-/*		const char* szlc = tag.AttributeValue("lc", true);
-		int lc = 0;
-		if (szlc) lc = atoi(szlc);
-		pm->m_fib.m_lcna = lc;
-		tag.value(pm->m_fib.m_ascl);
-*/
-		if (!tag.isleaf())
+		const char* szlc = tag.AttributeValue("lc");
+		assert(szlc);
+		FEParameterList& pl = pm->m_fib.GetParameterList();
+		FEParam& p = *pl.Find("ascl");
+		p.m_nlc = atoi(szlc);
+		p.value<double>() = 1.0;
+
+		++tag;
+		do
 		{
+			if (tag == "ca0") tag.value(pm->m_fib.m_ca0);
+			else if (tag == "beta") tag.value(pm->m_fib.m_beta);
+			else if (tag == "l0") tag.value(pm->m_fib.m_l0);
+			else if (tag == "refl") tag.value(pm->m_fib.m_refl);
+			else throw XMLReader::InvalidTag(tag);
 			++tag;
-			do
-			{
-				if (tag == "ca0") tag.value(pm->m_fib.m_ca0);
-				else if (tag == "beta") tag.value(pm->m_fib.m_beta);
-				else if (tag == "l0") tag.value(pm->m_fib.m_l0);
-				else if (tag == "refl") tag.value(pm->m_fib.m_refl);
-				else throw XMLReader::InvalidTag(tag);
-				++tag;
-			}
-			while (!tag.isend());
 		}
+		while (!tag.isend());
 
 		// mark tag as read
 		return true;
