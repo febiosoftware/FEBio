@@ -387,95 +387,90 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 	static vector<double> fe(3);
 
 	// loop over all the nodes
-	for (i=0; i<m_pMesh->Nodes(); ++i)
+	int NN = (int) m_Node.size();
+	for (i=0; i<NN; ++i)
 	{
+		UT4NODE& node = m_Node[i];
+
 		// get the elements that belong to this list
-		int NE = m_NEL.Valence(i);
-		FEElement** ppel = m_NEL.ElementList(i);
-		int* peli = m_NEL.ElementIndexList(i);
+		int NE = m_NEL.Valence(node.inode);
+		FEElement** ppel = m_NEL.ElementList(node.inode);
+		int* peli = m_NEL.ElementIndexList(node.inode);
 
-		if (NE > 0)
+		// get the nodal deformation gradient
+		mat3d FI = node.Fi;
+
+		mat3ds S;
+		if (m_bdev)
 		{
-			assert(m_tag[i] >= 0);
+			S = node.si - node.si.dev()*m_alpha;
+		}
+		else
+		{
+			S = node.si*(1 - m_alpha);
+		}
 
-			UT4NODE& node = m_Node[ m_tag[i] ];
-			assert(node.inode == i);
+		// convert the Cauchy stress to a PK2-stress
+		S = cauchy_to_pk2(S, FI);
 
-			// get the nodal deformation gradient
-			mat3d FI = node.Fi;
+		// loop over all elements that belong to this node
+		for (n=0; n<NE; ++n)
+		{
+			FESolidElement& el = dynamic_cast<FESolidElement&>(*ppel[n]);
+			UnpackLM(el, elm);
 
-			mat3ds S;
-			if (m_bdev)
+			// calculate element volume
+			// TODO: we should store this somewhere instead of recalculating it
+			Ve = m_Ve0[peli[n]];
+
+			// The '-' sign is so that the internal forces get subtracted from the residual (R = Fext - Fint)
+			double w = -0.25* Ve;
+
+			// calculate the jacobian
+			invjac0(el, Ji, 0);
+
+			// get the shape function derivatives
+			const double* Gr, *Gs, *Gt;
+			Gr = el.Gr(0);
+			Gs = el.Gs(0);
+			Gt = el.Gt(0);
+
+			for (j=0; j<4; ++j)
 			{
-				S = node.si - node.si.dev()*m_alpha;
+				// calculate global gradient of shape functions
+				// note that we need the transposed of Ji, not Ji itself !
+				Gx[j] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
+				Gy[j] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
+				Gz[j] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
 			}
-			else
+
+			// get the element deformation gradient
+			mat3d Fe = FI;
+
+			// loop over element nodes
+			for (j=0; j<4; ++j)
 			{
-				S = node.si*(1 - m_alpha);
-			}
+				// setup nonlinear element B-matrix
+				Be[0][0] = Fe[0][0]*Gx[j]; Be[0][1] = Fe[1][0]*Gx[j]; Be[0][2] = Fe[2][0]*Gx[j];
+				Be[1][0] = Fe[0][1]*Gy[j]; Be[1][1] = Fe[1][1]*Gy[j]; Be[1][2] = Fe[2][1]*Gy[j];
+				Be[2][0] = Fe[0][2]*Gz[j]; Be[2][1] = Fe[1][2]*Gz[j]; Be[2][2] = Fe[2][2]*Gz[j];
+				Be[3][0] = Fe[0][0]*Gy[j] + Fe[0][1]*Gx[j]; Be[3][1] = Fe[1][0]*Gy[j] + Fe[1][1]*Gx[j]; Be[3][2] = Fe[2][0]*Gy[j] + Fe[2][1]*Gx[j];
+				Be[4][0] = Fe[0][1]*Gz[j] + Fe[0][2]*Gy[j]; Be[4][1] = Fe[1][1]*Gz[j] + Fe[1][2]*Gy[j]; Be[4][2] = Fe[2][1]*Gz[j] + Fe[2][2]*Gy[j];
+				Be[5][0] = Fe[0][2]*Gx[j] + Fe[0][0]*Gz[j]; Be[5][1] = Fe[1][2]*Gx[j] + Fe[1][0]*Gz[j]; Be[5][2] = Fe[2][2]*Gx[j] + Fe[2][0]*Gz[j];
 
-			// convert the Cauchy stress to a PK2-stress
-			S = cauchy_to_pk2(S, FI);
+				LM[0] = elm[3*j  ];
+				LM[1] = elm[3*j+1];
+				LM[2] = elm[3*j+2];
 
-			// loop over all elements that belong to this node
-			for (n=0; n<NE; ++n)
-			{
-				FESolidElement& el = dynamic_cast<FESolidElement&>(*ppel[n]);
-				UnpackLM(el, elm);
+				en[0] = el.m_node[j];
+	
+				// calculate nodal force
+				fe[0] = w*(Be[0][0]*S.xx() + Be[1][0]*S.yy() + Be[2][0]*S.zz() + Be[3][0]*S.xy() + Be[4][0]*S.yz() + Be[5][0]*S.xz());
+				fe[1] = w*(Be[0][1]*S.xx() + Be[1][1]*S.yy() + Be[2][1]*S.zz() + Be[3][1]*S.xy() + Be[4][1]*S.yz() + Be[5][1]*S.xz());
+				fe[2] = w*(Be[0][2]*S.xx() + Be[1][2]*S.yy() + Be[2][2]*S.zz() + Be[3][2]*S.xy() + Be[4][2]*S.yz() + Be[5][2]*S.xz());
 
-				// calculate element volume
-				// TODO: we should store this somewhere instead of recalculating it
-				Ve = m_Ve0[peli[n]];
-
-				// The '-' sign is so that the internal forces get subtracted from the residual (R = Fext - Fint)
-				double w = -0.25* Ve;
-
-				// calculate the jacobian
-				invjac0(el, Ji, 0);
-
-				// get the shape function derivatives
-				const double* Gr, *Gs, *Gt;
-				Gr = el.Gr(0);
-				Gs = el.Gs(0);
-				Gt = el.Gt(0);
-
-				for (j=0; j<4; ++j)
-				{
-					// calculate global gradient of shape functions
-					// note that we need the transposed of Ji, not Ji itself !
-					Gx[j] = Ji[0][0]*Gr[j]+Ji[1][0]*Gs[j]+Ji[2][0]*Gt[j];
-					Gy[j] = Ji[0][1]*Gr[j]+Ji[1][1]*Gs[j]+Ji[2][1]*Gt[j];
-					Gz[j] = Ji[0][2]*Gr[j]+Ji[1][2]*Gs[j]+Ji[2][2]*Gt[j];
-				}
-
-				// get the element deformation gradient
-				mat3d Fe = FI;
-
-				// loop over element nodes
-				for (j=0; j<4; ++j)
-				{
-					// setup nonlinear element B-matrix
-					Be[0][0] = Fe[0][0]*Gx[j]; Be[0][1] = Fe[1][0]*Gx[j]; Be[0][2] = Fe[2][0]*Gx[j];
-					Be[1][0] = Fe[0][1]*Gy[j]; Be[1][1] = Fe[1][1]*Gy[j]; Be[1][2] = Fe[2][1]*Gy[j];
-					Be[2][0] = Fe[0][2]*Gz[j]; Be[2][1] = Fe[1][2]*Gz[j]; Be[2][2] = Fe[2][2]*Gz[j];
-					Be[3][0] = Fe[0][0]*Gy[j] + Fe[0][1]*Gx[j]; Be[3][1] = Fe[1][0]*Gy[j] + Fe[1][1]*Gx[j]; Be[3][2] = Fe[2][0]*Gy[j] + Fe[2][1]*Gx[j];
-					Be[4][0] = Fe[0][1]*Gz[j] + Fe[0][2]*Gy[j]; Be[4][1] = Fe[1][1]*Gz[j] + Fe[1][2]*Gy[j]; Be[4][2] = Fe[2][1]*Gz[j] + Fe[2][2]*Gy[j];
-					Be[5][0] = Fe[0][2]*Gx[j] + Fe[0][0]*Gz[j]; Be[5][1] = Fe[1][2]*Gx[j] + Fe[1][0]*Gz[j]; Be[5][2] = Fe[2][2]*Gx[j] + Fe[2][0]*Gz[j];
-
-					LM[0] = elm[3*j  ];
-					LM[1] = elm[3*j+1];
-					LM[2] = elm[3*j+2];
-
-					en[0] = el.m_node[j];
-		
-					// calculate nodal force
-					fe[0] = w*(Be[0][0]*S.xx() + Be[1][0]*S.yy() + Be[2][0]*S.zz() + Be[3][0]*S.xy() + Be[4][0]*S.yz() + Be[5][0]*S.xz());
-					fe[1] = w*(Be[0][1]*S.xx() + Be[1][1]*S.yy() + Be[2][1]*S.zz() + Be[3][1]*S.xy() + Be[4][1]*S.yz() + Be[5][1]*S.xz());
-					fe[2] = w*(Be[0][2]*S.xx() + Be[1][2]*S.yy() + Be[2][2]*S.zz() + Be[3][2]*S.xy() + Be[4][2]*S.yz() + Be[5][2]*S.xz());
-
-					// assemble in global residual
-					psolver->AssembleResidual(en, LM, fe, R);
-				}
+				// assemble in global residual
+				psolver->AssembleResidual(en, LM, fe, R);
 			}
 		}
 	}
