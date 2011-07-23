@@ -241,12 +241,7 @@ bool FEPlotContactPressure::SaveSliding2(FESlidingSurface2 &s, vector<float>& a)
 		FESurfaceElement& el = s.Element(i);
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
-		for (int k=0; k<ni; ++k, ++nint)
-		{
-			double L = s.m_Lmd[nint];
-			ti[k] = L;// + pf->m_epsn*gi[k];
-			ti[k] = (ti[k]>=0?ti[k] : 0);		
-		}
+		for (int k=0; k<ni; ++k, ++nint) ti[k] = s.m_Ln[nint];
 
 		el.project_to_nodes(ti, tn);
 
@@ -270,12 +265,7 @@ bool FEPlotContactPressure::SaveSliding3(FESlidingSurface3 &s, vector<float>& a)
 		FESurfaceElement& el = s.Element(i);
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
-		for (int k=0; k<ni; ++k, ++nint)
-		{
-			double L = s.m_Lmd[nint];
-			ti[k] = L;// + pf->m_epsn*gi[k];
-			ti[k] = (ti[k]>=0?ti[k] : 0);		
-		}
+		for (int k=0; k<ni; ++k, ++nint) ti[k] = s.m_Ln[nint];
 		
 		el.project_to_nodes(ti, tn);
 		

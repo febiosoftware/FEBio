@@ -32,8 +32,14 @@ protected:
 	//! Calculates the internal fluid forces
 	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
 	
+	//! Calculates the internal fluid forces for steady-state response
+	bool InternalFluidWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	
 	//! calculates the element biphasic stiffness matrix
 	bool ElementBiphasicStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	
+	//! calculates the element biphasic stiffness matrix for steady-state response
+	bool ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);
 	
 	//! calculates the solid element stiffness matrix
 	void SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);

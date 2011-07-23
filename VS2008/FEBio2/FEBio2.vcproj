@@ -337,6 +337,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FECellGrowth.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.cpp"
 				>
 			</File>
@@ -944,6 +948,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEBox.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FECellGrowth.h"
 				>
 			</File>
 			<File

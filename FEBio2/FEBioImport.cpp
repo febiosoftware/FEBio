@@ -503,6 +503,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		const char* szt = tag.AttributeValue("type");
 		if      (strcmp(szt, "static" ) == 0) pstep->m_nanalysis = FE_STATIC;
 		else if (strcmp(szt, "dynamic") == 0) pstep->m_nanalysis = FE_DYNAMIC;
+		else if (strcmp(szt, "steady-state") == 0) pstep->m_nanalysis = FE_STEADY_STATE;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}
 	else if (tag == "restart" )

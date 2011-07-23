@@ -85,6 +85,7 @@ enum FE_Module_Type {
 enum FE_Analysis_Type {
 	FE_STATIC		= 0,
 	FE_DYNAMIC		= 1,
+	FE_STEADY_STATE	= 2
 };
 
 ///////////////////////////////////////////////////////////////////////////////

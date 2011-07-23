@@ -19,67 +19,130 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	// element force vector
 	vector<double> fe;
 
-	vector<int> lm;
+	vector<int> elm;
 	
 	int NE = m_Elem.size();
-	for (i=0; i<NE; ++i)
-	{
-		// get the element
-		FESolidElement& el = m_Elem[i];
-		
-		// this element should not be rigid
-		assert(!el.IsRigid());
-		
-		//! this element should not be UDG
-		assert(el.Type() != FE_UDGHEX);
-		
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
-		
-		// calculate internal force vector
-		// (This function is inherited from FEElasticSolidDomain)
-		InternalForces(el, fe);
-		
-		// apply body forces
-		// TODO: can we calculate body-forces with our formulation
-		//       of biphasic theory
-		/*
-		 if (fem.UseBodyForces())
-		 {
-		 BodyForces(fem, el, fe);
-		 }
-		 */
-
-		// Get the element's equation numbers
-		UnpackLM(el, lm);
-		
-		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
-		
-		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
-		assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
-		
-		// calculate fluid internal work
-		InternalFluidWork(fem, el, fe);
-		
-		// add fluid work to global residual
-		int neln = el.Nodes();
-		int J;
-		for (j=0; j<neln; ++j)
+	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+		for (i=0; i<NE; ++i)
 		{
-			J = lm[3*neln+j];
-			if (J >= 0) R[J] += fe[j];
+			// get the element
+			FESolidElement& el = m_Elem[i];
+			
+			// this element should not be rigid
+			assert(!el.IsRigid());
+			
+			//! this element should not be UDG
+			assert(el.Type() != FE_UDGHEX);
+			
+			// unpack the element
+			UnpackLM(el, elm);
+			
+			// get the element force vector and initialize it to zero
+			int ndof = 3*el.Nodes();
+			fe.assign(ndof, 0);
+			
+			// calculate internal force vector
+			// (This function is inherited from FEElasticSolidDomain)
+			InternalForces(el, fe);
+			
+			// apply body forces
+			// TODO: can we calculate body-forces with our formulation
+			//       of biphasic theory
+			/*
+			 if (fem.UseBodyForces())
+			 {
+			 BodyForces(fem, el, fe);
+			 }
+			 */
+			
+			// assemble element 'fe'-vector into global R vector
+			psolver->AssembleResidual(el.m_node, elm, fe, R);
+			
+			FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+			assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
+			
+			// calculate fluid internal work
+			InternalFluidWorkSS(fem, el, fe);
+			
+			// add fluid work to global residual
+			int neln = el.Nodes();
+			int J;
+			for (j=0; j<neln; ++j)
+			{
+				J = elm[3*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
+			
+			// calculate solute internal work
+			InternalSoluteWorkSS(fem, el, fe);
+			
+			// add solute work to global residual
+			for (j=0; j<neln; ++j)
+			{
+				J = elm[11*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
-		
-		// calculate solute internal work
-		InternalSoluteWork(fem, el, fe);
-		
-		// add solute work to global residual
-		for (j=0; j<neln; ++j)
+	} else {
+		for (i=0; i<NE; ++i)
 		{
-			J = lm[11*neln+j];
-			if (J >= 0) R[J] += fe[j];
+			// get the element
+			FESolidElement& el = m_Elem[i];
+			
+			// this element should not be rigid
+			assert(!el.IsRigid());
+			
+			//! this element should not be UDG
+			assert(el.Type() != FE_UDGHEX);
+			
+			// unpack the element
+			UnpackLM(el, elm);
+			
+			// get the element force vector and initialize it to zero
+			int ndof = 3*el.Nodes();
+			fe.assign(ndof, 0);
+			
+			// calculate internal force vector
+			// (This function is inherited from FEElasticSolidDomain)
+			InternalForces(el, fe);
+			
+			// apply body forces
+			// TODO: can we calculate body-forces with our formulation
+			//       of biphasic theory
+			/*
+			 if (fem.UseBodyForces())
+			 {
+			 BodyForces(fem, el, fe);
+			 }
+			 */
+			
+			// assemble element 'fe'-vector into global R vector
+			psolver->AssembleResidual(el.m_node, elm, fe, R);
+			
+			FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+			assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
+			
+			// calculate fluid internal work
+			InternalFluidWork(fem, el, fe);
+			
+			// add fluid work to global residual
+			int neln = el.Nodes();
+			int J;
+			for (j=0; j<neln; ++j)
+			{
+				J = elm[3*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
+			
+			// calculate solute internal work
+			InternalSoluteWork(fem, el, fe);
+			
+			// add solute work to global residual
+			for (j=0; j<neln; ++j)
+			{
+				J = elm[11*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
 	}
 }
@@ -189,6 +252,86 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 		for (i=0; i<neln; ++i)
 		{
 			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
+		}
+	}
+	
+	return true;
+}
+
+
+//-----------------------------------------------------------------------------
+//! calculates the internal equivalent nodal forces due to the fluid work
+//! for a steady-state analysis (zero solid velocity)
+//! Note that we only use the first n entries in fe, where n is the number
+//! of nodes
+
+bool FEBiphasicSoluteDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
+{
+	int i, n;
+	
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+	
+	// jacobian
+	double Ji[3][3], detJ;
+	
+	double *Gr, *Gs, *Gt, *H;
+	double Gx, Gy, Gz;
+	
+	// Bp-matrix
+	vector<double> B1(neln), B2(neln), B3(neln);
+	
+	// gauss-weights
+	double* wg = el.GaussWeights();
+	
+	// get the element's material
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (fem.GetMaterial(el.GetMatID()));
+	if (pm == 0)
+	{
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
+		return false;
+	}
+	
+	zero(fe);
+	
+	// get the time step value
+	double dt = fem.m_pStep->m_dt;
+	
+	// loop over gauss-points
+	for (n=0; n<nint; ++n)
+	{
+		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		
+		// calculate jacobian
+		detJ = invjact(el, Ji, n);
+		
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+		Gt = el.Gt(n);
+		
+		H = el.H(n);
+		
+		for (i=0; i<neln; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+			
+			// calculate Bp matrix
+			B1[i] = Gx;
+			B2[i] = Gy;
+			B3[i] = Gz;
+		}
+		
+		// get the flux
+		vec3d& w = pt.m_w;
+		
+		// update force vector
+		for (i=0; i<neln; ++i)
+		{
+			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z)*detJ*wg[n];
 		}
 	}
 	
@@ -362,6 +505,87 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 
 
 //-----------------------------------------------------------------------------
+//! calculates the internal equivalent nodal forces due to the fluid work
+//! for steady-state response (zero solid velocity, zero time derivative of
+//! solute concentration)
+//! Note that we only use the first n entries in fe, where n is the number
+//! of nodes
+
+bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
+{
+	int i, n;
+	
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+	
+	// jacobian
+	double Ji[3][3], detJ;
+	
+	double *Gr, *Gs, *Gt, *H;
+	double Gx, Gy, Gz;
+	
+	// Bp-matrix
+	vector<double> B1(neln), B2(neln), B3(neln);
+	
+	// gauss-weights
+	double* wg = el.GaussWeights();
+		
+	// get the element's material
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (fem.GetMaterial(el.GetMatID()));
+	if (pm == 0)
+	{
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
+		return false;
+	}
+	
+	zero(fe);
+	
+	// get the time step value
+	double dt = fem.m_pStep->m_dt;
+	
+	// loop over gauss-points
+	for (n=0; n<nint; ++n)
+	{
+		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		
+		// calculate jacobian
+		detJ = invjact(el, Ji, n);
+				
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+		Gt = el.Gt(n);
+		
+		H = el.H(n);
+		
+		for (i=0; i<neln; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+			
+			// calculate Bp matrix
+			B1[i] = Gx;
+			B2[i] = Gy;
+			B3[i] = Gz;
+		}
+		
+		// get the solute flux
+		vec3d& j = pt.m_j;
+		
+		// update force vector
+		for (i=0; i<neln; ++i)
+		{
+			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z)*detJ*wg[n];
+		}
+	}
+	
+	return true;
+}
+
+
+//-----------------------------------------------------------------------------
 
 void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
@@ -374,43 +598,86 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
-	for (int iel=0; iel<NE; ++iel)
-	{
-		FESolidElement& el = m_Elem[iel];
-		
-		// this element should not be rigid
-		assert(!el.IsRigid());
-		
-		// get the elements material
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-		assert(dynamic_cast<FEBiphasicSolute*>(pmat) != 0);
-		
-		// allocate stiffness matrix
-		int neln = el.Nodes();
-		int ndof = neln*5;
-		ke.Create(ndof, ndof);
-		
-		// calculate the element stiffness matrix
-		ElementBiphasicSoluteStiffness(fem, el, ke);
-		
-		// TODO: the problem here is that the LM array that is returned by the UnpackElement
-		// function does not give the equation numbers in the right order. For this reason we
-		// have to create a new lm array and place the equation numbers in the right order.
-		// What we really ought to do is fix the UnpackElement function so that it returns
-		// the LM vector in the right order for solute-solid elements.
-		UnpackLM(el, elm);
-		vector<int> lm(ndof);
-		for (int i=0; i<neln; ++i)
+	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+		for (int iel=0; iel<NE; ++iel)
 		{
-			lm[5*i  ] = elm[3*i];
-			lm[5*i+1] = elm[3*i+1];
-			lm[5*i+2] = elm[3*i+2];
-			lm[5*i+3] = elm[3*neln+i];
-			lm[5*i+4] = elm[11*neln+i];
+			FESolidElement& el = m_Elem[iel];
+			
+			// this element should not be rigid
+			assert(!el.IsRigid());
+			
+			UnpackLM(el, elm);
+			
+			// get the elements material
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(dynamic_cast<FEBiphasicSolute*>(pmat) != 0);
+			
+			// allocate stiffness matrix
+			int neln = el.Nodes();
+			int ndof = neln*5;
+			ke.Create(ndof, ndof);
+			
+			// calculate the element stiffness matrix
+			ElementBiphasicSoluteStiffnessSS(fem, el, ke);
+			
+			// TODO: the problem here is that the LM array that is returned by the UnpackLM
+			// function does not give the equation numbers in the right order. For this reason we
+			// have to create a new lm array and place the equation numbers in the right order.
+			// What we really ought to do is fix the UnpackLM function so that it returns
+			// the LM vector in the right order for solute-solid elements.
+			vector<int> lm(ndof);
+			for (int i=0; i<neln; ++i)
+			{
+				lm[5*i  ] = elm[3*i];
+				lm[5*i+1] = elm[3*i+1];
+				lm[5*i+2] = elm[3*i+2];
+				lm[5*i+3] = elm[3*neln+i];
+				lm[5*i+4] = elm[11*neln+i];
+			}
+			
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
-		
-		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+	} else {
+		for (int iel=0; iel<NE; ++iel)
+		{
+			FESolidElement& el = m_Elem[iel];
+			
+			// this element should not be rigid
+			assert(!el.IsRigid());
+			
+			UnpackLM(el, elm);
+			
+			// get the elements material
+			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			assert(dynamic_cast<FEBiphasicSolute*>(pmat) != 0);
+			
+			// allocate stiffness matrix
+			int neln = el.Nodes();
+			int ndof = neln*5;
+			ke.Create(ndof, ndof);
+			
+			// calculate the element stiffness matrix
+			ElementBiphasicSoluteStiffness(fem, el, ke);
+			
+			// TODO: the problem here is that the LM array that is returned by the UnpackLM
+			// function does not give the equation numbers in the right order. For this reason we
+			// have to create a new lm array and place the equation numbers in the right order.
+			// What we really ought to do is fix the UnpackLM function so that it returns
+			// the LM vector in the right order for solute-solid elements.
+			vector<int> lm(ndof);
+			for (int i=0; i<neln; ++i)
+			{
+				lm[5*i  ] = elm[3*i];
+				lm[5*i+1] = elm[3*i+1];
+				lm[5*i+2] = elm[3*i+2];
+				lm[5*i+3] = elm[3*neln+i];
+				lm[5*i+4] = elm[11*neln+i];
+			}
+			
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
+		}
 	}
 }
 
@@ -440,15 +707,15 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 	
 	FEMesh& mesh = fem.m_mesh;
 	
-	vec3d r0[8], rt[8], rp[8], vt[8];
+	vec3d r0[8], rt[8], rp[8], v[8];
 	double cp[8];
 	for (i=0; i<neln; ++i) 
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		vt[i] = mesh.Node(el.m_node[i]).m_vt;
 		cp[i] = mesh.Node(el.m_node[i]).m_cp;
+		v[i]  = mesh.Node(el.m_node[i]).m_vt;
 	}
 	
 	// zero stiffness matrix
@@ -531,10 +798,10 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 			Fp[0][2] += rp[i].x*GZ; Fp[1][2] += rp[i].y*GZ; Fp[2][2] += rp[i].z*GZ;
 			
 			// calculate solid velocity and its gradient
-			vs += vt[i]*H[i];
-			gradv[0][0] += vt[i].x*Gx; gradv[1][0] += vt[i].y*Gx; gradv[2][0] += vt[i].z*Gx;
-			gradv[0][1] += vt[i].x*Gy; gradv[1][1] += vt[i].y*Gy; gradv[2][1] += vt[i].z*Gy;
-			gradv[0][2] += vt[i].x*Gz; gradv[1][2] += vt[i].y*Gz; gradv[2][2] += vt[i].z*Gz;
+			vs += v[i]*H[i];
+			gradv[0][0] += v[i].x*Gx; gradv[1][0] += v[i].y*Gx; gradv[2][0] += v[i].z*Gx;
+			gradv[0][1] += v[i].x*Gy; gradv[1][1] += v[i].y*Gy; gradv[2][1] += v[i].z*Gy;
+			gradv[0][2] += v[i].x*Gz; gradv[1][2] += v[i].y*Gz; gradv[2][2] += v[i].z*Gz;
 			
 			// calculate Bp matrix
 			B1[i] = Gx;
@@ -684,6 +951,226 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 				qcc = -H[j]*((phiw+J*dpdJ)*divv*(kappa+c*dkdc)
 				+phiw*((2*dkdc+c*dkdcc)*dcdt+(kappa+c*dkdc)/dt+dJdt*(dkdJ+c*dkdJc)));
 				ke[5*i+4][5*j+4] += (gradN[i]*jc + H[i]*qcc)*(tmp*dt);
+				
+			}
+		}
+	}
+	
+	// Enforce symmetry by averaging top-right and bottom-left corners of stiffness matrix
+	if (bsymm) {
+		for (i=0; i<5*neln; ++i)
+			for (j=i+1; j<5*neln; ++j) {
+				tmp = 0.5*(ke[i][j]+ke[j][i]);
+				ke[i][j] = ke[j][i] = tmp;
+			}
+	}
+	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! calculates element stiffness matrix for element iel
+//!
+bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke)
+{
+	int i, j, n;
+	
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+	
+	double *Gr, *Gs, *Gt, *H;
+	double Gx, Gy, Gz;
+	
+	// jacobian
+	double Ji[3][3], detJ;
+	
+	// Bp-matrix
+	vector<double> B1(neln), B2(neln), B3(neln);
+	vector<vec3d> gradN(neln);
+	double tmp;
+	
+	// gauss-weights
+	double* gw = el.GaussWeights();
+		
+	// zero stiffness matrix
+	ke.zero();
+	
+	// calculate solid stiffness matrix
+	int ndof = 3*el.Nodes();
+	matrix ks(ndof, ndof); ks.zero();
+	SolidElementStiffness(fem, el, ks);
+	
+	// copy solid stiffness matrix into ke
+	for (i=0; i<neln; ++i)
+		for (j=0; j<neln; ++j)
+		{
+			ke[5*i  ][5*j] = ks[3*i  ][3*j  ]; ke[5*i  ][5*j+1] = ks[3*i  ][3*j+1]; ke[5*i  ][5*j+2] = ks[3*i  ][3*j+2];
+			ke[5*i+1][5*j] = ks[3*i+1][3*j  ]; ke[5*i+1][5*j+1] = ks[3*i+1][3*j+1]; ke[5*i+1][5*j+2] = ks[3*i+1][3*j+2];
+			ke[5*i+2][5*j] = ks[3*i+2][3*j  ]; ke[5*i+2][5*j+1] = ks[3*i+2][3*j+1]; ke[5*i+2][5*j+2] = ks[3*i+2][3*j+2];
+		}
+	
+	// get the element's material
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (fem.GetMaterial(el.GetMatID()));
+	if (pm == 0)
+	{
+		clog.printbox("FATAL ERROR", "Incorrect material type\n");
+		return false;
+	}
+	
+	// check if we use the symmetric version of the poro-implementation
+	bool bsymm = fem.m_bsym_poro;
+	double dt = fem.m_pStep->m_dt;
+	
+	// loop over gauss-points
+	for (n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
+		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		
+		// calculate jacobian
+		detJ = invjact(el, Ji, n);
+		
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+		Gt = el.Gt(n);
+		
+		H = el.H(n);
+		
+		for (i=0; i<neln; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+			
+			// calculate Bp matrix
+			B1[i] = Gx;
+			B2[i] = Gy;
+			B3[i] = Gz;
+			gradN[i] = vec3d(Gx,Gy,Gz);
+		}
+		
+		// next we get the determinant
+		double J = ept.J;
+		
+		// get the fluid flux and pressure gradient
+		vec3d w = pt.m_w;
+		vec3d gradp = pt.m_gradp;
+		
+		// get the effective concentration, its gradient and its time derivative
+		double c = pt.m_c;
+		vec3d gradc = pt.m_gradc;
+		
+		// evaluate the permeability and its derivatives
+		mat3ds K = pm->m_pPerm->Permeability(mp);
+		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
+		mat3ds dKdc = pm->m_pPerm->Tangent_Permeability_Concentration(mp); 
+		
+		// evaluate the porosity and its derivative
+		double phiw = pm->Porosity(mp);
+		double phis = 1. - phiw;
+		double dpdJ = phis/J;
+		
+		// evaluate the solubility and its derivatives
+		double kappa = pm->m_pSolub->Solubility(mp);
+		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
+		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp);
+		
+		// evaluate the diffusivity tensor and its derivatives
+		mat3ds D = pm->m_pDiff->Diffusivity(mp);
+		mat3ds dDdc = pm->m_pDiff->Tangent_Diffusivity_Concentration(mp);
+		tens4ds dDdE = pm->m_pDiff->Tangent_Diffusivity_Strain(mp);
+		
+		// evaluate the solute free diffusivity
+		double D0 = pm->m_pDiff->Free_Diffusivity(mp);
+		double dD0dc = 0;	// TODO: temporary, until I implement it in FESoluteDiffusivity
+		
+		// evaluate the osmotic coefficient and its derivatives
+		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
+		double dodc = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp);
+		
+		// evaluate the stress tangent with concentration
+		mat3ds dTdc = pm->m_pSolid->Tangent_Concentration(mp);
+		
+		// Miscellaneous constants
+		mat3dd I(1);
+		double R = pm->m_Rgas;
+		double T = pm->m_Tabs;
+		
+		// evaluate the effective permeability and its derivatives
+		mat3ds Ki = K.inverse();
+		mat3ds ImD = I-D/D0;
+		mat3ds Ke = (Ki + ImD*(R*T*kappa*c/phiw/D0)).inverse();
+		tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
+		+dyad1s(ImD,I)*(R*T*c*J/D0/2/phiw*(dkdJ-kappa/phiw*dpdJ))
+		+(dyad1s(I) - dyad4s(I)*2 - dDdE/D0)*(R*T*kappa*c/phiw/D0);
+		tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
+		mat3ds Gc = -Ki*dKdc*Ki + ImD*(R*T/phiw/D0*(dkdc*c+kappa-kappa*c/D0*dD0dc))
+		+R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
+		mat3ds dKedc = -Ke*Gc*Ke;
+		
+		// calculate all the matrices
+		vec3d vtmp,gp,gc,wc,jc;
+		mat3d wu,ju;
+		tmp = detJ*gw[n];
+		for (i=0; i<neln; ++i)
+		{
+			for (j=0; j<neln; ++j)
+			{
+				// calculate the kpu matrix
+				gp = gradp+(D*gradc)*R*T*kappa/D0;
+				wu = vdotTdotv(-gp, dKedE, gradN[j])
+				-(((Ke*(D*gradc)) & gradN[j])*(J*dkdJ - kappa)
+				  +Ke*(2*kappa*(gradN[j]*(D*gradc))))*R*T/D0
+				- Ke*vdotTdotv(gradc, dDdE, gradN[j])*(kappa*R*T/D0);
+				vtmp = (wu.transpose()*gradN[i])*(tmp*dt);
+				ke[5*i+3][5*j  ] += vtmp.x;
+				ke[5*i+3][5*j+1] += vtmp.y;
+				ke[5*i+3][5*j+2] += vtmp.z;
+				
+				// calculate the kcu matrix
+				gc = -gradc*phiw + w*c/D0;
+				ju = ((D*gc) & gradN[j])*(J*dkdJ) 
+				+ vdotTdotv(gc, dDdE, gradN[j])*kappa
+				+ (((D*gradc) & gradN[j])*(-phis)
+				   +(D*((gradN[j]*w)*2) - ((D*w) & gradN[j]))*c/D0
+				   )*kappa
+				+D*wu*(kappa*c/D0);
+				vtmp = (ju.transpose()*gradN[i])*(tmp*dt);
+				ke[5*i+4][5*j  ] += vtmp.x;
+				ke[5*i+4][5*j+1] += vtmp.y;
+				ke[5*i+4][5*j+2] += vtmp.z;
+				
+				// calculate the kup matrix
+				vtmp = -gradN[i]*H[j]*tmp;
+				ke[5*i  ][5*j+3] += vtmp.x;
+				ke[5*i+1][5*j+3] += vtmp.y;
+				ke[5*i+2][5*j+3] += vtmp.z;
+				
+				// calculate the kpp matrix
+				ke[5*i+3][5*j+3] -= gradN[i]*(Ke*gradN[j])*(tmp*dt);
+				
+				// calculate the kcp matrix
+				ke[5*i+4][5*j+3] -= (gradN[i]*((D*Ke)*gradN[j]))*(kappa*c/D0)*(tmp*dt);
+				
+				// calculate the kuc matrix
+				vtmp = (dTdc*gradN[i] - gradN[i]*(R*T*(dodc*kappa*c+osmc*dkdc*c+osmc*kappa)))*H[j]*tmp;
+				ke[5*i  ][5*j+4] += vtmp.x;
+				ke[5*i+1][5*j+4] += vtmp.y;
+				ke[5*i+2][5*j+4] += vtmp.z;
+				
+				// calculate the kpc matrix
+				wc = (dKedc*gp)*(-H[j])
+				-Ke*((((D*(dkdc-kappa*dD0dc/D0)+dDdc*(kappa/D0))*gradc)*H[j]
+					  +(D*gradN[j])*kappa)*(R*T/D0));
+				ke[5*i+3][5*j+4] += (gradN[i]*wc)*(tmp*dt);
+				
+				// calculate the kcc matrix
+				jc = ((D*dkdc+dDdc*kappa)*gc)*H[j]
+				+D*((-gradN[j]*phiw+wc*(c/D0))*kappa);
+				ke[5*i+4][5*j+4] += (gradN[i]*jc)*(tmp*dt);
 				
 			}
 		}
@@ -895,7 +1382,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 		// get the integration weights
 		gw = el.GaussWeights();
 
-		// get the nodal coordinates
+		// get the nodal data
 		for (int j=0; j<neln; ++j)
 		{
 			r0[j] = mesh.Node(el.m_node[j]).m_r0;

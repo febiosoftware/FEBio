@@ -145,8 +145,9 @@ void echo_input(FEM& fem)
 	const char* szan = 0;
 	switch (step.m_nanalysis)
 	{
-	case FE_STATIC : szan = "quasi-static"; break;
-	case FE_DYNAMIC: szan = "dynamic"     ; break;
+	case FE_STATIC      : szan = "quasi-static"; break;
+	case FE_DYNAMIC     : szan = "dynamic"     ; break;
+	case FE_STEADY_STATE: szan = "steady-state"; break;
 	default:
 		szan = "unknown";
 		assert(false);

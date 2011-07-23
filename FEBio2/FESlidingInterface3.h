@@ -40,6 +40,8 @@ public:
 	vector<double>				m_Lmc;	//!< lagrange multipliers for solute concentrations
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
 	vector<int>					m_nei;	//!< surface element indices into arrays
+	vector<double>				m_Ln;	//!< net contact pressure
+	vector<int>					m_pmi;	//!< index of master element of projected integration point
 	
 	vector<double>	m_epsn;	//!< penalty factors
 	vector<double>	m_epsp;	//!< pressure penalty factors
@@ -76,7 +78,10 @@ public:
 	
 	//! calculate contact stiffness
 	void ContactStiffness();
-	
+
+	//! calculate contact pressures for file output
+	void UpdateContactPressures();
+
 	//! calculate Lagrangian augmentations
 	bool Augment(int naug);
 	
@@ -130,6 +135,10 @@ public:
 	double	m_Tabs;		//!< absolute temperature
 	double	m_ambp;		//!< ambient pressure
 	double	m_ambc;		//!< ambient concentration
+	int		m_aplc;		//!< ambient pressure load curve
+	int		m_aclc;		//!< ambient concentration load curve
+	FELoadCurve* m_pplc;	//!< pointer to ambient pressure load curve
+	FELoadCurve* m_pclc;	//!< pointer to ambient concentration load curve
 
 	DECLARE_PARAMETER_LIST();
 };

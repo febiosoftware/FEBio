@@ -417,6 +417,15 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "sxy") == 0) m_data.push_back(SXY);
 		else if (strcmp(sz, "syz") == 0) m_data.push_back(SYZ);
 		else if (strcmp(sz, "sxz") == 0) m_data.push_back(SXZ);
+		else if (strcmp(sz, "Fx" ) == 0) m_data.push_back(FX );
+		else if (strcmp(sz, "Fy" ) == 0) m_data.push_back(FY );
+		else if (strcmp(sz, "Fz" ) == 0) m_data.push_back(FZ );
+		else if (strcmp(sz, "Fyz") == 0) m_data.push_back(FYZ);
+		else if (strcmp(sz, "Fzx") == 0) m_data.push_back(FZX);
+		else if (strcmp(sz, "Fxy") == 0) m_data.push_back(FXY);
+		else if (strcmp(sz, "Fyx") == 0) m_data.push_back(FYX);
+		else if (strcmp(sz, "Fxz") == 0) m_data.push_back(FXZ);
+		else if (strcmp(sz, "Fzy") == 0) m_data.push_back(FZY);
 		else if (strcmp(sz, "p"  ) == 0) m_data.push_back(P  );
 		else if (strcmp(sz, "wx" ) == 0) m_data.push_back(WX );
 		else if (strcmp(sz, "wy" ) == 0) m_data.push_back(WY );
@@ -478,6 +487,15 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case SXY: val += pt.s.xy(); break;
 			case SYZ: val += pt.s.yz(); break;
 			case SXZ: val += pt.s.xz(); break;
+			case FX: val += pt.F(0,0); break;
+			case FY: val += pt.F(1,1); break;
+			case FZ: val += pt.F(2,2); break;
+			case FYZ: val += pt.F(1,2); break;
+			case FZX: val += pt.F(2,0); break;
+			case FXY: val += pt.F(0,1); break;
+			case FYX: val += pt.F(1,0); break;
+			case FXZ: val += pt.F(0,2); break;
+			case FZY: val += pt.F(2,1); break;
 			}
 
 			if (fem.m_pStep->m_nModule == FE_POROELASTIC)
@@ -543,6 +561,15 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case SXY: val += pt.s.xy(); break;
 			case SYZ: val += pt.s.yz(); break;
 			case SXZ: val += pt.s.xz(); break;
+			case FX: val += pt.F(0,0); break;
+			case FY: val += pt.F(1,1); break;
+			case FZ: val += pt.F(2,2); break;
+			case FYZ: val += pt.F(1,2); break;
+			case FZX: val += pt.F(2,0); break;
+			case FXY: val += pt.F(0,1); break;
+			case FYX: val += pt.F(1,0); break;
+			case FXZ: val += pt.F(0,2); break;
+			case FZY: val += pt.F(2,1); break;
 			}
 		}
 		val /= nint;

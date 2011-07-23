@@ -61,6 +61,8 @@ void FESlidingSurface2::Init()
 	m_pme.assign(nint, static_cast<FESurfaceElement*>(0));
 	m_epsn.assign(nint, 1.0);
 	m_epsp.assign(nint, 1.0);
+	m_Ln.assign(nint, 0.0);
+	m_pmi.assign(nint, -1);
 
 	m_nn.assign(Nodes(), 0);
 
@@ -108,7 +110,9 @@ void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 {
 	m_Lmd = s.m_Lmd;
 	m_gap = s.m_gap;
+	m_Ln = s.m_Ln;
 	zero(m_pme);
+	m_pmi = s.m_pmi;
 	m_bporo = s.m_bporo;
 
 	if (m_bporo)
@@ -185,6 +189,8 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar << m_epsp;
 		ar << m_nn;
 		ar << m_pg;
+		ar << m_Ln;
+		ar << m_pmi;
 
 		int ne = (int) m_pme.size();
 		ar << ne;
@@ -206,6 +212,8 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar >> m_epsp;
 		ar >> m_nn;
 		ar >> m_pg;
+		ar >> m_Ln;
+		ar >> m_pmi;
 
 		assert(m_pSibling);
 
@@ -421,6 +429,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 {
 	FEMesh& mesh = m_pfem->m_mesh;
 	FESurfaceElement* pme;
+	int pmi;
 	vec3d r, nu;
 	double rs[2];
 	double Ln;
@@ -434,7 +443,6 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
-
 		bool sporo = PoroStatus(mesh, el);
 
 		int ne = el.Nodes();
@@ -459,6 +467,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 
 			// first see if the old intersected face is still good enough
 			pme = ss.m_pme[n];
+			pmi = ss.m_pmi[n];
 			if (pme)
 			{
 				double g;
@@ -469,13 +478,18 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 					ss.m_rs[n][0] = rs[0];
 					ss.m_rs[n][1] = rs[1];
 				}
-				else pme = 0;
+				else
+				{
+					pme = 0;
+					pmi = -1;
+				}
 			}
 
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, m_stol);
+			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, m_stol, &pmi);
 
 			ss.m_pme[n] = pme;
+			ss.m_pmi[n] = pmi;
 			ss.m_nu[n] = nu;
 			ss.m_rs[n][0] = rs[0];
 			ss.m_rs[n][1] = rs[1];
@@ -567,6 +581,9 @@ void FESlidingInterface2::Update()
 	// this will update the gap functions as well
 	ProjectSurface(m_ss, m_ms, bupseg);
 	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupseg);
+
+	// Update the net contact pressures
+	UpdateContactPressures();
 
 	// set poro flag
 	bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
@@ -1326,6 +1343,58 @@ void FESlidingInterface2::ContactStiffness()
 					
 					// assemble the global stiffness
 					psolver->AssembleStiffness(en, LM, ke);
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingInterface2::UpdateContactPressures()
+{
+	int np, n, i, j, k;
+	int npass = (m_btwo_pass?2:1);
+	for (np=0; np<npass; ++np)
+	{
+		FESlidingSurface2& ss = (np == 0? m_ss : m_ms);
+		FESlidingSurface2& ms = (np == 0? m_ms : m_ss);
+		
+		// keep a running counter of integration points.
+		int ni = 0;
+		
+		// loop over all elements of the primary surface
+		for (n=0; n<ss.Elements(); ++n)
+		{
+			FESurfaceElement& el = ss.Element(n);
+			int nint = el.GaussPoints();
+			
+			// get the normal tractions at the integration points
+			double gap, eps;
+			int pmi;
+			for (i=0; i<nint; ++i, ++ni) 
+			{
+				gap = ss.m_gap[ni];
+				eps = m_epsn*ss.m_epsn[ni];
+				ss.m_Ln[ni] = MBRACKET(ss.m_Lmd[ni] + eps*gap);
+				pmi = ss.m_pmi[ni];
+				if ((m_btwo_pass) && (pmi != -1))
+				{
+					FESurfaceElement pme = ms.Element(pmi);
+					int mint = pme.GaussPoints();
+					int noff = ms.m_nei[pmi];
+					double ti[4];
+					for (j=0; j<mint; ++j) {
+						k = noff+j;
+						gap = ms.m_gap[k];
+						eps = m_epsn*ms.m_epsn[k];
+						ti[j] = MBRACKET(ms.m_Lmd[k] + m_epsn*ms.m_epsn[k]*ms.m_gap[k]);
+					}
+					// project the data to the nodes
+					double tn[4];
+					pme.project_to_nodes(ti, tn);
+					// now evaluate the traction at the intersection point
+					double Ln = pme.eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);
+					ss.m_Ln[ni] += MBRACKET(Ln);
 				}
 			}
 		}

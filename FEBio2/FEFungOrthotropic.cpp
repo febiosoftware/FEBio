@@ -28,13 +28,16 @@ void FEFungOrthotropic::Init()
 	if (E1 <= 0) throw MaterialError("E1 should be positive");
 	if (E2 <= 0) throw MaterialError("E2 should be positive");
 	if (E3 <= 0) throw MaterialError("E3 should be positive");
+
+	if (G12 < 0) throw MaterialError("G12 should be positive");
+	if (G23 < 0) throw MaterialError("G23 should be positive");
+	if (G31 < 0) throw MaterialError("G31 should be positive");
 	
 	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
 	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
 	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
 	
 	if (m_c <= 0) throw MaterialError("c should be positive");
-	if (m_K < 0) throw MaterialError("K should be positive");
 	
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;

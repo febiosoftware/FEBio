@@ -89,7 +89,9 @@ public:
 
 class ElementDataRecord : public DataRecord
 {
-	enum {X, Y, Z, J, EX, EY, EZ, EXY, EYZ, EXZ, SX, SY, SZ, SXY, SYZ, SXZ, P, WX, WY, WZ, C, JX, JY, JZ};
+	enum {X, Y, Z, J, EX, EY, EZ, EXY, EYZ, EXZ, SX, SY, SZ, SXY, SYZ, SXZ, 
+		FX, FY, FZ, FYZ, FZX, FXY, FYX, FXZ, FZY, 
+		P, WX, WY, WZ, C, JX, JY, JZ};
 
 	struct ELEMREF
 	{

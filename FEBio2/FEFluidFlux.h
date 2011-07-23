@@ -48,11 +48,20 @@ protected:
 	//! calculate stiffness for an element
 	void FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& vn, double dt, bool mixture);
 
+	//! calculate stiffness for an element, for steady-state analysis
+	void FluxStiffnessSS(FESurfaceElement& el, matrix& ke, vector<double>& vn, double dt, bool mixture);
+
 	//! Calculates volumetric flow rate due to flux
 	bool FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt, bool mixture);
 
+	//! Calculates volumetric flow rate due to flux, for steady-state analysis
+	bool FlowRateSS(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt, bool mixture);
+
 	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower)
 	bool LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt, bool mixture);
+
+	//! Calculates the linear volumetric flow rate due to flux (ie. non-follower), for steady-state analysis
+	bool LinearFlowRateSS(FESurfaceElement& el, vector<double>& fe, vector<double>& vn, double dt, bool mixture);
 
 protected:
 	bool	m_bmixture;		//!< mixture velocity or relative fluid flux
