@@ -135,10 +135,6 @@ public:
 	double	m_Tabs;		//!< absolute temperature
 	double	m_ambp;		//!< ambient pressure
 	double	m_ambc;		//!< ambient concentration
-	int		m_aplc;		//!< ambient pressure load curve
-	int		m_aclc;		//!< ambient concentration load curve
-	FELoadCurve* m_pplc;	//!< pointer to ambient pressure load curve
-	FELoadCurve* m_pclc;	//!< pointer to ambient concentration load curve
 
 	DECLARE_PARAMETER_LIST();
 };

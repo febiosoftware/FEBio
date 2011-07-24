@@ -304,8 +304,6 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_ambp = 0;
 	m_ambc = 0;
 	m_bautopen = false;
-	m_aplc = -1;
-	m_aclc = -1;
 	
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -325,10 +323,6 @@ void FESlidingInterface3::Init()
 {
 	m_Rgas = FEM::GetGlobalConstant("R");
 	m_Tabs = FEM::GetGlobalConstant("T");
-
-	// set ambient condition load curves
-	if (m_aplc >= 0) m_pplc = m_pfem->GetLoadCurve(m_aplc);
-	if (m_aclc >= 0) m_pclc = m_pfem->GetLoadCurve(m_aclc);
 
 	// initialize surface data
 	m_ss.Init();
@@ -2018,10 +2012,6 @@ void FESlidingInterface3::SetAmbient()
 {	
 	int i, np;
 
-	// Extract ambient conditions
-	double ambp = m_pplc ? m_ambp*m_pplc->Value() : m_ambp;
-	double ambc = m_pclc ? m_ambc*m_pclc->Value() : m_ambc;
-	
 	// Set the pressure to zero for the free-draining nodes
 	for (np=0; np<2; ++np)
 	{
@@ -2035,7 +2025,7 @@ void FESlidingInterface3::SetAmbient()
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition
-					node.m_pt = ambp;
+					node.m_pt = m_ambp;
 				}
 			}
 		}
@@ -2047,7 +2037,7 @@ void FESlidingInterface3::SetAmbient()
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition
-					node.m_ct = ambc;
+					node.m_ct = m_ambc;
 				}
 			}
 		}
