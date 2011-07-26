@@ -545,6 +545,13 @@ double FEM::GetGlobalConstant(const string& s)
 }
 
 //-----------------------------------------------------------------------------
+double FEM::GetGlobalConstant(const char* c)
+{
+	string s(c);
+	return GetGlobalConstant(s);
+}
+
+//-----------------------------------------------------------------------------
 //! Returns the elastic component of the material, identified by id
 FEElasticMaterial* FEM::GetElasticMaterial(int id)
 {
