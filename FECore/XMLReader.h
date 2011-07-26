@@ -99,6 +99,8 @@ public:
 
 	class Error{};
 
+	class EndOfFile{};
+
 	class UnexpectedEOF{};
 
 	class XMLSyntaxError{};
@@ -165,14 +167,7 @@ public:
 	int GetCurrentLine() { return m_nline; }
 
 protected:
-	char GetChar() 
-	{
-		char ch;
-		while ((ch=fgetc(m_fp))=='\n') ++m_nline;
-		if (feof(m_fp)) throw UnexpectedEOF();
-		return ch;
-	}
-
+	char GetChar();
 	void ReadTag(XMLTag& tag);
 	void ReadValue(XMLTag& tag);
 	void ReadEndTag(XMLTag& tag);

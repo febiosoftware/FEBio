@@ -247,9 +247,9 @@ void XMLReader::NextTag(XMLTag& tag)
 			ReadEndTag(tag);
 		}
 	}
-	catch (UnexpectedEOF)
+	catch (EndOfFile)
 	{
-		if (!tag.isend()) throw;
+		if (!tag.isend()) throw UnexpectedEOF();
 	}
 
 	// store current line number
@@ -443,4 +443,14 @@ void XMLReader::ReadEndTag(XMLTag& tag)
 		// make sure the name is the same as the root
 		if (strcmp(tag.m_sztag, tag.m_szroot[tag.m_nlevel]) != 0) throw UnmatchedEndTag(tag);
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Read the next character in the file.
+char XMLReader::GetChar()
+{
+	char ch;
+	while ((ch=fgetc(m_fp))=='\n') ++m_nline;
+	if (feof(m_fp)) throw EndOfFile();
+	return ch;
 }
