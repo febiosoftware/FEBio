@@ -2,6 +2,8 @@
 
 #include "mat3d.h"
 #include "DumpFile.h"
+#include <vector>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 //! Material point class
@@ -255,56 +257,94 @@ public:
 //-----------------------------------------------------------------------------
 
 class FESolutePoroElasticMaterialPoint : public FEMaterialPoint
+{
+public:
+	FESolutePoroElasticMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+	
+	FEMaterialPoint* Copy()
 	{
-	public:
-		FESolutePoroElasticMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
-		
-		FEMaterialPoint* Copy()
+		FESolutePoroElasticMaterialPoint* pt = new FESolutePoroElasticMaterialPoint(*this);
+		if (m_pt) pt->m_pt = m_pt->Copy();
+		return pt;
+	}
+	
+	void Serialize(DumpFile& ar)
+	{
+		if (ar.IsSaving())
 		{
-			FESolutePoroElasticMaterialPoint* pt = new FESolutePoroElasticMaterialPoint(*this);
-			if (m_pt) pt->m_pt = m_pt->Copy();
-			return pt;
+			ar << m_p << m_gradp << m_w << m_pa << m_c << m_gradc << m_j << m_ca;
+		}
+		else
+		{
+			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_c >> m_gradc >> m_j >> m_ca;
 		}
 		
-		void Serialize(DumpFile& ar)
+		if (m_pt) m_pt->Serialize(ar);
+	}
+	
+	void Init(bool bflag)
+	{
+		if (bflag)
 		{
-			if (ar.IsSaving())
-			{
-				ar << m_p << m_gradp << m_w << m_pa << m_c << m_gradc << m_j << m_ca;
-			}
-			else
-			{
-				ar >> m_p >> m_gradp >> m_w >> m_pa >> m_c >> m_gradc >> m_j >> m_ca;
-			}
-			
-			if (m_pt) m_pt->Serialize(ar);
+			m_p = m_pa = 0;
+			m_gradp = vec3d(0,0,0);
+			m_w = vec3d(0,0,0);
+			m_c = m_ca = 0;
+			m_gradc = vec3d(0,0,0);
+			m_j = vec3d(0,0,0);
 		}
 		
-		void Init(bool bflag)
-		{
-			if (bflag)
-			{
-				m_p = m_pa = 0;
-				m_gradp = vec3d(0,0,0);
-				m_w = vec3d(0,0,0);
-				m_c = m_ca = 0;
-				m_gradc = vec3d(0,0,0);
-				m_j = vec3d(0,0,0);
-			}
-			
-			if (m_pt) m_pt->Init(bflag);
-		}
-		
-	public:
-		// biphasic-solute material data
-		double		m_p;		//!< effective fluid pressure
-		vec3d		m_gradp;	//!< spatial gradient of p
-		vec3d		m_w;		//!< fluid flux
-		double		m_pa;		//!< actual fluid pressure
-		// solute material data
-		double		m_c;		//!< effective solute concentration
-		vec3d		m_gradc;	//!< spatial gradient of c
-		vec3d		m_j;		//!< solute molar flux
-		double		m_ca;		//!< actual solute concentration
-	};
+		if (m_pt) m_pt->Init(bflag);
+	}
+	
+public:
+	// biphasic-solute material data
+	double		m_p;		//!< effective fluid pressure
+	vec3d		m_gradp;	//!< spatial gradient of p
+	vec3d		m_w;		//!< fluid flux
+	double		m_pa;		//!< actual fluid pressure
+	// solute material data
+	double		m_c;		//!< effective solute concentration
+	vec3d		m_gradc;	//!< spatial gradient of c
+	vec3d		m_j;		//!< solute molar flux
+	double		m_ca;		//!< actual solute concentration
+};
 
+//-----------------------------------------------------------------------------
+//! Material point data for mixtures
+//!
+class FEElasticMixtureMaterialPoint : public FEMaterialPoint
+{
+public:
+	FEElasticMixtureMaterialPoint() { m_pt = new FEElasticMaterialPoint; }
+	FEMaterialPoint* Copy()
+	{
+		FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint;
+		pt->m_w = m_w;
+		if (m_pt) pt->m_pt = m_pt->Copy();
+		return pt;
+	}
+
+	void Init(bool bflag)
+	{
+		if (bflag)
+		{
+			for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
+		}
+	}
+
+	void Serialize(DumpFile& ar)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_w;
+		}
+		else
+		{
+			ar >> m_w;
+		}
+	}
+
+public:
+	vector<double>	m_w;	//!< material weights
+};

@@ -2,17 +2,11 @@
 #include "FECore/tens4d.h"
 #include "FEElasticMixture.h"
 
+//-----------------------------------------------------------------------------
 // register the material with the framework
 REGISTER_MATERIAL(FEElasticMixture, "solid mixture");
 
-// define the material parameters
-// BEGIN_PARAMETER_LIST(FEElasticMixture, FEElasticMaterial)
-// END_PARAMETER_LIST();
-
-//////////////////////////////////////////////////////////////////////
-// Mixture of elastic solids
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void FEElasticMixture::Init()
 {
 	FEElasticMaterial::Init();
@@ -20,29 +14,40 @@ void FEElasticMixture::Init()
 		m_pMat[i]->Init();
 }
 
+//-----------------------------------------------------------------------------
 mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 {
+	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+	vector<double>& w = pt.m_w;
+	assert(w.size() == m_pMat.size());
+
 	mat3ds s;
 	
 	// calculate stress
 	s.zero();
 	for (int i=0; i < (int) m_pMat.size(); ++i)
-		s += m_pMat[i]->Stress(mp);
+		s += m_pMat[i]->Stress(mp)*w[i];
 
 	return s;
 }
 
+//-----------------------------------------------------------------------------
 tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 {
+	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+	vector<double>& w = pt.m_w;
+	assert(w.size() == m_pMat.size());
+
 	tens4ds c(0.);
 
 	// calculate elasticity tensor
 	for (int i=0; i < (int) m_pMat.size(); ++i)
-		c += m_pMat[i]->Tangent(mp);
+		c += m_pMat[i]->Tangent(mp)*w[i];
 
 	return c;
 }
 
+//-----------------------------------------------------------------------------
 double FEElasticMixture::BulkModulus()
 {
 	double k = 0;
@@ -53,4 +58,3 @@ double FEElasticMixture::BulkModulus()
 	
 	return k;
 }
-

@@ -4,6 +4,7 @@
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
+#include "FEElasticMixture.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"      );
@@ -17,6 +18,7 @@ REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thi
 REGISTER_FEBIO_CLASS(FEPlotActualSoluteConcentration    , FEPlotData, "solute concentration"          );
 REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute flux"                   );
 REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                        );
+REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"               );
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -495,4 +497,29 @@ bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)
 		return true;
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, std::vector<float> &a)
+{
+	FEElasticMixture* pm = dynamic_cast<FEElasticMixture*>(m.GetMaterial());
+	if (pm == 0) return false;
+
+	int N = m.Elements();
+	for (int i=0; i<N; ++i)
+	{
+		FEElement& e = m.ElementRef(i);
+
+		float s = 0.f;
+		int nint = e.GaussPoints();
+		for (int n=0; n<nint; ++n)
+		{
+			FEElasticMixtureMaterialPoint& pt = *e.m_State[n]->ExtractData<FEElasticMixtureMaterialPoint>();
+			s += (float) pt.m_w[0];
+		}
+
+		a.push_back(s / (float) nint);
+	}
+
+	return true;
 }

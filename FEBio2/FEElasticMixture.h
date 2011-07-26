@@ -13,7 +13,15 @@ class FEElasticMixture : public FEElasticMaterial
 {
 public:
 	FEElasticMixture() {}
-		
+
+	// returns a pointer to a new material point object
+	virtual FEMaterialPoint* CreateMaterialPointData() 
+	{ 
+		FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
+		pt->m_w.resize(m_pMat.size());
+		return pt;
+	}
+	
 public:
 	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials
 		
@@ -32,7 +40,4 @@ public:
 		
 	// declare as registered
 	DECLARE_REGISTERED(FEElasticMixture);
-		
-	// declare the parameter list
-//	DECLARE_PARAMETER_LIST();
 };

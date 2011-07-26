@@ -110,3 +110,12 @@ public:
 	FEPlotDamage(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Mixture volume fraction
+class FEPlotMixtureVolumeFraction : public FEDomainData
+{
+public:
+	FEPlotMixtureVolumeFraction(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& m, vector<float>& a);
+};
