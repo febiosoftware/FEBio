@@ -76,11 +76,33 @@ bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::InitElements()
 {
+	vec3d x0[8], xt[8], r0, rt;
+	FEMesh& m = *GetMesh();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
+		for (int i=0; i<neln; ++i)
+		{
+			x0[i] = m.Node(el.m_node[i]).m_r0;
+			xt[i] = m.Node(el.m_node[i]).m_rt;
+		}
+
 		int n = el.GaussPoints();
-		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
+		for (int j=0; j<n; ++j) 
+		{
+			r0 = el.Evaluate(x0, j);
+			rt = el.Evaluate(xt, j);
+
+			FEMaterialPoint& mp = *el.m_State[j];
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			pt.r0 = r0;
+			pt.rt = rt;
+
+			pt.J = defgrad(el, pt.F, j);
+
+			el.m_State[j]->Init(false);
+		}
 	}
 }
 
