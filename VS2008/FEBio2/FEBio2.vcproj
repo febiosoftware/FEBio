@@ -437,6 +437,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FEFungOrthoCompressible.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEFungOrthotropic.cpp"
 				>
 			</File>
@@ -1060,6 +1064,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFluidFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEFungOrthoCompressible.h"
 				>
 			</File>
 			<File
