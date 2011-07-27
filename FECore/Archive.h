@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 #pragma once
+#include <assert.h>
 #include <string.h>
 #include <list>
 #include <vector>
