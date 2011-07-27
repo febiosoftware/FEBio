@@ -57,7 +57,7 @@ public:
 		void clear()
 		{
 			m_sztag[0] = 0;
-			m_szval[0] = 0;
+			m_szval.clear();
 			m_natt = 0;
 			m_bend = false;
 			m_bleaf = true;
