@@ -136,6 +136,15 @@ int main(int argc, char* argv[])
 	if (ptask == 0)
 	{
 		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
+		int N = febio.Count<FEBioTask>();
+		fprintf(stderr, "Nr. of task defined = %d:\n", N);
+		for (int i=0; i<N; ++i)
+		{
+			const char* sz = febio.GetTypeStr<FEBioTask>(i);
+			assert(sz);
+			if (sz == 0) sz = "(Unknown)";
+			fprintf(stderr, "Task %d = %s\n", i+1, sz);
+		}
 		return 1;
 	}
 

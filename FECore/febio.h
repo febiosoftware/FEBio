@@ -19,6 +19,10 @@ public:
 
 	template <typename T> const char* GetTypeStr(T* po);
 
+	template <typename T> const char* GetTypeStr(int i);
+
+	template <typename T> int Count();
+
 protected:
 	std::vector<FEBioFactory*>	m_Fac;
 
@@ -56,6 +60,36 @@ template <typename T> inline const char* FEBioKernel::GetTypeStr(T* po)
 		}
 	}
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+template <typename T> inline const char* FEBioKernel::GetTypeStr(int n)
+{
+	int i = 0;
+	std::vector<FEBioFactory*>::iterator pf;
+	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
+	{
+		FEBioFactory_T<T>* pfac = dynamic_cast<FEBioFactory_T<T>*>(*pf);
+		if (pfac)
+		{
+			if (i == n) return pfac->GetTypeStr();
+			++i;
+		}
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+template <typename T> inline int FEBioKernel::Count()
+{
+	int N = 0;
+	std::vector<FEBioFactory*>::iterator pf;
+	for (pf=m_Fac.begin(); pf!= m_Fac.end(); ++pf)
+	{
+		FEBioFactory_T<T>* pfac = dynamic_cast<FEBioFactory_T<T>*>(*pf);
+		if (pfac) N++;
+	}
+	return N;
 }
 
 //-----------------------------------------------------------------------------
