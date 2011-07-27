@@ -4,14 +4,12 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-#ifndef WIN32
-bool LoadPlugin(const char* szfile) { return false; }
-#else
+#ifdef WIN32
+
 #include "windows.h"
 
 typedef void (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 
-//-----------------------------------------------------------------------------
 bool LoadPlugin(const char* szfile)
 {
 	FEBioKernel& febio = FEBioKernel::GetInstance();
@@ -31,4 +29,32 @@ bool LoadPlugin(const char* szfile)
 	return true;
 }
 
-#endif	// ifndef WIN32
+#endif	// ifdef WIN32
+
+
+//-----------------------------------------------------------------------------
+#ifdef LINUX
+#include <dlfcn.h>
+
+extern "C" {
+typedef void (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
+}
+
+bool LoadPlugin(const char* szfile)
+{
+  // load the library
+  void* hlib = dlopen(szfile, RTLD_NOW);
+  if (hlib == NULL) return false;
+
+  // find the plugin's registration function
+  FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) dlsym(hlib, "RegisterPlugin");
+  if (pfnc == NULL) return false;
+
+  // allow the plugin to register itself with the framework
+  FEBioKernel& febio = FEBioKernel::GetInstance();
+  pfnc(febio);
+
+  return true;
+}
+
+#endif // ifdef LINUX
