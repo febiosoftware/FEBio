@@ -75,7 +75,8 @@ enum FE_Module_Type {
 	FE_SOLID,
 	FE_POROELASTIC,
 	FE_HEAT,
-	FE_POROSOLUTE
+	FE_POROSOLUTE,
+	FE_LINEAR_SOLID
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -160,6 +161,7 @@ enum FE_Print_Level {
 #define FE_3F_SOLID_DOMAIN			12
 #define FE_BIPHASIC_DOMAIN			13
 #define FE_BIPHASIC_SOLUTE_DOMAIN	14
+#define FE_LINEAR_SOLID_DOMAIN		15
 
 //-----------------------------------------------------------------------------
 //! surface load types

@@ -2,6 +2,7 @@
 #include "FECore/FEPlotData.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticSolidDomain.h"
+#include "FELinearSolidDomain.h"
 
 //=============================================================================
 // The following classes define data fields for domains. 
@@ -18,6 +19,8 @@ public:
 protected:
 	bool WriteSolidStress(FEElasticSolidDomain& d, vector<float>& a);
 	bool WriteShellStress(FEElasticShellDomain& d, vector<float>& a);
+
+	bool WriteLinearSolidStress(FELinearSolidDomain& d, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------

@@ -489,6 +489,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FELinearSolidDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FELinearSolidSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\fem.cpp"
 				>
 			</File>
@@ -1120,6 +1128,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FELinearOrthotropic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FELinearSolidDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FELinearSolidSolver.h"
 				>
 			</File>
 			<File

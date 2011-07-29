@@ -10,6 +10,7 @@
 #include "FEBioLib/SuperLUSolver.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
+#include "FELinearSolidSolver.h"
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
@@ -36,6 +37,7 @@
 #include "FEBiphasicDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEHeatSolidDomain.h"
+#include "FELinearSolidDomain.h"
 #include "FEElasticTrussDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"
@@ -334,6 +336,10 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	{
 		pstep->m_nModule = FE_SOLID;
 	}
+	else if (strcmp(szt, "linear solid") == 0)
+	{
+		pstep->m_nModule = FE_LINEAR_SOLID;
+	}
 	else if (strcmp(szt, "poro" ) == 0) 
 	{
 		pstep->m_nModule = FE_POROELASTIC;
@@ -359,10 +365,11 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
 {
 	switch (nmod)
 	{
-	case FE_SOLID      : return new FESolidSolver(fem);
-	case FE_POROELASTIC: return new FEPoroSolidSolver(fem);
-	case FE_POROSOLUTE : return new FEPoroSoluteSolver(fem);
-	case FE_HEAT       : return new FEHeatSolver(fem);
+	case FE_SOLID       : return new FESolidSolver(fem);
+	case FE_POROELASTIC : return new FEPoroSolidSolver(fem);
+	case FE_POROSOLUTE  : return new FEPoroSoluteSolver(fem);
+	case FE_HEAT        : return new FEHeatSolver(fem);
+	case FE_LINEAR_SOLID: return new FELinearSolidSolver(fem);
 	default:
 		assert(false);
 		return 0;
@@ -1568,6 +1575,11 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
+	else if (fem.m_pStep->m_nModule == FE_LINEAR_SOLID)
+	{
+		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_LINEAR_SOLID_DOMAIN;
+		else return 0;
+	}
 	else
 	{
 		if (dynamic_cast<FERigidMaterial*>(pmat))
@@ -1648,6 +1660,7 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 	case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
 	case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicDomain          (pm, pmat); break;
 	case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (pm, pmat); break;
+	case FE_LINEAR_SOLID_DOMAIN   : pd = new FELinearSolidDomain       (pm, pmat); break;
 	}
 
 	// return the domain

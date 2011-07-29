@@ -10,6 +10,7 @@
 #include "FEPoroElastic.h"
 #include "FEPoroSolidSolver.h"
 #include "FEPoroSoluteSolver.h"
+#include "FELinearSolidSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -686,6 +687,9 @@ void FEAnalysis::Serialize(DumpFile& ar)
 			break;
 		case FE_HEAT:
 			m_psolver = new FEHeatSolver(m_fem);
+			break;
+		case FE_LINEAR_SOLID:
+			m_psolver = new FELinearSolidSolver(m_fem);
 			break;
 		default:
 			throw "Unknown module type in FEAnalysis::Serialize";
