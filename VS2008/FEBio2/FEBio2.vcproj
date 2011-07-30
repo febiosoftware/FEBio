@@ -345,6 +345,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FECoupledHeatSolidSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEDamageMooneyRivlin.cpp"
 				>
 			</File>
@@ -968,6 +972,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FECoupledHeatSolidSolver.h"
 				>
 			</File>
 			<File
