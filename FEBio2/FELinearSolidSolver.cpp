@@ -97,40 +97,38 @@ void FELinearSolidSolver::Residual()
 {
 	zero(m_R);
 
-	// apply nodal fluxes
-	int i, id, bc, lc, n;
-	double s, f;
-
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over nodal forces
 	int ncnf = m_fem.m_FC.size();
-	for (i=0; i<ncnf; ++i)
+	for (int i=0; i<ncnf; ++i)
 	{
 		FENodalForce& fc = *m_fem.m_FC[i];
 		if (fc.IsActive())
 		{
-			id	 = fc.node;	// node ID
-			bc   = fc.bc;	// direction of force
-			lc   = fc.lc;	// loadcurve number
-			s    = fc.s;	// force scale factor
+			int id	 = fc.node;	// node ID
+			int bc   = fc.bc;	// direction of force
+			int lc   = fc.lc;	// loadcurve number
+			double s = fc.s;	// force scale factor
 
 			FENode& node = mesh.Node(id);
 
-			f = s*m_fem.GetLoadCurve(lc)->Value();
+			double f = s*m_fem.GetLoadCurve(lc)->Value();
 
-			n = node.m_ID[bc];
+			int n = node.m_ID[bc];
 			if ((bc == 0) && (n >= 0)) m_R[n] = f;
 			if ((bc == 1) && (n >= 0)) m_R[n] = f;
 			if ((bc == 2) && (n >= 0)) m_R[n] = f;
 		}
 	}
 
-	// TODO: surface tractions
-
-	// TODO: initial stress
+	// add contribution from domain
+	for (int i=0; i<mesh.Domains(); ++i) 
+	{
+		FELinearSolidDomain& d = dynamic_cast<FELinearSolidDomain&>(mesh.Domain(i));
+		d.RHS(this, m_R);
+	}
 }
-
 
 //-----------------------------------------------------------------------------
 //! Reform the stiffness matrix. That is, calculate the shape of the stiffness
@@ -231,6 +229,23 @@ void FELinearSolidSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
 				K.set(J,J, 1);			
 			}
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//!  Assembles the element into the global residual. This function
+//!  also checks for rigid dofs and assembles the residual using a condensing
+//!  procedure in the case of rigid dofs.
+
+void FELinearSolidSolver::AssembleRHS(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R)
+{
+	// assemble the element residual into the global residual
+	int ndof = fe.size();
+	for (int i=0; i<ndof; ++i)
+	{
+		int I = elm[i];
+		if ( I >= 0) R[I] += fe[i];
+//		else if (-I-2 >= 0) m_Fr[-I-2] -= fe[i];	// reaction forces
 	}
 }
 

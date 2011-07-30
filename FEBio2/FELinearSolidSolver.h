@@ -41,6 +41,9 @@ public:
 	//! assemble element stiffness matrix
 	void AssembleStiffness(matrix& ke, vector<int>& lm);
 
+	//! assemble the element residual into the global residual
+	void AssembleRHS(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
+
 protected:
 	vector<double>	m_u;	//!< nodal displacements
 	vector<double>	m_R;	//!< right hand side

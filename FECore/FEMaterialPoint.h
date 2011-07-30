@@ -58,6 +58,7 @@ public:
 		Q.unit();
 		J = 1;
 		s.zero();
+		s0.zero();
 	}
 
 	FEMaterialPoint* Copy()
@@ -71,11 +72,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << F << J << Q << s;
+			ar << F << J << Q << s << s0;
 		}
 		else
 		{
-			ar >> F >> J >> Q >> s;
+			ar >> F >> J >> Q >> s >> s0;
 		}
 
 		if (m_pt) m_pt->Serialize(ar);
@@ -102,6 +103,7 @@ public:
 			J = 1;
 
 			s.zero();
+			s0.zero();
 
 //			Q.unit();
 		}
@@ -121,6 +123,7 @@ public:
 
 	// solid material data
 	mat3ds		s;			//!< Cauchy stress
+	mat3ds		s0;			//!< Initial stress (only used by linear solid solver)
 };
 
 //-----------------------------------------------------------------------------

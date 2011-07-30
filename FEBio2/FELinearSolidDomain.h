@@ -28,6 +28,11 @@ public:
 
 	void UpdateStresses(FEModel& fem);
 
+	void RHS(FELinearSolidSolver* psolver, vector<double>& R);
+
+protected:
+	void InitialStress(FESolidElement& el, vector<double>& fe);
+
 protected:
 	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 };
