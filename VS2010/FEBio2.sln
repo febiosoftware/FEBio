@@ -18,22 +18,30 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FEBio2Setup", "FEBio2Setup\
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug - Skyline Only|Win32 = Debug - Skyline Only|Win32
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Debug - Skyline Only|Win32.ActiveCfg = Debug - Skyline Only|Win32
+		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Debug - Skyline Only|Win32.Build.0 = Debug - Skyline Only|Win32
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Debug|Win32.ActiveCfg = Debug|Win32
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Debug|Win32.Build.0 = Debug|Win32
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|Win32.ActiveCfg = Release|Win32
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|Win32.Build.0 = Release|Win32
+		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug - Skyline Only|Win32.ActiveCfg = Debug - Skyline Only|Win32
+		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug - Skyline Only|Win32.Build.0 = Debug - Skyline Only|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug|Win32.Build.0 = Debug|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|Win32.ActiveCfg = Release|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|Win32.Build.0 = Release|Win32
+		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug - Skyline Only|Win32.ActiveCfg = Debug - Skyline Only|Win32
+		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug - Skyline Only|Win32.Build.0 = Debug - Skyline Only|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug|Win32.ActiveCfg = Debug|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug|Win32.Build.0 = Debug|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|Win32.ActiveCfg = Release|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|Win32.Build.0 = Release|Win32
+		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug - Skyline Only|Win32.ActiveCfg = Debug - Skyline Only
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug|Win32.ActiveCfg = Debug
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection

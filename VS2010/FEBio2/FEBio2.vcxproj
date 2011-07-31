@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug - Skyline Only|Win32">
+      <Configuration>Debug - Skyline Only</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -25,6 +29,11 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Skyline Only|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -43,6 +52,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Skyline Only|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -54,6 +66,11 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
     <LibraryPath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\Debug;C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Skyline Only|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+    <LibraryPath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\Debug - Skyline Only;C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -77,6 +94,20 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>fecored.lib;febiolibd.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;libiomp5mt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug - Skyline Only|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>fecored.lib;febiolibd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -136,6 +167,7 @@
     <ClInclude Include="..\..\FEBio2\FEBox.h" />
     <ClInclude Include="..\..\FEBio2\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
+    <ClInclude Include="..\..\FEBio2\FECoupledHeatSolidSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBio2\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.h" />
@@ -175,6 +207,8 @@
     <ClInclude Include="..\..\FEBio2\FELinearConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FELinearElastic.h" />
     <ClInclude Include="..\..\FEBio2\FELinearOrthotropic.h" />
+    <ClInclude Include="..\..\FEBio2\FELinearSolidDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBio2\fem.h" />
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
@@ -281,6 +315,7 @@
     <ClCompile Include="..\..\FEBio2\FEBox.cpp" />
     <ClCompile Include="..\..\FEBio2\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FECoupledHeatSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDamageMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.cpp" />
@@ -316,6 +351,8 @@
     <ClCompile Include="..\..\FEBio2\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearElastic.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearOrthotropic.cpp" />
+    <ClCompile Include="..\..\FEBio2\FELinearSolidDomain.cpp" />
+    <ClCompile Include="..\..\FEBio2\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\fem.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
