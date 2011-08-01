@@ -222,7 +222,8 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	vec3d r;
 	double w;
 	quatd dq;
-	for (i=0; i<m_fem.m_nrb; ++i)
+	int nrb = m_fem.m_RB.size();
+	for (i=0; i<nrb; ++i)
 	{
 		// get the rigid body
 		FERigidBody& RB = m_fem.m_RB[i];

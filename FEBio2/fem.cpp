@@ -54,7 +54,6 @@ FEM::FEM()
 
 	// --- Geometry Data ---
 	m_nreq = 0;
-	m_nrb = 0;
 	m_nrm = 0;
 
 	m_bsymm = true;	// assume symmetric stiffness matrix
@@ -307,7 +306,8 @@ double* FEM::FindParameter(const char* szparam)
 
 
 	// the rigid bodies are dealt with differently
-	for (i=0; i<m_nrb; ++i)
+	int nrb = m_RB.size();
+	for (i=0; i<nrb; ++i)
 	{
 		FERigidBody& rb = m_RB[i];
 

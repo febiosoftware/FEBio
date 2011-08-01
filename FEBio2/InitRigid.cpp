@@ -148,10 +148,10 @@ bool FEM::InitRigidBodies()
 	int nmat = Materials();
 	vector<int> mrc; mrc.assign(nmat, -1);
 	for (i=0; i<nmat; ++i) if (mrb[i] >= 0) mrc[mrb[i]] = 0;
-	m_nrb = 0;
+	int nrb = 0;
 	for (i=0; i<nmat; ++i)
 	{
-		if (mrc[i] == 0) mrc[i] = m_nrb++;
+		if (mrc[i] == 0) mrc[i] = nrb++;
 	}
 
 	for (i=0; i<nmat; ++i) 
@@ -210,8 +210,8 @@ bool FEM::InitRigidBodies()
 
 	// Ok, we now know how many rigid bodies there are
 	// so let's create them
-	m_RB.resize(m_nrb);
-	for (i=0; i<m_nrb; ++i)
+	m_RB.resize(nrb);
+	for (i=0; i<nrb; ++i)
 	{
 		// attach the rigid body do this FEM
 		m_RB[i].AttachToFEM(this);

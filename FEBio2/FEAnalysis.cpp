@@ -197,7 +197,8 @@ bool FEAnalysis::Init()
 	// Sometimes an (ignorant) user might have added a rigid body
 	// that is not being used. Since this can cause problems we need
 	// to find these rigid bodies.
-	vector<int> mec; mec.assign(m_fem.m_nrb, 0);
+	int nrb = m_fem.m_RB.size();
+	vector<int> mec; mec.assign(nrb, 0);
 	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
 	{
 		FENode& node = m_fem.m_mesh.Node(i);
@@ -205,7 +206,7 @@ bool FEAnalysis::Init()
 		if (n >= 0) mec[n]++;
 	}
 
-	for (i=0; i<m_fem.m_nrb; ++i)
+	for (i=0; i<nrb; ++i)
 		if (mec[i] == 0)
 		{
 			clog.printbox("WARNING", "Rigid body %d is not being used.", m_fem.m_RB[i].m_mat+1);

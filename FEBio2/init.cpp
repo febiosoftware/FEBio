@@ -514,7 +514,8 @@ bool FEM::InitEquations()
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
 	m_nreq = m_neq;
-	for (i=0; i<m_nrb; ++i)
+	int nrb = m_RB.size();
+	for (i=0; i<nrb; ++i)
 	{
 		FERigidBody& RB = m_RB[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(RB.m_mat));
@@ -546,7 +547,7 @@ bool FEM::InitEquations()
 	}
 
 	// adjust the rigid dofs that are prescribed
-	for (i=0; i<m_nrb; ++i)
+	for (i=0; i<nrb; ++i)
 	{
 		FERigidBody& RB = m_RB[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(RB.m_mat));
@@ -573,7 +574,8 @@ bool FEM::Reset()
 	m_mesh.Reset();
 
 	// initialize rigid body data
-	for (i=0; i<m_nrb; ++i)
+	int nrb = m_RB.size();
+	for (i=0; i<nrb; ++i)
 	{
 		// zero total displacements
 		m_RB[i].m_Ut[0] = m_RB[i].m_Up[0] = 0;

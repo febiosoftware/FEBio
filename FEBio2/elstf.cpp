@@ -66,7 +66,8 @@ bool FESolidSolver::StiffnessMatrix()
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
-	for (i=0; i<m_fem.m_nrb; ++i)
+	int NRB = m_fem.m_RB.size();
+	for (i=0; i<NRB; ++i)
 	{
 		FERigidBody& rb = m_fem.m_RB[i];
 		for (j=0; j<6; ++j)
@@ -512,7 +513,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 	}
 
 	// see if there are any rigid body dofs here
-	if (m_fem.m_nrb > 0) RigidStiffness(en, elm, ke);
+	if (m_fem.m_RB.empty() == false) RigidStiffness(en, elm, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -543,7 +544,8 @@ bool FESolidSolver::Residual(vector<double>& R)
 	vector<double> fe;
 
 	// zero rigid body reaction forces
-	for (i=0; i<m_fem.m_nrb; ++i)
+	int NRB = m_fem.m_RB.size();
+	for (i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = m_fem.m_RB[i];
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
@@ -675,7 +677,7 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 	}
 
 	// If there are rigid bodies we need to look for rigid dofs
-	if (m_fem.m_nrb > 0)
+	if (m_fem.m_RB.empty() == false)
 	{
 		int *lm;
 

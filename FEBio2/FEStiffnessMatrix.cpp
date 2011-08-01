@@ -143,10 +143,11 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 			}
 
 			// Add rigid bodies to the profile
-			if (fem.m_nrb)
+			if (fem.m_RB.empty() == false)
 			{
 				vector<int> lm(6);
-				for (int i=0; i<fem.m_nrb; ++i)
+				int nrb = fem.m_RB.size();
+				for (int i=0; i<nrb; ++i)
 				{
 					FERigidBody& rb = fem.m_RB[i];
 					for (int j=0; j<6; ++j) lm[j] = rb.m_LM[j];

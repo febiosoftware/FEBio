@@ -216,7 +216,6 @@ public:
 		// rigid body data
 		int						m_nreq;	//!< start of rigid body equations
 		int						m_nrm;	//!< nr of rigid materials
-		int						m_nrb;	//!< nr of rigid bodies in problem
 		vector<FERigidBody>		m_RB;	//!< rigid body array
 
 		// rigid joints

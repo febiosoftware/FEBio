@@ -658,7 +658,8 @@ double RigidBodyDataRecord::Evaluate(int item, int ndata)
 	if (pm == 0) return 0;
 
 	// find the rigid body that has this material
-	for (int i=0; i<fem.m_nrb; ++i)
+	int NRB = fem.m_RB.size();
+	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = fem.m_RB[i];
 		if (RB.m_mat == nrb)

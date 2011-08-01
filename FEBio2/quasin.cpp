@@ -188,7 +188,8 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// initialize rigid bodies
-	for (i=0; i<m_fem.m_nrb; ++i)
+	int nrb = m_fem.m_RB.size();
+	for (i=0; i<nrb; ++i)
 	{
 		FERigidBody& RB = m_fem.m_RB[i];
 

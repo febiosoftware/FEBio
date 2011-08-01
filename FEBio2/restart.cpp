@@ -384,8 +384,9 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		int i;
 
 		// rigid bodies
-		ar << m_nreq << m_nrm << m_nrb;
-		for (i=0; i<m_nrb; ++i) m_RB[i].Serialize(ar);
+		int nrb = m_RB.size();
+		ar << m_nreq << m_nrm << nrb;
+		for (i=0; i<nrb; ++i) m_RB[i].Serialize(ar);
 
 		// rigid joints
 		int nrj = (int) m_RJ.size();
@@ -397,9 +398,10 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		int i;
 
 		// rigid bodies
-		ar >> m_nreq >> m_nrm >> m_nrb;
-		if (m_nrb) m_RB.resize(m_nrb); else m_RB.clear();
-		for (i=0; i<m_nrb; ++i)
+		int nrb;
+		ar >> m_nreq >> m_nrm >> nrb;
+		if (nrb) m_RB.resize(nrb); else m_RB.clear();
+		for (i=0; i<nrb; ++i)
 		{
 			FERigidBody& rb = m_RB[i];
 			rb.Serialize(ar);
