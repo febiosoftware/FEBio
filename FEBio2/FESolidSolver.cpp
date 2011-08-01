@@ -27,7 +27,7 @@ bool FESolidSolver::Init()
 	if (FESolver::Init() == false) return false;
 
 	// get nr of equations
-	int neq = m_fem.m_neq;
+	int neq = m_neq;
 
 	// allocate vectors
 	m_Fn.assign(neq, 0);
@@ -76,6 +76,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar << m_niter;
 		ar << m_nref << m_ntotref;
 		ar << m_naug;
+		ar << m_neq;
 
 		ar << m_bfgs.m_LStol << m_bfgs.m_LSiter << m_bfgs.m_LSmin;
 		ar << m_bfgs.m_maxups;
@@ -90,6 +91,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar >> m_niter;
 		ar >> m_nref >> m_ntotref;
 		ar >> m_naug;
+		ar >> m_neq;
 
 		ar >> m_bfgs.m_LStol >> m_bfgs.m_LSiter >> m_bfgs.m_LSmin;
 		ar >> m_bfgs.m_maxups;
@@ -173,7 +175,7 @@ bool FESolidSolver::InitEquations()
 	}
 
 	// store the number of equations
-	fem.m_neq = neq;
+	m_neq = neq;
 
 	// we assign the rigid body equation number to
 	// Also make sure that the nodes are NOT constrained!

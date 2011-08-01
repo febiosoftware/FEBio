@@ -32,7 +32,7 @@ public:
 	void Clear() { if (m_pA) m_pA->Clear(); }
 
 	//! construct the stiffness matrix from a FEM object
-	bool Create(FEM& fem, bool breset);
+	bool Create(FEM& fem, int neq, bool breset);
 
 	//! assemble an element stiffness matrix into the global stiffness matrix
 	void Assemble(matrix& ke, vector<int>& lm) { m_pA->Assemble(ke, lm); }
@@ -42,6 +42,9 @@ public:
 
 	//! return the nonzeroes in the sparse matrix
 	int NonZeroes() { return m_pA->NonZeroes(); }
+
+	//! return the number of rows
+	int Rows() { return m_pA->Size(); }
 
 	//! converts a FEStiffnessMatrix to a SparseMatrix
 	operator SparseMatrix* () { return m_pA; }
@@ -54,7 +57,7 @@ public:
 	void Zero() { m_pA->zero(); }
 
 protected:
-	void build_begin();
+	void build_begin(int neq);
 	void build_add(vector<int>& lm);
 	void build_end();
 	void build_flush();

@@ -44,7 +44,7 @@ FEStiffnessMatrix::~FEStiffnessMatrix()
 //! to the profile. Dynamic elements can change connectivity in between calls to
 //! Create() and therefore have to be added explicitly every time.
 
-bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
+bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
 {
 	int i, j, k, l, m, n;
 
@@ -60,7 +60,7 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 	static SparseMatrixProfile MP;
 
 	// begin building the profile
-	build_begin();
+	build_begin(neq);
 	{
 		FEMesh& mesh = fem.m_mesh;
 
@@ -743,10 +743,10 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 //-----------------------------------------------------------------------------
 //! Start building the profile. That is delete the old profile (if there was one)
 //! and create a new one. 
-void FEStiffnessMatrix::build_begin()
+void FEStiffnessMatrix::build_begin(int neq)
 {
 	if (m_pMP) delete m_pMP;
-	m_pMP = new SparseMatrixProfile(m_pfem->m_neq);
+	m_pMP = new SparseMatrixProfile(neq);
 	m_nlm = 0;
 }
 

@@ -19,8 +19,8 @@ bool FELinearSolidSolver::Init()
 	// initialize base class
 	if (FESolver::Init() == false) return false;
 
-	// get the nr of equations
-	int neq = m_fem.m_neq;
+	// number of equations
+	int neq = m_neq;
 
 	// allocate data structures
 	m_u.resize(neq);
@@ -84,8 +84,8 @@ bool FELinearSolidSolver::InitEquations()
 	}
 
 	// store the number of equations
-	fem.m_neq = neq;	
-	fem.m_nreq = neq;	// TODO: For some reason not setting this causes problems.
+	m_neq = neq;
+	fem.m_nreq = m_neq;	// TODO: For some reason not setting this causes problems.
 
 	// All initialization is done
 	return true;
@@ -98,7 +98,6 @@ bool FELinearSolidSolver::SolveStep(double time)
 {
 	// set-up the prescribed displacements
 	zero(m_d);
-	int neq = m_fem.m_neq;
 	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.m_DC[i];
@@ -113,9 +112,9 @@ bool FELinearSolidSolver::SolveStep(double time)
 
 			FENode& node = m_fem.m_mesh.Node(n);
 
-			if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
-			if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
-			if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
+			if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) m_d[I] = D; }
+			if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) m_d[I] = D; }
+			if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) m_d[I] = D; }
 		}
 	}
 
@@ -267,8 +266,6 @@ void FELinearSolidSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
 		SparseMatrix& K = *m_pK;
 
 		int N = ke.rows();
-
-		int neq = m_fem.m_neq;
 
 		// loop over columns
 		for (j=0; j<N; ++j)

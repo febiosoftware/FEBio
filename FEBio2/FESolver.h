@@ -62,6 +62,7 @@ public:
 
 	// global stiffness matrix
 	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
+	int					m_neq;		//!< number of equations
 
 	// BFGS parameters
 	BFGSSolver	m_bfgs;		//!< BFGS solver parameters

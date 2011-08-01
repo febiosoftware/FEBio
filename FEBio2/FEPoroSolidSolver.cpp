@@ -182,7 +182,7 @@ bool FEPoroSolidSolver::Quasin(double time)
 		}
 
 		// update total displacements
-		for (i=0; i<m_fem.m_neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
+		for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
 
 		// calculate norms
 		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;

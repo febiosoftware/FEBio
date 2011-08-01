@@ -250,7 +250,6 @@ public:
 	// --- Direct Solver Data ---
 	//{
 		int		m_nsolver;	//!< type of solver selected
-		int		m_neq;		//!< number of equations
 		int		m_npeq;		//!< number of equations related to pressure dofs
 		int		m_nceq;		//!< number of equations related to concentration dofs
 		int		m_bwopt;	//!< bandwidth optimization flag

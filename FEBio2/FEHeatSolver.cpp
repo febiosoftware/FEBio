@@ -19,8 +19,8 @@ bool FEHeatSolver::Init()
 	// initialize base class
 	if (FESolver::Init() == false) return false;
 
-	// get the nr of equations
-	int neq = m_fem.m_neq;
+	// get number of equations
+	int neq = m_neq;
 
 	// allocate data structures
 	m_R.resize(neq);
@@ -80,8 +80,8 @@ bool FEHeatSolver::InitEquations()
 	}
 
 	// store the number of equations
-	fem.m_neq = neq;
-	fem.m_nreq = neq;	// TODO: For some reason not setting this causes problems. 
+	m_neq = neq;
+	fem.m_nreq = m_neq;	// TODO: For some reason not setting this causes problems. 
 
 	// All initialization is done
 	return true;
@@ -110,7 +110,7 @@ bool FEHeatSolver::SolveStep(double time)
 			if (bc == 10)
 			{
 				int I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_fem.m_neq) m_u[I] = T;
+				if (I>=0 && I<m_neq) m_u[I] = T;
 			}
 		}
 	}
@@ -268,8 +268,6 @@ void FEHeatSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
 		SparseMatrix& K = *m_pK;
 
 		int N = ke.rows();
-
-		int neq = m_fem.m_neq;
 
 		// loop over columns
 		for (j=0; j<N; ++j)

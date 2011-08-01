@@ -124,7 +124,7 @@ void FESolidSolver::PrepStep(double time)
 	// we save the prescribed displacements increments in the ui vector
 	vector<double>& ui = m_bfgs.m_ui;
 	zero(ui);
-	int neq = m_fem.m_neq;
+	int neq = m_neq;
 	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.m_DC[i];

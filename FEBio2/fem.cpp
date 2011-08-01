@@ -75,7 +75,6 @@ FEM::FEM()
 	m_nsolver = SKYLINE_SOLVER;
 #endif
 
-	m_neq = 0;
 	m_npeq = 0;
 	m_nceq = 0;
 	m_bwopt = 0;

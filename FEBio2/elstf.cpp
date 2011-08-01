@@ -485,8 +485,6 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 
 		int N = ke.rows();
 
-		int neq = m_fem.m_neq;
-
 		// loop over columns
 		for (j=0; j<N; ++j)
 		{
@@ -532,7 +530,6 @@ void FESolidSolver::ContactForces(vector<double>& R)
 bool FESolidSolver::Residual(vector<double>& R)
 {
 	int i;
-	int neq = m_fem.m_neq;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -628,8 +625,6 @@ void FESolidSolver::LinearConstraintForces(vector<double> &R)
 void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R)
 {
 	int i, j, I, n, l;
-
-	int neq = m_fem.m_neq;
 
 	vec3d a, d;
 

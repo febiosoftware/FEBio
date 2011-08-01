@@ -20,8 +20,8 @@ FESolver::FESolver(FEM& fem) : m_fem(fem)
 	// Stiffness matrix and linear solver are allocated in Init()
 	m_pK = 0;
 	m_plinsolve = 0;
+	m_neq = 0;
 }
-
 
 FESolver::~FESolver()
 {
@@ -100,7 +100,7 @@ bool FESolver::CreateStiffness(bool breset)
 
 	// create the stiffness matrix
 	clog.printf("===== reforming stiffness matrix:\n");
-	if (m_pK->Create(m_fem, breset) == false) 
+	if (m_pK->Create(m_fem, m_neq, breset) == false) 
 	{
 		clog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;
@@ -108,7 +108,7 @@ bool FESolver::CreateStiffness(bool breset)
 	else
 	{
 		// output some information about the direct linear solver
-		int neq = m_fem.m_neq;
+		int neq = m_pK->Rows();
 		int nnz = m_pK->NonZeroes();
 		clog.printf("\tNr of equations ........................... : %d\n", neq);
 		clog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
