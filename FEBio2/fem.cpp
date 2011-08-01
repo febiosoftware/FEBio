@@ -74,8 +74,6 @@ FEM::FEM()
 	m_nsolver = SKYLINE_SOLVER;
 #endif
 
-	m_npeq = 0;
-	m_nceq = 0;
 	m_bwopt = 0;
 
 	// --- I/O-Data ---

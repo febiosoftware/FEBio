@@ -228,8 +228,6 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 
 		// direct solver data
 		ar << m_nsolver;
-		ar << m_npeq;
-		ar << m_nceq;
 		ar << m_bwopt;
 		ar << m_bsymm;
 
@@ -267,8 +265,6 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 
 		// direct solver data
 		ar >> m_nsolver;
-		ar >> m_npeq;
-		ar >> m_nceq;
 		ar >> m_bwopt;
 		ar >> m_bsymm;
 

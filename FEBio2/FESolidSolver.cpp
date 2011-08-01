@@ -16,7 +16,10 @@ FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
 	m_Rmin = 1.0e-20;
 
 	m_niter = 0;
-	m_nreq  = 0;
+
+	m_nreq = 0;
+	m_npeq = 0;
+	m_nceq = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,7 +80,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar << m_niter;
 		ar << m_nref << m_ntotref;
 		ar << m_naug;
-		ar << m_neq << m_nreq;
+		ar << m_neq << m_nreq << m_npeq << m_nceq;
 
 		ar << m_bfgs.m_LStol << m_bfgs.m_LSiter << m_bfgs.m_LSmin;
 		ar << m_bfgs.m_maxups;
@@ -92,7 +95,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar >> m_niter;
 		ar >> m_nref >> m_ntotref;
 		ar >> m_naug;
-		ar >> m_neq >> m_nreq;
+		ar >> m_neq >> m_nreq >> m_npeq >> m_nceq;
 
 		ar >> m_bfgs.m_LStol >> m_bfgs.m_LSiter >> m_bfgs.m_LSmin;
 		ar >> m_bfgs.m_maxups;
@@ -205,6 +208,16 @@ bool FESolidSolver::InitEquations()
 			n = RB.m_LM[j];
 			if (pm->m_bc[j] > 0) RB.m_LM[j] = -n-2;
 		}
+	}
+
+	// determine the nr of pressure and concentration equations
+	// TODO: move this to the correct solver class
+	m_npeq = m_nceq = 0;
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& n = mesh.Node(i);
+		if (n.m_ID[DOF_P] != -1) m_npeq++;
+		if (n.m_ID[DOF_C] != -1) m_nceq++;
 	}
 
 	// All initialization is done

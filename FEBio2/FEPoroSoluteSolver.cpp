@@ -33,9 +33,9 @@ bool FEPoroSoluteSolver::Init()
 	if (FEPoroSolidSolver::Init() == false) return false;
 
 	// allocate concentration-vectors
-	assert (m_fem.m_nceq > 0);
-	m_ci.assign(m_fem.m_nceq, 0);
-	m_Ci.assign(m_fem.m_nceq, 0);
+	assert (m_nceq > 0);
+	m_ci.assign(m_nceq, 0);
+	m_Ci.assign(m_nceq, 0);
 	
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
@@ -213,7 +213,7 @@ bool FEPoroSoluteSolver::Quasin(double time)
 			if (m_niter == 0) normPi = fabs(m_pi*m_pi);
 
 			// update total pressure
-			for (i=0; i<m_fem.m_npeq; ++i) m_Pi[i] += s*m_pi[i];
+			for (i=0; i<m_npeq; ++i) m_Pi[i] += s*m_pi[i];
 
 			// calculate norms
 			normP = m_Pi*m_Pi;
@@ -232,7 +232,7 @@ bool FEPoroSoluteSolver::Quasin(double time)
 			if (m_niter == 0) normCi = fabs(m_ci*m_ci);
 			
 			// update total pressure
-			for (i=0; i<m_fem.m_nceq; ++i) m_Ci[i] += s*m_ci[i];
+			for (i=0; i<m_nceq; ++i) m_Ci[i] += s*m_ci[i];
 			
 			// calculate norms
 			normC = m_Ci*m_Ci;

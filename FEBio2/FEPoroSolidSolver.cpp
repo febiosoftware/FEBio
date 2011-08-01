@@ -33,9 +33,9 @@ bool FEPoroSolidSolver::Init()
 	if (FESolidSolver::Init() == false) return false;
 
 	// allocate poro-vectors
-	assert(m_fem.m_npeq > 0);
-	m_pi.assign(m_fem.m_npeq, 0);
-	m_Pi.assign(m_fem.m_npeq, 0);
+	assert(m_npeq > 0);
+	m_pi.assign(m_npeq, 0);
+	m_Pi.assign(m_npeq, 0);
 
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
@@ -214,7 +214,7 @@ bool FEPoroSolidSolver::Quasin(double time)
 			if (m_niter == 0) normPi = fabs(m_pi*m_pi);
 
 			// update total pressure
-			for (i=0; i<m_fem.m_npeq; ++i) m_Pi[i] += s*m_pi[i];
+			for (i=0; i<m_npeq; ++i) m_Pi[i] += s*m_pi[i];
 
 			// calculate norms
 			normP = m_Pi*m_Pi;

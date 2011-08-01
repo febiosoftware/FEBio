@@ -112,7 +112,10 @@ public:
 	double	m_Etol;			//!< energy tolerance
 	double	m_Rmin;			//!< min residual value
 
+	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
+	int		m_npeq;			//!< number of equations related to pressure dofs
+	int		m_nceq;			//!< number of equations related to concentration dofs
 
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector
