@@ -31,6 +31,9 @@ public:
 public:
 	FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
 
+	//! Initialize linear equation system
+	bool InitEquations();
+
 public:
 	//{ --- NonLinearSystem overrides ---
 		//! Perform an update

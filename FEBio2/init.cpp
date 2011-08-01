@@ -5,13 +5,11 @@
 #include <time.h>
 #include "fem.h"
 #include "FECore/FEException.h"
-#include "FENodeReorder.h"
 #include "log.h"
 #include "FESolidSolver.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEDiscreteMaterial.h"
-#include "FEBioLib/FERigid.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEBioLib/FEPointBodyForce.h"
@@ -458,107 +456,6 @@ bool FEM::InitConstraints()
 		for (i=0; i<N; ++i, ++it) (*it)->Init();
 	}
 
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//!	This function initializes the equation system.
-//! It is assumed that all free dofs up until now have been given an ID >= 0
-//! and the fixed or rigid dofs an ID < 0.
-//! After this operation the nodal ID array will contain the equation
-//! number assigned to the corresponding degree of freedom. To distinguish
-//! between free or unconstrained dofs and constrained ones the following rules
-//! apply to the ID array:
-//!
-//!           /
-//!          |  >=  0 --> dof j of node i is a free dof
-//! ID[i][j] <  == -1 --> dof j of node i is a fixed (no equation assigned too)
-//!          |  <  -1 --> dof j of node i is constrained and has equation nr = -ID[i][j]-2
-//!           \
-//!
-
-bool FEM::InitEquations()
-{
-	int i, j, n;
-
-	// initialize nr of equations
-	m_neq=0;
-
-	// see if we need to optimize the bandwidth
-	if (m_bwopt)
-	{
-		// reorder the node numbers
-		vector<int> P(m_mesh.Nodes());
-		FENodeReorder mod;
-		mod.Apply(m_mesh, P);
-
-		// set the equation numbers
-		for (i=0; i<m_mesh.Nodes(); ++i)
-		{
-			FENode& node = m_mesh.Node(P[i]);
-			for (j=0; j<MAX_NDOFS; ++j)
-				if (node.m_ID[j] >= 0) node.m_ID[j] = m_neq++;
-		}
-	}
-	else
-	{
-		// give all free dofs an equation number
-		for (i=0; i<m_mesh.Nodes(); ++i)
-		{
-			FENode& node = m_mesh.Node(i);
-			for (j=0; j<MAX_NDOFS; ++j)
-				if (node.m_ID[j] >= 0) node.m_ID[j] = m_neq++;
-		}
-	}
-
-
-	// Next, we assign equation numbers to the rigid body degrees of freedom
-	m_nreq = m_neq;
-	int nrb = m_RB.size();
-	for (i=0; i<nrb; ++i)
-	{
-		FERigidBody& RB = m_RB[i];
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(RB.m_mat));
-		assert(pm);
-		for (j=0; j<6; ++j)
-			if (pm->m_bc[j] >= 0)
-			{
-				RB.m_LM[j] = m_neq++;
-			}
-			else 
-				RB.m_LM[j] = -1;
-	}
-
-	// we assign the rigid body equation number to
-	// Also make sure that the nodes are NOT constrained!
-	for (i=0; i<m_mesh.Nodes(); ++i)
-	{
-		FENode& node = m_mesh.Node(i);
-		if (node.m_rid >= 0)
-		{
-			FERigidBody& RB = m_RB[node.m_rid];
-			node.m_ID[0] = -RB.m_LM[0]-2;
-			node.m_ID[1] = -RB.m_LM[1]-2;
-			node.m_ID[2] = -RB.m_LM[2]-2;
-			node.m_ID[7] = -RB.m_LM[3]-2;
-			node.m_ID[8] = -RB.m_LM[4]-2;
-			node.m_ID[9] = -RB.m_LM[5]-2;
-		}
-	}
-
-	// adjust the rigid dofs that are prescribed
-	for (i=0; i<nrb; ++i)
-	{
-		FERigidBody& RB = m_RB[i];
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(RB.m_mat));
-		for (j=0; j<6; ++j)
-		{
-			n = RB.m_LM[j];
-			if (pm->m_bc[j] > 0) RB.m_LM[j] = -n-2;
-		}
-	}
-
-	// All initialization is done
 	return true;
 }
 

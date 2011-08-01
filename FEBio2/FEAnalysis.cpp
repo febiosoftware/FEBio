@@ -215,8 +215,7 @@ bool FEAnalysis::Init()
 
 	// initialize equations
 	// ----->
-	// TODO: Should I let the solver take care of this?
-	if (m_fem.InitEquations() == false) return false;
+	if (m_fem.m_pStep->m_psolver->InitEquations() == false) return false;
 
 	// initialize linear constraints
 	// Must be done after equations are initialized

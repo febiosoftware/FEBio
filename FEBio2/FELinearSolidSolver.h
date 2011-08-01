@@ -24,6 +24,9 @@ public:
 	//! Data serialization
 	void Serialize(DumpFile& ar);
 
+	//! Initialize linear equation system
+	bool InitEquations();
+
 protected:
 	//! calculate the residual
 	void Residual();

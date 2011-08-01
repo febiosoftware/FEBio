@@ -159,9 +159,6 @@ protected:
 public:
 	//{ --- Initialization routines ---
 
-		//! initialze equation numbering
-		bool InitEquations();
-
 		//! Initialize rigid bodies
 		bool InitRigidBodies();
 

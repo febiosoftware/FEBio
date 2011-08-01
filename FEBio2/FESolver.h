@@ -36,6 +36,10 @@ public:
 	virtual void Serialize(DumpFile& ar) = 0;
 	virtual void Clean();
 
+public:
+	// Initialize linear equation system (TODO: Is this the right place to do this?)
+	virtual bool InitEquations() = 0;
+
 private:
 	// These functions have to be overwritten from NonLinearSystem
 	// but are not yet used.

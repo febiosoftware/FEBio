@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FELinearSolidSolver.h"
 #include "FELinearSolidDomain.h"
+#include "FENodeReorder.h"
+#include "FEBioLib/FERigid.h"
 
 //-----------------------------------------------------------------------------
 //! Class constructor
@@ -25,6 +27,69 @@ bool FELinearSolidSolver::Init()
 	m_R.resize(neq);
 	m_d.resize(neq);
 
+	return true;
+}
+
+
+//-----------------------------------------------------------------------------
+//!	This function initializes the equation system.
+//! It is assumed that all free dofs up until now have been given an ID >= 0
+//! and the fixed or rigid dofs an ID < 0.
+//! After this operation the nodal ID array will contain the equation
+//! number assigned to the corresponding degree of freedom. To distinguish
+//! between free or unconstrained dofs and constrained ones the following rules
+//! apply to the ID array:
+//!
+//!           /
+//!          |  >=  0 --> dof j of node i is a free dof
+//! ID[i][j] <  == -1 --> dof j of node i is a fixed (no equation assigned too)
+//!          |  <  -1 --> dof j of node i is constrained and has equation nr = -ID[i][j]-2
+//!           \
+//!
+bool FELinearSolidSolver::InitEquations()
+{
+	int i, j, n;
+
+	FEM& fem = m_fem;
+	FEMesh& mesh = fem.m_mesh;
+
+	// initialize nr of equations
+	int neq = 0;
+
+	// see if we need to optimize the bandwidth
+	if (fem.m_bwopt)
+	{
+		// reorder the node numbers
+		vector<int> P(mesh.Nodes());
+		FENodeReorder mod;
+		mod.Apply(mesh, P);
+
+		// set the equation numbers
+		for (i=0; i<mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(P[i]);
+			if (node.m_ID[0] >= 0) node.m_ID[0] = neq++;
+			if (node.m_ID[1] >= 0) node.m_ID[1] = neq++;
+			if (node.m_ID[2] >= 0) node.m_ID[2] = neq++;
+		}
+	}
+	else
+	{
+		// give all free dofs an equation number
+		for (i=0; i<mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
+			if (node.m_ID[0] >= 0) node.m_ID[0] = neq++;
+			if (node.m_ID[1] >= 0) node.m_ID[1] = neq++;
+			if (node.m_ID[2] >= 0) node.m_ID[2] = neq++;
+		}
+	}
+
+	// store the number of equations
+	fem.m_neq = neq;	
+	fem.m_nreq = neq;	// TODO: For some reason not setting this causes problems.
+
+	// All initialization is done
 	return true;
 }
 
