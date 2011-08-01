@@ -661,36 +661,6 @@ bool FESurface::IsInsideElement(FESurfaceElement& el, double r, double s, double
 }
 
 //-----------------------------------------------------------------------------
-//! This function evaluates the natural coordinates of a point on a surface
-//! and returns the point on global coordinates
-
-vec3d FESurface::PointOnSurface(FESurfaceElement &el, double r, double s)
-{
-	int i;
-	vec3d y[4];
-	double H[4];
-	int n = el.Nodes();
-	for (i=0; i<n; ++i) y[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-	if (n == 4)
-	{
-		H[0] = 0.25*(1-r)*(1-s);
-		H[1] = 0.25*(1+r)*(1-s);
-		H[2] = 0.25*(1+r)*(1+s);
-		H[3] = 0.25*(1-r)*(1+s);
-	}
-	else if (n == 3)
-	{
-		H[0] = 1 - r - s;
-		H[1] = r;
-		H[2] = s;
-	}
-	vec3d q(0,0,0);
-	for (i=0; i<4; ++i) q += y[i]*H[i];
-
-	return q;
-}
-
-//-----------------------------------------------------------------------------
 //! This function calculates the covariant base vectors of a surface element
 //! at an integration point
 

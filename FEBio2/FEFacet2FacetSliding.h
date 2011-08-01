@@ -27,7 +27,9 @@ public:
 	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
 	vector<double>				m_Lm;	//!< lagrange multipliers 
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
+	vector<int>					m_nei;	//!< surface element indices into arrays
 	vector<double>				m_eps;	//!< penalty values for each integration point
+	vector<double>				m_Ln;	//!< net contact pressure
 
 protected:
 	FENNQuery	m_NQ;	//!< used to find the nearest neighbour
@@ -61,6 +63,9 @@ public:
 	//! calculate contact stiffness
 	void ContactStiffness();
 
+	//! calculate contact pressures for file output
+	void UpdateContactPressures();
+
 	//! calculate Lagrangian augmentations
 	bool Augment(int naug);
 
@@ -82,12 +87,12 @@ public:
 	bool	m_bautopen;		//!< auto-penalty flag
 	double	m_srad;			//!< search radius (% of model size)
 
-	double	m_atol;		//!< aug lag tolernace
-	double	m_gtol;		//!< gap tolerance
-	int		m_naugmin;	//!< min nr of augmentations
-	int		m_naugmax;	//!< max nr of augmentations
+	double	m_atol;			//!< aug lag tolernace
+	double	m_gtol;			//!< gap tolerance
+	int		m_naugmin;		//!< min nr of augmentations
+	int		m_naugmax;		//!< max nr of augmentations
 
-	double	m_dxtol;	//!< penalty insertion distance
+	double	m_dxtol;		//!< penalty insertion distance
 
 	FEFacetSlidingSurface	m_ms;	//!< master surface
 	FEFacetSlidingSurface	m_ss;	//!< slave surface

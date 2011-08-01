@@ -120,6 +120,7 @@ protected:
 	int		m_mat;		//!< material index
 
 public:
+
 	int		m_nrigid;		//!< rigid body number that this element is attached to
 	int		m_nID;			//!< element ID
 	int		m_gid;			//!< part ID (i.e. index of domain this element belongs to)
@@ -225,6 +226,8 @@ public:
 		m_lnode.resize(Nodes());
 	}
 	double* GaussWeights() { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
+	double gr(int n) { return ((FESurfaceElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
+	double gs(int n) { return ((FESurfaceElementTraits*)(m_pT))->gs[n]; }	// integration point coordinate  s
 
 	double* Gr(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gr[n]; }	// shape function derivative to r
 	double* Gs(int n) { return ((FESurfaceElementTraits*)(m_pT))->Gs[n]; }	// shape function derivative to s

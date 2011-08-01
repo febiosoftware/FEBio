@@ -212,7 +212,7 @@ bool FEPlotContactPressure::SaveFacetSliding(FEFacetSlidingSurface &s, vector<fl
 		int ni = el.GaussPoints();
 		for (int k=0; k<ni; ++k, ++nint)
 		{
-			double L = s.m_Lm[nint];
+			double L = s.m_Ln[nint];
 			ti[k] = L;// + pf->m_epsn*gi[k];
 			ti[k] = (ti[k]>=0?ti[k] : 0);		
 		}

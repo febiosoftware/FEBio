@@ -36,7 +36,6 @@ public:
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
 	vector<int>					m_nei;	//!< surface element indices into arrays
 	vector<double>				m_Ln;	//!< net contact pressure
-	vector<int>					m_pmi;	//!< index of master element of projected integration point
 
 	vector<double>	m_epsn;	//!< penalty factors
 	vector<double>	m_epsp;	//!< pressure penalty factors

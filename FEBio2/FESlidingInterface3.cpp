@@ -68,7 +68,6 @@ void FESlidingSurface3::Init()
 	m_epsp.assign(nint, 1.0);
 	m_epsc.assign(nint, 1.0);
 	m_Ln.assign(nint, 0.0);
-	m_pmi.assign(nint, -1);
 	
 	m_nn.assign(Nodes(), 0);
 	
@@ -143,7 +142,6 @@ void FESlidingSurface3::ShallowCopy(FESlidingSurface3 &s)
 	m_gap = s.m_gap;
 	m_Ln = s.m_Ln;
 	zero(m_pme);
-	m_pmi = s.m_pmi;
 	m_bporo = s.m_bporo;
 	m_bsolu = s.m_bsolu;
 	
@@ -232,7 +230,6 @@ void FESlidingSurface3::Serialize(DumpFile& ar)
 		ar << m_pg;
 		ar << m_cg;
 		ar << m_Ln;
-		ar << m_pmi;
 		
 		int ne = (int) m_pme.size();
 		ar << ne;
@@ -258,7 +255,6 @@ void FESlidingSurface3::Serialize(DumpFile& ar)
 		ar >> m_pg;
 		ar >> m_cg;
 		ar >> m_Ln;
-		ar >> m_pmi;
 		
 		assert(m_pSibling);
 		
@@ -587,7 +583,6 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 {
 	FEMesh& mesh = m_pfem->m_mesh;
 	FESurfaceElement* pme;
-	int pmi;
 	vec3d r, nu;
 	double rs[2];
 	double Ln;
@@ -637,7 +632,6 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 			
 			// first see if the old intersected face is still good enough
 			pme = ss.m_pme[n];
-			pmi = ss.m_pmi[n];
 			if (pme)
 			{
 				double g;
@@ -651,15 +645,13 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 				else
 				{
 					pme = 0;
-					pmi = -1;
 				}
 			}
 			
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, m_stol, &pmi);
+			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, m_stol);
 			
 			ss.m_pme[n] = pme;
-			ss.m_pmi[n] = pmi;
 			ss.m_nu[n] = nu;
 			ss.m_rs[n][0] = rs[0];
 			ss.m_rs[n][1] = rs[1];
@@ -1729,18 +1721,16 @@ void FESlidingInterface3::UpdateContactPressures()
 			
 			// get the normal tractions at the integration points
 			double gap, eps;
-			int pmi;
 			for (i=0; i<nint; ++i, ++ni) 
 			{
 				gap = ss.m_gap[ni];
 				eps = m_epsn*ss.m_epsn[ni];
 				ss.m_Ln[ni] = MBRACKET(ss.m_Lmd[ni] + eps*gap);
-				pmi = ss.m_pmi[ni];
-				if ((m_btwo_pass) && (pmi != -1))
+				FESurfaceElement* pme = ss.m_pme[ni];
+				if (m_btwo_pass && pme)
 				{
-					FESurfaceElement pme = ms.Element(pmi);
-					int mint = pme.GaussPoints();
-					int noff = ms.m_nei[pmi];
+					int mint = pme->GaussPoints();
+					int noff = ms.m_nei[pme->m_lid];
 					double ti[4];
 					for (j=0; j<mint; ++j) {
 						k = noff+j;
@@ -1750,9 +1740,9 @@ void FESlidingInterface3::UpdateContactPressures()
 					}
 					// project the data to the nodes
 					double tn[4];
-					pme.project_to_nodes(ti, tn);
+					pme->project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
-					double Ln = pme.eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);
+					double Ln = pme->eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);
 					ss.m_Ln[ni] += MBRACKET(Ln);
 				}
 			}

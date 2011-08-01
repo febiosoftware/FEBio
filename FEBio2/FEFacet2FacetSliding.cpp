@@ -49,6 +49,15 @@ void FEFacetSlidingSurface::Init()
 	m_Lm.assign(nint, 0.0);
 	m_pme.assign(nint, static_cast<FESurfaceElement*>(0));
 	m_eps.assign(nint, 1.0);
+	m_Ln.assign(nint, 0.0);
+
+	m_nei.resize(Elements());
+	nint = 0;
+	for (i=0; i<Elements(); ++i)
+	{
+		m_nei[i] = nint;
+		nint += Element(i).GaussPoints();
+	}
 
 	// set intial values
 	zero(m_nu);
@@ -59,6 +68,7 @@ void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
 {
 	m_Lm  = s.m_Lm;
 	m_gap = s.m_gap;
+	m_Ln = s.m_Ln;
 	zero(m_pme);
 }
 
@@ -122,7 +132,9 @@ void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 		ar << m_nu;
 		ar << m_rs;
 		ar << m_Lm;
+		ar << m_nei;
 		ar << m_eps;
+		ar << m_Ln;
 
 		int ne = (int) m_pme.size();
 		ar << ne;
@@ -138,7 +150,9 @@ void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 		ar >> m_nu;
 		ar >> m_rs;
 		ar >> m_Lm;
+		ar >> m_nei;
 		ar >> m_eps;
+		ar >> m_Ln;
 
 		assert(m_pSibling);
 
@@ -255,9 +269,6 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 	// point we are currently investigating
 	int ni = 0;
 
-	// get the mesh
-	FEMesh* pm = ss.GetMesh();
-
 	// loop over all slave elements
 	for (int i=0; i<ss.Elements(); ++i)
 	{
@@ -312,6 +323,9 @@ void FEFacet2FacetSliding::Update()
 	// project slave surface to master surface
 	ProjectSurface(m_ss, m_ms);
 	if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
+
+	// Update the net contact pressures
+	UpdateContactPressures();
 }
 
 //-----------------------------------------------------------------------------
@@ -809,6 +823,56 @@ void FEFacet2FacetSliding::ContactStiffness()
 
 					// assemble the global residual
 					psolver->AssembleStiffness(en, LM, ke);
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEFacet2FacetSliding::UpdateContactPressures()
+{
+	int np, n, i, j, k;
+	int npass = (m_btwo_pass?2:1);
+	for (np=0; np<npass; ++np)
+	{
+		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
+		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
+		
+		// keep a running counter of integration points.
+		int ni = 0;
+		
+		// loop over all elements of the primary surface
+		for (n=0; n<ss.Elements(); ++n)
+		{
+			FESurfaceElement& el = ss.Element(n);
+			int nint = el.GaussPoints();
+			
+			// get the normal tractions at the integration points
+			double gap, eps;
+			for (i=0; i<nint; ++i, ++ni) 
+			{
+				gap = ss.m_gap[ni];
+				eps = m_epsn*ss.m_eps[ni];
+				ss.m_Ln[ni] = MBRACKET(ss.m_Lm[ni] + eps*gap);
+				FESurfaceElement* pme = ss.m_pme[ni];
+				if (m_btwo_pass && pme)
+				{
+					int mint = pme->GaussPoints();
+					int noff = ms.m_nei[pme->m_lid];
+					double ti[4];
+					for (j=0; j<mint; ++j) {
+						k = noff+j;
+						gap = ms.m_gap[k];
+						eps = m_epsn*ms.m_eps[k];
+						ti[j] = MBRACKET(ms.m_Lm[k] + m_epsn*ms.m_eps[k]*ms.m_gap[k]);
+					}
+					// project the data to the nodes
+					double tn[4];
+					pme->project_to_nodes(ti, tn);
+					// now evaluate the traction at the intersection point
+					double Ln = pme->eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);
+					ss.m_Ln[ni] += MBRACKET(Ln);
 				}
 			}
 		}

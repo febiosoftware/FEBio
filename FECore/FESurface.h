@@ -86,9 +86,6 @@ public:
 	//! check to see if a point is on element
 	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
 
-	//! return the point on a surface element
-	vec3d PointOnSurface(FESurfaceElement& el, double r, double s);
-
 	//! calculates the covariant base vectors of a surface at an integration point
 	void CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
 

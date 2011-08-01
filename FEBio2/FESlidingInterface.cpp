@@ -1671,7 +1671,7 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 	double s = ss.rs[inode][1];
 	double rp = ss.rsp[inode][0], ro = rp;
 	double sp = ss.rsp[inode][1], so = sp;
-	vec3d xn = ms.PointOnSurface(eo, rp, sp);
+	vec3d xn = ms.Local2Global(eo, rp, sp);
 	vec3d qn;
 	qn = ms.ProjectToSurface(en, xn, rp, sp);
 	ss.rsp[inode][0] = rp;
