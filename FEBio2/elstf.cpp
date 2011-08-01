@@ -81,7 +81,8 @@ bool FESolidSolver::StiffnessMatrix()
 	if (m_fem.GetDebugFlag())
 	{
 		vector<int> zd;
-		for (i=0; i<m_fem.m_neq; ++i)
+		int neq = K.Size();
+		for (i=0; i<neq; ++i)
 		{
 			if (K.diag(i) == 0) zd.push_back(i);
 		}

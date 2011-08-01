@@ -124,6 +124,7 @@ void FESolidSolver::PrepStep(double time)
 	// we save the prescribed displacements increments in the ui vector
 	vector<double>& ui = m_bfgs.m_ui;
 	zero(ui);
+	int neq = m_fem.m_neq;
 	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.m_DC[i];
@@ -144,28 +145,28 @@ void FESolidSolver::PrepStep(double time)
 			{
 			case 0: 
 				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_fem.m_neq) 
+				if (I>=0 && I<neq) 
 					ui[I] = dq - (node.m_rt.x - node.m_r0.x);
 				break;
 			case 1: 
 				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_fem.m_neq) 
+				if (I>=0 && I<neq) 
 					ui[I] = dq - (node.m_rt.y - node.m_r0.y); 
 				break;
 			case 2: 
 				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_fem.m_neq) 
+				if (I>=0 && I<neq) 
 					ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
 				break;
 			// ---> TODO: move to the FEPoroSolidSolver
 			case 6: 
 				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_fem.m_neq) 
+				if (I>=0 && I<neq) 
 					ui[I] = dq - node.m_pt; 
 				break;
 			case 11: 
 				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<m_fem.m_neq) 
+				if (I>=0 && I<neq) 
 					ui[I] = dq - node.m_ct; 
 				break;
 			// --->
@@ -175,10 +176,10 @@ void FESolidSolver::PrepStep(double time)
 					dr.x = 0; dr.unit(); dr *= dq;
 
 					I = -node.m_ID[1]-2;
-					if (I>=0 && I<m_fem.m_neq) 
+					if (I>=0 && I<neq) 
 						ui[I] = dr.y - (node.m_rt.y - node.m_r0.y); 
 					I = -node.m_ID[2]-2;
-					if (I>=0 && I<m_fem.m_neq) 
+					if (I>=0 && I<neq) 
 						ui[I] = dr.z - (node.m_rt.z - node.m_r0.z); 
 				}
 				break;
@@ -461,7 +462,8 @@ bool FESolidSolver::Quasin(double time)
 		}
 
 		// update total displacements
-		for (i=0; i<m_fem.m_neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
+		int neq = m_Ui.size();
+		for (i=0; i<neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
 
 		// calculate norms
 		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;

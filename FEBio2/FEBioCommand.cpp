@@ -149,10 +149,6 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 			int nnz = psolver->m_pK->NonZeroes();
 			printf("Nonzeroes in stiffness matrix: %d\n", nnz);
 		}
-		else if (strcmp(argv[1], "neq") == 0)
-		{
-			printf("Number of equations: %d\n", m_pfem->m_neq);
-		}
 		else if (strcmp(argv[1], "time") == 0)
 		{
 			printf("Time : %lg\n", m_pfem->m_ftime);

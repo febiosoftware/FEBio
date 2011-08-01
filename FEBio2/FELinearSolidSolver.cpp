@@ -35,6 +35,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 {
 	// set-up the prescribed displacements
 	zero(m_d);
+	int neq = m_fem.m_neq;
 	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.m_DC[i];
@@ -49,9 +50,9 @@ bool FELinearSolidSolver::SolveStep(double time)
 
 			FENode& node = m_fem.m_mesh.Node(n);
 
-			if (bc == 0) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_fem.m_neq) m_d[I] = D; }
-			if (bc == 1) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_fem.m_neq) m_d[I] = D; }
-			if (bc == 2) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_fem.m_neq) m_d[I] = D; }
+			if (bc == 0) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
+			if (bc == 1) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
+			if (bc == 2) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
 		}
 	}
 
