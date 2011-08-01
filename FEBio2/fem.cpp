@@ -53,7 +53,6 @@ FEM::FEM()
 	AddLoadCurve(plc);
 
 	// --- Geometry Data ---
-	m_nreq = 0;
 	m_nrm = 0;
 
 	m_bsymm = true;	// assume symmetric stiffness matrix

@@ -85,7 +85,6 @@ bool FELinearSolidSolver::InitEquations()
 
 	// store the number of equations
 	m_neq = neq;
-	fem.m_nreq = m_neq;	// TODO: For some reason not setting this causes problems.
 
 	// All initialization is done
 	return true;
@@ -271,7 +270,7 @@ void FELinearSolidSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
 		for (j=0; j<N; ++j)
 		{
 			J = -lm[j]-2;
-			if ((J >= 0) && (J<m_fem.m_nreq))
+			if ((J >= 0) && (J<m_neq))
 			{
 				// dof j is a prescribed degree of freedom
 

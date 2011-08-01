@@ -16,6 +16,7 @@ FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
 	m_Rmin = 1.0e-20;
 
 	m_niter = 0;
+	m_nreq  = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -76,7 +77,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar << m_niter;
 		ar << m_nref << m_ntotref;
 		ar << m_naug;
-		ar << m_neq;
+		ar << m_neq << m_nreq;
 
 		ar << m_bfgs.m_LStol << m_bfgs.m_LSiter << m_bfgs.m_LSmin;
 		ar << m_bfgs.m_maxups;
@@ -91,7 +92,7 @@ void FESolidSolver::Serialize(DumpFile& ar)
 		ar >> m_niter;
 		ar >> m_nref >> m_ntotref;
 		ar >> m_naug;
-		ar >> m_neq;
+		ar >> m_neq >> m_nreq;
 
 		ar >> m_bfgs.m_LStol >> m_bfgs.m_LSiter >> m_bfgs.m_LSmin;
 		ar >> m_bfgs.m_maxups;
@@ -158,7 +159,7 @@ bool FESolidSolver::InitEquations()
 	}
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
-	fem.m_nreq = neq;
+	m_nreq = neq;
 	int nrb = fem.m_RB.size();
 	for (i=0; i<nrb; ++i)
 	{
