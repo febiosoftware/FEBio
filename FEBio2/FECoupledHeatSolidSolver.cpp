@@ -14,19 +14,31 @@ bool FECoupledHeatSolidSolver::Init()
 {
 	// NOTE: Don't call base class since it will try to allocate
 	//       a global stiffness matrix. We don't need one for this
-	//       type of coupled problem.
+	//       type of coupled problem. Instead, we'll need to sub-
+	//		 matrices which will be stored in the m_Heat and m_Solid
+	//		 classes.
 //	FESolver::Init();
-
-	// TODO: The solvers use FEM::m_neq to determine the size
-	//       for the solution vectors. Obviously that won't 
-	//       work here. I have to figure out a different way
-	//       to determine equation numbers.
 
 	// Initialize heat solver
 	if (m_Heat.Init() == false) return false;
 
 	// Initialize solid solver
 	if (m_Solid.Init() == false) return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize equation system.
+//! This solver doesn't manage a linear system, but the two child problems
+//! do so we just call the corresponding function.
+bool FECoupledHeatSolidSolver::InitEquations()
+{
+	// Initialize equations for heat problem
+	if (m_Heat.InitEquations() == false) return false;
+
+	// Initialize equations for solid problem
+	if (m_Solid.InitEquations() == false) return false;
 
 	return true;
 }
@@ -46,6 +58,12 @@ bool FECoupledHeatSolidSolver::SolveStep(double time)
 	if (m_Solid.SolveStep(time) == false) return false;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FECoupledHeatSolidSolver::Update(std::vector<double> &u)
+{
+	// Nothing to do here.
 }
 
 //-----------------------------------------------------------------------------

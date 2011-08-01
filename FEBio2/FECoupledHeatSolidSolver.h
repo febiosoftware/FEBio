@@ -21,8 +21,14 @@ public:
 	//! Solve a step
 	bool SolveStep(double time);
 
+	//! Update solution
+	void Update(vector<double>& u);
+
 	//! data serialization
 	void Serialize(DumpFile& ar);
+
+	//! Initialize equations
+	bool InitEquations();
 
 protected:
 	FEHeatSolver		m_Heat;		//!< heat solver

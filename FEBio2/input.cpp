@@ -137,6 +137,7 @@ void echo_input(FEM& fem)
 	case FE_HEAT        : szmod = "heat transfer"  ; break;
 	case FE_POROSOLUTE  : szmod = "biphasic-solute"; break;
 	case FE_LINEAR_SOLID: szmod = "linear solid"   ; break;
+	case FE_HEAT_SOLID  : szmod = "heat solid"     ; break;
 	default:
 		szmod = "unknown";
 		assert(false);

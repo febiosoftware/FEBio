@@ -26,6 +26,7 @@
 #include "FERigidWallInterface.h"
 #include "FEPoroSolidSolver.h"
 #include "FEPoroSoluteSolver.h"
+#include "FECoupledHeatSolidSolver.h"
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
 #include "FEHeatFlux.h"
@@ -332,26 +333,12 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 
 	assert(pstep && (pstep->m_psolver == 0));
 
-	if      (strcmp(szt, "solid") == 0) 
-	{
-		pstep->m_nModule = FE_SOLID;
-	}
-	else if (strcmp(szt, "linear solid") == 0)
-	{
-		pstep->m_nModule = FE_LINEAR_SOLID;
-	}
-	else if (strcmp(szt, "poro" ) == 0) 
-	{
-		pstep->m_nModule = FE_POROELASTIC;
-	}
-	else if (strcmp(szt, "solute") == 0)
-	{
-		pstep->m_nModule = FE_POROSOLUTE;
-	}
-	else if (strcmp(szt, "heat" ) == 0)
-	{
-		pstep->m_nModule = FE_HEAT;
-	}
+	if      (strcmp(szt, "solid"       ) == 0) pstep->m_nModule = FE_SOLID;
+	else if (strcmp(szt, "linear solid") == 0) pstep->m_nModule = FE_LINEAR_SOLID; 
+	else if (strcmp(szt, "poro"        ) == 0) pstep->m_nModule = FE_POROELASTIC;
+	else if (strcmp(szt, "solute"      ) == 0) pstep->m_nModule = FE_POROSOLUTE;
+	else if (strcmp(szt, "heat"        ) == 0) pstep->m_nModule = FE_HEAT;
+	else if (strcmp(szt, "heat-solid"  ) == 0) pstep->m_nModule = FE_HEAT_SOLID;
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 }
 
@@ -370,6 +357,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
 	case FE_POROSOLUTE  : return new FEPoroSoluteSolver(fem);
 	case FE_HEAT        : return new FEHeatSolver(fem);
 	case FE_LINEAR_SOLID: return new FELinearSolidSolver(fem);
+	case FE_HEAT_SOLID  : return new FECoupledHeatSolidSolver(fem);
 	default:
 		assert(false);
 		return 0;
@@ -1539,11 +1527,25 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	if (fem.m_pStep->m_nModule == FE_HEAT)
 	{
 		// open temperature dofs for heat-transfer problems
-		// and fix non-temperature dofs
 		for (i=0; i<nodes; ++i) 
 		{
 			FENode& n = fem.m_mesh.Node(i);
 			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
+			n.m_ID[DOF_T] = 0;
+		}
+	}
+
+	if (fem.m_pStep->m_nModule == FE_HEAT_SOLID)
+	{
+		// open temperature and displacement dofs 
+		// for coupled heat-solid problems
+		for (i=0; i<nodes; ++i) 
+		{
+			FENode& n = fem.m_mesh.Node(i);
+			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
+			n.m_ID[DOF_X] = 0;
+			n.m_ID[DOF_Y] = 0;
+			n.m_ID[DOF_Z] = 0;
 			n.m_ID[DOF_T] = 0;
 		}
 	}
@@ -1578,6 +1580,12 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 	else if (fem.m_pStep->m_nModule == FE_LINEAR_SOLID)
 	{
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_LINEAR_SOLID_DOMAIN;
+		else return 0;
+	}
+	else if (fem.m_pStep->m_nModule == FE_HEAT_SOLID)
+	{
+		// TODO: I will probably need to define a proper domain type
+		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
 	else

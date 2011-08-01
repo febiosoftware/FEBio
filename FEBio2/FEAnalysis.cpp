@@ -11,6 +11,7 @@
 #include "FEPoroSolidSolver.h"
 #include "FEPoroSoluteSolver.h"
 #include "FELinearSolidSolver.h"
+#include "FECoupledHeatSolidSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -215,7 +216,7 @@ bool FEAnalysis::Init()
 
 	// initialize equations
 	// ----->
-	if (m_fem.m_pStep->m_psolver->InitEquations() == false) return false;
+	if (m_psolver->InitEquations() == false) return false;
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
@@ -676,21 +677,12 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		assert(m_psolver == 0);
 		switch (m_nModule)
 		{
-		case FE_SOLID: 
-			m_psolver = new FESolidSolver(m_fem); 
-			break;
-		case FE_POROELASTIC:
-			m_psolver = new FEPoroSolidSolver(m_fem);
-			break;
-		case FE_POROSOLUTE:
-			m_psolver = new FEPoroSoluteSolver(m_fem);
-			break;
-		case FE_HEAT:
-			m_psolver = new FEHeatSolver(m_fem);
-			break;
-		case FE_LINEAR_SOLID:
-			m_psolver = new FELinearSolidSolver(m_fem);
-			break;
+		case FE_SOLID       : m_psolver = new FESolidSolver           (m_fem); break;
+		case FE_POROELASTIC : m_psolver = new FEPoroSolidSolver       (m_fem); break;
+		case FE_POROSOLUTE  : m_psolver = new FEPoroSoluteSolver      (m_fem); break;
+		case FE_HEAT        : m_psolver = new FEHeatSolver            (m_fem); break;
+		case FE_LINEAR_SOLID: m_psolver = new FELinearSolidSolver     (m_fem); break;
+		case FE_HEAT_SOLID  : m_psolver = new FECoupledHeatSolidSolver(m_fem); break;
 		default:
 			throw "Unknown module type in FEAnalysis::Serialize";
 		}

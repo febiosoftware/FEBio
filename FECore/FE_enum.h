@@ -76,7 +76,8 @@ enum FE_Module_Type {
 	FE_POROELASTIC,
 	FE_HEAT,
 	FE_POROSOLUTE,
-	FE_LINEAR_SOLID
+	FE_LINEAR_SOLID,
+	FE_HEAT_SOLID
 };
 
 ///////////////////////////////////////////////////////////////////////////////
