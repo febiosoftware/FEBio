@@ -629,11 +629,11 @@ void FESlidingInterface2::Update()
 			for (i=0; i<neln; ++i)
 			{
 				FENode& node = ss.Node(el.m_lnode[i]);
-				id = node.m_ID[6];
+				id = node.m_ID[DOF_P];
 				if ((id < -1) && (tn[i] > 0))
 				{
 					// mark node as non-free-draining (= pos ID)
-					node.m_ID[6] = -id-2;
+					node.m_ID[DOF_P] = -id-2;
 				}
 			}
 		}
@@ -681,11 +681,11 @@ void FESlidingInterface2::Update()
 					double tp = pse->eval(tn, rs[0], rs[1]);
 
 					// if tp > 0, mark node as non-free-draining. (= pos ID)
-					id = node.m_ID[6];
+					id = node.m_ID[DOF_P];
 					if ((id < -1) && (tp > 0))
 					{
 						// mark as non free-draining
-						node.m_ID[6] = -id-2;
+						node.m_ID[DOF_P] = -id-2;
 					}
 				}
 			}
@@ -1585,12 +1585,12 @@ void FESlidingInterface2::MarkFreeDraining()
 			// to a negative number
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				id = s.Node(i).m_ID[6];
+				id = s.Node(i).m_ID[DOF_P];
 				if (id >= 0) 
 				{
 					FENode& node = s.Node(i);
 					// mark node as free-draining
-					node.m_ID[6] = -id-2;
+					node.m_ID[DOF_P] = -id-2;
 				}
 			}
 		}
@@ -1612,7 +1612,7 @@ void FESlidingInterface2::SetFreeDraining()
 			// loop over all nodes
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				if (s.Node(i).m_ID[6] < -1)
+				if (s.Node(i).m_ID[DOF_P] < -1)
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to zero

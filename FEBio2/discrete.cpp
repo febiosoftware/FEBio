@@ -141,12 +141,12 @@ void FEDiscreteSpringDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		en[1] = el.m_node[1];
 
 		// set up the LM vector
-		lm[0] = n1.m_ID[0];
-		lm[1] = n1.m_ID[1];
-		lm[2] = n1.m_ID[2];
-		lm[3] = n2.m_ID[0];
-		lm[4] = n2.m_ID[1];
-		lm[5] = n2.m_ID[2];
+		lm[0] = n1.m_ID[DOF_X];
+		lm[1] = n1.m_ID[DOF_Y];
+		lm[2] = n1.m_ID[DOF_Z];
+		lm[3] = n2.m_ID[DOF_X];
+		lm[4] = n2.m_ID[DOF_Y];
+		lm[5] = n2.m_ID[DOF_Z];
 
 		// assemble element
 		psolver->AssembleResidual(en, lm, fe, R);
@@ -231,12 +231,12 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolidSolver* psolver)
 		en[1] = el.m_node[1];
 
 		// set up the LM vector
-		lm[0] = n1.m_ID[0];
-		lm[1] = n1.m_ID[1];
-		lm[2] = n1.m_ID[2];
-		lm[3] = n2.m_ID[0];
-		lm[4] = n2.m_ID[1];
-		lm[5] = n2.m_ID[2];
+		lm[0] = n1.m_ID[DOF_X];
+		lm[1] = n1.m_ID[DOF_Y];
+		lm[2] = n1.m_ID[DOF_Z];
+		lm[3] = n2.m_ID[DOF_X];
+		lm[4] = n2.m_ID[DOF_Y];
+		lm[5] = n2.m_ID[DOF_Z];
 
 		// assemble the element into the global system
 		psolver->AssembleStiffness(en, lm, ke);

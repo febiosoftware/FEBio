@@ -499,9 +499,9 @@ void FESurfaceConstraint::ContactStiffness()
 
 		// fill the lm array
 		lm.resize(3*(ne0+1));
-		lm[0] = ss.Node(nref).m_ID[0];
-		lm[1] = ss.Node(nref).m_ID[1];
-		lm[2] = ss.Node(nref).m_ID[2];
+		lm[0] = ss.Node(nref).m_ID[DOF_X];
+		lm[1] = ss.Node(nref).m_ID[DOF_Y];
+		lm[2] = ss.Node(nref).m_ID[DOF_Z];
 		for (l=0; l<ne0; ++l)
 		{
 			lm[3*(l+1)  ] = LM0[l*3  ];

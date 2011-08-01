@@ -48,8 +48,6 @@ bool FELinearSolidSolver::Init()
 //!
 bool FELinearSolidSolver::InitEquations()
 {
-	int i, j, n;
-
 	FEM& fem = m_fem;
 	FEMesh& mesh = fem.m_mesh;
 
@@ -65,23 +63,23 @@ bool FELinearSolidSolver::InitEquations()
 		mod.Apply(mesh, P);
 
 		// set the equation numbers
-		for (i=0; i<mesh.Nodes(); ++i)
+		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(P[i]);
-			if (node.m_ID[0] >= 0) node.m_ID[0] = neq++;
-			if (node.m_ID[1] >= 0) node.m_ID[1] = neq++;
-			if (node.m_ID[2] >= 0) node.m_ID[2] = neq++;
+			if (node.m_ID[DOF_X] >= 0) node.m_ID[DOF_X] = neq++;
+			if (node.m_ID[DOF_Y] >= 0) node.m_ID[DOF_Y] = neq++;
+			if (node.m_ID[DOF_Z] >= 0) node.m_ID[DOF_Z] = neq++;
 		}
 	}
 	else
 	{
 		// give all free dofs an equation number
-		for (i=0; i<mesh.Nodes(); ++i)
+		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(i);
-			if (node.m_ID[0] >= 0) node.m_ID[0] = neq++;
-			if (node.m_ID[1] >= 0) node.m_ID[1] = neq++;
-			if (node.m_ID[2] >= 0) node.m_ID[2] = neq++;
+			if (node.m_ID[DOF_X] >= 0) node.m_ID[DOF_X] = neq++;
+			if (node.m_ID[DOF_Y] >= 0) node.m_ID[DOF_Y] = neq++;
+			if (node.m_ID[DOF_Z] >= 0) node.m_ID[DOF_Z] = neq++;
 		}
 	}
 
@@ -115,9 +113,9 @@ bool FELinearSolidSolver::SolveStep(double time)
 
 			FENode& node = m_fem.m_mesh.Node(n);
 
-			if (bc == 0) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
-			if (bc == 1) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
-			if (bc == 2) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
+			if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
+			if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
+			if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<neq) m_d[I] = D; }
 		}
 	}
 
@@ -148,9 +146,9 @@ void FELinearSolidSolver::Update(vector<double>& u)
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		n = node.m_ID[0]; if (n >= 0) node.m_rt.x = node.m_r0.x + u[n]; else if (-n-2 >= 0) node.m_rt.x = node.m_r0.x + m_d[-n-2];
-		n = node.m_ID[1]; if (n >= 0) node.m_rt.y = node.m_r0.y + u[n]; else if (-n-2 >= 0) node.m_rt.y = node.m_r0.y + m_d[-n-2];
-		n = node.m_ID[2]; if (n >= 0) node.m_rt.z = node.m_r0.z + u[n]; else if (-n-2 >= 0) node.m_rt.z = node.m_r0.z + m_d[-n-2];
+		n = node.m_ID[DOF_X]; if (n >= 0) node.m_rt.x = node.m_r0.x + u[n]; else if (-n-2 >= 0) node.m_rt.x = node.m_r0.x + m_d[-n-2];
+		n = node.m_ID[DOF_Y]; if (n >= 0) node.m_rt.y = node.m_r0.y + u[n]; else if (-n-2 >= 0) node.m_rt.y = node.m_r0.y + m_d[-n-2];
+		n = node.m_ID[DOF_Z]; if (n >= 0) node.m_rt.z = node.m_r0.z + u[n]; else if (-n-2 >= 0) node.m_rt.z = node.m_r0.z + m_d[-n-2];
 	}
 
 	// update the stresses on all domains

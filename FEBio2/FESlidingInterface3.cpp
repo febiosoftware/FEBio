@@ -806,14 +806,15 @@ void FESlidingInterface3::Update()
 				if (tn[i] > 0)
 				{
 					FENode& node = ss.Node(el.m_lnode[i]);
-					id = node.m_ID[6];
+					id = node.m_ID[DOF_P];
 					if (id < -1)
 						// mark node as non-ambient (= pos ID)
-						node.m_ID[6] = -id-2;
-					id = node.m_ID[11];
+						node.m_ID[DOF_P] = -id-2;
+
+					id = node.m_ID[DOF_C];
 					if (id < -1)
 						// mark node as non-ambient (= pos ID)
-						node.m_ID[11] = -id-2;
+						node.m_ID[DOF_C] = -id-2;
 				}
 			}
 		}
@@ -862,14 +863,15 @@ void FESlidingInterface3::Update()
 					
 					// if tp > 0, mark node as non-ambient. (= pos ID)
 					if (tp > 0)  {
-						id = node.m_ID[6];
+						id = node.m_ID[DOF_P];
 						if (id < -1)
 							// mark as non-ambient
-							node.m_ID[6] = -id-2;
-						id = node.m_ID[11];
+							node.m_ID[DOF_P] = -id-2;
+
+						id = node.m_ID[DOF_C];
 						if (id < -1)
 							// mark as non-ambient
-							node.m_ID[11] = -id-2;
+							node.m_ID[DOF_C] = -id-2;
 					}
 				}
 			}
@@ -1969,12 +1971,12 @@ void FESlidingInterface3::MarkAmbient()
 			// to a negative number
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				id = s.Node(i).m_ID[6];
+				id = s.Node(i).m_ID[DOF_P];
 				if (id >= 0) 
 				{
 					FENode& node = s.Node(i);
 					// mark node as free-draining
-					node.m_ID[6] = -id-2;
+					node.m_ID[DOF_P] = -id-2;
 				}
 			}
 		}
@@ -1984,12 +1986,12 @@ void FESlidingInterface3::MarkAmbient()
 			// to a negative number
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				id = s.Node(i).m_ID[11];
+				id = s.Node(i).m_ID[DOF_C];
 				if (id >= 0) 
 				{
 					FENode& node = s.Node(i);
 					// mark node as free-draining
-					node.m_ID[11] = -id-2;
+					node.m_ID[DOF_C] = -id-2;
 				}
 			}
 		}
@@ -2011,7 +2013,7 @@ void FESlidingInterface3::SetAmbient()
 			// loop over all nodes
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				if (s.Node(i).m_ID[6] < -1)
+				if (s.Node(i).m_ID[DOF_P] < -1)
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition
@@ -2023,7 +2025,7 @@ void FESlidingInterface3::SetAmbient()
 			// loop over all nodes
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				if (s.Node(i).m_ID[11] < -1)
+				if (s.Node(i).m_ID[DOF_C] < -1)
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition

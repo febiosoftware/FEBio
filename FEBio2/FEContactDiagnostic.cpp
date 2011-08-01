@@ -141,27 +141,28 @@ bool FEContactDiagnostic::Init()
 		node.m_rid = -1;
 
 		// open displacement dofs
-		node.m_ID[0] = 0;
-		node.m_ID[1] = 0;
-		node.m_ID[2] = 0;
+		node.m_ID[DOF_X] = 0;
+		node.m_ID[DOF_Y] = 0;
+		node.m_ID[DOF_Z] = 0;
 
 		// open rotational dofs
-		node.m_ID[3] = 0;
-		node.m_ID[4] = 0;
-		node.m_ID[5] = 0;
+		node.m_ID[DOF_U] = 0;
+		node.m_ID[DOF_V] = 0;
+		node.m_ID[DOF_W] = 0;
 
 		// open pressure dof
-		node.m_ID[6] = 0;
+		node.m_ID[DOF_P] = 0;
 
 		// close the rigid rotational dofs
-		node.m_ID[7] = -1;
-		node.m_ID[8] = -1;
-		node.m_ID[9] = -1;
+		node.m_ID[DOF_RU] = -1;
+		node.m_ID[DOF_RV] = -1;
+		node.m_ID[DOF_RW] = -1;
 
-		node.m_ID[10] = 0;
+		// open temperature degree of freedom
+		node.m_ID[DOF_T] = 0;
 		
 		// open concentration dof
-		node.m_ID[11] = 0;
+		node.m_ID[DOF_C] = 0;
 	}
 
 	// get the one-and-only domain

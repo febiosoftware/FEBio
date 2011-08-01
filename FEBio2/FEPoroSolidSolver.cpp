@@ -46,7 +46,7 @@ bool FEPoroSolidSolver::Init()
 		FENode& node = mesh.Node(i);
 
 		// pressure dofs
-		n = node.m_ID[6]; if (n >= 0) m_Ut[n] = node.m_pt;
+		n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.m_pt;
 	}
 
 	return true;
@@ -405,7 +405,7 @@ void FEPoroSolidSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.m_mesh.Node(i);
-		nid = n.m_ID[6];
+		nid = n.m_ID[DOF_P];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);

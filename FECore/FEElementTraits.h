@@ -15,24 +15,25 @@
 #include "FE_enum.h"
 #include <vector>
 
-///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 // Max nr of nodal degrees of freedom
 
 #define MAX_NDOFS	12
 
-// At this point the 7 nodal dofs are used as follows:
-//  1: x-displacement
-//  2: y-displacement
-//  3: z-displacement
-//  4: x-rotation
-//  5: y-rotation
-//  6: z-rotation
-//  7: fluid pressure
-//  8: rigid x-rotation
-//  9: rigid y-rotation
-// 10: rigid z-rotation
-// 11: temperature
-// 12: solute concentration
+// At this point the nodal dofs are used as follows:
+//
+#define DOF_X			0		// x-displacement
+#define DOF_Y			1		// y-displacement
+#define DOF_Z			2		// z-displacement
+#define DOF_U			3		// x-rotation
+#define DOF_V			4		// y-rotation
+#define DOF_W			5		// z-rotation
+#define DOF_P			6		// fluid pressure
+#define DOF_RU			7		// rigid x-rotation
+#define DOF_RV			8		// rigid y-rotation
+#define DOF_RW			9		// rigid z-rotation
+#define DOF_T			10		// temperature
+#define DOF_C			11		// solute concentration
 //
 // The rotational degrees of freedom are only used for rigid nodes and shells.
 // The fluid pressure is only used for poroelastic problems.
@@ -41,11 +42,13 @@
 // The temperature is only used during heat-conduction problems
 // The solute concentration is only used in solute transport problems.
 
+//-----------------------------------------------------------------------------
+// Forward declaration of the FEElement class
 class FEElement;
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for all element trait's classes
-
+//
 class FEElementTraits
 {
 public:

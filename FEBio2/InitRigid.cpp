@@ -321,14 +321,14 @@ bool FEM::InitRigidBodies()
 		FENode& node = m_mesh.Node(i);
 		if (node.m_rid >= 0)
 		{
-			node.m_ID[0] = -1;
-			node.m_ID[1] = -1;
-			node.m_ID[2] = -1;
+			node.m_ID[DOF_X] = -1;
+			node.m_ID[DOF_Y] = -1;
+			node.m_ID[DOF_Z] = -1;
 			if (node.m_bshell == false)
 			{
-				node.m_ID[3] = -1;
-				node.m_ID[4] = -1;
-				node.m_ID[5] = -1;
+				node.m_ID[DOF_U] = -1;
+				node.m_ID[DOF_V] = -1;
+				node.m_ID[DOF_W] = -1;
 			}
 		}
 	}

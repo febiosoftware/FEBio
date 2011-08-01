@@ -23,13 +23,13 @@ bool FEM::InitPoroSolute()
 		// if there is no poroelasticity
 		// we set all pressure degrees of freedoms as fixed
 		// just to make sure they do not get assigned an equation number
-		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[6] = -1;
+		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[DOF_P] = -1;
 		
 		// also remove prescribed pressures
 		for (i=0; i<(int) m_DC.size(); ++i)
 		{
 			int& bc   = m_DC[i]->bc;
-			if (bc == 6) bc = -1;
+			if (bc == DOF_P) bc = -1;
 		}
 	}
 	
@@ -38,13 +38,13 @@ bool FEM::InitPoroSolute()
 		// if there is no solute
 		// we set all concentration degrees of freedoms as fixed
 		// just to make sure they do not get assigned an equation number
-		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[11] = -1;
+		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[DOF_C] = -1;
 		
 		// also remove prescribed concentrations
 		for (i=0; i<(int) m_DC.size(); ++i)
 		{
 			int& bc   = m_DC[i]->bc;
-			if (bc == 11) bc = -1;
+			if (bc == DOF_C) bc = -1;
 		}
 	}
 	
@@ -87,7 +87,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j) 
-							if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_P] == 0) m_mesh.Node(n[j]).m_ID[DOF_P] = 1;
 					}
 				}
 			}
@@ -106,7 +106,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j) 
-							if (m_mesh.Node(n[j]).m_ID[6] == 0) m_mesh.Node(n[j]).m_ID[6] = 1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_P] == 0) m_mesh.Node(n[j]).m_ID[DOF_P] = 1;
 					}
 				}
 			}
@@ -129,7 +129,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_P] != 1) m_mesh.Node(n[j]).m_ID[DOF_P] = -1;
 					}
 				}
 			}
@@ -148,7 +148,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[6] != 1) m_mesh.Node(n[j]).m_ID[6] = -1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_P] != 1) m_mesh.Node(n[j]).m_ID[DOF_P] = -1;
 					}
 				}
 			}
@@ -171,7 +171,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
+							if (m_mesh.Node(n[j]).m_ID[DOF_P] == 1) m_mesh.Node(n[j]).m_ID[DOF_P] = 0;
 					}
 				}
 			}
@@ -191,7 +191,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[6] == 1) m_mesh.Node(n[j]).m_ID[6] = 0;
+							if (m_mesh.Node(n[j]).m_ID[DOF_P] == 1) m_mesh.Node(n[j]).m_ID[DOF_P] = 0;
 					}
 				}
 			}
@@ -218,7 +218,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j) 
-							if (m_mesh.Node(n[j]).m_ID[11] == 0) m_mesh.Node(n[j]).m_ID[11] = 1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_C] == 0) m_mesh.Node(n[j]).m_ID[DOF_C] = 1;
 					}
 				}
 			}
@@ -235,7 +235,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j) 
-							if (m_mesh.Node(n[j]).m_ID[11] == 0) m_mesh.Node(n[j]).m_ID[11] = 1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_C] == 0) m_mesh.Node(n[j]).m_ID[DOF_C] = 1;
 					}
 				}
 			}
@@ -256,7 +256,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[11] != 1) m_mesh.Node(n[j]).m_ID[11] = -1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_C] != 1) m_mesh.Node(n[j]).m_ID[DOF_C] = -1;
 					}
 				}
 			}
@@ -273,7 +273,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[11] != 1) m_mesh.Node(n[j]).m_ID[11] = -1;
+							if (m_mesh.Node(n[j]).m_ID[DOF_C] != 1) m_mesh.Node(n[j]).m_ID[DOF_C] = -1;
 					}
 				}
 			}
@@ -294,7 +294,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[11] == 1) m_mesh.Node(n[j]).m_ID[11] = 0;
+							if (m_mesh.Node(n[j]).m_ID[DOF_C] == 1) m_mesh.Node(n[j]).m_ID[DOF_C] = 0;
 					}
 				}
 			}
@@ -312,7 +312,7 @@ bool FEM::InitPoroSolute()
 						int N = el.Nodes();
 						int* n = &el.m_node[0];
 						for (j=0; j<N; ++j)
-							if (m_mesh.Node(n[j]).m_ID[11] == 1) m_mesh.Node(n[j]).m_ID[11] = 0;
+							if (m_mesh.Node(n[j]).m_ID[DOF_C] == 1) m_mesh.Node(n[j]).m_ID[DOF_C] = 0;
 					}
 				}
 			}
@@ -324,8 +324,8 @@ bool FEM::InitPoroSolute()
 	for (i=0; i<m_mesh.Nodes(); ++i)
 	{
 		FENode& n = m_mesh.Node(i);
-		if (n.m_ID[6] != -1) m_npeq++;
-		if (n.m_ID[11] != -1) m_nceq++;
+		if (n.m_ID[DOF_P] != -1) m_npeq++;
+		if (n.m_ID[DOF_C] != -1) m_nceq++;
 	}
 	
 	return true;

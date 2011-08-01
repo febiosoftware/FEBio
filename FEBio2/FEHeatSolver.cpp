@@ -66,7 +66,7 @@ bool FEHeatSolver::InitEquations()
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(P[i]);
-			if (node.m_ID[10] >= 0) node.m_ID[10] = neq++;
+			if (node.m_ID[DOF_T] >= 0) node.m_ID[DOF_T] = neq++;
 		}
 	}
 	else
@@ -75,7 +75,7 @@ bool FEHeatSolver::InitEquations()
 		for (int i=0; i<mesh.Nodes(); ++i)
 		{
 			FENode& node = mesh.Node(i);
-			if (node.m_ID[10] >= 0) node.m_ID[10] = neq++;
+			if (node.m_ID[DOF_T] >= 0) node.m_ID[DOF_T] = neq++;
 		}
 	}
 
@@ -141,7 +141,7 @@ void FEHeatSolver::Update(vector<double>& u)
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		int n = node.m_ID[10];
+		int n = node.m_ID[DOF_T];
 		if (n >= 0) node.m_T = m_T[n];
 		else if (-n-2 >= 0) node.m_T = m_T[-n-2] = m_u[-n-2];
 	}

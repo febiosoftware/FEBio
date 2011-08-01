@@ -239,15 +239,15 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 				{
 					FEPointConstraint& pc = fem.m_PC[i];
 					FENode& n0 = mesh.Node(pc.m_node);
-					lm[0] = n0.m_ID[0];
-					lm[1] = n0.m_ID[1];
-					lm[2] = n0.m_ID[2];
+					lm[0] = n0.m_ID[DOF_X];
+					lm[1] = n0.m_ID[DOF_Y];
+					lm[2] = n0.m_ID[DOF_Z];
 					for (j=0; i<8; ++i)
 					{
 						FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
-						lm[3*(j+1)  ] = nj.m_ID[0];
-						lm[3*(j+1)+1] = nj.m_ID[1];
-						lm[3*(j+1)+2] = nj.m_ID[2];
+						lm[3*(j+1)  ] = nj.m_ID[DOF_X];
+						lm[3*(j+1)+1] = nj.m_ID[DOF_Y];
+						lm[3*(j+1)+2] = nj.m_ID[DOF_Z];
 					}
 					build_add(lm);
 				}
@@ -330,22 +330,22 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 									lm[6*(3+1)+5] = -1;
 								}
 
-								lm[0] = ss.Node(j).m_ID[0];
-								lm[1] = ss.Node(j).m_ID[1];
-								lm[2] = ss.Node(j).m_ID[2];
-								lm[3] = ss.Node(j).m_ID[7];
-								lm[4] = ss.Node(j).m_ID[8];
-								lm[5] = ss.Node(j).m_ID[9];
+								lm[0] = ss.Node(j).m_ID[DOF_X];
+								lm[1] = ss.Node(j).m_ID[DOF_Y];
+								lm[2] = ss.Node(j).m_ID[DOF_Z];
+								lm[3] = ss.Node(j).m_ID[DOF_RU];
+								lm[4] = ss.Node(j).m_ID[DOF_RV];
+								lm[5] = ss.Node(j).m_ID[DOF_RW];
 
 								for (k=0; k<n; ++k)
 								{
 									id = fem.m_mesh.Node(en[k]).m_ID;
-									lm[6*(k+1)  ] = id[0];
-									lm[6*(k+1)+1] = id[1];
-									lm[6*(k+1)+2] = id[2];
-									lm[6*(k+1)+3] = id[7];
-									lm[6*(k+1)+4] = id[8];
-									lm[6*(k+1)+5] = id[9];
+									lm[6*(k+1)  ] = id[DOF_X];
+									lm[6*(k+1)+1] = id[DOF_Y];
+									lm[6*(k+1)+2] = id[DOF_Z];
+									lm[6*(k+1)+3] = id[DOF_RU];
+									lm[6*(k+1)+4] = id[DOF_RV];
+									lm[6*(k+1)+5] = id[DOF_RW];
 								}
 
 								build_add(lm);
@@ -388,12 +388,12 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 									for (l=0; l<nseln; ++l)
 									{
 										id = fem.m_mesh.Node(sn[l]).m_ID;
-										lm[6*l  ] = id[0];
-										lm[6*l+1] = id[1];
-										lm[6*l+2] = id[2];
-										lm[6*l+3] = id[7];
-										lm[6*l+4] = id[8];
-										lm[6*l+5] = id[9];
+										lm[6*l  ] = id[DOF_X];
+										lm[6*l+1] = id[DOF_Y];
+										lm[6*l+2] = id[DOF_Z];
+										lm[6*l+3] = id[DOF_RU];
+										lm[6*l+4] = id[DOF_RV];
+										lm[6*l+5] = id[DOF_RW];
 									}
 
 									for (l=0; l<nmeln; ++l)
@@ -569,22 +569,22 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 								lm[6*(3+1)+5] = -1;
 							}
 
-							lm[0] = ss.Node(j).m_ID[0];
-							lm[1] = ss.Node(j).m_ID[1];
-							lm[2] = ss.Node(j).m_ID[2];
-							lm[3] = ss.Node(j).m_ID[7];
-							lm[4] = ss.Node(j).m_ID[8];
-							lm[5] = ss.Node(j).m_ID[9];
+							lm[0] = ss.Node(j).m_ID[DOF_X];
+							lm[1] = ss.Node(j).m_ID[DOF_Y];
+							lm[2] = ss.Node(j).m_ID[DOF_Z];
+							lm[3] = ss.Node(j).m_ID[DOF_RU];
+							lm[4] = ss.Node(j).m_ID[DOF_RV];
+							lm[5] = ss.Node(j).m_ID[DOF_RW];
 
 							for (k=0; k<n; ++k)
 							{
 								id = fem.m_mesh.Node(en[k]).m_ID;
-								lm[6*(k+1)  ] = id[0];
-								lm[6*(k+1)+1] = id[1];
-								lm[6*(k+1)+2] = id[2];
-								lm[6*(k+1)+3] = id[7];
-								lm[6*(k+1)+4] = id[8];
-								lm[6*(k+1)+5] = id[9];
+								lm[6*(k+1)  ] = id[DOF_X];
+								lm[6*(k+1)+1] = id[DOF_Y];
+								lm[6*(k+1)+2] = id[DOF_Z];
+								lm[6*(k+1)+3] = id[DOF_RU];
+								lm[6*(k+1)+4] = id[DOF_RV];
+								lm[6*(k+1)+5] = id[DOF_RW];
 							}
 
 							build_add(lm);
@@ -618,22 +618,22 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 							lm[6*(3+1)+5] = -1;
 						}
 
-						lm[0] = ss.Node(j).m_ID[0];
-						lm[1] = ss.Node(j).m_ID[1];
-						lm[2] = ss.Node(j).m_ID[2];
-						lm[3] = ss.Node(j).m_ID[7];
-						lm[4] = ss.Node(j).m_ID[8];
-						lm[5] = ss.Node(j).m_ID[9];
+						lm[0] = ss.Node(j).m_ID[DOF_X];
+						lm[1] = ss.Node(j).m_ID[DOF_Y];
+						lm[2] = ss.Node(j).m_ID[DOF_Z];
+						lm[3] = ss.Node(j).m_ID[DOF_RU];
+						lm[4] = ss.Node(j).m_ID[DOF_RV];
+						lm[5] = ss.Node(j).m_ID[DOF_RW];
 
 						for (k=0; k<n; ++k)
 						{
 							id = fem.m_mesh.Node(en[k]).m_ID;
-							lm[6*(k+1)  ] = id[0];
-							lm[6*(k+1)+1] = id[1];
-							lm[6*(k+1)+2] = id[2];
-							lm[6*(k+1)+3] = id[7];
-							lm[6*(k+1)+4] = id[8];
-							lm[6*(k+1)+5] = id[9];
+							lm[6*(k+1)  ] = id[DOF_X];
+							lm[6*(k+1)+1] = id[DOF_Y];
+							lm[6*(k+1)+2] = id[DOF_Z];
+							lm[6*(k+1)+3] = id[DOF_RU];
+							lm[6*(k+1)+4] = id[DOF_RV];
+							lm[6*(k+1)+5] = id[DOF_RW];
 						}
 
 						build_add(lm);
@@ -686,22 +686,22 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 
 						n = me.Nodes();
 
-						lm[0] = ss.Node(j).m_ID[0];
-						lm[1] = ss.Node(j).m_ID[1];
-						lm[2] = ss.Node(j).m_ID[2];
-						lm[3] = ss.Node(j).m_ID[7];
-						lm[4] = ss.Node(j).m_ID[8];
-						lm[5] = ss.Node(j).m_ID[9];
+						lm[0] = ss.Node(j).m_ID[DOF_X];
+						lm[1] = ss.Node(j).m_ID[DOF_Y];
+						lm[2] = ss.Node(j).m_ID[DOF_Z];
+						lm[3] = ss.Node(j).m_ID[DOF_RU];
+						lm[4] = ss.Node(j).m_ID[DOF_RV];
+						lm[5] = ss.Node(j).m_ID[DOF_RW];
 
 						for (k=0; k<n; ++k)
 						{
 							id = fem.m_mesh.Node(en[k]).m_ID;
-							lm[6*(k+1)  ] = id[0];
-							lm[6*(k+1)+1] = id[1];
-							lm[6*(k+1)+2] = id[2];
-							lm[6*(k+1)+3] = id[7];
-							lm[6*(k+1)+4] = id[8];
-							lm[6*(k+1)+5] = id[9];
+							lm[6*(k+1)  ] = id[DOF_X];
+							lm[6*(k+1)+1] = id[DOF_Y];
+							lm[6*(k+1)+2] = id[DOF_Z];
+							lm[6*(k+1)+3] = id[DOF_RU];
+							lm[6*(k+1)+4] = id[DOF_RV];
+							lm[6*(k+1)+5] = id[DOF_RW];
 						}
 
 						build_add(lm);
@@ -719,12 +719,12 @@ bool FEStiffnessMatrix::Create(FEM& fem, bool breset)
 					{
 						if (ss.gap[j] >= 0)
 						{
-							lm[0] = ss.Node(j).m_ID[0];
-							lm[1] = ss.Node(j).m_ID[1];
-							lm[2] = ss.Node(j).m_ID[2];
-							lm[3] = ss.Node(j).m_ID[7];
-							lm[4] = ss.Node(j).m_ID[8];
-							lm[5] = ss.Node(j).m_ID[9];
+							lm[0] = ss.Node(j).m_ID[DOF_X];
+							lm[1] = ss.Node(j).m_ID[DOF_Y];
+							lm[2] = ss.Node(j).m_ID[DOF_Z];
+							lm[3] = ss.Node(j).m_ID[DOF_RU];
+							lm[4] = ss.Node(j).m_ID[DOF_RV];
+							lm[5] = ss.Node(j).m_ID[DOF_RW];
 
 							build_add(lm);
 						}

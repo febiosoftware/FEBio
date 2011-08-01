@@ -304,14 +304,15 @@ bool FEM::InitMesh()
 		}
 	}
 
+	// fix rotational degrees of freedom of tagged nodes
 	for (i=0; i<m.Nodes(); ++i) 
 	{
 		FENode& node = m.Node(i);
 		if (tag[i] == 0)
 		{
-			node.m_ID[3] = -1;
-			node.m_ID[4] = -1;
-			node.m_ID[5] = -1;
+			node.m_ID[DOF_U] = -1;
+			node.m_ID[DOF_V] = -1;
+			node.m_ID[DOF_W] = -1;
 		}
 	}
 

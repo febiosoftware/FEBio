@@ -237,9 +237,9 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 		FEPrescribedBC& dc = *m_rve.m_DC[3*i];
 		FENode& n = m.Node(dc.node);
 		vec3d f;
-		f.x = R[-n.m_ID[0]-2];
-		f.y = R[-n.m_ID[1]-2];
-		f.z = R[-n.m_ID[2]-2];
+		f.x = R[-n.m_ID[DOF_X]-2];
+		f.y = R[-n.m_ID[DOF_Y]-2];
+		f.z = R[-n.m_ID[DOF_Z]-2];
 		T += f & n.m_rt;
 	}
 	mat3ds s = T.sym() / (J*m_V0);
@@ -302,7 +302,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 			for (j=0; j<ne; ++j)
 			{
 				FENode& nj = m.Node(e.m_node[j]);
-				if ((ni.m_ID[0] < 0) && (nj.m_ID[0] < 0))
+				if ((ni.m_ID[DOF_X] < 0) && (nj.m_ID[DOF_X] < 0))
 				{
 					// both nodes are boundary nodes
 					// so grab the element's submatrix
@@ -350,7 +350,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 				}
 			}
 /*
-			if (ni.m_ID[0] < 0)
+			if (ni.m_ID[DOF_X] < 0)
 			{
 				vec3d ri = ni.m_r0;
 

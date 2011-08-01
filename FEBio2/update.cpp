@@ -32,14 +32,14 @@ void FESolidSolver::Update(vector<double>& ui)
 
 		// displacement dofs
 		// current position = initial + total at prev conv step + total increment so far + current increment  
-		if ((n = node.m_ID[0]) >= 0) node.m_rt.x = node.m_r0.x + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[1]) >= 0) node.m_rt.y = node.m_r0.y + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[2]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_X]) >= 0) node.m_rt.x = node.m_r0.x + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_Y]) >= 0) node.m_rt.y = node.m_r0.y + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_rt.z = node.m_r0.z + m_Ut[n] + m_Ui[n] + ui[n];
 
 		// rotational dofs
-		if ((n = node.m_ID[3]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[4]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
-		if ((n = node.m_ID[5]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_U]) >= 0) node.m_Dt.x = node.m_D0.x + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_V]) >= 0) node.m_Dt.y = node.m_D0.y + m_Ut[n] + m_Ui[n] + ui[n];
+		if ((n = node.m_ID[DOF_W]) >= 0) node.m_Dt.z = node.m_D0.z + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 
 	// make sure the prescribed displacements are fullfilled
@@ -175,7 +175,7 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// update nodal pressures
-		n = node.m_ID[6];
+		n = node.m_ID[DOF_P];
 		if (n >= 0) node.m_pt = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 
@@ -352,7 +352,7 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 		
 		// update nodal concentration
-		n = node.m_ID[11];
+		n = node.m_ID[DOF_C];
 		if (n >= 0) node.m_ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 	

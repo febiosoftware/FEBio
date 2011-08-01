@@ -1510,28 +1510,28 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		node.m_rid = -1;
 
 		// open displacement dofs
-		node.m_ID[0] = 0;
-		node.m_ID[1] = 0;
-		node.m_ID[2] = 0;
+		node.m_ID[DOF_X] = 0;
+		node.m_ID[DOF_Y] = 0;
+		node.m_ID[DOF_Z] = 0;
 
 		// open rotational dofs
-		node.m_ID[3] = 0;
-		node.m_ID[4] = 0;
-		node.m_ID[5] = 0;
+		node.m_ID[DOF_U] = 0;
+		node.m_ID[DOF_V] = 0;
+		node.m_ID[DOF_W] = 0;
 
 		// open pressure dof
-		node.m_ID[6] = 0;
+		node.m_ID[DOF_P] = 0;
 
 		// close the rigid rotational dofs
-		node.m_ID[7] = -1;
-		node.m_ID[8] = -1;
-		node.m_ID[9] = -1;
+		node.m_ID[DOF_RU] = -1;
+		node.m_ID[DOF_RV] = -1;
+		node.m_ID[DOF_RW] = -1;
 
 		// fix temperature dof
-		node.m_ID[10] = -1;
+		node.m_ID[DOF_T] = -1;
 
 		// open concentration dof
-		node.m_ID[11] = 0;
+		node.m_ID[DOF_C] = 0;
 		
 		++tag;
 	}
@@ -1544,7 +1544,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		{
 			FENode& n = fem.m_mesh.Node(i);
 			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
-			n.m_ID[10] = 0;
+			n.m_ID[DOF_T] = 0;
 		}
 	}
 }
@@ -2264,23 +2264,23 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		int n = atoi(tag.AttributeValue("id"))-1;
 		FENode& node = fem.m_mesh.Node(n);
 		const char* sz = tag.AttributeValue("bc");
-		if      (strcmp(sz, "x") == 0) node.m_ID[0] = -1;
-		else if (strcmp(sz, "y") == 0) node.m_ID[1] = -1;
-		else if (strcmp(sz, "z") == 0) node.m_ID[2] = -1;
-		else if (strcmp(sz, "xy") == 0) { node.m_ID[0] = node.m_ID[1] = -1; }
-		else if (strcmp(sz, "yz") == 0) { node.m_ID[1] = node.m_ID[2] = -1; }
-		else if (strcmp(sz, "xz") == 0) { node.m_ID[0] = node.m_ID[2] = -1; }
-		else if (strcmp(sz, "xyz") == 0) { node.m_ID[0] = node.m_ID[1] = node.m_ID[2] = -1; }
-		else if (strcmp(sz, "p") == 0) { node.m_ID[6] = -1; }
-		else if (strcmp(sz, "u") == 0) node.m_ID[3] = -1;
-		else if (strcmp(sz, "v") == 0) node.m_ID[4] = -1;
-		else if (strcmp(sz, "w") == 0) node.m_ID[5] = -1;
-		else if (strcmp(sz, "uv") == 0) { node.m_ID[3] = node.m_ID[4] = -1; }
-		else if (strcmp(sz, "vw") == 0) { node.m_ID[4] = node.m_ID[5] = -1; }
-		else if (strcmp(sz, "uw") == 0) { node.m_ID[3] = node.m_ID[5] = -1; }
-		else if (strcmp(sz, "uvw") == 0) { node.m_ID[3] = node.m_ID[4] = node.m_ID[5] = -1; }
-		else if (strcmp(sz, "t") == 0) node.m_ID[10] = -1;
-		else if (strcmp(sz, "c") == 0) { node.m_ID[11] = -1; }
+		if      (strcmp(sz, "x") == 0) node.m_ID[DOF_X] = -1;
+		else if (strcmp(sz, "y") == 0) node.m_ID[DOF_Y] = -1;
+		else if (strcmp(sz, "z") == 0) node.m_ID[DOF_Z] = -1;
+		else if (strcmp(sz, "xy") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = -1; }
+		else if (strcmp(sz, "yz") == 0) { node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
+		else if (strcmp(sz, "xz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Z] = -1; }
+		else if (strcmp(sz, "xyz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
+		else if (strcmp(sz, "p") == 0) { node.m_ID[DOF_P] = -1; }
+		else if (strcmp(sz, "u") == 0) node.m_ID[DOF_U] = -1;
+		else if (strcmp(sz, "v") == 0) node.m_ID[DOF_V] = -1;
+		else if (strcmp(sz, "w") == 0) node.m_ID[DOF_W] = -1;
+		else if (strcmp(sz, "uv") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = -1; }
+		else if (strcmp(sz, "vw") == 0) { node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
+		else if (strcmp(sz, "uw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_W] = -1; }
+		else if (strcmp(sz, "uvw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
+		else if (strcmp(sz, "t") == 0) node.m_ID[DOF_T] = -1;
+		else if (strcmp(sz, "c") == 0) { node.m_ID[DOF_C] = -1; }
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 		++tag;
 	}

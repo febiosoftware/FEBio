@@ -596,9 +596,9 @@ bool FESolidSolver::Residual(vector<double>& R)
 		node.m_Fr = vec3d(0,0,0);
 
 		int n;
-		if ((n = -node.m_ID[0]-2) >= 0) node.m_Fr.x = -m_Fr[n];
-		if ((n = -node.m_ID[1]-2) >= 0) node.m_Fr.y = -m_Fr[n];
-		if ((n = -node.m_ID[2]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+		if ((n = -node.m_ID[DOF_X]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[DOF_Y]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[DOF_Z]-2) >= 0) node.m_Fr.z = -m_Fr[n];
 	}
 
 	// increase RHS counter
@@ -702,7 +702,7 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 /*
 				// if the rotational degrees of freedom are constrained for a rigid node
 				// then we need to add an additional component to the residual
-				if (node.m_ID[7] == lm[3])
+				if (node.m_ID[DOF_RU] == lm[3])
 				{
 					d = node.m_Dt;
 					n = lm[3]; if (n >= 0) R[n] += d.y*F.z-d.z*F.y; RB.m_Mr.x -= d.y*F.z-d.z*F.y;

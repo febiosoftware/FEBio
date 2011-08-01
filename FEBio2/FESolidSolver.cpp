@@ -45,14 +45,14 @@ bool FESolidSolver::Init()
 		FENode& node = mesh.Node(i);
 
 		// displacement dofs
-		n = node.m_ID[0]; if (n >= 0) m_Ut[n] = node.m_rt.x - node.m_r0.x;
-		n = node.m_ID[1]; if (n >= 0) m_Ut[n] = node.m_rt.y - node.m_r0.y;
-		n = node.m_ID[2]; if (n >= 0) m_Ut[n] = node.m_rt.z - node.m_r0.z;
+		n = node.m_ID[DOF_X]; if (n >= 0) m_Ut[n] = node.m_rt.x - node.m_r0.x;
+		n = node.m_ID[DOF_Y]; if (n >= 0) m_Ut[n] = node.m_rt.y - node.m_r0.y;
+		n = node.m_ID[DOF_Z]; if (n >= 0) m_Ut[n] = node.m_rt.z - node.m_r0.z;
 
 		// rotational dofs
-		n = node.m_ID[3]; if (n >= 0) m_Ut[n] = node.m_Dt.x - node.m_D0.x;
-		n = node.m_ID[4]; if (n >= 0) m_Ut[n] = node.m_Dt.y - node.m_D0.y;
-		n = node.m_ID[5]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
+		n = node.m_ID[DOF_U]; if (n >= 0) m_Ut[n] = node.m_Dt.x - node.m_D0.x;
+		n = node.m_ID[DOF_V]; if (n >= 0) m_Ut[n] = node.m_Dt.y - node.m_D0.y;
+		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
 	}
 
 	// initialize BFGS data
@@ -183,12 +183,12 @@ bool FESolidSolver::InitEquations()
 		if (node.m_rid >= 0)
 		{
 			FERigidBody& RB = fem.m_RB[node.m_rid];
-			node.m_ID[0] = -RB.m_LM[0]-2;
-			node.m_ID[1] = -RB.m_LM[1]-2;
-			node.m_ID[2] = -RB.m_LM[2]-2;
-			node.m_ID[7] = -RB.m_LM[3]-2;
-			node.m_ID[8] = -RB.m_LM[4]-2;
-			node.m_ID[9] = -RB.m_LM[5]-2;
+			node.m_ID[DOF_X] = -RB.m_LM[0]-2;
+			node.m_ID[DOF_Y] = -RB.m_LM[1]-2;
+			node.m_ID[DOF_Z] = -RB.m_LM[2]-2;
+			node.m_ID[DOF_RU] = -RB.m_LM[3]-2;
+			node.m_ID[DOF_RV] = -RB.m_LM[4]-2;
+			node.m_ID[DOF_RW] = -RB.m_LM[5]-2;
 		}
 	}
 

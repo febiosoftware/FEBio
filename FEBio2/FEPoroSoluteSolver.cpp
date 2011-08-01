@@ -46,7 +46,7 @@ bool FEPoroSoluteSolver::Init()
 		FENode& node = mesh.Node(i);
 
 		// concentration dofs
-		n = node.m_ID[11]; if (n >= 0) m_Ut[n] = node.m_ct;
+		n = node.m_ID[DOF_C]; if (n >= 0) m_Ut[n] = node.m_ct;
 	}
 
 	return true;
@@ -425,7 +425,7 @@ void FEPoroSoluteSolver::GetConcentrationData(vector<double> &ci, vector<double>
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.m_mesh.Node(i);
-		nid = n.m_ID[11];
+		nid = n.m_ID[DOF_C];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
