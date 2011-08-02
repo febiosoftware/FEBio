@@ -13,11 +13,9 @@
 #include "DumpFile.h"
 #include "FENodeElemList.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// STRUCT: FE_BOUNDING_BOX
+//-----------------------------------------------------------------------------
 //  This class stores the coordinates of a bounding box
 //
-
 struct FE_BOUNDING_BOX
 {
 	vec3d	r0, r1; // coordinates of opposite corners
@@ -116,11 +114,13 @@ public:
 	int		m_BC[MAX_NDOFS];	//!< boundary condition
 };
 
+//-----------------------------------------------------------------------------
+// Forward declaration of FEMesh class.
 class FEMesh;
 
 //-----------------------------------------------------------------------------
 //! Defines a node set
-
+//
 class FENodeSet
 {
 public:
@@ -146,7 +146,56 @@ protected:
 	char	m_szname[256];
 };
 
-class FEM;
+//-----------------------------------------------------------------------------
+//! Class that defines a finite element part, that is, a list of elements.
+
+//! Note that this class is only a base class defining a common interface
+//! to all derived part classes. Part classes need to be specialized depending
+//! on the element type (solid, shell, truss, ...)
+class FEPart
+{
+public:
+	//! constructor
+	FEPart(FEMesh* pm) : m_pmesh(pm) {}
+
+	//! Get the mesh this part belongs to
+	FEMesh* GetMesh() { return m_pmesh; }
+
+	//! Create a part
+	virtual void Create(int n) = 0;
+
+	//! Number of elements in domain
+	virtual int Elements() = 0;
+
+	//! return reference to an element
+	virtual FEElement& ElementRef(int n) = 0;
+
+	//! Find an element based on its ID
+	FEElement* FindElementFromID(int nid);
+
+protected:
+	FEMesh*		m_pmesh;
+};
+
+//-----------------------------------------------------------------------------
+template <class T> class FEPart_T : public FEPart
+{
+public:
+	FEPart_T(FEMesh* pm) : FEPart(pm) {}
+
+	void Create(int n) { m_Elem.resize(n); }
+	int Elements() { return (int) m_Elem.size(); }
+	FEElement& ElementRef(int n) { return m_Elem[n]; }
+
+protected:
+	vector<T>	m_Elem;
+};
+
+//-----------------------------------------------------------------------------
+typedef FEPart_T<FESolidElement>		FESolidPart;
+typedef FEPart_T<FEShellElement>		FEShellPart;
+typedef FEPart_T<FETrussElement>		FETrussPart;
+typedef FEPart_T<FEDiscreteElement>		FEDiscretePart;
 
 //-----------------------------------------------------------------------------
 //! Defines a finite element mesh
@@ -237,6 +286,10 @@ public:
 		return m_NEL;
 	}
 
+	// --- PARTS ---
+	int Parts() { return (int) m_Part.size(); }
+	FEPart& Part(int n) { return *m_Part[n]; }
+
 	// --- SOLID DOMAINS ---
 	int Domains() { return (int) m_Domain.size(); }
 	FEDomain& Domain(int n) { return *m_Domain[n]; }
@@ -252,10 +305,12 @@ protected:
 	void ClearDomains();
 
 protected:
-	vector<FENode>		m_Node;		//!< FE nodes array
-	vector<FEDomain*>	m_Domain;	//!< list of domains
+	vector<FENode>		m_Node;		//!< nodes
+	vector<FEPart*>		m_Part;		//!< parts
 	vector<FENodeSet*>	m_NodeSet;	//!< node sets
 	vector<FESurface*>	m_Surf;		//!< surfaces
+
+	vector<FEDomain*>	m_Domain;	//!< list of domains
 
 	FE_BOUNDING_BOX		m_box;	//!< bounding box
 

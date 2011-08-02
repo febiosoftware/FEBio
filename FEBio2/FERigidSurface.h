@@ -3,6 +3,10 @@
 #include "FECore/FESurface.h"
 
 //-----------------------------------------------------------------------------
+// forward declaration of FEM class
+class FEM;
+
+//-----------------------------------------------------------------------------
 //! This class is the base class for rigid surfaces
 
 //! Rigid surfaces are used in the rigid wall contact interface, where the

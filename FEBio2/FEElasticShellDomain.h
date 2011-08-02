@@ -2,6 +2,10 @@
 #include "FECore/FEShellDomain.h"
 
 //-----------------------------------------------------------------------------
+// forward declaration of FEM class
+class FEM;
+
+//-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
 class FEElasticShellDomain : public FEShellDomain
 {

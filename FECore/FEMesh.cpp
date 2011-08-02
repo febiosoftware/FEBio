@@ -10,7 +10,7 @@
 #include "FEShellDomain.h"
 #include "FESolidDomain.h"
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // FENodeSet
 //-----------------------------------------------------------------------------
 FENodeSet::FENodeSet(FEMesh* pm) : m_pmesh(pm), m_nID(-1)
@@ -31,14 +31,29 @@ void FENodeSet::SetName(const char* sz)
 	strcpy(m_szname, sz); 
 }
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
+// FEPart
+//-----------------------------------------------------------------------------
+FEElement* FEPart::FindElementFromID(int nid)
+{
+	int NE = Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FEElement& el = ElementRef(i);
+		if (el.m_nID == nid) return &el;
+	}
 
+	return 0;
+}
+
+//=============================================================================
+// FEMesh
+//-----------------------------------------------------------------------------
 FEMesh::FEMesh()
 {
 }
 
+//-----------------------------------------------------------------------------
 FEMesh::~FEMesh()
 {
 	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
@@ -46,12 +61,14 @@ FEMesh::~FEMesh()
 	ClearDomains();
 }
 
+//-----------------------------------------------------------------------------
 void FEMesh::ClearDomains()
 {
 	for (int i=0; i<(int) m_Domain.size(); ++i) delete m_Domain[i];
 	m_Domain.clear();
 }
 
+//-----------------------------------------------------------------------------
 FEMesh::FEMesh(FEMesh& m)
 {
 	// copy nodal data
@@ -69,11 +86,9 @@ FEMesh::FEMesh(FEMesh& m)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////
-// FUNCTION: FEMesh::operator = 
+//-----------------------------------------------------------------------------
 //  Assignment operator.
 //
-
 FEMesh& FEMesh::operator =(FEMesh& m)
 {
 	// copy nodal data
@@ -93,17 +108,16 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 	return (*this);
 }
 
-//////////////////////////////////////////////////////////////////////
-// FUNCTION: FEMesh::Create
+//-----------------------------------------------------------------------------
 //  Allocates storage for mesh data.
 //
-
 void FEMesh::CreateNodes(int nodes)
 {
 	assert(nodes);
 	m_Node.resize (nodes);
 }
 
+//-----------------------------------------------------------------------------
 void FEMesh::AddNode(vec3d r)
 {
 	FENode node;
@@ -140,6 +154,7 @@ void FEMesh::AddNode(vec3d r)
 	m_Node.push_back(node);
 }
 
+//-----------------------------------------------------------------------------
 int FEMesh::Elements()
 {
 	int N = 0;
@@ -147,6 +162,7 @@ int FEMesh::Elements()
 	return N;
 }
 
+//-----------------------------------------------------------------------------
 int FEMesh::SolidElements()
 {
 	int N = 0;
@@ -158,6 +174,7 @@ int FEMesh::SolidElements()
 	return N;
 }
 
+//-----------------------------------------------------------------------------
 int FEMesh::ShellElements()
 {
 	int N = 0;
@@ -180,6 +197,7 @@ int FEMesh::TrussElements()
 	return N;
 }
 
+//-----------------------------------------------------------------------------
 int FEMesh::DiscreteElements()
 {
 	int N = 0;
@@ -191,12 +209,9 @@ int FEMesh::DiscreteElements()
 	return N;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEMesh::UpdateBox
+//-----------------------------------------------------------------------------
 //  Updates the bounding box of the mesh (using current coordinates)
 //
-
 void FEMesh::UpdateBox()
 {
 	vec3d r0, r1;
@@ -219,11 +234,9 @@ void FEMesh::UpdateBox()
 	m_box.r1 = r1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEMesh::RemoveIsolatedVertices
+//-----------------------------------------------------------------------------
 //  Counts the number of shell elements in the mesh
 //
-
 int FEMesh::RemoveIsolatedVertices()
 {
 	int i, j, k, N = Nodes(), n;
