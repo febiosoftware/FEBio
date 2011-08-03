@@ -258,6 +258,7 @@ public:
 		PlotFile*	m_plot;		//!< the plot file
 		DataStore	m_Data;		//!< the data store used for data logging
 		
+		bool		m_becho;			//!< echo input to logfile
 		bool		m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
 
 protected:

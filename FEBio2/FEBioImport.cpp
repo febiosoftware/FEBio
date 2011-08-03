@@ -3791,6 +3791,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			fem.m_Data.AddRecord(prec);
 		}
+		else if (tag == "echo") tag.value(fem.m_becho);
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;

@@ -34,7 +34,7 @@ bool FEM::Solve()
 	// we do this here (and not e.g. directly after input)
 	// since the data can be changed after input, which is the case,
 	// for instance, in the parameter optimization module
-	echo_input(*this);
+	if (m_becho) echo_input(*this);
 
 	// obtain a pointer to the console window. We'll use this to 
 	// set the title of the window
