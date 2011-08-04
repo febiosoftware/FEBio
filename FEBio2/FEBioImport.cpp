@@ -3943,7 +3943,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 		{
 			const char* szt = tag.AttributeValue("type");
 			const char* szlc = tag.AttributeValue("lc", true);
-			int lc = 0;
+			int lc = 1;
 			if (szlc) lc = atoi(szlc)+1;
 
 			int bc = -1;
