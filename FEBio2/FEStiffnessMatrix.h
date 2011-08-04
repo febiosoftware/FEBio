@@ -13,6 +13,7 @@
 using namespace FECore;
 
 class FEM;
+class FESolver;
 
 //-----------------------------------------------------------------------------
 //! The FEStiffnessmatrix class stores the global stiffness matrix of the FE
@@ -32,7 +33,7 @@ public:
 	void Clear() { if (m_pA) m_pA->Clear(); }
 
 	//! construct the stiffness matrix from a FEM object
-	bool Create(FEM& fem, int neq, bool breset);
+	bool Create(FESolver* psolver, int neq, bool breset);
 
 	//! assemble an element stiffness matrix into the global stiffness matrix
 	void Assemble(matrix& ke, vector<int>& lm) { m_pA->Assemble(ke, lm); }

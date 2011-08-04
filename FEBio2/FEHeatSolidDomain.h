@@ -1,6 +1,10 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
-#include "FEHeatSolver.h"
+
+//-----------------------------------------------------------------------------
+// Forward declaration
+class FEM;
+class FEHeatSolver;
 
 //-----------------------------------------------------------------------------
 //! domain class for 3D heat elements

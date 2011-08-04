@@ -31,6 +31,10 @@ public:
 	bool InitEquations();
 
 protected:
+	//! calculate "initial" stresses base on temperatures
+	void CalculateInitialStresses();
+
+protected:
 	FEHeatSolver		m_Heat;		//!< heat solver
 	FELinearSolidSolver	m_Solid;	//!< linear solid solver
 };

@@ -164,6 +164,9 @@ public:
 	//! Create a part
 	virtual void Create(int n) = 0;
 
+	//! clone part
+	virtual FEPart* Clone() = 0;
+
 	//! Number of elements in domain
 	virtual int Elements() = 0;
 
@@ -184,6 +187,12 @@ public:
 	FEPart_T(FEMesh* pm) : FEPart(pm) {}
 
 	void Create(int n) { m_Elem.resize(n); }
+	FEPart* Clone()
+	{
+		FEPart_T<T>* pg = new FEPart_T<T>(m_pmesh);
+		pg->m_Elem = m_Elem;
+		return pg;
+	}
 	int Elements() { return (int) m_Elem.size(); }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
@@ -289,8 +298,9 @@ public:
 	// --- PARTS ---
 	int Parts() { return (int) m_Part.size(); }
 	FEPart& Part(int n) { return *m_Part[n]; }
+	void AddPart(FEPart* pg) { m_Part.push_back(pg); }
 
-	// --- SOLID DOMAINS ---
+	// --- DOMAINS ---
 	int Domains() { return (int) m_Domain.size(); }
 	FEDomain& Domain(int n) { return *m_Domain[n]; }
 
@@ -303,6 +313,7 @@ public:
 
 protected:
 	void ClearDomains();
+	void ClearParts();
 
 protected:
 	vector<FENode>		m_Node;		//!< nodes

@@ -21,6 +21,7 @@ FESolver::FESolver(FEM& fem) : m_fem(fem)
 	m_pK = 0;
 	m_plinsolve = 0;
 	m_neq = 0;
+	m_niter = 0;
 }
 
 FESolver::~FESolver()
@@ -100,7 +101,7 @@ bool FESolver::CreateStiffness(bool breset)
 
 	// create the stiffness matrix
 	clog.printf("===== reforming stiffness matrix:\n");
-	if (m_pK->Create(m_fem, m_neq, breset) == false) 
+	if (m_pK->Create(this, m_neq, breset) == false) 
 	{
 		clog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;

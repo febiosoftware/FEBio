@@ -8,7 +8,6 @@
 //! Class constructor
 FELinearSolidSolver::FELinearSolidSolver(FEM& fem) : FESolver(fem)
 {
-	m_niter = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -26,6 +25,17 @@ bool FELinearSolidSolver::Init()
 	m_u.resize(neq);
 	m_R.resize(neq);
 	m_d.resize(neq);
+
+	// Identify the linear solid domains
+	// TODO: I want this to be done automatically
+	//       e.g. while the input file is being read
+	FEMesh& mesh = m_fem.m_mesh;
+	for (int nd=0; nd<mesh.Domains(); ++nd)
+	{
+		FELinearSolidDomain* pd = dynamic_cast<FELinearSolidDomain*>(&mesh.Domain(nd));
+		if (pd) m_Dom.push_back(pd);
+	}
+	assert(m_Dom.empty() == false);
 
 	return true;
 }
@@ -150,7 +160,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 	}
 
 	// update the stresses on all domains
-	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).UpdateStresses(m_fem);
+	for (int i=0; i<(int) m_Dom.size(); ++i) m_Dom[i]->UpdateStresses(m_fem);
 }
 
 //-----------------------------------------------------------------------------
@@ -184,10 +194,10 @@ void FELinearSolidSolver::Residual()
 		}
 	}
 
-	// add contribution from domain
-	for (int i=0; i<mesh.Domains(); ++i) 
+	// add contribution from domains
+	for (int i=0; i<(int) m_Dom.size(); ++i) 
 	{
-		FELinearSolidDomain& d = dynamic_cast<FELinearSolidDomain&>(mesh.Domain(i));
+		FELinearSolidDomain& d = dynamic_cast<FELinearSolidDomain&>(*m_Dom[i]);
 		d.RHS(this, m_R);
 	}
 }
@@ -237,9 +247,10 @@ bool FELinearSolidSolver::StiffnessMatrix()
 	// zero the stiffness matrix
 	m_pK->Zero();
 
-	for (int nd=0; nd<mesh.Domains(); ++nd)
+	// add contribution from domains
+	for (int i=0; i<(int)m_Dom.size(); ++i)
 	{
-		FELinearSolidDomain& bd = dynamic_cast<FELinearSolidDomain&>(mesh.Domain(nd));
+		FELinearSolidDomain& bd = dynamic_cast<FELinearSolidDomain&>(*m_Dom[i]);
 		bd.StiffnessMatrix(this);
 	}
 

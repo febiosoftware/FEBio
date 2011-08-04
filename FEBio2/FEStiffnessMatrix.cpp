@@ -13,6 +13,7 @@
 #include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
+#include "FESolver.h"
 #include "ut4.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -44,12 +45,14 @@ FEStiffnessMatrix::~FEStiffnessMatrix()
 //! to the profile. Dynamic elements can change connectivity in between calls to
 //! Create() and therefore have to be added explicitly every time.
 
-bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
+bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 {
 	int i, j, k, l, m, n;
 
 	// keep a pointer to the FEM object
-	m_pfem = &fem;
+	FESolver& solver = *psolver;
+	m_pfem = &solver.m_fem;
+	FEM& fem = *m_pfem;
 
 	// The first time we come here we build the "static" profile.
 	// This static profile stores the contribution to the matrix profile
@@ -77,11 +80,11 @@ bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
 
 			vector<int> elm;
 
-			// add all elements to the profile
-			// TODO: perhaps we should ask the domain the create the profile
-			for (int nd=0; nd<mesh.Domains(); ++nd)
+			// Add all elements to the profile
+			// Loop over all active domains
+			for (int nd=0; nd<solver.Domains(); ++nd)
 			{
-				FEDomain& d = mesh.Domain(nd);
+				FEDomain& d = *solver.Domain(nd);
 
 				if (dynamic_cast<FEUT4Domain*>(&d) == 0)
 				{
@@ -168,9 +171,9 @@ bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
 				// keep a list that stores for each node the list of
 				// elements connected to that node.
 				// loop over all solid elements
-				for (int nd=0; nd<mesh.Domains(); ++nd)
+				for (int nd=0; nd<solver.Domains(); ++nd)
 				{
-					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(solver.Domain(nd));
 					if (pbd)
 					{
 						for (i=0; i<pbd->Elements(); ++i)
@@ -399,12 +402,12 @@ bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
 									for (l=0; l<nmeln; ++l)
 									{
 										id = fem.m_mesh.Node(mn[l]).m_ID;
-										lm[6*(l+nseln)  ] = id[0];
-										lm[6*(l+nseln)+1] = id[1];
-										lm[6*(l+nseln)+2] = id[2];
-										lm[6*(l+nseln)+3] = id[7];
-										lm[6*(l+nseln)+4] = id[8];
-										lm[6*(l+nseln)+5] = id[9];
+										lm[6*(l+nseln)  ] = id[DOF_X];
+										lm[6*(l+nseln)+1] = id[DOF_Y];
+										lm[6*(l+nseln)+2] = id[DOF_Z];
+										lm[6*(l+nseln)+3] = id[DOF_RU];
+										lm[6*(l+nseln)+4] = id[DOF_RV];
+										lm[6*(l+nseln)+5] = id[DOF_RW];
 									}
 
 									build_add(lm);
@@ -448,25 +451,25 @@ bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
 									for (l=0; l<nseln; ++l)
 									{
 										id = fem.m_mesh.Node(sn[l]).m_ID;
-										lm[7*l  ] = id[0];
-										lm[7*l+1] = id[1];
-										lm[7*l+2] = id[2];
-										lm[7*l+3] = id[6];
-										lm[7*l+4] = id[7];
-										lm[7*l+5] = id[8];
-										lm[7*l+6] = id[9];
+										lm[7*l  ] = id[DOF_X];
+										lm[7*l+1] = id[DOF_Y];
+										lm[7*l+2] = id[DOF_Z];
+										lm[7*l+3] = id[DOF_P];
+										lm[7*l+4] = id[DOF_RU];
+										lm[7*l+5] = id[DOF_RV];
+										lm[7*l+6] = id[DOF_RW];
 									}
 
 									for (l=0; l<nmeln; ++l)
 									{
 										id = fem.m_mesh.Node(mn[l]).m_ID;
-										lm[7*(l+nseln)  ] = id[0];
-										lm[7*(l+nseln)+1] = id[1];
-										lm[7*(l+nseln)+2] = id[2];
-										lm[7*(l+nseln)+3] = id[6];
-										lm[7*(l+nseln)+4] = id[7];
-										lm[7*(l+nseln)+5] = id[8];
-										lm[7*(l+nseln)+6] = id[9];
+										lm[7*(l+nseln)  ] = id[DOF_X];
+										lm[7*(l+nseln)+1] = id[DOF_Y];
+										lm[7*(l+nseln)+2] = id[DOF_Z];
+										lm[7*(l+nseln)+3] = id[DOF_P];
+										lm[7*(l+nseln)+4] = id[DOF_RU];
+										lm[7*(l+nseln)+5] = id[DOF_RV];
+										lm[7*(l+nseln)+6] = id[DOF_RW];
 									}
 
 									build_add(lm);
@@ -510,27 +513,27 @@ bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
 									for (l=0; l<nseln; ++l)
 									{
 										id = fem.m_mesh.Node(sn[l]).m_ID;
-										lm[8*l  ] = id[ 0];
-										lm[8*l+1] = id[ 1];
-										lm[8*l+2] = id[ 2];
-										lm[8*l+3] = id[ 6];
-										lm[8*l+4] = id[ 7];
-										lm[8*l+5] = id[ 8];
-										lm[8*l+6] = id[ 9];
-										lm[8*l+7] = id[11];
+										lm[8*l  ] = id[DOF_X];
+										lm[8*l+1] = id[DOF_Y];
+										lm[8*l+2] = id[DOF_Z];
+										lm[8*l+3] = id[DOF_P];
+										lm[8*l+4] = id[DOF_RU];
+										lm[8*l+5] = id[DOF_RV];
+										lm[8*l+6] = id[DOF_RW];
+										lm[8*l+7] = id[DOF_C];
 									}
 									
 									for (l=0; l<nmeln; ++l)
 									{
 										id = fem.m_mesh.Node(mn[l]).m_ID;
-										lm[8*(l+nseln)  ] = id[ 0];
-										lm[8*(l+nseln)+1] = id[ 1];
-										lm[8*(l+nseln)+2] = id[ 2];
-										lm[8*(l+nseln)+3] = id[ 6];
-										lm[8*(l+nseln)+4] = id[ 7];
-										lm[8*(l+nseln)+5] = id[ 8];
-										lm[8*(l+nseln)+6] = id[ 9];
-										lm[8*(l+nseln)+7] = id[11];
+										lm[8*(l+nseln)  ] = id[DOF_X];
+										lm[8*(l+nseln)+1] = id[DOF_Y];
+										lm[8*(l+nseln)+2] = id[DOF_Z];
+										lm[8*(l+nseln)+3] = id[DOF_P];
+										lm[8*(l+nseln)+4] = id[DOF_RU];
+										lm[8*(l+nseln)+5] = id[DOF_RV];
+										lm[8*(l+nseln)+6] = id[DOF_RW];
+										lm[8*(l+nseln)+7] = id[DOF_C];
 									}
 									
 									build_add(lm);
@@ -659,22 +662,22 @@ bool FEStiffnessMatrix::Create(FEM& fem, int neq, bool breset)
 
 					set(lm, -1);
 
-					lm[0] = ss.Node(nref).m_ID[0];
-					lm[1] = ss.Node(nref).m_ID[1];
-					lm[2] = ss.Node(nref).m_ID[2];
-					lm[3] = ss.Node(nref).m_ID[7];
-					lm[4] = ss.Node(nref).m_ID[8];
-					lm[5] = ss.Node(nref).m_ID[9];
+					lm[0] = ss.Node(nref).m_ID[DOF_X];
+					lm[1] = ss.Node(nref).m_ID[DOF_Y];
+					lm[2] = ss.Node(nref).m_ID[DOF_Z];
+					lm[3] = ss.Node(nref).m_ID[DOF_RU];
+					lm[4] = ss.Node(nref).m_ID[DOF_RV];
+					lm[5] = ss.Node(nref).m_ID[DOF_RW];
 
 					for (k=0; k<n0; ++k)
 					{
 						id = fem.m_mesh.Node(nr0[k]).m_ID;
-						lm[6*(k+1)  ] = id[0];
-						lm[6*(k+1)+1] = id[1];
-						lm[6*(k+1)+2] = id[2];
-						lm[6*(k+1)+3] = id[7];
-						lm[6*(k+1)+4] = id[8];
-						lm[6*(k+1)+5] = id[9];
+						lm[6*(k+1)  ] = id[DOF_X];
+						lm[6*(k+1)+1] = id[DOF_Y];
+						lm[6*(k+1)+2] = id[DOF_Z];
+						lm[6*(k+1)+3] = id[DOF_RU];
+						lm[6*(k+1)+4] = id[DOF_RV];
+						lm[6*(k+1)+5] = id[DOF_RW];
 					}
 
 					for (j=0; j<ss.Nodes(); ++j)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FESolver.h"
+#include "FEHeatSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! The FEHeatSolver solves heat-conduction problems

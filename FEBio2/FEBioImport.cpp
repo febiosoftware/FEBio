@@ -44,6 +44,7 @@
 #include "FEDiscreteSpringDomain.h"
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"
+#include "FEIsotropicFourier.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
@@ -1584,8 +1585,11 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 	}
 	else if (fem.m_pStep->m_nModule == FE_HEAT_SOLID)
 	{
-		// TODO: I will probably need to define a proper domain type
-		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
+		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET))
+		{
+			if (dynamic_cast<FEHeatTransferMaterial*>(pmat)) return FE_HEAT_SOLID_DOMAIN;
+			else return FE_LINEAR_SOLID_DOMAIN;
+		}
 		else return 0;
 	}
 	else

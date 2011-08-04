@@ -9,7 +9,6 @@
 //! constructor for the class
 FEHeatSolver::FEHeatSolver(FEM &fem) : FESolver(fem)
 {
-	m_niter = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -27,6 +26,17 @@ bool FEHeatSolver::Init()
 	m_T.resize(neq);
 	m_u.resize(neq);
 	m_Tp.assign(neq, 0);
+
+	// Identify the heat-transfer domains
+	// TODO: I want this to be done automatically
+	//       e.g. while the input file is being read
+	FEMesh& mesh = m_fem.m_mesh;
+	for (int nd=0; nd<mesh.Domains(); ++nd)
+	{
+		FEHeatSolidDomain* pd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(nd));
+		if (pd) m_Dom.push_back(pd);
+	}
+	assert(m_Dom.empty() == false);
 
 	return true;
 }
@@ -229,9 +239,8 @@ bool FEHeatSolver::ReformStiffness()
 
 //-----------------------------------------------------------------------------
 //! Calculate the global stiffness matrix. This function simply calls 
-//! FEHeatSolver::ElementStiffness() for each element and then assembles the
-//! element stiffness matrix into the global matrix.
-//!
+//! HeatStiffnessMatrix() for each domain which will calculate the
+//! contribution to the global stiffness matrix from each domain.
 bool FEHeatSolver::StiffnessMatrix()
 {
 	FEMesh& mesh = m_fem.m_mesh;
@@ -239,9 +248,10 @@ bool FEHeatSolver::StiffnessMatrix()
 	// zero the stiffness matrix
 	m_pK->Zero();
 
-	for (int nd=0; nd<mesh.Domains(); ++nd)
+	// Add stiffness contribution from all domains
+	for (int i=0; i<(int) m_Dom.size(); ++i)
 	{
-		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(mesh.Domain(nd));
+		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(*m_Dom[i]);
 		bd.HeatStiffnessMatrix(this);
 	}
 

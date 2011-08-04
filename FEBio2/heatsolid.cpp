@@ -2,6 +2,7 @@
 #include "FEHeatSolidDomain.h"
 #include "FEHeatSolver.h"
 #include "FEIsotropicFourier.h"
+#include "FEHeatSolver.h"
 
 //-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
@@ -9,7 +10,7 @@
 void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
+	lm.resize(N);
 
 	for (int i=0; i<N; ++i)
 	{
@@ -18,28 +19,8 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		int* id = node.m_ID;
 
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-		
-		// concentration dofs
-		lm[11*N+i] = id[11];
+		// get temperature equation number
+		lm[i] = id[DOF_T];
 	}
 }
 
@@ -47,8 +28,7 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 {
 	int i, j, k;
-	vector<int> lm(8);
-	vector<int> elm;
+	vector<int> lm;
 
 	FEM& fem = psolver->m_fem;
 
@@ -63,8 +43,7 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 		ConductionStiffness(fem, el, ke);
 
 		// set up the LM matrix
-		UnpackLM(el, elm);
-		for (j=0; j<ne; ++j) lm[j] = elm[10*ne + j];
+		UnpackLM(el, lm);
 
 		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) 
 		{

@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "FECoupledHeatSolidSolver.h"
+#include "FELinearSolidDomain.h"
+#include "FELinearElastic.h"
 
 //-----------------------------------------------------------------------------
 //! class constructor
 FECoupledHeatSolidSolver::FECoupledHeatSolidSolver(FEM& fem) : FESolver(fem), m_Heat(fem), m_Solid(fem)
 {
-	m_niter = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -52,12 +53,60 @@ bool FECoupledHeatSolidSolver::SolveStep(double time)
 	// Now we project the nodal temperatures
 	// to the integration points, and use them to set up an
 	// initial stress for the linear solid solver
-	// TODO: do above
+	CalculateInitialStresses();
 
 	// Next, we solve the linear solid problem
 	if (m_Solid.SolveStep(time) == false) return false;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FECoupledHeatSolidSolver::CalculateInitialStresses()
+{
+	FEHeatSolidDomain&   dh = dynamic_cast<FEHeatSolidDomain  &>(*m_Heat .Domain(0));
+	FELinearSolidDomain& ds = dynamic_cast<FELinearSolidDomain&>(*m_Solid.Domain(0));
+
+	FELinearElastic* pmat = dynamic_cast<FELinearElastic*>(ds.GetMaterial());
+	assert(pmat);
+
+	const double alpha = 1.0;
+
+	double tn[8], tj;
+
+	FEMesh& mesh = *ds.GetMesh();
+
+	for (int i=0; i<ds.Elements(); ++i)
+	{
+		FESolidElement& el = ds.Element(i);
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+
+		// get the nodal temperatures
+		for (int j=0; j<neln; ++j) tn[j] = mesh.Node(el.m_node[j]).m_T;
+
+		// loop over integration points
+		for (int j=0; j<nint; ++j)
+		{
+			// get the material point
+			// TODO: do I need to do anything to the material point?
+			FEMaterialPoint& mp = *el.m_State[j];
+
+			// get the material tangent at this point
+			tens4ds C = pmat->Tangent(mp);
+
+			// evaluate the temperature at this point
+			tj = el.Evaluate(tn, j);
+
+			// set up the thermal strain
+			double g = -alpha*tj;
+			mat3ds e = mat3ds(g,g,g,0,0,0);
+
+			// set the initial stress
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			pt.s0 = C.dot(e);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -59,6 +59,7 @@ FEMesh::~FEMesh()
 	for (size_t i=0; i<m_NodeSet.size(); ++i) delete m_NodeSet[i];
 	m_NodeSet.clear();
 	ClearDomains();
+	ClearParts();
 }
 
 //-----------------------------------------------------------------------------
@@ -69,6 +70,13 @@ void FEMesh::ClearDomains()
 }
 
 //-----------------------------------------------------------------------------
+void FEMesh::ClearParts()
+{
+	for (int i=0; i<(int) m_Part.size(); ++i) delete m_Part[i];
+	m_Part.clear();
+}
+
+//-----------------------------------------------------------------------------
 FEMesh::FEMesh(FEMesh& m)
 {
 	// copy nodal data
@@ -76,6 +84,14 @@ FEMesh::FEMesh(FEMesh& m)
 
 	// clear the domains
 	ClearDomains();
+	ClearParts();
+
+	// copy parts
+	for (int i=0; i<m.Parts(); ++i)
+	{
+		FEPart* pg = m.Part(i).Clone();
+		m_Part.push_back(pg);
+	}
 
 	// copy domains
 	for (int i=0; i<m.Domains(); ++i)
@@ -96,6 +112,14 @@ FEMesh& FEMesh::operator =(FEMesh& m)
 
 	// clear the domains
 	ClearDomains();
+	ClearParts();
+
+	// copy parts
+	for (int i=0; i<m.Parts(); ++i)
+	{
+		FEPart* pg = m.Part(i).Clone();
+		m_Part.push_back(pg);
+	}
 
 	// copy domains
 	for (int i=0; i<m.Domains(); ++i)

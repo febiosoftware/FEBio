@@ -8,7 +8,7 @@
 void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
+	lm.resize(3*N);
 
 	for (int i=0; i<N; ++i)
 	{
@@ -17,28 +17,10 @@ void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 		int* id = node.m_ID;
 
-		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
-
-		// now the pressure dofs
-		lm[3*N+i] = id[6];
-
-		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
-
-		// fill the rest with -1
-		lm[7*N + 3*i  ] = -1;
-		lm[7*N + 3*i+1] = -1;
-		lm[7*N + 3*i+2] = -1;
-
-		lm[10*N + i] = id[10];
-		
-		// concentration dofs
-		lm[11*N+i] = id[11];
+		// get displacement DOFs
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
 	}
 }
 
@@ -265,7 +247,7 @@ void FELinearSolidDomain::InitialStress(FESolidElement& el, vector<double>& fe)
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-		s = pt.s;
+		s = pt.s0;
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
