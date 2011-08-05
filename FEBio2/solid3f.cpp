@@ -72,7 +72,8 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, int iel, matrix
 	const int ndof = 3*neln;
 
 	// get the elements material
-	FEElasticMaterial* pm = fem.GetElasticMaterial(elem.GetMatID());
+	FEElasticMaterial* pm = fem.GetElasticMaterial(m_pMat);
+	assert(pm);
 
 	FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(pm);
 	assert(pmi);

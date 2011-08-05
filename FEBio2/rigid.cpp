@@ -69,8 +69,6 @@ void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		FESolidElement& el = m_Elem[i];
 		assert(el.IsRigid());
 
-		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
-
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
 		fe.assign(ndof, 0);

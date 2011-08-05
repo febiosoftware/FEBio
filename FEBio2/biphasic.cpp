@@ -54,7 +54,7 @@ void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 			psolver->AssembleResidual(el.m_node, elm, fe, R);
 		
 			// do biphasic forces
-			FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+			FEMaterial* pm = m_pMat;
 			assert(dynamic_cast<FEBiphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
@@ -106,7 +106,7 @@ void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 			psolver->AssembleResidual(el.m_node, elm, fe, R);
 			
 			// do biphasic forces
-			FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+			FEMaterial* pm = m_pMat;
 			assert(dynamic_cast<FEBiphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
@@ -157,7 +157,7 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 	}
 	
 	// get the element's material
-	FEBiphasic* pm = dynamic_cast<FEBiphasic*> (fem.GetMaterial(el.GetMatID()));
+	FEBiphasic* pm = dynamic_cast<FEBiphasic*>(m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
@@ -260,7 +260,7 @@ bool FEBiphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<
 	double* wg = el.GaussWeights();
 		
 	// get the element's material
-	FEBiphasic* pm = dynamic_cast<FEBiphasic*> (fem.GetMaterial(el.GetMatID()));
+	FEBiphasic* pm = dynamic_cast<FEBiphasic*>(m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
@@ -334,7 +334,7 @@ void FEBiphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 			assert(!el.IsRigid());
 			
 			// get the elements material
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			FEMaterial* pmat = m_pMat;
 			assert(dynamic_cast<FEBiphasic*>(pmat) != 0);
 			
 			// allocate stiffness matrix
@@ -374,7 +374,7 @@ void FEBiphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 			assert(!el.IsRigid());
 			
 			// get the elements material
-			FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+			FEMaterial* pmat = m_pMat;
 			assert(dynamic_cast<FEBiphasic*>(pmat) != 0);
 			
 			// allocate stiffness matrix
@@ -461,7 +461,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 		}
 	
 	// get the element's material
-	FEBiphasic* pm = dynamic_cast<FEBiphasic*> (fem.GetMaterial(el.GetMatID()));
+	FEBiphasic* pm = dynamic_cast<FEBiphasic*>(m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
@@ -652,7 +652,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, 
 		}
 	
 	// get the element's material
-	FEBiphasic* pm = dynamic_cast<FEBiphasic*> (fem.GetMaterial(el.GetMatID()));
+	FEBiphasic* pm = dynamic_cast<FEBiphasic*>(m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
@@ -825,7 +825,7 @@ void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, m
 	const double *gw = el.GaussWeights();
 	
 	// see if this is a biphasic material
-	FEBiphasic* pmat = dynamic_cast<FEBiphasic*>(fem.GetMaterial(el.GetMatID()));
+	FEBiphasic* pmat = dynamic_cast<FEBiphasic*>(m_pMat);
 	assert(pmat);
 
 	// nodal pressures
@@ -967,7 +967,7 @@ void FEBiphasicDomain::UpdateStresses(FEModel &fem)
 		}
 		
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pMat);
 		
 		assert(dynamic_cast<FEBiphasic*>(pm) != 0);
 		

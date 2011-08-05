@@ -83,7 +83,9 @@ void FELinearSolidDomain::ElementStiffness(FEM &fem, FESolidElement &el, matrix 
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+	// get the material
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
+	assert(pmat);
 
 	// calculate element stiffness matrix
 	ke.zero();
@@ -313,10 +315,12 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 		gw = el.GaussWeights();
 
 		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
+		assert(pm);
 
 		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+		FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
+		assert(pme);
 
 		// loop over the integration points and calculate
 		// the stress at the integration point

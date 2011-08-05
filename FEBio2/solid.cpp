@@ -31,7 +31,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 		if (dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver))
 		{
 			// get the elements material
-			FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+			FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
 
 			// set the local element coordinates
 			if (pme)
@@ -270,7 +270,7 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 		FEBodyForce& BF = *fem.GetBodyForce(nf);
 
 		// don't forget to multiply with the density
-		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
 		double dens = pme->Density();
 
 		// TODO: I don't like this but for now I'll hard-code the modification of the
@@ -339,7 +339,7 @@ void FEElasticSolidDomain::BodyForceStiffness(FEM& fem, FESolidElement &el, matr
 		FEBodyForce& BF = *fem.GetBodyForce(nf);
 
 		// don't forget to multiply with the density
-		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
 		double dens = pme->Density();
 
 		// jacobian
@@ -487,7 +487,7 @@ void FEElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matri
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
 
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -659,7 +659,7 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el
 	double J0;
 
 	// get the material
-	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 
 	double a = 4.0 / (fem.m_pStep->m_dt*fem.m_pStep->m_dt);
 	double d = pm->Density();
@@ -731,10 +731,11 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 		gw = el.GaussWeights();
 
 		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
+		assert(pm);
 
 		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+		FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
 
 		// loop over the integration points and calculate
 		// the stress at the integration point

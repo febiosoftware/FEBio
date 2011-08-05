@@ -1119,7 +1119,8 @@ void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
+	assert(pmat);
 
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)

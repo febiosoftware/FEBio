@@ -76,12 +76,12 @@ bool FEM::InitPoroSolute()
 			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 			if (pbd)
 			{
+				FEPoroElastic*    pm  = dynamic_cast<FEPoroElastic*   >(pbd->GetMaterial());
+				FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(pbd->GetMaterial());
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(pbd->GetMaterial());
 				for (i=0; i<pbd->Elements(); ++i)
 				{
 					FESolidElement& el = pbd->Element(i);
-					FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-					FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (pm || bm || bsm)
 					{
 						int N = el.Nodes();
@@ -95,12 +95,12 @@ bool FEM::InitPoroSolute()
 			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 			if (psd)
 			{
+				FEPoroElastic*    pm  = dynamic_cast<FEPoroElastic*   >(psd->GetMaterial());
+				FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(psd->GetMaterial());
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(psd->GetMaterial());
 				for (i=0; i<psd->Elements(); ++i)
 				{
 					FEShellElement& el = psd->Element(i);
-					FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-					FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (pm || bm || bsm)
 					{
 						int N = el.Nodes();
@@ -118,12 +118,12 @@ bool FEM::InitPoroSolute()
 			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 			if (pbd)
 			{
+				FEPoroElastic*    pm  = dynamic_cast<FEPoroElastic*   >(pbd->GetMaterial());
+				FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(pbd->GetMaterial());
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(pbd->GetMaterial());
 				for (i=0; i<pbd->Elements(); ++i)
 				{
 					FESolidElement& el = pbd->Element(i);
-					FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-					FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if ((pm == 0) && (bm == 0) && (bsm == 0))
 					{
 						int N = el.Nodes();
@@ -137,12 +137,12 @@ bool FEM::InitPoroSolute()
 			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 			if (psd)
 			{
+				FEPoroElastic*    pm  = dynamic_cast<FEPoroElastic*   >(psd->GetMaterial());
+				FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(psd->GetMaterial());
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(psd->GetMaterial());
 				for (i=0; i<psd->Elements(); ++i)
 				{
 					FEShellElement& el = psd->Element(i);
-					FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-					FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if ((pm == 0) && (bm == 0) && (bsm == 0))
 					{
 						int N = el.Nodes();
@@ -160,12 +160,12 @@ bool FEM::InitPoroSolute()
 			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 			if (pbd)
 			{
+				FEPoroElastic*    pm  = dynamic_cast<FEPoroElastic*   >(pbd->GetMaterial());
+				FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(pbd->GetMaterial());
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(pbd->GetMaterial());
 				for (i=0; i<pbd->Elements(); ++i)
 				{
 					FESolidElement& el = pbd->Element(i);
-					FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-					FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (pm || bm || bsm)
 					{
 						int N = el.Nodes();
@@ -180,12 +180,12 @@ bool FEM::InitPoroSolute()
 			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 			if (psd)
 			{
+				FEPoroElastic*    pm  = dynamic_cast<FEPoroElastic*   >(psd->GetMaterial());
+				FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(psd->GetMaterial());
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(psd->GetMaterial());
 				for (i=0; i<psd->Elements(); ++i)
 				{
 					FEShellElement& el = psd->Element(i);
-					FEPoroElastic* pm = dynamic_cast<FEPoroElastic*>(GetMaterial(el.GetMatID()));
-					FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (pm || bm || bsm)
 					{
 						int N = el.Nodes();
@@ -209,10 +209,10 @@ bool FEM::InitPoroSolute()
 			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 			if (pbd)
 			{
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(pbd->GetMaterial());
 				for (i=0; i<pbd->Elements(); ++i)
 				{
 					FESolidElement& el = pbd->Element(i);
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (bsm)
 					{
 						int N = el.Nodes();
@@ -226,10 +226,10 @@ bool FEM::InitPoroSolute()
 			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 			if (psd)
 			{
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(psd->GetMaterial());
 				for (i=0; i<psd->Elements(); ++i)
 				{
 					FEShellElement& el = psd->Element(i);
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (bsm)
 					{
 						int N = el.Nodes();
@@ -247,10 +247,10 @@ bool FEM::InitPoroSolute()
 			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 			if (pbd)
 			{
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(pbd->GetMaterial());
 				for (i=0; i<pbd->Elements(); ++i)
 				{
 					FESolidElement& el = pbd->Element(i);
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (bsm == 0)
 					{
 						int N = el.Nodes();
@@ -264,10 +264,10 @@ bool FEM::InitPoroSolute()
 			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 			if (psd)
 			{
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(psd->GetMaterial());
 				for (i=0; i<psd->Elements(); ++i)
 				{
 					FEShellElement& el = psd->Element(i);
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (bsm == 0)
 					{
 						int N = el.Nodes();
@@ -285,10 +285,10 @@ bool FEM::InitPoroSolute()
 			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
 			if (pbd)
 			{
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(pbd->GetMaterial());
 				for (i=0; i<pbd->Elements(); ++i)
 				{
 					FESolidElement& el = pbd->Element(i);
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (bsm)
 					{
 						int N = el.Nodes();
@@ -303,10 +303,10 @@ bool FEM::InitPoroSolute()
 			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 			if (psd)
 			{
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(psd->GetMaterial());
 				for (i=0; i<psd->Elements(); ++i)
 				{
 					FEShellElement& el = psd->Element(i);
-					FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
 					if (bsm)
 					{
 						int N = el.Nodes();

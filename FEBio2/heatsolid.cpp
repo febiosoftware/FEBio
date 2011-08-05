@@ -106,7 +106,7 @@ void FEHeatSolidDomain::ConductionStiffness(FEM& fem, FESolidElement& el, matrix
 	// conductivity matrix
 	double D[3][3];
 
-	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*fem.GetMaterial(el.GetMatID()));
+	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*m_pMat);
 
 	// loop over all integration points
 	for (n=0; n<ni; ++n)
@@ -175,7 +175,7 @@ void FEHeatSolidDomain::CapacitanceStiffness(FEM& fem, FESolidElement &el, matri
 
 	double dt = fem.m_pStep->m_dt;
 
-	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*fem.GetMaterial(el.GetMatID()));
+	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*m_pMat);
 	double alpha = mat.m_c*mat.m_rho / dt;
 
 	// loop over all integration points

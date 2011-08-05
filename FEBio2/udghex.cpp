@@ -24,8 +24,6 @@ void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 		// this element should not be rigid
 		assert(!el.IsRigid());
 
-		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
-
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
 		fe.assign(ndof, 0);
@@ -406,7 +404,8 @@ void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &
 	// The 'D*BL' matrix
 	double DBL[6][3];
 
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
+	assert(pmat);
 
 	FEMesh& mesh = fem.m_mesh;
 
@@ -530,10 +529,11 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 		gw = el.GaussWeights();
 
 		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
+		assert(pm);
 
 		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+		FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
 
 		// for the enhanced strain hex we need a slightly different procedure
 		// for calculating the element's stress. For this element, the stress

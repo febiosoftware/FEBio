@@ -31,7 +31,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 		FEShellElement& el = m_Elem[i];
 
 		// get the elements material
-		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+		FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
 
 		// set the local element coordinates
 		if (pme)
@@ -275,7 +275,7 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 		assert(!el.IsRigid());
 
 		// get the elements material
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+		FEMaterial* pmat = m_pMat;
 
 		// skip rigid elements and poro-elastic elements
 		if ((dynamic_cast<FEPoroElastic*>(pmat) == 0) && 
@@ -345,10 +345,12 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 	mat3ds s;
 
 	// get the element's material
-	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
+	assert(pm);
 
 	// extract the elastic component
-	FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
+	FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
+	assert(pme);
 
 	double *Grn, *Gsn, *Hn;
 	double Gr, Gs, H;
@@ -587,7 +589,9 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 		FEBodyForce& BF = *fem.GetBodyForce(nf);
 
 		// don't forget to multiply with the density
-		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
+		assert(pme);
+
 		double dens = pme->Density();
 
 		// calculate the average thickness
@@ -670,7 +674,7 @@ void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 		double* gw = el.GaussWeights();
 
 		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 
 		// loop over the integration points and calculate
 		// the stress at the integration point

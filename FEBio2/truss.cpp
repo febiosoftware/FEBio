@@ -81,7 +81,7 @@ void FEElasticTrussDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 	FETrussElement& el = Element(iel);
 
 	// get the material
-	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(fem.GetMaterial(el.GetMatID()));
+	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(m_pMat);
 	assert(pm);
 
 	// nodal coordinates
@@ -191,18 +191,19 @@ void FEElasticTrussDomain::InternalForces(FETrussElement& el, vector<double>& fe
 }
 
 //-----------------------------------------------------------------------------
-
+//! Update the truss' stresses
 void FEElasticTrussDomain::UpdateStresses(FEModel &fem)
 {
+	// get the material
+	FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(m_pMat);
+	assert(pm);
+
+	// loop over all elements
 	vec3d r0[2], rt[2];
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// unpack the element
 		FETrussElement& el = m_Elem[i];
-
-		// get the material
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
-		FETrussMaterial* pm = dynamic_cast<FETrussMaterial*>(pmat);
 
 		// setup the material point
 		FEMaterialPoint& mp = *(el.m_State[0]);
@@ -218,8 +219,10 @@ void FEElasticTrussDomain::UpdateStresses(FEModel &fem)
 		double l = (rt[1] - rt[0]).norm();
 		double L = (r0[1] - r0[0]).norm();
 
+		// calculate strain
 		pt.m_l = l / L;
 
+		// calculate stress
 		pt.m_tau = pm->Stress(pt);
 	}
 }

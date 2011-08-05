@@ -829,13 +829,12 @@ void FESolidSolver::InertialForces(vector<double>& R)
 		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial()); assert(pme);
+			double d = pme->Density();
+
 			for (iel=0; iel<pbd->Elements(); ++iel)
 			{
 				FESolidElement& el = pbd->Element(iel);
-
-				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
-
-				double d = pme->Density();
 
 				nint = el.GaussPoints();
 				neln = el.Nodes();

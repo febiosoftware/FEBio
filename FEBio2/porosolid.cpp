@@ -57,7 +57,7 @@ void FEPoroSolidDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 		psolver->AssembleResidual(el.m_node, elm, fe, R);
 
 		// do poro-elastic forces
-		FEMaterial* pm = fem.GetMaterial(el.GetMatID());
+		FEMaterial* pm = m_pMat;
 		assert(dynamic_cast<FEPoroElastic*>(pm) != 0);
 
 		// calculate fluid internal work
@@ -115,7 +115,7 @@ bool FEPoroSolidDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 	}
 
 	// get the element's material
-	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (fem.GetMaterial(el.GetMatID()));
+	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
@@ -215,7 +215,7 @@ void FEPoroSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		assert(!el.IsRigid());
 
 		// get the elements material
-		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+		FEMaterial* pmat = m_pMat;
 		assert(dynamic_cast<FEPoroElastic*>(pmat) != 0);
 
 		// allocate stiffness matrix
@@ -289,7 +289,7 @@ bool FEPoroSolidDomain::ElementPoroStiffness(FEM& fem, FESolidElement& el, matri
 		}
 
 	// get the element's material
-	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (fem.GetMaterial(el.GetMatID()));
+	FEPoroElastic* pm = dynamic_cast<FEPoroElastic*> (m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
@@ -554,7 +554,7 @@ void FEPoroSolidDomain::PoroMaterialStiffness(FEM& fem, FESolidElement &el, matr
 	for (i=0; i<neln; ++i) pn[i] = m_pMesh->Node(el.m_node[i]).m_pt;
 
 	// see if this is a poroelastic material
-	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
 	assert(dynamic_cast<FEPoroElastic*>(pmat));
 
 	// calculate element stiffness matrix
@@ -688,11 +688,11 @@ void FEPoroSolidDomain::UpdateStresses(FEModel &fem)
 		gw = el.GaussWeights();
 
 		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(el.GetMatID()));
+		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
+		assert(pm);
 
 		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(el.GetMatID());
-
+		FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
 		assert(dynamic_cast<FEPoroElastic*>(pm) != 0);
 
 		// loop over the integration points and calculate
