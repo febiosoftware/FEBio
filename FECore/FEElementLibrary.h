@@ -36,6 +36,9 @@ public:
 	//! Assign a traits class to an element
 	static void SetElementTraits(FEElement& el, int id);
 
+	//! return element traits data
+	static FEElementTraits* GetElementTraits(int ntype) { return m_Traits[ntype]; }
+
 protected:
 	static std::vector<FEElementTraits*>	m_Traits;	//!< pointer to registered element traits
 };

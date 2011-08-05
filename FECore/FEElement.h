@@ -59,7 +59,6 @@ public:
 	{ 
 		static int n = 1;
 		m_nID = n++;
-		m_gid = -1;
 		m_nrigid = -1; 
 	}
 
@@ -123,7 +122,6 @@ public:
 
 	int		m_nrigid;		//!< rigid body number that this element is attached to
 	int		m_nID;			//!< element ID
-	int		m_gid;			//!< part ID (i.e. index of domain this element belongs to)
 
 	vector<int>			m_node;		//!< connectivity
 	FEElementState		m_State;	//!< element state data
@@ -189,7 +187,6 @@ public:
 		m_nrigid = el.m_nrigid;
 		m_node = el.m_node;
 		m_nID = el.m_nID;
-		m_gid = el.m_gid;
 		m_lid = el.m_lid;
 
 		// copy surface element data
@@ -208,7 +205,6 @@ public:
 		m_nrigid = el.m_nrigid;
 		m_node = el.m_node;
 		m_nID = el.m_nID;
-		m_gid = el.m_gid;
 		m_lid = el.m_lid;
 
 		// copy surface element data

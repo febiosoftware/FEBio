@@ -323,38 +323,138 @@ void FEMesh::Reset()
 }
 
 //-----------------------------------------------------------------------------
-//! This function calculates the volume of an element
-//! using the element's integration points. It also assumes the element 
-//! is unpacked.
-
-double FEMesh::ElementVolume(FEElement& el)
+//! This function calculates the (initial) volume of an element. In some case, the volume
+//! may only be approximate.
+double FEMesh::ElementVolume(FEElement &el)
 {
-	// determine the type of the element
+	// get the nodal coordinates
+	int neln = el.Nodes();
+	vec3d r[8];
+	for (int i=0; i<neln; ++i) r[i] = Node(el.m_node[i]).m_r0;
+
+	// get element type
+	int ntype = el.Type();
+
 	double V = 0;
-
-	// get the domain from the domain ID of the element
-	FEDomain* pd = m_Domain[el.m_gid];
-
-	if (dynamic_cast<FESolidDomain*>(pd))
+	switch (ntype)
 	{
-		FESolidElement* ph = dynamic_cast<FESolidElement*>(&el);
-		FESolidDomain& bd = dynamic_cast<FESolidDomain&>(*pd);
-		int nint = ph->GaussPoints();
-		double *w = ph->GaussWeights();
-		for (int n=0; n<nint; ++n) V += bd.detJ0(*ph, n)*w[n];
+	case FE_HEX:
+	case FE_RIHEX:
+	case FE_UDGHEX:
+	case FE_TET:
+	case FE_PENTA:
+	case FE_TETG1:
+		V = SolidElementVolume(dynamic_cast<FESolidElement&>(el));
+		break;
+	case FE_SHELL_QUAD:
+	case FE_SHELL_TRI:
+		V = ShellElementVolume(dynamic_cast<FEShellElement&>(el));
+		break;
+	default:
+		V = 0;
 	}
 
-	if (dynamic_cast<FEShellDomain*>(pd))
+	return V;
+}
+
+//-----------------------------------------------------------------------------
+double FEMesh::SolidElementVolume(FESolidElement& el)
+{
+	int i;
+	vec3d r0[8];
+
+	int neln = el.Nodes();
+	for (i=0; i<neln; ++i) r0[i] = Node(el.m_node[i]).m_r0;
+
+	int nint = el.GaussPoints();
+	double *w = el.GaussWeights();
+	double V = 0;
+	for (int n=0; n<nint; ++n) 
 	{
-		FEShellElement* ps = dynamic_cast<FEShellElement*>(&el);
-		FEShellDomain& sd = dynamic_cast<FEShellDomain&>(*pd);
-		int nint = ps->GaussPoints();
-		double *w = ps->GaussWeights();
-		for (int n=0; n<nint; ++n) V += sd.detJ0(*ps, n)*w[n];
+		// shape function derivatives
+		double* Grn = el.Gr(n);
+		double* Gsn = el.Gs(n);
+		double* Gtn = el.Gt(n);
+
+		// jacobian matrix
+		double J[3][3] = {0};
+		for (i=0; i<neln; ++i)
+		{
+			const double& Gri = Grn[i];
+			const double& Gsi = Gsn[i];
+			const double& Gti = Gtn[i];
+			
+			const double& x = r0[i].x;
+			const double& y = r0[i].y;
+			const double& z = r0[i].z;
+			
+			J[0][0] += Gri*x; J[0][1] += Gsi*x; J[0][2] += Gti*x;
+			J[1][0] += Gri*y; J[1][1] += Gsi*y; J[1][2] += Gti*y;
+			J[2][0] += Gri*z; J[2][1] += Gsi*z; J[2][2] += Gti*z;
+		}
+			
+		// calculate the determinant
+		double detJ0 =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+					+ J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+					+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+		V += detJ0*w[n];
 	}
 
-	FESurfaceElement* pf = dynamic_cast<FESurfaceElement*>(&el);
-	if (pf) V = 0;
+	return V;
+}
+
+//-----------------------------------------------------------------------------
+double FEMesh::ShellElementVolume(FEShellElement& el)
+{
+	int i;
+	int neln = el.Nodes();
+
+	// initial nodal coordinates and directors
+	vec3d r0[4], D0[4];
+	for (i=0; i<neln; ++i)
+	{
+		r0[i] = Node(el.m_node[i]).m_r0;
+		D0[i] = Node(el.m_node[i]).m_D0;
+	}
+
+	int nint = el.GaussPoints();
+	double *w = el.GaussWeights();
+	double V = 0;
+	for (int n=0; n<nint; ++n)
+	{
+		// jacobian matrix
+		double* h0 = &el.m_h0[0];
+		double gt = el.gt(n);
+		double J[3][3] = {0};
+		for (i=0; i<neln; ++i)
+		{
+			const double& Hri = el.Hr(n)[i];
+			const double& Hsi = el.Hs(n)[i];
+			const double& Hi = el.H(n)[i];
+			
+			const double& x = r0[i].x;
+			const double& y = r0[i].y;
+			const double& z = r0[i].z;
+			
+			const double& dx = D0[i].x;
+			const double& dy = D0[i].y;
+			const double& dz = D0[i].z;
+			
+			double za = 0.5*gt*h0[i];
+			
+			J[0][0] += Hri*x + Hri*za*dx; J[0][1] += Hsi*x + Hsi*za*dx; J[0][2] += 0.5*h0[i]*Hi*dx;
+			J[1][0] += Hri*y + Hri*za*dy; J[1][1] += Hsi*y + Hsi*za*dy; J[1][2] += 0.5*h0[i]*Hi*dy;
+			J[2][0] += Hri*z + Hri*za*dz; J[2][1] += Hsi*z + Hsi*za*dz; J[2][2] += 0.5*h0[i]*Hi*dz;
+		}
+				
+		// calculate the determinant
+		double detJ0 =  J[0][0]*(J[1][1]*J[2][2] - J[1][2]*J[2][1]) 
+					  + J[0][1]*(J[1][2]*J[2][0] - J[2][2]*J[1][0]) 
+					  + J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+
+		V += detJ0*w[n];
+	}
 
 	return V;
 }

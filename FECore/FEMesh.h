@@ -312,6 +312,10 @@ public:
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
 
 protected:
+	double SolidElementVolume(FESolidElement& el);
+	double ShellElementVolume(FEShellElement& el);
+
+protected:
 	void ClearDomains();
 	void ClearParts();
 

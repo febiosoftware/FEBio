@@ -125,9 +125,9 @@ protected:
 	void ParseElementDataSection(XMLTag& tag);
 	void ParseGroupSection      (XMLTag& tag);
 
-	void ReadSolidElement(XMLTag& tag, FESolidElement& el, int ntype, int nid, int gid, int nmat);
-	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int gid, int nmat);
-	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int gid, int nmat);
+	void ReadSolidElement(XMLTag& tag, FESolidElement& el, int ntype, int nid, int nmat);
+	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int nmat);
+	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int nmat);
 
 	int ElementType(XMLTag& tag);
 	int DomainType(int etype, FEMaterial* pmat);

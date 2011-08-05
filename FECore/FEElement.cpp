@@ -32,7 +32,6 @@ FESolidElement::FESolidElement(const FESolidElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 }
 
 FESolidElement& FESolidElement::operator = (const FESolidElement& el)
@@ -45,7 +44,6 @@ FESolidElement& FESolidElement::operator = (const FESolidElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 
 	return (*this);
 }
@@ -61,7 +59,6 @@ FEShellElement::FEShellElement(const FEShellElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 
 	// copy shell data
 	m_h0 = el.m_h0;
@@ -78,7 +75,6 @@ FEShellElement& FEShellElement::operator = (const FEShellElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 
 	// copy shell data
 	m_h0 = el.m_h0;
@@ -97,7 +93,6 @@ FETrussElement::FETrussElement(const FETrussElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 
 	// truss data
 	m_a0 = el.m_a0;
@@ -113,7 +108,6 @@ FETrussElement& FETrussElement::operator = (const FETrussElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 
 	// copy truss data
 	m_a0 = el.m_a0;
@@ -132,7 +126,6 @@ FEDiscreteElement::FEDiscreteElement(const FEDiscreteElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 }
 
 FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
@@ -145,7 +138,6 @@ FEDiscreteElement& FEDiscreteElement::operator =(const FEDiscreteElement& el)
 	m_nrigid = el.m_nrigid;
 	m_node = el.m_node;
 	m_nID = el.m_nID;
-	m_gid = el.m_gid;
 
 	return (*this);
 }

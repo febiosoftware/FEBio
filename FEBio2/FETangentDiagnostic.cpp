@@ -103,7 +103,6 @@ void FETangentDiagnostic::BuildUniaxial()
 	FESolidElement& el = pd->Element(0);
 	el.SetType(FE_HEX);
 	el.m_nID = 1;
-	el.m_gid = 0;
 	el.SetMatID(0);
 	for (i=0; i<8; ++i) el.m_node[i] = i;
 
@@ -169,7 +168,6 @@ void FETangentDiagnostic::BuildSimpleShear()
 	FESolidElement& el = pd->Element(0);
 	el.SetType(FE_HEX);
 	el.m_nID = 1;
-	el.m_gid = 0;
 	el.SetMatID(0);
 	for (i=0; i<8; ++i) el.m_node[i] = i;
 

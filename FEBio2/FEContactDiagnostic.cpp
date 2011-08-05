@@ -184,8 +184,6 @@ bool FEContactDiagnostic::Init()
 	el0.m_node[5] = 5;
 	el0.m_node[6] = 6;
 	el0.m_node[7] = 7;
-	el0.m_gid = 0;
-
 
 	el1.SetType(FE_HEX);
 	el0.m_nID = 2;
@@ -198,7 +196,6 @@ bool FEContactDiagnostic::Init()
 	el1.m_node[5] = 13;
 	el1.m_node[6] = 14;
 	el1.m_node[7] = 15;
-	el1.m_gid = 0;
 
 	// --- create a material ---
 	FENeoHookean* pm = new FENeoHookean;

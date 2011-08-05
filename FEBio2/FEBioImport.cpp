@@ -1795,49 +1795,49 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		case FEFEBioImport::ET_HEX8:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nd, nmat);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_PENTA, nid, nd, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_PENTA, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET, nid, nd, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_UT4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nut4, nid, nd, nmat);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nut4, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TETG1:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TETG1, nid, nd, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_TETG1, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_QUAD4:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, nd, nmat);
+				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TRI3:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, nd, nmat);
+				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TRUSS2:
 			{
 				FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
-				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, nd, nmat);
+				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, nmat);
 			}
 			break;
 		default:
@@ -1857,11 +1857,10 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype, int nid, int gid, int nmat)
+void FEBioGeometrySection::ReadSolidElement(XMLTag &tag, FESolidElement& el, int ntype, int nid, int nmat)
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
-	el.m_gid = gid;
 	int n[8];
 	tag.value(n,el.Nodes());
 	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
@@ -1869,11 +1868,10 @@ void FEBioGeometrySection::ReadSolidElement(XMLTag &tag, FESolidElement& el, int
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype, int nid, int gid, int nmat)
+void FEBioGeometrySection::ReadShellElement(XMLTag &tag, FEShellElement& el, int ntype, int nid, int nmat)
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
-	el.m_gid = gid;
 	int n[8];
 	tag.value(n,el.Nodes());
 	for (int j=0; j<el.Nodes(); ++j) { el.m_node[j] = n[j]-1; el.m_h0[j] = 0.0; }
@@ -1881,11 +1879,10 @@ void FEBioGeometrySection::ReadShellElement(XMLTag &tag, FEShellElement& el, int
 }
 
 //-----------------------------------------------------------------------------
-void FEBioGeometrySection::ReadTrussElement(XMLTag &tag, FETrussElement& el, int ntype, int nid, int gid, int nmat)
+void FEBioGeometrySection::ReadTrussElement(XMLTag &tag, FETrussElement& el, int ntype, int nid, int nmat)
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
-	el.m_gid = gid;
 	int n[8];
 	tag.value(n, el.Nodes());
 	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
