@@ -33,7 +33,7 @@ bool FELinearSolidSolver::Init()
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FELinearSolidDomain* pd = dynamic_cast<FELinearSolidDomain*>(&mesh.Domain(nd));
-		if (pd) m_Dom.push_back(pd);
+		if (pd) m_Dom.push_back(nd);
 	}
 	assert(m_Dom.empty() == false);
 
@@ -160,7 +160,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 	}
 
 	// update the stresses on all domains
-	for (int i=0; i<(int) m_Dom.size(); ++i) m_Dom[i]->UpdateStresses(m_fem);
+	for (int i=0; i<(int) m_Dom.size(); ++i) Domain(i)->UpdateStresses(m_fem);
 }
 
 //-----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ void FELinearSolidSolver::Residual()
 	// add contribution from domains
 	for (int i=0; i<(int) m_Dom.size(); ++i) 
 	{
-		FELinearSolidDomain& d = dynamic_cast<FELinearSolidDomain&>(*m_Dom[i]);
+		FELinearSolidDomain& d = dynamic_cast<FELinearSolidDomain&>(*Domain(i));
 		d.RHS(this, m_R);
 	}
 }
@@ -250,7 +250,7 @@ bool FELinearSolidSolver::StiffnessMatrix()
 	// add contribution from domains
 	for (int i=0; i<(int)m_Dom.size(); ++i)
 	{
-		FELinearSolidDomain& bd = dynamic_cast<FELinearSolidDomain&>(*m_Dom[i]);
+		FELinearSolidDomain& bd = dynamic_cast<FELinearSolidDomain&>(*Domain(i));
 		bd.StiffnessMatrix(this);
 	}
 

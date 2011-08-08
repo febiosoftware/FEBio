@@ -20,7 +20,7 @@ BEGIN_PARAMETER_LIST(FESlidingInterface2, FEContactInterface)
 	ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"            );
 	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty"       );
 	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"           );
-	ADD_PARAMETER(m_knmult   , FE_PARAM_DOUBLE, "knmult"             );
+	ADD_PARAMETER(m_knmult   , FE_PARAM_INT   , "knmult"             );
 	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"         );
 	ADD_PARAMETER(m_epsp     , FE_PARAM_DOUBLE, "pressure_penalty"   );
 	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness");
@@ -251,6 +251,7 @@ FESlidingInterface2::FESlidingInterface2(FEModel* pfem) : FEContactInterface(pfe
 	m_gtol = -1;	// we use augmentation tolerance by default
 	m_ptol = -1;	// we use augmentation tolerance by default
 	m_bautopen = false;
+	m_nsegup = 0;
 
 	m_naugmin = 0;
 	m_naugmax = 10;

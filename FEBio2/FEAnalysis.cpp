@@ -454,13 +454,16 @@ bool FEAnalysis::Solve()
 			clog.printbox("FATAL ERROR", "A memory allocation failure has occured.\nThe program will now be terminated.");
 			break;
 		}
+
+// We only catch all exceptions for release versions
+#ifndef _DEBUG
 		catch (...)
 		{
 			bconv = false;
 			clog.printbox("FATAL ERROR", "An unknown exception has occured.\nThe program will now be terminated.");
 			break;
 		}
-
+#endif
 		// update counters
 		m_ntotref  += m_psolver->m_ntotref;
 		m_ntotiter += m_psolver->m_niter;

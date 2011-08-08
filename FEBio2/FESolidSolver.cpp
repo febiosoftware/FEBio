@@ -44,10 +44,7 @@ bool FESolidSolver::Init()
 
 	// For now, we add all domains to the solver's active domain list
 	FEMesh& mesh = m_fem.m_mesh;
-	for (i=0; i<mesh.Domains(); ++i)
-	{
-		m_Dom.push_back(&mesh.Domain(i));
-	}
+	for (i=0; i<mesh.Domains(); ++i) m_Dom.push_back(i);
 
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this

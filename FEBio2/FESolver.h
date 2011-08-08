@@ -55,14 +55,14 @@ public:
 	int Domains() { return m_Dom.size(); }
 
 	//! Get active domain
-	FEDomain* Domain(int i) { return m_Dom[i]; }
+	FEDomain* Domain(int i) { return &(m_fem.m_mesh.Domain(m_Dom[i])); }
 
 public:
 	// FEM data
 	FEM&		m_fem;	//!< reference the FE data structure
 
 	// domain data
-	vector<FEDomain*>	m_Dom;	//!< list of active domains for this analysis
+	vector<int>		m_Dom;	//!< list of active domains for this analysis
 
 	// timers
 	Timer	m_SolverTime;	//!< tracks time spent in solver

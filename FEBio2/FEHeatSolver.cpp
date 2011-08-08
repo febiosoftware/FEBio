@@ -34,7 +34,7 @@ bool FEHeatSolver::Init()
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEHeatSolidDomain* pd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(nd));
-		if (pd) m_Dom.push_back(pd);
+		if (pd) m_Dom.push_back(nd);
 	}
 	assert(m_Dom.empty() == false);
 
@@ -251,7 +251,7 @@ bool FEHeatSolver::StiffnessMatrix()
 	// Add stiffness contribution from all domains
 	for (int i=0; i<(int) m_Dom.size(); ++i)
 	{
-		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(*m_Dom[i]);
+		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(*Domain(i));
 		bd.HeatStiffnessMatrix(this);
 	}
 
