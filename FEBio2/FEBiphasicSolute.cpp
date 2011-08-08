@@ -20,7 +20,7 @@ END_PARAMETER_LIST();
 //! FEBiphasicSolute constructor
 
 FEBiphasicSolute::FEBiphasicSolute()
-{	m_pPerm = 0; m_pDiff = 0; m_pSolub = 0; m_pOsmC= 0; 
+{	m_pPerm = 0; m_pDiff = 0; m_pSolub = 0; m_pOsmC = 0; m_pSupp = 0;
 	m_rhoTw = 0; m_rhoTu = 0; m_Mu = 0; m_Rgas = 0; m_Tabs = 0; }
 
 //-----------------------------------------------------------------------------
@@ -32,6 +32,7 @@ void FEBiphasicSolute::Init()
 	m_pDiff->Init();
 	m_pSolub->Init();
 	m_pOsmC->Init();
+	if (m_pSupp) m_pSupp->Init();
 	
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	if (m_rhoTu < 0) throw MaterialError("solute_density must be positive");
@@ -268,6 +269,7 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 		ar << febio.GetTypeStr<FEMaterial>(m_pDiff ); m_pDiff ->Serialize(ar);
 		ar << febio.GetTypeStr<FEMaterial>(m_pSolub); m_pSolub->Serialize(ar);
 		ar << febio.GetTypeStr<FEMaterial>(m_pOsmC ); m_pOsmC ->Serialize(ar);
+		ar << febio.GetTypeStr<FEMaterial>(m_pSupp ); m_pSupp ->Serialize(ar);
 	}
 	else
 	{
@@ -298,5 +300,11 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEM()));
 		assert(m_pOsmC); m_pOsmC->Serialize(ar);
 		m_pOsmC->Init();
+
+		ar >> sz;
+		m_pSupp = dynamic_cast<FESoluteSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEM()));
+		assert(m_pSupp); m_pSupp->Serialize(ar);
+		m_pSupp->Init();
+
 	}
 }

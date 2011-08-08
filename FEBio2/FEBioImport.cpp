@@ -1442,6 +1442,38 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		
 		return true;
 	}
+	else if (tag == "supply")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
+		FESoluteSupply* pme = dynamic_cast<FESoluteSupply*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid supply %s in biphasic-solute material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the osmotic coefficient pointer
+		pm->m_pSupp = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
 	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 	
 	return false;

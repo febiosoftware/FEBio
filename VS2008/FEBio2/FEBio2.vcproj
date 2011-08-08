@@ -705,6 +705,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FESuppConst.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FESurfaceConstraint.cpp"
 				>
 			</File>
@@ -1348,6 +1352,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEStVenantKirchhoff.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FESuppConst.h"
 				>
 			</File>
 			<File

@@ -489,13 +489,15 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		double dcdt = (c - cprev)/dt;
 		double dkdt = dkdJ*dJdt + dkdc*dcdt;
 		double dpdt = dpdJ*dJdt;
+		// evaluate the solute supply
+		double crhat = (pm->m_pSupp) ? (pm->m_pSupp->Supply(pt)) : 0;
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
 			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z 
 						 - H[i]*(dpdt*kappa*c+phiw*dkdt*c+phiw*kappa*dcdt
-								 +phiw*kappa*c*divv)
+								 +phiw*kappa*c*divv-crhat/J)
 						 )*detJ*wg[n];
 		}
 	}
@@ -546,6 +548,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, 
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
+		FEElasticMaterialPoint& ept = *(el.m_State[n]->ExtractData<FEElasticMaterialPoint>());
 		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
 		
 		// calculate jacobian
@@ -571,13 +574,18 @@ bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, 
 			B3[i] = Gz;
 		}
 		
+		double J = ept.J;
+
 		// get the solute flux
 		vec3d& j = pt.m_j;
+		// evaluate the solute supply
+		double crhat = (pm->m_pSupp) ? (pm->m_pSupp->Supply(pt)) : 0;
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z)*detJ*wg[n];
+			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z
+						 + H[i]*crhat/J)*detJ*wg[n];
 		}
 	}
 	
@@ -882,6 +890,10 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		+R*T*kappa*c/phiw/D0/D0*(D*dD0dc/D0 - dDdc);
 		mat3ds dKedc = -Ke*Gc*Ke;
 		
+		// evaluate the tangents of solute supply
+		double dcrhatdJ = (pm->m_pSupp) ? (pm->m_pSupp->Tangent_Supply_Strain(mp)) : 0;
+		double dcrhatdc = (pm->m_pSupp) ? (pm->m_pSupp->Tangent_Supply_Concentration(mp)) : 0;
+		
 		// calculate all the matrices
 		vec3d vtmp,gp,gc,qpu,qcu,wc,jc;
 		mat3d wu,ju;
@@ -914,7 +926,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 				qcu = -gradN[j]*(c*dJdt*(2*(dpdJ*kappa+phiw*dkdJ+J*dpdJ*dkdJ)
 										 +J*(dpdJJ*kappa+phiw*dkdJJ))
 								 +dcdt*((phiw+J*dpdJ)*(kappa+dkdc*c)
-										+J*phiw*(dkdJ+dkdJc*c)))
+										+J*phiw*(dkdJ+dkdJc*c))-dcrhatdJ)
 				+qpu*(c*(phiw*kappa+J*dpdJ*kappa+J*phiw*dkdJ));
 				vtmp = (ju.transpose()*gradN[i] + qcu*H[i])*(tmp*dt);
 				ke[5*i+4][5*j  ] += vtmp.x;
@@ -948,7 +960,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 				// calculate the kcc matrix
 				jc = ((D*dkdc+dDdc*kappa)*gc)*H[j]
 				+D*((-gradN[j]*phiw+wc*(c/D0))*kappa);
-				qcc = -H[j]*((phiw+J*dpdJ)*divv*(kappa+c*dkdc)
+				qcc = -H[j]*((phiw+J*dpdJ)*divv*(kappa+c*dkdc)-dcrhatdc/J
 				+phiw*((2*dkdc+c*dkdcc)*dcdt+(kappa+c*dkdc)/dt+dJdt*(dkdJ+c*dkdJc)));
 				ke[5*i+4][5*j+4] += (gradN[i]*jc + H[i]*qcc)*(tmp*dt);
 				

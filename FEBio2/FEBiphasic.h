@@ -149,6 +149,27 @@ class FEOsmoticCoefficient : public FEMaterial
 	};
 
 //-----------------------------------------------------------------------------
+//! Base class for solute supply.
+//! These materials need to define the solute supply and tangent supply functions.
+//! The solute supply has units of moles/(referential mixture volume)/time
+//!
+class FESoluteSupply : public FEMaterial
+{
+public:
+	virtual void Init() {}
+	
+	//! solute supply
+	virtual double Supply(FEMaterialPoint& pt) {return 0;}
+	
+	//! tangent of supply with respect to strain
+	virtual double Tangent_Supply_Strain(FEMaterialPoint& mp) {return 0;}
+	
+	//! tangent of supply with respect to solute concentration
+	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp) {return 0;}
+	
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
 
 class FEBiphasicSolute : public FEMaterial
@@ -207,6 +228,7 @@ public:
 	FESoluteDiffusivity*		m_pDiff;		//!< pointer to diffusivity material
 	FESoluteSolubility*			m_pSolub;		//!< pointer to solubility material
 	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
+	FESoluteSupply*				m_pSupp;		//!< pointer to solute supply material
 	double						m_Rgas;			//!< universal gas constant
 	double						m_Tabs;			//!< absolute temperature
 	
