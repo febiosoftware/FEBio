@@ -228,6 +228,7 @@ public:
 
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);
+	void AddNodes(int nodes);
 
 	//! add nodes to the mesh
 	void AddNode(vec3d r);

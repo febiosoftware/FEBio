@@ -142,6 +142,15 @@ void FEMesh::CreateNodes(int nodes)
 }
 
 //-----------------------------------------------------------------------------
+// Make more room for nodes
+void FEMesh::AddNodes(int nodes)
+{
+	assert(nodes);
+	int N0 = (int) m_Node.size();
+	m_Node.resize(N0 + nodes);
+}
+
+//-----------------------------------------------------------------------------
 void FEMesh::AddNode(vec3d r)
 {
 	FENode node;
@@ -473,7 +482,7 @@ FENodeSet* FEMesh::FindNodeSet(int nid)
 
 FENodeSet* FEMesh::FindNodeSet(const char* szname)
 {
-	for (size_t i=0; i<m_NodeSet.size(); ++i) if (strcmp(m_NodeSet[i]->GetName(), szname)) return m_NodeSet[i];
+	for (size_t i=0; i<m_NodeSet.size(); ++i) if (strcmp(m_NodeSet[i]->GetName(), szname) == 0) return m_NodeSet[i];
 	return 0;
 }
 

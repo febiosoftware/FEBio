@@ -123,7 +123,7 @@ protected:
 	void ParseNodeSection       (XMLTag& tag);
 	void ParseElementSection    (XMLTag& tag);
 	void ParseElementDataSection(XMLTag& tag);
-	void ParseGroupSection      (XMLTag& tag);
+	void ParseNodeSetSection    (XMLTag& tag);
 
 	void ReadSolidElement(XMLTag& tag, FESolidElement& el, int ntype, int nid, int nmat);
 	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int nmat);
@@ -261,6 +261,8 @@ public:
 	int Version() { return m_nversion; }
 
 	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
+
+	void ReadList(XMLTag& tag, vector<int>& l);
 
 protected:
 	void ParseVersion			(XMLTag& tag);

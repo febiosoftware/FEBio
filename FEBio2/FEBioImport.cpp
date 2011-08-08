@@ -300,6 +300,40 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+void FEFEBioImport::ReadList(XMLTag& tag, vector<int>& l)
+{
+	// make sure the list is empty
+	l.clear();
+
+	// get a pointer to the value
+	const char* sz = tag.szvalue();
+
+	// parse the string
+	const char* ch;
+	do
+	{
+		int n0, n1, nn;
+		int nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+		switch (nread)
+		{
+		case 1:
+			n1 = n0;
+			nn = 1;
+			break;
+		case 2:
+			nn = 1;
+			break;
+		}
+
+		for (int i=n0; i<=n1; i += nn) l.push_back(i);
+
+		ch = strchr(sz, ',');
+		if (ch) sz = ch+1;
+	}
+	while (ch != 0);
+}
+
 //=============================================================================
 //
 //                     I M P O R T   S E C T I O N
@@ -1494,7 +1528,7 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 		if      (tag == "Nodes"      ) ParseNodeSection       (tag);
 		else if (tag == "Elements"   ) ParseElementSection    (tag);
 		else if (tag == "ElementData") ParseElementDataSection(tag);
-		else if (tag == "Groups"     ) ParseGroupSection      (tag);
+		else if (tag == "NodeSet"    ) ParseNodeSetSection    (tag);
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;
@@ -1507,8 +1541,8 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	int i;
 	FEMesh& mesh = fem.m_mesh;
+	int N0 = mesh.Nodes();
 
 	// first we need to figure out how many nodes there are
 	XMLTag t(tag);
@@ -1516,14 +1550,25 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	++t;
 	while (!t.isend()) { nodes++; ++t; }
 
-	// create nodes
-	mesh.CreateNodes(nodes);
+	// see if this list defines a set
+	const char* szl = tag.AttributeValue("set", true);
+	FENodeSet* ps = 0;
+	if (szl)
+	{
+		ps = new FENodeSet(&mesh);
+		ps->SetName(szl);
+		ps->create(nodes);
+		mesh.AddNodeSet(ps);
+	}
+
+	// resize node's array
+	mesh.AddNodes(nodes);
 
 	// read nodal coordinates
 	++tag;
-	for (i=0; i<nodes; ++i)
+	for (int i=0; i<nodes; ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = fem.m_mesh.Node(N0 + i);
 		tag.value(node.m_r0);
 		node.m_rt = node.m_r0;
 
@@ -1557,10 +1602,16 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		++tag;
 	}
 
+	// If a node-set is defined add these nodes to the node-set
+	if (ps)
+	{
+		for (int i=0; i<nodes; ++i) (*ps)[i] = N0+i;
+	}
+
+	// open temperature dofs for heat-transfer problems
 	if (fem.m_pStep->m_nModule == FE_HEAT)
 	{
-		// open temperature dofs for heat-transfer problems
-		for (i=0; i<nodes; ++i) 
+		for (int i=0; i<nodes; ++i) 
 		{
 			FENode& n = fem.m_mesh.Node(i);
 			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
@@ -1568,11 +1619,11 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 		}
 	}
 
+	// open temperature and displacement dofs 
+	// for coupled heat-solid problems
 	if (fem.m_pStep->m_nModule == FE_HEAT_SOLID)
 	{
-		// open temperature and displacement dofs 
-		// for coupled heat-solid problems
-		for (i=0; i<nodes; ++i) 
+		for (int i=0; i<nodes; ++i) 
 		{
 			FENode& n = fem.m_mesh.Node(i);
 			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
@@ -2102,106 +2153,30 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 //-----------------------------------------------------------------------------
 //! Reads the Geometry::Groups section of the FEBio input file
 
-void FEBioGeometrySection::ParseGroupSection(XMLTag& tag)
+void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
 	FEMesh &mesh = fem.m_mesh;
 
-	if (tag.isleaf()) return;
+	// get the name attribute
+	const char* szname = tag.AttributeValue("name");
 
-	++tag;
-	do
-	{
-		if (tag == "node_set")
-		{
-			// read the node set
-			FENodeSet* pns = new FENodeSet(&mesh);
+	// read the list of indices
+	vector<int> l;
+	m_pim->ReadList(tag, l);
+	assert(!l.empty());
 
-			int nid;
-			tag.AttributeValue("id", nid);
-			pns->SetID(nid);
+	// create a new node set
+	FENodeSet* pns = new FENodeSet(&mesh);
+	pns->SetName(szname);
 
-			const char* szname = tag.AttributeValue("name", true);
-			if (szname) pns->SetName(szname);
+	// assign indices to node set
+	int N = l.size();
+	pns->create(N);
+	for (int i=0; i<N; ++i) (*pns)[i] = l[i] - 1;
 
-			int i, n = 0, n0, n1, nn;
-			char* ch;
-			const int N = 5096;
-			char szval[N], *sz;
-
-			if (strlen(tag.szvalue()) >= N) throw XMLReader::InvalidValue(tag);
-
-			strcpy(szval , tag.szvalue());
-
-			sz = szval;
-
-			int nread;
-			do
-			{
-				ch = strchr(sz, ',');
-				if (ch) *ch = 0;
-				nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
-				switch (nread)
-				{
-				case 1:
-					n1 = n0;
-					nn = 1;
-					break;
-				case 2:
-					nn = 1;
-					break;
-				case 3:
-					break;
-				default:
-					n0 = 0;
-					n1 = -1;
-					nn = 1;
-				}
-
-				for (i=n0; i<=n1; i += nn) ++n;
-
-				if (ch) *ch = ',';
-				sz = ch+1;
-			}
-			while (ch != 0);
-
-			if (n != 0)
-			{
-				pns->create(n);
-
-				sz = szval;
-				n = 0;
-				do
-				{
-					ch = strchr(sz, ',');
-					if (ch) *ch = 0;
-					nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
-					switch (nread)
-					{
-					case 1:
-						n1 = n0;
-						nn = 1;
-						break;
-					case 2:
-						nn = 1;
-					}
-
-					for (i=n0; i<=n1; i += nn) (*pns)[n++] = i;
-					assert(n <= pns->size());
-
-					if (ch) *ch = ',';
-					sz = ch+1;
-				}
-				while (ch != 0);
-			}
-
-			// add the nodeset to the mesh
-			mesh.AddNodeSet(pns);
-		}
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
+	// add the nodeset to the mesh
+	mesh.AddNodeSet(pns);
 }
 
 //---------------------------------------------------------------------------------
@@ -2298,83 +2273,187 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 	// make sure this section does not appear in a step section
 	if (m_pim->m_nsteps != 0) throw XMLReader::InvalidTag(tag);
 
-	// Read the fixed nodes
-	++tag;
-	do
+	// see if a set is defined
+	const char* szset = tag.AttributeValue("set", true);
+	if (szset)
 	{
-		int n = atoi(tag.AttributeValue("id"))-1;
-		FENode& node = fem.m_mesh.Node(n);
+		// read the set
+		FEMesh& mesh = fem.m_mesh;
+		FENodeSet* ps = mesh.FindNodeSet(szset);
+		if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+
+		// get the bc attribute
 		const char* sz = tag.AttributeValue("bc");
-		if      (strcmp(sz, "x") == 0) node.m_ID[DOF_X] = -1;
-		else if (strcmp(sz, "y") == 0) node.m_ID[DOF_Y] = -1;
-		else if (strcmp(sz, "z") == 0) node.m_ID[DOF_Z] = -1;
-		else if (strcmp(sz, "xy") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = -1; }
-		else if (strcmp(sz, "yz") == 0) { node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
-		else if (strcmp(sz, "xz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Z] = -1; }
-		else if (strcmp(sz, "xyz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
-		else if (strcmp(sz, "p") == 0) { node.m_ID[DOF_P] = -1; }
-		else if (strcmp(sz, "u") == 0) node.m_ID[DOF_U] = -1;
-		else if (strcmp(sz, "v") == 0) node.m_ID[DOF_V] = -1;
-		else if (strcmp(sz, "w") == 0) node.m_ID[DOF_W] = -1;
-		else if (strcmp(sz, "uv") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = -1; }
-		else if (strcmp(sz, "vw") == 0) { node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
-		else if (strcmp(sz, "uw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_W] = -1; }
-		else if (strcmp(sz, "uvw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
-		else if (strcmp(sz, "t") == 0) node.m_ID[DOF_T] = -1;
-		else if (strcmp(sz, "c") == 0) { node.m_ID[DOF_C] = -1; }
-		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-		++tag;
+
+		// Make sure this is a leaf
+		if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
+
+		// loop over all nodes in the nodeset
+		FENodeSet& s = *ps;
+		int N = s.size();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = mesh.Node(s[i]);
+			if      (strcmp(sz, "x"  ) == 0) { node.m_ID[DOF_X] = -1; }
+			else if (strcmp(sz, "y"  ) == 0) { node.m_ID[DOF_Y] = -1; }
+			else if (strcmp(sz, "z"  ) == 0) { node.m_ID[DOF_Z] = -1; }
+			else if (strcmp(sz, "xy" ) == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = -1; }
+			else if (strcmp(sz, "yz" ) == 0) { node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
+			else if (strcmp(sz, "xz" ) == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Z] = -1; }
+			else if (strcmp(sz, "xyz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
+			else if (strcmp(sz, "p"  ) == 0) { node.m_ID[DOF_P] = -1; }
+			else if (strcmp(sz, "u"  ) == 0) { node.m_ID[DOF_U] = -1; }
+			else if (strcmp(sz, "v"  ) == 0) { node.m_ID[DOF_V] = -1; }
+			else if (strcmp(sz, "w"  ) == 0) { node.m_ID[DOF_W] = -1; }
+			else if (strcmp(sz, "uv" ) == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = -1; }
+			else if (strcmp(sz, "vw" ) == 0) { node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
+			else if (strcmp(sz, "uw" ) == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_W] = -1; }
+			else if (strcmp(sz, "uvw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
+			else if (strcmp(sz, "t"  ) == 0) { node.m_ID[DOF_T] = -1; }
+			else if (strcmp(sz, "c"  ) == 0) { node.m_ID[DOF_C] = -1; }
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		}
 	}
-	while (!tag.isend());
+	else
+	{
+		// Read the fixed nodes
+		++tag;
+		do
+		{
+			int n = atoi(tag.AttributeValue("id"))-1;
+			FENode& node = fem.m_mesh.Node(n);
+			const char* sz = tag.AttributeValue("bc");
+			if      (strcmp(sz, "x") == 0) node.m_ID[DOF_X] = -1;
+			else if (strcmp(sz, "y") == 0) node.m_ID[DOF_Y] = -1;
+			else if (strcmp(sz, "z") == 0) node.m_ID[DOF_Z] = -1;
+			else if (strcmp(sz, "xy") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = -1; }
+			else if (strcmp(sz, "yz") == 0) { node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
+			else if (strcmp(sz, "xz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Z] = -1; }
+			else if (strcmp(sz, "xyz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
+			else if (strcmp(sz, "p") == 0) { node.m_ID[DOF_P] = -1; }
+			else if (strcmp(sz, "u") == 0) node.m_ID[DOF_U] = -1;
+			else if (strcmp(sz, "v") == 0) node.m_ID[DOF_V] = -1;
+			else if (strcmp(sz, "w") == 0) node.m_ID[DOF_W] = -1;
+			else if (strcmp(sz, "uv") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = -1; }
+			else if (strcmp(sz, "vw") == 0) { node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
+			else if (strcmp(sz, "uw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_W] = -1; }
+			else if (strcmp(sz, "uvw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
+			else if (strcmp(sz, "t") == 0) node.m_ID[DOF_T] = -1;
+			else if (strcmp(sz, "c") == 0) { node.m_ID[DOF_C] = -1; }
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+			++tag;
+		}
+		while (!tag.isend());
+	}
 }
 
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
+	FEMesh& mesh = fem.m_mesh;
 
-	// count how many prescibed nodes there are
-	int ndis = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { ndis++; ++t; }
-
-	// read the prescribed data
-	++tag;
-	for (int i=0; i<ndis; ++i)
+	// see if this tag defines a set
+	const char* szset = tag.AttributeValue("set", true);
+	if (szset)
 	{
-		int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
+		// Find the set
+		FENodeSet* ps = mesh.FindNodeSet(szset);
+		if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
+
+		// get the bc attribute
 		const char* sz = tag.AttributeValue("bc");
 
-		if      (strcmp(sz, "x") == 0) bc = 0;
-		else if (strcmp(sz, "y") == 0) bc = 1;
-		else if (strcmp(sz, "z") == 0) bc = 2;
-		else if (strcmp(sz, "u") == 0) bc = 3;
-		else if (strcmp(sz, "v") == 0) bc = 4;
-		else if (strcmp(sz, "w") == 0) bc = 5;
-		else if (strcmp(sz, "p") == 0) bc = 6;
-		else if (strcmp(sz, "t") == 0) bc = 10; 
-		else if (strcmp(sz, "c") == 0) bc = 11;
+		int bc;
+		if      (strcmp(sz, "x") == 0) bc = DOF_X;
+		else if (strcmp(sz, "y") == 0) bc = DOF_Y;
+		else if (strcmp(sz, "z") == 0) bc = DOF_Z;
+		else if (strcmp(sz, "u") == 0) bc = DOF_U;
+		else if (strcmp(sz, "v") == 0) bc = DOF_V;
+		else if (strcmp(sz, "w") == 0) bc = DOF_W;
+		else if (strcmp(sz, "p") == 0) bc = DOF_P;
+		else if (strcmp(sz, "t") == 0) bc = DOF_T; 
+		else if (strcmp(sz, "c") == 0) bc = DOF_C;
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
+		// get the lc attribute
+		int lc;
 		sz = tag.AttributeValue("lc", true);
 		if (sz == 0) lc = 0;
 		else lc = atoi(sz);
 
-		FEPrescribedBC* pdc = new FEPrescribedBC;
-		pdc->node = n;
-		pdc->bc = bc;
-		pdc->lc = lc;
-		tag.value(pdc->s);
-		fem.m_DC.push_back(pdc);
+		// make sure this tag is a leaf
+		if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
 
-		// add this boundary condition to the current step
-		if (m_pim->m_nsteps > 0)
+		// get the scale factor
+		double s = 1;
+		tag.value(s);
+
+		// loop over all nodes in the nodeset
+		FENodeSet& ns = *ps;
+		int N = ns.size();
+		for (int i=0; i<N; ++i)
 		{
-			GetStep()->AddBoundaryCondition(pdc);
-			pdc->Deactivate();
+			FEPrescribedBC* pdc = new FEPrescribedBC;
+			pdc->node = ns[i];
+			pdc->bc = bc;
+			pdc->lc = lc;
+			pdc->s = s;
+			fem.m_DC.push_back(pdc);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddBoundaryCondition(pdc);
+				pdc->Deactivate();
+			}
 		}
+	}
+	else
+	{
+		// count how many prescibed nodes there are
+		int ndis = 0;
+		XMLTag t(tag); ++t;
+		while (!t.isend()) { ndis++; ++t; }
+
+		// read the prescribed data
 		++tag;
-	}	
+		for (int i=0; i<ndis; ++i)
+		{
+			int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
+			const char* sz = tag.AttributeValue("bc");
+
+			if      (strcmp(sz, "x") == 0) bc = DOF_X;
+			else if (strcmp(sz, "y") == 0) bc = DOF_Y;
+			else if (strcmp(sz, "z") == 0) bc = DOF_Z;
+			else if (strcmp(sz, "u") == 0) bc = DOF_U;
+			else if (strcmp(sz, "v") == 0) bc = DOF_V;
+			else if (strcmp(sz, "w") == 0) bc = DOF_W;
+			else if (strcmp(sz, "p") == 0) bc = DOF_P;
+			else if (strcmp(sz, "t") == 0) bc = DOF_T; 
+			else if (strcmp(sz, "c") == 0) bc = DOF_C;
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+			sz = tag.AttributeValue("lc", true);
+			if (sz == 0) lc = 0;
+			else lc = atoi(sz);
+
+			FEPrescribedBC* pdc = new FEPrescribedBC;
+			pdc->node = n;
+			pdc->bc = bc;
+			pdc->lc = lc;
+			tag.value(pdc->s);
+			fem.m_DC.push_back(pdc);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddBoundaryCondition(pdc);
+				pdc->Deactivate();
+			}
+			++tag;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
