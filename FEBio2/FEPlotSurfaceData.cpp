@@ -6,23 +6,11 @@
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );
 REGISTER_FEBIO_CLASS(FEPlotContactPressure , FEPlotData, "contact pressure");
-REGISTER_FEBIO_CLASS(FETestData			   , FEPlotData, "_test_data" );
+REGISTER_FEBIO_CLASS(FEPlotContactTraction , FEPlotData, "contact traction");
 
 //=============================================================================
-//                           S U R F A C E   D A T A
+// Contact Gap
 //=============================================================================
-
-//-----------------------------------------------------------------------------
-bool FETestData ::Save(FEDomain& dom, vector<float>& a)
-{
-	if (dynamic_cast<FERigidSolidDomain*>(&dom) == 0)
-	{
-		int N = dom.Nodes();
-		for (int i=0; i<N; ++i) a.push_back((float) i);
-		return true;
-	}
-	return false;
-}
 
 //-----------------------------------------------------------------------------
 bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
@@ -159,7 +147,10 @@ bool FEPlotContactGap::SaveSliding3(FESlidingSurface3& s, vector<float>& a)
 	return true;
 }
 
-//-----------------------------------------------------------------------------
+//=============================================================================
+// Contact Pressure
+//=============================================================================
+//
 // Store the contact pressures
 bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
 {
@@ -277,3 +268,144 @@ bool FEPlotContactPressure::SaveSliding3(FESlidingSurface3 &s, vector<float>& a)
 	return true;
 }
 
+//=============================================================================
+// Contact traction
+//=============================================================================
+
+bool FEPlotContactTraction::Save(FESurface &surf, std::vector<float> &a)
+{
+	FESlidingSurface* ps = dynamic_cast<FESlidingSurface*>(&surf);
+	if (ps) return SaveSliding(*ps, a);
+
+	FEFacetSlidingSurface* pf = dynamic_cast<FEFacetSlidingSurface*>(&surf);
+	if (pf) return SaveFacetSliding(*pf, a);
+
+	FESlidingSurface2* ps2 = dynamic_cast<FESlidingSurface2*>(&surf);
+	if (ps2) return SaveSliding2(*ps2, a);
+
+	FESlidingSurface3* ps3 = dynamic_cast<FESlidingSurface3*>(&surf);
+	if (ps3) return SaveSliding3(*ps3, a);
+	
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactTraction::SaveSliding(FESlidingSurface &s, std::vector<float> &a)
+{
+	vec3d t[4];
+	for (int i=0; i<s.Elements(); ++i)
+	{
+		FESurfaceElement& e = s.Element(i);
+		int ne = e.Nodes();
+
+		for (int j=0; j<ne; ++j)
+		{
+			int nj = e.m_lnode[j];
+			double gi = s.gap[nj];
+			double Li = s.m_Ln[nj];
+			vec3d ti = s.nu[nj];
+			if (gi > 0) t[j] = ti*Li; else t[j] = vec3d(0,0,0);
+		}
+		if (ne == 3) t[3] = t[2];
+
+		a.push_back((float) t[0].x); a.push_back((float) t[0].y); a.push_back((float) t[0].z);
+		a.push_back((float) t[1].x); a.push_back((float) t[1].y); a.push_back((float) t[1].z);
+		a.push_back((float) t[2].x); a.push_back((float) t[2].y); a.push_back((float) t[2].z);
+		a.push_back((float) t[3].x); a.push_back((float) t[3].y); a.push_back((float) t[3].z);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactTraction::SaveFacetSliding(FEFacetSlidingSurface &s, std::vector<float> &a)
+{
+	int nint = 0;
+	for (int j=0; j<s.Elements(); ++j)
+	{
+		FESurfaceElement& el = s.Element(j);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+
+		// calculate the average traction
+		vec3d t(0,0,0);
+		for (int k=0; k<ni; ++k, ++nint)
+		{
+			double gi = s.m_gap[nint];
+			double Li = s.m_Ln[nint];
+			vec3d  ti = s.m_nu[nint];
+			if (gi > 0) t += ti*(Li);
+		}
+		t /= (double) ni;
+
+		// project average traction to nodes
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactTraction::SaveSliding2(FESlidingSurface2 &s, std::vector<float> &a)
+{
+	int nint = 0;
+	for (int j=0; j<s.Elements(); ++j)
+	{
+		FESurfaceElement& el = s.Element(j);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+
+		// calculate the average traction
+		vec3d t(0,0,0);
+		for (int k=0; k<ni; ++k, ++nint)
+		{
+			double gi = s.m_gap[nint];
+			double Li = s.m_Ln[nint];
+			vec3d  ti = s.m_nu[nint];
+			if (gi > 0) t += ti*(Li);
+		}
+		t /= (double) ni;
+
+		// project average traction to nodes
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotContactTraction::SaveSliding3(FESlidingSurface3 &s, std::vector<float> &a)
+{
+	int nint = 0;
+	for (int j=0; j<s.Elements(); ++j)
+	{
+		FESurfaceElement& el = s.Element(j);
+		int ne = el.Nodes();
+		int ni = el.GaussPoints();
+
+		// calculate the average traction
+		vec3d t(0,0,0);
+		for (int k=0; k<ni; ++k, ++nint)
+		{
+			double gi = s.m_gap[nint];
+			double Li = s.m_Ln[nint];
+			vec3d  ti = s.m_nu[nint];
+			if (gi > 0) t += ti*(Li);
+		}
+		t /= (double) ni;
+
+		// project average traction to nodes
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+	}
+
+	return true;
+}

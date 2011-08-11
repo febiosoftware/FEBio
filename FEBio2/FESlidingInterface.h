@@ -30,6 +30,7 @@ public:
 		gap = s.gap;
 		zero(m_pme);
 		Lt  = s.Lt;
+		m_Ln = s.m_Ln;
 	}
 
 	//! Update the surface data
@@ -56,6 +57,7 @@ public:
 	vector<vec2d>				Lt;		//!< Lagrange multipliers for friction
 	vector<double>				off;	//!< gap offset (= shell thickness)
 	vector<double>				eps;	//!< normal penalty factors
+	vector<double>				m_Ln;	//!< net contact pressure
 
 	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node
 };
@@ -107,6 +109,9 @@ public:
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
+
+	//! calculate contact pressures for file output
+	void UpdateContactPressures();
 
 protected:
 	//! calculate auto penalty factor

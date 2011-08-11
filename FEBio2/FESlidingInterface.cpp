@@ -109,6 +109,7 @@ void FESlidingSurface::Init()
 	Lt.resize(nn);
 	off.assign(nn, 0.0);
 	eps.assign(nn, 1.0);
+	m_Ln.assign(nn, 0.0);
 
 	// we calculate the gap offset values
 	// This value is used to take the shell thickness into account
@@ -206,6 +207,7 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		ar << Lt;
 		ar << off;
 		ar << eps;
+		ar << m_Ln;
 
 		int ne = (int) m_pme.size();
 		ar << ne;
@@ -229,6 +231,7 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		ar >> Lt;
 		ar >> off;
 		ar >> eps;
+		ar >> m_Ln;
 
 		assert(m_pSibling);
 
@@ -537,6 +540,9 @@ void FESlidingInterface::Update()
 		m_ss.Update();
 		ProjectSurface(m_ms, m_ss, bupdate);
 	}
+
+	// Update the net contact pressures
+	UpdateContactPressures();
 
 	// set the first-entry-flag to false
 	bfirst = false;
@@ -1699,6 +1705,44 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 
 	ss.Lt[inode][0] = Lt[0];
 	ss.Lt[inode][1] = Lt[1];
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingInterface::UpdateContactPressures()
+{
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
+	{
+		FESlidingSurface& ss = (np == 0? m_ss : m_ms);
+		FESlidingSurface& ms = (np == 0? m_ms : m_ss);
+		
+		// loop over all nodes of the primary surface
+		for (int n=0; n<ss.Nodes(); ++n)
+		{
+			// get the normal tractions at the integration points
+			double gap = ss.gap[n];
+			double eps = m_eps*ss.eps[n];
+			ss.m_Ln[n] = MBRACKET(ss.Lm[n] + eps*gap);
+			FESurfaceElement* pme = ss.m_pme[n];
+			if (m_btwo_pass && pme)
+			{
+				int me = pme->Nodes();
+				double ti[4];
+				for (int j=0; j<me; ++j) {
+					int k = pme->m_lnode[j];
+					gap = ms.gap[k];
+					eps = m_eps*ms.eps[k];
+					ti[j] = MBRACKET(ms.Lm[k] + m_eps*ms.eps[k]*ms.gap[k]);
+				}
+				// project the data to the nodes
+				double tn[4];
+				pme->project_to_nodes(ti, tn);
+				// now evaluate the traction at the intersection point
+				double Ln = pme->eval(tn, ss.rs[n][0], ss.rs[n][1]);
+				ss.m_Ln[n] += MBRACKET(Ln);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

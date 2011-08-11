@@ -11,15 +11,6 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//! (this is just test data: don't use it)
-class FETestData : public FEDomainData
-{
-public:
-	FETestData(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
-	bool Save(FEDomain& dom, vector<float>& a);
-};
-
-//-----------------------------------------------------------------------------
 //! Contact gap
 //!
 class FEPlotContactGap : public FESurfaceData
@@ -47,6 +38,22 @@ public:
 
 protected:
 	bool SaveSliding     (FESlidingSurface&      s, vector<float>& a);
+	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
+	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
+	bool SaveSliding3    (FESlidingSurface3&	 s, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Contact traction
+//!
+class FEPlotContactTraction : public FESurfaceData
+{
+public:
+	FEPlotContactTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+
+protected:
+	bool SaveSliding(FESlidingSurface& s, vector<float>& a);
 	bool SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a);
 	bool SaveSliding2    (FESlidingSurface2&	 s, vector<float>& a);
 	bool SaveSliding3    (FESlidingSurface3&	 s, vector<float>& a);
