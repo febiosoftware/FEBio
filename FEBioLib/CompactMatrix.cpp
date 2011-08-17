@@ -35,14 +35,21 @@ CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
 //-----------------------------------------------------------------------------
 void CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 {
+	assert(Size() == (int) x.size());
+	assert(Size() == (int) r.size());
+	mult_vector(&x[0], &r[0]);
+}
+
+//-----------------------------------------------------------------------------
+void CompactSymmMatrix::mult_vector(const double* x, double* r)
+{
 	int j, i, n;
-	int N = x.size();
-	assert(N == Size());
+	int N = Size();
 
 	double* pv, rj;
 	int* pi;
 
-	::zero(r);
+	for (i=0; i<N; ++i) r[i] = 0.0;
 
 	// loop over all columns
 	for (j=0; j<N; ++j)

@@ -95,12 +95,16 @@ bool RCICGSolver::BackSolve(vector<double>& x, vector<double>& b)
 			break;
 		case 1: // compute vector A*tmp[0] and store in tmp[n]
 			{
-				char tr = 'u';
+				A.mult_vector(ptmp, ptmp+n);
+				// TODO: I would like to use blas but for some
+				//       reason this operation seems to have a memory leak for
+				//       large problems (+1,500,000)
+/*				char tr = 'u';
 				double* a = A.Values();
 				int* ia = A.Pointers();
 				int* ja = A.Indices();
 				mkl_dcsrsymv(&tr, &n, a, ia, ja, ptmp, ptmp+n);
-			}
+*/			}
 			break;
 		default:
 			bsuccess = false;

@@ -72,6 +72,9 @@
     <ClInclude Include="..\..\FEBioLib\FERigid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\RCICGSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\CompactMatrix.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\RCICGSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
