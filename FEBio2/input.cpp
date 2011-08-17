@@ -427,6 +427,7 @@ void echo_input(FEM& fem)
 	case WSMP_SOLVER        : clog.printf("WSMP\n"              ); break;
 	case LU_SOLVER          : clog.printf("LUSolver\n"          ); break;
 	case CG_ITERATIVE_SOLVER: clog.printf("Conjugate gradient\n"); break;
+	case RCICG_SOLVER       : clog.printf("RCICG\n"             ); break;
 	default:
 		assert(false);
 		clog.printf("Unknown solver\n");

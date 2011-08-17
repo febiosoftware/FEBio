@@ -65,7 +65,8 @@ enum FE_Linear_Solver_Type {
 	PARDISO_SOLVER, 	// use only where available
 	LU_SOLVER,
 	WSMP_SOLVER,		// use only where available
-	CG_ITERATIVE_SOLVER
+	CG_ITERATIVE_SOLVER,
+	RCICG_SOLVER		// use only where available
 };
 
 ///////////////////////////////////////////////////////////////////////////////

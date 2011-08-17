@@ -433,6 +433,7 @@ bool FEM::Configure(const char *szfile)
 						else if (strcmp(szt, "superlu"           ) == 0) m_nsolver = SUPERLU_SOLVER;
 						else if (strcmp(szt, "superlu_mt"        ) == 0) m_nsolver = SUPERLU_MT_SOLVER;
 						else if (strcmp(szt, "pardiso"           ) == 0) m_nsolver = PARDISO_SOLVER;
+						else if (strcmp(szt, "rcicg"             ) == 0) m_nsolver = RCICG_SOLVER;
 						else if (strcmp(szt, "wsmp"              ) == 0) m_nsolver = WSMP_SOLVER;
 					}
 					else if (tag == "import")

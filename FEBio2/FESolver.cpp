@@ -14,6 +14,7 @@
 #include "FEBioLib/PardisoSolver.h"
 #include "FEBioLib/WSMPSolver.h"
 #include "FEBioLib/ConjGradIterSolver.h"
+#include "FEBioLib/RCICGSolver.h"
 
 FESolver::FESolver(FEM& fem) : m_fem(fem)
 {
@@ -49,6 +50,7 @@ bool FESolver::Init()
 		case LU_SOLVER           : m_plinsolve = new LUSolver(); break;
 		case WSMP_SOLVER         : m_plinsolve = new WSMPSolver(); break;
 		case CG_ITERATIVE_SOLVER : m_plinsolve = new ConjGradIterSolver(); break;
+		case RCICG_SOLVER        : m_plinsolve = new RCICGSolver(); break;
 		default:
 			clog.printbox("FATAL ERROR","Unknown solver type selected\n");
 			return false;
