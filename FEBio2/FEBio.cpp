@@ -285,8 +285,26 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		}
 		else
 		{
-			fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
-			return false;
+			// we allow FEBio to run without a -i option
+			// so that we can run an .feb file by right-clicking on it in windows
+			if (nargs == 2)
+			{
+				char* c = strrchr(argv[1], '.');
+				if (c && (strcmp(c, ".feb")==0))
+				{
+					strcpy(ops.szfile, argv[1]);
+				}
+				else
+				{
+					fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
+					return false;
+				}
+			}
+			else
+			{
+				fprintf(stderr, "FATAL ERROR: Invalid command line option\n\n");
+				return false;
+			}
 		}
 	}
 
