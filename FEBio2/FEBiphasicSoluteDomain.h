@@ -18,6 +18,9 @@ public:
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
+
+	//! initialize elements for this domain
+	void InitElements();
 	
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolidSolver* psolver);

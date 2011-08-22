@@ -11,6 +11,7 @@ REGISTER_MATERIAL(FEBiphasicSolute, "biphasic-solute");
 
 // Material parameters for the FESolutePoroElastic material
 BEGIN_PARAMETER_LIST(FEBiphasicSolute, FEMaterial)
+	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 	ADD_PARAMETER(m_rhoTw, FE_PARAM_DOUBLE, "fluid_density");
 	ADD_PARAMETER(m_rhoTu, FE_PARAM_DOUBLE, "solute_density");
 	ADD_PARAMETER(m_Mu, FE_PARAM_DOUBLE, "solute_molecular_weight");
@@ -20,8 +21,8 @@ END_PARAMETER_LIST();
 //! FEBiphasicSolute constructor
 
 FEBiphasicSolute::FEBiphasicSolute()
-{	m_pPerm = 0; m_pDiff = 0; m_pSolub = 0; m_pOsmC = 0; m_pSupp = 0;
-	m_rhoTw = 0; m_rhoTu = 0; m_Mu = 0; m_Rgas = 0; m_Tabs = 0; }
+{	m_pPerm = 0; m_pDiff = 0; m_pSolub = 0; m_pOsmC = 0; m_pSupp = 0; 
+	m_phi0 = 0; m_rhoTw = 0; m_rhoTu = 0; m_Mu = 0; m_Rgas = 0; m_Tabs = 0; }
 
 //-----------------------------------------------------------------------------
 void FEBiphasicSolute::Init()
@@ -34,6 +35,7 @@ void FEBiphasicSolute::Init()
 	m_pOsmC->Init();
 	if (m_pSupp) m_pSupp->Init();
 	
+	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	if (m_rhoTu < 0) throw MaterialError("solute_density must be positive");
 	if (m_Mu < 0) throw MaterialError("solute_molecular_weight must be positive");
@@ -55,7 +57,7 @@ double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 	// relative volume
 	double J = et.J;
 	// porosity
-	double phiw = 1 - m_pPerm->m_phi0/J;
+	double phiw = 1 - m_phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse
 	phiw = (phiw > 0) ? phiw : 0;
@@ -251,6 +253,19 @@ double FEBiphasicSolute::Concentration(FEMaterialPoint& pt)
 	double ca = kappa*ppt.m_c;
 	
 	return ca;
+}
+
+//-----------------------------------------------------------------------------
+//! referential solute concentration
+double FEBiphasicSolute::ReferentialConcentration(FEMaterialPoint& pt)
+{
+	FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+
+	double J = ept.J;
+	double phiw = Porosity(pt);
+	double cr = J*phiw*Concentration(pt);
+	
+	return cr;
 }
 
 //-----------------------------------------------------------------------------

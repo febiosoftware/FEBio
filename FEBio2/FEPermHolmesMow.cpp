@@ -34,13 +34,16 @@ void FEPermHolmesMow::Init()
 mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 	
 	// relative volume
 	double J = et.J;
+	// referential solid volume fraction
+	double phi0 = J*(1-pt.m_phiw);
 	
 	// --- strain-dependent isotropic permeability ---
 	
-	return mat3dd(m_perm*pow((J-m_phi0)/(1.0-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0));
+	return mat3dd(m_perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0));
 }
 
 //-----------------------------------------------------------------------------
@@ -48,14 +51,17 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 tens4ds FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 	
 	// relative volume
 	double J = et.J;
+	// referential solid volume fraction
+	double phi0 = J*(1-pt.m_phiw);
 	
 	mat3dd I(1);	// Identity
 	
-	double k0 = m_perm*pow((J-m_phi0)/(1.0-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
-	double K0prime = (J*J*m_M+(J*(m_alpha+1)-m_phi0)/(J-m_phi0))*k0;
+	double k0 = m_perm*pow((J-phi0)/(1.0-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double K0prime = (J*J*m_M+(J*(m_alpha+1)-phi0)/(J-phi0))*k0;
 	mat3ds k0hat = I*K0prime;
 	
 	return dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0;

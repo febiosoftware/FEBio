@@ -7,6 +7,23 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+void FEBiphasicSoluteDomain::InitElements()
+{
+	FEElasticSolidDomain::InitElements();
+	
+	// store previous mesh state
+	// we need it for receptor-ligand complex calculations
+	for (int j=0; j<Elements(); ++j) {
+		FESolidElement& el = Element(j);
+		for (int k=0; k<el.GaussPoints(); ++k) {
+			FESolutePoroElasticMaterialPoint& pt = 
+			*(el.m_State[k]->ExtractData<FESolutePoroElasticMaterialPoint>());
+			pt.m_crcp = pt.m_crc;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	int i, j;
@@ -489,8 +506,9 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		double dcdt = (c - cprev)/dt;
 		double dkdt = dkdJ*dJdt + dkdc*dcdt;
 		double dpdt = dpdJ*dJdt;
-		// evaluate the solute supply
-		double crhat = (pm->m_pSupp) ? (pm->m_pSupp->Supply(pt)) : 0;
+		// Evaluate solute supply and receptor-ligand kinetics
+		double crhat = 0;
+		if (pm->m_pSupp) crhat = pm->m_pSupp->Supply(mp);
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
@@ -578,8 +596,13 @@ bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, 
 
 		// get the solute flux
 		vec3d& j = pt.m_j;
-		// evaluate the solute supply
-		double crhat = (pm->m_pSupp) ? (pm->m_pSupp->Supply(pt)) : 0;
+		// Evaluate solute supply and receptor-ligand kinetics
+		double crhat = 0;
+		if (pm->m_pSupp)
+		{
+			// evaluate the solute supply
+			crhat = pm->m_pSupp->SupplySS(pt);
+		}
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
@@ -891,8 +914,14 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		mat3ds dKedc = -Ke*Gc*Ke;
 		
 		// evaluate the tangents of solute supply
-		double dcrhatdJ = (pm->m_pSupp) ? (pm->m_pSupp->Tangent_Supply_Strain(mp)) : 0;
-		double dcrhatdc = (pm->m_pSupp) ? (pm->m_pSupp->Tangent_Supply_Concentration(mp)) : 0;
+		double dcrhatdJ = 0;
+		double dcrhatdc = 0;
+		if (pm->m_pSupp)
+		{
+			dcrhatdJ = pm->m_pSupp->Tangent_Supply_Strain(mp);
+			double dcrhatdcr = pm->m_pSupp->Tangent_Supply_Concentration(mp);
+			dcrhatdc = J*phiw*(kappa + c*dkdc)*dcrhatdcr;
+		}
 		
 		// calculate all the matrices
 		vec3d vtmp,gp,gc,qpu,qcu,wc,jc;
@@ -1374,6 +1403,9 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 	double pn[8], ct[8];
 
 	FEMesh& mesh = *m_pMesh;
+	FEM& mdl = dynamic_cast<FEM&>(fem);
+	double dt = mdl.m_pStep->m_dt;
+	bool sstate = (mdl.m_pStep->m_nanalysis == FE_STEADY_STATE);
 	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -1445,12 +1477,23 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 			// calculate the gradient of c at gauss-point
 			ppt.m_gradc = gradient(el, ct, n);
 			
-			// for biphasic-solute materials also update the fluid and solute fluxes
+			// for biphasic-solute materials also update the porosity, fluid and solute fluxes
 			// and evaluate the actual fluid pressure and solute concentration
+			ppt.m_phiw = pmb->Porosity(mp);
 			ppt.m_w = pmb->FluidFlux(mp);
 			ppt.m_pa = pmb->Pressure(mp);
 			ppt.m_j = pmb->SoluteFlux(mp);
 			ppt.m_ca = pmb->Concentration(mp);
+			if (pmb->m_pSupp)
+			{
+				if (sstate)
+					ppt.m_crc = pmb->m_pSupp->ReceptorLigandConcentrationSS(mp);
+				else {
+					// update m_crc using one-step integration
+					double crchat = pmb->m_pSupp->ReceptorLigandSupply(mp);
+					ppt.m_crc = ppt.m_crcp + crchat*dt;
+				}
+			}
 
 			// calculate the stress at this material point (must be done after evaluating m_pa)
 			pt.s = pmb->Stress(mp);

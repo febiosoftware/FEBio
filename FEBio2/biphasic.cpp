@@ -1003,6 +1003,7 @@ void FEBiphasicDomain::UpdateStresses(FEModel &fem)
 			ppt.m_gradp = gradient(el, pn, n);
 			
 			// for biphasic materials also update the fluid flux
+			ppt.m_phiw = pmb->Porosity(mp);
 			ppt.m_w = pmb->Flux(mp);
 			ppt.m_pa = pmb->Pressure(mp);
 			

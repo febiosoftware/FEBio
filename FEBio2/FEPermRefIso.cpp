@@ -10,7 +10,6 @@ BEGIN_PARAMETER_LIST(FEPermRefIso, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
 	ADD_PARAMETER(m_perm1, FE_PARAM_DOUBLE, "perm1");
 	ADD_PARAMETER(m_perm2, FE_PARAM_DOUBLE, "perm2");
-	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "M");
 	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
 END_PARAMETER_LIST();
@@ -42,6 +41,7 @@ void FEPermRefIso::Init()
 mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -51,10 +51,12 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 	
 	// relative volume
 	double J = et.J;
+	// referential solid volume fraction
+	double phi0 = J*(1-pt.m_phiw);
 	
 	// --- strain-dependent permeability ---
 	
-	double f = pow((J-m_phi0)/(1-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double f = pow((J-m_phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double k0 = m_perm0*f;
 	double k1 = m_perm1/(J*J)*f;
 	double k2 = 0.5*m_perm2/pow(J,4)*f;
@@ -68,6 +70,7 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -77,14 +80,16 @@ tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	
 	// relative volume
 	double J = et.J;
+	// referential solid volume fraction
+	double phi0 = J*(1-pt.m_phiw);
 	
-	double f = pow((J-m_phi0)/(1-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double f = pow((J-phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double k0 = m_perm0*f;
 	double k1 = m_perm1/(J*J)*f;
 	double k2 = 0.5*m_perm2/pow(J,4)*f;
-	double K0prime = (J*J*m_M+(J*(m_alpha+1)-m_phi0)/(J-m_phi0))*k0;
-	double K1prime = (J*J*m_M+(J*(m_alpha-1)+m_phi0)/(J-m_phi0))*k1;
-	double K2prime = (J*J*m_M+(J*(m_alpha-3)+3*m_phi0)/(J-m_phi0))*k2;
+	double K0prime = (J*J*m_M+(J*(m_alpha+1)-phi0)/(J-phi0))*k0;
+	double K1prime = (J*J*m_M+(J*(m_alpha-1)+phi0)/(J-phi0))*k1;
+	double K2prime = (J*J*m_M+(J*(m_alpha-3)+3*phi0)/(J-phi0))*k2;
 	mat3ds k0hat = I*K0prime;
 	mat3ds k1hat = I*K1prime;
 	mat3ds k2hat = I*K2prime;

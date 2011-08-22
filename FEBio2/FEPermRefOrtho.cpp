@@ -7,7 +7,6 @@ REGISTER_MATERIAL(FEPermRefOrtho, "perm-ref-ortho");
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefOrtho, FEHydraulicPermeability)
-	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
 	ADD_PARAMETER(m_M0, FE_PARAM_DOUBLE, "M0");
 	ADD_PARAMETER(m_alpha0, FE_PARAM_DOUBLE, "alpha0");
@@ -24,7 +23,6 @@ FEPermRefOrtho::FEPermRefOrtho()
 	m_perm0 = 1;
 	m_perm1[0] = m_perm1[1] = m_perm1[2] = 0;
 	m_perm2[0] = m_perm2[1] = m_perm2[2] = 0;
-	m_phi0 = 0.5;
 	m_M0 = m_alpha0 = 0;
 	m_M[0] = m_M[1] = m_M[2] = 0;
 	m_alpha[0] = m_alpha[1] =m_alpha[2] = 0;
@@ -41,7 +39,6 @@ void FEPermRefOrtho::Init()
 	if (m_perm2[0] < 0) throw MaterialError("perm2 components must be >= 0");
 	if (m_perm2[1] < 0) throw MaterialError("perm2 components must be >= 0");
 	if (m_perm2[2] < 0) throw MaterialError("perm2 components must be >= 0");
-	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
 	if (m_M0 < 0) throw MaterialError("M0 must be >= 0");
 	if (m_M[0] < 0) throw MaterialError("M components must be >= 0");
 	if (m_M[1] < 0) throw MaterialError("M components must be >= 0");
@@ -61,6 +58,7 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	mat3ds m[3];		// texture tensor in current configuration
 	
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -73,6 +71,8 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	
 	// relative volume
 	double J = et.J;
+	// referential solid volume fraction
+	double phi0 = J*(1-pt.m_phiw);
 	
 	for (a=0; a<3; a++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to V
@@ -83,9 +83,9 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	// --- strain-dependent permeability ---
 	
 	double f, k1[3], k2[3];
-	double k0 = m_perm0*pow((J-m_phi0)/(1-m_phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
+	double k0 = m_perm0*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
 	for (a=0; a<3; a++) {
-		f = pow((J-m_phi0)/(1-m_phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
+		f = pow((J-phi0)/(1-phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
 		k1[a] = m_perm1[a]/(J*J)*f;
 		k2[a] = 0.5*m_perm2[a]/pow(J,4)*f;
 	}
@@ -105,6 +105,7 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3ds m[3];		// texture tensor in current configuration
 	
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -117,6 +118,8 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	
 	// relative volume
 	double J = et.J;
+	// referential solid volume fraction
+	double phi0 = J*(1-pt.m_phiw);
 	
 	for (a=0; a<3; a++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to V
@@ -126,16 +129,16 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	
 	double f, k0, k1, k2, K0prime, K1prime, K2prime;
 	mat3ds k0hat, k1hat, k2hat;
-	k0 = m_perm0*pow((J-m_phi0)/(1-m_phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
-	K0prime = (J*J*m_M0+(J*(m_alpha0+1)-m_phi0)/(J-m_phi0))*k0;
+	k0 = m_perm0*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
+	K0prime = (J*J*m_M0+(J*(m_alpha0+1)-phi0)/(J-phi0))*k0;
 	k0hat = mat3dd(K0prime);
 	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0;
 	for (a=0; a<3; a++) {
-		f = pow((J-m_phi0)/(1-m_phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
+		f = pow((J-phi0)/(1-phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
 		k1 = m_perm1[a]/(J*J)*f;
 		k2 = 0.5*m_perm2[a]/pow(J,4)*f;
-		K1prime = (J*J*m_M[a]+(J*(m_alpha[a]-1)+m_phi0)/(J-m_phi0))*k1;
-		K2prime = (J*J*m_M[a]+(J*(m_alpha[a]-3)+3*m_phi0)/(J-m_phi0))*k2;
+		K1prime = (J*J*m_M[a]+(J*(m_alpha[a]-1)+phi0)/(J-phi0))*k1;
+		K2prime = (J*J*m_M[a]+(J*(m_alpha[a]-3)+3*phi0)/(J-phi0))*k2;
 		k1hat = mat3dd(K1prime);
 		k2hat = mat3dd(K2prime);
 		K4 += (dyad1s(m[a],k1hat) + dyad1s(m[a]*b+b*m[a],k2hat))/2.0

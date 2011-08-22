@@ -28,7 +28,6 @@ class FEPermRefTransIso :	public FEHydraulicPermeability
 		double	m_perm1A;		//!< axial permeability for b term
 		double	m_perm2T;		//!< transverse permeability for b^2 term
 		double	m_perm2A;		//!< axial permeability for b^2 term
-		double	m_phi0;			//!< solid volume fraction in reference state
 		double	m_M0;			//!< nonlinear exponential coefficient for I term
 		double	m_MT;			//!< nonlinear exponential coefficient for transverse direction
 		double	m_MA;			//!< nonlinear exponential coefficient for axial direction

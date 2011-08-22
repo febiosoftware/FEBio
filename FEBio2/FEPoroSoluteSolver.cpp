@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEPoroSoluteSolver.h"
+#include "FEBiphasicSoluteDomain.h"
 #include "Interrupt.h"
 #include "log.h"
 

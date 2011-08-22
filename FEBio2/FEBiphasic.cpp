@@ -4,13 +4,13 @@
 
 #include "stdafx.h"
 #include "FEBiphasic.h"
-#include "fem.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEBiphasic, "biphasic");
 
 // Material parameters for the FEBiphasic material
 BEGIN_PARAMETER_LIST(FEBiphasic, FEMaterial)
+	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 	ADD_PARAMETER(m_rhoTw, FE_PARAM_DOUBLE, "fluid_density");
 END_PARAMETER_LIST();
 
@@ -18,7 +18,7 @@ END_PARAMETER_LIST();
 //! FEBiphasic constructor
 
 FEBiphasic::FEBiphasic()
-{ m_pSolid = 0; m_pPerm = 0; m_rhoTw = 0; }
+{ m_pSolid = 0; m_pPerm = 0; m_rhoTw = 0; m_phi0 = 0;}
 
 //-----------------------------------------------------------------------------
 void FEBiphasic::Init()
@@ -27,6 +27,7 @@ void FEBiphasic::Init()
 	m_pSolid->Init();
 	m_pPerm->Init();
 	
+	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 }
 
@@ -39,7 +40,7 @@ double FEBiphasic::Porosity(FEMaterialPoint& pt)
 	// relative volume
 	double J = et.J;
 	// porosity
-	double phiw = 1 - m_pPerm->m_phi0/J;
+	double phiw = 1 - m_phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse
 	phiw = (phiw > 0) ? phiw : 0;
@@ -147,15 +148,6 @@ void FEBiphasic::Permeability(double k[3][3], FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
-//! tangent of permeability
-
-tens4ds FEBiphasic::Tangent_Permeability_Strain(FEMaterialPoint& pt)
-{
-	return m_pPerm->Tangent_Permeability_Strain(pt);
-}
-
-
-//-----------------------------------------------------------------------------
 //! serialization
 void FEBiphasic::Serialize(DumpFile &ar)
 {
@@ -194,15 +186,9 @@ void FEBiphasic::Serialize(DumpFile &ar)
 
 //-----------------------------------------------------------------------------
 // Material parameters for FEHydraulicPermeability
-BEGIN_PARAMETER_LIST(FEHydraulicPermeability, FEMaterial)
-	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
-END_PARAMETER_LIST();
-
 void FEHydraulicPermeability::Init()
 {
 	FEMaterial::Init();
-	
-	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
 }
 
 //-----------------------------------------------------------------------------

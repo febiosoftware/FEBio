@@ -8,7 +8,7 @@
 class FEHydraulicPermeability : public FEMaterial
 	{
 	public:
-		FEHydraulicPermeability() {m_phi0 = -1; }
+		FEHydraulicPermeability() {}
 		virtual ~FEHydraulicPermeability(){}
 		
 		//! hydraulic permeability
@@ -22,11 +22,6 @@ class FEHydraulicPermeability : public FEMaterial
 		
 		void Init();
 		
-	public:
-		double	m_phi0;			//!< solid volume fraction in reference state
-		
-		// declare parameter list
-		DECLARE_PARAMETER_LIST();
 	};
 
 //-----------------------------------------------------------------------------
@@ -51,19 +46,16 @@ public:
 	
 	//! calculate tangent stiffness at material point
 	tens4ds Tangent(FEMaterialPoint& pt);
+
+	//! return the permeability tensor as a matrix
+	void Permeability(double k[3][3], FEMaterialPoint& pt);
 	
 	//! calculate fluid flux
 	vec3d Flux(FEMaterialPoint& pt);
 	
 	//! calculate actual fluid pressure
 	double Pressure(FEMaterialPoint& pt);
-	
-	//! permeability
-	void Permeability(double k[3][3], FEMaterialPoint& pt);
-	
-	//! tangent of permeability
-	tens4ds Tangent_Permeability_Strain(FEMaterialPoint& pt);
-	
+
 	//! porosity
 	double Porosity(FEMaterialPoint& pt);
 	
@@ -75,6 +67,7 @@ public:
 	
 public:
 	double						m_rhoTw;	//!< true fluid density
+	double						m_phi0;		//!< solid volume fraction in reference configuration
 	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
 	
@@ -111,24 +104,24 @@ class FESoluteDiffusivity : public FEMaterial
 //! These materials need to define the solubility and tangent solubility functions.
 //!
 class FESoluteSolubility : public FEMaterial
-	{
-	public:
-		//! solute solubility
-		virtual double Solubility(FEMaterialPoint& pt) = 0;
-		
-		//! tangent of solubility with respect to strain
-		virtual double Tangent_Solubility_Strain(FEMaterialPoint& mp) = 0;
-		
-		//! tangent of solubility with respect to concentration
-		virtual double Tangent_Solubility_Concentration(FEMaterialPoint& mp) = 0;
-		
-		//! cross derivative of solubility with respect to strain and concentration
-		virtual double Tangent_Solubility_Strain_Concentration(FEMaterialPoint& mp) = 0;
-		
-		//! second derivative of solubility with respect to strain
-		virtual double Tangent_Solubility_Strain_Strain(FEMaterialPoint& mp) = 0;
-		
-	};
+{
+public:
+	//! solute solubility
+	virtual double Solubility(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of solubility with respect to strain
+	virtual double Tangent_Solubility_Strain(FEMaterialPoint& mp) = 0;
+	
+	//! tangent of solubility with respect to concentration
+	virtual double Tangent_Solubility_Concentration(FEMaterialPoint& mp) = 0;
+	
+	//! cross derivative of solubility with respect to strain and concentration
+	virtual double Tangent_Solubility_Strain_Concentration(FEMaterialPoint& mp) = 0;
+	
+	//! second derivative of solubility with respect to strain
+	virtual double Tangent_Solubility_Strain_Strain(FEMaterialPoint& mp) = 0;
+	
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for osmotic coefficient.
@@ -159,13 +152,22 @@ public:
 	virtual void Init() {}
 	
 	//! solute supply
-	virtual double Supply(FEMaterialPoint& pt) {return 0;}
+	virtual double Supply(FEMaterialPoint& pt) = 0;
 	
 	//! tangent of supply with respect to strain
-	virtual double Tangent_Supply_Strain(FEMaterialPoint& mp) {return 0;}
+	virtual double Tangent_Supply_Strain(FEMaterialPoint& mp) = 0;
 	
 	//! tangent of supply with respect to solute concentration
-	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp) {return 0;}
+	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp) = 0;
+	
+	//! receptor-ligand complex supply
+	virtual double ReceptorLigandSupply(FEMaterialPoint& pt) = 0;
+	
+	//! solute supply under steady-state conditions
+	virtual double SupplySS(FEMaterialPoint& pt) = 0;
+	
+	//! receptor-ligand concentration under steady-state conditions
+	virtual double ReceptorLigandConcentrationSS(FEMaterialPoint& pt) = 0;
 	
 };
 
@@ -203,7 +205,10 @@ public:
 	
 	//! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt);
-	
+
+	//! referential concentration (normalized to mixture volume in reference state)
+	double ReferentialConcentration(FEMaterialPoint& pt);
+
 	//! porosity
 	double Porosity(FEMaterialPoint& pt);
 	
@@ -223,6 +228,7 @@ public:
 	double						m_rhoTw;		//!< true fluid density
 	double						m_rhoTu;		//!< true solute density
 	double						m_Mu;			//!< solute molecular weight
+	double						m_phi0;			//!< solid volume fraction in reference configuration
 	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
 	FESoluteDiffusivity*		m_pDiff;		//!< pointer to diffusivity material

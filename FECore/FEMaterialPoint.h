@@ -144,11 +144,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_p << m_gradp << m_w << m_pa;
+			ar << m_p << m_gradp << m_w << m_pa << m_phiw;
 		}
 		else
 		{
-			ar >> m_p >> m_gradp >> m_w >> m_pa;
+			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phiw;
 		}
 
 		if (m_pt) m_pt->Serialize(ar);
@@ -161,6 +161,7 @@ public:
 			m_p = m_pa = 0;
 			m_gradp = vec3d(0,0,0);
 			m_w = vec3d(0,0,0);
+			m_phiw = 1;
 		}
 
 		if (m_pt) m_pt->Init(bflag);
@@ -177,6 +178,7 @@ public:
 	vec3d		m_gradp;	//!< spatial gradient of p
 	vec3d		m_w;		//!< fluid flux
 	double		m_pa;		//!< actual fluid pressure
+	double		m_phiw;		//!< porosity in current configuration
 };
 
 //-----------------------------------------------------------------------------
@@ -258,7 +260,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class FESolutePoroElasticMaterialPoint : public FEMaterialPoint
 {
 public:
@@ -275,11 +276,13 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_p << m_gradp << m_w << m_pa << m_c << m_gradc << m_j << m_ca;
+			ar << m_p << m_gradp << m_w << m_pa << m_phiw
+			<< m_c << m_gradc << m_j << m_ca << m_crc << m_crcp;
 		}
 		else
 		{
-			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_c >> m_gradc >> m_j >> m_ca;
+			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phiw
+			>> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp;
 		}
 		
 		if (m_pt) m_pt->Serialize(ar);
@@ -292,9 +295,11 @@ public:
 			m_p = m_pa = 0;
 			m_gradp = vec3d(0,0,0);
 			m_w = vec3d(0,0,0);
+			m_phiw = 1;
 			m_c = m_ca = 0;
 			m_gradc = vec3d(0,0,0);
 			m_j = vec3d(0,0,0);
+			m_crc = m_crcp = 0;
 		}
 		
 		if (m_pt) m_pt->Init(bflag);
@@ -306,11 +311,14 @@ public:
 	vec3d		m_gradp;	//!< spatial gradient of p
 	vec3d		m_w;		//!< fluid flux
 	double		m_pa;		//!< actual fluid pressure
+	double		m_phiw;		//!< porosity in current configuration
 	// solute material data
 	double		m_c;		//!< effective solute concentration
 	vec3d		m_gradc;	//!< spatial gradient of c
 	vec3d		m_j;		//!< solute molar flux
 	double		m_ca;		//!< actual solute concentration
+	double		m_crc;		//!< referential concentration of receptor-ligand complex
+	double		m_crcp;		//!< m_crc at previous time point
 };
 
 //-----------------------------------------------------------------------------

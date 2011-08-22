@@ -19,6 +19,7 @@ REGISTER_FEBIO_CLASS(FEPlotActualSoluteConcentration    , FEPlotData, "solute co
 REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute flux"                   );
 REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                        );
 REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"               );
+REGISTER_FEBIO_CLASS(FEPlotReceptorLigandConcentration  , FEPlotData, "receptor-ligand concentration" );
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -581,4 +582,35 @@ bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, std::vector<float> &a)
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FEBiphasicSoluteDomain* pbd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutePoroElasticMaterialPoint* pt = (mp.ExtractData<FESolutePoroElasticMaterialPoint>());
+				
+				if (pt) ew += pt->m_crc;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
 }

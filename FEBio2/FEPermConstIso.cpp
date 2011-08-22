@@ -28,8 +28,6 @@ void FEPermConstIso::Init()
 //! Permeability tensor.
 mat3ds FEPermConstIso::Permeability(FEMaterialPoint& mp)
 {
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
-	
 	// --- constant isotropic permeability ---
 	
 	return mat3dd(m_perm);

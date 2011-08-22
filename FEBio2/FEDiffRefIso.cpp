@@ -11,7 +11,6 @@ ADD_PARAMETER(m_free_diff, FE_PARAM_DOUBLE, "free_diff");
 ADD_PARAMETER(m_diff0, FE_PARAM_DOUBLE, "diff0");
 ADD_PARAMETER(m_diff1, FE_PARAM_DOUBLE, "diff1");
 ADD_PARAMETER(m_diff2, FE_PARAM_DOUBLE, "diff2");
-ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "M");
 ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
 END_PARAMETER_LIST();
@@ -24,7 +23,7 @@ FEDiffRefIso::FEDiffRefIso()
 	m_diff0 = 1;
 	m_diff1 = 0;
 	m_diff2 = 0;
-	m_phi0 = m_M = m_alpha = 0;
+	m_M = m_alpha = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -35,7 +34,6 @@ void FEDiffRefIso::Init()
 	if (m_diff0 < 0) throw MaterialError("diff0 must be >= 0");
 	if (m_diff1 < 0) throw MaterialError("diff1 must be >= 0");
 	if (m_diff2 < 0) throw MaterialError("diff2 must be >= 0");
-	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 < phi0 <= 1");
 	if (m_M < 0) throw MaterialError("M must be >= 0");
 	if (m_alpha < 0) throw MaterialError("alpha must be >= 0");
 }
@@ -52,6 +50,7 @@ double FEDiffRefIso::Free_Diffusivity(FEMaterialPoint& mp)
 mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -61,10 +60,13 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 	
 	// relative volume
 	double J = et.J;
+
+	// solid volume fraction in reference configuration
+	double phi0 = J*(1-pt.m_phiw);
 	
 	// --- strain-dependent permeability ---
 	
-	double f = pow((J-m_phi0)/(1-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double f = pow((J-phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double d0 = m_diff0*f;
 	double d1 = m_diff1/(J*J)*f;
 	double d2 = 0.5*m_diff2/pow(J,4)*f;
@@ -78,6 +80,7 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
+	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -87,14 +90,17 @@ tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	
 	// relative volume
 	double J = et.J;
+
+	// solid volume fraction in reference configuration
+	double phi0 = J*(1-pt.m_phiw);
 	
-	double f = pow((J-m_phi0)/(1-m_phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
+	double f = pow((J-phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double d0 = m_diff0*f;
 	double d1 = m_diff1/(J*J)*f;
 	double d2 = 0.5*m_diff2/pow(J,4)*f;
-	double D0prime = (J*J*m_M+(J*(m_alpha+1)-m_phi0)/(J-m_phi0))*d0;
-	double D1prime = (J*J*m_M+(J*(m_alpha-1)+m_phi0)/(J-m_phi0))*d1;
-	double D2prime = (J*J*m_M+(J*(m_alpha-3)+3*m_phi0)/(J-m_phi0))*d2;
+	double D0prime = (J*J*m_M+(J*(m_alpha+1)-phi0)/(J-phi0))*d0;
+	double D1prime = (J*J*m_M+(J*(m_alpha-1)+phi0)/(J-phi0))*d1;
+	double D2prime = (J*J*m_M+(J*(m_alpha-3)+3*phi0)/(J-phi0))*d2;
 	mat3ds d0hat = I*D0prime;
 	mat3ds d1hat = I*D1prime;
 	mat3ds d2hat = I*D2prime;

@@ -705,7 +705,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESuppConst.cpp"
+				RelativePath="..\..\FEBio2\FESupplyBinding.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FESupplyConst.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FESupplySynthesisBinding.cpp"
 				>
 			</File>
 			<File
@@ -1355,7 +1363,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESuppConst.h"
+				RelativePath="..\..\FEBio2\FESupplyBinding.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FESupplyConst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FESupplySynthesisBinding.h"
 				>
 			</File>
 			<File

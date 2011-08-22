@@ -122,3 +122,12 @@ public:
 	FEPlotMixtureVolumeFraction(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Receptor-ligand complex concentration
+class FEPlotReceptorLigandConcentration : public FEDomainData
+{
+public:
+	FEPlotReceptorLigandConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};

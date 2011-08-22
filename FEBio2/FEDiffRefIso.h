@@ -33,7 +33,6 @@ class FEDiffRefIso : public FESoluteDiffusivity
 		double	m_diff0;		//!< diffusivity for I term
 		double	m_diff1;		//!< diffusivity for b term
 		double	m_diff2;		//!< diffusivity for b^2 term
-		double	m_phi0;			//!< solid volume fraction in reference state
 		double	m_M;			//!< nonlinear exponential coefficient
 		double	m_alpha;		//!< nonlinear power exponent
 		
