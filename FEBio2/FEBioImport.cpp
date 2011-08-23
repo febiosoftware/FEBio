@@ -44,7 +44,7 @@
 #include "FEDiscreteSpringDomain.h"
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"
-#include "FEIsotropicFourier.h"
+#include "FEHeatTransferMaterial.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------

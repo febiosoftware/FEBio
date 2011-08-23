@@ -2,7 +2,30 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-//! material class for springs
+// Material point data for discrete materials.
+class FEDiscreteMaterialPoint : public FEMaterialPoint
+{
+public:
+	FEMaterialPoint* Copy()
+	{
+		FEDiscreteMaterialPoint* pt = new FEDiscreteMaterialPoint(*this);
+		if (m_pt) pt->m_pt = m_pt->Copy();
+		return pt;
+	}
+
+	void Serialize(DumpFile& ar)
+	{
+		if (m_pt) m_pt->Serialize(ar);
+	}
+
+	void Init(bool bflag)
+	{
+		if (m_pt) m_pt->Init(bflag);
+	}
+};
+
+//-----------------------------------------------------------------------------
+//! material class for discrete elements
 class FEDiscreteMaterial : public FEMaterial
 {
 public:

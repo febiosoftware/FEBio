@@ -6,7 +6,7 @@
  */
 
 #pragma once
-#include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
 
 //-----------------------------------------------------------------------------
 // This class implements a material that has a solute supply based on

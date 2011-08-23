@@ -2,6 +2,45 @@
 #include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
+//! Material point data for mixtures
+//!
+class FEElasticMixtureMaterialPoint : public FEMaterialPoint
+{
+public:
+	FEElasticMixtureMaterialPoint() { m_pt = new FEElasticMaterialPoint; }
+	FEMaterialPoint* Copy()
+	{
+		FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint;
+		pt->m_w = m_w;
+		if (m_pt) pt->m_pt = m_pt->Copy();
+		return pt;
+	}
+
+	void Init(bool bflag)
+	{
+		if (bflag)
+		{
+			for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
+		}
+	}
+
+	void Serialize(DumpFile& ar)
+	{
+		if (ar.IsSaving())
+		{
+			ar << m_w;
+		}
+		else
+		{
+			ar >> m_w;
+		}
+	}
+
+public:
+	vector<double>	m_w;	//!< material weights
+};
+
+//-----------------------------------------------------------------------------
 //! Elastic mixtures
 
 //! This class describes a mixture of elastic solids.  The user must declare

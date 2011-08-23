@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FEBioLib/FERigid.h"
 #include "FESolidSolver.h"
+#include "FEBiphasicSolute.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

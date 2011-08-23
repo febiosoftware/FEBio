@@ -1,13 +1,5 @@
 #pragma once
-#include "FECore/FEMaterial.h"
-
-//-----------------------------------------------------------------------------
-// Base class for heat-transfer problems
-class FEHeatTransferMaterial : public FEMaterial
-{
-public:
-	FEMaterialPoint* CreateMaterialPointData() { return new FEHeatMaterialPoint; }
-};
+#include "FEHeatTransferMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Isotropic Fourer heat-transfer material

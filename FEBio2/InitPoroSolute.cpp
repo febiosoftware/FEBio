@@ -3,6 +3,7 @@
 #include "FEPoroElastic.h"
 #include "FECore/FEMaterial.h"
 #include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticSolidDomain.h"
 #include "log.h"

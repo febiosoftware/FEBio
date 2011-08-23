@@ -5,6 +5,7 @@
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
 #include "FEElasticMixture.h"
+#include "FEBiphasicSolute.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"      );

@@ -16,6 +16,7 @@
 #include "LSDYNAPlotFile.h"
 #include "FECore/MathParser.h"
 #include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
 #include "FEBioLib/FETransverselyIsotropic.h"

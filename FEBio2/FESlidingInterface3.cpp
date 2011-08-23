@@ -4,6 +4,7 @@
 #include "FESolidSolver.h"
 #include "FEPoroElastic.h"
 #include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

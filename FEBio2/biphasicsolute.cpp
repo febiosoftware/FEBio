@@ -3,7 +3,7 @@
 #include "FEBiphasicSoluteDomain.h"
 #include "FESolidSolver.h"
 #include "FEMicroMaterial.h"
-#include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
