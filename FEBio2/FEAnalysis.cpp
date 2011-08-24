@@ -7,7 +7,6 @@
 #include "log.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
-#include "FEPoroElastic.h"
 #include "FEPoroSolidSolver.h"
 #include "FEPoroSoluteSolver.h"
 #include "FELinearSolidSolver.h"

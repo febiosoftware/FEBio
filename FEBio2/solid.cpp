@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
-#include "FEPoroElastic.h"
-#include "FEMicroMaterial.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "FESolidSolver.h"
 #include "FEBioLib/FEPointBodyForce.h"

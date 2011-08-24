@@ -320,6 +320,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEFiberMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.h"
 				>
 			</File>

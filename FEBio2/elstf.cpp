@@ -1,12 +1,10 @@
 #include "stdafx.h"
 #include <math.h>
 #include "FESolidSolver.h"
-#include "FEPoroElastic.h"
-#include "FEMicroMaterial.h"
 #include "FECore/tens4d.h"
-#include "log.h"
 #include "FEPressureLoad.h"
 #include "FEElasticSolidDomain.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.

@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEMaterial.h"
+#include "FEBiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for poroelastic materials.

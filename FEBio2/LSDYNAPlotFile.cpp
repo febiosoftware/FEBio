@@ -17,6 +17,7 @@
 #include "FECore/FESolidDomain.h"
 #include "FEHeatTransferMaterial.h"
 #include "FETrussMaterial.h"
+#include "FEBiphasic.h"
 
 LSDYNAPlotFile::LSDYNAPlotFile()
 {

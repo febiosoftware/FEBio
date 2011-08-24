@@ -1,5 +1,6 @@
 #pragma once
 #include "FEUncoupledMaterial.h"
+#include "FEFiberMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for transversely isotropic materials.
