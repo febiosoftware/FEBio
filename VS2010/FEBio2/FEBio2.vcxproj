@@ -541,6 +541,7 @@
     <ClInclude Include="..\..\FEBio2\FEBioStdSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBio2\FEBiphasicDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEBiphasicSolute.h" />
     <ClInclude Include="..\..\FEBio2\FEBiphasicSoluteDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEBox.h" />
     <ClInclude Include="..\..\FEBio2\FECellGrowth.h" />
@@ -577,6 +578,7 @@
     <ClInclude Include="..\..\FEBio2\FEHeatFlux.h" />
     <ClInclude Include="..\..\FEBio2\FEHeatSolidDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEHeatSolver.h" />
+    <ClInclude Include="..\..\FEBio2\FEHeatTransferMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBio2\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBio2\FEIsotropicElastic.h" />

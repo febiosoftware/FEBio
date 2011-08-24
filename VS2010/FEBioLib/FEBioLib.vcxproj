@@ -508,6 +508,7 @@
     <ClInclude Include="..\..\FEBioLib\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\FEBioLib\DenseMatrix.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
+    <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
     <ClInclude Include="..\..\FEBioLib\FETransverselyIsotropic.h" />

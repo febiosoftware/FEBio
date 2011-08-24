@@ -75,6 +75,9 @@
     <ClInclude Include="..\..\FEBioLib\RCICGSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\CompactMatrix.cpp">
