@@ -260,6 +260,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEElasticMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEElement.cpp"
 				>
 			</File>
@@ -439,6 +443,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEElasticMaterial.h"
 				>
 			</File>
 			<File
