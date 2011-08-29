@@ -4,6 +4,7 @@
 #include "LoadCurve.h"
 #include "BC.h"
 #include "FEBodyForce.h"
+#include "FEElasticMaterial.h"		// TODO: I want to delete this
 #include <vector>
 
 //-----------------------------------------------------------------------------

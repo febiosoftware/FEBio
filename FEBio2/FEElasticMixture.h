@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material point data for mixtures

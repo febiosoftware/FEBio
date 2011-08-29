@@ -5,8 +5,8 @@
  *  Created by Gerard Ateshian on 2/17/10.
  *
  */
-
-#include "FECore/FEMaterial.h"
+#pragma once
+#include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class that implements Donnan equilibrium. 

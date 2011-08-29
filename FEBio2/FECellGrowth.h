@@ -7,8 +7,8 @@
  *
  */
 
-
-#include "FECore/FEMaterial.h"
+#pragma once
+#include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class that implements the equilibrium of a perfect osmometer.

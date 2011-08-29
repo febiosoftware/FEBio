@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "FECore/FEMaterial.h"
 #include "FEBioLib/FEFiberMaterial.h"
+#include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFiberMaterial, FEMaterial);

@@ -109,32 +109,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Base class for (hyper-)elastic materials
-
-class FEElasticMaterial : public FESolidMaterial
-{
-public:
-	FEElasticMaterial() { m_density = 1; m_pmap = 0; m_unstable = false;}
-	~FEElasticMaterial(){ if(m_pmap) delete m_pmap; }
-
-	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }
-
-	void Init();
-
-	double Density() { return m_density; } 
-
-	void Serialize(DumpFile& ar);
-
-public:
-	double	m_density;	//!< material density
-	bool	m_unstable;	//!< flag indicating whether material is unstable on its own
-
-	FECoordSysMap*	m_pmap;	//!< local material coordinate system
-
-	DECLARE_PARAMETER_LIST();
-};
-
-//-----------------------------------------------------------------------------
 //! Base class for nested materials. A nested material describes whose material 
 //! response depends on the formulation of another user specified material. For
 //! instance, the FEPoroElastic and FEViscoElastic are two examples of nested

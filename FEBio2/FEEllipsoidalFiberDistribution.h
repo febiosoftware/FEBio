@@ -6,8 +6,8 @@
  *  Copyright 2010 Columbia University. All rights reserved.
  *
  */
-
-#include "FECore/FEMaterial.h"
+#pragma once
+#include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class for the ellipsoidal fiber distribution

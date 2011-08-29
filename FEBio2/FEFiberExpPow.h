@@ -1,4 +1,5 @@
-#include "FECore/FEMaterial.h"
+#pragma once
+#include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only
