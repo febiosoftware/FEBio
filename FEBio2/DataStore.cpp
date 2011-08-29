@@ -499,36 +499,27 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case FZY: val += pt.F(2,1); break;
 			}
 
-			if (fem.m_pStep->m_nModule == FE_POROELASTIC)
+			FEPoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
+			if (ppt)
 			{
-				FEPoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
-				if (ppt)
+				switch (ndata)
 				{
-					switch (ndata)
-					{
 					case P: val += ppt->m_pa; break;
 					case WX: val += ppt->m_w.x; break;
 					case WY: val += ppt->m_w.y; break;
 					case WZ: val += ppt->m_w.z; break;
-					}
 				}
 			}
-			else if (fem.m_pStep->m_nModule == FE_POROSOLUTE)
+
+			FESoluteMaterialPoint* spt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
+			if (spt)
 			{
-				FESolutePoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutePoroElasticMaterialPoint>();
-				if (ppt)
+				switch (ndata)
 				{
-					switch (ndata)
-					{
-					case P: val += ppt->m_pa; break;
-					case WX: val += ppt->m_w.x; break;
-					case WY: val += ppt->m_w.y; break;
-					case WZ: val += ppt->m_w.z; break;
-					case C: val += ppt->m_ca; break;
-					case JX: val += ppt->m_j.x; break;
-					case JY: val += ppt->m_j.y; break;
-					case JZ: val += ppt->m_j.z; break;
-					}
+					case C: val += spt->m_ca; break;
+					case JX: val += spt->m_j.x; break;
+					case JY: val += spt->m_j.y; break;
+					case JZ: val += spt->m_j.z; break;
 				}
 			}
 		}

@@ -16,8 +16,8 @@ void FEBiphasicSoluteDomain::InitElements()
 	for (int j=0; j<Elements(); ++j) {
 		FESolidElement& el = Element(j);
 		for (int k=0; k<el.GaussPoints(); ++k) {
-			FESolutePoroElasticMaterialPoint& pt = 
-			*(el.m_State[k]->ExtractData<FESolutePoroElasticMaterialPoint>());
+			FESoluteMaterialPoint& pt = 
+			*(el.m_State[k]->ExtractData<FESoluteMaterialPoint>());
 			pt.m_crcp = pt.m_crc;
 		}
 	}
@@ -214,7 +214,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		FEPoroElasticMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -263,7 +263,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 		double divv = ((J-Jp)/dt)/J;
 		
 		// get the flux
-		vec3d& w = pt.m_w;
+		vec3d& w = ppt.m_w;
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
@@ -317,7 +317,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, v
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		FEPoroElasticMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -343,7 +343,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, v
 		}
 		
 		// get the flux
-		vec3d& w = pt.m_w;
+		vec3d& w = ppt.m_w;
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
@@ -412,7 +412,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		FESoluteMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESoluteMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -488,10 +488,10 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		double divv = dJdt/J;
 		
 		// get the solute flux
-		vec3d& j = pt.m_j;
+		vec3d& j = spt.m_j;
 		// get the effective concentration and its gradient
-		double c = pt.m_c;
-		vec3d gradc = pt.m_gradc;
+		double c = spt.m_c;
+		vec3d gradc = spt.m_gradc;
 		
 		// evaluate the solubility and its derivatives w.r.t. J and c, and its gradient
 		double kappa = pm->m_pSolub->Solubility(mp);
@@ -566,8 +566,9 @@ bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, 
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEMaterialPoint>());
 		FEElasticMaterialPoint& ept = *(el.m_State[n]->ExtractData<FEElasticMaterialPoint>());
-		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		FESoluteMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESoluteMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -595,7 +596,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, 
 		double J = ept.J;
 
 		// get the solute flux
-		vec3d& j = pt.m_j;
+		vec3d& j = spt.m_j;
 		// Evaluate solute supply and receptor-ligand kinetics
 		double crhat = 0;
 		if (pm->m_pSupp)
@@ -783,7 +784,8 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		FEPoroElasticMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
+		FESoluteMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESoluteMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -853,12 +855,12 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		double divv = dJdt/J;
 		
 		// get the fluid flux and pressure gradient
-		vec3d w = pt.m_w;
-		vec3d gradp = pt.m_gradp;
+		vec3d w = ppt.m_w;
+		vec3d gradp = ppt.m_gradp;
 		
 		// get the effective concentration, its gradient and its time derivative
-		double c = pt.m_c;
-		vec3d gradc = pt.m_gradc;
+		double c = spt.m_c;
+		vec3d gradc = spt.m_gradc;
 		double dcdt = (c - cprev)/dt;
 		
 		// evaluate the permeability and its derivatives
@@ -1067,7 +1069,8 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FESolutePoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FESolutePoroElasticMaterialPoint>());
+		FEPoroElasticMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
+		FESoluteMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESoluteMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -1097,12 +1100,12 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 		double J = ept.J;
 		
 		// get the fluid flux and pressure gradient
-		vec3d w = pt.m_w;
-		vec3d gradp = pt.m_gradp;
+		vec3d w = ppt.m_w;
+		vec3d gradp = ppt.m_gradp;
 		
 		// get the effective concentration, its gradient and its time derivative
-		double c = pt.m_c;
-		vec3d gradc = pt.m_gradc;
+		double c = spt.m_c;
+		vec3d gradc = spt.m_gradc;
 		
 		// evaluate the permeability and its derivatives
 		mat3ds K = pm->m_pPerm->Permeability(mp);
@@ -1315,8 +1318,8 @@ void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidEl
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 		
 		// evaluate concentration at gauss-point
-		FESolutePoroElasticMaterialPoint& ppt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
-		ppt.m_c = el.Evaluate(ct, n);
+		FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
+		spt.m_c = el.Evaluate(ct, n);
 		
 		// get the 'D' matrix
 		tens4ds C = pmat->Tangent(mp);
@@ -1463,7 +1466,8 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 			pt.J = defgrad(el, pt.F, n);
 			
 			// solute-poroelastic data
-			FESolutePoroElasticMaterialPoint& ppt = *(mp.ExtractData<FESolutePoroElasticMaterialPoint>());
+			FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
 			
 			// evaluate fluid pressure at gauss-point
 			ppt.m_p = el.Evaluate(pn, n);
@@ -1472,26 +1476,26 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 			ppt.m_gradp = gradient(el, pn, n);
 			
 			// evaluate effective solute concentration at gauss-point
-			ppt.m_c = el.Evaluate(ct, n);
+			spt.m_c = el.Evaluate(ct, n);
 			
 			// calculate the gradient of c at gauss-point
-			ppt.m_gradc = gradient(el, ct, n);
+			spt.m_gradc = gradient(el, ct, n);
 			
 			// for biphasic-solute materials also update the porosity, fluid and solute fluxes
 			// and evaluate the actual fluid pressure and solute concentration
 			ppt.m_phiw = pmb->Porosity(mp);
 			ppt.m_w = pmb->FluidFlux(mp);
 			ppt.m_pa = pmb->Pressure(mp);
-			ppt.m_j = pmb->SoluteFlux(mp);
-			ppt.m_ca = pmb->Concentration(mp);
+			spt.m_j = pmb->SoluteFlux(mp);
+			spt.m_ca = pmb->Concentration(mp);
 			if (pmb->m_pSupp)
 			{
 				if (sstate)
-					ppt.m_crc = pmb->m_pSupp->ReceptorLigandConcentrationSS(mp);
+					spt.m_crc = pmb->m_pSupp->ReceptorLigandConcentrationSS(mp);
 				else {
 					// update m_crc using one-step integration
 					double crchat = pmb->m_pSupp->ReceptorLigandSupply(mp);
-					ppt.m_crc = ppt.m_crcp + crchat*dt;
+					spt.m_crc = spt.m_crcp + crchat*dt;
 				}
 			}
 

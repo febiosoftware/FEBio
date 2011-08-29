@@ -94,15 +94,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Material point class for biphasic-solute problems
-class FESolutePoroElasticMaterialPoint : public FEMaterialPoint
+
+class FESoluteMaterialPoint : public FEMaterialPoint
 {
 public:
-	FESolutePoroElasticMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+	FESoluteMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
 	
 	FEMaterialPoint* Copy()
 	{
-		FESolutePoroElasticMaterialPoint* pt = new FESolutePoroElasticMaterialPoint(*this);
+		FESoluteMaterialPoint* pt = new FESoluteMaterialPoint(*this);
 		if (m_pt) pt->m_pt = m_pt->Copy();
 		return pt;
 	}
@@ -111,13 +111,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_p << m_gradp << m_w << m_pa << m_phiw
-			<< m_c << m_gradc << m_j << m_ca << m_crc << m_crcp;
+			ar << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp;
 		}
 		else
 		{
-			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phiw
-			>> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp;
+			ar >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp;
 		}
 		
 		if (m_pt) m_pt->Serialize(ar);
@@ -127,10 +125,6 @@ public:
 	{
 		if (bflag)
 		{
-			m_p = m_pa = 0;
-			m_gradp = vec3d(0,0,0);
-			m_w = vec3d(0,0,0);
-			m_phiw = 1;
 			m_c = m_ca = 0;
 			m_gradc = vec3d(0,0,0);
 			m_j = vec3d(0,0,0);
@@ -141,12 +135,6 @@ public:
 	}
 	
 public:
-	// biphasic-solute material data
-	double		m_p;		//!< effective fluid pressure
-	vec3d		m_gradp;	//!< spatial gradient of p
-	vec3d		m_w;		//!< fluid flux
-	double		m_pa;		//!< actual fluid pressure
-	double		m_phiw;		//!< porosity in current configuration
 	// solute material data
 	double		m_c;		//!< effective solute concentration
 	vec3d		m_gradc;	//!< spatial gradient of c
@@ -155,6 +143,7 @@ public:
 	double		m_crc;		//!< referential concentration of receptor-ligand complex
 	double		m_crcp;		//!< m_crc at previous time point
 };
+
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
@@ -167,7 +156,8 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
-		return new FESolutePoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData());
+		return new FESoluteMaterialPoint
+		(new FEPoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}
 	
 public:

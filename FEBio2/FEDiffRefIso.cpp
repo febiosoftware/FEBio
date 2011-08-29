@@ -50,7 +50,8 @@ double FEDiffRefIso::Free_Diffusivity(FEMaterialPoint& mp)
 mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -60,9 +61,9 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 	
 	// relative volume
 	double J = et.J;
-
+	
 	// solid volume fraction in reference configuration
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = J*(1-ppt.m_phiw);
 	
 	// --- strain-dependent permeability ---
 	
@@ -80,7 +81,8 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -90,9 +92,9 @@ tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	
 	// relative volume
 	double J = et.J;
-
+	
 	// solid volume fraction in reference configuration
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = J*(1-ppt.m_phiw);
 	
 	double f = pow((J-phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double d0 = m_diff0*f;

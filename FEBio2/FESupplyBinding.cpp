@@ -53,7 +53,7 @@ double FESupplyBinding::Tangent_Supply_Strain(FEMaterialPoint &mp)
 //! Tangent of solute supply with respect to referential concentration
 double FESupplyBinding::Tangent_Supply_Concentration(FEMaterialPoint &mp)
 {
-	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& pt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	double crc = pt.m_crc;
 	double dcrhatdcr = -m_kf*(m_crt - crc);
@@ -66,13 +66,14 @@ double FESupplyBinding::Tangent_Supply_Concentration(FEMaterialPoint &mp)
 double FESupplyBinding::ReceptorLigandSupply(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	double J = et.J;
-	double ca = pt.m_ca;
-	double phiw = pt.m_phiw;
+	double ca = spt.m_ca;
+	double phiw = ppt.m_phiw;
 	double cr = phiw*J*ca;
-	double crc = pt.m_crc;
+	double crc = spt.m_crc;
 	double crchat = m_kf*cr*(m_crt-crc) - m_kr*crc;
 	return crchat;
 }
@@ -89,11 +90,12 @@ double FESupplyBinding::SupplySS(FEMaterialPoint& mp)
 double FESupplyBinding::ReceptorLigandConcentrationSS(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	double J = et.J;
-	double ca = pt.m_ca;
-	double phiw = pt.m_phiw;
+	double ca = spt.m_ca;
+	double phiw = ppt.m_phiw;
 	double cr = phiw*J*ca;
 	double Kd = m_kr/m_kf;	// dissociation constant
 	double crc = m_crt*cr/(Kd+cr);

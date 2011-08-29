@@ -73,7 +73,7 @@ double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 
 mat3ds FEBiphasicSolute::Stress(FEMaterialPoint& mp)
 {
-	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
 	
 	// calculate solid material stress
 	mat3ds s = m_pSolid->Stress(mp);
@@ -94,7 +94,8 @@ mat3ds FEBiphasicSolute::Stress(FEMaterialPoint& mp)
 tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& ept = *mp.ExtractData<FEElasticMaterialPoint>();
-	FESolutePoroElasticMaterialPoint& pt = *mp.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	// call solid tangent routine
 	tens4ds C = m_pSolid->Tangent(mp);
@@ -103,8 +104,8 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 	double J = ept.J;
 	
 	// fluid pressure and solute concentration
-	double p = pt.m_pa;
-	double c = pt.m_c;
+	double p = ppt.m_pa;
+	double c = spt.m_c;
 	
 	// solubility and its derivative w.r.t. strain
 	double kappa = m_pSolub->Solubility(mp);
@@ -140,7 +141,8 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 
 vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 {
-	FESolutePoroElasticMaterialPoint& ppt = *pt.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
 	double phiw = Porosity(pt);
@@ -149,10 +151,10 @@ vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 	vec3d gradp = ppt.m_gradp;
 	
 	// concentration
-	double c = ppt.m_c;
+	double c = spt.m_c;
 	
 	// concentration gradient
-	vec3d gradc = ppt.m_gradc;
+	vec3d gradc = spt.m_gradc;
 	
 	// hydraulic permeability
 	mat3ds kt = m_pPerm->Permeability(pt);
@@ -184,7 +186,8 @@ vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 
 vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 {
-	FESolutePoroElasticMaterialPoint& ppt = *pt.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
 	double phiw = Porosity(pt);
@@ -193,10 +196,10 @@ vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 	vec3d gradp = ppt.m_gradp;
 	
 	// concentration
-	double c = ppt.m_c;
+	double c = spt.m_c;
 	
 	// concentration gradient
-	vec3d gradc = ppt.m_gradc;
+	vec3d gradc = spt.m_gradc;
 	
 	// solute diffusivity in mixture
 	mat3ds D = m_pDiff->Diffusivity(pt);
@@ -220,13 +223,14 @@ vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 //! actual fluid pressure
 double FEBiphasicSolute::Pressure(FEMaterialPoint& pt)
 {
-	FESolutePoroElasticMaterialPoint& ppt = *pt.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// effective pressure
 	double p = ppt.m_p;
 	
 	// effective concentration
-	double c = ppt.m_c;
+	double c = spt.m_c;
 	
 	// osmotic coefficient
 	double osmc = m_pOsmC->OsmoticCoefficient(pt);
@@ -244,13 +248,13 @@ double FEBiphasicSolute::Pressure(FEMaterialPoint& pt)
 //! actual concentration
 double FEBiphasicSolute::Concentration(FEMaterialPoint& pt)
 {
-	FESolutePoroElasticMaterialPoint& ppt = *pt.ExtractData<FESolutePoroElasticMaterialPoint>();
+	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// solubility
 	double kappa = m_pSolub->Solubility(pt);
 	
 	// actual concentration = solubility * effective concentration
-	double ca = kappa*ppt.m_c;
+	double ca = kappa*spt.m_c;
 	
 	return ca;
 }
