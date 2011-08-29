@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEMaterial.h"
+#include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 // This class defines material point data for elastic materials.

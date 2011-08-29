@@ -474,6 +474,7 @@
     <ClInclude Include="..\..\FECore\FECore.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDomain.h" />
+    <ClInclude Include="..\..\FECore\FEElasticMaterial.h" />
     <ClInclude Include="..\..\FECore\FEElement.h" />
     <ClInclude Include="..\..\FECore\FEElementLibrary.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
@@ -525,6 +526,7 @@
     <ClCompile Include="..\..\FECore\FECore.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FEElasticMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEElement.cpp" />
     <ClCompile Include="..\..\FECore\FEElementLibrary.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
