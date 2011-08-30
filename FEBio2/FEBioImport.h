@@ -273,9 +273,6 @@ public:
 	FEM*		m_pfem;		//!< pointer to the fem class
 	FEAnalysis*	m_pStep;	//!< pointer to current analysis step
 
-protected:
-	XMLReader	m_xml;	//!< the actual reader
-
 public:
 	int	m_ntet4;	// tetrahedral integration rule
 	int	m_nut4;		// integration rule for stabilization of UT4

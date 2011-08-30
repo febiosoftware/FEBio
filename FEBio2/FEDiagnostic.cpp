@@ -32,7 +32,8 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	fem.SetInputFilename(szfile);
 
 	// Open the XML file
-	if (m_xml.Open(szfile) == false) 
+	XMLReader xml;
+	if (xml.Open(szfile) == false) 
 	{
 		errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);
 		return 0;
@@ -59,7 +60,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	{
 		// Find the root element
 		XMLTag tag;
-		if (m_xml.FindTag("febio_diagnostic", tag) == false) return false;
+		if (xml.FindTag("febio_diagnostic", tag) == false) return false;
 
 		if      (strcmp(tag.m_szatv[0], "tangent test"  ) == 0) m_pdia = new FETangentDiagnostic(fem);
 		else if (strcmp(tag.m_szatv[0], "contact test"  ) == 0) m_pdia = new FEContactDiagnostic(fem);
@@ -97,7 +98,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	}
 	catch (XMLReader::XMLSyntaxError)
 	{
-		clog.printf("FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
+		clog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 	catch (XMLReader::InvalidTag e)
@@ -132,12 +133,12 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	}
 	catch (...)
 	{
-		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
+		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 
 	// close the XML file
-	m_xml.Close();
+	xml.Close();
 
 	// we're done!
 	return m_pdia;

@@ -74,7 +74,8 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	fem.SetInputFilename(szfile);
 
 	// Open the XML file
-	if (m_xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);
+	XMLReader xml;
+	if (xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);
 
 	// keep a pointer to the fem object
 	m_pfem = &fem;
@@ -110,7 +111,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	XMLTag tag;
 	try
 	{
-		if (m_xml.FindTag("febio_spec", tag) == false) return false;
+		if (xml.FindTag("febio_spec", tag) == false) return errf("FATAL ERROR: febio_spec tag was not found. This is not a valid input file.\n\n");
 	}
 	catch (...)
 	{
@@ -149,9 +150,39 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 			// try to find a section parser
 			FEBioFileSectionMap::iterator is = map.find(tag.Name());
 
-			// if found, parse it otherwise throw a fit
-			if (is != map.end()) is->second->Parse(tag);
-			else throw XMLReader::InvalidTag(tag);
+			// make sure we found a section reader
+			if (is == map.end()) throw XMLReader::InvalidTag(tag);
+
+			// see if the file has the "from" attribute (for version 2.0 and up)
+			if (m_nversion >= 0x0200)
+			{
+				const char* szinc = tag.AttributeValue("from", true);
+				if (szinc)
+				{
+					// make sure this is a leaf
+					if (tag.isleaf() == false) return errf("FATAL ERROR: included sections may not have child sections.\n\n");
+
+					// read this section from an included file.
+					XMLReader xml2;
+					if (xml2.Open(szinc) == false) return errf("FATAL ERROR: failed opening input file %s\n\n", szinc);
+
+					// find the febio_spec tag
+					XMLTag tag2;
+					if (xml2.FindTag("febio_spec", tag2) == false) return errf("FATAL ERROR: febio_spec tag was not found. This is not a valid input file.\n\n");
+
+					// find the section we are looking for
+					if (xml2.FindTag(tag.Name(), tag2) == false) return errf("FATAL ERROR: Couldn't find %s section in file %s.\n\n", tag.Name(), szinc);
+
+					// parse the section
+					is->second->Parse(tag2);
+				}
+				else is->second->Parse(tag);
+			}
+			else
+			{
+				// parse the section
+				is->second->Parse(tag);
+			}
 
 			// go to the next tag
 			++tag;
@@ -161,7 +192,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// --- XML Reader Exceptions ---
 	catch (XMLReader::XMLSyntaxError)
 	{
-		clog.printf("FATAL ERROR: Syntax error (line %d)\n", m_xml.GetCurrentLine());
+		clog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 	catch (XMLReader::InvalidAttributeValue e)
@@ -227,18 +258,18 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	}
 	catch (UnknownDataField e)
 	{
-		clog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, m_xml.GetCurrentLine()-1);
+		clog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
 		return false;
 	}
 	// --- Unknown exceptions ---
 	catch (...)
 	{
-		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", m_xml.GetCurrentLine());
+		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 
 	// close the XML file
-	m_xml.Close();
+	xml.Close();
 
 	// we're done!
 	return true;
