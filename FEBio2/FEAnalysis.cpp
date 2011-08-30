@@ -85,11 +85,12 @@ bool FEAnalysis::Init()
 
 	m_tend = m_fem.m_ftime0 + Dt;
 
-	// init must point curve
+	// If no must point is defined, we create one
 	if (m_nmplc < 0)
 	{
 		FELoadCurve* plc = new FELoadCurve();
 		plc->Create(2);
+		plc->SetInterpolation(FELoadCurve::STEP);
 		plc->LoadPoint(0).time  = m_fem.m_ftime0;
 		plc->LoadPoint(0).value = 0;
 		plc->LoadPoint(1).time  = m_tend;
@@ -97,10 +98,6 @@ bool FEAnalysis::Init()
 		m_fem.AddLoadCurve(plc);
 		m_nmplc = m_fem.LoadCurves()-1;
 	}
-
-	// the must point load curve must be evaluated
-	// using a step interpolation
-	m_fem.GetLoadCurve(m_nmplc)->SetInterpolation(FELoadCurve::STEP);
 
 	// activate the boundary conditions
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();

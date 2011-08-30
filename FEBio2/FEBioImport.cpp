@@ -3859,14 +3859,25 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 void FEBioLoadSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
+	FEAnalysis* pstep = m_pim->GetStep();
+	int nmplc = pstep->m_nmplc;
 
 	++tag;
 	do
 	{
 		if (tag == "loadcurve")
 		{
+			// load curve ID
+			int nid;
+			tag.AttributeValue("id", nid);
+
+			// default type and extend mode
 			FELoadCurve::INTFUNC ntype = FELoadCurve::LINEAR;
 			FELoadCurve::EXTMODE nextm = FELoadCurve::CONSTANT;
+
+			// For backward compatibility we must set the default to STEP for the mustpoint loadcurve
+			// Note that this assumes that the step has already been read in.
+			if (nid == nmplc) ntype = FELoadCurve::STEP;
 
 			// get the (optional) type
 			const char* szt = tag.AttributeValue("type", true);
