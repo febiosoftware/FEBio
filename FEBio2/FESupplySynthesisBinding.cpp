@@ -67,7 +67,7 @@ double FESupplySynthesisBinding::Tangent_Supply_Concentration(FEMaterialPoint &m
 double FESupplySynthesisBinding::ReceptorLigandSupply(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	double J = et.J;
@@ -91,7 +91,7 @@ double FESupplySynthesisBinding::SupplySS(FEMaterialPoint& mp)
 double FESupplySynthesisBinding::ReceptorLigandConcentrationSS(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	double J = et.J;

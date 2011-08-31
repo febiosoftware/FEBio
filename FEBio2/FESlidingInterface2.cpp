@@ -406,7 +406,7 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			ept.s.zero();
 
 			// if this is a poroelastic element, then get the permeability tensor
-			FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			pt.m_p = 0;
 			pt.m_w = vec3d(0,0,0);
 					

@@ -73,7 +73,7 @@ double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 
 mat3ds FEBiphasicSolute::Stress(FEMaterialPoint& mp)
 {
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// calculate solid material stress
 	mat3ds s = m_pSolid->Stress(mp);
@@ -94,7 +94,7 @@ mat3ds FEBiphasicSolute::Stress(FEMaterialPoint& mp)
 tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& ept = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& ppt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
 	// call solid tangent routine
@@ -141,7 +141,7 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 
 vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 {
-	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
@@ -186,7 +186,7 @@ vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 
 vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 {
-	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
@@ -223,7 +223,7 @@ vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 //! actual fluid pressure
 double FEBiphasicSolute::Pressure(FEMaterialPoint& pt)
 {
-	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// effective pressure

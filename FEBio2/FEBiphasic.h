@@ -4,14 +4,14 @@
 //-----------------------------------------------------------------------------
 // Biphasic material point class.
 //
-class FEPoroElasticMaterialPoint : public FEMaterialPoint
+class FEBiphasicMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEPoroElasticMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+	FEBiphasicMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
 
 	FEMaterialPoint* Copy()
 	{
-		FEPoroElasticMaterialPoint* pt = new FEPoroElasticMaterialPoint(*this);
+		FEBiphasicMaterialPoint* pt = new FEBiphasicMaterialPoint(*this);
 		if (m_pt) pt->m_pt = m_pt->Copy();
 		return pt;
 	}
@@ -91,7 +91,7 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
-		return new FEPoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData());
+		return new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
 	}
 	
 public:

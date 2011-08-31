@@ -224,7 +224,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
-				FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 				
 				if (pt) ew += pt->m_pa;
 			}
@@ -259,7 +259,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
-				FEPoroElasticMaterialPoint* pt = (mp.ExtractData<FEPoroElasticMaterialPoint>());
+				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 
 				if (pt) ew += pt->m_w;
 			}

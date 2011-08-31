@@ -41,7 +41,7 @@ void FEPermRefIso::Init()
 mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -70,7 +70,7 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);

@@ -499,7 +499,7 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case FZY: val += pt.F(2,1); break;
 			}
 
-			FEPoroElasticMaterialPoint* ppt = el.m_State[i]->ExtractData<FEPoroElasticMaterialPoint>();
+			FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
 			if (ppt)
 			{
 				switch (ndata)

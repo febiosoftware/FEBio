@@ -56,7 +56,7 @@ double FEBiphasic::Porosity(FEMaterialPoint& pt)
 
 mat3ds FEBiphasic::Stress(FEMaterialPoint& mp)
 {
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// calculate solid material stress
 	mat3ds s = m_pSolid->Stress(mp);
@@ -76,7 +76,7 @@ mat3ds FEBiphasic::Stress(FEMaterialPoint& mp)
 
 tens4ds FEBiphasic::Tangent(FEMaterialPoint& mp)
 {
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// call solid tangent routine
 	tens4ds c = m_pSolid->Tangent(mp);
@@ -109,7 +109,7 @@ tens4ds FEBiphasic::Tangent(FEMaterialPoint& mp)
 
 vec3d FEBiphasic::Flux(FEMaterialPoint& pt)
 {
-	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// pressure gradient
 	vec3d gradp = ppt.m_gradp;
@@ -125,7 +125,7 @@ vec3d FEBiphasic::Flux(FEMaterialPoint& pt)
 
 double FEBiphasic::Pressure(FEMaterialPoint& pt)
 {
-	FEPoroElasticMaterialPoint& ppt = *pt.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	return ppt.m_p;
 }

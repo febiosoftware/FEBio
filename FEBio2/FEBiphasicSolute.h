@@ -157,7 +157,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
 		return new FESoluteMaterialPoint
-		(new FEPoroElasticMaterialPoint(m_pSolid->CreateMaterialPointData()));
+		(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}
 	
 public:

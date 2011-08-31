@@ -56,7 +56,7 @@ mat3ds FEPermRefTransIso::Permeability(FEMaterialPoint& mp)
 	mat3ds m;			// axial texture tensor in current configuration
 	
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);
@@ -102,7 +102,7 @@ tens4ds FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3ds m;			// axial texture tensor in current configuration
 	
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// Identity
 	mat3dd I(1);

@@ -174,7 +174,7 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
+		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -275,7 +275,7 @@ bool FEBiphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
+		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -477,7 +477,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
+		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -667,7 +667,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, 
 	for (n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
-		FEPoroElasticMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEPoroElasticMaterialPoint>());
+		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -849,7 +849,7 @@ void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, m
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// evaluate fluid pressure at gauss-point
-		FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		ppt.m_p = el.Evaluate(pn, n);
 		
 		// get the 'D' matrix
@@ -994,7 +994,7 @@ void FEBiphasicDomain::UpdateStresses(FEModel &fem)
 			pt.J = defgrad(el, pt.F, n);
 			
 			// poroelasticity data
-			FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
 			// evaluate fluid pressure at gauss-point
 			ppt.m_p = el.Evaluate(pn, n);

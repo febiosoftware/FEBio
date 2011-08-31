@@ -461,7 +461,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			ept.s.zero();
 			
 			// if this is a poroelastic element, then get the permeability tensor
-			FEPoroElasticMaterialPoint& pt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			pt.m_p = 0;
 			pt.m_w = vec3d(0,0,0);
 			
@@ -483,7 +483,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			ept.s.zero();
 			
 			// if this is a biphasic-solute element, then get the permeability tensor
-			FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
 			ppt.m_p = 0;
 			ppt.m_w = vec3d(0,0,0);
@@ -564,7 +564,7 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 			ept.s.zero();
 			
 			// if this is a biphasic-solute element, then get the diffusivity tensor
-			FEPoroElasticMaterialPoint& ppt = *(mp.ExtractData<FEPoroElasticMaterialPoint>());
+			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
 			ppt.m_p = 0;
 			ppt.m_w = vec3d(0,0,0);

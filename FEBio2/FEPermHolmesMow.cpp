@@ -34,7 +34,7 @@ void FEPermHolmesMow::Init()
 mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
 	double J = et.J;
@@ -51,7 +51,7 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 tens4ds FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& et = *mp.ExtractData<FEElasticMaterialPoint>();
-	FEPoroElasticMaterialPoint& pt = *mp.ExtractData<FEPoroElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
 	double J = et.J;
