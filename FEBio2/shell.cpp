@@ -4,7 +4,6 @@
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "FEPoroElastic.h"
 #include "log.h"
 #include <math.h>
 
@@ -278,28 +277,18 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// get the elements material
 		FEMaterial* pmat = m_pMat;
 
-		// skip rigid elements and poro-elastic elements
-		if ((dynamic_cast<FEPoroElastic*>(pmat) == 0) && 
-			(dynamic_cast<FEBiphasic*>(pmat) == 0) &&
-			(dynamic_cast<FEBiphasicSolute*>(pmat) == 0))
-		{
-			// create the element's stiffness matrix
-			int ndof = 6*el.Nodes();
-			ke.Create(ndof, ndof);
+		// create the element's stiffness matrix
+		int ndof = 6*el.Nodes();
+		ke.Create(ndof, ndof);
 
-			// calculate the element stiffness matrix
-			ElementStiffness(fem, iel, ke);
+		// calculate the element stiffness matrix
+		ElementStiffness(fem, iel, ke);
 
-			// get the element's LM vector
-			UnpackLM(el, lm);
+		// get the element's LM vector
+		UnpackLM(el, lm);
 
-			// assemble element matrix in global stiffness matrix
-			psolver->AssembleStiffness(el.m_node, lm, ke);
-		}
-		else if (dynamic_cast<FEPoroElastic*>(pmat))
-		{
-			// TODO: implement poro-elasticity for shells
-		}		
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 
 		if (fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
 		{

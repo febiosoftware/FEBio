@@ -597,18 +597,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPoroConstPerm.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroElastic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroHolmesMow.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPoroSolidSolver.cpp"
 				>
 			</File>
@@ -630,18 +618,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERefIsoPerm.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERefOrthoPerm.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERefTransIsoPerm.cpp"
 				>
 			</File>
 			<File
@@ -834,10 +810,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\plugin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\porosolid.cpp"
 				>
 			</File>
 			<File
@@ -1263,18 +1235,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPoroConstPerm.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroElastic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroHolmesMow.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPoroSolidSolver.h"
 				>
 			</File>
@@ -1296,18 +1256,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPrintMatrixDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERefIsoPerm.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERefOrthoPerm.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERefTransIsoPerm.h"
 				>
 			</File>
 			<File

@@ -111,8 +111,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for nested materials. A nested material describes whose material 
 //! response depends on the formulation of another user specified material. For
-//! instance, the FEPoroElastic and FEViscoElastic are two examples of nested
-//! materials.
+//! instance, the FEViscoElastic is an example of nested materials.
 
 class FENestedMaterial : public FESolidMaterial
 {

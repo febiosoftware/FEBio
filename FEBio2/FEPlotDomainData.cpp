@@ -211,9 +211,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 	int i, j;
 	double ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEPoroSolidDomain*>(&dom)) 
-		|| (dynamic_cast<FEBiphasicDomain*>(&dom))
-		|| (dynamic_cast<FEBiphasicSoluteDomain*>(&dom)))
+	if ((dynamic_cast<FEBiphasicDomain*>(&dom))	|| (dynamic_cast<FEBiphasicSoluteDomain*>(&dom)))
 	{
 		for (i=0; i<pbd->Elements(); ++i)
 		{
@@ -246,9 +244,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 	float af[3];
 	vec3d ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEPoroSolidDomain*>(&dom))
-		|| (dynamic_cast<FEBiphasicDomain*>(&dom))
-		|| (dynamic_cast<FEBiphasicSoluteDomain*>(&dom)))
+	if ((dynamic_cast<FEBiphasicDomain*>(&dom)) || (dynamic_cast<FEBiphasicSoluteDomain*>(&dom)))
 	{
 		for (i=0; i<pbd->Elements(); ++i)
 		{
@@ -412,20 +408,9 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
 {
-	FEPoroSolidDomain* pe = dynamic_cast<FEPoroSolidDomain*>(&dom);
 	FEBiphasicDomain* pd = dynamic_cast<FEBiphasicDomain*>(&dom);
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
-	if (pe)
-	{
-		int N = pe->Nodes();
-		for (int i=0; i<N; ++i)
-		{
-			FENode& node = pe->Node(i);
-			a.push_back((float) node.m_pt);
-		}
-		return true;
-	}
-	else if (pd)
+	if (pd)
 	{
 		int N = pd->Nodes();
 		for (int i=0; i<N; ++i)

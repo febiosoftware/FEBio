@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FESolidSolver.h"
-#include "FEPoroElastic.h"
 #include "FEMicroMaterial.h"
 #include "FETrussMaterial.h"
 #include "FESlidingInterface2.h"

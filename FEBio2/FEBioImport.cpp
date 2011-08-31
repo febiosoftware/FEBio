@@ -14,7 +14,6 @@
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
-#include "FEPoroElastic.h"
 #include "ut4.h"
 #include "FEDiscreteMaterial.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
@@ -1734,12 +1733,6 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 			else if ((etype == ET_QUAD) || (etype == ET_TRI)) return FE_RIGID_SHELL_DOMAIN;
 			else return 0;
 		}
-		else if (dynamic_cast<FEPoroElastic*>(pmat))
-		{
-			// poro-elastic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_PORO_SOLID_DOMAIN;
-			else return 0;
-		}
 		else if (dynamic_cast<FEBiphasic*>(pmat))
 		{
 			// biphasic elements
@@ -1800,7 +1793,6 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 	case FE_RIGID_SHELL_DOMAIN    : pd = new FERigidShellDomain        (pm, pmat); break;
 	case FE_UDGHEX_DOMAIN         : pd = new FEUDGHexDomain            (pm, pmat); break;
 	case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (pm, pmat); break;
-	case FE_PORO_SOLID_DOMAIN     : pd = new FEPoroSolidDomain         (pm, pmat); break;
 	case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (pm, pmat); break;
 	case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
 	case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicDomain          (pm, pmat); break;

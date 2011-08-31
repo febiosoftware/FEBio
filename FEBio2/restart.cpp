@@ -480,7 +480,6 @@ void FEM::SerializeMesh(DumpFile& ar)
 			case FE_RIGID_SOLID_DOMAIN    : pd = new FERigidSolidDomain        (&m, pm); break;
 			case FE_RIGID_SHELL_DOMAIN    : pd = new FERigidShellDomain        (&m, pm); break;
 			case FE_UDGHEX_DOMAIN         : pd = new FEUDGHexDomain            (&m, pm); break;
-			case FE_PORO_SOLID_DOMAIN     : pd = new FEPoroSolidDomain         (&m, pm); break;
 			case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (&m, pm); break;
 			case FE_DISCRETE_DOMAIN       : pd = new FEDiscreteSpringDomain    (&m, pm); break;
 			case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(&m, pm); break;

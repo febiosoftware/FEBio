@@ -2,7 +2,6 @@
 #include "fem.h"
 #include "FESlidingInterface3.h"
 #include "FESolidSolver.h"
-#include "FEPoroElastic.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "log.h"
@@ -97,10 +96,9 @@ void FESlidingSurface3::Init()
 			FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 			
 			// see if this is a poro-elastic element
-			FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
 			FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
 			FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-			if (poro || biph || bsolu) m_bporo = true;
+			if (biph || bsolu) m_bporo = true;
 		}
 		++i;
 	}
@@ -446,10 +444,9 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a poro-elastic element
-		FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
 		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
 		FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-		if (poro || biph)
+		if (biph)
 		{
 			// get a material point
 			FEMaterialPoint& mp = *pe->m_State[0];
@@ -466,8 +463,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			pt.m_w = vec3d(0,0,0);
 			
 			double K[3][3];
-			if (poro) poro->Permeability(K, mp);
-			else biph->Permeability(K, mp);
+			biph->Permeability(K, mp);
 			
 			eps = (K[0][0] + K[1][1] + K[2][2])/3;
 		}
@@ -1942,10 +1938,9 @@ void FESlidingInterface3::BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, 
 		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a poro-elastic element
-		FEPoroElastic* poro = dynamic_cast<FEPoroElastic*>(pm);
 		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
 		FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-		if (poro || biph || bsolu) bstat = true;
+		if (biph || bsolu) bstat = true;
 		if (bsolu) sstat = true;
 	}
 	
