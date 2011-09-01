@@ -81,10 +81,10 @@ void mat3ds::eigen(double l[3], vec3d r[3])
 					d[j] += h;
 					a[i][j] = 0;
 
-					for (k=  0; k<i-1; ++k) { ROTATE(a, k, i, k, j) }
-					for (k=i+1; k<j-1; ++k) { ROTATE(a, i, k, k, j) }
-					for (k=j+1; k<  3; ++k) { ROTATE(a, i, k, j, k) }
-					for (k=  0; k<  3; ++k) { ROTATE(v, k, i, k, j) }
+					for (k=  0; k<=i-1; ++k) { ROTATE(a, k, i, k, j) }
+					for (k=i+1; k<=j-1; ++k) { ROTATE(a, i, k, k, j) }
+					for (k=j+1; k<   3; ++k) { ROTATE(a, i, k, j, k) }
+					for (k=  0; k<   3; ++k) { ROTATE(v, k, i, k, j) }
 					++nrot;
 				}
 			}
