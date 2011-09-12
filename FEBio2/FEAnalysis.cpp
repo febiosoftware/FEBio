@@ -34,6 +34,7 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 	m_bautostep = false;
 	m_iteopt = 11;
 	m_dtmax = m_dtmin = 0;
+	m_ddt = 0;
 	m_nmplc = -1;
 	m_naggr = 0;
 
@@ -699,12 +700,11 @@ void FEAnalysis::Retry()
 	clog.printf("Retrying time step. Retry attempt %d of max %d\n\n", m_nretries+1, m_maxretries);
 
 	// adjust time step
-	static double ddt = 0;
 	double dtn;
 
-	if (m_nretries == 0) ddt = (m_dt) / (m_maxretries+1);
+	if (m_nretries == 0) m_ddt = (m_dt) / (m_maxretries+1);
 
-	if (m_naggr == 0) dtn = m_dt - ddt;
+	if (m_naggr == 0) dtn = m_dt - m_ddt;
 	else dtn = m_dt*0.5;
 
 	clog.printf("\nAUTO STEPPER: retry step, dt = %lg\n\n", dtn);

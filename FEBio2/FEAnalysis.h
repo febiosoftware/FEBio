@@ -78,6 +78,7 @@ public:
 		int		m_iteopt;		//!< optimum nr of iterations
 		double	m_dtmin;		//!< min time step size
 		double	m_dtmax;		//!< max time step size
+		double	m_ddt;			//!< used by auto-time stepper
 		int		m_nmplc;		//!< must point load curve number
 		int		m_naggr;		//!< aggressivness parameter
 	//}
