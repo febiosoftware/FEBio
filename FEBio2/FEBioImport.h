@@ -253,6 +253,7 @@ public:
 	public:
 		string	m_szfile;
 	};
+	class DuplicateMaterialSection {};
 
 public:
 	bool Load(FEM& fem, const char* szfile);

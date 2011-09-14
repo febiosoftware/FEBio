@@ -260,6 +260,11 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		clog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
 		return false;
 	}
+	catch (DuplicateMaterialSection)
+	{
+		clog.printf("Fatal Error: Material section has already been defined (line %d).\n", xml.GetCurrentLine()-1);
+		return false;
+	}
 	// --- Unknown exceptions ---
 	catch (...)
 	{
@@ -742,6 +747,9 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 void FEBioMaterialSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
+
+	// Make sure no materials are defined
+	if (fem.Materials() != 0) throw FEFEBioImport::DuplicateMaterialSection();
 
 	const char* sztype = 0;
 	const char* szname = 0;
