@@ -182,6 +182,13 @@ public:
 	
 	// determine eigen values and vectors
 	void eigen(double d[3], vec3d r[3] = 0);
+	void exact_eigen(double l[3]);
+
+	// L2-norm 
+	double norm();
+
+	// double contraction
+	double dotdot(mat3ds& S);
 
 protected:
 	double m[6];	// stores data in the order xx, xy, yy, xz, yz, zz

@@ -114,3 +114,27 @@ void mat3ds::eigen(double l[3], vec3d r[3])
 		r[2].x = v[0][2]; r[2].y = v[1][2]; r[2].z = v[2][2];
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Calculate the eigenvalues of A using an analytical expression for the 
+// eigen values.
+void mat3ds::exact_eigen(double l[3])
+{
+	const double PI = 4.0*atan(1.0);
+	const double S3 = sqrt(3.0);
+	const double S2 = sqrt(2.0);
+
+	mat3ds S = dev();
+	double nS = S.norm();
+	mat3ds T = (S*S).dev();
+	double nT = T.norm();
+
+	double w = S.dotdot(T)/(nS*nT);	if (w > 1.0) w = 1.0; 
+	double t = asin(w)/3.0;
+	double r = S.norm();
+	double z = tr()/S3;
+
+	l[0] = z/S3 + (r/S2)*(sin(t)/S3 + cos(t));
+	l[1] = z/S3 - (S2/S3)*r*sin(t);
+	l[2] = z/S3 + (r/S2)*(sin(t)/S3 - cos(t));
+}

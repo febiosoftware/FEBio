@@ -89,7 +89,11 @@ public:
 
 class ElementDataRecord : public DataRecord
 {
-	enum {X, Y, Z, J, EX, EY, EZ, EXY, EYZ, EXZ, SX, SY, SZ, SXY, SYZ, SXZ, 
+	enum {X, Y, Z, J, 
+		EX, EY, EZ, EXY, EYZ, EXZ, 
+		E1, E2, E3,
+		SX, SY, SZ, SXY, SYZ, SXZ,
+		S1, S2, S3,
 		FX, FY, FZ, FYZ, FZX, FXY, FYX, FXZ, FZY, 
 		P, WX, WY, WZ, C, JX, JY, JZ};
 

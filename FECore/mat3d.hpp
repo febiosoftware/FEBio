@@ -371,6 +371,20 @@ inline mat3ds mat3ds::inverse() const
 				  D*(m[XY]*m[YZ]-m[YY]*m[XZ]));
 }
 
+// L2-norm
+inline double mat3ds::norm()
+{ 
+	double D = m[XX]*m[XX] + m[YY]*m[YY] + m[ZZ]*m[ZZ] + 2*(m[XY]*m[XY] + m[YZ]*m[YZ] + m[XZ]*m[XZ]);
+	return sqrt(D); 
+}
+
+// double contraction
+inline double mat3ds::dotdot(mat3ds& B)
+{
+	double* n = B.m;
+	return m[XX]*n[XX] + m[YY]*n[YY] + m[ZZ]*n[ZZ] + 2.0*(m[XY]*n[XY] + m[YZ]*n[YZ] + m[XZ]*n[XZ]);
+}
+
 //-----------------------------------------------------------------------------
 // class mat3da : anti-symmetric 3D matrix of doubles
 //-----------------------------------------------------------------------------

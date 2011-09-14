@@ -412,12 +412,18 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "Exy") == 0) m_data.push_back(EXY);
 		else if (strcmp(sz, "Eyz") == 0) m_data.push_back(EYZ);
 		else if (strcmp(sz, "Exz") == 0) m_data.push_back(EXZ);
+		else if (strcmp(sz, "E1" ) == 0) m_data.push_back(E1);
+		else if (strcmp(sz, "E2" ) == 0) m_data.push_back(E2);
+		else if (strcmp(sz, "E3" ) == 0) m_data.push_back(E3);
 		else if (strcmp(sz, "sx" ) == 0) m_data.push_back(SX );
 		else if (strcmp(sz, "sy" ) == 0) m_data.push_back(SY );
 		else if (strcmp(sz, "sz" ) == 0) m_data.push_back(SZ );
 		else if (strcmp(sz, "sxy") == 0) m_data.push_back(SXY);
 		else if (strcmp(sz, "syz") == 0) m_data.push_back(SYZ);
 		else if (strcmp(sz, "sxz") == 0) m_data.push_back(SXZ);
+		else if (strcmp(sz, "s1" ) == 0) m_data.push_back(S1 );
+		else if (strcmp(sz, "s2" ) == 0) m_data.push_back(S2 );
+		else if (strcmp(sz, "s3" ) == 0) m_data.push_back(S3 );
 		else if (strcmp(sz, "Fx" ) == 0) m_data.push_back(FX );
 		else if (strcmp(sz, "Fy" ) == 0) m_data.push_back(FY );
 		else if (strcmp(sz, "Fz" ) == 0) m_data.push_back(FZ );
@@ -456,9 +462,18 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 	assert((e.ndom != -1) && (e.nid != -1));
 	FEElement* pe = &mesh.Domain(e.ndom).ElementRef(e.nid);
 
+	// see if we need to calculate strain
+	bool bE = false;
+	if ((ndata>=EX)&&(ndata<=E3)) bE = true;
+
+	// see if ndata requires eigen values
+	bool blE = false; if ((ndata>=E1)&&(ndata<=E3)) blE = true;
+	bool bls = false; if ((ndata>=S1)&&(ndata<=S3)) bls = true;
+
 	// calculate the return val
 	double val = 0;
 	mat3ds E;
+	double lE[3], ls[3];
 	if (dynamic_cast<FESolidElement*>(pe)) 
 	{
 		// this is a solid element
@@ -468,7 +483,9 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 		for (int i=0; i<nint; ++i)
 		{
 			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
-			E = pt.Strain();
+			if (bE) E = pt.Strain();
+			if (blE) E.exact_eigen(lE);
+			if (bls) pt.s.exact_eigen(ls);
 
 			switch (ndata)
 			{
@@ -482,12 +499,18 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case EXY: val += E.xy(); break;
 			case EYZ: val += E.yz(); break;
 			case EXZ: val += E.xz(); break;
+			case E1: val += lE[0]; break;
+			case E2: val += lE[1]; break;
+			case E3: val += lE[2]; break;
 			case SX: val += pt.s.xx(); break;
 			case SY: val += pt.s.yy(); break;
 			case SZ: val += pt.s.zz(); break;
 			case SXY: val += pt.s.xy(); break;
 			case SYZ: val += pt.s.yz(); break;
 			case SXZ: val += pt.s.xz(); break;
+			case S1: val += ls[0]; break;
+			case S2: val += ls[1]; break;
+			case S3: val += ls[2]; break;
 			case FX: val += pt.F(0,0); break;
 			case FY: val += pt.F(1,1); break;
 			case FZ: val += pt.F(2,2); break;
