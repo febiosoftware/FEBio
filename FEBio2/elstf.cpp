@@ -560,7 +560,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.m_SL[i];
-		psl->Residual(this, R);
+		if (psl->IsActive()) psl->Residual(this, R);
 	}
 
 	// rigid joint forces
