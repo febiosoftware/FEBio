@@ -90,6 +90,7 @@ protected:
 	bool ParseUncoupledElasticMixture	(XMLTag& tag, FEUncoupledElasticMixture* pm);
 	bool ParseBiphasicMaterial			(XMLTag& tag, FEBiphasic* pm);
 	bool ParseBiphasicSoluteMaterial	(XMLTag& tag, FEBiphasicSolute* pm);
+	bool ParseNestedMaterial			(XMLTag& tag, FENestedMaterial* pm);
 
 protected:
 	int	m_nmat;

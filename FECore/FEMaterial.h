@@ -112,6 +112,14 @@ public:
 //! Base class for nested materials. A nested material describes whose material 
 //! response depends on the formulation of another user specified material. For
 //! instance, the FEViscoElastic is an example of nested materials.
+//!
+//! NOTE:	The visco-elastic material uses a new format that no longer requires
+//!			the m_nBaseMat parameter anymore. In the interest of backward
+//!			compatibility I am implementing a hack that allows both formulations.
+//!			If the m_nBaseMat is -1, then the new format
+//!			is used where the m_pBase is owned by the FENestedMaterial. If
+//!			it is not -1, then it uses the old format where m_nBaseMat
+//!			points to another material.
 
 class FENestedMaterial : public FESolidMaterial
 {
