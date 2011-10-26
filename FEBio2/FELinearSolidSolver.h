@@ -44,7 +44,10 @@ public:
 	void AssembleStiffness(matrix& ke, vector<int>& lm);
 
 	//! assemble the element residual into the global residual
-	void AssembleRHS(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
+	void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
+
+public:
+	double	m_Dtol;			//!< displacement tolerance
 
 protected:
 	vector<double>	m_u;	//!< nodal displacements

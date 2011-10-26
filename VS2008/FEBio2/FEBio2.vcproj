@@ -749,6 +749,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FEVonMisesPlasticity.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FileImport.cpp"
 				>
 			</File>
@@ -1384,6 +1388,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEViscoElasticMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FEVonMisesPlasticity.h"
 				>
 			</File>
 			<File

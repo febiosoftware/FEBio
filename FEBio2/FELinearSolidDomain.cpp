@@ -3,6 +3,45 @@
 #include "FELinearSolidSolver.h"
 
 //-----------------------------------------------------------------------------
+void FELinearSolidDomain::Reset()
+{
+	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+}
+
+//-----------------------------------------------------------------------------
+void FELinearSolidDomain::InitElements()
+{
+	vec3d x0[8], xt[8], r0, rt;
+	FEMesh& m = *GetMesh();
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
+		for (int i=0; i<neln; ++i)
+		{
+			x0[i] = m.Node(el.m_node[i]).m_r0;
+			xt[i] = m.Node(el.m_node[i]).m_rt;
+		}
+
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) 
+		{
+			r0 = el.Evaluate(x0, j);
+			rt = el.Evaluate(xt, j);
+
+			FEMaterialPoint& mp = *el.m_State[j];
+			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+			pt.r0 = r0;
+			pt.rt = rt;
+
+			pt.J = defgrad(el, pt.F, j);
+
+			el.m_State[j]->Init(false);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 //!
 void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
@@ -78,7 +117,7 @@ void FELinearSolidDomain::ElementStiffness(FEM &fem, FESolidElement &el, matrix 
 	double Gr, Gs, Gt;
 
 	// jacobian
-	double Ji[3][3], detJt;
+	double Ji[3][3], detJ0;
 	
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
@@ -92,7 +131,7 @@ void FELinearSolidDomain::ElementStiffness(FEM &fem, FESolidElement &el, matrix 
 	for (n=0; n<nint; ++n)
 	{
 		// calculate jacobian
-		detJt = invjact(el, Ji, n)*gw[n];
+		detJ0 = invjac0(el, Ji, n)*gw[n];
 
 		Grn = el.Gr(n);
 		Gsn = el.Gs(n);
@@ -160,17 +199,17 @@ void FELinearSolidDomain::ElementStiffness(FEM &fem, FESolidElement &el, matrix 
 				DBL[5][1] = (D[5][1]*Gyj+D[5][3]*Gxj+D[5][4]*Gzj);
 				DBL[5][2] = (D[5][2]*Gzj+D[5][4]*Gyj+D[5][5]*Gxj);
 
-				ke[i3  ][j3  ] += (Gxi*DBL[0][0] + Gyi*DBL[3][0] + Gzi*DBL[5][0] )*detJt;
-				ke[i3  ][j3+1] += (Gxi*DBL[0][1] + Gyi*DBL[3][1] + Gzi*DBL[5][1] )*detJt;
-				ke[i3  ][j3+2] += (Gxi*DBL[0][2] + Gyi*DBL[3][2] + Gzi*DBL[5][2] )*detJt;
+				ke[i3  ][j3  ] += (Gxi*DBL[0][0] + Gyi*DBL[3][0] + Gzi*DBL[5][0] )*detJ0;
+				ke[i3  ][j3+1] += (Gxi*DBL[0][1] + Gyi*DBL[3][1] + Gzi*DBL[5][1] )*detJ0;
+				ke[i3  ][j3+2] += (Gxi*DBL[0][2] + Gyi*DBL[3][2] + Gzi*DBL[5][2] )*detJ0;
 
-				ke[i3+1][j3  ] += (Gyi*DBL[1][0] + Gxi*DBL[3][0] + Gzi*DBL[4][0] )*detJt;
-				ke[i3+1][j3+1] += (Gyi*DBL[1][1] + Gxi*DBL[3][1] + Gzi*DBL[4][1] )*detJt;
-				ke[i3+1][j3+2] += (Gyi*DBL[1][2] + Gxi*DBL[3][2] + Gzi*DBL[4][2] )*detJt;
+				ke[i3+1][j3  ] += (Gyi*DBL[1][0] + Gxi*DBL[3][0] + Gzi*DBL[4][0] )*detJ0;
+				ke[i3+1][j3+1] += (Gyi*DBL[1][1] + Gxi*DBL[3][1] + Gzi*DBL[4][1] )*detJ0;
+				ke[i3+1][j3+2] += (Gyi*DBL[1][2] + Gxi*DBL[3][2] + Gzi*DBL[4][2] )*detJ0;
 
-				ke[i3+2][j3  ] += (Gzi*DBL[2][0] + Gyi*DBL[4][0] + Gxi*DBL[5][0] )*detJt;
-				ke[i3+2][j3+1] += (Gzi*DBL[2][1] + Gyi*DBL[4][1] + Gxi*DBL[5][1] )*detJt;
-				ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*detJt;
+				ke[i3+2][j3  ] += (Gzi*DBL[2][0] + Gyi*DBL[4][0] + Gxi*DBL[5][0] )*detJ0;
+				ke[i3+2][j3+1] += (Gzi*DBL[2][1] + Gyi*DBL[4][1] + Gxi*DBL[5][1] )*detJ0;
+				ke[i3+2][j3+2] += (Gzi*DBL[2][2] + Gyi*DBL[4][2] + Gxi*DBL[5][2] )*detJ0;
 			}
 		}
 	}
@@ -206,6 +245,9 @@ void FELinearSolidDomain::RHS(FELinearSolidSolver *psolver, vector<double>& R)
 		// calculate initial stress vector
 		InitialStress(el, fe);
 
+		// calculate internal force vector (for material non-lineararity)
+		InternalForce(el, fe);
+
 		// apply body forces
 //		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
 
@@ -213,7 +255,7 @@ void FELinearSolidDomain::RHS(FELinearSolidSolver *psolver, vector<double>& R)
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleRHS(el.m_node, lm, fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 
@@ -225,7 +267,7 @@ void FELinearSolidDomain::InitialStress(FESolidElement& el, vector<double>& fe)
 	int i, n;
 
 	// jacobian matrix, inverse jacobian matrix and determinants
-	double Ji[3][3], detJt;
+	double Ji[3][3], detJ0;
 
 	double Gx, Gy, Gz;
 	mat3ds s;
@@ -244,9 +286,9 @@ void FELinearSolidDomain::InitialStress(FESolidElement& el, vector<double>& fe)
 		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 		// calculate the jacobian
-		detJt = invjact(el, Ji, n);
+		detJ0 = invjac0(el, Ji, n);
 
-		detJt *= gw[n];
+		detJ0 *= gw[n];
 
 		// get the stress vector for this integration point
 		s = pt.s0;
@@ -268,15 +310,79 @@ void FELinearSolidDomain::InitialStress(FESolidElement& el, vector<double>& fe)
 			// from the global residual vector
 			fe[3*i  ] -= ( Gx*s.xx() +
 				           Gy*s.xy() +
-					       Gz*s.xz() )*detJt;
+					       Gz*s.xz() )*detJ0;
 
 			fe[3*i+1] -= ( Gy*s.yy() +
 				           Gx*s.xy() +
-					       Gz*s.yz() )*detJt;
+					       Gz*s.yz() )*detJ0;
 
 			fe[3*i+2] -= ( Gz*s.zz() +
 				           Gy*s.yz() +
-					       Gx*s.xz() )*detJt;
+					       Gx*s.xz() )*detJ0;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the equivalent nodal forces for intial stress for solid elements
+//!
+void FELinearSolidDomain::InternalForce(FESolidElement& el, vector<double>& fe)
+{
+	int i, n;
+
+	// jacobian matrix, inverse jacobian matrix and determinants
+	double Ji[3][3], detJ0;
+
+	double Gx, Gy, Gz;
+	mat3ds s;
+
+	const double* Gr, *Gs, *Gt;
+
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+
+	double*	gw = el.GaussWeights();
+
+	// repeat for all integration points
+	for (n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+		// calculate the jacobian
+		detJ0 = invjac0(el, Ji, n);
+
+		detJ0 *= gw[n];
+
+		// get the stress vector for this integration point
+		s = pt.s;
+
+		Gr = el.Gr(n);
+		Gs = el.Gs(n);
+		Gt = el.Gt(n);
+
+		for (i=0; i<neln; ++i)
+		{
+			// calculate global gradient of shape functions
+			// note that we need the transposed of Ji, not Ji itself !
+			Gx = Ji[0][0]*Gr[i]+Ji[1][0]*Gs[i]+Ji[2][0]*Gt[i];
+			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
+			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
+
+			// calculate internal force
+			// the '-' sign is so that the internal forces get subtracted
+			// from the global residual vector
+			fe[3*i  ] -= ( Gx*s.xx() +
+				           Gy*s.xy() +
+					       Gz*s.xz() )*detJ0;
+
+			fe[3*i+1] -= ( Gy*s.yy() +
+				           Gx*s.xy() +
+					       Gz*s.yz() )*detJ0;
+
+			fe[3*i+2] -= ( Gz*s.zz() +
+				           Gy*s.yz() +
+					       Gx*s.xz() )*detJ0;
 		}
 	}
 }

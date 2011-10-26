@@ -30,8 +30,14 @@ public:
 
 	void RHS(FELinearSolidSolver* psolver, vector<double>& R);
 
+	//! reset element data
+	void Reset();
+
+	void InitElements();
+
 protected:
 	void InitialStress(FESolidElement& el, vector<double>& fe);
+	void InternalForce(FESolidElement& el, vector<double>& fe);
 
 protected:
 	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);

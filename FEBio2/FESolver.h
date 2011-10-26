@@ -40,6 +40,9 @@ public:
 	// Initialize linear equation system (TODO: Is this the right place to do this?)
 	virtual bool InitEquations() = 0;
 
+	//! assemble the element residual into the global residual
+	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) {}
+
 private:
 	// These functions have to be overwritten from NonLinearSystem
 	// but are not yet used.

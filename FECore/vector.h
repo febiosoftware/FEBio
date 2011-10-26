@@ -20,6 +20,7 @@ template<typename T> void zero(vector<T>& a) { fill(a.begin(), a.end(), T(0)); }
 template<typename T> void set(vector<T>& a, const T& v) { fill(a.begin(), a.end(), v); }
 vector<double>& operator += (vector<double>& a, const vector<double>& b);
 vector<double>& operator *= (vector<double>& a, double b);
+vector<double> operator + (const vector<double>& a, const vector<double>& b);
 
 // copy vector and scale
 void vcopys(vector<double>& a, const vector<double>& b, double s);

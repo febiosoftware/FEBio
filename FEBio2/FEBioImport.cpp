@@ -469,6 +469,11 @@ void FEBioControlSection::Parse(XMLTag& tag)
 					else throw XMLReader::InvalidTag(tag);
 				}
 			}
+			else if (dynamic_cast<FELinearSolidSolver*>(pstep->m_psolver))
+			{
+				FELinearSolidSolver* ps = dynamic_cast<FELinearSolidSolver*>(pstep->m_psolver);
+				if (tag == "dtol") tag.value(ps->m_Dtol);
+			}
 			else throw XMLReader::InvalidTag(tag);
 		}
 

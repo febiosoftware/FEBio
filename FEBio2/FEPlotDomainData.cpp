@@ -154,12 +154,13 @@ bool FEPlotElementStress::WriteLinearSolidStress(FELinearSolidDomain& d, vector<
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.s.xx());
-				s[1] += (float) (f*pt.s.yy());
-				s[2] += (float) (f*pt.s.zz());
-				s[3] += (float) (f*pt.s.xy());
-				s[4] += (float) (f*pt.s.yz());
-				s[5] += (float) (f*pt.s.xz());
+				mat3ds& es = pt.s;
+				s[0] += (float) (f*es.xx());
+				s[1] += (float) (f*es.yy());
+				s[2] += (float) (f*es.zz());
+				s[3] += (float) (f*es.xy());
+				s[4] += (float) (f*es.yz());
+				s[5] += (float) (f*es.xz());
 			}
 		}
 

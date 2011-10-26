@@ -18,7 +18,7 @@ public:
 
 public:
 	//! constructor
-	FEPressureLoad(FESurface* ps, bool blinear = false) : FESurfaceLoad(ps) { m_blinear = false; }
+	FEPressureLoad(FESurface* ps, bool blinear = false) : FESurfaceLoad(ps) { m_blinear = blinear; }
 
 	//! allocate storage
 	void create(int n) { m_PC.resize(n); }
@@ -43,6 +43,9 @@ public:
 
 	//! serialize data
 	void Serialize(DumpFile& ar);
+
+	//! Check if this is a linear force or not
+	bool IsLinear() { return m_blinear; }
 
 protected:
 	//! calculate stiffness for an element

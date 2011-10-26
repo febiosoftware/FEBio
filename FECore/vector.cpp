@@ -29,3 +29,11 @@ void vcopys(vector<double>& a, const vector<double>& b, double s)
 	a = b;
 	a *= s;
 }
+
+vector<double> operator + (const vector<double>& a, const vector<double>& b)
+{
+	assert(a.size() == b.size());
+	vector<double> s(a);
+	for (size_t i = 0; i < s.size(); ++i) s[i] += b[i];
+	return s;
+}

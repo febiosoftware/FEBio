@@ -177,6 +177,9 @@ public:
 	// deviator
 	mat3ds dev() const;
 
+	// isotropic part
+	mat3ds iso() const;
+
 	// calculates the inverse
 	mat3ds inverse() const;
 	

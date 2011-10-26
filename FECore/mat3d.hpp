@@ -356,6 +356,13 @@ inline mat3ds mat3ds::dev() const
 	return mat3ds(m[XX]-t, m[YY]-t, m[ZZ]-t, m[XY], m[YZ], m[XZ]);
 }
 
+// isotropic part
+inline mat3ds mat3ds::iso() const
+{
+	double t = (m[XX]+m[YY]+m[ZZ])/3.0;
+	return mat3ds(t, t, t, 0, 0, 0);
+}
+
 // inverse
 inline mat3ds mat3ds::inverse() const
 {

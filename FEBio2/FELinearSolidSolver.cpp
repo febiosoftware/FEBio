@@ -2,12 +2,15 @@
 #include "FELinearSolidSolver.h"
 #include "FELinearSolidDomain.h"
 #include "FENodeReorder.h"
+#include "FEPressureLoad.h"
 #include "FEBioLib/FERigid.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Class constructor
 FELinearSolidSolver::FELinearSolidSolver(FEM& fem) : FESolver(fem)
 {
+	m_Dtol = 1e-9;
 }
 
 //-----------------------------------------------------------------------------
@@ -105,8 +108,16 @@ bool FELinearSolidSolver::InitEquations()
 //!
 bool FELinearSolidSolver::SolveStep(double time)
 {
+	// prepare step
+	FEMaterialPoint::dt = m_fem.m_pStep->m_dt;
+	FEMaterialPoint::time = m_fem.m_ftime;
+
+	FEMesh& mesh = m_fem.m_mesh;
+	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
+
 	// set-up the prescribed displacements
 	zero(m_d);
+	vector<double> DT(m_d), DI(m_d);
 	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
 	{
 		FEPrescribedBC& dc = *m_fem.m_DC[i];
@@ -121,26 +132,57 @@ bool FELinearSolidSolver::SolveStep(double time)
 
 			FENode& node = m_fem.m_mesh.Node(n);
 
-			if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) m_d[I] = D; }
-			if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) m_d[I] = D; }
-			if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) m_d[I] = D; }
+			if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.x - node.m_r0.x); }}
+			if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.y - node.m_r0.y); }}
+			if (bc == DOF_Z) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.z - node.m_r0.z); }}
 		}
 	}
 
-	// build the residual
-	Residual();
+	// start Newton-loop
+	bool bconv = false;
+	int N = m_u.size();
+	vector<double> du(N), Du(N), U(m_u), D(m_d); zero(du); zero(Du);
+	const int NMAX = 10;
+	int n = 0;
+	m_niter = 0;
+	m_nrhs = 0;
+	m_ntotref = 0;
+	do
+	{
+		// build the residual
+		Residual();
 
-	// build the stiffness matrix
-	ReformStiffness();
+		// build the stiffness matrix
+		m_d = DI;
+		ReformStiffness();
 
-	// solve the equations
-	m_plinsolve->BackSolve(m_u, m_R);
+		// solve the equations
+		m_plinsolve->BackSolve(du, m_R);
 
-	// update solution
-	// NOTE: m_u is not being used in Update!
-	Update(m_u);
+		// update solution
+		// NOTE: m_u is not being used in Update!
+		Du += du;
+		m_u = U + Du;
 
-	return true;
+		m_d = DT;
+		Update(m_u);
+		zero(DI);
+
+		// check convergence
+		double normu = fabs(du*du);
+		double normR = fabs(m_R*m_R);
+
+		clog.printf("normu = %lg\n", normu);
+
+		if (normu < m_Dtol) bconv = true;
+		n++;
+
+		m_niter++;
+		m_nrhs++;
+	}
+	while (!bconv && (n < NMAX));
+
+	return bconv;
 }
 
 //-----------------------------------------------------------------------------
@@ -199,6 +241,13 @@ void FELinearSolidSolver::Residual()
 	{
 		FELinearSolidDomain& d = dynamic_cast<FELinearSolidDomain&>(*Domain(i));
 		d.RHS(this, m_R);
+	}
+
+	// add contribution of linear surface loads
+	for (int i=0; i<(int) m_fem.m_SL.size(); ++i)
+	{
+		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.m_SL[i]);
+		if (pl && (pl->IsLinear())) pl->Residual(this, m_R);
 	}
 }
 
@@ -308,7 +357,7 @@ void FELinearSolidSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
 //!  also checks for rigid dofs and assembles the residual using a condensing
 //!  procedure in the case of rigid dofs.
 
-void FELinearSolidSolver::AssembleRHS(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R)
+void FELinearSolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R)
 {
 	// assemble the element residual into the global residual
 	int ndof = fe.size();
