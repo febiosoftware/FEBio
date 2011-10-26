@@ -749,7 +749,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEVonMisesPlasticity.cpp"
+				RelativePath="..\..\FEBio2\FEVonMisesPlasticity.cpp"
 				>
 			</File>
 			<File
@@ -1391,7 +1391,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\FEVonMisesPlasticity.h"
+				RelativePath="..\..\FEBio2\FEVonMisesPlasticity.h"
 				>
 			</File>
 			<File
