@@ -2432,6 +2432,7 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 {
 	FEM& fem = *GetFEM();
 	FEMesh& m = fem.m_mesh;
+	int NN = m.Nodes();
 
 	// count nr of faces
 	int faces = 0, N, nf[4];
@@ -2456,7 +2457,12 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 		if (nfmt == 0)
 		{
 			tag.value(nf, N);
-			for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+			for (int j=0; j<N; ++j) 
+			{
+				int nid = nf[j]-1;
+				if ((nid<0)||(nid>= NN)) throw XMLReader::InvalidValue(tag);
+				el.m_node[j] = nid;
+			}
 		}
 		else if (nfmt == 1)
 		{
