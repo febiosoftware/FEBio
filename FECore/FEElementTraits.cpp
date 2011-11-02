@@ -906,10 +906,10 @@ void FEShellQuadElementTraits::init()
 	gr[ 2] =  a; gs[ 2] =  a; gt[ 2] = -b; gw[ 2] = w;
 	gr[ 3] = -a; gs[ 3] =  a; gt[ 3] = -b; gw[ 3] = w;
 	
-	gr[ 4] = -a; gs[ 4] = -a; gt[ 4] =  0; gw[ 4] = w;
-	gr[ 5] =  a; gs[ 5] = -a; gt[ 5] =  0; gw[ 5] = w;
-	gr[ 6] =  a; gs[ 6] =  a; gt[ 6] =  0; gw[ 6] = w;
-	gr[ 7] = -a; gs[ 7] =  a; gt[ 7] =  0; gw[ 7] = w;
+	gr[ 4] = -a; gs[ 4] = -a; gt[ 4] =  0; gw[ 4] = 8.0/9.0;
+	gr[ 5] =  a; gs[ 5] = -a; gt[ 5] =  0; gw[ 5] = 8.0/9.0;
+	gr[ 6] =  a; gs[ 6] =  a; gt[ 6] =  0; gw[ 6] = 8.0/9.0;
+	gr[ 7] = -a; gs[ 7] =  a; gt[ 7] =  0; gw[ 7] = 8.0/9.0;
 	
 	gr[ 8] = -a; gs[ 8] = -a; gt[ 8] =  b; gw[ 8] = w;
 	gr[ 9] =  a; gs[ 9] = -a; gt[ 9] =  b; gw[ 9] = w;
