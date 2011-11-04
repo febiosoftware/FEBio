@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "FELinearOrthotropic.h"
 
+//-----------------------------------------------------------------------------
 // register the material with the framework
 REGISTER_MATERIAL(FELinearOrthotropic, "linear orthotropic");
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FELinearOrthotropic, FEElasticMaterial)
 	ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
@@ -17,6 +19,7 @@ BEGIN_PARAMETER_LIST(FELinearOrthotropic, FEElasticMaterial)
 	ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
 void FELinearOrthotropic::Init()
 {
 	FEElasticMaterial::Init();
@@ -32,77 +35,42 @@ void FELinearOrthotropic::Init()
 	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
 	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
 	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
-	
-	// Evaluate Lame coefficients
-	mu[0] = G12 + G31 - G23;
-	mu[1] = G12 - G31 + G23;
-	mu[2] =-G12 + G31 + G23;
-	lam[0][0] = 1.0/E1; lam[0][1] = -v12/E1; lam[0][2] = -v31/E3;
-	lam[1][0] = -v12/E1; lam[1][1] = 1.0/E2; lam[1][2] = -v23/E2;
-	lam[2][0] = -v31/E3; lam[2][1] = -v23/E2; lam[2][2] = 1.0/E3;
-	mat3d c(lam);
-	c = c.inverse();
-	lam[0][0] = c[0][0] - 2*mu[0];
-	lam[1][1] = c[1][1] - 2*mu[1];
-	lam[2][2] = c[2][2] - 2*mu[2];
-	lam[1][2] = c[1][2]; lam[2][1] = c[2][1];
-	lam[2][0] = c[2][0]; lam[0][2] = c[0][2];
-	lam[0][1] = c[0][1]; lam[1][0] = c[1][0];
 }
 
 //-----------------------------------------------------------------------------
 //! Calculates the stress for a linear orthotropic material
+//! \todo implement material orientation
 mat3ds FELinearOrthotropic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	int i,j;
-	mat3ds A0[3];		// structural tensor in reference configuration
-	double K[3];		// Ka
+	// Evaluate the small-strain tensor
+	mat3ds e = pt.SmallStrain();
 
-	// Evaluate the strain
-	mat3ds E=pt.Strain();
+	// get the tangent
+	tens4ds C = Tangent(mp);
 	
-	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
-		// Copy the texture direction in the reference configuration to a0
-		vec3d a0(pt.Q[0][i],pt.Q[1][i],pt.Q[2][i]);
-		K[i] = a0*(E*a0);
-		A0[i] = dyad(a0);			// Evaluate the texture tensor in the reference configuration
-	}
-	
-	// Evaluate the stress
-	mat3ds s;
-	s.zero();		// Initialize for summation
-	for (i=0; i<3; i++) {
-		s += mu[i]*(A0[i]*E + E*A0[i]);
-		for (j=0; j<3; j++)
-			s += (A0[j]*K[i]+A0[i]*K[j])*(lam[i][j]/2.);
-	}
-
-	return s;
+	// stress = C:e
+	return C.dot(e);
 }
 
+//-----------------------------------------------------------------------------
+//! \todo implement material orientation
 tens4ds FELinearOrthotropic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	
-	int i,j;
-	mat3ds A0[3];		// texture tensor in current configuration
-	
-	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
-		// Copy the texture direction in the reference configuration to a0
-		vec3d a0(pt.Q[0][i],pt.Q[1][i],pt.Q[2][i]);
-		A0[i] = dyad(a0);			// Evaluate the texture tensor in the reference configuration
-	}
-	
-	// Evaluate the elasticity tensor
-	tens4ds C(0.0);
-	mat3dd I(1.0);
-	for (i=0; i<3; i++) {
-		C += dyad4s(A0[i],I)*mu[i];
-		for (j=0; j<3; j++)
-			C += dyad1s(A0[i],A0[j])*(lam[i][j]/2.);
-	}
-	
-	return C;
+
+	double v21 = E1*v12/E2;
+	double v32 = E2*v23/E3;
+	double v13 = E3*v31/E1;
+
+	double d = (1.0 - v12*v21 - v23*v32 - v13*v31 - 2.0*v12*v23*v31)/(E1*E2*E3);
+
+	double C[6][6] = {0};
+	C[0][0] = (1 - v23*v32)/(E2*E3*d  ); C[0][1] = (v12 + v13*v32)/(E2*E3*d); C[0][2] = (v13 + v12*v23)/(E2*E3*d);
+	C[1][0] = C[0][1]                  ; C[1][1] = (1.0 - v13*v31)/(E1*E3*d); C[1][2] = (v23 + v21*v13)/(E1*E3*d);
+	C[2][0] = C[0][2]                  ; C[2][1] = C[1][2]                  ; C[2][2] = (1.0 - v12*v21)/(E1*E2*d);
+	C[3][3] = G12; C[4][4] = G23; C[5][5] = G31;
+
+	return tens4ds(C);
 }

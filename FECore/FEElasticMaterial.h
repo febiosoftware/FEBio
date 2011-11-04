@@ -37,6 +37,7 @@ public:
 	}
 
 	mat3ds Strain();
+	mat3ds SmallStrain();
 
 	mat3ds RightCauchyGreen();
 	mat3ds LeftCauchyGreen ();

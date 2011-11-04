@@ -549,6 +549,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FEOrthoElastic.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEOsmCoefConst.cpp"
 				>
 			</File>
@@ -1188,6 +1192,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEOptimizer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEOrthoElastic.h"
 				>
 			</File>
 			<File

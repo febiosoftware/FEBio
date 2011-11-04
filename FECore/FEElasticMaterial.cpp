@@ -100,6 +100,14 @@ mat3ds FEElasticMaterialPoint::Strain()
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the small-strain tensor from the deformation gradient
+mat3ds FEElasticMaterialPoint::SmallStrain()
+{
+	// caculate small strain tensor
+	return mat3ds(F[0][0] - 1.0, F[1][1] - 1.0, F[2][2] - 1.0, 0.5*(F[0][1] + F[1][0]), 0.5*(F[0][2] + F[2][0]), 0.5*(F[1][2] + F[2][1]));
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the 2nd PK stress from the Cauchy stress stored in the point
 
 mat3ds FEElasticMaterialPoint::pull_back(const mat3ds& A)
