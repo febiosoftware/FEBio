@@ -197,6 +197,10 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 
 	m_dxtol = 0;
 
+	// Note that friction has not been implemented yet
+	m_mu = 0;
+	m_epsf = 0;
+
 	m_ss.SetSibling(&m_ms);
 	m_ms.SetSibling(&m_ss);
 }
@@ -219,6 +223,15 @@ void FEFacet2FacetSliding::Init()
 	{
 		ProjectSurface(m_ms, m_ss);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
+	}
+
+	// check friction parameters
+	// since friction has not been implemented yet
+	if ((m_mu != 0) || (m_epsf != 0))
+	{
+		clog.printbox("WARNING", "Friction has NOT been implemented yet for facet-to-facet contact\ninterfaces. Friction parameters are ignored.");
+		m_mu = 0;
+		m_epsf = 0;
 	}
 }
 

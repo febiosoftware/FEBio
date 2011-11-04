@@ -92,6 +92,9 @@ public:
 	int		m_naugmin;		//!< min nr of augmentations
 	int		m_naugmax;		//!< max nr of augmentations
 
+	double			m_mu;		//!< friction coefficient (not implemented yet)
+	double			m_epsf;		//!< penalty scale factor for friction (not implementer yet)
+
 	double	m_dxtol;		//!< penalty insertion distance
 
 	FEFacetSlidingSurface	m_ms;	//!< master surface
