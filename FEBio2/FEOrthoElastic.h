@@ -25,14 +25,8 @@ public:
 	//! data initialization
 	void Init();
 
-	//! return bulk modulus
-	//! \todo what is the bulk modulus of an orthotropic material?
-	double BulkModulus() { return (lam[0][0]+lam[1][1]+lam[2][2]
-								   +2*(lam[0][1]+lam[1][2]+lam[0][2]
-									   +mu[0]+mu[1]+mu[2]))/9.0;}
-
 	// declare as registered
-	DECLARE_REGISTERED(FELinearOrthotropic);
+	DECLARE_REGISTERED(FEOrthoElastic);
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

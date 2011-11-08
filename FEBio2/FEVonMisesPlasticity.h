@@ -74,8 +74,6 @@ public:
 	//! data initialization and checking
 	void Init();
 
-	double BulkModulus() { return m_K; }
-
 	// declare as registered
 	DECLARE_REGISTERED(FEVonMisesPlasticity);
 

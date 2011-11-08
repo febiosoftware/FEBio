@@ -83,9 +83,6 @@ public:
 	//! data initialization and checking
 	void Init();
 
-	//! return bulk modulus
-	double BulkModulus() { return m_E/(3.0*(1.0 - 2.0*m_v));}
-
 	// returns a pointer to a new material point object
 	virtual FEMaterialPoint* CreateMaterialPointData() 
 	{ 

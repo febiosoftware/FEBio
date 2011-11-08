@@ -16,9 +16,6 @@ public:
 	//! material parameter intialization and checking
 	void Init();
 
-	//! return bulk modulus
-	double BulkModulus() { return m_E/(3.0*(1.0 - 2.0*m_v));}
-
 public:
 	double	m_E;	//<! Young's modulus
 	double	m_v;	//<! Poisson's ratio

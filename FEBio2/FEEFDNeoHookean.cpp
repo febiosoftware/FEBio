@@ -51,9 +51,3 @@ tens4ds FEEFDNeoHookean::Tangent(FEMaterialPoint& mp)
 	
 	return c;
 }
-
-double FEEFDNeoHookean::BulkModulus()
-{
-	// Evaluate bulk modulus in reference configuration
-	return m_NH.BulkModulus() + m_EFD.BulkModulus();
-}

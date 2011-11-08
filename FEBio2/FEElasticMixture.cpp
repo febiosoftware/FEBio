@@ -46,15 +46,3 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 
 	return c;
 }
-
-//-----------------------------------------------------------------------------
-double FEElasticMixture::BulkModulus()
-{
-	double k = 0;
-	
-	// calculate bulk modulus
-	for (int i=0; i < (int) m_pMat.size(); ++i)
-		k += m_pMat[i]->BulkModulus();
-	
-	return k;
-}

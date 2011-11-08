@@ -27,9 +27,6 @@ public:
 	// Spatial tangent
 	virtual tens4ds Tangent(FEMaterialPoint& mp);
 	
-	//! returns the bulkmodulus
-	double BulkModulus() {return 0;}
-	
 	// declare as registered
 	DECLARE_REGISTERED(FEEllipsoidalFiberDistribution);
 	

@@ -84,16 +84,3 @@ tens4ds FEDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 	tens4ds c = bpi*IxI + p*(2.0*I4 - IxI);
 	return c;
 }
-
-//-----------------------------------------------------------------------------
-double FEDonnanEquilibrium::BulkModulus()
-{
-	// calculate osmotic pressure (assume J=1)
-	double tosm = sqrt(m_cFr*m_cFr+m_bosm*m_bosm);	// tissue osmolarity
-	double pi = m_Rgas*m_Tabs*(tosm - m_bosm);	// osmotic pressure
-	
-	// calculate derivative of osmotic pressure w.r.t. J
-	double bpi = m_Rgas*m_Tabs*m_cFr*m_cFr/m_phiwr/tosm;
-	
-	return -(pi/3.0 + bpi);
-}

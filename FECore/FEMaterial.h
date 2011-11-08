@@ -101,9 +101,6 @@ public:
 	//! calculate derivative of stress w.r.t. solute concentration at material point
 	mat3ds Tangent_Concentration(FEMaterialPoint& pt);
 	
-	//! return the bulk modulus
-	virtual double BulkModulus() = 0;
-
 	//! return the material density
 	virtual double Density() = 0;
 };
@@ -126,9 +123,6 @@ class FENestedMaterial : public FESolidMaterial
 public:
 	FENestedMaterial() { m_nBaseMat = -1; m_pBase = 0; }
 	virtual ~FENestedMaterial(){}
-
-	//! return solid component's bulk modulus
-	double BulkModulus() { return m_pBase->BulkModulus(); }
 
 	//! return solid component's density
 	double Density () { return m_pBase->Density(); }

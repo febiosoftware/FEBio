@@ -23,8 +23,6 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
-	double BulkModulus() { return 0; }
-
 	// declare as registered
 	DECLARE_REGISTERED(FENeoHookeanTransIso);
 

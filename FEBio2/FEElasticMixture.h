@@ -74,9 +74,6 @@ public:
 	//! data initialization and checking
 	void Init();
 		
-	//! return bulk modulus
-	double BulkModulus();
-		
 	// declare as registered
 	DECLARE_REGISTERED(FEElasticMixture);
 };

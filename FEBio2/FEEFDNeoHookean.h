@@ -24,9 +24,6 @@ public:
 	//! data initialization and checking
 	void Init();
 
-	//! return bulk modulus
-	double BulkModulus();
-
 public:
 
 	FEEllipsoidalFiberDistribution	m_EFD;

@@ -30,8 +30,6 @@ public:
 	//! data initialization
 	void Init();
 
-	double BulkModulus () { return 0; }
-
 protected:
 	void PrepRVE();
 	mat3ds AveragedStress(FEMaterialPoint& pt);

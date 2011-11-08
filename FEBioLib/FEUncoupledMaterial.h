@@ -70,9 +70,6 @@ public:
 	//! material initialization
 	void Init();
 
-	//! return bulk modulus
-	double BulkModulus() { return m_K; }
-
 public:
 	bool	m_blaugon;	//!< augmented lagrangian flag
 	double	m_atol;		//!< augmented lagrangian tolerance

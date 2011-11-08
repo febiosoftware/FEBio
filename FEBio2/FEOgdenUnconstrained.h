@@ -18,9 +18,6 @@ class FEOgdenUnconstrained : public FEElasticMaterial
 		//! calculate the tangent
 		tens4ds Tangent(FEMaterialPoint& pt);
 		
-		//! return bulk modulus
-		double BulkModulus() { return 0;}
-		
 	protected:
 		void EigenValues(mat3ds& A, double l[3], vec3d r[3], const double eps = 0);
 		double	m_eps;

@@ -22,10 +22,6 @@ public:
 	//! data initialization
 	void Init();
 
-	//! return bulk modulus
-	//! \todo what is the bulk modulus of an trans-iso material?
-	double BulkModulus() { return 0;}
-
 	// declare as registered
 	DECLARE_REGISTERED(FELinearTransIso);
 

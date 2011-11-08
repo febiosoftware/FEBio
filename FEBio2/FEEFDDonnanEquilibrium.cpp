@@ -64,11 +64,3 @@ tens4ds FEEFDDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 
 	return c;
 }
-
-//-----------------------------------------------------------------------------
-double FEEFDDonnanEquilibrium::BulkModulus()
-{
-	// Evaluate bulk modulus in reference configuration
-	// Only the matrix contributes to the bulk modulus
-	return m_DEQ.BulkModulus();
-}

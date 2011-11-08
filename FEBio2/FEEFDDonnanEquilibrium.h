@@ -25,9 +25,6 @@ public:
 	//! material parameter intialization and checking
 	void Init();
 
-	//! return bulk modulus
-	virtual double BulkModulus();
-
 	//! serialization
 	void Serialize(DumpFile& ar);
 		
