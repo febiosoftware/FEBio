@@ -3,6 +3,8 @@
 #include "FEMesh.h"
 
 //-----------------------------------------------------------------------------
+//! Domain initialization
+
 bool FESolidDomain::Initialize(FEModel &fem)
 {
 	int i, j;

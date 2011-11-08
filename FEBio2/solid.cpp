@@ -14,11 +14,13 @@ void FEElasticSolidDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
+//! \todo The material point initialization needs to move to the base class.
 bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class
 	FESolidDomain::Initialize(mdl);
 
+	// initialize material point data
 	FEM& fem = dynamic_cast<FEM&>(mdl);
 
 	bool bmerr = false;

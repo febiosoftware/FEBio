@@ -1,11 +1,73 @@
 #include "stdafx.h"
 #include "FELinearSolidDomain.h"
 #include "FELinearSolidSolver.h"
+#include "FEBioLib/FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+}
+
+
+//-----------------------------------------------------------------------------
+//! \todo The material point initialization needs to move to the base class.
+bool FELinearSolidDomain::Initialize(FEModel &mdl)
+{
+	// initialize base class
+	FESolidDomain::Initialize(mdl);
+
+	// initialize material point data
+	FEM& fem = dynamic_cast<FEM&>(mdl);
+
+	bool bmerr = false;
+
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		if (dynamic_cast<FELinearSolidSolver*>(fem.m_pStep->m_psolver))
+		{
+			// get the elements material
+			FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+
+			// set the local element coordinates
+			if (pme)
+			{
+				if (pme->m_pmap)
+				{
+					for (int n=0; n<el.GaussPoints(); ++n)
+					{
+						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+						pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+					}
+				}
+				else
+				{
+					if (fem.GetDebugFlag())
+					{
+						// If we get here, then the element has a user-defined fiber axis
+						// we should check to see if it has indeed been specified.
+						// TODO: This assumes that pt.Q will not get intialized to
+						//		 a valid value. I should find another way for checking since I
+						//		 would like pt.Q always to be initialized to a decent value.
+						if (dynamic_cast<FETransverselyIsotropic*>(pme))
+						{
+							FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+							mat3d& m = pt.Q;
+							if (fabs(m.det() - 1) > 1e-7)
+							{
+								// this element did not get specified a user-defined fiber direction
+//								clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+								bmerr = true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return (bmerr == false);
 }
 
 //-----------------------------------------------------------------------------

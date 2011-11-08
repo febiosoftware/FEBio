@@ -21,6 +21,9 @@ public:
 		return pd;
 	}
 
+	//! Initialization
+	bool Initialize(FEModel& fem);
+
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
