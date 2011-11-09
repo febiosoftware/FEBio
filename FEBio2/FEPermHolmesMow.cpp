@@ -39,7 +39,7 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 	// relative volume
 	double J = et.J;
 	// referential solid volume fraction
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = pt.m_phi0;
 	
 	// --- strain-dependent isotropic permeability ---
 	
@@ -56,7 +56,7 @@ tens4ds FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// relative volume
 	double J = et.J;
 	// referential solid volume fraction
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = pt.m_phi0;
 	
 	mat3dd I(1);	// Identity
 	

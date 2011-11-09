@@ -13,12 +13,25 @@ void FEBiphasicSoluteDomain::InitElements()
 	
 	// store previous mesh state
 	// we need it for receptor-ligand complex calculations
-	for (int j=0; j<Elements(); ++j) {
-		FESolidElement& el = Element(j);
-		for (int k=0; k<el.GaussPoints(); ++k) {
-			FESoluteMaterialPoint& pt = 
-			*(el.m_State[k]->ExtractData<FESoluteMaterialPoint>());
-			pt.m_crcp = pt.m_crc;
+	for (int i=0; i<(int) m_Elem.size(); ++i)
+	{
+		// get the solid element
+		FESolidElement& el = m_Elem[i];
+		
+		// get the number of integration points
+		int nint = el.GaussPoints();
+		
+		// loop over the integration points
+		for (int n=0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.m_State[n];
+			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+			FESoluteMaterialPoint& st = *(mp.ExtractData<FESoluteMaterialPoint>());
+			
+			// reset referential solid volume fraction at previous time
+			pt.m_phi0p = pt.m_phi0;
+			// reset referential receptor-ligand complex concentration at previous time
+			st.m_crcp = st.m_crc;
 		}
 	}
 }
@@ -1483,7 +1496,6 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 			
 			// for biphasic-solute materials also update the porosity, fluid and solute fluxes
 			// and evaluate the actual fluid pressure and solute concentration
-			ppt.m_phiw = pmb->Porosity(mp);
 			ppt.m_w = pmb->FluidFlux(mp);
 			ppt.m_pa = pmb->Pressure(mp);
 			spt.m_j = pmb->SoluteFlux(mp);
@@ -1496,6 +1508,10 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 					// update m_crc using one-step integration
 					double crchat = pmb->m_pSupp->ReceptorLigandSupply(mp);
 					spt.m_crc = spt.m_crcp + crchat*dt;
+					// update phi0 using one-step integration
+					double phi0hat = pmb->m_pSolid->MolarMass()/pmb->m_pSolid->Density()
+					*pmb->m_pSupp->SolidSupply(mp);
+					ppt.m_phi0 = ppt.m_phi0p + phi0hat*dt;
 				}
 			}
 

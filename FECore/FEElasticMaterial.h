@@ -87,7 +87,7 @@ public:
 class FEElasticMaterial : public FESolidMaterial
 {
 public:
-	FEElasticMaterial() { m_density = 1; m_pmap = 0; m_unstable = false;}
+	FEElasticMaterial() { m_density = 1; m_molarmass = 0; m_pmap = 0; m_unstable = false;}
 	~FEElasticMaterial(){ if(m_pmap) delete m_pmap; }
 
 	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint; }
@@ -96,10 +96,13 @@ public:
 
 	double Density() { return m_density; } 
 
+	double MolarMass() { return m_molarmass; }
+
 	void Serialize(DumpFile& ar);
 
 public:
 	double	m_density;	//!< material density
+	double	m_molarmass;//!< material molar mass (molecular weight)
 	bool	m_unstable;	//!< flag indicating whether material is unstable on its own
 
 	FECoordSysMap*	m_pmap;	//!< local material coordinate system

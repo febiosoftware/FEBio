@@ -24,6 +24,9 @@ public:
 	
 	//! calculates the residual
 	void Residual(FESolidSolver* psolver, vector<double>& R);
+
+	//! initialize class
+	bool Initialize(FEModel& fem);
 	
 	// update stresses
 	void UpdateStresses(FEModel& fem);

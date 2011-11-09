@@ -53,11 +53,14 @@ void FEBiphasicSolute::Init()
 double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
+	FEBiphasicMaterialPoint& pet = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
 	double J = et.J;
 	// porosity
-	double phiw = 1 - m_phi0/J;
+//	double phiw = 1 - m_phi0/J;
+	double phi0 = pet.m_phi0;
+	double phiw = 1 - phi0/J;
 	// check for pore collapse
 	// TODO: throw an error if pores collapse
 	phiw = (phiw > 0) ? phiw : 0;

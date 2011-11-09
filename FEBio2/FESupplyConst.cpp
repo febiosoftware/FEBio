@@ -73,3 +73,19 @@ double FESupplyConst::ReceptorLigandConcentrationSS(FEMaterialPoint& mp)
 	return 0;
 }
 
+//-----------------------------------------------------------------------------
+//! Referential solid supply (moles of solid/referential volume/time)
+double FESupplyConst::SolidSupply(FEMaterialPoint& mp)
+{
+	return ReceptorLigandSupply(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! Referential solid concentration (moles of solid/referential volume)
+//! at steady-state
+double FESupplyConst::SolidConcentrationSS(FEMaterialPoint& mp)
+{
+	return 0;
+}
+
+

@@ -72,7 +72,7 @@ mat3ds FEPermRefOrtho::Permeability(FEMaterialPoint& mp)
 	// relative volume
 	double J = et.J;
 	// referential solid volume fraction
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = pt.m_phi0;
 	
 	for (a=0; a<3; a++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to V
@@ -119,7 +119,7 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// relative volume
 	double J = et.J;
 	// referential solid volume fraction
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = pt.m_phi0;
 	
 	for (a=0; a<3; a++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to V

@@ -20,11 +20,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_p << m_gradp << m_w << m_pa << m_phiw;
+			ar << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p;
 		}
 		else
 		{
-			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phiw;
+			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p;
 		}
 
 		if (m_pt) m_pt->Serialize(ar);
@@ -37,7 +37,6 @@ public:
 			m_p = m_pa = 0;
 			m_gradp = vec3d(0,0,0);
 			m_w = vec3d(0,0,0);
-			m_phiw = 1;
 		}
 
 		if (m_pt) m_pt->Init(bflag);
@@ -54,7 +53,8 @@ public:
 	vec3d		m_gradp;	//!< spatial gradient of p
 	vec3d		m_w;		//!< fluid flux
 	double		m_pa;		//!< actual fluid pressure
-	double		m_phiw;		//!< porosity in current configuration
+	double		m_phi0;		//!< referential solid volume fraction at current time
+	double		m_phi0p;	//!< referential solid volume fraction at previous time
 };
 
 //-----------------------------------------------------------------------------

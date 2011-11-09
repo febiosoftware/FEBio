@@ -63,7 +63,7 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 	double J = et.J;
 	
 	// solid volume fraction in reference configuration
-	double phi0 = J*(1-ppt.m_phiw);
+	double phi0 = ppt.m_phi0;
 	
 	// --- strain-dependent permeability ---
 	
@@ -94,7 +94,7 @@ tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	double J = et.J;
 	
 	// solid volume fraction in reference configuration
-	double phi0 = J*(1-ppt.m_phiw);
+	double phi0 = ppt.m_phi0;
 	
 	double f = pow((J-phi0)/(1-phi0),m_alpha)*exp(m_M*(J*J-1.0)/2.0);
 	double d0 = m_diff0*f;

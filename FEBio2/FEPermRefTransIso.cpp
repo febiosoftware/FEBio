@@ -70,7 +70,7 @@ mat3ds FEPermRefTransIso::Permeability(FEMaterialPoint& mp)
 	// relative volume
 	double J = et.J;
 	// referential solid volume fraction
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = pt.m_phi0;
 	
 	// Copy the texture direction in the reference configuration to V
 	V.x = et.Q[0][0]; V.y = et.Q[1][0]; V.z = et.Q[2][0];
@@ -116,7 +116,7 @@ tens4ds FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	// relative volume
 	double J = et.J;
 	// referential solid volume fraction
-	double phi0 = J*(1-pt.m_phiw);
+	double phi0 = pt.m_phi0;
 	
 	// Copy the texture direction in the reference configuration to V
 	V.x = et.Q[0][0]; V.y = et.Q[1][0]; V.z = et.Q[2][0];

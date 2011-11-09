@@ -76,21 +76,26 @@ public:
 	//! solute supply
 	virtual double Supply(FEMaterialPoint& pt) = 0;
 	
-	//! tangent of supply with respect to strain
+	//! solute supply under steady-state conditions
+	virtual double SupplySS(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of solute supply with respect to strain
 	virtual double Tangent_Supply_Strain(FEMaterialPoint& mp) = 0;
 	
-	//! tangent of supply with respect to solute concentration
+	//! tangent of solute supply with respect to solute concentration
 	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp) = 0;
 	
 	//! receptor-ligand complex supply
 	virtual double ReceptorLigandSupply(FEMaterialPoint& pt) = 0;
 	
-	//! solute supply under steady-state conditions
-	virtual double SupplySS(FEMaterialPoint& pt) = 0;
-	
 	//! receptor-ligand concentration under steady-state conditions
 	virtual double ReceptorLigandConcentrationSS(FEMaterialPoint& pt) = 0;
 	
+	//! referential solid supply
+	virtual double SolidSupply(FEMaterialPoint& pt) = 0;
+	
+	//! referential solid concentration under steady-state conditions
+	virtual double SolidConcentrationSS(FEMaterialPoint& pt) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -194,7 +199,7 @@ public:
 	double SoluteDensity() { return m_rhoTu; }
 	
 	//! solute molecular weight
-	double SoluteMolecularWeight() { return m_Mu; }
+	double SoluteMolarMass() { return m_Mu; }
 
 	//! Serialization
 	void Serialize(DumpFile& ar);

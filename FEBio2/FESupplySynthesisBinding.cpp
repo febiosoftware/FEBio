@@ -72,8 +72,8 @@ double FESupplySynthesisBinding::ReceptorLigandSupply(FEMaterialPoint& mp)
 	
 	double J = et.J;
 	double ca = spt.m_ca;
-	double phiw = ppt.m_phiw;
-	double cr = phiw*J*ca;
+	double phi0 = ppt.m_phi0;
+	double cr = (J-phi0)*ca;
 	double crc = spt.m_crc;
 	double crchat = m_kf*cr*(m_crt-crc) - m_kr*crc;
 	return crchat;
@@ -96,9 +96,24 @@ double FESupplySynthesisBinding::ReceptorLigandConcentrationSS(FEMaterialPoint& 
 	
 	double J = et.J;
 	double ca = spt.m_ca;
-	double phiw = ppt.m_phiw;
-	double cr = phiw*J*ca;
+	double phi0 = ppt.m_phi0;
+	double cr = (J-phi0)*ca;
 	double Kd = m_kr/m_kf;	// dissociation constant
 	double crc = m_crt*cr/(Kd+cr);
 	return crc;
+}
+
+//-----------------------------------------------------------------------------
+//! Referential solid supply (moles of solid/referential volume/time)
+double FESupplySynthesisBinding::SolidSupply(FEMaterialPoint& mp)
+{
+	return ReceptorLigandSupply(mp);
+}
+
+//-----------------------------------------------------------------------------
+//! Referential solid concentration (moles of solid/referential volume)
+//! at steady-state
+double FESupplySynthesisBinding::SolidConcentrationSS(FEMaterialPoint& mp)
+{
+	return 0;
 }

@@ -27,7 +27,13 @@ public:
 	
 	//! receptor-ligand complex concentration at steady-state
 	double ReceptorLigandConcentrationSS(FEMaterialPoint& mp);
+
+	//! referential solid supply
+	double SolidSupply(FEMaterialPoint& pt);
 	
+	//! referential solid volume fraction under steady-state conditions
+	double SolidConcentrationSS(FEMaterialPoint& pt);
+
 	//! data initialization and checking
 	void Init();
 	

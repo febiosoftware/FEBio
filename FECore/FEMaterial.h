@@ -103,6 +103,9 @@ public:
 	
 	//! return the material density
 	virtual double Density() = 0;
+
+	//! return the molar mass
+	virtual double MolarMass() = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -126,6 +129,9 @@ public:
 
 	//! return solid component's density
 	double Density () { return m_pBase->Density(); }
+
+	//! return solid component's molar mass
+	double MolarMass () { return m_pBase->MolarMass(); }
 
 	//! serialization
 	void Serialize(DumpFile& ar);

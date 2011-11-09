@@ -6,6 +6,46 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+bool FEBiphasicDomain::Initialize(FEModel &mdl)
+{
+	// initialize base class
+	FEElasticSolidDomain::Initialize(mdl);
+	
+	for (int i=0; i<(int) m_Elem.size(); ++i)
+	{
+		// get the solid element
+		FESolidElement& el = m_Elem[i];
+		
+		assert(!el.IsRigid());
+		
+		assert(el.Type() != FE_UDGHEX);
+		
+		// get the number of integration points
+		int nint = el.GaussPoints();
+		
+		// get the material
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(mdl.GetMaterial(el.GetMatID()));
+		
+		assert(dynamic_cast<FEBiphasic*>(pm) != 0);
+		
+		// get the biphasic material
+		FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(pm);
+		
+		// loop over the integration points
+		for (int n=0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.m_State[n];
+			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+			
+			// initialize referential solid volume fraction
+			pt.m_phi0 = pmb->m_phi0;
+		}
+	}
+	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	int i, j;
@@ -1003,7 +1043,6 @@ void FEBiphasicDomain::UpdateStresses(FEModel &fem)
 			ppt.m_gradp = gradient(el, pn, n);
 			
 			// for biphasic materials also update the fluid flux
-			ppt.m_phiw = pmb->Porosity(mp);
 			ppt.m_w = pmb->Flux(mp);
 			ppt.m_pa = pmb->Pressure(mp);
 			
