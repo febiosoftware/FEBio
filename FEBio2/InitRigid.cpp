@@ -344,7 +344,7 @@ bool FEM::InitRigidBodies()
 	// a surface element is rigid when it has no free nodes
 	for (int is = 0; is < (int) m_SL.size(); ++is)
 	{
-		FESurfaceLoad* ps = m_SL[i];
+		FESurfaceLoad* ps = m_SL[is];
 		for (i=0; i<ps->Surface().Elements(); ++i)
 		{
 			FESurfaceElement& el = ps->Surface().Element(i);
