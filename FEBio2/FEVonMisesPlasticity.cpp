@@ -2,29 +2,35 @@
 
 //-----------------------------------------------------------------------------
 // register the material with the framework
-REGISTER_MATERIAL(FEVonMisesPlasticity, "von-Mises plastic");
+REGISTER_MATERIAL(FEVonMisesPlasticity, "von-Mises plasticity");
 
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEVonMisesPlasticity, FEElasticMaterial)
-	ADD_PARAMETER(m_K, FE_PARAM_DOUBLE, "K");
-	ADD_PARAMETER(m_G, FE_PARAM_DOUBLE, "G");
+	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
+	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 	ADD_PARAMETER(m_Y, FE_PARAM_DOUBLE, "Y");
+	ADD_PARAMETER(m_H, FE_PARAM_DOUBLE, "H");
 END_PARAMETER_LIST();
 
 
 //-----------------------------------------------------------------------------
 FEVonMisesPlasticity::FEVonMisesPlasticity(void)
 {
-	m_K = m_G = m_Y = 0;
+	m_E = m_v = m_Y = m_H = 0;
+	m_K = m_G = 0;
 }
 
 //-----------------------------------------------------------------------------
 void FEVonMisesPlasticity::Init()
 {
-	if (m_K <= 0) throw MaterialError("K must be postive number");
-	if (m_G <= 0) throw MaterialError("G must be postive number");
+	if (m_E <= 0) throw MaterialError("E must be postive number");
+	if ((m_v < -1)||(m_v >= 0.5)) throw MaterialError("v must be in the range [-1, 0.5]");
 	if (m_Y <= 0) throw MaterialError("Y must be postitive number");
+	if (m_H <  0) throw MaterialError("H must be postitive number");
+
+	m_K = m_E/(3.0*(1.0 - 2*m_v));
+	m_G = m_E/(2.0*(1.0 +   m_v));
 }
 
 //-----------------------------------------------------------------------------
@@ -42,9 +48,14 @@ mat3ds FEVonMisesPlasticity::Stress(FEMaterialPoint &mp)
 
 	// get the trial stress
 	mat3ds strial = pp.sn + (de.dev()*(2.0*m_G) + de.iso()*(3.0*m_K));
+	mat3ds dev_strial = strial.dev();
+	double devs_norm = dev_strial.norm();
 
-	double k = m_Y / sqrt(3.0);
-	double fac = strial.dev().norm() / (sqrt(2.0)*k);
+	// get current yield strenght
+	double Y = pp.Y0;
+
+	double k = Y / sqrt(3.0);
+	double fac = devs_norm / (sqrt(2.0)*k);
 
 	mat3ds s;
 	if (fac<=1)
@@ -54,7 +65,14 @@ mat3ds FEVonMisesPlasticity::Stress(FEMaterialPoint &mp)
 	}
 	else
 	{
-		s = strial.iso() + strial.dev() / fac;
+		// calculate plastic strain rate
+		double L = (devs_norm - sqrt(2.0/3.0)*Y)/(2*m_G + m_H);
+
+		// update yield strength
+		pp.Y1 = Y + m_H*L/sqrt(2.0/3.0);
+
+		// update stress
+		s = strial.iso() + dev_strial*(1.0 - 2.0*m_G*L/devs_norm);
 		pp.b = true;
 	}
 
@@ -91,7 +109,7 @@ tens4ds FEVonMisesPlasticity::Tangent(FEMaterialPoint &mp)
 		mat3ds n = s.dev()*2.0;
 
 		mat3ds A = C.dot(n);
-		double G = n.dotdot(C.dot(n));
+		double G = n.dotdot(C.dot(n)) + m_H;
 
 		C -= dyad4s(A)/G;
 	}

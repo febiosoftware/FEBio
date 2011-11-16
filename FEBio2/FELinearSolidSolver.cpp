@@ -203,6 +203,10 @@ void FELinearSolidSolver::Update(vector<double>& u)
 
 	// update the stresses on all domains
 	for (int i=0; i<(int) m_Dom.size(); ++i) Domain(i)->UpdateStresses(m_fem);
+
+	// dump all states to the plot file
+	// when requested
+	if (m_fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.m_plot->Write(m_fem);
 }
 
 //-----------------------------------------------------------------------------

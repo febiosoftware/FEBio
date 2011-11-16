@@ -504,6 +504,10 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 			pt.rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
+			// TODO: I should not evaulate this, since this can throw negative jacobians
+			//       for large deformations. I known I shouldn't use this for large
+			//       deformations, but in principle there should never be a negative 
+			//       jacobian for small deformations!
 			pt.J = defgrad(el, pt.F, n);
 
 			// calculate the stress at this material point
