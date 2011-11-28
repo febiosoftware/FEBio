@@ -2668,6 +2668,11 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		XMLTag t(tag); ++t;
 		while (!t.isend()) { ndis++; ++t; }
 
+		// determine whether prescribed BC is relative or absolute
+		bool br = false;
+		const char* sztype = tag.AttributeValue("type",true);
+		if (sztype && strcmp(sztype, "relative") == 0) br = true;
+
 		// read the prescribed data
 		++tag;
 		for (int i=0; i<ndis; ++i)
@@ -2695,6 +2700,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			pdc->bc = bc;
 			pdc->lc = lc;
 			tag.value(pdc->s);
+			pdc->br = br;
 			fem.m_DC.push_back(pdc);
 
 			// add this boundary condition to the current step
@@ -3845,6 +3851,11 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 		}
 		else if (tag == "concentration")
 		{
+			int isol = 0;
+			const char* sz = tag.AttributeValue("sol", true);
+			if (sz) isol = atoi(sz) - 1;
+			if ((isol < 0) || (isol >= MAX_CDOFS))
+				throw XMLReader::InvalidAttributeValue(tag, "sol", sz);
 			++tag;
 			do
 			{
@@ -3853,7 +3864,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 					int nid = atoi(tag.AttributeValue("id"))-1;
 					double c;
 					tag.value(c);
-					mesh.Node(nid).m_c0 += c;
+					mesh.Node(nid).m_c0[isol] += c;
 				}
 				else throw XMLReader::InvalidTag(tag);
 				++tag;

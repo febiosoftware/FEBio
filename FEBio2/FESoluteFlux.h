@@ -19,7 +19,7 @@ public:
 
 public:
 	//! constructor
-	FESoluteFlux(FESurface* ps, bool blinear = false) : FESurfaceLoad(ps) { m_blinear = blinear; }
+	FESoluteFlux(FESurface* ps, bool blinear = false, int isol = 0) : FESurfaceLoad(ps) { m_blinear = blinear; m_isol = isol; }
 	
 	//! allocate storage
 	void create(int n) { m_PC.resize(n); }
@@ -57,6 +57,7 @@ protected:
 	
 protected:
 	bool	m_blinear;	//!< linear or not (true is non-follower, false is follower)
+	int		m_isol;		//!< solute index
 
 	// solute flux boundary data
 	vector<LOAD>	m_PC;		//!< solute flux boundary cards

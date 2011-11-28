@@ -19,7 +19,7 @@ FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
 
 	m_nreq = 0;
 	m_npeq = 0;
-	m_nceq = 0;
+	for (int k=0; k<MAX_CDOFS; ++k) m_nceq[k] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -216,12 +216,14 @@ bool FESolidSolver::InitEquations()
 
 	// determine the nr of pressure and concentration equations
 	// TODO: move this to the correct solver class
-	m_npeq = m_nceq = 0;
+	// TODO: adjust this for MAX_CDOF concentration DOFS
+	m_npeq = m_nceq[0] = m_nceq[1] = 0;
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		if (n.m_ID[DOF_P] != -1) m_npeq++;
-		if (n.m_ID[DOF_C] != -1) m_nceq++;
+		if (n.m_ID[DOF_P  ] != -1) m_npeq++;
+		if (n.m_ID[DOF_C  ] != -1) m_nceq[0]++;
+		if (n.m_ID[DOF_C+1] != -1) m_nceq[1]++;
 	}
 
 	// All initialization is done

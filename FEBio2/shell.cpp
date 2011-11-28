@@ -731,6 +731,7 @@ void FEElasticShellDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[10*N + i] = id[10];
 		
 		// concentration dof
-		lm[11*N + i] = id[11];
+		for (int k=0; k<MAX_CDOFS; ++k)
+			lm[(11+k)*N + i] = id[11+k];
 	}
 }

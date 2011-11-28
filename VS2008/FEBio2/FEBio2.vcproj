@@ -673,6 +673,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FESolute.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FESoluteFlux.cpp"
 				>
 			</File>
@@ -738,6 +742,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETransIsoVerondaWestmann.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FETriphasic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FETriphasicDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FETriphasicSolver.cpp"
 				>
 			</File>
 			<File
@@ -1323,6 +1339,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FESolute.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FESoluteFlux.h"
 				>
 			</File>
@@ -1388,6 +1408,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETransIsoVerondaWestmann.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FETriphasic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FETriphasicDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FETriphasicSolver.h"
 				>
 			</File>
 			<File

@@ -111,12 +111,13 @@ bool FEHeatSolver::SolveStep(double time)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
+			double r = dc.r;	// GAA
 
-			double T = s*m_fem.GetLoadCurve(lc)->Value();
+			double T = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
 
 			FENode& node = m_fem.m_mesh.Node(n);
 
-			if (bc == 10)
+			if (bc == DOF_T)
 			{
 				int I = -node.m_ID[bc]-2;
 				if (I>=0 && I<m_neq) m_u[I] = T;
@@ -188,7 +189,7 @@ void FEHeatSolver::Residual()
 			FENode& node = mesh.Node(id);
 
 			n = node.m_ID[bc];
-			if ((n >= 0) && (bc == 10)) 
+			if ((n >= 0) && (bc == DOF_T)) 
 			{
 				f = s*m_fem.GetLoadCurve(lc)->Value();
 				m_R[n] = f;

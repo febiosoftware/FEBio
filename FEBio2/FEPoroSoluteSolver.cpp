@@ -34,9 +34,9 @@ bool FEPoroSoluteSolver::Init()
 	if (FEPoroSolidSolver::Init() == false) return false;
 
 	// allocate concentration-vectors
-	assert (m_nceq > 0);
-	m_ci.assign(m_nceq, 0);
-	m_Ci.assign(m_nceq, 0);
+	assert (m_nceq[0] > 0);
+	m_ci[0].assign(m_nceq[0], 0);
+	m_Ci[0].assign(m_nceq[0], 0);
 	
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
@@ -47,7 +47,7 @@ bool FEPoroSoluteSolver::Init()
 		FENode& node = mesh.Node(i);
 
 		// concentration dofs
-		n = node.m_ID[DOF_C]; if (n >= 0) m_Ut[n] = node.m_ct;
+		n = node.m_ID[DOF_C]; if (n >= 0) m_Ut[n] = node.m_ct[0];
 	}
 
 	return true;
@@ -58,7 +58,7 @@ bool FEPoroSoluteSolver::Init()
 //!
 void FEPoroSoluteSolver::PrepStep(double time)
 {
-	zero(m_Ci);
+	zero(m_Ci[0]);
 	FEPoroSolidSolver::PrepStep(time);
 }
 
@@ -227,17 +227,17 @@ bool FEPoroSoluteSolver::Quasin(double time)
 		// check solute convergence
 		{
 			// extract the pressure increments
-			GetConcentrationData(m_ci, m_bfgs.m_ui);
+			GetConcentrationData(m_ci[0], m_bfgs.m_ui);
 			
 			// set initial norm
-			if (m_niter == 0) normCi = fabs(m_ci*m_ci);
+			if (m_niter == 0) normCi = fabs(m_ci[0]*m_ci[0]);
 			
 			// update total pressure
-			for (i=0; i<m_nceq; ++i) m_Ci[i] += s*m_ci[i];
+			for (i=0; i<m_nceq[0]; ++i) m_Ci[0][i] += s*m_ci[0][i];
 			
 			// calculate norms
-			normC = m_Ci*m_Ci;
-			normc = (m_ci*m_ci)*(s*s);
+			normC = m_Ci[0]*m_Ci[0];
+			normc = (m_ci[0]*m_ci[0])*(s*s);
 			
 			// check convergence
 			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normC)) bconv = false;

@@ -162,7 +162,8 @@ bool FEContactDiagnostic::Init()
 		node.m_ID[DOF_T] = 0;
 		
 		// open concentration dof
-		node.m_ID[DOF_C] = 0;
+		for (int k=0; k<MAX_CDOFS; ++k)
+			node.m_ID[DOF_C+k] = 0;
 	}
 
 	// get the one-and-only domain

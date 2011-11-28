@@ -745,9 +745,10 @@ void FESolidSolver::NodalForces(vector<double>& F)
 		
 			f = s*m_fem.GetLoadCurve(lc)->Value();
 			
-			// TODO: this next line only needs to be done when we
-			//		 are using the symmetric version of poroelasticity!
-			if (bc == 6) f *= m_fem.m_pStep->m_dt;	// GAA
+			// For pressure and concentration loads, multiply by dt
+			// for consistency with evaluation of residual and stiffness matrix
+			if ((bc == DOF_P) || (bc == DOF_C) || (bc == DOF_C+1))
+				f *= m_fem.m_pStep->m_dt;
 
 			if (n >= 0) F[n] = f;
 			else if (node.m_rid >=0)

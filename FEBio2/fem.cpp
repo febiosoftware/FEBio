@@ -17,6 +17,7 @@
 #include "FECore/MathParser.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
@@ -552,6 +553,7 @@ FEElasticMaterial* FEM::GetElasticMaterial(int id)
 	while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
 	while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
 	while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
+	while (dynamic_cast<FETriphasic*>(pm)) pm = (dynamic_cast<FETriphasic*>(pm))->m_pSolid;
 	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 	assert(pme);
 	return pme;
@@ -564,6 +566,7 @@ FEElasticMaterial* FEM::GetElasticMaterial(FEMaterial* pm)
 	while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
 	while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
 	while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
+	while (dynamic_cast<FETriphasic*>(pm)) pm = (dynamic_cast<FETriphasic*>(pm))->m_pSolid;
 	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
 	assert(pme);
 	return pme;

@@ -52,10 +52,11 @@ void FESolidSolver::Update(vector<double>& ui)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
+			double r = dc.r;	// GAA
 
 			FENode& node = mesh.Node(n);
 
-			double g = s*m_fem.GetLoadCurve(lc)->Value();
+			double g = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
 
 			switch (bc)
 			{
@@ -198,10 +199,11 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
+			double r = dc.r;	// GAA
 
 			FENode& node = mesh.Node(n);
 
-			if (bc == 6) node.m_pt = s*m_fem.GetLoadCurve(lc)->Value();
+			if (bc == DOF_P) node.m_pt = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
 		}
 	}
 }
@@ -352,7 +354,7 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 		
 		// update nodal concentration
 		n = node.m_ID[DOF_C];
-		if (n >= 0) node.m_ct = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+		if (n >= 0) node.m_ct[0] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 	}
 	
 	// update solute data
@@ -375,10 +377,62 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
+			double r = dc.r;	// GAA
 			
 			FENode& node = mesh.Node(n);
 			
-			if (bc == 11) node.m_ct = s*m_fem.GetLoadCurve(lc)->Value();
+			if (bc == DOF_C) node.m_ct[0] = r + s*m_fem.GetLoadCurve(lc)->Value();
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//! Updates the triphasic solute data
+
+void FESolidSolver::UpdateTriphasic(vector<double>& ui)
+{
+	int i, n;
+	
+	FEMesh& mesh = m_fem.m_mesh;
+	
+	// update solute data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		
+		// update nodal concentration
+		n = node.m_ID[DOF_C];
+		if (n >= 0) node.m_ct[0] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+		n = node.m_ID[DOF_C+1];
+		if (n >= 0) node.m_ct[1] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+	}
+	
+	// update solute data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		
+		// update velocities
+		node.m_vt  = (node.m_rt - node.m_rp) / m_fem.m_pStep->m_dt;
+	}
+	
+	// make sure the prescribed concentrations are fullfilled
+	int ndis = m_fem.m_DC.size();
+	for (i=0; i<ndis; ++i)
+	{
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
+		if (dc.IsActive())
+		{
+			int n    = dc.node;
+			int lc   = dc.lc;
+			int bc   = dc.bc;
+			double s = dc.s;
+			double r = dc.r;	// GAA
+			
+			FENode& node = mesh.Node(n);
+			
+			if (bc == DOF_C) node.m_ct[0] = r + s*m_fem.GetLoadCurve(lc)->Value();	// GAA
+			if (bc == DOF_C+1) node.m_ct[1] = r + s*m_fem.GetLoadCurve(lc)->Value();	// GAA
 		}
 	}
 }

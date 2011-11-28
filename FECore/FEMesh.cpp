@@ -319,7 +319,8 @@ void FEMesh::Reset()
 
 		node.m_pt = node.m_p0;
 		
-		node.m_ct = node.m_cp = node.m_c0;
+		for (int k=0; k<MAX_CDOFS; ++k)
+			node.m_ct[k] = node.m_cp[k] = node.m_c0[k];
 		
 		node.m_T = 0;
 	}

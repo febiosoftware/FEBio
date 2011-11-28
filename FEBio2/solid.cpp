@@ -764,7 +764,7 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 {
 	int N = el.Nodes();
-	lm.resize(N*MAX_NDOFS);
+	lm.resize(N*int(MAX_NDOFS));
 	
 	for (int i=0; i<N; ++i)
 	{
@@ -794,6 +794,7 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		lm[10*N + i] = id[10];
 		
 		// concentration dofs
-		lm[11*N + i] = id[11];
+		for (int k=0; k<MAX_CDOFS; ++k)
+			lm[(11+k)*N + i] = id[11+k];
 	}
 }

@@ -654,7 +654,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC;
 			ar >> nid >> bactive;
-			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s;
+			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s >> pdc->br >> pdc->r; // GAA
 			pdc->SetID(nid);
 			if (bactive) pdc->Activate(); else pdc->Deactivate();
 			m_DC.push_back(pdc);

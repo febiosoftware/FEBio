@@ -78,7 +78,8 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 				node.m_ID[DOF_T] = 0;
 				
 				// open concentration dof
-				node.m_ID[DOF_C] = 0;
+				for (int k=0; k<MAX_CDOFS; ++k)
+					node.m_ID[DOF_C+k] = 0;
 			}
 		}
 	}

@@ -77,7 +77,7 @@ protected:
 
 class NodeDataRecord : public DataRecord
 {
-	enum { X, Y, Z, UX, UY, UZ, VX, VY, VZ, RX, RY, RZ, P, C };
+	enum { X, Y, Z, UX, UY, UZ, VX, VY, VZ, RX, RY, RZ, P, C, CP, CM };
 
 public:
 	NodeDataRecord(FEM* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
@@ -95,7 +95,10 @@ class ElementDataRecord : public DataRecord
 		SX, SY, SZ, SXY, SYZ, SXZ,
 		S1, S2, S3,
 		FX, FY, FZ, FYZ, FZX, FXY, FYX, FXZ, FZY, 
-		P, WX, WY, WZ, C, JX, JY, JZ};
+		P, WX, WY, WZ, C, JX, JY, JZ,
+		CP, JPX, JPY, JPZ, CM, JMX, JMY, JMZ,
+		PSI, IEX, IEY, IEZ
+	};
 
 	struct ELEMREF
 	{

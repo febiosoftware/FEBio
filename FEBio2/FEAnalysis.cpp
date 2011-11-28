@@ -178,7 +178,7 @@ bool FEAnalysis::Init()
 		{
 			// if the node is not free we don't use this prescribed displacement
 			// note that we don't do this for prescribed pressures and concentrations
-			if ((dc.bc != 6) && (dc.bc != 11))
+			if ((dc.bc != DOF_P) && (dc.bc != DOF_C) && (dc.bc != DOF_C + 1))
 			{
 				FENode& node = m_fem.m_mesh.Node(dc.node);
 				if (node.m_rid >= 0) 
@@ -228,6 +228,7 @@ bool FEAnalysis::Init()
 		FEPrescribedBC& DC = *m_fem.m_DC[i];
 		int nid = DC.node;
 		int bc  = DC.bc;
+		bool br = DC.br;
 
 		FENode& node = m_fem.m_mesh.Node(nid); 
 
@@ -235,23 +236,62 @@ bool FEAnalysis::Init()
 		{
 			switch (bc)
 			{
-			case 0: // x-displacement
-			case 1: // y-displacement
-			case 2: // z-displacement
-			case 3: // x-rotation
-			case 4: // y-rotation
-			case 5: // z-rotation
-			case 6: // prescribed pressure
-			case 10: // precribed temperature
-			case 11: // precribed concentration
+			case DOF_X: // x-displacement
 				n = node.m_ID[bc];
 				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_rt.x - node.m_r0.x : 0;	// GAA
+				break;
+			case DOF_Y: // y-displacement
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_rt.y - node.m_r0.y : 0;
+				break;
+			case DOF_Z: // z-displacement
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_rt.z - node.m_r0.z : 0;
+				break;
+			case DOF_U: // x-rotation
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_Dt.x - node.m_D0.x : 0;
+				break;
+			case DOF_V: // y-rotation
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_Dt.y - node.m_D0.y : 0;
+				break;
+			case DOF_W: // z-rotation
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_Dt.z - node.m_D0.z : 0;
+				break;
+			case DOF_P: // prescribed pressure
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_pt - node.m_p0 : 0;
+				break;
+			case DOF_T: // precribed temperature
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = 0;
+				break;
+			case DOF_C: // precribed concentration
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_ct[0] - node.m_c0[0] : 0;
+				break;
+			case DOF_C+1: // precribed concentration
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_ct[1] - node.m_c0[1] : 0;
 				break;
 			case 20: // y-z radial displacement
-				n = node.m_ID[1];
-				node.m_ID[1] = (n<0?n:-n-2);
-				n = node.m_ID[2];
-				node.m_ID[2] = (n<0?n:-n-2);
+				n = node.m_ID[DOF_Y];
+				node.m_ID[DOF_Y] = (n<0?n:-n-2);
+				n = node.m_ID[DOF_Z];
+				node.m_ID[DOF_Z] = (n<0?n:-n-2);
+				DC.r = 0;
 				break;
 			}
 		}

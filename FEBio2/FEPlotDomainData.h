@@ -69,6 +69,69 @@ class FEPlotSoluteFlux : public FEDomainData
 	};
 
 //-----------------------------------------------------------------------------
+//! Actual cation concentration
+class FEPlotActualCationConcentration : public FEDomainData
+{
+public:
+	FEPlotActualCationConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Cation flux
+class FEPlotCationFlux : public FEDomainData
+{
+public:
+	FEPlotCationFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Actual anion concentration
+class FEPlotActualAnionConcentration : public FEDomainData
+{
+public:
+	FEPlotActualAnionConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Anion flux
+class FEPlotAnionFlux : public FEDomainData
+{
+public:
+	FEPlotAnionFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Electric potential
+class FEPlotElectricPotential : public FEDomainData
+{
+public:
+	FEPlotElectricPotential(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Current density
+class FEPlotCurrentDensity : public FEDomainData
+{
+public:
+	FEPlotCurrentDensity(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fixed charge density
+class FEPlotFixedChargeDensity : public FEDomainData
+{
+public:
+	FEPlotFixedChargeDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Material fibers
 class FEPlotFiberVector : public FEDomainData
 {
@@ -102,6 +165,24 @@ class FEPlotEffectiveSoluteConcentration : public FEDomainData
 {
 public:
 	FEPlotEffectiveSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective cation concentrations
+class FEPlotEffectiveCationConcentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveCationConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective anion concentrations
+class FEPlotEffectiveAnionConcentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveAnionConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
 

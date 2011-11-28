@@ -96,7 +96,7 @@ void FESolver::Clean()
 bool FESolver::CreateStiffness(bool breset)
 {
 	// clean up the solver
-	if (m_pK->NonZeroes()) m_plinsolve->Destroy();	// GAA
+	if (m_pK->NonZeroes()) m_plinsolve->Destroy();
 
 	// clean up the stiffness matrix
 	m_pK->Clear();

@@ -4,8 +4,10 @@
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
+#include "FETriphasicDomain.h"
 #include "FEElasticMixture.h"
 #include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"      );
@@ -21,6 +23,15 @@ REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute fl
 REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                        );
 REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"               );
 REGISTER_FEBIO_CLASS(FEPlotReceptorLigandConcentration  , FEPlotData, "receptor-ligand concentration" );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveCationConcentration , FEPlotData, "effective cation concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualCationConcentration    , FEPlotData, "cation concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotCationFlux                   , FEPlotData, "cation flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveAnionConcentration  , FEPlotData, "effective anion concentration" );
+REGISTER_FEBIO_CLASS(FEPlotActualAnionConcentration     , FEPlotData, "anion concentration"           );
+REGISTER_FEBIO_CLASS(FEPlotAnionFlux                    , FEPlotData, "anion flux"                    );
+REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"            );
+REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"               );
+REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density"          );
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -212,7 +223,9 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 	int i, j;
 	double ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicDomain*>(&dom))	|| (dynamic_cast<FEBiphasicSoluteDomain*>(&dom)))
+	if ((dynamic_cast<FEBiphasicDomain*>(&dom))	|| 
+		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
+		(dynamic_cast<FETriphasicDomain*>(&dom)))
 	{
 		for (i=0; i<pbd->Elements(); ++i)
 		{
@@ -245,7 +258,9 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 	float af[3];
 	vec3d ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicDomain*>(&dom)) || (dynamic_cast<FEBiphasicSoluteDomain*>(&dom)))
+	if ((dynamic_cast<FEBiphasicDomain*>(&dom)) || 
+		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
+		(dynamic_cast<FETriphasicDomain*>(&dom)))
 	{
 		for (i=0; i<pbd->Elements(); ++i)
 		{
@@ -347,6 +362,245 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotActualCationConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca[0];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotCationFlux::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_j[0];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualAnionConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca[1];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotAnionFlux::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_j[1];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotElectricPotential::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average electric potential
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_psi;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotCurrentDensity::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_Ie;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average electric potential
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_cF;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+
+//-----------------------------------------------------------------------------
 bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j, n;
@@ -411,6 +665,7 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
 {
 	FEBiphasicDomain* pd = dynamic_cast<FEBiphasicDomain*>(&dom);
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	if (pd)
 	{
 		int N = pd->Nodes();
@@ -431,6 +686,16 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
 		}
 		return true;
 	}
+	else if (ptd)
+	{
+		int N = ptd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_pt);
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -444,12 +709,47 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = pd->Node(i);
-			a.push_back((float) node.m_ct);
+			a.push_back((float) node.m_ct[0]);
 		}
 		return true;
 	}
 	return false;
 }
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveCationConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	FETriphasicDomain* pd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (pd)
+	{
+		int N = pd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pd->Node(i);
+			a.push_back((float) node.m_ct[0]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveAnionConcentration::Save(FEDomain &dom, vector<float>& a)
+{
+	FETriphasicDomain* pd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (pd)
+	{
+		int N = pd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pd->Node(i);
+			a.push_back((float) node.m_ct[1]);
+		}
+		return true;
+	}
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)

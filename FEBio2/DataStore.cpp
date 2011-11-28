@@ -8,6 +8,7 @@
 #include "FEBioLib/FERigid.h"
 #include "FESolidSolver.h"
 #include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -333,6 +334,8 @@ void NodeDataRecord::Parse(const char* szexpr)
 		else if (strcmp(sz, "Rz") == 0) m_data.push_back(RZ);
 		else if (strcmp(sz, "p" ) == 0) m_data.push_back(P );
 		else if (strcmp(sz, "c" ) == 0) m_data.push_back(C );
+		else if (strcmp(sz, "c+" ) == 0) m_data.push_back(CP);
+		else if (strcmp(sz, "c-" ) == 0) m_data.push_back(CM);
 		else throw UnknownDataField(sz);
 		sz = ch;
 	}
@@ -367,7 +370,9 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 	case RY: val = (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);  break;
 	case RZ: val = (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);  break;
 	case P : val = node.m_pt; break;
-	case C : val = node.m_ct; break;
+	case C : val = node.m_ct[0]; break;
+	case CP: val = node.m_ct[0]; break;
+	case CM: val = node.m_ct[1]; break;
 	}
 	return val;
 }
@@ -441,6 +446,18 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "jx" ) == 0) m_data.push_back(JX );
 		else if (strcmp(sz, "jy" ) == 0) m_data.push_back(JY );
 		else if (strcmp(sz, "jz" ) == 0) m_data.push_back(JZ );
+		else if (strcmp(sz, "c+"  ) == 0) m_data.push_back(CP );
+		else if (strcmp(sz, "j+x" ) == 0) m_data.push_back(JPX);
+		else if (strcmp(sz, "j+y" ) == 0) m_data.push_back(JPY);
+		else if (strcmp(sz, "j+z" ) == 0) m_data.push_back(JPZ);
+		else if (strcmp(sz, "c-"  ) == 0) m_data.push_back(CM );
+		else if (strcmp(sz, "j-x" ) == 0) m_data.push_back(JMX);
+		else if (strcmp(sz, "j-y" ) == 0) m_data.push_back(JMY);
+		else if (strcmp(sz, "j-z" ) == 0) m_data.push_back(JMZ);
+		else if (strcmp(sz, "psi" ) == 0) m_data.push_back(PSI);
+		else if (strcmp(sz, "Iex" ) == 0) m_data.push_back(IEX);
+		else if (strcmp(sz, "Iey" ) == 0) m_data.push_back(IEY);
+		else if (strcmp(sz, "Iez" ) == 0) m_data.push_back(IEZ);
 		else throw UnknownDataField(sz);
 		sz = ch;
 	}
@@ -543,6 +560,26 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 					case JX: val += spt->m_j.x; break;
 					case JY: val += spt->m_j.y; break;
 					case JZ: val += spt->m_j.z; break;
+				}
+			}
+
+			FESaltMaterialPoint* stt = el.m_State[i]->ExtractData<FESaltMaterialPoint>();
+			if (stt)
+			{
+				switch (ndata)
+				{
+					case CP: val += stt->m_ca[0]; break;
+					case JPX: val += stt->m_j[0].x; break;
+					case JPY: val += stt->m_j[0].y; break;
+					case JPZ: val += stt->m_j[0].z; break;
+					case CM: val += stt->m_ca[1]; break;
+					case JMX: val += stt->m_j[1].x; break;
+					case JMY: val += stt->m_j[1].y; break;
+					case JMZ: val += stt->m_j[1].z; break;
+					case PSI: val += stt->m_psi; break;
+					case IEX: val += stt->m_Ie.x; break;
+					case IEY: val += stt->m_Ie.y; break;
+					case IEZ: val += stt->m_Ie.z; break;
 				}
 			}
 		}

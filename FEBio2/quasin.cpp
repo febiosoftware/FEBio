@@ -112,7 +112,8 @@ void FESolidSolver::PrepStep(double time)
 		m_fem.m_mesh.Node(i).m_rp = m_fem.m_mesh.Node(i).m_rt;
 		m_fem.m_mesh.Node(i).m_vp = m_fem.m_mesh.Node(i).m_vt;
 		m_fem.m_mesh.Node(i).m_ap = m_fem.m_mesh.Node(i).m_at;
-		m_fem.m_mesh.Node(i).m_cp = m_fem.m_mesh.Node(i).m_ct;
+		for (int k=0; k<MAX_CDOFS; ++k)
+			m_fem.m_mesh.Node(i).m_cp[k] = m_fem.m_mesh.Node(i).m_ct[k];
 	}
 
 	// apply concentrated nodal forces
@@ -134,8 +135,9 @@ void FESolidSolver::PrepStep(double time)
 			int lc   = dc.lc;
 			int bc   = dc.bc;
 			double s = dc.s;
+			double r = dc.r;	// GAA
 
-			double dq = s*m_fem.GetLoadCurve(lc)->Value();
+			double dq = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
 
 			int I;
 
@@ -143,31 +145,36 @@ void FESolidSolver::PrepStep(double time)
 
 			switch (bc)
 			{
-			case 0: 
+			case DOF_X: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<neq) 
 					ui[I] = dq - (node.m_rt.x - node.m_r0.x);
 				break;
-			case 1: 
+			case DOF_Y: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<neq) 
 					ui[I] = dq - (node.m_rt.y - node.m_r0.y); 
 				break;
-			case 2: 
+			case DOF_Z: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<neq) 
 					ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
 				break;
 			// ---> TODO: move to the FEPoroSolidSolver
-			case 6: 
+			case DOF_P: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<neq) 
 					ui[I] = dq - node.m_pt; 
 				break;
-			case 11: 
+			case DOF_C: 
 				I = -node.m_ID[bc]-2;
 				if (I>=0 && I<neq) 
-					ui[I] = dq - node.m_ct; 
+					ui[I] = dq - node.m_ct[0]; 
+				break;
+			case DOF_C+1: 
+				I = -node.m_ID[bc]-2;
+				if (I>=0 && I<neq) 
+					ui[I] = dq - node.m_ct[1]; 
 				break;
 			// --->
 			case 20:

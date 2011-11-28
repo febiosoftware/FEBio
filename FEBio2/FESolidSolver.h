@@ -60,6 +60,9 @@ public:
 
 		//! Update solute data
 		void UpdateSolute(vector<double>& ui);
+
+		//! Update triphasic data
+		void UpdateTriphasic(vector<double>& ui);
 		// --->
 
 		//! Update rigid body data
@@ -115,7 +118,7 @@ public:
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
 	int		m_npeq;			//!< number of equations related to pressure dofs
-	int		m_nceq;			//!< number of equations related to concentration dofs
+	int		m_nceq[MAX_CDOFS];	//!< number of equations related to concentration dofs
 
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector

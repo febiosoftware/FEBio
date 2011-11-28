@@ -35,6 +35,6 @@ public:
 	vector<double>	m_Pi;	//!< Total pressure vector for iteration
 
 	// solute data
-	vector<double>	m_ci;	//!< concentration increment vector
-	vector<double>	m_Ci;	//!< Total concentration vector for iteration
+	vector<double>	m_ci[MAX_CDOFS];	//!< concentration increment vector
+	vector<double>	m_Ci[MAX_CDOFS];	//!< Total concentration vector for iteration
 };

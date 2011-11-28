@@ -23,6 +23,8 @@ public:
 	int		node;	// node number
 	int		bc;		// dof
 	int		lc;		// load curve
+	double	r;		// initial value // GAA
+	bool	br;		// flag for relative bc
 };
 
 //-----------------------------------------------------------------------------

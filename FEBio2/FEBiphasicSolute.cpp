@@ -1,4 +1,4 @@
-// FESolutePoroElastic.cpp: implementation of the FESolutePoroElastic class.
+// FEBiphasicSolute.cpp: implementation of the FEBiphasicSolute class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -9,12 +9,12 @@
 // register the material with the framework
 REGISTER_MATERIAL(FEBiphasicSolute, "biphasic-solute");
 
-// Material parameters for the FESolutePoroElastic material
+// Material parameters for the FEBiphasicSolute material
 BEGIN_PARAMETER_LIST(FEBiphasicSolute, FEMaterial)
 	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 	ADD_PARAMETER(m_rhoTw, FE_PARAM_DOUBLE, "fluid_density");
 	ADD_PARAMETER(m_rhoTu, FE_PARAM_DOUBLE, "solute_density");
-	ADD_PARAMETER(m_Mu, FE_PARAM_DOUBLE, "solute_molecular_weight");
+	ADD_PARAMETER(m_Mu, FE_PARAM_DOUBLE, "solute_molar_mass");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ void FEBiphasicSolute::Init()
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	if (m_rhoTu < 0) throw MaterialError("solute_density must be positive");
-	if (m_Mu < 0) throw MaterialError("solute_molecular_weight must be positive");
+	if (m_Mu < 0) throw MaterialError("solute_molar_mass must be positive");
 	
 	m_Rgas = FEM::GetGlobalConstant("R");
 	m_Tabs = FEM::GetGlobalConstant("T");

@@ -8,6 +8,7 @@
 #include "FEUncoupledElasticMixture.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
 #include <map>
 #include <string>
 using namespace std;
@@ -67,10 +68,11 @@ public:
 protected:
 	FESolver* BuildSolver(int nmod, FEM& fem);
 
-	bool ParseCommonParams(XMLTag& tag);
-	bool ParseSolidParams (XMLTag& tag);
-	bool ParsePoroParams  (XMLTag& tag);
-	bool ParseSoluteParams(XMLTag& tag);
+	bool ParseCommonParams	 (XMLTag& tag);
+	bool ParseSolidParams	 (XMLTag& tag);
+	bool ParsePoroParams	 (XMLTag& tag);
+	bool ParseSoluteParams	 (XMLTag& tag);
+	bool ParseTriphasicParams(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
@@ -90,6 +92,8 @@ protected:
 	bool ParseUncoupledElasticMixture	(XMLTag& tag, FEUncoupledElasticMixture* pm);
 	bool ParseBiphasicMaterial			(XMLTag& tag, FEBiphasic* pm);
 	bool ParseBiphasicSoluteMaterial	(XMLTag& tag, FEBiphasicSolute* pm);
+	bool ParseSoluteMaterial			(XMLTag& tag, FESolute* pm);
+	bool ParseTriphasicMaterial			(XMLTag& tag, FETriphasic* pm);
 	bool ParseNestedMaterial			(XMLTag& tag, FENestedMaterial* pm);
 
 protected:

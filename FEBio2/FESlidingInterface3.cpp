@@ -612,7 +612,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 		// get the nodal concentrations
 		if (ssolu)
 		{
-			for (int j=0; j<ne; ++j) cs[j] = mesh.Node(el.m_node[j]).m_ct;
+			for (int j=0; j<ne; ++j) cs[j] = mesh.Node(el.m_node[j]).m_ct[0];
 		}
 		
 		for (int j=0; j<nint; ++j, ++n)
@@ -685,7 +685,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 					}
 					if (ssolu && msolu) {
 						double cm[4];
-						for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).m_ct;
+						for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).m_ct[0];
 						double c2 = pme->eval(cm, rs[0], rs[1]);
 						ss.m_cg[n] = c1 - c2;
 					}
@@ -1168,7 +1168,7 @@ void FESlidingInterface3::ContactStiffness()
 			for (j=0; j<4; ++j)
 			{
 				pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
-				cn[j] = ss.GetMesh()->Node(se.m_node[j]).m_ct;
+				cn[j] = ss.GetMesh()->Node(se.m_node[j]).m_ct[0];
 			}
 			
 			// get the element's LM vector
@@ -1224,7 +1224,7 @@ void FESlidingInterface3::ContactStiffness()
 					for (k=0; k<nmeln; ++k) 
 					{
 						pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
-						cm[k] = ms.GetMesh()->Node(me.m_node[k]).m_ct;
+						cm[k] = ms.GetMesh()->Node(me.m_node[k]).m_ct[0];
 					}
 					
 					// get the element's LM vector
@@ -2027,7 +2027,7 @@ void FESlidingInterface3::SetAmbient()
 				{
 					FENode& node = s.Node(i);
 					// set the fluid pressure to ambient condition
-					node.m_ct = m_ambc;
+					node.m_ct[0] = m_ambc;
 				}
 			}
 		}

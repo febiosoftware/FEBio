@@ -18,7 +18,9 @@
 //-----------------------------------------------------------------------------
 // Max nr of nodal degrees of freedom
 
-#define MAX_NDOFS	12
+#define MAX_CDOFS	2
+//#define MAX_NDOFS	11+MAX_CDOFS
+#define MAX_NDOFS	13
 
 // At this point the nodal dofs are used as follows:
 //
@@ -37,8 +39,7 @@
 //
 // The rotational degrees of freedom are only used for rigid nodes and shells.
 // The fluid pressure is only used for poroelastic problems.
-// The rigid rotational degrees of freedom are only used for rigid nodes
-// and only during the creation of the stiffenss matrix
+// The rigid rotational degrees of freedom are only used for rigid nodes and only during the creation of the stiffness matrix
 // The temperature is only used during heat-conduction problems
 // The solute concentration is only used in solute transport problems.
 

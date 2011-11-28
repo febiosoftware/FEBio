@@ -73,7 +73,7 @@ struct FE_BOUNDING_BOX
 class FENode
 {
 public:
-	FENode() : m_p0(0), m_c0(0) {}
+	FENode() : m_p0(0) { for (int k=0; k<MAX_CDOFS; ++k) m_c0[k] = 0.; }
 	
 	// geometry data
 	vec3d	m_r0;	//!< initial position
@@ -101,9 +101,9 @@ public:
 	double	m_T;	//!< temperature
 
 	// solute-data
-	double	m_c0;	//!< initial effective concentration
-	double	m_ct;	//!< current effective concentration
-	double	m_cp;	//!< effective concentration at previous time step
+	double	m_c0[MAX_CDOFS];	//!< initial effective concentration
+	double	m_ct[MAX_CDOFS];	//!< current effective concentration
+	double	m_cp[MAX_CDOFS];	//!< effective concentration at previous time step
 	
 	// rigid body data
 	int		m_rid;	//!< rigid body number
