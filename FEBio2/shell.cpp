@@ -86,7 +86,7 @@ void FEElasticShellDomain::InitElements()
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::Serialize(DumpFile &ar)
 {
-	FEM& fem = dynamic_cast<FEM&>(*ar.GetFEM());
+	FEM& fem = dynamic_cast<FEM&>(*ar.GetFEModel());
 	if (ar.IsSaving())
 	{
 		for (size_t i=0; i<m_Elem.size(); ++i)

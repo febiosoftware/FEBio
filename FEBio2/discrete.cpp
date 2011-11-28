@@ -27,7 +27,7 @@ void FEDiscreteSpringDomain::Serialize(DumpFile& ar)
 	}
 	else
 	{
-		FEM& fem = dynamic_cast<FEM&>(*ar.GetFEM());
+		FEM& fem = dynamic_cast<FEM&>(*ar.GetFEModel());
 		ar >> m_Node;
 		int n, mat;
 		for (size_t i=0; i<m_Elem.size(); ++i)

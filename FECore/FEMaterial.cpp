@@ -138,7 +138,7 @@ void FEElasticMaterial::Serialize(DumpFile& ar)
 		if (m_pmap) delete m_pmap;
 		m_pmap = 0;
 		assert(ntype != -1);
-		FEMesh& mesh = ar.GetFEM()->GetMesh();
+		FEMesh& mesh = ar.GetFEModel()->GetMesh();
 		switch (ntype)
 		{
 		case FE_MAP_NONE  : m_pmap = 0; break;

@@ -55,12 +55,12 @@ void FESolute::Serialize(DumpFile& ar)
 		
 		char sz[256] = {0};
 		ar >> sz;
-		m_pDiff = dynamic_cast<FESoluteDiffusivity*>(febio.Create<FEMaterial>(sz, ar.GetFEM()));
+		m_pDiff = dynamic_cast<FESoluteDiffusivity*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pDiff); m_pDiff->Serialize(ar);
 		m_pDiff->Init();
 		
 		ar >> sz;
-		m_pSolub = dynamic_cast<FESoluteSolubility*>(febio.Create<FEMaterial>(sz, ar.GetFEM()));
+		m_pSolub = dynamic_cast<FESoluteSolubility*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pSolub); m_pSolub->Serialize(ar);
 		m_pSolub->Init();
 		

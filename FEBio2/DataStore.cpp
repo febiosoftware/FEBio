@@ -80,7 +80,7 @@ void DataStore::Serialize(DumpFile &ar)
 	}
 	else
 	{
-		FEM* pfem = dynamic_cast<FEM*>(ar.GetFEM());
+		FEM* pfem = dynamic_cast<FEM*>(ar.GetFEModel());
 
 		int ndr;
 		Clear();

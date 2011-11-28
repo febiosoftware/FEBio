@@ -136,7 +136,7 @@ public:
 	}
 
 	//! get FEM model
-	FEModel* GetFEM() { return m_pfem; }
+	FEModel* GetFEModel() { return m_pfem; }
 
 protected:
 	FILE*		m_fp;		//!< The actual file pointer

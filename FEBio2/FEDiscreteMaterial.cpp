@@ -94,6 +94,6 @@ void FENonLinearSpring::Serialize(DumpFile& ar)
 	else
 	{
 		ar >> m_F >> m_nlc;
-		m_plc = ar.GetFEM()->GetLoadCurve(m_nlc);
+		m_plc = ar.GetFEModel()->GetLoadCurve(m_nlc);
 	}
 }

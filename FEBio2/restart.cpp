@@ -248,7 +248,7 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 	else
 	{
 		m_Step.clear();
-		FEM* pfem = dynamic_cast<FEM*>(ar.GetFEM());
+		FEM* pfem = dynamic_cast<FEM*>(ar.GetFEModel());
 
 		// analysis steps
 		int nsteps;
