@@ -74,10 +74,9 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-
 class NodeDataRecord : public DataRecord
 {
-	enum { X, Y, Z, UX, UY, UZ, VX, VY, VZ, RX, RY, RZ, P, C, CP, CM };
+	enum { X, Y, Z, UX, UY, UZ, VX, VY, VZ, RX, RY, RZ, P, C, C1, C2 };
 
 public:
 	NodeDataRecord(FEM* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
@@ -87,6 +86,7 @@ public:
 	void SetItemList(FENodeSet* pns);
 };
 
+//-----------------------------------------------------------------------------
 class ElementDataRecord : public DataRecord
 {
 	enum {X, Y, Z, J, 
@@ -96,7 +96,7 @@ class ElementDataRecord : public DataRecord
 		S1, S2, S3,
 		FX, FY, FZ, FYZ, FZX, FXY, FYX, FXZ, FZY, 
 		P, WX, WY, WZ, C, JX, JY, JZ,
-		CP, JPX, JPY, JPZ, CM, JMX, JMY, JMZ,
+		C1, J1X, J1Y, J1Z, C2, J2X, J2Y, J2Z,
 		PSI, IEX, IEY, IEZ
 	};
 
@@ -119,6 +119,7 @@ protected:
 	vector<ELEMREF>	m_ELT;
 };
 
+//-----------------------------------------------------------------------------
 class RigidBodyDataRecord : public DataRecord
 {
 	enum {X, Y, Z, QX, QY, QZ, QW, FX, FY, FZ, MX, MY, MZ};
@@ -131,7 +132,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
 class DataStore  
 {
 public:
