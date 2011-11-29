@@ -84,6 +84,10 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 		lm[7*N + 3*i+2] = -1;
 
 		lm[10*N + i] = id[10];
+
+		// concentration dofs
+		for (int k=0; k<MAX_CDOFS; ++k)
+			lm[(11+k)*N + i] = id[11+k];
 	}
 }
 
