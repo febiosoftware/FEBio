@@ -5,6 +5,7 @@
 #include "BC.h"
 #include "FEBodyForce.h"
 #include "FEElasticMaterial.h"		// TODO: I want to delete this
+#include "FEAnalysis.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -67,10 +68,24 @@ public: // body force functions
 	//! see if there are any body forces
 	bool HasBodyForces() { return !m_BF.empty();}
 
+public: // analysis step functions
+	//! retrieve the number of steps
+	int Steps() { return (int) m_Step.size(); }
+
+	//! clear the steps
+	void ClearSteps() { m_Step.clear(); }
+
+	//! Add an analysis step
+	void AddStep(FEAnalysis* pstep) { m_Step.push_back(pstep); }
+
+	//! Get a particular step
+	FEAnalysis* GetStep(int i) { return m_Step[i]; }
+
 protected:
 	std::vector<FELoadCurve*>	m_LC;	//!< load curve data
 	std::vector<FEMaterial*>	m_MAT;	//!< array of materials
 	std::vector<FEBodyForce*>	m_BF;	//!< body force data
+	std::vector<FEAnalysis*>	m_Step;	//!< array of analysis steps
 
 public:
 	// Geometry data

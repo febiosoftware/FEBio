@@ -44,7 +44,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	m_pdia = 0;
 
 	FEAnalysisStep* pstep = new FEAnalysisStep(fem);
-	fem.m_Step.push_back(pstep);
+	fem.AddStep(pstep);
 	fem.m_nStep = 0;
 	fem.m_pStep = pstep;
 	m_pStep = pstep;

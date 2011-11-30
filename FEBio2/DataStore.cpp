@@ -9,6 +9,7 @@
 #include "FESolidSolver.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
+#include "FEAnalysisStep.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

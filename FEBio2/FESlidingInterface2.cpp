@@ -3,6 +3,7 @@
 #include "FESlidingInterface2.h"
 #include "FESolidSolver.h"
 #include "FEBiphasic.h"
+#include "FEAnalysisStep.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

@@ -9,6 +9,7 @@
 #include "FECore/FENNQuery.h"
 #include "log.h"
 #include "FEElasticShellDomain.h"
+#include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

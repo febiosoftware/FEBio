@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FESolver.h"
 #include "log.h"
+#include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FEParamContainer);

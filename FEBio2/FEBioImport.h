@@ -9,6 +9,7 @@
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
+#include "FEAnalysisStep.h"
 #include <map>
 #include <string>
 using namespace std;

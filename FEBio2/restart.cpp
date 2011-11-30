@@ -22,6 +22,7 @@
 #include "FEPoroTraction.h"
 #include "FESoluteFlux.h"
 #include "FEHeatFlux.h"
+#include "FEAnalysisStep.h"
 
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"

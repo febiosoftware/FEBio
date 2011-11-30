@@ -2,6 +2,7 @@
 #include "FETriphasicSolver.h"
 #include "FETriphasicDomain.h"
 #include "Interrupt.h"
+#include "FEAnalysisStep.h"
 #include "log.h"
 
 #ifdef WIN32

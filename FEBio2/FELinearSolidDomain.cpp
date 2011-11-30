@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FELinearSolidDomain.h"
 #include "FELinearSolidSolver.h"
+#include "FEAnalysisStep.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------

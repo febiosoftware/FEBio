@@ -3,6 +3,7 @@
 #include "FESolver.h"
 #include "FEBioLib/FERigid.h"
 #include "FESolidSolver.h"
+#include "FEAnalysisStep.h"
 #include "log.h"
 #include "Interrupt.h"
 

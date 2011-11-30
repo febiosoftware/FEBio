@@ -7,6 +7,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "FECore/FENNQuery.h"
+#include "FEAnalysisStep.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

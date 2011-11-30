@@ -6,6 +6,7 @@
 #include "FECore/FEException.h"
 #include "FECore/FECore.h"
 #include "FEBioLib/CompactMatrix.h"
+#include "FEAnalysisStep.h"
 #include "FESolver.h"
 
 //-----------------------------------------------------------------------------

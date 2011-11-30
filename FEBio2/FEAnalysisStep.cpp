@@ -371,7 +371,7 @@ bool FEAnalysisStep::Solve()
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
 
-	int nsteps = m_fem.m_Step.size();
+	int nsteps = m_fem.Steps();
 
 	bool bdebug = m_fem.GetDebugFlag();
 

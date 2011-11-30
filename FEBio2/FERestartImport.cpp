@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FERestartImport.h"
 #include "FESolver.h"
+#include "FEAnalysisStep.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

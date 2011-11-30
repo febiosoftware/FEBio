@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEElasticSolidDomain.h"
 #include "FESolidSolver.h"
+#include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)

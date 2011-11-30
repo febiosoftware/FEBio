@@ -80,10 +80,10 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	m_pfem = &fem;
 
 	// Create one step
-	if (fem.m_Step.empty())
+	if (fem.Steps() == 0)
 	{
 		FEAnalysisStep* pstep = new FEAnalysisStep(fem);
-		fem.m_Step.push_back(pstep);
+		fem.AddStep(pstep);
 		fem.m_nStep = 0;
 		fem.m_pStep = pstep;
 	}
@@ -92,9 +92,9 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// get a pointer to the first step
 	// since we assume that the FEM object will always have
 	// at least one step defined
-	int nsteps = fem.m_Step.size();
+	int nsteps = fem.Steps();
 	assert(nsteps > 0);
-	m_pStep = fem.m_Step[nsteps-1];
+	m_pStep = fem.GetStep(nsteps-1);
 	m_nsteps = 0; // reset step section counter
 	m_nversion = -1;
 
@@ -5257,7 +5257,7 @@ void FEBioStepSection::Parse(XMLTag& tag)
 		assert(m_pim->m_pStep);
 		int nmod = m_pim->m_pStep->m_nModule;
 		m_pim->m_pStep = new FEAnalysisStep(*m_pim->m_pfem);
-		m_pim->m_pfem->m_Step.push_back(m_pim->m_pStep);
+		m_pim->m_pfem->AddStep(m_pim->m_pStep);
 		m_pim->m_pStep->m_nModule = nmod;
 	}
 

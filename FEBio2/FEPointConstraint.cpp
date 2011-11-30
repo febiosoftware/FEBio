@@ -2,6 +2,7 @@
 #include "FEPointConstraint.h"
 #include "fem.h"
 #include "FESolidSolver.h"
+#include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
 FEPointConstraint::FEPointConstraint(FEM* pfem)

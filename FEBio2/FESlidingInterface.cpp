@@ -8,6 +8,7 @@
 #include "FESolidSolver.h"
 #include "log.h"
 #include "FEElasticShellDomain.h"
+#include "FEAnalysisStep.h"
 #include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------

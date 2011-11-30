@@ -2,6 +2,7 @@
 #include "FEFacet2FacetSliding.h"
 #include "fem.h"
 #include "FESolidSolver.h"
+#include "FEAnalysisStep.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
