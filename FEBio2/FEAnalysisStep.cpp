@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEAnalysis.h"
+#include "FEAnalysisStep.h"
 #include "fem.h"
 #include "console.h"
 #include "FEBioLib/FERigid.h"
@@ -17,7 +17,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
+FEAnalysisStep::FEAnalysisStep(FEM& fem) : m_fem(fem)
 {
 	// --- Analysis data ---
 	m_nModule = FE_SOLID;		// solid-mechanics problem
@@ -57,13 +57,13 @@ FEAnalysis::FEAnalysis(FEM& fem) : m_fem(fem)
 }
 
 //-----------------------------------------------------------------------------
-FEAnalysis::~FEAnalysis(void)
+FEAnalysisStep::~FEAnalysisStep(void)
 {
 }
 
 //-----------------------------------------------------------------------------
 
-void FEAnalysis::Finish()
+void FEAnalysisStep::Finish()
 {
 	// deactivate the boundary conditions
 	for (size_t i=0; i<m_BC.size(); ++i) m_BC[i]->Deactivate();
@@ -73,7 +73,10 @@ void FEAnalysis::Finish()
 }
 
 //-----------------------------------------------------------------------------
-bool FEAnalysis::Init()
+//! This function is called before the analysis is solved and initializes all
+//! analysis data, such as determine active boundary conditions, initializes
+//! equation numbers (the latter is actually done by the FESolver class).
+bool FEAnalysisStep::Init()
 {
 	int i, j, n;
 
@@ -87,6 +90,7 @@ bool FEAnalysis::Init()
 	m_tend = m_fem.m_ftime0 + Dt;
 
 	// If no must point is defined, we create one
+	// that has two points, the start point and the end point
 	if (m_nmplc < 0)
 	{
 		FELoadCurve* plc = new FELoadCurve();
@@ -222,6 +226,7 @@ bool FEAnalysis::Init()
 
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
 	// Make sure that a prescribed dof has not been fixed
+	// TODO: maybe this can be moved to the FESolver::InitEquations function
 	int ndis = m_fem.m_DC.size();
 	for (i=0; i<ndis; ++i)
 	{
@@ -342,7 +347,7 @@ bool FEAnalysis::Init()
 }
 
 //-----------------------------------------------------------------------------
-bool FEAnalysis::Solve()
+bool FEAnalysisStep::Solve()
 {
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)
@@ -622,7 +627,7 @@ bool FEAnalysis::Solve()
 }
 
 //-----------------------------------------------------------------------------
-void FEAnalysis::Serialize(DumpFile& ar)
+void FEAnalysisStep::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -724,7 +729,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		case FE_LINEAR_SOLID: m_psolver = new FELinearSolidSolver     (m_fem); break;
 		case FE_HEAT_SOLID  : m_psolver = new FECoupledHeatSolidSolver(m_fem); break;
 		default:
-			throw "Unknown module type in FEAnalysis::Serialize";
+			throw "Unknown module type in FEAnalysisStep::Serialize";
 		}
 	}
 
@@ -735,7 +740,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 //! Restores data for a running restart
 
-void FEAnalysis::Retry()
+void FEAnalysisStep::Retry()
 {
 	clog.printf("Retrying time step. Retry attempt %d of max %d\n\n", m_nretries+1, m_maxretries);
 
@@ -761,7 +766,7 @@ void FEAnalysis::Retry()
 //! m_fem.m_iteopt iterations the step size is increased, else it
 //! is decreased.
 
-void FEAnalysis::AutoTimeStep(int niter)
+void FEAnalysisStep::AutoTimeStep(int niter)
 {
 	double dtn = m_dt;
 	double told = m_fem.m_ftime;

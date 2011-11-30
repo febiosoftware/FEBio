@@ -111,7 +111,7 @@ void echo_input(FEM& fem)
 	}
 
 	// get the analysis step
-	FEAnalysis& step = *fem.m_pStep;
+	FEAnalysisStep& step = *fem.m_pStep;
 
 	// get the FE mesh
 	FEMesh& mesh = fem.m_mesh;

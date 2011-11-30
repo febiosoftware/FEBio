@@ -293,7 +293,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEAnalysis.cpp"
+				RelativePath="..\..\FEBio2\FEAnalysisStep.cpp"
 				>
 			</File>
 			<File
@@ -935,7 +935,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEAnalysis.h"
+				RelativePath="..\..\FEBio2\FEAnalysisStep.h"
 				>
 			</File>
 			<File

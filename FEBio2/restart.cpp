@@ -255,7 +255,7 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		ar >> nsteps;
 		for (int i=0; i<nsteps; ++i)
 		{
-			FEAnalysis* pstep = new FEAnalysis(*this);
+			FEAnalysisStep* pstep = new FEAnalysisStep(*this);
 			pstep->Serialize(ar);
 			m_Step.push_back(pstep);
 		}

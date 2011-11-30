@@ -11,7 +11,7 @@
 #include "FERigidBody.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
-#include "FEAnalysis.h"
+#include "FEAnalysisStep.h"
 #include "FELinearConstraint.h"
 #include "FEAugLagLinearConstraint.h"
 #include "Timer.h"
@@ -196,9 +196,9 @@ public:
 public:
 	// --- Analysis Data ---
 	//{
-		vector<FEAnalysis*>		m_Step;		//!< array of analysis steps
+		vector<FEAnalysisStep*>		m_Step;		//!< array of analysis steps
 		int						m_nStep;	//!< current analysis step
-		FEAnalysis*				m_pStep;	//!< pointer to current analysis step
+		FEAnalysisStep*				m_pStep;	//!< pointer to current analysis step
 		double					m_ftime;	//!< current time value
 		double					m_ftime0;	//!< start time of current step
 		bool	m_bsym_poro;		//!< symmetric (old) poro-elastic flag

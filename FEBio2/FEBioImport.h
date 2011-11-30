@@ -25,7 +25,7 @@ public:
 	virtual void Parse(XMLTag& tag) = 0;
 
 	FEM* GetFEM();
-	FEAnalysis* GetStep();
+	FEAnalysisStep* GetStep();
 
 protected:
 	FEFEBioImport*	m_pim;
@@ -288,7 +288,7 @@ public:
 	bool Load(FEM& fem, const char* szfile);
 
 	FEM* GetFEM() { return m_pfem; }
-	FEAnalysis*	GetStep() { return m_pStep; }
+	FEAnalysisStep*	GetStep() { return m_pStep; }
 
 	int Version() { return m_nversion; }
 
@@ -301,7 +301,7 @@ protected:
 
 public:
 	FEM*		m_pfem;		//!< pointer to the fem class
-	FEAnalysis*	m_pStep;	//!< pointer to current analysis step
+	FEAnalysisStep*	m_pStep;	//!< pointer to current analysis step
 
 public:
 	int	m_ntet4;	// tetrahedral integration rule

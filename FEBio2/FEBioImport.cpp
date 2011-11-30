@@ -48,7 +48,7 @@ using namespace FECore;
 
 //-----------------------------------------------------------------------------
 FEM* FEBioFileSection::GetFEM() { return m_pim->GetFEM(); }
-FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
+FEAnalysisStep* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 
 //-----------------------------------------------------------------------------
 FEBioFileSectionMap::~FEBioFileSectionMap()
@@ -82,7 +82,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// Create one step
 	if (fem.m_Step.empty())
 	{
-		FEAnalysis* pstep = new FEAnalysis(fem);
+		FEAnalysisStep* pstep = new FEAnalysisStep(fem);
 		fem.m_Step.push_back(pstep);
 		fem.m_nStep = 0;
 		fem.m_pStep = pstep;
@@ -404,7 +404,7 @@ void FEBioImportSection::Parse(XMLTag &tag)
 void FEBioModuleSection::Parse(XMLTag &tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pstep = GetStep();
+	FEAnalysisStep* pstep = GetStep();
 
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
@@ -445,7 +445,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
 void FEBioControlSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pstep = GetStep();
+	FEAnalysisStep* pstep = GetStep();
 
 	// make sure we have a solver defined
 	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(pstep->m_nModule, fem);
@@ -493,7 +493,7 @@ void FEBioControlSection::Parse(XMLTag& tag)
 bool FEBioControlSection::ParseSolidParams(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pstep = GetStep();
+	FEAnalysisStep* pstep = GetStep();
 
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	assert(ps);
@@ -512,7 +512,7 @@ bool FEBioControlSection::ParseSolidParams(XMLTag& tag)
 bool FEBioControlSection::ParsePoroParams(XMLTag &tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pstep = GetStep();
+	FEAnalysisStep* pstep = GetStep();
 
 	FEPoroSolidSolver* pps = dynamic_cast<FEPoroSolidSolver*>(pstep->m_psolver);
 	assert(pps);
@@ -529,7 +529,7 @@ bool FEBioControlSection::ParsePoroParams(XMLTag &tag)
 bool FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pstep = GetStep();
+	FEAnalysisStep* pstep = GetStep();
 
 	FEPoroSoluteSolver* pps = dynamic_cast<FEPoroSoluteSolver*>(pstep->m_psolver);
 	assert(pps);
@@ -545,7 +545,7 @@ bool FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pstep = GetStep();
+	FEAnalysisStep* pstep = GetStep();
 	char sztitle[256];
 
 	if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }
@@ -1059,7 +1059,7 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pStep = GetStep();
+	FEAnalysisStep* pStep = GetStep();
 
 	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
 	else if (tag == "parent_id") { tag.value(pm->m_pmid); return true; }
@@ -4747,7 +4747,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 void FEBioLoadSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pstep = m_pim->GetStep();
+	FEAnalysisStep* pstep = m_pim->GetStep();
 	int nmplc = pstep->m_nmplc;
 
 	++tag;
@@ -5081,7 +5081,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysis* pStep = GetStep();
+	FEAnalysisStep* pStep = GetStep();
 
 	const char* szm = tag.AttributeValue("mat");
 	assert(szm);
@@ -5247,13 +5247,13 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	// We assume that the FEM object will already have at least one step
 	// defined. Therefor the first time we find a "step" section we
 	// do not create a new step. If more steps are required
-	// we need to create new FEAnalysis steps and add them to fem
+	// we need to create new FEAnalysisStep steps and add them to fem
 	if (m_pim->m_nsteps != 0)
 	{
 		// copy the module ID
 		assert(m_pim->m_pStep);
 		int nmod = m_pim->m_pStep->m_nModule;
-		m_pim->m_pStep = new FEAnalysis(*m_pim->m_pfem);
+		m_pim->m_pStep = new FEAnalysisStep(*m_pim->m_pfem);
 		m_pim->m_pfem->m_Step.push_back(m_pim->m_pStep);
 		m_pim->m_pStep->m_nModule = nmod;
 	}

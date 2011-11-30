@@ -26,7 +26,7 @@ bool solve(FEM& fem, const char* szfile)
 //-----------------------------------------------------------------------------
 //! This is the main solve method. This function loops over all analysis steps
 //! and solves each one in turn. 
-//! \sa FEAnalysis
+//! \sa FEAnalysisStep
 
 bool FEM::Solve()
 {

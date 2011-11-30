@@ -10,28 +10,16 @@ class FEM;
 class FESolver;
 
 //-----------------------------------------------------------------------------
-//! The FEAnalysis contains the data that describes a complete, single analysis.
+//! The FEAnalysisStep contains the data that describes a complete, single analysis.
 
-class FEAnalysis
+class FEAnalysisStep
 {
 public:
 	//! constructor
-	FEAnalysis(FEM& fem);
+	FEAnalysisStep(FEM& fem);
 
 	//! descructor
-	virtual ~FEAnalysis(void);
-
-	//! sets the plot level
-	void SetPlotLevel(int n) { m_nplot = n; }
-
-	//! get the plot level
-	int GetPlotLevel() { return m_nplot; }
-
-	//! Sets the print level
-	void SetPrintLevel(int n) { m_nprint = n; }
-
-	//! get the print level
-	int GetPrintLevel() { return m_nprint; }
+	virtual ~FEAnalysisStep(void);
 
 	//! initialize step
 	bool Init();
@@ -47,6 +35,19 @@ public:
 
 	//! add a boundary condition to the analysis
 	void AddBoundaryCondition(FEBoundaryCondition* pbc) { m_BC.push_back(pbc); }
+
+public:
+	//! sets the plot level
+	void SetPlotLevel(int n) { m_nplot = n; }
+
+	//! get the plot level
+	int GetPlotLevel() { return m_nplot; }
+
+	//! Sets the print level
+	void SetPrintLevel(int n) { m_nprint = n; }
+
+	//! get the print level
+	int GetPrintLevel() { return m_nprint; }
 
 protected:
 	//! Do a running restart
