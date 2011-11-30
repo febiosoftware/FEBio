@@ -23,8 +23,8 @@
 #include "FESlidingInterface3.h"
 #include "FETiedInterface.h"
 #include "FERigidWallInterface.h"
-#include "FEPoroSolidSolver.h"
-#include "FEPoroSoluteSolver.h"
+#include "FEBiphasicSolver.h"
+#include "FEBiphasicSoluteSolver.h"
 #include "FECoupledHeatSolidSolver.h"
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -413,7 +413,8 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 
 	if      (strcmp(szt, "solid"       ) == 0) pstep->m_nModule = FE_SOLID;
 	else if (strcmp(szt, "linear solid") == 0) pstep->m_nModule = FE_LINEAR_SOLID; 
-	else if (strcmp(szt, "poro"        ) == 0) pstep->m_nModule = FE_POROELASTIC;
+	else if (strcmp(szt, "poro"        ) == 0) pstep->m_nModule = FE_BIPHASIC;		// obsolete in 2.0
+	else if (strcmp(szt, "biphasic"    ) == 0) pstep->m_nModule = FE_BIPHASIC;
 	else if (strcmp(szt, "solute"      ) == 0) pstep->m_nModule = FE_POROSOLUTE;
 	else if (strcmp(szt, "heat"        ) == 0) pstep->m_nModule = FE_HEAT;
 	else if (strcmp(szt, "heat-solid"  ) == 0) pstep->m_nModule = FE_HEAT_SOLID;
@@ -431,8 +432,8 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
 	switch (nmod)
 	{
 	case FE_SOLID       : return new FESolidSolver(fem);
-	case FE_POROELASTIC : return new FEPoroSolidSolver(fem);
-	case FE_POROSOLUTE  : return new FEPoroSoluteSolver(fem);
+	case FE_BIPHASIC : return new FEBiphasicSolver(fem);
+	case FE_POROSOLUTE  : return new FEBiphasicSoluteSolver(fem);
 	case FE_HEAT        : return new FEHeatSolver(fem);
 	case FE_LINEAR_SOLID: return new FELinearSolidSolver(fem);
 	case FE_HEAT_SOLID  : return new FECoupledHeatSolidSolver(fem);
@@ -461,11 +462,11 @@ void FEBioControlSection::Parse(XMLTag& tag)
 			{
 				if (ParseSolidParams(tag) == false)
 				{
-					if (dynamic_cast<FEPoroSolidSolver*>(pstep->m_psolver))
+					if (dynamic_cast<FEBiphasicSolver*>(pstep->m_psolver))
 					{
 						if (ParsePoroParams(tag) == false)
 						{
-							if (dynamic_cast<FEPoroSoluteSolver*>(pstep->m_psolver))
+							if (dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver))
 							{
 								if (ParseSoluteParams(tag) == false) throw XMLReader::InvalidTag(tag);
 							}
@@ -514,7 +515,7 @@ bool FEBioControlSection::ParsePoroParams(XMLTag &tag)
 	FEM& fem = *GetFEM();
 	FEAnalysisStep* pstep = GetStep();
 
-	FEPoroSolidSolver* pps = dynamic_cast<FEPoroSolidSolver*>(pstep->m_psolver);
+	FEBiphasicSolver* pps = dynamic_cast<FEBiphasicSolver*>(pstep->m_psolver);
 	assert(pps);
 
 	if      (tag == "ptol"              ) tag.value(pps->m_Ptol);
@@ -531,7 +532,7 @@ bool FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 	FEM& fem = *GetFEM();
 	FEAnalysisStep* pstep = GetStep();
 
-	FEPoroSoluteSolver* pps = dynamic_cast<FEPoroSoluteSolver*>(pstep->m_psolver);
+	FEBiphasicSoluteSolver* pps = dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver);
 	assert(pps);
 
 	if (tag == "ctol") tag.value(pps->m_Ctol);

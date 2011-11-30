@@ -54,7 +54,7 @@ public:
 		//! Update Stresses
 		void UpdateStresses();
 
-		// ---> TODO: move to the FEPoroSolidSolver
+		// ---> TODO: move to the FEBiphasicSolver
 		//! Update poroelastic data
 		void UpdatePoro(vector<double>& ui);
 

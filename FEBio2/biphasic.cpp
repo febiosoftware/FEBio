@@ -833,7 +833,7 @@ void FEBiphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matri
 
 void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert((fem.m_pStep->m_nModule == FE_POROELASTIC)
+	assert((fem.m_pStep->m_nModule == FE_BIPHASIC)
 		   || (fem.m_pStep->m_nModule == FE_POROSOLUTE)
 		   || (fem.m_pStep->m_nModule == FE_TRIPHASIC));
 	

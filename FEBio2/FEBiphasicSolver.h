@@ -4,12 +4,12 @@
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver to solve
 // biphasic problems. 
-class FEPoroSolidSolver : public FESolidSolver
+class FEBiphasicSolver : public FESolidSolver
 {
 public:
 	//! constructor
-	FEPoroSolidSolver(FEM& fem);
-	virtual ~FEPoroSolidSolver() {}
+	FEBiphasicSolver(FEM& fem);
+	virtual ~FEBiphasicSolver() {}
 
 	//! Initialize data structures
 	bool Init();

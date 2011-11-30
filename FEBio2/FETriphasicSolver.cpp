@@ -20,7 +20,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FETriphasicSolver::FETriphasicSolver(FEM& fem) : FEPoroSolidSolver(fem)
+FETriphasicSolver::FETriphasicSolver(FEM& fem) : FEBiphasicSolver(fem)
 {
 	m_Ctol = 0.01;
 }
@@ -31,7 +31,7 @@ FETriphasicSolver::FETriphasicSolver(FEM& fem) : FEPoroSolidSolver(fem)
 bool FETriphasicSolver::Init()
 {
 	// initialize base class
-	if (FEPoroSolidSolver::Init() == false) return false;
+	if (FEBiphasicSolver::Init() == false) return false;
 	
 	// allocate concentration-vectors
 	assert ((m_nceq[0] > 0) || (m_nceq[1] > 0));
@@ -63,7 +63,7 @@ void FETriphasicSolver::PrepStep(double time)
 {
 	zero(m_Ci[0]);
 	zero(m_Ci[1]);
-	FEPoroSolidSolver::PrepStep(time);
+	FEBiphasicSolver::PrepStep(time);
 }
 
 //-----------------------------------------------------------------------------
@@ -458,7 +458,7 @@ void FETriphasicSolver::GetConcentrationData(vector<double> &ci, vector<double> 
 
 void FETriphasicSolver::Serialize(DumpFile& ar)
 {
-	FEPoroSolidSolver::Serialize(ar);
+	FEBiphasicSolver::Serialize(ar);
 	
 	if (ar.IsSaving())
 	{

@@ -333,6 +333,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FEBiphasicSoluteSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEBiphasicSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEBox.cpp"
 				>
 			</File>
@@ -602,14 +610,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPointConstraint.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroSolidSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroSoluteSolver.cpp"
 				>
 			</File>
 			<File
@@ -979,6 +979,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FEBiphasicSoluteSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEBiphasicSolver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEBox.h"
 				>
 			</File>
@@ -1268,14 +1276,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPointConstraint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroSolidSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPoroSoluteSolver.h"
 				>
 			</File>
 			<File

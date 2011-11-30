@@ -64,20 +64,20 @@ bool LSDYNAPlotFile::Open(FEM& fem, const char* szfile)
 	if (m_nfield[1] == -1)
 	{
 		m_nfield[1] = PLOT_NONE;
-		if ((nmode == FE_POROELASTIC) || (ntype == FE_DYNAMIC)) m_nfield[1] = PLOT_VELOCITY;
+		if ((nmode == FE_BIPHASIC) || (ntype == FE_DYNAMIC)) m_nfield[1] = PLOT_VELOCITY;
 		else if (nmode == FE_HEAT) m_nfield[1] = PLOT_HEAT_FLUX;
 	}
 	if (m_nfield[2] == -1)
 	{
 		m_nfield[2] = PLOT_NONE;
-		if (nmode == FE_POROELASTIC) m_nfield[2] = PLOT_FLUID_FLUX;
+		if (nmode == FE_BIPHASIC) m_nfield[2] = PLOT_FLUID_FLUX;
 		else if (ntype == FE_DYNAMIC) m_nfield[2] = PLOT_ACCELERATION;
 		else if (fem.ContactInterfaces() > 0) m_nfield[2] = PLOT_CONTACT_TRACTION;
 	}
 	if (m_nfield[3] == -1)
 	{
 		m_nfield[3] = PLOT_NONE;
-		if (nmode == FE_POROELASTIC) m_nfield[3] = PLOT_FLUID_PRESSURE;
+		if (nmode == FE_BIPHASIC) m_nfield[3] = PLOT_FLUID_PRESSURE;
 		else if (nmode == FE_HEAT) m_nfield[3] = PLOT_TEMPERATURE;
 		else if (fem.ContactInterfaces() > 0) m_nfield[3] = PLOT_CONTACT_GAP;
 	}

@@ -13,8 +13,8 @@
 #include "log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
-#include "FEPoroSolidSolver.h"
-#include "FEPoroSoluteSolver.h"
+#include "FEBiphasicSolver.h"
+#include "FEBiphasicSoluteSolver.h"
 #include "FETriphasicSolver.h"
 #include <string.h>
 
@@ -134,7 +134,7 @@ void echo_input(FEM& fem)
 	switch (step.m_nModule)
 	{
 	case FE_SOLID       : szmod = "solid mechanics"; break;
-	case FE_POROELASTIC : szmod = "poroelastic"    ; break;
+	case FE_BIPHASIC : szmod = "poroelastic"    ; break;
 	case FE_HEAT        : szmod = "heat transfer"  ; break;
 	case FE_POROSOLUTE  : szmod = "biphasic-solute"; break;
 	case FE_LINEAR_SOLID: szmod = "linear solid"   ; break;
@@ -195,9 +195,9 @@ void echo_input(FEM& fem)
 		clog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
 		clog.printf("\tMinimal residual value ......................... : %lg\n", ps->m_Rmin);
 	}
-	FEPoroSolidSolver* pps = dynamic_cast<FEPoroSolidSolver*>(step.m_psolver);
+	FEBiphasicSolver* pps = dynamic_cast<FEBiphasicSolver*>(step.m_psolver);
 	if (pps) clog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
-	FEPoroSoluteSolver* pss = dynamic_cast<FEPoroSoluteSolver*>(step.m_psolver);
+	FEBiphasicSoluteSolver* pss = dynamic_cast<FEBiphasicSoluteSolver*>(step.m_psolver);
 	if (pss) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pss->m_Ctol);
 	FETriphasicSolver* pts = dynamic_cast<FETriphasicSolver*>(step.m_psolver);
 	if (pts) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pts->m_Ctol);

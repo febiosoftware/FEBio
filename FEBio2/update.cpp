@@ -136,7 +136,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	}
 
 	// update poroelastic data
-	if (m_fem.m_pStep->m_nModule == FE_POROELASTIC) UpdatePoro(ui);
+	if (m_fem.m_pStep->m_nModule == FE_BIPHASIC) UpdatePoro(ui);
 
 	// update solute-poroelastic data
 	if (m_fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
@@ -459,7 +459,7 @@ void FEM::UpdateContact()
 	// If this analysis is a poroelastic analysis that uses
 	// a biphasic contact interface, we need to make sure that
 	// the free draining dof's are processed properly
-	bool bporo = (m_pStep->m_nModule == FE_POROELASTIC) || (m_pStep->m_nModule == FE_POROSOLUTE);
+	bool bporo = (m_pStep->m_nModule == FE_BIPHASIC) || (m_pStep->m_nModule == FE_POROSOLUTE);
 	if (bporo)
 	{
 		// mark all free-draining surfaces

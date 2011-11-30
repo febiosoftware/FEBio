@@ -7,8 +7,8 @@
 #include "log.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
-#include "FEPoroSolidSolver.h"
-#include "FEPoroSoluteSolver.h"
+#include "FEBiphasicSolver.h"
+#include "FEBiphasicSoluteSolver.h"
 #include "FELinearSolidSolver.h"
 #include "FECoupledHeatSolidSolver.h"
 
@@ -723,8 +723,8 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 		switch (m_nModule)
 		{
 		case FE_SOLID       : m_psolver = new FESolidSolver           (m_fem); break;
-		case FE_POROELASTIC : m_psolver = new FEPoroSolidSolver       (m_fem); break;
-		case FE_POROSOLUTE  : m_psolver = new FEPoroSoluteSolver      (m_fem); break;
+		case FE_BIPHASIC	: m_psolver = new FEBiphasicSolver       (m_fem); break;
+		case FE_POROSOLUTE  : m_psolver = new FEBiphasicSoluteSolver      (m_fem); break;
 		case FE_HEAT        : m_psolver = new FEHeatSolver            (m_fem); break;
 		case FE_LINEAR_SOLID: m_psolver = new FELinearSolidSolver     (m_fem); break;
 		case FE_HEAT_SOLID  : m_psolver = new FECoupledHeatSolidSolver(m_fem); break;

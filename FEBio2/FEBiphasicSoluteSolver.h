@@ -1,15 +1,15 @@
 #pragma once
-#include "FEPoroSolidSolver.h"
+#include "FEBiphasicSolver.h"
 
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver to solve
 // solute problems. 
-class FEPoroSoluteSolver : public FEPoroSolidSolver
+class FEBiphasicSoluteSolver : public FEBiphasicSolver
 {
 public:
 	//! con/descructor
-	FEPoroSoluteSolver(FEM& fem);
-	virtual ~FEPoroSoluteSolver(){}
+	FEBiphasicSoluteSolver(FEM& fem);
+	virtual ~FEBiphasicSoluteSolver(){}
 
 	//! Initialize data structures
 	bool Init();

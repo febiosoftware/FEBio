@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "FEPoroSoluteSolver.h"
-#include "FEBiphasicSoluteDomain.h"
+#include "FEBiphasicSolver.h"
 #include "Interrupt.h"
 #include "log.h"
 
@@ -20,24 +19,24 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FEPoroSoluteSolver::FEPoroSoluteSolver(FEM& fem) : FEPoroSolidSolver(fem)
+FEBiphasicSolver::FEBiphasicSolver(FEM& fem) : FESolidSolver(fem)
 {
-	m_Ctol = 0.01;
+	m_Ptol = 0.01;
 }
 
 //-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures.
 //
-bool FEPoroSoluteSolver::Init()
+bool FEBiphasicSolver::Init()
 {
 	// initialize base class
-	if (FEPoroSolidSolver::Init() == false) return false;
+	if (FESolidSolver::Init() == false) return false;
 
-	// allocate concentration-vectors
-	assert (m_nceq[0] > 0);
-	m_ci[0].assign(m_nceq[0], 0);
-	m_Ci[0].assign(m_nceq[0], 0);
-	
+	// allocate poro-vectors
+	assert(m_npeq > 0);
+	m_pi.assign(m_npeq, 0);
+	m_Pi.assign(m_npeq, 0);
+
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
 	FEMesh& mesh = m_fem.m_mesh;
@@ -46,20 +45,26 @@ bool FEPoroSoluteSolver::Init()
 	{
 		FENode& node = mesh.Node(i);
 
-		// concentration dofs
-		n = node.m_ID[DOF_C]; if (n >= 0) m_Ut[n] = node.m_ct[0];
+		// pressure dofs
+		n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.m_pt;
 	}
 
 	return true;
 }
 
+
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first QN iteration. 
 //!
-void FEPoroSoluteSolver::PrepStep(double time)
+void FEBiphasicSolver::PrepStep(double time)
 {
-	zero(m_Ci[0]);
-	FEPoroSolidSolver::PrepStep(time);
+	zero(m_Pi);
+
+	// TODO: There is some more stuff in the base method that 
+	//       I need to move to this method, but since it will
+	//       change the order of some operations I need to make
+	//       sure it won't break anything
+	FESolidSolver::PrepStep(time);
 }
 
 //-----------------------------------------------------------------------------
@@ -67,7 +72,7 @@ void FEPoroSoluteSolver::PrepStep(double time)
 //! The details of this implementation of the BFGS method can be found in:
 //!   "Finite Element Procedures", K.J. Bathe, p759 and following
 //!
-bool FEPoroSoluteSolver::Quasin(double time)
+bool FEBiphasicSolver::Quasin(double time)
 {
 	int i;
 	double s;
@@ -87,11 +92,6 @@ bool FEPoroSoluteSolver::Quasin(double time)
 	double	normP;		// current pressure norm
 	double	normp;		// incremement pressure norm
 
-	// solute convergence data
-	double	normCi;	// initial concentration norm
-	double	normC;	// current concentration norm
-	double	normc;	// incremement concentration norm
-
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
@@ -99,8 +99,8 @@ bool FEPoroSoluteSolver::Quasin(double time)
 	// get the current step
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.m_pStep);
 
-	// make sure this is poro-solute problem
-	assert(pstep->m_nModule == FE_POROSOLUTE);
+	// make-sure this is a poro-elastic problem
+	assert(pstep->m_nModule == FE_BIPHASIC);
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -227,25 +227,6 @@ bool FEPoroSoluteSolver::Quasin(double time)
 			if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
 		}
 
-		// check solute convergence
-		{
-			// extract the pressure increments
-			GetConcentrationData(m_ci[0], m_bfgs.m_ui);
-			
-			// set initial norm
-			if (m_niter == 0) normCi = fabs(m_ci[0]*m_ci[0]);
-			
-			// update total pressure
-			for (i=0; i<m_nceq[0]; ++i) m_Ci[0][i] += s*m_ci[0][i];
-			
-			// calculate norms
-			normC = m_Ci[0]*m_Ci[0];
-			normc = (m_ci[0]*m_ci[0])*(s*s);
-			
-			// check convergence
-			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normC)) bconv = false;
-		}
-
 		// print convergence summary
 		oldmode = clog.GetMode();
 		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
@@ -256,12 +237,11 @@ bool FEPoroSoluteSolver::Quasin(double time)
 		clog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
-		clog.printf("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
-		clog.printf("\t residual             %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
-		clog.printf("\t energy               %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-		clog.printf("\t displacement         %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
-		clog.printf("\t fluid pressure       %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
-		clog.printf("\t solute concentration %15le %15le %15le \n", normCi, normc ,(m_Ctol*m_Ctol)*normC );
+		clog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+		clog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
+		clog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
+		clog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
+		clog.printf("\t   fluid pressure   %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
 
 		clog.SetMode(oldmode);
 
@@ -290,7 +270,6 @@ bool FEPoroSoluteSolver::Quasin(double time)
 				normEi = normE1;
 				normRi = normR1;
 				normPi = normp;
-				normCi = normc;
 				breform = true;
 			}
 			else
@@ -423,37 +402,36 @@ bool FEPoroSoluteSolver::Quasin(double time)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroSoluteSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui)
+void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 {
 	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
-	zero(ci);
+	zero(pi);
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.m_mesh.Node(i);
-		nid = n.m_ID[DOF_C];
+		nid = n.m_ID[DOF_P];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);
-			ci[m++] = ui[nid];
-			assert(m <= (int) ci.size());
+			pi[m++] = ui[nid];
+			assert(m <= (int) pi.size());
 		}
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEPoroSoluteSolver::Serialize(DumpFile& ar)
+void FEBiphasicSolver::Serialize(DumpFile& ar)
 {
-	FEPoroSolidSolver::Serialize(ar);
+	FESolidSolver::Serialize(ar);
 
 	if (ar.IsSaving())
 	{
-		ar << m_Ctol;
+		ar << m_Ptol;
 	}
 	else
 	{
-		ar >> m_Ctol;
+		ar >> m_Ptol;
 	}
 }
