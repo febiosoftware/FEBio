@@ -89,6 +89,7 @@ int FEBioCmd_Conv::run(int nargs, char **argv)
 int FEBioCmd_Debug::run(int nargs, char** argv)
 {
 	assert(m_pfem);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
 	bool bdebug = m_pfem->GetDebugFlag();
 	if (nargs == 1) bdebug = !bdebug;
 	else
@@ -98,8 +99,8 @@ int FEBioCmd_Debug::run(int nargs, char** argv)
 		else { fprintf(stderr, "%s is not a valid option for debug.\n", argv[1]); return 0; }
 	}
 	m_pfem->SetDebugFlag(bdebug);
-	if (bdebug) m_pfem->m_pStep->SetPlotLevel(FE_PLOT_MINOR_ITRS); 
-	else m_pfem->m_pStep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
+	if (bdebug) pstep->SetPlotLevel(FE_PLOT_MINOR_ITRS); 
+	else pstep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
 
 	printf("Debug mode is %s\n", (bdebug?"on":"off"));
 	return 0;
@@ -140,7 +141,8 @@ int FEBioCmd_Plot::run(int nargs, char **argv)
 int FEBioCmd_Print::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	FESolver* psolver = m_pfem->m_pStep->m_psolver;
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FESolver* psolver = pstep->m_psolver;
 
 	if (nargs > 2)
 	{
@@ -186,7 +188,8 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 int FEBioCmd_Restart::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	bool bdump = m_pfem->m_pStep->m_bDump;
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	bool bdump = pstep->m_bDump;
 
 	if (nargs == 1) bdump = !bdump;
 	else
@@ -200,7 +203,7 @@ int FEBioCmd_Restart::run(int nargs, char **argv)
 		}
 	}
 
-	m_pfem->m_pStep->m_bDump = bdump;
+	pstep->m_bDump = bdump;
 	printf("Restart flag is %s\n", (bdump?"on":"off"));
 
 	return 0;

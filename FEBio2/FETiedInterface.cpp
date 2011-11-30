@@ -376,7 +376,8 @@ void FETiedInterface::ContactForces(vector<double>& F)
 	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	
 	// loop over all slave facets
 	int ne = ss.Elements();
@@ -529,7 +530,8 @@ void FETiedInterface::ContactStiffness()
 	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = m_pfem->m_mesh;
 
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// loop over all slave elements
 	int ne = ss.Elements();

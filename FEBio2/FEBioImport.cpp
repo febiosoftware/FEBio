@@ -48,7 +48,7 @@ using namespace FECore;
 
 //-----------------------------------------------------------------------------
 FEM* FEBioFileSection::GetFEM() { return m_pim->GetFEM(); }
-FEAnalysisStep* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
+FEAnalysisStep* FEBioFileSection::GetStep() { return dynamic_cast<FEAnalysisStep*>(m_pim->GetStep()); }
 
 //-----------------------------------------------------------------------------
 FEBioFileSectionMap::~FEBioFileSectionMap()
@@ -706,7 +706,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			if (!tag.isleaf())
 			{
 				SuperLUSolver* ps = new SuperLUSolver();
-				fem.m_pStep->m_psolver->m_plinsolve = ps;
+				FEAnalysisStep* pstep = GetStep();
+				pstep->m_psolver->m_plinsolve = ps;
 
 				++tag;
 				do
@@ -727,7 +728,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		{
 			fem.m_nsolver = CG_ITERATIVE_SOLVER;
 			ConjGradIterSolver* ps;
-			fem.m_pStep->m_psolver->m_plinsolve = ps = new ConjGradIterSolver();
+			FEAnalysisStep* pstep = GetStep();
+			pstep->m_psolver->m_plinsolve = ps = new ConjGradIterSolver();
 			if (!tag.isleaf())
 			{
 				++tag;
@@ -4747,7 +4749,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 void FEBioLoadSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysisStep* pstep = m_pim->GetStep();
+	FEAnalysisStep* pstep = GetStep();
 	int nmplc = pstep->m_nmplc;
 
 	++tag;

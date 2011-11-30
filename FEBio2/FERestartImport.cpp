@@ -161,23 +161,24 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 bool FERestartImport::ParseControlSection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
 
 	++tag;
 	do
 	{
-		if      (tag == "time_steps"        ) tag.value(fem.m_pStep->m_ntime);
-		if      (tag == "final_time"        ) tag.value(fem.m_pStep->m_final_time);
-		else if (tag == "step_size"         ) tag.value(fem.m_pStep->m_dt0);
-//		else if (tag == "dtol"              ) tag.value(fem.m_pStep->m_psolver->m_Dtol);
-//		else if (tag == "ptol"              ) tag.value(fem.m_pStep->m_psolver->m_Ptol);
-//		else if (tag == "ctol"              ) tag.value(fem.m_pStep->m_psolver->m_Ctol);
-//		else if (tag == "etol"              ) tag.value(fem.m_pStep->m_psolver->m_Etol);
-//		else if (tag == "rtol"              ) tag.value(fem.m_pStep->m_psolver->m_Rtol);
-		else if (tag == "lstol"             ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_LStol);
-		else if (tag == "max_refs"          ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_maxref);
-		else if (tag == "max_ups"           ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_maxups);
-		else if (tag == "cmax"              ) tag.value(fem.m_pStep->m_psolver->m_bfgs.m_cmax);
-		else if (tag == "pressure_stiffness") tag.value(fem.m_pStep->m_istiffpr);
+		if      (tag == "time_steps"        ) tag.value(pstep->m_ntime);
+		if      (tag == "final_time"        ) tag.value(pstep->m_final_time);
+		else if (tag == "step_size"         ) tag.value(pstep->m_dt0);
+//		else if (tag == "dtol"              ) tag.value(pstep->m_psolver->m_Dtol);
+//		else if (tag == "ptol"              ) tag.value(pstep->m_psolver->m_Ptol);
+//		else if (tag == "ctol"              ) tag.value(pstep->m_psolver->m_Ctol);
+//		else if (tag == "etol"              ) tag.value(pstep->m_psolver->m_Etol);
+//		else if (tag == "rtol"              ) tag.value(pstep->m_psolver->m_Rtol);
+		else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_bfgs.m_LStol);
+		else if (tag == "max_refs"          ) tag.value(pstep->m_psolver->m_bfgs.m_maxref);
+		else if (tag == "max_ups"           ) tag.value(pstep->m_psolver->m_bfgs.m_maxups);
+		else if (tag == "cmax"              ) tag.value(pstep->m_psolver->m_bfgs.m_cmax);
+		else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 		else if (tag == "debug")
 		{
 			int n;
@@ -192,13 +193,13 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		}
 		else if (tag == "time_stepper")
 		{
-			fem.m_pStep->m_bautostep = true;
+			pstep->m_bautostep = true;
 			++tag;
 			do
 			{
-				if      (tag == "max_retries") tag.value(fem.m_pStep->m_maxretries);
-				else if (tag == "opt_iter"   ) tag.value(fem.m_pStep->m_iteopt);
-				else if (tag == "dtmin"      ) tag.value(fem.m_pStep->m_dtmin);
+				if      (tag == "max_retries") tag.value(pstep->m_maxretries);
+				else if (tag == "opt_iter"   ) tag.value(pstep->m_iteopt);
+				else if (tag == "dtmin"      ) tag.value(pstep->m_dtmin);
 				else throw XMLReader::InvalidTag(tag);
 
 				++tag;
@@ -209,11 +210,11 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		{
 			char szval[256];
 			tag.value(szval);
-			if      (strcmp(szval, "PLOT_NEVER"      ) == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
-			else if (strcmp(szval, "PLOT_MAJOR_ITRS" ) == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
-			else if (strcmp(szval, "PLOT_MINOR_ITRS" ) == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_MINOR_ITRS);
-			else if (strcmp(szval, "PLOT_MUST_POINTS") == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_MUST_POINTS);
-			else if (strcmp(szval, "PLOT_FINAL"      ) == 0) fem.m_pStep->SetPlotLevel(FE_PLOT_FINAL);
+			if      (strcmp(szval, "PLOT_NEVER"      ) == 0) pstep->SetPlotLevel(FE_PLOT_NEVER);
+			else if (strcmp(szval, "PLOT_MAJOR_ITRS" ) == 0) pstep->SetPlotLevel(FE_PLOT_MAJOR_ITRS);
+			else if (strcmp(szval, "PLOT_MINOR_ITRS" ) == 0) pstep->SetPlotLevel(FE_PLOT_MINOR_ITRS);
+			else if (strcmp(szval, "PLOT_MUST_POINTS") == 0) pstep->SetPlotLevel(FE_PLOT_MUST_POINTS);
+			else if (strcmp(szval, "PLOT_FINAL"      ) == 0) pstep->SetPlotLevel(FE_PLOT_FINAL);
 			else throw XMLReader::InvalidValue(tag);
 		}
 		else throw XMLReader::InvalidTag(tag);

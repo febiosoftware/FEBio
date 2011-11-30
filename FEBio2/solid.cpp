@@ -22,13 +22,14 @@ bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 
 	// initialize material point data
 	FEM& fem = dynamic_cast<FEM&>(mdl);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
 
 	bool bmerr = false;
 
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		if (dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver))
+		if (dynamic_cast<FESolidSolver*>(pstep->m_psolver))
 		{
 			// get the elements material
 			FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);

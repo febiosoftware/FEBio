@@ -170,7 +170,8 @@ void FEUDGHexDomain::UDGHourglassForces(FEM& fem, FESolidElement &el, vector<dou
 	}
 
 	// calculate hourglass forces
-	double hg = fem.m_pStep->m_hg;
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	double hg = pstep->m_hg;
 
 	for (i=0; i<8; ++i)
 	{
@@ -309,7 +310,8 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix&
 	}
 
 	// calculate hourglass stiffness
-	double hg = fem.m_pStep->m_hg;
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	double hg = pstep->m_hg;
 
 	double kab;
 

@@ -335,9 +335,10 @@ void FESlidingInterface3::Init()
 		fem.SetSymmetryFlag(false);
 		
 		// make sure we are using full-Newton
-		if (bporo && (fem.m_pStep->m_psolver->m_bfgs.m_maxups != 0))
+		FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+		if (bporo && (pstep->m_psolver->m_bfgs.m_maxups != 0))
 		{
-			fem.m_pStep->m_psolver->m_bfgs.m_maxups = 0;
+			pstep->m_psolver->m_bfgs.m_maxups = 0;
 			clog.printbox("WARNING", "The non-symmetric biphasic-solute contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}
@@ -730,14 +731,15 @@ void FESlidingInterface3::Update()
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
 	// also reset number of iterations after each augmentation
-	if (fem.m_pStep->m_psolver->m_niter == 0) {
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	if (pstep->m_psolver->m_niter == 0) {
 		biter = 0;
-		naug = fem.m_pStep->m_psolver->m_naug;
-	} else if (fem.m_pStep->m_psolver->m_naug > naug) {
-		biter = fem.m_pStep->m_psolver->m_niter;
-		naug = fem.m_pStep->m_psolver->m_naug;
+		naug = pstep->m_psolver->m_naug;
+	} else if (pstep->m_psolver->m_naug > naug) {
+		biter = pstep->m_psolver->m_niter;
+		naug = pstep->m_psolver->m_naug;
 	}
-	int niter = fem.m_pStep->m_psolver->m_niter - biter;
+	int niter = pstep->m_psolver->m_niter - biter;
 	bool bupseg = ((m_nsegup == 0)? true : (niter <= m_nsegup));
 	// get the logfile
 	//	Logfile& log = GetLogfile();
@@ -901,7 +903,8 @@ void FESlidingInterface3::ContactForces(vector<double> &F)
 	FEMesh* pm = m_ss.GetMesh();
 	
 	// get the solver
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	
 	double dt = fem.m_pStep->m_dt;
 	
@@ -1119,7 +1122,8 @@ void FESlidingInterface3::ContactStiffness()
 	FEMesh* pm = m_ss.GetMesh();
 	
 	// get the solver
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;

@@ -365,7 +365,8 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 
 	// get the solver
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	double detJ[4], w[4], *Hs, Hm[4];
 	vec3d r0[4];
@@ -530,7 +531,8 @@ void FEFacet2FacetSliding::ContactStiffness()
 	FEMesh* pm = m_ss.GetMesh();
 
 	// get the solver
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;

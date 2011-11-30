@@ -228,7 +228,8 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	s /= V;
 */
 	// get the reaction force vector from the solid solver
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(m_rve.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.m_pStep);
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	mat3d T; T.zero();
@@ -255,7 +256,8 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	FEMesh& m = m_rve.m_mesh;
 
 	// get the solver
-	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(m_rve.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.m_pStep);
+	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// the element's stiffness matrix
 	matrix ke;

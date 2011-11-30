@@ -58,7 +58,7 @@ bool FEM::Init()
 	// check step data
 	for (i=0; i<(int) m_Step.size(); ++i)
 	{
-		FEAnalysisStep& step = *m_Step[i];
+		FEAnalysis& step = *m_Step[i];
 		if ((step.m_ntime <= 0) && (step.m_final_time <= 0.0)) return err("Invalid number of time steps for analysis step %d", i+1);
 		if ((step.m_ntime >  0) && (step.m_final_time >  0.0)) return err("You must either set the number of time steps or the final time but not both.\n");
 		if (step.m_dt0   <= 0) return err("Invalid time step size for analysis step %d", i+1);

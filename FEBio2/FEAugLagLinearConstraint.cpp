@@ -175,7 +175,8 @@ void FELinearConstraintSet::Residual(vector<double> &R)
 
 void FELinearConstraintSet::Stiffness()
 {
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(m_pfem->m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	vector<int> en;
 	vector<int> elm;

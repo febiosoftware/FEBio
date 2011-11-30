@@ -1313,7 +1313,8 @@ void LSDYNAPlotFile::write_reaction_forces()
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 
 	int N = mesh.Nodes(), i;

@@ -406,6 +406,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEAnalysis.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\febio.h"
 				>
 			</File>

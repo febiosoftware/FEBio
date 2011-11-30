@@ -40,11 +40,14 @@ bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 
 bool FEPrintHBMatrixDiagnostic::Run()
 {
-	// get and initialize the first step
-	m_fem.m_Step[0]->Init();
+	// Get the current step
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.m_pStep);
 
-	// get and initialize the solver
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*m_fem.m_pStep->m_psolver);
+	// initialize the step
+	pstep->Init();
+
+	// get and initialize the FE solver
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	solver.Init();
 
 	// build the stiffness matrix

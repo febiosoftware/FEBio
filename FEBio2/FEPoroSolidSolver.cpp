@@ -96,8 +96,11 @@ bool FEPoroSolidSolver::Quasin(double time)
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
 
+	// get the current step
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.m_pStep);
+
 	// make-sure this is a poro-elastic problem
-	assert(m_fem.m_pStep->m_nModule == FE_POROELASTIC);
+	assert(pstep->m_nModule == FE_POROELASTIC);
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -129,7 +132,7 @@ bool FEPoroSolidSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	clog.printf("\n===== beginning time step %d : %lg =====\n", m_fem.m_pStep->m_ntimesteps+1, m_fem.m_ftime);
+	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
@@ -321,7 +324,7 @@ bool FEPoroSolidSolver::Quasin(double time)
 			// copy last calculated residual
 			m_bfgs.m_R0 = m_bfgs.m_R1;
 		}
-		else if (m_fem.m_pStep->m_baugment)
+		else if (pstep->m_baugment)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
 
@@ -347,7 +350,8 @@ bool FEPoroSolidSolver::Quasin(double time)
 				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
-				if (m_fem.m_pStep->m_psolver->m_bfgs.m_maxups == 0)
+				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.m_pStep);
+				if (pstep->m_psolver->m_bfgs.m_maxups == 0)
 				{
 					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness() == false) break;

@@ -53,7 +53,8 @@ bool FEPrintMatrixDiagnostic::Run()
 	m_fem.m_Step[0]->Init();
 
 	// get and initialize the solver
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*m_fem.m_pStep->m_psolver);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.m_pStep);
+	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	solver.Init();
 
 	// build the stiffness matrix
