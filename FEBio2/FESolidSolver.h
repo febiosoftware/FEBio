@@ -117,9 +117,6 @@ public:
 
 	// equation numbers
 	int		m_nreq;			//!< start of rigid body equations
-	int		m_ndeq;			//!< number of equations related to displacement dofs
-	int		m_npeq;			//!< number of equations related to pressure dofs
-	int		m_nceq[MAX_CDOFS];	//!< number of equations related to concentration dofs
 
 public:
 	vector<double> m_Fn;	//!< concentrated nodal force vector

@@ -23,6 +23,9 @@
 FEBiphasicSolver::FEBiphasicSolver(FEM& fem) : FESolidSolver(fem)
 {
 	m_Ptol = 0.01;
+	m_ndeq = 0;
+	m_npeq = 0;
+	for (int k=0; k<MAX_CDOFS; ++k) m_nceq[k] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,6 +60,32 @@ bool FEBiphasicSolver::Init()
 	return true;
 }
 
+
+//-----------------------------------------------------------------------------
+//! Initialize equations
+bool FEBiphasicSolver::InitEquations()
+{
+	// base class does most of the work
+	FESolidSolver::InitEquations();
+
+	// determined the nr of pressure and concentration equations
+	FEMesh& mesh = m_fem.m_mesh;
+	m_ndeq = m_npeq = m_nceq[0] = m_nceq[1] = 0;
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& n = mesh.Node(i);
+		if (n.m_ID[DOF_X] != -1) m_ndeq++;
+		if (n.m_ID[DOF_Y] != -1) m_ndeq++;
+		if (n.m_ID[DOF_Z] != -1) m_ndeq++;
+		if (n.m_ID[DOF_P] != -1) m_npeq++;
+		if (n.m_ID[DOF_C] != -1) m_nceq[0]++;
+		if (n.m_ID[DOF_C+1] != -1) m_nceq[1]++;
+	}
+
+	clog.printf("m_nceq: %d, %d\n", m_nceq[0],m_nceq[1]);
+
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first QN iteration. 
@@ -473,9 +502,11 @@ void FEBiphasicSolver::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_Ptol;
+		ar << m_ndeq << m_npeq << m_nceq[0] << m_nceq[1];
 	}
 	else
 	{
 		ar >> m_Ptol;
+		ar >> m_ndeq >> m_npeq >> m_nceq[0] >> m_nceq[1];
 	}
 }

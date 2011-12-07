@@ -14,6 +14,9 @@ public:
 	//! Initialize data structures
 	bool Init();
 
+	//! Initialize linear equation system
+	bool InitEquations();
+
 	//! prepares the data for the first QN iteration
 	virtual void PrepStep(double time);
 
@@ -30,6 +33,11 @@ protected:
 public:
 	// additional convergence norms
 	double	m_Ptol;			//!< pressure tolerance
+
+	// equation numbers
+	int		m_ndeq;				//!< number of equations related to displacement dofs
+	int		m_npeq;				//!< number of equations related to pressure dofs
+	int		m_nceq[MAX_CDOFS];	//!< number of equations related to concentration dofs
 
 	// poro data
 	vector<double>	m_di;	//!< displacement increment vector
