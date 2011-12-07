@@ -26,7 +26,7 @@ FETriphasic::FETriphasic()
 	m_rhoTw = 0;
 	m_pSolute[0] = m_pSolute[1] = 0;
 	m_cFr = 0;
-	m_Rgas = 0; m_Tabs = 0;
+	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -542,7 +542,7 @@ void FEM::SetGlobalConstant(const string& s, double v)
 //-----------------------------------------------------------------------------
 double FEM::GetGlobalConstant(const string& s)
 {
-	return m_Const.find(s)->second;
+	return (m_Const.count(s) ? m_Const.find(s)->second : 0);
 }
 
 //-----------------------------------------------------------------------------

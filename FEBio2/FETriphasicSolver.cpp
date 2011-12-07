@@ -80,12 +80,12 @@ bool FETriphasicSolver::Quasin(double time)
 	// convergence norms
 	double	normR1;		// residual norm
 	double	normE1;		// energy norm
-	double	normU;		// displacement norm
-	double	normu;		// displacement increment norm
+	double	normD;		// displacement norm
+	double	normd;		// displacement increment norm
 	double	normRi;		// initial residual norm
 	double	normEi;		// initial energy norm
 	double	normEm;		// max energy norm
-	double	normUi;		// initial displacement norm
+	double	normDi;		// initial displacement norm
 	
 	// poro convergence norms data
 	double	normPi;		// initial pressure norm
@@ -165,13 +165,16 @@ bool FETriphasicSolver::Quasin(double time)
 			double du = m_bfgs.m_ui*m_bfgs.m_ui;
 			if (ISNAN(du)) throw NANDetected();
 		}
-		
+
+		// extract the pressure increments
+		GetDisplacementData(m_di, m_bfgs.m_ui);
+
 		// set initial convergence norms
 		if (m_niter == 0)
 		{
 			normRi = fabs(m_bfgs.m_R0*m_bfgs.m_R0);
 			normEi = fabs(m_bfgs.m_ui*m_bfgs.m_R0);
-			normUi = fabs(m_bfgs.m_ui*m_bfgs.m_ui);
+			normDi = fabs(m_di*m_di);
 			normEm = normEi;
 		}
 		
@@ -189,20 +192,23 @@ bool FETriphasicSolver::Quasin(double time)
 			Residual(m_bfgs.m_R1);
 		}
 		
-		// update total displacements
+		// update all degrees of freedom
 		for (i=0; i<m_neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
+		
+		// update displacements
+		for (i=0; i<m_ndeq; ++i) m_Di[i] += s*m_di[i];
 		
 		// calculate norms
 		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
-		normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
-		normU  = m_Ui*m_Ui;
+		normd  = (m_di*m_di)*(s*s);
+		normD  = m_Di*m_Di;
 		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
 		
 		// check residual norm
 		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
 		
 		// check displacement norm
-		if ((m_Dtol > 0) && (normu  > (m_Dtol*m_Dtol)*normU )) bconv = false;
+		if ((m_Dtol > 0) && (normd  > (m_Dtol*m_Dtol)*normD )) bconv = false;
 		
 		// check energy norm
 		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
@@ -271,7 +277,7 @@ bool FETriphasicSolver::Quasin(double time)
 		clog.printf("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
 		clog.printf("\t residual             %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
 		clog.printf("\t energy               %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-		clog.printf("\t displacement         %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
+		clog.printf("\t displacement         %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
 		clog.printf("\t fluid pressure       %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
 		clog.printf("\t cation concentration %15le %15le %15le \n", normCi[0], normc[0] ,(m_Ctol*m_Ctol)*normC[0] );
 		clog.printf("\t anion concentration  %15le %15le %15le \n", normCi[1], normc[1] ,(m_Ctol*m_Ctol)*normC[1] );
@@ -302,6 +308,7 @@ bool FETriphasicSolver::Quasin(double time)
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
+				normDi = normd;
 				normPi = normp;
 				normCi[0] = normc[0]; normCi[1] = normc[1];
 				breform = true;

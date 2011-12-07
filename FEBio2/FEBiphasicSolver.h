@@ -24,6 +24,7 @@ public:
 	void Serialize(DumpFile& ar);
 
 protected:
+	void GetDisplacementData(vector<double>& di, vector<double>& ui);
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
 
 public:
@@ -31,6 +32,8 @@ public:
 	double	m_Ptol;			//!< pressure tolerance
 
 	// poro data
+	vector<double>	m_di;	//!< displacement increment vector
+	vector<double>	m_Di;	//!< total displacement vector for iteration
 	vector<double>	m_pi;	//!< pressure increment vector
 	vector<double>	m_Pi;	//!< Total pressure vector for iteration
 
