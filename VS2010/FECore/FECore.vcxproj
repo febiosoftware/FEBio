@@ -464,6 +464,7 @@
     <ClInclude Include="..\..\FECore\BC.h" />
     <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\DumpFile.h" />
+    <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\febio.h" />
     <ClInclude Include="..\..\FECore\FEBioFactory.h" />
     <ClInclude Include="..\..\FECore\FEBioTask.h" />

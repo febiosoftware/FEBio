@@ -533,7 +533,7 @@
     <ClInclude Include="..\..\FEBio2\FE2DFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBio2\FE2DTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBio2\FE2DTransIsoVerondaWestmann.h" />
-    <ClInclude Include="..\..\FEBio2\FEAnalysis.h" />
+    <ClInclude Include="..\..\FEBio2\FEAnalysisStep.h" />
     <ClInclude Include="..\..\FEBio2\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBio2\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FEBioCommand.h" />
@@ -544,6 +544,8 @@
     <ClInclude Include="..\..\FEBio2\FEBiphasicDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEBiphasicSolute.h" />
     <ClInclude Include="..\..\FEBio2\FEBiphasicSoluteDomain.h" />
+    <ClInclude Include="..\..\FEBio2\FEBiphasicSoluteSolver.h" />
+    <ClInclude Include="..\..\FEBio2\FEBiphasicSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEBox.h" />
     <ClInclude Include="..\..\FEBio2\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
@@ -616,8 +618,6 @@
     <ClInclude Include="..\..\FEBio2\FEPlotNodeData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h" />
     <ClInclude Include="..\..\FEBio2\FEPointConstraint.h" />
-    <ClInclude Include="..\..\FEBio2\FEPoroSolidSolver.h" />
-    <ClInclude Include="..\..\FEBio2\FEPoroSoluteSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEPoroTraction.h" />
     <ClInclude Include="..\..\FEBio2\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
@@ -684,7 +684,7 @@
     <ClCompile Include="..\..\FEBio2\FE2DFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBio2\FE2DTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBio2\FE2DTransIsoVerondaWestmann.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEAnalysis.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEAnalysisStep.cpp" />
     <ClCompile Include="..\..\FEBio2\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBio2\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
@@ -694,6 +694,8 @@
     <ClCompile Include="..\..\FEBio2\FEBioStdSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBiphasicSolute.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBiphasicSoluteSolver.cpp" />
+    <ClCompile Include="..\..\FEBio2\FEBiphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBox.cpp" />
     <ClCompile Include="..\..\FEBio2\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
@@ -761,8 +763,6 @@
     <ClCompile Include="..\..\FEBio2\FEPlotNodeData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPointConstraint.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPoroSolidSolver.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPoroSoluteSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPoroTraction.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
