@@ -463,7 +463,8 @@ bool FEAnalysisStep::Solve()
 		catch (ZeroDiagonal e)
 		{
 			bconv = false;
-			clog.printbox("FATAL ERROR", "%s", e.m_szerr);
+			// TODO: Fix this feature
+			clog.printbox("FATAL ERROR", "Zero diagonal detected. Aborting run.");
 			break;
 		}
 		catch (NANDetected)
