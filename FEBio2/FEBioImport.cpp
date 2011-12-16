@@ -4850,6 +4850,11 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 	const char* sz;
 
+	// see if the log file has any attributes
+	const char* szlog = tag.AttributeValue("file", true);
+	if (szlog) fem.SetLogFilename(szlog);
+
+	if (tag.isleaf()) return;
 	++tag;
 	do
 	{
@@ -4972,6 +4977,9 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	else fem.m_plot = new LSDYNAPlotFile;
+
+	const char* szplt = tag.AttributeValue("file", true);
+	if (szplt) fem.SetPlotFilename(szplt);
 
 	if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot) && !tag.isleaf())
 	{
