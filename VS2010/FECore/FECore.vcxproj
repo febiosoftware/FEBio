@@ -201,7 +201,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -501,7 +503,6 @@
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
     <ClInclude Include="..\..\FECore\MathParser.h" />
-    <ClInclude Include="..\..\FECore\matrix.h" />
     <ClInclude Include="..\..\FECore\MatrixProfile.h" />
     <ClInclude Include="..\..\FECore\NonLinearSystem.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
@@ -518,7 +519,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
-    <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyForce.cpp" />
@@ -551,7 +551,6 @@
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
-    <ClCompile Include="..\..\FECore\matrix.cpp" />
     <ClCompile Include="..\..\FECore\MatrixProfile.cpp" />
     <ClCompile Include="..\..\FECore\NonLinearSystem.cpp" />
     <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SparseMatrix.h"
-#include "matrix.h"
+#include "NumCore/matrix.h"
 #include <vector>
 using namespace std;
 

@@ -120,9 +120,6 @@
     <ClInclude Include="..\..\FECore\mat3d.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\MatrixProfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -266,9 +263,6 @@
     <ClCompile Include="..\..\FECore\mat3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\matrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FECore\MatrixProfile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -288,9 +282,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEContactInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\colsol.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\XMLReader.cpp">

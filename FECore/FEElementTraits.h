@@ -9,8 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "NumCore/matrix.h"
 #include "vec3d.h"
-#include "matrix.h"
 #include "mat3d.h"
 #include "FE_enum.h"
 #include <vector>

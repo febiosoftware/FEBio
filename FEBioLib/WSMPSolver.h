@@ -10,7 +10,7 @@
 #include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
 #include "FECore/vector.h"
-#include "FECore/matrix.h"
+#include "NumCore/matrix.h"
 
 using namespace FECore;
 

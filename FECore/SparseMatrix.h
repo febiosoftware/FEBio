@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <vector>
 #include "MatrixProfile.h"
-#include "matrix.h"
+#include "NumCore/matrix.h"
 using namespace std;
 
 namespace FECore {

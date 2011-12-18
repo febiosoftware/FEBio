@@ -71,9 +71,12 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\NumCore\colsol.cpp" />
+    <ClCompile Include="..\..\NumCore\matrix.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\NumCore\matrix.h" />
     <ClInclude Include="..\..\NumCore\stdafx.h" />
     <ClInclude Include="..\..\NumCore\targetver.h" />
   </ItemGroup>

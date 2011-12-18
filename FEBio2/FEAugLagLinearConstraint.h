@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FECore/vector.h"
-#include "FECore/matrix.h"
+#include "NumCore/matrix.h"
 #include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include <list>

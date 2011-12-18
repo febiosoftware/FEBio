@@ -1,6 +1,6 @@
 #pragma once
 
-#include "matrix.h"
+#include "NumCore/matrix.h"
 #include "vector.h"
 #include "LinearSolver.h"
 #include "NonLinearSystem.h"
