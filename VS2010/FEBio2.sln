@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBio2", "FEBio2\FEBio2.vcxproj", "{448F4A28-A0DA-42F8-8D30-ED583D612E49}"
 	ProjectSection(ProjectDependencies) = postProject
+		{C853E891-6650-4718-8584-79768B9E42B6} = {C853E891-6650-4718-8584-79768B9E42B6}
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850} = {36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A} = {C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}
 	EndProjectSection
@@ -15,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEBioLib", "FEBioLib\FEBioL
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FEBio2Setup", "FEBio2Setup\FEBio2Setup.vdproj", "{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NumCore", "NumCore\NumCore.vcxproj", "{C853E891-6650-4718-8584-79768B9E42B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +116,22 @@ Global
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|Win32.ActiveCfg = Release
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|x64.ActiveCfg = Release - x64
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|x64.Build.0 = Release - x64
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug - Skyline Only|Itanium.ActiveCfg = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug - Skyline Only|Win32.ActiveCfg = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug - Skyline Only|Win32.Build.0 = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug - Skyline Only|x64.ActiveCfg = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug|Itanium.ActiveCfg = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug|Win32.Build.0 = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Debug|x64.ActiveCfg = Debug|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|Itanium.ActiveCfg = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|Win32.ActiveCfg = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|Win32.Build.0 = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|x64.ActiveCfg = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release|Itanium.ActiveCfg = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release|Win32.ActiveCfg = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release|Win32.Build.0 = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
