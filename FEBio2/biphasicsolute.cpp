@@ -698,7 +698,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 			// allocate stiffness matrix
 			int neln = el.Nodes();
 			int ndof = neln*5;
-			ke.Create(ndof, ndof);
+			ke.resize(ndof, ndof);
 			
 			// calculate the element stiffness matrix
 			ElementBiphasicSoluteStiffnessSS(fem, el, ke);
@@ -738,7 +738,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 			// allocate stiffness matrix
 			int neln = el.Nodes();
 			int ndof = neln*5;
-			ke.Create(ndof, ndof);
+			ke.resize(ndof, ndof);
 			
 			// calculate the element stiffness matrix
 			ElementBiphasicSoluteStiffness(fem, el, ke);

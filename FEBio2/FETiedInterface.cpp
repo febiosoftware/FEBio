@@ -623,7 +623,7 @@ void FETiedInterface::ContactStiffness()
 				ndof = 3*(1 + nmeln);
 
 				// fill stiffness matrix
-				ke.Create(ndof, ndof); ke.zero();
+				ke.resize(ndof, ndof); ke.zero();
 				ke[0][0] = w[n]*detJ*m_eps;
 				ke[1][1] = w[n]*detJ*m_eps;
 				ke[2][2] = w[n]*detJ*m_eps;

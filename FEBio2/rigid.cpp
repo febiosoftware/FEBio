@@ -33,7 +33,7 @@ void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		assert(el.IsRigid());
 
 		int ndof = 3*el.Nodes();
-		ke.Create(ndof, ndof);
+		ke.resize(ndof, ndof);
 		ke.zero();
 
 		// add the inertial stiffness for dynamics

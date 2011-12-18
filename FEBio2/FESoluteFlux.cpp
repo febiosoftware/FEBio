@@ -249,7 +249,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 					
 					// get the element stiffness matrix
 					int ndof = neln*4;
-					ke.Create(ndof, ndof);
+					ke.resize(ndof, ndof);
 					
 					// calculate pressure stiffness
 					FluxStiffness(el, ke, wn);

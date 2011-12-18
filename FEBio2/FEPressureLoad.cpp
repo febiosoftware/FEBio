@@ -251,7 +251,7 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 
 				// get the element stiffness matrix
 				int ndof = 3*neln;
-				ke.Create(ndof, ndof);
+				ke.resize(ndof, ndof);
 
 				// calculate pressure stiffness
 				PressureStiffness(el, ke, tn);

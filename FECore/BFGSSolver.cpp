@@ -28,8 +28,8 @@ FECore::BFGSSolver::BFGSSolver()
 void FECore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls)
 {
 	// allocate storage for BFGS update vectors
-	m_V.Create(m_maxups, neq);
-	m_W.Create(m_maxups, neq);
+	m_V.resize(m_maxups, neq);
+	m_W.resize(m_maxups, neq);
 
 	m_D.resize(neq);
 	m_G.resize(neq);

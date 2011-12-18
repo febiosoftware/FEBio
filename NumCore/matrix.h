@@ -31,8 +31,7 @@ public:
 	matrix& operator = (const matrix& m);
 
 	//! Matrix reallocation
-	// TODO: rename this resize
-	void Create(int nr, int nc);
+	void resize(int nr, int nc);
 
 	//! destructor
 	~matrix();

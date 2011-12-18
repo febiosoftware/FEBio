@@ -189,7 +189,7 @@ void FELinearConstraintSet::Stiffness()
 	{
 		FEAugLagLinearConstraint& LC = *(*im);
 		int n = LC.m_dof.size(), i, j;
-		ke.Create(n, n);
+		ke.resize(n, n);
 		FEAugLagLinearConstraint::Iterator it = LC.m_dof.begin(), jt;
 		for (i=0; i<n; ++i, ++it)
 		{

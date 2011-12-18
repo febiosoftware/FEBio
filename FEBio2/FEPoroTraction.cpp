@@ -272,7 +272,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 				
 				// get the element stiffness matrix
 				int ndof = (m_beffective ? 4*neln : 3*neln);
-				ke.Create(ndof, ndof);
+				ke.resize(ndof, ndof);
 
 				// calculate pressure stiffness
 				TractionStiffness(el, ke, tn, m_beffective);

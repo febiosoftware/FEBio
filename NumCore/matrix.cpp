@@ -106,7 +106,7 @@ matrix& matrix::operator = (const matrix& m)
 }
 
 //-----------------------------------------------------------------------------
-void matrix::Create(int nr, int nc)
+void matrix::resize(int nr, int nc)
 {
 	if ((nr != m_nr) || (nc != m_nc))
 	{

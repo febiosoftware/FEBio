@@ -601,7 +601,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
-		ke.Create(ndof, ndof);
+		ke.resize(ndof, ndof);
 		ke.zero();
 
 		// calculate the element stiffness matrix

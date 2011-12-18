@@ -506,7 +506,7 @@ void FERigidWallInterface::ContactStiffness()
 				// TODO: I don't think this is correct, since
 				// if the rigid wall is not a plance, some terms
 				// are probably missing
-				ke.Create(ndof, ndof);
+				ke.resize(ndof, ndof);
 				for (k=0; k<ndof; ++k)
 					for (l=0; l<ndof; ++l)
 						ke[k][l] = w[n]*detJ*eps*HEAVYSIDE(Lm+eps*gap)*N[k]*N[l];

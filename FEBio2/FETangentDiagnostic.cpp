@@ -280,7 +280,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	bd.InternalForces(el, f0);
 
 	// now calculate the perturbed residuals
-	ke.Create(24, 24);
+	ke.resize(24, 24);
 	ke.zero();
 	int i, j, nj;
 	int N = mesh.Nodes();

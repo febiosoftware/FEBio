@@ -286,7 +286,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 		// create the element's stiffness matrix
 		int ne = e.Nodes();
 		int ndof = 3*ne;
-		ke.Create(ndof, ndof);
+		ke.resize(ndof, ndof);
 		ke.zero();
 
 		// calculate the element's stiffness matrix

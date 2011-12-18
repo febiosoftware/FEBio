@@ -59,7 +59,7 @@ public:
 		neln = ne;
 		nint = ni;
 		
-		H.Create(ni, ne);
+		H.resize(ni, ne);
 	}
 
 	//! destructor
@@ -100,21 +100,21 @@ public:
 		gt.resize(ni);
 		gw.resize(ni);
 
-		Gr.Create(ni, ne);
-		Gs.Create(ni, ne);
-		Gt.Create(ni, ne);
+		Gr.resize(ni, ne);
+		Gs.resize(ni, ne);
+		Gt.resize(ni, ne);
 
-		Grr.Create(ni, ne);
-		Gsr.Create(ni, ne);
-		Gtr.Create(ni, ne);
+		Grr.resize(ni, ne);
+		Gsr.resize(ni, ne);
+		Gtr.resize(ni, ne);
 		
-		Grs.Create(ni, ne);
-		Gss.Create(ni, ne);
-		Gts.Create(ni, ne);
+		Grs.resize(ni, ne);
+		Gss.resize(ni, ne);
+		Gts.resize(ni, ne);
 		
-		Grt.Create(ni, ne);
-		Gst.Create(ni, ne);
-		Gtt.Create(ni, ne);
+		Grt.resize(ni, ne);
+		Gst.resize(ni, ne);
+		Gtt.resize(ni, ne);
 	}
 
 public:
@@ -244,8 +244,8 @@ public:
 		gs.resize(ni);
 		gw.resize(ni);
 
-		Gr.Create(ni, ne);
-		Gs.Create(ni, ne);
+		Gr.resize(ni, ne);
+		Gs.resize(ni, ne);
 	}
 
 public:
@@ -341,8 +341,8 @@ public:
 		gt.resize(ni);
 		gw.resize(ni);
 
-		Hr.Create(ni, ne);
-		Hs.Create(ni, ne);
+		Hr.resize(ni, ne);
+		Hs.resize(ni, ne);
 	}
 
 public:

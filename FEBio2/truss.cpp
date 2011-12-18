@@ -123,7 +123,7 @@ void FEElasticTrussDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 	vec3d n = TrussNormal(el);
 
 	// calculate the tangent matrix
-	ke.Create(6, 6);
+	ke.resize(6, 6);
 
 	ke[0][0] = ke[3][3] = k*n.x*n.x + T/l;
 	ke[1][1] = ke[4][4] = k*n.y*n.y + T/l;

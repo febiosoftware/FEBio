@@ -1344,7 +1344,7 @@ void FESlidingInterface3::ContactStiffness()
 					double dtn = (tn > 0.? eps :0.);
 					
 					// create the stiffness matrix
-					ke.Create(ndof, ndof); ke.zero();
+					ke.resize(ndof, ndof); ke.zero();
 					
 					// --- S O L I D - S O L I D   C O N T A C T ---
 					

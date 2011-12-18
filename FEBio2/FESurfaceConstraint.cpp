@@ -491,7 +491,7 @@ void FESurfaceConstraint::ContactStiffness()
 		for (k=0; k<ne0; ++k) N[k+1] = -N0[k];
 
 		// stiffness matrix
-		ke.Create(ndof, ndof); ke.zero();
+		ke.resize(ndof, ndof); ke.zero();
 		for (k=0; k<ndof/3; ++k)
 			for (l=0; l<ndof/3; ++l)
 			{
@@ -602,7 +602,7 @@ void FESurfaceConstraint::ContactStiffness()
 				N[0] = 1;
 				for (k=0; k<nmeln; ++k) N[k+1] = -H[k];
 
-				ke.Create(ndof, ndof); ke.zero();
+				ke.resize(ndof, ndof); ke.zero();
 				for (k=0; k<ndof/3; ++k)
 					for (l=0; l<ndof/3; ++l)
 					{

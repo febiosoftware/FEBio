@@ -838,7 +838,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 				nint = el.GaussPoints();
 				neln = el.Nodes();
 
-				ke.Create(3*neln, 3*neln);
+				ke.resize(3*neln, 3*neln);
 				ke.zero();
 
 				fe.resize(3*neln);

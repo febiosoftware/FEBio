@@ -706,7 +706,7 @@ void FEFacet2FacetSliding::ContactStiffness()
 					// --- N O R M A L   S T I F F N E S S ---
 
 					// create the stiffness matrix
-					ke.Create(ndof, ndof);
+					ke.resize(ndof, ndof);
 
 					// add the first order term (= D(tn)*dg )
 					for (k=0; k<ndof; ++k)

@@ -1016,7 +1016,7 @@ void FESlidingInterface::ContactStiffness()
 					ndof = 3*(nmeln+1);
 
 					// calculate the stiffness matrix
-					ke.Create(ndof, ndof);
+					ke.resize(ndof, ndof);
 					ContactNodalStiffness(m, ss, me, ke);
 
 					// muliply with weights

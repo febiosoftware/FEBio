@@ -700,7 +700,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 			int neln = el.Nodes();
 			int ndpn = 6;
 			int ndof = neln*ndpn;
-			ke.Create(ndof, ndof);
+			ke.resize(ndof, ndof);
 			
 			// calculate the element stiffness matrix
 			ElementTriphasicStiffnessSS(fem, el, ke);
@@ -742,7 +742,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 			int neln = el.Nodes();
 			int ndpn = 6;
 			int ndof = neln*ndpn;
-			ke.Create(ndof, ndof);
+			ke.resize(ndof, ndof);
 			
 			// calculate the element stiffness matrix
 			ElementTriphasicStiffness(fem, el, ke);
