@@ -11,11 +11,11 @@
 
 #include <stdio.h>
 #include "FECore/DumpFile.h"
+#include "FECore/FEMesh.h"
 #include <vector>
 using namespace std;
 
 class FEM;
-class FENodeSet;
 
 #define FE_DATA_NODE	1
 #define FE_DATA_ELEM	2

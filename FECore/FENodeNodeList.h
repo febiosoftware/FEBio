@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/vector.h"
+#include "vector.h"
 
 class FEMesh;
 class FEDomain;

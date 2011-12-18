@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "FENodeNodeList.h"
-#include "FECore/FENodeElemList.h"
-#include "FECore/FEMesh.h"
-#include "FECore/FEDomain.h"
+#include "FENodeElemList.h"
+#include "FEMesh.h"
+#include "FEDomain.h"
 #include <stdlib.h>
 
 //////////////////////////////////////////////////////////////////////

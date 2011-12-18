@@ -600,7 +600,6 @@
     <ClInclude Include="..\..\FEBio2\FEMuscleMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FENeoHookean.h" />
     <ClInclude Include="..\..\FEBio2\FENeoHookeanTransIso.h" />
-    <ClInclude Include="..\..\FEBio2\FENodeNodeList.h" />
     <ClInclude Include="..\..\FEBio2\FENodeReorder.h" />
     <ClInclude Include="..\..\FEBio2\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEOgdenUnconstrained.h" />
@@ -745,7 +744,6 @@
     <ClCompile Include="..\..\FEBio2\FEMuscleMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FENeoHookean.cpp" />
     <ClCompile Include="..\..\FEBio2\FENeoHookeanTransIso.cpp" />
-    <ClCompile Include="..\..\FEBio2\FENodeNodeList.cpp" />
     <ClCompile Include="..\..\FEBio2\FENodeReorder.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOgdenUnconstrained.cpp" />

@@ -165,9 +165,6 @@
     <ClInclude Include="..\..\FEBio2\FENeoHookeanTransIso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FENodeNodeList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FENodeReorder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -600,9 +597,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FENeoHookeanTransIso.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FENodeNodeList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FENodeReorder.cpp">
