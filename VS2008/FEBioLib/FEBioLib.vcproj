@@ -214,10 +214,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\DenseMatrix.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.cpp"
 				>
 			</File>
@@ -293,10 +289,6 @@
 			>
 			<File
 				RelativePath="..\..\FEBioLib\ConjGradIterSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\DenseMatrix.h"
 				>
 			</File>
 			<File

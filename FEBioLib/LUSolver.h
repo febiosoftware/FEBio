@@ -1,6 +1,6 @@
 #pragma once
 #include "NumCore/LinearSolver.h"
-#include "DenseMatrix.h"
+#include "NumCore/DenseMatrix.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------

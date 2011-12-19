@@ -2,13 +2,13 @@
 #include "DenseMatrix.h"
 
 //-----------------------------------------------------------------------------
-DenseMatrix::DenseMatrix()
+NumCore::DenseMatrix::DenseMatrix()
 {
 	m_pr = 0;
 }
 
 //-----------------------------------------------------------------------------
-DenseMatrix::~DenseMatrix()
+NumCore::DenseMatrix::~DenseMatrix()
 {
 	delete [] m_pd; m_pd = 0;
 	delete [] m_pr; m_pr = 0;
@@ -16,7 +16,7 @@ DenseMatrix::~DenseMatrix()
 
 //-----------------------------------------------------------------------------
 // Creat a dense matrix of size N x N
-void DenseMatrix::Create(int N)
+void NumCore::DenseMatrix::Create(int N)
 {
 	if (N != m_ndim)
 	{
@@ -38,7 +38,7 @@ void DenseMatrix::Create(int N)
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in dense format
 //!
-void DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
+void NumCore::DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
 {
 	int i, j, I, J;
 
@@ -57,7 +57,7 @@ void DenseMatrix::Assemble(matrix& ke, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void DenseMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void NumCore::DenseMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 
