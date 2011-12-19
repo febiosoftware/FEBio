@@ -923,6 +923,9 @@
     <ClCompile Include="..\..\FEBio2\FEBiphasicSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBio2\InitLibrary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FEBio2.rc">

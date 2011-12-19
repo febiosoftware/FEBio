@@ -805,6 +805,7 @@
     <ClCompile Include="..\..\FEBio2\hello.cpp" />
     <ClCompile Include="..\..\FEBio2\init.cpp" />
     <ClCompile Include="..\..\FEBio2\InitContact.cpp" />
+    <ClCompile Include="..\..\FEBio2\InitLibrary.cpp" />
     <ClCompile Include="..\..\FEBio2\InitPoroSolute.cpp" />
     <ClCompile Include="..\..\FEBio2\InitRigid.cpp" />
     <ClCompile Include="..\..\FEBio2\input.cpp" />
