@@ -76,6 +76,7 @@
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\LinearSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
     <ClCompile Include="..\..\NumCore\matrix.cpp" />
     <ClCompile Include="..\..\NumCore\MatrixProfile.cpp" />
     <ClCompile Include="..\..\NumCore\qsort.cpp" />
@@ -89,6 +90,7 @@
     <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
     <ClInclude Include="..\..\NumCore\LinearSolver.h" />
+    <ClInclude Include="..\..\NumCore\LUSolver.h" />
     <ClInclude Include="..\..\NumCore\matrix.h" />
     <ClInclude Include="..\..\NumCore\MatrixProfile.h" />
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />

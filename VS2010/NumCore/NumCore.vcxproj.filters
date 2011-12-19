@@ -54,6 +54,9 @@
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\NumCore\LUSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\NumCore\stdafx.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NumCore\SkylineSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NumCore\LUSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

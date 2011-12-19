@@ -511,7 +511,6 @@
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
     <ClInclude Include="..\..\FEBioLib\FETransverselyIsotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledMaterial.h" />
-    <ClInclude Include="..\..\FEBioLib\LUSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
     <ClInclude Include="..\..\FEBioLib\RCICGSolver.h" />
@@ -528,7 +527,6 @@
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETransverselyIsotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledMaterial.cpp" />
-    <ClCompile Include="..\..\FEBioLib\LUSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />
     <ClCompile Include="..\..\FEBioLib\PSLDLTSolver.cpp" />
