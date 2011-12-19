@@ -515,8 +515,6 @@
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
     <ClInclude Include="..\..\FEBioLib\RCICGSolver.h" />
-    <ClInclude Include="..\..\FEBioLib\SkylineMatrix.h" />
-    <ClInclude Include="..\..\FEBioLib\SkylineSolver.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
     <ClInclude Include="..\..\FEBioLib\SuperLUSolver.h" />
     <ClInclude Include="..\..\FEBioLib\SuperLU_MT_Solver.h" />
@@ -535,8 +533,6 @@
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />
     <ClCompile Include="..\..\FEBioLib\PSLDLTSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\RCICGSolver.cpp" />
-    <ClCompile Include="..\..\FEBioLib\SkylineMatrix.cpp" />
-    <ClCompile Include="..\..\FEBioLib\SkylineSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioLib\SuperLUSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\SuperLU_MT_Solver.cpp" />
