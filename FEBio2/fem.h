@@ -27,18 +27,6 @@ using namespace std;
 #define MAX_STRING	256
 
 //-----------------------------------------------------------------------------
-// forward declaration of the FEM class
-class FEM;
-
-//-----------------------------------------------------------------------------
-// FEBIO callback structure
-typedef void (*FEBIO_CB_FNC)(FEM*,void*);
-struct FEBIO_CALLBACK {
-	FEBIO_CB_FNC	m_pcb;
-	void*	m_pd;
-};
-
-//-----------------------------------------------------------------------------
 //! The Finite Element Model class. 
 
 //! This class stores solver parameters, geometry data, material data, and 
@@ -133,13 +121,10 @@ public:
 	//! Evaluate parameter list
 	void EvaluateParameterList(FEParameterList& pl);
 	void EvaluateMaterialParameters(FEMaterial* pm);
-	
-public:
-	//! copy constructor
-	FEM(const FEM& fem);
 
-	//! assignment operator
-	void operator = (const FEM& fem);
+public:
+	virtual void PushState();
+	virtual void PopState ();
 
 protected:
 	void ShallowCopy(FEM& fem);
@@ -181,15 +166,6 @@ public:
 
 		//! Update contact data
 		void UpdateContact();
-	//}
-
-	//{ --- Miscellaneous routines ---
-
-		//! set callback function
-		void AddCallback(FEBIO_CB_FNC pcb, void* pd);
-
-		//! call the callback function
-		void DoCallback();
 	//}
 
 public:
@@ -270,8 +246,6 @@ protected:
 		char	m_sztitle[MAX_STRING];	//!< problem title
 
 		bool	m_debug;			//!< debug flag
-
-		list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
 	//}
 };
 

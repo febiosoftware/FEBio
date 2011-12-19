@@ -347,6 +347,10 @@ bool FEAnalysisStep::Init()
 }
 
 //-----------------------------------------------------------------------------
+// This 
+static FEM* pfem_copy = 0;
+
+//-----------------------------------------------------------------------------
 bool FEAnalysisStep::Solve()
 {
 	// do one time initialization of solver data
@@ -380,9 +384,6 @@ bool FEAnalysisStep::Solve()
 	else
 		pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 
-	// keep a stack for push/pop'ing
-	stack<FEM> state;
-
 	// print initial progress bar
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
 	{
@@ -410,11 +411,7 @@ bool FEAnalysisStep::Solve()
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
-		if (m_bautostep) 
-		{
-			while (!state.empty()) state.pop();
-			state.push(m_fem);
-		}
+		if (m_bautostep) m_fem.PushState();
 
 		// update time
 		m_fem.m_ftime += m_dt;
@@ -568,7 +565,7 @@ bool FEAnalysisStep::Solve()
 			if (m_bautostep && (m_nretries < m_maxretries))
 			{
 				// restore the previous state
-				m_fem = state.top(); state.pop();
+				m_fem.PopState();
 				
 				// let's try again
 				Retry();

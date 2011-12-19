@@ -92,30 +92,6 @@ FEM::FEM()
 }
 
 //-----------------------------------------------------------------------------
-//! copy constructor for FEM class.
-//! The copy constructor and assignment operator are only used for push/pop'ing
-//! to a stack. This is used by the running restart feature. Note that not all 
-//! data is copied. We only copy the data that changes during iterations.
-//! for push/pop'ing
-
-FEM::FEM(const FEM& fem)
-{
-	ShallowCopy(const_cast<FEM&>(fem));
-}
-
-//-----------------------------------------------------------------------------
-//! assignment operator for FEM class.
-//! The copy constructor and assignment operator are only used for push/pop'ing
-//! to a stack. This is used by the running restart feature. Note that not all 
-//! data is copied. We only copy the data that changes during iterations.
-//! for push/pop'ing
-
-void FEM::operator =(const FEM& fem)
-{
-	ShallowCopy(const_cast<FEM&>(fem));
-}
-
-//-----------------------------------------------------------------------------
 //! destructor of FEM class.
 //! Delete all dynamically allocated data
 
@@ -141,6 +117,25 @@ FEM::~FEM()
 		for (pi = m_LCSet.begin(); pi != m_LCSet.end(); ++pi) delete (*pi); 
 		m_LCSet.clear();
 	}
+}
+
+//-----------------------------------------------------------------------------
+static FEM* pfem_copy = 0;
+
+//-----------------------------------------------------------------------------
+void FEM::PushState()
+{
+	if (pfem_copy == 0) pfem_copy = new FEM;
+	pfem_copy->ShallowCopy(*this);
+}
+
+//-----------------------------------------------------------------------------
+void FEM::PopState()
+{
+	assert(pfem_copy);
+	ShallowCopy(*pfem_copy);
+	delete pfem_copy;
+	pfem_copy = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -193,33 +188,6 @@ void FEM::ShallowCopy(FEM& fem)
 	}
 	assert(ContactInterfaces() == fem.ContactInterfaces());
 	for (i=0; i<ContactInterfaces(); ++i) m_CI[i]->ShallowCopy(*fem.m_CI[i]);
-}
-
-//-----------------------------------------------------------------------------
-// This function adds a callback routine
-//
-void FEM::AddCallback(FEBIO_CB_FNC pcb, void *pd)
-{
-	FEBIO_CALLBACK cb;
-	cb.m_pcb = pcb;
-	cb.m_pd = pd;
-
-	m_pcb.push_back(cb);
-}
-
-//-----------------------------------------------------------------------------
-// FEM::DoCallback
-// Call the callback function if there is one defined
-//
-
-void FEM::DoCallback()
-{
-	list<FEBIO_CALLBACK>::iterator it = m_pcb.begin();
-	for (int i=0; i<(int) m_pcb.size(); ++i, ++it)
-	{
-		// call the callback function
-		(it->m_pcb)(this, it->m_pd);
-	}
 }
 
 //-----------------------------------------------------------------------------

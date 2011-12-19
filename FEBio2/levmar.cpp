@@ -25,7 +25,7 @@ void mrqcof(vector<double>& x,
 			double& chisq,
 			void funcs(vector<double>& , vector<double>&, vector<double>&, matrix&));
 
-extern void fecb(FEM* pfem, void* pd);
+extern void fecb(FEModel* pfem, void* pd);
 
 //-----------------------------------------------------------------------------
 FELMOptimizeMethod::FELMOptimizeMethod()

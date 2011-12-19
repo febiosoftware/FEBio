@@ -9,6 +9,17 @@
 #include <vector>
 
 //-----------------------------------------------------------------------------
+class FEModel;
+
+//-----------------------------------------------------------------------------
+// FEBIO callback structure
+typedef void (*FEBIO_CB_FNC)(FEModel*,void*);
+struct FEBIO_CALLBACK {
+	FEBIO_CB_FNC	m_pcb;
+	void*	m_pd;
+};
+
+//-----------------------------------------------------------------------------
 class FEModel
 {
 public:
@@ -26,6 +37,10 @@ public:
 
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }
+
+	// facilities for (re)storing the model state data
+	virtual void PushState() = 0;
+	virtual void PopState () = 0;
 
 public:	// Load curve functions
 
@@ -81,6 +96,14 @@ public: // analysis step functions
 	//! Get a particular step
 	FEAnalysis* GetStep(int i) { return m_Step[i]; }
 
+public:	// Miscellaneous routines
+
+	//! set callback function
+	void AddCallback(FEBIO_CB_FNC pcb, void* pd);
+
+	//! call the callback function
+	void DoCallback();
+
 protected:
 	std::vector<FELoadCurve*>	m_LC;	//!< load curve data
 	std::vector<FEMaterial*>	m_MAT;	//!< array of materials
@@ -95,4 +118,6 @@ public:
 	std::vector<FEPrescribedBC*>	m_DC;	//!< prescribed constraints
 	std::vector<FENodalForce*>		m_FC;	//!< concentrated nodal loads
 	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
+
+	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
 };
