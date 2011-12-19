@@ -216,10 +216,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\BFGSSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\DumpFile.cpp"
 				>
 			</File>
@@ -344,10 +340,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\NonLinearSystem.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\stdafx.cpp"
 				>
 			</File>
@@ -371,10 +363,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\BC.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\BFGSSolver.h"
 				>
 			</File>
 			<File
@@ -523,10 +511,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\MathParser.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\NonLinearSystem.h"
 				>
 			</File>
 			<File

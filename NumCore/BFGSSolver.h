@@ -1,11 +1,11 @@
 #pragma once
 
-#include "NumCore/matrix.h"
-#include "NumCore/vector.h"
-#include "NumCore/LinearSolver.h"
+#include "matrix.h"
+#include "vector.h"
+#include "LinearSolver.h"
 #include "NonLinearSystem.h"
 
-namespace FECore {
+namespace NumCore {
 
 //-----------------------------------------------------------------------------
 //! The BFGSSolver solves a nonlinear system of equations using the BFGS method.
@@ -65,4 +65,4 @@ public:
 	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
 };
 
-} // namespace FECore
+} // namespace NumCore

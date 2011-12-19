@@ -44,7 +44,7 @@
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"
 #include "FEHeatTransferMaterial.h"
-using namespace FECore;
+using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 FEM* FEBioFileSection::GetFEM() { return m_pim->GetFEM(); }

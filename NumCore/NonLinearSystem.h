@@ -1,9 +1,8 @@
 #pragma once
 #include <vector>
-#include "NumCore/SparseMatrix.h"
-using namespace NumCore;
+#include "SparseMatrix.h"
 
-namespace FECore {
+namespace NumCore {
 
 //-----------------------------------------------------------------------------
 // The NonLinearSystem describes the interface for all non-linear systems.
@@ -15,7 +14,6 @@ namespace FECore {
 class NonLinearSystem
 {
 public:
-	NonLinearSystem(void);
 	virtual ~NonLinearSystem(void);
 
 	// overide function to evaluate current state
@@ -31,4 +29,4 @@ public:
 	virtual bool Converged() = 0;
 };
 
-}
+} // namespace NumCore

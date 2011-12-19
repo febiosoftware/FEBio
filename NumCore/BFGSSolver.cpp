@@ -5,7 +5,7 @@
 // BFGSSolver
 //-----------------------------------------------------------------------------
 
-FECore::BFGSSolver::BFGSSolver()
+NumCore::BFGSSolver::BFGSSolver()
 {
 	m_maxups = 10;
 	m_maxref = 15;
@@ -25,7 +25,7 @@ FECore::BFGSSolver::BFGSSolver()
 
 //-----------------------------------------------------------------------------
 // New initialization method
-void FECore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls)
+void NumCore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls)
 {
 	// allocate storage for BFGS update vectors
 	m_V.resize(m_maxups, neq);
@@ -58,7 +58,7 @@ void FECore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls)
 //! be an indication of an ill-conditioned matrix and the update should
 //! not be performed.
 
-bool FECore::BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
+bool NumCore::BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
 	int i;
 	double dg, dh,dgi, c, r;
@@ -113,7 +113,7 @@ bool FECore::BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0
 // The variable m_nups keeps track of how many updates have been made so far.
 // 
 
-void FECore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
+void NumCore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 {
 	int i, j;
 	double *vi, *wi, vr, wr;
@@ -153,7 +153,7 @@ void FECore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 
 //-----------------------------------------------------------------------------
 // New Solve routine
-void FECore::BFGSSolver::Solve()
+void NumCore::BFGSSolver::Solve()
 {
 	// create the initial jacobian matrix
 	SparseMatrix* pK = m_plinsolve->CreateSparseMatrix(SPARSE_SYMMETRIC);
@@ -206,7 +206,7 @@ void FECore::BFGSSolver::Solve()
 // For instance, define a di so that ui = s*di. Also, define the 
 // position of the nodes at the previous iteration.
 
-double FECore::BFGSSolver::LineSearch()
+double NumCore::BFGSSolver::LineSearch()
 {
 	double s = 1.0;
 	double smin = s;
