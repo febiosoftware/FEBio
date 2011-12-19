@@ -1135,10 +1135,10 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el
 	int ndpn = 6;
 	
 	double *Gr, *Gs, *Gt, *H;
-	double Gx, Gy, Gz, GX, GY, GZ;
+	double Gx, Gy, Gz;
 	
 	// jacobian
-	double Ji[3][3], detJ, J0i[3][3];
+	double Ji[3][3], detJ;
 	
 	// Bp-matrix
 	vector<double> B1(neln), B2(neln), B3(neln);

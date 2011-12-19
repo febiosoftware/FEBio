@@ -6,7 +6,7 @@
 #include "FESolver.h"
 #include "fem.h"
 #include "log.h"
-#include "FEBioLib/SkylineSolver.h"
+#include "NumCore/SkylineSolver.h"
 #include "FEBioLib/PSLDLTSolver.h"
 #include "FEBioLib/SuperLUSolver.h"
 #include "FEBioLib/SuperLU_MT_Solver.h"

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "NumCore/LinearSolver.h"
+#include "LinearSolver.h"
 #include "SkylineMatrix.h"
-using namespace NumCore;
+
+namespace NumCore {
 
 //-----------------------------------------------------------------------------
 //! Implements a linear solver that uses a skyline format
@@ -17,3 +18,5 @@ public:
 
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = (ntype == SPARSE_SYMMETRIC? new SkylineMatrix() : 0)); }
 };
+
+} // namespace NumCore

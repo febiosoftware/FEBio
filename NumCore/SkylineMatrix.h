@@ -1,6 +1,7 @@
 #pragma once
-#include "NumCore/SparseMatrix.h"
-using namespace NumCore;
+#include "SparseMatrix.h"
+
+namespace NumCore {
 
 //=============================================================================
 //! Implements a sparse matrix using the skyline storage
@@ -68,3 +69,5 @@ public:
 protected:
 	int*	m_ppointers;	// arrays of indices to diagonal elements
 };
+
+} // namespace NumCore

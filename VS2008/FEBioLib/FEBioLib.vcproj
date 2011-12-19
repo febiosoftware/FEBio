@@ -258,14 +258,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\SkylineMatrix.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\SkylineSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\stdafx.cpp"
 				>
 			</File>
@@ -333,14 +325,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\RCICGSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\SkylineMatrix.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\SkylineSolver.h"
 				>
 			</File>
 			<File

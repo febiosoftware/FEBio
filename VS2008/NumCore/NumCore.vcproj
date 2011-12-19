@@ -177,6 +177,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\NumCore\SkylineMatrix.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\SkylineSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\NumCore\SparseMatrix.cpp"
 				>
 			</File>
@@ -212,6 +220,14 @@
 			</File>
 			<File
 				RelativePath="..\..\NumCore\MatrixProfile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\SkylineMatrix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\SkylineSolver.h"
 				>
 			</File>
 			<File
