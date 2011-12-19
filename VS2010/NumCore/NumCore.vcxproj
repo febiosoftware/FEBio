@@ -74,6 +74,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\colsol.cpp" />
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
+    <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\LinearSolver.cpp" />
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
+    <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
     <ClInclude Include="..\..\NumCore\LinearSolver.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />

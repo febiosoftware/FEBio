@@ -57,6 +57,9 @@
     <ClCompile Include="..\..\NumCore\LUSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\NumCore\stdafx.h">
@@ -93,6 +96,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NumCore\LUSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

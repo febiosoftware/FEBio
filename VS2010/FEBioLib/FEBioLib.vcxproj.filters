@@ -18,9 +18,6 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FEBioLib\ConjGradIterSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -65,9 +62,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioLib\ConjGradIterSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
