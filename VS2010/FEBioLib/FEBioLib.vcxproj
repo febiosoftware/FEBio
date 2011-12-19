@@ -504,7 +504,6 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FEBioLib\CompactMatrix.h" />
     <ClInclude Include="..\..\FEBioLib\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\FEBioLib\DenseMatrix.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
@@ -526,7 +525,6 @@
     <ClInclude Include="..\..\FEBioLib\WSMPSolver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioLib\CompactMatrix.cpp" />
     <ClCompile Include="..\..\FEBioLib\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\DenseMatrix.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
@@ -538,7 +536,6 @@
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />
     <ClCompile Include="..\..\FEBioLib\PSLDLTSolver.cpp" />
-    <ClCompile Include="..\..\FEBioLib\qsort.cpp" />
     <ClCompile Include="..\..\FEBioLib\RCICGSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\FEBioLib\SkylineSolver.cpp" />
