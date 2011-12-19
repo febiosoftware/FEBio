@@ -1,7 +1,7 @@
 #pragma once
-#include "NumCore/LinearSolver.h"
-#include "NumCore/DenseMatrix.h"
-using namespace NumCore;
+#include "LinearSolver.h"
+#include "DenseMatrix.h"
+namespace NumCore {
 
 //-----------------------------------------------------------------------------
 //! LU decomposition solver
@@ -25,3 +25,5 @@ public:
 protected:
 	vector<int>	indx;
 };
+
+} // namespace NumCore

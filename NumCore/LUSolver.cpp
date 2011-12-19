@@ -3,14 +3,14 @@
 #include <math.h>
 
 //-----------------------------------------------------------------------------
-bool LUSolver::PreProcess()
+bool NumCore::LUSolver::PreProcess()
 {
 	// We don't need to do any preprocessing for this solver
 	return LinearSolver::PreProcess();
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::Factor()
+bool NumCore::LUSolver::Factor()
 {
 	// convert to a FullMatrix
 	DenseMatrix& a = dynamic_cast<DenseMatrix&> (*m_pA);
@@ -79,7 +79,7 @@ bool LUSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool LUSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool NumCore::LUSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	DenseMatrix& a = dynamic_cast<DenseMatrix&> (*m_pA);
 
@@ -112,7 +112,7 @@ bool LUSolver::BackSolve(vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-void LUSolver::Destroy()
+void NumCore::LUSolver::Destroy()
 {
 	// nothing to destroy
 	LinearSolver::Destroy();

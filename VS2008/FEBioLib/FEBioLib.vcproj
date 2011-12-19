@@ -238,10 +238,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\LUSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\PardisoSolver.cpp"
 				>
 			</File>
@@ -309,10 +305,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\LUSolver.h"
 				>
 			</File>
 			<File
