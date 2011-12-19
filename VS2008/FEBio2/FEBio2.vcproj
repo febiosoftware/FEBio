@@ -541,10 +541,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FENodeNodeList.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FENodeReorder.cpp"
 				>
 			</File>
@@ -1204,10 +1200,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FENeoHookeanTransIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FENodeNodeList.h"
 				>
 			</File>
 			<File

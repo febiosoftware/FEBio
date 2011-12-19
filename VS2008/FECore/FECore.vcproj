@@ -220,10 +220,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\colsol.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\DumpFile.cpp"
 				>
 			</File>
@@ -304,6 +300,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FENodeNodeList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEParameterList.cpp"
 				>
 			</File>
@@ -345,10 +345,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\MathParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\matrix.cpp"
 				>
 			</File>
 			<File
@@ -498,6 +494,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FENodeNodeList.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEParameterList.h"
 				>
 			</File>
@@ -543,10 +543,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\MathParser.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\matrix.h"
 				>
 			</File>
 			<File
