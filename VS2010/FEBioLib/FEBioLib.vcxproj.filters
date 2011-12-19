@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\FEBioLib\ConjGradIterSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\DenseMatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\LUSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -78,9 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\ConjGradIterSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\DenseMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\LUSolver.cpp">

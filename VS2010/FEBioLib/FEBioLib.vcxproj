@@ -505,7 +505,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioLib\ConjGradIterSolver.h" />
-    <ClInclude Include="..\..\FEBioLib\DenseMatrix.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
@@ -526,7 +525,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\ConjGradIterSolver.cpp" />
-    <ClCompile Include="..\..\FEBioLib\DenseMatrix.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
