@@ -500,23 +500,19 @@
     <ClInclude Include="..\..\FECore\FESurface.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
-    <ClInclude Include="..\..\FECore\LinearSolver.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
     <ClInclude Include="..\..\FECore\mat2d.h" />
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
     <ClInclude Include="..\..\FECore\MathParser.h" />
-    <ClInclude Include="..\..\FECore\MatrixProfile.h" />
     <ClInclude Include="..\..\FECore\NonLinearSystem.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
-    <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
     <ClInclude Include="..\..\FECore\tens4d.h" />
     <ClInclude Include="..\..\FECore\tens4d.hpp" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
-    <ClInclude Include="..\..\FECore\vector.h" />
     <ClInclude Include="..\..\FECore\XMLReader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -550,16 +546,12 @@
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\kernel.cpp" />
-    <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
-    <ClCompile Include="..\..\FECore\MatrixProfile.cpp" />
     <ClCompile Include="..\..\FECore\NonLinearSystem.cpp" />
-    <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
     <ClCompile Include="..\..\FECore\tens4d.cpp" />
-    <ClCompile Include="..\..\FECore\vector.cpp" />
     <ClCompile Include="..\..\FECore\XMLReader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

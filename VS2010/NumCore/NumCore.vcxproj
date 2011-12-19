@@ -73,13 +73,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\NumCore\colsol.cpp" />
+    <ClCompile Include="..\..\NumCore\LinearSolver.cpp" />
     <ClCompile Include="..\..\NumCore\matrix.cpp" />
+    <ClCompile Include="..\..\NumCore\MatrixProfile.cpp" />
+    <ClCompile Include="..\..\NumCore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />
+    <ClCompile Include="..\..\NumCore\vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\NumCore\LinearSolver.h" />
     <ClInclude Include="..\..\NumCore\matrix.h" />
+    <ClInclude Include="..\..\NumCore\MatrixProfile.h" />
+    <ClInclude Include="..\..\NumCore\SparseMatrix.h" />
     <ClInclude Include="..\..\NumCore\stdafx.h" />
     <ClInclude Include="..\..\NumCore\targetver.h" />
+    <ClInclude Include="..\..\NumCore\vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
