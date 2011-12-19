@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "ConjGradIterSolver.h"
+#include "vector.h"
 #include <algorithm>
-#include "NumCore/vector.h"
 
 //-----------------------------------------------------------------------------
-ConjGradIterSolver::ConjGradIterSolver()
+NumCore::ConjGradIterSolver::ConjGradIterSolver()
 {
 	m_tol = 0.01;
 	m_kmax = 200;
@@ -12,14 +12,14 @@ ConjGradIterSolver::ConjGradIterSolver()
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::PreProcess()
+bool NumCore::ConjGradIterSolver::PreProcess()
 {
 	assert(m_pA);
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::Factor()
+bool NumCore::ConjGradIterSolver::Factor()
 {
 /*	CompactMatrix& C = dynamic_cast<CompactMatrix&>(*m_pA);
 	int neq = K.Size();
@@ -52,7 +52,7 @@ bool ConjGradIterSolver::Factor()
 }
 
 //-----------------------------------------------------------------------------
-bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
+bool NumCore::ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 {
 	int i;
 
@@ -61,7 +61,7 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 	int N = x.size();
 
 	// intialize x to zero
-	fill(x.begin(), x.end(), 0);
+	std::fill(x.begin(), x.end(), 0);
 
 	// iteration counter
 	int k = 0;
@@ -79,10 +79,10 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 	normb = sqrt(normb);
 
 	// search direction
-	vector<double> p; p.assign(N, 0.0);
+	std::vector<double> p; p.assign(N, 0.0);
 
 	// work vector
-	vector<double> w(N);
+	std::vector<double> w(N);
 
 	double alpha, beta;
 
@@ -126,7 +126,7 @@ bool ConjGradIterSolver::BackSolve(vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-void ConjGradIterSolver::Destroy()
+void NumCore::ConjGradIterSolver::Destroy()
 {
-
+	LinearSolver::Destroy();
 }

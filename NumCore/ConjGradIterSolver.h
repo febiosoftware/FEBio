@@ -1,10 +1,9 @@
 #pragma once
-
-#include "NumCore/LinearSolver.h"
-#include "NumCore/CompactMatrix.h"
+#include "LinearSolver.h"
+#include "CompactMatrix.h"
 #include <vector>
-using namespace std;
-using namespace NumCore;
+
+namespace NumCore {
 
 //-----------------------------------------------------------------------------
 //! this class implements an iterative conjugate gradient solver 
@@ -15,7 +14,7 @@ public:
 
 	bool PreProcess();
 	bool Factor();
-	bool BackSolve(vector<double>& x, vector<double>& b);
+	bool BackSolve(std::vector<double>& x, std::vector<double>& b);
 
 	void Destroy();
 
@@ -26,5 +25,7 @@ public:
 	int		m_kmax;		// max iterations
 	int		m_nprint;	// printing level
 
-	vector<double>	m_P;	// preconditioning vector
+	std::vector<double>	m_P;	// preconditioning vector
 };
+
+} // namespace NumCore

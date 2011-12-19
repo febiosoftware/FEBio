@@ -157,6 +157,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\NumCore\ConjGradIterSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\NumCore\DenseMatrix.cpp"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			>
 			<File
 				RelativePath="..\..\NumCore\CompactMatrix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\ConjGradIterSolver.h"
 				>
 			</File>
 			<File

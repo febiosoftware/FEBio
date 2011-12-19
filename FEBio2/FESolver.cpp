@@ -8,12 +8,12 @@
 #include "log.h"
 #include "NumCore/SkylineSolver.h"
 #include "NumCore/LUSolver.h"
+#include "NumCore/ConjGradIterSolver.h"
 #include "FEBioLib/PSLDLTSolver.h"
 #include "FEBioLib/SuperLUSolver.h"
 #include "FEBioLib/SuperLU_MT_Solver.h"
 #include "FEBioLib/PardisoSolver.h"
 #include "FEBioLib/WSMPSolver.h"
-#include "FEBioLib/ConjGradIterSolver.h"
 #include "FEBioLib/RCICGSolver.h"
 
 FESolver::FESolver(FEM& fem) : m_fem(fem)

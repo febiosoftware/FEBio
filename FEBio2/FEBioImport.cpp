@@ -6,7 +6,7 @@
 #include "FEBioImport.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
-#include "FEBioLib/ConjGradIterSolver.h"
+#include "NumCore/ConjGradIterSolver.h"
 #include "FEBioLib/SuperLUSolver.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
