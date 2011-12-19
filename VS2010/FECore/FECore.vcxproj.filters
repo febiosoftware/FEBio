@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\FECore\BC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\BFGSSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\DumpFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -117,9 +114,6 @@
     <ClInclude Include="..\..\FECore\mat3d.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\NonLinearSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\quatd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -167,9 +161,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FECore\BFGSSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FECore\DumpFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -246,9 +237,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\mat3d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FECore\NonLinearSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\stdafx.cpp">

@@ -467,7 +467,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BC.h" />
-    <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\DumpFile.h" />
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\febio.h" />
@@ -505,7 +504,6 @@
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
     <ClInclude Include="..\..\FECore\MathParser.h" />
-    <ClInclude Include="..\..\FECore\NonLinearSystem.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
@@ -517,7 +515,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
-    <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyForce.cpp" />
@@ -549,7 +546,6 @@
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
-    <ClCompile Include="..\..\FECore\NonLinearSystem.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
     <ClCompile Include="..\..\FECore\tens4d.cpp" />
     <ClCompile Include="..\..\FECore\XMLReader.cpp" />
