@@ -4,9 +4,6 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPointBodyForce, FEBodyForce, "point");
-
-//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPointBodyForce, FEBodyForce);
 	ADD_PARAMETER(m_a, FE_PARAM_DOUBLE, "a");
 	ADD_PARAMETER(m_b, FE_PARAM_DOUBLE, "b");

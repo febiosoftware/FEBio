@@ -2,12 +2,6 @@
 #include "FEConstBodyForce.h"
 #include "FECore/febio.h"
 
-//-----------------------------------------------------------------------------
-// Register body force class
-REGISTER_FEBIO_CLASS(FEConstBodyForce      , FEBodyForce, "const");
-REGISTER_FEBIO_CLASS(FENonConstBodyForce   , FEBodyForce, "non-const");
-REGISTER_FEBIO_CLASS(FECentrifugalBodyForce, FEBodyForce, "centrifugal");
-
 //=============================================================================
 // FEConstBodyForce
 //-----------------------------------------------------------------------------

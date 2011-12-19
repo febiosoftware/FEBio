@@ -797,6 +797,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\InitLibrary.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\InitPoroSolute.cpp"
 				>
 			</File>
