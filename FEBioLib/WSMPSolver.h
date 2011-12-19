@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "FECore/SparseMatrix.h"
-#include "FECore/LinearSolver.h"
-#include "CompactMatrix.h"
-#include "FECore/vector.h"
+#include "NumCore/SparseMatrix.h"
+#include "NumCore/LinearSolver.h"
+#include "NumCore/vector.h"
 #include "NumCore/matrix.h"
+#include "CompactMatrix.h"
 
-using namespace FECore;
+using namespace NumCore;
 
 
 	/* WSMP Fortran prototypes */

@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/vec3d.h"
-#include "FECore/vector.h"
+#include "NumCore/vector.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEParameterList.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include "SparseMatrix.h"
+#include "NumCore/SparseMatrix.h"
+using namespace NumCore;
 
 namespace FECore {
 

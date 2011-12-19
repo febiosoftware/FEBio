@@ -1,8 +1,8 @@
 #pragma once
 
 #include "NumCore/matrix.h"
-#include "vector.h"
-#include "LinearSolver.h"
+#include "NumCore/vector.h"
+#include "NumCore/LinearSolver.h"
 #include "NonLinearSystem.h"
 
 namespace FECore {

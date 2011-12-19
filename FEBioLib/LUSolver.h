@@ -1,8 +1,7 @@
 #pragma once
-
-#include "FECore/LinearSolver.h"
+#include "NumCore/LinearSolver.h"
 #include "DenseMatrix.h"
-using namespace FECore;
+using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 //! LU decomposition solver

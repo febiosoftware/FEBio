@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FECore/vector.h"
+#include "NumCore/vector.h"
 #include "FECore/FEMesh.h"
 
 //-----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #pragma once
-#include "FECore/SparseMatrix.h"
-using namespace FECore;
+#include "NumCore/SparseMatrix.h"
+using namespace NumCore;
 
 //=============================================================================
 //! This class stores a sparse matrix in Harwell-Boeing format.

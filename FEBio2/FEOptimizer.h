@@ -3,7 +3,7 @@
 #include <string.h>
 #include "FECore/XMLReader.h"
 #include "fem.h"
-#include "FECore/vector.h"
+#include "NumCore/vector.h"
 
 //-----------------------------------------------------------------------------
 // IO exceptions

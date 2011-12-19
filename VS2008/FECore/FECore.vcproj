@@ -332,10 +332,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\LinearSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\LoadCurve.cpp"
 				>
 			</File>
@@ -348,15 +344,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\MatrixProfile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\NonLinearSystem.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\SparseMatrix.cpp"
 				>
 			</File>
 			<File
@@ -365,10 +353,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\tens4d.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\vector.cpp"
 				>
 			</File>
 			<File
@@ -522,10 +506,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\LinearSolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\LoadCurve.h"
 				>
 			</File>
@@ -546,19 +526,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\MatrixProfile.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\NonLinearSystem.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FECore\quatd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\SparseMatrix.h"
 				>
 			</File>
 			<File
@@ -583,10 +555,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\vec3d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\vector.h"
 				>
 			</File>
 			<File

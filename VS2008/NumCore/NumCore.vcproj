@@ -153,11 +153,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\NumCore\LinearSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\NumCore\matrix.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\..\NumCore\MatrixProfile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\SparseMatrix.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\NumCore\stdafx.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\vector.cpp"
 				>
 			</File>
 		</Filter>
@@ -167,7 +183,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\NumCore\LinearSolver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\NumCore\matrix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\MatrixProfile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\SparseMatrix.h"
 				>
 			</File>
 			<File
@@ -176,6 +204,10 @@
 			</File>
 			<File
 				RelativePath="..\..\NumCore\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\vector.h"
 				>
 			</File>
 		</Filter>

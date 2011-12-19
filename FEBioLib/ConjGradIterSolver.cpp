@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ConjGradIterSolver.h"
 #include <algorithm>
-#include "FECore/vector.h"
+#include "NumCore/vector.h"
 
 //-----------------------------------------------------------------------------
 ConjGradIterSolver::ConjGradIterSolver()

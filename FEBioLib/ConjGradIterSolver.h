@@ -1,10 +1,10 @@
 #pragma once
 
-#include "FECore/LinearSolver.h"
+#include "NumCore/LinearSolver.h"
 #include "CompactMatrix.h"
 #include <vector>
 using namespace std;
-using namespace FECore;
+using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 //! this class implements an iterative conjugate gradient solver 

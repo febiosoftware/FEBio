@@ -9,8 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/SparseMatrix.h"
-using namespace FECore;
+#include "NumCore/SparseMatrix.h"
+using namespace NumCore;
 
 class FEM;
 class FESolver;

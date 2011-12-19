@@ -1,6 +1,6 @@
 #pragma once
-#include "FECore/SparseMatrix.h"
-using namespace FECore;
+#include "NumCore/SparseMatrix.h"
+using namespace NumCore;
 
 //=============================================================================
 //! Implements a sparse matrix using the skyline storage

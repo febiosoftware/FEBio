@@ -1,7 +1,7 @@
 #pragma once
-#include "FECore/LinearSolver.h"
+#include "NumCore/LinearSolver.h"
 #include "CompactMatrix.h"
-using namespace FECore;
+using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 //! Implements a wrapper class for the SuperLU library

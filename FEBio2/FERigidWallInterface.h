@@ -14,7 +14,7 @@
 #include "FECore/FESurface.h"
 #include "FECore/vec3d.h"
 #include "FECore/vec2d.h"
-#include "FECore/vector.h"
+#include "NumCore/vector.h"
 
 //-----------------------------------------------------------------------------
 class FERigidWallSurface : public FESurface

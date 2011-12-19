@@ -1,8 +1,8 @@
 #pragma once
 
-#include "FECore/LinearSolver.h"
+#include "NumCore/LinearSolver.h"
 #include "SkylineMatrix.h"
-using namespace FECore;
+using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 //! Implements a linear solver that uses a skyline format

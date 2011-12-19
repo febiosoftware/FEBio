@@ -11,7 +11,7 @@
 
 #include "FECore/FEContactInterface.h"
 #include "FEBioLib/FEContactSurface.h"
-#include "FECore/vector.h"
+#include "NumCore/vector.h"
 
 //-----------------------------------------------------------------------------
 class FESlidingSurface : public FEContactSurface
