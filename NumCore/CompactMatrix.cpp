@@ -6,7 +6,7 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-CompactMatrix::CompactMatrix(int offset)
+NumCore::CompactMatrix::CompactMatrix(int offset)
 {
 	m_pindices = 0;
 	m_ppointers = 0;
@@ -14,7 +14,7 @@ CompactMatrix::CompactMatrix(int offset)
 }
 
 //-----------------------------------------------------------------------------
-void CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
+void NumCore::CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
 {
 	if (m_pd  ) delete [] m_pd; m_pd = pv;
 	if (m_pindices ) delete [] m_pindices; m_pindices = pi;
@@ -30,10 +30,10 @@ void CompactMatrix::Create(int N, int nz, double* pv, int* pi, int* pp)
 
 //-----------------------------------------------------------------------------
 //! constructor
-CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
+NumCore::CompactSymmMatrix::CompactSymmMatrix(int offset) : CompactMatrix(offset) {}
 
 //-----------------------------------------------------------------------------
-void CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
+void NumCore::CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 {
 	assert(Size() == (int) x.size());
 	assert(Size() == (int) r.size());
@@ -41,7 +41,7 @@ void CompactSymmMatrix::mult_vector(const vector<double>& x, vector<double>& r)
 }
 
 //-----------------------------------------------------------------------------
-void CompactSymmMatrix::mult_vector(const double* x, double* r)
+void NumCore::CompactSymmMatrix::mult_vector(const double* x, double* r)
 {
 	int j, i, n;
 	int N = Size();
@@ -99,7 +99,7 @@ void CompactSymmMatrix::mult_vector(const double* x, double* r)
 
 
 //-----------------------------------------------------------------------------
-void CompactSymmMatrix::Create(SparseMatrixProfile& mp)
+void NumCore::CompactSymmMatrix::Create(SparseMatrixProfile& mp)
 {
 	int i, j, k, n;
 
@@ -172,7 +172,7 @@ void qsort(int n, int* arr, int* indx);
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in compact column storage
 //!
-void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
+void NumCore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 {
 	// get the number of degrees of freedom
 	const int N = ke.rows();
@@ -219,7 +219,7 @@ void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 
 
 //-----------------------------------------------------------------------------
-void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void NumCore::CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 
@@ -256,7 +256,7 @@ void CompactSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 }
 
 //-----------------------------------------------------------------------------
-void write_hb(CompactMatrix& m, FILE* fp)
+void NumCore::write_hb(CompactMatrix& m, FILE* fp)
 {
 	int neq = m.Size();
 	int nnz = m.NonZeroes();
@@ -269,7 +269,7 @@ void write_hb(CompactMatrix& m, FILE* fp)
 }
 
 //-----------------------------------------------------------------------------
-void read_hb(CompactSymmMatrix& m, FILE* fp)
+void NumCore::read_hb(CompactSymmMatrix& m, FILE* fp)
 {
 	int neq, nnz;
 	fread(&neq, sizeof(neq), 1, fp);
@@ -292,13 +292,13 @@ void read_hb(CompactSymmMatrix& m, FILE* fp)
 
 //-----------------------------------------------------------------------------
 //! Constructor for CompactUnSymmMatrix class 
-CompactUnSymmMatrix::CompactUnSymmMatrix(int offset, bool row_based) : CompactMatrix(offset)
+NumCore::CompactUnSymmMatrix::CompactUnSymmMatrix(int offset, bool row_based) : CompactMatrix(offset)
 {
 	m_brow_based = row_based;
 }
 
 //-----------------------------------------------------------------------------
-void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
+void NumCore::CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 {
 	int i, j, k, n;
 
@@ -383,7 +383,7 @@ void CompactUnSymmMatrix::Create(SparseMatrixProfile& mp)
 //! into the global stiffness matrix which is in compact column storage and
 //! the matrix is unsymmetric
 //!
-void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
+void NumCore::CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 {
 	int i, j, I, J;
 
@@ -402,7 +402,7 @@ void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LM)
 }
 
 //-----------------------------------------------------------------------------
-void CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void NumCore::CompactUnSymmMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FETiedContactSurface.h"
-#include "FECore/vector.h"
+#include "NumCore/vector.h"
 
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data

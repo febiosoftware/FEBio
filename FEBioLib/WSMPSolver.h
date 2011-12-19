@@ -10,7 +10,7 @@
 #include "NumCore/LinearSolver.h"
 #include "NumCore/vector.h"
 #include "NumCore/matrix.h"
-#include "CompactMatrix.h"
+#include "NumCore/CompactMatrix.h"
 
 using namespace NumCore;
 

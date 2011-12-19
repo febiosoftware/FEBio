@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NumCore/LinearSolver.h"
-#include "CompactMatrix.h"
+#include "NumCore/CompactMatrix.h"
 #include <vector>
 using namespace std;
 using namespace NumCore;

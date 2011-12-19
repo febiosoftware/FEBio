@@ -1,11 +1,12 @@
 #pragma once
-#include "NumCore/SparseMatrix.h"
-using namespace NumCore;
+#include "SparseMatrix.h"
 
 //=============================================================================
 //! This class stores a sparse matrix in Harwell-Boeing format.
 
 //! This is the base class for the symmetric and unsymmetric classes
+
+namespace NumCore {
 
 class CompactMatrix : public SparseMatrix
 {
@@ -249,3 +250,5 @@ void write_hb(CompactMatrix& m, FILE* fp);
 //-----------------------------------------------------------------------------
 //! read Symmetric compact matrix data
 void read_hb(CompactSymmMatrix& m, FILE* fp);
+
+} // namespace NumCore
