@@ -318,6 +318,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FELinearTransIso.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEMooneyRivlin.cpp"
 				>
 			</File>
@@ -339,6 +343,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETCNonlinearOrthotropic.cpp"
 				>
 			</File>
 			<File
@@ -540,6 +552,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FELinearTransIso.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEMooneyRivlin.h"
 				>
 			</File>
@@ -561,6 +577,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETCNonlinearOrthotropic.h"
 				>
 			</File>
 			<File

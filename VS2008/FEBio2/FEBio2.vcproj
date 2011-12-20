@@ -409,10 +409,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FELinearTransIso.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\fem.cpp"
 				>
 			</File>
@@ -569,10 +565,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEStVenantKirchhoff.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESupplyBinding.cpp"
 				>
 			</File>
@@ -594,10 +586,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETCNonlinearOrthotropic.cpp"
 				>
 			</File>
 			<File
@@ -919,10 +907,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FELinearTransIso.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\fem.h"
 				>
 			</File>
@@ -1079,10 +1063,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEStVenantKirchhoff.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESupplyBinding.h"
 				>
 			</File>
@@ -1104,10 +1084,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETCNonlinearOrthotropic.h"
 				>
 			</File>
 			<File

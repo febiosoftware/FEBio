@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #include "FEStVenantKirchhoff.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEStVenantKirchhoff, "St.Venant-Kirchhoff");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEStVenantKirchhoff, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

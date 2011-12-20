@@ -29,10 +29,13 @@
 #include "FEBioLib/FEIsotropicElastic.h"
 #include "FEBioLib/FELinearElastic.h"
 #include "FEBioLib/FELinearOrthotropic.h"
+#include "FEBioLib/FELinearTransIso.h"
 #include "FEBioLib/FEMooneyRivlin.h"
 #include "FEBioLib/FEMuscleMaterial.h"
 #include "FEBioLib/FENeoHookean.h"
 #include "FEBioLib/FEOgdenMaterial.h"
+#include "FEBioLib/FEStVenantKirchhoff.h"
+#include "FEBioLib/FETCNonlinearOrthotropic.h"
 #include "FEBioLib/FETendonMaterial.h"
 #include "FEBioLib/FETransIsoMooneyRivlin.h"
 #include "FEBioLib/FETransIsoVerondaWestmann.h"
@@ -76,10 +79,13 @@ REGISTER_MATERIAL(FEIncompNeoHookean            , "incomp neo-Hookean"          
 REGISTER_MATERIAL(FEIsotropicElastic            , "isotropic elastic"             );
 REGISTER_MATERIAL(FELinearElastic               , "linear elastic"                );
 REGISTER_MATERIAL(FELinearOrthotropic           , "linear orthotropic"            );
+REGISTER_MATERIAL(FELinearTransIso              , "linear trans iso"              );
 REGISTER_MATERIAL(FEMooneyRivlin                , "Mooney-Rivlin"                 );
 REGISTER_MATERIAL(FEMuscleMaterial              , "muscle material"               );
 REGISTER_MATERIAL(FENeoHookean                  , "neo-Hookean"                   );
 REGISTER_MATERIAL(FEOgdenMaterial               , "Ogden"                         );
+REGISTER_MATERIAL(FEStVenantKirchhoff           , "St.Venant-Kirchhoff"           );
+REGISTER_MATERIAL(FETCNonlinearOrthotropic      , "TC nonlinear orthotropic"      );
 REGISTER_MATERIAL(FETendonMaterial              , "tendon material"               );
 REGISTER_MATERIAL(FETransIsoMooneyRivlin        , "trans iso Mooney-Rivlin"       );
 REGISTER_MATERIAL(FETransIsoVerondaWestmann     , "trans iso Veronda-Westmann"    );

@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Tension-compression nonlinear orthrotropic
@@ -39,9 +39,6 @@ public:
 
 	double m_c1;	//!< Mooney-Rivlin coefficient c1
 	double m_c2;	//!< Mooney-Rivlin coefficient c2	
-
-	// declare as registered
-	DECLARE_REGISTERED(FETCNonlinearOrthotropic);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

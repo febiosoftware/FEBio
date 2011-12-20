@@ -2,10 +2,6 @@
 #include "FELinearTransIso.h"
 
 //-----------------------------------------------------------------------------
-// register the material with the framework
-REGISTER_MATERIAL(FELinearTransIso, "linear trans iso");
-
-//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FELinearTransIso, FEElasticMaterial)
 	ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
