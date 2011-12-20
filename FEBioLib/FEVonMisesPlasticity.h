@@ -88,9 +88,6 @@ public:
 	//! data initialization and checking
 	void Init();
 
-	// declare as registered
-	DECLARE_REGISTERED(FEVonMisesPlasticity);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

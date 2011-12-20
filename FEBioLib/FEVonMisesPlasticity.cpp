@@ -1,10 +1,6 @@
 #include "FEVonMisesPlasticity.h"
 
 //-----------------------------------------------------------------------------
-// register the material with the framework
-REGISTER_MATERIAL(FEVonMisesPlasticity, "von-Mises plasticity");
-
-//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEVonMisesPlasticity, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

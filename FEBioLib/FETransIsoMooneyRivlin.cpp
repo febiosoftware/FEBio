@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #include "FETransIsoMooneyRivlin.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FETransIsoMooneyRivlin, "trans iso Mooney-Rivlin");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETransIsoMooneyRivlin, FETransverselyIsotropic)
 	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");

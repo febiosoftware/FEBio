@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FETransverselyIsotropic.h"
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Veronda-Westmann material
@@ -32,9 +32,6 @@ public:
 
 	//! calculate deviatoric tangent stiffness at material point
 	virtual tens4ds DevTangent(FEMaterialPoint& pt);
-
-	// declare as registered
-	DECLARE_REGISTERED(FETransIsoVerondaWestmann);
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

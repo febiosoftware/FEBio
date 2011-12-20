@@ -613,14 +613,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FETransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETransIsoVerondaWestmann.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETriphasic.cpp"
 				>
 			</File>
@@ -642,10 +634,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEViscoElasticMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEVonMisesPlasticity.cpp"
 				>
 			</File>
 			<File
@@ -1151,14 +1139,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FETransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETransIsoVerondaWestmann.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETriphasic.h"
 				>
 			</File>
@@ -1180,10 +1160,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEViscoElasticMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEVonMisesPlasticity.h"
 				>
 			</File>
 			<File

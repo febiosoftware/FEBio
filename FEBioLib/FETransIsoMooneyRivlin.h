@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FETransverselyIsotropic.h"
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 //! Transversely Isotropic Mooney-Rivlin material
@@ -33,12 +33,8 @@ public:
 	//! calculate deviatoric tangent stiffness at material point
 	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
-	// declare as registered
-	DECLARE_REGISTERED(FETransIsoMooneyRivlin);
-
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };
-
 
 #endif // !defined(AFX_FETRANSISOMOONEYRIVLIN_H__E918D89B_4CCD_44B9_9731_19CEC4EDF406__INCLUDED_)

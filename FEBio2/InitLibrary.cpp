@@ -33,7 +33,10 @@
 #include "FEBioLib/FENeoHookean.h"
 #include "FEBioLib/FEOgdenMaterial.h"
 #include "FEBioLib/FETendonMaterial.h"
+#include "FEBioLib/FETransIsoMooneyRivlin.h"
+#include "FEBioLib/FETransIsoVerondaWestmann.h"
 #include "FEBioLib/FEVerondaWestmann.h"
+#include "FEBioLib/FEVonMisesPlasticity.h"
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce
@@ -73,4 +76,7 @@ REGISTER_MATERIAL(FEMuscleMaterial              , "muscle material"             
 REGISTER_MATERIAL(FENeoHookean                  , "neo-Hookean"                   );
 REGISTER_MATERIAL(FEOgdenMaterial               , "Ogden"                         );
 REGISTER_MATERIAL(FETendonMaterial              , "tendon material"               );
+REGISTER_MATERIAL(FETransIsoMooneyRivlin        , "trans iso Mooney-Rivlin"       );
+REGISTER_MATERIAL(FETransIsoVerondaWestmann     , "trans iso Veronda-Westmann"    );
 REGISTER_MATERIAL(FEVerondaWestmann             , "Veronda-Westmann"              );
+REGISTER_MATERIAL(FEVonMisesPlasticity          , "von-Mises plasticity"          );

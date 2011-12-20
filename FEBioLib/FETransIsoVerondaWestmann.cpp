@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #include "FETransIsoVerondaWestmann.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FETransIsoVerondaWestmann, "trans iso Veronda-Westmann");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETransIsoVerondaWestmann, FETransverselyIsotropic)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");

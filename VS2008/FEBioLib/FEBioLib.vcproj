@@ -342,6 +342,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FETransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransIsoVerondaWestmann.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.cpp"
 				>
 			</File>
@@ -351,6 +359,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEVerondaWestmann.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEVonMisesPlasticity.cpp"
 				>
 			</File>
 			<File
@@ -536,6 +548,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FETransIsoMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETransIsoVerondaWestmann.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.h"
 				>
 			</File>
@@ -545,6 +565,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEVerondaWestmann.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEVonMisesPlasticity.h"
 				>
 			</File>
 			<File
