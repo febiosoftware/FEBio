@@ -52,9 +52,6 @@ public:
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData() { return new FETrussMaterialPoint; }
 
-	// declare as registered
-	DECLARE_REGISTERED(FETrussMaterial);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

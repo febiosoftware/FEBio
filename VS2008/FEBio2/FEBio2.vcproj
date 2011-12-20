@@ -625,18 +625,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FETrussMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEUncoupledElasticMixture.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEViscoElasticMaterial.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FileImport.cpp"
 				>
 			</File>
@@ -860,10 +848,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEDiscreteSpringDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEElasticMixture.h"
 				>
 			</File>
 			<File
@@ -1148,18 +1132,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETriphasicSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETrussMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEUncoupledElasticMixture.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEViscoElasticMaterial.h"
 				>
 			</File>
 			<File

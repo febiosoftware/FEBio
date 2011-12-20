@@ -73,7 +73,4 @@ public:
 		
 	//! data initialization and checking
 	void Init();
-		
-	// declare as registered
-	DECLARE_REGISTERED(FEElasticMixture);
 };

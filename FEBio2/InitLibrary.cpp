@@ -18,6 +18,7 @@
 #include "FEBioLib/FEEFDNeoHookean.h"
 #include "FEBioLib/FEEFDUncoupled.h"
 #include "FEBioLib/FEEFDVerondaWestmann.h"
+#include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEEllipsoidalFiberDistribution.h"
 #include "FEBioLib/FEFiberNeoHookean.h"
 #include "FEBioLib/FEFungOrthoCompressible.h"
@@ -35,7 +36,10 @@
 #include "FEBioLib/FETendonMaterial.h"
 #include "FEBioLib/FETransIsoMooneyRivlin.h"
 #include "FEBioLib/FETransIsoVerondaWestmann.h"
+#include "FEBioLib/FETrussMaterial.h"
+#include "FEBioLib/FEUncoupledElasticMixture.h"
 #include "FEBioLib/FEVerondaWestmann.h"
+#include "FEBioLib/FEViscoElasticMaterial.h"
 #include "FEBioLib/FEVonMisesPlasticity.h"
 
 //-----------------------------------------------------------------------------
@@ -61,6 +65,7 @@ REGISTER_MATERIAL(FEEFDMooneyRivlin             , "EFD Mooney-Rivlin"           
 REGISTER_MATERIAL(FEEFDNeoHookean               , "EFD neo-Hookean"               );
 REGISTER_MATERIAL(FEEFDUncoupled                , "EFD uncoupled"                 );
 REGISTER_MATERIAL(FEEFDVerondaWestmann          , "EFD Veronda-Westmann"          );
+REGISTER_MATERIAL(FEElasticMixture              , "solid mixture"                 );
 REGISTER_MATERIAL(FEEllipsoidalFiberDistribution, "ellipsoidal fiber distribution");
 REGISTER_MATERIAL(FEFiberNeoHookean             , "fiber neo-Hookean"             );
 REGISTER_MATERIAL(FEFungOrthoCompressible       , "Fung-ortho-compressible"       );
@@ -78,5 +83,8 @@ REGISTER_MATERIAL(FEOgdenMaterial               , "Ogden"                       
 REGISTER_MATERIAL(FETendonMaterial              , "tendon material"               );
 REGISTER_MATERIAL(FETransIsoMooneyRivlin        , "trans iso Mooney-Rivlin"       );
 REGISTER_MATERIAL(FETransIsoVerondaWestmann     , "trans iso Veronda-Westmann"    );
+REGISTER_MATERIAL(FETrussMaterial               , "linear truss"                  );
+REGISTER_MATERIAL(FEUncoupledElasticMixture     , "uncoupled solid mixture"       );
 REGISTER_MATERIAL(FEVerondaWestmann             , "Veronda-Westmann"              );
+REGISTER_MATERIAL(FEViscoElasticMaterial        , "viscoelastic"                  );
 REGISTER_MATERIAL(FEVonMisesPlasticity          , "von-Mises plasticity"          );

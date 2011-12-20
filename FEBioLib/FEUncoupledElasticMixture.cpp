@@ -1,9 +1,5 @@
 #include "stdafx.h"
-#include "FECore/tens4d.h"
 #include "FEUncoupledElasticMixture.h"
-
-// register the material with the framework
-REGISTER_MATERIAL(FEUncoupledElasticMixture, "uncoupled solid mixture");
 
 // define the material parameters
 // BEGIN_PARAMETER_LIST(FEUncoupledElasticMixture, FEUncoupledMaterial)

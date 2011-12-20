@@ -105,9 +105,6 @@ public:
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
 
 public:
-	// declare as registered
-	DECLARE_REGISTERED(FEViscoElasticMaterial);
-
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

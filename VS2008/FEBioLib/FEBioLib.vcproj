@@ -274,6 +274,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEElasticMixture.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEEllipsoidalFiberDistribution.cpp"
 				>
 			</File>
@@ -354,11 +358,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FETrussMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledElasticMixture.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEVerondaWestmann.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEViscoElasticMaterial.cpp"
 				>
 			</File>
 			<File
@@ -476,6 +492,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEElasticMixture.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h"
 				>
 			</File>
@@ -560,11 +580,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FETrussMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledElasticMixture.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEVerondaWestmann.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEViscoElasticMaterial.h"
 				>
 			</File>
 			<File

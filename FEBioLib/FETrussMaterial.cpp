@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FETrussMaterial.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FETrussMaterial, "linear truss");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETrussMaterial, FEMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

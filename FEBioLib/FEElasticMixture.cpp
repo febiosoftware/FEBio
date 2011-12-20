@@ -1,10 +1,5 @@
 #include "stdafx.h"
-#include "FECore/tens4d.h"
 #include "FEElasticMixture.h"
-
-//-----------------------------------------------------------------------------
-// register the material with the framework
-REGISTER_MATERIAL(FEElasticMixture, "solid mixture");
 
 //-----------------------------------------------------------------------------
 void FEElasticMixture::Init()
