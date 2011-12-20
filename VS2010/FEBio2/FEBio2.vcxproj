@@ -560,8 +560,6 @@
     <ClInclude Include="..\..\FEBio2\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBio2\FEFiberExpPowUncoupled.h" />
     <ClInclude Include="..\..\FEBio2\FEFluidFlux.h" />
-    <ClInclude Include="..\..\FEBio2\FEFungOrthotropic.h" />
-    <ClInclude Include="..\..\FEBio2\FEGasserOgdenHolzapfel.h" />
     <ClInclude Include="..\..\FEBio2\FEHeatFlux.h" />
     <ClInclude Include="..\..\FEBio2\FEHeatSolidDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEHeatSolver.h" />
@@ -678,8 +676,6 @@
     <ClCompile Include="..\..\FEBio2\FEFiberExpPowUncoupled.cpp" />
     <ClCompile Include="..\..\FEBio2\FEFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEFluidFlux.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEFungOrthotropic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEGasserOgdenHolzapfel.cpp" />
     <ClCompile Include="..\..\FEBio2\FEHeatFlux.cpp" />
     <ClCompile Include="..\..\FEBio2\FEHeatSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEIsotropicFourier.cpp" />
