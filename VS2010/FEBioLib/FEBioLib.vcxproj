@@ -504,12 +504,18 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h" />
+    <ClInclude Include="..\..\FEBioLib\FEIsotropicElastic.h" />
+    <ClInclude Include="..\..\FEBioLib\FEMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioLib\FENeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
     <ClInclude Include="..\..\FEBioLib\FETransverselyIsotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledMaterial.h" />
+    <ClInclude Include="..\..\FEBioLib\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PlotFile.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
@@ -522,11 +528,18 @@
     <ClInclude Include="..\..\FEBioLib\WSMPSolver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEIsotropicElastic.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FENeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETransverselyIsotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />
     <ClCompile Include="..\..\FEBioLib\PlotFile.cpp" />
