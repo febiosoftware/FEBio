@@ -504,10 +504,24 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioLib\FE2DFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
+    <ClInclude Include="..\..\FEBioLib\FEDonnanEquilibrium.h" />
+    <ClInclude Include="..\..\FEBioLib\FEEFDDonnanEquilibrium.h" />
+    <ClInclude Include="..\..\FEBioLib\FEEFDMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioLib\FEEFDNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FEEFDUncoupled.h" />
+    <ClInclude Include="..\..\FEBioLib\FEEFDVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h" />
+    <ClInclude Include="..\..\FEBioLib\FEFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FEIsotropicElastic.h" />
+    <ClInclude Include="..\..\FEBioLib\FELinearElastic.h" />
+    <ClInclude Include="..\..\FEBioLib\FELinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FEMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FENeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FEOgdenMaterial.h" />
@@ -516,6 +530,7 @@
     <ClInclude Include="..\..\FEBioLib\FETransverselyIsotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioLib\geodesic.h" />
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PlotFile.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
@@ -528,10 +543,24 @@
     <ClInclude Include="..\..\FEBioLib\WSMPSolver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioLib\FE2DFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEDonnanEquilibrium.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEEFDDonnanEquilibrium.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEEFDMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEEFDNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEEFDUncoupled.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEEFDVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEEllipsoidalFiberDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicElastic.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FELinearElastic.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FELinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FENeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEOgdenMaterial.cpp" />
