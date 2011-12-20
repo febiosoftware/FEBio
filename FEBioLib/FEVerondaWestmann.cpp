@@ -5,19 +5,14 @@
 #include "stdafx.h"
 #include "FEVerondaWestmann.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEVerondaWestmann, "Veronda-Westmann");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c2, FE_PARAM_DOUBLE, "c2");
 END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// FEVerondaWestmann
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void FEVerondaWestmann::Init()
 {
 	FEUncoupledMaterial::Init();

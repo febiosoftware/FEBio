@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Arruda-Boyce material
@@ -32,9 +32,6 @@ public:
 
 	//! data initialization
 	void Init();
-
-	// declare as registered
-	DECLARE_REGISTERED(FEArrudaBoyce);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //!  Veronda-Westmann material model
@@ -32,9 +32,6 @@ public:
 
 	//! initialize
 	void Init();
-
-	// declare as registered
-	DECLARE_REGISTERED(FEVerondaWestmann);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

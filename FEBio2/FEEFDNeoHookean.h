@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
-#include "FENeoHookean.h"
+#include "FEBioLib/FENeoHookean.h"
 #include "FEEllipsoidalFiberDistribution.h"
 
 class FEEFDNeoHookean :	public FEElasticMaterial

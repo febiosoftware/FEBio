@@ -1,10 +1,14 @@
 #pragma once
 #include "FECore/FEElasticMaterial.h"
 
-class FEIsotropicElastic : public FEElasticMaterial
+//-----------------------------------------------------------------------------
+//! Neo Hookean material
+
+//! Implementation of a neo-Hookean hyperelastic material.
+class FENeoHookean : public FEElasticMaterial
 {
 public:
-	FEIsotropicElastic() {}
+	FENeoHookean() {}
 
 public:
 	double	m_E;	//!< Young's modulus
@@ -17,11 +21,8 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
-	//! data initialization
+	//! data initialization and checking
 	void Init();
-
-	// declare as registered
-	DECLARE_REGISTERED(FEIsotropicElastic);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

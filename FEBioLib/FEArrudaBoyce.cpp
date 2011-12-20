@@ -6,18 +6,12 @@
 #include "stdafx.h"
 #include "FEArrudaBoyce.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEArrudaBoyce, "Arruda-Boyce");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEArrudaBoyce, FEUncoupledMaterial)
 	ADD_PARAMETER(m_mu, FE_PARAM_DOUBLE, "mu");
 	ADD_PARAMETER(m_N, FE_PARAM_DOUBLE, "N");
 END_PARAMETER_LIST();
-
-//////////////////////////////////////////////////////////////////////
-// FEArrudaBoyce
-//////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
 //! Material initialization

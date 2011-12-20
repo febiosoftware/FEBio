@@ -210,11 +210,35 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\FEBioLib\FEArrudaBoyce.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEContactSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEHolmesMow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicElastic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FENeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOgdenMaterial.cpp"
 				>
 			</File>
 			<File
@@ -231,6 +255,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -280,6 +308,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\FEBioLib\FEArrudaBoyce.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEConstBodyForce.h"
 				>
 			</File>
@@ -289,6 +321,26 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEFiberMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEHolmesMow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicElastic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FENeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOgdenMaterial.h"
 				>
 			</File>
 			<File
@@ -305,6 +357,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEVerondaWestmann.h"
 				>
 			</File>
 			<File

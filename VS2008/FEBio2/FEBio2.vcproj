@@ -297,10 +297,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEArrudaBoyce.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEAugLagLinearConstraint.cpp"
 				>
 			</File>
@@ -469,15 +465,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEHolmesMow.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEIncompNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEIsotropicElastic.cpp"
 				>
 			</File>
 			<File
@@ -525,15 +513,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEMooneyRivlin.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEMuscleMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FENeoHookean.cpp"
 				>
 			</File>
 			<File
@@ -542,10 +522,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FENodeReorder.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEOgdenMaterial.cpp"
 				>
 			</File>
 			<File
@@ -761,10 +737,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEVerondaWestmann.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEViscoElasticMaterial.cpp"
 				>
 			</File>
@@ -928,10 +900,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEAnalysisStep.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEArrudaBoyce.h"
 				>
 			</File>
 			<File
@@ -1127,15 +1095,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEHolmesMow.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEIncompNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEIsotropicElastic.h"
 				>
 			</File>
 			<File
@@ -1183,15 +1143,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEMooneyRivlin.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEMuscleMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FENeoHookean.h"
 				>
 			</File>
 			<File
@@ -1200,10 +1152,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FENodeReorder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEOgdenMaterial.h"
 				>
 			</File>
 			<File
@@ -1416,10 +1364,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEUncoupledElasticMixture.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEVerondaWestmann.h"
 				>
 			</File>
 			<File

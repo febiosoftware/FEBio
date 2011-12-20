@@ -1,6 +1,7 @@
 #pragma once
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
+//-----------------------------------------------------------------------------
 class FEOgdenMaterial :	public FEUncoupledMaterial
 {
 public:
@@ -24,8 +25,6 @@ protected:
 public:
 	double	m_c[MAX_TERMS];	//!< coefficients
 	double	m_m[MAX_TERMS];	//!< powers
-
-	DECLARE_REGISTERED(FEOgdenMaterial);
 
 	DECLARE_PARAMETER_LIST();
 };

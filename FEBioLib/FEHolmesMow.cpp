@@ -1,10 +1,7 @@
 #include "stdafx.h"
-#include "FECore/tens4d.h"
 #include "FEHolmesMow.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEHolmesMow, "Holmes-Mow");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEHolmesMow, FEElasticMaterial)
 ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
@@ -12,10 +9,7 @@ ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 ADD_PARAMETER(m_b, FE_PARAM_DOUBLE, "beta");
 END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// Compressible isotropic Holmes-Mow constitutive model
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void FEHolmesMow::Init()
 {
 	FEElasticMaterial::Init();
@@ -30,6 +24,7 @@ void FEHolmesMow::Init()
 	Ha = lam + 2*mu;	
 }
 
+//-----------------------------------------------------------------------------
 mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -57,6 +52,7 @@ mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
+//-----------------------------------------------------------------------------
 tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

@@ -1,19 +1,14 @@
 #include "stdafx.h"
 #include "FEIsotropicElastic.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEIsotropicElastic, "isotropic elastic");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEIsotropicElastic, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
 	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// FEIsotropicElastic
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void FEIsotropicElastic::Init()
 {
 	// intialize base class
@@ -23,6 +18,7 @@ void FEIsotropicElastic::Init()
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
 }
 
+//-----------------------------------------------------------------------------
 mat3ds FEIsotropicElastic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -52,6 +48,7 @@ mat3ds FEIsotropicElastic::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
+//-----------------------------------------------------------------------------
 tens4ds FEIsotropicElastic::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();

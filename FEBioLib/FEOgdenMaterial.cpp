@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "FEOgdenMaterial.h"
 
-REGISTER_MATERIAL(FEOgdenMaterial, "Ogden");
-
+//-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEOgdenMaterial, FEUncoupledMaterial);
 	ADD_PARAMETER(m_c[0], FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(m_c[1], FE_PARAM_DOUBLE, "c2");

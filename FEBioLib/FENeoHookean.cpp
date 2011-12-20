@@ -1,19 +1,14 @@
 #include "stdafx.h"
 #include "FENeoHookean.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FENeoHookean, "neo-Hookean");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
 	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// FENeoHookean
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void FENeoHookean::Init()
 {
 	FEElasticMaterial::Init();
@@ -22,6 +17,7 @@ void FENeoHookean::Init()
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialRangeError("v", -1.0, 0.5, true, false);
 }
 
+//-----------------------------------------------------------------------------
 mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -32,7 +28,6 @@ mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
 	double lndetF = log(detF);
 
 	// calculate left Cauchy-Green tensor
-	// (we commented out the matrix components we do not need)
 	mat3ds b = pt.LeftCauchyGreen();
 
 	// lame parameters
@@ -48,6 +43,7 @@ mat3ds FENeoHookean::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
+//-----------------------------------------------------------------------------
 tens4ds FENeoHookean::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
