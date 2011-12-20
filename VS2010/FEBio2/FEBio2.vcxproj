@@ -543,12 +543,8 @@
     <ClInclude Include="..\..\FEBio2\FEBiphasicSoluteSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEBiphasicSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEBox.h" />
-    <ClInclude Include="..\..\FEBio2\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FECoupledHeatSolidSolver.h" />
-    <ClInclude Include="..\..\FEBio2\FEDamageMooneyRivlin.h" />
-    <ClInclude Include="..\..\FEBio2\FEDamageNeoHookean.h" />
-    <ClInclude Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBio2\FEDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEDiffConstIso.h" />
     <ClInclude Include="..\..\FEBio2\FEDiffConstOrtho.h" />
@@ -668,12 +664,8 @@
     <ClCompile Include="..\..\FEBio2\FEBiphasicSoluteSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBiphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBox.cpp" />
-    <ClCompile Include="..\..\FEBio2\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FECoupledHeatSolidSolver.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEDamageMooneyRivlin.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEDamageNeoHookean.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDiffConstIso.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDiffConstOrtho.cpp" />

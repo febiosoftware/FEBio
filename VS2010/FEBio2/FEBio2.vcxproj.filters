@@ -294,15 +294,6 @@
     <ClInclude Include="..\..\FEBio2\FEUncoupledElasticMixture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEDamageMooneyRivlin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEDamageNeoHookean.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEIsotropicFourier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -322,9 +313,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FETransIsoVerondaWestmann.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FECellGrowth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FECoupledHeatSolidSolver.h">
@@ -710,15 +698,6 @@
     <ClCompile Include="..\..\FEBio2\FEFiberExpPowUncoupled.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEDamageMooneyRivlin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEDamageNeoHookean.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEDamageTransIsoMooneyRivlin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEIsotropicFourier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -738,9 +717,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FETransIsoVerondaWestmann.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FECellGrowth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FECoupledHeatSolidSolver.cpp">

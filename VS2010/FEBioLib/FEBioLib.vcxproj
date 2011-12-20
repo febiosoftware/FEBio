@@ -508,7 +508,11 @@
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
+    <ClInclude Include="..\..\FEBioLib\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
+    <ClInclude Include="..\..\FEBioLib\FEDamageMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioLib\FEDamageNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FEDonnanEquilibrium.h" />
     <ClInclude Include="..\..\FEBioLib\FEEFDDonnanEquilibrium.h" />
     <ClInclude Include="..\..\FEBioLib\FEEFDMooneyRivlin.h" />
@@ -547,7 +551,11 @@
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEDamageMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEDamageNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEDonnanEquilibrium.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEEFDDonnanEquilibrium.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEEFDMooneyRivlin.cpp" />
