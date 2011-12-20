@@ -225,9 +225,6 @@
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FETCNonlinearOrthotropic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FETiedContactSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -282,9 +279,6 @@
     <ClInclude Include="..\..\FEBio2\FERigid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEStVenantKirchhoff.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FECoupledHeatSolidSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -298,9 +292,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEBiphasicSolute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FELinearTransIso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEOrthoElastic.h">
@@ -542,9 +533,6 @@
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FETCNonlinearOrthotropic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FETiedContactSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -653,9 +641,6 @@
     <ClCompile Include="..\..\FEBio2\FERigid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEStVenantKirchhoff.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FECoupledHeatSolidSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -663,9 +648,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FELinearSolidSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FELinearTransIso.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEOrthoElastic.cpp">

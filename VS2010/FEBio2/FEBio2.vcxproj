@@ -568,7 +568,6 @@
     <ClInclude Include="..\..\FEBio2\FELinearConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FELinearSolidDomain.h" />
     <ClInclude Include="..\..\FEBio2\FELinearSolidSolver.h" />
-    <ClInclude Include="..\..\FEBio2\FELinearTransIso.h" />
     <ClInclude Include="..\..\FEBio2\fem.h" />
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
@@ -608,11 +607,9 @@
     <ClInclude Include="..\..\FEBio2\FESoluteFlux.h" />
     <ClInclude Include="..\..\FEBio2\FESolver.h" />
     <ClInclude Include="..\..\FEBio2\FEStiffnessMatrix.h" />
-    <ClInclude Include="..\..\FEBio2\FEStVenantKirchhoff.h" />
     <ClInclude Include="..\..\FEBio2\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FETCNonlinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBio2\FETiedContactSurface.h" />
     <ClInclude Include="..\..\FEBio2\FETiedInterface.h" />
     <ClInclude Include="..\..\FEBio2\FETractionLoad.h" />
@@ -673,7 +670,6 @@
     <ClCompile Include="..\..\FEBio2\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearSolidSolver.cpp" />
-    <ClCompile Include="..\..\FEBio2\FELinearTransIso.cpp" />
     <ClCompile Include="..\..\FEBio2\fem.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
@@ -713,11 +709,9 @@
     <ClCompile Include="..\..\FEBio2\FESoluteFlux.cpp" />
     <ClCompile Include="..\..\FEBio2\FESolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEStiffnessMatrix.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEStVenantKirchhoff.cpp" />
     <ClCompile Include="..\..\FEBio2\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FETCNonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBio2\FETiedContactSurface.cpp" />
     <ClCompile Include="..\..\FEBio2\FETiedInterface.cpp" />
     <ClCompile Include="..\..\FEBio2\FETractionLoad.cpp" />
