@@ -18,8 +18,8 @@
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
-#include "FEElasticMixture.h"
-#include "FEUncoupledElasticMixture.h"
+#include "FEBioLib/FEElasticMixture.h"
+#include "FEBioLib/FEUncoupledElasticMixture.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 
 // --- Global Constants Data ---
