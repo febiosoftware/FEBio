@@ -2,7 +2,6 @@
 #include "FESolidSolver.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FEDiscreteMaterial.h"
-#include "log.h"
 
 //-----------------------------------------------------------------------------
 void FEDiscreteSpringDomain::Serialize(DumpFile& ar)

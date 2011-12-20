@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
-#include "log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FESolidSolver::Augment
