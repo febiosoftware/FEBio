@@ -27,9 +27,6 @@ public:
 	// Spatial tangent
 	virtual tens4ds Tangent(FEMaterialPoint& mp);
 	
-	// declare as registered
-	DECLARE_REGISTERED(FEEllipsoidalFiberDistribution);
-	
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 	

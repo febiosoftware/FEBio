@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a material that consists of a continuous fiber distribution
@@ -48,9 +48,6 @@ public:
 	static double	m_cph[];
 	static double	m_sph[];
 	static double	m_w[];
-
-	// declare as registered
-	DECLARE_REGISTERED(FEEFDMooneyRivlin);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

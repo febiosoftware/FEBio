@@ -24,7 +24,7 @@
 
 // --- Global Constants Data ---
 // m_Const needs a definition, since static
-map<std::string, double> FEM::m_Const;
+map<std::string, double> FEModel::m_Const;
 
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
@@ -498,19 +498,6 @@ void FEM::SetPlotFileNameExtension(const char *szext)
 	char* ch = strrchr(m_szplot, '.');
 	if (ch) *ch = 0;
 	strcat(m_szplot, szext);
-}
-
-//-----------------------------------------------------------------------------
-void FEM::SetGlobalConstant(const string& s, double v)
-{
-	m_Const[s] = v;
-	return;
-}
-
-//-----------------------------------------------------------------------------
-double FEM::GetGlobalConstant(const string& s)
-{
-	return (m_Const.count(s) ? m_Const.find(s)->second : 0);
 }
 
 //-----------------------------------------------------------------------------

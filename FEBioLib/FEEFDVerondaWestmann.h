@@ -1,6 +1,6 @@
 #pragma once
-#include "FEBioLib/FEUncoupledMaterial.h"
-#include "FEBioLib/FEVerondaWestmann.h"
+#include "FEUncoupledMaterial.h"
+#include "FEVerondaWestmann.h"
 #include "FEEllipsoidalFiberDistribution.h"
 
 //-----------------------------------------------------------------------------
@@ -50,9 +50,6 @@ public:
 	static double	m_cph[];
 	static double	m_sph[];
 	static double	m_w[];
-
-	// declare as registered
-	DECLARE_REGISTERED(FEEFDVerondaWestmann);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

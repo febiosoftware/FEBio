@@ -7,6 +7,7 @@
 #include "FEElasticMaterial.h"		// TODO: I want to delete this
 #include "FEAnalysis.h"
 #include <vector>
+#include <map>
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -104,6 +105,10 @@ public:	// Miscellaneous routines
 	//! call the callback function
 	void DoCallback();
 
+	// get/set global data
+	static void SetGlobalConstant(const string& s, double v);
+	static double GetGlobalConstant(const string& s);
+
 protected:
 	std::vector<FELoadCurve*>	m_LC;	//!< load curve data
 	std::vector<FEMaterial*>	m_MAT;	//!< array of materials
@@ -120,4 +125,7 @@ public:
 	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
 
 	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
+
+protected:
+	static std::map<string, double> m_Const;
 };

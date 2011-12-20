@@ -7,11 +7,9 @@
  */
 #include "stdafx.h"
 #include "FEDonnanEquilibrium.h"
-#include "fem.h"
+#include "FECore/FEModel.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEDonnanEquilibrium, "Donnan equilibrium");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDonnanEquilibrium, FEElasticMaterial)
 	ADD_PARAMETER(m_phiwr, FE_PARAM_DOUBLE, "phiw0");
@@ -21,16 +19,14 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // FEDonnanEquilibrium
-//-----------------------------------------------------------------------------
-
 void FEDonnanEquilibrium::Init()
 {
 	if (m_unstable) throw MaterialError("This material is unstable (produces infinite swelling) when used alone.  Combine it in a solid mixture with a material that can resist tension.");
 	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
 	if (m_bosm < 0) throw MaterialError("bosm must be positive.");
 
-	m_Rgas = FEM::GetGlobalConstant("R");
-	m_Tabs = FEM::GetGlobalConstant("T");
+	m_Rgas = FEModel::GetGlobalConstant("R");
+	m_Tabs = FEModel::GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");

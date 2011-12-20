@@ -19,7 +19,6 @@
 #include "FEBioLib/PlotFile.h"
 
 #include <list>
-#include <map>
 #include <string>
 using namespace std;
 
@@ -116,10 +115,6 @@ public:
 	//! Evaluate parameter list
 	void EvaluateParameterList(FEParameterList& pl);
 	void EvaluateMaterialParameters(FEMaterial* pm);
-
-	// get/set global data
-	static void SetGlobalConstant(const string& s, double v);
-	static double GetGlobalConstant(const string& s);
 
 public:
 	virtual void PushState();
@@ -246,9 +241,6 @@ protected:
 
 		bool	m_debug;			//!< debug flag
 	//}
-
-protected:
-	static map<string, double> m_Const;
 };
 
 #endif // _FEM_H_07012006_

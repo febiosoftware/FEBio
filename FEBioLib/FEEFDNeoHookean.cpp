@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEEFDNeoHookean.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEEFDNeoHookean, "EFD neo-Hookean");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFDNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_NH.m_E, FE_PARAM_DOUBLE, "E");

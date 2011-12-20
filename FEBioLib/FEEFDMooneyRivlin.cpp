@@ -15,9 +15,6 @@ double FEEFDMooneyRivlin::m_cph[NSTH];
 double FEEFDMooneyRivlin::m_sph[NSTH];
 double FEEFDMooneyRivlin::m_w[NSTH];
 
-// register the material with the framework
-REGISTER_MATERIAL(FEEFDMooneyRivlin, "EFD Mooney-Rivlin");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFDMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");

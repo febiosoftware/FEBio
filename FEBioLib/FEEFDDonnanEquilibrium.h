@@ -33,9 +33,6 @@ public:
 	FEEllipsoidalFiberDistribution	m_Fib;
 	FEDonnanEquilibrium				m_DEQ;
 		
-	// declare as registered
-	DECLARE_REGISTERED(FEEFDDonnanEquilibrium);
-		
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

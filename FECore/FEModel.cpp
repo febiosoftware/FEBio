@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "FEModel.h"
+#include <string>
+using namespace std;
 
 //-----------------------------------------------------------------------------
 FEModel::FEModel(void)
@@ -34,4 +36,17 @@ void FEModel::DoCallback()
 		// call the callback function
 		(it->m_pcb)(this, it->m_pd);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::SetGlobalConstant(const string& s, double v)
+{
+	m_Const[s] = v;
+	return;
+}
+
+//-----------------------------------------------------------------------------
+double FEModel::GetGlobalConstant(const string& s)
+{
+	return (m_Const.count(s) ? m_Const.find(s)->second : 0);
 }

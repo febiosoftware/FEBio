@@ -12,9 +12,6 @@ double FEFiberNeoHookean::m_sth[NSTH];
 double FEFiberNeoHookean::m_cph[NSTH];
 double FEFiberNeoHookean::m_sph[NSTH];
 
-// register the material with the framework
-REGISTER_MATERIAL(FEFiberNeoHookean, "fiber neo-Hookean");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

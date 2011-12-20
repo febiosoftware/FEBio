@@ -33,9 +33,6 @@ public:
 	static double	m_cph[];
 	static double	m_sph[];
 
-	// declare as registered
-	DECLARE_REGISTERED(FEFiberNeoHookean);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

@@ -373,39 +373,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEDonnanEquilibrium.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDDonnanEquilibrium.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDUncoupled.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDVerondaWestmann.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEElasticMixture.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEElemElemList.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEllipsoidalFiberDistribution.cpp"
 				>
 			</File>
 			<File
@@ -422,10 +390,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFiberMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFiberNeoHookean.cpp"
 				>
 			</File>
 			<File
@@ -963,30 +927,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEDonnanEquilibrium.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDDonnanEquilibrium.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDUncoupled.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEEFDVerondaWestmann.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEElasticMixture.h"
 				>
 			</File>
@@ -1007,10 +947,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEEllipsoidalFiberDistribution.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEFacet2FacetSliding.h"
 				>
 			</File>
@@ -1020,10 +956,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFiberExpPowUncoupled.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFiberNeoHookean.h"
 				>
 			</File>
 			<File
@@ -1328,10 +1260,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FileImport.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\geodesic.h"
 				>
 			</File>
 			<File

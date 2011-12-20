@@ -234,6 +234,38 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEDonnanEquilibrium.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDDonnanEquilibrium.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDNeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDUncoupled.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDVerondaWestmann.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEllipsoidalFiberDistribution.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFiberNeoHookean.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.cpp"
 				>
 			</File>
@@ -356,7 +388,39 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEDonnanEquilibrium.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDDonnanEquilibrium.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDUncoupled.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEFDVerondaWestmann.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEFiberMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFiberNeoHookean.h"
 				>
 			</File>
 			<File
@@ -409,6 +473,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEVerondaWestmann.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\geodesic.h"
 				>
 			</File>
 			<File

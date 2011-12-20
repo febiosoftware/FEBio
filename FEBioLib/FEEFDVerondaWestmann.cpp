@@ -13,9 +13,6 @@ double FEEFDVerondaWestmann::m_cph[NSTH];
 double FEEFDVerondaWestmann::m_sph[NSTH];
 double FEEFDVerondaWestmann::m_w[NSTH];
 
-// register the material with the framework
-REGISTER_MATERIAL(FEEFDVerondaWestmann, "EFD Veronda-Westmann");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFDVerondaWestmann, FEUncoupledMaterial)
 	ADD_PARAMETER(m_c1, FE_PARAM_DOUBLE, "c1");

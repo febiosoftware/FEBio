@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEEFDDonnanEquilibrium.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEEFDDonnanEquilibrium, "EFD Donnan equilibrium");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFDDonnanEquilibrium, FEElasticMaterial)
 	ADD_PARAMETER(m_DEQ.m_phiwr, FE_PARAM_DOUBLE, "phiw0");

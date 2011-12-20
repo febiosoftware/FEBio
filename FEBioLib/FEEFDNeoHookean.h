@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
-#include "FEBioLib/FENeoHookean.h"
+#include "FENeoHookean.h"
 #include "FEEllipsoidalFiberDistribution.h"
 
 class FEEFDNeoHookean :	public FEElasticMaterial
@@ -28,9 +28,6 @@ public:
 
 	FEEllipsoidalFiberDistribution	m_EFD;
 	FENeoHookean					m_NH;
-
-	// declare as registered
-	DECLARE_REGISTERED(FEEFDNeoHookean);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
