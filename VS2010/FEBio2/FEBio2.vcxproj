@@ -661,10 +661,8 @@
     <ClInclude Include="..\..\FEBio2\log.h" />
     <ClInclude Include="..\..\FEBio2\Logfile.h" />
     <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h" />
-    <ClInclude Include="..\..\FEBio2\PlotFile.h" />
     <ClInclude Include="..\..\FEBio2\plugin.h" />
     <ClInclude Include="..\..\FEBio2\stdafx.h" />
-    <ClInclude Include="..\..\FEBio2\Timer.h" />
     <ClInclude Include="..\..\FEBio2\ut4.h" />
     <ClInclude Include="..\..\FEBio2\validate.h" />
     <ClInclude Include="..\..\FEBio2\version.h" />
@@ -814,7 +812,6 @@
     <ClCompile Include="..\..\FEBio2\Logfile.cpp" />
     <ClCompile Include="..\..\FEBio2\LSDYNAPlotFile.cpp" />
     <ClCompile Include="..\..\FEBio2\optimize.cpp" />
-    <ClCompile Include="..\..\FEBio2\PlotFile.cpp" />
     <ClCompile Include="..\..\FEBio2\plugin.cpp" />
     <ClCompile Include="..\..\FEBio2\powell.cpp" />
     <ClCompile Include="..\..\FEBio2\quasin.cpp" />
@@ -825,7 +822,6 @@
     <ClCompile Include="..\..\FEBio2\solid3f.cpp" />
     <ClCompile Include="..\..\FEBio2\solve.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
-    <ClCompile Include="..\..\FEBio2\Timer.cpp" />
     <ClCompile Include="..\..\FEBio2\truss.cpp" />
     <ClCompile Include="..\..\FEBio2\udghex.cpp" />
     <ClCompile Include="..\..\FEBio2\update.cpp" />
