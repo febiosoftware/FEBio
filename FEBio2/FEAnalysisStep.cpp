@@ -347,10 +347,6 @@ bool FEAnalysisStep::Init()
 }
 
 //-----------------------------------------------------------------------------
-// This 
-static FEM* pfem_copy = 0;
-
-//-----------------------------------------------------------------------------
 bool FEAnalysisStep::Solve()
 {
 	// do one time initialization of solver data

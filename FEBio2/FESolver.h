@@ -12,7 +12,7 @@
 #include "NumCore/BFGSSolver.h"
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
-#include "Timer.h"
+#include "FEBioLib/Timer.h"
 #include "FECore/FEException.h"
 using namespace NumCore;
 

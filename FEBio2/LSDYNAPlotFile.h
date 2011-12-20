@@ -1,5 +1,31 @@
 #pragma once
-#include "PlotFile.h"
+#include "FEBioLib/PlotFile.h"
+
+//-----------------------------------------------------------------------------
+// Field tags
+
+// empty field
+#define PLOT_NONE		0
+
+// scalar fields
+#define PLOT_FLUID_PRESSURE		1
+#define PLOT_CONTACT_PRESSURE	2
+#define PLOT_CONTACT_GAP		3
+#define	PLOT_PLASTIC_STRAIN		4
+#define PLOT_FIBER_STRAIN		5
+#define PLOT_DEV_FIBER_STRAIN	6
+#define PLOT_TEMPERATURE		7
+
+
+// vector fields
+#define PLOT_DISPLACEMENT		1
+#define PLOT_VELOCITY			2
+#define PLOT_ACCELERATION		3
+#define	PLOT_FLUID_FLUX			4
+#define PLOT_CONTACT_TRACTION	5
+#define	PLOT_REACTION_FORCE		6
+#define	PLOT_MATERIAL_FIBER		7
+#define	PLOT_HEAT_FLUX			8
 
 //-----------------------------------------------------------------------------
 //! This class stores the results of the analysis in the LSDYNA database format.
@@ -54,13 +80,13 @@ public:
 	~LSDYNAPlotFile(void);
 
 	//! Open the plot database
-	bool Open(FEM& fem, const char* szfile);
+	bool Open(FEModel& fem, const char* szfile);
 
 	//! Open for appending
-	bool Append(FEM& fem, const char* szfile);
+	bool Append(FEModel& fem, const char* szfile);
 
 	//! Write current FE state to plot database
-	bool Write(FEM& fem);
+	bool Write(FEModel& fem);
 
 protected:
 	// vector fields

@@ -13,12 +13,11 @@
 #include "FERigidJoint.h"
 #include "FELinearConstraint.h"
 #include "FEAugLagLinearConstraint.h"
-#include "Timer.h"
+#include "FEBioLib/Timer.h"
 #include "FESurfaceLoad.h"
 #include "FEPointConstraint.h"
-#include "PlotFile.h"
+#include "FEBioLib/PlotFile.h"
 
-#include <stack>
 #include <list>
 #include <map>
 #include <string>
@@ -114,13 +113,13 @@ public:
 	//! Set the sparse matrix symmetry flag
 	void SetSymmetryFlag(bool bsymm) { m_bsymm = bsymm; }
 
-	static map<string, double> m_Const;
-	static void SetGlobalConstant(const string& s, double v);
-	static double GetGlobalConstant(const string& s);
-
 	//! Evaluate parameter list
 	void EvaluateParameterList(FEParameterList& pl);
 	void EvaluateMaterialParameters(FEMaterial* pm);
+
+	// get/set global data
+	static void SetGlobalConstant(const string& s, double v);
+	static double GetGlobalConstant(const string& s);
 
 public:
 	virtual void PushState();
@@ -247,6 +246,9 @@ protected:
 
 		bool	m_debug;			//!< debug flag
 	//}
+
+protected:
+	static map<string, double> m_Const;
 };
 
 #endif // _FEM_H_07012006_

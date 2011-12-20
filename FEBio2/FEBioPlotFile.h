@@ -1,5 +1,5 @@
 #pragma once
-#include "PlotFile.h"
+#include "FEBioLib/PlotFile.h"
 #include "FECore/Archive.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
@@ -96,7 +96,7 @@ public:
 		int DomainVarialbes () { return m_Elem.size(); }
 		int SurfaceVariables() { return m_Face.size(); }
 
-		void Defaults(FEM& fem);
+		void Defaults(FEModel& fem);
 
 		void Clear();
 
@@ -129,13 +129,13 @@ public:
 	~FEBioPlotFile(void);
 
 	//! Open the plot database
-	bool Open(FEM& fem, const char* szfile);
+	bool Open(FEModel& fem, const char* szfile);
 
 	//! Open for appending
-	bool Append(FEM& fem, const char* szfile);
+	bool Append(FEModel& fem, const char* szfile);
 
 	//! Write current FE state to plot database
-	bool Write(FEM& fem);
+	bool Write(FEModel& fem);
 
 	//! Add a variable to the dictionary
 	bool AddVariable(const char* sz) { return m_dic.AddVariable(sz); }
@@ -144,10 +144,10 @@ public:
 	const Dictionary& GetDictionary() const { return m_dic; }
 
 protected:
-	bool WriteHeader    (FEM& fem);
-	bool WriteDictionary(FEM& fem);
-	bool WriteMaterials (FEM& fem);
-	bool WriteGeometry  (FEM& fem);
+	bool WriteHeader    (FEModel& fem);
+	bool WriteDictionary(FEModel& fem);
+	bool WriteMaterials (FEModel& fem);
+	bool WriteGeometry  (FEModel& fem);
 
 	void WriteDicList(list<DICTIONARY_ITEM>& dic);
 
@@ -160,11 +160,11 @@ protected:
 	void WriteTrussDomain   (FETrussDomain&    dom);
 	void WriteDiscreteDomain(FEDiscreteDomain& dom);
 
-	void WriteGlobalData  (FEM& fem);
-	void WriteMaterialData(FEM& fem);
-	void WriteNodeData    (FEM& fem);
-	void WriteDomainData  (FEM& fem);
-	void WriteSurfaceData (FEM& fem);
+	void WriteGlobalData  (FEModel& fem);
+	void WriteMaterialData(FEModel& fem);
+	void WriteNodeData    (FEModel& fem);
+	void WriteDomainData  (FEModel& fem);
+	void WriteSurfaceData (FEModel& fem);
 
 protected:
 	bool ReadDictionary();

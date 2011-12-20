@@ -242,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\PlotFile.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\PSLDLTSolver.cpp"
 				>
 			</File>
@@ -259,6 +263,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\SuperLUSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\Timer.cpp"
 				>
 			</File>
 			<File
@@ -304,6 +312,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\PlotFile.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\PSLDLTSolver.h"
 				>
 			</File>
@@ -325,6 +337,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\Timer.h"
 				>
 			</File>
 			<File

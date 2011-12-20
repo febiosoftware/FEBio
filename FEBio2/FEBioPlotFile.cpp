@@ -78,10 +78,11 @@ bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* s
 
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::Defaults(FEM& fem)
+void FEBioPlotFile::Dictionary::Defaults(FEModel& mdl)
 {
 	// First we build the dictionary
 	// get the mesh
+	FEM& fem = dynamic_cast<FEM&>(mdl);
 	FEMesh& m = fem.m_mesh;
 
 	int nmode = fem.m_pStep->m_nModule;
@@ -134,7 +135,7 @@ FEBioPlotFile::~FEBioPlotFile(void)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
+bool FEBioPlotFile::Open(FEModel &fem, const char *szfile)
 {
 	// open the archive
 	if (m_ar.Create(szfile) == false) return false;
@@ -176,7 +177,7 @@ bool FEBioPlotFile::Open(FEM &fem, const char *szfile)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::WriteHeader(FEM& fem)
+bool FEBioPlotFile::WriteHeader(FEModel& fem)
 {
 	// setup the header
 	unsigned int nversion = PLT_VERSION;
@@ -191,7 +192,7 @@ bool FEBioPlotFile::WriteHeader(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::WriteDictionary(FEM& fem)
+bool FEBioPlotFile::WriteDictionary(FEModel& fem)
 {
 	// setup defaults for the dictionary
 	m_dic.Defaults(fem);
@@ -268,7 +269,7 @@ void FEBioPlotFile::WriteDicList(list<FEBioPlotFile::DICTIONARY_ITEM>& dic)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::WriteMaterials(FEM& fem)
+bool FEBioPlotFile::WriteMaterials(FEModel& fem)
 {
 	int NMAT = fem.Materials();
 	for (int i=0; i<NMAT; ++i)
@@ -288,7 +289,7 @@ bool FEBioPlotFile::WriteMaterials(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::WriteGeometry(FEM& fem)
+bool FEBioPlotFile::WriteGeometry(FEModel& fem)
 {
 	// get the mesh
 	FEMesh& m = fem.m_mesh;
@@ -564,9 +565,10 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Write(FEM &fem)
+bool FEBioPlotFile::Write(FEModel &mdl)
 {
 	// store the fem pointer
+	FEM& fem = dynamic_cast<FEM&>(mdl);
 	m_pfem = &fem;
 
 	m_ar.BeginChunk(PLT_STATE);
@@ -639,19 +641,19 @@ bool FEBioPlotFile::Write(FEM &fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteGlobalData(FEM& fem)
+void FEBioPlotFile::WriteGlobalData(FEModel& fem)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteMaterialData(FEM& fem)
+void FEBioPlotFile::WriteMaterialData(FEModel& fem)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteNodeData(FEM& fem)
+void FEBioPlotFile::WriteNodeData(FEModel& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Node.begin();
 	for (int i=0; i<(int) m_dic.m_Node.size(); ++i, ++it)
@@ -671,7 +673,7 @@ void FEBioPlotFile::WriteNodeData(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteDomainData(FEM& fem)
+void FEBioPlotFile::WriteDomainData(FEModel& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Elem.begin();
 	for (int i=0; i<(int) m_dic.m_Elem.size(); ++i, ++it)
@@ -691,7 +693,7 @@ void FEBioPlotFile::WriteDomainData(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::WriteSurfaceData(FEM& fem)
+void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 {
 	list<DICTIONARY_ITEM>::iterator it = m_dic.m_Face.begin();
 	for (int i=0; i<(int) m_dic.m_Face.size(); ++i, ++it)
@@ -711,7 +713,7 @@ void FEBioPlotFile::WriteSurfaceData(FEM& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Append(FEM &fem, const char *szfile)
+bool FEBioPlotFile::Append(FEModel &fem, const char *szfile)
 {
 	// try to open the file
 	if (m_ar.Open(szfile) == false) return false;

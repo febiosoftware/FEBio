@@ -12,7 +12,7 @@
 #include <nage04.h>
 #include <time.h>
 #include "FECore/XMLReader.h"
-#include "Timer.h"
+#include "FEBioLib/Timer.h"
 #include "console.h"
 
 //-----------------------------------------------------------------------------

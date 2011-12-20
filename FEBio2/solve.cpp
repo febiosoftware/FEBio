@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include <math.h>
-#include "Timer.h"
-#include "PlotFile.h"
+#include "FEBioLib/Timer.h"
 #include "fem.h"
 #include "console.h"
 #include "log.h"

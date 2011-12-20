@@ -139,7 +139,7 @@ void FEM::PopState()
 }
 
 //-----------------------------------------------------------------------------
-// This function is used when pushing the FEM to a stack. Since we don't need
+// This function is used when pushing the FEM state data. Since we don't need
 // to copy all the data, this function only copies the data that needs to be 
 // restored for a running restart.
 //

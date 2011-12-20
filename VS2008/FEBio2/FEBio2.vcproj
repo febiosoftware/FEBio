@@ -833,10 +833,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\PlotFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\plugin.cpp"
 				>
 			</File>
@@ -874,10 +870,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\stdafx.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\Timer.cpp"
 				>
 			</File>
 			<File
@@ -1463,10 +1455,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\PlotFile.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\plugin.h"
 				>
 			</File>
@@ -1476,10 +1464,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\Timer.h"
 				>
 			</File>
 			<File

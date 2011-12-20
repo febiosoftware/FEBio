@@ -125,7 +125,7 @@ double FETriphasic::Concentration(FEMaterialPoint& pt, const int ion)
 	// solubility
 	double kappa = m_pSolute[ion]->m_pSolub->Solubility(pt);
 	// charge number
-	int z = m_pSolute[ion]->ChargeNumber();
+	int z = (int) m_pSolute[ion]->ChargeNumber();
 	
 	// actual concentration
 	double ca = kappa*c*exp(-z*m_Fc*psi/m_Rgas/m_Tabs);
