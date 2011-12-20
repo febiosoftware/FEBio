@@ -425,10 +425,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEMuscleMaterial.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FENeoHookeanTransIso.cpp"
 				>
 			</File>
@@ -602,10 +598,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETCNonlinearOrthotropic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETendonMaterial.cpp"
 				>
 			</File>
 			<File
@@ -971,10 +963,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEMuscleMaterial.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FENeoHookeanTransIso.h"
 				>
 			</File>
@@ -1148,10 +1136,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETCNonlinearOrthotropic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETendonMaterial.h"
 				>
 			</File>
 			<File

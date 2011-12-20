@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FETransverselyIsotropic.h"
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 //! Muscle Material
@@ -47,9 +47,6 @@ public:
 
 	//! calculate deviatoric tangent stiffness at material point
 	virtual tens4ds DevTangent(FEMaterialPoint& pt);
-
-	// declare as registered
-	DECLARE_REGISTERED(FEMuscleMaterial);
 
 	// declare the material parameters
 	DECLARE_PARAMETER_LIST();

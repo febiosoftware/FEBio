@@ -29,8 +29,10 @@
 #include "FEBioLib/FELinearElastic.h"
 #include "FEBioLib/FELinearOrthotropic.h"
 #include "FEBioLib/FEMooneyRivlin.h"
+#include "FEBioLib/FEMuscleMaterial.h"
 #include "FEBioLib/FENeoHookean.h"
 #include "FEBioLib/FEOgdenMaterial.h"
+#include "FEBioLib/FETendonMaterial.h"
 #include "FEBioLib/FEVerondaWestmann.h"
 
 //-----------------------------------------------------------------------------
@@ -67,6 +69,8 @@ REGISTER_MATERIAL(FEIsotropicElastic            , "isotropic elastic"           
 REGISTER_MATERIAL(FELinearElastic               , "linear elastic"                );
 REGISTER_MATERIAL(FELinearOrthotropic           , "linear orthotropic"            );
 REGISTER_MATERIAL(FEMooneyRivlin                , "Mooney-Rivlin"                 );
+REGISTER_MATERIAL(FEMuscleMaterial              , "muscle material"               );
 REGISTER_MATERIAL(FENeoHookean                  , "neo-Hookean"                   );
 REGISTER_MATERIAL(FEOgdenMaterial               , "Ogden"                         );
+REGISTER_MATERIAL(FETendonMaterial              , "tendon material"               );
 REGISTER_MATERIAL(FEVerondaWestmann             , "Veronda-Westmann"              );

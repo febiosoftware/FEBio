@@ -9,9 +9,6 @@
 	#define SQR(x) ((x)*(x))
 #endif
 
-// register the material with the framework
-REGISTER_MATERIAL(FEMuscleMaterial, "muscle material");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMuscleMaterial, FETransverselyIsotropic)
 	ADD_PARAMETER(m_G1, FE_PARAM_DOUBLE, "g1");
