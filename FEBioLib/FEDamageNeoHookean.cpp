@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEDamageNeoHookean.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEDamageNeoHookean, "damage neo-Hookean");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

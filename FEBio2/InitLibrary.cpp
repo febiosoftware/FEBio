@@ -8,6 +8,10 @@
 #include "FEBioLib/FE2DTransIsoMooneyRivlin.h"
 #include "FEBioLib/FE2DTransIsoVerondaWestmann.h"
 #include "FEBioLib/FEArrudaBoyce.h"
+#include "FEBioLib/FECellGrowth.h"
+#include "FEBioLib/FEDamageMooneyRivlin.h"
+#include "FEBioLib/FEDamageNeoHookean.h"
+#include "FEBioLib/FEDamageTransIsoMooneyRivlin.h"
 #include "FEBioLib/FEDonnanEquilibrium.h"
 #include "FEBioLib/FEEFDDonnanEquilibrium.h"
 #include "FEBioLib/FEEFDMooneyRivlin.h"
@@ -39,6 +43,10 @@ REGISTER_MATERIAL(FE2DFiberNeoHookean           , "2D fiber neo-Hookean"        
 REGISTER_MATERIAL(FE2DTransIsoMooneyRivlin      , "2D trans iso Mooney-Rivlin"    );
 REGISTER_MATERIAL(FE2DTransIsoVerondaWestmann   , "2D trans iso Veronda-Westmann" );
 REGISTER_MATERIAL(FEArrudaBoyce                 , "Arruda-Boyce"                  );
+REGISTER_MATERIAL(FECellGrowth                  , "cell growth"                   );
+REGISTER_MATERIAL(FEDamageMooneyRivlin          , "damage Mooney-Rivlin"          );
+REGISTER_MATERIAL(FEDamageNeoHookean            , "damage neo-Hookean"            );
+REGISTER_MATERIAL(FEDamageTransIsoMooneyRivlin  , "damage trans iso Mooney-Rivlin");
 REGISTER_MATERIAL(FEDonnanEquilibrium           , "Donnan equilibrium"            );
 REGISTER_MATERIAL(FEEFDDonnanEquilibrium        , "EFD Donnan equilibrium"        );
 REGISTER_MATERIAL(FEEFDMooneyRivlin             , "EFD Mooney-Rivlin"             );

@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEDamageMooneyRivlin.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEDamageMooneyRivlin, "damage Mooney-Rivlin");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEDamageMooneyRivlin, FEUncoupledMaterial)
 	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");

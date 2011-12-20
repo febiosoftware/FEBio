@@ -9,11 +9,9 @@
 
 #include "stdafx.h"
 #include "FECellGrowth.h"
-#include "fem.h"
+#include "FECore/FEModel.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FECellGrowth, "cell growth");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECellGrowth, FEElasticMaterial)
 ADD_PARAMETER(m_phir, FE_PARAM_DOUBLE, "phir");
@@ -22,17 +20,14 @@ ADD_PARAMETER(m_ce, FE_PARAM_DOUBLE, "ce");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-// FECellGrowth
-//-----------------------------------------------------------------------------
-
 void FECellGrowth::Init()
 {
 	if (m_phir < 0 || m_phir > 1) throw MaterialError("phir must be between 0. and 1.");
 	if (m_cr < 0) throw MaterialError("cr must be positive.");
 	if (m_ce < 0) throw MaterialError("ce must be positive.");
 	
-	m_Rgas = FEM::GetGlobalConstant("R");
-	m_Tabs = FEM::GetGlobalConstant("T");
+	m_Rgas = FEModel::GetGlobalConstant("R");
+	m_Tabs = FEModel::GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");

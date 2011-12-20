@@ -92,9 +92,6 @@ public:
 	// calculate damage reduction factor
 	double Damage(FEMaterialPoint& pt);
 
-	// declare as registered
-	DECLARE_REGISTERED(FEDamageNeoHookean);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

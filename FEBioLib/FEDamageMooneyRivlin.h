@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 #include "FEDamageNeoHookean.h"
 
 class FEDamageMooneyRivlin : public FEUncoupledMaterial
@@ -32,9 +32,6 @@ public:
 
 	// calculate damage reduction factor
 	double Damage(FEMaterialPoint& pt);
-
-	// declare as registered
-	DECLARE_REGISTERED(FEDamageMooneyRivlin);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
