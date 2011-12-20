@@ -20,6 +20,9 @@
 #include "FEBioLib/FEEFDVerondaWestmann.h"
 #include "FEBioLib/FEEllipsoidalFiberDistribution.h"
 #include "FEBioLib/FEFiberNeoHookean.h"
+#include "FEBioLib/FEFungOrthoCompressible.h"
+#include "FEBioLib/FEFungOrthotropic.h"
+#include "FEBioLib/FEGasserOgdenHolzapfel.h"
 #include "FEBioLib/FEHolmesMow.h"
 #include "FEBioLib/FEIncompNeoHookean.h"
 #include "FEBioLib/FEIsotropicElastic.h"
@@ -55,6 +58,9 @@ REGISTER_MATERIAL(FEEFDUncoupled                , "EFD uncoupled"               
 REGISTER_MATERIAL(FEEFDVerondaWestmann          , "EFD Veronda-Westmann"          );
 REGISTER_MATERIAL(FEEllipsoidalFiberDistribution, "ellipsoidal fiber distribution");
 REGISTER_MATERIAL(FEFiberNeoHookean             , "fiber neo-Hookean"             );
+REGISTER_MATERIAL(FEFungOrthoCompressible       , "Fung-ortho-compressible"       );
+REGISTER_MATERIAL(FEFungOrthotropic             , "Fung orthotropic"              );
+REGISTER_MATERIAL(FEGasserOgdenHolzapfel        , "Gasser-Ogden-Holzapfel"        );
 REGISTER_MATERIAL(FEHolmesMow                   , "Holmes-Mow"                    );
 REGISTER_MATERIAL(FEIncompNeoHookean            , "incomp neo-Hookean"            );
 REGISTER_MATERIAL(FEIsotropicElastic            , "isotropic elastic"             );

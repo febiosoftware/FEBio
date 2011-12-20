@@ -282,6 +282,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEFungOrthoCompressible.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFungOrthotropic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEGasserOgdenHolzapfel.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.cpp"
 				>
 			</File>
@@ -453,6 +465,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEFiberNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFungOrthoCompressible.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFungOrthotropic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEGasserOgdenHolzapfel.h"
 				>
 			</File>
 			<File

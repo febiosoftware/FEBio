@@ -1,38 +1,37 @@
 #include "stdafx.h"
-#include "FEFungOrthoCompressible.h"
-#include "FECore/tens4d.h"
-
-// register the material with the framework
-REGISTER_MATERIAL(FEFungOrthoCompressible, "Fung-ortho-compressible");
+#include "FEFungOrthotropic.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEFungOrthoCompressible, FEElasticMaterial)
-ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
-ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
-ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
-ADD_PARAMETER(G12, FE_PARAM_DOUBLE, "G12");
-ADD_PARAMETER(G23, FE_PARAM_DOUBLE, "G23");
-ADD_PARAMETER(G31, FE_PARAM_DOUBLE, "G31");
-ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
-ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
-ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
-ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
-ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");
+BEGIN_PARAMETER_LIST(FEFungOrthotropic, FEUncoupledMaterial)
+	ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
+	ADD_PARAMETER(E2, FE_PARAM_DOUBLE, "E2");
+	ADD_PARAMETER(E3, FE_PARAM_DOUBLE, "E3");
+	ADD_PARAMETER(G12, FE_PARAM_DOUBLE, "G12");
+	ADD_PARAMETER(G23, FE_PARAM_DOUBLE, "G23");
+	ADD_PARAMETER(G31, FE_PARAM_DOUBLE, "G31");
+	ADD_PARAMETER(v12, FE_PARAM_DOUBLE, "v12");
+	ADD_PARAMETER(v23, FE_PARAM_DOUBLE, "v23");
+	ADD_PARAMETER(v31, FE_PARAM_DOUBLE, "v31");
+	ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Data initialization
-void FEFungOrthoCompressible::Init()
+void FEFungOrthotropic::Init()
 {
-	FEElasticMaterial::Init();
-	
+	FEUncoupledMaterial::Init();
+
 	if (E1 <= 0) throw MaterialError("E1 should be positive");
 	if (E2 <= 0) throw MaterialError("E2 should be positive");
 	if (E3 <= 0) throw MaterialError("E3 should be positive");
+
+	if (G12 < 0) throw MaterialError("G12 should be positive");
+	if (G23 < 0) throw MaterialError("G23 should be positive");
+	if (G31 < 0) throw MaterialError("G31 should be positive");
 	
-	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 > sqrt(E1/E2)");
-	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 > sqrt(E2/E3)");
-	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 > sqrt(E3/E1)");
+	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
+	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
+	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
 	
 	if (m_c <= 0) throw MaterialError("c should be positive");
 	
@@ -54,8 +53,8 @@ void FEFungOrthoCompressible::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the stress
-mat3ds FEFungOrthoCompressible::Stress(FEMaterialPoint& mp)
+//! Calculates the deviatoric stress
+mat3ds FEFungOrthotropic::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -69,20 +68,20 @@ mat3ds FEFungOrthoCompressible::Stress(FEMaterialPoint& mp)
 	mat3ds bmi;			// B - I
 	// Evaluate the deformation gradient
 	mat3d &F = pt.F;
-	double J = pt.J;
+	double detF = pt.J;
+	mat3d Fd = F*pow(detF,-1./3.);
 	
-	// calculate left and right Cauchy-Green tensor
-	mat3ds b = pt.LeftCauchyGreen();
-	mat3ds c = pt.RightCauchyGreen();
+	// calculate deviatoric left and right Cauchy-Green tensor
+	mat3ds b = pt.DevLeftCauchyGreen();
+	mat3ds c = pt.DevRightCauchyGreen();
 	mat3ds c2 = c*c;
-	mat3dd I(1.);
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
 		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
-		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
+		a[i] = Fd*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
 		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 	
@@ -98,22 +97,20 @@ mat3ds FEFungOrthoCompressible::Stress(FEMaterialPoint& mp)
 	// Evaluate the stress
 	mat3ds s;
 	s.zero();		// Initialize for summation
-	bmi = b - I;
+	bmi = b - mat3dd(1.);
 	for (i=0; i<3; i++) {
 		s += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
 		for (j=0; j<3; j++)
 			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
 	}
-	s *= eQ/(2.0*J);
-	
-	s += I*(m_k*log(J)/J);
-	
-	return s;
+	s *= eQ/(2.0*detF);
+
+	return s.dev();
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the tangent
-tens4ds FEFungOrthoCompressible::Tangent(FEMaterialPoint& mp)
+//! Calculates the deviatoric tangent
+tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
@@ -127,11 +124,12 @@ tens4ds FEFungOrthoCompressible::Tangent(FEMaterialPoint& mp)
 	mat3ds bmi;			// B - I
 	// Evaluate the strain and texture
 	mat3d &F = pt.F;
-	double J = pt.J;
+	double detF = pt.J;
+	mat3d Fd = F*pow(detF,-1./3.);
 	
 	// calculate left and right Cauchy-Green tensor
-	mat3ds b = pt.LeftCauchyGreen();
-	mat3ds c = pt.RightCauchyGreen();
+	mat3ds b = pt.DevLeftCauchyGreen();
+	mat3ds c = pt.DevRightCauchyGreen();
 	mat3ds c2 = c*c;
 	mat3dd I(1.);
 	
@@ -140,7 +138,7 @@ tens4ds FEFungOrthoCompressible::Tangent(FEMaterialPoint& mp)
 		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
-		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
+		a[i] = Fd*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
 		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 	
@@ -153,26 +151,28 @@ tens4ds FEFungOrthoCompressible::Tangent(FEMaterialPoint& mp)
 	}
 	eQ = exp(eQ/(4.*m_c));
 	
-	// Evaluate the Cauchy stress
-	mat3ds s;
-	s.zero();		// Initialize for summation
-	//	tens4ds C;
-	//	C.zero();
+	// Evaluate the distortional part of the Cauchy stress
+	mat3ds sd;
+	sd.zero();		// Initialize for summation
 	tens4ds C(0.0);
 	bmi = b - I;
 	for (i=0; i<3; i++) {
-		s += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
+		sd += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
 		for (j=0; j<3; j++)
-			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
+			sd += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
 		C += mu[i]*K[i]*dyad4s(A[i],b);
 		for (j=0; j<3; j++)
 			C += lam[i][j]*K[i]*K[j]*dyad1s(A[i],A[j])/2.;
 	}
-	s *= eQ/(2.0*J);
-	
-	// Elasticity tensor
-	C = (eQ/J)*C + (2*J/m_c/eQ)*dyad1s(s);
-	C += (dyad1s(I) - dyad4s(I)*(2*log(J)))*(m_k/J);
+	sd *= eQ/(2.0*detF);
+	// This is the distortional part of the elasticity tensor
+	C = (eQ/detF)*C + (2*detF/m_c/eQ)*dyad1s(sd);
+	// This is the final value of the elasticity tensor
+	tens4ds IxI = dyad1s(I);
+	tens4ds I4  = dyad4s(I);
+
+	C += - 1./3.*(ddots(C,IxI) - IxI*(C.tr()/3.))
+	+ 2./3.*((I4-IxI/3.)*sd.tr()-dyad1s(sd.dev(),I));
 	
 	return C;
 }

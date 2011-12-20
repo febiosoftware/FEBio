@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 class FEFungOrthotropic : public FEUncoupledMaterial
 {
@@ -22,9 +22,6 @@ public:
 		
 	//! data initialization
 	void Init();
-		
-	// declare as registered
-	DECLARE_REGISTERED(FEFungOrthotropic);
 		
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

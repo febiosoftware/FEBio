@@ -24,9 +24,6 @@ public:
 	//! data initialization
 	void Init();
 	
-	// declare as registered
-	DECLARE_REGISTERED(FEFungOrthoCompressible);
-	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };
