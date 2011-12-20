@@ -5,18 +5,13 @@
 #include "stdafx.h"
 #include "FEIncompNeoHookean.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEIncompNeoHookean, "incomp neo-Hookean");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEIncompNeoHookean, FEUncoupledMaterial)
 	ADD_PARAMETER(m_G, FE_PARAM_DOUBLE, "G");
 END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// IncompNeoHookean
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void FEIncompNeoHookean::Init()
 {
 	FEUncoupledMaterial::Init();

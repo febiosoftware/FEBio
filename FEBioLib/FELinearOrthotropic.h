@@ -22,9 +22,6 @@ public:
 	//! data initialization
 	void Init();
 
-	// declare as registered
-	DECLARE_REGISTERED(FELinearOrthotropic);
-
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

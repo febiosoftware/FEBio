@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FE2DFiberNeoHookean.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FE2DFiberNeoHookean, "2D fiber neo-Hookean");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FE2DFiberNeoHookean, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FEUncoupledMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Incompressible Neo-Hookean material
@@ -31,9 +31,6 @@ public:
 
 	//! initialization
 	void Init();
-
-	// declare as registered
-	DECLARE_REGISTERED(FEIncompNeoHookean);
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

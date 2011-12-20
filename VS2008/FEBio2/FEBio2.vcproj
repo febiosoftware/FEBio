@@ -281,18 +281,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FE2DFiberNeoHookean.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoVerondaWestmann.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEAnalysisStep.cpp"
 				>
 			</File>
@@ -465,10 +453,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEIncompNeoHookean.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEIsotropicFourier.cpp"
 				>
 			</File>
@@ -478,14 +462,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FELinearConstraint.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FELinearElastic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FELinearOrthotropic.cpp"
 				>
 			</File>
 			<File
@@ -887,18 +863,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FE2DFiberNeoHookean.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE2DTransIsoVerondaWestmann.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEAnalysisStep.h"
 				>
 			</File>
@@ -1095,10 +1059,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEIncompNeoHookean.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEIsotropicFourier.h"
 				>
 			</File>
@@ -1108,14 +1068,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FELinearConstraint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FELinearElastic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FELinearOrthotropic.h"
 				>
 			</File>
 			<File

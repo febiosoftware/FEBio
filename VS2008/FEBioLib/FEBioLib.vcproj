@@ -210,6 +210,18 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEArrudaBoyce.cpp"
 				>
 			</File>
@@ -226,7 +238,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEIncompNeoHookean.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicElastic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FELinearElastic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FELinearOrthotropic.cpp"
 				>
 			</File>
 			<File
@@ -308,6 +332,18 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEArrudaBoyce.h"
 				>
 			</File>
@@ -328,7 +364,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEIncompNeoHookean.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicElastic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FELinearElastic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FELinearOrthotropic.h"
 				>
 			</File>
 			<File

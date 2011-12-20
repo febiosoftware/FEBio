@@ -1,6 +1,7 @@
 #pragma once
 #include "FECore/FEElasticMaterial.h"
 
+//-----------------------------------------------------------------------------
 class FE2DFiberNeoHookean :	public FEElasticMaterial
 {
 	enum { NSTEPS = 12 };	// nr of integration steps
@@ -27,12 +28,8 @@ public:
 	//! data initialization and checking
 	void Init();
 
-	// declare as registered
-	DECLARE_REGISTERED(FE2DFiberNeoHookean);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
-
 
 protected:
 	static double	m_cth[NSTEPS];

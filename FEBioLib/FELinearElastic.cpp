@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #include "FELinearElastic.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FELinearElastic, "linear elastic");
-
 // define the parameter list
 BEGIN_PARAMETER_LIST(FELinearElastic, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

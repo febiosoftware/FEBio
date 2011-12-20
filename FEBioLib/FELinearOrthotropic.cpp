@@ -2,10 +2,6 @@
 #include "FELinearOrthotropic.h"
 
 //-----------------------------------------------------------------------------
-// register the material with the framework
-REGISTER_MATERIAL(FELinearOrthotropic, "linear orthotropic");
-
-//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FELinearOrthotropic, FEElasticMaterial)
 	ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");
