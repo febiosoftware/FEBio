@@ -142,7 +142,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	if (m_fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
 	
 	// update contact
-	if (m_fem.ContactInterfaces() > 0) m_fem.UpdateContact();
+	if (m_fem.ContactInterfaces() > 0) UpdateContact();
 
 	// update element stresses
 	UpdateStresses();
@@ -450,39 +450,43 @@ void FESolidSolver::UpdateStresses()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEM::UpdateContact
 //  Update contact data
 //
-
-void FEM::UpdateContact()
+void FESolidSolver::UpdateContact()
 {
+	FEAnalysis* pstep = m_fem.m_pStep;
+
 	// If this analysis is a poroelastic analysis that uses
 	// a biphasic contact interface, we need to make sure that
 	// the free draining dof's are processed properly
-	bool bporo = (m_pStep->m_nModule == FE_BIPHASIC) || (m_pStep->m_nModule == FE_POROSOLUTE);
+	bool bporo = (pstep->m_nModule == FE_BIPHASIC) || (pstep->m_nModule == FE_POROSOLUTE);
 	if (bporo)
 	{
 		// mark all free-draining surfaces
-		for (int i=0; i<ContactInterfaces(); ++i) 
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i) 
 		{
-			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(m_CI[i]);
+			FEContactInterface* pci = m_fem.ContactInterface(i);
+
+			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
 			if (psi2) psi2->MarkFreeDraining();
-			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(m_CI[i]);
+			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(pci);
 			if (psi3) psi3->MarkAmbient();
 		}
 	}
 
 	// Update all contact interfaces
-	for (int i=0; i<ContactInterfaces(); ++i) m_CI[i]->Update();
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->Update();
 
 	if (bporo)
 	{
 		// set free-draining boundary conditions
-		for (int i=0; i<ContactInterfaces(); ++i) 
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i) 
 		{
-			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(m_CI[i]);
+			FEContactInterface* pci = m_fem.ContactInterface(i);
+
+			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
 			if (psi2) psi2->SetFreeDraining();
-			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(m_CI[i]);
+			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(pci);
 			if (psi3) psi3->SetAmbient();
 		}
 	}

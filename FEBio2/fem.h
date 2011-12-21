@@ -153,12 +153,6 @@ public:
 		bool InitMesh();
 	//}
 
-	//{ --- Update routines ---
-
-		//! Update contact data
-		void UpdateContact();
-	//}
-
 public:
 	// --- Analysis Data ---
 	//{

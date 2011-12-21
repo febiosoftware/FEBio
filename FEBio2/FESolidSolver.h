@@ -68,6 +68,9 @@ public:
 		//! Update rigid body data
 		void UpdateRigidBodies(vector<double>& ui);
 
+		//! update contact data
+		void UpdateContact();
+
 		//! Lagrangian augmentation
 		bool Augment();
 	//}

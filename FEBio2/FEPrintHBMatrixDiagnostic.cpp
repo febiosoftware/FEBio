@@ -52,7 +52,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 
 	// build the stiffness matrix
 	// recalculate the shape of the stiffness matrix if necessary
-	if (m_fem.ContactInterfaces()) m_fem.UpdateContact();
+	if (m_fem.ContactInterfaces()) solver.UpdateContact();
 
 	// reshape the stiffness matrix
 	if (!solver.CreateStiffness(true)) return false;
