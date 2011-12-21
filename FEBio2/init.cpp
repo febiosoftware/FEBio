@@ -9,7 +9,7 @@
 #include "FESolidSolver.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "FEDiscreteMaterial.h"
+#include "FEBioLib/FEDiscreteMaterial.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEBioLib/FEPointBodyForce.h"

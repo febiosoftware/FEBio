@@ -15,7 +15,7 @@
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
 #include "ut4.h"
-#include "FEDiscreteMaterial.h"
+#include "FEBioLib/FEDiscreteMaterial.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface.h"
@@ -43,7 +43,7 @@
 #include "FEDiscreteSpringDomain.h"
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"
-#include "FEHeatTransferMaterial.h"
+#include "FEBioLib/FEHeatTransferMaterial.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------

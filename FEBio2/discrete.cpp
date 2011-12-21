@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEDiscreteSpringDomain.h"
-#include "FEDiscreteMaterial.h"
+#include "FEBioLib/FEDiscreteMaterial.h"
 
 //-----------------------------------------------------------------------------
 void FEDiscreteSpringDomain::Serialize(DumpFile& ar)

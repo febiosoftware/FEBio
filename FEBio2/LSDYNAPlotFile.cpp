@@ -15,7 +15,7 @@
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEShellDomain.h"
 #include "FECore/FESolidDomain.h"
-#include "FEHeatTransferMaterial.h"
+#include "FEBioLib/FEHeatTransferMaterial.h"
 #include "FEBioLib/FETrussMaterial.h"
 #include "FEBiphasic.h"
 #include "FEAnalysisStep.h"
