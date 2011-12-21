@@ -566,13 +566,9 @@
     <ClInclude Include="..\..\FEBio2\fem.h" />
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
-    <ClInclude Include="..\..\FEBio2\FENeoHookeanTransIso.h" />
     <ClInclude Include="..\..\FEBio2\FENodeReorder.h" />
-    <ClInclude Include="..\..\FEBio2\FEOgdenUnconstrained.h" />
     <ClInclude Include="..\..\FEBio2\FEOptimizer.h" />
-    <ClInclude Include="..\..\FEBio2\FEOrthoElastic.h" />
     <ClInclude Include="..\..\FEBio2\FEOsmCoefConst.h" />
-    <ClInclude Include="..\..\FEBio2\FEPerfectOsmometer.h" />
     <ClInclude Include="..\..\FEBio2\FEPeriodicBoundary.h" />
     <ClInclude Include="..\..\FEBio2\FEPermConstIso.h" />
     <ClInclude Include="..\..\FEBio2\FEPermHolmesMow.h" />
@@ -588,7 +584,6 @@
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FERestartImport.h" />
-    <ClInclude Include="..\..\FEBio2\FERigid.h" />
     <ClInclude Include="..\..\FEBio2\FERigidBody.h" />
     <ClInclude Include="..\..\FEBio2\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBio2\FERigidSurface.h" />
@@ -664,13 +659,9 @@
     <ClCompile Include="..\..\FEBio2\fem.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
-    <ClCompile Include="..\..\FEBio2\FENeoHookeanTransIso.cpp" />
     <ClCompile Include="..\..\FEBio2\FENodeReorder.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEOgdenUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOptimizer.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEOrthoElastic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOsmCoefConst.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPerfectOsmometer.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPeriodicBoundary.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPermConstIso.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPermHolmesMow.cpp" />
@@ -686,7 +677,6 @@
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
-    <ClCompile Include="..\..\FEBio2\FERigid.cpp" />
     <ClCompile Include="..\..\FEBio2\FERigidBody.cpp" />
     <ClCompile Include="..\..\FEBio2\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBio2\FERigidSurface.cpp" />

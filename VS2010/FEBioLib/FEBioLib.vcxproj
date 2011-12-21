@@ -539,7 +539,11 @@
     <ClInclude Include="..\..\FEBioLib\FEMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FEMuscleMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FENeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FENeoHookeanTransIso.h" />
     <ClInclude Include="..\..\FEBioLib\FEOgdenMaterial.h" />
+    <ClInclude Include="..\..\FEBioLib\FEOgdenUnconstrained.h" />
+    <ClInclude Include="..\..\FEBioLib\FEOrthoElastic.h" />
+    <ClInclude Include="..\..\FEBioLib\FEPerfectOsmometer.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
     <ClInclude Include="..\..\FEBioLib\FEStVenantKirchhoff.h" />
@@ -601,7 +605,11 @@
     <ClCompile Include="..\..\FEBioLib\FEMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMuscleMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FENeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FENeoHookeanTransIso.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEOgdenMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEOgdenUnconstrained.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEOrthoElastic.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEPerfectOsmometer.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEStVenantKirchhoff.cpp" />
