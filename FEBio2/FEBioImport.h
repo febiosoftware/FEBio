@@ -6,9 +6,9 @@
 #include "FEBioLib/FERigid.h"
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEUncoupledElasticMixture.h"
-#include "FEBiphasic.h"
-#include "FEBiphasicSolute.h"
-#include "FETriphasic.h"
+#include "FEBioLib/FEBiphasic.h"
+#include "FEBioLib/FEBiphasicSolute.h"
+#include "FEBioLib/FETriphasic.h"
 #include "FEAnalysisStep.h"
 #include <map>
 #include <string>

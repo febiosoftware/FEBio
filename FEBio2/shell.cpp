@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FEElasticShellDomain.h"
-#include "FEBiphasic.h"
-#include "FEBiphasicSolute.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "log.h"
 #include <math.h>

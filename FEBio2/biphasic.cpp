@@ -2,7 +2,7 @@
 #include "FEBiphasicDomain.h"
 #include "FESolidSolver.h"
 #include "FEMicroMaterial.h"
-#include "FEBiphasic.h"
+#include "FEBioLib/FEBiphasic.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

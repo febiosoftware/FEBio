@@ -6,8 +6,8 @@
 #include "FEBiphasicDomain.h"
 #include "FETriphasicDomain.h"
 #include "FEBioLib/FEElasticMixture.h"
-#include "FEBiphasicSolute.h"
-#include "FETriphasic.h"
+#include "FEBioLib/FEBiphasicSolute.h"
+#include "FEBioLib/FETriphasic.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"      );

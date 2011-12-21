@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FECore/FEMaterial.h"
-#include "FEBiphasic.h"
-#include "FEBiphasicSolute.h"
+#include "FEBioLib/FEBiphasic.h"
+#include "FEBioLib/FEBiphasicSolute.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticSolidDomain.h"
-#include "FETriphasic.h"
+#include "FEBioLib/FETriphasic.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

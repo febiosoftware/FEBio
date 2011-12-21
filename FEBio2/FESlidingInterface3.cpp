@@ -2,8 +2,8 @@
 #include "fem.h"
 #include "FESlidingInterface3.h"
 #include "FESolidSolver.h"
-#include "FEBiphasic.h"
-#include "FEBiphasicSolute.h"
+#include "FEBioLib/FEBiphasic.h"
+#include "FEBioLib/FEBiphasicSolute.h"
 #include "FEAnalysisStep.h"
 #include "log.h"
 

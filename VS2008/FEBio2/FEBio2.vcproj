@@ -309,14 +309,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBiphasic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSolute.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBiphasicSoluteSolver.cpp"
 				>
 			</File>
@@ -338,18 +330,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDiffConstIso.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDiffConstOrtho.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDiffRefIso.cpp"
 				>
 			</File>
 			<File
@@ -413,31 +393,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEOsmCoefConst.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPeriodicBoundary.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermConstIso.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermHolmesMow.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermRefIso.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermRefOrtho.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermRefTransIso.cpp"
 				>
 			</File>
 			<File
@@ -509,14 +465,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESolubConst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESolute.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESoluteFlux.cpp"
 				>
 			</File>
@@ -526,18 +474,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEStiffnessMatrix.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESupplyBinding.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESupplyConst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESupplySynthesisBinding.cpp"
 				>
 			</File>
 			<File
@@ -562,10 +498,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETractionLoad.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETriphasic.cpp"
 				>
 			</File>
 			<File
@@ -743,15 +675,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBiphasic.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBiphasicDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSolute.h"
 				>
 			</File>
 			<File
@@ -780,18 +704,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDiffConstIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDiffConstOrtho.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEDiffRefIso.h"
 				>
 			</File>
 			<File
@@ -871,31 +783,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEOsmCoefConst.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPeriodicBoundary.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermConstIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermHolmesMow.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermRefIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermRefOrtho.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPermRefTransIso.h"
 				>
 			</File>
 			<File
@@ -967,35 +855,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESolubConst.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESolute.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESoluteFlux.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FESolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEStiffnessMatrix.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESupplyBinding.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESupplyConst.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESupplySynthesisBinding.h"
 				>
 			</File>
 			<File
@@ -1020,10 +884,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETractionLoad.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETriphasic.h"
 				>
 			</File>
 			<File

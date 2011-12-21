@@ -226,6 +226,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBiphasic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSolute.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FECellGrowth.cpp"
 				>
 			</File>
@@ -247,6 +255,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDiffConstIso.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDiffConstOrtho.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDiffRefIso.cpp"
 				>
 			</File>
 			<File
@@ -366,7 +386,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEOsmCoefConst.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPerfectOsmometer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermConstIso.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermHolmesMow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermRefIso.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermRefOrtho.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermRefTransIso.cpp"
 				>
 			</File>
 			<File
@@ -378,7 +422,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESolubConst.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESolute.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESupplyBinding.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESupplyConst.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESupplySynthesisBinding.cpp"
 				>
 			</File>
 			<File
@@ -399,6 +463,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETriphasic.cpp"
 				>
 			</File>
 			<File
@@ -488,6 +556,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBiphasic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSolute.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FECellGrowth.h"
 				>
 			</File>
@@ -509,6 +585,18 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDiffConstIso.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDiffConstOrtho.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEDiffRefIso.h"
 				>
 			</File>
 			<File
@@ -636,7 +724,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEOsmCoefConst.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPerfectOsmometer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermConstIso.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermHolmesMow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermRefIso.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermRefOrtho.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPermRefTransIso.h"
 				>
 			</File>
 			<File
@@ -648,7 +760,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESolubConst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESolute.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESupplyBinding.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESupplyConst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESupplySynthesisBinding.h"
 				>
 			</File>
 			<File
@@ -669,6 +801,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETriphasic.h"
 				>
 			</File>
 			<File

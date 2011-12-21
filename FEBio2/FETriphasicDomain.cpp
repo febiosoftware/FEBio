@@ -3,7 +3,7 @@
 #include "FESolidSolver.h"
 #include "FECore/FEMaterial.h"
 #include "FEMicroMaterial.h"
-#include "FETriphasic.h"
+#include "FEBioLib/FETriphasic.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
