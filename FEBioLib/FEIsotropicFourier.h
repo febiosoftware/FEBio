@@ -17,9 +17,6 @@ public:
 public:
 	void Conductivity(double D[3][3]);
 
-	// declare as registered
-	DECLARE_REGISTERED(FEIsotropicFourier);
-
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

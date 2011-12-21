@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEFiberExpPowUncoupled.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEFiberExpPowUncoupled, "fiber-exp-pow-uncoupled");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberExpPowUncoupled, FEUncoupledMaterial)
 	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");

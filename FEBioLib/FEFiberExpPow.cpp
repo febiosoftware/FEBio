@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEFiberExpPow.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEFiberExpPow, "fiber-exp-pow");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEFiberExpPow, FEElasticMaterial)
 	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");

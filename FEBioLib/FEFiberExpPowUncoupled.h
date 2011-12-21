@@ -1,26 +1,22 @@
-#pragma once
-#include "FECore/FEElasticMaterial.h"
+#include "FEUncoupledMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Material class for single fiber, tension only
 //! Exponential-power law
 
-class FEFiberExpPow : public FEElasticMaterial
+class FEFiberExpPowUncoupled : public FEUncoupledMaterial
 {
 public:
-	FEFiberExpPow() {m_unstable = true;}
+	FEFiberExpPowUncoupled() {m_unstable = true;}
 	
 	//! Initialization
 	void Init();
 	
 	//! Cauchy stress
-	virtual mat3ds Stress(FEMaterialPoint& mp);
+	virtual mat3ds DevStress(FEMaterialPoint& mp);
 	
 	// Spatial tangent
-	virtual tens4ds Tangent(FEMaterialPoint& mp);
-	
-	// declare as registered
-	DECLARE_REGISTERED(FEFiberExpPow);
+	virtual tens4ds DevTangent(FEMaterialPoint& mp);
 	
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

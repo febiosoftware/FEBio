@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEIsotropicFourier.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEIsotropicFourier, "isotropic Fourier");
-
 // define the parameter list
 BEGIN_PARAMETER_LIST(FEIsotropicFourier, FEMaterial)
 	ADD_PARAMETER(m_k  , FE_PARAM_DOUBLE, "k");

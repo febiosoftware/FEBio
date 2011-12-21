@@ -1,13 +1,9 @@
 #include "stdafx.h"
 #include "FEDiscreteMaterial.h"
-#include "fem.h"
-
+#include "FECore/FEModel.h"
 //-----------------------------------------------------------------------------
 // FELinearSpring
 //-----------------------------------------------------------------------------
-
-// register the material with the framework
-REGISTER_MATERIAL(FELinearSpring, "linear spring");
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FELinearSpring, FEDiscreteMaterial)

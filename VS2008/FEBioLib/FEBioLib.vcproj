@@ -250,6 +250,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEDiscreteMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEDonnanEquilibrium.cpp"
 				>
 			</File>
@@ -282,6 +286,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEFiberExpPow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFiberExpPowUncoupled.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEFiberNeoHookean.cpp"
 				>
 			</File>
@@ -307,6 +319,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicElastic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicFourier.cpp"
 				>
 			</File>
 			<File
@@ -480,6 +496,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEDiscreteMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEDonnanEquilibrium.h"
 				>
 			</File>
@@ -512,6 +532,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEFiberExpPow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFiberExpPowUncoupled.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEFiberMaterial.h"
 				>
 			</File>
@@ -532,6 +560,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHeatTransferMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.h"
 				>
 			</File>
@@ -541,6 +573,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicElastic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEIsotropicFourier.h"
 				>
 			</File>
 			<File

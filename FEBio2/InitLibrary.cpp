@@ -12,6 +12,7 @@
 #include "FEBioLib/FEDamageMooneyRivlin.h"
 #include "FEBioLib/FEDamageNeoHookean.h"
 #include "FEBioLib/FEDamageTransIsoMooneyRivlin.h"
+#include "FEBioLib/FEDiscreteMaterial.h"
 #include "FEBioLib/FEDonnanEquilibrium.h"
 #include "FEBioLib/FEEFDDonnanEquilibrium.h"
 #include "FEBioLib/FEEFDMooneyRivlin.h"
@@ -20,6 +21,8 @@
 #include "FEBioLib/FEEFDVerondaWestmann.h"
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEEllipsoidalFiberDistribution.h"
+#include "FEBioLib/FEFiberExpPow.h"
+#include "FEBioLib/FEFiberExpPowUncoupled.h"
 #include "FEBioLib/FEFiberNeoHookean.h"
 #include "FEBioLib/FEFungOrthoCompressible.h"
 #include "FEBioLib/FEFungOrthotropic.h"
@@ -27,6 +30,7 @@
 #include "FEBioLib/FEHolmesMow.h"
 #include "FEBioLib/FEIncompNeoHookean.h"
 #include "FEBioLib/FEIsotropicElastic.h"
+#include "FEBioLib/FEIsotropicFourier.h"
 #include "FEBioLib/FELinearElastic.h"
 #include "FEBioLib/FELinearOrthotropic.h"
 #include "FEBioLib/FELinearTransIso.h"
@@ -70,6 +74,8 @@ REGISTER_MATERIAL(FEEFDUncoupled                , "EFD uncoupled"               
 REGISTER_MATERIAL(FEEFDVerondaWestmann          , "EFD Veronda-Westmann"          );
 REGISTER_MATERIAL(FEElasticMixture              , "solid mixture"                 );
 REGISTER_MATERIAL(FEEllipsoidalFiberDistribution, "ellipsoidal fiber distribution");
+REGISTER_MATERIAL(FEFiberExpPow                 , "fiber-exp-pow"                 );
+REGISTER_MATERIAL(FEFiberExpPowUncoupled        , "fiber-exp-pow-uncoupled"       );
 REGISTER_MATERIAL(FEFiberNeoHookean             , "fiber neo-Hookean"             );
 REGISTER_MATERIAL(FEFungOrthoCompressible       , "Fung-ortho-compressible"       );
 REGISTER_MATERIAL(FEFungOrthotropic             , "Fung orthotropic"              );
@@ -77,8 +83,10 @@ REGISTER_MATERIAL(FEGasserOgdenHolzapfel        , "Gasser-Ogden-Holzapfel"      
 REGISTER_MATERIAL(FEHolmesMow                   , "Holmes-Mow"                    );
 REGISTER_MATERIAL(FEIncompNeoHookean            , "incomp neo-Hookean"            );
 REGISTER_MATERIAL(FEIsotropicElastic            , "isotropic elastic"             );
+REGISTER_MATERIAL(FEIsotropicFourier            , "isotropic Fourier"             );
 REGISTER_MATERIAL(FELinearElastic               , "linear elastic"                );
 REGISTER_MATERIAL(FELinearOrthotropic           , "linear orthotropic"            );
+REGISTER_MATERIAL(FELinearSpring                , "linear spring"                 );
 REGISTER_MATERIAL(FELinearTransIso              , "linear trans iso"              );
 REGISTER_MATERIAL(FEMooneyRivlin                , "Mooney-Rivlin"                 );
 REGISTER_MATERIAL(FEMuscleMaterial              , "muscle material"               );

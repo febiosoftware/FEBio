@@ -353,23 +353,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEDiscreteMaterial.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEElemElemList.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFacet2FacetSliding.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFiberExpPow.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFiberExpPowUncoupled.cpp"
 				>
 			</File>
 			<File
@@ -386,10 +374,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEHeatSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEIsotropicFourier.cpp"
 				>
 			</File>
 			<File
@@ -831,10 +815,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEDiscreteMaterial.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEDiscreteSpringDomain.h"
 				>
 			</File>
@@ -859,14 +839,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEFiberExpPow.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFiberExpPowUncoupled.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEFluidFlux.h"
 				>
 			</File>
@@ -880,14 +852,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEHeatSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEHeatTransferMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEIsotropicFourier.h"
 				>
 			</File>
 			<File
