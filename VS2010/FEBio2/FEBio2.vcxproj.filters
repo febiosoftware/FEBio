@@ -42,9 +42,6 @@
     <ClInclude Include="..\..\FEBio2\FEBioStdSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEBiphasic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEBiphasicDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -58,15 +55,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEDiagnostic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEDiffConstIso.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEDiffConstOrtho.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEDiffRefIso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEDiscreteSpringDomain.h">
@@ -120,25 +108,7 @@
     <ClInclude Include="..\..\FEBio2\FEOptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEOsmCoefConst.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPeriodicBoundary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPermConstIso.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPermHolmesMow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPermRefIso.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPermRefOrtho.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPermRefTransIso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h">
@@ -190,9 +160,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FESolidSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FESolubConst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FESoluteFlux.h">
@@ -264,15 +231,6 @@
     <ClInclude Include="..\..\FEBio2\FELinearSolidSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEBiphasicSolute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FESolute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FETriphasic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FETriphasicDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -335,12 +293,6 @@
     <ClCompile Include="..\..\FEBio2\FEBioStdSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEBiphasic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEBiphasicSolute.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -348,15 +300,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEDiffConstIso.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEDiffConstOrtho.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEDiffRefIso.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEElemElemList.cpp">
@@ -398,25 +341,7 @@
     <ClCompile Include="..\..\FEBio2\FEOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEOsmCoefConst.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPeriodicBoundary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPermConstIso.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPermHolmesMow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPermRefIso.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPermRefOrtho.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPermRefTransIso.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp">
@@ -468,9 +393,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FESolidSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FESolubConst.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FESoluteFlux.cpp">
@@ -594,12 +516,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FELinearSolidSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FESolute.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FETriphasic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FETriphasicDomain.cpp">
