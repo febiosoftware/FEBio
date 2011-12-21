@@ -2,9 +2,6 @@
 #include "FENeoHookeanTransIso.h"
 
 
-// register the material with the framework
-REGISTER_MATERIAL(FENeoHookeanTransIso, "neo-Hookean transiso");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENeoHookeanTransIso, FEElasticMaterial)
 	ADD_PARAMETER(m_Ep, FE_PARAM_DOUBLE, "Ep");

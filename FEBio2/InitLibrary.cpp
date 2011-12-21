@@ -37,7 +37,12 @@
 #include "FEBioLib/FEMooneyRivlin.h"
 #include "FEBioLib/FEMuscleMaterial.h"
 #include "FEBioLib/FENeoHookean.h"
+#include "FEBioLib/FENeoHookeanTransIso.h"
 #include "FEBioLib/FEOgdenMaterial.h"
+#include "FEBioLib/FEOgdenUnconstrained.h"
+#include "FEBioLib/FEOrthoElastic.h"
+#include "FEBioLib/FEPerfectOsmometer.h"
+#include "FEBioLib/FERigid.h"
 #include "FEBioLib/FEStVenantKirchhoff.h"
 #include "FEBioLib/FETCNonlinearOrthotropic.h"
 #include "FEBioLib/FETendonMaterial.h"
@@ -91,10 +96,17 @@ REGISTER_MATERIAL(FELinearTransIso              , "linear trans iso"            
 REGISTER_MATERIAL(FEMooneyRivlin                , "Mooney-Rivlin"                 );
 REGISTER_MATERIAL(FEMuscleMaterial              , "muscle material"               );
 REGISTER_MATERIAL(FENeoHookean                  , "neo-Hookean"                   );
+REGISTER_MATERIAL(FENeoHookeanTransIso          , "neo-Hookean transiso"          );
+REGISTER_MATERIAL(FENonLinearSpring             , "nonlinear spring"              );
 REGISTER_MATERIAL(FEOgdenMaterial               , "Ogden"                         );
+REGISTER_MATERIAL(FEOgdenUnconstrained          , "Ogden unconstrained"           );
+REGISTER_MATERIAL(FEOrthoElastic                , "orthotropic elastic"           );
+REGISTER_MATERIAL(FEPerfectOsmometer            , "perfect osmometer"             );
+REGISTER_MATERIAL(FERigidMaterial               , "rigid body"                    );
 REGISTER_MATERIAL(FEStVenantKirchhoff           , "St.Venant-Kirchhoff"           );
 REGISTER_MATERIAL(FETCNonlinearOrthotropic      , "TC nonlinear orthotropic"      );
 REGISTER_MATERIAL(FETendonMaterial              , "tendon material"               );
+REGISTER_MATERIAL(FETensionOnlyLinearSpring     , "tension only linear spring"    );
 REGISTER_MATERIAL(FETransIsoMooneyRivlin        , "trans iso Mooney-Rivlin"       );
 REGISTER_MATERIAL(FETransIsoVerondaWestmann     , "trans iso Veronda-Westmann"    );
 REGISTER_MATERIAL(FETrussMaterial               , "linear truss"                  );

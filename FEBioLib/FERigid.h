@@ -63,9 +63,6 @@ public:
 	//! serialization
 	void Serialize(DumpFile& ar);
 
-	// declare as registered
-	DECLARE_REGISTERED(FERigidMaterial);
-
 	// declare a parameter list
 	DECLARE_PARAMETER_LIST();
 };

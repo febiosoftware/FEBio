@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #include "FERigid.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FERigidMaterial, "rigid body");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FERigidMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");

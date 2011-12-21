@@ -47,9 +47,6 @@ public:
 public:
 	double m_E;	//!< spring constant
 
-	// declare as registered
-	DECLARE_REGISTERED(FELinearSpring);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

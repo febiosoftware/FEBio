@@ -27,9 +27,6 @@ public:
 	//! Returs the spatial tangent
 	virtual tens4ds Tangent(FEMaterialPoint& mp);
 
-	// declare as registered
-	DECLARE_REGISTERED(FEPerfectOsmometer);
-	
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 	

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
-#include "FETrussMaterial.h"
+#include "FEBioLib/FETrussMaterial.h"
 #include "FEElasticTrussDomain.h"
 
 //-----------------------------------------------------------------------------

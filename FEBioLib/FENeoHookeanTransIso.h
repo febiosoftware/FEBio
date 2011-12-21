@@ -23,9 +23,6 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds Tangent(FEMaterialPoint& pt);
 
-	// declare as registered
-	DECLARE_REGISTERED(FENeoHookeanTransIso);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

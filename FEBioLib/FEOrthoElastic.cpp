@@ -2,10 +2,6 @@
 #include "FEOrthoElastic.h"
 
 //-----------------------------------------------------------------------------
-// register the material with the framework
-REGISTER_MATERIAL(FEOrthoElastic, "orthotropic elastic");
-
-//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEOrthoElastic, FEElasticMaterial)
 	ADD_PARAMETER(E1, FE_PARAM_DOUBLE, "E1");

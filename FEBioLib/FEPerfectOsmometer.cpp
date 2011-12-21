@@ -7,10 +7,7 @@
  */
 #include "stdafx.h"
 #include "FEPerfectOsmometer.h"
-#include "fem.h"
-
-// register the material with the framework
-REGISTER_MATERIAL(FEPerfectOsmometer, "perfect osmometer");
+#include "FECore/FEModel.h"
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPerfectOsmometer, FEElasticMaterial)
@@ -29,8 +26,8 @@ void FEPerfectOsmometer::Init()
 	if (m_iosm < 0) throw MaterialError("iosm must be positive.");
 	if (m_bosm < 0) throw MaterialError("bosm must be positive.");
 	
-	m_Rgas = FEM::GetGlobalConstant("R");
-	m_Tabs = FEM::GetGlobalConstant("T");
+	m_Rgas = FEModel::GetGlobalConstant("R");
+	m_Tabs = FEModel::GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");

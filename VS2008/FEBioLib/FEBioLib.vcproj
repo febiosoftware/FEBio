@@ -350,7 +350,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FENeoHookeanTransIso.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEOgdenMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOgdenUnconstrained.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOrthoElastic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPerfectOsmometer.cpp"
 				>
 			</File>
 			<File
@@ -604,7 +620,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FENeoHookeanTransIso.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEOgdenMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOgdenUnconstrained.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEOrthoElastic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPerfectOsmometer.h"
 				>
 			</File>
 			<File

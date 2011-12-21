@@ -405,15 +405,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FENeoHookeanTransIso.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FENodeReorder.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEOgdenUnconstrained.cpp"
 				>
 			</File>
 			<File
@@ -421,15 +413,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEOrthoElastic.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEOsmCoefConst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPerfectOsmometer.cpp"
 				>
 			</File>
 			<File
@@ -490,10 +474,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FERestartImport.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERigid.cpp"
 				>
 			</File>
 			<File
@@ -883,15 +863,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FENeoHookeanTransIso.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FENodeReorder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEOgdenUnconstrained.h"
 				>
 			</File>
 			<File
@@ -899,15 +871,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEOrthoElastic.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEOsmCoefConst.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPerfectOsmometer.h"
 				>
 			</File>
 			<File
@@ -968,10 +932,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FERestartImport.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERigid.h"
 				>
 			</File>
 			<File

@@ -29,9 +29,6 @@ void FELinearSpring::Init()
 // FETensionOnlyLinearSpring
 //-----------------------------------------------------------------------------
 
-// register the material with the framework
-REGISTER_MATERIAL(FETensionOnlyLinearSpring, "tension only linear spring");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FETensionOnlyLinearSpring, FEDiscreteMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
@@ -55,9 +52,6 @@ void FETensionOnlyLinearSpring::Init()
 //-----------------------------------------------------------------------------
 // FENonLinearSpring
 //-----------------------------------------------------------------------------
-
-// register the material with the framework
-REGISTER_MATERIAL(FENonLinearSpring, "nonlinear spring");
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENonLinearSpring, FEDiscreteMaterial)

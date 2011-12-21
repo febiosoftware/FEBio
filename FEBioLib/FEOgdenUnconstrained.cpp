@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "FEOgdenUnconstrained.h"
 
-REGISTER_MATERIAL(FEOgdenUnconstrained, "Ogden unconstrained");
-
 BEGIN_PARAMETER_LIST(FEOgdenUnconstrained, FEElasticMaterial);
 	ADD_PARAMETER(m_p   , FE_PARAM_DOUBLE, "cp");
 	ADD_PARAMETER(m_c[0], FE_PARAM_DOUBLE, "c1");

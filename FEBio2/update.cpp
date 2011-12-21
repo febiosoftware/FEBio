@@ -2,7 +2,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "FEMicroMaterial.h"
-#include "FETrussMaterial.h"
+#include "FEBioLib/FETrussMaterial.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEBioLib/FEPointBodyForce.h"
