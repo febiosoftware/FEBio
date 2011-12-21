@@ -26,6 +26,9 @@ public:
 	//! serialize data to/from dump file
 	void Serialize(DumpFile& ar);
 
+	//! update contact
+	void UpdateContact();
+
 protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);
 	void GetPressureData(vector<double>& pi, vector<double>& ui);

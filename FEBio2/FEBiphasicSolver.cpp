@@ -2,6 +2,8 @@
 #include "FEBiphasicSolver.h"
 #include "FEAnalysisStep.h"
 #include "Interrupt.h"
+#include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
 #include "log.h"
 
 #ifdef WIN32
@@ -440,6 +442,47 @@ bool FEBiphasicSolver::Quasin(double time)
 	}
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSolver::UpdateContact()
+{
+	FEAnalysis* pstep = m_fem.m_pStep;
+
+	// If this analysis is a poroelastic analysis that uses
+	// a biphasic contact interface, we need to make sure that
+	// the free draining dof's are processed properly
+	bool bporo = (pstep->m_nModule == FE_BIPHASIC) || (pstep->m_nModule == FE_POROSOLUTE);
+	if (bporo)
+	{
+		// mark all free-draining surfaces
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i) 
+		{
+			FEContactInterface* pci = m_fem.ContactInterface(i);
+
+			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
+			if (psi2) psi2->MarkFreeDraining();
+			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(pci);
+			if (psi3) psi3->MarkAmbient();
+		}
+	}
+
+	// Update all contact interfaces
+	FESolidSolver::UpdateContact();
+
+	if (bporo)
+	{
+		// set free-draining boundary conditions
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i) 
+		{
+			FEContactInterface* pci = m_fem.ContactInterface(i);
+
+			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
+			if (psi2) psi2->SetFreeDraining();
+			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(pci);
+			if (psi3) psi3->SetAmbient();
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
