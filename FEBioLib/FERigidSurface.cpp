@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FERigidSurface.h"
-#include "fem.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FEPlane
@@ -22,7 +21,7 @@ void FEPlane::Init()
 //-----------------------------------------------------------------------------
 //! constructor
 
-FERigidSphere::FERigidSphere(FEM *pfem) : FERigidSurface(pfem)
+FERigidSphere::FERigidSphere(FEModel *pfem) : FERigidSurface(pfem)
 {
 	m_nplc[0] = m_nplc[1] = m_nplc[2] = -1;
 	m_pplc[0] = m_pplc[1] = m_pplc[2] = 0;

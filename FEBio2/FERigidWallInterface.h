@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEContactInterface.h"
-#include "FERigidSurface.h"
+#include "FEBioLib/FERigidSurface.h"
 #include "FECore/FESurface.h"
 #include "FECore/vec3d.h"
 #include "FECore/vec2d.h"

@@ -426,6 +426,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FERigidSurface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESolubConst.cpp"
 				>
 			</File>
@@ -765,6 +769,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidSurface.h"
 				>
 			</File>
 			<File

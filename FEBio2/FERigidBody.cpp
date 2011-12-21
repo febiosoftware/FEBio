@@ -3,7 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "fem.h"
 #include "FERigidBody.h"
 #include "FECore/FEMaterial.h"
 #include "FEBioLib/FERigid.h"
@@ -34,7 +33,7 @@ void FERigidBody::Update()
 	// make sure the rigid body is attached to a FEM
 	if (m_pfem == 0) return;
 
-	FEM& fem = *m_pfem;
+	FEModel& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
 	m_mass = 0;			// total mass of rigid body
@@ -55,6 +54,7 @@ void FERigidBody::Update()
 	// loop over all elements
 	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
+		// TODO: I should convert to a FERigidSolidDomain or FERigidShellDomain
 		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{

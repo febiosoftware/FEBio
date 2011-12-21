@@ -1,10 +1,11 @@
 #pragma once
 
 #include "FECore/FESurface.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-// forward declaration of FEM class
-class FEM;
+// TODO: introduce parameter lists so that we can remove references to load curves.
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 //! This class is the base class for rigid surfaces
@@ -15,7 +16,7 @@ class FEM;
 class FERigidSurface
 {
 public: // interface
-	FERigidSurface(FEM* pfem) : m_pfem(pfem) {}
+	FERigidSurface(FEModel* pfem) : m_pfem(pfem) {}
 
 	//! intialize surface
 	virtual void Init() = 0;
@@ -27,7 +28,7 @@ public: // interface
 	virtual vec3d Project(const vec3d& r) = 0;
 
 protected:
-	FEM*	m_pfem;
+	FEModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------
@@ -38,7 +39,7 @@ class FEPlane : public FERigidSurface
 {
 public:
 	//! constructor
-	FEPlane(FEM* pfem) : FERigidSurface(pfem)
+	FEPlane(FEModel* pfem) : FERigidSurface(pfem)
 	{
 		m_nplc = -1;
 		m_pplc = 0;
@@ -83,7 +84,7 @@ class FERigidSphere : public FERigidSurface
 {
 public:
 	//! constructor
-	FERigidSphere(FEM* pfem);
+	FERigidSphere(FEModel* pfem);
 
 	//! initialization
 	void Init();

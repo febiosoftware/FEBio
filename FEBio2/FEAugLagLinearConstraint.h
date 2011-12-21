@@ -2,7 +2,6 @@
 
 #include "NumCore/vector.h"
 #include "NumCore/matrix.h"
-#include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include <list>
 using namespace std;

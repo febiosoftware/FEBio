@@ -14,9 +14,7 @@
 #include "FECore/quatd.h"
 #include "FECore/FEBoundaryCondition.h"
 #include "FECore/DumpFile.h"
-
-class FEM;
-
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! rigid body force
@@ -65,7 +63,7 @@ public:
 	FERigidBody();
 	virtual ~FERigidBody();
 
-	void AttachToFEM(FEM* pfem) { m_pfem = pfem; }
+	void AttachToFEM(FEModel* pfem) { m_pfem = pfem; }
 
 	void Update();
 
@@ -98,7 +96,7 @@ public:
 	bool	m_bActive;	// activation flag
 
 private:
-	FEM*	m_pfem;
+	FEModel*	m_pfem;
 };
 
 #endif // !defined(AFX_FERIGIDBODY_H__2C1FB6E7_60F0_46E9_94D0_3B4D07EAC5CF__INCLUDED_)
