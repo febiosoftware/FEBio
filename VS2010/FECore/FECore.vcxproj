@@ -484,6 +484,7 @@
     <ClInclude Include="..\..\FECore\FEElementLibrary.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
+    <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
     <ClInclude Include="..\..\FECore\FEMaterialFactory.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
@@ -492,6 +493,7 @@
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
     <ClInclude Include="..\..\FECore\FENodeNodeList.h" />
+    <ClInclude Include="..\..\FECore\FENodeReorder.h" />
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
@@ -529,6 +531,7 @@
     <ClCompile Include="..\..\FECore\FEElementLibrary.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
+    <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
@@ -536,6 +539,7 @@
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeNodeList.cpp" />
+    <ClCompile Include="..\..\FECore\FENodeReorder.cpp" />
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
