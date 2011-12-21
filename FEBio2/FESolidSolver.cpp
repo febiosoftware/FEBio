@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "fem.h"
-#include "FENodeReorder.h"
+#include "FECore/FENodeReorder.h"
 #include "FEBioLib/FERigid.h"
 
 //-----------------------------------------------------------------------------

@@ -357,10 +357,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FELevelStructure.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FELinearSolidDomain.cpp"
 				>
 			</File>
@@ -378,10 +374,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEMicroMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FENodeReorder.cpp"
 				>
 			</File>
 			<File
@@ -743,10 +735,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FELevelStructure.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FELinearSolidDomain.h"
 				>
 			</File>
@@ -764,10 +752,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEMicroMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FENodeReorder.h"
 				>
 			</File>
 			<File

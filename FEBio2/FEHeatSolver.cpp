@@ -3,7 +3,7 @@
 #include "FEBioLib/FEIsotropicFourier.h"
 #include "FEHeatFlux.h"
 #include "FEHeatSolidDomain.h"
-#include "FENodeReorder.h"
+#include "FECore/FENodeReorder.h"
 
 //-----------------------------------------------------------------------------
 //! constructor for the class

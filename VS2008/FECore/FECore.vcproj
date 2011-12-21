@@ -272,6 +272,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FELevelStructure.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEMaterial.cpp"
 				>
 			</File>
@@ -297,6 +301,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FENodeNodeList.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FENodeReorder.cpp"
 				>
 			</File>
 			<File
@@ -438,6 +446,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FELevelStructure.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEMaterial.h"
 				>
 			</File>
@@ -467,6 +479,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FENodeNodeList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FENodeReorder.h"
 				>
 			</File>
 			<File

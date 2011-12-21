@@ -9,8 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/FEMesh.h"
-#include "FECore/FENodeNodeList.h"
+#include "FEMesh.h"
+#include "FENodeNodeList.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements the idea of a level structure
