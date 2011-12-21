@@ -11,7 +11,7 @@
 #include "FERigidBody.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
-#include "FELinearConstraint.h"
+#include "FEBioLib/FELinearConstraint.h"
 #include "FEAugLagLinearConstraint.h"
 #include "FEBioLib/Timer.h"
 #include "FESurfaceLoad.h"
