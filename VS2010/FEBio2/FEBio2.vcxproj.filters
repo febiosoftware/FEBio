@@ -135,9 +135,6 @@
     <ClInclude Include="..\..\FEBio2\FERigidJoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FERigidSurface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FERigidWallInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -357,9 +354,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FERigidJoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FERigidSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FERigidWallInterface.cpp">

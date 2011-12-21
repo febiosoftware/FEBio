@@ -560,6 +560,7 @@
     <ClInclude Include="..\..\FEBioLib\FEPermRefTransIso.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
+    <ClInclude Include="..\..\FEBioLib\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioLib\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioLib\FESolute.h" />
     <ClInclude Include="..\..\FEBioLib\FEStVenantKirchhoff.h" />
@@ -645,6 +646,7 @@
     <ClCompile Include="..\..\FEBioLib\FEPermRefTransIso.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolute.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEStVenantKirchhoff.cpp" />
