@@ -103,9 +103,6 @@ public:
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);
 
-	//! return number of contact interfaces
-	int ContactInterfaces() { return m_CI.size(); } 
-
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
 
@@ -184,10 +181,6 @@ public:
 
 		// rigid joints
 		vector<FERigidJoint*>		m_RJ;	//!< rigid joint array
-	//}
-
-	//{ --- Contact Data --
-		vector<FEContactInterface*>		m_CI;		//!< contact interface array
 	//}
 
 public:

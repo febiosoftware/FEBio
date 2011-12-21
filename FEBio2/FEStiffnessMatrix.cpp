@@ -299,8 +299,10 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 			// Add all contact interface elements
 			for (i=0; i<fem.ContactInterfaces(); ++i)
 			{
+				FEContactInterface* pci = fem.ContactInterface(i);
+
 				// add sliding interface elements
-				FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(fem.m_CI[i]);
+				FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(pci);
 				if (psi)
 				{
 					vector<int> lm(6*5);
@@ -358,7 +360,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				}
 
 				// facet-to-facet sliding interfaces
-				FEFacet2FacetSliding* pfi = dynamic_cast<FEFacet2FacetSliding*>(fem.m_CI[i]);
+				FEFacet2FacetSliding* pfi = dynamic_cast<FEFacet2FacetSliding*>(pci);
 				if (pfi)
 				{
 					vector<int> lm(6*8);
@@ -418,7 +420,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				}
 
 				// sliding2 interfaces
-				FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(fem.m_CI[i]);
+				FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(pci);
 				if (ps2)
 				{
 					vector<int> lm(7*8);
@@ -480,7 +482,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				}
 
 				// sliding3 interfaces
-				FESlidingInterface3* ps3 = dynamic_cast<FESlidingInterface3*>(fem.m_CI[i]);
+				FESlidingInterface3* ps3 = dynamic_cast<FESlidingInterface3*>(pci);
 				if (ps3)
 				{
 					vector<int> lm(8*8);
@@ -544,7 +546,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				}
 				
 				// add tied interface elements
-				FETiedInterface* pti = dynamic_cast<FETiedInterface*>(fem.m_CI[i]);
+				FETiedInterface* pti = dynamic_cast<FETiedInterface*>(pci);
 				if (pti)
 				{
 					vector<int> lm(6*5);
@@ -597,7 +599,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 				// add periodic boundary elements
 				// TODO: what if two_pass ??
-				FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(fem.m_CI[i]);
+				FEPeriodicBoundary* pbi = dynamic_cast<FEPeriodicBoundary*>(pci);
 				if (pbi)
 				{
 					vector<int> lm(6*5);
@@ -645,7 +647,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 				// add surface constraints
 				// TODO: what if two_pass ??
-				FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(fem.m_CI[i]);
+				FESurfaceConstraint* psc = dynamic_cast<FESurfaceConstraint*>(pci);
 				if (psc)
 				{
 					vector<int> lm(6*5);
@@ -712,7 +714,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				}
 
 				// add rigid wall elements
-				FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(fem.m_CI[i]);	
+				FERigidWallInterface* pri = dynamic_cast<FERigidWallInterface*>(pci);
 				if (pri)
 				{
 					vector<int> lm(6);

@@ -3415,7 +3415,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- S L I D I N G   W I T H   G A P S ---
 
 		FESlidingInterface* ps = new FESlidingInterface(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 
@@ -3458,7 +3458,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- F A C E T   T O   F A C E T   S L I D I N G ---
 
 		FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 
@@ -3510,7 +3510,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- S L I D I N G   I N T E R F A C E   2 ---
 		FESlidingInterface2* ps = new FESlidingInterface2(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 
@@ -3563,7 +3563,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// --- S L I D I N G   I N T E R F A C E   3 ---
 		FESlidingInterface3* ps = new FESlidingInterface3(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 		
@@ -3617,7 +3617,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- T I E D   C O N T A C T  ---
 
 		FETiedInterface* ps = new FETiedInterface(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 
@@ -3659,7 +3659,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- P E R I O D I C   B O U N D A R Y  ---
 
 		FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 
@@ -3701,7 +3701,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- S U R F A C E   C O N S T R A I N T ---
 
 		FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 
@@ -3743,7 +3743,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		// --- R I G I D   W A L L   I N T E R F A C E ---
 
 		FERigidWallInterface* ps = new FERigidWallInterface(&fem);
-		fem.m_CI.push_back(ps);
+		fem.AddContactInterface(ps);
 
 		FEParameterList& pl = ps->GetParameterList();
 
@@ -3965,7 +3965,7 @@ void FEBioContactSection::ParseSlidingInterface(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FESlidingInterface* ps = new FESlidingInterface(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -4011,7 +4011,7 @@ void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -4068,7 +4068,7 @@ void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FESlidingInterface2* ps = new FESlidingInterface2(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -4126,7 +4126,7 @@ void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FESlidingInterface3* ps = new FESlidingInterface3(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 	
@@ -4184,7 +4184,7 @@ void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FETiedInterface* ps = new FETiedInterface(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -4230,7 +4230,7 @@ void FEBioContactSection::ParsePeriodicBoundary(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -4276,7 +4276,7 @@ void FEBioContactSection::ParseSurfaceConstraint(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -4322,7 +4322,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 	FEMesh& m = fem.m_mesh;
 
 	FERigidWallInterface* ps = new FERigidWallInterface(&fem);
-	fem.m_CI.push_back(ps);
+	fem.AddContactInterface(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 

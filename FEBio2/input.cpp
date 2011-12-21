@@ -366,15 +366,15 @@ void echo_input(FEM& fem)
 		clog.printf("\n\n");
 	}
 
-	if (fem.m_CI.size() > 0)
+	if (fem.ContactInterfaces() > 0)
 	{
 		clog.printf(" CONTACT INTERFACE DATA\n");
 		clog.printf("===========================================================================\n");
-		for (i=0; i<(int) fem.m_CI.size(); ++i)
+		for (i=0; i<fem.ContactInterfaces(); ++i)
 		{
 			if (i>0) clog.printf("---------------------------------------------------------------------------\n");
 
-			FEContactInterface* pi = fem.m_CI[i];
+			FEContactInterface* pi = fem.ContactInterface(i);
 			const char* sztype = febio.GetTypeStr<FEContactInterface>(pi);
 			if (sztype == 0) sztype = "unknown";
 			clog.printf("contact interface %d - Type: %s\n", i+1, sztype);

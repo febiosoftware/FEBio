@@ -326,9 +326,9 @@ bool FEAnalysisStep::Init()
 
 	// see if we need to do contact augmentations
 	m_baugment = (m_fem.m_RJ.empty()? false : true);
-	for (i=0; i<(int) m_fem.m_CI.size(); ++i)
+	for (i=0; i<m_fem.ContactInterfaces(); ++i)
 	{
-		FEContactInterface& ci = *m_fem.m_CI[i];
+		FEContactInterface& ci = *m_fem.ContactInterface(i);
 		if (ci.m_blaugon) m_baugment = true;
 	}
 
@@ -437,7 +437,7 @@ bool FEAnalysisStep::Solve()
 		// evaluate contact interface parameter lists
 		for (i=0; i<m_fem.ContactInterfaces(); ++i)
 		{
-			FEParameterList& pl = m_fem.m_CI[i]->GetParameterList();
+			FEParameterList& pl = m_fem.ContactInterface(i)->GetParameterList();
 			m_fem.EvaluateParameterList(pl);
 		}
 

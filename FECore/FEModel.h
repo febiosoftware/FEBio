@@ -4,6 +4,7 @@
 #include "LoadCurve.h"
 #include "BC.h"
 #include "FEBodyForce.h"
+#include "FEContactInterface.h"
 #include "FEElasticMaterial.h"		// TODO: I want to delete this
 #include "FEAnalysis.h"
 #include <vector>
@@ -97,6 +98,16 @@ public: // analysis step functions
 	//! Get a particular step
 	FEAnalysis* GetStep(int i) { return m_Step[i]; }
 
+public: // contact interface functions
+	//! return number of contact interfaces
+	int ContactInterfaces() { return m_CI.size(); } 
+
+	//! retrive a contact interface
+	FEContactInterface* ContactInterface(int i) { return m_CI[i]; }
+
+	//! Add a contact interface
+	void AddContactInterface(FEContactInterface* pci) { m_CI.push_back(pci); }
+
 public:	// Miscellaneous routines
 
 	//! set callback function
@@ -110,10 +121,11 @@ public:	// Miscellaneous routines
 	static double GetGlobalConstant(const string& s);
 
 protected:
-	std::vector<FELoadCurve*>	m_LC;	//!< load curve data
-	std::vector<FEMaterial*>	m_MAT;	//!< array of materials
-	std::vector<FEBodyForce*>	m_BF;	//!< body force data
-	std::vector<FEAnalysis*>	m_Step;	//!< array of analysis steps
+	std::vector<FELoadCurve*>			m_LC;	//!< load curve data
+	std::vector<FEMaterial*>			m_MAT;	//!< array of materials
+	std::vector<FEBodyForce*>			m_BF;	//!< body force data
+	std::vector<FEAnalysis*>			m_Step;	//!< array of analysis steps
+	std::vector<FEContactInterface*>	m_CI;	//!< contact interface array
 
 public:
 	// Geometry data

@@ -31,7 +31,7 @@ bool FESolidSolver::Augment()
 	if (m_fem.ContactInterfaces() > 0)
 	{
 		// loop over all contact interfaces
-		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.m_CI[i]->Augment(m_naug) && bconv;
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.ContactInterface(i)->Augment(m_naug) && bconv;
 	}
 
 	// do linear constraint augmentations
