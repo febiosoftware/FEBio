@@ -1,5 +1,5 @@
 #pragma once
-#include "FESurfaceLoad.h"
+#include "FEBioLib/FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! Surface that sustains a heat flux boundary condition

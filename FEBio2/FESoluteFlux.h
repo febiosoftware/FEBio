@@ -1,5 +1,5 @@
 #pragma once
-#include "FESurfaceLoad.h"
+#include "FEBioLib/FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! The flux surface is a surface domain that sustains a solute flux boundary

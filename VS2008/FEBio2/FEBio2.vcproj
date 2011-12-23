@@ -465,10 +465,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESurfaceLoad.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
 				>
 			</File>
@@ -832,10 +828,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FESurfaceConstraint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESurfaceLoad.h"
 				>
 			</File>
 			<File

@@ -42,6 +42,9 @@ public:
 	//! assemble the element residual into the global residual
 	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) {}
 
+	//! assemble global stiffness matrix
+	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) {}
+
 private:
 	// These functions have to be overwritten from NonLinearSystem
 	// but are not yet used.

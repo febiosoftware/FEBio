@@ -112,7 +112,6 @@ void FEElasticSolidDomain::InitElements()
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Serialize(DumpFile &ar)
 {
-	FEM& fem = dynamic_cast<FEM&>(*ar.GetFEModel());
 	if (ar.IsSaving())
 	{
 		ar << m_Node;
@@ -135,6 +134,7 @@ void FEElasticSolidDomain::Serialize(DumpFile &ar)
 	{
 		ar >> m_Node;
 
+		FEModel& fem = *ar.GetFEModel();
 		int n, mat;
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{

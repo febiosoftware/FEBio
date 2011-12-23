@@ -1,5 +1,5 @@
 #pragma once
-#include "FESurfaceLoad.h"
+#include "FEBioLib/FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! This boundary condition applies a poro-elastic normal traction on a surface

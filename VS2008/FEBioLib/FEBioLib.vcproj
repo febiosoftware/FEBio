@@ -454,6 +454,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESurfaceLoad.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FETCNonlinearOrthotropic.cpp"
 				>
 			</File>
@@ -797,6 +801,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESupplySynthesisBinding.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESurfaceLoad.h"
 				>
 			</File>
 			<File

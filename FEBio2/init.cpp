@@ -56,6 +56,7 @@ bool FEM::Init()
 	}
 
 	// check step data
+	// TODO: should I let the Steps take care of this instead?
 	for (i=0; i<(int) m_Step.size(); ++i)
 	{
 		FEAnalysis& step = *m_Step[i];
@@ -201,7 +202,7 @@ bool FEM::InitMesh()
 			}
 		}
 
-		// initialize shell data
+		// Calculate the shell directors as the local node normals
 		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
 		if (psd)
 		{
@@ -240,6 +241,7 @@ bool FEM::InitMesh()
 		node.m_Dt = node.m_D0;
 	}
 
+	// Check initially inverted shell elements
 	for (nd = 0; nd < m.Domains(); ++nd)
 	{
 		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
@@ -276,6 +278,7 @@ bool FEM::InitMesh()
 		}
 	}
 
+	// report number of inverted elements
 	if (ninverted != 0)
 	{
 		fprintf(stderr, "**************************** E R R O R ****************************\n");
@@ -287,6 +290,7 @@ bool FEM::InitMesh()
 
 	// next if a node does not belong to a shell
 	// we turn of the rotational degrees of freedom
+	// To do this, we first tag all shell nodes
 	vector<int> tag(m.Nodes());
 	zero(tag);
 	for (nd = 0; nd < m.Domains(); ++nd)
@@ -316,6 +320,9 @@ bool FEM::InitMesh()
 		}
 	}
 
+	// At this point, the node ID still contains the boundary conditions
+	// so we copy that into the m_BC array
+	// TODO: perhaps we should put the BC's initially in BC instead of ID.
 	for (i=0; i<m.Nodes(); ++i)
 	{
 		FENode& node = m.Node(i);

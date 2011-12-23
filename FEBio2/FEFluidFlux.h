@@ -1,5 +1,5 @@
 #pragma once
-#include "FESurfaceLoad.h"
+#include "FEBioLib/FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! This boundary condition sustains a fluid flux on a surface

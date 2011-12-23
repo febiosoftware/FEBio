@@ -217,10 +217,10 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 {
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-	FEM& fem = solver.m_fem;
+	FEM& fem = psolver->m_fem;
 
 	matrix ke;
 	vector<int> lm;
@@ -260,7 +260,7 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 				m_psurf->UnpackLM(el, lm);
 
 				// assemble element matrix in global stiffness matrix
-				solver.AssembleStiffness(el.m_node, lm, ke);
+				psolver->AssembleStiffness(el.m_node, lm, ke);
 			}
 		}
 	}

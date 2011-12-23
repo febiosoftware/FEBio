@@ -14,7 +14,7 @@
 #include "FEBioLib/FELinearConstraint.h"
 #include "FEAugLagLinearConstraint.h"
 #include "FEBioLib/Timer.h"
-#include "FESurfaceLoad.h"
+#include "FEBioLib/FESurfaceLoad.h"
 #include "FEPointConstraint.h"
 #include "FEBioLib/PlotFile.h"
 
