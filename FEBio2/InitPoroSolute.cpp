@@ -9,8 +9,10 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-//! Initialize solute-poroelastic data
-
+//! Initialize solute-poroelastic data.
+//! Find all nodes that are not part of a poro-solute domain and fix the 
+//! pressure and concentration DOFS. 
+//! \todo This function should probably move to the FEAnalysisStep class.
 bool FEM::InitPoroSolute()
 {
 	int i, j, nd;

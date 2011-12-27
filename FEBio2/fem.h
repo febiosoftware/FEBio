@@ -135,7 +135,7 @@ public:
 	//{ --- Initialization routines ---
 
 		//! Initialize rigid bodies
-		bool InitRigidBodies();
+		bool CreateRigidBodies();
 
 		//! Initialize poroelastic/biphasic and solute data
 		bool InitPoroSolute();
@@ -170,7 +170,6 @@ public:
 	// --- Geometry Data ---
 	//{
 		// rigid body data
-		int						m_nrm;	//!< nr of rigid materials
 		vector<FERigidBody>		m_RB;	//!< rigid body array
 
 		// rigid joints

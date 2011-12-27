@@ -5,24 +5,23 @@
 #include "FEElasticSolidDomain.h"
 #include "log.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION: FEM::InitRigidBodies
-//  Initializes rigid body data
-//
-
-bool FEM::InitRigidBodies()
+//-----------------------------------------------------------------------------
+//! This function creates the rigid bodies by analyzing the rigid materials
+//! and the mesh in the model. 
+//!
+bool FEM::CreateRigidBodies()
 {
 	int i, j, n, m, nd;
 	// count the number of rigid materials
-	m_nrm = 0;
+	int nrm = 0;
 	for (i=0; i<Materials(); ++i)
 	{
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(i));
-		if (pm) m_nrm++;
+		if (pm) nrm++;
 	}
 	
 	// make sure there are rigid materials
-	if (m_nrm == 0) return true;
+	if (nrm == 0) return true;
 
 	// First we need to figure out how many rigid bodies there are.
 	// This is not the same as rigid materials, since a rigid body

@@ -90,8 +90,8 @@ bool FEM::Init()
 			clog.printbox("WARNING", "%d isolated vertices removed.", ni);
 	}
 
-	// initialize rigid body data
-	if (InitRigidBodies() == false) return false;
+	// create and initialize the rigid body data
+	if (CreateRigidBodies() == false) return false;
 
 	// initialize poroelastic/biphasic and solute data
 	if (InitPoroSolute() == false) return false;
