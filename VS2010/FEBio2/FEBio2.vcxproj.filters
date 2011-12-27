@@ -162,9 +162,6 @@
     <ClInclude Include="..\..\FEBio2\FESurfaceConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FESurfaceLoad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -381,9 +378,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FESurfaceConstraint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FESurfaceLoad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp">

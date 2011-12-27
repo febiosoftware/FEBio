@@ -581,7 +581,6 @@
     <ClInclude Include="..\..\FEBio2\FESolver.h" />
     <ClInclude Include="..\..\FEBio2\FEStiffnessMatrix.h" />
     <ClInclude Include="..\..\FEBio2\FESurfaceConstraint.h" />
-    <ClInclude Include="..\..\FEBio2\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FETiedContactSurface.h" />
     <ClInclude Include="..\..\FEBio2\FETiedInterface.h" />
@@ -656,7 +655,6 @@
     <ClCompile Include="..\..\FEBio2\FESolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEStiffnessMatrix.cpp" />
     <ClCompile Include="..\..\FEBio2\FESurfaceConstraint.cpp" />
-    <ClCompile Include="..\..\FEBio2\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FETiedContactSurface.cpp" />
     <ClCompile Include="..\..\FEBio2\FETiedInterface.cpp" />
