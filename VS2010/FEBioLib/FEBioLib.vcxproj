@@ -563,6 +563,7 @@
     <ClInclude Include="..\..\FEBioLib\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioLib\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioLib\FESolute.h" />
+    <ClInclude Include="..\..\FEBioLib\FESphericalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioLib\FEStVenantKirchhoff.h" />
     <ClInclude Include="..\..\FEBioLib\FESupplyBinding.h" />
     <ClInclude Include="..\..\FEBioLib\FESupplyConst.h" />
@@ -650,6 +651,7 @@
     <ClCompile Include="..\..\FEBioLib\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolute.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FESphericalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEStVenantKirchhoff.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESupplyBinding.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESupplyConst.cpp" />
