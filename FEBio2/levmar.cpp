@@ -205,9 +205,6 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	FELoadCurve& lc = opt.ReactionLoad();
 	lc.Clear();
 
-	// reset the FEM data
-	fem.Reset();
-
 	// set the material parameters
 	int nvar = opt.Variables();
 	for (int i=0; i<nvar; ++i)
@@ -215,6 +212,9 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 		OPT_VARIABLE& var = opt.Variable(i);
 		*(var.m_pd) = a[i];
 	}
+
+	// reset the FEM data
+	fem.Reset();
 
 	clog.SetMode(Logfile::FILE_AND_SCREEN);
 	clog.printf("\n----- Iteration: %d -----\n", opt.m_niter);

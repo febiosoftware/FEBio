@@ -475,6 +475,15 @@ bool FEM::Reset()
 {
 	int i;
 
+	// initialize materials
+	FEMaterial* pmat;
+	
+	for (i=0; i<Materials(); ++i)
+	{
+		pmat = GetMaterial(i);
+		pmat->Init();
+	}
+
 	// reset mesh data
 	m_mesh.Reset();
 
