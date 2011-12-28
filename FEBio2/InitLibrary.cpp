@@ -60,6 +60,7 @@
 #include "FEBioLib/FESupplyConst.h"
 #include "FEBioLib/FESupplySynthesisBinding.h"
 #include "FEBioLib/FESolute.h"
+#include "FEBioLib/FESphericalFiberDistribution.h"
 #include "FEBioLib/FETCNonlinearOrthotropic.h"
 #include "FEBioLib/FETendonMaterial.h"
 #include "FEBioLib/FETransIsoMooneyRivlin.h"
@@ -131,6 +132,7 @@ REGISTER_MATERIAL(FEPermRefIso                  , "perm-ref-iso"                
 REGISTER_MATERIAL(FEPermRefOrtho                , "perm-ref-ortho"                );
 REGISTER_MATERIAL(FEPermRefTransIso             , "perm-ref-trans-iso"            );
 REGISTER_MATERIAL(FERigidMaterial               , "rigid body"                    );
+REGISTER_MATERIAL(FESphericalFiberDistribution  , "spherical fiber distribution"  );
 REGISTER_MATERIAL(FEStVenantKirchhoff           , "St.Venant-Kirchhoff"           );
 REGISTER_MATERIAL(FESolubConst                  , "solub-const"                   );
 REGISTER_MATERIAL(FESolute                      , "solute"                        );

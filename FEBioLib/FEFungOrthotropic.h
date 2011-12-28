@@ -26,9 +26,6 @@ public:
 	//! convert material properties
 	void ConvertProperties();
 
-	//! convert material properties
-	void ConvertProperties();
-		
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

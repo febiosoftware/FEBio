@@ -438,6 +438,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESphericalFiberDistribution.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
 				>
 			</File>
@@ -785,6 +789,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESolute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESphericalFiberDistribution.h"
 				>
 			</File>
 			<File
