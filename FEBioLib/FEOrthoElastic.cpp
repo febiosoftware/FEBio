@@ -32,7 +32,14 @@ void FEOrthoElastic::Init()
 	if (v12 > sqrt(E1/E2)) throw MaterialError("Invalid value for v12. Let v12 <= sqrt(E1/E2)");
 	if (v23 > sqrt(E2/E3)) throw MaterialError("Invalid value for v23. Let v23 <= sqrt(E2/E3)");
 	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 <= sqrt(E3/E1)");
-	
+}
+
+
+//-----------------------------------------------------------------------------
+//! Convert properties
+//! Called at every iteration for compatibility with optimization
+void FEOrthoElastic::ConvertProperties()
+{
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;
 	mu[1] = G12 - G31 + G23;
@@ -54,6 +61,8 @@ void FEOrthoElastic::Init()
 //! Calculates the stress for a linear orthotropic material
 mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 {
+	ConvertProperties();
+
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	int i,j;
@@ -85,6 +94,8 @@ mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4ds FEOrthoElastic::Tangent(FEMaterialPoint& mp)
 {
+	ConvertProperties();
+
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	int i,j;

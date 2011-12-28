@@ -17,6 +17,8 @@
 #include "FEBioLib/FESurfaceLoad.h"
 #include "FEPointConstraint.h"
 #include "FEBioLib/PlotFile.h"
+#include "FEBioLib/FEElasticMixture.h"
+#include "FEBioLib/FEUncoupledElasticMixture.h"
 
 #include <list>
 #include <string>
@@ -103,6 +105,13 @@ public:
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);
 
+	//! return a pointer to the parameter variable
+	double* ReturnParameter(FEParam* pp, const int index);
+	
+	//! return a pointer to the named variable in a solid mixture
+	double* FindSolidMixtureParameter(const char* szvar, const int index, FEElasticMixture* pme);
+	double* FindUncoupledSolidMixtureParameter(const char* szvar, const int index, FEUncoupledElasticMixture* pme);
+	
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
 

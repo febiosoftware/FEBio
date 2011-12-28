@@ -84,8 +84,6 @@ bool FEBiphasicSolver::InitEquations()
 		if (n.m_ID[DOF_C+1] != -1) m_nceq[1]++;
 	}
 
-	clog.printf("m_nceq: %d, %d\n", m_nceq[0],m_nceq[1]);
-
 	return true;
 }
 

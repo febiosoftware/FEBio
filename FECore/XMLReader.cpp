@@ -35,61 +35,67 @@ XMLTag::XMLTag()
 	for (i=0; i<XMLReader::MAX_LEVEL; ++i) m_szroot[i][0] = 0;
 }
 
-//////////////////////////////////////////////////////////////////////
-
-void XMLTag::value(double* pf, int n)
+//-----------------------------------------------------------------------------
+//! This function reads in a comma delimited list of doubles. The function reads
+//! in a maximum of n values. The actual number of values that are read is returned.
+//!
+int XMLTag::value(double* pf, int n)
 {
 	const char* sz = m_szval.c_str();
-
+	int nr = 0;
 	for (int i=0; i<n; ++i)
 	{
 		const char* sze = strchr(sz, ',');
 
 		pf[i] = atof(sz);
+		nr++;
 
-		if (sze)
-		{
-			sz = sze+1;
-		}
+		if (sze) sz = sze+1;
+		else break;
 	}
+	return nr;
 }
 
-//////////////////////////////////////////////////////////////////////
-
-void XMLTag::value(float* pf, int n)
+//-----------------------------------------------------------------------------
+//! This function reads in a comma delimited list of floats. The function reads
+//! in a maximum of n values. The actual number of values that are read is returned.
+//!
+int XMLTag::value(float* pf, int n)
 {
 	const char* sz = m_szval.c_str();
-
+	int nr = 0;
 	for (int i=0; i<n; ++i)
 	{
 		const char* sze = strchr(sz, ',');
 
 		pf[i] = (float) atof(sz);
+		nr++;
 
-		if (sze)
-		{
-			sz = sze+1;
-		}
+		if (sze) sz = sze+1;
+		else break;
 	}
+	return nr;
 }
 
-//////////////////////////////////////////////////////////////////////
-
-void XMLTag::value(int* pi, int n)
+//-----------------------------------------------------------------------------
+//! This function reads in a comma delimited list of ints. The function reads
+//! in a maximum of n values. The actual number of values that are read is returned.
+//!
+int XMLTag::value(int* pi, int n)
 {
 	const char* sz = m_szval.c_str();
-
+	int nr = 0;
 	for (int i=0; i<n; ++i)
 	{
 		const char* sze = strchr(sz, ',');
 
 		pi[i] = atoi(sz);
+		nr++;
 
-		if (sze)
-		{
-			sz = sze+1;
-		}
+		if (sze) sz = sze+1;
+		else break;
 	}
+	return nr;
 }
 
 //////////////////////////////////////////////////////////////////////

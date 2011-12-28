@@ -106,6 +106,7 @@ struct OPT_VARIABLE
 	double*	m_pd;			//!< pointer to variable data
 	double	m_val;			//!< value
 	double	m_min, m_max;	//!< variable bounds
+	double	m_sf;			//!< variable scale factor
 };
 
 //=============================================================================

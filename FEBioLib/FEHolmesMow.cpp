@@ -17,17 +17,17 @@ void FEHolmesMow::Init()
 	if (m_E <= 0) throw MaterialError("E must be positive");
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Valid range for v is -1 <= v < 0.5");
 	if (m_b < 0) throw MaterialError("beta must be positive");
-
-	// Lame coefficients
-	lam = m_v*m_E/((1+m_v)*(1-2*m_v));
-	mu  = 0.5*m_E/(1+m_v);
-	Ha = lam + 2*mu;	
 }
 
 //-----------------------------------------------------------------------------
 mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// Lame coefficients
+	lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+	mu  = 0.5*m_E/(1+m_v);
+	Ha = lam + 2*mu;	
 	
 	mat3d &F = pt.F;
 	double detF = pt.J;
@@ -56,6 +56,11 @@ mat3ds FEHolmesMow::Stress(FEMaterialPoint& mp)
 tens4ds FEHolmesMow::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+
+	// Lame coefficients
+	lam = m_v*m_E/((1+m_v)*(1-2*m_v));
+	mu  = 0.5*m_E/(1+m_v);
+	Ha = lam + 2*mu;	
 	
 	mat3d &F = pt.F;
 	double detF = pt.J;

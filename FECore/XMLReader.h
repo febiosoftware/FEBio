@@ -87,9 +87,9 @@ public:
 		void value(int& val) { val = atoi(m_szval.c_str()); }
 		void value(long& val) { val = (long) atoi(m_szval.c_str()); }
 		void value(short& val) { val = (short) atoi(m_szval.c_str()); }
-		void value(double* pf, int n);
-		void value(float* pf, int n);
-		void value(int* pi, int n);
+		int value(double* pf, int n);
+		int value(float* pf, int n);
+		int value(int* pi, int n);
 		void value(vec3d& v);
 
 		const char* szvalue() { return m_szval.c_str(); }
