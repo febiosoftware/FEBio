@@ -136,9 +136,6 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	FELoadCurve& lc = opt.ReactionLoad();
 	lc.Clear();
 
-	// reset the FEM data
-	fem.Reset();
-
 	clog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 
 	// set the material parameters
@@ -149,6 +146,9 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 		*(var.m_pd) = p[i];
 		clog.printf("  %-15s: %.16lg\n", var.m_szname, p[i]);
 	}
+
+	// reset the FEM data
+	fem.Reset();
 
 	// suppress output
 	clog.SetMode(Logfile::NEVER);

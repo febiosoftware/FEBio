@@ -182,11 +182,12 @@ bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 			var.m_pd = pd;
 
 			// set initial values and bounds
-			double d[3];
-			tag.value(d, 3);
+			double d[4] = {0, 0, 0, 1};
+			tag.value(d, 4);
 			var.m_val = d[0];
 			var.m_min = d[1];
 			var.m_max = d[2];
+			var.m_sf  = d[3];
 
 			// add the variable
 			opt.AddVariable(var);

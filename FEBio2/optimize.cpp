@@ -226,11 +226,11 @@ void objfun(Integer m,
 	// set the FEM callback function
 	fem.AddCallback(fecb, &opt);
 
-	// reset the FEM data
-	fem.Reset();
-
 	// set the material parameters
 	for (i=0; i<n; ++i) *(opt.pvar[i]) = x[i];
+
+	// reset the FEM data
+	fem.Reset();
 
 	// suppress output to the screen
 	clog.SetMode(Logfile::FILE_ONLY);

@@ -181,7 +181,10 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	int ma = a.size();
 	for (int i=0; i<ma; ++i)
 	{
-		a1[i] = a1[i] + m_fdiff*(1.0 + a[i]);
+		double b = opt.Variable(i).m_sf;
+
+		a1[i] = a1[i] + m_fdiff*(fabs(b) + fabs(a[i]));
+		assert(a1[i] != a[i]);
 
 		FESolve(x, a1, y1);
 		for (int j=0; j<ndata; ++j) dyda[j][i] = (y1[j] - y[j])/(a1[i] - a[i]);
