@@ -31,13 +31,7 @@ void FEFungOrthoCompressible::Init()
 	if (v31 > sqrt(E3/E1)) throw MaterialError("Invalid value for v31. Let v31 > sqrt(E3/E1)");
 	
 	if (m_c <= 0) throw MaterialError("c should be positive");
-}
 
-//-----------------------------------------------------------------------------
-//! Convert properties
-//! Called at every iteration for compatibility with optimization
-void FEFungOrthoCompressible::ConvertProperties()
-{	
 	// Evaluate Lame coefficients
 	mu[0] = G12 + G31 - G23;
 	mu[1] = G12 - G31 + G23;
@@ -59,8 +53,6 @@ void FEFungOrthoCompressible::ConvertProperties()
 //! Calculates the stress
 mat3ds FEFungOrthoCompressible::Stress(FEMaterialPoint& mp)
 {
-	ConvertProperties();
-
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	int i,j;
@@ -119,8 +111,6 @@ mat3ds FEFungOrthoCompressible::Stress(FEMaterialPoint& mp)
 //! Calculates the tangent
 tens4ds FEFungOrthoCompressible::Tangent(FEMaterialPoint& mp)
 {
-	ConvertProperties();
-
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	int i,j;

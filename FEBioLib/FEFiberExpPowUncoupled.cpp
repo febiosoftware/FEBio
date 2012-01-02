@@ -20,10 +20,7 @@ void FEFiberExpPowUncoupled::Init()
 	if (m_ksi < 0) throw MaterialError("ksi must be positive.");
 	if (m_beta < 2) throw MaterialError("beta must be >= 2.");
 	if (m_alpha < 0) throw MaterialError("alpha must be >= 0.");
-}
 
-void FEFiberExpPowUncoupled::ConvertProperties()
-{
 	// convert angles from degrees to radians
 	double pi = 4*atan(1.0);
 	double the = m_thd*pi/180.;

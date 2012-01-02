@@ -12,9 +12,6 @@ public:
 	//! Initialization
 	void Init();
 
-	//! convert material properties
-	void ConvertProperties();
-	
 	//! Cauchy stress
 	virtual mat3ds DevStress(FEMaterialPoint& mp);
 	

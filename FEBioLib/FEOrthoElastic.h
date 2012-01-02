@@ -25,9 +25,6 @@ public:
 	//! data initialization
 	void Init();
 
-	//! convert material properties
-	void ConvertProperties();
-
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };
