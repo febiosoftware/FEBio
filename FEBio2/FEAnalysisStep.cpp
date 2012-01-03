@@ -343,19 +343,19 @@ bool FEAnalysisStep::Init()
 	// see if we have to do linear constraint augmentations
 	if (m_fem.m_LCSet.size()) m_baugment = true;
 
+	// do one time initialization of solver data
+	if (m_psolver->Init() == false)
+	{
+		clog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
+		return false;
+	}
+
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 bool FEAnalysisStep::Solve()
 {
-	// do one time initialization of solver data
-	if (m_psolver->Init() == false)
-	{
-		clog.printbox("FATAL ERROR","Initialization has failed.\nAborting run.\n");
-		return false;
-	}
-
 	// obtain a pointer to the console object. We'll use this to
 	// set the title of the console window.
 	Console* pShell = Console::GetHandle();

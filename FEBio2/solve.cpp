@@ -80,7 +80,6 @@ bool FEM::Solve()
 
 	// get and print elapsed time
 	char sztime[64];
-
 	m_TotalTime.time_str(sztime);
 	clog.printf("\n Elapsed time : %s\n\n", sztime);
 
