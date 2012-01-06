@@ -168,6 +168,19 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	// get the optimization data
 	FEOptimizeData& opt = *m_pOpt;
 
+	// poor man's box constraints
+	double dir = 1;	// forward difference by default
+	for (int i=0; i<opt.Variables(); ++i)
+	{
+		OPT_VARIABLE& var = opt.Variable(i);
+		if (a[i] < var.m_min) {
+			a[i] = var.m_min;
+		} else if (a[i] >= var.m_max) {
+			a[i] = var.m_max;
+			dir = -1;	// use backward difference
+		}
+	}
+	
 	// evaluate at a
 	bool bret = FESolve(x, a, y);
 	if (bret == false) throw FEErrorTermination();
@@ -183,7 +196,7 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	{
 		double b = opt.Variable(i).m_sf;
 
-		a1[i] = a1[i] + m_fdiff*(fabs(b) + fabs(a[i]));
+		a1[i] = a1[i] + dir*m_fdiff*(fabs(b) + fabs(a[i]));
 		assert(a1[i] != a[i]);
 
 		FESolve(x, a1, y1);
