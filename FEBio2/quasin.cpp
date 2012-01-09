@@ -113,6 +113,7 @@ void FESolidSolver::PrepStep(double time)
 		m_fem.m_mesh.Node(i).m_rp = m_fem.m_mesh.Node(i).m_rt;
 		m_fem.m_mesh.Node(i).m_vp = m_fem.m_mesh.Node(i).m_vt;
 		m_fem.m_mesh.Node(i).m_ap = m_fem.m_mesh.Node(i).m_at;
+		// ---> TODO: move to the FEPoroSoluteSolver
 		for (int k=0; k<MAX_CDOFS; ++k)
 			m_fem.m_mesh.Node(i).m_cp[k] = m_fem.m_mesh.Node(i).m_ct[k];
 	}

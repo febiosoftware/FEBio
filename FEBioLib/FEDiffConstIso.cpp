@@ -31,6 +31,13 @@ double FEDiffConstIso::Free_Diffusivity(FEMaterialPoint& mp)
 }
 
 //-----------------------------------------------------------------------------
+//! Tangent of free diffusivity with respect to concentration
+double FEDiffConstIso::Tangent_Free_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol)
+{
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Diffusivity tensor
 mat3ds FEDiffConstIso::Diffusivity(FEMaterialPoint& mp)
 {
@@ -50,7 +57,7 @@ tens4ds FEDiffConstIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of diffusivity with respect to concentration
-mat3ds FEDiffConstIso::Tangent_Diffusivity_Concentration(FEMaterialPoint &mp)
+mat3ds FEDiffConstIso::Tangent_Diffusivity_Concentration(FEMaterialPoint &mp, const int isol)
 {
 	mat3ds d;
 	d.zero();

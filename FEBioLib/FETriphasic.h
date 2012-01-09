@@ -100,7 +100,7 @@ public:
 	double FixedChargeDensity(FEMaterialPoint& pt);
 	
 	//! electric potential
-	double ElectricPotential(FEMaterialPoint& pt);
+	double ElectricPotential(FEMaterialPoint& pt, const bool eform=false);
 	
 	//! current density
 	vec3d CurrentDensity(FEMaterialPoint& pt);

@@ -99,7 +99,7 @@ public:
 	virtual tens4ds Tangent(FEMaterialPoint& pt) = 0;
 
 	//! calculate derivative of stress w.r.t. solute concentration at material point
-	mat3ds Tangent_Concentration(FEMaterialPoint& pt);
+	mat3ds Tangent_Concentration(FEMaterialPoint& pt, const int isol);
 	
 	//! return the material density
 	virtual double Density() = 0;

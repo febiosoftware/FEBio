@@ -547,8 +547,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 		// evaluate the solubility and its derivatives w.r.t. J and c, and its gradient
 		double kappa = pm->m_pSolub->Solubility(mp);
 		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
-		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp);
-		vec3d gradk = gradJ*dkdJ;
+		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp, 0);
 		// evaluate the porosity, its derivative w.r.t. J, and its gradient
 		double phiw = pm->Porosity(mp);
 		double dpdJ = (1. - phiw)/J;
@@ -917,7 +916,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		// evaluate the permeability and its derivatives
 		mat3ds K = pm->m_pPerm->Permeability(mp);
 		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
-		mat3ds dKdc = pm->m_pPerm->Tangent_Permeability_Concentration(mp); 
+		mat3ds dKdc = pm->m_pPerm->Tangent_Permeability_Concentration(mp, 0); 
 		
 		// evaluate the porosity and its derivative
 		double phiw = pm->Porosity(mp);
@@ -929,25 +928,25 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		double kappa = pm->m_pSolub->Solubility(mp);
 		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
 		double dkdJJ = pm->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
-		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp);
-		double dkdcc = 0;	// TODO: temporary, until I implent it in FESoluteSolubility
-		double dkdJc = pm->m_pSolub->Tangent_Solubility_Strain_Concentration(mp);
+		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp,0);
+		double dkdcc = pm->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0);
+		double dkdJc = pm->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0);
 		
 		// evaluate the diffusivity tensor and its derivatives
 		mat3ds D = pm->m_pDiff->Diffusivity(mp);
-		mat3ds dDdc = pm->m_pDiff->Tangent_Diffusivity_Concentration(mp);
+		mat3ds dDdc = pm->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
 		tens4ds dDdE = pm->m_pDiff->Tangent_Diffusivity_Strain(mp);
 		
 		// evaluate the solute free diffusivity
 		double D0 = pm->m_pDiff->Free_Diffusivity(mp);
-		double dD0dc = 0;	// TODO: temporary, until I implement it in FESoluteDiffusivity
+		double dD0dc = pm->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0);
 		
 		// evaluate the osmotic coefficient and its derivatives
 		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
-		double dodc = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp);
+		double dodc = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp, 0);
 		
 		// evaluate the stress tangent with concentration
-		mat3ds dTdc = pm->m_pSolid->Tangent_Concentration(mp);
+		mat3ds dTdc = pm->m_pSolid->Tangent_Concentration(mp, 0);
 		
 		// Miscellaneous constants
 		mat3dd I(1);
@@ -1035,7 +1034,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 				
 				// calculate the kpc matrix
 				wc = (dKedc*gp)*(-H[j])
-				-Ke*((((D*(dkdc-kappa*dD0dc/D0)+dDdc*(kappa/D0))*gradc)*H[j]
+				-Ke*((((D*(dkdc-kappa*dD0dc/D0)+dDdc*kappa)*gradc)*H[j]
 					  +(D*gradN[j])*kappa)*(R*T/D0));
 				ke[5*i+3][5*j+4] += (gradN[i]*wc)*(tmp*dt);
 				
@@ -1163,7 +1162,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 		// evaluate the permeability and its derivatives
 		mat3ds K = pm->m_pPerm->Permeability(mp);
 		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
-		mat3ds dKdc = pm->m_pPerm->Tangent_Permeability_Concentration(mp); 
+		mat3ds dKdc = pm->m_pPerm->Tangent_Permeability_Concentration(mp, 0); 
 		
 		// evaluate the porosity and its derivative
 		double phiw = pm->Porosity(mp);
@@ -1173,23 +1172,23 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 		// evaluate the solubility and its derivatives
 		double kappa = pm->m_pSolub->Solubility(mp);
 		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
-		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp);
+		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp, 0);
 		
 		// evaluate the diffusivity tensor and its derivatives
 		mat3ds D = pm->m_pDiff->Diffusivity(mp);
-		mat3ds dDdc = pm->m_pDiff->Tangent_Diffusivity_Concentration(mp);
+		mat3ds dDdc = pm->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
 		tens4ds dDdE = pm->m_pDiff->Tangent_Diffusivity_Strain(mp);
 		
 		// evaluate the solute free diffusivity
 		double D0 = pm->m_pDiff->Free_Diffusivity(mp);
-		double dD0dc = 0;	// TODO: temporary, until I implement it in FESoluteDiffusivity
+		double dD0dc = pm->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0);
 		
 		// evaluate the osmotic coefficient and its derivatives
 		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
-		double dodc = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp);
+		double dodc = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp, 0);
 		
 		// evaluate the stress tangent with concentration
-		mat3ds dTdc = pm->m_pSolid->Tangent_Concentration(mp);
+		mat3ds dTdc = pm->m_pSolid->Tangent_Concentration(mp, 0);
 		
 		// Miscellaneous constants
 		mat3dd I(1);

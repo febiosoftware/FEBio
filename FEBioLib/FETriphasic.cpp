@@ -6,6 +6,10 @@
 #include "FETriphasic.h"
 #include "FECore/FEModel.h"
 
+#ifndef SQR
+#define SQR(x) ((x)*(x))
+#endif
+
 // Material parameters for the FETriphasic material
 BEGIN_PARAMETER_LIST(FETriphasic, FEMaterial)
 ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
@@ -91,7 +95,7 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! Electric potential
-double FETriphasic::ElectricPotential(FEMaterialPoint& pt)
+double FETriphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 {
 	FESaltMaterialPoint& set = *pt.ExtractData<FESaltMaterialPoint>();
 	
@@ -100,11 +104,26 @@ double FETriphasic::ElectricPotential(FEMaterialPoint& pt)
 	// effective concentration
 	double c[2] = {set.m_c[0], set.m_c[1]};
 	// solubility
-	double kappa[2] = {m_pSolute[0]->m_pSolub->Solubility(pt),
+	double khat[2] = {
+		m_pSolute[0]->m_pSolub->Solubility(pt),
 		m_pSolute[1]->m_pSolub->Solubility(pt)};
-	double z[2] = {m_pSolute[0]->ChargeNumber(),m_pSolute[1]->ChargeNumber()};
-	double psi = -m_Rgas*m_Tabs/m_Fc/z[0]
-	*log((-cF+sqrt(cF*cF+4*kappa[0]*c[0]*kappa[1]*c[1]))/(2*z[0]*kappa[0]*c[0]));
+	double z[2] = {
+		m_pSolute[0]->ChargeNumber(),
+		m_pSolute[1]->ChargeNumber()};
+	double psi = 1;
+	if (c[0] > 0) {
+		psi = pow((-cF+sqrt(cF*cF+4*khat[0]*c[0]*khat[1]*c[1]))
+				  /(2*z[0]*khat[0]*c[0]),1./z[0]);
+	} else if (c[1] > 0) {
+		psi = pow((-cF+sqrt(cF*cF+4*khat[0]*c[0]*khat[1]*c[1]))
+				  /(2*z[1]*khat[1]*c[1]),1./z[1]);
+	}
+	
+	// Return exponential (non-dimensional) form if desired
+	if (eform) return psi;
+	
+	// Otherwise return dimensional value of electric potential
+	psi = -m_Rgas*m_Tabs/m_Fc*log(psi);
 	
 	return psi;
 }
@@ -115,17 +134,17 @@ double FETriphasic::Concentration(FEMaterialPoint& pt, const int ion)
 {
 	FESaltMaterialPoint& spt = *pt.ExtractData<FESaltMaterialPoint>();
 	
-	// electric potential
-	double psi = ElectricPotential(pt);
 	// effective concentration
 	double c = spt.m_c[ion];
 	// solubility
-	double kappa = m_pSolute[ion]->m_pSolub->Solubility(pt);
-	// charge number
-	int z = (int) m_pSolute[ion]->ChargeNumber();
+	double khat = m_pSolute[ion]->m_pSolub->Solubility(pt);
+	double z = m_pSolute[ion]->ChargeNumber();
+	double zeta = ElectricPotential(pt, true);
+	double zz = pow(zeta, z);
+	double kappa = zz*khat;
 	
 	// actual concentration
-	double ca = kappa*c*exp(-z*m_Fc*psi/m_Rgas/m_Tabs);
+	double ca = kappa*c;
 	
 	return ca;
 }
@@ -168,31 +187,49 @@ tens4ds FETriphasic::Tangent(FEMaterialPoint& mp)
 	// call solid tangent routine
 	tens4ds C = m_pSolid->Tangent(mp);
 	
-	// relative volume
+	// relative volume and solid volume fraction
 	double J = ept.J;
+	double phi0 = ppt.m_phi0;
+	
+	// get the charge density and its derivatives
+	double cF = FixedChargeDensity(mp);
+	double dcFdJ = -cF/(J - phi0);
 	
 	// fluid pressure and solute concentration
 	double p = Pressure(mp);
-	double ca[2] = {Concentration(mp, 0), Concentration(mp, 1)};
-	double z[2] = {m_pSolute[0]->m_z, m_pSolute[1]->m_z};
-	double cF = FixedChargeDensity(mp);
-	double dcFdJ = -cF/(ept.J - ppt.m_phi0);
 	
-	// solubility and its derivative w.r.t. strain
-	double kappa[2] = {m_pSolute[0]->m_pSolub->Solubility(mp),
+	// get the effective concentration
+	double c[2] = {spt.m_c[0],spt.m_c[1]};
+	
+	// get the charge number
+	double z[2] = {m_pSolute[0]->ChargeNumber(),m_pSolute[1]->ChargeNumber()};
+	
+	// evaluate the solubility and its derivatives w.r.t. J and c
+	double khat[2] = {
+		m_pSolute[0]->m_pSolub->Solubility(mp),
 		m_pSolute[1]->m_pSolub->Solubility(mp)};
-	double dkdJ[2] = {m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain(mp),
+	double dkhdJ[2] = {
+		m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain(mp),
 		m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain(mp)};
+	
+	// evaluate electric potential (nondimensional exponential form) and its derivatives
+	// also evaluate partition coefficients and their derivatives
+	double zeta = ElectricPotential(mp, true);
+	double zz[2] = {pow(zeta, z[0]), pow(zeta, z[1])};
+	double kappa[2] = {zz[0]*khat[0], zz[1]*khat[1]};
+	double den = SQR(z[0])*kappa[0]*c[0]+SQR(z[1])*kappa[1]*c[1];
+	double zidzdJ = 0;
+	if (den > 0) zidzdJ = -(dcFdJ+z[0]*zz[0]*dkhdJ[0]*c[0]
+							+z[1]*zz[1]*dkhdJ[1]*c[1])/den;
+	double dkdJ[2] = {
+		zz[0]*dkhdJ[0]+z[0]*kappa[0]*zidzdJ,
+		zz[1]*dkhdJ[1]+z[1]*kappa[1]*zidzdJ};
 	
 	// osmotic coefficient and its derivative w.r.t. strain
 	double osmc = m_pOsmC->OsmoticCoefficient(mp);
 	double dodJ = m_pOsmC->Tangent_OsmoticCoefficient_Strain(mp);
 	
-	double dp = m_Rgas*m_Tabs*J*(cF*osmc/(ca[0]+ca[1])*
-								 (dcFdJ+z[0]*ca[0]*dkdJ[0]/kappa[0]
-								  +z[1]*ca[1]*dkdJ[1]/kappa[1])
-								 +ca[0]*(dodJ+osmc*dkdJ[0]/kappa[0])
-								 +ca[1]*(dodJ+osmc*dkdJ[1]/kappa[1]));
+	double dp = m_Rgas*m_Tabs*J*(c[0]*(osmc*dkdJ[0]+dodJ*kappa[0]) +c[1]*(osmc*dkdJ[1]+dodJ*kappa[1]));
 	
 	// adjust tangent for pressures
 	double D[6][6] = {0};
@@ -233,27 +270,38 @@ vec3d FETriphasic::FluidFlux(FEMaterialPoint& pt)
 	// concentration gradient
 	vec3d gradc[2] = {spt.m_gradc[0], spt.m_gradc[1]};
 	
-	// hydraulic permeability
-	mat3ds kt = m_pPerm->Permeability(pt);
-	
 	// solute diffusivity in mixture
-	mat3ds D[2] = {m_pSolute[0]->m_pDiff->Diffusivity(pt),
+	mat3ds D[2] = {
+		m_pSolute[0]->m_pDiff->Diffusivity(pt),
 		m_pSolute[1]->m_pDiff->Diffusivity(pt)};
 	
 	// solute free diffusivity
-	double D0[2] = {m_pSolute[0]->m_pDiff->Free_Diffusivity(pt),
+	double D0[2] = {
+		m_pSolute[0]->m_pDiff->Free_Diffusivity(pt),
 		m_pSolute[1]->m_pDiff->Free_Diffusivity(pt)};
 	
 	// solubility
-	double kappa[2] = {m_pSolute[0]->m_pSolub->Solubility(pt),
+	double khat[2] = {
+		m_pSolute[0]->m_pSolub->Solubility(pt),
 		m_pSolute[1]->m_pSolub->Solubility(pt)};
+	double z[2] = {
+		m_pSolute[0]->ChargeNumber(),
+		m_pSolute[1]->ChargeNumber()};
+	double zeta = ElectricPotential(pt, true);
+	double zz[2] = {pow(zeta, z[0]),pow(zeta, z[1])};
+	double kappa[2] = {zz[0]*khat[0],zz[1]*khat[1]};
 	
 	// identity matrix
 	mat3dd I(1);
 	
+	// hydraulic permeability
+	mat3ds kt = m_pPerm->Permeability(pt);
+	
 	// effective hydraulic permeability
-	mat3ds ke = kt.inverse() + ((I-D[0]/D0[0])*(kappa[0]*c[0]/D0[0])
-								+ (I-D[1]/D0[1])*(kappa[1]*c[1]/D0[1]))*(m_Rgas*m_Tabs/phiw);
+	mat3ds ke = kt.inverse() +
+	( (I-D[0]/D0[0])*(kappa[0]*c[0]/D0[0])
+	 +(I-D[1]/D0[1])*(kappa[1]*c[1]/D0[1])
+	 )*(m_Rgas*m_Tabs/phiw);
 	ke = ke.inverse();
 	
 	// fluid flux w
@@ -290,8 +338,12 @@ vec3d FETriphasic::SoluteFlux(FEMaterialPoint& pt, const int ion)
 	double D0 = m_pSolute[ion]->m_pDiff->Free_Diffusivity(pt);
 	
 	// solubility
-	double kappa = m_pSolute[ion]->m_pSolub->Solubility(pt);
-	
+	double khat = m_pSolute[ion]->m_pSolub->Solubility(pt);
+	double z = m_pSolute[ion]->ChargeNumber();
+	double zeta = ElectricPotential(pt, true);
+	double zz = pow(zeta, z);
+	double kappa = zz*khat;
+
 	// fluid flux w
 	vec3d w = FluidFlux(pt);
 	

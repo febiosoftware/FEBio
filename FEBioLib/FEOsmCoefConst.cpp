@@ -38,7 +38,7 @@ double FEOsmCoefConst::Tangent_OsmoticCoefficient_Strain(FEMaterialPoint &mp)
 
 //-----------------------------------------------------------------------------
 //! Tangent of osmotic coefficient with respect to concentration
-double FEOsmCoefConst::Tangent_OsmoticCoefficient_Concentration(FEMaterialPoint &mp)
+double FEOsmCoefConst::Tangent_OsmoticCoefficient_Concentration(FEMaterialPoint &mp, const int isol)
 {
 	return 0;
 }

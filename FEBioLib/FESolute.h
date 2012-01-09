@@ -23,6 +23,15 @@ public:
 	
 	//! Serialization
 	void Serialize(DumpFile& ar);
+
+	//! set solute ID
+	void SetSoluteID(const int ID) {m_ID = ID;}
+	
+	//! get solute ID
+	int GetSoluteID() {return m_ID;}
+	
+private:
+	int						m_ID;		//!< solute ID
 	
 public:
 	double					m_rhoT;		//!< true solute density

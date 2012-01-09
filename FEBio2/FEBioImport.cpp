@@ -909,6 +909,12 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// biphasic-solute material parameters
 			if (!bfound && dynamic_cast<FEBiphasicSolute*>(pmat)) bfound = ParseBiphasicSoluteMaterial(tag, dynamic_cast<FEBiphasicSolute*>(pmat));
 
+			// solute material parameters
+			if (!bfound && dynamic_cast<FESolute*>(pmat)) bfound = ParseSoluteMaterial(tag, dynamic_cast<FESolute*>(pmat));
+			
+			// triphasic material parameters
+			if (!bfound && dynamic_cast<FETriphasic*>(pmat)) bfound = ParseTriphasicMaterial(tag, dynamic_cast<FETriphasic*>(pmat));
+
 			// nested materials
 			if (!bfound && dynamic_cast<FENestedMaterial*>(pmat)) bfound = ParseNestedMaterial(tag, dynamic_cast<FENestedMaterial*>(pmat));
 			
@@ -1476,6 +1482,9 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		// set the material's name
 		if (szname) pme->SetName(szname);
 		
+		// set solute ID
+		pme->SetSoluteID(0);
+
 		// parse the material
 		ParseMaterial(tag, pme);
 		
@@ -1507,6 +1516,9 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		
 		// set the material's name
 		if (szname) pme->SetName(szname);
+
+		// set solute ID
+		pme->SetSoluteID(0);
 		
 		// parse the material
 		ParseMaterial(tag, pme);
@@ -1582,6 +1594,253 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Parse FESolute material 
+//
+bool FEBioMaterialSection::ParseSoluteMaterial(XMLTag &tag, FESolute *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	// read the diffusivity material
+	if (tag == "diffusivity")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a diffusivity material)
+		FESoluteDiffusivity* pme = dynamic_cast<FESoluteDiffusivity*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid diffusivity %s in solute material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the diffusivity pointer
+		pm->m_pDiff = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// set solute ID in diffusivity
+		pme->SetSoluteID(pm->GetSoluteID());
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "solubility")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a solubility material)
+		FESoluteSolubility* pme = dynamic_cast<FESoluteSolubility*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid solubility %s in solute material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solubility pointer
+		pm->m_pSolub = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// set solute ID in solubility
+		pme->SetSoluteID(pm->GetSoluteID());
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Parse FETriphasic material 
+//
+bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	const char* szid = 0;
+	
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	// read the solid material
+	if (tag == "solid")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an elastic material)
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in triphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solid material pointer
+		pm->m_pSolid = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "permeability")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a permeability material)
+		FEHydraulicPermeability* pme = dynamic_cast<FEHydraulicPermeability*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid permeability %s in triphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the permeability pointer
+		pm->m_pPerm = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "solute")
+	{
+		// get the material type
+//		sztype = tag.AttributeValue("type");
+		sztype = "solute";
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// get the solute id
+		int id;
+		szid = tag.AttributeValue("id");
+		if (szid) {
+			id = atoi(szid) - 1;
+			if ((id < 0) || (id > 1))
+				throw XMLReader::InvalidAttributeValue(tag, "id", szid);
+		} else {
+			throw XMLReader::MissingAttribute(tag, "id");
+		}
+
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a solute material)
+		FESolute* pme = dynamic_cast<FESolute*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid solute %s in triphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solute pointer
+		pm->m_pSolute[id] = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// set the solute ID
+		pme->SetID(id);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "osmotic_coefficient")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
+		FEOsmoticCoefficient* pme = dynamic_cast<FEOsmoticCoefficient*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid osmotic coefficient %s in triphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the osmotic coefficient pointer
+		pm->m_pOsmC = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 // Parse a nested material

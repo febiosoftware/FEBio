@@ -15,11 +15,19 @@ public:
 	virtual tens4ds Tangent_Diffusivity_Strain(FEMaterialPoint& mp) = 0;
 	
 	//! tangent of diffusivity with respect to solute concentration
-	virtual mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp) = 0;
+	virtual mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol) = 0;
 	
 	//! solute diffusivity in free solution
 	virtual double Free_Diffusivity(FEMaterialPoint& pt) = 0;
 	
+	//! tangent of free diffusivity with respect to solute concentration
+	virtual double Tangent_Free_Diffusivity_Concentration(FEMaterialPoint& pt, const int isol) = 0;
+	
+	//! set solute ID
+	void SetSoluteID(const int ID) {m_ID = ID;}
+	
+private:
+	int	m_ID;		//!< solute ID
 };
 
 //-----------------------------------------------------------------------------
@@ -36,14 +44,22 @@ public:
 	virtual double Tangent_Solubility_Strain(FEMaterialPoint& mp) = 0;
 	
 	//! tangent of solubility with respect to concentration
-	virtual double Tangent_Solubility_Concentration(FEMaterialPoint& mp) = 0;
+	virtual double Tangent_Solubility_Concentration(FEMaterialPoint& mp, const int isol) = 0;
 	
 	//! cross derivative of solubility with respect to strain and concentration
-	virtual double Tangent_Solubility_Strain_Concentration(FEMaterialPoint& mp) = 0;
+	virtual double Tangent_Solubility_Strain_Concentration(FEMaterialPoint& mp, const int isol) = 0;
 	
 	//! second derivative of solubility with respect to strain
 	virtual double Tangent_Solubility_Strain_Strain(FEMaterialPoint& mp) = 0;
+
+	//! second derivative of solubility with respect to concentration
+	virtual double Tangent_Solubility_Concentration_Concentration(FEMaterialPoint& mp, const int isol, const int jsol) = 0;
 	
+	//! set solute ID
+	void SetSoluteID(const int ID) {m_ID = ID;}
+	
+private:
+	int	m_ID;		//!< solute ID
 };
 
 //-----------------------------------------------------------------------------
@@ -60,8 +76,7 @@ public:
 	virtual double Tangent_OsmoticCoefficient_Strain(FEMaterialPoint& mp) = 0;
 	
 	//! tangent of osmotic coefficient with respect to concentration
-	virtual double Tangent_OsmoticCoefficient_Concentration(FEMaterialPoint& mp) = 0;
-	
+	virtual double Tangent_OsmoticCoefficient_Concentration(FEMaterialPoint& mp, const int isol) = 0;
 };
 
 //-----------------------------------------------------------------------------
