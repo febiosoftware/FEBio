@@ -931,6 +931,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp,0);
 		double dkdcc = pm->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0);
 		double dkdJc = pm->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0);
+		double dkdt = dkdJ*dJdt + dkdc*dcdt;
 		
 		// evaluate the diffusivity tensor and its derivatives
 		mat3ds D = pm->m_pDiff->Diffusivity(mp);
@@ -1039,10 +1040,17 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 				ke[5*i+3][5*j+4] += (gradN[i]*wc)*(tmp*dt);
 				
 				// calculate the kcc matrix
-				jc = ((D*dkdc+dDdc*kappa)*gc)*H[j]
-				+D*((-gradN[j]*phiw+wc*(c/D0))*kappa);
-				qcc = -H[j]*((phiw+J*dpdJ)*divv*(kappa+c*dkdc)-dcrhatdc/J
-				+phiw*((2*dkdc+c*dkdcc)*dcdt+(kappa+c*dkdc)/dt+dJdt*(dkdJ+c*dkdJc)));
+//				jc = ((D*dkdc+dDdc*kappa)*gc)*H[j]
+//				+D*((-gradN[j]*phiw+wc*(c/D0))*kappa);
+				jc = (D*(-gradN[j]*phiw+w*(H[j]/D0)))*kappa
+				+((D*dkdc+dDdc*kappa)*(gradc*(-phiw)+w*(c/D0)))*H[j]
+				+((D*w)*(-H[j]*dD0dc/D0)+D*wc)*(kappa*c/D0);
+//				qcc = -H[j]*((phiw+J*dpdJ)*divv*(kappa+c*dkdc)-dcrhatdc/J
+//							 +phiw*((2*dkdc+c*dkdcc)*dcdt+(kappa+c*dkdc)/dt+dJdt*(dkdJ+c*dkdJc)));
+				qcc = -H[j]*(((phiw+J*dpdJ)*divv+phiw/dt)*(kappa+c*dkdc)
+							 +phiw*(dkdt+dkdc*dcdt)
+							 +phiw*c*(dkdJc*dJdt+dkdcc*dcdt)
+							 -dcrhatdc/J);
 				ke[5*i+4][5*j+4] += (gradN[i]*jc + H[i]*qcc)*(tmp*dt);
 				
 			}
