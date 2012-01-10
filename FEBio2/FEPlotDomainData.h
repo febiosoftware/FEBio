@@ -51,6 +51,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Nodal Fluid flux
+class FEPlotNodalFluidFlux : public FEDomainData
+{
+public:
+	FEPlotNodalFluidFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Actual solute concentration
 class FEPlotActualSoluteConcentration : public FEDomainData
 	{

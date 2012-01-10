@@ -38,6 +38,8 @@ void FEHexElementTraits::init()
 		H[n][6] = 0.125*(1 + gr[n])*(1 + gs[n])*(1 + gt[n]);
 		H[n][7] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 + gt[n]);
 	}
+
+	Hi = H.inverse();
 	
 	// calculate local derivatives of shape functions at gauss points
 	for (n=0; n<NINT; ++n)
@@ -188,6 +190,8 @@ void FERIHexElementTraits::init()
 		H[n][7] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 + gt[n]);
 	}
 	
+//	Hi = H.inverse();
+
 	// calculate local derivatives of shape functions at gauss points
 	for (n=0; n<NINT; ++n)
 	{
@@ -324,6 +328,8 @@ void FEUDFHexElementTraits::init()
 	H[0][5] = 0.125*(1 + gr[0])*(1 - gs[0])*(1 + gt[0]);
 	H[0][6] = 0.125*(1 + gr[0])*(1 + gs[0])*(1 + gt[0]);
 	H[0][7] = 0.125*(1 - gr[0])*(1 + gs[0])*(1 + gt[0]);
+
+//	Hi = H.inverse();
 	
 	// calculate local derivatives of shape functions at gauss points
 	Gr[0][0] = -0.125*(1 - gs[0])*(1 - gt[0]);
@@ -462,6 +468,8 @@ void FETetElementTraits::init()
 		H[n][2] = gs[n];
 		H[n][3] = gt[n];
 	}
+
+	Hi = H.inverse();
 	
 	// calculate local derivatives of shape functions at gauss points
 	for (n=0; n<NINT; ++n)
@@ -551,6 +559,8 @@ void FEG1TetElementTraits::init()
 	H[0][1] = gr[0];
 	H[0][2] = gs[0];
 	H[0][3] = gt[0];
+
+//	Hi = H.inverse();
 	
 	// calculate local derivatives of shape functions at gauss points
 	Gr[0][0] = -1;
@@ -647,6 +657,8 @@ void FEPentaElementTraits::init()
 		H[n][4] = 0.5*(1 + gt[n])*gr[n];
 		H[n][5] = 0.5*(1 + gt[n])*gs[n];
 	}
+
+	Hi = H.inverse();
 	
 	// calculate local derivatives of shape functions at gauss points
 	for (n=0; n<NINT; ++n)
@@ -924,7 +936,9 @@ void FEShellQuadElementTraits::init()
 		H[n][2] = 0.25*(1+gr[n])*(1+gs[n]);
 		H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
 	}
-	
+
+//	Hi = H.inverse();
+
 	for (n=0; n<NINT; ++n)
 	{
 		Hr[n][0] = -0.25*(1-gs[n]);
@@ -970,6 +984,8 @@ void FEShellTriElementTraits::init()
 		H[n][1] = gr[n];
 		H[n][2] = gs[n];
 	}
+
+//	Hi = H.inverse();
 
 	for (n=0; n<NINT; ++n)
 	{
