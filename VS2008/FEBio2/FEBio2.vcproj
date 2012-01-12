@@ -537,10 +537,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\Logfile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\LSDYNAPlotFile.cpp"
 				>
 			</File>
@@ -860,14 +856,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\Interrupt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\log.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\Logfile.h"
 				>
 			</File>
 			<File

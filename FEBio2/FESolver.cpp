@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "FESolver.h"
 #include "fem.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "NumCore/SkylineSolver.h"
 #include "NumCore/LUSolver.h"
 #include "NumCore/ConjGradIterSolver.h"

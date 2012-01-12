@@ -8,7 +8,7 @@
 #include "FESolidSolver.h"
 #include "FESlidingInterface.h"
 #include "FEElasticSolidDomain.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 void print_matrix(Logfile& log, DenseMatrix& m)
 {

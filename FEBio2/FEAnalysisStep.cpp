@@ -4,7 +4,7 @@
 #include "console.h"
 #include "FEBioLib/FERigid.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
 #include "FEBiphasicSolver.h"

@@ -9,7 +9,7 @@
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEMemoryDiagnostic.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

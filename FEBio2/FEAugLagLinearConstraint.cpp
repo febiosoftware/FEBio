@@ -3,7 +3,7 @@
 #include "fem.h"
 #include "FESolidSolver.h"
 #include "FEAnalysisStep.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 void FEAugLagLinearConstraint::Serialize(DumpFile& ar)

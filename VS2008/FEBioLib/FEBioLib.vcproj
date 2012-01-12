@@ -510,6 +510,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\Logfile.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\PardisoSolver.cpp"
 				>
 			</File>
@@ -865,6 +869,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\geodesic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\log.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\Logfile.h"
 				>
 			</File>
 			<File

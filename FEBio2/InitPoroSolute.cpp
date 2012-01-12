@@ -6,7 +6,7 @@
 #include "FEElasticShellDomain.h"
 #include "FEElasticSolidDomain.h"
 #include "FEBioLib/FETriphasic.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 //! Initialize solute-poroelastic data.

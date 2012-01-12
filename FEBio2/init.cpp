@@ -5,7 +5,7 @@
 #include <time.h>
 #include "fem.h"
 #include "FECore/FEException.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "FESolidSolver.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioLib/FETransverselyIsotropic.h"

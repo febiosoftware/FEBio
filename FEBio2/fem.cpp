@@ -11,7 +11,7 @@
 #include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "plugin.h"
 #include "LSDYNAPlotFile.h"
 #include "FECore/MathParser.h"

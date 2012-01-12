@@ -4,7 +4,7 @@
 #include "FECore/FEMaterial.h"
 #include "FEMicroMaterial.h"
 #include "FEBioLib/FETriphasic.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))

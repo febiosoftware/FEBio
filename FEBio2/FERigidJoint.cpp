@@ -6,7 +6,7 @@
 #include "FERigidJoint.h"
 #include "fem.h"
 #include "FESolver.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------

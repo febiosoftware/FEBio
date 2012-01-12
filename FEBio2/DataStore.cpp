@@ -5,12 +5,12 @@
 #include "stdafx.h"
 #include "DataStore.h"
 #include "fem.h"
+#include "FEAnalysisStep.h"
 #include "FEBioLib/FERigid.h"
 #include "FESolidSolver.h"
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/FETriphasic.h"
-#include "FEAnalysisStep.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 UnknownDataField::UnknownDataField(const char* sz)

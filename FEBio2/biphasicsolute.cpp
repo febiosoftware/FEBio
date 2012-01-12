@@ -4,7 +4,7 @@
 #include "FESolidSolver.h"
 #include "FEMicroMaterial.h"
 #include "FEBioLib/FEBiphasicSolute.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)

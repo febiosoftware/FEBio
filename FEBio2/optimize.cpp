@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FEOptimizer.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 #ifdef NAGLIB
 

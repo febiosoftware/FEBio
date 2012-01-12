@@ -4,7 +4,7 @@
 #include "FEBioLib/FERigid.h"
 #include "FESolidSolver.h"
 #include "FEAnalysisStep.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "Interrupt.h"
 
 #ifdef WIN32

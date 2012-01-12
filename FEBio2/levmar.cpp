@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEOptimizer.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "console.h"
 
 FELMOptimizeMethod* FELMOptimizeMethod::m_pThis = 0;

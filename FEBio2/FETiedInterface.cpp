@@ -6,7 +6,7 @@
 #include "FETiedInterface.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENNQuery.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

@@ -3,7 +3,7 @@
 #include "FEBioLib/Timer.h"
 #include "fem.h"
 #include "console.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 // echo the input data to the log file

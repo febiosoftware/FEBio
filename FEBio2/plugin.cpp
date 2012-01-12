@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "plugin.h"
 #include "FECore/febio.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 #ifdef WIN32

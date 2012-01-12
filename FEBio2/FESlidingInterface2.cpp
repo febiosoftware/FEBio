@@ -4,7 +4,7 @@
 #include "FESolver.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEAnalysisStep.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

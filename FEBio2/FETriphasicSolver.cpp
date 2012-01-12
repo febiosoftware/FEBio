@@ -3,7 +3,7 @@
 #include "FETriphasicDomain.h"
 #include "Interrupt.h"
 #include "FEAnalysisStep.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 #ifdef WIN32
 #include <float.h>

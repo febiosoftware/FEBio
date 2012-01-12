@@ -3,7 +3,7 @@
 #include "FEBiphasicSoluteDomain.h"
 #include "FEAnalysisStep.h"
 #include "Interrupt.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 #ifdef WIN32
 	#include <float.h>

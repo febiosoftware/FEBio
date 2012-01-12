@@ -12,7 +12,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
 #include "version.h"

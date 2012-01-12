@@ -2,7 +2,7 @@
 #include "FESurfaceConstraint.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

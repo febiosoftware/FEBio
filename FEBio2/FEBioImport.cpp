@@ -11,7 +11,7 @@
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
 #include "FELinearSolidSolver.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
 #include "ut4.h"

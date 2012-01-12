@@ -4,7 +4,7 @@
 #include "FECore/FENodeReorder.h"
 #include "FEPressureLoad.h"
 #include "FEBioLib/FERigid.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 //! Class constructor

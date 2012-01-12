@@ -6,7 +6,7 @@
 #include "FERigidWallInterface.h"
 #include "fem.h"
 #include "FECore/FENNQuery.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 #include "FEElasticShellDomain.h"
 
 //-----------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 #include "FEBioLib/FERigid.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticSolidDomain.h"
-#include "log.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 //! This function creates the rigid bodies by analyzing the rigid materials
