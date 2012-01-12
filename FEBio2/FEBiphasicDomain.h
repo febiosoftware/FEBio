@@ -30,6 +30,15 @@ public:
 	
 	// update stresses
 	void UpdateStresses(FEModel& fem);
+
+	//! return element stiffness matrix
+	void ElementStiffness(FEM& fem, int iel, matrix& ke) {
+		FESolidElement& el = Element(iel);
+		ElementBiphasicStiffness(fem, el, ke);
+	}
+	
+	//! calculate internal equivalent nodal forces
+	void InternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
 	
 protected:
 	//! Calculates the internal fluid forces

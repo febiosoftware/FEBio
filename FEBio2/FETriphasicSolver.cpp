@@ -262,8 +262,6 @@ bool FETriphasicSolver::Quasin(double time)
 			if ((m_Ctol > 0) && 
 				((normc[0] > (m_Ctol*m_Ctol)*normC[0]) || 
 				 (normc[1] > (m_Ctol*m_Ctol)*normC[1]))) bconv = false;
-//				((normc[0] > (m_Ctol*m_Ctol)*normCi[0]) || 
-//				 (normc[1] > (m_Ctol*m_Ctol)*normCi[1]))) bconv = false;
 		}
 		
 		// print convergence summary
@@ -283,8 +281,6 @@ bool FETriphasicSolver::Quasin(double time)
 		clog.printf("\t fluid pressure       %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
 		clog.printf("\t cation concentration %15le %15le %15le \n", normCi[0], normc[0] ,(m_Ctol*m_Ctol)*normC[0] );
 		clog.printf("\t anion concentration  %15le %15le %15le \n", normCi[1], normc[1] ,(m_Ctol*m_Ctol)*normC[1] );
-//		clog.printf("\t cation concentration %15le %15le %15le \n", normCi[0], normc[0] ,(m_Ctol*m_Ctol)*normCi[0] );
-//		clog.printf("\t anion concentration  %15le %15le %15le \n", normCi[1], normc[1] ,(m_Ctol*m_Ctol)*normCi[1] );
 		
 		clog.SetMode(oldmode);
 		

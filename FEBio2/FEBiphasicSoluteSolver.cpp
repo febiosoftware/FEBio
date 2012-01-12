@@ -251,7 +251,6 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 			
 			// check convergence
 			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normC)) bconv = false;
-			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normCi)) bconv = false;
 		}
 
 		// print convergence summary
@@ -270,7 +269,6 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		clog.printf("\t displacement         %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
 		clog.printf("\t fluid pressure       %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
 		clog.printf("\t solute concentration %15le %15le %15le \n", normCi, normc ,(m_Ctol*m_Ctol)*normC );
-//		clog.printf("\t solute concentration %15le %15le %15le \n", normCi, normc ,(m_Ctol*m_Ctol)*normCi );
 
 		clog.SetMode(oldmode);
 

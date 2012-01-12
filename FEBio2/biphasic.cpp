@@ -46,6 +46,53 @@ bool FEBiphasicDomain::Initialize(FEModel &mdl)
 }
 
 //-----------------------------------------------------------------------------
+//! calculate internal equivalent nodal forces
+
+void FEBiphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
+{
+	// local element force vector
+	vector<double> fl;
+	
+	vector<int> elm;
+	
+	// this element should not be rigid
+	assert(!el.IsRigid());
+	
+	//! this element should not be UDG
+	assert(el.Type() != FE_UDGHEX);
+	
+	// unpack the element
+	UnpackLM(el, elm);
+	
+	// get the element force vector and initialize it to zero
+	int neln = el.Nodes();
+	int ndpn = 4;
+	int ndof = ndpn*neln;
+	fe.assign(ndof, 0);
+	fl.assign(3*neln, 0);
+	
+	// calculate internal force vector
+	// (This function is inherited from FEElasticSolidDomain)
+	FEElasticSolidDomain::InternalForces(el, fl);
+	
+	// copy fl into fe
+	int i;
+	for (i=0; i<neln; ++i) {
+		fe[ndpn*i  ] = fl[3*i  ];
+		fe[ndpn*i+1] = fl[3*i+1];
+		fe[ndpn*i+2] = fl[3*i+2];
+	}
+	
+	// calculate fluid internal work
+	InternalFluidWork(fem, el, fl);
+	
+	// copy fl into fe
+	for (i=0; i<neln; ++i) {
+		fe[ndpn*i+3] = fl[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	int i, j;
@@ -77,7 +124,7 @@ void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 			
 			// calculate internal force vector
 			// (This function is inherited from FEElasticSolidDomain)
-			InternalForces(el, fe);
+			FEElasticSolidDomain::InternalForces(el, fe);
 			
 			// apply body forces
 			// TODO: can we calculate body-forces with our formulation
@@ -130,7 +177,7 @@ void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 			
 			// calculate internal force vector
 			// (This function is inherited from FEElasticSolidDomain)
-			InternalForces(el, fe);
+			FEElasticSolidDomain::InternalForces(el, fe);
 			
 			// apply body forces
 			// TODO: can we calculate body-forces with our formulation

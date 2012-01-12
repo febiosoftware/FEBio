@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to solute flux
 //!
-void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn)
+void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt)
 {
 	int i, j, n;
 	
@@ -56,7 +56,7 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 			{
 				t1 = dxt/dxt.norm()*wr;
 				t2 = dxs*Gr[j] - dxr*Gs[j];
-				kab = (t1 ^ t2)*(N[i]*w[n]);
+				kab = (t1 ^ t2)*(N[i]*w[n])*dt;
 				
 				ke[4*i+3][4*j  ] += kab.x;
 				ke[4*i+3][4*j+1] += kab.y;
@@ -68,7 +68,7 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
 //!
-bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
+bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn, double dt)
 {
 	int i, n;
 	
@@ -112,7 +112,7 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 		}
 		dxt = dxr ^ dxs;
 		
-		f = dxt.norm()*wr*w[n];
+		f = dxt.norm()*wr*w[n]*dt;
 		
 		for (i=0; i<neln; ++i)
 		{
@@ -126,7 +126,7 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 //-----------------------------------------------------------------------------
 //! calculates the equivalent nodal volumetric flow rates due to solute flux
 //!
-bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn)
+bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vector<double>& wn, double dt)
 {
 	int i, n;
 	
@@ -170,7 +170,7 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 		}
 		dxt = dxr ^ dxs;
 		
-		f = dxt.norm()*wr*w[n];
+		f = dxt.norm()*wr*w[n]*dt;
 		
 		for (i=0; i<neln; ++i)
 		{
@@ -220,6 +220,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
 	FEM& fem = solver.m_fem;
+	double dt = fem.m_pStep->m_dt;
 	
 	matrix ke;
 	vector<int> elm;
@@ -252,7 +253,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 					ke.resize(ndof, ndof);
 					
 					// calculate pressure stiffness
-					FluxStiffness(el, ke, wn);
+					FluxStiffness(el, ke, wn, dt);
 
 					// get the element's LM vector
 					m_psurf->UnpackLM(el, elm);
@@ -284,6 +285,7 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
 	FEM& fem = solver.m_fem;
+	double dt = fem.m_pStep->m_dt;
 	
 	vector<double> fe;
 	vector<int> elm;
@@ -307,7 +309,7 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 			int ndof = neln;
 			fe.resize(ndof);
 			
-			if (m_blinear) LinearFlowRate(el, fe, wn); else FlowRate(el, fe, wn);
+			if (m_blinear) LinearFlowRate(el, fe, wn, dt); else FlowRate(el, fe, wn, dt);
 
 			// get the element's LM vector
 			m_psurf->UnpackLM(el, elm);
