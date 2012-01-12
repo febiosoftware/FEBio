@@ -109,7 +109,7 @@ void FESolidSolver::LinearConstraintStiffness()
 
 void FESolidSolver::ContactStiffness()
 {
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactStiffness();
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactStiffness(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -515,7 +515,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 //! Calculates the contact forces
 void FESolidSolver::ContactForces(vector<double>& R)
 {
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactForces(R);
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactForces(R, this);
 }
 
 //-----------------------------------------------------------------------------

@@ -4,10 +4,8 @@
 
 #include "stdafx.h"
 #include "FETiedInterface.h"
-#include "fem.h"
-#include "FESolidSolver.h"
+#include "FECore/FEModel.h"
 #include "FECore/FENNQuery.h"
-#include "FEAnalysisStep.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -339,7 +337,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
 
-void FETiedInterface::ContactForces(vector<double>& F)
+void FETiedInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -374,12 +372,6 @@ void FETiedInterface::ContactForces(vector<double>& F)
 	vector<int> sLM;
 	vector<int> mLM;
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
-	
 	// loop over all slave facets
 	int ne = ss.Elements();
 	for (j=0; j<ne; ++j)
@@ -499,7 +491,7 @@ void FETiedInterface::ContactForces(vector<double>& F)
 
 //-----------------------------------------------------------------------------
 
-void FETiedInterface::ContactStiffness()
+void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
@@ -527,12 +519,6 @@ void FETiedInterface::ContactStiffness()
 
 	vector<int> sLM;
 	vector<int> mLM;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// loop over all slave elements
 	int ne = ss.Elements();

@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
 #include "FECore/DumpFile.h"
-#include "fem.h"
-#include "FESolidSolver.h"
-#include "FEAnalysisStep.h"
+#include "FECore/FEModel.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -221,7 +219,7 @@ void FEPeriodicBoundary::ShallowCopy(FEContactInterface &ci)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ContactForces(vector<double> &F)
+void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -256,12 +254,6 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 	vector<int> mLM;
 
 	vec3d r0[4], rt[4];
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -381,7 +373,7 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ContactStiffness()
+void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
@@ -409,12 +401,6 @@ void FEPeriodicBoundary::ContactStiffness()
 
 	vector<int> sLM;
 	vector<int> mLM;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)

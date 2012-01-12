@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FESlidingInterface2.h"
-#include "FESolidSolver.h"
+#include "FESolver.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEAnalysisStep.h"
 #include "log.h"
@@ -702,7 +702,7 @@ void FESlidingInterface2::ShallowCopy(FEContactInterface &ci)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ContactForces(vector<double> &F)
+void FESlidingInterface2::ContactForces(vector<double> &F, FENLSolver* psolver)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
@@ -714,10 +714,6 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
-
-	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// if we're using the symmetric formulation
 	// we need to multiply with the timestep
@@ -890,7 +886,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ContactStiffness()
+void FESlidingInterface2::ContactStiffness(FENLSolver* pnls)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -904,8 +900,7 @@ void FESlidingInterface2::ContactStiffness()
 	FEMesh* pm = m_ss.GetMesh();
 
 	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolver* psolver = dynamic_cast<FESolver*>(pnls);
 
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;

@@ -99,10 +99,10 @@ public:
 	double Penalty() { return m_eps; }
 
 	//! calculate contact forces
-	virtual void ContactForces(vector<double>& F);
+	virtual void ContactForces(vector<double>& F, FENLSolver* psolver);
 
 	//! calculate contact stiffness
-	virtual void ContactStiffness();
+	virtual void ContactStiffness(FENLSolver* psolver);
 
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug);

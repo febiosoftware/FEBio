@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "FEFacet2FacetSliding.h"
-#include "fem.h"
-#include "FESolidSolver.h"
-#include "FEAnalysisStep.h"
+#include "FECore/FEModel.h"
+#include "FESolver.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -351,7 +350,7 @@ void FEFacet2FacetSliding::ShallowCopy(FEContactInterface &ci)
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::ContactForces(vector<double>& F)
+void FEFacet2FacetSliding::ContactForces(vector<double>& F, FENLSolver* psolver)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
@@ -362,12 +361,6 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-
-	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	double detJ[4], w[4], *Hs, Hm[4];
 	vec3d r0[4];
@@ -516,7 +509,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F)
 
 //-----------------------------------------------------------------------------
 
-void FEFacet2FacetSliding::ContactStiffness()
+void FEFacet2FacetSliding::ContactStiffness(FENLSolver* pnls)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -526,14 +519,11 @@ void FEFacet2FacetSliding::ContactStiffness()
 	// keep a running counter of integration points
 	int ni = 0;
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
 
 	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolver* psolver = dynamic_cast<FESolver*>(pnls);
 
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;

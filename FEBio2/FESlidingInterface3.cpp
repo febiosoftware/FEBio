@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FESlidingInterface3.h"
-#include "FESolidSolver.h"
+#include "FESolver.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEAnalysisStep.h"
@@ -317,8 +317,8 @@ FESlidingInterface3::~FESlidingInterface3()
 //-----------------------------------------------------------------------------
 void FESlidingInterface3::Init()
 {
-	m_Rgas = FEM::GetGlobalConstant("R");
-	m_Tabs = FEM::GetGlobalConstant("T");
+	m_Rgas = FEModel::GetGlobalConstant("R");
+	m_Tabs = FEModel::GetGlobalConstant("T");
 
 	// initialize surface data
 	m_ss.Init();
@@ -890,7 +890,7 @@ void FESlidingInterface3::ShallowCopy(FEContactInterface &ci)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::ContactForces(vector<double> &F)
+void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
@@ -903,9 +903,6 @@ void FESlidingInterface3::ContactForces(vector<double> &F)
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
 	
-	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	
 	double dt = fem.m_pStep->m_dt;
 	
@@ -1107,7 +1104,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::ContactStiffness()
+void FESlidingInterface3::ContactStiffness(FENLSolver* pnls)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -1123,8 +1120,7 @@ void FESlidingInterface3::ContactStiffness()
 	FEMesh* pm = m_ss.GetMesh();
 	
 	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
+	FESolver* psolver = dynamic_cast<FESolver*>(pnls);
 	
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;

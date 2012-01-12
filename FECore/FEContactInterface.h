@@ -12,6 +12,7 @@
 #include "FEMesh.h"
 #include "DumpFile.h"
 #include "FEParameterList.h"
+#include "FECore/FENLSolver.h"
 
 class FEModel;
 
@@ -47,10 +48,10 @@ public:
 	virtual void ShallowCopy(FEContactInterface& ci)=0;
 
 	//! calculate contact forces
-	virtual void ContactForces(vector<double>& F) = 0;
+	virtual void ContactForces(vector<double>& F, FENLSolver* psolver) = 0;
 
 	//! calculate contact stiffness
-	virtual void ContactStiffness() = 0;
+	virtual void ContactStiffness(FENLSolver* psolver) = 0;
 
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug) = 0;

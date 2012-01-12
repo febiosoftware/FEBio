@@ -5,11 +5,9 @@
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
 #include "fem.h"
-#include "FESolidSolver.h"
 #include "FECore/FENNQuery.h"
 #include "log.h"
 #include "FEElasticShellDomain.h"
-#include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework
@@ -285,7 +283,7 @@ void FERigidWallInterface::Update()
 
 //-----------------------------------------------------------------------------
 
-void FERigidWallInterface::ContactForces(vector<double>& F)
+void FERigidWallInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 {
 	int j, k, m, n;
 	int nseln;
@@ -314,12 +312,6 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 	vector<int> en(1);
 
 	vector<int> sLM;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// penalty value
 	double pen = m_eps, eps;
@@ -404,7 +396,7 @@ void FERigidWallInterface::ContactForces(vector<double>& F)
 //! interface.
 //! \todo I think there are a couple of stiffness terms missing in this formulation
 
-void FERigidWallInterface::ContactStiffness()
+void FERigidWallInterface::ContactStiffness(FENLSolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, ndof;
@@ -424,12 +416,6 @@ void FERigidWallInterface::ContactStiffness()
 	double gap, Lm;
 
 	vector<int> sLM;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// penalty value
 	double pen = m_eps, eps;

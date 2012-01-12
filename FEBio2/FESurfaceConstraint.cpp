@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "FESurfaceConstraint.h"
 #include "FECore/DumpFile.h"
-#include "fem.h"
-#include "FESolidSolver.h"
-#include "FEAnalysisStep.h"
+#include "FECore/FEModel.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------
@@ -263,7 +261,7 @@ void FESurfaceConstraint::ShallowCopy(FEContactInterface &ci)
 
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::ContactForces(vector<double> &F)
+void FESurfaceConstraint::ContactForces(vector<double> &F, FENLSolver* psolver)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -298,12 +296,6 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 	vector<int> sLM;
 	vector<int> mLM;
 	vector<int> LM0;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -427,7 +419,7 @@ void FESurfaceConstraint::ContactForces(vector<double> &F)
 
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::ContactStiffness()
+void FESurfaceConstraint::ContactStiffness(FENLSolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
@@ -458,12 +450,6 @@ void FESurfaceConstraint::ContactStiffness()
 	vector<int> LM0;
 
 	int n0[4];
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)

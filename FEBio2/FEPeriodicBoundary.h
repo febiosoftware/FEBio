@@ -56,10 +56,10 @@ public:
 	void ShallowCopy(FEContactInterface& ci);
 
 	//! calculate contact forces
-	void ContactForces(vector<double>& F);
+	void ContactForces(vector<double>& F, FENLSolver* psolver);
 
 	//! calculate contact stiffness
-	void ContactStiffness();
+	void ContactStiffness(FENLSolver* psolver);
 
 	//! calculate Lagrangian augmentations
 	bool Augment(int naug);

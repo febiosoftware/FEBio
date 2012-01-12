@@ -5,11 +5,10 @@
 #include "stdafx.h"
 #include "FESlidingInterface.h"
 #include "fem.h"
-#include "FESolidSolver.h"
-#include "log.h"
 #include "FEElasticShellDomain.h"
 #include "FEAnalysisStep.h"
-#include "FECore/febio.h"
+#include "FESolver.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework
@@ -552,7 +551,7 @@ void FESlidingInterface::Update()
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::ContactForces(vector<double>& F)
+void FESlidingInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 {
 	int j, k, l, m, n, np;
 	int nseln, nmeln, ndof;
@@ -569,15 +568,6 @@ void FESlidingInterface::ContactForces(vector<double>& F)
 	// the elements LM vectors
 	vector<int> sLM;
 	vector<int> mLM;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-
-	// get the mesh
-	FEMesh& mesh = fem.m_mesh;
-
-	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	vec3d r0[4];
 	double w[4];
@@ -926,7 +916,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::ContactStiffness()
+void FESlidingInterface::ContactStiffness(FENLSolver* psolver)
 {
 	int j, k, l, n, m, np;
 	int nseln, nmeln, ndof;
@@ -944,13 +934,6 @@ void FESlidingInterface::ContactStiffness()
 
 	vector<int> sLM;
 	vector<int> mLM;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = m_pfem->m_mesh;
-
-	// Get the FE solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// do two-pass
 	int npass = (m_btwo_pass?2:1);

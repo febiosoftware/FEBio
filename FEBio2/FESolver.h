@@ -14,6 +14,7 @@
 #include "fem.h"
 #include "FEBioLib/Timer.h"
 #include "FECore/FEException.h"
+#include "FECore/FENLSolver.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------
@@ -24,7 +25,7 @@ using namespace NumCore;
 //! In the future this class might become a base-class for different FE solvers.
 //! For instances there could be a different solver for quasi-static, dynamic and
 //! eigenvalue problems.
-class FESolver : public NonLinearSystem
+class FESolver : public FENLSolver
 {
 public:
 	FESolver(FEM& fem);
@@ -44,13 +45,6 @@ public:
 
 	//! assemble global stiffness matrix
 	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) {}
-
-private:
-	// These functions have to be overwritten from NonLinearSystem
-	// but are not yet used.
-	void Evaluate(vector<double>& R) { assert(false); }
-	void Jacobian(SparseMatrix& K) { assert(false); }
-	bool Converged() { assert(false); return false; }
 
 public:
 	//! recalculates the shape of the stiffness matrix

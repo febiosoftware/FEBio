@@ -470,6 +470,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FENLSolver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FENNQuery.h"
 				>
 			</File>
