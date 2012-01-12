@@ -72,6 +72,10 @@
 #include "FEBioLib/FEViscoElasticMaterial.h"
 #include "FEBioLib/FEVonMisesPlasticity.h"
 
+#include "FEBioLib/FESurfaceConstraint.h"
+#include "FEBioLib/FEPeriodicBoundary.h"
+#include "FEBioLib/FETiedInterface.h"
+
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce
 REGISTER_FEBIO_CLASS(FEConstBodyForce      , FEBodyForce, "const"      );
@@ -150,3 +154,9 @@ REGISTER_MATERIAL(FEUncoupledElasticMixture     , "uncoupled solid mixture"     
 REGISTER_MATERIAL(FEVerondaWestmann             , "Veronda-Westmann"              );
 REGISTER_MATERIAL(FEViscoElasticMaterial        , "viscoelastic"                  );
 REGISTER_MATERIAL(FEVonMisesPlasticity          , "von-Mises plasticity"          );
+
+//-----------------------------------------------------------------------------
+// classes derived from FEContactInterface
+REGISTER_FEBIO_CLASS(FEPeriodicBoundary , FEContactInterface, "periodic boundary" );
+REGISTER_FEBIO_CLASS(FESurfaceConstraint, FEContactInterface, "surface constraint");
+REGISTER_FEBIO_CLASS(FETiedInterface    , FEContactInterface, "tied"              );

@@ -1,29 +1,25 @@
 #include "stdafx.h"
-#include "FEPeriodicBoundary.h"
+#include "FESurfaceConstraint.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
-#include "FEBioLib/log.h"
-
-//-----------------------------------------------------------------------------
-// Register the class with the framework
-REGISTER_FEBIO_CLASS(FEPeriodicBoundary, FEContactInterface, "periodic boundary");
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
-BEGIN_PARAMETER_LIST(FEPeriodicBoundary, FEContactInterface)
-	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"   );
-	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance");
-	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"  );
-	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"  );
+BEGIN_PARAMETER_LIST(FESurfaceConstraint, FEContactInterface)
+	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"      ); 
+	ADD_PARAMETER(m_atol     , FE_PARAM_DOUBLE, "tolerance"   );
+	ADD_PARAMETER(m_eps      , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-//! Creates a surface for use with a sliding interface. All surface data
+//! Creates a surface for use with an FESurfaceConstraint interface. All surface data
 //! structures are allocated.
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-void FEPeriodicSurface::Init()
+void FESurfaceConstraintSurface::Init()
 {
 	// always intialize base class first!
 	FEContactSurface::Init();
@@ -33,7 +29,7 @@ void FEPeriodicSurface::Init()
 
 	// allocate other surface data
 	m_gap.resize(nn);		// gap funtion
-	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated master element
+	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));	// penetrated master element
 	m_rs.resize(nn);		// natural coords of projected slave node on master element
 	m_Lm.resize(nn);		// Lagrangian multipliers
 
@@ -45,7 +41,7 @@ void FEPeriodicSurface::Init()
 //-----------------------------------------------------------------------------
 //! Calculate the center of mass for this surface
 //!
-vec3d FEPeriodicSurface::CenterOfMass()
+vec3d FESurfaceConstraintSurface::CenterOfMass()
 {
 	vec3d c(0,0,0);
 	int N = Nodes();
@@ -55,7 +51,7 @@ vec3d FEPeriodicSurface::CenterOfMass()
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicSurface::Serialize(DumpFile& ar)
+void FESurfaceConstraintSurface::Serialize(DumpFile& ar)
 {
 	FEContactSurface::Serialize(ar);
 	if (ar.IsSaving())
@@ -63,6 +59,7 @@ void FEPeriodicSurface::Serialize(DumpFile& ar)
 		ar << m_gap;
 		ar << m_rs;
 		ar << m_Lm;
+		ar << m_nref;
 
 		int ne = (int) m_pme.size();
 		ar << ne;
@@ -77,6 +74,7 @@ void FEPeriodicSurface::Serialize(DumpFile& ar)
 		ar >> m_gap;
 		ar >> m_rs;
 		ar >> m_Lm;
+		ar >> m_nref;
 
 		assert(m_pSibling);
 
@@ -97,13 +95,13 @@ void FEPeriodicSurface::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-// FEPeriodicBoundary
+// FESurfaceConstraint
 //-----------------------------------------------------------------------------
 
-FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
 {
 	static int count = 1;
-	m_ntype = FE_PERIODIC_BOUNDARY;
+	m_ntype = FE_SURFACE_CONSTRAINT;
 
 	m_stol = 0.01;
 	m_atol = 0;
@@ -117,7 +115,7 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::Init()
+void FESurfaceConstraint::Init()
 {
 	// create the surfaces
 	m_ss.Init();
@@ -131,7 +129,7 @@ void FEPeriodicBoundary::Init()
 //-----------------------------------------------------------------------------
 //! project surface
 
-void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove)
+void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfaceConstraintSurface& ms, bool bmove)
 {
 	int i, nm;
 	double rs[2];
@@ -164,27 +162,65 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 		ss.m_rs[i][0] = rs[0];
 		ss.m_rs[i][1] = rs[1];
 	}
+
+	// if the reference node has not been located, we do it now.
+	if (ss.m_nref < 0)
+	{
+		// we pick the node that is closest to the center of mass
+		double dmin = (ss.Node(0).m_rt - cs).norm(), d;
+		int nref = 0;
+		for (i=1; i<ss.Nodes(); ++i)
+		{
+			d = (ss.Node(i).m_rt - cs).norm();
+			if (d < dmin)
+			{
+				dmin = d;
+				nref = i;
+			}
+		}
+		ss.m_nref = nref;
+	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::Update()
+void FESurfaceConstraint::Update()
 {
-	int i, j, ne;
+	int i, j, ne, n0;
 	FESurfaceElement* pme;
 
 	FEMesh& mesh = *m_ss.GetMesh();
 
-	vec3d us, um;
+	vec3d us, um, u0;
 	vec3d umi[4];
 
 	// update gap functions
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
 	{
-		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
-		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
+		FESurfaceConstraintSurface& ss = (np == 0? m_ss : m_ms);
+		FESurfaceConstraintSurface& ms = (np == 0? m_ms : m_ss);
 
 		int N = ss.Nodes();
+
+		// calculate the reference node displacement
+		n0 = ss.m_nref;
+		FENode& node = ss.Node(n0);
+		us = node.m_rt - node.m_r0;
+
+		// get the master element
+		pme = ss.m_pme[n0];
+
+		// calculate the master displacement
+		ne = pme->Nodes();
+		for (j=0; j<ne; ++j)
+		{
+			FENode& node = ms.Node(pme->m_lnode[j]);
+			umi[j] = node.m_rt - node.m_r0;
+		}
+		um = pme->eval(umi, ss.m_rs[n0][0], ss.m_rs[n0][1]);
+
+		// calculate relative reference displacement
+		u0 = us - um;
 
 		for (i=0; i<N; ++i)
 		{
@@ -205,21 +241,23 @@ void FEPeriodicBoundary::Update()
 			um = pme->eval(umi, ss.m_rs[i][0], ss.m_rs[i][1]);
 
 			// calculate gap function
-			ss.m_gap[i] = us - um;
+			ss.m_gap[i] = us - um - u0;
 		}
 	}
 }
 
+
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ShallowCopy(FEContactInterface &ci)
+void FESurfaceConstraint::ShallowCopy(FEContactInterface &ci)
 {
-	FEPeriodicBoundary& si = dynamic_cast<FEPeriodicBoundary&>(ci);
+	FESurfaceConstraint& si = dynamic_cast<FESurfaceConstraint&>(ci);
 	m_ss.ShallowCopy(si.m_ss);
 	m_ms.ShallowCopy(si.m_ms);
 }
 
+
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
+void FESurfaceConstraint::ContactForces(vector<double> &F, FENLSolver* psolver)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -230,6 +268,7 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
 	double detJ;
 
 	vec3d dxr, dxs;
+	vec3d rt[4], r0[4];
 	double* w;
 
 	// natural coordinates of slave node in master element
@@ -252,14 +291,17 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
 
 	vector<int> sLM;
 	vector<int> mLM;
-
-	vec3d r0[4], rt[4];
+	vector<int> LM0;
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
 	{
-		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
-		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
+		FESurfaceConstraintSurface& ss = (np == 0? m_ss : m_ms);
+		FESurfaceConstraintSurface& ms = (np == 0? m_ms : m_ss);
+
+		// get the reference element
+		int nref = ss.m_nref;
+		FESurfaceElement* pref = ss.m_pme[nref];
 
 		// loop over all slave facets
 		int ne = ss.Elements();
@@ -267,18 +309,18 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
 		{
 			// get the slave element
 			FESurfaceElement& sel = ss.Element(j);
-			
-			// get the elements LM vector
+
+			// get the element's LM vector
 			ss.UnpackLM(sel, sLM);
 
 			nseln = sel.Nodes();
-			assert(nseln <= 4);
 
 			for (int i=0; i<nseln; ++i)
 			{
 				r0[i] = ss.GetMesh()->Node(sel.m_node[i]).m_r0;
 				rt[i] = ss.GetMesh()->Node(sel.m_node[i]).m_rt;
 			}
+
 			w = sel.GaussWeights();
 
 			// loop over slave element nodes (which are the integration points as well)
@@ -352,7 +394,6 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
 				lm[0] = sLM[n*3  ];
 				lm[1] = sLM[n*3+1];
 				lm[2] = sLM[n*3+2];
-
 				for (l=0; l<nmeln; ++l)
 				{
 					lm[3*(l+1)  ] = mLM[l*3  ];
@@ -372,8 +413,9 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
 	}
 }
 
+
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
+void FESurfaceConstraint::ContactStiffness(FENLSolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;
@@ -384,8 +426,8 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 	vector<int> en(5);
 
 	double *Gr, *Gs, *w;
+	
 	vec3d rt[4], r0[4];
-
 	vec3d rtm[4];
 
 	double detJ, r, s;
@@ -401,12 +443,64 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 
 	vector<int> sLM;
 	vector<int> mLM;
+	vector<int> LM0;
+
+	int n0[4];
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
 	{
-		FEPeriodicSurface& ss = (np == 0? m_ss : m_ms);
-		FEPeriodicSurface& ms = (np == 0? m_ms : m_ss);
+		FESurfaceConstraintSurface& ss = (np == 0? m_ss : m_ms);
+		FESurfaceConstraintSurface& ms = (np == 0? m_ms : m_ss);
+
+		// get the reference element
+		int nref = ss.m_nref;
+		FESurfaceElement* pref = ss.m_pme[nref];
+
+		// grab the data we'll need for this element
+		ms.UnpackLM(*pref, LM0);
+		int ne0 = pref->Nodes();
+		for (j=0; j<ne0; ++j) n0[j] = pref->m_node[j];
+		r = ss.m_rs[nref][0];
+		s = ss.m_rs[nref][1];
+		double N0[4];
+		pref->shape_fnc(N0, r, s);
+
+		// number of degrees of freedom
+		ndof = 3*(1 + ne0);
+		vector<double> N(ndof/3);
+		N[0] = 1;
+		for (k=0; k<ne0; ++k) N[k+1] = -N0[k];
+
+		// stiffness matrix
+		ke.resize(ndof, ndof); ke.zero();
+		for (k=0; k<ndof/3; ++k)
+			for (l=0; l<ndof/3; ++l)
+			{
+				ke[3*k  ][3*l  ] = m_eps*N[k]*N[l];
+				ke[3*k+1][3*l+1] = m_eps*N[k]*N[l];
+				ke[3*k+2][3*l+2] = m_eps*N[k]*N[l];
+			}
+
+		// fill the lm array
+		lm.resize(3*(ne0+1));
+		lm[0] = ss.Node(nref).m_ID[DOF_X];
+		lm[1] = ss.Node(nref).m_ID[DOF_Y];
+		lm[2] = ss.Node(nref).m_ID[DOF_Z];
+		for (l=0; l<ne0; ++l)
+		{
+			lm[3*(l+1)  ] = LM0[l*3  ];
+			lm[3*(l+1)+1] = LM0[l*3+1];
+			lm[3*(l+1)+2] = LM0[l*3+2];
+		}
+
+		// fill the en array
+		en.resize(ne0+1);
+		en[0] = ss.node[nref];
+		for (l=0; l<ne0; ++l) en[l+1] = n0[l];
+
+		// assemble stiffness matrix
+//		psolver->AssembleStiffness(en, lm, ke);
 
 		// loop over all slave elements
 		int ne = ss.Elements();
@@ -418,7 +512,6 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 			ss.UnpackLM(se, sLM);
 
 			nseln = se.Nodes();
-			assert(nseln <= 4);
 
 			for (int i=0; i<nseln; ++i)
 			{
@@ -487,45 +580,35 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 				// number of degrees of freedom
 				ndof = 3*(1 + nmeln);
 
-				// fill stiffness matrix
-				ke.resize(ndof, ndof); ke.zero();
-				ke[0][0] = w[n]*detJ*m_eps;
-				ke[1][1] = w[n]*detJ*m_eps;
-				ke[2][2] = w[n]*detJ*m_eps;
-				for (k=0; k<nmeln; ++k)
-				{
-					ke[0][3+3*k  ] = -w[n]*detJ*m_eps*H[k];
-					ke[1][3+3*k+1] = -w[n]*detJ*m_eps*H[k];
-					ke[2][3+3*k+2] = -w[n]*detJ*m_eps*H[k];
+				vector<double> N(ndof/3);
+				N[0] = 1;
+				for (k=0; k<nmeln; ++k) N[k+1] = -H[k];
 
-					ke[3+3*k  ][0] = -w[n]*detJ*m_eps*H[k];
-					ke[3+3*k+1][1] = -w[n]*detJ*m_eps*H[k];
-					ke[3+3*k+2][2] = -w[n]*detJ*m_eps*H[k];
-				}
-				for (k=0; k<nmeln; ++k)
-					for (l=0; l<nmeln; ++l)
+				ke.resize(ndof, ndof); ke.zero();
+				for (k=0; k<ndof/3; ++k)
+					for (l=0; l<ndof/3; ++l)
 					{
-						ke[3+3*k  ][3+3*l  ] = w[n]*detJ*m_eps*H[k]*H[l];
-						ke[3+3*k+1][3+3*l+1] = w[n]*detJ*m_eps*H[k]*H[l];
-						ke[3+3*k+2][3+3*l+2] = w[n]*detJ*m_eps*H[k]*H[l];
+						ke[3*k  ][3*l  ] = w[n]*detJ*m_eps*N[k]*N[l];
+						ke[3*k+1][3*l+1] = w[n]*detJ*m_eps*N[k]*N[l];
+						ke[3*k+2][3*l+2] = w[n]*detJ*m_eps*N[k]*N[l];
 					}
 
-				// create lm array
+				// fill the lm array
+				lm.resize(3*(nmeln+1));
 				lm[0] = sLM[n*3  ];
 				lm[1] = sLM[n*3+1];
 				lm[2] = sLM[n*3+2];
-
-				for (k=0; k<nmeln; ++k)
+				for (l=0; l<nmeln; ++l)
 				{
-					lm[3*(k+1)  ] = mLM[k*3  ];
-					lm[3*(k+1)+1] = mLM[k*3+1];
-					lm[3*(k+1)+2] = mLM[k*3+2];
+					lm[3*(l+1)  ] = mLM[l*3  ];
+					lm[3*(l+1)+1] = mLM[l*3+1];
+					lm[3*(l+1)+2] = mLM[l*3+2];
 				}
 
-				// create the en array
+				// fill the en array
 				en.resize(nmeln+1);
 				en[0] = se.m_node[n];
-				for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
+				for (l=0; l<nmeln; ++l) en[l+1] = me.m_node[l];
 
 				// assemble stiffness matrix
 				psolver->AssembleStiffness(en, lm, ke);
@@ -535,7 +618,7 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPeriodicBoundary::Augment(int naug)
+bool FESurfaceConstraint::Augment(int naug)
 {
 	int i;
 	bool bconv = true;
@@ -570,6 +653,7 @@ bool FEPeriodicBoundary::Augment(int naug)
 		normgc += g*g;
 		++N;
 	}
+
 	for (i=0; i<m_ms.Nodes(); ++i)
 	{
 		lm = m_ms.m_Lm[i] + m_ms.m_gap[i]*m_eps;
@@ -585,7 +669,7 @@ bool FEPeriodicBoundary::Augment(int naug)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	clog.printf(" tied interface # %d\n", m_nID);
+	clog.printf(" surface constraint# %d\n", m_nID);
 	clog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
@@ -600,6 +684,7 @@ bool FEPeriodicBoundary::Augment(int naug)
 			// update Lagrange multipliers
 			m_ss.m_Lm[i] = m_ss.m_Lm[i] + m_ss.m_gap[i]*m_eps;
 		}
+
 		for (i=0; i<m_ms.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
@@ -611,9 +696,8 @@ bool FEPeriodicBoundary::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::Serialize(DumpFile &ar)
+void FESurfaceConstraint::Serialize(DumpFile &ar)
 {
-	FEContactInterface::Serialize(ar);
 	if (ar.IsSaving())
 	{
 		ar << m_eps;

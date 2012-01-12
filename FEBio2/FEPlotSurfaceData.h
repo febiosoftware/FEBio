@@ -4,7 +4,7 @@
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
-#include "FETiedInterface.h"
+#include "FEBioLib/FETiedInterface.h"
 
 //=============================================================================
 //                         S U R F A C E   D A T A

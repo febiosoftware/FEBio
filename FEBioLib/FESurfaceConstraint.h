@@ -1,20 +1,20 @@
 #pragma once
 
 #include "FECore/FEContactInterface.h"
-#include "FEBioLib/FEContactSurface.h"
+#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FEPeriodicSurface : public FEContactSurface
+class FESurfaceConstraintSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FEPeriodicSurface(FEMesh* pm = 0) : FEContactSurface(pm) {}
+	FESurfaceConstraintSurface(FEMesh* pm = 0) : FEContactSurface(pm) { m_nref = -1; }
 
 	//! initializes data
 	void Init();
 
 	//! shallow copy
-	void ShallowCopy(FEPeriodicSurface& s)
+	void ShallowCopy(FESurfaceConstraintSurface& s)
 	{
 		m_Lm = s.m_Lm;
 		m_gap = s.m_gap;
@@ -33,18 +33,20 @@ public:
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
 	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
 	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
+
+	int		m_nref;	//!< reference node
 };
 
 //-----------------------------------------------------------------------------
 
-class FEPeriodicBoundary : public FEContactInterface
+class FESurfaceConstraint : public FEContactInterface
 {
 public:
 	//! constructor
-	FEPeriodicBoundary(FEModel* pfem);
+	FESurfaceConstraint(FEModel* pfem);
 
 	//! destructor
-	virtual ~FEPeriodicBoundary(void) {}
+	virtual ~FESurfaceConstraint(void) {}
 
 	//! initialization
 	void Init();
@@ -67,18 +69,17 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 
-
 protected:
-	void ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove);
+	void ProjectSurface(FESurfaceConstraintSurface& ss, FESurfaceConstraintSurface& ms, bool bmove);
 
 public:
-	FEPeriodicSurface	m_ss;	//!< slave surface
-	FEPeriodicSurface	m_ms;	//!< master surface
+	FESurfaceConstraintSurface	m_ss;	//!< slave surface
+	FESurfaceConstraintSurface	m_ms;	//!< master surface
 
 	double	m_atol;			//!< augmentation tolerance
 	double	m_eps;			//!< penalty scale factor
 	double	m_stol;			//!< search tolerance
-	bool	m_btwo_pass;	//!< two-pass flag
+	bool	m_btwo_pass;	//!< nr of passes
 
 	DECLARE_PARAMETER_LIST();
 };

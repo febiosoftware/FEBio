@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/FEContactSurface.h"
+#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact slave or master surface used for 

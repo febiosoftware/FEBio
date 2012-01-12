@@ -6,11 +6,7 @@
 #include "FETiedInterface.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENNQuery.h"
-#include "FEBioLib/log.h"
-
-//-----------------------------------------------------------------------------
-// Register the class with the framework
-REGISTER_FEBIO_CLASS(FETiedInterface, FEContactInterface, "tied");
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

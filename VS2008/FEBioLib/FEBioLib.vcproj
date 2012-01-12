@@ -398,6 +398,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEPeriodicBoundary.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPermConstIso.cpp"
 				>
 			</File>
@@ -458,6 +462,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESurfaceConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESurfaceLoad.cpp"
 				>
 			</File>
@@ -467,6 +475,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETendonMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETiedContactSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETiedInterface.cpp"
 				>
 			</File>
 			<File
@@ -756,6 +772,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEPeriodicBoundary.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPermConstIso.h"
 				>
 			</File>
@@ -816,6 +836,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESurfaceConstraint.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESurfaceLoad.h"
 				>
 			</File>
@@ -825,6 +849,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETendonMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETiedContactSurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETiedInterface.h"
 				>
 			</File>
 			<File

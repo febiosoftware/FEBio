@@ -381,10 +381,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPeriodicBoundary.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPlotDomainData.cpp"
 				>
 			</File>
@@ -461,19 +457,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESurfaceConstraint.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETiedContactSurface.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETiedInterface.cpp"
 				>
 			</File>
 			<File
@@ -747,10 +731,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPeriodicBoundary.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPlotDomainData.h"
 				>
 			</File>
@@ -823,19 +803,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESurfaceConstraint.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETiedContactSurface.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETiedInterface.h"
 				>
 			</File>
 			<File
