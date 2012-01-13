@@ -490,6 +490,7 @@
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
     <ClInclude Include="..\..\FECore\FEMesh.h" />
     <ClInclude Include="..\..\FECore\FEModel.h" />
+    <ClInclude Include="..\..\FECore\FENLSolver.h" />
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
     <ClInclude Include="..\..\FECore\FENodeNodeList.h" />

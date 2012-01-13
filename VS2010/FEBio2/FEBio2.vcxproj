@@ -560,7 +560,6 @@
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEOptimizer.h" />
-    <ClInclude Include="..\..\FEBio2\FEPeriodicBoundary.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotNodeData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h" />
@@ -580,17 +579,12 @@
     <ClInclude Include="..\..\FEBio2\FESoluteFlux.h" />
     <ClInclude Include="..\..\FEBio2\FESolver.h" />
     <ClInclude Include="..\..\FEBio2\FEStiffnessMatrix.h" />
-    <ClInclude Include="..\..\FEBio2\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FETiedContactSurface.h" />
-    <ClInclude Include="..\..\FEBio2\FETiedInterface.h" />
     <ClInclude Include="..\..\FEBio2\FETractionLoad.h" />
     <ClInclude Include="..\..\FEBio2\FETriphasicDomain.h" />
     <ClInclude Include="..\..\FEBio2\FETriphasicSolver.h" />
     <ClInclude Include="..\..\FEBio2\FileImport.h" />
     <ClInclude Include="..\..\FEBio2\Interrupt.h" />
-    <ClInclude Include="..\..\FEBio2\log.h" />
-    <ClInclude Include="..\..\FEBio2\Logfile.h" />
     <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h" />
     <ClInclude Include="..\..\FEBio2\plugin.h" />
     <ClInclude Include="..\..\FEBio2\stdafx.h" />
@@ -634,7 +628,6 @@
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOptimizer.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPeriodicBoundary.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotNodeData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp" />
@@ -654,10 +647,7 @@
     <ClCompile Include="..\..\FEBio2\FESoluteFlux.cpp" />
     <ClCompile Include="..\..\FEBio2\FESolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEStiffnessMatrix.cpp" />
-    <ClCompile Include="..\..\FEBio2\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FETiedContactSurface.cpp" />
-    <ClCompile Include="..\..\FEBio2\FETiedInterface.cpp" />
     <ClCompile Include="..\..\FEBio2\FETractionLoad.cpp" />
     <ClCompile Include="..\..\FEBio2\FETriphasicDomain.cpp" />
     <ClCompile Include="..\..\FEBio2\FETriphasicSolver.cpp" />
@@ -673,7 +663,6 @@
     <ClCompile Include="..\..\FEBio2\input.cpp" />
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio2\levmar.cpp" />
-    <ClCompile Include="..\..\FEBio2\Logfile.cpp" />
     <ClCompile Include="..\..\FEBio2\LSDYNAPlotFile.cpp" />
     <ClCompile Include="..\..\FEBio2\optimize.cpp" />
     <ClCompile Include="..\..\FEBio2\plugin.cpp" />
