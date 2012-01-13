@@ -2,7 +2,7 @@
 #include "FECore/FEDomain.h"
 #include "FESolidSolver.h"
 #include "FEElasticShellDomain.h"
-#include "FEElasticSolidDomain.h"
+#include "FERigidSolidDomain.h"
 
 //=============================================================================
 // Rigid Solid

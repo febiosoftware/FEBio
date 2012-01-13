@@ -611,6 +611,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FE3FieldElasticSolidDomain.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEAnalysisStep.h"
 				>
 			</File>
@@ -775,6 +779,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FERigidSolidDomain.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FERigidWallInterface.h"
 				>
 			</File>
@@ -816,6 +824,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETriphasicSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEUDGHexDomain.h"
 				>
 			</File>
 			<File

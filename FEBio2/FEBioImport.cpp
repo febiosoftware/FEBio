@@ -34,6 +34,8 @@
 #include "FESoluteFlux.h"
 #include "plugin.h"
 #include <string.h>
+#include "FEUDGHexDomain.h"
+#include "FERigidSolidDomain.h"
 #include "FEBiphasicDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEHeatSolidDomain.h"
@@ -41,6 +43,7 @@
 #include "FEElasticTrussDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"
+#include "FE3FieldElasticSolidDomain.h"
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"
 #include "FEBioLib/FEHeatTransferMaterial.h"

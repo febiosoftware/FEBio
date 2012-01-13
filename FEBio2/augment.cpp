@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
-#include "FEElasticSolidDomain.h"
+#include "FE3FieldElasticSolidDomain.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FUNCTION: FESolidSolver::Augment

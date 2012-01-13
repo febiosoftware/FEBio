@@ -5,6 +5,7 @@
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicDomain.h"
 #include "FETriphasicDomain.h"
+#include "FERigidSolidDomain.h"
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/FETriphasic.h"
