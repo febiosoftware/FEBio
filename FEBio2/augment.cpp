@@ -20,11 +20,13 @@ bool FESolidSolver::Augment()
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	// Do rigid joint augmentations
-	if (!m_fem.m_RJ.empty())
+	if (!fem.m_RJ.empty())
 	{
 		// loop over all rigid joints
-		for (int i=0; i<(int) m_fem.m_RJ.size(); ++i) bconv = m_fem.m_RJ[i]->Augment() && bconv;
+		for (int i=0; i<(int) fem.m_RJ.size(); ++i) bconv = fem.m_RJ[i]->Augment() && bconv;
 	}
 
 	// Do contact augmentations
@@ -35,10 +37,10 @@ bool FESolidSolver::Augment()
 	}
 
 	// do linear constraint augmentations
-	if (m_fem.m_LCSet.size())
+	if (fem.m_LCSet.size())
 	{
-		int n = m_fem.m_LCSet.size();
-		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
+		int n = fem.m_LCSet.size();
+		list<FELinearConstraintSet*>::iterator im = fem.m_LCSet.begin();
 		for (int i=0; i<n; ++i, ++im) bconv = (*im)->Augment(m_naug) && bconv;
 	}
 

@@ -8,7 +8,7 @@
 
 //-----------------------------------------------------------------------------
 //! Class constructor
-FELinearSolidSolver::FELinearSolidSolver(FEM& fem) : FESolver(fem)
+FELinearSolidSolver::FELinearSolidSolver(FEModel& fem) : FESolver(fem)
 {
 	m_Dtol = 1e-9;
 }
@@ -61,7 +61,7 @@ bool FELinearSolidSolver::Init()
 //!
 bool FELinearSolidSolver::InitEquations()
 {
-	FEM& fem = m_fem;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = fem.m_mesh;
 
 	// initialize nr of equations
@@ -108,9 +108,11 @@ bool FELinearSolidSolver::InitEquations()
 //!
 bool FELinearSolidSolver::SolveStep(double time)
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	// prepare step
-	FEMaterialPoint::dt = m_fem.m_pStep->m_dt;
-	FEMaterialPoint::time = m_fem.m_ftime;
+	FEMaterialPoint::dt = fem.m_pStep->m_dt;
+	FEMaterialPoint::time = fem.m_ftime;
 
 	FEMesh& mesh = m_fem.m_mesh;
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
@@ -189,6 +191,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 //! update solution
 void FELinearSolidSolver::Update(vector<double>& u)
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// update nodal positions
@@ -206,7 +209,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 
 	// dump all states to the plot file
 	// when requested
-	if (m_fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.m_plot->Write(m_fem);
+	if (fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) fem.m_plot->Write(m_fem);
 }
 
 //-----------------------------------------------------------------------------
@@ -215,6 +218,7 @@ void FELinearSolidSolver::Residual()
 {
 	zero(m_R);
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over nodal forces
@@ -248,9 +252,9 @@ void FELinearSolidSolver::Residual()
 	}
 
 	// add contribution of linear surface loads
-	for (int i=0; i<(int) m_fem.m_SL.size(); ++i)
+	for (int i=0; i<(int) fem.m_SL.size(); ++i)
 	{
-		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.m_SL[i]);
+		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(fem.m_SL[i]);
 		if (pl && (pl->IsLinear())) pl->Residual(this, m_R);
 	}
 }

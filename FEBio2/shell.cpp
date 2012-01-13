@@ -133,7 +133,7 @@ void FEElasticShellDomain::Serialize(DumpFile &ar)
 
 void FEElasticShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// element force vector
 	vector<double> fe;
@@ -259,7 +259,7 @@ void FEElasticShellDomain::InternalForces(FEShellElement& el, vector<double>& fe
 
 void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	matrix ke;
 

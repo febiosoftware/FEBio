@@ -15,7 +15,7 @@
 //! 
 void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// for dynamic analyses we do need to add the inertial stiffness of the rigid body
 	if (fem.m_pStep->m_nanalysis != FE_DYNAMIC) return;
@@ -53,7 +53,7 @@ void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 //!
 void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	if (fem.HasBodyForces() == false) return;
 
@@ -102,7 +102,7 @@ void FERigidSolidDomain::UpdateStresses(FEModel &fem)
 //!
 void FERigidShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// for dynamic analyses we do need to add the inertial stiffness of the rigid body
 	if (fem.m_pStep->m_nanalysis != FE_DYNAMIC) return;
@@ -125,7 +125,7 @@ void FERigidShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 //!
 void FERigidShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	if (fem.HasBodyForces() == false) return;
 

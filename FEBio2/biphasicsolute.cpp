@@ -81,7 +81,7 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	int i, j;
 	
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
 	// make sure we are in poro-solute mode
 	assert(fem.m_pStep->m_nModule == FE_POROSOLUTE);
@@ -671,7 +671,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, 
 
 void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
 	// element stiffness matrix
 	matrix ke;

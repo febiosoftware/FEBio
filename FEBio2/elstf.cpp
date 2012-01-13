@@ -37,20 +37,22 @@ bool FESolidSolver::StiffnessMatrix()
 		ContactStiffness();
 	}
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	// calculate joint stiffness 
-	if (!m_fem.m_RJ.empty())
+	if (!fem.m_RJ.empty())
 	{
-		for (int i=0; i<(int) m_fem.m_RJ.size(); ++i) m_fem.m_RJ[i]->JointStiffness();
+		for (int i=0; i<(int) fem.m_RJ.size(); ++i) fem.m_RJ[i]->JointStiffness();
 	}
 
 	// calculate stiffness matrices for surface loads
-	int nsl = (int) m_fem.m_SL.size();
+	int nsl = (int) fem.m_SL.size();
 	for (i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.m_SL[i];
+		FESurfaceLoad* psl = fem.m_SL[i];
 
 		// respect the pressure stiffness flag
-		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.m_pStep->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (fem.m_pStep->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
 	}
 
 	// calculate linear constraint stiffness
@@ -59,14 +61,14 @@ bool FESolidSolver::StiffnessMatrix()
 	LinearConstraintStiffness();
 
 	// point constraints
-	for (i=0; i<(int) m_fem.m_PC.size(); ++i) m_fem.m_PC[i].Stiffness();
+	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].Stiffness();
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
-	int NRB = m_fem.m_RB.size();
+	int NRB = fem.m_RB.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& rb = m_fem.m_RB[i];
+		FERigidBody& rb = fem.m_RB[i];
 		for (j=0; j<6; ++j)
 			if (rb.m_LM[j] < -1)
 			{
@@ -76,7 +78,7 @@ bool FESolidSolver::StiffnessMatrix()
 	}
 
 	// let's check the stiffness matrix for zero diagonal elements
-	if (m_fem.GetDebugFlag())
+	if (fem.GetDebugFlag())
 	{
 		vector<int> zd;
 		int neq = K.Size();
@@ -96,10 +98,12 @@ bool FESolidSolver::StiffnessMatrix()
 
 void FESolidSolver::LinearConstraintStiffness()
 {
-	int N = m_fem.m_LCSet.size();
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
+	int N = fem.m_LCSet.size();
 	if (N > 0)
 	{
-		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
+		list<FELinearConstraintSet*>::iterator im = fem.m_LCSet.begin();
 		for (int i=0; i<N; ++i, ++im) (*im)->Stiffness();
 	}
 }
@@ -133,16 +137,18 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 	int ndof = ke.columns() / n;
 
 	vector<double>& ui = m_bfgs.m_ui;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over columns
 	for (j=0; j<n; ++j)
 	{
-		FENode& nodej = m_fem.m_mesh.Node(en[j]);
+		FENode& nodej = mesh.Node(en[j]);
 		if (nodej.m_rid >= 0)
 		{
 			// this is a rigid interface node
 			// get the rigid body this node is attached to
-			FERigidBody& RBj = m_fem.m_RB[nodej.m_rid];
+			FERigidBody& RBj = fem.m_RB[nodej.m_rid];
 
 			// get the rigid body equation nrs.
 			lmj = RBj.m_LM;
@@ -162,15 +168,15 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 					for (l=0; l<ndof; ++l)
 						kij[k][l] = ke[ndof*i+k][ndof*j+l];
 
-				FENode& nodei = m_fem.m_mesh.Node(en[i]);
+				FENode& nodei = mesh.Node(en[i]);
 
 				if (nodei.m_rid>=0)
 				{
 					// node i is also a rigid body node
 					// get the rigid body this node is attached to
-					FERigidBody& RBi = m_fem.m_RB[nodei.m_rid];
+					FERigidBody& RBi = fem.m_RB[nodei.m_rid];
 
-					lmi = m_fem.m_RB[nodei.m_rid].m_LM;
+					lmi = fem.m_RB[nodei.m_rid].m_LM;
 					
 					// get the relative distance
 					ai = nodei.m_rt - RBi.m_rt;
@@ -297,12 +303,12 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 			// loop over rows
 			for (i=0; i<n; ++i)
 			{
-				FENode& nodei = m_fem.m_mesh.Node(en[i]);
+				FENode& nodei = mesh.Node(en[i]);
 				if (nodei.m_rid>=0)
 				{
 					// node i is a rigid body
 					// get the rigid body this node is attached to
-					FERigidBody& RBi = m_fem.m_RB[nodei.m_rid];
+					FERigidBody& RBi = fem.m_RB[nodei.m_rid];
 
 					// get the rigid body equation nrs.
 					lmi = RBi.m_LM;
@@ -364,11 +370,13 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 
 	vector<double>& ui = m_bfgs.m_ui;
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	// adjust for linear constraints
-	if (m_fem.m_LinC.size() > 0)
+	if (fem.m_LinC.size() > 0)
 	{
 		int i, j, l;
-		int nlin = m_fem.m_LinC.size();
+		int nlin = fem.m_LinC.size();
 
 		int ndof = ke.rows();
 		int ndn = ndof / en.size();
@@ -382,16 +390,16 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 		for (i=0; i<ndof; ++i)
 		{
 			ni = MAX_NDOFS*(en[i/ndn]) + i%ndn;
-			li = m_fem.m_LCT[ni];
+			li = fem.m_LCT[ni];
 			for (j=0; j<ndof; ++j)
 			{
 				nj = MAX_NDOFS*(en[j/ndn]) + j%ndn;
-				lj = m_fem.m_LCT[nj];
+				lj = fem.m_LCT[nj];
 
 				if ((li >= 0) && (lj < 0))
 				{
 					// dof i is constrained
-					FELinearConstraint& Li = *m_fem.m_LCA[li];
+					FELinearConstraint& Li = *fem.m_LCA[li];
 
 					assert(elm[i] == -1);
 
@@ -413,7 +421,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 				else if ((lj >= 0) && (li < 0))
 				{
 					// dof j is constrained
-					FELinearConstraint& Lj = *m_fem.m_LCA[lj];
+					FELinearConstraint& Lj = *fem.m_LCA[lj];
 
 					assert(elm[j] == -1);
 
@@ -436,8 +444,8 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 				else if ((li >= 0) && (lj >= 0))
 				{
 					// both dof i and j are constrained
-					FELinearConstraint& Li = *m_fem.m_LCA[li];
-					FELinearConstraint& Lj = *m_fem.m_LCA[lj];
+					FELinearConstraint& Li = *fem.m_LCA[li];
+					FELinearConstraint& Lj = *fem.m_LCA[lj];
 
 					list<FELinearConstraint::SlaveDOF>::iterator is = Li.slave.begin();
 					list<FELinearConstraint::SlaveDOF>::iterator js = Lj.slave.begin();
@@ -508,7 +516,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 	}
 
 	// see if there are any rigid body dofs here
-	if (m_fem.m_RB.empty() == false) RigidStiffness(en, elm, ke);
+	if (fem.m_RB.empty() == false) RigidStiffness(en, elm, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -527,6 +535,7 @@ void FESolidSolver::ContactForces(vector<double>& R)
 bool FESolidSolver::Residual(vector<double>& R)
 {
 	int i;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -538,10 +547,10 @@ bool FESolidSolver::Residual(vector<double>& R)
 	vector<double> fe;
 
 	// zero rigid body reaction forces
-	int NRB = m_fem.m_RB.size();
+	int NRB = fem.m_RB.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = m_fem.m_RB[i];
+		FERigidBody& RB = fem.m_RB[i];
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 
@@ -552,20 +561,20 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Residual(this, R);
 
 	// calculate inertial forces for dynamic problems
-	if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC) InertialForces(R);
+	if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) InertialForces(R);
 
 	// calculate forces due to surface loads
-	int nsl = (int) m_fem.m_SL.size();
+	int nsl = (int) fem.m_SL.size();
 	for (i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.m_SL[i];
+		FESurfaceLoad* psl = fem.m_SL[i];
 		if (psl->IsActive()) psl->Residual(this, R);
 	}
 
 	// rigid joint forces
-	if (!m_fem.m_RJ.empty())
+	if (!fem.m_RJ.empty())
 	{
-		for (int i=0; i<(int) m_fem.m_RJ.size(); ++i) m_fem.m_RJ[i]->JointForces(R);
+		for (int i=0; i<(int) fem.m_RJ.size(); ++i) fem.m_RJ[i]->JointForces(R);
 	}
 
 	// calculate contact forces
@@ -580,7 +589,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	LinearConstraintForces(R);
 
 	// forces due to point constraints
-	for (i=0; i<(int) m_fem.m_PC.size(); ++i) m_fem.m_PC[i].Residual(R);
+	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].Residual(R);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
@@ -606,10 +615,11 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 void FESolidSolver::LinearConstraintForces(vector<double> &R)
 {
-	int N = m_fem.m_LCSet.size();
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	int N = fem.m_LCSet.size();
 	if (N>0)
 	{
-		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
+		list<FELinearConstraintSet*>::iterator im = fem.m_LCSet.begin();
 		for (int i=0; i<N; ++i, ++im) (*im)->Residual(R);
 	}
 }
@@ -622,6 +632,7 @@ void FESolidSolver::LinearConstraintForces(vector<double> &R)
 void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R)
 {
 	int i, j, I, n, l;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
 	vec3d a, d;
 
@@ -637,18 +648,18 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 	int ndn = ndof / en.size();
 
 	// if there are linear constraints we need to apply them
-	if (m_fem.m_LinC.size() > 0)
+	if (fem.m_LinC.size() > 0)
 	{
 		// loop over all degrees of freedom of this element
 		for (i=0; i<ndof; ++i)
 		{
 			// see if this dof belongs to a linear constraint
 			n = MAX_NDOFS*(en[i/ndn]) + i%ndn;
-			l = m_fem.m_LCT[n];
+			l = fem.m_LCT[n];
 			if (l >= 0)
 			{
 				// if so, get the linear constraint
-				FELinearConstraint& lc = *m_fem.m_LCA[l];
+				FELinearConstraint& lc = *fem.m_LCA[l];
 				assert(elm[i] == -1);
 	
 				// now loop over all "slave" nodes and
@@ -669,7 +680,7 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 	}
 
 	// If there are rigid bodies we need to look for rigid dofs
-	if (m_fem.m_RB.empty() == false)
+	if (fem.m_RB.empty() == false)
 	{
 		int *lm;
 
@@ -682,7 +693,7 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 
 				// this is an interface dof
 				// get the rigid body this node is connected to
-				FERigidBody& RB = m_fem.m_RB[node.m_rid];
+				FERigidBody& RB = fem.m_RB[node.m_rid];
 				lm = RB.m_LM;
 
 				// add to total torque of this body
@@ -724,6 +735,7 @@ void FESolidSolver::NodalForces(vector<double>& F)
 	// zero nodal force vector
 	zero(F);
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over nodal force cards
@@ -747,13 +759,13 @@ void FESolidSolver::NodalForces(vector<double>& F)
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
 			if ((bc == DOF_P) || (bc == DOF_C) || (bc == DOF_C+1))
-				f *= m_fem.m_pStep->m_dt;
+				f *= fem.m_pStep->m_dt;
 
 			if (n >= 0) F[n] = f;
 			else if (node.m_rid >=0)
 			{
 				// this is a rigid body node
-				FERigidBody& RB = m_fem.m_RB[node.m_rid];
+				FERigidBody& RB = fem.m_RB[node.m_rid];
 
 				// get the relative position
 				a = node.m_rt - RB.m_rt;
@@ -792,6 +804,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	double *H, kab;
 
 	// get the mesh
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// allocate F
@@ -803,8 +816,8 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	vector<int> lm;
 
 	// calculate F
-	double a = 4.0 / m_fem.m_pStep->m_dt;
-	double b = a / m_fem.m_pStep->m_dt;
+	double a = 4.0 / fem.m_pStep->m_dt;
+	double b = a / fem.m_pStep->m_dt;
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);

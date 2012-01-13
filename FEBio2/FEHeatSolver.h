@@ -11,7 +11,7 @@ class FEHeatSolver : public FESolver
 {
 public:
 	//! constructor
-	FEHeatSolver(FEM& fem);
+	FEHeatSolver(FEModel& fem);
 
 	//! one-time initialization
 	bool Init();

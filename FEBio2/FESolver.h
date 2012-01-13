@@ -28,7 +28,7 @@ using namespace NumCore;
 class FESolver : public FENLSolver
 {
 public:
-	FESolver(FEM& fem);
+	FESolver(FEModel& fem);
 	virtual ~FESolver();
 
 	virtual bool Init();
@@ -57,9 +57,6 @@ public:
 	FEDomain* Domain(int i) { return &(m_fem.m_mesh.Domain(m_Dom[i])); }
 
 public:
-	// FEM data
-	FEM&		m_fem;	//!< reference the FE data structure
-
 	// domain data
 	vector<int>		m_Dom;	//!< list of active domains for this analysis
 

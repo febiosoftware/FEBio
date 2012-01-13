@@ -130,7 +130,7 @@ void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::StiffnessMatrix(FELinearSolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	vector<int> elm;
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -289,7 +289,7 @@ void FELinearSolidDomain::ElementStiffness(FEM &fem, FESolidElement &el, matrix 
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::RHS(FELinearSolidSolver *psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// element force vector
 	vector<double> fe;

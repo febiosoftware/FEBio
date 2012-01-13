@@ -33,6 +33,7 @@
 bool FESolidSolver::SolveStep(double time)
 {
 	bool bret;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
 	try
 	{
@@ -43,7 +44,7 @@ bool FESolidSolver::SolveStep(double time)
 	{
 		// A negative jacobian was detected
 		clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
-		if (m_fem.GetDebugFlag()) m_fem.m_plot->Write(m_fem);
+		if (fem.GetDebugFlag()) fem.m_plot->Write(m_fem);
 		return false;
 	}
 	catch (MaxStiffnessReformations)
@@ -94,6 +95,7 @@ bool FESolidSolver::SolveStep(double time)
 void FESolidSolver::PrepStep(double time)
 {
 	int i, j;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -197,10 +199,10 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// initialize rigid bodies
-	int nrb = m_fem.m_RB.size();
+	int nrb = fem.m_RB.size();
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = m_fem.m_RB[i];
+		FERigidBody& RB = fem.m_RB[i];
 
 		// clear reaction forces
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
@@ -224,10 +226,10 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate local rigid displacements
-	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
+	for (i=0; i<(int) fem.m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *m_fem.m_RDC[i];
-		FERigidBody& RB = m_fem.m_RB[DC.id];
+		FERigidBodyDisplacement& DC = *fem.m_RDC[i];
+		FERigidBody& RB = fem.m_RB[DC.id];
 		if (RB.m_bActive && DC.IsActive())
 		{
 			int I = DC.bc;
@@ -240,9 +242,9 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate global rigid displacements
-	for (i=0; i<(int) m_fem.m_RB.size(); ++i)
+	for (i=0; i<(int) fem.m_RB.size(); ++i)
 	{
-		FERigidBody& RB = m_fem.m_RB[i];
+		FERigidBody& RB = fem.m_RB[i];
 		if (RB.m_prb == 0)
 		{
 			for (j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
@@ -307,9 +309,9 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// store rigid displacements in Ui vector
-	for (i=0; i<(int) m_fem.m_RB.size(); ++i)
+	for (i=0; i<(int) fem.m_RB.size(); ++i)
 	{
-		FERigidBody& RB = m_fem.m_RB[i];
+		FERigidBody& RB = fem.m_RB[i];
 		for (j=0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j]-2;
@@ -320,10 +322,10 @@ void FESolidSolver::PrepStep(double time)
 	// apply prescribed rigid body forces
 	// TODO: I don't think this does anything since
 	//       the reaction forces are zeroed in the FESolidSolver::Residual function
-	for (i=0; i<(int) m_fem.m_RFC.size(); ++i)
+	for (i=0; i<(int) fem.m_RFC.size(); ++i)
 	{
-		FERigidBodyForce& FC = *m_fem.m_RFC[i];
-		FERigidBody& RB = m_fem.m_RB[FC.id];
+		FERigidBodyForce& FC = *fem.m_RFC[i];
+		FERigidBody& RB = fem.m_RB[FC.id];
 		if (RB.m_bActive && FC.IsActive())
 		{
 			int lc = FC.lc;
@@ -353,8 +355,8 @@ void FESolidSolver::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = m_fem.m_pStep->m_dt;
-	FEMaterialPoint::time = m_fem.m_ftime;
+	FEMaterialPoint::dt = fem.m_pStep->m_dt;
+	FEMaterialPoint::time = fem.m_ftime;
 
 	FEMesh& mesh = m_fem.m_mesh;
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
@@ -390,13 +392,14 @@ bool FESolidSolver::Quasin(double time)
 	bool breform = false;	// reformation flag
 
 	// Get the current step
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.m_pStep);
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
 
 	// prepare for the first iteration
 	PrepStep(time);
 
 	// check for CTRL+C interruption before we do any work
-	if (m_fem.m_bInterruptable)
+	if (fem.m_bInterruptable)
 	{
 		Interruption itr;
 		if (itr.m_bsig)
@@ -422,14 +425,14 @@ bool FESolidSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	clog.printf("\n===== beginning time step %d : %lg =====\n", m_fem.m_pStep->m_ntimesteps+1, m_fem.m_ftime);
+	clog.printf("\n===== beginning time step %d : %lg =====\n", fem.m_pStep->m_ntimesteps+1, fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
 	{
 		oldmode = clog.GetMode();
-		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" %d\n", m_niter+1);
 		clog.SetMode(oldmode);
@@ -445,7 +448,7 @@ bool FESolidSolver::Quasin(double time)
 		m_SolverTime.stop();
 
 		// check for nans
-		if (m_fem.GetDebugFlag())
+		if (fem.GetDebugFlag())
 		{
 			double du = m_bfgs.m_ui*m_bfgs.m_ui;
 			if (ISNAN(du)) throw NANDetected();
@@ -501,8 +504,8 @@ bool FESolidSolver::Quasin(double time)
 
 		// print convergence summary
 		oldmode = clog.GetMode();
-		if ((m_fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" Nonlinear solution status: time= %lg\n", time); 
 		clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
@@ -620,7 +623,7 @@ bool FESolidSolver::Quasin(double time)
 				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
-				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.m_pStep);
+				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
 				if (pstep->m_psolver->m_bfgs.m_maxups == 0)
 				{
 					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
@@ -636,7 +639,7 @@ bool FESolidSolver::Quasin(double time)
 		clog.flush();
 
 		// check for CTRL+C interruption
-		if (m_fem.m_bInterruptable)
+		if (fem.m_bInterruptable)
 		{
 			Interruption itr;
 			if (itr.m_bsig)

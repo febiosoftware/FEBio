@@ -234,7 +234,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-	FEM& fem = solver.m_fem;
+	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
 
 	matrix ke;
 
@@ -291,7 +291,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-	FEM& fem = solver.m_fem;
+	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
 
 	vector<double> fe;
 

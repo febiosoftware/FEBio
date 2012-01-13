@@ -9,7 +9,7 @@ class FELinearSolidSolver : public FESolver
 {
 public:
 	//! constructor
-	FELinearSolidSolver(FEM& fem);
+	FELinearSolidSolver(FEModel& fem);
 
 	//! destructor (does nothing)
 	~FELinearSolidSolver(){}

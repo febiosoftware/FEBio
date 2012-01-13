@@ -480,7 +480,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 //! This function calculates the element contribution to the residual
 void FEUT4Domain::ElementResidual(FESolidSolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// element force vector
 	vector<double> fe;
@@ -611,7 +611,7 @@ void FEUT4Domain::NodalStiffnessMatrix(FESolidSolver *psolver)
 	vector<int> en;
 
 	// Get the material for the domain
-	FEModel& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
 
 	// loop over all the nodes
@@ -945,7 +945,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMat
 //! Calculates the element contribution to the global stiffness matrix
 void FEUT4Domain::ElementalStiffnessMatrix(FESolidSolver *psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// element stiffness matrix
 	matrix ke;

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPressureLoad.h"
-#include "FESolidSolver.h"
+#include "FESolver.h"
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
@@ -220,7 +220,7 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	matrix ke;
 	vector<int> lm;
@@ -269,7 +269,7 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 //-----------------------------------------------------------------------------
 void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	vector<double> fe;
 	vector<int> lm;

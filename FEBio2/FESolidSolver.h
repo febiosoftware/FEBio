@@ -10,7 +10,7 @@ class FESolidSolver : public FESolver
 {
 public:
 	//! constructor
-	FESolidSolver(FEM& fem);
+	FESolidSolver(FEModel& fem);
 	virtual ~FESolidSolver(){}
 
 	//! serialize data to/from dump file

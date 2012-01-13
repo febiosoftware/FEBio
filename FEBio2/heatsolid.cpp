@@ -30,7 +30,7 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 	int i, j, k;
 	vector<int> lm;
 
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{

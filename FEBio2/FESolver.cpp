@@ -16,7 +16,7 @@
 #include "FEBioLib/WSMPSolver.h"
 #include "FEBioLib/RCICGSolver.h"
 
-FESolver::FESolver(FEM& fem) : m_fem(fem)
+FESolver::FESolver(FEModel& fem) : FENLSolver(fem)
 {
 	// Stiffness matrix and linear solver are allocated in Init()
 	m_pK = 0;
@@ -33,6 +33,8 @@ FESolver::~FESolver()
 
 bool FESolver::Init()
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	// Now that we have determined the equation numbers we can continue
 	// with creating the stiffness matrix. First we select the linear solver
 	// The stiffness matrix is created in CreateStiffness
@@ -40,7 +42,7 @@ bool FESolver::Init()
 	// then the solver might already be allocated. That's way we need to check it.
 	if (m_plinsolve == 0)
 	{
-		switch (m_fem.m_nsolver)
+		switch (fem.m_nsolver)
 		{
 		case SKYLINE_SOLVER      : m_plinsolve = new SkylineSolver(); break;
 		case PSLDLT_SOLVER       : m_plinsolve = new PSLDLTSolver (); break;
@@ -59,7 +61,7 @@ bool FESolver::Init()
 
 	// allocate storage for the sparse matrix that will hold the stiffness matrix data
 	// we let the solver allocate the correct type of matrix format
-	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(m_fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
+	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(fem.m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
 	if (pS == 0)
 	{
 		clog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");

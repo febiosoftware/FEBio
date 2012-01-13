@@ -5,7 +5,7 @@
 
 //-----------------------------------------------------------------------------
 //! class constructor
-FECoupledHeatSolidSolver::FECoupledHeatSolidSolver(FEM& fem) : FESolver(fem), m_Heat(fem), m_Solid(fem)
+FECoupledHeatSolidSolver::FECoupledHeatSolidSolver(FEModel& fem) : FESolver(fem), m_Heat(fem), m_Solid(fem)
 {
 }
 

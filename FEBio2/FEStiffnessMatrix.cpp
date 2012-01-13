@@ -51,8 +51,8 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 	// keep a pointer to the FEM object
 	FESolver& solver = *psolver;
-	m_pfem = &solver.m_fem;
-	FEM& fem = *m_pfem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	m_pfem = &fem;
 
 	// The first time we come here we build the "static" profile.
 	// This static profile stores the contribution to the matrix profile

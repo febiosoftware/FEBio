@@ -17,6 +17,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	int i, n;
 
 	// get the mesh
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// update rigid bodies
@@ -83,10 +84,10 @@ void FESolidSolver::Update(vector<double>& ui)
 	// enforce the linear constraints
 	// TODO: do we really have to do this? Shouldn't the algorithm
 	// already guarantee that the linear constraints are satisfied?
-	if (m_fem.m_LinC.size() > 0)
+	if (fem.m_LinC.size() > 0)
 	{
-		int nlin = m_fem.m_LinC.size();
-		list<FELinearConstraint>::iterator it = m_fem.m_LinC.begin();
+		int nlin = fem.m_LinC.size();
+		list<FELinearConstraint>::iterator it = fem.m_LinC.begin();
 		double d;
 		for (int n=0; n<nlin; ++n, ++it)
 		{
@@ -119,10 +120,10 @@ void FESolidSolver::Update(vector<double>& ui)
 
 	// update velocity and accelerations
 	// for dynamic simulations
-	if (m_fem.m_pStep->m_nanalysis == FE_DYNAMIC)
+	if (fem.m_pStep->m_nanalysis == FE_DYNAMIC)
 	{
 		int N = mesh.Nodes();
-		double dt = m_fem.m_pStep->m_dt;
+		double dt = fem.m_pStep->m_dt;
 		double a = 4.0 / dt;
 		double b = a / dt;
 		for (i=0; i<N; ++i)
@@ -134,13 +135,13 @@ void FESolidSolver::Update(vector<double>& ui)
 	}
 
 	// update poroelastic data
-	if (m_fem.m_pStep->m_nModule == FE_BIPHASIC) UpdatePoro(ui);
+	if (fem.m_pStep->m_nModule == FE_BIPHASIC) UpdatePoro(ui);
 
 	// update solute-poroelastic data
-	if (m_fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
+	if (fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
 	
 	// update contact
-	if (m_fem.ContactInterfaces() > 0) UpdateContact();
+	if (fem.ContactInterfaces() > 0) UpdateContact();
 
 	// update element stresses
 	UpdateStresses();
@@ -155,7 +156,7 @@ void FESolidSolver::Update(vector<double>& ui)
 
 	// dump all states to the plot file
 	// when requested
-	if (m_fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.m_plot->Write(m_fem);
+	if (fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) fem.m_plot->Write(m_fem);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -165,6 +166,7 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 {
 	int i, n;
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// update poro-elasticity data
@@ -183,7 +185,7 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / m_fem.m_pStep->m_dt;
+		node.m_vt  = (node.m_rt - node.m_rp) / fem.m_pStep->m_dt;
 	}
 
 	// make sure the prescribed pressures are fullfilled
@@ -213,6 +215,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
 	int i, j, lc;
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// update rigid bodies
@@ -221,11 +224,11 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	vec3d r;
 	double w;
 	quatd dq;
-	int nrb = m_fem.m_RB.size();
+	int nrb = fem.m_RB.size();
 	for (i=0; i<nrb; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = m_fem.m_RB[i];
+		FERigidBody& RB = fem.m_RB[i];
 		if (RB.m_bActive)
 		{
 			lm = RB.m_LM;
@@ -299,7 +302,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 		if (n >= 0)
 		{
 			// this is a rigid body node
-			FERigidBody& RB = m_fem.m_RB[n];
+			FERigidBody& RB = fem.m_RB[n];
 
 			a0 = node.m_r0 - RB.m_r0;
 			at = RB.m_qt*a0;
@@ -309,16 +312,16 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	}
 
 	// update rigid joints
-	if (!m_fem.m_RJ.empty())
+	if (!fem.m_RJ.empty())
 	{
 		vec3d c, ra, rb, qa, qb;
 
-		for (i=0; i<(int) m_fem.m_RJ.size(); ++i)
+		for (i=0; i<(int) fem.m_RJ.size(); ++i)
 		{
-			FERigidJoint& rj = *m_fem.m_RJ[i];
+			FERigidJoint& rj = *fem.m_RJ[i];
 
-			FERigidBody& RBa = m_fem.m_RB[ rj.m_nRBa ];
-			FERigidBody& RBb = m_fem.m_RB[ rj.m_nRBb ];
+			FERigidBody& RBa = fem.m_RB[ rj.m_nRBa ];
+			FERigidBody& RBb = fem.m_RB[ rj.m_nRBb ];
 
 			ra = RBa.m_rt;
 			rb = RBb.m_rt;
@@ -343,6 +346,7 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 {
 	int i, n;
 	
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 	
 	// update solute data
@@ -361,7 +365,7 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 		
 		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / m_fem.m_pStep->m_dt;
+		node.m_vt  = (node.m_rt - node.m_rp) / fem.m_pStep->m_dt;
 	}
 	
 	// make sure the prescribed concentrations are fullfilled
@@ -391,6 +395,7 @@ void FESolidSolver::UpdateTriphasic(vector<double>& ui)
 {
 	int i, n;
 	
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 	
 	// update solute data
@@ -411,7 +416,7 @@ void FESolidSolver::UpdateTriphasic(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 		
 		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / m_fem.m_pStep->m_dt;
+		node.m_vt  = (node.m_rt - node.m_rp) / fem.m_pStep->m_dt;
 	}
 	
 	// make sure the prescribed concentrations are fullfilled

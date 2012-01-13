@@ -7,7 +7,7 @@
 void FETractionLoad::Residual(FESolver* psolver, vector<double>& R)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-	FEM& fem = solver.m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	vector<double> fe;
 	vector<int> lm;

@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 //! FESolidSolver Construction
 //
-FESolidSolver::FESolidSolver(FEM& fem) : FESolver(fem)
+FESolidSolver::FESolidSolver(FEModel& fem) : FESolver(fem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 
@@ -129,7 +129,7 @@ bool FESolidSolver::InitEquations()
 {
 	int i, j, n;
 
-	FEM& fem = m_fem;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = fem.m_mesh;
 
 	// initialize nr of equations

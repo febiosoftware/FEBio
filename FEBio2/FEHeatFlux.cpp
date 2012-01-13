@@ -7,8 +7,7 @@
 void FEHeatFlux::Residual(FESolver* psolver, vector<double>& R)
 {
 	int i, j, n;
-	FEM& fem = psolver->m_fem;
-
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	vector<int> elm;
 
 	int nfc = m_psurf->Elements();

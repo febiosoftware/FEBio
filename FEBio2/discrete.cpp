@@ -96,7 +96,7 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 
 void FEDiscreteSpringDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	FEMesh& mesh = *m_pMesh;
 
 	vector<double> fe(6);
@@ -161,7 +161,7 @@ void FEDiscreteSpringDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 
 void FEDiscreteSpringDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	FEMesh& mesh = *m_pMesh;
 
 	matrix ke(6,6);

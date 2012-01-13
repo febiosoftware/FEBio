@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// element force vector
 	vector<double> fe;
@@ -187,7 +187,7 @@ void FEUDGHexDomain::UDGHourglassForces(FEM& fem, FESolidElement &el, vector<dou
 
 void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// element stiffness matrix
 	matrix ke;

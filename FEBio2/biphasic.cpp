@@ -97,7 +97,7 @@ void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
 	int i, j;
 	
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
 	// element force vector
 	vector<double> fe;
@@ -405,7 +405,7 @@ bool FEBiphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<
 
 void FEBiphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = psolver->m_fem;
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
 	// element stiffness matrix
 	matrix ke;

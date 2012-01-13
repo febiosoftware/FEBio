@@ -7,7 +7,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor for the class
-FEHeatSolver::FEHeatSolver(FEM &fem) : FESolver(fem)
+FEHeatSolver::FEHeatSolver(FEModel &fem) : FESolver(fem)
 {
 }
 
@@ -58,7 +58,7 @@ bool FEHeatSolver::Init()
 //!
 bool FEHeatSolver::InitEquations()
 {
-	FEM& fem = m_fem;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = fem.m_mesh;
 
 	// initialize nr of equations
@@ -172,6 +172,7 @@ void FEHeatSolver::Residual()
 	int i, id, bc, lc, n;
 	double s, f;
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over nodal force cards
@@ -198,9 +199,9 @@ void FEHeatSolver::Residual()
 	}
 
 	// add surface fluxes
-	for (i=0; i<(int) m_fem.m_SL.size(); ++i)
+	for (i=0; i<(int) fem.m_SL.size(); ++i)
 	{
-		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.m_SL[i]);
+		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(fem.m_SL[i]);
 		if (phf) phf->Residual(this, m_R);
 	}
 }

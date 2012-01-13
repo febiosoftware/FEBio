@@ -451,7 +451,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
 
-	FEM& fem = solver.m_fem;
+	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
 	double dt = fem.m_pStep->m_dt;
 
 	matrix ke;
@@ -546,8 +546,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 {
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-
-	FEM& fem = solver.m_fem;
+	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
 	double dt = fem.m_pStep->m_dt;
 
 	vector<double> fe;
