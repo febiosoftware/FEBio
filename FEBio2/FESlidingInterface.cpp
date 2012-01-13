@@ -4,10 +4,8 @@
 
 #include "stdafx.h"
 #include "FESlidingInterface.h"
-#include "fem.h"
 #include "FEElasticShellDomain.h"
-#include "FEAnalysisStep.h"
-#include "FESolver.h"
+#include "FECore/FEModel.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
