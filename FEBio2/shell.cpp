@@ -336,10 +336,6 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 	assert(pm);
 
-	// extract the elastic component
-	FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
-	assert(pme);
-
 	double *Grn, *Gsn, *Hn;
 	double Gr, Gs, H;
 
@@ -352,9 +348,6 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 	// calculate the average thickness
 	double* h0 = &el.m_h0[0], gt, za;
 
-	// make sure that this is the struct mech module.
-	assert(fem.m_pStep->m_nModule == FE_SOLID);
-	
 	// calculate element stiffness matrix
 	ke.zero();
 	for (n=0; n<nint; ++n)
@@ -634,7 +627,7 @@ void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<doubl
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 {
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	vec3d r0[8], rt[8];
 
 	int n;

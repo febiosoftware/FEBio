@@ -235,7 +235,7 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	
 	vec3d rp[8];
 	for (i=0; i<neln; ++i) 
@@ -519,7 +519,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 	// gauss-weights
 	double* gw = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	
 	vec3d r0[8], rt[8], rp[8], v[8];
 	for (i=0; i<neln; ++i) 

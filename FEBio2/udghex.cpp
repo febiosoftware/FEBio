@@ -235,10 +235,10 @@ void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 void FEUDGHexDomain::UDGElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness
-	UDGMaterialStiffness(fem, el, ke);
+	UDGMaterialStiffness(el, ke);
 
 	// calculate geometrical stiffness
-	UDGGeometricalStiffness(fem, el, ke);
+	UDGGeometricalStiffness(el, ke);
 
 	// add hourglass stiffness
 	UDGHourglassStiffness(fem, el, ke);
@@ -295,7 +295,7 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix&
 		x7 += h7[i]*rt[i].x; y7 += h7[i]*rt[i].y; z7 += h7[i]*rt[i].z;
 	}
 
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 
 	double GX[8], GY[8], GZ[8];
 	AvgCartDerivs(el, GX, GY, GZ);
@@ -311,6 +311,7 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix&
 	}
 
 	// calculate hourglass stiffness
+	// TODO: I need to get rid of this
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
 	double hg = pstep->m_hg;
 
@@ -332,7 +333,7 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix&
 
 //-----------------------------------------------------------------------------
 
-void FEUDGHexDomain::UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEUDGHexDomain::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
 {
 	int i, j;
 
@@ -347,7 +348,7 @@ void FEUDGHexDomain::UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matri
 	// s is the voight vector
 	mat3ds& s = pt.s;
 
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 
 	// calculate the average cartesian derivatives
 	double GX[8], GY[8], GZ[8];
@@ -388,7 +389,7 @@ void FEUDGHexDomain::UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matri
 
 //-----------------------------------------------------------------------------
 
-void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEUDGHexDomain::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	// make sure we have the right element type
 	assert(el.Type() == FE_UDGHEX);
@@ -410,7 +411,7 @@ void FEUDGHexDomain::UDGMaterialStiffness(FEM& fem, FESolidElement &el, matrix &
 	FESolidMaterial* pmat = dynamic_cast<FESolidMaterial*>(m_pMat);
 	assert(pmat);
 
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 
 	// calculate the average cartesian derivatives
 	double GX[8], GY[8], GZ[8];

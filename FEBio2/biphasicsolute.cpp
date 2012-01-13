@@ -241,7 +241,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	
 	vec3d rp[8];
 	for (i=0; i<neln; ++i) 
@@ -432,7 +432,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	
 	vec3d r0[8], rt[8], rp[8], vt[8];
 	double cp[8];
@@ -787,7 +787,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 	// gauss-weights
 	double* gw = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	
 	vec3d r0[8], rt[8], rp[8], v[8];
 	double cp[8];

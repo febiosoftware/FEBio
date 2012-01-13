@@ -199,10 +199,10 @@ protected:
 	void UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
 	//! geometrical stiffness for UDG hex elements
-	void UDGGeometricalStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void UDGGeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness for UDG hex elements
-	void UDGMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void UDGMaterialStiffness(FESolidElement& el, matrix& ke);
 
 protected:
 	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
