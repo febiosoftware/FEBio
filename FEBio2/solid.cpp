@@ -264,7 +264,7 @@ void FEElasticSolidDomain::InternalForces(FESolidElement& el, vector<double>& fe
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<double>& fe)
+void FEElasticSolidDomain::BodyForces(FEModel& fem, FESolidElement& el, vector<double>& fe)
 {
 	int NF = fem.BodyForces();
 	for (int nf = 0; nf < NF; ++nf)
@@ -330,7 +330,7 @@ void FEElasticSolidDomain::BodyForces(FEM& fem, FESolidElement& el, vector<doubl
 
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
-void FEElasticSolidDomain::BodyForceStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::BodyForceStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
 	int neln = el.Nodes();
 	int ndof = ke.columns()/neln;

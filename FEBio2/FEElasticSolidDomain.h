@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
+#include "FECore/FEModel.h"
 
 class FEM;
 
@@ -66,12 +67,12 @@ protected:
 	void ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the stiffness matrix due to body forces 
-	void BodyForceStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void BodyForceStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	// --- R E S I D U A L ---
 
 	//! Calculatess external body forces for solid elements
-	void BodyForces(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	void BodyForces(FEModel& fem, FESolidElement& elem, vector<double>& fe);
 
 	// ---
 };
