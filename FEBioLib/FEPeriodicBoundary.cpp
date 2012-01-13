@@ -163,7 +163,7 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::Update()
+void FEPeriodicBoundary::Update(int niter)
 {
 	int i, j, ne;
 	FESurfaceElement* pme;

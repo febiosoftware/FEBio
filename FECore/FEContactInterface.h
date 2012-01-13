@@ -39,7 +39,7 @@ public:
 	virtual void Init() = 0;
 
 	//! update 
-	virtual void Update() = 0;
+	virtual void Update(int niter) = 0;
 
 	//! return the type of this interface
 	int Type() { return m_ntype; }

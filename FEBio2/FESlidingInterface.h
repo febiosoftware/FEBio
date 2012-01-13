@@ -82,7 +82,7 @@ public:
 	void Init();
 
 	//! update interface data
-	void Update();
+	void Update(int niter);
 
 	//! projects slave nodes onto master nodes
 	void ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove = false);

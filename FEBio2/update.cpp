@@ -453,5 +453,5 @@ void FESolidSolver::UpdateStresses()
 void FESolidSolver::UpdateContact()
 {
 	// Update all contact interfaces
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->Update();
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->Update(m_niter);
 }

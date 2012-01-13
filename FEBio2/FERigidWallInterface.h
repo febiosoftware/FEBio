@@ -85,7 +85,7 @@ public:
 	void ProjectSurface(FERigidWallSurface& s);
 
 	//! update rigid wall data
-	void Update();
+	void Update(int niter);
 
 	//! shallow copy
 	void ShallowCopy(FEContactInterface& ci)

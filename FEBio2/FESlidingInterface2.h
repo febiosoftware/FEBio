@@ -60,7 +60,7 @@ public:
 	void Init();
 
 	//! update
-	void Update();
+	void Update(int niter);
 
 	//! Create a shallow copy
 	void ShallowCopy(FEContactInterface& ci);

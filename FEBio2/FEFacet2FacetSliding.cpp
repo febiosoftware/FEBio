@@ -331,7 +331,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::Update()
+void FEFacet2FacetSliding::Update(int niter)
 {
 	// project slave surface to master surface
 	ProjectSurface(m_ss, m_ms);

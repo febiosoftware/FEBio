@@ -511,17 +511,11 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 
 //-----------------------------------------------------------------------------
 //! updates sliding interface data
-
-void FESlidingInterface::Update()
+//! niter is the number of Newton iterations.
+//! TODO: should I get rid of the bfirst static variable?
+void FESlidingInterface::Update(int niter)
 {
 	static bool bfirst = true;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-
-	// get the iteration number
-	// we need this number to see if we can do segment updates or not
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
-	int niter = pstep->m_psolver->m_niter;
 
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;

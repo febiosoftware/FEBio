@@ -28,7 +28,7 @@ public:
 	void Init();
 
 	//! update interface data
-	void Update();
+	void Update(int niter);
 
 	//! projects slave nodes onto master nodes
 	void ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove = false);

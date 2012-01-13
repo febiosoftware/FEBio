@@ -302,7 +302,7 @@ void FESlidingInterface2::Init()
 	}
 
 	// update sliding interface data
-	Update();
+	Update(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -540,7 +540,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface2::Update()
+void FESlidingInterface2::Update(int niter)
 {	
 	int i, n, id, np;
 	double rs[2];
@@ -563,7 +563,7 @@ void FESlidingInterface2::Update()
 		biter = pstep->m_psolver->m_niter;
 		naug = pstep->m_psolver->m_naug;
 	}
-	int niter = pstep->m_psolver->m_niter - biter;
+	niter = pstep->m_psolver->m_niter - biter;
 	bool bupseg = ((m_nsegup == 0)? true : (niter <= m_nsegup));
 	// get the logfile
 //	Logfile& log = GetLogfile();

@@ -275,7 +275,7 @@ void FERigidWallInterface::ProjectSurface(FERigidWallSurface& ss)
 //-----------------------------------------------------------------------------
 //!  Updates rigid wall data
 
-void FERigidWallInterface::Update()
+void FERigidWallInterface::Update(int niter)
 {
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);

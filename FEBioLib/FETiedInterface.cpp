@@ -46,7 +46,7 @@ void FETiedInterface::Init()
 //-----------------------------------------------------------------------------
 //! update
 
-void FETiedInterface::Update()
+void FETiedInterface::Update(int niter)
 {
 	int i, l, n;
 	double r, s, H[4];

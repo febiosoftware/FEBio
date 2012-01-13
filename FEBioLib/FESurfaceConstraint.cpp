@@ -183,7 +183,7 @@ void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfa
 }
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::Update()
+void FESurfaceConstraint::Update(int niter)
 {
 	int i, j, ne, n0;
 	FESurfaceElement* pme;
