@@ -33,10 +33,10 @@ public:
 	LOAD& NormalTraction(int n) { return m_PC[n]; }
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(FESolver* psolver);
+	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculate residual
-	void Residual(FESolver* psolver, vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! serialize data
 	void Serialize(DumpFile& ar);

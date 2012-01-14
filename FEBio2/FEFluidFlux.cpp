@@ -447,11 +447,9 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
+void FEFluidFlux::StiffnessMatrix(FENLSolver* psolver)
 {
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-
-	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	double dt = fem.m_pStep->m_dt;
 
 	matrix ke;
@@ -494,7 +492,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 						FluxStiffnessSS(el, ke, wn, dt, m_bmixture);
 						
 						// assemble element matrix in global stiffness matrix
-						solver.AssembleStiffness(el.m_node, elm, ke);
+						psolver->AssembleStiffness(el.m_node, elm, ke);
 					}
 				}
 			}
@@ -534,7 +532,7 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 						FluxStiffness(el, ke, wn, dt, m_bmixture);
 						
 						// assemble element matrix in global stiffness matrix
-						solver.AssembleStiffness(el.m_node, elm, ke);
+						psolver->AssembleStiffness(el.m_node, elm, ke);
 					}
 				}
 			}
@@ -543,10 +541,10 @@ void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 
 }
 
-void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
+//-----------------------------------------------------------------------------
+void FEFluidFlux::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	double dt = fem.m_pStep->m_dt;
 
 	vector<double> fe;
@@ -582,7 +580,7 @@ void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 					FlowRateSS(el, fe, wn, dt, m_bmixture);
 				
 				// add element force vector to global force vector
-				solver.AssembleResidual(el.m_node, elm, fe, R);
+				psolver->AssembleResidual(el.m_node, elm, fe, R);
 			}
 		}
 	}
@@ -612,7 +610,7 @@ void FEFluidFlux::Residual(FESolver* psolver, vector<double>& R)
 					FlowRate(el, fe, wn, dt, m_bmixture);
 				
 				// add element force vector to global force vector
-				solver.AssembleResidual(el.m_node, elm, fe, R);
+				psolver->AssembleResidual(el.m_node, elm, fe, R);
 			}
 		}
 	}

@@ -218,9 +218,9 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
+void FEPressureLoad::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	matrix ke;
 	vector<int> lm;
@@ -267,9 +267,9 @@ void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::Residual(FESolver* psolver, vector<double>& R)
+void FEPressureLoad::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	vector<double> fe;
 	vector<int> lm;

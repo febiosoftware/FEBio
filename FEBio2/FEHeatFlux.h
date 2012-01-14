@@ -33,10 +33,10 @@ public:
 	LOAD& HeatFlux(int n) { return m_FC[n]; }
 
 	//! stiffness matrix
-	void StiffnessMatrix(FESolver* psolver) {}
+	void StiffnessMatrix(FENLSolver* psolver) {}
 	
 	//! residual
-	void Residual(FESolver* psolver, vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! serialization
 	void Serialize(DumpFile& ar);

@@ -216,9 +216,8 @@ void FESoluteFlux::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
+void FESoluteFlux::StiffnessMatrix(FENLSolver* psolver)
 {
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	double dt = fem.m_pStep->m_dt;
 	
@@ -273,7 +272,7 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 					}
 					
 					// assemble element matrix in global stiffness matrix
-					solver.AssembleStiffness(el.m_node, lm, ke);
+					psolver->AssembleStiffness(el.m_node, lm, ke);
 				}
 			}
 		}
@@ -281,9 +280,8 @@ void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
+void FESoluteFlux::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	double dt = fem.m_pStep->m_dt;
 	
@@ -324,7 +322,7 @@ void FESoluteFlux::Residual(FESolver* psolver, vector<double>& R)
 				lm[i] = elm[(11+m_isol)*neln+i];
 			
 			// add element force vector to global force vector
-			solver.AssembleResidual(el.m_node, lm, fe, R);
+			psolver->AssembleResidual(el.m_node, lm, fe, R);
 		}
 	}
 }

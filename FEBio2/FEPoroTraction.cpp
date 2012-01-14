@@ -231,10 +231,9 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
+void FEPoroNormalTraction::StiffnessMatrix(FENLSolver* psolver)
 {
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	matrix ke;
 
@@ -281,17 +280,16 @@ void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 				m_psurf->UnpackLM(el, lm);
 
 				// assemble element matrix in global stiffness matrix
-				solver.AssembleStiffness(el.m_node, lm, ke);
+				psolver->AssembleStiffness(el.m_node, lm, ke);
 			}
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
+void FEPoroNormalTraction::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*psolver);
-	FEM& fem = dynamic_cast<FEM&>(solver.GetFEModel());
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	vector<double> fe;
 
@@ -328,6 +326,6 @@ void FEPoroNormalTraction::Residual(FESolver* psolver, vector<double>& R)
 		m_psurf->UnpackLM(el, lm);
 
 		// add element force vector to global force vector
-		solver.AssembleResidual(el.m_node, lm, fe, R);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
