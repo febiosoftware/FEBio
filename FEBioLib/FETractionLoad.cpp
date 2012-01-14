@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FETractionLoad.h"
-#include "FESolidSolver.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load

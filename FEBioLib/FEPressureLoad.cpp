@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FEPressureLoad.h"
-#include "FESolver.h"
-
+#include "FECore/FEModel.h"
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to hydrostatic pressure
 

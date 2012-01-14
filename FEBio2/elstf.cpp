@@ -2,7 +2,7 @@
 #include <math.h>
 #include "FESolidSolver.h"
 #include "FECore/tens4d.h"
-#include "FEPressureLoad.h"
+#include "FEBioLib/FEPressureLoad.h"
 #include "FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/FESurfaceLoad.h"
+#include "FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! The pressure surface is a surface domain that sustains pressure boundary

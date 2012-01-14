@@ -4,8 +4,6 @@
 #include "FECore/DumpFile.h"
 #include "FECore/FENLSolver.h"
 
-class FESolver;
-
 //-----------------------------------------------------------------------------
 //! This is the base class for all loads that are applied to surfaces
 class FESurfaceLoad : public FEBoundaryCondition

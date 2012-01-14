@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEHeatSolver.h"
 #include "FEBioLib/FEIsotropicFourier.h"
-#include "FEHeatFlux.h"
+#include "FEBioLib/FEHeatFlux.h"
 #include "FEHeatSolidDomain.h"
 #include "FECore/FENodeReorder.h"
 

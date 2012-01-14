@@ -330,6 +330,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHeatFlux.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.cpp"
 				>
 			</File>
@@ -426,6 +430,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEPressureLoad.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FERigid.cpp"
 				>
 			</File>
@@ -483,6 +491,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETiedInterface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETractionLoad.cpp"
 				>
 			</File>
 			<File
@@ -700,6 +712,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHeatFlux.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHeatTransferMaterial.h"
 				>
 			</File>
@@ -800,6 +816,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEPressureLoad.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FERigid.h"
 				>
 			</File>
@@ -857,6 +877,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETiedInterface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETractionLoad.h"
 				>
 			</File>
 			<File

@@ -349,10 +349,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEHeatFlux.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEHeatSolver.cpp"
 				>
 			</File>
@@ -398,10 +394,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPoroTraction.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPressureLoad.cpp"
 				>
 			</File>
 			<File
@@ -458,10 +450,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETractionLoad.cpp"
 				>
 			</File>
 			<File
@@ -699,10 +687,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEHeatFlux.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEHeatSolidDomain.h"
 				>
 			</File>
@@ -752,10 +736,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPoroTraction.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPressureLoad.h"
 				>
 			</File>
 			<File
@@ -812,10 +792,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETractionLoad.h"
 				>
 			</File>
 			<File

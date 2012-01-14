@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEHeatFlux.h"
-#include "FESolver.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Calculate the heat flux residual
