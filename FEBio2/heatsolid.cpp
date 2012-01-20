@@ -87,9 +87,10 @@ void FEHeatSolidDomain::ConductionStiffness(FEM& fem, FESolidElement& el, matrix
 	int ni = el.GaussPoints();
 
 	// global derivatives of shape functions
-	// NOTE: hard-coding of hex elements!
 	// Gx = dH/dx
-	double Gx[8], Gy[8], Gz[8];
+	const int EN = FEElement::MAX_NODES;
+	double Gx[EN], Gy[EN], Gz[EN];
+
 	double Gr, Gs, Gt;
 	double Gi[3], Gj[3];
 	double DB[3];
@@ -161,7 +162,6 @@ void FEHeatSolidDomain::CapacitanceStiffness(FEM& fem, FESolidElement &el, matri
 	int ni = el.GaussPoints();
 
 	// shape functions
-	// NOTE: hard-coding of hex elements!
 	double* H;
 
 	// jacobian

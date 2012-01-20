@@ -72,7 +72,7 @@ protected:
 	};
 
 	// --- element types ---
-	enum Elem_Type { PLT_ELEM_HEX, PLT_ELEM_PENTA, PLT_ELEM_TET, PLT_ELEM_QUAD, PLT_ELEM_TRI, PLT_ELEM_TRUSS };
+	enum Elem_Type { PLT_ELEM_HEX, PLT_ELEM_PENTA, PLT_ELEM_TET, PLT_ELEM_QUAD, PLT_ELEM_TRI, PLT_ELEM_TRUSS, PLT_ELEM_HEX20 };
 
 	// size of name variables
 	enum { STR_SIZE = 64 };

@@ -54,6 +54,9 @@ private:
 class FEElement
 {
 public:
+	enum {MAX_NODES = 20}; // max nr of nodes
+
+public:
 	// default constructor
 	FEElement() : m_pT(0) 
 	{ 

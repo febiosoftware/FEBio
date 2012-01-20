@@ -23,6 +23,7 @@ FEElementLibrary::FEElementLibrary()
 		// register element types
 		int n;
 		n = RegisterTraits(new FEHexElementTraits       ); assert(n==FE_HEX);
+		n = RegisterTraits(new FEHex20ElementTraits     ); assert(n==FE_HEX20);
 		n = RegisterTraits(new FERIHexElementTraits     ); assert(n==FE_RIHEX);
 		n = RegisterTraits(new FEUDFHexElementTraits    ); assert(n==FE_UDGHEX);
 		n = RegisterTraits(new FETetElementTraits       ); assert(n==FE_TET);

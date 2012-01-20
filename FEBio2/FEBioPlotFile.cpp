@@ -380,6 +380,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 		case FE_HEX:
 		case FE_RIHEX:
 		case FE_UDGHEX: ne = 8; dtype = PLT_ELEM_HEX; break;
+		case FE_HEX20: ne = 20; dtype = PLT_ELEM_HEX20; break;
 		case FE_PENTA: ne = 6; dtype = PLT_ELEM_PENTA; break;
 		case FE_TET:
 		case FE_TETG1: ne = 4; dtype = PLT_ELEM_TET; break;
@@ -395,7 +396,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	m_ar.EndChunk();
 
 	// write the element list
-	int n[9];
+	int n[FEElement::MAX_NODES + 1];
 	m_ar.BeginChunk(PLT_DOM_ELEM_LIST);
 	{
 		for (i=0; i<NE; ++i)

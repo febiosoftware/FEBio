@@ -2038,6 +2038,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 int FEBioGeometrySection::ElementType(XMLTag& t)
 {
 	if (t=="hex8"  ) return ET_HEX;
+	if (t=="hex20" ) return ET_HEX20;
 	if (t=="penta6") return ET_PENTA;
 	if (t=="tet4"  ) return ET_TET;
 	if (t=="quad4" ) return ET_QUAD;
@@ -2056,7 +2057,7 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 	// get the module
 	if (fem.m_pStep->m_nModule == FE_HEAT)
 	{
-		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
+		if ((etype == ET_HEX) || (etype == ET_HEX20) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
 	else if (fem.m_pStep->m_nModule == FE_LINEAR_SOLID)
@@ -2257,6 +2258,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		// determine element type
 		int etype = -1;
 		if      (tag == "hex8"  ) etype = FEFEBioImport::ET_HEX8;
+		else if (tag == "hex20" ) etype = FEFEBioImport::ET_HEX20;
 		else if (tag == "penta6") etype = FEFEBioImport::ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
 		else if (tag == "quad4" ) etype = FEFEBioImport::ET_QUAD4;
@@ -2270,6 +2272,12 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_HEX20:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_HEX20, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_PENTA6:
@@ -2342,6 +2350,7 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 	// determine element type
 	int etype = -1;
 	if      (strcmp(szel, "hex8"  ) == 0) etype = ET_HEX;
+	else if (strcmp(szel, "hex20" ) == 0) etype = ET_HEX20;
 	else if (strcmp(szel, "penta6") == 0) etype = ET_PENTA;
 	else if (strcmp(szel, "tet4"  ) == 0) etype = ET_TET;
 	else if (strcmp(szel, "quad4" ) == 0) etype = ET_QUAD;
@@ -2461,7 +2470,7 @@ void FEBioGeometrySection::ReadSolidElement(XMLTag &tag, FESolidElement& el, int
 {
 	el.SetType(ntype);
 	el.m_nID = nid;
-	int n[8];
+	int n[FEElement::MAX_NODES];
 	tag.value(n,el.Nodes());
 	for (int j=0; j<el.Nodes(); ++j) el.m_node[j] = n[j]-1;
 	el.SetMatID(nmat);

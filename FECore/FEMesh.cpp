@@ -493,6 +493,7 @@ int FEMesh::Faces(FEElement& el)
 	switch (el.Type())
 	{
 	case FE_HEX:
+	case FE_HEX20:
 	case FE_RIHEX:
 	case FE_UDGHEX: return 6;
 	case FE_PENTA: return 5;

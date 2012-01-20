@@ -181,6 +181,19 @@ public:
 	void init();
 };
 
+//=============================================================================
+// 20-node hexahedral element using a 3x3x3 Gaussian integration rule
+class FEHex20ElementTraits : public FESolidElementTraits
+{
+public:
+	enum { NINT = 27 };
+	enum { NELN = 20 };
+
+public:
+	FEHex20ElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_HEX20; init(); }
+	void init();
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // CLASS: FETetElementTraits
 // 4-node tetrahedral elements with 4-point gaussian quadrature

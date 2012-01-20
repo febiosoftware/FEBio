@@ -288,7 +288,7 @@ double FESolidDomain::invjact(FESolidElement& el, double Ji[3][3], int n)
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d rt[8];
+	vec3d rt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
 	// calculate jacobian
