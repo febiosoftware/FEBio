@@ -98,6 +98,12 @@ public: // analysis step functions
 	//! Get a particular step
 	FEAnalysis* GetStep(int i) { return m_Step[i]; }
 
+	//! Get the current step
+	FEAnalysis* GetCurrentStep() { return m_pStep; }
+
+	//! Set the current step
+	void SetCurrentStep(FEAnalysis* pstep) { m_pStep = pstep; }
+
 public: // contact interface functions
 	//! return number of contact interfaces
 	int ContactInterfaces() { return m_CI.size(); } 
@@ -124,8 +130,11 @@ protected:
 	std::vector<FELoadCurve*>			m_LC;	//!< load curve data
 	std::vector<FEMaterial*>			m_MAT;	//!< array of materials
 	std::vector<FEBodyForce*>			m_BF;	//!< body force data
-	std::vector<FEAnalysis*>			m_Step;	//!< array of analysis steps
 	std::vector<FEContactInterface*>	m_CI;	//!< contact interface array
+
+	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
+	FEAnalysis*					m_pStep;	//!< pointer to current analysis step
+
 
 public:
 	// Geometry data

@@ -31,7 +31,7 @@ void FEPointConstraint::Residual(vector<double> &R)
 {
 	int i;
 	FEMesh& m = m_pfem->m_mesh;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// calculate H matrix
@@ -91,7 +91,7 @@ void FEPointConstraint::Stiffness()
 {
 	int i, j;
 	FEMesh& m = m_pfem->m_mesh;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
 	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// calculate H matrix

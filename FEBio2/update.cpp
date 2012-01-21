@@ -120,10 +120,11 @@ void FESolidSolver::Update(vector<double>& ui)
 
 	// update velocity and accelerations
 	// for dynamic simulations
-	if (fem.m_pStep->m_nanalysis == FE_DYNAMIC)
+	FEAnalysis* pstep = fem.GetCurrentStep();
+	if (pstep->m_nanalysis == FE_DYNAMIC)
 	{
 		int N = mesh.Nodes();
-		double dt = fem.m_pStep->m_dt;
+		double dt = pstep->m_dt;
 		double a = 4.0 / dt;
 		double b = a / dt;
 		for (i=0; i<N; ++i)
@@ -135,10 +136,10 @@ void FESolidSolver::Update(vector<double>& ui)
 	}
 
 	// update poroelastic data
-	if (fem.m_pStep->m_nModule == FE_BIPHASIC) UpdatePoro(ui);
+	if (pstep->m_nModule == FE_BIPHASIC) UpdatePoro(ui);
 
 	// update solute-poroelastic data
-	if (fem.m_pStep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
+	if (pstep->m_nModule == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
 	
 	// update contact
 	if (fem.ContactInterfaces() > 0) UpdateContact();
@@ -156,7 +157,7 @@ void FESolidSolver::Update(vector<double>& ui)
 
 	// dump all states to the plot file
 	// when requested
-	if (fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) fem.m_plot->Write(m_fem);
+	if (pstep->m_nplot == FE_PLOT_MINOR_ITRS) fem.m_plot->Write(m_fem);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,8 +167,8 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 {
 	int i, n;
 
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// update poro-elasticity data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -185,7 +186,7 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 
 		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / fem.m_pStep->m_dt;
+		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
 	}
 
 	// make sure the prescribed pressures are fullfilled
@@ -346,8 +347,8 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 {
 	int i, n;
 	
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -365,7 +366,7 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 		
 		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / fem.m_pStep->m_dt;
+		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
 	}
 	
 	// make sure the prescribed concentrations are fullfilled
@@ -395,8 +396,8 @@ void FESolidSolver::UpdateTriphasic(vector<double>& ui)
 {
 	int i, n;
 	
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -416,7 +417,7 @@ void FESolidSolver::UpdateTriphasic(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 		
 		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / fem.m_pStep->m_dt;
+		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
 	}
 	
 	// make sure the prescribed concentrations are fullfilled

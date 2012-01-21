@@ -52,7 +52,7 @@ bool FESolidSolver::StiffnessMatrix()
 		FESurfaceLoad* psl = fem.m_SL[i];
 
 		// respect the pressure stiffness flag
-		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (fem.m_pStep->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
 	}
 
 	// calculate linear constraint stiffness
@@ -561,7 +561,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Residual(this, R);
 
 	// calculate inertial forces for dynamic problems
-	if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) InertialForces(R);
+	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(R);
 
 	// calculate forces due to surface loads
 	int nsl = (int) fem.m_SL.size();
@@ -759,7 +759,7 @@ void FESolidSolver::NodalForces(vector<double>& F)
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
 			if ((bc == DOF_P) || (bc == DOF_C) || (bc == DOF_C+1))
-				f *= fem.m_pStep->m_dt;
+				f *= fem.GetCurrentStep()->m_dt;
 
 			if (n >= 0) F[n] = f;
 			else if (node.m_rid >=0)
@@ -816,8 +816,9 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	vector<int> lm;
 
 	// calculate F
-	double a = 4.0 / fem.m_pStep->m_dt;
-	double b = a / fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
+	double a = 4.0 / dt;
+	double b = a / dt;
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);

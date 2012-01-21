@@ -171,7 +171,7 @@ void FEUDGHexDomain::UDGHourglassForces(FEM& fem, FESolidElement &el, vector<dou
 	}
 
 	// calculate hourglass forces
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	double hg = pstep->m_hg;
 
 	for (i=0; i<8; ++i)
@@ -215,7 +215,7 @@ void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 		UDGElementStiffness(fem, el, ke);
 
 		// add the inertial stiffness for dynamics
-		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
+		if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -312,7 +312,7 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix&
 
 	// calculate hourglass stiffness
 	// TODO: I need to get rid of this
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	double hg = pstep->m_hg;
 
 	double kab;

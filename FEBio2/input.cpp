@@ -111,7 +111,7 @@ void echo_input(FEM& fem)
 	}
 
 	// get the analysis step
-	FEAnalysisStep& step = dynamic_cast<FEAnalysisStep&>(*fem.m_pStep);
+	FEAnalysisStep& step = dynamic_cast<FEAnalysisStep&>(*fem.GetCurrentStep());
 
 	// get the FE mesh
 	FEMesh& mesh = fem.m_mesh;

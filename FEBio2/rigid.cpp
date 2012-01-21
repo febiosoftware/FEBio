@@ -18,7 +18,7 @@ void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// for dynamic analyses we do need to add the inertial stiffness of the rigid body
-	if (fem.m_pStep->m_nanalysis != FE_DYNAMIC) return;
+	if (fem.GetCurrentStep()->m_nanalysis != FE_DYNAMIC) return;
 
 	// element stiffness matrix
 	matrix ke;
@@ -105,7 +105,7 @@ void FERigidShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
 	// for dynamic analyses we do need to add the inertial stiffness of the rigid body
-	if (fem.m_pStep->m_nanalysis != FE_DYNAMIC) return;
+	if (fem.GetCurrentStep()->m_nanalysis != FE_DYNAMIC) return;
 
 	matrix ke;
 

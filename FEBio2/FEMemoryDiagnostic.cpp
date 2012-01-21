@@ -27,8 +27,8 @@ bool FEMemoryDiagnostic::Init()
 	if (m_iters <= 0) return false;
 
 	// turn off all output
-	m_fem.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
-	m_fem.m_pStep->SetPrintLevel(FE_PRINT_NEVER);
+	m_fem.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+	m_fem.GetCurrentStep()->SetPrintLevel(FE_PRINT_NEVER);
 
 	return true;
 }

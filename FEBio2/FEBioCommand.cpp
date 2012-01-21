@@ -90,7 +90,7 @@ int FEBioCmd_Conv::run(int nargs, char **argv)
 int FEBioCmd_Debug::run(int nargs, char** argv)
 {
 	assert(m_pfem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
 	bool bdebug = m_pfem->GetDebugFlag();
 	if (nargs == 1) bdebug = !bdebug;
 	else
@@ -114,8 +114,8 @@ int FEBioCmd_Dtmin::run(int nargs, char **argv)
 	assert(m_pfem);
 	if (nargs == 2)
 	{
-		m_pfem->m_pStep->m_dtmin = atof(argv[1]);
-		printf("Minumum time step size = %lg\n", m_pfem->m_pStep->m_dtmin);
+		m_pfem->GetCurrentStep()->m_dtmin = atof(argv[1]);
+		printf("Minumum time step size = %lg\n", m_pfem->GetCurrentStep()->m_dtmin);
 	}
 	else printf("invalid number of arguments for dtmin\n");
 	return 0;
@@ -142,7 +142,7 @@ int FEBioCmd_Plot::run(int nargs, char **argv)
 int FEBioCmd_Print::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
 	FESolver* psolver = pstep->m_psolver;
 
 	if (nargs > 2)
@@ -189,7 +189,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 int FEBioCmd_Restart::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
 	bool bdump = pstep->m_bDump;
 
 	if (nargs == 1) bdump = !bdump;
@@ -234,10 +234,10 @@ int FEBioCmd_Time::run(int nargs, char **argv)
 	nsec  = (int) (sec);
 	printf("Elapsed time       :  %d:%02d:%02d\n", nhour, nmin, nsec);
 
-	double endtime = m_pfem->m_pStep->m_tend;
+	double endtime = m_pfem->GetCurrentStep()->m_tend;
 
-	double pct = (m_pfem->m_ftime - m_pfem->m_pStep->m_dt) / endtime;
-	if ((pct != 0) && (m_pfem->m_pStep->m_ntimesteps != 0))
+	double pct = (m_pfem->m_ftime - m_pfem->GetCurrentStep()->m_dt) / endtime;
+	if ((pct != 0) && (m_pfem->GetCurrentStep()->m_ntimesteps != 0))
 	{
 		double sec1 = sec0*(1.0/pct - 1.0);
 		nhour = (int) (sec1 / 3600.0); sec1 -= nhour*3600;

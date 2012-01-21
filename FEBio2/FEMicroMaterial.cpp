@@ -40,7 +40,7 @@ void FEMicroMaterial::Init()
 	}
 
 	// make sure the RVE problem doesn't output anything to a plot file
-	m_rve.m_pStep->SetPlotLevel(FE_PLOT_NEVER);
+	m_rve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
 	// create the DC's for this RVE
 	PrepRVE();
@@ -229,7 +229,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	s /= V;
 */
 	// get the reaction force vector from the solid solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.GetCurrentStep());
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
@@ -257,7 +257,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	FEMesh& m = m_rve.m_mesh;
 
 	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.GetCurrentStep());
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// the element's stiffness matrix

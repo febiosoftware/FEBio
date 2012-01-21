@@ -355,7 +355,7 @@ void FESolidSolver::PrepStep(double time)
 	// NOTE: do this before the stresses are updated
 	// TODO: does it matter if the stresses are updated before
 	//       the material point data is initialized
-	FEMaterialPoint::dt = fem.m_pStep->m_dt;
+	FEMaterialPoint::dt = fem.GetCurrentStep()->m_dt;
 	FEMaterialPoint::time = fem.m_ftime;
 
 	FEMesh& mesh = m_fem.m_mesh;
@@ -393,7 +393,7 @@ bool FESolidSolver::Quasin(double time)
 
 	// Get the current step
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -425,14 +425,14 @@ bool FESolidSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	clog.printf("\n===== beginning time step %d : %lg =====\n", fem.m_pStep->m_ntimesteps+1, fem.m_ftime);
+	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
 	{
 		oldmode = clog.GetMode();
-		if ((fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" %d\n", m_niter+1);
 		clog.SetMode(oldmode);
@@ -504,8 +504,8 @@ bool FESolidSolver::Quasin(double time)
 
 		// print convergence summary
 		oldmode = clog.GetMode();
-		if ((fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" Nonlinear solution status: time= %lg\n", time); 
 		clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
@@ -623,7 +623,6 @@ bool FESolidSolver::Quasin(double time)
 				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
-				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
 				if (pstep->m_psolver->m_bfgs.m_maxups == 0)
 				{
 					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);

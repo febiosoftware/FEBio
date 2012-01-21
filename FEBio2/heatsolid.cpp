@@ -25,12 +25,14 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
+void FEHeatSolidDomain::HeatStiffnessMatrix(FENLSolver* pnls)
 {
 	int i, j, k;
 	vector<int> lm;
 
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = pnls->GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
+	FEHeatSolver* psolver = dynamic_cast<FEHeatSolver*>(pnls);
 
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -40,15 +42,15 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 
 		// build the element stiffness matrix
 		matrix ke(ne, ne);
-		ConductionStiffness(fem, el, ke);
+		ConductionStiffness(el, ke);
 
 		// set up the LM matrix
 		UnpackLM(el, lm);
 
-		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) 
+		if (pstep->m_nanalysis == FE_DYNAMIC) 
 		{
 			matrix kc(ne, ne);
-			CapacitanceStiffness(fem, el, kc);
+			CapacitanceStiffness(el, kc, pstep->m_dt);
 
 			// add capacitance matrix to conduction stiffness
 			ke += kc;
@@ -61,6 +63,7 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 					double q = 0;
 					for (k=0; k<ne; ++k)
 					{
+						// TODO: Do I need kc or ke here? Maybe I can move this to the solver class.
 						if (lm[k] >= 0) q += kc[j][k]*psolver->m_Tp[lm[k]];
 						else if (-lm[k]-2 >= 0) q += kc[j][k]*psolver->m_Tp[-lm[k]-2];
 					}
@@ -79,7 +82,7 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FEHeatSolver* psolver)
 //! This function calculates the element stiffness matrix for a particular
 //! element.
 //!
-void FEHeatSolidDomain::ConductionStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEHeatSolidDomain::ConductionStiffness(FESolidElement& el, matrix& ke)
 {
 	int i, j, n;
 
@@ -154,7 +157,7 @@ void FEHeatSolidDomain::ConductionStiffness(FEM& fem, FESolidElement& el, matrix
 }
 
 //-----------------------------------------------------------------------------
-void FEHeatSolidDomain::CapacitanceStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEHeatSolidDomain::CapacitanceStiffness(FESolidElement &el, matrix &ke, double dt)
 {
 	int i, j, n;
 
@@ -172,8 +175,6 @@ void FEHeatSolidDomain::CapacitanceStiffness(FEM& fem, FESolidElement &el, matri
 
 	// zero stiffness matrix
 	ke.zero();
-
-	double dt = fem.m_pStep->m_dt;
 
 	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*m_pMat);
 	double alpha = mat.m_c*mat.m_rho / dt;

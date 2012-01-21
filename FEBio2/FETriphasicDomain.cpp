@@ -148,7 +148,7 @@ void FETriphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
 	// make sure we are in poro-solute mode
-	assert(fem.m_pStep->m_nModule == FE_TRIPHASIC);
+	assert(fem.GetCurrentStep()->m_nModule == FE_TRIPHASIC);
 	
 	// element force vector
 	vector<double> fe;
@@ -156,7 +156,7 @@ void FETriphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	vector<int> elm;
 	
 	int NE = m_Elem.size();
-	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) {
 		for (i=0; i<NE; ++i)
 		{
 			// get the element
@@ -344,7 +344,7 @@ bool FETriphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -449,7 +449,7 @@ bool FETriphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -541,7 +541,7 @@ bool FETriphasicDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, vector<
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -738,7 +738,7 @@ bool FETriphasicDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, vecto
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -794,7 +794,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	
-	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) {
 		for (int iel=0; iel<NE; ++iel)
 		{
 			FESolidElement& el = m_Elem[iel];
@@ -947,7 +947,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FEM& fem, FESolidElement& el, 
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1452,7 +1452,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1848,7 +1848,7 @@ void FETriphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matr
 
 void FETriphasicDomain::TriphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert(fem.m_pStep->m_nModule == FE_TRIPHASIC);
+	assert(fem.GetCurrentStep()->m_nModule == FE_TRIPHASIC);
 	
 	int i, i3, j, j3, n;
 	
@@ -1996,8 +1996,8 @@ void FETriphasicDomain::UpdateStresses(FEModel &fem)
 	
 	FEMesh& mesh = *m_pMesh;
 	FEM& mdl = dynamic_cast<FEM&>(fem);
-	double dt = mdl.m_pStep->m_dt;
-	bool sstate = (mdl.m_pStep->m_nanalysis == FE_STEADY_STATE);
+	double dt = mdl.GetCurrentStep()->m_dt;
+	bool sstate = (mdl.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
 	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{

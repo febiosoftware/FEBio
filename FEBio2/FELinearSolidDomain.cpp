@@ -20,7 +20,7 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 
 	// initialize material point data
 	FEM& fem = dynamic_cast<FEM&>(mdl);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	bool bmerr = false;
 

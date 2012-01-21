@@ -23,7 +23,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 
 	// initialize material point data
 	FEM& fem = dynamic_cast<FEM&>(mdl);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	bool bmerr = false;
 
@@ -608,7 +608,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 		ElementStiffness(fem, iel, ke);
 
 		// add the inertial stiffness for dynamics
-		if (fem.m_pStep->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
+		if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
 
 		// add body force stiffness
 		if (fem.HasBodyForces()) BodyForceStiffness(fem, el, ke);
@@ -663,7 +663,10 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el
 	// get the material
 	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 
-	double a = 4.0 / (fem.m_pStep->m_dt*fem.m_pStep->m_dt);
+	// get the analysis
+	FEAnalysis* pstep = fem.GetCurrentStep();
+
+	double a = 4.0 / (pstep->m_dt*pstep->m_dt);
 	double d = pm->Density();
 	double kab;
 

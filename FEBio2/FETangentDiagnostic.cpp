@@ -263,7 +263,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	FEM& fem = m_fem;
 
 	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh

@@ -288,7 +288,7 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 		// assemble element matrix in global stiffness matrix
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 
-		if (fem.m_pStep->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
+		if (fem.GetCurrentStep()->GetPrintLevel() == FE_PRINT_MINOR_ITRS_EXP)
 		{
 			fprintf(stderr, "Calculating stiffness matrix: %.1lf %% \r", 100.0*(iel)/ NS);
 		}

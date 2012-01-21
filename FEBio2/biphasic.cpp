@@ -106,7 +106,7 @@ void FEBiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	
 	int NE = m_Elem.size();
 
-	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) {
 		for (i=0; i<NE; ++i)
 		{
 			// get the element
@@ -254,7 +254,7 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -357,7 +357,7 @@ bool FEBiphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -412,7 +412,7 @@ void FEBiphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 
 	// repeat over all solid elements
 	int NE = m_Elem.size();
-	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) {
 		for (int iel=0; iel<NE; ++iel)
 		{
 			FESolidElement& el = m_Elem[iel];
@@ -557,7 +557,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -748,7 +748,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, 
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -880,9 +880,9 @@ void FEBiphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matri
 
 void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert((fem.m_pStep->m_nModule == FE_BIPHASIC)
-		   || (fem.m_pStep->m_nModule == FE_POROSOLUTE)
-		   || (fem.m_pStep->m_nModule == FE_TRIPHASIC));
+	assert((fem.GetCurrentStep()->m_nModule == FE_BIPHASIC)
+		   || (fem.GetCurrentStep()->m_nModule == FE_POROSOLUTE)
+		   || (fem.GetCurrentStep()->m_nModule == FE_TRIPHASIC));
 	
 	int i, i3, j, j3, n;
 	

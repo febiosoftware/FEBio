@@ -53,8 +53,8 @@ bool LSDYNAPlotFile::Open(FEModel& mdl, const char* szfile)
 	FEM& fem = dynamic_cast<FEM&>(mdl);
 	m_pfem = &fem;
 
-	int nmode = fem.m_pStep->m_nModule;
-	int ntype = fem.m_pStep->m_nanalysis;
+	int nmode = fem.GetCurrentStep()->m_nModule;
+	int ntype = fem.GetCurrentStep()->m_nanalysis;
 
 	// check the field values
 	if (m_nfield[0] == -1) 
@@ -1323,7 +1323,7 @@ void LSDYNAPlotFile::write_reaction_forces()
 {
 	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEMesh& mesh = fem.m_mesh;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 

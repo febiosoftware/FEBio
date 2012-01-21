@@ -111,7 +111,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
 	// prepare step
-	FEMaterialPoint::dt = fem.m_pStep->m_dt;
+	FEMaterialPoint::dt = fem.GetCurrentStep()->m_dt;
 	FEMaterialPoint::time = fem.m_ftime;
 
 	FEMesh& mesh = m_fem.m_mesh;
@@ -209,7 +209,7 @@ void FELinearSolidSolver::Update(vector<double>& u)
 
 	// dump all states to the plot file
 	// when requested
-	if (fem.m_pStep->m_nplot == FE_PLOT_MINOR_ITRS) fem.m_plot->Write(m_fem);
+	if (fem.GetCurrentStep()->m_nplot == FE_PLOT_MINOR_ITRS) fem.m_plot->Write(m_fem);
 }
 
 //-----------------------------------------------------------------------------

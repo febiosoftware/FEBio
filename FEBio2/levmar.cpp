@@ -76,7 +76,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	fem.AddCallback(fecb, &opt);
 
 	// don't plot anything
-	fem.m_pStep->m_nplot = FE_PLOT_NEVER;
+	fem.GetCurrentStep()->m_nplot = FE_PLOT_NEVER;
 
 	// set the this pointer
 	m_pThis = this;

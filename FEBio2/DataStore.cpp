@@ -158,7 +158,7 @@ bool DataRecord::Write()
 {
 	FEM& fem = *m_pfem;
 
-	int nstep = fem.m_pStep->m_ntimesteps;
+	int nstep = fem.GetCurrentStep()->m_ntimesteps;
 	double ftime = fem.m_ftime;
 	double val;
 
@@ -348,7 +348,7 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 {
 	FEM& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 	int nnode = item - 1;

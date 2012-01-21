@@ -46,7 +46,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
 	FEAnalysisStep* pstep = new FEAnalysisStep(fem);
 	fem.AddStep(pstep);
 	fem.m_nStep = 0;
-	fem.m_pStep = pstep;
+	fem.SetCurrentStep(pstep);
 	m_pStep = pstep;
 
 	// define file structure

@@ -1,10 +1,6 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
-
-//-----------------------------------------------------------------------------
-// Forward declaration
-class FEM;
-class FEHeatSolver;
+#include "FECore/FENLSolver.h"
 
 //-----------------------------------------------------------------------------
 //! domain class for 3D heat elements
@@ -23,12 +19,12 @@ public:
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	void HeatStiffnessMatrix(FEHeatSolver* psolver);
+	void HeatStiffnessMatrix(FENLSolver* psolver);
 
 protected:
 	//! calculate the conductive element stiffness matrix
-	void ConductionStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ConductionStiffness(FESolidElement& el, matrix& ke);
 
 	//! calculate the capacitance element stiffness matrix
-	void CapacitanceStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void CapacitanceStiffness(FESolidElement& el, matrix& ke, double dt);
 };

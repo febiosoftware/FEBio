@@ -162,7 +162,7 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 bool FERestartImport::ParseControlSection(XMLTag& tag)
 {
 	FEM& fem = *m_pfem;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	++tag;
 	do
@@ -190,7 +190,7 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		{
 			const char* szf = tag.AttributeValue("file", true);
 			if (szf) fem.SetDumpFilename(szf);
-			tag.value(fem.m_pStep->m_bDump);
+			tag.value(fem.GetCurrentStep()->m_bDump);
 		}
 		else if (tag == "time_stepper")
 		{

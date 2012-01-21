@@ -132,7 +132,7 @@ bool FEBiphasicSolver::Quasin(double time)
 
 	// get the current step
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	// make-sure this is a poro-elastic problem
 	assert(pstep->m_nModule == FE_BIPHASIC);
@@ -173,8 +173,8 @@ bool FEBiphasicSolver::Quasin(double time)
 	do
 	{
 		oldmode = clog.GetMode();
-		if ((fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" %d\n", m_niter+1);
 		clog.SetMode(oldmode);
@@ -270,8 +270,8 @@ bool FEBiphasicSolver::Quasin(double time)
 
 		// print convergence summary
 		oldmode = clog.GetMode();
-		if ((fem.m_pStep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(fem.m_pStep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" Nonlinear solution status: time= %lg\n", time); 
 		clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
@@ -392,7 +392,7 @@ bool FEBiphasicSolver::Quasin(double time)
 				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
-				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 				if (pstep->m_psolver->m_bfgs.m_maxups == 0)
 				{
 					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
@@ -447,7 +447,7 @@ bool FEBiphasicSolver::Quasin(double time)
 void FEBiphasicSolver::UpdateContact()
 {
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEAnalysis* pstep = fem.m_pStep;
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// If this analysis is a poroelastic analysis that uses
 	// a biphasic contact interface, we need to make sure that

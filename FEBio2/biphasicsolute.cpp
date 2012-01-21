@@ -82,9 +82,10 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	int i, j;
 	
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	
 	// make sure we are in poro-solute mode
-	assert(fem.m_pStep->m_nModule == FE_POROSOLUTE);
+	assert(pstep->m_nModule == FE_POROSOLUTE);
 	
 	// element force vector
 	vector<double> fe;
@@ -92,7 +93,7 @@ void FEBiphasicSoluteDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 	vector<int> elm;
 	
 	int NE = m_Elem.size();
-	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+	if (pstep->m_nanalysis == FE_STEADY_STATE) {
 		for (i=0; i<NE; ++i)
 		{
 			// get the element
@@ -260,7 +261,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -365,7 +366,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, v
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -456,7 +457,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -611,7 +612,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, 
 	zero(fe);
 	
 	// get the time step value
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -680,7 +681,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FESolidSolver* psolver)
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
-	if (fem.m_pStep->m_nanalysis == FE_STEADY_STATE) {
+	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE) {
 		for (int iel=0; iel<NE; ++iel)
 		{
 			FESolidElement& el = m_Elem[iel];
@@ -827,7 +828,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1122,7 +1123,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1322,7 +1323,7 @@ void FEBiphasicSoluteDomain::SolidElementStiffness(FEM& fem, FESolidElement& el,
 
 void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert(fem.m_pStep->m_nModule == FE_POROSOLUTE);
+	assert(fem.GetCurrentStep()->m_nModule == FE_POROSOLUTE);
 	
 	int i, i3, j, j3, n;
 	
@@ -1467,8 +1468,8 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 
 	FEMesh& mesh = *m_pMesh;
 	FEM& mdl = dynamic_cast<FEM&>(fem);
-	double dt = mdl.m_pStep->m_dt;
-	bool sstate = (mdl.m_pStep->m_nanalysis == FE_STEADY_STATE);
+	double dt = mdl.GetCurrentStep()->m_dt;
+	bool sstate = (mdl.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
 	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{

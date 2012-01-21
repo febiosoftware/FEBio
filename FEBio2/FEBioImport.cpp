@@ -88,9 +88,9 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		FEAnalysisStep* pstep = new FEAnalysisStep(fem);
 		fem.AddStep(pstep);
 		fem.m_nStep = 0;
-		fem.m_pStep = pstep;
+		fem.SetCurrentStep(pstep);
 	}
-	assert(fem.m_pStep);
+	assert(fem.GetCurrentStep());
 
 	// get a pointer to the first step
 	// since we assume that the FEM object will always have
@@ -2007,7 +2007,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	}
 
 	// open temperature dofs for heat-transfer problems
-	if (fem.m_pStep->m_nModule == FE_HEAT)
+	if (fem.GetCurrentStep()->m_nModule == FE_HEAT)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
@@ -2019,7 +2019,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 
 	// open temperature and displacement dofs 
 	// for coupled heat-solid problems
-	if (fem.m_pStep->m_nModule == FE_HEAT_SOLID)
+	if (fem.GetCurrentStep()->m_nModule == FE_HEAT_SOLID)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
@@ -2055,17 +2055,17 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 	FEMesh* pm = &fem.m_mesh;
 
 	// get the module
-	if (fem.m_pStep->m_nModule == FE_HEAT)
+	if (fem.GetCurrentStep()->m_nModule == FE_HEAT)
 	{
 		if ((etype == ET_HEX) || (etype == ET_HEX20) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
-	else if (fem.m_pStep->m_nModule == FE_LINEAR_SOLID)
+	else if (fem.GetCurrentStep()->m_nModule == FE_LINEAR_SOLID)
 	{
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_LINEAR_SOLID_DOMAIN;
 		else return 0;
 	}
-	else if (fem.m_pStep->m_nModule == FE_HEAT_SOLID)
+	else if (fem.GetCurrentStep()->m_nModule == FE_HEAT_SOLID)
 	{
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET))
 		{

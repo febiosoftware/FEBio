@@ -177,7 +177,7 @@ void FERigidJoint::JointStiffness()
 		LM[j+6] = RBb.m_LM[j];
 	}
 
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
 	pstep->m_psolver->m_pK->Assemble(ke, LM);
 }
 

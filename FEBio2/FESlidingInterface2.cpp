@@ -284,7 +284,7 @@ void FESlidingInterface2::Init()
 		fem.SetSymmetryFlag(false);
 
 		// make sure we are using full-Newton
-		FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+		FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 		if (bporo && (pstep->m_psolver->m_bfgs.m_maxups != 0))
 		{
 			pstep->m_psolver->m_bfgs.m_maxups = 0;
@@ -555,7 +555,7 @@ void FESlidingInterface2::Update(int niter)
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
 	// also reset number of iterations after each augmentation
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.m_pStep);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	if (pstep->m_psolver->m_niter == 0) {
 		biter = 0;
 		naug = pstep->m_psolver->m_naug;
@@ -717,7 +717,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F, FENLSolver* psolver)
 
 	// if we're using the symmetric formulation
 	// we need to multiply with the timestep
-	double dt = fem.m_pStep->m_dt;
+	double dt = fem.GetCurrentStep()->m_dt;
 
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
@@ -1256,7 +1256,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* pnls)
 						// the variable dt is either the timestep or one
 						// depending on whether we are using the symmetric
 						// poro version or not.
-						double dt = fem.m_pStep->m_dt;
+						double dt = fem.GetCurrentStep()->m_dt;
 						
 						double epsp = (tn > 0) ? m_epsp*ss.m_epsp[ni] : 0.;
 						
