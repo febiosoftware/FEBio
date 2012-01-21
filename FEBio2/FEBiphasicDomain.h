@@ -54,8 +54,8 @@ protected:
 	bool ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);
 	
 	//! calculates the solid element stiffness matrix
-	void SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void SolidElementStiffness(FESolidElement& el, matrix& ke);
 	
 	//! material stiffness component
-	void BiphasicMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void BiphasicMaterialStiffness(FESolidElement& el, matrix& ke);
 };

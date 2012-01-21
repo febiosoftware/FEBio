@@ -536,7 +536,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, ma
 	// calculate solid stiffness matrix
 	int ndof = 3*el.Nodes();
 	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(fem, el, ks);
+	SolidElementStiffness(el, ks);
 	
 	// copy solid stiffness matrix into ke
 	for (i=0; i<neln; ++i)
@@ -727,7 +727,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, 
 	// calculate solid stiffness matrix
 	int ndof = 3*el.Nodes();
 	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(fem, el, ks);
+	SolidElementStiffness(el, ks);
 	
 	// copy solid stiffness matrix into ke
 	for (i=0; i<neln; ++i)
@@ -857,10 +857,10 @@ bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, 
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEBiphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEBiphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
-	BiphasicMaterialStiffness(fem, el, ke);
+	BiphasicMaterialStiffness(el, ke);
 	
 	// calculate geometrical stiffness
 	GeometricalStiffness(el, ke);
@@ -878,12 +878,8 @@ void FEBiphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matri
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEBiphasicDomain::BiphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEBiphasicDomain::BiphasicMaterialStiffness(FESolidElement &el, matrix &ke)
 {
-	assert((fem.GetCurrentStep()->m_nModule == FE_BIPHASIC)
-		   || (fem.GetCurrentStep()->m_nModule == FE_POROSOLUTE)
-		   || (fem.GetCurrentStep()->m_nModule == FE_TRIPHASIC));
-	
 	int i, i3, j, j3, n;
 	
 	// Get the current element's data

@@ -449,7 +449,7 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FEFluidFlux::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 
 	matrix ke;
@@ -544,7 +544,7 @@ void FEFluidFlux::StiffnessMatrix(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 void FEFluidFlux::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 
 	vector<double> fe;

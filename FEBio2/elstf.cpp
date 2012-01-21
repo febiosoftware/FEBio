@@ -804,7 +804,6 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	double *H, kab;
 
 	// get the mesh
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// allocate F
@@ -816,7 +815,7 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	vector<int> lm;
 
 	// calculate F
-	double dt = fem.GetCurrentStep()->m_dt;
+	double dt = m_fem.GetCurrentStep()->m_dt;
 	double a = 4.0 / dt;
 	double b = a / dt;
 	for (i=0; i<mesh.Nodes(); ++i)
