@@ -84,7 +84,6 @@ void FEElasticShellDomain::InitElements()
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::Serialize(DumpFile &ar)
 {
-	FEM& fem = dynamic_cast<FEM&>(*ar.GetFEModel());
 	if (ar.IsSaving())
 	{
 		for (size_t i=0; i<m_Elem.size(); ++i)
@@ -105,6 +104,7 @@ void FEElasticShellDomain::Serialize(DumpFile &ar)
 	else
 	{
 		int n, mat;
+		FEModel& fem = *ar.GetFEModel();
 
 		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
@@ -133,7 +133,7 @@ void FEElasticShellDomain::Serialize(DumpFile &ar)
 
 void FEElasticShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	// element force vector
 	vector<double> fe;
@@ -259,7 +259,7 @@ void FEElasticShellDomain::InternalForces(FEShellElement& el, vector<double>& fe
 
 void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	matrix ke;
 
@@ -280,7 +280,7 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 		ke.resize(ndof, ndof);
 
 		// calculate the element stiffness matrix
-		ElementStiffness(fem, iel, ke);
+		ElementStiffness(iel, ke);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -298,7 +298,7 @@ void FEElasticShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 //-----------------------------------------------------------------------------
 //! Calculates the shell element stiffness matrix
 
-void FEElasticShellDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
+void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 {
 	FEShellElement& el = Element(iel);
 
@@ -562,7 +562,7 @@ void FEElasticShellDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates body forces for shells
 
-void FEElasticShellDomain::BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomain::BodyForces(FEModel& fem, FEShellElement& el, vector<double>& fe)
 {
 	int NF = fem.BodyForces();
 	for (int nf = 0; nf < NF; ++nf)

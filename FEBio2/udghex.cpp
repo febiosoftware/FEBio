@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	// element force vector
 	vector<double> fe;
@@ -48,7 +48,7 @@ void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
 //! calculates the internal equivalent nodal forces for enhanced strain
 //! solid elements.
 
-void FEUDGHexDomain::UDGInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
+void FEUDGHexDomain::UDGInternalForces(FEModel& fem, FESolidElement& el, vector<double>& fe)
 {
 	// make sure this element is of the correct type
 	assert(el.Type() == FE_UDGHEX);
@@ -95,7 +95,7 @@ void FEUDGHexDomain::UDGInternalForces(FEM& fem, FESolidElement& el, vector<doub
 //-----------------------------------------------------------------------------
 //! calculates the hourglass forces
 
-void FEUDGHexDomain::UDGHourglassForces(FEM& fem, FESolidElement &el, vector<double> &fe)
+void FEUDGHexDomain::UDGHourglassForces(FEModel& fem, FESolidElement &el, vector<double> &fe)
 {
 	int i;
 
@@ -232,7 +232,7 @@ void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEUDGHexDomain::UDGElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEUDGHexDomain::UDGElementStiffness(FEModel& fem, FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness
 	UDGMaterialStiffness(el, ke);
@@ -256,7 +256,7 @@ void FEUDGHexDomain::UDGElementStiffness(FEM& fem, FESolidElement& el, matrix& k
 //-----------------------------------------------------------------------------
 //! calculates the hourglass stiffness for UDG hex elements
 
-void FEUDGHexDomain::UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEUDGHexDomain::UDGHourglassStiffness(FEModel& fem, FESolidElement& el, matrix& ke)
 {
 	int i, j;
 

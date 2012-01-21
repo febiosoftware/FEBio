@@ -27,17 +27,17 @@ public:
 
 protected:
 	//! Calculates the internal stress vector for enhanced strain hex elements
-	void UDGInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+	void UDGInternalForces(FEModel& fem, FESolidElement& el, vector<double>& fe);
 
 	//! calculates hourglass forces for the UDG element
-	void UDGHourglassForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+	void UDGHourglassForces(FEModel& fem, FESolidElement& el, vector<double>& fe);
 
 protected:
 	//! calculate element stiffness
-	void UDGElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void UDGElementStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! hourglass stiffness for UDG hex elements
-	void UDGHourglassStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void UDGHourglassStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! geometrical stiffness for UDG hex elements
 	void UDGGeometricalStiffness(FESolidElement& el, matrix& ke);

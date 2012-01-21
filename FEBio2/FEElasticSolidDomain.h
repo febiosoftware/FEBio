@@ -64,7 +64,7 @@ protected:
 	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the solid element inertial stiffness matrix
-	void ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the stiffness matrix due to body forces 
 	void BodyForceStiffness(FEModel& fem, FESolidElement& el, matrix& ke);

@@ -95,7 +95,6 @@ bool FESolidSolver::SolveStep(double time)
 void FESolidSolver::PrepStep(double time)
 {
 	int i, j;
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
 	// initialize counters
 	m_niter = 0;	// nr of iterations
@@ -108,16 +107,19 @@ void FESolidSolver::PrepStep(double time)
 	// zero total displacements
 	zero(m_Ui);
 
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	FEMesh& mesh = m_fem.m_mesh;
+
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
-	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
+	for (i=0; i<mesh.Nodes(); ++i)
 	{
-		m_fem.m_mesh.Node(i).m_rp = m_fem.m_mesh.Node(i).m_rt;
-		m_fem.m_mesh.Node(i).m_vp = m_fem.m_mesh.Node(i).m_vt;
-		m_fem.m_mesh.Node(i).m_ap = m_fem.m_mesh.Node(i).m_at;
+		mesh.Node(i).m_rp = mesh.Node(i).m_rt;
+		mesh.Node(i).m_vp = mesh.Node(i).m_vt;
+		mesh.Node(i).m_ap = mesh.Node(i).m_at;
 		// ---> TODO: move to the FEPoroSoluteSolver
 		for (int k=0; k<MAX_CDOFS; ++k)
-			m_fem.m_mesh.Node(i).m_cp[k] = m_fem.m_mesh.Node(i).m_ct[k];
+			mesh.Node(i).m_cp[k] = mesh.Node(i).m_ct[k];
 	}
 
 	// apply concentrated nodal forces
@@ -358,7 +360,6 @@ void FESolidSolver::PrepStep(double time)
 	FEMaterialPoint::dt = fem.GetCurrentStep()->m_dt;
 	FEMaterialPoint::time = fem.m_ftime;
 
-	FEMesh& mesh = m_fem.m_mesh;
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
 	// intialize the stresses

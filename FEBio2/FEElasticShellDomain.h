@@ -42,7 +42,7 @@ public:
 	void StiffnessMatrix(FESolidSolver* psolver);
 
 	//! calculates the shell element stiffness matrix
-	void ElementStiffness(FEM& fem, int iel, matrix& ke);
+	void ElementStiffness(int iel, matrix& ke);
 
 	// --- R E S I D U A L ---
 
@@ -53,7 +53,7 @@ public:
 	void InternalForces(FEShellElement& el, vector<double>& fe);
 
 	//! Calculate extenral body forces for shell elements
-	void BodyForces(FEM& fem, FEShellElement& el, vector<double>& fe);
+	void BodyForces(FEModel& fem, FEShellElement& el, vector<double>& fe);
 };
 
 //-----------------------------------------------------------------------------

@@ -650,7 +650,7 @@ void FEElasticSolidDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 
 //-----------------------------------------------------------------------------
 //! calculates element inertial stiffness matrix
-void FEElasticSolidDomain::ElementInertialStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEElasticSolidDomain::ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke)
 {
 	int i, j, n;
 

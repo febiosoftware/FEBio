@@ -195,8 +195,6 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 	// first call the base class
 	if (FEElasticSolidDomain::Initialize(mdl) == false) return false;
 
-	FEM& fem = dynamic_cast<FEM&>(mdl);
-
 	// next, we need to identify all the nodes that belong to this domain
 	// we do this by looping over all the elements and tagging the nodes
 	int NN = m_pMesh->Nodes();
@@ -480,7 +478,7 @@ void FEUT4Domain::NodalResidual(FESolidSolver* psolver, vector<double>& R)
 //! This function calculates the element contribution to the residual
 void FEUT4Domain::ElementResidual(FESolidSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	// element force vector
 	vector<double> fe;
