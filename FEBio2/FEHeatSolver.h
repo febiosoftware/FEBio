@@ -38,6 +38,16 @@ protected:
 	//! update solution
 	void Update(vector<double>& u);
 
+	//! Prep the step
+	void PrepStep();
+
+protected:	// Residual functions
+	//! Nodal fluxes
+	void NodalFluxes(vector<double>& R);
+
+	//! Surface fluxes
+	void SurfaceFluxes(vector<double>& R);
+
 public:
 	//! assemble element stiffness matrix
 	void AssembleStiffness(matrix& ke, vector<int>& lm);

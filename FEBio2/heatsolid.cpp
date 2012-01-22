@@ -5,6 +5,14 @@
 #include "FEHeatSolver.h"
 
 //-----------------------------------------------------------------------------
+FEDomain* FEHeatSolidDomain::Clone()
+{
+	FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
 //! Unpack the element. That is, copy element data in traits structure
 
 void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
@@ -25,19 +33,16 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FEHeatSolidDomain::HeatStiffnessMatrix(FENLSolver* pnls)
+// Calculate the heat conduction matrix
+void FEHeatSolidDomain::ConductionMatrix(FENLSolver* pnls)
 {
-	int i, j, k;
 	vector<int> lm;
 
-	FEModel& fem = pnls->GetFEModel();
-	FEAnalysis* pstep = fem.GetCurrentStep();
 	FEHeatSolver* psolver = dynamic_cast<FEHeatSolver*>(pnls);
 
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-
 		int ne = el.Nodes();
 
 		// build the element stiffness matrix
@@ -47,34 +52,48 @@ void FEHeatSolidDomain::HeatStiffnessMatrix(FENLSolver* pnls)
 		// set up the LM matrix
 		UnpackLM(el, lm);
 
-		if (pstep->m_nanalysis == FE_DYNAMIC) 
+		// assemble into global matrix
+		psolver->AssembleStiffness(ke, lm);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Calculate the capacitance matrix
+void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* pnls, double dt)
+{
+	int i, j, k;
+	vector<int> lm;
+
+	FEHeatSolver* psolver = dynamic_cast<FEHeatSolver*>(pnls);
+
+	for (i=0; i<(int) m_Elem.size(); ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		int ne = el.Nodes();
+
+		// element capacitance matrix
+		matrix kc(ne, ne);
+		CapacitanceStiffness(el, kc, dt);
+
+		// subtract from RHS
+		for (j=0; j<ne; ++j)
 		{
-			matrix kc(ne, ne);
-			CapacitanceStiffness(el, kc, pstep->m_dt);
-
-			// add capacitance matrix to conduction stiffness
-			ke += kc;
-
-			// subtract from RHS
-			for (j=0; j<ne; ++j)
+			if (lm[j] >= 0)
 			{
-				if (lm[j] >= 0)
+				double q = 0;
+				for (k=0; k<ne; ++k)
 				{
-					double q = 0;
-					for (k=0; k<ne; ++k)
-					{
-						// TODO: Do I need kc or ke here? Maybe I can move this to the solver class.
-						if (lm[k] >= 0) q += kc[j][k]*psolver->m_Tp[lm[k]];
-						else if (-lm[k]-2 >= 0) q += kc[j][k]*psolver->m_Tp[-lm[k]-2];
-					}
-
-					psolver->m_R[lm[j]] += q;
+					// TODO: Do I need kc or ke here? Maybe I can move this to the solver class.
+					if (lm[k] >= 0) q += kc[j][k]*psolver->m_Tp[lm[k]];
+					else if (-lm[k]-2 >= 0) q += kc[j][k]*psolver->m_Tp[-lm[k]-2];
 				}
+
+				psolver->m_R[lm[j]] += q;
 			}
 		}
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(ke, lm);
+		psolver->AssembleStiffness(kc, lm);
 	}
 }
 

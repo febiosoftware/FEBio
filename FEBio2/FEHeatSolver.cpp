@@ -97,10 +97,8 @@ bool FEHeatSolver::InitEquations()
 }
 
 //-----------------------------------------------------------------------------
-//! solve a time step
-bool FEHeatSolver::SolveStep(double time)
+void FEHeatSolver::PrepStep()
 {
-	// set up the prescribed temperatures vector
 	zero(m_u);
 	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
 	{
@@ -124,6 +122,14 @@ bool FEHeatSolver::SolveStep(double time)
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! solve a time step
+bool FEHeatSolver::SolveStep(double time)
+{
+	// set up the prescribed temperatures vector
+	PrepStep();
 
 	// build the residual
 	Residual();
@@ -166,13 +172,24 @@ void FEHeatSolver::Update(vector<double>& u)
 //! Calculate the residual
 void FEHeatSolver::Residual()
 {
+	// intialize residual to zero
 	zero(m_R);
 
-	// apply nodal fluxes
+	// Add nodal flux contributions
+	NodalFluxes(m_R);
+
+	// add surface fluxes
+	SurfaceFluxes(m_R);
+}
+
+//-----------------------------------------------------------------------------
+//! Add nodal fluxes to residual
+void FEHeatSolver::NodalFluxes(vector<double>& R)
+{
 	int i, id, bc, lc, n;
 	double s, f;
 
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	// get the FE mesh
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over nodal force cards
@@ -193,16 +210,22 @@ void FEHeatSolver::Residual()
 			if ((n >= 0) && (bc == DOF_T)) 
 			{
 				f = s*m_fem.GetLoadCurve(lc)->Value();
-				m_R[n] = f;
+				R[n] = f;
 			}
 		}
 	}
+}
 
-	// add surface fluxes
-	for (i=0; i<(int) fem.m_SL.size(); ++i)
+//-----------------------------------------------------------------------------
+//! Calculate heat surface flux contribution to residual.
+void FEHeatSolver::SurfaceFluxes(vector<double>& R)
+{
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	int nsl = (int) fem.m_SL.size();
+	for (int i=0; i<nsl; ++i)
 	{
 		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(fem.m_SL[i]);
-		if (phf) phf->Residual(this, m_R);
+		if (phf) phf->Residual(this, R);
 	}
 }
 
@@ -217,26 +240,23 @@ bool FEHeatSolver::ReformStiffness()
 	if (!CreateStiffness(true)) return false;
 
 	// calculate the stiffness matrices
-	bool bret = StiffnessMatrix();
+	if (!StiffnessMatrix()) return false;
 
-	if (bret)
+	// factorize the stiffness matrix
+	m_SolverTime.start();
 	{
-		m_SolverTime.start();
-		{
-			// factorize the stiffness matrix
-			m_plinsolve->Factor();
-		}
-		m_SolverTime.stop();
-
-		// increase total nr of reformations
-		m_nref++;
-		m_ntotref++;
-
-		// reset bfgs update counter
-		m_bfgs.m_nups = 0;
+		m_plinsolve->Factor();
 	}
+	m_SolverTime.stop();
 
-	return bret;
+	// increase total nr of reformations
+	m_nref++;
+	m_ntotref++;
+
+	// reset bfgs update counter
+	m_bfgs.m_nups = 0;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -245,7 +265,11 @@ bool FEHeatSolver::ReformStiffness()
 //! contribution to the global stiffness matrix from each domain.
 bool FEHeatSolver::StiffnessMatrix()
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	// see if this is a dynamic problem
+	bool bdyn = (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC);
+
+	// get the time step size
+	double dt = m_fem.GetCurrentStep()->m_dt;
 
 	// zero the stiffness matrix
 	m_pK->Zero();
@@ -254,7 +278,12 @@ bool FEHeatSolver::StiffnessMatrix()
 	for (int i=0; i<(int) m_Dom.size(); ++i)
 	{
 		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(*Domain(i));
-		bd.HeatStiffnessMatrix(this);
+
+		// add the conduction stiffness
+		bd.ConductionMatrix(this);
+
+		// for a dynamic analysis add the capacitance matrix
+		if (bdyn) bd.CapacitanceMatrix(this, dt);
 	}
 
 	return true;

@@ -7,19 +7,20 @@
 class FEHeatSolidDomain : public FESolidDomain
 {
 public:
+	//! constructor
 	FEHeatSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_HEAT_SOLID_DOMAIN, pm, pmat) {}
 
-	FEDomain* Clone()
-	{
-		FEHeatSolidDomain* pd = new FEHeatSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
+	//! Create a clone of this domain
+	FEDomain* Clone();
 
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	void HeatStiffnessMatrix(FENLSolver* psolver);
+	//! Calculate the conduction stiffness 
+	void ConductionMatrix(FENLSolver* psolver);
+
+	//! Calculate capacitance stiffness matrix
+	void CapacitanceMatrix(FENLSolver* psolver, double dt);
 
 protected:
 	//! calculate the conductive element stiffness matrix
