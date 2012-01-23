@@ -24,8 +24,8 @@ public:
 
 protected:
 	//! calculate the conductive element stiffness matrix
-	void ConductionStiffness(FESolidElement& el, matrix& ke);
+	void ElementConduction(FESolidElement& el, matrix& ke);
 
 	//! calculate the capacitance element stiffness matrix
-	void CapacitanceStiffness(FESolidElement& el, matrix& ke, double dt);
+	void ElementCapacitance(FESolidElement& el, matrix& ke, double dt);
 };

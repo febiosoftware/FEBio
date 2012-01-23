@@ -50,7 +50,7 @@ protected:	// Residual functions
 
 public:
 	//! assemble element stiffness matrix
-	void AssembleStiffness(matrix& ke, vector<int>& lm);
+	void AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke);
 
 public:
 	vector<double>	m_T;	//!< temperature array

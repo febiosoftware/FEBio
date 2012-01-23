@@ -34,12 +34,12 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 // Calculate the heat conduction matrix
-void FEHeatSolidDomain::ConductionMatrix(FENLSolver* pnls)
+void FEHeatSolidDomain::ConductionMatrix(FENLSolver* psolver)
 {
 	vector<int> lm;
+	vector<int> en;
 
-	FEHeatSolver* psolver = dynamic_cast<FEHeatSolver*>(pnls);
-
+	// loop over all elements in domain
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -47,13 +47,17 @@ void FEHeatSolidDomain::ConductionMatrix(FENLSolver* pnls)
 
 		// build the element stiffness matrix
 		matrix ke(ne, ne);
-		ConductionStiffness(el, ke);
+		ElementConduction(el, ke);
+
+		// setup element node array
+		en.resize(ne);
+		for (int j=0; j<ne; ++j) en[j] = el.m_node[j];
 
 		// set up the LM matrix
 		UnpackLM(el, lm);
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(ke, lm);
+		psolver->AssembleStiffness(en, lm, ke);
 	}
 }
 
@@ -63,9 +67,11 @@ void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* pnls, double dt)
 {
 	int i, j, k;
 	vector<int> lm;
+	vector<int> en;
 
 	FEHeatSolver* psolver = dynamic_cast<FEHeatSolver*>(pnls);
 
+	// loop over all elements in domain
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
@@ -73,7 +79,7 @@ void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* pnls, double dt)
 
 		// element capacitance matrix
 		matrix kc(ne, ne);
-		CapacitanceStiffness(el, kc, dt);
+		ElementCapacitance(el, kc, dt);
 
 		// subtract from RHS
 		for (j=0; j<ne; ++j)
@@ -92,8 +98,15 @@ void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* pnls, double dt)
 			}
 		}
 
+		// setup element node array
+		en.resize(ne);
+		for (j=0; j<ne; ++j) en[j] = el.m_node[j];
+
+		// set up the LM matrix
+		UnpackLM(el, lm);
+
 		// assemble into global matrix
-		psolver->AssembleStiffness(kc, lm);
+		psolver->AssembleStiffness(en, lm, kc);
 	}
 }
 
@@ -101,7 +114,7 @@ void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* pnls, double dt)
 //! This function calculates the element stiffness matrix for a particular
 //! element.
 //!
-void FEHeatSolidDomain::ConductionStiffness(FESolidElement& el, matrix& ke)
+void FEHeatSolidDomain::ElementConduction(FESolidElement& el, matrix& ke)
 {
 	int i, j, n;
 
@@ -176,7 +189,7 @@ void FEHeatSolidDomain::ConductionStiffness(FESolidElement& el, matrix& ke)
 }
 
 //-----------------------------------------------------------------------------
-void FEHeatSolidDomain::CapacitanceStiffness(FESolidElement &el, matrix &ke, double dt)
+void FEHeatSolidDomain::ElementCapacitance(FESolidElement &el, matrix &ke, double dt)
 {
 	int i, j, n;
 

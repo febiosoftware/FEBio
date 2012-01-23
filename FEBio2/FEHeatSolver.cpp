@@ -294,7 +294,7 @@ bool FEHeatSolver::StiffnessMatrix()
 //! This function also modifies the residual according to the prescribed
 //! degrees of freedom. 
 //!
-void FEHeatSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
+void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke)
 {
 	// assemble into the global stiffness
 	m_pK->Assemble(ke, lm);
