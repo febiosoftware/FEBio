@@ -345,10 +345,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEFluidFlux.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEHeatSolver.cpp"
 				>
 			</File>
@@ -680,10 +676,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFacet2FacetSliding.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFluidFlux.h"
 				>
 			</File>
 			<File

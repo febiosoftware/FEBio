@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEFluidFlux.h"
-#include "FESolidSolver.h"
+#include "FECore/FENLSolver.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to fluid flux
