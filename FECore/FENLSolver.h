@@ -16,9 +16,6 @@ public:
 	//! assemble the element residual into the global residual
 	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) = 0;
 
-	//! assemble an element stiffness into the residual
-	virtual void AssembleResidual(vector<int>& lm, matrix& ke){};
-
 	//! assemble global stiffness matrix
 	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) = 0;
 

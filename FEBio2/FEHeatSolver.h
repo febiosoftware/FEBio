@@ -60,4 +60,7 @@ public:
 	vector<double>	m_Tp;	//!< previous temperatures
 	vector<double>	m_R;	//!< residual
 	vector<double>	m_u;	//!< prescribed temperatures
+
+protected:
+	bool	m_brhs;	//!< flag used to indicate if element stiffness must be assembled into RHS
 };

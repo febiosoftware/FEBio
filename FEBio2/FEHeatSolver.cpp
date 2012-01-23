@@ -8,6 +8,7 @@
 //! constructor for the class
 FEHeatSolver::FEHeatSolver(FEModel &fem) : FESolver(fem)
 {
+	m_brhs = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -279,10 +280,15 @@ bool FEHeatSolver::StiffnessMatrix()
 		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(*Domain(i));
 
 		// add the conduction stiffness
+		m_brhs = false;
 		bd.ConductionMatrix(this);
 
 		// for a dynamic analysis add the capacitance matrix
-		if (bdyn) bd.CapacitanceMatrix(this, dt);
+		if (bdyn) 
+		{
+			m_brhs = true;
+			bd.CapacitanceMatrix(this, dt);
+		}
 	}
 
 	return true;
@@ -297,6 +303,26 @@ void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& k
 {
 	// assemble into the global stiffness
 	m_pK->Assemble(ke, lm);
+
+	// see if we need to modify the RHS
+	// (This is needed for the capacitance matrix)
+	if (m_brhs)
+	{
+		int ne = (int) lm.size();
+		for (int j=0; j<ne; ++j)
+		{
+			if (lm[j] >= 0)
+			{
+				double q = 0;
+				for (int k=0; k<ne; ++k)
+				{
+					if (lm[k] >= 0) q += ke[j][k]*m_Tp[lm[k]];
+					else if (-lm[k]-2 >= 0) q += ke[j][k]*m_Tp[-lm[k]-2];
+				}
+				m_R[lm[j]] += q;
+			}
+		}
+	}
 
 	// if there are prescribed bc's we need to adjust the residual
 	if (m_fem.m_DC.size() > 0)
@@ -330,27 +356,6 @@ void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& k
 				// set the diagonal element of K to 1
 				K.set(J,J, 1);			
 			}
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Assembles a stiffness contribution to the RHS. This is used here
-//! to calculate the capacitance contribution to the residual
-void FEHeatSolver::AssembleResidual(vector<int>& lm, matrix& kc)
-{
-	int ne = (int) lm.size();
-	for (int j=0; j<ne; ++j)
-	{
-		if (lm[j] >= 0)
-		{
-			double q = 0;
-			for (int k=0; k<ne; ++k)
-			{
-				if (lm[k] >= 0) q += kc[j][k]*m_Tp[lm[k]];
-				else if (-lm[k]-2 >= 0) q += kc[j][k]*m_Tp[-lm[k]-2];
-			}
-			m_R[lm[j]] += q;
 		}
 	}
 }

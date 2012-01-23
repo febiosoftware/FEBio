@@ -84,9 +84,6 @@ void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* psolver, double dt)
 		// set up the LM matrix
 		UnpackLM(el, lm);
 
-		// assemble into residual
-		psolver->AssembleResidual(lm, kc);
-
 		// assemble into global matrix
 		psolver->AssembleStiffness(en, lm, kc);
 	}
