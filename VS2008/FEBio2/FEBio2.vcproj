@@ -465,10 +465,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\heatsolid.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\hello.cpp"
 				>
 			</File>
@@ -676,10 +672,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFacet2FacetSliding.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEHeatSolidDomain.h"
 				>
 			</File>
 			<File

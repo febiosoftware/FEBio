@@ -338,6 +338,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHeatSolidDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.cpp"
 				>
 			</File>
@@ -721,6 +725,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEHeatFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEHeatSolidDomain.h"
 				>
 			</File>
 			<File

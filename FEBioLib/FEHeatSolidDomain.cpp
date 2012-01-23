@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEHeatSolidDomain.h"
-#include "FECore/FENLSolver.h"
 #include "FECore/FEMesh.h"
 #include "FEBioLib/FEIsotropicFourier.h"
 
