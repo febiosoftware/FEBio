@@ -52,6 +52,9 @@ public:
 	//! assemble element stiffness matrix
 	void AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke);
 
+	//! assemble an element stiffness into the residual
+	void AssembleResidual(vector<int>& lm, matrix& kc);
+
 public:
 	vector<double>	m_T;	//!< temperature array
 	vector<double>	m_Tp;	//!< previous temperatures

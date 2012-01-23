@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEHeatSolidDomain.h"
-#include "FEHeatSolver.h"
+#include "FECore/FENLSolver.h"
+#include "FECore/FEMesh.h"
 #include "FEBioLib/FEIsotropicFourier.h"
-#include "FEHeatSolver.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEHeatSolidDomain::Clone()
@@ -63,16 +63,13 @@ void FEHeatSolidDomain::ConductionMatrix(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 // Calculate the capacitance matrix
-void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* pnls, double dt)
+void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* psolver, double dt)
 {
-	int i, j, k;
 	vector<int> lm;
 	vector<int> en;
 
-	FEHeatSolver* psolver = dynamic_cast<FEHeatSolver*>(pnls);
-
 	// loop over all elements in domain
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
 		int ne = el.Nodes();
@@ -81,29 +78,15 @@ void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* pnls, double dt)
 		matrix kc(ne, ne);
 		ElementCapacitance(el, kc, dt);
 
-		// subtract from RHS
-		for (j=0; j<ne; ++j)
-		{
-			if (lm[j] >= 0)
-			{
-				double q = 0;
-				for (k=0; k<ne; ++k)
-				{
-					// TODO: Do I need kc or ke here? Maybe I can move this to the solver class.
-					if (lm[k] >= 0) q += kc[j][k]*psolver->m_Tp[lm[k]];
-					else if (-lm[k]-2 >= 0) q += kc[j][k]*psolver->m_Tp[-lm[k]-2];
-				}
-
-				psolver->m_R[lm[j]] += q;
-			}
-		}
-
 		// setup element node array
 		en.resize(ne);
-		for (j=0; j<ne; ++j) en[j] = el.m_node[j];
+		for (int j=0; j<ne; ++j) en[j] = el.m_node[j];
 
 		// set up the LM matrix
 		UnpackLM(el, lm);
+
+		// assemble into residual
+		psolver->AssembleResidual(lm, kc);
 
 		// assemble into global matrix
 		psolver->AssembleStiffness(en, lm, kc);

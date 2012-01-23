@@ -336,6 +336,27 @@ void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& k
 }
 
 //-----------------------------------------------------------------------------
+//! Assembles a stiffness contribution to the RHS. This is used here
+//! to calculate the capacitance contribution to the residual
+void FEHeatSolver::AssembleResidual(vector<int>& lm, matrix& kc)
+{
+	int ne = (int) lm.size();
+	for (int j=0; j<ne; ++j)
+	{
+		if (lm[j] >= 0)
+		{
+			double q = 0;
+			for (int k=0; k<ne; ++k)
+			{
+				if (lm[k] >= 0) q += kc[j][k]*m_Tp[lm[k]];
+				else if (-lm[k]-2 >= 0) q += kc[j][k]*m_Tp[-lm[k]-2];
+			}
+			m_R[lm[j]] += q;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Serializes data to the archive.
 //! Still need to implement this.
 //!
