@@ -532,10 +532,12 @@
     <ClInclude Include="..\..\FEBioLib\FEFiberExpPowUncoupled.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberNeoHookean.h" />
+    <ClInclude Include="..\..\FEBioLib\FEFluidFlux.h" />
     <ClInclude Include="..\..\FEBioLib\FEFungOrthoCompressible.h" />
     <ClInclude Include="..\..\FEBioLib\FEFungOrthotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FEGasserOgdenHolzapfel.h" />
     <ClInclude Include="..\..\FEBioLib\FEHeatFlux.h" />
+    <ClInclude Include="..\..\FEBioLib\FEHeatSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEHeatTransferMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioLib\FEIncompNeoHookean.h" />
@@ -630,10 +632,12 @@
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPowUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberNeoHookean.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEFluidFlux.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFungOrthoCompressible.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFungOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEGasserOgdenHolzapfel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHeatFlux.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEHeatSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicElastic.cpp" />

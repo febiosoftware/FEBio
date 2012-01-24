@@ -551,8 +551,6 @@
     <ClInclude Include="..\..\FEBio2\FEElasticTrussDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEElemElemList.h" />
     <ClInclude Include="..\..\FEBio2\FEFacet2FacetSliding.h" />
-    <ClInclude Include="..\..\FEBio2\FEFluidFlux.h" />
-    <ClInclude Include="..\..\FEBio2\FEHeatSolidDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEHeatSolver.h" />
     <ClInclude Include="..\..\FEBio2\FELinearSolidDomain.h" />
     <ClInclude Include="..\..\FEBio2\FELinearSolidSolver.h" />
@@ -619,7 +617,6 @@
     <ClCompile Include="..\..\FEBio2\FEElemElemList.cpp" />
     <ClCompile Include="..\..\FEBio2\FEFacet2FacetSliding.cpp" />
     <ClCompile Include="..\..\FEBio2\FEFiberMaterial.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEFluidFlux.cpp" />
     <ClCompile Include="..\..\FEBio2\FEHeatSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBio2\FELinearSolidSolver.cpp" />
@@ -650,7 +647,6 @@
     <ClCompile Include="..\..\FEBio2\FETriphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FileImport.cpp" />
     <ClCompile Include="..\..\FEBio2\getapppath.cpp" />
-    <ClCompile Include="..\..\FEBio2\heatsolid.cpp" />
     <ClCompile Include="..\..\FEBio2\hello.cpp" />
     <ClCompile Include="..\..\FEBio2\init.cpp" />
     <ClCompile Include="..\..\FEBio2\InitContact.cpp" />

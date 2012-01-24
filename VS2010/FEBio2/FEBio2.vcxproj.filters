@@ -75,12 +75,6 @@
     <ClInclude Include="..\..\FEBio2\FEFacet2FacetSliding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEFluidFlux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEHeatSolidDomain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEHeatSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -278,9 +272,6 @@
     <ClCompile Include="..\..\FEBio2\FEFiberMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEFluidFlux.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEHeatSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -357,9 +348,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\getapppath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\heatsolid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\hello.cpp">
