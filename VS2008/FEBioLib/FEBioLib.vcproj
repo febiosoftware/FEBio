@@ -370,6 +370,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FELinearSolidDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FELinearTransIso.cpp"
 				>
 			</File>
@@ -761,6 +765,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FELinearOrthotropic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FELinearSolidDomain.h"
 				>
 			</File>
 			<File

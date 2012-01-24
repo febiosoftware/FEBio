@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FELinearSolidDomain.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
-
+#include "FETransverselyIsotropic.h"
 
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::Reset()

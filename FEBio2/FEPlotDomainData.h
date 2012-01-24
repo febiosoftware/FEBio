@@ -2,7 +2,7 @@
 #include "FECore/FEPlotData.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticSolidDomain.h"
-#include "FELinearSolidDomain.h"
+#include "FEBioLib/FELinearSolidDomain.h"
 
 //=============================================================================
 // The following classes define data fields for domains. 

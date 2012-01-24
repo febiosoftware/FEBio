@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FELinearSolidSolver.h"
-#include "FELinearSolidDomain.h"
+#include "FEBioLib/FELinearSolidDomain.h"
 #include "FECore/FENodeReorder.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FERigid.h"

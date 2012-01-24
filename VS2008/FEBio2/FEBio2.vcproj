@@ -349,10 +349,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FELinearSolidDomain.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FELinearSolidSolver.cpp"
 				>
 			</File>
@@ -676,10 +672,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEHeatSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FELinearSolidDomain.h"
 				>
 			</File>
 			<File

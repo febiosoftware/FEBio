@@ -39,7 +39,7 @@
 #include "FEBiphasicDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBioLib/FEHeatSolidDomain.h"
-#include "FELinearSolidDomain.h"
+#include "FEBioLib/FELinearSolidDomain.h"
 #include "FEElasticTrussDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"

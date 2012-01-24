@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FECoupledHeatSolidSolver.h"
-#include "FELinearSolidDomain.h"
+#include "FEBioLib/FELinearSolidDomain.h"
 #include "FEBioLib/FELinearElastic.h"
 
 //-----------------------------------------------------------------------------
