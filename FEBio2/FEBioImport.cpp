@@ -44,6 +44,7 @@
 #include "FEElasticShellDomain.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
+#include "FERigidShellDomain.h"
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"
 #include "FEBioLib/FEHeatTransferMaterial.h"

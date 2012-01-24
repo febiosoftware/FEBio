@@ -2,10 +2,6 @@
 #include "FECore/FEShellDomain.h"
 
 //-----------------------------------------------------------------------------
-// forward declaration of FEM class
-class FEM;
-
-//-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
 class FEElasticShellDomain : public FEShellDomain
 {
@@ -15,19 +11,19 @@ public:
 	//! TODO: do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
-	FEDomain* Clone()
-	{
-		FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
+	//! Clone this domain
+	FEDomain* Clone();
 
+	//! Reset element data
 	void Reset();
 
+	//! Initialize elements
 	void InitElements();
 
+	//! Initialize domain
 	bool Initialize(FEModel& fem);
 
+	//! Serialize domain data to archive
 	void Serialize(DumpFile& ar);
 
 	//! Unpack shell element data
@@ -54,30 +50,4 @@ public:
 
 	//! Calculate extenral body forces for shell elements
 	void BodyForces(FEModel& fem, FEShellElement& el, vector<double>& fe);
-};
-
-//-----------------------------------------------------------------------------
-//! domain class for 3D rigid shell elements
-//!
-class FERigidShellDomain : public FEElasticShellDomain
-{
-public:
-	//! constructor
-	FERigidShellDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticShellDomain(pm, pmat) { m_ntype = FE_RIGID_SHELL_DOMAIN; }
-
-	FEDomain* Clone()
-	{
-		FERigidShellDomain* pd = new FERigidShellDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
-
-	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolidSolver* psolver);
-
-	//! calculates the residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
-
-	// update stresses
-	void UpdateStresses(FEModel& fem);
 };

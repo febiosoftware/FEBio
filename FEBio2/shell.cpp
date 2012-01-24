@@ -14,6 +14,14 @@ void FEElasticShellDomain::Reset()
 }
 
 //-----------------------------------------------------------------------------
+FEDomain* FEElasticShellDomain::Clone()
+{
+	FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
 bool FEElasticShellDomain::Initialize(FEModel& mdl)
 {
 	// initialize base class

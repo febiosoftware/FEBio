@@ -33,6 +33,7 @@
 #include "FEBiphasicSoluteDomain.h"
 #include "FEUDGHexDomain.h"
 #include "FERigidSolidDomain.h"
+#include "FERigidShellDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "ut4.h"
 #include "FEBioLib/FEConstBodyForce.h"
