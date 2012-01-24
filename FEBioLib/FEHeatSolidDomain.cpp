@@ -36,7 +36,6 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 void FEHeatSolidDomain::ConductionMatrix(FENLSolver* psolver)
 {
 	vector<int> lm;
-	vector<int> en;
 
 	// loop over all elements in domain
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -48,15 +47,11 @@ void FEHeatSolidDomain::ConductionMatrix(FENLSolver* psolver)
 		matrix ke(ne, ne);
 		ElementConduction(el, ke);
 
-		// setup element node array
-		en.resize(ne);
-		for (int j=0; j<ne; ++j) en[j] = el.m_node[j];
-
 		// set up the LM matrix
 		UnpackLM(el, lm);
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(en, lm, ke);
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
@@ -65,7 +60,6 @@ void FEHeatSolidDomain::ConductionMatrix(FENLSolver* psolver)
 void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* psolver, double dt)
 {
 	vector<int> lm;
-	vector<int> en;
 
 	// loop over all elements in domain
 	for (int i=0; i<(int) m_Elem.size(); ++i)
@@ -77,15 +71,11 @@ void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* psolver, double dt)
 		matrix kc(ne, ne);
 		ElementCapacitance(el, kc, dt);
 
-		// setup element node array
-		en.resize(ne);
-		for (int j=0; j<ne; ++j) en[j] = el.m_node[j];
-
 		// set up the LM matrix
 		UnpackLM(el, lm);
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(en, lm, kc);
+		psolver->AssembleStiffness(el.m_node, lm, kc);
 	}
 }
 

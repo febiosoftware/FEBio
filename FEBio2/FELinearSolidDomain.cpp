@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "FELinearSolidDomain.h"
-#include "FELinearSolidSolver.h"
-#include "FEAnalysisStep.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
+
 
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::Reset()
@@ -10,6 +9,14 @@ void FELinearSolidDomain::Reset()
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 }
 
+//-----------------------------------------------------------------------------
+//! Create a copy of this domain
+FEDomain* FELinearSolidDomain::Clone()
+{
+	FELinearSolidDomain* pd = new FELinearSolidDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
@@ -18,52 +25,45 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 	// initialize base class
 	FESolidDomain::Initialize(mdl);
 
-	// initialize material point data
-	FEM& fem = dynamic_cast<FEM&>(mdl);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
-
+	// error flag
 	bool bmerr = false;
 
+	// loop over all elements
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
+		// get the next element
 		FESolidElement& el = m_Elem[i];
-		if (dynamic_cast<FELinearSolidSolver*>(pstep->m_psolver))
-		{
-			// get the elements material
-			FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
 
-			// set the local element coordinates
-			if (pme)
+		// get the elements material
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
+		if (pme == 0) return false;
+
+		// If the material has a material map
+		// generate the element's local coordinate transformation
+		if (pme->m_pmap)
+		{
+			for (int n=0; n<el.GaussPoints(); ++n)
 			{
-				if (pme->m_pmap)
+				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+				pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+			}
+		}
+		else
+		{
+			// If we get here, then the element has a user-defined fiber axis
+			// we should check to see if it has indeed been specified.
+			// TODO: This assumes that pt.Q will not get intialized to
+			//		 a valid value. I should find another way for checking since I
+			//		 would like pt.Q always to be initialized to a decent value.
+			if (dynamic_cast<FETransverselyIsotropic*>(pme))
+			{
+				FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+				mat3d& m = pt.Q;
+				if (fabs(m.det() - 1) > 1e-7)
 				{
-					for (int n=0; n<el.GaussPoints(); ++n)
-					{
-						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-						pt.Q = pme->m_pmap->LocalElementCoord(el, n);
-					}
-				}
-				else
-				{
-					if (fem.GetDebugFlag())
-					{
-						// If we get here, then the element has a user-defined fiber axis
-						// we should check to see if it has indeed been specified.
-						// TODO: This assumes that pt.Q will not get intialized to
-						//		 a valid value. I should find another way for checking since I
-						//		 would like pt.Q always to be initialized to a decent value.
-						if (dynamic_cast<FETransverselyIsotropic*>(pme))
-						{
-							FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-							mat3d& m = pt.Q;
-							if (fabs(m.det() - 1) > 1e-7)
-							{
-								// this element did not get specified a user-defined fiber direction
-//								clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
-								bmerr = true;
-							}
-						}
-					}
+					// this element did not get specified a user-defined fiber direction
+//					clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+					bmerr = true;
 				}
 			}
 		}
@@ -128,33 +128,30 @@ void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::StiffnessMatrix(FELinearSolidSolver* psolver)
+void FELinearSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	vector<int> elm;
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the next element
 		FESolidElement& el = m_Elem[i];
-
-		// number of element nodes
 		int ne = el.Nodes();
 
 		// build the element stiffness matrix
 		matrix ke(3*ne, 3*ne);
-		ElementStiffness(fem, el, ke);
+		ElementStiffness(el, ke);
 
 		// set up the LM matrix
 		UnpackLM(el, elm);
 
 		// assemble into global matrix
-		psolver->AssembleStiffness(ke, elm);
+		psolver->AssembleStiffness(el.m_node, elm, ke);
 	}
 }
 
 //-----------------------------------------------------------------------------
 //! Calculate the element stiffness matrix
-void FELinearSolidDomain::ElementStiffness(FEM &fem, FESolidElement &el, matrix &ke)
+void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -287,10 +284,8 @@ void FELinearSolidDomain::ElementStiffness(FEM &fem, FESolidElement &el, matrix 
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::RHS(FELinearSolidSolver *psolver, vector<double>& R)
+void FELinearSolidDomain::RHS(FENLSolver *psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-
 	// element force vector
 	vector<double> fe;
 

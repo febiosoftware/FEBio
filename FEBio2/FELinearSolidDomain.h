@@ -1,25 +1,19 @@
 #pragma once
 
 #include "FECore/FESolidDomain.h"
-
-//-----------------------------------------------------------------------------
-// Forward declarations
-class FEM;
-class FELinearSolidSolver;
+#include "FECore/FENLSolver.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Class describing a linear elastic solid domain
 class FELinearSolidDomain : public FESolidDomain
 {
 public:
+	//! constructor
 	FELinearSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_LINEAR_SOLID_DOMAIN, pm, pmat) {}
 
-	FEDomain* Clone()
-	{
-		FELinearSolidDomain* pd = new FELinearSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
+	//! Clone the data
+	FEDomain* Clone();
 
 	//! Initialization
 	bool Initialize(FEModel& fem);
@@ -27,15 +21,19 @@ public:
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	void StiffnessMatrix(FELinearSolidSolver* psolver);
+	//! Build the stiffness matrix
+	void StiffnessMatrix(FENLSolver* psolver);
 
+	//! Update the element stresses
 	void UpdateStresses(FEModel& fem);
 
-	void RHS(FELinearSolidSolver* psolver, vector<double>& R);
+	// Calculate the RHS vector
+	void RHS(FENLSolver* psolver, vector<double>& R);
 
 	//! reset element data
 	void Reset();
 
+	//! initialize elements
 	void InitElements();
 
 protected:
@@ -43,5 +41,5 @@ protected:
 	void InternalForce(FESolidElement& el, vector<double>& fe);
 
 protected:
-	void ElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ElementStiffness(FESolidElement& el, matrix& ke);
 };
