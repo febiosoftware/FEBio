@@ -546,6 +546,7 @@
     <ClInclude Include="..\..\FEBioLib\FELinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearElastic.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearOrthotropic.h" />
+    <ClInclude Include="..\..\FEBioLib\FELinearSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearTransIso.h" />
     <ClInclude Include="..\..\FEBioLib\FEMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FEMuscleMaterial.h" />
@@ -645,6 +646,7 @@
     <ClCompile Include="..\..\FEBioLib\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearElastic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearOrthotropic.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FELinearSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearTransIso.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMuscleMaterial.cpp" />
