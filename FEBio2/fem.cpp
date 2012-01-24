@@ -21,8 +21,9 @@
 #include "FEBioLib/FETransverselyIsotropic.h"
 
 // --- Global Constants Data ---
-// m_Const needs a definition, since static
+// m_Const and m_SD need a definitions, since static
 map<std::string, double> FEModel::m_Const;
+vector<FESoluteData*> FEM::m_SD;
 
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
@@ -613,6 +614,21 @@ void FEM::SetPlotFileNameExtension(const char *szext)
 	char* ch = strrchr(m_szplot, '.');
 	if (ch) *ch = 0;
 	strcat(m_szplot, szext);
+}
+
+//-----------------------------------------------------------------------------
+void FEM::SetSD(FESoluteData* psd)
+{
+	m_SD.push_back(psd);
+}
+
+//-----------------------------------------------------------------------------
+FESoluteData* FEM::FindSD(int nid)
+{
+	int i;
+	for (i=0; i<(int) m_SD.size(); ++i) if (m_SD[i]->m_nID == nid) return m_SD[i];
+	
+	return 0;
 }
 
 //-----------------------------------------------------------------------------

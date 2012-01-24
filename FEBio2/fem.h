@@ -19,6 +19,7 @@
 #include "FEBioLib/PlotFile.h"
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEUncoupledElasticMixture.h"
+#include "FEBioLib/FESolute.h"
 
 #include <list>
 #include <string>
@@ -117,6 +118,11 @@ public:
 
 	//! Set the sparse matrix symmetry flag
 	void SetSymmetryFlag(bool bsymm) { m_bsymm = bsymm; }
+
+	//! Set globals section parameters and functions
+	static vector<FESoluteData*> m_SD;	//!< unique identifier of solutes in multiphasic materials
+	static void SetSD(FESoluteData* psd);
+	static FESoluteData* FindSD(int nid);
 
 	//! Evaluate parameter list
 	void EvaluateParameterList(FEParameterList& pl);

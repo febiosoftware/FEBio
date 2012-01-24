@@ -1771,13 +1771,13 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 		
 		// get the solute id
 		int id;
-		szid = tag.AttributeValue("id");
+		szid = tag.AttributeValue("sol");
 		if (szid) {
 			id = atoi(szid) - 1;
 			if ((id < 0) || (id > 1))
-				throw XMLReader::InvalidAttributeValue(tag, "id", szid);
+				throw XMLReader::InvalidAttributeValue(tag, "sol", szid);
 		} else {
-			throw XMLReader::MissingAttribute(tag, "id");
+			throw XMLReader::MissingAttribute(tag, "sol");
 		}
 
 		
@@ -1801,7 +1801,7 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 		if (szname) pme->SetName(szname);
 		
 		// set the solute ID
-		pme->SetID(id);
+		pme->SetSoluteID(id);
 		
 		// parse the material
 		ParseMaterial(tag, pme);
@@ -5004,10 +5004,41 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 			}
 			while (!tag.isend());
 		}
+		else if (tag == "Solutes") ParseGSSoluteData(tag);
 
 		++tag;
 	}
 	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
+{
+	FEM& fem = *GetFEM();
+	
+	// count how many solutes there are
+	int nsol = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { nsol++; ++t; }
+	
+	// read the global solute data
+	++tag;
+	for (int i=0; i<nsol; ++i)
+	{
+		FESoluteData* psd = new FESoluteData;
+		psd->m_nID = atoi(tag.AttributeValue("id"))-1;
+		const char* sz = tag.AttributeValue("name");
+		
+		if (strcmp(sz, "") == 0)
+			throw XMLReader::InvalidAttributeValue(tag, "name", sz);
+		
+		strcpy(psd->m_szname, sz);
+		tag.value(psd->m_z);
+		
+		FEM::SetSD(psd);
+		
+		++tag;
+	}
 }
 
 //=============================================================================

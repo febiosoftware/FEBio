@@ -11,29 +11,29 @@
 #include "FEBioLib/FETriphasic.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"      );
-REGISTER_FEBIO_CLASS(FEPlotActualFluidPressure          , FEPlotData, "fluid pressure"                );
-REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPlotData, "stress"                        );
-REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPlotData, "relative volume"               );
-REGISTER_FEBIO_CLASS(FEPlotFluidFlux                    , FEPlotData, "fluid flux"                    );
-REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vector"                  );
-REGISTER_FEBIO_CLASS(FEPlotEffectiveSoluteConcentration , FEPlotData, "effective solute concentration");
-REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"               );
-REGISTER_FEBIO_CLASS(FEPlotActualSoluteConcentration    , FEPlotData, "solute concentration"          );
-REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute flux"                   );
-REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                        );
-REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"               );
-REGISTER_FEBIO_CLASS(FEPlotReceptorLigandConcentration  , FEPlotData, "receptor-ligand concentration" );
-REGISTER_FEBIO_CLASS(FEPlotEffectiveCationConcentration , FEPlotData, "effective cation concentration");
-REGISTER_FEBIO_CLASS(FEPlotActualCationConcentration    , FEPlotData, "cation concentration"          );
-REGISTER_FEBIO_CLASS(FEPlotCationFlux                   , FEPlotData, "cation flux"                   );
-REGISTER_FEBIO_CLASS(FEPlotEffectiveAnionConcentration  , FEPlotData, "effective anion concentration" );
-REGISTER_FEBIO_CLASS(FEPlotActualAnionConcentration     , FEPlotData, "anion concentration"           );
-REGISTER_FEBIO_CLASS(FEPlotAnionFlux                    , FEPlotData, "anion flux"                    );
-REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"            );
-REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"               );
-REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density"          );
-REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"              );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"        );
+REGISTER_FEBIO_CLASS(FEPlotActualFluidPressure          , FEPlotData, "fluid pressure"                  );
+REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPlotData, "stress"                          );
+REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPlotData, "relative volume"                 );
+REGISTER_FEBIO_CLASS(FEPlotFluidFlux                    , FEPlotData, "fluid flux"                      );
+REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vector"                    );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSoluteConcentration , FEPlotData, "effective solute concentration"  );
+REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"                 );
+REGISTER_FEBIO_CLASS(FEPlotActualSoluteConcentration    , FEPlotData, "solute concentration"            );
+REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute flux"                     );
+REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                          );
+REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"                 );
+REGISTER_FEBIO_CLASS(FEPlotReceptorLigandConcentration  , FEPlotData, "receptor-ligand concentration"   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol1Concentration   , FEPlotData, "effective solute 1 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol1Concentration      , FEPlotData, "solute 1 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol1Flux                     , FEPlotData, "solute 1 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol2Concentration   , FEPlotData, "effective solute 2 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol2Concentration      , FEPlotData, "solute 2 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol2Flux                     , FEPlotData, "solute 2 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"              );
+REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"                 );
+REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density"            );
+REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"                );
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -416,7 +416,7 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualCationConcentration::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotActualSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
 	double ew;
@@ -447,7 +447,7 @@ bool FEPlotActualCationConcentration::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotCationFlux::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
 	float af[3];
@@ -485,7 +485,7 @@ bool FEPlotCationFlux::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualAnionConcentration::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotActualSol2Concentration::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
 	double ew;
@@ -516,7 +516,7 @@ bool FEPlotActualAnionConcentration::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotAnionFlux::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotSol2Flux::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
 	float af[3];
@@ -771,7 +771,7 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveCationConcentration::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotEffectiveSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 {
 	FETriphasicDomain* pd = dynamic_cast<FETriphasicDomain*>(&dom);
 	if (pd)
@@ -788,7 +788,7 @@ bool FEPlotEffectiveCationConcentration::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotEffectiveAnionConcentration::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotEffectiveSol2Concentration::Save(FEDomain &dom, vector<float>& a)
 {
 	FETriphasicDomain* pd = dynamic_cast<FETriphasicDomain*>(&dom);
 	if (pd)

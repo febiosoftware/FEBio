@@ -3,9 +3,8 @@
 
 // Material parameters for the FESolute material
 BEGIN_PARAMETER_LIST(FESolute, FEMaterial)
-ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density");
-ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "molar_mass");
-ADD_PARAMETER(m_z, FE_PARAM_INT, "charge_number");
+	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density");
+	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "molar_mass");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -25,6 +24,10 @@ void FESolute::Init()
 	FEMaterial::Init();
 	m_pDiff->Init();
 	m_pSolub->Init();
+
+	FESoluteData* psd = 0; // FEM::FindSD(m_ID); TODO: I can't compile this in FEBio2.
+	if (psd == 0) throw MaterialError("no match with global solute data");
+	m_z = psd->m_z;
 	
 	if (m_rhoT < 0) throw MaterialError("density must be positive");
 	if (m_M < 0) throw MaterialError("molar_mass must be positive");

@@ -79,37 +79,37 @@ class FEPlotSoluteFlux : public FEDomainData
 
 //-----------------------------------------------------------------------------
 //! Actual cation concentration
-class FEPlotActualCationConcentration : public FEDomainData
+class FEPlotActualSol1Concentration : public FEDomainData
 {
 public:
-	FEPlotActualCationConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotActualSol1Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Cation flux
-class FEPlotCationFlux : public FEDomainData
+class FEPlotSol1Flux : public FEDomainData
 {
 public:
-	FEPlotCationFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	FEPlotSol1Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Actual anion concentration
-class FEPlotActualAnionConcentration : public FEDomainData
+class FEPlotActualSol2Concentration : public FEDomainData
 {
 public:
-	FEPlotActualAnionConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	FEPlotActualSol2Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Anion flux
-class FEPlotAnionFlux : public FEDomainData
+class FEPlotSol2Flux : public FEDomainData
 {
 public:
-	FEPlotAnionFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	FEPlotSol2Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -179,19 +179,19 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Nodal effective cation concentrations
-class FEPlotEffectiveCationConcentration : public FEDomainData
+class FEPlotEffectiveSol1Concentration : public FEDomainData
 {
 public:
-	FEPlotEffectiveCationConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	FEPlotEffectiveSol1Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
 
 //-----------------------------------------------------------------------------
 //! Nodal effective anion concentrations
-class FEPlotEffectiveAnionConcentration : public FEDomainData
+class FEPlotEffectiveSol2Concentration : public FEDomainData
 {
 public:
-	FEPlotEffectiveAnionConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	FEPlotEffectiveSol2Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
 
