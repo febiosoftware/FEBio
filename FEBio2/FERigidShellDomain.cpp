@@ -13,7 +13,7 @@ FEDomain* FERigidShellDomain::Clone()
 //-----------------------------------------------------------------------------
 //! Calculate stiffness contributions for rigid shells.
 //!
-void FERigidShellDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FERigidShellDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
@@ -36,7 +36,7 @@ void FERigidShellDomain::StiffnessMatrix(FESolidSolver* psolver)
 //-----------------------------------------------------------------------------
 //! calculate residual forces for rigid shells
 //!
-void FERigidShellDomain::Residual(FESolidSolver* psolver, vector<double>& R)
+void FERigidShellDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 

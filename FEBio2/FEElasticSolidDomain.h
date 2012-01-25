@@ -43,13 +43,13 @@ public:
 	void UpdateStresses(FEModel& fem);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolidSolver* psolver);
+	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
 	virtual void ElementStiffness(FEM& fem, int iel, matrix& ke);
 
 	//! calculates the residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! Calculates the internal stress vector for solid elements
 	void InternalForces(FESolidElement& el, vector<double>& fe);

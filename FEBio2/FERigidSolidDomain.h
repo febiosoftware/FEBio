@@ -18,10 +18,10 @@ public:
 	}
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolidSolver* psolver);
+	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	// update stresses
 	void UpdateStresses(FEModel& fem);

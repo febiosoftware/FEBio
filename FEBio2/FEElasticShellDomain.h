@@ -35,7 +35,7 @@ public:
 	// --- S T I F F N E S S --- 
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolidSolver* psolver);
+	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the shell element stiffness matrix
 	void ElementStiffness(int iel, matrix& ke);
@@ -43,7 +43,7 @@ public:
 	// --- R E S I D U A L ---
 
 	//! calculates the residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! Calculates the internal stress vector for shell elements
 	void InternalForces(FEShellElement& el, vector<double>& fe);

@@ -4,7 +4,7 @@
 #include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
-void FEUDGHexDomain::Residual(FESolidSolver *psolver, vector<double>& R)
+void FEUDGHexDomain::Residual(FENLSolver *psolver, vector<double>& R)
 {
 	FEModel& fem = psolver->GetFEModel();
 
@@ -185,7 +185,7 @@ void FEUDGHexDomain::UDGHourglassForces(FEModel& fem, FESolidElement &el, vector
 
 //-----------------------------------------------------------------------------
 
-void FEUDGHexDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FEUDGHexDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 

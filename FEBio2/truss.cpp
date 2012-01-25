@@ -64,7 +64,7 @@ void FEElasticTrussDomain::InitElements()
 
 //-----------------------------------------------------------------------------
 
-void FEElasticTrussDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FEElasticTrussDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	matrix ke;
@@ -140,7 +140,7 @@ void FEElasticTrussDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 
 //-----------------------------------------------------------------------------
 
-void FEElasticTrussDomain::Residual(FESolidSolver* psolver, vector<double>& R)
+void FEElasticTrussDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	// element force vector
 	vector<double> fe;

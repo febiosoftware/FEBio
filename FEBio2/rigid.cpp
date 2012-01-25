@@ -12,7 +12,7 @@
 //! Most stiffness contributions are ignored. Only in dynamic problems
 //! the inertial stiffness is computed.
 //! 
-void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FERigidSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
@@ -50,7 +50,7 @@ void FERigidSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
 //! Calculates the residual vector 3D rigid elements
 //! we only calculate the body-forces for rigid elements
 //!
-void FERigidSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
+void FERigidSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 

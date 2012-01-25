@@ -44,30 +44,30 @@ public:
 	void UpdateStresses(FEModel& fem);
 
 	//! calculates the total residual
-	void Residual(FESolidSolver* psolver, vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolidSolver* psolver);
+	void StiffnessMatrix(FENLSolver* psolver);
 
 protected:
 	//! calculates the nodal residual
-	void NodalResidual(FESolidSolver* psolver, vector<double>& R);
+	void NodalResidual(FENLSolver* psolver, vector<double>& R);
 
 	//! calculates the element residual
-	void ElementResidual(FESolidSolver* psolver, vector<double>& R);
+	void ElementResidual(FENLSolver* psolver, vector<double>& R);
 
 	//! Calculates the internal stress vector for solid elements
 	void ElementInternalForces(FESolidElement& el, vector<double>& fe);
 
 protected:
 	//! Calculates the element stiffness matrix
-	void ElementalStiffnessMatrix(FESolidSolver* psolver);
+	void ElementalStiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
 	void ElementStiffness(FEM& fem, int iel, matrix& ke);
 
 	//! Calculates the nodal stiffness matrix
-	void NodalStiffnessMatrix(FESolidSolver* psolver);
+	void NodalStiffnessMatrix(FENLSolver* psolver);
 
 	//! geometrical stiffness (i.e. initial stress)
 	void GeometricalStiffness(FESolidElement& el, matrix& ke);

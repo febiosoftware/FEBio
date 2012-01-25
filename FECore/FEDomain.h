@@ -3,6 +3,7 @@
 #include "FEElement.h"
 #include "DumpFile.h"
 #include "FE_enum.h"
+#include "FENLSolver.h"
 
 class FEModel;
 class FENode;
@@ -45,9 +46,9 @@ public:
 
 	virtual void InitElements() {}
 
-	virtual void StiffnessMatrix(FESolidSolver* psolver) {}
+	virtual void StiffnessMatrix(FENLSolver* psolver) {}
 
-	virtual void Residual(FESolidSolver* psolver, vector<double>& R) {}
+	virtual void Residual(FENLSolver* psolver, vector<double>& R) {}
 
 	//!< Initialize material point data for the elements
 	void InitMaterialPointData();

@@ -17,9 +17,9 @@ public:
 
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	void StiffnessMatrix(FESolidSolver* psolver);
+	void StiffnessMatrix(FENLSolver* psolver);
 
-	void Residual(FESolidSolver* psolver, vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	void Serialize(DumpFile& ar);
 };

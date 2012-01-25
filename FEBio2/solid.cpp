@@ -158,7 +158,7 @@ void FEElasticSolidDomain::Serialize(DumpFile &ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::Residual(FESolidSolver *psolver, vector<double>& R)
+void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 {
 	FEModel& fem = psolver->GetFEModel();
 
@@ -581,7 +581,7 @@ void FEElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matri
 
 //-----------------------------------------------------------------------------
 
-void FEElasticSolidDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 

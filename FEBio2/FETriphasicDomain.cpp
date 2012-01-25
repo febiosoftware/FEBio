@@ -141,7 +141,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
+void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	int i, j;
 	
@@ -782,7 +782,7 @@ bool FETriphasicDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, vecto
 
 //-----------------------------------------------------------------------------
 
-void FETriphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
+void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
