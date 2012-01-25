@@ -32,7 +32,7 @@ public:
 	void UpdateStresses(FEModel& fem);
 
 	//! return element stiffness matrix
-	void ElementStiffness(FEM& fem, int iel, matrix& ke) {
+	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {
 		FESolidElement& el = Element(iel);
 		ElementBiphasicStiffness(fem, el, ke);
 	}
@@ -48,7 +48,7 @@ protected:
 	bool InternalFluidWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe);
 	
 	//! calculates the element biphasic stiffness matrix
-	bool ElementBiphasicStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	bool ElementBiphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 	
 	//! calculates the element biphasic stiffness matrix for steady-state response
 	bool ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);

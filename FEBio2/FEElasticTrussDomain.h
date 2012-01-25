@@ -28,7 +28,7 @@ public:
 	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the truss element stiffness matrix
-	void ElementStiffness(FEM& fem, int iel, matrix& ke);
+	void ElementStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! calculates the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);

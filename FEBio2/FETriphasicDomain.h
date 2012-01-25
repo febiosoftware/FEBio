@@ -35,7 +35,7 @@ public:
 	void UpdateStresses(FEModel& fem);
 
 	//! return element stiffness matrix
-	void ElementStiffness(FEM& fem, int iel, matrix& ke) {
+	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {
 		FESolidElement& el = Element(iel);
 		ElementTriphasicStiffness(fem, el, ke);
 	}
@@ -57,7 +57,7 @@ protected:
 	bool InternalSoluteWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
 	
 	//! calculates the element triphasic stiffness matrix
-	bool ElementTriphasicStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	bool ElementTriphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 	
 	//! calculates the element triphasic stiffness matrix
 	bool ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);

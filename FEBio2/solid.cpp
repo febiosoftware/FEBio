@@ -457,7 +457,7 @@ void FEElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEElasticSolidDomain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::MaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -628,7 +628,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEElasticSolidDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
+void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 {
 	FESolidElement& el = Element(iel);
 

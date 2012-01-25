@@ -35,7 +35,7 @@ bool FE3FieldElasticSolidDomain::Initialize(FEModel &fem)
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FE3FieldElasticSolidDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
+void FE3FieldElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
 	MaterialStiffness(fem, iel, ke);
@@ -60,7 +60,7 @@ void FE3FieldElasticSolidDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
 
-void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, int iel, matrix& ke)
+void FE3FieldElasticSolidDomain::DilatationalStiffness(FEModel& fem, int iel, matrix& ke)
 {
 	int i, j, n;
 
@@ -147,7 +147,7 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEM& fem, int iel, matrix
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FE3FieldElasticSolidDomain::MaterialStiffness(FEM& fem, int iel, matrix &ke)
+void FE3FieldElasticSolidDomain::MaterialStiffness(FEModel& fem, int iel, matrix &ke)
 {
 	int i, i3, j, j3, n;
 

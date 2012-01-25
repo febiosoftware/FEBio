@@ -46,7 +46,7 @@ public:
 	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
-	virtual void ElementStiffness(FEM& fem, int iel, matrix& ke);
+	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! calculates the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);
@@ -61,7 +61,7 @@ protected:
 	void GeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness component
-	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void MaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the solid element inertial stiffness matrix
 	void ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);

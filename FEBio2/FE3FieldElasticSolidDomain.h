@@ -37,7 +37,7 @@ public:
 	void UpdateStresses(FEModel& fem);
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FEM& fem, int iel, matrix& ke);
+	void ElementStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! augmentation
 	bool Augment();
@@ -47,10 +47,10 @@ public:
 
 protected:
 	//! Dilatational stiffness component for nearly-incompressible materials
-	void DilatationalStiffness(FEM& fem, int iel, matrix& ke);
+	void DilatationalStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! material stiffness component
-	void MaterialStiffness(FEM& fem, int iel, matrix& ke);
+	void MaterialStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
 	void GeometricalStiffness(int iel, matrix& ke);

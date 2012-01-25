@@ -80,7 +80,7 @@ void FEElasticTrussDomain::StiffnessMatrix(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticTrussDomain::ElementStiffness(FEM& fem, int iel, matrix& ke)
+void FEElasticTrussDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 {
 	FETrussElement& el = Element(iel);
 

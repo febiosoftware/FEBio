@@ -498,8 +498,9 @@ void FEBiphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FEBiphasicDomain::ElementBiphasicStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+bool FEBiphasicDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElement& el, matrix& ke)
 {
+	FEM& fem = dynamic_cast<FEM&>(mdl);
 	int i, j, n;
 	
 	int nint = el.GaussPoints();

@@ -973,7 +973,7 @@ void FEUT4Domain::ElementalStiffnessMatrix(FENLSolver *psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEUT4Domain::ElementStiffness(FEM &fem, int iel, matrix &ke)
+void FEUT4Domain::ElementStiffness(FEModel &fem, int iel, matrix &ke)
 {
 	FESolidElement& el = Element(iel);
 
@@ -1082,7 +1082,7 @@ void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEUT4Domain::MaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEUT4Domain::MaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
 	// make sure this is the struct mech module
 	assert(fem.GetCurrentStep()->m_nModule == FE_SOLID);

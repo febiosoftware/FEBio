@@ -64,7 +64,7 @@ protected:
 	void ElementalStiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FEM& fem, int iel, matrix& ke);
+	void ElementStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! Calculates the nodal stiffness matrix
 	void NodalStiffnessMatrix(FENLSolver* psolver);
@@ -73,7 +73,7 @@ protected:
 	void GeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness component
-	void MaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void MaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! nodal geometry stiffness contribution
 	void NodalGeometryStiffness(UT4NODE& node, matrix& ke);
