@@ -688,6 +688,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEElasticDomain.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEElasticMixture.h"
 				>
 			</File>

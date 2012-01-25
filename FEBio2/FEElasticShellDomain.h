@@ -1,9 +1,10 @@
 #pragma once
 #include "FECore/FEShellDomain.h"
+#include "FEBioLib/FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements
-class FEElasticShellDomain : public FEShellDomain
+class FEElasticShellDomain : public FEShellDomain, public FEElasticDomain
 {
 public:
 	FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat) : FEShellDomain(FE_SHELL_DOMAIN, pm, pmat) {}

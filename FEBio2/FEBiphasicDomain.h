@@ -2,6 +2,9 @@
 #include "FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
+class FEM;
+
+//-----------------------------------------------------------------------------
 //! Domain class for biphasic 3D solid elements
 //! Note that this class inherits from FEElasticSolidDomain since the biphasic domain
 //! also needs to calculate elastic stiffness contributions.

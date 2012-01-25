@@ -1,13 +1,12 @@
 #pragma once
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEModel.h"
-
-class FEM;
+#include "FEBioLib/FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
 //! domain described by Lagrange-type 3D volumetric elements
 //!
-class FEElasticSolidDomain : public FESolidDomain
+class FEElasticSolidDomain : public FESolidDomain, public FEElasticDomain
 {
 public:
 	//! constructor

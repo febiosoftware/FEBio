@@ -4,8 +4,12 @@
 #include "FEElasticTrussDomain.h"
 
 //-----------------------------------------------------------------------------
-// FEElasticTrussDomain
-//-----------------------------------------------------------------------------
+FEDomain* FEElasticTrussDomain::Clone()
+{
+	FEElasticTrussDomain* pd = new FEElasticTrussDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
 
 //-----------------------------------------------------------------------------
 void FEElasticTrussDomain::Reset()

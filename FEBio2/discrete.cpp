@@ -4,6 +4,14 @@
 #include "FEBioLib/FEDiscreteMaterial.h"
 
 //-----------------------------------------------------------------------------
+FEDomain* FEDiscreteSpringDomain::Clone()
+{
+	FEDiscreteSpringDomain* pd = new FEDiscreteSpringDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
 void FEDiscreteSpringDomain::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())

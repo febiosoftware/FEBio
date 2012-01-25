@@ -29,7 +29,11 @@ bool FESolidSolver::StiffnessMatrix()
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// calculate the stiffness matrix for each domain
-	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).StiffnessMatrix(this);
+	for (i=0; i<mesh.Domains(); ++i) 
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.StiffnessMatrix(this);
+	}
 
 	// calculate contact stiffness
 	if (m_fem.ContactInterfaces() > 0) 
@@ -558,7 +562,11 @@ bool FESolidSolver::Residual(vector<double>& R)
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// loop over all domains
-	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).Residual(this, R);
+	for (i=0; i<mesh.Domains(); ++i) 
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.Residual(this, R);
+	}
 
 	// calculate inertial forces for dynamic problems
 	if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(R);

@@ -3,8 +3,6 @@
 #include "FEMaterial.h"
 
 //-----------------------------------------------------------------------------
-// FEDomain
-//-----------------------------------------------------------------------------
 FEElement* FEDomain::FindElementFromID(int nid)
 {
 	for (int i=0; i<Elements(); ++i)
@@ -26,4 +24,10 @@ void FEDomain::InitMaterialPointData()
 		FEElement& el = ElementRef(i);
 		for (int k=0; k<el.GaussPoints(); ++k) el.SetMaterialPointData(m_pMat->CreateMaterialPointData(), k);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEDomain::SetMatID(int mid)
+{
+	for (int i=0; i<Elements(); ++i) ElementRef(i).SetMatID(mid);
 }
