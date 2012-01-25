@@ -3,8 +3,17 @@
 #include "FECore/FENLSolver.h"
 
 //-----------------------------------------------------------------------------
+class FEHeatDomain
+{
+public:
+	virtual ~FEHeatDomain(){}
+	virtual void ConductionMatrix (FENLSolver* pnls) = 0;
+	virtual void CapacitanceMatrix(FENLSolver* pnls, double dt) = 0;
+};
+
+//-----------------------------------------------------------------------------
 //! domain class for 3D heat elements
-class FEHeatSolidDomain : public FESolidDomain
+class FEHeatSolidDomain : public FESolidDomain, public FEHeatDomain
 {
 public:
 	//! constructor
@@ -15,6 +24,8 @@ public:
 
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
+
+public: // overloaded from FEHeatDomain
 
 	//! Calculate the conduction stiffness 
 	void ConductionMatrix(FENLSolver* psolver);

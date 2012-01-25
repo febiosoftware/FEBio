@@ -277,7 +277,7 @@ bool FEHeatSolver::StiffnessMatrix()
 	// Add stiffness contribution from all domains
 	for (int i=0; i<(int) m_Dom.size(); ++i)
 	{
-		FEHeatSolidDomain& bd = dynamic_cast<FEHeatSolidDomain&>(*Domain(i));
+		FEHeatDomain& bd = dynamic_cast<FEHeatDomain&>(*Domain(i));
 
 		// add the conduction stiffness
 		m_brhs = false;
