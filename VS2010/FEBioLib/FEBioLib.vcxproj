@@ -526,6 +526,7 @@
     <ClInclude Include="..\..\FEBioLib\FEEFDNeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FEEFDUncoupled.h" />
     <ClInclude Include="..\..\FEBioLib\FEEFDVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioLib\FEElasticDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEElasticMixture.h" />
     <ClInclude Include="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberExpPow.h" />
