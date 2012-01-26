@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "FESolidSolver.h"
 #include "FEBioLib/FETrussMaterial.h"
 #include "FEElasticTrussDomain.h"
 
@@ -70,21 +69,20 @@ void FEElasticTrussDomain::InitElements()
 
 void FEElasticTrussDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	matrix ke;
 	int NT = m_Elem.size();
 	vector<int> lm;
 	for (int iel =0; iel<NT; ++iel)
 	{
 		FETrussElement& el = m_Elem[iel];
-		ElementStiffness(fem, iel, ke);
+		ElementStiffness(iel, ke);
 		UnpackLM(el, lm);
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticTrussDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
+void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 {
 	FETrussElement& el = Element(iel);
 

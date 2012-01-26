@@ -35,7 +35,7 @@ public: // overloads from FEElasticDomain
 
 protected:
 	//! calculates the truss element stiffness matrix
-	void ElementStiffness(FEModel& fem, int iel, matrix& ke);
+	void ElementStiffness(int iel, matrix& ke);
 
 	//! Calculates the internal stress vector for solid elements
 	void InternalForces(FETrussElement& el, vector<double>& fe);

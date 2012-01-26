@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "FESolidSolver.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FEBioLib/FEDiscreteMaterial.h"
 
@@ -34,7 +33,7 @@ void FEDiscreteSpringDomain::Serialize(DumpFile& ar)
 	}
 	else
 	{
-		FEM& fem = dynamic_cast<FEM&>(*ar.GetFEModel());
+		FEModel& fem = *ar.GetFEModel();
 		ar >> m_Node;
 		int n, mat;
 		for (size_t i=0; i<m_Elem.size(); ++i)
@@ -104,7 +103,6 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 
 void FEDiscreteSpringDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	FEMesh& mesh = *m_pMesh;
 
 	vector<double> fe(6);
@@ -169,7 +167,6 @@ void FEDiscreteSpringDomain::Residual(FENLSolver* psolver, vector<double>& R)
 
 void FEDiscreteSpringDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	FEMesh& mesh = *m_pMesh;
 
 	matrix ke(6,6);

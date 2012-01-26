@@ -19,7 +19,7 @@ public:
 	//! Serialize data to archive
 	void Serialize(DumpFile& ar);
 
-public: // overloaded from FEElasticDomain
+public: // overridden from FEElasticDomain
 
 	//! calculate stiffness matrix
 	void StiffnessMatrix(FENLSolver* psolver);
@@ -28,5 +28,5 @@ public: // overloaded from FEElasticDomain
 	void Residual(FENLSolver* psolver, vector<double>& R);
 
 protected:
-	void UpdateStresses(FEModel& fem){}
+	void UpdateStresses(FEModel& fem){}	// not used for discrete springs
 };
