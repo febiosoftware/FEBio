@@ -4,13 +4,15 @@
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems
-//! It can deal with quasi-static, dynamic, and poro-elastic problems
+//! It can deal with quasi-static and dynamic problems
 //! 
 class FESolidSolver : public FESolver
 {
 public:
 	//! constructor
 	FESolidSolver(FEModel& fem);
+
+	//! destructor
 	virtual ~FESolidSolver(){}
 
 	//! serialize data to/from dump file
@@ -27,9 +29,6 @@ public:
 
 	//! adjust the residual matrix for prescribed displacements
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
-
-public:
-	FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
 
 	//! Initialize linear equation system
 	bool InitEquations();

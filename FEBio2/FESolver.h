@@ -50,6 +50,9 @@ public:
 	//! recalculates the shape of the stiffness matrix
 	bool CreateStiffness(bool breset);
 
+	//! return pointer to stiffness matrix
+	FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
+
 	//! Get active domains
 	int Domains() { return m_Dom.size(); }
 
