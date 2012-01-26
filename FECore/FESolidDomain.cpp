@@ -83,7 +83,7 @@ FESolidElement* FESolidDomain::FindElement(vec3d y, double r[3])
 {
 	int i, j;
 	int NE = Elements();
-	vec3d x[8];
+	vec3d x[FEElement::MAX_NODES];
 	for (i=0; i<NE; ++i)
 	{
 		// get the next element
@@ -178,7 +178,7 @@ double FESolidDomain::defgrad(FESolidElement &el, mat3d &F, int n)
 	double *Gtn = el.Gt(n);
 
 	// nodal points
-	vec3d r[8];
+	vec3d r[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
 	// calculate inverse jacobian
@@ -229,7 +229,7 @@ double FESolidDomain::invjac0(FESolidElement& el, double Ji[3][3], int n)
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d r0[8];
+	vec3d r0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
 	// calculate Jacobian
@@ -376,7 +376,7 @@ double FESolidDomain::detJt(FESolidElement &el, int n)
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d rt[8];
+	vec3d rt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
 
 	// shape function derivatives
@@ -419,7 +419,7 @@ double FESolidDomain::detJ0(FESolidElement &el, int n)
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d r0[8];
+	vec3d r0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
 
 	// shape function derivatives

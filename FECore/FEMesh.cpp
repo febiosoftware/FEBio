@@ -339,7 +339,7 @@ double FEMesh::ElementVolume(FEElement &el)
 {
 	// get the nodal coordinates
 	int neln = el.Nodes();
-	vec3d r[8];
+	vec3d r[FEElement::MAX_NODES];
 	for (int i=0; i<neln; ++i) r[i] = Node(el.m_node[i]).m_r0;
 
 	// get element type
@@ -371,7 +371,7 @@ double FEMesh::ElementVolume(FEElement &el)
 double FEMesh::SolidElementVolume(FESolidElement& el)
 {
 	int i;
-	vec3d r0[8];
+	vec3d r0[FEElement::MAX_NODES];
 
 	int neln = el.Nodes();
 	for (i=0; i<neln; ++i) r0[i] = Node(el.m_node[i]).m_r0;

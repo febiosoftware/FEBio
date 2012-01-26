@@ -2109,6 +2109,10 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 					else return FE_SOLID_DOMAIN;
 				}
 			}
+			else if (etype == ET_HEX20)
+			{
+				return FE_SOLID_DOMAIN;
+			}
 			else if (etype == ET_TET)
 			{
 				if (m_pim->m_ntet4 == FEFEBioImport::ET_UT4) return FE_UT4_DOMAIN;

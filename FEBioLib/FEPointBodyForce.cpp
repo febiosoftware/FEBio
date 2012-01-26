@@ -117,11 +117,11 @@ void FEPointBodyForce::Update()
 		if (m_pel)
 		{
 			FEMesh& m = m_pfem->m_mesh;
-			vec3d x[8];
+			vec3d x[FEElement::MAX_NODES];
 			for (int i=0; i<8; ++i) x[i] = m.Node(m_pel->m_node[i]).m_rt;
 
 			double* r = m_rs;
-			double H[8];
+			double H[FEElement::MAX_NODES];
 			H[0] = 0.125*(1 - r[0])*(1 - r[1])*(1 - r[2]);
 			H[1] = 0.125*(1 + r[0])*(1 - r[1])*(1 - r[2]);
 			H[2] = 0.125*(1 + r[0])*(1 + r[1])*(1 - r[2]);

@@ -74,7 +74,9 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 //-----------------------------------------------------------------------------
 void FELinearSolidDomain::InitElements()
 {
-	vec3d x0[8], xt[8], r0, rt;
+	vec3d x0[FEElement::MAX_NODES];
+	vec3d xt[FEElement::MAX_NODES];
+	vec3d r0, rt;
 	FEMesh& m = *GetMesh();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
@@ -160,9 +162,10 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 	const int ndof = 3*neln;
 
 	// global derivatives of shape functions
-	// NOTE: hard-coding of hex elements!
 	// Gx = dH/dx
-	double Gx[8], Gy[8], Gz[8];
+	double Gx[FEElement::MAX_NODES];
+	double Gy[FEElement::MAX_NODES];
+	double Gz[FEElement::MAX_NODES];
 
 	double Gxi, Gyi, Gzi;
 	double Gxj, Gyj, Gzj;
@@ -468,7 +471,8 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 		neln = el.Nodes();
 
 		// nodall coordinates
-		vec3d r0[8], rt[8];
+		vec3d r0[FEElement::MAX_NODES];
+		vec3d rt[FEElement::MAX_NODES];
 		for (int j=0; j<neln; ++j)
 		{
 			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;

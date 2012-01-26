@@ -78,7 +78,8 @@ bool FEElasticSolidDomain::Initialize(FEModel &mdl)
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::InitElements()
 {
-	vec3d x0[8], xt[8], r0, rt;
+	const int NE = FEElement::MAX_NODES;
+	vec3d x0[NE], xt[NE], r0, rt;
 	FEMesh& m = *GetMesh();
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
@@ -295,7 +296,7 @@ void FEElasticSolidDomain::BodyForces(FEModel& fem, FESolidElement& el, vector<d
 		int neln = el.Nodes();
 
 		// nodal coordinates
-		vec3d r0[8], rt[8];
+		vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
 		for (int i=0; i<neln; ++i)
 		{
 			r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
@@ -389,7 +390,9 @@ void FEElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
 
-	double Gx[8], Gy[8], Gz[8];
+	double Gx[FEElement::MAX_NODES];
+	double Gy[FEElement::MAX_NODES];
+	double Gz[FEElement::MAX_NODES];
 	double *Grn, *Gsn, *Gtn;
 	double Gr, Gs, Gt;
 
@@ -467,9 +470,10 @@ void FEElasticSolidDomain::MaterialStiffness(FEModel& fem, FESolidElement &el, m
 	const int ndof = 3*neln;
 
 	// global derivatives of shape functions
-	// NOTE: hard-coding of hex elements!
 	// Gx = dH/dx
-	double Gx[8], Gy[8], Gz[8];
+	double Gx[FEElement::MAX_NODES];
+	double Gy[FEElement::MAX_NODES];
+	double Gz[FEElement::MAX_NODES];
 
 	double Gxi, Gyi, Gzi;
 	double Gxj, Gyj, Gzj;
@@ -725,7 +729,8 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 		neln = el.Nodes();
 
 		// nodall coordinates
-		vec3d r0[8], rt[8];
+		vec3d r0[FEElement::MAX_NODES];
+		vec3d rt[FEElement::MAX_NODES];
 		for (int j=0; j<neln; ++j)
 		{
 			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
