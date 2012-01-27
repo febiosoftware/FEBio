@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEDiscreteSpringDomain.h"
-#include "FEBioLib/FEDiscreteMaterial.h"
+#include "FEDiscreteMaterial.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEDiscreteSpringDomain::Clone()

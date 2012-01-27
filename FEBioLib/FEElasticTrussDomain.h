@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FETrussDomain.h"
-#include "FEBioLib/FEElasticDomain.h"
+#include "FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D truss elements

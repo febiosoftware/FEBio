@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEBioLib/FETrussMaterial.h"
+#include "FETrussMaterial.h"
 #include "FEElasticTrussDomain.h"
 
 //-----------------------------------------------------------------------------

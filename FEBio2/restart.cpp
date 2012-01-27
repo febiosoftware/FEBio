@@ -26,9 +26,9 @@
 
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
-#include "FEElasticTrussDomain.h"
+#include "FEBioLib/FEElasticTrussDomain.h"
 #include "FEBioLib/FEHeatSolidDomain.h"
-#include "FEDiscreteSpringDomain.h"
+#include "FEBioLib/FEDiscreteSpringDomain.h"
 #include "FEBiphasicDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEUDGHexDomain.h"

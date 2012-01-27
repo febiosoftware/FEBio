@@ -273,10 +273,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\discrete.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\elstf.cpp"
 				>
 			</File>
@@ -549,10 +545,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\truss.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\udghex.cpp"
 				>
 			</File>
@@ -651,19 +643,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEDiscreteSpringDomain.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEElasticShellDomain.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEElasticSolidDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEElasticTrussDomain.h"
 				>
 			</File>
 			<File

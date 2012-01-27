@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEDiscreteDomain.h"
-#include "FEBioLib/FEElasticDomain.h"
+#include "FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
 //! domain for discrete elements

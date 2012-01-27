@@ -274,6 +274,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEDiscreteSpringDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEDonnanEquilibrium.cpp"
 				>
 			</File>
@@ -299,6 +303,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEElasticMixture.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEElasticTrussDomain.cpp"
 				>
 			</File>
 			<File
@@ -664,6 +672,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEDiscreteSpringDomain.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEDonnanEquilibrium.h"
 				>
 			</File>
@@ -693,6 +705,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEElasticMixture.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEElasticTrussDomain.h"
 				>
 			</File>
 			<File
