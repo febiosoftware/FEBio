@@ -552,6 +552,7 @@ void FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
 	else if (tag == "ptol"        ) tag.value(ps->m_Ptol);
 	else if (tag == "ctol"        ) tag.value(ps->m_Ctol);
+	else if (tag == "symmetric_biphasic") tag.value(fem.m_bsym_poro);
 	else throw XMLReader::InvalidTag(tag);
 }
 
@@ -577,6 +578,7 @@ void FEBioControlSection::ParseTriphasicParams(XMLTag &tag)
 	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
 	else if (tag == "ptol"        ) tag.value(ps->m_Ptol);
 	else if (tag == "ctol"        ) tag.value(ps->m_Ctol);
+	else if (tag == "symmetric_biphasic") tag.value(fem.m_bsym_poro);
 	else throw XMLReader::InvalidTag(tag);
 }
 
