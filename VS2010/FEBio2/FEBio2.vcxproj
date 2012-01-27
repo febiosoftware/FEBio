@@ -545,10 +545,8 @@
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FECoupledHeatSolidSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEDiscreteSpringDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEElasticShellDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEElasticSolidDomain.h" />
-    <ClInclude Include="..\..\FEBio2\FEElasticTrussDomain.h" />
     <ClInclude Include="..\..\FEBio2\FEElemElemList.h" />
     <ClInclude Include="..\..\FEBio2\FEFacet2FacetSliding.h" />
     <ClInclude Include="..\..\FEBio2\FEHeatSolver.h" />
@@ -599,7 +597,6 @@
     <ClCompile Include="..\..\FEBio2\console.cpp" />
     <ClCompile Include="..\..\FEBio2\DataStore.cpp" />
     <ClCompile Include="..\..\FEBio2\diagnose.cpp" />
-    <ClCompile Include="..\..\FEBio2\discrete.cpp" />
     <ClCompile Include="..\..\FEBio2\elstf.cpp" />
     <ClCompile Include="..\..\FEBio2\FEAnalysisStep.cpp" />
     <ClCompile Include="..\..\FEBio2\FEAugLagLinearConstraint.cpp" />
@@ -668,7 +665,6 @@
     <ClCompile Include="..\..\FEBio2\solid3f.cpp" />
     <ClCompile Include="..\..\FEBio2\solve.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
-    <ClCompile Include="..\..\FEBio2\truss.cpp" />
     <ClCompile Include="..\..\FEBio2\udghex.cpp" />
     <ClCompile Include="..\..\FEBio2\update.cpp" />
     <ClCompile Include="..\..\FEBio2\ut4.cpp" />
