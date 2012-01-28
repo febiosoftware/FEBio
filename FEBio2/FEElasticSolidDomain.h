@@ -47,6 +47,12 @@ public: // overrides from FEElasticDomain
 	//! calculates the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);
 
+	//! internal stress forces
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
+
+	//! body forces
+	void BodyForce(FENLSolver* psolver, FEBodyForce& BF, vector<double>& R);
+
 public:
 	// --- S T I F F N E S S ---
 
@@ -73,5 +79,7 @@ public:
 	//! Calculatess external body forces for solid elements
 	void ElementBodyForce(FEModel& fem, FESolidElement& elem, vector<double>& fe);
 
+	//! Calculatess external body forces for solid elements
+	void ElementBodyForce(FEBodyForce& BF, FESolidElement& elem, vector<double>& fe);
 	// ---
 };

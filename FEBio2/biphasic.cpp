@@ -112,12 +112,6 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			// get the element
 			FESolidElement& el = m_Elem[i];
 		
-			// this element should not be rigid
-			assert(!el.IsRigid());
-			
-			//! this element should not be UDG
-			assert(el.Type() != FE_UDGHEX);
-			
 			// get the element force vector and initialize it to zero
 			int ndof = 3*el.Nodes();
 			fe.assign(ndof, 0);
@@ -161,12 +155,6 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 		{
 			// get the element
 			FESolidElement& el = m_Elem[i];
-			
-			// this element should not be rigid
-			assert(!el.IsRigid());
-			
-			//! this element should not be UDG
-			assert(el.Type() != FE_UDGHEX);
 			
 			// unpack the element
 			UnpackLM(el, elm);

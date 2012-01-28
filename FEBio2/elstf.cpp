@@ -558,11 +558,22 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// get the mesh
 	FEMesh& mesh = m_fem.m_mesh;
 
-	// loop over all domains
-	for (i=0; i<mesh.Domains(); ++i) 
+	// calculate the internal (stress) forces
+	for (i=0; i<mesh.Domains(); ++i)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.Residual(this, R);
+		dom.InternalForces(this, R);
+	}
+
+	// calculate the body forces
+	for (i=0; i<mesh.Domains(); ++i)
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		for (int j=0; j<fem.BodyForces(); ++j)
+		{
+			FEBodyForce& BF = *fem.GetBodyForce(j);
+			dom.BodyForce(this, BF, R);
+		}
 	}
 
 	// calculate inertial forces for dynamic problems

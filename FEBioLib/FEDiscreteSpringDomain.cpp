@@ -163,6 +163,70 @@ void FEDiscreteSpringDomain::Residual(FENLSolver* psolver, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculates the forces due to discrete elements (i.e. springs)
+
+void FEDiscreteSpringDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+{
+	FEMesh& mesh = *m_pMesh;
+
+	vector<double> fe(6);
+	vec3d u1, u2;
+
+	vector<int> en(2), lm(6);
+
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		// get the discrete element
+		FEDiscreteElement& el = m_Elem[i];
+
+		// get the nodes
+		FENode& n1 = mesh.Node(el.m_node[0]);
+		FENode& n2 = mesh.Node(el.m_node[1]);
+
+		// get the nodal positions
+		vec3d& r01 = n1.m_r0;
+		vec3d& r02 = n2.m_r0;
+		vec3d& rt1 = n1.m_rt;
+		vec3d& rt2 = n2.m_rt;
+
+		vec3d e = rt2 - rt1; e.unit();
+
+		// calculate spring lengths
+		double L0 = (r02 - r01).norm();
+		double Lt = (rt2 - rt1).norm();
+		double DL = Lt - L0;
+		
+		// evaluate the spring stiffness
+		FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(m_pMat);
+		assert(pm);
+		double F = pm->force(DL);
+
+		// set up the force vector
+		fe[0] =   F*e.x;
+		fe[1] =   F*e.y;
+		fe[2] =   F*e.z;
+		fe[3] =  -F*e.x;
+		fe[4] =  -F*e.y;
+		fe[5] =  -F*e.z;
+
+		// setup the node vector
+		en[0] = el.m_node[0];
+		en[1] = el.m_node[1];
+
+		// set up the LM vector
+		lm[0] = n1.m_ID[DOF_X];
+		lm[1] = n1.m_ID[DOF_Y];
+		lm[2] = n1.m_ID[DOF_Z];
+		lm[3] = n2.m_ID[DOF_X];
+		lm[4] = n2.m_ID[DOF_Y];
+		lm[5] = n2.m_ID[DOF_Z];
+
+		// assemble element
+		psolver->AssembleResidual(en, lm, fe, R);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
 void FEDiscreteSpringDomain::StiffnessMatrix(FENLSolver* psolver)

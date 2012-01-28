@@ -140,7 +140,7 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 	ke[2][3] = ke[3][2] = -ke[2][0]; ke[2][4] = ke[4][2] = -ke[2][1]; ke[2][5] = ke[5][2] = -ke[2][2];
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 void FEElasticTrussDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
@@ -151,14 +151,31 @@ void FEElasticTrussDomain::Residual(FENLSolver* psolver, vector<double>& R)
 	for (int i=0; i<NT; ++i)
 	{
 		FETrussElement& el = m_Elem[i];
-		InternalForces(el, fe);
+		ElementInternalForces(el, fe);
+		UnpackLM(el, lm);
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
+	}
+}
+
+//----------------------------------------------------------------------------
+
+void FEElasticTrussDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+{
+	// element force vector
+	vector<double> fe;
+	vector<int> lm;
+	int NT = m_Elem.size();
+	for (int i=0; i<NT; ++i)
+	{
+		FETrussElement& el = m_Elem[i];
+		ElementInternalForces(el, fe);
 		UnpackLM(el, lm);
 		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticTrussDomain::InternalForces(FETrussElement& el, vector<double>& fe)
+void FEElasticTrussDomain::ElementInternalForces(FETrussElement& el, vector<double>& fe)
 {
 	FEMaterialPoint& mp = *el.m_State[0];
 	FETrussMaterialPoint& pt = *(mp.ExtractData<FETrussMaterialPoint>());

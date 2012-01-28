@@ -175,6 +175,36 @@ void FEElasticShellDomain::Residual(FENLSolver* psolver, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
+// Calculates the forces due to the stress
+void FEElasticShellDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+{
+	// element force vector
+	vector<double> fe;
+
+	vector<int> lm;
+
+	int NS = m_Elem.size();
+	for (int i=0; i<NS; ++i)
+	{
+		// get the element
+		FEShellElement& el = m_Elem[i];
+
+		// create the element force vector and initialize to zero
+		int ndof = 6*el.Nodes();
+		fe.assign(ndof, 0);
+
+		// skip rigid elements for internal force calculation
+		ElementInternalForce(el, fe);
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble the residual
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for shell elements
 //! Note that we use a one-point gauss integration rule for the thickness
 //! integration. This will integrate linear functions exactly.
@@ -259,6 +289,95 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 			fe[6*i+5] -= ( Mz*s.zz()  +
 				           My*s.yz() +
 					       Mx*s.xz() )*detJt;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEElasticShellDomain::BodyForce(FENLSolver* psolver, FEBodyForce& BF, vector<double>& R)
+{
+	// element force vector
+	vector<double> fe;
+
+	vector<int> lm;
+
+	int NS = m_Elem.size();
+	for (int i=0; i<NS; ++i)
+	{
+		// get the element
+		FEShellElement& el = m_Elem[i];
+
+		// create the element force vector and initialize to zero
+		int ndof = 6*el.Nodes();
+		fe.assign(ndof, 0);
+
+		// apply body forces to shells
+		ElementBodyForce(BF, el, fe);
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble the residual
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates element body forces for shells
+
+void FEElasticShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe)
+{
+	// don't forget to multiply with the density
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
+	assert(pme);
+
+	double dens = pme->Density();
+
+	// calculate the average thickness
+	double* h0 = &el.m_h0[0], gt, za;
+
+	// integration weights
+	double* gw = el.GaussWeights();
+	double *Hn, detJ;
+
+	// loop over integration points
+	int nint = el.GaussPoints();
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	vec3d r0[4], rt[4];
+	for (int i=0; i<neln; ++i)
+	{
+		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+	}
+
+	for (int n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		pt.r0 = el.Evaluate(r0, n);
+		pt.rt = el.Evaluate(rt, n);
+
+		detJ = detJ0(el, n)*gw[n];
+		Hn  = el.H(n);
+		gt = el.gt(n);
+
+		// get the force
+		vec3d f = BF.force(mp);
+
+		for (int i=0; i<neln; ++i)
+		{
+			za = 0.5*gt*h0[i];
+
+			fe[6*i  ] -= Hn[i]*f.x*dens*detJ;
+			fe[6*i+1] -= Hn[i]*f.y*dens*detJ;
+			fe[6*i+2] -= Hn[i]*f.z*dens*detJ;
+
+			fe[6*i+3] -= za*Hn[i]*dens*f.x*detJ;
+			fe[6*i+4] -= za*Hn[i]*dens*f.y*detJ;
+			fe[6*i+5] -= za*Hn[i]*dens*f.z*detJ;
 		}
 	}
 }

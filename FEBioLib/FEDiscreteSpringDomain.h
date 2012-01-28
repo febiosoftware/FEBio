@@ -32,4 +32,10 @@ public: // overridden from FEElasticDomain
 
 	//! update stresses (not used for discrete springs)
 	void UpdateStresses(FEModel& fem){}	
+
+	//! internal stress forces
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
+
+	//! calculate bodyforces (not used since springs are considered mass-less)
+	void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R) {}
 };

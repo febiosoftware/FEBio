@@ -5,6 +5,7 @@
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEBioLib/log.h"
+#include "FEBioLib/FEElasticDomain.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -441,6 +442,88 @@ bool FEBiphasicSolver::Quasin(double time)
 	}
 
 	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the residual vector
+//! Note that the concentrated nodal forces are not calculated here.
+//! This is because they do not depend on the geometry 
+//! so we only calculate them once (in Quasin) and then add them here.
+
+bool FEBiphasicSolver::Residual(vector<double>& R)
+{
+	int i;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
+	// initialize residual with concentrated nodal loads
+	R = m_Fn;
+
+	// zero nodal reaction forces
+	zero(m_Fr);
+
+	// zero rigid body reaction forces
+	int NRB = fem.m_RB.size();
+	for (i=0; i<NRB; ++i)
+	{
+		FERigidBody& RB = fem.m_RB[i];
+		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
+	}
+
+	// get the mesh
+	FEMesh& mesh = m_fem.m_mesh;
+
+	// loop over all domains
+	for (i=0; i<mesh.Domains(); ++i) 
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.Residual(this, R);
+	}
+
+	// calculate forces due to surface loads
+	int nsl = (int) fem.m_SL.size();
+	for (i=0; i<nsl; ++i)
+	{
+		FESurfaceLoad* psl = fem.m_SL[i];
+		if (psl->IsActive()) psl->Residual(this, R);
+	}
+
+	// rigid joint forces
+	if (!fem.m_RJ.empty())
+	{
+		for (int i=0; i<(int) fem.m_RJ.size(); ++i) fem.m_RJ[i]->JointForces(R);
+	}
+
+	// calculate contact forces
+	if (m_fem.ContactInterfaces() > 0)
+	{
+		ContactForces(R);
+	}
+
+	// calculate linear constraint forces
+	// note that these are the linear constraints
+	// enforced using the augmented lagrangian
+	LinearConstraintForces(R);
+
+	// forces due to point constraints
+	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].Residual(R);
+
+	// set the nodal reaction forces
+	// TODO: Is this a good place to do this?
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		node.m_Fr = vec3d(0,0,0);
+
+		int n;
+		if ((n = -node.m_ID[DOF_X]-2) >= 0) node.m_Fr.x = -m_Fr[n];
+		if ((n = -node.m_ID[DOF_Y]-2) >= 0) node.m_Fr.y = -m_Fr[n];
+		if ((n = -node.m_ID[DOF_Z]-2) >= 0) node.m_Fr.z = -m_Fr[n];
+	}
+
+	// increase RHS counter
+	m_nrhs++;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

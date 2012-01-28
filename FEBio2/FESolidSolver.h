@@ -104,7 +104,7 @@ public:
 		void ContactForces(vector<double>& R);
 
 		//! Calculates residual
-		bool Residual(vector<double>& R);
+		virtual bool Residual(vector<double>& R);
 
 		//! Calculate linear constraint forces
 		void LinearConstraintForces(vector<double>& R);

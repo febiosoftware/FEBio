@@ -35,11 +35,17 @@ public: // overrides from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
+	//! calculates the residual
+	void Residual(FENLSolver* psolver, vector<double>& R);
+
+	//! internal stress forces
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
+
 	//! Calculates inertial forces for dynamic problems
 	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
 
-	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	//! calculate body force
+	void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R);
 
 	// update stresses
 	void UpdateStresses(FEModel& fem);
@@ -58,4 +64,7 @@ public:
 
 	//! Calculate extenral body forces for shell elements
 	void ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe);
+
+	//! Calculate extenral body forces for shell elements
+	void ElementBodyForce(FEBodyForce& BF, FEShellElement& el, vector<double>& fe);
 };

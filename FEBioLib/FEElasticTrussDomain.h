@@ -36,6 +36,12 @@ public: // overloads from FEElasticDomain
 	//! calculates the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);
 
+	//! internal stress forces
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
+
+	//! calculate body force (TODO: implement this)
+	void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R) { assert(false); }
+
 	//! update the truss stresses
 	void UpdateStresses(FEModel& fem);
 
@@ -44,5 +50,5 @@ protected:
 	void ElementStiffness(int iel, matrix& ke);
 
 	//! Calculates the internal stress vector for solid elements
-	void InternalForces(FETrussElement& el, vector<double>& fe);
+	void ElementInternalForces(FETrussElement& el, vector<double>& fe);
 };

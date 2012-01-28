@@ -191,6 +191,35 @@ void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticSolidDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
+{
+	// element force vector
+	vector<double> fe;
+
+	vector<int> lm;
+
+	int NE = m_Elem.size();
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+
+		// calculate internal force vector
+		ElementInternalForce(el, fe);
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element 'fe'-vector into global R vector
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
 void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
@@ -253,6 +282,99 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 		}
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FEElasticSolidDomain::BodyForce(FENLSolver *psolver, FEBodyForce& BF, vector<double>& R)
+{
+	// element force vector
+	vector<double> fe;
+
+	vector<int> lm;
+/*
+	// TODO: move this to the FESolidSolver class
+	// TODO: I don't like this but for now I'll hard-code the modification of the
+	//       force center position
+	if (dynamic_cast<FEPointBodyForce*>(&BF))
+	{
+		FEPointBodyForce* pf = dynamic_cast<FEPointBodyForce*>(&BF);
+		if (pf->m_rlc[0] >= 0) pf->m_rc.x = fem.GetLoadCurve(pf->m_rlc[0])->Value();
+		if (pf->m_rlc[1] >= 0) pf->m_rc.y = fem.GetLoadCurve(pf->m_rlc[1])->Value();
+		if (pf->m_rlc[2] >= 0) pf->m_rc.z = fem.GetLoadCurve(pf->m_rlc[2])->Value();
+	}
+*/
+
+	int NE = m_Elem.size();
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+
+		// apply body forces
+		ElementBodyForce(BF, el, fe);
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element 'fe'-vector into global R vector
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the body forces
+
+void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el, vector<double>& fe)
+{
+	// don't forget to multiply with the density
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
+	double dens = pme->Density();
+
+	// jacobian
+	double detJ;
+	double *H;
+	double* gw = el.GaussWeights();
+	vec3d f;
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
+	for (int i=0; i<neln; ++i)
+	{
+		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+	}
+
+	// loop over integration points
+	int nint = el.GaussPoints();
+	for (int n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+		pt.r0 = el.Evaluate(r0, n);
+		pt.rt = el.Evaluate(rt, n);
+
+		detJ = detJ0(el, n)*gw[n];
+
+		// get the force
+		f = BF.force(mp);
+
+		H = el.H(n);
+
+		for (int i=0; i<neln; ++i)
+		{
+			fe[3*i  ] -= H[i]*dens*f.x*detJ;
+			fe[3*i+1] -= H[i]*dens*f.y*detJ;
+			fe[3*i+2] -= H[i]*dens*f.z*detJ;
+		}						
+	}
+}
+
 
 //-----------------------------------------------------------------------------
 //! calculates the body forces

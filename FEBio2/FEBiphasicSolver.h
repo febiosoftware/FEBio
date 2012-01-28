@@ -29,6 +29,10 @@ public:
 	//! update contact
 	void UpdateContact();
 
+public:
+	//! Calculates residual (overridden from FESolidSolver)
+	virtual bool Residual(vector<double>& R);
+
 protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);
 	void GetPressureData(vector<double>& pi, vector<double>& ui);
