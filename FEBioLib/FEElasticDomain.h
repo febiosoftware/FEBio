@@ -11,6 +11,7 @@ class FEElasticDomain
 public:
 	virtual ~FEElasticDomain(){}
 	virtual void StiffnessMatrix(FENLSolver* psolver) = 0;
+	virtual void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) = 0;
 	virtual void Residual(FENLSolver* psolver, vector<double>& R) = 0;
 	virtual void UpdateStresses(FEModel& fem) = 0;
 };

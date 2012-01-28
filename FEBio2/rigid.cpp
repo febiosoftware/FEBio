@@ -73,7 +73,7 @@ void FERigidSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 		fe.assign(ndof, 0);
 
 		// apply body force to rigid elements
-		BodyForces(fem, el, fe);
+		ElementBodyForce(fem, el, fe);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);

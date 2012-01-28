@@ -804,10 +804,6 @@ void FESolidSolver::NodalForces(vector<double>& F)
 
 void FESolidSolver::InertialForces(vector<double>& R)
 {
-	int i, j, iel, n;
-	int nint, neln;
-	double *H, kab;
-
 	// get the mesh
 	FEMesh& mesh = m_fem.m_mesh;
 
@@ -815,15 +811,11 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	vector<double> F(3*mesh.Nodes());
 	zero(F);
 
-	vector<double> fe;
-
-	vector<int> lm;
-
 	// calculate F
 	double dt = m_fem.GetCurrentStep()->m_dt;
 	double a = 4.0 / dt;
 	double b = a / dt;
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		vec3d& rt = node.m_rt;
@@ -837,64 +829,10 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	}
 
 	// now multiply F with the mass matrix
-	// first do the solid elements
-	// TODO: move this to the domain class (or the DomainIntegrator class)
 	matrix ke;
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
-		if (pbd)
-		{
-			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(pbd->GetMaterial()); assert(pme);
-			double d = pme->Density();
-
-			for (iel=0; iel<pbd->Elements(); ++iel)
-			{
-				FESolidElement& el = pbd->Element(iel);
-
-				nint = el.GaussPoints();
-				neln = el.Nodes();
-
-				ke.resize(3*neln, 3*neln);
-				ke.zero();
-
-				fe.resize(3*neln);
-		
-				// create the element mass matrix
-				for (n=0; n<nint; ++n)
-				{
-					double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
-
-					H = el.H(n);
-					for (i=0; i<neln; ++i)
-						for (j=0; j<neln; ++j)
-						{
-							kab = H[i]*H[j]*detJ0*d;
-							ke[3*i  ][3*j  ] += kab;
-							ke[3*i+1][3*j+1] += kab;
-							ke[3*i+2][3*j+2] += kab;
-						}	
-				}
-
-				// now, multiply M with F and add to R
-				int* en = &el.m_node[0];
-				for (i=0; i<3*neln; ++i)
-				{
-					fe[i] = 0;
-					for (j=0; j<3*neln; ++j)
-					{
-						fe[i] -= ke[i][j]*F[3*(en[j/3]) + j%3];
-					}
-				}
-
-				// get the element degrees of freedom
-				pbd->UnpackLM(el, lm);
-
-				// assemble fe into R
-				AssembleResidual(el.m_node, lm, fe, R);
-			}
-		}
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(nd));
+		dom.InertialForces(this, R, F);
 	}
-
-	// TODO: do dynamics for shell elements
 }

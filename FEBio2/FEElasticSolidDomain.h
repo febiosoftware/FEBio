@@ -33,12 +33,6 @@ public:
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	//! calculates the solid element stiffness matrix
-	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
-
-	//! Calculates the internal stress vector for solid elements
-	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
-
 public: // overrides from FEElasticDomain
 
 	// update stresses
@@ -47,28 +41,37 @@ public: // overrides from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
+	//! intertial forces for dynamic problems
+	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F);
+
 	//! calculates the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);
 
-protected:
+public:
 	// --- S T I F F N E S S ---
+
+	//! calculates the solid element stiffness matrix
+	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
 	void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness component
-	void MaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	void ElementMaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the solid element inertial stiffness matrix
 	void ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the stiffness matrix due to body forces 
-	void BodyForceStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	void ElementBodyForceStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	// --- R E S I D U A L ---
 
+	//! Calculates the internal stress vector for solid elements
+	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
+
 	//! Calculatess external body forces for solid elements
-	void BodyForces(FEModel& fem, FESolidElement& elem, vector<double>& fe);
+	void ElementBodyForce(FEModel& fem, FESolidElement& elem, vector<double>& fe);
 
 	// ---
 };

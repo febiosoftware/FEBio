@@ -24,9 +24,12 @@ public: // overridden from FEElasticDomain
 	//! calculate stiffness matrix
 	void StiffnessMatrix(FENLSolver* psolver);
 
+	//! Calculates inertial forces for dynamic problems
+	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
+
 	//! calculate residual
 	void Residual(FENLSolver* psolver, vector<double>& R);
 
-protected:
-	void UpdateStresses(FEModel& fem){}	// not used for discrete springs
+	//! update stresses (not used for discrete springs)
+	void UpdateStresses(FEModel& fem){}	
 };

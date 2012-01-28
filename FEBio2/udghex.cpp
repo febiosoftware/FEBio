@@ -33,7 +33,7 @@ void FEUDGHexDomain::Residual(FENLSolver *psolver, vector<double>& R)
 		UDGInternalForces(fem, el, fe);
 
 		// apply body forces
-		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
+		if (fem.HasBodyForces()) ElementBodyForce(fem, el, fe);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);

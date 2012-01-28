@@ -180,7 +180,7 @@ void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 		ElementInternalForce(el, fe);
 
 		// apply body forces
-		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
+		if (fem.HasBodyForces()) ElementBodyForce(fem, el, fe);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -257,7 +257,7 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 //-----------------------------------------------------------------------------
 //! calculates the body forces
 
-void FEElasticSolidDomain::BodyForces(FEModel& fem, FESolidElement& el, vector<double>& fe)
+void FEElasticSolidDomain::ElementBodyForce(FEModel& fem, FESolidElement& el, vector<double>& fe)
 {
 	int NF = fem.BodyForces();
 	for (int nf = 0; nf < NF; ++nf)
@@ -323,7 +323,7 @@ void FEElasticSolidDomain::BodyForces(FEModel& fem, FESolidElement& el, vector<d
 
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
-void FEElasticSolidDomain::BodyForceStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::ElementBodyForceStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
 	int neln = el.Nodes();
 	int ndof = ke.columns()/neln;
@@ -452,7 +452,7 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEElasticSolidDomain::MaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -607,7 +607,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 		if (fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) ElementInertialStiffness(fem, el, ke);
 
 		// add body force stiffness
-		if (fem.HasBodyForces()) BodyForceStiffness(fem, el, ke);
+		if (fem.HasBodyForces()) ElementBodyForceStiffness(fem, el, ke);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -629,7 +629,7 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 	FESolidElement& el = Element(iel);
 
 	// calculate material stiffness (i.e. constitutive component)
-	MaterialStiffness(fem, el, ke);
+	ElementMaterialStiffness(fem, el, ke);
 
 	// calculate geometrical stiffness
 	ElementGeometricalStiffness(el, ke);
@@ -798,5 +798,70 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
 			lm[(11+k)*N + i] = id[11+k];
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Calculate inertial forces
+void FEElasticSolidDomain::InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F)
+{
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat); assert(pme);
+	double d = pme->Density();
+
+	// element mass matrix
+	matrix ke;
+
+	// element force vector
+	vector<double> fe;
+
+	// element's LM vector
+	vector<int> lm;
+
+	// loop over all elements
+	int NE = Elements();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = Element(iel);
+
+		int nint = el.GaussPoints();
+		int neln = el.Nodes();
+
+		ke.resize(3*neln, 3*neln);
+		ke.zero();
+
+		fe.resize(3*neln);
+		
+		// create the element mass matrix
+		for (int n=0; n<nint; ++n)
+		{
+			double J0 = detJ0(el, n)*el.GaussWeights()[n];
+
+			double* H = el.H(n);
+			for (int i=0; i<neln; ++i)
+				for (int j=0; j<neln; ++j)
+				{
+					double kab = H[i]*H[j]*J0*d;
+					ke[3*i  ][3*j  ] += kab;
+					ke[3*i+1][3*j+1] += kab;
+					ke[3*i+2][3*j+2] += kab;
+				}	
+		}
+
+		// now, multiply M with F and add to R
+		int* en = &el.m_node[0];
+		for (int i=0; i<3*neln; ++i)
+		{
+			fe[i] = 0;
+			for (int j=0; j<3*neln; ++j)
+			{
+				fe[i] -= ke[i][j]*F[3*(en[j/3]) + j%3];
+			}
+		}
+
+		// get the element degrees of freedom
+		UnpackLM(el, lm);
+
+		// assemble fe into R
+		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }

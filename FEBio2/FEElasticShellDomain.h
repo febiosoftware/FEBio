@@ -30,25 +30,32 @@ public:
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	// update stresses
-	void UpdateStresses(FEModel& fem);
-
-	// --- S T I F F N E S S --- 
+public: // overrides from FEElasticDomain
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
+
+	//! Calculates inertial forces for dynamic problems
+	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
+
+	//! calculates the residual
+	void Residual(FENLSolver* psolver, vector<double>& R);
+
+	// update stresses
+	void UpdateStresses(FEModel& fem);
+
+public:
+
+	// --- S T I F F N E S S --- 
 
 	//! calculates the shell element stiffness matrix
 	void ElementStiffness(int iel, matrix& ke);
 
 	// --- R E S I D U A L ---
 
-	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
-
 	//! Calculates the internal stress vector for shell elements
-	void InternalForces(FEShellElement& el, vector<double>& fe);
+	void ElementInternalForce(FEShellElement& el, vector<double>& fe);
 
 	//! Calculate extenral body forces for shell elements
-	void BodyForces(FEModel& fem, FEShellElement& el, vector<double>& fe);
+	void ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe);
 };

@@ -161,10 +161,10 @@ void FEElasticShellDomain::Residual(FENLSolver* psolver, vector<double>& R)
 		fe.assign(ndof, 0);
 
 		// skip rigid elements for internal force calculation
-		InternalForces(el, fe);
+		ElementInternalForce(el, fe);
 
 		// apply body forces to shells
-		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
+		if (fem.HasBodyForces()) ElementBodyForce(fem, el, fe);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -179,7 +179,7 @@ void FEElasticShellDomain::Residual(FENLSolver* psolver, vector<double>& R)
 //! Note that we use a one-point gauss integration rule for the thickness
 //! integration. This will integrate linear functions exactly.
 
-void FEElasticShellDomain::InternalForces(FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -570,7 +570,7 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates body forces for shells
 
-void FEElasticShellDomain::BodyForces(FEModel& fem, FEShellElement& el, vector<double>& fe)
+void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe)
 {
 	int NF = fem.BodyForces();
 	for (int nf = 0; nf < NF; ++nf)

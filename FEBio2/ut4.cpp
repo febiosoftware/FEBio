@@ -503,7 +503,7 @@ void FEUT4Domain::ElementResidual(FENLSolver* psolver, vector<double>& R)
 		{
 			// Note that this function is in the base class
 			// I'm not sure, but I don't think I have to overwrite this one
-			BodyForces(fem, el, fe);
+			ElementBodyForce(fem, el, fe);
 		}
 
 		// get the element's LM vector
