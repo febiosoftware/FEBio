@@ -296,7 +296,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 		fe.assign(ndof, 0);
 
 		// calculate the element's residual
-		bd.InternalForces(e, fe);
+		bd.ElementInternalForce(e, fe);
 
 		// loop over the element's nodes
 		for (i=0; i<ne; ++i)

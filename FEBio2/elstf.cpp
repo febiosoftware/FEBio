@@ -547,9 +547,6 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// zero nodal reaction forces
 	zero(m_Fr);
 
-	// element force vector
-	vector<double> fe;
-
 	// zero rigid body reaction forces
 	int NRB = fem.m_RB.size();
 	for (i=0; i<NRB; ++i)

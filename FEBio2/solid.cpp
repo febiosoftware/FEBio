@@ -7,8 +7,15 @@
 #include "FEBioLib/FEPointBodyForce.h"
 
 //-----------------------------------------------------------------------------
-// FEElasticSolidDomain
+FEDomain* FEElasticSolidDomain::Clone()
+{
+	FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
+
 //-----------------------------------------------------------------------------
+// Reset data
 void FEElasticSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
@@ -16,56 +23,47 @@ void FEElasticSolidDomain::Reset()
 
 //-----------------------------------------------------------------------------
 //! \todo The material point initialization needs to move to the base class.
-bool FEElasticSolidDomain::Initialize(FEModel &mdl)
+bool FEElasticSolidDomain::Initialize(FEModel &fem)
 {
 	// initialize base class
-	FESolidDomain::Initialize(mdl);
-
-	// initialize material point data
-	FEM& fem = dynamic_cast<FEM&>(mdl);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FESolidDomain::Initialize(fem);
 
 	bool bmerr = false;
 
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
-		if (dynamic_cast<FESolidSolver*>(pstep->m_psolver))
-		{
-			// get the elements material
-			FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
 
-			// set the local element coordinates
-			if (pme)
+		// get the elements material
+		FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+
+		// set the local element coordinates
+		if (pme)
+		{
+			if (pme->m_pmap)
 			{
-				if (pme->m_pmap)
+				for (int n=0; n<el.GaussPoints(); ++n)
 				{
-					for (int n=0; n<el.GaussPoints(); ++n)
-					{
-						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-						pt.Q = pme->m_pmap->LocalElementCoord(el, n);
-					}
+					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+					pt.Q = pme->m_pmap->LocalElementCoord(el, n);
 				}
-				else
+			}
+			else
+			{
+				// If we get here, then the element has a user-defined fiber axis
+				// we should check to see if it has indeed been specified.
+				// TODO: This assumes that pt.Q will not get intialized to
+				//		 a valid value. I should find another way for checking since I
+				//		 would like pt.Q always to be initialized to a decent value.
+				if (dynamic_cast<FETransverselyIsotropic*>(pme))
 				{
-					if (fem.GetDebugFlag())
+					FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+					mat3d& m = pt.Q;
+					if (fabs(m.det() - 1) > 1e-7)
 					{
-						// If we get here, then the element has a user-defined fiber axis
-						// we should check to see if it has indeed been specified.
-						// TODO: This assumes that pt.Q will not get intialized to
-						//		 a valid value. I should find another way for checking since I
-						//		 would like pt.Q always to be initialized to a decent value.
-						if (dynamic_cast<FETransverselyIsotropic*>(pme))
-						{
-							FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-							mat3d& m = pt.Q;
-							if (fabs(m.det() - 1) > 1e-7)
-							{
-								// this element did not get specified a user-defined fiber direction
-//								clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
-								bmerr = true;
-							}
-						}
+						// this element did not get specified a user-defined fiber direction
+//							clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+						bmerr = true;
 					}
 				}
 			}
@@ -174,18 +172,12 @@ void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 		// get the element
 		FESolidElement& el = m_Elem[i];
 
-		// this element should not be rigid
-		assert(!el.IsRigid());
-
-		//! this element should not be UDG
-		assert(el.Type() != FE_UDGHEX);
-
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
-		InternalForces(el, fe);
+		ElementInternalForce(el, fe);
 
 		// apply body forces
 		if (fem.HasBodyForces()) BodyForces(fem, el, fe);
@@ -201,7 +193,7 @@ void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces for solid elements
 
-void FEElasticSolidDomain::InternalForces(FESolidElement& el, vector<double>& fe)
+void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 
@@ -386,7 +378,7 @@ void FEElasticSolidDomain::BodyForceStiffness(FEModel& fem, FESolidElement &el, 
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for integration point n
 
-void FEElasticSolidDomain::GeometricalStiffness(FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
 
@@ -640,7 +632,7 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 	MaterialStiffness(fem, el, ke);
 
 	// calculate geometrical stiffness
-	GeometricalStiffness(el, ke);
+	ElementGeometricalStiffness(el, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only

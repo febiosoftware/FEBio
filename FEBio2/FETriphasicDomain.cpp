@@ -104,7 +104,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	
 	// calculate internal force vector
 	// (This function is inherited from FEElasticSolidDomain)
-	FEElasticSolidDomain::InternalForces(el, fl);
+	FEElasticSolidDomain::ElementInternalForce(el, fl);
 	
 	// copy fl into fe
 	int i;
@@ -177,7 +177,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			
 			// calculate internal force vector
 			// (This function is inherited from FEElasticSolidDomain)
-			FEElasticSolidDomain::InternalForces(el, fe);
+			FEElasticSolidDomain::ElementInternalForce(el, fe);
 			
 			// apply body forces
 			// TODO: can we calculate body-forces with our formulation
@@ -248,7 +248,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			
 			// calculate internal force vector
 			// (This function is inherited from FEElasticSolidDomain)
-			FEElasticSolidDomain::InternalForces(el, fe);
+			FEElasticSolidDomain::ElementInternalForce(el, fe);
 			
 			// apply body forces
 			// TODO: can we calculate body-forces with our formulation
@@ -1831,8 +1831,8 @@ void FETriphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matr
 	// calculate material stiffness (i.e. constitutive component)
 	TriphasicMaterialStiffness(fem, el, ke);
 	
-	// calculate geometrical stiffness
-	GeometricalStiffness(el, ke);
+	// calculate geometrical stiffness (inherited from FEElasticSolidDomain)
+	ElementGeometricalStiffness(el, ke);
 	
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only

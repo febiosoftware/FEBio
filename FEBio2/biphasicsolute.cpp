@@ -114,7 +114,7 @@ void FEBiphasicSoluteDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			
 			// calculate internal force vector
 			// (This function is inherited from FEElasticSolidDomain)
-			InternalForces(el, fe);
+			ElementInternalForce(el, fe);
 			
 			// apply body forces
 			// TODO: can we calculate body-forces with our formulation
@@ -175,7 +175,7 @@ void FEBiphasicSoluteDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			
 			// calculate internal force vector
 			// (This function is inherited from FEElasticSolidDomain)
-			InternalForces(el, fe);
+			ElementInternalForce(el, fe);
 			
 			// apply body forces
 			// TODO: can we calculate body-forces with our formulation
@@ -1305,8 +1305,8 @@ void FEBiphasicSoluteDomain::SolidElementStiffness(FEM& fem, FESolidElement& el,
 	// calculate material stiffness (i.e. constitutive component)
 	BiphasicSoluteMaterialStiffness(fem, el, ke);
 	
-	// calculate geometrical stiffness
-	GeometricalStiffness(el, ke);
+	// calculate geometrical stiffness (inherited from FEElasticSolidDomain)
+	ElementGeometricalStiffness(el, ke);
 	
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only

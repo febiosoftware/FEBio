@@ -277,7 +277,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	// first calculate the initial residual
 	vector<double> f0(24);
 	zero(f0);
-	bd.InternalForces(el, f0);
+	bd.ElementInternalForce(el, f0);
 
 	// now calculate the perturbed residuals
 	ke.resize(24, 24);
@@ -302,7 +302,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 		solver.UpdateStresses();
 
 		zero(f1);
-		bd.InternalForces(el, f1);
+		bd.ElementInternalForce(el, f1);
 
 		switch (nj)
 		{

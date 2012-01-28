@@ -16,12 +16,7 @@ public:
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! create a clone of this class
-	FEDomain* Clone()
-	{
-		FEElasticSolidDomain* pd = new FEElasticSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
+	FEDomain* Clone();
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
@@ -38,26 +33,28 @@ public:
 	//! Unpack solid element data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
+	//! calculates the solid element stiffness matrix
+	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
+
+	//! Calculates the internal stress vector for solid elements
+	void ElementInternalForce(FESolidElement& el, vector<double>& fe);
+
+public: // overrides from FEElasticDomain
+
 	// update stresses
 	void UpdateStresses(FEModel& fem);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
-	//! calculates the solid element stiffness matrix
-	virtual void ElementStiffness(FEModel& fem, int iel, matrix& ke);
-
 	//! calculates the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);
-
-	//! Calculates the internal stress vector for solid elements
-	void InternalForces(FESolidElement& el, vector<double>& fe);
 
 protected:
 	// --- S T I F F N E S S ---
 
 	//! geometrical stiffness (i.e. initial stress)
-	void GeometricalStiffness(FESolidElement& el, matrix& ke);
+	void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness component
 	void MaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
