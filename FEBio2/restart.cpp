@@ -29,7 +29,7 @@
 #include "FEBioLib/FEElasticTrussDomain.h"
 #include "FEBioLib/FEHeatSolidDomain.h"
 #include "FEBioLib/FEDiscreteSpringDomain.h"
-#include "FEBiphasicDomain.h"
+#include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEUDGHexDomain.h"
 #include "FERigidSolidDomain.h"
@@ -488,7 +488,7 @@ void FEM::SerializeMesh(DumpFile& ar)
 			case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (&m, pm); break;
 			case FE_DISCRETE_DOMAIN       : pd = new FEDiscreteSpringDomain    (&m, pm); break;
 			case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(&m, pm); break;
-			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicDomain          (&m, pm); break;
+			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicSolidDomain          (&m, pm); break;
 			case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (&m, pm); break;
 			case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (&m, pm); break;
 			default: assert(false);

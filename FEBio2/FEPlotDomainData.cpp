@@ -3,7 +3,7 @@
 #include "FEBioLib/FEDamageNeoHookean.h"
 #include "FEBioLib/FEDamageTransIsoMooneyRivlin.h"
 #include "FEBiphasicSoluteDomain.h"
-#include "FEBiphasicDomain.h"
+#include "FEBiphasicSolidDomain.h"
 #include "FETriphasicDomain.h"
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
@@ -226,7 +226,7 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 	int i, j;
 	double ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicDomain*>(&dom))	|| 
+	if ((dynamic_cast<FEBiphasicSolidDomain*>(&dom))	|| 
 		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
 		(dynamic_cast<FETriphasicDomain*>(&dom)))
 	{
@@ -261,7 +261,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 	float af[3];
 	vec3d ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicDomain*>(&dom)) || 
+	if ((dynamic_cast<FEBiphasicSolidDomain*>(&dom)) || 
 		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
 		(dynamic_cast<FETriphasicDomain*>(&dom)))
 	{
@@ -299,7 +299,7 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 {
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicDomain*>(&dom))
+	if ((dynamic_cast<FEBiphasicSolidDomain*>(&dom))
 		|| (dynamic_cast<FEBiphasicSoluteDomain*>(&dom))
 		|| (dynamic_cast<FETriphasicDomain*>(&dom)))
 	{
@@ -718,7 +718,7 @@ bool FEPlotShellThickness::Save(FEDomain &dom, vector<float> &a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
 {
-	FEBiphasicDomain* pd = dynamic_cast<FEBiphasicDomain*>(&dom);
+	FEBiphasicSolidDomain* pd = dynamic_cast<FEBiphasicSolidDomain*>(&dom);
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	if (pd)

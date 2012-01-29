@@ -1,12 +1,12 @@
 #include "stdafx.h"
-#include "FEBiphasicDomain.h"
+#include "FEBiphasicSolidDomain.h"
 #include "FESolidSolver.h"
 #include "FEMicroMaterial.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
-bool FEBiphasicDomain::Initialize(FEModel &mdl)
+bool FEBiphasicSolidDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class
 	FEElasticSolidDomain::Initialize(mdl);
@@ -48,7 +48,7 @@ bool FEBiphasicDomain::Initialize(FEModel &mdl)
 //-----------------------------------------------------------------------------
 //! calculate internal equivalent nodal forces
 
-void FEBiphasicDomain::ElementInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
+void FEBiphasicSolidDomain::ElementInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	// local element force vector
 	vector<double> fl;
@@ -94,7 +94,7 @@ void FEBiphasicDomain::ElementInternalForces(FEM& fem, FESolidElement& el, vecto
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
+void FEBiphasicSolidDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	int i, j;
 	
@@ -182,7 +182,7 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSolidDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -222,7 +222,7 @@ void FEBiphasicDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& 
 
 //-----------------------------------------------------------------------------
 // Calculate the work due to the internal fluid pressure
-void FEBiphasicDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSolidDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -263,7 +263,7 @@ void FEBiphasicDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R,
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FEBiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<double>& fe, double dt)
+bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -371,7 +371,7 @@ bool FEBiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<doubl
 //! calculates the internal equivalent nodal forces due to the fluid work
 //! for a steady-state analysis (solid velocity = 0)
 
-bool FEBiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<double>& fe, double dt)
+bool FEBiphasicSolidDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -444,7 +444,7 @@ bool FEBiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<dou
 
 //-----------------------------------------------------------------------------
 
-void FEBiphasicDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
@@ -539,7 +539,7 @@ void FEBiphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FEBiphasicDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElement& el, matrix& ke)
+bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElement& el, matrix& ke)
 {
 	FEM& fem = dynamic_cast<FEM&>(mdl);
 	int i, j, n;
@@ -742,7 +742,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElement& el
 //! calculates element stiffness matrix for element iel
 //! for the steady-state response (zero solid velocity)
 //!
-bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke)
+bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke)
 {
 	int i, j, n;
 	
@@ -899,7 +899,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, 
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEBiphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
+void FEBiphasicSolidDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
 	ElementBiphasicMaterialStiffness(el, ke);
@@ -920,7 +920,7 @@ void FEBiphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEBiphasicDomain::ElementBiphasicMaterialStiffness(FESolidElement &el, matrix &ke)
+void FEBiphasicSolidDomain::ElementBiphasicMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 	
@@ -1054,7 +1054,7 @@ void FEBiphasicDomain::ElementBiphasicMaterialStiffness(FESolidElement &el, matr
 
 
 //-----------------------------------------------------------------------------
-void FEBiphasicDomain::UpdateStresses(FEModel &fem)
+void FEBiphasicSolidDomain::UpdateStresses(FEModel &fem)
 {
 	int i, n;
 	int nint, neln;

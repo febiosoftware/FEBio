@@ -9,15 +9,15 @@ class FEM;
 //! Note that this class inherits from FEElasticSolidDomain since the biphasic domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FEBiphasicDomain : public FEElasticSolidDomain
+class FEBiphasicSolidDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEBiphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_BIPHASIC_DOMAIN; }
+	FEBiphasicSolidDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_BIPHASIC_DOMAIN; }
 	
 	FEDomain* Clone()
 	{
-		FEBiphasicDomain* pd = new FEBiphasicDomain(m_pMesh, m_pMat);
+		FEBiphasicSolidDomain* pd = new FEBiphasicSolidDomain(m_pMesh, m_pMat);
 		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 		return pd;
 	}
