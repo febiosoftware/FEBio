@@ -133,7 +133,7 @@ void FEBiphasicSoluteDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
 			
 			// calculate fluid internal work
-			InternalFluidWorkSS(fem, el, fe);
+			ElementInternalFluidWorkSS(fem, el, fe);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -145,7 +145,7 @@ void FEBiphasicSoluteDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate solute internal work
-			InternalSoluteWorkSS(fem, el, fe);
+			ElementInternalSoluteWorkSS(fem, el, fe);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -194,7 +194,7 @@ void FEBiphasicSoluteDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
 			
 			// calculate fluid internal work
-			InternalFluidWork(fem, el, fe);
+			ElementInternalFluidWork(fem, el, fe);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -206,7 +206,7 @@ void FEBiphasicSoluteDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate solute internal work
-			InternalSoluteWork(fem, el, fe);
+			ElementInternalSoluteWork(fem, el, fe);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -223,7 +223,7 @@ void FEBiphasicSoluteDomain::Residual(FENLSolver* psolver, vector<double>& R)
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FEBiphasicSoluteDomain::ElementInternalFluidWork(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	
@@ -336,7 +336,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vec
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FEBiphasicSoluteDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FEBiphasicSoluteDomain::ElementInternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	
@@ -413,7 +413,7 @@ bool FEBiphasicSoluteDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, v
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FEBiphasicSoluteDomain::ElementInternalSoluteWork(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	
@@ -582,7 +582,7 @@ bool FEBiphasicSoluteDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, ve
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FEBiphasicSoluteDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FEBiphasicSoluteDomain::ElementInternalSoluteWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	
@@ -1303,7 +1303,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 void FEBiphasicSoluteDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
-	BiphasicSoluteMaterialStiffness(fem, el, ke);
+	ElementBiphasicSoluteMaterialStiffness(fem, el, ke);
 	
 	// calculate geometrical stiffness (inherited from FEElasticSolidDomain)
 	ElementGeometricalStiffness(el, ke);
@@ -1321,7 +1321,7 @@ void FEBiphasicSoluteDomain::SolidElementStiffness(FEM& fem, FESolidElement& el,
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEBiphasicSoluteDomain::BiphasicSoluteMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
 	assert(fem.GetCurrentStep()->m_nModule == FE_POROSOLUTE);
 	

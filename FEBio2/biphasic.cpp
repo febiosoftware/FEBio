@@ -48,7 +48,7 @@ bool FEBiphasicDomain::Initialize(FEModel &mdl)
 //-----------------------------------------------------------------------------
 //! calculate internal equivalent nodal forces
 
-void FEBiphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
+void FEBiphasicDomain::ElementInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	// local element force vector
 	vector<double> fl;
@@ -84,7 +84,8 @@ void FEBiphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doubl
 	}
 	
 	// calculate fluid internal work
-	InternalFluidWork(fem, el, fl);
+	double dt = fem.GetCurrentStep()->m_dt;
+	ElementInternalFluidWork(el, fl, dt);
 	
 	// copy fl into fe
 	for (i=0; i<neln; ++i) {
@@ -98,6 +99,7 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 	int i, j;
 	
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// element force vector
 	vector<double> fe;
@@ -120,16 +122,6 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			// (This function is inherited from FEElasticSolidDomain)
 			FEElasticSolidDomain::ElementInternalForce(el, fe);
 			
-			// apply body forces
-			// TODO: can we calculate body-forces with our formulation
-			//       of biphasic theory
-			/*
-			 if (fem.UseBodyForces())
-			 {
-			 BodyForces(fem, el, fe);
-			 }
-			 */
-
 			// assemble element 'fe'-vector into global R vector
 			UnpackLM(el, elm);
 			psolver->AssembleResidual(el.m_node, elm, fe, R);
@@ -139,7 +131,7 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FEBiphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
-			InternalFluidWorkSS(fem, el, fe);
+			ElementInternalFluidWorkSS(el, fe, dt);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -167,16 +159,6 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			// (This function is inherited from FEElasticSolidDomain)
 			FEElasticSolidDomain::ElementInternalForce(el, fe);
 			
-			// apply body forces
-			// TODO: can we calculate body-forces with our formulation
-			//       of biphasic theory
-			/*
-			 if (fem.UseBodyForces())
-			 {
-			 BodyForces(fem, el, fe);
-			 }
-			 */
-			
 			// assemble element 'fe'-vector into global R vector
 			psolver->AssembleResidual(el.m_node, elm, fe, R);
 			
@@ -185,7 +167,7 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FEBiphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
-			InternalFluidWork(fem, el, fe);
+			ElementInternalFluidWork(el, fe, dt);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -200,11 +182,88 @@ void FEBiphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
+void FEBiphasicDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
+{
+	// element force vector
+	vector<double> fe;
+	vector<int> elm;
+	
+	int NE = m_Elem.size();
+
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+		
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+			
+		// assemble element 'fe'-vector into global R vector
+		UnpackLM(el, elm);
+		
+		// do biphasic forces
+		FEMaterial* pm = m_pMat;
+		assert(dynamic_cast<FEBiphasic*>(pm) != 0);
+			
+		// calculate fluid internal work
+		ElementInternalFluidWorkSS(el, fe, dt);
+			
+		// add fluid work to global residual
+		int neln = el.Nodes();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[3*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Calculate the work due to the internal fluid pressure
+void FEBiphasicDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt)
+{
+	// element force vector
+	vector<double> fe;
+	vector<int> elm;
+	
+	int NE = m_Elem.size();
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+			
+		// unpack the element
+		UnpackLM(el, elm);
+			
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+			
+		// do biphasic forces
+		FEMaterial* pm = m_pMat;
+		assert(dynamic_cast<FEBiphasic*>(pm) != 0);
+			
+		// calculate fluid internal work
+		ElementInternalFluidWork(el, fe, dt);
+			
+		// add fluid work to global residual
+		int neln = el.Nodes();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[3*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces due to the fluid work
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FEBiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -240,9 +299,6 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 	}
 	
 	zero(fe);
-	
-	// get the time step value
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -304,7 +360,7 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 		for (i=0; i<neln; ++i)
 		{
 			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
-			//			fe[i] -= (B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
+//			fe[i] -= (B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
 		}
 	}
 	
@@ -315,7 +371,7 @@ bool FEBiphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<do
 //! calculates the internal equivalent nodal forces due to the fluid work
 //! for a steady-state analysis (solid velocity = 0)
 
-bool FEBiphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FEBiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -343,9 +399,6 @@ bool FEBiphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<
 	}
 	
 	zero(fe);
-	
-	// get the time step value
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -849,7 +902,7 @@ bool FEBiphasicDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, 
 void FEBiphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
-	BiphasicMaterialStiffness(el, ke);
+	ElementBiphasicMaterialStiffness(el, ke);
 	
 	// calculate geometrical stiffness (inherited from FEElasticSolidDomain)
 	ElementGeometricalStiffness(el, ke);
@@ -867,7 +920,7 @@ void FEBiphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEBiphasicDomain::BiphasicMaterialStiffness(FESolidElement &el, matrix &ke)
+void FEBiphasicDomain::ElementBiphasicMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 	

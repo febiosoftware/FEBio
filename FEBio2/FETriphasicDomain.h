@@ -48,16 +48,16 @@ public:
 	
 protected:
 	//! Calculates the internal fluid forces
-	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	bool ElementInternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
 	
 	//! Calculates the internal fluid forces for steady-state response
-	bool InternalFluidWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	bool ElementInternalFluidWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe);
 	
 	//! Calculates the internal solute forces
-	bool InternalSoluteWork(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
+	bool ElementInternalSoluteWork(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
 	
 	//! Calculates the internal solute forces for steady-state response
-	bool InternalSoluteWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
+	bool ElementInternalSoluteWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
 	
 	//! calculates the element triphasic stiffness matrix
 	bool ElementTriphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
@@ -69,6 +69,6 @@ protected:
 	void SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 	
 	//! material stiffness component
-	void TriphasicMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ElementTriphasicMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
 	
 };

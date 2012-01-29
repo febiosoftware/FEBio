@@ -115,7 +115,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	}
 	
 	// calculate fluid internal work
-	InternalFluidWork(fem, el, fl);
+	ElementInternalFluidWork(fem, el, fl);
 	
 	// copy fl into fe
 	for (i=0; i<neln; ++i) {
@@ -123,7 +123,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	}
 	
 	// calculate cation internal work
-	InternalSoluteWork(fem, el, fl, 0);
+	ElementInternalSoluteWork(fem, el, fl, 0);
 	
 	// copy fl into fe
 	for (i=0; i<neln; ++i) {
@@ -131,7 +131,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	}
 	
 	// calculate anion internal work
-	InternalSoluteWork(fem, el, fl, 1);
+	ElementInternalSoluteWork(fem, el, fl, 1);
 	
 	// copy fl into fe
 	for (i=0; i<neln; ++i) {
@@ -196,7 +196,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FETriphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
-			InternalFluidWorkSS(fem, el, fe);
+			ElementInternalFluidWorkSS(fem, el, fe);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -208,7 +208,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate cation internal work
-			InternalSoluteWorkSS(fem, el, fe, 0);
+			ElementInternalSoluteWorkSS(fem, el, fe, 0);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -218,7 +218,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate anion internal work
-			InternalSoluteWorkSS(fem, el, fe, 1);
+			ElementInternalSoluteWorkSS(fem, el, fe, 1);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -267,7 +267,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FETriphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
-			InternalFluidWork(fem, el, fe);
+			ElementInternalFluidWork(fem, el, fe);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -279,7 +279,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate cation internal work
-			InternalSoluteWork(fem, el, fe, 0);
+			ElementInternalSoluteWork(fem, el, fe, 0);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -289,7 +289,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate anion internal work
-			InternalSoluteWork(fem, el, fe, 1);
+			ElementInternalSoluteWork(fem, el, fe, 1);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -306,7 +306,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FETriphasicDomain::ElementInternalFluidWork(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	
@@ -419,7 +419,7 @@ bool FETriphasicDomain::InternalFluidWork(FEM& fem, FESolidElement& el, vector<d
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FETriphasicDomain::ElementInternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	int i, n;
 	
@@ -496,7 +496,7 @@ bool FETriphasicDomain::InternalFluidWorkSS(FEM& fem, FESolidElement& el, vector
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, vector<double>& fe, const int ion)
+bool FETriphasicDomain::ElementInternalSoluteWork(FEM& fem, FESolidElement& el, vector<double>& fe, const int ion)
 {
 	int i, n;
 	
@@ -708,7 +708,7 @@ bool FETriphasicDomain::InternalSoluteWork(FEM& fem, FESolidElement& el, vector<
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::InternalSoluteWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe, const int ion)
+bool FETriphasicDomain::ElementInternalSoluteWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe, const int ion)
 {
 	int i, n;
 	
@@ -1829,7 +1829,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el
 void FETriphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
-	TriphasicMaterialStiffness(fem, el, ke);
+	ElementTriphasicMaterialStiffness(fem, el, ke);
 	
 	// calculate geometrical stiffness (inherited from FEElasticSolidDomain)
 	ElementGeometricalStiffness(el, ke);
@@ -1847,7 +1847,7 @@ void FETriphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matr
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FETriphasicDomain::TriphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FETriphasicDomain::ElementTriphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
 	assert(fem.GetCurrentStep()->m_nModule == FE_TRIPHASIC);
 	

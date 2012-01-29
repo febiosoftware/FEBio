@@ -22,33 +22,44 @@ public:
 		return pd;
 	}
 	
+	//! initialize class
+	bool Initialize(FEModel& fem);
+	
+	//! return element stiffness matrix
+	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {
+		FESolidElement& el = Element(iel);
+		ElementBiphasicStiffness(fem, el, ke);
+	}
+
+public: // overrides from FEElasticDomain
+
+	// update stresses
+	void UpdateStresses(FEModel& fem);
+
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 	
 	//! calculates the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);
 
-	//! initialize class
-	bool Initialize(FEModel& fem);
-	
-	// update stresses
-	void UpdateStresses(FEModel& fem);
+public: // TODO: The following functions are to replace Residual
 
-	//! return element stiffness matrix
-	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {
-		FESolidElement& el = Element(iel);
-		ElementBiphasicStiffness(fem, el, ke);
-	}
+	//! internal fluid work
+	void InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt);
+
+	//! internal fluid work (steady state analysis)
+	void InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt);
+
+public:
 	
 	//! calculate internal equivalent nodal forces
-	void InternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+	void ElementInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
 	
-protected:
 	//! Calculates the internal fluid forces
-	bool InternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	bool ElementInternalFluidWork(FESolidElement& elem, vector<double>& fe, double dt);
 	
 	//! Calculates the internal fluid forces for steady-state response
-	bool InternalFluidWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	bool ElementInternalFluidWorkSS(FESolidElement& elem, vector<double>& fe, double dt);
 	
 	//! calculates the element biphasic stiffness matrix
 	bool ElementBiphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
@@ -60,5 +71,5 @@ protected:
 	void SolidElementStiffness(FESolidElement& el, matrix& ke);
 	
 	//! material stiffness component
-	void BiphasicMaterialStiffness(FESolidElement& el, matrix& ke);
+	void ElementBiphasicMaterialStiffness(FESolidElement& el, matrix& ke);
 };

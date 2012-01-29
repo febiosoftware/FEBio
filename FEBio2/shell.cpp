@@ -193,7 +193,7 @@ void FEElasticShellDomain::InternalForces(FENLSolver* psolver, vector<double>& R
 		int ndof = 6*el.Nodes();
 		fe.assign(ndof, 0);
 
-		// skip rigid elements for internal force calculation
+		// calculate element's internal force
 		ElementInternalForce(el, fe);
 
 		// get the element's LM vector
