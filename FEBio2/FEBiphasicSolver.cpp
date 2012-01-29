@@ -6,6 +6,7 @@
 #include "FESlidingInterface3.h"
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEElasticDomain.h"
+#include "FEBiphasicSolidDomain.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -454,6 +455,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 {
 	int i;
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	double dt = fem.GetCurrentStep()->m_dt;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -471,12 +473,37 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 
 	// get the mesh
 	FEMesh& mesh = m_fem.m_mesh;
-
+/*
 	// loop over all domains
 	for (i=0; i<mesh.Domains(); ++i) 
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.Residual(this, R);
+	}
+*/
+	// calculate internal stress force
+	for (i=0; i<mesh.Domains(); ++i)
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.InternalForces(this, R);
+	}
+
+	// calculate internal fluid work
+	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+	{
+		for (i=0; i<mesh.Domains(); ++i)
+		{
+			FEBiphasicSolidDomain& dom = dynamic_cast<FEBiphasicSolidDomain&>(mesh.Domain(i));
+			dom.InternalFluidWorkSS(this, R, dt);
+		}
+	}
+	else
+	{
+		for (i=0; i<mesh.Domains(); ++i)
+		{
+			FEBiphasicSolidDomain& dom = dynamic_cast<FEBiphasicSolidDomain&>(mesh.Domain(i));
+			dom.InternalFluidWork(this, R, dt);
+		}
 	}
 
 	// calculate forces due to surface loads

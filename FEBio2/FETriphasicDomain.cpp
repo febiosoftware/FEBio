@@ -79,12 +79,14 @@ void FETriphasicDomain::InitElements()
 
 //-----------------------------------------------------------------------------
 //! calculate internal equivalent nodal forces
-void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
+void FETriphasicDomain::ElementInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe)
 {
 	// local element force vector
 	vector<double> fl;
 	
 	vector<int> elm;
+
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// this element should not be rigid
 	assert(!el.IsRigid());
@@ -115,7 +117,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	}
 	
 	// calculate fluid internal work
-	ElementInternalFluidWork(fem, el, fl);
+	ElementInternalFluidWork(el, fl, dt);
 	
 	// copy fl into fe
 	for (i=0; i<neln; ++i) {
@@ -123,7 +125,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	}
 	
 	// calculate cation internal work
-	ElementInternalSoluteWork(fem, el, fl, 0);
+	ElementInternalSoluteWork(el, fl, dt, 0);
 	
 	// copy fl into fe
 	for (i=0; i<neln; ++i) {
@@ -131,7 +133,7 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	}
 	
 	// calculate anion internal work
-	ElementInternalSoluteWork(fem, el, fl, 1);
+	ElementInternalSoluteWork(el, fl, dt, 1);
 	
 	// copy fl into fe
 	for (i=0; i<neln; ++i) {
@@ -139,13 +141,14 @@ void FETriphasicDomain::InternalForces(FEM& fem, FESolidElement& el, vector<doub
 	}
 	
 }
-
+/*
 //-----------------------------------------------------------------------------
 void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	int i, j;
 	
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// make sure we are in poro-solute mode
 	assert(fem.GetCurrentStep()->m_nModule == FE_TRIPHASIC);
@@ -179,16 +182,6 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			// (This function is inherited from FEElasticSolidDomain)
 			FEElasticSolidDomain::ElementInternalForce(el, fe);
 			
-			// apply body forces
-			// TODO: can we calculate body-forces with our formulation
-			//       of biphasic theory
-			/*
-			 if (fem.UseBodyForces())
-			 {
-			 BodyForces(fem, el, fe);
-			 }
-			 */
-			
 			// assemble element 'fe'-vector into global R vector
 			psolver->AssembleResidual(el.m_node, elm, fe, R);
 			
@@ -196,7 +189,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FETriphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
-			ElementInternalFluidWorkSS(fem, el, fe);
+			ElementInternalFluidWorkSS(el, fe, dt);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -208,7 +201,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate cation internal work
-			ElementInternalSoluteWorkSS(fem, el, fe, 0);
+			ElementInternalSoluteWorkSS(el, fe, dt, 0);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -218,7 +211,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate anion internal work
-			ElementInternalSoluteWorkSS(fem, el, fe, 1);
+			ElementInternalSoluteWorkSS(el, fe, dt, 1);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -250,16 +243,6 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			// (This function is inherited from FEElasticSolidDomain)
 			FEElasticSolidDomain::ElementInternalForce(el, fe);
 			
-			// apply body forces
-			// TODO: can we calculate body-forces with our formulation
-			//       of biphasic theory
-			/*
-			 if (fem.UseBodyForces())
-			 {
-			 BodyForces(fem, el, fe);
-			 }
-			 */
-			
 			// assemble element 'fe'-vector into global R vector
 			psolver->AssembleResidual(el.m_node, elm, fe, R);
 			
@@ -267,7 +250,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(dynamic_cast<FETriphasic*>(pm) != 0);
 			
 			// calculate fluid internal work
-			ElementInternalFluidWork(fem, el, fe);
+			ElementInternalFluidWork(el, fe, dt);
 			
 			// add fluid work to global residual
 			int neln = el.Nodes();
@@ -279,7 +262,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate cation internal work
-			ElementInternalSoluteWork(fem, el, fe, 0);
+			ElementInternalSoluteWork(el, fe, dt, 0);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -289,7 +272,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			}
 			
 			// calculate anion internal work
-			ElementInternalSoluteWork(fem, el, fe, 1);
+			ElementInternalSoluteWork(el, fe, dt, 1);
 			
 			// add solute work to global residual
 			for (j=0; j<neln; ++j)
@@ -300,13 +283,147 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 		}
 	}
 }
+*/
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<double>& R, double dt, const int ion)
+{
+	// element force vector
+	vector<double> fe;
+	vector<int> elm;
+	
+	int NE = m_Elem.size();
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+			
+		// unpack the element
+		UnpackLM(el, elm);
+			
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+			
+		// calculate cation internal work
+		ElementInternalSoluteWorkSS(el, fe, dt, ion);
+			
+		// add solute work to global residual
+		int neln = el.Nodes();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[12*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>& R, double dt, const int ion)
+{
+	// element force vector
+	vector<double> fe;
+	vector<int> elm;
+	
+	int NE = m_Elem.size();
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+			
+		// unpack the element
+		UnpackLM(el, elm);
+			
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+			
+		// calculate cation internal work
+		ElementInternalSoluteWork(el, fe, dt, ion);
+			
+		// add solute work to global residual
+		int neln = el.Nodes();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[12*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
+{
+	// element force vector
+	vector<double> fe;
+	vector<int> elm;
+	
+	int NE = m_Elem.size();
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+			
+		// unpack the element
+		UnpackLM(el, elm);
+			
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+			
+		// calculate fluid internal work
+		ElementInternalFluidWorkSS(el, fe, dt);
+			
+		// add fluid work to global residual
+		int neln = el.Nodes();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[3*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt)
+{
+	// element force vector
+	vector<double> fe;
+	vector<int> elm;
+	
+	int NE = m_Elem.size();
+	for (int i=0; i<NE; ++i)
+	{
+		// get the element
+		FESolidElement& el = m_Elem[i];
+			
+		// unpack the element
+		UnpackLM(el, elm);
+			
+		// get the element force vector and initialize it to zero
+		int ndof = 3*el.Nodes();
+		fe.assign(ndof, 0);
+			
+		// calculate fluid internal work
+		ElementInternalFluidWork(el, fe, dt);
+			
+		// add fluid work to global residual
+		int neln = el.Nodes();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[3*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+	}
+}
+
 
 //-----------------------------------------------------------------------------
 //! calculates the internal equivalent nodal forces due to the fluid work
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::ElementInternalFluidWork(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FETriphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -325,7 +442,7 @@ bool FETriphasicDomain::ElementInternalFluidWork(FEM& fem, FESolidElement& el, v
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *m_pMesh;
 	
 	vec3d rp[8];
 	for (i=0; i<neln; ++i) 
@@ -333,18 +450,7 @@ bool FETriphasicDomain::ElementInternalFluidWork(FEM& fem, FESolidElement& el, v
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
 	
-	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (fem.GetMaterial(el.GetMatID()));
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
-	
 	zero(fe);
-	
-	// get the time step value
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -419,7 +525,7 @@ bool FETriphasicDomain::ElementInternalFluidWork(FEM& fem, FESolidElement& el, v
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::ElementInternalFluidWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe)
+bool FETriphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<double>& fe, double dt)
 {
 	int i, n;
 	
@@ -438,18 +544,7 @@ bool FETriphasicDomain::ElementInternalFluidWorkSS(FEM& fem, FESolidElement& el,
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
-	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (fem.GetMaterial(el.GetMatID()));
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
-	
 	zero(fe);
-	
-	// get the time step value
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -496,7 +591,7 @@ bool FETriphasicDomain::ElementInternalFluidWorkSS(FEM& fem, FESolidElement& el,
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::ElementInternalSoluteWork(FEM& fem, FESolidElement& el, vector<double>& fe, const int ion)
+bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<double>& fe, double dt, const int ion)
 {
 	int i, n;
 	
@@ -516,7 +611,7 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FEM& fem, FESolidElement& el, 
 	// gauss-weights
 	double* wg = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *m_pMesh;
 	
 	vec3d r0[8], rt[8], rp[8], vt[8];
 	double cp[2][8];
@@ -529,19 +624,11 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FEM& fem, FESolidElement& el, 
 		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[1];
 		vt[i] = mesh.Node(el.m_node[i]).m_vt;
 	}
-	
-	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (fem.GetMaterial(el.GetMatID()));
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
+
+	FETriphasic* pm = dynamic_cast<FETriphasic*>(m_pMat);
+	assert(pm);
 	
 	zero(fe);
-	
-	// get the time step value
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -708,7 +795,7 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FEM& fem, FESolidElement& el, 
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
 
-bool FETriphasicDomain::ElementInternalSoluteWorkSS(FEM& fem, FESolidElement& el, vector<double>& fe, const int ion)
+bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<double>& fe, double dt, const int ion)
 {
 	int i, n;
 	
@@ -728,17 +815,10 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FEM& fem, FESolidElement& el
 	double* wg = el.GaussWeights();
 	
 	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (fem.GetMaterial(el.GetMatID()));
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat);
+	assert(pm);
 	
 	zero(fe);
-	
-	// get the time step value
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)

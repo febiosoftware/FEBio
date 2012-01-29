@@ -100,7 +100,7 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)
-
+/*
 void FEDiscreteSpringDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	FEMesh& mesh = *m_pMesh;
@@ -161,6 +161,7 @@ void FEDiscreteSpringDomain::Residual(FENLSolver* psolver, vector<double>& R)
 		psolver->AssembleResidual(en, lm, fe, R);
 	}
 }
+*/
 
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)

@@ -92,7 +92,7 @@ void FEBiphasicSolidDomain::ElementInternalForces(FEM& fem, FESolidElement& el, 
 		fe[ndpn*i+3] = fl[i];
 	}
 }
-
+/*
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
@@ -180,6 +180,7 @@ void FEBiphasicSolidDomain::Residual(FENLSolver* psolver, vector<double>& R)
 		}
 	}
 }
+*/
 
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)

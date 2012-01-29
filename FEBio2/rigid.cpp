@@ -47,40 +47,10 @@ void FERigidSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-//! Calculates the residual vector 3D rigid elements
-//! we only calculate the body-forces for rigid elements
-//!
-void FERigidSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
+// Rigid bodies do not generate stress so there is nothing to do here
+void FERigidSolidDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-
-	if (fem.HasBodyForces() == false) return;
-
-	// element force vector
-	vector<double> fe;
-
-	vector<int> lm;
-
-	// loop over all elements
-	for (int i=0; i<(int) m_Elem.size(); ++i)
-	{
-		// get the element
-		FESolidElement& el = m_Elem[i];
-		assert(el.IsRigid());
-
-		// get the element force vector and initialize it to zero
-		int ndof = 3*el.Nodes();
-		fe.assign(ndof, 0);
-
-		// apply body force to rigid elements
-		ElementBodyForce(fem, el, fe);
-
-		// get the element's LM vector
-		UnpackLM(el, lm);
-
-		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
-	}
+	// what you looking at ?!
 }
 
 //-----------------------------------------------------------------------------

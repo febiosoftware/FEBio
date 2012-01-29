@@ -155,7 +155,7 @@ void FEElasticSolidDomain::Serialize(DumpFile &ar)
 		}
 	}
 }
-
+/*
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 {
@@ -189,6 +189,7 @@ void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
+*/
 
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
@@ -378,7 +379,7 @@ void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
 
 //-----------------------------------------------------------------------------
 //! calculates the body forces
-
+/*
 void FEElasticSolidDomain::ElementBodyForce(FEModel& fem, FESolidElement& el, vector<double>& fe)
 {
 	int NF = fem.BodyForces();
@@ -442,7 +443,7 @@ void FEElasticSolidDomain::ElementBodyForce(FEModel& fem, FESolidElement& el, ve
 		}
 	}
 }
-
+*/
 //-----------------------------------------------------------------------------
 //! This function calculates the stiffness due to body forces
 void FEElasticSolidDomain::ElementBodyForceStiffness(FEModel& fem, FESolidElement &el, matrix &ke)

@@ -29,7 +29,7 @@ public:
 	void StiffnessMatrix(FENLSolver* psolver);
 	
 	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FENLSolver* psolver, vector<double>& R);
 	
 	//! initialize class
 	bool Initialize(FEModel& fem);
@@ -42,22 +42,35 @@ public:
 		FESolidElement& el = Element(iel);
 		ElementTriphasicStiffness(fem, el, ke);
 	}
-	
+
+public:
+	// internal fluid work
+	void InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt);
+
+	// internal fluid work (steady state analysis)
+	void InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt);
+
+	// solute work
+	void InternalSoluteWork(FENLSolver* psolver, vector<double>& R, double dt, const int ion);
+
+	// solute work (steady state analysis)
+	void InternalSoluteWorkSS(FENLSolver* psolver, vector<double>& R, double dt, const int ion);
+
+public:
 	//! calculate internal equivalent nodal forces
-	void InternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
+	void ElementInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
 	
-protected:
 	//! Calculates the internal fluid forces
-	bool ElementInternalFluidWork(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	bool ElementInternalFluidWork(FESolidElement& elem, vector<double>& fe, double dt);
 	
 	//! Calculates the internal fluid forces for steady-state response
-	bool ElementInternalFluidWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe);
+	bool ElementInternalFluidWorkSS(FESolidElement& elem, vector<double>& fe, double dt);
 	
 	//! Calculates the internal solute forces
-	bool ElementInternalSoluteWork(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
+	bool ElementInternalSoluteWork(FESolidElement& elem, vector<double>& fe, double dt, const int ion);
 	
 	//! Calculates the internal solute forces for steady-state response
-	bool ElementInternalSoluteWorkSS(FEM& fem, FESolidElement& elem, vector<double>& fe, const int ion);
+	bool ElementInternalSoluteWorkSS(FESolidElement& elem, vector<double>& fe, double dt, const int ion);
 	
 	//! calculates the element triphasic stiffness matrix
 	bool ElementTriphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke);

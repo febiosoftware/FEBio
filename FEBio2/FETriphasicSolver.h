@@ -22,6 +22,10 @@ public:
 	
 	//! serialize data to/from dump file
 	void Serialize(DumpFile& ar);
+
+public:
+	//! Calculates residual (overridden from FEBiphasicSolver)
+	virtual bool Residual(vector<double>& R);
 	
 protected:
 	void GetConcentrationData(vector<double>& ci, vector<double>& ui,const int ion);

@@ -4,7 +4,7 @@
 #include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
-void FEUDGHexDomain::Residual(FENLSolver *psolver, vector<double>& R)
+void FEUDGHexDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
 {
 	FEModel& fem = psolver->GetFEModel();
 
@@ -19,21 +19,12 @@ void FEUDGHexDomain::Residual(FENLSolver *psolver, vector<double>& R)
 		// get the element
 		FESolidElement& el = m_Elem[i];
 
-		//! this element should be a UDG-hex
-		assert(el.Type() == FE_UDGHEX);
-
-		// this element should not be rigid
-		assert(!el.IsRigid());
-
 		// get the element force vector and initialize it to zero
 		int ndof = 3*el.Nodes();
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
 		UDGInternalForces(fem, el, fe);
-
-		// apply body forces
-		if (fem.HasBodyForces()) ElementBodyForce(fem, el, fe);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
@@ -50,9 +41,6 @@ void FEUDGHexDomain::Residual(FENLSolver *psolver, vector<double>& R)
 
 void FEUDGHexDomain::UDGInternalForces(FEModel& fem, FESolidElement& el, vector<double>& fe)
 {
-	// make sure this element is of the correct type
-	assert(el.Type() == FE_UDGHEX);
-
 	// get the stress data
 	FEMaterialPoint& mp = *el.m_State[0];
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());

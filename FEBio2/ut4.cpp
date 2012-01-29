@@ -355,18 +355,18 @@ double FEUT4Domain::TetVolume(vec3d* r)
 //-----------------------------------------------------------------------------
 //! The residual is defined as the sum of the nodal residual and the
 //! element residual
-void FEUT4Domain::Residual(FENLSolver *psolver, vector<double> &R)
+void FEUT4Domain::InternalForces(FENLSolver *psolver, vector<double> &R)
 {
 	// Calculate the nodal contribution
-	NodalResidual(psolver, R);
+	NodalInternalForces(psolver, R);
 
 	// Calculate the element contribution
-	ElementResidual(psolver, R);
+	ElementInternalForces(psolver, R);
 }
 
 //-----------------------------------------------------------------------------
 //! This function calculates the nodal contribution to the residual
-void FEUT4Domain::NodalResidual(FENLSolver* psolver, vector<double>& R)
+void FEUT4Domain::NodalInternalForces(FENLSolver* psolver, vector<double>& R)
 {
 	// inverse jacobian matrix
 	double Ji[3][3];
@@ -476,7 +476,7 @@ void FEUT4Domain::NodalResidual(FENLSolver* psolver, vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the element contribution to the residual
-void FEUT4Domain::ElementResidual(FENLSolver* psolver, vector<double>& R)
+void FEUT4Domain::ElementInternalForces(FENLSolver* psolver, vector<double>& R)
 {
 	FEModel& fem = psolver->GetFEModel();
 
@@ -497,14 +497,6 @@ void FEUT4Domain::ElementResidual(FENLSolver* psolver, vector<double>& R)
 
 		// calculate internal force vector
 		ElementInternalForces(el, fe);
-
-		// apply body forces
-		if (fem.HasBodyForces())
-		{
-			// Note that this function is in the base class
-			// I'm not sure, but I don't think I have to overwrite this one
-			ElementBodyForce(fem, el, fe);
-		}
 
 		// get the element's LM vector
 		UnpackLM(el, lm);

@@ -16,8 +16,10 @@ public:
 		return pd;
 	}
 
+public:
+
 	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);

@@ -40,21 +40,23 @@ public:
 	//! initialization function
 	bool Initialize(FEModel& fem);
 
+public: // overrides from FEElasticDomain
+
 	//! Update stresses
 	void UpdateStresses(FEModel& fem);
 
-	//! calculates the total residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	//! calculates the internal force vector
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
 protected:
-	//! calculates the nodal residual
-	void NodalResidual(FENLSolver* psolver, vector<double>& R);
+	//! calculates the nodal internal forces
+	void NodalInternalForces(FENLSolver* psolver, vector<double>& R);
 
-	//! calculates the element residual
-	void ElementResidual(FENLSolver* psolver, vector<double>& R);
+	//! calculates the element internal forces
+	void ElementInternalForces(FENLSolver* psolver, vector<double>& R);
 
 	//! Calculates the internal stress vector for solid elements
 	void ElementInternalForces(FESolidElement& el, vector<double>& fe);

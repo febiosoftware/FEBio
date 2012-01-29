@@ -13,11 +13,12 @@ public:
 	//! clone this domain
 	FEDomain* Clone();
 
+public:
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
-	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	//! calculates the internal forces (nothing to do)
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
 
 	// update stresses
 	void UpdateStresses(FEModel& fem);

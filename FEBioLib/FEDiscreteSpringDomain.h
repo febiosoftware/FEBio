@@ -28,7 +28,7 @@ public: // overridden from FEElasticDomain
 	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
 
 	//! calculate residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! update stresses (not used for discrete springs)
 	void UpdateStresses(FEModel& fem){}	

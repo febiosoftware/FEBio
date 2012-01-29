@@ -34,7 +34,7 @@ public: // overloads from FEElasticDomain
 	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
 
 	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! internal stress forces
 	void InternalForces(FENLSolver* psolver, vector<double>& R);

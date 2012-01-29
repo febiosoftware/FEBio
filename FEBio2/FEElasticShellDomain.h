@@ -36,7 +36,7 @@ public: // overrides from FEElasticDomain
 	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! internal stress forces
 	void InternalForces(FENLSolver* psolver, vector<double>& R);

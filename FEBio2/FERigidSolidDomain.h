@@ -17,12 +17,14 @@ public:
 		return pd;
 	}
 
+public:
+
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
-	//! calculates the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	//! calculates the residual (nothing to do)
+	void InternalForces(FENLSolver* psolver, vector<double>& R);
 
-	// update stresses
+	// update stresses (nothing to do)
 	void UpdateStresses(FEModel& fem);
 };

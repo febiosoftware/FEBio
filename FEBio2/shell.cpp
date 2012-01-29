@@ -138,7 +138,7 @@ void FEElasticShellDomain::Serialize(DumpFile &ar)
 }
 
 //-----------------------------------------------------------------------------
-
+/*
 void FEElasticShellDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	FEModel& fem = psolver->GetFEModel();
@@ -173,6 +173,7 @@ void FEElasticShellDomain::Residual(FENLSolver* psolver, vector<double>& R)
 		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
+*/
 
 //-----------------------------------------------------------------------------
 // Calculates the forces due to the stress

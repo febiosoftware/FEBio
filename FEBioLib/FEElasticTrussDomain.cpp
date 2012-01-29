@@ -141,7 +141,7 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 }
 
 //----------------------------------------------------------------------------
-
+/*
 void FEElasticTrussDomain::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	// element force vector
@@ -156,7 +156,7 @@ void FEElasticTrussDomain::Residual(FENLSolver* psolver, vector<double>& R)
 		psolver->AssembleResidual(el.m_node, lm, fe, R);
 	}
 }
-
+*/
 //----------------------------------------------------------------------------
 
 void FEElasticTrussDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
