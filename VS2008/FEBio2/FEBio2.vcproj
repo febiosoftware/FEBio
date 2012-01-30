@@ -611,7 +611,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBiphasicDomain.h"
+				RelativePath="..\..\FEBio2\FEBiphasicSolidDomain.h"
 				>
 			</File>
 			<File
