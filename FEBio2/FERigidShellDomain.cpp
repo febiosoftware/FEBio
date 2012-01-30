@@ -12,24 +12,11 @@ FEDomain* FERigidShellDomain::Clone()
 
 //-----------------------------------------------------------------------------
 //! Calculate stiffness contributions for rigid shells.
-//!
+//! Since rigid elements don't generate stress, we don't need to do
+//! anything here.
 void FERigidShellDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-
-	// for dynamic analyses we do need to add the inertial stiffness of the rigid body
-	if (fem.GetCurrentStep()->m_nanalysis != FE_DYNAMIC) return;
-
-	matrix ke;
-
-	int NS = m_Elem.size();
-	for (int iel=0; iel<NS; ++iel)
-	{
-		FEShellElement& el = m_Elem[iel];
-		assert(el.IsRigid());
-
-		// TODO: add inertial stiffness for shells
-	}
+	// Caught you looking!
 }
 
 

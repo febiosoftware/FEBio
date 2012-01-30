@@ -940,17 +940,13 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 
-		assert(!el.IsRigid());
-
-		assert(el.Type() != FE_UDGHEX);
-
 		// get the number of integration points
 		nint = el.GaussPoints();
 
 		// number of nodes
 		neln = el.Nodes();
 
-		// nodall coordinates
+		// nodal coordinates
 		vec3d r0[FEElement::MAX_NODES];
 		vec3d rt[FEElement::MAX_NODES];
 		for (int j=0; j<neln; ++j)

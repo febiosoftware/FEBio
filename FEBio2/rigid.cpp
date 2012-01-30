@@ -8,42 +8,11 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//! Calculates the stiffness matrix for 3D rigid elements
-//! Most stiffness contributions are ignored. Only in dynamic problems
-//! the inertial stiffness is computed.
-//! 
+//! Calculates the stiffness matrix for 3D rigid elements.
+//! Rigid elements don't generate stress, so there is nothing to do here
 void FERigidSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-
-	// for dynamic analyses we do need to add the inertial stiffness of the rigid body
-	if (fem.GetCurrentStep()->m_nanalysis != FE_DYNAMIC) return;
-
-	// element stiffness matrix
-	matrix ke;
-
-	vector<int> lm;
-
-	// repeat over all solid elements
-	int NE = m_Elem.size();
-	for (int iel=0; iel<NE; ++iel)
-	{
-		FESolidElement& el = m_Elem[iel];
-		assert(el.IsRigid());
-
-		int ndof = 3*el.Nodes();
-		ke.resize(ndof, ndof);
-		ke.zero();
-
-		// add the inertial stiffness for dynamics
-		ElementInertialStiffness(fem, el, ke);
-
-		// get the element's LM vector
-		UnpackLM(el, lm);
-
-		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
-	}
+	// Caught you looking!
 }
 
 //-----------------------------------------------------------------------------

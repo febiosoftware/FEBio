@@ -292,7 +292,7 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FENLSolver* psolver, vector<doub
 		int neln = el.Nodes();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[3*neln+j];
+			int J = elm[11*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
@@ -325,7 +325,7 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<do
 		int neln = el.Nodes();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[3*neln+j];
+			int J = elm[11*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}

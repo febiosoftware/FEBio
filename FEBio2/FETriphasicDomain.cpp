@@ -248,7 +248,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<double>
 		int neln = el.Nodes();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[12*neln+j];
+			int J = elm[(11+ion)*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
@@ -281,7 +281,7 @@ void FETriphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>& 
 		int neln = el.Nodes();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[12*neln+j];
+			int J = elm[(11+ion)*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
