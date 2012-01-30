@@ -448,6 +448,7 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "jx" ) == 0) m_data.push_back(JX );
 		else if (strcmp(sz, "jy" ) == 0) m_data.push_back(JY );
 		else if (strcmp(sz, "jz" ) == 0) m_data.push_back(JZ );
+		else if (strcmp(sz, "crc") == 0) m_data.push_back(CRC);
 		else if (strcmp(sz, "c1"  ) == 0) m_data.push_back(C1 );
 		else if (strcmp(sz, "j1x" ) == 0) m_data.push_back(J1X);
 		else if (strcmp(sz, "j1y" ) == 0) m_data.push_back(J1Y);

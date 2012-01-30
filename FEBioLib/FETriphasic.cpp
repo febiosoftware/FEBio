@@ -111,12 +111,17 @@ double FETriphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 		m_pSolute[0]->ChargeNumber(),
 		m_pSolute[1]->ChargeNumber()};
 	double psi = 1;
+	double r[2],d;
 	if (c[0] > 0) {
-		psi = pow((-cF+sqrt(cF*cF+4*khat[0]*c[0]*khat[1]*c[1]))
-				  /(2*z[0]*khat[0]*c[0]),1./z[0]);
+		d = sqrt(SQR(cF)+4*SQR(z[0])*khat[0]*c[0]*khat[1]*c[1]);
+		r[0] = (-cF - d)/(2*z[0]*khat[0]*c[0]);
+		r[1] = (-cF + d)/(2*z[0]*khat[0]*c[0]);
+		psi = (r[0] >= 0) ? pow(r[0],1./z[0]) : pow(r[1],1./z[0]);
 	} else if (c[1] > 0) {
-		psi = pow((-cF+sqrt(cF*cF+4*khat[0]*c[0]*khat[1]*c[1]))
-				  /(2*z[1]*khat[1]*c[1]),1./z[1]);
+		d = sqrt(SQR(cF)+4*SQR(z[1])*khat[0]*c[0]*khat[1]*c[1]);
+		r[0] = (-cF - d)/(2*z[1]*khat[1]*c[1]);
+		r[1] = (-cF + d)/(2*z[1]*khat[1]*c[1]);
+		psi = (r[0] >= 0) ? pow(r[0],1./z[1]) : pow(r[1],1./z[1]);
 	}
 	
 	// Return exponential (non-dimensional) form if desired

@@ -95,7 +95,7 @@ class ElementDataRecord : public DataRecord
 		SX, SY, SZ, SXY, SYZ, SXZ,
 		S1, S2, S3,
 		FX, FY, FZ, FYZ, FZX, FXY, FYX, FXZ, FZY, 
-		P, WX, WY, WZ, C, JX, JY, JZ,
+		P, WX, WY, WZ, C, JX, JY, JZ, CRC,
 		C1, J1X, J1Y, J1Z, C2, J2X, J2Y, J2Z,
 		PSI, IEX, IEY, IEZ
 	};

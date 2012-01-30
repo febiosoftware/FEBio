@@ -131,6 +131,7 @@ public:
 	double						m_Rgas;			//!< universal gas constant
 	double						m_Tabs;			//!< absolute temperature
 	double						m_Fc;			//!< Faraday's constant
+	double						m_penalty;		//!< penalty for enforcing electroneutrality
 	
 	DECLARE_PARAMETER_LIST();
 };
