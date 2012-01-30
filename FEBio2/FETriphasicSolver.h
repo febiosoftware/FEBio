@@ -26,6 +26,9 @@ public:
 public:
 	//! Calculates residual (overridden from FEBiphasicSolver)
 	virtual bool Residual(vector<double>& R);
+
+	//! calculates the global stiffness matrix (overridden from FESolidSolver)
+	virtual bool StiffnessMatrix();
 	
 protected:
 	void GetConcentrationData(vector<double>& ci, vector<double>& ui,const int ion);

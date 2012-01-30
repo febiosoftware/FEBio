@@ -72,10 +72,10 @@ protected:
 	void NodalStiffnessMatrix(FENLSolver* psolver);
 
 	//! geometrical stiffness (i.e. initial stress)
-	void GeometricalStiffness(FESolidElement& el, matrix& ke);
+	void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness component
-	void MaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	void ElementMaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! nodal geometry stiffness contribution
 	void NodalGeometryStiffness(UT4NODE& node, matrix& ke);

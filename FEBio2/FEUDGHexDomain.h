@@ -27,17 +27,14 @@ public:
 	// update stresses
 	void UpdateStresses(FEModel& fem);
 
-protected:
+protected: // element residual contributions
 	//! Calculates the internal stress vector for enhanced strain hex elements
 	void UDGInternalForces(FEModel& fem, FESolidElement& el, vector<double>& fe);
 
 	//! calculates hourglass forces for the UDG element
 	void UDGHourglassForces(FEModel& fem, FESolidElement& el, vector<double>& fe);
 
-protected:
-	//! calculate element stiffness
-	void UDGElementStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
-
+protected: // element stiffness contributions
 	//! hourglass stiffness for UDG hex elements
 	void UDGHourglassStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 

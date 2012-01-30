@@ -33,27 +33,29 @@ public:
 	//! initialize class
 	bool Initialize(FEModel& fem);
 
-	// update stresses
-	void UpdateStresses(FEModel& fem);
-
-	//! calculates the solid element stiffness matrix
-	void ElementStiffness(FEModel& fem, int iel, matrix& ke);
-
 	//! augmentation
 	bool Augment();
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 
+public: // overridden from FEElasticDomain
+
+	// update stresses
+	void UpdateStresses(FEModel& fem);
+
+	// calculate stiffness matrix
+	void StiffnessMatrix(FENLSolver* psolver);
+
 protected:
 	//! Dilatational stiffness component for nearly-incompressible materials
-	void DilatationalStiffness(FEModel& fem, int iel, matrix& ke);
+	void ElementDilatationalStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! material stiffness component
-	void MaterialStiffness(FEModel& fem, int iel, matrix& ke);
+	void ElementMaterialStiffness(FEModel& fem, int iel, matrix& ke);
 
 	//! geometrical stiffness (i.e. initial stress)
-	void GeometricalStiffness(int iel, matrix& ke);
+	void ElementGeometricalStiffness(int iel, matrix& ke);
 
 protected:
 	vector<ELEM_DATA>	m_Data;

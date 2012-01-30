@@ -172,7 +172,7 @@ void FEUDGHexDomain::UDGHourglassForces(FEModel& fem, FESolidElement &el, vector
 
 
 //-----------------------------------------------------------------------------
-
+/*
 void FEUDGHexDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
@@ -187,12 +187,6 @@ void FEUDGHexDomain::StiffnessMatrix(FENLSolver* psolver)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
-
-		// this element should not be rigid
-		assert(!el.IsRigid());
-
-		// this element should be UDG
-		assert(el.Type() == FE_UDGHEX);
 
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
@@ -212,33 +206,50 @@ void FEUDGHexDomain::StiffnessMatrix(FENLSolver* psolver)
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
+*/
 
-//-----------------------------------------------------------------------------
-//! This function calculates the element stiffness matrix. It calls the material
-//! stiffness function, the geometrical stiffness function and, if necessary, the
-//! dilatational stiffness function. Note that these three functions only calculate
-//! the upper diagonal matrix due to the symmetry of the element stiffness matrix
-//! The last section of this function fills the rest of the element stiffness matrix.
-
-void FEUDGHexDomain::UDGElementStiffness(FEModel& fem, FESolidElement& el, matrix& ke)
+void FEUDGHexDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	// calculate material stiffness
-	UDGMaterialStiffness(el, ke);
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
-	// calculate geometrical stiffness
-	UDGGeometricalStiffness(el, ke);
+	// element stiffness matrix
+	matrix ke;
 
-	// add hourglass stiffness
-	UDGHourglassStiffness(fem, el, ke);
+	vector<int> lm;
 
-	// assign symmetic parts
-	// TODO: Can this be omitted by changing the Assemble routine so that it only
-	// grabs elements from the upper diagonal matrix?
-	int ndof = 3*el.Nodes();
-	int i, j;
-	for (i=0; i<ndof; ++i)
-		for (j=i+1; j<ndof; ++j)
-			ke[j][i] = ke[i][j];
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// calculate material stiffness
+		UDGMaterialStiffness(el, ke);
+
+		// calculate geometrical stiffness
+		UDGGeometricalStiffness(el, ke);
+
+		// add hourglass stiffness
+		UDGHourglassStiffness(fem, el, ke);
+
+		// assign symmetic parts
+		// TODO: Can this be omitted by changing the Assemble routine so that it only
+		// grabs elements from the upper diagonal matrix?
+		for (int i=0; i<ndof; ++i)
+			for (int j=i+1; j<ndof; ++j)
+				ke[j][i] = ke[i][j];
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
 }
 
 //-----------------------------------------------------------------------------

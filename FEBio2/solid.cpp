@@ -699,7 +699,7 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FEModel& fem, FESolidElement
 }
 
 //-----------------------------------------------------------------------------
-
+/*
 void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
@@ -731,6 +731,113 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 		// add body force stiffness
 		if (fem.HasBodyForces()) ElementBodyForceStiffness(fem, el, ke);
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+*/
+
+//-----------------------------------------------------------------------------
+
+void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+
+	// element stiffness matrix
+	matrix ke;
+	vector<int> lm;
+
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// calculate geometrical stiffness
+		ElementGeometricalStiffness(el, ke);
+
+		// calculate material stiffness
+		ElementMaterialStiffness(fem, el, ke);
+
+		// assign symmetic parts
+		// TODO: Can this be omitted by changing the Assemble routine so that it only
+		// grabs elements from the upper diagonal matrix?
+		for (int i=0; i<ndof; ++i)
+			for (int j=i+1; j<ndof; ++j)
+				ke[j][i] = ke[i][j];
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEElasticSolidDomain::InertialStiffness(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+
+	// element stiffness matrix
+	matrix ke;
+	vector<int> lm;
+
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// calculate inertial stiffness
+		ElementInertialStiffness(fem, el, ke);
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void FEElasticSolidDomain::BodyForceStiffness(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+
+	// element stiffness matrix
+	matrix ke;
+	vector<int> lm;
+
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// calculate inertial stiffness
+		ElementBodyForceStiffness(fem, el, ke);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);

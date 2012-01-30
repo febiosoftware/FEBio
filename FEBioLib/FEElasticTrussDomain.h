@@ -27,11 +27,8 @@ public:
 
 public: // overloads from FEElasticDomain
 
-	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver);
-
-	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
+	//! update the truss stresses
+	void UpdateStresses(FEModel& fem);
 
 	//! calculates the residual
 //	void Residual(FENLSolver* psolver, vector<double>& R);
@@ -42,8 +39,17 @@ public: // overloads from FEElasticDomain
 	//! calculate body force (TODO: implement this)
 	void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R) { assert(false); }
 
-	//! update the truss stresses
-	void UpdateStresses(FEModel& fem);
+	//! Calculates inertial forces for dynamic problems
+	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
+
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FENLSolver* psolver);
+
+	//! intertial stiffness matrix (TODO: implement this)
+	void InertialStiffness(FENLSolver* psolver) { assert(false); }
+
+	//! body force stiffness matrix (TODO: implement this)
+	void BodyForceStiffness(FENLSolver* psolver) { assert(false); }
 
 protected:
 	//! calculates the truss element stiffness matrix

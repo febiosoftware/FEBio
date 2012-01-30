@@ -80,7 +80,7 @@ public:
 		void ContactStiffness();
 
 		//! calculates the global stiffness matrix
-		bool StiffnessMatrix();
+		virtual bool StiffnessMatrix();
 
 		//! reform the stiffness matrix
 		bool ReformStiffness();

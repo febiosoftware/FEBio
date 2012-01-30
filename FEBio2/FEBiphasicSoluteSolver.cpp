@@ -4,6 +4,7 @@
 #include "FEAnalysisStep.h"
 #include "Interrupt.h"
 #include "FEBioLib/log.h"
+#include "FEBioLib/FEPressureLoad.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -551,6 +552,99 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 
 	// increase RHS counter
 	m_nrhs++;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculates global stiffness matrix.
+
+bool FEBiphasicSoluteSolver::StiffnessMatrix()
+{
+	// get the stiffness matrix
+	SparseMatrix& K = *m_pK;
+
+	// zero stiffness matrix
+	K.zero();
+
+	// zero the residual adjustment vector
+	zero(m_Fd);
+
+	// element stiffness matrix
+	matrix ke;
+
+	// nodal degrees of freedom
+	int i, j, I;
+
+	// get the mesh
+	FEMesh& mesh = m_fem.m_mesh;
+
+	// calculate the stiffness matrix for each domain
+	for (i=0; i<mesh.Domains(); ++i) 
+	{
+		FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
+		dom.StiffnessMatrix(this);
+	}
+
+	// calculate contact stiffness
+	if (m_fem.ContactInterfaces() > 0) 
+	{
+		ContactStiffness();
+	}
+
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
+	// calculate joint stiffness 
+	if (!fem.m_RJ.empty())
+	{
+		for (int i=0; i<(int) fem.m_RJ.size(); ++i) fem.m_RJ[i]->JointStiffness();
+	}
+
+	// calculate stiffness matrices for surface loads
+	int nsl = (int) fem.m_SL.size();
+	for (i=0; i<nsl; ++i)
+	{
+		FESurfaceLoad* psl = fem.m_SL[i];
+
+		// respect the pressure stiffness flag
+		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+	}
+
+	// calculate linear constraint stiffness
+	// note that this is the contribution of the 
+	// constrainst enforced with augmented lagrangian
+	LinearConstraintStiffness();
+
+	// point constraints
+	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].Stiffness();
+
+	// we still need to set the diagonal elements to 1
+	// for the prescribed rigid body dofs.
+	int NRB = fem.m_RB.size();
+	for (i=0; i<NRB; ++i)
+	{
+		FERigidBody& rb = fem.m_RB[i];
+		for (j=0; j<6; ++j)
+			if (rb.m_LM[j] < -1)
+			{
+				I = -rb.m_LM[j]-2;
+				K.set(I,I, 1);
+			}
+	}
+
+	// let's check the stiffness matrix for zero diagonal elements
+	if (fem.GetDebugFlag())
+	{
+		vector<int> zd;
+		int neq = K.Size();
+		for (i=0; i<neq; ++i)
+		{
+			if (K.diag(i) == 0) zd.push_back(i);
+		}
+
+//		if (zd.empty() == false) throw ZeroDiagonal(zd, m_fem);
+		if (zd.empty() == false) throw ZeroDiagonal(-1, -1);
+	}
 
 	return true;
 }

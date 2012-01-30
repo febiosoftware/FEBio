@@ -33,6 +33,9 @@ public:
 	//! Calculates residual (overridden from FESolidSolver)
 	virtual bool Residual(vector<double>& R);
 
+	//! calculates the global stiffness matrix (overridden from FESolidSolver)
+	virtual bool StiffnessMatrix();
+
 protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);
 	void GetPressureData(vector<double>& pi, vector<double>& ui);

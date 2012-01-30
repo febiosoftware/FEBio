@@ -975,10 +975,10 @@ void FEUT4Domain::ElementStiffness(FEModel &fem, int iel, matrix &ke)
 	//       material stiffnesses. 
 
 	// calculate material stiffness (i.e. constitutive component)
-	MaterialStiffness(fem, el, ke);
+	ElementMaterialStiffness(fem, el, ke);
 
 	// calculate geometrical stiffness
-	GeometricalStiffness(el, ke);
+	ElementGeometricalStiffness(el, ke);
 
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -993,7 +993,7 @@ void FEUT4Domain::ElementStiffness(FEModel &fem, int iel, matrix &ke)
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for integration point n
 
-void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
+void FEUT4Domain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
 
@@ -1074,7 +1074,7 @@ void FEUT4Domain::GeometricalStiffness(FESolidElement &el, matrix &ke)
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEUT4Domain::MaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
+void FEUT4Domain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
 	// make sure this is the struct mech module
 	assert(fem.GetCurrentStep()->m_nModule == FE_SOLID);

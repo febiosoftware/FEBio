@@ -687,6 +687,7 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 			ke[j][i] = ke[i][j];
 }
 
+
 //-----------------------------------------------------------------------------
 //! Calculates body forces for shells
 

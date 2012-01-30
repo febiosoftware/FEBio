@@ -29,38 +29,54 @@ bool FE3FieldElasticSolidDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
-//! This function calculates the element stiffness matrix. It calls the material
-//! stiffness function, the geometrical stiffness function and the
-//! dilatational stiffness function. Note that these three functions only calculate
-//! the upper diagonal matrix due to the symmetry of the element stiffness matrix
-//! The last section of this function fills the rest of the element stiffness matrix.
-
-void FE3FieldElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
+//! Stiffness matrix for three-field domain
+void FE3FieldElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	// calculate material stiffness (i.e. constitutive component)
-	MaterialStiffness(fem, iel, ke);
+	FEModel& fem = psolver->GetFEModel();
 
-	// calculate geometrical stiffness
-	GeometricalStiffness(iel, ke);
+	// element stiffness matrix
+	matrix ke;
+	vector<int> lm;
 
-	// Calculate dilatational stiffness
-	DilatationalStiffness(fem, iel, ke);
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
 
-	// assign symmetic parts
-	// TODO: Can this be omitted by changing the Assemble routine so that it only
-	// grabs elements from the upper diagonal matrix?
-	FESolidElement& el = Element(iel);
-	int ndof = 3*el.Nodes();
-	int i, j;
-	for (i=0; i<ndof; ++i)
-		for (j=i+1; j<ndof; ++j)
-			ke[j][i] = ke[i][j];
+		// create the element's stiffness matrix
+		int ndof = 3*el.Nodes();
+		ke.resize(ndof, ndof);
+		ke.zero();
+
+		// calculate material stiffness (i.e. constitutive component)
+		ElementMaterialStiffness(fem, iel, ke);
+
+		// calculate geometrical stiffness
+		ElementGeometricalStiffness(iel, ke);
+
+		// Calculate dilatational stiffness
+		ElementDilatationalStiffness(fem, iel, ke);
+
+		// assign symmetic parts
+		// TODO: Can this be omitted by changing the Assemble routine so that it only
+		// grabs elements from the upper diagonal matrix?
+		for (int i=0; i<ndof; ++i)
+			for (int j=i+1; j<ndof; ++j)
+				ke[j][i] = ke[i][j];
+
+		// get the element's LM vector
+		UnpackLM(el, lm);
+
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
 }
 
 //-----------------------------------------------------------------------------
 //! calculates dilatational element stiffness component for element iel
 
-void FE3FieldElasticSolidDomain::DilatationalStiffness(FEModel& fem, int iel, matrix& ke)
+void FE3FieldElasticSolidDomain::ElementDilatationalStiffness(FEModel& fem, int iel, matrix& ke)
 {
 	int i, j, n;
 
@@ -147,7 +163,7 @@ void FE3FieldElasticSolidDomain::DilatationalStiffness(FEModel& fem, int iel, ma
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FE3FieldElasticSolidDomain::MaterialStiffness(FEModel& fem, int iel, matrix &ke)
+void FE3FieldElasticSolidDomain::ElementMaterialStiffness(FEModel& fem, int iel, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -287,7 +303,7 @@ void FE3FieldElasticSolidDomain::MaterialStiffness(FEModel& fem, int iel, matrix
 //-----------------------------------------------------------------------------
 //! calculates element's geometrical stiffness component for each integration point
 
-void FE3FieldElasticSolidDomain::GeometricalStiffness(int iel, matrix &ke)
+void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke)
 {
 	int n, i, j;
 

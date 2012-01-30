@@ -52,9 +52,6 @@ public: // TODO: The following functions are to replace Residual
 
 public:
 	
-	//! calculate internal equivalent nodal forces
-	void ElementInternalForces(FEM& fem, FESolidElement& el, vector<double>& fe);
-	
 	//! Calculates the internal fluid forces
 	bool ElementInternalFluidWork(FESolidElement& elem, vector<double>& fe, double dt);
 	

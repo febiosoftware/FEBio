@@ -19,9 +19,6 @@ bool FESolidSolver::StiffnessMatrix()
 	// zero the residual adjustment vector
 	zero(m_Fd);
 
-	// element stiffness matrix
-	matrix ke;
-
 	// nodal degrees of freedom
 	int i, j, I;
 
@@ -33,6 +30,23 @@ bool FESolidSolver::StiffnessMatrix()
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.StiffnessMatrix(this);
+	}
+
+	// calculate the body force stiffness matrix for each domain
+	for (i=0; i<mesh.Domains(); ++i) 
+	{
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		dom.BodyForceStiffness(this);
+	}
+
+	// Add inertial stiffness for dynamic problems
+	if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC)
+	{
+		for (i=0; i<mesh.Domains(); ++i) 
+		{
+			FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+			dom.InertialStiffness(this);
+		}
 	}
 
 	// calculate contact stiffness
