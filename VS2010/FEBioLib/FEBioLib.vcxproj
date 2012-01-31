@@ -507,6 +507,7 @@
     <ClInclude Include="..\..\FEBioLib\FE2DFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h" />
+    <ClInclude Include="..\..\FEBioLib\FE3FieldElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSolute.h" />
@@ -618,6 +619,7 @@
     <ClCompile Include="..\..\FEBioLib\FE2DFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FE3FieldElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSolute.cpp" />
