@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "FETriphasicDomain.h"
-#include "FESolidSolver.h"
 #include "FECore/FEMaterial.h"
-#include "FEMicroMaterial.h"
 #include "FEBioLib/FETriphasic.h"
 #include "FEBioLib/log.h"
+#include "fem.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -795,9 +794,8 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 	return true;
 }
 
-
 //-----------------------------------------------------------------------------
-
+/*
 void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
@@ -894,6 +892,117 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 			// assemble element matrix in global stiffness matrix
 			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
+	}
+}
+*/
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	
+	// element stiffness matrix
+	matrix ke;
+	
+	vector<int> elm;
+	
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+		
+		// this element should not be rigid
+		assert(!el.IsRigid());
+		
+		UnpackLM(el, elm);
+		
+		// get the elements material
+		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+		assert(dynamic_cast<FETriphasic*>(pmat) != 0);
+		
+		// allocate stiffness matrix
+		int neln = el.Nodes();
+		int ndpn = 6;
+		int ndof = neln*ndpn;
+		ke.resize(ndof, ndof);
+		
+		// calculate the element stiffness matrix
+		ElementTriphasicStiffness(fem, el, ke);
+		
+		// TODO: the problem here is that the LM array that is returned by the UnpackLM
+		// function does not give the equation numbers in the right order. For this reason we
+		// have to create a new lm array and place the equation numbers in the right order.
+		// What we really ought to do is fix the UnpackLM function so that it returns
+		// the LM vector in the right order for solute-solid elements.
+		vector<int> lm(ndof);
+		for (int i=0; i<neln; ++i)
+		{
+			lm[ndpn*i  ] = elm[3*i];
+			lm[ndpn*i+1] = elm[3*i+1];
+			lm[ndpn*i+2] = elm[3*i+2];
+			lm[ndpn*i+3] = elm[3*neln+i];
+			lm[ndpn*i+4] = elm[11*neln+i];
+			lm[ndpn*i+5] = elm[12*neln+i];
+		}
+		
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	
+	// element stiffness matrix
+	matrix ke;
+	
+	vector<int> elm;
+	
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+		
+		// this element should not be rigid
+		assert(!el.IsRigid());
+		
+		UnpackLM(el, elm);
+		
+		// get the elements material
+		FEMaterial* pmat = fem.GetMaterial(el.GetMatID());
+		assert(dynamic_cast<FETriphasic*>(pmat) != 0);
+		
+		// allocate stiffness matrix
+		int neln = el.Nodes();
+		int ndpn = 6;
+		int ndof = neln*ndpn;
+		ke.resize(ndof, ndof);
+		
+		// calculate the element stiffness matrix
+		ElementTriphasicStiffnessSS(fem, el, ke);
+		
+		// TODO: the problem here is that the LM array that is returned by the UnpackLM
+		// function does not give the equation numbers in the right order. For this reason we
+		// have to create a new lm array and place the equation numbers in the right order.
+		// What we really ought to do is fix the UnpackLM function so that it returns
+		// the LM vector in the right order for solute-solid elements.
+		vector<int> lm(ndof);
+		for (int i=0; i<neln; ++i)
+		{
+			lm[ndpn*i  ] = elm[3*i];
+			lm[ndpn*i+1] = elm[3*i+1];
+			lm[ndpn*i+2] = elm[3*i+2];
+			lm[ndpn*i+3] = elm[3*neln+i];
+			lm[ndpn*i+4] = elm[11*neln+i];
+			lm[ndpn*i+5] = elm[12*neln+i];
+		}
+		
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEBiphasicSolidDomain.h"
-#include "FESolidSolver.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/log.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEBiphasicSolidDomain::Clone()
@@ -404,7 +404,7 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWorkSS(FESolidElement& el, vecto
 
 
 //-----------------------------------------------------------------------------
-
+/*
 void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
@@ -496,11 +496,116 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 		}
 	}
 }
+*/
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	double dt = fem.GetCurrentStep()->m_dt;
+	
+	// element stiffness matrix
+	matrix ke;
+
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+		
+		// this element should not be rigid
+		assert(!el.IsRigid());
+		
+		// get the elements material
+		FEMaterial* pmat = m_pMat;
+		assert(dynamic_cast<FEBiphasic*>(pmat) != 0);
+		
+		// allocate stiffness matrix
+		int neln = el.Nodes();
+		int ndof = neln*4;
+		ke.resize(ndof, ndof);
+		
+		// calculate the element stiffness matrix
+		ElementBiphasicStiffness(fem, el, ke, dt);
+		
+		// TODO: the problem here is that the LM array that is returned by the UnpackLM
+		// function does not give the equation numbers in the right order. For this reason we
+		// have to create a new lm array and place the equation numbers in the right order.
+		// What we really ought to do is fix the UnpackLM function so that it returns
+		// the LM vector in the right order for poroelastic elements.
+		vector<int> elm;
+		UnpackLM(el, elm);
+
+		vector<int> lm(ndof);
+		for (int i=0; i<neln; ++i)
+		{
+			lm[4*i  ] = elm[3*i];
+			lm[4*i+1] = elm[3*i+1];
+			lm[4*i+2] = elm[3*i+2];
+			lm[4*i+3] = elm[3*neln+i];
+		}
+		
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	double dt = fem.GetCurrentStep()->m_dt;
+	
+	// element stiffness matrix
+	matrix ke;
+
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+		
+		// this element should not be rigid
+		assert(!el.IsRigid());
+		
+		// get the elements material
+		FEMaterial* pmat = m_pMat;
+		assert(dynamic_cast<FEBiphasic*>(pmat) != 0);
+		
+		// allocate stiffness matrix
+		int neln = el.Nodes();
+		int ndof = neln*4;
+		ke.resize(ndof, ndof);
+		
+		// calculate the element stiffness matrix
+		ElementBiphasicStiffnessSS(fem, el, ke, dt);
+		
+		// TODO: the problem here is that the LM array that is returned by the UnpackLM
+		// function does not give the equation numbers in the right order. For this reason we
+		// have to create a new lm array and place the equation numbers in the right order.
+		// What we really ought to do is fix the UnpackLM function so that it returns
+		// the LM vector in the right order for poroelastic elements.
+		vector<int> elm;
+		UnpackLM(el, elm);
+
+		vector<int> lm(ndof);
+		for (int i=0; i<neln; ++i)
+		{
+			lm[4*i  ] = elm[3*i];
+			lm[4*i+1] = elm[3*i+1];
+			lm[4*i+2] = elm[3*i+2];
+			lm[4*i+3] = elm[3*neln+i];
+		}
+		
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElement& el, matrix& ke)
+bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElement& el, matrix& ke, double dt)
 {
 	FEM& fem = dynamic_cast<FEM&>(mdl);
 	int i, j, n;
@@ -560,7 +665,6 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElemen
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -703,7 +807,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElemen
 //! calculates element stiffness matrix for element iel
 //! for the steady-state response (zero solid velocity)
 //!
-bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke)
+bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke, double dt)
 {
 	int i, j, n;
 	
@@ -751,7 +855,6 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement&
 	
 	// check if we use the symmetric version of the poro-implementation
 	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)

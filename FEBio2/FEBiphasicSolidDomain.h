@@ -21,11 +21,12 @@ public:
 	//! initialize class
 	bool Initialize(FEModel& fem);
 	
-	//! return element stiffness matrix
+/*	//! return element stiffness matrix
 	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {
 		FESolidElement& el = Element(iel);
 		ElementBiphasicStiffness(fem, el, ke);
 	}
+*/
 
 public: // overrides from FEElasticDomain
 
@@ -34,6 +35,9 @@ public: // overrides from FEElasticDomain
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
+
+	//! calculates the global stiffness matrix (steady-state case)
+	void StiffnessMatrixSS(FENLSolver* psolver);
 	
 	//! calculates the residual
 //	void Residual(FENLSolver* psolver, vector<double>& R);
@@ -55,10 +59,10 @@ public:
 	bool ElementInternalFluidWorkSS(FESolidElement& elem, vector<double>& fe, double dt);
 	
 	//! calculates the element biphasic stiffness matrix
-	bool ElementBiphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	bool ElementBiphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke, double dt);
 	
 	//! calculates the element biphasic stiffness matrix for steady-state response
-	bool ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);
+	bool ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke, double dt);
 	
 	//! calculates the solid element stiffness matrix
 	void SolidElementStiffness(FESolidElement& el, matrix& ke);

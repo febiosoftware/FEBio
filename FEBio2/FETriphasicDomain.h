@@ -27,6 +27,9 @@ public:
 	
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
+
+	//! calculates the global stiffness matrix for this domain (steady-state case)
+	void StiffnessMatrixSS(FENLSolver* psolver);
 	
 	//! calculates the residual
 //	void Residual(FENLSolver* psolver, vector<double>& R);

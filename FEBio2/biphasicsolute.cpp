@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "FECore/FEMaterial.h"
 #include "FEBiphasicSoluteDomain.h"
-#include "FESolidSolver.h"
-#include "FEMicroMaterial.h"
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/log.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
 bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)
@@ -770,7 +769,7 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vec
 
 
 //-----------------------------------------------------------------------------
-
+/*
 void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
@@ -862,6 +861,117 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 			// assemble element matrix in global stiffness matrix
 			psolver->AssembleStiffness(el.m_node, lm, ke);
 		}
+	}
+}
+*/
+
+
+//-----------------------------------------------------------------------------
+
+void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	
+	// element stiffness matrix
+	matrix ke;
+
+	vector<int> elm;
+	
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+		
+		// this element should not be rigid
+		assert(!el.IsRigid());
+		
+		UnpackLM(el, elm);
+		
+		// get the elements material
+		FEMaterial* pmat = m_pMat;
+		assert(dynamic_cast<FEBiphasicSolute*>(pmat) != 0);
+		
+		// allocate stiffness matrix
+		int neln = el.Nodes();
+		int ndof = neln*5;
+		ke.resize(ndof, ndof);
+		
+		// calculate the element stiffness matrix
+		ElementBiphasicSoluteStiffness(fem, el, ke);
+		
+		// TODO: the problem here is that the LM array that is returned by the UnpackLM
+		// function does not give the equation numbers in the right order. For this reason we
+		// have to create a new lm array and place the equation numbers in the right order.
+		// What we really ought to do is fix the UnpackLM function so that it returns
+		// the LM vector in the right order for solute-solid elements.
+		vector<int> lm(ndof);
+		for (int i=0; i<neln; ++i)
+		{
+			lm[5*i  ] = elm[3*i];
+			lm[5*i+1] = elm[3*i+1];
+			lm[5*i+2] = elm[3*i+2];
+			lm[5*i+3] = elm[3*neln+i];
+			lm[5*i+4] = elm[11*neln+i];
+		}
+		
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+
+void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver)
+{
+	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	
+	// element stiffness matrix
+	matrix ke;
+
+	vector<int> elm;
+	
+	// repeat over all solid elements
+	int NE = m_Elem.size();
+	for (int iel=0; iel<NE; ++iel)
+	{
+		FESolidElement& el = m_Elem[iel];
+		
+		// this element should not be rigid
+		assert(!el.IsRigid());
+		
+		UnpackLM(el, elm);
+		
+		// get the elements material
+		FEMaterial* pmat = m_pMat;
+		assert(dynamic_cast<FEBiphasicSolute*>(pmat) != 0);
+		
+		// allocate stiffness matrix
+		int neln = el.Nodes();
+		int ndof = neln*5;
+		ke.resize(ndof, ndof);
+		
+		// calculate the element stiffness matrix
+		ElementBiphasicSoluteStiffnessSS(fem, el, ke);
+		
+		// TODO: the problem here is that the LM array that is returned by the UnpackLM
+		// function does not give the equation numbers in the right order. For this reason we
+		// have to create a new lm array and place the equation numbers in the right order.
+		// What we really ought to do is fix the UnpackLM function so that it returns
+		// the LM vector in the right order for solute-solid elements.
+		vector<int> lm(ndof);
+		for (int i=0; i<neln; ++i)
+		{
+			lm[5*i  ] = elm[3*i];
+			lm[5*i+1] = elm[3*i+1];
+			lm[5*i+2] = elm[3*i+2];
+			lm[5*i+3] = elm[3*neln+i];
+			lm[5*i+4] = elm[11*neln+i];
+		}
+		
+		// assemble element matrix in global stiffness matrix
+		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
 

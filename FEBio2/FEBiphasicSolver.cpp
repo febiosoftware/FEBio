@@ -578,10 +578,21 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// calculate the stiffness matrix for each domain
-	for (i=0; i<mesh.Domains(); ++i) 
+	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
-		FEBiphasicSolidDomain& dom = dynamic_cast<FEBiphasicSolidDomain&>(mesh.Domain(i));
-		dom.StiffnessMatrix(this);
+		for (i=0; i<mesh.Domains(); ++i) 
+		{
+			FEBiphasicSolidDomain& dom = dynamic_cast<FEBiphasicSolidDomain&>(mesh.Domain(i));
+			dom.StiffnessMatrixSS(this);
+		}
+	}
+	else
+	{
+		for (i=0; i<mesh.Domains(); ++i) 
+		{
+			FEBiphasicSolidDomain& dom = dynamic_cast<FEBiphasicSolidDomain&>(mesh.Domain(i));
+			dom.StiffnessMatrix(this);
+		}
 	}
 
 	// calculate contact stiffness
