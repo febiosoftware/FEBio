@@ -1,9 +1,6 @@
 #include "stdafx.h"
-#include "FESolidSolver.h"
 #include "FEElasticSolidDomain.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "FESolidSolver.h"
-#include "FEAnalysisStep.h"
 #include "FEBioLib/FEPointBodyForce.h"
 
 //-----------------------------------------------------------------------------
@@ -575,7 +572,7 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEElasticSolidDomain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
+void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
 
@@ -745,8 +742,6 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-
 	// element stiffness matrix
 	matrix ke;
 	vector<int> lm;
@@ -766,7 +761,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 		ElementGeometricalStiffness(el, ke);
 
 		// calculate material stiffness
-		ElementMaterialStiffness(fem, el, ke);
+		ElementMaterialStiffness(el, ke);
 
 		// assign symmetic parts
 		// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -787,7 +782,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 void FEElasticSolidDomain::InertialStiffness(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	// element stiffness matrix
 	matrix ke;
@@ -819,7 +814,7 @@ void FEElasticSolidDomain::InertialStiffness(FENLSolver* psolver)
 
 void FEElasticSolidDomain::BodyForceStiffness(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	// element stiffness matrix
 	matrix ke;
@@ -859,7 +854,7 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 	FESolidElement& el = Element(iel);
 
 	// calculate material stiffness (i.e. constitutive component)
-	ElementMaterialStiffness(fem, el, ke);
+	ElementMaterialStiffness(el, ke);
 
 	// calculate geometrical stiffness
 	ElementGeometricalStiffness(el, ke);

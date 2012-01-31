@@ -72,7 +72,7 @@ public:
 	void ElementGeometricalStiffness(FESolidElement& el, matrix& ke);
 
 	//! material stiffness component
-	void ElementMaterialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	void ElementMaterialStiffness(FESolidElement& el, matrix& ke);
 
 	//! calculates the solid element inertial stiffness matrix
 	void ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);

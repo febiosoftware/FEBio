@@ -64,11 +64,7 @@ public: // material functions
 	int Materials() { return m_MAT.size(); }
 
 	//! return a pointer to a material
-	FEMaterial* GetMaterial(int id) { return m_MAT[id]; }
-
-	//! return the elastic material
-	// TODO: this is only a temp solution
-//	virtual FEElasticMaterial* GetElasticMaterial(FEMaterial* pm) = 0;
+	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
 
 public: // body force functions
 
@@ -78,7 +74,7 @@ public: // body force functions
 	//! get the number of body forces
 	int BodyForces() { return (int) m_BF.size(); }
 
-	//! return a point to a body force
+	//! return a pointer to a body force
 	FEBodyForce* GetBodyForce(int i) { return m_BF[i]; }
 
 	//! see if there are any body forces

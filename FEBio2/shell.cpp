@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "FESolidSolver.h"
 #include "FEElasticShellDomain.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEBioLib/log.h"
@@ -27,8 +26,6 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 	// initialize base class
 	FEShellDomain::Initialize(mdl);
 
-	FEM& fem = dynamic_cast<FEM&>(mdl);
-
 	bool bmerr = false;
 
 	for (size_t i=0; i<m_Elem.size(); ++i)
@@ -52,23 +49,20 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 			}
 			else
 			{
-				if (fem.GetDebugFlag())
+				// If we get here, then the element has a user-defined fiber direction
+				// we should check to see if it has indeed been specified.
+				// TODO: This assumes that pt.Q will not get intialized to
+				//		 a valid value. I should find another way for checking since I
+				//		 would like pt.Q always to be initialized to a decent value.
+				if (dynamic_cast<FETransverselyIsotropic*>(pme))
 				{
-					// If we get here, then the element has a user-defined fiber direction
-					// we should check to see if it has indeed been specified.
-					// TODO: This assumes that pt.Q will not get intialized to
-					//		 a valid value. I should find another way for checking since I
-					//		 would like pt.Q always to be initialized to a decent value.
-					if (dynamic_cast<FETransverselyIsotropic*>(pme))
+					FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+					mat3d& m = pt.Q;
+					if (fabs(m.det() - 1) > 1e-7)
 					{
-						FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-						mat3d& m = pt.Q;
-						if (fabs(m.det() - 1) > 1e-7)
-						{
-							// this element did not get specified a user-defined fiber direction
-							clog.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
-							bmerr = true;
-						}
+						// this element did not get specified a user-defined fiber direction
+						clog.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
+						bmerr = true;
 					}
 				}
 			}
