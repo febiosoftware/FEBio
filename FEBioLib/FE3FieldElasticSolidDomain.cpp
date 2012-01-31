@@ -1,8 +1,7 @@
 #include "stdafx.h"
-#include "FESolidSolver.h"
 #include "FE3FieldElasticSolidDomain.h"
-#include "FEBioLib/FEUncoupledMaterial.h"
-#include "FEBioLib/log.h"
+#include "FEUncoupledMaterial.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Initialize the 3-field domain data

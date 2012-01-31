@@ -34,7 +34,7 @@
 #include "FEBioLib/FEUDGHexDomain.h"
 #include "FEBioLib/FERigidSolidDomain.h"
 #include "FEBioLib/FERigidShellDomain.h"
-#include "FE3FieldElasticSolidDomain.h"
+#include "FEBioLib/FE3FieldElasticSolidDomain.h"
 #include "FEBioLib/FEUT4Domain.h"
 #include "FEBioLib/FEConstBodyForce.h"
 

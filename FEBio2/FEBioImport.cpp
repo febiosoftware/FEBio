@@ -44,7 +44,7 @@
 #include "FEBioLib/FEElasticTrussDomain.h"
 #include "FEBioLib/FEElasticShellDomain.h"
 #include "FEBioLib/FEDiscreteSpringDomain.h"
-#include "FE3FieldElasticSolidDomain.h"
+#include "FEBioLib/FE3FieldElasticSolidDomain.h"
 #include "FEBioLib/FERigidShellDomain.h"
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"

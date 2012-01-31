@@ -517,10 +517,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\solid3f.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\solve.cpp"
 				>
 			</File>
@@ -556,10 +552,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\DataStore.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FE3FieldElasticSolidDomain.h"
 				>
 			</File>
 			<File
