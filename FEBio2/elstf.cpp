@@ -3,7 +3,7 @@
 #include "FESolidSolver.h"
 #include "FECore/tens4d.h"
 #include "FEBioLib/FEPressureLoad.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.

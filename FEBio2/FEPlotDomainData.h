@@ -1,7 +1,7 @@
 #pragma once
 #include "FECore/FEPlotData.h"
-#include "FEElasticShellDomain.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/FELinearSolidDomain.h"
 
 //=============================================================================

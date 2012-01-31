@@ -4,7 +4,7 @@
 #include "FEBioLib/log.h"
 #include "console.h"
 #include "FESolidSolver.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEAnalysisStep.h"
 
 // register the material with the framework

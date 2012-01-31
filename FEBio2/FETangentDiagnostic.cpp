@@ -6,7 +6,7 @@
 #include "FETangentDiagnostic.h"
 #include "FEBox.h"
 #include "FESolidSolver.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------

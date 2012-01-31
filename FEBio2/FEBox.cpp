@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "FEBox.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

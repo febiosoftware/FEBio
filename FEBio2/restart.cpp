@@ -24,8 +24,8 @@
 #include "FEBioLib/FEHeatFlux.h"
 #include "FEAnalysisStep.h"
 
-#include "FEElasticSolidDomain.h"
-#include "FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
 #include "FEBioLib/FEElasticTrussDomain.h"
 #include "FEBioLib/FEHeatSolidDomain.h"
 #include "FEBioLib/FEDiscreteSpringDomain.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEShellDomain.h"
-#include "FEBioLib/FEElasticDomain.h"
+#include "FEElasticDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain described by 3D shell elements

@@ -10,8 +10,8 @@
 #include "LSDYNAPlotFile.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEBioLib/FEDiscreteMaterial.h"
-#include "FEElasticSolidDomain.h"
-#include "FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
 #include "FEBioLib/FEPointBodyForce.h"
 
 // Forward declarations

@@ -42,7 +42,7 @@
 #include "FEBioLib/FEHeatSolidDomain.h"
 #include "FEBioLib/FELinearSolidDomain.h"
 #include "FEBioLib/FEElasticTrussDomain.h"
-#include "FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
 #include "FEBioLib/FEDiscreteSpringDomain.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FERigidShellDomain.h"

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEElemElemList.h"
 #include "FECore/FENodeElemList.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 
 FEElemElemList::FEElemElemList(void)
 {

@@ -7,7 +7,7 @@
 #include "fem.h"
 #include "FECore/FENNQuery.h"
 #include "FEBioLib/log.h"
-#include "FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

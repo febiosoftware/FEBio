@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPlotSurfaceData.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 #include "fem.h"
 
 //-----------------------------------------------------------------------------

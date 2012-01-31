@@ -306,6 +306,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEElasticShellDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEElasticSolidDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEElasticTrussDomain.cpp"
 				>
 			</File>
@@ -705,6 +713,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEElasticMixture.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEElasticShellDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEElasticSolidDomain.h"
 				>
 			</File>
 			<File

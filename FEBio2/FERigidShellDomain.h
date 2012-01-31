@@ -1,5 +1,5 @@
 #pragma once
-#include "FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
 
 //-----------------------------------------------------------------------------
 //! domain class for 3D rigid shell elements

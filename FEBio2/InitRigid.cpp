@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FEBioLib/FERigid.h"
-#include "FEElasticShellDomain.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------

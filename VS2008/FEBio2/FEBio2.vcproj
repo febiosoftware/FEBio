@@ -525,14 +525,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\shell.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\solid.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\solid3f.cpp"
 				>
 			</File>
@@ -640,14 +632,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEElasticShellDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEElasticSolidDomain.h"
 				>
 			</File>
 			<File

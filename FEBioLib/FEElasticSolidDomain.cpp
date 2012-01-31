@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEElasticSolidDomain.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
-#include "FEBioLib/FEPointBodyForce.h"
+#include "FETransverselyIsotropic.h"
+#include "FEPointBodyForce.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEElasticSolidDomain::Clone()

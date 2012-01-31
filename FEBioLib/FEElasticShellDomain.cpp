@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEElasticShellDomain.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
-#include "FEBioLib/log.h"
+#include "FETransverselyIsotropic.h"
+#include "log.h"
 #include <math.h>
 
 //-----------------------------------------------------------------------------

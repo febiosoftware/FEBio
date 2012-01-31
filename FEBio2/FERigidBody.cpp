@@ -6,7 +6,7 @@
 #include "FERigidBody.h"
 #include "FECore/FEMaterial.h"
 #include "FEBioLib/FERigid.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "FESlidingInterface.h"
-#include "FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
 #include "FECore/FEModel.h"
 #include "FEBioLib/log.h"
 

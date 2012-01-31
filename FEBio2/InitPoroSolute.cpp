@@ -3,8 +3,8 @@
 #include "FECore/FEMaterial.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/FEBiphasicSolute.h"
-#include "FEElasticShellDomain.h"
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticShellDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/FETriphasic.h"
 #include "FEBioLib/log.h"
 

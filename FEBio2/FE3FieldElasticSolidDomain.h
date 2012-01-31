@@ -1,5 +1,5 @@
 #pragma once
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! The following domain implements the finite element formulation for a three-field
