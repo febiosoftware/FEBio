@@ -65,16 +65,20 @@ class FETriphasic : public FEMaterial
 {
 public:
 	FETriphasic();
+
+	void Init();
 	
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
 		return new FESaltMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}
-	
+
+	// Get the elastic component (overridden from FEMaterial)
+	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
+
 public:
-	void Init();
-	
+
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 	

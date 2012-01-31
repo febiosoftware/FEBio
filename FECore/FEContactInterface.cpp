@@ -39,11 +39,8 @@ double FEContactInterface::BulkModulus(FESurfaceElement& el, FESurface &s)
 	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
 	if (pe)
 	{
-		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
-
-		// extract the elastic component
-		FEElasticMaterial* pme = m_pfem->GetElasticMaterial(pe->GetMatID());
+		// extract the elastic material
+		FEElasticMaterial* pme = m_pfem->GetMaterial(pe->GetMatID())->GetElasticMaterial();
 
 		// get a material point
 		FEMaterialPoint& mp = *pe->m_State[0];

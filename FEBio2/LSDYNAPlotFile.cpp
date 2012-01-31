@@ -1414,8 +1414,8 @@ void LSDYNAPlotFile::write_material_fibers()
 float LSDYNAPlotFile::fiber_strain(FESolidElement &el, int j)
 {
 	// see if this element belongs to a tranversely isotropic material
-	int mid = el.GetMatID();
-	if (dynamic_cast<FETransverselyIsotropic*>(m_pfem->GetElasticMaterial(mid)))
+	FEMaterial* pm = m_pfem->GetMaterial(el.GetMatID());
+	if (dynamic_cast<FETransverselyIsotropic*>(pm->GetElasticMaterial()))
 	{
 		FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
 
@@ -1436,8 +1436,8 @@ float LSDYNAPlotFile::fiber_strain(FESolidElement &el, int j)
 float LSDYNAPlotFile::dev_fiber_strain(FESolidElement &el, int j)
 {
 	// see if this element belongs to a tranversely isotropic material
-	int mid = el.GetMatID();
-	if (dynamic_cast<FETransverselyIsotropic*>(m_pfem->GetElasticMaterial(mid)))
+	FEMaterial* pm = m_pfem->GetMaterial(el.GetMatID());
+	if (dynamic_cast<FETransverselyIsotropic*>(pm->GetElasticMaterial()))
 	{
 		FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
 

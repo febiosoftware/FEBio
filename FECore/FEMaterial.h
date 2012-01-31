@@ -36,6 +36,13 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+// Forward declaration of the FEElasticMaterial class. 
+// TODO: The only reason I had to do this is to define the FEMaterial::GetElasticMaterial.
+// However, this is only a temporary construct so make sure to delete this forward declaration
+// when no longer needed.
+class FEElasticMaterial;
+
+//-----------------------------------------------------------------------------
 //! exception to throw during material initialization phase
 class MaterialRangeError
 {
@@ -79,6 +86,10 @@ public:
 
 	//! Serialize material data to archive
 	virtual void Serialize(DumpFile& ar);
+
+	//! TODO: I need to move this function up the hierarchy 
+	//        once I redesign the material library
+	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
 
 protected:
 	char	m_szname[128];	//!< name of material
@@ -135,6 +146,9 @@ public:
 
 	//! serialization
 	void Serialize(DumpFile& ar);
+
+	//! Get the elastic component
+	FEElasticMaterial* GetElasticMaterial() { return m_pBase->GetElasticMaterial(); }
 
 public:
 	int					m_nBaseMat;	//!< material ID of base material (one-based!)

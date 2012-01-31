@@ -93,6 +93,9 @@ public:
 	{ 
 		return new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
 	}
+
+	// Get the elastic component (overridden from FEMaterial)
+	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
 	
 public:
 	void Init();

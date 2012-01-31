@@ -35,7 +35,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 		FESolidElement& el = m_Elem[i];
 
 		// get the elements material
-		FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 		// set the local element coordinates
 		if (pme)
@@ -963,7 +963,7 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 		assert(pm);
 
 		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
+		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 		// loop over the integration points and calculate
 		// the stress at the integration point

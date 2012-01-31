@@ -630,21 +630,7 @@ FESoluteData* FEM::FindSD(int nid)
 	
 	return 0;
 }
-
-//-----------------------------------------------------------------------------
-//! Returns the elastic component of the material, identified by id
-FEElasticMaterial* FEM::GetElasticMaterial(int id)
-{
-	FEMaterial* pm = m_MAT[id];
-	while (dynamic_cast<FENestedMaterial*>(pm)) pm = (dynamic_cast<FENestedMaterial*>(pm))->m_pBase;
-	while (dynamic_cast<FEBiphasic*>(pm)) pm = (dynamic_cast<FEBiphasic*>(pm))->m_pSolid;
-	while (dynamic_cast<FEBiphasicSolute*>(pm)) pm = (dynamic_cast<FEBiphasicSolute*>(pm))->m_pSolid;
-	while (dynamic_cast<FETriphasic*>(pm)) pm = (dynamic_cast<FETriphasic*>(pm))->m_pSolid;
-	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
-	assert(pme);
-	return pme;
-}
-
+/*
 //-----------------------------------------------------------------------------
 //! Returns the elastic component of the material pm
 FEElasticMaterial* FEM::GetElasticMaterial(FEMaterial* pm)
@@ -657,6 +643,7 @@ FEElasticMaterial* FEM::GetElasticMaterial(FEMaterial* pm)
 	assert(pme);
 	return pme;
 }
+*/
 
 //-----------------------------------------------------------------------------
 //! Sets the name of the FEBio input file

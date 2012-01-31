@@ -100,6 +100,9 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	//! Get the elastic component
+	FEElasticMaterial* GetElasticMaterial() { return this; }
+
 public:
 	double	m_density;	//!< material density
 	double	m_molarmass;//!< material molar mass (molecular weight)

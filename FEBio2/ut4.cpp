@@ -301,7 +301,7 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 
 	// let's calculate the stresses
 	// get the elastic material
-	FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
@@ -602,7 +602,7 @@ void FEUT4Domain::NodalStiffnessMatrix(FENLSolver *psolver)
 
 	// Get the material for the domain
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-	FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 	// loop over all the nodes
 	int NN = (int) m_Node.size(), ni, nj;

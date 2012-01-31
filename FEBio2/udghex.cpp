@@ -536,7 +536,7 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 		assert(pm);
 
 		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
+		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 		// for the enhanced strain hex we need a slightly different procedure
 		// for calculating the element's stress. For this element, the stress

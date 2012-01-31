@@ -487,7 +487,7 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 		assert(pm);
 
 		// extract the elastic component
-		FEElasticMaterial* pme = fem.GetElasticMaterial(pm);
+		FEElasticMaterial* pme = pm->GetElasticMaterial();
 		assert(pme);
 
 		// loop over the integration points and calculate

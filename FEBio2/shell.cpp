@@ -37,7 +37,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 		FEShellElement& el = m_Elem[i];
 
 		// get the elements material
-		FEElasticMaterial* pme = fem.GetElasticMaterial(m_pMat);
+		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 		// set the local element coordinates
 		if (pme)

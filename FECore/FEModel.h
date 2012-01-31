@@ -68,8 +68,7 @@ public: // material functions
 
 	//! return the elastic material
 	// TODO: this is only a temp solution
-	virtual FEElasticMaterial* GetElasticMaterial(int id) = 0;
-	virtual FEElasticMaterial* GetElasticMaterial(FEMaterial* pm) = 0;
+//	virtual FEElasticMaterial* GetElasticMaterial(FEMaterial* pm) = 0;
 
 public: // body force functions
 

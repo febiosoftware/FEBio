@@ -69,10 +69,7 @@ public:
 	bool Input(const char* szfile);
 
 	//! return the elastic material
-	FEElasticMaterial* GetElasticMaterial(int id);
-
-	//! return the elastic material
-	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm);
+//	FEElasticMaterial* GetElasticMaterial(FEMaterial* pm);
 
 	//! set the debug level
 	void SetDebugFlag(bool b) { m_debug = b; }
