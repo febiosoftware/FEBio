@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEUDGHexDomain.h"
-#include "FESolidSolver.h"
-#include "FEAnalysisStep.h"
+
+double FEUDGHexDomain::m_hg = 1.0;
 
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
@@ -159,14 +159,11 @@ void FEUDGHexDomain::UDGHourglassForces(FEModel& fem, FESolidElement &el, vector
 	}
 
 	// calculate hourglass forces
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
-	double hg = pstep->m_hg;
-
 	for (i=0; i<8; ++i)
 	{
-		fe[3*i  ] -= hg*(g4[i]*u4 + g5[i]*u5 + g6[i]*u6 + g7[i]*u7);
-		fe[3*i+1] -= hg*(g4[i]*v4 + g5[i]*v5 + g6[i]*v6 + g7[i]*v7);
-		fe[3*i+2] -= hg*(g4[i]*w4 + g5[i]*w5 + g6[i]*w6 + g7[i]*w7);
+		fe[3*i  ] -= m_hg*(g4[i]*u4 + g5[i]*u5 + g6[i]*u6 + g7[i]*u7);
+		fe[3*i+1] -= m_hg*(g4[i]*v4 + g5[i]*v5 + g6[i]*v6 + g7[i]*v7);
+		fe[3*i+2] -= m_hg*(g4[i]*w4 + g5[i]*w5 + g6[i]*w6 + g7[i]*w7);
 	}
 }
 
@@ -210,7 +207,7 @@ void FEUDGHexDomain::StiffnessMatrix(FENLSolver* psolver)
 
 void FEUDGHexDomain::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	// element stiffness matrix
 	matrix ke;
@@ -310,17 +307,11 @@ void FEUDGHexDomain::UDGHourglassStiffness(FEModel& fem, FESolidElement& el, mat
 	}
 
 	// calculate hourglass stiffness
-	// TODO: I need to get rid of this
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
-	double hg = pstep->m_hg;
-
-	double kab;
-
 	for (i=0; i<8; ++i)
 	{
 		for (j=i; j<8; ++j)
 		{
-			kab = hg*(g4[i]*g4[j] + g5[i]*g5[j] + g6[i]*g6[j] + g7[i]*g7[j]);
+			double kab = m_hg*(g4[i]*g4[j] + g5[i]*g5[j] + g6[i]*g6[j] + g7[i]*g7[j]);
 
 			ke[3*i  ][3*j  ] += kab;
 			ke[3*i+1][3*j+1] += kab;

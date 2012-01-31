@@ -25,7 +25,6 @@ FEAnalysisStep::FEAnalysisStep(FEM& fem) : m_fem(fem)
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
 	m_istiffpr = 1;				// use pressure stiffness
 	m_baugment = false;			// no augmentations
-	m_hg = 1.0;
 
 	// --- Time Step Data ---
 	m_ntime = -1;
@@ -631,7 +630,6 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 		ar << m_nanalysis;
 		ar << m_istiffpr;
 		ar << m_baugment;
-		ar << m_hg;
 
 		// --- Time Step Data ---
 		ar << m_ntime;
@@ -670,7 +668,6 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 		ar >> m_nanalysis;
 		ar >> m_istiffpr;
 		ar >> m_baugment;
-		ar >> m_hg;
 
 		// --- Time Step Data ---
 		ar >> m_ntime;

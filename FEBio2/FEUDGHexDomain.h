@@ -48,4 +48,7 @@ protected:
 	void AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8], double GZ[8], int state = 0);
 	void AvgDefGrad(FESolidElement& el, mat3d& F, double GX[8], double GY[8], double GZ[8]);
 	double HexVolume(FESolidElement& el, int state = 0);
+
+public:
+	static double	m_hg;	//!< hourglass parameter
 };
