@@ -2,7 +2,7 @@
 #include "FECore/FENodeElemList.h"
 #include "FECore/tens4d.h"
 #include "FECore/FEElasticMaterial.h"
-#include "FEBioLib/FEElasticSolidDomain.h"
+#include "FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain for nodally integrated tet elements 

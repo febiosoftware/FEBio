@@ -1,8 +1,6 @@
 #include "stdafx.h"
-#include "ut4.h"
+#include "FEUT4Domain.h"
 #include "FECore/FEMesh.h"
-#include "FESolidSolver.h"
-#include "FEMicroMaterial.h"
 
 // set the default stabilization factor
 double FEUT4Domain::m_alpha = 0.05;
@@ -601,7 +599,6 @@ void FEUT4Domain::NodalStiffnessMatrix(FENLSolver *psolver)
 	vector<int> en;
 
 	// Get the material for the domain
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 	// loop over all the nodes
@@ -935,7 +932,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMat
 //! Calculates the element contribution to the global stiffness matrix
 void FEUT4Domain::ElementalStiffnessMatrix(FENLSolver *psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	// element stiffness matrix
 	matrix ke;
@@ -973,6 +970,7 @@ void FEUT4Domain::ElementStiffness(FEModel &fem, int iel, matrix &ke)
 	//       Incompressible materials require an additional dilatational 
 	//       stiffness which is calculated differently from the geometric and
 	//       material stiffnesses. 
+	// TODO: I don't know if the comment above applies anymore
 
 	// calculate material stiffness (i.e. constitutive component)
 	ElementMaterialStiffness(fem, el, ke);

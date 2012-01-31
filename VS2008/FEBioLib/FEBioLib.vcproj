@@ -562,6 +562,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEUT4Domain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEVerondaWestmann.cpp"
 				>
 			</File>
@@ -985,6 +989,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUT4Domain.h"
 				>
 			</File>
 			<File

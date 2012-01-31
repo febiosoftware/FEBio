@@ -537,10 +537,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\ut4.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\validate.cpp"
 				>
 			</File>
@@ -764,10 +760,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\ut4.h"
 				>
 			</File>
 			<File

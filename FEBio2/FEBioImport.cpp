@@ -14,7 +14,7 @@
 #include "FEBioLib/log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
-#include "ut4.h"
+#include "FEBioLib/FEUT4Domain.h"
 #include "FEBioLib/FEDiscreteMaterial.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
 #include "FEFacet2FacetSliding.h"

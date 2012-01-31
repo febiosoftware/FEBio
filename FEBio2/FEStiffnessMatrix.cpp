@@ -14,7 +14,7 @@
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
 #include "FESolver.h"
-#include "ut4.h"
+#include "FEBioLib/FEUT4Domain.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
