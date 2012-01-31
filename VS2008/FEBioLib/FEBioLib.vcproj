@@ -466,6 +466,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FERigidShellDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidSolidDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FERigidSurface.cpp"
 				>
 			</File>
@@ -881,6 +889,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidShellDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidSolidDomain.h"
 				>
 			</File>
 			<File

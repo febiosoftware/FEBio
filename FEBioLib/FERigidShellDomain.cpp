@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FERigidShellDomain.h"
-#include "FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FERigidShellDomain::Clone()

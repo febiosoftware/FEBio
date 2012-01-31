@@ -1,11 +1,13 @@
 #include "stdafx.h"
-#include "FECore/FEDomain.h"
-#include "FESolidSolver.h"
 #include "FERigidSolidDomain.h"
 
-//=============================================================================
-// Rigid Solid
-//=============================================================================
+//-----------------------------------------------------------------------------
+FEDomain* FERigidSolidDomain::Clone()
+{
+	FERigidSolidDomain* pd = new FERigidSolidDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
 
 //-----------------------------------------------------------------------------
 //! Calculates the stiffness matrix for 3D rigid elements.
