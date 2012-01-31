@@ -31,7 +31,7 @@
 #include "FEBioLib/FEDiscreteSpringDomain.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicSoluteDomain.h"
-#include "FEUDGHexDomain.h"
+#include "FEBioLib/FEUDGHexDomain.h"
 #include "FEBioLib/FERigidSolidDomain.h"
 #include "FEBioLib/FERigidShellDomain.h"
 #include "FE3FieldElasticSolidDomain.h"

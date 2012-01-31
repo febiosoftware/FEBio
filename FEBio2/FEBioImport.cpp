@@ -35,7 +35,7 @@
 #include "FESoluteFlux.h"
 #include "plugin.h"
 #include <string.h>
-#include "FEUDGHexDomain.h"
+#include "FEBioLib/FEUDGHexDomain.h"
 #include "FEBioLib/FERigidSolidDomain.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicSoluteDomain.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/FEElasticSolidDomain.h"
+#include "FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! domain class for uniform-deformation-gradient hex elements (UDG)

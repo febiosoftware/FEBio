@@ -529,10 +529,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\udghex.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\update.cpp"
 				>
 			</File>
@@ -732,10 +728,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETriphasicSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEUDGHexDomain.h"
 				>
 			</File>
 			<File

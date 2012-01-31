@@ -554,6 +554,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEUDGHexDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledElasticMixture.cpp"
 				>
 			</File>
@@ -981,6 +985,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETrussMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUDGHexDomain.h"
 				>
 			</File>
 			<File
