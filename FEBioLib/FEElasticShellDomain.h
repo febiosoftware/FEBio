@@ -54,7 +54,7 @@ public: // overrides from FEElasticDomain
 	void InertialStiffness   (FENLSolver* psolver) { assert(false); }
 
 	// body force stiffness (TODO: implement this)
-	void BodyForceStiffness  (FENLSolver* psolver) { assert(false); }
+	void BodyForceStiffness  (FENLSolver* psolver, FEBodyForce& bf) { assert(false); }
 
 public:
 

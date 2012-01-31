@@ -4,6 +4,7 @@
 #include "FECore/tens4d.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
+#include "FEBioLib/FEPointBodyForce.h"
 
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
@@ -36,7 +37,12 @@ bool FESolidSolver::StiffnessMatrix()
 	for (i=0; i<mesh.Domains(); ++i) 
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.BodyForceStiffness(this);
+		int NF = m_fem.BodyForces();
+		for (int j=0; j<NF; ++j)
+		{
+			FEBodyForce& BF = *m_fem.GetBodyForce(j);
+			dom.BodyForceStiffness(this, BF);
+		}
 	}
 
 	// Add inertial stiffness for dynamic problems
@@ -577,6 +583,20 @@ bool FESolidSolver::Residual(vector<double>& R)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.InternalForces(this, R);
+	}
+
+	// update body forces
+	for (i=0; i<fem.BodyForces(); ++i)
+	{
+		// TODO: I don't like this but for now I'll hard-code the modification of the
+		//       force center position
+		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(fem.GetBodyForce(i));
+		if (pbf)
+		{
+			if (pbf->m_rlc[0] >= 0) pbf->m_rc.x = fem.GetLoadCurve(pbf->m_rlc[0])->Value();
+			if (pbf->m_rlc[1] >= 0) pbf->m_rc.y = fem.GetLoadCurve(pbf->m_rlc[1])->Value();
+			if (pbf->m_rlc[2] >= 0) pbf->m_rc.z = fem.GetLoadCurve(pbf->m_rlc[2])->Value();
+		}
 	}
 
 	// calculate the body forces

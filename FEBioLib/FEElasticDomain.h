@@ -42,7 +42,7 @@ public:
 	virtual void StiffnessMatrix   (FENLSolver* psolver) = 0;
 
 	//! Calculate stiffness contribution of body forces
-	virtual void BodyForceStiffness(FENLSolver* psolver) = 0;
+	virtual void BodyForceStiffness(FENLSolver* psolver, FEBodyForce& bf) = 0;
 
 	//! calculate the inertial stiffness matrix (for dynamic problems)
 	virtual void InertialStiffness (FENLSolver* psolver) = 0;

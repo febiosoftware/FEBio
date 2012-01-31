@@ -60,7 +60,7 @@ public: // overrides from FEElasticDomain
 	void InertialStiffness(FENLSolver* psolver);
 
 	//! body force stiffness
-	void BodyForceStiffness(FENLSolver* psolver);
+	void BodyForceStiffness(FENLSolver* psolver, FEBodyForce& bf);
 
 public:
 	// --- S T I F F N E S S ---
@@ -78,7 +78,7 @@ public:
 	void ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the stiffness matrix due to body forces 
-	void ElementBodyForceStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);
 
 	// --- R E S I D U A L ---
 

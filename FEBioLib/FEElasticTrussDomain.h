@@ -49,7 +49,7 @@ public: // overloads from FEElasticDomain
 	void InertialStiffness(FENLSolver* psolver) { assert(false); }
 
 	//! body force stiffness matrix (TODO: implement this)
-	void BodyForceStiffness(FENLSolver* psolver) { assert(false); }
+	void BodyForceStiffness(FENLSolver* psolver, FEBodyForce& bf) { assert(false); }
 
 protected:
 	//! calculates the truss element stiffness matrix

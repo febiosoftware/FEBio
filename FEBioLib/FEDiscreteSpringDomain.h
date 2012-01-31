@@ -24,7 +24,7 @@ public: // overridden from FEElasticDomain
 	//! calculate stiffness matrix
 	void StiffnessMatrix(FENLSolver* psolver);
 	void InertialStiffness   (FENLSolver* psolver) {}
-	void BodyForceStiffness  (FENLSolver* psolver) {}
+	void BodyForceStiffness  (FENLSolver* psolver, FEBodyForce& bf) {}
 
 	//! Calculates inertial forces for dynamic problems
 	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
