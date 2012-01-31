@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEAugLagLinearConstraint.h"
-#include "fem.h"
+#include "FECore/FEModel.h"
 #include "FESolidSolver.h"
 #include "FEAnalysisStep.h"
 #include "FEBioLib/log.h"
@@ -33,7 +33,7 @@ void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-FELinearConstraintSet::FELinearConstraintSet(FEM* pfem)
+FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FEConstraint(pfem)
 {
 	static int nc = 1;
 	m_nID = nc++;
@@ -41,11 +41,9 @@ FELinearConstraintSet::FELinearConstraintSet(FEM* pfem)
 	m_eps = 1;
 	m_tol = 0.1;
 	m_naugmax = 50;
-
-	// store a pointer to the FEM data
-	m_pfem = pfem;
 }
 
+//-----------------------------------------------------------------------------
 void FELinearConstraintSet::Init()
 {
 	// set the equation numbers for the linear constraints
@@ -151,7 +149,7 @@ bool FELinearConstraintSet::Augment(int naug)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the residual.
 
-void FELinearConstraintSet::Residual(vector<double> &R)
+void FELinearConstraintSet::Residual(FENLSolver* psolver, vector<double> &R)
 {
 	int M = m_LC.size();
 	list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
@@ -174,11 +172,8 @@ void FELinearConstraintSet::Residual(vector<double> &R)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the stiffness matrix.
 
-void FELinearConstraintSet::Stiffness()
+void FELinearConstraintSet::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
-
 	vector<int> en;
 	vector<int> elm;
 	matrix ke;

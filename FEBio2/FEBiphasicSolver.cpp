@@ -533,7 +533,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	LinearConstraintForces(R);
 
 	// forces due to point constraints
-	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].Residual(R);
+	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].Residual(this, R);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
@@ -625,7 +625,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	LinearConstraintStiffness();
 
 	// point constraints
-	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].Stiffness();
+	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i].StiffnessMatrix(this);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.

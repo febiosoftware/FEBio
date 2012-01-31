@@ -3,10 +3,9 @@
 #include "NumCore/vector.h"
 #include "NumCore/matrix.h"
 #include "FECore/DumpFile.h"
+#include "FECore/FEConstraint.h"
 #include <list>
 using namespace std;
-
-class FEM;
 
 //-----------------------------------------------------------------------------
 //! linear constraint enforced using augmented lagrangian
@@ -44,29 +43,30 @@ public:
 //-----------------------------------------------------------------------------
 //! This class manages a group of linear constraints
 
-class FELinearConstraintSet
+class FELinearConstraintSet : public FEConstraint
 {
 public:
 	//! constructor
-	FELinearConstraintSet(FEM* pfem);
+	FELinearConstraintSet(FEModel* pfem);
 
 	//! add a linear constraint to the list
 	void add(FEAugLagLinearConstraint* plc) { m_LC.push_back(plc); }
 
-	//! add the linear constraint contributions to the residual
-	void Residual(vector<double>& R);
+	//! serialize data to archive
+	void Serialize(DumpFile& ar);
 
-	//! add the linear constraint contributions to the stiffness matrix
-	void Stiffness();
-
-	//! do the augmentation
-	bool Augment(int naug);
-
+public:
 	//! initialization
 	void Init();
 
-	//! serialize data to archive
-	void Serialize(DumpFile& ar);
+	//! add the linear constraint contributions to the residual
+	void Residual(FENLSolver* psolver, vector<double>& R);
+
+	//! add the linear constraint contributions to the stiffness matrix
+	void StiffnessMatrix(FENLSolver* psolver);
+
+	//! do the augmentation
+	bool Augment(int naug);
 
 protected:
 	//! calculate the constraint value
@@ -76,8 +76,6 @@ public:
 	list<FEAugLagLinearConstraint*>	m_LC;	//!< list of linear constraints
 
 public:
-	FEM*	m_pfem;	//!< pointer to FEM data
-
 	double	m_tol;	//!< augmentation tolerance
 	double	m_eps;	//!< penalty factor
 

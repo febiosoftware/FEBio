@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #include "FEPointConstraint.h"
-#include "fem.h"
-#include "FESolidSolver.h"
-#include "FEAnalysisStep.h"
+#include "FECore/FEModel.h"
+#include "FECore/FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FEPointConstraint::FEPointConstraint(FEM* pfem)
+FEPointConstraint::FEPointConstraint(FEModel* pfem) : FEConstraint(pfem)
 {
-	m_pfem = pfem;
 	m_node = -1;
 	m_pel = 0;
 }
@@ -27,12 +25,10 @@ void FEPointConstraint::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::Residual(vector<double> &R)
+void FEPointConstraint::Residual(FENLSolver* psolver, vector<double> &R)
 {
 	int i;
 	FEMesh& m = m_pfem->m_mesh;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// calculate H matrix
 	double H[9], *r = m_rs;
@@ -87,12 +83,10 @@ void FEPointConstraint::Residual(vector<double> &R)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::Stiffness()
+void FEPointConstraint::StiffnessMatrix(FENLSolver* psolver)
 {
 	int i, j;
 	FEMesh& m = m_pfem->m_mesh;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
-	FESolidSolver* psolver = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// calculate H matrix
 	double H[9], *r = m_rs;
