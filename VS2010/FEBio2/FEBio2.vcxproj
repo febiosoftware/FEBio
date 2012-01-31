@@ -574,7 +574,6 @@
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FETriphasicDomain.h" />
     <ClInclude Include="..\..\FEBio2\FETriphasicSolver.h" />
-    <ClInclude Include="..\..\FEBio2\FEUDGHexDomain.h" />
     <ClInclude Include="..\..\FEBio2\FileImport.h" />
     <ClInclude Include="..\..\FEBio2\Interrupt.h" />
     <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h" />
@@ -656,7 +655,6 @@
     <ClCompile Include="..\..\FEBio2\solid3f.cpp" />
     <ClCompile Include="..\..\FEBio2\solve.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
-    <ClCompile Include="..\..\FEBio2\udghex.cpp" />
     <ClCompile Include="..\..\FEBio2\update.cpp" />
     <ClCompile Include="..\..\FEBio2\validate.cpp" />
   </ItemGroup>
