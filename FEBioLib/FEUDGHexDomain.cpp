@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEUDGHexDomain.h"
+#include "FECore/FEElasticMaterial.h"
 
 double FEUDGHexDomain::m_hg = 1.0;
 

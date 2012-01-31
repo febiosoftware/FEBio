@@ -14,7 +14,6 @@
 #include "FEBioLib/FELinearConstraint.h"
 #include "FEAugLagLinearConstraint.h"
 #include "FEBioLib/Timer.h"
-#include "FEBioLib/FESurfaceLoad.h"
 #include "FEPointConstraint.h"
 #include "FEBioLib/PlotFile.h"
 #include "FEBioLib/FEElasticMixture.h"
@@ -187,9 +186,6 @@ public:
 public:
 	// --- Boundary Condition Data ---
 	//{
-		// surface loads
-		vector<FESurfaceLoad*>	m_SL;		//!< surface loads
-
 		// rigid displacements
 		vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
 

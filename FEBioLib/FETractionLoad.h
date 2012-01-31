@@ -1,5 +1,5 @@
 #pragma once
-#include "FESurfaceLoad.h"
+#include "FECore/FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! FETractionLoad is a surface that has a constant (deformation independant)

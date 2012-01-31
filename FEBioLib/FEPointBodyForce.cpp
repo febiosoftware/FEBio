@@ -2,6 +2,7 @@
 #include "FECore/febio.h"
 #include "FEPointBodyForce.h"
 #include "FECore/FEModel.h"
+#include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEPointBodyForce, FEBodyForce);

@@ -5,8 +5,8 @@
 #include "BC.h"
 #include "FEBodyForce.h"
 #include "FEContactInterface.h"
-#include "FEElasticMaterial.h"		// TODO: I want to delete this
 #include "FEAnalysis.h"
+#include "FESurfaceLoad.h"
 #include <vector>
 #include <map>
 
@@ -138,6 +138,7 @@ public:
 	// Boundary Conditions
 	std::vector<FEPrescribedBC*>	m_DC;	//!< prescribed constraints
 	std::vector<FENodalForce*>		m_FC;	//!< concentrated nodal loads
+	std::vector<FESurfaceLoad*>		m_SL;	//!< surface loads
 	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
 
 	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function

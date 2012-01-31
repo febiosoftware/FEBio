@@ -500,6 +500,7 @@
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
+    <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
@@ -546,6 +547,7 @@
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
+    <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\kernel.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />

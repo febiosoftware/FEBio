@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FEContactInterface.h"
 #include "FEModel.h"
+#include "FEElasticMaterial.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
