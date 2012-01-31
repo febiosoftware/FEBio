@@ -571,6 +571,8 @@
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
+    <ClInclude Include="..\..\FEBioLib\FERigidShellDomain.h" />
+    <ClInclude Include="..\..\FEBioLib\FERigidSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioLib\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioLib\FESolute.h" />
@@ -675,6 +677,8 @@
     <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FERigidShellDomain.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FERigidSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolute.cpp" />

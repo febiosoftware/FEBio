@@ -183,13 +183,7 @@
     <ClInclude Include="..\..\FEBio2\FE3FieldElasticSolidDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FERigidSolidDomain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEUDGHexDomain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FERigidShellDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEBiphasicSolidDomain.h">
@@ -377,9 +371,6 @@
     <ClCompile Include="..\..\FEBio2\restart.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\rigid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\solid3f.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -423,9 +414,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\InitLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FERigidShellDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -563,8 +563,6 @@
     <ClInclude Include="..\..\FEBio2\FERestartImport.h" />
     <ClInclude Include="..\..\FEBio2\FERigidBody.h" />
     <ClInclude Include="..\..\FEBio2\FERigidJoint.h" />
-    <ClInclude Include="..\..\FEBio2\FERigidShellDomain.h" />
-    <ClInclude Include="..\..\FEBio2\FERigidSolidDomain.h" />
     <ClInclude Include="..\..\FEBio2\FERigidWallInterface.h" />
     <ClInclude Include="..\..\FEBio2\FESlidingInterface.h" />
     <ClInclude Include="..\..\FEBio2\FESlidingInterface2.h" />
@@ -628,7 +626,6 @@
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBio2\FERigidBody.cpp" />
     <ClCompile Include="..\..\FEBio2\FERigidJoint.cpp" />
-    <ClCompile Include="..\..\FEBio2\FERigidShellDomain.cpp" />
     <ClCompile Include="..\..\FEBio2\FERigidWallInterface.cpp" />
     <ClCompile Include="..\..\FEBio2\FESlidingInterface.cpp" />
     <ClCompile Include="..\..\FEBio2\FESlidingInterface2.cpp" />
@@ -657,7 +654,6 @@
     <ClCompile Include="..\..\FEBio2\powell.cpp" />
     <ClCompile Include="..\..\FEBio2\quasin.cpp" />
     <ClCompile Include="..\..\FEBio2\restart.cpp" />
-    <ClCompile Include="..\..\FEBio2\rigid.cpp" />
     <ClCompile Include="..\..\FEBio2\solid3f.cpp" />
     <ClCompile Include="..\..\FEBio2\solve.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
