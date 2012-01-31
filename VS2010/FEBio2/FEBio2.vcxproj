@@ -580,7 +580,6 @@
     <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h" />
     <ClInclude Include="..\..\FEBio2\plugin.h" />
     <ClInclude Include="..\..\FEBio2\stdafx.h" />
-    <ClInclude Include="..\..\FEBio2\ut4.h" />
     <ClInclude Include="..\..\FEBio2\validate.h" />
     <ClInclude Include="..\..\FEBio2\version.h" />
     <ClInclude Include="resource.h" />
@@ -659,7 +658,6 @@
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
     <ClCompile Include="..\..\FEBio2\udghex.cpp" />
     <ClCompile Include="..\..\FEBio2\update.cpp" />
-    <ClCompile Include="..\..\FEBio2\ut4.cpp" />
     <ClCompile Include="..\..\FEBio2\validate.cpp" />
   </ItemGroup>
   <ItemGroup>

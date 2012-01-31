@@ -339,6 +339,9 @@
     <ClInclude Include="..\..\FEBioLib\FERigidSolidDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FEUT4Domain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp">
@@ -645,6 +648,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FERigidSolidDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FEUT4Domain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

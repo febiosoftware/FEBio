@@ -595,6 +595,7 @@
     <ClInclude Include="..\..\FEBioLib\FETrussMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledElasticMixture.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledMaterial.h" />
+    <ClInclude Include="..\..\FEBioLib\FEUT4Domain.h" />
     <ClInclude Include="..\..\FEBioLib\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FEViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEVonMisesPlasticity.h" />
@@ -701,6 +702,7 @@
     <ClCompile Include="..\..\FEBioLib\FETrussMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledElasticMixture.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEUT4Domain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEVonMisesPlasticity.cpp" />
