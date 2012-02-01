@@ -81,9 +81,6 @@
     <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPoroTraction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -112,9 +109,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FESolidSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FESoluteFlux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FESolver.h">
@@ -257,9 +251,6 @@
     <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPoroTraction.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -288,9 +279,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FESolidSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FESoluteFlux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FESolver.cpp">

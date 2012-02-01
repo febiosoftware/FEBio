@@ -572,6 +572,7 @@
     <ClInclude Include="..\..\FEBioLib\FEPermRefTransIso.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointConstraint.h" />
+    <ClInclude Include="..\..\FEBioLib\FEPoroTraction.h" />
     <ClInclude Include="..\..\FEBioLib\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidShellDomain.h" />
@@ -579,6 +580,7 @@
     <ClInclude Include="..\..\FEBioLib\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioLib\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioLib\FESolute.h" />
+    <ClInclude Include="..\..\FEBioLib\FESoluteFlux.h" />
     <ClInclude Include="..\..\FEBioLib\FESphericalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioLib\FEStVenantKirchhoff.h" />
     <ClInclude Include="..\..\FEBioLib\FESupplyBinding.h" />
@@ -682,6 +684,7 @@
     <ClCompile Include="..\..\FEBioLib\FEPermRefTransIso.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPointConstraint.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEPoroTraction.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidShellDomain.cpp" />
@@ -689,6 +692,7 @@
     <ClCompile Include="..\..\FEBioLib\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolute.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FESoluteFlux.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESphericalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEStVenantKirchhoff.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESupplyBinding.cpp" />
