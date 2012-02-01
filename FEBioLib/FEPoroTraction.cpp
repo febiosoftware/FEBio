@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPoroTraction.h"
-#include "FESolidSolver.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to normal traction
@@ -233,7 +233,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FEPoroNormalTraction::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	matrix ke;
 
@@ -289,7 +289,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 void FEPoroNormalTraction::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 
 	vector<double> fe;
 

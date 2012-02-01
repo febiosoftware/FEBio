@@ -470,6 +470,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEPoroTraction.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPressureLoad.cpp"
 				>
 			</File>
@@ -495,6 +499,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESolute.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESoluteFlux.cpp"
 				>
 			</File>
 			<File
@@ -912,6 +920,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEPoroTraction.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPressureLoad.h"
 				>
 			</File>
@@ -937,6 +949,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESolute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESoluteFlux.h"
 				>
 			</File>
 			<File

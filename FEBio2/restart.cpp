@@ -19,8 +19,8 @@
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FETractionLoad.h"
 #include "FEBioLib/FEFluidFlux.h"
-#include "FEPoroTraction.h"
-#include "FESoluteFlux.h"
+#include "FEBioLib/FEPoroTraction.h"
+#include "FEBioLib/FESoluteFlux.h"
 #include "FEBioLib/FEHeatFlux.h"
 #include "FEAnalysisStep.h"
 

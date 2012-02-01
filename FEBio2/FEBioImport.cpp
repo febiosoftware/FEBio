@@ -31,8 +31,8 @@
 #include "FEBioLib/FETractionLoad.h"
 #include "FEBioLib/FEHeatFlux.h"
 #include "FEBioLib/FEFluidFlux.h"
-#include "FEPoroTraction.h"
-#include "FESoluteFlux.h"
+#include "FEBioLib/FEPoroTraction.h"
+#include "FEBioLib/FESoluteFlux.h"
 #include "plugin.h"
 #include <string.h>
 #include "FEBioLib/FEUDGHexDomain.h"

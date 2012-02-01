@@ -373,10 +373,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPoroTraction.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp"
 				>
 			</File>
@@ -414,10 +410,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FESolidSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESoluteFlux.cpp"
 				>
 			</File>
 			<File
@@ -643,10 +635,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPoroTraction.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h"
 				>
 			</File>
@@ -684,10 +672,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FESolidSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESoluteFlux.h"
 				>
 			</File>
 			<File
