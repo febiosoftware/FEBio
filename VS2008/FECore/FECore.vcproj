@@ -328,6 +328,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FESurfaceLoad.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FETrussDomain.cpp"
 				>
 			</File>
@@ -403,6 +407,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEBoundaryCondition.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEConstraint.h"
 				>
 			</File>
 			<File
@@ -507,6 +515,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FESurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FESurfaceLoad.h"
 				>
 			</File>
 			<File
