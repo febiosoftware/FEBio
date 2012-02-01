@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FESoluteFlux.h"
-#include "FESolidSolver.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to solute flux
@@ -218,7 +218,7 @@ void FESoluteFlux::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FESoluteFlux::StiffnessMatrix(FENLSolver* psolver)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 	
 	matrix ke;
@@ -282,7 +282,7 @@ void FESoluteFlux::StiffnessMatrix(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 void FESoluteFlux::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = psolver->GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 	
 	vector<double> fe;
