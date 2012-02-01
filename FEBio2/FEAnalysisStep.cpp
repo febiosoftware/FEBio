@@ -318,10 +318,11 @@ bool FEAnalysisStep::Init()
 
 	// modify the (aug lag) nonlinear constraints
 	// TODO: I think this is already done in FEM::Init. Why do I need to do this again?
-	if (!m_fem.m_NLC.empty())
+	int M = m_fem.NonlinearConstraints();
+	for (int m=0; m<M; ++m) 
 	{
-		int M = m_fem.m_NLC.size();
-		for (int m=0; m<M; ++m) m_fem.m_NLC[i]->Init();
+		FENLConstraint* plc = m_fem.NonlinearConstraint(m);
+		plc->Init();
 	}
 
 	// see if we need to do contact augmentations
@@ -341,7 +342,7 @@ bool FEAnalysisStep::Init()
 	}
 
 	// see if we have to do nonlinear constraint augmentations
-	if (!m_fem.m_NLC.empty()) m_baugment = true;
+	if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
 
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)

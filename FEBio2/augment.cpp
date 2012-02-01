@@ -37,10 +37,11 @@ bool FESolidSolver::Augment()
 	}
 
 	// do nonlinear constraint augmentations
-	if (!fem.m_NLC.empty())
+	int n = fem.NonlinearConstraints();
+	for (int i=0; i<n; ++i) 
 	{
-		int n = fem.m_NLC.size();
-		for (int i=0; i<n; ++i) bconv = fem.m_NLC[i]->Augment(m_naug) && bconv;
+		FENLConstraint* plc = fem.NonlinearConstraint(i);
+		bconv = plc->Augment(m_naug) && bconv;
 	}
 
 	// do incompressibility multipliers for 3Field domains

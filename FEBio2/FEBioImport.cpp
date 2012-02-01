@@ -49,8 +49,8 @@
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointBodyForce.h"
 #include "FEBioLib/FEHeatTransferMaterial.h"
-#include "FEPointConstraint.h"
-#include "FEAugLagLinearConstraint.h"
+#include "FEBioLib/FEPointConstraint.h"
+#include "FEBioLib/FEAugLagLinearConstraint.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------
@@ -4211,7 +4211,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 		// create a new linear constraint manager
 		FELinearConstraintSet* pLCS = new FELinearConstraintSet(&fem);
-		fem.m_NLC.push_back(pLCS);
+		fem.AddNonlinearConstraint(pLCS);
 
 		// read the linear constraints
 		++tag;
@@ -4802,7 +4802,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 
 	// create a new linear constraint manager
 	FELinearConstraintSet* pLCS = new FELinearConstraintSet(&fem);
-	fem.m_NLC.push_back(pLCS);
+	fem.AddNonlinearConstraint(pLCS);
 
 	// read the linear constraints
 	++tag;
@@ -5617,7 +5617,7 @@ void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
 	FEPointConstraint* pc = new FEPointConstraint(&fem);
 	pc->m_eps = eps;
 	pc->m_node = node-1;
-	fem.m_NLC.push_back(pc);
+	fem.AddNonlinearConstraint(pc);
 }
 
 //=============================================================================

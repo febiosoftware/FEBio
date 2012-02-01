@@ -7,6 +7,7 @@
 #include "FEContactInterface.h"
 #include "FEAnalysis.h"
 #include "FESurfaceLoad.h"
+#include "FENLConstraint.h"
 #include <vector>
 #include <map>
 
@@ -22,6 +23,8 @@ struct FEBIO_CALLBACK {
 };
 
 //-----------------------------------------------------------------------------
+//! The FEModel class stores all the data for the finite element model.
+//!
 class FEModel
 {
 public:
@@ -44,7 +47,7 @@ public:
 	virtual void PushState() = 0;
 	virtual void PopState () = 0;
 
-public:	// Load curve functions
+public:	// --- Load curve functions ----
 
 	//! Add a loadcurve to the model
 	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }
@@ -55,7 +58,7 @@ public:	// Load curve functions
 	//! get the number of loadcurves
 	int LoadCurves() { return m_LC.size(); }
 
-public: // material functions
+public: // --- material functions ---
 
 	//! Add a material to the model
 	void AddMaterial(FEMaterial* pm) { m_MAT.push_back(pm); }
@@ -66,7 +69,7 @@ public: // material functions
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
 
-public: // body force functions
+public: // --- body force --- 
 
 	//! Add a body force to the model
 	void AddBodyForce(FEBodyForce* pf) { m_BF.push_back(pf); }
@@ -80,7 +83,7 @@ public: // body force functions
 	//! see if there are any body forces
 	bool HasBodyForces() { return !m_BF.empty();}
 
-public: // analysis step functions
+public: // --- analysis step ---
 	//! retrieve the number of steps
 	int Steps() { return (int) m_Step.size(); }
 
@@ -99,7 +102,7 @@ public: // analysis step functions
 	//! Set the current step
 	void SetCurrentStep(FEAnalysis* pstep) { m_pStep = pstep; }
 
-public: // contact interface functions
+public: // --- contact interface ---
 	//! return number of contact interfaces
 	int ContactInterfaces() { return m_CI.size(); } 
 
@@ -108,6 +111,17 @@ public: // contact interface functions
 
 	//! Add a contact interface
 	void AddContactInterface(FEContactInterface* pci) { m_CI.push_back(pci); }
+
+public: // --- nonlinear constraints ---
+
+	//! return number of nonlinear constraints
+	int NonlinearConstraints() { return (int) m_NLC.size(); }
+
+	//! retrieve a nonlinear constraint
+	FENLConstraint* NonlinearConstraint(int i) { return m_NLC[i]; }
+
+	//! add a nonlinear constraint
+	void AddNonlinearConstraint(FENLConstraint* pnlc) { m_NLC.push_back(pnlc); }
 
 public:	// Miscellaneous routines
 
@@ -126,6 +140,7 @@ protected:
 	std::vector<FEMaterial*>			m_MAT;	//!< array of materials
 	std::vector<FEBodyForce*>			m_BF;	//!< body force data
 	std::vector<FEContactInterface*>	m_CI;	//!< contact interface array
+	std::vector<FENLConstraint*>		m_NLC;	//!< nonlinear constraints
 
 	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
 	FEAnalysis*					m_pStep;	//!< pointer to current analysis step

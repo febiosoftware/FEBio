@@ -230,6 +230,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEAugLagLinearConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEBiphasic.cpp"
 				>
 			</File>
@@ -462,6 +466,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEPointConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEPressureLoad.cpp"
 				>
 			</File>
@@ -649,6 +657,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEArrudaBoyce.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEAugLagLinearConstraint.h"
 				>
 			</File>
 			<File
@@ -893,6 +905,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEPointConstraint.h"
 				>
 			</File>
 			<File

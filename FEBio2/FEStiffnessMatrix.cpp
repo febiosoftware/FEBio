@@ -15,8 +15,8 @@
 #include "FEBioLib/FESurfaceConstraint.h"
 #include "FESolver.h"
 #include "FEBioLib/FEUT4Domain.h"
-#include "FEPointConstraint.h"
-#include "FEAugLagLinearConstraint.h"
+#include "FEBioLib/FEPointConstraint.h"
+#include "FEBioLib/FEAugLagLinearConstraint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -240,10 +240,10 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 			}
 
 			// do the nonlinear constraints
-			int M = fem.m_NLC.size();
+			int M = fem.NonlinearConstraints();
 			for (int m=0; m<M; ++m)
 			{
-				FENLConstraint* pnlc = fem.m_NLC[m];
+				FENLConstraint* pnlc = fem.NonlinearConstraint(m);
 				switch (pnlc->Type())
 				{
 				case FE_POINT_CONSTRAINT: // add point constraints

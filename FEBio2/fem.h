@@ -17,9 +17,6 @@
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEUncoupledElasticMixture.h"
 #include "FEBioLib/FESolute.h"
-#include "FECore/FENLConstraint.h"
-//#include "FEAugLagLinearConstraint.h"
-//#include "FEPointConstraint.h"
 
 #include <list>
 #include <string>
@@ -197,16 +194,6 @@ public:
 		list<FELinearConstraint>	m_LinC;		//!< linear constraints data
 		vector<int>					m_LCT;		//!< linear constraint table
 		vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
-
-/*
-		// Augmented Lagrangian linear constraint data
-		vector<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
-
-		// Point constriant data
-		vector<FEPointConstraint*>	m_PC;		//!< point constraint data
-*/
-		vector<FENLConstraint*>		m_NLC;	//!< nonlinear constraints
-
 	//}
 
 	// --- Direct Solver Data ---

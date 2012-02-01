@@ -37,8 +37,8 @@
 #include "FEBioLib/FE3FieldElasticSolidDomain.h"
 #include "FEBioLib/FEUT4Domain.h"
 #include "FEBioLib/FEConstBodyForce.h"
-#include "FEPointConstraint.h"
-#include "FEAugLagLinearConstraint.h"
+#include "FEBioLib/FEPointConstraint.h"
+#include "FEBioLib/FEAugLagLinearConstraint.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)

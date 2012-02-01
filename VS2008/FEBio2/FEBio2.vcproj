@@ -281,10 +281,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEAugLagLinearConstraint.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBio.cpp"
 				>
 			</File>
@@ -374,10 +370,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPlotSurfaceData.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPointConstraint.cpp"
 				>
 			</File>
 			<File
@@ -559,10 +551,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEAugLagLinearConstraint.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBioCommand.h"
 				>
 			</File>
@@ -652,10 +640,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPlotSurfaceData.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPointConstraint.h"
 				>
 			</File>
 			<File

@@ -119,13 +119,15 @@ bool FESolidSolver::StiffnessMatrix()
 }
 
 //-----------------------------------------------------------------------------
-
+//! Calculate the stiffness contribution due to nonlinear constraints
 void FESolidSolver::NonLinearConstraintStiffness()
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-
-	int N = fem.m_NLC.size();
-	for (int i=0; i<N; ++i) fem.m_NLC[i]->StiffnessMatrix(this);
+	int N = m_fem.NonlinearConstraints();
+	for (int i=0; i<N; ++i) 
+	{
+		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+		plc->StiffnessMatrix(this);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -657,13 +659,15 @@ bool FESolidSolver::Residual(vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
-//! calculate the linear constraint forces 
-
+//! calculate the nonlinear constraint forces 
 void FESolidSolver::NonLinearConstraintForces(vector<double> &R)
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	int N = fem.m_NLC.size();
-	for (int i=0; i<N; ++i) fem.m_NLC[i]->Residual(this, R);
+	int N = m_fem.NonlinearConstraints();
+	for (int i=0; i<N; ++i) 
+	{
+		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+		plc->Residual(this, R);
+	}
 }
 
 //-----------------------------------------------------------------------------
