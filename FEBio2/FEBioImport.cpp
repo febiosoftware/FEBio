@@ -5612,9 +5612,9 @@ void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
 	while (!tag.isend());
 	if (node == -1) throw XMLReader::Error();
 
-	FEPointConstraint pc(&fem);
-	pc.m_eps = eps;
-	pc.m_node = node-1;
+	FEPointConstraint* pc = new FEPointConstraint(&fem);
+	pc->m_eps = eps;
+	pc->m_node = node-1;
 	fem.m_PC.push_back(pc);
 }
 

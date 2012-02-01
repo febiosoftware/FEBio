@@ -105,13 +105,8 @@ FEM::~FEM()
 	for (i=0; i<m_RDC.size (); ++i) delete m_RDC[i] ; m_RDC.clear ();
 	for (i=0; i<m_RFC.size (); ++i) delete m_RFC[i] ; m_RFC.clear ();
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
-
-	if (!m_LCSet.empty())
-	{
-		list<FELinearConstraintSet*>::iterator pi;
-		for (pi = m_LCSet.begin(); pi != m_LCSet.end(); ++pi) delete (*pi); 
-		m_LCSet.clear();
-	}
+	for (i=0; i<m_PC.size  (); ++i) delete m_PC [i] ; m_PC.clear  ();
+	for (i=0; i<m_LCSet.size(); ++i) delete m_LCSet[i]; m_LCSet.clear();
 }
 
 //-----------------------------------------------------------------------------

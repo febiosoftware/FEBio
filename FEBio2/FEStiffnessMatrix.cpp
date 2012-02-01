@@ -240,7 +240,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				lm.resize(3*9);
 				for (i=0; i<(int) fem.m_PC.size(); ++i)
 				{
-					FEPointConstraint& pc = fem.m_PC[i];
+					FEPointConstraint& pc = *fem.m_PC[i];
 					FENode& n0 = mesh.Node(pc.m_node);
 					lm[0] = n0.m_ID[DOF_X];
 					lm[1] = n0.m_ID[DOF_Y];
@@ -260,10 +260,9 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 			if (fem.m_LCSet.size())
 			{
 				int M = fem.m_LCSet.size();
-				list<FELinearConstraintSet*>::iterator im = fem.m_LCSet.begin();
-				for (int m=0; m<M; ++m, ++im)
+				for (int m=0; m<M; ++m)
 				{
-					list<FEAugLagLinearConstraint*>& LC = (*im)->m_LC;
+					list<FEAugLagLinearConstraint*>& LC = fem.m_LCSet[i]->m_LC;
 					vector<int> lm;
 					int N = LC.size();
 					list<FEAugLagLinearConstraint*>::iterator it = LC.begin();

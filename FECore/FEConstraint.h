@@ -8,8 +8,8 @@ using namespace std;
 class FEModel;
 
 //-----------------------------------------------------------------------------
-// Base class for constraints enforced using an augmented Lagrangian method.
-
+// Base class for nonlinear constraints enforced using an augmented Lagrangian method.
+// TODO: change the name to FENLConstraint
 class FEConstraint
 {
 public:

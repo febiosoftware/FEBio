@@ -40,8 +40,7 @@ bool FESolidSolver::Augment()
 	if (fem.m_LCSet.size())
 	{
 		int n = fem.m_LCSet.size();
-		list<FELinearConstraintSet*>::iterator im = fem.m_LCSet.begin();
-		for (int i=0; i<n; ++i, ++im) bconv = (*im)->Augment(m_naug) && bconv;
+		for (int i=0; i<n; ++i) bconv = fem.m_LCSet[i]->Augment(m_naug) && bconv;
 	}
 
 	// do incompressibility multipliers for 3Field domains

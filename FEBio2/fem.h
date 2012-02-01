@@ -198,10 +198,11 @@ public:
 		vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
 
 		// Augmented Lagrangian linear constraint data
-		list<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
+		vector<FELinearConstraintSet*>	m_LCSet;	//!< aug lag linear constraint data
 
 		// Point constriant data
-		vector<FEPointConstraint>	m_PC;		//!< point constraint data
+		vector<FEPointConstraint*>	m_PC;		//!< point constraint data
+
 	//}
 
 	// --- Direct Solver Data ---

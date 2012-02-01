@@ -121,7 +121,7 @@ bool FEM::Init()
 		if (m_BF[i]->Init() == false) return false;
 	}
 
-	for (i=0; i<(int) m_PC.size(); ++i) m_PC[i].Init();
+	for (i=0; i<(int) m_PC.size(); ++i) m_PC[i]->Init();
 
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
@@ -460,8 +460,7 @@ bool FEM::InitConstraints()
 	if (m_LCSet.size() > 0)
 	{
 		int N = m_LCSet.size();
-		list<FELinearConstraintSet*>::iterator it = m_LCSet.begin();
-		for (i=0; i<N; ++i, ++it) (*it)->Init();
+		for (i=0; i<N; ++i) m_LCSet[i]->Init();
 	}
 
 	return true;

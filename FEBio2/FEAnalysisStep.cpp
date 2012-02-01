@@ -320,8 +320,7 @@ bool FEAnalysisStep::Init()
 	if (m_fem.m_LCSet.size())
 	{
 		int M = m_fem.m_LCSet.size();
-		list<FELinearConstraintSet*>::iterator im = m_fem.m_LCSet.begin();
-		for (int m=0; m<M; ++m, ++im) (*im)->Init();
+		for (int m=0; m<M; ++m) m_fem.m_LCSet[i]->Init();
 	}
 
 	// see if we need to do contact augmentations

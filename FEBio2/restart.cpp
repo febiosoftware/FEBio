@@ -643,8 +643,7 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		ar << n;
 		if (m_LCSet.empty() == false)
 		{
-			list<FELinearConstraintSet*>::iterator ic = m_LCSet.begin();
-			for (i=0; i<n; ++i, ++ic) (*ic)->Serialize(ar);
+			for (i=0; i<n; ++i) m_LCSet[i]->Serialize(ar);
 		}
 	}
 	else
