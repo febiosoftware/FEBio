@@ -132,6 +132,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		ParseVersion(tag);
 		if ((m_nversion != 0x0100) && 
 			(m_nversion != 0x0101) &&
+			(m_nversion != 0x0102) && 
 			(m_nversion != 0x0200)) throw InvalidVersion();
 
 		// define the file structure
@@ -143,11 +144,17 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		map["Geometry"   ] = new FEBioGeometrySection   (this);
 		map["Boundary"   ] = new FEBioBoundarySection   (this);
 		map["Initial"    ] = new FEBioInitialSection    (this);
-		map["LoadData"   ] = new FEBioLoadSection       (this);
+		map["LoadData"   ] = new FEBioLoadDataSection   (this);
 		map["Globals"    ] = new FEBioGlobalsSection    (this);
 		map["Output"     ] = new FEBioOutputSection     (this);
 		map["Constraints"] = new FEBioConstraintsSection(this);
 		map["Step"       ] = new FEBioStepSection       (this);
+
+		// version 1.2 only
+		if (m_nversion >= 0x0102)
+		{
+			map["Loads"] = new FEBioLoadsSection(this);
+		}
 
 		// version 2.0 only!
 		if (m_nversion >= 0x0200)
@@ -2776,6 +2783,44 @@ void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 	mesh.AddNodeSet(pns);
 }
 
+//=============================================================================
+//
+//                       B O U N D A R Y   S E C T I O N
+//
+//=============================================================================
+//!  Parses the boundary section from the xml file
+//!
+void FEBioBoundarySection::Parse(XMLTag& tag)
+{
+	// make sure this tag has children
+	if (tag.isleaf()) return;
+
+	++tag;
+	do
+	{
+		if      (tag == "fix"                  ) ParseBCFix               (tag);
+		else if (tag == "prescribe"            ) ParseBCPrescribe         (tag);
+		else if (tag == "contact"              ) ParseContactSection      (tag);
+		else if (tag == "linear_constraint"    ) ParseConstraints         (tag);
+		else if (tag == "spring"               ) ParseSpringSection       (tag);
+		else if (m_pim->Version() < 0x0102)
+		{
+			// As of version 1.2 and up, the following functions are handled by the Loads section
+			if      (tag == "force"                ) ParseBCForce             (tag);
+			else if (tag == "pressure"             ) ParseBCPressure          (tag);
+			else if (tag == "traction"             ) ParseBCTraction          (tag);
+			else if (tag == "normal_traction"      ) ParseBCPoroNormalTraction(tag);
+			else if (tag == "fluidflux"            ) ParseBCFluidFlux         (tag);
+			else if (tag == "soluteflux"           ) ParseBCSoluteFlux        (tag);
+			else if (tag == "heatflux"             ) ParseBCHeatFlux          (tag);
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions
 //
@@ -2833,39 +2878,6 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 		++tag;
 	}
 	return true;
-}
-
-//=============================================================================
-//
-//                       B O U N D A R Y   S E C T I O N
-//
-//=============================================================================
-//!  Parses the boundary section from the xml file
-//!
-void FEBioBoundarySection::Parse(XMLTag& tag)
-{
-	// make sure this tag has children
-	if (tag.isleaf()) return;
-
-	++tag;
-	do
-	{
-		if      (tag == "fix"                  ) ParseBCFix               (tag);
-		else if (tag == "prescribe"            ) ParseBCPrescribe         (tag);
-		else if (tag == "force"                ) ParseBCForce             (tag);
-		else if (tag == "pressure"             ) ParseBCPressure          (tag);
-		else if (tag == "traction"             ) ParseBCTraction          (tag);
-		else if (tag == "normal_traction"      ) ParseBCPoroNormalTraction(tag);
-		else if (tag == "fluidflux"            ) ParseBCFluidFlux         (tag);
-		else if (tag == "soluteflux"           ) ParseBCSoluteFlux        (tag);
-		else if (tag == "heatflux"             ) ParseBCHeatFlux          (tag);
-		else if (tag == "contact"              ) ParseContactSection      (tag);
-		else if (tag == "linear_constraint"    ) ParseConstraints         (tag);
-		else if (tag == "spring"               ) ParseSpringSection       (tag);
-		else throw XMLReader::InvalidTag(tag);
-		++tag;
-	}
-	while (!tag.isend());
 }
 
 //-----------------------------------------------------------------------------
@@ -4909,6 +4921,96 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 
 //=============================================================================
 //
+//                       L O A D S   S E C T I O N
+//
+//=============================================================================
+//!  Parses the loads section from the xml file (version 1.2 or up)
+//!
+void FEBioLoadsSection::Parse(XMLTag& tag)
+{
+	assert(m_pim->Version() >= 0x0102);
+	
+	// make sure this tag has children
+	if (tag.isleaf()) return;
+
+	++tag;
+	do
+	{
+		if      (tag == "force"          ) ParseBCForce             (tag);
+		else if (tag == "pressure"       ) ParseBCPressure          (tag);
+		else if (tag == "traction"       ) ParseBCTraction          (tag);
+		else if (tag == "normal_traction") ParseBCPoroNormalTraction(tag);
+		else if (tag == "fluidflux"      ) ParseBCFluidFlux         (tag);
+		else if (tag == "soluteflux"     ) ParseBCSoluteFlux        (tag);
+		else if (tag == "heatflux"       ) ParseBCHeatFlux          (tag);
+		else if (tag == "body_force"     ) ParseBodyForce           (tag);
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+// NOTE: note that this section used to be in the Globals section (version 1.1)
+void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
+{
+	FEM& fem = *GetFEM();
+
+	const char* szt = tag.AttributeValue("type", true);
+	if (szt == 0) szt = "const";
+
+	if (strcmp(szt, "point") == 0)
+	{
+		FEPointBodyForce* pf = new FEPointBodyForce(&fem);
+		FEParameterList& pl = pf->GetParameterList();
+		++tag;
+		do
+		{
+			if (tag == "a")
+			{
+				const char* szlc = tag.AttributeValue("lc");
+//						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
+				tag.value(pf->m_a);
+			}
+			else if (tag == "node")
+			{
+				tag.value(pf->m_inode); 
+				pf->m_inode -= 1;
+			}
+			else if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+
+		fem.AddBodyForce(pf);
+	}
+	else
+	{
+		// see if the kernel knows this force
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		FEBodyForce* pf = febio.Create<FEBodyForce>(szt, &fem);
+		if (pf)
+		{
+			if (!tag.isleaf())
+			{
+				FEParameterList& pl = pf->GetParameterList();
+				++tag;
+				do
+				{
+					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+			}
+
+			fem.AddBodyForce(pf);
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+	}
+}
+
+//=============================================================================
+//
 //                     I N I T I A L   S E C T I O N
 //
 //=============================================================================
@@ -5002,81 +5104,92 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 //!
 void FEBioGlobalsSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
-
 	++tag;
 	do
 	{
-		if (tag == "body_force")
+		if      (tag == "Constants" ) ParseConstants(tag);
+		else if (tag == "Solutes"   ) ParseGSSoluteData(tag);
+		else if (m_pim->Version() < 0x0102)
 		{
-			const char* szt = tag.AttributeValue("type", true);
-			if (szt == 0) szt = "const";
+			if (tag == "body_force") ParseBodyForce(tag);
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+}
 
-			if (strcmp(szt, "point") == 0)
+//-----------------------------------------------------------------------------
+void FEBioGlobalsSection::ParseBodyForce(XMLTag &tag)
+{
+	FEM& fem = *GetFEM();
+
+	const char* szt = tag.AttributeValue("type", true);
+	if (szt == 0) szt = "const";
+
+	if (strcmp(szt, "point") == 0)
+	{
+		FEPointBodyForce* pf = new FEPointBodyForce(&fem);
+		FEParameterList& pl = pf->GetParameterList();
+		++tag;
+		do
+		{
+			if (tag == "a")
 			{
-				FEPointBodyForce* pf = new FEPointBodyForce(&fem);
+				const char* szlc = tag.AttributeValue("lc");
+//						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
+				tag.value(pf->m_a);
+			}
+			else if (tag == "node")
+			{
+				tag.value(pf->m_inode); 
+				pf->m_inode -= 1;
+			}
+			else if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+			++tag;
+		}
+		while (!tag.isend());
+
+		fem.AddBodyForce(pf);
+	}
+	else
+	{
+		// see if the kernel knows this force
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		FEBodyForce* pf = febio.Create<FEBodyForce>(szt, &fem);
+		if (pf)
+		{
+			if (!tag.isleaf())
+			{
 				FEParameterList& pl = pf->GetParameterList();
 				++tag;
 				do
 				{
-					if (tag == "a")
-					{
-						const char* szlc = tag.AttributeValue("lc");
-//						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
-						tag.value(pf->m_a);
-					}
-					else if (tag == "node")
-					{
-						tag.value(pf->m_inode); 
-						pf->m_inode -= 1;
-					}
-					else if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 					++tag;
 				}
 				while (!tag.isend());
-
-				fem.AddBodyForce(pf);
 			}
-			else
-			{
-				// see if the kernel knows this force
-				FEBioKernel& febio = FEBioKernel::GetInstance();
-				FEBodyForce* pf = febio.Create<FEBodyForce>(szt, &fem);
-				if (pf)
-				{
-					if (!tag.isleaf())
-					{
-						FEParameterList& pl = pf->GetParameterList();
-						++tag;
-						do
-						{
-							if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-							++tag;
-						}
-						while (!tag.isend());
-					}
 
-					fem.AddBodyForce(pf);
-				}
-				else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-			}
+			fem.AddBodyForce(pf);
 		}
-		else if (tag == "Constants")
-		{
-			++tag;
-			string s;
-			double v;
-			do
-			{
-				s = string(tag.Name());
-				tag.value(v);
-				FEM::SetGlobalConstant(s, v);
-				++tag;
-			}
-			while (!tag.isend());
-		}
-		else if (tag == "Solutes") ParseGSSoluteData(tag);
+		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+	}
+}
 
+//-----------------------------------------------------------------------------
+void FEBioGlobalsSection::ParseConstants(XMLTag& tag)
+{
+	FEM& fem = *GetFEM();
+	++tag;
+	string s;
+	double v;
+	do
+	{
+		s = string(tag.Name());
+		tag.value(v);
+		FEM::SetGlobalConstant(s, v);
 		++tag;
 	}
 	while (!tag.isend());
@@ -5120,7 +5233,7 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 //
 //!  This function reads the load data section from the xml file
 //!
-void FEBioLoadSection::Parse(XMLTag& tag)
+void FEBioLoadDataSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
 	FEAnalysisStep* pstep = GetStep();

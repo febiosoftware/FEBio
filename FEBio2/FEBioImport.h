@@ -170,6 +170,18 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+// Loads Section (new in version 1.2)
+class FEBioLoadsSection : public FEBioBoundarySection
+{
+public:
+	FEBioLoadsSection(FEFEBioImport* pim) : FEBioBoundarySection(pim){}
+	void Parse(XMLTag& tag);
+
+protected:
+	void ParseBodyForce(XMLTag& tag);
+};
+
+//-----------------------------------------------------------------------------
 // Contact section (new in version 2.0)
 class FEBioContactSection : public FEBioFileSection
 {
@@ -209,15 +221,19 @@ class FEBioGlobalsSection : public FEBioFileSection
 public:
 	FEBioGlobalsSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
 	void Parse            (XMLTag& tag);
+
+protected:
+	void ParseBodyForce   (XMLTag& tag);	// only for versions < 1.2
+	void ParseConstants   (XMLTag& tag);
 	void ParseGSSoluteData(XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------
 // LoadData Section
-class FEBioLoadSection : public FEBioFileSection
+class FEBioLoadDataSection : public FEBioFileSection
 {
 public:
-	FEBioLoadSection(FEFEBioImport* pim) : FEBioFileSection(pim) {}
+	FEBioLoadDataSection(FEFEBioImport* pim) : FEBioFileSection(pim) {}
 	void Parse(XMLTag& tag);
 };
 
