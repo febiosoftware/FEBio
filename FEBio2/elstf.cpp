@@ -79,13 +79,13 @@ bool FESolidSolver::StiffnessMatrix()
 		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
 	}
 
-	// calculate linear constraint stiffness
+	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	LinearConstraintStiffness();
+	NonLinearConstraintStiffness();
 
 	// point constraints
-	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->StiffnessMatrix(this);
+//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->StiffnessMatrix(this);
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
@@ -120,12 +120,12 @@ bool FESolidSolver::StiffnessMatrix()
 
 //-----------------------------------------------------------------------------
 
-void FESolidSolver::LinearConstraintStiffness()
+void FESolidSolver::NonLinearConstraintStiffness()
 {
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
-	int N = fem.m_LCSet.size();
-	for (int i=0; i<N; ++i) fem.m_LCSet[i]->StiffnessMatrix(this);
+	int N = fem.m_NLC.size();
+	for (int i=0; i<N; ++i) fem.m_NLC[i]->StiffnessMatrix(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -629,13 +629,13 @@ bool FESolidSolver::Residual(vector<double>& R)
 		ContactForces(R);
 	}
 
-	// calculate linear constraint forces
+	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	LinearConstraintForces(R);
+	NonLinearConstraintForces(R);
 
 	// forces due to point constraints
-	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
+//	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
@@ -659,14 +659,11 @@ bool FESolidSolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! calculate the linear constraint forces 
 
-void FESolidSolver::LinearConstraintForces(vector<double> &R)
+void FESolidSolver::NonLinearConstraintForces(vector<double> &R)
 {
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	int N = fem.m_LCSet.size();
-	if (N>0)
-	{
-		for (int i=0; i<N; ++i) fem.m_LCSet[i]->Residual(this, R);
-	}
+	int N = fem.m_NLC.size();
+	for (int i=0; i<N; ++i) fem.m_NLC[i]->Residual(this, R);
 }
 
 //-----------------------------------------------------------------------------

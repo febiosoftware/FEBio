@@ -1,12 +1,12 @@
 #pragma once
-#include "FECore/FEConstraint.h"
+#include "FECore/FENLConstraint.h"
 #include "FECore/FEElement.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a point constraint. That is, it forces a node of a 
 //! mesh in the same relative position with respect to the element in which the 
 //! node is located.
-class FEPointConstraint : public FEConstraint
+class FEPointConstraint : public FENLConstraint
 {
 public:
 	//! constructor
@@ -14,6 +14,9 @@ public:
 
 	//! initialize data
 	void Init();
+
+	//! serialize (TODO: implement this)
+	void Serialize(DumpFile& ar) {}
 
 	//! Calculate the constraint force
 	void Residual(FENLSolver* psolver, vector<double>& R);

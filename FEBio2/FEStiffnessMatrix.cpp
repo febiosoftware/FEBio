@@ -15,6 +15,8 @@
 #include "FEBioLib/FESurfaceConstraint.h"
 #include "FESolver.h"
 #include "FEBioLib/FEUT4Domain.h"
+#include "FEPointConstraint.h"
+#include "FEAugLagLinearConstraint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -235,46 +237,53 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 					for (j=0; j<ni; ++j, ++is) lm[n++] = is->neq;
 				}
 				build_add(lm);
-
-				// add point constraints
-				lm.resize(3*9);
-				for (i=0; i<(int) fem.m_PC.size(); ++i)
-				{
-					FEPointConstraint& pc = *fem.m_PC[i];
-					FENode& n0 = mesh.Node(pc.m_node);
-					lm[0] = n0.m_ID[DOF_X];
-					lm[1] = n0.m_ID[DOF_Y];
-					lm[2] = n0.m_ID[DOF_Z];
-					for (j=0; i<8; ++i)
-					{
-						FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
-						lm[3*(j+1)  ] = nj.m_ID[DOF_X];
-						lm[3*(j+1)+1] = nj.m_ID[DOF_Y];
-						lm[3*(j+1)+2] = nj.m_ID[DOF_Z];
-					}
-					build_add(lm);
-				}
 			}
 
-			// do the aug lag linear constraints
-			if (fem.m_LCSet.size())
+			// do the nonlinear constraints
+			int M = fem.m_NLC.size();
+			for (int m=0; m<M; ++m)
 			{
-				int M = fem.m_LCSet.size();
-				for (int m=0; m<M; ++m)
+				FENLConstraint* pnlc = fem.m_NLC[m];
+				switch (pnlc->Type())
 				{
-					list<FEAugLagLinearConstraint*>& LC = fem.m_LCSet[i]->m_LC;
-					vector<int> lm;
-					int N = LC.size();
-					list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
-					for (i=0; i<N; ++i, ++it)
+				case FE_POINT_CONSTRAINT: // add point constraints
 					{
-						int n = (*it)->m_dof.size();
-						lm.resize(n);
-						FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-						for (j=0; j<n; ++j, ++is) lm[j] = is->neq;
-	
+						FEPointConstraint& pc = dynamic_cast<FEPointConstraint&>(*pnlc);
+						vector<int> lm(3*9);
+						FENode& n0 = mesh.Node(pc.m_node);
+						lm[0] = n0.m_ID[DOF_X];
+						lm[1] = n0.m_ID[DOF_Y];
+						lm[2] = n0.m_ID[DOF_Z];
+						for (j=0; i<8; ++i)
+						{
+							FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
+							lm[3*(j+1)  ] = nj.m_ID[DOF_X];
+							lm[3*(j+1)+1] = nj.m_ID[DOF_Y];
+							lm[3*(j+1)+2] = nj.m_ID[DOF_Z];
+						}
 						build_add(lm);
 					}
+					break;
+				case FE_LINEAR_CONSTRAINT:
+					{
+						FELinearConstraintSet& lcs = dynamic_cast<FELinearConstraintSet&>(*pnlc);
+						list<FEAugLagLinearConstraint*>& LC = lcs.m_LC;
+						vector<int> lm;
+						int N = LC.size();
+						list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
+						for (i=0; i<N; ++i, ++it)
+						{
+							int n = (*it)->m_dof.size();
+							lm.resize(n);
+							FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
+							for (j=0; j<n; ++j, ++is) lm[j] = is->neq;
+		
+							build_add(lm);
+						}
+					}
+					break;
+				default:
+					assert(false);
 				}
 			}
 

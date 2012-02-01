@@ -121,7 +121,9 @@ bool FEM::Init()
 		if (m_BF[i]->Init() == false) return false;
 	}
 
-	for (i=0; i<(int) m_PC.size(); ++i) m_PC[i]->Init();
+	// initialize nonlinear constraints
+	// TODO: This is also initialized in the analysis step. Do I need to do this here?
+	for (i=0; i<(int) m_NLC.size(); ++i) m_NLC[i]->Init();
 
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
@@ -457,10 +459,11 @@ bool FEM::InitConstraints()
 	for (i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
 
 	// let's do the aug lag linear constraints
-	if (m_LCSet.size() > 0)
+	// TODO: This is also done in FEM::Init and FEAnalysis::Init. Where do I really need to do this?
+	if (m_NLC.size() > 0)
 	{
-		int N = m_LCSet.size();
-		for (i=0; i<N; ++i) m_LCSet[i]->Init();
+		int N = m_NLC.size();
+		for (i=0; i<N; ++i) m_NLC[i]->Init();
 	}
 
 	return true;

@@ -3,7 +3,7 @@
 #include "NumCore/vector.h"
 #include "NumCore/matrix.h"
 #include "FECore/DumpFile.h"
-#include "FECore/FEConstraint.h"
+#include "FECore/FENLConstraint.h"
 #include <list>
 using namespace std;
 
@@ -43,7 +43,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class manages a group of linear constraints
 
-class FELinearConstraintSet : public FEConstraint
+class FELinearConstraintSet : public FENLConstraint
 {
 public:
 	//! constructor
@@ -52,12 +52,12 @@ public:
 	//! add a linear constraint to the list
 	void add(FEAugLagLinearConstraint* plc) { m_LC.push_back(plc); }
 
-	//! serialize data to archive
-	void Serialize(DumpFile& ar);
-
 public:
 	//! initialization
 	void Init();
+
+	//! serialize data to archive
+	void Serialize(DumpFile& ar);
 
 	//! add the linear constraint contributions to the residual
 	void Residual(FENLSolver* psolver, vector<double>& R);

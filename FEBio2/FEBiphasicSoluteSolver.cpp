@@ -532,10 +532,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	// calculate linear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	LinearConstraintForces(R);
-
-	// forces due to point constraints
-	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
+	NonLinearConstraintForces(R);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?
@@ -621,13 +618,10 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
 	}
 
-	// calculate linear constraint stiffness
+	// calculate nonlinear constraint stiffness
 	// note that this is the contribution of the 
 	// constrainst enforced with augmented lagrangian
-	LinearConstraintStiffness();
-
-	// point constraints
-	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->StiffnessMatrix(this);
+	NonLinearConstraintStiffness();
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.

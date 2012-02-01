@@ -105,8 +105,9 @@ FEM::~FEM()
 	for (i=0; i<m_RDC.size (); ++i) delete m_RDC[i] ; m_RDC.clear ();
 	for (i=0; i<m_RFC.size (); ++i) delete m_RFC[i] ; m_RFC.clear ();
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
-	for (i=0; i<m_PC.size  (); ++i) delete m_PC [i] ; m_PC.clear  ();
-	for (i=0; i<m_LCSet.size(); ++i) delete m_LCSet[i]; m_LCSet.clear();
+	for (i=0; i<m_NLC.size (); ++i) delete m_NLC[i] ; m_NLC.clear ();
+//	for (i=0; i<m_PC.size  (); ++i) delete m_PC [i] ; m_PC.clear  ();
+//	for (i=0; i<m_LCSet.size(); ++i) delete m_LCSet[i]; m_LCSet.clear();
 }
 
 //-----------------------------------------------------------------------------

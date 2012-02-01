@@ -37,6 +37,8 @@
 #include "FEBioLib/FE3FieldElasticSolidDomain.h"
 #include "FEBioLib/FEUT4Domain.h"
 #include "FEBioLib/FEConstBodyForce.h"
+#include "FEPointConstraint.h"
+#include "FEAugLagLinearConstraint.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)
@@ -639,11 +641,22 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 		ar << m_LCT;
 
 		// aug lag linear constraints
-		n = (int) m_LCSet.size();
+/*		n = (int) m_LCSet.size();
 		ar << n;
 		if (m_LCSet.empty() == false)
 		{
 			for (i=0; i<n; ++i) m_LCSet[i]->Serialize(ar);
+		}
+*/
+		n = m_NLC.size();
+		ar << n;
+		if (n) 
+		{
+			for (i=0; i<n; ++i) 
+			{
+				ar << m_NLC[i]->Type();
+				m_NLC[i]->Serialize(ar);
+			}
 		}
 	}
 	else
@@ -769,11 +782,22 @@ void FEM::SerializeBoundaryData(DumpFile& ar)
 
 		// aug lag linear constraints
 		ar >> n;
+		int ntype;
+		m_NLC.clear();
 		for (i=0; i<n; ++i)
 		{
-			FELinearConstraintSet* plc = new FELinearConstraintSet(this);
+			ar >> ntype;
+			FENLConstraint* plc = 0;
+			switch (ntype)
+			{
+			case FE_POINT_CONSTRAINT : plc = new FEPointConstraint    (this); break;
+			case FE_LINEAR_CONSTRAINT: plc = new FELinearConstraintSet(this); break;
+			default:
+				assert(false);
+			}
+			assert(plc);
 			plc->Serialize(ar);
-			m_LCSet.push_back(plc);
+			m_NLC.push_back(plc);
 		}
 	}
 }

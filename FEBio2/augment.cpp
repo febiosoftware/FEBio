@@ -36,11 +36,11 @@ bool FESolidSolver::Augment()
 		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.ContactInterface(i)->Augment(m_naug) && bconv;
 	}
 
-	// do linear constraint augmentations
-	if (fem.m_LCSet.size())
+	// do nonlinear constraint augmentations
+	if (!fem.m_NLC.empty())
 	{
-		int n = fem.m_LCSet.size();
-		for (int i=0; i<n; ++i) bconv = fem.m_LCSet[i]->Augment(m_naug) && bconv;
+		int n = fem.m_NLC.size();
+		for (int i=0; i<n; ++i) bconv = fem.m_NLC[i]->Augment(m_naug) && bconv;
 	}
 
 	// do incompressibility multipliers for 3Field domains

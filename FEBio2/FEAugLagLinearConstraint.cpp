@@ -33,7 +33,7 @@ void FEAugLagLinearConstraint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FEConstraint(pfem)
+FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfem, FE_LINEAR_CONSTRAINT)
 {
 	static int nc = 1;
 	m_nID = nc++;

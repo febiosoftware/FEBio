@@ -88,8 +88,8 @@ public:
 		//! calculate the rigid stiffnes matrices
 		void RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
-		//! calculates stiffness contributon of linear constraints
-		void LinearConstraintStiffness();
+		//! calculates stiffness contributon of nonlinear constraints
+		void NonLinearConstraintStiffness();
 	//}
 
 	//{ --- Residual routines ---
@@ -106,8 +106,8 @@ public:
 		//! Calculates residual
 		virtual bool Residual(vector<double>& R);
 
-		//! Calculate linear constraint forces
-		void LinearConstraintForces(vector<double>& R);
+		//! Calculate nonlinear constraint forces
+		void NonLinearConstraintForces(vector<double>& R);
 	//}
 
 public:

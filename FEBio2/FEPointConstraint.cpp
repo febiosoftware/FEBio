@@ -4,7 +4,7 @@
 #include "FECore/FEMesh.h"
 
 //-----------------------------------------------------------------------------
-FEPointConstraint::FEPointConstraint(FEModel* pfem) : FEConstraint(pfem)
+FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem, FE_POINT_CONSTRAINT)
 {
 	m_node = -1;
 	m_pel = 0;
