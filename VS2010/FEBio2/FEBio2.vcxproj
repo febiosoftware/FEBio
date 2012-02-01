@@ -531,7 +531,6 @@
     <ClInclude Include="..\..\FEBio2\console.h" />
     <ClInclude Include="..\..\FEBio2\DataStore.h" />
     <ClInclude Include="..\..\FEBio2\FEAnalysisStep.h" />
-    <ClInclude Include="..\..\FEBio2\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FEBioCommand.h" />
     <ClInclude Include="..\..\FEBio2\FEBioImport.h" />
     <ClInclude Include="..\..\FEBio2\FEBioPlotFile.h" />
@@ -555,7 +554,6 @@
     <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotNodeData.h" />
     <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h" />
-    <ClInclude Include="..\..\FEBio2\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBio2\FEPoroTraction.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
@@ -592,7 +590,6 @@
     <ClCompile Include="..\..\FEBio2\diagnose.cpp" />
     <ClCompile Include="..\..\FEBio2\elstf.cpp" />
     <ClCompile Include="..\..\FEBio2\FEAnalysisStep.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioCommand.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioImport.cpp" />
@@ -616,7 +613,6 @@
     <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotNodeData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPoroTraction.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />

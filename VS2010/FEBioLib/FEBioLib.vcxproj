@@ -509,6 +509,7 @@
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FE3FieldElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
+    <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSolute.h" />
     <ClInclude Include="..\..\FEBioLib\FECellGrowth.h" />
@@ -570,6 +571,7 @@
     <ClInclude Include="..\..\FEBioLib\FEPermRefOrtho.h" />
     <ClInclude Include="..\..\FEBioLib\FEPermRefTransIso.h" />
     <ClInclude Include="..\..\FEBioLib\FEPointBodyForce.h" />
+    <ClInclude Include="..\..\FEBioLib\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioLib\FERigid.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidShellDomain.h" />
@@ -620,6 +622,7 @@
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FE3FieldElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSolute.cpp" />
     <ClCompile Include="..\..\FEBioLib\FECellGrowth.cpp" />
@@ -678,6 +681,7 @@
     <ClCompile Include="..\..\FEBioLib\FEPermRefOrtho.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPermRefTransIso.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPointBodyForce.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidShellDomain.cpp" />

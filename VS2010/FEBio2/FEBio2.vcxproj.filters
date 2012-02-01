@@ -27,9 +27,6 @@
     <ClInclude Include="..\..\FEBio2\DataStore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEAugLagLinearConstraint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEBioCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -82,9 +79,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBio2\FEPointConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBio2\FEPoroTraction.h">
@@ -206,9 +200,6 @@
     <ClCompile Include="..\..\FEBio2\elstf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEAugLagLinearConstraint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEBio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -264,9 +255,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEPointConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\FEPoroTraction.cpp">

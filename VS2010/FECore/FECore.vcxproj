@@ -474,7 +474,6 @@
     <ClInclude Include="..\..\FECore\FEBioTask.h" />
     <ClInclude Include="..\..\FECore\FEBodyForce.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
-    <ClInclude Include="..\..\FECore\FEConstraint.h" />
     <ClInclude Include="..\..\FECore\FEContactInterface.h" />
     <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
@@ -491,6 +490,7 @@
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
     <ClInclude Include="..\..\FECore\FEMesh.h" />
     <ClInclude Include="..\..\FECore\FEModel.h" />
+    <ClInclude Include="..\..\FECore\FENLConstraint.h" />
     <ClInclude Include="..\..\FECore\FENLSolver.h" />
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />

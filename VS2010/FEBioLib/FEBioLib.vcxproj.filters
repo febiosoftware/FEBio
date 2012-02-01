@@ -345,6 +345,12 @@
     <ClInclude Include="..\..\FEBioLib\FE3FieldElasticSolidDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FEPointConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp">
@@ -657,6 +663,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FE3FieldElasticSolidDomain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FEAugLagLinearConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FEPointConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
