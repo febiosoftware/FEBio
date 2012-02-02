@@ -1,10 +1,8 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FESlidingInterface3.h"
-#include "FESolver.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/FEBiphasicSolute.h"
-#include "FEAnalysisStep.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
@@ -336,7 +334,7 @@ void FESlidingInterface3::Init()
 		fem.SetSymmetryFlag(false);
 		
 		// make sure we are using full-Newton
-		FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+		FEAnalysis* pstep = fem.GetCurrentStep();
 		if (bporo && (pstep->m_psolver->m_bfgs.m_maxups != 0))
 		{
 			pstep->m_psolver->m_bfgs.m_maxups = 0;
@@ -732,7 +730,7 @@ void FESlidingInterface3::Update(int niter)
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
 	// also reset number of iterations after each augmentation
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	if (pstep->m_psolver->m_niter == 0) {
 		biter = 0;
 		naug = pstep->m_psolver->m_naug;
@@ -1104,7 +1102,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::ContactStiffness(FENLSolver* pnls)
+void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -1118,9 +1116,6 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* pnls)
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
-	
-	// get the solver
-	FESolver* psolver = dynamic_cast<FESolver*>(pnls);
 	
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;

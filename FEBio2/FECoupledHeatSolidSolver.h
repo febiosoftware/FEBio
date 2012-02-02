@@ -34,6 +34,10 @@ protected:
 	//! calculate "initial" stresses base on temperatures
 	void CalculateInitialStresses();
 
+private: // not used
+	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) { assert(false); }
+	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) { assert(false); }
+
 protected:
 	FEHeatSolver		m_Heat;		//!< heat solver
 	FELinearSolidSolver	m_Solid;	//!< linear solid solver

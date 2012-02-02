@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
-#include "fem.h"
 #include "FECore/FENNQuery.h"
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEElasticShellDomain.h"
@@ -611,8 +610,6 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 
 		m_ss.Serialize(ar);
 
-		FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-
 		// plane data
 		int ntype;
 		ar >> ntype;
@@ -620,7 +617,7 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 		{
 		case FE_RIGID_PLANE:
 			{
-				SetMasterSurface(new FEPlane(&fem));
+				SetMasterSurface(new FEPlane(m_pfem));
 				FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
 				ar >> pl.m_nplc;
 				if (pl.m_nplc >= 0) pl.m_pplc = m_pfem->GetLoadCurve(pl.m_nplc);
@@ -630,7 +627,7 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 			break;
 		case FE_RIGID_SPHERE:
 			{
-				SetMasterSurface(new FERigidSphere(&fem));
+				SetMasterSurface(new FERigidSphere(m_pfem));
 				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
 				ar >> s.m_rc;
 				ar >> s.m_R;

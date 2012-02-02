@@ -785,7 +785,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			{
 				SuperLUSolver* ps = new SuperLUSolver();
 				FEAnalysisStep* pstep = GetStep();
-				pstep->m_psolver->m_plinsolve = ps;
+				FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
+				psolver->m_plinsolve = ps;
 
 				++tag;
 				do
@@ -807,7 +808,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			fem.m_nsolver = CG_ITERATIVE_SOLVER;
 			ConjGradIterSolver* ps;
 			FEAnalysisStep* pstep = GetStep();
-			pstep->m_psolver->m_plinsolve = ps = new ConjGradIterSolver();
+			FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
+			psolver->m_plinsolve = ps = new ConjGradIterSolver();
 			if (!tag.isleaf())
 			{
 				++tag;

@@ -18,7 +18,7 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEAnalysisStep::FEAnalysisStep(FEM& fem) : m_fem(fem)
+FEAnalysisStep::FEAnalysisStep(FEModel& fem) : FEAnalysis(fem)
 {
 	// --- Analysis data ---
 	m_nModule = FE_SOLID;		// solid-mechanics problem
@@ -51,7 +51,7 @@ FEAnalysisStep::FEAnalysisStep(FEM& fem) : m_fem(fem)
 
 	// --- I/O Data ---
 	m_bDump = false;
-	bool bdebug = fem.GetDebugFlag();
+	bool bdebug = (dynamic_cast<FEM&>(fem)).GetDebugFlag();
 	m_nplot  = (bdebug?FE_PLOT_MINOR_ITRS     : FE_PLOT_MAJOR_ITRS );
 	m_nprint = (bdebug?FE_PRINT_MINOR_ITRS_EXP: FE_PRINT_MINOR_ITRS);
 }
@@ -87,7 +87,9 @@ bool FEAnalysisStep::Init()
 	double Dt;
 	if (m_ntime == -1) Dt = m_final_time; else Dt = m_dt0*m_ntime;
 
-	m_tend = m_fem.m_ftime0 + Dt;
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
+	m_tend = fem.m_ftime0 + Dt;
 
 	// If no must point is defined, we create one
 	// that has two points, the start point and the end point
@@ -96,7 +98,7 @@ bool FEAnalysisStep::Init()
 		FELoadCurve* plc = new FELoadCurve();
 		plc->Create(2);
 		plc->SetInterpolation(FELoadCurve::STEP);
-		plc->LoadPoint(0).time  = m_fem.m_ftime0;
+		plc->LoadPoint(0).time  = fem.m_ftime0;
 		plc->LoadPoint(0).value = 0;
 		plc->LoadPoint(1).time  = m_tend;
 		plc->LoadPoint(1).value = m_dtmax;
@@ -108,9 +110,9 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
 
 	// clear the active rigid body BC's
-	for (i=0; i<(int) m_fem.m_RB.size(); ++i)
+	for (i=0; i<(int) fem.m_RB.size(); ++i)
 	{
-		FERigidBody& RB = m_fem.m_RB[i];
+		FERigidBody& RB = fem.m_RB[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
@@ -123,10 +125,10 @@ bool FEAnalysisStep::Init()
 	}
 
 	// set the active rigid bodies BC's
-	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
+	for (i=0; i<(int) fem.m_RDC.size(); ++i)
 	{
-		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
-		FERigidBody& RB = m_fem.m_RB[DC.id];
+		FERigidBodyDisplacement& DC = *(fem.m_RDC[i]);
+		FERigidBody& RB = fem.m_RB[DC.id];
 //		assert(RB.m_pDC[DC.bc] == 0);
 		if (RB.m_bActive && DC.IsActive())
 		{
@@ -199,7 +201,7 @@ bool FEAnalysisStep::Init()
 	// Sometimes an (ignorant) user might have added a rigid body
 	// that is not being used. Since this can cause problems we need
 	// to find these rigid bodies.
-	int nrb = m_fem.m_RB.size();
+	int nrb = fem.m_RB.size();
 	vector<int> mec; mec.assign(nrb, 0);
 	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
 	{
@@ -211,8 +213,8 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<nrb; ++i)
 		if (mec[i] == 0)
 		{
-			clog.printbox("WARNING", "Rigid body %d is not being used.", m_fem.m_RB[i].m_mat+1);
-			m_fem.m_RB[i].m_bActive = false;
+			clog.printbox("WARNING", "Rigid body %d is not being used.", fem.m_RB[i].m_mat+1);
+			fem.m_RB[i].m_bActive = false;
 		}
 
 	// initialize equations
@@ -221,7 +223,7 @@ bool FEAnalysisStep::Init()
 
 	// initialize linear constraints
 	// Must be done after equations are initialized
-	if (m_fem.InitConstraints() == false) return false;
+	if (fem.InitConstraints() == false) return false;
 	// ----->
 
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
@@ -303,10 +305,10 @@ bool FEAnalysisStep::Init()
 	}
 
 	// modify the linear constraints
-	if (m_fem.m_LinC.size())
+	if (fem.m_LinC.size())
 	{
-		list<FELinearConstraint>::iterator il = m_fem.m_LinC.begin();
-		for (int l=0; l<(int) m_fem.m_LinC.size(); ++l, ++il)
+		list<FELinearConstraint>::iterator il = fem.m_LinC.begin();
+		for (int l=0; l<(int) fem.m_LinC.size(); ++l, ++il)
 		{
 			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
 			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
@@ -326,7 +328,7 @@ bool FEAnalysisStep::Init()
 	}
 
 	// see if we need to do contact augmentations
-	m_baugment = (m_fem.m_RJ.empty()? false : true);
+	m_baugment = (fem.m_RJ.empty()? false : true);
 	for (i=0; i<m_fem.ContactInterfaces(); ++i)
 	{
 		FEContactInterface& ci = *m_fem.ContactInterface(i);
@@ -357,6 +359,8 @@ bool FEAnalysisStep::Init()
 //-----------------------------------------------------------------------------
 bool FEAnalysisStep::Solve()
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	// obtain a pointer to the console object. We'll use this to
 	// set the title of the console window.
 	Console* pShell = Console::GetHandle();
@@ -367,19 +371,19 @@ bool FEAnalysisStep::Solve()
 	bool bconv = true;
 
 	// calculate end time value
-	double starttime = m_fem.m_ftime0;
-//	double endtime = m_fem.m_ftime0 + m_ntime*m_dt0;
+	double starttime = fem.m_ftime0;
+//	double endtime = fem.m_ftime0 + m_ntime*m_dt0;
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
 
 	int nsteps = m_fem.Steps();
 
-	bool bdebug = m_fem.GetDebugFlag();
+	bool bdebug = fem.GetDebugFlag();
 
 	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", fem.m_nStep+1, nsteps, (100.f*(fem.m_ftime - starttime) / (endtime - starttime)), fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 	else
-		pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+		pShell->SetTitle("(%.f%%) %s - %s", (100.f*fem.m_ftime/endtime), fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 
 	// print initial progress bar
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
@@ -394,7 +398,7 @@ bool FEAnalysisStep::Solve()
 	if (m_ntimesteps != 0)
 	{
 		// update time step
-		if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
+		if (m_bautostep && (fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
 	}
 	else
 	{
@@ -404,19 +408,19 @@ bool FEAnalysisStep::Solve()
 
 	// repeat for all timesteps
 	m_nretries = 0;
-	while (endtime - m_fem.m_ftime > eps)
+	while (endtime - fem.m_ftime > eps)
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
 		if (m_bautostep) m_fem.PushState();
 
 		// update time
-		m_fem.m_ftime += m_dt;
+		fem.m_ftime += m_dt;
 
 		int i;
 
 		// evaluate load curve values at current time
-		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(m_fem.m_ftime);
+		for (i=0; i<m_fem.LoadCurves(); ++i) m_fem.GetLoadCurve(i)->Evaluate(fem.m_ftime);
 
 		// evaluate material parameter lists
 		for (i=0; i<m_fem.Materials(); ++i)
@@ -425,28 +429,28 @@ bool FEAnalysisStep::Solve()
 			FEMaterial* pm = m_fem.GetMaterial(i);
 
 			// evaluate its parameter list
-			m_fem.EvaluateMaterialParameters(pm);
+			fem.EvaluateMaterialParameters(pm);
 		}
 
 		// evaluate body-force parameter lists
 		for (i=0; i<m_fem.BodyForces(); ++i)
 		{
 			FEParameterList& pl = m_fem.GetBodyForce(i)->GetParameterList();
-			m_fem.EvaluateParameterList(pl);
+			fem.EvaluateParameterList(pl);
 		}
 
 		// evaluate contact interface parameter lists
 		for (i=0; i<m_fem.ContactInterfaces(); ++i)
 		{
 			FEParameterList& pl = m_fem.ContactInterface(i)->GetParameterList();
-			m_fem.EvaluateParameterList(pl);
+			fem.EvaluateParameterList(pl);
 		}
 
 		// solve this timestep,
 		try
 		{
 			int oldmode = 0;
-			bconv = m_psolver->SolveStep(m_fem.m_ftime);
+			bconv = m_psolver->SolveStep(fem.m_ftime);
 		}
 		catch (ExitRequest)
 		{
@@ -510,7 +514,7 @@ bool FEAnalysisStep::Solve()
 		if (bconv)
 		{
 			// Yes! We have converged!
-			clog.printf("\n\n------- converged at time : %lg\n\n", m_fem.m_ftime);
+			clog.printf("\n\n------- converged at time : %lg\n\n", fem.m_ftime);
 
 			// update nr of completed timesteps
 			m_ntimesteps++;
@@ -521,31 +525,31 @@ bool FEAnalysisStep::Solve()
 				if ((m_nplot == FE_PLOT_MUST_POINTS) && (m_nmplc >= 0))
 				{
 					FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
-					if (lc.HasPoint(m_fem.m_ftime)) m_fem.m_plot->Write(m_fem);
+					if (lc.HasPoint(fem.m_ftime)) fem.m_plot->Write(fem);
 				}
-				else m_fem.m_plot->Write(m_fem);
+				else fem.m_plot->Write(fem);
 			}
 
 			// Dump converged state to the archive
 			if (m_bDump)
 			{
 				DumpFile ar(&m_fem);
-				if (ar.Create(m_fem.GetDumpFileName()) == false)
+				if (ar.Create(fem.GetDumpFileName()) == false)
 				{
 					clog.printf("WARNING: Failed creating restart point.\n");
 				}
 				else 
 				{
-					m_fem.Serialize(ar);
-					clog.printf("\nRestart point created. Archive name is %s\n", m_fem.GetDumpFileName());
+					fem.Serialize(ar);
+					clog.printf("\nRestart point created. Archive name is %s\n", fem.GetDumpFileName());
 				}
 			}
 
 			// store additional data to the logfile
-			m_fem.m_Data.Write();
+			fem.m_Data.Write();
 
 			// update time step
-			if (m_bautostep && (m_fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
+			if (m_bautostep && (fem.m_ftime + eps < endtime)) AutoTimeStep(m_psolver->m_niter);
 
 			// reset retry counter
 			m_nretries = 0;
@@ -556,13 +560,13 @@ bool FEAnalysisStep::Solve()
 		else 
 		{
 			// Report the sad news to the user.
-			clog.printf("\n\n------- failed to converge at time : %lg\n\n", m_fem.m_ftime);
+			clog.printf("\n\n------- failed to converge at time : %lg\n\n", fem.m_ftime);
 
 			// If we have auto time stepping, decrease time step and let's retry
 			if (m_bautostep && (m_nretries < m_maxretries))
 			{
 				// restore the previous state
-				m_fem.PopState();
+				fem.PopState();
 				
 				// let's try again
 				Retry();
@@ -579,7 +583,7 @@ bool FEAnalysisStep::Solve()
 		// print a progress bar
 		if (GetPrintLevel() == FE_PRINT_PROGRESS)
 		{
-			int l = (int)(50*m_fem.m_ftime / endtime);
+			int l = (int)(50*fem.m_ftime / endtime);
 			for (int i=0; i<l; ++i) printf("\xB2"); printf("\r");
 			fflush(stdout);
 		}
@@ -588,16 +592,16 @@ bool FEAnalysisStep::Solve()
 		// the next timestep goes wrong
 		clog.flush();
 
-		bool bdebug = m_fem.GetDebugFlag();
+		bool bdebug = fem.GetDebugFlag();
 		if (nsteps>1)
-			pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+			pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", fem.m_nStep+1, nsteps, (100.f*(fem.m_ftime - starttime) / (endtime - starttime)), fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 		else
-			pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+			pShell->SetTitle("(%.f%%) %s - %s", (100.f*fem.m_ftime/endtime), fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
 	}
 
-	if ((m_nplot == FE_PLOT_FINAL) && bconv) m_fem.m_plot->Write(m_fem);
+	if ((m_nplot == FE_PLOT_FINAL) && bconv) fem.m_plot->Write(fem);
 
-	m_fem.m_ftime0 = m_fem.m_ftime;
+	fem.m_ftime0 = fem.m_ftime;
 
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
 	{
@@ -615,7 +619,8 @@ bool FEAnalysisStep::Solve()
 	// get and print elapsed time
 	char sztime[64];
 
-	m_psolver->m_SolverTime.time_str(sztime);
+	FESolver* psolver = dynamic_cast<FESolver*>(m_psolver);
+	psolver->m_SolverTime.time_str(sztime);
 	clog.printf("\tTime in solver: %s\n\n", sztime);
 
 	return bconv;
@@ -624,6 +629,7 @@ bool FEAnalysisStep::Solve()
 //-----------------------------------------------------------------------------
 void FEAnalysisStep::Serialize(DumpFile& ar)
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	if (ar.IsSaving())
 	{
 		// --- analysis data ---
@@ -706,7 +712,7 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 		for (int i=0; i<n; ++i)
 		{
 			ar >> nbc;
-			FEBoundaryCondition* pbc = m_fem.FindBC(nbc);
+			FEBoundaryCondition* pbc = fem.FindBC(nbc);
 			assert(pbc);
 			m_BC.push_back(pbc);
 		}
@@ -762,8 +768,10 @@ void FEAnalysisStep::Retry()
 
 void FEAnalysisStep::AutoTimeStep(int niter)
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	double dtn = m_dt;
-	double told = m_fem.m_ftime;
+	double told = fem.m_ftime;
 
 	// make sure the timestep size is at least the minimum
 	if (dtn < m_dtmin) dtn = m_dtmin;

@@ -178,7 +178,8 @@ void FERigidJoint::JointStiffness()
 	}
 
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
-	pstep->m_psolver->m_pK->Assemble(ke, LM);
+	FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
+	psolver->m_pK->Assemble(ke, LM);
 }
 
 //-----------------------------------------------------------------------------

@@ -143,7 +143,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 {
 	assert(m_pfem);
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
-	FESolver* psolver = pstep->m_psolver;
+	FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
 
 	if (nargs > 2)
 	{

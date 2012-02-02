@@ -9,7 +9,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "NumCore/BFGSSolver.h"
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
 #include "FEBioLib/Timer.h"
@@ -32,19 +31,7 @@ public:
 	virtual ~FESolver();
 
 	virtual bool Init();
-	virtual bool SolveStep(double time) = 0;
-	virtual void Serialize(DumpFile& ar) = 0;
 	virtual void Clean();
-
-public:
-	// Initialize linear equation system (TODO: Is this the right place to do this?)
-	virtual bool InitEquations() = 0;
-
-	//! assemble the element residual into the global residual
-	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) {}
-
-	//! assemble global stiffness matrix
-	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) {}
 
 public:
 	//! recalculates the shape of the stiffness matrix
@@ -72,16 +59,6 @@ public:
 	// global stiffness matrix
 	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
 	int					m_neq;		//!< number of equations
-
-	// BFGS parameters
-	BFGSSolver	m_bfgs;		//!< BFGS solver parameters
-
-	// counters
-	int		m_nrhs;			//!< nr of right hand side evalutations
-	int		m_niter;		//!< nr of quasi-newton iterations
-	int		m_nref;			//!< nr of stiffness retormations
-	int		m_ntotref;
-	int		m_naug;			//!< nr of augmentations
 };
 
 #endif // !defined(AFX_FESOLVER_H__EFCA10FB_7487_44A1_A81D_8B53BE3BECEA__INCLUDED_)

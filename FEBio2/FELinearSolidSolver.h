@@ -46,6 +46,9 @@ public:
 	//! assemble the element residual into the global residual
 	void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
 
+private: // TODO: use this one instead
+	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) { assert(false); }
+
 public:
 	double	m_Dtol;			//!< displacement tolerance
 

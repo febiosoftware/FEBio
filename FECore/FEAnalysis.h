@@ -1,11 +1,16 @@
 #pragma once
 #include "DumpFile.h"
 
+class FEModel;
+class FENLSolver;
+
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
 class FEAnalysis
 {
 public:
+	FEAnalysis(FEModel& fem) : m_fem(fem) {}
+
 	virtual ~FEAnalysis(){}
 
 	//! Data initialization
@@ -34,6 +39,11 @@ public:
 	int GetPrintLevel() { return m_nprint; }
 
 public:
+	// --- The FE Model
+	//{
+		FEModel&	m_fem;
+	//}
+
 	// --- Control Data ---
 	//{
 		int		m_nModule;		//!< module type
@@ -59,6 +69,9 @@ public:
 
 	// --- Quasi-Newton Solver Variables ---
 	//{
+		// the FE solver
+		FENLSolver*	m_psolver;
+
 		int		m_nretries;		//!< nr of retries tried so far
 		int		m_maxretries;	//!< max nr of retries allowed per time step
 

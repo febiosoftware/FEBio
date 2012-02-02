@@ -1,5 +1,7 @@
 #pragma once
 #include "NumCore/NonLinearSystem.h"
+#include "NumCore/BFGSSolver.h"
+#include "DumpFile.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------
@@ -12,6 +14,12 @@ public:
 	FENLSolver(FEModel& fem) : m_fem(fem) {}
 	virtual ~FENLSolver() {}
 
+	FEModel& GetFEModel() { return m_fem; }
+
+	virtual bool Init() = 0;
+
+	virtual void Clean() = 0;
+
 public:
 	//! assemble the element residual into the global residual
 	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) = 0;
@@ -19,7 +27,14 @@ public:
 	//! assemble global stiffness matrix
 	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) = 0;
 
-	FEModel& GetFEModel() { return m_fem; }
+	// Initialize linear equation system (TODO: Is this the right place to do this?)
+	virtual bool InitEquations() = 0;
+
+	//! Solve an analysis step
+	virtual bool SolveStep(double time) = 0;
+
+	//! serialize data to the archive
+	virtual void Serialize(DumpFile& ar) = 0;
 
 private:
 	// TODO: I'm overriding these functions, but they are not used yet
@@ -30,4 +45,16 @@ private:
 
 protected:
 	FEModel&	m_fem;
+
+public: // TODO: temporary data that I would like to move elsewhere
+
+	// BFGS parameters
+	BFGSSolver	m_bfgs;		//!< BFGS solver parameters
+
+	// counters
+	int		m_nrhs;			//!< nr of right hand side evalutations
+	int		m_niter;		//!< nr of quasi-newton iterations
+	int		m_nref;			//!< nr of stiffness retormations
+	int		m_ntotref;
+	int		m_naug;			//!< nr of augmentations
 };

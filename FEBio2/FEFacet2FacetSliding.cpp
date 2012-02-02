@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FEFacet2FacetSliding.h"
 #include "FECore/FEModel.h"
-#include "FESolver.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
@@ -509,7 +508,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F, FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEFacet2FacetSliding::ContactStiffness(FENLSolver* pnls)
+void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
@@ -521,9 +520,6 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* pnls)
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
-
-	// get the solver
-	FESolver* psolver = dynamic_cast<FESolver*>(pnls);
 
 	// see how many reformations we've had to do so far
 	int nref = psolver->m_nref;

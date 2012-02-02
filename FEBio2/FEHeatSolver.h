@@ -55,6 +55,9 @@ public:
 	//! assemble an element stiffness into the residual
 	void AssembleResidual(vector<int>& lm, matrix& kc);
 
+private: // TODO: use this function instead
+	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) { assert(false); }
+
 public:
 	vector<double>	m_T;	//!< temperature array
 	vector<double>	m_Tp;	//!< previous temperatures

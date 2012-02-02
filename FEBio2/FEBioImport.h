@@ -10,6 +10,7 @@
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/FETriphasic.h"
 #include "FEAnalysisStep.h"
+#include "FESolver.h"
 #include <map>
 #include <string>
 using namespace std;

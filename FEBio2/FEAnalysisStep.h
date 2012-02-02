@@ -2,12 +2,10 @@
 
 #include "FECore/FEBoundaryCondition.h"
 #include "FECore/FEAnalysis.h"
+#include "FECore/FEModel.h"
+#include "FECore/FENLSolver.h"
 #include <vector>
 using namespace std;
-
-// forward declaration of FEM
-class FEM;
-class FESolver;
 
 //-----------------------------------------------------------------------------
 //! The FEAnalysisStep contains the data that describes a complete, single analysis.
@@ -16,7 +14,7 @@ class FEAnalysisStep : public FEAnalysis
 {
 public:
 	//! constructor
-	FEAnalysisStep(FEM& fem);
+	FEAnalysisStep(FEModel& fem);
 
 	//! descructor
 	virtual ~FEAnalysisStep(void);
@@ -57,8 +55,6 @@ protected:
 	void AutoTimeStep(int niter);
 
 public:
-	FEM&	m_fem;	//!< reference to parent fem object
-
 	// --- Control Data ---
 	//{
 //		int		m_nModule;		//!< module type
@@ -91,7 +87,7 @@ public:
 	// --- Quasi-Newton Solver Variables ---
 	//{
 		// the FE solver
-		FESolver*	m_psolver;
+//		FENLSolver*	m_psolver;
 
 		// Newton - Raphson iteration data
 //		int		m_nretries;		//!< nr of retries tried so far
