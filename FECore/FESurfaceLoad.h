@@ -1,8 +1,8 @@
 #pragma once
-#include "FEBoundaryCondition.h"
-#include "FESurface.h"
-#include "DumpFile.h"
-#include "FENLSolver.h"
+#include "FECore/FEBoundaryCondition.h"
+#include "FECore/FESurface.h"
+#include "FECore/DumpFile.h"
+#include "FECore/FENLSolver.h"
 
 //-----------------------------------------------------------------------------
 //! This is the base class for all loads that are applied to surfaces
