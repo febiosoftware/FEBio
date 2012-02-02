@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEPlotData.h"
-#include "FESlidingInterface.h"
+#include "FEBioLib/FESlidingInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"

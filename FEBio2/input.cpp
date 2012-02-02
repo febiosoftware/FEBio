@@ -4,7 +4,7 @@
 #include "fem.h"
 #include "FileImport.h"
 #include "FEBioImport.h"
-#include "FESlidingInterface.h"
+#include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEBioLib/FEPeriodicBoundary.h"

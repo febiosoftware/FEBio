@@ -2,7 +2,7 @@
 #include "LSDYNAPlotFile.h"
 #include "fem.h"
 #include "FESolidSolver.h"
-#include "FESlidingInterface.h"
+#include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEBioLib/FEPeriodicBoundary.h"

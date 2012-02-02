@@ -3,7 +3,7 @@
 #include "fem.h"
 #include "FEBioLib/FERigid.h"
 #include "FERestartImport.h"
-#include "FESlidingInterface.h"
+#include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"

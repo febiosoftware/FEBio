@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "FESlidingInterface.h"
-#include "FEBioLib/FEElasticShellDomain.h"
+#include "FEElasticShellDomain.h"
 #include "FECore/FEModel.h"
-#include "FEBioLib/log.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

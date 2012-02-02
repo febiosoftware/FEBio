@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "FEStiffnessMatrix.h"
 #include "fem.h"
-#include "FESlidingInterface.h"
+#include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"

@@ -18,7 +18,7 @@
 #include "FEBioLib/FEDiscreteMaterial.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
 #include "FEFacet2FacetSliding.h"
-#include "FESlidingInterface.h"
+#include "FEBioLib/FESlidingInterface.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEBioLib/FETiedInterface.h"

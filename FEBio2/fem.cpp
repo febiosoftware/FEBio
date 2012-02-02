@@ -3,7 +3,7 @@
 #include <string.h>
 #include "FECore/DumpFile.h"
 #include "FECore/XMLReader.h"
-#include "FESlidingInterface.h"
+#include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
