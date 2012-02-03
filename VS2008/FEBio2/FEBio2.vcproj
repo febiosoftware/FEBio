@@ -377,14 +377,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESlidingInterface2.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESlidingInterface3.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESolidSolver.cpp"
 				>
 			</File>
@@ -615,19 +607,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESlidingInterface2.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESlidingInterface3.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESolidSolver.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FESolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEStiffnessMatrix.h"
 				>
 			</File>
 			<File

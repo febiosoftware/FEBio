@@ -518,6 +518,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESlidingInterface2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESlidingInterface3.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESolubConst.cpp"
 				>
 			</File>
@@ -989,6 +997,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESlidingInterface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESlidingInterface2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESlidingInterface3.h"
 				>
 			</File>
 			<File
