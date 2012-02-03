@@ -584,6 +584,8 @@
     <ClInclude Include="..\..\FEBioLib\FERigidSurface.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidWallInterface.h" />
     <ClInclude Include="..\..\FEBioLib\FESlidingInterface.h" />
+    <ClInclude Include="..\..\FEBioLib\FESlidingInterface2.h" />
+    <ClInclude Include="..\..\FEBioLib\FESlidingInterface3.h" />
     <ClInclude Include="..\..\FEBioLib\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioLib\FESolute.h" />
     <ClInclude Include="..\..\FEBioLib\FESoluteFlux.h" />
@@ -702,6 +704,8 @@
     <ClCompile Include="..\..\FEBioLib\FERigidSurface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidWallInterface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESlidingInterface.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FESlidingInterface2.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FESlidingInterface3.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolute.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESoluteFlux.cpp" />

@@ -555,8 +555,6 @@
     <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FERestartImport.h" />
     <ClInclude Include="..\..\FEBio2\FERigidJoint.h" />
-    <ClInclude Include="..\..\FEBio2\FESlidingInterface2.h" />
-    <ClInclude Include="..\..\FEBio2\FESlidingInterface3.h" />
     <ClInclude Include="..\..\FEBio2\FESolidSolver.h" />
     <ClInclude Include="..\..\FEBio2\FESolver.h" />
     <ClInclude Include="..\..\FEBio2\FEStiffnessMatrix.h" />
@@ -606,8 +604,6 @@
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBio2\FERigidJoint.cpp" />
-    <ClCompile Include="..\..\FEBio2\FESlidingInterface2.cpp" />
-    <ClCompile Include="..\..\FEBio2\FESlidingInterface3.cpp" />
     <ClCompile Include="..\..\FEBio2\FESolidSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FESolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEStiffnessMatrix.cpp" />
