@@ -107,9 +107,6 @@ public:
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
 
-	//! Set the sparse matrix symmetry flag
-	void SetSymmetryFlag(bool bsymm) { m_bsymm = bsymm; }
-
 	//! Set globals section parameters and functions
 	static vector<FESoluteData*> m_SD;	//!< unique identifier of solutes in multiphasic materials
 	static void SetSD(FESoluteData* psd);
@@ -200,7 +197,6 @@ public:
 	//{
 		int		m_nsolver;	//!< type of solver selected
 		int		m_bwopt;	//!< bandwidth optimization flag
-		bool	m_bsymm;	//!< symmetric flag
 	//}
  
 	// --- I/O-Data --- 

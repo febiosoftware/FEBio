@@ -236,7 +236,6 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		// direct solver data
 		ar << m_nsolver;
 		ar << m_bwopt;
-		ar << m_bsymm;
 
 		// body loads
 		ar << (int) m_BF.size();
@@ -273,7 +272,6 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		// direct solver data
 		ar >> m_nsolver;
 		ar >> m_bwopt;
-		ar >> m_bsymm;
 
 		// body loads
 		int nbl;

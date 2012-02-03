@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "fem.h"
 #include "FESlidingInterface2.h"
+#include "FECore/FEModel.h"
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/log.h"
 
@@ -270,22 +270,21 @@ void FESlidingInterface2::Init()
 	m_ss.Init();
 	m_ms.Init();
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	
 	bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
 
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
 	{
+		FENLSolver *psolver = m_pfem->GetCurrentStep()->m_psolver;
+
 		// request a non-symmetric stiffness matrix
-		fem.SetSymmetryFlag(false);
+		psolver->m_bsymm = false;
 
 		// make sure we are using full-Newton
-		FEAnalysis* pstep = fem.GetCurrentStep();
-		if (bporo && (pstep->m_psolver->m_bfgs.m_maxups != 0))
+		if (bporo && (psolver->m_bfgs.m_maxups != 0))
 		{
-			pstep->m_psolver->m_bfgs.m_maxups = 0;
+			psolver->m_bfgs.m_maxups = 0;
 			clog.printbox("WARNING", "The non-symmetric biphasic contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 		}
 	}
@@ -548,7 +547,7 @@ void FESlidingInterface2::Update(int niter)
 	static int naug = 0;
 	static int biter = 0;
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 	
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
@@ -708,7 +707,7 @@ void FESlidingInterface2::ContactForces(vector<double> &F, FENLSolver* psolver)
 	double detJ[4], w[4], *Hs, Hm[4];
 	double N[32];
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -892,7 +891,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 	double N[32];
 	matrix ke;
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();

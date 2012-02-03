@@ -72,9 +72,10 @@ bool FEM::InitPoroSolute()
 		return true;
 	
 	// see if we are using the symmetric version or not
+	// TODO: this really needs to move to the Analysis step.
 	if (m_bsym_poro == false) 
 	{
-		SetSymmetryFlag(false);
+		m_pStep->m_psolver->m_bsymm = false;
 		
 		// make sure we are using full-Newton
 //		if (m_pStep->m_psolver->m_bfgs.m_maxups != 0)

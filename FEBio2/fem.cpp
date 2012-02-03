@@ -52,7 +52,6 @@ FEM::FEM()
 	plc->SetExtendMode(FELoadCurve::EXTRAPOLATE);
 	AddLoadCurve(plc);
 
-	m_bsymm = true;	// assume symmetric stiffness matrix
 	m_bInterruptable = true;
 
 	// --- Material Data ---
