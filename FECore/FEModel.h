@@ -8,6 +8,7 @@
 #include "FEAnalysis.h"
 #include "FESurfaceLoad.h"
 #include "FENLConstraint.h"
+#include "FELinearConstraint.h"
 #include <vector>
 #include <map>
 
@@ -155,6 +156,11 @@ public:
 	std::vector<FENodalForce*>		m_FC;	//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>		m_SL;	//!< surface loads
 	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
+
+	// linear constraint data
+	list<FELinearConstraint>	m_LinC;		//!< linear constraints data
+	vector<int>					m_LCT;		//!< linear constraint table
+	vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
 
 	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
 

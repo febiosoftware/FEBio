@@ -276,6 +276,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FELinearConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEMaterial.cpp"
 				>
 			</File>
@@ -451,6 +455,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FELevelStructure.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FELinearConstraint.h"
 				>
 			</File>
 			<File

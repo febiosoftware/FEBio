@@ -11,7 +11,6 @@
 #include "FEBioLib/FERigidBody.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
-#include "FEBioLib/FELinearConstraint.h"
 #include "FEBioLib/Timer.h"
 #include "FEBioLib/PlotFile.h"
 #include "FEBioLib/FEElasticMixture.h"
@@ -186,11 +185,6 @@ public:
 
 		// rigid forces
 		vector<FERigidBodyForce*>	m_RFC;	//!< rigid body forces
-
-		// linear constraint data
-		list<FELinearConstraint>	m_LinC;		//!< linear constraints data
-		vector<int>					m_LCT;		//!< linear constraint table
-		vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
 	//}
 
 	// --- Direct Solver Data ---

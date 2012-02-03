@@ -394,10 +394,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FELinearConstraint.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FELinearElastic.cpp"
 				>
 			</File>
@@ -873,10 +869,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicFourier.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FELinearConstraint.h"
 				>
 			</File>
 			<File
