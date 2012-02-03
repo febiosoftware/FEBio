@@ -242,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBox.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FECellGrowth.cpp"
 				>
 			</File>
@@ -490,6 +494,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FERigidBody.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FERigidShellDomain.cpp"
 				>
 			</File>
@@ -693,6 +701,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEBiphasicSolute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBox.h"
 				>
 			</File>
 			<File
@@ -953,6 +965,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidBody.h"
 				>
 			</File>
 			<File

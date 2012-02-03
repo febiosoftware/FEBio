@@ -309,10 +309,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBox.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.cpp"
 				>
 			</File>
@@ -374,10 +370,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FERestartImport.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERigidBody.cpp"
 				>
 			</File>
 			<File
@@ -559,10 +551,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBox.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.h"
 				>
 			</File>
@@ -620,10 +608,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FERestartImport.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERigidBody.h"
 				>
 			</File>
 			<File

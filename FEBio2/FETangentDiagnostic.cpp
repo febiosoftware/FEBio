@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "FETangentDiagnostic.h"
-#include "FEBox.h"
+#include "FEBioLib/FEBox.h"
 #include "FESolidSolver.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/log.h"

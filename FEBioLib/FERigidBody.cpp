@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "FERigidBody.h"
 #include "FECore/FEMaterial.h"
-#include "FEBioLib/FERigid.h"
-#include "FEBioLib/FEElasticSolidDomain.h"
+#include "FERigid.h"
+#include "FEElasticSolidDomain.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

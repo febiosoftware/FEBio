@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "FEDiagnostic.h"
 #include "FETangentDiagnostic.h"
-#include "FEBox.h"
+#include "FEBioLib/FEBox.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------

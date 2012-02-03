@@ -8,7 +8,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEContactInterface.h"
-#include "FERigidBody.h"
+#include "FEBioLib/FERigidBody.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
 #include "FEBioLib/FELinearConstraint.h"
