@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "FERigidWallInterface.h"
 #include "FECore/FENNQuery.h"
-#include "FEBioLib/log.h"
-#include "FEBioLib/FEElasticShellDomain.h"
+#include "FEElasticShellDomain.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

@@ -325,14 +325,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEElemElemList.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFacet2FacetSliding.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEFiberMaterial.cpp"
 				>
 			</File>
@@ -390,10 +382,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FERigidJoint.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERigidWallInterface.cpp"
 				>
 			</File>
 			<File
@@ -587,14 +575,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEElemElemList.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFacet2FacetSliding.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEHeatSolver.h"
 				>
 			</File>
@@ -648,10 +628,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FERigidJoint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERigidWallInterface.h"
 				>
 			</File>
 			<File

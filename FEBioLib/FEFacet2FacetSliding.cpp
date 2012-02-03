@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEFacet2FacetSliding.h"
 #include "FECore/FEModel.h"
-#include "FEBioLib/log.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 // Register the class with the framework

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FECore/FEContactInterface.h"
-#include "FEBioLib/FEContactSurface.h"
+#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 

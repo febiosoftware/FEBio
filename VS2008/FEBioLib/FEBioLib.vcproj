@@ -326,7 +326,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEElemElemList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEEllipsoidalFiberDistribution.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFacet2FacetSliding.cpp"
 				>
 			</File>
 			<File
@@ -491,6 +499,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigidSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidWallInterface.cpp"
 				>
 			</File>
 			<File
@@ -772,7 +784,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEElemElemList.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFacet2FacetSliding.h"
 				>
 			</File>
 			<File
@@ -945,6 +965,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigidSurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidWallInterface.h"
 				>
 			</File>
 			<File
