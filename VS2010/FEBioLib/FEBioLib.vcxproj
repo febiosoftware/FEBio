@@ -553,7 +553,6 @@
     <ClInclude Include="..\..\FEBioLib\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FEIsotropicElastic.h" />
     <ClInclude Include="..\..\FEBioLib\FEIsotropicFourier.h" />
-    <ClInclude Include="..\..\FEBioLib\FELinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearElastic.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearSolidDomain.h" />
@@ -673,7 +672,6 @@
     <ClCompile Include="..\..\FEBioLib\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicElastic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicFourier.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearElastic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearSolidDomain.cpp" />

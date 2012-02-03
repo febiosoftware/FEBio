@@ -485,6 +485,7 @@
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
+    <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
     <ClInclude Include="..\..\FECore\FEMaterialFactory.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
@@ -535,6 +536,7 @@
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
+    <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
