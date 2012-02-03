@@ -542,12 +542,6 @@ bool FETriphasicSolver::Residual(vector<double>& R)
 		if (psl->IsActive()) psl->Residual(this, R);
 	}
 
-	// rigid joint forces
-	if (!fem.m_RJ.empty())
-	{
-		for (int i=0; i<(int) fem.m_RJ.size(); ++i) fem.m_RJ[i]->JointForces(R);
-	}
-
 	// calculate contact forces
 	if (m_fem.ContactInterfaces() > 0)
 	{
@@ -626,12 +620,6 @@ bool FETriphasicSolver::StiffnessMatrix()
 	}
 
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
-
-	// calculate joint stiffness 
-	if (!fem.m_RJ.empty())
-	{
-		for (int i=0; i<(int) fem.m_RJ.size(); ++i) fem.m_RJ[i]->JointStiffness();
-	}
 
 	// calculate stiffness matrices for surface loads
 	int nsl = (int) fem.m_SL.size();

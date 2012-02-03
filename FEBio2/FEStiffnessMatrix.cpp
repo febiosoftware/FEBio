@@ -129,24 +129,6 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				}
 			}
 
-			// add rigid joint "elements" to the profile
-			if (!fem.m_RJ.empty())
-			{
-				vector<int> lm(12);
-				for (int i=0; i<(int) fem.m_RJ.size(); ++i)
-				{
-					FERigidJoint& rj = *fem.m_RJ[i];
-			
-					int* lm1 = fem.m_RB[ rj.m_nRBa ].m_LM;
-					int* lm2 = fem.m_RB[ rj.m_nRBb ].m_LM;
-
-					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-
-					build_add(lm);
-				}
-			}
-
 			// Add rigid bodies to the profile
 			if (fem.m_RB.empty() == false)
 			{
@@ -280,6 +262,19 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 		
 							build_add(lm);
 						}
+					}
+					break;
+				case FE_RIGID_JOINT:
+					{
+						FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*pnlc);
+						vector<int> lm(12);
+			
+						int* lm1 = fem.m_RB[ rj.m_nRBa ].m_LM;
+						int* lm2 = fem.m_RB[ rj.m_nRBb ].m_LM;
+
+						for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+						for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+						build_add(lm);
 					}
 					break;
 				default:

@@ -22,13 +22,6 @@ bool FESolidSolver::Augment()
 
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
-	// Do rigid joint augmentations
-	if (!fem.m_RJ.empty())
-	{
-		// loop over all rigid joints
-		for (int i=0; i<(int) fem.m_RJ.size(); ++i) bconv = fem.m_RJ[i]->Augment() && bconv;
-	}
-
 	// Do contact augmentations
 	if (m_fem.ContactInterfaces() > 0)
 	{

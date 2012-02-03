@@ -12,48 +12,37 @@
 #include "FECore/vec3d.h"
 #include "NumCore/vector.h"
 #include "FECore/DumpFile.h"
-#include "FECore/FEParameterList.h"
-
-class FEM;
+#include "FECore/FENLConstraint.h"
 
 //-----------------------------------------------------------------------------
 //! The FERigidJoint class implements a rigid joint. The rigid joint allows the
 //! user to connect two rigid bodies at a point in space.
 
-class FERigidJoint : public FEParamContainer
+class FERigidJoint : public FENLConstraint
 {
 public:
 	//! constructor
-	FERigidJoint(FEM* pfem);
+	FERigidJoint(FEModel* pfem);
 
 	//! destructor
-	virtual ~FERigidJoint();
+	virtual ~FERigidJoint() {}
 
 	//! create a shallow copy
-	void ShallowCopy(FERigidJoint& rj)
-	{
-		m_nRBa = rj.m_nRBa;
-		m_nRBb = rj.m_nRBb;
+	void ShallowCopy(FERigidJoint& rj);
 
-		m_q0  = rj.m_q0;
-		m_qa0 = rj.m_qa0;
-		m_qb0 = rj.m_qb0;
+public:
 
-		m_F = rj.m_F;
-		m_L = rj.m_L;
-
-		m_eps  = rj.m_eps;
-		m_atol = rj.m_atol;
-	}
+	//! initialization (TODO: Find a use for this)
+	void Init() {}
 
 	//! calculates the joint forces
-	void JointForces(vector<double>& R);
+	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! calculates the joint stiffness
-	void JointStiffness();
+	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculate Lagrangian augmentation
-	bool Augment();
+	bool Augment(int naug);
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
@@ -72,10 +61,7 @@ public:
 	double	m_atol;	//! augmented Lagrangian tolerance
 
 protected:
-	FEM*	m_pfem;	//!< FEM class to which this rigid joint belongs
-
 	int	m_nID;	//!< ID of rigid joint
-
 	DECLARE_PARAMETER_LIST();
 };
 

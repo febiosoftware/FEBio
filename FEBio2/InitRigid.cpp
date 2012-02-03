@@ -261,32 +261,37 @@ bool FEM::CreateRigidBodies()
 	}
 
 	// set up rigid joints
-	if (!m_RJ.empty())
+	if (!m_NLC.empty())
 	{
 		FERigidMaterial* pm;
-		for (i=0; i<(int) m_RJ.size(); ++i)
+		int NC = m_NLC.size();
+		for (i=0; i<NC; ++i)
 		{
-			FERigidJoint& rj = *m_RJ[i];
-			rj.m_F = vec3d(0,0,0);
-
-			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
-			if (pm == 0)
+			FENLConstraint* plc = m_NLC[i];
+			if (plc->Type() == FE_RIGID_JOINT)
 			{
-				clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
-				return false;
-			}
-			rj.m_nRBa = pm->m_nRB;
+				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
+				rj.m_F = vec3d(0,0,0);
 
-			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBb));
-			if (pm == 0)
-			{
-				clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
-				return false;
-			}
-			rj.m_nRBb = pm->m_nRB;
+				pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
+				if (pm == 0)
+				{
+					clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+					return false;
+				}
+				rj.m_nRBa = pm->m_nRB;
 
-			rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;
-			rj.m_qb0 = rj.m_q0 - m_RB[ rj.m_nRBb ].m_r0;
+				pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBb));
+				if (pm == 0)
+				{
+					clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+					return false;
+				}
+				rj.m_nRBb = pm->m_nRB;
+
+				rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;
+				rj.m_qb0 = rj.m_q0 - m_RB[ rj.m_nRBb ].m_r0;
+			}
 		}
 	}
 

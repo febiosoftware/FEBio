@@ -513,15 +513,20 @@ bool FEM::Reset()
 	}
 
 	// set up rigid joints
-	if (!m_RJ.empty())
+	if (!m_NLC.empty())
 	{
-		for (i=0; i<(int) m_RJ.size(); ++i)
+		int NC = (int) m_NLC.size();
+		for (i=0; i<NC; ++i)
 		{
-			FERigidJoint& rj = *m_RJ[i];
-			rj.m_F = vec3d(0,0,0);
+			FENLConstraint* plc = m_NLC[i];
+			if (plc->Type() == FE_RIGID_JOINT)
+			{
+				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
+				rj.m_F = vec3d(0,0,0);
 
-			rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;
-			rj.m_qb0 = rj.m_q0 - m_RB[ rj.m_nRBb ].m_r0;
+				rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;
+				rj.m_qb0 = rj.m_q0 - m_RB[ rj.m_nRBb ].m_r0;
+			}
 		}
 	}
 

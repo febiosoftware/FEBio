@@ -384,21 +384,25 @@ void echo_input(FEM& fem)
 		clog.printf("\n\n");
 	}
 
-	if (!fem.m_RJ.empty())
+	if (fem.NonlinearConstraints() != 0)
 	{
-		clog.printf(" RIGID JOINT DATA\n");
+		clog.printf(" NONLINEAR CONSTRAINT DATA\n");
 		clog.printf("===========================================================================\n");
-		for (i=0; i<(int) fem.m_RJ.size(); ++i)
+		int NC = fem.NonlinearConstraints();
+		for (i=0; i<NC; ++i)
 		{
-			if (i>0) clog.printf("---------------------------------------------------------------------------\n");
-
-			FERigidJoint& rj = *fem.m_RJ[i];
-			clog.printf("rigid joint %d:\n", i+1);
-			clog.printf("\tRigid body A                   : %d\n", fem.m_RB[rj.m_nRBa].m_mat + 1);
-			clog.printf("\tRigid body B                   : %d\n", fem.m_RB[rj.m_nRBb].m_mat + 1);
-			clog.printf("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
-			clog.printf("\tPenalty factor                 : %lg\n", rj.m_eps );
-			clog.printf("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
+			FENLConstraint* plc = fem.NonlinearConstraint(i);
+			if (plc->Type() == FE_RIGID_JOINT)
+			{
+				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
+				clog.printf("rigid joint %d:\n", i+1);
+				clog.printf("\tRigid body A                   : %d\n", fem.m_RB[rj.m_nRBa].m_mat + 1);
+				clog.printf("\tRigid body B                   : %d\n", fem.m_RB[rj.m_nRBb].m_mat + 1);
+				clog.printf("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
+				clog.printf("\tPenalty factor                 : %lg\n", rj.m_eps );
+				clog.printf("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);
+				clog.printf("---------------------------------------------------------------------------\n");
+			}
 		}
 		clog.printf("\n\n");
 	}

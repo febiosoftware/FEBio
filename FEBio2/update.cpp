@@ -317,29 +317,34 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	}
 
 	// update rigid joints
-	if (!fem.m_RJ.empty())
+	if (fem.NonlinearConstraints() != 0)
 	{
 		vec3d c, ra, rb, qa, qb;
 
-		for (i=0; i<(int) fem.m_RJ.size(); ++i)
+		int NC = fem.NonlinearConstraints();
+		for (i=0; i<NC; ++i)
 		{
-			FERigidJoint& rj = *fem.m_RJ[i];
+			FENLConstraint* plc = fem.NonlinearConstraint(i);
+			if (plc->Type() == FE_RIGID_JOINT)
+			{
+				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
 
-			FERigidBody& RBa = fem.m_RB[ rj.m_nRBa ];
-			FERigidBody& RBb = fem.m_RB[ rj.m_nRBb ];
+				FERigidBody& RBa = fem.m_RB[ rj.m_nRBa ];
+				FERigidBody& RBb = fem.m_RB[ rj.m_nRBb ];
 
-			ra = RBa.m_rt;
-			rb = RBb.m_rt;
+				ra = RBa.m_rt;
+				rb = RBb.m_rt;
 
-			qa = rj.m_qa0;
-			RBa.m_qt.RotateVector(qa);
+				qa = rj.m_qa0;
+				RBa.m_qt.RotateVector(qa);
 
-			qb = rj.m_qb0;
-			RBb.m_qt.RotateVector(qb);
+				qb = rj.m_qb0;
+				RBb.m_qt.RotateVector(qb);
 
-			c = ra + qa - rb - qb;
+				c = ra + qa - rb - qb;
 
-			rj.m_F = rj.m_L + c*rj.m_eps;
+				rj.m_F = rj.m_L + c*rj.m_eps;
+			}
 		}
 	}
 }

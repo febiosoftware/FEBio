@@ -172,9 +172,6 @@ public:
 	//{
 		// rigid body data
 		vector<FERigidBody>		m_RB;	//!< rigid body array
-
-		// rigid joints
-		vector<FERigidJoint*>		m_RJ;	//!< rigid joint array
 	//}
 
 public:

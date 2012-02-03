@@ -93,7 +93,6 @@ FEM::~FEM()
 {
 	size_t i;
 	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
-	for (i=0; i<m_RJ.size  (); ++i) delete m_RJ [i] ; m_RJ.clear  ();
 	for (i=0; i<m_CI.size  (); ++i) delete m_CI [i] ; m_CI.clear  ();
 	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
 	for (i=0; i<m_LC.size  (); ++i) delete m_LC [i] ; m_LC.clear  ();
@@ -132,7 +131,8 @@ void FEM::PopState()
 // This function is used when pushing the FEM state data. Since we don't need
 // to copy all the data, this function only copies the data that needs to be 
 // restored for a running restart.
-//
+
+// TODO: Shallow copy nonlinear constraints
 void FEM::ShallowCopy(FEM& fem)
 {
 	int i;
@@ -145,14 +145,6 @@ void FEM::ShallowCopy(FEM& fem)
 
 	// copy rigid body data
 	m_RB = fem.m_RB;
-
-	// copy rigid joint data
-	if (m_RJ.empty())
-	{
-		for (i=0; i<(int) fem.m_RJ.size(); ++i) m_RJ.push_back(new FERigidJoint(this));
-	}
-	assert(m_RJ.size() == fem.m_RJ.size());
-	for (i=0; i<(int) m_RJ.size(); ++i) m_RJ[i]->ShallowCopy(*fem.m_RJ[i]);
 
 	// copy contact data
 	if (m_CI.empty())

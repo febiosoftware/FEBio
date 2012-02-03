@@ -4214,7 +4214,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		while (!tag.isend());
 		prj->m_nRBa--;
 		prj->m_nRBb--;
-		fem.m_RJ.push_back(prj);
+		fem.AddNonlinearConstraint(prj);
 	}
 	else if (strcmp(szt, "linear constraint") == 0)
 	{
@@ -4801,7 +4801,7 @@ void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 	while (!tag.isend());
 	prj->m_nRBa--;
 	prj->m_nRBb--;
-	fem.m_RJ.push_back(prj);
+	fem.AddNonlinearConstraint(prj);
 }
 
 //-----------------------------------------------------------------------------

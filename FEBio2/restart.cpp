@@ -371,7 +371,7 @@ void FEM::SerializeMaterials(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-
+// TODO: serialize nonlinear constraints
 void FEM::SerializeGeometry(DumpFile &ar)
 {
 	// serialize the mesh first 
@@ -386,11 +386,6 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		int nrb = m_RB.size();
 		ar << nrb;
 		for (i=0; i<nrb; ++i) m_RB[i].Serialize(ar);
-
-		// rigid joints
-		int nrj = (int) m_RJ.size();
-		ar << nrj;
-		for (i=0; i<nrj; ++i) m_RJ[i]->Serialize(ar);	
 	}
 	else
 	{
@@ -405,16 +400,6 @@ void FEM::SerializeGeometry(DumpFile &ar)
 			FERigidBody& rb = m_RB[i];
 			rb.Serialize(ar);
 			rb.AttachToFEM(this);
-		}
-
-		// rigid joints
-		int nrj;
-		ar >> nrj;
-		for (i=0; i<nrj; ++i)
-		{
-			FERigidJoint* prj = new FERigidJoint(this);
-			prj->Serialize(ar);
-			m_RJ.push_back(prj);
 		}
 	}
 }

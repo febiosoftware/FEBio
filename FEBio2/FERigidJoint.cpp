@@ -10,7 +10,7 @@
 #include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
-BEGIN_PARAMETER_LIST(FERigidJoint, FEParamContainer);
+BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
 	ADD_PARAMETER(m_atol, FE_PARAM_DOUBLE, "tolerance");
 	ADD_PARAMETER(m_eps , FE_PARAM_DOUBLE, "penalty"  );
 	ADD_PARAMETER(m_nRBa, FE_PARAM_INT   , "body_a"   );
@@ -19,27 +19,41 @@ BEGIN_PARAMETER_LIST(FERigidJoint, FEParamContainer);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidJoint::FERigidJoint(FEM* pfem)
+FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem, FE_RIGID_JOINT)
 {
 	static int count = 1;
-	m_pfem = pfem;
 	m_nID = count++;
 }
 
 //-----------------------------------------------------------------------------
-FERigidJoint::~FERigidJoint()
+//! create a shallow copy
+void FERigidJoint::ShallowCopy(FERigidJoint& rj)
 {
-	m_pfem = 0;
+	m_nRBa = rj.m_nRBa;
+	m_nRBb = rj.m_nRBb;
+
+	m_q0  = rj.m_q0;
+	m_qa0 = rj.m_qa0;
+	m_qb0 = rj.m_qb0;
+
+	m_F = rj.m_F;
+	m_L = rj.m_L;
+
+	m_eps  = rj.m_eps;
+	m_atol = rj.m_atol;
 }
 
 //-----------------------------------------------------------------------------
-void FERigidJoint::JointForces(vector<double>& R)
+// TODO: Why is this class not using the FENLSolver for assembly?
+void FERigidJoint::Residual(FENLSolver* psolver, vector<double>& R)
 {
 	int i;
 	double fe[6];
 
-	FERigidBody& RBa = m_pfem->m_RB[m_nRBa];
-	FERigidBody& RBb = m_pfem->m_RB[m_nRBb];
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+
+	FERigidBody& RBa = fem.m_RB[m_nRBa];
+	FERigidBody& RBb = fem.m_RB[m_nRBb];
 
 	vec3d a = m_qa0;
 	RBa.m_qt.RotateVector(a);
@@ -69,9 +83,12 @@ void FERigidJoint::JointForces(vector<double>& R)
 }
 
 //-----------------------------------------------------------------------------
-void FERigidJoint::JointStiffness()
+// TODO: Why is this class not using the FENLSolver for assembly?
+void FERigidJoint::StiffnessMatrix(FENLSolver* pnls)
 {
 	int j, k;
+
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 
 	vector<int> LM(12);
 	matrix ke(12,12);
@@ -80,8 +97,8 @@ void FERigidJoint::JointStiffness()
 
 	double y1[3][3], y2[3][3], y11[3][3], y12[3][3], y22[3][3];
 
-	FERigidBody& RBa = m_pfem->m_RB[m_nRBa];
-	FERigidBody& RBb = m_pfem->m_RB[m_nRBb];
+	FERigidBody& RBa = fem.m_RB[m_nRBa];
+	FERigidBody& RBb = fem.m_RB[m_nRBb];
 
 	a = m_qa0;
 	RBa.m_qt.RotateVector(a);
@@ -183,14 +200,16 @@ void FERigidJoint::JointStiffness()
 }
 
 //-----------------------------------------------------------------------------
-bool FERigidJoint::Augment()
+bool FERigidJoint::Augment(int naug)
 {
 	vec3d ra, rb, qa, qb, c,  Lm;
 	double normF0, normF1;
 	bool bconv = true;
 
-	FERigidBody& RBa = m_pfem->m_RB[m_nRBa];
-	FERigidBody& RBb = m_pfem->m_RB[m_nRBb];
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+
+	FERigidBody& RBa = fem.m_RB[m_nRBa];
+	FERigidBody& RBb = fem.m_RB[m_nRBb];
 
 	ra = RBa.m_rt;
 	rb = RBb.m_rt;

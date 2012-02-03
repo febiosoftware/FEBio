@@ -1,6 +1,7 @@
 #pragma once
 #include "FENLSolver.h"
 #include "DumpFile.h"
+#include "FEParameterList.h"
 #include <vector>
 using namespace std;
 
@@ -8,7 +9,8 @@ using namespace std;
 // types of nonlinear constraints
 enum FENLConstraint_Type {
 	FE_POINT_CONSTRAINT,
-	FE_LINEAR_CONSTRAINT
+	FE_LINEAR_CONSTRAINT,
+	FE_RIGID_JOINT
 };
 
 //-----------------------------------------------------------------------------
@@ -21,7 +23,7 @@ class FEModel;
 //! The constraint must provide a residual (force) contribution, its stiffness matrix
 //! and an augmentation function.
 //!
-class FENLConstraint
+class FENLConstraint : public FEParamContainer
 {
 public:
 	FENLConstraint(FEModel* pfem, int ntype) : m_pfem(pfem), m_ntype(ntype) {}
