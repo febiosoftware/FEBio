@@ -273,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\ElementDataRecord.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\elstf.cpp"
 				>
 			</File>
@@ -449,6 +453,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\NodeDataRecord.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\optimize.cpp"
 				>
 			</File>
@@ -466,6 +474,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\restart.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\RigidBodyDataRecord.cpp"
 				>
 			</File>
 			<File
@@ -504,6 +516,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\DataStore.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\ElementDataRecord.h"
 				>
 			</File>
 			<File
@@ -643,11 +659,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\NodeDataRecord.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\plugin.h"
 				>
 			</File>
 			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\RigidBodyDataRecord.h"
 				>
 			</File>
 			<File

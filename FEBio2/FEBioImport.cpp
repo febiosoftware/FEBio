@@ -51,6 +51,9 @@
 #include "FEBioLib/FEHeatTransferMaterial.h"
 #include "FEBioLib/FEPointConstraint.h"
 #include "FEBioLib/FEAugLagLinearConstraint.h"
+#include "NodeDataRecord.h"
+#include "ElementDataRecord.h"
+#include "RigidBodyDataRecord.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------

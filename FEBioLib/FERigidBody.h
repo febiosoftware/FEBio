@@ -56,7 +56,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! rigid body class
-
+// TODO: perhaps the rigid body should store a list of domains it uses
 class FERigidBody  
 {
 public:
