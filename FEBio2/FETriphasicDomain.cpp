@@ -900,6 +900,8 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	bool bsymm = fem.m_bsym_poro;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// element stiffness matrix
 	matrix ke;
@@ -928,7 +930,7 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementTriphasicStiffness(fem, el, ke);
+		ElementTriphasicStiffness(el, ke, bsymm, dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -955,6 +957,8 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	bool bsymm = fem.m_bsym_poro;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// element stiffness matrix
 	matrix ke;
@@ -983,7 +987,7 @@ void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver)
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementTriphasicStiffnessSS(fem, el, ke);
+		ElementTriphasicStiffnessSS(el, ke, bsymm, dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -1009,9 +1013,8 @@ void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FETriphasicDomain::ElementTriphasicStiffness(FEModel& mdl, FESolidElement& el, matrix& ke)
+bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
-	FEM& fem = dynamic_cast<FEM&>(mdl);
 	int i, j, n;
 	
 	int nint = el.GaussPoints();
@@ -1032,7 +1035,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FEModel& mdl, FESolidElement& 
 	// gauss-weights
 	double* gw = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	
 	vec3d r0[8], rt[8], rp[8], v[8];
 	double cp[2][8];
@@ -1052,7 +1055,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FEModel& mdl, FESolidElement& 
 	// calculate solid stiffness matrix
 	int ndof = 3*el.Nodes();
 	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(fem, el, ks);
+	SolidElementStiffness(el, ks);
 	
 	// copy solid stiffness matrix into ke
 	for (i=0; i<neln; ++i)
@@ -1064,16 +1067,12 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FEModel& mdl, FESolidElement& 
 		}
 	
 	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (fem.GetMaterial(el.GetMatID()));
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
-	
-	// check if we use the symmetric version of the poro-implementation
-	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1515,7 +1514,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FEModel& mdl, FESolidElement& 
 //! for steady-state response (zero solid velocity, zero time derivative of
 //! solute concentration)
 //!
-bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke)
+bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
 	int i, j, n;
 	
@@ -1537,7 +1536,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el
 	// gauss-weights
 	double* gw = el.GaussWeights();
 	
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = *GetMesh();
 	
 	vec3d r0[8], rt[8], rp[8], v[8];
 	double cp[2][8];
@@ -1557,7 +1556,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el
 	// calculate solid stiffness matrix
 	int ndof = 3*el.Nodes();
 	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(fem, el, ks);
+	SolidElementStiffness(el, ks);
 	
 	// copy solid stiffness matrix into ke
 	for (i=0; i<neln; ++i)
@@ -1569,16 +1568,12 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el
 		}
 	
 	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (fem.GetMaterial(el.GetMatID()));
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat);
 	if (pm == 0)
 	{
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
-	
-	// check if we use the symmetric version of the poro-implementation
-	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1951,10 +1946,10 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FETriphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FETriphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
-	ElementTriphasicMaterialStiffness(fem, el, ke);
+	ElementTriphasicMaterialStiffness(el, ke);
 	
 	// calculate geometrical stiffness (inherited from FEElasticSolidDomain)
 	ElementGeometricalStiffness(el, ke);
@@ -1972,10 +1967,8 @@ void FETriphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matr
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FETriphasicDomain::ElementTriphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FETriphasicDomain::ElementTriphasicMaterialStiffness(FESolidElement &el, matrix &ke)
 {
-	assert(fem.GetCurrentStep()->GetType() == FE_TRIPHASIC);
-	
 	int i, i3, j, j3, n;
 	
 	// Get the current element's data
@@ -2013,7 +2006,7 @@ void FETriphasicDomain::ElementTriphasicMaterialStiffness(FEM& fem, FESolidEleme
 	const double *gw = el.GaussWeights();
 	
 	// see if this is a biphasic-solute material
-	FETriphasic* pmat = dynamic_cast<FETriphasic*>(fem.GetMaterial(el.GetMatID()));
+	FETriphasic* pmat = dynamic_cast<FETriphasic*>(m_pMat);
 	assert(pmat);
 	
 	// calculate element stiffness matrix

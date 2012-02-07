@@ -871,6 +871,8 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	bool bsymm = fem.m_bsym_poro;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// element stiffness matrix
 	matrix ke;
@@ -898,7 +900,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicSoluteStiffness(fem, el, ke);
+		ElementBiphasicSoluteStiffness(el, ke, bsymm, dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -926,6 +928,8 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	bool bsymm = fem.m_bsym_poro;
+	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// element stiffness matrix
 	matrix ke;
@@ -953,7 +957,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver)
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicSoluteStiffnessSS(fem, el, ke);
+		ElementBiphasicSoluteStiffnessSS(el, ke, bsymm, dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -978,7 +982,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
 	int i, j, n;
 	
@@ -1018,7 +1022,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 	// calculate solid stiffness matrix
 	int ndof = 3*el.Nodes();
 	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(fem, el, ks);
+	SolidElementStiffness(el, ks);
 	
 	// copy solid stiffness matrix into ke
 	for (i=0; i<neln; ++i)
@@ -1036,10 +1040,6 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
-	
-	// check if we use the symmetric version of the poro-implementation
-	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1282,7 +1282,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FEM& fem, FESolidEle
 //! for steady-state response (zero solid velocity, zero time derivative of
 //! solute concentration)
 //!
-bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke)
+bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
 	int i, j, n;
 	
@@ -1309,7 +1309,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 	// calculate solid stiffness matrix
 	int ndof = 3*el.Nodes();
 	matrix ks(ndof, ndof); ks.zero();
-	SolidElementStiffness(fem, el, ks);
+	SolidElementStiffness(el, ks);
 	
 	// copy solid stiffness matrix into ke
 	for (i=0; i<neln; ++i)
@@ -1327,10 +1327,6 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
-	
-	// check if we use the symmetric version of the poro-implementation
-	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1507,10 +1503,10 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidE
 //! the upper diagonal matrix due to the symmetry of the element stiffness matrix
 //! The last section of this function fills the rest of the element stiffness matrix.
 
-void FEBiphasicSoluteDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke)
+void FEBiphasicSoluteDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 {
 	// calculate material stiffness (i.e. constitutive component)
-	ElementBiphasicSoluteMaterialStiffness(fem, el, ke);
+	ElementBiphasicSoluteMaterialStiffness(el, ke);
 	
 	// calculate geometrical stiffness (inherited from FEElasticSolidDomain)
 	ElementGeometricalStiffness(el, ke);
@@ -1528,10 +1524,8 @@ void FEBiphasicSoluteDomain::SolidElementStiffness(FEM& fem, FESolidElement& el,
 //-----------------------------------------------------------------------------
 //! Calculates element material stiffness element matrix
 
-void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
+void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidElement &el, matrix &ke)
 {
-	assert(fem.GetCurrentStep()->GetType() == FE_POROSOLUTE);
-	
 	int i, i3, j, j3, n;
 	
 	// Get the current element's data

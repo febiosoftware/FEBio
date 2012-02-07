@@ -59,10 +59,10 @@ public:
 	bool ElementInternalFluidWorkSS(FESolidElement& elem, vector<double>& fe, double dt);
 	
 	//! calculates the element biphasic stiffness matrix
-	bool ElementBiphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke, double dt);
+	bool ElementBiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt);
 	
 	//! calculates the element biphasic stiffness matrix for steady-state response
-	bool ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke, double dt);
+	bool ElementBiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt);
 	
 	//! calculates the solid element stiffness matrix
 	void SolidElementStiffness(FESolidElement& el, matrix& ke);

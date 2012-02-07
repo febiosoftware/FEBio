@@ -41,11 +41,11 @@ public:
 	void UpdateStresses(FEModel& fem);
 
 	//! return element stiffness matrix
-	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {
+/*	void ElementStiffness(int iel, matrix& ke) {
 		FESolidElement& el = Element(iel);
-		ElementTriphasicStiffness(fem, el, ke);
+		ElementTriphasicStiffness(el, ke);
 	}
-
+*/
 public:
 	// internal fluid work
 	void InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt);
@@ -74,15 +74,15 @@ public:
 	bool ElementInternalSoluteWorkSS(FESolidElement& elem, vector<double>& fe, double dt, const int ion);
 	
 	//! calculates the element triphasic stiffness matrix
-	bool ElementTriphasicStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+	bool ElementTriphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt);
 	
 	//! calculates the element triphasic stiffness matrix
-	bool ElementTriphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);
+	bool ElementTriphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt);
 	
 	//! calculates the solid element stiffness matrix for steady-state response
-	void SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void SolidElementStiffness(FESolidElement& el, matrix& ke);
 	
 	//! material stiffness component
-	void ElementTriphasicMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ElementTriphasicMaterialStiffness(FESolidElement& el, matrix& ke);
 	
 };

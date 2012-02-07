@@ -503,6 +503,7 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	double dt = fem.GetCurrentStep()->m_dt;
+	bool bsymm = fem.m_bsym_poro;
 	
 	// element stiffness matrix
 	matrix ke;
@@ -526,7 +527,7 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicStiffness(fem, el, ke, dt);
+		ElementBiphasicStiffness(el, ke, bsymm, dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -555,6 +556,7 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	double dt = fem.GetCurrentStep()->m_dt;
+	bool bsymm = fem.m_bsym_poro;
 	
 	// element stiffness matrix
 	matrix ke;
@@ -578,7 +580,7 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver)
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicStiffnessSS(fem, el, ke, dt);
+		ElementBiphasicStiffnessSS(el, ke, bsymm, dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -605,9 +607,8 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 //! calculates element stiffness matrix for element iel
 //!
-bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElement& el, matrix& ke, double dt)
+bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
-	FEM& fem = dynamic_cast<FEM&>(mdl);
 	int i, j, n;
 	
 	int nint = el.GaussPoints();
@@ -662,9 +663,6 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElemen
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
-	
-	// check if we use the symmetric version of the poro-implementation
-	bool bsymm = fem.m_bsym_poro;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -807,7 +805,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FEModel& mdl, FESolidElemen
 //! calculates element stiffness matrix for element iel
 //! for the steady-state response (zero solid velocity)
 //!
-bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke, double dt)
+bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
 	int i, j, n;
 	
@@ -852,9 +850,6 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FEM& fem, FESolidElement&
 		clog.printbox("FATAL ERROR", "Incorrect material type\n");
 		return false;
 	}
-	
-	// check if we use the symmetric version of the poro-implementation
-	bool bsymm = fem.m_bsym_poro;
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)

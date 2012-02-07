@@ -67,14 +67,14 @@ protected:
 	bool ElementInternalSoluteWorkSS(FESolidElement& elem, vector<double>& fe, double dt);
 	
 	//! calculates the element solute-poroelastic stiffness matrix
-	bool ElementBiphasicSoluteStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	bool ElementBiphasicSoluteStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt);
 
 	//! calculates the element solute-poroelastic stiffness matrix
-	bool ElementBiphasicSoluteStiffnessSS(FEM& fem, FESolidElement& el, matrix& ke);
+	bool ElementBiphasicSoluteStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt);
 	
 	//! calculates the solid element stiffness matrix for steady-state response
-	void SolidElementStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void SolidElementStiffness(FESolidElement& el, matrix& ke);
 	
 	//! material stiffness component
-	void ElementBiphasicSoluteMaterialStiffness(FEM& fem, FESolidElement& el, matrix& ke);
+	void ElementBiphasicSoluteMaterialStiffness(FESolidElement& el, matrix& ke);
 };
