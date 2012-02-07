@@ -3,6 +3,7 @@
 #include "fem.h"
 #include "FECore/FENodeReorder.h"
 #include "FEBioLib/FERigid.h"
+#include "FEBioLib/FE3FieldElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! FESolidSolver Construction
@@ -210,4 +211,47 @@ bool FESolidSolver::InitEquations()
 
 	// All initialization is done
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//!  This functions performs the Lagrange augmentations
+//!  It returns true if all the augmentation have converged, 
+//!	otherwise it returns false
+//
+// TODO: There is an inherent problem with this approach. Since
+//  Lagrangian multipliers are inherited from previous timesteps
+//  they might not be zero in case a node-surface contact breaks. 
+//  The node's gap value needs to become negative to a certain value
+//  before the Lagr. multipliers dissapears. 
+//
+bool FESolidSolver::Augment()
+{
+	// Assume we will pass (can't hurt to be optimistic)
+	bool bconv = true;
+
+	// Do contact augmentations
+	if (m_fem.ContactInterfaces() > 0)
+	{
+		// loop over all contact interfaces
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.ContactInterface(i)->Augment(m_naug) && bconv;
+	}
+
+	// do nonlinear constraint augmentations
+	int n = m_fem.NonlinearConstraints();
+	for (int i=0; i<n; ++i) 
+	{
+		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
+		bconv = plc->Augment(m_naug) && bconv;
+	}
+
+	// do incompressibility multipliers for 3Field domains
+	FEMesh& mesh = m_fem.GetMesh();
+	int ND = mesh.Domains();
+	for (int i=0; i<ND; ++i)
+	{
+		FE3FieldElasticSolidDomain* pd = dynamic_cast<FE3FieldElasticSolidDomain*>(&mesh.Domain(i));
+		if (pd) bconv = (pd->Augment() && bconv);
+	}
+
+	return bconv;
 }
