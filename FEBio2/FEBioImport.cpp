@@ -73,8 +73,7 @@ FEBioFileSectionMap::~FEBioFileSectionMap()
 }
 
 //=============================================================================
-// FUNCTION : FEFEBioImport::Load
-//  Imports an XML input file.
+//  The FEBioImport class imports an XML formatted FEBio input file.
 //  The actual file is parsed using the XMLReader class.
 //
 bool FEFEBioImport::Load(FEM& fem, const char* szfile)
@@ -89,23 +88,10 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 	// keep a pointer to the fem object
 	m_pfem = &fem;
 
-	// Create one step
-	if (fem.Steps() == 0)
-	{
-		FEAnalysisStep* pstep = new FEAnalysisStep(fem);
-		fem.AddStep(pstep);
-		fem.m_nStep = 0;
-		fem.SetCurrentStep(pstep);
-	}
-	assert(fem.GetCurrentStep());
-
-	// get a pointer to the first step
-	// since we assume that the FEM object will always have
-	// at least one step defined
-	int nsteps = fem.Steps();
-	assert(nsteps > 0);
-	m_pStep = fem.GetStep(nsteps-1);
-	m_nsteps = 0; // reset step section counter
+	// intialize some variables
+	m_pStep = 0;	// zero step pointer
+	m_nsteps = 0;	// reset step section counter
+	m_nstep_type = FE_SOLID;	// default step type in case Module section is not defined
 	m_nversion = -1;
 
 	// default element type
@@ -128,7 +114,7 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 		return false;
 	}
 
-	// loop over all child tags
+	// parse the file
 	try
 	{
 		// get the version number
@@ -303,6 +289,41 @@ bool FEFEBioImport::Load(FEM& fem, const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
+FEAnalysis* FEFEBioImport::GetStep()
+{
+	if (m_pStep == 0)
+	{
+		m_pStep = CreateNewStep();
+		m_pfem->AddStep(m_pStep);	
+		if (m_pfem->Steps() == 1) 
+		{
+			m_pfem->SetCurrentStep(m_pStep);
+			m_pfem->m_nStep = 0;
+		}
+	}
+	return m_pStep;
+}
+
+//-----------------------------------------------------------------------------
+FEAnalysis* FEFEBioImport::CreateNewStep()
+{
+	FEAnalysis* pstep = 0;
+	switch (m_nstep_type)
+	{
+	case FE_SOLID       : pstep = new FESolidAnalysis         (*m_pfem); break;
+	case FE_LINEAR_SOLID: pstep = new FELinearSolidAnalysis   (*m_pfem); break;
+	case FE_BIPHASIC    : pstep = new FEBiphasicAnalysis      (*m_pfem); break;
+	case FE_POROSOLUTE  : pstep = new FEBiphasicSoluteAnalysis(*m_pfem); break;
+	case FE_TRIPHASIC   : pstep = new FETriphasicAnalysis     (*m_pfem); break;
+	case FE_HEAT        : pstep = new FEHeatTransferAnalysis  (*m_pfem); break;
+	case FE_HEAT_SOLID  : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
+	default:
+		assert(false);
+	}
+	return pstep;
+}
+
+//-----------------------------------------------------------------------------
 //! This function parses the febio_spec tag for the version number
 void FEFEBioImport::ParseVersion(XMLTag &tag)
 {
@@ -420,22 +441,17 @@ void FEBioImportSection::Parse(XMLTag &tag)
 //!
 void FEBioModuleSection::Parse(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
-	FEAnalysisStep* pstep = GetStep();
-
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
 
-	assert(pstep && (pstep->m_psolver == 0));
-
-	if      (strcmp(szt, "solid"       ) == 0) pstep->SetType(FE_SOLID);
-	else if (strcmp(szt, "linear solid") == 0) pstep->SetType(FE_LINEAR_SOLID); 
-	else if (strcmp(szt, "poro"        ) == 0) pstep->SetType(FE_BIPHASIC);		// obsolete in 2.0
-	else if (strcmp(szt, "biphasic"    ) == 0) pstep->SetType(FE_BIPHASIC);
-	else if (strcmp(szt, "solute"      ) == 0) pstep->SetType(FE_POROSOLUTE);
-	else if (strcmp(szt, "triphasic"   ) == 0) pstep->SetType(FE_TRIPHASIC);
-	else if (strcmp(szt, "heat"        ) == 0) pstep->SetType(FE_HEAT);
-	else if (strcmp(szt, "heat-solid"  ) == 0) pstep->SetType(FE_HEAT_SOLID);
+	if      (strcmp(szt, "solid"       ) == 0) m_pim->m_nstep_type = FE_SOLID;
+	else if (strcmp(szt, "linear solid") == 0) m_pim->m_nstep_type = FE_LINEAR_SOLID; 
+	else if (strcmp(szt, "poro"        ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;		// obsolete in 2.0
+	else if (strcmp(szt, "biphasic"    ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;
+	else if (strcmp(szt, "solute"      ) == 0) m_pim->m_nstep_type = FE_POROSOLUTE;
+	else if (strcmp(szt, "triphasic"   ) == 0) m_pim->m_nstep_type = FE_TRIPHASIC;
+	else if (strcmp(szt, "heat"        ) == 0) m_pim->m_nstep_type = FE_HEAT;
+	else if (strcmp(szt, "heat-solid"  ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 }
 
@@ -445,6 +461,7 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 //
 //=============================================================================
 
+//-----------------------------------------------------------------------------
 FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
 {
 	switch (nmod)
@@ -462,6 +479,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
 	}
 }
 
+//-----------------------------------------------------------------------------
 void FEBioControlSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
@@ -1150,12 +1168,13 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysisStep* pStep = GetStep();
 
 	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
 	else if (tag == "parent_id") { tag.value(pm->m_pmid); return true; }
 	else if (m_pim->Version() <= 0x0100)
 	{
+		FEAnalysisStep* pStep = GetStep();
+
 		// The following tags are only allowed in older version of FEBio
 		// Newer versions defined the rigid body constraints in the Constraints section
 		if (strncmp(tag.Name(), "trans_", 6) == 0)
@@ -2086,7 +2105,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	}
 
 	// open temperature dofs for heat-transfer problems
-	if (fem.GetCurrentStep()->GetType() == FE_HEAT)
+	if (m_pim->m_nstep_type == FE_HEAT)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
@@ -2098,7 +2117,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 
 	// open temperature and displacement dofs 
 	// for coupled heat-solid problems
-	if (fem.GetCurrentStep()->GetType() == FE_HEAT_SOLID)
+	if (m_pim->m_nstep_type == FE_HEAT_SOLID)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
@@ -2132,19 +2151,20 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 {
 	FEM& fem = *GetFEM();
 	FEMesh* pm = &fem.m_mesh;
+	int ntype = m_pim->m_nstep_type;
 
 	// get the module
-	if (fem.GetCurrentStep()->GetType() == FE_HEAT)
+	if (ntype == FE_HEAT)
 	{
 		if ((etype == ET_HEX) || (etype == ET_HEX20) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
-	else if (fem.GetCurrentStep()->GetType() == FE_LINEAR_SOLID)
+	else if (ntype == FE_LINEAR_SOLID)
 	{
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_LINEAR_SOLID_DOMAIN;
 		else return 0;
 	}
-	else if (fem.GetCurrentStep()->GetType() == FE_HEAT_SOLID)
+	else if (ntype == FE_HEAT_SOLID)
 	{
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET))
 		{
@@ -5241,8 +5261,12 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 void FEBioLoadDataSection::Parse(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysisStep* pstep = GetStep();
-	int nmplc = pstep->m_nmplc;
+	int nmplc = -1;
+	if (m_pim->Version() <= 0x0100)
+	{
+		FEAnalysisStep* pstep = GetStep();
+		nmplc = pstep->m_nmplc;
+	}
 
 	++tag;
 	do
@@ -5583,7 +5607,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 {
 	FEM& fem = *GetFEM();
-	FEAnalysisStep* pStep = GetStep();
+	FEAnalysisStep* pStep = (m_pim->m_nsteps > 0 ? GetStep() : 0);
 
 	const char* szm = tag.AttributeValue("mat");
 	assert(szm);
@@ -5746,19 +5770,8 @@ void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
 
 void FEBioStepSection::Parse(XMLTag& tag)
 {
-	// We assume that the FEM object will already have at least one step
-	// defined. Therefor the first time we find a "step" section we
-	// do not create a new step. If more steps are required
-	// we need to create new FEAnalysisStep steps and add them to fem
-	if (m_pim->m_nsteps != 0)
-	{
-		// copy the module ID
-		assert(m_pim->m_pStep);
-		int nmod = m_pim->m_pStep->GetType();
-		m_pim->m_pStep = new FEAnalysisStep(*m_pim->m_pfem);
-		m_pim->m_pfem->AddStep(m_pim->m_pStep);
-		m_pim->m_pStep->SetType(nmod);
-	}
+	// reset the step pointer
+	if (m_pim->m_nsteps != 0) m_pim->m_pStep = 0;
 
 	// increase the step section counter
 	++m_pim->m_nsteps;

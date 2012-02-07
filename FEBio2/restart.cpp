@@ -228,7 +228,13 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 	{
 		// analysis steps
 		ar << (int) m_Step.size();
-		for (int i=0; i<(int) m_Step.size(); ++i) m_Step[i]->Serialize(ar);
+		for (int i=0; i<(int) m_Step.size(); ++i) 
+		{
+			int ntype = m_Step[i]->GetType();
+			ar << ntype;
+			m_Step[i]->Serialize(ar);
+		}
+
 		ar << m_nStep;
 		ar << m_ftime << m_ftime0;
 		ar << m_bsym_poro << m_nplane_strain;
@@ -243,8 +249,8 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		{
 			FEBodyForce* pbf = m_BF[i];
 			int ntype = -1;
-			if (dynamic_cast<FEConstBodyForce*>(pbf)) ntype = FE_CONST_BODY_FORCE;
-			if (dynamic_cast<FENonConstBodyForce*>(pbf)) ntype = FE_NONCONST_BODY_FORCE;
+			if (dynamic_cast<FEConstBodyForce*      >(pbf)) ntype = FE_CONST_BODY_FORCE;
+			if (dynamic_cast<FENonConstBodyForce*   >(pbf)) ntype = FE_NONCONST_BODY_FORCE;
 			if (dynamic_cast<FECentrifugalBodyForce*>(pbf)) ntype = FE_CENTRIFUGAL_BODY_FORCE;
 			assert(ntype);
 			ar << ntype;
@@ -257,11 +263,24 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		FEM* pfem = dynamic_cast<FEM*>(ar.GetFEModel());
 
 		// analysis steps
-		int nsteps;
+		int nsteps, ntype;
 		ar >> nsteps;
 		for (int i=0; i<nsteps; ++i)
 		{
-			FEAnalysisStep* pstep = new FEAnalysisStep(*this);
+			ar >> ntype;
+			FEAnalysisStep* pstep = 0;
+			switch (ntype)
+			{
+			case FE_SOLID       : pstep = new FESolidAnalysis         (*this); break;
+			case FE_BIPHASIC    : pstep = new FEBiphasicAnalysis      (*this); break;
+			case FE_HEAT        : pstep = new FEHeatTransferAnalysis  (*this); break;
+			case FE_POROSOLUTE  : pstep = new FEBiphasicSoluteAnalysis(*this); break;
+			case FE_LINEAR_SOLID: pstep = new FELinearSolidAnalysis   (*this); break;
+			case FE_HEAT_SOLID  : pstep = new FEThermoElasticAnalysis (*this); break;
+			case FE_TRIPHASIC   : pstep = new FETriphasicAnalysis     (*this); break;
+			default:
+				assert(false);
+			}
 			pstep->Serialize(ar);
 			m_Step.push_back(pstep);
 		}

@@ -1,5 +1,6 @@
 #pragma once
 #include "DumpFile.h"
+#include "FECore/FEBoundaryCondition.h"
 #include <vector>
 
 class FEModel;
@@ -11,8 +12,10 @@ class FEDomain;
 class FEAnalysis
 {
 public:
-	FEAnalysis(FEModel& fem) : m_fem(fem) {}
+	//! constructor
+	FEAnalysis(FEModel& fem, int ntype) : m_fem(fem), m_ntype(ntype) {}
 
+	//! destructor
 	virtual ~FEAnalysis(){}
 
 	//! Data initialization
@@ -45,6 +48,13 @@ public:
 
 	//! clear all domains
 	void ClearDomains() { m_Dom.clear(); }
+
+public:
+	//! add a boundary condition to the analysis
+	void AddBoundaryCondition(FEBoundaryCondition* pbc) { m_BC.push_back(pbc); }
+
+	//! return number of boundary conditions
+	int BoundaryConditions() { return (int) m_BC.size(); }
 
 public:
 	//! sets the plot level
@@ -109,7 +119,8 @@ public:
 	//}
 
 protected:
-	std::vector<int>		m_Dom;	//!< list of active domains for this analysis
+	std::vector<int>					m_Dom;	//!< list of active domains for this analysis
+	std::vector<FEBoundaryCondition*>	m_BC;	//!< array of boundary conditions
 
 protected:
 	int		m_ntype;		// step type

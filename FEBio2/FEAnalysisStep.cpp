@@ -18,10 +18,9 @@
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEAnalysisStep::FEAnalysisStep(FEModel& fem) : FEAnalysis(fem)
+FEAnalysisStep::FEAnalysisStep(FEModel& fem, int ntype) : FEAnalysis(fem, ntype)
 {
 	// --- Analysis data ---
-	m_ntype = FE_SOLID;			// solid-mechanics problem
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
 	m_istiffpr = 1;				// use pressure stiffness
 	m_baugment = false;			// no augmentations
@@ -106,6 +105,12 @@ bool FEAnalysisStep::Init()
 		m_nmplc = m_fem.LoadCurves()-1;
 	}
 
+	// For now, add all domains to the analysis step
+	FEMesh& mesh = m_fem.m_mesh;
+	int ndom = mesh.Domains();
+	ClearDomains();
+	for (i=0; i<ndom; ++i) AddDomain(i);
+
 	// activate the boundary conditions
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
 
@@ -139,7 +144,6 @@ bool FEAnalysisStep::Init()
 	}
 
 	// reset nodal ID's
-	FEMesh& mesh = m_fem.m_mesh;
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -347,6 +351,7 @@ bool FEAnalysisStep::Init()
 	if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
 
 	// do one time initialization of solver data
+	if (fem.m_bsym_poro == false) m_psolver->m_bsymm = false;
 	if (m_psolver->Init() == false)
 	{
 		clog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "FECore/FEBoundaryCondition.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENLSolver.h"
@@ -14,7 +13,7 @@ class FEAnalysisStep : public FEAnalysis
 {
 public:
 	//! constructor
-	FEAnalysisStep(FEModel& fem);
+	FEAnalysisStep(FEModel& fem, int ntype = 0);
 
 	//! descructor
 	virtual ~FEAnalysisStep(void);
@@ -31,9 +30,6 @@ public:
 	//! Serialize data from and to a binary archive
 	void Serialize(DumpFile& ar);
 
-	//! add a boundary condition to the analysis
-	void AddBoundaryCondition(FEBoundaryCondition* pbc) { m_BC.push_back(pbc); }
-
 protected:
 	//! Do a running restart
 	void Retry();
@@ -44,7 +40,60 @@ protected:
 public:
 	// --- Control Data ---
 	bool	m_baugment;		//!< use Lagrangian augmentation (TODO: move to solver class?)
+};
 
-	// --- Boundary conditions data ---
-	vector<FEBoundaryCondition*>	m_BC;	//!< array of boundary conditions
+//-----------------------------------------------------------------------------
+//! Analysis class for structural mechanics problems
+class FESolidAnalysis : public FEAnalysisStep
+{
+public:
+	FESolidAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_SOLID) {}
+};
+
+//-----------------------------------------------------------------------------
+//! Analysis class for biphasic problems
+class FEBiphasicAnalysis : public FEAnalysisStep
+{
+public:
+	FEBiphasicAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_BIPHASIC) {}
+};
+
+//-----------------------------------------------------------------------------
+//! Analysis class for biphasic-solute problems
+class FEBiphasicSoluteAnalysis : public FEAnalysisStep
+{
+public:
+	FEBiphasicSoluteAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_POROSOLUTE) {}
+};
+
+//-----------------------------------------------------------------------------
+//! Analysis class for triphasic problems
+class FETriphasicAnalysis : public FEAnalysisStep
+{
+public:
+	FETriphasicAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_TRIPHASIC) {}
+};
+
+//-----------------------------------------------------------------------------
+//! Analysis class for triphasic problems
+class FEHeatTransferAnalysis : public FEAnalysisStep
+{
+public:
+	FEHeatTransferAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_HEAT) {}
+};
+
+//-----------------------------------------------------------------------------
+//! Analysis class for linear elastic problems
+class FELinearSolidAnalysis : public FEAnalysisStep
+{
+public:
+	FELinearSolidAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_LINEAR_SOLID) {}
+};
+
+//-----------------------------------------------------------------------------
+//! Analysis class for linear thermo-elastic problems
+class FEThermoElasticAnalysis : public FEAnalysisStep
+{
+public:
+	FEThermoElasticAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_HEAT_SOLID) {}
 };

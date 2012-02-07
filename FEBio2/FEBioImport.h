@@ -310,13 +310,15 @@ public:
 	bool Load(FEM& fem, const char* szfile);
 
 	FEM* GetFEM() { return m_pfem; }
-	FEAnalysis*	GetStep() { return m_pStep; }
+	FEAnalysis*	GetStep();
 
 	int Version() { return m_nversion; }
 
 	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
 
 	void ReadList(XMLTag& tag, vector<int>& l);
+
+	FEAnalysis* CreateNewStep();
 
 protected:
 	void ParseVersion			(XMLTag& tag);
@@ -329,6 +331,7 @@ public:
 	int	m_ntet4;	// tetrahedral integration rule
 	int	m_nut4;		// integration rule for stabilization of UT4
 	int m_nsteps;	// nr of step sections read
+	int	m_nstep_type;	// step type
 	int	m_nmat;		// nr of materials
 
 	bool	m_b3field;	// three-field element flag
