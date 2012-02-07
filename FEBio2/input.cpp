@@ -131,7 +131,7 @@ void echo_input(FEM& fem)
 	clog.printf(" CONTROL DATA\n");
 	clog.printf("===========================================================================\n");
 	const char* szmod = 0;
-	switch (step.m_nModule)
+	switch (step.GetType())
 	{
 	case FE_SOLID       : szmod = "solid mechanics"; break;
 	case FE_BIPHASIC : szmod = "poroelastic"    ; break;

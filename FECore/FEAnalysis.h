@@ -25,6 +25,12 @@ public:
 	//! Serialize data from and to a binary archive
 	virtual void Serialize(DumpFile& ar) {}
 
+	//! get the step type
+	int GetType () { return m_ntype; }
+
+	//! set the step type
+	void SetType(int ntype) { m_ntype = ntype; }
+
 public:
 	//! sets the plot level
 	void SetPlotLevel(int n) { m_nplot = n; }
@@ -46,7 +52,6 @@ public:
 
 	// --- Control Data ---
 	//{
-		int		m_nModule;		//!< module type
 		int		m_nanalysis;	//!< analysis type
 		int		m_istiffpr;		//!< calculate pressure stiffness (TODO remove)
 	//}
@@ -87,4 +92,7 @@ public:
 		int		m_nplot;	//!< plot level
 		bool	m_bDump;	//!< create a restart file or not
 	//}
+
+protected:
+	int		m_ntype;		// step type
 };

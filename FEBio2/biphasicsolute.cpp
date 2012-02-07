@@ -1530,7 +1530,7 @@ void FEBiphasicSoluteDomain::SolidElementStiffness(FEM& fem, FESolidElement& el,
 
 void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert(fem.GetCurrentStep()->m_nModule == FE_POROSOLUTE);
+	assert(fem.GetCurrentStep()->GetType() == FE_POROSOLUTE);
 	
 	int i, i3, j, j3, n;
 	

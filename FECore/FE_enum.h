@@ -71,9 +71,9 @@ enum FE_Linear_Solver_Type {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// ENUM: Module types
+// ENUM: Step types
 //
-enum FE_Module_Type {
+enum FE_Step_Type {
 	FE_SOLID,
 	FE_BIPHASIC,
 	FE_HEAT,

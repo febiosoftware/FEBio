@@ -85,9 +85,6 @@ void FEBioPlotFile::Dictionary::Defaults(FEModel& mdl)
 	FEM& fem = dynamic_cast<FEM&>(mdl);
 	FEMesh& m = fem.m_mesh;
 
-	int nmode = fem.GetCurrentStep()->m_nModule;
-	int ntype = fem.GetCurrentStep()->m_nanalysis;
-
 	// Define default variables
 	if (m_Node.empty() && m_Elem.empty() && m_Face.empty())
 	{

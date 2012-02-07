@@ -107,7 +107,7 @@ bool FETriphasicSolver::Quasin(double time)
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	
 	// make sure this is poro-solute problem
-	assert(pstep->m_nModule == FE_TRIPHASIC);
+	assert(pstep->GetType() == FE_TRIPHASIC);
 	
 	// prepare for the first iteration
 	PrepStep(time);

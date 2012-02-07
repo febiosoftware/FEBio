@@ -1974,7 +1974,7 @@ void FETriphasicDomain::SolidElementStiffness(FEM& fem, FESolidElement& el, matr
 
 void FETriphasicDomain::ElementTriphasicMaterialStiffness(FEM& fem, FESolidElement &el, matrix &ke)
 {
-	assert(fem.GetCurrentStep()->m_nModule == FE_TRIPHASIC);
+	assert(fem.GetCurrentStep()->GetType() == FE_TRIPHASIC);
 	
 	int i, i3, j, j3, n;
 	

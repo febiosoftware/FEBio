@@ -53,7 +53,7 @@ bool LSDYNAPlotFile::Open(FEModel& mdl, const char* szfile)
 	FEM& fem = dynamic_cast<FEM&>(mdl);
 	m_pfem = &fem;
 
-	int nmode = fem.GetCurrentStep()->m_nModule;
+	int nmode = fem.GetCurrentStep()->GetType();
 	int ntype = fem.GetCurrentStep()->m_nanalysis;
 
 	// check the field values

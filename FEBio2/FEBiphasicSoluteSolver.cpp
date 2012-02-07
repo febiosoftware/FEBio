@@ -103,7 +103,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	// make sure this is poro-solute problem
-	assert(pstep->m_nModule == FE_POROSOLUTE);
+	assert(pstep->GetType() == FE_POROSOLUTE);
 
 	// prepare for the first iteration
 	PrepStep(time);

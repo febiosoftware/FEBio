@@ -138,7 +138,7 @@ bool FEBiphasicSolver::Quasin(double time)
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	// make-sure this is a poro-elastic problem
-	assert(pstep->m_nModule == FE_BIPHASIC);
+	assert(pstep->GetType() == FE_BIPHASIC);
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -649,7 +649,7 @@ void FEBiphasicSolver::UpdateContact()
 	// If this analysis is a poroelastic analysis that uses
 	// a biphasic contact interface, we need to make sure that
 	// the free draining dof's are processed properly
-	bool bporo = (pstep->m_nModule == FE_BIPHASIC) || (pstep->m_nModule == FE_POROSOLUTE);
+	bool bporo = (pstep->GetType() == FE_BIPHASIC) || (pstep->GetType() == FE_POROSOLUTE);
 	if (bporo)
 	{
 		// mark all free-draining surfaces

@@ -428,14 +428,14 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 
 	assert(pstep && (pstep->m_psolver == 0));
 
-	if      (strcmp(szt, "solid"       ) == 0) pstep->m_nModule = FE_SOLID;
-	else if (strcmp(szt, "linear solid") == 0) pstep->m_nModule = FE_LINEAR_SOLID; 
-	else if (strcmp(szt, "poro"        ) == 0) pstep->m_nModule = FE_BIPHASIC;		// obsolete in 2.0
-	else if (strcmp(szt, "biphasic"    ) == 0) pstep->m_nModule = FE_BIPHASIC;
-	else if (strcmp(szt, "solute"      ) == 0) pstep->m_nModule = FE_POROSOLUTE;
-	else if (strcmp(szt, "triphasic"   ) == 0) pstep->m_nModule = FE_TRIPHASIC;
-	else if (strcmp(szt, "heat"        ) == 0) pstep->m_nModule = FE_HEAT;
-	else if (strcmp(szt, "heat-solid"  ) == 0) pstep->m_nModule = FE_HEAT_SOLID;
+	if      (strcmp(szt, "solid"       ) == 0) pstep->SetType(FE_SOLID);
+	else if (strcmp(szt, "linear solid") == 0) pstep->SetType(FE_LINEAR_SOLID); 
+	else if (strcmp(szt, "poro"        ) == 0) pstep->SetType(FE_BIPHASIC);		// obsolete in 2.0
+	else if (strcmp(szt, "biphasic"    ) == 0) pstep->SetType(FE_BIPHASIC);
+	else if (strcmp(szt, "solute"      ) == 0) pstep->SetType(FE_POROSOLUTE);
+	else if (strcmp(szt, "triphasic"   ) == 0) pstep->SetType(FE_TRIPHASIC);
+	else if (strcmp(szt, "heat"        ) == 0) pstep->SetType(FE_HEAT);
+	else if (strcmp(szt, "heat-solid"  ) == 0) pstep->SetType(FE_HEAT_SOLID);
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 }
 
@@ -468,7 +468,7 @@ void FEBioControlSection::Parse(XMLTag& tag)
 	FEAnalysisStep* pstep = GetStep();
 
 	// make sure we have a solver defined
-	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(pstep->m_nModule, fem);
+	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(pstep->GetType(), fem);
 
 	++tag;
 	do
@@ -2086,7 +2086,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	}
 
 	// open temperature dofs for heat-transfer problems
-	if (fem.GetCurrentStep()->m_nModule == FE_HEAT)
+	if (fem.GetCurrentStep()->GetType() == FE_HEAT)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
@@ -2098,7 +2098,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 
 	// open temperature and displacement dofs 
 	// for coupled heat-solid problems
-	if (fem.GetCurrentStep()->m_nModule == FE_HEAT_SOLID)
+	if (fem.GetCurrentStep()->GetType() == FE_HEAT_SOLID)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
@@ -2134,17 +2134,17 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 	FEMesh* pm = &fem.m_mesh;
 
 	// get the module
-	if (fem.GetCurrentStep()->m_nModule == FE_HEAT)
+	if (fem.GetCurrentStep()->GetType() == FE_HEAT)
 	{
 		if ((etype == ET_HEX) || (etype == ET_HEX20) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
-	else if (fem.GetCurrentStep()->m_nModule == FE_LINEAR_SOLID)
+	else if (fem.GetCurrentStep()->GetType() == FE_LINEAR_SOLID)
 	{
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_LINEAR_SOLID_DOMAIN;
 		else return 0;
 	}
-	else if (fem.GetCurrentStep()->m_nModule == FE_HEAT_SOLID)
+	else if (fem.GetCurrentStep()->GetType() == FE_HEAT_SOLID)
 	{
 		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET))
 		{
@@ -5754,10 +5754,10 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	{
 		// copy the module ID
 		assert(m_pim->m_pStep);
-		int nmod = m_pim->m_pStep->m_nModule;
+		int nmod = m_pim->m_pStep->GetType();
 		m_pim->m_pStep = new FEAnalysisStep(*m_pim->m_pfem);
 		m_pim->m_pfem->AddStep(m_pim->m_pStep);
-		m_pim->m_pStep->m_nModule = nmod;
+		m_pim->m_pStep->SetType(nmod);
 	}
 
 	// increase the step section counter

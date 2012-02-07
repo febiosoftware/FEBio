@@ -18,9 +18,10 @@ bool FEM::InitPoroSolute()
 	int i, j, nd;
 
 	// make sure this is the poro-solute module
-	bool bporo = (m_pStep->m_nModule == FE_BIPHASIC) || (m_pStep->m_nModule == FE_POROSOLUTE) || (m_pStep->m_nModule == FE_TRIPHASIC);
-	bool bsolu = (m_pStep->m_nModule == FE_POROSOLUTE)  || (m_pStep->m_nModule == FE_TRIPHASIC);
-	bool btri  = (m_pStep->m_nModule == FE_TRIPHASIC);
+	int nstep = m_pStep->GetType();
+	bool bporo = (nstep == FE_BIPHASIC  ) || (nstep == FE_POROSOLUTE) || (nstep == FE_TRIPHASIC);
+	bool bsolu = (nstep == FE_POROSOLUTE) || (nstep == FE_TRIPHASIC );
+	bool btri  = (nstep == FE_TRIPHASIC );
 	
 	if (!bporo)
 	{

@@ -21,7 +21,7 @@
 FEAnalysisStep::FEAnalysisStep(FEModel& fem) : FEAnalysis(fem)
 {
 	// --- Analysis data ---
-	m_nModule = FE_SOLID;		// solid-mechanics problem
+	m_ntype = FE_SOLID;			// solid-mechanics problem
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
 	m_istiffpr = 1;				// use pressure stiffness
 	m_baugment = false;			// no augmentations
@@ -633,7 +633,7 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		// --- analysis data ---
-		ar << m_nModule;
+		ar << m_ntype;
 		ar << m_nanalysis;
 		ar << m_istiffpr;
 		ar << m_baugment;
@@ -671,7 +671,7 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 	else
 	{
 		// --- analysis data ---
-		ar >> m_nModule;
+		ar >> m_ntype;
 		ar >> m_nanalysis;
 		ar >> m_istiffpr;
 		ar >> m_baugment;
@@ -719,7 +719,7 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 
 		// create a solver
 		assert(m_psolver == 0);
-		switch (m_nModule)
+		switch (m_ntype)
 		{
 		case FE_SOLID       : m_psolver = new FESolidSolver           (m_fem); break;
 		case FE_BIPHASIC	: m_psolver = new FEBiphasicSolver        (m_fem); break;
