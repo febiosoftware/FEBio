@@ -220,6 +220,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEAnalysis.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEBioTask.cpp"
 				>
 			</File>

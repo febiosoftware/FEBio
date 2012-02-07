@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <math.h>
+#include "fem.h"
 #include "FESolidSolver.h"
 #include "FECore/tens4d.h"
 #include "FEBioLib/FEPressureLoad.h"

@@ -43,12 +43,8 @@ protected:
 
 public:
 	// --- Control Data ---
-	//{
-		bool	m_baugment;		//!< use Lagrangian augmentation
-	//}
+	bool	m_baugment;		//!< use Lagrangian augmentation (TODO: move to solver class?)
 
 	// --- Boundary conditions data ---
-	//{
-		vector<FEBoundaryCondition*>	m_BC;	//!< array of boundary conditions
-	//}
+	vector<FEBoundaryCondition*>	m_BC;	//!< array of boundary conditions
 };

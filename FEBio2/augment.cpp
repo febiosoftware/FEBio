@@ -20,8 +20,6 @@ bool FESolidSolver::Augment()
 	// Assume we will pass (can't hurt to be optimistic)
 	bool bconv = true;
 
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-
 	// Do contact augmentations
 	if (m_fem.ContactInterfaces() > 0)
 	{
@@ -30,10 +28,10 @@ bool FESolidSolver::Augment()
 	}
 
 	// do nonlinear constraint augmentations
-	int n = fem.NonlinearConstraints();
+	int n = m_fem.NonlinearConstraints();
 	for (int i=0; i<n; ++i) 
 	{
-		FENLConstraint* plc = fem.NonlinearConstraint(i);
+		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
 		bconv = plc->Augment(m_naug) && bconv;
 	}
 

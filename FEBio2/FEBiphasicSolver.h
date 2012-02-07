@@ -1,5 +1,6 @@
 #pragma once
 #include "FESolidSolver.h"
+#include "FECore/FEElementTraits.h"
 
 //-----------------------------------------------------------------------------
 // This class adds additional functionality to the FESolidSolver to solve

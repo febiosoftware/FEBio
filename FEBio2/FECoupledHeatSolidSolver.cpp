@@ -62,10 +62,13 @@ bool FECoupledHeatSolidSolver::SolveStep(double time)
 }
 
 //-----------------------------------------------------------------------------
+// TODO: this won't work anymore since the domains are stored on the FEAnalysis
 void FECoupledHeatSolidSolver::CalculateInitialStresses()
 {
-	FEHeatSolidDomain&   dh = dynamic_cast<FEHeatSolidDomain  &>(*m_Heat .Domain(0));
-	FELinearSolidDomain& ds = dynamic_cast<FELinearSolidDomain&>(*m_Solid.Domain(0));
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+
+	FEHeatSolidDomain&   dh = dynamic_cast<FEHeatSolidDomain  &>(*pstep->Domain(0));
+	FELinearSolidDomain& ds = dynamic_cast<FELinearSolidDomain&>(*pstep->Domain(0));
 
 	FELinearElastic* pmat = dynamic_cast<FELinearElastic*>(ds.GetMaterial());
 	assert(pmat);

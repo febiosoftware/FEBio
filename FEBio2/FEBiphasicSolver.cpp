@@ -8,6 +8,7 @@
 #include "FEBioLib/FEElasticDomain.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBioLib/FEPressureLoad.h"
+#include "fem.h"
 
 #ifdef WIN32
 	#include <float.h>

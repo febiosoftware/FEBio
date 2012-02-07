@@ -5,6 +5,7 @@
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FERigid.h"
 #include "FEBioLib/log.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
 //! Class constructor
@@ -32,13 +33,16 @@ bool FELinearSolidSolver::Init()
 	// Identify the linear elastic domains
 	// TODO: I want this to be done automatically
 	//       e.g. while the input file is being read
+	// TODO: Do this in the analysis class
 	FEMesh& mesh = m_fem.m_mesh;
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	pstep->ClearDomains();
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FELinearElasticDomain* pd = dynamic_cast<FELinearElasticDomain*>(&mesh.Domain(nd));
-		if (pd) m_Dom.push_back(nd);
+		if (pd) pstep->AddDomain(nd);
 	}
-	assert(m_Dom.empty() == false);
+	assert(pstep->Domains() != 0);
 
 	return true;
 }
@@ -192,6 +196,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 void FELinearSolidSolver::Update(vector<double>& u)
 {
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// update nodal positions
@@ -205,9 +210,9 @@ void FELinearSolidSolver::Update(vector<double>& u)
 	}
 
 	// update the stresses on all domains
-	for (int i=0; i<(int) m_Dom.size(); ++i)
+	for (int i=0; i<pstep->Domains(); ++i)
 	{
-		FELinearElasticDomain& d = dynamic_cast<FELinearElasticDomain&>(*Domain(i));
+		FELinearElasticDomain& d = dynamic_cast<FELinearElasticDomain&>(*pstep->Domain(i));
 		d.UpdateStresses(m_fem);
 	}
 
@@ -224,6 +229,7 @@ void FELinearSolidSolver::Residual()
 
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	// loop over nodal forces
 	int ncnf = m_fem.m_FC.size();
@@ -249,9 +255,9 @@ void FELinearSolidSolver::Residual()
 	}
 
 	// add contribution from domains
-	for (int i=0; i<(int) m_Dom.size(); ++i) 
+	for (int i=0; i<pstep->Domains(); ++i) 
 	{
-		FELinearElasticDomain& d = dynamic_cast<FELinearElasticDomain&>(*Domain(i));
+		FELinearElasticDomain& d = dynamic_cast<FELinearElasticDomain&>(*pstep->Domain(i));
 		d.RHS(this, m_R);
 	}
 
@@ -309,9 +315,10 @@ bool FELinearSolidSolver::StiffnessMatrix()
 	m_pK->Zero();
 
 	// add contribution from domains
-	for (int i=0; i<(int)m_Dom.size(); ++i)
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	for (int i=0; i<pstep->Domains(); ++i)
 	{
-		FELinearElasticDomain& bd = dynamic_cast<FELinearElasticDomain&>(*Domain(i));
+		FELinearElasticDomain& bd = dynamic_cast<FELinearElasticDomain&>(*pstep->Domain(i));
 		bd.StiffnessMatrix(this);
 	}
 

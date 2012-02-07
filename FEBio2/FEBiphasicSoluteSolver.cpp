@@ -2,6 +2,7 @@
 #include "FEBiphasicSoluteSolver.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEAnalysisStep.h"
+#include "fem.h"
 #include "Interrupt.h"
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEPressureLoad.h"

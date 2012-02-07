@@ -5,6 +5,7 @@
 #include "FEAnalysisStep.h"
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEPressureLoad.h"
+#include "fem.h"
 
 #ifdef WIN32
 #include <float.h>

@@ -10,7 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include "FEStiffnessMatrix.h"
-#include "fem.h"
 #include "FEBioLib/Timer.h"
 #include "FECore/FEException.h"
 #include "FECore/FENLSolver.h"
@@ -40,18 +39,9 @@ public:
 	//! return pointer to stiffness matrix
 	FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
 
-	//! Get active domains
-	int Domains() { return m_Dom.size(); }
-
-	//! Get active domain
-	FEDomain* Domain(int i) { return &(m_fem.m_mesh.Domain(m_Dom[i])); }
-
 public:
-	// domain data
-	vector<int>		m_Dom;	//!< list of active domains for this analysis
-
 	// timers
-	Timer	m_SolverTime;	//!< tracks time spent in solver
+	Timer	m_SolverTime;	//!< time spent in solver
 
 	// linear solver
 	LinearSolver*		m_plinsolve;	//!< the linear solver

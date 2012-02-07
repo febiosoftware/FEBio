@@ -16,6 +16,8 @@
 #include "FEBioLib/WSMPSolver.h"
 #include "FEBioLib/RCICGSolver.h"
 
+//-----------------------------------------------------------------------------
+//! Constructor of FESolver base class
 FESolver::FESolver(FEModel& fem) : FENLSolver(fem)
 {
 	// Stiffness matrix and linear solver are allocated in Init()
@@ -25,12 +27,17 @@ FESolver::FESolver(FEModel& fem) : FENLSolver(fem)
 	m_niter = 0;
 }
 
+//-----------------------------------------------------------------------------
+//! Destructor.
 FESolver::~FESolver()
 {
 	delete m_pK;		// clean up stiffnes matrix data
 	delete m_plinsolve;	// clean up linear solver data
 }
 
+//-----------------------------------------------------------------------------
+//! Initialization
+// TODO: where is this function called?
 bool FESolver::Init()
 {
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
@@ -85,16 +92,16 @@ bool FESolver::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! Clean
+// TODO: why can this not be done in destructor?
 void FESolver::Clean()
 {
 	if (m_plinsolve) m_plinsolve->Destroy();
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION: FESolver::CreateStiffness
-//  Creates the global stiffness matrix
-//
-
+//!  Creates the global stiffness matrix
+// TODO: Can we move this to the FEStiffnessMatrix::Create function?
 bool FESolver::CreateStiffness(bool breset)
 {
 	// clean up the solver

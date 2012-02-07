@@ -54,6 +54,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 	// keep a pointer to the FEM object
 	FESolver& solver = *psolver;
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	m_pfem = &fem;
 
 	// The first time we come here we build the "static" profile.
@@ -84,9 +85,9 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 			// Add all elements to the profile
 			// Loop over all active domains
-			for (int nd=0; nd<solver.Domains(); ++nd)
+			for (int nd=0; nd<pstep->Domains(); ++nd)
 			{
-				FEDomain& d = *solver.Domain(nd);
+				FEDomain& d = *pstep->Domain(nd);
 
 				if (dynamic_cast<FEUT4Domain*>(&d) == 0)
 				{
@@ -155,9 +156,9 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 				// keep a list that stores for each node the list of
 				// elements connected to that node.
 				// loop over all solid elements
-				for (int nd=0; nd<solver.Domains(); ++nd)
+				for (int nd=0; nd<pstep->Domains(); ++nd)
 				{
-					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(solver.Domain(nd));
+					FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(pstep->Domain(nd));
 					if (pbd)
 					{
 						for (i=0; i<pbd->Elements(); ++i)

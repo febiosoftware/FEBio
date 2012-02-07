@@ -6,6 +6,7 @@
 #include "FEAnalysisStep.h"
 #include "FEBioLib/log.h"
 #include "Interrupt.h"
+#include "fem.h"
 
 #ifdef WIN32
 	#include <float.h>

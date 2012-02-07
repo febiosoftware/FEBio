@@ -3,6 +3,7 @@
 #include "FEBioLib/FEIsotropicFourier.h"
 #include "FEBioLib/FEHeatFlux.h"
 #include "FECore/FENodeReorder.h"
+#include "fem.h"
 
 //-----------------------------------------------------------------------------
 //! constructor for the class
@@ -30,13 +31,14 @@ bool FEHeatSolver::Init()
 	// Identify the heat-transfer domains
 	// TODO: I want this to be done automatically
 	//       e.g. while the input file is being read
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	FEMesh& mesh = m_fem.m_mesh;
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEHeatSolidDomain* pd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(nd));
-		if (pd) m_Dom.push_back(nd);
+		if (pd) pstep->AddDomain(nd);
 	}
-	assert(m_Dom.empty() == false);
+	assert(pstep->Domains() != 0);
 
 	return true;
 }
@@ -265,8 +267,10 @@ bool FEHeatSolver::ReformStiffness()
 //! contribution to the global stiffness matrix from each domain.
 bool FEHeatSolver::StiffnessMatrix()
 {
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+
 	// see if this is a dynamic problem
-	bool bdyn = (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC);
+	bool bdyn = (pstep->m_nanalysis == FE_DYNAMIC);
 
 	// get the time step size
 	double dt = m_fem.GetCurrentStep()->m_dt;
@@ -275,9 +279,9 @@ bool FEHeatSolver::StiffnessMatrix()
 	m_pK->Zero();
 
 	// Add stiffness contribution from all domains
-	for (int i=0; i<(int) m_Dom.size(); ++i)
+	for (int i=0; i<pstep->Domains(); ++i)
 	{
-		FEHeatDomain& bd = dynamic_cast<FEHeatDomain&>(*Domain(i));
+		FEHeatDomain& bd = dynamic_cast<FEHeatDomain&>(*pstep->Domain(i));
 
 		// add the conduction stiffness
 		m_brhs = false;

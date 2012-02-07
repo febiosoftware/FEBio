@@ -1,8 +1,10 @@
 #pragma once
 #include "DumpFile.h"
+#include <vector>
 
 class FEModel;
 class FENLSolver;
+class FEDomain;
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
@@ -30,6 +32,19 @@ public:
 
 	//! set the step type
 	void SetType(int ntype) { m_ntype = ntype; }
+
+public:
+	//! Get active domains
+	int Domains() { return m_Dom.size(); }
+
+	//! Get active domain
+	FEDomain* Domain(int i);
+
+	//! Add a domain
+	void AddDomain(int i) { m_Dom.push_back(i); }
+
+	//! clear all domains
+	void ClearDomains() { m_Dom.clear(); }
 
 public:
 	//! sets the plot level
@@ -92,6 +107,9 @@ public:
 		int		m_nplot;	//!< plot level
 		bool	m_bDump;	//!< create a restart file or not
 	//}
+
+protected:
+	std::vector<int>		m_Dom;	//!< list of active domains for this analysis
 
 protected:
 	int		m_ntype;		// step type
