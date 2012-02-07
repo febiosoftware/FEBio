@@ -296,5 +296,8 @@
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FECore\FEAnalysis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

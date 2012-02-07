@@ -522,6 +522,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />
+    <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyForce.cpp" />
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />

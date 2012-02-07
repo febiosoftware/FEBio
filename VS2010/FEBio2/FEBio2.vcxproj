@@ -530,6 +530,7 @@
     <ClInclude Include="..\..\FEBio2\CommandManager.h" />
     <ClInclude Include="..\..\FEBio2\console.h" />
     <ClInclude Include="..\..\FEBio2\DataStore.h" />
+    <ClInclude Include="..\..\FEBio2\ElementDataRecord.h" />
     <ClInclude Include="..\..\FEBio2\FEAnalysisStep.h" />
     <ClInclude Include="..\..\FEBio2\FEBioCommand.h" />
     <ClInclude Include="..\..\FEBio2\FEBioImport.h" />
@@ -564,7 +565,9 @@
     <ClInclude Include="..\..\FEBio2\FileImport.h" />
     <ClInclude Include="..\..\FEBio2\Interrupt.h" />
     <ClInclude Include="..\..\FEBio2\LSDYNAPlotFile.h" />
+    <ClInclude Include="..\..\FEBio2\NodeDataRecord.h" />
     <ClInclude Include="..\..\FEBio2\plugin.h" />
+    <ClInclude Include="..\..\FEBio2\RigidBodyDataRecord.h" />
     <ClInclude Include="..\..\FEBio2\stdafx.h" />
     <ClInclude Include="..\..\FEBio2\validate.h" />
     <ClInclude Include="..\..\FEBio2\version.h" />
@@ -578,6 +581,7 @@
     <ClCompile Include="..\..\FEBio2\console.cpp" />
     <ClCompile Include="..\..\FEBio2\DataStore.cpp" />
     <ClCompile Include="..\..\FEBio2\diagnose.cpp" />
+    <ClCompile Include="..\..\FEBio2\ElementDataRecord.cpp" />
     <ClCompile Include="..\..\FEBio2\elstf.cpp" />
     <ClCompile Include="..\..\FEBio2\FEAnalysisStep.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
@@ -622,11 +626,13 @@
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio2\levmar.cpp" />
     <ClCompile Include="..\..\FEBio2\LSDYNAPlotFile.cpp" />
+    <ClCompile Include="..\..\FEBio2\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FEBio2\optimize.cpp" />
     <ClCompile Include="..\..\FEBio2\plugin.cpp" />
     <ClCompile Include="..\..\FEBio2\powell.cpp" />
     <ClCompile Include="..\..\FEBio2\quasin.cpp" />
     <ClCompile Include="..\..\FEBio2\restart.cpp" />
+    <ClCompile Include="..\..\FEBio2\RigidBodyDataRecord.cpp" />
     <ClCompile Include="..\..\FEBio2\solve.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
     <ClCompile Include="..\..\FEBio2\update.cpp" />
