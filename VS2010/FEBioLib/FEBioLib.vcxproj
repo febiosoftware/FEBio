@@ -511,7 +511,9 @@
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasic.h" />
+    <ClInclude Include="..\..\FEBioLib\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSolute.h" />
+    <ClInclude Include="..\..\FEBioLib\FEBiphasicSoluteDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
     <ClInclude Include="..\..\FEBioLib\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
@@ -603,6 +605,7 @@
     <ClInclude Include="..\..\FEBioLib\FETransIsoVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FETransverselyIsotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FETriphasic.h" />
+    <ClInclude Include="..\..\FEBioLib\FETriphasicDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FETrussMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEUDGHexDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledElasticMixture.h" />
@@ -633,7 +636,9 @@
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasic.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSolute.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEBiphasicSoluteDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />
     <ClCompile Include="..\..\FEBioLib\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
@@ -722,6 +727,7 @@
     <ClCompile Include="..\..\FEBioLib\FETransIsoVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETransverselyIsotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETriphasic.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FETriphasicDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETrussMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUDGHexDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledElasticMixture.cpp" />
