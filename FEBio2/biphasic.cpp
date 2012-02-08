@@ -499,27 +499,17 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 */
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-	double dt = fem.GetCurrentStep()->m_dt;
-	bool bsymm = fem.m_bsym_poro;
-	
 	// element stiffness matrix
 	matrix ke;
+	vector<int> elm;
 
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
-		
-		// this element should not be rigid
-		assert(!el.IsRigid());
-		
-		// get the elements material
-		FEMaterial* pmat = m_pMat;
-		assert(dynamic_cast<FEBiphasic*>(pmat) != 0);
 		
 		// allocate stiffness matrix
 		int neln = el.Nodes();
@@ -534,7 +524,6 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for poroelastic elements.
-		vector<int> elm;
 		UnpackLM(el, elm);
 
 		vector<int> lm(ndof);
@@ -552,27 +541,17 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver)
+void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-	double dt = fem.GetCurrentStep()->m_dt;
-	bool bsymm = fem.m_bsym_poro;
-	
 	// element stiffness matrix
 	matrix ke;
+	vector<int> elm;
 
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
-		
-		// this element should not be rigid
-		assert(!el.IsRigid());
-		
-		// get the elements material
-		FEMaterial* pmat = m_pMat;
-		assert(dynamic_cast<FEBiphasic*>(pmat) != 0);
 		
 		// allocate stiffness matrix
 		int neln = el.Nodes();
@@ -587,7 +566,6 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver)
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for poroelastic elements.
-		vector<int> elm;
 		UnpackLM(el, elm);
 
 		vector<int> lm(ndof);

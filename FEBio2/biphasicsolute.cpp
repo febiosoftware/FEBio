@@ -868,15 +868,10 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
-	
 	// element stiffness matrix
 	matrix ke;
-
 	vector<int> elm;
 	
 	// repeat over all solid elements
@@ -885,14 +880,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 	{
 		FESolidElement& el = m_Elem[iel];
 		
-		// this element should not be rigid
-		assert(!el.IsRigid());
-		
 		UnpackLM(el, elm);
-		
-		// get the elements material
-		FEMaterial* pmat = m_pMat;
-		assert(dynamic_cast<FEBiphasicSolute*>(pmat) != 0);
 		
 		// allocate stiffness matrix
 		int neln = el.Nodes();
@@ -925,15 +913,10 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver)
+void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt)
 {
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
-	bool bsymm = fem.m_bsym_poro;
-	double dt = fem.GetCurrentStep()->m_dt;
-	
 	// element stiffness matrix
 	matrix ke;
-
 	vector<int> elm;
 	
 	// repeat over all solid elements
@@ -941,15 +924,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
-		
-		// this element should not be rigid
-		assert(!el.IsRigid());
-		
 		UnpackLM(el, elm);
-		
-		// get the elements material
-		FEMaterial* pmat = m_pMat;
-		assert(dynamic_cast<FEBiphasicSolute*>(pmat) != 0);
 		
 		// allocate stiffness matrix
 		int neln = el.Nodes();

@@ -161,7 +161,6 @@ public:
 		int						m_nStep;	//!< current analysis step
 		double					m_ftime;	//!< current time value
 		double					m_ftime0;	//!< start time of current step
-		bool	m_bsym_poro;		//!< symmetric (old) poro-elastic flag
 		int		m_nplane_strain;	//!< run analysis in plain strain mode
 
 		// Create timer to track total running time

@@ -26,10 +26,10 @@ public:
 	void InitElements();
 	
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt);
 
 	//! calculates the global stiffness matrix for this domain (steady-state case)
-	void StiffnessMatrixSS(FENLSolver* psolver);
+	void StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt);
 	
 	//! calculates the residual
 //	void Residual(FENLSolver* psolver, vector<double>& R);

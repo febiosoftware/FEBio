@@ -556,7 +556,7 @@ void FEBioControlSection::ParsePoroParams(XMLTag &tag)
 	else if (tag == "max_ups"     ) tag.value(ps->m_bfgs.m_maxups);
 	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
 	else if (tag == "ptol"        ) tag.value(ps->m_Ptol);
-	else if (tag == "symmetric_biphasic") tag.value(fem.m_bsym_poro);
+	else if (tag == "symmetric_biphasic") tag.value(pstep->m_bsym_poro);
 	else throw XMLReader::InvalidTag(tag);
 }
 
@@ -582,7 +582,7 @@ void FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
 	else if (tag == "ptol"        ) tag.value(ps->m_Ptol);
 	else if (tag == "ctol"        ) tag.value(ps->m_Ctol);
-	else if (tag == "symmetric_biphasic") tag.value(fem.m_bsym_poro);
+	else if (tag == "symmetric_biphasic") tag.value(pstep->m_bsym_poro);
 	else throw XMLReader::InvalidTag(tag);
 }
 
@@ -608,7 +608,7 @@ void FEBioControlSection::ParseTriphasicParams(XMLTag &tag)
 	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
 	else if (tag == "ptol"        ) tag.value(ps->m_Ptol);
 	else if (tag == "ctol"        ) tag.value(ps->m_Ctol);
-	else if (tag == "symmetric_biphasic") tag.value(fem.m_bsym_poro);
+	else if (tag == "symmetric_biphasic") tag.value(pstep->m_bsym_poro);
 	else throw XMLReader::InvalidTag(tag);
 }
 

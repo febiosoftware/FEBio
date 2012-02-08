@@ -40,6 +40,7 @@ protected:
 public:
 	// --- Control Data ---
 	bool	m_baugment;		//!< use Lagrangian augmentation (TODO: move to solver class?)
+	bool	m_bsym_poro;	//!< symmetric (old) poro-elastic flag (TODO: move to the solver classes?)
 };
 
 //-----------------------------------------------------------------------------

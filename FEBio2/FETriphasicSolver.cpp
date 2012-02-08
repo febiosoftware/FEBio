@@ -597,12 +597,16 @@ bool FETriphasicSolver::StiffnessMatrix()
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// calculate the stiffness matrix for each domain
-	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	bool bsymm = pstep->m_bsym_poro;
+	double dt = pstep->m_dt;
+	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
 			FETriphasicDomain& dom = dynamic_cast<FETriphasicDomain&>(mesh.Domain(i));
-			dom.StiffnessMatrixSS(this);
+			dom.StiffnessMatrixSS(this, bsymm, dt);
 		}
 	}
 	else
@@ -610,7 +614,7 @@ bool FETriphasicSolver::StiffnessMatrix()
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
 			FETriphasicDomain& dom = dynamic_cast<FETriphasicDomain&>(mesh.Domain(i));
-			dom.StiffnessMatrix(this);
+			dom.StiffnessMatrix(this, bsymm, dt);
 		}
 	}
 
@@ -619,8 +623,6 @@ bool FETriphasicSolver::StiffnessMatrix()
 	{
 		ContactStiffness();
 	}
-
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
 
 	// calculate stiffness matrices for surface loads
 	int nsl = (int) fem.m_SL.size();

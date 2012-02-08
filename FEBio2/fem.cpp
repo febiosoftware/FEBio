@@ -33,7 +33,6 @@ FEM::FEM()
 {
 	// --- Analysis Data ---
 	m_nStep = -1;
-	m_bsym_poro = true;			// use symmetric poro implementation
 	m_nplane_strain = -1;	// don't use plain strain mode
 
 	m_ftime = 0;

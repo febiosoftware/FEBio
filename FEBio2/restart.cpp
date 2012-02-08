@@ -237,7 +237,7 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 
 		ar << m_nStep;
 		ar << m_ftime << m_ftime0;
-		ar << m_bsym_poro << m_nplane_strain;
+		ar << m_nplane_strain;
 
 		// direct solver data
 		ar << m_nsolver;
@@ -286,7 +286,7 @@ void FEM::SerializeAnalysisData(DumpFile &ar)
 		}
 		ar >> m_nStep;
 		ar >> m_ftime >> m_ftime0;
-		ar >> m_bsym_poro >> m_nplane_strain;
+		ar >> m_nplane_strain;
 
 		// direct solver data
 		ar >> m_nsolver;
