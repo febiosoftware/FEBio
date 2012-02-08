@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "FETriphasicDomain.h"
 #include "FECore/FEMaterial.h"
-#include "FEBioLib/FETriphasic.h"
-#include "FEBioLib/log.h"
-#include "fem.h"
+#include "FETriphasic.h"
+#include "log.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))
@@ -2088,9 +2087,8 @@ void FETriphasicDomain::UpdateStresses(FEModel &fem)
 	double pn[8], ct[2][8];
 	
 	FEMesh& mesh = *m_pMesh;
-	FEM& mdl = dynamic_cast<FEM&>(fem);
-	double dt = mdl.GetCurrentStep()->m_dt;
-	bool sstate = (mdl.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+	double dt = fem.GetCurrentStep()->m_dt;
+	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
 	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{

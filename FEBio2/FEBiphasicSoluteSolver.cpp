@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBiphasicSoluteSolver.h"
-#include "FEBiphasicSoluteDomain.h"
+#include "FEBioLib/FEBiphasicSoluteDomain.h"
 #include "FEAnalysisStep.h"
 #include "fem.h"
 #include "Interrupt.h"

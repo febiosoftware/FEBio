@@ -37,8 +37,8 @@
 #include <string.h>
 #include "FEBioLib/FEUDGHexDomain.h"
 #include "FEBioLib/FERigidSolidDomain.h"
-#include "FEBiphasicSolidDomain.h"
-#include "FEBiphasicSoluteDomain.h"
+#include "FEBioLib/FEBiphasicSolidDomain.h"
+#include "FEBioLib/FEBiphasicSoluteDomain.h"
 #include "FEBioLib/FEHeatSolidDomain.h"
 #include "FEBioLib/FELinearSolidDomain.h"
 #include "FEBioLib/FEElasticTrussDomain.h"

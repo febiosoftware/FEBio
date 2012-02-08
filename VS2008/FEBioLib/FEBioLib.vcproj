@@ -238,7 +238,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSolidDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEBiphasicSolute.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSoluteDomain.cpp"
 				>
 			</File>
 			<File
@@ -594,6 +602,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FETriphasicDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FETrussMaterial.cpp"
 				>
 			</File>
@@ -704,7 +716,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSolidDomain.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEBiphasicSolute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSoluteDomain.h"
 				>
 			</File>
 			<File
@@ -1069,6 +1089,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETriphasic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETriphasicDomain.h"
 				>
 			</File>
 			<File

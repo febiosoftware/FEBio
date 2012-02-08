@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FETriphasicSolver.h"
-#include "FETriphasicDomain.h"
+#include "FEBioLib/FETriphasicDomain.h"
 #include "Interrupt.h"
 #include "FEAnalysisStep.h"
 #include "FEBioLib/log.h"

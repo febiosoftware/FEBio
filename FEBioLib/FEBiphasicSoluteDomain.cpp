@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "FECore/FEMaterial.h"
 #include "FEBiphasicSoluteDomain.h"
-#include "FEBioLib/FEBiphasicSolute.h"
-#include "FEBioLib/log.h"
-#include "fem.h"
+#include "FEBiphasicSolute.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)
@@ -1643,9 +1642,8 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 	double pn[8], ct[8];
 
 	FEMesh& mesh = *m_pMesh;
-	FEM& mdl = dynamic_cast<FEM&>(fem);
-	double dt = mdl.GetCurrentStep()->m_dt;
-	bool sstate = (mdl.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+	double dt = fem.GetCurrentStep()->m_dt;
+	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
 	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{

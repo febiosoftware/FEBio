@@ -245,14 +245,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\FEBio2\biphasic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\biphasicsolute.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\CommandManager.cpp"
 				>
 			</File>
@@ -390,10 +382,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETriphasicDomain.cpp"
 				>
 			</File>
 			<File
@@ -539,14 +527,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSolidDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSoluteDomain.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBiphasicSoluteSolver.h"
 				>
 			</File>
@@ -632,10 +612,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETriphasicDomain.h"
 				>
 			</File>
 			<File

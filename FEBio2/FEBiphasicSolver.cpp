@@ -6,7 +6,7 @@
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEElasticDomain.h"
-#include "FEBiphasicSolidDomain.h"
+#include "FEBioLib/FEBiphasicSolidDomain.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "fem.h"
 
