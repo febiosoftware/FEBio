@@ -8,7 +8,7 @@
 #include "FEBioLib/FEElasticDomain.h"
 #include "FEBioLib/FEBiphasicSolidDomain.h"
 #include "FEBioLib/FEPressureLoad.h"
-#include "fem.h"
+#include "FEBioLib/FERigidBody.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -135,8 +135,7 @@ bool FEBiphasicSolver::Quasin(double time)
 	bool breform = false;	// reformation flag
 
 	// get the current step
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
 
 	// make-sure this is a poro-elastic problem
 	assert(pstep->GetType() == FE_BIPHASIC);
@@ -145,7 +144,7 @@ bool FEBiphasicSolver::Quasin(double time)
 	PrepStep(time);
 
 	// check for CTRL+C interruption before we do any work
-	if (fem.m_bInterruptable)
+	if (m_fem.m_bInterruptable)
 	{
 		Interruption itr;
 		if (itr.m_bsig)
@@ -171,14 +170,14 @@ bool FEBiphasicSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, fem.m_ftime);
+	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
 	{
 		oldmode = clog.GetMode();
-		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" %d\n", m_niter+1);
 		clog.SetMode(oldmode);
@@ -194,7 +193,7 @@ bool FEBiphasicSolver::Quasin(double time)
 		m_SolverTime.stop();
 
 		// check for nans
-		if (fem.GetDebugFlag())
+		if (m_fem.GetDebugFlag())
 		{
 			double du = m_bfgs.m_ui*m_bfgs.m_ui;
 			if (ISNAN(du)) throw NANDetected();
@@ -274,8 +273,8 @@ bool FEBiphasicSolver::Quasin(double time)
 
 		// print convergence summary
 		oldmode = clog.GetMode();
-		if ((fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
 		clog.printf(" Nonlinear solution status: time= %lg\n", time); 
 		clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
@@ -396,7 +395,7 @@ bool FEBiphasicSolver::Quasin(double time)
 				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
-				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
 				if (pstep->m_psolver->m_bfgs.m_maxups == 0)
 				{
 					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
@@ -412,7 +411,7 @@ bool FEBiphasicSolver::Quasin(double time)
 		clog.flush();
 
 		// check for CTRL+C interruption
-		if (fem.m_bInterruptable)
+		if (m_fem.m_bInterruptable)
 		{
 			Interruption itr;
 			if (itr.m_bsig)
@@ -456,8 +455,7 @@ bool FEBiphasicSolver::Quasin(double time)
 bool FEBiphasicSolver::Residual(vector<double>& R)
 {
 	int i;
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	double dt = fem.GetCurrentStep()->m_dt;
+	double dt = m_fem.GetCurrentStep()->m_dt;
 
 	// initialize residual with concentrated nodal loads
 	R = m_Fn;
@@ -466,10 +464,10 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// zero rigid body reaction forces
-	int NRB = fem.m_Obj.size();
+	int NRB = m_fem.m_Obj.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 
@@ -491,7 +489,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 
 	// calculate internal fluid work
-	if (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
+	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
 		for (i=0; i<mesh.Domains(); ++i)
 		{
@@ -509,10 +507,10 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 
 	// calculate forces due to surface loads
-	int nsl = (int) fem.m_SL.size();
+	int nsl = (int) m_fem.m_SL.size();
 	for (i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = fem.m_SL[i];
+		FESurfaceLoad* psl = m_fem.m_SL[i];
 		if (psl->IsActive()) psl->Residual(this, R);
 	}
 
@@ -570,8 +568,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// calculate the stiffness matrix for each domain
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
 	bool bsymm = pstep->m_bsym_poro;
 	double dt = pstep->m_dt;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
@@ -598,13 +595,13 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	}
 
 	// calculate stiffness matrices for surface loads
-	int nsl = (int) fem.m_SL.size();
+	int nsl = (int) m_fem.m_SL.size();
 	for (i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = fem.m_SL[i];
+		FESurfaceLoad* psl = m_fem.m_SL[i];
 
 		// respect the pressure stiffness flag
-		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
+		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
 	}
 
 	// calculate nonlinear constraint stiffness
@@ -614,10 +611,10 @@ bool FEBiphasicSolver::StiffnessMatrix()
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
-	int NRB = fem.m_Obj.size();
+	int NRB = m_fem.m_Obj.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
+		FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
 		for (j=0; j<6; ++j)
 			if (rb.m_LM[j] < -1)
 			{
@@ -627,7 +624,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	}
 
 	// let's check the stiffness matrix for zero diagonal elements
-	if (fem.GetDebugFlag())
+	if (m_fem.GetDebugFlag())
 	{
 		vector<int> zd;
 		int neq = K.Size();
@@ -646,8 +643,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 //-----------------------------------------------------------------------------
 void FEBiphasicSolver::UpdateContact()
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEAnalysis* pstep = fem.GetCurrentStep();
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// If this analysis is a poroelastic analysis that uses
 	// a biphasic contact interface, we need to make sure that
