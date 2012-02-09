@@ -49,6 +49,9 @@ public:
 	virtual void PushState() = 0;
 	virtual void PopState () = 0;
 
+	// this function exports the data
+	virtual void Write() = 0;
+
 public:	// --- Load curve functions ----
 
 	//! Add a loadcurve to the model
@@ -136,6 +139,14 @@ public:	// Miscellaneous routines
 	// get/set global data
 	static void SetGlobalConstant(const string& s, double v);
 	static double GetGlobalConstant(const string& s);
+
+public: // TODO: Find a better place for these parameters
+	int		m_nsolver;			//!< type of solver selected
+	int		m_bwopt;			//!< bandwidth optimization flag
+	int		m_nStep;			//!< current analysis step
+	double	m_ftime;			//!< current time value
+	double	m_ftime0;			//!< start time of current step
+	int		m_nplane_strain;	//!< run analysis in plain strain mode
 
 protected:
 	std::vector<FELoadCurve*>			m_LC;	//!< load curve data

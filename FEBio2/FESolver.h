@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEStiffnessMatrix.h"
+#include "FEBioLib/FEStiffnessMatrix.h"
 #include "FEBioLib/Timer.h"
 #include "FECore/FEException.h"
 #include "FECore/FENLSolver.h"

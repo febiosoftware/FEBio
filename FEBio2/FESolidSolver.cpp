@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
-#include "fem.h"
 #include "FECore/FENodeReorder.h"
 #include "FEBioLib/FERigid.h"
+#include "FEBioLib/FERigidBody.h"
 #include "FEBioLib/FE3FieldElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
@@ -127,14 +127,14 @@ bool FESolidSolver::InitEquations()
 {
 	int i, j, n;
 
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEMesh& mesh = fem.m_mesh;
+	// get the mesh
+	FEMesh& mesh = m_fem.m_mesh;
 
 	// initialize nr of equations
 	int neq = 0;
 
 	// see if we need to optimize the bandwidth
-	if (fem.m_bwopt)
+	if (m_fem.m_bwopt)
 	{
 		// reorder the node numbers
 		vector<int> P(mesh.Nodes());
@@ -162,11 +162,11 @@ bool FESolidSolver::InitEquations()
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
 	m_nreq = neq;
-	int nrb = fem.m_Obj.size();
+	int nrb = m_fem.m_Obj.size();
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(RB.m_mat));
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		assert(pm);
 		for (j=0; j<6; ++j)
 			if (pm->m_bc[j] >= 0)
@@ -187,7 +187,7 @@ bool FESolidSolver::InitEquations()
 		FENode& node = mesh.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[node.m_rid]);
+			FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[node.m_rid]);
 			node.m_ID[DOF_X] = -RB.m_LM[0]-2;
 			node.m_ID[DOF_Y] = -RB.m_LM[1]-2;
 			node.m_ID[DOF_Z] = -RB.m_LM[2]-2;
@@ -200,8 +200,8 @@ bool FESolidSolver::InitEquations()
 	// adjust the rigid dofs that are prescribed
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(RB.m_mat));
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
+		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
 			n = RB.m_LM[j];

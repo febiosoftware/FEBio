@@ -3,7 +3,6 @@
 #include "FEBioLib/FEIsotropicFourier.h"
 #include "FEBioLib/FEHeatFlux.h"
 #include "FECore/FENodeReorder.h"
-#include "fem.h"
 
 //-----------------------------------------------------------------------------
 //! constructor for the class
@@ -60,14 +59,13 @@ bool FEHeatSolver::Init()
 //!
 bool FEHeatSolver::InitEquations()
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = m_fem.m_mesh;
 
 	// initialize nr of equations
 	int neq = 0;
 
 	// see if we need to optimize the bandwidth
-	if (fem.m_bwopt)
+	if (m_fem.m_bwopt)
 	{
 		// reorder the node numbers
 		vector<int> P(mesh.Nodes());
@@ -222,11 +220,10 @@ void FEHeatSolver::NodalFluxes(vector<double>& R)
 //! Calculate heat surface flux contribution to residual.
 void FEHeatSolver::SurfaceFluxes(vector<double>& R)
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-	int nsl = (int) fem.m_SL.size();
+	int nsl = (int) m_fem.m_SL.size();
 	for (int i=0; i<nsl; ++i)
 	{
-		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(fem.m_SL[i]);
+		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.m_SL[i]);
 		if (phf) phf->Residual(this, R);
 	}
 }

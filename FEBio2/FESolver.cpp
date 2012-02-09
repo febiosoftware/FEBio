@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "FESolver.h"
-#include "fem.h"
-#include "FEBioLib/log.h"
 #include "NumCore/SkylineSolver.h"
 #include "NumCore/LUSolver.h"
 #include "NumCore/ConjGradIterSolver.h"
@@ -15,6 +13,7 @@
 #include "FEBioLib/PardisoSolver.h"
 #include "FEBioLib/WSMPSolver.h"
 #include "FEBioLib/RCICGSolver.h"
+#include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor of FESolver base class
@@ -40,8 +39,6 @@ FESolver::~FESolver()
 // TODO: where is this function called?
 bool FESolver::Init()
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
-
 	// Now that we have determined the equation numbers we can continue
 	// with creating the stiffness matrix. First we select the linear solver
 	// The stiffness matrix is created in CreateStiffness
@@ -49,7 +46,7 @@ bool FESolver::Init()
 	// then the solver might already be allocated. That's way we need to check it.
 	if (m_plinsolve == 0)
 	{
-		switch (fem.m_nsolver)
+		switch (m_fem.m_nsolver)
 		{
 		case SKYLINE_SOLVER      : m_plinsolve = new SkylineSolver(); break;
 		case PSLDLT_SOLVER       : m_plinsolve = new PSLDLTSolver (); break;

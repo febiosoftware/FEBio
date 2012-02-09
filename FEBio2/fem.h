@@ -63,6 +63,9 @@ public:
 	//! input data from file
 	bool Input(const char* szfile);
 
+	//! write data 
+	void Write();
+
 	//! set the debug level
 	void SetDebugFlag(bool b) { m_debug = b; }
 
@@ -155,24 +158,11 @@ public:
 	//}
 
 public:
-	// --- Analysis Data ---
-	//{
-		int						m_nStep;	//!< current analysis step
-		double					m_ftime;	//!< current time value
-		double					m_ftime0;	//!< start time of current step
-		int		m_nplane_strain;	//!< run analysis in plain strain mode
-
 		// Create timer to track total running time
 		Timer	m_TotalTime;
 	//}
 
 public:
-	// --- Direct Solver Data ---
-	//{
-		int		m_nsolver;	//!< type of solver selected
-		int		m_bwopt;	//!< bandwidth optimization flag
-	//}
- 
 	// --- I/O-Data --- 
 	//{
 		PlotFile*	m_plot;		//!< the plot file

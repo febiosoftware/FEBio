@@ -373,10 +373,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEStiffnessMatrix.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
 				>
 			</File>
@@ -596,10 +592,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FESolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEStiffnessMatrix.h"
 				>
 			</File>
 			<File

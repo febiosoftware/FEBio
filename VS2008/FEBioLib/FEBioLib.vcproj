@@ -550,6 +550,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEStiffnessMatrix.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
 				>
 			</File>
@@ -1041,6 +1045,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESphericalFiberDistribution.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEStiffnessMatrix.h"
 				>
 			</File>
 			<File

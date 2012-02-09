@@ -128,6 +128,12 @@ void FEM::PopState()
 }
 
 //-----------------------------------------------------------------------------
+void FEM::Write()
+{
+	m_plot->Write(*this);
+}
+
+//-----------------------------------------------------------------------------
 // This function is used when pushing the FEM state data. Since we don't need
 // to copy all the data, this function only copies the data that needs to be 
 // restored for a running restart.
