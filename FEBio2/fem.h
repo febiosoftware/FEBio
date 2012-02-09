@@ -114,6 +114,9 @@ public:
 	void EvaluateParameterList(FEParameterList& pl);
 	void EvaluateMaterialParameters(FEMaterial* pm);
 
+	//! check for user-interruption
+	virtual void CheckInterruption();
+
 public:
 	virtual void PushState();
 	virtual void PopState ();

@@ -19,6 +19,7 @@
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/FETriphasic.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
+#include "Interrupt.h"
 
 // --- Global Constants Data ---
 // m_Const and m_SD need a definitions, since static
@@ -651,4 +652,18 @@ void FEM::SetInputFilename(const char* szfile)
 		if (m_szfile_title == 0) m_szfile_title = m_szfile; else ++m_szfile_title;
 	}
 	else ++m_szfile_title;
+}
+
+//-----------------------------------------------------------------------------
+void FEM::CheckInterruption()
+{
+	if (m_bInterruptable)
+	{
+		Interruption itr;
+		if (itr.m_bsig)
+		{
+			itr.m_bsig = false;
+			itr.interrupt();
+		}
+	}
 }

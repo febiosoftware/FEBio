@@ -4,7 +4,6 @@
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FERigidBody.h"
-#include "Interrupt.h"
 
 #ifdef WIN32
 #include <float.h>
@@ -112,15 +111,7 @@ bool FETriphasicSolver::Quasin(double time)
 	PrepStep(time);
 	
 	// check for CTRL+C interruption before we do any work
-	if (m_fem.m_bInterruptable)
-	{
-		Interruption itr;
-		if (itr.m_bsig)
-		{
-			itr.m_bsig = false;
-			itr.interrupt();
-		}
-	}
+	m_fem.CheckInterruption();
 	
 	// calculate initial stiffness matrix
 	if (ReformStiffness() == false) return false;
@@ -408,15 +399,7 @@ bool FETriphasicSolver::Quasin(double time)
 		clog.flush();
 		
 		// check for CTRL+C interruption
-		if (m_fem.m_bInterruptable)
-		{
-			Interruption itr;
-			if (itr.m_bsig)
-			{
-				itr.m_bsig = false;
-				itr.interrupt();
-			}
-		}
+		m_fem.CheckInterruption();
 	}
 	while (bconv == false);
 	

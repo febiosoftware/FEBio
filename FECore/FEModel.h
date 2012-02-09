@@ -69,6 +69,9 @@ public:
 	//! find a boundary condition from the ID
 	virtual FEBoundaryCondition* FindBC(int nid) = 0;
 
+	//! check for user interruption
+	virtual void CheckInterruption() = 0;
+
 public:	// --- Load curve functions ----
 
 	//! Add a loadcurve to the model
