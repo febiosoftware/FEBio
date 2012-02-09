@@ -179,4 +179,15 @@ protected:
 	//}
 };
 
+//-----------------------------------------------------------------------------
+class FEBioProgress : public Progress
+{
+public:
+	FEBioProgress(FEM& fem) : m_fem(fem) {}
+	void SetProgress(double f);
+
+protected:
+	FEM&	m_fem;
+};
+
 #endif // _FEM_H_07012006_

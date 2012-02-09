@@ -45,6 +45,9 @@ bool FEM::Solve()
 	// convergence flag
 	bool bconv = true;
 
+	// progress
+	FEBioProgress prg(*this);
+
 	// loop over all analysis steps
 	// Note that we don't necessarily from step 0.
 	// This is because the user could have restarted
@@ -63,7 +66,7 @@ bool FEM::Solve()
 		}
 
 		// solve the analaysis step
-		bconv = m_pStep->Solve();
+		bconv = m_pStep->Solve(prg);
 
 		// break if the step has failed
 		if (bconv == false) break;

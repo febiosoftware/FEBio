@@ -3,9 +3,21 @@
 #include "FECore/FEBoundaryCondition.h"
 #include <vector>
 
+//-----------------------------------------------------------------------------
 class FEModel;
 class FENLSolver;
 class FEDomain;
+
+//-----------------------------------------------------------------------------
+// This class is used as a method to communicate progress with the outside world
+class Progress
+{
+public:
+	Progress(){}
+	virtual ~Progress() {}
+
+	virtual void SetProgress(double f) = 0;
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
@@ -22,7 +34,7 @@ public:
 	virtual bool Init() { return false; }
 
 	//! Solve the analysis step
-	virtual bool Solve() { return false; }
+	virtual bool Solve(Progress& prg) { return false; }
 
 	//! wrap it up
 	virtual void Finish() {}

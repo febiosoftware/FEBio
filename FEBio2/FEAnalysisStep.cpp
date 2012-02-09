@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEAnalysisStep.h"
-#include "console.h"
 #include "FEBioLib/FERigid.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
 #include "FEBioLib/log.h"
@@ -424,12 +423,8 @@ bool FEAnalysisStep::InitConstraints()
 }
 
 //-----------------------------------------------------------------------------
-bool FEAnalysisStep::Solve()
+bool FEAnalysisStep::Solve(Progress& prg)
 {
-	// obtain a pointer to the console object. We'll use this to
-	// set the title of the console window.
-	Console* pShell = Console::GetHandle();
-
 	// convergence flag
 	// we initialize it to true so that when a restart is performed after 
 	// the last time step we terminate normally.
@@ -441,14 +436,8 @@ bool FEAnalysisStep::Solve()
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
 
-	int nsteps = m_fem.Steps();
-
-	bool bdebug = m_fem.GetDebugFlag();
-
-	if (nsteps > 1)
-		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
-	else
-		pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+	// set progress
+	prg.SetProgress(100.f*(m_fem.m_ftime - starttime) / (endtime - starttime));
 
 	// print initial progress bar
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
@@ -657,11 +646,8 @@ bool FEAnalysisStep::Solve()
 		// the next timestep goes wrong
 		clog.flush();
 
-		bool bdebug = m_fem.GetDebugFlag();
-		if (nsteps>1)
-			pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", m_fem.m_nStep+1, nsteps, (100.f*(m_fem.m_ftime - starttime) / (endtime - starttime)), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
-		else
-			pShell->SetTitle("(%.f%%) %s - %s", (100.f*m_fem.m_ftime/endtime), m_fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+		// set progress
+		prg.SetProgress(100.f*(m_fem.m_ftime - starttime) / (endtime - starttime));
 	}
 
 	if ((m_nplot == FE_PLOT_FINAL) && bconv) m_fem.Write();

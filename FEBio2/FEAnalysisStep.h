@@ -22,7 +22,7 @@ public:
 	bool Init();
 
 	//! Solve the analysis step
-	bool Solve();
+	bool Solve(Progress& prg);
 
 	//! wrap it up
 	void Finish();
