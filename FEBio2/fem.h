@@ -66,12 +66,6 @@ public:
 	//! write data 
 	void Write();
 
-	//! set the debug level
-	void SetDebugFlag(bool b) { m_debug = b; }
-
-	//! get the debug level
-	bool GetDebugFlag() { return m_debug; }
-
 	// set the i/o files
 	void SetInputFilename(const char* szfile);
 	void SetLogFilename  (const char* szfile) { strcpy(m_szlog , szfile); }
@@ -169,7 +163,6 @@ public:
 		DataStore	m_Data;		//!< the data store used for data logging
 		
 		bool		m_becho;			//!< echo input to logfile
-		bool		m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
 
 protected:
 		// file names
@@ -180,8 +173,6 @@ protected:
 		char	m_szdump[MAX_STRING];	//!< dump file name
 
 		char	m_sztitle[MAX_STRING];	//!< problem title
-
-		bool	m_debug;			//!< debug flag
 	//}
 };
 

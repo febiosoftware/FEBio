@@ -265,10 +265,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\elstf.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEAnalysisStep.cpp"
 				>
 			</File>
@@ -445,10 +441,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\quasin.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\restart.cpp"
 				>
 			</File>
@@ -462,10 +454,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\stdafx.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\update.cpp"
 				>
 			</File>
 			<File
