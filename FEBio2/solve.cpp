@@ -35,10 +35,6 @@ bool FEM::Solve()
 	// for instance, in the parameter optimization module
 	if (m_becho) echo_input(*this);
 
-	// obtain a pointer to the console window. We'll use this to 
-	// set the title of the window
-	Console* pShell = Console::GetHandle();
-
 	// start the total time tracker
 	m_TotalTime.start();
 
@@ -95,6 +91,9 @@ bool FEM::Solve()
 		clog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
 	}
 
+	// obtain a pointer to the console window. We'll use this to 
+	// set the title of the window
+	Console* pShell = Console::GetHandle();
 	pShell->SetTitle("(%s) %s - FEBio", (bconv?"NT":"ET"), m_szfile_title);
 
 	// We're done !

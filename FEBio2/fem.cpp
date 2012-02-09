@@ -53,33 +53,17 @@ void FEBioProgress::SetProgress(double f)
 //!
 FEM::FEM()
 {
-	// --- Analysis Data ---
-	m_nStep = -1;
-	m_nplane_strain = -1;	// don't use plain strain mode
-
-	m_ftime = 0;
-	m_ftime0 = 0;
-
-	// add the "zero" loadcurve
-	// this is the loadcurve that will be used if a loadcurve is not
-	// specified for something that depends on time
-	// TODO: I want to get rid of this 
-	FELoadCurve* plc = new FELoadCurve();
-	plc->Create(2);
-	plc->LoadPoint(0).time = 0;
-	plc->LoadPoint(0).value = 0;
-	plc->LoadPoint(1).time = 1;
-	plc->LoadPoint(1).value = 1;
-	plc->SetExtendMode(FELoadCurve::EXTRAPOLATE);
-	AddLoadCurve(plc);
-
+	// User may interrupt run
 	m_bInterruptable = true;
 
-	// --- Material Data ---
-	// (nothing to initialize yet)
-
-	// --- Load Curve Data ---
-	// (nothing to initialize yet)
+	// --- I/O-Data ---
+	strcpy(m_szplot, "n3plot");
+	strcpy(m_szlog , "n3log" );
+	strcpy(m_szdump, "n3dump");
+	m_sztitle[0] = 0;
+	m_debug = false;
+	m_becho = true;
+	m_plot = 0;
 
 	// --- Direct Solver Data ---
 	// set the default linear solver
@@ -90,44 +74,12 @@ FEM::FEM()
 #else
 	m_nsolver = SKYLINE_SOLVER;
 #endif
-
-	m_bwopt = 0;
-
-	// --- I/O-Data ---
-	strcpy(m_szplot, "n3plot");
-	strcpy(m_szlog , "n3log" );
-	strcpy(m_szdump, "n3dump");
-
-	m_sztitle[0] = 0;
-	m_debug = false;
-
-	m_becho = true;
-
-	m_plot = 0;
 }
 
 //-----------------------------------------------------------------------------
 //! destructor of FEM class.
-//! Delete all dynamically allocated data
-
 FEM::~FEM()
 {
-	size_t i;
-	for (i=0; i<m_Step.size(); ++i) delete m_Step[i]; m_Step.clear();
-	for (i=0; i<m_CI.size  (); ++i) delete m_CI [i] ; m_CI.clear  ();
-	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
-	for (i=0; i<m_LC.size  (); ++i) delete m_LC [i] ; m_LC.clear  ();
-	for (i=0; i<m_BF.size  (); ++i) delete m_BF [i] ; m_BF.clear  ();
-	for (i=0; i<m_DC.size  (); ++i) delete m_DC [i] ; m_DC.clear  ();
-	for (i=0; i<m_FC.size  (); ++i) delete m_FC [i] ; m_FC.clear  ();
-	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();
-	for (i=0; i<m_RDC.size (); ++i) delete m_RDC[i] ; m_RDC.clear ();
-	for (i=0; i<m_RFC.size (); ++i) delete m_RFC[i] ; m_RFC.clear ();
-	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
-	for (i=0; i<m_NLC.size (); ++i) delete m_NLC[i] ; m_NLC.clear ();
-	for (i=0; i<m_Obj.size (); ++i) delete m_Obj[i] ; m_Obj.clear ();
-//	for (i=0; i<m_PC.size  (); ++i) delete m_PC [i] ; m_PC.clear  ();
-//	for (i=0; i<m_LCSet.size(); ++i) delete m_LCSet[i]; m_LCSet.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -150,15 +102,33 @@ void FEM::PopState()
 }
 
 //-----------------------------------------------------------------------------
+//! Export state to plot file.
 void FEM::Write()
 {
 	m_plot->Write(*this);
 }
 
 //-----------------------------------------------------------------------------
+//! Write user data to the logfile
 void FEM::WriteData()
 {
 	m_Data.Write();
+}
+
+//-----------------------------------------------------------------------------
+//! Dump state to archive for restarts
+void FEM::DumpData()
+{
+	DumpFile ar(this);
+	if (ar.Create(m_szdump) == false)
+	{
+		clog.printf("WARNING: Failed creating restart point.\n");
+	}
+	else 
+	{
+		Serialize(ar);
+		clog.printf("\nRestart point created. Archive name is %s\n", m_szdump);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -619,7 +589,7 @@ bool FEM::Configure(const char *szfile)
 }
 
 //-----------------------------------------------------------------------------
-
+//! Find a BC based on its ID. This is needed for restarts.
 FEBoundaryCondition* FEM::FindBC(int nid)
 {
 	int i;
@@ -639,6 +609,7 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 }
 
 //-----------------------------------------------------------------------------
+//! Sets the extension of the plot file name.
 void FEM::SetPlotFileNameExtension(const char *szext)
 {
 	char* ch = strrchr(m_szplot, '.');
@@ -676,6 +647,8 @@ void FEM::SetInputFilename(const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
+//! This function is called in several places to see if the user requested to
+//! pause the run. If so, the FEBio prompt appears and users can enter a command.
 void FEM::CheckInterruption()
 {
 	if (m_bInterruptable)

@@ -585,19 +585,7 @@ bool FEAnalysisStep::Solve(Progress& prg)
 			}
 
 			// Dump converged state to the archive
-			if (m_bDump)
-			{
-				DumpFile ar(&m_fem);
-				if (ar.Create(m_fem.GetDumpFileName()) == false)
-				{
-					clog.printf("WARNING: Failed creating restart point.\n");
-				}
-				else 
-				{
-					m_fem.Serialize(ar);
-					clog.printf("\nRestart point created. Archive name is %s\n", m_fem.GetDumpFileName());
-				}
-			}
+			if (m_bDump) m_fem.DumpData();
 
 			// store additional data to the logfile
 			m_fem.WriteData();

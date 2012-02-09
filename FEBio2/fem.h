@@ -69,6 +69,9 @@ public:
 	//! write data to log file
 	void WriteData();
 
+	//! dump data to archive for restart
+	void DumpData();
+
 	// set the i/o files
 	void SetInputFilename(const char* szfile);
 	void SetLogFilename  (const char* szfile) { strcpy(m_szlog , szfile); }
@@ -81,7 +84,6 @@ public:
 	const char* GetInputFileName() { return m_szfile; }
 	const char* GetLogfileName  () { return m_szlog;  }
 	const char* GetPlotFileName () { return m_szplot; }
-	const char* GetDumpFileName () { return m_szdump; }
 
 	//! set the problem title
 	void SetTitle(const char* sz) { strcpy(m_sztitle, sz); }
@@ -155,9 +157,8 @@ public:
 	//}
 
 public:
-		// Create timer to track total running time
-		Timer	m_TotalTime;
-	//}
+	Timer	m_TotalTime;		//!< Create timer to track total running time
+	bool	m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
 
 public:
 	// --- I/O-Data --- 

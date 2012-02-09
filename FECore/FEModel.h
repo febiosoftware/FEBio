@@ -14,6 +14,7 @@
 #include <map>
 
 //-----------------------------------------------------------------------------
+// Forward declaration of the FEModel class.
 class FEModel;
 
 //-----------------------------------------------------------------------------
@@ -25,7 +26,9 @@ struct FEBIO_CALLBACK {
 };
 
 //-----------------------------------------------------------------------------
-//! The FEModel class stores all the data for the finite element model.
+//! The FEModel class stores all the data for the finite element model, including
+//! geometry, analysis steps, boundary and loading conditions, contact interfaces
+//! and so on.
 //!
 class FEModel
 {
@@ -33,44 +36,14 @@ public:
 	FEModel(void);
 	virtual ~FEModel(void);
 
-	// input from file
-	virtual bool Input(const char* szfile) = 0;
-
 	// Initialization
 	virtual bool Init() = 0;
 
 	// solve the model
 	virtual bool Solve() = 0;
 
-	//! serialize data
-	virtual bool Serialize(DumpFile& ar) = 0;
-
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }
-
-	// facilities for (re)storing the model state data
-	virtual void PushState() = 0;
-	virtual void PopState () = 0;
-
-	//! write to plot file
-	virtual void Write() = 0;
-
-	//! write data to log file
-	virtual void WriteData() = 0;
-
-	//! TODO: remove this function
-	virtual const char* GetFileTitle() = 0;
-	virtual const char* GetDumpFileName () = 0;
-
-	//! Evaluate parameter list
-	virtual void EvaluateParameterList(FEParameterList& pl) = 0;
-	virtual void EvaluateMaterialParameters(FEMaterial* pm) = 0;
-
-	//! find a boundary condition from the ID
-	virtual FEBoundaryCondition* FindBC(int nid) = 0;
-
-	//! check for user interruption
-	virtual void CheckInterruption() = 0;
 
 public:	// --- Load curve functions ----
 
@@ -83,7 +56,7 @@ public:	// --- Load curve functions ----
 	//! get the number of loadcurves
 	int LoadCurves() { return m_LC.size(); }
 
-public: // --- material functions ---
+public: // --- Material functions ---
 
 	//! Add a material to the model
 	void AddMaterial(FEMaterial* pm) { m_MAT.push_back(pm); }
@@ -94,7 +67,7 @@ public: // --- material functions ---
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
 
-public: // --- body force --- 
+public: // --- Body load functions --- 
 
 	//! Add a body force to the model
 	void AddBodyForce(FEBodyForce* pf) { m_BF.push_back(pf); }
@@ -108,7 +81,8 @@ public: // --- body force ---
 	//! see if there are any body forces
 	bool HasBodyForces() { return !m_BF.empty();}
 
-public: // --- analysis step ---
+public: // --- Analysis steps functions ---
+
 	//! retrieve the number of steps
 	int Steps() { return (int) m_Step.size(); }
 
@@ -127,7 +101,8 @@ public: // --- analysis step ---
 	//! Set the current step
 	void SetCurrentStep(FEAnalysis* pstep) { m_pStep = pstep; }
 
-public: // --- contact interface ---
+public: // --- Contact interface functions ---
+
 	//! return number of contact interfaces
 	int ContactInterfaces() { return m_CI.size(); } 
 
@@ -137,7 +112,7 @@ public: // --- contact interface ---
 	//! Add a contact interface
 	void AddContactInterface(FEContactInterface* pci) { m_CI.push_back(pci); }
 
-public: // --- nonlinear constraints ---
+public: // --- Nonlinear constraints functions ---
 
 	//! return number of nonlinear constraints
 	int NonlinearConstraints() { return (int) m_NLC.size(); }
@@ -150,6 +125,20 @@ public: // --- nonlinear constraints ---
 
 public:	// Miscellaneous routines
 
+	// facilities for (re)storing the model state data (used for running restarts)
+	virtual void PushState() = 0;
+	virtual void PopState () = 0;
+
+	//! Evaluate parameter list
+	virtual void EvaluateParameterList(FEParameterList& pl) = 0;
+	virtual void EvaluateMaterialParameters(FEMaterial* pm) = 0;
+
+	//! find a boundary condition from the ID
+	virtual FEBoundaryCondition* FindBC(int nid) = 0;
+
+	//! check for user interruption
+	virtual void CheckInterruption() = 0;
+
 	//! set callback function
 	void AddCallback(FEBIO_CB_FNC pcb, void* pd);
 
@@ -159,6 +148,23 @@ public:	// Miscellaneous routines
 	// get/set global data
 	static void SetGlobalConstant(const string& s, double v);
 	static double GetGlobalConstant(const string& s);
+
+public: // --- I/O functions
+
+	// input from file
+	virtual bool Input(const char* szfile) = 0;
+
+	//! write to plot file
+	virtual void Write() = 0;
+
+	//! write data to log file
+	virtual void WriteData() = 0;
+
+	//! write data to dump file
+	virtual void DumpData() = 0;
+
+	//! serialize data
+	virtual bool Serialize(DumpFile& ar) = 0;
 
 public:
 	//! set the debug level
@@ -173,8 +179,7 @@ public: // TODO: Find a better place for these parameters
 	int		m_nStep;			//!< current analysis step
 	double	m_ftime;			//!< current time value
 	double	m_ftime0;			//!< start time of current step
-	int		m_nplane_strain;	//!< run analysis in plain strain mode
-	bool	m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
+	int		m_nplane_strain;	//!< run analysis in plain strain mode (TODO: Move to the analysis class?)
 	bool	m_debug;			//!< debug flag
 
 protected:
@@ -183,7 +188,6 @@ protected:
 	std::vector<FEBodyForce*>			m_BF;	//!< body force data
 	std::vector<FEContactInterface*>	m_CI;	//!< contact interface array
 	std::vector<FENLConstraint*>		m_NLC;	//!< nonlinear constraints
-
 
 protected:
 	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
