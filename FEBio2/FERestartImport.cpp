@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "FERestartImport.h"
-#include "FESolver.h"
+#include "FEBioLib/FESolver.h"
 #include "FEAnalysisStep.h"
 
 //////////////////////////////////////////////////////////////////////

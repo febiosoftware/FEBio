@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "FEPrintHBMatrixDiagnostic.h"
-#include "FESolidSolver.h"
+#include "FEBioLib/FESolidSolver.h"
 #include "NumCore/CompactMatrix.h"
 using namespace NumCore;
 

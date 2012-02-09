@@ -14,9 +14,9 @@
 #include "FEBioLib/log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"
-#include "FEBiphasicSolver.h"
-#include "FEBiphasicSoluteSolver.h"
-#include "FETriphasicSolver.h"
+#include "FEBioLib/FEBiphasicSolver.h"
+#include "FEBioLib/FEBiphasicSoluteSolver.h"
+#include "FEBioLib/FETriphasicSolver.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------

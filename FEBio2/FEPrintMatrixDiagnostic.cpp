@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPrintMatrixDiagnostic.h"
-#include "FESolidSolver.h"
+#include "FEBioLib/FESolidSolver.h"
 
 FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEM& fem) : FEDiagnostic(fem)
 {

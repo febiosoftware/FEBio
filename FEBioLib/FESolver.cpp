@@ -7,13 +7,13 @@
 #include "NumCore/SkylineSolver.h"
 #include "NumCore/LUSolver.h"
 #include "NumCore/ConjGradIterSolver.h"
-#include "FEBioLib/PSLDLTSolver.h"
-#include "FEBioLib/SuperLUSolver.h"
-#include "FEBioLib/SuperLU_MT_Solver.h"
-#include "FEBioLib/PardisoSolver.h"
-#include "FEBioLib/WSMPSolver.h"
-#include "FEBioLib/RCICGSolver.h"
-#include "FEBioLib/log.h"
+#include "PSLDLTSolver.h"
+#include "SuperLUSolver.h"
+#include "SuperLU_MT_Solver.h"
+#include "PardisoSolver.h"
+#include "WSMPSolver.h"
+#include "RCICGSolver.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor of FESolver base class

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "FEBiphasicSolver.h"
-#include "FEBioLib/FESlidingInterface2.h"
-#include "FEBioLib/FESlidingInterface3.h"
-#include "FEBioLib/FEElasticDomain.h"
-#include "FEBioLib/FEBiphasicSolidDomain.h"
-#include "FEBioLib/FEPressureLoad.h"
-#include "FEBioLib/FERigidBody.h"
-#include "FEBioLib/log.h"
+#include "FESlidingInterface2.h"
+#include "FESlidingInterface3.h"
+#include "FEElasticDomain.h"
+#include "FEBiphasicSolidDomain.h"
+#include "FEPressureLoad.h"
+#include "FERigidBody.h"
+#include "log.h"
 
 #ifdef WIN32
 	#include <float.h>

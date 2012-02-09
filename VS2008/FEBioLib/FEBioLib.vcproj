@@ -250,6 +250,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSoluteSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEBox.cpp"
 				>
 			</File>
@@ -263,6 +271,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEContactSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FECoupledHeatSolidSolver.cpp"
 				>
 			</File>
 			<File
@@ -386,6 +398,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHeatSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.cpp"
 				>
 			</File>
@@ -411,6 +427,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FELinearSolidDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FELinearSolidSolver.cpp"
 				>
 			</File>
 			<File
@@ -534,6 +554,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESolidSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESolubConst.cpp"
 				>
 			</File>
@@ -543,6 +567,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESoluteFlux.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESolver.cpp"
 				>
 			</File>
 			<File
@@ -611,6 +639,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETriphasicDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETriphasicSolver.cpp"
 				>
 			</File>
 			<File
@@ -736,6 +768,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSoluteSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBiphasicSolver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEBox.h"
 				>
 			</File>
@@ -749,6 +789,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEContactSurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FECoupledHeatSolidSolver.h"
 				>
 			</File>
 			<File
@@ -880,6 +924,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHeatSolver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEHeatTransferMaterial.h"
 				>
 			</File>
@@ -909,6 +957,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FELinearSolidDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FELinearSolidSolver.h"
 				>
 			</File>
 			<File
@@ -1032,6 +1084,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESolidSolver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESolubConst.h"
 				>
 			</File>
@@ -1041,6 +1097,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESoluteFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESolver.h"
 				>
 			</File>
 			<File
@@ -1109,6 +1169,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETriphasicDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETriphasicSolver.h"
 				>
 			</File>
 			<File

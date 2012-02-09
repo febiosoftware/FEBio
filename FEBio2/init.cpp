@@ -6,7 +6,7 @@
 #include "fem.h"
 #include "FECore/FEException.h"
 #include "FEBioLib/log.h"
-#include "FESolidSolver.h"
+#include "FEBioLib/FESolidSolver.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEBioLib/FEDiscreteMaterial.h"

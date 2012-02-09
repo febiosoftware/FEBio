@@ -2,7 +2,7 @@
 #include "NodeDataRecord.h"
 #include "fem.h"
 #include "FEAnalysisStep.h"
-#include "FESolidSolver.h"
+#include "FEBioLib/FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
 void NodeDataRecord::Parse(const char* szexpr)

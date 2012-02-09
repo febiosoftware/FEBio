@@ -289,19 +289,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSoluteSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FECoupledHeatSolidSolver.cpp"
 				>
 			</File>
 			<File
@@ -310,14 +298,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEFiberMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEHeatSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FELinearSolidSolver.cpp"
 				>
 			</File>
 			<File
@@ -361,19 +341,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESolidSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETriphasicSolver.cpp"
 				>
 			</File>
 			<File
@@ -507,31 +475,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSoluteSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEBiphasicSolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEContactDiagnostic.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FECoupledHeatSolidSolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEHeatSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FELinearSolidSolver.h"
 				>
 			</File>
 			<File
@@ -575,19 +523,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FESolidSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FESolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FETriphasicSolver.h"
 				>
 			</File>
 			<File

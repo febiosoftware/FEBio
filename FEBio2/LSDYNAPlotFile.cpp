@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "LSDYNAPlotFile.h"
 #include "fem.h"
-#include "FESolidSolver.h"
+#include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"

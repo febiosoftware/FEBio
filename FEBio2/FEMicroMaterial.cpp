@@ -2,10 +2,10 @@
 #include "FEMicroMaterial.h"
 #include "FEBioLib/FEElemElemList.h"
 #include "FEBioLib/log.h"
-#include "console.h"
-#include "FESolidSolver.h"
+#include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEAnalysisStep.h"
+#include "console.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEMicroMaterial, "micro-material");

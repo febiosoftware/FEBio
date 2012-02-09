@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
-#include "FESolidSolver.h"
+#include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/log.h"
 

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FECore/FENodeReorder.h"
-#include "FEBioLib/FERigid.h"
-#include "FEBioLib/FERigidBody.h"
-#include "FEBioLib/FE3FieldElasticSolidDomain.h"
-#include "FEBioLib/FEPointBodyForce.h"
-#include "FEBioLib/log.h"
-#include "FEBioLib/FEPressureLoad.h"
+#include "FERigid.h"
+#include "FERigidBody.h"
+#include "FE3FieldElasticSolidDomain.h"
+#include "FEPointBodyForce.h"
+#include "FEPressureLoad.h"
+#include "log.h"
 
 #ifdef WIN32
 	#include <float.h>

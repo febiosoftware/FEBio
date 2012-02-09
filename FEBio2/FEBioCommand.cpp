@@ -7,7 +7,7 @@
 #include "FECore/FECore.h"
 #include "NumCore/CompactMatrix.h"
 #include "FEAnalysisStep.h"
-#include "FESolver.h"
+#include "FEBioLib/FESolver.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_COMMAND(FEBioCmd_Cont   , "cont"   , "continues run");

@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "FELinearSolidSolver.h"
-#include "FEBioLib/FELinearSolidDomain.h"
+#include "FELinearSolidDomain.h"
 #include "FECore/FENodeReorder.h"
-#include "FEBioLib/FEPressureLoad.h"
-#include "FEBioLib/FERigid.h"
-#include "FEBioLib/log.h"
+#include "FEPressureLoad.h"
+#include "FERigid.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 //! Class constructor

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "FETriphasicSolver.h"
-#include "FEBioLib/FETriphasicDomain.h"
-#include "FEBioLib/log.h"
-#include "FEBioLib/FEPressureLoad.h"
-#include "FEBioLib/FERigidBody.h"
+#include "FETriphasicDomain.h"
+#include "FEPressureLoad.h"
+#include "FERigidBody.h"
+#include "log.h"
 
 #ifdef WIN32
 #include <float.h>
