@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "DataStore.h"
 #include "fem.h"
-#include "FEAnalysisStep.h"
+#include "FEBioLib/FEAnalysisStep.h"
 #include "FEBioLib/FERigid.h"
 #include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FEBiphasicSolute.h"

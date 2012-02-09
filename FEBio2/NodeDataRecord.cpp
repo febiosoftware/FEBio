@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "NodeDataRecord.h"
 #include "fem.h"
-#include "FEAnalysisStep.h"
+#include "FEBioLib/FEAnalysisStep.h"
 #include "FEBioLib/FESolidSolver.h"
 
 //-----------------------------------------------------------------------------

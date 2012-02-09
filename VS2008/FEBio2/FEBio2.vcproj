@@ -265,10 +265,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEAnalysisStep.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBio.cpp"
 				>
 			</File>
@@ -452,10 +448,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\ElementDataRecord.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEAnalysisStep.h"
 				>
 			</File>
 			<File

@@ -18,7 +18,7 @@
 #include "FEBioLib/FEHeatTransferMaterial.h"
 #include "FEBioLib/FETrussMaterial.h"
 #include "FEBioLib/FEBiphasic.h"
-#include "FEAnalysisStep.h"
+#include "FEBioLib/FEAnalysisStep.h"
 
 LSDYNAPlotFile::LSDYNAPlotFile()
 {

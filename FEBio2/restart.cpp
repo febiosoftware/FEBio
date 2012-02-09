@@ -12,18 +12,13 @@
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "FEBioLib/log.h"
-#include "LSDYNAPlotFile.h"
-#include "FEBioPlotFile.h"
-#include "version.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FETractionLoad.h"
 #include "FEBioLib/FEFluidFlux.h"
 #include "FEBioLib/FEPoroTraction.h"
 #include "FEBioLib/FESoluteFlux.h"
 #include "FEBioLib/FEHeatFlux.h"
-#include "FEAnalysisStep.h"
-
+#include "FEBioLib/FEAnalysisStep.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/FEElasticShellDomain.h"
 #include "FEBioLib/FEElasticTrussDomain.h"
@@ -39,6 +34,10 @@
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointConstraint.h"
 #include "FEBioLib/FEAugLagLinearConstraint.h"
+#include "FEBioLib/log.h"
+#include "LSDYNAPlotFile.h"
+#include "FEBioPlotFile.h"
+#include "version.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)

@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "FERestartImport.h"
 #include "FEBioLib/FESolver.h"
-#include "FEAnalysisStep.h"
+#include "FEBioLib/FEAnalysisStep.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

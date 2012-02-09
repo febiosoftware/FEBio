@@ -226,6 +226,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEAnalysisStep.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEArrudaBoyce.cpp"
 				>
 			</File>
@@ -741,6 +745,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FE3FieldElasticSolidDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEAnalysisStep.h"
 				>
 			</File>
 			<File

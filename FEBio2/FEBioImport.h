@@ -9,7 +9,7 @@
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/FETriphasic.h"
-#include "FEAnalysisStep.h"
+#include "FEBioLib/FEAnalysisStep.h"
 #include "FEBioLib/FESolver.h"
 #include <map>
 #include <string>
