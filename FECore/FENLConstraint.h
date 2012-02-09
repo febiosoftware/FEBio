@@ -38,6 +38,9 @@ public:
 	virtual bool Augment(int naug) = 0;
 	virtual void Serialize(DumpFile& ar) = 0;
 
+	// update state
+	virtual void Update() {}
+
 protected:
 	FEModel*	m_pfem;
 	int			m_ntype;

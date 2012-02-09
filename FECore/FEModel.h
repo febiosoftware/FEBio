@@ -9,6 +9,7 @@
 #include "FESurfaceLoad.h"
 #include "FENLConstraint.h"
 #include "FELinearConstraint.h"
+#include "FEObject.h"
 #include <vector>
 #include <map>
 
@@ -143,19 +144,26 @@ protected:
 	std::vector<FEContactInterface*>	m_CI;	//!< contact interface array
 	std::vector<FENLConstraint*>		m_NLC;	//!< nonlinear constraints
 
+
+protected:
 	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
 	FEAnalysis*					m_pStep;	//!< pointer to current analysis step
 
-
 public:
 	// Geometry data
-	FEMesh		m_mesh;		//!< the FE mesh
+	FEMesh		m_mesh;					//!< the one and only FE mesh
+	std::vector<FEObject*>		m_Obj;	//!< FE Object array (NOTE: only used for rigid bodies)
 
 	// Boundary Conditions
 	std::vector<FEPrescribedBC*>	m_DC;	//!< prescribed constraints
 	std::vector<FENodalForce*>		m_FC;	//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>		m_SL;	//!< surface loads
 	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
+
+	// Boundary conditions for rigid bodies
+	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
+	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
+	vector<FERigidBodyForce*>			m_RFC;	//!< rigid body forces
 
 	// linear constraint data
 	list<FELinearConstraint>	m_LinC;		//!< linear constraints data

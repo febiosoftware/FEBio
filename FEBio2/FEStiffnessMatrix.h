@@ -10,10 +10,9 @@
 #endif // _MSC_VER > 1000
 
 #include "NumCore/SparseMatrix.h"
+#include "FECore/FENLSolver.h"
+#include "FECore/FEModel.h"
 using namespace NumCore;
-
-class FEM;
-class FESolver;
 
 //-----------------------------------------------------------------------------
 //! The FEStiffnessmatrix class stores the global stiffness matrix of the FE
@@ -33,7 +32,7 @@ public:
 	void Clear() { if (m_pA) m_pA->Clear(); }
 
 	//! construct the stiffness matrix from a FEM object
-	bool Create(FESolver* psolver, int neq, bool breset);
+	bool Create(FENLSolver* psolver, int neq, bool breset);
 
 	//! assemble an element stiffness matrix into the global stiffness matrix
 	void Assemble(matrix& ke, vector<int>& lm) { m_pA->Assemble(ke, lm); }
@@ -71,10 +70,9 @@ protected:
 
 	// The following data structures are used to incrementally
 	// build the profile of the sparse matrix
-	FEM*	m_pfem;					//!< pointer to the FEM object
-	SparseMatrixProfile*	m_pMP;			//!< profile of sparse matrix
-	vector< vector<int> >	m_LM;	//!< used for building the stiffness matrix
-	int	m_nlm;						//!< nr of elements in m_LM array
+	SparseMatrixProfile*	m_pMP;		//!< profile of sparse matrix
+	vector< vector<int> >	m_LM;		//!< used for building the stiffness matrix
+	int	m_nlm;							//!< nr of elements in m_LM array
 };
 
 #endif // !defined(AFX_FESTIFFNESSMATRIX_H__8E7BEF6B_A12D_4C74_9C88_3ADE0141B981__INCLUDED_)

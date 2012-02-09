@@ -7,7 +7,6 @@
 #include "fem.h"
 #include "FESolver.h"
 #include "FEBioLib/log.h"
-#include "FEAnalysisStep.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
@@ -50,10 +49,8 @@ void FERigidJoint::Residual(FENLSolver* psolver, vector<double>& R)
 	int i;
 	double fe[6];
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-
-	FERigidBody& RBa = fem.m_RB[m_nRBa];
-	FERigidBody& RBb = fem.m_RB[m_nRBb];
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBa]);
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBb]);
 
 	vec3d a = m_qa0;
 	RBa.m_qt.RotateVector(a);
@@ -97,8 +94,8 @@ void FERigidJoint::StiffnessMatrix(FENLSolver* pnls)
 
 	double y1[3][3], y2[3][3], y11[3][3], y12[3][3], y22[3][3];
 
-	FERigidBody& RBa = fem.m_RB[m_nRBa];
-	FERigidBody& RBb = fem.m_RB[m_nRBb];
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBa]);
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBb]);
 
 	a = m_qa0;
 	RBa.m_qt.RotateVector(a);
@@ -194,7 +191,7 @@ void FERigidJoint::StiffnessMatrix(FENLSolver* pnls)
 		LM[j+6] = RBb.m_LM[j];
 	}
 
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
+	FEAnalysis* pstep = m_pfem->GetCurrentStep();
 	FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
 	psolver->m_pK->Assemble(ke, LM);
 }
@@ -208,8 +205,8 @@ bool FERigidJoint::Augment(int naug)
 
 	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 
-	FERigidBody& RBa = fem.m_RB[m_nRBa];
-	FERigidBody& RBb = fem.m_RB[m_nRBb];
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBa]);
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBb]);
 
 	ra = RBa.m_rt;
 	rb = RBb.m_rt;
@@ -268,4 +265,23 @@ void FERigidJoint::Serialize(DumpFile& ar)
 		ar >> m_q0 >> m_qa0 >> m_qb0;
 		ar >> m_F >> m_L >> m_eps >> m_atol;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidJoint::Update()
+{
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[ m_nRBa ]);
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[ m_nRBb ]);
+
+	vec3d ra = RBa.m_rt;
+	vec3d rb = RBb.m_rt;
+
+	vec3d qa = m_qa0;
+	RBa.m_qt.RotateVector(qa);
+
+	vec3d qb = m_qb0;
+	RBb.m_qt.RotateVector(qb);
+
+	vec3d c = ra + qa - rb - qb;
+	m_F = m_L + c*m_eps;
 }

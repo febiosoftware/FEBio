@@ -489,28 +489,9 @@ bool FEM::Reset()
 	// reset mesh data
 	m_mesh.Reset();
 
-	// initialize rigid body data
-	int nrb = m_RB.size();
-	for (i=0; i<nrb; ++i)
-	{
-		// zero total displacements
-		m_RB[i].m_Ut[0] = m_RB[i].m_Up[0] = 0;
-		m_RB[i].m_Ut[1] = m_RB[i].m_Up[1] = 0;
-		m_RB[i].m_Ut[2] = m_RB[i].m_Up[2] = 0;
-		m_RB[i].m_Ut[3] = m_RB[i].m_Up[3] = 0;
-		m_RB[i].m_Ut[4] = m_RB[i].m_Up[4] = 0;
-		m_RB[i].m_Ut[5] = m_RB[i].m_Up[5] = 0;
-
-		// initialize orientation
-		m_RB[i].m_qt = quatd(0, vec3d(0,0,1));
-
-		// initialize center of mass
-		m_RB[i].m_rt = m_RB[i].m_r0;
-
-		// reset reaction force and torque
-		m_RB[i].m_Fr = vec3d(0,0,0);
-		m_RB[i].m_Mr = vec3d(0,0,0);
-	}
+	// reset object data
+	int nrb = m_Obj.size();
+	for (i=0; i<nrb; ++i) m_Obj[i]->Reset();
 
 	// set up rigid joints
 	if (!m_NLC.empty())
@@ -524,8 +505,11 @@ bool FEM::Reset()
 				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
 				rj.m_F = vec3d(0,0,0);
 
-				rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;
-				rj.m_qb0 = rj.m_q0 - m_RB[ rj.m_nRBb ].m_r0;
+				FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBa]);
+				FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBb]);
+
+				rj.m_qa0 = rj.m_q0 - ra.m_r0;
+				rj.m_qb0 = rj.m_q0 - rb.m_r0;
 			}
 		}
 	}

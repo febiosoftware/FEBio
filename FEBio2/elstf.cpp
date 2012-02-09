@@ -84,10 +84,10 @@ bool FESolidSolver::StiffnessMatrix()
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
-	int NRB = fem.m_RB.size();
+	int NRB = fem.m_Obj.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& rb = fem.m_RB[i];
+		FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		for (j=0; j<6; ++j)
 			if (rb.m_LM[j] < -1)
 			{
@@ -165,7 +165,7 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 		{
 			// this is a rigid interface node
 			// get the rigid body this node is attached to
-			FERigidBody& RBj = fem.m_RB[nodej.m_rid];
+			FERigidBody& RBj = dynamic_cast<FERigidBody&>(*fem.m_Obj[nodej.m_rid]);
 
 			// get the rigid body equation nrs.
 			lmj = RBj.m_LM;
@@ -191,9 +191,9 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 				{
 					// node i is also a rigid body node
 					// get the rigid body this node is attached to
-					FERigidBody& RBi = fem.m_RB[nodei.m_rid];
+					FERigidBody& RBi = dynamic_cast<FERigidBody&>(*fem.m_Obj[nodei.m_rid]);
 
-					lmi = fem.m_RB[nodei.m_rid].m_LM;
+					lmi = RBi.m_LM;
 					
 					// get the relative distance
 					ai = nodei.m_rt - RBi.m_rt;
@@ -325,7 +325,7 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 				{
 					// node i is a rigid body
 					// get the rigid body this node is attached to
-					FERigidBody& RBi = fem.m_RB[nodei.m_rid];
+					FERigidBody& RBi = dynamic_cast<FERigidBody&>(*fem.m_Obj[nodei.m_rid]);
 
 					// get the rigid body equation nrs.
 					lmi = RBi.m_LM;
@@ -533,7 +533,7 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 	}
 
 	// see if there are any rigid body dofs here
-	if (fem.m_RB.empty() == false) RigidStiffness(en, elm, ke);
+	if (fem.m_Obj.empty() == false) RigidStiffness(en, elm, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -561,10 +561,10 @@ bool FESolidSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// zero rigid body reaction forces
-	int NRB = fem.m_RB.size();
+	int NRB = fem.m_Obj.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 
@@ -715,7 +715,7 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 	}
 
 	// If there are rigid bodies we need to look for rigid dofs
-	if (fem.m_RB.empty() == false)
+	if (fem.m_Obj.empty() == false)
 	{
 		int *lm;
 
@@ -728,7 +728,7 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 
 				// this is an interface dof
 				// get the rigid body this node is connected to
-				FERigidBody& RB = fem.m_RB[node.m_rid];
+				FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[node.m_rid]);
 				lm = RB.m_LM;
 
 				// add to total torque of this body
@@ -800,7 +800,7 @@ void FESolidSolver::NodalForces(vector<double>& F)
 			else if (node.m_rid >=0)
 			{
 				// this is a rigid body node
-				FERigidBody& RB = fem.m_RB[node.m_rid];
+				FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[node.m_rid]);
 
 				// get the relative position
 				a = node.m_rt - RB.m_rt;

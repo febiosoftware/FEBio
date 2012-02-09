@@ -401,10 +401,10 @@ void FEM::SerializeGeometry(DumpFile &ar)
 	{
 		int i;
 
-		// rigid bodies
-		int nrb = m_RB.size();
+		// FE objects
+		int nrb = m_Obj.size();
 		ar << nrb;
-		for (i=0; i<nrb; ++i) m_RB[i].Serialize(ar);
+		for (i=0; i<nrb; ++i) m_Obj[i]->Serialize(ar);
 	}
 	else
 	{
@@ -413,12 +413,12 @@ void FEM::SerializeGeometry(DumpFile &ar)
 		// rigid bodies
 		int nrb;
 		ar >> nrb;
-		if (nrb) m_RB.resize(nrb); else m_RB.clear();
+		m_Obj.clear();
 		for (i=0; i<nrb; ++i)
 		{
-			FERigidBody& rb = m_RB[i];
-			rb.Serialize(ar);
-			rb.AttachToFEM(this);
+			FERigidBody* prb = new FERigidBody(this);
+			prb->Serialize(ar);
+			m_Obj.push_back(prb);
 		}
 	}
 }

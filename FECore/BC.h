@@ -36,3 +36,27 @@ public:
 	int	nid;	// node number
 	int	rid;	// rigid body number
 };
+
+//-----------------------------------------------------------------------------
+//! rigid body force
+
+class FERigidBodyForce : public FEBoundaryCondition
+{
+public:
+	int		id;	// rigid body id
+	int		bc;	// force direction
+	int		lc;	// load curve number
+	double	sf;	// scale factor
+};
+
+//-----------------------------------------------------------------------------
+//! rigid body displacement
+
+class FERigidBodyDisplacement : public FEBoundaryCondition
+{
+public:
+	int		id;	// rigid body id
+	int		bc;	// displacement direction
+	int		lc;	// load curve number
+	double	sf;	// scale factor
+};

@@ -464,10 +464,10 @@ bool FETriphasicSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// zero rigid body reaction forces
-	int NRB = fem.m_RB.size();
+	int NRB = fem.m_Obj.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 
@@ -641,10 +641,10 @@ bool FETriphasicSolver::StiffnessMatrix()
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
-	int NRB = fem.m_RB.size();
+	int NRB = fem.m_Obj.size();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& rb = fem.m_RB[i];
+		FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		for (j=0; j<6; ++j)
 			if (rb.m_LM[j] < -1)
 			{

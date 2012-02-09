@@ -395,9 +395,11 @@ void echo_input(FEM& fem)
 			if (plc->Type() == FE_RIGID_JOINT)
 			{
 				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
+				FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.m_Obj[rj.m_nRBa]);
+				FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.m_Obj[rj.m_nRBb]);
 				clog.printf("rigid joint %d:\n", i+1);
-				clog.printf("\tRigid body A                   : %d\n", fem.m_RB[rj.m_nRBa].m_mat + 1);
-				clog.printf("\tRigid body B                   : %d\n", fem.m_RB[rj.m_nRBb].m_mat + 1);
+				clog.printf("\tRigid body A                   : %d\n", ra.m_mat + 1);
+				clog.printf("\tRigid body B                   : %d\n", rb.m_mat + 1);
 				clog.printf("\tJoint                          : (%lg, %lg, %lg)\n", rj.m_q0.x, rj.m_q0.y, rj.m_q0.z);
 				clog.printf("\tPenalty factor                 : %lg\n", rj.m_eps );
 				clog.printf("\tAugmented Lagrangian tolerance : %lg\n", rj.m_atol);

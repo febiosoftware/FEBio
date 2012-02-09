@@ -116,9 +116,9 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
 
 	// clear the active rigid body BC's
-	for (i=0; i<(int) fem.m_RB.size(); ++i)
+	for (i=0; i<(int) fem.m_Obj.size(); ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
@@ -134,9 +134,9 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<(int) fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *(fem.m_RDC[i]);
-		FERigidBody& RB = fem.m_RB[DC.id];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[DC.id]);
 //		assert(RB.m_pDC[DC.bc] == 0);
-		if (RB.m_bActive && DC.IsActive())
+		if (RB.IsActive() && DC.IsActive())
 		{
 			RB.m_pDC[DC.bc] = &DC;
 			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
@@ -206,7 +206,7 @@ bool FEAnalysisStep::Init()
 	// Sometimes an (ignorant) user might have added a rigid body
 	// that is not being used. Since this can cause problems we need
 	// to find these rigid bodies.
-	int nrb = fem.m_RB.size();
+	int nrb = fem.m_Obj.size();
 	vector<int> mec; mec.assign(nrb, 0);
 	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
 	{
@@ -218,8 +218,9 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<nrb; ++i)
 		if (mec[i] == 0)
 		{
-			clog.printbox("WARNING", "Rigid body %d is not being used.", fem.m_RB[i].m_mat+1);
-			fem.m_RB[i].m_bActive = false;
+			FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
+			clog.printbox("WARNING", "Rigid body %d is not being used.", RB.m_mat+1);
+			RB.Activate(false);
 		}
 
 	// initialize equations

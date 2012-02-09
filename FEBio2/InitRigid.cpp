@@ -209,24 +209,12 @@ bool FEM::CreateRigidBodies()
 
 	// Ok, we now know how many rigid bodies there are
 	// so let's create them
-	m_RB.resize(nrb);
+	m_Obj.clear();
 	for (i=0; i<nrb; ++i)
 	{
-		// attach the rigid body do this FEM
-		m_RB[i].AttachToFEM(this);
-
-		// zero total displacements
-		m_RB[i].m_Ut[0] = m_RB[i].m_Up[0] = 0;
-		m_RB[i].m_Ut[1] = m_RB[i].m_Up[1] = 0;
-		m_RB[i].m_Ut[2] = m_RB[i].m_Up[2] = 0;
-		m_RB[i].m_Ut[3] = m_RB[i].m_Up[3] = 0;
-		m_RB[i].m_Ut[4] = m_RB[i].m_Up[4] = 0;
-		m_RB[i].m_Ut[5] = m_RB[i].m_Up[5] = 0;
-
-		m_RB[i].m_nID = i;
-
-		// initialize orientation
-		m_RB[i].m_qt = quatd(0, vec3d(0,0,1));
+		// create a new rigid body
+		FERigidBody* prb = new FERigidBody(this);
+		prb->m_nID = i;
 
 		// Since a rigid body may contain several rigid materials
 		// we find the first material that this body has and use
@@ -239,25 +227,22 @@ bool FEM::CreateRigidBodies()
 			if (pm && (pm->m_nRB == i))	break;
 		}
 		assert(j<Materials());
-		m_RB[i].m_mat = j;
+		prb->m_mat = j;
 
-/*		// initialize constraints
-		for (j=0; j<6; ++j)
-		{
-			m_RB[i].m_bc[j] = pm->m_bc[j];
-		}
-*/
 		// initialize center of mass
 		if (pm->m_com == 1)
 		{
 			// grab the com from the material
-			m_RB[i].m_r0 = m_RB[i].m_rt = pm->m_rc;
+			prb->m_r0 = prb->m_rt = pm->m_rc;
 		}
 		else
 		{
 			// calculate the com
-			m_RB[i].Update();
+			prb->UpdateCOM();
 		}
+
+		// add it to the pile
+		m_Obj.push_back(prb);
 	}
 
 	// set up rigid joints
@@ -289,8 +274,11 @@ bool FEM::CreateRigidBodies()
 				}
 				rj.m_nRBb = pm->m_nRB;
 
-				rj.m_qa0 = rj.m_q0 - m_RB[ rj.m_nRBa ].m_r0;
-				rj.m_qb0 = rj.m_q0 - m_RB[ rj.m_nRBb ].m_r0;
+				FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBa]);
+				FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBb]);
+
+				rj.m_qa0 = rj.m_q0 - ra.m_r0;
+				rj.m_qb0 = rj.m_q0 - rb.m_r0;
 			}
 		}
 	}
@@ -382,16 +370,16 @@ bool FEM::CreateRigidBodies()
 	}
 
 	// set the rigid body parents
-	for (i=0; i<(int) m_RB.size(); ++i)
+	for (i=0; i<(int) m_Obj.size(); ++i)
 	{
-		FERigidBody& rb = m_RB[i];
+		FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[i]);
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_MAT[rb.m_mat]);
 		assert(pm);
 		if (pm->m_pmid > -1)
 		{
 			FERigidMaterial* ppm = dynamic_cast<FERigidMaterial*>(m_MAT[pm->m_pmid-1]);
 			assert(ppm);
-			FERigidBody& prb = m_RB[ppm->m_nRB];
+			FERigidBody& prb = dynamic_cast<FERigidBody&>(*m_Obj[ppm->m_nRB]);
 			rb.m_prb = &prb;
 
 			// we also need to open up all the RB's degree of freedoms

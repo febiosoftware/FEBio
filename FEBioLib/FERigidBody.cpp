@@ -8,34 +8,63 @@
 #include "FERigid.h"
 #include "FEElasticSolidDomain.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-FERigidBody::FERigidBody()
+//-----------------------------------------------------------------------------
+FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
 {
-	m_pfem = 0;
 	m_bActive = true;
 	for (int i=0; i<6; ++i) m_pDC[i] = 0;
 	m_prb = 0;
+
+	// zero total displacements
+	m_Ut[0] = m_Up[0] = 0;
+	m_Ut[1] = m_Up[1] = 0;
+	m_Ut[2] = m_Up[2] = 0;
+	m_Ut[3] = m_Up[3] = 0;
+	m_Ut[4] = m_Up[4] = 0;
+	m_Ut[5] = m_Up[5] = 0;
+
+	// initialize orientation
+	m_qt = quatd(0, vec3d(0,0,1));
 }
 
+//-----------------------------------------------------------------------------
 FERigidBody::~FERigidBody()
 {
 
 }
 
 //-----------------------------------------------------------------------------
+//! Reset rigid body data (called from FEM::Reset)
+void FERigidBody::Reset()
+{
+	// zero total displacements
+	m_Ut[0] = m_Up[0] = 0;
+	m_Ut[1] = m_Up[1] = 0;
+	m_Ut[2] = m_Up[2] = 0;
+	m_Ut[3] = m_Up[3] = 0;
+	m_Ut[4] = m_Up[4] = 0;
+	m_Ut[5] = m_Up[5] = 0;
+
+	// initialize orientation
+	m_qt = quatd(0, vec3d(0,0,1));
+
+	// initialize center of mass
+	m_rt = m_r0;
+
+	// reset reaction force and torque
+	m_Fr = vec3d(0,0,0);
+	m_Mr = vec3d(0,0,0);
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the total mass and center of mass of a rigid body
 //!
-void FERigidBody::Update()
+void FERigidBody::UpdateCOM()
 {
-	// make sure the rigid body is attached to a FEM
-	if (m_pfem == 0) return;
+	// get the mesh
+	FEMesh& mesh = m_fem.m_mesh;
 
-	FEModel& fem = *m_pfem;
-	FEMesh& mesh = fem.m_mesh;
-
+	// initialize some data
 	m_mass = 0;			// total mass of rigid body
 	vec3d rc(0,0,0);	// center of mass
 
@@ -62,7 +91,7 @@ void FERigidBody::Update()
 			{	
 				FESolidElement& el = pbd->Element(iel);
 
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (fem.GetMaterial(el.GetMatID()));
+				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (m_fem.GetMaterial(el.GetMatID()));
 
 				// make sure this element belongs to the rigid body
 				if (pm && (pm->m_nRB == m_nID))
@@ -113,6 +142,32 @@ void FERigidBody::Update()
 }
 
 //-----------------------------------------------------------------------------
+void FERigidBody::ShallowCopy(FEObject *po)
+{
+	FERigidBody& rb = dynamic_cast<FERigidBody&>(*po);
+	m_mass = rb.m_mass;
+	m_Fr = rb.m_Fr;
+	m_Mr = rb.m_Mr;
+
+	m_rp = rb.m_rp;
+	m_rt = rb.m_rt;
+
+	m_qp = rb.m_qp;
+	m_qt = rb.m_qt;
+
+	m_bActive = rb.m_bActive;
+
+	for (int i=0; i<6; ++i)
+	{
+		m_Up[i] = rb.m_Up[i];
+		m_Ut[i] = rb.m_Ut[i];
+		m_du[i] = rb.m_du[i];
+		m_dul[i] = rb.m_dul[i];
+		m_pDC[i] = rb.m_pDC[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
 
 void FERigidBody::Serialize(DumpFile& ar)
 {
@@ -137,5 +192,80 @@ void FERigidBody::Serialize(DumpFile& ar)
 		ar.read(m_Ut , sizeof(double), 6);
 		ar.read(m_du , sizeof(double), 6);
 		ar.read(m_dul, sizeof(double), 6);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FERigidBody::Update(std::vector<double>& Ui, std::vector<double>& ui)
+{
+	int *lm = m_LM;
+	double* du = m_du;
+
+	// first do the displacements
+	if (m_prb == 0)
+	{
+		FERigidBodyDisplacement* pdc;
+		for (int j=0; j<3; ++j)
+		{
+			pdc = m_pDC[j];
+			if (pdc)
+			{
+				int lc = pdc->lc;
+				// TODO: do I need to take the line search step into account here?
+				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - m_Up[j]);
+			}
+			else du[j] = (lm[j] >=0 ? Ui[lm[j]] + ui[lm[j]] : 0);
+		}
+	}
+
+	m_rt.x = m_rp.x + du[0];
+	m_rt.y = m_rp.y + du[1];
+	m_rt.z = m_rp.z + du[2];
+
+	// next, we do the rotations. We do this seperatly since
+	// they need to be interpreted differently than displacements
+	if (m_prb == 0)
+	{
+		FERigidBodyDisplacement* pdc;
+		for (int j=3; j<6; ++j)
+		{
+			pdc = m_pDC[j];
+			if (pdc)
+			{
+				int lc = pdc->lc;
+				// TODO: do I need to take the line search step into account here?
+				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - m_Up[j]);
+			}
+			else du[j] = (lm[j] >=0 ? Ui[lm[j]] + ui[lm[j]] : 0);
+		}
+	}
+
+	vec3d r = vec3d(du[3], du[4], du[5]);
+	double w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
+	quatd dq = quatd(w, r);
+
+	m_qt = dq*m_qp;
+	m_qt.MakeUnit();
+
+	if (m_prb) du = m_dul;
+	m_Ut[0] = m_Up[0] + du[0];
+	m_Ut[1] = m_Up[1] + du[1];
+	m_Ut[2] = m_Up[2] + du[2];
+	m_Ut[3] = m_Up[3] + du[3];
+	m_Ut[4] = m_Up[4] + du[4];
+	m_Ut[5] = m_Up[5] + du[5];
+
+	// update the mesh' nodes
+	FEMesh& mesh = m_fem.m_mesh;
+	int N = mesh.Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		FENode& node = mesh.Node(i);
+		if (node.m_rid == m_nID)
+		{
+			vec3d a0 = node.m_r0 - m_r0;
+			vec3d at = m_qt*a0;
+			node.m_rt = m_rt + at;
+		}
 	}
 }

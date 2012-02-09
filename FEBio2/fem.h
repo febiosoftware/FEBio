@@ -8,7 +8,6 @@
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEContactInterface.h"
-#include "FEBioLib/FERigidBody.h"
 #include "DataStore.h"
 #include "FERigidJoint.h"
 #include "FEBioLib/Timer.h"
@@ -16,6 +15,7 @@
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEUncoupledElasticMixture.h"
 #include "FEBioLib/FESolute.h"
+#include "FEBioLib/FERigidBody.h"
 
 #include <list>
 #include <string>
@@ -167,22 +167,7 @@ public:
 		Timer	m_TotalTime;
 	//}
 
-	// --- Geometry Data ---
-	//{
-		// rigid body data
-		vector<FERigidBody>		m_RB;	//!< rigid body array
-	//}
-
 public:
-	// --- Boundary Condition Data ---
-	//{
-		// rigid displacements
-		vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements
-
-		// rigid forces
-		vector<FERigidBodyForce*>	m_RFC;	//!< rigid body forces
-	//}
-
 	// --- Direct Solver Data ---
 	//{
 		int		m_nsolver;	//!< type of solver selected

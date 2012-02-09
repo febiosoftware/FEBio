@@ -510,6 +510,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEObject.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEParameterList.h"
 				>
 			</File>

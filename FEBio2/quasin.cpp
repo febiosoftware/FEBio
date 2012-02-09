@@ -202,10 +202,10 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// initialize rigid bodies
-	int nrb = fem.m_RB.size();
+	int nrb = fem.m_Obj.size();
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 
 		// clear reaction forces
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
@@ -232,8 +232,8 @@ void FESolidSolver::PrepStep(double time)
 	for (i=0; i<(int) fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *fem.m_RDC[i];
-		FERigidBody& RB = fem.m_RB[DC.id];
-		if (RB.m_bActive && DC.IsActive())
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[DC.id]);
+		if (RB.IsActive() && DC.IsActive())
 		{
 			int I = DC.bc;
 			int lc = DC.lc;
@@ -245,9 +245,9 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate global rigid displacements
-	for (i=0; i<(int) fem.m_RB.size(); ++i)
+	for (i=0; i<(int) fem.m_Obj.size(); ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		if (RB.m_prb == 0)
 		{
 			for (j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
@@ -312,9 +312,9 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// store rigid displacements in Ui vector
-	for (i=0; i<(int) fem.m_RB.size(); ++i)
+	for (i=0; i<(int) fem.m_Obj.size(); ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		for (j=0; j<6; ++j)
 		{
 			int I = -RB.m_LM[j]-2;
@@ -328,8 +328,8 @@ void FESolidSolver::PrepStep(double time)
 	for (i=0; i<(int) fem.m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *fem.m_RFC[i];
-		FERigidBody& RB = fem.m_RB[FC.id];
-		if (RB.m_bActive && FC.IsActive())
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[FC.id]);
+		if (RB.IsActive() && FC.IsActive())
 		{
 			int lc = FC.lc;
 			int I  = RB.m_LM[FC.bc];

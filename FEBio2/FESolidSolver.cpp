@@ -162,10 +162,10 @@ bool FESolidSolver::InitEquations()
 
 	// Next, we assign equation numbers to the rigid body degrees of freedom
 	m_nreq = neq;
-	int nrb = fem.m_RB.size();
+	int nrb = fem.m_Obj.size();
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(RB.m_mat));
 		assert(pm);
 		for (j=0; j<6; ++j)
@@ -187,7 +187,7 @@ bool FESolidSolver::InitEquations()
 		FENode& node = mesh.Node(i);
 		if (node.m_rid >= 0)
 		{
-			FERigidBody& RB = fem.m_RB[node.m_rid];
+			FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[node.m_rid]);
 			node.m_ID[DOF_X] = -RB.m_LM[0]-2;
 			node.m_ID[DOF_Y] = -RB.m_LM[1]-2;
 			node.m_ID[DOF_Z] = -RB.m_LM[2]-2;
@@ -200,7 +200,7 @@ bool FESolidSolver::InitEquations()
 	// adjust the rigid dofs that are prescribed
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& RB = fem.m_RB[i];
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{

@@ -218,134 +218,24 @@ void FESolidSolver::UpdatePoro(vector<double>& ui)
 
 void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
-	int i, j, lc;
-
 	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// update rigid bodies
-	int* lm;
-	double* du;
-	vec3d r;
-	double w;
-	quatd dq;
-	int nrb = fem.m_RB.size();
-	for (i=0; i<nrb; ++i)
+	int nrb = fem.m_Obj.size();
+	for (int i=0; i<nrb; ++i)
 	{
 		// get the rigid body
-		FERigidBody& RB = fem.m_RB[i];
-		if (RB.m_bActive)
-		{
-			lm = RB.m_LM;
-
-			du = RB.m_du;
-
-			// first do the displacements
-			if (RB.m_prb == 0)
-			{
-				FERigidBodyDisplacement* pdc;
-				for (j=0; j<3; ++j)
-				{
-					pdc = RB.m_pDC[j];
-					if (pdc)
-					{
-						lc = pdc->lc;
-						// TODO: do I need to take the line search step into account here?
-						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
-					}
-					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
-				}
-			}
-
-			RB.m_rt.x = RB.m_rp.x + du[0];
-			RB.m_rt.y = RB.m_rp.y + du[1];
-			RB.m_rt.z = RB.m_rp.z + du[2];
-
-			// next, we do the rotations. We do this seperatly since
-			// they need to be interpreted differently than displacements
-			if (RB.m_prb == 0)
-			{
-				FERigidBodyDisplacement* pdc;
-				for (j=3; j<6; ++j)
-				{
-					pdc = RB.m_pDC[j];
-					if (pdc)
-					{
-						lc = pdc->lc;
-						// TODO: do I need to take the line search step into account here?
-						du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Up[j]);
-					}
-					else du[j] = (lm[j] >=0 ? m_Ui[lm[j]] + ui[lm[j]] : 0);
-				}
-			}
-
-			r = vec3d(du[3], du[4], du[5]);
-			w = sqrt(r.x*r.x + r.y*r.y + r.z*r.z);
-			dq = quatd(w, r);
-
-			RB.m_qt = dq*RB.m_qp;
-			RB.m_qt.MakeUnit();
-
-			if (RB.m_prb) du = RB.m_dul;
-			RB.m_Ut[0] = RB.m_Up[0] + du[0];
-			RB.m_Ut[1] = RB.m_Up[1] + du[1];
-			RB.m_Ut[2] = RB.m_Up[2] + du[2];
-			RB.m_Ut[3] = RB.m_Up[3] + du[3];
-			RB.m_Ut[4] = RB.m_Up[4] + du[4];
-			RB.m_Ut[5] = RB.m_Up[5] + du[5];
-		}
-	}
-
-	// update rigid body nodes
-	int n;
-	vec3d a0, at;
-	int N = mesh.Nodes();
-	for (i=0; i<N; ++i)
-	{
-		FENode& node = mesh.Node(i);
-		n = node.m_rid;
-		if (n >= 0)
-		{
-			// this is a rigid body node
-			FERigidBody& RB = fem.m_RB[n];
-
-			a0 = node.m_r0 - RB.m_r0;
-			at = RB.m_qt*a0;
-
-			node.m_rt = RB.m_rt + at;
-		}
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
+		if (RB.IsActive()) RB.Update(m_Ui, ui);
 	}
 
 	// update rigid joints
-	if (fem.NonlinearConstraints() != 0)
+	int NC = fem.NonlinearConstraints();
+	for (int i=0; i<NC; ++i)
 	{
-		vec3d c, ra, rb, qa, qb;
-
-		int NC = fem.NonlinearConstraints();
-		for (i=0; i<NC; ++i)
-		{
-			FENLConstraint* plc = fem.NonlinearConstraint(i);
-			if (plc->Type() == FE_RIGID_JOINT)
-			{
-				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
-
-				FERigidBody& RBa = fem.m_RB[ rj.m_nRBa ];
-				FERigidBody& RBb = fem.m_RB[ rj.m_nRBb ];
-
-				ra = RBa.m_rt;
-				rb = RBb.m_rt;
-
-				qa = rj.m_qa0;
-				RBa.m_qt.RotateVector(qa);
-
-				qb = rj.m_qb0;
-				RBb.m_qt.RotateVector(qb);
-
-				c = ra + qa - rb - qb;
-
-				rj.m_F = rj.m_L + c*rj.m_eps;
-			}
-		}
+		FENLConstraint* plc = fem.NonlinearConstraint(i);
+		plc->Update();
 	}
 }
 

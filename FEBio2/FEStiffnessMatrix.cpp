@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FEStiffnessMatrix.h"
-#include "fem.h"
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"
@@ -13,10 +12,11 @@
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
-#include "FESolver.h"
 #include "FEBioLib/FEUT4Domain.h"
 #include "FEBioLib/FEPointConstraint.h"
 #include "FEBioLib/FEAugLagLinearConstraint.h"
+#include "FEBioLib/FERigidBody.h"
+#include "FERigidJoint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -47,15 +47,14 @@ FEStiffnessMatrix::~FEStiffnessMatrix()
 //! to the profile. Dynamic elements can change connectivity in between calls to
 //! Create() and therefore have to be added explicitly every time.
 
-bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
+bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 {
 	int i, j, k, l, m, n;
 
 	// keep a pointer to the FEM object
-	FESolver& solver = *psolver;
-	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
+	FEModel& fem = pnls->GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	m_pfem = &fem;
+	FEMesh& mesh = fem.m_mesh;
 
 	// The first time we come here we build the "static" profile.
 	// This static profile stores the contribution to the matrix profile
@@ -68,8 +67,6 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 	// begin building the profile
 	build_begin(neq);
 	{
-		FEMesh& mesh = fem.m_mesh;
-
 		// The first time we are here we construct the "static"
 		// profile. This profile contains the contribution from
 		// all static elements. A static element is defined as
@@ -131,13 +128,13 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 			}
 
 			// Add rigid bodies to the profile
-			if (fem.m_RB.empty() == false)
+			if (fem.m_Obj.empty() == false)
 			{
 				vector<int> lm(6);
-				int nrb = fem.m_RB.size();
+				int nrb = fem.m_Obj.size();
 				for (int i=0; i<nrb; ++i)
 				{
-					FERigidBody& rb = fem.m_RB[i];
+					FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
 					for (int j=0; j<6; ++j) lm[j] = rb.m_LM[j];
 					build_add(lm);
 				}
@@ -270,8 +267,8 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 						FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*pnlc);
 						vector<int> lm(12);
 			
-						int* lm1 = fem.m_RB[ rj.m_nRBa ].m_LM;
-						int* lm2 = fem.m_RB[ rj.m_nRBb ].m_LM;
+						int* lm1 = dynamic_cast<FERigidBody*>(fem.m_Obj[ rj.m_nRBa ])->m_LM;
+						int* lm2 = dynamic_cast<FERigidBody*>(fem.m_Obj[ rj.m_nRBb ])->m_LM;
 
 						for (j=0; j<6; ++j) lm[j  ] = lm1[j];
 						for (j=0; j<6; ++j) lm[j+6] = lm2[j];
@@ -348,7 +345,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 								for (k=0; k<n; ++k)
 								{
-									id = fem.m_mesh.Node(en[k]).m_ID;
+									id = mesh.Node(en[k]).m_ID;
 									lm[6*(k+1)  ] = id[DOF_X];
 									lm[6*(k+1)+1] = id[DOF_Y];
 									lm[6*(k+1)+2] = id[DOF_Z];
@@ -396,7 +393,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 									for (l=0; l<nseln; ++l)
 									{
-										id = fem.m_mesh.Node(sn[l]).m_ID;
+										id = mesh.Node(sn[l]).m_ID;
 										lm[6*l  ] = id[DOF_X];
 										lm[6*l+1] = id[DOF_Y];
 										lm[6*l+2] = id[DOF_Z];
@@ -407,7 +404,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 									for (l=0; l<nmeln; ++l)
 									{
-										id = fem.m_mesh.Node(mn[l]).m_ID;
+										id = mesh.Node(mn[l]).m_ID;
 										lm[6*(l+nseln)  ] = id[DOF_X];
 										lm[6*(l+nseln)+1] = id[DOF_Y];
 										lm[6*(l+nseln)+2] = id[DOF_Z];
@@ -456,7 +453,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 									for (l=0; l<nseln; ++l)
 									{
-										id = fem.m_mesh.Node(sn[l]).m_ID;
+										id = mesh.Node(sn[l]).m_ID;
 										lm[7*l  ] = id[DOF_X];
 										lm[7*l+1] = id[DOF_Y];
 										lm[7*l+2] = id[DOF_Z];
@@ -468,7 +465,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 									for (l=0; l<nmeln; ++l)
 									{
-										id = fem.m_mesh.Node(mn[l]).m_ID;
+										id = mesh.Node(mn[l]).m_ID;
 										lm[7*(l+nseln)  ] = id[DOF_X];
 										lm[7*(l+nseln)+1] = id[DOF_Y];
 										lm[7*(l+nseln)+2] = id[DOF_Z];
@@ -518,7 +515,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 									
 									for (l=0; l<nseln; ++l)
 									{
-										id = fem.m_mesh.Node(sn[l]).m_ID;
+										id = mesh.Node(sn[l]).m_ID;
 										lm[8*l  ] = id[DOF_X];
 										lm[8*l+1] = id[DOF_Y];
 										lm[8*l+2] = id[DOF_Z];
@@ -531,7 +528,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 									
 									for (l=0; l<nmeln; ++l)
 									{
-										id = fem.m_mesh.Node(mn[l]).m_ID;
+										id = mesh.Node(mn[l]).m_ID;
 										lm[8*(l+nseln)  ] = id[DOF_X];
 										lm[8*(l+nseln)+1] = id[DOF_Y];
 										lm[8*(l+nseln)+2] = id[DOF_Z];
@@ -587,7 +584,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 							for (k=0; k<n; ++k)
 							{
-								id = fem.m_mesh.Node(en[k]).m_ID;
+								id = mesh.Node(en[k]).m_ID;
 								lm[6*(k+1)  ] = id[DOF_X];
 								lm[6*(k+1)+1] = id[DOF_Y];
 								lm[6*(k+1)+2] = id[DOF_Z];
@@ -636,7 +633,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 						for (k=0; k<n; ++k)
 						{
-							id = fem.m_mesh.Node(en[k]).m_ID;
+							id = mesh.Node(en[k]).m_ID;
 							lm[6*(k+1)  ] = id[DOF_X];
 							lm[6*(k+1)+1] = id[DOF_Y];
 							lm[6*(k+1)+2] = id[DOF_Z];
@@ -677,7 +674,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 					for (k=0; k<n0; ++k)
 					{
-						id = fem.m_mesh.Node(nr0[k]).m_ID;
+						id = mesh.Node(nr0[k]).m_ID;
 						lm[6*(k+1)  ] = id[DOF_X];
 						lm[6*(k+1)+1] = id[DOF_Y];
 						lm[6*(k+1)+2] = id[DOF_Z];
@@ -704,7 +701,7 @@ bool FEStiffnessMatrix::Create(FESolver* psolver, int neq, bool breset)
 
 						for (k=0; k<n; ++k)
 						{
-							id = fem.m_mesh.Node(en[k]).m_ID;
+							id = mesh.Node(en[k]).m_ID;
 							lm[6*(k+1)  ] = id[DOF_X];
 							lm[6*(k+1)+1] = id[DOF_Y];
 							lm[6*(k+1)+2] = id[DOF_Z];

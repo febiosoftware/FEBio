@@ -103,6 +103,7 @@ FEM::~FEM()
 	for (i=0; i<m_RFC.size (); ++i) delete m_RFC[i] ; m_RFC.clear ();
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
 	for (i=0; i<m_NLC.size (); ++i) delete m_NLC[i] ; m_NLC.clear ();
+	for (i=0; i<m_Obj.size (); ++i) delete m_Obj[i] ; m_Obj.clear ();
 //	for (i=0; i<m_PC.size  (); ++i) delete m_PC [i] ; m_PC.clear  ();
 //	for (i=0; i<m_LCSet.size(); ++i) delete m_LCSet[i]; m_LCSet.clear();
 }
@@ -143,7 +144,16 @@ void FEM::ShallowCopy(FEM& fem)
 	m_mesh = fem.m_mesh;
 
 	// copy rigid body data
-	m_RB = fem.m_RB;
+	if (m_Obj.empty())
+	{
+		for (int i=0; i<(int) fem.m_Obj.size();	++i)
+		{
+			FERigidBody* prb = new FERigidBody(this);
+			m_Obj.push_back(prb);
+		}
+	}
+	assert(m_Obj.size() == fem.m_Obj.size());
+	for (i=0; i<(int) m_Obj.size(); ++i) m_Obj[i]->ShallowCopy(fem.m_Obj[i]);
 
 	// copy contact data
 	if (m_CI.empty())
@@ -298,10 +308,10 @@ double* FEM::FindParameter(const char* szparam)
 	}
 
 	// the rigid bodies are dealt with differently
-	int nrb = m_RB.size();
+	int nrb = m_Obj.size();
 	for (i=0; i<nrb; ++i)
 	{
-		FERigidBody& rb = m_RB[i];
+		FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[i]);
 
 		if (rb.m_mat == nmat)
 		{
@@ -355,7 +365,7 @@ double* FEM::FindSolidMixtureParameter(const char* szvar, const int index, FEEla
 	const char* szvar2 = ch+1;
 	
 	FEMaterial* pmat;
-	for (int i=0; i<pme->m_pMat.size(); ++i) {
+	for (int i=0; i<(int) pme->m_pMat.size(); ++i) {
 		if (strcmp(szvar, pme->m_pMat[i]->GetName()) == 0)
 		{
 			// search the nested material parameter list
@@ -381,7 +391,7 @@ double* FEM::FindUncoupledSolidMixtureParameter(const char* szvar, const int ind
 	const char* szvar2 = ch+1;
 	
 	FEMaterial* pmat;
-	for (int i=0; i<pme->m_pMat.size(); ++i) {
+	for (int i=0; i<(int) pme->m_pMat.size(); ++i) {
 		if (strcmp(szvar, pme->m_pMat[i]->GetName()) == 0)
 		{
 			// search the nested material parameter list
