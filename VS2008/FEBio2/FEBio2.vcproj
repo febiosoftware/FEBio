@@ -365,10 +365,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FERigidJoint.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FESolidSolver.cpp"
 				>
 			</File>
@@ -592,10 +588,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FERestartImport.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERigidJoint.h"
 				>
 			</File>
 			<File

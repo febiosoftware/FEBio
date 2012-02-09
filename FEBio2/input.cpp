@@ -10,6 +10,7 @@
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
 #include "FEBioLib/FEFacet2FacetSliding.h"
+#include "FEBioLib/FERigidJoint.h"
 #include "FEBioLib/log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"

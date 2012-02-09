@@ -13,6 +13,7 @@
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/FEElasticShellDomain.h"
 #include "FEBioLib/FEPointBodyForce.h"
+#include "FEBioLib/FERigidJoint.h"
 
 // Forward declarations
 void Hello(FILE* fp);

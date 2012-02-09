@@ -9,7 +9,6 @@
 #include "FECore/DumpFile.h"
 #include "FECore/FEContactInterface.h"
 #include "DataStore.h"
-#include "FERigidJoint.h"
 #include "FEBioLib/Timer.h"
 #include "FEBioLib/PlotFile.h"
 #include "FEBioLib/FEElasticMixture.h"

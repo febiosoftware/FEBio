@@ -33,6 +33,7 @@
 #include "FEBioLib/FEFluidFlux.h"
 #include "FEBioLib/FEPoroTraction.h"
 #include "FEBioLib/FESoluteFlux.h"
+#include "FEBioLib/FERigidJoint.h"
 #include "plugin.h"
 #include <string.h>
 #include "FEBioLib/FEUDGHexDomain.h"

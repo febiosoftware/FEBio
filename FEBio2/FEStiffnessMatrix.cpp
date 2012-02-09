@@ -16,7 +16,7 @@
 #include "FEBioLib/FEPointConstraint.h"
 #include "FEBioLib/FEAugLagLinearConstraint.h"
 #include "FEBioLib/FERigidBody.h"
-#include "FERigidJoint.h"
+#include "FEBioLib/FERigidJoint.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

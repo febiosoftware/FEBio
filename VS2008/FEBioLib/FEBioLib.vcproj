@@ -502,6 +502,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FERigidJoint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FERigidShellDomain.cpp"
 				>
 			</File>
@@ -989,6 +993,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FERigidBody.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERigidJoint.h"
 				>
 			</File>
 			<File

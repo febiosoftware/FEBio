@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "FERigidJoint.h"
-#include "FEBioLib/log.h"
-#include "FEBioLib/FERigidBody.h"
+#include "log.h"
+#include "FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
