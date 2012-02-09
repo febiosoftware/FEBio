@@ -42,6 +42,9 @@ public:
 	// solve the model
 	virtual bool Solve() = 0;
 
+	//! serialize data
+	virtual bool Serialize(DumpFile& ar) = 0;
+
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }
 
@@ -49,8 +52,22 @@ public:
 	virtual void PushState() = 0;
 	virtual void PopState () = 0;
 
-	// this function exports the data
+	//! write to plot file
 	virtual void Write() = 0;
+
+	//! write data to log file
+	virtual void WriteData() = 0;
+
+	//! TODO: remove this function
+	virtual const char* GetFileTitle() = 0;
+	virtual const char* GetDumpFileName () = 0;
+
+	//! Evaluate parameter list
+	virtual void EvaluateParameterList(FEParameterList& pl) = 0;
+	virtual void EvaluateMaterialParameters(FEMaterial* pm) = 0;
+
+	//! find a boundary condition from the ID
+	virtual FEBoundaryCondition* FindBC(int nid) = 0;
 
 public:	// --- Load curve functions ----
 

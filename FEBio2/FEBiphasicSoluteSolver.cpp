@@ -1,11 +1,10 @@
 #include "stdafx.h"
 #include "FEBiphasicSoluteSolver.h"
 #include "FEBioLib/FEBiphasicSoluteDomain.h"
-#include "FEAnalysisStep.h"
-#include "Interrupt.h"
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FERigidBody.h"
+#include "Interrupt.h"
 
 #ifdef WIN32
 	#include <float.h>
@@ -100,7 +99,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	bool breform = false;	// reformation flag
 
 	// get the current step
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// make sure this is poro-solute problem
 	assert(pstep->GetType() == FE_POROSOLUTE);
@@ -381,7 +380,7 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
-				FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
+				FEAnalysis* pstep = m_fem.GetCurrentStep();
 				if (pstep->m_psolver->m_bfgs.m_maxups == 0)
 				{
 					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
@@ -570,7 +569,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 	FEMesh& mesh = m_fem.m_mesh;
 
 	// calculate the stiffness matrix for each domain
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	bool bsymm = pstep->m_bsym_poro;
 	double dt = pstep->m_dt;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)

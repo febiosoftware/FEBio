@@ -63,8 +63,11 @@ public:
 	//! input data from file
 	bool Input(const char* szfile);
 
-	//! write data 
+	//! write to plot file
 	void Write();
+
+	//! write data to log file
+	void WriteData();
 
 	// set the i/o files
 	void SetInputFilename(const char* szfile);
@@ -140,9 +143,6 @@ public:
 
 		//! Initializes contact data
 		bool InitContact();
-
-		//! Iniatialize linear constraint data
-		bool InitConstraints();
 
 		//! Initialize material data
 		bool InitMaterials();

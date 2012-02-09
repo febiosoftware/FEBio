@@ -7,7 +7,6 @@
 #include "FEBioLib/FEPointBodyForce.h"
 #include "FEBioLib/log.h"
 #include "FEBioLib/FEPressureLoad.h"
-#include "FEAnalysisStep.h"
 #include "Interrupt.h"
 
 #ifdef WIN32
@@ -989,7 +988,7 @@ bool FESolidSolver::Quasin(double time)
 	bool breform = false;	// reformation flag
 
 	// Get the current step
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// prepare for the first iteration
 	PrepStep(time);
