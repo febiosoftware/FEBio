@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "fem.h"
+#include "FECore/FEModel.h"
 #include "FEBioImport.h"
 
 //-----------------------------------------------------------------------------
@@ -20,7 +20,7 @@ class FEDiagnostic
 {
 public:
 	//! constructor
-	FEDiagnostic(FEM& fem);
+	FEDiagnostic(FEModel& fem);
 
 	//! destructor
 	virtual ~FEDiagnostic();
@@ -35,8 +35,7 @@ public:
 	virtual bool ParseSection(XMLTag& tag) { return false; }
 
 public:
-	FEM&	m_fem;	//!< the FEM object the diagnostic is performed on
-
+	FEModel&	m_fem;	//!< the FEModel object the diagnostic is performed on
 };
 
 //-----------------------------------------------------------------------------
@@ -55,7 +54,7 @@ public:
 class FEDiagnosticImport : public FEFEBioImport
 {
 public:
-	FEDiagnostic* LoadFile(FEM& fem, const char* szfile);
+	FEDiagnostic* LoadFile(FEModel& fem, const char* szfile);
 
 protected:
 	FEDiagnostic* m_pdia;

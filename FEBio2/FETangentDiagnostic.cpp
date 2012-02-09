@@ -195,15 +195,12 @@ void FETangentDiagnostic::BuildSimpleShear()
 // of the element residual.
 bool FETangentDiagnostic::Run()
 {
-	FEM& fem = m_fem;
-
-
 	Logfile::MODE oldmode = clog.SetMode(Logfile::FILE_ONLY);
 
 	// solve the problem
 	m_fem.Solve();
 
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = m_fem.m_mesh;
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
@@ -212,7 +209,7 @@ bool FETangentDiagnostic::Run()
 	// set up the element stiffness matrix
 	matrix k0(24, 24);
 	k0.zero();
-	bd.ElementStiffness(fem, 0, k0);
+	bd.ElementStiffness(m_fem, 0, k0);
 
 	// print the element stiffness matrix
 	clog.printf("\nActual stiffness matrix:\n");
@@ -260,14 +257,12 @@ bool FETangentDiagnostic::Run()
 // element residual.
 void FETangentDiagnostic::deriv_residual(matrix& ke)
 {
-	FEM& fem = m_fem;
-
 	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = m_fem.m_mesh;
 
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 

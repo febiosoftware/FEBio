@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "NodeDataRecord.h"
-#include "fem.h"
 #include "FEBioLib/FEAnalysisStep.h"
 #include "FEBioLib/FESolidSolver.h"
 
@@ -40,9 +39,8 @@ void NodeDataRecord::Parse(const char* szexpr)
 //-----------------------------------------------------------------------------
 double NodeDataRecord::Evaluate(int item, int ndata)
 {
-	FEM& fem = *m_pfem;
-	FEMesh& mesh = fem.m_mesh;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FEMesh& mesh = m_pfem->m_mesh;
+	FEAnalysis* pstep = m_pfem->GetCurrentStep();
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 	int nnode = item - 1;

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "ElementDataRecord.h"
-#include "fem.h"
 #include "FEBioLib/FETriphasic.h"
 
 //-----------------------------------------------------------------------------
@@ -75,8 +74,7 @@ void ElementDataRecord::Parse(const char *szexpr)
 //-----------------------------------------------------------------------------
 double ElementDataRecord::Evaluate(int item, int ndata)
 {
-	FEM& fem = *m_pfem;
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = m_pfem->m_mesh;
 
 	// make sure we have an ELT
 	if (m_ELT.empty()) BuildELT();

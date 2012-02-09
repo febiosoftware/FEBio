@@ -2,7 +2,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
-#include "fem.h"
 #include "FEOptimizer.h"
 #include "FEBioLib/log.h"
 
@@ -47,7 +46,7 @@ struct FE_OPTIMIZE
 	double	prec;				//!< expected precision of objective function
 	double	lstol;				//!< line search tolerance
 
-	FEM*	pfem;				//!< pointer to FEM object
+	FEModel*	pfem;				//!< pointer to FEM object
 
 	FELoadCurve	lc;				//!< loadcurve containing the reaction forces
 
@@ -66,16 +65,16 @@ struct FE_OPTIMIZE
 //-----------------------------------------------------------------------------
 // forward declarations
 
-bool ReadScript(FEM& fem, XMLReader& xml, XMLTag& tag, FE_OPTIMIZE& opt);
+bool ReadScript(FEModel& fem, XMLReader& xml, XMLTag& tag, FE_OPTIMIZE& opt);
 void objfun(Integer m, Integer n, double x[], double f[],
 			double fjac[], Integer tdfjac, Nag_Comm* comm);
-void fecb(FEM*, void*);
+void fecb(FEModel*, void*);
 
 //-----------------------------------------------------------------------------
 //! Perform a parameter optimization.
 //! This function calls the NAG routine to do the actual parameter optimization.
 
-bool optimize(FEM& fem, const char* szfile)
+bool optimize(FEModel& fem, const char* szfile)
 {
 	// try to open the file
 	XMLReader xml;
@@ -217,19 +216,19 @@ void objfun(Integer m,
 	// get the optimization data
 	FE_OPTIMIZE& opt = *((FE_OPTIMIZE*) comm->p);
 
-	// get the FEM data
-	FEM& fem = *(opt.pfem);
+	// get the FE Model data
+	FEModel& fem = *(opt.pfem);
 
 	// reset reaction force data
 	opt.lc.Clear();
 
-	// set the FEM callback function
+	// set the callback function
 	fem.AddCallback(fecb, &opt);
 
 	// set the material parameters
 	for (i=0; i<n; ++i) *(opt.pvar[i]) = x[i];
 
-	// reset the FEM data
+	// reset the FE data
 	fem.Reset();
 
 	// suppress output to the screen
@@ -271,13 +270,13 @@ void objfun(Integer m,
 
 //-----------------------------------------------------------------------------
 
-void fecb(FEM* pfem, void* pd)
+void fecb(FEModel* pfem, void* pd)
 {
 	// get the optimizaton data
 	FE_OPTIMIZE& opt = *((FE_OPTIMIZE*) pd);
 
-	// get the FEM data
-	FEM& fem = *(opt.pfem);
+	// get the FE Model data
+	FEModel& fem = *(opt.pfem);
 
 	// get the current time value
 	double time = fem.m_ftime;
@@ -291,7 +290,7 @@ void fecb(FEM* pfem, void* pd)
 
 //-----------------------------------------------------------------------------
 
-bool ReadScript(FEM& fem, XMLReader& xml, XMLTag& tag, FE_OPTIMIZE& opt)
+bool ReadScript(FEModel& fem, XMLReader& xml, XMLTag& tag, FE_OPTIMIZE& opt)
 {
 	// initialize optimization data
 	opt.nvar  = 0;
@@ -464,7 +463,7 @@ bool ReadScript(FEM& fem, XMLReader& xml, XMLTag& tag, FE_OPTIMIZE& opt)
 //-----------------------------------------------------------------------------
 //! If the NAG libraries are not defined this function simply returns false
 
-bool optimize(FEM& fem, const char* szfile)
+bool optimize(FEModel& fem, const char* szfile)
 {
 	clog.printbox("P A R A M E T E R   O P T I M I Z A T I O N   M O D U L E", "version 0.1");
 

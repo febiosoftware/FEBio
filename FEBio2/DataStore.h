@@ -12,10 +12,10 @@
 #include <stdio.h>
 #include "FECore/DumpFile.h"
 #include "FECore/FEMesh.h"
+#include "FECore/FEModel.h"
 #include <vector>
 using namespace std;
 
-class FEM;
 
 #define FE_DATA_NODE	1
 #define FE_DATA_ELEM	2
@@ -37,7 +37,7 @@ class DataRecord
 public:
 	enum {MAX_DELIM=16, MAX_STRING=128};
 public:
-	DataRecord(FEM* pfem, const char* szfile);
+	DataRecord(FEModel* pfem, const char* szfile);
 	virtual ~DataRecord();
 
 	bool Write();
@@ -69,12 +69,12 @@ protected:
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record
 
-	FEM*	m_pfem;
-	FILE*	m_fp;
+	FEModel*	m_pfem;
+	FILE*		m_fp;
 };
 
 //-----------------------------------------------------------------------------
-// I can move this to the FECore class.
+// TODO: I can move this to the FECore class.
 class DataStore  
 {
 public:

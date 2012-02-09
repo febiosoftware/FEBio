@@ -39,6 +39,9 @@ public:
 	// Initialization
 	virtual bool Init() = 0;
 
+	//! Resets data structures
+	virtual bool Reset() = 0;
+
 	// solve the model
 	virtual bool Solve() = 0;
 
@@ -132,6 +135,9 @@ public:	// Miscellaneous routines
 	//! Evaluate parameter list
 	virtual void EvaluateParameterList(FEParameterList& pl) = 0;
 	virtual void EvaluateMaterialParameters(FEMaterial* pm) = 0;
+
+	//! return a pointer to the named variable
+	virtual double* FindParameter(const char* szname) = 0;
 
 	//! find a boundary condition from the ID
 	virtual FEBoundaryCondition* FindBC(int nid) = 0;

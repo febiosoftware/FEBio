@@ -113,7 +113,7 @@ void DataStore::Serialize(DumpFile &ar)
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-DataRecord::DataRecord(FEM* pfem, const char* szfile)
+DataRecord::DataRecord(FEModel* pfem, const char* szfile)
 {
 	m_pfem = pfem;
 	m_nid = 0;
@@ -126,11 +126,12 @@ DataRecord::DataRecord(FEM* pfem, const char* szfile)
 	m_fp = 0;
 	m_szfile[0] = 0;
 
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	if (szfile)
 	{
 		strcpy(m_szfile, szfile);
 		m_fp = fopen(szfile, "wt");
-		fprintf(m_fp, "*Title:%s\n", pfem->GetTitle());
+		fprintf(m_fp, "*Title:%s\n", fem.GetTitle());
 	}
 }
 
@@ -159,10 +160,8 @@ void DataRecord::SetDelim(const char* sz)
 //-----------------------------------------------------------------------------
 bool DataRecord::Write()
 {
-	FEM& fem = *m_pfem;
-
-	int nstep = fem.GetCurrentStep()->m_ntimesteps;
-	double ftime = fem.m_ftime;
+	int nstep = m_pfem->GetCurrentStep()->m_ntimesteps;
+	double ftime = m_pfem->m_ftime;
 	double val;
 
 	FILE* fplog = (FILE*) clog;

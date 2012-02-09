@@ -34,6 +34,7 @@
 #include "FEBioLib/FEConstBodyForce.h"
 #include "FEBioLib/FEPointConstraint.h"
 #include "FEBioLib/FEAugLagLinearConstraint.h"
+#include "FEBioLib/FERigidBody.h"
 #include "FEBioLib/log.h"
 #include "LSDYNAPlotFile.h"
 #include "FEBioPlotFile.h"

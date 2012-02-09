@@ -47,7 +47,7 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	opt.m_niter = 0;
 
 	// set the FEM callback function
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 	fem.AddCallback(fecb, &opt);
 
 	// don't plot anything
@@ -105,7 +105,7 @@ void fecb(FEModel* pmdl, void* pd)
 	FEOptimizeData& opt = *((FEOptimizeData*) pd);
 
 	// get the FEM data
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 
 	// get the current time value
 	double time = fem.m_ftime;
@@ -130,7 +130,7 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	opt.m_niter++;
 
 	// get the FEM data
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 
 	// reset reaction force data
 	FELoadCurve& lc = opt.ReactionLoad();

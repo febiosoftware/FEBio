@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string.h>
 #include "FECore/XMLReader.h"
-#include "fem.h"
+#include "FECore/FEModel.h"
 #include "NumCore/vector.h"
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 // IO exceptions
@@ -124,7 +124,7 @@ class FEOptimizeData
 {
 public:
 	//! constructor
-	FEOptimizeData(FEM& fem);
+	FEOptimizeData(FEModel& fem);
 	~FEOptimizeData(void);
 
 	//! input function
@@ -136,8 +136,8 @@ public:
 	//! solver the problem
 	bool Solve();
 
-	//! return the FEM
-	FEM& GetFEM() { return m_fem; }
+	//! return the FE Model
+	FEModel& GetFEM() { return m_fem; }
 
 	//! add a loadcurve
 	void AddLoadCurve(FELoadCurve* plc) { m_LC.push_back(plc); }
@@ -164,7 +164,7 @@ public:
 	int	m_niter;	// nr of minor iterations (i.e. FE solves)
 
 protected:
-	FEM&	m_fem;
+	FEModel&	m_fem;
 
 	OPT_OBJECTIVE	m_obj;		//!< the objective function
 

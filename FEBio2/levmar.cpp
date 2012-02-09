@@ -72,7 +72,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	matrix covar(ma, ma), alpha(ma, ma);
 
 	// set the FEM callback function
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 	fem.AddCallback(fecb, &opt);
 
 	// don't plot anything
@@ -215,7 +215,7 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	opt.m_niter++;
 
 	// get the FEM data
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 
 	// reset reaction force data
 	FELoadCurve& lc = opt.ReactionLoad();

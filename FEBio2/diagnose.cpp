@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 //! The diagnose() function performs a diagnostic test on FEBio. 
 
-bool diagnose(FEM& fem, const char* szfile)
+bool diagnose(FEModel& fem, const char* szfile)
 {
 	// read the diagnostic file
 	// this will also create a specific diagnostic test

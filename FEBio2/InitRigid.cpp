@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FEBioLib/FERigid.h"
+#include "FEBioLib/FERigidBody.h"
 #include "FEBioLib/FERigidJoint.h"
 #include "FEBioLib/FEElasticShellDomain.h"
 #include "FEBioLib/FEElasticSolidDomain.h"

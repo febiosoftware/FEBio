@@ -9,7 +9,7 @@ class NodeDataRecord : public DataRecord
 	enum { X, Y, Z, UX, UY, UZ, VX, VY, VZ, RX, RY, RZ, P, C, C1, C2 };
 
 public:
-	NodeDataRecord(FEM* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
+	NodeDataRecord(FEModel* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();

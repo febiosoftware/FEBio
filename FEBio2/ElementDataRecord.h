@@ -23,7 +23,7 @@ class ElementDataRecord : public DataRecord
 	};
 
 public:
-	ElementDataRecord(FEM* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
+	ElementDataRecord(FEModel* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
 	double Evaluate(int item, int ndata);
 	void Parse(const char* sz);
 	void SelectAllItems();

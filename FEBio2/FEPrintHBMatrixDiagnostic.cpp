@@ -16,6 +16,7 @@ FEPrintHBMatrixDiagnostic::~FEPrintHBMatrixDiagnostic(void)
 
 bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	if (tag == "input")
 	{
 		// get the input file name
@@ -23,7 +24,7 @@ bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 
 		// try to read the file
 		FEFEBioImport im;
-		if (im.Load(m_fem, szfile) == false)
+		if (im.Load(fem, szfile) == false)
 		{
 			char szerr[256];
 			im.GetErrorMessage(szerr);

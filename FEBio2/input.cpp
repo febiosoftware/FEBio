@@ -11,12 +11,13 @@
 #include "FEBioLib/FESurfaceConstraint.h"
 #include "FEBioLib/FEFacet2FacetSliding.h"
 #include "FEBioLib/FERigidJoint.h"
-#include "FEBioLib/log.h"
-#include "LSDYNAPlotFile.h"
-#include "FEBioPlotFile.h"
 #include "FEBioLib/FEBiphasicSolver.h"
 #include "FEBioLib/FEBiphasicSoluteSolver.h"
 #include "FEBioLib/FETriphasicSolver.h"
+#include "FEBioLib/FERigidBody.h"
+#include "FEBioLib/log.h"
+#include "LSDYNAPlotFile.h"
+#include "FEBioPlotFile.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------

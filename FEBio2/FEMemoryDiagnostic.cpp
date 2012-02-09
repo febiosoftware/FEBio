@@ -16,9 +16,11 @@ FEMemoryDiagnostic::~FEMemoryDiagnostic(void)
 
 bool FEMemoryDiagnostic::Init()
 {
+	FEM& fem = dynamic_cast<FEM&>(m_fem);
+
 	// try to open the file
 	FEFEBioImport im;
-	if (im.Load(m_fem, m_szfile) == false)
+	if (im.Load(fem, m_szfile) == false)
 	{
 		return false;
 	}

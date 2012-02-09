@@ -14,7 +14,6 @@
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEUncoupledElasticMixture.h"
 #include "FEBioLib/FESolute.h"
-#include "FEBioLib/FERigidBody.h"
 
 #include <list>
 #include <string>

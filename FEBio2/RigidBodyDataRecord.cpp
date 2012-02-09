@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RigidBodyDataRecord.h"
-#include "fem.h"
 #include "FEBioLib/FERigid.h"
+#include "FEBioLib/FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 void RigidBodyDataRecord::Parse(const char* szexpr)
@@ -35,21 +35,20 @@ void RigidBodyDataRecord::Parse(const char* szexpr)
 //-----------------------------------------------------------------------------
 double RigidBodyDataRecord::Evaluate(int item, int ndata)
 {
-	FEM& fem = *m_pfem;
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = m_pfem->m_mesh;
 	int nrb = item - 1;
-	if ((nrb < 0) || (nrb >= fem.Materials())) return 0;
+	if ((nrb < 0) || (nrb >= m_pfem->Materials())) return 0;
 
 	double val = 0;
-	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(fem.GetMaterial(nrb));
+	FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_pfem->GetMaterial(nrb));
 	assert(pm);
 	if (pm == 0) return 0;
 
 	// find the rigid body that has this material
-	int NRB = fem.m_Obj.size();
+	int NRB = m_pfem->m_Obj.size();
 	for (int i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[i]);
 		if (RB.m_mat == nrb)
 		{
 			switch (ndata)

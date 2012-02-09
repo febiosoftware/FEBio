@@ -75,7 +75,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 //! Read the Model section of the input file
 bool FEOptimizeInput::ParseModel(XMLTag& tag, FEOptimizeData& opt)
 {
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 
 	// get the input file
 	char szfile[256];
@@ -126,7 +126,7 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 //! Read the objectives section of the input file
 bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 {
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 
 	OPT_OBJECTIVE obj;
 
@@ -160,7 +160,7 @@ bool FEOptimizeInput::ParseObjective(XMLTag &tag, FEOptimizeData& opt)
 //! Read the variables section of the input file
 bool FEOptimizeInput::ParseParameters(XMLTag& tag, FEOptimizeData& opt)
 {
-	FEM& fem = opt.GetFEM();
+	FEModel& fem = opt.GetFEM();
 
 	// read the parameters
 	OPT_VARIABLE var;
@@ -281,7 +281,7 @@ bool FENAGOptimizeMethod::Solve(FEOptimizeData *pOpt)
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-FEOptimizeData::FEOptimizeData(FEM& fem) : m_fem(fem)
+FEOptimizeData::FEOptimizeData(FEModel& fem) : m_fem(fem)
 {
 	m_pSolver = 0;
 }

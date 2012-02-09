@@ -15,7 +15,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEDiagnostic::FEDiagnostic(FEM& fem) : m_fem(fem)
+FEDiagnostic::FEDiagnostic(FEModel& fem) : m_fem(fem)
 {
 
 }
@@ -26,8 +26,10 @@ FEDiagnostic::~FEDiagnostic()
 }
 
 //-----------------------------------------------------------------------------
-FEDiagnostic* FEDiagnosticImport::LoadFile(FEM& fem, const char* szfile)
+FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& mdl, const char* szfile)
 {
+	FEM& fem = dynamic_cast<FEM&>(mdl);
+
 	// store a copy of the file name
 	fem.SetInputFilename(szfile);
 
