@@ -24,14 +24,15 @@ public:
 	//! solves a single time step
 	bool SolveStep(double time);
 
+	//! Initialize linear equation system
+	bool InitEquations();
+
+public:
 	//! assemble the element residual into the global residual
 	void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
 
 	//! adjust the residual matrix for prescribed displacements
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
-
-	//! Initialize linear equation system
-	bool InitEquations();
 
 public:
 	//{ --- NonLinearSystem overrides ---

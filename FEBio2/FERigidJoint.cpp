@@ -4,9 +4,8 @@
 
 #include "stdafx.h"
 #include "FERigidJoint.h"
-#include "fem.h"
-#include "FESolver.h"
 #include "FEBioLib/log.h"
+#include "FEBioLib/FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
@@ -46,46 +45,56 @@ void FERigidJoint::ShallowCopy(FERigidJoint& rj)
 // TODO: Why is this class not using the FENLSolver for assembly?
 void FERigidJoint::Residual(FENLSolver* psolver, vector<double>& R)
 {
-	int i;
-	double fe[6];
+	vector<double> fa(6);
+	vector<double> fb(6);
+	vector<int> lma(6);
+	vector<int> lmb(6);
 
 	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBa]);
 	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBb]);
 
+	for (int i=0; i<6; ++i)
+	{
+		lma[i] = RBa.m_LM[i];
+		lmb[i] = RBb.m_LM[i];
+	}
+
+	// body A
 	vec3d a = m_qa0;
 	RBa.m_qt.RotateVector(a);
 
-	fe[0] = m_F.x;
-	fe[1] = m_F.y;
-	fe[2] = m_F.z;
+	fa[0] = m_F.x;
+	fa[1] = m_F.y;
+	fa[2] = m_F.z;
 
-	fe[3] = a.y*m_F.z-a.z*m_F.y;
-	fe[4] = a.z*m_F.x-a.x*m_F.z;
-	fe[5] = a.x*m_F.y-a.y*m_F.x;
+	fa[3] = a.y*m_F.z-a.z*m_F.y;
+	fa[4] = a.z*m_F.x-a.x*m_F.z;
+	fa[5] = a.x*m_F.y-a.y*m_F.x;
 
-	for (i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fe[i];
-
+	// body b
 	a = m_qb0;
 	RBb.m_qt.RotateVector(a);
 
-	fe[0] = -m_F.x;
-	fe[1] = -m_F.y;
-	fe[2] = -m_F.z;
+	fb[0] = -m_F.x;
+	fb[1] = -m_F.y;
+	fb[2] = -m_F.z;
 
-	fe[3] = -a.y*m_F.z+a.z*m_F.y;
-	fe[4] = -a.z*m_F.x+a.x*m_F.z;
-	fe[5] = -a.x*m_F.y+a.y*m_F.x;
+	fb[3] = -a.y*m_F.z+a.z*m_F.y;
+	fb[4] = -a.z*m_F.x+a.x*m_F.z;
+	fb[5] = -a.x*m_F.y+a.y*m_F.x;
 
-	for (i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fe[i];
+	psolver->AssembleResidual(lma, fa, R);
+	psolver->AssembleResidual(lmb, fb, R);
+
+//	for (i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fe[i];
+//	for (i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fe[i];
 }
 
 //-----------------------------------------------------------------------------
 // TODO: Why is this class not using the FENLSolver for assembly?
-void FERigidJoint::StiffnessMatrix(FENLSolver* pnls)
+void FERigidJoint::StiffnessMatrix(FENLSolver* psolver)
 {
 	int j, k;
-
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 
 	vector<int> LM(12);
 	matrix ke(12,12);
@@ -94,8 +103,8 @@ void FERigidJoint::StiffnessMatrix(FENLSolver* pnls)
 
 	double y1[3][3], y2[3][3], y11[3][3], y12[3][3], y22[3][3];
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBa]);
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBb]);
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBa]);
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBb]);
 
 	a = m_qa0;
 	RBa.m_qt.RotateVector(a);
@@ -191,9 +200,7 @@ void FERigidJoint::StiffnessMatrix(FENLSolver* pnls)
 		LM[j+6] = RBb.m_LM[j];
 	}
 
-	FEAnalysis* pstep = m_pfem->GetCurrentStep();
-	FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
-	psolver->m_pK->Assemble(ke, LM);
+	psolver->AssembleStiffness(LM, ke);
 }
 
 //-----------------------------------------------------------------------------
@@ -203,10 +210,8 @@ bool FERigidJoint::Augment(int naug)
 	double normF0, normF1;
 	bool bconv = true;
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBa]);
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*fem.m_Obj[m_nRBb]);
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBa]);
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBb]);
 
 	ra = RBa.m_rt;
 	rb = RBb.m_rt;

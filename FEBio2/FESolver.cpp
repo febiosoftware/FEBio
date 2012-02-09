@@ -137,3 +137,21 @@ bool FESolver::CreateStiffness(bool breset)
 	// done!
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+//! TODO: This function is only used for rigid joints. I need to figure out if
+//!       I can use the other assembly function.
+void FESolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
+{
+	m_pK->Assemble(ke, lm);
+}
+
+//-----------------------------------------------------------------------------
+//! TODO: This function is only used by the rigid joints. I need to figure out
+//!       if I can use the ohter residual function
+void FESolver::AssembleResidual(vector<int>& lm, vector<double>& fe, vector<double>& R)
+{
+	int n = lm.size();
+	assert(fe.size() == n);
+	for (int i=0; i<n; ++i) if (lm[i] >= 0) R[lm[i]] += fe[i];
+}
