@@ -5243,8 +5243,21 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 			throw XMLReader::InvalidAttributeValue(tag, "name", sz);
 		
 		strcpy(psd->m_szname, sz);
-		tag.value(psd->m_z);
-		
+
+		// read solute properties
+		++tag;
+		do
+		{
+			if (tag == "charge_number")
+			{
+				tag.value(psd->m_z);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			
+			++tag;
+		}
+		while (!tag.isend());
+
 		FEM::SetSD(psd);
 		
 		++tag;
