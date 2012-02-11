@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "DataStore.h"
-#include "fem.h"
 #include "FEBioLib/FEAnalysisStep.h"
 #include "FEBioLib/FERigid.h"
 #include "FEBioLib/FESolidSolver.h"
@@ -84,7 +83,7 @@ void DataStore::Serialize(DumpFile &ar)
 	}
 	else
 	{
-		FEM* pfem = dynamic_cast<FEM*>(ar.GetFEModel());
+		FEModel* pfem = ar.GetFEModel();
 
 		int ndr;
 		Clear();
@@ -126,12 +125,11 @@ DataRecord::DataRecord(FEModel* pfem, const char* szfile)
 	m_fp = 0;
 	m_szfile[0] = 0;
 
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	if (szfile)
 	{
 		strcpy(m_szfile, szfile);
 		m_fp = fopen(szfile, "wt");
-		fprintf(m_fp, "*Title:%s\n", fem.GetTitle());
+		fprintf(m_fp, "*Title:%s\n", m_pfem->GetTitle());
 	}
 }
 

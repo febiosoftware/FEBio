@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "FEPlotNodeData.h"
 #include "FECore/FEMesh.h"
-#include "fem.h"
-
+#include "FECore/febio.h"
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
 REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );

@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "LSDYNAPlotFile.h"
-#include "fem.h"
+#include "FECore/FEDiscreteDomain.h"
+#include "FECore/FETrussDomain.h"
+#include "FECore/FEShellDomain.h"
+#include "FECore/FESolidDomain.h"
 #include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
@@ -11,10 +14,6 @@
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/FEFacet2FacetSliding.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "FECore/FEDiscreteDomain.h"
-#include "FECore/FETrussDomain.h"
-#include "FECore/FEShellDomain.h"
-#include "FECore/FESolidDomain.h"
 #include "FEBioLib/FEHeatTransferMaterial.h"
 #include "FEBioLib/FETrussMaterial.h"
 #include "FEBioLib/FEBiphasic.h"
@@ -43,15 +42,18 @@ LSDYNAPlotFile::~LSDYNAPlotFile()
 //  is written as well as the initial geometry of the model.
 //
 
-bool LSDYNAPlotFile::Open(FEModel& mdl, const char* szfile)
+bool LSDYNAPlotFile::Open(FEModel& fem, const char* szfile)
 {
 	int i, j, N, nd;
 
 	// open the archive
 	if ((m_fp = fopen(szfile, "wb")) == 0) return false;
 
-	FEM& fem = dynamic_cast<FEM&>(mdl);
+	// store a pointer to the FEModel class
 	m_pfem = &fem;
+
+	// get the mesh
+	FEMesh& mesh = fem.m_mesh;
 
 	int nmode = fem.GetCurrentStep()->GetType();
 	int ntype = fem.GetCurrentStep()->m_nanalysis;
@@ -106,14 +108,14 @@ bool LSDYNAPlotFile::Open(FEModel& mdl, const char* szfile)
 	plh.flagT = (m_nfield[3] == 0? 0 : 1);
 	plh.icode = 6;
 	plh.ndim  = 4;
-	plh.nel2  = fem.m_mesh.TrussElements() + fem.m_mesh.DiscreteElements();
-	plh.nel4  = fem.m_mesh.ShellElements();
-	plh.nel8  = fem.m_mesh.SolidElements();
+	plh.nel2  = mesh.TrussElements() + mesh.DiscreteElements();
+	plh.nel4  = mesh.ShellElements();
+	plh.nel8  = mesh.SolidElements();
 	plh.nglbv = 0;
-	plh.nummat2 = (fem.m_mesh.DiscreteElements()>0? 1 : 0);
+	plh.nummat2 = (mesh.DiscreteElements()>0? 1 : 0);
 	plh.nummat4 = 0;
 	plh.nummat8 = fem.Materials();
-	plh.nump    = fem.m_mesh.Nodes();
+	plh.nump    = mesh.Nodes();
 	plh.nv1d    = 6;
 	plh.nv2d    = (m_bsstrn? 44 : 32);
 	plh.nv3d    = 7;
@@ -128,9 +130,9 @@ bool LSDYNAPlotFile::Open(FEModel& mdl, const char* szfile)
 
 	// write the material coordinates
 	float xf[3];
-	for (i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (i=0; i<mesh.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = mesh.Node(i);
 
 		xf[0] = (float) node.m_r0.x;
 		xf[1] = (float) node.m_r0.y;
@@ -143,8 +145,6 @@ bool LSDYNAPlotFile::Open(FEModel& mdl, const char* szfile)
 	// Note that we increment all numbers by 1 since
 	// the plot database expects 1-based arrays
 	int n[9];
-
-	FEMesh& mesh = fem.m_mesh;
 
 	int nid = 1;
 
@@ -323,12 +323,10 @@ bool LSDYNAPlotFile::Append(FEModel& fem, const char* szfile)
 //  must have been opened with the Open or Append function.
 //
 
-bool LSDYNAPlotFile::Write(FEModel& mdl)
+bool LSDYNAPlotFile::Write(FEModel& fem)
 {
 	// make sure the archive is opened
 	if (m_fp == 0) return false;
-
-	FEM& fem = dynamic_cast<FEM&>(mdl);
 
 	// write the time value
 	float time = (float) fem.m_ftime;
@@ -621,11 +619,11 @@ void LSDYNAPlotFile::write_truss_stress()
 
 void LSDYNAPlotFile::write_velocities()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEMesh& mesh = m_pfem->m_mesh;
 	float vf[3];
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = mesh.Node(i);
 
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision
@@ -639,11 +637,11 @@ void LSDYNAPlotFile::write_velocities()
 
 void LSDYNAPlotFile::write_accelerations()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEMesh& mesh =m_pfem->m_mesh;
 	float af[3];
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = mesh.Node(i);
 
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision
@@ -657,14 +655,13 @@ void LSDYNAPlotFile::write_accelerations()
 
 void LSDYNAPlotFile::write_fluid_flux()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = m_pfem->m_mesh;
 
 	int i, j;
 
-	vector<vec3d> wn(fem.m_mesh.Nodes());
-	vector<int> val(fem.m_mesh.Nodes());
-	for (i=0; i<fem.m_mesh.Nodes(); ++i) val[i] = 0;
+	vector<vec3d> wn(mesh.Nodes());
+	vector<int> val(mesh.Nodes());
+	for (i=0; i<mesh.Nodes(); ++i) val[i] = 0;
 
 	vec3d ew;
 	int n;
@@ -699,11 +696,11 @@ void LSDYNAPlotFile::write_fluid_flux()
 			}
 		}
 	}
-	for (i=0; i<fem.m_mesh.Nodes(); ++i) if (val[i] != 0) wn[i] /= val[i];
+	for (i=0; i<mesh.Nodes(); ++i) if (val[i] != 0) wn[i] /= val[i];
 
 	// output nodal fluxes
 	float af[3];
-	for (i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		af[0] = (float) wn[i].x;
 		af[1] = (float) wn[i].y;
@@ -715,11 +712,12 @@ void LSDYNAPlotFile::write_fluid_flux()
 
 void LSDYNAPlotFile::write_contact_tractions()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
+	FEMesh& mesh = fem.m_mesh;
 
 	int i, j, k, n;
 
-	vector<float> acc(3*fem.m_mesh.Nodes()); zero(acc);
+	vector<float> acc(3*mesh.Nodes()); zero(acc);
 	for (i=0; i<fem.ContactInterfaces(); ++i)
 	{
 		FEContactInterface* pci = fem.ContactInterface(i);
@@ -960,11 +958,11 @@ void LSDYNAPlotFile::write_contact_tractions()
 //-----------------------------------------------------------------------------
 void LSDYNAPlotFile::write_fluid_pressures()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEMesh& mesh = m_pfem->m_mesh;
 	float t;
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = mesh.Node(i);
 		t = (float) node.m_pt;
 		fwrite(&t, sizeof(float),1, m_fp);
 	}
@@ -973,11 +971,11 @@ void LSDYNAPlotFile::write_fluid_pressures()
 //-----------------------------------------------------------------------------
 void LSDYNAPlotFile::write_temperatures()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEMesh& mesh = m_pfem->m_mesh;
 	float t;
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = mesh.Node(i);
 		t = (float) node.m_T;
 		fwrite(&t, sizeof(float), 1, m_fp);
 	}
@@ -986,14 +984,13 @@ void LSDYNAPlotFile::write_temperatures()
 //-----------------------------------------------------------------------------
 void LSDYNAPlotFile::write_heat_flux()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = m_pfem->m_mesh;
 
 	int i, j;
 
-	vector<vec3d> qn(fem.m_mesh.Nodes());
-	vector<int> val(fem.m_mesh.Nodes());
-	for (i=0; i<fem.m_mesh.Nodes(); ++i) val[i] = 0;
+	vector<vec3d> qn(mesh.Nodes());
+	vector<int> val(mesh.Nodes());
+	for (i=0; i<mesh.Nodes(); ++i) val[i] = 0;
 
 	vec3d ew;
 	int n;
@@ -1028,11 +1025,11 @@ void LSDYNAPlotFile::write_heat_flux()
 			}
 		}
 	}
-	for (i=0; i<fem.m_mesh.Nodes(); ++i) if (val[i] != 0) qn[i] /= val[i];
+	for (i=0; i<mesh.Nodes(); ++i) if (val[i] != 0) qn[i] /= val[i];
 
 	// output nodal fluxes
 	float af[3];
-	for (i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		af[0] = (float) qn[i].x;
 		af[1] = (float) qn[i].y;
@@ -1046,7 +1043,7 @@ void LSDYNAPlotFile::write_heat_flux()
 
 void LSDYNAPlotFile::write_contact_pressures()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
 	vector<float> t; t.assign(mesh.Nodes(), 0);
@@ -1164,7 +1161,7 @@ void LSDYNAPlotFile::write_contact_pressures()
 
 void LSDYNAPlotFile::write_contact_gaps()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 
 	vector<float> t; t.assign(mesh.Nodes(), 0);
@@ -1275,7 +1272,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 				}
 			}
 
-			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
+			for (j=0; j<mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
 		}
 
 		FESlidingInterface3* ps3 = dynamic_cast<FESlidingInterface3*>(pci);
@@ -1312,7 +1309,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 				}
 			}
 			
-			for (j=0; j<fem.m_mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
+			for (j=0; j<mesh.Nodes(); ++j) if (val[j] > 1) t[j] /= (float) val[j];
 		}
 	}
 
@@ -1321,7 +1318,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 
 void LSDYNAPlotFile::write_reaction_forces()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
@@ -1345,7 +1342,7 @@ void LSDYNAPlotFile::write_reaction_forces()
 void LSDYNAPlotFile::write_material_fibers()
 {
 	int i, j, n, nd;
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 	FEMesh& mesh = fem.m_mesh;
 	int N = mesh.Nodes();
 	vector<vec3d> v(N);
@@ -1461,12 +1458,12 @@ float LSDYNAPlotFile::dev_fiber_strain(FESolidElement &el, int j)
 //-----------------------------------------------------------------------------
 void LSDYNAPlotFile::write_displacements()
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEMesh& mesh = m_pfem->m_mesh;
 
 	float xf[3];
-	for (int i=0; i<fem.m_mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
-		FENode& node = fem.m_mesh.Node(i);
+		FENode& node = mesh.Node(i);
 
 		// since the PLOT file requires floats we need to convert
 		// the doubles to single precision

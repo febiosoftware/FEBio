@@ -16,10 +16,7 @@
 #include "FEBioLib/FESolute.h"
 
 #include <list>
-#include <string>
 using namespace std;
-
-#define MAX_STRING	256
 
 //-----------------------------------------------------------------------------
 //! The Finite Element Model class. 
@@ -83,12 +80,6 @@ public:
 	const char* GetInputFileName() { return m_szfile; }
 	const char* GetLogfileName  () { return m_szlog;  }
 	const char* GetPlotFileName () { return m_szplot; }
-
-	//! set the problem title
-	void SetTitle(const char* sz) { strcpy(m_sztitle, sz); }
-
-	//! get the problem title
-	const char* GetTitle() { return m_sztitle; }
 
 	//! get the file title
 	const char* GetFileTitle() { return m_szfile_title; }
@@ -174,8 +165,6 @@ protected:
 		char	m_szplot[MAX_STRING];	//!< plot output file name
 		char	m_szlog [MAX_STRING];	//!< log output file name
 		char	m_szdump[MAX_STRING];	//!< dump file name
-
-		char	m_sztitle[MAX_STRING];	//!< problem title
 	//}
 };
 

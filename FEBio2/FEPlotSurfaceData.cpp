@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEPlotSurfaceData.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
-#include "fem.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );

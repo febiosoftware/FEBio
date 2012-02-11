@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioPlotFile.h"
-#include "fem.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include "FECore/febio.h"
 
@@ -78,11 +77,10 @@ bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* s
 
 
 //-----------------------------------------------------------------------------
-void FEBioPlotFile::Dictionary::Defaults(FEModel& mdl)
+void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 {
 	// First we build the dictionary
 	// get the mesh
-	FEM& fem = dynamic_cast<FEM&>(mdl);
 	FEMesh& m = fem.m_mesh;
 
 	// Define default variables
@@ -563,10 +561,9 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Write(FEModel &mdl)
+bool FEBioPlotFile::Write(FEModel &fem)
 {
 	// store the fem pointer
-	FEM& fem = dynamic_cast<FEM&>(mdl);
 	m_pfem = &fem;
 
 	m_ar.BeginChunk(PLT_STATE);

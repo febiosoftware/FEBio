@@ -10,6 +10,7 @@
 #include "FENLConstraint.h"
 #include "FELinearConstraint.h"
 #include "FEObject.h"
+#include <string>
 #include <vector>
 #include <map>
 
@@ -33,6 +34,9 @@ struct FEBIO_CALLBACK {
 class FEModel
 {
 public:
+	enum {MAX_STRING = 256};
+
+public:
 	FEModel(void);
 	virtual ~FEModel(void);
 
@@ -47,6 +51,13 @@ public:
 
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }
+
+public:
+	//! set the problem title
+	void SetTitle(const char* sz) { strcpy(m_sztitle, sz); }
+
+	//! get the problem title
+	const char* GetTitle() { return m_sztitle; }
 
 public:	// --- Load curve functions ----
 
@@ -221,6 +232,9 @@ public:
 	vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
 
 	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
+
+protected:
+	char	m_sztitle[MAX_STRING];	//!< problem title
 
 protected:
 	static std::map<string, double> m_Const;
