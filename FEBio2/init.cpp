@@ -13,7 +13,7 @@
 #include "FEBioLib/FERigidJoint.h"
 #include "FEBioLib/FETriphasic.h"
 #include "FEBioLib/log.h"
-#include "LSDYNAPlotFile.h"
+#include "FEBioPlot/LSDYNAPlotFile.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>

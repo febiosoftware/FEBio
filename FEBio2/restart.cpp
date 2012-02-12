@@ -36,8 +36,8 @@
 #include "FEBioLib/FEAugLagLinearConstraint.h"
 #include "FEBioLib/FERigidBody.h"
 #include "FEBioLib/log.h"
-#include "LSDYNAPlotFile.h"
-#include "FEBioPlotFile.h"
+#include "FEBioPlot/LSDYNAPlotFile.h"
+#include "FEBioPlot/FEBioPlotFile.h"
 #include "version.h"
 
 //-----------------------------------------------------------------------------
