@@ -191,18 +191,6 @@
     <ClCompile Include="..\..\FEBio2\hello.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\init.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\InitContact.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\InitPoroSolute.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\InitRigid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -246,6 +234,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\RigidBodyDataRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBio2\init.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

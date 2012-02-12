@@ -629,7 +629,6 @@
     <ClInclude Include="..\..\FEBioLib\log.h" />
     <ClInclude Include="..\..\FEBioLib\Logfile.h" />
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
-    <ClInclude Include="..\..\FEBioLib\PlotFile.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
     <ClInclude Include="..\..\FEBioLib\RCICGSolver.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
@@ -761,7 +760,6 @@
     <ClCompile Include="..\..\FEBioLib\Logfile.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />
-    <ClCompile Include="..\..\FEBioLib\PlotFile.cpp" />
     <ClCompile Include="..\..\FEBioLib\PSLDLTSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\RCICGSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />

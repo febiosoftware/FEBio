@@ -60,9 +60,6 @@
     <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\PlotFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -459,9 +456,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\RCICGSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\PlotFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\Timer.cpp">

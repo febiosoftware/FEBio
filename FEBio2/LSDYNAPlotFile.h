@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/PlotFile.h"
+#include "FEBioPlot/PlotFile.h"
 
 //-----------------------------------------------------------------------------
 // Field tags
