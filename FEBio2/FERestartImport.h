@@ -12,6 +12,8 @@
 #include "FileImport.h"
 #include "FECore/XMLReader.h"
 
+//-----------------------------------------------------------------------------
+//! Restart input file reader.
 class FERestartImport : public FEFileImport  
 {
 public:
@@ -24,10 +26,12 @@ protected:
 	bool ParseControlSection (XMLTag& tag);
 	bool ParseLoadSection    (XMLTag& tag);
 
-protected:
-	FEModel*	m_pfem;	// point to the FEM
+public:
+	char		m_szdmp[256];	// user defined restart file name
 
-	XMLReader	m_xml;	// the file reader
+protected:
+	FEModel*	m_pfem;			// point to the FEM
+	XMLReader	m_xml;			// the file reader
 };
 
 #endif // !defined(AFX_FERESTARTIMPORT_H__A5A88D72_026C_45F5_BECB_5B3C7B3C767C__INCLUDED_)

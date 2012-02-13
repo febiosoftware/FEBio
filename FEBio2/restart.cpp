@@ -92,6 +92,9 @@ bool FEM::Restart(const char* szfile)
 			fprintf(stderr, "%s", szerr);
 			return false;
 		}
+
+		// see if user redefined restart file name
+		if (file.m_szdmp[0]) SetDumpFilename(file.m_szdmp);
 	}
 
 	// Open the log file for appending

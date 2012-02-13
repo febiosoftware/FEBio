@@ -92,6 +92,9 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	m_nsteps = 0;	// reset step section counter
 	m_nstep_type = FE_SOLID;	// default step type in case Module section is not defined
 	m_nversion = -1;
+	m_szdmp[0] = 0;
+	m_szlog[0] = 0;
+	m_szplt[0] = 0;
 
 	// default element type
 	m_ntet4 = ET_TET4;
@@ -648,7 +651,7 @@ void FEBioControlSection::ParseHeatParams(XMLTag &tag)
 // Parse control parameters common to all solvers/modules
 bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 {
-	FEM& fem = dynamic_cast<FEM&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 	char sztitle[256];
 
@@ -685,7 +688,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	else if (tag == "restart" )
 	{
 		const char* szf = tag.AttributeValue("file", true);
-		if (szf) fem.SetDumpFilename(szf);
+		if (szf) m_pim->SetDumpfileName(szf);
 		tag.value(pstep->m_bDump);
 	}
 	else if (tag == "time_stepper")
@@ -5217,7 +5220,7 @@ void FEBioGlobalsSection::ParseConstants(XMLTag& tag)
 	{
 		s = string(tag.Name());
 		tag.value(v);
-		FEM::SetGlobalConstant(s, v);
+		FEModel::SetGlobalConstant(s, v);
 		++tag;
 	}
 	while (!tag.isend());
@@ -5345,7 +5348,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 				++tag;
 			}
 
-			// add the loadcurve to FEM
+			// add the loadcurve
 			fem.AddLoadCurve(plc);
 		}
 		else throw XMLReader::InvalidTag(tag);
@@ -5383,7 +5386,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 	// see if the log file has any attributes
 	const char* szlog = tag.AttributeValue("file", true);
-	if (szlog) fem.SetLogFilename(szlog);
+	if (szlog) m_pim->SetLogfileName(szlog);
 
 	if (tag.isleaf()) return;
 	++tag;
@@ -5510,7 +5513,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 	else fem.m_plot = new LSDYNAPlotFile;
 
 	const char* szplt = tag.AttributeValue("file", true);
-	if (szplt) fem.SetPlotFilename(szplt);
+	if (szplt) m_pim->SetPlotfileName(szplt);
 
 	if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot) && !tag.isleaf())
 	{

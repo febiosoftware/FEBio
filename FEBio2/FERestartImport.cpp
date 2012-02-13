@@ -6,7 +6,6 @@
 #include "FERestartImport.h"
 #include "FEBioLib/FESolver.h"
 #include "FEBioLib/FEAnalysisStep.h"
-#include "fem.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -31,6 +30,8 @@ bool FERestartImport::Load(FEModel& fem, const char* szfile)
 
 	// keep a pointer to the fem object
 	m_pfem = &fem;
+
+	m_szdmp[0] = 0;
 
 	// loop over child tags
 	try
@@ -162,7 +163,7 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 
 bool FERestartImport::ParseControlSection(XMLTag& tag)
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEModel& fem = *m_pfem;
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	++tag;
@@ -190,7 +191,7 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 		else if (tag == "restart" ) 
 		{
 			const char* szf = tag.AttributeValue("file", true);
-			if (szf) fem.SetDumpFilename(szf);
+			if (szf) strcpy(m_szdmp, szf);
 			tag.value(fem.GetCurrentStep()->m_bDump);
 		}
 		else if (tag == "time_stepper")

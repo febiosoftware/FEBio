@@ -6,7 +6,6 @@
 #include "FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
 #include "FEBioLib/log.h"
-#include "fem.h"
 
 //-----------------------------------------------------------------------------
 //! The diagnose() function performs a diagnostic test on FEBio. 
@@ -30,10 +29,10 @@ bool diagnose(FEModel& fem, const char* szfile)
 		return false;
 	}
 
-	// --- initialize FEM data ---
+	// --- initialize FE Model data ---
 	if (fem.Init() == false)
 	{
-		fprintf(stderr, "FEM initialized has failed\n\n");
+		fprintf(stderr, "FE-model data initialized has failed\n\n");
 		return false;
 	}
 

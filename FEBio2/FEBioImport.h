@@ -321,12 +321,22 @@ public:
 
 	FEAnalysis* CreateNewStep();
 
+public:
+	void SetDumpfileName(const char* sz) { sprintf(m_szdmp, sz); }
+	void SetLogfileName (const char* sz) { sprintf(m_szlog, sz); }
+	void SetPlotfileName(const char* sz) { sprintf(m_szplt, sz); }
+
 protected:
 	void ParseVersion			(XMLTag& tag);
 
 public:
 	FEModel*	m_pfem;		//!< pointer to the fem class
 	FEAnalysis*	m_pStep;	//!< pointer to current analysis step
+
+public:
+	char	m_szdmp[256];
+	char	m_szlog[256];
+	char	m_szplt[256];
 
 public:
 	int	m_ntet4;	// tetrahedral integration rule
