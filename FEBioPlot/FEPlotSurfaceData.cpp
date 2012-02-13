@@ -3,11 +3,6 @@
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FECore/febio.h"
 
-//-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );
-REGISTER_FEBIO_CLASS(FEPlotContactPressure , FEPlotData, "contact pressure");
-REGISTER_FEBIO_CLASS(FEPlotContactTraction , FEPlotData, "contact traction");
-
 //=============================================================================
 // Contact Gap
 //=============================================================================

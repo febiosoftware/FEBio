@@ -74,12 +74,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioPlot\FEBioPlotFile.cpp" />
+    <ClCompile Include="..\..\FEBioPlot\FEPlotDomainData.cpp" />
+    <ClCompile Include="..\..\FEBioPlot\FEPlotNodeData.cpp" />
+    <ClCompile Include="..\..\FEBioPlot\FEPlotSurfaceData.cpp" />
     <ClCompile Include="..\..\FEBioPlot\LSDYNAPlotFile.cpp" />
     <ClCompile Include="..\..\FEBioPlot\PlotFile.cpp" />
     <ClCompile Include="..\..\FEBioPlot\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioPlot\FEBioPlotFile.h" />
+    <ClInclude Include="..\..\FEBioPlot\FEPlotDomainData.h" />
+    <ClInclude Include="..\..\FEBioPlot\FEPlotNodeData.h" />
+    <ClInclude Include="..\..\FEBioPlot\FEPlotSurfaceData.h" />
     <ClInclude Include="..\..\FEBioPlot\LSDYNAPlotFile.h" />
     <ClInclude Include="..\..\FEBioPlot\PlotFile.h" />
     <ClInclude Include="..\..\FEBioPlot\stdafx.h" />

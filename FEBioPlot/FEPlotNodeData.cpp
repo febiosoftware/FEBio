@@ -2,13 +2,6 @@
 #include "FEPlotNodeData.h"
 #include "FECore/FEMesh.h"
 #include "FECore/febio.h"
-//-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
-REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );
-REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPlotData, "acceleration"   );
-REGISTER_FEBIO_CLASS(FEPlotNodeTemperature   , FEPlotData, "temperature"    );
-REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
-//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 //! Store the nodal displacements

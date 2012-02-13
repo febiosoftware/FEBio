@@ -540,9 +540,6 @@
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEOptimizer.h" />
-    <ClInclude Include="..\..\FEBio2\FEPlotDomainData.h" />
-    <ClInclude Include="..\..\FEBio2\FEPlotNodeData.h" />
-    <ClInclude Include="..\..\FEBio2\FEPlotSurfaceData.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FERestartImport.h" />
@@ -574,9 +571,6 @@
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEOptimizer.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPlotDomainData.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPlotNodeData.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEPlotSurfaceData.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />

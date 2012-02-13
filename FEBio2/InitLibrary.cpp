@@ -76,6 +76,20 @@
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FETiedInterface.h"
 
+#include "FEBioPlot/FEPlotDomainData.h"
+#include "FEBioLib/FEDamageNeoHookean.h"
+#include "FEBioLib/FEDamageTransIsoMooneyRivlin.h"
+#include "FEBioLib/FEBiphasicSoluteDomain.h"
+#include "FEBioLib/FEBiphasicSolidDomain.h"
+#include "FEBioLib/FETriphasicDomain.h"
+#include "FEBioLib/FERigidSolidDomain.h"
+#include "FEBioLib/FERigidShellDomain.h"
+#include "FEBioLib/FEElasticMixture.h"
+#include "FEBioLib/FEBiphasicSolute.h"
+#include "FEBioLib/FETriphasic.h"
+#include "FEBioPlot/FEPlotNodeData.h"
+#include "FEBioPlot/FEPlotSurfaceData.h"
+
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce
 REGISTER_FEBIO_CLASS(FEConstBodyForce      , FEBodyForce, "const"      );
@@ -160,3 +174,41 @@ REGISTER_MATERIAL(FEVonMisesPlasticity          , "von-Mises plasticity"        
 REGISTER_FEBIO_CLASS(FEPeriodicBoundary , FEContactInterface, "periodic boundary" );
 REGISTER_FEBIO_CLASS(FESurfaceConstraint, FEContactInterface, "surface constraint");
 REGISTER_FEBIO_CLASS(FETiedInterface    , FEContactInterface, "tied"              );
+
+//-----------------------------------------------------------------------------
+// classes derived from FEPlotData
+REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"        );
+REGISTER_FEBIO_CLASS(FEPlotActualFluidPressure          , FEPlotData, "fluid pressure"                  );
+REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPlotData, "stress"                          );
+REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPlotData, "relative volume"                 );
+REGISTER_FEBIO_CLASS(FEPlotFluidFlux                    , FEPlotData, "fluid flux"                      );
+REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vector"                    );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSoluteConcentration , FEPlotData, "effective solute concentration"  );
+REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"                 );
+REGISTER_FEBIO_CLASS(FEPlotActualSoluteConcentration    , FEPlotData, "solute concentration"            );
+REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute flux"                     );
+REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                          );
+REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"                 );
+REGISTER_FEBIO_CLASS(FEPlotReceptorLigandConcentration  , FEPlotData, "receptor-ligand concentration"   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol1Concentration   , FEPlotData, "effective solute 1 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol1Concentration      , FEPlotData, "solute 1 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol1Flux                     , FEPlotData, "solute 1 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol2Concentration   , FEPlotData, "effective solute 2 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol2Concentration      , FEPlotData, "solute 2 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol2Flux                     , FEPlotData, "solute 2 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"              );
+REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"                 );
+REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density"            );
+REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"                );
+
+//-----------------------------------------------------------------------------
+REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );
+REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPlotData, "acceleration"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeTemperature   , FEPlotData, "temperature"    );
+REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
+
+//-----------------------------------------------------------------------------
+REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );
+REGISTER_FEBIO_CLASS(FEPlotContactPressure , FEPlotData, "contact pressure");
+REGISTER_FEBIO_CLASS(FEPlotContactTraction , FEPlotData, "contact traction");

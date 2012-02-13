@@ -12,32 +12,6 @@
 #include "FEBioLib/FETriphasic.h"
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotEffectiveFluidPressure		, FEPlotData, "effective fluid pressure"        );
-REGISTER_FEBIO_CLASS(FEPlotActualFluidPressure          , FEPlotData, "fluid pressure"                  );
-REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPlotData, "stress"                          );
-REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPlotData, "relative volume"                 );
-REGISTER_FEBIO_CLASS(FEPlotFluidFlux                    , FEPlotData, "fluid flux"                      );
-REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vector"                    );
-REGISTER_FEBIO_CLASS(FEPlotEffectiveSoluteConcentration , FEPlotData, "effective solute concentration"  );
-REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"                 );
-REGISTER_FEBIO_CLASS(FEPlotActualSoluteConcentration    , FEPlotData, "solute concentration"            );
-REGISTER_FEBIO_CLASS(FEPlotSoluteFlux                   , FEPlotData, "solute flux"                     );
-REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                          );
-REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"                 );
-REGISTER_FEBIO_CLASS(FEPlotReceptorLigandConcentration  , FEPlotData, "receptor-ligand concentration"   );
-REGISTER_FEBIO_CLASS(FEPlotEffectiveSol1Concentration   , FEPlotData, "effective solute 1 concentration");
-REGISTER_FEBIO_CLASS(FEPlotActualSol1Concentration      , FEPlotData, "solute 1 concentration"          );
-REGISTER_FEBIO_CLASS(FEPlotSol1Flux                     , FEPlotData, "solute 1 flux"                   );
-REGISTER_FEBIO_CLASS(FEPlotEffectiveSol2Concentration   , FEPlotData, "effective solute 2 concentration");
-REGISTER_FEBIO_CLASS(FEPlotActualSol2Concentration      , FEPlotData, "solute 2 concentration"          );
-REGISTER_FEBIO_CLASS(FEPlotSol2Flux                     , FEPlotData, "solute 2 flux"                   );
-REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"              );
-REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"                 );
-REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density"            );
-REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"                );
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
 bool FEPlotElementStress::Save(FEDomain& dom, vector<float>& a)
 {
