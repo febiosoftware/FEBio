@@ -4,15 +4,7 @@
 
 #include "stdafx.h"
 #include "DataStore.h"
-#include "FEBioLib/FEAnalysisStep.h"
-#include "FEBioLib/FERigid.h"
-#include "FEBioLib/FESolidSolver.h"
-#include "FEBioLib/FEBiphasicSolute.h"
-#include "FEBioLib/FETriphasic.h"
 #include "FEBioLib/log.h"
-#include "NodeDataRecord.h"
-#include "ElementDataRecord.h"
-#include "RigidBodyDataRecord.h"
 
 //-----------------------------------------------------------------------------
 UnknownDataField::UnknownDataField(const char* sz)
@@ -61,51 +53,6 @@ void DataStore::AddRecord(DataRecord* prec)
 	m_data.push_back(prec);
 }
 
-//-----------------------------------------------------------------------------
-
-void DataStore::Serialize(DumpFile &ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << (int) m_data.size();
-		for (int i=0; i<(int) m_data.size(); ++i)
-		{
-			DataRecord* pd = m_data[i];
-
-			int ntype = -1;
-			if (dynamic_cast<NodeDataRecord*>(pd)) ntype = FE_DATA_NODE;
-			if (dynamic_cast<ElementDataRecord*>(pd)) ntype = FE_DATA_ELEM;
-			if (dynamic_cast<RigidBodyDataRecord*>(pd)) ntype = FE_DATA_RB;
-			assert(ntype != -1);
-			ar << ntype;
-			pd->Serialize(ar);
-		}
-	}
-	else
-	{
-		FEModel* pfem = ar.GetFEModel();
-
-		int ndr;
-		Clear();
-		ar >> ndr;
-		for (int i=0; i<ndr; ++i)
-		{
-			int ntype;
-			ar >> ntype;
-
-			DataRecord* pd = 0;
-			switch(ntype)
-			{
-			case FE_DATA_NODE: pd = new NodeDataRecord(pfem, 0); break;
-			case FE_DATA_ELEM: pd = new ElementDataRecord(pfem, 0); break;
-			case FE_DATA_RB  : pd = new RigidBodyDataRecord(pfem, 0); break;
-			}
-			assert(pd);
-			pd->Serialize(ar);
-			AddRecord(pd);
-		}
-	}
-}
 
 //////////////////////////////////////////////////////////////////////
 // DataRecord

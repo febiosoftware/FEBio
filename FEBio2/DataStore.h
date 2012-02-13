@@ -87,7 +87,9 @@ public:
 
 	void AddRecord(DataRecord* prec);
 
-	void Serialize(DumpFile& ar);
+	int Size() { return (int) m_data.size(); }
+
+	DataRecord* GetDataRecord(int i) { return m_data[i]; }
 
 protected:
 	vector<DataRecord*>	m_data;	//!< the data records

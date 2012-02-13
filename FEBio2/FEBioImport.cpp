@@ -12,8 +12,6 @@
 #include "FEBioLib/FEHeatSolver.h"
 #include "FEBioLib/FELinearSolidSolver.h"
 #include "FEBioLib/log.h"
-#include "FEBioPlot/LSDYNAPlotFile.h"
-#include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioLib/FEUT4Domain.h"
 #include "FEBioLib/FEDiscreteMaterial.h"
 #include "FEBioLib/FEUncoupledMaterial.h"
@@ -50,6 +48,8 @@
 #include "FEBioLib/FEHeatTransferMaterial.h"
 #include "FEBioLib/FEPointConstraint.h"
 #include "FEBioLib/FEAugLagLinearConstraint.h"
+#include "FEBioPlot/LSDYNAPlotFile.h"
+#include "FEBioPlot/FEBioPlotFile.h"
 #include "NodeDataRecord.h"
 #include "ElementDataRecord.h"
 #include "RigidBodyDataRecord.h"
@@ -5472,7 +5472,6 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			fem.m_Data.AddRecord(prec);
 		}
-		else if (tag == "echo") tag.value(fem.m_becho);
 		else throw XMLReader::InvalidTag(tag);
 
 		++tag;

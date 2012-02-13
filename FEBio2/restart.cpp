@@ -38,6 +38,9 @@
 #include "FEBioLib/log.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "NodeDataRecord.h"
+#include "ElementDataRecord.h"
+#include "RigidBodyDataRecord.h"
 #include "version.h"
 
 //-----------------------------------------------------------------------------
@@ -833,7 +836,7 @@ void FEM::SerializeIOData(DumpFile &ar)
 		}
 
 		// data records
-		m_Data.Serialize(ar);
+		SerializeDataStore(ar);
 	}
 	else
 	{
@@ -883,6 +886,50 @@ void FEM::SerializeIOData(DumpFile &ar)
 		};
 
 		// data records
-		m_Data.Serialize(ar);
+		SerializeDataStore(ar);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEM::SerializeDataStore(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		int N = m_Data.Size();
+		ar << N;
+		for (int i=0; i<N; ++i)
+		{
+			DataRecord* pd = m_Data.GetDataRecord(i);
+
+			int ntype = -1;
+			if (dynamic_cast<NodeDataRecord*>(pd)) ntype = FE_DATA_NODE;
+			if (dynamic_cast<ElementDataRecord*>(pd)) ntype = FE_DATA_ELEM;
+			if (dynamic_cast<RigidBodyDataRecord*>(pd)) ntype = FE_DATA_RB;
+			assert(ntype != -1);
+			ar << ntype;
+			pd->Serialize(ar);
+		}
+	}
+	else
+	{
+		int N;
+		m_Data.Clear();
+		ar >> N;
+		for (int i=0; i<N; ++i)
+		{
+			int ntype;
+			ar >> ntype;
+
+			DataRecord* pd = 0;
+			switch(ntype)
+			{
+			case FE_DATA_NODE: pd = new NodeDataRecord(this, 0); break;
+			case FE_DATA_ELEM: pd = new ElementDataRecord(this, 0); break;
+			case FE_DATA_RB  : pd = new RigidBodyDataRecord(this, 0); break;
+			}
+			assert(pd);
+			pd->Serialize(ar);
+			m_Data.AddRecord(pd);
+		}
 	}
 }

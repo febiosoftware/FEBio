@@ -126,6 +126,7 @@ protected:
 	void SerializeIOData      (DumpFile& ar);
 	void SerializeLoadData    (DumpFile& ar);
 	void SerializeConstants   (DumpFile& ar);
+	void SerializeDataStore   (DumpFile& ar);
 
 public:
 	//{ --- Initialization routines ---
@@ -156,7 +157,7 @@ public:
 		PlotFile*	m_plot;		//!< the plot file
 		DataStore	m_Data;		//!< the data store used for data logging
 		
-		bool		m_becho;			//!< echo input to logfile
+		bool		m_becho;			//!< echo input to logfile (TODO: Make this a command line option)
 
 protected:
 		// file names
