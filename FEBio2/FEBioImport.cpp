@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "FEBioImport.h"
+#include "NumCore/ConjGradIterSolver.h"
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
-#include "NumCore/ConjGradIterSolver.h"
 #include "FEBioLib/SuperLUSolver.h"
 #include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FEHeatSolver.h"
@@ -34,8 +34,6 @@
 #include "FEBioLib/FEPoroTraction.h"
 #include "FEBioLib/FESoluteFlux.h"
 #include "FEBioLib/FERigidJoint.h"
-#include "plugin.h"
-#include <string.h>
 #include "FEBioLib/FEUDGHexDomain.h"
 #include "FEBioLib/FERigidSolidDomain.h"
 #include "FEBioLib/FEBiphasicSolidDomain.h"
@@ -56,6 +54,7 @@
 #include "ElementDataRecord.h"
 #include "RigidBodyDataRecord.h"
 #include "fem.h"
+#include <string.h>
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------
@@ -128,7 +127,6 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 
 		// define the file structure
 		FEBioFileSectionMap map;
-		map["Import"     ] = new FEBioImportSection     (this);
 		map["Module"     ] = new FEBioModuleSection     (this);
 		map["Control"    ] = new FEBioControlSection    (this);
 		map["Material"   ] = new FEBioMaterialSection   (this);
@@ -415,21 +413,6 @@ void FEFEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 		if (ch) sz = ch+1;
 	}
 	while (ch != 0);
-}
-
-//=============================================================================
-//
-//                     I M P O R T   S E C T I O N
-//
-//=============================================================================
-
-//! This function parses the Import section which allows a user to load custom
-//! dll's. 
-void FEBioImportSection::Parse(XMLTag &tag)
-{
-	const char* szfile = tag.szvalue();
-	if (LoadPlugin(szfile) == false) throw FEFEBioImport::FailedLoadingPlugin(szfile);
-	clog.printf("Plugin \"%s\" loaded successfully\n", szfile);
 }
 
 //=============================================================================

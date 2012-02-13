@@ -42,15 +42,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Import section
-class FEBioImportSection : public FEBioFileSection
-{
-public:
-	FEBioImportSection(FEFEBioImport* pim) : FEBioFileSection(pim){}
-	void Parse(XMLTag& tag);
-};
-
-//-----------------------------------------------------------------------------
 // Module Section
 class FEBioModuleSection : public FEBioFileSection
 {
