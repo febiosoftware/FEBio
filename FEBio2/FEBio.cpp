@@ -120,6 +120,9 @@ int main(int argc, char* argv[])
 		if (fem.Configure(ops.szcnf) == false) return 1;
 	}
 
+	// store the input file name
+	fem.SetInputFilename(ops.szfile);
+
 	// set the output filenames
 	fem.SetLogFilename (ops.szlog);
 	fem.SetPlotFilename(ops.szplt);

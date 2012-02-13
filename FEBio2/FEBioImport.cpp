@@ -78,13 +78,8 @@ FEBioFileSectionMap::~FEBioFileSectionMap()
 //  The FEBioImport class imports an XML formatted FEBio input file.
 //  The actual file is parsed using the XMLReader class.
 //
-bool FEFEBioImport::Load(FEModel& mdl, const char* szfile)
+bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 {
-	FEM& fem = dynamic_cast<FEM&>(mdl);
-
-	// store a copy of the file name
-	fem.SetInputFilename(szfile);
-
 	// Open the XML file
 	XMLReader xml;
 	if (xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening input file %s\n\n", szfile);

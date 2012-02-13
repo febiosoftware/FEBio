@@ -838,7 +838,7 @@ void FEM::SerializeIOData(DumpFile &ar)
 		ar >> m_szfile >> m_szplot >> m_szlog >> m_szdump;
 		ar >> m_sztitle;
 
-		// don't forget to call SetInputFilename so
+		// don't forget to call store the input file name so
 		// that m_szfile_title gets initialized
 		SetInputFilename(m_szfile);
 

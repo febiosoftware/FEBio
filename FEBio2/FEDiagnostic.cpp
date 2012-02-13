@@ -10,7 +10,6 @@
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEMemoryDiagnostic.h"
 #include "FEBioLib/log.h"
-#include "fem.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -27,13 +26,8 @@ FEDiagnostic::~FEDiagnostic()
 }
 
 //-----------------------------------------------------------------------------
-FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& mdl, const char* szfile)
+FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 {
-	FEM& fem = dynamic_cast<FEM&>(mdl);
-
-	// store a copy of the file name
-	fem.SetInputFilename(szfile);
-
 	// Open the XML file
 	XMLReader xml;
 	if (xml.Open(szfile) == false) 
