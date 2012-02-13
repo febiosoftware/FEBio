@@ -10,6 +10,7 @@
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEMemoryDiagnostic.h"
 #include "FEBioLib/log.h"
+#include "fem.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

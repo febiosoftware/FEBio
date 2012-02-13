@@ -6,7 +6,7 @@
 #include "NumCore/CompactMatrix.h"
 using namespace NumCore;
 
-FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEM& fem) : FEDiagnostic(fem)
+FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 }
 
@@ -16,7 +16,7 @@ FEPrintHBMatrixDiagnostic::~FEPrintHBMatrixDiagnostic(void)
 
 bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	FEModel& fem = m_fem;
 	if (tag == "input")
 	{
 		// get the input file name

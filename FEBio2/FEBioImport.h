@@ -26,7 +26,7 @@ public:
 
 	virtual void Parse(XMLTag& tag) = 0;
 
-	FEM* GetFEM();
+	FEModel* GetFEModel();
 	FEAnalysisStep* GetStep();
 
 protected:
@@ -68,7 +68,7 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	FESolver* BuildSolver(int nmod, FEM& fem);
+	FESolver* BuildSolver(int nmod, FEModel& fem);
 
 	bool ParseCommonParams	   (XMLTag& tag);
 	void ParseSolidParams	   (XMLTag& tag);
@@ -307,9 +307,10 @@ public:
 	class DuplicateMaterialSection {};
 
 public:
-	bool Load(FEM& fem, const char* szfile);
+	//! Load the model data from file.
+	bool Load(FEModel& fem, const char* szfile);
 
-	FEM* GetFEM() { return m_pfem; }
+	FEModel* GetFEModel() { return m_pfem; }
 	FEAnalysis*	GetStep();
 
 	int Version() { return m_nversion; }
@@ -324,7 +325,7 @@ protected:
 	void ParseVersion			(XMLTag& tag);
 
 public:
-	FEM*		m_pfem;		//!< pointer to the fem class
+	FEModel*	m_pfem;		//!< pointer to the fem class
 	FEAnalysis*	m_pStep;	//!< pointer to current analysis step
 
 public:

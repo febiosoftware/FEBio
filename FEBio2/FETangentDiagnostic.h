@@ -25,7 +25,7 @@ public:
 	};
 
 public:
-	FETangentDiagnostic(FEM& fem);
+	FETangentDiagnostic(FEModel& fem);
 	virtual ~FETangentDiagnostic(){}
 
 	bool Init();

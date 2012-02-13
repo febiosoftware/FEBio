@@ -9,8 +9,7 @@
 #include <stdarg.h>
 
 //-----------------------------------------------------------------------------
-// FUNCTION : FEFileImport::FEFileImport
-//
+//! class constructor
 FEFileImport::FEFileImport()
 {
 	m_fp = 0;
@@ -18,8 +17,7 @@ FEFileImport::FEFileImport()
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION : FEFileImport::~FEFileImport
-//
+// class destructor. Closes file on call.
 FEFileImport::~FEFileImport()
 {
 	// make sure to close the file
@@ -27,8 +25,7 @@ FEFileImport::~FEFileImport()
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION : FEFileImport::Open
-//
+//! Open a file and store the file name and file pointer.
 bool FEFileImport::Open(const char* szfile, const char* szmode)
 {
 	m_fp = fopen(szfile, szmode);
@@ -40,8 +37,7 @@ bool FEFileImport::Open(const char* szfile, const char* szmode)
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION : FEFileImport::Close
-//
+//! Close the file
 void FEFileImport::Close()
 {
 	if (m_fp)
@@ -52,16 +48,15 @@ void FEFileImport::Close()
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION : FEFileImport::GetErrorMessage
-//
+//! Get the error message. Errors message are stored when calling the errf function.
 void FEFileImport::GetErrorMessage(char* szerr)
 {
 	strcpy(szerr, m_szerr);
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION : FEFileImport::errf
-//
+//! Call this function to report an error message. The user can retrieve the 
+//! error message with the GetErrorMessage member function.
 bool FEFileImport::errf(const char* szerr, ...)
 {
 	// get a pointer to the argument list

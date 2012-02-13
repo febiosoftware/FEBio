@@ -4,7 +4,7 @@
 class FEPrintMatrixDiagnostic :	public FEDiagnostic
 {
 public:
-	FEPrintMatrixDiagnostic(FEM& fem);
+	FEPrintMatrixDiagnostic(FEModel& fem);
 	~FEPrintMatrixDiagnostic(void);
 
 	bool ParseSection(XMLTag& tag);

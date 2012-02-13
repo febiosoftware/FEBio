@@ -37,7 +37,7 @@ void print_matrix(Logfile& log, DenseMatrix& m)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FEContactDiagnostic::FEContactDiagnostic(FEM& fem) : FEDiagnostic(fem)
+FEContactDiagnostic::FEContactDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 
 }

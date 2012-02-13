@@ -55,10 +55,11 @@
 #include "NodeDataRecord.h"
 #include "ElementDataRecord.h"
 #include "RigidBodyDataRecord.h"
+#include "fem.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------
-FEM* FEBioFileSection::GetFEM() { return m_pim->GetFEM(); }
+FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
 FEAnalysisStep* FEBioFileSection::GetStep() { return dynamic_cast<FEAnalysisStep*>(m_pim->GetStep()); }
 
 //-----------------------------------------------------------------------------
@@ -77,8 +78,10 @@ FEBioFileSectionMap::~FEBioFileSectionMap()
 //  The FEBioImport class imports an XML formatted FEBio input file.
 //  The actual file is parsed using the XMLReader class.
 //
-bool FEFEBioImport::Load(FEM& fem, const char* szfile)
+bool FEFEBioImport::Load(FEModel& mdl, const char* szfile)
 {
+	FEM& fem = dynamic_cast<FEM&>(mdl);
+
 	// store a copy of the file name
 	fem.SetInputFilename(szfile);
 
@@ -463,7 +466,7 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
+FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 {
 	switch (nmod)
 	{
@@ -483,7 +486,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEM& fem)
 //-----------------------------------------------------------------------------
 void FEBioControlSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 
 	// make sure we have a solver defined
@@ -517,7 +520,7 @@ void FEBioControlSection::Parse(XMLTag& tag)
 // Parse parameters specific to solid solver
 void FEBioControlSection::ParseSolidParams(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
@@ -540,7 +543,7 @@ void FEBioControlSection::ParseSolidParams(XMLTag& tag)
 // Parse parameters specific for the poro-elastic solver
 void FEBioControlSection::ParsePoroParams(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 
 	FEBiphasicSolver* ps = dynamic_cast<FEBiphasicSolver*>(pstep->m_psolver);
@@ -565,7 +568,7 @@ void FEBioControlSection::ParsePoroParams(XMLTag &tag)
 // Parse parameters specific for the poro-solute solver
 void FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 
 	FEBiphasicSoluteSolver* ps = dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver);
@@ -591,7 +594,7 @@ void FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 // Parse parameters specific for the triphasic solver
 void FEBioControlSection::ParseTriphasicParams(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 
 	FETriphasicSolver* ps = dynamic_cast<FETriphasicSolver*>(pstep->m_psolver);
@@ -617,7 +620,7 @@ void FEBioControlSection::ParseTriphasicParams(XMLTag &tag)
 // Parse parameters specific for the linear elastic solver
 void FEBioControlSection::ParseLinearSolidParams(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 
 	FELinearSolidSolver* ps = dynamic_cast<FELinearSolidSolver*>(pstep->m_psolver);
@@ -637,7 +640,7 @@ void FEBioControlSection::ParseLinearSolidParams(XMLTag &tag)
 // Parse parameters specific for the heat solver
 void FEBioControlSection::ParseHeatParams(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pstep = GetStep();
 
 	FEHeatSolver* ps = dynamic_cast<FEHeatSolver*>(pstep->m_psolver);
@@ -650,7 +653,7 @@ void FEBioControlSection::ParseHeatParams(XMLTag &tag)
 // Parse control parameters common to all solvers/modules
 bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEM& fem = dynamic_cast<FEM&>(*GetFEModel());
 	FEAnalysisStep* pstep = GetStep();
 	char sztitle[256];
 
@@ -861,7 +864,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 
 void FEBioMaterialSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	// Make sure no materials are defined
 	if (fem.Materials() != 0) throw FEFEBioImport::DuplicateMaterialSection();
@@ -971,7 +974,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	// get the material's parameter list
 	FEParameterList& pl = pmat->GetParameterList();
@@ -1034,7 +1037,8 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 //
 bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *pm)
 {
-	FEMesh& mesh = m_pim->GetFEM()->GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 	// read the material axis
 	if (tag == "mat_axis")
 	{
@@ -1084,7 +1088,8 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 //
 bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsotropic *pm)
 {
-	FEMesh& mesh = m_pim->GetFEM()->GetMesh();
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
 
 	// read material fibers
 	if (tag == "fiber")
@@ -1168,7 +1173,7 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 //
 bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
 	else if (tag == "parent_id") { tag.value(pm->m_pmid); return true; }
@@ -1314,7 +1319,7 @@ bool FEBioMaterialSection::ParseElasticMixture(XMLTag &tag, FEElasticMixture *pm
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -1367,7 +1372,7 @@ bool FEBioMaterialSection::ParseUncoupledElasticMixture(XMLTag &tag, FEUncoupled
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an uncoupled elastic material)
@@ -1420,7 +1425,7 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -1453,7 +1458,7 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a permeability material)
@@ -1501,7 +1506,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -1534,7 +1539,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a permeability material)
@@ -1566,7 +1571,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a diffusivity material)
@@ -1601,7 +1606,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a solubility material)
@@ -1636,7 +1641,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
@@ -1668,7 +1673,7 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
@@ -1716,7 +1721,7 @@ bool FEBioMaterialSection::ParseSoluteMaterial(XMLTag &tag, FESolute *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a diffusivity material)
@@ -1751,7 +1756,7 @@ bool FEBioMaterialSection::ParseSoluteMaterial(XMLTag &tag, FESolute *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a solubility material)
@@ -1803,7 +1808,7 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -1836,7 +1841,7 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a permeability material)
@@ -1881,7 +1886,7 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a solute material)
@@ -1916,7 +1921,7 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
@@ -1969,7 +1974,7 @@ bool FEBioMaterialSection::ParseNestedMaterial(XMLTag &tag, FENestedMaterial *pm
 		szname = tag.AttributeValue("name", true);
 		
 		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEM());
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
@@ -2037,7 +2042,7 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 //! Reads the Nodes section of the FEBio input file
 void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 	int N0 = mesh.Nodes();
 
@@ -2150,7 +2155,7 @@ int FEBioGeometrySection::ElementType(XMLTag& t)
 //! find the domain type for the element and material type
 int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh* pm = &fem.m_mesh;
 	int ntype = m_pim->m_nstep_type;
 
@@ -2266,7 +2271,7 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 //!
 void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
 	// first we need to figure out how many elements 
@@ -2445,7 +2450,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
 	// get the element type
@@ -2613,7 +2618,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 {
 	int i;
 
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
 	// get the total nr of elements
@@ -2785,7 +2790,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 
 void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh &mesh = fem.m_mesh;
 
 	// get the name attribute
@@ -2852,7 +2857,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 //
 bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 	int NN = m.Nodes();
 
@@ -2909,7 +2914,7 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	// make sure this section does not appear in a step section
 	if (m_pim->m_nsteps != 0) throw XMLReader::InvalidTag(tag);
@@ -2991,7 +2996,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
 	int nversion = m_pim->Version();
@@ -3169,7 +3174,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	int nversion = m_pim->Version();
 	if (nversion >= 0x0200)
@@ -3267,7 +3272,7 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	const char* sz;
 	bool blinear = false;
@@ -3331,7 +3336,7 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	const char* sz;
 
@@ -3390,7 +3395,7 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	
 	const char* sz;
 	bool blinear = false;
@@ -3463,7 +3468,7 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	const char* sz;
 	bool blinear = false;
@@ -3536,7 +3541,7 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	
 	const char* sz;
 	bool blinear = false;
@@ -3600,7 +3605,7 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	// count how many heatflux cards there are
 	int npr = 0;
@@ -3656,7 +3661,7 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
 	// determine the spring type
@@ -3727,7 +3732,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 
 void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	// make sure there is a constraint defined
 	if (tag.isleaf()) return;
@@ -3783,7 +3788,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 
 void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	// make sure that the version is 1.x
@@ -4244,7 +4249,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	}
 	else if (strcmp(szt, "linear constraint") == 0)
 	{
-		FEM& fem = *GetFEM();
+		FEModel& fem = *GetFEModel();
 
 		// make sure there is a constraint defined
 		if (tag.isleaf()) return;
@@ -4343,7 +4348,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
 // --- S L I D I N G   W I T H   G A P S ---
 void FEBioContactSection::ParseSlidingInterface(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FESlidingInterface* ps = new FESlidingInterface(&fem);
@@ -4389,7 +4394,7 @@ void FEBioContactSection::ParseSlidingInterface(XMLTag& tag)
 // --- F A C E T   T O   F A C E T   S L I D I N G ---
 void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
@@ -4446,7 +4451,7 @@ void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
 // --- S L I D I N G   I N T E R F A C E   2 ---
 void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FESlidingInterface2* ps = new FESlidingInterface2(&fem);
@@ -4504,7 +4509,7 @@ void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
 // --- S L I D I N G   I N T E R F A C E   3 ---
 void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FESlidingInterface3* ps = new FESlidingInterface3(&fem);
@@ -4562,7 +4567,7 @@ void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
 // --- T I E D   C O N T A C T  ---
 void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FETiedInterface* ps = new FETiedInterface(&fem);
@@ -4608,7 +4613,7 @@ void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 // --- P E R I O D I C   B O U N D A R Y  ---
 void FEBioContactSection::ParsePeriodicBoundary(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
@@ -4654,7 +4659,7 @@ void FEBioContactSection::ParsePeriodicBoundary(XMLTag& tag)
 // --- S U R F A C E   C O N S T R A I N T ---
 void FEBioContactSection::ParseSurfaceConstraint(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
@@ -4700,7 +4705,7 @@ void FEBioContactSection::ParseSurfaceConstraint(XMLTag& tag)
 // --- R I G I D   W A L L   I N T E R F A C E ---
 void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FERigidWallInterface* ps = new FERigidWallInterface(&fem);
@@ -4778,7 +4783,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 // --- R I G I D   B O D Y   I N T E R F A C E ---
 void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	// count how many rigid nodes there are
@@ -4813,7 +4818,7 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 // --- R I G I D   J O I N T   I N T E R F A C E ---
 void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	FERigidJoint* prj = new FERigidJoint(&fem);
@@ -4834,7 +4839,7 @@ void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 // --- L I N E A R   C O N S T R A I N T ---
 void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 
 	// make sure there is a constraint defined
@@ -4893,7 +4898,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 //
 bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.m_mesh;
 	int NN = m.Nodes();
 
@@ -4982,7 +4987,7 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 // NOTE: note that this section used to be in the Globals section (version 1.1)
 void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	const char* szt = tag.AttributeValue("type", true);
 	if (szt == 0) szt = "const";
@@ -5048,7 +5053,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 {
 	if (tag.isleaf()) return;
 
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
 	// make sure we've read the nodes section
@@ -5151,7 +5156,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioGlobalsSection::ParseBodyForce(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 
 	const char* szt = tag.AttributeValue("type", true);
 	if (szt == 0) szt = "const";
@@ -5209,7 +5214,7 @@ void FEBioGlobalsSection::ParseBodyForce(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioGlobalsSection::ParseConstants(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	++tag;
 	string s;
 	double v;
@@ -5226,7 +5231,7 @@ void FEBioGlobalsSection::ParseConstants(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	
 	// count how many solutes there are
 	int nsol = 0;
@@ -5276,7 +5281,7 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 //!
 void FEBioLoadDataSection::Parse(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	int nmplc = -1;
 	if (m_pim->Version() <= 0x0100)
 	{
@@ -5376,7 +5381,7 @@ void FEBioOutputSection::Parse(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEM& fem = dynamic_cast<FEM&>(*GetFEModel());
 	FEMesh& mesh = fem.m_mesh;
 
 	const char* sz;
@@ -5497,7 +5502,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEM& fem = dynamic_cast<FEM&>(*GetFEModel());
 	FEMesh& mesh = fem.m_mesh;
 
 	const char* sz = tag.AttributeValue("type", true);
@@ -5622,7 +5627,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	FEAnalysisStep* pStep = (m_pim->m_nsteps > 0 ? GetStep() : 0);
 
 	const char* szm = tag.AttributeValue("mat");
@@ -5754,7 +5759,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
 {
-	FEM& fem = *GetFEM();
+	FEModel& fem = *GetFEModel();
 	int node = -1;
 	double	eps;
 

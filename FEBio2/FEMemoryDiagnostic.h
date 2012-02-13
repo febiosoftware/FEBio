@@ -4,7 +4,7 @@
 class FEMemoryDiagnostic :	public FEDiagnostic
 {
 public:
-	FEMemoryDiagnostic(FEM& fem);
+	FEMemoryDiagnostic(FEModel& fem);
 	~FEMemoryDiagnostic();
 
 	bool Init();

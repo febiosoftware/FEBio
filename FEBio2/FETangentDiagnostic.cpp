@@ -39,7 +39,7 @@ void print_matrix(matrix& m)
 
 //-----------------------------------------------------------------------------
 // Constructor
-FETangentDiagnostic::FETangentDiagnostic(FEM& fem) : FEDiagnostic(fem)
+FETangentDiagnostic::FETangentDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 	m_strain = 0;
 }

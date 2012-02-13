@@ -6,6 +6,7 @@
 #include "FERestartImport.h"
 #include "FEBioLib/FESolver.h"
 #include "FEBioLib/FEAnalysisStep.h"
+#include "fem.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -23,7 +24,7 @@ FERestartImport::~FERestartImport()
 
 //-----------------------------------------------------------------------------
 
-bool FERestartImport::Load(FEM& fem, const char* szfile)
+bool FERestartImport::Load(FEModel& fem, const char* szfile)
 {
 	// open the XML file
 	if (m_xml.Open(szfile) == false) return errf("FATAL ERROR: Failed opening restart file %s\n", szfile);
@@ -113,7 +114,7 @@ bool FERestartImport::Load(FEM& fem, const char* szfile)
 
 bool FERestartImport::ParseLoadSection(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEModel& fem = *m_pfem;
 
 	++tag;
 	do
@@ -161,7 +162,7 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 
 bool FERestartImport::ParseControlSection(XMLTag& tag)
 {
-	FEM& fem = *m_pfem;
+	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
 
 	++tag;

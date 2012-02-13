@@ -2,7 +2,7 @@
 #include "FEPrintMatrixDiagnostic.h"
 #include "FEBioLib/FESolidSolver.h"
 
-FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEM& fem) : FEDiagnostic(fem)
+FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 	m_szout[0] = 0;
 	m_rng[0] = m_rng[1] = 0;
@@ -15,7 +15,6 @@ FEPrintMatrixDiagnostic::~FEPrintMatrixDiagnostic(void)
 
 bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
 	if (tag == "input")
 	{
 		// get the input file name
@@ -23,7 +22,7 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 
 		// try to read the file
 		FEFEBioImport im;
-		if (im.Load(fem, szfile) == false)
+		if (im.Load(m_fem, szfile) == false)
 		{
 			char szerr[256];
 			im.GetErrorMessage(szerr);

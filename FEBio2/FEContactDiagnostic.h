@@ -16,7 +16,7 @@ using namespace NumCore;
 class FEContactDiagnostic : public FEDiagnostic  
 {
 public:
-	FEContactDiagnostic(FEM& fem);
+	FEContactDiagnostic(FEModel& fem);
 	virtual ~FEContactDiagnostic();
 
 	bool Run();

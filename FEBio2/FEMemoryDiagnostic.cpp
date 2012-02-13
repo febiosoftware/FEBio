@@ -3,7 +3,7 @@
 #include "FEBioLib/log.h"
 #include "console.h"
 
-FEMemoryDiagnostic::FEMemoryDiagnostic(FEM& fem) : FEDiagnostic(fem)
+FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
 	m_szfile[0] = 0;
 	m_iters = 1;
@@ -16,7 +16,7 @@ FEMemoryDiagnostic::~FEMemoryDiagnostic(void)
 
 bool FEMemoryDiagnostic::Init()
 {
-	FEM& fem = dynamic_cast<FEM&>(m_fem);
+	FEModel& fem = m_fem;
 
 	// try to open the file
 	FEFEBioImport im;

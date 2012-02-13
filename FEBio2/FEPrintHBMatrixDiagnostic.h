@@ -13,7 +13,7 @@
 class FEPrintHBMatrixDiagnostic :	public FEDiagnostic
 {
 public:
-	FEPrintHBMatrixDiagnostic(FEM& fem);
+	FEPrintHBMatrixDiagnostic(FEModel& fem);
 	~FEPrintHBMatrixDiagnostic(void);
 
 	bool ParseSection(XMLTag& tag);

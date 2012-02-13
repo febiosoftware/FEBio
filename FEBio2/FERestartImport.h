@@ -18,14 +18,14 @@ public:
 	FERestartImport();
 	virtual ~FERestartImport();
 
-	bool Load(FEM& fem, const char* szfile);
+	bool Load(FEModel& fem, const char* szfile);
 
 protected:
 	bool ParseControlSection (XMLTag& tag);
 	bool ParseLoadSection    (XMLTag& tag);
 
 protected:
-	FEM*	m_pfem;	// point to the FEM
+	FEModel*	m_pfem;	// point to the FEM
 
 	XMLReader	m_xml;	// the file reader
 };
