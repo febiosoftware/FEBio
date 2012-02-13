@@ -694,10 +694,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\PlotFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\PSLDLTSolver.cpp"
 				>
 			</File>
@@ -1229,10 +1225,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\PardisoSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\PlotFile.h"
 				>
 			</File>
 			<File

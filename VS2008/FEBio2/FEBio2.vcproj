@@ -277,10 +277,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBioPlotFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBioStdSolver.cpp"
 				>
 			</File>
@@ -310,18 +306,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEOptimizer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotDomainData.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotNodeData.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotSurfaceData.cpp"
 				>
 			</File>
 			<File
@@ -357,19 +341,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\InitContact.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\InitLibrary.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\InitPoroSolute.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\InitRigid.cpp"
 				>
 			</File>
 			<File
@@ -382,10 +354,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\levmar.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\LSDYNAPlotFile.cpp"
 				>
 			</File>
 			<File
@@ -459,10 +427,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBioPlotFile.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBioStdSolver.h"
 				>
 			</File>
@@ -491,18 +455,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEPlotDomainData.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotNodeData.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEPlotSurfaceData.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h"
 				>
 			</File>
@@ -524,10 +476,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\Interrupt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\LSDYNAPlotFile.h"
 				>
 			</File>
 			<File
