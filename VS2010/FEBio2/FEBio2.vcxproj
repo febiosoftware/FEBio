@@ -539,7 +539,6 @@
     <ClInclude Include="..\..\FEBio2\fem.h" />
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
-    <ClInclude Include="..\..\FEBio2\FEOptimizer.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FERestartImport.h" />
@@ -570,7 +569,6 @@
     <ClCompile Include="..\..\FEBio2\fem.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEOptimizer.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
