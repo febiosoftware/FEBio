@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEOptimizer.h"
+#include "FEBioLib/FEOptimizer.h"
 #include "FEBioLib/log.h"
 #include "console.h"
 

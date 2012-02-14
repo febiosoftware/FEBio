@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FEOptimizer.h"
+#include "FEBioLib/FEOptimizer.h"
 
 //-----------------------------------------------------------------------------
 // FEOptimizeInput

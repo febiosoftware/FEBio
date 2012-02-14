@@ -305,10 +305,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEOptimizer.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp"
 				>
 			</File>
@@ -448,10 +444,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEMicroMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEOptimizer.h"
 				>
 			</File>
 			<File
