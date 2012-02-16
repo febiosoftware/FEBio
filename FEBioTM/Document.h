@@ -12,6 +12,19 @@
 #include "FEM.h"
 
 //-----------------------------------------------------------------------------
+class CTask
+{
+	enum {MAX_FILE = 512};
+
+public:
+	void SetFileName(const char* szfile);
+	const char* GetFileName() { return m_szfile; }
+
+protected:
+	char	m_szfile[MAX_FILE];
+};
+
+//-----------------------------------------------------------------------------
 // Document class - stores all data
 //
 class CDocument  
@@ -21,9 +34,17 @@ public:
 	CDocument();
 	virtual ~CDocument();
 
-	bool OpenFile(const char* szfile);
+	// add a taks to the document
+	CTask* AddTask(const char* szfile);
+
+	// get the number of tasks
+	int Tasks() { return (int) m_Task.size(); }
+
+	// get a task
+	CTask* Task(int i) { return m_Task[i]; }
 
 protected:
+	vector<CTask*>	m_Task;
 	FEM		m_fem;
 };
 

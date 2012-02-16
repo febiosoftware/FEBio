@@ -11,19 +11,43 @@
 
 #include <Flx_Wnd.h>
 #include "Document.h"
+#include "Menu.h"
+#include "FileBrowser.h"
+#include "TaskBrowser.h"
 
+//-----------------------------------------------------------------------------
 class CWnd : public Flx_Wnd
 {
 public:
+	// constructor
 	CWnd(int w, int h, const char* sztitle, CDocument* pdoc);
+
+	// destructor
 	virtual ~CWnd();
 
+	// retrieve the document
 	CDocument* GetDocument() { return m_pDoc; }
 
+	// open a file
 	bool OpenFile(const char* szfile);
 
+	// update the GUI
+	void Update();
+
+public:	// --- M E N U   H A N D L E R S ---
+	void OnFileOpen(Fl_Widget* pw, void* pd);
+	void OnFileExit(Fl_Widget* pw, void* pd);
+
 protected:
-	CDocument*	m_pDoc;
+	// handle events
+	int handle(int nevent);	
+
+protected:
+	CDocument*	m_pDoc;	//!< pointer to document
+
+	CMenu*			m_pMenu;	//!< the menu
+	CFileBrowser*	m_pFile;	//!< the file browser
+	CTaskBrowser*	m_pTask;	//!< the task browser
 };
 
 #endif // !defined(AFX_WND_H__793D79A3_EBE4_4660_8EE3_0016B7467520__INCLUDED_)
