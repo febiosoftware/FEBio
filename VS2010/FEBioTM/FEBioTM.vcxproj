@@ -39,7 +39,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Steve\Documents\Flex\include;C:\Users\Steve\Documents\fltk-1.3.0;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;C:\Users\Steve\Documents\Flex\include;C:\Users\Steve\Documents\fltk-1.3.0;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Steve\Documents\fltk-1.3.0\lib;C:\Users\Steve\Documents\Flex\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -50,13 +50,13 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>flexd.lib;fltk.lib;fltkzlibd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../Debug/fecored.lib;../Debug/numcore.lib;../Debug/febiolibd.lib;flexd.lib;fltk.lib;fltkzlibd.lib;fltkimagesd.lib;fltkjpegd.lib;fltkpngd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\FEBioTM\Document.h" />
     <ClInclude Include="..\..\FEBioTM\FEBioTM.h" />
+    <ClInclude Include="..\..\FEBioTM\fem.h" />
     <ClInclude Include="..\..\FEBioTM\MainApp.h" />
     <ClInclude Include="..\..\FEBioTM\stdafx.h" />
     <ClInclude Include="..\..\FEBioTM\targetver.h" />
@@ -95,6 +96,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEBioTM\Document.cpp" />
     <ClCompile Include="..\..\FEBioTM\FEBioTM.cpp" />
+    <ClCompile Include="..\..\FEBioTM\fem.cpp" />
     <ClCompile Include="..\..\FEBioTM\MainApp.cpp" />
     <ClCompile Include="..\..\FEBioTM\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioTM\Wnd.cpp" />
