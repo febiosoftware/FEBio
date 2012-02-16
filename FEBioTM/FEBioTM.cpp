@@ -11,7 +11,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	// get the main application
-	CMainApp* papp = FLX_GetMainApp();
+	CMainApp* papp = FLXGetMainApp();
 
 	// initialize application
 	papp->Init();

@@ -6,10 +6,7 @@
 #include "Wnd.h"
 #include <FL/Fl.H>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h)
 {
 	m_pDoc = pdoc;
@@ -34,7 +31,14 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h)
 
 }
 
+//-----------------------------------------------------------------------------
 CWnd::~CWnd()
 {
 
+}
+
+//-----------------------------------------------------------------------------
+bool CWnd::OpenFile(const char* szfile)
+{
+	return m_pDoc->OpenFile(szfile);
 }

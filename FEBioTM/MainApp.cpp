@@ -13,8 +13,8 @@
 CMainApp theapp;
 //////////////////////////////////////////////////////////////////////
 
-CMainApp* FLX_GetMainApp() { return &theapp; }
-CWnd* FLX_GetMainWnd() { return theapp.GetMainWnd(); }
+CMainApp* FLXGetMainApp() { return &theapp; }
+CWnd* FLXGetMainWnd() { return theapp.GetMainWnd(); }
 
 //////////////////////////////////////////////////////////////////////
 
@@ -60,7 +60,7 @@ bool CMainApp::Load(const char* szfilename)
 	// load the initial project
 	if (strlen(szfilename)>0)
 	{
-//		m_pMainWnd->OpenFile(szfilename);
+		m_pMainWnd->OpenFile(szfilename);
 	}
 
 	return true;

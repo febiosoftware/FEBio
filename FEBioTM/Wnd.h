@@ -20,6 +20,8 @@ public:
 
 	CDocument* GetDocument() { return m_pDoc; }
 
+	bool OpenFile(const char* szfile);
+
 protected:
 	CDocument*	m_pDoc;
 };

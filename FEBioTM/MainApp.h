@@ -33,7 +33,7 @@ protected:
 	CDocument*	m_pDoc;		// document class
 };
 
-CMainApp* FLX_GetMainApp();
-CWnd*	FLX_GetMainWnd();
+CMainApp* FLXGetMainApp();
+CWnd*	FLXGetMainWnd();
 
 #endif // !defined(AFX_MAINAPP_H__5432BE41_2F50_46E1_80E3_E83BAC5BF8D8__INCLUDED_)

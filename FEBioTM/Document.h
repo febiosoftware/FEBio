@@ -21,6 +21,8 @@ public:
 	CDocument();
 	virtual ~CDocument();
 
+	bool OpenFile(const char* szfile);
+
 protected:
 	FEM		m_fem;
 };
