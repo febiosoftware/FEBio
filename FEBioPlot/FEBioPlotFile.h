@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioPlot/PlotFile.h"
+#include "PlotFile.h"
 #include "FECore/Archive.h"
 #include "FECore/FESolidDomain.h"
 #include "FECore/FEShellDomain.h"
