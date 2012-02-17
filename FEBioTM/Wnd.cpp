@@ -10,6 +10,7 @@
 #include <FL/Fl_Tile.H>
 #include <Flex.h>
 #include <Flx_Dialog.h>
+#include <FL/Fl_Tabs.H>
 
 //-----------------------------------------------------------------------------
 CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "FEBio Task Manager")
@@ -37,19 +38,30 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "
 
 			m_pTask = new CTaskBrowser(wf, hm, w-wf, 400, this);
 
-			pg = new Fl_Group(wf, hm+400, w-wf, h-hm-400);
+			Fl_Tabs* ptabs = new Fl_Tabs(wf, hm+400, w-wf, h-hm-400);
 			{
+				m_pText = new Fl_Text_Display(wf, hm+400+25, w-wf, h-hm-400-25, "    Input    ");
+				m_pText->textfont(FL_COURIER);
+				m_pText->buffer(new Fl_Text_Buffer);
+				m_pText->box(FL_DOWN_BOX);
+
+				pg = new Fl_Group(wf, hm+400+25, w-wf, h-hm-400-25, "    Log    ");
+				{
+				}
+				pg->end();
 			}
-			pg->end();
-			pg->box(FL_DOWN_BOX);
+			ptabs->end();
+//			ptabs->color(FL_DARK3);
 		}
 		pt->end();
+		pt->resizable(m_pFile);
 
 		resizable(pt);
 	}
 	end();
 
 //	box(FL_NO_BOX); // no background filling
+	color(FL_DARK3);
 
 	size_range(400, 300);
 
@@ -97,6 +109,7 @@ bool CWnd::OpenFile(const char* szfile)
 	if (pt)
 	{
 		m_pTask->AddTask(pt);
+		m_pText->buffer()->appendfile(szfile);
 	}
 	return (pt != 0);
 }

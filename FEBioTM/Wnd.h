@@ -14,6 +14,7 @@
 #include "Menu.h"
 #include "FileBrowser.h"
 #include "TaskBrowser.h"
+#include <FL/Fl_Text_Display.H>
 
 //-----------------------------------------------------------------------------
 class CWnd : public Flx_Wnd
@@ -45,9 +46,10 @@ protected:
 protected:
 	CDocument*	m_pDoc;	//!< pointer to document
 
-	CMenu*			m_pMenu;	//!< the menu
-	CFileBrowser*	m_pFile;	//!< the file browser
-	CTaskBrowser*	m_pTask;	//!< the task browser
+	CMenu*				m_pMenu;	//!< the menu
+	CFileBrowser*		m_pFile;	//!< the file browser
+	CTaskBrowser*		m_pTask;	//!< the task browser
+	Fl_Text_Display*	m_pText;	//!< Text display
 };
 
 #endif // !defined(AFX_WND_H__793D79A3_EBE4_4660_8EE3_0016B7467520__INCLUDED_)
