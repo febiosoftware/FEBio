@@ -17,6 +17,7 @@
 //-----------------------------------------------------------------------------
 // Forward declaration of the FEModel class.
 class FEModel;
+class DataRecord;
 
 //-----------------------------------------------------------------------------
 // FEBIO callback structure
@@ -182,6 +183,10 @@ public: // --- I/O functions
 
 	//! serialize data
 	virtual bool Serialize(DumpFile& ar) = 0;
+
+	//! Add data record
+	virtual void AddDataRecord(DataRecord* pd) = 0;
+
 
 public:
 	//! set the debug level

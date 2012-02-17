@@ -68,6 +68,9 @@ public:
 	//! dump data to archive for restart
 	void DumpData();
 
+	//! Add data record
+	void AddDataRecord(DataRecord* pd) { m_Data.AddRecord(pd); }
+
 	// set the i/o files
 	void SetInputFilename(const char* szfile);
 	void SetLogFilename  (const char* szfile) { strcpy(m_szlog , szfile); }

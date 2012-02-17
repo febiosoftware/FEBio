@@ -43,4 +43,7 @@ public:
 
 	//! serialize data
 	virtual bool Serialize(DumpFile& ar) { return false; }
+
+	//! Add data record
+	virtual void AddDataRecord(DataRecord* pd) {}
 };

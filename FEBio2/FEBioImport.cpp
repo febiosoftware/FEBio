@@ -5362,7 +5362,7 @@ void FEBioOutputSection::Parse(XMLTag& tag)
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 {
-	FEM& fem = dynamic_cast<FEM&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
 	const char* sz;
@@ -5420,7 +5420,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 				assert(tag.isend());
 			}
 
-			fem.m_Data.AddRecord(prec);
+			fem.AddDataRecord(prec);
 		}
 		else if (tag == "element_data")
 		{
@@ -5445,7 +5445,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			prec->SetItemList(tag.szvalue());
 
-			fem.m_Data.AddRecord(prec);
+			fem.AddDataRecord(prec);
 		}
 		else if (tag == "rigid_body_data")
 		{
@@ -5470,7 +5470,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 
 			prec->SetItemList(tag.szvalue());
 
-			fem.m_Data.AddRecord(prec);
+			fem.AddDataRecord(prec);
 		}
 		else throw XMLReader::InvalidTag(tag);
 
