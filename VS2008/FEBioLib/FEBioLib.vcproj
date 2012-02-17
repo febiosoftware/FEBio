@@ -210,6 +210,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\FEBioLib\DataStore.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\ElementDataRecord.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.cpp"
 				>
 			</File>
@@ -690,6 +698,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\NodeDataRecord.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\PardisoSolver.cpp"
 				>
 			</File>
@@ -703,6 +715,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\RCICGSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\RigidBodyDataRecord.cpp"
 				>
 			</File>
 			<File
@@ -731,6 +747,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\FEBioLib\DataStore.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\ElementDataRecord.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FE2DFiberNeoHookean.h"
 				>
@@ -1232,6 +1256,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\NodeDataRecord.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\PardisoSolver.h"
 				>
 			</File>
@@ -1241,6 +1269,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\RCICGSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\RigidBodyDataRecord.h"
 				>
 			</File>
 			<File
