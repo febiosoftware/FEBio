@@ -200,10 +200,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioTM\TaskBar.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioTM\TaskBrowser.cpp"
 				>
 			</File>
@@ -247,10 +243,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioTM\targetver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioTM\TaskBar.h"
 				>
 			</File>
 			<File

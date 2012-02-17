@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEM.h"
+#include <FL/Fl_Text_Buffer.H>
 
 //-----------------------------------------------------------------------------
 class CTask
@@ -17,11 +18,18 @@ class CTask
 	enum {MAX_FILE = 512};
 
 public:
+	CTask() { m_szfile[0] = 0; m_pb = 0; }
+	~CTask() { delete m_pb; }
+
 	void SetFileName(const char* szfile);
 	const char* GetFileName() { return m_szfile; }
 
+	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pb = pb; }
+	Fl_Text_Buffer* GetTextBuffer() { return m_pb; }
+
 protected:
-	char	m_szfile[MAX_FILE];
+	char			m_szfile[MAX_FILE];		//!< file name
+	Fl_Text_Buffer*	m_pb;					//!< text buffer for editing
 };
 
 //-----------------------------------------------------------------------------
