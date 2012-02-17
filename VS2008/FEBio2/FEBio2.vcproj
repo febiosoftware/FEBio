@@ -265,10 +265,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBioImport.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBioStdSolver.cpp"
 				>
 			</File>
@@ -310,10 +306,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FileImport.cpp"
 				>
 			</File>
 			<File
@@ -395,10 +387,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBioImport.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBioStdSolver.h"
 				>
 			</File>
@@ -436,10 +424,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FileImport.h"
 				>
 			</File>
 			<File

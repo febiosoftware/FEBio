@@ -246,6 +246,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBioImport.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEBiphasic.cpp"
 				>
 			</File>
@@ -694,6 +698,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FileImport.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\Logfile.cpp"
 				>
 			</File>
@@ -781,6 +789,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEAugLagLinearConstraint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBioImport.h"
 				>
 			</File>
 			<File
@@ -1241,6 +1253,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEVonMisesPlasticity.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FileImport.h"
 				>
 			</File>
 			<File

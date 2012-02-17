@@ -2,8 +2,8 @@
 
 #include "stdafx.h"
 #include "fem.h"
-#include "FileImport.h"
-#include "FEBioImport.h"
+#include "FEBioLib/FileImport.h"
+#include "FEBioLib/FEBioImport.h"
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"

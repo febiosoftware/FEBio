@@ -2,15 +2,15 @@
 
 #include "FileImport.h"
 #include "FECore/XMLReader.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
-#include "FEBioLib/FERigid.h"
-#include "FEBioLib/FEElasticMixture.h"
-#include "FEBioLib/FEUncoupledElasticMixture.h"
-#include "FEBioLib/FEBiphasic.h"
-#include "FEBioLib/FEBiphasicSolute.h"
-#include "FEBioLib/FETriphasic.h"
-#include "FEBioLib/FEAnalysisStep.h"
-#include "FEBioLib/FESolver.h"
+#include "FETransverselyIsotropic.h"
+#include "FERigid.h"
+#include "FEElasticMixture.h"
+#include "FEUncoupledElasticMixture.h"
+#include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
+#include "FEAnalysisStep.h"
+#include "FESolver.h"
 #include <map>
 #include <string>
 using namespace std;
