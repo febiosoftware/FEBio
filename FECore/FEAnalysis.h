@@ -1,6 +1,6 @@
 #pragma once
 #include "DumpFile.h"
-#include "FECore/FEBoundaryCondition.h"
+#include "FEBoundaryCondition.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
