@@ -16,8 +16,6 @@ public:
 
 	void resize(int X, int Y, int W, int H);
 
-	int selected_row();
-
 protected:
 	CWnd*	m_pWnd;
 };
@@ -31,6 +29,8 @@ public:
 	void Update();
 
 	void AddTask(CTask *pt);
+
+	int SelectedTask();
 
 protected:
 	CWnd*			m_pWnd;

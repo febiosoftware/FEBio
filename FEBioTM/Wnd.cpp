@@ -10,6 +10,7 @@
 #include <Flex.h>
 #include <Flx_Dialog.h>
 #include <FL/Fl_Tabs.H>
+#include <flx_message.h>
 
 //-----------------------------------------------------------------------------
 CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "FEBio Task Manager"), m_pDoc(pdoc)
@@ -141,9 +142,17 @@ void CWnd::OnSelectFile(Fl_Widget* pw, void* pd)
 	assert(pt);
 	if (pt->callback_context() == Fl_Table::CONTEXT_CELL)
 	{
-		int n = pt->selected_row();
+		int n = m_pTask->SelectedTask();
 		assert(n >= 0);
-		CTask* pt = GetDocument()->Task(n);
+		CTask* pt = GetDocument()->GetTask(n);
 		m_pText->buffer(pt->GetTextBuffer());
 	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
+{
+	int n = m_pTask->SelectedTask();
+	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
+	else m_pDoc->RunTask(n);
 }

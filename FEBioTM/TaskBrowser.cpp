@@ -45,7 +45,7 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 		 {
 			 bool b = (row_selected(ROW)==1);
 			CDocument* pdoc = m_pWnd->GetDocument();
-			CTask* pt = pdoc->Task(ROW);
+			CTask* pt = pdoc->GetTask(ROW);
 			 fl_push_clip(X,Y,W,H);
 			 // Draw cell bg
 			 fl_color((b?selection_color():FL_WHITE)); fl_rectf(X,Y,W,H);
@@ -69,14 +69,6 @@ void CTaskTable::resize(int X, int Y, int W, int H)
     col_width(1,80-4);      // default width of columns
 }
 
-//-----------------------------------------------------------------------------
-int CTaskTable::selected_row()
-{
-	for (int i=0; i<rows(); ++i)
-		if (row_selected(i) == 1) return i;
-	return -1;
-}
-
 //=============================================================================
 CTaskBrowser::CTaskBrowser(int x, int y, int w, int h, CWnd* pwnd) : Flx_Group(x, y, w, h), m_pWnd(pwnd)
 {
@@ -90,14 +82,24 @@ CTaskBrowser::CTaskBrowser(int x, int y, int w, int h, CWnd* pwnd) : Flx_Group(x
 	resizable(m_pg);
 }
 
+//-----------------------------------------------------------------------------
 void CTaskBrowser::Update()
 {
 }
 
+//-----------------------------------------------------------------------------
 void CTaskBrowser::AddTask(CTask *pt)
 {
 	// add a row
 	int N = m_pg->rows();
 	m_pg->rows(N+1);
 	m_pg->select_row(N);
+}
+
+//-----------------------------------------------------------------------------
+int CTaskBrowser::SelectedTask()
+{
+	for (int i=0; i<m_pg->rows(); ++i)
+		if (m_pg->row_selected(i) == 1) return i;
+	return -1;
 }

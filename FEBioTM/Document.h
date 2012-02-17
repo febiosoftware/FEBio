@@ -49,11 +49,13 @@ public:
 	int Tasks() { return (int) m_Task.size(); }
 
 	// get a task
-	CTask* Task(int i) { return m_Task[i]; }
+	CTask* GetTask(int i) { return m_Task[i]; }
+
+	// run a task
+	bool RunTask(int i);
 
 protected:
 	vector<CTask*>	m_Task;
-	FEM		m_fem;
 };
 
 #endif // !defined(AFX_DOCUMENT_H__E699CE33_76BC_46FB_8CFC_4FA83D106B4C__INCLUDED_)

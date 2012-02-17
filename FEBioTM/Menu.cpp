@@ -11,6 +11,9 @@ CMenu::CMenu(int w, int h, CWnd* pwnd) : Fl_Menu_Bar(0, 0, w, h), m_pWnd(pwnd)
 			{"&Open ...", FL_CTRL + 'o', FLX_MENU_HANDLER(pwnd, CWnd::OnFileOpen)},
 			{"&Exit"    ,             0, FLX_MENU_HANDLER(pwnd, CWnd::OnFileExit)},
 			{0},
+		{"Run", 0, 0, 0, FL_SUBMENU },
+			{"Run selected", FL_CTRL + FL_F + 5, FLX_MENU_HANDLER(pwnd, CWnd::OnRunSelected)},
+			{0},
 		{0}
 	};
 

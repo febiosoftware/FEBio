@@ -39,3 +39,23 @@ CTask* CDocument::AddTask(const char* szfile)
 	m_Task.push_back(pt);
 	return pt;
 }
+
+
+//-----------------------------------------------------------------------------
+bool CDocument::RunTask(int i)
+{
+	// get the task
+	CTask* pt = GetTask(i);
+
+	// create the FEM object
+	FEM fem;
+
+	// load the data from file
+	if (fem.Input(pt->GetFileName()) == false) return false;
+
+	// initialize FE data
+	if (fem.Init() == false) return false;
+
+	// solve the problem
+	return fem.Solve();
+}
