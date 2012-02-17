@@ -71,6 +71,9 @@ public:
 	//! Add data record
 	void AddDataRecord(DataRecord* pd) { m_Data.AddRecord(pd); }
 
+	//! Set the plot file
+	void SetPlotFile(PlotFile* pplt) { m_plot = pplt; }
+
 	// set the i/o files
 	void SetInputFilename(const char* szfile);
 	void SetLogFilename  (const char* szfile) { strcpy(m_szlog , szfile); }
@@ -99,11 +102,6 @@ public:
 	
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
-
-	//! Set globals section parameters and functions
-	static vector<FESoluteData*> m_SD;	//!< unique identifier of solutes in multiphasic materials
-	static void SetSD(FESoluteData* psd);
-	static FESoluteData* FindSD(int nid);
 
 	//! Evaluate parameter list
 	void EvaluateParameterList(FEParameterList& pl);

@@ -46,4 +46,9 @@ public:
 
 	//! Add data record
 	virtual void AddDataRecord(DataRecord* pd) {}
+
+	//! set plot file
+	void SetPlotFile(PlotFile* pplt) {}
+
+	virtual void SetPlotFileNameExtension(const char *szext) {}
 };

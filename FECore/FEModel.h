@@ -18,6 +18,7 @@
 // Forward declaration of the FEModel class.
 class FEModel;
 class DataRecord;
+class PlotFile;
 
 //-----------------------------------------------------------------------------
 // FEBIO callback structure
@@ -187,6 +188,14 @@ public: // --- I/O functions
 	//! Add data record
 	virtual void AddDataRecord(DataRecord* pd) = 0;
 
+	//! Set plot file
+	virtual void SetPlotFile(PlotFile* pplt) = 0;
+	virtual void SetPlotFileNameExtension(const char *szext) = 0;
+
+public:
+	// TODO: I don't like this here.
+	static void SetSD(FESoluteData* psd);
+	static FESoluteData* FindSD(int nid);
 
 public:
 	//! set the debug level
@@ -243,4 +252,5 @@ protected:
 
 protected:
 	static std::map<string, double> m_Const;
+	static vector<FESoluteData*> m_SD;	//!< unique identifier of solutes in multiphasic materials
 };

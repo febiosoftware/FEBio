@@ -4,6 +4,12 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
+// Global Constants Data 
+// m_Const and m_SD need a definitions, since static
+map<std::string, double> FEModel::m_Const;
+vector<FESoluteData*> FEModel::m_SD;
+
+//-----------------------------------------------------------------------------
 FEModel::FEModel(void)
 {
 	// --- Analysis Data ---
@@ -84,4 +90,19 @@ void FEModel::SetGlobalConstant(const string& s, double v)
 double FEModel::GetGlobalConstant(const string& s)
 {
 	return (m_Const.count(s) ? m_Const.find(s)->second : 0);
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::SetSD(FESoluteData* psd)
+{
+	m_SD.push_back(psd);
+}
+
+//-----------------------------------------------------------------------------
+FESoluteData* FEModel::FindSD(int nid)
+{
+	int i;
+	for (i=0; i<(int) m_SD.size(); ++i) if (m_SD[i]->m_nID == nid) return m_SD[i];
+	
+	return 0;
 }

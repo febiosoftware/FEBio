@@ -53,7 +53,6 @@
 #include "FEBioLib/NodeDataRecord.h"
 #include "FEBioLib/ElementDataRecord.h"
 #include "FEBioLib/RigidBodyDataRecord.h"
-#include "fem.h"
 #include <string.h>
 using namespace NumCore;
 
@@ -5246,7 +5245,7 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 		}
 		while (!tag.isend());
 
-		FEM::SetSD(psd);
+		fem.SetSD(psd);
 		
 		++tag;
 	}
@@ -5482,24 +5481,26 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 {
-	FEM& fem = dynamic_cast<FEM&>(*GetFEModel());
+	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.m_mesh;
 
+	PlotFile* pplt = 0;
 	const char* sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
-		if (strcmp(sz, "febio") == 0) fem.m_plot = new FEBioPlotFile;
-		else if (strcmp(sz, "lsdyna") == 0) fem.m_plot = new LSDYNAPlotFile;
+		if (strcmp(sz, "febio") == 0) pplt = new FEBioPlotFile;
+		else if (strcmp(sz, "lsdyna") == 0) pplt = new LSDYNAPlotFile;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
-	else fem.m_plot = new LSDYNAPlotFile;
+	else pplt = new LSDYNAPlotFile;
+	fem.SetPlotFile(pplt);
 
 	const char* szplt = tag.AttributeValue("file", true);
 	if (szplt) m_pim->SetPlotfileName(szplt);
 
-	if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot) && !tag.isleaf())
+	if (dynamic_cast<LSDYNAPlotFile*>(pplt) && !tag.isleaf())
 	{
-		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(fem.m_plot);
+		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(pplt);
 
 		++tag;
 		do
@@ -5556,14 +5557,14 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		}
 		while (!tag.isend());
 	}
-	else if (dynamic_cast<FEBioPlotFile*>(fem.m_plot))
+	else if (dynamic_cast<FEBioPlotFile*>(pplt))
 	{
 		// change the extension of the plot file to .xplt
 		fem.SetPlotFileNameExtension(".xplt");
 
 		if (!tag.isleaf())
 		{
-			FEBioPlotFile& plt = *dynamic_cast<FEBioPlotFile*>(fem.m_plot);
+			FEBioPlotFile& plt = *dynamic_cast<FEBioPlotFile*>(pplt);
 			++tag;
 			do
 			{

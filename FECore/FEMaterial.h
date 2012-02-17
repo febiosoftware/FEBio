@@ -157,4 +157,15 @@ public:
 	DECLARE_PARAMETER_LIST();
 };
 
+//-----------------------------------------------------------------------------
+//! Global solute data
+//! This structure uniquely identifies a solute in multiphasic problems
+// TODO: Move this to a different file
+struct FESoluteData {
+	int					m_nID;			//!< solute ID
+	char				m_szname[128];	//!< solute name
+	double				m_z;			//!< solute charge number
+};
+
+
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)
