@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RigidBodyDataRecord.h"
-#include "FEBioLib/FERigid.h"
-#include "FEBioLib/FERigidBody.h"
+#include "FERigid.h"
+#include "FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 void RigidBodyDataRecord::Parse(const char* szexpr)

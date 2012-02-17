@@ -8,7 +8,7 @@
 #include "FECore/FEModel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEContactInterface.h"
-#include "DataStore.h"
+#include "FEBioLib/DataStore.h"
 #include "FEBioLib/Timer.h"
 #include "FEBioPlot/PlotFile.h"
 #include "FEBioLib/FEElasticMixture.h"

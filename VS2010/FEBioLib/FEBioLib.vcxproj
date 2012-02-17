@@ -503,6 +503,8 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioLib\DataStore.h" />
+    <ClInclude Include="..\..\FEBioLib\ElementDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\FE2DFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.h" />
@@ -628,9 +630,11 @@
     <ClInclude Include="..\..\FEBioLib\geodesic.h" />
     <ClInclude Include="..\..\FEBioLib\log.h" />
     <ClInclude Include="..\..\FEBioLib\Logfile.h" />
+    <ClInclude Include="..\..\FEBioLib\NodeDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
     <ClInclude Include="..\..\FEBioLib\RCICGSolver.h" />
+    <ClInclude Include="..\..\FEBioLib\RigidBodyDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
     <ClInclude Include="..\..\FEBioLib\SuperLUSolver.h" />
     <ClInclude Include="..\..\FEBioLib\SuperLU_MT_Solver.h" />
@@ -639,6 +643,8 @@
     <ClInclude Include="..\..\FEBioLib\WSMPSolver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioLib\DataStore.cpp" />
+    <ClCompile Include="..\..\FEBioLib\ElementDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\FE2DFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FE2DTransIsoVerondaWestmann.cpp" />
@@ -759,10 +765,12 @@
     <ClCompile Include="..\..\FEBioLib\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEVonMisesPlasticity.cpp" />
     <ClCompile Include="..\..\FEBioLib\Logfile.cpp" />
+    <ClCompile Include="..\..\FEBioLib\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />
     <ClCompile Include="..\..\FEBioLib\PSLDLTSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\RCICGSolver.cpp" />
+    <ClCompile Include="..\..\FEBioLib\RigidBodyDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioLib\SuperLUSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\SuperLU_MT_Solver.cpp" />

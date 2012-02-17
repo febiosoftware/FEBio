@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ElementDataRecord.h"
-#include "FEBioLib/FETriphasic.h"
+#include "FETriphasic.h"
 
 //-----------------------------------------------------------------------------
 void ElementDataRecord::Parse(const char *szexpr)

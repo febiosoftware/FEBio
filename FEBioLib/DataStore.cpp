@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "DataStore.h"
-#include "FEBioLib/log.h"
+#include "log.h"
 
 //-----------------------------------------------------------------------------
 UnknownDataField::UnknownDataField(const char* sz)

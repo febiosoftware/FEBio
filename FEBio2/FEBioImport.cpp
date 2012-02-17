@@ -50,9 +50,9 @@
 #include "FEBioLib/FEAugLagLinearConstraint.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
-#include "NodeDataRecord.h"
-#include "ElementDataRecord.h"
-#include "RigidBodyDataRecord.h"
+#include "FEBioLib/NodeDataRecord.h"
+#include "FEBioLib/ElementDataRecord.h"
+#include "FEBioLib/RigidBodyDataRecord.h"
 #include "fem.h"
 #include <string.h>
 using namespace NumCore;
