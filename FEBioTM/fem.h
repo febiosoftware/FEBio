@@ -1,12 +1,17 @@
 #pragma once
-#include "FECore/FEModel.h"
+#include "FEBioLib/FEBioModel.h"
 #include "FEBioPlot/PlotFile.h"
 #include "FEBioLib/Timer.h"
 #include "FEBioLib/DataStore.h"
 
-class FEM : public FEModel
+//-----------------------------------------------------------------------------
+// The FE model class
+class FEM : public FEBioModel
 {
 public:
+	// constructor
+	FEM();
+
 	// Initialization
 	virtual bool Init() { return false; }
 

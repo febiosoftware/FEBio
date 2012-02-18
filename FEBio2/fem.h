@@ -5,7 +5,7 @@
 #ifndef _FEM_H_07012006_
 #define _FEM_H_07012006_
 
-#include "FECore/FEModel.h"
+#include "FEBioLib/FEBioModel.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEContactInterface.h"
 #include "FEBioLib/DataStore.h"
@@ -29,7 +29,7 @@ using namespace std;
 //! class provides the main solve routine it does not really solve anything.
 //! The actual solving is done by one of the classes derived from the FESolver class.
 
-class FEM : public FEModel
+class FEM : public FEBioModel
 {
 public:
 	//! constructor - sets default variables

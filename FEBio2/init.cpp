@@ -19,21 +19,9 @@
 #include <string.h>
 #include <time.h>
 
+//-----------------------------------------------------------------------------
 // Forward declarations
 void Hello(FILE* fp);
-
-bool err(const char* sz, ...)
-{
-	// get a pointer to the argument list
-	va_list	args;
-
-	// print to file
-	va_start(args, sz);
-	vfprintf(stderr, sz, args);
-	va_end(args);
-
-	return false;
-}
 
 //-----------------------------------------------------------------------------
 //! This function performs one-time-initialization stuff. All the different 
@@ -65,9 +53,9 @@ bool FEM::Init()
 	for (i=0; i<(int) m_Step.size(); ++i)
 	{
 		FEAnalysis& step = *m_Step[i];
-		if ((step.m_ntime <= 0) && (step.m_final_time <= 0.0)) return err("Invalid number of time steps for analysis step %d", i+1);
-		if ((step.m_ntime >  0) && (step.m_final_time >  0.0)) return err("You must either set the number of time steps or the final time but not both.\n");
-		if (step.m_dt0   <= 0) return err("Invalid time step size for analysis step %d", i+1);
+		if ((step.m_ntime <= 0) && (step.m_final_time <= 0.0)) { clog.printf("Invalid number of time steps for analysis step %d", i+1); return false; }
+		if ((step.m_ntime >  0) && (step.m_final_time >  0.0)) { clog.printf("You must either set the number of time steps or the final time but not both.\n"); return false; }
+		if (step.m_dt0   <= 0) { clog.printf("Invalid time step size for analysis step %d", i+1); return false; }
 		if (step.m_bautostep)
 		{
 //			if (m_pStep->m_dtmin <= 0) return err("Invalid minimum time step size");
@@ -192,17 +180,17 @@ bool FEM::InitMesh()
 					double J0 = pbd->detJ0(el, n);
 					if (J0 <= 0)
 					{
-						fprintf(stderr, "**************************** E R R O R ****************************\n");
-						fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-						fprintf(stderr, "Jacobian = %lg\n", J0);
-						fprintf(stderr, "Did you use the right node numbering?\n");
-						fprintf(stderr, "Nodes:");
+						clog.printf("**************************** E R R O R ****************************\n");
+						clog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+						clog.printf("Jacobian = %lg\n", J0);
+						clog.printf("Did you use the right node numbering?\n");
+						clog.printf("Nodes:");
 						for (int l=0; l<el.Nodes(); ++l)
 						{
-							fprintf(stderr, "%d", el.m_node[l]+1);
-							if (l+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+							clog.printf("%d", el.m_node[l]+1);
+							if (l+1 != el.Nodes()) clog.printf(","); else clog.printf("\n");
 						}
-						fprintf(stderr, "*******************************************************************\n\n");
+						clog.printf("*******************************************************************\n\n");
 						++ninverted;
 					}
 				}
@@ -266,17 +254,17 @@ bool FEM::InitMesh()
 						double J0 = psd->detJ0(el, n);
 						if (J0 <= 0)
 						{
-							fprintf(stderr, "**************************** E R R O R ****************************\n");
-							fprintf(stderr, "Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-							fprintf(stderr, "Jacobian = %lg\n", J0);
-							fprintf(stderr, "Did you use the right node numbering?\n");
-							fprintf(stderr, "Nodes:");
+							clog.printf("**************************** E R R O R ****************************\n");
+							clog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+							clog.printf("Jacobian = %lg\n", J0);
+							clog.printf("Did you use the right node numbering?\n");
+							clog.printf("Nodes:");
 							for (int l=0; l<el.Nodes(); ++l)
 							{
-								fprintf(stderr, "%d", el.m_node[l]+1);
-								if (l+1 != el.Nodes()) fprintf(stderr, ","); else fprintf(stderr, "\n");
+								clog.printf("%d", el.m_node[l]+1);
+								if (l+1 != el.Nodes()) clog.printf(","); else clog.printf("\n");
 							}
-							fprintf(stderr, "*******************************************************************\n\n");
+							clog.printf("*******************************************************************\n\n");
 							++ninverted;
 						}
 					}
@@ -288,10 +276,10 @@ bool FEM::InitMesh()
 	// report number of inverted elements
 	if (ninverted != 0)
 	{
-		fprintf(stderr, "**************************** E R R O R ****************************\n");
-		fprintf(stderr, " FEBio found %d initially inverted elements.\n", ninverted);
-		fprintf(stderr, " Run will be aborted.\n");
-		fprintf(stderr, "*******************************************************************\n\n");
+		clog.printf("**************************** E R R O R ****************************\n");
+		clog.printf(" FEBio found %d initially inverted elements.\n", ninverted);
+		clog.printf(" Run will be aborted.\n");
+		clog.printf("*******************************************************************\n\n");
 		return false;
 	}
 

@@ -513,6 +513,7 @@
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioImport.h" />
+    <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSolute.h" />
@@ -655,6 +656,7 @@
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioImport.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSolute.cpp" />
