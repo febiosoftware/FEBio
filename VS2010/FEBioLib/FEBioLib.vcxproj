@@ -643,6 +643,8 @@
     <ClInclude Include="..\..\FEBioLib\SuperLU_MT_Solver.h" />
     <ClInclude Include="..\..\FEBioLib\targetver.h" />
     <ClInclude Include="..\..\FEBioLib\Timer.h" />
+    <ClInclude Include="..\..\FEBioLib\validate.h" />
+    <ClInclude Include="..\..\FEBioLib\version.h" />
     <ClInclude Include="..\..\FEBioLib\WSMPSolver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -770,6 +772,7 @@
     <ClCompile Include="..\..\FEBioLib\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEVonMisesPlasticity.cpp" />
     <ClCompile Include="..\..\FEBioLib\FileImport.cpp" />
+    <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\Logfile.cpp" />
     <ClCompile Include="..\..\FEBioLib\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
@@ -781,6 +784,7 @@
     <ClCompile Include="..\..\FEBioLib\SuperLUSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\SuperLU_MT_Solver.cpp" />
     <ClCompile Include="..\..\FEBioLib\Timer.cpp" />
+    <ClCompile Include="..\..\FEBioLib\validate.cpp" />
     <ClCompile Include="..\..\FEBioLib\WSMPSolver.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

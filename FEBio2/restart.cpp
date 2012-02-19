@@ -41,7 +41,7 @@
 #include "FEBioLib/NodeDataRecord.h"
 #include "FEBioLib/ElementDataRecord.h"
 #include "FEBioLib/RigidBodyDataRecord.h"
-#include "version.h"
+#include "FEBioLib/version.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)

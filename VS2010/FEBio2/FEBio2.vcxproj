@@ -543,8 +543,6 @@
     <ClInclude Include="..\..\FEBio2\Interrupt.h" />
     <ClInclude Include="..\..\FEBio2\plugin.h" />
     <ClInclude Include="..\..\FEBio2\stdafx.h" />
-    <ClInclude Include="..\..\FEBio2\validate.h" />
-    <ClInclude Include="..\..\FEBio2\version.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -565,7 +563,6 @@
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\getapppath.cpp" />
-    <ClCompile Include="..\..\FEBio2\hello.cpp" />
     <ClCompile Include="..\..\FEBio2\init.cpp" />
     <ClCompile Include="..\..\FEBio2\InitLibrary.cpp" />
     <ClCompile Include="..\..\FEBio2\input.cpp" />
@@ -577,7 +574,6 @@
     <ClCompile Include="..\..\FEBio2\restart.cpp" />
     <ClCompile Include="..\..\FEBio2\solve.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
-    <ClCompile Include="..\..\FEBio2\validate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FEBio2.rc" />

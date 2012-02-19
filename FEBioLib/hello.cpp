@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "version.h"
 #include "validate.h"
+#include <stdio.h>
 
 unsigned char banner[] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -28,10 +29,10 @@ unsigned char banner[] = {
 // FUNCTION : Hello
 // Prints the FEBio banner to a file
 //
-
+/*
 #ifdef WIN32
 
-#include "console.h"
+//#include "console.h"
 #include "windows.h"
 
 void print_banner()
@@ -66,7 +67,7 @@ void print_banner()
 void print_banner() {}
 
 #endif
-
+*/
 void Hello(FILE* fp)
 {
 	int nlic = GetLicenseKeyStatus();

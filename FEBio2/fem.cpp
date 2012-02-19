@@ -44,25 +44,6 @@ FEM::FEM()
 {
 	// User may interrupt run
 	m_bInterruptable = true;
-
-	// --- I/O-Data ---
-	strcpy(m_szplot, "n3plot");
-	strcpy(m_szlog , "n3log" );
-	strcpy(m_szdump, "n3dump");
-	m_sztitle[0] = 0;
-	m_debug = false;
-	m_becho = true;
-	m_plot = 0;
-
-	// --- Direct Solver Data ---
-	// set the default linear solver
-#ifdef PARDISO
-	m_nsolver = PARDISO_SOLVER;
-#elif PSLDLT
-	m_nsolver = PSLDLT_SOLVER;
-#else
-	m_nsolver = SKYLINE_SOLVER;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -595,29 +576,6 @@ FEBoundaryCondition* FEM::FindBC(int nid)
 	for (i=0; i<(int) m_RN.size(); ++i) if (m_RN[i]->GetID() == nid) return m_RN[i];
 
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the extension of the plot file name.
-void FEM::SetPlotFileNameExtension(const char *szext)
-{
-	char* ch = strrchr(m_szplot, '.');
-	if (ch) *ch = 0;
-	strcat(m_szplot, szext);
-}
-
-//-----------------------------------------------------------------------------
-//! Sets the name of the FEBio input file
-void FEM::SetInputFilename(const char* szfile)
-{ 
-	strcpy(m_szfile, szfile); 
-	m_szfile_title = strrchr(m_szfile, '/');
-	if (m_szfile_title == 0) 
-	{
-		m_szfile_title = strchr(m_szfile, '\\'); 
-		if (m_szfile_title == 0) m_szfile_title = m_szfile; else ++m_szfile_title;
-	}
-	else ++m_szfile_title;
 }
 
 //-----------------------------------------------------------------------------

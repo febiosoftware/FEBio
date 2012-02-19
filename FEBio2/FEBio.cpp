@@ -44,10 +44,10 @@
 
 #include "stdafx.h"
 #include "fem.h"
-#include "version.h"
+#include "FEBioLib/version.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
-#include "validate.h"
+#include "FEBioLib/validate.h"
 #include "console.h"
 #include "FEBioLib/log.h"
 #include "FEBioStdSolver.h"

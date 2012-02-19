@@ -9,7 +9,6 @@
 #include "FECore/DumpFile.h"
 #include "FECore/FEContactInterface.h"
 #include "FEBioLib/DataStore.h"
-#include "FEBioLib/Timer.h"
 #include "FEBioPlot/PlotFile.h"
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEUncoupledElasticMixture.h"
@@ -44,20 +43,11 @@ public:
 	//! Restart from restart point
 	bool Restart(const char* szfile);
 
-	//! Initializes data structures
-	bool Init();
-
-	//! Resets data structures
-	bool Reset();
-
 	//! Solves the problem
 	bool Solve();
 
 	//! Serialize the current state to/from restart file
 	bool Serialize(DumpFile& ar);
-
-	//! input data from file
-	bool Input(const char* szfile);
 
 	//! write to plot file
 	void Write();
@@ -67,28 +57,6 @@ public:
 
 	//! dump data to archive for restart
 	void DumpData();
-
-	//! Add data record
-	void AddDataRecord(DataRecord* pd) { m_Data.AddRecord(pd); }
-
-	//! Set the plot file
-	void SetPlotFile(PlotFile* pplt) { m_plot = pplt; }
-
-	// set the i/o files
-	void SetInputFilename(const char* szfile);
-	void SetLogFilename  (const char* szfile) { strcpy(m_szlog , szfile); }
-	void SetPlotFilename (const char* szfile) { strcpy(m_szplot, szfile); }
-	void SetDumpFilename (const char* szfile) { strcpy(m_szdump, szfile); }
-
-	void SetPlotFileNameExtension(const char* szext);
-
-	// Get the I/O files
-	const char* GetInputFileName() { return m_szfile; }
-	const char* GetLogfileName  () { return m_szlog;  }
-	const char* GetPlotFileName () { return m_szplot; }
-
-	//! get the file title
-	const char* GetFileTitle() { return m_szfile_title; }
 
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);
@@ -130,44 +98,7 @@ protected:
 	void SerializeDataStore   (DumpFile& ar);
 
 public:
-	//{ --- Initialization routines ---
-
-		//! Initialize rigid bodies
-		bool CreateRigidBodies();
-
-		//! Initialize poroelastic/biphasic and solute data
-		bool InitPoroSolute();
-
-		//! Initializes contact data
-		bool InitContact();
-
-		//! Initialize material data
-		bool InitMaterials();
-
-		//! Initialize mesh data
-		bool InitMesh();
-	//}
-
-public:
-	Timer	m_TotalTime;		//!< Create timer to track total running time
 	bool	m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
-
-public:
-	// --- I/O-Data --- 
-	//{
-		PlotFile*	m_plot;		//!< the plot file
-		DataStore	m_Data;		//!< the data store used for data logging
-		
-		bool		m_becho;			//!< echo input to logfile (TODO: Make this a command line option)
-
-protected:
-		// file names
-		char*	m_szfile_title;			//!< master input file title 
-		char	m_szfile[MAX_STRING];	//!< master input file name (= path + title)
-		char	m_szplot[MAX_STRING];	//!< plot output file name
-		char	m_szlog [MAX_STRING];	//!< log output file name
-		char	m_szdump[MAX_STRING];	//!< dump file name
-	//}
 };
 
 //-----------------------------------------------------------------------------

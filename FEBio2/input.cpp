@@ -72,34 +72,6 @@ void print_parameter_list(FEParameterList& pl)
 	}
 }
 
-//-----------------------------------------------------------------------------
-//! This routine reads in an input file and performs some initialization stuff.
-//! The rest of the initialization is done in Init
-
-bool FEM::Input(const char* szfile)
-{
-	// create file reader
-	FEFEBioImport fim;
-
-	// Load the file
-	if (fim.Load(*this, szfile) == false)
-	{
-		char szerr[256];
-		fim.GetErrorMessage(szerr);
-		fprintf(stderr, szerr);
-
-		return false;
-	}
-
-	// see if user redefined output filenames
-	if (fim.m_szdmp[0]) SetDumpFilename(fim.m_szdmp);
-	if (fim.m_szlog[0]) SetLogFilename (fim.m_szlog);
-	if (fim.m_szplt[0]) SetPlotFilename(fim.m_szplt);
-
-	// we're done reading
-	return true;
-}
-
 //------------------------------------------------------------------------------
 //! This function outputs the input data to the clog file.
 void echo_input(FEM& fem)
