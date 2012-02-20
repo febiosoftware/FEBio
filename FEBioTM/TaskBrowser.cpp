@@ -13,9 +13,15 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 
     cols(2);				// how many columns
     col_header(1);          // enable column headers (along top)
-    col_width(0,W-80);      // default width of columns
-    col_width(1,80-4);      // default width of columns
+    col_width(0,W-WIDTH);      // default width of columns
+    col_width(1,WIDTH-4);      // default width of columns
     col_resize(0);          // enable column resizing
+
+	// the one-and-only progress bar
+	m_pg = new Fl_Progress(X+W/2, Y+H/2, 0, 0);
+	m_pg->hide();
+	m_pg->selection_color(FL_GREEN);
+	m_nrow = -1;
 	end();
 
 	type(Fl_Table_Row::SELECT_SINGLE);
@@ -28,6 +34,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y, int W, int H)
 {
 	static char* szc[] = {"Path", "Status"};
+	static char* szs[] = {"queued", "running", "completed"};
 
     switch ( context ) 
 	{
@@ -49,8 +56,9 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 			 fl_push_clip(X,Y,W,H);
 			 // Draw cell bg
 			 fl_color((b?selection_color():FL_WHITE)); fl_rectf(X,Y,W,H);
+			 if ((ROW == m_nrow) && (COL == 1) && m_pg->visible()) return;
 			 // Draw cell data
-			 fl_color(FL_GRAY0); fl_draw((COL == 0? pt->GetFileName() : "queued"), X+5,Y,W-5,H, (COL == 0 ? FL_ALIGN_LEFT : FL_ALIGN_CENTER));
+			 fl_color(FL_GRAY0); fl_draw((COL == 0? pt->GetFileName() : szs[pt->GetStatus()]), X+5,Y,W-5,H, (COL == 0 ? FL_ALIGN_LEFT : FL_ALIGN_CENTER));
 			 // Draw box border
 //			 fl_color(color()); fl_rect(X,Y,W,H);
 			 fl_pop_clip();
@@ -65,8 +73,24 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 void CTaskTable::resize(int X, int Y, int W, int H)
 {
 	Fl_Table_Row::resize(X, Y, W, H);
-    col_width(0,W-80);      // default width of columns
-    col_width(1,80-4);      // default width of columns
+    col_width(0,W-WIDTH);      // default width of columns
+    col_width(1,WIDTH-4);      // default width of columns
+}
+
+//-----------------------------------------------------------------------------
+void CTaskTable::show_progress(int nrow)
+{
+	int X, Y, W, H;
+	m_nrow = nrow;
+	find_cell(CONTEXT_CELL, nrow, 1, X, Y, W, H);
+	m_pg->resize(X+1, Y+2, W-2, 18);
+	m_pg->show();
+}
+
+//-----------------------------------------------------------------------------
+void CTaskTable::hide_progress()
+{
+	if (m_pg->visible()) m_pg->hide();
 }
 
 //=============================================================================
@@ -102,4 +126,18 @@ int CTaskBrowser::SelectedTask()
 	for (int i=0; i<m_pg->rows(); ++i)
 		if (m_pg->row_selected(i) == 1) return i;
 	return -1;
+}
+
+//-----------------------------------------------------------------------------
+Fl_Progress* CTaskBrowser::TrackSelectedTask()
+{
+	int nrow = SelectedTask();
+	m_pg->show_progress(nrow);
+	return m_pg->GetProgressBar();
+}
+
+//-----------------------------------------------------------------------------
+void CTaskBrowser::DoneTracking()
+{
+	m_pg->hide_progress();
 }

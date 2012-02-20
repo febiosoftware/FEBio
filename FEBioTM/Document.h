@@ -19,7 +19,10 @@ class CTask
 	enum {MAX_FILE = 512};
 
 public:
-	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; }
+	enum { QUEUED, RUNNING, COMPLETED };
+
+public:
+	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; m_nstatus = QUEUED; }
 	~CTask() { delete m_pfile; delete m_plog; }
 
 	void SetFileName(const char* szfile);
@@ -31,10 +34,20 @@ public:
 	void SetLogBuffer(Fl_Text_Buffer* pb) { m_plog = pb; }
 	Fl_Text_Buffer* GetLogBuffer() { return m_plog; }
 
+	void Clearlog()
+	{
+		m_plog->select(0, m_plog->length());
+		m_plog->remove_selection();	
+	}
+
+	void SetStatus(int n) { m_nstatus = n; }
+	int GetStatus() { return m_nstatus; }
+
 protected:
 	char			m_szfile[MAX_FILE];		//!< file name
 	Fl_Text_Buffer*	m_pfile;				//!< text buffer for editing
 	Fl_Text_Buffer*	m_plog;					//!< log buffer
+	int				m_nstatus;				//!< status
 };
 
 //-----------------------------------------------------------------------------

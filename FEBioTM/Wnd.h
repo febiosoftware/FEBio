@@ -38,6 +38,8 @@ public:
 
 	Fl_Text_Display* GetLogWnd() { return m_pLog; }
 
+	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
+
 public:	// --- M E N U   H A N D L E R S ---
 	void OnFileOpen(Fl_Widget* pw, void* pd);
 	void OnFileExit(Fl_Widget* pw, void* pd);
@@ -46,6 +48,7 @@ public:	// --- M E N U   H A N D L E R S ---
 
 	// other envent handlers
 	void OnSelectFile(Fl_Widget* pw, void* pd);
+	void OnSelectTab (Fl_Widget* pw, void* pd);
 
 protected:
 	// handle events

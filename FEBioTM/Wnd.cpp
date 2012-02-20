@@ -64,9 +64,11 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "
 				}
 				m_pTabs->end();
 				pg->resizable(m_pTabs);
+				AddCallback(m_pTabs, (FLX_CALLBACK) &CWnd::OnSelectTab);
 			}
 			pg->end();
 			pg->box(FL_FLAT_BOX);
+			pg->color(FL_DARK2);
 		}
 		pt->end();
 		resizable(pt);
@@ -76,6 +78,8 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "
 	box(FL_FLAT_BOX); // no background filling
 	color(FL_DARK3);
 	size_range(400, 300);
+
+	m_pTabs->do_callback();
 }
 
 //-----------------------------------------------------------------------------
@@ -165,7 +169,24 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
 	else 
 	{
-		m_pTabs->value(m_pLog->parent());
+		m_pTabs->value(m_pTabs->child(1));
+		m_pTabs->do_callback();
+		Fl::flush();
 		m_pDoc->RunTask(n);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
+{
+	Fl_Widget* ps = m_pTabs->value();
+	int n = m_pTabs->children();
+	for (int i=0; i<n; ++i) 
+	{
+		Fl_Widget* pc = m_pTabs->child(i);
+		pc->labelfont(FL_HELVETICA);
+		pc->selection_color(FL_DARK2);
+	}
+	ps->labelfont(FL_HELVETICA_BOLD);
+	ps->selection_color(FL_GRAY);
 }

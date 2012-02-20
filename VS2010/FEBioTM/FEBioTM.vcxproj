@@ -45,7 +45,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\steve\Documents\fltk-1.3.0;C:\Users\steve\Documents\Flex\include;C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\steve\Documents\Flex\lib;C:\Users\steve\Documents\fltk-1.3.0\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;C:\Users\steve\Documents\Flex\lib;C:\Users\steve\Documents\fltk-1.3.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -75,7 +75,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>../Release/fecore.lib;../Release/numcore.lib;../Release/febiolib.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../Release/fecore.lib;../Release/numcore.lib;../Release/febiolib.lib;../Release/febioplot.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

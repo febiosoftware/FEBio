@@ -3,15 +3,17 @@
 #include "FEBioPlot/PlotFile.h"
 #include "FEBioLib/Timer.h"
 #include "FEBioLib/DataStore.h"
+#include <FL/Fl_Progress.H>
+#include <FL/Fl.H>
 
 //-----------------------------------------------------------------------------
 class FETMProgress : public Progress
 {
 public:
-	FETMProgress(FEModel& fem) : m_fem(fem) {}
-	void SetProgress(double f) {}
+	FETMProgress(Fl_Progress* pw) : m_pw(pw) { pw->maximum(100.f); pw->minimum(0.f); pw->value(0.f); }
+	void SetProgress(double f) { m_pw->value((float) f); Fl::flush(); }
 protected:
-	FEModel&	m_fem;
+	Fl_Progress*	m_pw;
 };
 
 //-----------------------------------------------------------------------------

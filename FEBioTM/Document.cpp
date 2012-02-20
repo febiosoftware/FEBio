@@ -68,9 +68,14 @@ bool CDocument::RunTask(int i)
 
 	CWnd* pwnd = FLXGetMainWnd();
 
+	CTaskBrowser* ptb = pwnd->GetTaskBrowser();
+
 	// create a log buffer
 	LogBuffer* plog = new LogBuffer(pwnd->GetLogWnd());
 	clog.SetLogStream(plog);
+
+	// clear the log
+	pt->Clearlog();
 
 	// create the FEM object
 	FEM fem;
@@ -82,10 +87,16 @@ bool CDocument::RunTask(int i)
 	if (fem.Init() == false) return false;
 
 	// progress tracker
-	FETMProgress prg(fem);
+	FETMProgress prg(ptb->TrackSelectedTask());
+
+	pt->SetStatus(CTask::RUNNING);
 
 	// solve the problem
 	bool bret = fem.Solve(prg);
+
+	ptb->DoneTracking();
+
+	pt->SetStatus(CTask::COMPLETED);
 
 	// don't forget to clean up
 	delete plog;
