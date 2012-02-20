@@ -86,10 +86,21 @@ int get_app_path (char *pname, size_t pathsize);
 extern void InitFEBioLibrary();
 
 //-----------------------------------------------------------------------------
+// we use the console to log output 
+class ConsoleStream : public LogStream
+{
+public:
+	void print(const char* sz) { printf(sz); }
+};
+
+//-----------------------------------------------------------------------------
 // The starting point of the application
 //
 int main(int argc, char* argv[])
 {
+	// divert the log output to the console
+	clog.SetLogStream(new ConsoleStream);
+
 	// parse the command line
 	CMDOPTIONS ops;
 	if (ParseCmdLine(argc, argv, ops) == false) return 0;

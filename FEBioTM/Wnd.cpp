@@ -9,14 +9,13 @@
 #include <FL/Fl_Tile.H>
 #include <Flex.h>
 #include <Flx_Dialog.h>
-#include <FL/Fl_Tabs.H>
 #include <flx_message.h>
 
 //-----------------------------------------------------------------------------
 CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "FEBio Task Manager"), m_pDoc(pdoc)
 {
 	int hm = 27;	// menu height
-	int ht = 400;	// task browser height
+	int ht = 200;	// task browser height
 	int wf = 400;	// file browser width
 
 	// set the custom user interface settings
@@ -38,7 +37,7 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "
 
 			pg = new Fl_Group(wf, hm+ht, w-wf, h-hm-ht);
 			{
-				Fl_Tabs* ptabs = new Fl_Tabs(wf, hm+ht, w-wf, h-hm-ht);
+				m_pTabs = new Fl_Tabs(wf, hm+ht, w-wf, h-hm-ht);
 				{
 					Fl_Group* pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Input    ");
 					{
@@ -48,17 +47,23 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "
 						pg->resizable(m_pText);
 					}
 					pg->end();
-					ptabs->resizable(pg);
+					m_pTabs->resizable(pg);
 					pg->labelsize(11);
 
-					pg = new Fl_Group(wf, hm+ht+25, w-wf, h-hm-ht-25, "    Log    ");
+					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Log    ");
 					{
+						m_pLog = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
+						m_pLog->textfont(FL_COURIER);
+						m_pLog->box(FL_DOWN_BOX);
+						m_pLog->color(FL_BLACK);
+						m_pLog->textcolor(FL_WHITE);
+						pg->resizable(m_pLog);
 					}
 					pg->end();
 					pg->labelsize(11);
 				}
-				ptabs->end();
-				pg->resizable(ptabs);
+				m_pTabs->end();
+				pg->resizable(m_pTabs);
 			}
 			pg->end();
 			pg->box(FL_FLAT_BOX);
@@ -116,6 +121,7 @@ bool CWnd::OpenFile(const char* szfile)
 	{
 		m_pTask->AddTask(pt);
 		m_pText->buffer(pt->GetTextBuffer());
+		m_pLog->buffer(pt->GetLogBuffer());
 	}
 	return (pt != 0);
 }
@@ -148,6 +154,7 @@ void CWnd::OnSelectFile(Fl_Widget* pw, void* pd)
 		assert(n >= 0);
 		CTask* pt = GetDocument()->GetTask(n);
 		m_pText->buffer(pt->GetTextBuffer());
+		m_pLog->buffer(pt->GetLogBuffer());
 	}
 }
 
@@ -156,5 +163,9 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 {
 	int n = m_pTask->SelectedTask();
 	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
-	else m_pDoc->RunTask(n);
+	else 
+	{
+		m_pTabs->value(m_pLog->parent());
+		m_pDoc->RunTask(n);
+	}
 }

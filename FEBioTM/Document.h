@@ -10,7 +10,8 @@
 #endif // _MSC_VER > 1000
 
 #include "FEM.h"
-#include <FL/Fl_Text_Buffer.H>
+#include "FEBioLib/log.h"
+#include <FL/Fl_Text_Display.H>
 
 //-----------------------------------------------------------------------------
 class CTask
@@ -18,18 +19,33 @@ class CTask
 	enum {MAX_FILE = 512};
 
 public:
-	CTask() { m_szfile[0] = 0; m_pb = 0; }
-	~CTask() { delete m_pb; }
+	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; }
+	~CTask() { delete m_pfile; delete m_plog; }
 
 	void SetFileName(const char* szfile);
 	const char* GetFileName() { return m_szfile; }
 
-	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pb = pb; }
-	Fl_Text_Buffer* GetTextBuffer() { return m_pb; }
+	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pfile = pb; }
+	Fl_Text_Buffer* GetTextBuffer() { return m_pfile; }
+
+	void SetLogBuffer(Fl_Text_Buffer* pb) { m_plog = pb; }
+	Fl_Text_Buffer* GetLogBuffer() { return m_plog; }
 
 protected:
 	char			m_szfile[MAX_FILE];		//!< file name
-	Fl_Text_Buffer*	m_pb;					//!< text buffer for editing
+	Fl_Text_Buffer*	m_pfile;				//!< text buffer for editing
+	Fl_Text_Buffer*	m_plog;					//!< log buffer
+};
+
+//-----------------------------------------------------------------------------
+// class that will direct log output to the Log window
+class LogBuffer : public LogStream
+{
+public:
+	LogBuffer(Fl_Text_Display* pb) : m_plog(pb) {}
+	void print(const char* sz);
+private:
+	Fl_Text_Display*	m_plog;
 };
 
 //-----------------------------------------------------------------------------

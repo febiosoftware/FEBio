@@ -11,6 +11,18 @@
 #include <stdio.h>
 
 //-----------------------------------------------------------------------------
+// class used to create an abstract interface to a screen
+class LogStream
+{
+public:
+	LogStream() {}
+	virtual ~LogStream() {}
+
+	// override function to print
+	virtual void print(const char* sz) = 0;
+};
+
+//-----------------------------------------------------------------------------
 //! Class that is used for logging purposes
 
 //! This class can output to different 
@@ -62,6 +74,9 @@ public:
 	//! returns if the logfile is ready to be written to
 	bool is_valid() { return (m_fp != 0); }
 
+	// set the log stream
+	void SetLogStream(LogStream* ps) { m_ps = ps; }
+
 private:
 	//! constructor is private so that you cannot create it directly
 	Logfile();
@@ -69,6 +84,8 @@ private:
 
 protected:
 	FILE*	m_fp;	//!< the actual log file
+
+	LogStream*	m_ps;	//!< This stream is used to output to the screen
 
 	MODE	m_mode;	//!< mode of log file
 

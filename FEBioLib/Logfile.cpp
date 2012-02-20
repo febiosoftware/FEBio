@@ -86,18 +86,22 @@ bool Logfile::append(const char* szfile)
 //
 void Logfile::printf(const char* sz, ...)
 {
+	static char szmsg[1024] = {0};
+
 	// get a pointer to the argument list
 	va_list	args;
 
-	// print to file
+	// make the message
+	static char sztxt[1024] = {0};
 	va_start(args, sz);
-	if (m_fp && (m_mode & FILE_ONLY)) vfprintf(m_fp, sz, args);
+	vsprintf(sztxt, sz, args);
 	va_end(args);
+	
+	// print to file
+	if (m_fp && (m_mode & FILE_ONLY)) fprintf(m_fp, sztxt);
 
 	// print to screen
-	va_start(args, sz);
-	if (m_mode & SCREEN_ONLY) vprintf(sz, args);
-	va_end(args);
+	if (m_ps && (m_mode & SCREEN_ONLY)) m_ps->print(sztxt);
 }
 
 //-----------------------------------------------------------------------------
@@ -110,7 +114,7 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 	va_list	args;
 
 	// make the message
-	char sztxt[1024];
+	static char sztxt[1024] = {0};
 	va_start(args, sz);
 	vsprintf(sztxt, sz, args);
 	va_end(args);
