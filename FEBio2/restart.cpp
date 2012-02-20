@@ -41,6 +41,7 @@
 #include "FEBioLib/NodeDataRecord.h"
 #include "FEBioLib/ElementDataRecord.h"
 #include "FEBioLib/RigidBodyDataRecord.h"
+#include "FEBioProgress.h"
 #include "FEBioLib/version.h"
 
 //-----------------------------------------------------------------------------
@@ -49,8 +50,11 @@ bool restart(FEM& fem, const char* szfile)
 	// load restart data
 	if (fem.Restart(szfile) == false) return false;
 
+	// create progress tracker
+	FEBioProgress prg(fem);
+
 	// continue the analysis
-	return fem.Solve();
+	return fem.Solve(prg);
 }
 
 //-----------------------------------------------------------------------------

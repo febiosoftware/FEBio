@@ -5,15 +5,22 @@
 #include "FEBioLib/DataStore.h"
 
 //-----------------------------------------------------------------------------
+class FETMProgress : public Progress
+{
+public:
+	FETMProgress(FEModel& fem) : m_fem(fem) {}
+	void SetProgress(double f) {}
+protected:
+	FEModel&	m_fem;
+};
+
+//-----------------------------------------------------------------------------
 // The FE model class
 class FEM : public FEBioModel
 {
 public:
 	// constructor
 	FEM();
-
-	// solve the model
-	virtual bool Solve() { return false; }
 
 	virtual void PushState() {}
 	virtual void PopState () {}

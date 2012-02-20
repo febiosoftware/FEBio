@@ -693,6 +693,7 @@
     <ClCompile Include="..\..\FEBioLib\FEFacet2FacetSliding.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPowUncoupled.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFluidFlux.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFungOrthoCompressible.cpp" />
@@ -773,6 +774,8 @@
     <ClCompile Include="..\..\FEBioLib\FEVonMisesPlasticity.cpp" />
     <ClCompile Include="..\..\FEBioLib\FileImport.cpp" />
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
+    <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
+    <ClCompile Include="..\..\FEBioLib\input.cpp" />
     <ClCompile Include="..\..\FEBioLib\Logfile.cpp" />
     <ClCompile Include="..\..\FEBioLib\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />

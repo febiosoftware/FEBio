@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBioStdSolver.h"
+#include "FEBioProgress.h"
 #include "fem.h"
 
 //-----------------------------------------------------------------------------
@@ -18,8 +19,10 @@ bool FEBioStdSolver::Run(const char* szfile)
 	// initialize and check data
 	if (m_pfem->Init() == false) return false;
 
+	FEBioProgress prg(*m_pfem);
+
 	// Solve the problem and return error code
-	return m_pfem->Solve();
+	return m_pfem->Solve(prg);
 }
 
 //-----------------------------------------------------------------------------
@@ -30,8 +33,10 @@ bool FEBioRestart::Run(const char *szfile)
 	// load restart data
 	if (fem.Restart(szfile) == false) return false;
 
+	FEBioProgress prg(fem);
+
 	// continue the analysis
-	return fem.Solve();
+	return fem.Solve(prg);
 }
 
 //-----------------------------------------------------------------------------

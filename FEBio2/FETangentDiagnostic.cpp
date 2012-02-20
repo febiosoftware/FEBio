@@ -7,6 +7,7 @@
 #include "FEBioLib/FEBox.h"
 #include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
+#include "FEBioProgress.h"
 #include "FEBioLib/log.h"
 
 //-----------------------------------------------------------------------------
@@ -197,8 +198,10 @@ bool FETangentDiagnostic::Run()
 {
 	Logfile::MODE oldmode = clog.SetMode(Logfile::FILE_ONLY);
 
+	FEBioProgress prg(m_fem);
+
 	// solve the problem
-	m_fem.Solve();
+	m_fem.Solve(prg);
 
 	FEMesh& mesh = m_fem.m_mesh;
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));

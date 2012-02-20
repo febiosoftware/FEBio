@@ -83,6 +83,7 @@ bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
 void Hello(FILE* fp);
 int prompt(CMDOPTIONS& ops);
 int get_app_path (char *pname, size_t pathsize);
+extern void InitFEBioLibrary();
 
 //-----------------------------------------------------------------------------
 // The starting point of the application
@@ -101,6 +102,9 @@ int main(int argc, char* argv[])
 
 	// if silent mode only output to file
 	if (ops.bsilent) clog.SetMode(Logfile::FILE_ONLY);
+
+	// initialize FEBio library
+	InitFEBioLibrary();
 
 	// if there are no arguments, print the FEBio prompt
 	if (argc == 1)

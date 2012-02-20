@@ -43,9 +43,6 @@ public:
 	//! Restart from restart point
 	bool Restart(const char* szfile);
 
-	//! Solves the problem
-	bool Solve();
-
 	//! Serialize the current state to/from restart file
 	bool Serialize(DumpFile& ar);
 
@@ -99,17 +96,6 @@ protected:
 
 public:
 	bool	m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
-};
-
-//-----------------------------------------------------------------------------
-class FEBioProgress : public Progress
-{
-public:
-	FEBioProgress(FEM& fem) : m_fem(fem) {}
-	void SetProgress(double f);
-
-protected:
-	FEM&	m_fem;
 };
 
 #endif // _FEM_H_07012006_

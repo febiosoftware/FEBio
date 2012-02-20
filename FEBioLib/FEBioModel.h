@@ -21,6 +21,9 @@ public:
 	//! Resets data structures
 	bool Reset();
 
+	//! Solves the problem
+	bool Solve(Progress& prg);
+
 protected: // --- initialization functions ---
 
 	//! Initialize mesh data

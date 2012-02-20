@@ -2,12 +2,9 @@
 #include <math.h>
 #include "FEBioLib/Timer.h"
 #include "fem.h"
+#include "FEBioProgress.h"
 #include "console.h"
 #include "FEBioLib/log.h"
-
-//-----------------------------------------------------------------------------
-// echo the input data to the log file
-extern void echo_input(FEM& fem);
 
 //-----------------------------------------------------------------------------
 bool solve(FEM& fem, const char* szfile)
@@ -18,84 +15,16 @@ bool solve(FEM& fem, const char* szfile)
 	// initialize and check data
 	if (fem.Init() == false) return false;
 
+	// create a progress tracker
+	FEBioProgress prg(fem);
+
 	// run the analysis
-	return fem.Solve();
-}
+	bool bconv = fem.Solve(prg);
 
-//-----------------------------------------------------------------------------
-//! This is the main solve method. This function loops over all analysis steps
-//! and solves each one in turn. 
-//! \sa FEAnalysisStep
-
-bool FEM::Solve()
-{
-	// echo fem data to the logfile
-	// we do this here (and not e.g. directly after input)
-	// since the data can be changed after input, which is the case,
-	// for instance, in the parameter optimization module
-	if (m_becho) echo_input(*this);
-
-	// start the total time tracker
-	m_TotalTime.start();
-
-	// convergence flag
-	bool bconv = true;
-
-	// progress
-	FEBioProgress prg(*this);
-
-	// loop over all analysis steps
-	// Note that we don't necessarily from step 0.
-	// This is because the user could have restarted
-	// the analysis. 
-	for (size_t nstep=m_nStep; nstep < m_Step.size(); ++nstep)
-	{
-		// set the current analysis step
-		m_nStep = nstep;
-		m_pStep = m_Step[nstep];
-
-		// intitialize step data
-		if (m_pStep->Init() == false)
-		{
-			bconv = false;
-			break;
-		}
-
-		// solve the analaysis step
-		bconv = m_pStep->Solve(prg);
-
-		// break if the step has failed
-		if (bconv == false) break;
-
-		// wrap it up
-		m_pStep->Finish();
-	}
-
-	// close the plot file
-	if (m_plot) m_plot->Close();
-
-	// stop total time tracker
-	m_TotalTime.stop();
-
-	// get and print elapsed time
-	char sztime[64];
-	m_TotalTime.time_str(sztime);
-	clog.printf("\n Elapsed time : %s\n\n", sztime);
-
-	if (bconv)
-	{
-		clog.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
-	}
-	else
-	{
-		clog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
-	}
-
-	// obtain a pointer to the console window. We'll use this to 
-	// set the title of the window
+	// obtain a pointer to the console window. 
+	// We'll use this to set the title of the window
 	Console* pShell = Console::GetHandle();
-	pShell->SetTitle("(%s) %s - FEBio", (bconv?"NT":"ET"), m_szfile_title);
+	pShell->SetTitle("(%s) %s - FEBio", (bconv?"NT":"ET"), fem.GetFileTitle());
 
-	// We're done !
 	return bconv;
 }

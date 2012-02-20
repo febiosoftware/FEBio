@@ -1,23 +1,23 @@
 // input module
 
 #include "stdafx.h"
-#include "fem.h"
-#include "FEBioLib/FileImport.h"
-#include "FEBioLib/FEBioImport.h"
-#include "FEBioLib/FESlidingInterface.h"
-#include "FEBioLib/FETiedInterface.h"
-#include "FEBioLib/FERigidWallInterface.h"
-#include "FEBioLib/FEPeriodicBoundary.h"
-#include "FEBioLib/FESurfaceConstraint.h"
-#include "FEBioLib/FEFacet2FacetSliding.h"
-#include "FEBioLib/FERigidJoint.h"
-#include "FEBioLib/FEBiphasicSolver.h"
-#include "FEBioLib/FEBiphasicSoluteSolver.h"
-#include "FEBioLib/FETriphasicSolver.h"
-#include "FEBioLib/FERigidBody.h"
-#include "FEBioLib/log.h"
+#include "FEBioModel.h"
+#include "FileImport.h"
+#include "FEBioImport.h"
+#include "FESlidingInterface.h"
+#include "FETiedInterface.h"
+#include "FERigidWallInterface.h"
+#include "FEPeriodicBoundary.h"
+#include "FESurfaceConstraint.h"
+#include "FEFacet2FacetSliding.h"
+#include "FERigidJoint.h"
+#include "FEBiphasicSolver.h"
+#include "FEBiphasicSoluteSolver.h"
+#include "FETriphasicSolver.h"
+#include "FERigidBody.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "log.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void print_parameter_list(FEParameterList& pl)
 
 //------------------------------------------------------------------------------
 //! This function outputs the input data to the clog file.
-void echo_input(FEM& fem)
+void echo_input(FEBioModel& fem)
 {
 	// echo input
 	int i, j;

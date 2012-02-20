@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioLib/FEOptimizer.h"
 #include "FEBioLib/log.h"
+#include "FEBioProgress.h"
 #include "console.h"
 
 // forward declarations
@@ -157,7 +158,9 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 
 	double fobj = 0;
 
-	if (fem.Solve() == false)
+	FEBioProgress prg(fem);
+
+	if (fem.Solve(prg) == false)
 	{
 		printf("\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
 		return 0;

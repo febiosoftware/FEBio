@@ -69,6 +69,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBio2\FEBioProgress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBio2\CommandManager.cpp">
@@ -95,9 +98,6 @@
     <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\FEFiberMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\fem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -120,9 +120,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\getapppath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp">
@@ -149,10 +146,7 @@
     <ClCompile Include="..\..\FEBio2\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\InitLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBio2\init.cpp">
+    <ClCompile Include="..\..\FEBio2\FEBioProgress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

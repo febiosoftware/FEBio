@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "Document.h"
 
+extern void InitFEBioLibrary();
+
 //-----------------------------------------------------------------------------
 void CTask::SetFileName(const char* szfile)
 {
@@ -17,6 +19,8 @@ void CTask::SetFileName(const char* szfile)
 //-----------------------------------------------------------------------------
 CDocument::CDocument()
 {
+	// initialize FEBio library
+	InitFEBioLibrary();
 }
 
 //-----------------------------------------------------------------------------
@@ -56,6 +60,9 @@ bool CDocument::RunTask(int i)
 	// initialize FE data
 	if (fem.Init() == false) return false;
 
+	// progress tracker
+	FETMProgress prg(fem);
+
 	// solve the problem
-	return fem.Solve();
+	return fem.Solve(prg);
 }

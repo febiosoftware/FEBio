@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioLib/FEOptimizer.h"
 #include "FEBioLib/log.h"
+#include "FEBioProgress.h"
 #include "console.h"
 
 FELMOptimizeMethod* FELMOptimizeMethod::m_pThis = 0;
@@ -245,7 +246,9 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	Console* pwnd = Console::GetHandle();
 	pwnd->Deactivate();
 
-	bool bret = fem.Solve();
+	FEBioProgress prg(fem);
+
+	bool bret = fem.Solve(prg);
 
 	clog.SetMode(Logfile::FILE_AND_SCREEN);
 	if (bret)

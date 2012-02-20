@@ -5,6 +5,7 @@
 #include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioLib/FEAnalysisStep.h"
+#include "FEBioProgress.h"
 #include "console.h"
 
 // register the material with the framework
@@ -177,8 +178,10 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// turn the console off
 	Console::GetHandle()->Deactivate();
 
+	FEBioProgress prg(m_rve);
+
 	// solve the RVE
-	bool bret = m_rve.Solve();
+	bool bret = m_rve.Solve(prg);
 
 	// reset the logfile mode
 	clog.SetMode(nmode);
