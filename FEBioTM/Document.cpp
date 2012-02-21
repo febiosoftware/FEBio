@@ -66,6 +66,9 @@ bool CDocument::RunTask(int i)
 	// get the task
 	CTask* pt = GetTask(i);
 
+	// save the file
+	pt->Save();
+
 	CWnd* pwnd = FLXGetMainWnd();
 
 	CTaskBrowser* ptb = pwnd->GetTaskBrowser();

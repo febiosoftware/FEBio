@@ -43,6 +43,8 @@ public:
 	void SetStatus(int n) { m_nstatus = n; }
 	int GetStatus() { return m_nstatus; }
 
+	void Save() { m_pfile->savefile(m_szfile); }
+
 protected:
 	char			m_szfile[MAX_FILE];		//!< file name
 	Fl_Text_Buffer*	m_pfile;				//!< text buffer for editing

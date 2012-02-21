@@ -15,6 +15,7 @@
 #include "FileBrowser.h"
 #include "TaskBrowser.h"
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Tabs.H>
 
 //-----------------------------------------------------------------------------
@@ -62,7 +63,7 @@ protected:
 	Fl_Tabs*			m_pTabs;
 	CFileBrowser*		m_pFile;	//!< the file browser
 	CTaskBrowser*		m_pTask;	//!< the task browser
-	Fl_Text_Display*	m_pText;	//!< Text display
+	Fl_Text_Editor*		m_pText;	//!< Text display
 	Fl_Text_Display*	m_pLog;		//!< log text display
 };
 

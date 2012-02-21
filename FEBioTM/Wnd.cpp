@@ -41,7 +41,7 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "
 				{
 					Fl_Group* pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Input    ");
 					{
-						m_pText = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
+						m_pText = new Fl_Text_Editor(wf, hm+ht+24, w-wf, h-hm-ht-24);
 						m_pText->textfont(FL_COURIER);
 						m_pText->box(FL_DOWN_BOX);
 						pg->resizable(m_pText);
