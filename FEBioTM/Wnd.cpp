@@ -142,6 +142,33 @@ void CWnd::OnFileOpen(Fl_Widget *pw, void *pd)
 }
 
 //-----------------------------------------------------------------------------
+void CWnd::OnFileSave(Fl_Widget* pw, void* pd)
+{
+	int n = m_pTask->SelectedTask();
+	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
+	else 
+	{
+		m_pDoc->GetTask(n)->Save();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
+{
+	int n = m_pTask->SelectedTask();
+	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
+	else 
+	{
+		char szfile[1024] = {0};
+		if (flx_file_save(szfile, "FEBio files (*.feb)\t*.feb") == FLX_OK)
+		{
+			m_pDoc->GetTask(n)->Save(szfile);
+			m_pTask->redraw();
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void CWnd::OnFileExit(Fl_Widget *pw, void *pd)
 {
 	hide();

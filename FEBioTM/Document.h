@@ -19,7 +19,7 @@ class CTask
 	enum {MAX_FILE = 512};
 
 public:
-	enum { QUEUED, RUNNING, COMPLETED };
+	enum { QUEUED, RUNNING, COMPLETED, MODIFIED };
 
 public:
 	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; m_nstatus = QUEUED; }
@@ -43,7 +43,8 @@ public:
 	void SetStatus(int n) { m_nstatus = n; }
 	int GetStatus() { return m_nstatus; }
 
-	void Save() { m_pfile->savefile(m_szfile); }
+	void Save() { m_pfile->savefile(m_szfile); SetStatus(QUEUED); }
+	void Save(const char* szfile) { SetFileName(szfile); Save(); }
 
 protected:
 	char			m_szfile[MAX_FILE];		//!< file name

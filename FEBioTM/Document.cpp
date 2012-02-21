@@ -59,7 +59,6 @@ CTask* CDocument::AddTask(const char* szfile)
 	return pt;
 }
 
-
 //-----------------------------------------------------------------------------
 bool CDocument::RunTask(int i)
 {

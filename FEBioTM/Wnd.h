@@ -43,6 +43,8 @@ public:
 
 public:	// --- M E N U   H A N D L E R S ---
 	void OnFileOpen(Fl_Widget* pw, void* pd);
+	void OnFileSave(Fl_Widget* pw, void* pd);
+	void OnFileSaveAs(Fl_Widget* pw, void* pd);
 	void OnFileExit(Fl_Widget* pw, void* pd);
 
 	void OnRunSelected(Fl_Widget* pw, void* pd);
