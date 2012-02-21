@@ -250,6 +250,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEBioModel.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEBiphasic.cpp"
 				>
 			</File>
@@ -383,6 +387,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEFiberExpPowUncoupled.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFiberMaterial.cpp"
 				>
 			</File>
 			<File
@@ -702,6 +710,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\hello.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\InitLibrary.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\input.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\Logfile.cpp"
 				>
 			</File>
@@ -743,6 +763,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\Timer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\validate.cpp"
 				>
 			</File>
 			<File
@@ -793,6 +817,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEBioImport.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEBioModel.h"
 				>
 			</File>
 			<File
@@ -1309,6 +1337,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\Timer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\validate.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\version.h"
 				>
 			</File>
 			<File

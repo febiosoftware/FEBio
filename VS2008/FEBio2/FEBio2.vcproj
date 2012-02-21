@@ -265,6 +265,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBio2\FEBioProgress.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBio2\FEBioStdSolver.cpp"
 				>
 			</File>
@@ -274,10 +278,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEFiberMaterial.cpp"
 				>
 			</File>
 			<File
@@ -313,22 +313,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\hello.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\init.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\InitLibrary.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\input.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\Interrupt.cpp"
 				>
 			</File>
@@ -360,10 +344,6 @@
 				RelativePath="..\..\FEBio2\stdafx.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\FEBio2\validate.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -384,6 +364,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEBioCommand.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBio2\FEBioProgress.h"
 				>
 			</File>
 			<File
@@ -440,14 +424,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\validate.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\version.h"
 				>
 			</File>
 		</Filter>
