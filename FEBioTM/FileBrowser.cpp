@@ -71,9 +71,7 @@ CFileBrowser::CFileBrowser(int x, int y, int w, int h, CWnd* pwnd) : Flx_Group(x
 //-----------------------------------------------------------------------------
 CFileBrowser::~CFileBrowser()
 {
-	// save current working directory to preferences
-	Fl_Preferences& pref = FLXGetMainApp()->GetPreferences();
-	pref.set("cwd", m_szdir);
+
 }
 
 //-----------------------------------------------------------------------------

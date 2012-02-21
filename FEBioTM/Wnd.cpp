@@ -10,6 +10,8 @@
 #include <Flex.h>
 #include <Flx_Dialog.h>
 #include <flx_message.h>
+#include <FL/Fl_Preferences.H>
+#include "MainApp.h"
 
 const char* wnd_title = "FEBio Task Manager";
 
@@ -195,6 +197,11 @@ void CWnd::OnFileRemove(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnFileExit(Fl_Widget *pw, void *pd)
 {
+	// save current working directory to preferences
+	Fl_Preferences& pref = FLXGetMainApp()->GetPreferences();
+	pref.set("cwd", m_pFile->GetCWD());
+
+	// close application
 	hide();
 }
 

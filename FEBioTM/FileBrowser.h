@@ -12,6 +12,8 @@ public:
 	CFileBrowser(int x, int y, int w, int h, CWnd* pwnd);
 	virtual ~CFileBrowser(void);
 
+	const char* GetCWD() { return m_szdir; }
+
 protected:
 	void OnSelectFile(Fl_Widget* pw, void* pd);
 
