@@ -106,7 +106,7 @@ bool CDocument::RunTask(int i)
 	CTask* pt = GetTask(i);
 
 	// save the file
-	pt->Save();
+	if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
 
 	CWnd* pwnd = FLXGetMainWnd();
 
