@@ -1,6 +1,7 @@
 #pragma once
 #include <Flx_Group.h>
 #include <FL/Fl_File_Browser.H>
+#include <FL/Fl_Preferences.H>
 
 class CWnd;
 
@@ -23,4 +24,7 @@ protected:
 	Fl_File_Browser*	m_pfile;
 
 	char	m_szdir[1024];	// current directory
+
+private:
+//	static Fl_Preferences	m_prefs;
 };

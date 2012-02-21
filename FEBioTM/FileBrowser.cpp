@@ -1,8 +1,13 @@
 #include "stdafx.h"
 #include "FileBrowser.h"
 #include <FL/filename.H>
-#include <assert.h>
 #include "Wnd.h"
+#include "MainApp.h"
+#include <assert.h>
+
+//-----------------------------------------------------------------------------
+// we use the same preferences as the fltk Fl_File_Chooser class.
+//Fl_Preferences CFileBrowser::m_prefs(Fl_Preferences::USER, "fltk.org", "filechooser");
 
 //-----------------------------------------------------------------------------
 // we had some problem figuring out how to access this function, so I've just
@@ -55,15 +60,21 @@ CFileBrowser::CFileBrowser(int x, int y, int w, int h, CWnd* pwnd) : Flx_Group(x
 	end();
 	box(FL_NO_BOX);
 
+	// try to load the last working directory
+	Fl_Preferences& pref = FLXGetMainApp()->GetPreferences();
+	pref.get("cwd", m_szdir, ".", 1023);
+
 	// set the working directory
-	set_dir(".");
+	set_dir(m_szdir);
 }
 
 //-----------------------------------------------------------------------------
 CFileBrowser::~CFileBrowser()
 {
+	// save current working directory to preferences
+	Fl_Preferences& pref = FLXGetMainApp()->GetPreferences();
+	pref.set("cwd", m_szdir);
 }
-
 
 //-----------------------------------------------------------------------------
 void CFileBrowser::OnSelectFile(Fl_Widget* pw, void* pd)

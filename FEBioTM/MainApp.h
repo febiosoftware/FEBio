@@ -12,7 +12,8 @@
 #include <Flx_App.h>
 
 #include "Wnd.h"
-#include "Document.h"
+#include "Document.h" 
+#include <FL/Fl_Preferences.H>
 
 class CMainApp : public Flx_App 
 {
@@ -27,10 +28,12 @@ public:
 	CDocument* GetDocument() { return m_pDoc; }
 	CWnd* GetMainWnd() { return m_pMainWnd; }
 
+	Fl_Preferences& GetPreferences() { return m_prefs; }
 
 protected:
 	CWnd*		m_pMainWnd;	// main window
 	CDocument*	m_pDoc;		// document class
+	Fl_Preferences	m_prefs;	// FEBioTM preferences
 };
 
 CMainApp* FLXGetMainApp();
