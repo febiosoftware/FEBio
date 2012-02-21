@@ -42,20 +42,24 @@ public:
 	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
 
 public:	// --- M E N U   H A N D L E R S ---
-	void OnFileOpen(Fl_Widget* pw, void* pd);
-	void OnFileSave(Fl_Widget* pw, void* pd);
+	void OnFileOpen  (Fl_Widget* pw, void* pd);
+	void OnFileSave  (Fl_Widget* pw, void* pd);
 	void OnFileSaveAs(Fl_Widget* pw, void* pd);
-	void OnFileExit(Fl_Widget* pw, void* pd);
+	void OnFileRemove(Fl_Widget* pw, void* pd);
+	void OnFileExit  (Fl_Widget* pw, void* pd);
 
 	void OnRunSelected(Fl_Widget* pw, void* pd);
 
 	// other envent handlers
 	void OnSelectFile(Fl_Widget* pw, void* pd);
 	void OnSelectTab (Fl_Widget* pw, void* pd);
+	void OnChangeText(Fl_Widget* pw, void* pd);
 
 protected:
 	// handle events
 	int handle(int nevent);	
+
+	void SelectFile();
 
 protected:
 	CDocument*	m_pDoc;	//!< pointer to document

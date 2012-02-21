@@ -12,6 +12,10 @@
 #include "FEM.h"
 #include "FEBioLib/log.h"
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Progress.H>
+#include <FL/Fl.H>
+
+class CWnd;
 
 //-----------------------------------------------------------------------------
 class CTask
@@ -19,7 +23,7 @@ class CTask
 	enum {MAX_FILE = 512};
 
 public:
-	enum { QUEUED, RUNNING, COMPLETED, MODIFIED };
+	enum { QUEUED, MODIFIED, RUNNING, COMPLETED, FAILED };
 
 public:
 	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; m_nstatus = QUEUED; }
@@ -27,6 +31,8 @@ public:
 
 	void SetFileName(const char* szfile);
 	const char* GetFileName() { return m_szfile; }
+
+	const char* GetFileTitle();
 
 	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pfile = pb; }
 	Fl_Text_Buffer* GetTextBuffer() { return m_pfile; }
@@ -54,6 +60,18 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+class FETMProgress : public Progress
+{
+public:
+	FETMProgress(CWnd* pwnd, CTask* pt, Fl_Progress* pw) : m_pWnd(pwnd), m_pTask(pt), m_pw(pw) { pw->maximum(100.f); pw->minimum(0.f); pw->value(0.f); }
+	void SetProgress(double f);
+protected:
+	Fl_Progress*	m_pw;
+	CWnd*			m_pWnd;
+	CTask*			m_pTask;
+};
+
+//-----------------------------------------------------------------------------
 // class that will direct log output to the Log window
 class LogBuffer : public LogStream
 {
@@ -77,11 +95,14 @@ public:
 	// add a taks to the document
 	CTask* AddTask(const char* szfile);
 
+	// remove a task from the queue
+	void RemoveTask(int n);
+
 	// get the number of tasks
 	int Tasks() { return (int) m_Task.size(); }
 
 	// get a task
-	CTask* GetTask(int i) { return m_Task[i]; }
+	CTask* GetTask(int i);
 
 	// run a task
 	bool RunTask(int i);

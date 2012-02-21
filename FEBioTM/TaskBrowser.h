@@ -40,6 +40,8 @@ public:
 
 	void AddTask(CTask *pt);
 
+	void RemoveTask(int n);
+
 	int SelectedTask();
 
 	Fl_Progress* TrackSelectedTask();

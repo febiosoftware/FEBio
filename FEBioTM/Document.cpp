@@ -8,6 +8,7 @@
 #include "MainApp.h"
 
 extern void InitFEBioLibrary();
+extern const char* wnd_title;
 
 //-----------------------------------------------------------------------------
 void CTask::SetFileName(const char* szfile)
@@ -19,11 +20,33 @@ void CTask::SetFileName(const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
+const char* CTask::GetFileTitle()
+{
+	char* c1 = strrchr(m_szfile, '\\');
+	char* c2 = strrchr(m_szfile, '/');
+	if ((c1 == 0) && (c2 == 0)) return m_szfile;
+	if (c1 == 0) return c2+1;
+	if (c2 == 0) return c1+1;
+	if (c1 < c2) return c2+1; else return c1+1;
+}
+
+//-----------------------------------------------------------------------------
 void LogBuffer::print(const char* sz)
 {
 	m_plog->insert(sz);
 	m_plog->show_insert_position();
 //	m_plog->redraw();
+	Fl::flush();
+}
+
+//-----------------------------------------------------------------------------
+void FETMProgress::SetProgress(double f)
+{
+	static char sz[1024] = {0};
+	int n = (int) f;
+	sprintf(sz, "(%d%%) %s - %s", n, m_pTask->GetFileTitle(), wnd_title);
+	m_pWnd->label(sz);
+	m_pw->value((float) f); 
 	Fl::flush();
 }
 
@@ -37,6 +60,12 @@ CDocument::CDocument()
 //-----------------------------------------------------------------------------
 CDocument::~CDocument()
 {
+}
+
+CTask* CDocument::GetTask(int i)
+{
+	if ((i>=0) && (i<(int)m_Task.size())) return m_Task[i];
+	else return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,6 +86,17 @@ CTask* CDocument::AddTask(const char* szfile)
 
 	m_Task.push_back(pt);
 	return pt;
+}
+
+//-----------------------------------------------------------------------------
+void CDocument::RemoveTask(int n)
+{
+	CTask* pt = GetTask(n);
+	assert(pt);
+	if (pt == 0) return;
+	vector<CTask*>::iterator it = m_Task.begin() + n;
+	m_Task.erase(it);
+	delete pt;
 }
 
 //-----------------------------------------------------------------------------
@@ -83,13 +123,21 @@ bool CDocument::RunTask(int i)
 	FEM fem;
 
 	// load the data from file
-	if (fem.Input(pt->GetFileName()) == false) return false;
+	if (fem.Input(pt->GetFileName()) == false)
+	{
+		pt->SetStatus(CTask::FAILED);
+		return false;
+	}
 
 	// initialize FE data
-	if (fem.Init() == false) return false;
+	if (fem.Init() == false) 
+	{
+		pt->SetStatus(CTask::FAILED);
+		return false;
+	}
 
 	// progress tracker
-	FETMProgress prg(ptb->TrackSelectedTask());
+	FETMProgress prg(pwnd, pt, ptb->TrackSelectedTask());
 
 	pt->SetStatus(CTask::RUNNING);
 
@@ -98,7 +146,7 @@ bool CDocument::RunTask(int i)
 
 	ptb->DoneTracking();
 
-	pt->SetStatus(CTask::COMPLETED);
+	pt->SetStatus(bret?CTask::COMPLETED:CTask::FAILED);
 
 	// don't forget to clean up
 	delete plog;

@@ -34,7 +34,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y, int W, int H)
 {
 	static char* szc[] = {"Path", "Status"};
-	static char* szs[] = {"queued", "running", "completed"};
+	static char* szs[] = {"queued", "modified", "running", "completed", "failed"};
 
     switch ( context ) 
 	{
@@ -118,6 +118,13 @@ void CTaskBrowser::AddTask(CTask *pt)
 	int N = m_pg->rows();
 	m_pg->rows(N+1);
 	m_pg->select_row(N);
+}
+
+//-----------------------------------------------------------------------------
+void CTaskBrowser::RemoveTask(int n)
+{
+	int N = m_pg->rows();
+	if (N > 0) m_pg->rows(N - 1);
 }
 
 //-----------------------------------------------------------------------------

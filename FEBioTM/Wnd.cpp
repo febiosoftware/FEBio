@@ -11,8 +11,10 @@
 #include <Flx_Dialog.h>
 #include <flx_message.h>
 
+const char* wnd_title = "FEBio Task Manager";
+
 //-----------------------------------------------------------------------------
-CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "FEBio Task Manager"), m_pDoc(pdoc)
+CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, wnd_title), m_pDoc(pdoc)
 {
 	int hm = 27;	// menu height
 	int ht = 200;	// task browser height
@@ -45,6 +47,8 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, "
 						m_pText->textfont(FL_COURIER);
 						m_pText->box(FL_DOWN_BOX);
 						pg->resizable(m_pText);
+						AddCallback(m_pText, (FLX_CALLBACK) &CWnd::OnChangeText);
+						m_pText->when(FL_WHEN_CHANGED);
 					}
 					pg->end();
 					m_pTabs->resizable(pg);
@@ -145,10 +149,13 @@ void CWnd::OnFileOpen(Fl_Widget *pw, void *pd)
 void CWnd::OnFileSave(Fl_Widget* pw, void* pd)
 {
 	int n = m_pTask->SelectedTask();
-	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
+	CTask* pt = m_pDoc->GetTask(n);
+	if (pt == 0) flx_error("No task selected");
 	else 
 	{
-		m_pDoc->GetTask(n)->Save();
+		pt->Save();
+		pt->SetStatus(CTask::QUEUED);
+		m_pTask->redraw();
 	}
 }
 
@@ -156,16 +163,33 @@ void CWnd::OnFileSave(Fl_Widget* pw, void* pd)
 void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 {
 	int n = m_pTask->SelectedTask();
-	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
+	CTask* pt = m_pDoc->GetTask(n);
+	if (pt == 0) flx_error("No task selected");
 	else 
 	{
 		char szfile[1024] = {0};
 		if (flx_file_save(szfile, "FEBio files (*.feb)\t*.feb") == FLX_OK)
 		{
-			m_pDoc->GetTask(n)->Save(szfile);
+			pt->Save(szfile);
+			pt->SetStatus(CTask::QUEUED);
 			m_pTask->redraw();
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileRemove(Fl_Widget* pw, void* pd)
+{
+	int n = m_pTask->SelectedTask();
+	if (n>=0)
+	{
+		m_pText->buffer(0);
+		m_pLog->buffer(0);
+		m_pDoc->RemoveTask(n);
+		m_pTask->RemoveTask(n);
+		SelectFile();
+	}
+	else flx_alert("Nothing to remove.");
 }
 
 //-----------------------------------------------------------------------------
@@ -179,11 +203,15 @@ void CWnd::OnSelectFile(Fl_Widget* pw, void* pd)
 {
 	CTaskTable* pt = dynamic_cast<CTaskTable*>(pw);
 	assert(pt);
-	if (pt->callback_context() == Fl_Table::CONTEXT_CELL)
+	if (pt->callback_context() == Fl_Table::CONTEXT_CELL) SelectFile();
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::SelectFile()
+{
+	CTask* pt = GetDocument()->GetTask(m_pTask->SelectedTask());
+	if (pt)
 	{
-		int n = m_pTask->SelectedTask();
-		assert(n >= 0);
-		CTask* pt = GetDocument()->GetTask(n);
 		m_pText->buffer(pt->GetTextBuffer());
 		m_pLog->buffer(pt->GetLogBuffer());
 	}
@@ -196,10 +224,14 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
 	else 
 	{
+		CTask* pt = m_pDoc->GetTask(n);
+		assert(pt);
 		m_pTabs->value(m_pTabs->child(1));
 		m_pTabs->do_callback();
 		Fl::flush();
 		m_pDoc->RunTask(n);
+		m_pTask->redraw();
+		label(wnd_title);
 	}
 }
 
@@ -216,4 +248,16 @@ void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 	}
 	ps->labelfont(FL_HELVETICA_BOLD);
 	ps->selection_color(FL_GRAY);
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnChangeText(Fl_Widget* pw, void* pd)
+{
+	int n = m_pTask->SelectedTask();
+	CTask* pt = m_pDoc->GetTask(n);
+	if (pt && (pt->GetStatus() != CTask::MODIFIED))
+	{
+		pt->SetStatus(CTask::MODIFIED);
+		m_pTask->redraw();
+	}
 }
