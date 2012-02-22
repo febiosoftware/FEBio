@@ -309,10 +309,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\getapppath.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\Interrupt.cpp"
 				>
 			</File>

@@ -710,6 +710,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\getapppath.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\hello.cpp"
 				>
 			</File>
