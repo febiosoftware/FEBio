@@ -12,9 +12,14 @@ public:
 	// constructor
 	FEM();
 
-	virtual void PushState() {}
-	virtual void PopState () {}
+public:
+	virtual void PushState();
+	virtual void PopState ();
 
+protected:
+	void ShallowCopy(FEM& fem);
+
+public:
 	//! Evaluate parameter list
 	virtual void EvaluateParameterList(FEParameterList& pl) {}
 	virtual void EvaluateMaterialParameters(FEMaterial* pm) {}
