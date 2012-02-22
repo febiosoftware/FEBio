@@ -108,96 +108,84 @@ void FETiedInterface::Update(int niter)
 
 void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove)
 {
-	int i, j, l, m, n, np1, nm1, a;
-
-	int mn, ne;
+	// isoparametric coordinates of slave node onto master element
 	double r, s;
 
-	int nval;
-	FEElement** pe;
-	FEElement* pme;
-
-	double H[4];
-	double l1, l2, N;
-
-	vec3d q, r0;
-
-	vec3d y[4];
-
-	// plane normal
-	vec3d np;
-	// projection onto plane
-	vec3d rp;
+	// projection of slave node onto master element
+	vec3d q;
 
 	// neirest neigbour query
 	FENNQuery query(&ms);
-
 	query.Init();
 
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
 
-	const double eps = 0.01;
+	// search tolerance
+	// TODO: make this a user parameter
+	const double eps = 0.0001;
 
 	// loop over all slave nodes
-	for (i=0; i<ss.Nodes(); ++i)
+	for (int i=0; i<ss.Nodes(); ++i)
 	{
+		// get the next node
 		FENode& node = ss.Node(i);
 
-		a = ss.node[i];
-
-		// get the nodal position
+		// get the nodal position of this slave node
 		vec3d rs = node.m_rt;
 
 		// let's find the closest master node
-		mn = query.Find(rs);
+		int mn = query.Find(rs);
 
 		// now that we found the closest master node, lets see if we can find 
 		// the best master element
-		pme = 0;
+		FEElement* pme = 0;
 
 		// mn is a local index, so get the global node number too
-		m = ms.node[mn];
-		r0 = mesh.Node(m).m_rt;
+		int m = ms.node[mn];
+		vec3d r0 = mesh.Node(m).m_rt;
 
-		nval = ms.m_NEL.Valence(mn);
-		pe = ms.m_NEL.ElementList(mn);
+		int nval = ms.m_NEL.Valence(mn);
+		FEElement** pe = ms.m_NEL.ElementList(mn);
+
+		// local element node number of m
+		int n = -1;
 	
-		for (j=0; j<nval; ++j)
+		// loop over the master node's net
+		for (int j=0; j<nval; ++j)
 		{
 			// get the master element
 			FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
 
-			N = el.Nodes();
-			if (N == 4)
+			int ne = el.Nodes();
+			if (ne == 4) // project onto a quad
 			{
 				// find which node this is
-				n = -1;
 				if (el.m_node[0] == m) n = 0;
 				else if (el.m_node[1] == m) n = 1;
 				else if (el.m_node[2] == m) n = 2;
 				else if (el.m_node[3] == m) n = 3;
 				assert(n >= 0);
 
-				np1 = (n+1)%4;
-				nm1 = (n==0? 3 : n-1);
+				int np1 = (n+1)%4;
+				int nm1 = (n==0? 3 : n-1);
 
 				// approximate element surface by a plane
 				vec3d r1 = mesh.Node(el.m_node[np1]).m_rt - r0;
 				vec3d r2 = mesh.Node(el.m_node[nm1]).m_rt - r0;
 
-				l1 = r1.norm();
-				l2 = r2.norm();
+				double l1 = r1.norm();
+				double l2 = r2.norm();
 
-				np = r1^r2;
+				vec3d np = r1^r2;
 				np.unit();
 
 				// project rs to the plane
-				rp = rs - np*(np*(rs - r0));
+				q = rs - np*(np*(rs - r0));
 	
 				// get the plane coordinates
-				r = ((rp - r0)*r1)/(l1*l1);
-				s = ((rp - r0)*r2)/(l2*l2);
+				r = ((q - r0)*r1)/(l1*l1);
+				s = ((q - r0)*r2)/(l2*l2);
 		
 				if ((r >= -eps) && (s >= -eps))
 				{
@@ -206,25 +194,35 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 					break;
 				}
 			}
-			else if (N==3)
+			else if (ne==3) // project onto a triangle
 			{
 				// approximate element surface by a plane
 				vec3d rc = mesh.Node(el.m_node[0]).m_rt;
 				vec3d e1 = mesh.Node(el.m_node[1]).m_rt - rc;
 				vec3d e2 = mesh.Node(el.m_node[2]).m_rt - rc;
-	
-				l1 = e1.norm();
-				l2 = e2.norm();
-	
-				np = e1^e2;
+
+				// get the plane normal
+				vec3d np = e1^e2;
 				np.unit();
 
 				// project rs to the plane
-				rp = rs - np*(np*(rs - rc));
+				q = rs - np*(np*(rs - rc));
+
+				// find the iso-param coordinates
+				// first we setup the G-matrix
+				double g[2][2] = {e1*e1, e1*e2, e2*e1, e2*e2};
+				double G[2][2];
+				double D = 1.0 / (g[0][0]*g[1][1] - g[0][1]*g[1][0]);
+				G[0][0] =  D*g[1][1]; G[0][1] = -D*g[0][1];
+				G[1][0] = -D*g[1][0]; G[1][1] =  D*g[0][0];
+
+				// set up the dual basis
+				vec3d E1 = e1*G[0][0] + e2*G[0][1];
+				vec3d E2 = e1*G[1][0] + e2*G[1][1];
 
 				// get the plane coordinates
-				r = ((rp - r0)*e1)/(l1*l1);
-				s = ((rp - r0)*e2)/(l2*l2);
+				r = (q - rc)*E1;
+				s = (q - rc)*E2;
 	
 				if ((r >= -eps) && (s >= -eps) && (r+s<=1+eps))
 				{
@@ -235,6 +233,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 			}
 		}
 
+		// store the master element
 		ss.m_pme[i] = dynamic_cast<FESurfaceElement*>(pme);
 		if (pme != 0)
 		{
@@ -242,7 +241,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 			// more accurately.
 			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*pme);
 
-			ne = mel.Nodes();
+			int ne = mel.Nodes();
 
 			if (ne == 4)
 			{
@@ -275,14 +274,19 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 				s = fs;
 				q = ms.ProjectToSurface(mel, rs, fr, fs);
 
+				double H[4];
 				if ((fr < -1-eps) || (fr > 1+eps) || (fs < -1-eps) || (fs > 1+eps))
 				{
+
 					// the projection has failed
 					fr = r;
 					fs = s;
 
-					for (l=0; l<4; ++l)
-						y[l] = mesh.Node( mel.m_node[l] ).m_rt;
+					vec3d y[4];
+					y[0] = mesh.Node( mel.m_node[0] ).m_rt;
+					y[1] = mesh.Node( mel.m_node[1] ).m_rt;
+					y[2] = mesh.Node( mel.m_node[2] ).m_rt;
+					y[3] = mesh.Node( mel.m_node[3] ).m_rt;
 
 					H[0] = 0.25*(1 - fr)*(1 - fs);
 					H[1] = 0.25*(1 + fr)*(1 - fs);
@@ -290,7 +294,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 					H[3] = 0.25*(1 - fr)*(1 + fs);
 
 					q = vec3d(0,0,0);
-					for (l=0; l<4; ++l)	q += y[l]*H[l];
+					for (int l=0; l<4; ++l)	q += y[l]*H[l];
 				}
 				else
 				{
@@ -305,15 +309,15 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 			}
 			else if (ne == 3)
 			{
-				for (l=0; l<3; ++l)
-					y[l] = mesh.Node( mel.m_node[l] ).m_rt;
+				// TODO: I don't think this is necessary; this should give the same q value as before
+				vec3d y[3];
+				y[0] = mesh.Node( mel.m_node[0] ).m_rt;
+				y[1] = mesh.Node( mel.m_node[1] ).m_rt;
+				y[2] = mesh.Node( mel.m_node[2] ).m_rt;
 
-				H[0] = 1.0 - r - s;
-				H[1] = r;
-				H[2] = s;
-
+				double H[3] = {1.0 - r - s, r, s};
 				q = vec3d(0,0,0);
-				for (l=0; l<3; ++l)	q += y[l]*H[l];
+				for (int l=0; l<3; ++l)	q += y[l]*H[l];
 
 				ss.rs[i][0] = r;
 				ss.rs[i][1] = s;
