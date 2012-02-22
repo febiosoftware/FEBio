@@ -20,19 +20,7 @@
 class FERigidMaterial : public FEElasticMaterial
 {
 public:
-	FERigidMaterial()
-	{
-		m_com = 0;
-		for (int i=0; i<6; ++i)
-		{
-			m_bc[i] =  0;	// rigid bodies are initially free
-			m_fc[i] = -1;
-			m_fs[i] =  0;
-		}
-		m_E = 1;
-		m_v = 0;
-		m_pmid = -1;
-	}
+	FERigidMaterial();
 
 public:
 	double	m_E;		//!< Young's modulus

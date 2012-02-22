@@ -11,6 +11,21 @@ BEGIN_PARAMETER_LIST(FERigidMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+// constructor
+FERigidMaterial::FERigidMaterial()
+{
+	m_com = 0;	// calculate COM automatically
+	for (int i=0; i<6; ++i)
+	{
+		m_bc[i] =  0;	// rigid bodies are initially free
+		m_fc[i] = -1;
+		m_fs[i] =  0;
+	}
+	m_E = 1;
+	m_v = 0;
+	m_pmid = -1;
+}
 
 //-----------------------------------------------------------------------------
 // Initialize rigid material data
