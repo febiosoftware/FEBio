@@ -563,7 +563,6 @@
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\getapppath.cpp" />
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio2\levmar.cpp" />
     <ClCompile Include="..\..\FEBio2\optimize.cpp" />

@@ -34,6 +34,8 @@ public:
 
 	const char* GetFileTitle();
 
+	void GetFilePath(char* sz);
+
 	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pfile = pb; }
 	Fl_Text_Buffer* GetTextBuffer() { return m_pfile; }
 

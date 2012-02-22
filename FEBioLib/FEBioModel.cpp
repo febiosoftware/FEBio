@@ -194,6 +194,40 @@ bool FEBioModel::Input(const char* szfile)
 }
 
 //=============================================================================
+//    O U T P U T
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Export state to plot file.
+void FEBioModel::Write()
+{
+	m_plot->Write(*this);
+}
+
+//-----------------------------------------------------------------------------
+//! Write user data to the logfile
+void FEBioModel::WriteData()
+{
+	m_Data.Write();
+}
+
+//-----------------------------------------------------------------------------
+//! Dump state to archive for restarts
+void FEBioModel::DumpData()
+{
+	DumpFile ar(this);
+	if (ar.Create(m_szdump) == false)
+	{
+		clog.printf("WARNING: Failed creating restart point.\n");
+	}
+	else 
+	{
+		Serialize(ar);
+		clog.printf("\nRestart point created. Archive name is %s\n", m_szdump);
+	}
+}
+
+//=============================================================================
 //    I N I T I A L I Z A T I O N
 //=============================================================================
 

@@ -872,5 +872,8 @@
     <ClCompile Include="..\..\FEBioLib\FEFiberMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\getapppath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

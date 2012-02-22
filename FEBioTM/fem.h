@@ -28,15 +28,6 @@ public:
 	//! check for user interruption
 	virtual void CheckInterruption() {}
 
-	//! write to plot file
-	virtual void Write() {}
-
-	//! write data to log file
-	virtual void WriteData() {}
-
-	//! write data to dump file
-	virtual void DumpData() {}
-
 	//! serialize data
 	virtual bool Serialize(DumpFile& ar) { return false; }
 };

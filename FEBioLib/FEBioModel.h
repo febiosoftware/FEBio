@@ -24,6 +24,16 @@ public:
 	//! Solves the problem
 	bool Solve(Progress& prg);
 
+public:
+	//! write to plot file
+	void Write();
+
+	//! write data to log file
+	void WriteData();
+
+	//! dump data to archive for restart
+	void DumpData();
+
 protected: // --- initialization functions ---
 
 	//! Initialize mesh data

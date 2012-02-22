@@ -773,6 +773,7 @@
     <ClCompile Include="..\..\FEBioLib\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEVonMisesPlasticity.cpp" />
     <ClCompile Include="..\..\FEBioLib\FileImport.cpp" />
+    <ClCompile Include="..\..\FEBioLib\getapppath.cpp" />
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
     <ClCompile Include="..\..\FEBioLib\input.cpp" />

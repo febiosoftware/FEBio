@@ -119,9 +119,6 @@
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBio2\getapppath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

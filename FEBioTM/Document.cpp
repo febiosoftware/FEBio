@@ -31,6 +31,16 @@ const char* CTask::GetFileTitle()
 }
 
 //-----------------------------------------------------------------------------
+void CTask::GetFilePath(char* szpath)
+{
+	char* c1 = strrchr(m_szfile, '\\');
+	char* c2 = strrchr(m_szfile, '/');
+	if ((c1 == 0) && (c2 == 0)) strcpy(szpath, m_szfile);
+	if ((c1 == 0) || (c2 > c1)) strncpy(szpath, m_szfile, c2 - m_szfile);
+	if ((c2 == 0) || (c1 > c2)) strncpy(szpath, m_szfile, c1 - m_szfile);
+}
+
+//-----------------------------------------------------------------------------
 void LogBuffer::print(const char* sz)
 {
 	m_plog->insert(sz);
@@ -77,7 +87,9 @@ CTask* CDocument::AddTask(const char* szfile)
 
 	// create a text buffer
 	Fl_Text_Buffer* pb = new Fl_Text_Buffer;
-	int nret = pb->appendfile(szfile);
+	// TODO: the buffer size has to be a multiple of 100 due to a bug in the Fl_Text_Buffer. 
+	//       I need to test whether this bug has been fixed.
+	int nret = pb->appendfile(szfile, 100*1024);
 	pt->SetTextBuffer(pb);
 
 	// create a log buffer
@@ -121,6 +133,16 @@ bool CDocument::RunTask(int i)
 
 	// create the FEM object
 	FEM fem;
+
+	// set the default output file names
+	char szbase[1024] = {0}, szfile[1024] = {0};
+	strcpy(szbase, pt->GetFileName());
+	char* ch = strrchr(szbase, '.'); assert(ch);
+	if (ch) *ch = 0;
+	sprintf(szfile, "%s.log", szbase); fem.SetLogFilename(szfile);
+	sprintf(szfile, "%s.plt", szbase); fem.SetPlotFilename(szfile);
+	sprintf(szfile, "%s.dmp", szbase); fem.SetDumpFilename(szfile);
+	fem.SetInputFilename(pt->GetFileName());
 
 	// load the data from file
 	if (fem.Input(pt->GetFileName()) == false)

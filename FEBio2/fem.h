@@ -46,15 +46,6 @@ public:
 	//! Serialize the current state to/from restart file
 	bool Serialize(DumpFile& ar);
 
-	//! write to plot file
-	void Write();
-
-	//! write data to log file
-	void WriteData();
-
-	//! dump data to archive for restart
-	void DumpData();
-
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);
 

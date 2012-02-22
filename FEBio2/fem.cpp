@@ -52,36 +52,6 @@ void FEM::PopState()
 }
 
 //-----------------------------------------------------------------------------
-//! Export state to plot file.
-void FEM::Write()
-{
-	m_plot->Write(*this);
-}
-
-//-----------------------------------------------------------------------------
-//! Write user data to the logfile
-void FEM::WriteData()
-{
-	m_Data.Write();
-}
-
-//-----------------------------------------------------------------------------
-//! Dump state to archive for restarts
-void FEM::DumpData()
-{
-	DumpFile ar(this);
-	if (ar.Create(m_szdump) == false)
-	{
-		clog.printf("WARNING: Failed creating restart point.\n");
-	}
-	else 
-	{
-		Serialize(ar);
-		clog.printf("\nRestart point created. Archive name is %s\n", m_szdump);
-	}
-}
-
-//-----------------------------------------------------------------------------
 // This function is used when pushing the FEM state data. Since we don't need
 // to copy all the data, this function only copies the data that needs to be 
 // restored for a running restart.
