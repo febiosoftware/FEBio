@@ -49,6 +49,7 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnFileExit  (Fl_Widget* pw, void* pd);
 
 	void OnRunSelected(Fl_Widget* pw, void* pd);
+	void OnRunStop    (Fl_Widget* pw, void* pd);
 
 	// other envent handlers
 	void OnSelectFile(Fl_Widget* pw, void* pd);

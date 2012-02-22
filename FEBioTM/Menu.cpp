@@ -16,6 +16,7 @@ CMenu::CMenu(int w, int h, CWnd* pwnd) : Fl_Menu_Bar(0, 0, w, h), m_pWnd(pwnd)
 			{0},
 		{"Run", 0, 0, 0, FL_SUBMENU },
 			{"Run selected", FL_CTRL + FL_F + 5, FLX_MENU_HANDLER(pwnd, CWnd::OnRunSelected)},
+			{"Stop"        ,                  0, FLX_MENU_HANDLER(pwnd, CWnd::OnRunStop)},
 			{0},
 		{0}
 	};

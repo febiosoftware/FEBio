@@ -4,6 +4,8 @@
 #include "FEBioLib/Timer.h"
 #include "FEBioLib/DataStore.h"
 
+class CTask;
+
 //-----------------------------------------------------------------------------
 // The FE model class
 class FEM : public FEBioModel
@@ -11,6 +13,7 @@ class FEM : public FEBioModel
 public:
 	// constructor
 	FEM();
+	FEM(CTask* pt);
 
 public:
 	virtual void PushState();
@@ -31,8 +34,11 @@ public:
 	virtual FEBoundaryCondition* FindBC(int nid) { return 0; }
 
 	//! check for user interruption
-	virtual void CheckInterruption() {}
+	virtual void CheckInterruption();
 
 	//! serialize data
 	virtual bool Serialize(DumpFile& ar) { return false; }
+
+private:
+	CTask*	m_pTask;
 };

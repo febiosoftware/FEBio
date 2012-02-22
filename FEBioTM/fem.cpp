@@ -10,10 +10,29 @@
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
+#include "Document.h"
+#include "FECore/FEException.h"
 
 //-----------------------------------------------------------------------------
 FEM::FEM()
 {
+	m_pTask = 0;
+}
+
+//-----------------------------------------------------------------------------
+FEM::FEM(CTask* pt)
+{
+	m_pTask = pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEM::CheckInterruption()
+{
+	if (m_pTask && (m_pTask->GetStatus() == CTask::CLOSING)) 
+	{
+		throw ExitRequest();
+	}
+	Fl::check();
 }
 
 //-----------------------------------------------------------------------------

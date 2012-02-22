@@ -23,7 +23,7 @@ class CTask
 	enum {MAX_FILE = 512};
 
 public:
-	enum { QUEUED, MODIFIED, RUNNING, COMPLETED, FAILED };
+	enum { QUEUED, MODIFIED, RUNNING, COMPLETED, FAILED, CLOSING };
 
 public:
 	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; m_nstatus = QUEUED; }

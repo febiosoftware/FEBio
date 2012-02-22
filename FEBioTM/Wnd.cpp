@@ -235,10 +235,21 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 		assert(pt);
 		m_pTabs->value(m_pTabs->child(1));
 		m_pTabs->do_callback();
-		Fl::flush();
+		Fl::check();
 		m_pDoc->RunTask(n);
 		m_pTask->redraw();
 		label(wnd_title);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnRunStop(Fl_Widget* pw, void* pd)
+{
+	int n = m_pTask->SelectedTask();
+	CTask* pt = m_pDoc->GetTask(n);
+	if (pt && (pt->GetStatus() == CTask::RUNNING))
+	{
+		pt->SetStatus(CTask::CLOSING);
 	}
 }
 

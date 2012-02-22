@@ -46,7 +46,7 @@ void LogBuffer::print(const char* sz)
 	m_plog->insert(sz);
 	m_plog->show_insert_position();
 //	m_plog->redraw();
-	Fl::flush();
+	Fl::check();
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ void FETMProgress::SetProgress(double f)
 	sprintf(sz, "(%d%%) %s - %s", n, m_pTask->GetFileTitle(), wnd_title);
 	m_pWnd->label(sz);
 	m_pw->value((float) f); 
-	Fl::flush();
+	Fl::check();
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ bool CDocument::RunTask(int i)
 	pt->Clearlog();
 
 	// create the FEM object
-	FEM fem;
+	FEM fem(pt);
 
 	// set the default output file names
 	char szbase[1024] = {0}, szfile[1024] = {0};
