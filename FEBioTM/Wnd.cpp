@@ -13,6 +13,12 @@
 #include <FL/Fl_Preferences.H>
 #include "MainApp.h"
 
+#ifdef WIN32
+#define IDI_ICON1	101
+extern HINSTANCE fl_display;
+#endif
+
+//-----------------------------------------------------------------------------
 const char* wnd_title = "FEBio Task Manager";
 
 //-----------------------------------------------------------------------------
@@ -84,6 +90,15 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 	box(FL_FLAT_BOX); // no background filling
 	color(FL_DARK3);
 	size_range(400, 300);
+
+	// set the windows callback
+	AddCallback(this, (FLX_CALLBACK) &CWnd::OnFileExit);
+
+#ifdef WIN32
+	// set the icon of the window
+	icon((char*) LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON1)));
+	show();
+#endif
 
 	m_pTabs->do_callback();
 }
