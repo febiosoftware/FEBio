@@ -11,28 +11,37 @@
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
-	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 
-	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"   );
-	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"     );
+	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"          ); 
+	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"       );
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"         );
+	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tolerance");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-//! constructor
-
+//! Constructor. Initialize default values.
 FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->m_mesh), ms(&pfem->m_mesh)
 {
 	static int count = 1;
 	m_ntype = FE_CONTACT_TIED;
 
+	// define sibling relationships
 	ss.SetSibling(&ms);
 	ms.SetSibling(&ss);
 
+	// initial parameter values
+	m_blaugon = false;
+	m_atol = 0.01;
+	m_eps = 1.0;
+	m_stol = 0.0001;
+
+	// give this interface an ID (TODO: where is this actually used?)
 	m_nID = count++;
 }
 
 //-----------------------------------------------------------------------------
-//! initialization
-
+//! Initialization. This function intializes the surfaces data and projects the
+//! slave surface onto the master surface.
+//! 
 void FETiedInterface::Init()
 {
 	// create the surfaces
@@ -44,36 +53,32 @@ void FETiedInterface::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! update
-
+//! Update tied interface data. This function re-evaluates the gaps between
+//! the slave node and their projections onto the master surface.
+//!
 void FETiedInterface::Update(int niter)
 {
-	int i, l, n;
-	double r, s, H[4];
-	vec3d T;
-	vec3d y, q, rt;
-
 	// get the mesh
 	FEMesh& mesh = *ss.GetMesh();
 
-	// update the gap functions
-	FEElement* pme;
-	for (i=0; i<ss.Nodes(); ++i)
+	// loop over all slave nodes
+	for (int i=0; i<ss.Nodes(); ++i)
 	{
-		pme = ss.m_pme[i];
+		FEElement* pme = ss.m_pme[i];
 		if (pme)
 		{
-			// get the nodal position
+			// get the current slave nodal position
 			vec3d rt = ss.Node(i).m_rt;
 
 			// get the natural coordinates of the slave projection
 			// onto the master element
-			r = ss.rs[i][0];
-			s = ss.rs[i][1];
+			double r = ss.rs[i][0];
+			double s = ss.rs[i][1];
 
 			// calculate the shape function values
-			n = pme->Nodes();
-			if (n == 4)
+			int ne = pme->Nodes();
+			double H[4];
+			if (ne == 4)
 			{
 
 				H[0] = 0.25*(1 - r)*(1 - s);
@@ -81,7 +86,7 @@ void FETiedInterface::Update(int niter)
 				H[2] = 0.25*(1 + r)*(1 + s);
 				H[3] = 0.25*(1 - r)*(1 + s);
 			}
-			else if (n == 3)
+			else if (ne == 3)
 			{
 				H[0] = 1.0 - r - s;
 				H[1] = r;
@@ -90,10 +95,10 @@ void FETiedInterface::Update(int niter)
 			else assert(false);
 
 			// calculate the slave node projection
-			q = vec3d(0,0,0);
-			for (l=0; l<n; ++l)
+			vec3d q(0,0,0);
+			for (int l=0; l<ne; ++l)
 			{
-				y = mesh.Node( pme->m_node[l] ).m_rt;
+				vec3d y = mesh.Node( pme->m_node[l] ).m_rt;
 				q += y*H[l];
 			}
 
@@ -108,28 +113,16 @@ void FETiedInterface::Update(int niter)
 
 void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove)
 {
-	// isoparametric coordinates of slave node onto master element
-	double r, s;
-
-	// projection of slave node onto master element
-	vec3d q;
-
-	// neirest neigbour query
+	// nearest neigbour query
 	FENNQuery query(&ms);
 	query.Init();
-
-	// get the mesh
-	FEMesh& mesh = *ss.GetMesh();
-
-	// search tolerance
-	// TODO: make this a user parameter
-	const double eps = 0.0001;
 
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
 		// get the next node
 		FENode& node = ss.Node(i);
+		ss.m_pme[i] = 0;
 
 		// get the nodal position of this slave node
 		vec3d rs = node.m_rt;
@@ -139,196 +132,39 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 
 		// now that we found the closest master node, lets see if we can find 
 		// the best master element
-		FEElement* pme = 0;
-
-		// mn is a local index, so get the global node number too
-		int m = ms.node[mn];
-		vec3d r0 = mesh.Node(m).m_rt;
-
 		int nval = ms.m_NEL.Valence(mn);
 		FEElement** pe = ms.m_NEL.ElementList(mn);
 
-		// local element node number of m
-		int n = -1;
-	
 		// loop over the master node's net
 		for (int j=0; j<nval; ++j)
 		{
 			// get the master element
 			FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
 
-			int ne = el.Nodes();
-			if (ne == 4) // project onto a quad
+			// project the node onto this master element
+			double r, s;
+			vec3d q = ms.ProjectToSurface(el, rs, r, s);
+
+			// see if it is inside the element
+			if (ms.IsInsideElement(el, r, s, m_stol))
 			{
-				// find which node this is
-				if (el.m_node[0] == m) n = 0;
-				else if (el.m_node[1] == m) n = 1;
-				else if (el.m_node[2] == m) n = 2;
-				else if (el.m_node[3] == m) n = 3;
-				assert(n >= 0);
-
-				int np1 = (n+1)%4;
-				int nm1 = (n==0? 3 : n-1);
-
-				// approximate element surface by a plane
-				vec3d r1 = mesh.Node(el.m_node[np1]).m_rt - r0;
-				vec3d r2 = mesh.Node(el.m_node[nm1]).m_rt - r0;
-
-				double l1 = r1.norm();
-				double l2 = r2.norm();
-
-				vec3d np = r1^r2;
-				np.unit();
-
-				// project rs to the plane
-				q = rs - np*(np*(rs - r0));
-	
-				// get the plane coordinates
-				r = ((q - r0)*r1)/(l1*l1);
-				s = ((q - r0)*r2)/(l2*l2);
-		
-				if ((r >= -eps) && (s >= -eps))
-				{
-					// we have a winner !
-					pme = pe[j];
-					break;
-				}
-			}
-			else if (ne==3) // project onto a triangle
-			{
-				// approximate element surface by a plane
-				vec3d rc = mesh.Node(el.m_node[0]).m_rt;
-				vec3d e1 = mesh.Node(el.m_node[1]).m_rt - rc;
-				vec3d e2 = mesh.Node(el.m_node[2]).m_rt - rc;
-
-				// get the plane normal
-				vec3d np = e1^e2;
-				np.unit();
-
-				// project rs to the plane
-				q = rs - np*(np*(rs - rc));
-
-				// find the iso-param coordinates
-				// first we setup the G-matrix
-				double g[2][2] = {e1*e1, e1*e2, e2*e1, e2*e2};
-				double G[2][2];
-				double D = 1.0 / (g[0][0]*g[1][1] - g[0][1]*g[1][0]);
-				G[0][0] =  D*g[1][1]; G[0][1] = -D*g[0][1];
-				G[1][0] = -D*g[1][0]; G[1][1] =  D*g[0][0];
-
-				// set up the dual basis
-				vec3d E1 = e1*G[0][0] + e2*G[0][1];
-				vec3d E2 = e1*G[1][0] + e2*G[1][1];
-
-				// get the plane coordinates
-				r = (q - rc)*E1;
-				s = (q - rc)*E2;
-	
-				if ((r >= -eps) && (s >= -eps) && (r+s<=1+eps))
-				{
-					// we have a winner !
-					pme = pe[j];
-					break;
-				}
-			}
-		}
-
-		// store the master element
-		ss.m_pme[i] = dynamic_cast<FESurfaceElement*>(pme);
-		if (pme != 0)
-		{
-			// If we found a master element, we calculate the intersection
-			// more accurately.
-			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*pme);
-
-			int ne = mel.Nodes();
-
-			if (ne == 4)
-			{
-				double fr, fs;
-
-				// let's find the natural coordinates in the master element
-				// for now we simply approximate the natural coordinate using the plane coordinates
-				switch(n)
-				{
-				case 0:
-					fr = -1 + 2*r;
-					fs = -1 + 2*s;
-					break;
-				case 1:
-					fr =  1 - 2*s;
-					fs = -1 + 2*r;
-					break;
-				case 2:
-					fr =  1 - 2*r;
-					fs =  1 - 2*s;
-					break;
-				case 3:
-					fr = -1 + 2*s;
-					fs =  1 - 2*r;
-					break;
-				}
-
-				// improve estimate of (r,s)
-				r = fr;
-				s = fs;
-				q = ms.ProjectToSurface(mel, rs, fr, fs);
-
-				double H[4];
-				if ((fr < -1-eps) || (fr > 1+eps) || (fs < -1-eps) || (fs > 1+eps))
-				{
-
-					// the projection has failed
-					fr = r;
-					fs = s;
-
-					vec3d y[4];
-					y[0] = mesh.Node( mel.m_node[0] ).m_rt;
-					y[1] = mesh.Node( mel.m_node[1] ).m_rt;
-					y[2] = mesh.Node( mel.m_node[2] ).m_rt;
-					y[3] = mesh.Node( mel.m_node[3] ).m_rt;
-
-					H[0] = 0.25*(1 - fr)*(1 - fs);
-					H[1] = 0.25*(1 + fr)*(1 - fs);
-					H[2] = 0.25*(1 + fr)*(1 + fs);
-					H[3] = 0.25*(1 - fr)*(1 + fs);
-
-					q = vec3d(0,0,0);
-					for (int l=0; l<4; ++l)	q += y[l]*H[l];
-				}
-				else
-				{
-					H[0] = 0.25*(1 - fr)*(1 - fs);
-					H[1] = 0.25*(1 + fr)*(1 - fs);
-					H[2] = 0.25*(1 + fr)*(1 + fs);
-					H[3] = 0.25*(1 - fr)*(1 + fs);
-				}
-
-				ss.rs[i][0] = fr;
-				ss.rs[i][1] = fs;
-			}
-			else if (ne == 3)
-			{
-				// TODO: I don't think this is necessary; this should give the same q value as before
-				vec3d y[3];
-				y[0] = mesh.Node( mel.m_node[0] ).m_rt;
-				y[1] = mesh.Node( mel.m_node[1] ).m_rt;
-				y[2] = mesh.Node( mel.m_node[2] ).m_rt;
-
-				double H[3] = {1.0 - r - s, r, s};
-				q = vec3d(0,0,0);
-				for (int l=0; l<3; ++l)	q += y[l]*H[l];
-
+				// store the master element
+				ss.m_pme[i] = &el;
 				ss.rs[i][0] = r;
 				ss.rs[i][1] = s;
-			}
 
-			// calculate gap
-			ss.gap[i] = rs - q;
-			if (bmove && (ss.gap[i].norm()>0))
-			{
-				node.m_r0 = node.m_rt = q;
-				ss.gap[i] = vec3d(0,0,0);
+				// calculate gap
+				ss.gap[i] = rs - q;
+
+				// move the node if necessary
+				if (bmove && (ss.gap[i].norm()>0))
+				{
+					node.m_r0 = node.m_rt = q;
+					ss.gap[i] = vec3d(0,0,0);
+				}
+
+				// move on to the next node
+				break;
 			}
 		}
 	}
@@ -490,7 +326,7 @@ void FETiedInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-
+//! Calculate the stiffness matrix contribution.
 void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 {
 	int j, k, l, n, m;
@@ -656,7 +492,7 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-
+//! Do an augmentation.
 bool FETiedInterface::Augment(int naug)
 {
 	int i;
@@ -717,7 +553,7 @@ bool FETiedInterface::Augment(int naug)
 }
 
 //-----------------------------------------------------------------------------
-
+//! Serialize the data to the archive.
 void FETiedInterface::Serialize(DumpFile &ar)
 {
 	FEContactInterface::Serialize(ar);
@@ -725,6 +561,7 @@ void FETiedInterface::Serialize(DumpFile &ar)
 	{
 		ar << m_eps;
 		ar << m_atol;
+		ar << m_stol;
 		ar << nse;
 		ar << nme;
 
@@ -735,6 +572,7 @@ void FETiedInterface::Serialize(DumpFile &ar)
 	{
 		ar >> m_eps;
 		ar >> m_atol;
+		ar >> m_stol;
 		ar >> nse;
 		ar >> nme;
 

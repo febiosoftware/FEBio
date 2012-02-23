@@ -66,6 +66,7 @@ public:
 
 	double		m_atol;		//!< augmentation tolerance
 	double		m_eps;		//!< penalty scale factor
+	double		m_stol;		//!< search tolerance
 
 	DECLARE_PARAMETER_LIST();
 };
