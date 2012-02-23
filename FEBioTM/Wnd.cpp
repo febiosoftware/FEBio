@@ -56,14 +56,14 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 					m_pTabs->resizable(pg);
 					pg->labelsize(11);
 
-					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Log    ");
+					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Output    ");
 					{
-						m_pLog = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
-						m_pLog->textfont(FL_COURIER);
-						m_pLog->box(FL_DOWN_BOX);
-						m_pLog->color(FL_BLACK);
-						m_pLog->textcolor(FL_WHITE);
-						pg->resizable(m_pLog);
+						m_pOut = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
+						m_pOut->textfont(FL_COURIER);
+						m_pOut->box(FL_DOWN_BOX);
+						m_pOut->color(FL_BLACK);
+						m_pOut->textcolor(FL_WHITE);
+						pg->resizable(m_pOut);
 					}
 					pg->end();
 					pg->labelsize(11);
@@ -131,7 +131,7 @@ bool CWnd::OpenFile(const char* szfile)
 	{
 		m_pTask->AddTask(pt);
 		m_pText->buffer(pt->GetTextBuffer());
-		m_pLog->buffer(pt->GetLogBuffer());
+		m_pOut->buffer(pt->GetOutputBuffer());
 	}
 	return (pt != 0);
 }
@@ -186,7 +186,7 @@ void CWnd::OnFileRemove(Fl_Widget* pw, void* pd)
 	if (n>=0)
 	{
 		m_pText->buffer(0);
-		m_pLog->buffer(0);
+		m_pOut->buffer(0);
 		m_pDoc->RemoveTask(n);
 		m_pTask->RemoveTask(n);
 		SelectFile();
@@ -220,7 +220,7 @@ void CWnd::SelectFile()
 	if (pt)
 	{
 		m_pText->buffer(pt->GetTextBuffer());
-		m_pLog->buffer(pt->GetLogBuffer());
+		m_pOut->buffer(pt->GetOutputBuffer());
 	}
 }
 

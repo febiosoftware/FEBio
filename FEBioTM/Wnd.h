@@ -37,7 +37,7 @@ public:
 	// update the GUI
 	void Update();
 
-	Fl_Text_Display* GetLogWnd() { return m_pLog; }
+	Fl_Text_Display* GetLogWnd() { return m_pOut; }
 
 	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
 
@@ -71,7 +71,7 @@ protected:
 	CFileBrowser*		m_pFile;	//!< the file browser
 	CTaskBrowser*		m_pTask;	//!< the task browser
 	Fl_Text_Editor*		m_pText;	//!< Text display
-	Fl_Text_Display*	m_pLog;		//!< log text display
+	Fl_Text_Display*	m_pOut;		//!< output text display
 };
 
 #endif // !defined(AFX_WND_H__793D79A3_EBE4_4660_8EE3_0016B7467520__INCLUDED_)

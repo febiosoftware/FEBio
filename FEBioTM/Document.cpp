@@ -92,9 +92,9 @@ CTask* CDocument::AddTask(const char* szfile)
 	int nret = pb->appendfile(szfile, 100*1024);
 	pt->SetTextBuffer(pb);
 
-	// create a log buffer
+	// create an output buffer
 	pb = new Fl_Text_Buffer;
-	pt->SetLogBuffer(pb);
+	pt->SetOutputBuffer(pb);
 
 	m_Task.push_back(pt);
 	return pt;

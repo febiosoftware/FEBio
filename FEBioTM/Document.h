@@ -39,8 +39,8 @@ public:
 	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pfile = pb; }
 	Fl_Text_Buffer* GetTextBuffer() { return m_pfile; }
 
-	void SetLogBuffer(Fl_Text_Buffer* pb) { m_plog = pb; }
-	Fl_Text_Buffer* GetLogBuffer() { return m_plog; }
+	void SetOutputBuffer(Fl_Text_Buffer* pb) { m_plog = pb; }
+	Fl_Text_Buffer* GetOutputBuffer() { return m_plog; }
 
 	void Clearlog()
 	{

@@ -34,7 +34,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y, int W, int H)
 {
 	static char* szc[] = {"Path", "Status"};
-	static char* szs[] = {"queued", "modified", "running", "completed", "failed", "closing"};
+	static char* szs[] = {"Queued", "Modified", "Running", "Completed", "Failed", "Closing"};
 
     switch ( context ) 
 	{
