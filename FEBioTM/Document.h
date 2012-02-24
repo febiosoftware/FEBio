@@ -18,15 +18,23 @@
 class CWnd;
 
 //-----------------------------------------------------------------------------
+// The task defines a problem to be run with FEBio. It has several states:
+// - READY = File is read in and awaits to be scheduled.
+// - MODIFIED = File has been modified. Will be saved automatically when run.
+// - QUEUED = File is scheduled to be run.
+// - RUNNING = File is being run.
+// - COMPLETED = File has run and terminated successfully.
+// - FAILED = File has run but did not terminate successfully.
+// - CANCELLED = Run was cancelled by the user before terminating.
 class CTask
 {
 	enum {MAX_FILE = 512};
 
 public:
-	enum { QUEUED, MODIFIED, RUNNING, COMPLETED, FAILED, CLOSING };
+	enum { READY, MODIFIED, QUEUED, RUNNING, COMPLETED, FAILED, CANCELLED };
 
 public:
-	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; m_nstatus = QUEUED; }
+	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; m_nstatus = READY; }
 	~CTask() { delete m_pfile; delete m_plog; }
 
 	void SetFileName(const char* szfile);
@@ -51,7 +59,7 @@ public:
 	void SetStatus(int n) { m_nstatus = n; }
 	int GetStatus() { return m_nstatus; }
 
-	void Save() { m_pfile->savefile(m_szfile); SetStatus(QUEUED); }
+	void Save() { if (m_nstatus == MODIFIED) { m_pfile->savefile(m_szfile); SetStatus(READY);} }
 	void Save(const char* szfile) { SetFileName(szfile); Save(); }
 
 protected:
@@ -109,6 +117,10 @@ public:
 	// run a task
 	bool RunTask(int i);
 
+	// run all tasks
+	void RunSession();
+
+	void NewSession();
 	bool SaveSession(const char* szfile);
 	bool OpenSession(const char* szfile);
 

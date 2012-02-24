@@ -46,11 +46,13 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnFileSave       (Fl_Widget* pw, void* pd);
 	void OnFileSaveAs     (Fl_Widget* pw, void* pd);
 	void OnFileClose      (Fl_Widget* pw, void* pd);
+	void OnFileCloseAll   (Fl_Widget* pw, void* pd);
 	void OnFileOpenSession(Fl_Widget* pw, void* pd);
 	void OnFileSaveSession(Fl_Widget* pw, void* pd);
 	void OnFileExit       (Fl_Widget* pw, void* pd);
 
 	void OnRunSelected(Fl_Widget* pw, void* pd);
+	void OnRunSession (Fl_Widget* pw, void* pd);
 	void OnRunStop    (Fl_Widget* pw, void* pd);
 
 	// other envent handlers

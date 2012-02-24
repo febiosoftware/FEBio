@@ -112,7 +112,7 @@ CWnd::~CWnd()
 //-----------------------------------------------------------------------------
 void CWnd::Update()
 {
-	m_pTask->Update();
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ void CWnd::OnFileSave(Fl_Widget* pw, void* pd)
 	else 
 	{
 		pt->Save();
-		pt->SetStatus(CTask::QUEUED);
+		pt->SetStatus(CTask::READY);
 		m_pTask->redraw();
 	}
 }
@@ -188,7 +188,7 @@ void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 		if (flx_file_save(szfile, "FEBio files (*.feb)\t*.feb") == FLX_OK)
 		{
 			pt->Save(szfile);
-			pt->SetStatus(CTask::QUEUED);
+			pt->SetStatus(CTask::READY);
 			m_pTask->redraw();
 		}
 	}
@@ -207,6 +207,15 @@ void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 		SelectFile();
 	}
 	else flx_alert("Nothing to remove.");
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileCloseAll(Fl_Widget* pw, void* pd)
+{
+	m_pText->buffer(0);
+	m_pOut->buffer(0);
+	m_pDoc->NewSession();
+	m_pTask->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -258,13 +267,20 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 }
 
 //-----------------------------------------------------------------------------
+void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
+{
+	m_pDoc->RunSession();
+	label(wnd_title);
+}
+
+//-----------------------------------------------------------------------------
 void CWnd::OnRunStop(Fl_Widget* pw, void* pd)
 {
 	int n = m_pTask->SelectedTask();
 	CTask* pt = m_pDoc->GetTask(n);
 	if (pt && (pt->GetStatus() == CTask::RUNNING))
 	{
-		pt->SetStatus(CTask::CLOSING);
+		pt->SetStatus(CTask::CANCELLED);
 	}
 }
 
@@ -302,6 +318,8 @@ void CWnd::OnFileOpenSession(Fl_Widget* pw, void* pd)
 	if (flx_file_open(szfile, "Session files\t*.ftm") == FLX_OK)
 	{
 		if (m_pDoc->OpenSession(szfile) == false) flx_error("Failed opening session");
+		m_pTask->Update();
+		SelectFile();
 	}
 }
 

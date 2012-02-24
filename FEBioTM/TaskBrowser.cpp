@@ -34,7 +34,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y, int W, int H)
 {
 	static char* szc[] = {"Path", "Status"};
-	static char* szs[] = {"Queued", "Modified", "Running", "Completed", "Failed", "Closing"};
+	static char* szs[] = {"", "Modified", "Queued", "Running", "Completed", "Failed", "Cancelled"};
 
     switch ( context ) 
 	{
@@ -109,6 +109,9 @@ CTaskBrowser::CTaskBrowser(int x, int y, int w, int h, CWnd* pwnd) : Flx_Group(x
 //-----------------------------------------------------------------------------
 void CTaskBrowser::Update()
 {
+	CDocument* pdoc = m_pWnd->GetDocument();
+	m_pg->rows(pdoc->Tasks());
+	if (m_pg->rows() > 0) m_pg->select_row(0);
 }
 
 //-----------------------------------------------------------------------------

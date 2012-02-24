@@ -28,7 +28,7 @@ FEM::FEM(CTask* pt)
 //-----------------------------------------------------------------------------
 void FEM::CheckInterruption()
 {
-	if (m_pTask && (m_pTask->GetStatus() == CTask::CLOSING)) 
+	if (m_pTask && (m_pTask->GetStatus() == CTask::CANCELLED)) 
 	{
 		throw ExitRequest();
 	}

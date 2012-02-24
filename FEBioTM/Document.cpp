@@ -6,6 +6,8 @@
 #include "Document.h"
 #include "Wnd.h"
 #include "MainApp.h"
+#include "XMLWriter.h"
+#include "FECore/XMLReader.h"
 
 extern void InitFEBioLibrary();
 extern const char* wnd_title;
@@ -72,6 +74,13 @@ CDocument::~CDocument()
 {
 }
 
+//-----------------------------------------------------------------------------
+void CDocument::NewSession()
+{
+	while (m_Task.empty() == false) RemoveTask(0);
+}
+
+//-----------------------------------------------------------------------------
 CTask* CDocument::GetTask(int i)
 {
 	if ((i>=0) && (i<(int)m_Task.size())) return m_Task[i];
@@ -168,7 +177,8 @@ bool CDocument::RunTask(int i)
 
 	ptb->DoneTracking();
 
-	pt->SetStatus(bret?CTask::COMPLETED:CTask::FAILED);
+	if (pt->GetStatus() != CTask::CANCELLED)
+		pt->SetStatus(bret?CTask::COMPLETED:CTask::FAILED);
 
 	// don't forget to clean up
 	delete plog;
@@ -178,13 +188,63 @@ bool CDocument::RunTask(int i)
 }
 
 //-----------------------------------------------------------------------------
+void CDocument::RunSession()
+{
+	// Add all tasks to the queue
+	for (int i=0; i<Tasks(); ++i)
+	{
+		CTask* pt = GetTask(i);
+		if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
+		pt->SetStatus(CTask::QUEUED);
+	}
+
+	// run all tasks
+	for (int i=0; i<Tasks(); ++i) RunTask(i);
+}
+
+//-----------------------------------------------------------------------------
 bool CDocument::SaveSession(const char* szfile)
 {
+	XMLWriter xml;
+	xml.open(szfile);
+	xml.add_branch("febio_tm_session");
+	for (int i=0; i<Tasks(); ++i)
+	{
+		CTask* pt = GetTask(i);
+		XMLElement e;
+		e.name("file");
+		e.add_attribute("name", pt->GetFileName());
+		xml.add_empty(e);
+	}
+	xml.close_branch();
+	xml.close();
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 bool CDocument::OpenSession(const char* szfile)
 {
+	XMLReader xml;
+	if (xml.Open(szfile) == false) return false;
+
+	XMLTag tag;
+	if (xml.FindTag("febio_tm_session", tag) == false) return false;
+
+	NewSession();
+
+	++tag;
+	do
+	{
+		if (tag == "file")
+		{
+			const char* szfile = tag.AttributeValue("name");
+			AddTask(szfile);
+		}
+		else throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+
+	xml.Close();
 	return true;
 }

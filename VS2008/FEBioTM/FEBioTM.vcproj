@@ -208,6 +208,10 @@
 				RelativePath="..\..\FEBioTM\Wnd.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\FEBioTM\XMLWriter.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -256,6 +260,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioTM\Wnd.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioTM\XMLWriter.h"
 				>
 			</File>
 		</Filter>
