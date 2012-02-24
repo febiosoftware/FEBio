@@ -176,3 +176,15 @@ bool CDocument::RunTask(int i)
 	// all done!
 	return bret;
 }
+
+//-----------------------------------------------------------------------------
+bool CDocument::SaveSession(const char* szfile)
+{
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool CDocument::OpenSession(const char* szfile)
+{
+	return true;
+}

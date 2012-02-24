@@ -195,7 +195,7 @@ void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 }
 
 //-----------------------------------------------------------------------------
-void CWnd::OnFileRemove(Fl_Widget* pw, void* pd)
+void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 {
 	int n = m_pTask->SelectedTask();
 	if (n>=0)
@@ -292,5 +292,25 @@ void CWnd::OnChangeText(Fl_Widget* pw, void* pd)
 	{
 		pt->SetStatus(CTask::MODIFIED);
 		m_pTask->redraw();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileOpenSession(Fl_Widget* pw, void* pd)
+{
+	char szfile[1024] = {0};
+	if (flx_file_open(szfile, "Session files\t*.ftm") == FLX_OK)
+	{
+		if (m_pDoc->OpenSession(szfile) == false) flx_error("Failed opening session");
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileSaveSession(Fl_Widget* pw, void* pd)
+{
+	char szfile[1024] = {0};
+	if (flx_file_save(szfile, "Session files\t*.ftm") == FLX_OK)
+	{
+		if (m_pDoc->SaveSession(szfile) == false) flx_error("Failed saving session");
 	}
 }

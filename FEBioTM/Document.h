@@ -109,6 +109,9 @@ public:
 	// run a task
 	bool RunTask(int i);
 
+	bool SaveSession(const char* szfile);
+	bool OpenSession(const char* szfile);
+
 protected:
 	vector<CTask*>	m_Task;
 };

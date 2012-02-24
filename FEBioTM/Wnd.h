@@ -42,11 +42,13 @@ public:
 	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
 
 public:	// --- M E N U   H A N D L E R S ---
-	void OnFileOpen  (Fl_Widget* pw, void* pd);
-	void OnFileSave  (Fl_Widget* pw, void* pd);
-	void OnFileSaveAs(Fl_Widget* pw, void* pd);
-	void OnFileRemove(Fl_Widget* pw, void* pd);
-	void OnFileExit  (Fl_Widget* pw, void* pd);
+	void OnFileOpen       (Fl_Widget* pw, void* pd);
+	void OnFileSave       (Fl_Widget* pw, void* pd);
+	void OnFileSaveAs     (Fl_Widget* pw, void* pd);
+	void OnFileClose      (Fl_Widget* pw, void* pd);
+	void OnFileOpenSession(Fl_Widget* pw, void* pd);
+	void OnFileSaveSession(Fl_Widget* pw, void* pd);
+	void OnFileExit       (Fl_Widget* pw, void* pd);
 
 	void OnRunSelected(Fl_Widget* pw, void* pd);
 	void OnRunStop    (Fl_Widget* pw, void* pd);
