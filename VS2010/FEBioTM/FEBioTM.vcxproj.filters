@@ -57,6 +57,9 @@
     <ClInclude Include="..\..\FEBioTM\TaskBrowser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioTM\XMLWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FEBioTM.rc">
@@ -89,6 +92,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioTM\TaskBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioTM\XMLWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

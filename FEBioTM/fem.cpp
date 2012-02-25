@@ -33,6 +33,7 @@ void FEM::CheckInterruption()
 		throw ExitRequest();
 	}
 	Fl::check();
+	Fl::flush();
 }
 
 //-----------------------------------------------------------------------------

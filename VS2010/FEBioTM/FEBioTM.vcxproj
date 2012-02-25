@@ -94,6 +94,7 @@
     <ClInclude Include="..\..\FEBioTM\targetver.h" />
     <ClInclude Include="..\..\FEBioTM\TaskBrowser.h" />
     <ClInclude Include="..\..\FEBioTM\Wnd.h" />
+    <ClInclude Include="..\..\FEBioTM\XMLWriter.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +110,7 @@
     <ClCompile Include="..\..\FEBioTM\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioTM\TaskBrowser.cpp" />
     <ClCompile Include="..\..\FEBioTM\Wnd.cpp" />
+    <ClCompile Include="..\..\FEBioTM\XMLWriter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -131,6 +131,13 @@ void CTaskBrowser::RemoveTask(int n)
 }
 
 //-----------------------------------------------------------------------------
+void CTaskBrowser::SelectTask(int n)
+{
+	m_pg->select_row(n);
+	m_pg->row_position(n);
+}
+
+//-----------------------------------------------------------------------------
 int CTaskBrowser::SelectedTask()
 {
 	for (int i=0; i<m_pg->rows(); ++i)

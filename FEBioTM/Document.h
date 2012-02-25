@@ -115,11 +115,9 @@ public:
 	CTask* GetTask(int i);
 
 	// run a task
-	bool RunTask(int i);
+	void RunTask(CTask* pt);
 
-	// run all tasks
-	void RunSession();
-
+	// sessions
 	void NewSession();
 	bool SaveSession(const char* szfile);
 	bool OpenSession(const char* szfile);

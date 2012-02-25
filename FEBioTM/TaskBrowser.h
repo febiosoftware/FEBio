@@ -42,6 +42,8 @@ public:
 
 	void RemoveTask(int n);
 
+	void SelectTask(int n);
+
 	int SelectedTask();
 
 	Fl_Progress* TrackSelectedTask();

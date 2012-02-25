@@ -121,11 +121,8 @@ void CDocument::RemoveTask(int n)
 }
 
 //-----------------------------------------------------------------------------
-bool CDocument::RunTask(int i)
+void CDocument::RunTask(CTask* pt)
 {
-	// get the task
-	CTask* pt = GetTask(i);
-
 	// save the file
 	if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
 
@@ -157,14 +154,14 @@ bool CDocument::RunTask(int i)
 	if (fem.Input(pt->GetFileName()) == false)
 	{
 		pt->SetStatus(CTask::FAILED);
-		return false;
+		return;
 	}
 
 	// initialize FE data
 	if (fem.Init() == false) 
 	{
 		pt->SetStatus(CTask::FAILED);
-		return false;
+		return;
 	}
 
 	// progress tracker
@@ -182,24 +179,6 @@ bool CDocument::RunTask(int i)
 
 	// don't forget to clean up
 	delete plog;
-
-	// all done!
-	return bret;
-}
-
-//-----------------------------------------------------------------------------
-void CDocument::RunSession()
-{
-	// Add all tasks to the queue
-	for (int i=0; i<Tasks(); ++i)
-	{
-		CTask* pt = GetTask(i);
-		if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
-		pt->SetStatus(CTask::QUEUED);
-	}
-
-	// run all tasks
-	for (int i=0; i<Tasks(); ++i) RunTask(i);
 }
 
 //-----------------------------------------------------------------------------

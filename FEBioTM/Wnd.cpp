@@ -251,25 +251,41 @@ void CWnd::SelectFile()
 //-----------------------------------------------------------------------------
 void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 {
-	int n = m_pTask->SelectedTask();
-	if ((n < 0) || (n >= m_pDoc->Tasks())) flx_error("No task selected");
-	else 
-	{
-		CTask* pt = m_pDoc->GetTask(n);
-		assert(pt);
-		m_pTabs->value(m_pTabs->child(1));
-		m_pTabs->do_callback();
-		Fl::check();
-		m_pDoc->RunTask(n);
-		m_pTask->redraw();
-		label(wnd_title);
-	}
+	CTask* pt = m_pDoc->GetTask(m_pTask->SelectedTask());
+	if (pt == 0) { flx_error("No task selected"); return; }
+
+	m_pTabs->value(m_pTabs->child(1));
+	m_pTabs->do_callback();
+	Fl::check();
+	m_pDoc->RunTask(pt);
+	m_pTask->redraw();
+	label(wnd_title);
 }
 
 //-----------------------------------------------------------------------------
 void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 {
-	m_pDoc->RunSession();
+	// Add all tasks to the queue
+	for (int i=0; i<m_pDoc->Tasks(); ++i)
+	{
+		CTask* pt = m_pDoc->GetTask(i);
+		if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
+		pt->SetStatus(CTask::QUEUED);
+	}
+	m_pTabs->value(m_pTabs->child(1));
+	m_pTask->redraw();
+	Fl::flush();
+
+	// run all tasks
+	for (int i=0; i<m_pDoc->Tasks(); ++i) 
+	{
+		CTask* pt = m_pDoc->GetTask(i);
+		m_pTask->SelectTask(i);
+		SelectFile();
+		m_pDoc->RunTask(pt);
+		Fl::flush();
+	}
+
 	label(wnd_title);
 }
 
