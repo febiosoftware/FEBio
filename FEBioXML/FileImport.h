@@ -12,10 +12,12 @@
 #include <stdio.h>
 
 //-----------------------------------------------------------------------------
+// Forward declaration of the FE model
 class FEModel;
 
 //-----------------------------------------------------------------------------
-//! Base class for file import classes
+//! Base class for file import classes. This class offers a simple error reporting
+//! mechanism and manages the FILE* pointer. 
 
 class FEFileImport  
 {

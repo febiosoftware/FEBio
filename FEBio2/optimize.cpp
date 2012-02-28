@@ -10,7 +10,7 @@
 #include <nag.h>
 #include <nage04.h>
 #include <time.h>
-#include "FECore/XMLReader.h"
+#include "FEBioXML/XMLReader.h"
 #include "FEBioLib/Timer.h"
 #include "console.h"
 

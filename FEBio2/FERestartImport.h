@@ -9,8 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FileImport.h"
-#include "FECore/XMLReader.h"
+#include "FEBioXML/FileImport.h"
+#include "FEBioXML/XMLReader.h"
 
 //-----------------------------------------------------------------------------
 //! Restart input file reader.

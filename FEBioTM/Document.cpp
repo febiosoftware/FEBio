@@ -7,7 +7,7 @@
 #include "Wnd.h"
 #include "MainApp.h"
 #include "XMLWriter.h"
-#include "FECore/XMLReader.h"
+#include "FEBioXML/XMLReader.h"
 
 extern void InitFEBioLibrary();
 extern const char* wnd_title;

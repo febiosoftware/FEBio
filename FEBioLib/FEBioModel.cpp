@@ -10,7 +10,7 @@
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
-#include "FEBioImport.h"
+#include "FEBioXML/FEBioImport.h"
 #include "log.h"
 
 //-----------------------------------------------------------------------------

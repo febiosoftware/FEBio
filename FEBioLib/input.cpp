@@ -2,8 +2,8 @@
 
 #include "stdafx.h"
 #include "FEBioModel.h"
-#include "FileImport.h"
-#include "FEBioImport.h"
+#include "FEBioXML/FileImport.h"
+#include "FEBioXML/FEBioImport.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
 #include "FERigidWallInterface.h"

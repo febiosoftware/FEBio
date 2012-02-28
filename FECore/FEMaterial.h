@@ -11,7 +11,6 @@
 
 #include "tens4d.h"
 #include "LoadCurve.h"		//---> can we delete this?
-#include "FECoordSysMap.h"
 #include "FEMaterialFactory.h"
 #include "FEParameterList.h"
 #include "FEMaterialPoint.h"

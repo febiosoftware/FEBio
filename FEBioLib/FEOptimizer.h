@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FECore/XMLReader.h"
+#include "FEBioXML/XMLReader.h"
 #include "FECore/FEModel.h"
 #include "NumCore/vector.h"
 #include <string.h>

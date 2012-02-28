@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "fem.h"
-#include "FECore/XMLReader.h"
+#include "FEBioXML/XMLReader.h"
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "fem.h"
-#include "FEBioLib/FEBioImport.h"
+#include "FEBioXML/FEBioImport.h"
 #include "FEBioLib/FERigidBody.h"
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"

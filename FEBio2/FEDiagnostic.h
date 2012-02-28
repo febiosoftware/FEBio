@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEModel.h"
-#include "FEBioLib/FEBioImport.h"
+#include "FEBioXML/FEBioImport.h"
 
 //-----------------------------------------------------------------------------
 //! The FEDiagnostic class is a base class that can be used to create

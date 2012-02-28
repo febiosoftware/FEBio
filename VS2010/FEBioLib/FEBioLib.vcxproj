@@ -512,7 +512,6 @@
     <ClInclude Include="..\..\FEBioLib\FEAnalysisStep.h" />
     <ClInclude Include="..\..\FEBioLib\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h" />
-    <ClInclude Include="..\..\FEBioLib\FEBioImport.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSolidDomain.h" />
@@ -629,7 +628,6 @@
     <ClInclude Include="..\..\FEBioLib\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FEViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEVonMisesPlasticity.h" />
-    <ClInclude Include="..\..\FEBioLib\FileImport.h" />
     <ClInclude Include="..\..\FEBioLib\geodesic.h" />
     <ClInclude Include="..\..\FEBioLib\log.h" />
     <ClInclude Include="..\..\FEBioLib\Logfile.h" />
@@ -657,7 +655,6 @@
     <ClCompile Include="..\..\FEBioLib\FEAnalysisStep.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEAugLagLinearConstraint.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FEBioImport.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSolidDomain.cpp" />
@@ -772,7 +769,6 @@
     <ClCompile Include="..\..\FEBioLib\FEVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEViscoElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEVonMisesPlasticity.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FileImport.cpp" />
     <ClCompile Include="..\..\FEBioLib\getapppath.cpp" />
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
