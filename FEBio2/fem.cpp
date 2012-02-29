@@ -9,7 +9,6 @@
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
 #include "FEBioLib/FERigidBody.h"
 #include "FEBioLib/log.h"
 #include "plugin.h"

@@ -1,9 +1,8 @@
 #pragma once
 #include "FEBioLib/FEBioModel.h"
-#include "FEBioPlot/PlotFile.h"
-#include "FEBioLib/Timer.h"
-#include "FEBioLib/DataStore.h"
 
+//-----------------------------------------------------------------------------
+// forward declaration of the task class.
 class CTask;
 
 //-----------------------------------------------------------------------------
@@ -20,6 +19,7 @@ public:
 	virtual void PopState ();
 
 protected:
+	//! copy the model
 	void ShallowCopy(FEM& fem);
 
 public:

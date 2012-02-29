@@ -6,14 +6,6 @@
 #define _FEM_H_07012006_
 
 #include "FEBioLib/FEBioModel.h"
-#include "FECore/DumpFile.h"
-#include "FECore/FEContactInterface.h"
-#include "FEBioLib/DataStore.h"
-#include "FEBioPlot/PlotFile.h"
-#include "FEBioLib/FESolute.h"
-
-#include <list>
-using namespace std;
 
 //-----------------------------------------------------------------------------
 //! The Finite Element Model class. 
