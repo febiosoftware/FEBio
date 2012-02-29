@@ -153,6 +153,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioXML\FERestartImport.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioXML\FileImport.cpp"
 				>
 			</File>
@@ -168,6 +172,10 @@
 			>
 			<File
 				RelativePath="..\..\FEBioXML\FEBioImport.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FERestartImport.h"
 				>
 			</File>
 			<File

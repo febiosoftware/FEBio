@@ -301,10 +301,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FERestartImport.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FETangentDiagnostic.cpp"
 				>
 			</File>
@@ -396,10 +392,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEPrintMatrixDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FERestartImport.h"
 				>
 			</File>
 			<File

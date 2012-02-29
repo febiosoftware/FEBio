@@ -36,9 +36,6 @@ public:
 	//! check for user interruption
 	virtual void CheckInterruption();
 
-	//! serialize data
-	virtual bool Serialize(DumpFile& ar) { return false; }
-
 private:
 	CTask*	m_pTask;
 };

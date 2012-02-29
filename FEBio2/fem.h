@@ -43,9 +43,6 @@ public:
 	//! Restart from restart point
 	bool Restart(const char* szfile);
 
-	//! Serialize the current state to/from restart file
-	bool Serialize(DumpFile& ar);
-
 	//! return a pointer to the named variable
 	double* FindParameter(const char* szname);
 
@@ -72,18 +69,6 @@ public:
 
 protected:
 	void ShallowCopy(FEM& fem);
-
-protected:
-	void SerializeMaterials   (DumpFile& ar);
-	void SerializeAnalysisData(DumpFile& ar);
-	void SerializeGeometry    (DumpFile& ar);
-	void SerializeMesh        (DumpFile& ar);
-	void SerializeContactData (DumpFile& ar);
-	void SerializeBoundaryData(DumpFile& ar);
-	void SerializeIOData      (DumpFile& ar);
-	void SerializeLoadData    (DumpFile& ar);
-	void SerializeConstants   (DumpFile& ar);
-	void SerializeDataStore   (DumpFile& ar);
 
 public:
 	bool	m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c

@@ -34,6 +34,23 @@ public:
 	//! dump data to archive for restart
 	void DumpData();
 
+protected: //! serialization for restarts
+	
+	//! Write or read data from archive
+	bool Serialize(DumpFile& ar);
+
+	// helper functions for serialization
+	void SerializeMaterials   (DumpFile& ar);
+	void SerializeAnalysisData(DumpFile& ar);
+	void SerializeGeometry    (DumpFile& ar);
+	void SerializeMesh        (DumpFile& ar);
+	void SerializeContactData (DumpFile& ar);
+	void SerializeBoundaryData(DumpFile& ar);
+	void SerializeIOData      (DumpFile& ar);
+	void SerializeLoadData    (DumpFile& ar);
+	void SerializeConstants   (DumpFile& ar);
+	void SerializeDataStore   (DumpFile& ar);
+
 protected: // --- initialization functions ---
 
 	//! Initialize mesh data
