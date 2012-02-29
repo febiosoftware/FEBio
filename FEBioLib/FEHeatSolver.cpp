@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEHeatSolver.h"
-#include "FEIsotropicFourier.h"
 #include "FEHeatFlux.h"
 #include "FECore/FENodeReorder.h"
 

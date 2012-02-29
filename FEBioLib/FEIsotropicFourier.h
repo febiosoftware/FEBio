@@ -15,7 +15,14 @@ public:
 	double	m_rho;	//!< density
 
 public:
+	//! get the material's conductivity tensor
 	void Conductivity(double D[3][3]);
+
+	//! get the material's capacitance
+	double Capacitance() { return m_c; }
+
+	//! get the material's density
+	double Density() { return m_rho; }
 
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();

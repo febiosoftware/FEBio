@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEHeatSolidDomain.h"
 #include "FECore/FEMesh.h"
-#include "FEBioLib/FEIsotropicFourier.h"
+#include "FEBioLib/FEHeatTransferMaterial.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEHeatSolidDomain::Clone()
@@ -111,7 +111,7 @@ void FEHeatSolidDomain::ElementConduction(FESolidElement& el, matrix& ke)
 	// conductivity matrix
 	double D[3][3];
 
-	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*m_pMat);
+	FEHeatTransferMaterial& mat = dynamic_cast<FEHeatTransferMaterial&>(*m_pMat);
 
 	// loop over all integration points
 	for (n=0; n<ni; ++n)
@@ -177,8 +177,10 @@ void FEHeatSolidDomain::ElementCapacitance(FESolidElement &el, matrix &ke, doubl
 	// zero stiffness matrix
 	ke.zero();
 
-	FEIsotropicFourier& mat = dynamic_cast<FEIsotropicFourier&>(*m_pMat);
-	double alpha = mat.m_c*mat.m_rho / dt;
+	FEHeatTransferMaterial& mat = dynamic_cast<FEHeatTransferMaterial&>(*m_pMat);
+	double c = mat.Capacitance();
+	double d = mat.Density();
+	double alpha = c*d/dt;
 
 	// loop over all integration points
 	for (n=0; n<ni; ++n)
