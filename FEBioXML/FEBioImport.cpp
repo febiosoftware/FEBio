@@ -1390,80 +1390,36 @@ bool FEBioMaterialSection::ParseUncoupledElasticMixture(XMLTag &tag, FEUncoupled
 //
 bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 {
-	const char* sztype = 0;
-	const char* szname = 0;
+	// see if we can find a material property with this name
+	int nc = pm->FindComponent(tag.Name());
+	if (nc == -1) throw XMLReader::InvalidTag(tag);
 
+	// get the material type
+	const char* sztype = tag.AttributeValue("type");
+
+	// get the material name
+	const char* szname = tag.AttributeValue("name", true);
+
+	// create a new material of this type
 	FEBioKernel& febio = FEBioKernel::GetInstance();
-	
-	// read the solid material
-	if (tag == "solid")
+	FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	// assign the new material to the corresponding material property
+	if (pm->SetComponent(nc, pmat) == false)
 	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. an elastic material)
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
-		
-		// don't allow rigid bodies
-		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
-		{
-			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the solid material pointer
-		pm->m_pSolid = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// parse the solid
-		ParseMaterial(tag, pme);
-		
-		return true;
+		clog.printbox("INPUT ERROR: Invalid %s definition in biphasic material %s\n", tag.Name(), pm->GetName());
+		throw XMLReader::Error();
 	}
-	else if (tag == "permeability")
-	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
+
+	// set the new material's name (if defined)
+	if (szname) pmat->SetName(szname);
 		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a permeability material)
-		FEHydraulicPermeability* pme = dynamic_cast<FEHydraulicPermeability*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the permeability pointer
-		pm->m_pPerm = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// parse the solid
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	// parse the new material
+	ParseMaterial(tag, pmat);
 	
-	return false;
+	// done
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1471,214 +1427,35 @@ bool FEBioMaterialSection::ParseBiphasicMaterial(XMLTag &tag, FEBiphasic *pm)
 //
 bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSolute *pm)
 {
-	const char* sztype = 0;
-	const char* szname = 0;
+	// see if we can find a material property with this name
+	int nc = pm->FindComponent(tag.Name());
+	if (nc == -1) throw XMLReader::InvalidTag(tag);
 
+	// get the material type
+	const char* sztype = tag.AttributeValue("type");
+		
+	// get the material name
+	const char* szname = tag.AttributeValue("name", true);
+
+	// create a new material of this type
 	FEBioKernel& febio = FEBioKernel::GetInstance();
-	
-	// read the solid material
-	if (tag == "solid")
-	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. an elastic material)
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
-		
-		// don't allow rigid bodies
-		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
-		{
-			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the solid material pointer
-		pm->m_pSolid = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// parse the solid
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else if (tag == "permeability")
-	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a permeability material)
-		FEHydraulicPermeability* pme = dynamic_cast<FEHydraulicPermeability*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid permeability %s in biphasic material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the permeability pointer
-		pm->m_pPerm = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else if (tag == "diffusivity")
-	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a diffusivity material)
-		FESoluteDiffusivity* pme = dynamic_cast<FESoluteDiffusivity*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid diffusivity %s in biphasic-solute material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the diffusivity pointer
-		pm->m_pDiff = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// set solute ID
-		pme->SetSoluteID(0);
+	FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else if (tag == "solubility")
+	// assign the new material to the corresponding material property
+	if (pm->SetComponent(nc, pmat) == false)
 	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a solubility material)
-		FESoluteSolubility* pme = dynamic_cast<FESoluteSolubility*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid solubility %s in biphasic-solute material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the solubility pointer
-		pm->m_pSolub = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
+		clog.printbox("INPUT ERROR: Invalid %s definition in biphasic material %s\n", tag.Name(), pm->GetName());
+		throw XMLReader::Error();
+	}
 
-		// set solute ID
-		pme->SetSoluteID(0);
+	// set the new material's name (if defined)
+	if (szname) pmat->SetName(szname);
 		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else if (tag == "osmotic_coefficient")
-	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
-		FEOsmoticCoefficient* pme = dynamic_cast<FEOsmoticCoefficient*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid osmotic coefficient %s in biphasic-solute material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the osmotic coefficient pointer
-		pm->m_pOsmC = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else if (tag == "supply")
-	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a osmotic coefficient material)
-		FESoluteSupply* pme = dynamic_cast<FESoluteSupply*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid supply %s in biphasic-solute material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the osmotic coefficient pointer
-		pm->m_pSupp = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	// parse the new material
+	ParseMaterial(tag, pmat);
 	
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1686,85 +1463,35 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 //
 bool FEBioMaterialSection::ParseSoluteMaterial(XMLTag &tag, FESolute *pm)
 {
-	const char* sztype = 0;
-	const char* szname = 0;
-	
+	// see if we can find a material property with this name
+	int nc = pm->FindComponent(tag.Name());
+	if (nc == -1) throw XMLReader::InvalidTag(tag);
+
+	// get the material type
+	const char* sztype = tag.AttributeValue("type");
+		
+	// get the material name
+	const char* szname = tag.AttributeValue("name", true);
+
+	// create a new material of this type
 	FEBioKernel& febio = FEBioKernel::GetInstance();
-	
-	// read the diffusivity material
-	if (tag == "diffusivity")
+	FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	// assign the new material to the corresponding material property
+	if (pm->SetComponent(nc, pmat) == false)
 	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a diffusivity material)
-		FESoluteDiffusivity* pme = dynamic_cast<FESoluteDiffusivity*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid diffusivity %s in solute material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the diffusivity pointer
-		pm->m_pDiff = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// set solute ID in diffusivity
-		pme->SetSoluteID(pm->GetSoluteID());
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
+		clog.printbox("INPUT ERROR: Invalid %s definition in biphasic material %s\n", tag.Name(), pm->GetName());
+		throw XMLReader::Error();
 	}
-	else if (tag == "solubility")
-	{
-		// get the material type
-		sztype = tag.AttributeValue("type");
+
+	// set the new material's name (if defined)
+	if (szname) pmat->SetName(szname);
 		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a solubility material)
-		FESoluteSolubility* pme = dynamic_cast<FESoluteSolubility*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid solubility %s in solute material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the solubility pointer
-		pm->m_pSolub = pme;
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// set solute ID in solubility
-		pme->SetSoluteID(pm->GetSoluteID());
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	// parse the new material
+	ParseMaterial(tag, pmat);
 	
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

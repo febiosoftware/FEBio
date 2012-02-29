@@ -15,7 +15,13 @@ END_PARAMETER_LIST();
 //! FEBiphasic constructor
 
 FEBiphasic::FEBiphasic()
-{ m_pSolid = 0; m_pPerm = 0; m_rhoTw = 0; m_phi0 = 0;}
+{ 
+	m_rhoTw = 0; 
+	m_phi0 = 0;
+
+	AddComponent<FEElasticMaterial      >(&m_pSolid, "solid"       );
+	AddComponent<FEHydraulicPermeability>(&m_pPerm , "permeability");
+}
 
 //-----------------------------------------------------------------------------
 void FEBiphasic::Init()

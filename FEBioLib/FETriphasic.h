@@ -124,18 +124,20 @@ public:
 	//! Serialization
 	void Serialize(DumpFile& ar);
 	
-public:
+public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration
-	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
 	double						m_rhoTw;		//!< true fluid density
-	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
-	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FESolute*					m_pSolute[2];	//!< pointer to solute materials
 	double						m_cFr;			//!< fixed charge density in reference configurations
 	double						m_Rgas;			//!< universal gas constant
 	double						m_Tabs;			//!< absolute temperature
 	double						m_Fc;			//!< Faraday's constant
 	double						m_penalty;		//!< penalty for enforcing electroneutrality
-	
+
+public: // material properties
+	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
+	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
+	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
+	FESolute*					m_pSolute[2];	//!< pointer to solute materials
+
 	DECLARE_PARAMETER_LIST();
 };

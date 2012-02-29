@@ -18,8 +18,21 @@ END_PARAMETER_LIST();
 //! FEBiphasicSolute constructor
 
 FEBiphasicSolute::FEBiphasicSolute()
-{	m_pPerm = 0; m_pDiff = 0; m_pSolub = 0; m_pOsmC = 0; m_pSupp = 0; 
-	m_phi0 = 0; m_rhoTw = 0; m_rhoTu = 0; m_Mu = 0; m_Rgas = 0; m_Tabs = 0; }
+{
+	m_phi0 = 0;
+	m_rhoTw = 0;
+	m_rhoTu = 0;
+	m_Mu = 0;
+	m_Rgas = 0;
+	m_Tabs = 0; 
+
+	AddComponent<FEElasticMaterial      >(&m_pSolid, "solid"              );
+	AddComponent<FEHydraulicPermeability>(&m_pPerm , "permeability"       );
+	AddComponent<FESoluteDiffusivity    >(&m_pDiff , "diffusivity"        );
+	AddComponent<FESoluteSolubility     >(&m_pSolub, "solubility"         );
+	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC , "osmotic_coefficient");
+	AddComponent<FESoluteSupply         >(&m_pSupp , "supply"             ); 
+}
 
 //-----------------------------------------------------------------------------
 void FEBiphasicSolute::Init()

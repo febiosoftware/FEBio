@@ -169,7 +169,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
 
-class FEBiphasicSolute : public FEMaterial
+class FEBiphasicSolute : public FEMultiMaterial
 {
 public:
 	FEBiphasicSolute();
@@ -223,19 +223,21 @@ public:
 	//! Serialization
 	void Serialize(DumpFile& ar);
 	
-public:
+public: // material parameters
 	double						m_rhoTw;		//!< true fluid density
 	double						m_rhoTu;		//!< true solute density
 	double						m_Mu;			//!< solute molecular weight
 	double						m_phi0;			//!< solid volume fraction in reference configuration
+	double						m_Rgas;			//!< universal gas constant
+	double						m_Tabs;			//!< absolute temperature
+
+public: // material properties
 	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
 	FESoluteDiffusivity*		m_pDiff;		//!< pointer to diffusivity material
 	FESoluteSolubility*			m_pSolub;		//!< pointer to solubility material
 	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
 	FESoluteSupply*				m_pSupp;		//!< pointer to solute supply material
-	double						m_Rgas;			//!< universal gas constant
-	double						m_Tabs;			//!< absolute temperature
-	
+
 	DECLARE_PARAMETER_LIST();
 };

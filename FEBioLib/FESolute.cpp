@@ -11,11 +11,13 @@ END_PARAMETER_LIST();
 //! FESolute constructor
 
 FESolute::FESolute()
-{	m_pDiff = 0;
-	m_pSolub = 0;
+{
 	m_rhoT = 0;
 	m_M = 0;
 	m_z = 0;
+
+	AddComponent<FESoluteDiffusivity>(&m_pDiff , "diffusivity");
+	AddComponent<FESoluteSolubility >(&m_pSolub, "solubility");
 }
 
 //-----------------------------------------------------------------------------
@@ -27,7 +29,7 @@ void FESolute::Init()
 
 	FESoluteData* psd = 0; // FEM::FindSD(m_ID); TODO: I can't compile this in FEBio2.
 	if (psd == 0) throw MaterialError("no match with global solute data");
-	m_z = psd->m_z;
+	m_z = (int) psd->m_z;
 	
 	if (m_rhoT < 0) throw MaterialError("density must be positive");
 	if (m_M < 0) throw MaterialError("molar_mass must be positive");

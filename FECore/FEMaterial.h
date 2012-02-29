@@ -157,6 +157,59 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Base class for materials that define multiple sub-components, such as
+//! biphasic, biphasic-solute, triphasic and solute material classes.
+class FEMultiMaterial : public FEMaterial
+{
+	class Property
+	{
+	public:
+		Property(const char* szname) { m_szname = szname; }
+		virtual ~Property() {}
+
+	public:
+		void SetName(const char* sz) { m_szname = sz; }
+		const char* GetName() { return m_szname; }
+
+		virtual FEMaterial* GetMaterial() = 0;
+
+		virtual bool SetMaterial(FEMaterial* pm) = 0;
+
+	protected:
+		const char*		m_szname;
+	};
+
+	template <class T> class Property_T : public Property
+	{
+	public:
+		Property_T(T** ppm, const char* szname) : Property(szname), m_ppm(ppm) { *ppm = 0; }
+		bool SetMaterial(FEMaterial* pm) { *m_ppm = dynamic_cast<T*>(pm); return ((*m_ppm) != 0); }
+		FEMaterial* GetMaterial() { return *m_ppm; }
+	private:
+		T**	m_ppm;
+	};
+
+public:
+	FEMultiMaterial(){}
+	~FEMultiMaterial(){}
+
+	// return nr of material properties
+	int Components() { return (int) m_Mat.size(); }
+
+	// add component (use this in derived material's constructor)
+	template<class T> void AddComponent(T** ppm, const char* szname) { m_Mat.push_back(new Property_T<T>(ppm, szname)); }
+
+	// get/set component attributes
+	FEMaterial* GetComponent(int n) { return m_Mat[n]->GetMaterial(); }
+	const char* GetComponentName(int n) { return m_Mat[n]->GetName(); }
+	bool SetComponent(int n, FEMaterial* pm) { return m_Mat[n]->SetMaterial(pm); }
+	int FindComponent(const char* sz);
+
+protected:
+	vector<Property*>	m_Mat;
+};
+
+//-----------------------------------------------------------------------------
 //! Global solute data
 //! This structure uniquely identifies a solute in multiphasic problems
 // TODO: Move this to a different file

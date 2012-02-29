@@ -83,7 +83,7 @@ class FEHydraulicPermeability : public FEMaterial
 //-----------------------------------------------------------------------------
 //! Base class for biphasic materials.
 
-class FEBiphasic : public FEMaterial
+class FEBiphasic : public FEMultiMaterial
 {
 public:
 	FEBiphasic();
@@ -124,9 +124,11 @@ public:
 	//! Serialization
 	void Serialize(DumpFile& ar);
 	
-public:
+public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
 	double						m_phi0;		//!< solid volume fraction in reference configuration
+
+public: // material properties
 	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
 	

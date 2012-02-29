@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //! Base class for solute materials.
 
-class FESolute : public FEMaterial
+class FESolute : public FEMultiMaterial
 {
 public:
 	FESolute();
@@ -33,10 +33,12 @@ public:
 private:
 	int						m_ID;		//!< solute ID
 	
-public:
+public: // material parameters
 	double					m_rhoT;		//!< true solute density
 	double					m_M;		//!< solute molecular weight
 	int						m_z;		//!< charge number of solute
+
+public: // material properties
 	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
 	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
 	

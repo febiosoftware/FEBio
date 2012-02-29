@@ -129,3 +129,17 @@ void FENestedMaterial::Serialize(DumpFile &ar)
 		m_pBase = 0;
 	}
 }
+
+//=============================================================================
+// FEMultiMaterial
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+int FEMultiMaterial::FindComponent(const char* sz)
+{
+	for (int i=0; i<(int) m_Mat.size(); ++i)
+	{
+		if (strcmp(m_Mat[i]->GetName(), sz) == 0) return i;
+	}
+	return -1;
+}
