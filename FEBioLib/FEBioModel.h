@@ -2,6 +2,8 @@
 #include "FECore/FEModel.h"
 #include "DataStore.h"
 #include "Timer.h"
+#include "FEElasticMixture.h"
+#include "FEUncoupledElasticMixture.h"
 
 //-----------------------------------------------------------------------------
 //!< The FEBio model specializes the FEModel class to implement FEBio specific
@@ -24,7 +26,10 @@ public:
 	//! Solves the problem
 	bool Solve(Progress& prg);
 
-public:
+	//! find a boundary condition from the ID
+	FEBoundaryCondition* FindBC(int nid);
+
+public: // --- virtual I/O functions ---
 	//! write to plot file
 	void Write();
 
@@ -34,7 +39,7 @@ public:
 	//! dump data to archive for restart
 	void DumpData();
 
-protected: //! serialization for restarts
+protected: //! --- serialization for restarts ---
 	
 	//! Write or read data from archive
 	bool Serialize(DumpFile& ar);
@@ -50,6 +55,22 @@ protected: //! serialization for restarts
 	void SerializeLoadData    (DumpFile& ar);
 	void SerializeConstants   (DumpFile& ar);
 	void SerializeDataStore   (DumpFile& ar);
+
+public: //! --- parameter functions ---
+
+	//! return a pointer to the named variable
+	double* FindParameter(const char* szname);
+
+	//! return a pointer to the parameter variable
+	double* ReturnParameter(FEParam* pp, const int index);
+	
+	//! return a pointer to the named variable in a solid mixture
+	double* FindSolidMixtureParameter(const char* szvar, const int index, FEElasticMixture* pme);
+	double* FindUncoupledSolidMixtureParameter(const char* szvar, const int index, FEUncoupledElasticMixture* pme);
+
+	//! Evaluate parameter list
+	void EvaluateParameterList(FEParameterList& pl);
+	void EvaluateMaterialParameters(FEMaterial* pm);
 
 protected: // --- initialization functions ---
 
