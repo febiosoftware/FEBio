@@ -367,10 +367,6 @@
 				RelativePath="..\..\FECore\tens4d.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\FECore\XMLReader.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -587,10 +583,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\vec3d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\XMLReader.h"
 				>
 			</File>
 		</Filter>
