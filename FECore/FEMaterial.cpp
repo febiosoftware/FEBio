@@ -135,11 +135,12 @@ void FENestedMaterial::Serialize(DumpFile &ar)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-int FEMultiMaterial::FindComponent(const char* sz)
+int FEMultiMaterial::FindComponent(const char* sz, int nid)
 {
 	for (int i=0; i<(int) m_Mat.size(); ++i)
 	{
-		if (strcmp(m_Mat[i]->GetName(), sz) == 0) return i;
+		Property* p = m_Mat[i];
+		if ((strcmp(p->GetName(), sz) == 0) && (p->GetID() == nid)) return i;
 	}
 	return -1;
 }

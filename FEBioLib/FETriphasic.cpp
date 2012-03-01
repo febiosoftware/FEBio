@@ -21,13 +21,17 @@ END_PARAMETER_LIST();
 //! FETriphasic constructor
 
 FETriphasic::FETriphasic()
-{	m_pPerm = 0;
-	m_pOsmC = 0; 
-	m_phi0 = 0;
-	m_rhoTw = 0;
-	m_pSolute[0] = m_pSolute[1] = 0;
+{	
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
+	m_phi0 = 0;
+	m_rhoTw = 0;
+
+	AddComponent<FEElasticMaterial      >(&m_pSolid    , "solid"              );
+	AddComponent<FEHydraulicPermeability>(&m_pPerm     , "permeability"       );
+	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC     , "osmotic_coefficient");
+	AddComponent<FESolute               >(&m_pSolute[0], "solute",           0);
+	AddComponent<FESolute               >(&m_pSolute[1], "solute",           1);
 }
 
 //-----------------------------------------------------------------------------
