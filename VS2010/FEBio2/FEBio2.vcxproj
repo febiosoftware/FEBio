@@ -539,7 +539,6 @@
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FERestartImport.h" />
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\Interrupt.h" />
     <ClInclude Include="..\..\FEBio2\plugin.h" />
@@ -561,7 +560,6 @@
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio2\levmar.cpp" />
