@@ -527,9 +527,6 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 		assert(pm);
 
-		// extract the elastic component
-		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-
 		// for the enhanced strain hex we need a slightly different procedure
 		// for calculating the element's stress. For this element, the stress
 		// is evaluated using an average deformation gradient.

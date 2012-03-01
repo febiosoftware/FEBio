@@ -298,8 +298,8 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 	}
 
 	// let's calculate the stresses
-	// get the elastic material
-	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+	// first, let's get the solid material
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
 
 	// create a material point
 	// TODO: this will set the Q variable to a unit-matrix
@@ -599,7 +599,7 @@ void FEUT4Domain::NodalStiffnessMatrix(FENLSolver *psolver)
 	vector<int> en;
 
 	// Get the material for the domain
-	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
 
 	// loop over all the nodes
 	int NN = (int) m_Node.size(), ni, nj;
@@ -769,7 +769,7 @@ tens4ds FEUT4Domain::Cvol(const tens4ds& C, const mat3ds& S)
 
 //-----------------------------------------------------------------------------
 //! Calculates the nodal material stiffness contribution
-void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMaterial* pme)
+void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMaterial* pme)
 {
 	// get the number of elements this nodes connects
 	int NE = m_NEL.Valence(node.inode);

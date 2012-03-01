@@ -81,7 +81,7 @@ protected:
 	void NodalGeometryStiffness(UT4NODE& node, matrix& ke);
 
 	//! nodal material stiffness contribution
-	void NodalMaterialStiffness(UT4NODE& node, matrix& ke, FEElasticMaterial* pme);
+	void NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMaterial* pme);
 
 protected:
 	//! calculate the volume of a tet element
