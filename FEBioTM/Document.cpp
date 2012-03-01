@@ -96,9 +96,7 @@ CTask* CDocument::AddTask(const char* szfile)
 
 	// create a text buffer
 	Fl_Text_Buffer* pb = new Fl_Text_Buffer;
-	// TODO: the buffer size has to be a multiple of 100 due to a bug in the Fl_Text_Buffer. 
-	//       I need to test whether this bug has been fixed.
-	int nret = pb->appendfile(szfile, 100*1024);
+	int nret = pb->appendfile(szfile);
 	pt->SetTextBuffer(pb);
 
 	// create an output buffer
