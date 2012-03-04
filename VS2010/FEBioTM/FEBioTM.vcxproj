@@ -84,6 +84,7 @@
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioTM\DlgEditFind.h" />
     <ClInclude Include="..\..\FEBioTM\Document.h" />
     <ClInclude Include="..\..\FEBioTM\FEBioTM.h" />
     <ClInclude Include="..\..\FEBioTM\fem.h" />
@@ -101,6 +102,7 @@
     <ResourceCompile Include="FEBioTM.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioTM\DlgEditFind.cpp" />
     <ClCompile Include="..\..\FEBioTM\Document.cpp" />
     <ClCompile Include="..\..\FEBioTM\FEBioTM.cpp" />
     <ClCompile Include="..\..\FEBioTM\fem.cpp" />

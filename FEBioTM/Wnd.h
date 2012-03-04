@@ -51,6 +51,8 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnFileSaveSession(Fl_Widget* pw, void* pd);
 	void OnFileExit       (Fl_Widget* pw, void* pd);
 
+	void OnEditFind(Fl_Widget* pw, void* pd);
+
 	void OnRunSelected(Fl_Widget* pw, void* pd);
 	void OnRunSession (Fl_Widget* pw, void* pd);
 	void OnRunStop    (Fl_Widget* pw, void* pd);

@@ -12,6 +12,8 @@
 #include <flx_message.h>
 #include <FL/Fl_Preferences.H>
 #include "MainApp.h"
+#include <flx_message.h>
+#include "DlgEditFind.h"
 
 #ifdef WIN32
 #define IDI_ICON1	101
@@ -245,6 +247,31 @@ void CWnd::SelectFile()
 	{
 		m_pText->buffer(pt->GetTextBuffer());
 		m_pOut->buffer(pt->GetOutputBuffer());
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnEditFind(Fl_Widget* pw, void* pd)
+{
+	// TODO: find which text buffer is active
+	//       for now, let's assume the input buffer
+	CDlgEditFind dlg;
+	if (dlg.DoModal() == FLX_OK)
+	{
+		const char* sz = dlg.m_sztxt;
+		if (sz[0] != 0)
+		{
+			int npos = m_pText->insert_position();
+			Fl_Text_Buffer* pbuf = m_pText->buffer();
+			int found = pbuf->search_forward(npos, sz, &npos, (dlg.m_bcase?1:0));
+			if (found)
+			{
+				pbuf->select(npos, npos+strlen(sz));
+				m_pText->insert_position(npos + strlen(sz));
+				m_pText->show_insert_position();
+			}
+			else flx_alert("Could not find string:\n\n%s", sz);
+		}
 	}
 }
 
