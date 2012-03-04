@@ -52,6 +52,7 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnFileExit       (Fl_Widget* pw, void* pd);
 
 	void OnEditFind(Fl_Widget* pw, void* pd);
+	void OnEditFindAgain(Fl_Widget* pw, void* pd);
 
 	void OnRunSelected(Fl_Widget* pw, void* pd);
 	void OnRunSession (Fl_Widget* pw, void* pd);
@@ -70,6 +71,8 @@ protected:
 
 protected:
 	CDocument*	m_pDoc;	//!< pointer to document
+	char		m_szfind[1024];	//!< last find string
+	bool		m_bcase;		//!< case sensitive search
 
 	CMenu*				m_pMenu;	//!< the menu
 

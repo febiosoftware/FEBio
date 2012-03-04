@@ -35,6 +35,9 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 	Fl::background(236, 233, 216);
 	Fl::set_color((Fl_Color)1, 255, 200, 200);
 
+	m_szfind[0] = 0;
+	m_bcase = false;
+
 	Fl_Group* pg;
 	begin();
 	{
@@ -256,23 +259,29 @@ void CWnd::OnEditFind(Fl_Widget* pw, void* pd)
 	// TODO: find which text buffer is active
 	//       for now, let's assume the input buffer
 	CDlgEditFind dlg;
+	strcpy(dlg.m_sztxt, m_szfind);
+	dlg.m_bcase = m_bcase;
 	if (dlg.DoModal() == FLX_OK)
 	{
-		const char* sz = dlg.m_sztxt;
-		if (sz[0] != 0)
-		{
-			int npos = m_pText->insert_position();
-			Fl_Text_Buffer* pbuf = m_pText->buffer();
-			int found = pbuf->search_forward(npos, sz, &npos, (dlg.m_bcase?1:0));
-			if (found)
-			{
-				pbuf->select(npos, npos+strlen(sz));
-				m_pText->insert_position(npos + strlen(sz));
-				m_pText->show_insert_position();
-			}
-			else flx_alert("Could not find string:\n\n%s", sz);
-		}
+		strcpy(m_szfind, dlg.m_sztxt);
+		m_bcase = dlg.m_bcase;
+		if (m_szfind[0] != 0) OnEditFindAgain(pw, pd);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnEditFindAgain(Fl_Widget* pw, void* pd)
+{
+	int npos = m_pText->insert_position();
+	Fl_Text_Buffer* pbuf = m_pText->buffer();
+	int found = pbuf->search_forward(npos, m_szfind, &npos, (m_bcase?1:0));
+	if (found)
+	{
+		pbuf->select(npos, npos+strlen(m_szfind));
+		m_pText->insert_position(npos + strlen(m_szfind));
+		m_pText->show_insert_position();
+	}
+	else flx_alert("Could not find string:\n\n%s", m_szfind);
 }
 
 //-----------------------------------------------------------------------------
