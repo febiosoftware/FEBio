@@ -41,6 +41,8 @@ public:
 
 	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
 
+	void ClearOutputWnd();
+
 public:	// --- M E N U   H A N D L E R S ---
 	void OnFileOpen       (Fl_Widget* pw, void* pd);
 	void OnFileSave       (Fl_Widget* pw, void* pd);

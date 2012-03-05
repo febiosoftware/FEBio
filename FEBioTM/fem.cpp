@@ -28,12 +28,17 @@ FEM::FEM(CTask* pt)
 //-----------------------------------------------------------------------------
 void FEM::CheckInterruption()
 {
+	// get a lock
+/*	Fl::lock();
 	if (m_pTask && (m_pTask->GetStatus() == CTask::CANCELLED)) 
 	{
+		// release lock
+		Fl::unlock();
 		throw ExitRequest();
 	}
-	Fl::check();
-	Fl::flush();
+	// release lock
+	Fl::unlock();
+*/
 }
 
 //-----------------------------------------------------------------------------

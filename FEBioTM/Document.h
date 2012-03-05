@@ -11,71 +11,26 @@
 
 #include "FEM.h"
 #include "FEBioLib/log.h"
-#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Progress.H>
 #include <FL/Fl.H>
+#include "Task.h"
 
 class CWnd;
-
-//-----------------------------------------------------------------------------
-// The task defines a problem to be run with FEBio. It has several states:
-// - READY = File is read in and awaits to be scheduled.
-// - MODIFIED = File has been modified. Will be saved automatically when run.
-// - QUEUED = File is scheduled to be run.
-// - RUNNING = File is being run.
-// - COMPLETED = File has run and terminated successfully.
-// - FAILED = File has run but did not terminate successfully.
-// - CANCELLED = Run was cancelled by the user before terminating.
-class CTask
-{
-	enum {MAX_FILE = 512};
-
-public:
-	enum { READY, MODIFIED, QUEUED, RUNNING, COMPLETED, FAILED, CANCELLED };
-
-public:
-	CTask() { m_szfile[0] = 0; m_pfile = 0; m_plog = 0; m_nstatus = READY; }
-	~CTask() { delete m_pfile; delete m_plog; }
-
-	void SetFileName(const char* szfile);
-	const char* GetFileName() { return m_szfile; }
-
-	const char* GetFileTitle();
-
-	void GetFilePath(char* sz);
-
-	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pfile = pb; }
-	Fl_Text_Buffer* GetTextBuffer() { return m_pfile; }
-
-	void SetOutputBuffer(Fl_Text_Buffer* pb) { m_plog = pb; }
-	Fl_Text_Buffer* GetOutputBuffer() { return m_plog; }
-
-	void Clearlog()
-	{
-		m_plog->select(0, m_plog->length());
-		m_plog->remove_selection();	
-	}
-
-	void SetStatus(int n) { m_nstatus = n; }
-	int GetStatus() { return m_nstatus; }
-
-	void Save() { if (m_nstatus == MODIFIED) { m_pfile->savefile(m_szfile); SetStatus(READY);} }
-	void Save(const char* szfile) { SetFileName(szfile); Save(); }
-
-protected:
-	char			m_szfile[MAX_FILE];		//!< file name
-	Fl_Text_Buffer*	m_pfile;				//!< text buffer for editing
-	Fl_Text_Buffer*	m_plog;					//!< log buffer
-	int				m_nstatus;				//!< status
-};
 
 //-----------------------------------------------------------------------------
 class FETMProgress : public Progress
 {
 public:
-	FETMProgress(CWnd* pwnd, CTask* pt, Fl_Progress* pw) : m_pWnd(pwnd), m_pTask(pt), m_pw(pw) { pw->maximum(100.f); pw->minimum(0.f); pw->value(0.f); }
+	FETMProgress(FEM* pfem, CWnd* pwnd, CTask* pt, Fl_Progress* pw) : m_pfem(pfem), m_pWnd(pwnd), m_pTask(pt), m_pw(pw) { m_bstatus = false; pw->maximum(100.f); pw->minimum(0.f); pw->value(0.f); }
 	void SetProgress(double f);
+
+	FEM* GetFEM() { return m_pfem; }
+	void SetStatus(bool b) { m_bstatus = b; }
+	bool GetStatus() { return m_bstatus; }
+
 protected:
+	bool			m_bstatus;
+	FEM*			m_pfem;
 	Fl_Progress*	m_pw;
 	CWnd*			m_pWnd;
 	CTask*			m_pTask;

@@ -67,17 +67,20 @@ CWnd* FLXGetMainWnd() { return theapp.GetMainWnd(); }
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+//-------------------------------------------------------------------
 CMainApp::CMainApp() : m_prefs(Fl_Preferences::USER, "FEBio2", "FEBioTM")
 {
 	m_pMainWnd = 0;
 	m_pDoc     = 0;
 }
 
+//-------------------------------------------------------------------
 CMainApp::~CMainApp()
 {
 	delete m_pDoc;
 }
 
+//-------------------------------------------------------------------
 bool CMainApp::Init()
 {
 	// setup FLTK
@@ -103,6 +106,7 @@ bool CMainApp::Init()
 	return true;
 }
 
+//-------------------------------------------------------------------
 bool CMainApp::Load(const char* szfilename)
 {
 	// load the initial project
@@ -114,8 +118,15 @@ bool CMainApp::Load(const char* szfilename)
 	return true;
 }
 
+//-------------------------------------------------------------------
 int CMainApp::Run() 
 {
+	// Enable multi-thread support by locking from the main
+	// thread.  Fl::wait() and Fl::run() call Fl::unlock() and
+	// Fl::lock() as needed to release control to the child threads
+	// when it is safe to do so...
+	Fl::lock();
+
 	// message loop is handled by FLTK
 	return Fl::run();
 }

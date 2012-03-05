@@ -74,6 +74,7 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 						m_pOut->box(FL_DOWN_BOX);
 						m_pOut->color(FL_BLACK);
 						m_pOut->textcolor(FL_WHITE);
+						m_pOut->buffer(new Fl_Text_Buffer);
 						pg->resizable(m_pOut);
 					}
 					pg->end();
@@ -115,6 +116,15 @@ CWnd::~CWnd()
 }
 
 //-----------------------------------------------------------------------------
+// clear the output window
+void CWnd::ClearOutputWnd()
+{
+	Fl_Text_Buffer* plog = m_pOut->buffer();
+	plog->select(0, plog->length());
+	plog->remove_selection();	
+}
+
+//-----------------------------------------------------------------------------
 void CWnd::Update()
 {
 	
@@ -151,7 +161,6 @@ bool CWnd::OpenFile(const char* szfile)
 	{
 		m_pTask->AddTask(pt);
 		m_pText->buffer(pt->GetTextBuffer());
-		m_pOut->buffer(pt->GetOutputBuffer());
 	}
 	return (pt != 0);
 }
@@ -206,7 +215,6 @@ void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 	if (n>=0)
 	{
 		m_pText->buffer(0);
-		m_pOut->buffer(0);
 		m_pDoc->RemoveTask(n);
 		m_pTask->RemoveTask(n);
 		SelectFile();
@@ -249,7 +257,6 @@ void CWnd::SelectFile()
 	if (pt)
 	{
 		m_pText->buffer(pt->GetTextBuffer());
-		m_pOut->buffer(pt->GetOutputBuffer());
 	}
 }
 

@@ -93,6 +93,7 @@
     <ClInclude Include="..\..\FEBioTM\Menu.h" />
     <ClInclude Include="..\..\FEBioTM\stdafx.h" />
     <ClInclude Include="..\..\FEBioTM\targetver.h" />
+    <ClInclude Include="..\..\FEBioTM\Task.h" />
     <ClInclude Include="..\..\FEBioTM\TaskBrowser.h" />
     <ClInclude Include="..\..\FEBioTM\Wnd.h" />
     <ClInclude Include="..\..\FEBioTM\XMLWriter.h" />
@@ -110,6 +111,7 @@
     <ClCompile Include="..\..\FEBioTM\MainApp.cpp" />
     <ClCompile Include="..\..\FEBioTM\Menu.cpp" />
     <ClCompile Include="..\..\FEBioTM\stdafx.cpp" />
+    <ClCompile Include="..\..\FEBioTM\Task.cpp" />
     <ClCompile Include="..\..\FEBioTM\TaskBrowser.cpp" />
     <ClCompile Include="..\..\FEBioTM\Wnd.cpp" />
     <ClCompile Include="..\..\FEBioTM\XMLWriter.cpp" />

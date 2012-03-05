@@ -63,6 +63,9 @@
     <ClInclude Include="..\..\FEBioTM\DlgEditFind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioTM\Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FEBioTM.rc">
@@ -101,6 +104,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioTM\DlgEditFind.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioTM\Task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

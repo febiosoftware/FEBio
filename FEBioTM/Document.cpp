@@ -8,58 +8,47 @@
 #include "MainApp.h"
 #include "XMLWriter.h"
 #include "FEBioXML/XMLReader.h"
+#include <FL/threads.h>
 
 extern void InitFEBioLibrary();
 extern const char* wnd_title;
 
 //-----------------------------------------------------------------------------
-void CTask::SetFileName(const char* szfile)
-{
-	m_szfile[0] = 0;
-	int l = strlen(szfile)+1;
-	assert((l>1) && (l<MAX_FILE));
-	if ((l > 1) && (l<MAX_FILE)) strncpy(m_szfile, szfile, l);
-}
-
-//-----------------------------------------------------------------------------
-const char* CTask::GetFileTitle()
-{
-	char* c1 = strrchr(m_szfile, '\\');
-	char* c2 = strrchr(m_szfile, '/');
-	if ((c1 == 0) && (c2 == 0)) return m_szfile;
-	if (c1 == 0) return c2+1;
-	if (c2 == 0) return c1+1;
-	if (c1 < c2) return c2+1; else return c1+1;
-}
-
-//-----------------------------------------------------------------------------
-void CTask::GetFilePath(char* szpath)
-{
-	char* c1 = strrchr(m_szfile, '\\');
-	char* c2 = strrchr(m_szfile, '/');
-	if ((c1 == 0) && (c2 == 0)) strcpy(szpath, m_szfile);
-	if ((c1 == 0) || (c2 > c1)) strncpy(szpath, m_szfile, c2 - m_szfile);
-	if ((c2 == 0) || (c1 > c2)) strncpy(szpath, m_szfile, c1 - m_szfile);
-}
-
-//-----------------------------------------------------------------------------
 void LogBuffer::print(const char* sz)
 {
+	// obtain a lock before we change the display
+	Fl::lock();
+
+	// update the UI
 	m_plog->insert(sz);
 	m_plog->show_insert_position();
-//	m_plog->redraw();
-	Fl::check();
+
+	// release the lock
+	Fl::unlock();
+
+	// notify the main thread to update the display
+	Fl::awake((void*) 0);
 }
 
 //-----------------------------------------------------------------------------
 void FETMProgress::SetProgress(double f)
 {
-	static char sz[1024] = {0};
+	// obtain a lock before we change the window title
+	Fl::lock();
+
+	// for some reason this causes the program to deadlock
+/*	static char sz[1024] = {0};
 	int n = (int) f;
 	sprintf(sz, "(%d%%) %s - %s", n, m_pTask->GetFileTitle(), wnd_title);
 	m_pWnd->label(sz);
-	m_pw->value((float) f); 
-	Fl::check();
+*/
+	m_pw->value((float) f);
+
+	// releas the lock
+	Fl::unlock();
+
+	// notify the main thread to update the display
+	Fl::awake((void*) 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -99,10 +88,6 @@ CTask* CDocument::AddTask(const char* szfile)
 	int nret = pb->appendfile(szfile);
 	pt->SetTextBuffer(pb);
 
-	// create an output buffer
-	pb = new Fl_Text_Buffer;
-	pt->SetOutputBuffer(pb);
-
 	m_Task.push_back(pt);
 	return pt;
 }
@@ -119,8 +104,27 @@ void CDocument::RemoveTask(int n)
 }
 
 //-----------------------------------------------------------------------------
+void* febio_func(void* pd)
+{
+	FETMProgress* prg = (FETMProgress*)(pd);
+	FEM* pfem = prg->GetFEM();
+	bool bret = pfem->Solve(*prg);
+	prg->SetStatus(bret);
+
+	// clean up
+	delete pfem;
+	delete prg;
+
+	// done
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 void CDocument::RunTask(CTask* pt)
 {
+	// make sure no task is running
+	if (CTask::m_prun != 0) return;
+
 	// save the file
 	if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
 
@@ -129,54 +133,49 @@ void CDocument::RunTask(CTask* pt)
 	CTaskBrowser* ptb = pwnd->GetTaskBrowser();
 
 	// create a log buffer
-	LogBuffer* plog = new LogBuffer(pwnd->GetLogWnd());
+	static LogBuffer* plog = new LogBuffer(pwnd->GetLogWnd());
 	clog.SetLogStream(plog);
 
-	// clear the log
-	pt->Clearlog();
+	// clear the output window
+	pwnd->ClearOutputWnd();
 
 	// create the FEM object
-	FEM fem(pt);
+	FEM* pfem = new FEM(pt);
 
 	// set the default output file names
 	char szbase[1024] = {0}, szfile[1024] = {0};
 	strcpy(szbase, pt->GetFileName());
 	char* ch = strrchr(szbase, '.'); assert(ch);
 	if (ch) *ch = 0;
-	sprintf(szfile, "%s.log", szbase); fem.SetLogFilename(szfile);
-	sprintf(szfile, "%s.plt", szbase); fem.SetPlotFilename(szfile);
-	sprintf(szfile, "%s.dmp", szbase); fem.SetDumpFilename(szfile);
-	fem.SetInputFilename(pt->GetFileName());
+	sprintf(szfile, "%s.log", szbase); pfem->SetLogFilename(szfile);
+	sprintf(szfile, "%s.plt", szbase); pfem->SetPlotFilename(szfile);
+	sprintf(szfile, "%s.dmp", szbase); pfem->SetDumpFilename(szfile);
+	pfem->SetInputFilename(pt->GetFileName());
 
 	// load the data from file
-	if (fem.Input(pt->GetFileName()) == false)
+	if (pfem->Input(pt->GetFileName()) == false)
 	{
 		pt->SetStatus(CTask::FAILED);
+		delete pfem;
 		return;
 	}
 
 	// initialize FE data
-	if (fem.Init() == false) 
+	if (pfem->Init() == false) 
 	{
 		pt->SetStatus(CTask::FAILED);
+		delete pfem;
 		return;
 	}
 
 	// progress tracker
-	FETMProgress prg(pwnd, pt, ptb->TrackSelectedTask());
+	FETMProgress* prg = new FETMProgress(pfem, pwnd, pt, ptb->TrackSelectedTask());
 
 	pt->SetStatus(CTask::RUNNING);
 
 	// solve the problem
-	bool bret = fem.Solve(prg);
-
-	ptb->DoneTracking();
-
-	if (pt->GetStatus() != CTask::CANCELLED)
-		pt->SetStatus(bret?CTask::COMPLETED:CTask::FAILED);
-
-	// don't forget to clean up
-	delete plog;
+	Fl_Thread thread_id;
+	fl_create_thread(thread_id, febio_func, prg);
 }
 
 //-----------------------------------------------------------------------------
