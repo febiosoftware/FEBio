@@ -1,6 +1,8 @@
 #pragma once
 #include <FL/Fl_Text_Display.H>
 
+class Progress;
+
 //-----------------------------------------------------------------------------
 // The task defines a problem to be run with FEBio. It has several states:
 // - READY = File is read in and awaits to be scheduled.
@@ -56,12 +58,16 @@ public:
 	void SetProgress(float f) { m_prg = f; }
 	float GetProgress() { return m_prg; }
 
+	// run this task
+	void Run(Progress& prg);
+	static CTask* GetRunningTask() { return m_prun; }
+
 protected:
 	char			m_szfile[MAX_FILE];		//!< file name
 	Fl_Text_Buffer*	m_pfile;				//!< text buffer for editing
 	int				m_nstatus;				//!< status
 	float			m_prg;					//!< progress indicator
 
-public:
+private:
 	static CTask*	m_prun;	// this is the task that is running
 };

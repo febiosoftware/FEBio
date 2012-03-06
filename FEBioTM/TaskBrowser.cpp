@@ -152,9 +152,8 @@ int CTaskBrowser::SelectedTask()
 }
 
 //-----------------------------------------------------------------------------
-Fl_Progress* CTaskBrowser::TrackSelectedTask()
+Fl_Progress* CTaskBrowser::TrackTask(int nrow)
 {
-	int nrow = SelectedTask();
 	m_pg->show_progress(nrow);
 	return m_pg->GetProgressBar();
 }

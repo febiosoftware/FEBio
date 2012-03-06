@@ -301,49 +301,35 @@ void CWnd::OnEditFindAgain(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 {
+	// get the selected task
 	CTask* pt = m_pDoc->GetTask(m_pTask->SelectedTask());
 	if (pt == 0) { flx_error("No task selected"); return; }
 
-	if (m_pTabs)
-	{
-		m_pTabs->value(m_pTabs->child(1));
-		m_pTabs->do_callback();
-	}
+	// show the output window
+	m_pTabs->value(m_pTabs->child(1));
+	m_pTabs->do_callback();
+
+	// run the task
 	m_pDoc->RunTask(pt);
 }
 
 //-----------------------------------------------------------------------------
 void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 {
-	// Add all tasks to the queue
-	for (int i=0; i<m_pDoc->Tasks(); ++i)
-	{
-		CTask* pt = m_pDoc->GetTask(i);
-		if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
-		pt->SetStatus(CTask::QUEUED);
-	}
+	// show the output window
 	if (m_pTabs) m_pTabs->value(m_pTabs->child(1));
 	m_pTask->redraw();
 
-	// run all tasks
-	for (int i=0; i<m_pDoc->Tasks(); ++i) 
-	{
-		CTask* pt = m_pDoc->GetTask(i);
-		m_pTask->SelectTask(i);
-		SelectFile();
-		m_pDoc->RunTask(pt);
-	}
+	// run the session
+	m_pDoc->RunSession();
 }
 
 //-----------------------------------------------------------------------------
+// Stop the task that is currently running
 void CWnd::OnRunStop(Fl_Widget* pw, void* pd)
 {
-	int n = m_pTask->SelectedTask();
-	CTask* pt = m_pDoc->GetTask(n);
-	if (pt && (pt->GetStatus() == CTask::RUNNING))
-	{
-		pt->SetStatus(CTask::CANCELLED);
-	}
+	CTask* pt = CTask::GetRunningTask();
+	if (pt) pt->SetStatus(CTask::CANCELLED);
 }
 
 //-----------------------------------------------------------------------------

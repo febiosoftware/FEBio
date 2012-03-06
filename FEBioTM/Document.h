@@ -21,18 +21,11 @@ class CWnd;
 class FETMProgress : public Progress
 {
 public:
-	FETMProgress(FEM* pfem, CWnd* pwnd, CTask* pt, Fl_Progress* pw);
+	FETMProgress(Fl_Progress* pw);
 	void SetProgress(double f);
 
-	FEM* GetFEM() { return m_pfem; }
-	CWnd* GetWnd() { return m_pWnd; }
-	CTask* GetTask() { return m_pTask; }
-
 protected:
-	FEM*			m_pfem;
 	Fl_Progress*	m_pw;
-	CWnd*			m_pWnd;
-	CTask*			m_pTask;
 };
 
 //-----------------------------------------------------------------------------
@@ -71,10 +64,16 @@ public:
 	// run a task
 	void RunTask(CTask* pt);
 
+	// run all queued tasks
+	void RunSession();
+
 	// sessions
 	void NewSession();
 	bool SaveSession(const char* szfile);
 	bool OpenSession(const char* szfile);
+
+protected:
+	void RunQueue();
 
 protected:
 	vector<CTask*>	m_Task;

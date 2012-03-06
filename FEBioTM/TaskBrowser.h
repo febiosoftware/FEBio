@@ -46,7 +46,7 @@ public:
 
 	int SelectedTask();
 
-	Fl_Progress* TrackSelectedTask();
+	Fl_Progress* TrackTask(int nrow);
 
 	void DoneTracking();
 

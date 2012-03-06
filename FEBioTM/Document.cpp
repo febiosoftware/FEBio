@@ -12,6 +12,8 @@
 
 extern void InitFEBioLibrary();
 
+static Fl_Thread thread_id = -1;
+
 //-----------------------------------------------------------------------------
 void LogBuffer::print(const char* sz)
 {
@@ -30,7 +32,7 @@ void LogBuffer::print(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-FETMProgress::FETMProgress(FEM* pfem, CWnd* pwnd, CTask* pt, Fl_Progress* pw) : m_pfem(pfem), m_pWnd(pwnd), m_pTask(pt), m_pw(pw)
+FETMProgress::FETMProgress(Fl_Progress* pw) : m_pw(pw)
 {
 	pw->maximum(100.f); 
 	pw->minimum(0.f); 
@@ -107,89 +109,117 @@ void CDocument::RemoveTask(int n)
 //-----------------------------------------------------------------------------
 void* febio_func(void* pd)
 {
-	FETMProgress* prg = (FETMProgress*)(pd);
-	FEM* pfem = prg->GetFEM();
-
-	CTask* pt = prg->GetTask();
-	Fl::lock();
-	CTask::m_prun = pt;
-	pt->SetStatus(CTask::RUNNING);
-	Fl::unlock();
-
-	bool bret = pfem->Solve(*prg);
-
-	Fl::lock();
-	pt->SetStatus(bret?CTask::COMPLETED:CTask::FAILED);
-	CWnd* pwnd = prg->GetWnd();
+	// get the GUI components
+	CWnd* pwnd = (CWnd*) pd;
+	CDocument* pdoc = pwnd->GetDocument();
 	CTaskBrowser* ptb = pwnd->GetTaskBrowser();
-	ptb->DoneTracking();
-	Fl::unlock();
 
-	Fl::awake((void*)0);
+	LogBuffer log(pwnd->GetLogWnd());
+	clog.SetLogStream(&log);
 
-	// clean up
-	delete pfem;
-	delete prg;
+	// continue looping until queue is empty
+	int itask = -1;
+	do
+	{
+		// find a queued task
+		Fl::lock();
+		itask = -1;
+		for (int i=0; i<pdoc->Tasks(); ++i)
+		{
+			if (pdoc->GetTask(i)->GetStatus() == CTask::QUEUED)
+			{
+				itask = i;
+				break;
+			}
+		}
+		Fl::unlock();
+
+		// if task found, run the task
+		if (itask != -1)
+		{
+			// get the task
+			CTask* pt = pdoc->GetTask(itask);
+
+			// lock the display
+			Fl_Progress* pw = 0;
+			Fl::lock();
+			{
+				// clear the output wnd
+				pwnd->ClearOutputWnd();
+
+				// tell the task browser to track this task
+				pw = ptb->TrackTask(itask);
+			}
+			Fl::unlock();
+			Fl::awake((void*)0);
+
+			// set-up the progress tracker
+			FETMProgress prg(pw);
+
+			// run the task
+			pt->Run(prg);
+
+			// done tracking
+			Fl::lock();
+			{
+				ptb->DoneTracking();
+			}
+			Fl::unlock();
+			Fl::awake((void*)0);
+		}
+	}
+	while (itask != -1);
 
 	// done
+	Fl::lock();
+	thread_id = -1;
+	Fl::unlock();
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void CDocument::RunQueue()
+{
+	if (thread_id == -1)
+	{
+		fl_create_thread(thread_id, febio_func, (void*) FLXGetMainWnd());
+	}
 }
 
 //-----------------------------------------------------------------------------
 void CDocument::RunTask(CTask* pt)
 {
-	// make sure no task is running
-	if (CTask::m_prun != 0) return;
+	// make sure this task is not running
+	if (pt->GetStatus() == CTask::RUNNING) return;
 
-	// save the file
+	// save the file if necessary
 	if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
 
-	CWnd* pwnd = FLXGetMainWnd();
+	// add the file to the queue
+	pt->SetStatus(CTask::QUEUED);
 
-	CTaskBrowser* ptb = pwnd->GetTaskBrowser();
+	// run the queue
+	RunQueue();
+}
 
-	// create a log buffer
-	static LogBuffer* plog = new LogBuffer(pwnd->GetLogWnd());
-	clog.SetLogStream(plog);
-
-	// clear the output window
-	pwnd->ClearOutputWnd();
-
-	// create the FEM object
-	FEM* pfem = new FEM(pt);
-
-	// set the default output file names
-	char szbase[1024] = {0}, szfile[1024] = {0};
-	strcpy(szbase, pt->GetFileName());
-	char* ch = strrchr(szbase, '.'); assert(ch);
-	if (ch) *ch = 0;
-	sprintf(szfile, "%s.log", szbase); pfem->SetLogFilename(szfile);
-	sprintf(szfile, "%s.plt", szbase); pfem->SetPlotFilename(szfile);
-	sprintf(szfile, "%s.dmp", szbase); pfem->SetDumpFilename(szfile);
-	pfem->SetInputFilename(pt->GetFileName());
-
-	// load the data from file
-	if (pfem->Input(pt->GetFileName()) == false)
+//-----------------------------------------------------------------------------
+void CDocument::RunSession()
+{
+	// add all tasks to the queue
+	for (int i=0; i<Tasks(); ++i)
 	{
-		pt->SetStatus(CTask::FAILED);
-		delete pfem;
-		return;
+		// get the next task
+		CTask* pt = GetTask(i);
+
+		// save if necessary
+		if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
+
+		// only add the task if it is not running
+		if (pt->GetStatus() != CTask::RUNNING) pt->SetStatus(CTask::QUEUED);
 	}
 
-	// initialize FE data
-	if (pfem->Init() == false) 
-	{
-		pt->SetStatus(CTask::FAILED);
-		delete pfem;
-		return;
-	}
-
-	// progress tracker
-	FETMProgress* prg = new FETMProgress(pfem, pwnd, pt, ptb->TrackSelectedTask());
-
-	// solve the problem
-	Fl_Thread thread_id;
-	fl_create_thread(thread_id, febio_func, prg);
+	// run the queue
+	RunQueue();
 }
 
 //-----------------------------------------------------------------------------
