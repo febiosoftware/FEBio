@@ -8,7 +8,6 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 {
     rows(0);				// how many rows
     row_header(0);          // enable row headers (along left)
-    row_height_all(20);     // default height of rows
     row_resize(0);          // disable row resizing
 
     cols(2);				// how many columns
@@ -18,10 +17,13 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
     col_resize(0);          // enable column resizing
 
 	// the one-and-only progress bar
-	m_pg = new Fl_Progress(X+W/2, Y+H/2, 0, 0);
-	m_pg->hide();
-	m_pg->selection_color(FL_GREEN);
-	m_nrow = -1;
+	begin();
+	{
+		m_pg = new Fl_Progress(X+W/2, Y+H/2, 10, 10);
+		m_pg->hide();
+		m_pg->selection_color(FL_GREEN);
+		m_nrow = -1;
+	}
 	end();
 
 	type(Fl_Table_Row::SELECT_SINGLE);
@@ -50,13 +52,14 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 		return; 
      case CONTEXT_CELL:                        // Draw data in cells
 		 {
+			 if ((ROW == m_nrow) && (COL == 1) && m_pg->visible()) return;
+
 			 bool b = (row_selected(ROW)==1);
 			CDocument* pdoc = m_pWnd->GetDocument();
 			CTask* pt = pdoc->GetTask(ROW);
 			 fl_push_clip(X,Y,W,H);
 			 // Draw cell bg
 			 fl_color((b?selection_color():FL_WHITE)); fl_rectf(X,Y,W,H);
-			 if ((ROW == m_nrow) && (COL == 1) && m_pg->visible()) return;
 			 // Draw cell data
 			 fl_color(FL_GRAY0); fl_draw((COL == 0? pt->GetFileName() : szs[pt->GetStatus()]), X+5,Y,W-5,H, (COL == 0 ? FL_ALIGN_LEFT : FL_ALIGN_CENTER));
 			 // Draw box border
@@ -70,11 +73,13 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 }
 
 //-----------------------------------------------------------------------------
+
 void CTaskTable::resize(int X, int Y, int W, int H)
 {
 	Fl_Table_Row::resize(X, Y, W, H);
     col_width(0,W-WIDTH);      // default width of columns
     col_width(1,WIDTH-4);      // default width of columns
+	if (m_pg->visible()) show_progress(m_nrow);
 }
 
 //-----------------------------------------------------------------------------
@@ -83,8 +88,8 @@ void CTaskTable::show_progress(int nrow)
 	int X, Y, W, H;
 	m_nrow = nrow;
 	find_cell(CONTEXT_CELL, nrow, 1, X, Y, W, H);
-	m_pg->resize(X+1, Y+2, W-2, 18);
-	m_pg->show();
+	m_pg->resize(X, Y, W, H);
+	if (m_pg->visible() == 0) m_pg->show();
 }
 
 //-----------------------------------------------------------------------------
@@ -120,6 +125,7 @@ void CTaskBrowser::AddTask(CTask *pt)
 	// add a row
 	int N = m_pg->rows();
 	m_pg->rows(N+1);
+    m_pg->row_height_all(20); // default height of rows
 	m_pg->select_row(N);
 }
 

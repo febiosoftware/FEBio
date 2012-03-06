@@ -9,7 +9,7 @@ class CTask;
 //-----------------------------------------------------------------------------
 class CTaskTable : public Fl_Table_Row
 {
-	enum { WIDTH = 100 };
+	enum { WIDTH = 100, HEIGHT = 10 };
 
 public:
 	CTaskTable(int X, int Y, int W, int H, CWnd* pwnd);

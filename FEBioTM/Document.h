@@ -21,15 +21,14 @@ class CWnd;
 class FETMProgress : public Progress
 {
 public:
-	FETMProgress(FEM* pfem, CWnd* pwnd, CTask* pt, Fl_Progress* pw) : m_pfem(pfem), m_pWnd(pwnd), m_pTask(pt), m_pw(pw) { m_bstatus = false; pw->maximum(100.f); pw->minimum(0.f); pw->value(0.f); }
+	FETMProgress(FEM* pfem, CWnd* pwnd, CTask* pt, Fl_Progress* pw);
 	void SetProgress(double f);
 
 	FEM* GetFEM() { return m_pfem; }
-	void SetStatus(bool b) { m_bstatus = b; }
-	bool GetStatus() { return m_bstatus; }
+	CWnd* GetWnd() { return m_pWnd; }
+	CTask* GetTask() { return m_pTask; }
 
 protected:
-	bool			m_bstatus;
 	FEM*			m_pfem;
 	Fl_Progress*	m_pw;
 	CWnd*			m_pWnd;

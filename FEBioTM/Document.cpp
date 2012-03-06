@@ -11,7 +11,6 @@
 #include <FL/threads.h>
 
 extern void InitFEBioLibrary();
-extern const char* wnd_title;
 
 //-----------------------------------------------------------------------------
 void LogBuffer::print(const char* sz)
@@ -31,17 +30,19 @@ void LogBuffer::print(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+FETMProgress::FETMProgress(FEM* pfem, CWnd* pwnd, CTask* pt, Fl_Progress* pw) : m_pfem(pfem), m_pWnd(pwnd), m_pTask(pt), m_pw(pw)
+{
+	pw->maximum(100.f); 
+	pw->minimum(0.f); 
+	pw->value(0.f); 
+}
+
+//-----------------------------------------------------------------------------
 void FETMProgress::SetProgress(double f)
 {
-	// obtain a lock before we change the window title
+	// obtain a lock before we change the progress bar
 	Fl::lock();
 
-	// for some reason this causes the program to deadlock
-/*	static char sz[1024] = {0};
-	int n = (int) f;
-	sprintf(sz, "(%d%%) %s - %s", n, m_pTask->GetFileTitle(), wnd_title);
-	m_pWnd->label(sz);
-*/
 	m_pw->value((float) f);
 
 	// releas the lock
@@ -108,8 +109,23 @@ void* febio_func(void* pd)
 {
 	FETMProgress* prg = (FETMProgress*)(pd);
 	FEM* pfem = prg->GetFEM();
+
+	CTask* pt = prg->GetTask();
+	Fl::lock();
+	CTask::m_prun = pt;
+	pt->SetStatus(CTask::RUNNING);
+	Fl::unlock();
+
 	bool bret = pfem->Solve(*prg);
-	prg->SetStatus(bret);
+
+	Fl::lock();
+	pt->SetStatus(bret?CTask::COMPLETED:CTask::FAILED);
+	CWnd* pwnd = prg->GetWnd();
+	CTaskBrowser* ptb = pwnd->GetTaskBrowser();
+	ptb->DoneTracking();
+	Fl::unlock();
+
+	Fl::awake((void*)0);
 
 	// clean up
 	delete pfem;
@@ -170,8 +186,6 @@ void CDocument::RunTask(CTask* pt)
 
 	// progress tracker
 	FETMProgress* prg = new FETMProgress(pfem, pwnd, pt, ptb->TrackSelectedTask());
-
-	pt->SetStatus(CTask::RUNNING);
 
 	// solve the problem
 	Fl_Thread thread_id;

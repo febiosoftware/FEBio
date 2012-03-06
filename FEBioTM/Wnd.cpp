@@ -38,6 +38,10 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 	m_szfind[0] = 0;
 	m_bcase = false;
 
+	m_pTabs = 0;
+	m_pText = 0;
+	m_pOut = 0;
+
 	Fl_Group* pg;
 	begin();
 	{
@@ -106,7 +110,7 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 	show();
 #endif
 
-	m_pTabs->do_callback();
+	if (m_pTabs) m_pTabs->do_callback();
 }
 
 //-----------------------------------------------------------------------------
@@ -119,9 +123,12 @@ CWnd::~CWnd()
 // clear the output window
 void CWnd::ClearOutputWnd()
 {
-	Fl_Text_Buffer* plog = m_pOut->buffer();
-	plog->select(0, plog->length());
-	plog->remove_selection();	
+	if (m_pOut)
+	{
+		Fl_Text_Buffer* plog = m_pOut->buffer();
+		plog->select(0, plog->length());
+		plog->remove_selection();	
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -160,7 +167,7 @@ bool CWnd::OpenFile(const char* szfile)
 	if (pt)
 	{
 		m_pTask->AddTask(pt);
-		m_pText->buffer(pt->GetTextBuffer());
+		if (m_pText) m_pText->buffer(pt->GetTextBuffer());
 	}
 	return (pt != 0);
 }
@@ -214,7 +221,7 @@ void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 	int n = m_pTask->SelectedTask();
 	if (n>=0)
 	{
-		m_pText->buffer(0);
+		if (m_pText) m_pText->buffer(0);
 		m_pDoc->RemoveTask(n);
 		m_pTask->RemoveTask(n);
 		SelectFile();
@@ -225,8 +232,8 @@ void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnFileCloseAll(Fl_Widget* pw, void* pd)
 {
-	m_pText->buffer(0);
-	m_pOut->buffer(0);
+	if (m_pText) m_pText->buffer(0);
+	if (m_pOut) m_pOut->buffer(0);
 	m_pDoc->NewSession();
 	m_pTask->Update();
 }
@@ -256,7 +263,7 @@ void CWnd::SelectFile()
 	CTask* pt = GetDocument()->GetTask(m_pTask->SelectedTask());
 	if (pt)
 	{
-		m_pText->buffer(pt->GetTextBuffer());
+		if (m_pText) m_pText->buffer(pt->GetTextBuffer());
 	}
 }
 
@@ -297,12 +304,12 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 	CTask* pt = m_pDoc->GetTask(m_pTask->SelectedTask());
 	if (pt == 0) { flx_error("No task selected"); return; }
 
-	m_pTabs->value(m_pTabs->child(1));
-	m_pTabs->do_callback();
-	Fl::check();
+	if (m_pTabs)
+	{
+		m_pTabs->value(m_pTabs->child(1));
+		m_pTabs->do_callback();
+	}
 	m_pDoc->RunTask(pt);
-	m_pTask->redraw();
-	label(wnd_title);
 }
 
 //-----------------------------------------------------------------------------
@@ -315,9 +322,8 @@ void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 		if (pt->GetStatus() == CTask::MODIFIED) pt->Save();
 		pt->SetStatus(CTask::QUEUED);
 	}
-	m_pTabs->value(m_pTabs->child(1));
+	if (m_pTabs) m_pTabs->value(m_pTabs->child(1));
 	m_pTask->redraw();
-	Fl::flush();
 
 	// run all tasks
 	for (int i=0; i<m_pDoc->Tasks(); ++i) 
@@ -326,10 +332,7 @@ void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 		m_pTask->SelectTask(i);
 		SelectFile();
 		m_pDoc->RunTask(pt);
-		Fl::flush();
 	}
-
-	label(wnd_title);
 }
 
 //-----------------------------------------------------------------------------
