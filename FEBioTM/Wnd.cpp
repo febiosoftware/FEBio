@@ -311,6 +311,8 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 
 	// run the task
 	m_pDoc->RunTask(pt);
+
+	m_pTask->redraw();
 }
 
 //-----------------------------------------------------------------------------
@@ -325,11 +327,27 @@ void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 }
 
 //-----------------------------------------------------------------------------
-// Stop the task that is currently running
-void CWnd::OnRunStop(Fl_Widget* pw, void* pd)
+// Stop the task that the user has selected
+void CWnd::OnRunCancelSelected(Fl_Widget* pw, void* pd)
 {
-	CTask* pt = CTask::GetRunningTask();
-	if (pt) pt->SetStatus(CTask::CANCELLED);
+	CTask* pt = m_pDoc->GetTask(m_pTask->SelectedTask());
+	if (pt)
+	{
+		int n = pt->GetStatus();
+		if ((n==CTask::RUNNING)||(n==CTask::QUEUED)) pt->SetStatus(CTask::CANCELLED);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Stop all queued tasks
+void CWnd::OnRunCancelAll(Fl_Widget* pw, void* pd)
+{
+	for (int i=0; i<m_pDoc->Tasks(); ++i)
+	{
+		CTask* pt = m_pDoc->GetTask(i);
+		int n = pt->GetStatus();
+		if ((n==CTask::RUNNING)||(n==CTask::QUEUED)) pt->SetStatus(CTask::CANCELLED);
+	}
 }
 
 //-----------------------------------------------------------------------------

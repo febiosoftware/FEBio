@@ -56,9 +56,10 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnEditFind(Fl_Widget* pw, void* pd);
 	void OnEditFindAgain(Fl_Widget* pw, void* pd);
 
-	void OnRunSelected(Fl_Widget* pw, void* pd);
-	void OnRunSession (Fl_Widget* pw, void* pd);
-	void OnRunStop    (Fl_Widget* pw, void* pd);
+	void OnRunSelected      (Fl_Widget* pw, void* pd);
+	void OnRunSession       (Fl_Widget* pw, void* pd);
+	void OnRunCancelSelected(Fl_Widget* pw, void* pd);
+	void OnRunCancelAll     (Fl_Widget* pw, void* pd);
 
 	// other envent handlers
 	void OnSelectFile(Fl_Widget* pw, void* pd);
