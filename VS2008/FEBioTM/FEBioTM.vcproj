@@ -173,6 +173,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\FEBioTM\DlgEditFind.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioTM\Document.cpp"
 				>
 			</File>
@@ -201,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioTM\Task.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioTM\TaskBrowser.cpp"
 				>
 			</File>
@@ -218,6 +226,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\FEBioTM\DlgEditFind.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\FEBioTM\Document.h"
 				>
@@ -252,6 +264,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioTM\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioTM\Task.h"
 				>
 			</File>
 			<File
