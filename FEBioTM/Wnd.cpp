@@ -143,7 +143,6 @@ void CWnd::ClearOutputWnd()
 	pb->remove_selection();	
 }
 
-
 //-----------------------------------------------------------------------------
 void CWnd::ClearLogWnd()
 {
@@ -272,6 +271,24 @@ void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 			Fl_Text_Buffer* pb = m_pSel->buffer();
 			if (pb->savefile(szfile) != 0) flx_error("Failed saving text buffer to file.");
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileRevert(Fl_Widget* pw, void* pd)
+{
+	int n = m_pTask->SelectedTask();
+	CTask* pt = m_pDoc->GetTask(n);
+	if (pt == 0) flx_error("No task selected");
+	else 
+	{
+		if (pt->GetStatus() == CTask::MODIFIED)
+		{
+			if (flx_choice("This file has been modified. Are you sure you want to revert it?", "yes", "no", 0) == 1) return;
+		}
+
+		pt->Revert();
+		m_pTask->redraw();
 	}
 }
 

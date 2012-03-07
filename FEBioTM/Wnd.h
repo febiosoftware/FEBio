@@ -51,6 +51,7 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnFileOpen       (Fl_Widget* pw, void* pd);
 	void OnFileSave       (Fl_Widget* pw, void* pd);
 	void OnFileSaveAs     (Fl_Widget* pw, void* pd);
+	void OnFileRevert     (Fl_Widget* pw, void* pd);
 	void OnFileClose      (Fl_Widget* pw, void* pd);
 	void OnFileCloseAll   (Fl_Widget* pw, void* pd);
 	void OnFileOpenSession(Fl_Widget* pw, void* pd);

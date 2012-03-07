@@ -45,10 +45,14 @@ FETMProgress::FETMProgress(Fl_Progress* pw) : m_pw(pw)
 //-----------------------------------------------------------------------------
 void FETMProgress::SetProgress(double f)
 {
+	static char sz[256] = {0};
+
 	// obtain a lock before we change the progress bar
 	Fl::lock();
 
 	m_pw->value((float) f);
+	sprintf(sz, "%d%%", (int) f);
+	m_pw->label(sz);
 
 	// releas the lock
 	Fl::unlock();

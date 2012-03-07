@@ -54,6 +54,9 @@ public:
 	void Save() { if (m_nstatus == MODIFIED) { m_pfile->savefile(m_szfile); SetStatus(READY);} }
 	void Save(const char* szfile) { SetFileName(szfile); Save(); }
 
+	// reload the file
+	void Revert();
+
 	// get/set progress indicator
 	void SetProgress(float f) { m_prg = f; }
 	float GetProgress() { return m_prg; }

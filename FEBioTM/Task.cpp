@@ -39,6 +39,16 @@ void CTask::GetFilePath(char* szpath)
 }
 
 //-----------------------------------------------------------------------------
+void CTask::Revert()
+{
+	// clear the file buffer
+	m_pfile->select(0, m_pfile->length());
+	m_pfile->remove_selection();	
+	m_pfile->appendfile(m_szfile);
+	SetStatus(READY);
+}
+
+//-----------------------------------------------------------------------------
 void CTask::Run(Progress& prg)
 {
 	// set the status to running
