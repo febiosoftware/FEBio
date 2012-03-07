@@ -55,6 +55,7 @@ public:	// --- M E N U   H A N D L E R S ---
 
 	void OnEditFind(Fl_Widget* pw, void* pd);
 	void OnEditFindAgain(Fl_Widget* pw, void* pd);
+	void OnEditGoToLine(Fl_Widget* pw, void* pd);
 
 	void OnRunSelected      (Fl_Widget* pw, void* pd);
 	void OnRunSession       (Fl_Widget* pw, void* pd);

@@ -294,8 +294,26 @@ void CWnd::OnEditFindAgain(Fl_Widget* pw, void* pd)
 		pbuf->select(npos, npos+strlen(m_szfind));
 		m_pText->insert_position(npos + strlen(m_szfind));
 		m_pText->show_insert_position();
+		m_pText->take_focus();
 	}
 	else flx_alert("Could not find string:\n\n%s", m_szfind);
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnEditGoToLine(Fl_Widget* pw, void* pd)
+{
+	CDlgEditGoToLine dlg;
+	if (dlg.DoModal() == FLX_OK)
+	{
+		int nline = dlg.m_nline - 1;
+		if (nline < 0) nline = 0;
+
+		Fl_Text_Buffer* pbuf = m_pText->buffer();
+		int npos = pbuf->skip_lines(0, nline);
+		m_pText->insert_position(npos);
+		m_pText->show_insert_position();
+		m_pText->take_focus();
+	}
 }
 
 //-----------------------------------------------------------------------------
