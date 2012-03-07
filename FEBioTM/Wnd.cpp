@@ -110,7 +110,8 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 	show();
 #endif
 
-	if (m_pTabs) m_pTabs->do_callback();
+	m_pSel = m_pText;
+	m_pTabs->do_callback();
 }
 
 //-----------------------------------------------------------------------------
@@ -270,8 +271,6 @@ void CWnd::SelectFile()
 //-----------------------------------------------------------------------------
 void CWnd::OnEditFind(Fl_Widget* pw, void* pd)
 {
-	// TODO: find which text buffer is active
-	//       for now, let's assume the input buffer
 	CDlgEditFind dlg;
 	strcpy(dlg.m_sztxt, m_szfind);
 	dlg.m_bcase = m_bcase;
@@ -286,17 +285,30 @@ void CWnd::OnEditFind(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnEditFindAgain(Fl_Widget* pw, void* pd)
 {
-	int npos = m_pText->insert_position();
-	Fl_Text_Buffer* pbuf = m_pText->buffer();
+	int npos = m_pSel->insert_position();
+	Fl_Text_Buffer* pbuf = m_pSel->buffer();
 	int found = pbuf->search_forward(npos, m_szfind, &npos, (m_bcase?1:0));
 	if (found)
 	{
+		// search from the current position
 		pbuf->select(npos, npos+strlen(m_szfind));
-		m_pText->insert_position(npos + strlen(m_szfind));
-		m_pText->show_insert_position();
-		m_pText->take_focus();
+		m_pSel->insert_position(npos + strlen(m_szfind));
+		m_pSel->show_insert_position();
+		m_pSel->take_focus();
 	}
-	else flx_alert("Could not find string:\n\n%s", m_szfind);
+	else 
+	{
+		// wrap around to the beginning
+		int found = pbuf->search_forward(0, m_szfind, &npos, (m_bcase?1:0));
+		if (found)
+		{
+			pbuf->select(npos, npos+strlen(m_szfind));
+			m_pSel->insert_position(npos + strlen(m_szfind));
+			m_pSel->show_insert_position();
+			m_pSel->take_focus();
+		}
+		else flx_alert("Could not find string:\n\n%s", m_szfind);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -308,11 +320,11 @@ void CWnd::OnEditGoToLine(Fl_Widget* pw, void* pd)
 		int nline = dlg.m_nline - 1;
 		if (nline < 0) nline = 0;
 
-		Fl_Text_Buffer* pbuf = m_pText->buffer();
+		Fl_Text_Buffer* pbuf = m_pSel->buffer();
 		int npos = pbuf->skip_lines(0, nline);
-		m_pText->insert_position(npos);
-		m_pText->show_insert_position();
-		m_pText->take_focus();
+		m_pSel->insert_position(npos);
+		m_pSel->show_insert_position();
+		m_pSel->take_focus();
 	}
 }
 
@@ -371,7 +383,7 @@ void CWnd::OnRunCancelAll(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 {
-	Fl_Widget* ps = m_pTabs->value();
+	Fl_Group* ps = dynamic_cast<Fl_Group*>(m_pTabs->value()); assert(ps);
 	int n = m_pTabs->children();
 	for (int i=0; i<n; ++i) 
 	{
@@ -381,6 +393,9 @@ void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 	}
 	ps->labelfont(FL_HELVETICA_BOLD);
 	ps->selection_color(FL_GRAY);
+	Fl_Widget* pc = ps->child(0);
+	if (pc == m_pText) m_pSel = m_pText;
+	if (pc == m_pOut ) m_pSel = m_pOut;
 }
 
 //-----------------------------------------------------------------------------

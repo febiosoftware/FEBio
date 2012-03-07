@@ -7,6 +7,8 @@ class CDlgEditFind : public Flx_Dialog
 public:
 	CDlgEditFind();
 
+	int InitDialog();
+
 public:
 	bool	m_bcase;
 	char	m_sztxt[256];

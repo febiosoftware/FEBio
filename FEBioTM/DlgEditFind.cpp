@@ -4,6 +4,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Return_Button.H>
 #include <Flex.h>
+#include <assert.h>
 
 CDlgEditFind::CDlgEditFind() : Flx_Dialog(400, 150, "Find")
 {
@@ -26,6 +27,16 @@ CDlgEditFind::CDlgEditFind() : Flx_Dialog(400, 150, "Find")
 		pb = new Fl_Button       (W/2   , H-40, 70, 30, "Cancel"); AddCallback(pb, (FLX_CALLBACK) &Flx_Dialog::OnCancel);
 	}
 	end();
+}
+
+int CDlgEditFind::InitDialog()
+{
+	Flx_Dialog::InitDialog();
+	Fl_Input* pt = dynamic_cast<Fl_Input*>(child(0));
+	assert(pt);
+	pt->take_focus();
+	pt->position(0, pt->size());
+	return 1;
 }
 
 CDlgEditGoToLine::CDlgEditGoToLine() : Flx_Dialog(200, 100, "Go to line")

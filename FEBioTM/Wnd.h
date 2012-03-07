@@ -85,6 +85,8 @@ protected:
 	CTaskBrowser*		m_pTask;	//!< the task browser
 	Fl_Text_Editor*		m_pText;	//!< Text display
 	Fl_Text_Display*	m_pOut;		//!< output text display
+
+	Fl_Text_Display*	m_pSel;		//!< Target for editing
 };
 
 #endif // !defined(AFX_WND_H__793D79A3_EBE4_4660_8EE3_0016B7467520__INCLUDED_)

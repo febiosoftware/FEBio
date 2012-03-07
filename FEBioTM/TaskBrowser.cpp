@@ -116,7 +116,11 @@ void CTaskBrowser::Update()
 {
 	CDocument* pdoc = m_pWnd->GetDocument();
 	m_pg->rows(pdoc->Tasks());
-	if (m_pg->rows() > 0) m_pg->select_row(0);
+	if (m_pg->rows() > 0)
+	{
+		m_pg->row_height_all(20); // default height of rows
+		m_pg->select_row(0);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +137,11 @@ void CTaskBrowser::AddTask(CTask *pt)
 void CTaskBrowser::RemoveTask(int n)
 {
 	int N = m_pg->rows();
-	if (N > 0) m_pg->rows(N - 1);
+	if (N > 0)
+	{
+		m_pg->rows(N - 1);
+	    m_pg->row_height_all(20); // default height of rows
+	}
 }
 
 //-----------------------------------------------------------------------------
