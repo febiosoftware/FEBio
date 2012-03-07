@@ -228,31 +228,49 @@ void CWnd::OnFileOpen(Fl_Widget *pw, void *pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnFileSave(Fl_Widget* pw, void* pd)
 {
-	int n = m_pTask->SelectedTask();
-	CTask* pt = m_pDoc->GetTask(n);
-	if (pt == 0) flx_error("No task selected");
-	else 
+	if (m_pSel == 0) return;
+	if (m_pSel == m_pText)
 	{
-		pt->Save();
-		pt->SetStatus(CTask::READY);
-		m_pTask->redraw();
+		int n = m_pTask->SelectedTask();
+		CTask* pt = m_pDoc->GetTask(n);
+		if (pt == 0) flx_error("No task selected");
+		else 
+		{
+			pt->Save();
+			pt->SetStatus(CTask::READY);
+			m_pTask->redraw();
+		}
 	}
+	else OnFileSaveAs(pw, pd);
 }
 
 //-----------------------------------------------------------------------------
 void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 {
-	int n = m_pTask->SelectedTask();
-	CTask* pt = m_pDoc->GetTask(n);
-	if (pt == 0) flx_error("No task selected");
-	else 
+	if (m_pSel == 0) return;
+
+	char szfile[1024] = {0};
+	if (m_pSel == m_pText)
 	{
-		char szfile[1024] = {0};
-		if (flx_file_save(szfile, "FEBio files (*.feb)\t*.feb") == FLX_OK)
+		int n = m_pTask->SelectedTask();
+		CTask* pt = m_pDoc->GetTask(n);
+		if (pt == 0) flx_error("No task selected");
+		else 
 		{
-			pt->Save(szfile);
-			pt->SetStatus(CTask::READY);
-			m_pTask->redraw();
+			if (flx_file_save(szfile, "FEBio files (*.feb)\t*.feb") == FLX_OK)
+			{
+				pt->Save(szfile);
+				pt->SetStatus(CTask::READY);
+				m_pTask->redraw();
+			}
+		}
+	}
+	else
+	{
+		if (flx_file_save(szfile, "Text files (*.txt)\t*.txt") == FLX_OK)
+		{
+			Fl_Text_Buffer* pb = m_pSel->buffer();
+			if (pb->savefile(szfile) != 0) flx_error("Failed saving text buffer to file.");
 		}
 	}
 }
