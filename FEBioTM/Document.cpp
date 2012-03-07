@@ -21,6 +21,8 @@ void LogBuffer::print(const char* sz)
 	Fl::lock();
 
 	// update the UI
+	int N = m_plog->buffer()->length();
+	m_plog->insert_position(N);
 	m_plog->insert(sz);
 	m_plog->show_insert_position();
 
@@ -114,7 +116,7 @@ void* febio_func(void* pd)
 	CDocument* pdoc = pwnd->GetDocument();
 	CTaskBrowser* ptb = pwnd->GetTaskBrowser();
 
-	LogBuffer log(pwnd->GetLogWnd());
+	LogBuffer log(pwnd->GetOutputWnd());
 	clog.SetLogStream(&log);
 
 	// continue looping until queue is empty

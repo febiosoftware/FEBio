@@ -124,12 +124,9 @@ CWnd::~CWnd()
 // clear the output window
 void CWnd::ClearOutputWnd()
 {
-	if (m_pOut)
-	{
-		Fl_Text_Buffer* plog = m_pOut->buffer();
-		plog->select(0, plog->length());
-		plog->remove_selection();	
-	}
+	Fl_Text_Buffer* plog = m_pOut->buffer();
+	plog->select(0, plog->length());
+	plog->remove_selection();	
 }
 
 //-----------------------------------------------------------------------------
@@ -233,10 +230,35 @@ void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnFileCloseAll(Fl_Widget* pw, void* pd)
 {
-	if (m_pText) m_pText->buffer(0);
-	if (m_pOut) m_pOut->buffer(0);
+	m_pText->buffer(0);
 	m_pDoc->NewSession();
 	m_pTask->Update();
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileOpenSession(Fl_Widget* pw, void* pd)
+{
+	char szfile[1024] = {0};
+	if (flx_file_open(szfile, "Session files\t*.ftm") == FLX_OK)
+	{
+		// close the current session
+		OnFileCloseAll(0,0);
+
+		// open the new session
+		if (m_pDoc->OpenSession(szfile) == false) flx_error("Failed opening session");
+		m_pTask->Update();
+		SelectFile();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnFileSaveSession(Fl_Widget* pw, void* pd)
+{
+	char szfile[1024] = {0};
+	if (flx_file_save(szfile, "Session files\t*.ftm") == FLX_OK)
+	{
+		if (m_pDoc->SaveSession(szfile) == false) flx_error("Failed saving session");
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -407,27 +429,5 @@ void CWnd::OnChangeText(Fl_Widget* pw, void* pd)
 	{
 		pt->SetStatus(CTask::MODIFIED);
 		m_pTask->redraw();
-	}
-}
-
-//-----------------------------------------------------------------------------
-void CWnd::OnFileOpenSession(Fl_Widget* pw, void* pd)
-{
-	char szfile[1024] = {0};
-	if (flx_file_open(szfile, "Session files\t*.ftm") == FLX_OK)
-	{
-		if (m_pDoc->OpenSession(szfile) == false) flx_error("Failed opening session");
-		m_pTask->Update();
-		SelectFile();
-	}
-}
-
-//-----------------------------------------------------------------------------
-void CWnd::OnFileSaveSession(Fl_Widget* pw, void* pd)
-{
-	char szfile[1024] = {0};
-	if (flx_file_save(szfile, "Session files\t*.ftm") == FLX_OK)
-	{
-		if (m_pDoc->SaveSession(szfile) == false) flx_error("Failed saving session");
 	}
 }

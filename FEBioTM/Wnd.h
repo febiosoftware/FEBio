@@ -37,7 +37,7 @@ public:
 	// update the GUI
 	void Update();
 
-	Fl_Text_Display* GetLogWnd() { return m_pOut; }
+	Fl_Text_Display* GetOutputWnd() { return m_pOut; }
 
 	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
 
