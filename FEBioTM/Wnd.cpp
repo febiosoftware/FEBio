@@ -41,6 +41,7 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 	m_pTabs = 0;
 	m_pText = 0;
 	m_pOut = 0;
+	m_pLog = 0;
 
 	Fl_Group* pg;
 	begin();
@@ -58,7 +59,7 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 			{
 				m_pTabs = new Fl_Tabs(wf, hm+ht, w-wf, h-hm-ht);
 				{
-					Fl_Group* pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Input    ");
+					Fl_Group* pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Input   ");
 					{
 						m_pText = new Fl_Text_Editor(wf, hm+ht+24, w-wf, h-hm-ht-24);
 						m_pText->textfont(FL_COURIER);
@@ -71,7 +72,7 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 					m_pTabs->resizable(pg);
 					pg->labelsize(11);
 
-					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Output    ");
+					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "   Output   ");
 					{
 						m_pOut = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
 						m_pOut->textfont(FL_COURIER);
@@ -80,6 +81,17 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 						m_pOut->textcolor(FL_WHITE);
 						m_pOut->buffer(new Fl_Text_Buffer);
 						pg->resizable(m_pOut);
+					}
+					pg->end();
+					pg->labelsize(11);
+
+					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Log     ");
+					{
+						m_pLog = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
+						m_pLog->textfont(FL_COURIER);
+						m_pLog->box(FL_DOWN_BOX);
+						m_pLog->buffer(new Fl_Text_Buffer);
+						pg->resizable(m_pLog);
 					}
 					pg->end();
 					pg->labelsize(11);
@@ -112,6 +124,8 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 
 	m_pSel = m_pText;
 	m_pTabs->do_callback();
+
+	ClearLogWnd();
 }
 
 //-----------------------------------------------------------------------------
@@ -124,9 +138,39 @@ CWnd::~CWnd()
 // clear the output window
 void CWnd::ClearOutputWnd()
 {
-	Fl_Text_Buffer* plog = m_pOut->buffer();
-	plog->select(0, plog->length());
-	plog->remove_selection();	
+	Fl_Text_Buffer* pb = m_pOut->buffer();
+	pb->select(0, pb->length());
+	pb->remove_selection();	
+}
+
+
+//-----------------------------------------------------------------------------
+void CWnd::ClearLogWnd()
+{
+	Fl_Text_Buffer* pb = m_pLog->buffer();
+	pb->select(0, pb->length());
+	pb->remove_selection();	
+
+	m_pLog->insert(" FEBio Task Manager\n");
+	m_pLog->insert("----------------------------------------------\n");
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::AddLogEntry(const char* sz, ...)
+{
+	// get a pointer to the argument list
+	va_list	args;
+
+	// make the message
+	static char sztxt[1024] = {0};
+	va_start(args, sz);
+	vsprintf(sztxt, sz, args);
+	va_end(args);
+
+	// add the message to the log
+	m_pLog->insert_position(m_pLog->buffer()->length());
+	m_pLog->insert(sztxt);
+	m_pLog->show_insert_position();	
 }
 
 //-----------------------------------------------------------------------------
@@ -243,6 +287,7 @@ void CWnd::OnFileOpenSession(Fl_Widget* pw, void* pd)
 	{
 		// close the current session
 		OnFileCloseAll(0,0);
+		ClearLogWnd();
 
 		// open the new session
 		if (m_pDoc->OpenSession(szfile) == false) flx_error("Failed opening session");
@@ -418,6 +463,7 @@ void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 	Fl_Widget* pc = ps->child(0);
 	if (pc == m_pText) m_pSel = m_pText;
 	if (pc == m_pOut ) m_pSel = m_pOut;
+	if (pc == m_pLog ) m_pSel = m_pLog;
 }
 
 //-----------------------------------------------------------------------------

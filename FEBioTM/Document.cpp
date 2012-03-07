@@ -9,6 +9,7 @@
 #include "XMLWriter.h"
 #include "FEBioXML/XMLReader.h"
 #include "threads.h"
+#include <time.h>
 
 extern void InitFEBioLibrary();
 
@@ -139,6 +140,8 @@ void* febio_func(void* pd)
 		// if task found, run the task
 		if (itask != -1)
 		{
+			time_t time0, time1;
+
 			// get the task
 			CTask* pt = pdoc->GetTask(itask);
 
@@ -146,6 +149,12 @@ void* febio_func(void* pd)
 			Fl_Progress* pw = 0;
 			Fl::lock();
 			{
+				// add entry to log
+				pwnd->AddLogEntry("Running: %s\n", pt->GetFileName());
+
+				time(&time0);
+				pwnd->AddLogEntry("\tstart time: %s", ctime(&time0));
+
 				// clear the output wnd
 				pwnd->ClearOutputWnd();
 
@@ -165,6 +174,14 @@ void* febio_func(void* pd)
 			Fl::lock();
 			{
 				ptb->DoneTracking();
+				time(&time1);
+				pwnd->AddLogEntry("\tend time  : %s", ctime(&time1));
+
+				double sec = difftime(time1, time0);
+				int ih = (int) (sec / 3600.0); sec -= ih*3600;
+				int im = (int) (sec / 60.0); sec -= im*60.0;
+				int is = (int) sec;
+				pwnd->AddLogEntry("\trun time  : %d:%02d:%02d\n\n", ih, im, is);
 			}
 			Fl::unlock();
 			Fl::awake((void*)0);

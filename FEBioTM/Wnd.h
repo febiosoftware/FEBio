@@ -38,10 +38,14 @@ public:
 	void Update();
 
 	Fl_Text_Display* GetOutputWnd() { return m_pOut; }
+	Fl_Text_Display* GetLogWnd() { return m_pLog; }
 
 	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
 
 	void ClearOutputWnd();
+	void ClearLogWnd();
+
+	void AddLogEntry(const char* sz, ...);
 
 public:	// --- M E N U   H A N D L E R S ---
 	void OnFileOpen       (Fl_Widget* pw, void* pd);
@@ -83,8 +87,9 @@ protected:
 	Fl_Tabs*			m_pTabs;
 	CFileBrowser*		m_pFile;	//!< the file browser
 	CTaskBrowser*		m_pTask;	//!< the task browser
-	Fl_Text_Editor*		m_pText;	//!< Text display
+	Fl_Text_Editor*		m_pText;	//!< input file display
 	Fl_Text_Display*	m_pOut;		//!< output text display
+	Fl_Text_Display*	m_pLog;		//!< run-log display
 
 	Fl_Text_Display*	m_pSel;		//!< Target for editing
 };
