@@ -34,21 +34,28 @@ bool FEBiphasicSoluteSolver::Init()
 	// initialize base class
 	if (FEBiphasicSolver::Init() == false) return false;
 
+	int i, j, n;
+	
 	// allocate concentration-vectors
-	assert (m_nceq[0] > 0);
-	m_ci[0].assign(m_nceq[0], 0);
-	m_Ci[0].assign(m_nceq[0], 0);
+	for (i=0; i<MAX_CDOFS; ++i) {
+		m_ci[i].assign(m_nceq[i], 0);
+		m_Ci[i].assign(m_nceq[i], 0);
+	}
 	
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
 	FEMesh& mesh = m_fem.m_mesh;
-	int i, n;
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-
+		
 		// concentration dofs
-		n = node.m_ID[DOF_C]; if (n >= 0) m_Ut[n] = node.m_ct[0];
+		for (j=0; j<MAX_CDOFS; ++j) {
+			if (m_nceq[j]) {
+				n = node.m_ID[DOF_C+j];
+				if (n >= 0) m_Ut[n] = node.m_ct[j];
+			}
+		}
 	}
 
 	return true;
@@ -59,7 +66,8 @@ bool FEBiphasicSoluteSolver::Init()
 //!
 void FEBiphasicSoluteSolver::PrepStep(double time)
 {
-	zero(m_Ci[0]);
+	for (int j=0; j<MAX_CDOFS; ++j)
+		if (m_nceq[j]) zero(m_Ci[j]);
 	FEBiphasicSolver::PrepStep(time);
 }
 
@@ -70,7 +78,7 @@ void FEBiphasicSoluteSolver::PrepStep(double time)
 //!
 bool FEBiphasicSoluteSolver::Quasin(double time)
 {
-	int i;
+	int i, j;
 	double s;
 
 	// convergence norms
@@ -89,9 +97,9 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	double	normp;		// incremement pressure norm
 
 	// solute convergence data
-	double	normCi;	// initial concentration norm
-	double	normC;	// current concentration norm
-	double	normc;	// incremement concentration norm
+	double	normCi[MAX_CDOFS];	// initial concentration norm
+	double	normC[MAX_CDOFS];	// current concentration norm
+	double	normc[MAX_CDOFS];	// incremement concentration norm
 
 	// initialize flags
 	bool bconv = false;		// convergence flag
@@ -228,21 +236,30 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 
 		// check solute convergence
 		{
-			// extract the pressure increments
-			GetConcentrationData(m_ci[0], m_bfgs.m_ui);
-			
-			// set initial norm
-			if (m_niter == 0) normCi = fabs(m_ci[0]*m_ci[0]);
-			
-			// update total pressure
-			for (i=0; i<m_nceq[0]; ++i) m_Ci[0][i] += s*m_ci[0][i];
-			
-			// calculate norms
-			normC = m_Ci[0]*m_Ci[0];
-			normc = (m_ci[0]*m_ci[0])*(s*s);
+			// extract the concentration increments
+			for (j=0; j<MAX_CDOFS; ++j) {
+				if (m_nceq[j]) {
+					GetConcentrationData(m_ci[j], m_bfgs.m_ui,j);
+					
+					// set initial norm
+					if (m_niter == 0)
+						normCi[j] = fabs(m_ci[j]*m_ci[j]);
+					
+					// update total concentration
+					for (i=0; i<m_nceq[j]; ++i) m_Ci[j][i] += s*m_ci[j][i];
+					
+					// calculate norms
+					normC[j] = m_Ci[j]*m_Ci[j];
+					normc[j] = (m_ci[j]*m_ci[j])*(s*s);
+					
+				}
+			}
 			
 			// check convergence
-			if ((m_Ctol > 0) && (normc > (m_Ctol*m_Ctol)*normC)) bconv = false;
+			if (m_Ctol > 0) {
+				for (j=0; j<MAX_CDOFS; ++j)
+					if (m_nceq[j]) bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
+			}
 		}
 
 		// print convergence summary
@@ -260,7 +277,10 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		clog.printf("\t energy               %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
 		clog.printf("\t displacement         %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
 		clog.printf("\t fluid pressure       %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
-		clog.printf("\t solute concentration %15le %15le %15le \n", normCi, normc ,(m_Ctol*m_Ctol)*normC );
+		for (j=0; j<MAX_CDOFS; ++j) {
+			if (m_nceq[j])
+				clog.printf("\t solute %d concentration  %15le %15le %15le \n", j+1, normCi[j], normc[j] ,(m_Ctol*m_Ctol)*normC[j] );
+		}
 
 		clog.SetMode(oldmode);
 
@@ -290,7 +310,8 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 				normRi = normR1;
 				normDi = normd;
 				normPi = normp;
-				normCi = normc;
+				for (j=0; j<MAX_CDOFS; ++j)
+					if (m_nceq[j]) normCi[j] = normc[j];
 				breform = true;
 			}
 			else
@@ -625,14 +646,14 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui)
+void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui, const int sol)
 {
 	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
 	zero(ci);
 	for (int i=0; i<N; ++i)
 	{
 		FENode& n = m_fem.m_mesh.Node(i);
-		nid = n.m_ID[DOF_C];
+		nid = n.m_ID[DOF_C+sol];
 		if (nid != -1)
 		{
 			nid = (nid < -1 ? -nid-2 : nid);

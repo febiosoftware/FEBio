@@ -186,7 +186,7 @@ bool FEAnalysisStep::Init()
 		{
 			// if the node is not free we don't use this prescribed displacement
 			// note that we don't do this for prescribed pressures and concentrations
-			if ((dc.bc != DOF_P) && (dc.bc != DOF_C) && (dc.bc != DOF_C + 1))
+			if ((dc.bc != DOF_P) && (dc.bc < DOF_C))
 			{
 				FENode& node = m_fem.m_mesh.Node(dc.node);
 				if (node.m_rid >= 0) 
@@ -286,7 +286,7 @@ bool FEAnalysisStep::Init()
 				node.m_ID[bc] = (n<0?n:-n-2);
 				DC.r = 0;
 				break;
-			case DOF_C: // precribed concentration
+/*			case DOF_C: // precribed concentration
 				n = node.m_ID[bc];
 				node.m_ID[bc] = (n<0?n:-n-2);
 				DC.r = br ? node.m_ct[0] - node.m_c0[0] : 0;
@@ -295,7 +295,8 @@ bool FEAnalysisStep::Init()
 				n = node.m_ID[bc];
 				node.m_ID[bc] = (n<0?n:-n-2);
 				DC.r = br ? node.m_ct[1] - node.m_c0[1] : 0;
-				break;
+				break;*/
+				//--> TODO: change bc=20 to something else
 			case 20: // y-z radial displacement
 				n = node.m_ID[DOF_Y];
 				node.m_ID[DOF_Y] = (n<0?n:-n-2);

@@ -26,12 +26,10 @@ FEBiphasicSolute::FEBiphasicSolute()
 	m_Rgas = 0;
 	m_Tabs = 0; 
 
-	AddComponent<FEElasticMaterial      >(&m_pSolid, "solid"              );
-	AddComponent<FEHydraulicPermeability>(&m_pPerm , "permeability"       );
-	AddComponent<FESoluteDiffusivity    >(&m_pDiff , "diffusivity"        );
-	AddComponent<FESoluteSolubility     >(&m_pSolub, "solubility"         );
-	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC , "osmotic_coefficient");
-	AddComponent<FESoluteSupply         >(&m_pSupp , "supply"             ); 
+	AddComponent<FEElasticMaterial      >(&m_pSolid , "solid"              );
+	AddComponent<FEHydraulicPermeability>(&m_pPerm  , "permeability"       );
+	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC  , "osmotic_coefficient");
+	AddComponent<FESolute               >(&m_pSolute, "solute"             ); 
 }
 
 //-----------------------------------------------------------------------------
@@ -40,15 +38,11 @@ void FEBiphasicSolute::Init()
 	FEMaterial::Init();
 	m_pSolid->Init();
 	m_pPerm->Init();
-	m_pDiff->Init();
-	m_pSolub->Init();
 	m_pOsmC->Init();
-	if (m_pSupp) m_pSupp->Init();
+	m_pSolute->Init();
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
-	if (m_rhoTu < 0) throw MaterialError("solute_density must be positive");
-	if (m_Mu < 0) throw MaterialError("solute_molar_mass must be positive");
 	
 	m_Rgas = FEModel::GetGlobalConstant("R");
 	m_Tabs = FEModel::GetGlobalConstant("T");
@@ -121,8 +115,8 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 	double c = spt.m_c;
 	
 	// solubility and its derivative w.r.t. strain
-	double kappa = m_pSolub->Solubility(mp);
-	double dkdJ = m_pSolub->Tangent_Solubility_Strain(mp);
+	double kappa = m_pSolute->m_pSolub->Solubility(mp);
+	double dkdJ = m_pSolute->m_pSolub->Tangent_Solubility_Strain(mp);
 	
 	// osmotic coefficient and its derivative w.r.t. strain
 	double osmc = m_pOsmC->OsmoticCoefficient(mp);
@@ -173,13 +167,13 @@ vec3d FEBiphasicSolute::FluidFlux(FEMaterialPoint& pt)
 	mat3ds kt = m_pPerm->Permeability(pt);
 	
 	// solute diffusivity in mixture
-	mat3ds D = m_pDiff->Diffusivity(pt);
+	mat3ds D = m_pSolute->m_pDiff->Diffusivity(pt);
 	
 	// solute free diffusivity
-	double D0 = m_pDiff->Free_Diffusivity(pt);
+	double D0 = m_pSolute->m_pDiff->Free_Diffusivity(pt);
 	
 	// solubility
-	double kappa = m_pSolub->Solubility(pt);
+	double kappa = m_pSolute->m_pSolub->Solubility(pt);
 	
 	// identity matrix
 	mat3dd I(1);
@@ -215,13 +209,13 @@ vec3d FEBiphasicSolute::SoluteFlux(FEMaterialPoint& pt)
 	vec3d gradc = spt.m_gradc;
 	
 	// solute diffusivity in mixture
-	mat3ds D = m_pDiff->Diffusivity(pt);
+	mat3ds D = m_pSolute->m_pDiff->Diffusivity(pt);
 	
 	// solute free diffusivity
-	double D0 = m_pDiff->Free_Diffusivity(pt);
+	double D0 = m_pSolute->m_pDiff->Free_Diffusivity(pt);
 	
 	// solubility
-	double kappa = m_pSolub->Solubility(pt);
+	double kappa = m_pSolute->m_pSolub->Solubility(pt);
 	
 	// fluid flux w
 	vec3d w = FluidFlux(pt);
@@ -249,7 +243,7 @@ double FEBiphasicSolute::Pressure(FEMaterialPoint& pt)
 	double osmc = m_pOsmC->OsmoticCoefficient(pt);
 	
 	// solubility
-	double kappa = m_pSolub->Solubility(pt);
+	double kappa = m_pSolute->m_pSolub->Solubility(pt);
 	
 	// actual pressure
 	double pa = p + m_Rgas*m_Tabs*osmc*kappa*c;
@@ -264,7 +258,7 @@ double FEBiphasicSolute::Concentration(FEMaterialPoint& pt)
 	FESoluteMaterialPoint& spt = *pt.ExtractData<FESoluteMaterialPoint>();
 	
 	// solubility
-	double kappa = m_pSolub->Solubility(pt);
+	double kappa = m_pSolute->m_pSolub->Solubility(pt);
 	
 	// actual concentration = solubility * effective concentration
 	double ca = kappa*spt.m_c;
@@ -296,12 +290,10 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 	{
 		ar << m_Rgas << m_Tabs;
 
-		ar << febio.GetTypeStr<FEMaterial>(m_pSolid); m_pSolid->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pPerm ); m_pPerm ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pDiff ); m_pDiff ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pSolub); m_pSolub->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pOsmC ); m_pOsmC ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pSupp ); m_pSupp ->Serialize(ar);
+		ar << febio.GetTypeStr<FEMaterial>(m_pSolid ); m_pSolid ->Serialize(ar);
+		ar << febio.GetTypeStr<FEMaterial>(m_pPerm  ); m_pPerm  ->Serialize(ar);
+		ar << febio.GetTypeStr<FEMaterial>(m_pOsmC  ); m_pOsmC  ->Serialize(ar);
+		ar << febio.GetTypeStr<FEMaterial>(m_pSolute); m_pSolute->Serialize(ar);
 	}
 	else
 	{
@@ -319,24 +311,14 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 		m_pPerm->Init();
 
 		ar >> sz;
-		m_pDiff = dynamic_cast<FESoluteDiffusivity*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
-		assert(m_pDiff); m_pDiff->Serialize(ar);
-		m_pDiff->Init();
-
-		ar >> sz;
-		m_pSolub = dynamic_cast<FESoluteSolubility*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
-		assert(m_pSolub); m_pSolub->Serialize(ar);
-		m_pSolub->Init();
-
-		ar >> sz;
 		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pOsmC); m_pOsmC->Serialize(ar);
 		m_pOsmC->Init();
 
 		ar >> sz;
-		m_pSupp = dynamic_cast<FESoluteSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
-		assert(m_pSupp); m_pSupp->Serialize(ar);
-		m_pSupp->Init();
+		m_pSolute = dynamic_cast<FESolute*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		assert(m_pSolute); m_pSolute->Serialize(ar);
+		m_pSolute->Init();
 
 	}
 }

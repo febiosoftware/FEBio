@@ -269,6 +269,9 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FENLSolver* psolver, vector<doub
 	// element force vector
 	vector<double> fe;
 	vector<int> elm;
+
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	assert(pm);
 	
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
@@ -288,9 +291,10 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FENLSolver* psolver, vector<doub
 			
 		// add fluid work to global residual
 		int neln = el.Nodes();
+		int dofc = DOF_C + pm->m_pSolute->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[11*neln+j];
+			int J = elm[dofc*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
@@ -302,6 +306,9 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<do
 	// element force vector
 	vector<double> fe;
 	vector<int> elm;
+
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	assert(pm);
 	
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
@@ -321,9 +328,10 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<do
 			
 		// add fluid work to global residual
 		int neln = el.Nodes();
+		int dofc = DOF_C + pm->m_pSolute->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[11*neln+j];
+			int J = elm[dofc*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
@@ -539,6 +547,10 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWork(FESolidElement& el, vecto
 	double* wg = el.GaussWeights();
 	
 	FEMesh& mesh = *GetMesh();
+
+	// get the element's material
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat); assert(false);
+	int id0 = pm->m_pSolute->GetSoluteID();
 	
 	vec3d r0[8], rt[8], rp[8], vt[8];
 	double cp[8];
@@ -547,16 +559,8 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWork(FESolidElement& el, vecto
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		cp[i] = mesh.Node(el.m_node[i]).m_cp[0];
+		cp[i] = mesh.Node(el.m_node[i]).m_cp[id0];
 		vt[i] = mesh.Node(el.m_node[i]).m_vt;
-	}
-	
-	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
 	}
 	
 	zero(fe);
@@ -648,9 +652,9 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWork(FESolidElement& el, vecto
 		vec3d gradc = spt.m_gradc;
 		
 		// evaluate the solubility and its derivatives w.r.t. J and c, and its gradient
-		double kappa = pm->m_pSolub->Solubility(mp);
-		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
-		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp, 0);
+		double kappa = pm->m_pSolute->m_pSolub->Solubility(mp);
+		double dkdJ = pm->m_pSolute->m_pSolub->Tangent_Solubility_Strain(mp);
+		double dkdc = pm->m_pSolute->m_pSolub->Tangent_Solubility_Concentration(mp, 0);
 		// evaluate the porosity, its derivative w.r.t. J, and its gradient
 		double phiw = pm->Porosity(mp);
 		double dpdJ = (1. - phiw)/J;
@@ -661,7 +665,7 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWork(FESolidElement& el, vecto
 		double dpdt = dpdJ*dJdt;
 		// Evaluate solute supply and receptor-ligand kinetics
 		double crhat = 0;
-		if (pm->m_pSupp) crhat = pm->m_pSupp->Supply(mp);
+		if (pm->m_pSolute->m_pSupp) crhat = pm->m_pSolute->m_pSupp->Supply(mp);
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
@@ -749,10 +753,10 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vec
 		vec3d& j = spt.m_j;
 		// Evaluate solute supply and receptor-ligand kinetics
 		double crhat = 0;
-		if (pm->m_pSupp)
+		if (pm->m_pSolute->m_pSupp)
 		{
 			// evaluate the solute supply
-			crhat = pm->m_pSupp->SupplySS(pt);
+			crhat = pm->m_pSolute->m_pSupp->SupplySS(pt);
 		}
 		
 		// update force vector
@@ -872,6 +876,9 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, do
 	// element stiffness matrix
 	matrix ke;
 	vector<int> elm;
+
+	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	assert(pmat);
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
@@ -895,13 +902,14 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, do
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for solute-solid elements.
 		vector<int> lm(ndof);
+		int dofc = DOF_C + pmat->m_pSolute->GetSoluteID();
 		for (int i=0; i<neln; ++i)
 		{
 			lm[5*i  ] = elm[3*i];
 			lm[5*i+1] = elm[3*i+1];
 			lm[5*i+2] = elm[3*i+2];
 			lm[5*i+3] = elm[3*neln+i];
-			lm[5*i+4] = elm[11*neln+i];
+			lm[5*i+4] = elm[dofc*neln+i];
 		}
 		
 		// assemble element matrix in global stiffness matrix
@@ -917,7 +925,10 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, 
 	// element stiffness matrix
 	matrix ke;
 	vector<int> elm;
-	
+
+	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	assert(pmat);
+
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 	for (int iel=0; iel<NE; ++iel)
@@ -939,13 +950,14 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, 
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for solute-solid elements.
 		vector<int> lm(ndof);
+		int dofc = DOF_C + pmat->m_pSolute->GetSoluteID();
 		for (int i=0; i<neln; ++i)
 		{
 			lm[5*i  ] = elm[3*i];
 			lm[5*i+1] = elm[3*i+1];
 			lm[5*i+2] = elm[3*i+2];
 			lm[5*i+3] = elm[3*neln+i];
-			lm[5*i+4] = elm[11*neln+i];
+			lm[5*i+4] = elm[dofc*neln+i];
 		}
 		
 		// assemble element matrix in global stiffness matrix
@@ -978,6 +990,10 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, 
 	double* gw = el.GaussWeights();
 	
 	FEMesh& mesh = *GetMesh();
+
+	// get the element's material
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat); assert(pm);
+	int id0 = pm->m_pSolute->GetSoluteID();
 	
 	vec3d r0[8], rt[8], rp[8], v[8];
 	double cp[8];
@@ -986,7 +1002,7 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, 
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		cp[i] = mesh.Node(el.m_node[i]).m_cp[0];
+		cp[i] = mesh.Node(el.m_node[i]).m_cp[id0];
 		v[i]  = mesh.Node(el.m_node[i]).m_vt;
 	}
 	
@@ -1006,14 +1022,6 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, 
 			ke[5*i+1][5*j] = ks[3*i+1][3*j  ]; ke[5*i+1][5*j+1] = ks[3*i+1][3*j+1]; ke[5*i+1][5*j+2] = ks[3*i+1][3*j+2];
 			ke[5*i+2][5*j] = ks[3*i+2][3*j  ]; ke[5*i+2][5*j+1] = ks[3*i+2][3*j+1]; ke[5*i+2][5*j+2] = ks[3*i+2][3*j+2];
 		}
-	
-	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1111,22 +1119,22 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, 
 		double dpdJJ = -2*phis/(J*J);
 		
 		// evaluate the solubility and its derivatives
-		double kappa = pm->m_pSolub->Solubility(mp);
-		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
-		double dkdJJ = pm->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
-		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp,0);
-		double dkdcc = pm->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0);
-		double dkdJc = pm->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0);
+		double kappa = pm->m_pSolute->m_pSolub->Solubility(mp);
+		double dkdJ = pm->m_pSolute->m_pSolub->Tangent_Solubility_Strain(mp);
+		double dkdJJ = pm->m_pSolute->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
+		double dkdc = pm->m_pSolute->m_pSolub->Tangent_Solubility_Concentration(mp,0);
+		double dkdcc = pm->m_pSolute->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0);
+		double dkdJc = pm->m_pSolute->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0);
 		double dkdt = dkdJ*dJdt + dkdc*dcdt;
 		
 		// evaluate the diffusivity tensor and its derivatives
-		mat3ds D = pm->m_pDiff->Diffusivity(mp);
-		mat3ds dDdc = pm->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
-		tens4ds dDdE = pm->m_pDiff->Tangent_Diffusivity_Strain(mp);
+		mat3ds D = pm->m_pSolute->m_pDiff->Diffusivity(mp);
+		mat3ds dDdc = pm->m_pSolute->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
+		tens4ds dDdE = pm->m_pSolute->m_pDiff->Tangent_Diffusivity_Strain(mp);
 		
 		// evaluate the solute free diffusivity
-		double D0 = pm->m_pDiff->Free_Diffusivity(mp);
-		double dD0dc = pm->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0);
+		double D0 = pm->m_pSolute->m_pDiff->Free_Diffusivity(mp);
+		double dD0dc = pm->m_pSolute->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0);
 		
 		// evaluate the osmotic coefficient and its derivatives
 		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
@@ -1155,10 +1163,10 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, 
 		// evaluate the tangents of solute supply
 		double dcrhatdJ = 0;
 		double dcrhatdc = 0;
-		if (pm->m_pSupp)
+		if (pm->m_pSolute->m_pSupp)
 		{
-			dcrhatdJ = pm->m_pSupp->Tangent_Supply_Strain(mp);
-			double dcrhatdcr = pm->m_pSupp->Tangent_Supply_Concentration(mp);
+			dcrhatdJ = pm->m_pSolute->m_pSupp->Tangent_Supply_Strain(mp);
+			double dcrhatdcr = pm->m_pSolute->m_pSupp->Tangent_Supply_Concentration(mp);
 			dcrhatdc = J*phiw*(kappa + c*dkdc)*dcrhatdcr;
 		}
 		
@@ -1356,18 +1364,18 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FESolidElement& el
 		double dpdJ = phis/J;
 		
 		// evaluate the solubility and its derivatives
-		double kappa = pm->m_pSolub->Solubility(mp);
-		double dkdJ = pm->m_pSolub->Tangent_Solubility_Strain(mp);
-		double dkdc = pm->m_pSolub->Tangent_Solubility_Concentration(mp, 0);
+		double kappa = pm->m_pSolute->m_pSolub->Solubility(mp);
+		double dkdJ = pm->m_pSolute->m_pSolub->Tangent_Solubility_Strain(mp);
+		double dkdc = pm->m_pSolute->m_pSolub->Tangent_Solubility_Concentration(mp, 0);
 		
 		// evaluate the diffusivity tensor and its derivatives
-		mat3ds D = pm->m_pDiff->Diffusivity(mp);
-		mat3ds dDdc = pm->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
-		tens4ds dDdE = pm->m_pDiff->Tangent_Diffusivity_Strain(mp);
+		mat3ds D = pm->m_pSolute->m_pDiff->Diffusivity(mp);
+		mat3ds dDdc = pm->m_pSolute->m_pDiff->Tangent_Diffusivity_Concentration(mp, 0);
+		tens4ds dDdE = pm->m_pSolute->m_pDiff->Tangent_Diffusivity_Strain(mp);
 		
 		// evaluate the solute free diffusivity
-		double D0 = pm->m_pDiff->Free_Diffusivity(mp);
-		double dD0dc = pm->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0);
+		double D0 = pm->m_pSolute->m_pDiff->Free_Diffusivity(mp);
+		double dD0dc = pm->m_pSolute->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0);
 		
 		// evaluate the osmotic coefficient and its derivatives
 		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
@@ -1501,6 +1509,11 @@ void FEBiphasicSoluteDomain::SolidElementStiffness(FESolidElement& el, matrix& k
 void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	int i, i3, j, j3, n;
+
+	// see if this is a biphasic-solute material
+	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*>(m_pMat);
+	assert(pmat);
+	int id0 = pmat->m_pSolute->GetSoluteID();
 	
 	// Get the current element's data
 	const int nint = el.GaussPoints();
@@ -1529,14 +1542,10 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 
 	// nodal concentrations
 	double ct[8];
-	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).m_ct[0];
+	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).m_ct[id0];
 
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
-	
-	// see if this is a biphasic-solute material
-	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*>(m_pMat);
-	assert(pmat);
 	
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
@@ -1644,15 +1653,21 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 	FEMesh& mesh = *m_pMesh;
 	double dt = fem.GetCurrentStep()->m_dt;
 	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+
+	// get the material
+	FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pMat);
 	
+	// get the biphasic-solute material
+	FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(pm); assert(pmb);
+	int id0 = pmb->m_pSolute->GetSoluteID();
+
+	// extract the elastic component
+	FEElasticMaterial* pme = pmb->m_pSolid;
+
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
-		
-		assert(!el.IsRigid());
-		
-		assert(el.Type() != FE_UDGHEX);
 		
 		// get the number of integration points
 		nint = el.GaussPoints();
@@ -1670,19 +1685,8 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 			r0[j] = mesh.Node(el.m_node[j]).m_r0;
 			rt[j] = mesh.Node(el.m_node[j]).m_rt;
 			pn[j] = mesh.Node(el.m_node[j]).m_pt;
-			ct[j] = mesh.Node(el.m_node[j]).m_ct[0];
+			ct[j] = mesh.Node(el.m_node[j]).m_ct[id0];
 		}
-		
-		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pMat);
-		
-		assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
-		
-		// get the biphasic-solute material
-		FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(pm);
-		
-		// extract the elastic component
-		FEElasticMaterial* pme = pmb->m_pSolid;
 		
 		// loop over the integration points and calculate
 		// the stress at the integration point
@@ -1722,17 +1726,17 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 			ppt.m_pa = pmb->Pressure(mp);
 			spt.m_j = pmb->SoluteFlux(mp);
 			spt.m_ca = pmb->Concentration(mp);
-			if (pmb->m_pSupp)
+			if (pmb->m_pSolute->m_pSupp)
 			{
 				if (sstate)
-					spt.m_crc = pmb->m_pSupp->ReceptorLigandConcentrationSS(mp);
+					spt.m_crc = pmb->m_pSolute->m_pSupp->ReceptorLigandConcentrationSS(mp);
 				else {
 					// update m_crc using one-step integration
-					double crchat = pmb->m_pSupp->ReceptorLigandSupply(mp);
+					double crchat = pmb->m_pSolute->m_pSupp->ReceptorLigandSupply(mp);
 					spt.m_crc = spt.m_crcp + crchat*dt;
 					// update phi0 using one-step integration
 					double phi0hat = pmb->m_pSolid->MolarMass()/pmb->m_pSolid->Density()
-					*pmb->m_pSupp->SolidSupply(mp);
+					*pmb->m_pSolute->m_pSupp->SolidSupply(mp);
 					ppt.m_phi0 = ppt.m_phi0p + phi0hat*dt;
 				}
 			}

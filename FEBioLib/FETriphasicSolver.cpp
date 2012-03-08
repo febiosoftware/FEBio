@@ -34,24 +34,28 @@ bool FETriphasicSolver::Init()
 	// initialize base class
 	if (FEBiphasicSolver::Init() == false) return false;
 	
+	int i, j, n;
+	
 	// allocate concentration-vectors
-	assert ((m_nceq[0] > 0) || (m_nceq[1] > 0));
-	m_ci[0].assign(m_nceq[0], 0);
-	m_ci[1].assign(m_nceq[1], 0);
-	m_Ci[0].assign(m_nceq[0], 0);
-	m_Ci[1].assign(m_nceq[1], 0);
+	for (i=0; i<MAX_CDOFS; ++i) {
+		m_ci[i].assign(m_nceq[i], 0);
+		m_Ci[i].assign(m_nceq[i], 0);
+	}
 	
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
 	FEMesh& mesh = m_fem.m_mesh;
-	int i, n;
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
 		
 		// concentration dofs
-		n = node.m_ID[DOF_C]; if (n >= 0) m_Ut[n] = node.m_ct[0];
-		n = node.m_ID[DOF_C+1]; if (n >= 0) m_Ut[n] = node.m_ct[1];
+		for (j=0; j<MAX_CDOFS; ++j) {
+			if (m_nceq[j]) {
+				n = node.m_ID[DOF_C+j];
+				if (n >= 0) m_Ut[n] = node.m_ct[j];
+			}
+		}
 	}
 	
 	return true;
@@ -62,8 +66,9 @@ bool FETriphasicSolver::Init()
 //!
 void FETriphasicSolver::PrepStep(double time)
 {
-	zero(m_Ci[0]);
-	zero(m_Ci[1]);
+	for (int j=0; j<MAX_CDOFS; ++j)
+		if (m_nceq[j]) zero(m_Ci[j]);
+
 	FEBiphasicSolver::PrepStep(time);
 }
 
@@ -74,7 +79,7 @@ void FETriphasicSolver::PrepStep(double time)
 //!
 bool FETriphasicSolver::Quasin(double time)
 {
-	int i;
+	int i, j;
 	double s;
 	
 	// convergence norms
@@ -93,9 +98,9 @@ bool FETriphasicSolver::Quasin(double time)
 	double	normp;		// incremement pressure norm
 	
 	// solute convergence data
-	double	normCi[2];	// initial concentration norm
-	double	normC[2];	// current concentration norm
-	double	normc[2];	// incremement concentration norm
+	double	normCi[MAX_CDOFS];	// initial concentration norm
+	double	normC[MAX_CDOFS];	// current concentration norm
+	double	normc[MAX_CDOFS];	// incremement concentration norm
 	
 	// initialize flags
 	bool bconv = false;		// convergence flag
@@ -233,27 +238,29 @@ bool FETriphasicSolver::Quasin(double time)
 		// check solute convergence
 		{
 			// extract the concentration increments
-			GetConcentrationData(m_ci[0], m_bfgs.m_ui,0);
-			GetConcentrationData(m_ci[1], m_bfgs.m_ui,1);
-			
-			// set initial norm
-			if (m_niter == 0) {
-				normCi[0] = fabs(m_ci[0]*m_ci[0]);
-				normCi[1] = fabs(m_ci[1]*m_ci[1]);
+			for (j=0; j<MAX_CDOFS; ++j) {
+				if (m_nceq[j]) {
+					GetConcentrationData(m_ci[j], m_bfgs.m_ui,j);
+
+					// set initial norm
+					if (m_niter == 0)
+						normCi[j] = fabs(m_ci[j]*m_ci[j]);
+
+					// update total concentration
+					for (i=0; i<m_nceq[j]; ++i) m_Ci[j][i] += s*m_ci[j][i];
+					
+					// calculate norms
+					normC[j] = m_Ci[j]*m_Ci[j];
+					normc[j] = (m_ci[j]*m_ci[j])*(s*s);
+					
+				}
 			}
 			
-			// update total concentration
-			for (i=0; i<m_nceq[0]; ++i) m_Ci[0][i] += s*m_ci[0][i];
-			for (i=0; i<m_nceq[1]; ++i) m_Ci[1][i] += s*m_ci[1][i];
-			
-			// calculate norms
-			normC[0] = m_Ci[0]*m_Ci[0]; normC[1] = m_Ci[1]*m_Ci[1];
-			normc[0] = (m_ci[0]*m_ci[0])*(s*s); normc[1] = (m_ci[1]*m_ci[1])*(s*s);
-			
 			// check convergence
-			if ((m_Ctol > 0) && 
-				((normc[0] > (m_Ctol*m_Ctol)*normC[0]) || 
-				 (normc[1] > (m_Ctol*m_Ctol)*normC[1]))) bconv = false;
+			if (m_Ctol > 0) {
+				for (j=0; j<MAX_CDOFS; ++j)
+					if (m_nceq[j]) bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
+			}
 		}
 		
 		// print convergence summary
@@ -271,8 +278,10 @@ bool FETriphasicSolver::Quasin(double time)
 		clog.printf("\t energy               %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
 		clog.printf("\t displacement         %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
 		clog.printf("\t fluid pressure       %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
-		clog.printf("\t cation concentration %15le %15le %15le \n", normCi[0], normc[0] ,(m_Ctol*m_Ctol)*normC[0] );
-		clog.printf("\t anion concentration  %15le %15le %15le \n", normCi[1], normc[1] ,(m_Ctol*m_Ctol)*normC[1] );
+		for (j=0; j<MAX_CDOFS; ++j) {
+			if (m_nceq[j])
+				clog.printf("\t solute %d concentration  %15le %15le %15le \n", j+1, normCi[j], normc[j] ,(m_Ctol*m_Ctol)*normC[j] );
+		}
 		
 		clog.SetMode(oldmode);
 		
@@ -302,7 +311,8 @@ bool FETriphasicSolver::Quasin(double time)
 				normRi = normR1;
 				normDi = normd;
 				normPi = normp;
-				normCi[0] = normc[0]; normCi[1] = normc[1];
+				for (j=0; j<MAX_CDOFS; ++j)
+					if (m_nceq[j]) normCi[j] = normc[j];
 				breform = true;
 			}
 			else

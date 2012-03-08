@@ -225,6 +225,8 @@ void FETriphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<double>
 	// element force vector
 	vector<double> fe;
 	vector<int> elm;
+
+	FETriphasic* pm = dynamic_cast<FETriphasic*>(m_pMat); assert(pm);
 	
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
@@ -244,9 +246,10 @@ void FETriphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<double>
 			
 		// add solute work to global residual
 		int neln = el.Nodes();
+		int dofc = DOF_C + pm->m_pSolute[ion]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[(11+ion)*neln+j];
+			int J = elm[dofc*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
@@ -258,6 +261,8 @@ void FETriphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>& 
 	// element force vector
 	vector<double> fe;
 	vector<int> elm;
+
+	FETriphasic* pm = dynamic_cast<FETriphasic*>(m_pMat); assert(pm);
 	
 	int NE = m_Elem.size();
 	for (int i=0; i<NE; ++i)
@@ -277,9 +282,10 @@ void FETriphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>& 
 			
 		// add solute work to global residual
 		int neln = el.Nodes();
+		int dofc = DOF_C + pm->m_pSolute[ion]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
-			int J = elm[(11+ion)*neln+j];
+			int J = elm[dofc*neln+j];
 			if (J >= 0) R[J] += fe[j];
 		}
 	}
@@ -546,6 +552,11 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 	double* wg = el.GaussWeights();
 	
 	FEMesh& mesh = *m_pMesh;
+
+	// get the element's material
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat); assert(pm);
+	int id0 = pm->m_pSolute[0]->GetSoluteID();
+	int id1 = pm->m_pSolute[1]->GetSoluteID();
 	
 	vec3d r0[8], rt[8], rp[8], vt[8];
 	double cp[2][8];
@@ -554,14 +565,11 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[0];
-		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[1];
+		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[id0];
+		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[id1];
 		vt[i] = mesh.Node(el.m_node[i]).m_vt;
 	}
 
-	FETriphasic* pm = dynamic_cast<FETriphasic*>(m_pMat);
-	assert(pm);
-	
 	zero(fe);
 	
 	// loop over gauss-points
@@ -901,6 +909,10 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double 
 	// element stiffness matrix
 	matrix ke;
 	vector<int> elm;
+
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat); assert(pm);
+	int dofc0 = DOF_C + pm->m_pSolute[0]->GetSoluteID();
+	int dofc1 = DOF_C + pm->m_pSolute[1]->GetSoluteID();
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
@@ -930,8 +942,8 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double 
 			lm[ndpn*i+1] = elm[3*i+1];
 			lm[ndpn*i+2] = elm[3*i+2];
 			lm[ndpn*i+3] = elm[3*neln+i];
-			lm[ndpn*i+4] = elm[11*neln+i];
-			lm[ndpn*i+5] = elm[12*neln+i];
+			lm[ndpn*i+4] = elm[dofc0*neln+i];
+			lm[ndpn*i+5] = elm[dofc1*neln+i];
 		}
 		
 		// assemble element matrix in global stiffness matrix
@@ -945,6 +957,11 @@ void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, doubl
 	// element stiffness matrix
 	matrix ke;
 	vector<int> elm;
+
+	// get the elements material
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat); assert(pm);
+	int dofc0 = DOF_C + pm->m_pSolute[0]->GetSoluteID();
+	int dofc1 = DOF_C + pm->m_pSolute[1]->GetSoluteID();
 	
 	// repeat over all solid elements
 	int NE = m_Elem.size();
@@ -974,8 +991,8 @@ void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, doubl
 			lm[ndpn*i+1] = elm[3*i+1];
 			lm[ndpn*i+2] = elm[3*i+2];
 			lm[ndpn*i+3] = elm[3*neln+i];
-			lm[ndpn*i+4] = elm[11*neln+i];
-			lm[ndpn*i+5] = elm[12*neln+i];
+			lm[ndpn*i+4] = elm[dofc0*neln+i];
+			lm[ndpn*i+5] = elm[dofc1*neln+i];
 		}
 		
 		// assemble element matrix in global stiffness matrix
@@ -1009,6 +1026,11 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 	double* gw = el.GaussWeights();
 	
 	FEMesh& mesh = *GetMesh();
+
+	// get the element's material
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat); assert(pm);
+	int id0 = pm->m_pSolute[0]->GetSoluteID();
+	int id1 = pm->m_pSolute[1]->GetSoluteID();
 	
 	vec3d r0[8], rt[8], rp[8], v[8];
 	double cp[2][8];
@@ -1017,8 +1039,8 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[0];
-		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[1];
+		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[id0];
+		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[id1];
 		v[i]  = mesh.Node(el.m_node[i]).m_vt;
 	}
 	
@@ -1038,14 +1060,6 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 			ke[ndpn*i+1][ndpn*j] = ks[3*i+1][3*j  ]; ke[ndpn*i+1][ndpn*j+1] = ks[3*i+1][3*j+1]; ke[ndpn*i+1][ndpn*j+2] = ks[3*i+1][3*j+2];
 			ke[ndpn*i+2][ndpn*j] = ks[3*i+2][3*j  ]; ke[ndpn*i+2][ndpn*j+1] = ks[3*i+2][3*j+1]; ke[ndpn*i+2][ndpn*j+2] = ks[3*i+2][3*j+2];
 		}
-	
-	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1510,7 +1524,12 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 	double* gw = el.GaussWeights();
 	
 	FEMesh& mesh = *GetMesh();
-	
+
+	// get the element's material
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat); assert(pm);
+	int id0 = pm->m_pSolute[0]->GetSoluteID();
+	int id1 = pm->m_pSolute[1]->GetSoluteID();
+
 	vec3d r0[8], rt[8], rp[8], v[8];
 	double cp[2][8];
 	for (i=0; i<neln; ++i) 
@@ -1518,8 +1537,8 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
 		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[0];
-		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[1];
+		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[id0];
+		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[id1];
 		v[i]  = mesh.Node(el.m_node[i]).m_vt;
 	}
 	
@@ -1540,14 +1559,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 			ke[ndpn*i+2][ndpn*j] = ks[3*i+2][3*j  ]; ke[ndpn*i+2][ndpn*j+1] = ks[3*i+2][3*j+1]; ke[ndpn*i+2][ndpn*j+2] = ks[3*i+2][3*j+2];
 		}
 	
-	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
-	
+
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
@@ -1967,21 +1979,23 @@ void FETriphasicDomain::ElementTriphasicMaterialStiffness(FESolidElement &el, ma
 	
 	// jacobian
 	double Ji[3][3], detJt;
+
+	// see if this is a biphasic-solute material
+	FETriphasic* pmat = dynamic_cast<FETriphasic*>(m_pMat);	assert(pmat);
+	int id0 = pmat->m_pSolute[0]->GetSoluteID();
+	int id1 = pmat->m_pSolute[1]->GetSoluteID();
 	
 	// nodal concentrations
 	double ct[2][8];
 	for (i=0; i<neln; ++i) {
-		ct[0][i] = m_pMesh->Node(el.m_node[i]).m_ct[0];
-		ct[1][i] = m_pMesh->Node(el.m_node[i]).m_ct[1];
+		ct[0][i] = m_pMesh->Node(el.m_node[i]).m_ct[id0];
+		ct[1][i] = m_pMesh->Node(el.m_node[i]).m_ct[id1];
 	}
 	
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 	
-	// see if this is a biphasic-solute material
-	FETriphasic* pmat = dynamic_cast<FETriphasic*>(m_pMat);
-	assert(pmat);
-	
+
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
 	{
@@ -2089,15 +2103,22 @@ void FETriphasicDomain::UpdateStresses(FEModel &fem)
 	FEMesh& mesh = *m_pMesh;
 	double dt = fem.GetCurrentStep()->m_dt;
 	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+
+	// get the material
+	FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pMat);
+	
+	// get the biphasic-solute material
+	FETriphasic* pmb = dynamic_cast<FETriphasic*>(pm); assert(pmb);
+	int id0 = pmb->m_pSolute[0]->GetSoluteID();
+	int id1 = pmb->m_pSolute[1]->GetSoluteID();
+	
+	// extract the elastic component
+	FEElasticMaterial* pme = pmb->m_pSolid;
 	
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
-		
-		assert(!el.IsRigid());
-		
-		assert(el.Type() != FE_UDGHEX);
 		
 		// get the number of integration points
 		nint = el.GaussPoints();
@@ -2115,20 +2136,9 @@ void FETriphasicDomain::UpdateStresses(FEModel &fem)
 			r0[j] = mesh.Node(el.m_node[j]).m_r0;
 			rt[j] = mesh.Node(el.m_node[j]).m_rt;
 			pn[j] = mesh.Node(el.m_node[j]).m_pt;
-			ct[0][j] = mesh.Node(el.m_node[j]).m_ct[0];
-			ct[1][j] = mesh.Node(el.m_node[j]).m_ct[1];
+			ct[0][j] = mesh.Node(el.m_node[j]).m_ct[id0];
+			ct[1][j] = mesh.Node(el.m_node[j]).m_ct[id1];
 		}
-		
-		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(fem.GetMaterial(el.GetMatID()));
-		
-		assert(dynamic_cast<FETriphasic*>(pm) != 0);
-		
-		// get the biphasic-solute material
-		FETriphasic* pmb = dynamic_cast<FETriphasic*>(pm);
-		
-		// extract the elastic component
-		FEElasticMaterial* pme = pmb->m_pSolid;
 		
 		// loop over the integration points and calculate
 		// the stress at the integration point

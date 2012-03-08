@@ -31,7 +31,7 @@ public:
 	virtual bool StiffnessMatrix();
 
 protected:
-	void GetConcentrationData(vector<double>& ci, vector<double>& ui);
+	void GetConcentrationData(vector<double>& ci, vector<double>& ui, const int sol);
 
 public:
 	double	m_Ctol;			//!< concentration tolerance

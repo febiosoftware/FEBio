@@ -78,7 +78,7 @@ void FESlidingSurface3::Init()
 		nint += Element(i).GaussPoints();
 	}
 	
-	// set intial values
+	// set initial values
 	zero(m_nu);
 	
 	// determine biphasic status
@@ -95,9 +95,9 @@ void FESlidingSurface3::Init()
 			FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 			
 			// see if this is a poro-elastic element
-			FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-			FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-			if (biph || bsolu) m_bporo = true;
+			FEBiphasic* bp = dynamic_cast<FEBiphasic*> (pm);
+			FEBiphasicSolute* bps = dynamic_cast<FEBiphasicSolute*> (pm);
+			if (bp || bps) m_bporo = true;
 		}
 		++i;
 	}
@@ -116,8 +116,8 @@ void FESlidingSurface3::Init()
 			FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 			
 			// see if this is a biphasic-solute element
-			FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-			if (bsolu) m_bsolu = true;
+			FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+			if (pbs) m_bsolu = true;
 		}
 		++i;
 	}
@@ -443,9 +443,9 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a poro-elastic element
-		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-		FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-		if (biph)
+		FEBiphasic* bp = dynamic_cast<FEBiphasic*> (pm);
+		FEBiphasicSolute* bps = dynamic_cast<FEBiphasicSolute*> (pm);
+		if (bp)
 		{
 			// get a material point
 			FEMaterialPoint& mp = *pe->m_State[0];
@@ -462,11 +462,11 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			pt.m_w = vec3d(0,0,0);
 			
 			double K[3][3];
-			biph->Permeability(K, mp);
+			bp->Permeability(K, mp);
 			
 			eps = (K[0][0] + K[1][1] + K[2][2])/3;
 		}
-		else if (bsolu)
+		else if (bps)
 		{
 			// get a material point
 			FEMaterialPoint& mp = *pe->m_State[0];
@@ -485,7 +485,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			spt.m_c = 0;
 			spt.m_j = vec3d(0,0,0);
 			
-			mat3ds K = bsolu->m_pPerm->Permeability(mp);
+			mat3ds K = bps->m_pPerm->Permeability(mp);
 			
 			eps = K.tr()/3;
 		}
@@ -546,8 +546,8 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a biphasic-solute element
-		FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-		if (bsolu)
+		FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
+		if (pbs)
 		{
 			// get a material point
 			FEMaterialPoint& mp = *pe->m_State[0];
@@ -566,8 +566,8 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 			spt.m_c = 0;
 			spt.m_j = vec3d(0,0,0);
 			
-			mat3ds D = bsolu->m_pDiff->Diffusivity(mp)
-			*(bsolu->Porosity(mp)*bsolu->m_pSolub->Solubility(mp));
+			mat3ds D = pbs->m_pSolute->m_pDiff->Diffusivity(mp)
+			*(pbs->Porosity(mp)*pbs->m_pSolute->m_pSolub->Solubility(mp));
 			
 			eps = D.tr()/3;
 		}
@@ -587,6 +587,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 	
 	double ps[4], p1;
 	double cs[4], c1;
+	int sid, mid;
 	
 	double R = m_srad*mesh.GetBoundingBox().radius();
 	
@@ -597,7 +598,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 		FESurfaceElement& el = ss.Element(i);
 
 		bool sporo, ssolu;
-		BiphasicSoluteStatus(mesh, el, sporo, ssolu);
+		BiphasicSoluteStatus(mesh, el, sporo, ssolu, sid);
 		
 		int ne = el.Nodes();
 		int nint = el.GaussPoints();
@@ -611,7 +612,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 		// get the nodal concentrations
 		if (ssolu)
 		{
-			for (int j=0; j<ne; ++j) cs[j] = mesh.Node(el.m_node[j]).m_ct[0];
+			for (int j=0; j<ne; ++j) cs[j] = mesh.Node(el.m_node[j]).m_ct[sid];
 		}
 		
 		for (int j=0; j<nint; ++j, ++n)
@@ -675,16 +676,16 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 					
 					// calculate the pressure gap function
 					bool mporo, msolu;
-					BiphasicSoluteStatus(mesh, *pme, mporo, msolu);
+					BiphasicSoluteStatus(mesh, *pme, mporo, msolu, mid);
 					if (sporo && mporo) {
 						double pm[4];
 						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
 						double p2 = pme->eval(pm, rs[0], rs[1]);
 						ss.m_pg[n] = p1 - p2;
 					}
-					if (ssolu && msolu) {
+					if (ssolu && msolu && (sid == mid)) {
 						double cm[4];
-						for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).m_ct[0];
+						for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).m_ct[sid];
 						double c2 = pme->eval(cm, rs[0], rs[1]);
 						ss.m_cg[n] = c1 - c2;
 					}
@@ -716,7 +717,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 
 void FESlidingInterface3::Update(int niter)
 {	
-	int i, n, id, np;
+	int i, j, n, id, np;
 	double rs[2];
 
 	double R = m_srad*m_pfem->m_mesh.GetBoundingBox().radius();
@@ -810,10 +811,12 @@ void FESlidingInterface3::Update(int niter)
 						// mark node as non-ambient (= pos ID)
 						node.m_ID[DOF_P] = -id-2;
 
-					id = node.m_ID[DOF_C];
-					if (id < -1)
-						// mark node as non-ambient (= pos ID)
-						node.m_ID[DOF_C] = -id-2;
+					for (j=0; j<MAX_CDOFS; ++j) {
+						id = node.m_ID[DOF_C+j];
+						if (id < -1)
+							// mark node as non-ambient (= pos ID)
+							node.m_ID[DOF_C+j] = -id-2;
+					}
 				}
 			}
 		}
@@ -867,10 +870,12 @@ void FESlidingInterface3::Update(int niter)
 							// mark as non-ambient
 							node.m_ID[DOF_P] = -id-2;
 
-						id = node.m_ID[DOF_C];
-						if (id < -1)
-							// mark as non-ambient
-							node.m_ID[DOF_C] = -id-2;
+						for (j=0; j<MAX_CDOFS; ++j) {
+							id = node.m_ID[DOF_C+j];
+							if (id < -1)
+								// mark as non-ambient
+								node.m_ID[DOF_C+j] = -id-2;
+						}
 					}
 				}
 			}
@@ -894,6 +899,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 	vector<double> fe;
 	double detJ[4], w[4], *Hs, Hm[4];
 	double N[40];
+	int sid, mid;
 
 	FEModel& fem = *m_pfem;
 
@@ -921,7 +927,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 			FESurfaceElement& se = ss.Element(i);
 
 			bool sporo, ssolu;
-			BiphasicSoluteStatus(*pm, se, sporo, ssolu);
+			BiphasicSoluteStatus(*pm, se, sporo, ssolu, sid);
 			
 			// get the nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -957,7 +963,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 					FESurfaceElement& me = *pme;
 
 					bool mporo, msolu;
-					BiphasicSoluteStatus(*pm, me, mporo, msolu);
+					BiphasicSoluteStatus(*pm, me, mporo, msolu, mid);
 					
 					// get the nr of master element nodes
 					int nmeln = me.Nodes();
@@ -1067,7 +1073,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 							// assemble residual
 							psolver->AssembleResidual(en, LM, fe, F);
 						}
-						if (ssolu && msolu)
+						if (ssolu && msolu && (sid == mid))
 						{
 							// calculate nr of concentration dofs
 							int ndof = nseln + nmeln;
@@ -1079,8 +1085,8 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 							
 							// fill the LM
 							LM.resize(ndof);
-							for (k=0; k<nseln; ++k) LM[k        ] = sLM[11*nseln+k];
-							for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[11*nmeln+k];
+							for (k=0; k<nseln; ++k) LM[k        ] = sLM[(DOF_C+sid)*nseln+k];
+							for (k=0; k<nmeln; ++k) LM[k + nseln] = mLM[(DOF_C+mid)*nmeln+k];
 							
 							// fill the force array
 							fe.resize(ndof);
@@ -1110,6 +1116,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 	double ct[4], dcr[4], dcs[4];
 	double N[40];
 	matrix ke;
+	int sid, mid;
 
 	FEModel& fem = *m_pfem;
 
@@ -1153,7 +1160,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 			FESurfaceElement& se = ss.Element(i);
 
 			bool sporo, ssolu;
-			BiphasicSoluteStatus(*pm, se, sporo, ssolu);
+			BiphasicSoluteStatus(*pm, se, sporo, ssolu, sid);
 			
 			// get nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -1163,7 +1170,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 			for (j=0; j<4; ++j)
 			{
 				pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
-				cn[j] = ss.GetMesh()->Node(se.m_node[j]).m_ct[0];
+				cn[j] = ss.GetMesh()->Node(se.m_node[j]).m_ct[sid];
 			}
 			
 			// get the element's LM vector
@@ -1209,7 +1216,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 					FESurfaceElement& me = *pme;
 
 					bool mporo, msolu;
-					BiphasicSoluteStatus(*pm, me, mporo, msolu);
+					BiphasicSoluteStatus(*pm, me, mporo, msolu, mid);
 					
 					// get the nr of master nodes
 					int nmeln = me.Nodes();
@@ -1219,7 +1226,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 					for (k=0; k<nmeln; ++k) 
 					{
 						pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
-						cm[k] = ms.GetMesh()->Node(me.m_node[k]).m_ct[0];
+						cm[k] = ms.GetMesh()->Node(me.m_node[k]).m_ct[mid];
 					}
 					
 					// get the element's LM vector
@@ -1228,7 +1235,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 					int ndpn;	// number of dofs per node
 					int ndof;	// number of dofs in stiffness matrix
 					
-					if (ssolu && msolu) {
+					if (ssolu && msolu && (sid == mid)) {
 						// calculate dofs for biphasic-solute contact
 						ndpn = 5;
 						ndof = ndpn*(nseln+nmeln);
@@ -1242,7 +1249,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 							LM[ndpn*k+1] = sLM[3*k+1];			// y-dof
 							LM[ndpn*k+2] = sLM[3*k+2];			// z-dof
 							LM[ndpn*k+3] = sLM[3*nseln+k];		// p-dof
-							LM[ndpn*k+4] = sLM[11*nseln+k];		// c-dof
+							LM[ndpn*k+4] = sLM[(DOF_C+sid)*nseln+k];		// c-dof
 						}
 						for (k=0; k<nmeln; ++k)
 						{
@@ -1250,7 +1257,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 							LM[ndpn*(k+nseln)+1] = mLM[3*k+1];			// y-dof
 							LM[ndpn*(k+nseln)+2] = mLM[3*k+2];			// z-dof
 							LM[ndpn*(k+nseln)+3] = mLM[3*nmeln+k];		// p-dof
-							LM[ndpn*(k+nseln)+4] = mLM[11*nmeln+k];		// c-dof
+							LM[ndpn*(k+nseln)+4] = mLM[(DOF_C+mid)*nmeln+k];		// c-dof
 						}
 					}
 					
@@ -1519,7 +1526,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 					}
 					
 					// --- B I P H A S I C - S O L U T E  S T I F F N E S S ---
-					if (ssolu && msolu)
+					if (ssolu && msolu && (sid == mid))
 					{
 						double dt = fem.GetCurrentStep()->m_dt;
 						
@@ -1921,9 +1928,10 @@ void FESlidingInterface3::Serialize(DumpFile &ar)
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface3::BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, bool& bstat, bool& sstat)
+void FESlidingInterface3::BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, bool& bstat, bool& sstat, int& sid)
 {
 	bstat = sstat = false;
+	sid = -1;
 	
 	// get the solid element this surface element belongs to
 	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
@@ -1933,10 +1941,14 @@ void FESlidingInterface3::BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, 
 		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a poro-elastic element
-		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-		FEBiphasicSolute* bsolu = dynamic_cast<FEBiphasicSolute*> (pm);
-		if (biph || bsolu) bstat = true;
-		if (bsolu) sstat = true;
+		FEBiphasic* bp = dynamic_cast<FEBiphasic*> (pm);
+		FEBiphasicSolute* bps = dynamic_cast<FEBiphasicSolute*> (pm);
+		if (bp || bps) bstat = true;
+		if (bps) 
+		{
+			sstat = true;
+			sid = bps->m_pSolute->GetSoluteID();
+		}
 	}
 	
 	return;
@@ -1946,7 +1958,7 @@ void FESlidingInterface3::BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, 
 
 void FESlidingInterface3::MarkAmbient()
 {	
-	int i, id, np;
+	int i, j, id, np;
 	
 	// Mark all nodes as free-draining.  This needs to be done for ALL
 	// contact interfaces prior to executing Update(), where nodes that are
@@ -1979,12 +1991,14 @@ void FESlidingInterface3::MarkAmbient()
 			// to a negative number
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				id = s.Node(i).m_ID[DOF_C];
-				if (id >= 0) 
-				{
-					FENode& node = s.Node(i);
-					// mark node as free-draining
-					node.m_ID[DOF_C] = -id-2;
+				for (j=0; j<MAX_CDOFS; ++j) {
+					id = s.Node(i).m_ID[DOF_C+j];
+					if (id >= 0) 
+					{
+						FENode& node = s.Node(i);
+						// mark node as free-draining
+						node.m_ID[DOF_C+j] = -id-2;
+					}
 				}
 			}
 		}
@@ -1995,7 +2009,7 @@ void FESlidingInterface3::MarkAmbient()
 
 void FESlidingInterface3::SetAmbient()
 {	
-	int i, np;
+	int i, j, np;
 
 	// Set the pressure to zero for the free-draining nodes
 	for (np=0; np<2; ++np)
@@ -2018,11 +2032,14 @@ void FESlidingInterface3::SetAmbient()
 			// loop over all nodes
 			for (i=0; i<s.Nodes(); ++i) 
 			{
-				if (s.Node(i).m_ID[DOF_C] < -1)
+				for (j=0; j<MAX_CDOFS; ++j)
 				{
-					FENode& node = s.Node(i);
-					// set the fluid pressure to ambient condition
-					node.m_ct[0] = m_ambc;
+					if (s.Node(i).m_ID[DOF_C+j] < -1)
+					{
+						FENode& node = s.Node(i);
+						// set the fluid pressure to ambient condition
+						node.m_ct[j] = m_ambc;
+					}
 				}
 			}
 		}

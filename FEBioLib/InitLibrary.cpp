@@ -198,6 +198,18 @@ REGISTER_FEBIO_CLASS(FEPlotSol1Flux                     , FEPlotData, "solute 1 
 REGISTER_FEBIO_CLASS(FEPlotEffectiveSol2Concentration   , FEPlotData, "effective solute 2 concentration");
 REGISTER_FEBIO_CLASS(FEPlotActualSol2Concentration      , FEPlotData, "solute 2 concentration"          );
 REGISTER_FEBIO_CLASS(FEPlotSol2Flux                     , FEPlotData, "solute 2 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol3Concentration   , FEPlotData, "effective solute 3 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol3Concentration      , FEPlotData, "solute 3 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol3Flux                     , FEPlotData, "solute 3 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol4Concentration   , FEPlotData, "effective solute 4 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol4Concentration      , FEPlotData, "solute 4 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol4Flux                     , FEPlotData, "solute 4 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol5Concentration   , FEPlotData, "effective solute 5 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol5Concentration      , FEPlotData, "solute 5 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol5Flux                     , FEPlotData, "solute 5 flux"                   );
+REGISTER_FEBIO_CLASS(FEPlotEffectiveSol6Concentration   , FEPlotData, "effective solute 6 concentration");
+REGISTER_FEBIO_CLASS(FEPlotActualSol6Concentration      , FEPlotData, "solute 6 concentration"          );
+REGISTER_FEBIO_CLASS(FEPlotSol6Flux                     , FEPlotData, "solute 6 flux"                   );
 REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"              );
 REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"                 );
 REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density"            );

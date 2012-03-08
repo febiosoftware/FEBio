@@ -72,10 +72,14 @@ bool FEBiphasicSolver::InitEquations()
 	// base class does most of the work
 	FESolidSolver::InitEquations();
 
+	int i, j;
+
 	// determined the nr of pressure and concentration equations
 	FEMesh& mesh = m_fem.m_mesh;
-	m_ndeq = m_npeq = m_nceq[0] = m_nceq[1] = 0;
-	for (int i=0; i<mesh.Nodes(); ++i)
+	m_ndeq = m_npeq = 0;
+	for (j=0; j<MAX_CDOFS; ++j) m_nceq[j] = 0;
+	
+	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
 		if (n.m_ID[DOF_X] != -1) m_ndeq++;
@@ -83,7 +87,8 @@ bool FEBiphasicSolver::InitEquations()
 		if (n.m_ID[DOF_Z] != -1) m_ndeq++;
 		if (n.m_ID[DOF_P] != -1) m_npeq++;
 		if (n.m_ID[DOF_C] != -1) m_nceq[0]++;
-		if (n.m_ID[DOF_C+1] != -1) m_nceq[1]++;
+		for (j=0; j<MAX_CDOFS; ++j)
+			if (n.m_ID[DOF_C+j] != -1) m_nceq[j]++;
 	}
 
 	return true;
@@ -723,11 +728,14 @@ void FEBiphasicSolver::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_Ptol;
-		ar << m_ndeq << m_npeq << m_nceq[0] << m_nceq[1];
+		ar << m_ndeq << m_npeq;
+		for (int i=0; i<MAX_CDOFS; ++i) ar << m_nceq[i];
 	}
 	else
 	{
 		ar >> m_Ptol;
-		ar >> m_ndeq >> m_npeq >> m_nceq[0] >> m_nceq[1];
+		ar >> m_ndeq >> m_npeq;
+		ar >> m_ndeq >> m_npeq;
+		for (int i=0; i<MAX_CDOFS; ++i) ar >> m_nceq[i];
 	}
 }

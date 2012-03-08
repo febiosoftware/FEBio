@@ -78,7 +78,7 @@ class FEPlotSoluteFlux : public FEDomainData
 	};
 
 //-----------------------------------------------------------------------------
-//! Actual cation concentration
+//! Actual solute 1 concentration
 class FEPlotActualSol1Concentration : public FEDomainData
 {
 public:
@@ -87,16 +87,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Cation flux
-class FEPlotSol1Flux : public FEDomainData
-{
-public:
-	FEPlotSol1Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
-	bool Save(FEDomain& dom, vector<float>& a);
-};
-
-//-----------------------------------------------------------------------------
-//! Actual anion concentration
+//! Actual solute 2 concentration
 class FEPlotActualSol2Concentration : public FEDomainData
 {
 public:
@@ -105,11 +96,92 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Anion flux
+//! Actual solute 3 concentration
+class FEPlotActualSol3Concentration : public FEDomainData
+{
+public:
+	FEPlotActualSol3Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Actual solute 4 concentration
+class FEPlotActualSol4Concentration : public FEDomainData
+{
+public:
+	FEPlotActualSol4Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Actual solute 5 concentration
+class FEPlotActualSol5Concentration : public FEDomainData
+{
+public:
+	FEPlotActualSol5Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Actual solute 6 concentration
+class FEPlotActualSol6Concentration : public FEDomainData
+{
+public:
+	FEPlotActualSol6Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Solute 1 flux
+class FEPlotSol1Flux : public FEDomainData
+{
+public:
+	FEPlotSol1Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Solute 2 flux
 class FEPlotSol2Flux : public FEDomainData
 {
 public:
 	FEPlotSol2Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Solute 3 flux
+class FEPlotSol3Flux : public FEDomainData
+{
+public:
+	FEPlotSol3Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Solute 4 flux
+class FEPlotSol4Flux : public FEDomainData
+{
+public:
+	FEPlotSol4Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Solute 5 flux
+class FEPlotSol5Flux : public FEDomainData
+{
+public:
+	FEPlotSol5Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Solute 6 flux
+class FEPlotSol6Flux : public FEDomainData
+{
+public:
+	FEPlotSol6Flux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
 
@@ -178,7 +250,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Nodal effective cation concentrations
+//! Nodal effective solute 1 concentrations
 class FEPlotEffectiveSol1Concentration : public FEDomainData
 {
 public:
@@ -187,11 +259,47 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Nodal effective anion concentrations
+//! Nodal effective solute 2 concentrations
 class FEPlotEffectiveSol2Concentration : public FEDomainData
 {
 public:
 	FEPlotEffectiveSol2Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute 3 concentrations
+class FEPlotEffectiveSol3Concentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveSol3Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute 4 concentrations
+class FEPlotEffectiveSol4Concentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveSol4Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute 5 concentrations
+class FEPlotEffectiveSol5Concentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveSol5Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
+	bool Save(FEDomain& m, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Nodal effective solute 6 concentrations
+class FEPlotEffectiveSol6Concentration : public FEDomainData
+{
+public:
+	FEPlotEffectiveSol6Concentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_NODE){}
 	bool Save(FEDomain& m, vector<float>& a);
 };
 

@@ -1,5 +1,105 @@
 #pragma once
-#include "FEBiphasicSolute.h"
+#include "FECore/FEMaterial.h"
+
+//-----------------------------------------------------------------------------
+//! Base class for solute diffusivity.
+//! These materials need to define the diffusivity and tangent diffusivity functions.
+//!
+class FESoluteDiffusivity : public FEMaterial
+{
+public:
+	//! solute diffusivity
+	virtual mat3ds Diffusivity(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of diffusivity with respect to strain
+	virtual tens4ds Tangent_Diffusivity_Strain(FEMaterialPoint& mp) = 0;
+	
+	//! tangent of diffusivity with respect to solute concentration
+	virtual mat3ds Tangent_Diffusivity_Concentration(FEMaterialPoint& mp, const int isol) = 0;
+	
+	//! solute diffusivity in free solution
+	virtual double Free_Diffusivity(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of free diffusivity with respect to solute concentration
+	virtual double Tangent_Free_Diffusivity_Concentration(FEMaterialPoint& pt, const int isol) = 0;
+	
+	//! set solute ID
+	void SetSoluteID(const int ID) {m_ID = ID;}
+	
+private:
+	int	m_ID;		//!< solute ID
+	
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for solute solubility.
+//! These materials need to define the solubility and tangent solubility functions.
+//!
+class FESoluteSolubility : public FEMaterial
+{
+public:
+	//! solute solubility
+	virtual double Solubility(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of solubility with respect to strain
+	virtual double Tangent_Solubility_Strain(FEMaterialPoint& mp) = 0;
+	
+	//! tangent of solubility with respect to concentration
+	virtual double Tangent_Solubility_Concentration(FEMaterialPoint& mp, const int isol) = 0;
+	
+	//! cross derivative of solubility with respect to strain and concentration
+	virtual double Tangent_Solubility_Strain_Concentration(FEMaterialPoint& mp, const int isol) = 0;
+	
+	//! second derivative of solubility with respect to strain
+	virtual double Tangent_Solubility_Strain_Strain(FEMaterialPoint& mp) = 0;
+	
+	//! second derivative of solubility with respect to concentration
+	virtual double Tangent_Solubility_Concentration_Concentration(FEMaterialPoint& mp, 
+																  const int isol, const int jsol) = 0;
+	
+	//! set solute ID
+	void SetSoluteID(const int ID) {m_ID = ID;}
+	
+private:
+	int	m_ID;		//!< solute ID
+	
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for solute supply.
+//! These materials need to define the solute supply and tangent supply functions.
+//! The solute supply has units of moles/(referential mixture volume)/time
+//!
+class FESoluteSupply : public FEMaterial
+{
+public:
+	virtual void Init() {}
+	
+	//! solute supply
+	virtual double Supply(FEMaterialPoint& pt) = 0;
+	
+	//! solute supply under steady-state conditions
+	virtual double SupplySS(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of solute supply with respect to strain
+	virtual double Tangent_Supply_Strain(FEMaterialPoint& mp) = 0;
+	
+	//! tangent of solute supply with respect to solute concentration
+	virtual double Tangent_Supply_Concentration(FEMaterialPoint& mp) = 0;
+	
+	//! receptor-ligand complex supply
+	virtual double ReceptorLigandSupply(FEMaterialPoint& pt) = 0;
+	
+	//! receptor-ligand concentration under steady-state conditions
+	virtual double ReceptorLigandConcentrationSS(FEMaterialPoint& pt) = 0;
+	
+	//! referential solid supply
+	virtual double SolidSupply(FEMaterialPoint& pt) = 0;
+	
+	//! referential solid concentration under steady-state conditions
+	virtual double SolidConcentrationSS(FEMaterialPoint& pt) = 0;
+	
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for solute materials.
@@ -31,7 +131,7 @@ public:
 	int GetSoluteID() {return m_ID;}
 	
 private:
-	int						m_ID;		//!< solute ID
+	int						m_ID;		//!< solute ID in global table
 	
 public: // material parameters
 	double					m_rhoT;		//!< true solute density
@@ -41,6 +141,7 @@ public: // material parameters
 public: // material properties
 	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
 	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
+	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
 	
-	DECLARE_PARAMETER_LIST();
+	DECLARE_REGISTERED(FESolute);
 };

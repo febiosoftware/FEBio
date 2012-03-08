@@ -92,7 +92,10 @@ public:
 	
 	//! set ambient condition 
 	void SetAmbient();
-	
+
+	//! determine the status of element contact pair
+	void BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, bool& bstat, bool& sstat, int& sid);
+
 protected:
 	void ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg);
 	
@@ -105,8 +108,6 @@ protected:
 	void CalcAutoConcentrationPenalty(FESlidingSurface3& s);
 	double AutoConcentrationPenalty(FESurfaceElement& el, FESlidingSurface3& s);
 
-	void BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, bool& bstat, bool& sstat);
-	
 public:
 	FESlidingSurface3	m_ms;	//!< master surface
 	FESlidingSurface3	m_ss;	//!< slave surface

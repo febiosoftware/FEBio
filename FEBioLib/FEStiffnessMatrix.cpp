@@ -493,11 +493,16 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 					{
 						FESlidingSurface3& ss = (np == 0? ps3->m_ss : ps3->m_ms);
 						FESlidingSurface3& ms = (np == 0? ps3->m_ms : ps3->m_ss);
+						// get the mesh
+						FEMesh* pm = ss.GetMesh();
+						int sid, mid;
 						
 						int ni = 0, k, l;
 						for (j=0; j<ss.Elements(); ++j)
 						{
 							FESurfaceElement& se = ss.Element(j);
+							bool sporo, ssolu;
+							ps3->BiphasicSoluteStatus(*pm, se, sporo, ssolu, sid);
 							int nint = se.GaussPoints();
 							int* sn = &se.m_node[0];
 							for (k=0; k<nint; ++k, ++ni)
@@ -506,6 +511,8 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 								if (pe != 0)
 								{
 									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+									bool mporo, msolu;
+									ps3->BiphasicSoluteStatus(*pm, me, mporo, msolu, mid);
 									int* mn = &me.m_node[0];
 									
 									set(lm, -1);
@@ -523,7 +530,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 										lm[8*l+4] = id[DOF_RU];
 										lm[8*l+5] = id[DOF_RV];
 										lm[8*l+6] = id[DOF_RW];
-										lm[8*l+7] = id[DOF_C];
+										lm[8*l+7] = id[DOF_C + sid];
 									}
 									
 									for (l=0; l<nmeln; ++l)
@@ -536,7 +543,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 										lm[8*(l+nseln)+4] = id[DOF_RU];
 										lm[8*(l+nseln)+5] = id[DOF_RV];
 										lm[8*(l+nseln)+6] = id[DOF_RW];
-										lm[8*(l+nseln)+7] = id[DOF_C];
+										lm[8*(l+nseln)+7] = id[DOF_C + mid];
 									}
 									
 									build_add(lm);

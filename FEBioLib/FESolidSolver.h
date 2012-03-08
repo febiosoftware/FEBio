@@ -60,9 +60,6 @@ public:
 
 		//! Update solute data
 		void UpdateSolute(vector<double>& ui);
-
-		//! Update triphasic data
-		void UpdateTriphasic(vector<double>& ui);
 		// --->
 
 		//! Update rigid body data

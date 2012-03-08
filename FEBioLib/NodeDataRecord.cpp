@@ -67,6 +67,10 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 	case C : val = node.m_ct[0]; break;
 	case C1: val = node.m_ct[0]; break;
 	case C2: val = node.m_ct[1]; break;
+	case C3: val = node.m_ct[2]; break;
+	case C4: val = node.m_ct[3]; break;
+	case C5: val = node.m_ct[4]; break;
+	case C6: val = node.m_ct[5]; break;
 	}
 	return val;
 }

@@ -393,12 +393,18 @@ bool FEPlotSoluteFlux::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotActualSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 {
+	const int SOL = 0;
 	int i, j;
 	double ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	if (psd)
 	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+
 		for (i=0; i<psd->Elements(); ++i)
 		{
 			FESolidElement& el = psd->Element(i);
@@ -421,6 +427,13 @@ bool FEPlotActualSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 	}
 	else if (ptd)
 	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+
 		for (i=0; i<ptd->Elements(); ++i)
 		{
 			FESolidElement& el = ptd->Element(i);
@@ -432,7 +445,342 @@ bool FEPlotActualSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
 				
-				if (st) ew += st->m_ca[0];
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualSol2Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 1;
+	int i, j;
+	double ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualSol3Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 2;
+	int i, j;
+	double ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualSol4Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 3;
+	int i, j;
+	double ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualSol5Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 4;
+	int i, j;
+	double ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotActualSol6Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 5;
+	int i, j;
+	double ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
 			}
 			
 			ew /= el.GaussPoints();
@@ -447,6 +795,7 @@ bool FEPlotActualSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 {
+	const int SOL = 0;
 	int i, j;
 	float af[3];
 	vec3d ew;
@@ -454,6 +803,11 @@ bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	if (psd)
 	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
 		for (i=0; i<psd->Elements(); ++i)
 		{
 			FESolidElement& el = psd->Element(i);
@@ -482,6 +836,13 @@ bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 	}
 	else if (ptd)
 	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
 		for (i=0; i<ptd->Elements(); ++i)
 		{
 			FESolidElement& el = ptd->Element(i);
@@ -493,7 +854,7 @@ bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
 				
-				if (st) ew += st->m_j[0];
+				if (st) ew += st->m_j[sid];
 			}
 			
 			ew /= el.GaussPoints();
@@ -512,45 +873,56 @@ bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
-bool FEPlotActualSol2Concentration::Save(FEDomain &dom, vector<float>& a)
+bool FEPlotSol2Flux::Save(FEDomain &dom, vector<float>& a)
 {
+	const int SOL = 1;
 	int i, j;
-	double ew;
+	float af[3];
+	vec3d ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
-	if (ptd)
+	if (psd)
 	{
-		for (i=0; i<ptd->Elements(); ++i)
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
 		{
-			FESolidElement& el = ptd->Element(i);
+			FESolidElement& el = psd->Element(i);
 			
-			// calculate average concentration
-			ew = 0;
+			// calculate average flux
+			ew = vec3d(0,0,0);
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
-				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
 				
-				if (pt) ew += pt->m_ca[1];
+				if (pt) ew += pt->m_j;
 			}
 			
 			ew /= el.GaussPoints();
 			
-			a.push_back((float) ew);
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
 		}
 		return true;
 	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-bool FEPlotSol2Flux::Save(FEDomain &dom, vector<float>& a)
-{
-	int i, j;
-	float af[3];
-	vec3d ew;
-	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
-	if (ptd)
+	else if (ptd)
 	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
 		for (i=0; i<ptd->Elements(); ++i)
 		{
 			FESolidElement& el = ptd->Element(i);
@@ -560,9 +932,329 @@ bool FEPlotSol2Flux::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<el.GaussPoints(); ++j)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
-				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
 				
-				if (pt) ew += pt->m_j[1];
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSol3Flux::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 2;
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_j;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSol4Flux::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 3;
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_j;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSol5Flux::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 4;
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_j;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSol6Flux::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 5;
+	int i, j;
+	float af[3];
+	vec3d ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_j;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		int sid = -1;
+		if (pm->m_pSolute[0]->GetSoluteID() == SOL) sid = 0;
+		else if (pm->m_pSolute[1]->GetSoluteID() == SOL) sid = 1;
+		if (sid == -1) return false;
+		
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
 			}
 			
 			ew /= el.GaussPoints();
@@ -800,25 +1492,36 @@ bool FEPlotEffectiveSoluteConcentration::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 {
+	const int SOL = 0;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
 	if (psd)
 	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
 		int N = psd->Nodes();
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = psd->Node(i);
-			a.push_back((float) node.m_ct[0]);
+			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
 	}
 	else if (ptd)
 	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		bool present = (pm->m_pSolute[0]->GetSoluteID() == SOL) || (pm->m_pSolute[1]->GetSoluteID() == SOL);
+		if (!present) return false;
+		
 		int N = ptd->Nodes();
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = ptd->Node(i);
-			a.push_back((float) node.m_ct[0]);
+			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
 	}
@@ -828,20 +1531,197 @@ bool FEPlotEffectiveSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 //-----------------------------------------------------------------------------
 bool FEPlotEffectiveSol2Concentration::Save(FEDomain &dom, vector<float>& a)
 {
-	FETriphasicDomain* pd = dynamic_cast<FETriphasicDomain*>(&dom);
-	if (pd)
+	const int SOL = 1;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
 	{
-		int N = pd->Nodes();
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = psd->Nodes();
 		for (int i=0; i<N; ++i)
 		{
-			FENode& node = pd->Node(i);
-			a.push_back((float) node.m_ct[1]);
+			FENode& node = psd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		bool present = (pm->m_pSolute[0]->GetSoluteID() == SOL) || (pm->m_pSolute[1]->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = ptd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
 	}
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveSol3Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 2;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = psd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = psd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		bool present = (pm->m_pSolute[0]->GetSoluteID() == SOL) || (pm->m_pSolute[1]->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = ptd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveSol4Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 3;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = psd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = psd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		bool present = (pm->m_pSolute[0]->GetSoluteID() == SOL) || (pm->m_pSolute[1]->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = ptd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveSol5Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 4;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = psd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = psd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		bool present = (pm->m_pSolute[0]->GetSoluteID() == SOL) || (pm->m_pSolute[1]->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = ptd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotEffectiveSol6Concentration::Save(FEDomain &dom, vector<float>& a)
+{
+	const int SOL = 5;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	if (psd)
+	{
+		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
+		// Check if this solute is present in this specific biphasic-solute mixture
+		bool present = (pm->m_pSolute->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = psd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = psd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		FETriphasic* pm = dynamic_cast<FETriphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific triphasic mixture
+		bool present = (pm->m_pSolute[0]->GetSoluteID() == SOL) || (pm->m_pSolute[1]->GetSoluteID() == SOL);
+		if (!present) return false;
+		
+		int N = ptd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 bool FEPlotDamage::Save(FEDomain &m, vector<float>& a)

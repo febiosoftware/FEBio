@@ -217,6 +217,8 @@ protected:
 struct FESoluteData {
 	int					m_nID;			//!< solute ID
 	char				m_szname[128];	//!< solute name
+	double				m_rhoT;			//!< true solute density
+	double				m_M;			//!< solute molecular weight
 	double				m_z;			//!< solute charge number
 };
 

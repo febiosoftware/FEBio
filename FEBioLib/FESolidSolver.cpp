@@ -408,7 +408,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	if (pstep->GetType() == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
 
 	// update triphasic data
-	if (pstep->GetType() == FE_TRIPHASIC) { UpdatePoro(ui); UpdateTriphasic(ui); }
+	if (pstep->GetType() == FE_TRIPHASIC) { UpdatePoro(ui); UpdateSolute(ui); }
 
 	// update contact
 	if (m_fem.ContactInterfaces() > 0) UpdateContact();
@@ -507,7 +507,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 //! TODO: Move to the FEBiphasicSoluteSolver class
 void FESolidSolver::UpdateSolute(vector<double>& ui)
 {
-	int i, n;
+	int i, j, n;
 	
 	FEMesh& mesh = m_fem.m_mesh;
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -518,60 +518,11 @@ void FESolidSolver::UpdateSolute(vector<double>& ui)
 		FENode& node = mesh.Node(i);
 		
 		// update nodal concentration
-		n = node.m_ID[DOF_C];
-		if (n >= 0) node.m_ct[0] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-	}
-	
-	// update solute data
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		
-		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
-	}
-	
-	// make sure the prescribed concentrations are fullfilled
-	int ndis = m_fem.m_DC.size();
-	for (i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& dc = *m_fem.m_DC[i];
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;	// GAA
-			
-			FENode& node = mesh.Node(n);
-			
-			if (bc == DOF_C) node.m_ct[0] = r + s*m_fem.GetLoadCurve(lc)->Value();
+		for (j=0; j<MAX_CDOFS; ++j) {
+			n = node.m_ID[DOF_C+j];
+			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-//! Updates the triphasic solute data
-//! TODO: Move to the FETriphasicSolver class
-void FESolidSolver::UpdateTriphasic(vector<double>& ui)
-{
-	int i, n;
-	
-	FEMesh& mesh = m_fem.m_mesh;
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	
-	// update solute data
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		
-		// update nodal concentration
-		n = node.m_ID[DOF_C];
-		if (n >= 0) node.m_ct[0] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-		n = node.m_ID[DOF_C+1];
-		if (n >= 0) node.m_ct[1] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-	}
 	
 	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -597,8 +548,9 @@ void FESolidSolver::UpdateTriphasic(vector<double>& ui)
 			
 			FENode& node = mesh.Node(n);
 			
-			if (bc == DOF_C) node.m_ct[0] = r + s*m_fem.GetLoadCurve(lc)->Value();	// GAA
-			if (bc == DOF_C+1) node.m_ct[1] = r + s*m_fem.GetLoadCurve(lc)->Value();	// GAA
+			for (j=0; j<MAX_CDOFS; ++j) {
+				if (bc == DOF_C+j) node.m_ct[j] = r + s*m_fem.GetLoadCurve(lc)->Value();
+			}
 		}
 	}
 }
@@ -702,19 +654,16 @@ void FESolidSolver::PrepStep(double time)
 	// zero total displacements
 	zero(m_Ui);
 
-	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
-
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
 	{
-		mesh.Node(i).m_rp = mesh.Node(i).m_rt;
-		mesh.Node(i).m_vp = mesh.Node(i).m_vt;
-		mesh.Node(i).m_ap = mesh.Node(i).m_at;
+		m_fem.m_mesh.Node(i).m_rp = m_fem.m_mesh.Node(i).m_rt;
+		m_fem.m_mesh.Node(i).m_vp = m_fem.m_mesh.Node(i).m_vt;
+		m_fem.m_mesh.Node(i).m_ap = m_fem.m_mesh.Node(i).m_at;
 		// ---> TODO: move to the FEPoroSoluteSolver
 		for (int k=0; k<MAX_CDOFS; ++k)
-			mesh.Node(i).m_cp[k] = mesh.Node(i).m_ct[k];
+			m_fem.m_mesh.Node(i).m_cp[k] = m_fem.m_mesh.Node(i).m_ct[k];
 	}
 
 	// apply concentrated nodal forces
@@ -738,7 +687,7 @@ void FESolidSolver::PrepStep(double time)
 			double s = dc.s;
 			double r = dc.r;	// GAA
 
-			double dq = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
+			double dq = r + s*m_fem.GetLoadCurve(lc)->Value();	// GAA
 
 			int I;
 
@@ -746,43 +695,43 @@ void FESolidSolver::PrepStep(double time)
 
 			switch (bc)
 			{
-			case DOF_X: 
-				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<neq) 
-					ui[I] = dq - (node.m_rt.x - node.m_r0.x);
-				break;
-			case DOF_Y: 
-				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<neq) 
-					ui[I] = dq - (node.m_rt.y - node.m_r0.y); 
-				break;
-			case DOF_Z: 
-				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<neq) 
-					ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
-				break;
-			// ---> TODO: move to the FEBiphasicSolver
-			case DOF_P: 
-				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<neq) 
-					ui[I] = dq - node.m_pt; 
-				break;
-			case DOF_C: 
-				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<neq) 
-					ui[I] = dq - node.m_ct[0]; 
-				break;
-			case DOF_C+1: 
-				I = -node.m_ID[bc]-2;
-				if (I>=0 && I<neq) 
-					ui[I] = dq - node.m_ct[1]; 
-				break;
-			// --->
-			case 20:
+				case DOF_X: 
+					I = -node.m_ID[bc]-2;
+					if (I>=0 && I<neq) 
+						ui[I] = dq - (node.m_rt.x - node.m_r0.x);
+					break;
+				case DOF_Y: 
+					I = -node.m_ID[bc]-2;
+					if (I>=0 && I<neq) 
+						ui[I] = dq - (node.m_rt.y - node.m_r0.y); 
+					break;
+				case DOF_Z: 
+					I = -node.m_ID[bc]-2;
+					if (I>=0 && I<neq) 
+						ui[I] = dq - (node.m_rt.z - node.m_r0.z); 
+					break;
+					// ---> TODO: move to the FEPoroSolidSolver
+				case DOF_P: 
+					I = -node.m_ID[bc]-2;
+					if (I>=0 && I<neq) 
+						ui[I] = dq - node.m_pt; 
+					break;
+/*				case DOF_C: 
+					I = -node.m_ID[bc]-2;
+					if (I>=0 && I<neq) 
+						ui[I] = dq - node.m_ct[0]; 
+					break;
+				case DOF_C+1: 
+					I = -node.m_ID[bc]-2;
+					if (I>=0 && I<neq) 
+						ui[I] = dq - node.m_ct[1]; 
+					break;*/
+					// ---> TODO: change bc=20 to something else
+				case 20:
 				{
 					vec3d dr = node.m_r0;
 					dr.x = 0; dr.unit(); dr *= dq;
-
+					
 					I = -node.m_ID[1]-2;
 					if (I>=0 && I<neq) 
 						ui[I] = dr.y - (node.m_rt.y - node.m_r0.y); 
@@ -790,36 +739,46 @@ void FESolidSolver::PrepStep(double time)
 					if (I>=0 && I<neq) 
 						ui[I] = dr.z - (node.m_rt.z - node.m_r0.z); 
 				}
-				break;
+					break;
+				default:
+					if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+						I = -node.m_ID[bc]-2;
+						if (I>=0 && I<neq) 
+							ui[I] = dq - node.m_ct[bc - DOF_C]; 
+					}
 			}
 		}
 	}
 
 	// initialize rigid bodies
-	int nrb = m_fem.m_Obj.size();
-	for (i=0; i<nrb; ++i)
+	int NO = m_fem.m_Obj.size();
+	for (i=0; i<NO; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
+		FERigidBody* prb = dynamic_cast<FERigidBody*>(m_fem.m_Obj[i]);
+		if (prb)
+		{
+			FERigidBody& RB = *prb;
 
-		// clear reaction forces
-		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
+			// clear reaction forces
+			RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 
-		// store previous state
-		RB.m_rp = RB.m_rt;
-		RB.m_qp = RB.m_qt;
-		RB.m_Up[0] = RB.m_Ut[0];
-		RB.m_Up[1] = RB.m_Ut[1];
-		RB.m_Up[2] = RB.m_Ut[2];
-		RB.m_Up[3] = RB.m_Ut[3];
-		RB.m_Up[4] = RB.m_Ut[4];
-		RB.m_Up[5] = RB.m_Ut[5];
+			// store previous state
+			RB.m_rp = RB.m_rt;
+			RB.m_qp = RB.m_qt;
+			RB.m_Up[0] = RB.m_Ut[0];
+			RB.m_Up[1] = RB.m_Ut[1];
+			RB.m_Up[2] = RB.m_Ut[2];
+			RB.m_Up[3] = RB.m_Ut[3];
+			RB.m_Up[4] = RB.m_Ut[4];
+			RB.m_Up[5] = RB.m_Ut[5];
 
-		RB.m_du[0] = RB.m_dul[0] = 0.0;
-		RB.m_du[1] = RB.m_dul[1] = 0.0;
-		RB.m_du[2] = RB.m_dul[2] = 0.0;
-		RB.m_du[3] = RB.m_dul[3] = 0.0;
-		RB.m_du[4] = RB.m_dul[4] = 0.0;
-		RB.m_du[5] = RB.m_dul[5] = 0.0;
+			RB.m_du[0] = RB.m_dul[0] = 0.0;
+			RB.m_du[1] = RB.m_dul[1] = 0.0;
+			RB.m_du[2] = RB.m_dul[2] = 0.0;
+			RB.m_du[3] = RB.m_dul[3] = 0.0;
+			RB.m_du[4] = RB.m_dul[4] = 0.0;
+			RB.m_du[5] = RB.m_dul[5] = 0.0;
+		}
 	}
 
 	// calculate local rigid displacements
@@ -839,74 +798,78 @@ void FESolidSolver::PrepStep(double time)
 	}
 
 	// calculate global rigid displacements
-	for (i=0; i<(int) m_fem.m_Obj.size(); ++i)
+	for (i=0; i<NO; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
-		if (RB.m_prb == 0)
+		FERigidBody* prb = dynamic_cast<FERigidBody*>(m_fem.m_Obj[i]);
+		if (prb)
 		{
-			for (j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
-		}
-		else
-		{
-			double* dul = RB.m_dul;
-			vec3d dr = vec3d(dul[0], dul[1], dul[2]);
-			
-			vec3d v = vec3d(dul[3], dul[4], dul[5]);
-			double w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-			quatd dq = quatd(w, v);
-
-			FERigidBody* pprb = RB.m_prb;
-
-			vec3d r0 = RB.m_rt;
-			quatd Q0 = RB.m_qt;
-
-			dr = Q0*dr;
-			dq = Q0*dq*Q0.Inverse();
-
-			while (pprb)
+			FERigidBody& RB = *prb;
+			if (RB.m_prb == 0)
 			{
-				vec3d r1 = pprb->m_rt;
-				dul = pprb->m_dul;
-
-				quatd Q1 = pprb->m_qt;
-				
-				dr = r0 + dr - r1;
-
-				// grab the parent's local displacements
-				vec3d dR = vec3d(dul[0], dul[1], dul[2]);
-				v = vec3d(dul[3], dul[4], dul[5]);
-				w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-				quatd dQ = quatd(w, v);
-
-				dQ = Q1*dQ*Q1.Inverse();
-
-				// update global displacements
-				quatd Qi = Q1.Inverse();
-				dr = dR + r1 + dQ*dr - r0;
-				dq = dQ*dq;
-
-				// move up in the chain
-				pprb = pprb->m_prb;
-				Q0 = Q1;
+				for (j=0; j<6; ++j) RB.m_du[j] = RB.m_dul[j];
 			}
+			else
+			{
+				double* dul = RB.m_dul;
+				vec3d dr = vec3d(dul[0], dul[1], dul[2]);
+				
+				vec3d v = vec3d(dul[3], dul[4], dul[5]);
+				double w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+				quatd dq = quatd(w, v);
 
-			// set global displacements
-			double* du = RB.m_du;
+				FERigidBody* pprb = RB.m_prb;
 
-			du[0] = dr.x;
-			du[1] = dr.y;
-			du[2] = dr.z;
+				vec3d r0 = RB.m_rt;
+				quatd Q0 = RB.m_qt;
 
-			v = dq.GetVector();
-			w = dq.GetAngle();
-			du[3] = w*v.x;
-			du[4] = w*v.y;
-			du[5] = w*v.z;
+				dr = Q0*dr;
+				dq = Q0*dq*Q0.Inverse();
+
+				while (pprb)
+				{
+					vec3d r1 = pprb->m_rt;
+					dul = pprb->m_dul;
+
+					quatd Q1 = pprb->m_qt;
+					
+					dr = r0 + dr - r1;
+
+					// grab the parent's local displacements
+					vec3d dR = vec3d(dul[0], dul[1], dul[2]);
+					v = vec3d(dul[3], dul[4], dul[5]);
+					w = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+					quatd dQ = quatd(w, v);
+
+					dQ = Q1*dQ*Q1.Inverse();
+
+					// update global displacements
+					quatd Qi = Q1.Inverse();
+					dr = dR + r1 + dQ*dr - r0;
+					dq = dQ*dq;
+
+					// move up in the chain
+					pprb = pprb->m_prb;
+					Q0 = Q1;
+				}
+
+				// set global displacements
+				double* du = RB.m_du;
+
+				du[0] = dr.x;
+				du[1] = dr.y;
+				du[2] = dr.z;
+
+				v = dq.GetVector();
+				w = dq.GetAngle();
+				du[3] = w*v.x;
+				du[4] = w*v.y;
+				du[5] = w*v.z;
+			}
 		}
 	}
 
 	// store rigid displacements in Ui vector
-	for (i=0; i<(int) m_fem.m_Obj.size(); ++i)
+	for (i=0; i<NO; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
 		for (j=0; j<6; ++j)
@@ -955,6 +918,7 @@ void FESolidSolver::PrepStep(double time)
 	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
 	FEMaterialPoint::time = m_fem.m_ftime;
 
+	FEMesh& mesh = m_fem.m_mesh;
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
 	// intialize the stresses
@@ -2070,7 +2034,7 @@ void FESolidSolver::NodalForces(vector<double>& F)
 			
 			// For pressure and concentration loads, multiply by dt
 			// for consistency with evaluation of residual and stiffness matrix
-			if ((bc == DOF_P) || (bc == DOF_C) || (bc == DOF_C+1))
+			if ((bc == DOF_P) || (bc >= DOF_C))
 				f *= m_fem.GetCurrentStep()->m_dt;
 
 			if (n >= 0) F[n] = f;

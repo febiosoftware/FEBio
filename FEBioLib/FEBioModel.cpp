@@ -513,11 +513,28 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 	FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*>(pm);
 	if (pbs)
 	{
-		EvaluateMaterialParameters(pbs->m_pSolid);
-		EvaluateMaterialParameters(pbs->m_pPerm );
-		EvaluateMaterialParameters(pbs->m_pDiff );
-		EvaluateMaterialParameters(pbs->m_pSolub);
-		EvaluateMaterialParameters(pbs->m_pOsmC );
+		EvaluateMaterialParameters(pbs->m_pSolid );
+		EvaluateMaterialParameters(pbs->m_pPerm  );
+		EvaluateMaterialParameters(pbs->m_pOsmC  );
+		EvaluateMaterialParameters(pbs->m_pSolute);
+	}
+
+	FETriphasic* pt = dynamic_cast<FETriphasic*>(pm);
+	if (pt)
+	{
+		EvaluateMaterialParameters(pt->m_pSolid);
+		EvaluateMaterialParameters(pt->m_pPerm );
+		EvaluateMaterialParameters(pt->m_pOsmC );
+		EvaluateMaterialParameters(pt->m_pSolute[0]);
+		EvaluateMaterialParameters(pt->m_pSolute[1]);
+	}
+	
+	FESolute* ps = dynamic_cast<FESolute*>(pm);
+	if (ps)
+	{
+		EvaluateMaterialParameters(ps->m_pDiff );
+		EvaluateMaterialParameters(ps->m_pSolub);
+		if (ps->m_pSupp) EvaluateMaterialParameters(ps->m_pSupp );
 	}
 }
 
@@ -2210,13 +2227,12 @@ bool FEBioModel::InitMesh()
 //! \todo This function should probably move to the FEAnalysisStep class.
 bool FEBioModel::InitPoroSolute()
 {
-	int i, j, nd;
+	int i, j, k, nd, id0, id1;
 
 	// make sure this is the poro-solute module
 	int nstep = m_pStep->GetType();
-	bool bporo = (nstep == FE_BIPHASIC  ) || (nstep == FE_POROSOLUTE) || (nstep == FE_TRIPHASIC);
-	bool bsolu = (nstep == FE_POROSOLUTE) || (nstep == FE_TRIPHASIC );
-	bool btri  = (nstep == FE_TRIPHASIC );
+	bool bporo = ((nstep == FE_BIPHASIC) || (nstep == FE_POROSOLUTE) || (nstep == FE_TRIPHASIC));
+	bool bsolu = ((nstep == FE_POROSOLUTE  )|| (nstep == FE_TRIPHASIC));
 	
 	if (!bporo)
 	{
@@ -2238,28 +2254,16 @@ bool FEBioModel::InitPoroSolute()
 		// if there is no solute
 		// we set all concentration degrees of freedoms as fixed
 		// just to make sure they do not get assigned an equation number
-		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[DOF_C] = -1;
-		
-		// also remove prescribed concentrations
-		for (i=0; i<(int) m_DC.size(); ++i)
-		{
-			int& bc   = m_DC[i]->bc;
-			if (bc == DOF_C) bc = -1;
+		for (j=0; j<MAX_CDOFS; ++j) {
+			k = DOF_C+j;
+			for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[k] = -1;
 		}
-	}
-	
-	if (!btri)
-	{
-		// if there is no solute
-		// we set all concentration degrees of freedoms as fixed
-		// just to make sure they do not get assigned an equation number
-		for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[DOF_C+1] = -1;
 		
 		// also remove prescribed concentrations
 		for (i=0; i<(int) m_DC.size(); ++i)
 		{
 			int& bc   = m_DC[i]->bc;
-			if (bc == int(DOF_C+1)) bc = -1;
+			if ((bc >= DOF_C) && (bc < MAX_NDOFS)) bc = -1;
 		}
 	}
 	
@@ -2267,199 +2271,254 @@ bool FEBioModel::InitPoroSolute()
 		// let's go back
 		return true;
 	
-	if (bporo)
+	// see if we are using the symmetric version or not
+	if (m_pStep->m_bsym_poro == false) 
 	{
-		// fix all pressure dofs that are not used
-		// that is, that are not part of a biphasic, biphasic-solute, or triphasic element
-		// this is done in three steps
-		// step 1. mark all biphasic nodes
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
+		m_pStep->m_psolver->m_bsymm = false;
+		
+		// make sure we are using full-Newton
+//		if (m_pStep->m_psolver->m_bfgs.m_maxups != 0)
+//		{
+//			m_pStep->m_psolver->m_bfgs.m_maxups = 0;
+//			clog.printbox("WARNING", "The non-symmetric solver algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+//		}
+	}
+	
+	// fix all mixture dofs that are not used
+	// that is, that are not part of a biphasic, biphasic-solute, or triphasic element
+	// this is done in three steps
+	// step 1. mark all mixture nodes
+	for (nd = 0; nd<m_mesh.Domains(); ++nd)
+	{
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
 		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(dom.GetMaterial());
-			FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
-			FETriphasic*	  btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
-			if (bm || bsm || btm)
+			for (i=0; i<pbd->Elements(); ++i)
 			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				FESolidElement& el = pbd->Element(i);
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
+				FETriphasic* btm = dynamic_cast<FETriphasic*>(GetMaterial(el.GetMatID()));
+				if (bm || bsm || btm)
 				{
-					FEElement& el = dom.ElementRef(i);
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j) 
 						if (m_mesh.Node(n[j]).m_ID[DOF_P] == 0) m_mesh.Node(n[j]).m_ID[DOF_P] = 1;
 				}
-			}
-		}
-		
-		// step 2. fix pressure dofs of all unmarked nodes
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
-		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(dom.GetMaterial());
-			FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
-			FETriphasic*	  btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
-			if ((bm == 0) && (bsm == 0) && (btm == 0))
-			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				if (bsm)
 				{
-					FEElement& el = dom.ElementRef(i);
+					id0 = bsm->m_pSolute->GetSoluteID();
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
-					for (j=0; j<N; ++j)
-						if (m_mesh.Node(n[j]).m_ID[DOF_P] != 1) m_mesh.Node(n[j]).m_ID[DOF_P] = -1;
+					for (j=0; j<N; ++j) {
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if (k == id0) {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = 1;
+							}
+							else {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = -1;
+							}
+						}
+					}
+				}
+				else if (btm)
+				{
+					id0 = btm->m_pSolute[0]->GetSoluteID();
+					id1 = btm->m_pSolute[1]->GetSoluteID();
+					int N = el.Nodes();
+					int* n = &el.m_node[0];
+					for (j=0; j<N; ++j) {
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if ((k == id0) || (k == id1)) {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = 1;
+							}
+							else {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = -1;
+							}
+						}
+					}
 				}
 			}
 		}
 		
-		// step 3. free all marked dofs
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FEBiphasic*       bm  = dynamic_cast<FEBiphasic*      >(dom.GetMaterial());
-			FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
-			FETriphasic*	  btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
-			if (bm || bsm || btm)
+			for (i=0; i<psd->Elements(); ++i)
 			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				FEShellElement& el = psd->Element(i);
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
+				FETriphasic* btm = dynamic_cast<FETriphasic*>(GetMaterial(el.GetMatID()));
+				if (bm || bsm || btm)
 				{
-					FEElement& el = dom.ElementRef(i);
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
-					for (j=0; j<N; ++j)
-						if (m_mesh.Node(n[j]).m_ID[DOF_P] == 1) m_mesh.Node(n[j]).m_ID[DOF_P] = 0;
+					for (j=0; j<N; ++j) 
+						if (m_mesh.Node(n[j]).m_ID[DOF_P] == 0) m_mesh.Node(n[j]).m_ID[DOF_P] = 1;
+				}
+				if (bsm)
+				{
+					id0 = bsm->m_pSolute->GetSoluteID();
+					int N = el.Nodes();
+					int* n = &el.m_node[0];
+					for (j=0; j<N; ++j) {
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if (k == id0) {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = 1;
+							}
+							else {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = -1;
+							}
+						}
+					}
+				}
+				else if (btm)
+				{
+					id0 = btm->m_pSolute[0]->GetSoluteID();
+					id1 = btm->m_pSolute[1]->GetSoluteID();
+					int N = el.Nodes();
+					int* n = &el.m_node[0];
+					for (j=0; j<N; ++j) {
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if ((k == id0) || (k == id1)) {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = 1;
+							}
+							else {
+								if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = -1;
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 	
-	if (bsolu)
+	// step 2. fix mixture dofs of all unmarked nodes
+	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		// fix all neutral/cation concentration dofs that are not used
-		// that is, that are not part of a solute-solid element
-		// this is done in three steps
-		// step 1. mark all solute-solid nodes
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
 		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
-			FETriphasic*	  btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
-			if (bsm || btm)
+			for (i=0; i<pbd->Elements(); ++i)
 			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				FESolidElement& el = pbd->Element(i);
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
+				FETriphasic* btm = dynamic_cast<FETriphasic*>(GetMaterial(el.GetMatID()));
+				if ((bm == 0) && (bsm == 0) && (btm == 0))
 				{
-					FEElement& el = dom.ElementRef(i);
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
-					for (j=0; j<N; ++j) 
-						if (m_mesh.Node(n[j]).m_ID[DOF_C] == 0) m_mesh.Node(n[j]).m_ID[DOF_C] = 1;
+					for (j=0; j<N; ++j)
+						if (m_mesh.Node(n[j]).m_ID[DOF_P] != 1) m_mesh.Node(n[j]).m_ID[DOF_P] = -1;
+				}
+				if ((bsm == 0) && (btm == 0))
+				{
+					int N = el.Nodes();
+					int* n = &el.m_node[0];
+					for (j=0; j<N; ++j)
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if (m_mesh.Node(n[j]).m_ID[dofc] != 1) m_mesh.Node(n[j]).m_ID[dofc] = -1;
+						}
 				}
 			}
 		}
 		
-		// step 2. fix concentration dofs of all unmarked nodes
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
-			FETriphasic*	  btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
-			if ((bsm == 0) && (btm == 0))
+			for (i=0; i<psd->Elements(); ++i)
 			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				FEShellElement& el = psd->Element(i);
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
+				FETriphasic* btm = dynamic_cast<FETriphasic*>(GetMaterial(el.GetMatID()));
+				if ((bm == 0) && (bsm == 0) && (btm == 0))
 				{
-					FEElement& el = dom.ElementRef(i);
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j)
-						if (m_mesh.Node(n[j]).m_ID[DOF_C] != 1) m_mesh.Node(n[j]).m_ID[DOF_C] = -1;
+						if (m_mesh.Node(n[j]).m_ID[DOF_P] != 1) m_mesh.Node(n[j]).m_ID[DOF_P] = -1;
 				}
-			}
-		}
-		
-		// step 3. free all marked dofs
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
-		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
-			FETriphasic*	  btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
-			if (bsm || btm)
-			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				if ((bsm == 0) && (btm == 0))
 				{
-					FEElement& el = dom.ElementRef(i);
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j)
-						if (m_mesh.Node(n[j]).m_ID[DOF_C] == 1) m_mesh.Node(n[j]).m_ID[DOF_C] = 0;
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if (m_mesh.Node(n[j]).m_ID[dofc] != 1) m_mesh.Node(n[j]).m_ID[dofc] = -1;
+						}
 				}
 			}
 		}
 	}
-
-	if (btri)
+	
+	// step 3. free all marked dofs
+	for (nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
-		// fix all anion concentration dofs that are not used
-		// that is, that are not part of a solute-solid element
-		// this is done in three steps
-		// step 1. mark all solute-solid nodes
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
+		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
+		if (pbd)
 		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FETriphasic* btm = dynamic_cast<FETriphasic*>(dom.GetMaterial());
-			if (btm)
+			for (i=0; i<pbd->Elements(); ++i)
 			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				FESolidElement& el = pbd->Element(i);
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
+				FETriphasic* btm = dynamic_cast<FETriphasic*>(GetMaterial(el.GetMatID()));
+				if (bm || bsm || btm)
 				{
-					FEElement& el = dom.ElementRef(i);
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
-					for (j=0; j<N; ++j) 
-						if (m_mesh.Node(n[j]).m_ID[DOF_C+1] == 0) m_mesh.Node(n[j]).m_ID[DOF_C+1] = 1;
+					for (j=0; j<N; ++j)
+						if (m_mesh.Node(n[j]).m_ID[DOF_P] == 1) m_mesh.Node(n[j]).m_ID[DOF_P] = 0;
+				}
+				if (bsm || btm)
+				{
+					int N = el.Nodes();
+					int* n = &el.m_node[0];
+					for (j=0; j<N; ++j)
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if (m_mesh.Node(n[j]).m_ID[dofc] == 1) m_mesh.Node(n[j]).m_ID[dofc] = 0;
+						}
 				}
 			}
 		}
 		
-		// step 2. fix concentration dofs of all unmarked nodes
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
-		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FETriphasic* btm = dynamic_cast<FETriphasic*>(dom.GetMaterial());
-			if (btm == 0)
-			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
-				{
-					FEElement& el = dom.ElementRef(i);
-					int N = el.Nodes();
-					int* n = &el.m_node[0];
-					for (j=0; j<N; ++j)
-						if (m_mesh.Node(n[j]).m_ID[DOF_C+1] != 1) m_mesh.Node(n[j]).m_ID[DOF_C+1] = -1;
-				}
-			}
-		}
 		
-		// step 3. free all marked dofs
-		for (nd = 0; nd<m_mesh.Domains(); ++nd)
+		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
+		if (psd)
 		{
-			FEDomain& dom = m_mesh.Domain(nd);
-			FETriphasic* btm = dynamic_cast<FETriphasic*>(dom.GetMaterial());
-			if (btm)
+			for (i=0; i<psd->Elements(); ++i)
 			{
-				int NE = dom.Elements();
-				for (i=0; i<NE; ++i)
+				FEShellElement& el = psd->Element(i);
+				FEBiphasic* bm = dynamic_cast<FEBiphasic*>(GetMaterial(el.GetMatID()));
+				FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(GetMaterial(el.GetMatID()));
+				FETriphasic* btm = dynamic_cast<FETriphasic*>(GetMaterial(el.GetMatID()));
+				if (bm || bsm || btm)
 				{
-					FEElement& el = dom.ElementRef(i);
 					int N = el.Nodes();
 					int* n = &el.m_node[0];
 					for (j=0; j<N; ++j)
-						if (m_mesh.Node(n[j]).m_ID[DOF_C+1] == 1) m_mesh.Node(n[j]).m_ID[DOF_C+1] = 0;
+						if (m_mesh.Node(n[j]).m_ID[DOF_P] == 1) m_mesh.Node(n[j]).m_ID[DOF_P] = 0;
+				}
+				if (bsm || btm)
+				{
+					int N = el.Nodes();
+					int* n = &el.m_node[0];
+					for (j=0; j<N; ++j)
+						for (k=0; k<MAX_CDOFS; ++k) {
+							int dofc = DOF_C + k;
+							if (m_mesh.Node(n[j]).m_ID[dofc] == 1) m_mesh.Node(n[j]).m_ID[dofc] = 0;
+						}
 				}
 			}
 		}

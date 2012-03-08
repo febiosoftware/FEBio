@@ -46,9 +46,9 @@ void FETriphasic::Init()
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	if ((m_pSolute[0]->ChargeNumber() != 1) && (m_pSolute[0]->ChargeNumber() != -1))
-		throw MaterialError("charge_number for solute id=1 must be +1 or -1");
+		throw MaterialError("charge_number for first solute must be +1 or -1");
 	if ((m_pSolute[1]->ChargeNumber() != 1) && (m_pSolute[1]->ChargeNumber() != -1))
-		throw MaterialError("charge_number for solute id=2 must be +1 or -1");
+		throw MaterialError("charge_number for second solute must be +1 or -1");
 	if (m_pSolute[0]->ChargeNumber() != -m_pSolute[1]->ChargeNumber())
 		throw MaterialError("charge_number of solutes must have opposite signs");
 	
@@ -429,6 +429,11 @@ void FETriphasic::Serialize(DumpFile& ar)
 		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pPerm); m_pPerm->Serialize(ar);
 		m_pPerm->Init();
+
+		ar >> sz;
+		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		assert(m_pOsmC); m_pOsmC->Serialize(ar);
+		m_pOsmC->Init();
 		
 		ar >> sz;
 		m_pSolute[0] = dynamic_cast<FESolute*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
@@ -439,11 +444,5 @@ void FETriphasic::Serialize(DumpFile& ar)
 		m_pSolute[1] = dynamic_cast<FESolute*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pSolute[1]); m_pSolute[1]->Serialize(ar);
 		m_pSolute[1]->Init();
-		
-		ar >> sz;
-		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
-		assert(m_pOsmC); m_pOsmC->Serialize(ar);
-		m_pOsmC->Init();
-		
 	}
 }
