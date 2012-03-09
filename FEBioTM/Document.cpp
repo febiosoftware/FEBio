@@ -8,7 +8,7 @@
 #include "MainApp.h"
 #include "XMLWriter.h"
 #include "FEBioXML/XMLReader.h"
-#include "threads.h"
+#include "flx_threads.h"
 #include <time.h>
 
 extern void InitFEBioLibrary();
