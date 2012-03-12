@@ -619,7 +619,6 @@
     <ClInclude Include="..\..\FEBioLib\FETransverselyIsotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FETriphasic.h" />
     <ClInclude Include="..\..\FEBioLib\FETriphasicDomain.h" />
-    <ClInclude Include="..\..\FEBioLib\FETriphasicSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FETrussMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEUDGHexDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledElasticMixture.h" />
@@ -760,7 +759,6 @@
     <ClCompile Include="..\..\FEBioLib\FETransverselyIsotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETriphasic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETriphasicDomain.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FETriphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETrussMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUDGHexDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledElasticMixture.cpp" />

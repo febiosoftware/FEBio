@@ -519,16 +519,6 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 		EvaluateMaterialParameters(pbs->m_pSolute);
 	}
 
-	FETriphasic* pt = dynamic_cast<FETriphasic*>(pm);
-	if (pt)
-	{
-		EvaluateMaterialParameters(pt->m_pSolid);
-		EvaluateMaterialParameters(pt->m_pPerm );
-		EvaluateMaterialParameters(pt->m_pOsmC );
-		EvaluateMaterialParameters(pt->m_pSolute[0]);
-		EvaluateMaterialParameters(pt->m_pSolute[1]);
-	}
-	
 	FESolute* ps = dynamic_cast<FESolute*>(pm);
 	if (ps)
 	{
@@ -778,7 +768,6 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 			case FE_POROSOLUTE  : pstep = new FEBiphasicSoluteAnalysis(*this); break;
 			case FE_LINEAR_SOLID: pstep = new FELinearSolidAnalysis   (*this); break;
 			case FE_HEAT_SOLID  : pstep = new FEThermoElasticAnalysis (*this); break;
-			case FE_TRIPHASIC   : pstep = new FETriphasicAnalysis     (*this); break;
 			default:
 				assert(false);
 			}
@@ -2231,8 +2220,8 @@ bool FEBioModel::InitPoroSolute()
 
 	// make sure this is the poro-solute module
 	int nstep = m_pStep->GetType();
-	bool bporo = ((nstep == FE_BIPHASIC) || (nstep == FE_POROSOLUTE) || (nstep == FE_TRIPHASIC));
-	bool bsolu = ((nstep == FE_POROSOLUTE  )|| (nstep == FE_TRIPHASIC));
+	bool bporo = ((nstep == FE_BIPHASIC) || (nstep == FE_POROSOLUTE));
+	bool bsolu = (nstep == FE_POROSOLUTE);
 	
 	if (!bporo)
 	{

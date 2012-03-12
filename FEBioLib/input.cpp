@@ -13,7 +13,6 @@
 #include "FERigidJoint.h"
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"
-#include "FETriphasicSolver.h"
 #include "FERigidBody.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
@@ -118,7 +117,6 @@ void echo_input(FEBioModel& fem)
 	case FE_POROSOLUTE  : szmod = "biphasic-solute"; break;
 	case FE_LINEAR_SOLID: szmod = "linear solid"   ; break;
 	case FE_HEAT_SOLID  : szmod = "heat solid"     ; break;
-	case FE_TRIPHASIC   : szmod = "triphasic"      ; break;
 	default:
 		szmod = "unknown";
 		assert(false);
@@ -178,8 +176,6 @@ void echo_input(FEBioModel& fem)
 	if (pps) clog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
 	FEBiphasicSoluteSolver* pss = dynamic_cast<FEBiphasicSoluteSolver*>(step.m_psolver);
 	if (pss) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pss->m_Ctol);
-	FETriphasicSolver* pts = dynamic_cast<FETriphasicSolver*>(step.m_psolver);
-	if (pts) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pts->m_Ctol);
 	clog.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_bfgs.m_LStol );
 	clog.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_bfgs.m_LSmin );
 	clog.printf("\tMaximum number of line search iterations ....... : %d\n" , step.m_psolver->m_bfgs.m_LSiter);

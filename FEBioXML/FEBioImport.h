@@ -65,7 +65,6 @@ protected:
 	void ParseSolidParams	   (XMLTag& tag);
 	void ParsePoroParams	   (XMLTag& tag);
 	void ParseSoluteParams	   (XMLTag& tag);
-	void ParseTriphasicParams  (XMLTag& tag);
 	void ParseLinearSolidParams(XMLTag& tag);
 	void ParseHeatParams       (XMLTag& tag);
 };

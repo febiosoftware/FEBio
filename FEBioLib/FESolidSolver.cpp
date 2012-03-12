@@ -407,9 +407,6 @@ void FESolidSolver::Update(vector<double>& ui)
 	// update solute-poroelastic data
 	if (pstep->GetType() == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
 
-	// update triphasic data
-	if (pstep->GetType() == FE_TRIPHASIC) { UpdatePoro(ui); UpdateSolute(ui); }
-
 	// update contact
 	if (m_fem.ContactInterfaces() > 0) UpdateContact();
 

@@ -67,14 +67,6 @@ public:
 
 //-----------------------------------------------------------------------------
 //! Analysis class for triphasic problems
-class FETriphasicAnalysis : public FEAnalysisStep
-{
-public:
-	FETriphasicAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_TRIPHASIC) {}
-};
-
-//-----------------------------------------------------------------------------
-//! Analysis class for triphasic problems
 class FEHeatTransferAnalysis : public FEAnalysisStep
 {
 public:

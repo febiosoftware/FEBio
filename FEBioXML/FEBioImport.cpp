@@ -22,7 +22,6 @@
 #include "FEBioLib/FERigidWallInterface.h"
 #include "FEBioLib/FEBiphasicSolver.h"
 #include "FEBioLib/FEBiphasicSoluteSolver.h"
-#include "FEBioLib/FETriphasicSolver.h"
 #include "FEBioLib/FECoupledHeatSolidSolver.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FETractionLoad.h"
@@ -313,7 +312,6 @@ FEAnalysis* FEFEBioImport::CreateNewStep()
 	case FE_LINEAR_SOLID: pstep = new FELinearSolidAnalysis   (*m_pfem); break;
 	case FE_BIPHASIC    : pstep = new FEBiphasicAnalysis      (*m_pfem); break;
 	case FE_POROSOLUTE  : pstep = new FEBiphasicSoluteAnalysis(*m_pfem); break;
-	case FE_TRIPHASIC   : pstep = new FETriphasicAnalysis     (*m_pfem); break;
 	case FE_HEAT        : pstep = new FEHeatTransferAnalysis  (*m_pfem); break;
 	case FE_HEAT_SOLID  : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
 	default:
@@ -433,7 +431,6 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	else if (strcmp(szt, "poro"        ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;		// obsolete in 2.0
 	else if (strcmp(szt, "biphasic"    ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;
 	else if (strcmp(szt, "solute"      ) == 0) m_pim->m_nstep_type = FE_POROSOLUTE;
-	else if (strcmp(szt, "triphasic"   ) == 0) m_pim->m_nstep_type = FE_TRIPHASIC;
 	else if (strcmp(szt, "heat"        ) == 0) m_pim->m_nstep_type = FE_HEAT;
 	else if (strcmp(szt, "heat-solid"  ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
@@ -453,7 +450,6 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 	case FE_SOLID       : return new FESolidSolver           (fem);
 	case FE_BIPHASIC    : return new FEBiphasicSolver        (fem);
 	case FE_POROSOLUTE  : return new FEBiphasicSoluteSolver  (fem);
-	case FE_TRIPHASIC   : return new FETriphasicSolver       (fem);
 	case FE_HEAT        : return new FEHeatSolver            (fem);
 	case FE_LINEAR_SOLID: return new FELinearSolidSolver     (fem);
 	case FE_HEAT_SOLID  : return new FECoupledHeatSolidSolver(fem);
@@ -479,11 +475,10 @@ void FEBioControlSection::Parse(XMLTag& tag)
 		if (ParseCommonParams(tag) == false)
 		{
 			// next, parse solver specific control parameters
-			// NOTE: The order is important here! For instance, since the FETriphasicSolver is derived
+			// NOTE: The order is important here! For instance, since the FEBiphasicSoluteSolver is derived
 			//       from FEBiphasicSolver it must be checked before the biphasic solver. Same thing 
-			//       with the biphasic-solute and biphasic, and with the biphasic and solid solver.
-			if      (dynamic_cast<FETriphasicSolver*     >(pstep->m_psolver)) ParseTriphasicParams  (tag);
-			else if (dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver)) ParseSoluteParams     (tag);
+			//       with the biphasic and solid solver.
+			if      (dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver)) ParseSoluteParams     (tag);
 			else if (dynamic_cast<FEBiphasicSolver*      >(pstep->m_psolver)) ParsePoroParams       (tag);
 			else if (dynamic_cast<FESolidSolver*         >(pstep->m_psolver)) ParseSolidParams      (tag);
 			else if (dynamic_cast<FELinearSolidSolver*   >(pstep->m_psolver)) ParseLinearSolidParams(tag);
@@ -552,32 +547,6 @@ void FEBioControlSection::ParseSoluteParams(XMLTag &tag)
 	FEAnalysisStep* pstep = GetStep();
 
 	FEBiphasicSoluteSolver* ps = dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver);
-	assert(ps);
-
-	if      (tag == "dtol"        ) tag.value(ps->m_Dtol);
-	else if (tag == "etol"        ) tag.value(ps->m_Etol);
-	else if (tag == "rtol"        ) tag.value(ps->m_Rtol);
-	else if (tag == "min_residual") tag.value(ps->m_Rmin);
-	else if (tag == "lstol"       ) tag.value(ps->m_bfgs.m_LStol);
-	else if (tag == "lsmin"       ) tag.value(ps->m_bfgs.m_LSmin);
-	else if (tag == "lsiter"      ) tag.value(ps->m_bfgs.m_LSiter);
-	else if (tag == "max_refs"    ) tag.value(ps->m_bfgs.m_maxref);
-	else if (tag == "max_ups"     ) tag.value(ps->m_bfgs.m_maxups);
-	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
-	else if (tag == "ptol"        ) tag.value(ps->m_Ptol);
-	else if (tag == "ctol"        ) tag.value(ps->m_Ctol);
-	else if (tag == "symmetric_biphasic") tag.value(pstep->m_bsym_poro);
-	else throw XMLReader::InvalidTag(tag);
-}
-
-//-----------------------------------------------------------------------------
-// Parse parameters specific for the triphasic solver
-void FEBioControlSection::ParseTriphasicParams(XMLTag &tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEAnalysisStep* pstep = GetStep();
-
-	FETriphasicSolver* ps = dynamic_cast<FETriphasicSolver*>(pstep->m_psolver);
 	assert(ps);
 
 	if      (tag == "dtol"        ) tag.value(ps->m_Dtol);
@@ -1787,6 +1756,12 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 		{
 			// biphasic elements
 			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_BIPHASIC_SOLUTE_DOMAIN;
+			else return 0;
+		}
+		else if (dynamic_cast<FETriphasic*>(pmat))
+		{
+			// triphasic elements
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_TRIPHASIC_DOMAIN;
 			else return 0;
 		}
 		else

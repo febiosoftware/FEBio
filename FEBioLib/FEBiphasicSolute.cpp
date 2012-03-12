@@ -10,8 +10,6 @@
 BEGIN_PARAMETER_LIST(FEBiphasicSolute, FEMaterial)
 	ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 	ADD_PARAMETER(m_rhoTw, FE_PARAM_DOUBLE, "fluid_density");
-	ADD_PARAMETER(m_rhoTu, FE_PARAM_DOUBLE, "solute_density");
-	ADD_PARAMETER(m_Mu, FE_PARAM_DOUBLE, "solute_molar_mass");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
