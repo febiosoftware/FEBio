@@ -666,10 +666,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FETriphasicSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FETrussMaterial.cpp"
 				>
 			</File>
@@ -1237,10 +1233,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETriphasicDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETriphasicSolver.h"
 				>
 			</File>
 			<File
