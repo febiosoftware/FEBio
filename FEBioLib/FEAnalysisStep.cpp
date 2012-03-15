@@ -87,21 +87,6 @@ bool FEAnalysisStep::Init()
 
 	m_tend = m_fem.m_ftime0 + Dt;
 
-	// If no must point is defined, we create one
-	// that has two points, the start point and the end point
-	if (m_nmplc < 0)
-	{
-		FELoadCurve* plc = new FELoadCurve();
-		plc->Create(2);
-		plc->SetInterpolation(FELoadCurve::STEP);
-		plc->LoadPoint(0).time  = m_fem.m_ftime0;
-		plc->LoadPoint(0).value = 0;
-		plc->LoadPoint(1).time  = m_tend;
-		plc->LoadPoint(1).value = m_dtmax;
-		m_fem.AddLoadCurve(plc);
-		m_nmplc = m_fem.LoadCurves()-1;
-	}
-
 	// For now, add all domains to the analysis step
 	FEMesh& mesh = m_fem.m_mesh;
 	int ndom = mesh.Domains();
@@ -813,11 +798,18 @@ void FEAnalysisStep::AutoTimeStep(int niter)
 	// make sure the timestep size is at least the minimum
 	if (dtn < m_dtmin) dtn = m_dtmin;
 
-	// get the must point load curve
-	FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
+	// get the max time step
+	double dtmax = m_dtmax;
+	
+	// If we have a must-point load curve
+	// we take the max step size from the lc
+	if (m_nmplc >= 0)
+	{
+		FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
+		dtmax = lc.Value(told);
+	}
 
-	double dtmax = lc.Value(told);
-
+	// adjust time step size
 	if (niter > 0)
 	{
 		double scale = sqrt((double) m_iteopt / (double) niter);
@@ -844,26 +836,29 @@ void FEAnalysisStep::AutoTimeStep(int niter)
 	}
 
 	// check for mustpoints
-	double tnew = told + dtn;
-
-	const double eps = m_tend*1e-07;
-
-	int n = lc.FindPoint(told+eps);
-	if (n >= 0)
+	if (m_nmplc >= 0)
 	{
-		// TODO: what happens when dtn < dtmin and the next time step fails??
-		double tmust = lc.LoadPoint(n).time;
-		if (tnew > tmust)
+		double tnew = told + dtn;
+		const double eps = m_tend*1e-07;
+		FELoadCurve& lc = *m_fem.GetLoadCurve(m_nmplc);
+		int n = lc.FindPoint(told+eps);
+		if (n >= 0)
 		{
-			dtn = tmust - told;
-			clog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
-		}
-		else if (tnew > m_tend)
-		{
-			dtn = m_tend - told;
-			clog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
+			// TODO: what happens when dtn < dtmin and the next time step fails??
+			double tmust = lc.LoadPoint(n).time;
+			if (tnew > tmust)
+			{
+				dtn = tmust - told;
+				clog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
+			}
+			else if (tnew > m_tend)
+			{
+				dtn = m_tend - told;
+				clog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
+			}
 		}
 	}
 
+	// store time step size
 	m_dt = dtn;
 }

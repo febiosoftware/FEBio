@@ -787,9 +787,9 @@ void FESolidSolver::PrepStep(double time)
 		{
 			int I = DC.bc;
 			int lc = DC.lc;
-			if (lc > 0)
+			if (lc >= 0)
 			{
-				RB.m_dul[I] = DC.sf*m_fem.GetLoadCurve(lc-1)->Value() - RB.m_Ut[DC.bc];
+				RB.m_dul[I] = DC.sf*m_fem.GetLoadCurve(lc)->Value() - RB.m_Ut[DC.bc];
 			}
 		}
 	}

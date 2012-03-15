@@ -362,7 +362,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
 			const char* szat = tag.m_szatt[i];
 			if (strcmp(szat, "lc") == 0)
 			{
-				int lc = atoi(tag.m_szatv[i]);
+				int lc = atoi(tag.m_szatv[i])-1;
 				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_szatv[i]);
 				pp->m_nlc = lc;
 				switch (pp->m_itype)
@@ -655,7 +655,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			{
 				tag.value(pstep->m_dtmax);
 				const char* sz = tag.AttributeValue("lc", true);
-				if (sz) sscanf(sz,"%d", &pstep->m_nmplc);
+				if (sz) pstep->m_nmplc = atoi(sz) - 1;
 			}
 			else if (tag == "aggressiveness") tag.value(pstep->m_naggr);
 			else throw XMLReader::InvalidTag(tag);
@@ -1093,10 +1093,9 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 	else if (tag == "active_contraction")
 	{
 		const char* szlc = tag.AttributeValue("lc");
-		assert(szlc);
 		FEParameterList& pl = pm->m_fib.GetParameterList();
 		FEParam& p = *pl.Find("ascl");
-		p.m_nlc = atoi(szlc);
+		p.m_nlc = atoi(szlc)-1;
 		p.value<double>() = 1.0;
 
 		++tag;
@@ -1135,9 +1134,6 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 		if (strncmp(tag.Name(), "trans_", 6) == 0)
 		{
 			const char* szt = tag.AttributeValue("type");
-			const char* szlc = tag.AttributeValue("lc", true);
-			int lc = 0;
-			if (szlc) lc = atoi(szlc)+1;
 
 			int bc = -1;
 			if      (tag.Name()[6] == 'x') bc = 0;
@@ -1149,7 +1145,10 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 			else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
 			else if (strcmp(szt, "prescribed") == 0)
 			{
-				pm->m_bc[bc] = lc;
+				const char* szlc = tag.AttributeValue("lc");
+				int lc = atoi(szlc)-1;
+
+				pm->m_bc[bc] = lc+1;
 				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
 				pDC->id = m_nmat;
 				pDC->bc = bc;
@@ -1168,11 +1167,14 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 			}
 			else if (strcmp(szt, "force") == 0)
 			{
+				const char* szlc = tag.AttributeValue("lc");
+				int lc = atoi(szlc)-1;
+
 				pm->m_bc[bc] = 0;
 				FERigidBodyForce* pFC = new FERigidBodyForce;
 				pFC->id = m_nmat;
 				pFC->bc = bc;
-				pFC->lc = lc-1;
+				pFC->lc = lc;
 				tag.value(pFC->sf);
 				fem.m_RFC.push_back(pFC);
 
@@ -1191,9 +1193,6 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 		else if (strncmp(tag.Name(), "rot_", 4) == 0)
 		{
 			const char* szt = tag.AttributeValue("type");
-			const char* szlc = tag.AttributeValue("lc", true);
-			int lc = 0;
-			if (szlc) lc = atoi(szlc)+1;
 
 			int bc = -1;
 			if      (tag.Name()[4] == 'x') bc = 3;
@@ -1205,7 +1204,10 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 			else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
 			else if (strcmp(szt, "prescribed") == 0)
 			{
-				pm->m_bc[bc] = lc;
+				const char* szlc = tag.AttributeValue("lc", true);
+				int lc = atoi(szlc)-1;
+
+				pm->m_bc[bc] = lc+1;
 				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
 				pDC->id = m_nmat;
 				pDC->bc = bc;
@@ -1224,11 +1226,14 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 			}
 			else if (strcmp(szt, "force") == 0)
 			{
+				const char* szlc = tag.AttributeValue("lc", true);
+				int lc = atoi(szlc)-1;
+
 				pm->m_bc[bc] = 0;
 				FERigidBodyForce* pFC = new FERigidBodyForce;
 				pFC->id = m_nmat;
 				pFC->bc = bc;
-				pFC->lc = lc-1;
+				pFC->lc = lc;
 				tag.value(pFC->sf);
 				fem.m_RFC.push_back(pFC);
 
@@ -2598,12 +2603,11 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		for (int i=0; i<ndis; ++i)
 		{
 			// get the node ID
-			int n = atoi(tag.AttributeValue("id"))-1, lc;
+			int n = atoi(tag.AttributeValue("id"))-1;
 
 			// get the load curve number
-			sz = tag.AttributeValue("lc", true);
-			if (sz == 0) lc = 0;
-			else lc = atoi(sz);
+			sz = tag.AttributeValue("lc");
+			int lc = atoi(sz) - 1;
 
 			// create a new BC
 			FEPrescribedBC* pdc = new FEPrescribedBC;
@@ -2649,10 +2653,8 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 			// get the lc attribute
-			int lc;
-			sz = tag.AttributeValue("lc", true);
-			if (sz == 0) lc = 0;
-			else lc = atoi(sz);
+			sz = tag.AttributeValue("lc");
+			int lc = atoi(sz);
 
 			// make sure this tag is a leaf
 			if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
@@ -2697,7 +2699,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			++tag;
 			for (int i=0; i<ndis; ++i)
 			{
-				int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
+				int n = atoi(tag.AttributeValue("id"))-1, bc;
 				const char* sz = tag.AttributeValue("bc");
 
 				if      (strcmp(sz, "x") == 0) bc = DOF_X;
@@ -2711,9 +2713,8 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 				else if (strcmp(sz, "c") == 0) bc = DOF_C;
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
-				sz = tag.AttributeValue("lc", true);
-				if (sz == 0) lc = 0;
-				else lc = atoi(sz);
+				sz = tag.AttributeValue("lc");
+				int lc = atoi(sz)-1;
 
 				FEPrescribedBC* pdc = new FEPrescribedBC;
 				pdc->node = n;
@@ -2770,8 +2771,8 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 			int n = atoi(tag.AttributeValue("id"))-1;
 
 			// get the load curve
-			sz = tag.AttributeValue("lc", true);
-			int lc = (sz == 0? 0 : lc = atoi(sz));
+			sz = tag.AttributeValue("lc");
+			int lc = atoi(sz)-1;
 
 			// create new nodal force
 			FENodalForce* pfc = new FENodalForce;
@@ -2802,7 +2803,7 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 		++tag;
 		for (int i=0; i<ncnf; ++i)
 		{
-			int n = atoi(tag.AttributeValue("id"))-1, bc, lc;
+			int n = atoi(tag.AttributeValue("id"))-1, bc;
 			const char* sz = tag.AttributeValue("bc");
 
 			if      (strcmp(sz, "x") == 0) bc = 0;
@@ -2813,9 +2814,8 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 			else if (strcmp(sz, "c") == 0) bc = 11;
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
-			sz = tag.AttributeValue("lc", true);
-			if (sz == 0) lc = 0;
-			else lc = atoi(sz);
+			sz = tag.AttributeValue("lc");
+			int lc = atoi(sz) - 1;
 
 			FENodalForce* pfc = new FENodalForce;
 			pfc->node = n;
@@ -2875,8 +2875,8 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 		FEPressureLoad::LOAD& pc = ps->PressureLoad(i);
 		FESurfaceElement& el = psurf->Element(i);
 
-		sz = tag.AttributeValue("lc", true);
-		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+		sz = tag.AttributeValue("lc");
+		pc.lc = atoi(sz)-1;
 
 		s  = atof(tag.AttributeValue("scale"));
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
@@ -2931,8 +2931,8 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 		FETractionLoad::LOAD& tc = pt->TractionLoad(i);
 		FESurfaceElement& el = psurf->Element(i);
 
-		sz = tag.AttributeValue("lc", true);
-		if (sz) tc.lc = atoi(sz); else tc.lc = 0;
+		sz = tag.AttributeValue("lc");
+		tc.lc = atoi(sz)-1;
 
 		s.x  = atof(tag.AttributeValue("tx"));
 		s.y  = atof(tag.AttributeValue("ty"));
@@ -3007,8 +3007,8 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 		FEPoroNormalTraction::LOAD& pc = ps->NormalTraction(i);
 		FESurfaceElement& el = psurf->Element(i);
 		
-		sz = tag.AttributeValue("lc", true);
-		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+		sz = tag.AttributeValue("lc");
+		pc.lc = atoi(sz)-1;
 		
 		s  = atof(tag.AttributeValue("scale"));
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
@@ -3080,8 +3080,8 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 		FEFluidFlux::LOAD& fc = pfs->FluidFlux(i);
 		FESurfaceElement& el = psurf->Element(i);
 		
-		sz = tag.AttributeValue("lc", true);
-		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
+		sz = tag.AttributeValue("lc");
+		fc.lc = atoi(sz) - 1;
 		
 		s  = atof(tag.AttributeValue("scale"));
 		fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
@@ -3144,8 +3144,8 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 		FESoluteFlux::LOAD& fc = pfs->SoluteFlux(i);
 		FESurfaceElement& el = psurf->Element(i);
 		
-		sz = tag.AttributeValue("lc", true);
-		if (sz) fc.lc = atoi(sz); else fc.lc = 0;
+		sz = tag.AttributeValue("lc");
+		fc.lc = atoi(sz) - 1;
 		
 		s  = atof(tag.AttributeValue("scale"));
 		fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
@@ -3200,8 +3200,8 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 		FEHeatFlux::LOAD& pc = ph->HeatFlux(i);
 		FESurfaceElement& el = psurf->Element(i);
 
-		sz = tag.AttributeValue("lc", true);
-		if (sz) pc.lc = atoi(sz); else pc.lc = 0;
+		sz = tag.AttributeValue("lc");
+		if (sz) pc.lc = atoi(sz) - 1;
 
 		s  = atof(tag.AttributeValue("scale"));
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
@@ -3280,8 +3280,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 				FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
 				tag.value(ps->m_F);
 				const char* szl = tag.AttributeValue("lc");
-				int lc = atoi(szl);
-				ps->m_nlc = lc;
+				ps->m_nlc = atoi(szl) - 1;
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}
@@ -3711,7 +3710,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					ps->SetMasterSurface(new FEPlane(&fem));
 					FEPlane& pl = dynamic_cast<FEPlane&>(*ps->m_mp);
 					const char* sz = tag.AttributeValue("lc", true);
-					if (sz)	pl.m_nplc = atoi(sz);
+					if (sz)	pl.m_nplc = atoi(sz) - 1;
 
 					double* a = pl.GetEquation();
 					tag.value(a, 4);
@@ -3728,17 +3727,17 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 						else if (tag == "xtrans")
 						{
 							const char* szlc = tag.AttributeValue("lc");
-							s.m_nplc[0] = atoi(szlc);
+							s.m_nplc[0] = atoi(szlc) - 1;
 						}
 						else if (tag == "ytrans")
 						{
 							const char* szlc = tag.AttributeValue("lc");
-							s.m_nplc[1] = atoi(szlc);
+							s.m_nplc[1] = atoi(szlc) - 1;
 						}
 						else if (tag == "ztrans")
 						{
 							const char* szlc = tag.AttributeValue("lc");
-							s.m_nplc[2] = atoi(szlc);
+							s.m_nplc[2] = atoi(szlc) - 1;
 						}
 						else throw XMLReader::InvalidTag(tag);
 						++tag;
@@ -4290,7 +4289,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 				ps->SetMasterSurface(new FEPlane(&fem));
 				FEPlane& pl = dynamic_cast<FEPlane&>(*ps->m_mp);
 				const char* sz = tag.AttributeValue("lc", true);
-				if (sz)	pl.m_nplc = atoi(sz);
+				if (sz)	pl.m_nplc = atoi(sz) - 1;
 
 				double* a = pl.GetEquation();
 				tag.value(a, 4);
@@ -4307,17 +4306,17 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 					else if (tag == "xtrans")
 					{
 						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[0] = atoi(szlc);
+						s.m_nplc[0] = atoi(szlc) - 1;
 					}
 					else if (tag == "ytrans")
 					{
 						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[1] = atoi(szlc);
+						s.m_nplc[1] = atoi(szlc) - 1;
 					}
 					else if (tag == "ztrans")
 					{
 						const char* szlc = tag.AttributeValue("lc");
-						s.m_nplc[2] = atoi(szlc);
+						s.m_nplc[2] = atoi(szlc) - 1;
 					}
 					else throw XMLReader::InvalidTag(tag);
 					++tag;
@@ -5213,9 +5212,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 		if (strncmp(tag.Name(), "trans_", 6) == 0)
 		{
 			const char* szt = tag.AttributeValue("type");
-			const char* szlc = tag.AttributeValue("lc", true);
-			int lc = 1;
-			if (szlc) lc = atoi(szlc)+1;
 
 			int bc = -1;
 			if      (tag.Name()[6] == 'x') bc = 0;
@@ -5225,13 +5221,16 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 			
 			if (strcmp(szt, "prescribed") == 0)
 			{
+				const char* szlc = tag.AttributeValue("lc");
+				int lc = atoi(szlc) - 1;
+
 				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
 				pDC->id = nmat;
 				pDC->bc = bc;
 				pDC->lc = lc;
 				tag.value(pDC->sf);
 				fem.m_RDC.push_back(pDC);
-				pm->m_bc[bc] = lc;
+				pm->m_bc[bc] = lc+1;
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -5244,10 +5243,13 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "force") == 0)
 			{
+				const char* szlc = tag.AttributeValue("lc");
+				int lc = atoi(szlc) - 1;
+
 				FERigidBodyForce* pFC = new FERigidBodyForce;
 				pFC->id = nmat;
 				pFC->bc = bc;
-				pFC->lc = lc-1;
+				pFC->lc = lc;
 				tag.value(pFC->sf);
 				fem.m_RFC.push_back(pFC);
 				pm->m_bc[bc] = 0;
@@ -5267,9 +5269,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 		else if (strncmp(tag.Name(), "rot_", 4) == 0)
 		{
 			const char* szt = tag.AttributeValue("type");
-			const char* szlc = tag.AttributeValue("lc", true);
-			int lc = 0;
-			if (szlc) lc = atoi(szlc)+1;
 
 			int bc = -1;
 			if      (tag.Name()[4] == 'x') bc = 3;
@@ -5279,13 +5278,16 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 
 			if (strcmp(szt, "prescribed") == 0)
 			{
+				const char* szlc = tag.AttributeValue("lc");
+				int lc = atoi(szlc) - 1;
+
 				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
 				pDC->id = nmat;
 				pDC->bc = bc;
 				pDC->lc = lc;
 				tag.value(pDC->sf);
 				fem.m_RDC.push_back(pDC);
-				pm->m_bc[bc] = lc;
+				pm->m_bc[bc] = lc+1;
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -5298,10 +5300,13 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 			}
 			else if (strcmp(szt, "force") == 0)
 			{
+				const char* szlc = tag.AttributeValue("lc");
+				int lc = atoi(szlc) - 1;
+
 				FERigidBodyForce* pFC = new FERigidBodyForce;
 				pFC->id = nmat;
 				pFC->bc = bc;
-				pFC->lc = lc-1;
+				pFC->lc = lc;
 				tag.value(pFC->sf);
 				fem.m_RFC.push_back(pFC);
 				pm->m_bc[bc] = 0;

@@ -19,19 +19,6 @@ FEModel::FEModel(void)
 	m_ftime = 0;
 	m_ftime0 = 0;
 	m_bwopt = 0;
-
-	// add the "zero" loadcurve
-	// this is the loadcurve that will be used if a loadcurve is not
-	// specified for something that depends on time
-	// TODO: I want to get rid of this 
-	FELoadCurve* plc = new FELoadCurve();
-	plc->Create(2);
-	plc->LoadPoint(0).time = 0;
-	plc->LoadPoint(0).value = 0;
-	plc->LoadPoint(1).time = 1;
-	plc->LoadPoint(1).value = 1;
-	plc->SetExtendMode(FELoadCurve::EXTRAPOLATE);
-	AddLoadCurve(plc);
 }
 
 //-----------------------------------------------------------------------------

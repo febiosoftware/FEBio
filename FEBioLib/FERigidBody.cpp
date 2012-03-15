@@ -212,7 +212,7 @@ void FERigidBody::Update(std::vector<double>& Ui, std::vector<double>& ui)
 			{
 				int lc = pdc->lc;
 				// TODO: do I need to take the line search step into account here?
-				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - m_Up[j]);
+				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - m_Up[j]);
 			}
 			else du[j] = (lm[j] >=0 ? Ui[lm[j]] + ui[lm[j]] : 0);
 		}
@@ -234,7 +234,7 @@ void FERigidBody::Update(std::vector<double>& Ui, std::vector<double>& ui)
 			{
 				int lc = pdc->lc;
 				// TODO: do I need to take the line search step into account here?
-				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc-1)->Value() - m_Up[j]);
+				du[j] = (lc < 0? 0 : pdc->sf*m_fem.GetLoadCurve(lc)->Value() - m_Up[j]);
 			}
 			else du[j] = (lm[j] >=0 ? Ui[lm[j]] + ui[lm[j]] : 0);
 		}
