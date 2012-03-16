@@ -4852,7 +4852,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 	if (m_pim->Version() <= 0x0100)
 	{
 		FEAnalysisStep* pstep = GetStep();
-		nmplc = pstep->m_nmplc;
+		nmplc = pstep->m_nmplc+1;
 	}
 
 	++tag;
