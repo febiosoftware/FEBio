@@ -859,6 +859,13 @@ void FEAnalysisStep::AutoTimeStep(int niter)
 		}
 	}
 
+	// make sure we are not exceeding the final time
+	if (told + dtn > m_tend)
+	{
+		dtn = m_tend - told;
+		clog.printf("MUST POINT CONTROLLER: adjusting time step. dt = %lg\n\n", dtn);
+	}
+
 	// store time step size
 	m_dt = dtn;
 }
