@@ -11,7 +11,7 @@ public:
 	FEPeriodicSurface(FEMesh* pm = 0) : FEContactSurface(pm) {}
 
 	//! initializes data
-	void Init();
+	bool Init();
 
 	//! shallow copy
 	void ShallowCopy(FEPeriodicSurface& s)
@@ -47,7 +47,7 @@ public:
 	virtual ~FEPeriodicBoundary(void) {}
 
 	//! initialization
-	void Init();
+	bool Init();
 
 	//! update
 	void Update(int niter);

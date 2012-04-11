@@ -19,10 +19,10 @@ END_PARAMETER_LIST();
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-void FESurfaceConstraintSurface::Init()
+bool FESurfaceConstraintSurface::Init()
 {
 	// always intialize base class first!
-	FEContactSurface::Init();
+	if (FEContactSurface::Init() == false) return false;
 
 	// get the number of nodes
 	int nn = Nodes();
@@ -36,6 +36,8 @@ void FESurfaceConstraintSurface::Init()
 	// set initial values
 	zero(m_gap);
 	zero(m_Lm);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -91,15 +93,17 @@ FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfe
 }
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::Init()
+bool FESurfaceConstraint::Init()
 {
 	// create the surfaces
-	m_ss.Init();
-	m_ms.Init();
+	if (m_ss.Init() == false) return false;
+	if (m_ms.Init() == false) return false;
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, false);
 	ProjectSurface(m_ms, m_ss, false);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

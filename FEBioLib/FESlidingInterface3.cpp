@@ -42,10 +42,10 @@ FESlidingSurface3::FESlidingSurface3(FEModel* pfem) : FEContactSurface(&pfem->m_
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface3::Init()
+bool FESlidingSurface3::Init()
 {
 	// initialize surface data first
-	FEContactSurface::Init();
+	if (FEContactSurface::Init() == false) return false;
 	
 	// count how many integration points we have
 	int nint = 0, i;
@@ -131,6 +131,8 @@ void FESlidingSurface3::Init()
 	{
 		m_cg.assign(nint, 0);
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -289,14 +291,14 @@ FESlidingInterface3::~FESlidingInterface3()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::Init()
+bool FESlidingInterface3::Init()
 {
 	m_Rgas = FEModel::GetGlobalConstant("R");
 	m_Tabs = FEModel::GetGlobalConstant("T");
 
 	// initialize surface data
-	m_ss.Init();
-	m_ms.Init();
+	if (m_ss.Init() == false) return false;
+	if (m_ms.Init() == false) return false;
 	
 	bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
 
@@ -330,6 +332,8 @@ void FESlidingInterface3::Init()
 	
 	// update sliding interface data
 	Update(0);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

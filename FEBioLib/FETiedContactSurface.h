@@ -15,7 +15,7 @@ public:
 	FETiedContactSurface(FEMesh* pm=0) : FEContactSurface(pm) {}
 
 	//! Initializes data structures
-	void Init();
+	bool Init();
 
 	//! shallow copy
 	void ShallowCopy(FETiedContactSurface& s)

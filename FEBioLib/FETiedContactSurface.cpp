@@ -8,10 +8,10 @@
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-void FETiedContactSurface::Init()
+bool FETiedContactSurface::Init()
 {
 	// always intialize base class first!
-	FEContactSurface::Init();
+	if (FEContactSurface::Init() == false) return false;
 
 	// get the number of nodes
 	int nn = Nodes();
@@ -25,6 +25,8 @@ void FETiedContactSurface::Init()
 	// set initial values
 	zero(gap);
 	zero(Lm);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

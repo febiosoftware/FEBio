@@ -1559,7 +1559,7 @@ bool FEBioModel::InitContact()
 		FEContactInterface& ci = *m_CI[i];
 
 		// initializes contact interface data
-		ci.Init();
+		if (ci.Init() == false) return false;
 	}
 
 	return true;

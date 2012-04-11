@@ -83,12 +83,12 @@ FEElement* FESlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, boo
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-void FESlidingSurface::Init()
+bool FESlidingSurface::Init()
 {
 	int i, j, n;
 
 	// always intialize base class first!
-	FEContactSurface::Init();
+	if (FEContactSurface::Init() == false) return false;
 
 	// make sure the sibling surface has been set
 	assert(m_pSibling);
@@ -129,6 +129,8 @@ void FESlidingSurface::Init()
 		}
 	}
 	for (i=0; i<nn; ++i) off[i] = tag[node[i]];
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -312,11 +314,11 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 //-----------------------------------------------------------------------------
 //! Initializes the sliding interface data
 
-void FESlidingInterface::Init()
+bool FESlidingInterface::Init()
 {
 	// create the surfaces
-	m_ss.Init();
-	m_ms.Init();
+	if (m_ss.Init() == false) return false;
+	if (m_ms.Init() == false) return false;
 
 	// update the master surface normals
 //	m_ms.UpdateNormals();
@@ -333,6 +335,8 @@ void FESlidingInterface::Init()
 		ProjectSurface(m_ms, m_ss, true);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -42,14 +42,16 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&
 //! Initialization. This function intializes the surfaces data and projects the
 //! slave surface onto the master surface.
 //! 
-void FETiedInterface::Init()
+bool FETiedInterface::Init()
 {
 	// create the surfaces
-	ss.Init();
-	ms.Init();
+	if (ss.Init() == false) return false;
+	if (ms.Init() == false) return false;
 
 	// project slave surface onto master surface
 	ProjectSurface(ss, ms, false);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

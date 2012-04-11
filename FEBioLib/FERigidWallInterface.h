@@ -24,7 +24,7 @@ public:
 	FERigidWallSurface(FEMesh* pm=0) : FESurface(pm) { m_NQ.Attach(this); }
 
 	//! Initializes data structures
-	void Init();
+	bool Init();
 
 	//! shallow copy
 	void ShallowCopy(FERigidWallSurface& s)
@@ -79,7 +79,7 @@ public:
 	virtual ~FERigidWallInterface() { if (m_mp) delete m_mp; }
 
 	//! intializes rigid wall interface
-	void Init();
+	bool Init();
 
 	//! project slave nodes onto master plane
 	void ProjectSurface(FERigidWallSurface& s);

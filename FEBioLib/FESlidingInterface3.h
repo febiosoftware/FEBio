@@ -13,7 +13,7 @@ public:
 	~FESlidingSurface3() {}
 	
 	//! initialization
-	void Init();
+	bool Init();
 	
 	//! shallow copy
 	void ShallowCopy(FESlidingSurface3& s);
@@ -64,7 +64,7 @@ public:
 	~FESlidingInterface3();
 	
 	//! initialization
-	void Init();
+	bool Init();
 	
 	//! update
 	void Update(int niter);

@@ -36,7 +36,7 @@ public:
 	virtual ~FEContactInterface();
 
 	//! initialization routine
-	virtual void Init() = 0;
+	virtual bool Init() = 0;
 
 	//! update 
 	virtual void Update(int niter) = 0;

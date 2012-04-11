@@ -10,9 +10,12 @@
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-void FESurface::Init()
+bool FESurface::Init()
 {
 	int i, j, m;
+
+	// make sure this surface has elements
+	if (Elements() == 0) return false;
 
 	// get the mesh to which this surface belongs
 	FEMesh& mesh = *m_pMesh;
@@ -62,6 +65,8 @@ void FESurface::Init()
 		FESurfaceElement& el = Element(i);
 		if (el.m_nelem < 0) el.m_nelem = FindElement(el);
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

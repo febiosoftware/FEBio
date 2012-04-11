@@ -11,7 +11,7 @@ public:
 	FESurfaceConstraintSurface(FEMesh* pm = 0) : FEContactSurface(pm) { m_nref = -1; }
 
 	//! initializes data
-	void Init();
+	bool Init();
 
 	//! shallow copy
 	void ShallowCopy(FESurfaceConstraintSurface& s)
@@ -49,7 +49,7 @@ public:
 	virtual ~FESurfaceConstraint(void) {}
 
 	//! initialization
-	void Init();
+	bool Init();
 
 	//! update
 	void Update(int niter);

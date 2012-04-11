@@ -10,7 +10,7 @@ public:
 	FESlidingSurface2(FEModel* pfem);
 
 	//! initialization
-	void Init();
+	bool Init();
 
 	//! shallow copy
 	void ShallowCopy(FESlidingSurface2& s);
@@ -57,7 +57,7 @@ public:
 	~FESlidingInterface2();
 
 	//! initialization
-	void Init();
+	bool Init();
 
 	//! update
 	void Update(int niter);

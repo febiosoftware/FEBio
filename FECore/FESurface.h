@@ -57,7 +57,7 @@ public:
 	int Nodes() { return node.size(); }
 
 	//! initialize surface data structure
-	virtual void Init();
+	virtual bool Init();
 
 	//! return the FENode object for local node n
 	FENode& Node(int n) { return m_pMesh->Node( node[n] ); }

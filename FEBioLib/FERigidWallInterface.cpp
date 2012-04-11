@@ -75,12 +75,12 @@ FEElement* FERigidWallSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, b
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-void FERigidWallSurface::Init()
+bool FERigidWallSurface::Init()
 {
 	int i, j, n;
 
 	// always intialize base class first!
-	FESurface::Init();
+	if (FESurface::Init() == false) return false;
 
 	// get the number of nodes
 	int nn = Nodes();
@@ -117,6 +117,8 @@ void FERigidWallSurface::Init()
 		}
 	}
 	for (i=0; i<nn; ++i) off[i] = tag[node[i]];
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -229,16 +231,18 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(p
 //-----------------------------------------------------------------------------
 //! Initializes the rigid wall interface data
 
-void FERigidWallInterface::Init()
+bool FERigidWallInterface::Init()
 {
 	// create the surface
-	m_ss.Init();
+	if (m_ss.Init() == false) return false;
 
 	// initialize rigid surface
 	m_mp->Init();
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

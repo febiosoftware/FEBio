@@ -28,10 +28,10 @@ END_PARAMETER_LIST();
 // FEFacetSlidingSurface
 //-----------------------------------------------------------------------------
 
-void FEFacetSlidingSurface::Init()
+bool FEFacetSlidingSurface::Init()
 {
 	// initialize surface data first
-	FEContactSurface::Init();
+	if (FEContactSurface::Init() == false) return false;
 
 	// count how many integration points we have
 	int nint = 0, i;
@@ -60,6 +60,8 @@ void FEFacetSlidingSurface::Init()
 
 	// set intial values
 	zero(m_nu);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -182,11 +184,11 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 
 //-----------------------------------------------------------------------------
 //! Initialization routine
-void FEFacet2FacetSliding::Init()
+bool FEFacet2FacetSliding::Init()
 {
 	// initialize surface data
-	m_ss.Init();
-	m_ms.Init();
+	if (m_ss.Init() == false) return false;
+	if (m_ms.Init() == false) return false;
 
 	// calculate penalty factors
 	if (m_bautopen) CalcAutoPenalty(m_ss);
@@ -208,6 +210,8 @@ void FEFacet2FacetSliding::Init()
 		m_mu = 0;
 		m_epsf = 0;
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

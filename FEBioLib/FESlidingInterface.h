@@ -21,7 +21,7 @@ public:
 	FESlidingSurface(FEMesh* pm=0) : FEContactSurface(pm) { m_NQ.Attach(this); }
 
 	//! Initializes data structures
-	void Init();
+	bool Init();
 
 	//! shallow copy
 	void ShallowCopy(FESlidingSurface& s)
@@ -79,7 +79,7 @@ public:
 	virtual ~FESlidingInterface(){}
 
 	//! Initializes sliding interface
-	void Init();
+	bool Init();
 
 	//! update interface data
 	void Update(int niter);

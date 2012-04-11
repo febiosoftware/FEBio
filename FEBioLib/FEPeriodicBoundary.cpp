@@ -19,10 +19,10 @@ END_PARAMETER_LIST();
 //! Note that it is assumed that the element array is already created
 //! and initialized.
 
-void FEPeriodicSurface::Init()
+bool FEPeriodicSurface::Init()
 {
 	// always intialize base class first!
-	FEContactSurface::Init();
+	if (FEContactSurface::Init() == false) return false;
 
 	// get the number of nodes
 	int nn = Nodes();
@@ -36,6 +36,8 @@ void FEPeriodicSurface::Init()
 	// set initial values
 	zero(m_gap);
 	zero(m_Lm);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -89,15 +91,17 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::Init()
+bool FEPeriodicBoundary::Init()
 {
 	// create the surfaces
-	m_ss.Init();
-	m_ms.Init();
+	if (m_ss.Init() == false) return false;
+	if (m_ms.Init() == false) return false;
 
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, false);
 	ProjectSurface(m_ms, m_ss, false);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

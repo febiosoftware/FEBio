@@ -25,7 +25,7 @@ public:
 	virtual ~FETiedInterface(){}
 
 	//! Initializes sliding interface
-	void Init();
+	bool Init();
 
 	//! update interface data
 	void Update(int niter);

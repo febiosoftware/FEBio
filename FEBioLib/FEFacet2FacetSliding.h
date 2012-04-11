@@ -12,7 +12,7 @@ public:
 	FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm) { m_NQ.Attach(this); }
 
 	//! initialization
-	void Init();
+	bool Init();
 
 	//! Find element that contains the projection of x
 	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol, double srad);
@@ -49,7 +49,7 @@ public:
 	FEFacet2FacetSliding(FEModel* pfem);
 
 	//! initialization routine
-	void Init();
+	bool Init();
 
 	//! update 
 	void Update(int niter);
