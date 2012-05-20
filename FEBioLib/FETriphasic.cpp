@@ -101,38 +101,43 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 //! Electric potential
 double FETriphasic::ElectricPotential(FEMaterialPoint& pt, const bool eform)
 {
-	FESaltMaterialPoint& set = *pt.ExtractData<FESaltMaterialPoint>();
+	int i, j;
 	
-	// Fixed charge density
+	// Solve electroneutrality polynomial for zeta
+	FESaltMaterialPoint& set = *pt.ExtractData<FESaltMaterialPoint>();
+	const int nsol = 2;
 	double cF = FixedChargeDensity(pt);
-	// effective concentration
-	double c[2] = {set.m_c[0], set.m_c[1]};
-	// solubility
-	double khat[2] = {
-		m_pSolute[0]->m_pSolub->Solubility(pt),
-		m_pSolute[1]->m_pSolub->Solubility(pt)};
-	double z[2] = {
-		m_pSolute[0]->ChargeNumber(),
-		m_pSolute[1]->ChargeNumber()};
-	double psi = 1;
-	double r[2],d;
-	if (c[0] > 0) {
-		d = sqrt(SQR(cF)+4*SQR(z[0])*khat[0]*c[0]*khat[1]*c[1]);
-		r[0] = (-cF - d)/(2*z[0]*khat[0]*c[0]);
-		r[1] = (-cF + d)/(2*z[0]*khat[0]*c[0]);
-		psi = (r[0] >= 0) ? pow(r[0],1./z[0]) : pow(r[1],1./z[0]);
-	} else if (c[1] > 0) {
-		d = sqrt(SQR(cF)+4*SQR(z[1])*khat[0]*c[0]*khat[1]*c[1]);
-		r[0] = (-cF - d)/(2*z[1]*khat[1]*c[1]);
-		r[1] = (-cF + d)/(2*z[1]*khat[1]*c[1]);
-		psi = (r[0] >= 0) ? pow(r[0],1./z[1]) : pow(r[1],1./z[1]);
+	double c[2];		// effective concentration
+	double khat[2];		// solubility
+	int z[2];			// charge number
+	for (i=0; i<nsol; ++i) {
+		c[i] = set.m_c[i];
+		khat[i] = m_pSolute[i]->m_pSolub->Solubility(pt);
+		z[i] = m_pSolute[i]->ChargeNumber();
+	}
+	double zeta, psi;
+	
+	// evaluate polynomial coefficients
+	double a[3] = {0};
+	for (i=0; i<nsol; ++i) {
+		j = z[i] + 1;
+		a[j] += z[i]*khat[i]*c[i];
+	}
+	a[1] = cF;
+	
+	// solve polynomial
+	zeta = 1.0;
+	if (a[2]) {
+		zeta = (-a[1]+sqrt(a[1]*a[1]-4*a[0]*a[2]))/(2*a[2]);	// quadratic
+	} else if (a[1]) {
+		zeta = -a[0]/a[1];			// linear
 	}
 	
 	// Return exponential (non-dimensional) form if desired
-	if (eform) return psi;
+	if (eform) return zeta;
 	
 	// Otherwise return dimensional value of electric potential
-	psi = -m_Rgas*m_Tabs/m_Fc*log(psi);
+	psi = -m_Rgas*m_Tabs/m_Fc*log(zeta);
 	
 	return psi;
 }
@@ -147,7 +152,7 @@ double FETriphasic::Concentration(FEMaterialPoint& pt, const int ion)
 	double c = spt.m_c[ion];
 	// solubility
 	double khat = m_pSolute[ion]->m_pSolub->Solubility(pt);
-	double z = m_pSolute[ion]->ChargeNumber();
+	int z = m_pSolute[ion]->ChargeNumber();
 	double zeta = ElectricPotential(pt, true);
 	double zz = pow(zeta, z);
 	double kappa = zz*khat;
@@ -211,7 +216,7 @@ tens4ds FETriphasic::Tangent(FEMaterialPoint& mp)
 	double c[2] = {spt.m_c[0],spt.m_c[1]};
 	
 	// get the charge number
-	double z[2] = {m_pSolute[0]->ChargeNumber(),m_pSolute[1]->ChargeNumber()};
+	int z[2] = {m_pSolute[0]->ChargeNumber(),m_pSolute[1]->ChargeNumber()};
 	
 	// evaluate the solubility and its derivatives w.r.t. J and c
 	double khat[2] = {
@@ -293,7 +298,7 @@ vec3d FETriphasic::FluidFlux(FEMaterialPoint& pt)
 	double khat[2] = {
 		m_pSolute[0]->m_pSolub->Solubility(pt),
 		m_pSolute[1]->m_pSolub->Solubility(pt)};
-	double z[2] = {
+	int z[2] = {
 		m_pSolute[0]->ChargeNumber(),
 		m_pSolute[1]->ChargeNumber()};
 	double zeta = ElectricPotential(pt, true);
@@ -348,7 +353,7 @@ vec3d FETriphasic::SoluteFlux(FEMaterialPoint& pt, const int ion)
 	
 	// solubility
 	double khat = m_pSolute[ion]->m_pSolub->Solubility(pt);
-	double z = m_pSolute[ion]->ChargeNumber();
+	int z = m_pSolute[ion]->ChargeNumber();
 	double zeta = ElectricPotential(pt, true);
 	double zz = pow(zeta, z);
 	double kappa = zz*khat;
@@ -391,7 +396,7 @@ vec3d FETriphasic::CurrentDensity(FEMaterialPoint& pt)
 	vec3d j[2];
 	j[0] = SoluteFlux(pt, 0);
 	j[1] = SoluteFlux(pt, 1);
-	double z[2] = {m_pSolute[0]->ChargeNumber(), m_pSolute[1]->ChargeNumber()};
+	int z[2] = {m_pSolute[0]->ChargeNumber(), m_pSolute[1]->ChargeNumber()};
 	
 	vec3d Ie = (j[0]*z[0] + j[1]*z[1])*m_Fc;
 	

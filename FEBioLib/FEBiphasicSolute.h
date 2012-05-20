@@ -37,11 +37,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp;
+			ar << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp << m_crchat << m_crchatp;
 		}
 		else
 		{
-			ar >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp;
+			ar >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp >> m_crchat >> m_crchatp;
 		}
 		
 		if (m_pt) m_pt->Serialize(ar);
@@ -54,7 +54,7 @@ public:
 			m_c = m_ca = 0;
 			m_gradc = vec3d(0,0,0);
 			m_j = vec3d(0,0,0);
-			m_crc = m_crcp = 0;
+			m_crc = m_crcp = m_crchat = m_crchat = m_crchatp = 0;
 		}
 		
 		if (m_pt) m_pt->Init(bflag);
@@ -68,8 +68,9 @@ public:
 	double		m_ca;		//!< actual solute concentration
 	double		m_crc;		//!< referential concentration of receptor-ligand complex
 	double		m_crcp;		//!< m_crc at previous time point
+	double		m_crchat;	//!< referential receptor-ligand complex supply
+	double		m_crchatp;	//!< m_crchat at previous time point
 };
-
 
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.

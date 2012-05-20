@@ -968,6 +968,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// triphasic material parameters
 			if (!bfound && dynamic_cast<FETriphasic*>(pmat)) bfound = ParseTriphasicMaterial(tag, dynamic_cast<FETriphasic*>(pmat));
 
+			// multiphasic material parameters
+			if (!bfound && dynamic_cast<FEMultiphasic*>(pmat)) bfound = ParseMultiphasicMaterial(tag, dynamic_cast<FEMultiphasic*>(pmat));
+
 			// nested materials
 			if (!bfound && dynamic_cast<FENestedMaterial*>(pmat)) bfound = ParseNestedMaterial(tag, dynamic_cast<FENestedMaterial*>(pmat));
 			
@@ -1511,6 +1514,51 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 	
 	return false;
 }
+
+//-----------------------------------------------------------------------------
+// Parse FETriphasic material 
+//
+bool FEBioMaterialSection::ParseMultiphasicMaterial(XMLTag &tag, FEMultiphasic *pm)
+{
+	// get the material type
+	const char* sztype = tag.AttributeValue("type");
+		
+	// get the material name
+	const char* szname = tag.AttributeValue("name", true);
+
+	// get the material ID
+	// TODO: If this is a triphasic material, this is only used for the solutes.
+	//       Perhaps I can encode whether the ID is necessary in the FEMultiMaterial class.
+	//       For now I have to define it as an optional argument.
+	int nid = 0;
+	const char* szid = tag.AttributeValue("sol", true);
+	if (szid) nid = atoi(szid) - 1;
+
+	// see if we can find a material property with this name
+	int nc = pm->FindComponent(tag.Name(), nid);
+	if (nc == -1) throw XMLReader::InvalidTag(tag);
+
+	// create a new material of this type
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+	// assign the new material to the corresponding material property
+	if (pm->SetComponent(nc, pmat) == false)
+	{
+		clog.printbox("INPUT ERROR: Invalid %s definition in material %s\n", tag.Name(), pm->GetName());
+		throw XMLReader::Error();
+	}
+
+	// set the new material's name (if defined)
+	if (szname) pmat->SetName(szname);
+		
+	// parse the new material
+	ParseMaterial(tag, pmat);
+	
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 // Parse a nested material

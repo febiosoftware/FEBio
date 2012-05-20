@@ -24,6 +24,7 @@
 FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel& fem) : FEBiphasicSolver(fem)
 {
 	m_Ctol = 0.01;
+	for (int k=0; k<MAX_CDOFS; ++k) m_nceq[k] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -37,6 +38,8 @@ bool FEBiphasicSoluteSolver::Init()
 	int i, j, n;
 	
 	// allocate concentration-vectors
+	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
+	m_Ci.assign(MAX_CDOFS,vector<double>(0,0));
 	for (i=0; i<MAX_CDOFS; ++i) {
 		m_ci[i].assign(m_nceq[i], 0);
 		m_Ci[i].assign(m_nceq[i], 0);
@@ -58,6 +61,29 @@ bool FEBiphasicSoluteSolver::Init()
 		}
 	}
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize equations
+bool FEBiphasicSoluteSolver::InitEquations()
+{
+	// base class does most of the work
+	FEBiphasicSolver::InitEquations();
+	
+	int i,j;
+	
+	// determined the nr of concentration equations
+	FEMesh& mesh = m_fem.m_mesh;
+	for (j=0; j<MAX_CDOFS; ++j) m_nceq[j] = 0;
+	
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& n = mesh.Node(i);
+		for (j=0; j<MAX_CDOFS; ++j)
+			if (n.m_ID[DOF_C+j] != -1) m_nceq[j]++;
+	}
+	
 	return true;
 }
 
@@ -674,9 +700,11 @@ void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_Ctol;
+		for (int i=0; i<MAX_CDOFS; ++i) ar << m_nceq[i];
 	}
 	else
 	{
 		ar >> m_Ctol;
+		for (int i=0; i<MAX_CDOFS; ++i) ar >> m_nceq[i];
 	}
 }

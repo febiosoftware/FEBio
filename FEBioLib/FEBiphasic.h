@@ -20,11 +20,11 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p;
+			ar << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat << m_phi0hatp;
 		}
 		else
 		{
-			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p;
+			ar >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat >> m_phi0hatp;
 		}
 
 		if (m_pt) m_pt->Serialize(ar);
@@ -37,6 +37,8 @@ public:
 			m_p = m_pa = 0;
 			m_gradp = vec3d(0,0,0);
 			m_w = vec3d(0,0,0);
+			m_phi0 = m_phi0p = 0;
+			m_phi0hat = m_phi0hatp = 0;
 		}
 
 		if (m_pt) m_pt->Init(bflag);
@@ -55,6 +57,8 @@ public:
 	double		m_pa;		//!< actual fluid pressure
 	double		m_phi0;		//!< referential solid volume fraction at current time
 	double		m_phi0p;	//!< referential solid volume fraction at previous time
+	double		m_phi0hat;	//!< referential solid volume fraction supply at current time
+	double		m_phi0hatp;	//!< m_phi0hat at previous time
 };
 
 //-----------------------------------------------------------------------------

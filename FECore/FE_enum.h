@@ -165,6 +165,7 @@ enum FE_Print_Level {
 #define FE_BIPHASIC_SOLUTE_DOMAIN	13
 #define FE_LINEAR_SOLID_DOMAIN		14
 #define FE_TRIPHASIC_DOMAIN			15
+#define FE_MULTIPHASIC_DOMAIN		16
 
 //-----------------------------------------------------------------------------
 //! surface load types

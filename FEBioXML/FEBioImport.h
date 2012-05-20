@@ -9,6 +9,7 @@
 #include "FEBioLib/FEBiphasic.h"
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/FETriphasic.h"
+#include "FEBioLib/FEMultiphasic.h"
 #include "FEBioLib/FEAnalysisStep.h"
 #include "FEBioLib/FESolver.h"
 #include <map>
@@ -88,6 +89,7 @@ protected:
 	bool ParseBiphasicSoluteMaterial	(XMLTag& tag, FEBiphasicSolute* pm);
 	bool ParseSoluteMaterial			(XMLTag& tag, FESolute* pm);
 	bool ParseTriphasicMaterial			(XMLTag& tag, FETriphasic* pm);
+	bool ParseMultiphasicMaterial       (XMLTag& tag, FEMultiphasic* pm);
 	bool ParseNestedMaterial			(XMLTag& tag, FENestedMaterial* pm);
 
 protected:

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ElementDataRecord.h"
 #include "FETriphasic.h"
+#include "FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 void ElementDataRecord::Parse(const char *szexpr)
@@ -202,6 +203,41 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 					case IEX: val += stt->m_Ie.x; break;
 					case IEY: val += stt->m_Ie.y; break;
 					case IEZ: val += stt->m_Ie.z; break;
+				}
+			}
+			FESolutesMaterialPoint* sst = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+			if (sst)
+			{
+				switch (ndata)
+				{
+					case C1: val += sst->m_ca[0]; break;
+					case J1X: val += sst->m_j[0].x; break;
+					case J1Y: val += sst->m_j[0].y; break;
+					case J1Z: val += sst->m_j[0].z; break;
+					case C2: val += sst->m_ca[1]; break;
+					case J2X: val += sst->m_j[1].x; break;
+					case J2Y: val += sst->m_j[1].y; break;
+					case J2Z: val += sst->m_j[1].z; break;
+					case C3: val += sst->m_ca[2]; break;
+					case J3X: val += sst->m_j[2].x; break;
+					case J3Y: val += sst->m_j[2].y; break;
+					case J3Z: val += sst->m_j[2].z; break;
+					case C4: val += sst->m_ca[3]; break;
+					case J4X: val += sst->m_j[3].x; break;
+					case J4Y: val += sst->m_j[3].y; break;
+					case J4Z: val += sst->m_j[3].z; break;
+					case C5: val += sst->m_ca[4]; break;
+					case J5X: val += sst->m_j[4].x; break;
+					case J5Y: val += sst->m_j[4].y; break;
+					case J5Z: val += sst->m_j[4].z; break;
+					case C6: val += sst->m_ca[5]; break;
+					case J6X: val += sst->m_j[5].x; break;
+					case J6Y: val += sst->m_j[5].y; break;
+					case J6Z: val += sst->m_j[5].z; break;
+					case PSI: val += sst->m_psi; break;
+					case IEX: val += sst->m_Ie.x; break;
+					case IEY: val += sst->m_Ie.y; break;
+					case IEZ: val += sst->m_Ie.z; break;
 				}
 			}
 		}

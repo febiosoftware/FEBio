@@ -3,16 +3,16 @@
 #include "FESolute.h"
 
 //-----------------------------------------------------------------------------
-// Monovalent salt (cation + anion)
+// Multiple solutes
 
-class FESaltMaterialPoint : public FEMaterialPoint
+class FESolutesMaterialPoint : public FEMaterialPoint
 {
 public:
-	FESaltMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+	FESolutesMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
 	
 	FEMaterialPoint* Copy()
 	{
-		FESaltMaterialPoint* pt = new FESaltMaterialPoint(*this);
+		FESolutesMaterialPoint* pt = new FESolutesMaterialPoint(*this);
 		if (m_pt) pt->m_pt = m_pt->Copy();
 		return pt;
 	}
@@ -21,13 +21,13 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			ar << m_c[0] << m_gradc[0] << m_j[0] << m_ca[0];
-			ar << m_c[1] << m_gradc[1] << m_j[1] << m_ca[1];
+			for (int i=0; i<m_nsol; ++i)
+				ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i];
 		}
 		else
 		{
-			ar >> m_c[0] >> m_gradc[0] >> m_j[0] >> m_ca[0];
-			ar >> m_c[1] >> m_gradc[1] >> m_j[1] >> m_ca[1];
+			for (int i=0; i<m_nsol; ++i)
+				ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i];
 		}
 		
 		if (m_pt) m_pt->Serialize(ar);
@@ -37,48 +37,46 @@ public:
 	{
 		if (bflag)
 		{
-			m_c[0] = m_c[1] = 0;
-			m_ca[0] = m_ca[1] = 0;
+			m_nsol = 0;
 			m_psi = m_cF = 0;
-			m_gradc[0] = m_gradc[1] = vec3d(0,0,0);
-			m_j[0] = m_j[1] = m_Ie = vec3d(0,0,0);
+			m_Ie = vec3d(0,0,0);
 		}
 		
 		if (m_pt) m_pt->Init(bflag);
 	}
 	
 public:
-	// salt material data
-	double		m_c[2];		//!< effective concentration (0=cation, 1=anion)
-	vec3d		m_gradc[2];	//!< spatial gradient of concentration
-	vec3d		m_j[2];		//!< solute molar flux
-	double		m_ca[2];	//!< actual solute concentration
-	double		m_psi;		//!< electric potential
-	vec3d		m_Ie;		//!< current density
-	double		m_cF;		//!< fixed charge density in current configuration
+	// solutes material data
+	int				m_nsol;		//!< number of solutes
+	vector<double>	m_c;		//!< effective concentration
+	vector<vec3d>	m_gradc;	//!< spatial gradient of concentration
+	vector<vec3d>	m_j;		//!< solute molar flux
+	vector<double>	m_ca;		//!< actual solute concentration
+	double			m_psi;		//!< electric potential
+	vec3d			m_Ie;		//!< current density
+	double			m_cF;		//!< fixed charge density in current configuration
 };
 
 //-----------------------------------------------------------------------------
-//! Base class for triphasic materials.
+//! Base class for multiphasic materials.
 
-class FETriphasic : public FEMultiMaterial
+class FEMultiphasic : public FEMultiMaterial
 {
 public:
-	FETriphasic();
-
-	void Init();
+	FEMultiphasic();
 	
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
-		return new FESaltMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
+		return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
 	}
-
-	// Get the elastic component (overridden from FEMaterial)
+	
+	// return elastic material component
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
-
+	
 public:
-
+	void Init();
+	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);
 	
@@ -89,13 +87,13 @@ public:
 	vec3d FluidFlux(FEMaterialPoint& pt);
 	
 	//! calculate solute molar flux
-	vec3d SoluteFlux(FEMaterialPoint& pt, const int ion);
+	vec3d SoluteFlux(FEMaterialPoint& pt, const int sol);
 	
 	//! actual fluid pressure (as opposed to effective pressure)
 	double Pressure(FEMaterialPoint& pt);
 	
 	//! actual concentration (as opposed to effective concentration)
-	double Concentration(FEMaterialPoint& pt, const int ion);
+	double Concentration(FEMaterialPoint& pt, const int sol);
 	
 	//! porosity
 	double Porosity(FEMaterialPoint& pt);
@@ -113,18 +111,18 @@ public:
 	double FluidDensity() { return m_rhoTw; }
 	
 	//! solute density
-	double SoluteDensity(const int ion) { return m_pSolute[ion]->Density(); }
+	double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }
 	
 	//! solute molar mass
-	double SoluteMolarMass(const int ion) { return m_pSolute[ion]->MolarMass(); }
+	double SoluteMolarMass(const int sol) { return m_pSolute[sol]->MolarMass(); }
 	
 	//! solute charge number
-	int SoluteChargeNumber(const int ion) { return m_pSolute[ion]->ChargeNumber(); }
+	int SoluteChargeNumber(const int sol) { return m_pSolute[sol]->ChargeNumber(); }
 	
 	//! Serialization
 	void Serialize(DumpFile& ar);
-	
-public: // material parameters
+		
+public:
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density
 	double						m_cFr;			//!< fixed charge density in reference configurations
@@ -132,12 +130,17 @@ public: // material parameters
 	double						m_Tabs;			//!< absolute temperature
 	double						m_Fc;			//!< Faraday's constant
 	double						m_penalty;		//!< penalty for enforcing electroneutrality
+	int							m_zmin;			//!< minimum charge number in mixture
+	int							m_ndeg;			//!< polynomial degree of zeta in electroneutrality
 
-public: // material properties
+public:
 	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
 	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FESolute*					m_pSolute[2];	//!< pointer to solute materials
+	vector<FESolute*>			m_pSolute;		//!< pointer to solute materials
 
+	// declare as registered
+	DECLARE_REGISTERED(FEMultiphasic);
+	
 	DECLARE_PARAMETER_LIST();
 };

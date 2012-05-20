@@ -118,8 +118,8 @@ public:
 	//! solute molecular weight
 	double MolarMass() { return m_M; }
 	
-	//! solute valence
-	double ChargeNumber() { return m_z; }
+	//! solute charge number
+	int ChargeNumber() { return m_z; }
 	
 	//! Serialization
 	void Serialize(DumpFile& ar);

@@ -10,6 +10,8 @@
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEBiphasicSolute.h"
 #include "FEBioLib/FETriphasic.h"
+#include "FEBioLib/FEMultiphasicDomain.h"
+#include "FEBioLib/FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
@@ -200,9 +202,10 @@ bool FEPlotActualFluidPressure::Save(FEDomain &dom, vector<float>& a)
 	int i, j;
 	double ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain*>(&dom))	|| 
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) || 
 		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
-		(dynamic_cast<FETriphasicDomain*>(&dom)))
+		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
+		(dynamic_cast<FEMultiphasicDomain*   >(&dom)))
 	{
 		for (i=0; i<pbd->Elements(); ++i)
 		{
@@ -235,9 +238,10 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 	float af[3];
 	vec3d ew;
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain*>(&dom)) || 
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) || 
 		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
-		(dynamic_cast<FETriphasicDomain*>(&dom)))
+		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
+		(dynamic_cast<FEMultiphasicDomain*   >(&dom)))
 	{
 		for (i=0; i<pbd->Elements(); ++i)
 		{
@@ -273,9 +277,10 @@ bool FEPlotFluidFlux::Save(FEDomain &dom, vector<float>& a)
 bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 {
 	FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&dom);
-	if ((dynamic_cast<FEBiphasicSolidDomain*>(&dom))
-		|| (dynamic_cast<FEBiphasicSoluteDomain*>(&dom))
-		|| (dynamic_cast<FETriphasicDomain*>(&dom)))
+	if ((dynamic_cast<FEBiphasicSolidDomain* >(&dom)) ||
+		(dynamic_cast<FEBiphasicSoluteDomain*>(&dom)) ||
+		(dynamic_cast<FETriphasicDomain*     >(&dom)) ||
+		(dynamic_cast<FEMultiphasicDomain*   >(&dom)))
 	{
 		for (int i=0; i<pbd->Elements(); ++i)
 		{
@@ -398,6 +403,7 @@ bool FEPlotActualSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 	double ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -444,6 +450,35 @@ bool FEPlotActualSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_ca[sid];
 			}
@@ -465,6 +500,7 @@ bool FEPlotActualSol2Concentration::Save(FEDomain &dom, vector<float>& a)
 	double ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -511,6 +547,35 @@ bool FEPlotActualSol2Concentration::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if ( pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_ca[sid];
 			}
@@ -532,6 +597,7 @@ bool FEPlotActualSol3Concentration::Save(FEDomain &dom, vector<float>& a)
 	double ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -578,6 +644,35 @@ bool FEPlotActualSol3Concentration::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_ca[sid];
 			}
@@ -599,6 +694,7 @@ bool FEPlotActualSol4Concentration::Save(FEDomain &dom, vector<float>& a)
 	double ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -645,6 +741,35 @@ bool FEPlotActualSol4Concentration::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_ca[sid];
 			}
@@ -666,6 +791,7 @@ bool FEPlotActualSol5Concentration::Save(FEDomain &dom, vector<float>& a)
 	double ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -722,6 +848,35 @@ bool FEPlotActualSol5Concentration::Save(FEDomain &dom, vector<float>& a)
 		}
 		return true;
 	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -733,6 +888,7 @@ bool FEPlotActualSol6Concentration::Save(FEDomain &dom, vector<float>& a)
 	double ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -779,6 +935,35 @@ bool FEPlotActualSol6Concentration::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_ca[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_ca[sid];
 			}
@@ -801,6 +986,7 @@ bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 	vec3d ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -853,6 +1039,41 @@ bool FEPlotSol1Flux::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_j[sid];
 			}
@@ -881,6 +1102,7 @@ bool FEPlotSol2Flux::Save(FEDomain &dom, vector<float>& a)
 	vec3d ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -933,6 +1155,41 @@ bool FEPlotSol2Flux::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_j[sid];
 			}
@@ -961,6 +1218,7 @@ bool FEPlotSol3Flux::Save(FEDomain &dom, vector<float>& a)
 	vec3d ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1013,6 +1271,41 @@ bool FEPlotSol3Flux::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_j[sid];
 			}
@@ -1041,6 +1334,7 @@ bool FEPlotSol4Flux::Save(FEDomain &dom, vector<float>& a)
 	vec3d ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1093,6 +1387,41 @@ bool FEPlotSol4Flux::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_j[sid];
 			}
@@ -1121,6 +1450,7 @@ bool FEPlotSol5Flux::Save(FEDomain &dom, vector<float>& a)
 	vec3d ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1173,6 +1503,41 @@ bool FEPlotSol5Flux::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* st = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (st) ew += st->m_j[sid];
 			}
@@ -1201,6 +1566,7 @@ bool FEPlotSol6Flux::Save(FEDomain &dom, vector<float>& a)
 	vec3d ew;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1269,6 +1635,41 @@ bool FEPlotSol6Flux::Save(FEDomain &dom, vector<float>& a)
 		}
 		return true;
 	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (st) ew += st->m_j[sid];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -1278,6 +1679,7 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, vector<float>& a)
 	int i, j;
 	double ew;
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (ptd)
 	{
 		for (i=0; i<ptd->Elements(); ++i)
@@ -1300,6 +1702,28 @@ bool FEPlotElectricPotential::Save(FEDomain &dom, vector<float>& a)
 		}
 		return true;
 	}
+	else if (pmd)
+	{
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average electric potential
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (pt) ew += pt->m_psi;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -1310,6 +1734,7 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, vector<float>& a)
 	float af[3];
 	vec3d ew;
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (ptd)
 	{
 		for (i=0; i<ptd->Elements(); ++i)
@@ -1338,6 +1763,34 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, vector<float>& a)
 		}
 		return true;
 	}
+	else if (pmd)
+	{
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average flux
+			ew = vec3d(0,0,0);
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (pt) ew += pt->m_Ie;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			af[0] = (float) ew.x;
+			af[1] = (float) ew.y;
+			af[2] = (float) ew.z;
+			
+			a.push_back(af[0]);
+			a.push_back(af[1]);
+			a.push_back(af[2]);
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -1347,6 +1800,7 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 	int i, j;
 	double ew;
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (ptd)
 	{
 		for (i=0; i<ptd->Elements(); ++i)
@@ -1359,6 +1813,28 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 			{
 				FEMaterialPoint& mp = *el.m_State[j];
 				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_cF;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average electric potential
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
 				if (pt) ew += pt->m_cF;
 			}
@@ -1439,6 +1915,7 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
 	FEBiphasicSolidDomain* pd = dynamic_cast<FEBiphasicSolidDomain*>(&dom);
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (pd)
 	{
 		int N = pd->Nodes();
@@ -1469,6 +1946,16 @@ bool FEPlotEffectiveFluidPressure::Save(FEDomain &dom, vector<float>& a)
 		}
 		return true;
 	}
+	else if (pmd)
+	{
+		int N = pmd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pmd->Node(i);
+			a.push_back((float) node.m_pt);
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -1495,6 +1982,7 @@ bool FEPlotEffectiveSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 	const int SOL = 0;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1521,6 +2009,23 @@ bool FEPlotEffectiveSol1Concentration::Save(FEDomain &dom, vector<float>& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		bool present = false;
+		for (int i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {present = true; break;}
+		if (!present) return false;
+		
+		int N = pmd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pmd->Node(i);
 			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
@@ -1534,6 +2039,7 @@ bool FEPlotEffectiveSol2Concentration::Save(FEDomain &dom, vector<float>& a)
 	const int SOL = 1;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1560,6 +2066,23 @@ bool FEPlotEffectiveSol2Concentration::Save(FEDomain &dom, vector<float>& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		bool present = false;
+		for (int i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {present = true; break;}
+		if (!present) return false;
+		
+		int N = pmd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pmd->Node(i);
 			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
@@ -1573,6 +2096,7 @@ bool FEPlotEffectiveSol3Concentration::Save(FEDomain &dom, vector<float>& a)
 	const int SOL = 2;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1599,6 +2123,23 @@ bool FEPlotEffectiveSol3Concentration::Save(FEDomain &dom, vector<float>& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		bool present = false;
+		for (int i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {present = true; break;}
+		if (!present) return false;
+		
+		int N = pmd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pmd->Node(i);
 			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
@@ -1612,6 +2153,7 @@ bool FEPlotEffectiveSol4Concentration::Save(FEDomain &dom, vector<float>& a)
 	const int SOL = 3;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1638,6 +2180,23 @@ bool FEPlotEffectiveSol4Concentration::Save(FEDomain &dom, vector<float>& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		bool present = false;
+		for (int i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {present = true; break;}
+		if (!present) return false;
+		
+		int N = pmd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pmd->Node(i);
 			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
@@ -1651,6 +2210,7 @@ bool FEPlotEffectiveSol5Concentration::Save(FEDomain &dom, vector<float>& a)
 	const int SOL = 4;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1677,6 +2237,23 @@ bool FEPlotEffectiveSol5Concentration::Save(FEDomain &dom, vector<float>& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		bool present = false;
+		for (int i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {present = true; break;}
+		if (!present) return false;
+		
+		int N = pmd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pmd->Node(i);
 			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;
@@ -1690,6 +2267,7 @@ bool FEPlotEffectiveSol6Concentration::Save(FEDomain &dom, vector<float>& a)
 	const int SOL = 5;
 	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
 	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
 	if (psd)
 	{
 		FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (dom.GetMaterial());
@@ -1716,6 +2294,23 @@ bool FEPlotEffectiveSol6Concentration::Save(FEDomain &dom, vector<float>& a)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = ptd->Node(i);
+			a.push_back((float) node.m_ct[SOL]);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solute is present in this specific multiphasic mixture
+		bool present = false;
+		for (int i=0; i<pm->m_pSolute.size(); ++i)
+			if (pm->m_pSolute[i]->GetSoluteID() == SOL) {present = true; break;}
+		if (!present) return false;
+		
+		int N = pmd->Nodes();
+		for (int i=0; i<N; ++i)
+		{
+			FENode& node = pmd->Node(i);
 			a.push_back((float) node.m_ct[SOL]);
 		}
 		return true;

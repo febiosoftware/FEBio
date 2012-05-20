@@ -40,6 +40,7 @@
 #include "FELinearOrthotropic.h"
 #include "FELinearTransIso.h"
 #include "FEMooneyRivlin.h"
+#include "FEMultiphasic.h"
 #include "FEMuscleMaterial.h"
 #include "FENeoHookean.h"
 #include "FENeoHookeanTransIso.h"
@@ -137,6 +138,7 @@ REGISTER_MATERIAL(FELinearOrthotropic           , "linear orthotropic"          
 REGISTER_MATERIAL(FELinearSpring                , "linear spring"                 );
 REGISTER_MATERIAL(FELinearTransIso              , "linear trans iso"              );
 REGISTER_MATERIAL(FEMooneyRivlin                , "Mooney-Rivlin"                 );
+REGISTER_MATERIAL(FEMultiphasic                 , "multiphasic"                   );
 REGISTER_MATERIAL(FEMuscleMaterial              , "muscle material"               );
 REGISTER_MATERIAL(FENeoHookean                  , "neo-Hookean"                   );
 REGISTER_MATERIAL(FENeoHookeanTransIso          , "neo-Hookean transiso"          );

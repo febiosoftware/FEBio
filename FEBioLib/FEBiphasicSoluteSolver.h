@@ -14,6 +14,9 @@ public:
 	//! Initialize data structures
 	bool Init();
 
+	//! Initialize equations
+	bool InitEquations();
+
 	//! prepares the data for the first QN iteration
 	virtual void PrepStep(double time);
 
@@ -35,4 +38,8 @@ protected:
 
 public:
 	double	m_Ctol;			//!< concentration tolerance
+
+	// solute data
+	vector< vector<double> >	m_ci;	//!< concentration increment vector
+	vector< vector<double> >	m_Ci;	//!< Total concentration vector for iteration
 };

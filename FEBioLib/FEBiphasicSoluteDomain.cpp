@@ -68,8 +68,12 @@ void FEBiphasicSoluteDomain::InitElements()
 			
 			// reset referential solid volume fraction at previous time
 			pt.m_phi0p = pt.m_phi0;
+			// reset referential solid volume fraction supply at previous time
+			pt.m_phi0hatp = pt.m_phi0hat;
 			// reset referential receptor-ligand complex concentration at previous time
 			st.m_crcp = st.m_crc;
+			// reset referential receptor-ligand complex supply at previous time
+			st.m_crchatp = st.m_crchat;
 		}
 	}
 }
@@ -1731,13 +1735,13 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 				if (sstate)
 					spt.m_crc = pmb->m_pSolute->m_pSupp->ReceptorLigandConcentrationSS(mp);
 				else {
-					// update m_crc using one-step integration
-					double crchat = pmb->m_pSolute->m_pSupp->ReceptorLigandSupply(mp);
-					spt.m_crc = spt.m_crcp + crchat*dt;
-					// update phi0 using one-step integration
-					double phi0hat = pmb->m_pSolid->MolarMass()/pmb->m_pSolid->Density()
+					// update m_crc using one-step trapezoidal integration
+					spt.m_crchat = pmb->m_pSolute->m_pSupp->ReceptorLigandSupply(mp);
+					spt.m_crc = spt.m_crcp + 0.5*(spt.m_crchatp+spt.m_crchat)*dt;
+					// update phi0 using one-step trapezoidal integration
+					ppt.m_phi0hat = pmb->m_pSolid->MolarMass()/pmb->m_pSolid->Density()
 					*pmb->m_pSolute->m_pSupp->SolidSupply(mp);
-					ppt.m_phi0 = ppt.m_phi0p + phi0hat*dt;
+					ppt.m_phi0 = ppt.m_phi0p + 0.5*(ppt.m_phi0hatp + ppt.m_phi0hat)*dt;
 				}
 			}
 
