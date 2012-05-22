@@ -110,3 +110,8 @@ public:
 //-----------------------------------------------------------------------------
 #define REGISTER_FEBIO_CLASS(theClass, theBase, theName) \
 	static FERegisterClass_T<theClass, theBase> _##theClass##_rc(theName);
+
+//-----------------------------------------------------------------------------
+// version for classes that require template arguments
+#define REGISTER_FEBIO_CLASS_T(theClass, theBase, theArg, theName) \
+	static FERegisterClass_T<theClass<theArg>, theBase> _##theClass##theArg##_rc(theName);
