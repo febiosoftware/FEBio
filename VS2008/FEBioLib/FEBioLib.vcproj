@@ -462,6 +462,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEMultiphasic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEMultiphasicDomain.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEMuscleMaterial.cpp"
 				>
 			</File>
@@ -1029,6 +1037,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEMultiphasic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEMultiphasicDomain.h"
 				>
 			</File>
 			<File
