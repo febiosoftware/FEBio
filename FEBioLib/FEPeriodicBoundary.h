@@ -78,6 +78,7 @@ public:
 	double	m_atol;			//!< augmentation tolerance
 	double	m_eps;			//!< penalty scale factor
 	double	m_stol;			//!< search tolerance
+	double  m_srad;			//!< search radius (%)
 	bool	m_btwo_pass;	//!< two-pass flag
 
 	DECLARE_PARAMETER_LIST();

@@ -25,7 +25,7 @@ class FESurface : public FEDomain
 {
 public:
 	//! constructor
-	FESurface(FEMesh* pm) : FEDomain(FE_SURFACE_DOMAIN, pm, 0) {}
+	FESurface(FEMesh* pm) : FEDomain(FE_SURFACE_DOMAIN, pm, 0)  { m_SNQ.Attach(this); }
 
 	//! destructor
 	virtual ~FESurface(){}
@@ -102,7 +102,8 @@ public:
 	void ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
 	//! find the intersection of a ray with the surface
-	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei = 0);
+//	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei = 0);
+	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad, int* pei = 0);
 
 public:
 	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
@@ -118,6 +119,9 @@ public:
 	vector<int>	node;	//!< array of node indices
 
 	FENodeElemList	m_NEL;	//!< the node element list
+
+protected:
+	FENNQuery	m_SNQ;	//!< used to find the nearest neighbour
 };
 
 #endif // !defined(AFX_FESURFACE_H__6437C4B1_5BB7_4DDA_8354_CADFF3291D3E__INCLUDED_)

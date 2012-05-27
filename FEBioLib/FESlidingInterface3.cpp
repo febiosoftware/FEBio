@@ -269,7 +269,7 @@ FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfe
 	m_btwo_pass = false;
 	m_stol = 0.01;
 	m_bsymm = true;
-	m_srad = 0.1;
+	m_srad = 1.0;
 	m_gtol = -1;	// we use augmentation tolerance by default
 	m_ptol = -1;	// we use augmentation tolerance by default
 	m_ctol = -1;	// we use augmentation tolerance by default
@@ -559,6 +559,8 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 //-----------------------------------------------------------------------------
 void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg)
 {
+	bool bfirst = true;
+
 	FEMesh& mesh = m_pfem->m_mesh;
 	FESurfaceElement* pme;
 	vec3d r, nu;
@@ -628,7 +630,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 			}
 			
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, m_stol);
+			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, m_srad);
 			
 			ss.m_pme[n] = pme;
 			ss.m_nu[n] = nu;
@@ -811,7 +813,8 @@ void FESlidingInterface3::Update(int niter)
 			
 			// project it onto the primary surface
 			int nei;
-			FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, m_stol, &nei);
+			bool bfirst = false;
+			FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, bfirst, m_stol, m_srad, &nei);
 			
 			if (pse)
 			{

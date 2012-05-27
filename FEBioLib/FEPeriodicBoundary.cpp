@@ -80,6 +80,7 @@ FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem)
 	m_ntype = FE_PERIODIC_BOUNDARY;
 
 	m_stol = 0.01;
+	m_srad = 1.0;
 	m_atol = 0;
 	m_eps = 0;
 	m_btwo_pass = false;
@@ -109,6 +110,8 @@ bool FEPeriodicBoundary::Init()
 
 void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove)
 {
+	bool bfirst = true;
+
 	int i, nm;
 	double rs[2];
 
@@ -134,7 +137,7 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, m_stol, &nm);
+		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, m_srad, &nm);
 		assert(ss.m_pme[i]);
 
 		ss.m_rs[i][0] = rs[0];

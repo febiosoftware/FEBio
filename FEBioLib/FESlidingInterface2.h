@@ -44,6 +44,10 @@ public:
 
 	// biphasic data
 	vector<double>				m_pg;	//!< pressure "gap"
+
+	
+protected:
+	FENNQuery	m_NQ;			//!< used to find the nearest neighbour
 };
 
 //-----------------------------------------------------------------------------

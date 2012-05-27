@@ -82,6 +82,7 @@ FESurfaceConstraint::FESurfaceConstraint(FEModel* pfem) : FEContactInterface(pfe
 	m_ntype = FE_SURFACE_CONSTRAINT;
 
 	m_stol = 0.01;
+	m_srad = 1.0;
 	m_atol = 0;
 	m_eps = 0;
 	m_btwo_pass = false;
@@ -111,6 +112,8 @@ bool FESurfaceConstraint::Init()
 
 void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfaceConstraintSurface& ms, bool bmove)
 {
+	bool bfirst = true;
+
 	int i, nm;
 	double rs[2];
 
@@ -136,7 +139,7 @@ void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfa
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, m_stol, &nm);
+		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, m_srad, &nm);
 		assert(ss.m_pme[i]);
 
 		ss.m_rs[i][0] = rs[0];

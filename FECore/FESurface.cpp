@@ -945,42 +945,54 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 //! It returns a pointer to the element, as well as the isoparametric coordinates
 //! of the intersection point.
 //!
-FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei)
+FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad, int* pei)
 {
-//	double g, gmin = 1e99, r2[2] = {rs[0], rs[1]};
-	double g, gmax = -1e99, r2[2] = {rs[0], rs[1]};
-	int imin = -1;
-	FESurfaceElement* pme = 0;
-
-	// loop over all surface element
-	for (int i=0; i<Elements(); ++i)
+	double g;
+	
+	// get the mesh
+	FEMesh& mesh = *m_pMesh;
+	
+	// see if we need to initialize the NQ structure
+	if (binit_nq) m_SNQ.Init();
+	binit_nq = false;
+	
+	// let's find the closest surface node to r
+	int mn = m_SNQ.Find(r);
+	
+	// mn is a local index, so get the global node number too
+	int m = node[mn];
+	
+	// get the nodal position
+	vec3d r0 = mesh.Node(m).m_rt;
+	
+	// see if this node is within an acceptable distance for contact
+	FE_BOUNDING_BOX box = mesh.GetBoundingBox();
+	double R = srad*box.radius();
+	if ((r0-r).norm() > R) return 0;
+	
+	// now that we found the closest surface node, lets see if we can find 
+	// the best surface element
+	int N;
+	
+	// loop over all surface elements that contain the node mn
+	int nval = m_NEL.Valence(mn);
+	FEElement** pe = m_NEL.ElementList(mn);
+	int* ipe = m_NEL.ElementIndexList(mn);
+	for (int j=0; j<nval; ++j)
 	{
-		FESurfaceElement& el = Element(i);
-
-		// see if the ray intersects this element
-		if (Intersect(el, r, n, r2, g, eps))
-		{
-			// see if this is the best intersection found so far
-			// TODO: should I put a limit on how small g can
-			//       be to be considered a valid intersection?
-//			if (g < gmin)
-			if (g > gmax)
-			{
-				// keep results
-				pme = &el;
-//				gmin = g;
-				gmax = g;
-				imin = i;
-				rs[0] = r2[0];
-				rs[1] = r2[1];
-			}
-		}	
+		// get the surface element
+		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+		N = el.Nodes();
+		
+		// project the node on the element
+		if (Intersect(el, r, n, rs, g, tol)) {
+			if (pei) *pei = ipe[j];
+			return &el;
+		}
 	}
-
-	if (pei) *pei = imin;
-
-	// return the intersected element (or zero if none)
-	return pme;
+	
+	// we did not find a master surface
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
