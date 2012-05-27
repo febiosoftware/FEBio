@@ -1340,6 +1340,9 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 bool FESlidingInterface::Augment(int naug)
 {
+	// make sure we need to augment
+	if (!m_blaugon) return true;
+
 	int i;
 	double Ln;
 	double Lt[2];
@@ -1347,9 +1350,6 @@ bool FESlidingInterface::Augment(int naug)
 	mat2d Mi;
 
 	static double normg0 = 0;
-
-	// make sure we need to augment
-	if (!m_blaugon) return true;
 
 	// penalty factor
 	double eps, scale = Penalty();

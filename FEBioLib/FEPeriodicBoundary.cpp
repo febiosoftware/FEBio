@@ -516,6 +516,9 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 bool FEPeriodicBoundary::Augment(int naug)
 {
+	// make sure we need to augment
+	if (!m_blaugon) return true;
+
 	int i;
 	bool bconv = true;
 

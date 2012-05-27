@@ -519,6 +519,9 @@ void FERigidWallInterface::ContactStiffness(FENLSolver* psolver)
 
 bool FERigidWallInterface::Augment(int naug)
 {
+	// make sure we need to augment
+	if (!m_blaugon) return true;
+
 	int i;
 	double Lm;
 	bool bconv = true;
