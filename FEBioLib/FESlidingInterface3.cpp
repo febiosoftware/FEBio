@@ -300,8 +300,6 @@ bool FESlidingInterface3::Init()
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
 	
-	bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
-
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
@@ -310,13 +308,6 @@ bool FESlidingInterface3::Init()
 
 		// request a non-symmetric stiffness matrix
 		psolver->m_bsymm = false;
-		
-		// make sure we are using full-Newton
-		if (bporo && (psolver->m_bfgs.m_maxups != 0))
-		{
-			psolver->m_bfgs.m_maxups = 0;
-			clog.printbox("WARNING", "The non-symmetric biphasic-solute contact algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
-		}
 	}
 	
 	// calculate the penalty
@@ -729,7 +720,7 @@ void FESlidingInterface3::Update(int niter)
 	// project the surfaces onto each other
 	// this will update the gap functions as well
 	ProjectSurface(m_ss, m_ms, bupseg);
-	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupseg);
+	if (m_btwo_pass || m_ss.m_bporo) ProjectSurface(m_ms, m_ss, bupseg);
 	
 	// Update the net contact pressures
 	UpdateContactPressures();
@@ -806,58 +797,59 @@ void FESlidingInterface3::Update(int niter)
 		// loop over all nodes of the secondary surface
 		// the secondary surface is trickier since we need
 		// to look at the primary's surface projection
-		for (n=0; n<ms.Nodes(); ++n)
-		{
-			// get the node
-			FENode& node = ms.Node(n);
-			
-			// project it onto the primary surface
-			int nei;
-			bool bfirst = false;
-			FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, bfirst, m_stol, m_srad, &nei);
-			
-			if (pse)
+		if (ms.m_bporo) {
+			for (n=0; n<ms.Nodes(); ++n)
 			{
-				// we found an element, so let's see if it's even remotely close to contact
-				// find the global location of the intersection point
-				vec3d q = ms.Local2Global(*pse, rs[0], rs[1]);
+				// get the node
+				FENode& node = ms.Node(n);
 				
-				// calculate the gap function
-				double g = ms.m_nn[n]*(node.m_rt - q);
+				// project it onto the primary surface
+				int nei;
+				bool bfirst = false;
+				FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, bfirst, m_stol, m_srad, &nei);
 				
-				if (fabs(g) <= R)
+				if (pse)
 				{
-					// we found an element so let's calculate the nodal traction values for this element
-					// get the normal tractions at the integration points
-					double ti[4], gap, eps;
-					int nint = pse->GaussPoints();
-					int noff = ss.m_nei[nei];
-					for (i=0; i<nint; ++i) 
+					// we found an element, so let's see if it's even remotely close to contact
+					// find the global location of the intersection point
+					vec3d q = ss.Local2Global(*pse, rs[0], rs[1]);
+					
+					// calculate the gap function
+					double g = ms.m_nn[n]*(node.m_rt - q);
+					
+					if (fabs(g) <= R)
 					{
-						gap = ss.m_gap[noff + i];
-						eps = m_epsn*ss.m_epsn[noff + i];
-						ti[i] = MBRACKET(ss.m_Lmd[noff + i] + eps*gap);
-					}
-					
-					// project the data to the nodes
-					double tn[4];
-					pse->project_to_nodes(ti, tn);
-					
-					// now evaluate the traction at the intersection point
-					double tp = pse->eval(tn, rs[0], rs[1]);
-					
-					// if tp > 0, mark node as non-ambient. (= pos ID)
-					if (tp > 0)  {
-						id = node.m_ID[DOF_P];
-						if (id < -1)
-							// mark as non-ambient
-							node.m_ID[DOF_P] = -id-2;
-
-						for (j=0; j<MAX_CDOFS; ++j) {
-							id = node.m_ID[DOF_C+j];
+						// we found an element so let's calculate the nodal traction values for this element
+						// get the normal tractions at the integration points
+						double ti[4], gap, eps;
+						int nint = pse->GaussPoints();
+						int noff = ss.m_nei[nei];
+						for (i=0; i<nint; ++i) 
+						{
+							gap = ss.m_gap[noff + i];
+							eps = m_epsn*ss.m_epsn[noff + i];
+							ti[i] = MBRACKET(ss.m_Lmd[noff + i] + eps*gap);
+						}
+						
+						// project the data to the nodes
+						double tn[4];
+						pse->project_to_nodes(ti, tn);
+						
+						// now evaluate the traction at the intersection point
+						double tp = pse->eval(tn, rs[0], rs[1]);
+						
+						// if tp > 0, mark node as non-ambient. (= pos ID)
+						if (tp > 0)  {
+							id = node.m_ID[DOF_P];
 							if (id < -1)
 								// mark as non-ambient
-								node.m_ID[DOF_C+j] = -id-2;
+								node.m_ID[DOF_P] = -id-2;
+							for (j=0; j<MAX_CDOFS; ++j) {
+								id = node.m_ID[DOF_C+j];
+								if (id < -1)
+									// mark as non-ambient
+									node.m_ID[DOF_C+j] = -id-2;
+							}
 						}
 					}
 				}

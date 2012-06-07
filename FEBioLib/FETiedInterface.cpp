@@ -14,6 +14,8 @@ BEGIN_PARAMETER_LIST(FETiedInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"          ); 
 	ADD_PARAMETER(m_atol   , FE_PARAM_DOUBLE, "tolerance"       );
 	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty"         );
+	ADD_PARAMETER(m_naugmin, FE_PARAM_INT   , "minaug"          );
+	ADD_PARAMETER(m_naugmax, FE_PARAM_INT   , "maxaug"          );
 	ADD_PARAMETER(m_stol   , FE_PARAM_DOUBLE, "search_tolerance");
 END_PARAMETER_LIST();
 
@@ -33,6 +35,8 @@ FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&
 	m_atol = 0.01;
 	m_eps = 1.0;
 	m_stol = 0.0001;
+	m_naugmin = 0;
+	m_naugmax = 10;
 
 	// give this interface an ID (TODO: where is this actually used?)
 	m_nID = count++;
@@ -501,16 +505,12 @@ bool FETiedInterface::Augment(int naug)
 	if (!m_blaugon) return true;
 
 	int i;
-	bool bconv = true;
-
-	double g;
-	vec3d lm;
 
 	// calculate initial norms
 	double normL0 = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		lm = ss.Lm[i];
+		vec3d lm = ss.Lm[i];
 		normL0 += lm*lm;
 	}
 	normL0 = sqrt(normL0);
@@ -521,12 +521,12 @@ bool FETiedInterface::Augment(int naug)
 	int N = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		lm = ss.Lm[i] + ss.gap[i]*m_eps;
+		vec3d lm = ss.Lm[i] + ss.gap[i]*m_eps;
 
 		normL1 += lm*lm;
 		if (ss.m_pme[i] != 0)
 		{
-			g = ss.gap[i].norm();
+			double g = ss.gap[i].norm();
 			normgc += g*g;
 			++N;
 		}
@@ -544,9 +544,14 @@ bool FETiedInterface::Augment(int naug)
 	clog.printf("    normal force : %15le %15le\n", pctn, m_atol);
 	clog.printf("    gap function : %15le       ***\n", normgc);
 		
-	if (pctn >= m_atol) 
+	// check convergence
+	bool bconv = true;
+	if (pctn >= m_atol) bconv = false;
+	if (naug < m_naugmin ) bconv = false;
+	if (naug >= m_naugmax) bconv = true;
+
+	if (bconv == false) 
 	{
-		bconv = false;
 		for (i=0; i<ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers

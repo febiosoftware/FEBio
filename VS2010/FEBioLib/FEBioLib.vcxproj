@@ -613,6 +613,7 @@
     <ClInclude Include="..\..\FEBioLib\FESurfaceConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FETCNonlinearOrthotropic.h" />
     <ClInclude Include="..\..\FEBioLib\FETendonMaterial.h" />
+    <ClInclude Include="..\..\FEBioLib\FETiedBiphasicInterface.h" />
     <ClInclude Include="..\..\FEBioLib\FETiedContactSurface.h" />
     <ClInclude Include="..\..\FEBioLib\FETiedInterface.h" />
     <ClInclude Include="..\..\FEBioLib\FETractionLoad.h" />
@@ -755,6 +756,7 @@
     <ClCompile Include="..\..\FEBioLib\FESurfaceConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETCNonlinearOrthotropic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETendonMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FETiedBiphasicInterface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETiedContactSurface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETiedInterface.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETractionLoad.cpp" />

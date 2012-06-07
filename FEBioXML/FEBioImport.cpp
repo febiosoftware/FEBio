@@ -19,6 +19,7 @@
 #include "FEBioLib/FESlidingInterface2.h"
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/FETiedInterface.h"
+#include "FEBioLib/FETiedBiphasicInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"
 #include "FEBioLib/FEBiphasicSolver.h"
 #include "FEBioLib/FEBiphasicSoluteSolver.h"
@@ -3651,6 +3652,59 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else throw XMLReader::InvalidTag(tag);
 			}
 
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (strcmp(szt, "tied-biphasic") == 0)
+	{
+		// --- T I E D - B I P H A S I C ---
+		FETiedBiphasicInterface* ps = new FETiedBiphasicInterface(&fem);
+		fem.AddContactInterface(ps);
+		
+		FEParameterList& pl = ps->GetParameterList();
+		
+		++tag;
+		do
+		{
+			// read parameters
+			if (m_pim->ReadParameter(tag, pl) == false)
+			{
+				if (tag == "surface")
+				{
+					const char* sztype = tag.AttributeValue("type");
+					int ntype;
+					if (strcmp(sztype, "master") == 0) ntype = 1;
+					else if (strcmp(sztype, "slave") == 0) ntype = 2;
+					
+					FETiedBiphasicSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+					m.AddSurface(&s);
+					
+					int nfmt = 0;
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					}
+					
+					// read the surface section
+					ParseSurfaceSection(tag, s, nfmt);
+					
+					// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
+					// For this type of contact we want gaussian quadrature,
+					// so we have to modify those elements to FE_QUAD and FE_TRI
+					// TODO: we need a better way of doing this!
+					for (int i=0; i<s.Elements(); ++i)
+					{
+						FESurfaceElement& e = s.Element(i);
+						if (e.Nodes() == 4) e.SetType(FE_QUAD); 
+						else e.SetType(FE_TRI);
+					}
+				}
+				else throw XMLReader::InvalidTag(tag);
+			}
+			
 			++tag;
 		}
 		while (!tag.isend());

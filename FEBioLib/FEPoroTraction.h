@@ -43,7 +43,7 @@ public:
 
 protected:
 	//! calculate stiffness for an element
-	void TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective);
+	void TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective, bool bsymm);
 
 	//! Calculates external pressure forces
 	bool TractionForce(FESurfaceElement& el, vector<double>& fe, vector<double>& tn);

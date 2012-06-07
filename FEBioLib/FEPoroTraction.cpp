@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to normal traction
 
-void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective)
+void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective, bool bsymm)
 {
 	int i, j, n;
 
@@ -47,37 +47,78 @@ void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, v
 		}
 		
 		// calculate stiffness component
-		for (i=0; i<neln; ++i)
-			for (j=0; j<neln; ++j)
-			{
-				kab = (dxs*Gr[j] - dxr*Gs[j])*N[i]*w[n]*tr;
-
-				ke[3*i  ][3*j  ] +=      0;
-				ke[3*i  ][3*j+1] += -kab.z;
-				ke[3*i  ][3*j+2] +=  kab.y;
-
-				ke[3*i+1][3*j  ] +=  kab.z;
-				ke[3*i+1][3*j+1] +=      0;
-				ke[3*i+1][3*j+2] += -kab.x;
-
-				ke[3*i+2][3*j  ] += -kab.y;
-				ke[3*i+2][3*j+1] +=  kab.x;
-				ke[3*i+2][3*j+2] +=      0;
-			}
-		
-		// if prescribed traction is effective, add stiffness component
-		if (effective)
-		{
+		if (!bsymm) {
+			// non-symmetric
 			for (i=0; i<neln; ++i)
 				for (j=0; j<neln; ++j)
 				{
-					kab = (dxr ^ dxs)*w[n]*N[i]*N[j];
+					kab = (dxs*Gr[j] - dxr*Gs[j])*N[i]*w[n]*tr;
 					
-					ke[3*i  ][3*neln+j] += kab.x;
-					ke[3*i+1][3*neln+j] += kab.y;
-					ke[3*i+2][3*neln+j] += kab.z;
+					ke[3*i  ][3*j  ] +=      0;
+					ke[3*i  ][3*j+1] += -kab.z;
+					ke[3*i  ][3*j+2] +=  kab.y;
+					
+					ke[3*i+1][3*j  ] +=  kab.z;
+					ke[3*i+1][3*j+1] +=      0;
+					ke[3*i+1][3*j+2] += -kab.x;
+					
+					ke[3*i+2][3*j  ] += -kab.y;
+					ke[3*i+2][3*j+1] +=  kab.x;
+					ke[3*i+2][3*j+2] +=      0;
 				}
+			
+			// if prescribed traction is effective, add stiffness component
+			if (effective)
+			{
+				for (i=0; i<neln; ++i)
+					for (j=0; j<neln; ++j)
+					{
+						kab = (dxr ^ dxs)*w[n]*N[i]*N[j];
+						
+						ke[3*i  ][3*neln+j] += kab.x;
+						ke[3*i+1][3*neln+j] += kab.y;
+						ke[3*i+2][3*neln+j] += kab.z;
+					}
+			}
+		} else {
+			// symmetric
+			for (i=0; i<neln; ++i)
+				for (j=0; j<neln; ++j)
+				{
+					kab = ((dxs*Gr[j] - dxr*Gs[j])*N[i]-(dxs*Gr[i] - dxr*Gs[i])*N[j])*0.5*w[n]*tr;
+					
+					ke[3*i  ][3*j  ] +=      0;
+					ke[3*i  ][3*j+1] += -kab.z;
+					ke[3*i  ][3*j+2] +=  kab.y;
+					
+					ke[3*i+1][3*j  ] +=  kab.z;
+					ke[3*i+1][3*j+1] +=      0;
+					ke[3*i+1][3*j+2] += -kab.x;
+					
+					ke[3*i+2][3*j  ] += -kab.y;
+					ke[3*i+2][3*j+1] +=  kab.x;
+					ke[3*i+2][3*j+2] +=      0;
+				}
+			
+			// if prescribed traction is effective, add stiffness component
+			if (effective)
+			{
+				for (i=0; i<neln; ++i)
+					for (j=0; j<neln; ++j)
+					{
+						kab = (dxr ^ dxs)*w[n]*0.5*N[i]*N[j];
+						
+						ke[3*i  ][3*neln+j] += kab.x;
+						ke[3*i+1][3*neln+j] += kab.y;
+						ke[3*i+2][3*neln+j] += kab.z;
+
+						ke[3*i  ][3*neln+j] += kab.x;
+						ke[3*i+1][3*neln+j] += kab.y;
+						ke[3*i+2][3*neln+j] += kab.z;
+					}
+			}
 		}
+
 	}
 }
 
@@ -234,6 +275,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 void FEPoroNormalTraction::StiffnessMatrix(FENLSolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	matrix ke;
 
@@ -274,7 +316,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FENLSolver* psolver)
 				ke.resize(ndof, ndof);
 
 				// calculate pressure stiffness
-				TractionStiffness(el, ke, tn, m_beffective);
+				TractionStiffness(el, ke, tn, m_beffective, pstep->m_bsym_poro);
 
 				// get the element's LM vector
 				m_psurf->UnpackLM(el, lm);

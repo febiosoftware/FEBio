@@ -12,6 +12,7 @@
 #include "FEBioLib/FERigid.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
+#include "FETiedBiphasicInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
@@ -1037,14 +1038,15 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 			// create a new interface
 			switch (ntype)
 			{
-			case FE_CONTACT_SLIDING    : ps = new FESlidingInterface(this); break;
-			case FE_FACET2FACET_SLIDING: ps = new FEFacet2FacetSliding(this); break;
-			case FE_CONTACT_TIED       : ps = new FETiedInterface(this); break;
-			case FE_CONTACT_RIGIDWALL  : ps = new FERigidWallInterface(this); break;
-			case FE_CONTACT_SLIDING2   : ps = new FESlidingInterface2(this); break;
-			case FE_PERIODIC_BOUNDARY  : ps = new FEPeriodicBoundary(this); break;
-			case FE_SURFACE_CONSTRAINT : ps = new FESurfaceConstraint(this); break;
-			case FE_CONTACT_SLIDING3   : ps = new FESlidingInterface3(this); break;
+			case FE_CONTACT_SLIDING      : ps = new FESlidingInterface     (this); break;
+			case FE_FACET2FACET_SLIDING  : ps = new FEFacet2FacetSliding   (this); break;
+			case FE_CONTACT_TIED         : ps = new FETiedInterface        (this); break;
+			case FE_CONTACT_RIGIDWALL    : ps = new FERigidWallInterface   (this); break;
+			case FE_CONTACT_SLIDING2     : ps = new FESlidingInterface2    (this); break;
+			case FE_PERIODIC_BOUNDARY    : ps = new FEPeriodicBoundary     (this); break;
+			case FE_SURFACE_CONSTRAINT   : ps = new FESurfaceConstraint    (this); break;
+			case FE_CONTACT_SLIDING3     : ps = new FESlidingInterface3    (this); break;
+			case FE_CONTACT_TIED_BIPHASIC: ps = new FETiedBiphasicInterface(this); break;
 			default:
 				assert(false);
 			}

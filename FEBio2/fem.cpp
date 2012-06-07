@@ -3,6 +3,7 @@
 #include "FEBioXML/XMLReader.h"
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
+#include "FEBioLib/FETiedBiphasicInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"
 #include "FEBioLib/FEFacet2FacetSliding.h"
 #include "FEBioLib/FESlidingInterface2.h"
@@ -86,14 +87,15 @@ void FEM::ShallowCopy(FEM& fem)
 		{
 			switch (fem.m_CI[i]->Type())
 			{
-			case FE_CONTACT_SLIDING    : pci = new FESlidingInterface  (this); break;
-			case FE_FACET2FACET_SLIDING: pci = new FEFacet2FacetSliding(this); break;
-			case FE_CONTACT_TIED       : pci = new FETiedInterface     (this); break;
-			case FE_CONTACT_RIGIDWALL  : pci = new FERigidWallInterface(this); break;
-			case FE_CONTACT_SLIDING2   : pci = new FESlidingInterface2 (this); break;
-			case FE_PERIODIC_BOUNDARY  : pci = new FEPeriodicBoundary  (this); break;
-			case FE_SURFACE_CONSTRAINT : pci = new FESurfaceConstraint (this); break;
-			case FE_CONTACT_SLIDING3   : pci = new FESlidingInterface3 (this); break;
+			case FE_CONTACT_SLIDING      : pci = new FESlidingInterface  (this); break;
+			case FE_FACET2FACET_SLIDING  : pci = new FEFacet2FacetSliding(this); break;
+			case FE_CONTACT_TIED         : pci = new FETiedInterface     (this); break;
+			case FE_CONTACT_RIGIDWALL    : pci = new FERigidWallInterface(this); break;
+			case FE_CONTACT_SLIDING2     : pci = new FESlidingInterface2 (this); break;
+			case FE_PERIODIC_BOUNDARY    : pci = new FEPeriodicBoundary  (this); break;
+			case FE_SURFACE_CONSTRAINT   : pci = new FESurfaceConstraint (this); break;
+			case FE_CONTACT_SLIDING3     : pci = new FESlidingInterface3 (this); break;
+			case FE_CONTACT_TIED_BIPHASIC: pci = new FETiedBiphasicInterface(this); break;
 			default:
 				assert(false);
 			}

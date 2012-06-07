@@ -76,6 +76,7 @@
 #include "FESurfaceConstraint.h"
 #include "FEPeriodicBoundary.h"
 #include "FETiedInterface.h"
+#include "FETiedBiphasicInterface.h"
 
 #include "FEBioPlot/FEPlotDomainData.h"
 #include "FEDamageNeoHookean.h"
@@ -175,9 +176,10 @@ REGISTER_MATERIAL(FEVonMisesPlasticity          , "von-Mises plasticity"        
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
-REGISTER_FEBIO_CLASS(FEPeriodicBoundary , FEContactInterface, "periodic boundary" );
-REGISTER_FEBIO_CLASS(FESurfaceConstraint, FEContactInterface, "surface constraint");
-REGISTER_FEBIO_CLASS(FETiedInterface    , FEContactInterface, "tied"              );
+REGISTER_FEBIO_CLASS(FEPeriodicBoundary     , FEContactInterface, "periodic boundary" );
+REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FEContactInterface, "surface constraint");
+REGISTER_FEBIO_CLASS(FETiedInterface        , FEContactInterface, "tied"              );
+REGISTER_FEBIO_CLASS(FETiedBiphasicInterface, FEContactInterface, "tied-biphasic"     );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData

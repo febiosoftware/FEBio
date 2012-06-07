@@ -6,6 +6,7 @@
 #include "FEStiffnessMatrix.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
+#include "FETiedBiphasicInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
 #include "FESlidingInterface2.h"
@@ -601,6 +602,68 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 							}
 
 							build_add(lm);
+						}
+					}
+				}
+
+				// tied-biphasic interfaces
+				FETiedBiphasicInterface* ptb = dynamic_cast<FETiedBiphasicInterface*>(pci);
+				if (ptb)
+				{
+					vector<int> lm(7*8);
+					
+					int npass = (ptb->m_btwo_pass?2:1);
+					for (int np=0; np<npass; ++np)
+					{
+						FETiedBiphasicSurface& ss = (np == 0? ptb->m_ss : ptb->m_ms);
+						FETiedBiphasicSurface& ms = (np == 0? ptb->m_ms : ptb->m_ss);
+						
+						int ni = 0, k, l;
+						for (j=0; j<ss.Elements(); ++j)
+						{
+							FESurfaceElement& se = ss.Element(j);
+							int nint = se.GaussPoints();
+							int* sn = &se.m_node[0];
+							for (k=0; k<nint; ++k, ++ni)
+							{
+								FESurfaceElement* pe = ss.m_pme[ni];
+								if (pe != 0)
+								{
+									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+									int* mn = &me.m_node[0];
+									
+									set(lm, -1);
+									
+									int nseln = se.Nodes();
+									int nmeln = me.Nodes();
+									
+									for (l=0; l<nseln; ++l)
+									{
+										id = fem.m_mesh.Node(sn[l]).m_ID;
+										lm[7*l  ] = id[DOF_X];
+										lm[7*l+1] = id[DOF_Y];
+										lm[7*l+2] = id[DOF_Z];
+										lm[7*l+3] = id[DOF_P];
+										lm[7*l+4] = id[DOF_RU];
+										lm[7*l+5] = id[DOF_RV];
+										lm[7*l+6] = id[DOF_RW];
+									}
+									
+									for (l=0; l<nmeln; ++l)
+									{
+										id = fem.m_mesh.Node(mn[l]).m_ID;
+										lm[7*(l+nseln)  ] = id[DOF_X];
+										lm[7*(l+nseln)+1] = id[DOF_Y];
+										lm[7*(l+nseln)+2] = id[DOF_Z];
+										lm[7*(l+nseln)+3] = id[DOF_P];
+										lm[7*(l+nseln)+4] = id[DOF_RU];
+										lm[7*(l+nseln)+5] = id[DOF_RV];
+										lm[7*(l+nseln)+6] = id[DOF_RW];
+									}
+									
+									build_add(lm);
+								}
+							}
 						}
 					}
 				}
