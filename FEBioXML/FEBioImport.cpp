@@ -972,6 +972,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// multiphasic material parameters
 			if (!bfound && dynamic_cast<FEMultiphasic*>(pmat)) bfound = ParseMultiphasicMaterial(tag, dynamic_cast<FEMultiphasic*>(pmat));
 
+			// viscoelastic materials
+			if (!bfound && dynamic_cast<FEViscoElasticMaterial*>(pmat)) bfound = ParseViscoElasticMaterial(tag, dynamic_cast<FEViscoElasticMaterial*>(pmat));
+			
 			// nested materials
 			if (!bfound && dynamic_cast<FENestedMaterial*>(pmat)) bfound = ParseNestedMaterial(tag, dynamic_cast<FENestedMaterial*>(pmat));
 			
@@ -1031,6 +1034,55 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 		}
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
+		return true;
+	}
+	else if (tag == "fiber")
+	{
+		const char* szt = tag.AttributeValue("type");
+		if (strcmp(szt, "local") == 0)
+		{
+			FELocalMap* pmap = new FELocalMap(mesh);
+			pm->m_pmap = pmap;
+			
+			int n[3] = {0};
+			tag.value(n, 2);
+			
+			if ((n[0]==0)&&(n[1]==0)&&(n[2]==0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
+			if (n[2] == 0) n[2] = n[1];
+			
+			pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
+		}
+		else if (strcmp(szt, "spherical") == 0)
+		{
+			FESphericalMap* pmap = new FESphericalMap(mesh);
+			pm->m_pmap = pmap;
+			
+			vec3d c;
+			tag.value(c);
+			
+			pmap->SetSphereCenter(c);
+		}
+		else if (strcmp(szt, "vector") == 0)
+		{
+			FEVectorMap* pmap = new FEVectorMap;
+			pm->m_pmap = pmap;
+			
+			vec3d a, d;
+			tag.value(a);
+			a.unit();
+			
+			d = vec3d(1,0,0);
+			if (a*d > .999) d = vec3d(0,1,0);
+			
+			pmap->SetVectors(a, d);
+		}
+		else if (strcmp(szt, "user") == 0)
+		{
+			// fibers are read in in the ElementData section
+		}
+		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		
+		// mark the tag as read
 		return true;
 	}
 	return false;
@@ -1560,6 +1612,49 @@ bool FEBioMaterialSection::ParseMultiphasicMaterial(XMLTag &tag, FEMultiphasic *
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Parse a viscoelastic material
+bool FEBioMaterialSection::ParseViscoElasticMaterial(XMLTag &tag, FEViscoElasticMaterial *pm)
+{
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	// read the solid material
+	if (tag == "elastic")
+	{
+		const char* sztype = 0;
+		const char* szname = 0;
+		
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an elastic material)
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in nested material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+
+		// set the solid material pointer
+		pm->m_pBase = pme;
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 // Parse a nested material

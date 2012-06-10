@@ -76,7 +76,7 @@ public:
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation visco-elastic material
 
-class FEViscoElasticMaterial :	public FENestedMaterial
+class FEViscoElasticMaterial :	public FEElasticMaterial
 {
 public:
 	// NOTE: make sure that this parameter is the 
@@ -103,6 +103,9 @@ public:
 	double	m_t[MAX_TERMS];	//!< relaxation times
 	double	m_g0;			//!< intitial visco-elastic coefficient
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
+
+public:
+	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material
 
 public:
 	// declare parameter list

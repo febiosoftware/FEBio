@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEElasticSolidDomain.h"
 #include "FETransverselyIsotropic.h"
+#include "FEViscoElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEElasticSolidDomain::Clone()
@@ -60,6 +61,22 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 						// this element did not get specified a user-defined fiber direction
 //							clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
 						bmerr = true;
+					}
+				}
+			}
+
+			// check if this is also a viscoelastic material
+			FEViscoElasticMaterial* pve = dynamic_cast<FEViscoElasticMaterial*> (pme);
+			if (pve)
+			{
+				// check if the nested elastic material has local material axes specified
+				if (pve->m_pBase->m_pmap) {
+					for (int n=0; n<el.GaussPoints(); ++n)
+					{
+						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+						// compound the local map with the global material axes
+						mat3d Qlocal = pve->m_pBase->m_pmap->LocalElementCoord(el, n);
+						pt.Q = Qlocal*pt.Q;
 					}
 				}
 			}
