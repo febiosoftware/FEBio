@@ -72,6 +72,7 @@
 #include "FEVerondaWestmann.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
+#include "FEElasticMultigeneration.h"
 
 #include "FESurfaceConstraint.h"
 #include "FEPeriodicBoundary.h"
@@ -173,6 +174,7 @@ REGISTER_MATERIAL(FEUncoupledElasticMixture     , "uncoupled solid mixture"     
 REGISTER_MATERIAL(FEVerondaWestmann             , "Veronda-Westmann"              );
 REGISTER_MATERIAL(FEViscoElasticMaterial        , "viscoelastic"                  );
 REGISTER_MATERIAL(FEVonMisesPlasticity          , "von-Mises plasticity"          );
+REGISTER_MATERIAL(FEElasticMultigeneration      , "multigeneration"               );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

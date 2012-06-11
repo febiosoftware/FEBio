@@ -540,6 +540,7 @@
     <ClInclude Include="..\..\FEBioLib\FEEFDVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioLib\FEElasticDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEElasticMixture.h" />
+    <ClInclude Include="..\..\FEBioLib\FEElasticMultigeneration.h" />
     <ClInclude Include="..\..\FEBioLib\FEElasticShellDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEElasticSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEElasticTrussDomain.h" />
@@ -684,6 +685,7 @@
     <ClCompile Include="..\..\FEBioLib\FEEFDUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEEFDVerondaWestmann.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEElasticMixture.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEElasticMultigeneration.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEElasticShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEElasticSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEElasticTrussDomain.cpp" />
