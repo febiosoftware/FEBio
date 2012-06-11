@@ -106,6 +106,76 @@ void XMLTag::value(vec3d& v)
 	if (n != 3) throw XMLReader::XMLSyntaxError();
 }
 
+//-----------------------------------------------------------------------------
+void XMLTag::value(vector<int>& l)
+{
+	int i, n = 0, n0, n1, nn;
+	char* szval = strdup(m_szval.c_str());
+	char* ch;
+	char* sz = szval;
+	int nread;
+	do
+	{
+		ch = strchr(sz, ',');
+		if (ch) *ch = 0;
+		nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+		switch (nread)
+		{
+		case 1:
+			n1 = n0;
+			nn = 1;
+			break;
+		case 2:
+			nn = 1;
+			break;
+		case 3:
+			break;
+		default:
+			n0 = 0;
+			n1 = -1;
+			nn = 1;
+		}
+
+		for (i=n0; i<=n1; i += nn) ++n;
+
+		if (ch) *ch = ',';
+		sz = ch+1;
+	}
+	while (ch != 0);
+
+	if (n != 0)
+	{
+		l.resize(n);
+
+		sz = szval;
+		n = 0;
+		do
+		{
+			ch = strchr(sz, ',');
+			if (ch) *ch = 0;
+			nread = sscanf(sz, "%d:%d:%d", &n0, &n1, &nn);
+			switch (nread)
+			{
+			case 1:
+				n1 = n0;
+				nn = 1;
+				break;
+			case 2:
+				nn = 1;
+			}
+
+			for (i=n0; i<=n1; i += nn) l[n++] = i;
+			assert(n <= (int) l.size());
+
+			if (ch) *ch = ',';
+			sz = ch+1;
+		}
+		while (ch != 0);
+	}
+
+	free(szval);
+}
+
 //////////////////////////////////////////////////////////////////////
 
 const char* XMLTag::AttributeValue(const char* szat, bool bopt)

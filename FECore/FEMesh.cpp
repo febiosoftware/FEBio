@@ -9,6 +9,7 @@
 #include "FETrussDomain.h"
 #include "FEShellDomain.h"
 #include "FESolidDomain.h"
+#include "FEMaterial.h"
 
 //=============================================================================
 // FENodeSet
@@ -595,4 +596,30 @@ FESolidElement* FEMesh::FindSolidElement(vec3d y, double r[3])
 		}
 	}
 	return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+//! This function finds all the domains that have a certain material
+void FEMesh::DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom)
+{
+	// make sure the list is empty
+	if (ldom.empty() == false) ldom.clear();
+
+	// loop over all domains
+	int ND = (int) m_Domain.size();
+	int NM = (int) lmat.size();
+	for (int i=0; i<ND; ++i)
+	{
+		FEDomain& di = *m_Domain[i];
+		int dmat = di.GetMaterial()->GetID();
+		for (int j=0; j<NM; ++j)
+		{
+			if (dmat == lmat[j])
+			{
+				ldom.push_back(i);
+				break;
+			}
+		}
+	}
 }

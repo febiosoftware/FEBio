@@ -36,13 +36,21 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 //-----------------------------------------------------------------------------
 void FEDomainData::Save(FEModel &fem, Archive& ar)
 {
-	// loop over all domains
 	FEMesh& m = fem.m_mesh;
 	int ND = m.Domains();
+
+	// if the item list is empty, store all domains
+	if (m_item.empty())
+	{
+		for (int i=0; i<ND; ++i) m_item.push_back(i);
+	}
+
+	// loop over all domains in the item list
+	int N = m_item.size();
 	for (int i=0; i<ND; ++i)
 	{
 		// get the domain
-		FEDomain& D = m.Domain(i);
+		FEDomain& D = m.Domain(m_item[i]);
 
 		// calculate the size of the data vector
 		int nsize = VarSize(DataType());
@@ -71,7 +79,7 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 		if (Save(D, a))
 		{
 			assert(a.size() == nsize);
-			ar.WriteChunk(i+1, a);
+			ar.WriteChunk(m_item[i]+1, a);
 		}
 	}
 }

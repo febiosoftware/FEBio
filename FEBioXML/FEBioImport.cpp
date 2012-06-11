@@ -5353,8 +5353,22 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 			{
 				if (tag == "var")
 				{
+					// get the variable name
 					const char* szt = tag.AttributeValue("type");
-					if (plt.AddVariable(szt) == false) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+
+					// get the item list
+					vector<int> item;
+					if (tag.isempty() == false)
+					{
+						// TODO: currently, this is only supported for domain variables, where
+						//       the list is a list of materials
+						vector<int> lmat;
+						tag.value(lmat);
+						// convert the material list to a domain list
+						mesh.DomainListFromMaterial(lmat, item);
+					}
+
+					if (plt.AddVariable(szt, item) == false) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 				}
 				++tag;
 			}

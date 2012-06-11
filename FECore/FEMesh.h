@@ -307,6 +307,9 @@ public:
 
 	void AddDomain(FEDomain* pd) { m_Domain.push_back(pd); }
 
+	//! get a list of domains that belong to a specific material
+	void DomainListFromMaterial(vector<int>& lmat, vector<int>& ldom);
+
 	// --- SURFACES ---
 	int Surfaces() { return (int) m_Surf.size(); }
 	FESurface& Surface(int n) { return *m_Surf[n]; }

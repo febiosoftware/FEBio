@@ -34,9 +34,12 @@ public:
 
 	int VarSize(Var_Type t);
 
+	void SetItemList(vector<int>& item) { m_item = item; }
+
 protected:
-	Var_Type		m_ntype;
-	Storage_Fmt		m_sfmt;
+	Var_Type		m_ntype;	//!< data type
+	Storage_Fmt		m_sfmt;		//!< data storage format
+	vector<int>		m_item;		//!< Data will only be stored for the item's in this list
 };
 
 //-----------------------------------------------------------------------------

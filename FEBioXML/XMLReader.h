@@ -15,6 +15,8 @@
 #include <ctype.h>
 #include "FECore/vec3d.h"
 #include <string>
+#include <vector>
+using namespace std;
 
 class XMLReader  
 {
@@ -91,6 +93,7 @@ public:
 		int value(float* pf, int n);
 		int value(int* pi, int n);
 		void value(vec3d& v);
+		void value(vector<int>& l);
 
 		const char* szvalue() { return m_szval.c_str(); }
 	};

@@ -4,14 +4,15 @@
 #include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Dictionary::AddVariable(const char* szname)
+bool FEBioPlotFile::Dictionary::AddVariable(const char* szname, vector<int>& item)
 {
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	FEPlotData* ps = febio.Create<FEPlotData>(szname, 0);
-	if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname);
-	else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname);
-	else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname);
+	ps->SetItemList(item);
+	if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
+	else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
+	else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
 	return false;
 }
 
@@ -28,7 +29,7 @@ bool FEBioPlotFile::Dictionary::AddMaterialVariable(FEPlotData* ps, const char* 
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
 	if (dynamic_cast<FENodeData*>(ps))
 	{
@@ -44,7 +45,7 @@ bool FEBioPlotFile::Dictionary::AddNodalVariable(FEPlotData* ps, const char* szn
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
 	if (dynamic_cast<FEDomainData*>(ps))
 	{
@@ -60,7 +61,7 @@ bool FEBioPlotFile::Dictionary::AddDomainVariable(FEPlotData* ps, const char* sz
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* szname)
+bool FEBioPlotFile::Dictionary::AddSurfaceVariable(FEPlotData* ps, const char* szname, vector<int>& item)
 {
 	if (dynamic_cast<FESurfaceData*>(ps))
 	{
@@ -86,8 +87,9 @@ void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 	// Define default variables
 	if (m_Node.empty() && m_Elem.empty() && m_Face.empty())
 	{
-		AddVariable("displacement");
-		AddVariable("stress");
+		vector<int> l; // empty list
+		AddVariable("displacement", l);
+		AddVariable("stress", l);
 	}
 }
 
@@ -767,6 +769,7 @@ bool FEBioPlotFile::ReadDictionary()
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::ReadDicList()
 {
+	vector<int> l; // empty filder
 	while (m_ar.OpenChunk() == IO_OK)
 	{
 		unsigned int nid = m_ar.GetChunkID();
@@ -779,7 +782,7 @@ bool FEBioPlotFile::ReadDicList()
 				{
 					char sz[STR_SIZE];
 					m_ar.read(sz, STR_SIZE);
-					AddVariable(sz);
+					AddVariable(sz, l);
 				}
 				m_ar.CloseChunk();
 			}

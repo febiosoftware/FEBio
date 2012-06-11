@@ -90,7 +90,7 @@ public:
 	class Dictionary
 	{
 	public:
-		bool AddVariable(const char* szname);
+		bool AddVariable(const char* szname, vector<int>& item);
 
 		int NodalVariables  () { return m_Node.size(); }
 		int DomainVarialbes () { return m_Elem.size(); }
@@ -110,9 +110,9 @@ public:
 	protected:
 		bool AddGlobalVariable  (FEPlotData* ps, const char* szname);
 		bool AddMaterialVariable(FEPlotData* ps, const char* szname);
-		bool AddNodalVariable   (FEPlotData* ps, const char* szname);
-		bool AddDomainVariable  (FEPlotData* ps, const char* szname);
-		bool AddSurfaceVariable (FEPlotData* ps, const char* szname);
+		bool AddNodalVariable   (FEPlotData* ps, const char* szname, vector<int>& item);
+		bool AddDomainVariable  (FEPlotData* ps, const char* szname, vector<int>& item);
+		bool AddSurfaceVariable (FEPlotData* ps, const char* szname, vector<int>& item);
 
 	protected:
 		list<DICTIONARY_ITEM>	m_Glob;		// Global variables
@@ -138,7 +138,7 @@ public:
 	bool Write(FEModel& fem);
 
 	//! Add a variable to the dictionary
-	bool AddVariable(const char* sz) { return m_dic.AddVariable(sz); }
+	bool AddVariable(const char* sz, vector<int>& item) { return m_dic.AddVariable(sz, item); }
 
 public:
 	const Dictionary& GetDictionary() const { return m_dic; }

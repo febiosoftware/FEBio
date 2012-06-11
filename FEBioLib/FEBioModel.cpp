@@ -527,7 +527,7 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 		EvaluateMaterialParameters(pmp->m_pSolid);
 		EvaluateMaterialParameters(pmp->m_pPerm );
 		EvaluateMaterialParameters(pmp->m_pOsmC );
-		for (int i=0; i<pmp->m_pSolute.size(); ++i)
+		for (int i=0; i<(int)pmp->m_pSolute.size(); ++i)
 			EvaluateMaterialParameters(pmp->m_pSolute[i]);
 	}
 
