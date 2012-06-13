@@ -354,6 +354,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEElasticMultigeneration.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEElasticShellDomain.cpp"
 				>
 			</File>
@@ -642,6 +646,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FETiedBiphasicInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FETiedContactSurface.cpp"
 				>
 			</File>
@@ -925,6 +933,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEElasticMixture.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEElasticMultigeneration.h"
 				>
 			</File>
 			<File
@@ -1217,6 +1229,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETendonMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FETiedBiphasicInterface.h"
 				>
 			</File>
 			<File
