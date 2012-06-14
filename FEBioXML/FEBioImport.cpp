@@ -1004,7 +1004,7 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 			FELocalMap* pmap = new FELocalMap(mesh);
 			pm->m_pmap = pmap;
 
-			int n[3];
+			int n[3] = {0};
 			tag.value(n, 3);
 			if ((n[0] == 0) && (n[1] == 0) && (n[2] == 0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
 
