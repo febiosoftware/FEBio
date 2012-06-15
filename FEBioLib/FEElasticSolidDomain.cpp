@@ -2,6 +2,7 @@
 #include "FEElasticSolidDomain.h"
 #include "FETransverselyIsotropic.h"
 #include "FEViscoElasticMaterial.h"
+#include "FEUncoupledViscoElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEElasticSolidDomain::Clone()
@@ -76,6 +77,22 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 						// compound the local map with the global material axes
 						mat3d Qlocal = pve->m_pBase->m_pmap->LocalElementCoord(el, n);
+						pt.Q = Qlocal*pt.Q;
+					}
+				}
+			}
+
+			// check if this is also an uncoupled viscoelastic material
+			FEUncoupledViscoElasticMaterial* puve = dynamic_cast<FEUncoupledViscoElasticMaterial*> (pme);
+			if (puve)
+			{
+				// check if the nested elastic material has local material axes specified
+				if (puve->m_pBase->m_pmap) {
+					for (int n=0; n<el.GaussPoints(); ++n)
+					{
+						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+						// compound the local map with the global material axes
+						mat3d Qlocal = puve->m_pBase->m_pmap->LocalElementCoord(el, n);
 						pt.Q = Qlocal*pt.Q;
 					}
 				}

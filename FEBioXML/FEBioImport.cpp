@@ -974,6 +974,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 
 			// viscoelastic materials
 			if (!bfound && dynamic_cast<FEViscoElasticMaterial*>(pmat)) bfound = ParseViscoElasticMaterial(tag, dynamic_cast<FEViscoElasticMaterial*>(pmat));
+
+			// uncoupled viscoelastic materials
+			if (!bfound && dynamic_cast<FEUncoupledViscoElasticMaterial*>(pmat)) bfound = ParseUncoupledViscoElasticMaterial(tag, dynamic_cast<FEUncoupledViscoElasticMaterial*>(pmat));
 			
 			// nested materials
 			if (!bfound && dynamic_cast<FENestedMaterial*>(pmat)) bfound = ParseNestedMaterial(tag, dynamic_cast<FENestedMaterial*>(pmat));
@@ -1363,6 +1366,75 @@ bool FEBioMaterialSection::ParseElasticMixture(XMLTag &tag, FEElasticMixture *pm
 }
 
 //-----------------------------------------------------------------------------
+// Parse ParseElasticMultigeneration material 
+//
+bool FEBioMaterialSection::ParseElasticMultigeneration(XMLTag &tag, FEElasticMultigeneration *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	const char* szid = 0;
+	int id;
+	
+	// set global flag for multigeneration growth
+//	FEM::SetMultigenerationFlag(true);
+	
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	// read the solid material
+	if (tag == "solid")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an elastic material)
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in solid mixture material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// get the growth generation and store it in the material ID
+		szid = tag.AttributeValue("gen");
+		if (szid) {
+			id = atoi(szid) - 1;
+			if (id < 0)
+				throw XMLReader::InvalidAttributeValue(tag, "gen", szid);
+		} else {
+			throw XMLReader::MissingAttribute(tag, "gen");
+		}
+		pme->SetID(id);
+		
+		// set the solid material pointer
+		pm->m_pMat.push_back(pme);
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// TODO: assume that the material becomes stable since it is combined with others
+		// in a solid mixture.  (This may not necessarily be true.)
+		pme->m_unstable = false;
+		
+		// parse the solid
+		ParseMaterial(tag, pmat);
+		
+		return true;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 // Parse FEUncoupledElasticMixture material 
 //
 bool FEBioMaterialSection::ParseUncoupledElasticMixture(XMLTag &tag, FEUncoupledElasticMixture *pm)
@@ -1640,10 +1712,54 @@ bool FEBioMaterialSection::ParseViscoElasticMaterial(XMLTag &tag, FEViscoElastic
 		// don't allow rigid bodies
 		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
 		{
-			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in nested material %s\n", szname, pm->GetName());
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in viscoelastic material %s\n", szname, pm->GetName());
 			throw XMLReader::Error();
 		}
 
+		// set the solid material pointer
+		pm->m_pBase = pme;
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Parse an uncoupled viscoelastic material
+bool FEBioMaterialSection::ParseUncoupledViscoElasticMaterial(XMLTag &tag, FEUncoupledViscoElasticMaterial *pm)
+{
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	// read the solid material
+	if (tag == "elastic")
+	{
+		const char* sztype = 0;
+		const char* szname = 0;
+		
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an uncoupled material)
+		FEUncoupledMaterial* pme = dynamic_cast<FEUncoupledMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in uncoupled viscoelastic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
 		// set the solid material pointer
 		pm->m_pBase = pme;
 		
