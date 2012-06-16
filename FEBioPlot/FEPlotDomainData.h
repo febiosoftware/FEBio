@@ -224,3 +224,12 @@ public:
 	FEPlotReceptorLigandConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Class that outputs the element nodal stresses for UT4 domains
+class FEPlotUT4NodalStresses : public FEDomainData
+{
+public:
+	FEPlotUT4NodalStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+};

@@ -134,10 +134,10 @@ void FEUT4Domain::Serialize(DumpFile& ar)
 	{
 		ar << m_alpha << m_bdev;
 		ar << m_tag;
-		ar << (int) m_Node.size();
-		for (int i=0; i<(int) m_Node.size(); ++i)
+		ar << (int) m_NODE.size();
+		for (int i=0; i<(int) m_NODE.size(); ++i)
 		{
-			UT4NODE& n = m_Node[i];
+			UT4NODE& n = m_NODE[i];
 			ar << n.inode << n.Vi << n.vi << n.Fi << n.si;
 		}
 	}
@@ -147,11 +147,11 @@ void FEUT4Domain::Serialize(DumpFile& ar)
 		ar >> m_tag;
 		int nodes;
 		ar >> nodes;
-		m_Node.clear();
-		if (nodes > 0) m_Node.resize(nodes);
+		m_NODE.clear();
+		if (nodes > 0) m_NODE.resize(nodes);
 		for (int i=0; i<nodes; ++i)
 		{
-			UT4NODE& n = m_Node[i];
+			UT4NODE& n = m_NODE[i];
 			ar >> n.inode >> n.Vi >> n.vi >> n.Fi >> n.si;
 		}
 
@@ -175,7 +175,7 @@ FEDomain* FEUT4Domain::Clone()
 	FEUT4Domain* pd = new FEUT4Domain(m_pMesh, m_pMat);
 	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
 	pd->m_tag = m_tag;
-	pd->m_Node = m_Node;
+	pd->m_NODE = m_NODE;
 	pd->m_Ve0 = m_Ve0;
 	pd->m_NEL.Create(*pd);
 	int Nmax = pd->m_NEL.MaxValence();
@@ -196,39 +196,27 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 	// next, we need to identify all the nodes that belong to this domain
 	// we do this by looping over all the elements and tagging the nodes
 	int NN = m_pMesh->Nodes();
-	m_tag.assign(NN, 0);
+	m_tag.assign(NN, -1);
 
 	int i, j;
-	int NE = Elements();
-	for (i=0; i<NE; ++i)
-	{
-		FESolidElement& el = m_Elem[i];
-		assert((el.Type() == FE_TET) || (el.Type() == FE_TETG1));
-		for (int j=0; j<4; ++j) m_tag[el.m_node[j]] = 1;
-	}
-
-	// count the tags
-	int N = 0;
-	for (i=0; i<NN; ++i) if (m_tag[i] == 1) ++N;
-	if (N < 4) return false;
+	int N = m_Node.size();
+	for (i=0; i<N; ++i) m_tag[m_Node[i]] = i;
 
 	// allocate node structure
-	m_Node.resize(N);
+	m_NODE.resize(N);
 
 	// initialize nodes
-	N = 0;
-	for (i=0; i<NN; ++i)
-		if (m_tag[i] == 1)
-		{
-			UT4NODE& n = m_Node[N];
-			m_tag[i] = N++;
-			n.inode = i;
-			n.Vi = n.vi = 0.0;
-		}
-		else m_tag[i] = -1;
+	for (i=0; i<N; ++i)
+	{
+		UT4NODE& n = m_NODE[i];
+		n.inode = m_Node[i];
+		n.Vi = n.vi = 0.0;
+		n.si.zero();
+	}
 
 	// calculate the reference nodal volume
 	// we do this here since this volume never changes
+	int NE = m_pMesh->Elements();
 	m_Ve0.resize(NE);
 	double Ve;
 	vec3d r0[4];
@@ -243,7 +231,7 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 		m_Ve0[i] = Ve = TetVolume(r0);
 
 		// now assign one-quart to each node
-		for (j=0; j<4; ++j) m_Node[ m_tag[el.m_node[j]]].Vi += 0.25*Ve;
+		for (int j=0; j<4; ++j) m_NODE[ m_tag[el.m_node[j]]].Vi += 0.25*Ve;
 	}
 
 	// create the node-element list
@@ -270,7 +258,7 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 
 	// next we update the nodal data
 	int i, j, NE = Elements();
-	for (i=0; i<(int) m_Node.size(); ++i) { m_Node[i].vi = 0; m_Node[i].Fi.zero(); }
+	for (i=0; i<(int) m_NODE.size(); ++i) { m_NODE[i].vi = 0; m_NODE[i].Fi.zero(); }
 	double Ve, ve;
 	mat3d Fe;
 	vec3d rt[4];
@@ -291,7 +279,7 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 		// now assign one-quart to each node
 		for (j=0; j<4; ++j) 
 		{
-			UT4NODE& n = m_Node[ m_tag[el.m_node[j]]];
+			UT4NODE& n = m_NODE[ m_tag[el.m_node[j]]];
 			n.vi += 0.25*ve;
 			n.Fi += Fe*(0.25*Ve / n.Vi);
 		}
@@ -310,9 +298,9 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 	pt.Init(true);
 
 	// loop over all the nodes
-	for (i=0; i<(int) m_Node.size(); ++i)
+	for (i=0; i<(int) m_NODE.size(); ++i)
 	{
-		UT4NODE& node = m_Node[i];
+		UT4NODE& node = m_NODE[i];
 
 		// set the material point data
 		pt.r0 = m_pMesh->Node(node.inode).m_r0;
@@ -383,10 +371,10 @@ void FEUT4Domain::NodalInternalForces(FENLSolver* psolver, vector<double>& R)
 	static vector<double> fe(3);
 
 	// loop over all the nodes
-	int NN = (int) m_Node.size();
+	int NN = (int) m_NODE.size();
 	for (i=0; i<NN; ++i)
 	{
-		UT4NODE& node = m_Node[i];
+		UT4NODE& node = m_NODE[i];
 
 		// get the elements that belong to this list
 		int NE = m_NEL.Valence(node.inode);
@@ -602,11 +590,11 @@ void FEUT4Domain::NodalStiffnessMatrix(FENLSolver *psolver)
 	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
 
 	// loop over all the nodes
-	int NN = (int) m_Node.size(), ni, nj;
+	int NN = (int) m_NODE.size(), ni, nj;
 	for (int i=0; i<NN; ++i)
 	{
 		// get the next node
-		UT4NODE& node = m_Node[i];
+		UT4NODE& node = m_NODE[i];
 		FEElement** ppe = m_NEL.ElementList(node.inode);
 
 		// get its valence

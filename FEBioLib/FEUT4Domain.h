@@ -12,6 +12,7 @@
 //!
 class FEUT4Domain : public FEElasticSolidDomain
 {
+public:
 	struct UT4NODE
 	{
 		int		inode;	// index of FE node
@@ -33,6 +34,10 @@ public:
 
 	//! data serialization
 	void Serialize(DumpFile& ar);
+
+	//! get nodal data
+	int UT4Nodes() { return (int) m_NODE.size(); }
+	UT4NODE& UT4Node(int i) { return m_NODE[i]; }
 
 	//! return the node-element list for this domain
 	FENodeElemList& GetNodeElemList() { return m_NEL; }
@@ -95,7 +100,7 @@ public:
 
 private:
 	vector<int>		m_tag;	//!< nodal tags
-	vector<UT4NODE>	m_Node;	//!< Nodal data
+	vector<UT4NODE>	m_NODE;	//!< Nodal data
 	vector<double>	m_Ve0;	//!< initial element volumes
 
 	double	(*m_Be)[6][3];

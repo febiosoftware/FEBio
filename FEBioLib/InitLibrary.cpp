@@ -216,10 +216,11 @@ REGISTER_FEBIO_CLASS_T(FEPlotSolFluxT                   , FEPlotData, 4, "solute
 REGISTER_FEBIO_CLASS_T(FEPlotEffectiveSolConcentrationT , FEPlotData, 5, "effective solute 6 concentration");
 REGISTER_FEBIO_CLASS_T(FEPlotActualSolConcentrationT    , FEPlotData, 5, "solute 6 concentration"          );
 REGISTER_FEBIO_CLASS_T(FEPlotSolFluxT                   , FEPlotData, 5, "solute 6 flux"                   );
-REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"              );
-REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"                 );
-REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density"            );
-REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"                );
+REGISTER_FEBIO_CLASS(FEPlotElectricPotential            , FEPlotData, "electric potential"  );
+REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current density"     );
+REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density");
+REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"    );
+REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPlotData, "ut4 nodal stress"    );
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );

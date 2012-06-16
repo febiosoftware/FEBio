@@ -12,6 +12,7 @@
 #include "FEBioLib/FETriphasic.h"
 #include "FEBioLib/FEMultiphasicDomain.h"
 #include "FEBioLib/FEMultiphasic.h"
+#include "FEBioLib/FEUT4Domain.h"
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 
@@ -1069,4 +1070,26 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, vector<float>& a)
 		return true;
 	}
 	return false;
+}
+
+
+//-----------------------------------------------------------------------------
+bool FEPlotUT4NodalStresses::Save(FEDomain& dom, vector<float>& a)
+{
+	FEUT4Domain* pd = dynamic_cast<FEUT4Domain*>(&dom);
+	if (pd == 0) return false;
+
+	int N = pd->Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		FEUT4Domain::UT4NODE& n = pd->UT4Node(i);
+		mat3ds& s = n.si;
+		a.push_back((float) s.xx());
+		a.push_back((float) s.yy());
+		a.push_back((float) s.zz());
+		a.push_back((float) s.xy());
+		a.push_back((float) s.yz());
+		a.push_back((float) s.xz());
+	}
+	return true;
 }
