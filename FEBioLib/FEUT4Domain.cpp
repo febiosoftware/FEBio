@@ -216,7 +216,7 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 
 	// calculate the reference nodal volume
 	// we do this here since this volume never changes
-	int NE = m_pMesh->Elements();
+	int NE = Elements();
 	m_Ve0.resize(NE);
 	double Ve;
 	vec3d r0[4];
