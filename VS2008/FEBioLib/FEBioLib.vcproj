@@ -698,6 +698,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledViscoElasticMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEUT4Domain.cpp"
 				>
 			</File>
@@ -1281,6 +1285,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledViscoElasticMaterial.h"
 				>
 			</File>
 			<File
