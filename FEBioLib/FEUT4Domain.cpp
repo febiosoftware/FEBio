@@ -173,7 +173,7 @@ FEUT4Domain::~FEUT4Domain()
 FEDomain* FEUT4Domain::Clone()
 {
 	FEUT4Domain* pd = new FEUT4Domain(m_pMesh, m_pMat);
-	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh;
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
 	pd->m_tag = m_tag;
 	pd->m_NODE = m_NODE;
 	pd->m_Ve0 = m_Ve0;
