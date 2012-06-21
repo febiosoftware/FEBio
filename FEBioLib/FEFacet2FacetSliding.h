@@ -74,7 +74,7 @@ public:
 
 protected:
 	//! project slave surface onto master
-	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms);
+	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup);
 
 	//! calculate auto-penalty
 	void CalcAutoPenalty(FEFacetSlidingSurface& s);
@@ -86,6 +86,7 @@ public:
 	bool	m_btwo_pass;	//!< two-pass flag
 	bool	m_bautopen;		//!< auto-penalty flag
 	double	m_srad;			//!< search radius (% of model size)
+	int		m_nsegup;		//!< segment update parameter
 
 	double	m_atol;			//!< aug lag tolernace
 	double	m_gtol;			//!< gap tolerance

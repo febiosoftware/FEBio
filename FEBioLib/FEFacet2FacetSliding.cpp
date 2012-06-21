@@ -22,6 +22,7 @@ BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"   );
 	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius");
 	ADD_PARAMETER(m_dxtol    , FE_PARAM_DOUBLE, "dxtol"        );
+	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"       );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -165,6 +166,7 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 	m_stol = 0.01;
 	m_btwo_pass = false;
 	m_bautopen = false;
+	m_nsegup = 0;	// always do segment updates
 
 	m_atol = 0.01;
 	m_gtol = 0;
@@ -194,11 +196,11 @@ bool FEFacet2FacetSliding::Init()
 	if (m_bautopen) CalcAutoPenalty(m_ss);
 
 	// project slave surface onto master surface
-	ProjectSurface(m_ss, m_ms);
+	ProjectSurface(m_ss, m_ms, true);
 
 	if (m_btwo_pass) 
 	{
-		ProjectSurface(m_ms, m_ss);
+		ProjectSurface(m_ms, m_ss, true);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
 	}
 
@@ -253,7 +255,7 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 //! In this function we project the integration points to the master surface,
 //! calculate the projection's natural coordinates and normal vector
 //
-void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms)
+void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms, bool bsegup)
 {
 	bool bfirst = true;
 
@@ -282,26 +284,45 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			vec3d x(0,0,0), q;
 			for (int k=0; k<nn; ++k) x += re[k]*H[k];
 
-			// find the master segment this element belongs to
-			ss.m_rs[ni] = vec2d(0,0);
-			FESurfaceElement* pme = dynamic_cast<FESurfaceElement*>(ms.FindMasterSegment(x, q, ss.m_rs[ni], bfirst, m_stol, m_srad));
-			ss.m_pme[ni] = pme;
+			// see if the point still projects to the same element
+			if (ss.m_pme[ni])
+			{
+				// update projection to master element
+				FESurfaceElement& mel = *ss.m_pme[ni];
+				q = ms.ProjectToSurface(mel, x, ss.m_rs[ni][0], ss.m_rs[ni][1]);
 
-			if (pme)
+				// see if the projection is still in the element
+				if (bsegup && (!ms.IsInsideElement(mel, ss.m_rs[ni][0], ss.m_rs[ni][1], m_stol)))
+				{
+					// if not, do a new search
+					ss.m_rs[ni] = vec2d(0,0);
+					FEElement* pme = ms.FindMasterSegment(x, q, ss.m_rs[ni], bfirst, m_stol, m_srad);
+					ss.m_pme[ni] = dynamic_cast<FESurfaceElement*>(pme);
+				}
+			}
+			if (bsegup)
+			{
+				// find the master segment this element belongs to
+				ss.m_rs[ni] = vec2d(0,0);
+				FESurfaceElement* pme = dynamic_cast<FESurfaceElement*>(ms.FindMasterSegment(x, q, ss.m_rs[ni], bfirst, m_stol, m_srad));
+				ss.m_pme[ni] = pme;
+			}
+
+			// update normal and gap at integration point
+			if (ss.m_pme[ni])
 			{
 				double r = ss.m_rs[ni][0];
 				double s = ss.m_rs[ni][1];
 
-				FESurfaceElement& mel = *pme;
-
 				// the slave normal is set to the master element normal
-				ss.m_nu[ni] = ms.SurfaceNormal(mel, r, s);
+				ss.m_nu[ni] = ms.SurfaceNormal(*ss.m_pme[ni], r, s);
 
 				// calculate gap
 				ss.m_gap[ni] = -ss.m_nu[ni]*(x - q);
 			}
 			else
 			{
+				// since the node is not in contact, we set the gap and Lagrange multiplier to zero
 				ss.m_gap[ni] = 0;
 				ss.m_Lm[ni] = 0;
 			}
@@ -312,12 +333,24 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::Update(int niter)
 {
+	static bool bfirst = true;
+
+	FEModel& fem = *m_pfem;
+
+	// should we do a segment update or not?
+	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;
+	// We have to make sure that in this case, both surfaces get at least
+	// one pass!
+	bool bupdate = (bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
+
 	// project slave surface to master surface
-	ProjectSurface(m_ss, m_ms);
-	if (m_btwo_pass) ProjectSurface(m_ms, m_ss);
+	ProjectSurface(m_ss, m_ms, bupdate);
+	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupdate);
 
 	// Update the net contact pressures
 	UpdateContactPressures();
+
+	bfirst = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -995,6 +1028,7 @@ void FEFacet2FacetSliding::Serialize(DumpFile &ar)
 		ar << m_naugmin;
 		ar << m_naugmax;
 		ar << m_dxtol;
+		ar << m_nsegup;
 
 		m_ms.Serialize(ar);
 		m_ss.Serialize(ar);
@@ -1012,6 +1046,7 @@ void FEFacet2FacetSliding::Serialize(DumpFile &ar)
 		ar >> m_naugmin;
 		ar >> m_naugmax;
 		ar >> m_dxtol;
+		ar >> m_nsegup;
 
 		m_ms.Serialize(ar);
 		m_ss.Serialize(ar);

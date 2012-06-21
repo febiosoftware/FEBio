@@ -324,7 +324,7 @@ bool FESlidingInterface::Init()
 //	m_ms.UpdateNormals();
 
 	// project slave surface onto master surface
-	ProjectSurface(m_ss, m_ms, m_breloc);
+	ProjectSurface(m_ss, m_ms, true, m_breloc);
 	if (m_bautopen) CalcAutoPenalty(m_ss);
 
 	// for two-pass algorithms we repeat the previous
@@ -501,18 +501,10 @@ void FESlidingInterface::Update(int niter)
 	// one pass!
 	bool bupdate = (bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
 
-	// update master surfaces
-	m_ms.Update();
-
 	// project slave surface onto master surface
 	// this also calculates the nodal gap functions
 	ProjectSurface(m_ss, m_ms, bupdate);
-
-	if (m_btwo_pass)
-	{
-		m_ss.Update();
-		ProjectSurface(m_ms, m_ss, bupdate);
-	}
+	if (m_btwo_pass) ProjectSurface(m_ms, m_ss, bupdate);
 
 	// Update the net contact pressures
 	UpdateContactPressures();

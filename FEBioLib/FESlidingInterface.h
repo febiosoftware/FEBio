@@ -33,9 +33,6 @@ public:
 		m_Ln = s.m_Ln;
 	}
 
-	//! Update the surface data
-	void Update() {}
-
 	//! Find element that contains the projection of x
 	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol);
 
