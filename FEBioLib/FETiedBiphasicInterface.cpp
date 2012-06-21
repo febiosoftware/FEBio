@@ -1234,45 +1234,12 @@ bool FETiedBiphasicInterface::Augment(int naug)
 //-----------------------------------------------------------------------------
 void FETiedBiphasicInterface::Serialize(DumpFile &ar)
 {
+	// store contact data
 	FEContactInterface::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_knmult;
-		ar << m_btwo_pass;
-		ar << m_atol;
-		ar << m_gtol;
-		ar << m_ptol;
-		ar << m_stol;
-		ar << m_bsymm;
-		ar << m_srad;
-		ar << m_naugmax;
-		ar << m_naugmin;
-		ar << m_epsn;
-		ar << m_bautopen;
-		ar << m_epsp;
-		
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
-	else
-	{
-		ar >> m_knmult;
-		ar >> m_btwo_pass;
-		ar >> m_atol;
-		ar >> m_gtol;
-		ar >> m_ptol;
-		ar >> m_stol;
-		ar >> m_bsymm;
-		ar >> m_srad;
-		ar >> m_naugmax;
-		ar >> m_naugmin;
-		ar >> m_epsn;
-		ar >> m_bautopen;
-		ar >> m_epsp;
-		
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
+
+	// store contact surface data
+	m_ms.Serialize(ar);
+	m_ss.Serialize(ar);
 }
 
 //-----------------------------------------------------------------------------

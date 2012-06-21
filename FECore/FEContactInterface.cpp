@@ -81,4 +81,7 @@ void FEContactInterface::Serialize(DumpFile& ar)
 		ar >> m_nID;
 		ar >> m_blaugon;
 	}
+
+	// store parameters
+	FEParamContainer::Serialize(ar);
 }

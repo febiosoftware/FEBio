@@ -66,3 +66,91 @@ FEParameterList& FEParamContainer::GetParameterList()
 	}
 	return *m_pParam;
 }
+
+//-----------------------------------------------------------------------------
+// Serialize parameters to archive
+void FEParamContainer::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		int NP = m_pParam->Parameters();
+		ar << NP;
+		list<FEParam>::iterator it = m_pParam->first();
+		for (int i=0; i<NP; ++i)
+		{
+			FEParam& p = *it++;
+			ar << p.m_nlc;
+			ar << p.m_scl;
+			ar << (int) p.m_itype;
+			switch (p.m_itype)
+			{
+			case FE_PARAM_INT   : ar << p.value<int   >(); break;
+			case FE_PARAM_BOOL  : ar << p.value<bool  >(); break;
+			case FE_PARAM_DOUBLE: ar << p.value<double>(); break;
+			case FE_PARAM_VEC3D : ar << p.value<vec3d >(); break;
+			case FE_PARAM_STRING: ar << (const char*) p.m_pv; break;
+			case FE_PARAM_INTV:
+				{
+					int* pi = (int*) p.m_pv;
+					ar << p.m_ndim;
+					for (int i=0; i<p.m_ndim; ++i) ar << pi[i];
+				}
+				break;
+			case FE_PARAM_DOUBLEV:
+				{
+					double* pv = (double*) p.m_pv;
+					ar << p.m_ndim;
+					for (int i=0; i<p.m_ndim; ++i) ar << pv[i];
+				}
+				break;
+			default:
+				assert(false);
+			}
+		}
+	}
+	else
+	{
+		FEParameterList& pl = GetParameterList();
+		int NP = 0;
+		ar >> NP;
+		if (NP != pl.Parameters()) throw DumpFile::ReadError();
+		list<FEParam>::iterator it = pl.first();
+		for (int i=0; i<NP; ++i)
+		{
+			FEParam& p = *it++;
+			ar >> p.m_nlc;
+			ar >> p.m_scl;
+			int ntype;
+			ar >> ntype;
+			if (ntype != p.m_itype) throw DumpFile::ReadError();
+			switch (p.m_itype)
+			{
+			case FE_PARAM_INT   : ar >> p.value<int   >(); break;
+			case FE_PARAM_BOOL  : ar >> p.value<bool  >(); break;
+			case FE_PARAM_DOUBLE: ar >> p.value<double>(); break;
+			case FE_PARAM_VEC3D : ar >> p.value<vec3d >(); break;
+			case FE_PARAM_STRING: ar >> (char*) p.m_pv; break;
+			case FE_PARAM_INTV:
+				{
+					int* pi = (int*) p.m_pv;
+					int ndim;
+					ar >> ndim;
+					if (ndim != p.m_ndim) throw DumpFile::ReadError();
+					for (int i=0; i<p.m_ndim; ++i) ar >> pi[i];
+				}
+				break;
+			case FE_PARAM_DOUBLEV:
+				{
+					double* pv = (double*) p.m_pv;
+					int ndim;
+					ar >> ndim;
+					if (ndim != p.m_ndim) throw DumpFile::ReadError();
+					for (int i=0; i<p.m_ndim; ++i) ar >> pv[i];
+				}
+				break;
+			default:
+				assert(false);
+			}
+		}
+	}
+}

@@ -29,6 +29,10 @@ class FEModel;
 class DumpFile  
 {
 public:
+	// This class is thrown when an error occurs reading the dumpfile
+	class ReadError{};
+
+public:
 	DumpFile(FEModel* pfem);
 	virtual ~DumpFile();
 

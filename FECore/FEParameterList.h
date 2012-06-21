@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <list>
 #include <memory>
+#include "DumpFile.h"
 using namespace std;
 
 
@@ -94,6 +95,9 @@ public:
 
 	// return the material's parameter list
 	FEParameterList& GetParameterList();
+
+	// serialize parameter data
+	virtual void Serialize(DumpFile& ar);
 
 protected:
 	// This function will be overridden by each class that defines a parameter list

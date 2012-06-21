@@ -684,24 +684,10 @@ bool FESurfaceConstraint::Augment(int naug)
 //-----------------------------------------------------------------------------
 void FESurfaceConstraint::Serialize(DumpFile &ar)
 {
-	if (ar.IsSaving())
-	{
-		ar << m_eps;
-		ar << m_atol;
-		ar << m_stol;
-		ar << m_btwo_pass;
+	// store contact data
+	FEContactInterface::Serialize(ar);
 
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
-	else
-	{
-		ar >> m_eps;
-		ar >> m_atol;
-		ar >> m_stol;
-		ar >> m_btwo_pass;
-
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
+	// store contact surface data
+	m_ms.Serialize(ar);
+	m_ss.Serialize(ar);
 }

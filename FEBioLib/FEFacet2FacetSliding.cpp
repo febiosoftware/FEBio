@@ -1015,42 +1015,10 @@ bool FEFacet2FacetSliding::Augment(int naug)
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::Serialize(DumpFile &ar)
 {
+	// store contact data
 	FEContactInterface::Serialize(ar);
 
-	if (ar.IsSaving())
-	{
-		ar << m_epsn;
-		ar << m_knmult;
-		ar << m_stol;
-		ar << m_btwo_pass;
-		ar << m_bautopen;
-		ar << m_srad;
-		ar << m_atol;
-		ar << m_gtol;
-		ar << m_naugmin;
-		ar << m_naugmax;
-		ar << m_dxtol;
-		ar << m_nsegup;
-
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
-	else
-	{
-		ar >> m_epsn;
-		ar >> m_knmult;
-		ar >> m_stol;
-		ar >> m_btwo_pass;
-		ar >> m_bautopen;
-		ar >> m_srad;
-		ar >> m_atol;
-		ar >> m_gtol;
-		ar >> m_naugmin;
-		ar >> m_naugmax;
-		ar >> m_dxtol;
-		ar >> m_nsegup;
-
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
+	// store contact surface data
+	m_ms.Serialize(ar);
+	m_ss.Serialize(ar);
 }

@@ -1701,45 +1701,10 @@ void FESlidingInterface::UpdateContactPressures()
 
 void FESlidingInterface::Serialize(DumpFile& ar)
 {
+	// store contact data
 	FEContactInterface::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_btwo_pass;
-		ar << m_naugmax;
-		ar << m_naugmin;
-		ar << m_gtol;
-		ar << m_atol;
-		ar << m_ktmult;
-		ar << m_knmult;
-		ar << m_stol;
-		ar << m_bautopen;
-		ar << m_eps;
-		ar << m_breloc;
-		ar << m_mu;
-		ar << m_epsf;
-		ar << m_nsegup;
 
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
-	else
-	{
-		ar >> m_btwo_pass;
-		ar >> m_naugmax;
-		ar >> m_naugmin;
-		ar >> m_gtol;
-		ar >> m_atol;
-		ar >> m_ktmult;
-		ar >> m_knmult;
-		ar >> m_stol;
-		ar >> m_bautopen;
-		ar >> m_eps;
-		ar >> m_breloc;
-		ar >> m_mu;
-		ar >> m_epsf;
-		ar >> m_nsegup;
-
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
+	// store contact surface data
+	m_ms.Serialize(ar);
+	m_ss.Serialize(ar);
 }

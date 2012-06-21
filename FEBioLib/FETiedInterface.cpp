@@ -566,27 +566,10 @@ bool FETiedInterface::Augment(int naug)
 //! Serialize the data to the archive.
 void FETiedInterface::Serialize(DumpFile &ar)
 {
+	// store contact data
 	FEContactInterface::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_eps;
-		ar << m_atol;
-		ar << m_stol;
-		ar << nse;
-		ar << nme;
 
-		ms.Serialize(ar);
-		ss.Serialize(ar);
-	}
-	else
-	{
-		ar >> m_eps;
-		ar >> m_atol;
-		ar >> m_stol;
-		ar >> nse;
-		ar >> nme;
-
-		ms.Serialize(ar);
-		ss.Serialize(ar);
-	}
+	// store contact surface data
+	ms.Serialize(ar);
+	ss.Serialize(ar);
 }

@@ -595,25 +595,10 @@ bool FEPeriodicBoundary::Augment(int naug)
 //-----------------------------------------------------------------------------
 void FEPeriodicBoundary::Serialize(DumpFile &ar)
 {
+	// store contact data
 	FEContactInterface::Serialize(ar);
-	if (ar.IsSaving())
-	{
-		ar << m_eps;
-		ar << m_atol;
-		ar << m_stol;
-		ar << m_btwo_pass;
 
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
-	else
-	{
-		ar >> m_eps;
-		ar >> m_atol;
-		ar >> m_stol;
-		ar >> m_btwo_pass;
-
-		m_ms.Serialize(ar);
-		m_ss.Serialize(ar);
-	}
+	// store contact surface data
+	m_ms.Serialize(ar);
+	m_ss.Serialize(ar);
 }
