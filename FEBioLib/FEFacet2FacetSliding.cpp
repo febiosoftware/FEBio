@@ -22,6 +22,8 @@ BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"   );
 	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius");
 	ADD_PARAMETER(m_dxtol    , FE_PARAM_DOUBLE, "dxtol"        );
+	ADD_PARAMETER(m_mu       , FE_PARAM_DOUBLE, "fric_coeff"   );
+	ADD_PARAMETER(m_epsf     , FE_PARAM_DOUBLE, "fric_penalty" );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"       );
 END_PARAMETER_LIST();
 

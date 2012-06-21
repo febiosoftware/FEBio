@@ -5,8 +5,8 @@
     <LocalDebuggerCommandArguments Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">-i test.feb</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Steve\Documents\FEBio Documents\Examples</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerWorkingDirectory Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Steve\Documents\FEBio Documents\Users\Wim Decraemer</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Steve\Documents\FEBio Documents\Examples</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">-i g3l_plp_stop_YM_1e6_pf_2000_140Pa_sinus_2kHz_6T_512_sm.feb -g</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">-i cnt04.feb</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
