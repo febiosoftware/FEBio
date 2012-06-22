@@ -767,6 +767,87 @@ void FEG1TetElementTraits::init()
 	
 }
 
+
+//*****************************************************************************
+//                          F E T E T 1 0 E L E M E N T
+//*****************************************************************************
+// I think this assumes that the tetrahedron in natural space is essentially
+// a constant metric tet with the edge nodes at the center of the edges.
+void FETet10ElementTraits::init()
+{
+	int n;
+	
+	// integration point coordinates
+	const double a = 0.58541020;
+	const double b = 0.13819660;
+	const double w = 0.25 / 6.0;
+	gr[ 0] = a; gs[ 0] = b; gt[ 0] = b; gw[ 0] = w;
+	gr[ 1] = b; gs[ 1] = a; gt[ 1] = b; gw[ 1] = w;
+	gr[ 2] = b; gs[ 2] = b; gt[ 2] = a; gw[ 2] = w;
+	gr[ 3] = b; gs[ 3] = b; gt[ 3] = b; gw[ 3] = w;
+	
+	// calculate shape function values at gauss points
+	for (n=0; n<NINT; ++n)
+	{
+		double r1 = 1.0 - gr[n] - gs[n] - gt[n];
+		double r2 = gr[n];
+		double r3 = gs[n];
+		double r4 = gt[n];
+
+		H[n][0] = r1*(2.0*r1 - 1.0);
+		H[n][1] = r2*(2.0*r2 - 1.0);
+		H[n][2] = r3*(2.0*r3 - 1.0);
+		H[n][3] = r4*(2.0*r4 - 1.0);
+		H[n][4] = 4.0*r1*r2;
+		H[n][5] = 4.0*r2*r3;
+		H[n][6] = 4.0*r3*r1;
+		H[n][7] = 4.0*r1*r4;
+		H[n][8] = 4.0*r2*r4;
+		H[n][9] = 4.0*r3*r4;
+	}
+
+//	Hi = H.inverse();
+	
+	// calculate local derivatives of shape functions at gauss points
+	for (n=0; n<NINT; ++n)
+	{
+		Gr[n][0] = -3.0 + 4.0*gr[n] + 4.0*(gs[n] + gt[n]);
+		Gr[n][1] =  4.0*gr[n] - 1.0;
+		Gr[n][2] =  0.0;
+		Gr[n][3] =  0.0;
+		Gr[n][4] =  4.0 - 8.0*gr[n] - 4.0*(gs[n] + gt[n]);
+		Gr[n][5] =  4.0*gs[n];
+		Gr[n][6] = -4.0*gs[n];
+		Gr[n][7] = -4.0*gt[n];
+		Gr[n][8] =  4.0*gt[n];
+		Gr[n][9] =  0.0;
+
+		Gs[n][0] = -3.0 + 4.0*gs[n] + 4.0*(gr[n] + gt[n]);
+		Gs[n][1] =  0.0;
+		Gs[n][2] =  4.0*gs[n] - 1.0;
+		Gs[n][3] =  0.0;
+		Gs[n][4] = -4.0*gr[n];
+		Gs[n][5] =  4.0*gr[n];
+		Gs[n][6] =  4.0 - 8.0*gs[n] - 4.0*(gr[n] + gt[n]);
+		Gs[n][7] = -4.0*gt[n];
+		Gs[n][8] =  0.0;
+		Gs[n][9] =  4.0*gt[n];
+
+		Gt[n][0] = -3.0 + 4.0*gt[n] + 4.0*(gr[n] + gs[n]);
+		Gt[n][1] =  0.0;
+		Gt[n][2] =  0.0;
+		Gt[n][3] =  4.0*gt[n] - 1.0;
+		Gt[n][4] = -4.0*gr[n];
+		Gt[n][5] =  0.0;
+		Gt[n][6] = -4.0*gs[n];
+		Gt[n][7] =  4.0 - 8.0*gt[n] - 4.0*(gr[n] + gs[n]);
+		Gt[n][8] =  4.0*gr[n];
+		Gt[n][9] =  4.0*gs[n];
+	}
+	
+	// TODO: calculate local second derivatives of shape functions at gauss points (need for biphasic problems)
+}
+
 //*****************************************************************************
 //                          F E P E N T A E L E M E N T
 //*****************************************************************************

@@ -27,6 +27,7 @@ FEElementLibrary::FEElementLibrary()
 		n = RegisterTraits(new FERIHexElementTraits     ); assert(n==FE_RIHEX);
 		n = RegisterTraits(new FEUDFHexElementTraits    ); assert(n==FE_UDGHEX);
 		n = RegisterTraits(new FETetElementTraits       ); assert(n==FE_TET);
+		n = RegisterTraits(new FETet10ElementTraits     ); assert(n==FE_TET10);
 		n = RegisterTraits(new FEPentaElementTraits     ); assert(n==FE_PENTA);
 		n = RegisterTraits(new FEG1TetElementTraits     ); assert(n==FE_TETG1);
 		n = RegisterTraits(new FEQuadElementTraits      ); assert(n==FE_QUAD);

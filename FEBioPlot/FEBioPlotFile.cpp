@@ -381,6 +381,7 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 		case FE_PENTA: ne = 6; dtype = PLT_ELEM_PENTA; break;
 		case FE_TET:
 		case FE_TETG1: ne = 4; dtype = PLT_ELEM_TET; break;
+		case FE_TET10: ne = 10; dtype = PLT_ELEM_TET10; break;
 	}
 
 	// write the header

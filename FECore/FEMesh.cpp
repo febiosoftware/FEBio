@@ -498,7 +498,8 @@ int FEMesh::Faces(FEElement& el)
 	case FE_RIHEX:
 	case FE_UDGHEX: return 6;
 	case FE_PENTA: return 5;
-	case FE_TET: 
+	case FE_TET:
+	case FE_TET10:
 	case FE_TETG1: return 4;
 	case FE_SHELL_QUAD:
 	case FE_SHELL_TRI: return 1;

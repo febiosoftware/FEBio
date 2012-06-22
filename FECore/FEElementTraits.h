@@ -194,6 +194,20 @@ public:
 	void init();
 };
 
+//=============================================================================
+// 10-node tetrahedral element using a 4-node Gaussian integration rule
+class FETet10ElementTraits : public FESolidElementTraits
+{
+public:
+	enum { NINT = 4 };
+	enum { NELN = 10 };
+
+public:
+	FETet10ElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_TET10; init(); }
+	void init();
+};
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // CLASS: FETetElementTraits
 // 4-node tetrahedral elements with 4-point gaussian quadrature

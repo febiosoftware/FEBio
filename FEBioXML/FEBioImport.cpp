@@ -1968,6 +1968,7 @@ int FEBioGeometrySection::ElementType(XMLTag& t)
 	if (t=="hex20" ) return ET_HEX20;
 	if (t=="penta6") return ET_PENTA;
 	if (t=="tet4"  ) return ET_TET;
+	if (t=="tet10" ) return ET_TET10;
 	if (t=="quad4" ) return ET_QUAD;
 	if (t=="tri3"  ) return ET_TRI;
 	if (t=="truss2") return ET_TRUSS;
@@ -1985,7 +1986,7 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 	// get the module
 	if (ntype == FE_HEAT)
 	{
-		if ((etype == ET_HEX) || (etype == ET_HEX20) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_HEAT_SOLID_DOMAIN;
+		if ((etype == ET_HEX) || (etype == ET_HEX20) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
 	else if (ntype == FE_LINEAR_SOLID)
@@ -2050,6 +2051,10 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 			{
 				if (m_pim->m_ntet4 == FEFEBioImport::ET_UT4) return FE_UT4_DOMAIN;
 				else return FE_SOLID_DOMAIN;
+			}
+			else if (etype == ET_TET10)
+			{
+				return FE_SOLID_DOMAIN;
 			}
 			else if (etype == ET_PENTA) 
 			{
@@ -2199,6 +2204,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		else if (tag == "hex20" ) etype = FEFEBioImport::ET_HEX20;
 		else if (tag == "penta6") etype = FEFEBioImport::ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
+		else if (tag == "tet10" ) etype = FEFEBioImport::ET_TET10;
 		else if (tag == "quad4" ) etype = FEFEBioImport::ET_QUAD4;
 		else if (tag == "tri3"  ) etype = FEFEBioImport::ET_TRI3;
 		else if (tag == "truss2") etype = FEFEBioImport::ET_TRUSS2;
@@ -2240,6 +2246,12 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_TETG1, nid, nmat);
+			}
+			break;
+		case FEFEBioImport::ET_TET10:
+			{
+				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET10, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_QUAD4:
