@@ -630,6 +630,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESupplyMichaelisMenten.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESupplySynthesisBinding.cpp"
 				>
 			</File>
@@ -1217,6 +1221,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESupplyConst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESupplyMichaelisMenten.h"
 				>
 			</File>
 			<File
