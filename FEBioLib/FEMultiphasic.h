@@ -72,7 +72,7 @@ public:
 	}
 	
 	// return elastic material component
-	FEElasticMaterial* GetElasticMaterial() { return m_pSolid; }
+	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
 	
 public:
 	void Init();

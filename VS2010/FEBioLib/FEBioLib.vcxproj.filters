@@ -453,6 +453,9 @@
     <ClInclude Include="..\..\FEBioLib\FEUncoupledViscoElasticMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FESupplyMichaelisMenten.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp">
@@ -885,6 +888,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FEUncoupledViscoElasticMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FESupplyMichaelisMenten.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
