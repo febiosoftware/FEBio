@@ -479,7 +479,7 @@ void FESurfaceConstraint::ContactStiffness(FENLSolver* psolver)
 
 		// fill the en array
 		en.resize(ne0+1);
-		en[0] = ss.node[nref];
+		en[0] = ss.m_node[nref];
 		for (l=0; l<ne0; ++l) en[l+1] = n0[l];
 
 		// assemble stiffness matrix

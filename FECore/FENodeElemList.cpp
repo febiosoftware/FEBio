@@ -195,3 +195,73 @@ void FENodeElemList::Create(FEDomain& dom)
 		}
 	}
 }
+
+
+//-----------------------------------------------------------------------------
+void FENodeElemTree::Create(FESurface* ps, int k)
+{
+	int NN = ps->Nodes();
+	int NE = ps->Elements();
+
+	// temporary arrays
+	vector< vector<int> > nel;
+	vector<int> tag;
+	nel.resize(NN);
+	tag.assign(NE, -1);
+
+	// build the first level
+	for (int i=0; i<NE; ++i)
+	{
+		FESurfaceElement* pe = &ps->Element(i);
+		int ne = pe->Nodes();
+		for (int j=0; j<ne; ++j) nel[pe->m_lnode[j]].push_back(i);
+	}
+
+	// build the other levels
+	for (int l=0; l<k; ++l)
+	{
+		vector<int> ns(NN);
+		for (int i=0; i<NN; ++i) ns[i] = (int) nel[i].size();
+
+		for (int i=0; i<NN; ++i)
+		{
+			int ntag = l*NN + i;
+			vector<int>& NI = nel[i];
+			int ni = ns[i];
+			for (int j=0; j<ni; ++j) tag[NI[j]] = ntag;
+
+			for (int j=0; j<ni; ++j)
+			{
+				FESurfaceElement& e = ps->Element(NI[j]);
+				int ne = e.Nodes();
+				for (int n=0; n<ne; ++n)
+				{
+					if (e.m_lnode[n] != i)
+					{
+						vector<int>& NJ = nel[e.m_lnode[n]];
+						int nj = ns[e.m_lnode[n]];
+						for (int m=0; m<nj; ++m)
+						{
+							if (tag[NJ[m]] < ntag) 
+							{
+								NI.push_back(NJ[m]);
+								tag[NJ[m]] = ntag;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// assign the element pointers
+	m_nel.resize(NN);
+	for (int i=0; i<NN; ++i)
+	{
+		vector<int>& NI = nel[i];
+		sort(NI.begin(), NI.end());
+		int ni = NI.size();
+		m_nel[i].resize(ni);
+		for (int j=0; j<ni; ++j) m_nel[i][j] = &ps->Element(NI[j]);
+	}
+}

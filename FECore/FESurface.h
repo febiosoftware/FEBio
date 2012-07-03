@@ -14,7 +14,7 @@
 #include "LoadCurve.h"
 #include "FENNQuery.h"
 #include "mat2d.h"
-
+#include "vec2d.h"
 //-----------------------------------------------------------------------------
 //! Surface mesh
 
@@ -30,40 +30,68 @@ public:
 	//! destructor
 	virtual ~FESurface(){}
 
+	//! initialize surface data structure
+	virtual bool Init();
+
 	//! creates surface
 	void create(int n) { m_el.resize(n); }
 
 	//! serialization
 	void Serialize(DumpFile& ar);
 
-	//! return an element of the surface
-	FESurfaceElement& Element(int i) { return m_el[i]; }
+	//! Unpack surface element data
+	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	FEElement& ElementRef(int n) { return m_el[n]; }
+public:
 
 	//! return number of surface elements
 	int Elements() { return m_el.size(); }
 
+	//! return an element of the surface
+	FESurfaceElement& Element(int i) { return m_el[i]; }
+
+	//! returns reference to element
+	FEElement& ElementRef(int n) { return m_el[n]; }
+
+	//! find the index of a surface element
+	int FindElement(FESurfaceElement& el);
+
+	//! number of nodes on this surface
+	int Nodes() { return m_node.size(); }
+
+	//! return the FENode object for local node n
+	FENode& Node(int n) { return m_pMesh->Node( m_node[n] ); }
+
+public:
+
 	//! Project a node onto a surface element
 	vec3d ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s);
 
-	//! Unpack surface element data
-	void UnpackLM(FEElement& el, vector<int>& lm);
+	//! check to see if a point is on element
+	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
 
-	//! return the mesh to which this surface is attached
-	FEMesh* GetMesh() { return m_pMesh; }
+	//! find the intersection of a ray with the surface
+	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad, int* pei = 0);
 
-	//! number of nodes on this surface
-	int Nodes() { return node.size(); }
+	//! See if a ray intersects an element
+	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
 
-	//! initialize surface data structure
-	virtual bool Init();
+	//! helper function for intersection with triangles
+	bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
 
-	//! return the FENode object for local node n
-	FENode& Node(int n) { return m_pMesh->Node( node[n] ); }
+	//! helper function for intersection with quads
+	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
+
+	//! Find the closest point projection onto this surface
+	FESurfaceElement* ClosestPointProjection(vec3d& x, vec3d& q, vec2d& r, bool binit_nq, double tol);
+
+public:
 
 	//! calculate the surface area of a surface element
 	double FaceArea(FESurfaceElement& el);
+
+	//! return the max element size
+	double MaxElementSize();
 
 	//! calculate the metric tensor in the reference configuration
 	mat2d Metric(FESurfaceElement& el, double r, double s);
@@ -83,9 +111,6 @@ public:
 	//! calculate the global position of an integration point
 	vec3d Local2Global(FESurfaceElement& el, int n);
 
-	//! check to see if a point is on element
-	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
-
 	//! calculates the covariant base vectors of a surface at an integration point
 	void CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2]);
 
@@ -101,24 +126,14 @@ public:
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
-	//! find the intersection of a ray with the surface
-//	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], double eps, int* pei = 0);
-	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad, int* pei = 0);
-
-public:
-	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
-	bool IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
-	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
-
-	int FindElement(FESurfaceElement& el);
-
 protected:
 	vector<FESurfaceElement>	m_el;	//!< surface elements
 
 public:
-	vector<int>	node;	//!< array of node indices
+	vector<int>	m_node;	//!< array of node indices
 
 	FENodeElemList	m_NEL;	//!< the node element list
+	FENodeElemTree	m_NET;
 
 protected:
 	FENNQuery	m_SNQ;	//!< used to find the nearest neighbour

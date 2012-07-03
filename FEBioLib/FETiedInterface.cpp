@@ -78,8 +78,8 @@ void FETiedInterface::Update(int niter)
 
 			// get the natural coordinates of the slave projection
 			// onto the master element
-			double r = ss.rs[i][0];
-			double s = ss.rs[i][1];
+			double r = ss.m_rs[i][0];
+			double s = ss.m_rs[i][1];
 
 			// calculate the shape function values
 			int ne = pme->Nodes();
@@ -109,7 +109,7 @@ void FETiedInterface::Update(int niter)
 			}
 
 			// calculate the gap function
-			ss.gap[i] = rt - q;
+			ss.m_gap[i] = rt - q;
 		}
 	}
 }
@@ -119,10 +119,6 @@ void FETiedInterface::Update(int niter)
 
 void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove)
 {
-	// nearest neigbour query
-	FENNQuery query(&ms);
-	query.Init();
-
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
@@ -131,46 +127,26 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 		ss.m_pme[i] = 0;
 
 		// get the nodal position of this slave node
-		vec3d rs = node.m_rt;
+		vec3d x = node.m_rt;
 
-		// let's find the closest master node
-		int mn = query.Find(rs);
-
-		// now that we found the closest master node, lets see if we can find 
-		// the best master element
-		int nval = ms.m_NEL.Valence(mn);
-		FEElement** pe = ms.m_NEL.ElementList(mn);
-
-		// loop over the master node's net
-		for (int j=0; j<nval; ++j)
+		// find the master element
+		vec3d q; vec2d rs;
+		FESurfaceElement* pme = ms.ClosestPointProjection(x, q, rs, (i==0), m_stol);
+		if (pme)
 		{
-			// get the master element
-			FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+			// store the master element
+			ss.m_pme[i] = pme;
+			ss.m_rs[i][0] = rs[0];
+			ss.m_rs[i][1] = rs[1];
 
-			// project the node onto this master element
-			double r, s;
-			vec3d q = ms.ProjectToSurface(el, rs, r, s);
+			// calculate gap
+			ss.m_gap[i] = x - q;
 
-			// see if it is inside the element
-			if (ms.IsInsideElement(el, r, s, m_stol))
+			// move the node if necessary
+			if (bmove && (ss.m_gap[i].norm()>0))
 			{
-				// store the master element
-				ss.m_pme[i] = &el;
-				ss.rs[i][0] = r;
-				ss.rs[i][1] = s;
-
-				// calculate gap
-				ss.gap[i] = rs - q;
-
-				// move the node if necessary
-				if (bmove && (ss.gap[i].norm()>0))
-				{
-					node.m_r0 = node.m_rt = q;
-					ss.gap[i] = vec3d(0,0,0);
-				}
-
-				// move on to the next node
-				break;
+				node.m_r0 = node.m_rt = q;
+				ss.m_gap[i] = vec3d(0,0,0);
 			}
 		}
 	}
@@ -264,7 +240,7 @@ void FETiedInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 				detJ = (dxr ^ dxs).norm();
 
 				// get slave node contact force
-				tc = ss.Lm[m] + ss.gap[m]*m_eps;
+				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
 
 				// get the master element
 				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
@@ -274,8 +250,8 @@ void FETiedInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 
 				// isoparametric coordinates of the projected slave node
 				// onto the master element
-				r = ss.rs[m][0];
-				s = ss.rs[m][1];
+				r = ss.m_rs[m][0];
+				s = ss.m_rs[m][1];
 
 				// get the master shape function values at this slave node
 				if (nmeln == 4)
@@ -418,17 +394,17 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
 				// slave node natural coordinates in master element
-				r = ss.rs[m][0];
-				s = ss.rs[m][1];
+				r = ss.m_rs[m][0];
+				s = ss.m_rs[m][1];
 
 				// slave gap
-				gap = ss.gap[m];
+				gap = ss.m_gap[m];
 
 				// lagrange multiplier
-				Lm = ss.Lm[m];
+				Lm = ss.m_Lm[m];
 
 				// get slave node normal force
-				tc = ss.Lm[m] + ss.gap[m]*m_eps; //ss.T[m];
+				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps; //ss.T[m];
 
 				// get the master shape function values at this slave node
 				if (nmeln == 4)
@@ -510,7 +486,7 @@ bool FETiedInterface::Augment(int naug)
 	double normL0 = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		vec3d lm = ss.Lm[i];
+		vec3d lm = ss.m_Lm[i];
 		normL0 += lm*lm;
 	}
 	normL0 = sqrt(normL0);
@@ -521,12 +497,12 @@ bool FETiedInterface::Augment(int naug)
 	int N = 0;
 	for (i=0; i<ss.Nodes(); ++i)
 	{
-		vec3d lm = ss.Lm[i] + ss.gap[i]*m_eps;
+		vec3d lm = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
 
 		normL1 += lm*lm;
 		if (ss.m_pme[i] != 0)
 		{
-			double g = ss.gap[i].norm();
+			double g = ss.m_gap[i].norm();
 			normgc += g*g;
 			++N;
 		}
@@ -555,7 +531,7 @@ bool FETiedInterface::Augment(int naug)
 		for (i=0; i<ss.Nodes(); ++i)
 		{
 			// update Lagrange multipliers
-			ss.Lm[i] = ss.Lm[i] + ss.gap[i]*m_eps;
+			ss.m_Lm[i] = ss.m_Lm[i] + ss.m_gap[i]*m_eps;
 		}	
 	}
 

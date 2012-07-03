@@ -9,16 +9,15 @@ class FEFacetSlidingSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm) { m_NQ.Attach(this); }
+	FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm) {}
 
 	//! initialization
 	bool Init();
 
-	//! Find element that contains the projection of x
-	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol, double srad);
-
+	//! create a shallow copy for running restarts
 	void ShallowCopy(FEFacetSlidingSurface& s);
 
+	//! serialize data for (cold) restart
 	void Serialize(DumpFile& ar);
 
 public:
@@ -30,9 +29,6 @@ public:
 	vector<int>					m_nei;	//!< surface element indices into arrays
 	vector<double>				m_eps;	//!< penalty values for each integration point
 	vector<double>				m_Ln;	//!< net contact pressure
-
-protected:
-	FENNQuery	m_NQ;	//!< used to find the nearest neighbour
 };
 
 //-----------------------------------------------------------------------------

@@ -18,23 +18,13 @@ class FESlidingSurface : public FEContactSurface
 {
 public:
 	//! constructor
-	FESlidingSurface(FEMesh* pm=0) : FEContactSurface(pm) { m_NQ.Attach(this); }
+	FESlidingSurface(FEMesh* pm=0) : FEContactSurface(pm) {}
 
 	//! Initializes data structures
 	bool Init();
 
 	//! shallow copy
-	void ShallowCopy(FESlidingSurface& s)
-	{
-		Lm  = s.Lm;
-		gap = s.gap;
-		zero(m_pme);
-		Lt  = s.Lt;
-		m_Ln = s.m_Ln;
-	}
-
-	//! Find element that contains the projection of x
-	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol);
+	void ShallowCopy(FESlidingSurface& s);
 
 	//! Calculate the total traction at a node
 	vec3d traction(int inode);
@@ -44,19 +34,17 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
-	vector<double>				gap;	//!< gap function at nodes
-	vector<vec3d>				nu;		//!< master normal at slave node
+	vector<double>				m_gap;	//!< gap function at nodes
+	vector<vec3d>				m_nu;	//!< master normal at slave node
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-	vector<vec2d>				rs;		//!< natural coordinates of slave projection on master element
-	vector<vec2d>				rsp;	//!< natural coordinates at previous time step
-	vector<double>				Lm;		//!< Lagrange multipliers for contact pressure
-	vector<mat2d>				M;		//!< surface metric tensor
-	vector<vec2d>				Lt;		//!< Lagrange multipliers for friction
-	vector<double>				off;	//!< gap offset (= shell thickness)
-	vector<double>				eps;	//!< normal penalty factors
+	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
+	vector<vec2d>				m_rsp;	//!< natural coordinates at previous time step
+	vector<double>				m_Lm;	//!< Lagrange multipliers for contact pressure
+	vector<mat2d>				m_M;	//!< surface metric tensor
+	vector<vec2d>				m_Lt;	//!< Lagrange multipliers for friction
+	vector<double>				m_off;	//!< gap offset (= shell thickness)
+	vector<double>				m_eps;	//!< normal penalty factors
 	vector<double>				m_Ln;	//!< net contact pressure
-
-	FENNQuery		m_NQ;		//!< this structure is used in finding the master element that corresponds to a slave node
 };
 
 //-----------------------------------------------------------------------------

@@ -40,7 +40,7 @@ FEElement* FERigidWallSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, b
 	int mn = m_NQ.Find(x);
 
 	// mn is a local index, so get the global node number too
-	int m = node[mn];
+	int m = m_node[mn];
 
 	// get the nodal position
 	vec3d r0 = mesh.Node(m).m_rt;
@@ -116,7 +116,7 @@ bool FERigidWallSurface::Init()
 			}
 		}
 	}
-	for (i=0; i<nn; ++i) off[i] = tag[node[i]];
+	for (i=0; i<nn; ++i) off[i] = tag[m_node[i]];
 
 	return true;
 }

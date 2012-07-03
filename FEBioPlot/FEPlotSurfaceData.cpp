@@ -39,10 +39,10 @@ bool FEPlotContactGap::SaveSliding(FESlidingSurface& s, vector<float>& a)
 	for (int i=0; i<NF; ++i) 
 	{
 		FESurfaceElement& f = s.Element(i);
-		a[4*i  ] = (float) s.gap[f.m_lnode[0]];
-		a[4*i+1] = (float) s.gap[f.m_lnode[1]];
-		a[4*i+2] = (float) s.gap[f.m_lnode[2]];
-		a[4*i+3] = (float) s.gap[f.m_lnode[3]];
+		a[4*i  ] = (float) s.m_gap[f.m_lnode[0]];
+		a[4*i+1] = (float) s.m_gap[f.m_lnode[1]];
+		a[4*i+2] = (float) s.m_gap[f.m_lnode[2]];
+		a[4*i+3] = (float) s.m_gap[f.m_lnode[3]];
 	}
 	return true;
 }
@@ -58,10 +58,10 @@ bool FEPlotContactGap::SaveTied(FETiedContactSurface& s, vector<float>& a)
 	for (int i=0; i<NF; ++i) 
 	{
 		FESurfaceElement& f = s.Element(i);
-		a[4*i  ] = (float) s.gap[f.m_lnode[0]].norm();
-		a[4*i+1] = (float) s.gap[f.m_lnode[1]].norm();
-		a[4*i+2] = (float) s.gap[f.m_lnode[2]].norm();
-		a[4*i+3] = (float) s.gap[f.m_lnode[3]].norm();
+		a[4*i  ] = (float) s.m_gap[f.m_lnode[0]].norm();
+		a[4*i+1] = (float) s.m_gap[f.m_lnode[1]].norm();
+		a[4*i+2] = (float) s.m_gap[f.m_lnode[2]].norm();
+		a[4*i+3] = (float) s.m_gap[f.m_lnode[3]].norm();
 	}
 	return true;
 }
@@ -174,9 +174,9 @@ bool FEPlotContactPressure::SaveSliding(FESlidingSurface &s, vector<float>& a)
 		FESurfaceElement& f = s.Element(i);
 		for (int j=0; j<4; ++j)
 		{
-			double g = s.gap[f.m_lnode[j]];
-			double L = s.Lm[f.m_lnode[j]];
-			double e = s.eps[f.m_lnode[j]];
+			double g = s.m_gap[f.m_lnode[j]];
+			double L = s.m_Lm[f.m_lnode[j]];
+			double e = s.m_eps[f.m_lnode[j]];
 			double t = MBRACKET(L + g*e);
 			a[4*i+j] = (float) t;
 		}
@@ -296,9 +296,9 @@ bool FEPlotContactTraction::SaveSliding(FESlidingSurface &s, std::vector<float> 
 		for (int j=0; j<ne; ++j)
 		{
 			int nj = e.m_lnode[j];
-			double gi = s.gap[nj];
+			double gi = s.m_gap[nj];
 			double Li = s.m_Ln[nj];
-			vec3d ti = s.nu[nj];
+			vec3d ti = s.m_nu[nj];
 			if (gi > 0) t[j] = ti*Li; else t[j] = vec3d(0,0,0);
 		}
 		if (ne == 3) t[3] = t[2];

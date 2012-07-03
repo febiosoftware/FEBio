@@ -18,11 +18,7 @@ public:
 	bool Init();
 
 	//! shallow copy
-	void ShallowCopy(FETiedContactSurface& s)
-	{
-		Lm  = s.Lm;
-		gap = s.gap;
-	}
+	void ShallowCopy(FETiedContactSurface& s);
 
 	//! Update the surface data
 	void Update();
@@ -30,8 +26,8 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
-	vector<vec3d>				gap;	//!< gap function at nodes
+	vector<vec3d>				m_gap;	//!< gap function at nodes
 	vector<FESurfaceElement*>	m_pme;	//!< master element a slave node penetrates
-	vector<vec2d>				rs;		//!< natural coordinates of slave projection on master element
-	vector<vec3d>				Lm;		//!< Lagrange multipliers
+	vector<vec2d>				m_rs;	//!< natural coordinates of slave projection on master element
+	vector<vec3d>				m_Lm;	//!< Lagrange multipliers
 };

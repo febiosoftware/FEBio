@@ -52,4 +52,21 @@ protected:
 	std::vector<int>			m_pn;	// start index into the eref array
 };
 
+//-----------------------------------------------------------------------------
+class FENodeElemTree
+{
+public:
+	FENodeElemTree() {}
+	virtual ~FENodeElemTree() {}
+
+	void Create(FESurface* ps, int k = 0);
+
+	int Valence(int n) { return (int) m_nel[n].size(); }
+
+	FEElement** ElementList(int n) { return &(m_nel[n][0]);}
+
+protected:
+	std::vector< std::vector<FEElement*> >	m_nel;
+};
+
 #endif // !defined(AFX_FENODEELEMLIST_H__774D7DB9_D0A9_4F6F_AE4D_191126B5D3F8__INCLUDED_)

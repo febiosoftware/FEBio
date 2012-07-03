@@ -12,8 +12,6 @@
 
 bool FESurface::Init()
 {
-	int i, j, m;
-
 	// make sure this surface has elements
 	if (Elements() == 0) return false;
 
@@ -26,15 +24,15 @@ bool FESurface::Init()
 	// let's find all nodes the surface needs
 	int nn = 0;
 	int ne = Elements();
-	for (i=0; i<ne; ++i)
+	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
 		el.m_lid = i;
 
-		for (j=0; j<el.Nodes(); ++j)
+		for (int j=0; j<el.Nodes(); ++j)
 		{
 			// get the global node number
-			m = el.m_node[j];
+			int m = el.m_node[j];
 		
 			// create a local node number
 			if (tag[m] == -1) tag[m] = nn++;
@@ -45,14 +43,14 @@ bool FESurface::Init()
 	}
 
 	// allocate node index table
-	node.resize(nn);
+	m_node.resize(nn);
 
 	// fill the node index table
-	for (i=0; i<mesh.Nodes(); ++i)
+	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		if (tag[i] >= 0)
 		{
-			node[tag[i]] = i;
+			m_node[tag[i]] = i;
 		}
 	}
 
@@ -60,7 +58,7 @@ bool FESurface::Init()
 	m_NEL.Create(*this);
 
 	// see if we can find all elements that the faces belong to
-	for (i=0; i<ne; ++i)
+	for (int i=0; i<ne; ++i)
 	{
 		FESurfaceElement& el = Element(i);
 		if (el.m_nelem < 0) el.m_nelem = FindElement(el);
@@ -75,7 +73,7 @@ bool FESurface::Init()
 int FESurface::FindElement(FESurfaceElement& el)
 {
 	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pMesh;
+	FEMesh& mesh = *GetMesh();
 	FENodeElemList& NEL = mesh.NodeElementList();
 
 	vector<int>& sf = el.m_node;
@@ -130,24 +128,24 @@ void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 		int* id = node.m_ID;
 
 		// first the displacement dofs
-		lm[3*i  ] = id[0];
-		lm[3*i+1] = id[1];
-		lm[3*i+2] = id[2];
+		lm[3*i  ] = id[DOF_X];
+		lm[3*i+1] = id[DOF_Y];
+		lm[3*i+2] = id[DOF_Z];
 
 		// now the pressure dofs
-		lm[3*N+i] = id[6];
+		lm[3*N+i] = id[DOF_P];
 
 		// rigid rotational dofs
-		lm[4*N + 3*i  ] = id[7];
-		lm[4*N + 3*i+1] = id[8];
-		lm[4*N + 3*i+2] = id[9];
+		lm[4*N + 3*i  ] = id[DOF_RU];
+		lm[4*N + 3*i+1] = id[DOF_RV];
+		lm[4*N + 3*i+2] = id[DOF_RW];
 
 		// fill the rest with -1
 		lm[7*N + 3*i  ] = -1;
 		lm[7*N + 3*i+1] = -1;
 		lm[7*N + 3*i+2] = -1;
 
-		lm[10*N + i] = id[10];
+		lm[10*N + i] = id[DOF_T];
 		
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
@@ -402,6 +400,29 @@ double FESurface::FaceArea(FESurfaceElement& el)
 }
 
 //-----------------------------------------------------------------------------
+//! Calculate the max element size.
+double FESurface::MaxElementSize()
+{
+	FEMesh& mesh = *m_pMesh;
+	double h2 = 0.0;
+	int NS = Elements();
+	for (int m=0; m<NS; ++m)
+	{
+		FESurfaceElement& e = Element(m);
+		int n = e.Nodes();
+		for (int i=0; i<n; ++i)
+			for (int j=i+1; j<n; ++j)
+			{
+				vec3d& a = mesh.Node(e.m_node[i]).m_rt;
+				vec3d& b = mesh.Node(e.m_node[j]).m_rt;
+				double L2 = (b - a)*(b - a);
+				if (L2 > h2) h2 = L2;
+			}
+	}
+	return sqrt(h2);
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the metric tensor at the point with surface coordinates (r,s)
 // TODO: perhaps I should place this function in the element class
 
@@ -502,6 +523,8 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 }
 
 //-----------------------------------------------------------------------------
+//! Given an element an the natural coordinates of a point in this element, this
+//! function returns the global position vector.
 vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
 {
 	int l;
@@ -933,8 +956,13 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 	for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 
 	// call the correct intersection function
-	if (N == 3) return IntersectTri(y, r, n, rs, g, eps);
-	else if (N == 4) return IntersectQuad(y, r, n, rs, g, eps);
+	switch (N)
+	{
+	case 3: return IntersectTri(y, r, n, rs, g, eps); break;
+	case 4: return IntersectQuad(y, r, n, rs, g, eps); break;
+	default:
+		assert(false);
+	}
 
 	// if we get here, the ray did not intersect the element
 	return false;
@@ -960,7 +988,7 @@ FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], bo
 	int mn = m_SNQ.Find(r);
 	
 	// mn is a local index, so get the global node number too
-	int m = node[mn];
+	int m = m_node[mn];
 	
 	// get the nodal position
 	vec3d r0 = mesh.Node(m).m_rt;
@@ -992,6 +1020,58 @@ FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], bo
 	}
 	
 	// we did not find a master surface
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Finds the element that contains the closest point projection of a node.
+//! Returns zero if no such element can be found.
+// TODO: I need to define a max search radius. For contact problems it is important that only nodes are
+//       considered that are within an acceptable distance for contact.
+FESurfaceElement* FESurface::ClosestPointProjection(vec3d& x, vec3d& q, vec2d& r, bool binit_nq, double tol)
+{
+	// get the mesh
+	FEMesh& mesh = *GetMesh();
+
+	// see if we need to initialize the NQ structure
+	if (binit_nq) m_SNQ.Init();
+
+	// let's find the closest master node
+	int mn = m_SNQ.Find(x);
+
+	// mn is a local index, so get the global node number too
+	int m = m_node[mn];
+
+	// get the nodal position
+	vec3d r0 = mesh.Node(m).m_rt;
+
+	// now that we found the closest master node, lets see if we can find 
+	// the best master element
+	int nval = m_NET.Valence(mn);
+	FEElement** pe = m_NET.ElementList(mn);
+	for (int j=0; j<nval; ++j)
+	{
+		// get the master element
+		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+		int N = el.Nodes();
+
+		// project the node on the element
+		r[0] = 0;
+		r[1] = 0;
+		q = ProjectToSurface(el, x, r[0], r[1]);
+		if (IsInsideElement(el, r[0], r[1], tol)) return &el;
+	}
+
+	// If we get here, we did not find a facet.
+	// There are a couple of reasons why the search has failed:
+	// -1. the point cannot be projected onto the surface. For contact this implies the node is not in contact.
+	// -2. the projection falls outside the set of elements surrounding the closest point.
+	// -3. the projection falls on an edge of two faces whos normals are pointing away.
+	// -4. the closest node is in fact the closest point and no closer projection on face or edge can be found
+	//
+	// TODO: I am not sure yet how to distinguish these cases. One way might be to project the point onto
+	//       the edges and see if there is an edge that has a projection that is closer than the closest
+	//       node. I am not sure yet if this is a sufficient argument though.
 	return 0;
 }
 

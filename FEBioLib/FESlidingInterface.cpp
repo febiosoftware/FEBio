@@ -33,48 +33,13 @@ BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-//! Finds the (master) element that contains the projection of a (slave) node
-
-FEElement* FESlidingSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
+void FESlidingSurface::ShallowCopy(FESlidingSurface& s)
 {
-	// get the mesh
-	FEMesh& mesh = *m_pMesh;
-
-	// see if we need to initialize the NQ structure
-	if (binit_nq) m_NQ.Init();
-	binit_nq = false;
-
-	// let's find the closest master node
-	int mn = m_NQ.Find(x);
-
-	// mn is a local index, so get the global node number too
-	int m = node[mn];
-
-	// get the nodal position
-	vec3d r0 = mesh.Node(m).m_rt;
-
-	// now that we found the closest master node, lets see if we can find 
-	// the best master element
-	int N;
-
-	// loop over all master elements that contain the node mn
-	int nval = m_NEL.Valence(mn);
-	FEElement** pe = m_NEL.ElementList(mn);
-	for (int j=0; j<nval; ++j)
-	{
-		// get the master element
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
-		N = el.Nodes();
-
-		// project the node on the element
-		r[0] = 0;
-		r[1] = 0;
-		q = ProjectToSurface(el, x, r[0], r[1]);
-		if (IsInsideElement(el, r[0], r[1], tol)) return pe[j];
-	}
-
-	// we did not find a master surface
-	return 0;
+	m_Lm  = s.m_Lm;
+	m_gap = s.m_gap;
+	zero(m_pme);
+	m_Lt  = s.m_Lt;
+	m_Ln = s.m_Ln;
 }
 
 //-----------------------------------------------------------------------------
@@ -97,16 +62,16 @@ bool FESlidingSurface::Init()
 	int nn = Nodes();
 
 	// allocate other surface data
-	gap.assign(nn, 0.0);	// gap funtion
-	nu.resize(nn);			// node normal 
+	m_gap.assign(nn, 0.0);	// gap funtion
+	m_nu.resize(nn);			// node normal 
 	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));		// penetrated master element
-	rs.resize(nn);			// natural coords of projected slave node on master element
-	rsp.resize(nn);
-	Lm.assign(nn, 0.0);
-	M.resize(nn);
-	Lt.resize(nn);
-	off.assign(nn, 0.0);
-	eps.assign(nn, 1.0);
+	m_rs.resize(nn);			// natural coords of projected slave node on master element
+	m_rsp.resize(nn);
+	m_Lm.assign(nn, 0.0);
+	m_M.resize(nn);
+	m_Lt.resize(nn);
+	m_off.assign(nn, 0.0);
+	m_eps.assign(nn, 1.0);
 	m_Ln.assign(nn, 0.0);
 
 	// we calculate the gap offset values
@@ -128,7 +93,7 @@ bool FESlidingSurface::Init()
 			}
 		}
 	}
-	for (i=0; i<nn; ++i) off[i] = tag[node[i]];
+	for (i=0; i<nn; ++i) m_off[i] = tag[m_node[i]];
 
 	return true;
 }
@@ -142,16 +107,16 @@ vec3d FESlidingSurface::traction(int inode)
 	if (m_pme[inode])
 	{
 		FESurfaceElement& el = *m_pme[inode];
-		double Tn = Lm[inode];
-		double T1 = Lt[inode][0];
-		double T2 = Lt[inode][1];
-		double r = rs[inode][0];
-		double s = rs[inode][1];
-		double g = gap[inode];
-		double epsilon = eps[inode];
+		double Tn = m_Lm[inode];
+		double T1 = m_Lt[inode][0];
+		double T2 = m_Lt[inode][1];
+		double r = m_rs[inode][0];
+		double s = m_rs[inode][1];
+		double g = m_gap[inode];
+		double epsilon = m_eps[inode];
 		Tn = MBRACKET(Tn + epsilon*g);
 
-		vec3d tn = nu[inode]*Tn, tt;
+		vec3d tn = m_nu[inode]*Tn, tt;
 		vec3d e[2];
 		ContraBaseVectors0(el, r, s, e);
 		tt = e[0]*T1 + e[1]*T2;
@@ -168,7 +133,7 @@ void FESlidingSurface::UpdateNormals()
 	int i, j, jp1, jm1;
 	int N = Nodes();
 	int NE = Elements();
-	for (i=0; i<N; ++i) nu[i] = vec3d(0,0,0);
+	for (i=0; i<N; ++i) m_nu[i] = vec3d(0,0,0);
 	vec3d y[4], e1, e2;
 
 	for (i=0; i<NE; ++i)
@@ -185,11 +150,11 @@ void FESlidingSurface::UpdateNormals()
 			e1 = y[jp1] - y[j];
 			e2 = y[jm1] - y[j];
 
-			nu[el.m_lnode[j]] -= e1 ^ e2;						
+			m_nu[el.m_lnode[j]] -= e1 ^ e2;						
 		}
 	}
 
-	for (i=0; i<N; ++i) nu[i].unit();
+	for (i=0; i<N; ++i) m_nu[i].unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -198,15 +163,15 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 	FEContactSurface::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << gap;
-		ar << nu;
-		ar << rs;
-		ar << rsp;
-		ar << Lm;
-		ar << M;
-		ar << Lt;
-		ar << off;
-		ar << eps;
+		ar << m_gap;
+		ar << m_nu;
+		ar << m_rs;
+		ar << m_rsp;
+		ar << m_Lm;
+		ar << m_M;
+		ar << m_Lt;
+		ar << m_off;
+		ar << m_eps;
 		ar << m_Ln;
 	}
 	else
@@ -214,15 +179,15 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 		// read the contact data
 		// Note that we do this after Init() (called in FESurface::Serialize) since this data gets 
 		// initialized to zero there
-		ar >> gap;
-		ar >> nu;
-		ar >> rs;
-		ar >> rsp;
-		ar >> Lm;
-		ar >> M;
-		ar >> Lt;
-		ar >> off;
-		ar >> eps;
+		ar >> m_gap;
+		ar >> m_nu;
+		ar >> m_rs;
+		ar >> m_rsp;
+		ar >> m_Lm;
+		ar >> m_M;
+		ar >> m_Lt;
+		ar >> m_off;
+		ar >> m_eps;
 		ar >> m_Ln;
 	}
 }
@@ -271,7 +236,7 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 	int i, k, m;
 
 	// zero penalty values
-	zero(s.eps);
+	zero(s.m_eps);
 
 	// get the mesh
 	FEMesh& mesh = *s.GetMesh();
@@ -303,12 +268,12 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 		for (k=0; k<face.Nodes(); ++k)
 		{
 			m = face.m_lnode[k];
-			s.eps[m] += eps;
+			s.m_eps[m] += eps;
 		}
 	}
 
 	// scale values according to valence
-	for (i=0; i<s.Nodes(); ++i) s.eps[i] /= s.m_NEL.Valence(i);
+	for (i=0; i<s.Nodes(); ++i) s.m_eps[i] /= s.m_NEL.Valence(i);
 }
 
 //-----------------------------------------------------------------------------
@@ -353,47 +318,39 @@ bool FESlidingInterface::Init()
 
 void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove)
 {
-	int i;
-	double r, s;
-	FEElement* pme;
 	bool bfirst = true;
 
-	// spatial position of slave node
-	vec3d x;
-
 	// slave node projection
+	double r, s;
 	vec3d q;
 
-	// get the mesh
-	FEMesh& mesh = *ss.GetMesh();
-
 	// loop over all slave nodes
-	for (i=0; i<ss.Nodes(); ++i)
+	for (int i=0; i<ss.Nodes(); ++i)
 	{
 		// get the node
 		FENode& node = ss.Node(i);
 
 		// get the nodal position
-		x = node.m_rt;
+		vec3d x = node.m_rt;
 
 		// get the global node number
-		int m = ss.node[i];
+		int m = ss.m_node[i];
 
 		// get the previous master element (if any)
-		pme = ss.m_pme[i];
+		FESurfaceElement* pme = ss.m_pme[i];
 
 		// If the node is in contact, let's see if the node still is 
 		// on the same master element
 		if (pme != 0)
 		{
-			FESurfaceElement& mel = dynamic_cast<FESurfaceElement&>(*pme);
+			FESurfaceElement& mel = *pme;
 
-			r = ss.rs[i][0];
-			s = ss.rs[i][1];
+			r = ss.m_rs[i][0];
+			s = ss.m_rs[i][1];
 
 			q = ms.ProjectToSurface(mel, x, r, s);
-			ss.rs[i][0] = r;
-			ss.rs[i][1] = s;
+			ss.m_rs[i][0] = r;
+			ss.m_rs[i][1] = s;
 
 			// we only check when we can update the segments
 			// otherwise, we just stick with this element, even
@@ -403,9 +360,9 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 				if (!ms.IsInsideElement(mel, r, s, m_stol) && bupseg)
 				{
 					// see if the node might have moved to another master element
-					FEElement* pold = pme; 
-					ss.rs[i] = vec2d(0,0);
-					pme = ms.FindMasterSegment(x, q, ss.rs[i], bfirst, m_stol);
+					FESurfaceElement* pold = pme; 
+					ss.m_rs[i] = vec2d(0,0);
+					pme = ms.ClosestPointProjection(x, q, ss.m_rs[i], bfirst, m_stol); bfirst = false;
 
 					if (pme == 0)
 					{
@@ -418,8 +375,8 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 						// the node has moved to another master segment.
 						// If friction is active we need to translate the frictional
 						// data to the new master segment.
-						FESurfaceElement& eo = dynamic_cast<FESurfaceElement&>(*pold);
-						FESurfaceElement& en = dynamic_cast<FESurfaceElement&>(*pme );
+						FESurfaceElement& eo = *pold;
+						FESurfaceElement& en = *pme;
 						MapFrictionData(i, ss, ms, en, eo, q);
 					}
 				}
@@ -429,38 +386,38 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 		{
 			// get the master element
 			// don't forget to initialize the search for the first node!
-			ss.rs[i] = vec2d(0,0);
-			pme = ms.FindMasterSegment(x, q, ss.rs[i], bfirst, m_stol);
+			ss.m_rs[i] = vec2d(0,0);
+			pme = ms.ClosestPointProjection(x, q, ss.m_rs[i], bfirst, m_stol); bfirst = false;
 			if (pme)
 			{
 				// the node has come into contact so make sure to initialize
 				// the previous natural coordinates for friction.
-				ss.rsp[i] = ss.rs[i];
+				ss.m_rsp[i] = ss.m_rs[i];
 			}
 		}
 
 		// if we found a master element, update the gap and normal data
-		ss.m_pme[i] = dynamic_cast<FESurfaceElement*>(pme);
+		ss.m_pme[i] = pme;
 		if (pme != 0)
 		{
 			FESurfaceElement& mel =  *ss.m_pme[i];
 
-			r = ss.rs[i][0];
-			s = ss.rs[i][1];
+			r = ss.m_rs[i][0];
+			s = ss.m_rs[i][1];
 
 			// if this is a new contact, copy the current coordinates
 			// to the previous ones
-			ss.M[i] = ss.Metric0(mel, r, s);
+			ss.m_M[i] = ss.Metric0(mel, r, s);
 
 			// the slave normal is set to the master element normal
-			ss.nu[i] = ss.SurfaceNormal(mel, r, s);
+			ss.m_nu[i] = ss.SurfaceNormal(mel, r, s);
 
 			// calculate gap
-			ss.gap[i] = -(ss.nu[i]*(x - q)) + ss.off[i];
-			if (bmove && (ss.gap[i]>0))
+			ss.m_gap[i] = -(ss.m_nu[i]*(x - q)) + ss.m_off[i];
+			if (bmove && (ss.m_gap[i]>0))
 			{
-				node.m_r0 = node.m_rt = q + ss.nu[i]*ss.off[i];
-				ss.gap[i] = 0;
+				node.m_r0 = node.m_rt = q + ss.m_nu[i]*ss.m_off[i];
+				ss.m_gap[i] = 0;
 			}
 
 			// TODO: what should we do if the gap function becomes
@@ -480,9 +437,9 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 			//		 perhaps this is not even necessary.
 			// since the node is not in contact, we set the gap function 
 			// and Lagrangian multiplier to zero
-			ss.gap[i] = 0;
-			ss.Lm[i]  = 0;
-			ss.Lt[i][0] = ss.Lt[i][1] = 0;
+			ss.m_gap[i] = 0;
+			ss.m_Lm[i]  = 0;
+			ss.m_Lt[i][0] = ss.m_Lt[i][1] = 0;
 		}
 	}
 }
@@ -686,24 +643,24 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	int nmeln, ndof;
 
 	// gap function
-	gap = ss.gap[m];
+	gap = ss.m_gap[m];
 
 	// normal penalty
-	eps = ss.eps[m]*scale;
+	eps = ss.m_eps[m]*scale;
 
 	// get slave node normal force
-	Ln = ss.Lm[m];
+	Ln = ss.m_Lm[m];
 	tn = Ln + eps*gap;
 	tn = MBRACKET(tn);
 
 	// get the slave node normal
-	vec3d& nu = ss.nu[m];
+	vec3d& nu = ss.m_nu[m];
 
 	nmeln = mel.Nodes();
 	ndof = 3*(1 + nmeln);
 
 	// metric tensors
-	mat2d Mk = ss.M[m];
+	mat2d Mk = ss.m_M[m];
 	mat2d Mki = Mk.inverse();
 
 	// get the master element node positions
@@ -711,12 +668,12 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 
 	// isoparametric coordinates of the projected slave node
 	// onto the master element
-	double r = ss.rs[m][0];
-	double s = ss.rs[m][1];
+	double r = ss.m_rs[m][0];
+	double s = ss.m_rs[m][1];
 
 	// get the coordinates at the previous step
-	double rp = ss.rsp[m][0];
-	double sp = ss.rsp[m][1];
+	double rp = ss.m_rsp[m][0];
+	double sp = ss.m_rsp[m][1];
 
 	// get the master shape function values at this slave node
 	if (nmeln == 4)
@@ -756,8 +713,8 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	{
 		// Lagrangian traction
 		double Lt[2];
-		Lt[0] = ss.Lt[m][0];
-		Lt[1] = ss.Lt[m][1];
+		Lt[0] = ss.m_Lt[m][0];
+		Lt[1] = ss.m_Lt[m][1];
 
 		// calculate contact vector for tangential traction
 		// only if both the friction coefficient and friction
@@ -1017,28 +974,28 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 	// penalty factor
 	double scale = Penalty();
-	double eps = ss.eps[m]*scale;
+	double eps = ss.m_eps[m]*scale;
 
 	// nodal coordinates
 	vec3d rt[4];
 	for (j=0; j<nmeln; ++j) rt[j] = mesh.Node(mel.m_node[j]).m_rt;
 
 	// slave node natural coordinates in master element
-	double r = ss.rs[m][0];
-	double s = ss.rs[m][1];
+	double r = ss.m_rs[m][0];
+	double s = ss.m_rs[m][1];
 
 	// slave gap
-	double gap = ss.gap[m];
+	double gap = ss.m_gap[m];
 
 	// lagrange multiplier
-	double Lm = ss.Lm[m];
+	double Lm = ss.m_Lm[m];
 
 	// get slave node normal force
 	double tn = Lm + eps*gap;
 	tn = MBRACKET(tn);
 
 	// get the slave node normal
-	vec3d& nu = ss.nu[m];
+	vec3d& nu = ss.m_nu[m];
 
 	// get the master shape function values and the derivatives at this slave node
 	mel.shape_fnc(H, r, s);
@@ -1162,16 +1119,16 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	{
 		// get the traction multipliers
 		double Lt[2];
-		Lt[0] = ss.Lt[m][0];
-		Lt[1] = ss.Lt[m][1];
+		Lt[0] = ss.m_Lt[m][0];
+		Lt[1] = ss.m_Lt[m][1];
 
 		// get the metric tensor and its inverse
-		mat2d& Mk = ss.M[m];
+		mat2d& Mk = ss.m_M[m];
 		mat2d Mki = Mk.inverse();
 
 		// get the previous isoparameteric coordinates
-		double rp = ss.rsp[m][0];
-		double sp = ss.rsp[m][1];
+		double rp = ss.m_rsp[m][0];
+		double sp = ss.m_rsp[m][1];
 
 		// get the traction
 		double Tt[2];
@@ -1350,8 +1307,8 @@ bool FESlidingInterface::Augment(int naug)
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
 	double normL0 = 0;
-	for (i=0; i<m_ss.Nodes(); ++i)	normL0 += m_ss.Lm[i]*m_ss.Lm[i];
-	for (i=0; i<m_ms.Nodes(); ++i)	normL0 += m_ms.Lm[i]*m_ms.Lm[i];
+	for (i=0; i<m_ss.Nodes(); ++i)	normL0 += m_ss.m_Lm[i]*m_ss.m_Lm[i];
+	for (i=0; i<m_ms.Nodes(); ++i)	normL0 += m_ms.m_Lm[i]*m_ms.m_Lm[i];
 
 	// b. tangential component
 	if (m_mu*m_epsf > 0)
@@ -1360,9 +1317,9 @@ bool FESlidingInterface::Augment(int naug)
 		{
 			if (m_ss.m_pme[i])
 			{
-				Lt[0] = m_ss.Lt[i][0];
-				Lt[1] = m_ss.Lt[i][1];
-				mat2d& M = m_ss.M[i];
+				Lt[0] = m_ss.m_Lt[i][0];
+				Lt[1] = m_ss.m_Lt[i][1];
+				mat2d& M = m_ss.m_M[i];
 				Mi = M.inverse();
 				normL0 += Lt[0]*(Mi[0][0]*Lt[0] + Mi[0][1]*Lt[1]) + Lt[1]*(Mi[1][0]*Lt[0] + Mi[1][1]*Lt[1]);
 			}
@@ -1372,9 +1329,9 @@ bool FESlidingInterface::Augment(int naug)
 		{
 			if (m_ms.m_pme[i])
 			{
-				Lt[0] = m_ms.Lt[i][0];
-				Lt[1] = m_ms.Lt[i][1];
-				mat2d& M = m_ms.M[i];
+				Lt[0] = m_ms.m_Lt[i][0];
+				Lt[1] = m_ms.m_Lt[i][1];
+				mat2d& M = m_ms.m_M[i];
 				Mi = M.inverse();
 				normL0 += Lt[0]*(Mi[0][0]*Lt[0] + Mi[0][1]*Lt[1]) + Lt[1]*(Mi[1][0]*Lt[0] + Mi[1][1]*Lt[1]);
 			}
@@ -1389,33 +1346,33 @@ bool FESlidingInterface::Augment(int naug)
 	int N = 0;
 	for (i=0; i<m_ss.Nodes(); ++i)
 	{
-		eps = m_ss.eps[i]*scale;
+		eps = m_ss.m_eps[i]*scale;
 
 		// update Lagrange multipliers
-		Ln = m_ss.Lm[i] + eps*m_ss.gap[i];
+		Ln = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
 		Ln = MBRACKET(Ln);
 
 		normL1 += Ln*Ln;
 
-		if (m_ss.gap[i] > 0)
+		if (m_ss.m_gap[i] > 0)
 		{
-			normg1 += m_ss.gap[i]*m_ss.gap[i];
+			normg1 += m_ss.m_gap[i]*m_ss.m_gap[i];
 			++N;
 		}
 	}	
 
 	for (i=0; i<m_ms.Nodes(); ++i)
 	{
-		eps = m_ms.eps[i]*scale;
+		eps = m_ms.m_eps[i]*scale;
 
 		// update Lagrange multipliers
-		Ln = m_ms.Lm[i] + eps*m_ms.gap[i];
+		Ln = m_ms.m_Lm[i] + eps*m_ms.m_gap[i];
 		Ln = MBRACKET(Ln);
 
 		normL1 += Ln*Ln;
-		if (m_ms.gap[i] > 0)
+		if (m_ms.m_gap[i] > 0)
 		{
-			normg1 += m_ms.gap[i]*m_ms.gap[i];
+			normg1 += m_ms.m_gap[i]*m_ms.m_gap[i];
 			++N;
 		}
 	}
@@ -1429,17 +1386,17 @@ bool FESlidingInterface::Augment(int naug)
 		{
 			if (m_ss.m_pme[i])
 			{
-				r = m_ss.rs[i][0];
-				s = m_ss.rs[i][1];
-				rp = m_ss.rsp[i][0];
-				sp = m_ss.rsp[i][1];
-				Ln = m_ss.Lm[i];
+				r = m_ss.m_rs[i][0];
+				s = m_ss.m_rs[i][1];
+				rp = m_ss.m_rsp[i][0];
+				sp = m_ss.m_rsp[i][1];
+				Ln = m_ss.m_Lm[i];
 	
-				mat2d& Mk = m_ss.M[i];
+				mat2d& Mk = m_ss.m_M[i];
 				Mi = Mk.inverse();
 
-				Lt[0] = m_ss.Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
-				Lt[1] = m_ss.Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
+				Lt[0] = m_ss.m_Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
+				Lt[1] = m_ss.m_Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
 
 				double TMT = Lt[0]*(Mi[0][0]*Lt[0]+Mi[0][1]*Lt[1])+Lt[1]*(Mi[1][0]*Lt[0]+Mi[1][1]*Lt[1]);
 				double phi = sqrt(TMT) - m_mu*Ln;
@@ -1459,17 +1416,17 @@ bool FESlidingInterface::Augment(int naug)
 		{
 			if (m_ms.m_pme[i])
 			{
-				r = m_ms.rs[i][0];
-				s = m_ms.rs[i][1];
-				rp = m_ms.rsp[i][0];
-				sp = m_ms.rsp[i][1];
-				Ln = m_ms.Lm[i];
+				r = m_ms.m_rs[i][0];
+				s = m_ms.m_rs[i][1];
+				rp = m_ms.m_rsp[i][0];
+				sp = m_ms.m_rsp[i][1];
+				Ln = m_ms.m_Lm[i];
 
-				mat2d& Mk = m_ms.M[i];
+				mat2d& Mk = m_ms.m_M[i];
 				Mi = Mk.inverse();
 
-				Lt[0] = m_ms.Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
-				Lt[1] = m_ms.Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
+				Lt[0] = m_ms.m_Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
+				Lt[1] = m_ms.m_Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
 
 				double TMT = Lt[0]*(Mi[0][0]*Lt[0]+Mi[0][1]*Lt[1])+Lt[1]*(Mi[1][0]*Lt[0]+Mi[1][1]*Lt[1]);
 				double phi = sqrt(TMT) - m_mu*Ln;
@@ -1515,30 +1472,30 @@ bool FESlidingInterface::Augment(int naug)
 		// we did not converge so update multipliers
 		for (i=0; i<m_ss.Nodes(); ++i)
 		{
-			eps = m_ss.eps[i]*scale;
+			eps = m_ss.m_eps[i]*scale;
 
 			// update Lagrange multipliers
-			Ln = m_ss.Lm[i] + eps*m_ss.gap[i];
-			m_ss.Lm[i] = MBRACKET(Ln);
+			Ln = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
+			m_ss.m_Lm[i] = MBRACKET(Ln);
 
 			if ((m_mu*m_epsf > 0) && (m_ss.m_pme[i]))
 			{
 				// update the metrics
 				FESurfaceElement& mel = *m_ss.m_pme[i];
 
-				double r = m_ss.rs[i][0], s = m_ss.rs[i][1];
-				double rp = m_ss.rsp[i][0], sp = m_ss.rsp[i][1];
+				double r = m_ss.m_rs[i][0], s = m_ss.m_rs[i][1];
+				double rp = m_ss.m_rsp[i][0], sp = m_ss.m_rsp[i][1];
 
-				double Ln = m_ss.Lm[i];
+				double Ln = m_ss.m_Lm[i];
 
-				mat2d Mk = m_ss.M[i];
+				mat2d Mk = m_ss.m_M[i];
 				mat2d Mki = Mk.inverse();
 				
 			
 				// update traction multipliers
 				// a. trial state
-				Lt[0] = m_ss.Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
-				Lt[1] = m_ss.Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
+				Lt[0] = m_ss.m_Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
+				Lt[1] = m_ss.m_Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
 
 				double TMT = Lt[0]*(Mki[0][0]*Lt[0]+Mki[0][1]*Lt[1])+Lt[1]*(Mki[1][0]*Lt[0]+Mki[1][1]*Lt[1]);
 				assert(TMT >= 0);
@@ -1552,40 +1509,39 @@ bool FESlidingInterface::Augment(int naug)
 					Lt[1] = m_mu*Ln*Lt[1]/sqrt(TMT);
 				}
 
-				m_ss.M[i] = m_ss.Metric0(mel, r, s);
+				m_ss.m_M[i] = m_ss.Metric0(mel, r, s);
 
-				m_ss.Lt[i][0] = Lt[0];
-				m_ss.Lt[i][1] = Lt[1];
-			
+				m_ss.m_Lt[i][0] = Lt[0];
+				m_ss.m_Lt[i][1] = Lt[1];
 			}
 		}	
 
 		for (i=0; i<m_ms.Nodes(); ++i)
 		{
-			eps = m_ms.eps[i]*scale;
+			eps = m_ms.m_eps[i]*scale;
 
 			// update Lagrange multipliers
-			Ln = m_ms.Lm[i] + eps*m_ms.gap[i];
-			m_ms.Lm[i] = MBRACKET(Ln);
+			Ln = m_ms.m_Lm[i] + eps*m_ms.m_gap[i];
+			m_ms.m_Lm[i] = MBRACKET(Ln);
 
 			if ((m_mu*m_epsf > 0) && (m_ms.m_pme[i]))
 			{
 				// update the metrics
 				FESurfaceElement& mel = *m_ms.m_pme[i];
 
-				double r = m_ms.rs[i][0], s = m_ms.rs[i][1];
-				double rp = m_ms.rsp[i][0], sp = m_ms.rsp[i][1];
+				double r = m_ms.m_rs[i][0], s = m_ms.m_rs[i][1];
+				double rp = m_ms.m_rsp[i][0], sp = m_ms.m_rsp[i][1];
 
-				double Ln = m_ms.Lm[i];
+				double Ln = m_ms.m_Lm[i];
 
-				mat2d Mk = m_ms.M[i];
+				mat2d Mk = m_ms.m_M[i];
 				mat2d Mki = Mk.inverse();
 				
 				// update traction multipliers
 				// a. trial state
 				double Lt[2];
-				Lt[0] = m_ms.Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
-				Lt[1] = m_ms.Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
+				Lt[0] = m_ms.m_Lt[i][0] + m_epsf*(Mk[0][0]*(r - rp) + Mk[0][1]*(s - sp));
+				Lt[1] = m_ms.m_Lt[i][1] + m_epsf*(Mk[1][0]*(r - rp) + Mk[1][1]*(s - sp));
 
 				double TMT = Lt[0]*(Mki[0][0]*Lt[0]+Mki[0][1]*Lt[1])+Lt[1]*(Mki[1][0]*Lt[0]+Mki[1][1]*Lt[1]);
 				assert(TMT >= 0);
@@ -1599,18 +1555,18 @@ bool FESlidingInterface::Augment(int naug)
 					Lt[1] = m_mu*Ln*Lt[1]/sqrt(TMT);
 				}
 
-				m_ms.M[i] = m_ms.Metric0(mel, r, s);
+				m_ms.m_M[i] = m_ms.Metric0(mel, r, s);
 
-				m_ms.Lt[i][0] = Lt[0];
-				m_ms.Lt[i][1] = Lt[1];
+				m_ms.m_Lt[i][0] = Lt[0];
+				m_ms.m_Lt[i][1] = Lt[1];
 			}
 		}
 	}
 
 	if (bconv)
 	{
-		m_ss.rsp = m_ss.rs;
-		m_ms.rsp = m_ms.rs;
+		m_ss.m_rsp = m_ss.m_rs;
+		m_ms.m_rsp = m_ms.m_rs;
 	}
 
 	// store the last gap norm
@@ -1625,15 +1581,15 @@ bool FESlidingInterface::Augment(int naug)
 void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlidingSurface& ms, FESurfaceElement &en, FESurfaceElement &eo, vec3d &q)
 {
 	// first we find the projection of the old point on the new segment
-	double r = ss.rs[inode][0];
-	double s = ss.rs[inode][1];
-	double rp = ss.rsp[inode][0], ro = rp;
-	double sp = ss.rsp[inode][1], so = sp;
+	double r = ss.m_rs[inode][0];
+	double s = ss.m_rs[inode][1];
+	double rp = ss.m_rsp[inode][0], ro = rp;
+	double sp = ss.m_rsp[inode][1], so = sp;
 	vec3d xn = ms.Local2Global(eo, rp, sp);
 	vec3d qn;
 	qn = ms.ProjectToSurface(en, xn, rp, sp);
-	ss.rsp[inode][0] = rp;
-	ss.rsp[inode][1] = sp;
+	ss.m_rsp[inode][0] = rp;
+	ss.m_rsp[inode][1] = sp;
 
 	// next, we transform the frictional traction
 	// since these tractions are decomposed in the local 
@@ -1646,8 +1602,8 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 	ms.CoBaseVectors0(en, r, s, tn);
 
 	double Lt[2];
-	Lt[0] = ss.Lt[inode][0];
-	Lt[1] = ss.Lt[inode][1];
+	Lt[0] = ss.m_Lt[inode][0];
+	Lt[1] = ss.m_Lt[inode][1];
 	
 	vec3d t;
 	t = to[0]*Lt[0] + to[1]*Lt[1];
@@ -1655,8 +1611,8 @@ void FESlidingInterface::MapFrictionData(int inode, FESlidingSurface& ss, FESlid
 	Lt[0] = t*tn[0];
 	Lt[1] = t*tn[1];
 
-	ss.Lt[inode][0] = Lt[0];
-	ss.Lt[inode][1] = Lt[1];
+	ss.m_Lt[inode][0] = Lt[0];
+	ss.m_Lt[inode][1] = Lt[1];
 }
 
 //-----------------------------------------------------------------------------
@@ -1672,9 +1628,9 @@ void FESlidingInterface::UpdateContactPressures()
 		for (int n=0; n<ss.Nodes(); ++n)
 		{
 			// get the normal tractions at the integration points
-			double gap = ss.gap[n];
-			double eps = m_eps*ss.eps[n];
-			ss.m_Ln[n] = MBRACKET(ss.Lm[n] + eps*gap);
+			double gap = ss.m_gap[n];
+			double eps = m_eps*ss.m_eps[n];
+			ss.m_Ln[n] = MBRACKET(ss.m_Lm[n] + eps*gap);
 			FESurfaceElement* pme = ss.m_pme[n];
 			if (m_btwo_pass && pme)
 			{
@@ -1682,15 +1638,15 @@ void FESlidingInterface::UpdateContactPressures()
 				double ti[4];
 				for (int j=0; j<me; ++j) {
 					int k = pme->m_lnode[j];
-					gap = ms.gap[k];
-					eps = m_eps*ms.eps[k];
-					ti[j] = MBRACKET(ms.Lm[k] + m_eps*ms.eps[k]*ms.gap[k]);
+					gap = ms.m_gap[k];
+					eps = m_eps*ms.m_eps[k];
+					ti[j] = MBRACKET(ms.m_Lm[k] + m_eps*ms.m_eps[k]*ms.m_gap[k]);
 				}
 				// project the data to the nodes
 				double tn[4];
 				pme->project_to_nodes(ti, tn);
 				// now evaluate the traction at the intersection point
-				double Ln = pme->eval(tn, ss.rs[n][0], ss.rs[n][1]);
+				double Ln = pme->eval(tn, ss.m_rs[n][0], ss.m_rs[n][1]);
 				ss.m_Ln[n] += MBRACKET(Ln);
 			}
 		}

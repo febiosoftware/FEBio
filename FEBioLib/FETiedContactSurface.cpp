@@ -17,16 +17,23 @@ bool FETiedContactSurface::Init()
 	int nn = Nodes();
 
 	// allocate other surface data
-	gap.resize(nn);		// gap funtion
+	m_gap.resize(nn);		// gap funtion
 	m_pme.assign(nn, static_cast<FESurfaceElement*>(0));	// penetrated master element
-	rs.resize(nn);		// natural coords of projected slave node on master element
-	Lm.resize(nn);		// Lagrangian multipliers
+	m_rs.resize(nn);		// natural coords of projected slave node on master element
+	m_Lm.resize(nn);		// Lagrangian multipliers
 
 	// set initial values
-	zero(gap);
-	zero(Lm);
+	zero(m_gap);
+	zero(m_Lm);
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FETiedContactSurface::ShallowCopy(FETiedContactSurface& s)
+{
+	m_Lm  = s.m_Lm;
+	m_gap = s.m_gap;
 }
 
 //-----------------------------------------------------------------------------
@@ -35,14 +42,14 @@ void FETiedContactSurface::Serialize(DumpFile &ar)
 	FEContactSurface::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << gap;
-		ar << rs;
-		ar << Lm;
+		ar << m_gap;
+		ar << m_rs;
+		ar << m_Lm;
 	}
 	else
 	{
-		ar >> gap;
-		ar >> rs;
-		ar >> Lm;
+		ar >> m_gap;
+		ar >> m_rs;
+		ar >> m_Lm;
 	}
 }
