@@ -1,11 +1,3 @@
-/*
- *  FEEllipsoidalFiberDistribution.cpp
- *  FEBioXCode
- *
- *  Created by Gerard Ateshian on 2/17/10.
- *  Copyright 2010 Columbia University. All rights reserved.
- *
- */
 #include "stdafx.h"
 #include "FEEllipsoidalFiberDistribution.h"
 
@@ -17,23 +9,18 @@
 #define SQR(x) ((x)*(x))
 #endif
 
-// we store the cos and sin of the angles here
-int FEEllipsoidalFiberDistribution::m_nres = 0;
-double FEEllipsoidalFiberDistribution::m_cth[NSTH];
-double FEEllipsoidalFiberDistribution::m_sth[NSTH];
-double FEEllipsoidalFiberDistribution::m_cph[NSTH];
-double FEEllipsoidalFiberDistribution::m_sph[NSTH];
-double FEEllipsoidalFiberDistribution::m_w[NSTH];
+//-----------------------------------------------------------------------------
+// FEEllipsoidalFiberDistribution
+//-----------------------------------------------------------------------------
+
+// register the material with the framework
+REGISTER_MATERIAL(FEEllipsoidalFiberDistribution, "ellipsoidal fiber distribution");
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEllipsoidalFiberDistribution, FEElasticMaterial)
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
 	ADD_PARAMETERV(m_ksi , FE_PARAM_DOUBLEV, 3, "ksi" );
 END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-// FEEllipsoidalFiberDistribution
-//-----------------------------------------------------------------------------
 
 void FEEllipsoidalFiberDistribution::Init()
 {
@@ -44,28 +31,6 @@ void FEEllipsoidalFiberDistribution::Init()
 	if (m_beta[0] < 2) throw MaterialError("beta1 must be greater than 2.");
 	if (m_beta[1] < 2) throw MaterialError("beta1 must be greater than 2.");
 	if (m_beta[2] < 2) throw MaterialError("beta1 must be greater than 2.");
-
-	static bool bfirst = true;
-	
-	if (bfirst)
-	{
-		// select the integration rule
-		const int nint = (m_nres == 0? NSTL  : NSTH  );
-		const double* phi = (m_nres == 0? PHIL  : PHIH  );
-		const double* the = (m_nres == 0? THETAL: THETAH);
-		const double* w   = (m_nres == 0? AREAL : AREAH );
-		
-		for (int n=0; n<nint; ++n)
-		{
-			m_cth[n] = cos(the[n]);
-			m_sth[n] = sin(the[n]);
-			m_cph[n] = cos(phi[n]);
-			m_sph[n] = sin(phi[n]);
-			m_w[n] = w[n];
-		}
-		
-		bfirst = false;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -78,54 +43,122 @@ mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 	double J = pt.J;
 
 	// get the element's local coordinate system
-	mat3d QT = (pt.Q).transpose();
+	mat3d Q = pt.Q;
 
 	// loop over all integration points
-	double ksi, beta;
-	vec3d n0e, n0a, nt;
+	vec3d n0e, n0a, n0q, nt;
 	double In, Wl;
 	const double eps = 0;
-	mat3ds C = pt.RightCauchyGreen();
 	mat3ds s;
 	s.zero();
 
-	const int nint = (m_nres == 0? NSTL  : NSTH  );
-
+	const int nint = 45;
 	for (int n=0; n<nint; ++n)
 	{
-		// set the global fiber direction in reference configuration
-		n0e.x = m_cth[n]*m_sph[n];
-		n0e.y = m_sth[n]*m_sph[n];
-		n0e.z = m_cph[n];
+		// set the global fiber direction in material coordinate system
+		n0a.x = XYZ2[n][0];
+		n0a.y = XYZ2[n][1];
+		n0a.z = XYZ2[n][2];
+		double wn = XYZ2[n][3];
+
+		// calculate material coefficients
+		// TODO: There is an obvious optimization opportunity here, since the values of ksi
+		//       and beta can be precalculated and reused. I have not done this yet since I
+		//       need to figure out how to initialize the material parameters for each time
+		//       step (instead of once at the start) in case the values depend on load curves.
+		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
+		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
 		
+		// --- quadrant 1,1,1 ---
+
+		// rotate to reference configuration
+		n0e = Q*n0a;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
 		// Calculate In = n0e*C*n0e
-		In = n0e*(C*n0e);
+		In = nt*nt;
 		
 		// only take fibers in tension into consideration
 		if (In > 1. + eps)
 		{
-			// get the global spatial fiber direction in current configuration
-			nt = (F*n0e)/sqrt(In);
-			
-			// calculate the outer product of nt
-			mat3ds N = dyad(nt);
-			
-			// get the local material fiber direction in reference configuration
-			n0a = QT*n0e;
-			
-			// calculate material coefficients
-			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
-			
 			// calculate strain energy derivative
 			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
-			
+
 			// calculate the stress
-			s += N*(2.0/J*In*Wl*m_w[n]);
+			s += dyad(nt)*(Wl*wn);
 		}
+
+		// --- quadrant -1,1,1 ---
+		n0q = vec3d(-n0a.x, n0a.y, n0a.z);
+
+		// rotate to reference configuration
+		n0e = Q*n0q;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
 		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
+
+			// calculate the stress
+			s += dyad(nt)*(Wl*wn);
+		}
+
+		// --- quadrant -1,-1,1 ---
+		n0q = vec3d(-n0a.x, -n0a.y, n0a.z);
+
+		// rotate to reference configuration
+		n0e = Q*n0q;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
+
+			// calculate the stress
+			s += dyad(nt)*(Wl*wn);
+		}
+
+		// --- quadrant 1,-1,1 ---
+		n0q = vec3d(n0a.x, -n0a.y, n0a.z);
+
+		// rotate to reference configuration
+		n0e = Q*n0q;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wl = beta*ksi*pow(In - 1.0, beta-1.0);
+
+			// calculate the stress
+			s += dyad(nt)*(Wl*wn);
+		}
 	}
-	return s;
+
+	// we multiply by two to add contribution from other half-sphere
+	return s*(4.0/J);
 }
 
 //-----------------------------------------------------------------------------
@@ -138,11 +171,10 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	double J = pt.J;
 
 	// get the element's local coordinate system
-	mat3d QT = (pt.Q).transpose();
+	mat3d Q = pt.Q;
 
 	// loop over all integration points
-	double ksi, beta;
-	vec3d n0e, n0a, nt;
+	vec3d n0e, n0a, n0q, nt;
 	double In, Wll;
 	const double eps = 0;
 	tens4ds cf, cfw; cf.zero();
@@ -151,46 +183,118 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 	
-	// right Cauchy-Green tensor: C = Ft*F
-	mat3ds C = (F.transpose()*F).sym();
-
-	const int nint = (m_nres == 0? NSTL  : NSTH  );
-	
+	const int nint = 45;
 	for (int n=0; n<nint; ++n)
 	{
-		// set the global fiber direction in reference configuration
-		n0e.x = m_cth[n]*m_sph[n];
-		n0e.y = m_sth[n]*m_sph[n];
-		n0e.z = m_cph[n];
-		
+		// set the global fiber direction in material coordinate system
+		n0a.x = XYZ2[n][0];
+		n0a.y = XYZ2[n][1];
+		n0a.z = XYZ2[n][2];
+		double wn = XYZ2[n][3];
+
+		// calculate material coefficients
+		double ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
+		double beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
+
+		// --- quadrant 1,1,1 ---
+
+		// rotate to reference configuration
+		n0e = Q*n0a;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
 		// Calculate In = n0e*C*n0e
-		In = n0e*(C*n0e);
+		In = nt*nt;
 		
 		// only take fibers in tension into consideration
 		if (In > 1. + eps)
 		{
-			// get the global spatial fiber direction in current configuration
-			nt = (F*n0e)/sqrt(In);
-			
-			// calculate the outer product of nt
+			// calculate strain energy derivative
+			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
+
 			N2 = dyad(nt);
+			N4 = dyad1s(N2);
 			
-			// get the local material fiber direction in reference configuration
-			n0a = QT*n0e;
-			
-			// calculate material coefficients in local fiber direction
-			ksi  = 1.0 / sqrt(SQR(n0a.x / m_ksi [0]) + SQR(n0a.y / m_ksi [1]) + SQR(n0a.z / m_ksi [2]));
-			beta = 1.0 / sqrt(SQR(n0a.x / m_beta[0]) + SQR(n0a.y / m_beta[1]) + SQR(n0a.z / m_beta[2]));
-			
+			c += N4*(Wll*wn);
+		}
+
+		// --- quadrant -1,1,1 ---
+
+		n0q = vec3d(-n0a.x, n0a.y, n0a.z);
+
+		// rotate to reference configuration
+		n0e = Q*n0q;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
 			// calculate strain energy derivative
 			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
 			
 			N2 = dyad(nt);
 			N4 = dyad1s(N2);
 			
-			c += N4*(4.0/J*In*In*Wll*m_w[n]);
+			c += N4*(Wll*wn);
+		}
+
+		// --- quadrant -1,-1,1 ---
+
+		n0q = vec3d(-n0a.x, -n0a.y, n0a.z);
+
+		// rotate to reference configuration
+		n0e = Q*n0q;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
+			
+			N2 = dyad(nt);
+			N4 = dyad1s(N2);
+			
+			c += N4*(Wll*wn);
+		}
+
+		// --- quadrant 1,-1,1 ---
+
+		n0q = vec3d(n0a.x, -n0a.y, n0a.z);
+
+		// rotate to reference configuration
+		n0e = Q*n0q;
+
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wll = beta*(beta-1.0)*ksi*pow(In - 1.0, beta-2.0);
+			
+			N2 = dyad(nt);
+			N4 = dyad1s(N2);
+			
+			c += N4*(Wll*wn);
 		}
 	}
-	
-	return c;
+
+	// multiply by two to integrate over other half of sphere
+	return c*(2.0*4.0/J);
 }
