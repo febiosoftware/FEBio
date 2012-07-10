@@ -78,6 +78,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FETiedInterface.h"
 #include "FETiedBiphasicInterface.h"
+#include "FESlidingInterfaceBW.h"
 
 #include "FEBioPlot/FEPlotDomainData.h"
 #include "FEDamageNeoHookean.h"
@@ -182,6 +183,7 @@ REGISTER_FEBIO_CLASS(FEPeriodicBoundary     , FEContactInterface, "periodic boun
 REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FEContactInterface, "surface constraint");
 REGISTER_FEBIO_CLASS(FETiedInterface        , FEContactInterface, "tied"              );
 REGISTER_FEBIO_CLASS(FETiedBiphasicInterface, FEContactInterface, "tied-biphasic"     );
+REGISTER_FEBIO_CLASS(FESlidingInterfaceBW   , FEContactInterface, "sliding-Bonet-Wood");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
