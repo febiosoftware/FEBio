@@ -590,6 +590,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FESlidingInterfaceBW.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FESolidSolver.cpp"
 				>
 			</File>
@@ -1181,6 +1185,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESlidingInterface3.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESlidingInterfaceBW.h"
 				>
 			</File>
 			<File
