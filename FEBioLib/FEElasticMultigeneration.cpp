@@ -6,10 +6,102 @@
 // BEGIN_PARAMETER_LIST(FEElasticMultigeneration, FEElasticMaterial)
 // END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// Mixture of elastic solids
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+vector<FEGenerationData*> FEElasticMultigeneration::m_MG;
 
+//=============================================================================
+FEMaterialPoint* FEMultigenerationMaterialPoint::Copy()
+{
+	FEMultigenerationMaterialPoint* pt = new FEMultigenerationMaterialPoint(*this);
+	pt->m_pmat = m_pmat;
+	pt->Fi = Fi;
+	pt->Ji = Ji;
+	if (m_pt) pt->m_pt = m_pt->Copy();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEMultigenerationMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (m_pt) m_pt->Serialize(ar);
+			
+	if (ar.IsSaving())
+	{
+		for (int i=0; i < (int)Fi.size(); i++)
+			ar << Fi[i];
+		for (int i=0; i < (int)Ji.size(); i++)
+			ar << Ji[i];
+	}
+	else
+	{
+		for (int i=0; i < (int)Fi.size(); i++)
+			ar >> Fi[i];
+		for (int i=0; i < (int)Ji.size(); i++)
+			ar >> Ji[i];
+	}
+			
+	if (m_pt) m_pt->Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
+void FEMultigenerationMaterialPoint::Init(bool bflag)
+{
+	if (m_pt) m_pt->Init(bflag);
+
+	if (bflag)
+	{
+		Fi.clear();
+		Ji.clear();
+	}
+
+	// get the time
+	double t = FEMaterialPoint::time;
+
+	// Check if this constitutes a new generation
+	int igen = m_pmat->CheckGeneration(t);
+	t = m_pmat->m_MG[igen]->btime;
+	if ((bflag == false) && (m_pmat->HasGeneration(igen) && (t>m_tgen)))
+	{
+		FEElasticMaterialPoint& pt = *((*this).ExtractData<FEElasticMaterialPoint>());
+					
+		// push back F and J to define relative deformation gradient of this generation
+		mat3d F = pt.F;
+		double J = pt.J; 
+		Fi.push_back(F.inverse());
+		Ji.push_back(1.0/J);
+
+		m_tgen = t;
+	}
+}
+
+//=============================================================================
+void FEElasticMultigeneration::PushGeneration(FEGenerationData* G)
+{
+	m_MG.push_back (G);
+}
+
+//--------------------------------------------------------------------------------
+// Check if time t constitutes a new generation and return that generation
+int FEElasticMultigeneration::CheckGeneration(const double t)
+{
+	int ngen = m_MG.size();
+	for (int igen=1; igen<ngen; ++igen)
+	{
+		if (t < m_MG[igen]->btime) return igen - 1;
+	}
+	return ngen - 1;
+}
+
+//--------------------------------------------------------------------------------
+bool FEElasticMultigeneration::HasGeneration(const int igen)
+{
+	for (int i=0; i<(int)m_pMat.size(); ++i)
+		if (m_pMat[i]->GetID() == igen) return true;
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticMultigeneration::Init()
 {
 	FEElasticMaterial::Init();
@@ -17,6 +109,7 @@ void FEElasticMultigeneration::Init()
 		m_pMat[i]->Init();
 }
 
+//-----------------------------------------------------------------------------
 mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 {
 	FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
@@ -51,6 +144,7 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
+//-----------------------------------------------------------------------------
 tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
 {
 	FEMultigenerationMaterialPoint& pt = *mp.ExtractData<FEMultigenerationMaterialPoint>();
@@ -81,12 +175,3 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
 	
 	return c;
 }
-
-bool FEElasticMultigeneration::HasGeneration(const int igen)
-{
-	for (int i=0; i<(int)m_pMat.size(); ++i)
-		if (m_pMat[i]->GetID() == igen) return true;
-
-	return false;
-}
-

@@ -981,6 +981,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// nested materials
 			if (!bfound && dynamic_cast<FENestedMaterial*>(pmat)) bfound = ParseNestedMaterial(tag, dynamic_cast<FENestedMaterial*>(pmat));
 			
+			// multigeneration materials
+			if (!bfound && dynamic_cast<FEElasticMultigeneration*>(pmat)) bfound = ParseElasticMultigeneration(tag, dynamic_cast<FEElasticMultigeneration*>(pmat));
+
 			// see if we have processed the tag
 			if (bfound == false) throw XMLReader::InvalidTag(tag);
 		}
@@ -1374,9 +1377,6 @@ bool FEBioMaterialSection::ParseElasticMultigeneration(XMLTag &tag, FEElasticMul
 	const char* szname = 0;
 	const char* szid = 0;
 	int id;
-	
-	// set global flag for multigeneration growth
-//	FEM::SetMultigenerationFlag(true);
 	
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 	
@@ -5031,8 +5031,9 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if      (tag == "Constants" ) ParseConstants(tag);
-		else if (tag == "Solutes"   ) ParseGSSoluteData(tag);
+		if      (tag == "Constants"  ) ParseConstants(tag);
+		else if (tag == "Solutes"    ) ParseGSSoluteData(tag);
+		else if (tag == "Generations") ParseMGData(tag);
 		else if (m_pim->Version() < 0x0102)
 		{
 			if (tag == "body_force") ParseBodyForce(tag);
@@ -5160,6 +5161,30 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 		
 		++tag;
 	}
+}
+
+//-----------------------------------------------------------------------------
+//! Parse the time increments for multigeneration materials
+void FEBioGlobalsSection::ParseMGData(XMLTag &tag)
+{
+	++tag;
+	do
+	{
+		if (tag == "gen") {
+			FEGenerationData* G = new FEGenerationData;
+			int id = atoi(tag.AttributeValue("id"))-1;
+			if (id) {
+				G->born = false;
+			} else {
+				G->born = true;
+			}
+			tag.value(G->btime);
+			FEElasticMultigeneration::PushGeneration(G);
+		}
+		++tag;
+	}
+	while (!tag.isend());
+
 }
 
 //=============================================================================

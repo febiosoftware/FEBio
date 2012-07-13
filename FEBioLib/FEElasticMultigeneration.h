@@ -2,6 +2,18 @@
 #include "FECore/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
+//! Global generation data
+
+struct FEGenerationData {
+	double	btime;	//!< generation birth time
+	bool	born;	//!< flag for generation birth
+};
+
+//-----------------------------------------------------------------------------
+// forward declaration of material class
+class FEElasticMultigeneration;
+
+//-----------------------------------------------------------------------------
 //! Multigenerational material point.
 //! First generation exists at t=0. Second, third, etc. generations appear at t>0.
 //! This material point stores the inverse of the relative deformation gradient of
@@ -9,56 +21,24 @@
 //! each generation relative to the first generation.
 
 class FEMultigenerationMaterialPoint : public FEMaterialPoint
-	{
-	public:
-		FEMultigenerationMaterialPoint(FEMaterialPoint* pt) : FEMaterialPoint(pt) {}
+{
+public:
+	FEMultigenerationMaterialPoint(FEElasticMultigeneration* pm, FEMaterialPoint* pt) : m_pmat(pm), FEMaterialPoint(pt) { m_tgen = 0.0; }
 		
-		FEMaterialPoint* Copy()
-		{
-			FEMultigenerationMaterialPoint* pt = new FEMultigenerationMaterialPoint(*this);
-			if (m_pt) pt->m_pt = m_pt->Copy();
-			return pt;
-		}
+	FEMaterialPoint* Copy();
 		
-		void Serialize(DumpFile& ar)
-		{
-			if (m_pt) m_pt->Serialize(ar);
-			
-			if (ar.IsSaving())
-			{
-				for (int i=0; i < (int) Fi.size(); i++)
-					ar << Fi[i];
-				for (int i=0; i < (int) Ji.size(); i++)
-					ar << Ji[i];
-			}
-			else
-			{
-				for (int i=0; i < (int) Fi.size(); i++)
-					ar >> Fi[i];
-				for (int i=0; i < (int) Ji.size(); i++)
-					ar >> Ji[i];
-			}
-			
-			if (m_pt) m_pt->Serialize(ar);
-		}
+	void Serialize(DumpFile& ar);
 		
-		void Init(bool bflag)
-		{
-			if (bflag)
-			{
-				Fi.clear();
-				Ji.clear();
-			}
-			
-			if (m_pt) m_pt->Init(bflag);
-		}
+	void Init(bool bflag);
 		
-	public:
-		// multigenerational material data
-		vector <mat3d> Fi;	//!< inverse of relative deformation gradient
-		vector <double> Ji;	//!< determinant of Fi (store for efficiency)
-	};
-
+public:
+	// multigenerational material data
+	vector <mat3d> Fi;	//!< inverse of relative deformation gradient
+	vector <double> Ji;	//!< determinant of Fi (store for efficiency)
+	double	m_tgen;		//!< last generation time
+private:
+	FEElasticMultigeneration*	m_pmat;
+};
 
 //-----------------------------------------------------------------------------
 //! Multigenerational solid
@@ -72,7 +52,7 @@ public:
 	FEMaterialPoint* CreateMaterialPointData() 
 	{ 
 		// use the zero-th generation material point as the base elastic material point
-		return new FEMultigenerationMaterialPoint(m_pMat[0]->CreateMaterialPointData());
+		return new FEMultigenerationMaterialPoint(this, m_pMat[0]->CreateMaterialPointData());
 	}
 	
 public:
@@ -90,15 +70,13 @@ public:
 		
 	//! check existence of generation
 	bool HasGeneration(const int igen);
-	
+
+	static void PushGeneration(FEGenerationData* G);
+	static int CheckGeneration(const double t);
+
+public:
+	static vector<FEGenerationData*> m_MG;	//!< multigeneration data
+
 	// declare the parameter list
 //	DECLARE_PARAMETER_LIST();
-};
-
-//-----------------------------------------------------------------------------
-//! Global generation data
-
-struct FEGenerationData {
-	double	btime;	//!< generation birth time
-	bool	born;	//!< flag for generation birth
 };
