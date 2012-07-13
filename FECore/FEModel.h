@@ -83,6 +83,9 @@ public: // --- Material functions ---
 	//! return a pointer to a material
 	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
 
+	//! material initialization
+	virtual bool InitMaterials() = 0;
+
 public: // --- Body load functions --- 
 
 	//! Add a body force to the model

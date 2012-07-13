@@ -471,6 +471,16 @@ bool FEAnalysisStep::Solve(Progress& prg)
 			m_fem.EvaluateMaterialParameters(pm);
 		}
 
+		// initialize materials
+		// TODO: I need to do this since the material parameters can have changed and thus a new initialization
+		//       needs to be done to see if the material parameters are still valid. I would like to add value checking
+		//       directly in the parameter evaluation above so this can be removed.
+		if (m_fem.InitMaterials() == false)
+		{
+			bconv = false;
+			break;
+		}
+
 		// evaluate body-force parameter lists
 		for (i=0; i<m_fem.BodyForces(); ++i)
 		{
