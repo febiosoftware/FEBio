@@ -387,7 +387,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
 									int* mn = &me.m_node[0];
 
-									set(lm, -1);
+									assign(lm, -1);
 
 									int nseln = se.Nodes();
 									int nmeln = me.Nodes();
@@ -447,7 +447,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
 									int* mn = &me.m_node[0];
 
-									set(lm, -1);
+									assign(lm, -1);
 
 									int nseln = se.Nodes();
 									int nmeln = me.Nodes();
@@ -516,7 +516,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 									ps3->BiphasicSoluteStatus(*pm, me, mporo, msolu, mid);
 									int* mn = &me.m_node[0];
 									
-									set(lm, -1);
+									assign(lm, -1);
 									
 									int nseln = se.Nodes();
 									int nmeln = me.Nodes();
@@ -632,7 +632,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
 									int* mn = &me.m_node[0];
 									
-									set(lm, -1);
+									assign(lm, -1);
 									
 									int nseln = se.Nodes();
 									int nmeln = me.Nodes();
@@ -733,7 +733,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 					int nr0[4];
 					for (j=0; j<n0; ++j) nr0[j] = pref->m_node[j];
 
-					set(lm, -1);
+					assign(lm, -1);
 
 					lm[0] = ss.Node(nref).m_ID[DOF_X];
 					lm[1] = ss.Node(nref).m_ID[DOF_Y];
@@ -758,7 +758,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 						FESurfaceElement& me = *ss.m_pme[j];
 						int* en = &me.m_node[0];
 
-						set(lm, -1);
+						assign(lm, -1);
 
 						n = me.Nodes();
 

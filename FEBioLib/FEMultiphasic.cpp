@@ -146,7 +146,7 @@ void FEMultiphasic::Init()
 	m_pSolid->Init();
 	m_pPerm->Init();
 	m_pOsmC->Init();
-	for (int i=0; i<m_pSolute.size(); ++i) m_pSolute[i]->Init();
+	for (int i=0; i<(int)m_pSolute.size(); ++i) m_pSolute[i]->Init();
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
@@ -155,7 +155,7 @@ void FEMultiphasic::Init()
 	// Determine how to solve for the electric potential psi
 	int isol;
 	int zmin = 0, zmax = 0, z;
-	for (isol=0; isol<m_pSolute.size(); ++isol) {
+	for (isol=0; isol<(int)m_pSolute.size(); ++isol) {
 		z = m_pSolute[isol]->ChargeNumber();
 		if (z < zmin) zmin = z;
 		if (z > zmax) zmax = z;
@@ -594,7 +594,7 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 		ar << febio.GetTypeStr<FEMaterial>(m_pSolid); m_pSolid->Serialize(ar);
 		ar << febio.GetTypeStr<FEMaterial>(m_pPerm ); m_pPerm ->Serialize(ar);
 		ar << febio.GetTypeStr<FEMaterial>(m_pOsmC ); m_pOsmC ->Serialize(ar);
-		for (i=0; i<m_pSolute.size(); ++i) {
+		for (i=0; i<(int)m_pSolute.size(); ++i) {
 			ar << febio.GetTypeStr<FEMaterial>(m_pSolute[i]);
 			m_pSolute[i] ->Serialize(ar);
 		}

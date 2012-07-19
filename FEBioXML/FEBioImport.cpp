@@ -5128,7 +5128,10 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 	// count how many solutes there are
 	int nsol = 0;
 	XMLTag t(tag); ++t;
-	while (!t.isend()) { nsol++; ++t; }
+	while (!(t == "Solutes")) { 
+		if ((t == "solute") && !t.isend()) ++nsol;	// only count on opening tag
+		++t;
+	}
 	
 	// read the global solute data
 	++tag;
@@ -5151,12 +5154,20 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 			{
 				tag.value(psd->m_z);
 			}
+			else if (tag == "true_density")
+			{
+				tag.value(psd->m_rhoT);
+			}
+			else if (tag == "molar_mass")
+			{
+				tag.value(psd->m_M);
+			}
 			else throw XMLReader::InvalidTag(tag);
 			
 			++tag;
 		}
 		while (!tag.isend());
-
+		
 		fem.SetSD(psd);
 		
 		++tag;

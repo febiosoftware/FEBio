@@ -465,7 +465,7 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 		// Check if this solute is present in this specific multiphasic mixture
 		int sid = -1;
-		for (i=0; i<pm->m_pSolute.size(); ++i)
+		for (i=0; i<(int)pm->m_pSolute.size(); ++i)
 			if (pm->m_pSolute[i]->GetSoluteID() == m_nsol) {sid = i; break;}
 		if (sid == -1) return false;
 		
@@ -574,7 +574,7 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 		// Check if this solute is present in this specific multiphasic mixture
 		int sid = -1;
-		for (i=0; i<pm->m_pSolute.size(); ++i)
+		for (i=0; i<(int)pm->m_pSolute.size(); ++i)
 			if (pm->m_pSolute[i]->GetSoluteID() == m_nsol) {sid = i; break;}
 		if (sid == -1) return false;
 		
@@ -951,7 +951,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 		// Check if this solute is present in this specific multiphasic mixture
 		bool present = false;
-		for (int i=0; i<pm->m_pSolute.size(); ++i)
+		for (int i=0; i<(int)pm->m_pSolute.size(); ++i)
 			if (pm->m_pSolute[i]->GetSoluteID() == m_nsol) {present = true; break;}
 		if (!present) return false;
 		
