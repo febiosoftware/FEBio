@@ -37,10 +37,14 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial()
 //! data initialization and checking
 void FEUncoupledViscoElasticMaterial::Init()
 {
+	static bool bfirst = true;
+
 	FEUncoupledMaterial::Init();
 	
 	// combine bulk modulus from base material and uncoupled viscoelastic material
-	m_K += m_pBase->m_K;
+	if (bfirst) m_K += m_pBase->m_K;
+
+	bfirst = false;
 }
 
 //-----------------------------------------------------------------------------
