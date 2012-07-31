@@ -77,23 +77,33 @@ void Console::GetCommand(int& nargs, char **argv)
 	// parse the arguments
 	nargs = 0;
 	int n = 0;
-	int l = strlen(szcmd);
+	int b = 0;
 	ch = szcmd;
-	for (int i=0; i<=l; ++i, ++ch)
+	while (*ch)
 	{
-		if (!isspace(*ch) && (*ch != 0))
+		switch (*ch)
 		{
-			if (n==0) argv[nargs++] = ch;
-			++n;
-		}
-		else 
-		{
-			if (n!=0)
+		case ' ':
+			if ((b == 0) && (n != 0))
 			{
-				argv[nargs-1][n] = 0;
+				*ch = 0;
 				n = 0;
 			}
+			break;
+		case '"':
+			if ((b == 0) && (n==0)) b = 1;
+			else 
+			{
+				b = 0;
+				*ch = 0;
+				n = 0;
+			}
+			break;
+		default:
+			if (n == 0) argv[nargs++] = ch;
+			n++;
 		}
+		ch++;
 	}
 }
 
