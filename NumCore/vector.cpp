@@ -11,6 +11,14 @@ double operator*(const vector<double>& a, const vector<double>& b)
 	return sum;
 }
 
+vector<double> operator - (vector<double>& a, vector<double>& b)
+{
+	vector<double> c(a);
+	int n = (int) c.size();
+	for (int i=0; i<n; ++i) c[i] -= b[i];
+	return c;
+}
+
 vector<double>& operator += (vector<double>& a, const vector<double>& b)
 {
 	assert(a.size() == b.size());

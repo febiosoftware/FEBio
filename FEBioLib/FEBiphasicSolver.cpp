@@ -204,7 +204,7 @@ bool FEBiphasicSolver::Quasin(double time)
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
-		if (m_bfgs.m_LStol > 0) s = m_bfgs.LineSearch();
+		if (m_bfgs.m_LStol > 0) s = m_bfgs.LineSearch(1.0);
 		else
 		{
 			s = 1;

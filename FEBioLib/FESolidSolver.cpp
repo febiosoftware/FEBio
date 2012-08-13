@@ -80,6 +80,65 @@ bool FESolidSolver::Init()
 	// initialize BFGS data
 	m_bfgs.Init(neq, this, m_plinsolve);
 
+	// calculate the inverse mass vector for explicit analysis
+	if (m_solvertype==2)
+	{
+		matrix ke;
+		int i, j, iel, n;
+		int nint, neln;
+		double *H, kab;
+		vector <int> lm;
+		vector <double> el_lumped_mass;
+		for (int nd = 0; nd < mesh.Domains(); ++nd)
+		{
+			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+			if (pbd)
+			{
+				for (iel=0; iel<pbd->Elements(); ++iel)
+				{
+					FESolidElement& el = pbd->Element(iel);
+					pbd->UnpackLM(el, lm);
+
+					FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
+
+					double d = pme->Density();
+
+					nint = el.GaussPoints();
+					neln = el.Nodes();
+
+					ke.resize(3*neln, 3*neln);
+					ke.zero();
+					el_lumped_mass.resize(3*neln);
+					for (i=0; i<3*neln; ++i) el_lumped_mass[i]=0.0;
+
+					// create the element mass matrix
+					for (n=0; n<nint; ++n)
+					{
+						double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
+
+						H = el.H(n);
+						for (i=0; i<neln; ++i)
+							for (j=0; j<neln; ++j)
+							{
+								kab = H[i]*H[j]*detJ0*d;
+								ke[3*i  ][3*j  ] += kab;
+								ke[3*i+1][3*j+1] += kab;
+								ke[3*i+2][3*j+2] += kab;
+							}	
+					}
+					// reduce to a lumped mass vector
+					for (i=0; i<3*neln; ++i)
+							for (j=0; j<neln; ++j)
+							{
+								el_lumped_mass[i]+=ke[i][j];
+							}	
+					
+					// assemble element matrix into inv_mass vector
+					AssembleResidual(el.m_node, lm, el_lumped_mass, m_inv_mass);
+				}
+			}
+		}
+	}
 	// set the create stiffness matrix flag
 	m_breshape = true;
 
@@ -387,7 +446,7 @@ void FESolidSolver::Update(vector<double>& ui)
 	// update velocity and accelerations
 	// for dynamic simulations
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	if (pstep->m_nanalysis == FE_DYNAMIC)
+	if ((pstep->m_nanalysis == FE_DYNAMIC)&&(m_solvertype==0))
 	{
 		int N = mesh.Nodes();
 		double dt = pstep->m_dt;
@@ -400,6 +459,15 @@ void FESolidSolver::Update(vector<double>& ui)
 			n.m_vt = n.m_vp + (n.m_ap + n.m_at)*dt*0.5;
 		}
 	}
+	//	// update velocity - acceleration is calculated in Quasin
+	//{
+	//	int N = mesh.Nodes();
+	//	double dt = m_fem.m_pStep->m_dt;
+	//	for (i=0; i<N; ++i)
+	//	{
+	//		FENode& n = mesh.Node(i);
+	//	}
+	//}
 
 	// update poroelastic data
 	if (pstep->GetType() == FE_BIPHASIC) UpdatePoro(ui);
@@ -930,8 +998,13 @@ void FESolidSolver::PrepStep(double time)
 //!   "Finite Element Procedures", K.J. Bathe, p759 and following
 bool FESolidSolver::Quasin(double time)
 {
-	int i;
-	double s;
+	int i, n;
+
+	double s, olds, oldolds;  // line search step lengths from the current iteration and the two previous ones
+	double bdiv,betapcg, moddU, modR, etak;
+	vector<double> u0(m_neq);
+	vector<double> RR(m_neq);
+	vector<double> Rold(m_neq);
 
 	// convergence norms
 	double	normR1;		// residual norm
@@ -946,6 +1019,7 @@ bool FESolidSolver::Quasin(double time)
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
+	bool sdflag = true;		// flag for steepest descent iterations in NLCG
 
 	// Get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -957,7 +1031,10 @@ bool FESolidSolver::Quasin(double time)
 	m_fem.CheckInterruption();
 
 	// calculate initial stiffness matrix
-	if (ReformStiffness() == false) return false;
+	if (m_solvertype == 0)
+	{
+		if (ReformStiffness() == false) return false;
+	}
 
 	// calculate initial residual
 	if (Residual(m_bfgs.m_R0) == false) return false;
@@ -974,6 +1051,9 @@ bool FESolidSolver::Quasin(double time)
 
 	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
+	// set the initial step length estimates to 1.0
+	s=1; olds=1; oldolds=1;
+
 	// loop until converged or when max nr of reformations reached
 	do
 	{
@@ -986,14 +1066,82 @@ bool FESolidSolver::Quasin(double time)
 
 		// assume we'll converge. 
 		bconv = true;
-
-		// solve the equations
-		m_SolverTime.start();
+		if (m_solvertype==1) 	//  calculate new direction using Hager & Zhang conjugate gradient method
 		{
-			m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
+			if ((m_niter>0)&&(breform==0))  // no need to restart CG
+			{ 
+			// calculate Hager- Zhang direction
+        	moddU=sqrt(u0*u0);  // needed later for the step length calculation
+			RR=m_bfgs.m_R1-Rold;	// yk
+    		bdiv=u0*RR;		// dk.yk
+			if (bdiv==0.0) {
+				betapcg=0.0;
+				sdflag=true;
+				}
+    		else {
+				double RR2=RR*RR;	// yk^2
+               		// use m_ui as a temporary vector
+				for (i=0; i<m_neq; ++i) {
+					m_bfgs.m_ui[i] = RR[i]-2.0*u0[i]*RR2/bdiv;	// yk-2*dk*yk^2/(dk.yk)
+					}
+				betapcg=m_bfgs.m_ui*m_bfgs.m_R1;	// m_ui*gk+1
+				betapcg=-betapcg/bdiv;   
+          		modR=sqrt(m_bfgs.m_R0*m_bfgs.m_R0);
+          		etak=-1.0/(moddU*min(0.01,modR));
+          		betapcg=max(etak,betapcg);
+				// try Fletcher - Reeves instead
+				// betapcg=(m_R0*m_R0)/(m_Rold*m_Rold);
+				// betapcg=0.0;
+				sdflag=false;
+				}
+			for (i=0; i<m_neq; ++i) {
+            	m_bfgs.m_ui[i]=m_bfgs.m_R1[i]+betapcg*u0[i];
+				}
 		}
-		m_SolverTime.stop();
+         else {
+		// use steepest descent for first iteration or when a restart is needed
+            	m_bfgs.m_ui=m_bfgs.m_R0;
+				breform=false;
+				sdflag=true;
+        	 }
+			Rold=m_bfgs.m_R1;		// store residual for use next time
+			u0=m_bfgs.m_ui;		// store direction for use on the next iteration
+		}
+		else if (m_solvertype==0)	// we are using the BFGS solver and need to solve the equations
+		{
+			// solve the equations
+			m_SolverTime.start();
+			{
+				m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
+			}
+			m_SolverTime.stop();
+		}
+		else if (m_solvertype==2)	// we are doing an explicit analysis and need to calculate the acceleration and velocity
+		{
+			// get the mesh
+			FEMesh& mesh = m_fem.m_mesh;
+			int N = mesh.Nodes();
+			double dt=m_fem.GetCurrentStep()->m_dt;
+			for (i=0; i<N; ++i)
+			{
+				FENode& node = mesh.Node(i);
+				//  calculate acceleration using F=ma and update
+				if ((n = node.m_ID[DOF_X]) >= 0) node.m_at.x = m_inv_mass[n]*m_bfgs.m_R1[n];
+				if ((n = node.m_ID[DOF_Y]) >= 0) node.m_at.y = m_inv_mass[n]*m_bfgs.m_R1[n];
+				if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = m_inv_mass[n]*m_bfgs.m_R1[n];
+				// and update the velocities using the accelerations
+				node.m_vt = node.m_vp + node.m_at*dt;	//  update velocity using acceleration m_at
+				node.m_vt.x*=m_dyn_damping;
+				node.m_vt.y*=m_dyn_damping;
+				node.m_vt.z*=m_dyn_damping;
+				//	calculate incremental displacement using velocity
+				double vel=node.m_vt.x;
+				if ((n = node.m_ID[DOF_X]) >= 0) m_bfgs.m_ui[n] = node.m_vt.x*dt;
+				if ((n = node.m_ID[DOF_Y]) >= 0) m_bfgs.m_ui[n] = node.m_vt.y*dt;
+				if ((n = node.m_ID[DOF_Z]) >= 0) m_bfgs.m_ui[n] = node.m_vt.z*dt;
+			}
 
+		}
 		// check for nans
 		if (m_fem.GetDebugFlag())
 		{
@@ -1012,11 +1160,32 @@ bool FESolidSolver::Quasin(double time)
 
 		// perform a linesearch
 		// the geometry is also updated in the line search
-		if (m_bfgs.m_LStol > 0) s = m_bfgs.LineSearch();
-		else
+		if (m_solvertype==0) // we are using the BFGS solver
 		{
-			s = 1;
+			if (m_bfgs.m_LStol > 0) s = m_bfgs.LineSearch(1.0);
+			else
+			{
+				s = 1;
 
+				// Update geometry
+				Update(m_bfgs.m_ui);
+
+				// calculate residual at this point
+				Residual(m_bfgs.m_R1);
+			}
+		}
+		else if (m_solvertype==1)	// we are using the Hager - Zhang solver, which starts with a guess for the step length 
+		{
+			// use the step length from two steps previously as the initial guess
+			// note that it has its own linesearch, different from the BFGS one
+			s = m_bfgs.LineSearchCG(oldolds);
+			// update the old step lengths for use as an initial guess in two iterations' time
+			if (m_niter<1) oldolds=s;	// if this is the first iteration, use current step length
+			else oldolds=olds;	// otherwise use the previous one
+			olds=s;  // and store the current step to be used for the iteration after next
+		}
+		else if (m_solvertype==2) // need to update everything for the explicit solver
+		{
 			// Update geometry
 			Update(m_bfgs.m_ui);
 
@@ -1026,9 +1195,12 @@ bool FESolidSolver::Quasin(double time)
 
 		// update total displacements
 		int neq = m_Ui.size();
+		if (m_solvertype==2) s=1.0;  // we have not done a line search in the explicit solver 
 		for (i=0; i<neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
 
 		// calculate norms
+		if (m_solvertype<2) 
+		{
 		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
 		normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
 		normU  = m_Ui*m_Ui;
@@ -1065,6 +1237,7 @@ bool FESolidSolver::Quasin(double time)
 		clog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
 
 		clog.SetMode(oldmode);
+		}
 
 		// check if we have converged. 
 		// If not, calculate the BFGS update vectors
@@ -1086,7 +1259,7 @@ bool FESolidSolver::Quasin(double time)
 			else if (normE1 > normEm)
 			{
 				// check for diverging
-				clog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
+				if (m_solvertype==0) clog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
@@ -1096,7 +1269,7 @@ bool FESolidSolver::Quasin(double time)
 			{
 				// If we havn't reached max nr of BFGS updates
 				// do an update
-				if (!breform)
+				if (!breform && (m_solvertype==0))
 				{
 					if (m_bfgs.m_nups < m_bfgs.m_maxups-1)
 					{
@@ -1130,7 +1303,7 @@ bool FESolidSolver::Quasin(double time)
 			zero(m_bfgs.m_ui);
 
 			// reform stiffness matrices if necessary
-			if (breform)
+			if (breform && (m_solvertype == 0))
 			{
 				clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 

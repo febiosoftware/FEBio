@@ -30,7 +30,10 @@ public:
 	void Solve();
 
 	//! Performs a linesearch
-	double LineSearch();
+	double LineSearch(double s);
+
+	//! modified linesearch for Hager-Zhang solver
+	double LineSearchCG(double s);
 
 public:
 	int		m_maxups;		//!< max nr of QN iters permitted between stiffness reformations

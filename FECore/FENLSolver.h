@@ -14,6 +14,8 @@ public:
 	FENLSolver(FEModel& fem) : m_fem(fem)
 	{ 
 		m_bsymm = true; // assume symmetric stiffness matrix
+		m_solvertype = 0;
+		m_dyn_damping = 0.99;
 	}
 
 	virtual ~FENLSolver() {}
@@ -61,6 +63,8 @@ public: // TODO: temporary data that I would like to move elsewhere
 	// BFGS parameters
 	BFGSSolver	m_bfgs;		//!< BFGS solver parameters
 	bool		m_bsymm;	//!< symmetry flag for linear solver allocation
+	int			m_solvertype;	//!< defines the type of solver; 0=BFGs, 1-Hager-Zhang NLCG
+	double		m_dyn_damping;	//!< velocity damping for the explicit solver
 
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations

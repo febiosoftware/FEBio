@@ -172,7 +172,7 @@ void NumCore::BFGSSolver::Solve()
 		SolveEquations(m_ui, m_R0);
 
 		// update solution
-		if (m_LStol > 0) LineSearch();
+		if (m_LStol > 0) LineSearch(1.0);
 		else m_pNLS->Update(m_ui);
 
 		// check for convergence
@@ -206,9 +206,8 @@ void NumCore::BFGSSolver::Solve()
 // For instance, define a di so that ui = s*di. Also, define the 
 // position of the nodes at the previous iteration.
 
-double NumCore::BFGSSolver::LineSearch()
+double NumCore::BFGSSolver::LineSearch(double s)
 {
-	double s = 1.0;
 	double smin = s;
 
 	double a, A, B, D;
@@ -332,5 +331,173 @@ double NumCore::BFGSSolver::LineSearch()
 		}
 	}
 */
+	return s;
+}
+
+
+double NumCore::BFGSSolver::LineSearchCG(double s)
+{
+	//  s is now passed from the solver routine instead of defaulting to 1.0
+	double smin = s;
+
+	double FA, FB, FC, AA, AB, r, r0 ;
+	bool failed=false;
+
+	// max nr of line search iterations
+	int nmax = m_LSiter;
+	int n = 0;
+
+	// initial energy
+	FA = m_ui*m_R0;
+	AA=0.0;
+	r0=FA;
+
+	double rmin = fabs(FA);
+
+	vector<double> ul(m_ui.size());
+
+	// so we can set AA = 0 and FA= r0
+	// AB=s and we need to evaluate FB (called r1)
+	// n is a count of the number of linesearch attempts
+
+		// calculate residual at this point, reducing s if necessary
+		do
+		{
+			// Update geometry using the initial guess s
+			vcopys(ul, m_ui, s);
+			failed=false;
+			try
+				{
+					m_pNLS->Update(ul);
+					m_pNLS->Evaluate(m_R1);
+				}
+				catch (...)
+				{
+//					printf("reducing s at initial evaluation");
+					failed=true;
+					s=0.1*s;
+				}
+		}
+		while (failed==true);
+
+		// calculate energies
+		FB = m_ui*m_R1;
+		AB=s;
+
+		if (FB<rmin){
+			rmin=FB;
+			smin=s;
+		}
+
+	do
+	{
+		// make sure that r1 does not happen to be really close to zero,
+		// since in that case we won't find any better solution.
+		if (fabs(FB) < 1.e-20) r = 0;  // we've hit the converged solution and don't need to do any more
+		else r = fabs(FB/r0);
+
+		if (r > m_LStol)	// we need to search and find a better value of s
+		{
+            if (FB==FA) s=(AA+AB)*1000;
+			else { 
+				s=(AA*FB-AB*FA)/(FB-FA);
+				s=min(s,100*max(AA,AB));
+			}
+		// calculate residual at this point, reducing s if necessary
+		do
+		{
+			// Update geometry using the initial guess s
+			vcopys(ul, m_ui, s);
+			failed=false;
+			try
+				{
+					m_pNLS->Update(ul);
+					m_pNLS->Evaluate(m_R1);
+				}
+				catch (...)
+				{
+//					printf("reducing s at FC");
+					failed=true;
+					s=0.1*s;
+				}
+		}
+		while ((failed==true)&&(s>m_LSmin));
+
+			// calculate energies
+			FC = m_ui*m_R1;
+			r=fabs(FC/r0);
+            
+			if (fabs(FC)>100*min(fabs(FA),fabs(FB)))  //  it was a bad guess and we need to go back a bit
+			{
+				s=0.1*s;
+
+		// calculate residual at this point, reducing s if necessary
+		do
+		{
+			// Update geometry using the initial guess s
+			vcopys(ul, m_ui, s);
+			failed=false;
+			try
+				{
+					m_pNLS->Update(ul);
+					m_pNLS->Evaluate(m_R1);
+				}
+				catch (...)
+				{
+//					printf("reducing s after bad guess");
+					failed=true;
+					s=0.1*s;
+				}
+		}
+		while (failed==true);
+
+			// calculate energies
+			FC = m_ui*m_R1;
+			r=fabs(FC/r0);
+			}
+            
+            if (fabs(FA)<fabs(FB)) // use the new value and the closest of the previous ones
+			{
+				FB=FC;
+				AB=s;
+			}
+			else
+			{
+               FA=FC;
+			   AA=s;
+			}
+
+			++n;
+		}
+	}
+	while ((r > m_LStol) && (n < nmax));
+
+
+	if (n >= nmax)
+	{
+		// max nr of iterations reached.
+		// we choose the line step that reached the smallest energy
+		s = smin;
+		// calculate residual at this point, reducing s if necessary
+		do
+		{
+			// Update geometry using the initial guess s
+			vcopys(ul, m_ui, s);
+			failed=false;
+			try
+				{
+					m_pNLS->Update(ul);
+					m_pNLS->Evaluate(m_R1);
+				}
+				catch (...)
+				{
+//					printf("reducing s after failed line search");
+					failed=true;
+					s=0.1*s;
+				}
+		}
+		while (failed==true);
+	}
+
 	return s;
 }

@@ -512,6 +512,8 @@ void FEBioControlSection::ParseSolidParams(XMLTag& tag)
 	else if (tag == "max_refs"    ) tag.value(ps->m_bfgs.m_maxref);
 	else if (tag == "max_ups"     ) tag.value(ps->m_bfgs.m_maxups);
 	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
+	else if (tag == "solvertype"  ) tag.value(ps->m_solvertype);
+	else if (tag == "dyn_damping" ) tag.value(ps->m_dyn_damping);
 	else throw XMLReader::InvalidTag(tag);
 }
 
