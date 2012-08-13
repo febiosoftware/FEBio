@@ -1000,10 +1000,7 @@ bool FESolidSolver::Quasin(double time)
 {
 	int i, n;
 
-	double s, olds, oldolds;  // line search step lengths from the current iteration and the two previous ones
-	double bdiv,betapcg, moddU, modR, etak;
 	vector<double> u0(m_neq);
-	vector<double> RR(m_neq);
 	vector<double> Rold(m_neq);
 
 	// convergence norms
@@ -1047,17 +1044,16 @@ bool FESolidSolver::Quasin(double time)
 
 //	double r0 = m_R0*m_R0;
 
-	Logfile::MODE oldmode;
-
 	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// set the initial step length estimates to 1.0
+	double s, olds, oldolds;  // line search step lengths from the current iteration and the two previous ones
 	s=1; olds=1; oldolds=1;
 
 	// loop until converged or when max nr of reformations reached
 	do
 	{
-		oldmode = clog.GetMode();
+		Logfile::MODE oldmode = clog.GetMode();
 		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
 			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
@@ -1070,36 +1066,46 @@ bool FESolidSolver::Quasin(double time)
 		{
 			if ((m_niter>0)&&(breform==0))  // no need to restart CG
 			{ 
-			// calculate Hager- Zhang direction
-        	moddU=sqrt(u0*u0);  // needed later for the step length calculation
-			RR=m_bfgs.m_R1-Rold;	// yk
-    		bdiv=u0*RR;		// dk.yk
-			if (bdiv==0.0) {
-				betapcg=0.0;
-				sdflag=true;
+				// calculate Hager- Zhang direction
+        		double moddU=sqrt(u0*u0);  // needed later for the step length calculation
+
+				// calculate yk
+				vector<double> RR(m_neq);
+				RR=m_bfgs.m_R1-Rold;
+
+				// calculate dk.yk
+				double bdiv=u0*RR;
+				double betapcg;
+				if (bdiv==0.0) 
+				{
+					betapcg=0.0;
+					sdflag=true;
 				}
-    		else {
-				double RR2=RR*RR;	// yk^2
-               		// use m_ui as a temporary vector
-				for (i=0; i<m_neq; ++i) {
-					m_bfgs.m_ui[i] = RR[i]-2.0*u0[i]*RR2/bdiv;	// yk-2*dk*yk^2/(dk.yk)
-					}
-				betapcg=m_bfgs.m_ui*m_bfgs.m_R1;	// m_ui*gk+1
-				betapcg=-betapcg/bdiv;   
-          		modR=sqrt(m_bfgs.m_R0*m_bfgs.m_R0);
-          		etak=-1.0/(moddU*min(0.01,modR));
-          		betapcg=max(etak,betapcg);
-				// try Fletcher - Reeves instead
-				// betapcg=(m_R0*m_R0)/(m_Rold*m_Rold);
-				// betapcg=0.0;
-				sdflag=false;
+    			else {
+					double RR2=RR*RR;	// yk^2
+               			// use m_ui as a temporary vector
+					for (i=0; i<m_neq; ++i) {
+						m_bfgs.m_ui[i] = RR[i]-2.0*u0[i]*RR2/bdiv;	// yk-2*dk*yk^2/(dk.yk)
+						}
+					betapcg=m_bfgs.m_ui*m_bfgs.m_R1;	// m_ui*gk+1
+					betapcg=-betapcg/bdiv;   
+          			double modR=sqrt(m_bfgs.m_R0*m_bfgs.m_R0);
+          			double etak=-1.0/(moddU*min(0.01,modR));
+          			betapcg=max(etak,betapcg);
+					// try Fletcher - Reeves instead
+					// betapcg=(m_R0*m_R0)/(m_Rold*m_Rold);
+					// betapcg=0.0;
+					sdflag=false;
 				}
-			for (i=0; i<m_neq; ++i) {
-            	m_bfgs.m_ui[i]=m_bfgs.m_R1[i]+betapcg*u0[i];
+
+				for (i=0; i<m_neq; ++i) 
+				{
+            		m_bfgs.m_ui[i]=m_bfgs.m_R1[i]+betapcg*u0[i];
 				}
-		}
-         else {
-		// use steepest descent for first iteration or when a restart is needed
+			}
+			else 
+			{
+				// use steepest descent for first iteration or when a restart is needed
             	m_bfgs.m_ui=m_bfgs.m_R0;
 				breform=false;
 				sdflag=true;
@@ -1140,8 +1146,8 @@ bool FESolidSolver::Quasin(double time)
 				if ((n = node.m_ID[DOF_Y]) >= 0) m_bfgs.m_ui[n] = node.m_vt.y*dt;
 				if ((n = node.m_ID[DOF_Z]) >= 0) m_bfgs.m_ui[n] = node.m_vt.z*dt;
 			}
-
 		}
+
 		// check for nans
 		if (m_fem.GetDebugFlag())
 		{
@@ -1201,42 +1207,42 @@ bool FESolidSolver::Quasin(double time)
 		// calculate norms
 		if (m_solvertype<2) 
 		{
-		normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
-		normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
-		normU  = m_Ui*m_Ui;
-		normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
+			normR1 = m_bfgs.m_R1*m_bfgs.m_R1;
+			normu  = (m_bfgs.m_ui*m_bfgs.m_ui)*(s*s);
+			normU  = m_Ui*m_Ui;
+			normE1 = s*fabs(m_bfgs.m_ui*m_bfgs.m_R1);
 
-		// check residual norm
-		if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
+			// check residual norm
+			if ((m_Rtol > 0) && (normR1 > m_Rtol*normRi)) bconv = false;	
 
-		// check displacement norm
-		if ((m_Dtol > 0) && (normu  > (m_Dtol*m_Dtol)*normU )) bconv = false;
+			// check displacement norm
+			if ((m_Dtol > 0) && (normu  > (m_Dtol*m_Dtol)*normU )) bconv = false;
 
-		// check energy norm
-		if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
+			// check energy norm
+			if ((m_Etol > 0) && (normE1 > m_Etol*normEi)) bconv = false;
 
-		// check linestep size
-		if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
+			// check linestep size
+			if ((m_bfgs.m_LStol > 0) && (s < m_bfgs.m_LSmin)) bconv = false;
 
-		// check energy divergence
-		if (normE1 > normEm) bconv = false;
+			// check energy divergence
+			if (normE1 > normEm) bconv = false;
 
-		// print convergence summary
-		oldmode = clog.GetMode();
-		if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(pstep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+			// print convergence summary
+			oldmode = clog.GetMode();
+			if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
+				(pstep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
 
-		clog.printf(" Nonlinear solution status: time= %lg\n", time); 
-		clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
-		clog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
-		clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
-		clog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		clog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
-		clog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-		clog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
+			clog.printf(" Nonlinear solution status: time= %lg\n", time); 
+			clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
+			clog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
+			clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
+			if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
+			clog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
+			clog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
+			clog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
+			clog.printf("\t   displacement     %15le %15le %15le \n", normUi, normu ,(m_Dtol*m_Dtol)*normU );
 
-		clog.SetMode(oldmode);
+			clog.SetMode(oldmode);
 		}
 
 		// check if we have converged. 
