@@ -335,10 +335,9 @@ bool FESolidSolver::Augment()
 }
 
 //-----------------------------------------------------------------------------
-//! Updates the current nodal positions based on the displacement increment
-//! and line search factor. If bfinal is true, it also updates the current
-//! displacements
-void FESolidSolver::Update(vector<double>& ui)
+//! Update the kinematics of the model, such as nodal positions, velocities,
+//! accelerations, etc.
+void FESolidSolver::UpdateKinematics(vector<double>& ui)
 {
 	int i, n;
 
@@ -468,12 +467,14 @@ void FESolidSolver::Update(vector<double>& ui)
 	//		FENode& n = mesh.Node(i);
 	//	}
 	//}
+}
 
-	// update poroelastic data
-	if (pstep->GetType() == FE_BIPHASIC) UpdatePoro(ui);
-
-	// update solute-poroelastic data
-	if (pstep->GetType() == FE_POROSOLUTE) { UpdatePoro(ui); UpdateSolute(ui); }
+//-----------------------------------------------------------------------------
+//! Updates the current state of the model
+void FESolidSolver::Update(vector<double>& ui)
+{
+	// update kinematics
+	UpdateKinematics(ui);
 
 	// update contact
 	if (m_fem.ContactInterfaces() > 0) UpdateContact();
@@ -483,64 +484,14 @@ void FESolidSolver::Update(vector<double>& ui)
 
 	// update other stuff that may depend on the deformation
 	int NBF = m_fem.BodyForces();
-	for (i=0; i<NBF; ++i)
+	for (int i=0; i<NBF; ++i)
 	{
 		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyForce(i));
 		if (pbf) pbf->Update();
 	}
 
-	// dump all states to the plot file
-	// when requested
-	if (pstep->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.Write();
-}
-
-//-----------------------------------------------------------------------------
-//! Updates the poroelastic data
-// TODO: Move to the FEBiphasicSolver class
-void FESolidSolver::UpdatePoro(vector<double>& ui)
-{
-	int i, n;
-
-	FEMesh& mesh = m_fem.m_mesh;
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-
-	// update poro-elasticity data
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-
-		// update nodal pressures
-		n = node.m_ID[DOF_P];
-		if (n >= 0) node.m_pt = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-	}
-
-	// update poro-elasticity data
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-
-		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
-	}
-
-	// make sure the prescribed pressures are fullfilled
-	int ndis = m_fem.m_DC.size();
-	for (i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& dc = *m_fem.m_DC[i];
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;	// GAA
-
-			FENode& node = mesh.Node(n);
-
-			if (bc == DOF_P) node.m_pt = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
-		}
-	}
+	// dump all states to the plot file when requested
+	if (m_fem.GetCurrentStep()->m_nplot == FE_PLOT_MINOR_ITRS) m_fem.Write();
 }
 
 //-----------------------------------------------------------------------------
@@ -564,59 +515,6 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
 		plc->Update();
-	}
-}
-
-//-----------------------------------------------------------------------------
-//! Updates the solute data
-//! TODO: Move to the FEBiphasicSoluteSolver class
-void FESolidSolver::UpdateSolute(vector<double>& ui)
-{
-	int i, j, n;
-	
-	FEMesh& mesh = m_fem.m_mesh;
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	
-	// update solute data
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		
-		// update nodal concentration
-		for (j=0; j<MAX_CDOFS; ++j) {
-			n = node.m_ID[DOF_C+j];
-			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
-		}
-	}
-	
-	// update solute data
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		
-		// update velocities
-		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
-	}
-	
-	// make sure the prescribed concentrations are fullfilled
-	int ndis = m_fem.m_DC.size();
-	for (i=0; i<ndis; ++i)
-	{
-		FEPrescribedBC& dc = *m_fem.m_DC[i];
-		if (dc.IsActive())
-		{
-			int n    = dc.node;
-			int lc   = dc.lc;
-			int bc   = dc.bc;
-			double s = dc.s;
-			double r = dc.r;	// GAA
-			
-			FENode& node = mesh.Node(n);
-			
-			for (j=0; j<MAX_CDOFS; ++j) {
-				if (bc == DOF_C+j) node.m_ct[j] = r + s*m_fem.GetLoadCurve(lc)->Value();
-			}
-		}
 	}
 }
 

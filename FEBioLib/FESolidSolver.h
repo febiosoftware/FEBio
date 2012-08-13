@@ -51,16 +51,11 @@ public:
 		//! Performs a Newton-Raphson iteration
 		virtual bool Quasin(double time);
 
+		//! update nodal positions, velocities, accelerations, etc.
+		virtual void UpdateKinematics(vector<double>& ui);
+
 		//! Update Stresses
 		void UpdateStresses();
-
-		// ---> TODO: move to the FEBiphasicSolver
-		//! Update poroelastic data
-		void UpdatePoro(vector<double>& ui);
-
-		//! Update solute data
-		void UpdateSolute(vector<double>& ui);
-		// --->
 
 		//! Update rigid body data
 		void UpdateRigidBodies(vector<double>& ui);

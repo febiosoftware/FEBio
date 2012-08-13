@@ -691,6 +691,70 @@ void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<dou
 
 
 //-----------------------------------------------------------------------------
+//! Update the model's kinematic data. This is overriden from FEBiphasicSolver so
+//! that solute data is updated
+void FEBiphasicSoluteSolver::UpdateKinematics(vector<double>& ui)
+{
+	// first update all solid-mechanics kinematics
+	FEBiphasicSolver::UpdateKinematics(ui);
+
+	// update solute-poroelastic data
+	UpdateSolute(ui);
+}
+
+//-----------------------------------------------------------------------------
+//! Updates the solute data
+void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
+{
+	int i, j, n;
+	
+	FEMesh& mesh = m_fem.m_mesh;
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+	
+	// update solute data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		
+		// update nodal concentration
+		for (j=0; j<MAX_CDOFS; ++j) {
+			n = node.m_ID[DOF_C+j];
+			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+		}
+	}
+	
+	// update solute data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		
+		// update velocities
+		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
+	}
+	
+	// make sure the prescribed concentrations are fullfilled
+	int ndis = m_fem.m_DC.size();
+	for (i=0; i<ndis; ++i)
+	{
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
+		if (dc.IsActive())
+		{
+			int n    = dc.node;
+			int lc   = dc.lc;
+			int bc   = dc.bc;
+			double s = dc.s;
+			double r = dc.r;	// GAA
+			
+			FENode& node = mesh.Node(n);
+			
+			for (j=0; j<MAX_CDOFS; ++j) {
+				if (bc == DOF_C+j) node.m_ct[j] = r + s*m_fem.GetLoadCurve(lc)->Value();
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Save data to dump file
 
 void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)

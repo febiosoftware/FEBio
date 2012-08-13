@@ -624,6 +624,66 @@ bool FEBiphasicSolver::StiffnessMatrix()
 }
 
 //-----------------------------------------------------------------------------
+//! Update the model's kinematic data. This is overriden from FESolidSolver so
+//! that biphasic data is updated
+void FEBiphasicSolver::UpdateKinematics(vector<double>& ui)
+{
+	// first update all solid-mechanics kinematics
+	FESolidSolver::UpdateKinematics(ui);
+
+	// update poroelastic data
+	UpdatePoro(ui);
+}
+
+//-----------------------------------------------------------------------------
+//! Updates the poroelastic data
+void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
+{
+	int i, n;
+
+	FEMesh& mesh = m_fem.m_mesh;
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
+
+	// update poro-elasticity data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+
+		// update nodal pressures
+		n = node.m_ID[DOF_P];
+		if (n >= 0) node.m_pt = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+	}
+
+	// update poro-elasticity data
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+
+		// update velocities
+		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
+	}
+
+	// make sure the prescribed pressures are fullfilled
+	int ndis = m_fem.m_DC.size();
+	for (i=0; i<ndis; ++i)
+	{
+		FEPrescribedBC& dc = *m_fem.m_DC[i];
+		if (dc.IsActive())
+		{
+			int n    = dc.node;
+			int lc   = dc.lc;
+			int bc   = dc.bc;
+			double s = dc.s;
+			double r = dc.r;	// GAA
+
+			FENode& node = mesh.Node(n);
+
+			if (bc == DOF_P) node.m_pt = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicSolver::UpdateContact()
 {
 	FEAnalysis* pstep = m_fem.GetCurrentStep();

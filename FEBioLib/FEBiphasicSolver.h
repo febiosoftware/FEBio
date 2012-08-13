@@ -27,8 +27,15 @@ public:
 	//! serialize data to/from dump file
 	void Serialize(DumpFile& ar);
 
+public:
 	//! update contact
-	void UpdateContact();
+	virtual void UpdateContact();
+
+	//! update kinematics
+	virtual void UpdateKinematics(vector<double>& ui);
+
+	//! Update poroelastic data
+	void UpdatePoro(vector<double>& ui);
 
 public:
 	//! Calculates residual (overridden from FESolidSolver)

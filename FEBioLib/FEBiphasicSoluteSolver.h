@@ -33,6 +33,12 @@ public:
 	//! calculates the global stiffness matrix (overridden from FESolidSolver)
 	virtual bool StiffnessMatrix();
 
+	//! update kinematics
+	virtual void UpdateKinematics(vector<double>& ui);
+
+	//! Update solute data
+	void UpdateSolute(vector<double>& ui);
+
 protected:
 	void GetConcentrationData(vector<double>& ci, vector<double>& ui, const int sol);
 
