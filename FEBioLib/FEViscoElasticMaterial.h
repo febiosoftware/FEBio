@@ -87,6 +87,9 @@ public:
 	//! default constructor
 	FEViscoElasticMaterial();
 
+	//! data initialization
+	void Init();
+
 	//! stress function
 	mat3ds Stress(FEMaterialPoint& pt);
 

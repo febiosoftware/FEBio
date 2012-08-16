@@ -31,6 +31,14 @@ FEViscoElasticMaterial::FEViscoElasticMaterial()
 }
 
 //-----------------------------------------------------------------------------
+//! data initialization
+void FEViscoElasticMaterial::Init()
+{
+	FEElasticMaterial::Init();
+	m_pBase->Init();
+}
+
+//-----------------------------------------------------------------------------
 //! Stress function
 mat3ds FEViscoElasticMaterial::Stress(FEMaterialPoint& mp)
 {
