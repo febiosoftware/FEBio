@@ -81,6 +81,7 @@ enum FE_Step_Type {
 	FE_POROSOLUTE,
 	FE_LINEAR_SOLID,
 	FE_HEAT_SOLID,
+	FE_EXPLICIT_SOLID,
 };
 
 ///////////////////////////////////////////////////////////////////////////////

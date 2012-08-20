@@ -111,12 +111,13 @@ void echo_input(FEBioModel& fem)
 	const char* szmod = 0;
 	switch (step.GetType())
 	{
-	case FE_SOLID       : szmod = "solid mechanics"; break;
-	case FE_BIPHASIC : szmod = "poroelastic"    ; break;
-	case FE_HEAT        : szmod = "heat transfer"  ; break;
-	case FE_POROSOLUTE  : szmod = "biphasic-solute"; break;
-	case FE_LINEAR_SOLID: szmod = "linear solid"   ; break;
-	case FE_HEAT_SOLID  : szmod = "heat solid"     ; break;
+	case FE_SOLID         : szmod = "solid mechanics"; break;
+	case FE_EXPLICIT_SOLID: szmod = "explicit solid mechanics"; break;
+	case FE_BIPHASIC      : szmod = "poroelastic"    ; break;
+	case FE_HEAT          : szmod = "heat transfer"  ; break;
+	case FE_POROSOLUTE    : szmod = "biphasic-solute"; break;
+	case FE_LINEAR_SOLID  : szmod = "linear solid"   ; break;
+	case FE_HEAT_SOLID    : szmod = "heat solid"     ; break;
 	default:
 		szmod = "unknown";
 		assert(false);

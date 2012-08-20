@@ -119,7 +119,6 @@ public:
 	vector<double> m_Ui;	//!< Total displacement vector for iteration
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
-	vector<double> m_inv_mass;	//!< inverse mass vector for explicit analysis
 
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag

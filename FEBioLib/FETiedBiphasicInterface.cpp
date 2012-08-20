@@ -713,7 +713,6 @@ void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
 	double detJ[4], w[4], *Hs, Hm[4], pt[4], dpr[4], dps[4];
-	double N[32];
 	matrix ke;
 
 	// get time step

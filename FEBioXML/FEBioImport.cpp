@@ -24,6 +24,7 @@
 #include "FEBioLib/FEBiphasicSolver.h"
 #include "FEBioLib/FEBiphasicSoluteSolver.h"
 #include "FEBioLib/FECoupledHeatSolidSolver.h"
+#include "FEBioLib/FEExplicitSolidSolver.h"
 #include "FEBioLib/FEPressureLoad.h"
 #include "FEBioLib/FETractionLoad.h"
 #include "FEBioLib/FEHeatFlux.h"
@@ -309,12 +310,13 @@ FEAnalysis* FEFEBioImport::CreateNewStep()
 	FEAnalysis* pstep = 0;
 	switch (m_nstep_type)
 	{
-	case FE_SOLID       : pstep = new FESolidAnalysis         (*m_pfem); break;
-	case FE_LINEAR_SOLID: pstep = new FELinearSolidAnalysis   (*m_pfem); break;
-	case FE_BIPHASIC    : pstep = new FEBiphasicAnalysis      (*m_pfem); break;
-	case FE_POROSOLUTE  : pstep = new FEBiphasicSoluteAnalysis(*m_pfem); break;
-	case FE_HEAT        : pstep = new FEHeatTransferAnalysis  (*m_pfem); break;
-	case FE_HEAT_SOLID  : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
+	case FE_SOLID         : pstep = new FESolidAnalysis         (*m_pfem); break;
+	case FE_EXPLICIT_SOLID: pstep = new FEExplicitSolidAnalysis (*m_pfem); break;
+	case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (*m_pfem); break;
+	case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (*m_pfem); break;
+	case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(*m_pfem); break;
+	case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (*m_pfem); break;
+	case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
 	default:
 		assert(false);
 	}
@@ -427,13 +429,14 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	// get the type attribute
 	const char* szt = tag.AttributeValue("type");
 
-	if      (strcmp(szt, "solid"       ) == 0) m_pim->m_nstep_type = FE_SOLID;
-	else if (strcmp(szt, "linear solid") == 0) m_pim->m_nstep_type = FE_LINEAR_SOLID; 
-	else if (strcmp(szt, "poro"        ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;		// obsolete in 2.0
-	else if (strcmp(szt, "biphasic"    ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;
-	else if (strcmp(szt, "solute"      ) == 0) m_pim->m_nstep_type = FE_POROSOLUTE;
-	else if (strcmp(szt, "heat"        ) == 0) m_pim->m_nstep_type = FE_HEAT;
-	else if (strcmp(szt, "heat-solid"  ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
+	if      (strcmp(szt, "solid"         ) == 0) m_pim->m_nstep_type = FE_SOLID;
+	else if (strcmp(szt, "explicit-solid") == 0) m_pim->m_nstep_type = FE_EXPLICIT_SOLID;
+	else if (strcmp(szt, "linear solid"  ) == 0) m_pim->m_nstep_type = FE_LINEAR_SOLID; 
+	else if (strcmp(szt, "poro"          ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;		// obsolete in 2.0
+	else if (strcmp(szt, "biphasic"      ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;
+	else if (strcmp(szt, "solute"        ) == 0) m_pim->m_nstep_type = FE_POROSOLUTE;
+	else if (strcmp(szt, "heat"          ) == 0) m_pim->m_nstep_type = FE_HEAT;
+	else if (strcmp(szt, "heat-solid"    ) == 0) m_pim->m_nstep_type = FE_HEAT_SOLID;
 	else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 }
 
@@ -448,12 +451,13 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 {
 	switch (nmod)
 	{
-	case FE_SOLID       : return new FESolidSolver           (fem);
-	case FE_BIPHASIC    : return new FEBiphasicSolver        (fem);
-	case FE_POROSOLUTE  : return new FEBiphasicSoluteSolver  (fem);
-	case FE_HEAT        : return new FEHeatSolver            (fem);
-	case FE_LINEAR_SOLID: return new FELinearSolidSolver     (fem);
-	case FE_HEAT_SOLID  : return new FECoupledHeatSolidSolver(fem);
+	case FE_SOLID         : return new FESolidSolver           (fem);
+	case FE_EXPLICIT_SOLID: return new FEExplicitSolidSolver   (fem);
+	case FE_BIPHASIC      : return new FEBiphasicSolver        (fem);
+	case FE_POROSOLUTE    : return new FEBiphasicSoluteSolver  (fem);
+	case FE_HEAT          : return new FEHeatSolver            (fem);
+	case FE_LINEAR_SOLID  : return new FELinearSolidSolver     (fem);
+	case FE_HEAT_SOLID    : return new FECoupledHeatSolidSolver(fem);
 	default:
 		assert(false);
 		return 0;
@@ -479,11 +483,12 @@ void FEBioControlSection::Parse(XMLTag& tag)
 			// NOTE: The order is important here! For instance, since the FEBiphasicSoluteSolver is derived
 			//       from FEBiphasicSolver it must be checked before the biphasic solver. Same thing 
 			//       with the biphasic and solid solver.
-			if      (dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver)) ParseSoluteParams     (tag);
-			else if (dynamic_cast<FEBiphasicSolver*      >(pstep->m_psolver)) ParsePoroParams       (tag);
-			else if (dynamic_cast<FESolidSolver*         >(pstep->m_psolver)) ParseSolidParams      (tag);
-			else if (dynamic_cast<FELinearSolidSolver*   >(pstep->m_psolver)) ParseLinearSolidParams(tag);
-			else if (dynamic_cast<FEHeatSolver*          >(pstep->m_psolver)) ParseHeatParams       (tag);
+			if      (dynamic_cast<FEBiphasicSoluteSolver*>(pstep->m_psolver)) ParseSoluteParams       (tag);
+			else if (dynamic_cast<FEBiphasicSolver*      >(pstep->m_psolver)) ParsePoroParams         (tag);
+			else if (dynamic_cast<FESolidSolver*         >(pstep->m_psolver)) ParseSolidParams        (tag);
+			else if (dynamic_cast<FEExplicitSolidSolver* >(pstep->m_psolver)) ParseExplicitSolidParams(tag);
+			else if (dynamic_cast<FELinearSolidSolver*   >(pstep->m_psolver)) ParseLinearSolidParams  (tag);
+			else if (dynamic_cast<FEHeatSolver*          >(pstep->m_psolver)) ParseHeatParams         (tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
 
@@ -513,6 +518,22 @@ void FEBioControlSection::ParseSolidParams(XMLTag& tag)
 	else if (tag == "max_ups"     ) tag.value(ps->m_bfgs.m_maxups);
 	else if (tag == "cmax"        ) tag.value(ps->m_bfgs.m_cmax);
 	else if (tag == "solvertype"  ) tag.value(ps->m_solvertype);
+	else throw XMLReader::InvalidTag(tag);
+}
+
+
+//-----------------------------------------------------------------------------
+// Parse parameters specific to explicit-solid solver
+void FEBioControlSection::ParseExplicitSolidParams(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEAnalysisStep* pstep = GetStep();
+
+	FEExplicitSolidSolver* ps = dynamic_cast<FEExplicitSolidSolver*>(pstep->m_psolver);
+	assert(ps);
+
+	if      (tag == "lstol"       ) tag.value(ps->m_bfgs.m_LStol);
+	else if (tag == "lsiter"      ) tag.value(ps->m_bfgs.m_LSiter);
 	else if (tag == "dyn_damping" ) tag.value(ps->m_dyn_damping);
 	else throw XMLReader::InvalidTag(tag);
 }

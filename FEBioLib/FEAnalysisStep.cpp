@@ -8,6 +8,7 @@
 #include "FEBiphasicSoluteSolver.h"
 #include "FELinearSolidSolver.h"
 #include "FECoupledHeatSolidSolver.h"
+#include "FEExplicitSolidSolver.h"
 #include "FERigidBody.h"
 #include "log.h"
 
@@ -756,12 +757,13 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 		assert(m_psolver == 0);
 		switch (m_ntype)
 		{
-		case FE_SOLID       : m_psolver = new FESolidSolver           (m_fem); break;
-		case FE_BIPHASIC	: m_psolver = new FEBiphasicSolver        (m_fem); break;
-		case FE_POROSOLUTE  : m_psolver = new FEBiphasicSoluteSolver  (m_fem); break;
-		case FE_HEAT        : m_psolver = new FEHeatSolver            (m_fem); break;
-		case FE_LINEAR_SOLID: m_psolver = new FELinearSolidSolver     (m_fem); break;
-		case FE_HEAT_SOLID  : m_psolver = new FECoupledHeatSolidSolver(m_fem); break;
+		case FE_SOLID         : m_psolver = new FESolidSolver           (m_fem); break;
+		case FE_EXPLICIT_SOLID: m_psolver = new FEExplicitSolidSolver   (m_fem); break;
+		case FE_BIPHASIC	  : m_psolver = new FEBiphasicSolver        (m_fem); break;
+		case FE_POROSOLUTE    : m_psolver = new FEBiphasicSoluteSolver  (m_fem); break;
+		case FE_HEAT          : m_psolver = new FEHeatSolver            (m_fem); break;
+		case FE_LINEAR_SOLID  : m_psolver = new FELinearSolidSolver     (m_fem); break;
+		case FE_HEAT_SOLID    : m_psolver = new FECoupledHeatSolidSolver(m_fem); break;
 		default:
 			throw "Unknown module type in FEAnalysisStep::Serialize";
 		}

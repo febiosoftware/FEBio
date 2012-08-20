@@ -546,6 +546,7 @@
     <ClInclude Include="..\..\FEBioLib\FEElasticTrussDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEElemElemList.h" />
     <ClInclude Include="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h" />
+    <ClInclude Include="..\..\FEBioLib\FEExplicitSolidSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FEFacet2FacetSliding.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberExpPowUncoupled.h" />
@@ -695,6 +696,7 @@
     <ClCompile Include="..\..\FEBioLib\FEElasticTrussDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEElemElemList.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEEllipsoidalFiberDistribution.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEExplicitSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFacet2FacetSliding.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPowUncoupled.cpp" />

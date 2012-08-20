@@ -80,65 +80,6 @@ bool FESolidSolver::Init()
 	// initialize BFGS data
 	m_bfgs.Init(neq, this, m_plinsolve);
 
-	// calculate the inverse mass vector for explicit analysis
-	if (m_solvertype==2)
-	{
-		matrix ke;
-		int i, j, iel, n;
-		int nint, neln;
-		double *H, kab;
-		vector <int> lm;
-		vector <double> el_lumped_mass;
-		for (int nd = 0; nd < mesh.Domains(); ++nd)
-		{
-			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
-			if (pbd)
-			{
-				for (iel=0; iel<pbd->Elements(); ++iel)
-				{
-					FESolidElement& el = pbd->Element(iel);
-					pbd->UnpackLM(el, lm);
-
-					FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_fem.GetMaterial(el.GetMatID()));
-
-					double d = pme->Density();
-
-					nint = el.GaussPoints();
-					neln = el.Nodes();
-
-					ke.resize(3*neln, 3*neln);
-					ke.zero();
-					el_lumped_mass.resize(3*neln);
-					for (i=0; i<3*neln; ++i) el_lumped_mass[i]=0.0;
-
-					// create the element mass matrix
-					for (n=0; n<nint; ++n)
-					{
-						double detJ0 = pbd->detJ0(el, n)*el.GaussWeights()[n];
-
-						H = el.H(n);
-						for (i=0; i<neln; ++i)
-							for (j=0; j<neln; ++j)
-							{
-								kab = H[i]*H[j]*detJ0*d;
-								ke[3*i  ][3*j  ] += kab;
-								ke[3*i+1][3*j+1] += kab;
-								ke[3*i+2][3*j+2] += kab;
-							}	
-					}
-					// reduce to a lumped mass vector
-					for (i=0; i<3*neln; ++i)
-							for (j=0; j<neln; ++j)
-							{
-								el_lumped_mass[i]+=ke[i][j];
-							}	
-					
-					// assemble element matrix into inv_mass vector
-					AssembleResidual(el.m_node, lm, el_lumped_mass, m_inv_mass);
-				}
-			}
-		}
-	}
 	// set the create stiffness matrix flag
 	m_breshape = true;
 
@@ -896,7 +837,7 @@ void FESolidSolver::PrepStep(double time)
 //!   "Finite Element Procedures", K.J. Bathe, p759 and following
 bool FESolidSolver::Quasin(double time)
 {
-	int i, n;
+	int i;
 
 	vector<double> u0(m_neq);
 	vector<double> Rold(m_neq);
@@ -1020,31 +961,6 @@ bool FESolidSolver::Quasin(double time)
 			}
 			m_SolverTime.stop();
 		}
-		else if (m_solvertype==2)	// we are doing an explicit analysis and need to calculate the acceleration and velocity
-		{
-			// get the mesh
-			FEMesh& mesh = m_fem.m_mesh;
-			int N = mesh.Nodes();
-			double dt=m_fem.GetCurrentStep()->m_dt;
-			for (i=0; i<N; ++i)
-			{
-				FENode& node = mesh.Node(i);
-				//  calculate acceleration using F=ma and update
-				if ((n = node.m_ID[DOF_X]) >= 0) node.m_at.x = m_inv_mass[n]*m_bfgs.m_R1[n];
-				if ((n = node.m_ID[DOF_Y]) >= 0) node.m_at.y = m_inv_mass[n]*m_bfgs.m_R1[n];
-				if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = m_inv_mass[n]*m_bfgs.m_R1[n];
-				// and update the velocities using the accelerations
-				node.m_vt = node.m_vp + node.m_at*dt;	//  update velocity using acceleration m_at
-				node.m_vt.x*=m_dyn_damping;
-				node.m_vt.y*=m_dyn_damping;
-				node.m_vt.z*=m_dyn_damping;
-				//	calculate incremental displacement using velocity
-				double vel=node.m_vt.x;
-				if ((n = node.m_ID[DOF_X]) >= 0) m_bfgs.m_ui[n] = node.m_vt.x*dt;
-				if ((n = node.m_ID[DOF_Y]) >= 0) m_bfgs.m_ui[n] = node.m_vt.y*dt;
-				if ((n = node.m_ID[DOF_Z]) >= 0) m_bfgs.m_ui[n] = node.m_vt.z*dt;
-			}
-		}
 
 		// check for nans
 		if (m_fem.GetDebugFlag())
@@ -1088,18 +1004,9 @@ bool FESolidSolver::Quasin(double time)
 			else oldolds=olds;	// otherwise use the previous one
 			olds=s;  // and store the current step to be used for the iteration after next
 		}
-		else if (m_solvertype==2) // need to update everything for the explicit solver
-		{
-			// Update geometry
-			Update(m_bfgs.m_ui);
-
-			// calculate residual at this point
-			Residual(m_bfgs.m_R1);
-		}
 
 		// update total displacements
 		int neq = m_Ui.size();
-		if (m_solvertype==2) s=1.0;  // we have not done a line search in the explicit solver 
 		for (i=0; i<neq; ++i) m_Ui[i] += s*m_bfgs.m_ui[i];
 
 		// calculate norms

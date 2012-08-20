@@ -65,12 +65,13 @@ public:
 protected:
 	FESolver* BuildSolver(int nmod, FEModel& fem);
 
-	bool ParseCommonParams	   (XMLTag& tag);
-	void ParseSolidParams	   (XMLTag& tag);
-	void ParsePoroParams	   (XMLTag& tag);
-	void ParseSoluteParams	   (XMLTag& tag);
-	void ParseLinearSolidParams(XMLTag& tag);
-	void ParseHeatParams       (XMLTag& tag);
+	bool ParseCommonParams	     (XMLTag& tag);
+	void ParseSolidParams	     (XMLTag& tag);
+	void ParseExplicitSolidParams(XMLTag& tag);
+	void ParsePoroParams	     (XMLTag& tag);
+	void ParseSoluteParams	     (XMLTag& tag);
+	void ParseLinearSolidParams  (XMLTag& tag);
+	void ParseHeatParams         (XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------

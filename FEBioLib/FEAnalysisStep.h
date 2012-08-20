@@ -50,6 +50,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Analysis class for structural mechanics problems using explicit solver
+class FEExplicitSolidAnalysis : public FEAnalysisStep
+{
+public:
+	FEExplicitSolidAnalysis(FEModel& fem) : FEAnalysisStep(fem, FE_EXPLICIT_SOLID) {}
+};
+
+//-----------------------------------------------------------------------------
 //! Analysis class for biphasic problems
 class FEBiphasicAnalysis : public FEAnalysisStep
 {
