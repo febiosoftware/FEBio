@@ -1,6 +1,7 @@
 #pragma once
 #include "NumCore/NonLinearSystem.h"
 #include "NumCore/BFGSSolver.h"
+#include "FEParameterList.h"
 #include "DumpFile.h"
 using namespace NumCore;
 
@@ -8,7 +9,7 @@ using namespace NumCore;
 class FEModel;
 
 //-----------------------------------------------------------------------------
-class FENLSolver : public NonLinearSystem
+class FENLSolver : public NonLinearSystem, public FEParamContainer
 {
 public:
 	FENLSolver(FEModel& fem) : m_fem(fem)
@@ -43,9 +44,6 @@ public:
 
 	//! Solve an analysis step
 	virtual bool SolveStep(double time) = 0;
-
-	//! serialize data to the archive
-	virtual void Serialize(DumpFile& ar) = 0;
 
 private:
 	// TODO: I'm overriding these functions, but they are not used yet

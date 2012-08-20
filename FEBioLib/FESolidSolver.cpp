@@ -23,6 +23,21 @@
 #define ISNAN(x) isnan(x)
 #endif
 
+//-----------------------------------------------------------------------------
+// define the parameter list
+BEGIN_PARAMETER_LIST(FESolidSolver, FESolver)
+	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"        );
+	ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
+	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
+	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
+	ADD_PARAMETER(m_solvertype   , FE_PARAM_DOUBLE, "solvertype"  );
+	ADD_PARAMETER(m_bfgs.m_LStol , FE_PARAM_DOUBLE, "lstol"       );
+	ADD_PARAMETER(m_bfgs.m_LSmin , FE_PARAM_DOUBLE, "lsmin"       );
+	ADD_PARAMETER(m_bfgs.m_LSiter, FE_PARAM_DOUBLE, "lsiter"      );
+	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_DOUBLE, "max_refs"    );
+	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_DOUBLE, "max_ups"     );
+	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"        );
+END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! FESolidSolver Construction

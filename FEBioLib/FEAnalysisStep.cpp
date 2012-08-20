@@ -23,7 +23,6 @@ FEAnalysisStep::FEAnalysisStep(FEModel& fem, int ntype) : FEAnalysis(fem, ntype)
 	m_nanalysis = FE_STATIC;	// do quasi-static analysis
 	m_istiffpr = 1;				// use pressure stiffness
 	m_baugment = false;			// no augmentations
-	m_bsym_poro = true;			// use symmetric poro implementation
 
 	// --- Time Step Data ---
 	m_ntime = -1;
@@ -336,7 +335,6 @@ bool FEAnalysisStep::Init()
 	if (m_fem.NonlinearConstraints() != 0) m_baugment = true;
 
 	// do one time initialization of solver data
-	if (m_bsym_poro == false) m_psolver->m_bsymm = false;
 	if (m_psolver->Init() == false)
 	{
 		clog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
@@ -671,7 +669,6 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 		ar << m_nanalysis;
 		ar << m_istiffpr;
 		ar << m_baugment;
-		ar << m_bsym_poro;
 
 		// --- Time Step Data ---
 		ar << m_ntime;
@@ -710,7 +707,6 @@ void FEAnalysisStep::Serialize(DumpFile& ar)
 		ar >> m_nanalysis;
 		ar >> m_istiffpr;
 		ar >> m_baugment;
-		ar >> m_bsym_poro;
 
 		// --- Time Step Data ---
 		ar >> m_ntime;

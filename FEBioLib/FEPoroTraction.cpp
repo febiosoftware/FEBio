@@ -316,7 +316,7 @@ void FEPoroNormalTraction::StiffnessMatrix(FENLSolver* psolver)
 				ke.resize(ndof, ndof);
 
 				// calculate pressure stiffness
-				TractionStiffness(el, ke, tn, m_beffective, pstep->m_bsym_poro);
+				TractionStiffness(el, ke, tn, m_beffective, psolver->m_bsymm);
 
 				// get the element's LM vector
 				m_psurf->UnpackLM(el, lm);

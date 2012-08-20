@@ -24,6 +24,23 @@
 #endif
 
 //-----------------------------------------------------------------------------
+// define the parameter list
+BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolver)
+	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"        );
+	ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
+	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
+	ADD_PARAMETER(m_Ptol         , FE_PARAM_DOUBLE, "ptol"        );
+	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
+	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_biphasic");
+	ADD_PARAMETER(m_bfgs.m_LStol , FE_PARAM_DOUBLE, "lstol"       );
+	ADD_PARAMETER(m_bfgs.m_LSmin , FE_PARAM_DOUBLE, "lsmin"       );
+	ADD_PARAMETER(m_bfgs.m_LSiter, FE_PARAM_DOUBLE, "lsiter"      );
+	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_DOUBLE, "max_refs"    );
+	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_DOUBLE, "max_ups"     );
+	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"        );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FEBiphasicSolver::FEBiphasicSolver(FEModel& fem) : FESolidSolver(fem)
 {
 	m_Ptol = 0.01;
@@ -552,7 +569,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	bool bsymm = pstep->m_bsym_poro;
+	bool bsymm = m_bsymm;
 	double dt = pstep->m_dt;
 	if (pstep->m_nanalysis == FE_STEADY_STATE)
 	{

@@ -56,4 +56,7 @@ protected:
 	vector<double>	m_u;	//!< nodal displacements
 	vector<double>	m_R;	//!< right hand side
 	vector<double>	m_d;	//!< prescribed displacements
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };

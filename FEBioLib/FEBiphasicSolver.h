@@ -66,4 +66,7 @@ public:
 	// solute data
 	vector<double>	m_ci[MAX_CDOFS];	//!< concentration increment vector
 	vector<double>	m_Ci[MAX_CDOFS];	//!< Total concentration vector for iteration
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };

@@ -66,4 +66,7 @@ public:
 
 protected:
 	bool	m_brhs;	//!< flag used to indicate if element stiffness must be assembled into RHS
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };

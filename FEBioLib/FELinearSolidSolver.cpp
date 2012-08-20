@@ -7,6 +7,18 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
+// define the parameter list
+BEGIN_PARAMETER_LIST(FELinearSolidSolver, FESolver)
+	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"    );
+	ADD_PARAMETER(m_bfgs.m_LStol , FE_PARAM_DOUBLE, "lstol"   );
+	ADD_PARAMETER(m_bfgs.m_LSmin , FE_PARAM_DOUBLE, "lsmin"   );
+	ADD_PARAMETER(m_bfgs.m_LSiter, FE_PARAM_DOUBLE, "lsiter"  );
+	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_DOUBLE, "max_refs");
+	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_DOUBLE, "max_ups" );
+	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"    );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 //! Class constructor
 FELinearSolidSolver::FELinearSolidSolver(FEModel& fem) : FESolver(fem)
 {

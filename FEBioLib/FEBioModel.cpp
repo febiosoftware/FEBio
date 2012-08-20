@@ -2275,7 +2275,7 @@ bool FEBioModel::InitPoroSolute()
 		return true;
 	
 	// see if we are using the symmetric version or not
-	if (m_pStep->m_bsym_poro == false) 
+/*	if (m_pStep->m_bsym_poro == false) 
 	{
 		m_pStep->m_psolver->m_bsymm = false;
 		
@@ -2286,7 +2286,7 @@ bool FEBioModel::InitPoroSolute()
 //			clog.printbox("WARNING", "The non-symmetric solver algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 //		}
 	}
-	
+*/	
 	// fix all mixture dofs that are not used
 	// that is, that are not part of a biphasic, biphasic-solute, or triphasic or multiphasic element
 	// this is done in three steps

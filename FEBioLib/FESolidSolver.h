@@ -122,4 +122,7 @@ public:
 
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };

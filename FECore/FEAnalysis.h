@@ -92,7 +92,6 @@ public:
 		int		m_nanalysis;	//!< analysis type
 		int		m_istiffpr;		//!< calculate pressure stiffness (TODO remove)
 		bool	m_baugment;		//!< use Lagrangian augmentation (TODO: move to solver class?)
-		bool	m_bsym_poro;	//!< symmetric (old) poro-elastic flag (TODO: move to the solver classes?)
 	//}
 
 	// --- Time Step Data ---

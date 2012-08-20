@@ -42,10 +42,14 @@ public:
 protected:
 	void GetConcentrationData(vector<double>& ci, vector<double>& ui, const int sol);
 
-public:
+public:	// Parameters
 	double	m_Ctol;			//!< concentration tolerance
 
+public:
 	// solute data
 	vector< vector<double> >	m_ci;	//!< concentration increment vector
 	vector< vector<double> >	m_Ci;	//!< Total concentration vector for iteration
+
+	// declare the parameter list
+	DECLARE_PARAMETER_LIST();
 };

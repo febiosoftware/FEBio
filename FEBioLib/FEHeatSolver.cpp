@@ -4,6 +4,11 @@
 #include "FECore/FENodeReorder.h"
 
 //-----------------------------------------------------------------------------
+// define the parameter list
+BEGIN_PARAMETER_LIST(FEHeatSolver, FESolver)
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 //! constructor for the class
 FEHeatSolver::FEHeatSolver(FEModel &fem) : FESolver(fem)
 {
