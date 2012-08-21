@@ -378,6 +378,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEExplicitSolidSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEFacet2FacetSliding.cpp"
 				>
 			</File>
@@ -973,6 +977,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEExplicitSolidSolver.h"
 				>
 			</File>
 			<File
