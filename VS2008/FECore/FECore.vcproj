@@ -316,6 +316,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEOctree.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEParameterList.cpp"
 				>
 			</File>
@@ -507,6 +511,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEOctree.h"
 				>
 			</File>
 			<File

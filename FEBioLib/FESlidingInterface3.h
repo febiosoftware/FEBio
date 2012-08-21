@@ -39,8 +39,10 @@ public:
 	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
 	vector<double>				m_Lmc;	//!< lagrange multipliers for solute concentrations
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
-	vector<int>					m_nei;	//!< surface element indices into arrays
 	vector<double>				m_Ln;	//!< net contact pressure
+	vector<int>					m_nei;	//!< surface element indices into arrays
+	vector<bool>				m_poro;	//!< surface element poro status
+	vector<int>					m_solu;	//!< surface element solute id
 	
 	vector<double>	m_epsn;	//!< penalty factors
 	vector<double>	m_epsp;	//!< pressure penalty factors
@@ -92,9 +94,6 @@ public:
 	
 	//! set ambient condition 
 	void SetAmbient();
-
-	//! determine the status of element contact pair
-	void BiphasicSoluteStatus(FEMesh& m, FESurfaceElement& el, bool& bstat, bool& sstat, int& sid);
 
 protected:
 	void ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg);

@@ -68,8 +68,9 @@ bool FETiedBiphasicSurface::Init()
 	zero(m_nu);
 	
 	// determine biphasic status
-	i = 0;
-	while (!m_bporo && (i<Elements())) {
+	m_poro.resize(Elements(),false);
+	for (i=0; i<Elements(); ++i)
+	{
 		// get the surface element
 		FESurfaceElement& se = Element(i);
 		
@@ -82,9 +83,11 @@ bool FETiedBiphasicSurface::Init()
 			
 			// see if this is a poro-elastic element
 			FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-			if (biph) m_bporo = true;
+			if (biph) {
+				m_poro[i] = true;
+				m_bporo = true;
+			}
 		}
-		++i;
 	}
 	
 	// allocate biphasic stuff
@@ -104,7 +107,6 @@ void FETiedBiphasicSurface::ShallowCopy(FETiedBiphasicSurface &s)
 	m_Lmd = s.m_Lmd;
 	m_Gap = s.m_Gap;
 	m_dg = s.m_dg;
-	zero(m_pme);
 	m_bporo = s.m_bporo;
 	
 	if (m_bporo)
@@ -182,6 +184,7 @@ void FETiedBiphasicSurface::Serialize(DumpFile& ar)
 		ar << m_epsp;
 		ar << m_nn;
 		ar << m_pg;
+		ar << m_poro;
 	}
 	else
 	{
@@ -196,6 +199,7 @@ void FETiedBiphasicSurface::Serialize(DumpFile& ar)
 		ar >> m_epsp;
 		ar >> m_nn;
 		ar >> m_pg;
+		ar >> m_poro;
 	}
 }
 
@@ -241,8 +245,6 @@ bool FETiedBiphasicInterface::Init()
 	// initialize surface data
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
-	
-	bool bporo = (m_ss.m_bporo || m_ms.m_bporo);
 	
 	FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
 	
@@ -392,6 +394,9 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETiedBiphasicSurface& ms)
 {
 	bool bfirst = true;
+
+	FEMesh& mesh = m_pfem->GetMesh();
+	double R = m_srad*mesh.GetBoundingBox().radius();
 	
 	FESurfaceElement* pme;
 	vec3d r, nu;
@@ -414,7 +419,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 			nu = ss.SurfaceNormal(el, j);
 			
 			// find the intersection point with the master surface
-			pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, m_srad);
+			pme = ms.FindIntersection2(r, nu, rs, bfirst, m_stol, R);
 			
 			ss.m_pme[n] = pme;
 			ss.m_rs[n][0] = rs[0];
@@ -452,7 +457,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
-		bool sporo = PoroStatus(mesh, el);
+		bool sporo = ss.m_poro[i];
 		
 		int ne = el.Nodes();
 		int nint = el.GaussPoints();
@@ -486,7 +491,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 				ss.m_dg[n] = g - ss.m_Gap[n];
 				
 				// calculate the pressure gap function
-				bool mporo = PoroStatus(mesh, *pme);
+				bool mporo = ms.m_poro[pme->m_lid];
 				if (sporo && mporo) {
 					double pm[4];
 					for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
@@ -560,7 +565,7 @@ void FETiedBiphasicInterface::ContactForces(vector<double> &F, FENLSolver* psolv
 			// get the surface element
 			FESurfaceElement& se = ss.Element(i);
 			
-			bool sporo = PoroStatus(*pm, se);
+			bool sporo = ss.m_poro[i];
 			
 			// get the nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -595,7 +600,7 @@ void FETiedBiphasicInterface::ContactForces(vector<double> &F, FENLSolver* psolv
 					// get the master element
 					FESurfaceElement& me = *pme;
 					
-					bool mporo = PoroStatus(*pm, me);
+					bool mporo = ms.m_poro[pme->m_lid];
 					
 					// get the nr of master element nodes
 					int nmeln = me.Nodes();
@@ -757,7 +762,7 @@ void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
 			// get ths slave element
 			FESurfaceElement& se = ss.Element(i);
 			
-			bool sporo = PoroStatus(*pm, se);
+			bool sporo = ss.m_poro[i];
 			
 			// get nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -802,7 +807,7 @@ void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
 				{
 					FESurfaceElement& me = *pme;
 					
-					bool mporo = PoroStatus(*pm, me);
+					bool mporo = ms.m_poro[pme->m_lid];
 					
 					// get the nr of master nodes
 					int nmeln = me.Nodes();
@@ -1214,7 +1219,10 @@ bool FETiedBiphasicInterface::Augment(int naug)
 	
 	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
 	if ((m_atol > 0) && (pnorm > m_atol)) bconv = false;
-	
+
+	if (naug < m_naugmin ) bconv = false;
+	if (naug >= m_naugmax) bconv = true;
+
 	clog.printf(" sliding interface # %d\n", m_nID);
 	clog.printf("                        CURRENT        REQUIRED\n");
 	clog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n");
@@ -1239,25 +1247,4 @@ void FETiedBiphasicInterface::Serialize(DumpFile &ar)
 	// store contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
-
-bool FETiedBiphasicInterface::PoroStatus(FEMesh& m, FESurfaceElement& el)
-{
-	bool status = false;
-	
-	// get the solid element this surface element belongs to
-	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
-	if (pe)
-	{
-		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
-		
-		// see if this is a poro-elastic element
-		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-		if (biph) status = true;
-	}
-	
-	return status;
 }

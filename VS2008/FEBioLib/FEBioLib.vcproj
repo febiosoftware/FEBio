@@ -490,10 +490,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEOctree.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEOgdenMaterial.cpp"
 				>
 			</File>
@@ -1093,10 +1089,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FENeoHookeanTransIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEOctree.h"
 				>
 			</File>
 			<File

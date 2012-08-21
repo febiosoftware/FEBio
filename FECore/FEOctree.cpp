@@ -9,9 +9,9 @@ void OTnode::CreateChildren(const int max_level, const int max_elem)
 {
 	int i,j,k;
 	vec3d dc = (cmax - cmin)/2;
-	for (i=0; i<2; ++i) {
-		for (j=0; j<2; ++j) {
-			for (k=0; k<2; ++k) {
+	for (i=0; i<=1; ++i) {
+		for (j=0; j<=1; ++j) {
+			for (k=0; k<=1; ++k) {
 				OTnode node;
 				node.m_ps = m_ps;
 				// evaluate bounding box by subdividing parent node box
@@ -29,19 +29,12 @@ void OTnode::CreateChildren(const int max_level, const int max_elem)
 					// use recursion to create children of this node
 					// as long as node contains too many elements
 					// and max octree levels not exceeded
-					if ((int)node.selist.size() > max_elem) {
-						if (max_level) {
-							if (node.level < max_level) {
-								node.CreateChildren(max_level, max_elem);
-							}
-						} else {
-							node.CreateChildren(max_level, max_elem);
-						}
-
-					}
-					// store this node
-					children.push_back(node);
+					if ((node.level < max_level) &&
+						(node.selist.size() > max_elem))
+						node.CreateChildren(max_level, max_elem);
 				}
+				// store this node
+				children.push_back(node);
 			}
 		}
 	}
@@ -230,6 +223,7 @@ FEOctree::FEOctree(FESurface* ps)
 	m_ps = ps;
 	max_level = 0;	// by default there is no limit to number of levels
 	max_elem = 9;
+	assert(max_level && max_elem);
 }
 
 FEOctree::~FEOctree()
@@ -271,14 +265,10 @@ void FEOctree::Init()
 	}
 	
 	// Recursively create children of this root
-	if ((int)root.selist.size() > max_elem) {
-		if (max_level) {
-			if (root.level < max_level) {
-				root.CreateChildren(max_level, max_elem);
-			}
-		} else {
+	if (root.selist.size()) {
+		if ((root.level < max_level) &&
+			(root.selist.size() > max_elem))
 			root.CreateChildren(max_level, max_elem);
-		}
 	}
 	
 // For debugging purposes...

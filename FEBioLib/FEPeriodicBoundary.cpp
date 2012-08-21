@@ -112,7 +112,7 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 {
 	bool bfirst = true;
 
-	int i, nm;
+	int i;
 	double rs[2];
 
 	// get the slave's center of mass
@@ -137,7 +137,7 @@ void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, m_srad, &nm);
+		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, m_srad);
 		assert(ss.m_pme[i]);
 
 		ss.m_rs[i][0] = rs[0];

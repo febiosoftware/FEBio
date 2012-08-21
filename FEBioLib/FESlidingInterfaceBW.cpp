@@ -957,8 +957,9 @@ bool FESlidingInterfaceBW::Augment(int naug)
 	
 	// check convergence
 	if ((m_gtol > 0) && (maxgap > m_gtol)) bconv = false;
-	
 	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
+	if (naug < m_naugmin ) bconv = false;
+	if (naug >= m_naugmax) bconv = true;
 	
 	clog.printf(" sliding interface # %d\n", m_nID);
 	clog.printf("                        CURRENT        REQUIRED\n");

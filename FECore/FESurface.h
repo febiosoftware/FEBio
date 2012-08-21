@@ -12,6 +12,7 @@
 #include "FEMesh.h"
 #include "FENodeElemList.h"
 #include "LoadCurve.h"
+#include "FEOctree.h"
 #include "FENNQuery.h"
 #include "mat2d.h"
 #include "vec2d.h"
@@ -25,7 +26,7 @@ class FESurface : public FEDomain
 {
 public:
 	//! constructor
-	FESurface(FEMesh* pm) : FEDomain(FE_SURFACE_DOMAIN, pm, 0)  { m_SNQ.Attach(this); }
+	FESurface(FEMesh* pm) : FEDomain(FE_SURFACE_DOMAIN, pm, 0)  { m_SNQ.Attach(this); m_OT.Attach(this); }
 
 	//! destructor
 	virtual ~FESurface(){}
@@ -71,7 +72,8 @@ public:
 	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
 
 	//! find the intersection of a ray with the surface
-	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad, int* pei = 0);
+	FESurfaceElement* FindIntersection(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad);
+	FESurfaceElement* FindIntersection2(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad);
 
 	//! See if a ray intersects an element
 	bool Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], double& g, double eps);
@@ -136,7 +138,8 @@ public:
 	FENodeElemTree	m_NET;
 
 protected:
-	FENNQuery	m_SNQ;	//!< used to find the nearest neighbour
+	FENNQuery		m_SNQ;	//!< used to find the nearest neighbour
+	FEOctree		m_OT;	//!< used to optimize ray-surface intersections
 };
 
 #endif // !defined(AFX_FESURFACE_H__6437C4B1_5BB7_4DDA_8354_CADFF3291D3E__INCLUDED_)

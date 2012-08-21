@@ -36,6 +36,7 @@ public:
 	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
 	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
 	vector<int>					m_nei;	//!< surface element indices into arrays
+	vector<bool>				m_poro;	//!< surface element poro status
 	
 	vector<double>				m_epsn;	//!< penalty factors
 	vector<double>				m_epsp;	//!< pressure penalty factors
@@ -87,8 +88,6 @@ protected:
 	
 	void CalcAutoPressurePenalty(FETiedBiphasicSurface& s);
 	double AutoPressurePenalty(FESurfaceElement& el, FETiedBiphasicSurface& s);
-	
-	bool PoroStatus(FEMesh& m, FESurfaceElement& el);
 	
 public:
 	FETiedBiphasicSurface	m_ms;	//!< master surface

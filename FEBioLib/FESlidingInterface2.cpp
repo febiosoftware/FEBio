@@ -75,11 +75,12 @@ bool FESlidingSurface2::Init()
 	zero(m_nu);
 
 	// determine biphasic status
-	i = 0;
-	while (!m_bporo && (i<Elements())) {
+	m_poro.resize(Elements(),false);
+	for (i=0; i<Elements(); ++i)
+	{
 		// get the surface element
 		FESurfaceElement& se = Element(i);
-
+		
 		// get the solid element this surface element belongs to
 		FESolidElement* pe = dynamic_cast<FESolidElement*>(m_pMesh->FindElementFromID(se.m_nelem));
 		if (pe)
@@ -89,9 +90,11 @@ bool FESlidingSurface2::Init()
 			
 			// see if this is a poro-elastic element
 			FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-			if (biph) m_bporo = true;
+			if (biph) {
+				m_poro[i] = true;
+				m_bporo = true;
+			}
 		}
-		++i;
 	}
 		
 	// allocate biphasic stuff
@@ -187,6 +190,7 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar << m_nn;
 		ar << m_pg;
 		ar << m_Ln;
+		ar << m_poro;
 	}
 	else
 	{
@@ -201,6 +205,7 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 		ar >> m_nn;
 		ar >> m_pg;
 		ar >> m_Ln;
+		ar >> m_poro;
 	}
 }
 
@@ -223,10 +228,10 @@ FESlidingInterface2::FESlidingInterface2(FEModel* pfem) : FEContactInterface(pfe
 	m_stol = 0.01;
 	m_bsymm = true;
 	m_srad = 1.0;
-	m_gtol = -1;	// we use augmentation tolerance by default
-	m_ptol = -1;	// we use augmentation tolerance by default
-	m_bautopen = false;
+	m_gtol = 0;
+	m_ptol = 0;
 	m_nsegup = 0;
+	m_bautopen = false;
 
 	m_naugmin = 0;
 	m_naugmax = 10;
@@ -407,7 +412,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
-		bool sporo = PoroStatus(mesh, el);
+		bool sporo = ss.m_poro[i];
 
 		int ne = el.Nodes();
 		int nint = el.GaussPoints();
@@ -448,7 +453,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 			}
 
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, m_srad);
+			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, R);
 
 			ss.m_pme[n] = pme;
 			ss.m_nu[n] = nu;
@@ -475,7 +480,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 				{
 
 					// calculate the pressure gap function
-					bool mporo = PoroStatus(mesh, *pme);
+					bool mporo = ms.m_poro[pme->m_lid];
 					if (sporo && mporo) {
 						double pm[4];
 						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
@@ -618,9 +623,8 @@ void FESlidingInterface2::Update(int niter)
 				FENode& node = ms.Node(n);
 				
 				// project it onto the primary surface
-				int nei;
 				bool bfirst = false;
-				FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, bfirst, m_stol, m_srad, &nei);
+				FESurfaceElement* pse = ss.FindIntersection(node.m_rt, ms.m_nn[n], rs, bfirst, m_stol, R);
 				
 				if (pse)
 				{
@@ -637,7 +641,7 @@ void FESlidingInterface2::Update(int niter)
 						// get the normal tractions at the integration points
 						double ti[4], gap, eps;
 						int nint = pse->GaussPoints();
-						int noff = ss.m_nei[nei];
+						int noff = ss.m_nei[pse->m_lid];
 						for (i=0; i<nint; ++i) 
 						{
 							gap = ss.m_gap[noff + i];
@@ -709,13 +713,13 @@ void FESlidingInterface2::ContactForces(vector<double> &F, FENLSolver* psolver)
 			// get the surface element
 			FESurfaceElement& se = ss.Element(i);
 
-			bool sporo = PoroStatus(*pm, se);
+			bool sporo = ss.m_poro[i];
 
 			// get the nr of nodes and integration points
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			// get the element's LM vector
+			// copy the LM vector; we'll need it later
 			ss.UnpackLM(se, sLM);
 
 			// we calculate all the metrics we need before we
@@ -744,12 +748,12 @@ void FESlidingInterface2::ContactForces(vector<double> &F, FENLSolver* psolver)
 					// get the master element
 					FESurfaceElement& me = *pme;
 
-					bool mporo = PoroStatus(*pm, me);
+					bool mporo = ms.m_poro[pme->m_lid];
 
 					// get the nr of master element nodes
 					int nmeln = me.Nodes();
 
-					// get the element's LM vector
+					// copy LM vector
 					ms.UnpackLM(me, mLM);
 
 					// calculate degrees of freedom
@@ -908,7 +912,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 			// get ths slave element
 			FESurfaceElement& se = ss.Element(i);
 
-			bool sporo = PoroStatus(*pm, se);
+			bool sporo = ss.m_poro[i];
 
 			// get nr of nodes and integration points
 			int nseln = se.Nodes();
@@ -918,7 +922,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 			double pn[4];
 			for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
 
-			// get the element's LM vector
+			// copy the LM vector
 			ss.UnpackLM(se, sLM);
 
 			// we calculate all the metrics we need before we
@@ -953,7 +957,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 				{
 					FESurfaceElement& me = *pme;
 
-					bool mporo = PoroStatus(*pm, me);
+					bool mporo = ms.m_poro[pme->m_lid];
 
 					// get the nr of master nodes
 					int nmeln = me.Nodes();
@@ -962,7 +966,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 					double pm[4];
 					for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
 
-					// get the element's LM vector
+					// copy the LM vector
 					ms.UnpackLM(me, mLM);
 					
 					int ndpn;	// number of dofs per node
@@ -1447,6 +1451,9 @@ bool FESlidingInterface2::Augment(int naug)
 	if ((m_atol > 0) && (lnorm > m_atol)) bconv = false;
 	if ((m_atol > 0) && (pnorm > m_atol)) bconv = false;
 
+	if (naug < m_naugmin ) bconv = false;
+	if (naug >= m_naugmax) bconv = true;
+
 	clog.printf(" sliding interface # %d\n", m_nID);
 	clog.printf("                        CURRENT        REQUIRED\n");
 	clog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n");
@@ -1465,33 +1472,12 @@ bool FESlidingInterface2::Augment(int naug)
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::Serialize(DumpFile &ar)
 {
-	// store contact data
+	// serialize contact data
 	FEContactInterface::Serialize(ar);
 
-	// store contact surface data
+	// serialize contact surface data
 	m_ms.Serialize(ar);
 	m_ss.Serialize(ar);
-}
-
-//-----------------------------------------------------------------------------
-
-bool FESlidingInterface2::PoroStatus(FEMesh& m, FESurfaceElement& el)
-{
-	bool status = false;
-
-	// get the solid element this surface element belongs to
-	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
-	if (pe)
-	{
-		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
-		
-		// see if this is a poro-elastic element
-		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
-		if (biph) status = true;
-	}
-	
-	return status;
 }
 
 //-----------------------------------------------------------------------------

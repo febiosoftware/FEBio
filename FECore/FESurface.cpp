@@ -971,53 +971,102 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 //-----------------------------------------------------------------------------
 //! This function finds the element which is intersected by the ray (r,n).
 //! It returns a pointer to the element, as well as the isoparametric coordinates
-//! of the intersection point.
+//! of the intersection point. It searches for the closest patch based on
+//! algebraic value of the gap function
 //!
-FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2], bool& binit_nq, double tol, double srad, int* pei)
+FESurfaceElement* FESurface::FindIntersection(vec3d r, vec3d n, double rs[2],
+											  bool& binit_nq, double tol,
+											  double srad)
 {
 	double g;
+	int j;
 	
-	// get the mesh
-	FEMesh& mesh = *m_pMesh;
-	
-	// see if we need to initialize the NQ structure
-	if (binit_nq) m_SNQ.Init();
+	// see if we need to initialize the octree structure
+	if (binit_nq) m_OT.Init();
 	binit_nq = false;
 	
-	// let's find the closest surface node to r
-	int mn = m_SNQ.Find(r);
+	// let's find all the candidate surface elements
+	set<int>selist;
+	m_OT.FindCandidateSurfaceElements(r, n, selist);
 	
-	// mn is a local index, so get the global node number too
-	int m = m_node[mn];
-	
-	// get the nodal position
-	vec3d r0 = mesh.Node(m).m_rt;
-	
-	// see if this node is within an acceptable distance for contact
-	FE_BOUNDING_BOX box = mesh.GetBoundingBox();
-	double R = srad*box.radius();
-	if ((r0-r).norm() > R) return 0;
-	
-	// now that we found the closest surface node, lets see if we can find 
-	// the best surface element
-	int N;
-	
-	// loop over all surface elements that contain the node mn
-	int nval = m_NEL.Valence(mn);
-	FEElement** pe = m_NEL.ElementList(mn);
-	int* ipe = m_NEL.ElementIndexList(mn);
-	for (int j=0; j<nval; ++j)
-	{
+	// now that we found candidate surface elements, lets see if we can find 
+	// those that intersect the ray, then pick the closest intersection
+	int iel;
+	set<int>::iterator it;
+	bool found = false;
+	double rsl[2], gl;
+	for (it=selist.begin(); it!=selist.end(); ++it) {
 		// get the surface element
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
-		N = el.Nodes();
-		
+		j = *it;
 		// project the node on the element
-		if (Intersect(el, r, n, rs, g, tol)) {
-			if (pei) *pei = ipe[j];
-			return &el;
+		if (Intersect(m_el[j], r, n, rsl, gl, tol)) {
+			if ((!found) && (gl > -srad)) {
+				found = true;
+				g = gl;
+				rs[0] = rsl[0];
+				rs[1] = rsl[1];
+				iel = j;
+			} else if ((gl < g) && (gl > -srad)) {
+				g = gl;
+				rs[0] = rsl[0];
+				rs[1] = rsl[1];
+				iel = j;
+			}
 		}
 	}
+	if (found) return &m_el[iel];
+	
+	// we did not find a master surface
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! This function finds the element which is intersected by the ray (r,n).
+//! It returns a pointer to the element, as well as the isoparametric coordinates
+//! of the intersection point.  It searches for the closest patch based on
+//! the absolute value of the gap function
+//!
+FESurfaceElement* FESurface::FindIntersection2(vec3d r, vec3d n, double rs[2],
+											  bool& binit_nq, double tol,
+											  double srad)
+{
+	double g;
+	int j;
+	
+	// see if we need to initialize the octree structure
+	if (binit_nq) m_OT.Init();
+	binit_nq = false;
+	
+	// let's find all the candidate surface elements
+	set<int>selist;
+	m_OT.FindCandidateSurfaceElements(r, n, selist);
+	
+	// now that we found candidate surface elements, lets see if we can find 
+	// those that intersect the ray, then pick the closest intersection
+	int iel;
+	set<int>::iterator it;
+	bool found = false;
+	double rsl[2], gl;
+	for (it=selist.begin(); it!=selist.end(); ++it) {
+		// get the surface element
+		j = *it;
+		// project the node on the element
+		if (Intersect(m_el[j], r, n, rsl, gl, tol)) {
+			if ((!found) && (fabs(gl) < srad)) {
+				found = true;
+				g = gl;
+				rs[0] = rsl[0];
+				rs[1] = rsl[1];
+				iel = j;
+			} else if ((fabs(gl) < fabs(g)) && (fabs(gl) < srad)) {
+				g = gl;
+				rs[0] = rsl[0];
+				rs[1] = rsl[1];
+				iel = j;
+			}
+		}
+	}
+	if (found) return &m_el[iel];
 	
 	// we did not find a master surface
 	return 0;

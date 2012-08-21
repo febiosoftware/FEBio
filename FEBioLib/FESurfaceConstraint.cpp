@@ -114,6 +114,9 @@ void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfa
 {
 	bool bfirst = true;
 
+	FEMesh& mesh = m_pfem->GetMesh();
+	double R = m_srad*mesh.GetBoundingBox().radius();
+
 	int i, nm;
 	double rs[2];
 
@@ -139,7 +142,7 @@ void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfa
 		vec3d r0 = node.m_r0;
 
 		// find the intersection with the master surface
-		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, m_srad, &nm);
+		ss.m_pme[i] = ms.FindIntersection(r0, cn, rs, bfirst, m_stol, R);
 		assert(ss.m_pme[i]);
 
 		ss.m_rs[i][0] = rs[0];
