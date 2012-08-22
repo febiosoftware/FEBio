@@ -575,7 +575,6 @@
     <ClInclude Include="..\..\FEBioLib\FEMuscleMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FENeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FENeoHookeanTransIso.h" />
-    <ClInclude Include="..\..\FEBioLib\FEOctree.h" />
     <ClInclude Include="..\..\FEBioLib\FEOgdenMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEOgdenUnconstrained.h" />
     <ClInclude Include="..\..\FEBioLib\FEOptimizer.h" />
@@ -724,7 +723,6 @@
     <ClCompile Include="..\..\FEBioLib\FEMuscleMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FENeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FENeoHookeanTransIso.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FEOctree.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEOgdenMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEOgdenUnconstrained.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEOptimizer.cpp" />

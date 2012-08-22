@@ -497,6 +497,7 @@
     <ClInclude Include="..\..\FECore\FENodeNodeList.h" />
     <ClInclude Include="..\..\FECore\FENodeReorder.h" />
     <ClInclude Include="..\..\FECore\FEObject.h" />
+    <ClInclude Include="..\..\FECore\FEOctree.h" />
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
@@ -545,6 +546,7 @@
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeNodeList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeReorder.cpp" />
+    <ClCompile Include="..\..\FECore\FEOctree.cpp" />
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />

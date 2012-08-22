@@ -459,9 +459,6 @@
     <ClInclude Include="..\..\FEBioLib\FESlidingInterfaceBW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEOctree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FEExplicitSolidSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -903,9 +900,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FESlidingInterfaceBW.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\FEOctree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FEExplicitSolidSolver.cpp">
