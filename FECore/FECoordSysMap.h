@@ -19,6 +19,7 @@ class FEMesh;
 #define FE_MAP_LOCAL	1
 #define FE_MAP_SPHERE	2
 #define FE_MAP_VECTOR	3
+#define FE_MAP_CYLINDER	4
 
 //-----------------------------------------------------------------------------
 //! The FECoordSysMap class is used to create local coordinate systems.
@@ -72,6 +73,31 @@ public:
 protected:
 	FEMesh&		m_mesh;
 	vec3d		m_c;	// center of map
+};
+
+
+//-----------------------------------------------------------------------------
+
+class FECylindricalMap : public FECoordSysMap
+{
+public:
+	FECylindricalMap(FEMesh& mesh);
+
+	void SetCylinderCenter(vec3d c) { m_c = c; }
+
+	void SetCylinderAxis(vec3d a) { m_a = a; m_a.unit(); }
+
+	void SetCylinderRef(vec3d r) { m_r = r; m_r.unit(); }
+
+	mat3d LocalElementCoord(FEElement& el, int n);
+
+	virtual void Serialize(DumpFile& ar);
+
+protected:
+	FEMesh&		m_mesh;
+	vec3d		m_c;	// center of map
+	vec3d		m_a;	// axis
+	vec3d		m_r;	// reference direction
 };
 
 //-----------------------------------------------------------------------------

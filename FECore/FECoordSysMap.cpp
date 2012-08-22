@@ -120,6 +120,73 @@ void FESphericalMap::Serialize(DumpFile& ar)
 	}
 }
 
+
+//=============================================================================
+// FECylindricalMap
+//-----------------------------------------------------------------------------
+FECylindricalMap::FECylindricalMap(FEMesh& mesh) : FECoordSysMap(FE_MAP_CYLINDER), m_mesh(mesh)
+{
+	m_c = vec3d(0,0,0);
+	m_a = vec3d(0,0,1);
+	m_r = vec3d(1,0,0);
+}
+
+//-----------------------------------------------------------------------------
+mat3d FECylindricalMap::LocalElementCoord(FEElement& el, int n)
+{
+	// get the element nodes
+	vec3d r0[FEElement::MAX_NODES];
+	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
+
+	// find the nodal position of the integration point n
+	vec3d p = el.Evaluate(r0, n);
+
+	// find the vector to the axis
+	vec3d b = (p - m_c) - m_a*(m_a*(p - m_c)); b.unit();
+
+	// setup the rotation vector
+	quatd q(vec3d(1,0,0), b);
+
+	// rotate the reference vector
+	vec3d r(m_r); r.unit();
+	q.RotateVector(r);
+
+	// setup a local coordinate system with r as the x-axis
+	vec3d d(vec3d(0,1,0));
+	q.RotateVector(d);
+	if (fabs(d*r) > 0.99)
+	{
+		d = vec3d(0,0,1);
+		q.RotateVector(d);
+	}
+
+	// find basis vectors
+	vec3d e1 = r;
+	vec3d e3 = (e1 ^ d); e3.unit();
+	vec3d e2 = e3 ^ e1;
+
+	// setup rotation matrix
+	mat3d Q;
+	Q[0][0] = e1.x; Q[0][1] = e2.x; Q[0][2] = e3.x;
+	Q[1][0] = e1.y; Q[1][1] = e2.y; Q[1][2] = e3.y;
+	Q[2][0] = e1.z; Q[2][1] = e2.z; Q[2][2] = e3.z;
+
+	return Q;
+}
+
+//-----------------------------------------------------------------------------
+void FECylindricalMap::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_c << m_a << m_r;
+	}
+	else
+	{
+		ar >> m_c >> m_a >> m_r;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // FEVectorMap
 //////////////////////////////////////////////////////////////////////

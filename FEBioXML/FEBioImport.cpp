@@ -961,6 +961,29 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 			
 			pmap->SetSphereCenter(c);
 		}
+		else if (strcmp(szt, "cylindrical") == 0)
+		{
+			FECylindricalMap* pmap = new FECylindricalMap(mesh);
+			pm->m_pmap = pmap;
+			
+			vec3d a(0,0,1), c(0,0,0), r(1,0,0);
+			if (tag.isleaf()) throw XMLReader::InvalidValue(tag);
+
+			++tag;
+			do
+			{
+				if      (tag == "center") tag.value(c);
+				else if (tag == "axis"  ) tag.value(a);
+				else if (tag == "vector") tag.value(r);
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+
+			pmap->SetCylinderCenter(c);
+			pmap->SetCylinderAxis(a);
+			pmap->SetCylinderRef(r);
+		}
 		else if (strcmp(szt, "vector") == 0)
 		{
 			FEVectorMap* pmap = new FEVectorMap;
@@ -1021,6 +1044,29 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 			tag.value(c);
 
 			pmap->SetSphereCenter(c);
+		}
+		else if (strcmp(szt, "cylindrical") == 0)
+		{
+			FECylindricalMap* pmap = new FECylindricalMap(mesh);
+			pm->m_pmap = pmap;
+			
+			vec3d a(0,0,1), c(0,0,0), r(1,0,0);
+			if (tag.isleaf()) throw XMLReader::InvalidValue(tag);
+
+			++tag;
+			do
+			{
+				if      (tag == "center") tag.value(c);
+				else if (tag == "axis"  ) tag.value(a);
+				else if (tag == "vector") tag.value(r);
+				else throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+
+			pmap->SetCylinderCenter(c);
+			pmap->SetCylinderAxis(a);
+			pmap->SetCylinderRef(r);
 		}
 		else if (strcmp(szt, "vector") == 0)
 		{
