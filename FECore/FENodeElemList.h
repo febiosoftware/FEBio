@@ -65,6 +65,8 @@ public:
 
 	FEElement** ElementList(int n) { return &(m_nel[n][0]);}
 
+	bool empty() { return m_nel.empty(); }
+
 protected:
 	std::vector< std::vector<FEElement*> >	m_nel;
 };

@@ -10,6 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FECore/FEContactInterface.h"
+#include "FECore/FEClosestPointProjection.h"
 #include "FEContactSurface.h"
 #include "NumCore/vector.h"
 
@@ -45,6 +46,9 @@ public:
 	vector<double>				m_off;	//!< gap offset (= shell thickness)
 	vector<double>				m_eps;	//!< normal penalty factors
 	vector<double>				m_Ln;	//!< net contact pressure
+
+public:
+//	FEClosestPointProjection	m_ccp;	//!< used for finding the closest point projection
 };
 
 //-----------------------------------------------------------------------------
