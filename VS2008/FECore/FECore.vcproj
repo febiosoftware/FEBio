@@ -236,6 +236,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEClosestPointProjection.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEContactInterface.cpp"
 				>
 			</File>
@@ -415,6 +419,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEBoundaryCondition.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEClosestPointProjection.h"
 				>
 			</File>
 			<File
