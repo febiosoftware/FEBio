@@ -18,6 +18,7 @@
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FESlidingInterface2.h"
 #include "FEBioLib/FESlidingInterface3.h"
+#include "FEBioLib/FESlidingInterfaceBW.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FEBioLib/FETiedBiphasicInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"
@@ -3666,6 +3667,65 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 				else throw XMLReader::InvalidTag(tag);
 			}
 
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (strcmp(szt, "sliding-tension-compression") == 0)
+	{
+		// --- S L I D I N G   I N T E R F A C E   B W ---
+		FESlidingInterfaceBW* ps = new FESlidingInterfaceBW(&fem);
+		fem.AddContactInterface(ps);
+		
+		FEParameterList& pl = ps->GetParameterList();
+		
+		++tag;
+		do
+		{
+			// read parameters
+			if (m_pim->ReadParameter(tag, pl) == false)
+			{
+				if (tag == "surface")
+				{
+					const char* sztype = tag.AttributeValue("type");
+					int ntype;
+					if (strcmp(sztype, "master") == 0) ntype = 1;
+					else if (strcmp(sztype, "slave") == 0) ntype = 2;
+					
+					FESlidingSurfaceBW& s = (ntype == 1? ps->m_ms : ps->m_ss);
+					m.AddSurface(&s);
+					
+					int nfmt = 0;
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					}
+					
+					// read the surface section
+					ParseSurfaceSection(tag, s, nfmt);
+					
+					// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
+					// For this type of contact we want gaussian quadrature,
+					// so we have to modify those elements to FE_QUAD and FE_TRI
+					// TODO: we need a better way of doing this!
+					for (int i=0; i<s.Elements(); ++i)
+					{
+						FESurfaceElement& e = s.Element(i);
+						switch (e.Nodes())
+						{
+						case 3: e.SetType(FE_TRI ); break;
+						case 4: e.SetType(FE_QUAD); break;
+//						case 6: e.SetType(FE_TRI6); break;
+						default:
+							assert(false);
+						}
+					}
+				}
+				else throw XMLReader::InvalidTag(tag);
+			}
+			
 			++tag;
 		}
 		while (!tag.isend());

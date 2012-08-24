@@ -27,6 +27,8 @@ BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
 	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness"  );
 	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"        );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"               );
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_DOUBLE, "minaug"               );
+	ADD_PARAMETER(m_naugmax  , FE_PARAM_DOUBLE, "maxaug"               );
 	ADD_PARAMETER(m_ambp     , FE_PARAM_DOUBLE, "ambient_pressure"     );
 	ADD_PARAMETER(m_ambc     , FE_PARAM_DOUBLE, "ambient_concentration");
 END_PARAMETER_LIST();

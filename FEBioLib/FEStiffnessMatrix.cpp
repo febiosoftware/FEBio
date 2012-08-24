@@ -18,6 +18,7 @@
 #include "FEAugLagLinearConstraint.h"
 #include "FERigidBody.h"
 #include "FERigidJoint.h"
+#include "FESlidingInterfaceBW.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -421,6 +422,66 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 					}
 				}
 
+				// sliding-tension-compression interfaces
+				FESlidingInterfaceBW* psbw = dynamic_cast<FESlidingInterfaceBW*>(fem.ContactInterface(i));
+				if (psbw)
+				{
+					vector<int> lm(6*8);
+					
+					int npass = (psbw->m_btwo_pass?2:1);
+					for (int np=0; np<npass; ++np)
+					{
+						FESlidingSurfaceBW& ss = (np == 0? psbw->m_ss : psbw->m_ms);
+						FESlidingSurfaceBW& ms = (np == 0? psbw->m_ms : psbw->m_ss);
+						
+						int ni = 0, k, l;
+						for (j=0; j<ss.Elements(); ++j)
+						{
+							FESurfaceElement& se = ss.Element(j);
+							int nint = se.GaussPoints();
+							int* sn = &se.m_node[0];
+							for (k=0; k<nint; ++k, ++ni)
+							{
+								FESurfaceElement* pe = ss.m_pme[ni];
+								if (pe != 0)
+								{
+									FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+									int* mn = &me.m_node[0];
+									
+									assign(lm, -1);
+									
+									int nseln = se.Nodes();
+									int nmeln = me.Nodes();
+									
+									for (l=0; l<nseln; ++l)
+									{
+										id = fem.GetMesh().Node(sn[l]).m_ID;
+										lm[6*l  ] = id[DOF_X];
+										lm[6*l+1] = id[DOF_Y];
+										lm[6*l+2] = id[DOF_Z];
+										lm[6*l+3] = id[DOF_RU];
+										lm[6*l+4] = id[DOF_RV];
+										lm[6*l+5] = id[DOF_RW];
+									}
+									
+									for (l=0; l<nmeln; ++l)
+									{
+										id = fem.GetMesh().Node(mn[l]).m_ID;
+										lm[6*(l+nseln)  ] = id[DOF_X];
+										lm[6*(l+nseln)+1] = id[DOF_Y];
+										lm[6*(l+nseln)+2] = id[DOF_Z];
+										lm[6*(l+nseln)+3] = id[DOF_RU];
+										lm[6*(l+nseln)+4] = id[DOF_RV];
+										lm[6*(l+nseln)+5] = id[DOF_RW];
+									}
+									
+									build_add(lm);
+								}
+							}
+						}
+					}
+				}
+	
 				// sliding2 interfaces
 				FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(pci);
 				if (ps2)
