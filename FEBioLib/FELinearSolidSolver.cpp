@@ -132,9 +132,10 @@ bool FELinearSolidSolver::SolveStep(double time)
 	// set-up the prescribed displacements
 	zero(m_d);
 	vector<double> DT(m_d), DI(m_d);
-	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
+	int nbc = m_fem.PrescribedBCs();
+	for (int i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive())
 		{
 			int n    = dc.node;
@@ -238,10 +239,10 @@ void FELinearSolidSolver::Residual()
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// loop over nodal forces
-	int ncnf = m_fem.m_FC.size();
+	int ncnf = m_fem.NodalLoads();
 	for (int i=0; i<ncnf; ++i)
 	{
-		FENodalForce& fc = *m_fem.m_FC[i];
+		FENodalForce& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
 			int id	 = fc.node;	// node ID
@@ -268,9 +269,10 @@ void FELinearSolidSolver::Residual()
 	}
 
 	// add contribution of linear surface loads
-	for (int i=0; i<(int) m_fem.m_SL.size(); ++i)
+	int nsl = m_fem.SurfaceLoads();
+	for (int i=0; i<nsl; ++i)
 	{
-		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.m_SL[i]);
+		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.SurfaceLoad(i));
 		if (pl && (pl->IsLinear())) pl->Residual(this, m_R);
 	}
 }
@@ -342,7 +344,7 @@ void FELinearSolidSolver::AssembleStiffness(matrix& ke, vector<int>& lm)
 	m_pK->Assemble(ke, lm);
 
 	// if there are prescribed bc's we need to adjust the residual
-	if (m_fem.m_DC.size() > 0)
+	if (m_fem.PrescribedBCs() > 0)
 	{
 		int i, j;
 		int I, J;

@@ -104,9 +104,10 @@ bool FEHeatSolver::InitEquations()
 void FEHeatSolver::PrepStep()
 {
 	zero(m_u);
-	for (size_t i=0; i<m_fem.m_DC.size(); ++i)
+	int nbc = m_fem.PrescribedBCs();
+	for (int i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive())
 		{
 			int n    = dc.node;
@@ -197,10 +198,10 @@ void FEHeatSolver::NodalFluxes(vector<double>& R)
 	FEMesh& mesh = m_fem.GetMesh();
 
 	// loop over nodal force cards
-	int ncnf = m_fem.m_FC.size();
+	int ncnf = m_fem.NodalLoads();
 	for (i=0; i<ncnf; ++i)
 	{
-		FENodalForce& fc = *m_fem.m_FC[i];
+		FENodalForce& fc = *m_fem.NodalLoad(i);
 		if (fc.IsActive())
 		{
 			id	 = fc.node;	// node ID
@@ -224,10 +225,10 @@ void FEHeatSolver::NodalFluxes(vector<double>& R)
 //! Calculate heat surface flux contribution to residual.
 void FEHeatSolver::SurfaceFluxes(vector<double>& R)
 {
-	int nsl = (int) m_fem.m_SL.size();
+	int nsl = m_fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
-		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.m_SL[i]);
+		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.SurfaceLoad(i));
 		if (phf) phf->Residual(this, R);
 	}
 }
@@ -330,7 +331,7 @@ void FEHeatSolver::AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& k
 	}
 
 	// if there are prescribed bc's we need to adjust the residual
-	if (m_fem.m_DC.size() > 0)
+	if (m_fem.PrescribedBCs() > 0)
 	{
 		int i, j;
 		int I, J;

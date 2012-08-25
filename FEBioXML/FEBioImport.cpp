@@ -2828,7 +2828,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			pdc->lc = lc;
 			tag.value(pdc->s);
 			pdc->br = br;
-			fem.m_DC.push_back(pdc);
+			fem.AddPrescribedBC(pdc);
 
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
@@ -2885,7 +2885,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 				pdc->bc = bc;
 				pdc->lc = lc;
 				pdc->s = s;
-				fem.m_DC.push_back(pdc);
+				fem.AddPrescribedBC(pdc);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -2934,7 +2934,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 				pdc->lc = lc;
 				tag.value(pdc->s);
 				pdc->br = br;
-				fem.m_DC.push_back(pdc);
+				fem.AddPrescribedBC(pdc);
 
 				// add this boundary condition to the current step
 				if (m_pim->m_nsteps > 0)
@@ -2992,7 +2992,7 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 			pfc->bc = bc;
 			pfc->lc = lc;
 			tag.value(pfc->s);
-			fem.m_FC.push_back(pfc);
+			fem.AddNodalLoad(pfc);
 
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
@@ -3034,7 +3034,7 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 			pfc->bc = bc;
 			pfc->lc = lc;
 			tag.value(pfc->s);
-			fem.m_FC.push_back(pfc);
+			fem.AddNodalLoad(pfc);
 
 			// add this boundary condition to the current step
 			if (m_pim->m_nsteps > 0)
@@ -3076,7 +3076,7 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	// allocate pressure data
 	FEPressureLoad* ps = new FEPressureLoad(psurf, blinear);
 	ps->create(npr);
-	fem.m_SL.push_back(ps);
+	fem.AddSurfaceLoad(ps);
 
 	// read the pressure data
 	++tag;
@@ -3131,7 +3131,7 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 
 	// allocate traction data
 	FETractionLoad* pt = new FETractionLoad(psurf);
-	fem.m_SL.push_back(pt);
+	fem.AddSurfaceLoad(pt);
 	pt->create(ntc);
 
 	// read the traction data
@@ -3208,7 +3208,7 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	// allocate normal traction data
 	FEPoroNormalTraction* ps = new FEPoroNormalTraction(psurf, blinear, beffective);
 	ps->create(npr);
-	fem.m_SL.push_back(ps);
+	fem.AddSurfaceLoad(ps);
 	
 	// read the normal traction data
 	++tag;
@@ -3281,7 +3281,7 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	// allocate fluid flux data
 	FEFluidFlux* pfs = new FEFluidFlux(psurf, blinear, bmixture);
 	pfs->create(nfr);
-	fem.m_SL.push_back(pfs);
+	fem.AddSurfaceLoad(pfs);
 	
 	// read the fluid flux data
 	++tag;
@@ -3345,7 +3345,7 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	// allocate fluid flux data
 	FESoluteFlux* pfs = new FESoluteFlux(psurf, blinear);
 	pfs->create(nfr);
-	fem.m_SL.push_back(pfs);
+	fem.AddSurfaceLoad(pfs);
 	
 	// read the fluid flux data
 	++tag;
@@ -3399,7 +3399,7 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 	// allocate flux data
 	FEHeatFlux* ph = new FEHeatFlux(psurf);
 	ph->create(npr);
-	fem.m_SL.push_back(ph);
+	fem.AddSurfaceLoad(ph);
 
 	const char* sz;
 
@@ -4109,7 +4109,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 
 			prn->nid = id;
 			prn->rid = rb;
-			fem.m_RN.push_back(prn);
+			fem.AddRigidNode(prn);
 
 			if (m_pim->m_nsteps > 0)
 			{
@@ -4692,7 +4692,7 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 
 		prn->nid = id;
 		prn->rid = rb;
-		fem.m_RN.push_back(prn);
+		fem.AddRigidNode(prn);
 
 		if (m_pim->m_nsteps > 0)
 		{

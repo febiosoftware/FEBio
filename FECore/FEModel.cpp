@@ -42,6 +42,13 @@ FEModel::~FEModel(void)
 }
 
 //-----------------------------------------------------------------------------
+void FEModel::ClearBCs()
+{
+	for (size_t i=0; i<m_DC.size  (); ++i) delete m_DC[i];
+	m_DC.clear();
+}
+
+//-----------------------------------------------------------------------------
 // This function adds a callback routine
 //
 void FEModel::AddCallback(FEBIO_CB_FNC pcb, void *pd)

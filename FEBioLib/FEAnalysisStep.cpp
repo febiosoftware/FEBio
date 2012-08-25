@@ -97,9 +97,10 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
 
 	// clear the active rigid body BC's
-	for (i=0; i<(int) m_fem.m_Obj.size(); ++i)
+	int NRB = m_fem.Objects();
+	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_fem.GetMaterial(RB.m_mat));
 		for (j=0; j<6; ++j)
 		{
@@ -115,7 +116,7 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<(int) m_fem.m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *(m_fem.m_RDC[i]);
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[DC.id]);
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(DC.id));
 //		assert(RB.m_pDC[DC.bc] == 0);
 		if (RB.IsActive() && DC.IsActive())
 		{
@@ -135,9 +136,10 @@ bool FEAnalysisStep::Init()
 	// set the rigid nodes
 	// Note that also the rotational degrees of freedom are fixed
 	// for rigid nodes that do not belong to a non-rigid shell element.
-	for (i=0; i<(int) m_fem.m_RN.size(); ++i)
+	int nrn = m_fem.RigidNodes();
+	for (i=0; i<nrn; ++i)
 	{
-		FERigidNode& rn = *m_fem.m_RN[i];
+		FERigidNode& rn = *m_fem.RigidNode(i);
 		if (rn.IsActive())
 		{
 			FENode& node = m_fem.GetMesh().Node(rn.nid);
@@ -163,9 +165,10 @@ bool FEAnalysisStep::Init()
 
 	// override prescribed displacements for rigid nodes
 	bool bdisp = false;
-	for (i=0; i<(int) m_fem.m_DC.size(); ++i)
+	int nbc = m_fem.PrescribedBCs();
+	for (i=0; i<nbc; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive())
 		{
 			// if the node is not free we don't use this prescribed displacement
@@ -187,7 +190,7 @@ bool FEAnalysisStep::Init()
 	// Sometimes an (ignorant) user might have added a rigid body
 	// that is not being used. Since this can cause problems we need
 	// to find these rigid bodies.
-	int nrb = m_fem.m_Obj.size();
+	int nrb = m_fem.Objects();
 	vector<int> mec; mec.assign(nrb, 0);
 	for (i=0; i<m_fem.GetMesh().Nodes(); ++i)
 	{
@@ -199,7 +202,7 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<nrb; ++i)
 		if (mec[i] == 0)
 		{
-			FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
+			FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
 			clog.printbox("WARNING", "Rigid body %d is not being used.", RB.m_mat+1);
 			RB.Activate(false);
 		}
@@ -216,10 +219,10 @@ bool FEAnalysisStep::Init()
 	// Now we adjust the equation numbers of prescribed dofs according to the above rule
 	// Make sure that a prescribed dof has not been fixed
 	// TODO: maybe this can be moved to the FESolver::InitEquations function
-	int ndis = m_fem.m_DC.size();
+	int ndis = m_fem.PrescribedBCs();
 	for (i=0; i<ndis; ++i)
 	{
-		FEPrescribedBC& DC = *m_fem.m_DC[i];
+		FEPrescribedBC& DC = *m_fem.PrescribedBC(i);
 		int nid = DC.node;
 		int bc  = DC.bc;
 		bool br = DC.br;

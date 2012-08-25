@@ -88,7 +88,7 @@ void FEMicroMaterial::PrepRVE()
 	assert(NN > 0);
 
 	// create the DC's
-	m_rve.m_DC.resize(NN*3);
+	m_rve.ClearBCs();
 	NN = 0;
 	for (i=0; i<N; ++i)
 		if (tag[i] == 1)
@@ -100,7 +100,7 @@ void FEMicroMaterial::PrepRVE()
 				pdc->lc = 0;	// we use the zeroth loadcurve
 				pdc->node = i;
 				pdc->s = 0;
-				m_rve.m_DC[NN] = pdc;
+				m_rve.AddPrescribedBC(pdc);
 			}
 		}
 
@@ -158,12 +158,12 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	FEMesh& m = m_rve.GetMesh();
 
 	// assign new DC's for the boundary nodes
-	int N = m_rve.m_DC.size()/3, i;
+	int N = m_rve.PrescribedBCs()/3, i;
 	for (i=0; i<N; ++i)
 	{
-		FEPrescribedBC& dx = *m_rve.m_DC[3*i  ];
-		FEPrescribedBC& dy = *m_rve.m_DC[3*i+1];
-		FEPrescribedBC& dz = *m_rve.m_DC[3*i+2];
+		FEPrescribedBC& dx = *m_rve.PrescribedBC(3*i  );
+		FEPrescribedBC& dy = *m_rve.PrescribedBC(3*i+1);
+		FEPrescribedBC& dz = *m_rve.PrescribedBC(3*i+2);
 
 		FENode& node = m.Node(dx.node);
 
@@ -237,9 +237,10 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
 	mat3d T; T.zero();
-	for (int i=0; i<(int) m_rve.m_DC.size()/3; ++i)
+	int nbc = m_rve.PrescribedBCs();
+	for (int i=0; i<nbc/3; ++i)
 	{
-		FEPrescribedBC& dc = *m_rve.m_DC[3*i];
+		FEPrescribedBC& dc = *m_rve.PrescribedBC(3*i);
 		FENode& n = m.Node(dc.node);
 		vec3d f;
 		f.x = R[-n.m_ID[DOF_X]-2];

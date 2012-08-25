@@ -121,7 +121,7 @@ void FETangentDiagnostic::BuildUniaxial()
 		pdc->bc = 0;
 		pdc->lc = 0;
 		pdc->s = d;
-		m_fem.m_DC.push_back(pdc);
+		m_fem.AddPrescribedBC(pdc);
 	}
 }
 
@@ -186,7 +186,7 @@ void FETangentDiagnostic::BuildSimpleShear()
 		pdc->bc = 0;
 		pdc->lc = 0;
 		pdc->s = d;
-		m_fem.m_DC.push_back(pdc);
+		m_fem.AddPrescribedBC(pdc);
 	}
 }
 

@@ -54,6 +54,12 @@ public:
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }
 
+	// get the rigid object
+	FEObject* Object(int i) { return m_Obj[i]; }
+
+	// return number of rigid objects
+	int Objects() { return (int) m_Obj.size(); }
+
 public:
 	//! set the problem title
 	void SetTitle(const char* sz) { strcpy(m_sztitle, sz); }
@@ -85,6 +91,29 @@ public: // --- Material functions ---
 
 	//! material initialization
 	virtual bool InitMaterials() = 0;
+
+public: // --- Boundary Conditions functions ---
+
+	// prescribed BC's
+	int PrescribedBCs() { return (int) m_DC.size(); }
+	FEPrescribedBC* PrescribedBC(int i) { return m_DC[i]; }
+	void AddPrescribedBC(FEPrescribedBC* pbc) { m_DC.push_back(pbc); }
+	void ClearBCs();
+
+	// nodal loads
+	int NodalLoads() { return (int) m_FC.size(); }
+	FENodalForce* NodalLoad(int i) { return m_FC[i]; }
+	void AddNodalLoad(FENodalForce* pfc) { m_FC.push_back(pfc); }
+
+	// surface loads
+	int SurfaceLoads() { return (int) m_SL.size(); }
+	FESurfaceLoad* SurfaceLoad(int i) { return m_SL[i]; }
+	void AddSurfaceLoad(FESurfaceLoad* psl) { m_SL.push_back(psl); }
+
+	// rigid nodes
+	int RigidNodes() { return (int) m_RN.size(); }
+	FERigidNode* RigidNode(int i) { return m_RN[i]; }
+	void AddRigidNode(FERigidNode* prn) { m_RN.push_back(prn); }
 
 public: // --- Body load functions --- 
 
@@ -230,17 +259,16 @@ protected:
 protected:
 	// Geometry data
 	FEMesh		m_mesh;					//!< the one and only FE mesh
-
-public:
 	std::vector<FEObject*>		m_Obj;	//!< FE Object array (NOTE: only used for rigid bodies)
 
-public:
+protected:
 	// Boundary Conditions
 	std::vector<FEPrescribedBC*>	m_DC;	//!< prescribed constraints
 	std::vector<FENodalForce*>		m_FC;	//!< concentrated nodal loads
 	std::vector<FESurfaceLoad*>		m_SL;	//!< surface loads
 	std::vector<FERigidNode*>		m_RN;	//!< rigid nodes
 
+public:
 	// Boundary conditions for rigid bodies
 	// TODO: I'd like to do something different with this. Perhaps place them in the BC or in some constraint section.
 	vector<FERigidBodyDisplacement*>	m_RDC;	//!< rigid body displacements

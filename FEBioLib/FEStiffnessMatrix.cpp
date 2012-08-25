@@ -130,13 +130,13 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 			}
 
 			// Add rigid bodies to the profile
-			if (fem.m_Obj.empty() == false)
+			if (fem.Objects())
 			{
 				vector<int> lm(6);
-				int nrb = fem.m_Obj.size();
+				int nrb = fem.Objects();
 				for (int i=0; i<nrb; ++i)
 				{
-					FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.m_Obj[i]);
+					FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(i));
 					for (int j=0; j<6; ++j) lm[j] = rb.m_LM[j];
 					build_add(lm);
 				}
@@ -269,8 +269,8 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 						FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*pnlc);
 						vector<int> lm(12);
 			
-						int* lm1 = dynamic_cast<FERigidBody*>(fem.m_Obj[ rj.m_nRBa ])->m_LM;
-						int* lm2 = dynamic_cast<FERigidBody*>(fem.m_Obj[ rj.m_nRBb ])->m_LM;
+						int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+						int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
 
 						for (j=0; j<6; ++j) lm[j  ] = lm1[j];
 						for (j=0; j<6; ++j) lm[j+6] = lm2[j];

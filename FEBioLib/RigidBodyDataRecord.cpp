@@ -45,10 +45,10 @@ double RigidBodyDataRecord::Evaluate(int item, int ndata)
 	if (pm == 0) return 0;
 
 	// find the rigid body that has this material
-	int NRB = m_pfem->m_Obj.size();
+	int NRB = m_pfem->Objects();
 	for (int i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[i]);
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_pfem->Object(i));
 		if (RB.m_mat == nrb)
 		{
 			switch (ndata)

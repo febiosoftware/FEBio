@@ -156,11 +156,11 @@ void echo_input(FEBioModel& fem)
 		clog.printf("\t  Maximum allowable step size .................. : %lg\n", step.m_dtmax);
 	}
 	clog.printf("\tNumber of loadcurves ........................... : %d\n", fem.LoadCurves());
-	clog.printf("\tNumber of displacement boundary conditions ..... : %d\n", fem.m_DC.size());
+	clog.printf("\tNumber of displacement boundary conditions ..... : %d\n", fem.PrescribedBCs());
 //	clog.printf("\tNumber of pressure boundary cards .............. : %d\n", (fem.m_psurf ? fem.m_psurf->Surface().Elements() : 0));
 //	clog.printf("\tNumber of constant traction boundary cards ..... : %d\n", (fem.m_ptrac ? fem.m_ptrac->Surface().Elements() : 0));
 //	clog.printf("\tNumber of fluid flux boundary cards .............: %d\n", (fem.m_fsurf ? fem.m_fsurf->Surface().Elements() : 0));
-	clog.printf("\tNumber of concentrated nodal forces ............ : %d\n", fem.m_FC.size());
+	clog.printf("\tNumber of concentrated nodal forces ............ : %d\n", fem.NodalLoads());
 	clog.printf("\tMax nr of stiffness reformations ............... : %d\n", step.m_psolver->m_bfgs.m_maxref);
 	clog.printf("\tper time steps\n");
 	clog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", step.m_psolver->m_bfgs.m_maxups);
@@ -371,8 +371,8 @@ void echo_input(FEBioModel& fem)
 			if (plc->Type() == FE_RIGID_JOINT)
 			{
 				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
-				FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.m_Obj[rj.m_nRBa]);
-				FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.m_Obj[rj.m_nRBb]);
+				FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(rj.m_nRBa));
+				FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(rj.m_nRBb));
 				clog.printf("rigid joint %d:\n", i+1);
 				clog.printf("\tRigid body A                   : %d\n", ra.m_mat + 1);
 				clog.printf("\tRigid body B                   : %d\n", rb.m_mat + 1);

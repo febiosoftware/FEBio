@@ -50,8 +50,8 @@ void FERigidJoint::Residual(FENLSolver* psolver, vector<double>& R)
 	vector<int> lma(6);
 	vector<int> lmb(6);
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBa]);
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBb]);
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
 
 	for (int i=0; i<6; ++i)
 	{
@@ -103,8 +103,8 @@ void FERigidJoint::StiffnessMatrix(FENLSolver* psolver)
 
 	double y1[3][3], y2[3][3], y11[3][3], y12[3][3], y22[3][3];
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBa]);
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBb]);
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
 
 	a = m_qa0;
 	RBa.m_qt.RotateVector(a);
@@ -210,8 +210,8 @@ bool FERigidJoint::Augment(int naug)
 	double normF0, normF1;
 	bool bconv = true;
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBa]);
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[m_nRBb]);
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
 
 	ra = RBa.m_rt;
 	rb = RBb.m_rt;
@@ -275,8 +275,8 @@ void FERigidJoint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FERigidJoint::Update()
 {
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[ m_nRBa ]);
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->m_Obj[ m_nRBb ]);
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
 
 	vec3d ra = RBa.m_rt;
 	vec3d rb = RBb.m_rt;

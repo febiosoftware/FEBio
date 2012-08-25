@@ -464,10 +464,10 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// zero rigid body reaction forces
-	int NRB = m_fem.m_Obj.size();
+	int NRB = m_fem.Objects();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
+		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
 		RB.m_Fr = RB.m_Mr = vec3d(0,0,0);
 	}
 
@@ -507,10 +507,10 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 
 	// calculate forces due to surface loads
-	int nsl = (int) m_fem.m_SL.size();
+	int nsl = m_fem.SurfaceLoads();
 	for (i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.m_SL[i];
+		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 		if (psl->IsActive()) psl->Residual(this, R);
 	}
 
@@ -595,10 +595,10 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	}
 
 	// calculate stiffness matrices for surface loads
-	int nsl = (int) m_fem.m_SL.size();
+	int nsl = m_fem.SurfaceLoads();
 	for (i=0; i<nsl; ++i)
 	{
-		FESurfaceLoad* psl = m_fem.m_SL[i];
+		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
 
 		// respect the pressure stiffness flag
 		if ((dynamic_cast<FEPressureLoad*>(psl) == 0) || (m_fem.GetCurrentStep()->m_istiffpr != 0)) psl->StiffnessMatrix(this); 
@@ -611,10 +611,10 @@ bool FEBiphasicSolver::StiffnessMatrix()
 
 	// we still need to set the diagonal elements to 1
 	// for the prescribed rigid body dofs.
-	int NRB = m_fem.m_Obj.size();
+	int NRB = m_fem.Objects();
 	for (i=0; i<NRB; ++i)
 	{
-		FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_fem.m_Obj[i]);
+		FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
 		for (j=0; j<6; ++j)
 			if (rb.m_LM[j] < -1)
 			{
@@ -681,10 +681,10 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 	}
 
 	// make sure the prescribed pressures are fullfilled
-	int ndis = m_fem.m_DC.size();
+	int ndis = m_fem.PrescribedBCs();
 	for (i=0; i<ndis; ++i)
 	{
-		FEPrescribedBC& dc = *m_fem.m_DC[i];
+		FEPrescribedBC& dc = *m_fem.PrescribedBC(i);
 		if (dc.IsActive())
 		{
 			int n    = dc.node;
