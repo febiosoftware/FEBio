@@ -108,7 +108,7 @@ bool FEContactDiagnostic::Run()
 //-----------------------------------------------------------------------------
 bool FEContactDiagnostic::Init()
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// --- create the geometry ---
 
@@ -244,7 +244,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	solver.UpdateContact();
 

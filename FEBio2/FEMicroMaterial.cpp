@@ -51,7 +51,7 @@ void FEMicroMaterial::Init()
 void FEMicroMaterial::PrepRVE()
 {
 	// first we need to find all the boundary nodes
-	FEMesh& m = m_rve.m_mesh;
+	FEMesh& m = m_rve.GetMesh();
 	int N = m.Nodes();
 	vector<int> tag; tag.assign(N, 0);
 
@@ -155,7 +155,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	m_rve.Reset();
 
 	// get the mesh
-	FEMesh& m = m_rve.m_mesh;
+	FEMesh& m = m_rve.GetMesh();
 
 	// assign new DC's for the boundary nodes
 	int N = m_rve.m_DC.size()/3, i;
@@ -205,7 +205,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	double J = pt.J;
 
 	// get the mesh
-	FEMesh& m = m_rve.m_mesh;
+	FEMesh& m = m_rve.GetMesh();
 /*
 	mat3ds s(0);
 	double V = 0, ve;
@@ -257,7 +257,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get the mesh
-	FEMesh& m = m_rve.m_mesh;
+	FEMesh& m = m_rve.GetMesh();
 
 	// get the solver
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.GetCurrentStep());

@@ -24,9 +24,9 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 	// so we just pass the mesh
 	int ndata = VarSize(DataType());
 
-	int N = fem.m_mesh.Nodes();
+	int N = fem.GetMesh().Nodes();
 	vector<float> a; a.reserve(ndata*N);
-	if (Save(fem.m_mesh, a))
+	if (Save(fem.GetMesh(), a))
 	{
 		assert(a.size() == N*ndata);
 		ar.WriteChunk(0, a);
@@ -36,7 +36,7 @@ void FENodeData::Save(FEModel &fem, Archive& ar)
 //-----------------------------------------------------------------------------
 void FEDomainData::Save(FEModel &fem, Archive& ar)
 {
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 	int ND = m.Domains();
 
 	// if the item list is empty, store all domains
@@ -88,7 +88,7 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 void FESurfaceData::Save(FEModel &fem, Archive& ar)
 {
 	// loop over all surfaces
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 	int NS = m.Surfaces();
 	for (int i=0; i<NS; ++i)
 	{

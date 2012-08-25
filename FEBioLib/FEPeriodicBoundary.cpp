@@ -74,7 +74,7 @@ void FEPeriodicSurface::Serialize(DumpFile& ar)
 // FEPeriodicBoundary
 //-----------------------------------------------------------------------------
 
-FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
 	m_ntype = FE_PERIODIC_BOUNDARY;
@@ -376,7 +376,7 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 	// curvature tensor K
 	double K[2][2] = {0};
 
-//	double scale = -0.0035*m_fem.m_mesh.GetBoundingBox().radius();
+//	double scale = -0.0035*m_fem.GetMesh().GetBoundingBox().radius();
 
 	vector<int> sLM;
 	vector<int> mLM;

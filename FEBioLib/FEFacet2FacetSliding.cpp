@@ -106,7 +106,7 @@ void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 // FEFacet2FacetSliding
 //-----------------------------------------------------------------------------
 
-FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	m_ntype = FE_FACET2FACET_SLIDING;
 	static int ncount = 1;
@@ -172,7 +172,7 @@ bool FEFacet2FacetSliding::Init()
 void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 
 	// loop over all surface elements
 	int ni = 0;
@@ -497,7 +497,7 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 
 	// get the "size" of the model
 	// We need this to scale the insertion distance
-	double R = m_pfem->m_mesh.GetBoundingBox().radius();
+	double R = m_pfem->GetMesh().GetBoundingBox().radius();
 	double dxtol = R*m_dxtol;
 
 	// set higher order stiffness mutliplier

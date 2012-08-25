@@ -42,7 +42,7 @@ bool FEExplicitSolidSolver::Init()
 
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -146,7 +146,7 @@ bool FEExplicitSolidSolver::InitEquations()
 	int i, j, n;
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// initialize nr of equations
 	int neq = 0;
@@ -272,7 +272,7 @@ void FEExplicitSolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, 
 
 		for (i=0; i<ndof; i+=ndn)
 		{
-			FENode& node = m_fem.m_mesh.Node(en[i/ndn]);
+			FENode& node = m_fem.GetMesh().Node(en[i/ndn]);
 			if (node.m_rid >= 0)
 			{
 				vec3d F(fe[i], fe[i+1], fe[i+2]);
@@ -339,7 +339,7 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 	int i, n;
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// update rigid bodies
 	UpdateRigidBodies(ui);
@@ -443,7 +443,7 @@ void FEExplicitSolidSolver::UpdateKinematics(vector<double>& ui)
 //! Updates the rigid body data
 void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// update rigid bodies
 	int nrb = m_fem.m_Obj.size();
@@ -467,7 +467,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 //!  Updates the element stresses
 void FEExplicitSolidSolver::UpdateStresses()
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// update the stresses on all domains
 	for (int i=0; i<mesh.Domains(); ++i)
@@ -590,14 +590,14 @@ void FEExplicitSolidSolver::PrepStep(double time)
 
 	// store previous mesh state
 	// we need them for velocity and acceleration calculations
-	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
+	for (i=0; i<m_fem.GetMesh().Nodes(); ++i)
 	{
-		m_fem.m_mesh.Node(i).m_rp = m_fem.m_mesh.Node(i).m_rt;
-		m_fem.m_mesh.Node(i).m_vp = m_fem.m_mesh.Node(i).m_vt;
-		m_fem.m_mesh.Node(i).m_ap = m_fem.m_mesh.Node(i).m_at;
+		m_fem.GetMesh().Node(i).m_rp = m_fem.GetMesh().Node(i).m_rt;
+		m_fem.GetMesh().Node(i).m_vp = m_fem.GetMesh().Node(i).m_vt;
+		m_fem.GetMesh().Node(i).m_ap = m_fem.GetMesh().Node(i).m_at;
 		// ---> TODO: move to the FEPoroSoluteSolver
 		for (int k=0; k<MAX_CDOFS; ++k)
-			m_fem.m_mesh.Node(i).m_cp[k] = m_fem.m_mesh.Node(i).m_ct[k];
+			m_fem.GetMesh().Node(i).m_cp[k] = m_fem.GetMesh().Node(i).m_ct[k];
 	}
 
 	// apply concentrated nodal forces
@@ -625,7 +625,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 
 			int I;
 
-			FENode& node = m_fem.m_mesh.Node(n);
+			FENode& node = m_fem.GetMesh().Node(n);
 
 			switch (bc)
 			{
@@ -852,7 +852,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
 	FEMaterialPoint::time = m_fem.m_ftime;
 
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	for (i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
 	// intialize the stresses
@@ -874,7 +874,7 @@ void FEExplicitSolidSolver::NodalForces(vector<double>& F)
 	// zero nodal force vector
 	zero(F);
 
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// loop over nodal force cards
 	int ncnf = m_fem.m_FC.size();
@@ -964,7 +964,7 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	clog.SetMode(oldmode);
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	int N = mesh.Nodes();
 	double dt=m_fem.GetCurrentStep()->m_dt;
 	for (i=0; i<N; ++i)
@@ -1047,7 +1047,7 @@ bool FEExplicitSolidSolver::Residual(vector<double>& R)
 	}
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// calculate the internal (stress) forces
 	for (i=0; i<mesh.Domains(); ++i)
@@ -1151,7 +1151,7 @@ void FEExplicitSolidSolver::NonLinearConstraintForces(vector<double> &R)
 void FEExplicitSolidSolver::InertialForces(vector<double>& R)
 {
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// allocate F
 	vector<double> F(3*mesh.Nodes());

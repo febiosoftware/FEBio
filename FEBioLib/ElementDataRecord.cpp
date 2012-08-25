@@ -91,7 +91,7 @@ void ElementDataRecord::Parse(const char *szexpr)
 //-----------------------------------------------------------------------------
 double ElementDataRecord::Evaluate(int item, int ndata)
 {
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 
 	// make sure we have an ELT
 	if (m_ELT.empty()) BuildELT();
@@ -292,7 +292,7 @@ void ElementDataRecord::BuildELT()
 {
 	int i, j;
 	m_ELT.clear();
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 	int NE = m.Elements();
 	m_ELT.resize(NE);
 	for (i=0; i<NE; ++i) 
@@ -317,7 +317,7 @@ void ElementDataRecord::BuildELT()
 //-----------------------------------------------------------------------------
 void ElementDataRecord::SelectAllItems()
 {
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 	int n = m.Elements();
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;

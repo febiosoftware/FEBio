@@ -45,7 +45,7 @@ bool FELinearSolidSolver::Init()
 	// TODO: I want this to be done automatically
 	//       e.g. while the input file is being read
 	// TODO: Do this in the analysis class
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	pstep->ClearDomains();
 	for (int nd=0; nd<mesh.Domains(); ++nd)
@@ -76,7 +76,7 @@ bool FELinearSolidSolver::Init()
 //!
 bool FELinearSolidSolver::InitEquations()
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// initialize nr of equations
 	int neq = 0;
@@ -126,7 +126,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 	FEMaterialPoint::dt = m_fem.GetCurrentStep()->m_dt;
 	FEMaterialPoint::time = m_fem.m_ftime;
 
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	for (int i=0; i<mesh.Domains(); ++i) mesh.Domain(i).InitElements();
 
 	// set-up the prescribed displacements
@@ -144,7 +144,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 
 			double D = s*m_fem.GetLoadCurve(lc)->Value();
 
-			FENode& node = m_fem.m_mesh.Node(n);
+			FENode& node = m_fem.GetMesh().Node(n);
 
 			if (bc == DOF_X) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.x - node.m_r0.x); }}
 			if (bc == DOF_Y) { int I = -node.m_ID[bc]-2; if (I>=0 && I<m_neq) { DT[I] = D; DI[I] = D - (node.m_rt.y - node.m_r0.y); }}
@@ -204,7 +204,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 void FELinearSolidSolver::Update(vector<double>& u)
 {
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// update nodal positions
 	int n;
@@ -234,7 +234,7 @@ void FELinearSolidSolver::Residual()
 {
 	zero(m_R);
 
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// loop over nodal forces
@@ -315,7 +315,7 @@ bool FELinearSolidSolver::ReformStiffness()
 //!
 bool FELinearSolidSolver::StiffnessMatrix()
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// zero the stiffness matrix
 	m_pK->Zero();

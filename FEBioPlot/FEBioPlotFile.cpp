@@ -82,7 +82,7 @@ void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 {
 	// First we build the dictionary
 	// get the mesh
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	// Define default variables
 	if (m_Node.empty() && m_Elem.empty() && m_Face.empty())
@@ -182,7 +182,7 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 	// output header
 	m_ar.WriteChunk(PLT_HDR_VERSION, nversion);
 
-	int N = fem.m_mesh.Nodes();
+	int N = fem.GetMesh().Nodes();
 	m_ar.WriteChunk(PLT_HDR_NODES, N);
 
 	return true;
@@ -289,7 +289,7 @@ bool FEBioPlotFile::WriteMaterials(FEModel& fem)
 bool FEBioPlotFile::WriteGeometry(FEModel& fem)
 {
 	// get the mesh
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	// node section
 	m_ar.BeginChunk(PLT_NODE_SECTION);

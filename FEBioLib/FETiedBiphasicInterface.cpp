@@ -27,7 +27,7 @@ END_PARAMETER_LIST();
 // FETiedBiphasicSurface
 //-----------------------------------------------------------------------------
 
-FETiedBiphasicSurface::FETiedBiphasicSurface(FEModel* pfem) : FEContactSurface(&pfem->m_mesh)
+FETiedBiphasicSurface::FETiedBiphasicSurface(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
 { 
 	m_bporo = false;
 	m_pfem = pfem; 
@@ -281,7 +281,7 @@ bool FETiedBiphasicInterface::Init()
 void FETiedBiphasicInterface::CalcAutoPenalty(FETiedBiphasicSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 	
 	// loop over all surface elements
 	int ni = 0;
@@ -316,7 +316,7 @@ void FETiedBiphasicInterface::CalcAutoPenalty(FETiedBiphasicSurface& s)
 void FETiedBiphasicInterface::CalcAutoPressurePenalty(FETiedBiphasicSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 	
 	// loop over all surface elements
 	int ni = 0;
@@ -352,7 +352,7 @@ void FETiedBiphasicInterface::CalcAutoPressurePenalty(FETiedBiphasicSurface& s)
 double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedBiphasicSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 	
 	double eps = 0;
 	
@@ -448,7 +448,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 // Evaluate gap functions for position and fluid pressure
 void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBiphasicSurface& ms)
 {
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r;
 	

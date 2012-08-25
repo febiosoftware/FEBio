@@ -32,7 +32,7 @@ END_PARAMETER_LIST();
 // FESlidingSurface2
 //-----------------------------------------------------------------------------
 
-FESlidingSurface2::FESlidingSurface2(FEModel* pfem) : FEContactSurface(&pfem->m_mesh)
+FESlidingSurface2::FESlidingSurface2(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
 { 
 	m_bporo = false;
 	m_pfem = pfem; 
@@ -284,7 +284,7 @@ bool FESlidingInterface2::Init()
 void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 
 	// loop over all surface elements
 	int ni = 0;
@@ -319,7 +319,7 @@ void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 
 	// loop over all surface elements
 	int ni = 0;
@@ -355,7 +355,7 @@ void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingSurface2& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 
 	double eps = 0;
 
@@ -399,7 +399,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 {
 	bool bfirst = true;
 
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r, nu;
 	double rs[2];
@@ -522,7 +522,7 @@ void FESlidingInterface2::Update(int niter)
 	int i, n, id, np;
 	double rs[2];
 
-	double R = m_srad*m_pfem->m_mesh.GetBoundingBox().radius();
+	double R = m_srad*m_pfem->GetMesh().GetBoundingBox().radius();
 
 	static int naug = 0;
 	static int biter = 0;

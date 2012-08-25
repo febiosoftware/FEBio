@@ -34,7 +34,7 @@ double FEContactInterface::BulkModulus(FESurfaceElement& el, FESurface &s)
 	double eps = 0;
 
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 
 	// get the solid element this surface element belongs to
 	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));

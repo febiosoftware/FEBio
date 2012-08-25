@@ -67,7 +67,7 @@ bool FEBiphasicSolver::Init()
 
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	int i, n;
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
@@ -91,7 +91,7 @@ bool FEBiphasicSolver::InitEquations()
 	int i;
 
 	// determined the nr of pressure and concentration equations
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	m_ndeq = m_npeq = 0;
 	
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -472,7 +472,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 	}
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 /*
 	// loop over all domains
 	for (i=0; i<mesh.Domains(); ++i) 
@@ -565,7 +565,7 @@ bool FEBiphasicSolver::StiffnessMatrix()
 	int i, j, I;
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -658,7 +658,7 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 {
 	int i, n;
 
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// update poro-elasticity data
@@ -744,11 +744,11 @@ void FEBiphasicSolver::UpdateContact()
 //-----------------------------------------------------------------------------
 void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &ui)
 {
-	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
+	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
 	zero(di);
 	for (int i=0; i<N; ++i)
 	{
-		FENode& n = m_fem.m_mesh.Node(i);
+		FENode& n = m_fem.GetMesh().Node(i);
 		nid = n.m_ID[DOF_X];
 		if (nid != -1)
 		{
@@ -776,11 +776,11 @@ void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &u
 //-----------------------------------------------------------------------------
 void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 {
-	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
+	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
 	zero(pi);
 	for (int i=0; i<N; ++i)
 	{
-		FENode& n = m_fem.m_mesh.Node(i);
+		FENode& n = m_fem.GetMesh().Node(i);
 		nid = n.m_ID[DOF_P];
 		if (nid != -1)
 		{

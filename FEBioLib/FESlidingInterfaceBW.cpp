@@ -26,7 +26,7 @@ END_PARAMETER_LIST();
 // FESlidingSurfaceBW
 //-----------------------------------------------------------------------------
 
-FESlidingSurfaceBW::FESlidingSurfaceBW(FEModel* pfem) : FEContactSurface(&pfem->m_mesh)
+FESlidingSurfaceBW::FESlidingSurfaceBW(FEModel* pfem) : FEContactSurface(&pfem->GetMesh())
 { 
 	m_pfem = pfem; 
 }
@@ -216,7 +216,7 @@ bool FESlidingInterfaceBW::Init()
 void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->m_mesh;
+	FEMesh& m = m_pfem->GetMesh();
 	
 	// loop over all surface elements
 	int ni = 0;
@@ -252,7 +252,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 {
 	bool bfirst = true;
 	
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r, nu;
 	double rs[2];

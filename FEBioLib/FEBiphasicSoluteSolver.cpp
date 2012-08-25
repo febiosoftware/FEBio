@@ -65,7 +65,7 @@ bool FEBiphasicSoluteSolver::Init()
 	
 	// we need to fill the total displacement vector m_Ut
 	// TODO: I need to find an easier way to do this
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
@@ -92,7 +92,7 @@ bool FEBiphasicSoluteSolver::InitEquations()
 	int i,j;
 	
 	// determined the nr of concentration equations
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	for (j=0; j<MAX_CDOFS; ++j) m_nceq[j] = 0;
 	
 	for (i=0; i<mesh.Nodes(); ++i)
@@ -505,7 +505,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	}
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 /*	// loop over all domains
 	for (i=0; i<mesh.Domains(); ++i) 
@@ -614,7 +614,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 	int i, j, I;
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// calculate the stiffness matrix for each domain
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
@@ -692,11 +692,11 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix()
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui, const int sol)
 {
-	int N = m_fem.m_mesh.Nodes(), nid, m = 0;
+	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
 	zero(ci);
 	for (int i=0; i<N; ++i)
 	{
-		FENode& n = m_fem.m_mesh.Node(i);
+		FENode& n = m_fem.GetMesh().Node(i);
 		nid = n.m_ID[DOF_C+sol];
 		if (nid != -1)
 		{
@@ -726,7 +726,7 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 {
 	int i, j, n;
 	
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	
 	// update solute data

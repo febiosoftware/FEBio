@@ -39,7 +39,7 @@ void NodeDataRecord::Parse(const char* szexpr)
 //-----------------------------------------------------------------------------
 double NodeDataRecord::Evaluate(int item, int ndata)
 {
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 	FEAnalysis* pstep = m_pfem->GetCurrentStep();
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
@@ -78,7 +78,7 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 //-----------------------------------------------------------------------------
 void NodeDataRecord::SelectAllItems()
 {
-	int n = m_pfem->m_mesh.Nodes();
+	int n = m_pfem->GetMesh().Nodes();
 	m_item.resize(n);
 	for (int i=0; i<n; ++i) m_item[i] = i+1;
 }

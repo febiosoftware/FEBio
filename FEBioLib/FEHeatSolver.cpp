@@ -35,7 +35,7 @@ bool FEHeatSolver::Init()
 	// TODO: I want this to be done automatically
 	//       e.g. while the input file is being read
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEHeatSolidDomain* pd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(nd));
@@ -63,7 +63,7 @@ bool FEHeatSolver::Init()
 //!
 bool FEHeatSolver::InitEquations()
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// initialize nr of equations
 	int neq = 0;
@@ -117,7 +117,7 @@ void FEHeatSolver::PrepStep()
 
 			double T = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
 
-			FENode& node = m_fem.m_mesh.Node(n);
+			FENode& node = m_fem.GetMesh().Node(n);
 
 			if (bc == DOF_T)
 			{
@@ -155,7 +155,7 @@ bool FEHeatSolver::SolveStep(double time)
 //! update solution
 void FEHeatSolver::Update(vector<double>& u)
 {
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// update temperatures
 	for (int i=0; i<mesh.Nodes(); ++i)
@@ -194,7 +194,7 @@ void FEHeatSolver::NodalFluxes(vector<double>& R)
 	double s, f;
 
 	// get the FE mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// loop over nodal force cards
 	int ncnf = m_fem.m_FC.size();

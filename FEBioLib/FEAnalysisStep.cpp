@@ -88,7 +88,7 @@ bool FEAnalysisStep::Init()
 	m_tend = m_fem.m_ftime0 + Dt;
 
 	// For now, add all domains to the analysis step
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	int ndom = mesh.Domains();
 	ClearDomains();
 	for (i=0; i<ndom; ++i) AddDomain(i);
@@ -140,7 +140,7 @@ bool FEAnalysisStep::Init()
 		FERigidNode& rn = *m_fem.m_RN[i];
 		if (rn.IsActive())
 		{
-			FENode& node = m_fem.m_mesh.Node(rn.nid);
+			FENode& node = m_fem.GetMesh().Node(rn.nid);
 			node.m_rid = rn.rid;
 
 			// fix degrees of freedom
@@ -156,7 +156,7 @@ bool FEAnalysisStep::Init()
 		}
 		else 
 		{
-			FENode& node = m_fem.m_mesh.Node(rn.nid);
+			FENode& node = m_fem.GetMesh().Node(rn.nid);
 			node.m_rid = -1;
 		}
 	}
@@ -172,7 +172,7 @@ bool FEAnalysisStep::Init()
 			// note that we don't do this for prescribed pressures and concentrations
 			if ((dc.bc != DOF_P) && (dc.bc < DOF_C))
 			{
-				FENode& node = m_fem.m_mesh.Node(dc.node);
+				FENode& node = m_fem.GetMesh().Node(dc.node);
 				if (node.m_rid >= 0) 
 				{
 					dc.Deactivate();
@@ -189,9 +189,9 @@ bool FEAnalysisStep::Init()
 	// to find these rigid bodies.
 	int nrb = m_fem.m_Obj.size();
 	vector<int> mec; mec.assign(nrb, 0);
-	for (i=0; i<m_fem.m_mesh.Nodes(); ++i)
+	for (i=0; i<m_fem.GetMesh().Nodes(); ++i)
 	{
-		FENode& node = m_fem.m_mesh.Node(i);
+		FENode& node = m_fem.GetMesh().Node(i);
 		n = node.m_rid;
 		if (n >= 0) mec[n]++;
 	}
@@ -224,7 +224,7 @@ bool FEAnalysisStep::Init()
 		int bc  = DC.bc;
 		bool br = DC.br;
 
-		FENode& node = m_fem.m_mesh.Node(nid); 
+		FENode& node = m_fem.GetMesh().Node(nid); 
 
 		if (DC.IsActive())
 		{
@@ -301,7 +301,7 @@ bool FEAnalysisStep::Init()
 			list<FELinearConstraint::SlaveDOF>::iterator is = il->slave.begin();
 			for (int i=0; i<(int) il->slave.size(); ++i, ++is)
 			{
-				is->neq = m_fem.m_mesh.Node(is->node).m_ID[is->bc];
+				is->neq = m_fem.GetMesh().Node(is->node).m_ID[is->bc];
 			}
 		}
 	}
@@ -355,7 +355,7 @@ bool FEAnalysisStep::InitConstraints()
 	if (nlin == 0) return true;
 	int i;
 
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// set the equation numbers for the linear constraints
 	list<FELinearConstraint>::iterator it = m_fem.m_LinC.begin();

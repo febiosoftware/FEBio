@@ -92,7 +92,7 @@ void echo_input(FEBioModel& fem)
 	FEAnalysisStep& step = dynamic_cast<FEAnalysisStep&>(*fem.GetCurrentStep());
 
 	// get the FE mesh
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	// print title
 	clog.printf("%s\n\n", fem.GetTitle());

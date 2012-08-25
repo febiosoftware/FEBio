@@ -198,7 +198,7 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->m_mesh), m_ms(&pfem->m_mesh)
+FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
 	m_ntype = FE_CONTACT_SLIDING;
@@ -636,7 +636,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	double eps, scale = Penalty();
 
 	// get the mesh
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 
 	double Tt[2];
 
@@ -966,7 +966,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	double N[15], T1[15], T2[15], N1[15], N2[15], D1[15], D2[15], Nb1[15], Nb2[15];
 
 	// get the mesh
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 
 	// nr of element nodes and degrees of freedom 
 	int nmeln = mel.Nodes();

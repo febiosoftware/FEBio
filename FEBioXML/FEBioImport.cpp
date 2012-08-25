@@ -1806,7 +1806,7 @@ void FEBioGeometrySection::Parse(XMLTag& tag)
 void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 	int N0 = mesh.Nodes();
 
 	// first we need to figure out how many nodes there are
@@ -1833,7 +1833,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	++tag;
 	for (int i=0; i<nodes; ++i)
 	{
-		FENode& node = fem.m_mesh.Node(N0 + i);
+		FENode& node = fem.GetMesh().Node(N0 + i);
 		tag.value(node.m_r0);
 		node.m_rt = node.m_r0;
 
@@ -1878,7 +1878,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
-			FENode& n = fem.m_mesh.Node(i);
+			FENode& n = fem.GetMesh().Node(i);
 			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
 			n.m_ID[DOF_T] = 0;
 		}
@@ -1890,7 +1890,7 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 	{
 		for (int i=0; i<nodes; ++i) 
 		{
-			FENode& n = fem.m_mesh.Node(i);
+			FENode& n = fem.GetMesh().Node(i);
 			for (int j=0; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
 			n.m_ID[DOF_X] = 0;
 			n.m_ID[DOF_Y] = 0;
@@ -1920,7 +1920,7 @@ int FEBioGeometrySection::ElementType(XMLTag& t)
 int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh* pm = &fem.m_mesh;
+	FEMesh* pm = &fem.GetMesh();
 	int ntype = m_pim->m_nstep_type;
 
 	// get the module
@@ -2046,7 +2046,7 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	// first we need to figure out how many elements 
 	// and how many domains there are
@@ -2232,7 +2232,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the element type
 	const char* szel = tag.AttributeValue("elem");
@@ -2400,7 +2400,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 	int i;
 
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	// get the total nr of elements
 	int nelems = mesh.Elements();
@@ -2572,7 +2572,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 void FEBioGeometrySection::ParseNodeSetSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh &mesh = fem.m_mesh;
+	FEMesh &mesh = fem.GetMesh();
 
 	// get the name attribute
 	const char* szname = tag.AttributeValue("name");
@@ -2639,7 +2639,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 	int NN = m.Nodes();
 
 	// count nr of faces
@@ -2705,7 +2705,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 	if (szset)
 	{
 		// read the set
-		FEMesh& mesh = fem.m_mesh;
+		FEMesh& mesh = fem.GetMesh();
 		FENodeSet* ps = mesh.FindNodeSet(szset);
 		if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
@@ -2748,7 +2748,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		do
 		{
 			int n = atoi(tag.AttributeValue("id"))-1;
-			FENode& node = fem.m_mesh.Node(n);
+			FENode& node = fem.GetMesh().Node(n);
 			const char* sz = tag.AttributeValue("bc");
 			if      (strcmp(sz, "x") == 0) node.m_ID[DOF_X] = -1;
 			else if (strcmp(sz, "y") == 0) node.m_ID[DOF_Y] = -1;
@@ -2778,7 +2778,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	int nversion = m_pim->Version();
 
@@ -3069,9 +3069,9 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem.m_mesh);
+	FESurface* psurf = new FESurface(&fem.GetMesh());
 	psurf->create(npr);
-	fem.m_mesh.AddSurface(psurf);
+	fem.GetMesh().AddSurface(psurf);
 
 	// allocate pressure data
 	FEPressureLoad* ps = new FEPressureLoad(psurf, blinear);
@@ -3125,9 +3125,9 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 	while (!t.isend()) { ntc++; ++t; }
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem.m_mesh);
+	FESurface* psurf = new FESurface(&fem.GetMesh());
 	psurf->create(ntc);
-	fem.m_mesh.AddSurface(psurf);
+	fem.GetMesh().AddSurface(psurf);
 
 	// allocate traction data
 	FETractionLoad* pt = new FETractionLoad(psurf);
@@ -3201,9 +3201,9 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem.m_mesh);
+	FESurface* psurf = new FESurface(&fem.GetMesh());
 	psurf->create(npr);
-	fem.m_mesh.AddSurface(psurf);
+	fem.GetMesh().AddSurface(psurf);
 	
 	// allocate normal traction data
 	FEPoroNormalTraction* ps = new FEPoroNormalTraction(psurf, blinear, beffective);
@@ -3274,9 +3274,9 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	while (!t.isend()) { nfr++; ++t; }
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem.m_mesh);
+	FESurface* psurf = new FESurface(&fem.GetMesh());
 	psurf->create(nfr);
-	fem.m_mesh.AddSurface(psurf);
+	fem.GetMesh().AddSurface(psurf);
 	
 	// allocate fluid flux data
 	FEFluidFlux* pfs = new FEFluidFlux(psurf, blinear, bmixture);
@@ -3338,9 +3338,9 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	while (!t.isend()) { nfr++; ++t; }
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem.m_mesh);
+	FESurface* psurf = new FESurface(&fem.GetMesh());
 	psurf->create(nfr);
-	fem.m_mesh.AddSurface(psurf);
+	fem.GetMesh().AddSurface(psurf);
 	
 	// allocate fluid flux data
 	FESoluteFlux* pfs = new FESoluteFlux(psurf, blinear);
@@ -3392,9 +3392,9 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 	while (!t.isend()) { npr++; ++t; }
 
 	// create a new surface
-	FESurface* psurf = new FESurface(&fem.m_mesh);
+	FESurface* psurf = new FESurface(&fem.GetMesh());
 	psurf->create(npr);
-	fem.m_mesh.AddSurface(psurf);
+	fem.GetMesh().AddSurface(psurf);
 
 	// allocate flux data
 	FEHeatFlux* ph = new FEHeatFlux(psurf);
@@ -3441,7 +3441,7 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	// determine the spring type
 	FEDiscreteMaterial* pm = 0;
@@ -3529,7 +3529,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 
 	// we must deactive the master dof
 	// so that it does not get assigned an equation
-	fem.m_mesh.Node(node-1).m_ID[LC.master.bc] = -1;
+	fem.GetMesh().Node(node-1).m_ID[LC.master.bc] = -1;
 
 	// read the slave nodes
 	++tag;
@@ -3567,7 +3567,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	// make sure that the version is 1.x
 	int nversion = m_pim->Version();
@@ -4239,7 +4239,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
 void FEBioContactSection::ParseSlidingInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FESlidingInterface* ps = new FESlidingInterface(&fem);
 	fem.AddContactInterface(ps);
@@ -4285,7 +4285,7 @@ void FEBioContactSection::ParseSlidingInterface(XMLTag& tag)
 void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
 	fem.AddContactInterface(ps);
@@ -4342,7 +4342,7 @@ void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
 void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FESlidingInterface2* ps = new FESlidingInterface2(&fem);
 	fem.AddContactInterface(ps);
@@ -4400,7 +4400,7 @@ void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
 void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FESlidingInterface3* ps = new FESlidingInterface3(&fem);
 	fem.AddContactInterface(ps);
@@ -4458,7 +4458,7 @@ void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
 void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FETiedInterface* ps = new FETiedInterface(&fem);
 	fem.AddContactInterface(ps);
@@ -4504,7 +4504,7 @@ void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 void FEBioContactSection::ParsePeriodicBoundary(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
 	fem.AddContactInterface(ps);
@@ -4550,7 +4550,7 @@ void FEBioContactSection::ParsePeriodicBoundary(XMLTag& tag)
 void FEBioContactSection::ParseSurfaceConstraint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
 	fem.AddContactInterface(ps);
@@ -4596,7 +4596,7 @@ void FEBioContactSection::ParseSurfaceConstraint(XMLTag& tag)
 void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FERigidWallInterface* ps = new FERigidWallInterface(&fem);
 	fem.AddContactInterface(ps);
@@ -4674,7 +4674,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	// count how many rigid nodes there are
 	int nrn= 0;
@@ -4709,7 +4709,7 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	FERigidJoint* prj = new FERigidJoint(&fem);
 	FEParameterList& pl = prj->GetParameterList();
@@ -4730,7 +4730,7 @@ void FEBioContactSection::ParseRigidJoint(XMLTag& tag)
 void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	// make sure there is a constraint defined
 	if (tag.isleaf()) return;
@@ -4789,7 +4789,7 @@ void FEBioContactSection::ParseLinearConstraint(XMLTag& tag)
 bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 	int NN = m.Nodes();
 
 	// count nr of faces
@@ -4944,7 +4944,7 @@ void FEBioInitialSection::Parse(XMLTag& tag)
 	if (tag.isleaf()) return;
 
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	// make sure we've read the nodes section
 	if (mesh.Nodes() == 0) throw XMLReader::InvalidTag(tag);
@@ -5308,7 +5308,7 @@ void FEBioOutputSection::Parse(XMLTag& tag)
 void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	const char* sz;
 
@@ -5428,7 +5428,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	PlotFile* pplt = 0;
 	const char* sz = tag.AttributeValue("type", true);

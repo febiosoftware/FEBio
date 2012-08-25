@@ -35,7 +35,7 @@ void RigidBodyDataRecord::Parse(const char* szexpr)
 //-----------------------------------------------------------------------------
 double RigidBodyDataRecord::Evaluate(int item, int ndata)
 {
-	FEMesh& mesh = m_pfem->m_mesh;
+	FEMesh& mesh = m_pfem->GetMesh();
 	int nrb = item - 1;
 	if ((nrb < 0) || (nrb >= m_pfem->Materials())) return 0;
 

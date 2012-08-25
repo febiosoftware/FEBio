@@ -56,7 +56,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 	// keep a pointer to the FEM object
 	FEModel& fem = pnls->GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();
-	FEMesh& mesh = fem.m_mesh;
+	FEMesh& mesh = fem.GetMesh();
 
 	// The first time we come here we build the "static" profile.
 	// This static profile stores the contribution to the matrix profile
@@ -698,7 +698,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 									
 									for (l=0; l<nseln; ++l)
 									{
-										id = fem.m_mesh.Node(sn[l]).m_ID;
+										id = fem.GetMesh().Node(sn[l]).m_ID;
 										lm[7*l  ] = id[DOF_X];
 										lm[7*l+1] = id[DOF_Y];
 										lm[7*l+2] = id[DOF_Z];
@@ -710,7 +710,7 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 									
 									for (l=0; l<nmeln; ++l)
 									{
-										id = fem.m_mesh.Node(mn[l]).m_ID;
+										id = fem.GetMesh().Node(mn[l]).m_ID;
 										lm[7*(l+nseln)  ] = id[DOF_X];
 										lm[7*(l+nseln)+1] = id[DOF_Y];
 										lm[7*(l+nseln)+2] = id[DOF_Z];

@@ -62,7 +62,7 @@ void FERigidBody::Reset()
 void FERigidBody::UpdateCOM()
 {
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	// initialize some data
 	m_mass = 0;			// total mass of rigid body
@@ -256,7 +256,7 @@ void FERigidBody::Update(std::vector<double>& Ui, std::vector<double>& ui)
 	m_Ut[5] = m_Up[5] + du[5];
 
 	// update the mesh' nodes
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	int N = mesh.Nodes();
 	for (int i=0; i<N; ++i)
 	{

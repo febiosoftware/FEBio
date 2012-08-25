@@ -4,5 +4,5 @@
 
 FEDomain* FEAnalysis::Domain(int i)
 {
-	return &(m_fem.m_mesh.Domain(m_Dom[i])); 
+	return &(m_fem.GetMesh().Domain(m_Dom[i])); 
 }

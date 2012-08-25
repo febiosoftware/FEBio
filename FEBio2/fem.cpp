@@ -65,7 +65,7 @@ void FEM::ShallowCopy(FEM& fem)
 	m_ftime = fem.m_ftime;
 
 	// copy the mesh
-	m_mesh = fem.m_mesh;
+	m_mesh = fem.GetMesh();
 
 	// copy rigid body data
 	if (m_Obj.empty())

@@ -21,7 +21,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. Initialize default values.
-FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->m_mesh), ms(&pfem->m_mesh)
+FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->GetMesh()), ms(&pfem->GetMesh())
 {
 	static int count = 1;
 	m_ntype = FE_CONTACT_TIED;
@@ -333,7 +333,7 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 	// curvature tensor K
 	double K[2][2] = {0};
 
-//	double scale = -0.0035*m_fem.m_mesh.GetBoundingBox().radius();
+//	double scale = -0.0035*m_fem.GetMesh().GetBoundingBox().radius();
 
 	vector<int> sLM;
 	vector<int> mLM;

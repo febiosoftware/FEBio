@@ -77,7 +77,7 @@ void FETangentDiagnostic::BuildUniaxial()
 
 	// --- create the FE problem ---
 	// create the mesh
-	FEMesh& m = m_fem.m_mesh;
+	FEMesh& m = m_fem.GetMesh();
 	m.CreateNodes(8);
 	for (i=0; i<8; ++i)
 	{
@@ -142,7 +142,7 @@ void FETangentDiagnostic::BuildSimpleShear()
 
 	// --- create the FE problem ---
 	// create the mesh
-	FEMesh& m = m_fem.m_mesh;
+	FEMesh& m = m_fem.GetMesh();
 	m.CreateNodes(8);
 	for (i=0; i<8; ++i)
 	{
@@ -203,7 +203,7 @@ bool FETangentDiagnostic::Run()
 	// solve the problem
 	m_fem.Solve(prg);
 
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 
 	// get the one and only element
@@ -265,7 +265,7 @@ void FETangentDiagnostic::deriv_residual(matrix& ke)
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 
 	// get the mesh
-	FEMesh& mesh = m_fem.m_mesh;
+	FEMesh& mesh = m_fem.GetMesh();
 
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(mesh.Domain(0));
 

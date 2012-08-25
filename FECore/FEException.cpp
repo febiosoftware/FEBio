@@ -28,7 +28,7 @@ ZeroDiagonal::ZeroDiagonal(int node, int ndof)
 ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 {
 	// let's find what dof this equation belonges to
-	FEMesh& m = fem.m_mesh;
+	FEMesh& m = fem.GetMesh();
 
 	int nz = (int) l.size();
 	int i, j, id;

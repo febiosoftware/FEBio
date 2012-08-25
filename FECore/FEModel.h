@@ -227,11 +227,14 @@ protected:
 	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps
 	FEAnalysis*					m_pStep;	//!< pointer to current analysis step
 
-public:
+protected:
 	// Geometry data
 	FEMesh		m_mesh;					//!< the one and only FE mesh
+
+public:
 	std::vector<FEObject*>		m_Obj;	//!< FE Object array (NOTE: only used for rigid bodies)
 
+public:
 	// Boundary Conditions
 	std::vector<FEPrescribedBC*>	m_DC;	//!< prescribed constraints
 	std::vector<FENodalForce*>		m_FC;	//!< concentrated nodal loads
