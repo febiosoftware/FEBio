@@ -48,6 +48,9 @@ public:
 	//! retrieves the value for an array item
 	template <class T> T* pvalue() { return (T*) m_pv; }
 
+	//! retrieves pointer to element in array
+	template <class T> T* pvalue(int n);
+
 	//! assignment operators
 	void operator = (double g) { assert(m_itype == FE_PARAM_DOUBLE); value<double>() = g; }
 	void operator = (int    n) { assert(m_itype == FE_PARAM_INT   ); value<int   >() = n; }
@@ -57,6 +60,15 @@ public:
 	//! override the template for char pointers
 	char* cvalue() { return (char*) m_pv; }
 };
+
+//-----------------------------------------------------------------------------
+//! Retrieves a pointer to element in array (TODO: only works with doubles for now)
+template<class T> inline T* FEParam::pvalue(int n)
+{
+	assert((m_itype==FE_PARAM_DOUBLE)||(m_itype==FE_PARAM_DOUBLEV));
+	assert((n >= 0) && (n < m_ndim));
+	return &(pvalue<double>()[n]);
+}
 
 //-----------------------------------------------------------------------------
 //! A list of material parameters
