@@ -87,6 +87,11 @@ public:
 	
 	//! set free-draining condition 
 	void SetFreeDraining();
+
+	//! return the master and slave surface
+	FESurface* GetMasterSurface() { return &m_ms; }
+	FESurface* GetSlaveSurface () { return &m_ss; }
+
 	
 protected:
 	void ProjectSurface(FESlidingSurface2& ss, FESlidingSurface2& ms, bool bupseg);

@@ -34,12 +34,7 @@ public:
 	void ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove = false);
 
 	//! shallow copy
-	void ShallowCopy(FEContactInterface& ci)
-	{
-		FETiedInterface& si = dynamic_cast<FETiedInterface&>(ci);
-		ss.ShallowCopy(si.ss);
-		ms.ShallowCopy(si.ms);
-	}
+	void ShallowCopy(FEContactInterface& ci);
 
 	//! calculate contact forces
 	virtual void ContactForces(vector<double>& F, FENLSolver* psolver);
@@ -52,6 +47,10 @@ public:
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
+
+	//! return the master and slave surface
+	FESurface* GetMasterSurface() { return &ms; }
+	FESurface* GetSlaveSurface () { return &ss; }
 
 private:
 	//! copy constructor hidden

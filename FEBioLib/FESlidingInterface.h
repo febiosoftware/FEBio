@@ -102,6 +102,10 @@ public:
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();
 
+	//! return the master and slave surface
+	FESurface* GetMasterSurface() { return &m_ms; }
+	FESurface* GetSlaveSurface () { return &m_ss; }
+
 protected:
 	//! calculate auto penalty factor
 	void CalcAutoPenalty(FESlidingSurface& s);

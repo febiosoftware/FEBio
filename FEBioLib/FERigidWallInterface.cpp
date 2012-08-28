@@ -9,10 +9,6 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-// Register the class with the framework
-REGISTER_FEBIO_CLASS(FERigidWallInterface, FEContactInterface, "rigid_wall");
-
-//-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FERigidWallInterface, FEContactInterface)
 	ADD_PARAMETER(m_blaugon, FE_PARAM_BOOL  , "laugon"      ); 

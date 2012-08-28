@@ -95,6 +95,10 @@ public:
 	//! set ambient condition 
 	void SetAmbient();
 
+	//! return the master and slave surface
+	FESurface* GetMasterSurface() { return &m_ms; }
+	FESurface* GetSlaveSurface () { return &m_ss; }
+
 protected:
 	void ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg);
 	

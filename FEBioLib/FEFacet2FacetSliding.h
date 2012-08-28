@@ -68,6 +68,10 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 
+	//! return the master and slave surface
+	FESurface* GetMasterSurface() { return &m_ms; }
+	FESurface* GetSlaveSurface () { return &m_ss; }
+
 protected:
 	//! project slave surface onto master
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup);

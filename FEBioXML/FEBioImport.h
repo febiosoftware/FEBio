@@ -161,6 +161,12 @@ protected:
 	void ParseConstraints         (XMLTag& tag);
 	void ParseSpringSection       (XMLTag& tag);
 	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt);
+
+protected:
+	void ParseRigidJoint      (XMLTag& tag);
+	void ParseLinearConstraint(XMLTag& tag);
+	void ParseRigidWall       (XMLTag& tag);
+	void ParseRigidContact    (XMLTag& tag);
 };
 
 //-----------------------------------------------------------------------------

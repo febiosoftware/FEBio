@@ -109,6 +109,10 @@ public:
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
 
+	//! return the master and slave surface
+	FESurface* GetMasterSurface() { return 0; }
+	FESurface* GetSlaveSurface () { return &m_ss; }
+
 private:
 	//! copy constructor hidden
 	FERigidWallInterface(FERigidWallInterface& ri){}

@@ -59,6 +59,14 @@ bool FETiedInterface::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FETiedInterface::ShallowCopy(FEContactInterface& ci)
+{
+	FETiedInterface& si = dynamic_cast<FETiedInterface&>(ci);
+	ss.ShallowCopy(si.ss);
+	ms.ShallowCopy(si.ms);
+}
+
+//-----------------------------------------------------------------------------
 //! Update tied interface data. This function re-evaluates the gaps between
 //! the slave node and their projections onto the master surface.
 //!

@@ -59,6 +59,10 @@ public:
 	//! serialize data to archive
 	virtual void Serialize(DumpFile& ar);
 
+	//! return the master and slave surface
+	virtual FESurface* GetMasterSurface() = 0;
+	virtual FESurface* GetSlaveSurface () = 0;
+
 protected:
 	//! don't call the default constructor
 	FEContactInterface() {m_pfem=0;}

@@ -4,10 +4,6 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-// Register the class with the framework
-REGISTER_FEBIO_CLASS(FEFacet2FacetSliding, FEContactInterface, "facet-to-facet sliding");
-
-//-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
 	ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"      );

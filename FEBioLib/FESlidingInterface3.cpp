@@ -6,10 +6,6 @@
 #include "log.h"
 
 //-----------------------------------------------------------------------------
-// Register the class with the framework
-REGISTER_FEBIO_CLASS(FESlidingInterface3, FEContactInterface, "sliding3");
-
-//-----------------------------------------------------------------------------
 // Define sliding interface parameters
 BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
 	ADD_PARAMETER(m_blaugon  , FE_PARAM_BOOL  , "laugon"               ); 
