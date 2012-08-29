@@ -553,7 +553,7 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWork(FESolidElement& el, vecto
 	FEMesh& mesh = *GetMesh();
 
 	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat); assert(false);
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat); assert(pm);
 	int id0 = pm->m_pSolute->GetSoluteID();
 	
 	vec3d r0[8], rt[8], rp[8], vt[8];

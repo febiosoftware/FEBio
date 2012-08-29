@@ -214,13 +214,17 @@ protected:
 //! Global solute data
 //! This structure uniquely identifies a solute in multiphasic problems
 // TODO: Move this to a different file
-struct FESoluteData {
-	int					m_nID;			//!< solute ID
-	char				m_szname[128];	//!< solute name
-	double				m_rhoT;			//!< true solute density
-	double				m_M;			//!< solute molecular weight
-	double				m_z;			//!< solute charge number
-};
+class FESoluteData 
+{
+public:
+	FESoluteData() { m_nID = -1; m_rhoT = 0; m_M = 0; m_z = 0; m_szname[0] = 0; }
 
+public:
+	int		m_nID;			//!< solute ID
+	double	m_rhoT;			//!< true solute density
+	double	m_M;			//!< solute molecular weight
+	int		m_z;			//!< solute charge number
+	char	m_szname[128];	//!< solute name
+};
 
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)
