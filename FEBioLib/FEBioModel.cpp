@@ -50,6 +50,8 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEMultiphasic.h"
+#include "FEViscoElasticMaterial.h"
+#include "FEUncoupledViscoElasticMaterial.h"
 #include "log.h"
 #include "version.h"
 

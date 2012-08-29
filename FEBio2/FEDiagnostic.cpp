@@ -10,6 +10,8 @@
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEMemoryDiagnostic.h"
 #include "FEBioLib/log.h"
+#include <FEBioXML/FEBioControlSection.h>
+#include <FEBioXML/FEBioMaterialSection.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

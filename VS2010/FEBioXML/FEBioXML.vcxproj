@@ -77,13 +77,39 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\FEBioXML\FEBioBoundarySection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioConstraintsSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioContactSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioControlSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioGeometrySection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioGlobalsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioImport.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioInitialSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioLoadDataSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioLoadsSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioMaterialSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioModuleSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioOutputSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioStepSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FERestartImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\FileImport.cpp" />
     <ClCompile Include="..\..\FEBioXML\XMLReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\FEBioXML\FEBioBoundarySection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioConstraintsSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioContactSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioControlSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioGeometrySection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioGlobalsSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioImport.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioInitialSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioLoadDataSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioLoadsSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioMaterialSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioModuleSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioOutputSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioStepSection.h" />
     <ClInclude Include="..\..\FEBioXML\FERestartImport.h" />
     <ClInclude Include="..\..\FEBioXML\FileImport.h" />
     <ClInclude Include="..\..\FEBioXML\stdafx.h" />
