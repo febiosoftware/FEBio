@@ -1474,8 +1474,13 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 	if (nc == -1) throw XMLReader::InvalidTag(tag);
 
 	// get the material type
-	const char* sztype = tag.AttributeValue("type");
-		
+	// TODO: For solute materials, there is no type
+	//       but these materials are registered under "solute" 
+	//       so we set the type to that
+	const char* sztype = 0;
+	if (tag == "solute") sztype = "solute";
+	else sztype = tag.AttributeValue("type");
+
 	// get the material name
 	const char* szname = tag.AttributeValue("name", true);
 
@@ -1489,6 +1494,16 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 	{
 		clog.printbox("INPUT ERROR: Invalid %s definition in material %s\n", tag.Name(), pm->GetName());
 		throw XMLReader::Error();
+	}
+
+	// TODO: Solute materials need to have their ID set
+	if (dynamic_cast<FESolute*>(pmat))
+	{
+		FESolute* ps = dynamic_cast<FESolute*>(pmat);
+		const char* szid = tag.AttributeValue("sol");
+		int nid = atoi(szid) - 1;
+		if ((nid < 0) || (nid >= MAX_CDOFS)) throw XMLReader::InvalidAttributeValue(tag, "sol", szid);
+		ps->SetSoluteID(nid);
 	}
 
 	// set the new material's name (if defined)
@@ -2862,6 +2877,8 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			else if (strcmp(sz, "p") == 0) bc = DOF_P;
 			else if (strcmp(sz, "t") == 0) bc = DOF_T; 
 			else if (strcmp(sz, "c") == 0) bc = DOF_C;
+			else if (strcmp(sz, "c1") == 0) bc = DOF_C;
+			else if (strcmp(sz, "c2") == 0) bc = DOF_C + 1;
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 			// get the lc attribute
@@ -2923,6 +2940,8 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 				else if (strcmp(sz, "p") == 0) bc = DOF_P;
 				else if (strcmp(sz, "t") == 0) bc = DOF_T; 
 				else if (strcmp(sz, "c") == 0) bc = DOF_C;
+				else if (strcmp(sz, "c1") == 0) bc = DOF_C;
+				else if (strcmp(sz, "c2") == 0) bc = DOF_C + 1;
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 				sz = tag.AttributeValue("lc");
