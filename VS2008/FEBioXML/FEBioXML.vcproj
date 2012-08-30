@@ -149,7 +149,59 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\FEBioXML\FEBioBoundarySection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioConstraintsSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioContactSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioControlSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioGeometrySection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioGlobalsSection.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioXML\FEBioImport.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioInitialSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioLoadDataSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioLoadsSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioMaterialSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioModuleSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioOutputSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioStepSection.cpp"
 				>
 			</File>
 			<File
@@ -171,7 +223,59 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\FEBioXML\FEBioBoundarySection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioConstraintsSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioContactSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioControlSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioGeometrySection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioGlobalsSection.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioXML\FEBioImport.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioInitialSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioLoadDataSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioLoadsSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioMaterialSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioModuleSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioOutputSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioStepSection.h"
 				>
 			</File>
 			<File
