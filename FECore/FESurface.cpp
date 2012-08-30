@@ -761,7 +761,7 @@ void FESurface::CoBaseVectors0(FESurfaceElement &el, double r, double s, vec3d t
 		H0[2] =  0; H1[2] =  1;
 	}
 	t[0] = t[1] = vec3d(0,0,0);
-	for (i=0; i<4; ++i) 
+	for (i=0; i<n; ++i) 
 	{
 		t[0] += y[i]*H0[i];
 		t[1] += y[i]*H1[i];

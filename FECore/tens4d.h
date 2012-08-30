@@ -85,11 +85,14 @@ public:
 	// trace
 	double tr() const;
 	
-	// intialize to zero
+	// initialize to zero
 	void zero();
 
 	// extract 6x6 matrix
 	void extract(double d[6][6]);
+
+	// calculates the inverse
+	tens4ds inverse() const;
 
 public:
 	double d[NNZ];	// stored in column major order

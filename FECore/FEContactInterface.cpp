@@ -52,17 +52,19 @@ double FEContactInterface::BulkModulus(FESurfaceElement& el, FESurface &s)
 		pt.J = 1;
 		pt.s.zero();
 
-		// get the tangent at this point
-		tens4ds C = pme->Tangent(pt);
+		// get the tangent (stiffness) and it inverse (compliance) at this point
+		tens4ds S = pme->Tangent(pt);
+		tens4ds C = S.inverse();
 
-		// get the upper 3x3
-		mat3d T(mat3ds(C(0,0), C(1,1), C(2,2), C(0,1), C(1,2), C(0,2)));
-
-		// invert the matrix
-		mat3d Ti = T.inverse();
-
-		// calculate average modulus
-		eps = (1/Ti(0,0) + 1/Ti(1,1) + 1/Ti(2,2))/3;
+		// evaluate element surface normal at parametric center
+		vec3d t[2];
+		s.CoBaseVectors0(el, 0, 0, t);
+		vec3d n = t[0] ^ t[1];
+		n.unit();
+		
+		// evaluate normal component of the compliance matrix
+		// (equivalent to inverse of Young's modulus along n)
+		eps = 1./(n*(vdotTdotv(n, C, n)*n));
 	}
 
 	return eps;

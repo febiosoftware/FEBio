@@ -1,6 +1,7 @@
 // NOTE: This file is automatically included from tens4d.h
 // Users should not include this file manually!
 
+#include <NumCore/matrix.h>
 
 // operator +
 inline tens4ds tens4ds::operator + (const tens4ds& t) const
@@ -597,4 +598,64 @@ inline mat3d vdotTdotv(const vec3d a, const tens4ds T, const vec3d b)
 				 a.z*(b.x*T.d[3] + b.y*T.d[8] + b.z*T.d[17]) + a.y*(b.x*T.d[10] + b.y*T.d[13] + b.z*T.d[19]) + a.x*(b.x*T.d[15] + b.y*T.d[18] + b.z*T.d[20]),
 				 a.z*(b.y*T.d[4] + b.x*T.d[8] + b.z*T.d[12]) + a.y*(b.y*T.d[11] + b.x*T.d[13] + b.z*T.d[14]) + a.x*(b.y*T.d[16] + b.x*T.d[18] + b.z*T.d[19]),
 				 a.z*(b.z*T.d[5] + b.y*T.d[12] + b.x*T.d[17]) + a.y*(b.z*T.d[12] + b.y*T.d[14] + b.x*T.d[19]) + a.x*(b.z*T.d[17] + b.y*T.d[19] + b.x*T.d[20]));
+}
+
+
+//-----------------------------------------------------------------------------
+// inverse
+inline tens4ds tens4ds::inverse() const
+{
+	matrix c(6,6);
+	
+	// populate c
+	c(0,0) = d[0];
+	c(1,1) = d[2];
+	c(2,2) = d[5];
+	c(3,3) = d[9];
+	c(4,4) = d[14];
+	c(5,5) = d[20];
+	c(0,1) = c(1,0) = d[1];
+	c(0,2) = c(2,0) = d[3];
+	c(0,3) = c(3,0) = d[6];
+	c(0,4) = c(4,0) = d[10];
+	c(0,5) = c(5,0) = d[15];
+	c(1,2) = c(2,1) = d[4];
+	c(1,3) = c(3,1) = d[7];
+	c(1,4) = c(4,1) = d[11];
+	c(1,5) = c(5,1) = d[16];
+	c(2,3) = c(3,2) = d[8];
+	c(2,4) = c(4,2) = d[12];
+	c(2,5) = c(5,2) = d[17];
+	c(3,4) = c(4,3) = d[13];
+	c(3,5) = c(5,3) = d[18];
+	c(4,5) = c(5,4) = d[19];
+	
+	// invert c
+	matrix s = c.inverse();
+	
+	// return inverse
+	tens4ds S;
+	S.d[ 0] = s(0,0);
+	S.d[ 2] = s(1,1);
+	S.d[ 5] = s(2,2);
+	S.d[ 9] = s(3,3)/4.;
+	S.d[14] = s(4,4)/4.;
+	S.d[20] = s(5,5)/4.;
+	S.d[ 1] = s(0,1);
+	S.d[ 3] = s(0,2);
+	S.d[ 6] = s(0,3)/2.;
+	S.d[10] = s(0,4)/2.;
+	S.d[15] = s(0,5)/2.;
+	S.d[ 4] = s(1,2);
+	S.d[ 7] = s(1,3)/2.;
+	S.d[11] = s(1,4)/2.;
+	S.d[16] = s(1,5)/2.;
+	S.d[ 8] = s(2,3)/2.;
+	S.d[12] = s(2,4)/2.;
+	S.d[17] = s(2,5)/2.;
+	S.d[13] = s(3,4)/4.;
+	S.d[18] = s(3,5)/4.;
+	S.d[19] = s(4,5)/4.;
+	
+	return S;
 }

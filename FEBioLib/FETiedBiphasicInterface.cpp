@@ -353,6 +353,12 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 {
 	// get the mesh
 	FEMesh& m = m_pfem->GetMesh();
+
+	// evaluate element surface normal at parametric center
+	vec3d t[2];
+	s.CoBaseVectors0(el, 0, 0, t);
+	vec3d n = t[0] ^ t[1];
+	n.unit();
 	
 	double eps = 0;
 	
@@ -384,7 +390,9 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 			double K[3][3];
 			biph->Permeability(K, mp);
 			
-			eps = (K[0][0] + K[1][1] + K[2][2])/3;
+			eps = n.x*(K[0][0]*n.x+K[0][1]*n.y+K[0][2]*n.z)
+			+n.y*(K[1][0]*n.x+K[1][1]*n.y+K[1][2]*n.z)
+			+n.z*(K[2][0]*n.x+K[2][1]*n.y+K[2][2]*n.z);
 		}
 	}
 	

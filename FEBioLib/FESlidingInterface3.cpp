@@ -394,7 +394,13 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 {
 	// get the mesh
 	FEMesh& m = m_pfem->GetMesh();
-	
+
+	// evaluate element surface normal at parametric center
+	vec3d t[2];
+	s.CoBaseVectors0(el, 0, 0, t);
+	vec3d n = t[0] ^ t[1];
+	n.unit();
+
 	double eps = 0;
 	
 	// get the solid element this surface element belongs to
@@ -426,7 +432,9 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			double K[3][3];
 			bp->Permeability(K, mp);
 			
-			eps = (K[0][0] + K[1][1] + K[2][2])/3;
+			eps = n.x*(K[0][0]*n.x+K[0][1]*n.y+K[0][2]*n.z)
+			+n.y*(K[1][0]*n.x+K[1][1]*n.y+K[1][2]*n.z)
+			+n.z*(K[2][0]*n.x+K[2][1]*n.y+K[2][2]*n.z);
 		}
 		else if (bps)
 		{
@@ -449,7 +457,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			
 			mat3ds K = bps->m_pPerm->Permeability(mp);
 			
-			eps = K.tr()/3;
+			eps = n*(K*n);
 		}
 	}
 	
@@ -497,6 +505,12 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 {
 	// get the mesh
 	FEMesh& m = m_pfem->GetMesh();
+
+	// evaluate element surface normal at parametric center
+	vec3d t[2];
+	s.CoBaseVectors0(el, 0, 0, t);
+	vec3d n = t[0] ^ t[1];
+	n.unit();
 	
 	double eps = 0;
 	
@@ -531,7 +545,7 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 			mat3ds D = pbs->m_pSolute->m_pDiff->Diffusivity(mp)
 			*(pbs->Porosity(mp)*pbs->m_pSolute->m_pSolub->Solubility(mp));
 			
-			eps = D.tr()/3;
+			eps = n*(D*n);
 		}
 	}
 	
