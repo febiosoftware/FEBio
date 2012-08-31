@@ -291,6 +291,13 @@ bool FEAnalysisStep::Init()
 				node.m_ID[DOF_Z] = (n<0?n:-n-2);
 				DC.r = 0;
 				break;
+			default:	// all prescribed concentrations
+				if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+					n = node.m_ID[bc];
+					node.m_ID[bc] = (n<0?n:-n-2);
+					int sid = bc - DOF_C;
+					DC.r = br ? node.m_ct[sid] - node.m_c0[sid] : 0;
+				}
 			}
 		}
 	}

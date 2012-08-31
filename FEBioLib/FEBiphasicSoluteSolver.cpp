@@ -317,10 +317,10 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
 		clog.printf("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
-		clog.printf("\t residual             %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
-		clog.printf("\t energy               %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-		clog.printf("\t displacement         %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
-		clog.printf("\t fluid pressure       %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
+		clog.printf("\t residual                %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
+		clog.printf("\t energy                  %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
+		clog.printf("\t displacement            %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
+		clog.printf("\t fluid pressure          %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
 		for (j=0; j<MAX_CDOFS; ++j) {
 			if (m_nceq[j])
 				clog.printf("\t solute %d concentration  %15le %15le %15le \n", j+1, normCi[j], normc[j] ,(m_Ctol*m_Ctol)*normC[j] );
