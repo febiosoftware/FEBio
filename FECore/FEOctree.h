@@ -21,7 +21,7 @@ public:
 	void PrintNodeContent();
 	bool RayIntersectsNode(vec3d p, vec3d n);
 	void FindIntersectedLeaves(vec3d p, vec3d n, std::set<int>& sel);
-	void CountNodes(int& nnode);
+	void CountNodes(int& nnode, int& nlevel);
 	
 public:
 	int				level;		//!< node level

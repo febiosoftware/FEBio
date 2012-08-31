@@ -83,12 +83,9 @@ bool OTnode::ElementIntersectsNode(const int iel)
 	}
 	
 	// Check if bounding boxes of OT node and surface element overlap
-	if ((fmin.x < cmin.x) && (fmax.x < cmin.x)) return false;
-	if ((fmin.y < cmin.y) && (fmax.y < cmin.y)) return false;
-	if ((fmin.z < cmin.z) && (fmax.z < cmin.z)) return false;
-	if ((fmin.x > cmax.x) && (fmax.x > cmax.x)) return false;
-	if ((fmin.y > cmax.y) && (fmax.y > cmax.y)) return false;
-	if ((fmin.z > cmax.z) && (fmax.z > cmax.z)) return false;
+	if ((fmax.x < cmin.x) || (fmin.x > cmax.x)) return false;
+	if ((fmax.y < cmin.y) || (fmin.y > cmax.y)) return false;
+	if ((fmax.z < cmin.z) || (fmin.z > cmax.z)) return false;
 	
 	// At this point we find that bounding boxes overlap.
 	// Technically that does not prove that the surface element is
@@ -205,12 +202,13 @@ void OTnode::PrintNodeContent()
 //-----------------------------------------------------------------------------
 // Count nodes (for debugging purposes)
 
-void OTnode::CountNodes(int& nnode)
+void OTnode::CountNodes(int& nnode, int& nlevel)
 {
 	int nc = children.size();
 	nnode += nc;
+	nlevel = (level > nlevel) ? level : nlevel;
 	for (int i=0; i<nc; ++i) {
-		children[i].CountNodes(nnode);
+		children[i].CountNodes(nnode, nlevel);
 	}
 }
 
@@ -221,7 +219,7 @@ void OTnode::CountNodes(int& nnode)
 FEOctree::FEOctree(FESurface* ps)
 {
 	m_ps = ps;
-	max_level = 0;	// by default there is no limit to number of levels
+	max_level = 6;
 	max_elem = 9;
 	assert(max_level && max_elem);
 }
@@ -250,12 +248,11 @@ void FEOctree::Init()
 		root.selist[i] = i;
 	
 	// Find the bounding box of the surface
-	FEMesh& mesh = *(m_ps->GetMesh());
-	vec3d fenode = mesh.Node(m_ps->m_node[0]).m_rt;
+	vec3d fenode = (m_ps->Node(0)).m_rt;
 	root.cmin = fenode;
 	root.cmax = fenode;
-	for (i=1; i<(int)m_ps->m_node.size(); ++i) {
-		fenode = mesh.Node(m_ps->m_node[i]).m_rt;
+	for (i=1; i<m_ps->Nodes(); ++i) {
+		fenode = (m_ps->Node(i)).m_rt;
 		if (fenode.x < root.cmin.x) root.cmin.x = fenode.x;
 		if (fenode.x > root.cmax.x) root.cmax.x = fenode.x;
 		if (fenode.y < root.cmin.y) root.cmin.y = fenode.y;
@@ -271,11 +268,12 @@ void FEOctree::Init()
 			root.CreateChildren(max_level, max_elem);
 	}
 	
-// For debugging purposes...
-//	root.PrintNodeContent();
-//	int nnode = 0;
-//	root.CountNodes(nnode);
-//	printf("Number of nodes in octree = %d\n",nnode);
+	// For debugging purposes...
+	//	root.PrintNodeContent();
+	//	int nnode = 0, nlevel = 0;
+	//	root.CountNodes(nnode, nlevel);
+	//	clog.printf("Max level and number of nodes in octree = %d, %d\n",
+	//				nlevel, nnode);
 	
 	return;
 }
