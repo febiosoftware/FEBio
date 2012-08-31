@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="flexd.lib fltkd.lib fltkzd.lib fltkimagesd.lib fltkjpegd.lib fltkpngd.lib mkl_intel_c.lib mkl_intel_thread.lib mkl_core.lib mkl_solver.lib libiomp5mt.lib superlud.lib"
+				AdditionalDependencies="flexd.lib fltk.lib fltkz.lib fltkimages.lib fltkjpeg.lib fltkpng.lib mkl_intel_c.lib mkl_intel_thread.lib mkl_core.lib mkl_solver.lib libiomp5mt.lib superlud.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
