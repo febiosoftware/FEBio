@@ -17,7 +17,7 @@ BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem, FE_RIGID_JOINT)
+FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem)
 {
 	static int count = 1;
 	m_nID = count++;

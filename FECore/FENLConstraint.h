@@ -6,14 +6,6 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-// types of nonlinear constraints
-enum FENLConstraint_Type {
-	FE_POINT_CONSTRAINT,
-	FE_LINEAR_CONSTRAINT,
-	FE_RIGID_JOINT
-};
-
-//-----------------------------------------------------------------------------
 // forward declaration of the model class
 class FEModel;
 
@@ -26,10 +18,8 @@ class FEModel;
 class FENLConstraint : public FEParamContainer
 {
 public:
-	FENLConstraint(FEModel* pfem, int ntype) : m_pfem(pfem), m_ntype(ntype) {}
+	FENLConstraint(FEModel* pfem) : m_pfem(pfem) {}
 	virtual ~FENLConstraint(){}
-
-	int Type() const { return m_ntype; }
 
 public:
 	virtual void Init() = 0;
@@ -43,5 +33,4 @@ public:
 
 protected:
 	FEModel*	m_pfem;
-	int			m_ntype;
 };

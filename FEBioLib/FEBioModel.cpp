@@ -140,7 +140,7 @@ bool FEBioModel::Reset()
 		for (i=0; i<NC; ++i)
 		{
 			FENLConstraint* plc = m_NLC[i];
-			if (plc->Type() == FE_RIGID_JOINT)
+			if (dynamic_cast<FERigidJoint*>(plc))
 			{
 				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
 				rj.m_F = vec3d(0,0,0);
@@ -1205,8 +1205,8 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			for (i=0; i<n; ++i) 
 			{
-				ar << m_NLC[i]->Type();
-				m_NLC[i]->Serialize(ar);
+//				ar << m_NLC[i]->Type();
+//				m_NLC[i]->Serialize(ar);
 			}
 		}
 	}
@@ -1337,7 +1337,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_NLC.clear();
 		for (i=0; i<n; ++i)
 		{
-			ar >> ntype;
+/*			ar >> ntype;
 			FENLConstraint* plc = 0;
 			switch (ntype)
 			{
@@ -1349,7 +1349,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			assert(plc);
 			plc->Serialize(ar);
 			m_NLC.push_back(plc);
-		}
+*/		}
 	}
 }
 
@@ -1937,7 +1937,7 @@ bool FEBioModel::CreateRigidBodies()
 		for (i=0; i<NC; ++i)
 		{
 			FENLConstraint* plc = m_NLC[i];
-			if (plc->Type() == FE_RIGID_JOINT)
+			if (dynamic_cast<FERigidJoint*>(plc))
 			{
 				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
 				rj.m_F = vec3d(0,0,0);

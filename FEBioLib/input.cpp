@@ -368,7 +368,7 @@ void echo_input(FEBioModel& fem)
 		for (i=0; i<NC; ++i)
 		{
 			FENLConstraint* plc = fem.NonlinearConstraint(i);
-			if (plc->Type() == FE_RIGID_JOINT)
+			if (dynamic_cast<FERigidJoint*>(plc))
 			{
 				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
 				FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(rj.m_nRBa));

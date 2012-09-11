@@ -226,60 +226,53 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 			for (int m=0; m<M; ++m)
 			{
 				FENLConstraint* pnlc = fem.NonlinearConstraint(m);
-				switch (pnlc->Type())
+				if (dynamic_cast<FEPointConstraint*>(pnlc))
 				{
-				case FE_POINT_CONSTRAINT: // add point constraints
+					FEPointConstraint& pc = dynamic_cast<FEPointConstraint&>(*pnlc);
+					vector<int> lm(3*9);
+					FENode& n0 = mesh.Node(pc.m_node);
+					lm[0] = n0.m_ID[DOF_X];
+					lm[1] = n0.m_ID[DOF_Y];
+					lm[2] = n0.m_ID[DOF_Z];
+					for (j=0; i<8; ++i)
 					{
-						FEPointConstraint& pc = dynamic_cast<FEPointConstraint&>(*pnlc);
-						vector<int> lm(3*9);
-						FENode& n0 = mesh.Node(pc.m_node);
-						lm[0] = n0.m_ID[DOF_X];
-						lm[1] = n0.m_ID[DOF_Y];
-						lm[2] = n0.m_ID[DOF_Z];
-						for (j=0; i<8; ++i)
-						{
-							FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
-							lm[3*(j+1)  ] = nj.m_ID[DOF_X];
-							lm[3*(j+1)+1] = nj.m_ID[DOF_Y];
-							lm[3*(j+1)+2] = nj.m_ID[DOF_Z];
-						}
-						build_add(lm);
+						FENode& nj = mesh.Node(pc.m_pel->m_node[j]);
+						lm[3*(j+1)  ] = nj.m_ID[DOF_X];
+						lm[3*(j+1)+1] = nj.m_ID[DOF_Y];
+						lm[3*(j+1)+2] = nj.m_ID[DOF_Z];
 					}
-					break;
-				case FE_LINEAR_CONSTRAINT:
-					{
-						FELinearConstraintSet& lcs = dynamic_cast<FELinearConstraintSet&>(*pnlc);
-						list<FEAugLagLinearConstraint*>& LC = lcs.m_LC;
-						vector<int> lm;
-						int N = LC.size();
-						list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
-						for (i=0; i<N; ++i, ++it)
-						{
-							int n = (*it)->m_dof.size();
-							lm.resize(n);
-							FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
-							for (j=0; j<n; ++j, ++is) lm[j] = is->neq;
-		
-							build_add(lm);
-						}
-					}
-					break;
-				case FE_RIGID_JOINT:
-					{
-						FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*pnlc);
-						vector<int> lm(12);
-			
-						int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
-						int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
-
-						for (j=0; j<6; ++j) lm[j  ] = lm1[j];
-						for (j=0; j<6; ++j) lm[j+6] = lm2[j];
-						build_add(lm);
-					}
-					break;
-				default:
-					assert(false);
+					build_add(lm);
 				}
+				else if (dynamic_cast<FELinearConstraintSet*>(pnlc))
+				{
+					FELinearConstraintSet& lcs = dynamic_cast<FELinearConstraintSet&>(*pnlc);
+					list<FEAugLagLinearConstraint*>& LC = lcs.m_LC;
+					vector<int> lm;
+					int N = LC.size();
+					list<FEAugLagLinearConstraint*>::iterator it = LC.begin();
+					for (i=0; i<N; ++i, ++it)
+					{
+						int n = (*it)->m_dof.size();
+						lm.resize(n);
+						FEAugLagLinearConstraint::Iterator is = (*it)->m_dof.begin();
+						for (j=0; j<n; ++j, ++is) lm[j] = is->neq;
+		
+						build_add(lm);
+					}
+				}
+				else if (dynamic_cast<FERigidJoint*>(pnlc))
+				{
+					FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*pnlc);
+					vector<int> lm(12);
+			
+					int* lm1 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBa))->m_LM;
+					int* lm2 = dynamic_cast<FERigidBody*>(fem.Object(rj.m_nRBb))->m_LM;
+
+					for (j=0; j<6; ++j) lm[j  ] = lm1[j];
+					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
+					build_add(lm);
+				}
+				else assert(false);
 			}
 
 			// copy the static profile to the MP object
