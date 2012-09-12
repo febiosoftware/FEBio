@@ -183,6 +183,9 @@
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FECore\Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\DumpFile.cpp">
@@ -306,6 +309,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

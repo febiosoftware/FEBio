@@ -4,11 +4,11 @@
 #include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Dictionary::AddVariable(const char* szname, vector<int>& item)
+bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, vector<int>& item)
 {
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 
-	FEPlotData* ps = febio.Create<FEPlotData>(szname, 0);
+	FEPlotData* ps = febio.Create<FEPlotData>(szname, pfem);
 	ps->SetItemList(item);
 	if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
 	else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
@@ -88,8 +88,8 @@ void FEBioPlotFile::Dictionary::Defaults(FEModel& fem)
 	if (m_Node.empty() && m_Elem.empty() && m_Face.empty())
 	{
 		vector<int> l; // empty list
-		AddVariable("displacement", l);
-		AddVariable("stress", l);
+		AddVariable(&fem, "displacement", l);
+		AddVariable(&fem, "stress", l);
 	}
 }
 
@@ -106,7 +106,7 @@ void FEBioPlotFile::Dictionary::Clear()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-FEBioPlotFile::FEBioPlotFile(void)
+FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
 {
 }
 
@@ -132,7 +132,7 @@ FEBioPlotFile::~FEBioPlotFile(void)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Open(FEModel &fem, const char *szfile)
+bool FEBioPlotFile::Open(FEModel& fem, const char *szfile)
 {
 	// open the archive
 	if (m_ar.Create(szfile) == false) return false;
@@ -143,28 +143,28 @@ bool FEBioPlotFile::Open(FEModel &fem, const char *szfile)
 		// --- save the header file ---
 		m_ar.BeginChunk(PLT_HEADER);
 		{
-			if (WriteHeader(fem) == false) return false;
+			if (WriteHeader(m_fem) == false) return false;
 		}
 		m_ar.EndChunk();
 
 		// --- save the dictionary ---
 		m_ar.BeginChunk(PLT_DICTIONARY);
 		{
-			if (WriteDictionary(fem) == false) return false;
+			if (WriteDictionary(m_fem) == false) return false;
 		}
 		m_ar.EndChunk();
 
 		// --- save the materials
 		m_ar.BeginChunk(PLT_MATERIALS);
 		{
-			if (WriteMaterials(fem) == false) return false;
+			if (WriteMaterials(m_fem) == false) return false;
 		}
 		m_ar.EndChunk();
 
 		// --- save the geometry ---
 		m_ar.BeginChunk(PLT_GEOMETRY);
 		{
-			if (WriteGeometry(fem) == false) return false;
+			if (WriteGeometry(m_fem) == false) return false;
 		}
 		m_ar.EndChunk();
 	}
@@ -711,7 +711,7 @@ void FEBioPlotFile::WriteSurfaceData(FEModel& fem)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Append(FEModel &fem, const char *szfile)
+bool FEBioPlotFile::Append(FEModel& fem, const char *szfile)
 {
 	// try to open the file
 	if (m_ar.Open(szfile) == false) return false;

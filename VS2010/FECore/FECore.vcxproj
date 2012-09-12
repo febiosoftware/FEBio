@@ -508,6 +508,7 @@
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
+    <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
     <ClInclude Include="..\..\FECore\mat2d.h" />
     <ClInclude Include="..\..\FECore\mat3d.h" />
@@ -557,6 +558,7 @@
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
+    <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\kernel.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />

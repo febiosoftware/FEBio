@@ -1418,7 +1418,7 @@ void FEBioModel::SerializeIOData(DumpFile &ar)
 			break;
 		case 2:
 			{
-				m_plot = new FEBioPlotFile;
+				m_plot = new FEBioPlotFile(*this);
 				if (m_plot->Append(*this, m_szplot) == false)
 				{
 					printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);

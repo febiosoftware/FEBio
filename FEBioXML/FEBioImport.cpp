@@ -20,6 +20,7 @@
 #include <FEBioLib/DataStore.h>
 #include <FEBioLib/log.h>
 #include <string.h>
+#include <FECore/Image.h>
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------
@@ -319,6 +320,23 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
 		case FE_PARAM_STRING : tag.value(pp->cvalue() ); break;
 		case FE_PARAM_INTV   : tag.value(pp->pvalue<int   >(), pp->m_ndim); break;
 		case FE_PARAM_DOUBLEV: tag.value(pp->pvalue<double>(), pp->m_ndim); break;
+		case FE_PARAM_IMAGE_3D:
+			{
+				const char* szfile = tag.AttributeValue("file");
+				++tag;
+				int n[3] = {0};
+				do
+				{
+					if (tag == "size") tag.value(n, 3);
+					else throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while (!tag.isend());
+				Image& im = pp->value<Image>();
+				im.Create(n[0], n[1], n[2]);
+				if (im.Load(szfile) == false) throw XMLReader::InvalidValue(tag);
+			}
+			break;
 		default:
 			assert(false);
 			return false;

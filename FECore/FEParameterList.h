@@ -15,13 +15,14 @@ enum FEParamType {
 	FE_PARAM_BOOL,
 	FE_PARAM_DOUBLE,
 	FE_PARAM_VEC3D,
+	FE_PARAM_IMAGE_3D,
 	FE_PARAM_STRING,
 	FE_PARAM_INTV = 100,
 	FE_PARAM_DOUBLEV,
 };
 
 //-----------------------------------------------------------------------------
-//! A material parameter
+//! This class describes a user-defined parameter
 class FEParam
 {
 public:

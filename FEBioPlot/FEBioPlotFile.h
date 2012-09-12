@@ -90,7 +90,7 @@ public:
 	class Dictionary
 	{
 	public:
-		bool AddVariable(const char* szname, vector<int>& item);
+		bool AddVariable(FEModel* pfem, const char* szname, vector<int>& item);
 
 		int NodalVariables  () { return m_Node.size(); }
 		int DomainVarialbes () { return m_Elem.size(); }
@@ -125,7 +125,7 @@ public:
 	};
 
 public:
-	FEBioPlotFile(void);
+	FEBioPlotFile(FEModel& fem);
 	~FEBioPlotFile(void);
 
 	//! Open the plot database
@@ -138,7 +138,7 @@ public:
 	bool Write(FEModel& fem);
 
 	//! Add a variable to the dictionary
-	bool AddVariable(const char* sz, vector<int>& item) { return m_dic.AddVariable(sz, item); }
+	bool AddVariable(const char* sz, vector<int>& item) { return m_dic.AddVariable(&m_fem, sz, item); }
 
 public:
 	const Dictionary& GetDictionary() const { return m_dic; }
@@ -173,4 +173,5 @@ protected:
 protected:
 	Dictionary	m_dic;	// dictionary
 	Archive		m_ar;	// the data archive
+	FEModel&	m_fem;
 };

@@ -150,7 +150,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 	const char* sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
-		if (strcmp(sz, "febio") == 0) pplt = new FEBioPlotFile;
+		if (strcmp(sz, "febio") == 0) pplt = new FEBioPlotFile(fem);
 		else if (strcmp(sz, "lsdyna") == 0) pplt = new LSDYNAPlotFile;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
