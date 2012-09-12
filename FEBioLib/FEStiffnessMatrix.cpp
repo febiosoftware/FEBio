@@ -272,7 +272,6 @@ bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
 					for (j=0; j<6; ++j) lm[j+6] = lm2[j];
 					build_add(lm);
 				}
-				else assert(false);
 			}
 
 			// copy the static profile to the MP object

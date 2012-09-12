@@ -17,11 +17,33 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 	// make sure there is something to read
 	if (tag.isleaf()) return;
 
+	// get the FEBio kernel
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	++tag;
 	do
 	{
 		if (tag == "rigid_body") ParseRigidConstraint(tag);
 		else if (tag == "point") ParsePointConstraint(tag);
+		else if (tag == "constraint")
+		{
+			const char* sztype = tag.AttributeValue("type");
+			FENLConstraint* plc = febio.Create<FENLConstraint>(sztype, m_pim->GetFEModel());
+			if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			FEParameterList& pl = plc->GetParameterList();
+
+			++tag;
+			do
+			{
+				if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+				++tag;
+			}
+			while (!tag.isend());
+
+			FEModel& fem = *GetFEModel();
+			fem.AddNonlinearConstraint(plc);
+		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

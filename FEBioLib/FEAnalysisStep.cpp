@@ -504,6 +504,13 @@ bool FEAnalysisStep::Solve(Progress& prg)
 			m_fem.EvaluateParameterList(pl);
 		}
 
+		// evaluate constraint parameter lists
+		for (i=0; i<m_fem.NonlinearConstraints(); ++i)
+		{
+			FEParameterList& pl = m_fem.NonlinearConstraint(i)->GetParameterList();
+			m_fem.EvaluateParameterList(pl);
+		}
+
 		// solve this timestep,
 		try
 		{
