@@ -151,6 +151,11 @@ bool FEM::Configure(const char *szfile)
 						if (LoadPlugin(szfile) == false) throw XMLReader::InvalidValue(tag);
 						printf("Plugin \"%s\" loaded successfully\n", szfile);
 					}
+					else if (tag == "import_folder")
+					{
+						const char* szfile = tag.szvalue();
+						if (LoadPluginFolder(szfile) == false) throw XMLReader::InvalidTag(tag);
+					}
 					else throw XMLReader::InvalidTag(tag);
 
 					// go to the next tag

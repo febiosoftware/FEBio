@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "FECore/febio.h"
 #include "FEBioLib/log.h"
+#include <direct.h>
 
 //-----------------------------------------------------------------------------
 #ifdef WIN32
@@ -26,6 +27,26 @@ bool LoadPlugin(const char* szfile)
 	pfnc(febio);
 
 	// a-ok!
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Import all the plugins from a folder. The szdir is actually a folder name
+// plus a wildcard file reference (e.g. C:\folder\*.dll)
+bool LoadPluginFolder(const char* szdir)
+{
+	WIN32_FIND_DATAA FileData;
+	HANDLE hFind = FindFirstFileA(szdir, &FileData);
+
+	LoadPlugin(FileData.cFileName);
+	printf("Plugin \"%s\" loaded successfully\n", FileData.cFileName);
+
+	while (FindNextFileA(hFind, &FileData)) 
+	{
+		LoadPlugin(FileData.cFileName);
+		printf("Plugin \"%s\" loaded successfully\n", FileData.cFileName);
+	}
+
 	return true;
 }
 
@@ -55,6 +76,11 @@ bool LoadPlugin(const char* szfile)
   pfnc(febio);
 
   return true;
+}
+
+bool LoadPluginFolder(const char* szdir)
+{
+	return false;
 }
 
 #endif // ifdef LINUX
