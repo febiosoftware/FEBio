@@ -22,7 +22,7 @@ void Image::Create(int nx, int ny, int nz)
 	m_nx = nx;
 	m_ny = ny;
 	m_nz = nz;
-	m_pf = new float[m_nx*m_ny];
+	m_pf = new float[m_nx*m_ny*m_nz];
 }
 
 //-----------------------------------------------------------------------------
