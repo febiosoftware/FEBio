@@ -352,6 +352,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\Image.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\kernel.cpp"
 				>
 			</File>
@@ -551,6 +555,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FETrussDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\Image.h"
 				>
 			</File>
 			<File
