@@ -20,8 +20,8 @@ BEGIN_PARAMETER_LIST(FESlidingInterface2, FEContactInterface)
 	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"      );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"             );
-	ADD_PARAMETER(m_naugmin  , FE_PARAM_DOUBLE, "minaug"             );
-	ADD_PARAMETER(m_naugmax  , FE_PARAM_DOUBLE, "maxaug"             );
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"             );
+	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

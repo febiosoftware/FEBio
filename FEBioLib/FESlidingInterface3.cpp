@@ -16,15 +16,15 @@ BEGIN_PARAMETER_LIST(FESlidingInterface3, FEContactInterface)
 	ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"              );
 	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty"         );
 	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"             );
-	ADD_PARAMETER(m_knmult   , FE_PARAM_DOUBLE, "knmult"               );
+	ADD_PARAMETER(m_knmult   , FE_PARAM_INT   , "knmult"               );
 	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"           );
 	ADD_PARAMETER(m_epsp     , FE_PARAM_DOUBLE, "pressure_penalty"     );
 	ADD_PARAMETER(m_epsc     , FE_PARAM_DOUBLE, "concentration_penalty");
 	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness"  );
 	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"        );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"               );
-	ADD_PARAMETER(m_naugmin  , FE_PARAM_DOUBLE, "minaug"               );
-	ADD_PARAMETER(m_naugmax  , FE_PARAM_DOUBLE, "maxaug"               );
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"               );
+	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"               );
 	ADD_PARAMETER(m_ambp     , FE_PARAM_DOUBLE, "ambient_pressure"     );
 	ADD_PARAMETER(m_ambc     , FE_PARAM_DOUBLE, "ambient_concentration");
 END_PARAMETER_LIST();

@@ -12,14 +12,14 @@ BEGIN_PARAMETER_LIST(FESlidingInterfaceBW, FEContactInterface)
 	ADD_PARAMETER(m_epsn     , FE_PARAM_DOUBLE, "penalty"            );
 	ADD_PARAMETER(m_bautopen , FE_PARAM_BOOL  , "auto_penalty"       );
 	ADD_PARAMETER(m_btwo_pass, FE_PARAM_BOOL  , "two_pass"           );
-	ADD_PARAMETER(m_knmult   , FE_PARAM_DOUBLE, "knmult"             );
+	ADD_PARAMETER(m_knmult   , FE_PARAM_INT   , "knmult"             );
 	ADD_PARAMETER(m_stol     , FE_PARAM_DOUBLE, "search_tol"         );
 	ADD_PARAMETER(m_bsymm    , FE_PARAM_BOOL  , "symmetric_stiffness");
 	ADD_PARAMETER(m_srad     , FE_PARAM_DOUBLE, "search_radius"      );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"             );
 	ADD_PARAMETER(m_btension , FE_PARAM_BOOL  , "tension"            );
-	ADD_PARAMETER(m_naugmin  , FE_PARAM_DOUBLE, "minaug"             );
-	ADD_PARAMETER(m_naugmax  , FE_PARAM_DOUBLE, "maxaug"             );
+	ADD_PARAMETER(m_naugmin  , FE_PARAM_INT   , "minaug"             );
+	ADD_PARAMETER(m_naugmax  , FE_PARAM_INT   , "maxaug"             );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
