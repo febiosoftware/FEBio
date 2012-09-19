@@ -1,7 +1,7 @@
 #pragma once
 #include "FEBioImport.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
-#include "FEBioLib/FERigid.h"
+#include <FECore/FERigid.h>
 #include "FEBioLib/FEElasticMixture.h"
 #include "FEBioLib/FEUncoupledElasticMixture.h"
 #include "FEBioLib/FEBiphasic.h"

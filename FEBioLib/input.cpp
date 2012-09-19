@@ -13,7 +13,7 @@
 #include "FERigidJoint.h"
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"
-#include "FERigidBody.h"
+#include <FECore/FERigidBody.h>
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "log.h"

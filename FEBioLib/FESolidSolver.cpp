@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
 #include "FECore/FENodeReorder.h"
-#include "FERigid.h"
-#include "FERigidBody.h"
+#include <FECore/FERigid.h>
+#include <FECore/FERigidBody.h>
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEPointBodyForce.h"
 #include "FEPressureLoad.h"

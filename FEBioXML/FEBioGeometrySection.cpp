@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioGeometrySection.h"
 #include <FEBioLib/FEHeatTransferMaterial.h>
-#include <FEBioLib/FERigid.h>
+#include <FECore/FERigid.h>
 #include <FEBioLib/FEBiphasic.h>
 #include <FEBioLib/FEBiphasicSolute.h>
 #include <FEBioLib/FETriphasic.h>

@@ -9,13 +9,13 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/FE_enum.h"
-#include "FECore/vec3d.h"
-#include "FECore/quatd.h"
-#include "FECore/BC.h"
-#include "FECore/DumpFile.h"
-#include "FECore/FEModel.h"
-#include "FECore/FEObject.h"
+#include "FE_enum.h"
+#include "vec3d.h"
+#include "quatd.h"
+#include "BC.h"
+#include "DumpFile.h"
+#include "FEModel.h"
+#include "FEObject.h"
 
 //-----------------------------------------------------------------------------
 //! rigid body class

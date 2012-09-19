@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBioConstraintsSection.h"
-#include <FEBioLib/FERigid.h>
+#include <FECore/FERigid.h>
 #include <FEBioLib/FEPointConstraint.h>
 
 //=============================================================================

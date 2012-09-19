@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "FERigidBody.h"
-#include "FECore/FEMaterial.h"
+#include "FEMaterial.h"
 #include "FERigid.h"
-#include "FEElasticSolidDomain.h"
+#include "FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
 FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
@@ -74,9 +74,6 @@ void FERigidBody::UpdateCOM()
 	// shape function values
 	double* H;
 
-	// material density
-	double dens;
-
 	// nodal coordinates
 	vec3d r0[8];
 	
@@ -84,19 +81,20 @@ void FERigidBody::UpdateCOM()
 	for (int nd=0; nd < mesh.Domains(); ++nd)
 	{
 		// TODO: I should convert to a FERigidSolidDomain or FERigidShellDomain
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&mesh.Domain(nd));
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
-			for (int iel=0; iel<pbd->Elements(); ++iel)
-			{	
-				FESolidElement& el = pbd->Element(iel);
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (pbd->GetMaterial());
+			// make sure this element belongs to the rigid body
+			if (pm && (pm->m_nRB == m_nID))
+			{
+				// get the material density
+				double dens = pm->m_density;
 
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (m_fem.GetMaterial(el.GetMatID()));
-
-				// make sure this element belongs to the rigid body
-				if (pm && (pm->m_nRB == m_nID))
-				{
-					dens = pm->m_density;
+				// loop over all elements
+				for (int iel=0; iel<pbd->Elements(); ++iel)
+				{	
+					FESolidElement& el = pbd->Element(iel);
 
 					// nr of integration points
 					int nint = el.GaussPoints();

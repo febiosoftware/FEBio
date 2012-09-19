@@ -1,0 +1,26 @@
+#pragma once
+#include <vector>
+using namespace std;
+
+class FEModel;
+
+//-----------------------------------------------------------------------------
+//! This class represents a global system array. It provides functions to assemble
+//! local (element) vectors into this array
+class FEGlobalVector
+{
+public:
+	//! constructor
+	FEGlobalVector(FEModel& fem, vector<double>& R, vector<double>& Fr);
+
+	//! Assemble the element vector into this global vector
+	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
+
+	//! access operator
+	double& operator [] (int i) { return m_R[i]; }
+
+protected:
+	FEModel&			m_fem;	//!< model
+	vector<double>&		m_R;	//!< residual
+	vector<double>&		m_Fr;	//!< nodal reaction forces (TODO: I want to remove this)
+};

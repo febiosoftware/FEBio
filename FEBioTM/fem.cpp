@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FEBioXML/FEBioImport.h"
-#include "FEBioLib/FERigidBody.h"
+#include <FECore/FERigidBody.h>
 #include "FEBioLib/FESlidingInterface.h"
 #include "FEBioLib/FETiedInterface.h"
 #include "FEBioLib/FERigidWallInterface.h"

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEExplicitSolidSolver.h"
 #include "FEElasticSolidDomain.h"
-#include "FERigidBody.h"
-#include "FERigid.h"
+#include <FECore/FERigidBody.h>
+#include <FECore/FERigid.h>
 #include "FEPointBodyForce.h"
 #include "log.h"
 

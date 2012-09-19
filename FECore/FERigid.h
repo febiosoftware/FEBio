@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FECore/FEElasticMaterial.h"
+#include "FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Rigd body material data

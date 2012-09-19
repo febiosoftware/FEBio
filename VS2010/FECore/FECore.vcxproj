@@ -485,6 +485,7 @@
     <ClInclude Include="..\..\FECore\FEElementLibrary.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
+    <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
@@ -502,6 +503,8 @@
     <ClInclude Include="..\..\FECore\FEOctree.h" />
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
+    <ClInclude Include="..\..\FECore\FERigid.h" />
+    <ClInclude Include="..\..\FECore\FERigidBody.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
@@ -540,6 +543,7 @@
     <ClCompile Include="..\..\FECore\FEElementLibrary.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
+    <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
     <ClCompile Include="..\..\FECore\FEMaterial.cpp" />
@@ -553,6 +557,8 @@
     <ClCompile Include="..\..\FECore\FEOctree.cpp" />
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
+    <ClCompile Include="..\..\FECore\FERigid.cpp" />
+    <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />

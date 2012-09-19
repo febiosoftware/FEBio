@@ -591,8 +591,6 @@
     <ClInclude Include="..\..\FEBioLib\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEPoroTraction.h" />
     <ClInclude Include="..\..\FEBioLib\FEPressureLoad.h" />
-    <ClInclude Include="..\..\FEBioLib\FERigid.h" />
-    <ClInclude Include="..\..\FEBioLib\FERigidBody.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidShellDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidSolidDomain.h" />
@@ -739,8 +737,6 @@
     <ClCompile Include="..\..\FEBioLib\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPoroTraction.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPressureLoad.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FERigid.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FERigidBody.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidSolidDomain.cpp" />

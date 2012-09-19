@@ -16,7 +16,7 @@
 #include "FEUT4Domain.h"
 #include "FEPointConstraint.h"
 #include "FEAugLagLinearConstraint.h"
-#include "FERigidBody.h"
+#include <FECore/FERigidBody.h>
 #include "FERigidJoint.h"
 #include "FESlidingInterfaceBW.h"
 

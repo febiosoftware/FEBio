@@ -3,7 +3,7 @@
 #include "FELinearSolidDomain.h"
 #include "FECore/FENodeReorder.h"
 #include "FEPressureLoad.h"
-#include "FERigid.h"
+#include <FECore/FERigid.h>
 #include "log.h"
 
 //-----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioModel.h"
-#include "FERigid.h"
-#include "FERigidBody.h"
+#include <FECore/FERigid.h>
+#include <FECore/FERigidBody.h>
 #include "FERigidJoint.h"
 #include "FEDiscreteMaterial.h"
 #include "FEElasticSolidDomain.h"
@@ -9,7 +9,6 @@
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
-#include "FEBioLib/FERigid.h"
 #include "FESlidingInterface.h"
 #include "FETiedInterface.h"
 #include "FETiedBiphasicInterface.h"
@@ -42,7 +41,7 @@
 #include "FEConstBodyForce.h"
 #include "FEPointConstraint.h"
 #include "FEAugLagLinearConstraint.h"
-#include "FERigidBody.h"
+#include <FECore/FERigidBody.h>
 #include "NodeDataRecord.h"
 #include "ElementDataRecord.h"
 #include "RigidBodyDataRecord.h"

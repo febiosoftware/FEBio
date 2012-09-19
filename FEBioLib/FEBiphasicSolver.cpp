@@ -5,7 +5,7 @@
 #include "FEElasticDomain.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEPressureLoad.h"
-#include "FERigidBody.h"
+#include <FECore/FERigidBody.h>
 #include "log.h"
 
 #ifdef WIN32

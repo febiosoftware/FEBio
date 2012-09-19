@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "FERigidJoint.h"
 #include "log.h"
-#include "FERigidBody.h"
+#include <FECore/FERigidBody.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);

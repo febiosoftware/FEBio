@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEAnalysisStep.h"
-#include "FERigid.h"
+#include <FECore/FERigid.h>
 #include "FEUncoupledMaterial.h"
 #include "FESolidSolver.h"
 #include "FEHeatSolver.h"
@@ -9,7 +9,7 @@
 #include "FELinearSolidSolver.h"
 #include "FECoupledHeatSolidSolver.h"
 #include "FEExplicitSolidSolver.h"
-#include "FERigidBody.h"
+#include <FECore/FERigidBody.h>
 #include "log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))

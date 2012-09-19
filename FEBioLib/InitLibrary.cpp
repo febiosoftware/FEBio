@@ -54,7 +54,7 @@
 #include "FEPermRefIso.h"
 #include "FEPermRefOrtho.h"
 #include "FEPermRefTransIso.h"
-#include "FERigid.h"
+#include <FECore/FERigid.h>
 #include "FEStVenantKirchhoff.h"
 #include "FESolubConst.h"
 #include "FESupplyBinding.h"
