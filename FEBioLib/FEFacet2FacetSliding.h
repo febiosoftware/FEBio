@@ -54,7 +54,7 @@ public:
 	void ShallowCopy(FEContactInterface& ci);
 
 	//! calculate contact forces
-	void ContactForces(vector<double>& F, FENLSolver* psolver);
+	void ContactForces(FEGlobalVector& R);
 
 	//! calculate contact stiffness
 	void ContactStiffness(FENLSolver* psolver);

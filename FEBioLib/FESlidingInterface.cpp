@@ -468,7 +468,7 @@ void FESlidingInterface::Update(int niter)
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
+void FESlidingInterface::ContactForces(FEGlobalVector& R)
 {
 	int j, k, l, m, n, np;
 	int nseln, nmeln, ndof;
@@ -591,7 +591,7 @@ void FESlidingInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 					for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
 					// assemble into global force vector
-					psolver->AssembleResidual(en, lm, fe, F);
+					R.Assemble(en, lm, fe);
 				}
 			}
 		}

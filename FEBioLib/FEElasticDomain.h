@@ -27,13 +27,13 @@ public:
 //	virtual void Residual(FENLSolver* psolver, vector<double>& R) = 0;
 
 	//! calculate the internal forces
-	virtual void InternalForces(FENLSolver* psolver, vector<double>& R) = 0;
+	virtual void InternalForces(FEGlobalVector& R) = 0;
 
 	//! Calculate the body force vector
-	virtual void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R) = 0;
+	virtual void BodyForce(FEGlobalVector& R, FEBodyForce& bf) = 0;
 
 	//! calculate the interial forces (for dynamic problems)
-	virtual void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) = 0;
+	virtual void InertialForces(FEGlobalVector& R, vector<double>& F) = 0;
 
 	// --- S T I F F N E S S   M A T R I X ---
 

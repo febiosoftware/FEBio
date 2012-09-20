@@ -35,7 +35,7 @@ public:
 	void Init() {}
 
 	//! calculates the joint forces
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	void Residual(FEGlobalVector& R);
 
 	//! calculates the joint stiffness
 	void StiffnessMatrix(FENLSolver* psolver);

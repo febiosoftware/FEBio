@@ -19,7 +19,7 @@ public:
 public:
 
 	//! calculates the residual
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
@@ -29,10 +29,10 @@ public:
 
 protected: // element residual contributions
 	//! Calculates the internal stress vector for enhanced strain hex elements
-	void UDGInternalForces(FEModel& fem, FESolidElement& el, vector<double>& fe);
+	void UDGInternalForces(FESolidElement& el, vector<double>& fe);
 
 	//! calculates hourglass forces for the UDG element
-	void UDGHourglassForces(FEModel& fem, FESolidElement& el, vector<double>& fe);
+	void UDGHourglassForces(FESolidElement& el, vector<double>& fe);
 
 protected: // element stiffness contributions
 	//! hourglass stiffness for UDG hex elements

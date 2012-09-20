@@ -1332,7 +1332,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 		// aug lag linear constraints
 		ar >> n;
-		int ntype;
+//		int ntype;
 		m_NLC.clear();
 		for (i=0; i<n; ++i)
 		{

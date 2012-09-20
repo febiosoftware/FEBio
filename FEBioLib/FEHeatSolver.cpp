@@ -177,19 +177,23 @@ void FEHeatSolver::Update(vector<double>& u)
 //! Calculate the residual
 void FEHeatSolver::Residual()
 {
+	vector<double> dummy(m_R);
+
+	FEGlobalVector RHS(GetFEModel(), m_R, dummy);
+
 	// intialize residual to zero
 	zero(m_R);
 
 	// Add nodal flux contributions
-	NodalFluxes(m_R);
+	NodalFluxes(RHS);
 
 	// add surface fluxes
-	SurfaceFluxes(m_R);
+	SurfaceFluxes(RHS);
 }
 
 //-----------------------------------------------------------------------------
 //! Add nodal fluxes to residual
-void FEHeatSolver::NodalFluxes(vector<double>& R)
+void FEHeatSolver::NodalFluxes(FEGlobalVector& R)
 {
 	int i, id, bc, lc, n;
 	double s, f;
@@ -223,13 +227,13 @@ void FEHeatSolver::NodalFluxes(vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! Calculate heat surface flux contribution to residual.
-void FEHeatSolver::SurfaceFluxes(vector<double>& R)
+void FEHeatSolver::SurfaceFluxes(FEGlobalVector& R)
 {
 	int nsl = m_fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
 		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.SurfaceLoad(i));
-		if (phf) phf->Residual(this, R);
+		if (phf) phf->Residual(R);
 	}
 }
 

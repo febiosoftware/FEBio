@@ -282,7 +282,7 @@ void FERigidWallInterface::Update(int niter)
 
 //-----------------------------------------------------------------------------
 
-void FERigidWallInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
+void FERigidWallInterface::ContactForces(FEGlobalVector& R)
 {
 	int j, k, m, n;
 	int nseln;
@@ -383,7 +383,7 @@ void FERigidWallInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 				en[0] = sel.m_node[n];
 
 				// assemble into global force vector
-				psolver->AssembleResidual(en, lm, fe, F);
+				R.Assemble(en, lm, fe);
 			}
 		}
 	}

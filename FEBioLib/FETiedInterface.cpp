@@ -163,7 +163,7 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 //-----------------------------------------------------------------------------
 //! This function calculates the contact forces for a tied interface.
 
-void FETiedInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
+void FETiedInterface::ContactForces(FEGlobalVector& R)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -309,7 +309,7 @@ void FETiedInterface::ContactForces(vector<double>& F, FENLSolver* psolver)
 				for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
 				// assemble into global force vector
-				psolver->AssembleResidual(en, lm, fe, F);
+				R.Assemble(en, lm, fe);
 			}
 		}
 	}

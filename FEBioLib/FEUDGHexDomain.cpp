@@ -5,10 +5,8 @@
 double FEUDGHexDomain::m_hg = 1.0;
 
 //-----------------------------------------------------------------------------
-void FEUDGHexDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
+void FEUDGHexDomain::InternalForces(FEGlobalVector& R)
 {
-	FEModel& fem = psolver->GetFEModel();
-
 	// element force vector
 	vector<double> fe;
 
@@ -25,13 +23,13 @@ void FEUDGHexDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
 		fe.assign(ndof, 0);
 
 		// calculate internal force vector
-		UDGInternalForces(fem, el, fe);
+		UDGInternalForces(el, fe);
 
 		// get the element's LM vector
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
@@ -40,7 +38,7 @@ void FEUDGHexDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
 //! calculates the internal equivalent nodal forces for enhanced strain
 //! solid elements.
 
-void FEUDGHexDomain::UDGInternalForces(FEModel& fem, FESolidElement& el, vector<double>& fe)
+void FEUDGHexDomain::UDGInternalForces(FESolidElement& el, vector<double>& fe)
 {
 	// get the stress data
 	FEMaterialPoint& mp = *el.m_State[0];
@@ -77,14 +75,14 @@ void FEUDGHexDomain::UDGInternalForces(FEModel& fem, FESolidElement& el, vector<
 	}
 
 	// add hourglass forces
-	UDGHourglassForces(fem, el, fe);
+	UDGHourglassForces(el, fe);
 }
 
 
 //-----------------------------------------------------------------------------
 //! calculates the hourglass forces
 
-void FEUDGHexDomain::UDGHourglassForces(FEModel& fem, FESolidElement &el, vector<double> &fe)
+void FEUDGHexDomain::UDGHourglassForces(FESolidElement &el, vector<double> &fe)
 {
 	int i;
 

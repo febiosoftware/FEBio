@@ -266,9 +266,9 @@ void FEPressureLoad::StiffnessMatrix(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::Residual(FENLSolver* psolver, vector<double>& R)
+void FEPressureLoad::Residual(FEGlobalVector& R)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = R.GetFEModel();
 
 	vector<double> fe;
 	vector<int> lm;
@@ -299,6 +299,6 @@ void FEPressureLoad::Residual(FENLSolver* psolver, vector<double>& R)
 		m_psurf->UnpackLM(el, lm);
 
 		// add element force vector to global force vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }

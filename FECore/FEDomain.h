@@ -4,6 +4,7 @@
 #include "DumpFile.h"
 #include "FE_enum.h"
 #include "FENLSolver.h"
+#include "FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of classes

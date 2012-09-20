@@ -19,7 +19,7 @@ public:
 	virtual void StiffnessMatrix(FENLSolver* psolver) = 0;
 
 	//! calculate residual
-	virtual void Residual(FENLSolver* psolver, vector<double>& R) = 0;
+	virtual void Residual(FEGlobalVector& R) = 0;
 
 	//! serialization
 	virtual void Serialize(DumpFile& ar) = 0;

@@ -36,7 +36,7 @@ public:
 	void StiffnessMatrix(FENLSolver* psolver) {}
 	
 	//! residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	void Residual(FEGlobalVector& R);
 
 	//! serialization
 	void Serialize(DumpFile& ar);

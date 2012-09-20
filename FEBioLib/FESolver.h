@@ -41,7 +41,7 @@ public:
 
 public:
 	//! assemble into global residual (TODO: this is only used by rigid joints)
-	void AssembleResidual(vector<int>& lm, vector<double>& fe, vector<double>& R);
+//	void AssembleResidual(vector<int>& lm, vector<double>& fe, vector<double>& R);
 
 	//! assemble global stiffness matrix (TODO: this is only used by rigid joints)
 	void AssembleStiffness(vector<int>& elm, matrix& ke);

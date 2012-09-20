@@ -51,17 +51,17 @@ public: // overrides from FEElasticDomain
 	void UpdateStresses(FEModel& fem);
 
 	//! calculates the internal force vector
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
 protected:
 	//! calculates the nodal internal forces
-	void NodalInternalForces(FENLSolver* psolver, vector<double>& R);
+	void NodalInternalForces(FEGlobalVector& R);
 
 	//! calculates the element internal forces
-	void ElementInternalForces(FENLSolver* psolver, vector<double>& R);
+	void ElementInternalForces(FEGlobalVector& R);
 
 	//! Calculates the internal stress vector for solid elements
 	void ElementInternalForces(FESolidElement& el, vector<double>& fe);

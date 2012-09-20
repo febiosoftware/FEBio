@@ -25,7 +25,7 @@ void FEPointConstraint::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::Residual(FENLSolver* psolver, vector<double> &R)
+void FEPointConstraint::Residual(FEGlobalVector& R)
 {
 	int i;
 	FEMesh& m = m_pfem->GetMesh();
@@ -79,7 +79,7 @@ void FEPointConstraint::Residual(FENLSolver* psolver, vector<double> &R)
 	}
 
 	// assemble residual
-	psolver->AssembleResidual(en, LM, fe, R);
+	R.Assemble(en, LM, fe);
 }
 
 //-----------------------------------------------------------------------------

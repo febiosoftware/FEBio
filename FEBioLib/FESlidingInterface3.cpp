@@ -872,7 +872,7 @@ void FESlidingInterface3::ShallowCopy(FEContactInterface &ci)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
+void FESlidingInterface3::ContactForces(FEGlobalVector& R)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
@@ -1021,7 +1021,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 					for (k=0; k<ndof; ++k) fe[k] += tn*N[k]*detJ[j]*w[j];
 					
 					// assemble the global residual
-					psolver->AssembleResidual(en, LM, fe, F);
+					R.Assemble(en, LM, fe);
 					
 					// do the biphasic stuff
 					// TODO: I should only do this when the node is actually in contact
@@ -1052,7 +1052,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 							for (k=0; k<ndof; ++k) fe[k] += dt*wn*N[k]*detJ[j]*w[j];
 							
 							// assemble residual
-							psolver->AssembleResidual(en, LM, fe, F);
+							R.Assemble(en, LM, fe);
 						}
 						if (ssolu && msolu && (sid == mid))
 						{
@@ -1078,7 +1078,7 @@ void FESlidingInterface3::ContactForces(vector<double> &F, FENLSolver* psolver)
 							for (k=0; k<ndof; ++k) fe[k] += dt*jn*N[k]*detJ[j]*w[j];
 							
 							// assemble residual
-							psolver->AssembleResidual(en, LM, fe, F);
+							R.Assemble(en, LM, fe);
 						}
 					}
 				}

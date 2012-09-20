@@ -4,10 +4,10 @@
 
 //-----------------------------------------------------------------------------
 //! Calculate the heat flux residual
-void FEHeatFlux::Residual(FENLSolver* psolver, vector<double>& R)
+void FEHeatFlux::Residual(FEGlobalVector& R)
 {
 	int i, j, n;
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = R.GetFEModel();
 	vector<int> elm;
 
 	int nfc = m_psurf->Elements();

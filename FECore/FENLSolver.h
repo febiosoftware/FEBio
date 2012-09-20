@@ -28,10 +28,10 @@ public:
 
 public:
 	//! assemble into global residual (TODO: this is only used by rigid joints)
-	virtual void AssembleResidual(vector<int>& lm, vector<double>& fe, vector<double>& R) { assert(false); }
+//	virtual void AssembleResidual(vector<int>& lm, vector<double>& fe, vector<double>& R) { assert(false); }
 
 	//! assemble the element residual into the global residual
-	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) = 0;
+//	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) = 0;
 
 	//! assemble global stiffness matrix (TODO: this is only used by rigid joints)
 	virtual void AssembleStiffness(vector<int>& elm, matrix& ke) { assert(false); }

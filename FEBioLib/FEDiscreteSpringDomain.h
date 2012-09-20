@@ -27,17 +27,17 @@ public: // overridden from FEElasticDomain
 	void BodyForceStiffness  (FENLSolver* psolver, FEBodyForce& bf) {}
 
 	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
+	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
 
 	//! calculate residual
-//	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FEGlobalVector& R);
 
 	//! update stresses (not used for discrete springs)
 	void UpdateStresses(FEModel& fem){}	
 
 	//! internal stress forces
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R);
 
 	//! calculate bodyforces (not used since springs are considered mass-less)
-	void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R) {}
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) {}
 };

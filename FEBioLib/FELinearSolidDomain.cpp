@@ -286,7 +286,7 @@ void FELinearSolidDomain::ElementStiffness(FESolidElement &el, matrix &ke)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::RHS(FENLSolver *psolver, vector<double>& R)
+void FELinearSolidDomain::RHS(FEGlobalVector& R)
 {
 	// element force vector
 	vector<double> fe;
@@ -316,7 +316,7 @@ void FELinearSolidDomain::RHS(FENLSolver *psolver, vector<double>& R)
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 

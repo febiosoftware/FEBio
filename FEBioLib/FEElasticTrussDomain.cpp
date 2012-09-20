@@ -159,7 +159,7 @@ void FEElasticTrussDomain::Residual(FENLSolver* psolver, vector<double>& R)
 */
 //----------------------------------------------------------------------------
 
-void FEElasticTrussDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+void FEElasticTrussDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector
 	vector<double> fe;
@@ -170,7 +170,7 @@ void FEElasticTrussDomain::InternalForces(FENLSolver* psolver, vector<double>& R
 		FETrussElement& el = m_Elem[i];
 		ElementInternalForces(el, fe);
 		UnpackLM(el, lm);
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 

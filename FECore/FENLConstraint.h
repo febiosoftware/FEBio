@@ -2,6 +2,7 @@
 #include "FENLSolver.h"
 #include "DumpFile.h"
 #include "FEParameterList.h"
+#include "FEGlobalVector.h"
 #include <vector>
 using namespace std;
 
@@ -23,7 +24,7 @@ public:
 
 public:
 	virtual void Init() = 0;
-	virtual void Residual(FENLSolver* psolver, vector<double>& R) = 0;
+	virtual void Residual(FEGlobalVector& R) = 0;
 	virtual void StiffnessMatrix(FENLSolver* psolver) = 0;
 	virtual bool Augment(int naug) = 0;
 	virtual void Serialize(DumpFile& ar) = 0;

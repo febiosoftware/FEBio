@@ -171,7 +171,7 @@ void FEElasticShellDomain::Residual(FENLSolver* psolver, vector<double>& R)
 
 //-----------------------------------------------------------------------------
 // Calculates the forces due to the stress
-void FEElasticShellDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+void FEElasticShellDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector
 	vector<double> fe;
@@ -195,7 +195,7 @@ void FEElasticShellDomain::InternalForces(FENLSolver* psolver, vector<double>& R
 		UnpackLM(el, lm);
 
 		// assemble the residual
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
@@ -290,7 +290,7 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 
 //-----------------------------------------------------------------------------
 
-void FEElasticShellDomain::BodyForce(FENLSolver* psolver, FEBodyForce& BF, vector<double>& R)
+void FEElasticShellDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
 	// element force vector
 	vector<double> fe;
@@ -314,7 +314,7 @@ void FEElasticShellDomain::BodyForce(FENLSolver* psolver, FEBodyForce& BF, vecto
 		UnpackLM(el, lm);
 
 		// assemble the residual
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 

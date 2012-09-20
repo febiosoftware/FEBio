@@ -18,7 +18,7 @@ public:
 	void StiffnessMatrix(FENLSolver* psolver);
 
 	//! calculates the internal forces (nothing to do)
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R);
 
 	// update stresses
 	void UpdateStresses(FEModel& fem);

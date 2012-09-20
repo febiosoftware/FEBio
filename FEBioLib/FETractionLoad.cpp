@@ -4,9 +4,9 @@
 
 //-----------------------------------------------------------------------------
 //! Calculate the residual for the traction load
-void FETractionLoad::Residual(FENLSolver* psolver, vector<double>& R)
+void FETractionLoad::Residual(FEGlobalVector& R)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = R.GetFEModel();
 
 	vector<double> fe;
 	vector<int> lm;
@@ -78,7 +78,7 @@ void FETractionLoad::Residual(FENLSolver* psolver, vector<double>& R)
 		m_psurf->UnpackLM(el, lm);
 
 		// add element force vector to global force vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 

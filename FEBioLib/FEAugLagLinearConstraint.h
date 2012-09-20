@@ -60,7 +60,7 @@ public:
 	void Serialize(DumpFile& ar);
 
 	//! add the linear constraint contributions to the residual
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	void Residual(FEGlobalVector& R);
 
 	//! add the linear constraint contributions to the stiffness matrix
 	void StiffnessMatrix(FENLSolver* psolver);

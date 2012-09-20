@@ -250,8 +250,10 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 
 	// first calculate the initial residual
 	vector<double> R0; R0.assign(48, 0);
-	solver.ContactForces(R0);
-//	solver.Residual(R0);
+	vector<double> dummy(R0);
+	FEGlobalVector RHS0(m_fem, R0, dummy);
+	solver.ContactForces(RHS0);
+//	solver.Residual(RHS);
 
 	// now calculate the perturbed residuals
 	K.Create(48);
@@ -275,7 +277,8 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 		solver.UpdateContact();
 
 		zero(R1);
-		solver.ContactForces(R1);
+		FEGlobalVector RHS1(m_fem, R1, dummy);
+		solver.ContactForces(RHS1);
 //		solver.Residual(R1);
 
 		switch (nj)

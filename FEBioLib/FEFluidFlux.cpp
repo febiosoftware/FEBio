@@ -543,9 +543,9 @@ void FEFluidFlux::StiffnessMatrix(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::Residual(FENLSolver* psolver, vector<double>& R)
+void FEFluidFlux::Residual(FEGlobalVector& R)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = R.GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 
 	vector<double> fe;
@@ -581,7 +581,7 @@ void FEFluidFlux::Residual(FENLSolver* psolver, vector<double>& R)
 					FlowRateSS(el, fe, wn, dt, m_bmixture);
 				
 				// add element force vector to global force vector
-				psolver->AssembleResidual(el.m_node, elm, fe, R);
+				R.Assemble(el.m_node, elm, fe);
 			}
 		}
 	}
@@ -611,7 +611,7 @@ void FEFluidFlux::Residual(FENLSolver* psolver, vector<double>& R)
 					FlowRate(el, fe, wn, dt, m_bmixture);
 				
 				// add element force vector to global force vector
-				psolver->AssembleResidual(el.m_node, elm, fe, R);
+				R.Assemble(el.m_node, elm, fe);
 			}
 		}
 	}

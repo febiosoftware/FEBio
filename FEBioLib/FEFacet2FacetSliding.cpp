@@ -310,7 +310,7 @@ void FEFacet2FacetSliding::ShallowCopy(FEContactInterface &ci)
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::ContactForces(vector<double>& F, FENLSolver* psolver)
+void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 {
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
@@ -466,7 +466,7 @@ void FEFacet2FacetSliding::ContactForces(vector<double>& F, FENLSolver* psolver)
 					for (k=0; k<ndof; ++k) fe[k] *= tn*detJ[j]*w[j];
 
 					// assemble the global residual
-					psolver->AssembleResidual(en, LM, fe, F);
+					R.Assemble(en, LM, fe);
 				}
 			}
 		}

@@ -88,7 +88,7 @@ public:
 	double Penalty() { return m_eps; }
 
 	//! calculate contact forces
-	virtual void ContactForces(vector<double>& F, FENLSolver* psolver);
+	virtual void ContactForces(FEGlobalVector& R);
 
 	//! calculate contact stiffness
 	virtual void ContactStiffness(FENLSolver* psolver);

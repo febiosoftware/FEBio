@@ -280,9 +280,9 @@ void FESoluteFlux::StiffnessMatrix(FENLSolver* psolver)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::Residual(FENLSolver* psolver, vector<double>& R)
+void FESoluteFlux::Residual(FEGlobalVector& R)
 {
-	FEModel& fem = psolver->GetFEModel();
+	FEModel& fem = R.GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;
 	
 	vector<double> fe;
@@ -322,7 +322,7 @@ void FESoluteFlux::Residual(FENLSolver* psolver, vector<double>& R)
 				lm[i] = elm[(11+m_isol)*neln+i];
 			
 			// add element force vector to global force vector
-			psolver->AssembleResidual(el.m_node, lm, fe, R);
+			R.Assemble(el.m_node, lm, fe);
 		}
 	}
 }

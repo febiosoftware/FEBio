@@ -28,7 +28,7 @@ public:
 
 public:
 	//! assemble the element residual into the global residual
-	void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
+//	void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R);
 
 public:
 
@@ -53,11 +53,11 @@ public:
 
 	bool Residual(vector<double>& R);
 
-	void NonLinearConstraintForces(vector<double> &R);
+	void NonLinearConstraintForces(FEGlobalVector& R);
 
-	void InertialForces(vector<double>& R);
+	void InertialForces(FEGlobalVector& R);
 	
-	void ContactForces(vector<double>& R);
+	void ContactForces(FEGlobalVector& R);
 
 private:
 	//! TODO: I have to overload this but I need to remove this.

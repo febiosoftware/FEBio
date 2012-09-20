@@ -43,7 +43,7 @@ void FERigidJoint::ShallowCopy(FERigidJoint& rj)
 
 //-----------------------------------------------------------------------------
 // TODO: Why is this class not using the FENLSolver for assembly?
-void FERigidJoint::Residual(FENLSolver* psolver, vector<double>& R)
+void FERigidJoint::Residual(FEGlobalVector& R)
 {
 	vector<double> fa(6);
 	vector<double> fb(6);
@@ -83,11 +83,8 @@ void FERigidJoint::Residual(FENLSolver* psolver, vector<double>& R)
 	fb[4] = -a.z*m_F.x+a.x*m_F.z;
 	fb[5] = -a.x*m_F.y+a.y*m_F.x;
 
-	psolver->AssembleResidual(lma, fa, R);
-	psolver->AssembleResidual(lmb, fb, R);
-
-//	for (i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fe[i];
-//	for (i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fe[i];
+	for (int i=0; i<6; ++i) if (RBa.m_LM[i] >= 0) R[RBa.m_LM[i]] += fa[i];
+	for (int i=0; i<6; ++i) if (RBb.m_LM[i] >= 0) R[RBb.m_LM[i]] += fb[i];
 }
 
 //-----------------------------------------------------------------------------

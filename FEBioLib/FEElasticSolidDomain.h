@@ -42,13 +42,13 @@ public: // overrides from FEElasticDomain
 //	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! intertial forces for dynamic problems
-	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F);
+	void InertialForces(FEGlobalVector& R, vector<double>& F);
 
 	//! internal stress forces
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R);
 
 	//! body forces
-	void BodyForce(FENLSolver* psolver, FEBodyForce& BF, vector<double>& R);
+	void BodyForce(FEGlobalVector& R, FEBodyForce& BF);
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);

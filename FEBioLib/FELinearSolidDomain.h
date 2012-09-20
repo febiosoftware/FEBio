@@ -1,8 +1,8 @@
 #pragma once
 
-#include "FECore/FESolidDomain.h"
-#include "FECore/FENLSolver.h"
-#include "FECore/FEModel.h"
+#include <FECore/FESolidDomain.h>
+#include <FECore/FENLSolver.h>
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 class FELinearElasticDomain
@@ -10,7 +10,7 @@ class FELinearElasticDomain
 public:
 	virtual ~FELinearElasticDomain(){}
 	virtual void StiffnessMatrix(FENLSolver* psolver) = 0;
-	virtual void RHS(FENLSolver* psolver, vector<double>& R) = 0;
+	virtual void RHS(FEGlobalVector& R) = 0;
 	virtual void UpdateStresses(FEModel& fem) = 0;
 };
 
@@ -43,7 +43,7 @@ public: // overrides from FELinearElasticDomain
 	void StiffnessMatrix(FENLSolver* psolver);
 
 	// Calculate the RHS vector
-	void RHS(FENLSolver* psolver, vector<double>& R);
+	void RHS(FEGlobalVector& R);
 
 	//! Update the element stresses
 	void UpdateStresses(FEModel& fem);

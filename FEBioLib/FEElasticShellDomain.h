@@ -36,13 +36,13 @@ public: // overrides from FEElasticDomain
 //	void Residual(FENLSolver* psolver, vector<double>& R);
 
 	//! internal stress forces
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R);
 
 	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
+	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
 
 	//! calculate body force
-	void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R);
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf);
 
 	// update stresses
 	void UpdateStresses(FEModel& fem);

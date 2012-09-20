@@ -166,7 +166,7 @@ void FEDiscreteSpringDomain::Residual(FENLSolver* psolver, vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)
 
-void FEDiscreteSpringDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)
 {
 	FEMesh& mesh = *m_pMesh;
 
@@ -223,7 +223,7 @@ void FEDiscreteSpringDomain::InternalForces(FENLSolver* psolver, vector<double>&
 		lm[5] = n2.m_ID[DOF_Z];
 
 		// assemble element
-		psolver->AssembleResidual(en, lm, fe, R);
+		R.Assemble(en, lm, fe);
 	}
 }
 

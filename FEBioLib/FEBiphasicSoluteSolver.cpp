@@ -496,6 +496,9 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	// zero nodal reaction forces
 	zero(m_Fr);
 
+	// setup global RHS vector
+	FEGlobalVector RHS(GetFEModel(), R, m_Fr);
+
 	// zero rigid body reaction forces
 	int NRB = m_fem.Objects();
 	for (i=0; i<NRB; ++i)
@@ -519,7 +522,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	for (i=0; i<mesh.Domains(); ++i) 
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.InternalForces(this, R);
+		dom.InternalForces(RHS);
 	}
 
 	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
@@ -560,19 +563,19 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(this, R);
+		if (psl->IsActive()) psl->Residual(RHS);
 	}
 
 	// calculate contact forces
 	if (m_fem.ContactInterfaces() > 0)
 	{
-		ContactForces(R);
+		ContactForces(RHS);
 	}
 
 	// calculate linear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	NonLinearConstraintForces(R);
+	NonLinearConstraintForces(RHS);
 
 	// set the nodal reaction forces
 	// TODO: Is this a good place to do this?

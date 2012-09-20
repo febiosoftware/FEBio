@@ -19,6 +19,9 @@ public:
 	//! access operator
 	double& operator [] (int i) { return m_R[i]; }
 
+	//! Get the FE model
+	FEModel& GetFEModel() { return m_fem; }
+
 protected:
 	FEModel&			m_fem;	//!< model
 	vector<double>&		m_R;	//!< residual

@@ -235,6 +235,10 @@ void FELinearSolidSolver::Residual()
 {
 	zero(m_R);
 
+	vector<double> dummy(m_R);
+
+	FEGlobalVector RHS(GetFEModel(), m_R, dummy);
+
 	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
@@ -265,7 +269,7 @@ void FELinearSolidSolver::Residual()
 	for (int i=0; i<pstep->Domains(); ++i) 
 	{
 		FELinearElasticDomain& d = dynamic_cast<FELinearElasticDomain&>(*pstep->Domain(i));
-		d.RHS(this, m_R);
+		d.RHS(RHS);
 	}
 
 	// add contribution of linear surface loads
@@ -273,7 +277,7 @@ void FELinearSolidSolver::Residual()
 	for (int i=0; i<nsl; ++i)
 	{
 		FEPressureLoad* pl = dynamic_cast<FEPressureLoad*>(m_fem.SurfaceLoad(i));
-		if (pl && (pl->IsLinear())) pl->Residual(this, m_R);
+		if (pl && (pl->IsLinear())) pl->Residual(RHS);
 	}
 }
 

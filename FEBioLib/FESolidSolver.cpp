@@ -1781,9 +1781,9 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 
 //-----------------------------------------------------------------------------
 //! Calculates the contact forces
-void FESolidSolver::ContactForces(vector<double>& R)
+void FESolidSolver::ContactForces(FEGlobalVector& R)
 {
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactForces(R, this);
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactForces(R);
 }
 
 //-----------------------------------------------------------------------------
@@ -1801,6 +1801,9 @@ bool FESolidSolver::Residual(vector<double>& R)
 	// zero nodal reaction forces
 	zero(m_Fr);
 
+	// setup the global vector
+	FEGlobalVector RHS(GetFEModel(), R, m_Fr);
+
 	// zero rigid body reaction forces
 	int NRB = m_fem.Objects();
 	for (i=0; i<NRB; ++i)
@@ -1816,7 +1819,7 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (i=0; i<mesh.Domains(); ++i)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		dom.InternalForces(this, R);
+		dom.InternalForces(RHS);
 	}
 
 	// update body forces
@@ -1840,31 +1843,31 @@ bool FESolidSolver::Residual(vector<double>& R)
 		for (int j=0; j<m_fem.BodyForces(); ++j)
 		{
 			FEBodyForce& BF = *m_fem.GetBodyForce(j);
-			dom.BodyForce(this, BF, R);
+			dom.BodyForce(RHS, BF);
 		}
 	}
 
 	// calculate inertial forces for dynamic problems
-	if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(R);
+	if (m_fem.GetCurrentStep()->m_nanalysis == FE_DYNAMIC) InertialForces(RHS);
 
 	// calculate forces due to surface loads
 	int nsl = m_fem.SurfaceLoads();
 	for (i=0; i<nsl; ++i)
 	{
 		FESurfaceLoad* psl = m_fem.SurfaceLoad(i);
-		if (psl->IsActive()) psl->Residual(this, R);
+		if (psl->IsActive()) psl->Residual(RHS);
 	}
 
 	// calculate contact forces
 	if (m_fem.ContactInterfaces() > 0)
 	{
-		ContactForces(R);
+		ContactForces(RHS);
 	}
 
 	// calculate nonlinear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
-	NonLinearConstraintForces(R);
+	NonLinearConstraintForces(RHS);
 
 	// forces due to point constraints
 //	for (i=0; i<(int) fem.m_PC.size(); ++i) fem.m_PC[i]->Residual(this, R);
@@ -1890,16 +1893,16 @@ bool FESolidSolver::Residual(vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! calculate the nonlinear constraint forces 
-void FESolidSolver::NonLinearConstraintForces(vector<double> &R)
+void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R)
 {
 	int N = m_fem.NonlinearConstraints();
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		plc->Residual(this, R);
+		plc->Residual(R);
 	}
 }
-
+/*
 //-----------------------------------------------------------------------------
 //!  Assembles the element into the global residual. This function
 //!  also checks for rigid dofs and assembles the residual using a condensing
@@ -1976,17 +1979,17 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 				n = lm[3]; if (n >= 0) R[n] += a.y*F.z-a.z*F.y; RB.m_Mr.x -= a.y*F.z-a.z*F.y;
 				n = lm[4]; if (n >= 0) R[n] += a.z*F.x-a.x*F.z; RB.m_Mr.y -= a.z*F.x-a.x*F.z;
 				n = lm[5]; if (n >= 0) R[n] += a.x*F.y-a.y*F.x; RB.m_Mr.z -= a.x*F.y-a.y*F.x;
-/*
+
 				// if the rotational degrees of freedom are constrained for a rigid node
 				// then we need to add an additional component to the residual
-				if (node.m_ID[DOF_RU] == lm[3])
-				{
-					d = node.m_Dt;
-					n = lm[3]; if (n >= 0) R[n] += d.y*F.z-d.z*F.y; RB.m_Mr.x -= d.y*F.z-d.z*F.y;
-					n = lm[4]; if (n >= 0) R[n] += d.z*F.x-d.x*F.z; RB.m_Mr.y -= d.z*F.x-d.x*F.z;
-					n = lm[5]; if (n >= 0) R[n] += d.x*F.y-d.y*F.x; RB.m_Mr.z -= d.x*F.y-d.y*F.x;
-				}
-*/
+//				if (node.m_ID[DOF_RU] == lm[3])
+//				{
+//					d = node.m_Dt;
+//					n = lm[3]; if (n >= 0) R[n] += d.y*F.z-d.z*F.y; RB.m_Mr.x -= d.y*F.z-d.z*F.y;
+//					n = lm[4]; if (n >= 0) R[n] += d.z*F.x-d.x*F.z; RB.m_Mr.y -= d.z*F.x-d.x*F.z;
+//					n = lm[5]; if (n >= 0) R[n] += d.x*F.y-d.y*F.x; RB.m_Mr.z -= d.x*F.y-d.y*F.x;
+//				}
+
 				// add to global force vector
 				n = lm[0]; if (n >= 0) R[n] += F.x; RB.m_Fr.x -= F.x;
 				n = lm[1]; if (n >= 0) R[n] += F.y; RB.m_Fr.y -= F.y;
@@ -1995,7 +1998,7 @@ void FESolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, vector<d
 		}
 	}
 }
-
+*/
 //-----------------------------------------------------------------------------
 //! calculates the concentrated nodal forces
 
@@ -2070,7 +2073,7 @@ void FESolidSolver::NodalForces(vector<double>& F)
 //-----------------------------------------------------------------------------
 //! This function calculates the inertial forces for dynamic problems
 
-void FESolidSolver::InertialForces(vector<double>& R)
+void FESolidSolver::InertialForces(FEGlobalVector& R)
 {
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
@@ -2101,6 +2104,6 @@ void FESolidSolver::InertialForces(vector<double>& R)
 	for (int nd = 0; nd < mesh.Domains(); ++nd)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(nd));
-		dom.InertialForces(this, R, F);
+		dom.InertialForces(R, F);
 	}
 }

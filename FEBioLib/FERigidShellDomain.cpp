@@ -22,7 +22,7 @@ void FERigidShellDomain::StiffnessMatrix(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 //! calculate residual forces for rigid shells
 //!
-void FERigidShellDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+void FERigidShellDomain::InternalForces(FEGlobalVector& R)
 {
 	// Nothing to do.
 }

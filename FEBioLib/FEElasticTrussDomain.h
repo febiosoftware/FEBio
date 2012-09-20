@@ -31,16 +31,16 @@ public: // overloads from FEElasticDomain
 	void UpdateStresses(FEModel& fem);
 
 	//! calculates the residual
-//	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FEGlobalVector& R);
 
 	//! internal stress forces
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FEGlobalVector& R);
 
 	//! calculate body force (TODO: implement this)
-	void BodyForce(FENLSolver* psolver, FEBodyForce& bf, vector<double>& R) { assert(false); }
+	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) { assert(false); }
 
 	//! Calculates inertial forces for dynamic problems
-	void InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F) { assert(false); }
+	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
 
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);

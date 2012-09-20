@@ -198,7 +198,7 @@ void FEPeriodicBoundary::ShallowCopy(FEContactInterface &ci)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
+void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -345,7 +345,7 @@ void FEPeriodicBoundary::ContactForces(vector<double> &F, FENLSolver* psolver)
 				for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
 				// assemble into global force vector
-				psolver->AssembleResidual(en, lm, fe, F);
+				R.Assemble(en, lm, fe);
 			}
 		}
 	}

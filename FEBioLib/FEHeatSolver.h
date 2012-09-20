@@ -43,10 +43,10 @@ protected:
 
 protected:	// Residual functions
 	//! Nodal fluxes
-	void NodalFluxes(vector<double>& R);
+	void NodalFluxes(FEGlobalVector& R);
 
 	//! Surface fluxes
-	void SurfaceFluxes(vector<double>& R);
+	void SurfaceFluxes(FEGlobalVector& R);
 
 public:
 	//! assemble element stiffness matrix
@@ -56,7 +56,7 @@ public:
 	void AssembleResidual(vector<int>& lm, matrix& kc);
 
 private: // TODO: use this function instead
-	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) { assert(false); }
+//	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) { assert(false); }
 
 public:
 	vector<double>	m_T;	//!< temperature array

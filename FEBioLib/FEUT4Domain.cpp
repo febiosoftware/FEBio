@@ -341,18 +341,18 @@ double FEUT4Domain::TetVolume(vec3d* r)
 //-----------------------------------------------------------------------------
 //! The residual is defined as the sum of the nodal residual and the
 //! element residual
-void FEUT4Domain::InternalForces(FENLSolver *psolver, vector<double> &R)
+void FEUT4Domain::InternalForces(FEGlobalVector& R)
 {
 	// Calculate the nodal contribution
-	NodalInternalForces(psolver, R);
+	NodalInternalForces(R);
 
 	// Calculate the element contribution
-	ElementInternalForces(psolver, R);
+	ElementInternalForces(R);
 }
 
 //-----------------------------------------------------------------------------
 //! This function calculates the nodal contribution to the residual
-void FEUT4Domain::NodalInternalForces(FENLSolver* psolver, vector<double>& R)
+void FEUT4Domain::NodalInternalForces(FEGlobalVector& R)
 {
 	// inverse jacobian matrix
 	double Ji[3][3];
@@ -454,7 +454,7 @@ void FEUT4Domain::NodalInternalForces(FENLSolver* psolver, vector<double>& R)
 				fe[2] = w*(Be[0][2]*S.xx() + Be[1][2]*S.yy() + Be[2][2]*S.zz() + Be[3][2]*S.xy() + Be[4][2]*S.yz() + Be[5][2]*S.xz());
 
 				// assemble in global residual
-				psolver->AssembleResidual(en, LM, fe, R);
+				R.Assemble(en, LM, fe);
 			}
 		}
 	}
@@ -462,10 +462,8 @@ void FEUT4Domain::NodalInternalForces(FENLSolver* psolver, vector<double>& R)
 
 //-----------------------------------------------------------------------------
 //! This function calculates the element contribution to the residual
-void FEUT4Domain::ElementInternalForces(FENLSolver* psolver, vector<double>& R)
+void FEUT4Domain::ElementInternalForces(FEGlobalVector& R)
 {
-	FEModel& fem = psolver->GetFEModel();
-
 	// element force vector
 	vector<double> fe;
 
@@ -488,7 +486,7 @@ void FEUT4Domain::ElementInternalForces(FENLSolver* psolver, vector<double>& R)
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 

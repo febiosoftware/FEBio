@@ -243,7 +243,7 @@ void FESurfaceConstraint::ShallowCopy(FEContactInterface &ci)
 
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::ContactForces(vector<double> &F, FENLSolver* psolver)
+void FESurfaceConstraint::ContactForces(FEGlobalVector& R)
 {
 	int j, k, l, m, n;
 	int nseln, nmeln;
@@ -393,7 +393,7 @@ void FESurfaceConstraint::ContactForces(vector<double> &F, FENLSolver* psolver)
 				for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
 				// assemble into global force vector
-				psolver->AssembleResidual(en, lm, fe, F);
+				R.Assemble(en, lm, fe);
 			}
 		}
 	}

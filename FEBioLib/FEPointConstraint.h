@@ -1,6 +1,7 @@
 #pragma once
-#include "FECore/FENLConstraint.h"
-#include "FECore/FEElement.h"
+#include <FECore/FENLConstraint.h>
+#include <FECore/FEElement.h>
+#include <FECore/FEGlobalVector.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a point constraint. That is, it forces a node of a 
@@ -19,7 +20,7 @@ public:
 	void Serialize(DumpFile& ar) {}
 
 	//! Calculate the constraint force
-	void Residual(FENLSolver* psolver, vector<double>& R);
+	void Residual(FEGlobalVector& R);
 
 	//! calculate the constraint stiffness
 	void StiffnessMatrix(FENLSolver* psolver);

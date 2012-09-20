@@ -222,7 +222,7 @@ void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
 */
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::InternalForces(FENLSolver *psolver, vector<double>& R)
+void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 {
 	// element force vector
 	vector<double> fe;
@@ -246,7 +246,7 @@ void FEElasticSolidDomain::InternalForces(FENLSolver *psolver, vector<double>& R
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
@@ -315,7 +315,7 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::BodyForce(FENLSolver *psolver, FEBodyForce& BF, vector<double>& R)
+void FEElasticSolidDomain::BodyForce(FEGlobalVector& R, FEBodyForce& BF)
 {
 	// element force vector
 	vector<double> fe;
@@ -339,7 +339,7 @@ void FEElasticSolidDomain::BodyForce(FENLSolver *psolver, FEBodyForce& BF, vecto
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }
 
@@ -1036,7 +1036,7 @@ void FEElasticSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 // Calculate inertial forces
-void FEElasticSolidDomain::InertialForces(FENLSolver* psolver, vector<double>& R, vector<double>& F)
+void FEElasticSolidDomain::InertialForces(FEGlobalVector& R, vector<double>& F)
 {
 	FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat); assert(pme);
 	double d = pme->Density();
@@ -1095,6 +1095,6 @@ void FEElasticSolidDomain::InertialForces(FENLSolver* psolver, vector<double>& R
 		UnpackLM(el, lm);
 
 		// assemble fe into R
-		psolver->AssembleResidual(el.m_node, lm, fe, R);
+		R.Assemble(el.m_node, lm, fe);
 	}
 }

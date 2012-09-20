@@ -147,7 +147,7 @@ bool FELinearConstraintSet::Augment(int naug)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the residual.
 
-void FELinearConstraintSet::Residual(FENLSolver* psolver, vector<double> &R)
+void FELinearConstraintSet::Residual(FEGlobalVector& R)
 {
 	int M = m_LC.size();
 	list<FEAugLagLinearConstraint*>::iterator  im = m_LC.begin();
