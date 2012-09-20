@@ -554,14 +554,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FERigid.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FERigidBody.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FERigidJoint.cpp"
 				>
 			</File>
@@ -1153,14 +1145,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPressureLoad.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FERigid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FERigidBody.h"
 				>
 			</File>
 			<File

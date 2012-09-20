@@ -280,6 +280,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEGlobalVector.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FELevelStructure.cpp"
 				>
 			</File>
@@ -329,6 +333,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEPlotData.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FERigid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FERigidBody.cpp"
 				>
 			</File>
 			<File
@@ -470,6 +482,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEGlobalVector.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FELevelStructure.h"
 				>
 			</File>
@@ -535,6 +551,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEPlotData.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FERigid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FERigidBody.h"
 				>
 			</File>
 			<File
