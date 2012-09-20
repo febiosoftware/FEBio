@@ -12,11 +12,11 @@
 
 bool FESurface::Init()
 {
-	// make sure this surface has elements
+	// make sure that there is a surface defined
 	if (Elements() == 0) return false;
 
 	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pMesh;
+	FEMesh& mesh = *GetMesh();
 
 	// This array is used to keep tags on each node
 	vector<int> tag; tag.assign(mesh.Nodes(), -1);
@@ -56,6 +56,7 @@ bool FESurface::Init()
 
 	// create the node element list
 	m_NEL.Create(*this);
+	m_NET.Create(this, 1);
 
 	// see if we can find all elements that the faces belong to
 	for (int i=0; i<ne; ++i)
@@ -83,19 +84,8 @@ int FESurface::FindElement(FESurfaceElement& el)
 	for (int i=0; i<nval; ++i)
 	{
 		FEElement& e = *ppe[i];
-		int nfaces = 0;
-		switch (e.Type())
-		{
-		case FE_HEX  : nfaces = 6; break;
-		case FE_PENTA: nfaces = 5; break;
-		case FE_TET  : nfaces = 4; break;
-		case FE_TETG1: nfaces = 4; break;
-		case FE_SHELL_QUAD : nfaces = 1; break;
-		case FE_SHELL_TRI  : nfaces = 1; break;
-		default:
-			assert(false);
-		}
-
+		int nfaces = mesh.Faces(e);
+		
 		int nf[4], nn;
 		for (int j=0; j<nfaces; ++j)
 		{
@@ -149,7 +139,7 @@ void FESurface::UnpackLM(FEElement& el, vector<int>& lm)
 		
 		// concentration dofs
 		for (int k=0; k<MAX_CDOFS; ++k)
-			lm[(11+k)*N+i] = id[DOF_C+k];
+			lm[(11+k)*N + i] = id[DOF_C+k];
 	}
 }
 
