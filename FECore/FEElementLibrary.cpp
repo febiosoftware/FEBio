@@ -34,6 +34,8 @@ FEElementLibrary::FEElementLibrary()
 		n = RegisterTraits(new FENIQuadElementTraits    ); assert(n==FE_NIQUAD);
 		n = RegisterTraits(new FETriElementTraits       ); assert(n==FE_TRI);
 		n = RegisterTraits(new FENITriElementTraits     ); assert(n==FE_NITRI);
+		n = RegisterTraits(new FETri6ElementTraits      ); assert(n==FE_TRI6);
+		n = RegisterTraits(new FENITri6ElementTraits    ); assert(n==FE_NITRI6);
 		n = RegisterTraits(new FEShellQuadElementTraits ); assert(n==FE_SHELL_QUAD);
 		n = RegisterTraits(new FEShellTriElementTraits  ); assert(n==FE_SHELL_TRI);
 		n = RegisterTraits(new FETrussElementTraits     ); assert(n==FE_TRUSS);

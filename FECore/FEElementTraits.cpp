@@ -1123,6 +1123,170 @@ void FENITriElementTraits::init()
 	}
 }
 
+
+//*****************************************************************************
+//                          F E T R I 6 E L E M E N T
+//*****************************************************************************
+
+void FETri6ElementTraits::init()
+{
+	int n;
+	
+	const double a = 1.0 / 6.0;
+	const double b = 2.0 / 3.0;
+	
+	gr[0] = a; gs[0] = a; gw[0] = a;
+	gr[1] = b; gs[1] = a; gw[1] = a;
+	gr[2] = a; gs[2] = b; gw[2] = a;
+	
+	// calculate shape function values at gauss points
+	for (n=0; n<NINT; ++n)
+	{
+		double r1 = 1.0 - gr[n] - gs[n];
+		double r2 = gr[n];
+		double r3 = gs[n];
+
+		H[n][0] = r1*(2.0*r1 - 1.0);
+		H[n][1] = r2*(2.0*r2 - 1.0);
+		H[n][2] = r3*(2.0*r3 - 1.0);
+		H[n][3] = 4.0*r1*r2;
+		H[n][4] = 4.0*r2*r3;
+		H[n][5] = 4.0*r3*r1;
+	}
+
+//	Hi = H.inverse();
+
+	// calculate local derivatives of shape functions at gauss points
+	for (n=0; n<NINT; ++n)
+	{
+		Gr[n][0] = -3.0 + 4.0*gr[n] + 4.0*gs[n];
+		Gr[n][1] =  4.0*gr[n] - 1.0;
+		Gr[n][2] =  0.0;
+		Gr[n][3] =  4.0 - 8.0*gr[n] - 4.0*gs[n];
+		Gr[n][4] =  4.0*gs[n];
+		Gr[n][5] = -4.0*gs[n];
+
+		Gs[n][0] = -3.0 + 4.0*gs[n] + 4.0*gr[n];
+		Gs[n][1] =  0.0;
+		Gs[n][2] =  4.0*gs[n] - 1.0;
+		Gs[n][3] = -4.0*gr[n];
+		Gs[n][4] =  4.0*gr[n];
+		Gs[n][5] =  4.0 - 8.0*gs[n] - 4.0*gr[n];
+	}
+}
+
+void FETri6ElementTraits::shape(double* H, double r, double s)
+{
+	double r1 = 1.0 - r - s;
+	double r2 = r;
+	double r3 = s;
+
+	H[0] = r1*(2.0*r1 - 1.0);
+	H[1] = r2*(2.0*r2 - 1.0);
+	H[2] = r3*(2.0*r3 - 1.0);
+	H[3] = 4.0*r1*r2;
+	H[4] = 4.0*r2*r3;
+	H[5] = 4.0*r3*r1;
+}
+
+void FETri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -3.0 + 4.0*r + 4.0*s;
+	Hr[1] =  4.0*r - 1.0;
+	Hr[2] =  0.0;
+	Hr[3] =  4.0 - 8.0*r - 4.0*s;
+	Hr[4] =  4.0*s;
+	Hr[5] = -4.0*s;
+
+	Hs[0] = -3.0 + 4.0*s + 4.0*r;
+	Hs[1] =  0.0;
+	Hs[2] =  4.0*s - 1.0;
+	Hs[3] = -4.0*r;
+	Hs[4] =  4.0*r;
+	Hs[5] =  4.0 - 8.0*s - 4.0*r;
+}
+
+//*****************************************************************************
+//                          F E N I T R I 6 E L E M E N T
+//*****************************************************************************
+
+void FENITri6ElementTraits::init()
+{
+	const double w = 1.0 / 12.0;
+	gr[0] = 0.0; gs[0] = 0.0; gw[0] = w;
+	gr[1] = 1.0; gs[1] = 0.0; gw[1] = w;
+	gr[2] = 0.0; gs[2] = 1.0; gw[2] = w;
+	gr[3] = 0.5; gs[3] = 0.0; gw[3] = w;
+	gr[4] = 0.5; gs[4] = 0.5; gw[4] = w;
+	gr[5] = 0.0; gs[5] = 0.5; gw[5] = w;
+	
+	// calculate shape function values at gauss points
+	for (int n=0; n<NINT; ++n)
+	{
+		double r1 = 1.0 - gr[n] - gs[n];
+		double r2 = gr[n];
+		double r3 = gs[n];
+
+		H[n][0] = r1*(2.0*r1 - 1.0);
+		H[n][1] = r2*(2.0*r2 - 1.0);
+		H[n][2] = r3*(2.0*r3 - 1.0);
+		H[n][3] = 4.0*r1*r2;
+		H[n][4] = 4.0*r2*r3;
+		H[n][5] = 4.0*r3*r1;
+	}
+
+//	Hi = H.inverse();
+
+	// calculate local derivatives of shape functions at gauss points
+	for (int n=0; n<NINT; ++n)
+	{
+		Gr[n][0] = -3.0 + 4.0*gr[n] + 4.0*gs[n];
+		Gr[n][1] =  4.0*gr[n] - 1.0;
+		Gr[n][2] =  0.0;
+		Gr[n][3] =  4.0 - 8.0*gr[n] - 4.0*gs[n];
+		Gr[n][4] =  4.0*gs[n];
+		Gr[n][5] = -4.0*gs[n];
+
+		Gs[n][0] = -3.0 + 4.0*gs[n] + 4.0*gr[n];
+		Gs[n][1] =  0.0;
+		Gs[n][2] =  4.0*gs[n] - 1.0;
+		Gs[n][3] = -4.0*gr[n];
+		Gs[n][4] =  4.0*gr[n];
+		Gs[n][5] =  4.0 - 8.0*gs[n] - 4.0*gr[n];
+	}
+}
+
+void FENITri6ElementTraits::shape(double* H, double r, double s)
+{
+	double r1 = 1.0 - r - s;
+	double r2 = r;
+	double r3 = s;
+
+	H[0] = r1*(2.0*r1 - 1.0);
+	H[1] = r2*(2.0*r2 - 1.0);
+	H[2] = r3*(2.0*r3 - 1.0);
+	H[3] = 4.0*r1*r2;
+	H[4] = 4.0*r2*r3;
+	H[5] = 4.0*r3*r1;
+}
+
+void FENITri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -3.0 + 4.0*r + 4.0*s;
+	Hr[1] =  4.0*r - 1.0;
+	Hr[2] =  0.0;
+	Hr[3] =  4.0 - 8.0*r - 4.0*s;
+	Hr[4] =  4.0*s;
+	Hr[5] = -4.0*s;
+
+	Hs[0] = -3.0 + 4.0*s + 4.0*r;
+	Hs[1] =  0.0;
+	Hs[2] =  4.0*s - 1.0;
+	Hs[3] = -4.0*r;
+	Hs[4] =  4.0*r;
+	Hs[5] =  4.0 - 8.0*s - 4.0*r;
+}
+
 //*****************************************************************************
 //                          F E S H E L L Q U A D E L E M E N T
 //*****************************************************************************

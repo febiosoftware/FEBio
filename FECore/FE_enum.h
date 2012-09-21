@@ -28,16 +28,18 @@ enum FE_Element_Type {
 	FE_NIQUAD,		// = 9
 	FE_TRI,			// = 10
 	FE_NITRI,		// = 11
+	FE_TRI6,		// = 12
+	FE_NITRI6,		// = 13
 
 	// shell elements
-	FE_SHELL_QUAD,	// = 12
-	FE_SHELL_TRI,	// = 13
+	FE_SHELL_QUAD,	// = 14
+	FE_SHELL_TRI,	// = 15
 
 	// truss elements
-	FE_TRUSS,		// = 14
+	FE_TRUSS,		// = 16
 
 	// discrete elements
-	FE_DISCRETE		// = 15
+	FE_DISCRETE		// = 17
 };
 
 /////////////////////////////////////////////////////////////////////////////

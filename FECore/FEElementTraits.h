@@ -353,6 +353,48 @@ public:
 	void init();
 };
 
+//=============================================================================
+//  6-node triangular element with 3-point gaussian quadrature
+//
+class FETri6ElementTraits : public FESurfaceElementTraits
+{
+public:
+	enum { NINT = 3 };
+	enum { NELN = 6 };
+
+public:
+	FETri6ElementTraits() : FESurfaceElementTraits(NINT, NELN) { m_ntype = FE_TRI6; init(); }
+
+	void init();
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+};
+
+//=============================================================================
+//  6-node triangular element with 6-point nodal quadrature
+//
+class FENITri6ElementTraits : public FESurfaceElementTraits
+{
+public:
+	enum { NINT = 6 };
+	enum { NELN = 6 };
+
+public:
+	FENITri6ElementTraits() : FESurfaceElementTraits(NINT, NELN) { m_ntype = FE_NITRI6; init(); }
+
+	void init();
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // CLASS: FEShellElementTraits
 //  This class defines the specific traits for shell elements
