@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEUncoupledViscoElasticMaterial, "uncoupled viscoelastic");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
 ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
