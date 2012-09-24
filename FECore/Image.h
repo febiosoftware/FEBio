@@ -23,7 +23,7 @@ public:
 	int depth () { return m_nz; }
 
 	// get a particular data value
-	float& value(int x, int y, int z) { return m_pf[(z*m_ny + y)*m_nx+x]; }
+	float& value(int x, int y, int z) { return m_pf[(z*m_ny + (m_ny-y-1))*m_nx+x]; }
 
 	// zero image data
 	void zero();
