@@ -11,7 +11,7 @@ void FETractionLoad::Residual(FEGlobalVector& R)
 	vector<double> fe;
 	vector<int> lm;
 
-	vec3d r0[4];
+	vec3d r0[FEElement::MAX_NODES];
 
 	int i, n;
 	int npr = m_TC.size();

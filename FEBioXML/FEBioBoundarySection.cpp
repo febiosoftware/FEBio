@@ -518,6 +518,7 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 
 		s  = atof(tag.AttributeValue("scale"));
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
 
 		if      (tag == "quad4") el.SetType(FE_QUAD);
 		else if (tag == "tri3" ) el.SetType(FE_TRI );
@@ -578,6 +579,7 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 		s.z  = atof(tag.AttributeValue("tz"));
 
 		tc.s[0] = tc.s[1] = tc.s[2] = tc.s[3] = s;
+		tc.s[4] = tc.s[5] = tc.s[6] = tc.s[7] = s;
 
 		if      (tag == "quad4") el.SetType(FE_QUAD);
 		else if (tag == "tri3" ) el.SetType(FE_TRI);

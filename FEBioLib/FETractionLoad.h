@@ -10,7 +10,7 @@ class FETractionLoad : public FESurfaceLoad
 public:
 	struct LOAD
 	{
-		vec3d	s[4];		// nodal scale factors
+		vec3d	s[8];		// nodal scale factors
 		int		lc;			// load curve
 	};
 
