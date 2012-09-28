@@ -22,7 +22,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 void FECellGrowth::Init()
 {
-	if (m_phir < 0 || m_phir > 1) throw MaterialError("phir must be between 0. and 1.");
+	if (m_phir < 0) throw MaterialError("phir must be positive.");
 	if (m_cr < 0) throw MaterialError("cr must be positive.");
 	if (m_ce < 0) throw MaterialError("ce must be positive.");
 	
