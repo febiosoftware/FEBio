@@ -51,6 +51,7 @@
 #include "FEMultiphasic.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
+#include "FEElasticMultigeneration.h"
 #include "log.h"
 #include "version.h"
 
@@ -549,6 +550,13 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 			EvaluateMaterialParameters(pum->m_pMat[i]);
 	}
 	
+	FEElasticMultigeneration* pmg = dynamic_cast<FEElasticMultigeneration*>(pm);
+	if (pmg)
+	{
+		for (int i=0; i < (int) pmg->m_pMat.size(); ++i)
+			EvaluateMaterialParameters(pmg->m_pMat[i]);
+	}
+
 	FEBiphasic* pb = dynamic_cast<FEBiphasic*>(pm);
 	if (pb)
 	{
