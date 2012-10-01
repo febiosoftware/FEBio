@@ -9,26 +9,21 @@ bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class
 	FEElasticSolidDomain::Initialize(mdl);
-	
+
+	// get the material
+	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
+		
+	// get the biphasic-solute material
+	FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(pm);
+	assert(pmb);
+
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
-		assert(!el.IsRigid());
-		
-		assert(el.Type() != FE_UDGHEX);
-		
 		// get the number of integration points
 		int nint = el.GaussPoints();
-		
-		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(mdl.GetMaterial(el.GetMatID()));
-		
-		assert(dynamic_cast<FEBiphasicSolute*>(pm) != 0);
-		
-		// get the biphasic-solute material
-		FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(pm);
 		
 		// loop over the integration points
 		for (int n=0; n<nint; ++n)
@@ -274,7 +269,7 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FENLSolver* psolver, vector<doub
 	vector<double> fe;
 	vector<int> elm;
 
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);
 	
 	int NE = m_Elem.size();
@@ -311,7 +306,7 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<do
 	vector<double> fe;
 	vector<int> elm;
 
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);
 	
 	int NE = m_Elem.size();
@@ -367,19 +362,15 @@ bool FEBiphasicSoluteDomain::ElementInternalFluidWork(FESolidElement& el, vector
 	
 	FEMesh& mesh = *GetMesh();
 	
-	vec3d rp[8];
+	vec3d rp[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) 
 	{
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
 	
 	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(GetMaterial());
+	assert(pm);
 	
 	zero(fe);
 	
@@ -476,12 +467,8 @@ bool FEBiphasicSoluteDomain::ElementInternalFluidWorkSS(FESolidElement& el, vect
 	double* wg = el.GaussWeights();
 	
 	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(GetMaterial());
+	assert(pm);
 	
 	zero(fe);
 	
@@ -553,11 +540,12 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWork(FESolidElement& el, vecto
 	FEMesh& mesh = *GetMesh();
 
 	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat); assert(pm);
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial()); assert(pm);
 	int id0 = pm->m_pSolute->GetSoluteID();
 	
-	vec3d r0[8], rt[8], rp[8], vt[8];
-	double cp[8];
+	const int NE = FEElement::MAX_NODES;
+	vec3d r0[NE], rt[NE], rp[NE], vt[NE];
+	double cp[NE];
 	for (i=0; i<neln; ++i) 
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
@@ -712,12 +700,8 @@ bool FEBiphasicSoluteDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vec
 	double* wg = el.GaussWeights();
 		
 	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(GetMaterial());
+	assert(pm);
 	
 	zero(fe);
 	
@@ -881,7 +865,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, do
 	matrix ke;
 	vector<int> elm;
 
-	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pmat);
 	
 	// repeat over all solid elements
@@ -930,7 +914,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, 
 	matrix ke;
 	vector<int> elm;
 
-	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (m_pMat);
+	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pmat);
 
 	// repeat over all solid elements
@@ -996,11 +980,12 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffness(FESolidElement& el, 
 	FEMesh& mesh = *GetMesh();
 
 	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (m_pMat); assert(pm);
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial()); assert(pm);
 	int id0 = pm->m_pSolute->GetSoluteID();
 	
-	vec3d r0[8], rt[8], rp[8], v[8];
-	double cp[8];
+	const int NE = FEElement::MAX_NODES;
+	vec3d r0[NE], rt[NE], rp[NE], v[NE];
+	double cp[NE];
 	for (i=0; i<neln; ++i) 
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
@@ -1307,12 +1292,8 @@ bool FEBiphasicSoluteDomain::ElementBiphasicSoluteStiffnessSS(FESolidElement& el
 		}
 	
 	// get the element's material
-	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(m_pMat);
-	if (pm == 0)
-	{
-		clog.printbox("FATAL ERROR", "Incorrect material type\n");
-		return false;
-	}
+	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*>(GetMaterial());
+	assert(pm);
 	
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
@@ -1515,7 +1496,7 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 	int i, i3, j, j3, n;
 
 	// see if this is a biphasic-solute material
-	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*>(m_pMat);
+	FEBiphasicSolute* pmat = dynamic_cast<FEBiphasicSolute*>(GetMaterial());
 	assert(pmat);
 	int id0 = pmat->m_pSolute->GetSoluteID();
 	
@@ -1527,7 +1508,9 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 	// global derivatives of shape functions
 	// NOTE: hard-coding of hex elements!
 	// Gx = dH/dx
-	double Gx[8], Gy[8], Gz[8];
+	double Gx[FEElement::MAX_NODES];
+	double Gy[FEElement::MAX_NODES];
+	double Gz[FEElement::MAX_NODES];
 	
 	double Gxi, Gyi, Gzi;
 	double Gxj, Gyj, Gzj;
@@ -1545,7 +1528,7 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 	double Ji[3][3], detJt;
 
 	// nodal concentrations
-	double ct[8];
+	double ct[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) ct[i] = m_pMesh->Node(el.m_node[i]).m_ct[id0];
 
 	// weights at gauss points
@@ -1650,16 +1633,16 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 	int i, n;
 	int nint, neln;
 	double* gw;
-	vec3d r0[8];
-	vec3d rt[8];
-	double pn[8], ct[8];
+	vec3d r0[FEElement::MAX_NODES];
+	vec3d rt[FEElement::MAX_NODES];
+	double pn[FEElement::MAX_NODES], ct[FEElement::MAX_NODES];
 
 	FEMesh& mesh = *m_pMesh;
 	double dt = fem.GetCurrentStep()->m_dt;
 	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
 
 	// get the material
-	FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pMat);
+	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
 	
 	// get the biphasic-solute material
 	FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(pm); assert(pmb);

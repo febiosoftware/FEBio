@@ -208,7 +208,7 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 		else if (dynamic_cast<FEBiphasic*>(pmat))
 		{
 			// biphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_BIPHASIC_DOMAIN;
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10)) return FE_BIPHASIC_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FEBiphasicSolute*>(pmat))

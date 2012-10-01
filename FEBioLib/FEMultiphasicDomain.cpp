@@ -13,27 +13,21 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class
 	FEElasticSolidDomain::Initialize(mdl);
-	
+
+	// get the material
+	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
+		
+	// get the multiphasic material
+	FEMultiphasic* pmb = dynamic_cast<FEMultiphasic*>(pm); assert(pmb);
+	const int nsol = pmb->m_pSolute.size();
+
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
-		assert(!el.IsRigid());
-		
-		assert(el.Type() != FE_UDGHEX);
-		
 		// get the number of integration points
 		int nint = el.GaussPoints();
-		
-		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(mdl.GetMaterial(el.GetMatID()));
-		
-		assert(dynamic_cast<FEMultiphasic*>(pm) != 0);
-		
-		// get the multiphasic material
-		FEMultiphasic* pmb = dynamic_cast<FEMultiphasic*>(pm);
-		const int nsol = pmb->m_pSolute.size();
 		
 		// loop over the integration points
 		for (int n=0; n<nint; ++n)
@@ -250,7 +244,7 @@ void FEMultiphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<doubl
 	vector<int> elm;
 
 	// get the elements material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial());
 	assert(pm);
 	const int nsol = pm->m_pSolute.size();
 
@@ -301,7 +295,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& elem, vect
 	double* wg = elem.GaussWeights();
 	
 	// get the element's material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	const int nsol = pm->m_pSolute.size();
 	vector<vec3d> j(nsol);
 	vector<int> z(nsol);
@@ -367,7 +361,7 @@ void FEMultiphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>
 	vector<int> elm;
 
 	// get the elements material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial());
 	assert(pm);
 	const int nsol = pm->m_pSolute.size();
 
@@ -427,15 +421,16 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 	FEMesh& mesh = *m_pMesh;
 	
 	// get the element's material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 
 	const int nsol = pm->m_pSolute.size();
 	vector<int> sid(nsol);
 	for (isol=0; isol<nsol; ++isol)
 		sid[isol] = pm->m_pSolute[isol]->GetSoluteID();
 	
-	vec3d r0[8], rt[8], rp[8], vt[8];
-	vector< vector<double> > cp(nsol, vector<double>(8));
+	const int NE = FEElement::MAX_NODES;
+	vec3d r0[NE], rt[NE], rp[NE], vt[NE];
+	vector< vector<double> > cp(nsol, vector<double>(FEElement::MAX_NODES));
 	for (i=0; i<neln; ++i) 
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
@@ -657,14 +652,14 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 	
 	FEMesh& mesh = *m_pMesh;
 	
-	vec3d rp[8];
+	vec3d rp[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) 
 	{
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
 	}
 	
 	// get the element's material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	
 	zero(fe);
 	
@@ -793,7 +788,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 	double* wg = el.GaussWeights();
 	
 	// get the element's material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	
 	zero(fe);
 	
@@ -957,7 +952,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, doubl
 	vector<int> elm;
 
 	// get the elements material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	const int nsol = pm->m_pSolute.size();
 
 	// repeat over all solid elements
@@ -1008,7 +1003,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, dou
 	vector<int> elm;
 
 	// get the elements material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	const int nsol = pm->m_pSolute.size();
 
 	// repeat over all solid elements
@@ -1078,15 +1073,15 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 	FEMesh& mesh = *m_pMesh;
 	
 	// get the element's material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	const int nsol = pm->m_pSolute.size();
 	int ndpn = 4+nsol;
 	vector<int> sid(nsol);
 	for (isol=0; isol<nsol; ++isol)
 		sid[isol] = pm->m_pSolute[isol]->GetSoluteID();
 	
-	vec3d rp[8], v[8];
-	vector< vector<double> > cp(nsol, vector<double>(8));
+	vec3d rp[FEElement::MAX_NODES], v[FEElement::MAX_NODES];
+	vector< vector<double> > cp(nsol, vector<double>(FEElement::MAX_NODES));
 	for (i=0; i<neln; ++i)
 	{
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
@@ -1572,7 +1567,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 	FEMesh& mesh = *m_pMesh;
 	
 	// get the element's material
-	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (m_pMat); assert(pm);
+	FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (GetMaterial()); assert(pm);
 	const int nsol = pm->m_pSolute.size();
 	int ndpn = 4+nsol;
 	vector<int> sid(nsol);
@@ -1990,7 +1985,7 @@ void FEMultiphasicDomain::SolidElementStiffness(FESolidElement& el, matrix& ke)
 void FEMultiphasicDomain::ElementMultiphasicMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	// see if this is a multiphasic material
-	FEMultiphasic* pmat = dynamic_cast<FEMultiphasic*>(m_pMat);
+	FEMultiphasic* pmat = dynamic_cast<FEMultiphasic*>(GetMaterial());
 	assert(pmat);
 	
 	int i, i3, j, j3, n;
@@ -2002,7 +1997,9 @@ void FEMultiphasicDomain::ElementMultiphasicMaterialStiffness(FESolidElement &el
 	// global derivatives of shape functions
 	// NOTE: hard-coding of hex elements!
 	// Gx = dH/dx
-	double Gx[8], Gy[8], Gz[8];
+	double Gx[FEElement::MAX_NODES];
+	double Gy[FEElement::MAX_NODES];
+	double Gz[FEElement::MAX_NODES];
 	
 	double Gxi, Gyi, Gzi;
 	double Gxj, Gyj, Gzj;
@@ -2116,14 +2113,14 @@ void FEMultiphasicDomain::UpdateStresses(FEModel &fem)
 	int i, j, k, n;
 	int nint, neln;
 	double* gw;
-	vec3d r0[8];
-	vec3d rt[8];
-	double pn[8];
+	vec3d r0[FEElement::MAX_NODES];
+	vec3d rt[FEElement::MAX_NODES];
+	double pn[FEElement::MAX_NODES];
 	
 	FEMesh& mesh = *m_pMesh;
 
 	// get the material
-	FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pMat);
+	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
 
 	for (i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -2134,7 +2131,7 @@ void FEMultiphasicDomain::UpdateStresses(FEModel &fem)
 		FEMultiphasic* pmb = dynamic_cast<FEMultiphasic*>(pm);
 		assert(pmb);
 		const int nsol = pmb->m_pSolute.size();
-		double ct[MAX_CDOFS][8];
+		double ct[MAX_CDOFS][FEElement::MAX_NODES];
 		vector<int> sid(nsol);
 		for (j=0; j<nsol; ++j) sid[j] = pmb->m_pSolute[j]->GetSoluteID();
 		
