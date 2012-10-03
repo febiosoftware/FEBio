@@ -2,12 +2,12 @@
 #include "plugin.h"
 #include "FECore/febio.h"
 #include "FEBioLib/log.h"
-//#include <direct.h>
 
 //-----------------------------------------------------------------------------
 #ifdef WIN32
 
 #include "windows.h"
+#include <direct.h>
 
 typedef void (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 
