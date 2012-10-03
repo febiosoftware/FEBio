@@ -2,7 +2,7 @@
 #include "plugin.h"
 #include "FECore/febio.h"
 #include "FEBioLib/log.h"
-#include <direct.h>
+//#include <direct.h>
 
 //-----------------------------------------------------------------------------
 #ifdef WIN32

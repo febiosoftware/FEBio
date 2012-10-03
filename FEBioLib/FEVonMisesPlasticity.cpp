@@ -105,7 +105,7 @@ tens4ds FEVonMisesPlasticity::Tangent(FEMaterialPoint &mp)
 		mat3ds n = s.dev()*2.0;
 
 		mat3ds A = C.dot(n);
-		double G = n.dotdot(C.dot(n)) + m_H;
+		double G = n.dotdot(A) + m_H;
 
 		C -= dyad4s(A)/G;
 	}

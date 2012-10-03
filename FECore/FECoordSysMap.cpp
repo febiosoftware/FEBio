@@ -145,7 +145,8 @@ mat3d FECylindricalMap::LocalElementCoord(FEElement& el, int n)
 	vec3d b = (p - m_c) - m_a*(m_a*(p - m_c)); b.unit();
 
 	// setup the rotation vector
-	quatd q(vec3d(1,0,0), b);
+	vec3d x_unit(vec3d(1,0,0));
+	quatd q(x_unit, b);
 
 	// rotate the reference vector
 	vec3d r(m_r); r.unit();

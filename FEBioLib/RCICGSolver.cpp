@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "RCICGSolver.h"
 #include "NumCore/CompactMatrix.h"
 using namespace NumCore;
