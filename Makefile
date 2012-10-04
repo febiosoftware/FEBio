@@ -115,4 +115,4 @@ clean:
 	( cd FEBioXML; $(MAKE) -f febioxml.mk clean PLAT="$(PLAT)")
 	( cd NumCore; $(MAKE) -f numcore.mk clean PLAT="$(PLAT)")
 	( cd FECore; $(MAKE) -f fecore.mk clean PLAT="$(PLAT)")
-	( cd FEBio;  $(MAKE) -f febio.mk clean PLAT="$(PLAT)") 
+	( cd FEBio;  $(MAKE) -f febio2.mk clean PLAT="$(PLAT)") 
