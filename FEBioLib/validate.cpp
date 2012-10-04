@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <stdlib.h>
+#include <stdio.h>
 using namespace std;
 
 // load the key generator
