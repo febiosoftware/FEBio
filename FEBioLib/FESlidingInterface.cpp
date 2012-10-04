@@ -212,7 +212,7 @@ FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem)
 	m_ktmult = 0;
 	m_knmult = 1;
 
-	m_breloc = true;
+	m_breloc = false;
 
 	m_nsegup = 0;	// always do segment updates
 	m_bautopen = false;	// don't use auto-penalty
