@@ -91,7 +91,7 @@ public:
 		return (*this);
 	}
 
-	template <> DumpFile& operator << (std::vector<bool>& v)
+	DumpFile& operator << (std::vector<bool>& v)
 	{
 		int n = v.size();
 		fwrite(&n, sizeof(int), 1, m_fp);
@@ -133,7 +133,7 @@ public:
 		return (*this);
 	}
 
-	template <> DumpFile& operator >> (std::vector<bool>& v)
+	DumpFile& operator >> (std::vector<bool>& v)
 	{
 		int n;
 		fread(&n, sizeof(int), 1, m_fp);
