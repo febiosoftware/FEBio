@@ -90,6 +90,14 @@ public:
 		if (n>0) fwrite((T*) &v[0], sizeof(T), v.size(), m_fp);
 		return (*this);
 	}
+
+	template <> DumpFile& operator << (std::vector<bool>& v)
+	{
+		int n = v.size();
+		fwrite(&n, sizeof(int), 1, m_fp);
+		for (int i=0; i<n; ++i) { int a = (v[i]?1:0); fwrite(&a, sizeof(int), 1, m_fp); }
+		return (*this);
+	}
 	//@}
 
 
@@ -122,6 +130,20 @@ public:
 			fread((T*) &v[0], sizeof(T), n, m_fp);
 		}
 		else v.clear();
+		return (*this);
+	}
+
+	template <> DumpFile& operator >> (std::vector<bool>& v)
+	{
+		int n;
+		fread(&n, sizeof(int), 1, m_fp);
+		if (n > 0) v.resize(n); else v.clear();
+		for (int i=0; i<n; ++i)
+		{
+			int a;
+			fread(&a, sizeof(int), 1, m_fp);
+			v[i] = (a == 1);
+		}
 		return (*this);
 	}
 	//@}
