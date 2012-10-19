@@ -1212,13 +1212,14 @@ void FETri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s
 
 void FENITri6ElementTraits::init()
 {
-	const double w = 1.0 / 12.0;
-	gr[0] = 0.0; gs[0] = 0.0; gw[0] = w;
-	gr[1] = 1.0; gs[1] = 0.0; gw[1] = w;
-	gr[2] = 0.0; gs[2] = 1.0; gw[2] = w;
-	gr[3] = 0.5; gs[3] = 0.0; gw[3] = w;
-	gr[4] = 0.5; gs[4] = 0.5; gw[4] = w;
-	gr[5] = 0.0; gs[5] = 0.5; gw[5] = w;
+	const double a = 0.0;
+	const double b = 1.0/6.0;
+	gr[0] = 0.0; gs[0] = 0.0; gw[0] = a;
+	gr[1] = 1.0; gs[1] = 0.0; gw[1] = a;
+	gr[2] = 0.0; gs[2] = 1.0; gw[2] = a;
+	gr[3] = 0.5; gs[3] = 0.0; gw[3] = b;
+	gr[4] = 0.5; gs[4] = 0.5; gw[4] = b;
+	gr[5] = 0.0; gs[5] = 0.5; gw[5] = b;
 	
 	// calculate shape function values at gauss points
 	for (int n=0; n<NINT; ++n)
