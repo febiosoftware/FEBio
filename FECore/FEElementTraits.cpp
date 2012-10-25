@@ -1015,6 +1015,42 @@ void FEQuadElementTraits::init()
 	}
 }
 
+void FEQuadElementTraits::shape(double* H, double r, double s)
+{
+	H[0] = 0.25*(1-r)*(1-s);
+	H[1] = 0.25*(1+r)*(1-s);
+	H[2] = 0.25*(1+r)*(1+s);
+	H[3] = 0.25*(1-r)*(1+s);
+}
+
+void FEQuadElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
+	Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
+	Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
+	Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
+}
+
+void FEQuadElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] = 0; Hrs[0] =  0.25; Hss[0] = 0;
+	Hrr[1] = 0; Hrs[1] = -0.25; Hss[1] = 0;
+	Hrr[2] = 0; Hrs[2] =  0.25; Hss[2] = 0;
+	Hrr[3] = 0; Hrs[3] = -0.25; Hss[3] = 0;
+}
+
+void FEQuadElementTraits::project_to_nodes(double* ai, double* ao)
+{
+	int ni = NINT;
+	int ne = NELN;
+	assert(ni == ne);
+	for (int i=0; i<ne; ++i)
+	{
+		ao[i] = 0;
+		for (int j=0; j<ni; ++j) ao[i] += Hi[i][j]*ai[j];
+	}
+}
+
 //*****************************************************************************
 //                          F E N I Q U A D E L E M E N T
 //*****************************************************************************
@@ -1050,6 +1086,38 @@ void FENIQuadElementTraits::init()
 		Gs[n][2] =  0.25*(1+gr[n]);
 		Gs[n][3] =  0.25*(1-gr[n]);
 	}
+}
+
+void FENIQuadElementTraits::shape(double* H, double r, double s)
+{
+	H[0] = 0.25*(1-r)*(1-s);
+	H[1] = 0.25*(1+r)*(1-s);
+	H[2] = 0.25*(1+r)*(1+s);
+	H[3] = 0.25*(1-r)*(1+s);
+}
+
+void FENIQuadElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
+	Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
+	Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
+	Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
+}
+
+void FENIQuadElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] = 0; Hrs[0] =  0.25; Hss[0] = 0;
+	Hrr[1] = 0; Hrs[1] = -0.25; Hss[1] = 0;
+	Hrr[2] = 0; Hrs[2] =  0.25; Hss[2] = 0;
+	Hrr[3] = 0; Hrs[3] = -0.25; Hss[3] = 0;
+}
+
+void FENIQuadElementTraits::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[1];
+	ao[2] = ai[2];
+	ao[3] = ai[3];
 }
 
 //*****************************************************************************
@@ -1088,6 +1156,34 @@ void FETriElementTraits::init()
 	}
 }
 
+void FETriElementTraits::shape(double* H, double r, double s)
+{
+	H[0] = 1.0 - r - s;
+	H[1] = r;
+	H[2] = s;
+}
+
+void FETriElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -1; Hs[0] = -1;
+	Hr[1] =  1; Hs[1] =  0;
+	Hr[2] =  0; Hs[2] =  1;
+}
+
+void FETriElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] = 0; Hrs[0] = 0; Hss[0] = 0;
+	Hrr[1] = 0; Hrs[1] = 0; Hss[1] = 0;
+	Hrr[2] = 0; Hrs[2] = 0; Hss[2] = 0;
+}
+
+void FETriElementTraits::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[0];
+	ao[2] = ai[0];
+}
+
 //*****************************************************************************
 //                          F E N I T R I E L E M E N T
 //*****************************************************************************
@@ -1123,6 +1219,33 @@ void FENITriElementTraits::init()
 	}
 }
 
+void FENITriElementTraits::shape(double* H, double r, double s)
+{
+	H[0] = 1.0 - r - s;
+	H[1] = r;
+	H[2] = s;
+}
+
+void FENITriElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[0] = -1; Hs[0] = -1;
+	Hr[1] =  1; Hs[1] =  0;
+	Hr[2] =  0; Hs[2] =  1;
+}
+
+void FENITriElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] = 0; Hrs[0] = 0; Hss[0] = 0;
+	Hrr[1] = 0; Hrs[1] = 0; Hss[1] = 0;
+	Hrr[2] = 0; Hrs[2] = 0; Hss[2] = 0;
+}
+
+void FENITriElementTraits::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[1];
+	ao[2] = ai[2];
+}
 
 //*****************************************************************************
 //                          F E T R I 6 E L E M E N T
@@ -1206,6 +1329,38 @@ void FETri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s
 	Hs[5] =  4.0 - 8.0*s - 4.0*r;
 }
 
+void FETri6ElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
+	Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
+	Hrr[2] =  0.0; Hrs[2] =  0.0; Hss[2] =  4.0;
+	Hrr[3] = -8.0; Hrs[3] = -4.0; Hss[3] =  0.0;
+	Hrr[4] =  0.0; Hrs[4] =  4.0; Hss[4] =  0.0;
+	Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
+}
+
+void FETri6ElementTraits::project_to_nodes(double* ai, double* ao)
+{
+	matrix H(3, 3);
+	for (int n=0; n<3; ++n)
+	{
+		H[n][0] = 1.0 - gr[n] - gs[n];
+		H[n][1] = gr[n];
+		H[n][2] = gs[n];
+	}
+	H.inverse();
+
+	for (int i=0; i<3; ++i)
+	{
+		ao[i] = 0;
+		for (int j=0; j<3; ++j) ao[i] += H[i][j]*ai[j];
+	}
+
+	ao[3] = 0.5*(ao[0] + ao[1]);
+	ao[4] = 0.5*(ao[1] + ao[2]);
+	ao[5] = 0.5*(ao[2] + ao[0]);
+}
+
 //*****************************************************************************
 //                          F E N I T R I 6 E L E M E N T
 //*****************************************************************************
@@ -1286,6 +1441,26 @@ void FENITri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double
 	Hs[3] = -4.0*r;
 	Hs[4] =  4.0*r;
 	Hs[5] =  4.0 - 8.0*s - 4.0*r;
+}
+
+void FENITri6ElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+{
+	Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
+	Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
+	Hrr[2] =  0.0; Hrs[2] =  0.0; Hss[2] =  4.0;
+	Hrr[3] = -8.0; Hrs[3] = -4.0; Hss[3] =  0.0;
+	Hrr[4] =  0.0; Hrs[4] =  4.0; Hss[4] =  0.0;
+	Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
+}
+
+void FENITri6ElementTraits::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[1];
+	ao[2] = ai[2];
+	ao[3] = ai[3];
+	ao[4] = ai[4];
+	ao[5] = ai[5];
 }
 
 //*****************************************************************************

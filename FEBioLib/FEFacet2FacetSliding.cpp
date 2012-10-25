@@ -34,9 +34,12 @@ bool FEFacetSlidingSurface::Init()
 
 	// count how many integration points we have
 	int nint = 0, i;
-	for (i=0; i<Elements(); ++i)
+	int NE = Elements();
+	m_nei.resize(NE);
+	for (i=0; i<NE; ++i)
 	{
 		FESurfaceElement& el = Element(i);
+		m_nei[i] = nint;
 		nint += el.GaussPoints();
 	}
 
@@ -48,14 +51,6 @@ bool FEFacetSlidingSurface::Init()
 	m_pme.assign(nint, static_cast<FESurfaceElement*>(0));
 	m_eps.assign(nint, 1.0);
 	m_Ln.assign(nint, 0.0);
-
-	m_nei.resize(Elements());
-	nint = 0;
-	for (i=0; i<Elements(); ++i)
-	{
-		m_nei[i] = nint;
-		nint += Element(i).GaussPoints();
-	}
 
 	// set intial values
 	zero(m_nu);
@@ -219,7 +214,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 		int nn = se.Nodes();
 
 		// get nodal coordinates
-		vec3d re[4];
+		vec3d re[FEElement::MAX_NODES];
 		for (int l=0; l<nn; ++l) re[l] = ss.GetMesh()->Node(se.m_node[l]).m_rt;
 
 		// loop over all its integration points
@@ -319,11 +314,9 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 	// keep a running counter of integration points
 	int ni = 0;
 
-	// get the mesh
-	FEMesh* pm = m_ss.GetMesh();
-
-	double detJ[4], w[4], *Hs, Hm[4];
-	vec3d r0[4];
+	const int MELN = FEElement::MAX_NODES;
+	double detJ[MELN], w[MELN], *Hs, Hm[MELN];
+	vec3d r0[MELN];
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -383,8 +376,6 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 					FESurfaceElement& me = *pme;
 
 					int nmeln = me.Nodes();
-
-					// get the element's LM vector
 					ms.UnpackLM(me, mLM);
 
 					// calculate degrees of freedom
@@ -416,19 +407,7 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 
 					double r = ss.m_rs[ni][0];
 					double s = ss.m_rs[ni][1];
-					if (me.Nodes() == 4)
-					{
-						Hm[0] = 0.25*(1-r)*(1-s);
-						Hm[1] = 0.25*(1+r)*(1-s);
-						Hm[2] = 0.25*(1+r)*(1+s);
-						Hm[3] = 0.25*(1-r)*(1+s);
-					}
-					else if (me.Nodes() == 3)
-					{
-						Hm[0] = 1.0 - r - s;
-						Hm[1] = r;
-						Hm[2] = s;
-					}
+					me.shape_fnc(Hm, r, s);
 
 					// get normal vector
 					vec3d nu = ss.m_nu[ni];
@@ -479,7 +458,9 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
-	double N[24], T1[24], T2[24], N1[24] = {0}, N2[24] = {0}, D1[24], D2[24], Nb1[24], Nb2[24];
+	const int MN = FEElement::MAX_NODES;
+	const int ME = 3*MN*2;
+	double N[ME], T1[ME], T2[ME], N1[ME] = {0}, N2[ME] = {0}, D1[ME], D2[ME], Nb1[ME], Nb2[ME];
 	matrix ke;
 
 	// keep a running counter of integration points
@@ -509,8 +490,8 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 		else knmult = 0;
 	}
 
-	double detJ[4], w[4], *Hs, Hm[4], Hmr[4], Hms[4];
-	vec3d r0[4];
+	double detJ[MN], w[MN], *Hs, Hm[MN], Hmr[MN], Hms[MN];
+	vec3d r0[MN];
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np < npass; ++np)
@@ -570,8 +551,6 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 					FESurfaceElement& me = *pme;
 
 					int nmeln = me.Nodes();
-
-					// get the element's LM vector
 					ms.UnpackLM(me, mLM);
 
 					// calculate degrees of freedom
@@ -602,19 +581,7 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 					Hs = se.H(j);
 					double r = ss.m_rs[ni][0];
 					double s = ss.m_rs[ni][1];
-					if (me.Nodes() == 4)
-					{
-						Hm[0] = 0.25*(1-r)*(1-s);
-						Hm[1] = 0.25*(1+r)*(1-s);
-						Hm[2] = 0.25*(1+r)*(1+s);
-						Hm[3] = 0.25*(1-r)*(1+s);
-					}
-					else
-					{
-						Hm[0] = 1 - r - s;
-						Hm[1] = r;
-						Hm[2] = s;
-					}
+					me.shape_fnc(Hm, r, s);
 
 					// get normal vector
 					vec3d nu = ss.m_nu[ni];
@@ -669,22 +636,10 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 					if (knmult > 0)
 					{
 						// calculate the master shape fncs derivatives
-						if (nmeln == 4)
-						{
-							Hmr[0] = -0.25*(1-s); Hms[0] = -0.25*(1-r);
-							Hmr[1] =  0.25*(1-s); Hms[1] = -0.25*(1+r);
-							Hmr[2] =  0.25*(1+s); Hms[2] =  0.25*(1+r);
-							Hmr[3] = -0.25*(1+s); Hms[3] =  0.25*(1-r);
-						}
-						else
-						{
-							Hmr[0] = -1; Hms[0] = -1;
-							Hmr[1] =  1; Hms[1] =  0;
-							Hmr[2] =  0; Hms[2] =  1;
-						}
+						me.shape_deriv(Hmr, Hms, r, s);
 
 						// get the master nodes
-						vec3d rt[4];
+						vec3d rt[MN];
 						for (k=0; k<nmeln; ++k) rt[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
 						// get the tangent vectors
@@ -741,14 +696,16 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 
 						// calculate curvature tensor
 						double K[2][2] = {0};
-						const double Grs[4] = {0.25, -0.25, 0.25, -0.25};
-						if (nmeln == 4)
+						double Grr[MN];
+						double Gss[MN];
+						double Grs[MN];
+						me.shape_deriv2(Grr, Grs, Gss, r, s);
+						for (k=0; k<nmeln; ++k)
 						{
-							for (k=0; k<nmeln; ++k)
-							{
-								K[0][1] += (nu*rt[k])*Grs[k];
-								K[1][0] += (nu*rt[k])*Grs[k];
-							}
+							K[0][0] += (nu*rt[k])*Grr[k];
+							K[0][1] += (nu*rt[k])*Grs[k];
+							K[1][0] += (nu*rt[k])*Grs[k];
+							K[1][1] += (nu*rt[k])*Gss[k];
 						}
 
 						// setup A matrix A = M + gK
@@ -829,7 +786,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 				{
 					int mint = pme->GaussPoints();
 					int noff = ms.m_nei[pme->m_lid];
-					double ti[4];
+					double ti[FEElement::MAX_NODES];
 					for (j=0; j<mint; ++j) {
 						k = noff+j;
 						gap = ms.m_gap[k];
@@ -837,7 +794,7 @@ void FEFacet2FacetSliding::UpdateContactPressures()
 						ti[j] = MBRACKET(ms.m_Lm[k] + m_epsn*ms.m_eps[k]*ms.m_gap[k]);
 					}
 					// project the data to the nodes
-					double tn[4];
+					double tn[FEElement::MAX_NODES];
 					pme->project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
 					double Ln = pme->eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);

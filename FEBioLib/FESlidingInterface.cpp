@@ -29,16 +29,6 @@ BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface::ShallowCopy(FESlidingSurface& s)
-{
-	m_Lm  = s.m_Lm;
-	m_gap = s.m_gap;
-	zero(m_pme);
-	m_Lt  = s.m_Lt;
-	m_Ln = s.m_Ln;
-}
-
-//-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data
 //! structures are allocated.
 //! Note that it is assumed that the element array is already created
@@ -95,8 +85,17 @@ bool FESlidingSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! 
+void FESlidingSurface::ShallowCopy(FESlidingSurface& s)
+{
+	m_Lm  = s.m_Lm;
+	m_gap = s.m_gap;
+	zero(m_pme);
+	m_Lt  = s.m_Lt;
+	m_Ln = s.m_Ln;
+}
 
+//-----------------------------------------------------------------------------
+//! 
 vec3d FESlidingSurface::traction(int inode)
 {
 	vec3d t(0,0,0);
@@ -120,37 +119,6 @@ vec3d FESlidingSurface::traction(int inode)
 	}
 
 	return t;
-}
-
-//-----------------------------------------------------------------------------
-
-void FESlidingSurface::UpdateNormals()
-{
-	int i, j, jp1, jm1;
-	int N = Nodes();
-	int NE = Elements();
-	for (i=0; i<N; ++i) m_nu[i] = vec3d(0,0,0);
-	vec3d y[4], e1, e2;
-
-	for (i=0; i<NE; ++i)
-	{
-		FESurfaceElement& el = Element(i);
-		int ne = el.Nodes();
-		for (j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
-
-		for (j=0; j<ne; ++j)
-		{
-			jp1 = (j+1)%ne;
-			jm1 = (j+ne-1)%ne;
-
-			e1 = y[jp1] - y[j];
-			e2 = y[jm1] - y[j];
-
-			m_nu[el.m_lnode[j]] -= e1 ^ e2;						
-		}
-	}
-
-	for (i=0; i<N; ++i) m_nu[i].unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -281,9 +249,6 @@ bool FESlidingInterface::Init()
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
 
-	// update the master surface normals
-//	m_ms.UpdateNormals();
-
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, true, m_breloc);
 	if (m_bautopen) CalcAutoPenalty(m_ss);
@@ -292,7 +257,6 @@ bool FESlidingInterface::Init()
 	// two steps with master and slave switched
 	if (m_btwo_pass)
 	{
-//		m_ss.UpdateNormals();
 		ProjectSurface(m_ms, m_ss, true);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
 	}
@@ -486,10 +450,10 @@ void FESlidingInterface::ContactForces(FEGlobalVector& R)
 	vector<int> sLM;
 	vector<int> mLM;
 
-	vec3d r0[4];
-	double w[4];
+	vec3d r0[6];
+	double w[6];
 	double* Gr, *Gs;
-	double detJ[4];
+	double detJ[6];
 	vec3d dxr, dxs;
 
 	// do two-pass
@@ -618,14 +582,20 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	// tangents
 	vec3d tau1, tau2;
 
+	// max nr of master element nodes
+	const int MAXMN = 6;
+
 	// master element nodes
-	vec3d rtm[4];
+	vec3d rtm[MAXMN];
 
 	// shape function values
-	double H[4], Hr[4], Hs[4];
+	double H[MAXMN], Hr[MAXMN], Hs[MAXMN];
 
 	// contact vectors
-	double N[15], N1[15], N2[15], T1[15], T2[15], D1[15], D2[15];
+	double N[3*(MAXMN+1)], N1[3*(MAXMN+1)], N2[3*(MAXMN+1)];
+	double T1[3*(MAXMN+1)], T2[3*(MAXMN+1)], D1[3*(MAXMN+1)], D2[3*(MAXMN+1)];
+
+	// surface metrics
 	double A[2][2], M[2][2], K[2][2];
 	double detA;
 
@@ -672,21 +642,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	double sp = ss.m_rsp[m][1];
 
 	// get the master shape function values at this slave node
-	if (nmeln == 4)
-	{
-		// quadrilateral
-		H[0] = 0.25*(1-r)*(1-s);
-		H[1] = 0.25*(1+r)*(1-s);
-		H[2] = 0.25*(1+r)*(1+s);
-		H[3] = 0.25*(1-r)*(1+s);
-	}
-	else if (nmeln == 3)
-	{
-		// triangle
-		H[0] = 1 - r - s;
-		H[1] = r;
-		H[2] = s;
-	}
+	mel.shape_fnc(H, r, s);
 
 	// --- N O R M A L   T R A C T I O N ---
 
@@ -716,20 +672,8 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		// only if both the friction coefficient and friction
 		// penalty factor are non-zero
 
-		// get the master shape function values at this slave node
-		if (nmeln == 4)
-		{
-			Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-			Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-			Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-			Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-		}
-		else if (nmeln == 3)
-		{
-			Hr[0] = -1; Hs[0] = -1;
-			Hr[1] =  1; Hs[1] =  0;
-			Hr[2] =  0; Hs[2] =  1;
-		}
+		// get the master shape function derivative values at this slave node
+		mel.shape_deriv(Hr, Hs, r, s);
 
 		// get the tangent vectors
 		tau1 = tau2 = vec3d(0,0,0);
@@ -784,14 +728,16 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 		K[0][0] = 0; K[0][1] = 0;
 		K[1][0] = 0; K[1][1] = 0;
 
-		if (nmeln == 4)
+		double Grr[FEElement::MAX_NODES];
+		double Grs[FEElement::MAX_NODES];
+		double Gss[FEElement::MAX_NODES];
+		mel.shape_deriv2(Grr, Grs, Gss, r, s);
+		for (k=0; k<nmeln; ++k)
 		{
-			const double h[4] = {0.25, -0.25, 0.25, -0.25};
-			for (k=0; k<nmeln; ++k)
-			{
-				K[0][1] += (nu*rtm[k])*h[k];
-				K[1][0] += (nu*rtm[k])*h[k];
-			}
+			K[0][0] += (nu*rtm[k])*Grr[k];
+			K[0][1] += (nu*rtm[k])*Grs[k];
+			K[1][0] += (nu*rtm[k])*Grs[k];
+			K[1][1] += (nu*rtm[k])*Gss[k];
 		}
 
 		// setup A matrix
@@ -840,13 +786,14 @@ void FESlidingInterface::ContactStiffness(FENLSolver* psolver)
 
 	matrix ke;
 
-	vector<int> lm(15);
-	vector<int> en(5);
+	const int MAXMN = 6;
+	vector<int> lm(3*(MAXMN + 1));
+	vector<int> en(MAXMN+1);
 
-	double *Gr, *Gs, w[4];
-	vec3d r0[4];
+	double *Gr, *Gs, w[6];
+	vec3d r0[6];
 
-	double detJ[4];
+	double detJ[6];
 	vec3d dxr, dxs;
 
 	vector<int> sLM;
@@ -954,12 +901,17 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 {
 	int i, j, k, l;
 
-	vector<int> lm(15);
-	vector<int> en(5);
+	const int MAXMN = 6;
+
+	vector<int> lm(3*(MAXMN+1));
+	vector<int> en(MAXMN + 1);
 
 	vec3d dxr, dxs;
-	double H[4], Hr[4], Hs[4];
-	double N[15], T1[15], T2[15], N1[15], N2[15], D1[15], D2[15], Nb1[15], Nb2[15];
+	double H[MAXMN], Hr[MAXMN], Hs[MAXMN];
+
+	double N[3*(MAXMN+1)], T1[3*(MAXMN+1)], T2[3*(MAXMN+1)];
+	double N1[3*(MAXMN+1)], N2[3*(MAXMN+1)], D1[3*(MAXMN+1)], D2[3*(MAXMN+1)];
+	double Nb1[3*(MAXMN+1)], Nb2[3*(MAXMN+1)];
 
 	// get the mesh
 	FEMesh& mesh = m_pfem->GetMesh();
@@ -973,7 +925,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	double eps = ss.m_eps[m]*scale;
 
 	// nodal coordinates
-	vec3d rt[4];
+	vec3d rt[MAXMN];
 	for (j=0; j<nmeln; ++j) rt[j] = mesh.Node(mel.m_node[j]).m_rt;
 
 	// slave node natural coordinates in master element
@@ -1055,14 +1007,16 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 	// calculate curvature tensor
 	double K[2][2] = {0};
-	const double Grs[4] = {0.25, -0.25, 0.25, -0.25};
-	if (nmeln == 4)
+	double Grr[FEElement::MAX_NODES];
+	double Grs[FEElement::MAX_NODES];
+	double Gss[FEElement::MAX_NODES];
+	mel.shape_deriv2(Grr, Grs, Gss, r, s);
+	for (k=0; k<nmeln; ++k)
 	{
-		for (k=0; k<nmeln; ++k)
-		{
-			K[0][1] += (nu*rt[k])*Grs[k];
-			K[1][0] += (nu*rt[k])*Grs[k];
-		}
+		K[0][0] += (nu*rt[k])*Grr[k];
+		K[0][1] += (nu*rt[k])*Grs[k];
+		K[1][0] += (nu*rt[k])*Grs[k];
+		K[1][1] += (nu*rt[k])*Gss[k];
 	}
 
 	// setup A matrix A = M + gK
@@ -1156,11 +1110,11 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 
 		// we need to define additional arrays for the tangential
 		// contribution of the contact stiffness
-		double T11[15] = {0}, T12[15] = {0}, T21[15] = {0}, T22[15] = {0};	// Tab matrix
-		double N11[15] = {0}, N12[15] = {0}, N21[15] = {0}, N22[15] = {0};	// Nab matrix
-		double P1[15] = {0}, P2[15] = {0};	// P arrays
-		double Tb11[15], Tb21[15], Tb12[15], Tb22[15]; // Tbar matrix
-		double Pb1[15], Pb2[15]; // Pbar array
+		double T11[3*(MAXMN+1)] = {0}, T12[3*(MAXMN+1)] = {0}, T21[3*(MAXMN+1)] = {0}, T22[3*(MAXMN+1)] = {0};	// Tab matrix
+		double N11[3*(MAXMN+1)] = {0}, N12[3*(MAXMN+1)] = {0}, N21[3*(MAXMN+1)] = {0}, N22[3*(MAXMN+1)] = {0};	// Nab matrix
+		double P1[3*(MAXMN+1)] = {0}, P2[3*(MAXMN+1)] = {0};	// P arrays
+		double Tb11[3*(MAXMN+1)], Tb21[3*(MAXMN+1)], Tb12[3*(MAXMN+1)], Tb22[3*(MAXMN+1)]; // Tbar matrix
+		double Pb1[3*(MAXMN+1)], Pb2[3*(MAXMN+1)]; // Pbar array
 
 		for (k=0; k<nmeln; ++k)
 		{
@@ -1186,6 +1140,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 				N12[3*(k+1)+1] = N21[3*(k+1)+1] = -0.25*nu.y;
 				N12[3*(k+1)+2] = N21[3*(k+1)+2] = -0.25*nu.z;
 			}
+			else if (nmeln == 6) assert(false);
 
 			P1[3*(k+1)  ] = -Hr[k]*pt.x;
 			P1[3*(k+1)+1] = -Hr[k]*pt.y;
@@ -1197,7 +1152,16 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 		}
 
 		vec3d g12(0,0,0);
-		if (nmeln == 4) g12 = rt[0]*Grs[0]+rt[1]*Grs[1]+rt[2]*Grs[2]+rt[3]*Grs[3];
+		if (nmeln == 4) 
+		{
+			const double Grs[4] = {0.25, -0.25, 0.25, -0.25};
+			g12 = rt[0]*Grs[0]+rt[1]*Grs[1]+rt[2]*Grs[2]+rt[3]*Grs[3];
+		}
+		else if (nmeln == 6)
+		{
+			const double Grs[6] = {4.0, 0.0, 0.0, -4.0, 4.0, -4.0};
+			g12 = rt[0]*Grs[0]+rt[1]*Grs[1]+rt[2]*Grs[2]+rt[3]*Grs[3]+rt[4]*Grs[4]+rt[5]*Grs[5];
+		}
 		double gt1 = g12*tau[0];
 		double gt2 = g12*tau[1];
 		double gp = g12*pt;
@@ -1225,9 +1189,15 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 			}
 
 		vec3d Hrs[2][2] = {{vec3d(0,0,0),vec3d(0,0,0)},{vec3d(0,0,0),vec3d(0,0,0)}};
-		if (nmeln == 4)
+		if (nmeln == 4) 
 		{
+			const double Grs[4] = {0.25, -0.25, 0.25, -0.25};
 			Hrs[0][1] = Hrs[1][0] = rt[0]*Grs[0]+rt[1]*Grs[1]+rt[2]*Grs[2]+rt[3]*Grs[3];
+		}
+		else if (nmeln == 6)
+		{
+			const double Grs[6] = {4.0, 0.0, 0.0, -4.0, 4.0, -4.0};
+			Hrs[0][1] = Hrs[1][0] = rt[0]*Grs[0]+rt[1]*Grs[1]+rt[2]*Grs[2]+rt[3]*Grs[3]+rt[4]*Grs[4]+rt[5]*Grs[5];
 		}
 
 		// calculate stiffness matrix
@@ -1631,26 +1601,36 @@ void FESlidingInterface::UpdateContactPressures()
 			if (m_btwo_pass && pme)
 			{
 				int me = pme->Nodes();
-				double ti[4];
-				for (int j=0; j<me; ++j) {
-					int k = pme->m_lnode[j];
-					gap = ms.m_gap[k];
-					eps = m_eps*ms.m_eps[k];
-					ti[j] = MBRACKET(ms.m_Lm[k] + m_eps*ms.m_eps[k]*ms.m_gap[k]);
+				if (me < 6)
+				{
+					double ti[6];
+					for (int j=0; j<me; ++j) {
+						int k = pme->m_lnode[j];
+						gap = ms.m_gap[k];
+						eps = m_eps*ms.m_eps[k];
+						ti[j] = MBRACKET(ms.m_Lm[k] + m_eps*ms.m_eps[k]*ms.m_gap[k]);
+					}
+					// project the data to the nodes
+					double tn[6];
+					pme->project_to_nodes(ti, tn);
+					// now evaluate the traction at the intersection point
+					double Ln = pme->eval(tn, ss.m_rs[n][0], ss.m_rs[n][1]);
+					ss.m_Ln[n] += MBRACKET(Ln);
 				}
-				// project the data to the nodes
-				double tn[4];
-				pme->project_to_nodes(ti, tn);
-				// now evaluate the traction at the intersection point
-				double Ln = pme->eval(tn, ss.m_rs[n][0], ss.m_rs[n][1]);
-				ss.m_Ln[n] += MBRACKET(Ln);
 			}
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingInterface::ShallowCopy(FEContactInterface& ci)
+{
+	FESlidingInterface& si = dynamic_cast<FESlidingInterface&>(ci);
+	m_ss.ShallowCopy(si.m_ss);
+	m_ms.ShallowCopy(si.m_ms);
+}
 
+//-----------------------------------------------------------------------------
 void FESlidingInterface::Serialize(DumpFile& ar)
 {
 	// store contact data

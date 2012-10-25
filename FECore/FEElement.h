@@ -224,6 +224,7 @@ public:
 		m_node.resize(Nodes());
 		m_lnode.resize(Nodes());
 	}
+
 	double* GaussWeights() { return &((FESurfaceElementTraits*)(m_pT))->gw[0]; }			// weights of integration points
 	double gr(int n) { return ((FESurfaceElementTraits*)(m_pT))->gr[n]; }	// integration point coordinate r
 	double gs(int n) { return ((FESurfaceElementTraits*)(m_pT))->gs[n]; }	// integration point coordinate  s
@@ -243,7 +244,7 @@ public:
 	double eval(double* d, double r, double s)
 	{
 		int n = Nodes();
-		double H[4];
+		double H[FEElement::MAX_NODES];
 		shape_fnc(H, r, s);
 		double a = 0;
 		for (int i=0; i<n; ++i) a += H[i]*d[i];
@@ -253,7 +254,7 @@ public:
 	vec3d eval(vec3d* d, double r, double s)
 	{
 		int n = Nodes();
-		double H[4];
+		double H[FEElement::MAX_NODES];
 		shape_fnc(H, r, s);
 		vec3d a(0,0,0);
 		for (int i=0; i<n; ++i) a += d[i]*H[i];
@@ -289,7 +290,7 @@ public:
 
 	double eval_deriv1(double* d, double r, double s)
 	{
-		double Hr[4], Hs[4];
+		double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
 		shape_deriv(Hr, Hs, r, s);
 		int n = Nodes();
 		double a = 0;
@@ -299,7 +300,7 @@ public:
 
 	double eval_deriv2(double* d, double r, double s)
 	{
-		double Hr[4], Hs[4];
+		double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
 		shape_deriv(Hr, Hs, r, s);
 		int n = Nodes();
 		double a = 0;
@@ -309,54 +310,23 @@ public:
 
 	void shape_fnc(double* H, double r, double s)
 	{
-		int n = Nodes();
-		if (n == 4)
-		{
-			H[0] = 0.25*(1-r)*(1-s);
-			H[1] = 0.25*(1+r)*(1-s);
-			H[2] = 0.25*(1+r)*(1+s);
-			H[3] = 0.25*(1-r)*(1+s);
-		}
-		else if (n==3)
-		{
-			H[0] = 1 - r - s;
-			H[1] = r;
-			H[2] = s;
-		}
-		else assert(false);
+		((FESurfaceElementTraits*)m_pT)->shape(H, r, s);
 	}
 
 	void shape_deriv(double* Gr, double* Gs, double r, double s)
 	{
-		int n = Nodes();
-		if (n == 4)
-		{
-			Gr[0] = -0.25*(1-s); Gs[0] = -0.25*(1-r);
-			Gr[1] =  0.25*(1-s); Gs[1] = -0.25*(1+r);
-			Gr[2] =  0.25*(1+s); Gs[2] =  0.25*(1+r);
-			Gr[3] = -0.25*(1+s); Gs[3] =  0.25*(1-r);
-		}
-		else if (n == 3)
-		{
-			Gr[0] = -1; Gs[0] = -1;
-			Gr[1] =  1; Gs[1] =  0;
-			Gr[2] =  0; Gs[2] =  1;
-		}
-		else assert(false);
+		((FESurfaceElementTraits*)m_pT)->shape_deriv(Gr, Gs, r, s);
+	}
+
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
+	{
+		((FESurfaceElementTraits*)m_pT)->shape_deriv2(Grr, Grs, Gss, r, s);
 	}
 
 	//! this function projects data from the gauss-points to the nodal points
 	void project_to_nodes(double* ai, double* ao)
 	{
-		int ni = GaussPoints();
-		int ne = Nodes();
-		assert(ni == ne); // TODO: for now we assume that the number of nodes equals the nr of gauss-points
-		matrix& Hi = m_pT->Hi;
-		for (int i=0; i<ne; ++i)
-		{
-			ao[i] = 0;
-			for (int j=0; j<ni; ++j) ao[i] += Hi[i][j]*ai[j];
-		}
+		((FESurfaceElementTraits*)m_pT)->project_to_nodes(ai, ao);
 	}
 
 	bool HasNode(int n)

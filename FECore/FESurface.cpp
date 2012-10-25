@@ -63,6 +63,7 @@ bool FESurface::Init()
 	{
 		FESurfaceElement& el = Element(i);
 		if (el.m_nelem < 0) el.m_nelem = FindElement(el);
+		assert(el.m_nelem >= 0);
 	}
 
 	return true;
@@ -97,6 +98,10 @@ int FESurface::FindElement(FESurfaceElement& el)
 			else if ((nn == 4) && (el.Nodes() == 4))
 			{
 				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2]) && el.HasNode(nf[3])) return e.m_nID;
+			}
+			else if ((nn == 6) && (el.Nodes() == 6))
+			{
+				if (el.HasNode(nf[0]) && el.HasNode(nf[1]) && el.HasNode(nf[2])) return e.m_nID;
 			}
 		}
 	}
@@ -277,6 +282,129 @@ bool project2quad(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
 }
 
 //-----------------------------------------------------------------------------
+// project onto a 6-node quadratic triangular element
+bool project2tri6(vec3d* y, vec3d x, double& r, double& s, vec3d& q)
+{
+	double R[2], u[2], D;
+	double H[6], Hr[6], Hs[6], Hrs[6];
+	
+	int i, j;
+	int NMAX = 50, n=0;
+	
+	// evaulate scalar products
+	double xy[6] = {x*y[0], x*y[1], x*y[2], x*y[3], x*y[4], x*y[5]};
+	double yy[6][6];
+	yy[0][0] = y[0]*y[0]; yy[1][1] = y[1]*y[1]; yy[2][2] = y[2]*y[2]; yy[3][3] = y[3]*y[3]; yy[4][4] = y[4]*y[4]; yy[5][5] = y[5]*y[5];
+	yy[0][1] = yy[1][0] = y[0]*y[1];
+	yy[0][2] = yy[2][0] = y[0]*y[2];
+	yy[0][3] = yy[3][0] = y[0]*y[3];
+	yy[0][4] = yy[4][0] = y[0]*y[4];
+	yy[0][5] = yy[5][0] = y[0]*y[5];
+	yy[1][2] = yy[2][1] = y[1]*y[2];
+	yy[1][3] = yy[3][1] = y[1]*y[3];
+	yy[1][4] = yy[4][1] = y[1]*y[4];
+	yy[1][5] = yy[5][1] = y[1]*y[5];
+	yy[2][3] = yy[3][2] = y[2]*y[3];
+	yy[2][4] = yy[4][2] = y[2]*y[4];
+	yy[2][5] = yy[5][2] = y[2]*y[5];
+	yy[3][4] = yy[4][3] = y[3]*y[4];
+	yy[3][5] = yy[5][3] = y[3]*y[5];
+	yy[4][5] = yy[5][4] = y[4]*y[5];
+	
+	// loop until converged
+	bool bconv = false;
+	double normu;
+	do
+	{
+		// evaluate shape functions and shape function derivatives.
+		double r1 = 1.0 - r - s;
+		double r2 = r;
+		double r3 = s;
+
+		H[0] = r1*(2.0*r1 - 1.0);
+		H[1] = r2*(2.0*r2 - 1.0);
+		H[2] = r3*(2.0*r3 - 1.0);
+		H[3] = 4.0*r1*r2;
+		H[4] = 4.0*r2*r3;
+		H[5] = 4.0*r3*r1;
+
+		Hr[0] = -3.0 + 4.0*r + 4.0*s;
+		Hr[1] =  4.0*r - 1.0;
+		Hr[2] =  0.0;
+		Hr[3] =  4.0 - 8.0*r - 4.0*s;
+		Hr[4] =  4.0*s;
+		Hr[5] = -4.0*s;
+
+		Hs[0] = -3.0 + 4.0*s + 4.0*r;
+		Hs[1] =  0.0;
+		Hs[2] =  4.0*s - 1.0;
+		Hs[3] = -4.0*r;
+		Hs[4] =  4.0*r;
+		Hs[5] =  4.0 - 8.0*s - 4.0*r;
+
+		Hrs[0] =  4.0;
+		Hrs[1] =  0.0;
+		Hrs[2] =  0.0;
+		Hrs[3] = -4.0;
+		Hrs[4] =  4.0;
+		Hrs[5] = -4.0;
+
+		// set up the system of equations
+		R[0] = R[1] = 0;
+		double A[2][2] = {0};
+		for (i=0; i<6; ++i)
+		{
+			R[0] -= (xy[i])*Hr[i];
+			R[1] -= (xy[i])*Hs[i];
+			
+			A[0][1] += (xy[i])*Hrs[i];
+			A[1][0] += (xy[i])*Hrs[i];
+			
+			for (j=0; j<6; ++j)
+			{
+				double yij = yy[i][j];
+				R[0] -= -H[j]*Hr[i]*(yij);
+				R[1] -= -H[j]*Hs[i]*(yij);
+				
+				A[0][0] -= (yij)*(Hr[i]*Hr[j]);
+				A[1][1] -= (yij)*(Hs[i]*Hs[j]);
+				
+				A[0][1] -= (yij)*(Hr[i]*Hs[j]+Hrs[i]*H[j]);
+				A[1][0] -= (yij)*(Hs[i]*Hr[j]+Hrs[i]*H[j]);
+			}
+		}
+		
+		// determinant of A
+		D = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+		
+		// solve for u = A^(-1)*R
+		u[0] = (A[1][1]*R[0] - A[0][1]*R[1])/D;
+		u[1] = (A[0][0]*R[1] - A[1][0]*R[0])/D;
+		
+		// calculate displacement norm
+		normu = u[0]*u[0]+u[1]*u[1];
+		
+		// check for convergence
+		bconv = ((normu < 1e-10));
+		if (!bconv && (n <= NMAX))
+		{
+			// Don't update if converged otherwise the point q
+			// does not correspond with the current values for (r,s)
+			r += u[0];
+			s += u[1];
+			++n;
+		}
+		else break;
+	}
+	while (1);
+	
+	// evaluate q
+	q = y[0]*H[0] + y[1]*H[1] + y[2]*H[2] + y[3]*H[3]+ y[4]*H[4]+ y[5]*H[5];
+	
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
 //! This function calculates the projection of x on the surface element el.
 //! It does this by finding the solution of the nonlinear equation (x-y)*y,[a]=0,
 //! where the comma denotes differentation and a ranges from 1 to 2.
@@ -292,14 +420,15 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 	int ne = el.Nodes();
 
 	// get the elements nodal positions
-	vec3d y[4];
+	vec3d y[FEElement::MAX_NODES];
 	for (int i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 
 	// calculate normal projection of x onto element
 	vec3d q;
-	if (ne == 3) q = project2tri(y, x, r, s);
-	else
+	switch (ne)
 	{
+	case 3: q = project2tri(y, x, r, s); break;
+	case 4: 
 		// see if we get lucky
 		if (project2quad(y, x, r, s, q) == false)
 		{
@@ -308,7 +437,7 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 			r = s = 0;
 			bool b = project2quad(y, x0, r, s, q);
 			assert(b);
-
+			
 			double w = 0.5;
 			int l = 1, N = 0, NMAX = 20;
 			do
@@ -330,6 +459,15 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 			}
 			while ((l >= 0) && (N<=NMAX) && (w>0.1));
 		}
+		break;
+	case 6: 
+		if (project2tri6(y, x, r, s, q)==false)
+		{
+//			assert(false);
+		}
+		break;
+	default:
+		assert(false);
 	}
 
 	return q;
@@ -348,7 +486,7 @@ double FESurface::FaceArea(FESurfaceElement& el)
 	int neln = el.Nodes();
 
 	// get the initial nodes
-	vec3d r0[4];
+	vec3d r0[FEElement::MAX_NODES];
 	for (int i=0; i<neln; ++i) r0[i] = mesh.Node(el.m_node[i]).m_r0;
 
 	// get the integration weights
@@ -420,44 +558,26 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 {
 	// nr of element nodes
 	int neln = el.Nodes();
-
+	
 	// element nodes
-	vec3d r0[4];
+	vec3d r0[FEElement::MAX_NODES];
 	for (int i=0; i<neln; ++i) r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-
+	
 	// shape function derivatives
-	double Hr[4], Hs[4];
-
+	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+	
 	// get the shape function values at this slave node
-	if (neln == 4)
-	{
-		Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-		Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-		Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-		Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-	}
-	else if (neln == 3)
-	{
-		Hr[0] = -1; Hs[0] = -1;
-		Hr[1] =  1; Hs[1] =  0;
-		Hr[2] =  0; Hs[2] =  1;
-	}
-	else assert(false);
-
+	el.shape_deriv(Hr, Hs, r, s);
+	
 	// get the tangent vectors
 	vec3d t1(0,0,0);
 	vec3d t2(0,0,0);
 	for (int k=0; k<neln; ++k)
 	{
-		t1.x += Hr[k]*r0[k].x;
-		t1.y += Hr[k]*r0[k].y;
-		t1.z += Hr[k]*r0[k].z;
-		
-		t2.x += Hs[k]*r0[k].x;
-		t2.y += Hs[k]*r0[k].y;
-		t2.z += Hs[k]*r0[k].z;
+		t1 += r0[k]*Hr[k];
+		t2 += r0[k]*Hs[k];
 	}
-
+	
 	// calculate metric tensor
 	return mat2d(t1*t1, t1*t2, t2*t1, t2*t2);
 }
@@ -470,44 +590,26 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 {
 	// nr of element nodes
 	int neln = el.Nodes();
-
+	
 	// element nodes
-	vec3d rt[4];
+	vec3d rt[FEElement::MAX_NODES];
 	for (int i=0; i<neln; ++i) rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-
+	
 	// shape function derivatives
-	double Hr[4], Hs[4];
-
+	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+	
 	// get the shape function values at this slave node
-	if (neln == 4)
-	{
-		Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-		Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-		Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-		Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-	}
-	else if (neln == 3)
-	{
-		Hr[0] = -1; Hs[0] = -1;
-		Hr[1] =  1; Hs[1] =  0;
-		Hr[2] =  0; Hs[2] =  1;
-	}
-	else assert(false);
-
+	el.shape_deriv(Hr, Hs, r, s);
+	
 	// get the tangent vectors
 	vec3d t1(0,0,0);
 	vec3d t2(0,0,0);
 	for (int k=0; k<neln; ++k)
 	{
-		t1.x += Hr[k]*rt[k].x;
-		t1.y += Hr[k]*rt[k].y;
-		t1.z += Hr[k]*rt[k].z;
-		
-		t2.x += Hs[k]*rt[k].x;
-		t2.y += Hs[k]*rt[k].y;
-		t2.z += Hs[k]*rt[k].z;
+		t1 += rt[k]*Hr[k];
+		t2 += rt[k]*Hs[k];
 	}
-
+	
 	// calculate metric tensor
 	return mat2d(t1*t1, t1*t2, t2*t1, t2*t2);
 }
@@ -517,36 +619,16 @@ mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 //! function returns the global position vector.
 vec3d FESurface::Local2Global(FESurfaceElement &el, double r, double s)
 {
-	int l;
+	// get the mesh
 	FEMesh& mesh = *m_pMesh;
 
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
-	vec3d y[4];
-	for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
-
-	// set up shape functions and derivatives
-	double H[4];
-	if (ne == 4)
-	{
-		H[0] = 0.25*(1 - r)*(1 - s);
-		H[1] = 0.25*(1 + r)*(1 - s);
-		H[2] = 0.25*(1 + r)*(1 + s);
-		H[3] = 0.25*(1 - r)*(1 + s);
-	}
-	else if (ne == 3)
-	{
-		H[0] = 1-r-s;
-		H[1] = r;
-		H[2] = s;
-	}
-	else assert(false);
+	vec3d y[FEElement::MAX_NODES];
+	for (int l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
 
 	// calculate the element position
-	vec3d q;
-	for (l=0; l<ne; ++l) q += y[l]*H[l];
-
-	return q;
+	return el.eval(y, r, s);
 }
 
 //-----------------------------------------------------------------------------
@@ -583,7 +665,7 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, int n)
 
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
-	vec3d y[4];
+	vec3d y[FEElement::MAX_NODES];
 	for (i=0; i<ne; ++i) y[i] = m.Node(el.m_node[i]).m_rt;
 
 	// calculate the tangents
@@ -609,38 +691,16 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s)
 {
 	int l;
 	FEMesh& mesh = *m_pMesh;
-
+	
 	// get the coordinates of the element nodes
 	int ne = el.Nodes();
-	vec3d y[4];
+	vec3d y[FEElement::MAX_NODES];
 	for (l=0; l<ne; ++l) y[l] = mesh.Node(el.m_node[l]).m_rt;
-
+	
 	// set up shape functions and derivatives
-	double H[4], Hr[4], Hs[4];
-	if (ne == 4)
-	{
-		H[0] = 0.25*(1 - r)*(1 - s);
-		H[1] = 0.25*(1 + r)*(1 - s);
-		H[2] = 0.25*(1 + r)*(1 + s);
-		H[3] = 0.25*(1 - r)*(1 + s);
-
-		Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-		Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-		Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-		Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-	}
-	else if (ne == 3)
-	{
-		H[0] = 1-r-s;
-		H[1] = r;
-		H[2] = s;
-
-		Hr[0] = -1; Hs[0] = -1;
-		Hr[1] =  1; Hs[1] =  0;
-		Hr[2] =  0; Hs[2] =  1;
-	}
-	else assert(false);
-
+	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
+	el.shape_deriv(Hr, Hs, r, s);
+	
 	// calculate the element tangents
 	vec3d xr(0,0,0), xs;
 	for (l=0; l<ne; ++l)
@@ -648,11 +708,11 @@ vec3d FESurface::SurfaceNormal(FESurfaceElement &el, double r, double s)
 		xr += y[l]*Hr[l];
 		xs += y[l]*Hs[l];
 	}
-
+	
 	// calculate the normal
 	vec3d np = xr ^ xs;
 	np.unit();
-
+	
 	return np;
 }
 
@@ -691,7 +751,7 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, double r, double s, vec3d t[
 	int n = el.Nodes();
 
 	// get the shape function derivatives
-	double Hr[4], Hs[4];
+	double Hr[FEElement::MAX_NODES], Hs[FEElement::MAX_NODES];
 	el.shape_deriv(Hr, Hs, r, s);
 
 	t[0] = t[1] = vec3d(0,0,0);
@@ -733,23 +793,12 @@ void FESurface::CoBaseVectors(FESurfaceElement& el, int j, vec3d t[2])
 void FESurface::CoBaseVectors0(FESurfaceElement &el, double r, double s, vec3d t[2])
 {
 	int i;
-	vec3d y[4];
-	double H0[4], H1[4];
+	const int MN = FEElement::MAX_NODES;
+	vec3d y[MN];
+	double H0[MN], H1[MN];
 	int n = el.Nodes();
 	for (i=0; i<n; ++i) y[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-	if (n == 4)
-	{
-		H0[0] = -0.25*(1-s); H1[0] = -0.25*(1-r);
-		H0[1] =  0.25*(1-s); H1[1] = -0.25*(1+r);
-		H0[2] =  0.25*(1+s); H1[2] =  0.25*(1+r);
-		H0[3] = -0.25*(1+s); H1[3] =  0.25*(1-r);
-	}
-	else if (n == 3)
-	{
-		H0[0] = -1; H1[0] = -1;
-		H0[1] =  1; H1[1] =  0;
-		H0[2] =  0; H1[2] =  1;
-	}
+	el.shape_deriv(H0, H1, r, s);
 	t[0] = t[1] = vec3d(0,0,0);
 	for (i=0; i<n; ++i) 
 	{
@@ -801,7 +850,9 @@ bool FESurface::IntersectTri(vec3d* y, vec3d r, vec3d n, double rs[2], double& g
 	vec3d m = e[0]^e[1]; m.unit();
 
 	double d = n*m;
-	if (d != 0)
+//	if (d != 0)
+	// normals should be pointing opposite to each other for valid contact
+	if (d < 0)
 	{
 		// distance from r to plane of triangle
 		g = m*(y[0] - r)/d;
@@ -942,7 +993,7 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 
 	// get the element nodes
 	FEMesh& mesh = *m_pMesh;
-	vec3d y[4];
+	vec3d y[FEElement::MAX_NODES];
 	for (int i=0; i<N; ++i) y[i] = mesh.Node(el.m_node[i]).m_rt;
 
 	// call the correct intersection function

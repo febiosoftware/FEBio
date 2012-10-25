@@ -195,24 +195,7 @@ public:
 };
 
 //=============================================================================
-// 10-node tetrahedral element using a 4-node Gaussian integration rule
-class FETet10ElementTraits : public FESolidElementTraits
-{
-public:
-	enum { NINT = 4 };
-	enum { NELN = 10 };
-
-public:
-	FETet10ElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_TET10; init(); }
-	void init();
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FETetElementTraits
-// 4-node tetrahedral elements with 4-point gaussian quadrature
-//
-
+// 4-node tetrahedral element using a 4-node Gaussian integration rule
 class FETetElementTraits : public FESolidElementTraits
 {
 public:
@@ -225,9 +208,21 @@ public:
 	void init();
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// single Gauss point integrated tet element
+//=============================================================================
+// 10-node tetrahedral element using a 4-node Gaussian integration rule
+class FETet10ElementTraits : public FESolidElementTraits
+{
+public:
+	enum { NINT = 4 };
+	enum { NELN = 10 };
 
+public:
+	FETet10ElementTraits() : FESolidElementTraits(NINT, NELN) { m_ntype = FE_TET10; init(); }
+	void init();
+};
+
+//=============================================================================
+// single Gauss point integrated tet element
 class FEG1TetElementTraits : public FESolidElementTraits
 {
 public:
@@ -240,11 +235,8 @@ public:
 	void init();
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FEPentaElementTraits
+//=============================================================================
 // 6-node pentahedral elements with 6-point gaussian quadrature 
-//
-
 class FEPentaElementTraits : public FESolidElementTraits
 {
 public:
@@ -257,11 +249,8 @@ public:
 	void init();
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FESurfaceElementTraits
-//  This class defines the specific traits for shell elements
-//
-
+//=============================================================================
+//  This class defines the specific traits for surface elements
 class FESurfaceElementTraits : public FEElementTraits
 {
 public:
@@ -275,6 +264,18 @@ public:
 		Gs.resize(ni, ne);
 	}
 
+	// shape functions at (r,s)
+	virtual void shape(double* H, double r, double s) = 0;
+
+	// shape function derivatives at (r,s)
+	virtual void shape_deriv(double* Gr, double* Gs, double r, double s) = 0;
+
+	// shape function derivatives at (r,s)
+	virtual void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s) = 0;
+
+	// project integration point data to nodes
+	virtual void project_to_nodes(double* ai, double* ao) = 0;
+
 public:
 	// gauss-point coordinates and weights
 	std::vector<double> gr;
@@ -285,11 +286,8 @@ public:
 	matrix Gr, Gs;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FEQuadElementTraits
+//=============================================================================
 // 4-node quadrilateral elements with 4-point gaussian quadrature 
-//
-
 class FEQuadElementTraits : public FESurfaceElementTraits
 {
 public:
@@ -300,13 +298,22 @@ public:
 	FEQuadElementTraits() : FESurfaceElementTraits(NINT, NELN) { m_ntype = FE_QUAD; init(); }
 
 	void init();
+
+	// shape functions at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FENIQuadElementTraits
+//=============================================================================
 // 4-node quadrilateral elements with nodal quadrature 
-//
-
 class FENIQuadElementTraits : public FESurfaceElementTraits
 {
 public:
@@ -317,13 +324,22 @@ public:
 	FENIQuadElementTraits() : FESurfaceElementTraits(NINT, NELN) { m_ntype = FE_NIQUAD; init(); }
 
 	void init();
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FETriElementTraits
+//=============================================================================
 //  3-node triangular element with 3-point gaussian quadrature
-//
-
 class FETriElementTraits : public FESurfaceElementTraits
 {
 public:
@@ -334,13 +350,22 @@ public:
 	FETriElementTraits() : FESurfaceElementTraits(NINT, NELN) { m_ntype = FE_TRI; init(); }
 
 	void init();
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FENITriElementTraits
+//=============================================================================
 //  3-node triangular element with nodal quadrature
-//
-
 class FENITriElementTraits : public FESurfaceElementTraits
 {
 public:
@@ -351,6 +376,18 @@ public:
 	FENITriElementTraits() : FESurfaceElementTraits(NINT, NELN) { m_ntype = FE_NITRI; init(); }
 
 	void init();
+
+	// shape function at (r,s)
+	void shape(double* H, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
 };
 
 //=============================================================================
@@ -372,6 +409,12 @@ public:
 
 	// shape function derivatives at (r,s)
 	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
 };
 
 //=============================================================================
@@ -393,13 +436,17 @@ public:
 
 	// shape function derivatives at (r,s)
 	void shape_deriv(double* Gr, double* Gs, double r, double s);
+
+	// shape function derivatives at (r,s)
+	void shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s);
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FEShellElementTraits
+//=============================================================================
 //  This class defines the specific traits for shell elements
 //
-
 class FEShellElementTraits : public FEElementTraits
 {
 public:
@@ -425,11 +472,9 @@ public:
 	matrix Hr, Hs;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FEShellQuadElementTraits
+//=============================================================================
 // 4-node quadrilateral elements with 4*3-point gaussian quadrature 
 //
-
 class FEShellQuadElementTraits : public FEShellElementTraits
 {
 public:
@@ -442,11 +487,9 @@ public:
 	void init();
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// CLASS: FEShellTriElementTraits
+//=============================================================================
 // 3-node triangular elements with 3*3-point gaussian quadrature 
 //
-
 class FEShellTriElementTraits : public FEShellElementTraits
 {
 public:
@@ -459,7 +502,7 @@ public:
 	void init();
 };
 
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 class FETrussElementTraits : public FEElementTraits
 {
 public:
@@ -472,7 +515,7 @@ public:
 	void init();
 };
 
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 class FEDiscreteElementTraits : public FEElementTraits
 {
 public:

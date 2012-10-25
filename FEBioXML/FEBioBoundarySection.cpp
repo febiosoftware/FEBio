@@ -78,8 +78,9 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 	{
 		FESurfaceElement& el = s.Element(i);
 
-		if (tag == "quad4") el.SetType(FE_NIQUAD);
-		else if (tag == "tri3") el.SetType(FE_NITRI);
+		if      (tag == "quad4") el.SetType(FE_NIQUAD);
+		else if (tag == "tri3" ) el.SetType(FE_NITRI );
+		else if (tag == "tri6" ) el.SetType(FE_NITRI6);
 		else throw XMLReader::InvalidTag(tag);
 
 		N = el.Nodes();

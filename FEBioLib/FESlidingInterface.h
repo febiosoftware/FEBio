@@ -30,8 +30,7 @@ public:
 	//! Calculate the total traction at a node
 	vec3d traction(int inode);
 
-	void UpdateNormals();
-
+	//! Serialize data to archive
 	void Serialize(DumpFile& ar);
 
 public:
@@ -77,12 +76,7 @@ public:
 	void ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove = false);
 
 	//! shallow copy
-	void ShallowCopy(FEContactInterface& ci)
-	{
-		FESlidingInterface& si = dynamic_cast<FESlidingInterface&>(ci);
-		m_ss.ShallowCopy(si.m_ss);
-		m_ms.ShallowCopy(si.m_ms);
-	}
+	void ShallowCopy(FEContactInterface& ci);
 
 	//! calculate penalty value
 	double Penalty() { return m_eps; }
