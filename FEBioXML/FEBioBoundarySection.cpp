@@ -655,6 +655,7 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 		
 		s  = atof(tag.AttributeValue("scale"));
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
 		
 		if (tag == "quad4") el.SetType(FE_QUAD);
 		else if (tag == "tri3") el.SetType(FE_TRI);
@@ -728,6 +729,7 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 		
 		s  = atof(tag.AttributeValue("scale"));
 		fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
+		fc.s[4] = fc.s[5] = fc.s[6] = fc.s[7] = s;
 		
 		if (tag == "quad4") el.SetType(FE_QUAD);
 		else if (tag == "tri3") el.SetType(FE_TRI);
@@ -792,6 +794,7 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 		
 		s  = atof(tag.AttributeValue("scale"));
 		fc.s[0] = fc.s[1] = fc.s[2] = fc.s[3] = s;
+		fc.s[4] = fc.s[5] = fc.s[6] = fc.s[7] = s;
 		
 		if (tag == "quad4") el.SetType(FE_QUAD);
 		else if (tag == "tri3") el.SetType(FE_TRI);
@@ -848,6 +851,7 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 
 		s  = atof(tag.AttributeValue("scale"));
 		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
 
 		if (tag == "quad4") el.SetType(FE_QUAD);
 		else if (tag == "tri3") el.SetType(FE_TRI);

@@ -10,9 +10,9 @@ class FESoluteFlux : public FESurfaceLoad
 public:
 	struct LOAD
 	{
-		LOAD() { s[0] = s[1] = s[2] = s[3] = 1.0; bc = 0; }
+		LOAD() { s[0] = s[1] = s[2] = s[3] = s[4] = s[5] = s[6] = s[7] = 1.0; bc = 0; }
 		
-		double	s[4];		// nodal scale factors
+		double	s[8];		// nodal scale factors
 		int		lc;			// load curve
 		int		bc;			// degree of freedom
 	};

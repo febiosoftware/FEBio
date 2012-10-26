@@ -195,6 +195,7 @@ void FESoluteFlux::Serialize(DumpFile& ar)
 			LOAD& fc = m_PC[i];
 			ar << fc.lc;
 			ar << fc.s[0] << fc.s[1] << fc.s[2] << fc.s[3];
+			ar << fc.s[4] << fc.s[5] << fc.s[6] << fc.s[7];
 			ar << fc.bc;
 		}
 	}
@@ -210,6 +211,7 @@ void FESoluteFlux::Serialize(DumpFile& ar)
 			LOAD& fc = m_PC[i];
 			ar >> fc.lc;
 			ar >> fc.s[0] >> fc.s[1] >> fc.s[2] >> fc.s[3];
+			ar >> fc.s[4] >> fc.s[5] >> fc.s[6] >> fc.s[7];
 			ar >> fc.bc;
 		}
 	}

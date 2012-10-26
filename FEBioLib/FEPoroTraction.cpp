@@ -254,6 +254,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 			LOAD& pc = m_PC[i];
 			ar << pc.lc;
 			ar << pc.s[0] << pc.s[1] << pc.s[2] << pc.s[3];
+			ar << pc.s[4] << pc.s[5] << pc.s[6] << pc.s[7];
 		}
 	}
 	else
@@ -267,6 +268,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 			LOAD& pc = m_PC[i];
 			ar >> pc.lc;
 			ar >> pc.s[0] >> pc.s[1] >> pc.s[2] >> pc.s[3];
+			ar >> pc.s[4] >> pc.s[5] >> pc.s[6] >> pc.s[7];
 		}
 	}
 }

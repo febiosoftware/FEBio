@@ -93,6 +93,7 @@ void FEHeatFlux::Serialize(DumpFile &ar)
 			LOAD& d = m_FC[i];
 			ar << d.lc;
 			ar << d.s[0] << d.s[1] << d.s[2] << d.s[3];
+			ar << d.s[4] << d.s[5] << d.s[6] << d.s[7];
 		}
 	}
 	else
@@ -105,6 +106,7 @@ void FEHeatFlux::Serialize(DumpFile &ar)
 			LOAD& d = m_FC[i];
 			ar >> d.lc;
 			ar >> d.s[0] >> d.s[1] >> d.s[2] >> d.s[3];
+			ar >> d.s[4] >> d.s[5] >> d.s[6] >> d.s[7];
 		}
 	}
 }
