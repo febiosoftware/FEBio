@@ -19,6 +19,8 @@ public:
 	virtual void SetProgress(double f) = 0;
 };
 
+namespace FECore {
+
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
 class FEAnalysis
@@ -138,3 +140,5 @@ protected:
 protected:
 	int		m_ntype;		// step type
 };
+
+} // namespace FECore

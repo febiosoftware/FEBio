@@ -15,7 +15,6 @@
 #include <vector>
 #include "MatrixProfile.h"
 #include "matrix.h"
-using namespace std;
 
 namespace NumCore {
 
@@ -31,42 +30,48 @@ public:
 	SparseMatrix();
 	virtual ~SparseMatrix() {}
 
+public:
+
+	//! return number of nonzeros
+	int NonZeroes() { return m_nsize; };
+
+	//! return size, i.e. number of rows (or columns)
+	int Size() { return m_ndim; }
+
+	//! set all matrix elements to zero
+	void zero();
+
+public: // functions to be overwritten in derived classes
+
 	//! Create a sparse matrix from a sparse-matrix profile
 	virtual void Create(SparseMatrixProfile& MP) = 0;
 
 	//! assemble a matrix into the sparse matrix
-	virtual void Assemble(matrix& ke, vector<int>& lm) = 0;
+	virtual void Assemble(matrix& ke, std::vector<int>& lm) = 0;
 
 	//! assemble a matrix into the sparse matrix
-	virtual void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj) = 0;
+	virtual void Assemble(matrix& ke, std::vector<int>& lmi, std::vector<int>& lmj) = 0;
 
-	// set entry to value
+	//! set entry to value
 	virtual void set(int i, int j, double v) = 0;
 
-	// add value to entry
+	//! add value to entry
 	virtual void add(int i, int j, double v) = 0;
 
-	// retrieve value
+	//! retrieve value
 	virtual double get(int i, int j) { return 0; }
 
-	// get the diagonal
+	//! get the diagonal value
 	virtual double diag(int i) = 0;
 
-	virtual void Clear()
-	{
-		if (m_pd) delete [] m_pd; m_pd = 0;
-	}
-
-	void zero() { memset(m_pd, 0, m_nsize*sizeof(double)); };
-
-	int NonZeroes() { return m_nsize; };
-	int Size() { return m_ndim; }
+	//! release memory for storing data
+	virtual void Clear();
 
 protected:
-	int	m_ndim;	// dimension of matrix
+	int	m_ndim;		//!< dimension of matrix
+	int	m_nsize;	//!< size of m_pd array
 
-	double*	m_pd;		// matrix values
-	int	m_nsize;	// size of m_pd array
+	double*	m_pd;	//!< matrix values
 };
 
 //-----------------------------------------------------------------------------

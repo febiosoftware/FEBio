@@ -1,5 +1,6 @@
 #pragma once
 #include "FEBoundaryCondition.h"
+using namespace FECore;
 
 //-----------------------------------------------------------------------------
 //! concentrated nodal force boundary condition

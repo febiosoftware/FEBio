@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBoundaryCondition.h"
+using namespace FECore;
 
 int FEBoundaryCondition::m_ncount = 0;
 
