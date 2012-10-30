@@ -6,6 +6,7 @@
 FEClosestPointProjection::FEClosestPointProjection(FESurface& s) : m_surf(s)
 {
 	// set default options
+	m_tol = 0.01;
 
 	// calculate node-element list
 	m_NET.Create(&m_surf);
@@ -27,7 +28,7 @@ bool FEClosestPointProjection::Init()
 //! surface element if the projection is succesful, otherwise null. The natural
 //! coordinates of the projection is return in r and the spatial coordinates in q.
 //! 
-FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r, double tol)
+FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r)
 {
 	// get the mesh
 	FEMesh& mesh = *m_surf.GetMesh();
@@ -55,7 +56,7 @@ FESurfaceElement* FEClosestPointProjection::Project(vec3d& x, vec3d& q, vec2d& r
 		r[0] = 0;
 		r[1] = 0;
 		q = m_surf.ProjectToSurface(el, x, r[0], r[1]);
-		if (m_surf.IsInsideElement(el, r[0], r[1], tol)) return &el;
+		if (m_surf.IsInsideElement(el, r[0], r[1], m_tol)) return &el;
 	}
 
 	// If we get here, we did not find a facet.
