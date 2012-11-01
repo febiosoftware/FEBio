@@ -287,7 +287,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febioplotd.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecored.lib;numcored.lib;febiolibd.lib;febioplotd.lib;febioxmld.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -52,6 +52,9 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	// keep a pointer to the fem object
 	m_pfem = &fem;
 
+	// keep a pointer to the mesh
+	m_pMesh = &fem.GetMesh();
+
 	// intialize some variables
 	m_pStep = 0;	// zero step pointer
 	m_nsteps = 0;	// reset step section counter

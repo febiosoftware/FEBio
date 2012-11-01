@@ -68,6 +68,9 @@ public:
 	//! Project a node onto a surface element
 	vec3d ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, double& s);
 
+	//! Project a node onto a surface element
+	vec3d ProjectToReferenceSurface(FESurfaceElement& el, vec3d x, double& r, double& s);
+
 	//! check to see if a point is on element
 	bool IsInsideElement(FESurfaceElement& el, double r, double s, double tol = 0);
 
@@ -86,6 +89,9 @@ public:
 
 	//! Find the closest point projection onto this surface
 	FESurfaceElement* ClosestPointProjection(vec3d& x, vec3d& q, vec2d& r, bool binit_nq, double tol);
+
+	//! Find the closest point projection onto this surface
+	FESurfaceElement* ClosestReferencePointProjection(vec3d& x, vec3d& q, vec2d& r, bool binit_nq, double tol);
 
 public:
 

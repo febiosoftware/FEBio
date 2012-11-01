@@ -34,12 +34,14 @@ public:
 
 	//! initialize search structures
 	void Init();
+	void InitReference();
 
 	//! attach to a surface
 	void Attach(FESurface* ps) { m_ps = ps; }
 
 	//! find the neirest neighbour of r
 	int Find(vec3d x);	
+	int FindReference(vec3d x);	
 
 protected:
 	int FindRadius(double r);

@@ -36,7 +36,17 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 			++tag;
 			do
 			{
-				if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+				if (m_pim->ReadParameter(tag, pl) == false)
+				{
+					if (tag == "surface")
+					{
+						const char* sztype = tag.AttributeValue("type");
+						FESurface* ps = plc->GetSurface(sztype);
+						if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+						ParseSurfaceSection(tag, *ps, 0);
+					}
+					else throw XMLReader::InvalidTag(tag);
+				}
 				++tag;
 			}
 			while (!tag.isend());
@@ -213,4 +223,63 @@ void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
 	pc->m_eps = eps;
 	pc->m_node = node-1;
 	fem.AddNonlinearConstraint(pc);
+}
+
+//---------------------------------------------------------------------------------
+// parse a surface section for contact definitions
+//
+bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+	int NN = m.Nodes();
+
+	// count nr of faces
+	int faces = 0, N, nf[4];
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { faces++; ++t; }
+
+	// allocate storage for faces
+	s.create(faces);
+
+	// read faces
+	++tag;
+	for (int i=0; i<faces; ++i)
+	{
+		FESurfaceElement& el = s.Element(i);
+
+		if (tag == "quad4") el.SetType(FE_NIQUAD);
+		else if (tag == "tri3") el.SetType(FE_NITRI);
+		else throw XMLReader::InvalidTag(tag);
+
+		N = el.Nodes();
+
+		if (nfmt == 0)
+		{
+			tag.value(nf, N);
+			for (int j=0; j<N; ++j) 
+			{
+				int nid = nf[j]-1;
+				if ((nid<0)||(nid>= NN)) throw XMLReader::InvalidValue(tag);
+				el.m_node[j] = nid;
+			}
+		}
+		else if (nfmt == 1)
+		{
+			tag.value(nf, 2);
+			FEElement* pe = m.FindElementFromID(nf[0]);
+			if (pe)
+			{
+				int ne[4];
+				int nn = m.GetFace(*pe, nf[1]-1, ne);
+				if (nn != N) throw XMLReader::InvalidValue(tag);
+				for (int j=0; j<N; ++j) el.m_node[j] = ne[j];
+				el.m_nelem = nf[0];
+			}
+			else throw XMLReader::InvalidValue(tag);
+		}
+
+		++tag;
+	}
+	return true;
 }

@@ -3,6 +3,7 @@
 #include "DumpFile.h"
 #include "FEParameterList.h"
 #include "FEGlobalVector.h"
+#include "FESurface.h"
 #include <vector>
 using namespace std;
 
@@ -31,6 +32,8 @@ public:
 
 	// update state
 	virtual void Update() {}
+
+	virtual FESurface* GetSurface(const char* sz) { return 0; }
 
 protected:
 	FEModel*	m_pfem;

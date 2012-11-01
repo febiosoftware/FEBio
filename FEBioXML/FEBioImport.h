@@ -71,7 +71,9 @@ public:
 	//! Load the model data from file.
 	bool Load(FEModel& fem, const char* szfile);
 
+public:
 	FEModel* GetFEModel() { return m_pfem; }
+	FEMesh* GetFEMesh() { return m_pMesh; }
 	FEAnalysis*	GetStep();
 
 	int Version() { return m_nversion; }
@@ -93,6 +95,7 @@ protected:
 public:
 	FEModel*	m_pfem;		//!< pointer to the fem class
 	FEAnalysis*	m_pStep;	//!< pointer to current analysis step
+	FEMesh*		m_pMesh;	//!< pointer to the mesh class
 
 public:
 	char	m_szdmp[256];

@@ -35,6 +35,8 @@ protected:
 	void ParseNodeSetSection    (XMLTag& tag);
 	void ParsePartSection       (XMLTag& tag);
 
+	void ParseMesh(XMLTag& tag);
+
 	void ReadSolidElement(XMLTag& tag, FESolidElement& el, int ntype, int nid, int nmat);
 	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int nmat);
 	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int nmat);

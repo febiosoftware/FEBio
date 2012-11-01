@@ -90,6 +90,64 @@ void FENNQuery::Init()
 
 //-----------------------------------------------------------------------------
 
+void FENNQuery::InitReference()
+{
+	assert(m_ps);
+
+	int i;
+	vec3d r0, r;
+	int N = m_ps->Nodes();
+
+	// pick a random point as pivot
+	r0 = m_q1 = m_ps->Node(0).m_r0;
+
+	// find the furtest node of this node
+	double dmax = 0, d;
+	for (i=0; i<N; ++i)
+	{
+		r = m_ps->Node(i).m_r0;
+		d = (r - r0)*(r - r0);
+		if (d > dmax)
+		{
+			m_q1 = r;
+			dmax = d;
+		}
+	}
+
+	// let's find the furthest node of this node
+	r0 = m_q2 = m_q1;
+	dmax = 0;
+	for (i=0; i<N; ++i)
+	{
+		r = m_ps->Node(i).m_r0;
+		d = (r - r0)*(r - r0);
+		if (d > dmax)
+		{
+			m_q2 = r;
+			dmax = d;
+		}
+	}
+
+	// create the BK-"tree"
+	m_bk.resize(N);
+	for (i=0; i<N; ++i) 
+	{
+		r = m_ps->Node(i).m_r0;
+		m_bk[i].i = i;
+		m_bk[i].r = r;
+		m_bk[i].d1 = (m_q1 - r)*(m_q1 - r);
+		m_bk[i].d2 = (m_q2 - r)*(m_q2 - r);
+	}
+
+	// sort the tree
+	qsort(&m_bk[0], N, sizeof(NODE), cmp_node);
+
+	// set the initial search item
+	m_imin = 0;
+}
+
+//-----------------------------------------------------------------------------
+
 int FENNQuery::Find(vec3d x)
 {
 	int m_i0 = -1;
@@ -172,6 +230,94 @@ int FENNQuery::Find(vec3d x)
 		}
 	}
 	assert(imin == m_imin);
+*/
+	return m_imin;
+}
+
+//-----------------------------------------------------------------------------
+
+int FENNQuery::FindReference(vec3d x)
+{
+	int m_i0 = -1;
+	double rmin1, rmin2, rmax1, rmax2;
+	double rmin1s, rmin2s, rmax1s, rmax2s;
+	double d, d1, d2, dmin;
+	vec3d r;
+
+	// set the initial search radii
+	d1 = sqrt((m_q1 - x)*(m_q1 - x)); 
+	rmin1 = 0;
+	rmax1 = 2*d1;
+
+	d2 = sqrt((m_q2 - x)*(m_q2 - x));
+	rmin2 = 0;
+	rmax2 = 2*d2;
+
+	// check the last found item
+	r = m_ps->Node(m_imin).m_r0;
+	dmin = (r - x)*(r - x);
+	d = sqrt(dmin);
+	
+	// adjust search radii
+	if (d1 - d > rmin1) rmin1 = d1 - d;
+	if (d1 + d < rmax1) rmax1 = d1 + d;
+	rmin1s = rmin1*rmin1;
+	rmax1s = rmax1*rmax1;
+
+	if (d2 - d > rmin2) rmin2 = d2 - d;
+	if (d2 + d < rmax2) rmax2 = d2 + d;
+	rmin2s = rmin2*rmin2;
+	rmax2s = rmax2*rmax2;
+
+	// find the first item that satisfies d(i, q1) >= rmin1
+	int i0 = FindRadius(rmin1s);
+
+	for (int i=i0; i<(int) m_bk.size(); ++i)
+	{
+		NODE& n = m_bk[i];
+		if (n.d1 <= rmax1s)
+		{
+			if ((n.d2 >= rmin2s) && (n.d2 <= rmax2s))
+			{
+				r = n.r;
+				d = (r - x)*(r - x);
+				if (d < dmin)
+				{
+					dmin = d;
+					d = sqrt(dmin);
+					m_imin = n.i;
+
+//					if (d1 - d > rmin1) rmin1 = d1 - d;
+					if (d1 + d < rmax1) rmax1 = d1 + d;
+//					rmin1s = rmin1*rmin1;
+					rmax1s = rmax1*rmax1;
+
+					if (d2 - d > rmin2) rmin2 = d2 - d;
+					if (d2 + d < rmax2) rmax2 = d2 + d;
+					rmin2s = rmin2*rmin2;
+					rmax2s = rmax2*rmax2;
+				}
+			}
+		}
+		else break;
+	}
+
+/*
+	// do it the hard way
+	int imin = 0;
+	r = m_ps->Node(imin).m_r0;
+	double d0 = (r - x)*(r - x);
+	for (int i=0; i<m_ps->Nodes(); ++i)
+	{
+		r = m_ps->Node(i).m_r0;
+		d = (r - x)*(r - x);
+		if (d < d0)
+		{
+			d0 = d;
+			imin = i;
+		}
+	}
+//	assert(imin == m_imin);
 */
 	return m_imin;
 }
