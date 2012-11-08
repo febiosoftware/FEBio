@@ -6,15 +6,178 @@
 #include "FEElementTraits.h"
 #include "FEElement.h"
 #include "FEException.h"
-
-//*****************************************************************************
-//                          F E H E X E L E M E N T
-//*****************************************************************************
-
-void FEHexElementTraits::init()
+//=============================================================================
+FESolidElementTraits::FESolidElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et) 
 {
-	int n;
+	gr.resize(ni);
+	gs.resize(ni);
+	gt.resize(ni);
+	gw.resize(ni);
+
+	Gr.resize(ni, ne);
+	Gs.resize(ni, ne);
+	Gt.resize(ni, ne);
+
+	Grr.resize(ni, ne);
+	Gsr.resize(ni, ne);
+	Gtr.resize(ni, ne);
+		
+	Grs.resize(ni, ne);
+	Gss.resize(ni, ne);
+	Gts.resize(ni, ne);
+		
+	Grt.resize(ni, ne);
+	Gst.resize(ni, ne);
+	Gtt.resize(ni, ne);
+		
+	m_Jt.resize(ni);
+	m_Jti.resize(ni);
+	m_detJt.resize(ni);
+
+	m_J0.resize(ni);
+	m_J0i.resize(ni);
+	m_detJ0.resize(ni);
+}
+
+//-----------------------------------------------------------------------------
+//! initialize element traits data
+void FESolidElementTraits::init()
+{
+	assert(nint > 0);
+	assert(neln > 0);
+	const int NELN = FEElement::MAX_NODES;
+
+	// calculate shape function values at gauss points
+	double N[NELN];
+	for (int n=0; n<nint; ++n)
+	{
+		shape_fnc(N, gr[n], gs[n], gt[n]);
+		for (int i=0; i<neln; ++i) H[n][i] = N[i];
+	}
+
+	// calculate local derivatives of shape functions at gauss points
+	double Hr[NELN], Hs[NELN], Ht[NELN];
+	for (int n=0; n<nint; ++n)
+	{
+		shape_deriv(Hr, Hs, Ht, gr[n], gs[n], gt[n]);
+		for (int i=0; i<neln; ++i)
+		{
+			Gr[n][i] = Hr[i];
+			Gs[n][i] = Hs[i];
+			Gt[n][i] = Ht[i];
+		}
+	}
 	
+	// calculate local second derivatives of shape functions at gauss points
+	double Hrr[NELN], Hss[NELN], Htt[NELN], Hrs[NELN], Hst[NELN], Hrt[NELN];
+	for (int n=0; n<nint; ++n)
+	{
+		shape_deriv2(Hrr, Hss, Htt, Hrs, Hst, Hrt, gr[n], gs[n], gt[n]);
+		for (int i=0; i<neln; ++i)
+		{
+			Grr[n][i] = Hrr[i]; Grs[n][i] = Hrs[i]; Grr[n][i] = Hrr[i]; 
+			Gsr[n][i] = Hrs[i]; Gss[n][i] = Hss[i]; Gst[n][i] = Hst[i]; 
+			Gtr[n][i] = Hrt[i]; Gts[n][i] = Hst[i]; Gtt[n][i] = Htt[i]; 
+		}
+	}
+}
+
+//=============================================================================
+//                                F E H E X 8
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+void FEHex8_::shape_fnc(double* H, double r, double s, double t)
+{
+	H[0] = 0.125*(1 - r)*(1 - s)*(1 - t);
+	H[1] = 0.125*(1 + r)*(1 - s)*(1 - t);
+	H[2] = 0.125*(1 + r)*(1 + s)*(1 - t);
+	H[3] = 0.125*(1 - r)*(1 + s)*(1 - t);
+	H[4] = 0.125*(1 - r)*(1 - s)*(1 + t);
+	H[5] = 0.125*(1 + r)*(1 - s)*(1 + t);
+	H[6] = 0.125*(1 + r)*(1 + s)*(1 + t);
+	H[7] = 0.125*(1 - r)*(1 + s)*(1 + t);
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FEHex8_::shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t)
+{
+	Hr[0] = -0.125*(1 - s)*(1 - t);
+	Hr[1] =  0.125*(1 - s)*(1 - t);
+	Hr[2] =  0.125*(1 + s)*(1 - t);
+	Hr[3] = -0.125*(1 + s)*(1 - t);
+	Hr[4] = -0.125*(1 - s)*(1 + t);
+	Hr[5] =  0.125*(1 - s)*(1 + t);
+	Hr[6] =  0.125*(1 + s)*(1 + t);
+	Hr[7] = -0.125*(1 + s)*(1 + t);
+		
+	Hs[0] = -0.125*(1 - r)*(1 - t);
+	Hs[1] = -0.125*(1 + r)*(1 - t);
+	Hs[2] =  0.125*(1 + r)*(1 - t);
+	Hs[3] =  0.125*(1 - r)*(1 - t);
+	Hs[4] = -0.125*(1 - r)*(1 + t);
+	Hs[5] = -0.125*(1 + r)*(1 + t);
+	Hs[6] =  0.125*(1 + r)*(1 + t);
+	Hs[7] =  0.125*(1 - r)*(1 + t);
+		
+	Ht[0] = -0.125*(1 - r)*(1 - s);
+	Ht[1] = -0.125*(1 + r)*(1 - s);
+	Ht[2] = -0.125*(1 + r)*(1 + s);
+	Ht[3] = -0.125*(1 - r)*(1 + s);
+	Ht[4] =  0.125*(1 - r)*(1 - s);
+	Ht[5] =  0.125*(1 + r)*(1 - s);
+	Ht[6] =  0.125*(1 + r)*(1 + s);
+	Ht[7] =  0.125*(1 - r)*(1 + s);
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function second derivatives
+void FEHex8_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t)
+{
+	Hrr[0] = 0.0; Hss[0] = 0.0; Htt[0] = 0.0;
+	Hrr[1] = 0.0; Hss[1] = 0.0; Htt[1] = 0.0;
+	Hrr[2] = 0.0; Hss[2] = 0.0; Htt[2] = 0.0;
+	Hrr[3] = 0.0; Hss[3] = 0.0; Htt[3] = 0.0;
+	Hrr[4] = 0.0; Hss[4] = 0.0; Htt[4] = 0.0;
+	Hrr[5] = 0.0; Hss[5] = 0.0; Htt[5] = 0.0;
+	Hrr[6] = 0.0; Hss[6] = 0.0; Htt[6] = 0.0;
+	Hrr[7] = 0.0; Hss[7] = 0.0; Htt[7] = 0.0;
+		
+	Hrs[0] =  0.125*(1 - t);
+	Hrs[1] = -0.125*(1 - t);
+	Hrs[2] =  0.125*(1 - t);
+	Hrs[3] = -0.125*(1 - t);
+	Hrs[4] =  0.125*(1 + t);
+	Hrs[5] = -0.125*(1 + t);
+	Hrs[6] =  0.125*(1 + t);
+	Hrs[7] = -0.125*(1 + t);
+		
+	Hrt[0] =  0.125*(1 - s);
+	Hrt[1] = -0.125*(1 - s);
+	Hrt[2] = -0.125*(1 + s);
+	Hrt[3] =  0.125*(1 + s);
+	Hrt[4] = -0.125*(1 - s);
+	Hrt[5] =  0.125*(1 - s);
+	Hrt[6] =  0.125*(1 + s);
+	Hrt[7] = -0.125*(1 + s);
+		
+	Hst[0] =  0.125*(1 - r);
+	Hst[1] =  0.125*(1 + r);
+	Hst[2] = -0.125*(1 + r);
+	Hst[3] = -0.125*(1 - r);
+	Hst[4] = -0.125*(1 - r);
+	Hst[5] = -0.125*(1 + r);
+	Hst[6] =  0.125*(1 + r);
+	Hst[7] =  0.125*(1 - r);
+}
+
+//*****************************************************************************
+//                          H E X 8 G 8 
+//*****************************************************************************
+
+FEHex8G8::FEHex8G8() : FEHex8_(NINT, FE_HEX8G8)
+{
 	// integration point coordinates
 	const double a = 1.0 / sqrt(3.0);
 	gr[0] = -a; gs[0] = -a; gt[0] = -a; gw[0] = 1;
@@ -25,148 +188,521 @@ void FEHexElementTraits::init()
 	gr[5] =  a; gs[5] = -a; gt[5] =  a; gw[5] = 1;
 	gr[6] =  a; gs[6] =  a; gt[6] =  a; gw[6] = 1;
 	gr[7] = -a; gs[7] =  a; gt[7] =  a; gw[7] = 1;
-	
-	// calculate shape function values at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 0.125*(1 - gr[n])*(1 - gs[n])*(1 - gt[n]);
-		H[n][1] = 0.125*(1 + gr[n])*(1 - gs[n])*(1 - gt[n]);
-		H[n][2] = 0.125*(1 + gr[n])*(1 + gs[n])*(1 - gt[n]);
-		H[n][3] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 - gt[n]);
-		H[n][4] = 0.125*(1 - gr[n])*(1 - gs[n])*(1 + gt[n]);
-		H[n][5] = 0.125*(1 + gr[n])*(1 - gs[n])*(1 + gt[n]);
-		H[n][6] = 0.125*(1 + gr[n])*(1 + gs[n])*(1 + gt[n]);
-		H[n][7] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 + gt[n]);
-	}
-
+	init();
 	Hi = H.inverse();
-	
-	// calculate local derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
+}
+
+//-----------------------------------------------------------------------------
+void FEHex8G8::project_to_nodes(double* ai, double* ao)
+{
+	for (int j=0; j<NELN; ++j)
 	{
-		Gr[n][0] = -0.125*(1 - gs[n])*(1 - gt[n]);
-		Gr[n][1] =  0.125*(1 - gs[n])*(1 - gt[n]);
-		Gr[n][2] =  0.125*(1 + gs[n])*(1 - gt[n]);
-		Gr[n][3] = -0.125*(1 + gs[n])*(1 - gt[n]);
-		Gr[n][4] = -0.125*(1 - gs[n])*(1 + gt[n]);
-		Gr[n][5] =  0.125*(1 - gs[n])*(1 + gt[n]);
-		Gr[n][6] =  0.125*(1 + gs[n])*(1 + gt[n]);
-		Gr[n][7] = -0.125*(1 + gs[n])*(1 + gt[n]);
-		
-		Gs[n][0] = -0.125*(1 - gr[n])*(1 - gt[n]);
-		Gs[n][1] = -0.125*(1 + gr[n])*(1 - gt[n]);
-		Gs[n][2] =  0.125*(1 + gr[n])*(1 - gt[n]);
-		Gs[n][3] =  0.125*(1 - gr[n])*(1 - gt[n]);
-		Gs[n][4] = -0.125*(1 - gr[n])*(1 + gt[n]);
-		Gs[n][5] = -0.125*(1 + gr[n])*(1 + gt[n]);
-		Gs[n][6] =  0.125*(1 + gr[n])*(1 + gt[n]);
-		Gs[n][7] =  0.125*(1 - gr[n])*(1 + gt[n]);
-		
-		Gt[n][0] = -0.125*(1 - gr[n])*(1 - gs[n]);
-		Gt[n][1] = -0.125*(1 + gr[n])*(1 - gs[n]);
-		Gt[n][2] = -0.125*(1 + gr[n])*(1 + gs[n]);
-		Gt[n][3] = -0.125*(1 - gr[n])*(1 + gs[n]);
-		Gt[n][4] =  0.125*(1 - gr[n])*(1 - gs[n]);
-		Gt[n][5] =  0.125*(1 + gr[n])*(1 - gs[n]);
-		Gt[n][6] =  0.125*(1 + gr[n])*(1 + gs[n]);
-		Gt[n][7] =  0.125*(1 - gr[n])*(1 + gs[n]);
+		ao[j] = 0;
+		for (int k=0; k<NINT; ++k) 
+		{
+			ao[j] += Hi[j][k]*ai[k];
+		}
 	}
-	
-	// calculate local second derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Grr[n][0] = 0.0;
-		Grr[n][1] = 0.0;
-		Grr[n][2] = 0.0;
-		Grr[n][3] = 0.0;
-		Grr[n][4] = 0.0;
-		Grr[n][5] = 0.0;
-		Grr[n][6] = 0.0;
-		Grr[n][7] = 0.0;
-		
-		Gsr[n][0] = 0.125*(1 - gt[n]);
-		Gsr[n][1] = -0.125*(1 - gt[n]);
-		Gsr[n][2] =  0.125*(1 - gt[n]);
-		Gsr[n][3] = -0.125*(1 - gt[n]);
-		Gsr[n][4] =  0.125*(1 + gt[n]);
-		Gsr[n][5] = -0.125*(1 + gt[n]);
-		Gsr[n][6] =  0.125*(1 + gt[n]);
-		Gsr[n][7] = -0.125*(1 + gt[n]);
-		
-		Gtr[n][0] =  0.125*(1 - gs[n]);
-		Gtr[n][1] = -0.125*(1 - gs[n]);
-		Gtr[n][2] = -0.125*(1 + gs[n]);
-		Gtr[n][3] =  0.125*(1 + gs[n]);
-		Gtr[n][4] = -0.125*(1 - gs[n]);
-		Gtr[n][5] =  0.125*(1 - gs[n]);
-		Gtr[n][6] =  0.125*(1 + gs[n]);
-		Gtr[n][7] = -0.125*(1 + gs[n]);
-		
-		Grs[n][0] =  0.125*(1 - gt[n]);
-		Grs[n][1] = -0.125*(1 - gt[n]);
-		Grs[n][2] =  0.125*(1 - gt[n]);
-		Grs[n][3] = -0.125*(1 - gt[n]);
-		Grs[n][4] =  0.125*(1 + gt[n]);
-		Grs[n][5] = -0.125*(1 + gt[n]);
-		Grs[n][6] =  0.125*(1 + gt[n]);
-		Grs[n][7] = -0.125*(1 + gt[n]);
-		
-		Gss[n][0] = 0.0;
-		Gss[n][1] = 0.0;
-		Gss[n][2] = 0.0;
-		Gss[n][3] = 0.0;
-		Gss[n][4] = 0.0;
-		Gss[n][5] = 0.0;
-		Gss[n][6] = 0.0;
-		Gss[n][7] = 0.0;
-		
-		Gts[n][0] =  0.125*(1 - gr[n]);
-		Gts[n][1] =  0.125*(1 + gr[n]);
-		Gts[n][2] = -0.125*(1 + gr[n]);
-		Gts[n][3] = -0.125*(1 - gr[n]);
-		Gts[n][4] = -0.125*(1 - gr[n]);
-		Gts[n][5] = -0.125*(1 + gr[n]);
-		Gts[n][6] =  0.125*(1 + gr[n]);
-		Gts[n][7] =  0.125*(1 - gr[n]);
-		
-		Grt[n][0] =  0.125*(1 - gs[n]);
-		Grt[n][1] = -0.125*(1 - gs[n]);
-		Grt[n][2] = -0.125*(1 + gs[n]);
-		Grt[n][3] =  0.125*(1 + gs[n]);
-		Grt[n][4] = -0.125*(1 - gs[n]);
-		Grt[n][5] =  0.125*(1 - gs[n]);
-		Grt[n][6] =  0.125*(1 + gs[n]);
-		Grt[n][7] = -0.125*(1 + gs[n]);
-		
-		Gst[n][0] =  0.125*(1 - gr[n]);
-		Gst[n][1] =  0.125*(1 + gr[n]);
-		Gst[n][2] = -0.125*(1 + gr[n]);
-		Gst[n][3] = -0.125*(1 - gr[n]);
-		Gst[n][4] = -0.125*(1 - gr[n]);
-		Gst[n][5] = -0.125*(1 + gr[n]);
-		Gst[n][6] =  0.125*(1 + gr[n]);
-		Gst[n][7] =  0.125*(1 - gr[n]);
-		
-		Gtt[n][0] = 0.0;
-		Gtt[n][1] = 0.0;
-		Gtt[n][2] = 0.0;
-		Gtt[n][3] = 0.0;
-		Gtt[n][4] = 0.0;
-		Gtt[n][5] = 0.0;
-		Gtt[n][6] = 0.0;
-		Gtt[n][7] = 0.0;
-	}
-	
 }
 
 //*****************************************************************************
-//                          F E H E X 2 0 E L E M E N T
+//                          F E H E X R I 
 //*****************************************************************************
 
-void FEHex20ElementTraits::init()
+FEHex8RI::FEHex8RI(): FEHex8_(NINT, FE_HEX8RI)
 {
-	int n;
+	// This is for a six point integration rule
+	// integration point coordinates
+	const double a = 8.0 / 6.0;
+	gr[0] = -1; gs[0] = 0; gt[0] = 0; gw[0] = a;
+	gr[1] =  1; gs[1] = 0; gt[1] = 0; gw[1] = a;
+	gr[2] =  0; gs[2] =-1; gt[2] = 0; gw[2] = a;
+	gr[3] =  0; gs[3] = 1; gt[3] = 0; gw[3] = a;
+	gr[4] =  0; gs[4] = 0; gt[4] =-1; gw[4] = a;
+	gr[5] =  0; gs[5] = 0; gt[5] = 1; gw[5] = a;
 	
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FEHex8RI::project_to_nodes(double* ai, double* ao)
+{
+	// TODO: implement this
+}
+
+//*****************************************************************************
+//                          F E H E X G 1
+//*****************************************************************************
+
+FEHex8G1::FEHex8G1() : FEHex8_(NINT, FE_HEX8G1)
+{
+	// single gauss-point integration rule
+	gr[0] = 0; gs[0] = 0; gt[0] = 0; gw[0] = 8.0;
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FEHex8G1::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[0];
+	ao[2] = ai[0];
+	ao[3] = ai[0];
+	ao[4] = ai[0];
+	ao[5] = ai[0];
+	ao[6] = ai[0];
+	ao[7] = ai[0];
+}
+
+//=============================================================================
+//                              F E T E T 4
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! values of shape functions
+void FETet4_::shape_fnc(double* H, double r, double s, double t)
+{
+	H[0] = 1 - r - s - t;
+	H[1] = r;
+	H[2] = s;
+	H[3] = t;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FETet4_::shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t)
+{
+	Hr[0] = -1; Hs[0] = -1; Ht[0] = -1;
+	Hr[1] =  1;	Hs[1] =  0; Ht[1] =  0;
+	Hr[2] =  0;	Hs[2] =  1; Ht[2] =  0;
+	Hr[3] =  0;	Hs[3] =  0; Ht[3] =  1;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function second derivatives
+void FETet4_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t)
+{
+	Hrr[0] =  0.0; Hss[0] =  0.0; Htt[0] =  0.0;
+	Hrr[1] =  0.0; Hss[1] =  0.0; Htt[1] =  0.0;
+	Hrr[2] =  0.0; Hss[2] =  0.0; Htt[2] =  0.0;
+	Hrr[3] =  0.0; Hss[3] =  0.0; Htt[3] =  0.0;
+
+	Hrs[0] =  0.0; Hst[0] =  0.0; Hrt[0] =  0.0;
+	Hrs[1] =  0.0; Hst[1] =  0.0; Hrt[1] =  0.0;
+	Hrs[2] =  0.0; Hst[2] =  0.0; Hrt[2] =  0.0;
+	Hrs[3] =  0.0; Hst[3] =  0.0; Hrt[3] =  0.0;
+}
+
+//=============================================================================
+//                          T E T 4
+//=============================================================================
+
+FETet4G4::FETet4G4() : FETet4_(NINT, FE_TET4G4)
+{
+	// gaussian integration for tetrahedral elements
+	const double a = 0.58541020;
+	const double b = 0.13819660;
+	const double w = 1.0 / 24.0;
+	
+	gr[0] = b; gs[0] = b; gt[0] = b; gw[0] = w;
+	gr[1] = a; gs[1] = b; gt[1] = b; gw[1] = w;
+	gr[2] = b; gs[2] = a; gt[2] = b; gw[2] = w;
+	gr[3] = b; gs[3] = b; gt[3] = a; gw[3] = w;
+
+	init();
+	Hi = H.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FETet4G4::project_to_nodes(double* ai, double* ao)
+{
+	for (int j=0; j<NELN; ++j)
+	{
+		ao[j] = 0;
+		for (int k=0; k<NINT; ++k) 
+		{
+			ao[j] += Hi[j][k]*ai[k];
+		}
+	}
+}
+
+//=============================================================================
+//                          F E G 1 T E T E L E M E N T
+//=============================================================================
+
+FETet4G1::FETet4G1() : FETet4_(NINT, FE_TET4G1)
+{
+	// gaussian integration for tetrahedral elements
+	const double a = 0.25;
+	const double w = 1.0 / 6.0;
+	
+	gr[0] = a; gs[0] = a; gt[0] = a; gw[0] = w;
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FETet4G1::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0];
+	ao[1] = ai[0];
+	ao[2] = ai[0];
+	ao[3] = ai[0];
+}
+
+//=============================================================================
+//                       P E N T A 6
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! values of shape functions
+void FEPenta6_::shape_fnc(double* H, double r, double s, double t)
+{
+	H[0] = 0.5*(1 - t)*(1 - r - s);
+	H[1] = 0.5*(1 - t)*r;
+	H[2] = 0.5*(1 - t)*s;
+	H[3] = 0.5*(1 + t)*(1 - r - s);
+	H[4] = 0.5*(1 + t)*r;
+	H[5] = 0.5*(1 + t)*s;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FEPenta6_::shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t)
+{
+	Hr[0] = -0.5*(1 - t);
+	Hr[1] =  0.5*(1 - t);
+	Hr[2] =  0.0;
+	Hr[3] = -0.5*(1 + t);
+	Hr[4] =  0.5*(1 + t);
+	Hr[5] =  0.0;
+		
+	Hs[0] = -0.5*(1 - t);
+	Hs[1] =  0.0;
+	Hs[2] =  0.5*(1 - t);
+	Hs[3] = -0.5*(1 + t);
+	Hs[4] =  0.0;
+	Hs[5] =  0.5*(1 + t);
+		
+	Ht[0] = -0.5*(1 - r - s);
+	Ht[1] = -0.5*r;
+	Ht[2] = -0.5*s;
+	Ht[3] =  0.5*(1 - r - s);
+	Ht[4] =  0.5*r;
+	Ht[5] =  0.5*s;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function second derivatives
+void FEPenta6_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t)
+{
+	Hrr[0] =  0.0; Hss[0] =  0.0; Htt[0] =  0.0;
+	Hrr[1] =  0.0; Hss[1] =  0.0; Htt[1] =  0.0;
+	Hrr[2] =  0.0; Hss[2] =  0.0; Htt[2] =  0.0;
+	Hrr[3] =  0.0; Hss[3] =  0.0; Htt[3] =  0.0;
+	Hrr[4] =  0.0; Hss[4] =  0.0; Htt[4] =  0.0;
+	Hrr[5] =  0.0; Hss[5] =  0.0; Htt[5] =  0.0;
+		
+	Hrs[0] =  0.0; Hst[0] =  0.5; Hrt[0] =  0.5;
+	Hrs[1] =  0.0; Hst[1] =  0.0; Hrt[1] = -0.5;
+	Hrs[2] =  0.0; Hst[2] = -0.5; Hrt[2] =  0.0;
+	Hrs[3] =  0.0; Hst[3] = -0.5; Hrt[3] = -0.5;
+	Hrs[4] =  0.0; Hst[4] =  0.0; Hrt[4] =  0.5;
+	Hrs[5] =  0.0; Hst[5] =  0.5; Hrt[5] =  0.0;
+}
+
+//=============================================================================
+//                         P E N T A 6 G 6
+//=============================================================================
+
+FEPenta6G6::FEPenta6G6(): FEPenta6_(NINT, FE_PENTA6G6)
+{
+	//gauss intergration points
+	const double a = 1.0/6.0;
+	const double b = 2.0/3.0;
+	const double c = 1.0 / sqrt(3.0);
+	const double w = 1.0 / 6.0;
+	
+	gr[0] = a; gs[0] = a; gt[0] = -c; gw[0] = w;
+	gr[1] = b; gs[1] = a; gt[1] = -c; gw[1] = w;
+	gr[2] = a; gs[2] = b; gt[2] = -c; gw[2] = w;
+	gr[3] = a; gs[3] = a; gt[3] =  c; gw[3] = w;
+	gr[4] = b; gs[4] = a; gt[4] =  c; gw[4] = w;
+	gr[5] = a; gs[5] = b; gt[5] =  c; gw[5] = w;
+
+	init();
+
+	Hi = H.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FEPenta6G6::project_to_nodes(double* ai, double* ao)
+{
+	for (int j=0; j<NELN; ++j)
+	{
+		ao[j] = 0;
+		for (int k=0; k<NINT; ++k) 
+		{
+			ao[j] += Hi[j][k]*ai[k];
+		}
+	}
+}
+
+//=============================================================================
+//                           T E T 1 0
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! values of shape functions
+void FETet10_::shape_fnc(double* H, double r, double s, double t)
+{
+	double r1 = 1.0 - r - s - t;
+	double r2 = r;
+	double r3 = s;
+	double r4 = t;
+
+	H[0] = r1*(2.0*r1 - 1.0);
+	H[1] = r2*(2.0*r2 - 1.0);
+	H[2] = r3*(2.0*r3 - 1.0);
+	H[3] = r4*(2.0*r4 - 1.0);
+	H[4] = 4.0*r1*r2;
+	H[5] = 4.0*r2*r3;
+	H[6] = 4.0*r3*r1;
+	H[7] = 4.0*r1*r4;
+	H[8] = 4.0*r2*r4;
+	H[9] = 4.0*r3*r4;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FETet10_::shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t)
+{
+	Hr[0] = -3.0 + 4.0*r + 4.0*(s + t);
+	Hr[1] =  4.0*r - 1.0;
+	Hr[2] =  0.0;
+	Hr[3] =  0.0;
+	Hr[4] =  4.0 - 8.0*r - 4.0*(s + t);
+	Hr[5] =  4.0*s;
+	Hr[6] = -4.0*s;
+	Hr[7] = -4.0*t;
+	Hr[8] =  4.0*t;
+	Hr[9] =  0.0;
+
+	Hs[0] = -3.0 + 4.0*s + 4.0*(r + t);
+	Hs[1] =  0.0;
+	Hs[2] =  4.0*s - 1.0;
+	Hs[3] =  0.0;
+	Hs[4] = -4.0*r;
+	Hs[5] =  4.0*r;
+	Hs[6] =  4.0 - 8.0*s - 4.0*(r + t);
+	Hs[7] = -4.0*t;
+	Hs[8] =  0.0;
+	Hs[9] =  4.0*t;
+
+	Ht[0] = -3.0 + 4.0*t + 4.0*(r + s);
+	Ht[1] =  0.0;
+	Ht[2] =  0.0;
+	Ht[3] =  4.0*t - 1.0;
+	Ht[4] = -4.0*r;
+	Ht[5] =  0.0;
+	Ht[6] = -4.0*s;
+	Ht[7] =  4.0 - 8.0*t - 4.0*(r + s);
+	Ht[8] =  4.0*r;
+	Ht[9] =  4.0*s;
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function second derivatives
+void FETet10_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t)
+{
+	Hrr[0] =  4.0; Hss[0] =  4.0; Htt[0] =  4.0;
+	Hrr[1] =  4.0; Hss[1] =  0.0; Htt[1] =  0.0;
+	Hrr[2] =  0.0; Hss[2] =  4.0; Htt[2] =  0.0;
+	Hrr[3] =  0.0; Hss[3] =  0.0; Htt[3] =  4.0;
+	Hrr[4] = -8.0; Hss[4] =  0.0; Htt[4] =  0.0;
+	Hrr[5] =  0.0; Hss[5] =  0.0; Htt[5] =  0.0;
+	Hrr[6] =  0.0; Hss[6] = -8.0; Htt[6] =  0.0;
+	Hrr[7] =  0.0; Hss[7] =  0.0; Htt[7] =  8.0;
+	Hrr[8] =  0.0; Hss[8] =  0.0; Htt[8] =  0.0;
+	Hrr[9] =  0.0; Hss[9] =  0.0; Htt[9] =  0.0;
+
+	Hrs[0] =  4.0; Hst[0] =  4.0; Hrt[0] =  4.0;
+	Hrs[1] =  0.0; Hst[1] =  0.0; Hrt[1] =  0.0;
+	Hrs[2] =  0.0; Hst[2] =  0.0; Hrt[2] =  0.0;
+	Hrs[3] =  0.0; Hst[3] =  0.0; Hrt[3] =  0.0;
+	Hrs[4] = -4.0; Hst[4] =  0.0; Hrt[4] = -4.0;
+	Hrs[5] =  4.0; Hst[5] =  0.0; Hrt[5] =  0.0;
+	Hrs[6] = -4.0; Hst[6] = -4.0; Hrt[6] =  0.0;
+	Hrs[7] =  0.0; Hst[7] = -4.0; Hrt[7] = -4.0;
+	Hrs[8] =  0.0; Hst[8] =  0.0; Hrt[8] =  4.0;
+	Hrs[9] =  0.0; Hst[9] =  4.0; Hrt[9] =  0.0;
+}
+
+//*****************************************************************************
+//                          F E T E T 1 0 E L E M E N T
+//*****************************************************************************
+// I think this assumes that the tetrahedron in natural space is essentially
+// a constant metric tet with the edge nodes at the center of the edges.
+FETet10G4::FETet10G4() : FETet10_(NINT, FE_TET10G4)
+{
+	// integration point coordinates
+	const double a = 0.58541020;
+	const double b = 0.13819660;
+	const double w = 0.25 / 6.0;
+	gr[ 0] = a; gs[ 0] = b; gt[ 0] = b; gw[ 0] = w;
+	gr[ 1] = b; gs[ 1] = a; gt[ 1] = b; gw[ 1] = w;
+	gr[ 2] = b; gs[ 2] = b; gt[ 2] = a; gw[ 2] = w;
+	gr[ 3] = b; gs[ 3] = b; gt[ 3] = b; gw[ 3] = w;
+
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FETet10G4::project_to_nodes(double* ai, double* ao)
+{
+	// TODO: implement this
+}
+
+//=============================================================================
+//                          F E T E T 1 0 E L E M E N T
+//=============================================================================
+// I think this assumes that the tetrahedron in natural space is essentially
+// a constant metric tet with the edge nodes at the center of the edges.
+FETet10G8::FETet10G8() : FETet10_(NINT, FE_TET10G8)
+{
+	const double w = 1.0/6.0;
+    gr[0] = 0.0158359099; gs[0] = 0.3280546970; gt[0] = 0.3280546970; gw[0] = 0.138527967*w;
+    gr[1] = 0.3280546970; gs[1] = 0.0158359099; gt[1] = 0.3280546970; gw[1] = 0.138527967*w;
+    gr[2] = 0.3280546970; gs[2] = 0.3280546970; gt[2] = 0.0158359099; gw[2] = 0.138527967*w;
+    gr[3] = 0.3280546970; gs[3] = 0.3280546970; gt[3] = 0.3280546970; gw[3] = 0.138527967*w;
+    gr[4] = 0.6791431780; gs[4] = 0.1069522740; gt[4] = 0.1069522740; gw[4] = 0.111472033*w;
+    gr[5] = 0.1069522740; gs[5] = 0.6791431780; gt[5] = 0.1069522740; gw[5] = 0.111472033*w;
+    gr[6] = 0.1069522740; gs[6] = 0.1069522740; gt[6] = 0.6791431780; gw[6] = 0.111472033*w;
+    gr[7] = 0.1069522740; gs[7] = 0.1069522740; gt[7] = 0.1069522740; gw[7] = 0.111472033*w;
+
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FETet10G8::project_to_nodes(double* ai, double* ao)
+{
+	// TODO: implement this
+}
+
+//=============================================================================
+//              H E X 2 0
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! values of shape functions
+void FEHex20_::shape_fnc(double* H, double r, double s, double t)
+{
+	H[ 8] = 0.25*(1 - r*r)*(1 - s)*(1 - t);
+	H[ 9] = 0.25*(1 - s*s)*(1 + r)*(1 - t);
+	H[10] = 0.25*(1 - r*r)*(1 + s)*(1 - t);
+	H[11] = 0.25*(1 - s*s)*(1 - r)*(1 - t);
+	H[12] = 0.25*(1 - r*r)*(1 - s)*(1 + t);
+	H[13] = 0.25*(1 - s*s)*(1 + r)*(1 + t);
+	H[14] = 0.25*(1 - r*r)*(1 + s)*(1 + t);
+	H[15] = 0.25*(1 - s*s)*(1 - r)*(1 + t);
+	H[16] = 0.25*(1 - t*t)*(1 - r)*(1 - s);
+	H[17] = 0.25*(1 - t*t)*(1 + r)*(1 - s);
+	H[18] = 0.25*(1 - t*t)*(1 + r)*(1 + s);
+	H[19] = 0.25*(1 - t*t)*(1 - r)*(1 + s);
+
+	H[0] = 0.125*(1 - r)*(1 - s)*(1 - t) - 0.5*(H[ 8] + H[11] + H[16]);
+	H[1] = 0.125*(1 + r)*(1 - s)*(1 - t) - 0.5*(H[ 8] + H[ 9] + H[17]);
+	H[2] = 0.125*(1 + r)*(1 + s)*(1 - t) - 0.5*(H[ 9] + H[10] + H[18]);
+	H[3] = 0.125*(1 - r)*(1 + s)*(1 - t) - 0.5*(H[10] + H[11] + H[19]);
+	H[4] = 0.125*(1 - r)*(1 - s)*(1 + t) - 0.5*(H[12] + H[15] + H[16]);
+	H[5] = 0.125*(1 + r)*(1 - s)*(1 + t) - 0.5*(H[12] + H[13] + H[17]);
+	H[6] = 0.125*(1 + r)*(1 + s)*(1 + t) - 0.5*(H[13] + H[14] + H[18]);
+	H[7] = 0.125*(1 - r)*(1 + s)*(1 + t) - 0.5*(H[14] + H[15] + H[19]);
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function derivatives
+void FEHex20_::shape_deriv(double* Hr, double* Hs, double* Ht, double r, double s, double t)
+{
+	Hr[ 8] = -0.5*r*(1 - s)*(1 - t);
+	Hr[ 9] =  0.25*(1 - s*s)*(1 - t);
+	Hr[10] = -0.5*r*(1 + s)*(1 - t);
+	Hr[11] = -0.25*(1 - s*s)*(1 - t);
+	Hr[12] = -0.5*r*(1 - s)*(1 + t);
+	Hr[13] =  0.25*(1 - s*s)*(1 + t);
+	Hr[14] = -0.5*r*(1 + s)*(1 + t);
+	Hr[15] = -0.25*(1 - s*s)*(1 + t);
+	Hr[16] = -0.25*(1 - t*t)*(1 - s);
+	Hr[17] =  0.25*(1 - t*t)*(1 - s);
+	Hr[18] =  0.25*(1 - t*t)*(1 + s);
+	Hr[19] = -0.25*(1 - t*t)*(1 + s);
+
+	Hr[0] = -0.125*(1 - s)*(1 - t) - 0.5*(Hr[ 8] + Hr[11] + Hr[16]);
+	Hr[1] =  0.125*(1 - s)*(1 - t) - 0.5*(Hr[ 8] + Hr[ 9] + Hr[17]);
+	Hr[2] =  0.125*(1 + s)*(1 - t) - 0.5*(Hr[ 9] + Hr[10] + Hr[18]);
+	Hr[3] = -0.125*(1 + s)*(1 - t) - 0.5*(Hr[10] + Hr[11] + Hr[19]);
+	Hr[4] = -0.125*(1 - s)*(1 + t) - 0.5*(Hr[12] + Hr[15] + Hr[16]);
+	Hr[5] =  0.125*(1 - s)*(1 + t) - 0.5*(Hr[12] + Hr[13] + Hr[17]);
+	Hr[6] =  0.125*(1 + s)*(1 + t) - 0.5*(Hr[13] + Hr[14] + Hr[18]);
+	Hr[7] = -0.125*(1 + s)*(1 + t) - 0.5*(Hr[14] + Hr[15] + Hr[19]);
+		
+	Hs[ 8] = -0.25*(1 - r*r)*(1 - t);
+	Hs[ 9] = -0.5*s*(1 + r)*(1 - t);
+	Hs[10] = 0.25*(1 - r*r)*(1 - t);
+	Hs[11] = -0.5*s*(1 - r)*(1 - t);
+	Hs[12] = -0.25*(1 - r*r)*(1 + t);
+	Hs[13] = -0.5*s*(1 + r)*(1 + t);
+	Hs[14] = 0.25*(1 - r*r)*(1 + t);
+	Hs[15] = -0.5*s*(1 - r)*(1 + t);
+	Hs[16] = -0.25*(1 - t*t)*(1 - r);
+	Hs[17] = -0.25*(1 - t*t)*(1 + r);
+	Hs[18] =  0.25*(1 - t*t)*(1 + r);
+	Hs[19] =  0.25*(1 - t*t)*(1 - r);
+
+	Hs[0] = -0.125*(1 - r)*(1 - t) - 0.5*(Hs[ 8] + Hs[11] + Hs[16]);
+	Hs[1] = -0.125*(1 + r)*(1 - t) - 0.5*(Hs[ 8] + Hs[ 9] + Hs[17]);
+	Hs[2] =  0.125*(1 + r)*(1 - t) - 0.5*(Hs[ 9] + Hs[10] + Hs[18]);
+	Hs[3] =  0.125*(1 - r)*(1 - t) - 0.5*(Hs[10] + Hs[11] + Hs[19]);
+	Hs[4] = -0.125*(1 - r)*(1 + t) - 0.5*(Hs[12] + Hs[15] + Hs[16]);
+	Hs[5] = -0.125*(1 + r)*(1 + t) - 0.5*(Hs[12] + Hs[13] + Hs[17]);
+	Hs[6] =  0.125*(1 + r)*(1 + t) - 0.5*(Hs[13] + Hs[14] + Hs[18]);
+	Hs[7] =  0.125*(1 - r)*(1 + t) - 0.5*(Hs[14] + Hs[15] + Hs[19]);
+
+	Ht[ 8] = -0.25*(1 - r*r)*(1 - s);
+	Ht[ 9] = -0.25*(1 - s*s)*(1 + r);
+	Ht[10] = -0.25*(1 - r*r)*(1 + s);
+	Ht[11] = -0.25*(1 - s*s)*(1 - r);
+	Ht[12] =  0.25*(1 - r*r)*(1 - s);
+	Ht[13] =  0.25*(1 - s*s)*(1 + r);
+	Ht[14] =  0.25*(1 - r*r)*(1 + s);
+	Ht[15] =  0.25*(1 - s*s)*(1 - r);
+	Ht[16] = -0.5*t*(1 - r)*(1 - s);
+	Ht[17] = -0.5*t*(1 + r)*(1 - s);
+	Ht[18] = -0.5*t*(1 + r)*(1 + s);
+	Ht[19] = -0.5*t*(1 - r)*(1 + s);
+		
+	Ht[0] = -0.125*(1 - r)*(1 - s) - 0.5*(Ht[ 8] + Ht[11] + Ht[16]);
+	Ht[1] = -0.125*(1 + r)*(1 - s) - 0.5*(Ht[ 8] + Ht[ 9] + Ht[17]);
+	Ht[2] = -0.125*(1 + r)*(1 + s) - 0.5*(Ht[ 9] + Ht[10] + Ht[18]);
+	Ht[3] = -0.125*(1 - r)*(1 + s) - 0.5*(Ht[10] + Ht[11] + Ht[19]);
+	Ht[4] =  0.125*(1 - r)*(1 - s) - 0.5*(Ht[12] + Ht[15] + Ht[16]);
+	Ht[5] =  0.125*(1 + r)*(1 - s) - 0.5*(Ht[12] + Ht[13] + Ht[17]);
+	Ht[6] =  0.125*(1 + r)*(1 + s) - 0.5*(Ht[13] + Ht[14] + Ht[18]);
+	Ht[7] =  0.125*(1 - r)*(1 + s) - 0.5*(Ht[14] + Ht[15] + Ht[19]);
+}
+
+//-----------------------------------------------------------------------------
+//! values of shape function second derivatives
+void FEHex20_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t)
+{
+	// TODO: implement this (needed for biphasic problems)
+}
+
+//=============================================================================
+//              H E X 2 0 G 2 7
+//=============================================================================
+
+FEHex20G27::FEHex20G27() : FEHex20_(NINT, FE_HEX20G27)
+{
 	// integration point coordinates
 	const double a = 0.774596669241483;
 	const double w1 = 5.0 / 9.0;
@@ -198,824 +734,70 @@ void FEHex20ElementTraits::init()
 	gr[24] = -a; gs[24] =  a; gt[24] =  a; gw[24] = w1*w1*w1;
 	gr[25] =  0; gs[25] =  a; gt[25] =  a; gw[25] = w2*w1*w1;
 	gr[26] =  a; gs[26] =  a; gt[26] =  a; gw[26] = w1*w1*w1;
-	
-	// calculate shape function values at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][ 8] = 0.25*(1 - gr[n]*gr[n])*(1 - gs[n])*(1 - gt[n]);
-		H[n][ 9] = 0.25*(1 - gs[n]*gs[n])*(1 + gr[n])*(1 - gt[n]);
-		H[n][10] = 0.25*(1 - gr[n]*gr[n])*(1 + gs[n])*(1 - gt[n]);
-		H[n][11] = 0.25*(1 - gs[n]*gs[n])*(1 - gr[n])*(1 - gt[n]);
-		H[n][12] = 0.25*(1 - gr[n]*gr[n])*(1 - gs[n])*(1 + gt[n]);
-		H[n][13] = 0.25*(1 - gs[n]*gs[n])*(1 + gr[n])*(1 + gt[n]);
-		H[n][14] = 0.25*(1 - gr[n]*gr[n])*(1 + gs[n])*(1 + gt[n]);
-		H[n][15] = 0.25*(1 - gs[n]*gs[n])*(1 - gr[n])*(1 + gt[n]);
-		H[n][16] = 0.25*(1 - gt[n]*gt[n])*(1 - gr[n])*(1 - gs[n]);
-		H[n][17] = 0.25*(1 - gt[n]*gt[n])*(1 + gr[n])*(1 - gs[n]);
-		H[n][18] = 0.25*(1 - gt[n]*gt[n])*(1 + gr[n])*(1 + gs[n]);
-		H[n][19] = 0.25*(1 - gt[n]*gt[n])*(1 - gr[n])*(1 + gs[n]);
 
-		H[n][0] = 0.125*(1 - gr[n])*(1 - gs[n])*(1 - gt[n]) - 0.5*(H[n][ 8] + H[n][11] + H[n][16]);
-		H[n][1] = 0.125*(1 + gr[n])*(1 - gs[n])*(1 - gt[n]) - 0.5*(H[n][ 8] + H[n][ 9] + H[n][17]);
-		H[n][2] = 0.125*(1 + gr[n])*(1 + gs[n])*(1 - gt[n]) - 0.5*(H[n][ 9] + H[n][10] + H[n][18]);
-		H[n][3] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 - gt[n]) - 0.5*(H[n][10] + H[n][11] + H[n][19]);
-		H[n][4] = 0.125*(1 - gr[n])*(1 - gs[n])*(1 + gt[n]) - 0.5*(H[n][12] + H[n][15] + H[n][16]);
-		H[n][5] = 0.125*(1 + gr[n])*(1 - gs[n])*(1 + gt[n]) - 0.5*(H[n][12] + H[n][13] + H[n][17]);
-		H[n][6] = 0.125*(1 + gr[n])*(1 + gs[n])*(1 + gt[n]) - 0.5*(H[n][13] + H[n][14] + H[n][18]);
-		H[n][7] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 + gt[n]) - 0.5*(H[n][14] + H[n][15] + H[n][19]);
-	}
-
-//	Hi = H.inverse();
-	
-	// calculate local derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][ 8] = -0.5*gr[n]*(1 - gs[n])*(1 - gt[n]);
-		Gr[n][ 9] =  0.25*(1 - gs[n]*gs[n])*(1 - gt[n]);
-		Gr[n][10] = -0.5*gr[n]*(1 + gs[n])*(1 - gt[n]);
-		Gr[n][11] = -0.25*(1 - gs[n]*gs[n])*(1 - gt[n]);
-		Gr[n][12] = -0.5*gr[n]*(1 - gs[n])*(1 + gt[n]);
-		Gr[n][13] = 0.25*(1 - gs[n]*gs[n])*(1 + gt[n]);
-		Gr[n][14] = -0.5*gr[n]*(1 + gs[n])*(1 + gt[n]);
-		Gr[n][15] = -0.25*(1 - gs[n]*gs[n])*(1 + gt[n]);
-		Gr[n][16] = -0.25*(1 - gt[n]*gt[n])*(1 - gs[n]);
-		Gr[n][17] =  0.25*(1 - gt[n]*gt[n])*(1 - gs[n]);
-		Gr[n][18] =  0.25*(1 - gt[n]*gt[n])*(1 + gs[n]);
-		Gr[n][19] = -0.25*(1 - gt[n]*gt[n])*(1 + gs[n]);
-
-		Gr[n][0] = -0.125*(1 - gs[n])*(1 - gt[n]) - 0.5*(Gr[n][ 8] + Gr[n][11] + Gr[n][16]);
-		Gr[n][1] =  0.125*(1 - gs[n])*(1 - gt[n]) - 0.5*(Gr[n][ 8] + Gr[n][ 9] + Gr[n][17]);
-		Gr[n][2] =  0.125*(1 + gs[n])*(1 - gt[n]) - 0.5*(Gr[n][ 9] + Gr[n][10] + Gr[n][18]);
-		Gr[n][3] = -0.125*(1 + gs[n])*(1 - gt[n]) - 0.5*(Gr[n][10] + Gr[n][11] + Gr[n][19]);
-		Gr[n][4] = -0.125*(1 - gs[n])*(1 + gt[n]) - 0.5*(Gr[n][12] + Gr[n][15] + Gr[n][16]);
-		Gr[n][5] =  0.125*(1 - gs[n])*(1 + gt[n]) - 0.5*(Gr[n][12] + Gr[n][13] + Gr[n][17]);
-		Gr[n][6] =  0.125*(1 + gs[n])*(1 + gt[n]) - 0.5*(Gr[n][13] + Gr[n][14] + Gr[n][18]);
-		Gr[n][7] = -0.125*(1 + gs[n])*(1 + gt[n]) - 0.5*(Gr[n][14] + Gr[n][15] + Gr[n][19]);
-		
-		Gs[n][ 8] = -0.25*(1 - gr[n]*gr[n])*(1 - gt[n]);
-		Gs[n][ 9] = -0.5*gs[n]*(1 + gr[n])*(1 - gt[n]);
-		Gs[n][10] = 0.25*(1 - gr[n]*gr[n])*(1 - gt[n]);
-		Gs[n][11] = -0.5*gs[n]*(1 - gr[n])*(1 - gt[n]);
-		Gs[n][12] = -0.25*(1 - gr[n]*gr[n])*(1 + gt[n]);
-		Gs[n][13] = -0.5*gs[n]*(1 + gr[n])*(1 + gt[n]);
-		Gs[n][14] = 0.25*(1 - gr[n]*gr[n])*(1 + gt[n]);
-		Gs[n][15] = -0.5*gs[n]*(1 - gr[n])*(1 + gt[n]);
-		Gs[n][16] = -0.25*(1 - gt[n]*gt[n])*(1 - gr[n]);
-		Gs[n][17] = -0.25*(1 - gt[n]*gt[n])*(1 + gr[n]);
-		Gs[n][18] =  0.25*(1 - gt[n]*gt[n])*(1 + gr[n]);
-		Gs[n][19] =  0.25*(1 - gt[n]*gt[n])*(1 - gr[n]);
-
-		Gs[n][0] = -0.125*(1 - gr[n])*(1 - gt[n]) - 0.5*(Gs[n][ 8] + Gs[n][11] + Gs[n][16]);
-		Gs[n][1] = -0.125*(1 + gr[n])*(1 - gt[n]) - 0.5*(Gs[n][ 8] + Gs[n][ 9] + Gs[n][17]);
-		Gs[n][2] =  0.125*(1 + gr[n])*(1 - gt[n]) - 0.5*(Gs[n][ 9] + Gs[n][10] + Gs[n][18]);
-		Gs[n][3] =  0.125*(1 - gr[n])*(1 - gt[n]) - 0.5*(Gs[n][10] + Gs[n][11] + Gs[n][19]);
-		Gs[n][4] = -0.125*(1 - gr[n])*(1 + gt[n]) - 0.5*(Gs[n][12] + Gs[n][15] + Gs[n][16]);
-		Gs[n][5] = -0.125*(1 + gr[n])*(1 + gt[n]) - 0.5*(Gs[n][12] + Gs[n][13] + Gs[n][17]);
-		Gs[n][6] =  0.125*(1 + gr[n])*(1 + gt[n]) - 0.5*(Gs[n][13] + Gs[n][14] + Gs[n][18]);
-		Gs[n][7] =  0.125*(1 - gr[n])*(1 + gt[n]) - 0.5*(Gs[n][14] + Gs[n][15] + Gs[n][19]);
-
-		Gt[n][ 8] = -0.25*(1 - gr[n]*gr[n])*(1 - gs[n]);
-		Gt[n][ 9] = -0.25*(1 - gs[n]*gs[n])*(1 + gr[n]);
-		Gt[n][10] = -0.25*(1 - gr[n]*gr[n])*(1 + gs[n]);
-		Gt[n][11] = -0.25*(1 - gs[n]*gs[n])*(1 - gr[n]);
-		Gt[n][12] =  0.25*(1 - gr[n]*gr[n])*(1 - gs[n]);
-		Gt[n][13] =  0.25*(1 - gs[n]*gs[n])*(1 + gr[n]);
-		Gt[n][14] =  0.25*(1 - gr[n]*gr[n])*(1 + gs[n]);
-		Gt[n][15] =  0.25*(1 - gs[n]*gs[n])*(1 - gr[n]);
-		Gt[n][16] = -0.5*gt[n]*(1 - gr[n])*(1 - gs[n]);
-		Gt[n][17] = -0.5*gt[n]*(1 + gr[n])*(1 - gs[n]);
-		Gt[n][18] = -0.5*gt[n]*(1 + gr[n])*(1 + gs[n]);
-		Gt[n][19] = -0.5*gt[n]*(1 - gr[n])*(1 + gs[n]);
-		
-		Gt[n][0] = -0.125*(1 - gr[n])*(1 - gs[n]) - 0.5*(Gt[n][ 8] + Gt[n][11] + Gt[n][16]);
-		Gt[n][1] = -0.125*(1 + gr[n])*(1 - gs[n]) - 0.5*(Gt[n][ 8] + Gt[n][ 9] + Gt[n][17]);
-		Gt[n][2] = -0.125*(1 + gr[n])*(1 + gs[n]) - 0.5*(Gt[n][ 9] + Gt[n][10] + Gt[n][18]);
-		Gt[n][3] = -0.125*(1 - gr[n])*(1 + gs[n]) - 0.5*(Gt[n][10] + Gt[n][11] + Gt[n][19]);
-		Gt[n][4] =  0.125*(1 - gr[n])*(1 - gs[n]) - 0.5*(Gt[n][12] + Gt[n][15] + Gt[n][16]);
-		Gt[n][5] =  0.125*(1 + gr[n])*(1 - gs[n]) - 0.5*(Gt[n][12] + Gt[n][13] + Gt[n][17]);
-		Gt[n][6] =  0.125*(1 + gr[n])*(1 + gs[n]) - 0.5*(Gt[n][13] + Gt[n][14] + Gt[n][18]);
-		Gt[n][7] =  0.125*(1 - gr[n])*(1 + gs[n]) - 0.5*(Gt[n][14] + Gt[n][15] + Gt[n][19]);
-	}
-	
-	// TODO: calculate local second derivatives of shape functions at gauss points (need for biphasic problems)
+	init();
 }
 
-//*****************************************************************************
-//                          F E R I H E X E L E M E N T
-//*****************************************************************************
-
-void FERIHexElementTraits::init()
+//-----------------------------------------------------------------------------
+void FEHex20G27::project_to_nodes(double* ai, double* ao)
 {
-	int n;
-	
-	// This is for a six point integration rule
-	// integration point coordinates
-	const double a = 8.0 / 6.0;
-	gr[0] = -1; gs[0] = 0; gt[0] = 0; gw[0] = a;
-	gr[1] =  1; gs[1] = 0; gt[1] = 0; gw[1] = a;
-	gr[2] =  0; gs[2] =-1; gt[2] = 0; gw[2] = a;
-	gr[3] =  0; gs[3] = 1; gt[3] = 0; gw[3] = a;
-	gr[4] =  0; gs[4] = 0; gt[4] =-1; gw[4] = a;
-	gr[5] =  0; gs[5] = 0; gt[5] = 1; gw[5] = a;
-	
-	// calculate shape function values at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 0.125*(1 - gr[n])*(1 - gs[n])*(1 - gt[n]);
-		H[n][1] = 0.125*(1 + gr[n])*(1 - gs[n])*(1 - gt[n]);
-		H[n][2] = 0.125*(1 + gr[n])*(1 + gs[n])*(1 - gt[n]);
-		H[n][3] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 - gt[n]);
-		H[n][4] = 0.125*(1 - gr[n])*(1 - gs[n])*(1 + gt[n]);
-		H[n][5] = 0.125*(1 + gr[n])*(1 - gs[n])*(1 + gt[n]);
-		H[n][6] = 0.125*(1 + gr[n])*(1 + gs[n])*(1 + gt[n]);
-		H[n][7] = 0.125*(1 - gr[n])*(1 + gs[n])*(1 + gt[n]);
-	}
-	
-//	Hi = H.inverse();
-
-	// calculate local derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -0.125*(1 - gs[n])*(1 - gt[n]);
-		Gr[n][1] =  0.125*(1 - gs[n])*(1 - gt[n]);
-		Gr[n][2] =  0.125*(1 + gs[n])*(1 - gt[n]);
-		Gr[n][3] = -0.125*(1 + gs[n])*(1 - gt[n]);
-		Gr[n][4] = -0.125*(1 - gs[n])*(1 + gt[n]);
-		Gr[n][5] =  0.125*(1 - gs[n])*(1 + gt[n]);
-		Gr[n][6] =  0.125*(1 + gs[n])*(1 + gt[n]);
-		Gr[n][7] = -0.125*(1 + gs[n])*(1 + gt[n]);
-		
-		Gs[n][0] = -0.125*(1 - gr[n])*(1 - gt[n]);
-		Gs[n][1] = -0.125*(1 + gr[n])*(1 - gt[n]);
-		Gs[n][2] =  0.125*(1 + gr[n])*(1 - gt[n]);
-		Gs[n][3] =  0.125*(1 - gr[n])*(1 - gt[n]);
-		Gs[n][4] = -0.125*(1 - gr[n])*(1 + gt[n]);
-		Gs[n][5] = -0.125*(1 + gr[n])*(1 + gt[n]);
-		Gs[n][6] =  0.125*(1 + gr[n])*(1 + gt[n]);
-		Gs[n][7] =  0.125*(1 - gr[n])*(1 + gt[n]);
-		
-		Gt[n][0] = -0.125*(1 - gr[n])*(1 - gs[n]);
-		Gt[n][1] = -0.125*(1 + gr[n])*(1 - gs[n]);
-		Gt[n][2] = -0.125*(1 + gr[n])*(1 + gs[n]);
-		Gt[n][3] = -0.125*(1 - gr[n])*(1 + gs[n]);
-		Gt[n][4] =  0.125*(1 - gr[n])*(1 - gs[n]);
-		Gt[n][5] =  0.125*(1 + gr[n])*(1 - gs[n]);
-		Gt[n][6] =  0.125*(1 + gr[n])*(1 + gs[n]);
-		Gt[n][7] =  0.125*(1 - gr[n])*(1 + gs[n]);
-	}
-	
-	// calculate local second derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Grr[n][0] = 0.0;
-		Grr[n][1] = 0.0;
-		Grr[n][2] = 0.0;
-		Grr[n][3] = 0.0;
-		Grr[n][4] = 0.0;
-		Grr[n][5] = 0.0;
-		Grr[n][6] = 0.0;
-		Grr[n][7] = 0.0;
-		
-		Gsr[n][0] = 0.125*(1 - gt[n]);
-		Gsr[n][1] = -0.125*(1 - gt[n]);
-		Gsr[n][2] =  0.125*(1 - gt[n]);
-		Gsr[n][3] = -0.125*(1 - gt[n]);
-		Gsr[n][4] =  0.125*(1 + gt[n]);
-		Gsr[n][5] = -0.125*(1 + gt[n]);
-		Gsr[n][6] =  0.125*(1 + gt[n]);
-		Gsr[n][7] = -0.125*(1 + gt[n]);
-		
-		Gtr[n][0] =  0.125*(1 - gs[n]);
-		Gtr[n][1] = -0.125*(1 - gs[n]);
-		Gtr[n][2] = -0.125*(1 + gs[n]);
-		Gtr[n][3] =  0.125*(1 + gs[n]);
-		Gtr[n][4] = -0.125*(1 - gs[n]);
-		Gtr[n][5] =  0.125*(1 - gs[n]);
-		Gtr[n][6] =  0.125*(1 + gs[n]);
-		Gtr[n][7] = -0.125*(1 + gs[n]);
-		
-		Grs[n][0] =  0.125*(1 - gt[n]);
-		Grs[n][1] = -0.125*(1 - gt[n]);
-		Grs[n][2] =  0.125*(1 - gt[n]);
-		Grs[n][3] = -0.125*(1 - gt[n]);
-		Grs[n][4] =  0.125*(1 + gt[n]);
-		Grs[n][5] = -0.125*(1 + gt[n]);
-		Grs[n][6] =  0.125*(1 + gt[n]);
-		Grs[n][7] = -0.125*(1 + gt[n]);
-		
-		Gss[n][0] = 0.0;
-		Gss[n][1] = 0.0;
-		Gss[n][2] = 0.0;
-		Gss[n][3] = 0.0;
-		Gss[n][4] = 0.0;
-		Gss[n][5] = 0.0;
-		Gss[n][6] = 0.0;
-		Gss[n][7] = 0.0;
-		
-		Gts[n][0] =  0.125*(1 - gr[n]);
-		Gts[n][1] =  0.125*(1 + gr[n]);
-		Gts[n][2] = -0.125*(1 + gr[n]);
-		Gts[n][3] = -0.125*(1 - gr[n]);
-		Gts[n][4] = -0.125*(1 - gr[n]);
-		Gts[n][5] = -0.125*(1 + gr[n]);
-		Gts[n][6] =  0.125*(1 + gr[n]);
-		Gts[n][7] =  0.125*(1 - gr[n]);
-		
-		Grt[n][0] =  0.125*(1 - gs[n]);
-		Grt[n][1] = -0.125*(1 - gs[n]);
-		Grt[n][2] = -0.125*(1 + gs[n]);
-		Grt[n][3] =  0.125*(1 + gs[n]);
-		Grt[n][4] = -0.125*(1 - gs[n]);
-		Grt[n][5] =  0.125*(1 - gs[n]);
-		Grt[n][6] =  0.125*(1 + gs[n]);
-		Grt[n][7] = -0.125*(1 + gs[n]);
-		
-		Gst[n][0] =  0.125*(1 - gr[n]);
-		Gst[n][1] =  0.125*(1 + gr[n]);
-		Gst[n][2] = -0.125*(1 + gr[n]);
-		Gst[n][3] = -0.125*(1 - gr[n]);
-		Gst[n][4] = -0.125*(1 - gr[n]);
-		Gst[n][5] = -0.125*(1 + gr[n]);
-		Gst[n][6] =  0.125*(1 + gr[n]);
-		Gst[n][7] =  0.125*(1 - gr[n]);
-		
-		Gtt[n][0] = 0.0;
-		Gtt[n][1] = 0.0;
-		Gtt[n][2] = 0.0;
-		Gtt[n][3] = 0.0;
-		Gtt[n][4] = 0.0;
-		Gtt[n][5] = 0.0;
-		Gtt[n][6] = 0.0;
-		Gtt[n][7] = 0.0;
-	}
-	
+	// TODO: implement this
 }
 
-//*****************************************************************************
-//                          F E U D F H E X E L E M E N T
-//*****************************************************************************
+//=============================================================================
+//
+//                  S U R F A C E   E L E M E N T S
+//
+//=============================================================================
 
-void FEUDFHexElementTraits::init()
+FESurfaceElementTraits::FESurfaceElementTraits(int ni, int ne, FE_Element_Type et) : FEElementTraits(ni, ne, et)
 {
-	// single gauss-point integration rule
-	gr[0] = 0; gs[0] = 0; gt[0] = 0; gw[0] = 8.0;
-	
-	// calculate shape function values at gauss points
-	H[0][0] = 0.125*(1 - gr[0])*(1 - gs[0])*(1 - gt[0]);
-	H[0][1] = 0.125*(1 + gr[0])*(1 - gs[0])*(1 - gt[0]);
-	H[0][2] = 0.125*(1 + gr[0])*(1 + gs[0])*(1 - gt[0]);
-	H[0][3] = 0.125*(1 - gr[0])*(1 + gs[0])*(1 - gt[0]);
-	H[0][4] = 0.125*(1 - gr[0])*(1 - gs[0])*(1 + gt[0]);
-	H[0][5] = 0.125*(1 + gr[0])*(1 - gs[0])*(1 + gt[0]);
-	H[0][6] = 0.125*(1 + gr[0])*(1 + gs[0])*(1 + gt[0]);
-	H[0][7] = 0.125*(1 - gr[0])*(1 + gs[0])*(1 + gt[0]);
+	m_ntype = et;
 
-//	Hi = H.inverse();
-	
-	// calculate local derivatives of shape functions at gauss points
-	Gr[0][0] = -0.125*(1 - gs[0])*(1 - gt[0]);
-	Gr[0][1] =  0.125*(1 - gs[0])*(1 - gt[0]);
-	Gr[0][2] =  0.125*(1 + gs[0])*(1 - gt[0]);
-	Gr[0][3] = -0.125*(1 + gs[0])*(1 - gt[0]);
-	Gr[0][4] = -0.125*(1 - gs[0])*(1 + gt[0]);
-	Gr[0][5] =  0.125*(1 - gs[0])*(1 + gt[0]);
-	Gr[0][6] =  0.125*(1 + gs[0])*(1 + gt[0]);
-	Gr[0][7] = -0.125*(1 + gs[0])*(1 + gt[0]);
-	
-	Gs[0][0] = -0.125*(1 - gr[0])*(1 - gt[0]);
-	Gs[0][1] = -0.125*(1 + gr[0])*(1 - gt[0]);
-	Gs[0][2] =  0.125*(1 + gr[0])*(1 - gt[0]);
-	Gs[0][3] =  0.125*(1 - gr[0])*(1 - gt[0]);
-	Gs[0][4] = -0.125*(1 - gr[0])*(1 + gt[0]);
-	Gs[0][5] = -0.125*(1 + gr[0])*(1 + gt[0]);
-	Gs[0][6] =  0.125*(1 + gr[0])*(1 + gt[0]);
-	Gs[0][7] =  0.125*(1 - gr[0])*(1 + gt[0]);
-	
-	Gt[0][0] = -0.125*(1 - gr[0])*(1 - gs[0]);
-	Gt[0][1] = -0.125*(1 + gr[0])*(1 - gs[0]);
-	Gt[0][2] = -0.125*(1 + gr[0])*(1 + gs[0]);
-	Gt[0][3] = -0.125*(1 - gr[0])*(1 + gs[0]);
-	Gt[0][4] =  0.125*(1 - gr[0])*(1 - gs[0]);
-	Gt[0][5] =  0.125*(1 + gr[0])*(1 - gs[0]);
-	Gt[0][6] =  0.125*(1 + gr[0])*(1 + gs[0]);
-	Gt[0][7] =  0.125*(1 - gr[0])*(1 + gs[0]);
-	
-	// calculate local second derivatives of shape functions at gauss points
-	Grr[0][0] = 0.0;
-	Grr[0][1] = 0.0;
-	Grr[0][2] = 0.0;
-	Grr[0][3] = 0.0;
-	Grr[0][4] = 0.0;
-	Grr[0][5] = 0.0;
-	Grr[0][6] = 0.0;
-	Grr[0][7] = 0.0;
-	
-	Gsr[0][0] = 0.125*(1 - gt[0]);
-	Gsr[0][1] = -0.125*(1 - gt[0]);
-	Gsr[0][2] =  0.125*(1 - gt[0]);
-	Gsr[0][3] = -0.125*(1 - gt[0]);
-	Gsr[0][4] =  0.125*(1 + gt[0]);
-	Gsr[0][5] = -0.125*(1 + gt[0]);
-	Gsr[0][6] =  0.125*(1 + gt[0]);
-	Gsr[0][7] = -0.125*(1 + gt[0]);
-	
-	Gtr[0][0] =  0.125*(1 - gs[0]);
-	Gtr[0][1] = -0.125*(1 - gs[0]);
-	Gtr[0][2] = -0.125*(1 + gs[0]);
-	Gtr[0][3] =  0.125*(1 + gs[0]);
-	Gtr[0][4] = -0.125*(1 - gs[0]);
-	Gtr[0][5] =  0.125*(1 - gs[0]);
-	Gtr[0][6] =  0.125*(1 + gs[0]);
-	Gtr[0][7] = -0.125*(1 + gs[0]);
-	
-	Grs[0][0] =  0.125*(1 - gt[0]);
-	Grs[0][1] = -0.125*(1 - gt[0]);
-	Grs[0][2] =  0.125*(1 - gt[0]);
-	Grs[0][3] = -0.125*(1 - gt[0]);
-	Grs[0][4] =  0.125*(1 + gt[0]);
-	Grs[0][5] = -0.125*(1 + gt[0]);
-	Grs[0][6] =  0.125*(1 + gt[0]);
-	Grs[0][7] = -0.125*(1 + gt[0]);
-	
-	Gss[0][0] = 0.0;
-	Gss[0][1] = 0.0;
-	Gss[0][2] = 0.0;
-	Gss[0][3] = 0.0;
-	Gss[0][4] = 0.0;
-	Gss[0][5] = 0.0;
-	Gss[0][6] = 0.0;
-	Gss[0][7] = 0.0;
-	
-	Gts[0][0] =  0.125*(1 - gr[0]);
-	Gts[0][1] =  0.125*(1 + gr[0]);
-	Gts[0][2] = -0.125*(1 + gr[0]);
-	Gts[0][3] = -0.125*(1 - gr[0]);
-	Gts[0][4] = -0.125*(1 - gr[0]);
-	Gts[0][5] = -0.125*(1 + gr[0]);
-	Gts[0][6] =  0.125*(1 + gr[0]);
-	Gts[0][7] =  0.125*(1 - gr[0]);
-	
-	Grt[0][0] =  0.125*(1 - gs[0]);
-	Grt[0][1] = -0.125*(1 - gs[0]);
-	Grt[0][2] = -0.125*(1 + gs[0]);
-	Grt[0][3] =  0.125*(1 + gs[0]);
-	Grt[0][4] = -0.125*(1 - gs[0]);
-	Grt[0][5] =  0.125*(1 - gs[0]);
-	Grt[0][6] =  0.125*(1 + gs[0]);
-	Grt[0][7] = -0.125*(1 + gs[0]);
-	
-	Gst[0][0] =  0.125*(1 - gr[0]);
-	Gst[0][1] =  0.125*(1 + gr[0]);
-	Gst[0][2] = -0.125*(1 + gr[0]);
-	Gst[0][3] = -0.125*(1 - gr[0]);
-	Gst[0][4] = -0.125*(1 - gr[0]);
-	Gst[0][5] = -0.125*(1 + gr[0]);
-	Gst[0][6] =  0.125*(1 + gr[0]);
-	Gst[0][7] =  0.125*(1 - gr[0]);
-	
-	Gtt[0][0] = 0.0;
-	Gtt[0][1] = 0.0;
-	Gtt[0][2] = 0.0;
-	Gtt[0][3] = 0.0;
-	Gtt[0][4] = 0.0;
-	Gtt[0][5] = 0.0;
-	Gtt[0][6] = 0.0;
-	Gtt[0][7] = 0.0;
+	gr.resize(ni);
+	gs.resize(ni);
+	gw.resize(ni);
+
+	Gr.resize(ni, ne);
+	Gs.resize(ni, ne);
 }
 
-//*****************************************************************************
-//                          F E T E T E L E M E N T
-//*****************************************************************************
-
-void FETetElementTraits::init()
+//-----------------------------------------------------------------------------
+//! Initialize the surface element traits data variables.
+//
+void FESurfaceElementTraits::init()
 {
-	int n;
-	
-	// gaussian integration for tetrahedral elements
-	const double a = 0.58541020;
-	const double b = 0.13819660;
-	const double w = 1.0 / 24.0;
-	
-	gr[0] = b; gs[0] = b; gt[0] = b; gw[0] = w;
-	gr[1] = a; gs[1] = b; gt[1] = b; gw[1] = w;
-	gr[2] = b; gs[2] = a; gt[2] = b; gw[2] = w;
-	gr[3] = b; gs[3] = b; gt[3] = a; gw[3] = w;
-	
-	// calculate shape function values at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 1 - gr[n] - gs[n] - gt[n];
-		H[n][1] = gr[n];
-		H[n][2] = gs[n];
-		H[n][3] = gt[n];
-	}
+	assert(nint > 0);
+	assert(neln > 0);
 
-	Hi = H.inverse();
-	
-	// calculate local derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
+	// evaluate shape functions
+	const int NE = FEElement::MAX_NODES;
+	double N[NE];
+	for (int n=0; n<nint; ++n)
 	{
-		Gr[n][0] = -1;
-		Gr[n][1] =  1;
-		Gr[n][2] =  0;
-		Gr[n][3] =  0;
-		
-		Gs[n][0] = -1;
-		Gs[n][1] =  0;
-		Gs[n][2] =  1;
-		Gs[n][3] =  0;
-		
-		Gt[n][0] = -1;
-		Gt[n][1] =  0;
-		Gt[n][2] =  0;
-		Gt[n][3] =  1;
+		shape(N, gr[n], gs[n]);
+		for (int i=0; i<neln; ++i) H[n][i] = N[i]; 
 	}
 	
-	// calculate local second derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
+	// evaluate shape function derivatives
+	double Nr[NE], Ns[NE];
+	for (int n=0; n<nint; ++n)
 	{
-		Grr[n][0] =  0.0;
-		Grr[n][1] =  0.0;
-		Grr[n][2] =  0.0;
-		Grr[n][3] =  0.0;
-		
-		Gsr[n][0] =  0.0;
-		Gsr[n][1] =  0.0;
-		Gsr[n][2] =  0.0;
-		Gsr[n][3] =  0.0;
-		
-		Gtr[n][0] =  0.0;
-		Gtr[n][1] =  0.0;
-		Gtr[n][2] =  0.0;
-		Gtr[n][3] =  0.0;
-		
-		Grs[n][0] =  0.0;
-		Grs[n][1] =  0.0;
-		Grs[n][2] =  0.0;
-		Grs[n][3] =  0.0;
-		
-		Gss[n][0] =  0.0;
-		Gss[n][1] =  0.0;
-		Gss[n][2] =  0.0;
-		Gss[n][3] =  0.0;
-		
-		Gts[n][0] =  0.0;
-		Gts[n][1] =  0.0;
-		Gts[n][2] =  0.0;
-		Gts[n][3] =  0.0;
-		
-		Grt[n][0] =  0.0;
-		Grt[n][1] =  0.0;
-		Grt[n][2] =  0.0;
-		Grt[n][3] =  0.0;
-		
-		Gst[n][0] =  0.0;
-		Gst[n][1] =  0.0;
-		Gst[n][2] =  0.0;
-		Gst[n][3] =  0.0;
-		
-		Gtt[n][0] =  0.0;
-		Gtt[n][1] =  0.0;
-		Gtt[n][2] =  0.0;
-		Gtt[n][3] =  0.0;
+		shape_deriv(Nr, Ns, gr[n], gs[n]);
+		for (int i=0; i<neln; ++i)
+		{
+			Gr[n][i] = Nr[i];
+			Gs[n][i] = Ns[i];
+		}
 	}
-	
 }
 
-
-//*****************************************************************************
-//                          F E G 1 T E T E L E M E N T
-//*****************************************************************************
-
-void FEG1TetElementTraits::init()
-{
-	// gaussian integration for tetrahedral elements
-	const double a = 0.25;
-	const double w = 1.0 / 6.0;
-	
-	gr[0] = a; gs[0] = a; gt[0] = a; gw[0] = w;
-	
-	// calculate shape function values at gauss points
-	H[0][0] = 1 - gr[0] - gs[0] - gt[0];
-	H[0][1] = gr[0];
-	H[0][2] = gs[0];
-	H[0][3] = gt[0];
-
-//	Hi = H.inverse();
-	
-	// calculate local derivatives of shape functions at gauss points
-	Gr[0][0] = -1;
-	Gr[0][1] =  1;
-	Gr[0][2] =  0;
-	Gr[0][3] =  0;
-	
-	Gs[0][0] = -1;
-	Gs[0][1] =  0;
-	Gs[0][2] =  1;
-	Gs[0][3] =  0;
-	
-	Gt[0][0] = -1;
-	Gt[0][1] =  0;
-	Gt[0][2] =  0;
-	Gt[0][3] =  1;
-	
-	// calculate local second derivatives of shape functions at gauss points
-	Grr[0][0] =  0.0;
-	Grr[0][1] =  0.0;
-	Grr[0][2] =  0.0;
-	Grr[0][3] =  0.0;
-	
-	Gsr[0][0] =  0.0;
-	Gsr[0][1] =  0.0;
-	Gsr[0][2] =  0.0;
-	Gsr[0][3] =  0.0;
-	
-	Gtr[0][0] =  0.0;
-	Gtr[0][1] =  0.0;
-	Gtr[0][2] =  0.0;
-	Gtr[0][3] =  0.0;
-	
-	Grs[0][0] =  0.0;
-	Grs[0][1] =  0.0;
-	Grs[0][2] =  0.0;
-	Grs[0][3] =  0.0;
-	
-	Gss[0][0] =  0.0;
-	Gss[0][1] =  0.0;
-	Gss[0][2] =  0.0;
-	Gss[0][3] =  0.0;
-	
-	Gts[0][0] =  0.0;
-	Gts[0][1] =  0.0;
-	Gts[0][2] =  0.0;
-	Gts[0][3] =  0.0;
-	
-	Grt[0][0] =  0.0;
-	Grt[0][1] =  0.0;
-	Grt[0][2] =  0.0;
-	Grt[0][3] =  0.0;
-	
-	Gst[0][0] =  0.0;
-	Gst[0][1] =  0.0;
-	Gst[0][2] =  0.0;
-	Gst[0][3] =  0.0;
-	
-	Gtt[0][0] =  0.0;
-	Gtt[0][1] =  0.0;
-	Gtt[0][2] =  0.0;
-	Gtt[0][3] =  0.0;
-	
-}
-
-
-//*****************************************************************************
-//                          F E T E T 1 0 E L E M E N T
-//*****************************************************************************
-// I think this assumes that the tetrahedron in natural space is essentially
-// a constant metric tet with the edge nodes at the center of the edges.
-void FETet10ElementTraits::init()
-{
-	int n;
-	
-	// integration point coordinates
-	const double a = 0.58541020;
-	const double b = 0.13819660;
-	const double w = 0.25 / 6.0;
-	gr[ 0] = a; gs[ 0] = b; gt[ 0] = b; gw[ 0] = w;
-	gr[ 1] = b; gs[ 1] = a; gt[ 1] = b; gw[ 1] = w;
-	gr[ 2] = b; gs[ 2] = b; gt[ 2] = a; gw[ 2] = w;
-	gr[ 3] = b; gs[ 3] = b; gt[ 3] = b; gw[ 3] = w;
-	
-	// calculate shape function values at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		double r1 = 1.0 - gr[n] - gs[n] - gt[n];
-		double r2 = gr[n];
-		double r3 = gs[n];
-		double r4 = gt[n];
-
-		H[n][0] = r1*(2.0*r1 - 1.0);
-		H[n][1] = r2*(2.0*r2 - 1.0);
-		H[n][2] = r3*(2.0*r3 - 1.0);
-		H[n][3] = r4*(2.0*r4 - 1.0);
-		H[n][4] = 4.0*r1*r2;
-		H[n][5] = 4.0*r2*r3;
-		H[n][6] = 4.0*r3*r1;
-		H[n][7] = 4.0*r1*r4;
-		H[n][8] = 4.0*r2*r4;
-		H[n][9] = 4.0*r3*r4;
-	}
-
-//	Hi = H.inverse();
-	
-	// calculate local derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -3.0 + 4.0*gr[n] + 4.0*(gs[n] + gt[n]);
-		Gr[n][1] =  4.0*gr[n] - 1.0;
-		Gr[n][2] =  0.0;
-		Gr[n][3] =  0.0;
-		Gr[n][4] =  4.0 - 8.0*gr[n] - 4.0*(gs[n] + gt[n]);
-		Gr[n][5] =  4.0*gs[n];
-		Gr[n][6] = -4.0*gs[n];
-		Gr[n][7] = -4.0*gt[n];
-		Gr[n][8] =  4.0*gt[n];
-		Gr[n][9] =  0.0;
-
-		Gs[n][0] = -3.0 + 4.0*gs[n] + 4.0*(gr[n] + gt[n]);
-		Gs[n][1] =  0.0;
-		Gs[n][2] =  4.0*gs[n] - 1.0;
-		Gs[n][3] =  0.0;
-		Gs[n][4] = -4.0*gr[n];
-		Gs[n][5] =  4.0*gr[n];
-		Gs[n][6] =  4.0 - 8.0*gs[n] - 4.0*(gr[n] + gt[n]);
-		Gs[n][7] = -4.0*gt[n];
-		Gs[n][8] =  0.0;
-		Gs[n][9] =  4.0*gt[n];
-
-		Gt[n][0] = -3.0 + 4.0*gt[n] + 4.0*(gr[n] + gs[n]);
-		Gt[n][1] =  0.0;
-		Gt[n][2] =  0.0;
-		Gt[n][3] =  4.0*gt[n] - 1.0;
-		Gt[n][4] = -4.0*gr[n];
-		Gt[n][5] =  0.0;
-		Gt[n][6] = -4.0*gs[n];
-		Gt[n][7] =  4.0 - 8.0*gt[n] - 4.0*(gr[n] + gs[n]);
-		Gt[n][8] =  4.0*gr[n];
-		Gt[n][9] =  4.0*gs[n];
-	}
-	
-	// TODO: calculate local second derivatives of shape functions at gauss points (need for biphasic problems)
-}
-
-//*****************************************************************************
-//                          F E P E N T A E L E M E N T
-//*****************************************************************************
-
-void FEPentaElementTraits::init()
-{
-	int n;
-	
-	//gauss intergration points
-	const double a = 1.0/6.0;
-	const double b = 2.0/3.0;
-	const double c = 1.0 / sqrt(3.0);
-	const double w = 1.0 / 6.0;
-	
-	gr[0] = a; gs[0] = a; gt[0] = -c; gw[0] = w;
-	gr[1] = b; gs[1] = a; gt[1] = -c; gw[1] = w;
-	gr[2] = a; gs[2] = b; gt[2] = -c; gw[2] = w;
-	gr[3] = a; gs[3] = a; gt[3] =  c; gw[3] = w;
-	gr[4] = b; gs[4] = a; gt[4] =  c; gw[4] = w;
-	gr[5] = a; gs[5] = b; gt[5] =  c; gw[5] = w;
-	
-	// calculate shape function values at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 0.5*(1 - gt[n])*(1 - gr[n] - gs[n]);
-		H[n][1] = 0.5*(1 - gt[n])*gr[n];
-		H[n][2] = 0.5*(1 - gt[n])*gs[n];
-		H[n][3] = 0.5*(1 + gt[n])*(1 - gr[n] - gs[n]);
-		H[n][4] = 0.5*(1 + gt[n])*gr[n];
-		H[n][5] = 0.5*(1 + gt[n])*gs[n];
-	}
-
-	Hi = H.inverse();
-	
-	// calculate local derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -0.5*(1 - gt[n]);
-		Gr[n][1] =  0.5*(1 - gt[n]);
-		Gr[n][2] =  0.0;
-		Gr[n][3] = -0.5*(1 + gt[n]);
-		Gr[n][4] =  0.5*(1 + gt[n]);
-		Gr[n][5] =  0.0;
-		
-		Gs[n][0] = -0.5*(1 - gt[n]);
-		Gs[n][1] =  0.0;
-		Gs[n][2] =  0.5*(1 - gt[n]);
-		Gs[n][3] = -0.5*(1 + gt[n]);
-		Gs[n][4] =  0.0;
-		Gs[n][5] =  0.5*(1 + gt[n]);
-		
-		Gt[n][0] = -0.5*(1 - gr[n] - gs[n]);
-		Gt[n][1] = -0.5*gr[n];
-		Gt[n][2] = -0.5*gs[n];
-		Gt[n][3] =  0.5*(1 - gr[n] - gs[n]);
-		Gt[n][4] =  0.5*gr[n];
-		Gt[n][5] =  0.5*gs[n];
-	}
-	
-	// calculate local second derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Grr[n][0] =  0.0;
-		Grr[n][1] =  0.0;
-		Grr[n][2] =  0.0;
-		Grr[n][3] =  0.0;
-		Grr[n][4] =  0.0;
-		Grr[n][5] =  0.0;
-		
-		Gsr[n][0] =  0.0;
-		Gsr[n][1] =  0.0;
-		Gsr[n][2] =  0.0;
-		Gsr[n][3] =  0.0;
-		Gsr[n][4] =  0.0;
-		Gsr[n][5] =  0.0;
-		
-		Gtr[n][0] =  0.5;
-		Gtr[n][1] = -0.5;
-		Gtr[n][2] =  0.0;
-		Gtr[n][3] = -0.5;
-		Gtr[n][4] =  0.5;
-		Gtr[n][5] =  0.0;
-		
-		Grs[n][0] =  0.0;
-		Grs[n][1] =  0.0;
-		Grs[n][2] =  0.0;
-		Grs[n][3] =  0.0;
-		Grs[n][4] =  0.0;
-		Grs[n][5] =  0.0;
-		
-		Gss[n][0] =  0.0;
-		Gss[n][1] =  0.0;
-		Gss[n][2] =  0.0;
-		Gss[n][3] =  0.0;
-		Gss[n][4] =  0.0;
-		Gss[n][5] =  0.0;
-		
-		Gts[n][0] =  0.5;
-		Gts[n][1] =  0.0;
-		Gts[n][2] = -0.5;
-		Gts[n][3] = -0.5;
-		Gts[n][4] =  0.0;
-		Gts[n][5] =  0.5;
-		
-		Grt[n][0] =  0.5;
-		Grt[n][1] = -0.5;
-		Grt[n][2] =  0.0;
-		Grt[n][3] = -0.5;
-		Grt[n][4] =  0.5;
-		Grt[n][5] =  0.0;
-		
-		Gst[n][0] =  0.5;
-		Gst[n][1] =  0.0;
-		Gst[n][2] = -0.5;
-		Gst[n][3] = -0.5;
-		Gst[n][4] =  0.0;
-		Gst[n][5] =  0.5;
-		
-		Gtt[n][0] =  0.0;
-		Gtt[n][1] =  0.0;
-		Gtt[n][2] =  0.0;
-		Gtt[n][3] =  0.0;
-		Gtt[n][4] =  0.0;
-		Gtt[n][5] =  0.0;
-	}
-	
-}
-
-//*****************************************************************************
+//=============================================================================
 //                          F E Q U A D E L E M E N T
-//*****************************************************************************
+//=============================================================================
 
-void FEQuadElementTraits::init()
-{
-	int n;
-	
-	const double a = 1.0 / sqrt(3.0);
-	
-	gr[0] = -a; gs[0] = -a; gw[0] = 1;
-	gr[1] =  a; gs[1] = -a; gw[1] = 1;
-	gr[2] =  a; gs[2] =  a; gw[2] = 1;
-	gr[3] = -a; gs[3] =  a; gw[3] = 1;
-	
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 0.25*(1-gr[n])*(1-gs[n]);
-		H[n][1] = 0.25*(1+gr[n])*(1-gs[n]);
-		H[n][2] = 0.25*(1+gr[n])*(1+gs[n]);
-		H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
-	}
-	
-	Hi = H.inverse();
-	
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -0.25*(1-gs[n]);
-		Gr[n][1] =  0.25*(1-gs[n]);
-		Gr[n][2] =  0.25*(1+gs[n]);
-		Gr[n][3] = -0.25*(1+gs[n]);
-		
-		Gs[n][0] = -0.25*(1-gr[n]);
-		Gs[n][1] = -0.25*(1+gr[n]);
-		Gs[n][2] =  0.25*(1+gr[n]);
-		Gs[n][3] =  0.25*(1-gr[n]);
-	}
-}
-
-void FEQuadElementTraits::shape(double* H, double r, double s)
+//-----------------------------------------------------------------------------
+void FEQuad4_::shape(double* H, double r, double s)
 {
 	H[0] = 0.25*(1-r)*(1-s);
 	H[1] = 0.25*(1+r)*(1-s);
@@ -1023,7 +805,8 @@ void FEQuadElementTraits::shape(double* H, double r, double s)
 	H[3] = 0.25*(1-r)*(1+s);
 }
 
-void FEQuadElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+//-----------------------------------------------------------------------------
+void FEQuad4_::shape_deriv(double* Hr, double* Hs, double r, double s)
 {
 	Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
 	Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
@@ -1031,7 +814,8 @@ void FEQuadElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s
 	Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
 }
 
-void FEQuadElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+//-----------------------------------------------------------------------------
+void FEQuad4_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
 {
 	Hrr[0] = 0; Hrs[0] =  0.25; Hss[0] = 0;
 	Hrr[1] = 0; Hrs[1] = -0.25; Hss[1] = 0;
@@ -1039,7 +823,23 @@ void FEQuadElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, do
 	Hrr[3] = 0; Hrs[3] = -0.25; Hss[3] = 0;
 }
 
-void FEQuadElementTraits::project_to_nodes(double* ai, double* ao)
+//=============================================================================
+//                          F E Q U A D G 4 E L E M E N T
+//=============================================================================
+
+FEQuad4G4::FEQuad4G4() : FEQuad4_(NINT, FE_QUAD4G4) 
+{
+	const double a = 1.0 / sqrt(3.0);
+	gr[0] = -a; gs[0] = -a; gw[0] = 1;
+	gr[1] =  a; gs[1] = -a; gw[1] = 1;
+	gr[2] =  a; gs[2] =  a; gw[2] = 1;
+	gr[3] = -a; gs[3] =  a; gw[3] = 1;
+	init(); 
+	Hi = H.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FEQuad4G4::project_to_nodes(double* ai, double* ao)
 {
 	int ni = NINT;
 	int ne = NELN;
@@ -1051,68 +851,21 @@ void FEQuadElementTraits::project_to_nodes(double* ai, double* ao)
 	}
 }
 
-//*****************************************************************************
+//=============================================================================
 //                          F E N I Q U A D E L E M E N T
-//*****************************************************************************
+//=============================================================================
 
-void FENIQuadElementTraits::init()
+FEQuad4NI::FEQuad4NI() : FEQuad4_(NINT, FE_QUAD4NI) 
 {
-	int n;
-	
 	gr[0] = -1; gs[0] = -1; gw[0] = 1;
 	gr[1] =  1; gs[1] = -1; gw[1] = 1;
 	gr[2] =  1; gs[2] =  1; gw[2] = 1;
 	gr[3] = -1; gs[3] =  1; gw[3] = 1;
-	
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 0.25*(1-gr[n])*(1-gs[n]);
-		H[n][1] = 0.25*(1+gr[n])*(1-gs[n]);
-		H[n][2] = 0.25*(1+gr[n])*(1+gs[n]);
-		H[n][3] = 0.25*(1-gr[n])*(1+gs[n]);
-	}
-	
-	Hi = H.inverse();
-	
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -0.25*(1-gs[n]);
-		Gr[n][1] =  0.25*(1-gs[n]);
-		Gr[n][2] =  0.25*(1+gs[n]);
-		Gr[n][3] = -0.25*(1+gs[n]);
-		
-		Gs[n][0] = -0.25*(1-gr[n]);
-		Gs[n][1] = -0.25*(1+gr[n]);
-		Gs[n][2] =  0.25*(1+gr[n]);
-		Gs[n][3] =  0.25*(1-gr[n]);
-	}
+	init(); 
 }
 
-void FENIQuadElementTraits::shape(double* H, double r, double s)
-{
-	H[0] = 0.25*(1-r)*(1-s);
-	H[1] = 0.25*(1+r)*(1-s);
-	H[2] = 0.25*(1+r)*(1+s);
-	H[3] = 0.25*(1-r)*(1+s);
-}
-
-void FENIQuadElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[0] = -0.25*(1-s); Hs[0] = -0.25*(1-r);
-	Hr[1] =  0.25*(1-s); Hs[1] = -0.25*(1+r);
-	Hr[2] =  0.25*(1+s); Hs[2] =  0.25*(1+r);
-	Hr[3] = -0.25*(1+s); Hs[3] =  0.25*(1-r);
-}
-
-void FENIQuadElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[0] = 0; Hrs[0] =  0.25; Hss[0] = 0;
-	Hrr[1] = 0; Hrs[1] = -0.25; Hss[1] = 0;
-	Hrr[2] = 0; Hrs[2] =  0.25; Hss[2] = 0;
-	Hrr[3] = 0; Hrs[3] = -0.25; Hss[3] = 0;
-}
-
-void FENIQuadElementTraits::project_to_nodes(double* ai, double* ao)
+//-----------------------------------------------------------------------------
+void FEQuad4NI::project_to_nodes(double* ai, double* ao)
 {
 	ao[0] = ai[0];
 	ao[1] = ai[1];
@@ -1120,185 +873,115 @@ void FENIQuadElementTraits::project_to_nodes(double* ai, double* ao)
 	ao[3] = ai[3];
 }
 
-//*****************************************************************************
+//=============================================================================
 //                          F E T R I E L E M E N T
-//*****************************************************************************
+//=============================================================================
 
-void FETriElementTraits::init()
-{
-	int n;
-	
-	const double a = 1.0 / 6.0;
-	const double b = 2.0 / 3.0;
-	
-	gr[0] = a; gs[0] = a; gw[0] = a;
-	gr[1] = b; gs[1] = a; gw[1] = a;
-	gr[2] = a; gs[2] = b; gw[2] = a;
-	
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 1-gr[n]-gs[n];
-		H[n][1] = gr[n];
-		H[n][2] = gs[n];
-	}
-	
-	Hi = H.inverse();
-	
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -1;
-		Gr[n][1] =  1;
-		Gr[n][2] =  0;
-		
-		Gs[n][0] = -1;
-		Gs[n][1] =  0;
-		Gs[n][2] =  1;
-	}
-}
-
-void FETriElementTraits::shape(double* H, double r, double s)
+//-----------------------------------------------------------------------------
+void FETri3_::shape(double* H, double r, double s)
 {
 	H[0] = 1.0 - r - s;
 	H[1] = r;
 	H[2] = s;
 }
 
-void FETriElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+//-----------------------------------------------------------------------------
+void FETri3_::shape_deriv(double* Hr, double* Hs, double r, double s)
 {
 	Hr[0] = -1; Hs[0] = -1;
 	Hr[1] =  1; Hs[1] =  0;
 	Hr[2] =  0; Hs[2] =  1;
 }
 
-void FETriElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+//-----------------------------------------------------------------------------
+void FETri3_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
 {
 	Hrr[0] = 0; Hrs[0] = 0; Hss[0] = 0;
 	Hrr[1] = 0; Hrs[1] = 0; Hss[1] = 0;
 	Hrr[2] = 0; Hrs[2] = 0; Hss[2] = 0;
 }
 
-void FETriElementTraits::project_to_nodes(double* ai, double* ao)
+//=============================================================================
+//                          F E T R I G 1 E L E M E N T
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FETri3G1::FETri3G1() : FETri3_(NINT, FE_TRI3G1)
+{
+	const double a = 1.0/3.0;
+	gr[0] = a; gs[0] = a; gw[0] = 0.5;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FETri3G1::project_to_nodes(double* ai, double* ao)
 {
 	ao[0] = ai[0];
 	ao[1] = ai[0];
 	ao[2] = ai[0];
 }
 
-//*****************************************************************************
-//                          F E N I T R I E L E M E N T
-//*****************************************************************************
+//=============================================================================
+//                          F E T R I G 3 E L E M E N T
+//=============================================================================
 
-void FENITriElementTraits::init()
+//-----------------------------------------------------------------------------
+FETri3G3::FETri3G3() : FETri3_(NINT, FE_TRI3G3)
 {
-	int n;
-	
 	const double a = 1.0 / 6.0;
-	
+	const double b = 2.0 / 3.0;
+	gr[0] = a; gs[0] = a; gw[0] = a;
+	gr[1] = b; gs[1] = a; gw[1] = a;
+	gr[2] = a; gs[2] = b; gw[2] = a;
+	init(); 
+	Hi = H.inverse();
+}
+
+//-----------------------------------------------------------------------------
+void FETri3G3::project_to_nodes(double* ai, double* ao)
+{
+	assert(NINT == NELN);
+	for (int i=0; i<NELN; ++i)
+	{
+		ao[i] = 0;
+		for (int j=0; j<NINT; ++j) ao[i] += Hi[i][j]*ai[j];
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEQuad8G9::project_to_nodes(double* ai, double* ao)
+{
+	// TODO: implement this
+}
+
+//=============================================================================
+//                          F E N I T R I E L E M E N T
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FETri3NI::FETri3NI() : FETri3_(NINT, FE_TRI3NI)
+{ 
+	const double a = 1.0 / 6.0;
 	gr[0] = 0; gs[0] = 0; gw[0] = a;
 	gr[1] = 1; gs[1] = 0; gw[1] = a;
 	gr[2] = 0; gs[2] = 1; gw[2] = a;
-	
-	for (n=0; n<NINT; ++n)
-	{
-		H[n][0] = 1-gr[n]-gs[n];
-		H[n][1] = gr[n];
-		H[n][2] = gs[n];
-	}
-	
-	Hi = H.inverse();
-	
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -1;
-		Gr[n][1] =  1;
-		Gr[n][2] =  0;
-		
-		Gs[n][0] = -1;
-		Gs[n][1] =  0;
-		Gs[n][2] =  1;
-	}
+	init(); 
 }
 
-void FENITriElementTraits::shape(double* H, double r, double s)
-{
-	H[0] = 1.0 - r - s;
-	H[1] = r;
-	H[2] = s;
-}
-
-void FENITriElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[0] = -1; Hs[0] = -1;
-	Hr[1] =  1; Hs[1] =  0;
-	Hr[2] =  0; Hs[2] =  1;
-}
-
-void FENITriElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[0] = 0; Hrs[0] = 0; Hss[0] = 0;
-	Hrr[1] = 0; Hrs[1] = 0; Hss[1] = 0;
-	Hrr[2] = 0; Hrs[2] = 0; Hss[2] = 0;
-}
-
-void FENITriElementTraits::project_to_nodes(double* ai, double* ao)
+//-----------------------------------------------------------------------------
+void FETri3NI::project_to_nodes(double* ai, double* ao)
 {
 	ao[0] = ai[0];
 	ao[1] = ai[1];
 	ao[2] = ai[2];
 }
 
-//*****************************************************************************
-//                          F E T R I 6 E L E M E N T
-//*****************************************************************************
+//============================================================================
+//                             F E T R I 6
+//============================================================================
 
-void FETri6ElementTraits::init()
-{
-	int n;
-	
-	const double a = 1.0 / 6.0;
-	const double b = 2.0 / 3.0;
-	
-	gr[0] = a; gs[0] = a; gw[0] = a;
-	gr[1] = b; gs[1] = a; gw[1] = a;
-	gr[2] = a; gs[2] = b; gw[2] = a;
-	
-	// calculate shape function values at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		double r1 = 1.0 - gr[n] - gs[n];
-		double r2 = gr[n];
-		double r3 = gs[n];
-
-		H[n][0] = r1*(2.0*r1 - 1.0);
-		H[n][1] = r2*(2.0*r2 - 1.0);
-		H[n][2] = r3*(2.0*r3 - 1.0);
-		H[n][3] = 4.0*r1*r2;
-		H[n][4] = 4.0*r2*r3;
-		H[n][5] = 4.0*r3*r1;
-	}
-
-//	Hi = H.inverse();
-
-	// calculate local derivatives of shape functions at gauss points
-	for (n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -3.0 + 4.0*gr[n] + 4.0*gs[n];
-		Gr[n][1] =  4.0*gr[n] - 1.0;
-		Gr[n][2] =  0.0;
-		Gr[n][3] =  4.0 - 8.0*gr[n] - 4.0*gs[n];
-		Gr[n][4] =  4.0*gs[n];
-		Gr[n][5] = -4.0*gs[n];
-
-		Gs[n][0] = -3.0 + 4.0*gs[n] + 4.0*gr[n];
-		Gs[n][1] =  0.0;
-		Gs[n][2] =  4.0*gs[n] - 1.0;
-		Gs[n][3] = -4.0*gr[n];
-		Gs[n][4] =  4.0*gr[n];
-		Gs[n][5] =  4.0 - 8.0*gs[n] - 4.0*gr[n];
-	}
-}
-
-void FETri6ElementTraits::shape(double* H, double r, double s)
+//-----------------------------------------------------------------------------
+void FETri6_::shape(double* H, double r, double s)
 {
 	double r1 = 1.0 - r - s;
 	double r2 = r;
@@ -1312,7 +995,8 @@ void FETri6ElementTraits::shape(double* H, double r, double s)
 	H[5] = 4.0*r3*r1;
 }
 
-void FETri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
+//-----------------------------------------------------------------------------
+void FETri6_::shape_deriv(double* Hr, double* Hs, double r, double s)
 {
 	Hr[0] = -3.0 + 4.0*r + 4.0*s;
 	Hr[1] =  4.0*r - 1.0;
@@ -1329,7 +1013,8 @@ void FETri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s
 	Hs[5] =  4.0 - 8.0*s - 4.0*r;
 }
 
-void FETri6ElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
+//-----------------------------------------------------------------------------
+void FETri6_::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
 {
 	Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
 	Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
@@ -1339,7 +1024,22 @@ void FETri6ElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, do
 	Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
 }
 
-void FETri6ElementTraits::project_to_nodes(double* ai, double* ao)
+//=============================================================================
+//                          F E T R I 6 G 3 E L E M E N T
+//=============================================================================
+
+FETri6G3::FETri6G3() : FETri6_(NINT, FE_TRI6G3) 
+{ 
+	const double a = 1.0 / 6.0;
+	const double b = 2.0 / 3.0;
+	gr[0] = a; gs[0] = a; gw[0] = a;
+	gr[1] = b; gs[1] = a; gw[1] = a;
+	gr[2] = a; gs[2] = b; gw[2] = a;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FETri6G3::project_to_nodes(double* ai, double* ao)
 {
 	matrix H(3, 3);
 	for (int n=0; n<3; ++n)
@@ -1361,12 +1061,57 @@ void FETri6ElementTraits::project_to_nodes(double* ai, double* ao)
 	ao[5] = 0.5*(ao[2] + ao[0]);
 }
 
-//*****************************************************************************
-//                          F E N I T R I 6 E L E M E N T
-//*****************************************************************************
+//=============================================================================
+//                          F E T R I 6 G 4 E L E M E N T
+//=============================================================================
 
-void FENITri6ElementTraits::init()
+FETri6G4::FETri6G4() : FETri6_(NINT, FE_TRI6G4) 
+{ 
+	const double a = 1.0/3.0;
+	const double b = 1.0/5.0;
+	const double c = 3.0/5.0;
+	gr[0] = a; gs[0] = a; gw[0] = -27.0/96.0;
+	gr[1] = c; gs[1] = b; gw[1] =  25.0/96.0;
+	gr[2] = b; gs[2] = b; gw[2] =  25.0/96.0;
+	gr[3] = b; gs[3] = c; gw[3] =  25.0/96.0;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FETri6G4::project_to_nodes(double* ai, double* ao)
 {
+	// TODO: implement this
+}
+
+//=============================================================================
+//                          F E T R I 6 G 7 E L E M E N T
+//=============================================================================
+
+FETri6G7::FETri6G7() : FETri6_(NINT, FE_TRI6G7) 
+{ 
+	const double w = 1.0/2.0;
+	gr[0] = 0.333333333333333; gs[0] = 0.333333333333333; gw[0] = w*0.225000000000000;
+	gr[1] = 0.797426985353087; gs[1] = 0.101286507323456; gw[1] = w*0.125939180544827;
+	gr[2] = 0.101286507323456; gs[2] = 0.797426985353087; gw[2] = w*0.125939180544827;
+	gr[3] = 0.101286507323456; gs[3] = 0.101286507323456; gw[3] = w*0.125939180544827;
+	gr[4] = 0.470142064105115; gs[4] = 0.470142064105115; gw[4] = w*0.132394152788506;
+	gr[5] = 0.470142064105115; gs[5] = 0.059715871789770; gw[5] = w*0.132394152788506;
+	gr[6] = 0.059715871789770; gs[6] = 0.470142064105115; gw[6] = w*0.132394152788506;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FETri6G7::project_to_nodes(double* ai, double* ao)
+{
+	// TODO: implement this
+}
+
+//=============================================================================
+//                          F E N I T R I 6 E L E M E N T
+//=============================================================================
+
+FETri6NI::FETri6NI() : FETri6_(NINT, FE_TRI6NI)
+{ 
 	const double a = 0.0;
 	const double b = 1.0/6.0;
 	gr[0] = 0.0; gs[0] = 0.0; gw[0] = a;
@@ -1375,85 +1120,11 @@ void FENITri6ElementTraits::init()
 	gr[3] = 0.5; gs[3] = 0.0; gw[3] = b;
 	gr[4] = 0.5; gs[4] = 0.5; gw[4] = b;
 	gr[5] = 0.0; gs[5] = 0.5; gw[5] = b;
-	
-	// calculate shape function values at gauss points
-	for (int n=0; n<NINT; ++n)
-	{
-		double r1 = 1.0 - gr[n] - gs[n];
-		double r2 = gr[n];
-		double r3 = gs[n];
-
-		H[n][0] = r1*(2.0*r1 - 1.0);
-		H[n][1] = r2*(2.0*r2 - 1.0);
-		H[n][2] = r3*(2.0*r3 - 1.0);
-		H[n][3] = 4.0*r1*r2;
-		H[n][4] = 4.0*r2*r3;
-		H[n][5] = 4.0*r3*r1;
-	}
-
-//	Hi = H.inverse();
-
-	// calculate local derivatives of shape functions at gauss points
-	for (int n=0; n<NINT; ++n)
-	{
-		Gr[n][0] = -3.0 + 4.0*gr[n] + 4.0*gs[n];
-		Gr[n][1] =  4.0*gr[n] - 1.0;
-		Gr[n][2] =  0.0;
-		Gr[n][3] =  4.0 - 8.0*gr[n] - 4.0*gs[n];
-		Gr[n][4] =  4.0*gs[n];
-		Gr[n][5] = -4.0*gs[n];
-
-		Gs[n][0] = -3.0 + 4.0*gs[n] + 4.0*gr[n];
-		Gs[n][1] =  0.0;
-		Gs[n][2] =  4.0*gs[n] - 1.0;
-		Gs[n][3] = -4.0*gr[n];
-		Gs[n][4] =  4.0*gr[n];
-		Gs[n][5] =  4.0 - 8.0*gs[n] - 4.0*gr[n];
-	}
+	init(); 
 }
 
-void FENITri6ElementTraits::shape(double* H, double r, double s)
-{
-	double r1 = 1.0 - r - s;
-	double r2 = r;
-	double r3 = s;
-
-	H[0] = r1*(2.0*r1 - 1.0);
-	H[1] = r2*(2.0*r2 - 1.0);
-	H[2] = r3*(2.0*r3 - 1.0);
-	H[3] = 4.0*r1*r2;
-	H[4] = 4.0*r2*r3;
-	H[5] = 4.0*r3*r1;
-}
-
-void FENITri6ElementTraits::shape_deriv(double* Hr, double* Hs, double r, double s)
-{
-	Hr[0] = -3.0 + 4.0*r + 4.0*s;
-	Hr[1] =  4.0*r - 1.0;
-	Hr[2] =  0.0;
-	Hr[3] =  4.0 - 8.0*r - 4.0*s;
-	Hr[4] =  4.0*s;
-	Hr[5] = -4.0*s;
-
-	Hs[0] = -3.0 + 4.0*s + 4.0*r;
-	Hs[1] =  0.0;
-	Hs[2] =  4.0*s - 1.0;
-	Hs[3] = -4.0*r;
-	Hs[4] =  4.0*r;
-	Hs[5] =  4.0 - 8.0*s - 4.0*r;
-}
-
-void FENITri6ElementTraits::shape_deriv2(double* Hrr, double* Hrs, double* Hss, double r, double s)
-{
-	Hrr[0] =  4.0; Hrs[0] =  4.0; Hss[0] =  4.0;
-	Hrr[1] =  4.0; Hrs[1] =  0.0; Hss[1] =  0.0;
-	Hrr[2] =  0.0; Hrs[2] =  0.0; Hss[2] =  4.0;
-	Hrr[3] = -8.0; Hrs[3] = -4.0; Hss[3] =  0.0;
-	Hrr[4] =  0.0; Hrs[4] =  4.0; Hss[4] =  0.0;
-	Hrr[5] =  0.0; Hrs[5] = -4.0; Hss[5] = -8.0;
-}
-
-void FENITri6ElementTraits::project_to_nodes(double* ai, double* ao)
+//-----------------------------------------------------------------------------
+void FETri6NI::project_to_nodes(double* ai, double* ao)
 {
 	ao[0] = ai[0];
 	ao[1] = ai[1];
@@ -1463,9 +1134,89 @@ void FENITri6ElementTraits::project_to_nodes(double* ai, double* ao)
 	ao[5] = ai[5];
 }
 
-//*****************************************************************************
+//=============================================================================
+//          F E Q U A D 8 
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// shape function at (r,s)
+void FEQuad8_::shape(double* H, double r, double s)
+{
+	H[4] = 0.5*(1 - r*r)*(1 - s);
+	H[5] = 0.5*(1 - s*s)*(1 + r);
+	H[6] = 0.5*(1 - r*r)*(1 + s);
+	H[7] = 0.5*(1 - s*s)*(1 - r);
+
+	H[0] = 0.25*(1 - r)*(1 - s) - 0.5*(H[4] + H[7]);
+	H[1] = 0.25*(1 + r)*(1 - s) - 0.5*(H[4] + H[5]);
+	H[2] = 0.25*(1 + r)*(1 + s) - 0.5*(H[5] + H[6]);
+	H[3] = 0.25*(1 - r)*(1 + s) - 0.5*(H[6] + H[7]);
+}
+
+//-----------------------------------------------------------------------------
+// shape function derivatives at (r,s)
+void FEQuad8_::shape_deriv(double* Hr, double* Hs, double r, double s)
+{
+	Hr[4] = -r*(1 - s);
+	Hr[5] = 0.5*(1 - s*s);
+	Hr[6] = -r*(1 + s);
+	Hr[7] = -0.5*(1 - s*s);
+
+	Hr[0] = -0.25*(1 - s) - 0.5*(Hr[4] + Hr[7]);
+	Hr[1] =  0.25*(1 - s) - 0.5*(Hr[4] + Hr[5]);
+	Hr[2] =  0.25*(1 + s) - 0.5*(Hr[5] + Hr[6]);
+	Hr[3] = -0.25*(1 + s) - 0.5*(Hr[6] + Hr[7]);
+
+	Hs[4] = -0.5*(1 - r*r);
+	Hs[5] = -s*(1 + r);
+	Hs[6] = 0.5*(1 - r*r);
+	Hs[7] = -s*(1 - r);
+
+	Hs[0] = -0.25*(1 - r) - 0.5*(Hs[4] + Hs[7]);
+	Hs[1] = -0.25*(1 + r) - 0.5*(Hs[4] + Hs[5]);
+	Hs[2] =  0.25*(1 + r) - 0.5*(Hs[5] + Hs[6]);
+	Hs[3] =  0.25*(1 - r) - 0.5*(Hs[6] + Hs[7]);
+}
+
+//-----------------------------------------------------------------------------
+// shape function derivatives at (r,s)
+void FEQuad8_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
+{
+	// TODO: implement this
+}
+
+//=============================================================================
+//       F E Q U A D 8 G 7
+//=============================================================================
+
+FEQuad8G9::FEQuad8G9() : FEQuad8_(NINT, FE_QUAD8G9)
+{
+	// integration point coordinates
+	const double a = sqrt(0.6);
+	const double w1 = 25.0/81.0;
+	const double w2 = 40.0/81.0;
+	const double w3 = 64.0/81.0;
+	gr[ 0] = -a; gs[ 0] = -a;  gw[ 0] = w1;
+	gr[ 1] =  0; gs[ 1] = -a;  gw[ 1] = w2;
+	gr[ 2] =  a; gs[ 2] = -a;  gw[ 2] = w1;
+	gr[ 3] = -a; gs[ 3] =  0;  gw[ 3] = w2;
+	gr[ 4] =  0; gs[ 4] =  0;  gw[ 4] = w3;
+	gr[ 5] =  a; gs[ 5] =  0;  gw[ 5] = w2;
+	gr[ 6] = -a; gs[ 6] =  a;  gw[ 6] = w1;
+	gr[ 7] =  0; gs[ 7] =  a;  gw[ 7] = w2;
+	gr[ 8] =  a; gs[ 8] =  a;  gw[ 8] = w1;
+	init();
+}
+
+//=============================================================================
+//
+//                      S H E L L   E L E M E N T S
+//
+//=============================================================================
+
+//=============================================================================
 //                          F E S H E L L Q U A D E L E M E N T
-//*****************************************************************************
+//=============================================================================
 
 void FEShellQuadElementTraits::init()
 {
@@ -1515,9 +1266,9 @@ void FEShellQuadElementTraits::init()
 	}
 }
 
-//*****************************************************************************
+//=============================================================================
 //                          F E S H E L L T R I E L E M E N T
-//*****************************************************************************
+//=============================================================================
 
 void FEShellTriElementTraits::init()
 {
@@ -1525,7 +1276,6 @@ void FEShellTriElementTraits::init()
 
 	const double a = 1.0 / 6.0;
 	const double b = 2.0 / 3.0;
-	const double c = sqrt(3.0/5.0);
 	const double w = 5.0 / 9.0;
 
 	gr[0] = a; gs[0] = a; gt[0] = -b; gw[0] = a*w;
@@ -1561,9 +1311,9 @@ void FEShellTriElementTraits::init()
 	}
 }
 
-//*****************************************************************************
+//=============================================================================
 //                          F E T R U S S E L E M E N T
-//*****************************************************************************
+//=============================================================================
 
 void FETrussElementTraits::init()
 {

@@ -381,7 +381,7 @@ void FEUDGHexDomain::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
 void FEUDGHexDomain::UDGMaterialStiffness(FESolidElement &el, matrix &ke)
 {
 	// make sure we have the right element type
-	assert(el.Type() == FE_UDGHEX);
+	assert(el.Type() == FE_HEX8G1);
 
 	int i, i3, j, j3;
 
@@ -503,7 +503,7 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 
 		assert(!el.IsRigid());
 
-		assert(el.Type() == FE_UDGHEX);
+		assert(el.Type() == FE_HEX8G1);
 
 		// get the number of integration points
 		nint = el.GaussPoints();
@@ -660,7 +660,7 @@ void FEUDGHexDomain::AvgCartDerivs(FESolidElement& el, double GX[8], double GY[8
 double FEUDGHexDomain::HexVolume(FESolidElement& el, int state)
 {
 	// let's make sure this is indeed a hex element
-//	assert(el.Type() == FE_HEX);
+//	assert(el.Type() == FE_HEX8G8);
 
 	int neln = el.Nodes();
 	vec3d r[8];

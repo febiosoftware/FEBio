@@ -97,7 +97,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(!el.IsRigid());
 			
 			//! this element should not be UDG
-			assert(el.Type() != FE_UDGHEX);
+			assert(el.Type() != FE_HEX8G1);
 			
 			// unpack the element
 			UnpackLM(el, elm);
@@ -158,7 +158,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 			assert(!el.IsRigid());
 			
 			//! this element should not be UDG
-			assert(el.Type() != FE_UDGHEX);
+			assert(el.Type() != FE_HEX8G1);
 			
 			// unpack the element
 			UnpackLM(el, elm);

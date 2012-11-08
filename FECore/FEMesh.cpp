@@ -349,12 +349,12 @@ double FEMesh::ElementVolume(FEElement &el)
 	double V = 0;
 	switch (ntype)
 	{
-	case FE_HEX:
-	case FE_RIHEX:
-	case FE_UDGHEX:
-	case FE_TET:
-	case FE_PENTA:
-	case FE_TETG1:
+	case FE_HEX8G8:
+	case FE_HEX8RI:
+	case FE_HEX8G1:
+	case FE_TET4G1:
+	case FE_TET4G4:
+	case FE_PENTA6G6:
 		V = SolidElementVolume(dynamic_cast<FESolidElement&>(el));
 		break;
 	case FE_SHELL_QUAD:
@@ -493,14 +493,15 @@ int FEMesh::Faces(FEElement& el)
 {
 	switch (el.Type())
 	{
-	case FE_HEX:
-	case FE_HEX20:
-	case FE_RIHEX:
-	case FE_UDGHEX: return 6;
-	case FE_PENTA: return 5;
-	case FE_TET:
-	case FE_TET10:
-	case FE_TETG1: return 4;
+	case FE_HEX8G8:
+	case FE_HEX20G27:
+	case FE_HEX8RI:
+	case FE_HEX8G1: return 6;
+	case FE_PENTA6G6: return 5;
+	case FE_TET4G4:
+	case FE_TET10G8:
+	case FE_TET10G4:
+	case FE_TET4G1: return 4;
 	case FE_SHELL_QUAD:
 	case FE_SHELL_TRI: return 1;
 	}
@@ -517,9 +518,9 @@ int FEMesh::GetFace(FEElement& el, int n, int nf[4])
 	int* en = &el.m_node[0];
 	switch (el.Type())
 	{
-	case FE_HEX:
-	case FE_RIHEX:
-	case FE_UDGHEX:
+	case FE_HEX8G8:
+	case FE_HEX8RI:
+	case FE_HEX8G1:
 		nn = 4;
 		switch (n)
 		{
@@ -531,7 +532,7 @@ int FEMesh::GetFace(FEElement& el, int n, int nf[4])
 		case 5: nf[0] = en[4]; nf[1] = en[5]; nf[2] = en[6]; nf[3] = en[7]; break;
 		}
 		break;
-	case FE_PENTA:
+	case FE_PENTA6G6:
 		switch(n)
 		{
 		case 0: nn = 4; nf[0] = en[0]; nf[1] = en[1]; nf[2] = en[4]; nf[3] = en[3]; break;
@@ -541,8 +542,8 @@ int FEMesh::GetFace(FEElement& el, int n, int nf[4])
 		case 4: nn = 3; nf[0] = en[3]; nf[1] = en[4]; nf[2] = en[5]; nf[3] = en[5]; break;
 		}
 		break;
-	case FE_TET:
-	case FE_TETG1:
+	case FE_TET4G4:
+	case FE_TET4G1:
 		nn = 3;
 		switch (n)
 		{

@@ -170,6 +170,12 @@ public:
 		int nint = GaussPoints();
 		for (int i=0; i<nint; ++i) m_State[i]->Init(bflag);
 	}
+
+	//! this function projects data from the gauss-points to the nodal points
+	void project_to_nodes(double* ai, double* ao)
+	{
+		((FESolidElementTraits*)m_pT)->project_to_nodes(ai, ao);
+	}
 };
 
 //-----------------------------------------------------------------------------

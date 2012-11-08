@@ -14,32 +14,37 @@
 
 enum FE_Element_Type {
 	// 3D solid elements
-	FE_HEX,			// = 0
-	FE_HEX20,		// = 1
-	FE_RIHEX,		// = 2
-	FE_UDGHEX,		// = 3
-	FE_TET,			// = 4
-	FE_TET10,		// = 5
-	FE_PENTA,		// = 6
-	FE_TETG1,		// = 7
+	FE_HEX8G8,	
+	FE_HEX8RI,
+	FE_HEX8G1,	
+	FE_TET4G1,	
+	FE_TET4G4,		
+	FE_PENTA6G6,	
+	FE_TET10G4,
+	FE_TET10G8,
+	FE_HEX20G27,
 
 	// 2.5D surface elements
-	FE_QUAD,		// = 8
-	FE_NIQUAD,		// = 9
-	FE_TRI,			// = 10
-	FE_NITRI,		// = 11
-	FE_TRI6,		// = 12
-	FE_NITRI6,		// = 13
+	FE_QUAD4G4,
+	FE_QUAD4NI,
+	FE_TRI3G1,
+	FE_TRI3G3,
+	FE_TRI3NI,
+	FE_TRI6G3,
+	FE_TRI6G4,
+	FE_TRI6G7,
+	FE_TRI6NI,
+	FE_QUAD8G9,
 
 	// shell elements
-	FE_SHELL_QUAD,	// = 14
-	FE_SHELL_TRI,	// = 15
+	FE_SHELL_QUAD,
+	FE_SHELL_TRI,
 
 	// truss elements
-	FE_TRUSS,		// = 16
+	FE_TRUSS,
 
 	// discrete elements
-	FE_DISCRETE		// = 17
+	FE_DISCRETE,
 };
 
 /////////////////////////////////////////////////////////////////////////////

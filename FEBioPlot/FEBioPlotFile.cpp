@@ -374,14 +374,14 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	int dtype = 0;
 	switch (etype)
 	{
-		case FE_HEX:
-		case FE_RIHEX:
-		case FE_UDGHEX: ne = 8; dtype = PLT_ELEM_HEX; break;
-		case FE_HEX20: ne = 20; dtype = PLT_ELEM_HEX20; break;
-		case FE_PENTA: ne = 6; dtype = PLT_ELEM_PENTA; break;
-		case FE_TET:
-		case FE_TETG1: ne = 4; dtype = PLT_ELEM_TET; break;
-		case FE_TET10: ne = 10; dtype = PLT_ELEM_TET10; break;
+		case FE_HEX8G8:
+		case FE_HEX8RI:
+		case FE_HEX8G1: ne = 8; dtype = PLT_ELEM_HEX; break;
+		case FE_HEX20G27: ne = 20; dtype = PLT_ELEM_HEX20; break;
+		case FE_PENTA6G6: ne = 6; dtype = PLT_ELEM_PENTA; break;
+		case FE_TET4G4:
+		case FE_TET4G1: ne = 4; dtype = PLT_ELEM_TET; break;
+		case FE_TET10G4: ne = 10; dtype = PLT_ELEM_TET10; break;
 	}
 
 	// write the header

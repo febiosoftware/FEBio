@@ -165,12 +165,12 @@ bool LSDYNAPlotFile::Open(FEModel& fem, const char* szfile)
 				N = el.Nodes();
 				switch (el.Type())
 				{
-				case FE_HEX:
-				case FE_RIHEX:
-				case FE_UDGHEX:
+				case FE_HEX8G8:
+				case FE_HEX8RI:
+				case FE_HEX8G1:
 					for (j=0; j<N; ++j) n[j] = el.m_node[j]+1;
 					break;
-				case FE_PENTA:
+				case FE_PENTA6G6:
 					// note the weird mapping. This is to be consistent
 					// with NIKE's wedge element
 					n[0] = el.m_node[0]+1;
@@ -182,8 +182,8 @@ bool LSDYNAPlotFile::Open(FEModel& fem, const char* szfile)
 					n[6] = el.m_node[4]+1;
 					n[7] = el.m_node[4]+1;
 					break;
-				case FE_TET:
-				case FE_TETG1:
+				case FE_TET4G4:
+				case FE_TET4G1:
 					n[0] = el.m_node[0]+1;
 					n[1] = el.m_node[1]+1;
 					n[2] = el.m_node[2]+1;

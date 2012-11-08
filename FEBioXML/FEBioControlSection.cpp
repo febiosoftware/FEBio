@@ -161,9 +161,9 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 
 				if (strcmp(sze, "hex8") == 0)
 				{
-					if (strcmp(szv, "GAUSS8") == 0) m_pim->m_nhex8 = FE_HEX;
-					else if (strcmp(szv, "POINT6") == 0) m_pim->m_nhex8 = FE_RIHEX;
-					else if (strcmp(szv, "UDG") == 0) m_pim->m_nhex8 = FE_UDGHEX;
+					if (strcmp(szv, "GAUSS8") == 0) m_pim->m_nhex8 = FE_HEX8G8;
+					else if (strcmp(szv, "POINT6") == 0) m_pim->m_nhex8 = FE_HEX8RI;
+					else if (strcmp(szv, "UDG") == 0) m_pim->m_nhex8 = FE_HEX8G1;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (strcmp(sze, "tet4") == 0)
@@ -191,8 +191,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 							else if (tag == "stab_int")
 							{
 								const char* sz = tag.szvalue();
-								if (strcmp(sz, "GAUSS4") == 0) m_pim->m_nut4 = FE_TET;
-								else if (strcmp(sz, "GAUSS1") == 0) m_pim->m_nut4 = FE_TETG1;
+								if (strcmp(sz, "GAUSS4") == 0) m_pim->m_nut4 = FE_TET4G4;
+								else if (strcmp(sz, "GAUSS1") == 0) m_pim->m_nut4 = FE_TET4G1;
 							}
 							else throw XMLReader::InvalidTag(tag);
 							++tag;

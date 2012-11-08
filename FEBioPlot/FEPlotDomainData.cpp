@@ -293,33 +293,27 @@ bool FEPlotNodalFluidFlux::Save(FEDomain &dom, vector<float>& a)
 
 			// fluid flux at gauss points
 			int j;
-			vec3d vi[8];
+			double vi[3][FEElement::MAX_NODES];
 			for (j=0; j<nint; ++j)
 			{
 				FEBiphasicMaterialPoint* pt = el.m_State[j]->ExtractData<FEBiphasicMaterialPoint>(); assert(pt);
-				vi[j] = pt->m_w;
+				vi[0][j] = pt->m_w.x;
+				vi[1][j] = pt->m_w.y;
+				vi[2][j] = pt->m_w.z;
 			}
 
 			// project to nodes
-			vec3d vn[8];
-			matrix& Hi = el.m_pT->Hi;
-			for (j=0; j<neln; ++j)
-			{
-				vn[j] = 0;
-				for (int k=0; k<nint; ++k) 
-				{
-					vn[j].x += Hi[j][k]*vi[k].x;
-					vn[j].y += Hi[j][k]*vi[k].y;
-					vn[j].z += Hi[j][k]*vi[k].z;
-				}
-			}
+			double vn[3][FEElement::MAX_NODES];
+			el.project_to_nodes(vi[0], vn[0]);
+			el.project_to_nodes(vi[1], vn[1]);
+			el.project_to_nodes(vi[2], vn[2]);
 
 			// output data
 			for (j=0; j<neln; ++j)
 			{
-				a.push_back((float)vn[j].x);
-				a.push_back((float)vn[j].y);
-				a.push_back((float)vn[j].z);
+				a.push_back((float)vn[0][j]);
+				a.push_back((float)vn[1][j]);
+				a.push_back((float)vn[2][j]);
 			}
 		}
 		return true;

@@ -242,7 +242,7 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && m_pim->m_b3field) return FE_3F_SOLID_DOMAIN;
 				else
 				{
-					if (m_pim->m_nhex8 == FE_UDGHEX) return FE_UDGHEX_DOMAIN;
+					if (m_pim->m_nhex8 == FE_HEX8G1) return FE_UDGHEX_DOMAIN;
 					else return FE_SOLID_DOMAIN;
 				}
 			}
@@ -424,19 +424,19 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		case FEFEBioImport::ET_HEX20:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_HEX20, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_PENTA, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET4G4, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_UT4:
@@ -448,13 +448,13 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		case FEFEBioImport::ET_TETG1:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TETG1, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET4G1, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TET10:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET10, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET10G4, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_QUAD4:
@@ -599,19 +599,19 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		case FEFEBioImport::ET_HEX20:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_HEX20, nid, 0);
+				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, 0);
 			}
 			break;
 		case FEFEBioImport::ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_PENTA, nid, 0);
+				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, 0);
 			}
 			break;
 		case FEFEBioImport::ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET, nid, 0);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET4G4, nid, 0);
 			}
 			break;
 		case FEFEBioImport::ET_UT4:
@@ -623,13 +623,13 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 		case FEFEBioImport::ET_TETG1:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TETG1, nid, 0);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET4G1, nid, 0);
 			}
 			break;
 		case FEFEBioImport::ET_TET10:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET10, nid, 0);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET10G4, nid, 0);
 			}
 			break;
 		case FEFEBioImport::ET_QUAD4:
@@ -735,13 +735,13 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 		case FEFEBioImport::ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_PENTA, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET4G4, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_UT4:
@@ -753,7 +753,7 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 		case FEFEBioImport::ET_TETG1:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TETG1, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), FE_TET4G1, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_QUAD4:

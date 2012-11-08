@@ -88,7 +88,7 @@ FESolidElement* FESolidDomain::FindElement(vec3d y, double r[3])
 	{
 		// get the next element
 		FESolidElement& e = Element(i);
-		assert(e.Type() == FE_HEX);
+		assert(e.Type() == FE_HEX8G8);
 
 		// get the element nodal coordinates
 		int neln = e.Nodes();

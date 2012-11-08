@@ -22,24 +22,29 @@ FEElementLibrary::FEElementLibrary()
 	{
 		// register element types
 		int n;
-		n = RegisterTraits(new FEHexElementTraits       ); assert(n==FE_HEX);
-		n = RegisterTraits(new FEHex20ElementTraits     ); assert(n==FE_HEX20);
-		n = RegisterTraits(new FERIHexElementTraits     ); assert(n==FE_RIHEX);
-		n = RegisterTraits(new FEUDFHexElementTraits    ); assert(n==FE_UDGHEX);
-		n = RegisterTraits(new FETetElementTraits       ); assert(n==FE_TET);
-		n = RegisterTraits(new FETet10ElementTraits     ); assert(n==FE_TET10);
-		n = RegisterTraits(new FEPentaElementTraits     ); assert(n==FE_PENTA);
-		n = RegisterTraits(new FEG1TetElementTraits     ); assert(n==FE_TETG1);
-		n = RegisterTraits(new FEQuadElementTraits      ); assert(n==FE_QUAD);
-		n = RegisterTraits(new FENIQuadElementTraits    ); assert(n==FE_NIQUAD);
-		n = RegisterTraits(new FETriElementTraits       ); assert(n==FE_TRI);
-		n = RegisterTraits(new FENITriElementTraits     ); assert(n==FE_NITRI);
-		n = RegisterTraits(new FETri6ElementTraits      ); assert(n==FE_TRI6);
-		n = RegisterTraits(new FENITri6ElementTraits    ); assert(n==FE_NITRI6);
-		n = RegisterTraits(new FEShellQuadElementTraits ); assert(n==FE_SHELL_QUAD);
-		n = RegisterTraits(new FEShellTriElementTraits  ); assert(n==FE_SHELL_TRI);
-		n = RegisterTraits(new FETrussElementTraits     ); assert(n==FE_TRUSS);
-		n = RegisterTraits(new FEDiscreteElementTraits  ); assert(n==FE_DISCRETE);
+		n = RegisterTraits(new FEHex8G8  ); assert(n==FE_HEX8G8  );
+		n = RegisterTraits(new FEHex8RI  ); assert(n==FE_HEX8RI  );
+		n = RegisterTraits(new FEHex8G1  ); assert(n==FE_HEX8G1  );
+		n = RegisterTraits(new FETet4G1  ); assert(n==FE_TET4G1  );
+		n = RegisterTraits(new FETet4G4  ); assert(n==FE_TET4G4  );
+		n = RegisterTraits(new FEPenta6G6); assert(n==FE_PENTA6G6);
+		n = RegisterTraits(new FETet10G4 ); assert(n==FE_TET10G4 );
+		n = RegisterTraits(new FETet10G8 ); assert(n==FE_TET10G8 );
+		n = RegisterTraits(new FEHex20G27); assert(n==FE_HEX20G27);
+		n = RegisterTraits(new FEQuad4G4 ); assert(n==FE_QUAD4G4 );
+		n = RegisterTraits(new FEQuad4NI ); assert(n==FE_QUAD4NI );
+		n = RegisterTraits(new FETri3G1  ); assert(n==FE_TRI3G1  );
+		n = RegisterTraits(new FETri3G3  ); assert(n==FE_TRI3G3  );
+		n = RegisterTraits(new FETri3NI  ); assert(n==FE_TRI3NI  );
+		n = RegisterTraits(new FETri6G3  ); assert(n==FE_TRI6G3  );
+		n = RegisterTraits(new FETri6G4  ); assert(n==FE_TRI6G4  );
+		n = RegisterTraits(new FETri6G7  ); assert(n==FE_TRI6G7  );
+		n = RegisterTraits(new FETri6NI  ); assert(n==FE_TRI6NI  );
+		n = RegisterTraits(new FEQuad8G9 ); assert(n==FE_QUAD8G9 );
+		n = RegisterTraits(new FEShellQuadElementTraits  ); assert(n==FE_SHELL_QUAD);
+		n = RegisterTraits(new FEShellTriElementTraits   ); assert(n==FE_SHELL_TRI);
+		n = RegisterTraits(new FETrussElementTraits      ); assert(n==FE_TRUSS);
+		n = RegisterTraits(new FEDiscreteElementTraits   ); assert(n==FE_DISCRETE);
 		bfirst = false;
 	}
 }

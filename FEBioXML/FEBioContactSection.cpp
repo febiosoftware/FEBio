@@ -140,8 +140,13 @@ void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
 				for (int i=0; i<s.Elements(); ++i)
 				{
 					FESurfaceElement& e = s.Element(i);
-					if (e.Nodes() == 4) e.SetType(FE_QUAD); 
-					else e.SetType(FE_TRI);
+					switch (e.Nodes())
+					{
+					case 3: e.SetType(FE_TRI3G3 ); break;
+					case 6: e.SetType(FE_TRI6G7 ); break;
+					case 4: e.SetType(FE_QUAD4G4); break;
+					case 8: e.SetType(FE_QUAD8G9); break;
+					}
 				}
 			}
 			else throw XMLReader::InvalidTag(tag);
@@ -198,8 +203,13 @@ void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
 				for (int i=0; i<s.Elements(); ++i)
 				{
 					FESurfaceElement& e = s.Element(i);
-					if (e.Nodes() == 4) e.SetType(FE_QUAD); 
-					else e.SetType(FE_TRI);
+					switch (e.Nodes())
+					{
+					case 3: e.SetType(FE_TRI3G3 ); break;
+					case 6: e.SetType(FE_TRI6G7 ); break;
+					case 4: e.SetType(FE_QUAD4G4); break;
+					case 8: e.SetType(FE_QUAD8G9); break;
+					}
 				}
 			}
 			else throw XMLReader::InvalidTag(tag);
@@ -256,8 +266,13 @@ void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
 				for (int i=0; i<s.Elements(); ++i)
 				{
 					FESurfaceElement& e = s.Element(i);
-					if (e.Nodes() == 4) e.SetType(FE_QUAD); 
-					else e.SetType(FE_TRI);
+					switch (e.Nodes())
+					{
+					case 3: e.SetType(FE_TRI3G3 ); break;
+					case 6: e.SetType(FE_TRI6G7 ); break;
+					case 4: e.SetType(FE_QUAD4G4); break;
+					case 8: e.SetType(FE_QUAD8G9); break;
+					}
 				}
 			}
 			else throw XMLReader::InvalidTag(tag);
@@ -621,8 +636,9 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 	{
 		FESurfaceElement& el = s.Element(i);
 
-		if (tag == "quad4") el.SetType(FE_NIQUAD);
-		else if (tag == "tri3") el.SetType(FE_NITRI);
+		if      (tag == "quad4") el.SetType(FE_QUAD4NI);
+		else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
+		else if (tag == "tri6" ) el.SetType(FE_TRI6NI );
 		else throw XMLReader::InvalidTag(tag);
 
 		N = el.Nodes();
