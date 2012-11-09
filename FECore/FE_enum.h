@@ -33,6 +33,7 @@ enum FE_Element_Type {
 	FE_TRI6G3,
 	FE_TRI6G4,
 	FE_TRI6G7,
+	FE_TRI6GL7,
 	FE_TRI6NI,
 	FE_QUAD8G9,
 

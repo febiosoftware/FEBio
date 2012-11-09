@@ -1098,12 +1098,54 @@ FETri6G7::FETri6G7() : FETri6_(NINT, FE_TRI6G7)
 	gr[5] = 0.470142064105115; gs[5] = 0.059715871789770; gw[5] = w*0.132394152788506;
 	gr[6] = 0.059715871789770; gs[6] = 0.470142064105115; gw[6] = w*0.132394152788506;
 	init(); 
+
+	// we need Ai to project integration point data to the nodes
+	matrix A(NELN,NELN);
+	Ai.resize(NELN,NELN);
+	A = H.transpose()*H;
+	Ai = A.inverse();
 }
 
 //-----------------------------------------------------------------------------
 void FETri6G7::project_to_nodes(double* ai, double* ao)
 {
-	// TODO: implement this
+	vector<double> b(NELN);
+	for (int i=0; i<NELN; ++i) 
+	{
+		b[i] = 0;
+		for (int j=0; j<NINT; ++j) b[i] += H[j][i]*ai[j];
+	}
+
+	for (int i=0; i<NELN; ++i) 
+	{
+		ao[i] = 0;
+		for (int j=0; j<NELN; ++j) ao[i] += Ai[i][j]*b[j];
+	}
+}
+
+//=============================================================================
+//                          T R I 6 G L 7
+//=============================================================================
+
+FETri6GL7::FETri6GL7() : FETri6_(NINT, FE_TRI6GL7) 
+{ 
+	const double a = 1.0/40.0;
+	const double b = 1.0/15.0;
+	gr[0] = 0.0; gs[0] = 0.0; gw[0] = a;
+	gr[1] = 1.0; gs[1] = 0.0; gw[1] = a;
+	gr[2] = 0.0; gs[2] = 1.0; gw[2] = a;
+	gr[3] = 0.5; gs[3] = 0.0; gw[3] = b;
+	gr[4] = 0.5; gs[4] = 0.5; gw[4] = b;
+	gr[5] = 0.0; gs[5] = 0.5; gw[5] = b;
+	gr[6] = 1.0/3.0; gs[6] = 1.0/3.0; gw[6] = 9.0*a;
+	init(); 
+}
+
+//-----------------------------------------------------------------------------
+void FETri6GL7::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0]; ao[1] = ai[1]; ao[2] = ai[2];
+	ao[3] = ai[3]; ao[4] = ai[4]; ao[5] = ai[5];
 }
 
 //=============================================================================

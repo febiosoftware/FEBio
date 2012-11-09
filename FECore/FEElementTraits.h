@@ -598,6 +598,25 @@ public:
 
 	// project integration point data to nodes
 	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix	Ai;
+};
+
+//=============================================================================
+//  6-node triangular element with 7-point Gauss-Lobatto quadrature
+//
+class FETri6GL7 : public FETri6_
+{
+public:
+	enum { NINT = 7 };
+
+public:
+	// constructor
+	FETri6GL7();
+
+	// project integration point data to nodes
+	void project_to_nodes(double* ai, double* ao);
 };
 
 //=============================================================================
