@@ -161,9 +161,29 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 
 				if (strcmp(sze, "hex8") == 0)
 				{
-					if (strcmp(szv, "GAUSS8") == 0) m_pim->m_nhex8 = FE_HEX8G8;
+					if      (strcmp(szv, "GAUSS8") == 0) m_pim->m_nhex8 = FE_HEX8G8;
 					else if (strcmp(szv, "POINT6") == 0) m_pim->m_nhex8 = FE_HEX8RI;
-					else if (strcmp(szv, "UDG") == 0) m_pim->m_nhex8 = FE_HEX8G1;
+					else if (strcmp(szv, "UDG"   ) == 0) m_pim->m_nhex8 = FE_HEX8G1;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (strcmp(sze, "tet10") == 0)
+				{
+					if      (strcmp(szv, "GAUSS4") == 0) m_pim->m_ntet10 = FE_TET10G4;
+					else if (strcmp(szv, "GAUSS8") == 0) m_pim->m_ntet10 = FE_TET10G8;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (strcmp(sze, "tri3") == 0)
+				{
+					if      (strcmp(szv, "GAUSS1") == 0) m_pim->m_ntri3 = FE_TRI3G1;
+					else if (strcmp(szv, "GAUSS3") == 0) m_pim->m_ntri3 = FE_TRI3G3;
+					else throw XMLReader::InvalidValue(tag);
+				}
+				else if (strcmp(sze, "tri6") == 0)
+				{
+					if      (strcmp(szv, "GAUSS3"  ) == 0) m_pim->m_ntri6 = FE_TRI6G3;
+					else if (strcmp(szv, "GAUSS4"  ) == 0) m_pim->m_ntri6 = FE_TRI6G4;
+					else if (strcmp(szv, "GAUSS7"  ) == 0) m_pim->m_ntri6 = FE_TRI6G7;
+					else if (strcmp(szv, "LOBATTO7") == 0) m_pim->m_ntri6 = FE_TRI6GL7;
 					else throw XMLReader::InvalidValue(tag);
 				}
 				else if (strcmp(sze, "tet4") == 0)

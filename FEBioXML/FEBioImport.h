@@ -103,14 +103,17 @@ public:
 	char	m_szplt[256];
 
 public:
-	int	m_ntet4;	// tetrahedral integration rule
-	int	m_nut4;		// integration rule for stabilization of UT4
 	int m_nsteps;	// nr of step sections read
 	int	m_nstep_type;	// step type
 	int	m_nmat;		// nr of materials
 
-	bool	m_b3field;	// three-field element flag
-	int		m_nhex8;	// hex integration rule
+	bool	m_b3field;	//!< three-field element flag
+	int		m_nhex8;	//!< hex integration rule
+	int		m_ntet4;	//!< tetrahedral integration rule
+	int		m_nut4;		//!< integration rule for stabilization of UT4
+	int		m_ntet10;	//!< tet10 integration rule
+	int		m_ntri6;	//!< tri6 integration rule
+	int		m_ntri3;	//!< tri3 integration rule
 
 protected:
 	int	m_nversion;	// version of file

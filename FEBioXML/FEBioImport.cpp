@@ -68,6 +68,9 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	m_ntet4 = ET_TET4;
 	m_nhex8 = FE_HEX8G8;
 	m_nut4  = FE_TET4G1;
+	m_ntet10 = FE_TET10G4;
+	m_ntri6 = FE_TRI6G3;
+	m_ntri3 = FE_TRI3G3;
 
 	// 3-field formulation on by default
 	m_b3field = true;

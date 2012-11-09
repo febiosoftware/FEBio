@@ -58,7 +58,7 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions
 //
-bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
+bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt, bool bnodal)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
@@ -78,10 +78,22 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 	{
 		FESurfaceElement& el = s.Element(i);
 
-		if      (tag == "quad4") el.SetType(FE_QUAD4NI);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6NI );
-		else throw XMLReader::InvalidTag(tag);
+		// set the element type/integration rule
+		if (bnodal)
+		{
+			if      (tag == "quad4") el.SetType(FE_QUAD4NI);
+			else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
+			else if (tag == "tri6" ) el.SetType(FE_TRI6NI);
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else
+		{
+			if      (tag == "quad4") el.SetType(FE_QUAD4G4);
+			else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+			else throw XMLReader::InvalidTag(tag);
+		}
 
 		N = el.Nodes();
 
@@ -522,8 +534,9 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
 
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3G3 );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6G4 );
+		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else throw XMLReader::InvalidTag(tag);
 
 		N = el.Nodes();
@@ -583,8 +596,9 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 		tc.s[4] = tc.s[5] = tc.s[6] = tc.s[7] = s;
 
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3G3 );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6G4 );
+		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else throw XMLReader::InvalidTag(tag);
 
 		N = el.Nodes();
@@ -658,8 +672,9 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
 		
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3G3 );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6G4 );
+		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else throw XMLReader::InvalidTag(tag);
 		
 		N = el.Nodes();
@@ -733,8 +748,9 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 		fc.s[4] = fc.s[5] = fc.s[6] = fc.s[7] = s;
 		
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3G3 );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6G4 );
+		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else throw XMLReader::InvalidTag(tag);
 		
 		N = el.Nodes();
@@ -799,8 +815,9 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 		fc.s[4] = fc.s[5] = fc.s[6] = fc.s[7] = s;
 		
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3G3 );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6G4 );
+		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else throw XMLReader::InvalidTag(tag);
 		
 		N = el.Nodes();
@@ -857,8 +874,9 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
 
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3G3 );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6G4 );
+		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else throw XMLReader::InvalidTag(tag);
 
 		N = el.Nodes();
@@ -1048,7 +1066,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
+					ParseSurfaceSection(tag, s, nfmt, true);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1091,23 +1109,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
-
-					// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
-					// so we have to modify those elements to FE_QUAD and FE_TRI
-					// TODO: we need a better way of doing this!
-					for (int i=0; i<s.Elements(); ++i)
-					{
-						FESurfaceElement& e = s.Element(i);
-						switch (e.Nodes())
-						{
-						case 3: e.SetType(FE_TRI3G3 ); break;
-						case 4: e.SetType(FE_QUAD4G4); break;
-						case 6: e.SetType(FE_TRI6G7 ); break;
-						default:
-							assert(false);
-						}
-					}
+					ParseSurfaceSection(tag, s, nfmt, false);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1149,24 +1151,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 					
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
-					
-					// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
-					// For this type of contact we want gaussian quadrature,
-					// so we have to modify those elements to FE_QUAD and FE_TRI
-					// TODO: we need a better way of doing this!
-					for (int i=0; i<s.Elements(); ++i)
-					{
-						FESurfaceElement& e = s.Element(i);
-						switch (e.Nodes())
-						{
-						case 3: e.SetType(FE_TRI3G3 ); break;
-						case 4: e.SetType(FE_QUAD4G4); break;
-						case 6: e.SetType(FE_TRI6G7 ); break;
-						default:
-							assert(false);
-						}
-					}
+					ParseSurfaceSection(tag, s, nfmt, false);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1208,24 +1193,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
-
-					// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
-					// For this type of contact we want gaussian quadrature,
-					// so we have to modify those elements to FE_QUAD and FE_TRI
-					// TODO: we need a better way of doing this!
-					for (int i=0; i<s.Elements(); ++i)
-					{
-						FESurfaceElement& e = s.Element(i);
-						switch (e.Nodes())
-						{
-						case 3: e.SetType(FE_TRI3G3 ); break;
-						case 4: e.SetType(FE_QUAD4G4); break;
-						case 6: e.SetType(FE_TRI6G7 ); break;
-						default:
-							assert(false);
-						}
-					}
+					ParseSurfaceSection(tag, s, nfmt, false);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1267,24 +1235,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 					
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
-					
-					// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
-					// For this type of contact we want gaussian quadrature,
-					// so we have to modify those elements to FE_QUAD and FE_TRI
-					// TODO: we need a better way of doing this!
-					for (int i=0; i<s.Elements(); ++i)
-					{
-						FESurfaceElement& e = s.Element(i);
-						switch (e.Nodes())
-						{
-						case 3: e.SetType(FE_TRI3G3 ); break;
-						case 4: e.SetType(FE_QUAD4G4); break;
-						case 6: e.SetType(FE_TRI6G7 ); break;
-						default:
-							assert(false);
-						}
-					}
+					ParseSurfaceSection(tag, s, nfmt, false);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1326,7 +1277,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
+					ParseSurfaceSection(tag, s, nfmt, true);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1368,24 +1319,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 					
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
-					
-					// currently the element types are automatically set to FE_NIQUAD or FE_NITRI
-					// For this type of contact we want gaussian quadrature,
-					// so we have to modify those elements to FE_QUAD and FE_TRI
-					// TODO: we need a better way of doing this!
-					for (int i=0; i<s.Elements(); ++i)
-					{
-						FESurfaceElement& e = s.Element(i);
-						switch (e.Nodes())
-						{
-						case 3: e.SetType(FE_TRI3G3 ); break;
-						case 4: e.SetType(FE_QUAD4G4); break;
-						case 6: e.SetType(FE_TRI6G7 ); break;
-						default:
-							assert(false);
-						}
-					}
+					ParseSurfaceSection(tag, s, nfmt, false);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1427,7 +1361,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
+					ParseSurfaceSection(tag, s, nfmt, true);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1469,7 +1403,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
+					ParseSurfaceSection(tag, s, nfmt, true);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}
@@ -1544,7 +1478,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					}
 
 					// read the surface section
-					ParseSurfaceSection(tag, s, nfmt);
+					ParseSurfaceSection(tag, s, nfmt, true);
 				}
 				else throw XMLReader::InvalidTag(tag);
 			}

@@ -43,7 +43,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 						const char* sztype = tag.AttributeValue("type");
 						FESurface* ps = plc->GetSurface(sztype);
 						if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-						ParseSurfaceSection(tag, *ps, 0);
+						ParseSurfaceSection(tag, *ps, 0, true);
 					}
 					else throw XMLReader::InvalidTag(tag);
 				}
@@ -228,7 +228,7 @@ void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
 //---------------------------------------------------------------------------------
 // parse a surface section for contact definitions
 //
-bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt)
+bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfmt, bool bnodal)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
@@ -248,10 +248,22 @@ bool FEBioConstraintsSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int
 	{
 		FESurfaceElement& el = s.Element(i);
 
-		if      (tag == "quad4") el.SetType(FE_QUAD4NI);
-		else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
-		else if (tag == "tri6" ) el.SetType(FE_TRI6NI );
-		else throw XMLReader::InvalidTag(tag);
+		// set the element type/integration rule
+		if (bnodal)
+		{
+			if      (tag == "quad4") el.SetType(FE_QUAD4NI);
+			else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
+			else if (tag == "tri6" ) el.SetType(FE_TRI6NI);
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else
+		{
+			if      (tag == "quad4") el.SetType(FE_QUAD4G4);
+			else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+			else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+			else throw XMLReader::InvalidTag(tag);
+		}
 
 		N = el.Nodes();
 

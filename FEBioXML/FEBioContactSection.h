@@ -22,5 +22,5 @@ protected:
 	void ParseRigidJoint           (XMLTag& tag);
 	void ParseLinearConstraint     (XMLTag& tag);
 
-	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt);
+	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 };

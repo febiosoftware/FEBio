@@ -22,7 +22,7 @@ protected:
 	void ParseContactSection      (XMLTag& tag);
 	void ParseConstraints         (XMLTag& tag);
 	void ParseSpringSection       (XMLTag& tag);
-	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt);
+	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 
 protected:
 	void ParseRigidJoint      (XMLTag& tag);
