@@ -18,6 +18,8 @@ FEContactInterface::FEContactInterface(FEModel* pfem)
 	m_nID = -1;
 
 	m_blaugon = false;
+
+	m_bactive = true;
 }
 
 FEContactInterface::~FEContactInterface()

@@ -1,6 +1,7 @@
 #pragma once
 #include "DumpFile.h"
 #include "FEBoundaryCondition.h"
+#include "FEContactInterface.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -70,6 +71,9 @@ public:
 	//! return number of boundary conditions
 	int BoundaryConditions() { return (int) m_BC.size(); }
 
+	//! add a boundary condition to the analysis
+	void AddContactInterface(FEContactInterface* pci) { m_CI.push_back(pci); }
+
 public:
 	//! sets the plot level
 	void SetPlotLevel(int n) { m_nplot = n; }
@@ -136,6 +140,7 @@ public:
 protected:
 	std::vector<int>					m_Dom;	//!< list of active domains for this analysis
 	std::vector<FEBoundaryCondition*>	m_BC;	//!< array of boundary conditions
+	std::vector<FEContactInterface* >	m_CI;	//!< active contact interfaces
 
 protected:
 	int		m_ntype;		// step type

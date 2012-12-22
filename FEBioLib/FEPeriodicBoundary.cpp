@@ -98,11 +98,18 @@ bool FEPeriodicBoundary::Init()
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEPeriodicBoundary::Activate()
+{
+	// don't forget to call the base class
+	FEContactInterface::Activate();
+
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, false);
 	ProjectSurface(m_ms, m_ss, false);
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

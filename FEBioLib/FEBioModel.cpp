@@ -1615,7 +1615,18 @@ bool FEBioModel::Init()
 
 //-----------------------------------------------------------------------------
 //! Initializes contact data
-// TODO: I should probably let the analysis step take care of this
+// TODO: Contact interfaces have two initialization functions: Init() and
+//   Activate(). The Init member is called here and allocates the required memory
+//   for each interface. The Activate() member is called during the step initialization
+//   which is called later during the solve phase. However, for global interfaces (i.e.
+//   interfaces that are active during the entire simulation), the Activate() member is
+//   not called in the solve phase. That is why we have to call it here. Global interfaces
+//   can be idenfitifed since they are active during the initialization. 
+//
+//   I am not entirely a fan of this approach but it does solve the problem that contact
+//   interface shoulds only do work (e.g. update projection status) when they are active, but
+//   have to allocate memory during the initialization fase.
+//
 bool FEBioModel::InitContact()
 {
 	// loop over all contact interfaces
@@ -1626,6 +1637,10 @@ bool FEBioModel::InitContact()
 
 		// initializes contact interface data
 		if (ci.Init() == false) return false;
+
+		// If the contact interface is active
+		// we have to call the Activate() member. 
+		if (ci.IsActive()) ci.Activate();
 	}
 
 	return true;

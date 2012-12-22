@@ -188,14 +188,22 @@ bool FESlidingInterfaceBW::Init()
 	// initialize surface data
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
-
-	FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
 	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingInterfaceBW::Activate()
+{
+	// don't forget to call the base class!
+	FEContactInterface::Activate();
+
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
+		FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 	
@@ -208,8 +216,6 @@ bool FESlidingInterfaceBW::Init()
 	
 	// update sliding interface data
 	Update(0);
-	
-	return true;
 }
 
 //-----------------------------------------------------------------------------

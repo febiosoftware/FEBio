@@ -267,7 +267,11 @@ bool FESolidSolver::Augment()
 	if (m_fem.ContactInterfaces() > 0)
 	{
 		// loop over all contact interfaces
-		for (int i=0; i<m_fem.ContactInterfaces(); ++i) bconv = m_fem.ContactInterface(i)->Augment(m_naug) && bconv;
+		for (int i=0; i<m_fem.ContactInterfaces(); ++i)
+		{
+			FEContactInterface* pci = m_fem.ContactInterface(i);
+			if (pci->IsActive()) bconv = (m_fem.ContactInterface(i)->Augment(m_naug) && bconv);
+		}
 	}
 
 	// do nonlinear constraint augmentations
@@ -493,7 +497,11 @@ void FESolidSolver::UpdateStresses()
 void FESolidSolver::UpdateContact()
 {
 	// Update all contact interfaces
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->Update(m_niter);
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) 
+	{
+		FEContactInterface* pci = m_fem.ContactInterface(i);
+		if (pci->IsActive()) pci->Update(m_niter);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1376,7 +1384,11 @@ void FESolidSolver::NonLinearConstraintStiffness()
 
 void FESolidSolver::ContactStiffness()
 {
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactStiffness(this);
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i)
+	{
+		FEContactInterface* pci = m_fem.ContactInterface(i);
+		if (pci->IsActive()) pci->ContactStiffness(this);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1783,7 +1795,11 @@ void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix&
 //! Calculates the contact forces
 void FESolidSolver::ContactForces(FEGlobalVector& R)
 {
-	for (int i=0; i<m_fem.ContactInterfaces(); ++i) m_fem.ContactInterface(i)->ContactForces(R);
+	for (int i=0; i<m_fem.ContactInterfaces(); ++i) 
+	{
+		FEContactInterface* pci = m_fem.ContactInterface(i);
+		if (pci->IsActive()) pci->ContactForces(R);
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -251,15 +251,24 @@ bool FESlidingInterface2::Init()
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
 	
-	FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
-
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
+		FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! This function is called during the initialization
+void FESlidingInterface2::Activate()
+{
+	// don't forget to call base member
+	FEContactInterface::Activate();
 
 	// calculate the penalty
 	if (m_bautopen) 
@@ -272,8 +281,6 @@ bool FESlidingInterface2::Init()
 
 	// update sliding interface data
 	Update(0);
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -247,14 +247,22 @@ bool FETiedBiphasicInterface::Init()
 	// initialize surface data
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
-	
-	FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
-	
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FETiedBiphasicInterface::Activate()
+{
+	// don't forget to call the base class
+	FEContactInterface::Activate();
+
 	// this contact implementation requires a non-symmetric stiffness matrix
 	// so inform the FEM class
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
+		FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 	
@@ -273,8 +281,6 @@ bool FETiedBiphasicInterface::Init()
 	// this will evaluate the gap functions in the reference configuration
 	InitialProjection(m_ss, m_ms);
 	if (m_btwo_pass) InitialProjection(m_ms, m_ss);
-	
-	return true;
 }
 
 //-----------------------------------------------------------------------------

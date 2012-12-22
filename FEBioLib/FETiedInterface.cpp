@@ -52,10 +52,18 @@ bool FETiedInterface::Init()
 	if (ss.Init() == false) return false;
 	if (ms.Init() == false) return false;
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! Interface activation
+void FETiedInterface::Activate()
+{
+	// Don't forget to call base member!
+	FEContactInterface::Activate();
+
 	// project slave surface onto master surface
 	ProjectSurface(ss, ms, false);
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

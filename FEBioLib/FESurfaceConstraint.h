@@ -51,6 +51,9 @@ public:
 	//! initialization
 	bool Init();
 
+	//! interface activation
+	void Activate();
+
 	//! update
 	void Update(int niter);
 

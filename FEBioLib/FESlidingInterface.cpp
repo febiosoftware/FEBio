@@ -249,6 +249,15 @@ bool FESlidingInterface::Init()
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingInterface::Activate()
+{
+	// don't forget to call the base class
+	FEContactInterface::Activate();
+
 	// project slave surface onto master surface
 	ProjectSurface(m_ss, m_ms, true, m_breloc);
 	if (m_bautopen) CalcAutoPenalty(m_ss);
@@ -260,8 +269,6 @@ bool FESlidingInterface::Init()
 		ProjectSurface(m_ms, m_ss, true);
 		if (m_bautopen) CalcAutoPenalty(m_ms);
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

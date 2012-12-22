@@ -81,6 +81,9 @@ public:
 	//! intializes rigid wall interface
 	bool Init();
 
+	//! interface activation
+	void Activate();
+
 	//! project slave nodes onto master plane
 	void ProjectSurface(FERigidWallSurface& s);
 

@@ -66,6 +66,9 @@ void FEAnalysisStep::Finish()
 	// deactivate the boundary conditions
 	for (size_t i=0; i<m_BC.size(); ++i) m_BC[i]->Deactivate();
 
+	// deactivate contact interfaces
+	for (size_t i=0; i<m_CI.size(); ++i) m_CI[i]->Deactivate();
+
 	// clean up solver data (i.e. destroy linear solver)
 	m_psolver->Clean();
 }
@@ -95,6 +98,9 @@ bool FEAnalysisStep::Init()
 
 	// activate the boundary conditions
 	for (i=0; i<(int) m_BC.size(); ++i) m_BC[i]->Activate();
+
+	// activate contact interface
+	for (i=0; i<(int) m_CI.size(); ++i) m_CI[i]->Activate();
 
 	// clear the active rigid body BC's
 	int NRB = m_fem.Objects();
@@ -330,7 +336,7 @@ bool FEAnalysisStep::Init()
 	for (i=0; i<m_fem.ContactInterfaces(); ++i)
 	{
 		FEContactInterface& ci = *m_fem.ContactInterface(i);
-		if (ci.m_blaugon) m_baugment = true;
+		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
 	}
 
 	// see if we need to do incompressible augmentations

@@ -25,7 +25,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for contact interfaces
-
+// TODO: Merge the active interface with the boundary condition class
 class FEContactInterface : public FEParamContainer
 {
 public:
@@ -63,6 +63,16 @@ public:
 	virtual FESurface* GetMasterSurface() = 0;
 	virtual FESurface* GetSlaveSurface () = 0;
 
+public:
+	//! Is this contact interface active
+	bool IsActive() { return m_bactive; }
+
+	//! Activate the contact interface
+	virtual void Activate() { m_bactive = true; }
+
+	//! Deactivate the contact interface
+	virtual void Deactivate() { m_bactive = false; }
+
 protected:
 	//! don't call the default constructor
 	FEContactInterface() {m_pfem=0;}
@@ -79,6 +89,9 @@ protected:
 	int	m_ntype;	//!< type of interface
 
 	int	m_nID;	//!< ID of interface
+
+protected:
+	bool	m_bactive;	//!< active flag
 };
 
 #endif // !defined(AFX_FECONTACTINTERFACE_H__DB89AB6C_87DA_4C47_923C_B9D488E04403__INCLUDED_)

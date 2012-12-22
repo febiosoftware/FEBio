@@ -57,6 +57,9 @@ public:
 	void Zero() { m_pA->zero(); }
 
 protected:
+	void AddContactInterface(FEContactInterface* pci);
+
+protected:
 	void build_begin(int neq);
 	void build_add(vector<int>& lm);
 	void build_end();
@@ -67,6 +70,7 @@ protected:
 
 protected:
 	SparseMatrix*	m_pA;	//!< the actual global stiffness matrix
+	FEModel*		m_pfem;	//!< pointer to model
 
 	// The following data structures are used to incrementally
 	// build the profile of the sparse matrix

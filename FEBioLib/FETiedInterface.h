@@ -27,6 +27,9 @@ public:
 	//! Initializes sliding interface
 	bool Init();
 
+	//! interface activation
+	void Activate();
+
 	//! update interface data
 	void Update(int niter);
 

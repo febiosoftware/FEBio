@@ -135,6 +135,15 @@ bool FEFacet2FacetSliding::Init()
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEFacet2FacetSliding::Activate()
+{
+	// don't forget the base class
+	FEContactInterface::Activate();
+
 	// calculate penalty factors
 	if (m_bautopen) CalcAutoPenalty(m_ss);
 
@@ -155,8 +164,6 @@ bool FEFacet2FacetSliding::Init()
 		m_mu = 0;
 		m_epsf = 0;
 	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -1251,6 +1251,13 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 		FETiedInterface* ps = new FETiedInterface(&fem);
 		fem.AddContactInterface(ps);
 
+		// add this contact interface to the current step
+		if (m_pim->m_nsteps > 0)
+		{
+			GetStep()->AddContactInterface(ps);
+			ps->Deactivate();
+		}
+
 		FEParameterList& pl = ps->GetParameterList();
 
 		++tag;

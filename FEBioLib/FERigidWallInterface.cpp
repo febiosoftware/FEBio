@@ -235,10 +235,17 @@ bool FERigidWallInterface::Init()
 	// initialize rigid surface
 	m_mp->Init();
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidWallInterface::Activate()
+{
+	// don't forget to call the base class
+	FEContactInterface::Activate();
+
 	// project slave surface onto master surface
 	ProjectSurface(m_ss);
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

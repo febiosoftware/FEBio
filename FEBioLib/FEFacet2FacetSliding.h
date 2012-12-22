@@ -47,6 +47,9 @@ public:
 	//! initialization routine
 	bool Init();
 
+	//! interface activation
+	void Activate();
+
 	//! update 
 	void Update(int niter);
 
