@@ -2,7 +2,7 @@
 #include "FETriphasicDomain.h"
 #include "FECore/FEMaterial.h"
 #include "FETriphasic.h"
-#include "log.h"
+#include "FECore/log.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))

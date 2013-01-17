@@ -2,7 +2,7 @@
 #include "FECore/FEMaterial.h"
 #include "FEBiphasicSoluteDomain.h"
 #include "FEBiphasicSolute.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)

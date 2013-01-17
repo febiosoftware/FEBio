@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBioMaterialSection.h"
-#include <FEBioLib/log.h>
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 void FEBioMaterialSection::Parse(XMLTag& tag)

@@ -3,7 +3,7 @@
 #include "FEBiphasicSoluteDomain.h"
 #include "FEPressureLoad.h"
 #include <FECore/FERigidBody.h>
-#include "log.h"
+#include "FECore/log.h"
 
 #ifdef WIN32
 	#include <float.h>

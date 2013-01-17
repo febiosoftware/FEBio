@@ -3,7 +3,7 @@
 #include "FECore/FEModel.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

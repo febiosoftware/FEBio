@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESlidingInterfaceBW.h"
 #include "FESolidSolver.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

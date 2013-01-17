@@ -13,7 +13,7 @@
 #include "PardisoSolver.h"
 #include "WSMPSolver.h"
 #include "RCICGSolver.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 //! Constructor of FESolver base class

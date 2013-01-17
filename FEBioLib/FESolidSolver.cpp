@@ -6,7 +6,7 @@
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEPointBodyForce.h"
 #include "FEPressureLoad.h"
-#include "log.h"
+#include "FECore/log.h"
 
 #ifdef WIN32
 	#include <float.h>

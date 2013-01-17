@@ -4,7 +4,7 @@
 #include <FECore/FERigidBody.h>
 #include <FECore/FERigid.h>
 #include "FEPointBodyForce.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list

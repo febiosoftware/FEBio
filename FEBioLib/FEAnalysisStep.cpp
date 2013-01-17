@@ -10,7 +10,7 @@
 #include "FECoupledHeatSolidSolver.h"
 #include "FEExplicitSolidSolver.h"
 #include <FECore/FERigidBody.h>
-#include "log.h"
+#include "FECore/log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))

@@ -10,8 +10,8 @@
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
-#include <FECore/FERigidBody.h>
-#include "FEBioLib/log.h"
+#include "FECore/FERigidBody.h"
+#include "FECore/log.h"
 #include "plugin.h"
 #include "Interrupt.h"
 #include "console.h"

@@ -49,7 +49,7 @@
 #include "FECore/FECore.h"
 #include "FEBioLib/validate.h"
 #include "console.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 #include "FEBioStdSolver.h"
 #include "FECore/febio.h"
 #include "FEBioLib/FEPointBodyForce.h"

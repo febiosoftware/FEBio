@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEAugLagLinearConstraint.h"
 #include "FECore/FEModel.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 void FEAugLagLinearConstraint::Serialize(DumpFile& ar)

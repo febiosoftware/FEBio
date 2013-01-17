@@ -634,8 +634,6 @@
     <ClInclude Include="..\..\FEBioLib\FEViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEVonMisesPlasticity.h" />
     <ClInclude Include="..\..\FEBioLib\geodesic.h" />
-    <ClInclude Include="..\..\FEBioLib\log.h" />
-    <ClInclude Include="..\..\FEBioLib\Logfile.h" />
     <ClInclude Include="..\..\FEBioLib\NodeDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\PardisoSolver.h" />
     <ClInclude Include="..\..\FEBioLib\PSLDLTSolver.h" />
@@ -783,7 +781,6 @@
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
     <ClCompile Include="..\..\FEBioLib\input.cpp" />
-    <ClCompile Include="..\..\FEBioLib\Logfile.cpp" />
     <ClCompile Include="..\..\FEBioLib\NodeDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\PardisoSolverDL.cpp" />

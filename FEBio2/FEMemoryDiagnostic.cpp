@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEMemoryDiagnostic.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 #include "FEBioProgress.h"
 #include "console.h"
 

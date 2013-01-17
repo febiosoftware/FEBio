@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "FERigidJoint.h"
-#include "log.h"
+#include "FECore/log.h"
 #include <FECore/FERigidBody.h>
 
 //-----------------------------------------------------------------------------

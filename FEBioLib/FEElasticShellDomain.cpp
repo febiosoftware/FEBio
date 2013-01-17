@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEElasticShellDomain.h"
 #include "FETransverselyIsotropic.h"
-#include "log.h"
+#include "FECore/log.h"
 #include <math.h>
 
 //-----------------------------------------------------------------------------

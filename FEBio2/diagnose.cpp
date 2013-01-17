@@ -5,7 +5,7 @@
 #include "FEDiagnostic.h"
 #include "FETangentDiagnostic.h"
 #include "FEBioLib/FEBox.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 //! The diagnose() function performs a diagnostic test on FEBio. 

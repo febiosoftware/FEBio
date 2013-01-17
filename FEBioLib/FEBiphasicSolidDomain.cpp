@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasic.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEBiphasicSolidDomain::Clone()

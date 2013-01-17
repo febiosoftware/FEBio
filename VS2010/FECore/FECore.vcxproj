@@ -513,6 +513,8 @@
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
+    <ClInclude Include="..\..\FECore\log.h" />
+    <ClInclude Include="..\..\FECore\Logfile.h" />
     <ClInclude Include="..\..\FECore\mat2d.h" />
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
@@ -567,6 +569,7 @@
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\kernel.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
+    <ClCompile Include="..\..\FECore\Logfile.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />

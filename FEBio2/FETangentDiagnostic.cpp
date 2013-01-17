@@ -8,7 +8,7 @@
 #include "FEBioLib/FESolidSolver.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FEBioProgress.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Helper function to print a matrix

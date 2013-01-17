@@ -6,7 +6,7 @@
 #include "FERigidWallInterface.h"
 #include "FECore/FENNQuery.h"
 #include "FEElasticShellDomain.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

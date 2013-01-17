@@ -40,7 +40,7 @@ Logfile::Logfile()
 //
 Logfile::~Logfile()
 {
-	if (m_fp) fclose(m_fp);
+	close();
 	m_plog = 0;
 }
 
@@ -50,6 +50,9 @@ Logfile::~Logfile()
 //
 bool Logfile::open(const char* szfile)
 {
+	// close the previously open logfile
+	if (m_fp) fclose(m_fp);
+
 	// create the log file
 	m_fp = fopen(szfile, "wt");
 

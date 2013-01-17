@@ -52,7 +52,7 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FEElasticMultigeneration.h"
-#include "log.h"
+#include "FECore/log.h"
 #include "version.h"
 
 //-----------------------------------------------------------------------------
@@ -2575,6 +2575,9 @@ bool FEBioModel::Solve(Progress& prg)
 	{
 		clog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
 	}
+
+	// close the log file
+	clog.close();
 
 	// We're done !
 	return bconv;

@@ -6,7 +6,7 @@
 #include "FETiedInterface.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENNQuery.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

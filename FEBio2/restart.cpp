@@ -3,7 +3,7 @@
 #include "fem.h"
 #include "FEBioProgress.h"
 #include "FEBioXML/FERestartImport.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 bool restart(FEM& fem, const char* szfile)

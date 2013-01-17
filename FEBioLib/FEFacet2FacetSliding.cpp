@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEFacet2FacetSliding.h"
 #include "FECore/FEModel.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

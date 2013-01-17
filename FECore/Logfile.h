@@ -65,6 +65,9 @@ public:
 	//! flush the logfile
 	void flush() { if (m_fp) fflush(m_fp); }
 
+	//! close the logfile
+	void close() { if (m_fp) fclose(m_fp); m_fp = 0; }
+
 	//! return the file name
 	const char* FileName() { return m_szfile; }
 

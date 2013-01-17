@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "DataStore.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 UnknownDataField::UnknownDataField(const char* sz)

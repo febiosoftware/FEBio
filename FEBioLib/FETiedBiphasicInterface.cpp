@@ -2,7 +2,7 @@
 #include "FETiedBiphasicInterface.h"
 #include "FESolidSolver.h"
 #include "FEBiphasic.h"
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Define sliding interface parameters

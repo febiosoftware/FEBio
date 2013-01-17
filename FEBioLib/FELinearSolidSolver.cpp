@@ -4,7 +4,7 @@
 #include "FECore/FENodeReorder.h"
 #include "FEPressureLoad.h"
 #include <FECore/FERigid.h>
-#include "log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list

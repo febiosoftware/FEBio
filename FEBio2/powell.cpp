@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBioLib/FEOptimizer.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 #include "FEBioProgress.h"
 #include "console.h"
 

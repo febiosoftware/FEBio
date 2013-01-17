@@ -4,7 +4,7 @@
 #include "fem.h"
 #include "FEBioProgress.h"
 #include "console.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 bool solve(FEM& fem, const char* szfile)

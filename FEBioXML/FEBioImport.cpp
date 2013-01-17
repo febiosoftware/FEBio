@@ -18,7 +18,7 @@
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
 #include <FEBioLib/DataStore.h>
-#include <FEBioLib/log.h>
+#include <FECore/log.h>
 #include <string.h>
 #include <FECore/Image.h>
 using namespace NumCore;

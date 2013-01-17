@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include "FEM.h"
-#include "FEBioLib/log.h"
+#include "FECore/log.h"
 #include <FL/Fl_Progress.H>
 #include <FL/Fl.H>
 #include "Task.h"

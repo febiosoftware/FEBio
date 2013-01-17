@@ -2,7 +2,7 @@
 #include "FEMultiphasicDomain.h"
 #include "FECore/FEMaterial.h"
 #include "FEMultiphasic.h"
-#include "log.h"
+#include "FECore/log.h"
 
 #ifndef SQR
 #define SQR(x) ((x)*(x))

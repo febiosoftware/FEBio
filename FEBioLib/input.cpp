@@ -16,7 +16,7 @@
 #include <FECore/FERigidBody.h>
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
-#include "log.h"
+#include "FECore/log.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
