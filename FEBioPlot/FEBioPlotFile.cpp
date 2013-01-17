@@ -9,10 +9,13 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	FEPlotData* ps = febio.Create<FEPlotData>(szname, pfem);
-	ps->SetItemList(item);
-	if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
-	else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
-	else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
+	if (ps)
+	{
+		ps->SetItemList(item);
+		if      (dynamic_cast<FENodeData*   >(ps)) return AddNodalVariable  (ps, szname, item);
+		else if (dynamic_cast<FEDomainData* >(ps)) return AddDomainVariable (ps, szname, item);
+		else if (dynamic_cast<FESurfaceData*>(ps)) return AddSurfaceVariable(ps, szname, item);
+	}
 	return false;
 }
 
