@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "FEHeatSolver.h"
 #include "FEHeatFlux.h"
+#include "FEConvectiveHeatFlux.h"
 #include "FECore/FENodeReorder.h"
+#include "FEHeatTransferMaterial.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -167,7 +169,39 @@ void FEHeatSolver::Update(vector<double>& u)
 		else if (-n-2 >= 0) node.m_T = m_T[-n-2] = m_u[-n-2];
 	}
 
-	// TODO: calculate fluxes
+	// update heat fluxes
+	for (int i=0; i<mesh.Domains(); ++i)
+	{
+		FEHeatSolidDomain* pbd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(i));
+		if (pbd)
+		{
+			FEHeatTransferMaterial* pmat = dynamic_cast<FEHeatTransferMaterial*>(pbd->GetMaterial());
+			assert(pmat);
+
+			int NE = pbd->Elements();
+			for (int j=0; j<NE; ++j)
+			{
+				FESolidElement& el = pbd->Element(j);
+				int ni = el.GaussPoints();
+				int ne = el.Nodes();
+
+				// get the nodal temperatures
+				double T[FEElement::MAX_NODES];
+				for (int n=0; n<ne; ++n) T[n] = mesh.Node(el.m_node[n]).m_T;
+
+				// calculate heat flux for each integration point
+				for (int n=0; n<ni; ++n)
+				{
+					FEMaterialPoint& mp = *el.m_State[n];
+					FEHeatMaterialPoint* pt = (mp.ExtractData<FEHeatMaterialPoint>());
+					assert(pt);
+
+					vec3d gradT = pbd->gradient(el, T, n);
+					pt->m_q = pmat->HeatFlux(gradT);
+				}
+			}
+		}
+	}
 
 	// copy new temperatures to old temperature
 	m_Tp = m_T;
@@ -232,8 +266,13 @@ void FEHeatSolver::SurfaceFluxes(FEGlobalVector& R)
 	int nsl = m_fem.SurfaceLoads();
 	for (int i=0; i<nsl; ++i)
 	{
+		// heat flux
 		FEHeatFlux* phf = dynamic_cast<FEHeatFlux*>(m_fem.SurfaceLoad(i));
-		if (phf) phf->Residual(R);
+		if (phf && phf->IsActive()) phf->Residual(R);
+
+		// convective heat flux
+		FEConvectiveHeatFlux* pchf = dynamic_cast<FEConvectiveHeatFlux*>(m_fem.SurfaceLoad(i));
+		if (pchf && pchf->IsActive()) pchf->Residual(R);
 	}
 }
 
@@ -299,6 +338,14 @@ bool FEHeatSolver::StiffnessMatrix()
 			m_brhs = true;
 			bd.CapacitanceMatrix(this, dt);
 		}
+	}
+
+	// add convective heat fluxes
+	m_brhs = false;
+	for (int i=0; i<m_fem.SurfaceLoads(); ++i)
+	{
+		FEConvectiveHeatFlux* pbc = dynamic_cast<FEConvectiveHeatFlux*>(m_fem.SurfaceLoad(i));
+		if (pbc && pbc->IsActive()) pbc->StiffnessMatrix(this);
 	}
 
 	return true;

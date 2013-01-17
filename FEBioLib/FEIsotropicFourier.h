@@ -24,6 +24,9 @@ public:
 	//! get the material's density
 	double Density() { return m_rho; }
 
+	//! get the heat flux
+	vec3d HeatFlux(vec3d gradT) { return gradT*m_k; }
+
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

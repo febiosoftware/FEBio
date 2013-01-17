@@ -25,6 +25,7 @@
 #include "FEPoroTraction.h"
 #include "FESoluteFlux.h"
 #include "FEHeatFlux.h"
+#include "FEConvectiveHeatFlux.h"
 #include "FEAnalysisStep.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
@@ -1158,6 +1159,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			if (dynamic_cast<FEPoroNormalTraction*>(psl)) ntype = FE_PORO_TRACTION;
 			if (dynamic_cast<FESoluteFlux*        >(psl)) ntype = FE_SOLUTE_FLUX;
 			if (dynamic_cast<FEHeatFlux*          >(psl)) ntype = FE_HEAT_FLUX;
+			if (dynamic_cast<FEConvectiveHeatFlux*>(psl)) ntype = FE_CONV_HEAT_FLUX;
 			assert(ntype != -1);
 			ar << ntype;
 			ar << psl->GetID() << psl->IsActive();
@@ -1263,12 +1265,13 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			FESurfaceLoad* ps = 0;
 			switch (ntype)
 			{
-			case FE_PRESSURE_LOAD: ps = new FEPressureLoad      (psurf); break;
-			case FE_TRACTION_LOAD: ps = new FETractionLoad      (psurf); break;
-			case FE_FLUID_FLUX   : ps = new FEFluidFlux         (psurf); break;
-			case FE_PORO_TRACTION: ps = new FEPoroNormalTraction(psurf); break;
-			case FE_SOLUTE_FLUX  : ps = new FESoluteFlux        (psurf); break;
-			case FE_HEAT_FLUX    : ps = new FEHeatFlux          (psurf); break;
+			case FE_PRESSURE_LOAD : ps = new FEPressureLoad      (psurf); break;
+			case FE_TRACTION_LOAD : ps = new FETractionLoad      (psurf); break;
+			case FE_FLUID_FLUX    : ps = new FEFluidFlux         (psurf); break;
+			case FE_PORO_TRACTION : ps = new FEPoroNormalTraction(psurf); break;
+			case FE_SOLUTE_FLUX   : ps = new FESoluteFlux        (psurf); break;
+			case FE_HEAT_FLUX     : ps = new FEHeatFlux          (psurf); break;
+			case FE_CONV_HEAT_FLUX: ps = new FEConvectiveHeatFlux(psurf); break;
 			default:
 				assert(false);
 			}

@@ -187,6 +187,7 @@ enum FE_Print_Level {
 #define FE_PORO_TRACTION		4
 #define FE_SOLUTE_FLUX			5
 #define FE_HEAT_FLUX			6
+#define FE_CONV_HEAT_FLUX		7
 
 //-----------------------------------------------------------------------------
 //! body loads

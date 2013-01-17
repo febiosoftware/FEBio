@@ -15,14 +15,15 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if      (tag == "force"          ) ParseBCForce             (tag);
-		else if (tag == "pressure"       ) ParseBCPressure          (tag);
-		else if (tag == "traction"       ) ParseBCTraction          (tag);
-		else if (tag == "normal_traction") ParseBCPoroNormalTraction(tag);
-		else if (tag == "fluidflux"      ) ParseBCFluidFlux         (tag);
-		else if (tag == "soluteflux"     ) ParseBCSoluteFlux        (tag);
-		else if (tag == "heatflux"       ) ParseBCHeatFlux          (tag);
-		else if (tag == "body_force"     ) ParseBodyForce           (tag);
+		if      (tag == "force"              ) ParseBCForce             (tag);
+		else if (tag == "pressure"           ) ParseBCPressure          (tag);
+		else if (tag == "traction"           ) ParseBCTraction          (tag);
+		else if (tag == "normal_traction"    ) ParseBCPoroNormalTraction(tag);
+		else if (tag == "fluidflux"          ) ParseBCFluidFlux         (tag);
+		else if (tag == "soluteflux"         ) ParseBCSoluteFlux        (tag);
+		else if (tag == "heatflux"           ) ParseBCHeatFlux          (tag);
+		else if (tag == "convective_heatflux") ParseBCConvectiveHeatFlux(tag);
+		else if (tag == "body_force"         ) ParseBodyForce           (tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

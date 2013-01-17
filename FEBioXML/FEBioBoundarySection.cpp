@@ -6,6 +6,7 @@
 #include <FEBioLib/FEFluidFlux.h>
 #include <FEBioLib/FESoluteFlux.h>
 #include <FEBioLib/FEHeatFlux.h>
+#include <FEBioLib/FEConvectiveHeatFlux.h>
 #include <FEBioLib/FEDiscreteMaterial.h>
 #include <FEBioLib/FEDiscreteSpringDomain.h>
 #include <FEBioLib/FESlidingInterface.h>
@@ -877,6 +878,69 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
 		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+		else throw XMLReader::InvalidTag(tag);
+
+		N = el.Nodes();
+		tag.value(nf, N);
+		for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+		++tag;
+	}
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(ph);
+		ph->Deactivate();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection::ParseBCConvectiveHeatFlux(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	// count how many heatflux cards there are
+	int npr = 0;
+	XMLTag t(tag); ++t;
+	while (!t.isend()) { npr++; ++t; }
+
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.GetMesh());
+	psurf->create(npr);
+	fem.GetMesh().AddSurface(psurf);
+
+	// allocate flux data
+	FEConvectiveHeatFlux* ph = new FEConvectiveHeatFlux(psurf);
+	ph->create(npr);
+	fem.AddSurfaceLoad(ph);
+
+	const char* sz;
+
+	// read the flux data
+	++tag;
+	int nf[4], N;
+	for (int i=0; i<npr; ++i)
+	{
+		FEConvectiveHeatFlux::LOAD& pc = ph->HeatFlux(i);
+		FESurfaceElement& el = psurf->Element(i);
+
+		sz = tag.AttributeValue("lc");
+		if (sz) pc.lc = atoi(sz) - 1;
+
+		double s  = atof(tag.AttributeValue("scale"));
+		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+
+		// heat transfer coefficient
+		double hc = atof(tag.AttributeValue("hc"));
+		pc.hc = hc;
+
+		// read the element
+		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
+		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+//		else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+//		else if (tag == "quad8") el.SetType(FE_QUAD8G9);
 		else throw XMLReader::InvalidTag(tag);
 
 		N = el.Nodes();

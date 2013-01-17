@@ -231,6 +231,7 @@ REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current d
 REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density");
 REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"    );
 REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPlotData, "ut4 nodal stress"    );
+REGISTER_FEBIO_CLASS(FEPlotHeatFlux                     , FEPlotData, "heat flux"           );
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );

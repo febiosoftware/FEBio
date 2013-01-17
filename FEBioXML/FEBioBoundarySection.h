@@ -19,6 +19,7 @@ protected:
 	void ParseBCFluidFlux         (XMLTag& tag);
 	void ParseBCSoluteFlux        (XMLTag &tag);
 	void ParseBCHeatFlux          (XMLTag& tag);
+	void ParseBCConvectiveHeatFlux(XMLTag& tag);
 	void ParseContactSection      (XMLTag& tag);
 	void ParseConstraints         (XMLTag& tag);
 	void ParseSpringSection       (XMLTag& tag);

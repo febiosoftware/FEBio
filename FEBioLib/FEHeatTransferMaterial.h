@@ -43,4 +43,7 @@ public:
 
 	//! get the material's density
 	virtual double Density() = 0;
+
+	//! get the heat flux
+	virtual vec3d HeatFlux(vec3d gradT) = 0;
 };

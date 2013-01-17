@@ -233,3 +233,12 @@ public:
 	FEPlotUT4NodalStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE) {}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Class the outputs the heat flux
+class FEPlotHeatFlux : public FEDomainData
+{
+public:
+	FEPlotHeatFlux(FEModel* pfem) : FEDomainData(PLT_VEC3F, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};

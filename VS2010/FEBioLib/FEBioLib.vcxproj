@@ -523,6 +523,7 @@
     <ClInclude Include="..\..\FEBioLib\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FEContactSurface.h" />
+    <ClInclude Include="..\..\FEBioLib\FEConvectiveHeatFlux.h" />
     <ClInclude Include="..\..\FEBioLib\FECoupledHeatSolidSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FEDamageNeoHookean.h" />
@@ -669,6 +670,7 @@
     <ClCompile Include="..\..\FEBioLib\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEContactSurface.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEConvectiveHeatFlux.cpp" />
     <ClCompile Include="..\..\FEBioLib\FECoupledHeatSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEDamageMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEDamageNeoHookean.cpp" />
