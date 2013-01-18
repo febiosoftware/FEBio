@@ -15,6 +15,9 @@ END_PARAMETER_LIST();
 FEHeatSolver::FEHeatSolver(FEModel &fem) : FESolver(fem)
 {
 	m_brhs = false;
+	m_ntotref = 0;
+	m_niter = 0;
+	m_nrhs = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -38,6 +41,7 @@ bool FEHeatSolver::Init()
 	//       e.g. while the input file is being read
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 	FEMesh& mesh = m_fem.GetMesh();
+	pstep->ClearDomains();
 	for (int nd=0; nd<mesh.Domains(); ++nd)
 	{
 		FEHeatSolidDomain* pd = dynamic_cast<FEHeatSolidDomain*>(&mesh.Domain(nd));
@@ -135,6 +139,11 @@ void FEHeatSolver::PrepStep()
 //! solve a time step
 bool FEHeatSolver::SolveStep(double time)
 {
+	m_niter = 0;
+	m_nrhs = 0;
+	m_nref = 0;
+	m_ntotref = 0;
+
 	// set up the prescribed temperatures vector
 	PrepStep();
 
@@ -150,6 +159,9 @@ bool FEHeatSolver::SolveStep(double time)
 	// update solution
 	// NOTE: m_u is not being used in Update!
 	Update(m_u);
+
+	// increase iteration count
+	m_niter++;
 
 	return true;
 }
@@ -223,6 +235,9 @@ void FEHeatSolver::Residual()
 
 	// add surface fluxes
 	SurfaceFluxes(RHS);
+
+	// increase RHS counter
+	m_nrhs++;
 }
 
 //-----------------------------------------------------------------------------
