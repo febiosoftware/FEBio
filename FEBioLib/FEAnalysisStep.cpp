@@ -497,9 +497,9 @@ bool FEAnalysisStep::Solve(Progress& prg)
 		}
 
 		// evaluate body-force parameter lists
-		for (i=0; i<m_fem.BodyForces(); ++i)
+		for (i=0; i<m_fem.BodyLoads(); ++i)
 		{
-			FEParameterList& pl = m_fem.GetBodyForce(i)->GetParameterList();
+			FEParameterList& pl = m_fem.GetBodyLoad(i)->GetParameterList();
 			m_fem.EvaluateParameterList(pl);
 		}
 

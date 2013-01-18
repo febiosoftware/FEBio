@@ -56,7 +56,7 @@ void FEBioGlobalsSection::ParseBodyForce(XMLTag &tag)
 		}
 		while (!tag.isend());
 
-		fem.AddBodyForce(pf);
+		fem.AddBodyLoad(pf);
 	}
 	else
 	{
@@ -77,7 +77,7 @@ void FEBioGlobalsSection::ParseBodyForce(XMLTag &tag)
 				while (!tag.isend());
 			}
 
-			fem.AddBodyForce(pf);
+			fem.AddBodyLoad(pf);
 		}
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}

@@ -4,6 +4,7 @@
 #include "FEConvectiveHeatFlux.h"
 #include "FECore/FENodeReorder.h"
 #include "FEHeatTransferMaterial.h"
+#include "FEHeatSource.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -236,6 +237,9 @@ void FEHeatSolver::Residual()
 	// add surface fluxes
 	SurfaceFluxes(RHS);
 
+	// heat sources
+	HeatSources(RHS);
+
 	// increase RHS counter
 	m_nrhs++;
 }
@@ -288,6 +292,18 @@ void FEHeatSolver::SurfaceFluxes(FEGlobalVector& R)
 		// convective heat flux
 		FEConvectiveHeatFlux* pchf = dynamic_cast<FEConvectiveHeatFlux*>(m_fem.SurfaceLoad(i));
 		if (pchf && pchf->IsActive()) pchf->Residual(R);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate the heat generation from heat sources
+void FEHeatSolver::HeatSources(FEGlobalVector& R)
+{
+	int nbl = m_fem.BodyLoads();
+	for (int i=0; i<nbl; ++i)
+	{
+		FEHeatSource* psh = dynamic_cast<FEHeatSource*>(m_fem.GetBodyLoad(i));
+		if (psh) psh->Residual(R);
 	}
 }
 

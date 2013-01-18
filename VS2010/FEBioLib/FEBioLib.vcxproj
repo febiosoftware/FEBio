@@ -560,6 +560,7 @@
     <ClInclude Include="..\..\FEBioLib\FEHeatFlux.h" />
     <ClInclude Include="..\..\FEBioLib\FEHeatSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEHeatSolver.h" />
+    <ClInclude Include="..\..\FEBioLib\FEHeatSource.h" />
     <ClInclude Include="..\..\FEBioLib\FEHeatTransferMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEHolmesMow.h" />
     <ClInclude Include="..\..\FEBioLib\FEIncompNeoHookean.h" />
@@ -706,6 +707,7 @@
     <ClCompile Include="..\..\FEBioLib\FEHeatFlux.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHeatSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHeatSolver.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEHeatSource.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHolmesMow.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicElastic.cpp" />

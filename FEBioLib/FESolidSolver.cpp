@@ -443,10 +443,10 @@ void FESolidSolver::Update(vector<double>& ui)
 	UpdateStresses();
 
 	// update other stuff that may depend on the deformation
-	int NBF = m_fem.BodyForces();
-	for (int i=0; i<NBF; ++i)
+	int NBL = m_fem.BodyLoads();
+	for (int i=0; i<NBL; ++i)
 	{
-		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyForce(i));
+		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyLoad(i));
 		if (pbf) pbf->Update();
 	}
 
@@ -1294,11 +1294,11 @@ bool FESolidSolver::StiffnessMatrix()
 	for (i=0; i<mesh.Domains(); ++i) 
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		int NF = m_fem.BodyForces();
-		for (int j=0; j<NF; ++j)
+		int NBL = m_fem.BodyLoads();
+		for (int j=0; j<NBL; ++j)
 		{
-			FEBodyForce& BF = *m_fem.GetBodyForce(j);
-			dom.BodyForceStiffness(this, BF);
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+			if (pbf) dom.BodyForceStiffness(this, *pbf);
 		}
 	}
 
@@ -1839,11 +1839,11 @@ bool FESolidSolver::Residual(vector<double>& R)
 	}
 
 	// update body forces
-	for (i=0; i<m_fem.BodyForces(); ++i)
+	for (i=0; i<m_fem.BodyLoads(); ++i)
 	{
 		// TODO: I don't like this but for now I'll hard-code the modification of the
 		//       force center position
-		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyForce(i));
+		FEPointBodyForce* pbf = dynamic_cast<FEPointBodyForce*>(m_fem.GetBodyLoad(i));
 		if (pbf)
 		{
 			if (pbf->m_rlc[0] >= 0) pbf->m_rc.x = m_fem.GetLoadCurve(pbf->m_rlc[0])->Value();
@@ -1856,10 +1856,10 @@ bool FESolidSolver::Residual(vector<double>& R)
 	for (i=0; i<mesh.Domains(); ++i)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
-		for (int j=0; j<m_fem.BodyForces(); ++j)
+		for (int j=0; j<m_fem.BodyLoads(); ++j)
 		{
-			FEBodyForce& BF = *m_fem.GetBodyForce(j);
-			dom.BodyForce(RHS, BF);
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_fem.GetBodyLoad(j));
+			dom.BodyForce(RHS, *pbf);
 		}
 	}
 

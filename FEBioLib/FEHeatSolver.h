@@ -48,6 +48,9 @@ protected:	// Residual functions
 	//! Surface fluxes
 	void SurfaceFluxes(FEGlobalVector& R);
 
+	//! Heat Sources
+	void HeatSources(FEGlobalVector& R);
+
 public:
 	//! assemble element stiffness matrix
 	void AssembleStiffness(vector<int>& en, vector<int>& lm, matrix& ke);

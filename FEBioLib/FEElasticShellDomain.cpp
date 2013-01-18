@@ -687,61 +687,63 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 
 void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, vector<double>& fe)
 {
-	int NF = fem.BodyForces();
+	int NF = fem.BodyLoads();
 	for (int nf = 0; nf < NF; ++nf)
 	{
-		FEBodyForce& BF = *fem.GetBodyForce(nf);
-
-		// don't forget to multiply with the density
-		FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
-		assert(pme);
-
-		double dens = pme->Density();
-
-		// calculate the average thickness
-		double* h0 = &el.m_h0[0], gt, za;
-
-		// integration weights
-		double* gw = el.GaussWeights();
-		double *Hn, detJ;
-
-		// loop over integration points
-		int nint = el.GaussPoints();
-		int neln = el.Nodes();
-
-		// nodal coordinates
-		vec3d r0[4], rt[4];
-		for (int i=0; i<neln; ++i)
+		FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(fem.GetBodyLoad(nf));
+		if (pbf)
 		{
-			r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
-			rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
-		}
+			// don't forget to multiply with the density
+			FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(m_pMat);
+			assert(pme);
 
-		for (int n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.m_State[n];
-			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
+			double dens = pme->Density();
 
-			detJ = detJ0(el, n)*gw[n];
-			Hn  = el.H(n);
-			gt = el.gt(n);
+			// calculate the average thickness
+			double* h0 = &el.m_h0[0], gt, za;
 
-			// get the force
-			vec3d f = BF.force(mp);
+			// integration weights
+			double* gw = el.GaussWeights();
+			double *Hn, detJ;
 
+			// loop over integration points
+			int nint = el.GaussPoints();
+			int neln = el.Nodes();
+
+			// nodal coordinates
+			vec3d r0[4], rt[4];
 			for (int i=0; i<neln; ++i)
 			{
-				za = 0.5*gt*h0[i];
+				r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
+				rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
+			}
 
-				fe[6*i  ] -= Hn[i]*f.x*dens*detJ;
-				fe[6*i+1] -= Hn[i]*f.y*dens*detJ;
-				fe[6*i+2] -= Hn[i]*f.z*dens*detJ;
+			for (int n=0; n<nint; ++n)
+			{
+				FEMaterialPoint& mp = *el.m_State[n];
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+				pt.r0 = el.Evaluate(r0, n);
+				pt.rt = el.Evaluate(rt, n);
 
-				fe[6*i+3] -= za*Hn[i]*dens*f.x*detJ;
-				fe[6*i+4] -= za*Hn[i]*dens*f.y*detJ;
-				fe[6*i+5] -= za*Hn[i]*dens*f.z*detJ;
+				detJ = detJ0(el, n)*gw[n];
+				Hn  = el.H(n);
+				gt = el.gt(n);
+
+				// get the force
+				vec3d f = pbf->force(mp);
+
+				for (int i=0; i<neln; ++i)
+				{
+					za = 0.5*gt*h0[i];
+
+					fe[6*i  ] -= Hn[i]*f.x*dens*detJ;
+					fe[6*i+1] -= Hn[i]*f.y*dens*detJ;
+					fe[6*i+2] -= Hn[i]*f.z*dens*detJ;
+
+					fe[6*i+3] -= za*Hn[i]*dens*f.x*detJ;
+					fe[6*i+4] -= za*Hn[i]*dens*f.y*detJ;
+					fe[6*i+5] -= za*Hn[i]*dens*f.z*detJ;
+				}
 			}
 		}
 	}

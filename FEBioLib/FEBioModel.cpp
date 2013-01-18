@@ -800,10 +800,10 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		ar << m_bwopt;
 
 		// body loads
-		ar << (int) m_BF.size();
-		for (int i=0; i<(int) m_BF.size(); ++i)
+		ar << (int) m_BL.size();
+		for (int i=0; i<(int) m_BL.size(); ++i)
 		{
-			FEBodyForce* pbf = m_BF[i];
+			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_BL[i]);
 			int ntype = -1;
 			if (dynamic_cast<FEConstBodyForce*      >(pbf)) ntype = FE_CONST_BODY_FORCE;
 			if (dynamic_cast<FENonConstBodyForce*   >(pbf)) ntype = FE_NONCONST_BODY_FORCE;
@@ -851,7 +851,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		// body loads
 		int nbl;
 		ar >> nbl;
-		m_BF.clear();
+		m_BL.clear();
 		for (int i=0; i<nbl; ++i)
 		{
 			int ntype = -1;
@@ -859,15 +859,15 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 			FEBodyForce* pbl = 0;
 			switch (ntype)
 			{
-			case FE_CONST_BODY_FORCE: pbl = new FEConstBodyForce(pfem); break;
-			case FE_NONCONST_BODY_FORCE: pbl = new FENonConstBodyForce(pfem); break;
+			case FE_CONST_BODY_FORCE      : pbl = new FEConstBodyForce      (pfem); break;
+			case FE_NONCONST_BODY_FORCE   : pbl = new FENonConstBodyForce   (pfem); break;
 			case FE_CENTRIFUGAL_BODY_FORCE: pbl = new FECentrifugalBodyForce(pfem); break;
 			default:
 				assert(false);
 			}
 			assert(pbl);
 			pbl->Serialize(ar);
-			m_BF.push_back(pbl);
+			m_BL.push_back(pbl);
 		}
 
 		// set the correct step
@@ -1581,9 +1581,9 @@ bool FEBioModel::Init()
 	if (InitContact() == false) return false;
 
 	// init some other stuff
-	for (i=0; i<(int) m_BF.size(); ++i)
+	for (i=0; i<(int) m_BL.size(); ++i)
 	{
-		if (m_BF[i]->Init() == false) return false;
+		if (m_BL[i]->Init() == false) return false;
 	}
 
 	// initialize nonlinear constraints

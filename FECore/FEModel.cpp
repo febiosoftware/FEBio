@@ -30,7 +30,7 @@ FEModel::~FEModel(void)
 	for (i=0; i<m_CI.size  (); ++i) delete m_CI [i] ; m_CI.clear  ();
 	for (i=0; i<m_MAT.size (); ++i) delete m_MAT[i] ; m_MAT.clear ();
 	for (i=0; i<m_LC.size  (); ++i) delete m_LC [i] ; m_LC.clear  ();
-	for (i=0; i<m_BF.size  (); ++i) delete m_BF [i] ; m_BF.clear  ();
+	for (i=0; i<m_BL.size  (); ++i) delete m_BL [i] ; m_BL.clear  ();
 	for (i=0; i<m_DC.size  (); ++i) delete m_DC [i] ; m_DC.clear  ();
 	for (i=0; i<m_FC.size  (); ++i) delete m_FC [i] ; m_FC.clear  ();
 	for (i=0; i<m_SL.size  (); ++i) delete m_SL [i] ; m_SL.clear  ();

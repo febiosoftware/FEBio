@@ -9,10 +9,22 @@
 class FEModel;
 
 //-----------------------------------------------------------------------------
+// Base class for body-loads (TODO: work in progress)
+class FEBodyLoad : public FEParamContainer
+{
+public:
+	FEBodyLoad(){}
+	virtual ~FEBodyLoad(){}
+
+	//! initialization
+	virtual bool Init() { return true; }
+};
+
+//-----------------------------------------------------------------------------
 //! This class is the base class for body forces
 //! Derived classes need to implement the force and stiffness functions.
 //
-class FEBodyForce : public FEParamContainer
+class FEBodyForce : public FEBodyLoad
 {
 public:
 	//! constructor
@@ -26,9 +38,6 @@ public:
 
 	//! serialize data to archive
 	virtual void Serialize(DumpFile& ar);
-
-	//! initialization
-	virtual bool Init() { return true; }
 
 	//! update
 	virtual void Update(){}

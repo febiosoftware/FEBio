@@ -117,17 +117,17 @@ public: // --- Boundary Conditions functions ---
 
 public: // --- Body load functions --- 
 
-	//! Add a body force to the model
-	void AddBodyForce(FEBodyForce* pf) { m_BF.push_back(pf); }
+	//! Add a body load to the model
+	void AddBodyLoad(FEBodyLoad* pf) { m_BL.push_back(pf); }
 
-	//! get the number of body forces
-	int BodyForces() { return (int) m_BF.size(); }
+	//! get the number of body loads
+	int BodyLoads() { return (int) m_BL.size(); }
 
-	//! return a pointer to a body force
-	FEBodyForce* GetBodyForce(int i) { return m_BF[i]; }
+	//! return a pointer to a body load
+	FEBodyLoad* GetBodyLoad(int i) { return m_BL[i]; }
 
-	//! see if there are any body forces
-	bool HasBodyForces() { return !m_BF.empty();}
+	//! see if there are any body loads
+	bool HasBodyLoads() { return !m_BL.empty();}
 
 public: // --- Analysis steps functions ---
 
@@ -248,7 +248,7 @@ public: // TODO: Find a better place for these parameters
 protected:
 	std::vector<FELoadCurve*>			m_LC;	//!< load curve data
 	std::vector<FEMaterial*>			m_MAT;	//!< array of materials
-	std::vector<FEBodyForce*>			m_BF;	//!< body force data
+	std::vector<FEBodyLoad*>			m_BL;	//!< body load data
 	std::vector<FEContactInterface*>	m_CI;	//!< contact interface array
 	std::vector<FENLConstraint*>		m_NLC;	//!< nonlinear constraints
 

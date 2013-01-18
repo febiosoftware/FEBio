@@ -318,25 +318,25 @@ void echo_input(FEBioModel& fem)
 	}
 	clog.printf("\n\n");
 
-	if (fem.HasBodyForces())
+	if (fem.HasBodyLoads())
 	{
-		clog.printf(" BODYFORCE DATA\n");
+		clog.printf(" BODY LOAD DATA\n");
 		clog.printf("===========================================================================\n");
-		for (i=0; i<fem.BodyForces(); ++i)
+		for (i=0; i<fem.BodyLoads(); ++i)
 		{
 			if (i>0) clog.printf("---------------------------------------------------------------------------\n");
 			clog.printf("%3d - ", i+1);
 
-			// get the body force
-			FEBodyForce* pbf = fem.GetBodyForce(i);
+			// get the body load
+			FEBodyLoad* pbl = fem.GetBodyLoad(i);
 
 			// get the type string
-			const char* sztype = febio.GetTypeStr<FEBodyForce>(pbf);
+			const char* sztype = febio.GetTypeStr<FEBodyLoad>(pbl);
 			if (sztype == 0) sztype = "unknown";
 			clog.printf(" Type: %s\n", sztype);
 
 			// print the parameter list
-			FEParameterList& pl = pbf->GetParameterList();
+			FEParameterList& pl = pbl->GetParameterList();
 			print_parameter_list(pl);
 		}
 		clog.printf("\n\n");
