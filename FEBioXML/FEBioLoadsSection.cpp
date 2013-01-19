@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
 #include <FEBioLib/FEPointBodyForce.h>
+#include <FEBioLib/FEHeatSource.h>
 
 //-----------------------------------------------------------------------------
 //!  Parses the loads section from the xml file (version 1.2 or up)
@@ -24,6 +25,7 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 		else if (tag == "heatflux"           ) ParseBCHeatFlux          (tag);
 		else if (tag == "convective_heatflux") ParseBCConvectiveHeatFlux(tag);
 		else if (tag == "body_force"         ) ParseBodyForce           (tag);
+		else if (tag == "heat_source"        ) ParseHeatSource          (tag);
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
@@ -87,4 +89,20 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 		}
 		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 	}
+}
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection::ParseHeatSource(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEHeatSource* phs = new  FEHeatSource(&fem);
+	FEParameterList& PL = phs->GetParameterList();
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, PL) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+	fem.AddBodyLoad(phs);
 }

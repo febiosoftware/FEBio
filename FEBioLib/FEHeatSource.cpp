@@ -2,10 +2,14 @@
 #include "FEHeatSource.h"
 #include <FECore/FEModel.h>
 
+BEGIN_PARAMETER_LIST(FEHeatSource, FEBodyLoad);
+	ADD_PARAMETER(m_Q, FE_PARAM_DOUBLE, "Q");
+END_PARAMETER_LIST();
+
 //-----------------------------------------------------------------------------
 FEHeatSource::FEHeatSource(FEModel* pfem) : m_pfem(pfem)
 {
-
+	m_Q = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -39,7 +43,6 @@ void FEHeatSource::Residual(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 void FEHeatSource::ElementResidual(FEHeatSolidDomain& dom, FESolidElement& el, vector<double>& fe)
 {
-	double Q = 1.0;
 	zero(fe);
 	double* w = el.GaussWeights();
 	int ne = el.Nodes();
@@ -50,7 +53,7 @@ void FEHeatSource::ElementResidual(FEHeatSolidDomain& dom, FESolidElement& el, v
 		double J = dom.detJt(el, n);
 		for (int i=0; i<ne; ++i)
 		{
-			fe[i] += Q*H[i]*J*w[n];
+			fe[i] += m_Q*H[i]*J*w[n];
 		}
 	}
 }
