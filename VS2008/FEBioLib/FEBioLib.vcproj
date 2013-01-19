@@ -290,6 +290,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEConvectiveHeatFlux.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FECoupledHeatSolidSolver.cpp"
 				>
 			</File>
@@ -427,6 +431,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEHeatSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEHeatSource.cpp"
 				>
 			</File>
 			<File
@@ -738,10 +746,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\Logfile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\NodeDataRecord.cpp"
 				>
 			</File>
@@ -873,6 +877,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEContactSurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEConvectiveHeatFlux.h"
 				>
 			</File>
 			<File
@@ -1017,6 +1025,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEHeatSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEHeatSource.h"
 				>
 			</File>
 			<File
@@ -1317,14 +1329,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\geodesic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\log.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\Logfile.h"
 				>
 			</File>
 			<File

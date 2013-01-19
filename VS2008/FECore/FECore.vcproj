@@ -376,6 +376,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\Logfile.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\mat3d.cpp"
 				>
 			</File>
@@ -587,6 +591,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\LoadCurve.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\log.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\Logfile.h"
 				>
 			</File>
 			<File
