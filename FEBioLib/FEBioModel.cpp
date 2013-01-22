@@ -160,6 +160,8 @@ bool FEBioModel::Reset()
 	m_ftime0 = 0;
 
 	// set first time step
+	m_pStep = m_Step[0];
+	m_nStep = 0;
 	m_pStep->m_dt = m_pStep->m_dt0;
 	m_pStep->m_ntotref    = 0;		// total nr of stiffness reformations
 	m_pStep->m_ntotiter   = 0;		// total nr of non-linear iterations
