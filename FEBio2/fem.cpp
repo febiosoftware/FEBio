@@ -10,6 +10,7 @@
 #include "FEBioLib/FESlidingInterface3.h"
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
+#include "FEBioLib/FESlidingInterfaceBW.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include "plugin.h"
@@ -96,6 +97,7 @@ void FEM::ShallowCopy(FEM& fem)
 			case FE_SURFACE_CONSTRAINT   : pci = new FESurfaceConstraint (this); break;
 			case FE_CONTACT_SLIDING3     : pci = new FESlidingInterface3 (this); break;
 			case FE_CONTACT_TIED_BIPHASIC: pci = new FETiedBiphasicInterface(this); break;
+			case FE_CONTACT_SLIDINGBW    : pci = new FESlidingInterfaceBW(this); break;
 			default:
 				assert(false);
 			}

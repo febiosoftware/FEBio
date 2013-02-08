@@ -53,6 +53,7 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FEElasticMultigeneration.h"
+#include "FESlidingInterfaceBW.h"
 #include "FECore/log.h"
 #include "version.h"
 
@@ -1103,6 +1104,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 			case FE_SURFACE_CONSTRAINT   : ps = new FESurfaceConstraint    (this); break;
 			case FE_CONTACT_SLIDING3     : ps = new FESlidingInterface3    (this); break;
 			case FE_CONTACT_TIED_BIPHASIC: ps = new FETiedBiphasicInterface(this); break;
+			case FE_CONTACT_SLIDINGBW    : ps = new FESlidingInterfaceBW   (this); break;
 			default:
 				assert(false);
 			}
