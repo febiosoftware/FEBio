@@ -19,8 +19,9 @@ FEBiphasic::FEBiphasic()
 	m_rhoTw = 0; 
 	m_phi0 = 0;
 
-	AddComponent<FEElasticMaterial      >(&m_pSolid, "solid"       );
-	AddComponent<FEHydraulicPermeability>(&m_pPerm , "permeability");
+	AddComponent<FEElasticMaterial      >(&m_pSolid, "solid"         );
+	AddComponent<FEHydraulicPermeability>(&m_pPerm , "permeability"  );
+	AddComponent<FESolventSupply        >(&m_pSupp , "solvent_supply");
 }
 
 //-----------------------------------------------------------------------------
@@ -29,6 +30,7 @@ void FEBiphasic::Init()
 	FEMaterial::Init();
 	m_pSolid->Init();
 	m_pPerm->Init();
+	if (m_pSupp) m_pSupp->Init();
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
@@ -170,6 +172,9 @@ void FEBiphasic::Serialize(DumpFile &ar)
 
 		ar << febio.GetTypeStr<FEMaterial>(m_pPerm);
 		m_pPerm->Serialize(ar);
+
+		ar << febio.GetTypeStr<FEMaterial>(m_pSupp);
+		m_pSupp->Serialize(ar);
 	}
 	else
 	{
@@ -186,6 +191,12 @@ void FEBiphasic::Serialize(DumpFile &ar)
 		assert(m_pPerm);
 		m_pPerm->Serialize(ar);
 		m_pPerm->Init();
+
+		ar >> sz;
+		m_pSupp = dynamic_cast<FESolventSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		assert(m_pSupp);
+		m_pSupp->Serialize(ar);
+		m_pSupp->Init();
 	}
 }
 
@@ -203,4 +214,19 @@ void FEHydraulicPermeability::Init()
 mat3ds FEHydraulicPermeability::Tangent_Permeability_Concentration(FEMaterialPoint& pt, const int isol)
 {
 	return mat3ds(0,0,0,0,0,0);
+}
+
+//-----------------------------------------------------------------------------
+// Material parameters for FESolventSupply
+void FESolventSupply::Init()
+{
+	FEMaterial::Init();
+}
+
+//-----------------------------------------------------------------------------
+// Derivative of supply w.r.t. solute concentration at material point
+// Set this to zero by default because biphasic problems do not require it
+double FESolventSupply::Tangent_Supply_Concentration(FEMaterialPoint& pt, const int isol)
+{
+	return 0;
 }

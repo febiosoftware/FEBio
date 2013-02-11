@@ -85,6 +85,31 @@ class FEHydraulicPermeability : public FEMaterial
 	};
 
 //-----------------------------------------------------------------------------
+//! Base class for solvent supply.
+//! These materials need to define the supply and tangent supply functions.
+//!
+class FESolventSupply : public FEMaterial
+{
+public:
+	FESolventSupply() {}
+	virtual ~FESolventSupply(){}
+	
+	//! solvent supply
+	virtual double Supply(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of solvent supply with respect to strain
+	virtual mat3ds Tangent_Supply_Strain(FEMaterialPoint& mp) = 0;
+	
+	//! tangent of solvent supply with respect to pressure
+	virtual double Tangent_Supply_Pressure(FEMaterialPoint& mp) = 0;
+	
+	//! tangent of solvent supply with respect to concentration
+	double Tangent_Supply_Concentration(FEMaterialPoint& mp, const int isol);
+	
+	void Init();
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for biphasic materials.
 
 class FEBiphasic : public FEMultiMaterial
@@ -135,6 +160,7 @@ public: // material parameters
 public: // material properties
 	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
+	FESolventSupply*			m_pSupp;	//!< pointer to solvent supply
 	
 	DECLARE_PARAMETER_LIST();
 };

@@ -302,12 +302,15 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 		
 		// get the flux
 		vec3d& w = pt.m_w;
+
+		// get the solvent supply
+		double phiwhat = 0;
+		if (pm->m_pSupp) phiwhat = pm->m_pSupp->Supply(mp);
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
-//			fe[i] -= (B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
+			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z + (phiwhat - divv)*H[i])*detJ*wg[n];
 		}
 	}
 	
@@ -346,6 +349,8 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWorkSS(FESolidElement& el, vecto
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 		FEBiphasicMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
@@ -371,13 +376,17 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWorkSS(FESolidElement& el, vecto
 			B3[i] = Gz;
 		}
 		
-		// get the flux
+		// get the solvent flux
 		vec3d& w = pt.m_w;
-		
+
+		// get the solvent supply
+		double phiwhat = 0;
+		if (pm->m_pSupp) phiwhat = pm->m_pSupp->Supply(mp);
+
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z)*detJ*wg[n];
+			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z + H[i]*phiwhat)*detJ*wg[n];
 		}
 	}
 	
@@ -699,6 +708,16 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		// evaluate the permeability and its derivatives
 		mat3ds K = pm->m_pPerm->Permeability(mp);
 		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
+
+		// evaluate the solvent supply and its derivatives
+		double phiwhat = 0;
+		mat3ds Phie; Phie.zero();
+		double Phip = 0;
+		if (pm->m_pSupp) {
+			phiwhat = pm->m_pSupp->Supply(mp);
+			Phie = pm->m_pSupp->Tangent_Supply_Strain(mp);
+			Phip = pm->m_pSupp->Tangent_Supply_Pressure(mp);
+		}
 		
 		// Miscellaneous constants
 		mat3dd I(1);
@@ -846,7 +865,17 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 		// evaluate the permeability and its derivatives
 		mat3ds K = pm->m_pPerm->Permeability(mp);
 		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
-		
+
+		// evaluate the solvent supply and its derivatives
+		double phiwhat = 0;
+		mat3ds Phie; Phie.zero();
+		double Phip = 0;
+		if (pm->m_pSupp) {
+			phiwhat = pm->m_pSupp->Supply(mp);
+			Phie = pm->m_pSupp->Tangent_Supply_Strain(mp);
+			Phip = pm->m_pSupp->Tangent_Supply_Pressure(mp);
+		}
+
 		// Miscellaneous constants
 		mat3dd I(1);
 		

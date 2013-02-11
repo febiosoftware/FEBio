@@ -74,6 +74,7 @@
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticMultigeneration.h"
+#include "FESolventSupplyStarling.h"
 
 #include "FESurfaceConstraint.h"
 #include "FEPeriodicBoundary.h"
@@ -179,6 +180,7 @@ REGISTER_MATERIAL(FEViscoElasticMaterial         , "viscoelastic"               
 REGISTER_MATERIAL(FEUncoupledViscoElasticMaterial, "uncoupled viscoelastic"        );
 REGISTER_MATERIAL(FEVonMisesPlasticity           , "von-Mises plasticity"          );
 REGISTER_MATERIAL(FEElasticMultigeneration       , "multigeneration"               );
+REGISTER_MATERIAL(FESolventSupplyStarling        , "Starling"                      );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

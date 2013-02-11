@@ -606,6 +606,7 @@
     <ClInclude Include="..\..\FEBioLib\FESolubConst.h" />
     <ClInclude Include="..\..\FEBioLib\FESolute.h" />
     <ClInclude Include="..\..\FEBioLib\FESoluteFlux.h" />
+    <ClInclude Include="..\..\FEBioLib\FESolventSupplyStarling.h" />
     <ClInclude Include="..\..\FEBioLib\FESolver.h" />
     <ClInclude Include="..\..\FEBioLib\FESphericalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioLib\FEStiffnessMatrix.h" />
@@ -752,6 +753,7 @@
     <ClCompile Include="..\..\FEBioLib\FESolubConst.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolute.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESoluteFlux.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FESolventSupplyStarling.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FESphericalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEStiffnessMatrix.cpp" />

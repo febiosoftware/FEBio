@@ -132,10 +132,12 @@ FEMultiphasic::FEMultiphasic()
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_penalty = 1;
+	m_pSupp = 0;
 
 	AddComponent<FEElasticMaterial      >(&m_pSolid    , "solid"              );
 	AddComponent<FEHydraulicPermeability>(&m_pPerm     , "permeability"       );
 	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC     , "osmotic_coefficient");
+	AddComponent<FESolventSupply        >(&m_pSupp , "solvent_supply");
 //	AddComponent<FESolute               >(&m_pSolute[0], "solute",           0);
 }
 
@@ -145,6 +147,7 @@ void FEMultiphasic::Init()
 	FEMaterial::Init();
 	m_pSolid->Init();
 	m_pPerm->Init();
+	if (m_pSupp) m_pSupp->Init();
 	m_pOsmC->Init();
 	for (int i=0; i<(int)m_pSolute.size(); ++i) m_pSolute[i]->Init();
 	
@@ -593,6 +596,7 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 		
 		ar << febio.GetTypeStr<FEMaterial>(m_pSolid); m_pSolid->Serialize(ar);
 		ar << febio.GetTypeStr<FEMaterial>(m_pPerm ); m_pPerm ->Serialize(ar);
+		ar << febio.GetTypeStr<FEMaterial>(m_pSupp ); m_pSupp ->Serialize(ar);
 		ar << febio.GetTypeStr<FEMaterial>(m_pOsmC ); m_pOsmC ->Serialize(ar);
 		for (i=0; i<(int)m_pSolute.size(); ++i) {
 			ar << febio.GetTypeStr<FEMaterial>(m_pSolute[i]);
@@ -613,6 +617,11 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pPerm); m_pPerm->Serialize(ar);
 		m_pPerm->Init();
+
+		ar >> sz;
+		m_pSupp = dynamic_cast<FESolventSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		assert(m_pSupp); m_pSupp->Serialize(ar);
+		m_pSupp->Init();
 		
 		ar >> sz;
 		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));

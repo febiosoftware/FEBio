@@ -457,7 +457,7 @@ bool FEBiphasicSoluteDomain::ElementInternalFluidWorkSS(FESolidElement& el, vect
 	// jacobian
 	double Ji[3][3], detJ;
 	
-	double *Gr, *Gs, *Gt;
+	double *Gr, *Gs, *Gt, *H;
 	double Gx, Gy, Gz;
 	
 	// Bp-matrix
@@ -475,14 +475,18 @@ bool FEBiphasicSoluteDomain::ElementInternalFluidWorkSS(FESolidElement& el, vect
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FEBiphasicMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
+		FEMaterialPoint& pt = *(el.m_State[n]->ExtractData<FEMaterialPoint>());
+		FEElasticMaterialPoint& ept = *(el.m_State[n]->ExtractData<FEElasticMaterialPoint>());
+		FESoluteMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESoluteMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
-		
+				
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
+		
+		H = el.H(n);
 		
 		for (i=0; i<neln; ++i)
 		{
@@ -498,13 +502,23 @@ bool FEBiphasicSoluteDomain::ElementInternalFluidWorkSS(FESolidElement& el, vect
 			B3[i] = Gz;
 		}
 		
-		// get the flux
-		vec3d& w = ppt.m_w;
+		double J = ept.J;
+
+		// get the solute flux
+		vec3d& j = spt.m_j;
+		// Evaluate solute supply and receptor-ligand kinetics
+		double crhat = 0;
+		if (pm->m_pSolute->m_pSupp)
+		{
+			// evaluate the solute supply
+			crhat = pm->m_pSolute->m_pSupp->SupplySS(pt);
+		}
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z)*detJ*wg[n];
+			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z
+						 + H[i]*crhat/J)*detJ*wg[n];
 		}
 	}
 	

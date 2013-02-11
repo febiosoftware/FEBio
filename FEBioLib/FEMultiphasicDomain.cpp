@@ -718,11 +718,15 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 		
 		// get the flux
 		vec3d& w = ppt.m_w;
+
+		// get the solvent supply
+		double phiwhat = 0;
+		if (pm->m_pSupp) phiwhat = pm->m_pSupp->Supply(mp);
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z - divv*H[i])*detJ*wg[n];
+			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z + (phiwhat - divv)*H[i])*detJ*wg[n];
 		}
 	}
 	
@@ -778,7 +782,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 	// jacobian
 	double Ji[3][3], detJ;
 	
-	double *Gr, *Gs, *Gt;
+	double *Gr, *Gs, *Gt, *H;
 	double Gx, Gy, Gz;
 	
 	// Bp-matrix
@@ -795,6 +799,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 	// loop over gauss-points
 	for (int n=0; n<nint; ++n)
 	{
+		FEMaterialPoint& mp = *el.m_State[n];
 		FEBiphasicMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
 		
 		// calculate jacobian
@@ -803,6 +808,8 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
+
+		H = el.H(n);
 		
 		for (i=0; i<neln; ++i)
 		{
@@ -820,11 +827,15 @@ bool FEMultiphasicDomain::ElementInternalFluidWorkSS(FESolidElement& el, vector<
 		
 		// get the flux
 		vec3d& w = ppt.m_w;
+
+		// get the solvent supply
+		double phiwhat = 0;
+		if (pm->m_pSupp) phiwhat = pm->m_pSupp->Supply(mp);
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z)*detJ*wg[n];
+			fe[i] -= dt*(B1[i]*w.x+B2[i]*w.y+B3[i]*w.z + H[i]*phiwhat)*detJ*wg[n];
 		}
 	}
 	
@@ -1331,7 +1342,18 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		vector<mat3ds> dTdc(nsol);
 		vector<mat3ds> ImD(nsol);
 		mat3dd I(1);
-		
+
+		// evaluate the solvent supply and its derivatives
+		double phiwhat = 0;
+		mat3ds Phie; Phie.zero();
+		double Phip = 0;
+		vector<double> Phic(nsol,0);
+		if (pm->m_pSupp) {
+			phiwhat = pm->m_pSupp->Supply(mp);
+			Phie = pm->m_pSupp->Tangent_Supply_Strain(mp);
+			Phip = pm->m_pSupp->Tangent_Supply_Pressure(mp);
+		}
+
 		for (isol=0; isol<nsol; ++isol) {
 			// evaluate the permeability derivatives
 			dKdc[isol] = pm->m_pPerm->Tangent_Permeability_Concentration(mp,isol);
@@ -1355,6 +1377,9 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 				dDdc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
 				dD0dc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
 			}
+
+			// evaluate the solvent supply tangent with concentration
+			if (pm->m_pSupp) Phic[isol] = pm->m_pSupp->Tangent_Supply_Concentration(mp,isol);
 		}
 		
 		// Miscellaneous constants
@@ -1774,7 +1799,18 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		vector<mat3ds> dTdc(nsol);
 		vector<mat3ds> ImD(nsol);
 		mat3dd I(1);
-		
+
+		// evaluate the solvent supply and its derivatives
+		double phiwhat = 0;
+		mat3ds Phie; Phie.zero();
+		double Phip = 0;
+		vector<double> Phic(nsol,0);
+		if (pm->m_pSupp) {
+			phiwhat = pm->m_pSupp->Supply(mp);
+			Phie = pm->m_pSupp->Tangent_Supply_Strain(mp);
+			Phip = pm->m_pSupp->Tangent_Supply_Pressure(mp);
+		}
+
 		for (isol=0; isol<nsol; ++isol) {
 			// evaluate the permeability derivatives
 			dKdc[isol] = pm->m_pPerm->Tangent_Permeability_Concentration(mp,isol);
@@ -1798,6 +1834,9 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 				dDdc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
 				dD0dc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
 			}
+
+			// evaluate the solvent supply tangent with concentration
+			if (pm->m_pSupp) Phic[isol] = pm->m_pSupp->Tangent_Supply_Concentration(mp,isol);
 		}
 		
 		// Miscellaneous constants
