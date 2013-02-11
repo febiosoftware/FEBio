@@ -572,6 +572,7 @@
     <ClInclude Include="..\..\FEBioLib\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearTransIso.h" />
     <ClInclude Include="..\..\FEBioLib\FEMooneyRivlin.h" />
+    <ClInclude Include="..\..\FEBioLib\FEMRVonMisesFibers.h" />
     <ClInclude Include="..\..\FEBioLib\FEMultiphasic.h" />
     <ClInclude Include="..\..\FEBioLib\FEMultiphasicDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FEMuscleMaterial.h" />
@@ -719,6 +720,7 @@
     <ClCompile Include="..\..\FEBioLib\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearTransIso.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMooneyRivlin.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEMRVonMisesFibers.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMultiphasic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMultiphasicDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMuscleMaterial.cpp" />

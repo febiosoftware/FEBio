@@ -459,6 +459,9 @@
     <ClInclude Include="..\..\FEBioLib\FESolventSupplyStarling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FEMRVonMisesFibers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp">
@@ -900,6 +903,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FESolventSupplyStarling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FEMRVonMisesFibers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
