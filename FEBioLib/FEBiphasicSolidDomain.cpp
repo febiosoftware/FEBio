@@ -728,7 +728,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		for (i=0; i<neln; ++i)
 			for (j=0; j<neln; ++j)
 			{
-				ke[4*i+3][4*j+3] -= gradN[i]*(K*gradN[j])*tmp;
+				ke[4*i+3][4*j+3] += (H[i]*H[j]*Phip - gradN[i]*(K*gradN[j]))*tmp;
 			}
 		
 		if (!bsymm) {
@@ -750,7 +750,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 				for (j=0; j<neln; ++j)
 				{
 					vec3d vt = (-(vdotTdotv(gradN[i], dKdE, gradN[j])*(gradp))
-								-(I*(divv+1./dt) - gradv.transpose())*gradN[j]*H[i])*tmp;
+								-(I*(divv+1./dt) - gradv.transpose() - Phie)*gradN[j]*H[i])*tmp;
 					ke[4*i+3][4*j  ] += vt.x;
 					ke[4*i+3][4*j+1] += vt.y;
 					ke[4*i+3][4*j+2] += vt.z;
@@ -885,7 +885,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 		for (i=0; i<neln; ++i)
 			for (j=0; j<neln; ++j)
 			{
-				ke[4*i+3][4*j+3] -= gradN[i]*(K*gradN[j])*tmp;
+				ke[4*i+3][4*j+3] += (H[i]*H[j]*Phip - gradN[i]*(K*gradN[j]))*tmp;
 			}
 		
 		if (!bsymm) {
@@ -906,7 +906,8 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 			for (i=0; i<neln; ++i) {
 				for (j=0; j<neln; ++j)
 				{
-					vec3d vt = -(vdotTdotv(gradN[i], dKdE, gradN[j])*(gradp))*tmp;
+					vec3d vt = (-(vdotTdotv(gradN[i], dKdE, gradN[j])*(gradp))
+								+Phie*gradN[j]*H[i])*tmp;
 					ke[4*i+3][4*j  ] += vt.x;
 					ke[4*i+3][4*j+1] += vt.y;
 					ke[4*i+3][4*j+2] += vt.z;

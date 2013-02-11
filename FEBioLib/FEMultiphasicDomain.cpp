@@ -1433,7 +1433,8 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 							+Ke*(2*kappa[isol]*(gradN[j]*(D[isol]*gradc[isol]))))*(-R*T/D0[isol])
 					+ (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
 				}
-				qpu = -gradN[j]*(divv+1.0/dt)-gradv.transpose()*gradN[j];
+//				qpu = -gradN[j]*(divv+1.0/dt)-gradv.transpose()*gradN[j];
+				qpu = -gradN[j]*(divv+1.0/dt)+(Phie + gradv.transpose())*gradN[j];
 				vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(tmp*dt);
 				ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
 				ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
@@ -1446,7 +1447,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 				ke[ndpn*i+2][ndpn*j+3] += vtmp.z;
 				
 				// calculate the kpp matrix
-				ke[ndpn*i+3][ndpn*j+3] -= gradN[i]*(Ke*gradN[j])*(tmp*dt);
+				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(tmp*dt);
 				
 				// calculate kcu matrix data
 				jue.zero();
@@ -1502,7 +1503,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 								+dDdc[jsol][isol]*kappa[jsol])/D0[jsol]*gradc[jsol];
 					wc[isol] = (dKedc[isol]*gp)*(-H[j])
 					-Ke*((D[isol]*gradN[j])*(kappa[isol]/D0[isol])+vtmp*H[j])*(R*T);
-					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol])*(tmp*dt);
+					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(tmp*dt);
 					
 				}
 				
@@ -1867,7 +1868,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 			dKedc[isol] = -Ke*(-Ki*dKdc[isol]*Ki + Gc[isol])*Ke;
 		
 		// calculate all the matrices
-		vec3d vtmp,gp;
+		vec3d vtmp,gp,qpu;
 		vector<vec3d> gc(nsol),wc(nsol),jce(nsol);
 		vector< vector<vec3d> > jc(nsol, vector<vec3d>(nsol));
 		mat3d wu, jue;
@@ -1889,7 +1890,8 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 						   +Ke*(2*kappa[isol]*(gradN[j]*(D[isol]*gradc[isol]))))*(-R*T/D0[isol])
 					+ (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
 				}
-				vtmp = (wu.transpose()*gradN[i])*(tmp*dt);
+				qpu = Phie*gradN[j];
+				vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(tmp*dt);
 				ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
 				ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
 				ke[ndpn*i+3][ndpn*j+2] += vtmp.z;
@@ -1901,7 +1903,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 				ke[ndpn*i+2][ndpn*j+3] += vtmp.z;
 				
 				// calculate the kpp matrix
-				ke[ndpn*i+3][ndpn*j+3] -= gradN[i]*(Ke*gradN[j])*(tmp*dt);
+				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(tmp*dt);
 				
 				// calculate kcu matrix data
 				jue.zero();
@@ -1949,7 +1951,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 								 +dDdc[jsol][isol]*kappa[jsol])/D0[jsol]*gradc[jsol];
 					wc[isol] = (dKedc[isol]*gp)*(-H[j])
 					-Ke*((D[isol]*gradN[j])*(kappa[isol]/D0[isol])+vtmp*H[j])*(R*T);
-					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol])*(tmp*dt);
+					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(tmp*dt);
 					
 				}
 				
