@@ -478,6 +478,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEMRVonMisesFibers.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEMultiphasic.cpp"
 				>
 			</File>
@@ -611,6 +615,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESoluteFlux.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESolventSupplyStarling.cpp"
 				>
 			</File>
 			<File
@@ -1076,6 +1084,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEMRVonMisesFibers.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEMultiphasic.h"
 				>
 			</File>
@@ -1209,6 +1221,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESoluteFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FESolventSupplyStarling.h"
 				>
 			</File>
 			<File
