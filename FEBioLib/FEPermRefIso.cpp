@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "FEPermRefIso.h"
 
+
+// register the material with the framework
+REGISTER_MATERIAL(FEPermRefIso, "perm-ref-iso");
+
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefIso, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
@@ -83,7 +87,7 @@ tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double k0 = m_perm0*f;
 	double k1 = m_perm1/(J*J)*f;
 	double k2 = 0.5*m_perm2/pow(J,4)*f;
-	double K0prime = (J*J*m_M+(J*(m_alpha+1)-phi0)/(J-phi0))*k0;
+    double K0prime = (1+J*(m_alpha/(J-phi0)+m_M*J))*k0;
 	double K1prime = (J*J*m_M+(J*(m_alpha-1)+phi0)/(J-phi0))*k1;
 	double K2prime = (J*J*m_M+(J*(m_alpha-3)+3*phi0)/(J-phi0))*k2;
 	mat3ds k0hat = I*K0prime;
@@ -92,7 +96,7 @@ tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	
 	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0
 	+ dyad1s(b,k1hat)/2.0
-	+ dyad1s(b*b,k2hat)+dyad4s(b)*4*k2;
+	+ dyad1s(b*b,k2hat)+dyad4s(b)*(4*k2);
 	
 	return K4;
 }

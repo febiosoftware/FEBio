@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "FEPermRefOrtho.h"
 
+
+// register the material with the framework
+REGISTER_MATERIAL(FEPermRefOrtho, "perm-ref-ortho");
+
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefOrtho, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");
@@ -126,9 +130,9 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	double f, k0, k1, k2, K0prime, K1prime, K2prime;
 	mat3ds k0hat, k1hat, k2hat;
 	k0 = m_perm0*pow((J-phi0)/(1-phi0),m_alpha0)*exp(m_M0*(J*J-1.0)/2.0);
-	K0prime = (J*J*m_M0+(J*(m_alpha0+1)-phi0)/(J-phi0))*k0;
+	K0prime = (1+J*(m_alpha0/(J-m_phi0)+m_M0*J))*k0;
 	k0hat = mat3dd(K0prime);
-	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*2*k0;
+	tens4ds K4 = dyad1s(I,k0hat)/2.0-dyad4s(I)*(2*k0);
 	for (a=0; a<3; a++) {
 		f = pow((J-phi0)/(1-phi0),m_alpha[a])*exp(m_M[a]*(J*J-1.0)/2.0);
 		k1 = m_perm1[a]/(J*J)*f;
@@ -138,7 +142,7 @@ tens4ds FEPermRefOrtho::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 		k1hat = mat3dd(K1prime);
 		k2hat = mat3dd(K2prime);
 		K4 += (dyad1s(m[a],k1hat) + dyad1s(m[a]*b+b*m[a],k2hat))/2.0
-		+dyad4s(m[a],b)*2.0;
+		+dyad4s(m[a],b)*(2.0*k2);
 	}
 	
 	return K4;
