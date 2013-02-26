@@ -17,6 +17,9 @@ public:
 	
 	//! initialize class
 	bool Initialize(FEModel& fem);
+
+	//! reset domain data
+	void Reset();
 	
 /*	//! return element stiffness matrix
 	void ElementStiffness(FEModel& fem, int iel, matrix& ke) {

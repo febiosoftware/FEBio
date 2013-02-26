@@ -183,8 +183,7 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 	}
 	
 	// evaluate at a
-	bool bret = FESolve(x, a, y);
-	if (bret == false) throw FEErrorTermination();
+	if (FESolve(x, a, y) == false) throw FEErrorTermination();
 	
 	m_yopt = y;
 
@@ -200,7 +199,7 @@ void FELMOptimizeMethod::ObjFun(vector<double>& x, vector<double>& a, vector<dou
 		a1[i] = a1[i] + dir*m_fdiff*(fabs(b) + fabs(a[i]));
 		assert(a1[i] != a[i]);
 
-		FESolve(x, a1, y1);
+		if (FESolve(x, a1, y1) == false) throw FEErrorTermination();
 		for (int j=0; j<ndata; ++j) dyda[j][i] = (y1[j] - y[j])/(a1[i] - a[i]);
 		a1[i] = a[i];
 	}
