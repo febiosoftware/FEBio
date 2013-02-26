@@ -50,6 +50,9 @@ bool FEBiphasicSolidDomain::Initialize(FEModel &mdl)
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::Reset()
 {
+	// reset base class data
+	FEElasticSolidDomain::Reset();
+
 	// get the biphasic material
 	FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(GetMaterial());
 	assert(pmb);
