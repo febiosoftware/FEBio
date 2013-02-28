@@ -8,6 +8,57 @@
 #include <string.h>
 
 //-----------------------------------------------------------------------------
+LogFileStream::LogFileStream()
+{
+	m_fp = 0;
+}
+
+//-----------------------------------------------------------------------------
+LogFileStream::~LogFileStream()
+{
+	close();
+}
+
+//-----------------------------------------------------------------------------
+void LogFileStream::close()
+{
+	if (m_fp) fclose(m_fp);
+	m_fp = 0;
+}
+
+//-----------------------------------------------------------------------------
+void LogFileStream::flush()
+{
+	if (m_fp) fflush(m_fp);
+}
+
+//-----------------------------------------------------------------------------
+bool LogFileStream::open(const char* szfile)
+{
+	if (m_fp) close();
+	m_fp = fopen(szfile, "wt");
+	return (m_fp != NULL);
+}
+
+//-----------------------------------------------------------------------------
+bool LogFileStream::append(const char* szfile)
+{
+	// make sure we don't have a log file already open
+	if (m_fp) return false;
+
+	// create the log file
+	m_fp = fopen(szfile, "a+t");
+
+	return (m_fp != NULL);
+}
+
+//-----------------------------------------------------------------------------
+void LogFileStream::print(const char* sztxt)
+{
+	fprintf(m_fp, sztxt);
+}
+
+//=============================================================================
 // The one-and-only logfile
 Logfile& clog = *Logfile::GetInstance();
 
@@ -15,7 +66,6 @@ Logfile& clog = *Logfile::GetInstance();
 Logfile* Logfile::m_plog = 0;
 
 //-----------------------------------------------------------------------------
-
 Logfile* Logfile::GetInstance()
 {
 	if (m_plog == 0) m_plog = new Logfile();
@@ -23,19 +73,18 @@ Logfile* Logfile::GetInstance()
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION: Logfile::Logfile
 // constructor for the Logfile class
-//
 Logfile::Logfile()
 {
 	m_fp = 0;
 	m_szfile[0] = 0;
 
+	m_ps = 0;
+
 	m_mode = FILE_AND_SCREEN;
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION: Logfile::~Logfile
 // destructor for the Logfile class
 //
 Logfile::~Logfile()
@@ -45,44 +94,26 @@ Logfile::~Logfile()
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION: Logfile::open
 // open a file
 //
 bool Logfile::open(const char* szfile)
 {
-	// close the previously open logfile
-	if (m_fp) fclose(m_fp);
-
-	// create the log file
-	m_fp = fopen(szfile, "wt");
-
 	strcpy(m_szfile, szfile);
-
-	return (m_fp != 0);
+	if (m_fp == 0) m_fp = new LogFileStream;
+	return m_fp->open(szfile);
 }
 
 //-----------------------------------------------------------------------------
-// FUNCTION: Logfile::append
 //  opens a file and prepares for appending
 //
-
 bool Logfile::append(const char* szfile)
 {
-	// make sure we don't have a log file already open
-	if (m_fp) return false;
-
-	// create the log file
-	m_fp = fopen(szfile, "a+t");
-
 	// store a copy of the filename
 	strcpy(m_szfile, szfile);
-
-	return (m_fp != 0);
+	return m_fp->append(szfile);
 }
 
-
 //-----------------------------------------------------------------------------
-// FUNCTION: Logfile::print
 // This function works like all other printf functions
 // with the exception that everything that is output to the file
 // is (optionally) also output to the screen.
@@ -101,7 +132,7 @@ void Logfile::printf(const char* sz, ...)
 	va_end(args);
 	
 	// print to file
-	if (m_fp && (m_mode & FILE_ONLY)) fprintf(m_fp, sztxt);
+	if (m_fp && (m_mode & FILE_ONLY)) m_fp->print(sztxt);
 
 	// print to screen
 	if (m_ps && (m_mode & SCREEN_ONLY)) m_ps->print(sztxt);
@@ -157,7 +188,6 @@ void Logfile::printbox(const char* sztitle, const char* sz, ...)
 
 
 //-----------------------------------------------------------------------------
-// FUNCTION: Logfile::SetMode
 // Sets the Logfile mode. 
 //
 Logfile::MODE Logfile::SetMode(Logfile::MODE mode)

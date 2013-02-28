@@ -20,6 +20,43 @@ public:
 
 	// override function to print
 	virtual void print(const char* sz) = 0;
+
+	// flush the stream
+	virtual void flush() {}
+};
+
+//-----------------------------------------------------------------------------
+// A stream that outputs to a file
+class LogFileStream : public LogStream
+{
+public:
+	// constructor
+	LogFileStream();
+
+	// destructor
+	~LogFileStream();
+
+	// open the file
+	bool open(const char* szfile);
+
+	// open for appending
+	bool append(const char* szfile);
+
+	// close the file stream
+	void close();
+
+	// get the file handle
+	FILE* GetFileHandle() { return m_fp; }
+
+public:
+	// print text to the file
+	void print(const char* sz);
+
+	// flush the stream
+	void flush();
+
+private:
+	FILE*	m_fp;
 };
 
 //-----------------------------------------------------------------------------
@@ -63,16 +100,13 @@ public:
 	MODE GetMode() {return m_mode; }
 
 	//! flush the logfile
-	void flush() { if (m_fp) fflush(m_fp); }
+	void flush() { if (m_fp) m_fp->flush(); }
 
 	//! close the logfile
-	void close() { if (m_fp) fclose(m_fp); m_fp = 0; }
+	void close() { if (m_fp) m_fp->close(); }
 
 	//! return the file name
 	const char* FileName() { return m_szfile; }
-
-	//! return a file pointer
-	operator FILE* () { return m_fp; }
 
 	//! returns if the logfile is ready to be written to
 	bool is_valid() { return (m_fp != 0); }
@@ -80,13 +114,16 @@ public:
 	// set the log stream
 	void SetLogStream(LogStream* ps) { m_ps = ps; }
 
+	// return the file handle
+	operator FILE* () { return m_fp->GetFileHandle(); }
+
 private:
 	//! constructor is private so that you cannot create it directly
 	Logfile();
 	Logfile(const Logfile& log){}
 
 protected:
-	FILE*	m_fp;	//!< the actual log file
+	LogFileStream*	m_fp;	//!< the actual log file
 
 	LogStream*	m_ps;	//!< This stream is used to output to the screen
 

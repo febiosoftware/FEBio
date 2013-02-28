@@ -18,10 +18,10 @@
 class CWnd;
 
 //-----------------------------------------------------------------------------
-class FETMProgress : public Progress
+class Progress
 {
 public:
-	FETMProgress(Fl_Progress* pw);
+	Progress(Fl_Progress* pw);
 	void SetProgress(double f);
 
 protected:

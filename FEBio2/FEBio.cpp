@@ -80,7 +80,7 @@ struct CMDOPTIONS
 // forward declarations
 //
 bool ParseCmdLine(int argc, char* argv[], CMDOPTIONS& ops);
-void Hello(FILE* fp);
+void Hello();
 int prompt(CMDOPTIONS& ops);
 int get_app_path (char *pname, size_t pathsize);
 extern void InitFEBioLibrary();
@@ -92,6 +92,34 @@ class ConsoleStream : public LogStream
 public:
 	void print(const char* sz) { printf(sz); }
 };
+
+//-----------------------------------------------------------------------------
+// callback to update window title
+void update_console_cb(FEModel* pfem, void* pd)
+{
+	FEM& fem = dynamic_cast<FEM&>(*pfem);
+
+	// get the number of steps
+	int nsteps = fem.Steps();
+
+	// calculate progress
+	double starttime = fem.m_ftime0;
+	double endtime = fem.GetCurrentStep()->m_tend;
+	double f = 100.f*(fem.m_ftime - starttime) / (endtime - starttime);
+
+	// check debug flag
+	bool bdebug = fem.GetDebugFlag();
+
+	// obtain a pointer to the console object. We'll use this to
+	// set the title of the console window.
+	Console* pShell = Console::GetHandle();
+
+	// print progress in title bar
+	if (nsteps > 1)
+		pShell->SetTitle("(step %d/%d: %.f%%) %s - %s", fem.m_nStep+1, nsteps, f, fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+	else
+		pShell->SetTitle("(%.f%%) %s - %s", f, fem.GetFileTitle(), (bdebug?"FEBio (debug mode)": "FEBio"));
+}
 
 //-----------------------------------------------------------------------------
 // The starting point of the application
@@ -109,7 +137,7 @@ int main(int argc, char* argv[])
 	LoadLicenseFile();
 
 	// print welcome message
-	if (ops.bsplash && (!ops.bsilent)) Hello(stdout);
+	if (ops.bsplash && (!ops.bsilent)) Hello();
 
 	// if silent mode only output to file
 	if (ops.bsilent) clog.SetMode(Logfile::FILE_ONLY);
@@ -125,6 +153,9 @@ int main(int argc, char* argv[])
 
 	// create the one and only FEM object
 	FEM fem;
+
+	// register update callback
+	fem.AddCallback(update_console_cb, 0);
 
 	// intialize the framework
 	FEBioCommand::SetFEM(&fem);

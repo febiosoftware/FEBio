@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "FEBioLib/FEOptimizer.h"
+#include "FEOptimizer.h"
+#include "FELMOptimizeMethod.h"
 
 //-----------------------------------------------------------------------------
 // FEOptimizeInput
@@ -264,15 +264,6 @@ bool FEOptimizeInput::ParseLoadData(XMLTag &tag, FEOptimizeData& opt)
 	}
 	while (!tag.isend());
 
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-// FENAGOptimizeMethod
-//-----------------------------------------------------------------------------
-
-bool FENAGOptimizeMethod::Solve(FEOptimizeData *pOpt)
-{
 	return true;
 }
 

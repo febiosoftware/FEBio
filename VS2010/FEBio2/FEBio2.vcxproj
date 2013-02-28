@@ -530,7 +530,6 @@
     <ClInclude Include="..\..\FEBio2\CommandManager.h" />
     <ClInclude Include="..\..\FEBio2\console.h" />
     <ClInclude Include="..\..\FEBio2\FEBioCommand.h" />
-    <ClInclude Include="..\..\FEBio2\FEBioProgress.h" />
     <ClInclude Include="..\..\FEBio2\FEBioStdSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEDiagnostic.h" />
@@ -551,7 +550,6 @@
     <ClCompile Include="..\..\FEBio2\diagnose.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBio.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioCommand.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEBioProgress.cpp" />
     <ClCompile Include="..\..\FEBio2\FEBioStdSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp" />
@@ -562,12 +560,8 @@
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
-    <ClCompile Include="..\..\FEBio2\levmar.cpp" />
-    <ClCompile Include="..\..\FEBio2\optimize.cpp" />
     <ClCompile Include="..\..\FEBio2\plugin.cpp" />
-    <ClCompile Include="..\..\FEBio2\powell.cpp" />
     <ClCompile Include="..\..\FEBio2\restart.cpp" />
-    <ClCompile Include="..\..\FEBio2\solve.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FEMemoryDiagnostic.h"
 #include "FECore/log.h"
-#include "FEBioProgress.h"
 #include "console.h"
 
 FEMemoryDiagnostic::FEMemoryDiagnostic(FEModel& fem) : FEDiagnostic(fem)
@@ -47,14 +46,12 @@ bool FEMemoryDiagnostic::Run()
 	// turn the console off
 	Console::GetHandle()->Deactivate();
 
-	FEBioProgress prg(m_fem);
-
 	// run the problem
 	for (int i=0; i<m_iters; ++i)
 	{
 		fprintf(stderr, "%d/%d: ...", i+1, m_iters);
 		m_fem.Reset();
-		bool b = m_fem.Solve(prg);
+		bool b = m_fem.Solve();
 //		system("ps -C febio.test -o rss,vsize h");
 		fprintf(stderr, "%s\n", (b?"NT" : "ET"));
 	}

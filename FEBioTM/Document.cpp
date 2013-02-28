@@ -35,7 +35,7 @@ void LogBuffer::print(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
-FETMProgress::FETMProgress(Fl_Progress* pw) : m_pw(pw)
+Progress::Progress(Fl_Progress* pw) : m_pw(pw)
 {
 	pw->maximum(100.f); 
 	pw->minimum(0.f); 
@@ -43,7 +43,7 @@ FETMProgress::FETMProgress(Fl_Progress* pw) : m_pw(pw)
 }
 
 //-----------------------------------------------------------------------------
-void FETMProgress::SetProgress(double f)
+void Progress::SetProgress(double f)
 {
 	static char sz[256] = {0};
 
@@ -169,7 +169,7 @@ void* febio_func(void* pd)
 			Fl::awake((void*)0);
 
 			// set-up the progress tracker
-			FETMProgress prg(pw);
+			Progress prg(pw);
 
 			// run the task
 			pt->Run(prg);

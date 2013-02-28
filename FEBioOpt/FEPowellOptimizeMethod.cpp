@@ -1,9 +1,13 @@
 #include "stdafx.h"
-#include "FEBioLib/FEOptimizer.h"
-#include "FECore/log.h"
-#include "FEBioProgress.h"
-#include "console.h"
+#include "FEPowellOptimizeMethod.h"
+#include <FECore/Logfile.h>
 
+//-----------------------------------------------------------------------------
+// declared in dllmain.cpp
+extern FEBioKernel* pFEBio;
+static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
+
+//-----------------------------------------------------------------------------
 // forward declarations
 void linmin(double* p, double* xi, int n, double* fret, double (*fnc)(double[]));
 void powell(double* p, double* xi, int n, double ftol, int* iter, double* fret, double (*fnc)(double[]));
@@ -62,18 +66,20 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	double fret = 0;
 	powell(p, xi, nvar, 0.001, &niter, &fret, objfun);
 
-	clog.SetMode(Logfile::FILE_AND_SCREEN);
+	Logfile& log = GetLogfile();
 
-	clog.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
+	log.SetMode(Logfile::FILE_AND_SCREEN);
 
-	clog.printf("\tMajor iterations ....................... : %d\n\n", niter);
-	clog.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
+	log.printf("\nP A R A M E T E R   O P T I M I Z A T I O N   R E S U L T S\n\n");
 
-	clog.printf("\tVariables:\n\n");
+	log.printf("\tMajor iterations ....................... : %d\n\n", niter);
+	log.printf("\tMinor iterations ....................... : %d\n\n", opt.m_niter);
+
+	log.printf("\tVariables:\n\n");
 	for (i=0; i<nvar; ++i)
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
-		clog.printf("\t\t%-15s : %.16lg\n", var.m_szname, p[i]);
+		log.printf("\t\t%-15s : %.16lg\n", var.m_szname, p[i]);
 	}
 
 	// evaluate reaction forces at correct times
@@ -81,16 +87,16 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 	FELoadCurve& rlc = opt.ReactionLoad();
 	FELoadCurve& olc = opt.GetLoadCurve(obj.m_nlc);
 
-	clog.printf("\n\tFunction values:\n\n");
-	clog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+	log.printf("\n\tFunction values:\n\n");
+	log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 	for (i=0; i<olc.Points(); ++i)
 	{
 		LOADPOINT& p = olc.LoadPoint(i);
 		double f = rlc.Value(p.time);
-		clog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, f, p.value, fabs(f - p.value));
+		log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, f, p.value, fabs(f - p.value));
 	}
 
-	clog.printf("\n\tFinal objective value: %15lg\n\n", fret);
+	log.printf("\n\tFinal objective value: %15lg\n\n", fret);
 
 	// done
 	delete [] p;
@@ -137,7 +143,9 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	FELoadCurve& lc = opt.ReactionLoad();
 	lc.Clear();
 
-	clog.printf("\n----- Iteration: %d -----\n", opt.m_niter);
+	Logfile& log = GetLogfile();
+
+	log.printf("\n----- Iteration: %d -----\n", opt.m_niter);
 
 	// set the material parameters
 	int nvar = opt.Variables();
@@ -145,48 +153,44 @@ double FEPowellOptimizeMethod::ObjFun(double *p)
 	{
 		OPT_VARIABLE& var = opt.Variable(i);
 		*(var.m_pd) = p[i];
-		clog.printf("  %-15s: %.16lg\n", var.m_szname, p[i]);
+		log.printf("  %-15s: %.16lg\n", var.m_szname, p[i]);
 	}
 
 	// reset the FEM data
 	fem.Reset();
 
 	// suppress output
-	clog.SetMode(Logfile::NEVER);
-	Console* pwnd = Console::GetHandle();
-	pwnd->Deactivate();
+	log.SetMode(Logfile::NEVER);
 
 	double fobj = 0;
 
-	FEBioProgress prg(fem);
-
-	if (fem.Solve(prg) == false)
+	if (fem.Solve() == false)
 	{
-		printf("\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
+		log.printf("\n\n\nAAAAAAAAARRRRRRRRRGGGGGGGGHHHHHHHHHHH !!!!!!!!!!!!!\n\n\n\n");
 		return 0;
 	}
 	else
 	{
-		clog.SetMode(Logfile::FILE_AND_SCREEN);
+		log.SetMode(Logfile::FILE_AND_SCREEN);
 
 		// evaluate reaction forces at correct times
 		OPT_OBJECTIVE& obj = opt.GetObjective();
 		FELoadCurve& rlc = opt.ReactionLoad();
 		FELoadCurve& olc = opt.GetLoadCurve(obj.m_nlc);
 
-		clog.printf("\n\tFunction values:\n\n");
-		clog.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
+		log.printf("\n\tFunction values:\n\n");
+		log.printf("               CURRENT        REQUIRED      DIFFERENCE\n");
 		for (int i=0; i<olc.Points(); ++i)
 		{
 			LOADPOINT& p = olc.LoadPoint(i);
 
 			double f = rlc.Value(p.time);
 			fobj += (f - p.value)*(f - p.value);
-			clog.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, f, p.value, fabs(f - p.value));
+			log.printf("%5d: %15.10lg %15.10lg %15lg\n", i+1, f, p.value, fabs(f - p.value));
 		}
 	}
 
-	clog.printf("\n objective function: %.16lg\n", fobj);
+	log.printf("\n objective function: %.16lg\n", fobj);
 
 	return fobj;
 }

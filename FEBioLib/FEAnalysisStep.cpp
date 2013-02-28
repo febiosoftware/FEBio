@@ -423,7 +423,7 @@ bool FEAnalysisStep::InitConstraints()
 }
 
 //-----------------------------------------------------------------------------
-bool FEAnalysisStep::Solve(Progress& prg)
+bool FEAnalysisStep::Solve()
 {
 	// convergence flag
 	// we initialize it to true so that when a restart is performed after 
@@ -435,9 +435,6 @@ bool FEAnalysisStep::Solve(Progress& prg)
 //	double endtime = m_fem.m_ftime0 + m_ntime*m_dt0;
 	double endtime = m_tend;
 	const double eps = endtime*1e-7;
-
-	// set progress
-	prg.SetProgress(100.f*(m_fem.m_ftime - starttime) / (endtime - starttime));
 
 	// print initial progress bar
 	if (GetPrintLevel() == FE_PRINT_PROGRESS)
@@ -650,9 +647,6 @@ bool FEAnalysisStep::Solve(Progress& prg)
 		// flush the m_log file, so we don't loose anything if 
 		// the next timestep goes wrong
 		clog.flush();
-
-		// set progress
-		prg.SetProgress(100.f*(m_fem.m_ftime - starttime) / (endtime - starttime));
 	}
 
 	if ((m_nplot == FE_PLOT_FINAL) && bconv) m_fem.Write();

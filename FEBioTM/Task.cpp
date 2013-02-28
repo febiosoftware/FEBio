@@ -49,6 +49,24 @@ void CTask::Revert()
 }
 
 //-----------------------------------------------------------------------------
+// This callback will update the UI
+void update_ui_cb(FEModel* pfem, void* pd)
+{
+	Progress* pp = (Progress*) pd;
+
+	// get the number of steps
+	int nsteps = pfem->Steps();
+
+	// calculate progress
+	double starttime = pfem->m_ftime0;
+	double endtime = pfem->GetCurrentStep()->m_tend;
+	double f = 100.f*(pfem->m_ftime - starttime) / (endtime - starttime);
+
+	// set the progress (will also update UI)
+	pp->SetProgress(f);
+}
+
+//-----------------------------------------------------------------------------
 void CTask::Run(Progress& prg)
 {
 	// set the status to running
@@ -60,6 +78,9 @@ void CTask::Run(Progress& prg)
 
 	// setup the FE problem
 	FEM fem(this);
+
+	// set the callback function
+	fem.AddCallback(update_ui_cb, &prg);
 
 	// set the default output file names
 	char szbase[1024] = {0}, szfile[1024] = {0};
@@ -88,7 +109,7 @@ void CTask::Run(Progress& prg)
 	}
 
 	// run the problem
-	bool bret = fem.Solve(prg);
+	bool bret = fem.Solve();
 
 	// set the final status
 	// Note that the user could have cancelled this task, so

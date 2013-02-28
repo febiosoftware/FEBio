@@ -24,7 +24,7 @@ public:
 	bool Reset();
 
 	//! Solves the problem
-	bool Solve(Progress& prg);
+	bool Solve();
 
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);

@@ -2,19 +2,38 @@
 #include "FEBioFactory.h"
 #include <vector>
 
+//-----------------------------------------------------------------------------
+// Forward declaration of model class
 class FEModel;
 
 //-----------------------------------------------------------------------------
-// This is the FEBio kernel class which manages the interactions between the 
-// different executable modules. In particular, it manages the factory classes
-// which are responsible for the life of different classes
+// forward declaration of the log file
+class Logfile;
+
+//-----------------------------------------------------------------------------
+// This is the FEBio kernel class that manages the interactions between the 
+// different modules. In particular, it manages the factory classes
+// which are responsible for the creation of different classes that are registered
+// with the kernel.
+
+// TODO: I am using template definitions in this class which means that different plugins
+//       will see a different interface to FEBioKernel, depending on the classes that
+//		 are registered in the pluing. Could this be a problem?
+//
 class FEBioKernel
 {
 public:
+	// Do not call this function from a plugin as it will not return the correct
+	// instance. Instead, use the FEBioKernel object that is passed in the RegisterFEBioPlugin method
 	static FEBioKernel& GetInstance();
+
+	// Get the logfile
+	Logfile& GetLogfile();
 
 public:
 	void RegisterClass(FEBioFactory* ptf) { m_Fac.push_back(ptf); }
+
+public:
 	template <typename T> T* Create(const char* sztag, FEModel* pfem);
 
 	template <typename T> const char* GetTypeStr(T* po);
@@ -23,13 +42,18 @@ public:
 
 	template <typename T> int Count();
 
-protected:
-	std::vector<FEBioFactory*>	m_Fac;
+private:
+	std::vector<FEBioFactory*>	m_Fac;	// list of registered factory classes
+
+	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
+
+private: // make singleton
+	FEBioKernel();
+	FEBioKernel(const FEBioKernel&){}
+	void operator = (const FEBioKernel&){}
 
 private:
-	FEBioKernel(){}
-	FEBioKernel(const FEBioKernel&){}
-	static FEBioKernel* m_pKernel;
+	static FEBioKernel* m_pKernel;	// the one-and-only kernel object
 };
 
 //-----------------------------------------------------------------------------

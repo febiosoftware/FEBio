@@ -15,15 +15,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FEBioOptimize : public FEBioTask
-{
-public:
-	FEBioOptimize(FEModel* pfem) : FEBioTask(pfem){}
-	//! Run the FE model
-	virtual bool Run(const char* szfile);
-};
-
-//-----------------------------------------------------------------------------
 class FEBioDiagnostic : public FEBioTask
 {
 public:

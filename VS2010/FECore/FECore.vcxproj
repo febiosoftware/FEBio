@@ -515,6 +515,7 @@
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
     <ClInclude Include="..\..\FECore\log.h" />
     <ClInclude Include="..\..\FECore\Logfile.h" />
+    <ClInclude Include="..\..\FECore\LogStream.h" />
     <ClInclude Include="..\..\FECore\mat2d.h" />
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />

@@ -49,7 +49,7 @@ public:
 	virtual bool Reset() = 0;
 
 	// solve the model
-	virtual bool Solve(Progress& prg) = 0;
+	virtual bool Solve() = 0;
 
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }

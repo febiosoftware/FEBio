@@ -197,7 +197,7 @@ bool FEBioModel::Reset()
 		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
 
 		// print welcome message to file
-		Hello(log);
+		Hello();
 	}
 */
 	// do the callback
@@ -1497,7 +1497,7 @@ void FEBioModel::SerializeDataStore(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 // Forward declarations
-void Hello(FILE* fp);
+void Hello();
 
 //-----------------------------------------------------------------------------
 //! This function performs one-time-initialization stuff. All the different 
@@ -1521,7 +1521,9 @@ bool FEBioModel::Init()
 		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) clog.SetMode(Logfile::FILE_ONLY);
 
 		// print welcome message to file
-		Hello(clog);
+		Logfile::MODE m = clog.SetMode(Logfile::FILE_ONLY);
+		Hello();
+		clog.SetMode(m);
 	}
 
 	// intitialize time
@@ -2522,7 +2524,7 @@ bool FEBioModel::InitPoroSolute()
 //! and solves each one in turn. 
 //! \sa FEAnalysisStep
 
-bool FEBioModel::Solve(Progress& prg)
+bool FEBioModel::Solve()
 {
 	// echo fem data to the logfile
 	// we do this here (and not e.g. directly after input)
@@ -2554,7 +2556,7 @@ bool FEBioModel::Solve(Progress& prg)
 		}
 
 		// solve the analaysis step
-		bconv = m_pStep->Solve(prg);
+		bconv = m_pStep->Solve();
 
 		// break if the step has failed
 		if (bconv == false) break;
@@ -2583,8 +2585,8 @@ bool FEBioModel::Solve(Progress& prg)
 		clog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
 	}
 
-	// close the log file
-	clog.close();
+	// flush the log file
+	clog.flush();
 
 	// We're done !
 	return bconv;
