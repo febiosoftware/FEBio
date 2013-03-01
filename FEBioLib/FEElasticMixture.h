@@ -60,10 +60,16 @@ public:
 		pt->m_w.resize(m_pMat.size());
 		return pt;
 	}
+
+	// return number of materials
+	int Materials() { return m_pMat.size(); }
+
+	// return a material component
+	FEElasticMaterial* GetMaterial(int i) { return m_pMat[i]; }
+
+	// Add a material component
+	void AddMaterial(FEElasticMaterial* pm) { m_pMat.push_back(pm); }
 	
-public:
-	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials
-		
 public:
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);
@@ -73,4 +79,7 @@ public:
 		
 	//! data initialization and checking
 	void Init();
+
+private:
+	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic materials
 };

@@ -95,18 +95,12 @@ public:
 
 	void Init();
 
-	double Density() { return m_density; } 
-
-	double MolarMass() { return m_molarmass; }
-
 	void Serialize(DumpFile& ar);
 
 	//! Get the elastic component
 	FEElasticMaterial* GetElasticMaterial() { return this; }
 
 public:
-	double	m_density;	//!< material density
-	double	m_molarmass;//!< material molar mass (molecular weight)
 	bool	m_unstable;	//!< flag indicating whether material is unstable on its own
 
 	FECoordSysMap*	m_pmap;	//!< local material coordinate system

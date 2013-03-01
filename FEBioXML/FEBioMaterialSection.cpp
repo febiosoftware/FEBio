@@ -577,16 +577,10 @@ bool FEBioMaterialSection::ParseElasticMixture(XMLTag &tag, FEElasticMixture *pm
 		
 		// make sure the base material is a valid material (i.e. an elastic material)
 		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
-		
-		// don't allow rigid bodies
-		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
-		{
-			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in solid mixture material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
+		if (pme == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 		
 		// set the solid material pointer
-		pm->m_pMat.push_back(pme);
+		pm->AddMaterial(pme);
 		
 		// set the material's name
 		if (szname) pme->SetName(szname);

@@ -112,10 +112,14 @@ public:
 	mat3ds Tangent_Concentration(FEMaterialPoint& pt, const int isol);
 	
 	//! return the material density
-	virtual double Density() = 0;
+	virtual double Density() { return m_density; }
 
 	//! return the molar mass
-	virtual double MolarMass() = 0;
+	virtual double MolarMass() { return m_molarmass; }
+
+protected:
+	double	m_density;	//!< material density
+	double	m_molarmass;//!< material molar mass (molecular weight)
 };
 
 //-----------------------------------------------------------------------------

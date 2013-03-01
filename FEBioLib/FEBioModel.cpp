@@ -241,13 +241,14 @@ double* FindSolidMixtureParameter(const char* szvar, const int index, FEElasticM
 	*ch = 0;
 	const char* szvar2 = ch+1;
 	
-	FEMaterial* pmat;
-	for (int i=0; i<(int) pme->m_pMat.size(); ++i) {
-		if (strcmp(szvar, pme->m_pMat[i]->GetName()) == 0)
+	int NMAT = pme->Materials();
+	for (int i=0; i<NMAT; ++i) 
+	{
+		FEElasticMaterial* pmi = pme->GetMaterial(i);
+		if (strcmp(szvar, pmi->GetName()) == 0)
 		{
 			// search the nested material parameter list
-			pmat = pme->m_pMat[i];
-			FEParameterList& pl = pmat->GetParameterList();
+			FEParameterList& pl = pmi->GetParameterList();
 			FEParam* pp = pl.Find(szvar2);
 			if (pp) return pp->pvalue<double>(index);
 			else return 0;
@@ -543,8 +544,9 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 	FEElasticMixture* pem = dynamic_cast<FEElasticMixture*>(pm);
 	if (pem)
 	{
-		for (int i=0; i < (int) pem->m_pMat.size(); ++i)
-			EvaluateMaterialParameters(pem->m_pMat[i]);
+		int NMAT = pem->Materials();
+		for (int i=0; i<NMAT; ++i)
+			EvaluateMaterialParameters(pem->GetMaterial(i));
 	}
 	
 	FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pm);

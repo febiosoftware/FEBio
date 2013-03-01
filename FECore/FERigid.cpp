@@ -6,7 +6,7 @@
 #include "FERigid.h"
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FERigidMaterial, FEElasticMaterial)
+BEGIN_PARAMETER_LIST(FERigidMaterial, FESolidMaterial)
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
 	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 END_PARAMETER_LIST();
@@ -31,7 +31,7 @@ FERigidMaterial::FERigidMaterial()
 // Initialize rigid material data
 void FERigidMaterial::Init()
 {
-	FEElasticMaterial::Init();
+	FESolidMaterial::Init();
 
 	if (m_E <= 0) throw MaterialError("Invalid value for E");
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialError("Invalid value for v");
@@ -42,7 +42,7 @@ void FERigidMaterial::Init()
 void FERigidMaterial::Serialize(DumpFile &ar)
 {
 	// serialize base class parameters
-	FEElasticMaterial::Serialize(ar);
+	FESolidMaterial::Serialize(ar);
 
 	// TODO: do we really need to store this data?
 	if (ar.IsSaving())

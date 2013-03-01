@@ -89,7 +89,7 @@ void FERigidBody::UpdateCOM()
 			if (pm && (pm->m_nRB == m_nID))
 			{
 				// get the material density
-				double dens = pm->m_density;
+				double dens = pm->Density();
 
 				// loop over all elements
 				for (int iel=0; iel<pbd->Elements(); ++iel)

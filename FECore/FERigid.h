@@ -17,7 +17,7 @@
 //! Since rigid elements are skipped during the stiffness and residual calculations
 //! we don't implement the Stress and Tangent functions
 
-class FERigidMaterial : public FEElasticMaterial
+class FERigidMaterial : public FESolidMaterial
 {
 public:
 	FERigidMaterial();
