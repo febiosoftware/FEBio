@@ -137,7 +137,7 @@ public: // material properties
 	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
 	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FESolute*					m_pSolute[2];	//!< pointer to solute materials
+	vector<FESolute*>			m_pSolute;		//!< pointer to solute materials
 
 	DECLARE_PARAMETER_LIST();
 };

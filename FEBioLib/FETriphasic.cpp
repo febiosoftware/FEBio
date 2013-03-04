@@ -41,6 +41,8 @@ void FETriphasic::Init()
 	m_pSolid->Init();
 	m_pPerm->Init();
 	m_pOsmC->Init();
+
+	if (m_pSolute.size() != 2) throw MaterialError("Exactly two solutes must be specified");
 	m_pSolute[0]->Init(); m_pSolute[1]->Init();
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");

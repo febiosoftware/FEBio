@@ -1,5 +1,6 @@
 #include "FEOptimizer.h"
 #include "FELMOptimizeMethod.h"
+#include <FECore/Logfile.h>
 
 //-----------------------------------------------------------------------------
 // FEOptimizeInput
@@ -110,6 +111,19 @@ bool FEOptimizeInput::ParseOptions(XMLTag& tag, FEOptimizeData& opt)
 		{
 			if      (tag == "obj_tol"     ) tag.value(popt->m_objtol);
 			else if (tag == "f_diff_scale") tag.value(popt->m_fdiff );
+			else if (tag == "max_iter"    ) tag.value(popt->m_nmax  );
+//			else if (tag == "print_cov"   ) tag.value(popt->m_bcov  );
+            else if (tag == "log_level"   )
+            {
+                char szval[256];
+                tag.value(szval);
+                if		(strcmp(szval, "LOG_DEFAULT"        ) == 0) {} // don't change the plot level
+                else if (strcmp(szval, "LOG_NEVER"          ) == 0) popt->m_loglevel = Logfile::NEVER;
+                else if (strcmp(szval, "LOG_FILE_ONLY"      ) == 0) popt->m_loglevel = Logfile::FILE_ONLY;
+                else if (strcmp(szval, "LOG_SCREEN_ONLY"    ) == 0) popt->m_loglevel = Logfile::SCREEN_ONLY;
+                else if (strcmp(szval, "LOG_FILE_AND_SCREEN") == 0) popt->m_loglevel = Logfile::FILE_AND_SCREEN;
+                else throw XMLReader::InvalidValue(tag);
+            }
 			else throw XMLReader::InvalidTag(tag);
 
 			++tag;

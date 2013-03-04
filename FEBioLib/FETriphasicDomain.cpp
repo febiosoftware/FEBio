@@ -1000,11 +1000,10 @@ void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, doubl
 //!
 bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
-	int i, j, n;
+	int i, j, isol, jsol, ksol, n;
 	
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
-	int ndpn = 6;
 	
 	double *Gr, *Gs, *Gt, *H;
 	double Gx, Gy, Gz, GX, GY, GZ;
@@ -1012,8 +1011,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 	// jacobian
 	double Ji[3][3], detJ, J0i[3][3];
 	
-	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
+	// Gradient of shape functions
 	vector<vec3d> gradN(neln);
 	double tmp;
 	
@@ -1021,23 +1019,25 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 	double* gw = el.GaussWeights();
 	
 	FEMesh& mesh = *GetMesh();
-
-	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (GetMaterial()); assert(pm);
-	int id0 = pm->m_pSolute[0]->GetSoluteID();
-	int id1 = pm->m_pSolute[1]->GetSoluteID();
 	
-	const int NE = FEElement::MAX_NODES;
-	vec3d r0[NE], rt[NE], rp[NE], v[NE];
-	double cp[2][NE];
-	for (i=0; i<neln; ++i) 
+	// get the element's material
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (GetMaterial());
+	assert(pm);
+    
+	const int nsol = 2;
+	int ndpn = 4+nsol;
+    int sid[nsol];
+	for (isol=0; isol<nsol; ++isol)
+		sid[isol] = pm->m_pSolute[isol]->GetSoluteID();
+	
+	vec3d rp[FEElement::MAX_NODES], v[FEElement::MAX_NODES];
+    double cp[nsol][FEElement::MAX_NODES];
+	for (i=0; i<neln; ++i)
 	{
-		r0[i] = mesh.Node(el.m_node[i]).m_r0;
-		rt[i] = mesh.Node(el.m_node[i]).m_rt;
 		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[id0];
-		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[id1];
 		v[i]  = mesh.Node(el.m_node[i]).m_vt;
+		for (isol=0; isol<nsol; ++isol)
+			cp[isol][i] = mesh.Node(el.m_node[i]).m_cp[sid[isol]];
 	}
 	
 	// zero stiffness matrix
@@ -1062,8 +1062,8 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
-		FESaltMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESaltMaterialPoint>());
+		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+		FESaltMaterialPoint& spt = *(mp.ExtractData<FESaltMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -1084,7 +1084,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 		Fp.zero();
 		gradv.zero();
 		vec3d vs(0);
-		double cprev[2] = {0,0};
+		vector<double> cprev(nsol,0);
 		
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -1115,14 +1115,11 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 			gradv[0][2] += v[i].x*Gz; gradv[1][2] += v[i].y*Gz; gradv[2][2] += v[i].z*Gz;
 			
 			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
 			gradN[i] = vec3d(Gx,Gy,Gz);
 			
 			// calculate effective concentration at previous time step
-			cprev[0] += cp[0][i]*H[i];
-			cprev[1] += cp[1][i]*H[i];
+			for (isol=0; isol<nsol; ++isol)
+				cprev[isol] += cp[isol][i]*H[i];
 		}
 		
 		// next we get the determinant
@@ -1137,113 +1134,128 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 		vec3d w = ppt.m_w;
 		vec3d gradp = ppt.m_gradp;
 		
-		// get the effective concentration, its gradient and its time derivative
-		double c[2] = {spt.m_c[0],spt.m_c[1]};
-		vec3d gradc[2] = {spt.m_gradc[0],spt.m_gradc[1]};
-		double dcdt[2] = {(c[0] - cprev[0])/dt,(c[1] - cprev[1])/dt};
-		
-		// get the charge number
-		double z[2] = {pm->m_pSolute[0]->ChargeNumber(),
-			pm->m_pSolute[1]->ChargeNumber()};
-		
 		// get the charge density and its derivatives
 		double phi0 = ppt.m_phi0;
 		double cF = pm->FixedChargeDensity(mp);
 		double dcFdJ = -cF/(J - phi0);
 		double dcFdJJ = 2*cF/SQR(J-phi0);
 		
-		// evaluate the solubility and its derivatives w.r.t. J and c
-		double khat[2] = {
-			pm->m_pSolute[0]->m_pSolub->Solubility(mp),
-			pm->m_pSolute[1]->m_pSolub->Solubility(mp)};
-		double dkhdJ[2] = {
-			pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain(mp),
-			pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain(mp)};
-		double dkhdJJ[2] = {
-			pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain_Strain(mp),
-			pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain_Strain(mp)};
-		double dkhdc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration(mp,1)}};
-		double dkhdJc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,1)}};
-		double dkhdcc[2][3] = {
-			{
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,1),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,1,1)},
-			{
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,1),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,1,1)}};
+		double c[nsol];
+		vec3d gradc[nsol];
+		double dcdt[nsol];
+		int z[nsol];
+		double khat[nsol];
+		double dkhdJ[nsol];
+		double dkhdJJ[nsol];
+		double dkhdc[nsol][nsol];
+		double dkhdJc[nsol][nsol];
+		double dkhdcc[nsol][nsol][nsol];
+		
+		double zeta = pm->ElectricPotential(mp, true);
+		double zz[nsol];
+		double kappa[nsol];
+		double den = 0;
+		
+		for (isol=0; isol<nsol; ++isol) {
+			// get the effective concentration, its gradient and its time derivative
+			c[isol] = spt.m_c[isol];
+			gradc[isol] = spt.m_gradc[isol];
+			dcdt[isol] = (c[isol] - cprev[isol])/dt;
+			
+			// get the charge number
+			z[isol] = pm->m_pSolute[isol]->ChargeNumber();
+			
+			// evaluate the solubility and its derivatives w.r.t. J and c
+			khat[isol] = pm->m_pSolute[isol]->m_pSolub->Solubility(mp);
+			dkhdJ[isol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain(mp);
+			dkhdJJ[isol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
+			for (jsol=0; jsol<nsol; ++jsol) {
+				dkhdc[isol][jsol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration(mp,jsol);
+				dkhdJc[isol][jsol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,jsol);
+				for (ksol=0; ksol<nsol; ++ksol) {
+					dkhdcc[isol][jsol][ksol] =
+					pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,jsol,ksol);
+				}
+			}
+			zz[isol] = pow(zeta, z[isol]);
+			kappa[isol] = zz[isol]*khat[isol];
+			den += SQR(z[isol])*kappa[isol]*c[isol];
+		}
 		
 		// evaluate electric potential (nondimensional exponential form) and its derivatives
 		// also evaluate partition coefficients and their derivatives
-		double zeta = pm->ElectricPotential(mp, true);
-		double zz[2] = {pow(zeta, z[0]), pow(zeta, z[1])};
-		double kappa[2] = {zz[0]*khat[0], zz[1]*khat[1]};
-		double den = SQR(z[0])*kappa[0]*c[0]+SQR(z[1])*kappa[1]*c[1];
 		double zidzdJ = 0;
-		double zidzdJJ = 0;
-		double zidzdc[2] = {0,0};
-		double zidzdJc[2] = {0,0};
+		double zidzdJJ = 0, zidzdJJ1 = 0, zidzdJJ2 = 0;
+		double zidzdc[nsol] = {0};
+		double zidzdJc[nsol] = {0}, zidzdJc1[nsol] = {0}, zidzdJc2[nsol] = {0};
+		double zidzdcc[nsol][nsol] = {0};
+		double zidzdcc1[nsol][nsol] = {0};
+		double zidzdcc2[nsol] = {0};
+		double zidzdcc3 = 0;
 		if (den > 0) {
-			zidzdJ = -(dcFdJ+z[0]*zz[0]*dkhdJ[0]*c[0]
-					   +z[1]*zz[1]*dkhdJ[1]*c[1])/den;
-			zidzdc[0] = -(z[0]*kappa[0]+z[0]*zz[0]*dkhdc[0][0]*c[0]+z[1]*zz[1]*dkhdc[1][0]*c[1])/den;
-			zidzdc[1] = -(z[1]*kappa[1]+z[0]*zz[0]*dkhdc[0][1]*c[0]+z[1]*zz[1]*dkhdc[1][1]*c[1])/den;
-			zidzdJJ = -(dcFdJJ+z[0]*zz[0]*c[0]*(z[0]*zidzdJ*dkhdJ[0]+dkhdJJ[0])
-						+z[1]*zz[1]*c[1]*(z[1]*zidzdJ*dkhdJ[1]+dkhdJJ[1]))/den
-			+zidzdJ*(SQR(z[0])*zz[0]*c[0]*(dkhdJ[0]+kappa[0]*(z[0]-1)*zidzdJ)
-					 +SQR(z[1])*zz[1]*c[1]*(dkhdJ[1]+kappa[1]*(z[1]-1)*zidzdJ))/den;
-			zidzdJc[0] = -(z[0]*zz[0]*dkhdJ[0]+z[0]*zz[0]*c[0]*(z[0]*zidzdc[0]*dkhdJ[0]+dkhdJc[0][0])
-						   +z[1]*zz[1]*c[1]*(z[1]*zidzdc[0]*dkhdJ[1]+dkhdJc[1][0]))/den
-			+zidzdJ*(SQR(z[0])*kappa[0]+SQR(z[0])*zz[0]*c[0]*(dkhdc[0][0]+kappa[0]*(z[0]-1)*zidzdc[0])
-					 +SQR(z[1])*zz[1]*c[1]*(dkhdc[1][0]+kappa[1]*(z[1]-1)*zidzdc[0]))/den;
-			zidzdJc[1] = -(z[1]*zz[1]*dkhdJ[1]+z[0]*zz[0]*c[0]*(z[0]*zidzdc[1]*dkhdJ[0]+dkhdJc[0][1])
-						   +z[1]*zz[1]*c[1]*(z[1]*zidzdc[1]*dkhdJ[1]+dkhdJc[1][1]))/den
-			+zidzdJ*(SQR(z[1])*kappa[1]+SQR(z[0])*zz[0]*c[0]*(dkhdc[0][1]+kappa[0]*(z[0]-1)*zidzdc[1])
-					 +SQR(z[1])*zz[1]*c[1]*(dkhdc[1][1]+kappa[1]*(z[1]-1)*zidzdc[1]))/den;
-		}
-		double dkdJ[2] = {zz[0]*dkhdJ[0]+z[0]*kappa[0]*zidzdJ,
-			zz[1]*dkhdJ[1]+z[1]*kappa[1]*zidzdJ};
-		double dkdc[2][2] = {{zz[0]*dkhdc[0][0]+z[0]*kappa[0]*zidzdc[0],
-			zz[0]*dkhdc[0][1]+z[0]*kappa[0]*zidzdc[1]},
-			{zz[1]*dkhdc[1][0]+z[1]*kappa[1]*zidzdc[0],
-				zz[1]*dkhdc[1][1]+z[1]*kappa[1]*zidzdc[1]}};
-		double dkdJJ[2] = {zz[0]*dkhdJJ[0]+2*z[0]*zz[0]*dkhdJ[0]*zidzdJ
-			+z[0]*kappa[0]*((z[0]-1)*SQR(zidzdJ)+zidzdJJ),
-			zz[1]*dkhdJJ[1]+2*z[1]*zz[1]*dkhdJ[1]*zidzdJ
-			+z[1]*kappa[1]*((z[1]-1)*SQR(zidzdJ)+zidzdJJ)};
-		double dkdJc[2][2] = {
-			{
-				zz[0]*dkhdJc[0][0]+z[0]*zz[0]*(dkhdJ[0]*zidzdc[0]+dkhdc[0][0]*zidzdJ)
-				+z[0]*kappa[0]*((z[0]-1)*zidzdc[0]*zidzdJ+zidzdJc[0]),
-				zz[0]*dkhdJc[0][1]+z[0]*zz[0]*(dkhdJ[0]*zidzdc[1]+dkhdc[0][1]*zidzdJ)
-				+z[0]*kappa[0]*((z[0]-1)*zidzdc[1]*zidzdJ+zidzdJc[1])},
-			{
-				zz[1]*dkhdJc[1][0]+z[1]*zz[1]*(dkhdJ[1]*zidzdc[0]+dkhdc[1][0]*zidzdJ)
-				+z[1]*kappa[1]*((z[1]-1)*zidzdc[0]*zidzdJ+zidzdJc[0]),
-				zz[1]*dkhdJc[1][1]+z[1]*zz[1]*(dkhdJ[1]*zidzdc[1]+dkhdc[1][1]*zidzdJ)
-				+z[1]*kappa[1]*((z[1]-1)*zidzdc[1]*zidzdJ+zidzdJc[1])}};
-		double dkdt[2] = {
-			dkdJ[0]*dJdt+dkdc[0][0]*dcdt[0]+dkdc[0][1]*dcdt[1],
-			dkdJ[1]*dJdt+dkdc[1][0]*dcdt[0]+dkdc[1][1]*dcdt[1]};
 			
-		// evaluate the permeability and its derivatives
-		mat3ds K = pm->m_pPerm->Permeability(mp);
-		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
-		mat3ds dKdc[2] = {pm->m_pPerm->Tangent_Permeability_Concentration(mp,0),
-			pm->m_pPerm->Tangent_Permeability_Concentration(mp,1)};
+			for (isol=0; isol<nsol; ++isol)
+				zidzdJ += z[isol]*zz[isol]*dkhdJ[isol]*c[isol];
+			zidzdJ = -(dcFdJ+zidzdJ)/den;
+			
+			for (isol=0; isol<nsol; ++isol) {
+				for (jsol=0; jsol<nsol; ++jsol) {
+					zidzdJJ1 += SQR(z[jsol])*c[jsol]*(z[jsol]*zidzdJ*kappa[jsol]+zz[jsol]*dkhdJ[jsol]);
+					zidzdJJ2 += z[jsol]*zz[jsol]*c[jsol]*(zidzdJ*z[jsol]*dkhdJ[jsol]+dkhdJJ[jsol]);
+					zidzdc[isol] += z[jsol]*zz[jsol]*dkhdc[jsol][isol]*c[jsol];
+				}
+				zidzdc[isol] = -(z[isol]*kappa[isol]+zidzdc[isol])/den;
+				zidzdcc3 += pow(double(z[isol]),3)*kappa[isol]*c[isol];
+			}
+			zidzdJJ = zidzdJ*(zidzdJ-zidzdJJ1/den)-(dcFdJJ+zidzdJJ2)/den;
+			
+			for (isol=0; isol<nsol; ++isol) {
+				for (jsol=0; jsol<nsol; ++jsol) {
+					zidzdJc1[isol] += SQR(z[jsol])*c[jsol]*(zidzdc[isol]*z[jsol]*kappa[jsol]+zz[jsol]*dkhdc[jsol][isol]);
+					zidzdJc2[isol] += z[jsol]*zz[jsol]*c[jsol]*(zidzdc[isol]*z[jsol]*dkhdJ[jsol]+dkhdJc[jsol][isol]);
+					zidzdcc2[isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
+					for (ksol=0; ksol<nsol; ++ksol)
+						zidzdcc1[isol][jsol] += z[ksol]*zz[ksol]*c[ksol]*dkhdcc[ksol][isol][jsol];
+				}
+				zidzdJc[isol] = zidzdJ*(zidzdc[isol]-(SQR(z[isol])*kappa[isol] + zidzdJc1[isol])/den)
+				-(z[isol]*zz[isol]*dkhdJ[isol] + zidzdJc2[isol])/den;
+			}
+			
+			for (isol=0; isol<nsol; ++isol) {
+				for (jsol=0; jsol<nsol; ++jsol) {
+					zidzdcc[isol][jsol] = zidzdc[isol]*zidzdc[jsol]*(1 - zidzdcc3/den)
+					- zidzdcc1[isol][jsol]/den
+					- z[isol]*(z[isol]*kappa[isol]*zidzdc[jsol]+zz[isol]*dkhdc[isol][jsol])/den
+					- z[jsol]*(z[jsol]*kappa[jsol]*zidzdc[isol]+zz[jsol]*dkhdc[jsol][isol])/den
+					- zidzdc[jsol]*zidzdcc2[isol]/den
+					- zidzdc[isol]*zidzdcc2[jsol]/den;
+				}
+			}
+		}
+		
+		double dkdJ[nsol];
+		double dkdc[nsol][nsol];
+		double dkdJJ[nsol];
+		double dkdJc[nsol][nsol];
+		double dkdcc[nsol][nsol][nsol];
+		
+		for (isol=0; isol<nsol; ++isol) {
+			dkdJ[isol] = zz[isol]*dkhdJ[isol]+z[isol]*kappa[isol]*zidzdJ;
+			dkdJJ[isol] = zz[isol]*dkhdJJ[isol]+2*z[isol]*zz[isol]*dkhdJ[isol]*zidzdJ
+			+z[isol]*kappa[isol]*((z[isol]-1)*SQR(zidzdJ)+zidzdJJ);
+			for (jsol=0; jsol<nsol; ++jsol) {
+				dkdc[isol][jsol] = zz[isol]*dkhdc[isol][jsol]+z[isol]*kappa[isol]*zidzdc[jsol];
+				dkdJc[isol][jsol] = zz[isol]*dkhdJc[isol][jsol]
+				+z[isol]*zz[isol]*(dkhdJ[isol]*zidzdc[jsol]+dkhdc[isol][jsol]*zidzdJ)
+				+z[isol]*kappa[isol]*((z[isol]-1)*zidzdc[jsol]*zidzdJ+zidzdJc[jsol]);
+				for (ksol=0; ksol<nsol; ++ksol) {
+					dkdcc[isol][jsol][ksol] = zz[isol]*(dkhdcc[isol][jsol][ksol]
+														+z[isol]*(dkhdc[isol][jsol]*zidzdc[ksol]
+																  +dkhdc[isol][ksol]*zidzdc[jsol]))
+					+z[isol]*kappa[isol]*((z[isol]-1)*zidzdc[ksol]*zidzdc[jsol]+zidzdcc[jsol][ksol]);
+				}
+			}
+		}
 		
 		// evaluate the porosity and its derivative
 		double phiw = pm->Porosity(mp);
@@ -1251,135 +1263,112 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 		double dpdJ = phis/J;
 		double dpdJJ = -2*phis/(J*J);
 		
-		// evaluate the diffusivity tensor and its derivatives
-		mat3ds D[2] = {
-			pm->m_pSolute[0]->m_pDiff->Diffusivity(mp),
-			pm->m_pSolute[1]->m_pDiff->Diffusivity(mp)};
-		tens4ds dDdE[2] = {
-			pm->m_pSolute[0]->m_pDiff->Tangent_Diffusivity_Strain(mp),
-			pm->m_pSolute[1]->m_pDiff->Tangent_Diffusivity_Strain(mp)};
-		mat3ds dDdc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pDiff->Tangent_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pDiff->Tangent_Diffusivity_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pDiff->Tangent_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pDiff->Tangent_Diffusivity_Concentration(mp,1)}};
-		
-		// evaluate the solute free diffusivity
-		double D0[2] = {
-			pm->m_pSolute[0]->m_pDiff->Free_Diffusivity(mp),
-			pm->m_pSolute[1]->m_pDiff->Free_Diffusivity(mp)};
-		double dD0dc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,1)}};
-			
-		// evaluate the osmotic coefficient and its derivatives
+		// evaluate the osmotic coefficient
 		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
-		double dodc[2] = {
-			pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,0),
-			pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,1)};
 		
-		// evaluate the stress tangent with concentration
-		mat3ds dTdc[2] = {
-			pm->m_pSolid->Tangent_Concentration(mp,0), 
-			pm->m_pSolid->Tangent_Concentration(mp,1)};
+		// evaluate the permeability
+		mat3ds K = pm->m_pPerm->Permeability(mp);
+		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
+		
+		mat3ds dKdc[nsol];
+		mat3ds D[nsol];
+		tens4ds dDdE[nsol];
+		mat3ds dDdc[nsol][nsol];
+		vector<double> D0(nsol);
+		double dD0dc[nsol][nsol];
+		double dodc[nsol];
+		mat3ds dTdc[nsol];
+		mat3ds ImD[nsol];
+		mat3dd I(1);
+		
+		// evaluate the solvent supply and its derivatives
+		double phiwhat = 0;
+		mat3ds Phie; Phie.zero();
+		double Phip = 0;
+		double Phic[nsol] = {0};
+		
+		for (isol=0; isol<nsol; ++isol) {
+			// evaluate the permeability derivatives
+			dKdc[isol] = pm->m_pPerm->Tangent_Permeability_Concentration(mp,isol);
+			
+			// evaluate the diffusivity tensor and its derivatives
+			D[isol] = pm->m_pSolute[isol]->m_pDiff->Diffusivity(mp);
+			dDdE[isol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Strain(mp);
+			
+			// evaluate the solute free diffusivity
+			D0[isol] = pm->m_pSolute[isol]->m_pDiff->Free_Diffusivity(mp);
+			
+			// evaluate the derivative of the osmotic coefficient
+			dodc[isol] = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,isol);
+			
+			// evaluate the stress tangent with concentration
+			dTdc[isol] = pm->m_pSolid->Tangent_Concentration(mp,isol);
+			
+			ImD[isol] = I-D[isol]/D0[isol];
+			
+			for (jsol=0; jsol<nsol; ++jsol) {
+				dDdc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
+				dD0dc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
+			}
+		}
 		
 		// Miscellaneous constants
-		mat3dd I(1);
 		double R = pm->m_Rgas;
 		double T = pm->m_Tabs;
+		double penalty = pm->m_penalty;
 		
 		// evaluate the effective permeability and its derivatives
 		mat3ds Ki = K.inverse();
-		mat3ds ImD[2] = {I-D[0]/D0[0],I-D[1]/D0[1]};
-		mat3ds Ke = (Ki + (ImD[0]*(kappa[0]*c[0]/D0[0])+ImD[1]*(kappa[1]*c[1]/D0[1]))*(R*T/phiw)).inverse();
-		tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
-		+dyad1s(ImD[0],I)*(R*T*c[0]*J/D0[0]/2/phiw*(dkdJ[0]-kappa[0]/phiw*dpdJ))
-		+(dyad1s(I) - dyad4s(I)*2 - dDdE[0]/D0[0])*(R*T*kappa[0]*c[0]/phiw/D0[0])
-		+dyad1s(ImD[1],I)*(R*T*c[1]*J/D0[1]/2/phiw*(dkdJ[1]-kappa[1]/phiw*dpdJ))
-		+(dyad1s(I) - dyad4s(I)*2 - dDdE[1]/D0[1])*(R*T*kappa[1]*c[1]/phiw/D0[1]);
+		mat3ds Ke(0,0,0,0,0,0);
+		tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5;
+		mat3ds Gc[nsol];
+		mat3ds dKedc[nsol];
+		for (isol=0; isol<nsol; ++isol) {
+			Ke += ImD[isol]*(kappa[isol]*c[isol]/D0[isol]);
+			G += dyad1s(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/2/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
+			+(dyad1s(I) - dyad4s(I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
+			Gc[isol] = ImD[isol]*(kappa[isol]/D0[isol]);
+			for (jsol=0; jsol<nsol; ++jsol) {
+				Gc[isol] += ImD[jsol]*(c[jsol]/D0[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol]))
+				-(dDdc[jsol][isol]-D[jsol]*(dD0dc[jsol][isol]/D0[jsol])*(kappa[jsol]*c[jsol]/SQR(D0[jsol])));
+			}
+			Gc[isol] *= R*T/phiw;
+		}
+		Ke = (Ki + Ke*(R*T/phiw)).inverse();
 		tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
-		mat3ds Gc[2] = {
-			(ImD[0]*(kappa[0]/D0[0])
-			 +ImD[0]*(c[0]/D0[0]*(dkdc[0][0]-kappa[0]/D0[0]*dD0dc[0][0]))
-			 +ImD[1]*(c[1]/D0[1]*(dkdc[1][0]-kappa[1]/D0[1]*dD0dc[1][0]))
-			 -(dDdc[0][0]-D[0]*(dD0dc[0][0]/D0[0])*(kappa[0]*c[0]/SQR(D0[0])))
-			 -(dDdc[1][0]-D[1]*(dD0dc[1][0]/D0[1])*(kappa[1]*c[1]/SQR(D0[1])))
-			 )*(R*T/phiw),
-			(ImD[1]*(kappa[1]/D0[1])
-			 +ImD[0]*(c[0]/D0[0]*(dkdc[0][1]-kappa[0]/D0[0]*dD0dc[0][1]))
-			 +ImD[1]*(c[1]/D0[1]*(dkdc[1][1]-kappa[1]/D0[1]*dD0dc[1][1]))
-			 -(dDdc[0][1]-D[0]*(dD0dc[0][1]/D0[0])*(kappa[0]*c[0]/SQR(D0[0])))
-			 -(dDdc[1][1]-D[1]*(dD0dc[1][1]/D0[1])*(kappa[1]*c[1]/SQR(D0[1])))
-			 )*(R*T/phiw)};
-		mat3ds dKedc[2] = {-Ke*(-Ki*dKdc[0]*Ki + Gc[0])*Ke,-Ke*(-Ki*dKdc[1]*Ki + Gc[1])*Ke};
+		for (isol=0; isol<nsol; ++isol)
+			dKedc[isol] = -Ke*(-Ki*dKdc[isol]*Ki + Gc[isol])*Ke;
 		
 		// calculate all the matrices
-		vec3d vtmp,gp,gc[2],qpu,qcu[2],wc[2],jc[2][2];
-		mat3d wu,ju[2];
-		double qcc[2][2];
+		vec3d vtmp,gp,qpu;
+		vec3d gc[nsol],qcu[nsol],wc[nsol],jce[nsol];
+		vec3d jc[nsol][nsol];
+		mat3d wu, jue;
+		mat3d ju[nsol];
+		double qcc[nsol][nsol];
+		double sum;
+		mat3ds De;
 		tmp = detJ*gw[n];
 		for (i=0; i<neln; ++i)
 		{
 			for (j=0; j<neln; ++j)
 			{
 				// calculate the kpu matrix
-				gp = gradp+((D[0]*gradc[0])*(kappa[0]/D0[0])+(D[1]*gradc[1])*(kappa[1]/D0[1]))*R*T;
-				wu = vdotTdotv(-gp, dKedE, gradN[j])
-				-(((Ke*(D[0]*gradc[0])) & gradN[j])*(J*dkdJ[0] - kappa[0])
-				  +Ke*(2*kappa[0]*(gradN[j]*(D[0]*gradc[0]))))*R*T/D0[0]
-				- Ke*vdotTdotv(gradc[0], dDdE[0], gradN[j])*(kappa[0]*R*T/D0[0])
-				-(((Ke*(D[1]*gradc[1])) & gradN[j])*(J*dkdJ[1] - kappa[1])
-				  +Ke*(2*kappa[1]*(gradN[j]*(D[1]*gradc[1]))))*R*T/D0[1]
-				- Ke*vdotTdotv(gradc[1], dDdE[1], gradN[j])*(kappa[1]*R*T/D0[1]);
-				qpu = -gradN[j]*(divv+1/dt)-gradv.transpose()*gradN[j];
+				gp = vec3d(0,0,0);
+				for (isol=0; isol<nsol; ++isol) gp += (D[isol]*gradc[isol])*(kappa[isol]/D0[isol]);
+				gp = gradp+gp*(R*T);
+				wu = vdotTdotv(-gp, dKedE, gradN[j]);
+				for (isol=0; isol<nsol; ++isol) {
+					wu += (((Ke*(D[isol]*gradc[isol])) & gradN[j])*(J*dkdJ[isol] - kappa[isol])
+                           +Ke*(2*kappa[isol]*(gradN[j]*(D[isol]*gradc[isol]))))*(-R*T/D0[isol])
+					+ (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
+				}
+                //				qpu = -gradN[j]*(divv+1.0/dt)-gradv.transpose()*gradN[j];
+				qpu = -gradN[j]*(divv+1.0/dt)+(Phie + gradv.transpose())*gradN[j];
 				vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(tmp*dt);
 				ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
 				ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
 				ke[ndpn*i+3][ndpn*j+2] += vtmp.z;
-				
-				// calculate the kcu matrix for the cation
-				gc[0] = -gradc[0]*phiw + w*c[0]/D0[0];
-				ju[0] = ((D[0]*gc[0]) & gradN[j])*(J*dkdJ[0]) 
-				+ vdotTdotv(gc[0], dDdE[0], gradN[j])*kappa[0]
-				+ (((D[0]*gradc[0]) & gradN[j])*(-phis)
-				   +(D[0]*((gradN[j]*w)*2) - ((D[0]*w) & gradN[j]))*c[0]/D0[0]
-				   )*kappa[0]
-				+D[0]*wu*(kappa[0]*c[0]/D0[0]);
-				qcu[0] = -gradN[j]*(c[0]*dJdt*(2*(dpdJ*kappa[0]+phiw*dkdJ[0]+J*dpdJ*dkdJ[0])
-											   +J*(dpdJJ*kappa[0]+phiw*dkdJJ[0]))
-									+dcdt[0]*(phiw*kappa[0]+J*dpdJ*kappa[0]+J*phiw*dkdJ[0])
-									+c[0]*(dcdt[0]*((phiw+J*dpdJ)*dkdc[0][0]+J*phiw*dkdJc[0][0])
-										   +dcdt[1]*((phiw+J*dpdJ)*dkdc[0][1]+J*phiw*dkdJc[0][1])))
-				+qpu*(c[0]*(phiw*kappa[0]+J*dpdJ*kappa[0]+J*phiw*dkdJ[0]));
-				vtmp = (ju[0].transpose()*gradN[i] + qcu[0]*H[i])*(tmp*dt);
-				ke[ndpn*i+4][ndpn*j  ] += vtmp.x;
-				ke[ndpn*i+4][ndpn*j+1] += vtmp.y;
-				ke[ndpn*i+4][ndpn*j+2] += vtmp.z;
-
-				// calculate the kcu matrix for the anion
-				gc[1] = -gradc[1]*phiw + w*c[1]/D0[1];
-				ju[1] = ((D[1]*gc[1]) & gradN[j])*(J*dkdJ[1]) 
-				+ vdotTdotv(gc[1], dDdE[1], gradN[j])*kappa[1]
-				+ (((D[1]*gradc[1]) & gradN[j])*(-phis)
-				   +(D[1]*((gradN[j]*w)*2) - ((D[1]*w) & gradN[j]))*c[1]/D0[1]
-				   )*kappa[1]
-				+D[1]*wu*(kappa[1]*c[1]/D0[1]);
-				qcu[1] = -gradN[j]*(c[1]*dJdt*(2*(dpdJ*kappa[1]+phiw*dkdJ[1]+J*dpdJ*dkdJ[1])
-											   +J*(dpdJJ*kappa[1]+phiw*dkdJJ[1]))
-									+dcdt[1]*(phiw*kappa[1]+J*dpdJ*kappa[1]+J*phiw*dkdJ[1])
-									+c[1]*(dcdt[0]*((phiw+J*dpdJ)*dkdc[1][0]+J*phiw*dkdJc[1][0])
-										   +dcdt[1]*((phiw+J*dpdJ)*dkdc[1][1]+J*phiw*dkdJc[1][1])))
-				+qpu*(c[1]*(phiw*kappa[1]+J*dpdJ*kappa[1]+J*phiw*dkdJ[1]));
-				vtmp = (ju[1].transpose()*gradN[i] + qcu[1]*H[i])*(tmp*dt);
-				ke[ndpn*i+5][ndpn*j  ] += vtmp.x;
-				ke[ndpn*i+5][ndpn*j+1] += vtmp.y;
-				ke[ndpn*i+5][ndpn*j+2] += vtmp.z;
 				
 				// calculate the kup matrix
 				vtmp = -gradN[i]*H[j]*tmp;
@@ -1388,94 +1377,108 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 				ke[ndpn*i+2][ndpn*j+3] += vtmp.z;
 				
 				// calculate the kpp matrix
-				ke[ndpn*i+3][ndpn*j+3] -= gradN[i]*(Ke*gradN[j])*(tmp*dt);
+				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(tmp*dt);
 				
-				// calculate the kcp matrix for the cation
-				ke[ndpn*i+4][ndpn*j+3] -= (gradN[i]*((D[0]*Ke)*gradN[j]))*(kappa[0]*c[0]/D0[0])*(tmp*dt);
+				// calculate kcu matrix data
+				jue.zero();
+				De.zero();
+				for (isol=0; isol<nsol; ++isol) {
+					gc[isol] = -gradc[isol]*phiw + w*c[isol]/D0[isol];
+					ju[isol] = ((D[isol]*gc[isol]) & gradN[j])*(J*dkdJ[isol])
+					+ vdotTdotv(gc[isol], dDdE[isol], gradN[j])*kappa[isol]
+					+ (((D[isol]*gradc[isol]) & gradN[j])*(-phis)
+					   +(D[isol]*((gradN[j]*w)*2) - ((D[isol]*w) & gradN[j]))*c[isol]/D0[isol]
+					   )*kappa[isol]
+					+D[isol]*wu*(kappa[isol]*c[isol]/D0[isol]);
+					jue += ju[isol]*z[isol];
+					De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
+					sum = 0;
+					for (jsol=0; jsol<nsol; ++jsol)
+						sum += dcdt[jsol]*((phiw+J*dpdJ)*dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]);
+					qcu[isol] = -gradN[j]*(c[isol]*(dJdt*(2*(dpdJ*kappa[isol]+phiw*dkdJ[isol]+J*dpdJ*dkdJ[isol])
+														  +J*(dpdJJ*kappa[isol]+phiw*dkdJJ[isol])) + sum)
+										   +dcdt[isol]*((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]))
+					+qpu*(c[isol]*((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]));
+				}
 				
-				// calculate the kcp matrix for the anion
-				ke[ndpn*i+5][ndpn*j+3] -= (gradN[i]*((D[1]*Ke)*gradN[j]))*(kappa[1]*c[1]/D0[1])*(tmp*dt);
+				for (isol=0; isol<nsol; ++isol) {
+					
+					// calculate the kcu matrix
+					vtmp = ((ju[isol]+jue*penalty).transpose()*gradN[i]
+							+ qcu[isol]*H[i])*(tmp*dt);
+					ke[ndpn*i+4+isol][ndpn*j  ] += vtmp.x;
+					ke[ndpn*i+4+isol][ndpn*j+1] += vtmp.y;
+					ke[ndpn*i+4+isol][ndpn*j+2] += vtmp.z;
+					
+					// calculate the kcp matrix
+					ke[ndpn*i+4+isol][ndpn*j+3] -= (gradN[i]*(
+															  (D[isol]*(kappa[isol]*c[isol]/D0[isol])
+															   +De*penalty)
+															  *(Ke*gradN[j])
+															  ))*(tmp*dt);
+                    
+					// calculate the kuc matrix
+					sum = 0;
+					for (jsol=0; jsol<nsol; ++jsol)
+						sum += c[jsol]*(dodc[isol]*kappa[jsol]+osmc*dkdc[jsol][isol]);
+					vtmp = (dTdc[isol]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[isol]+sum)))*H[j]*tmp;
+					ke[ndpn*i  ][ndpn*j+4+isol] += vtmp.x;
+					ke[ndpn*i+1][ndpn*j+4+isol] += vtmp.y;
+					ke[ndpn*i+2][ndpn*j+4+isol] += vtmp.z;
+					
+					// calculate the kpc matrix
+					vtmp = vec3d(0,0,0);
+					for (jsol=0; jsol<nsol; ++jsol)
+						vtmp += (D[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol])
+                                 +dDdc[jsol][isol]*kappa[jsol])/D0[jsol]*gradc[jsol];
+					wc[isol] = (dKedc[isol]*gp)*(-H[j])
+					-Ke*((D[isol]*gradN[j])*(kappa[isol]/D0[isol])+vtmp*H[j])*(R*T);
+					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(tmp*dt);
+					
+				}
 				
-				// calculate the kuc matrix for the cation
-				vtmp = (dTdc[0]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[0]
-														  +c[0]*(dodc[0]*kappa[0]+osmc*dkdc[0][0])
-														  +c[1]*(dodc[0]*kappa[1]+osmc*dkdc[1][0])
-														  )))*H[j]*tmp;
-				ke[ndpn*i  ][ndpn*j+4] += vtmp.x;
-				ke[ndpn*i+1][ndpn*j+4] += vtmp.y;
-				ke[ndpn*i+2][ndpn*j+4] += vtmp.z;
-				
-				// calculate the kuc matrix for the anion
-				vtmp = (dTdc[1]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[1]
-														  +c[0]*(dodc[1]*kappa[0]+osmc*dkdc[0][1])
-														  +c[1]*(dodc[1]*kappa[1]+osmc*dkdc[1][1])
-														  )))*H[j]*tmp;
-				ke[ndpn*i  ][ndpn*j+5] += vtmp.x;
-				ke[ndpn*i+1][ndpn*j+5] += vtmp.y;
-				ke[ndpn*i+2][ndpn*j+5] += vtmp.z;
-				
-				// calculate the kpc matrix for the cation
-				wc[0] = (dKedc[0]*gp)*(-H[j])
-				-Ke*((D[0]*gradN[j])*(kappa[0]/D0[0])
-					 +((D[0]*(dkdc[0][0]-kappa[0]/D0[0]*dD0dc[0][0])
-						+dDdc[0][0]*kappa[0])*gradc[0]
-					   +(D[1]*(dkdc[1][0]-kappa[1]/D0[1]*dD0dc[1][0])
-						 +dDdc[1][0]*kappa[1])*gradc[1]
-					   )*H[j]
-					 )*(R*T);
-				ke[ndpn*i+3][ndpn*j+4] += (gradN[i]*wc[0])*(tmp*dt);
-				
-				// calculate the kpc matrix for the anion
-				wc[1] = (dKedc[1]*gp)*(-H[j])
-				-Ke*((D[1]*gradN[j])*(kappa[1]/D0[1])
-					 +((D[0]*(dkdc[0][1]-kappa[0]/D0[0]*dD0dc[0][1])
-						+dDdc[0][1]*kappa[0])*gradc[0]
-					   +(D[1]*(dkdc[1][1]-kappa[1]/D0[1]*dD0dc[1][1])
-						 +dDdc[1][1]*kappa[1])*gradc[1]
-					   )*H[j]
-					 )*(R*T);
-				ke[ndpn*i+3][ndpn*j+5] += (gradN[i]*wc[1])*(tmp*dt);
-				
-				// calculate the kcc matrix for the cation-cation
-				jc[0][0] = (D[0]*(gradN[j]*(-phiw)+w*(H[j]/D0[0])))*kappa[0]
-				+((D[0]*dkdc[0][0]+dDdc[0][0]*kappa[0])*(gradc[0]*(-phiw)+w*(c[0]/D0[0])))*H[j]
-				+(D[0]*w*(-H[j]*dD0dc[0][0]/D0[0])+D[0]*wc[0])*(kappa[0]*c[0]/D0[0]);
-				qcc[0][0] = -H[j]*(((phiw+J*dpdJ)*divv+phiw/dt)*(kappa[0]+c[0]*dkdc[0][0])
-								   +phiw*(dkdt[0]+dkdc[0][0]*dcdt[0])
-								   +phiw*c[0]*dJdt*dkdJc[0][0]
-								   );
-				ke[ndpn*i+4][ndpn*j+4] += (gradN[i]*jc[0][0] + H[i]*qcc[0][0])*(tmp*dt);
-				
-				// calculate the kcc matrix for the anion-anion
-				jc[1][1] = (D[1]*(gradN[j]*(-phiw)+w*(H[j]/D0[1])))*kappa[1]
-				+((D[1]*dkdc[1][1]+dDdc[1][1]*kappa[1])*(gradc[1]*(-phiw)+w*(c[1]/D0[1])))*H[j]
-				+(D[1]*w*(-H[j]*dD0dc[1][1]/D0[1])+D[1]*wc[1])*(kappa[1]*c[1]/D0[1]);
-				qcc[1][1] = -H[j]*(((phiw+J*dpdJ)*divv+phiw/dt)*(kappa[1]+c[1]*dkdc[1][1])
-								   +phiw*(dkdt[1]+dkdc[1][1]*dcdt[1])
-								   +phiw*c[1]*dJdt*dkdJc[1][1]
-								   );
-				ke[ndpn*i+5][ndpn*j+5] += (gradN[i]*jc[1][1] + H[i]*qcc[1][1])*(tmp*dt);
-				
-				// calculate the kcc matrix for the cation-anion
-				jc[0][1] = 
-				((D[0]*dkdc[0][1]+dDdc[0][1]*kappa[0])*(gradc[0]*(-phiw)+w*(c[0]/D0[0])))*H[j]
-				+(D[0]*w*(-H[j]*dD0dc[0][1]/D0[0])+D[0]*wc[1])*(kappa[0]*c[0]/D0[0]);
-				qcc[0][1] = -H[j]*(((phiw+J*dpdJ)*divv+phiw/dt)*(c[0]*dkdc[0][1])
-								   +phiw*(dkdc[0][1]*dcdt[0])
-								   +phiw*c[0]*dJdt*dkdJc[0][1]
-								   );
-				ke[ndpn*i+4][ndpn*j+5] += (gradN[i]*jc[0][1] + H[i]*qcc[0][1])*(tmp*dt);
-				
-				// calculate the kcc matrix for the anion-cation
-				jc[1][0] = 
-				((D[1]*dkdc[1][0]+dDdc[1][0]*kappa[1])*(gradc[1]*(-phiw)+w*(c[1]/D0[1])))*H[j]
-				+(D[1]*w*(-H[j]*dD0dc[1][0]/D0[1])+D[1]*wc[0])*(kappa[1]*c[1]/D0[1]);
-				qcc[1][0] = -H[j]*(((phiw+J*dpdJ)*divv+phiw/dt)*(c[1]*dkdc[1][0])
-								   +phiw*(dkdc[1][0]*dcdt[1])
-								   +phiw*c[1]*dJdt*dkdJc[1][0]
-								   );
-				ke[ndpn*i+5][ndpn*j+4] += (gradN[i]*jc[1][0] + H[i]*qcc[1][0])*(tmp*dt);
-				
+				// calculate data for the kcc matrix
+                jce[0] = jce[1] = vec3d(0,0,0);
+				for (isol=0; isol<nsol; ++isol) {
+					for (jsol=0; jsol<nsol; ++jsol) {
+						if (jsol != isol) {
+							jc[isol][jsol] =
+							((D[isol]*dkdc[isol][jsol]+dDdc[isol][jsol]*kappa[isol])*gc[isol])*H[j]
+							+(D[isol]*(w*(-H[j]*dD0dc[isol][jsol]/D0[isol])+wc[jsol]))*(kappa[isol]*c[isol]/D0[isol]);
+							
+							sum = dkdc[isol][jsol]*dcdt[isol];
+							for (ksol=0; ksol<nsol; ++ksol)
+								sum += c[isol]*dkdcc[isol][jsol][ksol]*dcdt[ksol];
+							
+							qcc[isol][jsol] = -H[j]*((c[isol]*((phiw+J*dpdJ)*dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
+                                                     +phiw*(c[isol]*dkdc[isol][jsol])/dt
+                                                     +phiw*sum);
+						}
+						else {
+							jc[isol][jsol] = (D[isol]*(gradN[j]*(-phiw)+w*(H[j]/D0[isol])))*kappa[isol]
+							+((D[isol]*dkdc[isol][jsol]+dDdc[isol][jsol]*kappa[isol])*gc[isol])*H[j]
+							+(D[isol]*(w*(-H[j]*dD0dc[isol][jsol]/D0[isol])+wc[jsol]))*(kappa[isol]*c[isol]/D0[isol]);
+							
+							sum = dkdc[isol][jsol]*dcdt[isol];
+							for (ksol=0; ksol<nsol; ++ksol)
+								sum += (dkdc[isol][ksol]+c[isol]*dkdcc[isol][jsol][ksol])*dcdt[ksol];
+							
+							qcc[isol][jsol] = -H[j]*(((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]
+													  +c[isol]*((phiw+J*dpdJ)*dkdc[isol][jsol]+J*phiw*dkdJc[isol][jsol]))*divv
+													 +phiw*(kappa[isol] + c[isol]*dkdc[isol][jsol])/dt
+													 +phiw*sum);
+						}
+						jce[jsol] += jc[isol][jsol]*z[isol];
+					}
+				}
+                
+				// calculate the kcc matrix
+				for (isol=0; isol<nsol; ++isol) {
+					for (jsol=0; jsol<nsol; ++jsol) {
+						ke[ndpn*i+4+isol][ndpn*j+4+jsol] += (gradN[i]*(jc[isol][jsol]+jce[jsol]*penalty)
+                                                             + H[i]*qcc[isol][jsol])*(tmp*dt);
+					}
+				}
 			}
 		}
 	}
@@ -1499,11 +1502,10 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 //!
 bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
-	int i, j, n;
+	int i, j, isol, jsol, ksol, n;
 	
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
-	int ndpn = 6;
 	
 	double *Gr, *Gs, *Gt, *H;
 	double Gx, Gy, Gz;
@@ -1511,8 +1513,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 	// jacobian
 	double Ji[3][3], detJ;
 	
-	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
+	// Gradient of shape functions
 	vector<vec3d> gradN(neln);
 	double tmp;
 	
@@ -1520,24 +1521,16 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 	double* gw = el.GaussWeights();
 	
 	FEMesh& mesh = *GetMesh();
-
+	
 	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (GetMaterial()); assert(pm);
-	int id0 = pm->m_pSolute[0]->GetSoluteID();
-	int id1 = pm->m_pSolute[1]->GetSoluteID();
-
-	const int NE = FEElement::MAX_NODES;
-	vec3d r0[NE], rt[NE], rp[NE], v[NE];
-	double cp[2][NE];
-	for (i=0; i<neln; ++i) 
-	{
-		r0[i] = mesh.Node(el.m_node[i]).m_r0;
-		rt[i] = mesh.Node(el.m_node[i]).m_rt;
-		rp[i] = mesh.Node(el.m_node[i]).m_rp;
-		cp[0][i] = mesh.Node(el.m_node[i]).m_cp[id0];
-		cp[1][i] = mesh.Node(el.m_node[i]).m_cp[id1];
-		v[i]  = mesh.Node(el.m_node[i]).m_vt;
-	}
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (GetMaterial());
+	assert(pm);
+    
+	const int nsol = 2;
+	int ndpn = 4+nsol;
+	int sid[nsol];
+	for (isol=0; isol<nsol; ++isol)
+		sid[isol] = pm->m_pSolute[isol]->GetSoluteID();
 	
 	// zero stiffness matrix
 	ke.zero();
@@ -1556,14 +1549,13 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 			ke[ndpn*i+2][ndpn*j] = ks[3*i+2][3*j  ]; ke[ndpn*i+2][ndpn*j+1] = ks[3*i+2][3*j+1]; ke[ndpn*i+2][ndpn*j+2] = ks[3*i+2][3*j+2];
 		}
 	
-
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
-		FEBiphasicMaterialPoint& ppt = *(el.m_State[n]->ExtractData<FEBiphasicMaterialPoint>());
-		FESaltMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESaltMaterialPoint>());
+		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+		FESaltMaterialPoint& spt = *(mp.ExtractData<FESaltMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -1587,10 +1579,8 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 			
 			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
 			gradN[i] = vec3d(Gx,Gy,Gz);
+			
 		}
 		
 		// next we get the determinant
@@ -1600,231 +1590,235 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 		vec3d w = ppt.m_w;
 		vec3d gradp = ppt.m_gradp;
 		
-		// get the effective concentration and its gradient
-		double c[2] = {spt.m_c[0],spt.m_c[1]};
-		vec3d gradc[2] = {spt.m_gradc[0],spt.m_gradc[1]};
-
-		// get the charge number
-		double z[2] = {pm->m_pSolute[0]->ChargeNumber(),
-			pm->m_pSolute[1]->ChargeNumber()};
-		
 		// get the charge density and its derivatives
 		double phi0 = ppt.m_phi0;
 		double cF = pm->FixedChargeDensity(mp);
 		double dcFdJ = -cF/(J - phi0);
 		double dcFdJJ = 2*cF/SQR(J-phi0);
 		
-		// evaluate the solubility and its derivatives w.r.t. J and c
-		double khat[2] = {
-			pm->m_pSolute[0]->m_pSolub->Solubility(mp),
-			pm->m_pSolute[1]->m_pSolub->Solubility(mp)};
-		double dkhdJ[2] = {
-			pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain(mp),
-			pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain(mp)};
-		double dkhdJJ[2] = {
-			pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain_Strain(mp),
-			pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain_Strain(mp)};
-		double dkhdc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration(mp,1)}};
-		double dkhdJc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,1)}};
-		double dkhdcc[2][3] = {
-			{
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,1),
-				pm->m_pSolute[0]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,1,1)},
-			{
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,0),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,0,1),
-				pm->m_pSolute[1]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,1,1)}};
+		vector<double> c(nsol);
+		vector<vec3d> gradc(nsol);
+		vector<int> z(nsol);
+		vector<double> khat(nsol);
+		vector<double> dkhdJ(nsol);
+		vector<double> dkhdJJ(nsol);
+		vector< vector<double> > dkhdc(nsol, vector<double>(nsol));
+		vector< vector<double> > dkhdJc(nsol, vector<double>(nsol));
+		vector< vector< vector<double> > > dkhdcc(nsol, dkhdc);	// use dkhdc for initialization only
+		
+		double zeta = pm->ElectricPotential(mp, true);
+		double zz[nsol];
+		double kappa[nsol];
+		double den = 0;
+		
+		for (isol=0; isol<nsol; ++isol) {
+			// get the effective concentration, its gradient and its time derivative
+			c[isol] = spt.m_c[isol];
+			gradc[isol] = spt.m_gradc[isol];
+			
+			// get the charge number
+			z[isol] = pm->m_pSolute[isol]->ChargeNumber();
+			
+			// evaluate the solubility and its derivatives w.r.t. J and c
+			khat[isol] = pm->m_pSolute[isol]->m_pSolub->Solubility(mp);
+			dkhdJ[isol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain(mp);
+			dkhdJJ[isol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Strain(mp);
+			for (jsol=0; jsol<nsol; ++jsol) {
+				dkhdc[isol][jsol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration(mp,jsol);
+				dkhdJc[isol][jsol] = pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Strain_Concentration(mp,jsol);
+				for (ksol=0; ksol<nsol; ++ksol) {
+					dkhdcc[isol][jsol][ksol] =
+					pm->m_pSolute[isol]->m_pSolub->Tangent_Solubility_Concentration_Concentration(mp,jsol,ksol);
+				}
+			}
+			zz[isol] = pow(zeta, z[isol]);
+			kappa[isol] = zz[isol]*khat[isol];
+			den += SQR(z[isol])*kappa[isol]*c[isol];
+		}
 		
 		// evaluate electric potential (nondimensional exponential form) and its derivatives
 		// also evaluate partition coefficients and their derivatives
-		double zeta = pm->ElectricPotential(mp, true);
-		double zz[2] = {pow(zeta, z[0]), pow(zeta, z[1])};
-		double kappa[2] = {zz[0]*khat[0], zz[1]*khat[1]};
-		double den = SQR(z[0])*kappa[0]*c[0]+SQR(z[1])*kappa[1]*c[1];
 		double zidzdJ = 0;
-		double zidzdJJ = 0;
-		double zidzdc[2] = {0,0};
-		double zidzdJc[2] = {0,0};
+		double zidzdJJ = 0, zidzdJJ1 = 0, zidzdJJ2 = 0;
+		double zidzdc[nsol] = {0};
+		double zidzdJc[nsol] = {0}, zidzdJc1[nsol] = {0}, zidzdJc2[nsol] = {0};
+		double zidzdcc[nsol][nsol] = {0}, zidzdcc1[nsol][nsol] = {0};
+		double zidzdcc2[nsol] = {0};
+		double zidzdcc3 = 0;
 		if (den > 0) {
-			zidzdJ = -(dcFdJ+z[0]*zz[0]*dkhdJ[0]*c[0]
-					   +z[1]*zz[1]*dkhdJ[1]*c[1])/den;
-			zidzdc[0] = -(z[0]*kappa[0]+z[0]*zz[0]*dkhdc[0][0]*c[0]+z[1]*zz[1]*dkhdc[1][0]*c[1])/den;
-			zidzdc[1] = -(z[1]*kappa[1]+z[0]*zz[0]*dkhdc[0][1]*c[0]+z[1]*zz[1]*dkhdc[1][1]*c[1])/den;
-			zidzdJJ = -(dcFdJJ+z[0]*zz[0]*c[0]*(z[0]*zidzdJ*dkhdJ[0]+dkhdJJ[0])
-						+z[1]*zz[1]*c[1]*(z[1]*zidzdJ*dkhdJ[1]+dkhdJJ[1]))/den
-			+zidzdJ*(SQR(z[0])*zz[0]*c[0]*(dkhdJ[0]+kappa[0]*(z[0]-1)*zidzdJ)
-					 +SQR(z[1])*zz[1]*c[1]*(dkhdJ[1]+kappa[1]*(z[1]-1)*zidzdJ))/den;
-			zidzdJc[0] = -(z[0]*zz[0]*dkhdJ[0]+z[0]*zz[0]*c[0]*(z[0]*zidzdc[0]*dkhdJ[0]+dkhdJc[0][0])
-						   +z[1]*zz[1]*c[1]*(z[1]*zidzdc[0]*dkhdJ[1]+dkhdJc[1][0]))/den
-			+zidzdJ*(SQR(z[0])*kappa[0]+SQR(z[0])*zz[0]*c[0]*(dkhdc[0][0]+kappa[0]*(z[0]-1)*zidzdc[0])
-					 +SQR(z[1])*zz[1]*c[1]*(dkhdc[1][0]+kappa[1]*(z[1]-1)*zidzdc[0]))/den;
-			zidzdJc[1] = -(z[1]*zz[1]*dkhdJ[1]+z[0]*zz[0]*c[0]*(z[0]*zidzdc[1]*dkhdJ[0]+dkhdJc[0][1])
-						   +z[1]*zz[1]*c[1]*(z[1]*zidzdc[1]*dkhdJ[1]+dkhdJc[1][1]))/den
-			+zidzdJ*(SQR(z[1])*kappa[1]+SQR(z[0])*zz[0]*c[0]*(dkhdc[0][1]+kappa[0]*(z[0]-1)*zidzdc[1])
-					 +SQR(z[1])*zz[1]*c[1]*(dkhdc[1][1]+kappa[1]*(z[1]-1)*zidzdc[1]))/den;
+			
+			for (isol=0; isol<nsol; ++isol)
+				zidzdJ += z[isol]*zz[isol]*dkhdJ[isol]*c[isol];
+			zidzdJ = -(dcFdJ+zidzdJ)/den;
+			
+			for (isol=0; isol<nsol; ++isol) {
+				for (jsol=0; jsol<nsol; ++jsol) {
+					zidzdJJ1 += SQR(z[jsol])*c[jsol]*(z[jsol]*zidzdJ*kappa[jsol]+zz[jsol]*dkhdJ[jsol]);
+					zidzdJJ2 += z[jsol]*zz[jsol]*c[jsol]*(zidzdJ*z[jsol]*dkhdJ[jsol]+dkhdJJ[jsol]);
+					zidzdc[isol] += z[jsol]*zz[jsol]*dkhdc[jsol][isol]*c[jsol];
+				}
+				zidzdc[isol] = -(z[isol]*kappa[isol]+zidzdc[isol])/den;
+				zidzdcc3 += pow(double(z[isol]),3)*kappa[isol]*c[isol];
+			}
+			zidzdJJ = zidzdJ*(zidzdJ-zidzdJJ1/den)-(dcFdJJ+zidzdJJ2)/den;
+			
+			for (isol=0; isol<nsol; ++isol) {
+				for (jsol=0; jsol<nsol; ++jsol) {
+					zidzdJc1[isol] += SQR(z[jsol])*c[jsol]*(zidzdc[isol]*z[jsol]*kappa[jsol]+zz[jsol]*dkhdc[jsol][isol]);
+					zidzdJc2[isol] += z[jsol]*zz[jsol]*c[jsol]*(zidzdc[isol]*z[jsol]*dkhdJ[jsol]+dkhdJc[jsol][isol]);
+					zidzdcc2[isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
+					for (ksol=0; ksol<nsol; ++ksol)
+						zidzdcc1[isol][jsol] += z[ksol]*zz[ksol]*c[ksol]*dkhdcc[ksol][isol][jsol];
+				}
+				zidzdJc[isol] = zidzdJ*(zidzdc[isol]-(SQR(z[isol])*kappa[isol] + zidzdJc1[isol])/den)
+				-(z[isol]*zz[isol]*dkhdJ[isol] + zidzdJc2[isol])/den;
+			}
+			
+			for (isol=0; isol<nsol; ++isol) {
+				for (jsol=0; jsol<nsol; ++jsol) {
+					zidzdcc[isol][jsol] = zidzdc[isol]*zidzdc[jsol]*(1 - zidzdcc3/den)
+					- zidzdcc1[isol][jsol]/den
+					- z[isol]*(z[isol]*kappa[isol]*zidzdc[jsol]+zz[isol]*dkhdc[isol][jsol])/den
+					- z[jsol]*(z[jsol]*kappa[jsol]*zidzdc[isol]+zz[jsol]*dkhdc[jsol][isol])/den
+					- zidzdc[jsol]*zidzdcc2[isol]/den
+					- zidzdc[isol]*zidzdcc2[jsol]/den;
+				}
+			}
 		}
-		double dkdJ[2] = {zz[0]*dkhdJ[0]+z[0]*kappa[0]*zidzdJ,
-			zz[1]*dkhdJ[1]+z[1]*kappa[1]*zidzdJ};
-		double dkdc[2][2] = {{zz[0]*dkhdc[0][0]+z[0]*kappa[0]*zidzdc[0],
-			zz[0]*dkhdc[0][1]+z[0]*kappa[0]*zidzdc[1]},
-			{zz[1]*dkhdc[1][0]+z[1]*kappa[1]*zidzdc[0],
-				zz[1]*dkhdc[1][1]+z[1]*kappa[1]*zidzdc[1]}};
-		double dkdJJ[2] = {zz[0]*dkhdJJ[0]+2*z[0]*zz[0]*dkhdJ[0]*zidzdJ
-			+z[0]*kappa[0]*((z[0]-1)*SQR(zidzdJ)+zidzdJJ),
-			zz[1]*dkhdJJ[1]+2*z[1]*zz[1]*dkhdJ[1]*zidzdJ
-			+z[1]*kappa[1]*((z[1]-1)*SQR(zidzdJ)+zidzdJJ)};
-		double dkdJc[2][2] = {
-			{
-				zz[0]*dkhdJc[0][0]+z[0]*zz[0]*(dkhdJ[0]*zidzdc[0]+dkhdc[0][0]*zidzdJ)
-				+z[0]*kappa[0]*((z[0]-1)*zidzdc[0]*zidzdJ+zidzdJc[0]),
-				zz[0]*dkhdJc[0][1]+z[0]*zz[0]*(dkhdJ[0]*zidzdc[1]+dkhdc[0][1]*zidzdJ)
-				+z[0]*kappa[0]*((z[0]-1)*zidzdc[1]*zidzdJ+zidzdJc[1])},
-			{
-				zz[1]*dkhdJc[1][0]+z[1]*zz[1]*(dkhdJ[1]*zidzdc[0]+dkhdc[1][0]*zidzdJ)
-				+z[1]*kappa[1]*((z[1]-1)*zidzdc[0]*zidzdJ+zidzdJc[0]),
-				zz[1]*dkhdJc[1][1]+z[1]*zz[1]*(dkhdJ[1]*zidzdc[1]+dkhdc[1][1]*zidzdJ)
-				+z[1]*kappa[1]*((z[1]-1)*zidzdc[1]*zidzdJ+zidzdJc[1])}};
 		
-		// evaluate the permeability and its derivatives
-		mat3ds K = pm->m_pPerm->Permeability(mp);
-		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
-		mat3ds dKdc[2] = {pm->m_pPerm->Tangent_Permeability_Concentration(mp,0),
-			pm->m_pPerm->Tangent_Permeability_Concentration(mp,1)};
+		double dkdJ[nsol];
+		double dkdc[nsol][nsol];
+		double dkdJJ[nsol];
+		double dkdJc[nsol][nsol];
+		double dkdcc[nsol][nsol][nsol];
+		
+		for (isol=0; isol<nsol; ++isol) {
+			dkdJ[isol] = zz[isol]*dkhdJ[isol]+z[isol]*kappa[isol]*zidzdJ;
+			dkdJJ[isol] = zz[isol]*dkhdJJ[isol]+2*z[isol]*zz[isol]*dkhdJ[isol]*zidzdJ
+			+z[isol]*kappa[isol]*((z[isol]-1)*SQR(zidzdJ)+zidzdJJ);
+			for (jsol=0; jsol<nsol; ++jsol) {
+				dkdc[isol][jsol] = zz[isol]*dkhdc[isol][jsol]+z[isol]*kappa[isol]*zidzdc[jsol];
+				dkdJc[isol][jsol] = zz[isol]*dkhdJc[isol][jsol]
+				+z[isol]*zz[isol]*(dkhdJ[isol]*zidzdc[jsol]+dkhdc[isol][jsol]*zidzdJ)
+				+z[isol]*kappa[isol]*((z[isol]-1)*zidzdc[jsol]*zidzdJ+zidzdJc[jsol]);
+				for (ksol=0; ksol<nsol; ++ksol) {
+					dkdcc[isol][jsol][ksol] = zz[isol]*(dkhdcc[isol][jsol][ksol]
+														+z[isol]*(dkhdc[isol][jsol]*zidzdc[ksol]
+																  +dkhdc[isol][ksol]*zidzdc[jsol]))
+					+z[isol]*kappa[isol]*((z[isol]-1)*zidzdc[ksol]*zidzdc[jsol]+zidzdcc[jsol][ksol]);
+				}
+			}
+		}
 		
 		// evaluate the porosity and its derivative
 		double phiw = pm->Porosity(mp);
 		double phis = 1. - phiw;
 		double dpdJ = phis/J;
-		double dpdJJ = -2*phis/(J*J);
 		
-		// evaluate the diffusivity tensor and its derivatives
-		mat3ds D[2] = {
-			pm->m_pSolute[0]->m_pDiff->Diffusivity(mp),
-			pm->m_pSolute[1]->m_pDiff->Diffusivity(mp)};
-		tens4ds dDdE[2] = {
-			pm->m_pSolute[0]->m_pDiff->Tangent_Diffusivity_Strain(mp),
-			pm->m_pSolute[1]->m_pDiff->Tangent_Diffusivity_Strain(mp)};
-		mat3ds dDdc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pDiff->Tangent_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pDiff->Tangent_Diffusivity_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pDiff->Tangent_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pDiff->Tangent_Diffusivity_Concentration(mp,1)}};
-		
-		// evaluate the solute free diffusivity
-		double D0[2] = {
-			pm->m_pSolute[0]->m_pDiff->Free_Diffusivity(mp),
-			pm->m_pSolute[1]->m_pDiff->Free_Diffusivity(mp)};
-		double dD0dc[2][2] = {
-			{
-				pm->m_pSolute[0]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[0]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,1)},
-			{
-				pm->m_pSolute[1]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,0),
-				pm->m_pSolute[1]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,1)}};
-		
-		// evaluate the osmotic coefficient and its derivatives
+		// evaluate the osmotic coefficient
 		double osmc = pm->m_pOsmC->OsmoticCoefficient(mp);
-		double dodc[2] = {
-			pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,0),
-			pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,1)};
 		
-		// evaluate the stress tangent with concentration
-		mat3ds dTdc[2] = {
-			pm->m_pSolid->Tangent_Concentration(mp,0),
-			pm->m_pSolid->Tangent_Concentration(mp,1)};
+		// evaluate the permeability
+		mat3ds K = pm->m_pPerm->Permeability(mp);
+		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
+		
+		mat3ds dKdc[nsol];
+		mat3ds D[nsol];
+		tens4ds dDdE[nsol];
+		mat3ds dDdc[nsol][nsol];
+		double D0[nsol];
+		double dD0dc[nsol][nsol];
+		double dodc[nsol];
+		mat3ds dTdc[nsol];
+		mat3ds ImD[nsol];
+		mat3dd I(1);
+		
+		// evaluate the solvent supply and its derivatives
+		double phiwhat = 0;
+		mat3ds Phie; Phie.zero();
+		double Phip = 0;
+		double Phic[nsol] = {0};
+		
+		for (isol=0; isol<nsol; ++isol) {
+			// evaluate the permeability derivatives
+			dKdc[isol] = pm->m_pPerm->Tangent_Permeability_Concentration(mp,isol);
+			
+			// evaluate the diffusivity tensor and its derivatives
+			D[isol] = pm->m_pSolute[isol]->m_pDiff->Diffusivity(mp);
+			dDdE[isol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Strain(mp);
+			
+			// evaluate the solute free diffusivity
+			D0[isol] = pm->m_pSolute[isol]->m_pDiff->Free_Diffusivity(mp);
+			
+			// evaluate the derivative of the osmotic coefficient
+			dodc[isol] = pm->m_pOsmC->Tangent_OsmoticCoefficient_Concentration(mp,isol);
+			
+			// evaluate the stress tangent with concentration
+			dTdc[isol] = pm->m_pSolid->Tangent_Concentration(mp,isol);
+			
+			ImD[isol] = I-D[isol]/D0[isol];
+			
+			for (jsol=0; jsol<nsol; ++jsol) {
+				dDdc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Diffusivity_Concentration(mp,jsol);
+				dD0dc[isol][jsol] = pm->m_pSolute[isol]->m_pDiff->Tangent_Free_Diffusivity_Concentration(mp,jsol);
+			}
+		}
 		
 		// Miscellaneous constants
-		mat3dd I(1);
 		double R = pm->m_Rgas;
 		double T = pm->m_Tabs;
+		double penalty = pm->m_penalty;
 		
 		// evaluate the effective permeability and its derivatives
 		mat3ds Ki = K.inverse();
-		mat3ds ImD[2] = {I-D[0]/D0[0],I-D[1]/D0[1]};
-		mat3ds Ke = (Ki + (ImD[0]*(kappa[0]*c[0]/D0[0])+ImD[1]*(kappa[1]*c[1]/D0[1]))*(R*T/phiw)).inverse();
-		tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5
-		+dyad1s(ImD[0],I)*(R*T*c[0]*J/D0[0]/2/phiw*(dkdJ[0]-kappa[0]/phiw*dpdJ))
-		+(dyad1s(I) - dyad4s(I)*2 - dDdE[0]/D0[0])*(R*T*kappa[0]*c[0]/phiw/D0[0])
-		+dyad1s(ImD[1],I)*(R*T*c[1]*J/D0[1]/2/phiw*(dkdJ[1]-kappa[1]/phiw*dpdJ))
-		+(dyad1s(I) - dyad4s(I)*2 - dDdE[1]/D0[1])*(R*T*kappa[1]*c[1]/phiw/D0[1]);
+		mat3ds Ke(0,0,0,0,0,0);
+		tens4ds G = dyad1s(Ki,I) - dyad4s(Ki,I)*2 - ddots(dyad2s(Ki),dKdE)*0.5;
+		mat3ds Gc[nsol];
+		mat3ds dKedc[nsol];
+		for (isol=0; isol<nsol; ++isol) {
+			Ke += ImD[isol]*(kappa[isol]*c[isol]/D0[isol]);
+			G += dyad1s(ImD[isol],I)*(R*T*c[isol]*J/D0[isol]/2/phiw*(dkdJ[isol]-kappa[isol]/phiw*dpdJ))
+			+(dyad1s(I) - dyad4s(I)*2 - dDdE[isol]/D0[isol])*(R*T*kappa[isol]*c[isol]/phiw/D0[isol]);
+			Gc[isol] = ImD[isol]*(kappa[isol]/D0[isol]);
+			for (jsol=0; jsol<nsol; ++jsol) {
+				Gc[isol] += ImD[jsol]*(c[jsol]/D0[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol]))
+				-(dDdc[jsol][isol]-D[jsol]*(dD0dc[jsol][isol]/D0[jsol])*(kappa[jsol]*c[jsol]/SQR(D0[jsol])));
+			}
+			Gc[isol] *= R*T/phiw;
+		}
+		Ke = (Ki + Ke*(R*T/phiw)).inverse();
 		tens4ds dKedE = dyad1s(Ke,I) - 2*dyad4s(Ke,I) - ddots(dyad2s(Ke),G)*0.5;
-		mat3ds Gc[2] = {
-			(ImD[0]*(kappa[0]/D0[0])
-			 +ImD[0]*(c[0]/D0[0]*(dkdc[0][0]-kappa[0]/D0[0]*dD0dc[0][0]))
-			 +ImD[1]*(c[1]/D0[1]*(dkdc[1][0]-kappa[1]/D0[1]*dD0dc[1][0]))
-			 -(dDdc[0][0]-D[0]*(dD0dc[0][0]/D0[0])*(kappa[0]*c[0]/SQR(D0[0])))
-			 -(dDdc[1][0]-D[1]*(dD0dc[1][0]/D0[1])*(kappa[1]*c[1]/SQR(D0[1])))
-			 )*(R*T/phiw),
-			(ImD[1]*(kappa[1]/D0[1])
-			 +ImD[0]*(c[0]/D0[0]*(dkdc[0][1]-kappa[0]/D0[0]*dD0dc[0][1]))
-			 +ImD[1]*(c[1]/D0[1]*(dkdc[1][1]-kappa[1]/D0[1]*dD0dc[1][1]))
-			 -(dDdc[0][1]-D[0]*(dD0dc[0][1]/D0[0])*(kappa[0]*c[0]/SQR(D0[0])))
-			 -(dDdc[1][1]-D[1]*(dD0dc[1][1]/D0[1])*(kappa[1]*c[1]/SQR(D0[1])))
-			 )*(R*T/phiw)};
-		mat3ds dKedc[2] = {-Ke*(-Ki*dKdc[0]*Ki + Gc[0])*Ke,-Ke*(-Ki*dKdc[1]*Ki + Gc[1])*Ke};
+		for (isol=0; isol<nsol; ++isol)
+			dKedc[isol] = -Ke*(-Ki*dKdc[isol]*Ki + Gc[isol])*Ke;
 		
 		// calculate all the matrices
-		vec3d vtmp,gp,gc[2],wc[2],jc[2][2];
-		mat3d wu,ju[2];
+		vec3d vtmp,gp,qpu;
+		vec3d gc[nsol],wc[nsol],jce[nsol];
+		vec3d jc[nsol][nsol];
+		mat3d wu, jue;
+		mat3d ju[nsol];
+		double sum;
+		mat3ds De;
 		tmp = detJ*gw[n];
 		for (i=0; i<neln; ++i)
 		{
 			for (j=0; j<neln; ++j)
 			{
 				// calculate the kpu matrix
-				gp = gradp+((D[0]*gradc[0])*(kappa[0]/D0[0])+(D[1]*gradc[1])*(kappa[1]/D0[1]))*R*T;
-				wu = vdotTdotv(-gp, dKedE, gradN[j])
-				-(((Ke*(D[0]*gradc[0])) & gradN[j])*(J*dkdJ[0] - kappa[0])
-				  +Ke*(2*kappa[0]*(gradN[j]*(D[0]*gradc[0]))))*R*T/D0[0]
-				- Ke*vdotTdotv(gradc[0], dDdE[0], gradN[j])*(kappa[0]*R*T/D0[0])
-				-(((Ke*(D[1]*gradc[1])) & gradN[j])*(J*dkdJ[1] - kappa[1])
-				  +Ke*(2*kappa[1]*(gradN[j]*(D[1]*gradc[1]))))*R*T/D0[1]
-				- Ke*vdotTdotv(gradc[1], dDdE[1], gradN[j])*(kappa[1]*R*T/D0[1]);
-				vtmp = (wu.transpose()*gradN[i])*(tmp*dt);
+				gp = vec3d(0,0,0);
+				for (isol=0; isol<nsol; ++isol) gp += (D[isol]*gradc[isol])*(kappa[isol]/D0[isol]);
+				gp = gradp+gp*(R*T);
+				wu = vdotTdotv(-gp, dKedE, gradN[j]);
+				for (isol=0; isol<nsol; ++isol) {
+					wu += (((Ke*(D[isol]*gradc[isol])) & gradN[j])*(J*dkdJ[isol] - kappa[isol])
+						   +Ke*(2*kappa[isol]*(gradN[j]*(D[isol]*gradc[isol]))))*(-R*T/D0[isol])
+					+ (Ke*vdotTdotv(gradc[isol], dDdE[isol], gradN[j]))*(-kappa[isol]*R*T/D0[isol]);
+				}
+				qpu = Phie*gradN[j];
+				vtmp = (wu.transpose()*gradN[i] + qpu*H[i])*(tmp*dt);
 				ke[ndpn*i+3][ndpn*j  ] += vtmp.x;
 				ke[ndpn*i+3][ndpn*j+1] += vtmp.y;
 				ke[ndpn*i+3][ndpn*j+2] += vtmp.z;
-				
-				// calculate the kcu matrix for the cation
-				gc[0] = -gradc[0]*phiw + w*c[0]/D0[0];
-				ju[0] = ((D[0]*gc[0]) & gradN[j])*(J*dkdJ[0]) 
-				+ vdotTdotv(gc[0], dDdE[0], gradN[j])*kappa[0]
-				+ (((D[0]*gradc[0]) & gradN[j])*(-phis)
-				   +(D[0]*((gradN[j]*w)*2) - ((D[0]*w) & gradN[j]))*c[0]/D0[0]
-				   )*kappa[0]
-				+D[0]*wu*(kappa[0]*c[0]/D0[0]);
-				vtmp = (ju[0].transpose()*gradN[i])*(tmp*dt);
-				ke[ndpn*i+4][ndpn*j  ] += vtmp.x;
-				ke[ndpn*i+4][ndpn*j+1] += vtmp.y;
-				ke[ndpn*i+4][ndpn*j+2] += vtmp.z;
-				
-				// calculate the kcu matrix for the anion
-				gc[1] = -gradc[1]*phiw + w*c[1]/D0[1];
-				ju[1] = ((D[1]*gc[1]) & gradN[j])*(J*dkdJ[1]) 
-				+ vdotTdotv(gc[1], dDdE[1], gradN[j])*kappa[1]
-				+ (((D[1]*gradc[1]) & gradN[j])*(-phis)
-				   +(D[1]*((gradN[j]*w)*2) - ((D[1]*w) & gradN[j]))*c[1]/D0[1]
-				   )*kappa[1]
-				+D[1]*wu*(kappa[1]*c[1]/D0[1]);
-				vtmp = (ju[1].transpose()*gradN[i])*(tmp*dt);
-				ke[ndpn*i+5][ndpn*j  ] += vtmp.x;
-				ke[ndpn*i+5][ndpn*j+1] += vtmp.y;
-				ke[ndpn*i+5][ndpn*j+2] += vtmp.z;
 				
 				// calculate the kup matrix
 				vtmp = -gradN[i]*H[j]*tmp;
@@ -1833,78 +1827,82 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 				ke[ndpn*i+2][ndpn*j+3] += vtmp.z;
 				
 				// calculate the kpp matrix
-				ke[ndpn*i+3][ndpn*j+3] -= gradN[i]*(Ke*gradN[j])*(tmp*dt);
+				ke[ndpn*i+3][ndpn*j+3] += (H[i]*H[j]*Phip - gradN[i]*(Ke*gradN[j]))*(tmp*dt);
 				
-				// calculate the kcp matrix for the cation
-				ke[ndpn*i+4][ndpn*j+3] -= (gradN[i]*((D[0]*Ke)*gradN[j]))*(kappa[0]*c[0]/D0[0])*(tmp*dt);
+				// calculate kcu matrix data
+				jue.zero();
+				De.zero();
+				for (isol=0; isol<nsol; ++isol) {
+					gc[isol] = -gradc[isol]*phiw + w*c[isol]/D0[isol];
+					ju[isol] = ((D[isol]*gc[isol]) & gradN[j])*(J*dkdJ[isol])
+					+ vdotTdotv(gc[isol], dDdE[isol], gradN[j])*kappa[isol]
+					+ (((D[isol]*gradc[isol]) & gradN[j])*(-phis)
+					   +(D[isol]*((gradN[j]*w)*2) - ((D[isol]*w) & gradN[j]))*c[isol]/D0[isol]
+					   )*kappa[isol]
+					+D[isol]*wu*(kappa[isol]*c[isol]/D0[isol]);
+					jue += ju[isol]*z[isol];
+					De += D[isol]*(z[isol]*kappa[isol]*c[isol]/D0[isol]);
+				}
 				
-				// calculate the kcp matrix for the anion
-				ke[ndpn*i+5][ndpn*j+3] -= (gradN[i]*((D[1]*Ke)*gradN[j]))*(kappa[1]*c[1]/D0[1])*(tmp*dt);
+				for (isol=0; isol<nsol; ++isol) {
+					
+					// calculate the kcu matrix
+					vtmp = ((ju[isol]+jue*penalty).transpose()*gradN[i])*(tmp*dt);
+					ke[ndpn*i+4+isol][ndpn*j  ] += vtmp.x;
+					ke[ndpn*i+4+isol][ndpn*j+1] += vtmp.y;
+					ke[ndpn*i+4+isol][ndpn*j+2] += vtmp.z;
+					
+					// calculate the kcp matrix
+					ke[ndpn*i+4+isol][ndpn*j+3] -= (gradN[i]*(
+															  (D[isol]*(kappa[isol]*c[isol]/D0[isol])
+															   +De*penalty)
+															  *(Ke*gradN[j])
+															  ))*(tmp*dt);
+					
+					// calculate the kuc matrix
+					sum = 0;
+					for (jsol=0; jsol<nsol; ++jsol)
+						sum += c[jsol]*(dodc[isol]*kappa[jsol]+osmc*dkdc[jsol][isol]);
+					vtmp = (dTdc[isol]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[isol]+sum)))*H[j]*tmp;
+					ke[ndpn*i  ][ndpn*j+4+isol] += vtmp.x;
+					ke[ndpn*i+1][ndpn*j+4+isol] += vtmp.y;
+					ke[ndpn*i+2][ndpn*j+4+isol] += vtmp.z;
+					
+					// calculate the kpc matrix
+					vtmp = vec3d(0,0,0);
+					for (jsol=0; jsol<nsol; ++jsol)
+						vtmp += (D[jsol]*(dkdc[jsol][isol]-kappa[jsol]/D0[jsol]*dD0dc[jsol][isol])
+								 +dDdc[jsol][isol]*kappa[jsol])/D0[jsol]*gradc[jsol];
+					wc[isol] = (dKedc[isol]*gp)*(-H[j])
+					-Ke*((D[isol]*gradN[j])*(kappa[isol]/D0[isol])+vtmp*H[j])*(R*T);
+					ke[ndpn*i+3][ndpn*j+4+isol] += (gradN[i]*wc[isol]+H[i]*H[j]*Phic[isol])*(tmp*dt);
+					
+				}
 				
-				// calculate the kuc matrix for the cation
-				vtmp = (dTdc[0]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[0]
-														  +c[0]*(dodc[0]*kappa[0]+osmc*dkdc[0][0])
-														  +c[1]*(dodc[0]*kappa[1]+osmc*dkdc[1][0])
-														  )))*H[j]*tmp;
-				ke[ndpn*i  ][ndpn*j+4] += vtmp.x;
-				ke[ndpn*i+1][ndpn*j+4] += vtmp.y;
-				ke[ndpn*i+2][ndpn*j+4] += vtmp.z;
+				// calculate data for the kcc matrix
+				jce[0] = jce[1] = vec3d(0,0,0);
+				for (isol=0; isol<nsol; ++isol) {
+					for (jsol=0; jsol<nsol; ++jsol) {
+						if (jsol != isol) {
+							jc[isol][jsol] =
+							((D[isol]*dkdc[isol][jsol]+dDdc[isol][jsol]*kappa[isol])*gc[isol])*H[j]
+							+(D[isol]*(w*(-H[j]*dD0dc[isol][jsol]/D0[isol])+wc[jsol]))*(kappa[isol]*c[isol]/D0[isol]);
+						}
+						else {
+							jc[isol][jsol] = (D[isol]*(gradN[j]*(-phiw)+w*(H[j]/D0[isol])))*kappa[isol]
+							+((D[isol]*dkdc[isol][jsol]+dDdc[isol][jsol]*kappa[isol])*gc[isol])*H[j]
+							+(D[isol]*(w*(-H[j]*dD0dc[isol][jsol]/D0[isol])+wc[jsol]))*(kappa[isol]*c[isol]/D0[isol]);
+						}
+						jce[jsol] += jc[isol][jsol]*z[isol];
+					}
+				}
 				
-				// calculate the kuc matrix for the anion
-				vtmp = (dTdc[1]*gradN[i] - gradN[i]*(R*T*(osmc*kappa[1]
-														  +c[0]*(dodc[1]*kappa[0]+osmc*dkdc[0][1])
-														  +c[1]*(dodc[1]*kappa[1]+osmc*dkdc[1][1])
-														  )))*H[j]*tmp;
-				ke[ndpn*i  ][ndpn*j+5] += vtmp.x;
-				ke[ndpn*i+1][ndpn*j+5] += vtmp.y;
-				ke[ndpn*i+2][ndpn*j+5] += vtmp.z;
-				
-				// calculate the kpc matrix for the cation
-				wc[0] = (dKedc[0]*gp)*(-H[j])
-				-Ke*((D[0]*gradN[j])*(kappa[0]/D0[0])
-					 +((D[0]*(dkdc[0][0]-kappa[0]/D0[0]*dD0dc[0][0])
-						+dDdc[0][0]*kappa[0])*gradc[0]
-					   +(D[1]*(dkdc[1][0]-kappa[1]/D0[1]*dD0dc[1][0])
-						 +dDdc[1][0]*kappa[1])*gradc[1]
-					   )*H[j]
-					 )*(R*T);
-				ke[ndpn*i+3][ndpn*j+4] += (gradN[i]*wc[0])*(tmp*dt);
-				
-				// calculate the kpc matrix for the anion
-				wc[1] = (dKedc[1]*gp)*(-H[j])
-				-Ke*((D[1]*gradN[j])*(kappa[1]/D0[1])
-					 +((D[0]*(dkdc[0][1]-kappa[0]/D0[0]*dD0dc[0][1])
-						+dDdc[0][1]*kappa[0])*gradc[0]
-					   +(D[1]*(dkdc[1][1]-kappa[1]/D0[1]*dD0dc[1][1])
-						 +dDdc[1][1]*kappa[1])*gradc[1]
-					   )*H[j]
-					 )*(R*T);
-				ke[ndpn*i+3][ndpn*j+5] += (gradN[i]*wc[1])*(tmp*dt);
-				
-				// calculate the kcc matrix for the cation-cation
-				jc[0][0] = (D[0]*(gradN[j]*(-phiw)+w*(H[j]/D0[0])))*kappa[0]
-				+((D[0]*dkdc[0][0]+dDdc[0][0]*kappa[0])*(gradc[0]*(-phiw)+w*(c[0]/D0[0])))*H[j]
-				+(D[0]*w*(-H[j]*dD0dc[0][0]/D0[0])+D[0]*wc[0])*(kappa[0]*c[0]/D0[0]);
-				ke[ndpn*i+4][ndpn*j+4] += (gradN[i]*jc[0][0])*(tmp*dt);
-				
-				// calculate the kcc matrix for the anion-anion
-				jc[1][1] = (D[1]*(gradN[j]*(-phiw)+w*(H[j]/D0[1])))*kappa[1]
-				+((D[1]*dkdc[1][1]+dDdc[1][1]*kappa[1])*(gradc[1]*(-phiw)+w*(c[1]/D0[1])))*H[j]
-				+(D[1]*w*(-H[j]*dD0dc[1][1]/D0[1])+D[1]*wc[1])*(kappa[1]*c[1]/D0[1]);
-				ke[ndpn*i+5][ndpn*j+5] += (gradN[i]*jc[1][1])*(tmp*dt);
-				
-				// calculate the kcc matrix for the cation-anion
-				jc[0][1] = 
-				((D[0]*dkdc[0][1]+dDdc[0][1]*kappa[0])*(gradc[0]*(-phiw)+w*(c[0]/D0[0])))*H[j]
-				+(D[0]*w*(-H[j]*dD0dc[0][1]/D0[0])+D[0]*wc[1])*(kappa[0]*c[0]/D0[0]);
-				ke[ndpn*i+4][ndpn*j+5] += (gradN[i]*jc[0][1])*(tmp*dt);
-				
-				// calculate the kcc matrix for the anion-cation
-				jc[1][0] = 
-				((D[1]*dkdc[1][0]+dDdc[1][0]*kappa[1])*(gradc[1]*(-phiw)+w*(c[1]/D0[1])))*H[j]
-				+(D[1]*w*(-H[j]*dD0dc[1][0]/D0[1])+D[1]*wc[0])*(kappa[1]*c[1]/D0[1]);
-				ke[ndpn*i+5][ndpn*j+4] += (gradN[i]*jc[1][0])*(tmp*dt);
-				
+				// calculate the kcc matrix
+				for (isol=0; isol<nsol; ++isol) {
+					for (jsol=0; jsol<nsol; ++jsol) {
+						ke[ndpn*i+4+isol][ndpn*j+4+jsol] += (gradN[i]*(jc[isol][jsol]+jce[jsol]*penalty))*(tmp*dt);
+					}
+				}
 			}
 		}
 	}

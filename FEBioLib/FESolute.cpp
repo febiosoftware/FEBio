@@ -29,6 +29,7 @@ void FESolute::Init()
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;
 	m_z = (int) psd->m_z;
+	SetName(psd->m_szname);
 	
 	if (m_rhoT < 0) throw MaterialError("density must be positive");
 	if (m_M < 0) throw MaterialError("molar_mass must be positive");

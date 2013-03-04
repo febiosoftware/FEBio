@@ -38,6 +38,9 @@ FELMOptimizeMethod::FELMOptimizeMethod()
 {
 	m_objtol = 0.001;
 	m_fdiff  = 0.001;
+	m_nmax   = 100;
+	m_bcov   = 0;
+    m_loglevel = Logfile::NEVER;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,7 +110,6 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 		// repeat until converged
 		double fprev = fret, lam1 = alamda;
 		bool bconv = false;
-		int NMAX = 100;
 		do
 		{
 			log.printf("\n----- Major Iteration: %d -----\n", niter);
@@ -129,7 +131,7 @@ bool FELMOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 			++niter;
 		}
-		while ((bconv == false) && (niter < NMAX));
+		while ((bconv == false) && (niter < m_nmax));
 
 		// do final call with lamda = 0
 		alamda = 0.0;
@@ -249,7 +251,7 @@ bool FELMOptimizeMethod::FESolve(vector<double> &x, vector<double> &a, vector<do
 	}
 
 	// solve the FE problem
-	log.SetMode(Logfile::NEVER);
+	log.SetMode(m_loglevel);
 
 	bool bret = fem.Solve();
 
