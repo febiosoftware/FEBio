@@ -109,6 +109,9 @@ public:
 	// return the material's parameter list
 	FEParameterList& GetParameterList();
 
+	//! find a parameter using it's name
+	FEParam* GetParameter(const char* sz);
+
 	// serialize parameter data
 	virtual void Serialize(DumpFile& ar);
 

@@ -68,6 +68,14 @@ FEParameterList& FEParamContainer::GetParameterList()
 }
 
 //-----------------------------------------------------------------------------
+// Find a parameter from its name
+FEParam* FEParamContainer::GetParameter(const char* sz)
+{
+	FEParameterList& pl = GetParameterList();
+	return pl.Find(sz);
+}
+
+//-----------------------------------------------------------------------------
 // Serialize parameters to archive
 void FEParamContainer::Serialize(DumpFile& ar)
 {
