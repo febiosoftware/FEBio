@@ -123,44 +123,6 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-//! Base class for nested materials. A nested material describes whose material 
-//! response depends on the formulation of another user specified material. For
-//! instance, the FEViscoElastic is an example of nested materials.
-//!
-//! NOTE:	The visco-elastic material uses a new format that no longer requires
-//!			the m_nBaseMat parameter anymore. In the interest of backward
-//!			compatibility I am implementing a hack that allows both formulations.
-//!			If the m_nBaseMat is -1, then the new format
-//!			is used where the m_pBase is owned by the FENestedMaterial. If
-//!			it is not -1, then it uses the old format where m_nBaseMat
-//!			points to another material.
-
-class FENestedMaterial : public FESolidMaterial
-{
-public:
-	FENestedMaterial() { m_nBaseMat = -1; m_pBase = 0; }
-	virtual ~FENestedMaterial(){}
-
-	//! return solid component's density
-	double Density () { return m_pBase->Density(); }
-
-	//! return solid component's molar mass
-	double MolarMass () { return m_pBase->MolarMass(); }
-
-	//! serialization
-	void Serialize(DumpFile& ar);
-
-	//! Get the elastic component
-	FEElasticMaterial* GetElasticMaterial() { return m_pBase->GetElasticMaterial(); }
-
-public:
-	int					m_nBaseMat;	//!< material ID of base material (one-based!)
-	FESolidMaterial*	m_pBase;	//!< pointer to base material
-
-	DECLARE_PARAMETER_LIST();
-};
-
-//-----------------------------------------------------------------------------
 //! Base class for materials that define multiple sub-components, such as
 //! biphasic, biphasic-solute, triphasic and solute material classes.
 class FEMultiMaterial : public FEMaterial

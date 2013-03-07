@@ -34,7 +34,6 @@ protected:
 	bool ParseMultiphasicMaterial          (XMLTag& tag, FEMultiphasic* pm);
 	bool ParseViscoElasticMaterial		   (XMLTag& tag, FEViscoElasticMaterial* pm);
 	bool ParseUncoupledViscoElasticMaterial(XMLTag& tag, FEUncoupledViscoElasticMaterial* pm);
-	bool ParseNestedMaterial			   (XMLTag& tag, FENestedMaterial* pm);
 	bool ParseElasticMultigeneration	   (XMLTag &tag, FEElasticMultigeneration *pm);
 
 protected:

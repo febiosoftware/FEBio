@@ -353,26 +353,6 @@ double* FEBioModel::FindParameter(const char* szparam)
 
 	if (pp) return pp->pvalue<double>(index);
 
-	// if this material is a nested material, we'll need to check the base material
-	FENestedMaterial* pmn = dynamic_cast<FENestedMaterial*>(pmat);
-	if (pmn)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-
-		if (strcmp(szvar, "elastic") == 0)
-		{
-			// search the nested material parameter list
-			pmat = pmn->m_pBase;
-			FEParameterList& pl = pmat->GetParameterList();
-			FEParam* pp = pl.Find(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-	}
-
 	// if material is solid mixture, check individual solid materials
 	FEElasticMixture* pme = dynamic_cast<FEElasticMixture*>(pmat);
 	if (pme) return FindSolidMixtureParameter(szvar, index, pme);
@@ -1235,17 +1215,6 @@ void FEBioModel::SerializeMaterials(DumpFile& ar)
 
 			// Add material and parameter list to FEM
 			AddMaterial(pmat);
-		}
-
-		// we still need to reset the material pointers for the nested materials
-		for (int i=0; i<nmat; ++i)
-		{
-			FENestedMaterial* pmat = dynamic_cast<FENestedMaterial*>(m_MAT[i]);
-			if (pmat)
-			{
-				pmat->m_pBase = dynamic_cast<FESolidMaterial*>(m_MAT[pmat->m_nBaseMat-1]);
-				assert(pmat->m_pBase);
-			}
 		}
 	}
 }

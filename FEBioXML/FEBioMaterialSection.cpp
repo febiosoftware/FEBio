@@ -66,50 +66,6 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-
-	// assign material pointers for nested materials
-	for (int i=0; i<fem.Materials(); ++i)
-	{
-		FENestedMaterial* pm = dynamic_cast<FENestedMaterial*>(fem.GetMaterial(i));
-		// NOTE: The nested version of visco-elasticity is obselete. Until a new
-		//		 implementation is available I am using the FENestedMaterial version
-		//		 with some tweaks. Only if the m_nBaseMat is not -1 the nested formulation
-		//		 is used. If m_nBaseMat == -1 we assume the new formulation and assume that
-		//		 the m_pBase is already set.
-		if (pm)
-		{
-			if (pm->m_nBaseMat == -1)
-			{
-				if (pm->m_pBase == 0) clog.printbox("INPUT ERROR", "base material for material %d is not defined\n", i+1);
-			}
-			else
-			{
-				// get the ID of the base material
-				// note that m_nBaseMat is a one-based variable!
-				int nbase = pm->m_nBaseMat - 1;
-
-				// make sure the base ID is valid
-				if ((nbase < 0) || (nbase >= fem.Materials()))
-				{
-					clog.printbox("INPUT ERROR", "Invalid base material ID for material %d\n", i+1);
-					throw XMLReader::Error();
-				}
-
-				// make sure the base material is a valid material (i.e. an elastic material)
-				FESolidMaterial* pme = dynamic_cast<FESolidMaterial*>(fem.GetMaterial(nbase));
-
-				// don't allow rigid bodies
-				if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
-				{
-					clog.printbox("INPUT ERROR", "Invalid base material for material %d\n", i+1);
-					throw XMLReader::Error();
-				}
-
-				// set the base material pointer
-				pm->m_pBase = pme;
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -168,9 +124,6 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 
 			// uncoupled viscoelastic materials
 			if (!bfound && dynamic_cast<FEUncoupledViscoElasticMaterial*>(pmat)) bfound = ParseUncoupledViscoElasticMaterial(tag, dynamic_cast<FEUncoupledViscoElasticMaterial*>(pmat));
-			
-			// nested materials
-			if (!bfound && dynamic_cast<FENestedMaterial*>(pmat)) bfound = ParseNestedMaterial(tag, dynamic_cast<FENestedMaterial*>(pmat));
 			
 			// multigeneration materials
 			if (!bfound && dynamic_cast<FEElasticMultigeneration*>(pmat)) bfound = ParseElasticMultigeneration(tag, dynamic_cast<FEElasticMultigeneration*>(pmat));
@@ -1015,55 +968,5 @@ bool FEBioMaterialSection::ParseUncoupledViscoElasticMaterial(XMLTag &tag, FEUnc
 		return true;
 	}
 	
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Parse a nested material
-// NOTE: nested materials are obselete, but we are still using them in the
-// interest of backward compatibility. At this point, they are somewhat of a
-// hybrid between the old and new format.
-bool FEBioMaterialSection::ParseNestedMaterial(XMLTag &tag, FENestedMaterial *pm)
-{
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-
-	// Make sure the m_nBaseMat is -1
-	if (pm->m_nBaseMat != -1) return false;
-	
-	// read the solid material
-	if (tag == "elastic")
-	{
-		const char* sztype = 0;
-		const char* szname = 0;
-
-		// get the material type
-		sztype = tag.AttributeValue("type");
-		
-		// get the material name
-		szname = tag.AttributeValue("name", true);
-		
-		// create a new material of this type
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. an elastic material)
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
-		
-		// don't allow rigid bodies
-		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
-		{
-			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in biphasic material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the solid material pointer
-		pm->m_pBase = pme;
-		
-		// parse the solid
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-
 	return false;
 }

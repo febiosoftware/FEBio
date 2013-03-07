@@ -103,33 +103,6 @@ mat3ds FESolidMaterial::Tangent_Concentration(FEMaterialPoint& pt, const int iso
 	return mat3ds(0,0,0,0,0,0);
 }
 
-//-----------------------------------------------------------------------------
-// Material parameters for the FENestedMaterial
-BEGIN_PARAMETER_LIST(FENestedMaterial, FEMaterial)
-	ADD_PARAMETER(m_nBaseMat, FE_PARAM_INT, "solid_id");
-END_PARAMETER_LIST();
-
-//-----------------------------------------------------------------------------
-void FENestedMaterial::Serialize(DumpFile &ar)
-{
-	// serialize base class
-	FESolidMaterial::Serialize(ar);
-
-	// serialize nested material data
-	if (ar.IsSaving())
-	{
-		ar << m_nBaseMat;
-		assert(m_pBase && (m_pBase->GetID() == m_nBaseMat));
-	}
-	else
-	{
-		ar >> m_nBaseMat;
-
-		// We can't set the base material here since it may not have been loaded yet
-		m_pBase = 0;
-	}
-}
-
 //=============================================================================
 // FEMultiMaterial
 //=============================================================================

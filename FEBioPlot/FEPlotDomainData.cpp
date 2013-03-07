@@ -1005,17 +1005,7 @@ bool FEPlotMixtureVolumeFraction::Save(FEDomain &m, std::vector<float> &a)
 	// extract the mixture material
 	FEMaterial* pmat = m.GetMaterial();
 	FEElasticMixture* pm = dynamic_cast<FEElasticMixture*>(pmat);
-	if (pm == 0)
-	{
-		FENestedMaterial* pnm = dynamic_cast<FENestedMaterial*>(pmat);
-		if (pnm)
-		{
-			pmat = pnm->m_pBase;
-			FEElasticMixture* pm = dynamic_cast<FEElasticMixture*>(pmat);
-			if (pm == 0) return false;
-		}
-		else return false;
-	}
+	if (pm == 0) return false;
 
 	// store the volume fraction of the first material
 	int N = m.Elements();
