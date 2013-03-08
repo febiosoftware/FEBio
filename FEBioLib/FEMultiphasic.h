@@ -73,6 +73,9 @@ public:
 	
 	// return elastic material component
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
+
+	// find a material parameter
+	FEParam* GetParameter(const char* sz);
 	
 public:
 	void Init();

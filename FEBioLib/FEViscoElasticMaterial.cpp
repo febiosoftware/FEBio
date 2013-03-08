@@ -28,6 +28,7 @@ FEViscoElasticMaterial::FEViscoElasticMaterial()
 		m_t[i] = 1;
 		m_g[i] = 0;
 	}
+	m_pBase = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -35,7 +36,15 @@ FEViscoElasticMaterial::FEViscoElasticMaterial()
 void FEViscoElasticMaterial::Init()
 {
 	FEElasticMaterial::Init();
+	if (m_pBase == 0) throw MaterialError("This material needs an elastic base");
 	m_pBase->Init();
+}
+
+//-----------------------------------------------------------------------------
+//! Create material point data for this material
+FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
+{ 
+	return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
 }
 
 //-----------------------------------------------------------------------------
@@ -94,4 +103,21 @@ tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 
 	// multiply tangent with visco-factor
 	return C*f;
+}
+
+//-----------------------------------------------------------------------------
+//! Get a material parameter
+FEParam* FEViscoElasticMaterial::GetParameter(const char* sz)
+{
+	// see if this is a composite parameter
+	char* ch = strchr((char*)sz, '.');
+
+	// if not, check this class' parameters
+	if (ch == 0) return FEElasticMaterial::GetParameter(sz);
+
+	// else, see if this a parameter of the elastic component
+	*ch = 0;
+	const char* szvar2 = ch+1;
+	if (strcmp(sz, "elastic") == 0) return m_pBase->GetParameter(szvar2);
+	return 0;
 }

@@ -28,6 +28,7 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial()
 		m_t[i] = 1;
 		m_g[i] = 0;
 	}
+	m_pBase = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -37,12 +38,20 @@ void FEUncoupledViscoElasticMaterial::Init()
 	static bool bfirst = true;
 
 	FEUncoupledMaterial::Init();
+	if (m_pBase == 0) throw MaterialError("This material needs a base material.");
 	m_pBase->Init();
 	
 	// combine bulk modulus from base material and uncoupled viscoelastic material
 	if (bfirst) m_K += m_pBase->m_K;
 
 	bfirst = false;
+}
+
+//-----------------------------------------------------------------------------
+//! Create material point data
+FEMaterialPoint* FEUncoupledViscoElasticMaterial::CreateMaterialPointData()
+{ 
+	return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
 }
 
 //-----------------------------------------------------------------------------
@@ -101,4 +110,21 @@ tens4ds FEUncoupledViscoElasticMaterial::DevTangent(FEMaterialPoint& pt)
 	
 	// multiply tangent with visco-factor
 	return C*f;
+}
+
+//-----------------------------------------------------------------------------
+//! Get a material parameter
+FEParam* FEUncoupledViscoElasticMaterial::GetParameter(const char* sz)
+{
+	// see if this is a composite parameter
+	char* ch = strchr((char*)sz, '.');
+
+	// if not, check this class' parameters
+	if (ch == 0) return FEUncoupledMaterial::GetParameter(sz);
+
+	// else, see if this a parameter of the elastic component
+	*ch = 0;
+	const char* szvar2 = ch+1;
+	if (strcmp(sz, "elastic") == 0) return m_pBase->GetParameter(szvar2);
+	return 0;
 }

@@ -13,9 +13,18 @@ class FEUncoupledElasticMixture : public FEUncoupledMaterial
 {
 public:
 	FEUncoupledElasticMixture() {}
-	
-public:
-	vector <FEUncoupledMaterial*>	m_pMat;	//!< pointers to elastic materials
+
+	// return number of materials
+	int Materials() const { return m_pMat.size(); }
+
+	// return a material component
+	FEUncoupledMaterial* GetMaterial(int i) { return m_pMat[i]; }
+
+	// Add a material component
+	void AddMaterial(FEUncoupledMaterial* pm) { m_pMat.push_back(pm); }
+
+	// get a material parameter
+	FEParam* GetParameter(const char* sz);
 	
 public:
 	//! calculate stress at material point
@@ -26,7 +35,7 @@ public:
 	
 	//! data initialization and checking
 	void Init();
-	
-	// declare the parameter list
-//		DECLARE_PARAMETER_LIST();
+
+private:
+	vector <FEUncoupledMaterial*>	m_pMat;	//!< pointers to elastic materials
 };

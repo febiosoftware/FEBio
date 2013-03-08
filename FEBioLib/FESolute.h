@@ -129,6 +129,9 @@ public:
 	
 	//! get solute ID
 	int GetSoluteID() {return m_ID;}
+
+	//! Find a material parameter
+	FEParam* GetParameter(const char* sz);
 	
 private:
 	int						m_ID;		//!< solute ID in global table

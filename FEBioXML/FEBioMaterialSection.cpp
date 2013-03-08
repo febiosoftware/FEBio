@@ -652,7 +652,7 @@ bool FEBioMaterialSection::ParseUncoupledElasticMixture(XMLTag &tag, FEUncoupled
 		}
 		
 		// set the solid material pointer
-		pm->m_pMat.push_back(pme);
+		pm->AddMaterial(pme);
 		
 		// set the material's name
 		if (szname) pme->SetName(szname);
@@ -916,7 +916,7 @@ bool FEBioMaterialSection::ParseViscoElasticMaterial(XMLTag &tag, FEViscoElastic
 		}
 
 		// set the solid material pointer
-		pm->m_pBase = pme;
+		pm->SetBaseMaterial(pme);
 		
 		// parse the solid
 		ParseMaterial(tag, pme);

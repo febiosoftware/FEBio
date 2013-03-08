@@ -637,3 +637,31 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 		
 	}
 }
+
+//-----------------------------------------------------------------------------
+FEParam* FEMultiphasic::GetParameter(const char* sz)
+{
+	char* ch = strchr((char*)sz, '.');
+	if (ch == 0) return FEMultiMaterial::GetParameter(sz);
+	*ch = 0;
+	const char* szvar = ch+1;
+		
+	if      (strcmp(sz, "solid"              ) == 0) return m_pSolid->GetParameter(szvar);
+	else if (strcmp(sz, "permeability"       ) == 0) return m_pPerm ->GetParameter(szvar);
+	else if (strcmp(sz, "osmotic_coefficient") == 0) return m_pOsmC ->GetParameter(szvar);
+	else if (strcmp(sz, "solute"             ) == 0)
+	{
+		char* ch = strchr((char*)szvar, '.');
+		if (ch == 0) return 0;
+		*ch = 0;
+		const char* szvar2 = ch+1;
+		
+		int NSOL = (int)m_pSolute.size();
+		for (int i=0; i<NSOL; ++i) 
+		{
+			FESolute* psi = m_pSolute[i];
+			if (strcmp(szvar, psi->GetName()) == 0) return psi->GetParameter(szvar2);
+		}
+	}
+	return 0;
+}

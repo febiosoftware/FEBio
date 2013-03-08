@@ -71,12 +71,12 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 			if (pve)
 			{
 				// check if the nested elastic material has local material axes specified
-				if (pve->m_pBase->m_pmap) {
+				if (pve->GetBaseMaterial()->m_pmap) {
 					for (int n=0; n<el.GaussPoints(); ++n)
 					{
 						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 						// compound the local map with the global material axes
-						mat3d Qlocal = pve->m_pBase->m_pmap->LocalElementCoord(el, n);
+						mat3d Qlocal = pve->GetBaseMaterial()->m_pmap->LocalElementCoord(el, n);
 						pt.Q = Qlocal*pt.Q;
 					}
 				}
@@ -87,12 +87,12 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 			if (puve)
 			{
 				// check if the nested elastic material has local material axes specified
-				if (puve->m_pBase->m_pmap) {
+				if (puve->GetBaseMaterial()->m_pmap) {
 					for (int n=0; n<el.GaussPoints(); ++n)
 					{
 						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 						// compound the local map with the global material axes
-						mat3d Qlocal = puve->m_pBase->m_pmap->LocalElementCoord(el, n);
+						mat3d Qlocal = puve->GetBaseMaterial()->m_pmap->LocalElementCoord(el, n);
 						pt.Q = Qlocal*pt.Q;
 					}
 				}
@@ -968,9 +968,6 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 		// get the material
 		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 		assert(pm);
-
-		// extract the elastic component
-		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
 
 		// loop over the integration points and calculate
 		// the stress at the integration point

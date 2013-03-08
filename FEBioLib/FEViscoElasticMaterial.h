@@ -94,20 +94,26 @@ public:
 	mat3ds Stress(FEMaterialPoint& pt);
 
 	//! tangent function
-	virtual tens4ds Tangent(FEMaterialPoint& pt);
+	tens4ds Tangent(FEMaterialPoint& pt);
 
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() 
-	{ 
-		return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
-	}
+	FEMaterialPoint* CreateMaterialPointData();
+
+	//! Get a parameter
+	FEParam* GetParameter(const char* sz);
+
+	//! get the elastic base material (TODO: I want to call this GetElasticMaterial, but this name is being used)
+	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
+
+	//! Set the base material
+	void SetBaseMaterial(FEElasticMaterial* pbase) { m_pBase = pbase; }
 
 public:
 	double	m_t[MAX_TERMS];	//!< relaxation times
 	double	m_g0;			//!< intitial visco-elastic coefficient
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
 
-public:
+private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material
 
 public:

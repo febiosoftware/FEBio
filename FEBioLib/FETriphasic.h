@@ -77,6 +77,9 @@ public:
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
 
+	//! find a material parameter
+	FEParam* GetParameter(const char* sz);
+
 public:
 
 	//! calculate stress at material point

@@ -26,20 +26,26 @@ public:
 	tens4ds DevTangent(FEMaterialPoint& pt);
 	
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() 
-	{ 
-		return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
-	}
+	FEMaterialPoint* CreateMaterialPointData();
 	
-	// get the elastic material
+	// get the elastic material (TODO: Is this right to overload this function?)
 	FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
-	
+
+	// get the elastic base material
+	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
+
+	// set the elastic base material
+	void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_pBase = pbase; }
+
+	//! Find a material parameter
+	FEParam* GetParameter(const char* sz);
+
 public:
 	double	m_t[MAX_TERMS];	//!< relaxation times
 	double	m_g0;			//!< intitial visco-elastic coefficient
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
 	
-public:
+private:
 	FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material
 	
 public:

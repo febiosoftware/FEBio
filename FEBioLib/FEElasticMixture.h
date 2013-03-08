@@ -51,24 +51,22 @@ public:
 class FEElasticMixture : public FEElasticMaterial
 {
 public:
-	FEElasticMixture() {}
+	FEElasticMixture();
 
 	// returns a pointer to a new material point object
-	virtual FEMaterialPoint* CreateMaterialPointData() 
-	{ 
-		FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
-		pt->m_w.resize(m_pMat.size());
-		return pt;
-	}
+	FEMaterialPoint* CreateMaterialPointData();
 
 	// return number of materials
-	int Materials() { return m_pMat.size(); }
+	int Materials() const { return m_pMat.size(); }
 
 	// return a material component
 	FEElasticMaterial* GetMaterial(int i) { return m_pMat[i]; }
 
 	// Add a material component
 	void AddMaterial(FEElasticMaterial* pm) { m_pMat.push_back(pm); }
+
+	// get a material parameter
+	FEParam* GetParameter(const char* sz);
 	
 public:
 	//! calculate stress at material point

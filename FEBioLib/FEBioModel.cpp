@@ -232,93 +232,6 @@ FEBoundaryCondition* FEBioModel::FindBC(int nid)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//! Helper function returning a pointer to the named variable in a solid mixture
-
-double* FindSolidMixtureParameter(const char* szvar, const int index, FEElasticMixture* pme)
-{
-	char* ch = strchr((char*)szvar, '.');
-	if (ch == 0) return 0;
-	*ch = 0;
-	const char* szvar2 = ch+1;
-	
-	int NMAT = pme->Materials();
-	for (int i=0; i<NMAT; ++i) 
-	{
-		FEElasticMaterial* pmi = pme->GetMaterial(i);
-		if (strcmp(szvar, pmi->GetName()) == 0)
-		{
-			// search the nested material parameter list
-			FEParameterList& pl = pmi->GetParameterList();
-			FEParam* pp = pl.Find(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-	}
-	// no match found
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Helper function returning a pointer to the named variable in a uncoupled solid mixture
-
-double* FindUncoupledSolidMixtureParameter(const char* szvar, const int index, FEUncoupledElasticMixture* pme)
-{
-	char* ch = strchr((char*)szvar, '.');
-	if (ch == 0) return 0;
-	*ch = 0;
-	const char* szvar2 = ch+1;
-	
-	FEMaterial* pmat;
-	for (int i=0; i<(int) pme->m_pMat.size(); ++i) {
-		if (strcmp(szvar, pme->m_pMat[i]->GetName()) == 0)
-		{
-			// search the nested material parameter list
-			pmat = pme->m_pMat[i];
-			FEParameterList& pl = pmat->GetParameterList();
-			FEParam* pp = pl.Find(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-	}
-	// no match found
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-//! Helper function returning a pointer to the named variable in an elastic material
-double* FindElasticMaterialParameter(const char* szvar, int index, FEElasticMaterial* pme)
-{
-	FEParam* pp = pme->GetParameter(szvar);
-	if (pp) return pp->pvalue<double>(index);
-	// if material is solid mixture, check individual solid materials
-	FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pme);
-	if (pmm) return FindSolidMixtureParameter(szvar, index, pmm);
-	// if this material is a viscoelastic material, check its elastic solid
-	FEViscoElasticMaterial* pmv = dynamic_cast<FEViscoElasticMaterial*>(pme);
-	if (pmv)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar3 = ch+1;
-				
-		if (strcmp(szvar, "elastic") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = pmv->m_pBase;
-			FEParam* pp = pme->GetParameter(szvar3);
-			if (pp) return pp->pvalue<double>(index);
-			// if material is solid mixture, check individual solid materials
-			FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pme);
-			if (pmm) return FindSolidMixtureParameter(szvar3, index, pmm);
-			else return 0;
-		}
-		else return 0;
-	}
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
 //! Return a pointer to the named variable
 
 //! This function returns a pointer to a named variable. Currently, we only
@@ -336,8 +249,6 @@ double* FindElasticMaterialParameter(const char* szvar, int index, FEElasticMate
 
 double* FEBioModel::FindParameter(const char* szparam)
 {
-	int i, nmat;
-
 	char szname[256];
 	strcpy(szname, szparam);
 
@@ -349,18 +260,13 @@ double* FEBioModel::FindParameter(const char* szparam)
 	const char* szvar = ch+1;
 
 	// find the material with the same name
-	FEMaterial* pmat;
-
-	for (i=0; i<Materials(); ++i)
+	FEMaterial* pmat = 0;
+	int nmat = -1;
+	for (int i=0; i<Materials(); ++i)
 	{
 		pmat = GetMaterial(i);
 		nmat = i;
-
-		if (strcmp(szmat, pmat->GetName()) == 0)
-		{
-			break;
-		}
-
+		if (strcmp(szmat, pmat->GetName()) == 0) break;
 		pmat = 0;
 	}
 
@@ -378,289 +284,13 @@ double* FEBioModel::FindParameter(const char* szparam)
 		index = atoi(szarg) - 1;	// index is one-based for user
 	}
 
-	// find the parameter
+	// find the material parameter
 	FEParam* pp = pmat->GetParameter(szvar);
 	if (pp) return pp->pvalue<double>(index);
 
-	// if material is solid mixture, check individual solid materials
-	FEElasticMixture* pme = dynamic_cast<FEElasticMixture*>(pmat);
-	if (pme) return FindSolidMixtureParameter(szvar, index, pme);
-	FEUncoupledElasticMixture* pmu = dynamic_cast<FEUncoupledElasticMixture*>(pmat);
-	if (pmu) return FindUncoupledSolidMixtureParameter(szvar, index, pmu);
-	
-	// if this material is a viscoelastic material, check its elastic solid
-	FEViscoElasticMaterial* pmv = dynamic_cast<FEViscoElasticMaterial*>(pmat);
-	if (pmv)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-		
-		if (strcmp(szvar, "elastic") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = pmv->m_pBase;
-			FEParam* pp = pme->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			// if material is solid mixture, check individual solid materials
-			FEElasticMixture* pmm = dynamic_cast<FEElasticMixture*>(pme);
-			if (pmm) return FindSolidMixtureParameter(szvar2, index, pmm);
-			else return 0;
-		}
-	}
-	
-	// if this material is an uncoupled viscoelastic material, check its elastic solid
-	FEUncoupledViscoElasticMaterial* puv = dynamic_cast<FEUncoupledViscoElasticMaterial*>(pmat);
-	if (puv)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-		
-		if (strcmp(szvar, "elastic") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = puv->m_pBase;
-			FEParam* pp = pme->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			// if material is an uncoupled solid mixture, check individual solid materials
-			FEUncoupledElasticMixture* pmm = dynamic_cast<FEUncoupledElasticMixture*>(pme);
-			if (pmm) return FindUncoupledSolidMixtureParameter(szvar2, index, pmm);
-			else return 0;
-		}
-	}
-
-	// if this material is a biphasic material, check solid and permeability materials
-	FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(pmat);
-	if (pmb)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-		
-		if (strcmp(szvar, "solid") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = pmb->m_pSolid;
-			return FindElasticMaterialParameter(szvar2, index, pme);
-		}
-		else if (strcmp(szvar, "permeability") == 0)
-		{
-			// search the nested material parameter list
-			pmat = pmb->m_pPerm;
-			FEParam* pp = pmat->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-	}
-
-	// if this material is a biphasic-solute material, check solid, permeability,
-	// osmotic_coefficient, and solute materials
-	FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*>(pmat);
-	if (pbs)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-		
-		if (strcmp(szvar, "solid") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = pbs->m_pSolid;
-			return FindElasticMaterialParameter(szvar2, index, pme);
-		}
-		else if (strcmp(szvar, "permeability") == 0)
-		{
-			// search the nested material parameter list
-			pmat = pbs->m_pPerm;
-			FEParam* pp = pmat->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-		else if (strcmp(szvar, "osmotic_coefficient") == 0)
-		{
-			// search the nested material parameter list
-			pmat = pbs->m_pOsmC;
-			FEParam* pp = pmat->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-		else if (strcmp(szvar, "solute") == 0)
-		{
-			char* ch = strchr((char*)szvar2, '.');
-			if (ch == 0) return 0;
-			*ch = 0;
-			const char* szvar3 = ch+1;
-			
-            FESolute* pms = pbs->m_pSolute;
-            if (strcmp(szvar2, "diffusivity") == 0)
-            {
-                // search the nested material parameter list
-                FESoluteDiffusivity* pmd = pms->m_pDiff;
-				FEParam* pp = pmd->GetParameter(szvar3);
-                if (pp) return pp->pvalue<double>(index);
-                else return 0;
-            }
-            else if (strcmp(szvar2, "solubility") == 0)
-            {
-                // search the nested material parameter list
-                FESoluteSolubility* pmd = pms->m_pSolub;
-				FEParam* pp = pmd->GetParameter(szvar3);
-                if (pp) return pp->pvalue<double>(index);
-                else return 0;
-            }
-			// no match found
-			return 0;
-		}
-	}
-	
-	// if this material is a triphasic material, check solid, permeability,
-	// osmotic_coefficient, and solute materials
-	FETriphasic* ptp = dynamic_cast<FETriphasic*>(pmat);
-	if (ptp)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-		
-		if (strcmp(szvar, "solid") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = ptp->m_pSolid;
-			return FindElasticMaterialParameter(szvar2, index, pme);
-		}
-		else if (strcmp(szvar, "permeability") == 0)
-		{
-			// search the nested material parameter list
-			pmat = ptp->m_pPerm;
-			FEParam* pp = ptp->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-		else if (strcmp(szvar, "osmotic_coefficient") == 0)
-		{
-			// search the nested material parameter list
-			pmat = ptp->m_pOsmC;
-			FEParam* pp = ptp->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-		else if (strcmp(szvar, "solute") == 0)
-		{
-			char* ch = strchr((char*)szvar2, '.');
-			if (ch == 0) return 0;
-			*ch = 0;
-			const char* szvar3 = ch+1;
-			
-			for (int i=0; i<(int)ptp->m_pSolute.size(); ++i) {
-				if (strcmp(szvar2, ptp->m_pSolute[i]->GetName()) == 0)
-				{
-					FESolute* pms = ptp->m_pSolute[i];
-					char* ch = strchr((char*)szvar3, '.');
-					if (ch == 0) return 0;
-					*ch = 0;
-					const char* szvar4 = ch+1;
-					if (strcmp(szvar3, "diffusivity") == 0)
-					{
-						// search the nested material parameter list
-						FESoluteDiffusivity* pmd = pms->m_pDiff;
-						FEParam* pp = pmd->GetParameter(szvar4);
-						if (pp) return pp->pvalue<double>(index);
-						else return 0;
-					}
-					else if (strcmp(szvar3, "solubility") == 0)
-					{
-						// search the nested material parameter list
-						FESoluteSolubility* pmd = pms->m_pSolub;
-						FEParam* pp = pmd->GetParameter(szvar4);
-						if (pp) return pp->pvalue<double>(index);
-						else return 0;
-					}
-				}
-			}
-			// no match found
-			return 0;
-		}
-	}
-	
-	// if this material is a multiphasic material, check solid, permeability,
-	// osmotic_coefficient, and solute materials
-	FEMultiphasic* pmp = dynamic_cast<FEMultiphasic*>(pmat);
-	if (pmp)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-		
-		if (strcmp(szvar, "solid") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = pmp->m_pSolid;
-			return FindElasticMaterialParameter(szvar2, index, pme);
-		}
-		else if (strcmp(szvar, "permeability") == 0)
-		{
-			// search the nested material parameter list
-			pmat = pmp->m_pPerm;
-			FEParam* pp = pmat->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-		else if (strcmp(szvar, "osmotic_coefficient") == 0)
-		{
-			// search the nested material parameter list
-			pmat = pmp->m_pOsmC;
-			FEParam* pp = pmat->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			else return 0;
-		}
-		else if (strcmp(szvar, "solute") == 0)
-		{
-			char* ch = strchr((char*)szvar2, '.');
-			if (ch == 0) return 0;
-			*ch = 0;
-			const char* szvar3 = ch+1;
-			
-			for (int i=0; i<(int)pmp->m_pSolute.size(); ++i) {
-				if (strcmp(szvar2, pmp->m_pSolute[i]->GetName()) == 0)
-				{
-					FESolute* pms = pmp->m_pSolute[i];
-					char* ch = strchr((char*)szvar3, '.');
-					if (ch == 0) return 0;
-					*ch = 0;
-					const char* szvar4 = ch+1;
-					if (strcmp(szvar3, "diffusivity") == 0)
-					{
-						// search the nested material parameter list
-						FESoluteDiffusivity* pmd = pms->m_pDiff;
-						FEParam* pp = pmd->GetParameter(szvar4);
-						if (pp) return pp->pvalue<double>(index);
-						else return 0;
-					}
-					else if (strcmp(szvar3, "solubility") == 0)
-					{
-						// search the nested material parameter list
-						FESoluteSolubility* pmd = pms->m_pSolub;
-						FEParam* pp = pmd->GetParameter(szvar4);
-						if (pp) return pp->pvalue<double>(index);
-						else return 0;
-					}
-				}
-			}
-			// no match found
-			return 0;
-		}
-	}
-
 	// the rigid bodies are dealt with differently
 	int nrb = m_Obj.size();
-	for (i=0; i<nrb; ++i)
+	for (int i=0; i<nrb; ++i)
 	{
 		FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[i]);
 
@@ -731,8 +361,9 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 	FEUncoupledElasticMixture* pum = dynamic_cast<FEUncoupledElasticMixture*>(pm);
 	if (pum)
 	{
-		for (int i=0; i < (int) pum->m_pMat.size(); ++i)
-			EvaluateMaterialParameters(pum->m_pMat[i]);
+		int NMAT = pum->Materials();
+		for (int i=0; i < NMAT; ++i)
+			EvaluateMaterialParameters(pum->GetMaterial(i));
 	}
 	
 	FEElasticMultigeneration* pmg = dynamic_cast<FEElasticMultigeneration*>(pm);
