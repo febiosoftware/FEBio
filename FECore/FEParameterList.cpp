@@ -57,6 +57,19 @@ FEParam* FEParameterList::Find(const char* sz)
 }
 
 //-----------------------------------------------------------------------------
+FEParamContainer::FEParamContainer()
+{
+	m_pParam = 0;
+}
+
+//-----------------------------------------------------------------------------
+FEParamContainer::~FEParamContainer()
+{
+	delete m_pParam; 
+	m_pParam = 0;
+}
+
+//-----------------------------------------------------------------------------
 FEParameterList& FEParamContainer::GetParameterList()
 {
 	if (m_pParam == 0) 
@@ -73,6 +86,14 @@ FEParam* FEParamContainer::GetParameter(const char* sz)
 {
 	FEParameterList& pl = GetParameterList();
 	return pl.Find(sz);
+}
+
+//-----------------------------------------------------------------------------
+// Add a parameter to the parameter list
+void FEParamContainer::AddParameter(void* pv, FEParamType itype, int ndim, const char* sz)
+{
+	assert(m_pParam);
+	m_pParam->AddParameter(pv, itype, ndim, sz);
 }
 
 //-----------------------------------------------------------------------------

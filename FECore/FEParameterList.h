@@ -101,10 +101,10 @@ class FEParamContainer
 {
 public:
 	// constructor
-	FEParamContainer() { m_pParam = 0; }
+	FEParamContainer();
 
 	// destructor
-	virtual ~FEParamContainer() { delete m_pParam; m_pParam = 0; }
+	virtual ~FEParamContainer();
 
 	// return the material's parameter list
 	FEParameterList& GetParameterList();
@@ -119,6 +119,10 @@ protected:
 	// This function will be overridden by each class that defines a parameter list
 	virtual void BuildParamList() {}
 
+	//! Add a parameter to the list
+	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
+
+private:
 	FEParameterList*	m_pParam;	//!< parameter list
 };
 
@@ -140,12 +144,12 @@ protected: \
 
 // the ADD_PARAMETER macro adds a parameter to the parameter list
 #define ADD_PARAMETER(theParam, theType, theName) \
-	m_pParam->AddParameter(&theParam, theType, 1, theName);
+	AddParameter(&theParam, theType, 1, theName);
 
 // the ADD_PARAMETERV macro adds a parameter to the paramter list
 // that is an array
 #define ADD_PARAMETERV(theParam, theType, theDim, theName) \
-	m_pParam->AddParameter(theParam, theType, theDim, theName);
+	AddParameter(theParam, theType, theDim, theName);
 
 // the END_PARAMETER_LIST defines the end of a parameter list
 #define END_PARAMETER_LIST() \

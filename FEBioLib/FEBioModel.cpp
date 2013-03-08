@@ -315,29 +315,6 @@ double* FindElasticMaterialParameter(const char* szvar, int index, FEElasticMate
 		}
 		else return 0;
 	}
-
-	// if this material is an uncoupled viscoelastic material, check its elastic solid
-	FEUncoupledViscoElasticMaterial* puv = dynamic_cast<FEUncoupledViscoElasticMaterial*>(pme);
-	if (puv)
-	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
-		
-		if (strcmp(szvar, "elastic") == 0)
-		{
-			// search the nested material parameter list
-			FEElasticMaterial* pme = puv->m_pBase;
-			FEParam* pp = pme->GetParameter(szvar2);
-			if (pp) return pp->pvalue<double>(index);
-			// if material is an uncoupled solid mixture, check individual solid materials
-			FEUncoupledElasticMixture* pmm = dynamic_cast<FEUncoupledElasticMixture*>(pme);
-			if (pmm) return FindUncoupledSolidMixtureParameter(szvar2, index, pmm);
-			else return 0;
-		}
-	}
-
 	return 0;
 }
 
