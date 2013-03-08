@@ -960,7 +960,7 @@ bool FEBioMaterialSection::ParseUncoupledViscoElasticMaterial(XMLTag &tag, FEUnc
 		}
 		
 		// set the solid material pointer
-		pm->m_pBase = pme;
+		pm->SetBaseMaterial(pme);
 		
 		// parse the solid
 		ParseMaterial(tag, pme);
