@@ -91,7 +91,7 @@ public:
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
 
 	// find a material parameter
-	FEParam* GetParameter(const char* sz);
+	FEParam* GetParameter(const ParamString& s);
 	
 public:
 	void Init();

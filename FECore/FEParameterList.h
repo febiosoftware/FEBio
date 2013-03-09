@@ -96,6 +96,43 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+// helper class for retrieving parameters
+class ParamString
+{
+public:
+	//! constructor
+	explicit ParamString(const char* sz);
+
+	//! copy constructor
+	ParamString(const ParamString& p);
+
+	//! assignment operator
+	void operator = (const ParamString& p);
+
+	//! destructor
+	~ParamString();
+
+	//! see how many components the string has
+	int count() const;
+
+	//! return the next component
+	ParamString next() const;
+
+	//! return the next name in the list
+	const char* c_str() const { return m_sz; }
+
+	//! compare to a string
+	bool operator == (const char* sz) const;
+
+private:
+	explicit ParamString(char* sz, int nc) : m_sz(sz), m_nc(nc) {}
+
+private:
+	char*	m_sz;	//!< string containing parameter names
+	int		m_nc;	//!< number of string components
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for classes that wish to support parameter lists
 class FEParamContainer
 {
@@ -110,7 +147,7 @@ public:
 	FEParameterList& GetParameterList();
 
 	//! find a parameter using it's name
-	FEParam* GetParameter(const char* sz);
+	FEParam* GetParameter(const ParamString& s);
 
 	// serialize parameter data
 	virtual void Serialize(DumpFile& ar);

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
 ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
@@ -114,17 +115,9 @@ tens4ds FEUncoupledViscoElasticMaterial::DevTangent(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! Get a material parameter
-FEParam* FEUncoupledViscoElasticMaterial::GetParameter(const char* sz)
+FEParam* FEUncoupledViscoElasticMaterial::GetParameter(const ParamString& s)
 {
-	// see if this is a composite parameter
-	char* ch = strchr((char*)sz, '.');
-
-	// if not, check this class' parameters
-	if (ch == 0) return FEUncoupledMaterial::GetParameter(sz);
-
-	// else, see if this a parameter of the elastic component
-	*ch = 0;
-	const char* szvar2 = ch+1;
-	if (strcmp(sz, "elastic") == 0) return m_pBase->GetParameter(szvar2);
+	if (s.count() == 1) return FEUncoupledMaterial::GetParameter(s);
+	if (s == "elastic") return m_pBase->GetParameter(s.next());
 	return 0;
 }

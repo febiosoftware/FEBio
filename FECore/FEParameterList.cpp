@@ -56,7 +56,70 @@ FEParam* FEParameterList::Find(const char* sz)
 	return pp;
 }
 
+//=============================================================================
+ParamString::ParamString(const char* sz)
+{
+	m_sz = 0;
+	m_nc = 0;
+	int l = strlen(sz);
+	m_sz = new char[l+1];
+	strcpy(m_sz, sz);
+	char* ch = m_sz;
+	while (strchr(ch, '.')) { m_nc++; *ch = 0; ch = ch+1; }
+	m_nc++;
+}
+
 //-----------------------------------------------------------------------------
+ParamString::ParamString(const ParamString& p)
+{
+	m_nc = p.m_nc;
+	int l = strlen(p.m_sz);
+	m_sz = new char[l+1];
+	strcpy(m_sz, p.m_sz);
+}
+
+//-----------------------------------------------------------------------------
+void ParamString::operator=(const ParamString& p)
+{
+	m_nc = p.m_nc;
+	delete [] m_sz;
+	int l = strlen(p.m_sz);
+	m_sz = new char[l+1];
+	strcpy(m_sz, p.m_sz);
+}
+
+//-----------------------------------------------------------------------------
+ParamString::~ParamString()
+{
+	delete [] m_sz;
+	m_sz = 0;
+	m_nc = 0;
+}
+
+//-----------------------------------------------------------------------------
+int ParamString::count() const
+{
+	return m_nc;
+}
+
+//-----------------------------------------------------------------------------
+ParamString ParamString::next() const
+{
+	int nc = m_nc - 1;
+	char* sz = strchr(m_sz, '\0');
+	int l = strlen(sz);
+	char* sznew = new char[l+1];
+	strcpy(sznew, sz);
+	return ParamString(sznew, nc);
+}
+
+//-----------------------------------------------------------------------------
+bool ParamString::operator==(const char* sz) const
+{
+	return strcmp(m_sz, sz) == 0;
+}
+
+//=============================================================================
 FEParamContainer::FEParamContainer()
 {
 	m_pParam = 0;
@@ -82,10 +145,10 @@ FEParameterList& FEParamContainer::GetParameterList()
 
 //-----------------------------------------------------------------------------
 // Find a parameter from its name
-FEParam* FEParamContainer::GetParameter(const char* sz)
+FEParam* FEParamContainer::GetParameter(const ParamString& s)
 {
 	FEParameterList& pl = GetParameterList();
-	return pl.Find(sz);
+	return pl.Find(s.c_str());
 }
 
 //-----------------------------------------------------------------------------

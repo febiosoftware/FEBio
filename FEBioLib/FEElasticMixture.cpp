@@ -62,22 +62,17 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 //! where material refers to the name of one of the mixture components and
 //! param is the parameter name.
 //!
-FEParam* FEElasticMixture::GetParameter(const char* sz)
+FEParam* FEElasticMixture::GetParameter(const ParamString& s)
 {
 	// see if this is a composite name
-	char* ch = strchr((char*)sz, '.');
-
-	// if not, find the parameter in the base class
-	if (ch == 0) return FEElasticMaterial::GetParameter(sz);
+	if (s.count() == 1) return FEElasticMaterial::GetParameter(s);
 
 	// else, find the variable name and search the mixture components
-	*ch = 0;
-	const char* szvar2 = ch+1;
 	int NMAT = Materials();
 	for (int i=0; i<NMAT; ++i) 
 	{
 		FEElasticMaterial* pmi = GetMaterial(i);
-		if (strcmp(sz, pmi->GetName()) == 0) return pmi->GetParameter(szvar2);
+		if (s == pmi->GetName()) return pmi->GetParameter(s.next());
 	}
 
 	// no match found

@@ -4,7 +4,7 @@
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation uncoupled visco-elastic material
-
+//
 class FEUncoupledViscoElasticMaterial :	public FEUncoupledMaterial
 {
 public:
@@ -15,19 +15,7 @@ public:
 public:
 	//! default constructor
 	FEUncoupledViscoElasticMaterial();
-	
-	//! data initialization and checking
-	void Init();
-	
-	//! deviatoric stress function
-	mat3ds DevStress(FEMaterialPoint& pt);
-	
-	//! deviatoric tangent function
-	tens4ds DevTangent(FEMaterialPoint& pt);
-	
-	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData();
-	
+
 	// get the elastic material (TODO: Is this right to overload this function?)
 	FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
 
@@ -38,8 +26,21 @@ public:
 	void SetBaseMaterial(FEUncoupledMaterial* pbase) { m_pBase = pbase; }
 
 	//! Find a material parameter
-	FEParam* GetParameter(const char* sz);
+	FEParam* GetParameter(const ParamString& s);
 
+public:
+	//! data initialization and checking
+	void Init();
+	
+	//! deviatoric stress function
+	mat3ds DevStress(FEMaterialPoint& pt);
+	
+	//! deviatoric tangent function
+	tens4ds DevTangent(FEMaterialPoint& pt);
+	
+	//! returns a pointer to a new material point object
+	FEMaterialPoint* CreateMaterialPointData();
+	
 public:
 	double	m_t[MAX_TERMS];	//!< relaxation times
 	double	m_g0;			//!< intitial visco-elastic coefficient
@@ -49,9 +50,6 @@ private:
 	FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material
 	
 public:
-	// declare as registered
-	DECLARE_REGISTERED(FEUncoupledViscoElasticMaterial);
-	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

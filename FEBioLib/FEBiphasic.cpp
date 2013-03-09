@@ -201,19 +201,14 @@ void FEBiphasic::Serialize(DumpFile &ar)
 }
 
 //-----------------------------------------------------------------------------
-FEParam* FEBiphasic::GetParameter(const char* sz)
+FEParam* FEBiphasic::GetParameter(const ParamString& s)
 {
 	// see if this is a composite parameter
-	char* ch = strchr((char*)sz, '.');
-
-	// if not, try to find the parameter in the class' parameter list
-	if (ch == 0) return FEMultiMaterial::GetParameter(sz);
+	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
 
 	// else find the component's parameter
-	*ch = 0;
-	const char* szvar2 = ch+1;
-	if      (strcmp(sz, "solid"       ) == 0) return m_pSolid->GetParameter(szvar2);
-	else if (strcmp(sz, "permeability") == 0) return m_pPerm ->GetParameter(szvar2);
+	if      (s == "solid"       ) return m_pSolid->GetParameter(s.next());
+	else if (s == "permeability") return m_pPerm ->GetParameter(s.next());
 	else return 0;
 }
 

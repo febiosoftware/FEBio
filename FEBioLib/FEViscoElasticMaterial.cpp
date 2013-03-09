@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEViscoElasticMaterial.h"
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEViscoElasticMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
@@ -17,6 +18,65 @@ BEGIN_PARAMETER_LIST(FEViscoElasticMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_g[4], FE_PARAM_DOUBLE, "g5");
 	ADD_PARAMETER(m_g[5], FE_PARAM_DOUBLE, "g6");
 END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! Create a shallow copy of the material point data
+FEMaterialPoint* FEViscoElasticMaterialPoint::Copy()
+{
+	FEViscoElasticMaterialPoint* pt = new FEViscoElasticMaterialPoint(*this);
+	if (m_pt) pt->m_pt = m_pt->Copy();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+//! Initializes material point data.
+void FEViscoElasticMaterialPoint::Init(bool bflag)
+{
+	FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
+	if (bflag)
+	{
+		// intialize data to zero
+		m_se.zero();
+		m_Sep.zero();
+		for (int i=0; i<MAX_TERMS; ++i) { m_H[i].zero(); m_Hp[i].zero(); };
+	}
+	else
+	{
+		// the elastic stress stored in pt is the Cauchy stress.
+		// however, we need to store the 2nd PK stress
+		m_Sep = pt.pull_back(m_se);
+
+		// copy previous data
+		for (int i=0; i<MAX_TERMS; ++i) m_Hp[i] = m_H[i];
+	}
+
+	// don't forget to intialize the nested data
+	if (m_pt) m_pt->Init(bflag);
+}
+
+//-----------------------------------------------------------------------------
+//! Serialize data to the archive
+void FEViscoElasticMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (m_pt) m_pt->Serialize(ar);
+
+	if (ar.IsSaving())
+	{
+		ar << m_se;
+		ar << m_Sep;
+		ar << (int) MAX_TERMS;
+		for (int i=0; i<MAX_TERMS; ++i) ar << m_H[i] << m_Hp[i];
+	}
+	else
+	{
+		ar >> m_se;
+		ar >> m_Sep;
+		int n;
+		ar >> n;
+		assert(n == MAX_TERMS);
+		for (int i=0; i<MAX_TERMS; ++i) ar >> m_H[i] >> m_Hp[i];
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! constructor
@@ -36,7 +96,7 @@ FEViscoElasticMaterial::FEViscoElasticMaterial()
 void FEViscoElasticMaterial::Init()
 {
 	FEElasticMaterial::Init();
-	if (m_pBase == 0) throw MaterialError("This material needs an elastic base");
+	if (m_pBase == 0) throw MaterialError("This material needs an elastic base.");
 	m_pBase->Init();
 }
 
@@ -107,17 +167,9 @@ tens4ds FEViscoElasticMaterial::Tangent(FEMaterialPoint& pt)
 
 //-----------------------------------------------------------------------------
 //! Get a material parameter
-FEParam* FEViscoElasticMaterial::GetParameter(const char* sz)
+FEParam* FEViscoElasticMaterial::GetParameter(const ParamString& s)
 {
-	// see if this is a composite parameter
-	char* ch = strchr((char*)sz, '.');
-
-	// if not, check this class' parameters
-	if (ch == 0) return FEElasticMaterial::GetParameter(sz);
-
-	// else, see if this a parameter of the elastic component
-	*ch = 0;
-	const char* szvar2 = ch+1;
-	if (strcmp(sz, "elastic") == 0) return m_pBase->GetParameter(szvar2);
+	if (s.count() == 1) return FEElasticMaterial::GetParameter(s);
+	if (s == "elastic") return m_pBase->GetParameter(s.next());
 	return 0;
 }

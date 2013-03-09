@@ -24,7 +24,7 @@ public:
 	void AddMaterial(FEUncoupledMaterial* pm) { m_pMat.push_back(pm); }
 
 	// get a material parameter
-	FEParam* GetParameter(const char* sz);
+	FEParam* GetParameter(const ParamString& s);
 	
 public:
 	//! calculate stress at material point

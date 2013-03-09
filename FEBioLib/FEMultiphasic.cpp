@@ -639,28 +639,22 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-FEParam* FEMultiphasic::GetParameter(const char* sz)
+FEParam* FEMultiphasic::GetParameter(const ParamString& s)
 {
-	char* ch = strchr((char*)sz, '.');
-	if (ch == 0) return FEMultiMaterial::GetParameter(sz);
-	*ch = 0;
-	const char* szvar = ch+1;
+	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
 		
-	if      (strcmp(sz, "solid"              ) == 0) return m_pSolid->GetParameter(szvar);
-	else if (strcmp(sz, "permeability"       ) == 0) return m_pPerm ->GetParameter(szvar);
-	else if (strcmp(sz, "osmotic_coefficient") == 0) return m_pOsmC ->GetParameter(szvar);
-	else if (strcmp(sz, "solute"             ) == 0)
+	if      (s == "solid"              ) return m_pSolid->GetParameter(s.next());
+	else if (s == "permeability"       ) return m_pPerm ->GetParameter(s.next());
+	else if (s == "osmotic_coefficient") return m_pOsmC ->GetParameter(s.next());
+	else if (s == "solute"             )
 	{
-		char* ch = strchr((char*)szvar, '.');
-		if (ch == 0) return 0;
-		*ch = 0;
-		const char* szvar2 = ch+1;
+		ParamString s2 = s.next();
 		
 		int NSOL = (int)m_pSolute.size();
 		for (int i=0; i<NSOL; ++i) 
 		{
 			FESolute* psi = m_pSolute[i];
-			if (strcmp(szvar, psi->GetName()) == 0) return psi->GetParameter(szvar2);
+			if (s2 == psi->GetName()) return psi->GetParameter(s2.next());
 		}
 	}
 	return 0;

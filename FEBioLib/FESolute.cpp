@@ -74,14 +74,10 @@ void FESolute::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-FEParam* FESolute::GetParameter(const char* sz)
+FEParam* FESolute::GetParameter(const ParamString& s)
 {
-	char* ch = strchr((char*)sz, '.');
-	if (ch == 0) return 0;
-	*ch = 0;
-	const char* szvar = ch+1;
-			
-	if      (strcmp(sz, "diffusivity") == 0) return m_pDiff ->GetParameter(szvar);
-	else if (strcmp(sz, "solubility" ) == 0) return m_pSolub->GetParameter(szvar);
+	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
+	if      (s == "diffusivity") return m_pDiff ->GetParameter(s.next());
+	else if (s == "solubility" ) return m_pSolub->GetParameter(s.next());
 	return 0;
 }

@@ -285,7 +285,8 @@ double* FEBioModel::FindParameter(const char* szparam)
 	}
 
 	// find the material parameter
-	FEParam* pp = pmat->GetParameter(szvar);
+	ParamString sz(szvar);
+	FEParam* pp = pmat->GetParameter(sz);
 	if (pp) return pp->pvalue<double>(index);
 
 	// the rigid bodies are dealt with differently

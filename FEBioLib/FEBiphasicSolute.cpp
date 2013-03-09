@@ -322,20 +322,15 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-FEParam* FEBiphasicSolute::GetParameter(const char* sz)
+FEParam* FEBiphasicSolute::GetParameter(const ParamString& s)
 {
 	// see if this is a composite material parameter
-	char* ch = strchr((char*)sz, '.');
-
-	// if not, check the material class parameter list
-	if (ch == 0) return FEMultiMaterial::GetParameter(sz);
+	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
 
 	// otherwise, search the material components
-	*ch = 0;
-	const char* szvar2 = ch+1;
-	if      (strcmp(sz, "solid"              ) == 0) return m_pSolid ->GetParameter(sz);
-	else if (strcmp(sz, "permeability"       ) == 0) return m_pPerm  ->GetParameter(sz);
-	else if (strcmp(sz, "osmotic_coefficient") == 0) return m_pOsmC  ->GetParameter(sz);
-	else if (strcmp(sz, "solute"             ) == 0) return m_pSolute->GetParameter(sz);
+	if      (s == "solid"              ) return m_pSolid ->GetParameter(s.next());
+	else if (s == "permeability"       ) return m_pPerm  ->GetParameter(s.next());
+	else if (s == "osmotic_coefficient") return m_pOsmC  ->GetParameter(s.next());
+	else if (s == "solute"             ) return m_pSolute->GetParameter(s.next());
 	else return 0;
 }

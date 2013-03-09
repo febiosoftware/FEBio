@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEElasticMaterial.h"
+#include <FECore/FEElasticMaterial.h>
 
 //-----------------------------------------------------------------------------
 //! Material point data for visco-elastic materials
@@ -9,60 +9,17 @@ public:
 	enum { MAX_TERMS = 6 };
 
 public:
+	//! constructor
 	FEViscoElasticMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
 
-	FEMaterialPoint* Copy()
-	{
-		FEViscoElasticMaterialPoint* pt = new FEViscoElasticMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
-		return pt;
-	}
+	//! copy material point data
+	FEMaterialPoint* Copy();
 
-	void Init(bool bflag)
-	{
-		FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
-		if (bflag)
-		{
-			// intialize data to zero
-			m_se.zero();
-			m_Sep.zero();
-			for (int i=0; i<MAX_TERMS; ++i) { m_H[i].zero(); m_Hp[i].zero(); };
-		}
-		else
-		{
-			// the elastic stress stored in pt is the Cauchy stress.
-			// however, we need to store the 2nd PK stress
-			m_Sep = pt.pull_back(m_se);
+	//! Initialize material point data
+	void Init(bool bflag);
 
-			// copy previous data
-			for (int i=0; i<MAX_TERMS; ++i) m_Hp[i] = m_H[i];
-		}
-
-		// don't forget to intialize the nested data
-		if (m_pt) m_pt->Init(bflag);
-	}
-
-	void Serialize(DumpFile& ar)
-	{
-		if (m_pt) m_pt->Serialize(ar);
-
-		if (ar.IsSaving())
-		{
-			ar << m_se;
-			ar << m_Sep;
-			ar << (int) MAX_TERMS;
-			for (int i=0; i<MAX_TERMS; ++i) ar << m_H[i] << m_Hp[i];
-		}
-		else
-		{
-			ar >> m_se;
-			ar >> m_Sep;
-			int n;
-			ar >> n;
-			assert(n == MAX_TERMS);
-			for (int i=0; i<MAX_TERMS; ++i) ar >> m_H[i] >> m_Hp[i];
-		}
-	}
+	//! Serialize data to archive
+	void Serialize(DumpFile& ar);
 
 public:
 	mat3ds	m_se;	//!< elastic Cauchy stress
@@ -75,7 +32,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! This class implements a large deformation visco-elastic material
-
+//
 class FEViscoElasticMaterial :	public FEElasticMaterial
 {
 public:
@@ -87,6 +44,16 @@ public:
 	//! default constructor
 	FEViscoElasticMaterial();
 
+	//! Get a parameter
+	FEParam* GetParameter(const ParamString& s);
+
+	//! get the elastic base material (TODO: I want to call this GetElasticMaterial, but this name is being used)
+	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
+
+	//! Set the base material
+	void SetBaseMaterial(FEElasticMaterial* pbase) { m_pBase = pbase; }
+
+public:
 	//! data initialization
 	void Init();
 
@@ -99,19 +66,11 @@ public:
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();
 
-	//! Get a parameter
-	FEParam* GetParameter(const char* sz);
-
-	//! get the elastic base material (TODO: I want to call this GetElasticMaterial, but this name is being used)
-	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
-
-	//! Set the base material
-	void SetBaseMaterial(FEElasticMaterial* pbase) { m_pBase = pbase; }
-
-public:
-	double	m_t[MAX_TERMS];	//!< relaxation times
+public: 
+	// material parameters
 	double	m_g0;			//!< intitial visco-elastic coefficient
 	double	m_g[MAX_TERMS];	//!< visco-elastic coefficients
+	double	m_t[MAX_TERMS];	//!< relaxation times
 
 private:
 	FEElasticMaterial*	m_pBase;	//!< pointer to elastic solid material
