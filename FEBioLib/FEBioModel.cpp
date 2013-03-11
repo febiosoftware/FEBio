@@ -281,7 +281,7 @@ double* FEBioModel::FindParameter(const char* szparam)
 		*szarg = 0; szarg++;
 		const char* ch = strchr(szarg, ']');
 		assert(ch);
-		index = atoi(szarg) - 1;	// index is one-based for user
+		index = atoi(szarg);
 	}
 
 	// find the material parameter

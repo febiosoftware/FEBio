@@ -147,7 +147,7 @@ public:
 	FEParameterList& GetParameterList();
 
 	//! find a parameter using it's name
-	FEParam* GetParameter(const ParamString& s);
+	virtual FEParam* GetParameter(const ParamString& s);
 
 	// serialize parameter data
 	virtual void Serialize(DumpFile& ar);

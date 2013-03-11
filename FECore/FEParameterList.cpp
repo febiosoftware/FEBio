@@ -65,7 +65,7 @@ ParamString::ParamString(const char* sz)
 	m_sz = new char[l+1];
 	strcpy(m_sz, sz);
 	char* ch = m_sz;
-	while (strchr(ch, '.')) { m_nc++; *ch = 0; ch = ch+1; }
+	while (ch = strchr(ch, '.')) { m_nc++; *ch = 0; ch = ch+1; }
 	m_nc++;
 }
 
@@ -107,9 +107,9 @@ ParamString ParamString::next() const
 {
 	int nc = m_nc - 1;
 	char* sz = strchr(m_sz, '\0');
-	int l = strlen(sz);
+	int l = strlen(sz+1);
 	char* sznew = new char[l+1];
-	strcpy(sznew, sz);
+	strcpy(sznew, sz+1);
 	return ParamString(sznew, nc);
 }
 

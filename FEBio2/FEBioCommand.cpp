@@ -145,7 +145,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
 	FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
 
-	if (nargs > 2)
+	if (nargs >= 2)
 	{
 		if (strcmp(argv[1], "nnz") == 0)
 		{
@@ -176,7 +176,16 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 		}
 		else
 		{
-			printf("The variable %s is not recognized\n", argv[1]);
+			// assume it is a material parameter
+			double* pd = m_pfem->FindParameter(argv[1]);
+			if (pd)
+			{
+				printf("%lg\n", *pd);
+			}
+			else
+			{
+				printf("The variable %s is not recognized\n", argv[1]);
+			}
 		}
 	}
 	else printf("Incorrect number of arguments for print command\n");
