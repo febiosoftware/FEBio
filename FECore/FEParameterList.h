@@ -125,11 +125,12 @@ public:
 	bool operator == (const char* sz) const;
 
 private:
-	explicit ParamString(char* sz, int nc) : m_sz(sz), m_nc(nc) {}
+	explicit ParamString(char* sz, int nc, int nl) : m_sz(sz), m_nc(nc), m_nl(nl) {}
 
 private:
 	char*	m_sz;	//!< string containing parameter names
 	int		m_nc;	//!< number of string components
+	int		m_nl;	//!< total string length
 };
 
 //-----------------------------------------------------------------------------

@@ -57,12 +57,18 @@ FEParam* FEParameterList::Find(const char* sz)
 }
 
 //=============================================================================
+
+void cstrncpy(char* pd, char* ps, int l)
+{
+	for (int i=0; i<=l; ++i) pd[i] = ps[i];
+}
+
 ParamString::ParamString(const char* sz)
 {
 	m_sz = 0;
 	m_nc = 0;
-	int l = strlen(sz);
-	m_sz = new char[l+1];
+	m_nl = strlen(sz);
+	m_sz = new char[m_nl+1];
 	strcpy(m_sz, sz);
 	char* ch = m_sz;
 	while (ch = strchr(ch, '.')) { m_nc++; *ch = 0; ch = ch+1; }
@@ -73,19 +79,19 @@ ParamString::ParamString(const char* sz)
 ParamString::ParamString(const ParamString& p)
 {
 	m_nc = p.m_nc;
-	int l = strlen(p.m_sz);
-	m_sz = new char[l+1];
-	strcpy(m_sz, p.m_sz);
+	m_nl = p.m_nl;
+	m_sz = new char[m_nl+1];
+	cstrncpy(m_sz, p.m_sz, m_nl);
 }
 
 //-----------------------------------------------------------------------------
 void ParamString::operator=(const ParamString& p)
 {
 	m_nc = p.m_nc;
+	m_nl = p.m_nl;
 	delete [] m_sz;
-	int l = strlen(p.m_sz);
-	m_sz = new char[l+1];
-	strcpy(m_sz, p.m_sz);
+	m_sz = new char[m_nl+1];
+	cstrncpy(m_sz, p.m_sz, m_nl);
 }
 
 //-----------------------------------------------------------------------------
@@ -94,6 +100,7 @@ ParamString::~ParamString()
 	delete [] m_sz;
 	m_sz = 0;
 	m_nc = 0;
+	m_nl = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,11 +113,11 @@ int ParamString::count() const
 ParamString ParamString::next() const
 {
 	int nc = m_nc - 1;
+	int l = strlen(m_sz);
 	char* sz = strchr(m_sz, '\0');
-	int l = strlen(sz+1);
-	char* sznew = new char[l+1];
-	strcpy(sznew, sz+1);
-	return ParamString(sznew, nc);
+	char* sznew = new char[m_nl-l+1];
+	cstrncpy(sznew, sz+1, m_nl-l);
+	return ParamString(sznew, nc, m_nl-l);
 }
 
 //-----------------------------------------------------------------------------
