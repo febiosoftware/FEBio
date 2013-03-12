@@ -5,13 +5,21 @@
 #include "Document.h"
 
 //-----------------------------------------------------------------------------
+// This function will be called when the text buffer is modified
+void update_style(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText, void* cbArg)
+{
+	CTask* pt = (CTask*) cbArg;
+	pt->UpdateStyle(pos, nInserted, nDeleted, nRestyled, deletedText);
+}
+
+//-----------------------------------------------------------------------------
 // initialize static CTask variables
 CTask* CTask::m_prun = 0;
 
 //-----------------------------------------------------------------------------
 CTask::CTask()
 {
-	m_szfile[0] = 0; m_pfile = 0; m_nstatus = READY;
+	m_szfile[0] = 0; m_pFile = 0; m_pStyle = 0; m_nstatus = READY;
 
 	// default FEBio options
 	m_bdebug = false;
@@ -20,7 +28,9 @@ CTask::CTask()
 //-----------------------------------------------------------------------------
 CTask::~CTask()
 { 
-	delete m_pfile; 
+	m_pFile->remove_modify_callback(update_style, (void*)this);
+	delete m_pFile; 
+	delete m_pStyle;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,10 +67,114 @@ void CTask::GetFilePath(char* szpath)
 void CTask::Revert()
 {
 	// clear the file buffer
-	m_pfile->select(0, m_pfile->length());
-	m_pfile->remove_selection();	
-	m_pfile->appendfile(m_szfile);
+	m_pFile->select(0, m_pFile->length());
+	m_pFile->remove_selection();	
+	m_pFile->appendfile(m_szfile);
 	SetStatus(READY);
+}
+
+//-----------------------------------------------------------------------------
+void format_style(char* cs, char* cd, int l)
+{
+	char style = 'A';
+	int nkey = 0;
+	for (int i=0; i<l; ++i, ++cd, ++cs)
+	{
+		switch (*cs)
+		{
+		case '<' : { *cd =  'B'; style = 'B'; nkey = 1; } break;
+		case '>' : { *cd =  'B'; style = 'A'; nkey = 0; } break;
+		case '"' : { *cd =  'C'; style = (style=='C'?'A':'C'); } break;
+		case ' ' : { *cd =  'A'; style = (nkey==1?'D':'A'); } break;
+		case '=' : { *cd =  'A'; } break;
+		case '\n': { *cd = '\n'; style = 'A'; } break;
+		default:
+			*cd = style;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CTask::SetTextBuffer(Fl_Text_Buffer* pb)
+{
+	// store the text buffer
+	m_pFile = pb;
+
+	// create a style buffer
+	assert(m_pStyle == 0);
+	m_pStyle = new Fl_Text_Buffer(m_pFile->length());
+
+	// format the text
+	char *style = new char[m_pFile->length() + 1];
+	char *text = m_pFile->text();
+
+	memset(style, 'A', m_pFile->length());
+	style[m_pFile->length()] = '\0';
+
+	// process the buffer
+	format_style(text, style, m_pFile->length());
+
+	// copy the style buffer
+	m_pStyle->text(style);
+	delete[] style;
+	free(text);
+
+	m_pFile->add_modify_callback(update_style, (void*)this);
+}
+
+//-----------------------------------------------------------------------------
+void CTask::UpdateStyle(int npos, int nInserted, int nDeleted, int nRestyled, const char* deletedText)
+{
+  // If this is just a selection change, just unselect the style buffer...
+  if (nInserted == 0 && nDeleted == 0) {
+    m_pStyle->unselect();
+    return;
+  }
+
+  // Track changes in the text buffer...
+  if (nInserted > 0) {
+    // Insert characters into the style buffer...
+    char* style = new char[nInserted + 1];
+    memset(style, 'A', nInserted);
+    style[nInserted] = '\0';
+
+    m_pStyle->replace(npos, npos + nDeleted, style);
+    delete [] style;
+  } else {
+    // Just delete characters in the style buffer...
+    m_pStyle->remove(npos, npos + nDeleted);
+  }
+
+  // Select the area that was just updated to avoid unnecessary callbacks...
+  m_pStyle->select(npos, npos + nInserted - nDeleted);
+
+  int start = m_pFile->line_start(npos);
+  int end   = m_pFile->line_end(npos + nInserted);
+  char* text  = m_pFile->text_range(start, end);
+  char* style = m_pStyle->text_range(start, end);
+  char last = (start==end?0:style[end - start - 1]);
+
+  format_style(text, style, end - start);
+  m_pStyle->replace(start, end, style);
+
+  if (start==end || last != style[end - start - 1]) {
+    // Either the user deleted some text, or the last character
+    // on the line changed styles, so reparse the
+    // remainder of the buffer...
+    free(text);
+    free(style);
+
+    end   = m_pFile->length();
+    text  = m_pFile->text_range(start, end);
+    style = m_pStyle->text_range(start, end);
+
+    format_style(text, style, end - start);
+
+    m_pStyle->replace(start, end, style);
+  }
+
+  free(text);
+  free(style);
 }
 
 //-----------------------------------------------------------------------------

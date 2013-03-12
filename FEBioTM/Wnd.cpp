@@ -21,6 +21,17 @@ extern HINSTANCE fl_display;
 #endif
 
 //-----------------------------------------------------------------------------
+// style table entries
+static Fl_Text_Display::Style_Table_Entry stable[] = {
+       // FONT COLOR      FONT FACE   FONT SIZE
+       // --------------- ----------- --------------
+       {  FL_BLACK   , FL_COURIER, 12 }, // A - default
+       {  FL_BLUE    , FL_COURIER, 12 }, // B - keyword
+       {  FL_DARK_RED, FL_COURIER, 12 }, // C - text (attribute value)
+	   {  FL_MAGENTA , FL_COURIER, 12 }, // D - attribute
+   };
+
+//-----------------------------------------------------------------------------
 const char* wnd_title = "FEBio Task Manager";
 
 //-----------------------------------------------------------------------------
@@ -72,6 +83,9 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 					m_pTabs->resizable(pg);
 					pg->labelsize(11);
 
+					pg = m_pOps = new CSettingsView(this, wf, hm+ht+24, w-wf, h-hm-ht-24, "  Settings  ");
+					pg->labelsize(11);
+
 					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "   Output   ");
 					{
 						m_pOut = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
@@ -94,9 +108,6 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 						pg->resizable(m_pLog);
 					}
 					pg->end();
-					pg->labelsize(11);
-
-					pg = m_pOps = new CSettingsView(this, wf, hm+ht+24, w-wf, h-hm-ht-24, "  Settings  ");
 					pg->labelsize(11);
 				}
 				m_pTabs->end();
@@ -211,7 +222,11 @@ bool CWnd::OpenFile(const char* szfile)
 	if (pt)
 	{
 		m_pTask->AddTask(pt);
-		if (m_pText) m_pText->buffer(pt->GetTextBuffer());
+		if (m_pText)
+		{
+			m_pText->buffer(pt->GetTextBuffer());
+			m_pText->highlight_data(pt->GetStyleBuffer(), stable, 4, 'A', 0, 0);
+		}
 	}
 	return (pt != 0);
 }
@@ -369,7 +384,11 @@ void CWnd::SelectFile()
 	CTask* pt = GetDocument()->GetTask(m_pTask->SelectedTask());
 	if (pt)
 	{
-		if (m_pText) m_pText->buffer(pt->GetTextBuffer());
+		if (m_pText) 
+		{
+			m_pText->buffer(pt->GetTextBuffer());
+			m_pText->highlight_data(pt->GetStyleBuffer(), stable, 4, 'A', 0, 0);
+		}
 		if (m_pOps ) m_pOps->Update();
 	}
 }
@@ -448,7 +467,7 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 	if (pt == 0) { flx_error("No task selected"); return; }
 
 	// show the output window
-	m_pTabs->value(m_pTabs->child(1));
+	m_pTabs->value(m_pTabs->child(2));
 	m_pTabs->do_callback();
 
 	// run the task
@@ -461,7 +480,7 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 {
 	// show the output window
-	if (m_pTabs) m_pTabs->value(m_pTabs->child(1));
+	if (m_pTabs) m_pTabs->value(m_pTabs->child(2));
 	m_pTask->redraw();
 
 	// run the session
@@ -506,6 +525,7 @@ void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 	ps->labelfont(FL_HELVETICA_BOLD);
 	ps->selection_color(FL_GRAY);
 	Fl_Widget* pc = ps->child(0);
+	m_pSel = 0;
 	if (pc == m_pText) m_pSel = m_pText;
 	if (pc == m_pOut ) m_pSel = m_pOut;
 	if (pc == m_pLog ) m_pSel = m_pLog;
@@ -516,6 +536,14 @@ void CWnd::OnChangeText(Fl_Widget* pw, void* pd)
 {
 	int n = m_pTask->SelectedTask();
 	CTask* pt = m_pDoc->GetTask(n);
+
+	// we need to update the format of the modified line
+	int npos = m_pText->insert_position();
+	int nstart = m_pText->line_start(npos);
+	int nend = m_pText->line_end(nstart, true);
+
+//	pt->format_style(nstart, nend);
+
 	if (pt && (pt->GetStatus() != CTask::MODIFIED))
 	{
 		pt->SetStatus(CTask::MODIFIED);

@@ -43,15 +43,16 @@ public:
 	void GetFilePath(char* sz);
 
 	// get/set the input file text buffer
-	void SetTextBuffer(Fl_Text_Buffer* pb) { m_pfile = pb; }
-	Fl_Text_Buffer* GetTextBuffer() { return m_pfile; }
+	void SetTextBuffer(Fl_Text_Buffer* pb);
+	Fl_Text_Buffer* GetTextBuffer() { return m_pFile; }
+	Fl_Text_Buffer* GetStyleBuffer() { return m_pStyle; }
 
 	// get/set the task status
 	void SetStatus(int n) { m_nstatus = n; }
 	int GetStatus() { return m_nstatus; }
 
 	// save the task input file
-	void Save() { if (m_nstatus == MODIFIED) { m_pfile->savefile(m_szfile); SetStatus(READY);} }
+	void Save() { if (m_nstatus == MODIFIED) { m_pFile->savefile(m_szfile); SetStatus(READY);} }
 	void Save(const char* szfile) { SetFileName(szfile); Save(); }
 
 	// reload the file
@@ -65,9 +66,13 @@ public:
 	void Run(Progress& prg);
 	static CTask* GetRunningTask() { return m_prun; }
 
+public:
+	void UpdateStyle(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText);
+
 protected:
 	char			m_szfile[MAX_FILE];		//!< file name
-	Fl_Text_Buffer*	m_pfile;				//!< text buffer for editing
+	Fl_Text_Buffer*	m_pFile;				//!< text buffer for editing
+	Fl_Text_Buffer*	m_pStyle;				//!< text buffer for styling
 	int				m_nstatus;				//!< status
 	float			m_prg;					//!< progress indicator
 
