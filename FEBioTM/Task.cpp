@@ -9,6 +9,21 @@
 CTask* CTask::m_prun = 0;
 
 //-----------------------------------------------------------------------------
+CTask::CTask()
+{
+	m_szfile[0] = 0; m_pfile = 0; m_nstatus = READY;
+
+	// default FEBio options
+	m_bdebug = false;
+}
+
+//-----------------------------------------------------------------------------
+CTask::~CTask()
+{ 
+	delete m_pfile; 
+}
+
+//-----------------------------------------------------------------------------
 void CTask::SetFileName(const char* szfile)
 {
 	m_szfile[0] = 0;
@@ -91,6 +106,9 @@ void CTask::Run(Progress& prg)
 	sprintf(szfile, "%s.plt", szbase); fem.SetPlotFilename(szfile);
 	sprintf(szfile, "%s.dmp", szbase); fem.SetDumpFilename(szfile);
 	fem.SetInputFilename(GetFileName());
+
+	// set command line options
+	if (m_bdebug) fem.SetDebugFlag(true);
 
 	// load the data from file
 	if (fem.Input(GetFileName()) == false)

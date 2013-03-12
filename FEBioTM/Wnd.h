@@ -14,6 +14,7 @@
 #include "Menu.h"
 #include "FileBrowser.h"
 #include "TaskBrowser.h"
+#include "SettingsView.h"
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Tabs.H>
@@ -41,6 +42,8 @@ public:
 	Fl_Text_Display* GetLogWnd() { return m_pLog; }
 
 	CTaskBrowser* GetTaskBrowser() { return m_pTask; }
+
+	CTask* GetSelectedTask();
 
 	void ClearOutputWnd();
 	void ClearLogWnd();
@@ -91,6 +94,7 @@ protected:
 	Fl_Text_Editor*		m_pText;	//!< input file display
 	Fl_Text_Display*	m_pOut;		//!< output text display
 	Fl_Text_Display*	m_pLog;		//!< run-log display
+	CSettingsView*		m_pOps;		//!< file settings view
 
 	Fl_Text_Display*	m_pSel;		//!< Target for editing
 };

@@ -95,6 +95,9 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 					}
 					pg->end();
 					pg->labelsize(11);
+
+					pg = m_pOps = new CSettingsView(this, wf, hm+ht+24, w-wf, h-hm-ht-24, "  Settings  ");
+					pg->labelsize(11);
 				}
 				m_pTabs->end();
 				pg->resizable(m_pTabs);
@@ -367,6 +370,7 @@ void CWnd::SelectFile()
 	if (pt)
 	{
 		if (m_pText) m_pText->buffer(pt->GetTextBuffer());
+		if (m_pOps ) m_pOps->Update();
 	}
 }
 
@@ -428,6 +432,12 @@ void CWnd::OnEditGoToLine(Fl_Widget* pw, void* pd)
 		m_pSel->show_insert_position();
 		m_pSel->take_focus();
 	}
+}
+
+//-----------------------------------------------------------------------------
+CTask* CWnd::GetSelectedTask()
+{
+	return m_pDoc->GetTask(m_pTask->SelectedTask());
 }
 
 //-----------------------------------------------------------------------------

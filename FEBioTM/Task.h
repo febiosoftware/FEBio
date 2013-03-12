@@ -33,8 +33,8 @@ public:
 
 public:
 	// con-/de-structor
-	CTask() { m_szfile[0] = 0; m_pfile = 0; m_nstatus = READY; }
-	~CTask() { delete m_pfile; }
+	CTask();
+	~CTask();
 
 	// file name handling
 	void SetFileName(const char* szfile);
@@ -70,6 +70,9 @@ protected:
 	Fl_Text_Buffer*	m_pfile;				//!< text buffer for editing
 	int				m_nstatus;				//!< status
 	float			m_prg;					//!< progress indicator
+
+public: // FEBio command line options
+	bool	m_bdebug;	//!< debug mode
 
 private:
 	static CTask*	m_prun;	// this is the task that is running
