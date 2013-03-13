@@ -187,11 +187,13 @@ void update_ui_cb(FEModel* pfem, void* pd)
 
 	// get the number of steps
 	int nsteps = pfem->Steps();
+	int nstepi = pfem->m_nStep;
+	double pct = 100.0/nsteps;
 
 	// calculate progress
 	double starttime = pfem->m_ftime0;
 	double endtime = pfem->GetCurrentStep()->m_tend;
-	double f = 100.f*(pfem->m_ftime - starttime) / (endtime - starttime);
+	double f = pct*nstepi + pct*(pfem->m_ftime - starttime) / (endtime - starttime);
 
 	// set the progress (will also update UI)
 	pp->SetProgress(f);
