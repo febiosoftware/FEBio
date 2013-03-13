@@ -106,6 +106,7 @@ public:
 	int m_nsteps;	// nr of step sections read
 	int	m_nstep_type;	// step type
 	int	m_nmat;		// nr of materials
+	int	m_maxid;	// max element ID
 
 	bool	m_b3field;	//!< three-field element flag
 	int		m_nhex8;	//!< hex integration rule

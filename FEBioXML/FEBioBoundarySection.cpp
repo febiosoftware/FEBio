@@ -982,6 +982,7 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	pd->create(1);
 	FEDiscreteElement& de = dynamic_cast<FEDiscreteElement&>(pd->ElementRef(0));
 	de.SetType(FE_DISCRETE);
+	de.m_nID = ++m_pim->m_maxid;
 	
 	// add a new material for each spring
 	fem.AddMaterial(pm);

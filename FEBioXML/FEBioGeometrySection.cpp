@@ -24,6 +24,8 @@
 //!
 void FEBioGeometrySection::Parse(XMLTag& tag)
 {
+	m_pim->m_maxid = -1;
+
 	if (m_pim->GetFEModel() == 0)
 	{
 		++tag;
@@ -327,6 +329,13 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		// get the element type
 		int etype = ElementType(t);
 		if (etype < 0) throw XMLReader::InvalidTag(t);
+
+		// get the element ID
+		int nid = -1;
+		t.AttributeValue("id", nid);
+
+		// keep track of the largest element ID
+		if (nid > m_pim->m_maxid) m_pim->m_maxid = nid;
 
 		// find a domain for this element
 		int ndom = -1;

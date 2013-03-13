@@ -192,7 +192,10 @@ void FEMesh::AddNode(vec3d r)
 int FEMesh::Elements()
 {
 	int N = 0;
-	for (int i=0; i<(int) m_Domain.size(); ++i) N += m_Domain[i]->Elements();
+	for (int i=0; i<(int) m_Domain.size(); ++i) 
+	{
+		N += m_Domain[i]->Elements();
+	}
 	return N;
 }
 

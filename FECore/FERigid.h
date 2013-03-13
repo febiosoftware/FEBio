@@ -40,6 +40,9 @@ public:
 	int		m_pmid;		//!< parent material ID
 
 public:
+	//! Create a rigid material point
+	FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint(); }
+
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt){ return mat3ds(); }
 
