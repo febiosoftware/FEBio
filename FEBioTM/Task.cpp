@@ -85,9 +85,10 @@ void format_style(char* cs, char* cd, int l)
 		case '<' : { *cd =  'B'; style = 'B'; nkey = 1; } break;
 		case '>' : { *cd =  'B'; style = 'A'; nkey = 0; } break;
 		case '"' : { *cd =  'C'; style = (style=='C'?'A':'C'); } break;
-		case ' ' : { *cd =  'A'; style = (nkey==1?'D':'A'); } break;
+		case ' ' : { *cd =  'A'; style = (style=='C'?'C':(nkey==1?'D':'A')); } break;
 		case '=' : { *cd =  'A'; } break;
 		case '\n': { *cd = '\n'; style = 'A'; } break;
+		case '/' : { *cd = 'B'; } break;
 		default:
 			*cd = style;
 		}
@@ -99,6 +100,7 @@ void CTask::SetTextBuffer(Fl_Text_Buffer* pb)
 {
 	// store the text buffer
 	m_pFile = pb;
+	m_pFile->tab_distance(4);
 
 	// create a style buffer
 	assert(m_pStyle == 0);
