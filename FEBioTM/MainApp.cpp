@@ -112,9 +112,12 @@ bool CMainApp::Load(const char* szfilename)
 	// load the initial project
 	if (strlen(szfilename)>0)
 	{
-		m_pMainWnd->OpenFile(szfilename);
+		char* szfile = (char*) szfilename;
+		if (szfile[0] == '"') szfile++;
+		char* ch = strrchr(szfile, '"');
+		if (ch) *ch = 0;
+		m_pMainWnd->OpenFile(szfile);
 	}
-
 	return true;
 }
 
