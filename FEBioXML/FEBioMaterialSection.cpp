@@ -114,7 +114,7 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			if (!bfound && dynamic_cast<FESolute*>(pmat)) bfound = ParseSoluteMaterial(tag, dynamic_cast<FESolute*>(pmat));
 			
 			// triphasic material parameters
-			if (!bfound && dynamic_cast<FETriphasic*>(pmat)) bfound = ParseTriphasicMaterial(tag, dynamic_cast<FETriphasic*>(pmat));
+//			if (!bfound && dynamic_cast<FETriphasic*>(pmat)) bfound = ParseTriphasicMaterial(tag, dynamic_cast<FETriphasic*>(pmat));
 
 			// multiphasic material parameters
 			if (!bfound && dynamic_cast<FEMultiphasic*>(pmat)) bfound = ParseMultiphasicMaterial(tag, dynamic_cast<FEMultiphasic*>(pmat));
@@ -801,7 +801,12 @@ bool FEBioMaterialSection::ParseSoluteMaterial(XMLTag &tag, FESolute *pm)
 bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 {
 	// get the material type
-	const char* sztype = tag.AttributeValue("type");
+	const char* sztype = tag.AttributeValue("type", true);
+	if (sztype == 0)
+	{
+		if (tag == "solute") sztype = "solute";
+		else throw XMLReader::InvalidTag(tag);
+	}
 		
 	// get the material name
 	const char* szname = tag.AttributeValue("name", true);
@@ -823,6 +828,9 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 	FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
 	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
+	FESolute* psol = dynamic_cast<FESolute*>(pmat);
+	if (psol) psol->SetSoluteID(nid);
+
 	// assign the new material to the corresponding material property
 	if (pm->SetComponent(nc, pmat) == false)
 	{
@@ -836,7 +844,7 @@ bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 	// parse the new material
 	ParseMaterial(tag, pmat);
 	
-	return false;
+	return true;
 }
 
 //-----------------------------------------------------------------------------

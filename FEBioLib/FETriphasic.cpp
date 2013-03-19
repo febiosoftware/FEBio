@@ -27,6 +27,7 @@ FETriphasic::FETriphasic()
 	m_phi0 = 0;
 	m_rhoTw = 0;
 
+	m_pSolute.resize(2);
 	AddComponent<FEElasticMaterial      >(&m_pSolid    , "solid"              );
 	AddComponent<FEHydraulicPermeability>(&m_pPerm     , "permeability"       );
 	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC     , "osmotic_coefficient");

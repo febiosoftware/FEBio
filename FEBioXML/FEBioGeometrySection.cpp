@@ -15,6 +15,7 @@
 #include <FEBioLib/FEUT4Domain.h>
 #include <FEBioLib/FEHeatSolidDomain.h>
 #include <FEBioLib/FEBiphasicSolidDomain.h>
+#include <FEBioLib/FETriphasicDomain.h>
 #include <FEBioLib/FEBiphasicSoluteDomain.h>
 #include <FEBioLib/FE3FieldElasticSolidDomain.h>
 #include <FEBioLib/FELinearSolidDomain.h>
@@ -294,6 +295,7 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 	case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (pm, pmat); break;
 	case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
 	case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicSolidDomain     (pm, pmat); break;
+	case FE_TRIPHASIC_DOMAIN      : pd = new FETriphasicDomain         (pm, pmat); break;
 	case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (pm, pmat); break;
 	case FE_LINEAR_SOLID_DOMAIN   : pd = new FELinearSolidDomain       (pm, pmat); break;
 	}
