@@ -510,10 +510,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEOptimizer.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEOrthoElastic.cpp"
 				>
 			</File>
@@ -1113,10 +1109,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEOgdenUnconstrained.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEOptimizer.h"
 				>
 			</File>
 			<File

@@ -265,10 +265,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\FEBioProgress.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEBioStdSolver.cpp"
 				>
 			</File>
@@ -309,27 +305,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\levmar.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\optimize.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\plugin.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\powell.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\restart.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\solve.cpp"
 				>
 			</File>
 			<File
@@ -356,10 +336,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\FEBioCommand.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEBioProgress.h"
 				>
 			</File>
 			<File

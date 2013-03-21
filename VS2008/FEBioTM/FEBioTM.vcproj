@@ -201,6 +201,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioTM\SettingsView.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioTM\stdafx.cpp"
 				>
 			</File>
@@ -256,6 +260,10 @@
 			</File>
 			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioTM\SettingsView.h"
 				>
 			</File>
 			<File
