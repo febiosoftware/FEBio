@@ -153,6 +153,7 @@ enum FE_Plot_Level {
 ///////////////////////////////////////////////////////////////////////////////
 
 enum FE_Print_Level {
+	FE_PRINT_DEFAULT,		// let FEBio choose
 	FE_PRINT_NEVER,
 	FE_PRINT_PROGRESS,
 	FE_PRINT_MAJOR_ITRS,

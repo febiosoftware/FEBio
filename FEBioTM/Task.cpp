@@ -23,6 +23,7 @@ CTask::CTask()
 
 	// default FEBio options
 	m_bdebug = false;
+	m_nlog   = FE_PRINT_DEFAULT;
 }
 
 //-----------------------------------------------------------------------------
@@ -283,6 +284,10 @@ void CTask::Run(Progress& prg)
 		m_prun = 0;
 		return;
 	}
+
+	// get the step
+	FEAnalysis* pstep = fem.GetStep(0);
+	if (m_nlog != FE_PRINT_DEFAULT) pstep->SetPrintLevel(m_nlog);
 
 	// run the problem
 	bool bret = fem.Solve();

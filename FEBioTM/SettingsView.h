@@ -18,6 +18,7 @@ protected:
 
 public:
 	bool	m_bdebug;	//!< debug mode
+	int		m_nlog;		//!< log level
 
 private:
 	CWnd*	m_pWnd;

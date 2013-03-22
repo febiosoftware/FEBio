@@ -76,8 +76,9 @@ protected:
 	int				m_nstatus;				//!< status
 	float			m_prg;					//!< progress indicator
 
-public: // FEBio command line options
+public: // FEBio command line and control options
 	bool	m_bdebug;	//!< debug mode
+	int		m_nlog;		//!< log level
 
 private:
 	static CTask*	m_prun;	// this is the task that is running
