@@ -25,10 +25,11 @@ extern HINSTANCE fl_display;
 static Fl_Text_Display::Style_Table_Entry stable[] = {
        // FONT COLOR      FONT FACE   FONT SIZE
        // --------------- ----------- --------------
-       {  FL_BLACK   , FL_COURIER, 12 }, // A - default
-       {  FL_BLUE    , FL_COURIER, 12 }, // B - keyword
-       {  FL_DARK_RED, FL_COURIER, 12 }, // C - text (attribute value)
-	   {  FL_MAGENTA , FL_COURIER, 12 }, // D - attribute
+       {  FL_BLACK     , FL_COURIER, 12 }, // A - default
+       {  FL_BLUE      , FL_COURIER, 12 }, // B - keyword
+       {  FL_DARK_RED  , FL_COURIER, 12 }, // C - text (attribute value)
+	   {  FL_MAGENTA   , FL_COURIER, 12 }, // D - attribute
+	   {  FL_DARK_GREEN, FL_COURIER, 12 }, // E - comment
    };
 
 //-----------------------------------------------------------------------------
@@ -225,7 +226,7 @@ bool CWnd::OpenFile(const char* szfile)
 		if (m_pText)
 		{
 			m_pText->buffer(pt->GetTextBuffer());
-			m_pText->highlight_data(pt->GetStyleBuffer(), stable, 4, 'A', 0, 0);
+			m_pText->highlight_data(pt->GetStyleBuffer(), stable, sizeof(stable)/sizeof(stable[0]), 'A', 0, 0);
 		}
 	}
 	return (pt != 0);
@@ -387,7 +388,7 @@ void CWnd::SelectFile()
 		if (m_pText) 
 		{
 			m_pText->buffer(pt->GetTextBuffer());
-			m_pText->highlight_data(pt->GetStyleBuffer(), stable, 4, 'A', 0, 0);
+			m_pText->highlight_data(pt->GetStyleBuffer(), stable, sizeof(stable)/sizeof(stable[0]), 'A', 0, 0);
 		}
 		if (m_pOps ) m_pOps->Update();
 	}

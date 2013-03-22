@@ -23,6 +23,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 		m_pg->hide();
 		m_pg->selection_color(FL_GREEN);
 		m_nrow = -1;
+		m_pg->box(FL_BORDER_BOX);
 	}
 	end();
 

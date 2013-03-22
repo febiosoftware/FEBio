@@ -74,23 +74,63 @@ void CTask::Revert()
 }
 
 //-----------------------------------------------------------------------------
+bool is_comment_start(char* sz)
+{
+	if (sz[0] != '<') return false;
+	if (sz[1] != '!') return false;
+	if (sz[2] != '-') return false;
+	if (sz[3] != '-') return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool is_comment_end(char* sz)
+{
+	if (sz[ 0] != '>') return false;
+	if (sz[-1] != '-') return false;
+	if (sz[-2] != '-') return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void format_style(char* cs, char* cd, int l)
 {
 	char style = 'A';
 	int nkey = 0;
+	int ncomm = 0;
 	for (int i=0; i<l; ++i, ++cd, ++cs)
 	{
-		switch (*cs)
+		if (ncomm == 0)
 		{
-		case '<' : { *cd =  'B'; style = 'B'; nkey = 1; } break;
-		case '>' : { *cd =  'B'; style = 'A'; nkey = 0; } break;
-		case '"' : { *cd =  'C'; style = (style=='C'?'A':'C'); } break;
-		case ' ' : { *cd =  'A'; style = (style=='C'?'C':(nkey==1?'D':'A')); } break;
-		case '=' : { *cd =  'A'; } break;
-		case '\n': { *cd = '\n'; style = 'A'; } break;
-		case '/' : { *cd = 'B'; } break;
-		default:
-			*cd = style;
+			if ((*cs == '<') && is_comment_start(cs))
+			{
+				*cd = 'E';
+				ncomm = 1;
+			}
+			else
+			{
+				switch (*cs)
+				{
+				case '<' : { *cd =  'B'; style = 'B'; nkey = 1; } break;
+				case '>' : { *cd =  'B'; style = 'A'; nkey = 0; } break;
+				case '"' : { *cd =  'C'; style = (style=='C'?'A':'C'); } break;
+				case ' ' : { *cd =  'A'; style = (style=='C'?'C':(nkey==1?'D':'A')); } break;
+				case '=' : { *cd =  'A'; } break;
+				case '\n': { *cd = '\n'; style = 'A'; } break;
+				case '/' : { *cd = 'B'; } break;
+				default:
+					*cd = style;
+				}
+			}
+		}
+		else
+		{
+			*cd = 'E';
+			if ((*cs == '>') && is_comment_end(cs))
+			{
+				style = 'A';
+				ncomm = 0;
+			}
 		}
 	}
 }
