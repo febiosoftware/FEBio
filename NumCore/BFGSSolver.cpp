@@ -133,6 +133,7 @@ void NumCore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 
 		wr = 0;
 		for (j=0; j<neq; j++) wr += wi[j]*tmp[j];
+
 		for (j=0; j<neq; j++) tmp[j] += vi[j]*wr;
 	}
 
@@ -147,6 +148,7 @@ void NumCore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 
 		vr = 0;
 		for (j=0; j<neq; ++j) vr += vi[j]*x[j];
+
 		for (j=0; j<neq; ++j) x[j] += wi[j]*vr;
 	}
 }

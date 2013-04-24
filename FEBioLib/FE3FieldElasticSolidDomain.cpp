@@ -39,6 +39,7 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 	// repeat over all solid elements
 	int NE = m_Elem.size();
+	#pragma omp parallel for private(ke,lm)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -68,6 +69,7 @@ void FE3FieldElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 		UnpackLM(el, lm);
 
 		// assemble element matrix in global stiffness matrix
+		#pragma omp critical
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
@@ -386,6 +388,7 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEModel &fem)
 	FEUncoupledMaterial& mat = *(dynamic_cast<FEUncoupledMaterial*>(m_pMat));
 
 	int NE = (int) m_Elem.size();
+	#pragma omp parallel for private(i, n, nint, neln, gw)
 	for (i=0; i<NE; ++i)
 	{
 		// get the solid element

@@ -4,6 +4,10 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 
+extern "C" int __cdecl omp_get_num_threads(void);
+extern "C" int __cdecl omp_get_thread_num(void);
+
+
 //-----------------------------------------------------------------------------
 FEDomain* FEElasticSolidDomain::Clone()
 {
@@ -230,6 +234,7 @@ void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 	vector<int> lm;
 
 	int NE = m_Elem.size();
+	#pragma omp parallel for private(fe, lm)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -246,6 +251,7 @@ void FEElasticSolidDomain::InternalForces(FEGlobalVector& R)
 		UnpackLM(el, lm);
 
 		// assemble element 'fe'-vector into global R vector
+		#pragma omp critical
 		R.Assemble(el.m_node, lm, fe);
 	}
 }
@@ -762,6 +768,8 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 	// repeat over all solid elements
 	int NE = m_Elem.size();
+
+	#pragma omp parallel for private(ke,lm)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -788,6 +796,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 		UnpackLM(el, lm);
 
 		// assemble element matrix in global stiffness matrix
+		#pragma omp critical
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
@@ -942,7 +951,9 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 	int nint, neln;
 	double* gw;
 
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	int NE = (int) m_Elem.size();
+	#pragma omp parallel for private(i, n, nint, neln, gw)
+	for (i=0; i<NE; ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
