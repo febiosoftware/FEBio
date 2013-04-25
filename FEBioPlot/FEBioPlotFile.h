@@ -9,14 +9,24 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
+// VERSION INFO
+//==============
+// -0.2: increased max surface nodes to 8 to accomodate tri6 and quad8 facets.
+//       facets store nr of nodes for each face PLT_FACE
+// -0.1: initial design
+
+//-----------------------------------------------------------------------------
 //! This class implements the facilities to export FE data in the FEBio
 //! plot file format.
 //!
 class FEBioPlotFile : public PlotFile
 {
-protected:
+public:
 	// file version
-	enum { PLT_VERSION = 0x0001 };
+	enum { PLT_VERSION = 0x0002 };
+
+	// max nodes per facet
+	enum { PLT_MAX_FACET_NODES = 8 };
 
 	// file tags
 	enum { 
@@ -24,6 +34,7 @@ protected:
 		PLT_HEADER						= 0x01010000,
 			PLT_HDR_VERSION				= 0x01010001,
 			PLT_HDR_NODES				= 0x01010002,
+			PLT_HDR_MAX_FACET_NODES		= 0x01010003,
 		PLT_DICTIONARY					= 0x01020000,
 			PLT_DIC_ITEM				= 0x01020001,
 			PLT_DIC_ITEM_TYPE			= 0x01020002,
@@ -144,6 +155,7 @@ public:
 	const Dictionary& GetDictionary() const { return m_dic; }
 
 protected:
+	bool WriteRoot      (FEModel& fem);
 	bool WriteHeader    (FEModel& fem);
 	bool WriteDictionary(FEModel& fem);
 	bool WriteMaterials (FEModel& fem);

@@ -2,6 +2,7 @@
 #include "FEPlotSurfaceData.h"
 #include "FEBioLib/FEElasticSolidDomain.h"
 #include "FECore/febio.h"
+#include "FEBioPlotFile.h"
 
 //=============================================================================
 // Contact Gap
@@ -35,14 +36,13 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 bool FEPlotContactGap::SaveSliding(FESlidingSurface& s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
 	for (int i=0; i<NF; ++i) 
 	{
 		FESurfaceElement& f = s.Element(i);
-		a[4*i  ] = (float) s.m_gap[f.m_lnode[0]];
-		a[4*i+1] = (float) s.m_gap[f.m_lnode[1]];
-		a[4*i+2] = (float) s.m_gap[f.m_lnode[2]];
-		a[4*i+3] = (float) s.m_gap[f.m_lnode[3]];
+		int ne = f.m_lnode.size();
+		for (int j= 0; j< ne; ++j) a[MFN*i + j] = (float) s.m_gap[f.m_lnode[j]];
 	}
 	return true;
 }
@@ -54,14 +54,13 @@ bool FEPlotContactGap::SaveSliding(FESlidingSurface& s, vector<float>& a)
 bool FEPlotContactGap::SaveTied(FETiedContactSurface& s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
 	for (int i=0; i<NF; ++i) 
 	{
 		FESurfaceElement& f = s.Element(i);
-		a[4*i  ] = (float) s.m_gap[f.m_lnode[0]].norm();
-		a[4*i+1] = (float) s.m_gap[f.m_lnode[1]].norm();
-		a[4*i+2] = (float) s.m_gap[f.m_lnode[2]].norm();
-		a[4*i+3] = (float) s.m_gap[f.m_lnode[3]].norm();
+		int ne = f.m_lnode.size();
+		for (int j= 0; j< ne; ++j) a[MFN*i + j] = (float) s.m_gap[f.m_lnode[j]].norm();
 	}
 	return true;
 }
@@ -70,26 +69,23 @@ bool FEPlotContactGap::SaveTied(FETiedContactSurface& s, vector<float>& a)
 bool FEPlotContactGap::SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	int NFM = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(NFM*NF, 0.f);
 	int nint = 0;
-	double gi[4], gn[4];
-	int i, k;
-	for (i=0; i<NF; ++i)
+	double gi[FEElement::MAX_NODES], gn[FEElement::MAX_NODES];
+	for (int i=0; i<NF; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
-		for (k=0; k<ni; ++k, ++nint) gi[k] = s.m_gap[nint];
+		for (int k=0; k<ni; ++k, ++nint) gi[k] = s.m_gap[nint];
 
-		for (k=0; k<ni; ++k) if (gi[k] < 0) gi[k] = 0;
+		for (int k=0; k<ni; ++k) if (gi[k] < 0) gi[k] = 0;
 		el.project_to_nodes(gi, gn);
 
-		for (k=0; k<ni; ++k) if (gn[k] < 0) gn[k] = 0;
+		for (int k=0; k<ne; ++k) if (gn[k] < 0) gn[k] = 0;
 
-		a[4*i  ] = (float) gn[0];
-		a[4*i+1] = (float) gn[1];
-		a[4*i+2] = (float) gn[2];
-		a[4*i+3] = (float) (ne == 4? gn[3] : gn[2]);
+		for (int k=0; k<ne; ++k) a[NFM*i + k] = (float) gn[k];
 	}
 	return true;
 }
@@ -98,9 +94,10 @@ bool FEPlotContactGap::SaveFacetSliding(FEFacetSlidingSurface& s, vector<float>&
 bool FEPlotContactGap::SaveSliding2(FESlidingSurface2& s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	const int NFM = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(NFM*NF, 0.f);
 	int nint = 0;
-	double gi[4], gn[4];
+	double gi[NFM], gn[NFM];
 	for (int i=0; i<NF; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
@@ -110,10 +107,7 @@ bool FEPlotContactGap::SaveSliding2(FESlidingSurface2& s, vector<float>& a)
 
 		el.project_to_nodes(gi, gn);
 
-		a[4*i  ] = (float) gn[0];
-		a[4*i+1] = (float) gn[1];
-		a[4*i+2] = (float) gn[2];
-		a[4*i+3] = (float) (ne == 4? gn[3] : gn[2]);
+		for (int k=0; k<ne; ++k) a[NFM*i + k] = (float) gn[k];
 	}
 	return true;
 }
@@ -122,9 +116,10 @@ bool FEPlotContactGap::SaveSliding2(FESlidingSurface2& s, vector<float>& a)
 bool FEPlotContactGap::SaveSliding3(FESlidingSurface3& s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	const int NFM = FEBioPlotFile::PLT_MAX_FACET_NODES;
 	int nint = 0;
-	double gi[4], gn[4];
+	double gi[NFM], gn[NFM];
+	a.assign(NFM*NF, 0.f);
 	for (int i=0; i<NF; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
@@ -134,10 +129,7 @@ bool FEPlotContactGap::SaveSliding3(FESlidingSurface3& s, vector<float>& a)
 		
 		el.project_to_nodes(gi, gn);
 		
-		a[4*i  ] = (float) gn[0];
-		a[4*i+1] = (float) gn[1];
-		a[4*i+2] = (float) gn[2];
-		a[4*i+3] = (float) (ne == 4? gn[3] : gn[2]);
+		for (int k=0; k<ne; ++k) a[NFM*i + k] = (float) gn[k];
 	}
 	return true;
 }
@@ -168,18 +160,13 @@ bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
 bool FEPlotContactPressure::SaveSliding(FESlidingSurface &s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
 	for (int i=0; i<NF; ++i) 
 	{
 		FESurfaceElement& f = s.Element(i);
-		for (int j=0; j<4; ++j)
-		{
-			double g = s.m_gap[f.m_lnode[j]];
-			double L = s.m_Lm[f.m_lnode[j]];
-			double e = s.m_eps[f.m_lnode[j]];
-			double t = MBRACKET(L + g*e);
-			a[4*i+j] = (float) t;
-		}
+		int ne = f.Nodes();
+		for (int j=0; j<ne; ++j) a[MFN*i+j] = (float) s.m_Ln[f.m_lnode[j]];
 	}
 	return true;
 }
@@ -188,9 +175,10 @@ bool FEPlotContactPressure::SaveSliding(FESlidingSurface &s, vector<float>& a)
 bool FEPlotContactPressure::SaveFacetSliding(FEFacetSlidingSurface &s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
 	int nint = 0;
-	double ti[4], tn[4];
+	double ti[MFN], tn[MFN];
 	for (int i=0; i<NF; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
@@ -207,10 +195,7 @@ bool FEPlotContactPressure::SaveFacetSliding(FEFacetSlidingSurface &s, vector<fl
 		for (int k=0; k<ni; ++k)
 			tn[k] = (tn[k]>=0?tn[k] : 0);		
 
-		a[4*i  ] = (float) tn[0];
-		a[4*i+1] = (float) tn[1];
-		a[4*i+2] = (float) tn[2];
-		a[4*i+3] = (float) (ne == 4? tn[3] : tn[2]);
+		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) tn[k];
 	}
 	return true;
 }
@@ -219,9 +204,10 @@ bool FEPlotContactPressure::SaveFacetSliding(FEFacetSlidingSurface &s, vector<fl
 bool FEPlotContactPressure::SaveSliding2(FESlidingSurface2 &s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
 	int nint = 0;
-	double ti[4], tn[4];
+	double ti[MFN], tn[MFN];
 	for (int i=0; i<NF; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
@@ -231,10 +217,7 @@ bool FEPlotContactPressure::SaveSliding2(FESlidingSurface2 &s, vector<float>& a)
 
 		el.project_to_nodes(ti, tn);
 
-		a[4*i  ] = (float) tn[0];
-		a[4*i+1] = (float) tn[1];
-		a[4*i+2] = (float) tn[2];
-		a[4*i+3] = (float) (ne == 4? tn[3] : tn[2]);
+		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) tn[k];
 	}
 	return true;
 }
@@ -243,9 +226,10 @@ bool FEPlotContactPressure::SaveSliding2(FESlidingSurface2 &s, vector<float>& a)
 bool FEPlotContactPressure::SaveSliding3(FESlidingSurface3 &s, vector<float>& a)
 {
 	int NF = s.Elements();
-	a.assign(4*NF, 0.f);
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
 	int nint = 0;
-	double ti[4], tn[4];
+	double ti[MFN], tn[MFN];
 	for (int i=0; i<NF; ++i)
 	{
 		FESurfaceElement& el = s.Element(i);
@@ -255,10 +239,7 @@ bool FEPlotContactPressure::SaveSliding3(FESlidingSurface3 &s, vector<float>& a)
 		
 		el.project_to_nodes(ti, tn);
 		
-		a[4*i  ] = (float) tn[0];
-		a[4*i+1] = (float) tn[1];
-		a[4*i+2] = (float) tn[2];
-		a[4*i+3] = (float) (ne == 4? tn[3] : tn[2]);
+		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) tn[k];
 	}
 	return true;
 }
@@ -287,7 +268,8 @@ bool FEPlotContactTraction::Save(FESurface &surf, std::vector<float> &a)
 //-----------------------------------------------------------------------------
 bool FEPlotContactTraction::SaveSliding(FESlidingSurface &s, std::vector<float> &a)
 {
-	vec3d t[4];
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	vec3d t[MFN];
 	for (int i=0; i<s.Elements(); ++i)
 	{
 		FESurfaceElement& e = s.Element(i);
@@ -301,20 +283,24 @@ bool FEPlotContactTraction::SaveSliding(FESlidingSurface &s, std::vector<float> 
 			vec3d ti = s.m_nu[nj];
 			if (gi > 0) t[j] = ti*Li; else t[j] = vec3d(0,0,0);
 		}
-		if (ne == 3) t[3] = t[2];
 
-		a.push_back((float) t[0].x); a.push_back((float) t[0].y); a.push_back((float) t[0].z);
-		a.push_back((float) t[1].x); a.push_back((float) t[1].y); a.push_back((float) t[1].z);
-		a.push_back((float) t[2].x); a.push_back((float) t[2].y); a.push_back((float) t[2].z);
-		a.push_back((float) t[3].x); a.push_back((float) t[3].y); a.push_back((float) t[3].z);
+		for (int j=0; j<MFN; ++j)
+		{
+			a.push_back((float) t[j].x);
+			a.push_back((float) t[j].y);
+			a.push_back((float) t[j].z); 
+		}
 	}
-
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 bool FEPlotContactTraction::SaveFacetSliding(FEFacetSlidingSurface &s, std::vector<float> &a)
 {
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(3*MFN*s.Elements(), 0.f);
+	double tix[MFN], tiy[MFN], tiz[MFN];
+	double tnx[MFN], tny[MFN], tnz[MFN];
 	int nint = 0;
 	for (int j=0; j<s.Elements(); ++j)
 	{
@@ -322,22 +308,28 @@ bool FEPlotContactTraction::SaveFacetSliding(FEFacetSlidingSurface &s, std::vect
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		// calculate the average traction
-		vec3d t(0,0,0);
+		vec3d t;
 		for (int k=0; k<ni; ++k, ++nint)
 		{
 			double gi = s.m_gap[nint];
 			double Li = s.m_Ln[nint];
 			vec3d  ti = s.m_nu[nint];
-			if (gi > 0) t += ti*(Li);
+			if (gi > 0) t = ti*(Li); else t = vec3d(0,0,0);
+			tix[k] = t.x; tiy[k] = t.y; tiz[k] = t.z;
 		}
-		t /= (double) ni;
 
-		// project average traction to nodes
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		// project traction to nodes
+		el.project_to_nodes(tix, tnx);
+		el.project_to_nodes(tiy, tny);
+		el.project_to_nodes(tiz, tnz);
+
+		// store in archive
+		for (int k=0; k<ne; ++k)
+		{
+			a[3*MFN*j +3*k   ] = (float) tnx[k];
+			a[3*MFN*j +3*k +1] = (float) tny[k];
+			a[3*MFN*j +3*k +2] = (float) tnz[k];
+		}
 	}
 
 	return true;
@@ -346,6 +338,10 @@ bool FEPlotContactTraction::SaveFacetSliding(FEFacetSlidingSurface &s, std::vect
 //-----------------------------------------------------------------------------
 bool FEPlotContactTraction::SaveSliding2(FESlidingSurface2 &s, std::vector<float> &a)
 {
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(3*MFN*s.Elements(), 0.f);
+	double tix[MFN], tiy[MFN], tiz[MFN];
+	double tnx[MFN], tny[MFN], tnz[MFN];
 	int nint = 0;
 	for (int j=0; j<s.Elements(); ++j)
 	{
@@ -353,22 +349,28 @@ bool FEPlotContactTraction::SaveSliding2(FESlidingSurface2 &s, std::vector<float
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		// calculate the average traction
-		vec3d t(0,0,0);
+		vec3d t;
 		for (int k=0; k<ni; ++k, ++nint)
 		{
 			double gi = s.m_gap[nint];
 			double Li = s.m_Ln[nint];
 			vec3d  ti = s.m_nu[nint];
-			if (gi > 0) t += ti*(Li);
+			if (gi > 0) t = ti*(Li); else t = vec3d(0,0,0);
+			tix[k] = t.x; tiy[k] = t.y; tiz[k] = t.z;
 		}
-		t /= (double) ni;
 
-		// project average traction to nodes
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		// project traction to nodes
+		el.project_to_nodes(tix, tnx);
+		el.project_to_nodes(tiy, tny);
+		el.project_to_nodes(tiz, tnz);
+
+		// store in archive
+		for (int k=0; k<ne; ++k)
+		{
+			a[3*MFN*j +3*k   ] = (float) tnx[k];
+			a[3*MFN*j +3*k +1] = (float) tny[k];
+			a[3*MFN*j +3*k +2] = (float) tnz[k];
+		}
 	}
 
 	return true;
@@ -377,6 +379,10 @@ bool FEPlotContactTraction::SaveSliding2(FESlidingSurface2 &s, std::vector<float
 //-----------------------------------------------------------------------------
 bool FEPlotContactTraction::SaveSliding3(FESlidingSurface3 &s, std::vector<float> &a)
 {
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(3*MFN*s.Elements(), 0.f);
+	double tix[MFN], tiy[MFN], tiz[MFN];
+	double tnx[MFN], tny[MFN], tnz[MFN];
 	int nint = 0;
 	for (int j=0; j<s.Elements(); ++j)
 	{
@@ -384,22 +390,28 @@ bool FEPlotContactTraction::SaveSliding3(FESlidingSurface3 &s, std::vector<float
 		int ne = el.Nodes();
 		int ni = el.GaussPoints();
 
-		// calculate the average traction
-		vec3d t(0,0,0);
+		vec3d t;
 		for (int k=0; k<ni; ++k, ++nint)
 		{
 			double gi = s.m_gap[nint];
 			double Li = s.m_Ln[nint];
 			vec3d  ti = s.m_nu[nint];
-			if (gi > 0) t += ti*(Li);
+			if (gi > 0) t = ti*(Li); else t = vec3d(0,0,0);
+			tix[k] = t.x; tiy[k] = t.y; tiz[k] = t.z;
 		}
-		t /= (double) ni;
 
-		// project average traction to nodes
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
-		a.push_back((float) t.x); a.push_back((float) t.y); a.push_back((float) t.z);
+		// project traction to nodes
+		el.project_to_nodes(tix, tnx);
+		el.project_to_nodes(tiy, tny);
+		el.project_to_nodes(tiz, tnz);
+
+		// store in archive
+		for (int k=0; k<ne; ++k)
+		{
+			a[3*MFN*j +3*k   ] = (float) tnx[k];
+			a[3*MFN*j +3*k +1] = (float) tny[k];
+			a[3*MFN*j +3*k +2] = (float) tnz[k];
+		}
 	}
 
 	return true;

@@ -135,39 +135,55 @@ FEBioPlotFile::~FEBioPlotFile(void)
 }
 
 //-----------------------------------------------------------------------------
-bool FEBioPlotFile::Open(FEModel& fem, const char *szfile)
+bool FEBioPlotFile::Open(FEModel &fem, const char *szfile)
 {
 	// open the archive
-	if (m_ar.Create(szfile) == false) return false;
+	m_ar.Create(szfile);
 
+	// write the root element
+	try
+	{
+		if (WriteRoot(fem) == false) return false;
+	}
+	catch (...)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlotFile::WriteRoot(FEModel& fem)
+{
 	// write the root element
 	m_ar.BeginChunk(PLT_ROOT);
 	{
 		// --- save the header file ---
 		m_ar.BeginChunk(PLT_HEADER);
 		{
-			if (WriteHeader(m_fem) == false) return false;
+			if (WriteHeader(fem) == false) return false;
 		}
 		m_ar.EndChunk();
 
 		// --- save the dictionary ---
 		m_ar.BeginChunk(PLT_DICTIONARY);
 		{
-			if (WriteDictionary(m_fem) == false) return false;
+			if (WriteDictionary(fem) == false) return false;
 		}
 		m_ar.EndChunk();
 
 		// --- save the materials
 		m_ar.BeginChunk(PLT_MATERIALS);
 		{
-			if (WriteMaterials(m_fem) == false) return false;
+			if (WriteMaterials(fem) == false) return false;
 		}
 		m_ar.EndChunk();
 
 		// --- save the geometry ---
 		m_ar.BeginChunk(PLT_GEOMETRY);
 		{
-			if (WriteGeometry(m_fem) == false) return false;
+			if (WriteGeometry(fem) == false) return false;
 		}
 		m_ar.EndChunk();
 	}
@@ -187,6 +203,10 @@ bool FEBioPlotFile::WriteHeader(FEModel& fem)
 
 	int N = fem.GetMesh().Nodes();
 	m_ar.WriteChunk(PLT_HDR_NODES, N);
+
+	// max number of nodes per facet
+	int n = (int) PLT_MAX_FACET_NODES;
+	m_ar.WriteChunk(PLT_HDR_MAX_FACET_NODES, n);
 
 	return true;
 }
