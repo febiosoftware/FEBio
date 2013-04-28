@@ -17,6 +17,8 @@
 #include "Interrupt.h"
 #include "console.h"
 
+extern "C" void __cdecl omp_set_num_threads(int);
+
 //-----------------------------------------------------------------------------
 //! Constructor of the FEM class
 //! Initializes default variables
@@ -157,6 +159,12 @@ bool FEM::Configure(const char *szfile)
 					{
 						const char* szfile = tag.szvalue();
 						if (LoadPluginFolder(szfile) == false) throw XMLReader::InvalidTag(tag);
+					}
+					else if (tag == "omp_num_threads")
+					{
+						int n;
+						tag.value(n);
+						omp_set_num_threads(n);
 					}
 					else throw XMLReader::InvalidTag(tag);
 

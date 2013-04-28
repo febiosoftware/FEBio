@@ -177,6 +177,7 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<doub
 	
 	int NE = m_Elem.size();
 
+	#pragma omp parallel for private(fe, elm) shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -196,12 +197,15 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<doub
 		// calculate fluid internal work
 		ElementInternalFluidWorkSS(el, fe, dt);
 			
-		// add fluid work to global residual
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j)
+		#pragma omp critical
 		{
-			int J = elm[3*neln+j];
-			if (J >= 0) R[J] += fe[j];
+			// add fluid work to global residual
+			int neln = el.Nodes();
+			for (int j=0; j<neln; ++j)
+			{
+				int J = elm[3*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
 	}
 }
@@ -572,6 +576,8 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, d
 
 	// repeat over all solid elements
 	int NE = m_Elem.size();
+
+	#pragma omp parallel for private(ke, elm) shared(NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -601,6 +607,7 @@ void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, d
 		}
 		
 		// assemble element matrix in global stiffness matrix
+		#pragma omp critical
 		psolver->AssembleStiffness(el.m_node, lm, ke);
 	}
 }
@@ -1132,10 +1139,6 @@ void FEBiphasicSolidDomain::ElementBiphasicMaterialStiffness(FESolidElement &el,
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::UpdateStresses(FEModel &fem)
 {
-	int i, n;
-	int nint, neln;
-	double* gw;
-
 	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES];
@@ -1152,19 +1155,20 @@ void FEBiphasicSolidDomain::UpdateStresses(FEModel &fem)
 
 	FEMesh& mesh = *m_pMesh;
 
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	#pragma omp parallel for shared(pm, pmb, pme, mesh) private(r0, rt, pn)
+	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
 		// get the number of integration points
-		nint = el.GaussPoints();
+		int nint = el.GaussPoints();
 		
 		// get the integration weights
-		gw = el.GaussWeights();
+		double* gw = el.GaussWeights();
 
 		// get the number of nodes
-		neln = el.Nodes();
+		int neln = el.Nodes();
 
 		// get the nodal data
 		for (int j=0; j<neln; ++j)
@@ -1176,7 +1180,7 @@ void FEBiphasicSolidDomain::UpdateStresses(FEModel &fem)
 		
 		// loop over the integration points and calculate
 		// the stress at the integration point
-		for (n=0; n<nint; ++n)
+		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
 			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());

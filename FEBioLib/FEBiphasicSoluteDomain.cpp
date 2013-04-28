@@ -202,8 +202,9 @@ void FEBiphasicSoluteDomain::InternalFluidWork(FENLSolver* psolver, vector<doubl
 	// element force vector
 	vector<double> fe;
 	vector<int> elm;
-	
-	int NE = m_Elem.size();
+	const int NE = m_Elem.size();
+
+	#pragma omp parallel for private(fe, elm) shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -220,11 +221,14 @@ void FEBiphasicSoluteDomain::InternalFluidWork(FENLSolver* psolver, vector<doubl
 		ElementInternalFluidWork(el, fe, dt);
 			
 		// add fluid work to global residual
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j)
+		#pragma omp critical
 		{
-			int J = elm[3*neln+j];
-			if (J >= 0) R[J] += fe[j];
+			int neln = el.Nodes();
+			for (int j=0; j<neln; ++j)
+			{
+				int J = elm[3*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
 	}
 }
@@ -235,8 +239,9 @@ void FEBiphasicSoluteDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<dou
 	// element force vector
 	vector<double> fe;
 	vector<int> elm;
-	
-	int NE = m_Elem.size();
+	const int NE = m_Elem.size();
+
+	#pragma omp parallel for private(fe, elm) shared(NE)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -253,11 +258,14 @@ void FEBiphasicSoluteDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<dou
 		ElementInternalFluidWorkSS(el, fe, dt);
 			
 		// add fluid work to global residual
-		int neln = el.Nodes();
-		for (int j=0; j<neln; ++j)
+		#pragma omp critical
 		{
-			int J = elm[3*neln+j];
-			if (J >= 0) R[J] += fe[j];
+			int neln = el.Nodes();
+			for (int j=0; j<neln; ++j)
+			{
+				int J = elm[3*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
 	}
 }
@@ -271,8 +279,10 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FENLSolver* psolver, vector<doub
 
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);
-	
-	int NE = m_Elem.size();
+
+	const int NE = m_Elem.size();
+
+	#pragma omp parallel for private(fe, elm) shared(NE, pm)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -289,12 +299,15 @@ void FEBiphasicSoluteDomain::InternalSoluteWork(FENLSolver* psolver, vector<doub
 		ElementInternalSoluteWork(el, fe, dt);
 			
 		// add fluid work to global residual
-		int neln = el.Nodes();
-		int dofc = DOF_C + pm->m_pSolute->GetSoluteID();
-		for (int j=0; j<neln; ++j)
+		#pragma omp critical
 		{
-			int J = elm[dofc*neln+j];
-			if (J >= 0) R[J] += fe[j];
+			int neln = el.Nodes();
+			int dofc = DOF_C + pm->m_pSolute->GetSoluteID();
+			for (int j=0; j<neln; ++j)
+			{
+				int J = elm[dofc*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
 	}
 }
@@ -309,7 +322,9 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<do
 	FEBiphasicSolute* pm = dynamic_cast<FEBiphasicSolute*> (GetMaterial());
 	assert(pm);
 	
-	int NE = m_Elem.size();
+	const int NE = m_Elem.size();
+
+	#pragma omp parallel for private(fe, elm) shared(NE, pm)
 	for (int i=0; i<NE; ++i)
 	{
 		// get the element
@@ -326,12 +341,15 @@ void FEBiphasicSoluteDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<do
 		ElementInternalSoluteWorkSS(el, fe, dt);
 			
 		// add fluid work to global residual
-		int neln = el.Nodes();
-		int dofc = DOF_C + pm->m_pSolute->GetSoluteID();
-		for (int j=0; j<neln; ++j)
+		#pragma omp critical
 		{
-			int J = elm[dofc*neln+j];
-			if (J >= 0) R[J] += fe[j];
+			int neln = el.Nodes();
+			int dofc = DOF_C + pm->m_pSolute->GetSoluteID();
+			for (int j=0; j<neln; ++j)
+			{
+				int J = elm[dofc*neln+j];
+				if (J >= 0) R[J] += fe[j];
+			}
 		}
 	}
 }
@@ -883,7 +901,9 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, do
 	assert(pmat);
 	
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	const int NE = m_Elem.size();
+
+	#pragma omp parallel for private(ke, elm) shared(pmat, NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -903,19 +923,22 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, do
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for solute-solid elements.
-		vector<int> lm(ndof);
-		int dofc = DOF_C + pmat->m_pSolute->GetSoluteID();
-		for (int i=0; i<neln; ++i)
+		#pragma omp critical
 		{
-			lm[5*i  ] = elm[3*i];
-			lm[5*i+1] = elm[3*i+1];
-			lm[5*i+2] = elm[3*i+2];
-			lm[5*i+3] = elm[3*neln+i];
-			lm[5*i+4] = elm[dofc*neln+i];
-		}
+			vector<int> lm(ndof);
+			int dofc = DOF_C + pmat->m_pSolute->GetSoluteID();
+			for (int i=0; i<neln; ++i)
+			{
+				lm[5*i  ] = elm[3*i];
+				lm[5*i+1] = elm[3*i+1];
+				lm[5*i+2] = elm[3*i+2];
+				lm[5*i+3] = elm[3*neln+i];
+				lm[5*i+4] = elm[dofc*neln+i];
+			}
 		
-		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
+		}
 	}
 }
 
@@ -932,7 +955,9 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, 
 	assert(pmat);
 
 	// repeat over all solid elements
-	int NE = m_Elem.size();
+	const int NE = m_Elem.size();
+
+	#pragma omp parallel for private(ke, elm) shared(pmat, NE)
 	for (int iel=0; iel<NE; ++iel)
 	{
 		FESolidElement& el = m_Elem[iel];
@@ -951,19 +976,22 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, 
 		// have to create a new lm array and place the equation numbers in the right order.
 		// What we really ought to do is fix the UnpackLM function so that it returns
 		// the LM vector in the right order for solute-solid elements.
-		vector<int> lm(ndof);
-		int dofc = DOF_C + pmat->m_pSolute->GetSoluteID();
-		for (int i=0; i<neln; ++i)
+		#pragma omp critical
 		{
-			lm[5*i  ] = elm[3*i];
-			lm[5*i+1] = elm[3*i+1];
-			lm[5*i+2] = elm[3*i+2];
-			lm[5*i+3] = elm[3*neln+i];
-			lm[5*i+4] = elm[dofc*neln+i];
-		}
+			vector<int> lm(ndof);
+			int dofc = DOF_C + pmat->m_pSolute->GetSoluteID();
+			for (int i=0; i<neln; ++i)
+			{
+				lm[5*i  ] = elm[3*i];
+				lm[5*i+1] = elm[3*i+1];
+				lm[5*i+2] = elm[3*i+2];
+				lm[5*i+3] = elm[3*neln+i];
+				lm[5*i+4] = elm[dofc*neln+i];
+			}
 		
-		// assemble element matrix in global stiffness matrix
-		psolver->AssembleStiffness(el.m_node, lm, ke);
+			// assemble element matrix in global stiffness matrix
+			psolver->AssembleStiffness(el.m_node, lm, ke);
+		}
 	}
 }
 
@@ -1644,9 +1672,6 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 {
-	int i, n;
-	int nint, neln;
-	double* gw;
 	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES], ct[FEElement::MAX_NODES];
@@ -1665,20 +1690,21 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 	// extract the elastic component
 	FEElasticMaterial* pme = pmb->m_pSolid;
 
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	#pragma omp parallel for private(r0, rt, pn, ct) shared(mesh, dt, sstate, pm, pmb, id0, pme)
+	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 		
 		// get the number of integration points
-		nint = el.GaussPoints();
+		int nint = el.GaussPoints();
 
 		// get the number of nodes
-		neln = el.Nodes();
+		int neln = el.Nodes();
 		assert(neln <= 8);
 		
 		// get the integration weights
-		gw = el.GaussWeights();
+		double* gw = el.GaussWeights();
 
 		// get the nodal data
 		for (int j=0; j<neln; ++j)
@@ -1691,7 +1717,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 		
 		// loop over the integration points and calculate
 		// the stress at the integration point
-		for (n=0; n<nint; ++n)
+		for (int n=0; n<nint; ++n)
 		{
 			FEMaterialPoint& mp = *el.m_State[n];
 			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
