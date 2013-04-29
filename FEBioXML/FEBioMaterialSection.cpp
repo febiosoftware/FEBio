@@ -715,7 +715,108 @@ bool FEBioMaterialSection::ParseBiphasicSoluteMaterial(XMLTag &tag, FEBiphasicSo
 {
 	// see if we can find a material property with this name
 	int nc = pm->FindComponent(tag.Name());
-	if (nc == -1) throw XMLReader::InvalidTag(tag);
+	if (nc == -1)
+	{
+		if (tag == "diffusivity")
+		{
+			// get the material type
+			const char* sztype = tag.AttributeValue("type");
+		
+			// get the material name
+			const char* szname = tag.AttributeValue("name", true);
+		
+			// create a new material of this type
+			FEBioKernel& febio = FEBioKernel::GetInstance();
+			FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+			if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+			// make sure the base material is a valid material (i.e. a diffusivity material)
+			FESoluteDiffusivity* pme = dynamic_cast<FESoluteDiffusivity*>(pmat);
+		
+			if (pme == 0)
+			{
+				clog.printbox("INPUT ERROR", "Invalid diffusivity %s in solute material %s\n", szname, pm->GetName());
+				throw XMLReader::Error();
+			}
+		
+			// create a new material of type solute
+			if (!pm->m_pSolute) {
+				FEMaterial* pmm = febio.Create<FEMaterial>("solute", GetFEModel());
+				FESolute* pms = dynamic_cast<FESolute*>(pmm);
+				pms->SetSoluteID(0);
+				pm->m_pSolute = pms;
+				// create a solute with ID 0
+				FESoluteData* psd = new FESoluteData;
+				psd->m_nID = 0;
+				strcpy(psd->m_szname, "neutral");
+				FEModel::SetSD(psd);
+			}
+		
+			// set the diffusivity pointer
+			pm->m_pSolute->m_pDiff = pme;
+		
+			// set the material's name
+			if (szname) pme->SetName(szname);
+		
+			// set solute ID in diffusivity
+			pme->SetSoluteID(0);
+		
+			// parse the material
+			ParseMaterial(tag, pme);
+		
+			return true;
+		}
+		else if (tag == "solubility")
+		{
+			// get the material type
+			const char* sztype = tag.AttributeValue("type");
+		
+			// get the material name
+			const char* szname = tag.AttributeValue("name", true);
+		
+			// create a new material of this type
+			FEBioKernel& febio = FEBioKernel::GetInstance();
+			FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+			if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+			// make sure the base material is a valid material (i.e. a solubility material)
+			FESoluteSolubility* pme = dynamic_cast<FESoluteSolubility*>(pmat);
+		
+			if (pme == 0)
+			{
+				clog.printbox("INPUT ERROR", "Invalid solubility %s in solute material %s\n", szname, pm->GetName());
+				throw XMLReader::Error();
+			}
+		
+			// create a new material of type solute
+			if (!pm->m_pSolute) {
+				FEMaterial* pmm = febio.Create<FEMaterial>("solute", GetFEModel());
+				FESolute* pms = dynamic_cast<FESolute*>(pmm);
+				pms->SetSoluteID(0);
+				pm->m_pSolute = pms;
+				// create a solute with ID 0
+				FESoluteData* psd = new FESoluteData;
+				psd->m_nID = 0;
+				strcpy(psd->m_szname, "neutral");
+				FEModel::SetSD(psd);
+			}
+		
+			// set the solubility pointer
+			pm->m_pSolute->m_pSolub = pme;
+		
+			// set the material's name
+			if (szname) pme->SetName(szname);
+		
+			// set solute ID in solubility
+			pme->SetSoluteID(0);
+		
+			// parse the material
+			ParseMaterial(tag, pme);
+		
+			return true;
+		}
+		else throw XMLReader::InvalidTag(tag);
+	}
 
 	// get the material type
 	// TODO: For solute materials, there is no type
