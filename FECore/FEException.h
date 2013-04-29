@@ -72,5 +72,7 @@ class FatalError {};
 
 class FEMultiScaleException {};
 
+class DoRunningRestart{};
+
 
 #endif // !defined(AFX_FEEXCEPTION_H__A56BADF1_E3BA_4482_AE23_EA40A591ED88__INCLUDED_)

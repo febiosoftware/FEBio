@@ -560,6 +560,12 @@ bool FESolidSolver::SolveStep(double time)
 		clog.printbox("ERROR", "The RVE problem has failed. Aborting macro run.");
 		return false;
 	}
+	catch (DoRunningRestart)
+	{
+		// a request to fail the iteration and restart the time step
+		if (m_fem.GetDebugFlag()) m_fem.Write();
+		return false;
+	}
 
 	return bret;
 }

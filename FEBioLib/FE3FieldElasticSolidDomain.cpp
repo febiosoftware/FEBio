@@ -28,6 +28,15 @@ bool FE3FieldElasticSolidDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
+FEDomain* FE3FieldElasticSolidDomain::Clone()
+{
+	FE3FieldElasticSolidDomain* pd = new FE3FieldElasticSolidDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	pd->m_Data = m_Data;
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
 //! Stiffness matrix for three-field domain
 void FE3FieldElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
@@ -375,87 +384,102 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 }
 
 //-----------------------------------------------------------------------------
+//! This function loops over all elements and updates the stress
+void FE3FieldElasticSolidDomain::UpdateStresses(FEModel &fem)
+{
+	bool berr = false;
+	int NE = (int) m_Elem.size();
+	#pragma omp parallel for shared(NE, berr)
+	for (int i=0; i<NE; ++i)
+	{
+		try
+		{
+			UpdateElementStress(i);
+		}
+		catch (NegativeJacobian e)
+		{
+			// A negative jacobian was detected
+			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+			#pragma omp atomic
+			berr = true;
+		}
+	}
+
+	// if we encountered an error, we request a running restart
+	if (berr) throw DoRunningRestart();
+}
+
+//-----------------------------------------------------------------------------
 //! This function updates the stresses for elements using the three-field formulation.
 //! For such elements, the stress is a sum of a deviatoric stress, calculate by the
 //! material and a dilatational term.
-void FE3FieldElasticSolidDomain::UpdateStresses(FEModel &fem)
+void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 {
-	int i, n;
-	int nint, neln;
-	double* gw;
-
 	// get the material
 	FEUncoupledMaterial& mat = *(dynamic_cast<FEUncoupledMaterial*>(m_pMat));
 
-	int NE = (int) m_Elem.size();
-	#pragma omp parallel for private(i, n, nint, neln, gw)
-	for (i=0; i<NE; ++i)
+	// get the solid element
+	FESolidElement& el = m_Elem[iel];
+	ELEM_DATA& ed = m_Data[iel];
+
+	// get the number of integration points
+	int nint = el.GaussPoints();
+
+	// get the integration weights
+	double* gw = el.GaussWeights();
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	vec3d r0[8], rt[8];
+	for (int j=0; j<neln; ++j)
 	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
-		ELEM_DATA& ed = m_Data[i];
+		r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
+		rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+	}
 
-		// get the number of integration points
-		nint = el.GaussPoints();
+	// calculate the average dilatation and pressure
+	double v = 0, V = 0;
+	for (int n=0; n<nint; ++n)
+	{
+		v += detJt(el, n)*gw[n];
+		V += detJ0(el, n)*gw[n];
+	}
 
-		// get the integration weights
-		gw = el.GaussWeights();
+	// calculate volume ratio
+	ed.eJ = v / V;
 
-		// number of nodes
-		neln = el.Nodes();
-
-		// nodal coordinates
-		vec3d r0[8], rt[8];
-		for (int j=0; j<neln; ++j)
-		{
-			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
-			rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
-		}
-
-		// calculate the average dilatation and pressure
-		double v = 0, V = 0;
-
-		for (n=0; n<nint; ++n)
-		{
-			v += detJt(el, n)*gw[n];
-			V += detJ0(el, n)*gw[n];
-		}
-
-		// calculate volume ratio
-		ed.eJ = v / V;
-
-		// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
-		//        <----- Lag. mult. ----->   <------ penalty ----->
+	// Calculate pressure. This is a sum of a Lagrangian term and a penalty term
+	//        <----- Lag. mult. ----->   <------ penalty ----->
 //		el.m_ep = el.m_Lk*pmi->hp(el.m_eJ) + pmi->Up(el.m_eJ);
-		ed.ep = mat.UJ(ed.eJ);
+	ed.ep = mat.UJ(ed.eJ);
 
-		// loop over the integration points and calculate
-		// the stress at the integration point
-		for (n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.m_State[n];
-			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+	// loop over the integration points and calculate
+	// the stress at the integration point
+	for (int n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
-			// material point coordinates
-			// TODO: I'm not entirly happy with this solution
-			//		 since the material point coordinates are not used by most materials.
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
+		// material point coordinates
+		// TODO: I'm not entirly happy with this solution
+		//		 since the material point coordinates are not used by most materials.
+		pt.r0 = el.Evaluate(r0, n);
+		pt.rt = el.Evaluate(rt, n);
 
-			// get the deformation gradient and determinant
-			pt.J = defgrad(el, pt.F, n);
+		// get the deformation gradient and determinant
+		pt.J = defgrad(el, pt.F, n);
 
-			// calculate the stress at this material point
-			// Note that we don't call the material's Stress member function.
-			// The reason is that we need to use the averaged pressure for the element
-			// and the Stress function uses the pointwise pressure. 
-			// Therefore we call the DevStress function and add the pressure term
-			// seperately. 
-			pt.s = mat3dd(ed.ep) + mat.DevStress(mp);
-		}
+		// calculate the stress at this material point
+		// Note that we don't call the material's Stress member function.
+		// The reason is that we need to use the averaged pressure for the element
+		// and the Stress function uses the pointwise pressure. 
+		// Therefore we call the DevStress function and add the pressure term
+		// seperately. 
+		pt.s = mat3dd(ed.ep) + mat.DevStress(mp);
 	}
 }
-
 
 //-----------------------------------------------------------------------------
 //! Do augmentation

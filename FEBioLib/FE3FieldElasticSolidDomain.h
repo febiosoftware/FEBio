@@ -22,13 +22,7 @@ public:
 	FE3FieldElasticSolidDomain& operator = (FE3FieldElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! create a clone of this class
-	FEDomain* Clone()
-	{
-		FE3FieldElasticSolidDomain* pd = new FE3FieldElasticSolidDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		pd->m_Data = m_Data;
-		return pd;
-	}
+	FEDomain* Clone();
 
 	//! initialize class
 	bool Initialize(FEModel& fem);
@@ -56,6 +50,9 @@ protected:
 
 	//! geometrical stiffness (i.e. initial stress)
 	void ElementGeometricalStiffness(int iel, matrix& ke);
+
+	//! update the stress of an element
+	void UpdateElementStress(int iel);
 
 protected:
 	vector<ELEM_DATA>	m_Data;
