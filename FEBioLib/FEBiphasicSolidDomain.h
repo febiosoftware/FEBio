@@ -33,6 +33,9 @@ public: // overrides from FEElasticDomain
 	// update stresses
 	void UpdateStresses(FEModel& fem);
 
+	// update element stress
+	void UpdateElementStress(int iel);
+
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt);
 

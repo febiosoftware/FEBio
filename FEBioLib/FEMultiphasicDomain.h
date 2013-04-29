@@ -36,6 +36,10 @@ public:
 	
 	// update stresses
 	void UpdateStresses(FEModel& fem);
+
+	// update element state data
+	void UpdateElementStress(int iel);
+
 /*	
 	//! return element stiffness matrix
 	void ElementStiffness(FEM& fem, int iel, matrix& ke) {

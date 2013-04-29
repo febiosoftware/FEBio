@@ -9,6 +9,14 @@
 #endif
 
 //-----------------------------------------------------------------------------
+FEDomain* FETriphasicDomain::Clone()
+{
+	FETriphasicDomain* pd = new FETriphasicDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
 bool FETriphasicDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class
@@ -2086,104 +2094,111 @@ void FETriphasicDomain::ElementTriphasicMaterialStiffness(FESolidElement &el, ma
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 void FETriphasicDomain::UpdateStresses(FEModel &fem)
 {
-	int i, n;
-	int nint, neln;
-	double* gw;
+	bool berr = false;
+	int NE = (int) m_Elem.size();
+	#pragma omp parallel for shared(NE, berr)
+	for (int i=0; i<NE; ++i)
+	{
+		try
+		{
+			UpdateElementStress(i);
+		}
+		catch (NegativeJacobian e)
+		{
+			// A negative jacobian was detected
+			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+			#pragma omp critical
+			berr = true;
+		}
+	}
+
+	// if we encountered an error, we request a running restart
+	if (berr) throw DoRunningRestart();
+}
+
+//-----------------------------------------------------------------------------
+void FETriphasicDomain::UpdateElementStress(int iel)
+{
+	// get the solid element
+	FESolidElement& el = m_Elem[iel];
+		
+	// get the number of integration points
+	int nint = el.GaussPoints();
+		
+	// get the number of nodes
+	int neln = el.Nodes();
+		
+	// get the integration weights
+	double* gw = el.GaussWeights();
+
+	// get the biphasic-solute material
+	FETriphasic* pmb = dynamic_cast<FETriphasic*>(GetMaterial()); assert(pmb);
+	int id0 = pmb->m_pSolute[0]->GetSoluteID();
+	int id1 = pmb->m_pSolute[1]->GetSoluteID();
+		
+	// get the nodal data
+	FEMesh& mesh = *m_pMesh;
 	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES], ct[2][FEElement::MAX_NODES];
-	
-	FEMesh& mesh = *m_pMesh;
-	double dt = fem.GetCurrentStep()->m_dt;
-	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
-
-	// get the material
-	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
-	
-	// get the biphasic-solute material
-	FETriphasic* pmb = dynamic_cast<FETriphasic*>(pm); assert(pmb);
-	int id0 = pmb->m_pSolute[0]->GetSoluteID();
-	int id1 = pmb->m_pSolute[1]->GetSoluteID();
-	
-	// extract the elastic component
-	FEElasticMaterial* pme = pmb->m_pSolid;
-	
-	for (i=0; i<(int) m_Elem.size(); ++i)
+	for (int j=0; j<neln; ++j)
 	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
+		r0[j] = mesh.Node(el.m_node[j]).m_r0;
+		rt[j] = mesh.Node(el.m_node[j]).m_rt;
+		pn[j] = mesh.Node(el.m_node[j]).m_pt;
+		ct[0][j] = mesh.Node(el.m_node[j]).m_ct[id0];
+		ct[1][j] = mesh.Node(el.m_node[j]).m_ct[id1];
+	}
 		
-		// get the number of integration points
-		nint = el.GaussPoints();
-		
-		// get the number of nodes
-		neln = el.Nodes();
-		assert(neln <= 8);
-		
-		// get the integration weights
-		gw = el.GaussWeights();
-		
-		// get the nodal data
-		for (int j=0; j<neln; ++j)
-		{
-			r0[j] = mesh.Node(el.m_node[j]).m_r0;
-			rt[j] = mesh.Node(el.m_node[j]).m_rt;
-			pn[j] = mesh.Node(el.m_node[j]).m_pt;
-			ct[0][j] = mesh.Node(el.m_node[j]).m_ct[id0];
-			ct[1][j] = mesh.Node(el.m_node[j]).m_ct[id1];
-		}
-		
-		// loop over the integration points and calculate
-		// the stress at the integration point
-		for (n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.m_State[n];
-			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+	// loop over the integration points and calculate
+	// the stress at the integration point
+	for (int n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
-			// material point coordinates
-			// TODO: I'm not entirly happy with this solution
-			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
+		// material point coordinates
+		// TODO: I'm not entirly happy with this solution
+		//		 since the material point coordinates are used by most materials.
+		pt.r0 = el.Evaluate(r0, n);
+		pt.rt = el.Evaluate(rt, n);
 			
-			// get the deformation gradient and determinant
-			pt.J = defgrad(el, pt.F, n);
+		// get the deformation gradient and determinant
+		pt.J = defgrad(el, pt.F, n);
 			
-			// solute-poroelastic data
-			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESaltMaterialPoint& spt = *(mp.ExtractData<FESaltMaterialPoint>());
+		// solute-poroelastic data
+		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+		FESaltMaterialPoint& spt = *(mp.ExtractData<FESaltMaterialPoint>());
 			
-			// evaluate fluid pressure at gauss-point
-			ppt.m_p = el.Evaluate(pn, n);
+		// evaluate fluid pressure at gauss-point
+		ppt.m_p = el.Evaluate(pn, n);
 			
-			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = gradient(el, pn, n);
+		// calculate the gradient of p at gauss-point
+		ppt.m_gradp = gradient(el, pn, n);
 			
-			// evaluate effective solute concentration at gauss-point
-			spt.m_c[0] = el.Evaluate(ct[0], n);
-			spt.m_c[1] = el.Evaluate(ct[1], n);
+		// evaluate effective solute concentration at gauss-point
+		spt.m_c[0] = el.Evaluate(ct[0], n);
+		spt.m_c[1] = el.Evaluate(ct[1], n);
 			
-			// calculate the gradient of c at gauss-point
-			spt.m_gradc[0] = gradient(el, ct[0], n);
-			spt.m_gradc[1] = gradient(el, ct[1], n);
+		// calculate the gradient of c at gauss-point
+		spt.m_gradc[0] = gradient(el, ct[0], n);
+		spt.m_gradc[1] = gradient(el, ct[1], n);
 			
-			// for biphasic-solute materials also update the porosity, fluid and solute fluxes
-			// and evaluate the actual fluid pressure and solute concentration
-			ppt.m_w = pmb->FluidFlux(mp);
-			spt.m_psi = pmb->ElectricPotential(mp);
-			spt.m_ca[0] = pmb->Concentration(mp,0);
-			spt.m_ca[1] = pmb->Concentration(mp,1);
-			ppt.m_pa = pmb->Pressure(mp);
-			spt.m_j[0] = pmb->SoluteFlux(mp,0);
-			spt.m_j[1] = pmb->SoluteFlux(mp,1);
-			spt.m_cF = pmb->FixedChargeDensity(mp);
-			spt.m_Ie = pmb->CurrentDensity(mp);
+		// for biphasic-solute materials also update the porosity, fluid and solute fluxes
+		// and evaluate the actual fluid pressure and solute concentration
+		ppt.m_w = pmb->FluidFlux(mp);
+		spt.m_psi = pmb->ElectricPotential(mp);
+		spt.m_ca[0] = pmb->Concentration(mp,0);
+		spt.m_ca[1] = pmb->Concentration(mp,1);
+		ppt.m_pa = pmb->Pressure(mp);
+		spt.m_j[0] = pmb->SoluteFlux(mp,0);
+		spt.m_j[1] = pmb->SoluteFlux(mp,1);
+		spt.m_cF = pmb->FixedChargeDensity(mp);
+		spt.m_Ie = pmb->CurrentDensity(mp);
 			
-			pt.s = pmb->Stress(mp);
-		}
+		pt.s = pmb->Stress(mp);
 	}
 }

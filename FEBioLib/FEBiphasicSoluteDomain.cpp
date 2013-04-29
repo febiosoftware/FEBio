@@ -1672,104 +1672,117 @@ void FEBiphasicSoluteDomain::ElementBiphasicSoluteMaterialStiffness(FESolidEleme
 //-----------------------------------------------------------------------------
 void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 {
+	double dt = fem.GetCurrentStep()->m_dt;
+	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
+	bool berr = false;
+
+	int NE = (int) m_Elem.size();
+	#pragma omp parallel for shared(NE, dt, sstate, berr)
+	for (int i=0; i<NE; ++i)
+	{
+		try
+		{
+			UpdateElementStress(i, dt, sstate);
+		}
+		catch (NegativeJacobian e)
+		{
+			// A negative jacobian was detected
+			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+			#pragma omp critical
+			berr = true;
+		}
+	}
+
+	// if we encountered an error, we request a running restart
+	if (berr) throw DoRunningRestart();
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSoluteDomain::UpdateElementStress(int iel, double dt, bool sstate)
+{
+	// get the solid element
+	FESolidElement& el = m_Elem[iel];
+		
+	// get the number of integration points
+	int nint = el.GaussPoints();
+
+	// get the number of nodes
+	int neln = el.Nodes();
+		
+	// get the integration weights
+	double* gw = el.GaussWeights();
+
+	// get the biphasic-solute material
+	FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(GetMaterial()); assert(pmb);
+	int id0 = pmb->m_pSolute->GetSoluteID();
+
+	// get the nodal data
+	FEMesh& mesh = *m_pMesh;
 	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES], ct[FEElement::MAX_NODES];
-
-	FEMesh& mesh = *m_pMesh;
-	double dt = fem.GetCurrentStep()->m_dt;
-	bool sstate = (fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE);
-
-	// get the material
-	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
-	
-	// get the biphasic-solute material
-	FEBiphasicSolute* pmb = dynamic_cast<FEBiphasicSolute*>(pm); assert(pmb);
-	int id0 = pmb->m_pSolute->GetSoluteID();
-
-	// extract the elastic component
-	FEElasticMaterial* pme = pmb->m_pSolid;
-
-	#pragma omp parallel for private(r0, rt, pn, ct) shared(mesh, dt, sstate, pm, pmb, id0, pme)
-	for (int i=0; i<(int) m_Elem.size(); ++i)
+	for (int j=0; j<neln; ++j)
 	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
+		r0[j] = mesh.Node(el.m_node[j]).m_r0;
+		rt[j] = mesh.Node(el.m_node[j]).m_rt;
+		pn[j] = mesh.Node(el.m_node[j]).m_pt;
+		ct[j] = mesh.Node(el.m_node[j]).m_ct[id0];
+	}
 		
-		// get the number of integration points
-		int nint = el.GaussPoints();
-
-		// get the number of nodes
-		int neln = el.Nodes();
-		assert(neln <= 8);
-		
-		// get the integration weights
-		double* gw = el.GaussWeights();
-
-		// get the nodal data
-		for (int j=0; j<neln; ++j)
+	// loop over the integration points and calculate
+	// the stress at the integration point
+	for (int n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+			
+		// material point coordinates
+		// TODO: I'm not entirly happy with this solution
+		//		 since the material point coordinates are used by most materials.
+		pt.r0 = el.Evaluate(r0, n);
+		pt.rt = el.Evaluate(rt, n);
+			
+		// get the deformation gradient and determinant
+		pt.J = defgrad(el, pt.F, n);
+			
+		// solute-poroelastic data
+		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+		FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
+			
+		// evaluate fluid pressure at gauss-point
+		ppt.m_p = el.Evaluate(pn, n);
+			
+		// calculate the gradient of p at gauss-point
+		ppt.m_gradp = gradient(el, pn, n);
+			
+		// evaluate effective solute concentration at gauss-point
+		spt.m_c = el.Evaluate(ct, n);
+			
+		// calculate the gradient of c at gauss-point
+		spt.m_gradc = gradient(el, ct, n);
+			
+		// for biphasic-solute materials also update the porosity, fluid and solute fluxes
+		// and evaluate the actual fluid pressure and solute concentration
+		ppt.m_w = pmb->FluidFlux(mp);
+		ppt.m_pa = pmb->Pressure(mp);
+		spt.m_j = pmb->SoluteFlux(mp);
+		spt.m_ca = pmb->Concentration(mp);
+		if (pmb->m_pSolute->m_pSupp)
 		{
-			r0[j] = mesh.Node(el.m_node[j]).m_r0;
-			rt[j] = mesh.Node(el.m_node[j]).m_rt;
-			pn[j] = mesh.Node(el.m_node[j]).m_pt;
-			ct[j] = mesh.Node(el.m_node[j]).m_ct[id0];
-		}
-		
-		// loop over the integration points and calculate
-		// the stress at the integration point
-		for (int n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.m_State[n];
-			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-			
-			// material point coordinates
-			// TODO: I'm not entirly happy with this solution
-			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
-			
-			// get the deformation gradient and determinant
-			pt.J = defgrad(el, pt.F, n);
-			
-			// solute-poroelastic data
-			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
-			FESoluteMaterialPoint& spt = *(mp.ExtractData<FESoluteMaterialPoint>());
-			
-			// evaluate fluid pressure at gauss-point
-			ppt.m_p = el.Evaluate(pn, n);
-			
-			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = gradient(el, pn, n);
-			
-			// evaluate effective solute concentration at gauss-point
-			spt.m_c = el.Evaluate(ct, n);
-			
-			// calculate the gradient of c at gauss-point
-			spt.m_gradc = gradient(el, ct, n);
-			
-			// for biphasic-solute materials also update the porosity, fluid and solute fluxes
-			// and evaluate the actual fluid pressure and solute concentration
-			ppt.m_w = pmb->FluidFlux(mp);
-			ppt.m_pa = pmb->Pressure(mp);
-			spt.m_j = pmb->SoluteFlux(mp);
-			spt.m_ca = pmb->Concentration(mp);
-			if (pmb->m_pSolute->m_pSupp)
-			{
-				if (sstate)
-					spt.m_crc = pmb->m_pSolute->m_pSupp->ReceptorLigandConcentrationSS(mp);
-				else {
-					// update m_crc using one-step trapezoidal integration
-					spt.m_crchat = pmb->m_pSolute->m_pSupp->ReceptorLigandSupply(mp);
-					spt.m_crc = spt.m_crcp + 0.5*(spt.m_crchatp+spt.m_crchat)*dt;
-					// update phi0 using one-step trapezoidal integration
-					ppt.m_phi0hat = pmb->m_pSolid->MolarMass()/pmb->m_pSolid->Density()
-					*pmb->m_pSolute->m_pSupp->SolidSupply(mp);
-					ppt.m_phi0 = ppt.m_phi0p + 0.5*(ppt.m_phi0hatp + ppt.m_phi0hat)*dt;
-				}
+			if (sstate)
+				spt.m_crc = pmb->m_pSolute->m_pSupp->ReceptorLigandConcentrationSS(mp);
+			else {
+				// update m_crc using one-step trapezoidal integration
+				spt.m_crchat = pmb->m_pSolute->m_pSupp->ReceptorLigandSupply(mp);
+				spt.m_crc = spt.m_crcp + 0.5*(spt.m_crchatp+spt.m_crchat)*dt;
+				// update phi0 using one-step trapezoidal integration
+				ppt.m_phi0hat = pmb->m_pSolid->MolarMass()/pmb->m_pSolid->Density()
+				*pmb->m_pSolute->m_pSupp->SolidSupply(mp);
+				ppt.m_phi0 = ppt.m_phi0p + 0.5*(ppt.m_phi0hatp + ppt.m_phi0hat)*dt;
 			}
-
-			// calculate the stress at this material point (must be done after evaluating m_pa)
-			pt.s = pmb->Stress(mp);
 		}
+
+		// calculate the stress at this material point (must be done after evaluating m_pa)
+		pt.s = pmb->Stress(mp);
 	}
 }

@@ -3,6 +3,7 @@
 #include "FETransverselyIsotropic.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
+#include <FECore/Log.h>
 
 extern "C" int __cdecl omp_get_num_threads(void);
 extern "C" int __cdecl omp_get_thread_num(void);
@@ -947,58 +948,74 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEModel& fem, FESolidElement
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 {
-	int i, n;
-	int nint, neln;
-	double* gw;
-
+	bool berr = false;
 	int NE = (int) m_Elem.size();
-	#pragma omp parallel for private(i, n, nint, neln, gw)
-	for (i=0; i<NE; ++i)
+	#pragma omp parallel for shared(NE, berr)
+	for (int i=0; i<NE; ++i)
 	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
-
-		// get the number of integration points
-		nint = el.GaussPoints();
-
-		// number of nodes
-		neln = el.Nodes();
-
-		// nodal coordinates
-		vec3d r0[FEElement::MAX_NODES];
-		vec3d rt[FEElement::MAX_NODES];
-		for (int j=0; j<neln; ++j)
+		try
 		{
-			r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
-			rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+			UpdateElementStress(i);
 		}
-
-		// get the integration weights
-		gw = el.GaussWeights();
-
-		// get the material
-		FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
-		assert(pm);
-
-		// loop over the integration points and calculate
-		// the stress at the integration point
-		for (n=0; n<nint; ++n)
+		catch (NegativeJacobian e)
 		{
-			FEMaterialPoint& mp = *el.m_State[n];
-			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-
-			// material point coordinates
-			// TODO: I'm not entirly happy with this solution
-			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
-
-			// get the deformation gradient and determinant
-			pt.J = defgrad(el, pt.F, n);
-
-			// calculate the stress at this material point
-			pt.s = pm->Stress(mp);
+			// A negative jacobian was detected
+			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+			#pragma omp critical
+			berr = true;
 		}
+	}
+
+	// if we encountered an error, we request a running restart
+	if (berr) throw DoRunningRestart();
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticSolidDomain::UpdateElementStress(int iel)
+{
+	// get the solid element
+	FESolidElement& el = m_Elem[iel];
+
+	// get the number of integration points
+	int nint = el.GaussPoints();
+
+	// number of nodes
+	int neln = el.Nodes();
+
+	// nodal coordinates
+	vec3d r0[FEElement::MAX_NODES];
+	vec3d rt[FEElement::MAX_NODES];
+	for (int j=0; j<neln; ++j)
+	{
+		r0[j] = m_pMesh->Node(el.m_node[j]).m_r0;
+		rt[j] = m_pMesh->Node(el.m_node[j]).m_rt;
+	}
+
+	// get the integration weights
+	double* gw = el.GaussWeights();
+
+	// get the material
+	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
+	assert(pm);
+
+	// loop over the integration points and calculate
+	// the stress at the integration point
+	for (int n=0; n<nint; ++n)
+	{
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+		// material point coordinates
+		// TODO: I'm not entirly happy with this solution
+		//		 since the material point coordinates are used by most materials.
+		pt.r0 = el.Evaluate(r0, n);
+		pt.rt = el.Evaluate(rt, n);
+
+		// get the deformation gradient and determinant
+		pt.J = defgrad(el, pt.F, n);
+
+		// calculate the stress at this material point
+		pt.s = pm->Stress(mp);
 	}
 }
 

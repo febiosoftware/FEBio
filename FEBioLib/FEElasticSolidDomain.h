@@ -38,6 +38,9 @@ public: // overrides from FEElasticDomain
 	// update stresses
 	void UpdateStresses(FEModel& fem);
 
+	// update the element stress
+	void UpdateElementStress(int iel);
+
 	//! calculates the residual
 //	void Residual(FENLSolver* psolver, vector<double>& R);
 

@@ -12,13 +12,9 @@ public:
 	//! constructor
 	FETriphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_TRIPHASIC_DOMAIN; }
 	
-	FEDomain* Clone()
-	{
-		FETriphasicDomain* pd = new FETriphasicDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
-	
+	//! create shallow copy
+	FEDomain* Clone();
+
 	//! initialize elements for this domain
 	void InitElements();
 	
@@ -36,6 +32,9 @@ public:
 	
 	// update stresses
 	void UpdateStresses(FEModel& fem);
+
+	//! update element state data
+	void UpdateElementStress(int iel);
 
 	//! return element stiffness matrix
 /*	void ElementStiffness(int iel, matrix& ke) {

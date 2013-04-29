@@ -37,6 +37,9 @@ public:
 	// update stresses
 	void UpdateStresses(FEModel& fem);
 
+	// update element stress
+	void UpdateElementStress(int iel, double dt, bool sstate);
+
 public:
 	//! internal fluid work
 	void InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt);

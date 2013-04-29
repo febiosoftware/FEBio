@@ -1139,76 +1139,88 @@ void FEBiphasicSolidDomain::ElementBiphasicMaterialStiffness(FESolidElement &el,
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::UpdateStresses(FEModel &fem)
 {
+	bool berr = false;
+	int NE = (int) m_Elem.size();
+	#pragma omp parallel for shared(NE, berr)
+	for (int i=0; i<NE; ++i)
+	{
+		try
+		{
+			UpdateElementStress(i);
+		}
+		catch (NegativeJacobian e)
+		{
+			// A negative jacobian was detected
+			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+			#pragma omp critical
+			berr = true;
+		}
+	}
+	// if we encountered an error, we request a running restart
+	if (berr) throw DoRunningRestart();
+}
+
+//-----------------------------------------------------------------------------
+void FEBiphasicSolidDomain::UpdateElementStress(int iel)
+{
+	// get the solid element
+	FESolidElement& el = m_Elem[iel];
+		
+	// get the number of integration points
+	int nint = el.GaussPoints();
+		
+	// get the integration weights
+	double* gw = el.GaussWeights();
+
+	// get the number of nodes
+	int neln = el.Nodes();
+
+	// get the nodal data
+	FEMesh& mesh = *m_pMesh;
 	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES];
+	for (int j=0; j<neln; ++j)
+	{
+		r0[j] = mesh.Node(el.m_node[j]).m_r0;
+		rt[j] = mesh.Node(el.m_node[j]).m_rt;
+		pn[j] = mesh.Node(el.m_node[j]).m_pt;
+	}
 
-	// get the material
-	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
-		
 	// get the biphasic material
-	FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(pm);
+	FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(GetMaterial());
 	assert(pmb);
 		
-	// extract the elastic component
-	FEElasticMaterial* pme = pmb->m_pSolid;
-
-	FEMesh& mesh = *m_pMesh;
-
-	#pragma omp parallel for shared(pm, pmb, pme, mesh) private(r0, rt, pn)
-	for (int i=0; i<(int) m_Elem.size(); ++i)
+	// loop over the integration points and calculate
+	// the stress at the integration point
+	for (int n=0; n<nint; ++n)
 	{
-		// get the solid element
-		FESolidElement& el = m_Elem[i];
-		
-		// get the number of integration points
-		int nint = el.GaussPoints();
-		
-		// get the integration weights
-		double* gw = el.GaussWeights();
-
-		// get the number of nodes
-		int neln = el.Nodes();
-
-		// get the nodal data
-		for (int j=0; j<neln; ++j)
-		{
-			r0[j] = mesh.Node(el.m_node[j]).m_r0;
-			rt[j] = mesh.Node(el.m_node[j]).m_rt;
-			pn[j] = mesh.Node(el.m_node[j]).m_pt;
-		}
-		
-		// loop over the integration points and calculate
-		// the stress at the integration point
-		for (int n=0; n<nint; ++n)
-		{
-			FEMaterialPoint& mp = *el.m_State[n];
-			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
-			// material point coordinates
-			// TODO: I'm not entirly happy with this solution
-			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
+		// material point coordinates
+		// TODO: I'm not entirly happy with this solution
+		//		 since the material point coordinates are used by most materials.
+		pt.r0 = el.Evaluate(r0, n);
+		pt.rt = el.Evaluate(rt, n);
 			
-			// get the deformation gradient and determinant
-			pt.J = defgrad(el, pt.F, n);
+		// get the deformation gradient and determinant
+		pt.J = defgrad(el, pt.F, n);
 			
-			// poroelasticity data
-			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+		// poroelasticity data
+		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 			
-			// evaluate fluid pressure at gauss-point
-			ppt.m_p = el.Evaluate(pn, n);
+		// evaluate fluid pressure at gauss-point
+		ppt.m_p = el.Evaluate(pn, n);
 			
-			// calculate the gradient of p at gauss-point
-			ppt.m_gradp = gradient(el, pn, n);
+		// calculate the gradient of p at gauss-point
+		ppt.m_gradp = gradient(el, pn, n);
 			
-			// for biphasic materials also update the fluid flux
-			ppt.m_w = pmb->Flux(mp);
-			ppt.m_pa = pmb->Pressure(mp);
+		// for biphasic materials also update the fluid flux
+		ppt.m_w = pmb->Flux(mp);
+		ppt.m_pa = pmb->Pressure(mp);
 			
-			// calculate the stress at this material point
-			pt.s = pmb->Stress(mp);
-		}
+		// calculate the stress at this material point
+		pt.s = pmb->Stress(mp);
 	}
 }
