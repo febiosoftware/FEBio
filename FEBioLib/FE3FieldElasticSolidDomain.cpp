@@ -400,7 +400,7 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEModel &fem)
 		{
 			// A negative jacobian was detected
 			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
-			#pragma omp atomic
+			#pragma omp critical
 			berr = true;
 		}
 	}
