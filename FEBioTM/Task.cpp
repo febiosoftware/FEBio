@@ -234,7 +234,8 @@ void update_ui_cb(FEModel* pfem, void* pd)
 	// calculate progress
 	double starttime = pfem->m_ftime0;
 	double endtime = pfem->GetCurrentStep()->m_tend;
-	double f = pct*nstepi + pct*(pfem->m_ftime - starttime) / (endtime - starttime);
+	double f = 0.0;
+	if (endtime > 0.0) f = pct*nstepi + pct*(pfem->m_ftime - starttime) / (endtime - starttime);
 
 	// set the progress (will also update UI)
 	pp->SetProgress(f);

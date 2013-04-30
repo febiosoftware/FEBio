@@ -105,7 +105,8 @@ void update_console_cb(FEModel* pfem, void* pd)
 	// calculate progress
 	double starttime = fem.m_ftime0;
 	double endtime = fem.GetCurrentStep()->m_tend;
-	double f = 100.f*(fem.m_ftime - starttime) / (endtime - starttime);
+	double f = 0.0;
+	if (endtime > 0.0) f = 100.f*(fem.m_ftime - starttime) / (endtime - starttime);
 
 	// check debug flag
 	bool bdebug = fem.GetDebugFlag();

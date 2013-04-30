@@ -17,7 +17,7 @@ class FEAnalysis
 {
 public:
 	//! constructor
-	FEAnalysis(FEModel& fem, int ntype) : m_fem(fem), m_ntype(ntype) {}
+	FEAnalysis(FEModel& fem, int ntype);
 
 	//! destructor
 	virtual ~FEAnalysis(){}
