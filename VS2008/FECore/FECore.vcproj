@@ -586,6 +586,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FETypes.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\Image.h"
 				>
 			</File>
