@@ -700,6 +700,7 @@
     <ClInclude Include="..\..\FECore\FESurface.h" />
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
+    <ClInclude Include="..\..\FECore\FETypes.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />

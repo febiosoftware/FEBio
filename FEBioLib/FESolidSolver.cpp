@@ -1247,7 +1247,10 @@ bool FESolidSolver::ReformStiffness()
 	}
 
 	// calculate the stiffness matrices
-	bool bret = StiffnessMatrix();
+	FETimePoint tp;
+	tp.t = m_fem.m_ftime;
+	tp.dt = m_fem.GetCurrentStep()->m_dt;
+	bool bret = StiffnessMatrix(tp);
 
 	if (bret)
 	{
@@ -1272,7 +1275,7 @@ bool FESolidSolver::ReformStiffness()
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FESolidSolver::StiffnessMatrix()
+bool FESolidSolver::StiffnessMatrix(const FETimePoint& tp)
 {
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;

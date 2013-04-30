@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FESolver.h"
+#include <FECore/FETypes.h>
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems
@@ -69,11 +70,11 @@ public:
 
 	//{ --- Stiffness matrix routines ---
 
+		//! calculates the global stiffness matrix
+		virtual bool StiffnessMatrix(const FETimePoint& tp);
+
 		//! contact stiffness
 		void ContactStiffness();
-
-		//! calculates the global stiffness matrix
-		virtual bool StiffnessMatrix();
 
 		//! reform the stiffness matrix
 		bool ReformStiffness();

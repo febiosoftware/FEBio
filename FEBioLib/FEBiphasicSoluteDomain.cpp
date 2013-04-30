@@ -5,6 +5,14 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
+FEDomain* FEBiphasicSoluteDomain::Clone()
+{
+	FEBiphasicSoluteDomain* pd = new FEBiphasicSoluteDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
 bool FEBiphasicSoluteDomain::Initialize(FEModel &mdl)
 {
 	// initialize base class
@@ -891,7 +899,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt)
+void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, const FETimePoint& tp)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -916,7 +924,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, do
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicSoluteStiffness(el, ke, bsymm, dt);
+		ElementBiphasicSoluteStiffness(el, ke, bsymm, tp.dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -945,7 +953,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, do
 
 //-----------------------------------------------------------------------------
 
-void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt)
+void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, const FETimePoint& tp)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -969,7 +977,7 @@ void FEBiphasicSoluteDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, 
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementBiphasicSoluteStiffnessSS(el, ke, bsymm, dt);
+		ElementBiphasicSoluteStiffnessSS(el, ke, bsymm, tp.dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we

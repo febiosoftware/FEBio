@@ -1,5 +1,6 @@
 #pragma once
 #include "FEElasticSolidDomain.h"
+#include <FECore/FETypes.h>
 
 //-----------------------------------------------------------------------------
 //! Domain class for biphasic-solute 3D solid elements
@@ -12,21 +13,17 @@ public:
 	//! constructor
 	FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_BIPHASIC_SOLUTE_DOMAIN; }
 	
-	FEDomain* Clone()
-	{
-		FEBiphasicSoluteDomain* pd = new FEBiphasicSoluteDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
+	//! Create shallow copy
+	FEDomain* Clone();
 
 	//! initialize elements for this domain
 	void InitElements();
 	
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrix(FENLSolver* psolver, bool bsymm, const FETimePoint& tp);
 
 	//! calculates the global stiffness matrix for this domain (steady-state case)
-	void StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, const FETimePoint& tp);
 	
 	//! calculates the residual
 //	void Residual(FENLSolver* psolver, vector<double>& R);

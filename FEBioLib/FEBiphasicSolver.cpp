@@ -550,7 +550,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEBiphasicSolver::StiffnessMatrix()
+bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 {
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;

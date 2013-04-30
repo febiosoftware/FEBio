@@ -42,7 +42,7 @@ public:
 	virtual bool Residual(vector<double>& R);
 
 	//! calculates the global stiffness matrix (overridden from FESolidSolver)
-	virtual bool StiffnessMatrix();
+	virtual bool StiffnessMatrix(const FETimePoint& tp);
 
 protected:
 	void GetDisplacementData(vector<double>& di, vector<double>& ui);
