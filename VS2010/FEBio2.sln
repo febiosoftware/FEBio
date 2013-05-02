@@ -70,9 +70,6 @@ Global
 		Debug|Itanium = Debug|Itanium
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		Release - x64|Itanium = Release - x64|Itanium
-		Release - x64|Win32 = Release - x64|Win32
-		Release - x64|x64 = Release - x64|x64
 		Release OpenMP|Itanium = Release OpenMP|Itanium
 		Release OpenMP|Win32 = Release OpenMP|Win32
 		Release OpenMP|x64 = Release OpenMP|x64
@@ -99,12 +96,6 @@ Global
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Debug|Win32.Build.0 = Debug|Win32
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Debug|x64.ActiveCfg = Debug|x64
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Debug|x64.Build.0 = Debug|x64
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release - x64|Itanium.ActiveCfg = Release - x64|Win32
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release - x64|Itanium.Build.0 = Release - x64|Win32
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release - x64|Win32.ActiveCfg = Release - x64|Win32
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release - x64|Win32.Build.0 = Release - x64|Win32
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release - x64|x64.ActiveCfg = Release - x64|x64
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release - x64|x64.Build.0 = Release - x64|x64
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Itanium
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release OpenMP|Itanium.Build.0 = Release OpenMP|Itanium
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
@@ -115,8 +106,8 @@ Global
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|Itanium.Build.0 = Release|Win32
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|Win32.ActiveCfg = Release|Win32
 		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|Win32.Build.0 = Release|Win32
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|x64.ActiveCfg = Release|Win32
-		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|x64.Build.0 = Release|Win32
+		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|x64.ActiveCfg = Release|x64
+		{448F4A28-A0DA-42F8-8D30-ED583D612E49}.Release|x64.Build.0 = Release|x64
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug - Skyline Only|Itanium.ActiveCfg = Debug - Skyline Only|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug - Skyline Only|Itanium.Build.0 = Debug - Skyline Only|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug - Skyline Only|Win32.ActiveCfg = Debug - Skyline Only|Win32
@@ -133,12 +124,6 @@ Global
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug|Win32.Build.0 = Debug|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Debug|x64.ActiveCfg = Debug|Win32
-		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release - x64|Itanium.ActiveCfg = Release - x64|Win32
-		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release - x64|Itanium.Build.0 = Release - x64|Win32
-		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release - x64|Win32.ActiveCfg = Release - x64|Win32
-		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release - x64|Win32.Build.0 = Release - x64|Win32
-		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release - x64|x64.ActiveCfg = Release - x64|x64
-		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release - x64|x64.Build.0 = Release - x64|x64
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Itanium
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release OpenMP|Itanium.Build.0 = Release OpenMP|Itanium
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
@@ -149,7 +134,8 @@ Global
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|Itanium.Build.0 = Release|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|Win32.ActiveCfg = Release|Win32
 		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|Win32.Build.0 = Release|Win32
-		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|x64.ActiveCfg = Release|Win32
+		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|x64.ActiveCfg = Release|x64
+		{C43CD5CF-8AA6-4F49-AB17-C22DE2EEEC5A}.Release|x64.Build.0 = Release|x64
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug - Skyline Only|Itanium.ActiveCfg = Debug - Skyline Only|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug - Skyline Only|Itanium.Build.0 = Debug - Skyline Only|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug - Skyline Only|Win32.ActiveCfg = Debug - Skyline Only|Win32
@@ -166,12 +152,6 @@ Global
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug|Win32.ActiveCfg = Debug|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug|Win32.Build.0 = Debug|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Debug|x64.ActiveCfg = Debug|Win32
-		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release - x64|Itanium.ActiveCfg = Release - x64|Win32
-		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release - x64|Itanium.Build.0 = Release - x64|Win32
-		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release - x64|Win32.ActiveCfg = Release - x64|Win32
-		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release - x64|Win32.Build.0 = Release - x64|Win32
-		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release - x64|x64.ActiveCfg = Release - x64|x64
-		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release - x64|x64.Build.0 = Release - x64|x64
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Itanium
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release OpenMP|Itanium.Build.0 = Release OpenMP|Itanium
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
@@ -182,7 +162,8 @@ Global
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|Itanium.Build.0 = Release|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|Win32.ActiveCfg = Release|Win32
 		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|Win32.Build.0 = Release|Win32
-		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|x64.ActiveCfg = Release|Win32
+		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|x64.ActiveCfg = Release|x64
+		{36BC93C1-67B2-4CDC-A6B2-EED6EC3F4850}.Release|x64.Build.0 = Release|x64
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug - Skyline Only|Itanium.ActiveCfg = Debug - Skyline Only
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug - Skyline Only|Win32.ActiveCfg = Debug - Skyline Only
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug - Skyline Only|x64.ActiveCfg = Debug - Skyline Only
@@ -195,9 +176,6 @@ Global
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug|Win32.ActiveCfg = Debug
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug|x64.ActiveCfg = Debug - Skyline Only
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Debug|x64.Build.0 = Debug - Skyline Only
-		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release - x64|Itanium.ActiveCfg = Release - x64
-		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release - x64|Win32.ActiveCfg = Release - x64
-		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release - x64|x64.ActiveCfg = Release - x64
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release OpenMP|Win32.ActiveCfg = Release OpenMP
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release OpenMP|x64.ActiveCfg = Release OpenMP
@@ -205,7 +183,6 @@ Global
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|Itanium.ActiveCfg = Release
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|Win32.ActiveCfg = Release
 		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|x64.ActiveCfg = Release - x64
-		{4F9551F4-03E6-41C0-9504-F93F29AAFAA7}.Release|x64.Build.0 = Release - x64
 		{C853E891-6650-4718-8584-79768B9E42B6}.Debug - Skyline Only|Itanium.ActiveCfg = Debug|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Debug - Skyline Only|Win32.ActiveCfg = Debug|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Debug - Skyline Only|Win32.Build.0 = Debug|Win32
@@ -218,10 +195,6 @@ Global
 		{C853E891-6650-4718-8584-79768B9E42B6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Debug|Win32.Build.0 = Debug|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Debug|x64.ActiveCfg = Debug|Win32
-		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|Itanium.ActiveCfg = Release|Win32
-		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|Win32.ActiveCfg = Release|Win32
-		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|Win32.Build.0 = Release|Win32
-		{C853E891-6650-4718-8584-79768B9E42B6}.Release - x64|x64.ActiveCfg = Release|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Release OpenMP|Win32.Build.0 = Release OpenMP|Win32
@@ -229,7 +202,8 @@ Global
 		{C853E891-6650-4718-8584-79768B9E42B6}.Release|Itanium.ActiveCfg = Release|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Release|Win32.ActiveCfg = Release|Win32
 		{C853E891-6650-4718-8584-79768B9E42B6}.Release|Win32.Build.0 = Release|Win32
-		{C853E891-6650-4718-8584-79768B9E42B6}.Release|x64.ActiveCfg = Release|Win32
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release|x64.ActiveCfg = Release|x64
+		{C853E891-6650-4718-8584-79768B9E42B6}.Release|x64.Build.0 = Release|x64
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Debug - Skyline Only|Itanium.ActiveCfg = Debug|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Debug - Skyline Only|Win32.ActiveCfg = Debug|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Debug - Skyline Only|Win32.Build.0 = Debug|Win32
@@ -242,10 +216,6 @@ Global
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Debug|Win32.Build.0 = Debug|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Debug|x64.ActiveCfg = Debug|Win32
-		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release - x64|Itanium.ActiveCfg = Release|Win32
-		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release - x64|Win32.ActiveCfg = Release|Win32
-		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release - x64|Win32.Build.0 = Release|Win32
-		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release - x64|x64.ActiveCfg = Release|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release OpenMP|Win32.Build.0 = Release OpenMP|Win32
@@ -253,7 +223,8 @@ Global
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release|Itanium.ActiveCfg = Release|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release|Win32.ActiveCfg = Release|Win32
 		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release|Win32.Build.0 = Release|Win32
-		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release|x64.ActiveCfg = Release|Win32
+		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release|x64.ActiveCfg = Release|x64
+		{4102D3E1-8084-4EFC-A1AE-05ABCD44D4BD}.Release|x64.Build.0 = Release|x64
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Debug - Skyline Only|Itanium.ActiveCfg = Debug|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Debug - Skyline Only|Win32.ActiveCfg = Debug|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Debug - Skyline Only|Win32.Build.0 = Debug|Win32
@@ -266,10 +237,6 @@ Global
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Debug|Win32.Build.0 = Debug|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Debug|x64.ActiveCfg = Debug|Win32
-		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release - x64|Itanium.ActiveCfg = Release|Win32
-		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release - x64|Win32.ActiveCfg = Release|Win32
-		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release - x64|Win32.Build.0 = Release|Win32
-		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release - x64|x64.ActiveCfg = Release|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release OpenMP|Win32.Build.0 = Release OpenMP|Win32
@@ -277,7 +244,7 @@ Global
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release|Itanium.ActiveCfg = Release|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release|Win32.ActiveCfg = Release|Win32
 		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release|Win32.Build.0 = Release|Win32
-		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release|x64.ActiveCfg = Release|Win32
+		{6006C5A5-86B5-445B-8DE2-3A760C3B3E7C}.Release|x64.ActiveCfg = Release|x64
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Debug - Skyline Only|Itanium.ActiveCfg = Debug|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Debug - Skyline Only|Win32.ActiveCfg = Debug|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Debug - Skyline Only|Win32.Build.0 = Debug|Win32
@@ -290,10 +257,6 @@ Global
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Debug|Win32.ActiveCfg = Debug|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Debug|Win32.Build.0 = Debug|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Debug|x64.ActiveCfg = Debug|Win32
-		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release - x64|Itanium.ActiveCfg = Release|Win32
-		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release - x64|Win32.ActiveCfg = Release|Win32
-		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release - x64|Win32.Build.0 = Release|Win32
-		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release - x64|x64.ActiveCfg = Release|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release OpenMP|Win32.Build.0 = Release OpenMP|Win32
@@ -301,7 +264,8 @@ Global
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release|Itanium.ActiveCfg = Release|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release|Win32.ActiveCfg = Release|Win32
 		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release|Win32.Build.0 = Release|Win32
-		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release|x64.ActiveCfg = Release|Win32
+		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release|x64.ActiveCfg = Release|x64
+		{94D5ECDE-4031-4231-9C28-2365B079EC3E}.Release|x64.Build.0 = Release|x64
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Debug - Skyline Only|Itanium.ActiveCfg = Debug|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Debug - Skyline Only|Win32.ActiveCfg = Debug|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Debug - Skyline Only|Win32.Build.0 = Debug|Win32
@@ -314,10 +278,6 @@ Global
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Debug|Win32.Build.0 = Debug|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Debug|x64.ActiveCfg = Debug|Win32
-		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release - x64|Itanium.ActiveCfg = Release|Win32
-		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release - x64|Win32.ActiveCfg = Release|Win32
-		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release - x64|Win32.Build.0 = Release|Win32
-		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release - x64|x64.ActiveCfg = Release|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release OpenMP|Itanium.ActiveCfg = Release OpenMP|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release OpenMP|Win32.ActiveCfg = Release OpenMP|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release OpenMP|Win32.Build.0 = Release OpenMP|Win32
@@ -325,7 +285,7 @@ Global
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release|Itanium.ActiveCfg = Release|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release|Win32.ActiveCfg = Release|Win32
 		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release|Win32.Build.0 = Release|Win32
-		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release|x64.ActiveCfg = Release|Win32
+		{B149AB0E-816A-47D1-8271-79046DE7BE85}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
