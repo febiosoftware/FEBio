@@ -1,11 +1,31 @@
 #include "stdafx.h"
-#include "FEBioLib/FEFiberMaterial.h"
-#include "FECore/FEElasticMaterial.h"
+#include "FEFiberMaterial.h"
+#include <FECore/FEElasticMaterial.h>
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFiberMaterial, FEMaterial);
 	ADD_PARAMETER(m_ascl, FE_PARAM_DOUBLE, "ascl");
 END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+FEFiberMaterial::FEFiberMaterial()
+{
+	m_ascl = 0;
+	m_c3 = m_c4 = m_c5 = 0;
+	m_lam1 = 1;
+
+	m_Tmax = 1.0;
+	m_ca0 = 1.0;
+	m_camax = 0.0;
+}
+
+//-----------------------------------------------------------------------------
+void FEFiberMaterial::Init()
+{
+	// for backward compatibility we set m_camax to m_ca0 if it is not defined
+	if (m_camax == 0.0) m_camax = m_ca0;
+	assert(m_camax > 0.0);
+}
 
 //-----------------------------------------------------------------------------
 // Fiber material stress
@@ -83,10 +103,14 @@ mat3ds FEFiberMaterial::Stress(FEMaterialPoint &mp)
 
 		if (dl >= 0)
 		{
+			// calcium sensitivity
 			double eca50i = (exp(m_beta*dl) - 1);
 
+			// ratio of Camax/Ca0
+			double rca = m_camax/m_ca0;
+
 			// active fiber stress
-			double saf = ctenslm*eca50i / ( eca50i + 1 );
+			double saf = m_Tmax*(eca50i / ( eca50i + rca*rca ))*ctenslm;
 
 			// add saf*(a x a)
 			s += AxA*saf;

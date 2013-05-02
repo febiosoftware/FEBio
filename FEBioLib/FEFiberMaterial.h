@@ -7,12 +7,10 @@ class FEFiberMaterial : public FEMaterial
 {
 public:
 	//! Constructor
-	FEFiberMaterial()
-	{
-		m_ascl = 0;
-		m_c3 = m_c4 = m_c5 = 0;
-		m_lam1 = 1;
-	}
+	FEFiberMaterial();
+
+	//! Initialization
+	void Init();
 
 	//! Calculate the fiber stress
 	mat3ds Stress(FEMaterialPoint& mp);
@@ -29,7 +27,9 @@ public:
 
 	//--- time varying elastance active contraction data ---
 	double	m_ascl;		//!< activation scale factor
+	double	m_Tmax;		//!< activation scale factor
 	double	m_ca0;		//!< intracellular calcium concentration
+	double	m_camax;	//!< peak calcium concentration
 	double	m_beta;		//!< shape of peak isometric tension-sarcomere length relation
 	double	m_l0;		//!< unloaded length
 	double	m_refl;		//!< sarcomere length

@@ -828,6 +828,7 @@
     <ClInclude Include="..\..\FEBioLib\FETriphasicDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FETrussMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEUDGHexDomain.h" />
+    <ClInclude Include="..\..\FEBioLib\FEUncoupledActiveContraction.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledElasticMixture.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEUncoupledViscoElasticMaterial.h" />
@@ -975,6 +976,7 @@
     <ClCompile Include="..\..\FEBioLib\FETriphasicDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FETrussMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUDGHexDomain.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEUncoupledActiveContraction.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledElasticMixture.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEUncoupledViscoElasticMaterial.cpp" />

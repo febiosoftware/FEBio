@@ -353,10 +353,12 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 		++tag;
 		do
 		{
-			if (tag == "ca0") tag.value(pm->m_fib.m_ca0);
-			else if (tag == "beta") tag.value(pm->m_fib.m_beta);
-			else if (tag == "l0") tag.value(pm->m_fib.m_l0);
-			else if (tag == "refl") tag.value(pm->m_fib.m_refl);
+			if      (tag == "Tmax" ) tag.value(pm->m_fib.m_Tmax );
+			else if (tag == "ca0"  ) tag.value(pm->m_fib.m_ca0  );
+			else if (tag == "camax") tag.value(pm->m_fib.m_camax);
+			else if (tag == "beta" ) tag.value(pm->m_fib.m_beta );
+			else if (tag == "l0"   ) tag.value(pm->m_fib.m_l0   );
+			else if (tag == "refl" ) tag.value(pm->m_fib.m_refl );
 			else throw XMLReader::InvalidTag(tag);
 			++tag;
 		}

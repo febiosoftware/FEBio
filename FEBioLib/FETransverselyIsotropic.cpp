@@ -10,6 +10,13 @@ BEGIN_PARAMETER_LIST(FETransverselyIsotropic, FEUncoupledMaterial)
 	ADD_PARAMETER(m_fib.m_lam1, FE_PARAM_DOUBLE, "lam_max");
 END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+// Data initialization
+void FETransverselyIsotropic::Init()
+{
+	FEUncoupledMaterial::Init();
+	m_fib.Init();
+}
 
 //-----------------------------------------------------------------------------
 //! Serialize data to or from the dump file 
