@@ -706,6 +706,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledActiveContraction.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEUncoupledElasticMixture.cpp"
 				>
 			</File>
@@ -1305,6 +1309,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEUDGHexDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEUncoupledActiveContraction.h"
 				>
 			</File>
 			<File
