@@ -88,7 +88,8 @@ void FESlidingSurfaceBW::ShallowCopy(FESlidingSurfaceBW &s)
 void FESlidingSurfaceBW::UpdateNodeNormals()
 {
 	int N = Nodes(), i, j, ne, jp1, jm1;
-	vec3d y[4], n;
+	const int MN = FEElement::MAX_NODES;
+	vec3d y[MN], n;
 	
 	// zero nodal normals
 	zero(m_nn);
@@ -390,8 +391,9 @@ void FESlidingInterfaceBW::ContactForces(FEGlobalVector& R)
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
-	double detJ[4], w[4], *Hs, Hm[4];
-	double N[24];
+	const int MN = FEElement::MAX_NODES;
+	double detJ[MN], w[MN], *Hs, Hm[MN];
+	double N[MN*6];
 
 	FEModel& fem = *m_pfem;
 	
@@ -536,8 +538,9 @@ void FESlidingInterfaceBW::ContactStiffness(FENLSolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
-	double detJ[4], w[4], *Hs, Hm[4];
-	double N[24];
+	const int MN = FEElement::MAX_NODES;
+	double detJ[MN], w[MN], *Hs, Hm[MN];
+	double N[MN*6];
 	matrix ke;
 	
 	FEModel& fem = *m_pfem;
@@ -853,6 +856,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
 {
 	int np, n, i, j, k;
 	int npass = (m_btwo_pass?2:1);
+	const int MN = FEElement::MAX_NODES;
 	for (np=0; np<npass; ++np)
 	{
 		FESlidingSurfaceBW& ss = (np == 0? m_ss : m_ms);
@@ -880,7 +884,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
 				{
 					int mint = pme->GaussPoints();
 					int noff = ms.m_nei[pme->m_lid];
-					double ti[4];
+					double ti[MN];
 					for (j=0; j<mint; ++j) {
 						k = noff+j;
 						gap = ms.m_gap[k];
@@ -890,7 +894,7 @@ void FESlidingInterfaceBW::UpdateContactPressures()
 //						ti[j] = MBRACKET(ms.m_Lmd[k] + m_epsn*ms.m_epsn[k]*ms.m_gap[k]);
 					}
 					// project the data to the nodes
-					double tn[4];
+					double tn[MN];
 					pme->project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
 					double Ln = pme->eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);

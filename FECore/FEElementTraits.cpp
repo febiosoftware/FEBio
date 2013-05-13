@@ -554,16 +554,44 @@ FETet10G4::FETet10G4() : FETet10_(NINT, FE_TET10G4)
 	gr[ 3] = b; gs[ 3] = b; gt[ 3] = b; gw[ 3] = w;
 
 	init();
+
+	// setup the shape function matrix
+	matrix A(4,4);
+	for (int i=0; i<4; ++i)
+	{
+		double r = gr[i];
+		double s = gs[i];
+		double t = gt[i];
+
+		A[i][0] = 1 - r - s - t;
+		A[i][1] = r;
+		A[i][2] = s;
+		A[i][3] = t;
+	}
+
+	// calculate inverse matrix
+	Ai.resize(4, 4);
+	Ai = A.inverse();
 }
 
 //-----------------------------------------------------------------------------
 void FETet10G4::project_to_nodes(double* ai, double* ao)
 {
-	// TODO: implement this
+	ao[0] = Ai[0][0]*ai[0] + Ai[0][1]*ai[1] + Ai[0][2]*ai[2] + Ai[0][3]*ai[3];
+	ao[1] = Ai[1][0]*ai[0] + Ai[1][1]*ai[1] + Ai[1][2]*ai[2] + Ai[1][3]*ai[3];
+	ao[2] = Ai[2][0]*ai[0] + Ai[2][1]*ai[1] + Ai[2][2]*ai[2] + Ai[2][3]*ai[3];
+	ao[3] = Ai[3][0]*ai[0] + Ai[3][1]*ai[1] + Ai[3][2]*ai[2] + Ai[3][3]*ai[3];
+
+	ao[4] = 0.5*(ao[0] + ao[1]);
+	ao[5] = 0.5*(ao[1] + ao[2]);
+	ao[6] = 0.5*(ao[2] + ao[0]);
+	ao[7] = 0.5*(ao[0] + ao[3]);
+	ao[8] = 0.5*(ao[1] + ao[3]);
+	ao[9] = 0.5*(ao[2] + ao[3]);
 }
 
 //=============================================================================
-//                          F E T E T 1 0 E L E M E N T
+//                          T E T 1 0 G 8
 //=============================================================================
 // I think this assumes that the tetrahedron in natural space is essentially
 // a constant metric tet with the edge nodes at the center of the edges.
@@ -580,12 +608,79 @@ FETet10G8::FETet10G8() : FETet10_(NINT, FE_TET10G8)
     gr[7] = 0.1069522740; gs[7] = 0.1069522740; gt[7] = 0.1069522740; gw[7] = 0.111472033*w;
 
 	init();
+
+	// setup the shape function matrix
+	N.resize(8, 4);
+	for (int i=0; i<8; ++i)
+	{
+		N[i][0] = 1.0 - gr[i] - gs[i] - gt[i];
+		N[i][1] = gr[i];
+		N[i][2] = gs[i];
+		N[i][3] = gt[i];
+	}
+
+	matrix A(4, 4);
+	A = N.transpose()*N;
+
+	// calculate inverse matrix
+	Ai.resize(4, 4);
+	Ai = A.inverse();
 }
 
 //-----------------------------------------------------------------------------
 void FETet10G8::project_to_nodes(double* ai, double* ao)
 {
-	// TODO: implement this
+	vector<double> b(4);
+	for (int i=0; i<4; ++i)
+	{
+		b[i] = 0;
+		for (int j=0; j<NINT; ++j) b[i] += N[j][i]*ai[j];
+	}
+
+	for (int i=0; i<4; ++i)
+	{
+		ao[i] = 0.0;
+		for (int j=0; j<4; ++j) ao[i] += Ai[i][j]*b[j];
+	}
+
+	ao[4] = 0.5*(ao[0] + ao[1]);
+	ao[5] = 0.5*(ao[1] + ao[2]);
+	ao[6] = 0.5*(ao[2] + ao[0]);
+	ao[7] = 0.5*(ao[0] + ao[3]);
+	ao[8] = 0.5*(ao[1] + ao[3]);
+	ao[9] = 0.5*(ao[2] + ao[3]);
+}
+
+
+//=============================================================================
+//                             T E T 1 0 G L 1 1
+//=============================================================================
+// I think this assumes that the tetrahedron in natural space is essentially
+// a constant metric tet with the edge nodes at the center of the edges.
+FETet10GL11::FETet10GL11() : FETet10_(NINT, FE_TET10GL11)
+{
+	const double w = 1.0/6.0;
+	const double a = w*1.0/60.0;
+	const double b = w*4.0/60.0;
+	gr[ 0] = 0.0; gs[ 0] = 0.0; gt[ 0] = 0.0; gw[ 0] = a;
+	gr[ 1] = 1.0; gs[ 1] = 0.0; gt[ 1] = 0.0; gw[ 1] = a;
+	gr[ 2] = 0.0; gs[ 2] = 1.0; gt[ 2] = 0.0; gw[ 2] = a;
+	gr[ 3] = 0.0; gs[ 3] = 0.0; gt[ 3] = 1.0; gw[ 3] = a;
+	gr[ 4] = 0.5; gs[ 4] = 0.0; gt[ 4] = 0.0; gw[ 4] = b;
+	gr[ 5] = 0.5; gs[ 5] = 0.5; gt[ 5] = 0.0; gw[ 5] = b;
+	gr[ 6] = 0.0; gs[ 6] = 0.5; gt[ 6] = 0.0; gw[ 6] = b;
+	gr[ 7] = 0.0; gs[ 7] = 0.0; gt[ 7] = 0.5; gw[ 7] = b;
+	gr[ 8] = 0.5; gs[ 8] = 0.0; gt[ 8] = 0.5; gw[ 8] = b;
+	gr[ 9] = 0.0; gs[ 9] = 0.5; gt[ 9] = 0.5; gw[ 9] = b;
+	gr[10] = 0.25; gs[10] = 0.25; gt[10] = 0.25; gw[10] = 32*a;
+	init();
+}
+
+//-----------------------------------------------------------------------------
+void FETet10GL11::project_to_nodes(double* ai, double* ao)
+{
+	ao[0] = ai[0]; ao[1] = ai[1]; ao[2] = ai[2]; ao[3] = ai[3];
+	ao[4] = ai[4]; ao[5] = ai[5]; ao[6] = ai[6]; ao[7] = ai[7]; ao[8] = ai[8]; ao[9] = ai[9];
 }
 
 //=============================================================================

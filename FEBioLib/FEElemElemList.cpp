@@ -55,7 +55,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 
 	// loop over all solid elements first
 	int i, j, k, l;
-	int n = 0, en0[4], en1[4], n0, n1, M = 0;
+	int n = 0, en0[8], en1[8], n0, n1, M = 0;
 	int nf0, nf1;
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
 	for (i=0; i<bd.Elements(); ++i, ++n)

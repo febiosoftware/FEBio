@@ -22,6 +22,7 @@ enum FE_Element_Type {
 	FE_PENTA6G6,	
 	FE_TET10G4,
 	FE_TET10G8,
+	FE_TET10GL11,
 	FE_HEX20G27,
 
 	// 2.5D surface elements

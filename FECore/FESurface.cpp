@@ -87,7 +87,7 @@ int FESurface::FindElement(FESurfaceElement& el)
 		FEElement& e = *ppe[i];
 		int nfaces = mesh.Faces(e);
 		
-		int nf[4], nn;
+		int nf[8], nn;
 		for (int j=0; j<nfaces; ++j)
 		{
 			nn = mesh.GetFace(e, j, nf);
@@ -1071,11 +1071,137 @@ bool FESurface::Intersect(FESurfaceElement& el, vec3d r, vec3d n, double rs[2], 
 	{
 	case 3: return IntersectTri(y, r, n, rs, g, eps); break;
 	case 4: return IntersectQuad(y, r, n, rs, g, eps); break;
+	case 6: return IntersectTri6(y, r, n, rs, g, eps); break;
 	default:
 		assert(false);
 	}
 
 	// if we get here, the ray did not intersect the element
+	return false;
+}
+
+
+//-----------------------------------------------------------------------------
+//! This function calculates the intersection of a ray with a 6-node triangle
+//! and returns true if the ray intersected.
+//!
+bool FESurface::IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps)
+{
+	// first we're going to see if the ray intersects the four subtriangles
+	vec3d x1[3], x2[3], x3[3], x4[3];
+	x1[0] = y[0]; x2[0] = y[3]; x3[0] = y[5]; x4[0] = y[4];
+	x1[1] = y[3]; x2[1] = y[1]; x3[1] = y[4]; x4[1] = y[5];
+	x1[2] = y[5]; x2[2] = y[4]; x3[2] = y[2]; x4[2] = y[3];
+	
+	bool b = false;
+	double rp, sp;
+	
+	if (IntersectTri(x1, r, n, rs, g, eps))
+	{
+		// we've intersected the first triangle
+		b = true;
+		rp = rs[0]/2.0;
+		sp = rs[1]/2.0;
+	}
+	else if (IntersectTri(x2, r, n, rs, g, eps))
+	{
+		// we've intersected the second triangle
+		b = true;
+		rp = 0.5 + rs[0]/2.0;
+		sp = rs[1]/2.0;
+	}
+	else if (IntersectTri(x3, r, n, rs, g, eps))
+	{
+		// we've intersected the third triangle
+		b = true;
+		rp = rs[0]/2.0;
+		sp = 0.5 + rs[1]/2.0;
+	}
+	else if (IntersectTri(x4, r, n, rs, g, eps))
+	{
+		// we've intersected the fourth triangle
+		b = true;
+		rp = 0.5 - rs[0]/2.0;
+		sp = 0.5 - rs[1]/2.0;
+	}
+	
+	// if one of the triangels was intersected,
+	// we calculate a more accurate projection
+	if (b)
+	{
+		mat3d A;
+		vec3d dx;
+		vec3d F, F1, F2, F3;
+		double H[6], H1[6], H2[6];
+		
+		double l0;
+		double l1 = rp;
+		double l2 = sp;
+		double l3 = g;
+		
+		int nn = 0;
+		int maxn = 5;
+		do
+		{
+			l0 = 1 - l1 - l2;
+			
+			// shape functions of quad
+			H[0] = l0*(2.0*l0 - 1.0);
+			H[1] = l1*(2.0*l1 - 1.0);
+			H[2] = l2*(2.0*l2 - 1.0);
+			H[3] = 4.0*l0*l1;
+			H[4] = 4.0*l1*l2;
+			H[5] = 4.0*l2*l0;
+			
+			// shape function derivatives
+			H1[0] = -3.0 + 4.0*l1 + 4.0*l2;
+			H1[1] =  4.0*l1 - 1.0;
+			H1[2] =  0.0;
+			H1[3] =  4.0 - 8.0*l1 - 4.0*l2;
+			H1[4] =  4.0*l2;
+			H1[5] = -4.0*l2;
+			
+			H2[0] = -3.0 + 4.0*l2 + 4.0*l1;
+			H2[1] =  0.0;
+			H2[2] =  4.0*l2 - 1.0;
+			H2[3] = -4.0*l1;
+			H2[4] =  4.0*l1;
+			H2[5] =  4.0 - 8.0*l2 - 4.0*l1;
+
+			// calculate residual
+			F = r + n*l3 - y[0]*H[0] - y[1]*H[1] - y[2]*H[2] - y[3]*H[3] - y[4]*H[4] - y[5]*H[5];
+			
+			// residual derivatives
+			F1 = - y[0]*H1[0] - y[1]*H1[1] - y[2]*H1[2] - y[3]*H1[3] - y[4]*H1[4] - y[5]*H1[5];
+			F2 = - y[0]*H2[0] - y[1]*H2[1] - y[2]*H2[2] - y[3]*H2[3] - y[4]*H2[4] - y[5]*H2[5];
+			F3 = n;
+			
+			// set up the tangent matrix
+			A[0][0] = F1.x; A[0][1] = F2.x; A[0][2] = F3.x;
+			A[1][0] = F1.y; A[1][1] = F2.y; A[1][2] = F3.y;
+			A[2][0] = F1.z; A[2][1] = F2.z; A[2][2] = F3.z;
+			
+			// calculate solution increment
+			dx = -(A.inverse()*F);
+			
+			// update solution
+			l1 += dx.x;
+			l2 += dx.y;
+			l3 += dx.z;
+			
+			++nn;
+		}
+		while ((dx.norm() > 1e-7) && (nn < maxn));
+		
+		// store results
+		rs[0] = l1;
+		rs[1] = l2;
+		g     = l3;
+		
+		// see if the point is inside the quad
+		if ((rs[0] >= -eps) && (rs[1] >= -eps) && (rs[0]+rs[1] <= 1+eps)) return true;
+	}
+	
 	return false;
 }
 

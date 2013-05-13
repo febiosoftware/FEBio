@@ -576,7 +576,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 	int NN = m.Nodes();
 
 	// count nr of faces
-	int faces = 0, N, nf[4];
+	int faces = 0, N, nf[8];
 	XMLTag t(tag); ++t;
 	while (!t.isend()) { faces++; ++t; }
 

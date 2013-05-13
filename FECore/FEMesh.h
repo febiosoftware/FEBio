@@ -279,7 +279,7 @@ public:
 	FENodeSet* FindNodeSet(const char* szname);
 
 	//! Get the face nodes from a given element
-	int GetFace(FEElement& el, int n, int nf[4]);
+	int GetFace(FEElement& el, int n, int nf[8]);
 
 	//! return the nr of faces an element has
 	int Faces(FEElement& el);

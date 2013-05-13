@@ -320,6 +320,9 @@ public:
 	FETet10G4();
 
 	void project_to_nodes(double* ai, double* ao);
+
+private:
+	matrix Ai;
 };
 
 //=============================================================================
@@ -331,6 +334,25 @@ public:
 
 public:
 	FETet10G8();
+
+	void project_to_nodes(double* ai, double* ao);
+
+
+private:
+	matrix N;
+	matrix Ai;
+};
+
+
+//=============================================================================
+// 10-node tetrahedral element using a 11-node Gauss-Lobatto integration rule
+class FETet10GL11 : public FETet10_
+{
+public:
+	enum { NINT = 11 };
+
+public:
+	FETet10GL11();
 
 	void project_to_nodes(double* ai, double* ao);
 };

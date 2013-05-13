@@ -87,6 +87,9 @@ public:
 	//! helper function for intersection with quads
 	bool IntersectQuad(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
 
+	//! helper function for intersection with 6-node triangles
+	bool IntersectTri6(vec3d* y, vec3d r, vec3d n, double rs[2], double& g, double eps);
+
 	//! Find the closest point projection onto this surface
 	FESurfaceElement* ClosestPointProjection(vec3d& x, vec3d& q, vec2d& r, bool binit_nq, double tol);
 
