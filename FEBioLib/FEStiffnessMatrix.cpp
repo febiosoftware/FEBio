@@ -319,7 +319,8 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 	FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(pci);
 	if (psi)
 	{
-		vector<int> lm(6*5);
+		// TODO: this is currently for max 6 nodes (hence 7=6+1)
+		vector<int> lm(6*7);
 
 		int npass = (psi->m_btwo_pass?2:1);
 		for (int np=0; np<npass; ++np)
@@ -377,7 +378,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 	FEFacet2FacetSliding* pfi = dynamic_cast<FEFacet2FacetSliding*>(pci);
 	if (pfi)
 	{
-		vector<int> lm(6*8);
+		vector<int> lm(6*FEElement::MAX_NODES*2);
 
 		int npass = (pfi->m_btwo_pass?2:1);
 		for (int np=0; np<npass; ++np)
@@ -437,7 +438,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 	FESlidingInterfaceBW* psbw = dynamic_cast<FESlidingInterfaceBW*>(pci);
 	if (psbw)
 	{
-		vector<int> lm(6*8);
+		vector<int> lm(6*FEElement::MAX_NODES*2);
 					
 		int npass = (psbw->m_btwo_pass?2:1);
 		for (int np=0; np<npass; ++np)
@@ -497,7 +498,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 	FESlidingInterface2* ps2 = dynamic_cast<FESlidingInterface2*>(pci);
 	if (ps2)
 	{
-		vector<int> lm(7*8);
+		vector<int> lm(7*FEElement::MAX_NODES*2);
 
 		int npass = (ps2->m_btwo_pass?2:1);
 		for (int np=0; np<npass; ++np)
@@ -559,7 +560,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 	FESlidingInterface3* ps3 = dynamic_cast<FESlidingInterface3*>(pci);
 	if (ps3)
 	{
-		vector<int> lm(8*8);
+		vector<int> lm(8*FEElement::MAX_NODES*2);
 					
 		int npass = (ps3->m_btwo_pass?2:1);
 		for (int np=0; np<npass; ++np)
@@ -680,7 +681,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 	FETiedBiphasicInterface* ptb = dynamic_cast<FETiedBiphasicInterface*>(pci);
 	if (ptb)
 	{
-		vector<int> lm(7*8);
+		vector<int> lm(7*FEElement::MAX_NODES*2);
 					
 		int npass = (ptb->m_btwo_pass?2:1);
 		for (int np=0; np<npass; ++np)

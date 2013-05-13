@@ -23,6 +23,9 @@ public:
 	void UpdateNodeNormals();
 	
 	void Serialize(DumpFile& ar);
+
+	//! evaluate net contact force
+	vec3d NetContactForce();
 	
 protected:
 	FEModel*	m_pfem;
@@ -43,7 +46,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class FESlidingInterfaceBW :	public FEContactInterface
+class FESlidingInterfaceBW : public FEContactInterface
 {
 public:
 	//! constructor

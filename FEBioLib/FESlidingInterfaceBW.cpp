@@ -149,6 +149,41 @@ void FESlidingSurfaceBW::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+vec3d FESlidingSurfaceBW::NetContactForce()
+{
+	int n, i;
+	
+	// initialize contact force
+	vec3d f(0,0,0);
+	
+	// keep a running counter of integration points.
+	int ni = 0;
+	
+	// loop over all elements of the primary surface
+	for (n=0; n<Elements(); ++n)
+	{
+		FESurfaceElement& el = Element(n);
+		int nint = el.GaussPoints();
+		
+		// evaluate the contact force for that element
+		for (i=0; i<nint; ++i, ++ni) 
+		{
+			// get the base vectors
+			vec3d g[2];
+			CoBaseVectors(el, i, g);
+			// normal (magnitude = area)
+			vec3d n = g[0] ^ g[1];
+			// gauss weight
+			double w = el.GaussWeights()[i];
+			// contact force
+			f += n*(w*m_Ln[ni]);
+		}
+	}
+	
+	return f;
+}
+
+//-----------------------------------------------------------------------------
 // FESlidingInterfaceBW
 //-----------------------------------------------------------------------------
 
@@ -163,10 +198,11 @@ FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(p
 	m_atol = 0.1;
 	m_epsn = 1;
 	m_btwo_pass = false;
+	m_gtol = 0;
 	m_stol = 0.01;
 	m_bsymm = true;
 	m_srad = 1.0;
-	m_gtol = -1;	// we use augmentation tolerance by default
+	m_nsegup = 0;
 	m_bautopen = false;
 	m_btension = false;
 	
@@ -326,9 +362,11 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 				
 				ss.m_gap[n] = (g <= R? g : 0);
 				
-				if ((g > R) || ((!m_btension) && (Ln < 0)) )
+				if ((g > R) || ((!m_btension) && (Ln < 0)) ) {
 //				if ((g > R) || (Ln < 0) )
 					ss.m_pme[n] = 0;
+					ss.m_gap[n] = 0;
+				}
 			}
 			else
 			{
@@ -395,11 +433,6 @@ void FESlidingInterfaceBW::ContactForces(FEGlobalVector& R)
 	double detJ[MN], w[MN], *Hs, Hm[MN];
 	double N[MN*6];
 
-	FEModel& fem = *m_pfem;
-	
-	// get the mesh
-	FEMesh* pm = m_ss.GetMesh();
-	
 	// loop over the nr of passes
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -717,7 +750,7 @@ void FESlidingInterfaceBW::ContactStiffness(FENLSolver* psolver)
 					mat3d S1, S2;
 					S1.skew(gs[0]);
 					S2.skew(gs[1]);
-					mat3d As[4];
+					mat3d As[MN];
 					for (l=0; l<nseln; ++l)
 						As[l] = S2*Gr[l] - S1*Gs[l];
 					
@@ -784,9 +817,9 @@ void FESlidingInterfaceBW::ContactStiffness(FENLSolver* psolver)
 					vec3d mnu = Gm[0] ^ Gm[1];
 					mnu.unit();
 					
-					double Hmr[4], Hms[4];
+					double Hmr[MN], Hms[MN];
 					me.shape_deriv(Hmr, Hms, r, s);
-					vec3d mm[4];
+					vec3d mm[MN];
 					for (k=0; k<nmeln; ++k) 
 						mm[k] = Gm[0]*Hmr[k] + Gm[1]*Hms[k];
 					
