@@ -86,7 +86,7 @@ void FETiedInterface::Update(int niter)
 	// loop over all slave nodes
 	for (int i=0; i<ss.Nodes(); ++i)
 	{
-		FEElement* pme = ss.m_pme[i];
+		FESurfaceElement* pme = ss.m_pme[i];
 		if (pme)
 		{
 			// get the current slave nodal position
@@ -97,32 +97,13 @@ void FETiedInterface::Update(int niter)
 			double r = ss.m_rs[i][0];
 			double s = ss.m_rs[i][1];
 
-			// calculate the shape function values
+			// get the nodal coordinates
 			int ne = pme->Nodes();
-			double H[FEElement::MAX_NODES];
-			if (ne == 4)
-			{
-
-				H[0] = 0.25*(1 - r)*(1 - s);
-				H[1] = 0.25*(1 + r)*(1 - s);
-				H[2] = 0.25*(1 + r)*(1 + s);
-				H[3] = 0.25*(1 - r)*(1 + s);
-			}
-			else if (ne == 3)
-			{
-				H[0] = 1.0 - r - s;
-				H[1] = r;
-				H[2] = s;
-			}
-			else assert(false);
+			vec3d y[FEElement::MAX_NODES];
+			for (int l=0; l<ne; ++l) y[l] = mesh.Node( pme->m_node[l] ).m_rt;
 
 			// calculate the slave node projection
-			vec3d q(0,0,0);
-			for (int l=0; l<ne; ++l)
-			{
-				vec3d y = mesh.Node( pme->m_node[l] ).m_rt;
-				q += y*H[l];
-			}
+			vec3d q = pme->eval(y, r, s);
 
 			// calculate the gap function
 			ss.m_gap[i] = rt - q;
@@ -270,21 +251,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 				s = ss.m_rs[m][1];
 
 				// get the master shape function values at this slave node
-				if (nmeln == 4)
-				{
-					// quadrilateral
-					N[0] = 0.25*(1-r)*(1-s);
-					N[1] = 0.25*(1+r)*(1-s);
-					N[2] = 0.25*(1+r)*(1+s);
-					N[3] = 0.25*(1-r)*(1+s);
-				}
-				else if (nmeln == 3)
-				{
-					// triangle
-					N[0] = 1 - r - s;
-					N[1] = r;
-					N[2] = s;
-				}
+				mel.shape_fnc(N, r, s);
 
 				// calculate force vector
 				fe.resize(3*(nmeln+1));
@@ -332,17 +299,18 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 
 	matrix ke;
 
-	vector<int> lm(15);
-	vector<int> en(5);
+	const int MN = FEElement::MAX_NODES;
+	vector<int> lm(3*(MN+1));
+	vector<int> en(MN + 1);
 
 	double *Gr, *Gs, *w;
-	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	vec3d rt[MN], r0[MN];
 
-	vec3d rtm[FEElement::MAX_NODES];
+	vec3d rtm[MN];
 
 	double detJ, r, s;
 	vec3d dxr, dxs;
-	double H[FEElement::MAX_NODES];
+	double H[MN];
 
 	vec3d gap, Lm, tc;
 
@@ -423,21 +391,7 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps; //ss.T[m];
 
 				// get the master shape function values at this slave node
-				if (nmeln == 4)
-				{
-					// quadrilateral
-					H[0] = 0.25*(1-r)*(1-s);
-					H[1] = 0.25*(1+r)*(1-s);
-					H[2] = 0.25*(1+r)*(1+s);
-					H[3] = 0.25*(1-r)*(1+s);
-				}
-				else if (nmeln == 3)
-				{
-					// triangle
-					H[0] = 1 - r - s;
-					H[1] = r;
-					H[2] = s;
-				}
+				me.shape_fnc(H, r, s);
 
 				// number of degrees of freedom
 				ndof = 3*(1 + nmeln);

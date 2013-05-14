@@ -987,9 +987,7 @@ bool FESolidSolver::Quasin(double time)
 			// solve the equations
 			m_SolverTime.start();
 			{
-				fprintf(stderr, "Entering Solve Equations ...");
 				m_bfgs.SolveEquations(m_bfgs.m_ui, m_bfgs.m_R0);
-				fprintf(stderr, "done!\n");
 			}
 			m_SolverTime.stop();
 		}

@@ -629,7 +629,8 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 	FETiedInterface* pti = dynamic_cast<FETiedInterface*>(pci);
 	if (pti)
 	{
-		vector<int> lm(6*5);
+		const int LMSIZE = 6*(FEElement::MAX_NODES+1);
+		vector<int> lm(LMSIZE);
 
 		FETiedContactSurface& ss = pti->ss;
 		FETiedContactSurface& ms = pti->ms;
@@ -637,22 +638,13 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 		for (int j=0; j<ss.Nodes(); ++j)
 		{
 			FEElement* pe = ss.m_pme[j];
-
 			if (pe != 0)
 			{
 				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
 				int* en = &me.m_node[0];
 
 				int n = me.Nodes();
-				if (n == 3)
-				{
-					lm[6*(3+1)  ] = -1;
-					lm[6*(3+1)+1] = -1;
-					lm[6*(3+1)+2] = -1;
-					lm[6*(3+1)+3] = -1;
-					lm[6*(3+1)+4] = -1;
-					lm[6*(3+1)+5] = -1;
-				}
+				lm.assign(LMSIZE, -1);
 
 				lm[0] = ss.Node(j).m_ID[DOF_X];
 				lm[1] = ss.Node(j).m_ID[DOF_Y];
