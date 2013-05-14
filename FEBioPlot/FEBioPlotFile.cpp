@@ -397,14 +397,18 @@ void FEBioPlotFile::WriteSolidDomain(FESolidDomain& dom)
 	int dtype = 0;
 	switch (etype)
 	{
-		case FE_HEX8G8:
-		case FE_HEX8RI:
-		case FE_HEX8G1: ne = 8; dtype = PLT_ELEM_HEX; break;
-		case FE_HEX20G27: ne = 20; dtype = PLT_ELEM_HEX20; break;
+		case FE_HEX8G8  :
+		case FE_HEX8RI  :
+		case FE_HEX8G1  : ne = 8; dtype = PLT_ELEM_HEX; break;
 		case FE_PENTA6G6: ne = 6; dtype = PLT_ELEM_PENTA; break;
-		case FE_TET4G4:
-		case FE_TET4G1: ne = 4; dtype = PLT_ELEM_TET; break;
-		case FE_TET10G4: ne = 10; dtype = PLT_ELEM_TET10; break;
+		case FE_TET4G4  :
+		case FE_TET4G1  : ne = 4; dtype = PLT_ELEM_TET; break;
+		case FE_TET10G4 :
+		case FE_TET10G8 : 
+		case FE_TET10GL11: ne = 10; dtype = PLT_ELEM_TET10; break;
+		case FE_HEX20G27: ne = 20; dtype = PLT_ELEM_HEX20; break;
+		default:
+			assert(false);
 	}
 
 	// write the header
@@ -567,17 +571,15 @@ void FEBioPlotFile::WriteSurfaceSection(FEMesh& m)
 
 			m_ar.BeginChunk(PLT_FACE_LIST);
 			{
-				int n[5];
+				int n[FEBioPlotFile::PLT_MAX_FACET_NODES + 2];
 				for (int i=0; i<NF; ++i)
 				{
 					FESurfaceElement& f = s.Element(i);
 					int nf = f.Nodes();
 					n[0] = i+1;
-					n[1] = f.m_node[0];
-					n[2] = f.m_node[1];
-					n[3] = f.m_node[2];
-					n[4] = (nf==4?f.m_node[3]:n[3]);
-					m_ar.WriteChunk(PLT_FACE, n, 5);
+					n[1] = nf;
+					for (int i=0; i<nf; ++i) n[i+2] = f.m_node[i];
+					m_ar.WriteChunk(PLT_FACE, n, FEBioPlotFile::PLT_MAX_FACET_NODES);
 				}
 			}
 			m_ar.EndChunk();
@@ -793,7 +795,7 @@ bool FEBioPlotFile::ReadDictionary()
 //-----------------------------------------------------------------------------
 bool FEBioPlotFile::ReadDicList()
 {
-	vector<int> l; // empty filder
+	vector<int> l; // empty item list
 	while (m_ar.OpenChunk() == IO_OK)
 	{
 		unsigned int nid = m_ar.GetChunkID();
