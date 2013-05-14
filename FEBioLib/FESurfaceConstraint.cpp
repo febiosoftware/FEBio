@@ -184,7 +184,7 @@ void FESurfaceConstraint::Update(int niter)
 	FEMesh& mesh = *m_ss.GetMesh();
 
 	vec3d us, um, u0;
-	vec3d umi[4];
+	vec3d umi[FEElement::MAX_NODES];
 
 	// update gap functions
 	int npass = (m_btwo_pass?2:1);
@@ -261,7 +261,7 @@ void FESurfaceConstraint::ContactForces(FEGlobalVector& R)
 	double detJ;
 
 	vec3d dxr, dxs;
-	vec3d rt[4], r0[4];
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
 	double* w;
 
 	// natural coordinates of slave node in master element
@@ -271,7 +271,7 @@ void FESurfaceConstraint::ContactForces(FEGlobalVector& R)
 	vec3d tc;
 
 	// shape function values
-	double N[4];
+	double N[FEElement::MAX_NODES];
 
 	// element contact force vector
 	vector<double> fe;
@@ -420,12 +420,12 @@ void FESurfaceConstraint::ContactStiffness(FENLSolver* psolver)
 
 	double *Gr, *Gs, *w;
 	
-	vec3d rt[4], r0[4];
-	vec3d rtm[4];
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
+	vec3d rtm[FEElement::MAX_NODES];
 
 	double detJ, r, s;
 	vec3d dxr, dxs;
-	double H[4];
+	double H[FEElement::MAX_NODES];
 
 	vec3d gap, Lm, tc;
 
@@ -438,7 +438,7 @@ void FESurfaceConstraint::ContactStiffness(FENLSolver* psolver)
 	vector<int> mLM;
 	vector<int> LM0;
 
-	int n0[4];
+	int n0[FEElement::MAX_NODES];
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -456,7 +456,7 @@ void FESurfaceConstraint::ContactStiffness(FENLSolver* psolver)
 		for (j=0; j<ne0; ++j) n0[j] = pref->m_node[j];
 		r = ss.m_rs[nref][0];
 		s = ss.m_rs[nref][1];
-		double N0[4];
+		double N0[FEElement::MAX_NODES];
 		pref->shape_fnc(N0, r, s);
 
 		// number of degrees of freedom

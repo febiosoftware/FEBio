@@ -26,7 +26,7 @@ void FELocalMap::SetLocalNodes(int n1, int n2, int n3)
 
 mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 {
-	vec3d r0[8];
+	vec3d r0[FEElement::MAX_NODES];
 	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
 
 	vec3d a, b, c, d;
@@ -76,7 +76,7 @@ void FELocalMap::Serialize(DumpFile& ar)
 
 mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 {
-	vec3d r0[8];
+	vec3d r0[FEElement::MAX_NODES];
 	for (int i=0; i<el.Nodes(); ++i) r0[i] = m_mesh.Node(el.m_node[i]).m_r0;
 
 	double* H = el.H(n);

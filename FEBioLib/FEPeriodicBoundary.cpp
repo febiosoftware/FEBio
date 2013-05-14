@@ -161,7 +161,7 @@ void FEPeriodicBoundary::Update(int niter)
 	FEMesh& mesh = *m_ss.GetMesh();
 
 	vec3d us, um;
-	vec3d umi[4];
+	vec3d umi[FEElement::MAX_NODES];
 
 	// update gap functions
 	int npass = (m_btwo_pass?2:1);
@@ -225,7 +225,7 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 	vec3d tc;
 
 	// shape function values
-	double N[4];
+	double N[FEElement::MAX_NODES];
 
 	// element contact force vector
 	vector<double> fe;
@@ -239,7 +239,7 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 	vector<int> sLM;
 	vector<int> mLM;
 
-	vec3d r0[4], rt[4];
+	vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
 
 	int npass = (m_btwo_pass?2:1);
 	for (int np=0; np<npass; ++np)
@@ -258,7 +258,6 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 			ss.UnpackLM(sel, sLM);
 
 			nseln = sel.Nodes();
-			assert(nseln <= 4);
 
 			for (int i=0; i<nseln; ++i)
 			{
@@ -320,6 +319,10 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 					N[1] = r;
 					N[2] = s;
 				}
+				else
+				{
+					assert(false);
+				}
 
 				// calculate force vector
 				fe.resize(3*(nmeln+1));
@@ -366,17 +369,18 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 
 	matrix ke;
 
-	vector<int> lm(15);
-	vector<int> en(5);
+	const int MN = FEElement::MAX_NODES;
+	vector<int> lm(3*(MN+1));
+	vector<int> en(MN+1);
 
 	double *Gr, *Gs, *w;
-	vec3d rt[4], r0[4];
+	vec3d rt[MN], r0[MN];
 
-	vec3d rtm[4];
+	vec3d rtm[MN];
 
 	double detJ, r, s;
 	vec3d dxr, dxs;
-	double H[4];
+	double H[MN];
 
 	vec3d gap, Lm, tc;
 
@@ -404,7 +408,6 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 			ss.UnpackLM(se, sLM);
 
 			nseln = se.Nodes();
-			assert(nseln <= 4);
 
 			for (int i=0; i<nseln; ++i)
 			{
@@ -468,6 +471,10 @@ void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
 					H[0] = 1 - r - s;
 					H[1] = r;
 					H[2] = s;
+				}
+				else 
+				{
+					assert(false);
 				}
 
 				// number of degrees of freedom

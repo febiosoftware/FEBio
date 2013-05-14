@@ -151,7 +151,7 @@ void FERigidWallSurface::UpdateNormals()
 	int N = Nodes();
 	int NE = Elements();
 	for (i=0; i<N; ++i) nu[i] = vec3d(0,0,0);
-	vec3d y[4], e1, e2;
+	vec3d y[FEElement::MAX_NODES], e1, e2;
 
 	for (i=0; i<NE; ++i)
 	{
@@ -300,7 +300,7 @@ void FERigidWallInterface::ContactForces(FEGlobalVector& R)
 	double detJ;
 
 	vec3d dxr, dxs;
-	vec3d rt[4], r0[4];
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
 	double* w;
 
 	// normal force
@@ -413,7 +413,7 @@ void FERigidWallInterface::ContactStiffness(FENLSolver* psolver)
 	vector<int> en(1);
 
 	double *Gr, *Gs, *w;
-	vec3d rt[4], r0[4];
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
 
 	double detJ, tn;
 	vec3d dxr, dxs;

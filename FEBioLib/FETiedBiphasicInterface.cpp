@@ -127,7 +127,7 @@ void FETiedBiphasicSurface::ShallowCopy(FETiedBiphasicSurface &s)
 void FETiedBiphasicSurface::UpdateNodeNormals()
 {
 	int N = Nodes(), i, j, ne, jp1, jm1;
-	vec3d y[4], n;
+	vec3d y[FEElement::MAX_NODES], n;
 	
 	// zero nodal normals
 	zero(m_nn);
@@ -466,7 +466,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 	FESurfaceElement* pme;
 	vec3d r;
 	
-	double ps[4], p1;
+	double ps[FEElement::MAX_NODES], p1;
 	
 	// loop over all integration points
 	int n = 0;
@@ -509,7 +509,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 				// calculate the pressure gap function
 				bool mporo = ms.m_poro[pme->m_lid];
 				if (sporo && mporo) {
-					double pm[4];
+					double pm[FEElement::MAX_NODES];
 					for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
 					double p2 = pme->eval(pm, ss.m_rs[n][0], ss.m_rs[n][1]);
 					ss.m_pg[n] = p1 - p2;
@@ -551,8 +551,9 @@ void FETiedBiphasicInterface::ContactForces(FEGlobalVector& R)
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
-	double detJ[4], w[4], *Hs, Hm[4];
-	double N[32];
+	const int MN = FEElement::MAX_NODES;
+	double detJ[MN], w[MN], *Hs, Hm[MN];
+	double N[8*MN];
 
 	// get time step
 	double dt = m_pfem->GetCurrentStep()->m_dt;
@@ -733,7 +734,8 @@ void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
-	double detJ[4], w[4], *Hs, Hm[4], pt[4], dpr[4], dps[4];
+	const int MN = FEElement::MAX_NODES;
+	double detJ[MN], w[MN], *Hs, Hm[MN], pt[MN], dpr[MN], dps[MN];
 	matrix ke;
 
 	// get time step
@@ -785,7 +787,7 @@ void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
 			int nint = se.GaussPoints();
 			
 			// nodal pressures
-			double pn[4];
+			double pn[FEElement::MAX_NODES];
 			for (j=0; j<nseln; ++j) pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
 			
 			// copy the LM vector
@@ -829,7 +831,7 @@ void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
 					int nmeln = me.Nodes();
 					
 					// nodal pressure
-					double pm[4];
+					double pm[FEElement::MAX_NODES];
 					if (mporo) for (k=0; k<nmeln; ++k) pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
 					
 					// copy the LM vector
@@ -959,8 +961,8 @@ void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
 					vec3d gs[2];
 					ss.CoBaseVectors(se, j, gs);
 					
-					vec3d as[4];
-					mat3d As[4];
+					vec3d as[FEElement::MAX_NODES];
+					mat3d As[FEElement::MAX_NODES];
 					for (l=0; l<nseln; ++l) {
 						as[l] = nu ^ (gs[1]*Gr[l] - gs[0]*Gs[l]);
 						As[l] = t & as[l];

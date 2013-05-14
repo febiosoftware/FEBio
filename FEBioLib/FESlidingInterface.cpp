@@ -457,10 +457,11 @@ void FESlidingInterface::ContactForces(FEGlobalVector& R)
 	vector<int> sLM;
 	vector<int> mLM;
 
-	vec3d r0[6];
-	double w[6];
+	const int MN = FEElement::MAX_NODES;
+	vec3d r0[MN];
+	double w[MN];
 	double* Gr, *Gs;
-	double detJ[6];
+	double detJ[MN];
 	vec3d dxr, dxs;
 
 	// do two-pass
@@ -590,7 +591,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	vec3d tau1, tau2;
 
 	// max nr of master element nodes
-	const int MAXMN = 6;
+	const int MAXMN = FEElement::MAX_NODES;
 
 	// master element nodes
 	vec3d rtm[MAXMN];
@@ -793,7 +794,7 @@ void FESlidingInterface::ContactStiffness(FENLSolver* psolver)
 
 	matrix ke;
 
-	const int MAXMN = 6;
+	const int MAXMN = FEElement::MAX_NODES;
 	vector<int> lm(3*(MAXMN + 1));
 	vector<int> en(MAXMN+1);
 
@@ -908,7 +909,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 {
 	int i, j, k, l;
 
-	const int MAXMN = 6;
+	const int MAXMN = FEElement::MAX_NODES;
 
 	vector<int> lm(3*(MAXMN+1));
 	vector<int> en(MAXMN + 1);
@@ -1168,6 +1169,10 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 		{
 			const double Grs[6] = {4.0, 0.0, 0.0, -4.0, 4.0, -4.0};
 			g12 = rt[0]*Grs[0]+rt[1]*Grs[1]+rt[2]*Grs[2]+rt[3]*Grs[3]+rt[4]*Grs[4]+rt[5]*Grs[5];
+		}
+		else
+		{
+			assert(false);
 		}
 		double gt1 = g12*tau[0];
 		double gt2 = g12*tau[1];

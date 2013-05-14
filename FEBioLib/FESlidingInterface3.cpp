@@ -152,7 +152,7 @@ void FESlidingSurface3::ShallowCopy(FESlidingSurface3 &s)
 void FESlidingSurface3::UpdateNodeNormals()
 {
 	int N = Nodes(), i, j, ne, jp1, jm1;
-	vec3d y[4], n;
+	vec3d y[FEElement::MAX_NODES], n;
 	
 	// zero nodal normals
 	zero(m_nn);
@@ -569,8 +569,8 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 	double rs[2];
 	double Ln;
 	
-	double ps[4], p1;
-	double cs[4], c1;
+	double ps[FEElement::MAX_NODES], p1;
+	double cs[FEElement::MAX_NODES], c1;
 	
 	double R = m_srad*mesh.GetBoundingBox().radius();
 	
@@ -663,13 +663,13 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 					int mid = ms.m_solu[pme->m_lid];
 					bool msolu = (mid > -1) ? true : false;
 					if (sporo && mporo) {
-						double pm[4];
+						double pm[FEElement::MAX_NODES];
 						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
 						double p2 = pme->eval(pm, rs[0], rs[1]);
 						ss.m_pg[n] = p1 - p2;
 					}
 					if (ssolu && msolu && (sid == mid)) {
-						double cm[4];
+						double cm[FEElement::MAX_NODES];
 						for (int k=0; k<pme->Nodes(); ++k) cm[k] = mesh.Node(pme->m_node[k]).m_ct[sid];
 						double c2 = pme->eval(cm, rs[0], rs[1]);
 						ss.m_cg[n] = c1 - c2;
@@ -774,7 +774,7 @@ void FESlidingInterface3::Update(int niter)
 			int neln = el.Nodes();
 			
 			// get the normal tractions at the integration points
-			double ti[4], gap, eps;
+			double ti[FEElement::MAX_NODES], gap, eps;
 			for (i=0; i<nint; ++i, ++ni) 
 			{
 				gap = ss.m_gap[ni];
@@ -783,7 +783,7 @@ void FESlidingInterface3::Update(int niter)
 			}
 			
 			// project the data to the nodes
-			double tn[4];
+			double tn[FEElement::MAX_NODES];
 			el.project_to_nodes(ti, tn);
 			
 			// see if we need to make changes to the BC's
@@ -832,7 +832,7 @@ void FESlidingInterface3::Update(int niter)
 					{
 						// we found an element so let's calculate the nodal traction values for this element
 						// get the normal tractions at the integration points
-						double ti[4], gap, eps;
+						double ti[FEElement::MAX_NODES], gap, eps;
 						int nint = pse->GaussPoints();
 						int noff = ss.m_nei[pse->m_lid];
 						for (i=0; i<nint; ++i) 
@@ -843,7 +843,7 @@ void FESlidingInterface3::Update(int niter)
 						}
 						
 						// project the data to the nodes
-						double tn[4];
+						double tn[FEElement::MAX_NODES];
 						pse->project_to_nodes(ti, tn);
 						
 						// now evaluate the traction at the intersection point
@@ -883,8 +883,9 @@ void FESlidingInterface3::ContactForces(FEGlobalVector& R)
 	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
-	double detJ[4], w[4], *Hs, Hm[4];
-	double N[40];
+	const int MN = FEElement::MAX_NODES;
+	double detJ[MN], w[MN], *Hs, Hm[MN];
+	double N[10*MN];
 
 	FEModel& fem = *m_pfem;
 
@@ -1098,10 +1099,11 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
-	double detJ[4], w[4], *Hs, Hm[4];
-	double pt[4], dpr[4], dps[4];
-	double ct[4], dcr[4], dcs[4];
-	double N[40];
+	const int MN = FEElement::MAX_NODES;
+	double detJ[MN], w[MN], *Hs, Hm[MN];
+	double pt[MN], dpr[MN], dps[MN];
+	double ct[MN], dcr[MN], dcs[MN];
+	double N[10*MN];
 	matrix ke;
 
 	FEModel& fem = *m_pfem;
@@ -1153,7 +1155,8 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 			int nseln = se.Nodes();
 			int nint = se.GaussPoints();
 
-			double pn[4], cn[4];
+			double pn[FEElement::MAX_NODES], cn[FEElement::MAX_NODES];
+			assert(nseln == 4);
 			for (j=0; j<4; ++j)
 			{
 				pn[j] = ss.GetMesh()->Node(se.m_node[j]).m_pt;
@@ -1210,7 +1213,8 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 					int nmeln = me.Nodes();
 
 					// nodal data
-					double pm[4], cm[4];
+					double pm[FEElement::MAX_NODES], cm[FEElement::MAX_NODES];
+					assert(nmeln == 4);
 					for (k=0; k<nmeln; ++k) 
 					{
 						pm[k] = ms.GetMesh()->Node(me.m_node[k]).m_pt;
@@ -1387,7 +1391,7 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 					mat3d S1, S2;
 					S1.skew(gs[0]);
 					S2.skew(gs[1]);
-					mat3d As[4];
+					mat3d As[FEElement::MAX_NODES];
 					for (l=0; l<nseln; ++l)
 						As[l] = S2*Gr[l] - S1*Gs[l];
 					
@@ -1454,9 +1458,9 @@ void FESlidingInterface3::ContactStiffness(FENLSolver* psolver)
 					vec3d mnu = Gm[0] ^ Gm[1];
 					mnu.unit();
 					
-					double Hmr[4], Hms[4];
+					double Hmr[FEElement::MAX_NODES], Hms[FEElement::MAX_NODES];
 					me.shape_deriv(Hmr, Hms, r, s);
-					vec3d mm[4];
+					vec3d mm[FEElement::MAX_NODES];
 					for (k=0; k<nmeln; ++k) 
 						mm[k] = Gm[0]*Hmr[k] + Gm[1]*Hms[k];
 					
@@ -1722,7 +1726,7 @@ void FESlidingInterface3::UpdateContactPressures()
 				{
 					int mint = pme->GaussPoints();
 					int noff = ms.m_nei[pme->m_lid];
-					double ti[4];
+					double ti[FEElement::MAX_NODES];
 					for (j=0; j<mint; ++j) {
 						k = noff+j;
 						gap = ms.m_gap[k];
@@ -1730,7 +1734,7 @@ void FESlidingInterface3::UpdateContactPressures()
 						ti[j] = MBRACKET(ms.m_Lmd[k] + m_epsn*ms.m_epsn[k]*ms.m_gap[k]);
 					}
 					// project the data to the nodes
-					double tn[4];
+					double tn[FEElement::MAX_NODES];
 					pme->project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
 					double Ln = pme->eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);

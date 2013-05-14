@@ -75,7 +75,7 @@ void FERigidBody::UpdateCOM()
 	double* H;
 
 	// nodal coordinates
-	vec3d r0[8];
+	vec3d r0[FEElement::MAX_NODES];
 	
 	// loop over all elements
 	for (int nd=0; nd < mesh.Domains(); ++nd)

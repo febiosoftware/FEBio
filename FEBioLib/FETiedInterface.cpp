@@ -99,7 +99,7 @@ void FETiedInterface::Update(int niter)
 
 			// calculate the shape function values
 			int ne = pme->Nodes();
-			double H[4];
+			double H[FEElement::MAX_NODES];
 			if (ne == 4)
 			{
 
@@ -182,7 +182,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 	double detJ;
 
 	vec3d dxr, dxs;
-	vec3d rt[4], r0[4];
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
 	double* w;
 
 	// natural coordinates of slave node in master element
@@ -192,7 +192,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 	vec3d tc;
 
 	// shape function values
-	double N[4];
+	double N[FEElement::MAX_NODES];
 
 	// element contact force vector
 	vector<double> fe;
@@ -336,13 +336,13 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 	vector<int> en(5);
 
 	double *Gr, *Gs, *w;
-	vec3d rt[4], r0[4];
+	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
 
-	vec3d rtm[4];
+	vec3d rtm[FEElement::MAX_NODES];
 
 	double detJ, r, s;
 	vec3d dxr, dxs;
-	double H[4];
+	double H[FEElement::MAX_NODES];
 
 	vec3d gap, Lm, tc;
 
