@@ -594,7 +594,7 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 		{
 			if      (tag == "quad4") el.SetType(FE_QUAD4NI);
 			else if (tag == "tri3" ) el.SetType(FE_TRI3NI );
-			else if (tag == "tri6" ) el.SetType(FE_TRI6NI);
+			else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		else
