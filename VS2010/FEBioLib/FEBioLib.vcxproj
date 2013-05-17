@@ -750,6 +750,7 @@
     <ClInclude Include="..\..\FEBioLib\FEEllipsoidalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioLib\FEExplicitSolidSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FEFacet2FacetSliding.h" />
+    <ClInclude Include="..\..\FEBioLib\FEFacet2FacetTied.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberExpPowUncoupled.h" />
     <ClInclude Include="..\..\FEBioLib\FEFiberMaterial.h" />
@@ -899,6 +900,7 @@
     <ClCompile Include="..\..\FEBioLib\FEEllipsoidalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEExplicitSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFacet2FacetSliding.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEFacet2FacetTied.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPowUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEFiberMaterial.cpp" />

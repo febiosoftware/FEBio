@@ -462,6 +462,9 @@
     <ClInclude Include="..\..\FEBioLib\FEUncoupledActiveContraction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FEFacet2FacetTied.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp">
@@ -906,6 +909,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FEUncoupledActiveContraction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FEFacet2FacetTied.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
