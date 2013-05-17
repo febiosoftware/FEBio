@@ -902,6 +902,28 @@ void FESurface::ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec
 	t[1] = e[0]*Mi[1][0] + e[1]*Mi[1][1];
 }
 
+//-----------------------------------------------------------------------------
+double FESurface::jac0(FESurfaceElement &el, int n)
+{
+	const int nseln = el.Nodes();
+	vec3d r0[FEElement::MAX_NODES];
+	for (int i=0; i<nseln; ++i) r0[i] = GetMesh()->Node(el.m_node[i]).m_r0;
+
+	double* Gr = el.Gr(n);
+	double* Gs = el.Gs(n);
+	vec3d dxr, dxs;
+	for (int k=0; k<nseln; ++k)
+	{
+		dxr.x += Gr[k]*r0[k].x;
+		dxr.y += Gr[k]*r0[k].y;
+		dxr.z += Gr[k]*r0[k].z;
+
+		dxs.x += Gs[k]*r0[k].x;
+		dxs.y += Gs[k]*r0[k].y;
+		dxs.z += Gs[k]*r0[k].z;
+	}
+	return (dxr ^ dxs).norm();
+}
 
 //-----------------------------------------------------------------------------
 // This function calculates the intersection of a ray with a triangle

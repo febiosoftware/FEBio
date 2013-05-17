@@ -15,6 +15,7 @@
 #include <FEBioLib/FETiedInterface.h>
 #include <FEBioLib/FETiedBiphasicInterface.h>
 #include <FEBioLib/FEFacet2FacetSliding.h>
+#include <FEBioLib/FEFacet2FacetTied.h>
 #include <FEBioLib/FESlidingInterfaceBW.h>
 #include <FEBioLib/FEPeriodicBoundary.h>
 #include <FEBioLib/FESurfaceConstraint.h>
@@ -1338,6 +1339,55 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 					else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
 					FETiedContactSurface& s = (ntype == 1? ps->ms : ps->ss);
+					m.AddSurface(&s);
+
+					int nfmt = 0;
+					const char* szfmt = tag.AttributeValue("format", true);
+					if (szfmt)
+					{
+						if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+						else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+					}
+
+					// read the surface section
+					ParseSurfaceSection(tag, s, nfmt, true);
+				}
+				else throw XMLReader::InvalidTag(tag);
+			}
+
+			++tag;
+		}
+		while (!tag.isend());
+	}
+	else if (strcmp(szt, "facet-to-facet tied") == 0)
+	{
+		// --- F2F T I E D   C O N T A C T  ---
+
+		FEFacet2FacetTied* pt = new FEFacet2FacetTied(&fem);
+		fem.AddContactInterface(pt);
+
+		// add this contact interface to the current step
+		if (m_pim->m_nsteps > 0)
+		{
+			GetStep()->AddContactInterface(pt);
+			pt->Deactivate();
+		}
+
+		FEParameterList& pl = pt->GetParameterList();
+
+		++tag;
+		do
+		{
+			if (m_pim->ReadParameter(tag, pl) == false)
+			{
+				if (tag == "surface")
+				{
+					const char* sztype = tag.AttributeValue("type");
+					int ntype;
+					if (strcmp(sztype, "master") == 0) ntype = 1;
+					else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+					FEFacetTiedSurface& s = dynamic_cast<FEFacetTiedSurface&>((ntype == 1? *pt->GetMasterSurface(): *pt->GetSlaveSurface()));
 					m.AddSurface(&s);
 
 					int nfmt = 0;

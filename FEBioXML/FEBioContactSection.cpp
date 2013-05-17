@@ -4,6 +4,7 @@
 #include <FEBioLib/FESlidingInterface2.h>
 #include <FEBioLib/FESlidingInterface3.h>
 #include <FEBioLib/FETiedInterface.h>
+#include <FEBioLib/FEFacet2FacetTied.h>
 #include <FEBioLib/FETiedBiphasicInterface.h>
 #include <FEBioLib/FEFacet2FacetSliding.h>
 #include <FEBioLib/FESlidingInterfaceBW.h>
@@ -34,6 +35,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
 			else if (strcmp(sztype, "sliding2"              ) == 0) ParseSlidingInterface2    (tag);
 			else if (strcmp(sztype, "sliding3"              ) == 0) ParseSlidingInterface3    (tag);
 			else if (strcmp(sztype, "tied"                  ) == 0) ParseTiedInterface        (tag);
+			else if (strcmp(sztype, "facet-to-facet tied"   ) == 0) ParseFacetTiedInterface   (tag);
 			else if (strcmp(sztype, "periodic boundary"     ) == 0) ParsePeriodicBoundary     (tag);
 			else if (strcmp(sztype, "surface constraint"    ) == 0) ParseSurfaceConstraint    (tag);
 			else if (strcmp(sztype, "rigid_wall"            ) == 0) ParseRigidWall            (tag);
@@ -277,6 +279,51 @@ void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 			else throw XMLReader::InvalidTag(tag);
 		}
 
+		++tag;
+	}
+	while (!tag.isend());
+}
+
+//-----------------------------------------------------------------------------
+// --- F2F T I E D   C O N T A C T  ---
+void FEBioContactSection::ParseFacetTiedInterface(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& m = fem.GetMesh();
+
+	FEFacet2FacetTied* pt = new FEFacet2FacetTied(&fem);
+	fem.AddContactInterface(pt);
+
+	FEParameterList& pl = pt->GetParameterList();
+
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pl) == false)
+		{
+			if (tag == "surface")
+			{
+				const char* sztype = tag.AttributeValue("type");
+				int ntype;
+				if (strcmp(sztype, "master") == 0) ntype = 1;
+				else if (strcmp(sztype, "slave") == 0) ntype = 2;
+
+				FEFacetTiedSurface& s = dynamic_cast<FEFacetTiedSurface&>((ntype == 1? *pt->GetMasterSurface(): *pt->GetSlaveSurface()));
+				m.AddSurface(&s);
+
+				int nfmt = 0;
+				const char* szfmt = tag.AttributeValue("format", true);
+				if (szfmt)
+				{
+					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
+					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
+				}
+
+				// read the surface section
+				ParseSurfaceSection(tag, s, nfmt, true);
+			}
+			else throw XMLReader::InvalidTag(tag);
+		}
 		++tag;
 	}
 	while (!tag.isend());

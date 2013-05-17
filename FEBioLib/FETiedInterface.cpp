@@ -294,114 +294,59 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 //! Calculate the stiffness matrix contribution.
 void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 {
-	int j, k, l, n, m;
-	int nseln, nmeln, ndof;
-
+	vector<int> sLM, mLM, lm, en;
+	const int MN = FEElement::MAX_NODES;
 	matrix ke;
 
-	const int MN = FEElement::MAX_NODES;
-	vector<int> lm(3*(MN+1));
-	vector<int> en(MN + 1);
-
-	double *Gr, *Gs, *w;
-	vec3d rt[MN], r0[MN];
-
-	vec3d rtm[MN];
-
-	double detJ, r, s;
-	vec3d dxr, dxs;
+	// shape functions
 	double H[MN];
 
-	vec3d gap, Lm, tc;
-
-	// curvature tensor K
-	double K[2][2] = {0};
-
-//	double scale = -0.0035*m_fem.GetMesh().GetBoundingBox().radius();
-
-	vector<int> sLM;
-	vector<int> mLM;
-
 	// loop over all slave elements
-	int ne = ss.Elements();
-	for (j=0; j<ne; ++j)
+	const int NE = ss.Elements();
+	for (int i=0; i<NE; ++i)
 	{
-		FESurfaceElement& se = ss.Element(j);
+		// get the next element
+		FESurfaceElement& se = ss.Element(i);
+		int nseln = se.Nodes();
 
 		// get the element's LM vector
 		ss.UnpackLM(se, sLM);
 
-		nseln = se.Nodes();
-
-		for (int i=0; i<nseln; ++i)
-		{
-			r0[i] = ss.GetMesh()->Node(se.m_node[i]).m_r0;
-			rt[i] = ss.GetMesh()->Node(se.m_node[i]).m_rt;
-		}
-
-		w = se.GaussWeights();
+		double* w = se.GaussWeights();
 
 		// loop over all integration points (that is nodes)
-		for (n=0; n<nseln; ++n)
+		for (int n=0; n<nseln; ++n)
 		{
-			Gr = se.Gr(n);
-			Gs = se.Gs(n);
+			int m = se.m_lnode[n];
 
-			m = se.m_lnode[n];
-
-			// see if this node's constraint is active
-			// that is, if it has a master element associated with it
-			if (ss.m_pme[m] != 0)
+			// get the master element
+			FESurfaceElement* pme = ss.m_pme[m];
+			if (pme)
 			{
-				// calculate jacobian
-				dxr = dxs = vec3d(0,0,0);
-				for (k=0; k<nseln; ++k)
-				{
-					dxr.x += Gr[k]*r0[k].x;
-					dxr.y += Gr[k]*r0[k].y;
-					dxr.z += Gr[k]*r0[k].z;
-
-					dxs.x += Gs[k]*r0[k].x;
-					dxs.y += Gs[k]*r0[k].y;
-					dxs.z += Gs[k]*r0[k].z;
-				}
-
-				detJ = (dxr ^ dxs).norm();
-
 				// get the master element
-				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
+				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pme);
+				int nmeln = me.Nodes();
 				ms.UnpackLM(me, mLM);
 
-				nmeln = me.Nodes();
-
-				// get the master element node positions
-				for (k=0; k<nmeln; ++k) rtm[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
+				// calculate jacobian
+				double detJ = ss.jac0(se, n);
 
 				// slave node natural coordinates in master element
-				r = ss.m_rs[m][0];
-				s = ss.m_rs[m][1];
-
-				// slave gap
-				gap = ss.m_gap[m];
-
-				// lagrange multiplier
-				Lm = ss.m_Lm[m];
-
-				// get slave node normal force
-				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps; //ss.T[m];
+				double r = ss.m_rs[m][0];
+				double s = ss.m_rs[m][1];
 
 				// get the master shape function values at this slave node
 				me.shape_fnc(H, r, s);
 
 				// number of degrees of freedom
-				ndof = 3*(1 + nmeln);
+				int ndof = 3*(1 + nmeln);
 
 				// fill stiffness matrix
 				ke.resize(ndof, ndof); ke.zero();
 				ke[0][0] = w[n]*detJ*m_eps;
 				ke[1][1] = w[n]*detJ*m_eps;
 				ke[2][2] = w[n]*detJ*m_eps;
-				for (k=0; k<nmeln; ++k)
+				for (int k=0; k<nmeln; ++k)
 				{
 					ke[0][3+3*k  ] = -w[n]*detJ*m_eps*H[k];
 					ke[1][3+3*k+1] = -w[n]*detJ*m_eps*H[k];
@@ -411,8 +356,8 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 					ke[3+3*k+1][1] = -w[n]*detJ*m_eps*H[k];
 					ke[3+3*k+2][2] = -w[n]*detJ*m_eps*H[k];
 				}
-				for (k=0; k<nmeln; ++k)
-					for (l=0; l<nmeln; ++l)
+				for (int k=0; k<nmeln; ++k)
+					for (int l=0; l<nmeln; ++l)
 					{
 						ke[3+3*k  ][3+3*l  ] = w[n]*detJ*m_eps*H[k]*H[l];
 						ke[3+3*k+1][3+3*l+1] = w[n]*detJ*m_eps*H[k]*H[l];
@@ -420,11 +365,12 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 					}
 
 				// create lm array
+				lm.resize(3*(1+nmeln));
 				lm[0] = sLM[n*3  ];
 				lm[1] = sLM[n*3+1];
 				lm[2] = sLM[n*3+2];
 
-				for (k=0; k<nmeln; ++k)
+				for (int k=0; k<nmeln; ++k)
 				{
 					lm[3*(k+1)  ] = mLM[k*3  ];
 					lm[3*(k+1)+1] = mLM[k*3+1];
@@ -434,7 +380,7 @@ void FETiedInterface::ContactStiffness(FENLSolver* psolver)
 				// create the en array
 				en.resize(nmeln+1);
 				en[0] = se.m_node[n];
-				for (k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
+				for (int k=0; k<nmeln; ++k) en[k+1] = me.m_node[k];
 						
 				// assemble stiffness matrix
 				psolver->AssembleStiffness(en, lm, ke);

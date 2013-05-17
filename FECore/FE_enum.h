@@ -130,7 +130,8 @@ enum FE_Contact_Types {
 	FE_SURFACE_CONSTRAINT	 = 7,
 	FE_CONTACT_SLIDING3		 = 8,
 	FE_CONTACT_TIED_BIPHASIC = 9,
-	FE_CONTACT_SLIDINGBW	 = 10
+	FE_CONTACT_SLIDINGBW	 = 10,
+	FE_FACET2FACET_TIED		 = 11
 };
 
 ///////////////////////////////////////////////////////////////////////////////

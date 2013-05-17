@@ -15,6 +15,7 @@ protected:
 	void ParseSlidingInterface2    (XMLTag& tag);
 	void ParseSlidingInterface3    (XMLTag& tag);
 	void ParseTiedInterface        (XMLTag& tag);
+	void ParseFacetTiedInterface   (XMLTag& tag);
 	void ParsePeriodicBoundary     (XMLTag& tag);
 	void ParseSurfaceConstraint    (XMLTag& tag);
 	void ParseRigidWall            (XMLTag& tag);

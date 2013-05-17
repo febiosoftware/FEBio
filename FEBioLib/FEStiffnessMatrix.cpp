@@ -9,6 +9,7 @@
 #include "FETiedBiphasicInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
+#include "FEFacet2FacetTied.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
@@ -433,6 +434,63 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 			}
 		}
 	}
+
+	// facet-to-facet tied interfaces
+	FEFacet2FacetTied* pfti = dynamic_cast<FEFacet2FacetTied*>(pci);
+	if (pfti)
+	{
+		vector<int> lm(6*FEElement::MAX_NODES*2);
+
+		FEFacetTiedSurface& ss = dynamic_cast<FEFacetTiedSurface&>(*pfti->GetSlaveSurface ());
+		FEFacetTiedSurface& ms = dynamic_cast<FEFacetTiedSurface&>(*pfti->GetMasterSurface());
+
+		int ni = 0, k, l;
+		for (int j=0; j<ss.Elements(); ++j)
+		{
+			FESurfaceElement& se = ss.Element(j);
+			int nint = se.GaussPoints();
+			int* sn = &se.m_node[0];
+			for (k=0; k<nint; ++k, ++ni)
+			{
+				FESurfaceElement* pe = ss.m_pme[ni];
+				if (pe != 0)
+				{
+					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					int* mn = &me.m_node[0];
+
+					lm.assign(lm.size(), -1);
+
+					int nseln = se.Nodes();
+					int nmeln = me.Nodes();
+
+					for (l=0; l<nseln; ++l)
+					{
+						id = mesh.Node(sn[l]).m_ID;
+						lm[6*l  ] = id[DOF_X];
+						lm[6*l+1] = id[DOF_Y];
+						lm[6*l+2] = id[DOF_Z];
+						lm[6*l+3] = id[DOF_RU];
+						lm[6*l+4] = id[DOF_RV];
+						lm[6*l+5] = id[DOF_RW];
+					}
+
+					for (l=0; l<nmeln; ++l)
+					{
+						id = mesh.Node(mn[l]).m_ID;
+						lm[6*(l+nseln)  ] = id[DOF_X];
+						lm[6*(l+nseln)+1] = id[DOF_Y];
+						lm[6*(l+nseln)+2] = id[DOF_Z];
+						lm[6*(l+nseln)+3] = id[DOF_RU];
+						lm[6*(l+nseln)+4] = id[DOF_RV];
+						lm[6*(l+nseln)+5] = id[DOF_RW];
+					}
+
+					build_add(lm);
+				}
+			}
+		}
+	}
+
 
 	// sliding-tension-compression interfaces
 	FESlidingInterfaceBW* psbw = dynamic_cast<FESlidingInterfaceBW*>(pci);

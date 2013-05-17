@@ -390,6 +390,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEFacet2FacetTied.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEFiberExpPow.cpp"
 				>
 			</File>
@@ -989,6 +993,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEFacet2FacetSliding.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEFacet2FacetTied.h"
 				>
 			</File>
 			<File

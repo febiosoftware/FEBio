@@ -10,6 +10,7 @@
 #include "FEPeriodicBoundary.h"
 #include "FESurfaceConstraint.h"
 #include "FEFacet2FacetSliding.h"
+#include "FEFacet2FacetTied.h"
 #include "FERigidJoint.h"
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"

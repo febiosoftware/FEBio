@@ -14,6 +14,7 @@
 #include "FETiedBiphasicInterface.h"
 #include "FERigidWallInterface.h"
 #include "FEFacet2FacetSliding.h"
+#include "FEFacet2FacetTied.h"
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FEPeriodicBoundary.h"
@@ -907,6 +908,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 			case FE_CONTACT_SLIDING3     : ps = new FESlidingInterface3    (this); break;
 			case FE_CONTACT_TIED_BIPHASIC: ps = new FETiedBiphasicInterface(this); break;
 			case FE_CONTACT_SLIDINGBW    : ps = new FESlidingInterfaceBW   (this); break;
+			case FE_FACET2FACET_TIED     : ps = new FEFacet2FacetTied      (this); break;
 			default:
 				assert(false);
 			}

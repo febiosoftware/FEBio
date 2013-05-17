@@ -137,6 +137,9 @@ public:
 	//! calculates contravariant base vectors of a surface
 	void ContraBaseVectors0(FESurfaceElement& el, double r, double s, vec3d t[2]);
 
+	//! Jacobian in reference configuration for integration point n
+	double jac0(FESurfaceElement& el, int n);
+
 protected:
 	vector<FESurfaceElement>	m_el;	//!< surface elements
 
