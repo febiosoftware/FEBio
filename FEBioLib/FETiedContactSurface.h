@@ -20,9 +20,7 @@ public:
 	//! shallow copy
 	void ShallowCopy(FETiedContactSurface& s);
 
-	//! Update the surface data
-	void Update();
-
+	//! data serialization
 	void Serialize(DumpFile& ar);
 
 public:

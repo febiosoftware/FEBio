@@ -27,14 +27,11 @@ bool FEFacetTiedSurface::Init()
 	if (FEContactSurface::Init() == false) return false;
 
 	// count how many integration points we have
-	// and initialize the element offset array (nei)
 	int nint = 0;
 	int NE = Elements();
-	m_nei.resize(NE);
 	for (int i=0; i<NE; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-		m_nei[i] = nint;
 		nint += el.GaussPoints();
 	}
 
@@ -342,9 +339,6 @@ void FEFacet2FacetTied::ContactForces(FEGlobalVector& R)
 void FEFacet2FacetTied::ContactStiffness(FENLSolver* psolver)
 {
 	vector<int> sLM, mLM, LM, en;
-	const int MN = FEElement::MAX_NODES;
-	const int ME = 3*MN*2;
-	double N[ME];
 	matrix ke;
 
 	// shape functions
@@ -391,27 +385,46 @@ void FEFacet2FacetTied::ContactStiffness(FENLSolver* psolver)
 				double s = m_ss.m_rs[ni][1];
 				me.shape_fnc(Hm, r, s);
 
-				// calculate the N-vector
-				for (int k=0; k<nseln; ++k)
-				{
-					N[3*k  ] = Hs[k];
-					N[3*k+1] = Hs[k];
-					N[3*k+2] = Hs[k];
-				}
-				for (int k=0; k<nmeln; ++k)
-				{
-					N[3*(k+nseln)  ] = -Hm[k];
-					N[3*(k+nseln)+1] = -Hm[k];
-					N[3*(k+nseln)+2] = -Hm[k];
-				}
-
 				// calculate degrees of freedom
 				int ndof = 3*(nseln + nmeln);
 
 				// create the stiffness matrix
 				ke.resize(ndof, ndof);
+				ke.zero();
+				for (int k=0; k<nseln; ++k)
+				{
+					for (int l=0; l<nseln; ++l)
+					{
+						ke[3*k  ][3*l  ] = Hs[k]*Hs[l];
+						ke[3*k+1][3*l+1] = Hs[k]*Hs[l];
+						ke[3*k+2][3*l+2] = Hs[k]*Hs[l];
+					}
+				}
+
+				for (int k=0; k<nseln; ++k)
+				{
+					for (int l=0; l<nmeln; ++l)
+					{
+						ke[3*k  ][3*(l+nseln)  ] = -Hs[k]*Hm[l];
+						ke[3*k+1][3*(l+nseln)+1] = -Hs[k]*Hm[l];
+						ke[3*k+2][3*(l+nseln)+2] = -Hs[k]*Hm[l];
+
+						ke[3*(l+nseln)  ][3*k  ] = -Hs[k]*Hm[l];
+						ke[3*(l+nseln)+1][3*k+1] = -Hs[k]*Hm[l];
+						ke[3*(l+nseln)+2][3*k+2] = -Hs[k]*Hm[l];
+					}
+				}
+
+				for (int k=0; k<nmeln; ++k)
+					for (int l=0; l<nmeln; ++l)
+					{
+						ke[3*(k+nseln)  ][3*(l+nseln)  ] = Hm[k]*Hm[l];
+						ke[3*(k+nseln)+1][3*(l+nseln)+1] = Hm[k]*Hm[l];
+						ke[3*(k+nseln)+2][3*(l+nseln)+2] = Hm[k]*Hm[l];
+					}
+
 				for (int k=0; k<ndof; ++k)
-					for (int l=0; l<ndof; ++l) ke[k][l] = m_eps*N[k]*N[l]*detJ*w[n];
+					for (int l=0; l<ndof; ++l) ke[k][l] *= m_eps*detJ*w[n];
 
 				// build the LM vector
 				LM.resize(ndof);

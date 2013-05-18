@@ -154,24 +154,6 @@ void FETiedInterface::ProjectSurface(FETiedContactSurface& ss, FETiedContactSurf
 
 void FETiedInterface::ContactForces(FEGlobalVector& R)
 {
-	int j, k, l, m, n;
-	int nseln, nmeln;
-
-	double *Gr, *Gs;
-
-	// jacobian
-	double detJ;
-
-	vec3d dxr, dxs;
-	vec3d rt[FEElement::MAX_NODES], r0[FEElement::MAX_NODES];
-	double* w;
-
-	// natural coordinates of slave node in master element
-	double r, s;
-
-	// contact force
-	vec3d tc;
-
 	// shape function values
 	double N[FEElement::MAX_NODES];
 
@@ -188,8 +170,8 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 	vector<int> mLM;
 
 	// loop over all slave facets
-	int ne = ss.Elements();
-	for (j=0; j<ne; ++j)
+	const int NE = ss.Elements();
+	for (int j=0; j<NE; ++j)
 	{
 		// get the slave element
 		FESurfaceElement& sel = ss.Element(j);
@@ -197,23 +179,14 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 		// get the element's LM vector
 		ss.UnpackLM(sel, sLM);
 
-		nseln = sel.Nodes();
+		int nseln = sel.Nodes();
 
-		for (int i=0; i<nseln; ++i)
-		{
-			r0[i] = ss.GetMesh()->Node(sel.m_node[i]).m_r0;
-			rt[i] = ss.GetMesh()->Node(sel.m_node[i]).m_rt;
-		}
-
-		w = sel.GaussWeights();
+		double* w = sel.GaussWeights();
 
 		// loop over slave element nodes (which are the integration points as well)
-		for (n=0; n<nseln; ++n)
+		for (int n=0; n<nseln; ++n)
 		{
-			Gr = sel.Gr(n);
-			Gs = sel.Gs(n);
-
-			m = sel.m_lnode[n];
+			int m = sel.m_lnode[n];
 
 			// see if this node's constraint is active
 			// that is, if it has a master element associated with it
@@ -222,33 +195,21 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 			if (ss.m_pme[m] != 0)
 			{
 				// calculate jacobian
-				dxr = dxs = vec3d(0,0,0);
-				for (k=0; k<nseln; ++k)
-				{
-					dxr.x += Gr[k]*r0[k].x;
-					dxr.y += Gr[k]*r0[k].y;
-					dxr.z += Gr[k]*r0[k].z;
-
-					dxs.x += Gs[k]*r0[k].x;
-					dxs.y += Gs[k]*r0[k].y;
-					dxs.z += Gs[k]*r0[k].z;
-				}
-
-				detJ = (dxr ^ dxs).norm();
+				double detJ = ss.jac0(sel, n);
 
 				// get slave node contact force
-				tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
+				vec3d tc = ss.m_Lm[m] + ss.m_gap[m]*m_eps;
 
 				// get the master element
 				FESurfaceElement& mel = dynamic_cast<FESurfaceElement&> (*ss.m_pme[m]);
 				ms.UnpackLM(mel, mLM);
 
-				nmeln = mel.Nodes();
+				int nmeln = mel.Nodes();
 
 				// isoparametric coordinates of the projected slave node
 				// onto the master element
-				r = ss.m_rs[m][0];
-				s = ss.m_rs[m][1];
+				double r = ss.m_rs[m][0];
+				double s = ss.m_rs[m][1];
 
 				// get the master shape function values at this slave node
 				mel.shape_fnc(N, r, s);
@@ -258,7 +219,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 				fe[0] = -detJ*w[n]*tc.x;
 				fe[1] = -detJ*w[n]*tc.y;
 				fe[2] = -detJ*w[n]*tc.z;
-				for (l=0; l<nmeln; ++l)
+				for (int l=0; l<nmeln; ++l)
 				{	
 					fe[3*(l+1)  ] = detJ*w[n]*tc.x*N[l];
 					fe[3*(l+1)+1] = detJ*w[n]*tc.y*N[l];
@@ -271,7 +232,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 				lm[1] = sLM[n*3+1];
 				lm[2] = sLM[n*3+2];
 
-				for (l=0; l<nmeln; ++l)
+				for (int l=0; l<nmeln; ++l)
 				{
 					lm[3*(l+1)  ] = mLM[l*3  ];
 					lm[3*(l+1)+1] = mLM[l*3+1];
@@ -281,7 +242,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 				// fill the en array
 				en.resize(nmeln+1);
 				en[0] = sel.m_node[n];
-				for (l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
+				for (int l=0; l<nmeln; ++l) en[l+1] = mel.m_node[l];
 
 				// assemble into global force vector
 				R.Assemble(en, lm, fe);
