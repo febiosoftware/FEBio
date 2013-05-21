@@ -98,6 +98,7 @@
 #include "FETriphasic.h"
 #include "FEBioPlot/FEPlotNodeData.h"
 #include "FEBioPlot/FEPlotSurfaceData.h"
+#include <FECore/FECoordSysMap.h>
 
 void InitFEBioLibrary()
 {
@@ -250,4 +251,11 @@ REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
 REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );
 REGISTER_FEBIO_CLASS(FEPlotContactPressure , FEPlotData, "contact pressure");
 REGISTER_FEBIO_CLASS(FEPlotContactTraction , FEPlotData, "contact traction");
+
+//-----------------------------------------------------------------------------
+// Classes derived from FECoordSysMap
+REGISTER_FEBIO_CLASS(FELocalMap      , FECoordSysMap, "local"      );
+REGISTER_FEBIO_CLASS(FESphericalMap  , FECoordSysMap, "spherical"  );
+REGISTER_FEBIO_CLASS(FECylindricalMap, FECoordSysMap, "cylindrical");
+REGISTER_FEBIO_CLASS(FEVectorMap     , FECoordSysMap, "vector"     );
 }

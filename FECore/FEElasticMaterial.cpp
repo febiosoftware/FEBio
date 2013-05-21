@@ -173,14 +173,14 @@ void FEElasticMaterial::Serialize(DumpFile& ar)
 		if (m_pmap) delete m_pmap;
 		m_pmap = 0;
 		assert(ntype != -1);
-		FEMesh& mesh = ar.GetFEModel()->GetMesh();
+		FEModel* pfem = ar.GetFEModel();
 		switch (ntype)
 		{
 		case FE_MAP_NONE    : m_pmap = 0; break;
-		case FE_MAP_LOCAL   : m_pmap = new FELocalMap      (mesh); break;
-		case FE_MAP_SPHERE  : m_pmap = new FESphericalMap  (mesh); break;
-		case FE_MAP_CYLINDER: m_pmap = new FECylindricalMap(mesh); break;
-		case FE_MAP_VECTOR  : m_pmap = new FEVectorMap     (    ); break;
+		case FE_MAP_LOCAL   : m_pmap = new FELocalMap      (pfem); break;
+		case FE_MAP_SPHERE  : m_pmap = new FESphericalMap  (pfem); break;
+		case FE_MAP_CYLINDER: m_pmap = new FECylindricalMap(pfem); break;
+		case FE_MAP_VECTOR  : m_pmap = new FEVectorMap     (pfem); break;
 		}
 		if (m_pmap) m_pmap->Serialize(ar);
 	}

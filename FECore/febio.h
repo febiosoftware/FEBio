@@ -118,6 +118,8 @@ template <typename T> inline int FEBioKernel::Count()
 
 //-----------------------------------------------------------------------------
 //! This class helps with the registration of a class with the FEBio framework
+//! The TDerived class is the typename of the class to be registered.
+//! The TBase class is the name of the base class, that is the class that TDerived inherits from
 template <typename TDerived, typename TBase> class FERegisterClass_T : public FEBioFactory_T<TBase>
 {
 public:
@@ -132,6 +134,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// Register a class using default creation parameters
 #define REGISTER_FEBIO_CLASS(theClass, theBase, theName) \
 	static FERegisterClass_T<theClass, theBase> _##theClass##_rc(theName);
 

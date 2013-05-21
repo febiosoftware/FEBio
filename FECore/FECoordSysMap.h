@@ -13,6 +13,7 @@
 #include "FEElement.h"
 #include "DumpFile.h"
 
+class FEModel;
 class FEMesh;
 
 #define FE_MAP_NONE		0
@@ -44,7 +45,7 @@ public:
 class FELocalMap : public FECoordSysMap
 {
 public:
-	FELocalMap(FEMesh& m);
+	FELocalMap(FEModel* pfem);
 
 	void SetLocalNodes(int n1, int n2, int n3);
 
@@ -62,7 +63,7 @@ protected:
 class FESphericalMap : public FECoordSysMap
 {
 public:
-	FESphericalMap(FEMesh& mesh) : FECoordSysMap(FE_MAP_SPHERE), m_mesh(mesh) {}
+	FESphericalMap(FEModel* pfem);
 
 	void SetSphereCenter(vec3d c) { m_c = c; }
 
@@ -81,7 +82,7 @@ protected:
 class FECylindricalMap : public FECoordSysMap
 {
 public:
-	FECylindricalMap(FEMesh& mesh);
+	FECylindricalMap(FEModel* pfem);
 
 	void SetCylinderCenter(vec3d c) { m_c = c; }
 
@@ -105,7 +106,7 @@ protected:
 class FEVectorMap : public FECoordSysMap
 {
 public:
-	FEVectorMap() : FECoordSysMap(FE_MAP_VECTOR) {}
+	FEVectorMap(FEModel* pfem) : FECoordSysMap(FE_MAP_VECTOR) {}
 
 	void SetVectors(vec3d a, vec3d d) { m_a = a; m_d = d; }
 

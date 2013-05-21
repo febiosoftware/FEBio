@@ -5,12 +5,13 @@
 #include "stdafx.h"
 #include "FECoordSysMap.h"
 #include "FEMesh.h"
+#include "FEModel.h"
 
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 // FELocalMap
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 
-FELocalMap::FELocalMap(FEMesh& mesh) : FECoordSysMap(FE_MAP_LOCAL), m_mesh(mesh)
+FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(FE_MAP_LOCAL), m_mesh(pfem->GetMesh())
 {
 	m_n[0] = 0;
 	m_n[1] = 1;
@@ -70,9 +71,11 @@ void FELocalMap::Serialize(DumpFile& ar)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 // FESphericalMap
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+
+FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(FE_MAP_SPHERE), m_mesh(pfem->GetMesh()) {}
 
 mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 {
@@ -124,7 +127,7 @@ void FESphericalMap::Serialize(DumpFile& ar)
 //=============================================================================
 // FECylindricalMap
 //-----------------------------------------------------------------------------
-FECylindricalMap::FECylindricalMap(FEMesh& mesh) : FECoordSysMap(FE_MAP_CYLINDER), m_mesh(mesh)
+FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(FE_MAP_CYLINDER), m_mesh(pfem->GetMesh())
 {
 	m_c = vec3d(0,0,0);
 	m_a = vec3d(0,0,1);
@@ -188,9 +191,9 @@ void FECylindricalMap::Serialize(DumpFile& ar)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////
+//=============================================================================
 // FEVectorMap
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
 
 mat3d FEVectorMap::LocalElementCoord(FEElement& el, int n)
 {
