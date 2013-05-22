@@ -11,13 +11,30 @@
 // FELocalMap
 //-----------------------------------------------------------------------------
 
+BEGIN_PARAMETER_LIST(FELocalMap, FECoordSysMap)
+	ADD_PARAMETERV(m_n, FE_PARAM_INTV, 3, "local");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FELocalMap::FELocalMap(FEModel* pfem) : FECoordSysMap(FE_MAP_LOCAL), m_mesh(pfem->GetMesh())
 {
 	m_n[0] = 0;
-	m_n[1] = 1;
-	m_n[2] = 3;
+	m_n[1] = 0;
+	m_n[2] = 0;
 }
 
+//-----------------------------------------------------------------------------
+void FELocalMap::Init()
+{
+	if ((m_n[0]==0)&&(m_n[1]==0)&&(m_n[2]==0)) { m_n[0] = 1; m_n[1] = 2; m_n[2] = 4; }
+	if (m_n[2] == 0) m_n[2] = m_n[1];
+
+	m_n[0] -= 1;
+	m_n[1] -= 1;
+	m_n[2] -= 1;
+}
+
+//-----------------------------------------------------------------------------
 void FELocalMap::SetLocalNodes(int n1, int n2, int n3)
 {
 	m_n[0] = n1;
@@ -25,6 +42,7 @@ void FELocalMap::SetLocalNodes(int n1, int n2, int n3)
 	m_n[2] = n3;
 }
 
+//-----------------------------------------------------------------------------
 mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 {
 	vec3d r0[FEElement::MAX_NODES];
@@ -59,6 +77,7 @@ mat3d FELocalMap::LocalElementCoord(FEElement& el, int n)
 	return Q;
 }
 
+//-----------------------------------------------------------------------------
 void FELocalMap::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
@@ -75,8 +94,23 @@ void FELocalMap::Serialize(DumpFile& ar)
 // FESphericalMap
 //-----------------------------------------------------------------------------
 
-FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(FE_MAP_SPHERE), m_mesh(pfem->GetMesh()) {}
+BEGIN_PARAMETER_LIST(FESphericalMap, FECoordSysMap)
+	ADD_PARAMETER(m_c, FE_PARAM_VEC3D, "spherical");
+END_PARAMETER_LIST();
 
+//-----------------------------------------------------------------------------
+FESphericalMap::FESphericalMap(FEModel* pfem): FECoordSysMap(FE_MAP_SPHERE), m_mesh(pfem->GetMesh())
+{
+
+}
+
+//-----------------------------------------------------------------------------
+void FESphericalMap::Init()
+{
+
+}
+
+//-----------------------------------------------------------------------------
 mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 {
 	vec3d r0[FEElement::MAX_NODES];
@@ -111,6 +145,7 @@ mat3d FESphericalMap::LocalElementCoord(FEElement& el, int n)
 	return Q;
 }
 
+//-----------------------------------------------------------------------------
 void FESphericalMap::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
@@ -127,11 +162,26 @@ void FESphericalMap::Serialize(DumpFile& ar)
 //=============================================================================
 // FECylindricalMap
 //-----------------------------------------------------------------------------
+
+BEGIN_PARAMETER_LIST(FECylindricalMap, FECoordSysMap)
+	ADD_PARAMETER(m_c, FE_PARAM_VEC3D, "center");
+	ADD_PARAMETER(m_a, FE_PARAM_VEC3D, "axis"  );
+	ADD_PARAMETER(m_r, FE_PARAM_VEC3D, "vector");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FECylindricalMap::FECylindricalMap(FEModel* pfem) : FECoordSysMap(FE_MAP_CYLINDER), m_mesh(pfem->GetMesh())
 {
 	m_c = vec3d(0,0,0);
 	m_a = vec3d(0,0,1);
 	m_r = vec3d(1,0,0);
+}
+
+//-----------------------------------------------------------------------------
+void FECylindricalMap::Init()
+{
+	m_a.unit();
+	m_r.unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -195,6 +245,19 @@ void FECylindricalMap::Serialize(DumpFile& ar)
 // FEVectorMap
 //-----------------------------------------------------------------------------
 
+BEGIN_PARAMETER_LIST(FEVectorMap, FECoordSysMap)
+	ADD_PARAMETER(m_a, FE_PARAM_VEC3D, "vector");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+void FEVectorMap::Init()
+{
+	m_a.unit();
+	m_d = vec3d(1,0,0);
+	if (m_a*m_d > .999) m_d = vec3d(0,1,0);
+}
+
+//-----------------------------------------------------------------------------
 mat3d FEVectorMap::LocalElementCoord(FEElement& el, int n)
 {
 	vec3d a = m_a;
@@ -215,6 +278,7 @@ mat3d FEVectorMap::LocalElementCoord(FEElement& el, int n)
 	return Q;
 }
 
+//-----------------------------------------------------------------------------
 void FEVectorMap::Serialize(DumpFile &ar)
 {
 	if (ar.IsSaving())

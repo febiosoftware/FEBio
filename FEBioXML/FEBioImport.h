@@ -78,7 +78,7 @@ public:
 
 	int Version() { return m_nversion; }
 
-	bool ReadParameter(XMLTag& tag, FEParameterList& pl);
+	bool ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam = 0);
 
 	void ReadList(XMLTag& tag, vector<int>& l);
 

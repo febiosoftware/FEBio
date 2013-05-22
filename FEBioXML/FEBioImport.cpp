@@ -311,10 +311,10 @@ void FEFEBioImport::ParseVersion(XMLTag &tag)
 
 //-----------------------------------------------------------------------------
 //! This function parese a parameter list
-bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl)
+bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* szparam)
 {
 	// see if we can find this parameter
-	FEParam* pp = pl.Find(tag.Name());
+	FEParam* pp = pl.Find((szparam == 0 ? tag.Name() : szparam));
 	if (pp)
 	{
 		switch (pp->m_itype)
