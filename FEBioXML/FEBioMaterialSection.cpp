@@ -193,6 +193,7 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 		// create a new coordinate system generator
 		const char* sztype = tag.AttributeValue("type");
 		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(sztype, &fem);
+		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 		// read the parameter list
 		FEParameterList& pl = pmap->GetParameterList();
@@ -210,9 +211,7 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 				while(!tag.isend());
 			}
 		}
-
-		// TODO: can I initialize later, e.g. with the materials
-		pmap->Init();
+		pm->m_pmap = pmap;
 
 		// mark the tag as read
 		return true;
@@ -231,72 +230,30 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 	// read material fibers
 	if (tag == "fiber")
 	{
-		const char* szt = tag.AttributeValue("type");
-		if (strcmp(szt, "local") == 0)
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+
+		// create a new coordinate system generator
+		const char* sztype = tag.AttributeValue("type");
+		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(sztype, &fem);
+		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+		// read the parameter list
+		FEParameterList& pl = pmap->GetParameterList();
+		if (pl.Parameters() > 0)
 		{
-			FELocalMap* pmap = new FELocalMap(&fem);
-			pm->m_pmap = pmap;
-
-			int n[3] = {0};
-			tag.value(n, 2);
-
-			if ((n[0]==0)&&(n[1]==0)&&(n[2]==0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
-			if (n[2] == 0) n[2] = n[1];
-
-			pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
-		}
-		else if (strcmp(szt, "spherical") == 0)
-		{
-			FESphericalMap* pmap = new FESphericalMap(&fem);
-			pm->m_pmap = pmap;
-
-			vec3d c;
-			tag.value(c);
-
-			pmap->SetSphereCenter(c);
-		}
-		else if (strcmp(szt, "cylindrical") == 0)
-		{
-			FECylindricalMap* pmap = new FECylindricalMap(&fem);
-			pm->m_pmap = pmap;
-			
-			vec3d a(0,0,1), c(0,0,0), r(1,0,0);
-			if (tag.isleaf()) throw XMLReader::InvalidValue(tag);
-
-			++tag;
-			do
+			if (tag.isleaf()) m_pim->ReadParameter(tag, pl, sztype);
+			else
 			{
-				if      (tag == "center") tag.value(c);
-				else if (tag == "axis"  ) tag.value(a);
-				else if (tag == "vector") tag.value(r);
-				else throw XMLReader::InvalidTag(tag);
 				++tag;
+				do
+				{
+					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while(!tag.isend());
 			}
-			while (!tag.isend());
-
-			pmap->SetCylinderCenter(c);
-			pmap->SetCylinderAxis(a);
-			pmap->SetCylinderRef(r);
 		}
-		else if (strcmp(szt, "vector") == 0)
-		{
-			FEVectorMap* pmap = new FEVectorMap(&fem);
-			pm->m_pmap = pmap;
-
-			vec3d a, d;
-			tag.value(a);
-			a.unit();
-
-			d = vec3d(1,0,0);
-			if (a*d > .999) d = vec3d(0,1,0);
-
-			pmap->SetVectors(a, d);
-		}
-		else if (strcmp(szt, "user") == 0)
-		{
-			// fibers are read in in the ElementData section
-		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		pm->m_pmap = pmap;
 
 		// mark the tag as read
 		return true;

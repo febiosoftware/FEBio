@@ -1378,14 +1378,16 @@ bool FEBioModel::Init()
 	// initialize random number generator
 	srand((unsigned) time(NULL));
 
+	// initialize material data
+	// NOTE: call this before InitMesh since we need to initialize the FECoordSysMap
+	// before we can calculate the local element coordinate systems.
+	if (InitMaterials() == false) return false;
+
 	// initialize mesh data
-	// note that this must be done AFTER the elements have been assigned material point data !
+	// NOTE: this must be done AFTER the elements have been assigned material point data !
 	// this is because the mesh data is reset
 	// TODO: perhaps I should not reset the mesh data during the initialization
 	if (InitMesh() == false) return false;
-
-	// initialize material data
-	if (InitMaterials() == false) return false;
 
 	// initialize contact data
 	if (InitContact() == false) return false;

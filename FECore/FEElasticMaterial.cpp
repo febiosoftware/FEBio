@@ -147,7 +147,7 @@ mat3ds FEElasticMaterialPoint::push_forward(const mat3ds& A)
 void FEElasticMaterial::Init()
 {
 	FEMaterial::Init();
-
+	if (m_pmap) m_pmap->Init();
 	if (m_density <= 0) throw MaterialError("Invalid material density");
 }
 

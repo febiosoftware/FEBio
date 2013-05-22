@@ -21,6 +21,7 @@ FEUncoupledMaterial::FEUncoupledMaterial(void)
 //-----------------------------------------------------------------------------
 void FEUncoupledMaterial::Init()
 {
+	FEElasticMaterial::Init();
 	if (m_K < 0) throw MaterialError("k must be positive.");
 }
 
