@@ -26,6 +26,7 @@ void NodeDataRecord::Parse(const char* szexpr)
 		else if (strcmp(sz, "Rx") == 0) m_data.push_back(RX);
 		else if (strcmp(sz, "Ry") == 0) m_data.push_back(RY);
 		else if (strcmp(sz, "Rz") == 0) m_data.push_back(RZ);
+		else if (strcmp(sz, "T" ) == 0) m_data.push_back(T );
 		else if (strcmp(sz, "p" ) == 0) m_data.push_back(P );
 		else if (strcmp(sz, "c" ) == 0) m_data.push_back(C );
 		else if (strcmp(sz, "c1" ) == 0) m_data.push_back(C1);
@@ -40,9 +41,6 @@ void NodeDataRecord::Parse(const char* szexpr)
 double NodeDataRecord::Evaluate(int item, int ndata)
 {
 	FEMesh& mesh = m_pfem->GetMesh();
-	FEAnalysis* pstep = m_pfem->GetCurrentStep();
-	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
-	vector<double>& Fr = solver.m_Fr;
 	int nnode = item - 1;
 	if ((nnode < 0) || (nnode >= mesh.Nodes())) return 0;
 	FENode& node = mesh.Node(nnode);
@@ -60,9 +58,7 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 	case VX: val = node.m_vt.x; break;
 	case VY: val = node.m_vt.y; break;
 	case VZ: val = node.m_vt.z; break;
-	case RX: val = (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0);  break;
-	case RY: val = (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);  break;
-	case RZ: val = (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);  break;
+	case T : val = node.m_T; break;
 	case P : val = node.m_pt; break;
 	case C : val = node.m_ct[0]; break;
 	case C1: val = node.m_ct[0]; break;
@@ -71,6 +67,20 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 	case C4: val = node.m_ct[3]; break;
 	case C5: val = node.m_ct[4]; break;
 	case C6: val = node.m_ct[5]; break;
+	default:
+		{
+			FESolidSolver* psolid_solver = dynamic_cast<FESolidSolver*>(m_pfem->GetCurrentStep()->m_psolver);
+			if (psolid_solver)
+			{
+				vector<double>& Fr = psolid_solver->m_Fr;
+				switch (ndata)
+				{
+				case RX: val = (-id[0] - 2 >= 0 ? Fr[-id[0]-2] : 0);  break;
+				case RY: val = (-id[1] - 2 >= 0 ? Fr[-id[1]-2] : 0);  break;
+				case RZ: val = (-id[2] - 2 >= 0 ? Fr[-id[2]-2] : 0);  break;
+				}
+			}
+		}
 	}
 	return val;
 }
