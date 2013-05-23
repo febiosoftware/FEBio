@@ -1021,9 +1021,7 @@ bool FESolidSolver::Quasin(double time)
 				Update(m_bfgs.m_ui);
 
 				// calculate residual at this point
-				fprintf(stderr, "Entering Residual ...");
 				Residual(m_bfgs.m_R1);
-				fprintf(stderr, "done\n");
 			}
 		}
 		else if (m_solvertype==1)	// we are using the Hager - Zhang solver, which starts with a guess for the step length 
