@@ -341,37 +341,16 @@ void FEMesh::Reset()
 //! may only be approximate.
 double FEMesh::ElementVolume(FEElement &el)
 {
-	// get the nodal coordinates
-	int neln = el.Nodes();
-	vec3d r[FEElement::MAX_NODES];
-	for (int i=0; i<neln; ++i) r[i] = Node(el.m_node[i]).m_r0;
-
-	// get element type
-	int ntype = el.Type();
-
 	double V = 0;
-	switch (ntype)
-	{
-	case FE_HEX8G8:
-	case FE_HEX8RI:
-	case FE_HEX8G1:
-	case FE_TET4G1:
-	case FE_TET4G4:
-	case FE_PENTA6G6:
-		V = SolidElementVolume(dynamic_cast<FESolidElement&>(el));
-		break;
-	case FE_SHELL_QUAD:
-	case FE_SHELL_TRI:
-		V = ShellElementVolume(dynamic_cast<FEShellElement&>(el));
-		break;
-	default:
-		V = 0;
-	}
+	if (dynamic_cast<FESolidElement*  >(&el)) V = SolidElementVolume(dynamic_cast<FESolidElement&>(el));
+	if (dynamic_cast<FEShellElement*  >(&el)) V = ShellElementVolume(dynamic_cast<FEShellElement&>(el));
+	if (dynamic_cast<FESurfaceElement*>(&el)) V = 0;
 
 	return V;
 }
 
 //-----------------------------------------------------------------------------
+// TODO: replace this with what FEBio 1.x does
 double FEMesh::SolidElementVolume(FESolidElement& el)
 {
 	int i;
@@ -419,6 +398,7 @@ double FEMesh::SolidElementVolume(FESolidElement& el)
 }
 
 //-----------------------------------------------------------------------------
+// TODO: replace this with what FEBio 1.x does
 double FEMesh::ShellElementVolume(FEShellElement& el)
 {
 	int i;
@@ -497,16 +477,19 @@ int FEMesh::Faces(FEElement& el)
 	switch (el.Type())
 	{
 	case FE_HEX8G8:
-	case FE_HEX20G27:
 	case FE_HEX8RI:
-	case FE_HEX8G1: return 6;
+	case FE_HEX8G1:
+	case FE_HEX20G27: return 6;
 	case FE_PENTA6G6: return 5;
 	case FE_TET4G4:
-	case FE_TET10G8:
 	case FE_TET10G4:
+	case FE_TET10G8:
+	case FE_TET10GL11:
 	case FE_TET4G1: return 4;
 	case FE_SHELL_QUAD:
 	case FE_SHELL_TRI: return 1;
+	default:
+		assert(false);
 	}
 
 	return 0;
