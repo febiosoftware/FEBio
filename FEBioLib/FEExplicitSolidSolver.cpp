@@ -533,7 +533,7 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 	catch (NegativeJacobian e)
 	{
 		// A negative jacobian was detected
-		clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng, e.m_vol);
+		clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 		if (m_fem.GetDebugFlag()) m_fem.Write();
 		return false;
 	}
