@@ -31,7 +31,7 @@ FEContactInterface::~FEContactInterface()
 //! This function calculates a contact penalty parameter based on the 
 //! material and geometrical properties of the slave and master surfaces
 //!
-double FEContactInterface::BulkModulus(FESurfaceElement& el, FESurface &s)
+double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 {
 	double eps = 0;
 

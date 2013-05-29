@@ -217,7 +217,7 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 		assert(pe);
 
 		// we need a measure for the modulus
-		double K = BulkModulus(face, s);
+		double K = AutoPenalty(face, s);
 
 		// calculate the facet area
 		double area = s.FaceArea(face);

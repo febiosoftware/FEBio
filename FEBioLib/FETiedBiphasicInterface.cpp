@@ -307,7 +307,7 @@ void FETiedBiphasicInterface::CalcAutoPenalty(FETiedBiphasicSurface& s)
 		double V = m.ElementVolume(*pe);
 		
 		// calculate a modulus
-		double E = BulkModulus(el, s);
+		double E = AutoPenalty(el, s);
 		
 		// calculate penalty
 		double eps = E*A/V;
