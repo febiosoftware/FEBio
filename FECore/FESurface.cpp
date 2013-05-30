@@ -473,79 +473,8 @@ vec3d FESurface::ProjectToSurface(FESurfaceElement& el, vec3d x, double& r, doub
 	return q;
 }
 
-
-//-----------------------------------------------------------------------------
-//! This function calculates the projection of x on the surface element el.
-//! It does this by finding the solution of the nonlinear equation (x-y)*y,[a]=0,
-//! where the comma denotes differentation and a ranges from 1 to 2.
-//! The system is solved using the Newton-Raphson method.
-//! The surface element may be either a quad or a triangular element.
-
-vec3d FESurface::ProjectToReferenceSurface(FESurfaceElement& el, vec3d x, double& r, double& s)
-{
-	// get the mesh to which this surface belongs
-	FEMesh& mesh = *m_pMesh;
-
-	// number of element nodes
-	int ne = el.Nodes();
-
-	// get the elements nodal positions
-	vec3d y[FEElement::MAX_NODES];
-	for (int i=0; i<ne; ++i) y[i] = mesh.Node(el.m_node[i]).m_r0;
-
-	// calculate normal projection of x onto element
-	vec3d q;
-	switch (ne)
-	{
-	case 3: q = project2tri(y, x, r, s); break;
-	case 4: 
-		// see if we get lucky
-		if (project2quad(y, x, r, s, q) == false)
-		{
-			// the direct projection failed, so we'll try it more incrementally
-			vec3d x0 = (y[0]+y[1]+y[2]+y[3])*0.25;
-			r = s = 0;
-			bool b = project2quad(y, x0, r, s, q);
-			assert(b);
-			
-			double w = 0.5;
-			int l = 1, N = 0, NMAX = 20;
-			do
-			{
-				vec3d xi = x0*(1.0 - w) + x*w;
-				b = project2quad(y, xi, r, s, q);
-				if (b)
-				{
-					--l;
-					if (l == 0) { x0 = xi; w = 1.0; }
-					else w *= 2.0;
-				}
-				else 
-				{
-					++l;
-					w *= 0.5;
-				}
-				++N;
-			}
-			while ((l >= 0) && (N<=NMAX) && (w>0.1));
-		}
-		break;
-	case 6: 
-		if (project2tri6(y, x, r, s, q)==false)
-		{
-//			assert(false);
-		}
-		break;
-	default:
-		assert(false);
-	}
-
-	return q;
-}
-
 //-----------------------------------------------------------------------------
 //! This function calculates the area of a surface element
-
 double FESurface::FaceArea(FESurfaceElement& el)
 {
 	// get the mesh to which this surface belongs
@@ -1384,31 +1313,65 @@ FESurfaceElement* FESurface::ClosestPointProjection(vec3d& x, vec3d& q, vec2d& r
 }
 
 //-----------------------------------------------------------------------------
-//! Finds the element that contains the closest point projection of a node.
-//! Returns zero if no such element can be found.
-// TODO: I need to define a max search radius. For contact problems it is important that only nodes are
-//       considered that are within an acceptable distance for contact.
-FESurfaceElement* FESurface::ClosestReferencePointProjection(vec3d& x, vec3d& q, vec2d& r, bool binit_nq, double tol)
+//! This is slightly modified version of the ClosestPointProjection where the
+//! node to be projected is part of this surface. This is used in some contact algorithms
+//! that support self-contact. The algorithm is modified in two ways. First, a search_radius
+//! limits the max distance for consideration of closest point. Second, the search point cannot
+//! be part of the net of the closest point.
+FESurfaceElement* FESurface::ClosestPointSelfProjection(int n, vec3d& q, vec2d& r, bool binit_nq, double tol, double sradius)
 {
 	// get the mesh
 	FEMesh& mesh = *GetMesh();
 
+	// get the node's position
+	vec3d x = mesh.Node(n).m_rt;
+	
 	// see if we need to initialize the NQ structure
-	if (binit_nq) m_SNQ.InitReference();
-
+//	if (binit_nq) m_SNQ.Init();
+	
 	// let's find the closest master node
-	int mn = m_SNQ.FindReference(x);
+//	int mn = m_SNQ.Find(x);
 
+	// do it the hard way
+	int mn = -1;
+	double d0;
+	for (int i=0; i<Nodes(); ++i)
+	{
+		if (m_node[i] != n)
+		{
+			vec3d r = Node(i).m_rt;
+			double d = (r - x)*(r - x);
+			if ((mn == -1) || (d < d0))
+			{
+				d0 = d;
+				mn = i;
+			}
+		}
+	}
+	
 	// mn is a local index, so get the global node number too
 	int m = m_node[mn];
-
+	
 	// get the nodal position
-	vec3d r0 = mesh.Node(m).m_r0;
+	vec3d r0 = mesh.Node(m).m_rt;
 
+	// check the distance
+	double D = (x - r0).norm();
+	if ((sradius > 0) && (D > sradius)) return 0;
+
+	// The node cannot be part of the net of the closest point
+	int nval = m_NET.Valence(mn);
+	FEElement** pe = m_NET.ElementList(mn);
+	for (int j=0; j<nval; ++j)
+	{
+		// get the master element
+		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
+		// make sure the node is not contained in this surface element
+		if (el.HasNode(n)) return 0;
+	}
+	
 	// now that we found the closest master node, lets see if we can find 
 	// the best master element
-	int nval = m_NEL.Valence(mn);
-	FEElement** pe = m_NEL.ElementList(mn);
 	for (int j=0; j<nval; ++j)
 	{
 		// get the master element
@@ -1418,10 +1381,10 @@ FESurfaceElement* FESurface::ClosestReferencePointProjection(vec3d& x, vec3d& q,
 		// project the node on the element
 		r[0] = 0;
 		r[1] = 0;
-		q = ProjectToReferenceSurface(el, x, r[0], r[1]);
+		q = ProjectToSurface(el, x, r[0], r[1]);
 		if (IsInsideElement(el, r[0], r[1], tol)) return &el;
 	}
-
+	
 	// If we get here, we did not find a facet.
 	// There are a couple of reasons why the search has failed:
 	// -1. the point cannot be projected onto the surface. For contact this implies the node is not in contact.
