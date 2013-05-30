@@ -36,6 +36,18 @@ XMLTag::XMLTag()
 }
 
 //-----------------------------------------------------------------------------
+//! Clear tag data
+void XMLTag::clear()
+{
+	m_sztag[0] = 0;
+	m_szval.clear();
+	m_natt = 0;
+	m_bend = false;
+	m_bleaf = true;
+	m_bempty = false;
+}
+
+//-----------------------------------------------------------------------------
 //! This function reads in a comma delimited list of doubles. The function reads
 //! in a maximum of n values. The actual number of values that are read is returned.
 //!
@@ -176,8 +188,18 @@ void XMLTag::value(vector<int>& l)
 	free(szval);
 }
 
-//////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+//! Return the number of children of a tag
+int XMLTag::children()
+{
+	XMLTag tag(*this); ++tag;
+	int ncount = 0;
+	while (!tag.isend()) { ncount++; ++tag; }
+	return ncount;
+}
 
+//-----------------------------------------------------------------------------
+//! return the string value of an attribute
 const char* XMLTag::AttributeValue(const char* szat, bool bopt)
 {
 	// find the attribute
@@ -191,8 +213,7 @@ const char* XMLTag::AttributeValue(const char* szat, bool bopt)
 	return 0;
 }
 
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 bool XMLTag::AttributeValue(const char* szat, double& d, bool bopt)
 {
 	const char* szv = AttributeValue(szat, bopt);

@@ -66,10 +66,10 @@ bool FEBioBoundarySection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nf
 	FEMesh& m = fem.GetMesh();
 	int NN = m.Nodes();
 
+	int N, nf[8];
+
 	// count nr of faces
-	int faces = 0, N, nf[8];
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { faces++; ++t; }
+	int faces = tag.children();
 
 	// allocate storage for faces
 	s.create(faces);
@@ -222,9 +222,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 	if (nversion >= 0x0200)
 	{
 		// count how many prescibed nodes there are
-		int ndis = 0;
-		XMLTag t(tag); ++t;
-		while (!t.isend()) { ndis++; ++t; }
+		int ndis = tag.children();
 
 		// determine whether prescribed BC is relative or absolute
 		bool br = false;
@@ -337,9 +335,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		else
 		{
 			// count how many prescibed nodes there are
-			int ndis = 0;
-			XMLTag t(tag); ++t;
-			while (!t.isend()) { ndis++; ++t; }
+			int ndis = tag.children();
 
 			// determine whether prescribed BC is relative or absolute
 			bool br = false;
@@ -398,9 +394,7 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 	if (nversion >= 0x0200)
 	{
 		// count how many nodal forces there are
-		int ncnf = 0;
-		XMLTag t(tag); ++t;
-		while (!t.isend()) { ncnf++; ++t; }
+		int ncnf = tag.children();
 
 		// get the bc
 		int bc = -1;
@@ -448,9 +442,7 @@ void FEBioBoundarySection::ParseBCForce(XMLTag &tag)
 	else
 	{
 		// count how many nodal forces there are
-		int ncnf = 0;
-		XMLTag t(tag); ++t;
-		while (!t.isend()) { ncnf++; ++t; }
+		int ncnf = tag.children();
 
 		// read the prescribed data
 		++tag;
@@ -505,9 +497,7 @@ void FEBioBoundarySection::ParseBCPressure(XMLTag& tag)
 	}
 
 	// count how many pressure cards there are
-	int npr = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { npr++; ++t; }
+	int npr = tag.children();
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
@@ -564,9 +554,7 @@ void FEBioBoundarySection::ParseBCTraction(XMLTag &tag)
 	const char* sz;
 
 	// count how many traction cards there are
-	int ntc = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { ntc++; ++t; }
+	int ntc = tag.children();
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
@@ -643,9 +631,7 @@ void FEBioBoundarySection::ParseBCPoroNormalTraction(XMLTag& tag)
 	}
 	
 	// count how many normal traction cards there are
-	int npr = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { npr++; ++t; }
+	int npr = tag.children();
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
@@ -719,9 +705,7 @@ void FEBioBoundarySection::ParseBCFluidFlux(XMLTag &tag)
 	}
 	
 	// count how many fluid flux cards there are
-	int nfr = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { nfr++; ++t; }
+	int nfr = tag.children();
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
@@ -786,9 +770,7 @@ void FEBioBoundarySection::ParseBCSoluteFlux(XMLTag &tag)
 	}
 	
 	// count how many fluid flux cards there are
-	int nfr = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { nfr++; ++t; }
+	int nfr = tag.children();
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
@@ -843,9 +825,7 @@ void FEBioBoundarySection::ParseBCHeatFlux(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 
 	// count how many heatflux cards there are
-	int npr = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { npr++; ++t; }
+	int npr = tag.children();
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
@@ -902,9 +882,7 @@ void FEBioBoundarySection::ParseBCConvectiveHeatFlux(XMLTag& tag)
 	FEModel& fem = *GetFEModel();
 
 	// count how many heatflux cards there are
-	int npr = 0;
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { npr++; ++t; }
+	int npr = tag.children();
 
 	// create a new surface
 	FESurface* psurf = new FESurface(&fem.GetMesh());
@@ -920,7 +898,7 @@ void FEBioBoundarySection::ParseBCConvectiveHeatFlux(XMLTag& tag)
 
 	// read the flux data
 	++tag;
-	int nf[4], N;
+	int nf[8], N;
 	for (int i=0; i<npr; ++i)
 	{
 		FEConvectiveHeatFlux::LOAD& pc = ph->HeatFlux(i);

@@ -622,10 +622,10 @@ bool FEBioContactSection::ParseSurfaceSection(XMLTag &tag, FESurface& s, int nfm
 	FEMesh& m = fem.GetMesh();
 	int NN = m.Nodes();
 
+	int N, nf[8];
+
 	// count nr of faces
-	int faces = 0, N, nf[8];
-	XMLTag t(tag); ++t;
-	while (!t.isend()) { faces++; ++t; }
+	int faces = tag.children();
 
 	// allocate storage for faces
 	s.create(faces);

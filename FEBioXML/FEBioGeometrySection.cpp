@@ -5,6 +5,7 @@
 #include <FEBioLib/FEBiphasic.h>
 #include <FEBioLib/FEBiphasicSolute.h>
 #include <FEBioLib/FETriphasic.h>
+#include <FEBioLib/FEMultiphasic.h>
 #include <FEBioLib/FEUncoupledMaterial.h>
 #include <FEBioLib/FEElasticSolidDomain.h>
 #include <FEBioLib/FEElasticShellDomain.h>
@@ -19,6 +20,7 @@
 #include <FEBioLib/FEBiphasicSoluteDomain.h>
 #include <FEBioLib/FE3FieldElasticSolidDomain.h>
 #include <FEBioLib/FELinearSolidDomain.h>
+#include <FEBioLib/FEMultiphasicDomain.h>
 
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file
@@ -214,26 +216,32 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 		if (dynamic_cast<FERigidMaterial*>(pmat))
 		{
 			// rigid elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_RIGID_SOLID_DOMAIN;
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_RIGID_SOLID_DOMAIN;
 			else if ((etype == ET_QUAD) || (etype == ET_TRI)) return FE_RIGID_SHELL_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FEBiphasic*>(pmat))
 		{
 			// biphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10)) return FE_BIPHASIC_DOMAIN;
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FEBiphasicSolute*>(pmat))
 		{
 			// biphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_BIPHASIC_SOLUTE_DOMAIN;
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_SOLUTE_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FETriphasic*>(pmat))
 		{
 			// triphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_TRIPHASIC_DOMAIN;
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_TRIPHASIC_DOMAIN;
+			else return 0;
+		}
+		else if (dynamic_cast<FEMultiphasic*>(pmat))
+		{
+			// multiphasic elements
+			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_MULTIPHASIC_DOMAIN;
 			else return 0;
 		}
 		else
@@ -295,8 +303,9 @@ FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* 
 	case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (pm, pmat); break;
 	case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
 	case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicSolidDomain     (pm, pmat); break;
-	case FE_TRIPHASIC_DOMAIN      : pd = new FETriphasicDomain         (pm, pmat); break;
 	case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (pm, pmat); break;
+	case FE_TRIPHASIC_DOMAIN      : pd = new FETriphasicDomain         (pm, pmat); break;
+	case FE_MULTIPHASIC_DOMAIN    : pd = new FEMultiphasicDomain       (pm, pmat); break;
 	case FE_LINEAR_SOLID_DOMAIN   : pd = new FELinearSolidDomain       (pm, pmat); break;
 	}
 
@@ -465,7 +474,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		case FEFEBioImport::ET_TET10:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET10G4, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet10, nid, nmat);
 			}
 			break;
 		case FEFEBioImport::ET_QUAD4:

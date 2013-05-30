@@ -18,12 +18,14 @@
 #include <vector>
 using namespace std;
 
+//-----------------------------------------------------------------------------
+//! This class implements a reader for XML files
 class XMLReader  
 {
 public:
 	enum {MAX_TAG   = 128};
 	enum {MAX_ATT   =   8};
-	enum {MAX_LEVEL = 16};
+	enum {MAX_LEVEL =  16};
 
 	class XMLTag
 	{
@@ -51,30 +53,22 @@ public:
 		bool	m_bleaf;	// this is a leaf (i.e. has no child elements)
 		bool	m_bempty;	// empty tag (i.e. no value)
 
-		void operator ++ () { m_preader->NextTag(*this); }
-
-
+	public:
 		XMLTag();
 
-		void clear()
-		{
-			m_sztag[0] = 0;
-			m_szval.clear();
-			m_natt = 0;
-			m_bend = false;
-			m_bleaf = true;
-			m_bempty = false;
-		}
+		void clear();
 
-	public:
 		bool operator == (const char* sztag) { return (strcmp(sztag, m_sztag) == 0); }
 		bool operator != (const char* sztag) { return (strcmp(sztag, m_sztag) != 0); }
+		void operator ++ () { m_preader->NextTag(*this); }
 
 		bool isend() { return m_bend; }
 		bool isleaf() { return m_bleaf; }
 		bool isempty() { return m_bempty; }
 
-	public:
+		// count the number of children
+		int children();
+
 		const char* AttributeValue(const char* szat, bool bopt = false);
 
 		bool AttributeValue(const char* szat, int&    n, bool bopt = false);
