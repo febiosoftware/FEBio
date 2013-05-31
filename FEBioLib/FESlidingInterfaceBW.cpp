@@ -339,7 +339,7 @@ void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfa
 			}
 			
 			// find the intersection point with the master surface
-			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, m_srad);
+			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, R);
 			
 			ss.m_pme[n] = pme;
 			ss.m_nu[n] = nu;
