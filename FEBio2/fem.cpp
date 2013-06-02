@@ -132,7 +132,7 @@ bool FEM::Configure(const char *szfile)
 		XMLTag tag;
 		if (xml.FindTag("febio_config", tag) == false) return false;
 
-		if (strcmp(tag.m_szatv[0], "1.0") == 0)
+		if (strcmp(tag.m_att[0].m_szatv, "1.0") == 0)
 		{
 			if (!tag.isleaf())
 			{

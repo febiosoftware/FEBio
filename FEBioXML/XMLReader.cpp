@@ -12,6 +12,21 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
+//-----------------------------------------------------------------------------
+// XMLTag
+//-----------------------------------------------------------------------------
+XMLAtt::XMLAtt()
+{
+	m_szatt[0] = 0;
+	m_szatv[0] = 0;
+}
+
+//-----------------------------------------------------------------------------
+bool XMLAtt::operator == (const char* sz)
+{
+	return (strcmp(m_szatv, sz) == 0);
+}
+
 //////////////////////////////////////////////////////////////////////
 // XMLTag
 //////////////////////////////////////////////////////////////////////
@@ -25,14 +40,8 @@ XMLTag::XMLTag()
 	m_nlevel = 0;
 
 	m_natt = 0;
-	int i;
-	for (i=0; i<XMLReader::MAX_ATT; ++i)
-	{
-		m_szatt[i][0] = 0;
-		m_szatv[i][0] = 0;
-	}
 
-	for (i=0; i<XMLReader::MAX_LEVEL; ++i) m_szroot[i][0] = 0;
+	for (int i=0; i<XMLReader::MAX_LEVEL; ++i) m_szroot[i][0] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -204,13 +213,40 @@ const char* XMLTag::AttributeValue(const char* szat, bool bopt)
 {
 	// find the attribute
 	for (int i=0; i<m_natt; ++i)
-		if (strcmp(m_szatt[i], szat) == 0) return m_szatv[i];
+		if (strcmp(m_att[i].m_szatt, szat) == 0) return m_att[i].m_szatv;
 
 	// If the attribute was not optional, we throw a fit
 	if (!bopt) throw XMLReader::MissingAttribute(*this, szat);
 
 	// we didn't find it
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! return the attribute
+XMLReader::XMLAtt* XMLTag::Attribute(const char* szat, bool bopt)
+{
+	// find the attribute
+	for (int i=0; i<m_natt; ++i)
+		if (strcmp(m_att[i].m_szatt, szat) == 0) return m_att+i;
+
+	// If the attribute was not optional, we throw a fit
+	if (!bopt) throw XMLReader::MissingAttribute(*this, szat);
+
+	// we didn't find it
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! return the attribute
+XMLReader::XMLAtt& XMLTag::Attribute(const char* szat)
+{
+	// find the attribute
+	for (int i=0; i<m_natt; ++i)
+		if (strcmp(m_att[i].m_szatt, szat) == 0) return m_att[i];
+
+	// throw a fit
+	throw XMLReader::MissingAttribute(*this, szat);
 }
 
 //-----------------------------------------------------------------------------
@@ -439,7 +475,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 		else if (ch == '>') break;
 
 		// read the attribute's name
-		sz = tag.m_szatt[n];
+		sz = tag.m_att[n].m_szatt;
 		if (!isvalid(ch)) throw XMLSyntaxError();
 		*sz++ = ch;
 		while (isvalid(ch=GetChar())) *sz++ = ch;
@@ -453,7 +489,7 @@ void XMLReader::ReadTag(XMLTag& tag)
 		while (isspace(ch=GetChar()));
 		if (ch != '"') throw XMLSyntaxError();
 
-		sz = tag.m_szatv[n];
+		sz = tag.m_att[n].m_szatv;
 		while ((ch=GetChar())!='"') *sz++ = ch;
 		*sz=0; sz=0;
 		ch=GetChar();

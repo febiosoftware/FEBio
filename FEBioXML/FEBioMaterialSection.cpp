@@ -148,8 +148,8 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 	// read the material axis
 	if (tag == "mat_axis")
 	{
-		const char* szt = tag.AttributeValue("type");
-		if (strcmp(szt, "local") == 0)
+		XMLAtt& type = tag.Attribute("type");
+		if (type == "local")
 		{
 			FELocalMap* pmap = new FELocalMap(&fem);
 			pm->m_pmap = pmap;
@@ -160,7 +160,7 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 
 			pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
 		}
-		else if (strcmp(szt, "vector") == 0)
+		else if (type == "vector")
 		{
 			FEVectorMap* pmap = new FEVectorMap(&fem);
 			pm->m_pmap = pmap;
@@ -178,11 +178,11 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 			while (!tag.isend());
 			pmap->SetVectors(a, d);
 		}
-		else if (strcmp(szt, "user") == 0)
+		else if (type == "user")
 		{
 			// material axis are read in from the ElementData section
 		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 
 		return true;
 	}
@@ -191,15 +191,15 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 		FEBioKernel& febio = FEBioKernel::GetInstance();
 
 		// create a new coordinate system generator
-		const char* sztype = tag.AttributeValue("type");
-		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(sztype, &fem);
-		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		XMLAtt& type = tag.Attribute("type");
+		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(type.cvalue(), &fem);
+		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 
 		// read the parameter list
 		FEParameterList& pl = pmap->GetParameterList();
 		if (pl.Parameters() > 0)
 		{
-			if (tag.isleaf()) m_pim->ReadParameter(tag, pl, sztype);
+			if (tag.isleaf()) m_pim->ReadParameter(tag, pl, type.cvalue());
 			else
 			{
 				++tag;

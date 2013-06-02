@@ -27,22 +27,38 @@ public:
 	enum {MAX_ATT   =   8};
 	enum {MAX_LEVEL =  16};
 
+	//-------------------------------------------------------------------------
+	//! This class represents a xml-attribute
+	class XMLAtt
+	{
+	public:
+		XMLAtt();
+		bool operator == (const char* sz);
+
+		const char* cvalue() { return m_szatv; }
+
+	public:
+		char	m_szatt[MAX_TAG];	// tag attributes
+		char	m_szatv[MAX_TAG];	// value of attribute
+	};
+
+	//-------------------------------------------------------------------------
+	// This class implements a xml-tag. The value and attributes of this tag
+	// can be queried.
 	class XMLTag
 	{
 	// TODO: I would like to get rid of the m_szroot element and replace it with a 
 	// parent tag. The root element can then be identified by the tag that 
 	// does not have a parent
 	public:
-		char	m_sztag[MAX_TAG];			// tag name
-		char	m_szatt[MAX_ATT][MAX_TAG];	// tag attributes
-		char	m_szatv[MAX_ATT][MAX_TAG];	// value of attributes
+		char		m_sztag[MAX_TAG];		// tag name
+		std::string m_szval;				// tag value
 
-		std::string m_szval;	// tag value
+		XMLAtt	m_att[MAX_ATT];				// attribute list
+		int		m_natt;						// nr of attributes
 
-		int		m_nlevel;	// depth level
+		int		m_nlevel;						// depth level
 		char	m_szroot[MAX_LEVEL][MAX_TAG];	// name tag of parent's
-
-		int		m_natt;	// nr of attributes
 
 		XMLReader*	m_preader;		// pointer to reader
 		fpos_t	m_fpos;				// file position of next tag
@@ -70,6 +86,8 @@ public:
 		int children();
 
 		const char* AttributeValue(const char* szat, bool bopt = false);
+		XMLAtt* Attribute(const char* szat, bool bopt);
+		XMLAtt& Attribute(const char* szat);
 
 		bool AttributeValue(const char* szat, int&    n, bool bopt = false);
 		bool AttributeValue(const char* szat, double& d, bool bopt = false);
@@ -172,10 +190,9 @@ protected:
 protected:
 	FILE*	m_fp;		// the file pointer
 	int		m_nline;	// current line (used only as temp storage)
-
-	friend class XMLTag;
 };
 
 typedef XMLReader::XMLTag XMLTag;
+typedef XMLReader::XMLAtt XMLAtt;
 
 #endif // !defined(AFX_XMLREADER_H__667494D8_4C95_4342_BC31_6C1C097A4C81__INCLUDED_)

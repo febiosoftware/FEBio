@@ -76,13 +76,14 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	else if (tag == "plane_strain"      )
 	{
 		int bc = 2;
-		const char* szt = tag.AttributeValue("bc", true);
-		if (szt)
+		XMLAtt* patt = tag.Attribute("bc", true);
+		if (patt)
 		{
-			if      (strcmp(szt, "x") == 0) bc = 0;
-			else if (strcmp(szt, "y") == 0) bc = 1;
-			else if (strcmp(szt, "z") == 0) bc = 2;
-			else throw XMLReader::InvalidAttributeValue(tag, "bc", szt);
+			XMLAtt& att = *patt;
+			if      (att == "x") bc = 0;
+			else if (att == "y") bc = 1;
+			else if (att == "z") bc = 2;
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", att.cvalue());
 		}
 		bool b = false;
 		tag.value(b);
@@ -90,11 +91,11 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	}
 	else if (tag == "analysis")
 	{
-		const char* szt = tag.AttributeValue("type");
-		if      (strcmp(szt, "static" ) == 0) pstep->m_nanalysis = FE_STATIC;
-		else if (strcmp(szt, "dynamic") == 0) pstep->m_nanalysis = FE_DYNAMIC;
-		else if (strcmp(szt, "steady-state") == 0) pstep->m_nanalysis = FE_STEADY_STATE;
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		XMLAtt& att = tag.Attribute("type");
+		if      (att == "static"      ) pstep->m_nanalysis = FE_STATIC;
+		else if (att == "dynamic"     ) pstep->m_nanalysis = FE_DYNAMIC;
+		else if (att == "steady-state") pstep->m_nanalysis = FE_STEADY_STATE;
+		else throw XMLReader::InvalidAttributeValue(tag, "type", att.cvalue());
 	}
 	else if (tag == "restart" )
 	{
@@ -156,30 +157,30 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 		{
 			if (tag == "rule")
 			{
-				const char* sze = tag.AttributeValue("elem");
+				XMLAtt& elem = tag.Attribute("elem");
 				const char* szv = tag.szvalue();
 
-				if (strcmp(sze, "hex8") == 0)
+				if (elem == "hex8")
 				{
 					if      (strcmp(szv, "GAUSS8") == 0) m_pim->m_nhex8 = FE_HEX8G8;
 					else if (strcmp(szv, "POINT6") == 0) m_pim->m_nhex8 = FE_HEX8RI;
 					else if (strcmp(szv, "UDG"   ) == 0) m_pim->m_nhex8 = FE_HEX8G1;
 					else throw XMLReader::InvalidValue(tag);
 				}
-				else if (strcmp(sze, "tet10") == 0)
+				else if (elem == "tet10")
 				{
 					if      (strcmp(szv, "GAUSS4"   ) == 0) m_pim->m_ntet10 = FE_TET10G4;
 					else if (strcmp(szv, "GAUSS8"   ) == 0) m_pim->m_ntet10 = FE_TET10G8;
 					else if (strcmp(szv, "LOBATTO11") == 0) m_pim->m_ntet10 = FE_TET10GL11;
 					else throw XMLReader::InvalidValue(tag);
 				}
-				else if (strcmp(sze, "tri3") == 0)
+				else if (elem == "tri3")
 				{
 					if      (strcmp(szv, "GAUSS1") == 0) m_pim->m_ntri3 = FE_TRI3G1;
 					else if (strcmp(szv, "GAUSS3") == 0) m_pim->m_ntri3 = FE_TRI3G3;
 					else throw XMLReader::InvalidValue(tag);
 				}
-				else if (strcmp(sze, "tri6") == 0)
+				else if (elem == "tri6")
 				{
 					if      (strcmp(szv, "GAUSS3"  ) == 0) m_pim->m_ntri6 = FE_TRI6G3;
 					else if (strcmp(szv, "GAUSS6"  ) == 0) m_pim->m_ntri6 = FE_TRI6NI;
@@ -188,27 +189,27 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 					else if (strcmp(szv, "LOBATTO7") == 0) m_pim->m_ntri6 = FE_TRI6GL7;
 					else throw XMLReader::InvalidValue(tag);
 				}
-				else if (strcmp(sze, "tet4") == 0)
+				else if (elem == "tet4")
 				{
 					if (tag.isleaf())
 					{
-						if (strcmp(szv, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
+						if      (strcmp(szv, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
 						else if (strcmp(szv, "GAUSS1") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TETG1;
-						else if (strcmp(szv, "UT4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
+						else if (strcmp(szv, "UT4"   ) == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else
 					{
 						const char* szt = tag.AttributeValue("type");
-						if (strcmp(szt, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
+						if      (strcmp(szt, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
 						else if (strcmp(szt, "GAUSS1") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TETG1;
-						else if (strcmp(szt, "UT4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
+						else if (strcmp(szt, "UT4"   ) == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
 						else throw XMLReader::InvalidAttributeValue(tag, "type", szv);
 
 						++tag;
 						do
 						{
-							if (tag == "alpha") tag.value(FEUT4Domain::m_alpha);
+							if      (tag == "alpha"   ) tag.value(FEUT4Domain::m_alpha);
 							else if (tag == "iso_stab") tag.value(FEUT4Domain::m_bdev);
 							else if (tag == "stab_int")
 							{
@@ -222,7 +223,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 						while (!tag.isend());
 					}
 				}
-				else throw XMLReader::InvalidAttributeValue(tag, "elem", sze);
+				else throw XMLReader::InvalidAttributeValue(tag, "elem", elem.cvalue());
 			}
 			else throw XMLReader::InvalidValue(tag);
 			++tag;
@@ -231,10 +232,10 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	}
 	else if (tag == "linear_solver")
 	{
-		const char* szt = tag.AttributeValue("type");
-		if      (strcmp(szt, "skyline"           ) == 0) fem.m_nsolver = SKYLINE_SOLVER;
-		else if (strcmp(szt, "psldlt"            ) == 0) fem.m_nsolver = PSLDLT_SOLVER;
-		else if (strcmp(szt, "superlu"           ) == 0)
+		XMLAtt& type = tag.Attribute("type");
+		if      (type == "skyline") fem.m_nsolver = SKYLINE_SOLVER;
+		else if (type == "psldlt" ) fem.m_nsolver = PSLDLT_SOLVER;
+		else if (type == "superlu")
 		{
 			fem.m_nsolver = SUPERLU_SOLVER;
 			if (!tag.isleaf())
@@ -254,12 +255,12 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 				while (!tag.isend());
 			}
 		}
-		else if (strcmp(szt, "superlu_mt"        ) == 0) fem.m_nsolver = SUPERLU_MT_SOLVER;
-		else if (strcmp(szt, "pardiso"           ) == 0) fem.m_nsolver = PARDISO_SOLVER;
-		else if (strcmp(szt, "wsmp"              ) == 0) fem.m_nsolver = WSMP_SOLVER;
-		else if (strcmp(szt, "lusolver"          ) == 0) fem.m_nsolver = LU_SOLVER;
-		else if (strcmp(szt, "rcicg"             ) == 0) fem.m_nsolver = RCICG_SOLVER;
-		else if (strcmp(szt, "conjugate gradient") == 0)
+		else if (type == "superlu_mt"        ) fem.m_nsolver = SUPERLU_MT_SOLVER;
+		else if (type == "pardiso"           ) fem.m_nsolver = PARDISO_SOLVER;
+		else if (type == "wsmp"              ) fem.m_nsolver = WSMP_SOLVER;
+		else if (type == "lusolver"          ) fem.m_nsolver = LU_SOLVER;
+		else if (type == "rcicg"             ) fem.m_nsolver = RCICG_SOLVER;
+		else if (type == "conjugate gradient")
 		{
 			fem.m_nsolver = CG_ITERATIVE_SOLVER;
 			ConjGradIterSolver* ps;
@@ -280,7 +281,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 				while (!tag.isend());
 			}
 		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+		else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 	}
 	else return false;
 

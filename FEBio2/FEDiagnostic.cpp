@@ -61,11 +61,12 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		XMLTag tag;
 		if (xml.FindTag("febio_diagnostic", tag) == false) return false;
 
-		if      (strcmp(tag.m_szatv[0], "tangent test"  ) == 0) m_pdia = new FETangentDiagnostic(fem);
-		else if (strcmp(tag.m_szatv[0], "contact test"  ) == 0) m_pdia = new FEContactDiagnostic(fem);
-		else if (strcmp(tag.m_szatv[0], "print matrix"  ) == 0) m_pdia = new FEPrintMatrixDiagnostic(fem);
-		else if (strcmp(tag.m_szatv[0], "print hbmatrix") == 0) m_pdia = new FEPrintHBMatrixDiagnostic(fem);
-		else if (strcmp(tag.m_szatv[0], "memory test") == 0) m_pdia = new FEMemoryDiagnostic(fem);
+		XMLAtt& att = tag.m_att[0];
+		if      (att == "tangent test"  ) m_pdia = new FETangentDiagnostic(fem);
+		else if (att == "contact test"  ) m_pdia = new FEContactDiagnostic(fem);
+		else if (att == "print matrix"  ) m_pdia = new FEPrintMatrixDiagnostic(fem);
+		else if (att == "print hbmatrix") m_pdia = new FEPrintHBMatrixDiagnostic(fem);
+		else if (att == "memory test"   ) m_pdia = new FEMemoryDiagnostic(fem);
 		else 
 		{
 			clog.printf("\nERROR: unknown diagnostic\n\n");
@@ -150,10 +151,10 @@ void FEBioScenarioSection::Parse(XMLTag &tag)
 	FEDiagnosticImport& dim = dynamic_cast<FEDiagnosticImport&>(*m_pim);
 	FETangentDiagnostic& td = dynamic_cast<FETangentDiagnostic&>(*dim.m_pdia);
 
-	const char* sztype = tag.AttributeValue("type");
-	if      (strcmp(sztype, "uni-axial"   ) == 0) td.m_scn = FETangentDiagnostic::TDS_UNIAXIAL;
-	else if (strcmp(sztype, "simple shear") == 0) td.m_scn = FETangentDiagnostic::TDS_SIMPLE_SHEAR;
-	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	XMLAtt& type = tag.Attribute("type");
+	if      (type == "uni-axial"   ) td.m_scn = FETangentDiagnostic::TDS_UNIAXIAL;
+	else if (type == "simple shear") td.m_scn = FETangentDiagnostic::TDS_SIMPLE_SHEAR;
+	else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 	++tag;
 	do
 	{

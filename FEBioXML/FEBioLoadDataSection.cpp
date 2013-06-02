@@ -32,30 +32,30 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 			if (nid == nmplc) ntype = FELoadCurve::STEP;
 
 			// get the (optional) type
-			const char* szt = tag.AttributeValue("type", true);
-			if (szt)
+			XMLAtt* patt = tag.Attribute("type", true);
+			if (patt)
 			{
-				if      (strcmp(szt, "step"  ) == 0) ntype = FELoadCurve::STEP;
-				else if (strcmp(szt, "linear") == 0) ntype = FELoadCurve::LINEAR;
-				else if (strcmp(szt, "smooth") == 0) ntype = FELoadCurve::SMOOTH;
-				else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
+				XMLAtt& type = *patt;
+				if      (type == "step"  ) ntype = FELoadCurve::STEP;
+				else if (type == "linear") ntype = FELoadCurve::LINEAR;
+				else if (type == "smooth") ntype = FELoadCurve::SMOOTH;
+				else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 			}
 
 			// get the optional extend mode
-			const char* szm = tag.AttributeValue("extend", true);
-			if (szm)
+			patt = tag.Attribute("extend", true);
+			if (patt)
 			{
-				if      (strcmp(szm, "constant"     ) == 0) nextm = FELoadCurve::CONSTANT;
-				else if (strcmp(szm, "extrapolate"  ) == 0) nextm = FELoadCurve::EXTRAPOLATE;
-				else if (strcmp(szm, "repeat"       ) == 0) nextm = FELoadCurve::REPEAT;
-				else if (strcmp(szm, "repeat offset") == 0) nextm = FELoadCurve::REPEAT_OFFSET;
-				else throw XMLReader::InvalidAttributeValue(tag, "extend", szt);
+				XMLAtt& ext = *patt;
+				if      (ext == "constant"     ) nextm = FELoadCurve::CONSTANT;
+				else if (ext == "extrapolate"  ) nextm = FELoadCurve::EXTRAPOLATE;
+				else if (ext == "repeat"       ) nextm = FELoadCurve::REPEAT;
+				else if (ext == "repeat offset") nextm = FELoadCurve::REPEAT_OFFSET;
+				else throw XMLReader::InvalidAttributeValue(tag, "extend", ext.cvalue());
 			}
 
 			// count how many points we have
-			XMLTag t(tag); ++t;
-			int nlp = 0;
-			while (!t.isend()) { ++nlp; ++t; }
+			int nlp = tag.children();
 
 			// create the loadcurve
 			FELoadCurve* plc = new FELoadCurve;

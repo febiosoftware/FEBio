@@ -351,11 +351,11 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		int nattr = tag.m_natt;
 		for (int i=0; i<nattr; ++i)
 		{
-			const char* szat = tag.m_szatt[i];
+			const char* szat = tag.m_att[i].m_szatt;
 			if (strcmp(szat, "lc") == 0)
 			{
-				int lc = atoi(tag.m_szatv[i])-1;
-				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_szatv[i]);
+				int lc = atoi(tag.m_att[i].m_szatv)-1;
+				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
 				pp->m_nlc = lc;
 				switch (pp->m_itype)
 				{
