@@ -10,6 +10,23 @@
 class FESlidingSurfaceBW : public FEContactSurface
 {
 public:
+	// data for each integration point
+	class Data
+	{
+	public:
+		Data();
+
+	public:
+		double	m_gap;		//!< gap function
+		double	m_Lmd;		//!< Lagrange multipliers for displacements
+		double	m_Ln;		//!< net contact pressure
+		double	m_epsn;		//!< penalty factor
+		vec3d	m_nu;		//!< local normal
+		vec2d	m_rs;		//!< natural coordinates of this integration point
+		FESurfaceElement*	m_pme;	//!< projected master element
+	};
+
+public:
 	//! constructor
 	FESlidingSurfaceBW(FEModel* pfem);
 	
@@ -19,30 +36,19 @@ public:
 	//! shallow copy
 	void ShallowCopy(FESlidingSurfaceBW& s);
 	
-	//! calculate the nodal normals
-	void UpdateNodeNormals();
-	
 	void Serialize(DumpFile& ar);
 
 	//! evaluate net contact force
 	vec3d NetContactForce();
+
+	//! initialize projection
+	void InitProjection();
 	
 protected:
 	FEModel*	m_pfem;
 	
 public:
-	vector<double>				m_gap;	//!< gap function at integration points
-	vector<vec3d>				m_nu;	//!< normal at integration points
-	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
-	vector<double>				m_Lmd;	//!< lagrange multipliers for displacements
-	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
-	vector<int>					m_nei;	//!< surface element indices into arrays
-	vector<double>				m_Ln;	//!< net contact pressure
-	
-	vector<double>	m_epsn;	//!< penalty factors
-	
-	vector<vec3d>		m_nn;	//!< node normals
-	
+	vector< vector<Data> >	m_Data;		//!< integration point data for all elements
 };
 
 //-----------------------------------------------------------------------------
