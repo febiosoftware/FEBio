@@ -187,7 +187,6 @@ void FEFacet2FacetTied::ProjectSurface(FEFacetTiedSurface& ss, FEFacetTiedSurfac
 			else pt.m_pme = 0;
 		}
 	}
-	assert(ni==(int)m_ss.m_Lm.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -243,7 +242,6 @@ void FEFacet2FacetTied::Update(int niter)
 			}
 		}
 	}
-	assert(ni==(int)m_ss.m_Lm.size());
 }
 
 
@@ -349,7 +347,6 @@ void FEFacet2FacetTied::ContactForces(FEGlobalVector& R)
 			}
 		}
 	}
-	assert(ni==(int)m_ss.m_Lm.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -469,7 +466,6 @@ void FEFacet2FacetTied::ContactStiffness(FENLSolver* psolver)
 			}
 		}
 	}
-	assert(ni==(int)m_ss.m_Lm.size());
 }
 
 //-----------------------------------------------------------------------------
