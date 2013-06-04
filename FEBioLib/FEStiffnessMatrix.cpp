@@ -396,15 +396,15 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 			FEFacetSlidingSurface& ss = (np == 0? pfi->m_ss : pfi->m_ms);
 			FEFacetSlidingSurface& ms = (np == 0? pfi->m_ms : pfi->m_ss);
 
-			int ni = 0, k, l;
 			for (int j=0; j<ss.Elements(); ++j)
 			{
 				FESurfaceElement& se = ss.Element(j);
 				int nint = se.GaussPoints();
 				int* sn = &se.m_node[0];
-				for (k=0; k<nint; ++k, ++ni)
+				for (int k=0; k<nint; ++k)
 				{
-					FESurfaceElement* pe = ss.m_pme[ni];
+					FEFacetSlidingSurface::Data& pt = ss.m_Data[j][k];
+					FESurfaceElement* pe = pt.m_pme;
 					if (pe != 0)
 					{
 						FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
@@ -415,7 +415,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 						int nseln = se.Nodes();
 						int nmeln = me.Nodes();
 
-						for (l=0; l<nseln; ++l)
+						for (int l=0; l<nseln; ++l)
 						{
 							id = mesh.Node(sn[l]).m_ID;
 							lm[6*l  ] = id[DOF_X];
@@ -426,7 +426,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 							lm[6*l+5] = id[DOF_RW];
 						}
 
-						for (l=0; l<nmeln; ++l)
+						for (int l=0; l<nmeln; ++l)
 						{
 							id = mesh.Node(mn[l]).m_ID;
 							lm[6*(l+nseln)  ] = id[DOF_X];
@@ -453,15 +453,14 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 		FEFacetTiedSurface& ss = dynamic_cast<FEFacetTiedSurface&>(*pfti->GetSlaveSurface ());
 		FEFacetTiedSurface& ms = dynamic_cast<FEFacetTiedSurface&>(*pfti->GetMasterSurface());
 
-		int ni = 0, k, l;
 		for (int j=0; j<ss.Elements(); ++j)
 		{
 			FESurfaceElement& se = ss.Element(j);
 			int nint = se.GaussPoints();
 			int* sn = &se.m_node[0];
-			for (k=0; k<nint; ++k, ++ni)
+			for (int k=0; k<nint; ++k)
 			{
-				FESurfaceElement* pe = ss.m_pme[ni];
+				FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
 				if (pe != 0)
 				{
 					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
@@ -472,7 +471,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 					int nseln = se.Nodes();
 					int nmeln = me.Nodes();
 
-					for (l=0; l<nseln; ++l)
+					for (int l=0; l<nseln; ++l)
 					{
 						id = mesh.Node(sn[l]).m_ID;
 						lm[6*l  ] = id[DOF_X];
@@ -483,7 +482,7 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 						lm[6*l+5] = id[DOF_RW];
 					}
 
-					for (l=0; l<nmeln; ++l)
+					for (int l=0; l<nmeln; ++l)
 					{
 						id = mesh.Node(mn[l]).m_ID;
 						lm[6*(l+nseln)  ] = id[DOF_X];

@@ -24,6 +24,18 @@ BEGIN_PARAMETER_LIST(FEFacet2FacetSliding, FEContactInterface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+FEFacetSlidingSurface::Data::Data()
+{
+	m_gap = 0.0;
+	m_Lm  = 0.0;
+	m_Ln  = 0.0;
+	m_eps = 1.0;
+	m_nu = vec3d(0,0,0);
+	m_rs = vec2d(0,0);
+	m_pme = (FESurfaceElement*)0;
+}
+
+//-----------------------------------------------------------------------------
 // FEFacetSlidingSurface
 //-----------------------------------------------------------------------------
 
@@ -32,28 +44,15 @@ bool FEFacetSlidingSurface::Init()
 	// initialize surface data first
 	if (FEContactSurface::Init() == false) return false;
 
-	// count how many integration points we have
-	int nint = 0, i;
-	int NE = Elements();
-	m_nei.resize(NE);
-	for (i=0; i<NE; ++i)
+	// allocate data structures
+	const int NE = Elements();
+	m_Data.resize(NE);
+	for (int i=0; i<NE; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-		m_nei[i] = nint;
-		nint += el.GaussPoints();
+		int nint = el.GaussPoints();
+		m_Data[i].resize(nint);
 	}
-
-	// allocate data structures
-	m_gap.assign(nint, 0.0);
-	m_nu.resize(nint);
-	m_rs.resize(nint);
-	m_Lm.assign(nint, 0.0);
-	m_pme.assign(nint, static_cast<FESurfaceElement*>(0));
-	m_eps.assign(nint, 1.0);
-	m_Ln.assign(nint, 0.0);
-
-	// set intial values
-	zero(m_nu);
 
 	return true;
 }
@@ -61,10 +60,9 @@ bool FEFacetSlidingSurface::Init()
 //-----------------------------------------------------------------------------
 void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
 {
-	m_Lm  = s.m_Lm;
-	m_gap = s.m_gap;
-	m_Ln = s.m_Ln;
-	zero(m_pme);
+	// TODO: originally, we only copied Lmd, gap, Ln and reset pme to zero.
+	//       Need to check if this achieves the same
+	m_Data = s.m_Data;
 }
 
 //-----------------------------------------------------------------------------
@@ -73,23 +71,39 @@ void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 	FEContactSurface::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_gap;
-		ar << m_nu;
-		ar << m_rs;
-		ar << m_Lm;
-		ar << m_nei;
-		ar << m_eps;
-		ar << m_Ln;
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				ar << d.m_gap;
+				ar << d.m_nu;
+				ar << d.m_rs;
+				ar << d.m_Lm;
+				ar << d.m_eps;
+				ar << d.m_Ln;
+			}
+		}
 	}
 	else
 	{
-		ar >> m_gap;
-		ar >> m_nu;
-		ar >> m_rs;
-		ar >> m_Lm;
-		ar >> m_nei;
-		ar >> m_eps;
-		ar >> m_Ln;
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				ar >> d.m_gap;
+				ar >> d.m_nu;
+				ar >> d.m_rs;
+				ar >> d.m_Lm;
+				ar >> d.m_eps;
+				ar >> d.m_Ln;
+			}
+		}
 	}
 }
 
@@ -173,7 +187,6 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 	FEMesh& m = m_pfem->GetMesh();
 
 	// loop over all surface elements
-	int ni = 0;
 	for (int i=0; i<s.Elements(); ++i)
 	{
 		// get the surface element
@@ -197,7 +210,11 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 
 		// assign to integation points of surface element
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j, ++ni) s.m_eps[ni] = eps;
+		for (int j=0; j<nint; ++j) 
+		{
+			FEFacetSlidingSurface::Data& pt = s.m_Data[i][j];
+			pt.m_eps = eps;
+		}
 	}
 }
 
@@ -208,10 +225,6 @@ void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlidingSurface &ms, bool bsegup)
 {
 	bool bfirst = true;
-
-	// keep a running counter of which integration 
-	// point we are currently investigating
-	int ni = 0;
 
 	// loop over all slave elements
 	for (int i=0; i<ss.Elements(); ++i)
@@ -226,8 +239,11 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 
 		// loop over all its integration points
 		int nint = se.GaussPoints();
-		for (int j=0; j<nint; ++j, ++ni)
+		for (int j=0; j<nint; ++j)
 		{
+			// get the integration point data
+			FEFacetSlidingSurface::Data& pt = ss.m_Data[i][j];
+
 			// calculate the global coordinates of this integration point
 			double* H = se.H(j);
 
@@ -235,46 +251,46 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 			for (int k=0; k<nn; ++k) x += re[k]*H[k];
 
 			// see if the point still projects to the same element
-			if (ss.m_pme[ni])
+			if (pt.m_pme)
 			{
 				// update projection to master element
-				FESurfaceElement& mel = *ss.m_pme[ni];
-				q = ms.ProjectToSurface(mel, x, ss.m_rs[ni][0], ss.m_rs[ni][1]);
+				FESurfaceElement& mel = *pt.m_pme;
+				q = ms.ProjectToSurface(mel, x, pt.m_rs[0], pt.m_rs[1]);
 
 				// see if the projection is still in the element
-				if (bsegup && (!ms.IsInsideElement(mel, ss.m_rs[ni][0], ss.m_rs[ni][1], m_stol)))
+				if (bsegup && (!ms.IsInsideElement(mel, pt.m_rs[0], pt.m_rs[1], m_stol)))
 				{
 					// if not, do a new search
-					ss.m_rs[ni] = vec2d(0,0);
-					FESurfaceElement* pme = ms.ClosestPointProjection(x, q, ss.m_rs[ni], bfirst, m_stol); bfirst = false;
-					ss.m_pme[ni] = dynamic_cast<FESurfaceElement*>(pme);
+					pt.m_rs = vec2d(0,0);
+					FESurfaceElement* pme = ms.ClosestPointProjection(x, q, pt.m_rs, bfirst, m_stol); bfirst = false;
+					pt.m_pme = dynamic_cast<FESurfaceElement*>(pme);
 				}
 			}
 			if (bsegup)
 			{
 				// find the master segment this element belongs to
-				ss.m_rs[ni] = vec2d(0,0);
-				FESurfaceElement* pme = ms.ClosestPointProjection(x, q, ss.m_rs[ni], bfirst, m_stol); bfirst = false;
-				ss.m_pme[ni] = pme;
+				pt.m_rs = vec2d(0,0);
+				FESurfaceElement* pme = ms.ClosestPointProjection(x, q, pt.m_rs, bfirst, m_stol); bfirst = false;
+				pt.m_pme = pme;
 			}
 
 			// update normal and gap at integration point
-			if (ss.m_pme[ni])
+			if (pt.m_pme)
 			{
-				double r = ss.m_rs[ni][0];
-				double s = ss.m_rs[ni][1];
+				double r = pt.m_rs[0];
+				double s = pt.m_rs[1];
 
 				// the slave normal is set to the master element normal
-				ss.m_nu[ni] = ms.SurfaceNormal(*ss.m_pme[ni], r, s);
+				pt.m_nu = ms.SurfaceNormal(*pt.m_pme, r, s);
 
 				// calculate gap
-				ss.m_gap[ni] = -ss.m_nu[ni]*(x - q);
+				pt.m_gap = -pt.m_nu*(x - q);
 			}
 			else
 			{
 				// since the node is not in contact, we set the gap and Lagrange multiplier to zero
-				ss.m_gap[ni] = 0;
-				ss.m_Lm[ni] = 0;
+				pt.m_gap = 0;
+				pt.m_Lm = 0;
 			}
 		}
 	}
@@ -314,12 +330,8 @@ void FEFacet2FacetSliding::ShallowCopy(FEContactInterface &ci)
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 {
-	int i, j, k;
 	vector<int> sLM, mLM, LM, en;
 	vector<double> fe;
-
-	// keep a running counter of integration points
-	int ni = 0;
 
 	const int MELN = FEElement::MAX_NODES;
 	double detJ[MELN], w[MELN], *Hs, Hm[MELN];
@@ -332,8 +344,7 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
 		// loop over all slave elements
-		ni = 0;
-		for (i=0; i<ss.Elements(); ++i)
+		for (int i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
 			int nseln = se.Nodes();
@@ -343,11 +354,11 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 			ss.UnpackLM(se, sLM);
 
 			// nodal coordinates
-			for (j=0; j<nseln; ++j) r0[j] = ss.GetMesh()->Node(se.m_node[j]).m_r0;
+			for (int j=0; j<nseln; ++j) r0[j] = ss.GetMesh()->Node(se.m_node[j]).m_r0;
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
-			for (j=0; j<nint; ++j)
+			for (int j=0; j<nint; ++j)
 			{
 				double* Gr = se.Gr(j);
 				double* Gs = se.Gs(j);
@@ -355,7 +366,7 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 				// calculate jacobian
 				// note that we are integrating over the reference surface
 				vec3d dxr, dxs;
-				for (k=0; k<nseln; ++k)
+				for (int k=0; k<nseln; ++k)
 				{
 					dxr.x += Gr[k]*r0[k].x;
 					dxr.y += Gr[k]*r0[k].y;
@@ -374,10 +385,13 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 			}
 
 			// loop over all integration points
-			for (int j=0; j<nint; ++j, ++ni)
+			for (int j=0; j<nint; ++j)
 			{
+				// get integration point data
+				FEFacetSlidingSurface::Data& pt = ss.m_Data[i][j];
+
 				// get the master element
-				FESurfaceElement* pme = ss.m_pme[ni];
+				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
@@ -390,14 +404,14 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 
 					// build the LM vector
 					LM.resize(ndof);
-					for (k=0; k<nseln; ++k)
+					for (int k=0; k<nseln; ++k)
 					{
 						LM[3*k  ] = sLM[3*k  ];
 						LM[3*k+1] = sLM[3*k+1];
 						LM[3*k+2] = sLM[3*k+2];
 					}
 
-					for (k=0; k<nmeln; ++k)
+					for (int k=0; k<nmeln; ++k)
 					{
 						LM[3*(k+nseln)  ] = mLM[3*k  ];
 						LM[3*(k+nseln)+1] = mLM[3*k+1];
@@ -406,27 +420,27 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 
 					// build the en vector
 					en.resize(nseln+nmeln);
-					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
-					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+					for (int k=0; k<nseln; ++k) en[k] = se.m_node[k];
+					for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
 					// calculate shape functions
 					Hs = se.H(j);
 
-					double r = ss.m_rs[ni][0];
-					double s = ss.m_rs[ni][1];
+					double r = pt.m_rs[0];
+					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
 
 					// get normal vector
-					vec3d nu = ss.m_nu[ni];
+					vec3d nu = pt.m_nu;
 
 					// gap function
-					double g = ss.m_gap[ni];
+					double g = pt.m_gap;
 					
 					// lagrange multiplier
-					double Lm = ss.m_Lm[ni];
+					double Lm = pt.m_Lm;
 
 					// penalty value
-					double eps = m_epsn*ss.m_eps[ni];
+					double eps = m_epsn*pt.m_eps;
 
 					// contact traction
 					double tn = Lm + eps*g;
@@ -435,21 +449,21 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 					// calculate the force vector
 					fe.resize(ndof);
 
-					for (k=0; k<nseln; ++k)
+					for (int k=0; k<nseln; ++k)
 					{
 						fe[3*k  ] = Hs[k]*nu.x;
 						fe[3*k+1] = Hs[k]*nu.y;
 						fe[3*k+2] = Hs[k]*nu.z;
 					}
 
-					for (k=0; k<nmeln; ++k)
+					for (int k=0; k<nmeln; ++k)
 					{
 						fe[3*(k+nseln)  ] = -Hm[k]*nu.x;
 						fe[3*(k+nseln)+1] = -Hm[k]*nu.y;
 						fe[3*(k+nseln)+2] = -Hm[k]*nu.z;
 					}
 
-					for (k=0; k<ndof; ++k) fe[k] *= tn*detJ[j]*w[j];
+					for (int k=0; k<ndof; ++k) fe[k] *= tn*detJ[j]*w[j];
 
 					// assemble the global residual
 					R.Assemble(en, LM, fe);
@@ -463,15 +477,11 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 
 void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 {
-	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;
 	const int ME = 3*MN*2;
 	double N[ME], T1[ME], T2[ME], N1[ME] = {0}, N2[ME] = {0}, D1[ME], D2[ME], Nb1[ME], Nb2[ME];
 	matrix ke;
-
-	// keep a running counter of integration points
-	int ni = 0;
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -507,8 +517,7 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 
 		// loop over all slave elements
-		ni = 0;
-		for (i=0; i<ss.Elements(); ++i)
+		for (int i=0; i<ss.Elements(); ++i)
 		{
 			FESurfaceElement& se = ss.Element(i);
 			int nseln = se.Nodes();
@@ -518,11 +527,11 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 			ss.UnpackLM(se, sLM);
 
 			// nodal coordinates
-			for (j=0; j<nseln; ++j) r0[j] = ss.GetMesh()->Node(se.m_node[j]).m_r0;
+			for (int j=0; j<nseln; ++j) r0[j] = ss.GetMesh()->Node(se.m_node[j]).m_r0;
 
 			// we calculate all the metrics we need before we
 			// calculate the nodal forces
-			for (j=0; j<nint; ++j)
+			for (int j=0; j<nint; ++j)
 			{
 				double* Gr = se.Gr(j);
 				double* Gs = se.Gs(j);
@@ -530,7 +539,7 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 				// calculate jacobian
 				// note that we are integrating over the reference surface
 				vec3d dxr, dxs;
-				for (k=0; k<nseln; ++k)
+				for (int k=0; k<nseln; ++k)
 				{
 					dxr.x += Gr[k]*r0[k].x;
 					dxr.y += Gr[k]*r0[k].y;
@@ -549,10 +558,13 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 			}
 
 			// loop over all integration points
-			for (int j=0; j<nint; ++j, ++ni)
+			for (int j=0; j<nint; ++j)
 			{
+				// get integration point data
+				FEFacetSlidingSurface::Data& pt = ss.m_Data[i][j];
+
 				// get the master element
-				FESurfaceElement* pme = ss.m_pme[ni];
+				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
@@ -565,14 +577,14 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 
 					// build the LM vector
 					LM.resize(ndof);
-					for (k=0; k<nseln; ++k)
+					for (int k=0; k<nseln; ++k)
 					{
 						LM[3*k  ] = sLM[3*k  ];
 						LM[3*k+1] = sLM[3*k+1];
 						LM[3*k+2] = sLM[3*k+2];
 					}
 
-					for (k=0; k<nmeln; ++k)
+					for (int k=0; k<nmeln; ++k)
 					{
 						LM[3*(k+nseln)  ] = mLM[3*k  ];
 						LM[3*(k+nseln)+1] = mLM[3*k+1];
@@ -581,26 +593,26 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 
 					// build the en vector
 					en.resize(nseln+nmeln);
-					for (k=0; k<nseln; ++k) en[k] = se.m_node[k];
-					for (k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
+					for (int k=0; k<nseln; ++k) en[k] = se.m_node[k];
+					for (int k=0; k<nmeln; ++k) en[k+nseln] = me.m_node[k];
 
 					// calculate shape functions
 					Hs = se.H(j);
-					double r = ss.m_rs[ni][0];
-					double s = ss.m_rs[ni][1];
+					double r = pt.m_rs[0];
+					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
 
 					// get normal vector
-					vec3d nu = ss.m_nu[ni];
+					vec3d nu = pt.m_nu;
 
 					// gap function
-					double g = ss.m_gap[ni];
+					double g = pt.m_gap;
 					
 					// lagrange multiplier
-					double Lm = ss.m_Lm[ni];
+					double Lm = pt.m_Lm;
 
 					// penalty value
-					double eps = m_epsn*ss.m_eps[ni];
+					double eps = m_epsn*pt.m_eps;
 
 					// contact traction
 					double tn = Lm + eps*g;
@@ -616,14 +628,14 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 					}
 
 					// calculate the N-vector
-					for (k=0; k<nseln; ++k)
+					for (int k=0; k<nseln; ++k)
 					{
 						N[3*k  ] = Hs[k]*nu.x;
 						N[3*k+1] = Hs[k]*nu.y;
 						N[3*k+2] = Hs[k]*nu.z;
 					}
 
-					for (k=0; k<nmeln; ++k)
+					for (int k=0; k<nmeln; ++k)
 					{
 						N[3*(k+nseln)  ] = -Hm[k]*nu.x;
 						N[3*(k+nseln)+1] = -Hm[k]*nu.y;
@@ -636,8 +648,8 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 					ke.resize(ndof, ndof);
 
 					// add the first order term (= D(tn)*dg )
-					for (k=0; k<ndof; ++k)
-						for (l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
+					for (int k=0; k<ndof; ++k)
+						for (int l=0; l<ndof; ++l) ke[k][l] = dtn*N[k]*N[l]*detJ[j]*w[j];
 
 					// add the higher order terms (= tn*D(dg) )
 					if (knmult > 0)
@@ -647,11 +659,11 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 
 						// get the master nodes
 						vec3d rt[MN];
-						for (k=0; k<nmeln; ++k) rt[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
+						for (int k=0; k<nmeln; ++k) rt[k] = ms.GetMesh()->Node(me.m_node[k]).m_rt;
 
 						// get the tangent vectors
 						vec3d tau1(0,0,0), tau2(0,0,0);
-						for (k=0; k<nmeln; ++k)
+						for (int k=0; k<nmeln; ++k)
 						{
 							tau1.x += Hmr[k]*rt[k].x;
 							tau1.y += Hmr[k]*rt[k].y;
@@ -663,14 +675,14 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 						}
 
 						// set up the Ti vectors
-						for (k=0; k<nseln; ++k)
+						for (int k=0; k<nseln; ++k)
 						{
 							T1[k*3  ] = Hs[k]*tau1.x; T2[k*3  ] = Hs[k]*tau2.x;
 							T1[k*3+1] = Hs[k]*tau1.y; T2[k*3+1] = Hs[k]*tau2.y;
 							T1[k*3+2] = Hs[k]*tau1.z; T2[k*3+2] = Hs[k]*tau2.z;
 						}
 
-						for (k=0; k<nmeln; ++k) 
+						for (int k=0; k<nmeln; ++k) 
 						{
 							T1[(k+nseln)*3  ] = -Hm[k]*tau1.x;
 							T1[(k+nseln)*3+1] = -Hm[k]*tau1.y;
@@ -682,7 +694,7 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 						}
 
 						// set up the Ni vectors
-						for (k=0; k<nmeln; ++k) 
+						for (int k=0; k<nmeln; ++k) 
 						{
 							N1[(k+nseln)*3  ] = -Hmr[k]*nu.x;
 							N1[(k+nseln)*3+1] = -Hmr[k]*nu.y;
@@ -707,7 +719,7 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 						double Gss[MN];
 						double Grs[MN];
 						me.shape_deriv2(Grr, Grs, Gss, r, s);
-						for (k=0; k<nmeln; ++k)
+						for (int k=0; k<nmeln; ++k)
 						{
 							K[0][0] += (nu*rt[k])*Grr[k];
 							K[0][1] += (nu*rt[k])*Grs[k];
@@ -726,14 +738,14 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 						double detA = A[0][0]*A[1][1] - A[0][1]*A[1][0];
 
 						// setup Di vectors
-						for (k=0; k<ndof; ++k)
+						for (int k=0; k<ndof; ++k)
 						{
 							D1[k] = (1/detA)*(A[1][1]*(T1[k]+g*N1[k]) - A[0][1]*(T2[k] + g*N2[k]));
 							D2[k] = (1/detA)*(A[0][0]*(T2[k]+g*N2[k]) - A[0][1]*(T1[k] + g*N1[k]));
 						}
 
 						// setup Nbi vectors
-						for (k=0; k<ndof; ++k)
+						for (int k=0; k<ndof; ++k)
 						{
 							Nb1[k] = N1[k] - K[0][1]*D2[k];
 							Nb2[k] = N2[k] - K[0][1]*D1[k];
@@ -741,8 +753,8 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 
 						// add it to the stiffness
 						double sum;
-						for (k=0; k<ndof; ++k)
-							for (l=0; l<ndof; ++l)
+						for (int k=0; k<ndof; ++k)
+							for (int l=0; l<ndof; ++l)
 							{
 								sum = Mi[0][0]*Nb1[k]*Nb1[l]+Mi[0][1]*(Nb1[k]*Nb2[l]+Nb2[k]*Nb1[l])+Mi[1][1]*Nb2[k]*Nb2[l];
 								sum *= g;
@@ -765,47 +777,47 @@ void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::UpdateContactPressures()
 {
-	int np, n, i, j, k;
 	int npass = (m_btwo_pass?2:1);
-	for (np=0; np<npass; ++np)
+	for (int np=0; np<npass; ++np)
 	{
 		FEFacetSlidingSurface& ss = (np == 0? m_ss : m_ms);
 		FEFacetSlidingSurface& ms = (np == 0? m_ms : m_ss);
 		
-		// keep a running counter of integration points.
-		int ni = 0;
-		
 		// loop over all elements of the primary surface
-		for (n=0; n<ss.Elements(); ++n)
+		for (int n=0; n<ss.Elements(); ++n)
 		{
 			FESurfaceElement& el = ss.Element(n);
 			int nint = el.GaussPoints();
 			
 			// get the normal tractions at the integration points
 			double gap, eps;
-			for (i=0; i<nint; ++i, ++ni) 
+			for (int i=0; i<nint; ++i) 
 			{
-				gap = ss.m_gap[ni];
-				eps = m_epsn*ss.m_eps[ni];
-				ss.m_Ln[ni] = MBRACKET(ss.m_Lm[ni] + eps*gap);
-				FESurfaceElement* pme = ss.m_pme[ni];
+				FEFacetSlidingSurface::Data& pt = ss.m_Data[n][i];
+
+				gap = pt.m_gap;
+				eps = m_epsn*pt.m_eps;
+				pt.m_Ln = MBRACKET(pt.m_Lm + eps*gap);
+				FESurfaceElement* pme = pt.m_pme;
 				if (m_btwo_pass && pme)
 				{
+					// get master element data
+					vector<FEFacetSlidingSurface::Data>& mdv = ms.m_Data[pme->m_lid];
 					int mint = pme->GaussPoints();
-					int noff = ms.m_nei[pme->m_lid];
 					double ti[FEElement::MAX_NODES];
-					for (j=0; j<mint; ++j) {
-						k = noff+j;
-						gap = ms.m_gap[k];
-						eps = m_epsn*ms.m_eps[k];
-						ti[j] = MBRACKET(ms.m_Lm[k] + m_epsn*ms.m_eps[k]*ms.m_gap[k]);
+					for (int j=0; j<mint; ++j) 
+					{
+						FEFacetSlidingSurface::Data& md = mdv[j];
+						gap = md.m_gap;
+						eps = m_epsn*md.m_eps;
+						ti[j] = MBRACKET(md.m_Lm + m_epsn*md.m_eps*md.m_gap);
 					}
 					// project the data to the nodes
 					double tn[FEElement::MAX_NODES];
 					pme->project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
-					double Ln = pme->eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);
-					ss.m_Ln[ni] += MBRACKET(Ln);
+					double Ln = pme->eval(tn, pt.m_rs[0], pt.m_rs[1]);
+					pt.m_Ln += MBRACKET(Ln);
 				}
 			}
 		}
@@ -818,19 +830,35 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	// make sure we need to augment
 	if (!m_blaugon) return true;
 
-	int i;
-	double Ln;
 	bool bconv = true;
 
+	// TODO: why is this static?
 	static double normg0 = 0;
 
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
-	int NS = m_ss.m_Lm.size();
-	int NM = m_ms.m_Lm.size();
+	int NS = (int) m_ss.m_Data.size();
+	int NM = (int) m_ms.m_Data.size();
+
 	double normL0 = 0;
-	for (i=0; i<NS; ++i) normL0 += m_ss.m_Lm[i]*m_ss.m_Lm[i];
-	for (i=0; i<NM; ++i) normL0 += m_ms.m_Lm[i]*m_ms.m_Lm[i];
+	for (int i=0; i<NS; ++i)
+	{
+		vector<FEFacetSlidingSurface::Data>& sd = m_ss.m_Data[i];
+		for (int j=0; j<(int)sd.size(); ++j)
+		{
+			FEFacetSlidingSurface::Data& ds = sd[j];
+			normL0 += ds.m_Lm*ds.m_Lm;
+		}
+	}
+	for (int i=0; i<NM; ++i)
+	{
+		vector<FEFacetSlidingSurface::Data>& md = m_ms.m_Data[i];
+		for (int j=0; j<(int)md.size(); ++j)
+		{
+			FEFacetSlidingSurface::Data& dm = md[j];
+			normL0 += dm.m_Lm*dm.m_Lm;
+		}
+	}
 	normL0 = sqrt(normL0);
 
 	// --- c a l c u l a t e   c u r r e n t   n o r m s ---
@@ -838,38 +866,50 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	double normL1 = 0;	// force norm
 	double normg1 = 0;	// gap norm
 	int N = 0;
-	for (i=0; i<NS; ++i)
+	for (int i=0; i<NS; ++i)
 	{
-		// penalty value
-		double eps = m_epsn*m_ss.m_eps[i];
-
-		// update Lagrange multipliers
-		Ln = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
-		Ln = MBRACKET(Ln);
-
-		normL1 += Ln*Ln;
-
-		if (m_ss.m_gap[i] > 0)
+		vector<FEFacetSlidingSurface::Data>& sd = m_ss.m_Data[i];
+		for (int j=0; j<(int)sd.size(); ++j)
 		{
-			normg1 += m_ss.m_gap[i]*m_ss.m_gap[i];
-			++N;
+			FEFacetSlidingSurface::Data& ds = sd[j];
+
+			// penalty value
+			double eps = m_epsn*ds.m_eps;
+
+			// update Lagrange multipliers
+			double Ln = ds.m_Lm + eps*ds.m_gap;
+			Ln = MBRACKET(Ln);
+
+			normL1 += Ln*Ln;
+
+			if (ds.m_gap > 0)
+			{
+				normg1 += ds.m_gap*ds.m_gap;
+				++N;
+			}
 		}
 	}	
 
-	for (i=0; i<NM; ++i)
+	for (int i=0; i<NM; ++i)
 	{
-		// penalty value
-		double eps = m_epsn*m_ms.m_eps[i];
-
-		// update Lagrange multipliers
-		Ln = m_ms.m_Lm[i] + eps*m_ms.m_gap[i];
-		Ln = MBRACKET(Ln);
-
-		normL1 += Ln*Ln;
-		if (m_ms.m_gap[i] > 0)
+		vector<FEFacetSlidingSurface::Data>& md = m_ms.m_Data[i];
+		for (int j=0; j<(int)md.size(); ++j)
 		{
-			normg1 += m_ms.m_gap[i]*m_ms.m_gap[i];
-			++N;
+			FEFacetSlidingSurface::Data& dm = md[j];
+
+			// penalty value
+			double eps = m_epsn*dm.m_eps;
+
+			// update Lagrange multipliers
+			double Ln = dm.m_Lm + eps*dm.m_gap;
+			Ln = MBRACKET(Ln);
+
+			normL1 += Ln*Ln;
+			if (dm.m_gap > 0)
+			{
+				normg1 += dm.m_gap*dm.m_gap;
+				++N;
+			}
 		}
 	}
 	if (N == 0) N=1;
@@ -901,24 +941,36 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	if (bconv == false)
 	{
 		// we did not converge so update multipliers
-		for (i=0; i<NS; ++i)
+		for (int i=0; i<NS; ++i)
 		{
-			// penalty value
-			double eps = m_epsn*m_ss.m_eps[i];
+			vector<FEFacetSlidingSurface::Data>& sd = m_ss.m_Data[i];
+			for (int j=0; j<(int)sd.size(); ++j)
+			{
+				FEFacetSlidingSurface::Data& ds = sd[j];
 
-			// update Lagrange multipliers
-			Ln = m_ss.m_Lm[i] + eps*m_ss.m_gap[i];
-			m_ss.m_Lm[i] = MBRACKET(Ln);
+				// penalty value
+				double eps = m_epsn*ds.m_eps;
+
+				// update Lagrange multipliers
+				double Ln = ds.m_Lm + eps*ds.m_gap;
+				ds.m_Lm = MBRACKET(Ln);
+			}
 		}	
 
-		for (i=0; i<NM; ++i)
+		for (int i=0; i<NM; ++i)
 		{
-			// penalty value
-			double eps = m_epsn*m_ms.m_eps[i];
+			vector<FEFacetSlidingSurface::Data>& md = m_ms.m_Data[i];
+			for (int j=0; j<(int)md.size(); ++j)
+			{
+				FEFacetSlidingSurface::Data& dm = md[j];
 
-			// update Lagrange multipliers
-			Ln = m_ms.m_Lm[i] + eps*m_ms.m_gap[i];
-			m_ms.m_Lm[i] = MBRACKET(Ln);
+				// penalty value
+				double eps = m_epsn*dm.m_eps;
+
+				// update Lagrange multipliers
+				double Ln = dm.m_Lm + eps*dm.m_gap;
+				dm.m_Lm = MBRACKET(Ln);
+			}
 		}
 	}
 

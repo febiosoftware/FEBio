@@ -4,9 +4,26 @@
 #include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
-
+//! Contact surface for facet-to-facet sliding interfaces
 class FEFacetSlidingSurface : public FEContactSurface
 {
+public:
+	//! Integration point data
+	class Data
+	{
+	public:
+		Data();
+
+	public:
+		double	m_gap;	//!< gap function at integration points
+		double	m_Lm;	//!< Lagrange multipliers
+		double	m_eps;	//!< penalty value at integration point
+		double	m_Ln;	//!< net contact pressure
+		vec3d	m_nu;	//!< master normal at integration points
+		vec2d	m_rs;	//!< natural coordinates of projection of integration point
+		FESurfaceElement*	m_pme;	//!< master element of projection
+	};
+
 public:
 	//! constructor
 	FEFacetSlidingSurface(FEMesh* pm) : FEContactSurface(pm) {}
@@ -21,14 +38,7 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
-	vector<double>				m_gap;	//!< gap function at integration points
-	vector<vec3d>				m_nu;	//!< master normal at integration points
-	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
-	vector<double>				m_Lm;	//!< lagrange multipliers 
-	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
-	vector<int>					m_nei;	//!< surface element indices into arrays
-	vector<double>				m_eps;	//!< penalty values for each integration point
-	vector<double>				m_Ln;	//!< net contact pressure
+	vector< vector<Data> >		m_Data;	//!< integration point data
 };
 
 //-----------------------------------------------------------------------------

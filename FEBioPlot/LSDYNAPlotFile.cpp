@@ -810,16 +810,16 @@ void LSDYNAPlotFile::write_contact_tractions()
 			{
 				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
 
-				int nint = 0;
 				for (j=0; j<s.Elements(); ++j)
 				{
 					FESurfaceElement& el = s.Element(j);
 					ne = el.Nodes();
 					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint)
+					for (k=0; k<ni; ++k)
 					{
-						li[k] = s.m_Lm[nint];
-						gi[k] = s.m_gap[nint];
+						FEFacetSlidingSurface::Data& pt = s.m_Data[j][k];
+						li[k] = pt.m_Lm;
+						gi[k] = pt.m_gap;
 						ti[k] = li[k] + pf->m_epsn*gi[k];
 
 						gi[k] = (gi[k]>=0?gi[k] : 0);
@@ -1128,16 +1128,16 @@ void LSDYNAPlotFile::write_contact_pressures()
 			{
 				FEFacetSlidingSurface& s = (n==0?pfs->m_ss:pfs->m_ms);
 
-				int nint = 0;
 				for (j=0; j<s.Elements(); ++j)
 				{
 					FESurfaceElement& el = s.Element(j);
 					ne = el.Nodes();
 					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint) 
+					for (k=0; k<ni; ++k) 
 					{
-						double eps = pfs->m_epsn*s.m_eps[nint];
-						Li[k] = s.m_Lm[nint] + eps*s.m_gap[nint];
+						FEFacetSlidingSurface::Data& pt = s.m_Data[j][k];
+						double eps = pfs->m_epsn*pt.m_eps;
+						Li[k] = pt.m_Lm + eps*pt.m_gap;
 						Li[k] =  MBRACKET(Li[k]);
 					}
 
@@ -1211,15 +1211,14 @@ void LSDYNAPlotFile::write_contact_gaps()
 			{
 				FEFacetSlidingSurface& s = (n==0?pf->m_ss:pf->m_ms);
 
-				int nint = 0;
 				for (j=0; j<s.Elements(); ++j)
 				{
 					FESurfaceElement& el = s.Element(j);
 					ne = el.Nodes();
 					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint)
+					for (k=0; k<ni; ++k)
 					{
-						double gk = s.m_gap[nint];
+						double gk = s.m_Data[j][k].m_gap;
 						gi[k] = (gk < 0 ? 0 : gk);
 					}
 
