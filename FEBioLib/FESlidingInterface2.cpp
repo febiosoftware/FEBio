@@ -25,6 +25,21 @@ BEGIN_PARAMETER_LIST(FESlidingInterface2, FEContactInterface)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+FESlidingSurface2::Data::Data()
+{
+	m_gap  = 0.0;
+	m_Lmd  = 0.0;
+	m_Lmp  = 0.0;
+	m_epsn = 1.0;
+	m_epsp = 1.0;
+	m_Ln   = 0.0;
+	m_pg   = 0.0;
+	m_nu   = vec3d(0,0,0);
+	m_rs   = vec2d(0,0);
+	m_pme  = (FESurfaceElement*)0;
+}
+
+//-----------------------------------------------------------------------------
 // FESlidingSurface2
 //-----------------------------------------------------------------------------
 
@@ -40,41 +55,22 @@ bool FESlidingSurface2::Init()
 	// initialize surface data first
 	if (FEContactSurface::Init() == false) return false;
 
-	// count how many integration points we have
-	int nint = 0, i;
-	for (i=0; i<Elements(); ++i)
+	// allocate data structures
+	int NE = Elements();
+	m_Data.resize(NE);
+	for (int i=0; i<NE; ++i)
 	{
 		FESurfaceElement& el = Element(i);
-		nint += el.GaussPoints();
+		int nint = el.GaussPoints();
+		m_Data[i].resize(nint);
 	}
 
-	// allocate data structures
-	m_gap.assign(nint, 0.0);
-	m_nu.resize(nint);
-	m_rs.resize(nint);
-	m_Lmd.assign(nint, 0.0);
-	m_Lmp.assign(nint, 0.0);
-	m_pme.assign(nint, static_cast<FESurfaceElement*>(0));
-	m_epsn.assign(nint, 1.0);
-	m_epsp.assign(nint, 1.0);
-	m_Ln.assign(nint, 0.0);
-
+	// allocate node normals
 	m_nn.assign(Nodes(), 0);
-
-	m_nei.resize(Elements());
-	nint = 0;
-	for (i=0; i<Elements(); ++i)
-	{
-		m_nei[i] = nint;
-		nint += Element(i).GaussPoints();
-	}
-
-	// set intial values
-	zero(m_nu);
 
 	// determine biphasic status
 	m_poro.resize(Elements(),false);
-	for (i=0; i<Elements(); ++i)
+	for (int i=0; i<Elements(); ++i)
 	{
 		// get the surface element
 		FESurfaceElement& se = Element(i);
@@ -94,12 +90,6 @@ bool FESlidingSurface2::Init()
 			}
 		}
 	}
-		
-	// allocate biphasic stuff
-	if (m_bporo)
-	{
-		m_pg.assign(nint, 0);
-	}
 
 	return true;
 }
@@ -107,17 +97,8 @@ bool FESlidingSurface2::Init()
 //-----------------------------------------------------------------------------
 void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 {
-	m_Lmd = s.m_Lmd;
-	m_gap = s.m_gap;
-	m_Ln = s.m_Ln;
-	zero(m_pme);
+	m_Data = s.m_Data;
 	m_bporo = s.m_bporo;
-
-	if (m_bporo)
-	{
-		m_pg  = s.m_pg;
-		m_Lmp = s.m_Lmp;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -129,33 +110,33 @@ void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 void FESlidingSurface2::UpdateNodeNormals()
 {
 	const int MN = FEElement::MAX_NODES;
-	int N = Nodes(), i, j, ne, jp1, jm1;
-	vec3d y[MN], n;
+	vec3d y[MN];
 
 	// zero nodal normals
 	zero(m_nn);
 
 	// loop over all elements
-	for (i=0; i<Elements(); ++i)
+	for (int i=0; i<Elements(); ++i)
 	{
 		FESurfaceElement& el = Element(i);
-		ne = el.Nodes();
+		int ne = el.Nodes();
 
 		// get the nodal coordinates
-		for (j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
+		for (int j=0; j<ne; ++j) y[j] = Node(el.m_lnode[j]).m_rt;
 
 		// calculate the normals
-		for (j=0; j<ne; ++j)
+		for (int j=0; j<ne; ++j)
 		{
-			jp1 = (j+1)%ne;
-			jm1 = (j+ne-1)%ne;
-			n = (y[jp1] - y[j]) ^ (y[jm1] - y[j]);
+			int jp1 = (j+1)%ne;
+			int jm1 = (j+ne-1)%ne;
+			vec3d n = (y[jp1] - y[j]) ^ (y[jm1] - y[j]);
 			m_nn[el.m_lnode[j]] += n;
 		}
 	}
 
 	// normalize all vectors
-	for (i=0; i<N; ++i) m_nn[i].unit();
+	const int N = Nodes();
+	for (int i=0; i<N; ++i) m_nn[i].unit();
 }
 
 //-----------------------------------------------------------------------------
@@ -178,33 +159,49 @@ void FESlidingSurface2::Serialize(DumpFile& ar)
 	// And finally, we serialize the surface data
 	if (ar.IsSaving())
 	{
-		ar << m_gap;
-		ar << m_nu;
-		ar << m_rs;
-		ar << m_Lmd;
-		ar << m_Lmp;
-		ar << m_nei;
-		ar << m_epsn;
-		ar << m_epsp;
-		ar << m_nn;
-		ar << m_pg;
-		ar << m_Ln;
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				ar << d.m_gap;
+				ar << d.m_nu;
+				ar << d.m_rs;
+				ar << d.m_Lmd;
+				ar << d.m_Lmp;
+				ar << d.m_epsn;
+				ar << d.m_epsp;
+				ar << d.m_pg;
+				ar << d.m_Ln;
+			}
+		}
 		ar << m_poro;
+		ar << m_nn;
 	}
 	else
 	{
-		ar >> m_gap;
-		ar >> m_nu;
-		ar >> m_rs;
-		ar >> m_Lmd;
-		ar >> m_Lmp;
-		ar >> m_nei;
-		ar >> m_epsn;
-		ar >> m_epsp;
-		ar >> m_nn;
-		ar >> m_pg;
-		ar >> m_Ln;
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				ar >> d.m_gap;
+				ar >> d.m_nu;
+				ar >> d.m_rs;
+				ar >> d.m_Lmd;
+				ar >> d.m_Lmp;
+				ar >> d.m_epsn;
+				ar >> d.m_epsp;
+				ar >> d.m_pg;
+				ar >> d.m_Ln;
+			}
+		}
 		ar >> m_poro;
+		ar >> m_nn;
 	}
 }
 
@@ -291,7 +288,6 @@ void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 	FEMesh& m = m_pfem->GetMesh();
 
 	// loop over all surface elements
-	int ni = 0;
 	for (int i=0; i<s.Elements(); ++i)
 	{
 		// get the surface element
@@ -315,7 +311,11 @@ void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 
 		// assign to integation points of surface element
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j, ++ni) s.m_epsn[ni] = eps;
+		for (int j=0; j<nint; ++j)
+		{
+			FESlidingSurface2::Data& pt = s.m_Data[i][j];
+			pt.m_epsn = eps;
+		}
 	}
 }
 
@@ -326,7 +326,6 @@ void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 	FEMesh& m = m_pfem->GetMesh();
 
 	// loop over all surface elements
-	int ni = 0;
 	for (int i=0; i<s.Elements(); ++i)
 	{
 		// get the surface element
@@ -350,7 +349,11 @@ void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 
 		// assign to integation points of surface element
 		int nint = el.GaussPoints();
-		for (int j=0; j<nint; ++j, ++ni) s.m_epsp[ni] = eps;
+		for (int j=0; j<nint; ++j)
+		{
+			FESlidingSurface2::Data& pt = s.m_Data[i][j];
+			pt.m_epsp = eps;
+		}
 	}
 }
 
@@ -422,7 +425,6 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 	double R = m_srad*mesh.GetBoundingBox().radius();
 
 	// loop over all integration points
-	int n = 0;
 	for (int i=0; i<ss.Elements(); ++i)
 	{
 		FESurfaceElement& el = ss.Element(i);
@@ -437,8 +439,11 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 			for (int j=0; j<ne; ++j) ps[j] = mesh.Node(el.m_node[j]).m_pt;
 		}
 
-		for (int j=0; j<nint; ++j, ++n)
+		for (int j=0; j<nint; ++j)
 		{
+			// get the integration point data
+			FESlidingSurface2::Data& pt = ss.m_Data[i][j];
+
 			// calculate the global position of the integration point
 			r = ss.Local2Global(el, j);
 
@@ -449,7 +454,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 			nu = ss.SurfaceNormal(el, j);
 
 			// first see if the old intersected face is still good enough
-			pme = ss.m_pme[n];
+			pme = pt.m_pme;
 			if (pme)
 			{
 				double g;
@@ -457,8 +462,8 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 				// see if the ray intersects this element
 				if (ms.Intersect(*pme, r, nu, rs, g, m_stol))
 				{
-					ss.m_rs[n][0] = rs[0];
-					ss.m_rs[n][1] = rs[1];
+					pt.m_rs[0] = rs[0];
+					pt.m_rs[1] = rs[1];
 				}
 				else
 				{
@@ -469,10 +474,10 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 			// find the intersection point with the master surface
 			if (pme == 0 && bupseg) pme = ms.FindIntersection(r, nu, rs, bfirst, m_stol, R);
 
-			ss.m_pme[n] = pme;
-			ss.m_nu[n] = nu;
-			ss.m_rs[n][0] = rs[0];
-			ss.m_rs[n][1] = rs[1];
+			pt.m_pme = pme;
+			pt.m_nu = nu;
+			pt.m_rs[0] = rs[0];
+			pt.m_rs[1] = rs[1];
 			if (pme)
 			{
 				// the node could potentially be in contact
@@ -484,11 +489,11 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 				// to Gerard's notes.
 				double g = nu*(r - q);
 
-				double eps = m_epsn*ss.m_epsn[n];
+				double eps = m_epsn*pt.m_epsn;
 
-				Ln = ss.m_Lmd[n] + eps*g;
+				Ln = pt.m_Lmd + eps*g;
 
-				ss.m_gap[n] = (g <= R? g : 0);
+				pt.m_gap = (g <= R? g : 0);
 
 				if ((Ln >= 0) && (g <= R))
 				{
@@ -499,28 +504,28 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 						double pm[FEElement::MAX_NODES];
 						for (int k=0; k<pme->Nodes(); ++k) pm[k] = mesh.Node(pme->m_node[k]).m_pt;
 						double p2 = pme->eval(pm, rs[0], rs[1]);
-						ss.m_pg[n] = p1 - p2;
+						pt.m_pg = p1 - p2;
 					}
 				}
 				else
 				{
-//					ss.m_Lmd[n] = 0;
-//					ss.m_gap[n] = 0;
-					ss.m_pme[n] = 0;
+//					pt.m_Lmd = 0;
+//					pt.m_gap = 0;
+					pt.m_pme = 0;
 					if (sporo) {
-//						ss.m_Lmp[n] = 0;
-//						ss.m_pg[n] = 0;
+//						pt.m_Lmp = 0;
+//						pt.m_pg = 0;
 					}
 				}
 			}
 			else
 			{
 				// the node is not in contact
-				ss.m_Lmd[n] = 0;
-				ss.m_gap[n] = 0;
+				pt.m_Lmd = 0;
+				pt.m_gap = 0;
 				if (sporo) {
-					ss.m_Lmp[n] = 0;
-					ss.m_pg[n] = 0;
+					pt.m_Lmp = 0;
+					pt.m_pg = 0;
 				}
 			}
 		}
@@ -591,9 +596,6 @@ void FESlidingInterface2::Update(int niter)
 		FESlidingSurface2& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface2& ms = (np == 0? m_ms : m_ss);
 
-		// keep a running counter of integration points.
-		int ni = 0;
-
 		// loop over all elements of the primary surface
 		for (n=0; n<ss.Elements(); ++n)
 		{
@@ -603,11 +605,12 @@ void FESlidingInterface2::Update(int niter)
 
 			// get the normal tractions at the integration points
 			double ti[FEElement::MAX_NODES], gap, eps;
-			for (i=0; i<nint; ++i, ++ni) 
+			for (i=0; i<nint; ++i) 
 			{
-				gap = ss.m_gap[ni];
-				eps = m_epsn*ss.m_epsn[ni];
-				ti[i] = MBRACKET(ss.m_Lmd[ni] + eps*gap);
+				FESlidingSurface2::Data& pt = ss.m_Data[n][i];
+				gap = pt.m_gap;
+				eps = m_epsn*pt.m_epsn;
+				ti[i] = MBRACKET(pt.m_Lmd + eps*gap);
 			}
 
 			// project the data to the nodes
@@ -655,12 +658,12 @@ void FESlidingInterface2::Update(int niter)
 						// get the normal tractions at the integration points
 						double ti[FEElement::MAX_NODES], gap, eps;
 						int nint = pse->GaussPoints();
-						int noff = ss.m_nei[pse->m_lid];
 						for (i=0; i<nint; ++i) 
 						{
-							gap = ss.m_gap[noff + i];
-							eps = m_epsn*ss.m_epsn[noff + i];
-							ti[i] = MBRACKET(ss.m_Lmd[noff + i] + eps*gap);
+							FESlidingSurface2::Data& pt = ss.m_Data[pse->m_lid][i];
+							gap = pt.m_gap;
+							eps = m_epsn*pt.m_epsn;
+							ti[i] = MBRACKET(pt.m_Lmd + eps*gap);
 						}
 						
 						// project the data to the nodes
@@ -719,9 +722,6 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 		FESlidingSurface2& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface2& ms = (np == 0? m_ms : m_ss);
 
-		// keep a running counter of integration points
-		int ni = 0;
-
 		// loop over all slave elements
 		for (i=0; i<ss.Elements(); ++i)
 		{
@@ -754,10 +754,13 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 
 			// loop over all integration points
 			// note that we are integrating over the current surface
-			for (j=0; j<nint; ++j, ++ni)
+			for (j=0; j<nint; ++j)
 			{
+				// get the integration point data
+				FESlidingSurface2::Data& pt = ss.m_Data[i][j];
+
 				// get the master element
-				FESurfaceElement* pme = ss.m_pme[ni];
+				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
 					// get the master element
@@ -799,21 +802,21 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 					Hs = se.H(j);
 
 					// get master element shape functions
-					double r = ss.m_rs[ni][0];
-					double s = ss.m_rs[ni][1];
+					double r = pt.m_rs[0];
+					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
 
 					// get normal vector
-					vec3d nu = ss.m_nu[ni];
+					vec3d nu = pt.m_nu;
 
 					// gap function
-					double g = ss.m_gap[ni];
+					double g = pt.m_gap;
 					
 					// lagrange multiplier
-					double Lm = ss.m_Lmd[ni];
+					double Lm = pt.m_Lmd;
 
 					// penalty 
-					double eps = m_epsn*ss.m_epsn[ni];
+					double eps = m_epsn*pt.m_epsn;
 
 					// contact traction
 					double tn = Lm + eps*g;
@@ -851,9 +854,9 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 						int ndof = nseln + nmeln;
 
 						// calculate the flow rate
-						double epsp = m_epsp*ss.m_epsp[ni];
+						double epsp = m_epsp*pt.m_epsp;
 
-						double wn = ss.m_Lmp[ni] + epsp*ss.m_pg[ni];
+						double wn = pt.m_Lmp + epsp*pt.m_pg;
 
 						// fill the LM
 						LM.resize(ndof);
@@ -919,9 +922,6 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 		FESlidingSurface2& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface2& ms = (np == 0? m_ms : m_ss);
 
-		// keep a running counter of the integration points
-		int ni = 0;
-
 		// loop over all slave elements
 		for (i=0; i<ss.Elements(); ++i)
 		{
@@ -965,10 +965,13 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 			}
 
 			// loop over all integration points
-			for (j=0; j<nint; ++j, ++ni)
+			for (j=0; j<nint; ++j)
 			{
+				// get integration point data
+				FESlidingSurface2::Data& pt = ss.m_Data[i][j];
+
 				// get the master element
-				FESurfaceElement* pme = ss.m_pme[ni];
+				FESurfaceElement* pme = pt.m_pme;
 				if (pme)
 				{
 					FESurfaceElement& me = *pme;
@@ -1044,21 +1047,21 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 					Hs = se.H(j);
 
 					// master shape functions
-					double r = ss.m_rs[ni][0];
-					double s = ss.m_rs[ni][1];
+					double r = pt.m_rs[0];
+					double s = pt.m_rs[1];
 					me.shape_fnc(Hm, r, s);
 
 					// get slave normal vector
-					vec3d nu = ss.m_nu[ni];
+					vec3d nu = pt.m_nu;
 
 					// gap function
-					double g = ss.m_gap[ni];
+					double g = pt.m_gap;
 					
 					// lagrange multiplier
-					double Lm = ss.m_Lmd[ni];
+					double Lm = pt.m_Lmd;
 
 					// penalty 
-					double eps = m_epsn*ss.m_epsn[ni];
+					double eps = m_epsn*pt.m_epsn;
 
 					// contact traction
 					double tn = Lm + eps*g;
@@ -1248,7 +1251,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 						// poro version or not.
 						double dt = fem.GetCurrentStep()->m_dt;
 						
-						double epsp = (tn > 0) ? m_epsp*ss.m_epsp[ni] : 0.;
+						double epsp = (tn > 0) ? m_epsp*pt.m_epsp : 0.;
 						
 						// --- S O L I D - P R E S S U R E   C O N T A C T ---
 						
@@ -1270,7 +1273,7 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 									ke[4*k + 3][4*l+2] += dt*w[j]*detJ[j]*epsp*N[k]*N[l]*(dpmr*Gm[0].z + dpms*Gm[1].z);
 								}
 							
-							double wn = ss.m_Lmp[ni] + epsp*ss.m_pg[ni];
+							double wn = pt.m_Lmp + epsp*pt.m_pg;
 							
 							// b. A-term
 							//-------------------------------------
@@ -1331,47 +1334,45 @@ void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
 //-----------------------------------------------------------------------------
 void FESlidingInterface2::UpdateContactPressures()
 {
-	int np, n, i, j, k;
 	int npass = (m_btwo_pass?2:1);
-	for (np=0; np<npass; ++np)
+	for (int np=0; np<npass; ++np)
 	{
 		FESlidingSurface2& ss = (np == 0? m_ss : m_ms);
 		FESlidingSurface2& ms = (np == 0? m_ms : m_ss);
 		
-		// keep a running counter of integration points.
-		int ni = 0;
-		
 		// loop over all elements of the primary surface
-		for (n=0; n<ss.Elements(); ++n)
+		for (int n=0; n<ss.Elements(); ++n)
 		{
 			FESurfaceElement& el = ss.Element(n);
 			int nint = el.GaussPoints();
 			
 			// get the normal tractions at the integration points
 			double gap, eps;
-			for (i=0; i<nint; ++i, ++ni) 
+			for (int i=0; i<nint; ++i) 
 			{
-				gap = ss.m_gap[ni];
-				eps = m_epsn*ss.m_epsn[ni];
-				ss.m_Ln[ni] = MBRACKET(ss.m_Lmd[ni] + eps*gap);
-				FESurfaceElement* pme = ss.m_pme[ni];
+				// get integration point data
+				FESlidingSurface2::Data& pt = ss.m_Data[n][i];
+
+				gap = pt.m_gap;
+				eps = m_epsn*pt.m_epsn;
+				pt.m_Ln = MBRACKET(pt.m_Lmd + eps*gap);
+				FESurfaceElement* pme = pt.m_pme;
 				if (m_btwo_pass && pme)
 				{
 					int mint = pme->GaussPoints();
-					int noff = ms.m_nei[pme->m_lid];
 					double ti[FEElement::MAX_NODES];
-					for (j=0; j<mint; ++j) {
-						k = noff+j;
-						gap = ms.m_gap[k];
-						eps = m_epsn*ms.m_epsn[k];
-						ti[j] = MBRACKET(ms.m_Lmd[k] + m_epsn*ms.m_epsn[k]*ms.m_gap[k]);
+					for (int j=0; j<mint; ++j) {
+						FESlidingSurface2::Data& mp = ms.m_Data[pme->m_lid][j];
+						gap = mp.m_gap;
+						eps = m_epsn*mp.m_epsn;
+						ti[j] = MBRACKET(mp.m_Lmd + m_epsn*mp.m_epsn*mp.m_gap);
 					}
 					// project the data to the nodes
 					double tn[FEElement::MAX_NODES];
 					pme->project_to_nodes(ti, tn);
 					// now evaluate the traction at the intersection point
-					double Ln = pme->eval(tn, ss.m_rs[ni][0], ss.m_rs[ni][1]);
-					ss.m_Ln[ni] += MBRACKET(Ln);
+					double Ln = pme->eval(tn, pt.m_rs[0], pt.m_rs[1]);
+					pt.m_Ln += MBRACKET(Ln);
 				}
 			}
 		}
@@ -1389,14 +1390,30 @@ bool FESlidingInterface2::Augment(int naug)
 	bool bconv = true;
 
 	bool bporo = (m_ss.m_bporo && m_ms.m_bporo);
-	int NS = m_ss.m_Lmd.size();
-	int NM = m_ms.m_Lmd.size();
+	int NS = m_ss.m_Data.size();
+	int NM = m_ms.m_Data.size();
 
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
 	double normL0 = 0, normP = 0, normDP = 0;
-	for (i=0; i<NS; ++i) normL0 += m_ss.m_Lmd[i]*m_ss.m_Lmd[i];
-	for (i=0; i<NM; ++i) normL0 += m_ms.m_Lmd[i]*m_ms.m_Lmd[i];
+	for (int i=0; i<NS; ++i)
+	{
+		vector<FESlidingSurface2::Data>& sd = m_ss.m_Data[i];
+		for (int j=0; j<(int)sd.size(); ++j)
+		{
+			FESlidingSurface2::Data& ds = sd[j];
+			normL0 += ds.m_Lmd*ds.m_Lmd;
+		}
+	}
+	for (int i=0; i<NM; ++i)
+	{
+		vector<FESlidingSurface2::Data>& md = m_ms.m_Data[i];
+		for (int j=0; j<(int)md.size(); ++j)
+		{
+			FESlidingSurface2::Data& dm = md[j];
+			normL0 += dm.m_Lmd*dm.m_Lmd;
+		}
+	}
 
 	// b. gap component
 	// (is calculated during update)
@@ -1407,48 +1424,60 @@ bool FESlidingInterface2::Augment(int naug)
 	double normL1 = 0, eps, epsp;
 	for (i=0; i<NS; ++i)
 	{
-		// update Lagrange multipliers on slave surface
-		eps = m_epsn*m_ss.m_epsn[i];
-		Ln = m_ss.m_Lmd[i] + eps*m_ss.m_gap[i];
-		m_ss.m_Lmd[i] = MBRACKET(Ln);
+		vector<FESlidingSurface2::Data>& sd = m_ss.m_Data[i];
+		for (int j=0; j<(int)sd.size(); ++j)
+		{
+			FESlidingSurface2::Data& ds = sd[j];
 
-		normL1 += m_ss.m_Lmd[i]*m_ss.m_Lmd[i];
+			// update Lagrange multipliers on slave surface
+			eps = m_epsn*ds.m_epsn;
+			Ln = ds.m_Lmd + eps*ds.m_gap;
+			ds.m_Lmd = MBRACKET(Ln);
+
+			normL1 += ds.m_Lmd*ds.m_Lmd;
 		
-		if (m_ss.m_bporo) {
-			Lp = 0;
-			if (Ln > 0) {
-				epsp = m_epsp*m_ss.m_epsp[i];
-				Lp = m_ss.m_Lmp[i] + epsp*m_ss.m_pg[i];
-				maxpg = max(maxpg,fabs(m_ss.m_pg[i]));
-				normDP += m_ss.m_pg[i]*m_ss.m_pg[i];
+			if (m_ss.m_bporo) {
+				Lp = 0;
+				if (Ln > 0) {
+					epsp = m_epsp*ds.m_epsp;
+					Lp = ds.m_Lmp + epsp*ds.m_pg;
+					maxpg = max(maxpg,fabs(ds.m_pg));
+					normDP += ds.m_pg*ds.m_pg;
+				}
+				ds.m_Lmp = Lp;
 			}
-			m_ss.m_Lmp[i] = Lp;
-		}
 		
-		if (Ln > 0) maxgap = max(maxgap,fabs(m_ss.m_gap[i]));
+			if (Ln > 0) maxgap = max(maxgap,fabs(ds.m_gap));
+		}
 	}	
 	
 	for (i=0; i<NM; ++i)
 	{
-		// update Lagrange multipliers on master surface
-		eps = m_epsn*m_ms.m_epsn[i];
-		Ln = m_ms.m_Lmd[i] + eps*m_ms.m_gap[i];
-		m_ms.m_Lmd[i] = MBRACKET(Ln);
+		vector<FESlidingSurface2::Data>& md = m_ms.m_Data[i];
+		for (int j=0; j<(int)md.size(); ++j)
+		{
+			FESlidingSurface2::Data& dm = md[j];
 
-		normL1 += m_ms.m_Lmd[i]*m_ms.m_Lmd[i];
+			// update Lagrange multipliers on master surface
+			eps = m_epsn*dm.m_epsn;
+			Ln = dm.m_Lmd + eps*dm.m_gap;
+			dm.m_Lmd = MBRACKET(Ln);
+
+			normL1 += dm.m_Lmd*dm.m_Lmd;
 		
-		if (m_ms.m_bporo) {
-			Lp = 0;
-			if (Ln > 0) {
-				epsp = m_epsp*m_ms.m_epsp[i];
-				Lp = m_ms.m_Lmp[i] + epsp*m_ms.m_pg[i];
-				maxpg = max(maxpg,fabs(m_ms.m_pg[i]));
-				normDP += m_ms.m_pg[i]*m_ms.m_pg[i];
+			if (m_ms.m_bporo) {
+				Lp = 0;
+				if (Ln > 0) {
+					epsp = m_epsp*dm.m_epsp;
+					Lp = dm.m_Lmp + epsp*dm.m_pg;
+					maxpg = max(maxpg,fabs(dm.m_pg));
+					normDP += dm.m_pg*dm.m_pg;
+				}
+				dm.m_Lmp = Lp;
 			}
-			m_ms.m_Lmp[i] = Lp;
-		}
 		
-		if (Ln > 0) maxgap = max(maxgap,fabs(m_ms.m_gap[i]));
+			if (Ln > 0) maxgap = max(maxgap,fabs(dm.m_gap));
+		}
 	}
 
 	// Ideally normP should be evaluated from the fluid pressure at the

@@ -572,15 +572,16 @@ void FEStiffnessMatrix::AddContactInterface(FEContactInterface* pci)
 			FESlidingSurface2& ss = (np == 0? ps2->m_ss : ps2->m_ms);
 			FESlidingSurface2& ms = (np == 0? ps2->m_ms : ps2->m_ss);
 
-			int ni = 0, k, l;
+			int k, l;
 			for (int j=0; j<ss.Elements(); ++j)
 			{
 				FESurfaceElement& se = ss.Element(j);
 				int nint = se.GaussPoints();
 				int* sn = &se.m_node[0];
-				for (k=0; k<nint; ++k, ++ni)
+				for (k=0; k<nint; ++k)
 				{
-					FESurfaceElement* pe = ss.m_pme[ni];
+					FESlidingSurface2::Data& pt = ss.m_Data[j][k];
+					FESurfaceElement* pe = pt.m_pme;
 					if (pe != 0)
 					{
 						FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);

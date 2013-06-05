@@ -861,16 +861,16 @@ void LSDYNAPlotFile::write_contact_tractions()
 			{
 				FESlidingSurface2& s = (n==0?ps2->m_ss:ps2->m_ms);
 
-				int nint = 0;
 				for (j=0; j<s.Elements(); ++j)
 				{
 					FESurfaceElement& el = s.Element(j);
 					ne = el.Nodes();
 					ni = el.GaussPoints();
-					for (k=0; k<ni; ++k, ++nint)
+					for (k=0; k<ni; ++k)
 					{
-						li[k] = s.m_Lmd[nint];
-						gi[k] = s.m_gap[nint];
+						FESlidingSurface2::Data& pt = s.m_Data[j][k];
+						li[k] = pt.m_Lmd;
+						gi[k] = pt.m_gap;
 						ti[k] = li[k] + ps2->m_epsn*gi[k];
 
 						gi[k] = (gi[k]>=0?gi[k] : 0);
@@ -1257,7 +1257,7 @@ void LSDYNAPlotFile::write_contact_gaps()
 					ni = el.GaussPoints();
 					for (k=0; k<ni; ++k, ++nint)
 					{
-						gi[k] = s.m_gap[nint];
+						gi[k] = s.m_Data[j][k].m_gap;
 					}
 
 					el.project_to_nodes(gi, gn);

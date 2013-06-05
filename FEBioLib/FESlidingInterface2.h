@@ -6,6 +6,26 @@
 class FESlidingSurface2 : public FEContactSurface
 {
 public:
+	//! Integration point data
+	class Data
+	{
+	public:
+		Data();
+
+	public:
+		double	m_gap;	//!< gap function
+		double	m_Lmd;	//!< lagrange multipliers for displacement
+		double	m_Lmp;	//!< lagrange multipliers for fluid pressures
+		double	m_Ln;	//!< net contact pressure
+		double	m_epsn;	//!< penalty factor
+		double	m_epsp;	//!< pressure penatly factor
+		double	m_pg;	//!< pressure "gap" for biphasic contact
+		vec3d	m_nu;	//!< normal at integration points
+		vec2d	m_rs;	//!< natrual coordinates of projection
+		FESurfaceElement*	m_pme;	//!< master element
+	};
+
+public:
 	//! constructor
 	FESlidingSurface2(FEModel* pfem);
 
@@ -26,26 +46,11 @@ protected:
 	FEModel*	m_pfem;
 
 public:
-	bool				m_bporo;	//!< set poro-mode
+	bool	m_bporo;	//!< set poro-mode
 
-	vector<double>				m_gap;	//!< gap function at integration points
-	vector<vec3d>				m_nu;	//!< normal at integration points
-	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
-	vector<double>				m_Lmd;	//!< lagrange multipliers for displacements
-	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
-	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
-	vector<double>				m_Ln;	//!< net contact pressure
-	vector<int>					m_nei;	//!< surface element indices into arrays
-	vector<bool>				m_poro;	//!< surface element poro status
-
-	vector<double>	m_epsn;	//!< penalty factors
-	vector<double>	m_epsp;	//!< pressure penalty factors
-
+	vector< vector<Data> >	m_Data;	//!< integration point data
+	vector<bool>		m_poro;	//!< surface element poro status
 	vector<vec3d>		m_nn;	//!< node normals
-
-	// biphasic data
-	vector<double>				m_pg;	//!< pressure "gap"
-
 };
 
 //-----------------------------------------------------------------------------
