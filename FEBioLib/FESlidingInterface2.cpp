@@ -97,8 +97,18 @@ bool FESlidingSurface2::Init()
 //-----------------------------------------------------------------------------
 void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
 {
-	m_Data = s.m_Data;
 	m_bporo = s.m_bporo;
+
+	// copy integration point data
+	m_Data = s.m_Data;
+
+	// reset element pointers
+	for (int i=0; i<Elements(); ++i)
+	{
+		vector<Data>& di = m_Data[i];
+		int n = (int) di.size();
+		for (int j=0; j<n; ++j) di[j].m_pme = 0;
+	}
 }
 
 //-----------------------------------------------------------------------------

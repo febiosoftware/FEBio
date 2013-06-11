@@ -6,6 +6,29 @@
 class FESlidingSurface3 : public FEContactSurface
 {
 public:
+	//! integration point data
+	class Data
+	{
+	public:
+		Data();
+
+	public:
+		double	m_gap;	//!< gap function at integration points
+		double	m_Lmd;	//!< Lagrange multipliers for displacements
+		double	m_Lmp;	//!< Lagrange multipliers for fluid pressure
+		double	m_Lmc;	//!< Lagrange multipliers for solute concentrations
+		double	m_Ln;	//!< net contact pressure
+		double	m_epsn;	//!< displacement penalty factors
+		double	m_epsp;	//!< pressure penalty factors
+		double	m_epsc;	//!< concentration penatly factors
+		double	m_pg;	//!< pressure "gap"
+		double	m_cg;	//!< concentration "gap"
+		vec3d	m_nu;	//!< normal at integration points
+		vec2d	m_rs;	//!< natural coordinates of projection of integration point
+		FESurfaceElement*	m_pme;	//!< master element of projected integration point
+	};
+
+public:
 	//! constructor
 	FESlidingSurface3(FEModel* pfem);
 	
@@ -32,27 +55,12 @@ public:
 	bool						m_bporo;	//!< set poro-mode
 	bool						m_bsolu;	//!< set solute-mode
 	
-	vector<double>				m_gap;	//!< gap function at integration points
-	vector<vec3d>				m_nu;	//!< normal at integration points
-	vector<vec2d>				m_rs;	//!< natural coordinates of projection of integration point
-	vector<double>				m_Lmd;	//!< lagrange multipliers for displacements
-	vector<double>				m_Lmp;	//!< lagrange multipliers for fluid pressures
-	vector<double>				m_Lmc;	//!< lagrange multipliers for solute concentrations
-	vector<FESurfaceElement*>	m_pme;	//!< master element of projected integration point
-	vector<double>				m_Ln;	//!< net contact pressure
-	vector<int>					m_nei;	//!< surface element indices into arrays
 	vector<bool>				m_poro;	//!< surface element poro status
 	vector<int>					m_solu;	//!< surface element solute id
+
+	vector< vector<Data> >		m_Data; //!< integration point data
 	
-	vector<double>	m_epsn;	//!< penalty factors
-	vector<double>	m_epsp;	//!< pressure penalty factors
-	vector<double>	m_epsc;	//!< concentration penalty factors
-	
-	vector<vec3d>		m_nn;	//!< node normals
-	
-	// biphasic-solute data
-	vector<double>				m_pg;	//!< pressure "gap"
-	vector<double>				m_cg;	//!< concentration "gap"
+	vector<vec3d>		m_nn;	//!< node normals	
 };
 
 //-----------------------------------------------------------------------------
