@@ -18,24 +18,24 @@
 #define SQR(x) ((x)*(x))
 #endif
 
-// we store the cos and sin of the angles here
-int FESphericalFiberDistribution::m_nres = 0;
-double FESphericalFiberDistribution::m_cth[NSTH];
-double FESphericalFiberDistribution::m_sth[NSTH];
-double FESphericalFiberDistribution::m_cph[NSTH];
-double FESphericalFiberDistribution::m_sph[NSTH];
-double FESphericalFiberDistribution::m_w[NSTH];
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FESphericalFiberDistribution, FEElasticMaterial)
-ADD_PARAMETER(m_beta, FE_PARAM_DOUBLE, "beta");
-ADD_PARAMETER(m_ksi , FE_PARAM_DOUBLE, "ksi" );
+	ADD_PARAMETER(m_alpha, FE_PARAM_DOUBLE, "alpha");
+	ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
+	ADD_PARAMETER(m_ksi  , FE_PARAM_DOUBLE, "ksi"  );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // FESphericalFiberDistribution
 //-----------------------------------------------------------------------------
 
+FESphericalFiberDistribution::FESphericalFiberDistribution()
+{
+	m_unstable = true;
+	m_alpha = 0.0;
+}
+
+//-----------------------------------------------------------------------------
 void FESphericalFiberDistribution::Init()
 {
 	FEElasticMaterial::Init();
@@ -43,28 +43,7 @@ void FESphericalFiberDistribution::Init()
 	if (m_unstable) throw MaterialError("This fibrous material is unstable (collapses on itself) when used alone.  Combine it in a solid mixture with a material that can serve as a ground matrix.");
 	if (m_ksi < 0) throw MaterialError("ksi must be positive.");
 	if (m_beta < 2) throw MaterialError("beta must be greater than 2.");
-	
-	static bool bfirst = true;
-	
-	if (bfirst)
-	{
-		// select the integration rule
-		const int nint = (m_nres == 0? NSTL  : NSTH  );
-		const double* phi = (m_nres == 0? PHIL  : PHIH  );
-		const double* the = (m_nres == 0? THETAL: THETAH);
-		const double* w   = (m_nres == 0? AREAL : AREAH );
-		
-		for (int n=0; n<nint; ++n)
-		{
-			m_cth[n] = cos(the[n]);
-			m_sth[n] = sin(the[n]);
-			m_cph[n] = cos(phi[n]);
-			m_sph[n] = sin(phi[n]);
-			m_w[n] = w[n];
-		}
-		
-		bfirst = false;
-	}
+	if (m_alpha < 0) throw MaterialError("alpha must be positive.");
 }
 
 //-----------------------------------------------------------------------------
@@ -77,49 +56,119 @@ mat3ds FESphericalFiberDistribution::Stress(FEMaterialPoint& mp)
 	double J = pt.J;
 	
 	// get the element's local coordinate system
-	mat3d QT = (pt.Q).transpose();
+	mat3d Q = pt.Q;
 	
 	// loop over all integration points
-	vec3d n0e, n0a, nt;
+	vec3d n0e, n0a, n0q, nt;
 	double In, Wl;
 	const double eps = 0;
-	mat3ds C = pt.RightCauchyGreen();
 	mat3ds s;
 	s.zero();
 	
-	const int nint = (m_nres == 0? NSTL  : NSTH  );
-	
+	const int nint = 45;
 	for (int n=0; n<nint; ++n)
 	{
-		// set the global fiber direction in reference configuration
-		n0e.x = m_cth[n]*m_sph[n];
-		n0e.y = m_sth[n]*m_sph[n];
-		n0e.z = m_cph[n];
+		// set the global fiber direction in material coordinate system
+		n0a.x = XYZ2[n][0];
+		n0a.y = XYZ2[n][1];
+		n0a.z = XYZ2[n][2];
+		double wn = XYZ2[n][3];
+		
+		// calculate material coefficients
+		double ksi  = m_ksi;
+		double alpha = m_alpha;
+		double beta = m_beta;
+		
+		// --- quadrant 1,1,1 ---
+		
+		// rotate to reference configuration
+		n0e = Q*n0a;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
 		
 		// Calculate In = n0e*C*n0e
-		In = n0e*(C*n0e);
+		In = nt*nt;
 		
 		// only take fibers in tension into consideration
 		if (In > 1. + eps)
 		{
-			// get the global spatial fiber direction in current configuration
-			nt = (F*n0e)/sqrt(In);
-			
-			// calculate the outer product of nt
-			mat3ds N = dyad(nt);
-			
-			// get the local material fiber direction in reference configuration
-			n0a = QT*n0e;
-			
 			// calculate strain energy derivative
-			Wl = m_beta*m_ksi*pow(In - 1.0, m_beta-1.0);
+			Wl = beta*ksi*pow(In - 1.0, beta-1.0)*exp(alpha*pow(In - 1.0, beta));
 			
 			// calculate the stress
-			s += N*(2.0/J*In*Wl*m_w[n]);
+			s += dyad(nt)*(Wl*wn);
 		}
 		
+		// --- quadrant -1,1,1 ---
+		n0q = vec3d(-n0a.x, n0a.y, n0a.z);
+		
+		// rotate to reference configuration
+		n0e = Q*n0q;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+		
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wl = beta*ksi*pow(In - 1.0, beta-1.0)*exp(alpha*pow(In - 1.0, beta));
+			
+			// calculate the stress
+			s += dyad(nt)*(Wl*wn);
+		}
+		
+		// --- quadrant -1,-1,1 ---
+		n0q = vec3d(-n0a.x, -n0a.y, n0a.z);
+		
+		// rotate to reference configuration
+		n0e = Q*n0q;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+		
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wl = beta*ksi*pow(In - 1.0, beta-1.0)*exp(alpha*pow(In - 1.0, beta));
+			
+			// calculate the stress
+			s += dyad(nt)*(Wl*wn);
+		}
+		
+		// --- quadrant 1,-1,1 ---
+		n0q = vec3d(n0a.x, -n0a.y, n0a.z);
+		
+		// rotate to reference configuration
+		n0e = Q*n0q;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+		
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			Wl = beta*ksi*pow(In - 1.0, beta-1.0)*exp(alpha*pow(In - 1.0, beta));
+			
+			// calculate the stress
+			s += dyad(nt)*(Wl*wn);
+		}
 	}
-	return s;
+	
+	// we multiply by two to add contribution from other half-sphere
+	return s*(4.0/J);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,10 +181,10 @@ tens4ds FESphericalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	double J = pt.J;
 	
 	// get the element's local coordinate system
-	mat3d QT = (pt.Q).transpose();
+	mat3d Q = pt.Q;
 	
 	// loop over all integration points
-	vec3d n0e, n0a, nt;
+	vec3d n0e, n0a, n0q, nt;
 	double In, Wll;
 	const double eps = 0;
 	tens4ds cf, cfw; cf.zero();
@@ -144,42 +193,123 @@ tens4ds FESphericalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	tens4ds c;
 	c.zero();
 	
-	// right Cauchy-Green tensor: C = Ft*F
-	mat3ds C = (F.transpose()*F).sym();
-	
-	const int nint = (m_nres == 0? NSTL  : NSTH  );
-	
+	const int nint = 45;
 	for (int n=0; n<nint; ++n)
 	{
-		// set the global fiber direction in reference configuration
-		n0e.x = m_cth[n]*m_sph[n];
-		n0e.y = m_sth[n]*m_sph[n];
-		n0e.z = m_cph[n];
+		// set the global fiber direction in material coordinate system
+		n0a.x = XYZ2[n][0];
+		n0a.y = XYZ2[n][1];
+		n0a.z = XYZ2[n][2];
+		double wn = XYZ2[n][3];
+		
+		// calculate material coefficients
+		double ksi  = m_ksi;
+		double alpha = m_alpha;
+		double beta = m_beta;
+		
+		// --- quadrant 1,1,1 ---
+		
+		// rotate to reference configuration
+		n0e = Q*n0a;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
 		
 		// Calculate In = n0e*C*n0e
-		In = n0e*(C*n0e);
+		In = nt*nt;
 		
 		// only take fibers in tension into consideration
 		if (In > 1. + eps)
 		{
-			// get the global spatial fiber direction in current configuration
-			nt = (F*n0e)/sqrt(In);
-			
-			// calculate the outer product of nt
-			N2 = dyad(nt);
-			
-			// get the local material fiber direction in reference configuration
-			n0a = QT*n0e;
-			
 			// calculate strain energy derivative
-			Wll = m_beta*(m_beta-1.0)*m_ksi*pow(In - 1.0, m_beta-2.0);
+			double pIn = alpha*pow(In - 1.0,beta);
+			Wll = beta*ksi*pow(In - 1.0, beta-2.0)*(beta*pIn+beta-1.0)*exp(pIn);
 			
 			N2 = dyad(nt);
 			N4 = dyad1s(N2);
 			
-			c += N4*(4.0/J*In*In*Wll*m_w[n]);
+			c += N4*(Wll*wn);
+		}
+		
+		// --- quadrant -1,1,1 ---
+		
+		n0q = vec3d(-n0a.x, n0a.y, n0a.z);
+		
+		// rotate to reference configuration
+		n0e = Q*n0q;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+		
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			double pIn = alpha*pow(In - 1.0,beta);
+			Wll = beta*ksi*pow(In - 1.0, beta-2.0)*(beta*pIn+beta-1.0)*exp(pIn);
+			
+			N2 = dyad(nt);
+			N4 = dyad1s(N2);
+			
+			c += N4*(Wll*wn);
+		}
+		
+		// --- quadrant -1,-1,1 ---
+		
+		n0q = vec3d(-n0a.x, -n0a.y, n0a.z);
+		
+		// rotate to reference configuration
+		n0e = Q*n0q;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+		
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			double pIn = alpha*pow(In - 1.0,beta);
+			Wll = beta*ksi*pow(In - 1.0, beta-2.0)*(beta*pIn+beta-1.0)*exp(pIn);
+			
+			N2 = dyad(nt);
+			N4 = dyad1s(N2);
+			
+			c += N4*(Wll*wn);
+		}
+		
+		// --- quadrant 1,-1,1 ---
+		
+		n0q = vec3d(n0a.x, -n0a.y, n0a.z);
+		
+		// rotate to reference configuration
+		n0e = Q*n0q;
+		
+		// get the global spatial fiber direction in current configuration
+		nt = F*n0e;
+		
+		// Calculate In = n0e*C*n0e
+		In = nt*nt;
+		
+		// only take fibers in tension into consideration
+		if (In > 1. + eps)
+		{
+			// calculate strain energy derivative
+			double pIn = alpha*pow(In - 1.0,beta);
+			Wll = beta*ksi*pow(In - 1.0, beta-2.0)*(beta*pIn+beta-1.0)*exp(pIn);
+			
+			N2 = dyad(nt);
+			N4 = dyad1s(N2);
+			
+			c += N4*(Wll*wn);
 		}
 	}
 	
-	return c;
+	// multiply by two to integrate over other half of sphere
+	return c*(2.0*4.0/J);
 }

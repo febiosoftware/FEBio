@@ -16,7 +16,7 @@
 class FESphericalFiberDistribution : public FEElasticMaterial
 {
 public:
-	FESphericalFiberDistribution() {m_unstable = true;}
+	FESphericalFiberDistribution();
 	
 	//! Initialization
 	void Init();
@@ -36,11 +36,5 @@ public:
 public:
 	double	m_beta;		// power in power-law relation
 	double	m_ksi;		// coefficient in power-law relation
-	
-	static int		m_nres;	// integration rule
-	static double	m_cth[];
-	static double	m_sth[];
-	static double	m_cph[];
-	static double	m_sph[];
-	static double	m_w[];
+	double	m_alpha;	// coefficient of exponential argument
 };
