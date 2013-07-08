@@ -31,7 +31,7 @@ public:
 
 public:
 
-	//! initialization (TODO: Find a use for this)
+	//! initialization \todo Find a use for this
 	void Init() {}
 
 	//! calculates the joint forces

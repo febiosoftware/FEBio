@@ -19,9 +19,9 @@
 
 //-----------------------------------------------------------------------------
 //! rigid body class
-// TODO: perhaps the rigid body should store a list of domains it uses
-//       That way, we can have multiple domains per RB using multiple 
-//       materials.
+//! \todo perhaps the rigid body should store a list of domains it uses.
+//!       That way, we can have multiple domains per RB using multiple 
+//!       materials.
 class FERigidBody : public FEObject 
 {
 public:

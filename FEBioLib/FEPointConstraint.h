@@ -16,7 +16,7 @@ public:
 	//! initialize data
 	void Init();
 
-	//! serialize (TODO: implement this)
+	//! serialize \todo Implement this
 	void Serialize(DumpFile& ar) {}
 
 	//! Calculate the constraint force
@@ -25,7 +25,7 @@ public:
 	//! calculate the constraint stiffness
 	void StiffnessMatrix(FENLSolver* psolver);
 
-	//! augmentations (TODO: implement this)
+	//! augmentations \todo implement this
 	bool Augment(int naug) { return true; }
 
 public:

@@ -85,8 +85,8 @@ public:
 	// --- Control Data ---
 	//{
 		int		m_nanalysis;	//!< analysis type
-		int		m_istiffpr;		//!< calculate pressure stiffness (TODO remove)
-		bool	m_baugment;		//!< use Lagrangian augmentation (TODO: move to solver class?)
+		int		m_istiffpr;		//!< calculate pressure stiffness \todo remove
+		bool	m_baugment;		//!< use Lagrangian augmentation \todo move to solver class?
 	//}
 
 	// --- Time Step Data ---

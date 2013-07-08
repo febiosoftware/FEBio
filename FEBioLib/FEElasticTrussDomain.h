@@ -36,7 +36,7 @@ public: // overloads from FEElasticDomain
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
 
-	//! calculate body force (TODO: implement this)
+	//! calculate body force \todo implement this
 	void BodyForce(FEGlobalVector& R, FEBodyForce& bf) { assert(false); }
 
 	//! Calculates inertial forces for dynamic problems
@@ -45,10 +45,10 @@ public: // overloads from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
-	//! intertial stiffness matrix (TODO: implement this)
+	//! intertial stiffness matrix \todo implement this
 	void InertialStiffness(FENLSolver* psolver) { assert(false); }
 
-	//! body force stiffness matrix (TODO: implement this)
+	//! body force stiffness matrix \todo implement this
 	void BodyForceStiffness(FENLSolver* psolver, FEBodyForce& bf) { assert(false); }
 
 protected:

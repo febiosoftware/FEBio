@@ -9,7 +9,7 @@ class FEElasticShellDomain : public FEShellDomain, public FEElasticDomain
 public:
 	FEElasticShellDomain(FEMesh* pm, FEMaterial* pmat) : FEShellDomain(FE_SHELL_DOMAIN, pm, pmat) {}
 
-	//! TODO: do I really need this?
+	//! \todo do I really need this?
 	FEElasticShellDomain& operator = (FEElasticShellDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! Clone this domain
@@ -50,10 +50,10 @@ public: // overrides from FEElasticDomain
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FENLSolver* psolver);
 
-	// inertial stiffness (TODO: implement this)
+	// inertial stiffness \todo implement this
 	void InertialStiffness   (FENLSolver* psolver) { assert(false); }
 
-	// body force stiffness (TODO: implement this)
+	// body force stiffness \todo implement this
 	void BodyForceStiffness  (FENLSolver* psolver, FEBodyForce& bf) { assert(false); }
 
 public:

@@ -242,7 +242,7 @@ public: // TODO: Find a better place for these parameters
 	int		m_nStep;			//!< current analysis step
 	double	m_ftime;			//!< current time value
 	double	m_ftime0;			//!< start time of current step
-	int		m_nplane_strain;	//!< run analysis in plain strain mode (TODO: Move to the analysis class?)
+	int		m_nplane_strain;	//!< run analysis in plain strain mode \todo Move to the analysis class?
 	bool	m_debug;			//!< debug flag
 
 protected:

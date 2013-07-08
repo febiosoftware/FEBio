@@ -11,15 +11,15 @@ class FEModel;
 class Logfile;
 
 //-----------------------------------------------------------------------------
-// This is the FEBio kernel class that manages the interactions between the 
-// different modules. In particular, it manages the factory classes
-// which are responsible for the creation of different classes that are registered
-// with the kernel.
+//! This is the FEBio kernel class that manages the interactions between the 
+//! different modules. In particular, it manages the factory classes
+//! which are responsible for the creation of different classes that are registered
+//! with the kernel.
 
-// TODO: I am using template definitions in this class which means that different plugins
-//       will see a different interface to FEBioKernel, depending on the classes that
-//		 are registered in the pluing. Could this be a problem?
-//
+//! \todo I am using template definitions in this class which means that different plugins
+//!       will see a different interface to FEBioKernel, depending on the classes that
+//!		  are registered in the pluing. Could this be a problem?
+//!
 class FEBioKernel
 {
 public:

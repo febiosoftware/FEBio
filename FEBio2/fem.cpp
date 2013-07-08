@@ -56,11 +56,11 @@ void FEM::PopState()
 }
 
 //-----------------------------------------------------------------------------
-// This function is used when pushing the FEM state data. Since we don't need
-// to copy all the data, this function only copies the data that needs to be 
-// restored for a running restart.
-
-// TODO: Shallow copy nonlinear constraints
+//! This function is used when pushing the FEM state data. Since we don't need
+//! to copy all the data, this function only copies the data that needs to be 
+//! restored for a running restart.
+//!
+//! \todo Shallow copy nonlinear constraints
 void FEM::ShallowCopy(FEM& fem)
 {
 	int i;

@@ -60,7 +60,7 @@ public:
 	void ContactForces(FEGlobalVector& R);
 
 private:
-	//! TODO: I have to overload this but I need to remove this.
+	//! \todo I have to overload this but I need to remove this.
 	virtual void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke) { assert(false); }
 
 public:

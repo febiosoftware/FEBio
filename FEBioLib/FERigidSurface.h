@@ -4,14 +4,12 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-// TODO: introduce parameter lists so that we can remove references to load curves.
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
 //! This class is the base class for rigid surfaces
 
 //! Rigid surfaces are used in the rigid wall contact interface, where the
 //! master surface is defined by an implicit surface
+
+//! \todo Introduce parameter lists so that we can remove references to load curves.
 
 class FERigidSurface
 {

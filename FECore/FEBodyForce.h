@@ -9,7 +9,8 @@
 class FEModel;
 
 //-----------------------------------------------------------------------------
-// Base class for body-loads (TODO: work in progress)
+//! Base class for body-loads
+//! \todo This is a work in progress
 class FEBodyLoad : public FEParamContainer
 {
 public:

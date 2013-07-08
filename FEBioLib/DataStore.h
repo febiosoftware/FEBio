@@ -74,7 +74,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-// TODO: I can move this to the FECore class.
+//! \todo I'd like to move this to FECore.
 class DataStore  
 {
 public:

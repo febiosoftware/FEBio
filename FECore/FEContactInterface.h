@@ -25,7 +25,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This is the base class for contact interfaces
-// TODO: Merge the active interface with the boundary condition class
+//! \todo Merge the active interface with the boundary condition class
 class FEContactInterface : public FEParamContainer
 {
 public:

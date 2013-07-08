@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! This class records nodal data
-// TODO: should I create a different class for each data record? Like for the plot file?
+//! \todo should I create a different class for each data record? Like for the plot file?
 class NodeDataRecord : public DataRecord
 {
 	enum { X, Y, Z, UX, UY, UZ, VX, VY, VZ, RX, RY, RZ, T, P, C, C1, C2, C3, C4, C5, C6 };

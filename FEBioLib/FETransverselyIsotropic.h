@@ -9,10 +9,10 @@
 //! Rivlin and Veronda-Westmann models.
 //! This class only stores some data
 
-// TODO: don't derive it from FEUncoupledMaterial. Materials that are both
-// incompressible and have a fiber distribution should derive from 
-// FEUncoupledMaterial and from a fiber material class. Or perhaps they should
-// have a fiber (or material axis) class as a member.
+//! \todo Don't derive it from FEUncoupledMaterial. Materials that are both
+//!       incompressible and have a fiber distribution should derive from 
+//!       FEUncoupledMaterial and from a fiber material class. Or perhaps they should
+//!       have a fiber (or material axis) class as a member.
 
 class FETransverselyIsotropic : public FEUncoupledMaterial
 {

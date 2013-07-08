@@ -2,7 +2,7 @@
 #include "DataStore.h"
 
 //-----------------------------------------------------------------------------
-// TODO: should I create a different class for each data record? Like for the plot file?
+//! \todo Should I create a different class for each data record? Like for the plot file?
 class RigidBodyDataRecord : public DataRecord
 {
 	enum {X, Y, Z, QX, QY, QZ, QW, FX, FY, FZ, MX, MY, MZ};

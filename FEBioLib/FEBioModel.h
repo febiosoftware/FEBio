@@ -6,12 +6,18 @@
 #include "FEUncoupledElasticMixture.h"
 
 //-----------------------------------------------------------------------------
-//!< The FEBio model specializes the FEModel class to implement FEBio specific
-//!< functionality.
+//! The FEBio model specializes the FEModel class to implement FEBio specific
+//! functionality.
+//!
+//! In addition it adds support for all I/O capabilities. 
+//!
+//! \todo Several parameters are still public. I need to make them all at least protected.
+//! \todo Maybe all the serialization functions can be handled by a new class?
+//!
 class FEBioModel : public FEModel
 {
 public:
-	//!< constructor
+	//! constructor
 	FEBioModel();
 
 	//! input data from file
@@ -84,32 +90,33 @@ protected: // --- initialization functions ---
 
 public: // --- I/O functions ---
 	//! Add data record
-	void AddDataRecord(DataRecord* pd) { m_Data.AddRecord(pd); }
+	void AddDataRecord(DataRecord* pd);
 
 	//! Set the plot file
-	void SetPlotFile(PlotFile* pplt) { m_plot = pplt; }
+	void SetPlotFile(PlotFile* pplt);
 
 	// set the i/o files
 	void SetInputFilename(const char* szfile);
-	void SetLogFilename  (const char* szfile) { strcpy(m_szlog , szfile); }
-	void SetPlotFilename (const char* szfile) { strcpy(m_szplot, szfile); }
-	void SetDumpFilename (const char* szfile) { strcpy(m_szdump, szfile); }
+	void SetLogFilename  (const char* szfile);
+	void SetPlotFilename (const char* szfile);
+	void SetDumpFilename (const char* szfile);
 
+	//! Set the extension of the plot file
 	void SetPlotFileNameExtension(const char* szext);
 
 	//! Get the I/O file names
-	const char* GetInputFileName() { return m_szfile; }
-	const char* GetLogfileName  () { return m_szlog;  }
-	const char* GetPlotFileName () { return m_szplot; }
+	const char* GetInputFileName();
+	const char* GetLogfileName  ();
+	const char* GetPlotFileName ();
 
 	//! get the file title
-	const char* GetFileTitle() { return m_szfile_title; }
+	const char* GetFileTitle();
 
 public:
 	Timer		m_TotalTime;	//!< Create timer to track total running time
 	PlotFile*	m_plot;			//!< the plot file
 	DataStore	m_Data;			//!< the data store used for data logging
-	bool		m_becho;		//!< echo input to logfile (TODO: Make this a command line option)
+	bool		m_becho;		//!< echo input to logfile \todo Make this a command line option
 
 protected:
 	// file names

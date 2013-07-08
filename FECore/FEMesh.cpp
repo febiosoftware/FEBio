@@ -350,7 +350,7 @@ double FEMesh::ElementVolume(FEElement &el)
 }
 
 //-----------------------------------------------------------------------------
-// TODO: replace this with what FEBio 1.x does
+//! \todo Replace this with what FEBio 1.x does.
 double FEMesh::SolidElementVolume(FESolidElement& el)
 {
 	int i;
@@ -398,7 +398,7 @@ double FEMesh::SolidElementVolume(FESolidElement& el)
 }
 
 //-----------------------------------------------------------------------------
-// TODO: replace this with what FEBio 1.x does
+//! \todo Replace this with what FEBio 1.x does.
 double FEMesh::ShellElementVolume(FEShellElement& el)
 {
 	int i;

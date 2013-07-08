@@ -38,7 +38,7 @@ public:
 	// --- S T I F F N E S S   M A T R I X ---
 
 	//! Calculate global stiffness matrix (only contribution from internal force derivative)
-	// TODO: maybe I should rename this the InternalStiffness matrix?
+	//! \todo maybe I should rename this the InternalStiffness matrix?
 	virtual void StiffnessMatrix   (FENLSolver* psolver) = 0;
 
 	//! Calculate stiffness contribution of body forces

@@ -283,14 +283,12 @@ bool LSDYNAPlotFile::Open(FEModel& fem, const char* szfile)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// FUNCTION : PlotFile::Append
-// Opens a PLOT database for appending
-//
-// TODO: I always need to make sure that the same amount of data is written
-// to the file after opening for appending. In other words, make sure that
-// the flags are the same as when opening the file for the first time.
-
+//-----------------------------------------------------------------------------
+//! Opens a PLOT database for appending
+//!
+//! \todo I always need to make sure that the same amount of data is written
+//!       to the file after opening for appending. In other words, make sure that
+//!       the flags are the same as when opening the file for the first time.
 bool LSDYNAPlotFile::Append(FEModel& fem, const char* szfile)
 {
 	// open the file

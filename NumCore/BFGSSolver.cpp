@@ -200,13 +200,13 @@ void NumCore::BFGSSolver::Solve()
 }
 
 //-----------------------------------------------------------------------------
-// Performs a linesearch on a NR iteration
-// The description of this method can be found in:
-//    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.
+//! Performs a linesearch on a NR iteration
+//! The description of this method can be found in:
+//!    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.
 //
-// TODO: Find a different way to update the deformation based on the ls.
-// For instance, define a di so that ui = s*di. Also, define the 
-// position of the nodes at the previous iteration.
+//! \todo Find a different way to update the deformation based on the ls.
+//! For instance, define a di so that ui = s*di. Also, define the 
+//! position of the nodes at the previous iteration.
 
 double NumCore::BFGSSolver::LineSearch(double s)
 {

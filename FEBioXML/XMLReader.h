@@ -43,13 +43,13 @@ public:
 	};
 
 	//-------------------------------------------------------------------------
-	// This class implements a xml-tag. The value and attributes of this tag
-	// can be queried.
+	//! This class implements a xml-tag. The value and attributes of this tag
+	//! can be queried.
+	//! \todo I would like to get rid of the m_szroot element and replace it with a 
+	//!       parent tag. The root element can then be identified by the tag that 
+	//!       does not have a parent
 	class XMLTag
 	{
-	// TODO: I would like to get rid of the m_szroot element and replace it with a 
-	// parent tag. The root element can then be identified by the tag that 
-	// does not have a parent
 	public:
 		char		m_sztag[MAX_TAG];		// tag name
 		std::string m_szval;				// tag value

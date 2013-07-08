@@ -12,7 +12,7 @@ public:
 	//! constructor
 	FEElasticSolidDomain(FEMesh* pm, FEMaterial* pmat) : FESolidDomain(FE_SOLID_DOMAIN, pm, pmat) {}
 
-	//! TODO: do I really use this?
+	//! \todo Do I really use this?
 	FEElasticSolidDomain& operator = (FEElasticSolidDomain& d) { m_Elem = d.m_Elem; m_pMesh = d.m_pMesh; return (*this); }
 
 	//! create a clone of this class

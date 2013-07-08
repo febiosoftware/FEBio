@@ -225,9 +225,10 @@ FEHex8RI::FEHex8RI(): FEHex8_(NINT, FE_HEX8RI)
 }
 
 //-----------------------------------------------------------------------------
+//! \todo implement this
 void FEHex8RI::project_to_nodes(double* ai, double* ao)
 {
-	// TODO: implement this
+	
 }
 
 //*****************************************************************************
@@ -787,9 +788,10 @@ void FEHex20_::shape_deriv(double* Hr, double* Hs, double* Ht, double r, double 
 
 //-----------------------------------------------------------------------------
 //! values of shape function second derivatives
+//! \todo implement this (needed for biphasic problems)
 void FEHex20_::shape_deriv2(double* Hrr, double* Hss, double* Htt, double* Hrs, double* Hst, double* Hrt, double r, double s, double t)
 {
-	// TODO: implement this (needed for biphasic problems)
+	
 }
 
 //=============================================================================
@@ -834,9 +836,10 @@ FEHex20G27::FEHex20G27() : FEHex20_(NINT, FE_HEX20G27)
 }
 
 //-----------------------------------------------------------------------------
+//! \todo implement this
 void FEHex20G27::project_to_nodes(double* ai, double* ao)
 {
-	// TODO: implement this
+	
 }
 
 //=============================================================================
@@ -1044,9 +1047,10 @@ void FETri3G3::project_to_nodes(double* ai, double* ao)
 }
 
 //-----------------------------------------------------------------------------
+//! \todo implement this
 void FEQuad8G9::project_to_nodes(double* ai, double* ao)
 {
-	// TODO: implement this
+	
 }
 
 //=============================================================================
@@ -1173,9 +1177,10 @@ FETri6G4::FETri6G4() : FETri6_(NINT, FE_TRI6G4)
 }
 
 //-----------------------------------------------------------------------------
+//! \todo implement this
 void FETri6G4::project_to_nodes(double* ai, double* ao)
 {
-	// TODO: implement this
+	
 }
 
 //=============================================================================
@@ -1316,10 +1321,11 @@ void FEQuad8_::shape_deriv(double* Hr, double* Hs, double r, double s)
 }
 
 //-----------------------------------------------------------------------------
-// shape function derivatives at (r,s)
+//! shape function derivatives at (r,s)
+//! \todo implement this
 void FEQuad8_::shape_deriv2(double* Grr, double* Grs, double* Gss, double r, double s)
 {
-	// TODO: implement this
+	
 }
 
 //=============================================================================

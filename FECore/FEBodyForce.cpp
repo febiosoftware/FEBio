@@ -7,7 +7,9 @@ FEBodyForce::FEBodyForce(FEModel* pfem) : m_pfem(pfem)
 }
 
 //-----------------------------------------------------------------------------
+//! Serialize body force
+//! \todo serialize parameters
 void FEBodyForce::Serialize(DumpFile& ar)
 {
-	// TODO: Serialize parameters
+	
 }

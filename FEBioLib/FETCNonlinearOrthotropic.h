@@ -15,8 +15,8 @@
 //! Tension-compression nonlinear orthrotropic
 
 //! This is Gerard's material model for articular cartilage.
-//! TODO: make an orthotropic material base class where we 
-//! can derive this material from.
+//! \todo Make an orthotropic material base class where we 
+//!       can derive this material from.
 
 class FETCNonlinearOrthotropic : public FEUncoupledMaterial
 {

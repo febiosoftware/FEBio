@@ -551,7 +551,7 @@ double FESurface::MaxElementSize()
 
 //-----------------------------------------------------------------------------
 //! Calculates the metric tensor at the point with surface coordinates (r,s)
-// TODO: perhaps I should place this function in the element class
+//! \todo Perhaps I should place this function in the element class.
 
 mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 {
@@ -583,7 +583,7 @@ mat2d FESurface::Metric0(FESurfaceElement& el, double r, double s)
 
 //-----------------------------------------------------------------------------
 //! Calculates the metric tensor at the point with surface coordinates (r,s)
-// TODO: perhaps I should place this function in the element class
+//! \todo Perhaps I should place this function in the element class.
 
 mat2d FESurface::Metric(FESurfaceElement& el, double r, double s)
 {
@@ -1263,8 +1263,8 @@ FESurfaceElement* FESurface::FindIntersection2(vec3d r, vec3d n, double rs[2],
 //-----------------------------------------------------------------------------
 //! Finds the element that contains the closest point projection of a node.
 //! Returns zero if no such element can be found.
-// TODO: I need to define a max search radius. For contact problems it is important that only nodes are
-//       considered that are within an acceptable distance for contact.
+//! \todo I need to define a max search radius. For contact problems it is important that only nodes are
+//!        considered that are within an acceptable distance for contact.
 FESurfaceElement* FESurface::ClosestPointProjection(vec3d& x, vec3d& q, vec2d& r, bool binit_nq, double tol)
 {
 	// get the mesh

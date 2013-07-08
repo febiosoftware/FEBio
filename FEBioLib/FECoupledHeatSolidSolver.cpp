@@ -62,7 +62,7 @@ bool FECoupledHeatSolidSolver::SolveStep(double time)
 }
 
 //-----------------------------------------------------------------------------
-// TODO: this won't work anymore since the domains are stored on the FEAnalysis
+//! \todo This won't work anymore since the domains are stored on the FEAnalysis
 void FECoupledHeatSolidSolver::CalculateInitialStresses()
 {
 	FEAnalysis* pstep = m_fem.GetCurrentStep();

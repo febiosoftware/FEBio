@@ -86,8 +86,7 @@ public:
 	//! Serialize material data to archive
 	virtual void Serialize(DumpFile& ar);
 
-	//! TODO: I need to move this function up the hierarchy 
-	//        once I redesign the material library
+	//! Return elastic material \todo I need to move this function up the hierarchy once I redesign the material library
 	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
 
 protected:
@@ -179,7 +178,7 @@ protected:
 //-----------------------------------------------------------------------------
 //! Global solute data
 //! This structure uniquely identifies a solute in multiphasic problems
-// TODO: Move this to a different file
+//! \todo Move this to a different file
 class FESoluteData 
 {
 public:

@@ -25,5 +25,5 @@ public:
 protected:
 	FEModel&			m_fem;	//!< model
 	vector<double>&		m_R;	//!< residual
-	vector<double>&		m_Fr;	//!< nodal reaction forces (TODO: I want to remove this)
+	vector<double>&		m_Fr;	//!< nodal reaction forces \todo I want to remove this
 };

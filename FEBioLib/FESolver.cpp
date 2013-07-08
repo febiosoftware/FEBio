@@ -36,7 +36,7 @@ FESolver::~FESolver()
 
 //-----------------------------------------------------------------------------
 //! Initialization
-// TODO: where is this function called?
+//! \todo where is this function called?
 bool FESolver::Init()
 {
 	// Now that we have determined the equation numbers we can continue
@@ -90,7 +90,7 @@ bool FESolver::Init()
 
 //-----------------------------------------------------------------------------
 //! Clean
-// TODO: why can this not be done in destructor?
+//! \todo Why can this not be done in destructor?
 void FESolver::Clean()
 {
 	if (m_plinsolve) m_plinsolve->Destroy();
@@ -98,7 +98,7 @@ void FESolver::Clean()
 
 //-----------------------------------------------------------------------------
 //!  Creates the global stiffness matrix
-// TODO: Can we move this to the FEStiffnessMatrix::Create function?
+//! \todo Can we move this to the FEStiffnessMatrix::Create function?
 bool FESolver::CreateStiffness(bool breset)
 {
 	// clean up the solver
@@ -136,7 +136,7 @@ bool FESolver::CreateStiffness(bool breset)
 }
 
 //-----------------------------------------------------------------------------
-//! TODO: This function is only used for rigid joints. I need to figure out if
+//! \todo This function is only used for rigid joints. I need to figure out if
 //!       I can use the other assembly function.
 void FESolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 {
@@ -144,7 +144,7 @@ void FESolver::AssembleStiffness(std::vector<int>& lm, matrix& ke)
 }
 /*
 //-----------------------------------------------------------------------------
-//! TODO: This function is only used by the rigid joints. I need to figure out
+//! \todo This function is only used by the rigid joints. I need to figure out
 //!       if I can use the ohter residual function
 void FESolver::AssembleResidual(vector<int>& lm, vector<double>& fe, vector<double>& R)
 {

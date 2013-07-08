@@ -61,7 +61,7 @@ public: // interface for derived classes
 	//! return number of elements
 	virtual int Elements() = 0;
 
-	// return a reference to an element (TODO: this is not the preferred interface but I've added it for now)
+	//! return a reference to an element \todo this is not the preferred interface but I've added it for now
 	virtual FEElement& ElementRef(int i) = 0;
 
 	//! Unpack the LM data for an element of this domain

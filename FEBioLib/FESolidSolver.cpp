@@ -252,11 +252,11 @@ bool FESolidSolver::InitEquations()
 //!  It returns true if all the augmentation have converged, 
 //!	otherwise it returns false
 //
-// TODO: There is an inherent problem with this approach. Since
-//  Lagrangian multipliers are inherited from previous timesteps
-//  they might not be zero in case a node-surface contact breaks. 
-//  The node's gap value needs to become negative to a certain value
-//  before the Lagr. multipliers dissapears. 
+//! \todo There is an inherent problem with this approach. Since
+//!	      Lagrangian multipliers are inherited from previous timesteps
+//!       they might not be zero in case a node-surface contact breaks. 
+//!       The node's gap value needs to become negative to a certain value
+//!       before the Lagr. multipliers dissapears. 
 //
 bool FESolidSolver::Augment()
 {
@@ -1641,10 +1641,10 @@ void FESolidSolver::RigidStiffness(vector<int>& en, vector<int>& elm, matrix& ke
 //!  Also adjusts the global stiffness matrix and residual to take the 
 //!  prescribed displacements into account.
 
-// TODO: In stead of changing the global stiffness matrix to accomodate for 
-// the rigid bodies and linear constraints, can I modify the element stiffness
-// matrix prior to assembly? I might have to change the elm vector as well as 
-// the element matrix size.
+//! \todo In stead of changing the global stiffness matrix to accomodate for 
+//!       the rigid bodies and linear constraints, can I modify the element stiffness
+//!       matrix prior to assembly? I might have to change the elm vector as well as 
+//!       the element matrix size.
 
 void FESolidSolver::AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke)
 {

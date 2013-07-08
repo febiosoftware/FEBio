@@ -109,15 +109,15 @@ bool FEBiphasicSolver::InitEquations()
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first QN iteration. 
 //!
+//! \todo There is some more stuff in the base method that 
+//!       I need to move to this method, but since it will
+//!       change the order of some operations I need to make
+//!       sure it won't break anything
 void FEBiphasicSolver::PrepStep(double time)
 {
 	zero(m_Pi);
 	zero(m_Di);
 
-	// TODO: There is some more stuff in the base method that 
-	//       I need to move to this method, but since it will
-	//       change the order of some operations I need to make
-	//       sure it won't break anything
 	FESolidSolver::PrepStep(time);
 }
 

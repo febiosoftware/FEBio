@@ -14,10 +14,8 @@
 namespace NumCore {
 
 //-----------------------------------------------------------------------------
-// Memory exception class
-// TODO: move this to a seperate file
-//
-
+//! Memory exception class
+//! \todo move this to a seperate file
 class MemException
 {
 public:

@@ -63,7 +63,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! Retrieves a pointer to element in array (TODO: only works with doubles for now)
+//! Retrieves a pointer to element in array
+//! \todo only works with doubles for now
 template<class T> inline T* FEParam::pvalue(int n)
 {
 	assert((m_itype==FE_PARAM_DOUBLE)||(m_itype==FE_PARAM_DOUBLEV));

@@ -19,7 +19,7 @@ NumCore::SkylineMatrix::~SkylineMatrix()
 }
 
 //-----------------------------------------------------------------------------
-// TODO: can I get rid of this function?
+//! \todo Can I get rid of this function?
 void NumCore::SkylineMatrix::Create(double* pv, int* pp, int N)
 {
 	delete [] m_pd  ; m_pd = pv;

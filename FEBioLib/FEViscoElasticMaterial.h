@@ -47,7 +47,7 @@ public:
 	//! Get a parameter
 	FEParam* GetParameter(const ParamString& s);
 
-	//! get the elastic base material (TODO: I want to call this GetElasticMaterial, but this name is being used)
+	//! get the elastic base material \todo I want to call this GetElasticMaterial, but this name is being used
 	FEElasticMaterial* GetBaseMaterial() { return m_pBase; }
 
 	//! Set the base material

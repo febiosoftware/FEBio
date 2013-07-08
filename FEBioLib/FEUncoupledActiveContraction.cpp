@@ -77,8 +77,8 @@ mat3ds FEUncoupledActiveContraction::DevStress(FEMaterialPoint &mp)
 }
 
 //-----------------------------------------------------------------------------
+// \todo Implement this
 tens4ds FEUncoupledActiveContraction::DevTangent(FEMaterialPoint &pt)
 {
-	// TODO: implement this
 	return tens4ds(0.0);
 }

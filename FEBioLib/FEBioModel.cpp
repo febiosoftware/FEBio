@@ -89,6 +89,27 @@ FEBioModel::FEBioModel()
 	m_plot = 0;
 }
 
+//=============================================================================
+//
+//		FEBioModel: I-O Functions
+//
+//=============================================================================
+
+
+//-----------------------------------------------------------------------------
+//! Add a data record to the data store
+void FEBioModel::AddDataRecord(DataRecord* pd)
+{
+	m_Data.AddRecord(pd); 
+}
+
+//-----------------------------------------------------------------------------
+//! Set the plot file
+void FEBioModel::SetPlotFile(PlotFile* pplt) 
+{ 
+	m_plot = pplt; 
+}
+
 //-----------------------------------------------------------------------------
 //! Sets the extension of the plot file name.
 void FEBioModel::SetPlotFileNameExtension(const char *szext)
@@ -110,6 +131,56 @@ void FEBioModel::SetInputFilename(const char* szfile)
 		if (m_szfile_title == 0) m_szfile_title = m_szfile; else ++m_szfile_title;
 	}
 	else ++m_szfile_title;
+}
+
+//-----------------------------------------------------------------------------
+//! Set the name of the log file
+void FEBioModel::SetLogFilename(const char* szfile) 
+{ 
+	strcpy(m_szlog , szfile); 
+}
+
+//-----------------------------------------------------------------------------
+//! Set the name of the plot file
+void FEBioModel::SetPlotFilename(const char* szfile) 
+{ 
+	strcpy(m_szplot, szfile); 
+}
+
+//-----------------------------------------------------------------------------
+//! Set the name of the restart archive (i.e. the dump file)
+void FEBioModel::SetDumpFilename (const char* szfile) 
+{ 
+	strcpy(m_szdump, szfile); 
+}
+
+//-----------------------------------------------------------------------------
+//! Return the name of the input file
+const char* FEBioModel::GetInputFileName()
+{ 
+	return m_szfile; 
+}
+
+//-----------------------------------------------------------------------------
+//! Return the name of the log file
+const char* FEBioModel::GetLogfileName()
+{ 
+	return m_szlog;  
+}
+
+//-----------------------------------------------------------------------------
+//! Return the name of the plot file
+const char* FEBioModel::GetPlotFileName()
+{ 
+	return m_szplot; 
+}
+
+//-----------------------------------------------------------------------------
+//! get the file title (i.e. name of input file without the path)
+//! \todo Do I actually need to store this?
+const char* FEBioModel::GetFileTitle()
+{ 
+	return m_szfile_title; 
 }
 
 //-----------------------------------------------------------------------------
@@ -752,7 +823,7 @@ void FEBioModel::SerializeMaterials(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-// TODO: serialize nonlinear constraints
+//! \todo Serialize nonlinear constraints
 void FEBioModel::SerializeGeometry(DumpFile &ar)
 {
 	// serialize the mesh first 
@@ -923,8 +994,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 }
 
 //-----------------------------------------------------------------------------
-// TODO: do we need to store the m_bActive flag of the boundary conditions?
-//
+//! \todo Do we need to store the m_bActive flag of the boundary conditions?
 void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 {
 	int i, n;
@@ -1430,18 +1500,17 @@ bool FEBioModel::Init()
 
 //-----------------------------------------------------------------------------
 //! Initializes contact data
-// TODO: Contact interfaces have two initialization functions: Init() and
-//   Activate(). The Init member is called here and allocates the required memory
-//   for each interface. The Activate() member is called during the step initialization
-//   which is called later during the solve phase. However, for global interfaces (i.e.
-//   interfaces that are active during the entire simulation), the Activate() member is
-//   not called in the solve phase. That is why we have to call it here. Global interfaces
-//   can be idenfitifed since they are active during the initialization. 
-//
-//   I am not entirely a fan of this approach but it does solve the problem that contact
-//   interface shoulds only do work (e.g. update projection status) when they are active, but
-//   have to allocate memory during the initialization fase.
-//
+//! \todo Contact interfaces have two initialization functions: Init() and
+//!   Activate(). The Init member is called here and allocates the required memory
+//!   for each interface. The Activate() member is called during the step initialization
+//!   which is called later during the solve phase. However, for global interfaces (i.e.
+//!   interfaces that are active during the entire simulation), the Activate() member is
+//!   not called in the solve phase. That is why we have to call it here. Global interfaces
+//!   can be idenfitifed since they are active during the initialization. 
+//!   I am not entirely a fan of this approach but it does solve the problem that contact
+//!   interface shoulds only do work (e.g. update projection status) when they are active, but
+//!   have to allocate memory during the initialization fase.
+//!
 bool FEBioModel::InitContact()
 {
 	// loop over all contact interfaces

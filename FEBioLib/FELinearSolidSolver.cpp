@@ -402,7 +402,8 @@ void FELinearSolidSolver::AssembleResidual(vector<int>& en, vector<int>& elm, ve
 
 //-----------------------------------------------------------------------------
 //! Store data to restart file
+//! \todo Implement serialization
 void FELinearSolidSolver::Serialize(DumpFile &ar)
 {
-	// TODO: implement serialization
+	
 }

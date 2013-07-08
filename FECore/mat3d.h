@@ -204,7 +204,7 @@ inline mat3ds operator * (double a, const mat3ds& m) { return m*a; }
 
 //-----------------------------------------------------------------------------
 //! This class describes an anti-symmetric 3D matrix of doubles
-// TODO: expand this class
+//! \todo expand this class
 class mat3da
 {
 public:

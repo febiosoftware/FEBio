@@ -19,9 +19,11 @@ FEException::~FEException()
 
 }
 
+//-----------------------------------------------------------------------------
+//! \todo implement error handling
 ZeroDiagonal::ZeroDiagonal(int node, int ndof)
 {
-	// TODO: implement error handling
+	
 }
 
 /*

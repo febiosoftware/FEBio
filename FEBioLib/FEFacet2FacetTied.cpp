@@ -49,10 +49,10 @@ bool FEFacetTiedSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
+//!       Need to check if this achieves the same
 void FEFacetTiedSurface::ShallowCopy(FEFacetTiedSurface& s)
 {
-	// TODO: originally, we only copied Lmd, gap, Ln and reset pme to zero.
-	//       Need to check if this achieves the same
 	m_Data = s.m_Data;
 }
 

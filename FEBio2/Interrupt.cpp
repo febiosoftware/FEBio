@@ -21,9 +21,12 @@ Interruption::Interruption()
 	}
 }
 
+//-----------------------------------------------------------------------------
+//! Destructor
+//! \todo Restore original intteruption handler
 Interruption::~Interruption()
 {
-	// TODO: restore original interruption handler
+	
 }
 
 void Interruption::handler(int sig)

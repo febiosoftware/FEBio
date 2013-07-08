@@ -277,11 +277,11 @@ void FESlidingInterface::Activate()
 //!  master element and the projection of the slave node onto
 //!  this master element.
 
-// TODO: this function needs to identify the different types of node-slave contact:
-//   1/ first contact
-//   2/ crossing of element boundary
-//	 3/ contact termination 
-//			either by failure to find master segment or when g < tolerance
+//! \todo this function needs to identify the different types of node-slave contact:
+//!   1/ first contact
+//!   2/ crossing of element boundary
+//!	  3/ contact termination 
+//!			either by failure to find master segment or when g < tolerance
 
 void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove)
 {
@@ -414,7 +414,7 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 //-----------------------------------------------------------------------------
 //! updates sliding interface data
 //! niter is the number of Newton iterations.
-//! TODO: should I get rid of the bfirst static variable?
+//! \todo Should I get rid of the bfirst static variable?
 void FESlidingInterface::Update(int niter)
 {
 	static bool bfirst = true;
