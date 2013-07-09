@@ -89,18 +89,37 @@ FEBioModel::FEBioModel()
 	m_plot = 0;
 }
 
+//-----------------------------------------------------------------------------
+Timer& FEBioModel::GetTotalTimer()
+{
+	return m_TotalTime;
+}
+
 //=============================================================================
 //
 //		FEBioModel: I-O Functions
 //
 //=============================================================================
 
+//-----------------------------------------------------------------------------
+//! Return the data store
+DataStore& FEBioModel::GetDataStore()
+{
+	return m_Data;
+}
 
 //-----------------------------------------------------------------------------
 //! Add a data record to the data store
 void FEBioModel::AddDataRecord(DataRecord* pd)
 {
 	m_Data.AddRecord(pd); 
+}
+
+//-----------------------------------------------------------------------------
+//! Get the plot file
+PlotFile* FEBioModel::GetPlotFile()
+{
+	return m_plot;
 }
 
 //-----------------------------------------------------------------------------

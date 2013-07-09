@@ -196,9 +196,10 @@ void echo_input(FEBioModel& fem)
 	case FE_PLOT_FINAL      : clog.printf("\tplot level ................................ : final state\n"); break;
 	}
 
-	if (dynamic_cast<LSDYNAPlotFile*>(fem.m_plot))
+	PlotFile* pplt = fem.GetPlotFile();
+	if (dynamic_cast<LSDYNAPlotFile*>(pplt))
 	{
-		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(fem.m_plot);
+		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(pplt);
 
 		clog.printf("\tplotfile format ........................... : LSDYNA\n");
 		clog.printf("\tshell strains included .................... : %s\n", (plt.m_bsstrn? "Yes" : "No"));
@@ -241,9 +242,9 @@ void echo_input(FEBioModel& fem)
 		}
 	}
 
-	if (dynamic_cast<FEBioPlotFile*>(fem.m_plot))
+	if (dynamic_cast<FEBioPlotFile*>(pplt))
 	{
-		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(fem.m_plot);
+		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);
 		clog.printf("\tplotfile format ........................... : FEBIO\n");
 
 		const FEBioPlotFile::Dictionary& dic = pf->GetDictionary();

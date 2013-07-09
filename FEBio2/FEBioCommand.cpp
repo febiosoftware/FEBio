@@ -233,7 +233,7 @@ int FEBioCmd_Version::run(int nargs, char **argv)
 
 int FEBioCmd_Time::run(int nargs, char **argv)
 {
-	double sec = m_pfem->m_TotalTime.peek();
+	double sec = m_pfem->GetTotalTimer().peek();
 	double sec0 = sec;
 
 	int nhour, nmin, nsec;

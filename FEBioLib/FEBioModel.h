@@ -11,7 +11,6 @@
 //!
 //! In addition it adds support for all I/O capabilities. 
 //!
-//! \todo Several parameters are still public. I need to make them all at least protected.
 //! \todo Maybe all the serialization functions can be handled by a new class?
 //!
 class FEBioModel : public FEModel
@@ -95,6 +94,9 @@ public: // --- I/O functions ---
 	//! Set the plot file
 	void SetPlotFile(PlotFile* pplt);
 
+	//! Get the plot file
+	PlotFile* GetPlotFile();
+
 	// set the i/o files
 	void SetInputFilename(const char* szfile);
 	void SetLogFilename  (const char* szfile);
@@ -112,14 +114,19 @@ public: // --- I/O functions ---
 	//! get the file title
 	const char* GetFileTitle();
 
-public:
+	//! return the data store
+	DataStore& GetDataStore();
+
+	//! Return the total timer
+	Timer& GetTotalTimer();
+
+private:
 	Timer		m_TotalTime;	//!< Create timer to track total running time
-	PlotFile*	m_plot;			//!< the plot file
 	DataStore	m_Data;			//!< the data store used for data logging
+	PlotFile*	m_plot;			//!< the plot file
 	bool		m_becho;		//!< echo input to logfile \todo Make this a command line option
 
-protected:
-	// file names
+protected: // file names
 	char*	m_szfile_title;			//!< master input file title 
 	char	m_szfile[MAX_STRING];	//!< master input file name (= path + title)
 	char	m_szplot[MAX_STRING];	//!< plot output file name
