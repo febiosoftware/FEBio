@@ -3,11 +3,15 @@
 #include "FETransverselyIsotropic.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
-#include <FECore/Log.h>
+#include <FECore/log.h>
 
+#ifdef WIN32
 extern "C" int __cdecl omp_get_num_threads(void);
 extern "C" int __cdecl omp_get_thread_num(void);
-
+#else
+extern "C" int omp_get_num_threads(void);
+extern "C" int omp_get_thread_num(void);
+#endif
 
 //-----------------------------------------------------------------------------
 FEDomain* FEElasticSolidDomain::Clone()
