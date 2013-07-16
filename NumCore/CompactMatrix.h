@@ -13,36 +13,48 @@ namespace NumCore {
 class CompactMatrix : public SparseMatrix
 {
 public:
+	//! constructor
 	CompactMatrix( int offset );
-	virtual ~CompactMatrix() { Clear(); }
 
-	void Clear()
-	{
-		if (m_pd) delete [] m_pd; m_pd = 0;
-		if (m_pindices) delete [] m_pindices; m_pindices = 0;
-		if (m_ppointers) delete [] m_ppointers; m_ppointers = 0;
-	}
+	//! destructor
+	virtual ~CompactMatrix();
 
+	//! Clear 
+	void Clear();
+
+public:
+	//! Create the matrix
 	virtual void Create(int N, int nz, double* pv, int *pi, int* pp);
 
+	//! add an item to the matrix
 	virtual void add(int i, int j, double v) = 0;
 
+	//! set the matrix item
 	virtual void set(int i, int j, double v) = 0;
 
+	//! get the matrix item
 	virtual double get(int i, int j) { return 0; }
 
+	//! get the diagonal entry
 	virtual double diag(int i) = 0;
 
 public:
+	//! Pointer to matrix values
 	double* Values  () { return m_pd;   }
+
+	//! Pointer to matrix indices
 	int*    Indices () { return m_pindices;  }
+
+	//! pointer to matrix row pointers
 	int*    Pointers() { return m_ppointers; }
+
+	//! return the index offset (is 0 or 1)
 	int     Offset  () { return m_offset; }
 
 protected:
-	int*	m_pindices;
-	int*	m_ppointers;
-	int		m_offset; // adjust array indices for fortran arrays
+	int*	m_pindices;		//!< indices
+	int*	m_ppointers;	//!< pointers
+	int		m_offset;		//!< adjust array indices for fortran arrays
 };
 
 //=============================================================================
@@ -54,17 +66,22 @@ protected:
 class CompactSymmMatrix : public CompactMatrix
 {
 public:
+	//! class constructor
 	CompactSymmMatrix( int offset = 0 );
 
+	//! Create the matrix structure from the SparseMatrixProfile.
 	void Create(SparseMatrixProfile& mp);
 
+	//! Allocate storage for matrix data
 	void Create(int N, int nz, double* pv, int *pi, int* pp) { CompactMatrix::Create(N, nz, pv, pi, pp); }
 
+	//! Assemble an element matrix into the global matrix
 	void Assemble(matrix& ke, vector<int>& lm);
 
 	//! assemble a matrix into the sparse matrix
 	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj);
 
+	//! add a matrix item
 	void add(int i, int j, double v)
 	{
 
@@ -89,6 +106,7 @@ public:
 		}
 	}
 
+	//! set matrix item
 	void set(int i, int j, double v)
 	{
 		int k;
@@ -116,6 +134,7 @@ public:
 		}
 	}
 
+	//! get a matrix item
 	double get(int i, int j)
 	{
 		if (j>i) { i ^= j; j ^= i; i ^= j; }
@@ -133,13 +152,16 @@ public:
 		return 0;
 	}
 
+	//! return the diagonal component
 	double diag(int i)
 	{
 		return m_pd[m_ppointers[i] - m_offset];
 	}
 
-
+	//! multiply with vector
 	void mult_vector(const vector<double>& x, vector<double>& r);
+
+	//! multiply with vector
 	void mult_vector(const double* x, double* r);
 };
 
@@ -153,15 +175,19 @@ public:
 class CompactUnSymmMatrix : public CompactMatrix
 {
 public:
+	//! constructor
 	CompactUnSymmMatrix( int offset = 0, bool row_based = false );
 
+	//! Create the matrix structure from the SparseMatrixProfile
 	void Create(SparseMatrixProfile& mp);
 
+	//! Assemble the element matrix into the global matrix
 	void Assemble(matrix& ke, vector<int>& lm);
 
 	//! assemble a matrix into the sparse matrix
 	void Assemble(matrix& ke, vector<int>& lmi, vector<int>& lmj);
 
+	//! add a value to the matrix item
 	void add(int i, int j, double v)
 	{
 		if (m_brow_based)
@@ -187,6 +213,7 @@ public:
 		assert(false);
 	}
 
+	//! set the matrix item
 	void set(int i, int j, double v)
 	{
 		if (m_brow_based)
@@ -207,6 +234,7 @@ public:
 		assert(false);
 	}
 
+	//! get a matrix item
 	double get(int i, int j)
 	{
 		if (m_brow_based)
@@ -223,6 +251,7 @@ public:
 		return 0;
 	}
 
+	//! return the diagonal value
 	double diag(int i)
 	{
 		int* pi = m_pindices + m_ppointers[i] - m_offset;
@@ -241,7 +270,7 @@ public:
 	}
 
 protected:
-	bool m_brow_based;
+	bool m_brow_based;	//!< flag indicating whether the matrix is stored row-based on column-based
 
 };
 

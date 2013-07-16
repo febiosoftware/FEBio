@@ -50,8 +50,8 @@ public:
 	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 
 	// the non-linear system to solve
-	NonLinearSystem*	m_pNLS;
-	int					m_neq;
+	NonLinearSystem*	m_pNLS;		//!< pointer to nonlinear system to solve
+	int					m_neq;		//!< number of equations
 
 	// counters
 	int		m_nups;			//!< nr of stiffness updates
@@ -63,8 +63,8 @@ public:
 	vector<double> m_R1;	//!< residual at iteration i
 
 	// BFGS update vectors
-	matrix			m_V;
-	matrix			m_W;
+	matrix			m_V;		//!< BFGS update vector
+	matrix			m_W;		//!< BFGS update vector
 	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
 };
 

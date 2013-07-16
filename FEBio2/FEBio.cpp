@@ -17,28 +17,26 @@
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 //
-//! \mainpage FEBio Documentation
-//! \section sec_intro Introduction
-//! FEBio is a finite element solver that is specifically designed for three
-//! dimensional biomechanical applications. It solves the nonlinear finite
-//! element equations using a quasi-Newton method called the BFGS-method. It
-//! also offers several biologically relevant constitutive models.
-//!
-//! This software is developed at the Musculoskeletal Research Laboratories
-//! at the University of Utah. All rights reserved.
-//! Copyright (c) 2006 - 2010
-//!
-//! The subversion (svn) revision number of this code can be found in the file
-//! FEBio/svnrev.h
-//!
-//! Main developers:
-//!  - Steve Maas
-//!  - Jeff Weiss
-//!  - Dave Rawlins
-//!  - Gerard Ateshian
-//!
-//! Contributors:
-//!  - Alexander Veress
+// FEBio is a finite element solver that is specifically designed for three
+// dimensional biomechanical applications. It solves the nonlinear finite
+// element equations using a quasi-Newton method called the BFGS-method. It
+// also offers several biologically relevant constitutive models.
+//
+// This software is developed at the Musculoskeletal Research Laboratories
+// at the University of Utah. All rights reserved.
+// Copyright (c) 2006 - 2013
+//
+// The subversion (svn) revision number of this code can be found in the file
+// FEBio/svnrev.h
+//
+// Main developers:
+//  - Steve Maas
+//  - Jeff Weiss
+//  - Dave Rawlins
+//  - Gerard Ateshian
+//
+// Contributors:
+//  - Alexander Veress
 //
 ///////////////////////////////////////////////////////////////////////////////
 

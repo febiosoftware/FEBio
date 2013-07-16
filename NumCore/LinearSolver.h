@@ -41,11 +41,11 @@ public:
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) = 0;
 
 protected:
-	bool	m_bvalid;	// flag indication wether a valid matrix structure is ready
+	bool	m_bvalid;	//!< flag indication wether a valid matrix structure is ready
 
-	SparseMatrix*	m_pA;	// the matrix that stores the coefficients
+	SparseMatrix*	m_pA;	//!< the matrix that stores the coefficients
 
-	static int	m_numthreads;	// nr of threads to create
+	static int	m_numthreads;	//!< nr of threads to create
 };
 
 } // namespace NumCore

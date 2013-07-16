@@ -6,6 +6,20 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
+NumCore::CompactMatrix::~CompactMatrix()
+{ 
+	Clear(); 
+}
+
+//-----------------------------------------------------------------------------
+void NumCore::CompactMatrix::Clear()
+{
+	if (m_pd) delete [] m_pd; m_pd = 0;
+	if (m_pindices) delete [] m_pindices; m_pindices = 0;
+	if (m_ppointers) delete [] m_ppointers; m_ppointers = 0;
+}
+
+//-----------------------------------------------------------------------------
 NumCore::CompactMatrix::CompactMatrix(int offset)
 {
 	m_pindices = 0;

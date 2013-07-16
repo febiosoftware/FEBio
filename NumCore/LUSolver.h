@@ -15,15 +15,23 @@ namespace NumCore {
 class LUSolver : public LinearSolver
 {
 public:
+	//! Pre-process data
 	bool PreProcess();
+
+	//! Factor matrix
 	bool Factor();
+
+	//! solve using factored matrix
 	bool BackSolve(vector<double>& x, vector<double>& b);
+
+	//! Clean-up
 	void Destroy();
 
+	//! Create a sparse matrix
 	SparseMatrix* CreateSparseMatrix(Matrix_Type ntype) { return (m_pA = new DenseMatrix()); }
 
 protected:
-	vector<int>	indx;
+	vector<int>	indx;	//!< indices
 };
 
 } // namespace NumCore
