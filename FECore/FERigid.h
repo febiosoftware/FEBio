@@ -23,7 +23,6 @@ public:
 	FERigidMaterial();
 
 public:
-	double	m_density;	//!< density
 	double	m_E;		//!< Young's modulus
 	double	m_v;		//!< Poisson's ratio
 
