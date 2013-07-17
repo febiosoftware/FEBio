@@ -70,15 +70,17 @@ public:
 	FEMaterial();
 	virtual ~FEMaterial();
 
-	//! set/get material name
-	void SetName(const char* sz) { strcpy(m_szname, sz); }
-	const char* GetName() { return m_szname; }
+	//! set material name
+	void SetName(const char* sz);
+
+	//! get the material's name
+	const char* GetName();
 
 	//! returns a pointer to a new material point object
 	virtual FEMaterialPoint* CreateMaterialPointData() { return 0; };
 
 	//! performs initialization and parameter checking
-	virtual void Init(){}
+	virtual void Init();
 
 	int GetID() { return m_nID; }
 	void SetID(int nid) { m_nID = nid; }

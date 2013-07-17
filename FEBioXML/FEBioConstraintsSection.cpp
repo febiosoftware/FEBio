@@ -11,9 +11,6 @@
 
 void FEBioConstraintsSection::Parse(XMLTag &tag)
 {
-	// This section is only allowed in the new format
-	if (m_pim->Version() < 0x0101) throw XMLReader::InvalidTag(tag);
-
 	// make sure there is something to read
 	if (tag.isleaf()) return;
 

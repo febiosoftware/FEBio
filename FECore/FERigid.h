@@ -16,6 +16,8 @@
 
 //! Since rigid elements are skipped during the stiffness and residual calculations
 //! we don't implement the Stress and Tangent functions
+//! \todo make the m_rc a parameter
+//! \todo Can I remove the m_bc variable?
 
 class FERigidMaterial : public FESolidMaterial
 {

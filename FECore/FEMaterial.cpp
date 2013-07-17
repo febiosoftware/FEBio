@@ -34,6 +34,27 @@ FEMaterial::~FEMaterial()
 }
 
 //-----------------------------------------------------------------------------
+//! Sets the name of the material
+void FEMaterial::SetName(const char* sz)
+{ 
+	strcpy(m_szname, sz); 
+}
+
+//-----------------------------------------------------------------------------
+//! Return the name of the material
+const char* FEMaterial::GetName()
+{ 
+	return m_szname; 
+}
+
+//-----------------------------------------------------------------------------
+//! This function doesn't initialize anything but should be overridden in 
+//! derived classes to initialize and check material parameters
+void FEMaterial::Init()
+{
+}
+
+//-----------------------------------------------------------------------------
 //! Store the material data to the archive
 void FEMaterial::Serialize(DumpFile &ar)
 {

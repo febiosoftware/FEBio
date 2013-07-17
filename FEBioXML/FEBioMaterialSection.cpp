@@ -30,24 +30,11 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, &fem);
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
-		// IMPORTANT: depending on the format version number we need to process 
-		// rigid bodies differently. For versions <= 0x0100 rigid degrees of 
-		// freedom are initially constrained and can be defined in the material
-		// section. For versions >= 0x0101 rigid degrees of freedom are free and
-		// can be constrained in the Constraints section.
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
 		if (pm)
 		{
-			if (m_pim->Version() <= 0x0100)
-			{
-				// older versions have the rigid degrees of freedom constrained
-				for (int i=0; i<6; ++i) pm->m_bc[i] = -1;
-			}
-			else
-			{
-				// newer versions have the rigid degrees of freedom unconstrained
-				for (int i=0; i<6; ++i) pm->m_bc[i] = 0;
-			}
+			// rigid degrees of freedom are initially unconstrained
+			for (int i=0; i<6; ++i) pm->m_bc[i] = 0;
 		}
 
 		// add the material
@@ -295,131 +282,6 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 
 	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
 	else if (tag == "parent_id") { tag.value(pm->m_pmid); return true; }
-	else if (m_pim->Version() <= 0x0100)
-	{
-		FEAnalysisStep* pStep = GetStep();
-
-		// The following tags are only allowed in older version of FEBio
-		// Newer versions defined the rigid body constraints in the Constraints section
-		if (strncmp(tag.Name(), "trans_", 6) == 0)
-		{
-			const char* szt = tag.AttributeValue("type");
-
-			int bc = -1;
-			if      (tag.Name()[6] == 'x') bc = 0;
-			else if (tag.Name()[6] == 'y') bc = 1;
-			else if (tag.Name()[6] == 'z') bc = 2;
-			assert(bc >= 0);
-
-			if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
-			else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-			else if (strcmp(szt, "prescribed") == 0)
-			{
-				const char* szlc = tag.AttributeValue("lc");
-				int lc = atoi(szlc)-1;
-
-				pm->m_bc[bc] = lc+1;
-				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
-				pDC->id = m_nmat;
-				pDC->bc = bc;
-				pDC->lc = lc;
-				tag.value(pDC->sf);
-				fem.m_RDC.push_back(pDC);
-
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					int n = fem.m_RDC.size()-1;
-					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-					pStep->AddBoundaryCondition(pDC);
-					pDC->Deactivate();
-				}
-			}
-			else if (strcmp(szt, "force") == 0)
-			{
-				const char* szlc = tag.AttributeValue("lc");
-				int lc = atoi(szlc)-1;
-
-				pm->m_bc[bc] = 0;
-				FERigidBodyForce* pFC = new FERigidBodyForce;
-				pFC->id = m_nmat;
-				pFC->bc = bc;
-				pFC->lc = lc;
-				tag.value(pFC->sf);
-				fem.m_RFC.push_back(pFC);
-
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					int n = fem.m_RFC.size()-1;
-					FERigidBodyForce* pFC = fem.m_RFC[n];
-					pStep->AddBoundaryCondition(pFC);
-					pFC->Deactivate();
-				}
-			}
-			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-			return true;
-		}
-		else if (strncmp(tag.Name(), "rot_", 4) == 0)
-		{
-			const char* szt = tag.AttributeValue("type");
-
-			int bc = -1;
-			if      (tag.Name()[4] == 'x') bc = 3;
-			else if (tag.Name()[4] == 'y') bc = 4;
-			else if (tag.Name()[4] == 'z') bc = 5;
-			assert(bc >= 0);
-
-			if      (strcmp(szt, "free"      ) == 0) pm->m_bc[bc] =  0;
-			else if (strcmp(szt, "fixed"     ) == 0) pm->m_bc[bc] = -1;
-			else if (strcmp(szt, "prescribed") == 0)
-			{
-				const char* szlc = tag.AttributeValue("lc", true);
-				int lc = atoi(szlc)-1;
-
-				pm->m_bc[bc] = lc+1;
-				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
-				pDC->id = m_nmat;
-				pDC->bc = bc;
-				pDC->lc = lc;
-				tag.value(pDC->sf);
-				fem.m_RDC.push_back(pDC);
-
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					int n = fem.m_RDC.size()-1;
-					FERigidBodyDisplacement* pDC = fem.m_RDC[n];
-					pStep->AddBoundaryCondition(pDC);
-					pDC->Deactivate();
-				}
-			}
-			else if (strcmp(szt, "force") == 0)
-			{
-				const char* szlc = tag.AttributeValue("lc", true);
-				int lc = atoi(szlc)-1;
-
-				pm->m_bc[bc] = 0;
-				FERigidBodyForce* pFC = new FERigidBodyForce;
-				pFC->id = m_nmat;
-				pFC->bc = bc;
-				pFC->lc = lc;
-				tag.value(pFC->sf);
-				fem.m_RFC.push_back(pFC);
-
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					int n = fem.m_RFC.size()-1;
-					FERigidBodyForce* pFC = fem.m_RFC[n];
-					pStep->AddBoundaryCondition(pFC);
-					pFC->Deactivate();
-				}
-			}
-			else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-			return true;
-		}
-	}
 	return false;
 }
 
