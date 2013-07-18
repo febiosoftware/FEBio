@@ -36,9 +36,9 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "s1" ) == 0) m_data.push_back(S1 );
 		else if (strcmp(sz, "s2" ) == 0) m_data.push_back(S2 );
 		else if (strcmp(sz, "s3" ) == 0) m_data.push_back(S3 );
-		else if (strcmp(sz, "Fx" ) == 0) m_data.push_back(FX );
-		else if (strcmp(sz, "Fy" ) == 0) m_data.push_back(FY );
-		else if (strcmp(sz, "Fz" ) == 0) m_data.push_back(FZ );
+		else if (strcmp(sz, "Fxx") == 0) m_data.push_back(FXX);
+		else if (strcmp(sz, "Fyy") == 0) m_data.push_back(FYY);
+		else if (strcmp(sz, "Fzz") == 0) m_data.push_back(FZZ);
 		else if (strcmp(sz, "Fyz") == 0) m_data.push_back(FYZ);
 		else if (strcmp(sz, "Fzx") == 0) m_data.push_back(FZX);
 		else if (strcmp(sz, "Fxy") == 0) m_data.push_back(FXY);
@@ -60,6 +60,8 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "c4"  ) == 0) m_data.push_back(C4 );
 		else if (strcmp(sz, "c5"  ) == 0) m_data.push_back(C5 );
 		else if (strcmp(sz, "c6"  ) == 0) m_data.push_back(C6 );
+		else if (strcmp(sz, "c7"  ) == 0) m_data.push_back(C7 );
+		else if (strcmp(sz, "c8"  ) == 0) m_data.push_back(C8 );
 		else if (strcmp(sz, "j1x" ) == 0) m_data.push_back(J1X);
 		else if (strcmp(sz, "j1y" ) == 0) m_data.push_back(J1Y);
 		else if (strcmp(sz, "j1z" ) == 0) m_data.push_back(J1Z);
@@ -78,10 +80,24 @@ void ElementDataRecord::Parse(const char *szexpr)
 		else if (strcmp(sz, "j6x" ) == 0) m_data.push_back(J6X);
 		else if (strcmp(sz, "j6y" ) == 0) m_data.push_back(J6Y);
 		else if (strcmp(sz, "j6z" ) == 0) m_data.push_back(J6Z);
+		else if (strcmp(sz, "j7x" ) == 0) m_data.push_back(J7X);
+		else if (strcmp(sz, "j7y" ) == 0) m_data.push_back(J7Y);
+		else if (strcmp(sz, "j7z" ) == 0) m_data.push_back(J7Z);
+		else if (strcmp(sz, "j8x" ) == 0) m_data.push_back(J8X);
+		else if (strcmp(sz, "j8y" ) == 0) m_data.push_back(J8Y);
+		else if (strcmp(sz, "j8z" ) == 0) m_data.push_back(J8Z);
 		else if (strcmp(sz, "psi" ) == 0) m_data.push_back(PSI);
 		else if (strcmp(sz, "Iex" ) == 0) m_data.push_back(IEX);
 		else if (strcmp(sz, "Iey" ) == 0) m_data.push_back(IEY);
 		else if (strcmp(sz, "Iez" ) == 0) m_data.push_back(IEZ);
+		else if (strcmp(sz, "sbm1") == 0) m_data.push_back(SBM1);
+		else if (strcmp(sz, "sbm2") == 0) m_data.push_back(SBM2);
+		else if (strcmp(sz, "sbm3") == 0) m_data.push_back(SBM3);
+		else if (strcmp(sz, "sbm4") == 0) m_data.push_back(SBM4);
+		else if (strcmp(sz, "sbm5") == 0) m_data.push_back(SBM5);
+		else if (strcmp(sz, "sbm6") == 0) m_data.push_back(SBM6);
+		else if (strcmp(sz, "sbm7") == 0) m_data.push_back(SBM7);
+		else if (strcmp(sz, "sbm8") == 0) m_data.push_back(SBM8);
 		else throw UnknownDataField(sz);
 		sz = ch;
 	}
@@ -151,9 +167,9 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case S1: val += ls[0]; break;
 			case S2: val += ls[1]; break;
 			case S3: val += ls[2]; break;
-			case FX: val += pt.F(0,0); break;
-			case FY: val += pt.F(1,1); break;
-			case FZ: val += pt.F(2,2); break;
+			case FXX: val += pt.F(0,0); break;
+			case FYY: val += pt.F(1,1); break;
+			case FZZ: val += pt.F(2,2); break;
 			case FYZ: val += pt.F(1,2); break;
 			case FZX: val += pt.F(2,0); break;
 			case FXY: val += pt.F(0,1); break;
@@ -183,6 +199,7 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 					case JX: val += spt->m_j.x; break;
 					case JY: val += spt->m_j.y; break;
 					case JZ: val += spt->m_j.z; break;
+					case CRC: val += spt->m_crc; break;
 				}
 			}
 
@@ -234,10 +251,26 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 					case J6X: val += sst->m_j[5].x; break;
 					case J6Y: val += sst->m_j[5].y; break;
 					case J6Z: val += sst->m_j[5].z; break;
+					case C7: val += sst->m_ca[6]; break;
+					case J7X: val += sst->m_j[6].x; break;
+					case J7Y: val += sst->m_j[6].y; break;
+					case J7Z: val += sst->m_j[6].z; break;
+					case C8: val += sst->m_ca[7]; break;
+					case J8X: val += sst->m_j[7].x; break;
+					case J8Y: val += sst->m_j[7].y; break;
+					case J8Z: val += sst->m_j[7].z; break;
 					case PSI: val += sst->m_psi; break;
 					case IEX: val += sst->m_Ie.x; break;
 					case IEY: val += sst->m_Ie.y; break;
 					case IEZ: val += sst->m_Ie.z; break;
+					case SBM1: val += sst->m_sbmr[0]; break;
+					case SBM2: val += sst->m_sbmr[1]; break;
+					case SBM3: val += sst->m_sbmr[2]; break;
+					case SBM4: val += sst->m_sbmr[3]; break;
+					case SBM5: val += sst->m_sbmr[4]; break;
+					case SBM6: val += sst->m_sbmr[5]; break;
+					case SBM7: val += sst->m_sbmr[6]; break;
+					case SBM8: val += sst->m_sbmr[7]; break;
 				}
 			}
 		}
@@ -271,9 +304,9 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case SXY: val += pt.s.xy(); break;
 			case SYZ: val += pt.s.yz(); break;
 			case SXZ: val += pt.s.xz(); break;
-			case FX: val += pt.F(0,0); break;
-			case FY: val += pt.F(1,1); break;
-			case FZ: val += pt.F(2,2); break;
+			case FXX: val += pt.F(0,0); break;
+			case FYY: val += pt.F(1,1); break;
+			case FZZ: val += pt.F(2,2); break;
 			case FYZ: val += pt.F(1,2); break;
 			case FZX: val += pt.F(2,0); break;
 			case FXY: val += pt.F(0,1); break;

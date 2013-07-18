@@ -80,6 +80,8 @@ public:
 	// solid material data
 	mat3ds		s;			//!< Cauchy stress
 	mat3ds		s0;			//!< Initial stress (only used by linear solid solver)
+	double	sed;		//!< strain energy density	\todo Is this a good place for this?
+	double	rhor;		//!< current referential mass density
 };
 
 //-----------------------------------------------------------------------------
@@ -102,6 +104,7 @@ public:
 
 public:
 	bool	m_unstable;	//!< flag indicating whether material is unstable on its own
+	void	*pVoid;		//!< pointer to parent
 
 	FECoordSysMap*	m_pmap;	//!< local material coordinate system
 

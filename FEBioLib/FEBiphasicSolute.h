@@ -121,7 +121,7 @@ public:
 	double Porosity(FEMaterialPoint& pt);
 	
 	//! fluid density
-	double FluidDensity() { return m_rhoTw; }
+	double FluidTrueDensity() { return m_rhoTw; }
 	
 	//! Serialization
 	void Serialize(DumpFile& ar);

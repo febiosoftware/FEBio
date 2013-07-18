@@ -721,6 +721,8 @@
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSoluteSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FEBiphasicSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
+    <ClInclude Include="..\..\FEBioLib\FECarterHayes.h" />
+    <ClInclude Include="..\..\FEBioLib\FECarterHayesOld.h" />
     <ClInclude Include="..\..\FEBioLib\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioLib\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioLib\FEContactSurface.h" />
@@ -773,6 +775,9 @@
     <ClInclude Include="..\..\FEBioLib\FELinearSolidDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBioLib\FELinearTransIso.h" />
+    <ClInclude Include="..\..\FEBioLib\FEMassActionForward.h" />
+    <ClInclude Include="..\..\FEBioLib\FEMassActionReversible.h" />
+    <ClInclude Include="..\..\FEBioLib\FEMichaelisMenten.h" />
     <ClInclude Include="..\..\FEBioLib\FEMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioLib\FEMRVonMisesFibers.h" />
     <ClInclude Include="..\..\FEBioLib\FEMultiphasic.h" />
@@ -795,6 +800,8 @@
     <ClInclude Include="..\..\FEBioLib\FEPointConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEPoroTraction.h" />
     <ClInclude Include="..\..\FEBioLib\FEPressureLoad.h" />
+    <ClInclude Include="..\..\FEBioLib\FEReactionRateConst.h" />
+    <ClInclude Include="..\..\FEBioLib\FEReactionRateHuiskes.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidShellDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidSolidDomain.h" />
@@ -872,6 +879,8 @@
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSoluteSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBiphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FECarterHayes.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FECarterHayesOld.cpp" />
     <ClCompile Include="..\..\FEBioLib\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEContactSurface.cpp" />
@@ -922,6 +931,9 @@
     <ClCompile Include="..\..\FEBioLib\FELinearSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FELinearTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEMassActionForward.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEMassActionReversible.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEMichaelisMenten.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMRVonMisesFibers.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMultiphasic.cpp" />
@@ -944,6 +956,8 @@
     <ClCompile Include="..\..\FEBioLib\FEPointConstraint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPoroTraction.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEPressureLoad.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEReactionRateConst.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEReactionRateHuiskes.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidSolidDomain.cpp" />

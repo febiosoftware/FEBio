@@ -51,6 +51,39 @@ bool FETriphasicDomain::Initialize(FEModel &mdl)
 }
 
 //-----------------------------------------------------------------------------
+void FETriphasicDomain::Reset()
+{
+	// reset base class
+	FEElasticSolidDomain::Reset();
+	
+	// get the material
+	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
+    
+	// get the triphasic material
+	FETriphasic* pmb = dynamic_cast<FETriphasic*>(pm);
+	assert(pmb);
+	
+	for (int i=0; i<(int) m_Elem.size(); ++i)
+	{
+		// get the solid element
+		FESolidElement& el = m_Elem[i];
+		
+		// get the number of integration points
+		int nint = el.GaussPoints();
+		
+		// loop over the integration points
+		for (int n=0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.m_State[n];
+			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+			
+			// initialize referential solid volume fraction
+			pt.m_phi0 = pmb->m_phi0;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FETriphasicDomain::InitElements()
 {
 	FEElasticSolidDomain::InitElements();
@@ -2200,5 +2233,9 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		spt.m_Ie = pmb->CurrentDensity(mp);
 			
 		pt.s = pmb->Stress(mp);
+
+		// evaluate the strain energy density
+//		pt.sed = pme->StrainEnergy(mp);
+
 	}
 }

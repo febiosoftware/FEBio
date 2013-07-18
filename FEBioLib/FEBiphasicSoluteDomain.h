@@ -16,6 +16,9 @@ public:
 	//! Create shallow copy
 	FEDomain* Clone();
 
+	//! reset domain data
+	void Reset();
+
 	//! initialize elements for this domain
 	void InitElements();
 	

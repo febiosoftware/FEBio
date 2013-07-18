@@ -66,23 +66,22 @@ public:
 //! These materials need to define the permeability and tangent permeability functions.
 //!
 class FEHydraulicPermeability : public FEMaterial
-	{
-	public:
-		FEHydraulicPermeability() {}
-		virtual ~FEHydraulicPermeability(){}
+{
+public:
+	FEHydraulicPermeability() {}
+	virtual ~FEHydraulicPermeability(){}
 		
-		//! hydraulic permeability
-		virtual mat3ds Permeability(FEMaterialPoint& pt) = 0;
+	//! hydraulic permeability
+	virtual mat3ds Permeability(FEMaterialPoint& pt) = 0;
 		
-		//! tangent of hydraulic permeability with respect to strain
-		virtual tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp) = 0;
+	//! tangent of hydraulic permeability with respect to strain
+	virtual tens4ds Tangent_Permeability_Strain(FEMaterialPoint& mp) = 0;
 		
-		//! tangent of hydraulic permeability with respect to concentration
-		mat3ds Tangent_Permeability_Concentration(FEMaterialPoint& mp, const int isol);
+	//! tangent of hydraulic permeability with respect to concentration
+	mat3ds Tangent_Permeability_Concentration(FEMaterialPoint& mp, const int isol);
 		
-		void Init();
-		
-	};
+	void Init();
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for solvent supply.
@@ -151,7 +150,7 @@ public:
 	double Porosity(FEMaterialPoint& pt);
 	
 	//! fluid density
-	double FluidDensity() { return m_rhoTw; } 
+	double FluidTrueDensity() { return m_rhoTw; } 
 
 	//! Serialization
 	void Serialize(DumpFile& ar);

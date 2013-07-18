@@ -489,6 +489,12 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 		EvaluateMaterialParameters(pmp->m_pOsmC );
 		for (int i=0; i<(int)pmp->m_pSolute.size(); ++i)
 			EvaluateMaterialParameters(pmp->m_pSolute[i]);
+		for (int i=0; i<(int)pmp->m_pReact.size(); ++i){
+			if (pmp->m_pReact[i]->m_pFwd)
+				EvaluateMaterialParameters(pmp->m_pReact[i]->m_pFwd);
+			if (pmp->m_pReact[i]->m_pRev)
+				EvaluateMaterialParameters(pmp->m_pReact[i]->m_pRev);
+		}
 	}
 
 	FESolute* ps = dynamic_cast<FESolute*>(pm);

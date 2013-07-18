@@ -168,6 +168,101 @@ bool FEPlotElementStress::WriteLinearSolidStress(FELinearSolidDomain& d, vector<
 	return true;
 }
 
+
+//-----------------------------------------------------------------------------
+bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average strain energy
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
+				
+				if (pt) ew += pt->sed;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average strain energy
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
+				
+				if (pt) ew += pt->sed/pt->rhor;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&dom);
+	if (pbd)
+	{
+		for (i=0; i<pbd->Elements(); ++i)
+		{
+			FESolidElement& el = pbd->Element(i);
+			
+			// calculate average mass density
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
+				
+				if (pt) ew += pt->rhor;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+
 //-----------------------------------------------------------------------------
 bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
 {
@@ -725,6 +820,37 @@ bool FEPlotCurrentDensity::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotReferentialSolidVolumeFraction::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	if (pmd)
+	{
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FEBiphasicMaterialPoint* pt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+				
+				if (pt) ew += pt->m_phi0;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
@@ -778,6 +904,102 @@ bool FEPlotFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average electric potential
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+                FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
+                FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+				FESaltMaterialPoint* spt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (spt) ew += (ept->J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average electric potential
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+                FEElasticMaterialPoint* ept = (mp.ExtractData<FEElasticMaterialPoint>());
+                FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
+				FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (spt) ew += (ept->J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+
+//-----------------------------------------------------------------------------
+bool FEPlotSBMConcentration_::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solid-bound molecule is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<(int)pm->m_pSBM.size(); ++i)
+			if (pm->m_pSBM[i]->GetSBMID() == m_nsbm) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (st) ew += pm->SBMConcentration(mp,sid);
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)

@@ -12,12 +12,11 @@ public:
 	//! constructor
 	FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_MULTIPHASIC_DOMAIN; }
 	
-	FEDomain* Clone()
-	{
-		FEMultiphasicDomain* pd = new FEMultiphasicDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
+	//! clone domain
+	FEDomain* Clone();
+
+	//! Reset data
+	void Reset();
 	
 	//! initialize elements for this domain
 	void InitElements();

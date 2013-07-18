@@ -31,6 +31,12 @@ void NodeDataRecord::Parse(const char* szexpr)
 		else if (strcmp(sz, "c" ) == 0) m_data.push_back(C );
 		else if (strcmp(sz, "c1" ) == 0) m_data.push_back(C1);
 		else if (strcmp(sz, "c2" ) == 0) m_data.push_back(C2);
+		else if (strcmp(sz, "c3" ) == 0) m_data.push_back(C3);
+		else if (strcmp(sz, "c4" ) == 0) m_data.push_back(C4);
+		else if (strcmp(sz, "c5" ) == 0) m_data.push_back(C5);
+		else if (strcmp(sz, "c6" ) == 0) m_data.push_back(C6);
+		else if (strcmp(sz, "c7" ) == 0) m_data.push_back(C7);
+		else if (strcmp(sz, "c8" ) == 0) m_data.push_back(C8);
 		else throw UnknownDataField(sz);
 		sz = ch;
 	}
@@ -67,6 +73,8 @@ double NodeDataRecord::Evaluate(int item, int ndata)
 	case C4: val = node.m_ct[3]; break;
 	case C5: val = node.m_ct[4]; break;
 	case C6: val = node.m_ct[5]; break;
+	case C7: val = node.m_ct[6]; break;
+	case C8: val = node.m_ct[7]; break;
 	default:
 		{
 			FESolidSolver* psolid_solver = dynamic_cast<FESolidSolver*>(m_pfem->GetCurrentStep()->m_psolver);

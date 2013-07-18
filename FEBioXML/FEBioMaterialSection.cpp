@@ -99,6 +99,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 
 			// solute material parameters
 			if (!bfound && dynamic_cast<FESolute*>(pmat)) bfound = ParseSoluteMaterial(tag, dynamic_cast<FESolute*>(pmat));
+
+			// chemical reaction material parameters
+			if (!bfound && dynamic_cast<FEChemicalReaction*>(pmat)) bfound = ParseReactionMaterial(tag, dynamic_cast<FEChemicalReaction*>(pmat));
 			
 			// triphasic material parameters
 //			if (!bfound && dynamic_cast<FETriphasic*>(pmat)) bfound = ParseTriphasicMaterial(tag, dynamic_cast<FETriphasic*>(pmat));
@@ -674,6 +677,141 @@ bool FEBioMaterialSection::ParseSoluteMaterial(XMLTag &tag, FESolute *pm)
 	ParseMaterial(tag, pmat);
 	
 	return true;
+}
+
+
+//-----------------------------------------------------------------------------
+// Parse FEChemicalReaction material 
+//
+bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	const char* szid = 0;
+	
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	// read the stoichiometric coefficients and reaction rates
+	if (tag == "vR")
+	{
+		int id, vR;
+		szid = tag.AttributeValue("sbm", true);
+		if (szid) {
+			id = atoi(szid) - 1;
+			if (id < 0)
+				throw XMLReader::InvalidAttributeValue(tag, "sbm", szid);
+			tag.value(vR);
+			pm->m_sbmR.insert(std::pair<int, int>(id, vR));
+		}
+		szid = tag.AttributeValue("sol", true);
+		if (szid) {
+			id = atoi(szid) - 1;
+			if ((id < 0) || (id >= MAX_CDOFS))
+				throw XMLReader::InvalidAttributeValue(tag, "sol", szid);
+			tag.value(vR);
+			pm->m_solR.insert(std::pair<int, int>(id, vR));
+		}
+		
+		return true;
+	}
+	else if (tag == "vP")
+	{
+		int id, vP;
+		szid = tag.AttributeValue("sbm", true);
+		if (szid) {
+			id = atoi(szid) - 1;
+			if (id < 0)
+				throw XMLReader::InvalidAttributeValue(tag, "sbm", szid);
+			tag.value(vP);
+			pm->m_sbmP.insert(std::pair<int, int>(id, vP));
+		}
+		szid = tag.AttributeValue("sol", true);
+		if (szid) {
+			id = atoi(szid) - 1;
+			if ((id < 0) || (id >= MAX_CDOFS))
+				throw XMLReader::InvalidAttributeValue(tag, "sol", szid);
+			tag.value(vP);
+			pm->m_solP.insert(std::pair<int, int>(id, vP));
+		}
+		
+		return true;
+	}
+	else if (tag == "forward_rate")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material
+		FEReactionRate* pme = dynamic_cast<FEReactionRate*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid reaction rate %s in multiphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the reaction rate pointer
+		pm->m_pFwd = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "reverse_rate")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material
+		FEReactionRate* pme = dynamic_cast<FEReactionRate*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid reaction rate %s in multiphasic material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the reaction rate pointer
+		pm->m_pRev = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the material
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "Vbar")
+    {
+        pm->m_Vovr = true;
+        tag.value(pm->m_Vbar);
+		
+		return true;
+    }
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
 }
 
 //-----------------------------------------------------------------------------

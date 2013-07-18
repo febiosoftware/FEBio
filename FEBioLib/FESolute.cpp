@@ -81,3 +81,68 @@ FEParam* FESolute::GetParameter(const ParamString& s)
 	else if (s == "solubility" ) return m_pSolub->GetParameter(s.next());
 	return 0;
 }
+
+// register the FESolidBoundMolecule material with the framework
+REGISTER_MATERIAL(FESolidBoundMolecule, "solid_bound");
+
+// Material parameters for the FESolidBoundMolecule material
+BEGIN_PARAMETER_LIST(FESolidBoundMolecule, FEMaterial)
+ADD_PARAMETER(m_rho0, FE_PARAM_DOUBLE, "rho0");
+ADD_PARAMETER(m_rhomin, FE_PARAM_DOUBLE, "rhomin");
+ADD_PARAMETER(m_rhomax, FE_PARAM_DOUBLE, "rhomax");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! FESolidBoundMolecule constructor
+
+FESolidBoundMolecule::FESolidBoundMolecule()
+{
+	m_rhoT = 1;
+	m_M = 1;
+	m_z = 0;
+	m_rho0 = 0;
+	m_rhomin = 0;
+	m_rhomax = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FESolidBoundMolecule::Init()
+{
+	FEMaterial::Init();
+	
+	FESBMData* psd = FEModel::FindSBM(m_ID);
+	if (psd == 0) throw MaterialError("no match with global solid-bound molecule data");
+	m_rhoT = psd->m_rhoT;
+	m_M = psd->m_M;
+	m_z = psd->m_z;
+	SetName(psd->m_szname);
+	
+	if (m_rhoT < 0) throw MaterialError("density must be positive");
+	if (m_M < 0) throw MaterialError("molar_mass must be positive");
+	
+}
+
+//-----------------------------------------------------------------------------
+//! Data serialization
+void FESolidBoundMolecule::Serialize(DumpFile& ar)
+{
+	FEMaterial::Serialize(ar);
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	if (ar.IsSaving())
+	{
+		ar << m_rhoT << m_M << m_z << m_rho0 << m_rhomin << m_rhomax;
+	}
+	else
+	{
+		ar >> m_rhoT >> m_M >> m_z >> m_rho0 >> m_rhomin >> m_rhomax;
+	}
+}
+
+//-----------------------------------------------------------------------------
+FEParam* FESolidBoundMolecule::GetParameter(const ParamString& s)
+{
+	if (s.count() == 1) return FEMaterial::GetParameter(s);
+	
+	return 0;
+}

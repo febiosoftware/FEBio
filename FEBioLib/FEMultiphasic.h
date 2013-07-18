@@ -1,6 +1,10 @@
 #pragma once
 #include "FEBiphasicSolute.h"
 #include "FESolute.h"
+#include <map>
+
+class FEMultiphasic;
+class FEChemicalReaction;
 
 //-----------------------------------------------------------------------------
 // Multiple solutes
@@ -21,13 +25,27 @@ public:
 	{
 		if (ar.IsSaving())
 		{
-			for (int i=0; i<m_nsol; ++i)
-				ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i];
+			ar << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
+			for (int i=0; i<m_nsol; ++i) {
+				ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
+				<< m_k[i] << m_dkdJ[i];
+				for (int j=0; j<m_nsol; ++j)
+					ar << m_dkdc[i][j];
+			}
+			for (int i=0; i<m_nsbm; ++i)
+				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i];
 		}
 		else
 		{
-			for (int i=0; i<m_nsol; ++i)
-				ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i];
+			ar >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
+			for (int i=0; i<m_nsol; ++i) {
+				ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
+				>> m_k[i] << m_dkdJ[i];
+				for (int j=0; j<m_nsol; ++j)
+					ar >> m_dkdc[i][j];
+			}
+			for (int i=0; i<m_nsbm; ++i)
+				ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i];
 		}
 		
 		if (m_pt) m_pt->Serialize(ar);
@@ -37,7 +55,7 @@ public:
 	{
 		if (bflag)
 		{
-			m_nsol = 0;
+			m_nsol = m_nsbm = 0;
 			m_psi = m_cF = 0;
 			m_Ie = vec3d(0,0,0);
 		}
@@ -48,13 +66,98 @@ public:
 public:
 	// solutes material data
 	int				m_nsol;		//!< number of solutes
-	vector<double>	m_c;		//!< effective concentration
-	vector<vec3d>	m_gradc;	//!< spatial gradient of concentration
+	vector<double>	m_c;		//!< effective solute concentration
+	vector<vec3d>	m_gradc;	//!< spatial gradient of solute concentration
 	vector<vec3d>	m_j;		//!< solute molar flux
 	vector<double>	m_ca;		//!< actual solute concentration
 	double			m_psi;		//!< electric potential
 	vec3d			m_Ie;		//!< current density
 	double			m_cF;		//!< fixed charge density in current configuration
+	int				m_nsbm;		//!< number of solid-bound molecules
+	vector<double>	m_sbmr;		//!< referential mass concentration of solid-bound molecules
+	vector<double>	m_sbmrp;	//!< m_sbmr at previoust time step
+	vector<double>	m_sbmrhat;	//!< referential mass supply of solid-bound molecules
+	vector<double>	m_sbmrmin;	//!< minimum value of m_sbmr
+	vector<double>	m_sbmrmax;	//!< maximum value of m_sbmr
+	vector<double>	m_k;		//!< solute partition coefficient
+	vector<double>	m_dkdJ;		//!< 1st deriv of m_k with strain (J)
+	vector<double>	m_dkdJJ;	//!< 2nd deriv of m_k with strain (J)
+	vector< vector<double> >	m_dkdc;			//!< 1st deriv of m_k with effective concentration
+	vector< vector<double> >	m_dkdJc;		//!< cross deriv of m_k with J and c
+	vector< vector< vector<double> > > m_dkdcc;	// 2nd deriv of m_k with c
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for reaction rates.
+
+class FEReactionRate : public FEMaterial
+{
+public:
+	virtual void Init() {}
+	
+	//! reaction rate at material point
+	virtual double ReactionRate(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of reaction rate with strain at material point
+	virtual mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of reaction rate with effective fluid pressure at material point
+	virtual double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) = 0;
+	
+public:
+	FEChemicalReaction*	m_pReact;	//!< pointer to parent chemical reaction
+
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for chemical reactions.
+
+typedef std::map<int,int> intmap;
+typedef std::map<int,int>::iterator itrmap;
+
+class FEChemicalReaction : public FEMaterial
+{
+public:
+    FEChemicalReaction() {m_Vovr = false; m_pMP = 0; }
+    
+	virtual void Init() {
+		if (m_pFwd) InitializeReactionRate(m_pFwd);
+		if (m_pRev) InitializeReactionRate(m_pRev);
+	}
+	
+	//! molar supply at material point
+	virtual double ReactionSupply(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of molar supply with strain at material point
+	virtual mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of molar supply with effective pressure at material point
+	virtual double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) = 0;
+	
+	//! tangent of molar supply with effective concentration at material point
+	virtual double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) = 0;
+	
+	// initialize chemical reaction rate
+	void InitializeReactionRate(FEReactionRate* m_pRate) {m_pRate->m_pReact = this; }
+	
+public:
+	intmap			m_solR;		//!< stoichiometric coefficients of solute reactants (input)
+	intmap			m_solP;		//!< stoichiometric coefficients of solute products (input)
+	intmap			m_sbmR;		//!< stoichiometric coefficients of solid-bound reactants (input)
+	intmap			m_sbmP;		//!< stoichiometric coefficients of solid-bound products (input)
+	
+public:
+	int				m_nsol;		//!< number of solutes in the mixture
+	vector<int>		m_vR;		//!< stoichiometric coefficients of reactants
+	vector<int>		m_vP;		//!< stoichiometric coefficients of products
+	vector<int>		m_v;		//!< net stoichiometric coefficients of reactants and products
+	FEReactionRate*	m_pFwd;		//!< pointer to forward reaction rate
+	FEReactionRate*	m_pRev;		//!< pointer to reverse reaction rate
+    double          m_Vbar;     //!< weighted molar volume of reactants and products
+    bool            m_Vovr;     //!< override flag for m_Vbar
+	
+public:
+	FEMultiphasic*	m_pMP;		//!< pointer to multiphasic material where reaction occurs
 };
 
 //-----------------------------------------------------------------------------
@@ -94,7 +197,24 @@ public:
 	
 	//! actual fluid pressure (as opposed to effective pressure)
 	double Pressure(FEMaterialPoint& pt);
+
+	//! partition coefficient
+	double PartitionCoefficient(FEMaterialPoint& pt, const int sol);
 	
+	//! partition coefficients and their derivatives
+	void PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
+									   vector<double>& dkdJ,
+									   vector< vector<double> >& dkdc,
+									   vector<double>& dkdJJ,
+									   vector< vector<double> >& dkdJc,
+									   vector< vector< vector<double> > >& dkdcc);
+	
+	//! solid referential apparent density
+	double SolidReferentialApparentDensity(FEMaterialPoint& pt);
+	
+	//! solid referential volume fraction
+	double SolidReferentialVolumeFraction(FEMaterialPoint& pt);
+
 	//! actual concentration (as opposed to effective concentration)
 	double Concentration(FEMaterialPoint& pt, const int sol);
 	
@@ -109,12 +229,12 @@ public:
 	
 	//! current density
 	vec3d CurrentDensity(FEMaterialPoint& pt);
-	
-	//! fluid density
-	double FluidDensity() { return m_rhoTw; }
+
+	//! fluid true density
+	double FluidTrueDensity() { return m_rhoTw; }
 	
 	//! solute density
-	double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }
+	double SoluteTrueDensity(const int sol) { return m_pSolute[sol]->TrueDensity(); }
 	
 	//! solute molar mass
 	double SoluteMolarMass(const int sol) { return m_pSolute[sol]->MolarMass(); }
@@ -122,9 +242,35 @@ public:
 	//! solute charge number
 	int SoluteChargeNumber(const int sol) { return m_pSolute[sol]->ChargeNumber(); }
 	
+	//! SBM density
+	double SBMTrueDensity(const int sbm) { return m_pSBM[sbm]->TrueDensity(); }
+	
+	//! SBM molar mass
+	double SBMMolarMass(const int sbm) { return m_pSBM[sbm]->MolarMass(); }
+	
+	//! SBM charge number
+	int SBMChargeNumber(const int sbm) { return m_pSBM[sbm]->ChargeNumber(); }
+	
+	//! SBM actual concentration (molar concentration in current configuration)
+	double SBMConcentration(FEMaterialPoint& pt, const int sbm) {
+		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
+		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
+		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+		return spt.m_sbmr[sbm]/(ept.J-bpt.m_phi0)/SBMMolarMass(sbm);
+	}
+
+	//! SBM referential volume fraction
+	double SBMReferentialVolumeFraction(FEMaterialPoint& pt, const int sbm) {
+		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
+		return spt.m_sbmr[sbm]/SBMTrueDensity(sbm);
+	}
+	
 	//! Serialization
 	void Serialize(DumpFile& ar);
-		
+
+	// initialize chemical reaction
+	void InitializeReaction(FEChemicalReaction* m_pReact);
+
 public:
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density
@@ -137,11 +283,13 @@ public:
 	int							m_ndeg;			//!< polynomial degree of zeta in electroneutrality
 
 public:
-	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
-	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
-	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material
-	FESolventSupply*			m_pSupp;		//!< pointer to solvent supply material
-	vector<FESolute*>			m_pSolute;		//!< pointer to solute materials
+	FEElasticMaterial*				m_pSolid;		//!< pointer to elastic solid material
+	FEHydraulicPermeability*		m_pPerm;		//!< pointer to permeability material
+	FEOsmoticCoefficient*			m_pOsmC;		//!< pointer to osmotic coefficient material
+	FESolventSupply*				m_pSupp;		//!< pointer to solvent supply material
+	vector<FESolute*>				m_pSolute;		//!< pointer to solute materials
+	vector<FESolidBoundMolecule*>	m_pSBM;			//!< pointer to solid-bound molecule materials
+	vector<FEChemicalReaction*>		m_pReact;		//!< pointer to chemical reactions
 
 	// declare as registered
 	DECLARE_REGISTERED(FEMultiphasic);

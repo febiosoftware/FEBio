@@ -30,6 +30,7 @@ protected:
 	bool ParseBiphasicMaterial		  	   (XMLTag& tag, FEBiphasic* pm);
 	bool ParseBiphasicSoluteMaterial  	   (XMLTag& tag, FEBiphasicSolute* pm);
 	bool ParseSoluteMaterial			   (XMLTag& tag, FESolute* pm);
+	bool ParseReactionMaterial			   (XMLTag& tag, FEChemicalReaction* pm);
 	bool ParseTriphasicMaterial  		   (XMLTag& tag, FETriphasic* pm);
 	bool ParseMultiphasicMaterial          (XMLTag& tag, FEMultiphasic* pm);
 	bool ParseViscoElasticMaterial		   (XMLTag& tag, FEViscoElasticMaterial* pm);

@@ -17,13 +17,11 @@ bool FEBiphasicSolidDomain::Initialize(FEModel &mdl)
 	// initialize base class
 	FEElasticSolidDomain::Initialize(mdl);
 
-	// get the material
-	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
-		
 	// get the biphasic material
-	FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(pm);
+	FEBiphasic* pmb = dynamic_cast<FEBiphasic*>(GetMaterial());
 	assert(pmb);
 
+	// initialize all element data
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
@@ -1222,5 +1220,8 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 			
 		// calculate the stress at this material point
 		pt.s = pmb->Stress(mp);
+
+		// evaluate the strain energy density
+//		pt.sed = pme->StrainEnergy(mp);
 	}
 }

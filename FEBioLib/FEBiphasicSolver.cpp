@@ -61,20 +61,22 @@ bool FEBiphasicSolver::Init()
 	m_di.assign(m_ndeq, 0);
 	m_Di.assign(m_ndeq, 0);
 
-	assert(m_npeq > 0);
-	m_pi.assign(m_npeq, 0);
-	m_Pi.assign(m_npeq, 0);
+//	assert(m_npeq > 0);
+	if (m_npeq > 0) {
+		m_pi.assign(m_npeq, 0);
+		m_Pi.assign(m_npeq, 0);
 
-	// we need to fill the total displacement vector m_Ut
-	// TODO: I need to find an easier way to do this
-	FEMesh& mesh = m_fem.GetMesh();
-	int i, n;
-	for (i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
+		// we need to fill the total displacement vector m_Ut
+		// TODO: I need to find an easier way to do this
+		FEMesh& mesh = m_fem.GetMesh();
+		int i, n;
+		for (i=0; i<mesh.Nodes(); ++i)
+		{
+			FENode& node = mesh.Node(i);
 
-		// pressure dofs
-		n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.m_pt;
+			// pressure dofs
+			n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.m_pt;
+		}
 	}
 
 	return true;

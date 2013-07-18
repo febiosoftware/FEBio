@@ -228,6 +228,8 @@ public:
 	// TODO: I don't like this here.
 	static void SetSD(FESoluteData* psd);
 	static FESoluteData* FindSD(int nid);
+	static void SetSBM(FESBMData* psd);
+	static FESBMData* FindSBM(int nid);
 
 public:
 	//! set the debug level
@@ -287,4 +289,5 @@ protected:
 protected:
 	static std::map<string, double> m_Const;
 	static vector<FESoluteData*> m_SD;	//!< unique identifier of solutes in multiphasic materials
+	static vector<FESBMData*> m_SBM;		//!< unique identifier of solid-bound molecules in multiphasic materials
 };

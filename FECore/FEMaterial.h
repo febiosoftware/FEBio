@@ -194,4 +194,22 @@ public:
 	char	m_szname[128];	//!< solute name
 };
 
+
+//-----------------------------------------------------------------------------
+//! Global solid-bound molecule (SBM) data.
+//! \todo move this to a different file
+class FESBMData 
+{
+public:
+	FESBMData() { m_nID = -1; m_rhoT = 1; m_M = 1; m_z = 0; m_szname[0] = 0; }
+	
+public:
+	int		m_nID;			//!< SBM ID
+	double	m_rhoT;			//!< SBM true density
+	double	m_M;			//!< SBM molar mass
+	int		m_z;			//!< SBM charge number
+	char	m_szname[128];	//!< SBM name
+};
+
+
 #endif // !defined(AFX_FEMATERIAL_H__07F3E572_45B6_444E_A3ED_33FE9D18E82D__INCLUDED_)

@@ -24,22 +24,49 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
+//! Strain energy density
+class FEPlotStrainEnergyDensity : public FEDomainData
+{
+public:
+	FEPlotStrainEnergyDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Specific strain energy
+class FEPlotSpecificStrainEnergy : public FEDomainData
+{
+public:
+	FEPlotSpecificStrainEnergy(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Mass density
+class FEPlotDensity : public FEDomainData
+{
+public:
+	FEPlotDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Relative volume
 class FEPlotRelativeVolume : public FEDomainData
-	{
-	public:
-		FEPlotRelativeVolume(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-		bool Save(FEDomain& dom, vector<float>& a);
-	};
+{
+public:
+	FEPlotRelativeVolume(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Actual fluid pressure
 class FEPlotActualFluidPressure : public FEDomainData
-	{
-	public:
-		FEPlotActualFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-		bool Save(FEDomain& dom, vector<float>& a);
-	};
+{
+public:
+	FEPlotActualFluidPressure(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Fluid flux
@@ -60,13 +87,22 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Referential solid volume fraction
+class FEPlotReferentialSolidVolumeFraction : public FEDomainData
+{
+public:
+    FEPlotReferentialSolidVolumeFraction(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Actual solute concentration
 class FEPlotActualSoluteConcentration : public FEDomainData
-	{
-	public:
-		FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
-		bool Save(FEDomain& dom, vector<float>& a);
-	};
+{
+public:
+	FEPlotActualSoluteConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
 
 //-----------------------------------------------------------------------------
 //! Base class for solute concentration variables
@@ -140,6 +176,34 @@ class FEPlotFixedChargeDensity : public FEDomainData
 public:
 	FEPlotFixedChargeDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Referential fixed charge density
+class FEPlotReferentialFixedChargeDensity : public FEDomainData
+{
+public:
+	FEPlotReferentialFixedChargeDensity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for solid-bound molecule concentration
+class FEPlotSBMConcentration_ : public FEDomainData
+{
+public:
+	FEPlotSBMConcentration_(int nsbm) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(nsbm) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	int m_nsbm;
+};
+
+//-----------------------------------------------------------------------------
+// template class for instantiating solid-bound molecule variables
+template <int SBM> class FEPlotSBMConcentrationT : public FEPlotSBMConcentration_
+{
+public:
+	FEPlotSBMConcentrationT(FEModel* pfem) : FEPlotSBMConcentration_(SBM) {}
 };
 
 //-----------------------------------------------------------------------------

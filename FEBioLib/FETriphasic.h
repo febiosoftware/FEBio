@@ -113,10 +113,10 @@ public:
 	vec3d CurrentDensity(FEMaterialPoint& pt);
 	
 	//! fluid density
-	double FluidDensity() { return m_rhoTw; }
+	double FluidTrueDensity() { return m_rhoTw; }
 	
 	//! solute density
-	double SoluteDensity(const int ion) { return m_pSolute[ion]->Density(); }
+	double SoluteTrueDensity(const int ion) { return m_pSolute[ion]->TrueDensity(); }
 	
 	//! solute molar mass
 	double SoluteMolarMass(const int ion) { return m_pSolute[ion]->MolarMass(); }

@@ -8,6 +8,7 @@ using namespace std;
 // m_Const and m_SD need a definitions, since static
 map<std::string, double> FEModel::m_Const;
 vector<FESoluteData*> FEModel::m_SD;
+vector<FESBMData*> FEModel::m_SBM;
 
 //-----------------------------------------------------------------------------
 FEModel::FEModel(void)
@@ -97,6 +98,21 @@ FESoluteData* FEModel::FindSD(int nid)
 {
 	int i;
 	for (i=0; i<(int) m_SD.size(); ++i) if (m_SD[i]->m_nID == nid) return m_SD[i];
+	
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::SetSBM(FESBMData* psd)
+{
+	m_SBM.push_back(psd);
+}
+
+//-----------------------------------------------------------------------------
+FESBMData* FEModel::FindSBM(int nid)
+{
+	int i;
+	for (i=0; i<(int) m_SBM.size(); ++i) if (m_SBM[i]->m_nID == nid) return m_SBM[i];
 	
 	return 0;
 }

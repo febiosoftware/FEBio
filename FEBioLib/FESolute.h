@@ -113,7 +113,7 @@ public:
 	void Init();
 	
 	//! solute density
-	double Density() { return m_rhoT; }
+	double TrueDensity() { return m_rhoT; }
 	
 	//! solute molecular weight
 	double MolarMass() { return m_M; }
@@ -147,4 +147,53 @@ public: // material properties
 	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
 	
 	DECLARE_REGISTERED(FESolute);
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for solid-bound molecules.
+
+class FESolidBoundMolecule : public FEMaterial
+{
+public:
+	FESolidBoundMolecule();
+	
+public:
+	void Init();
+	
+	//! solute density
+	double TrueDensity() { return m_rhoT; }
+	
+	//! solute molecular weight
+	double MolarMass() { return m_M; }
+	
+	//! solute charge number
+	int ChargeNumber() { return m_z; }
+	
+	//! Serialization
+	void Serialize(DumpFile& ar);
+	
+	//! set solute ID
+	void SetSBMID(const int ID) {m_ID = ID;}
+	
+	//! get SBM ID
+	int GetSBMID() {return m_ID;}
+	
+	//! Find a material parameter
+	FEParam* GetParameter(const ParamString& s);
+	
+private:
+	int						m_ID;		//!< SBM ID in global table
+	
+public:
+	double					m_rhoT;		//!< true SBM density
+	double					m_M;		//!< SBM molar mass
+	int						m_z;		//!< charge number of SBM
+	double					m_rho0;		//!< initial referential (apparent) density of SBM
+	double					m_rhomin;	//!< minimum referential (apparent) density of SBM
+	double					m_rhomax;	//!< maximum referential (apparent) density of SBM
+	
+	// declare as registered
+	DECLARE_REGISTERED(FESolidBoundMolecule);
+	
+	DECLARE_PARAMETER_LIST();
 };
