@@ -104,7 +104,7 @@ public:
 
 public:
 	bool	m_unstable;	//!< flag indicating whether material is unstable on its own
-	void	*pVoid;		//!< pointer to parent
+	void	*pVoid;		//!< pointer to parent	\todo This has to go!
 
 	FECoordSysMap*	m_pmap;	//!< local material coordinate system
 

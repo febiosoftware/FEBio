@@ -30,8 +30,9 @@ public:
 		
 public:
 		
-	FEEllipsoidalFiberDistribution	m_Fib;
-	FEDonnanEquilibrium				m_DEQ;
+//	FEEllipsoidalFiberDistribution		m_Fib;
+	FEEllipsoidalFiberDistributionOld	m_Fib;
+	FEDonnanEquilibrium					m_DEQ;
 		
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

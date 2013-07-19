@@ -363,7 +363,8 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
 				}
 			}
-			else clog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
+			// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
+//			else clog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}
 
 		return true;

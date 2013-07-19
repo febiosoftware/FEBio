@@ -155,6 +155,58 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
+void FEBioGlobalsSection::ParseGSSBMData(XMLTag &tag)
+{
+	// count how many solid-bound molecules there are
+	int nsbm = 0;
+	XMLTag t(tag); ++t;
+	while (!(t == "SolidBoundMolecules")) { 
+		if ((t == "solid_bound") && !t.isend()) ++nsbm;	// only count on opening tag
+		++t;
+	}
+	
+	// read the global sbm data
+	++tag;
+	for (int i=0; i<nsbm; ++i)
+	{
+		FESBMData* psd = new FESBMData;
+		psd->m_nID = atoi(tag.AttributeValue("id"))-1;
+		const char* sz = tag.AttributeValue("name");
+		
+		if (strcmp(sz, "") == 0)
+			throw XMLReader::InvalidAttributeValue(tag, "name", sz);
+		
+		strcpy(psd->m_szname, sz);
+		
+		// read sbm properties
+		++tag;
+		do
+		{
+			if (tag == "charge_number")
+			{
+				tag.value(psd->m_z);
+			}
+			else if (tag == "true_density")
+			{
+				tag.value(psd->m_rhoT);
+			}
+			else if (tag == "molar_mass")
+			{
+				tag.value(psd->m_M);
+			}
+			else throw XMLReader::InvalidTag(tag);
+			
+			++tag;
+		}
+		while (!tag.isend());
+		
+		FEModel::SetSBM(psd);
+		
+		++tag;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Parse the time increments for multigeneration materials
 void FEBioGlobalsSection::ParseMGData(XMLTag &tag)
 {

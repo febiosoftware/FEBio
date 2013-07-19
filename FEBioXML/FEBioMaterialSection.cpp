@@ -182,26 +182,33 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 
 		// create a new coordinate system generator
 		XMLAtt& type = tag.Attribute("type");
-		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(type.cvalue(), &fem);
-		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
-
-		// read the parameter list
-		FEParameterList& pl = pmap->GetParameterList();
-		if (pl.Parameters() > 0)
+		if (type == "user")
 		{
-			if (tag.isleaf()) m_pim->ReadParameter(tag, pl, type.cvalue());
-			else
-			{
-				++tag;
-				do
-				{
-					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while(!tag.isend());
-			}
+			fprintf(stderr, "WARNING: The ""user"" fiber type is deprecated\n");
 		}
-		pm->m_pmap = pmap;
+		else
+		{
+			FECoordSysMap* pmap = febio.Create<FECoordSysMap>(type.cvalue(), &fem);
+			if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
+
+			// read the parameter list
+			FEParameterList& pl = pmap->GetParameterList();
+			if (pl.Parameters() > 0)
+			{
+				if (tag.isleaf()) m_pim->ReadParameter(tag, pl, type.cvalue());
+				else
+				{
+					++tag;
+					do
+					{
+						if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while(!tag.isend());
+				}
+			}
+			pm->m_pmap = pmap;
+		}
 
 		// mark the tag as read
 		return true;
@@ -224,26 +231,33 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 
 		// create a new coordinate system generator
 		const char* sztype = tag.AttributeValue("type");
-		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(sztype, &fem);
-		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-		// read the parameter list
-		FEParameterList& pl = pmap->GetParameterList();
-		if (pl.Parameters() > 0)
+		if (strcmp(sztype, "user") == 0)
 		{
-			if (tag.isleaf()) m_pim->ReadParameter(tag, pl, sztype);
-			else
-			{
-				++tag;
-				do
-				{
-					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while(!tag.isend());
-			}
+			fprintf(stderr, "WARNING: The ""user"" fiber type is deprecated\n");
 		}
-		pm->m_pmap = pmap;
+		else
+		{
+			FECoordSysMap* pmap = febio.Create<FECoordSysMap>(sztype, &fem);
+			if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+			// read the parameter list
+			FEParameterList& pl = pmap->GetParameterList();
+			if (pl.Parameters() > 0)
+			{
+				if (tag.isleaf()) m_pim->ReadParameter(tag, pl, sztype);
+				else
+				{
+					++tag;
+					do
+					{
+						if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+						++tag;
+					}
+					while(!tag.isend());
+				}
+			}
+			pm->m_pmap = pmap;
+		}
 
 		// mark the tag as read
 		return true;
