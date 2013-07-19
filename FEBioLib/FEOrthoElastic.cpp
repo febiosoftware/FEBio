@@ -40,14 +40,23 @@ void FEOrthoElastic::Init()
 	lam[0][0] = 1.0/E1; lam[0][1] = -v12/E1; lam[0][2] = -v31/E3;
 	lam[1][0] = -v12/E1; lam[1][1] = 1.0/E2; lam[1][2] = -v23/E2;
 	lam[2][0] = -v31/E3; lam[2][1] = -v23/E2; lam[2][2] = 1.0/E3;
-	mat3d c(lam);
+	
+	// check that compliance matrix is positive definite
+	mat3ds c(lam[0][0],lam[1][1],lam[2][2],lam[0][1],lam[1][2],lam[0][2]);
+	double l[3];
+	c.exact_eigen(l);
+
+	if ((l[0]<0) || (l[1]<0) || (l[2]<0))
+		throw MaterialError("Stiffness matrix is not positive definite.");
+
+	// evaluate stiffness matrix and extract Lame constants
 	c = c.inverse();
-	lam[0][0] = c[0][0] - 2*mu[0];
-	lam[1][1] = c[1][1] - 2*mu[1];
-	lam[2][2] = c[2][2] - 2*mu[2];
-	lam[1][2] = c[1][2]; lam[2][1] = c[2][1];
-	lam[2][0] = c[2][0]; lam[0][2] = c[0][2];
-	lam[0][1] = c[0][1]; lam[1][0] = c[1][0];
+	lam[0][0] = c(0,0) - 2*mu[0];
+	lam[1][1] = c(1,1) - 2*mu[1];
+	lam[2][2] = c(2,2) - 2*mu[2];
+	lam[1][2] = c(1,2); lam[2][1] = c(2,1);
+	lam[2][0] = c(2,0); lam[0][2] = c(0,2);
+	lam[0][1] = c(0,1); lam[1][0] = c(1,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -55,30 +64,44 @@ void FEOrthoElastic::Init()
 mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-
+	
 	int i,j;
-	mat3ds A0[3];		// structural tensor in reference configuration
+	vec3d a0[3];		// texture direction in reference configuration
+	vec3d a[3];			// texture direction in current configuration
+	mat3ds A[3];		// texture tensor in current configuration
 	double K[3];		// Ka
-
-	// Evaluate the strain
-	mat3ds E=pt.Strain();
+	double L[3];		// La
+	mat3ds bmi;			// B - I
+	// Evaluate the deformation gradient
+	mat3d &F = pt.F;
+	double J = pt.J;
+	
+	// calculate left and right Cauchy-Green tensor
+	mat3ds b = pt.LeftCauchyGreen();
+	mat3ds c = pt.RightCauchyGreen();
+	mat3ds c2 = c*c;
+	mat3dd I(1.);
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		vec3d a0(pt.Q[0][i],pt.Q[1][i],pt.Q[2][i]);
-		K[i] = a0*(E*a0);
-		A0[i] = dyad(a0);			// Evaluate the texture tensor in the reference configuration
+		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
+		K[i] = a0[i]*(c*a0[i]);
+		L[i] = a0[i]*(c2*a0[i]);
+		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
+		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 	
 	// Evaluate the stress
 	mat3ds s;
 	s.zero();		// Initialize for summation
+	bmi = b - I;
 	for (i=0; i<3; i++) {
-		s += mu[i]*(A0[i]*E + E*A0[i]);
+		s += mu[i]*K[i]*(A[i]*bmi + bmi*A[i]);
 		for (j=0; j<3; j++)
-			s += (A0[j]*K[i]+A0[i]*K[j])*(lam[i][j]/2.);
+			s += lam[i][j]*((K[i]-1)*K[j]*A[j]+(K[j]-1)*K[i]*A[i])/2.;
 	}
-
+	s /= 2.0*J;
+	
 	return s;
 }
 
@@ -88,22 +111,37 @@ tens4ds FEOrthoElastic::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	int i,j;
-	mat3ds A0[3];		// texture tensor in current configuration
+	vec3d a0[3];		// texture direction in reference configuration
+	vec3d a[3];			// texture direction in current configuration
+	mat3ds A[3];		// texture tensor in current configuration
+	double K[3];		// Ka
+	// Evaluate the strain and texture
+	mat3d &F = pt.F;
+	double J = pt.J;
+	
+	// calculate left and right Cauchy-Green tensor
+	mat3ds b = pt.LeftCauchyGreen();
+	mat3ds c = pt.RightCauchyGreen();
+	mat3ds c2 = c*c;
+	mat3dd I(1.);
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		vec3d a0(pt.Q[0][i],pt.Q[1][i],pt.Q[2][i]);
-		A0[i] = dyad(a0);			// Evaluate the texture tensor in the reference configuration
+		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
+		K[i] = a0[i]*(c*a0[i]);
+		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
+		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration
 	}
 	
-	// Evaluate the elasticity tensor
 	tens4ds C(0.0);
-	mat3dd I(1.0);
 	for (i=0; i<3; i++) {
-		C += dyad4s(A0[i],I)*mu[i];
+		C += mu[i]*K[i]*dyad4s(A[i],b);
 		for (j=0; j<3; j++)
-			C += dyad1s(A0[i],A0[j])*(lam[i][j]/2.);
+			C += lam[i][j]*K[i]*K[j]*dyad1s(A[i],A[j])/2.;
 	}
+	
+	// Elasticity tensor
+	C /= J;
 	
 	return C;
 }
