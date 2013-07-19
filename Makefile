@@ -75,6 +75,8 @@ all:
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioPlot; $(MAKE) -f febioplot.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
+	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
+	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioXML; $(MAKE) -f febioxml.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 	( cd NumCore; $(MAKE) -f numcore.mk \
@@ -108,10 +110,15 @@ febiolib:
 	( cd FEBioLib; $(MAKE) -f febiolib.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 
+febioopt:
+	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
+	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
+
 clean:
 
 	( cd FEBioLib; $(MAKE) -f febiolib.mk clean PLAT="$(PLAT)")
 	( cd FEBioPlot; $(MAKE) -f febioplot.mk clean PLAT="$(PLAT)")
+	( cd FEBioOpt; $(MAKE) -f febioopt.mk clean PLAT="$(PLAT)")
 	( cd FEBioXML; $(MAKE) -f febioxml.mk clean PLAT="$(PLAT)")
 	( cd NumCore; $(MAKE) -f numcore.mk clean PLAT="$(PLAT)")
 	( cd FECore; $(MAKE) -f fecore.mk clean PLAT="$(PLAT)")

@@ -48,7 +48,11 @@ FEBioKernel*	pFEBio;
 
 //-----------------------------------------------------------------------------
 // This function is called from the application and is used to register the plugin classes.
+#ifdef WIN32
 extern "C" __declspec(dllexport) void RegisterPlugin(FEBioKernel& febio)
+#else
+extern "C" void RegisterPlugin(FEBioKernel& febio)
+#endif
 {
 	// register the plugin classes
 	febio.RegisterClass(&febioopt_factory);
