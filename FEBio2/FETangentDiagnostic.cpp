@@ -111,6 +111,12 @@ void FETangentDiagnostic::BuildUniaxial()
 	// convert strain to a displacement
 	double d = sqrt(2*m_strain+1) - 1;
 
+	// Add a loadcurve
+	FELoadCurve* plc = new FELoadCurve;
+	plc->Add(0, 0);
+	plc->Add(1, 1);
+	m_fem.AddLoadCurve(plc);
+
 	// Add a prescribed BC
 	int nd[4] = {1, 2, 5, 6};
 	for (i=0; i<4; ++i)
@@ -175,6 +181,12 @@ void FETangentDiagnostic::BuildSimpleShear()
 
 	// convert strain to a displacement
 	double d = 2*m_strain;
+
+	// Add a loadcurve
+	FELoadCurve* plc = new FELoadCurve;
+	plc->Add(0, 0);
+	plc->Add(1, 1);
+	m_fem.AddLoadCurve(plc);
 
 	// Add a prescribed BC
 	int nd[4] = {4, 5, 6, 7};

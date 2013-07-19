@@ -127,7 +127,8 @@ REGISTER_MATERIAL(FEDiffRefIso                   , "diff-ref-iso"               
 REGISTER_MATERIAL(FEDonnanEquilibrium            , "Donnan equilibrium"            );
 REGISTER_MATERIAL(FEEFDDonnanEquilibrium         , "EFD Donnan equilibrium"        );
 REGISTER_MATERIAL(FEEFDMooneyRivlin              , "EFD Mooney-Rivlin"             );
-REGISTER_MATERIAL(FEEFDNeoHookean                , "EFD neo-Hookean"               );
+//REGISTER_MATERIAL(FEEFDNeoHookean                , "EFD neo-Hookean"               );
+REGISTER_MATERIAL(FEEFDNeoHookeanOld             , "EFD neo-Hookean"               );
 REGISTER_MATERIAL(FEEFDUncoupled                 , "EFD uncoupled"                 );
 REGISTER_MATERIAL(FEEFDVerondaWestmann           , "EFD Veronda-Westmann"          );
 REGISTER_MATERIAL(FEElasticMixture               , "solid mixture"                 );
