@@ -2,6 +2,7 @@
 #include "FEPlotData.h"
 #include "FEModel.h"
 
+
 //-----------------------------------------------------------------------------
 int FEPlotData::VarSize(Var_Type t)
 {
@@ -85,6 +86,9 @@ void FEDomainData::Save(FEModel &fem, Archive& ar)
 }
 
 //-----------------------------------------------------------------------------
+//! Save surface data
+//! \todo For the FMT_MULT option we are assuming 8 values per facet. I need to
+//! make sure that the FEBioPlot assumes as many values.
 void FESurfaceData::Save(FEModel &fem, Archive& ar)
 {
 	// loop over all surfaces
@@ -96,16 +100,17 @@ void FESurfaceData::Save(FEModel &fem, Archive& ar)
 
 		// Determine data size.
 		// Note that for the FMT_MULT case we are 
-		// assuming four data entries per facet
+		// assuming 8 data entries per facet
 		// regardless of the nr of nodes a facet really has
 		// this is because for surfaces, all elements are not
 		// necessarily of the same type
+		// TODO: Fix the assumption of the FMT_MULT
 		int nsize = VarSize(DataType());
 		switch (m_sfmt)
 		{
 		case FMT_NODE: nsize *= S.Nodes(); break;
 		case FMT_ITEM: nsize *= S.Elements(); break;
-		case FMT_MULT: nsize *= 4*S.Elements(); break;
+		case FMT_MULT: nsize *= 8*S.Elements(); break;
 		default:
 			assert(false);
 		}

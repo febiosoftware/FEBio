@@ -686,8 +686,14 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 				}
 				else
 				{
-//					pt.m_gap = 0;
+					pt.m_gap = 0;
 					pt.m_pme = 0;
+					if (sporo) {
+						pt.m_pg = 0;
+					}
+					if (ssolu) {
+						pt.m_cg = 0;
+					}
 				}
 			}
 			else

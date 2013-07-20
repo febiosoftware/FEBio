@@ -520,11 +520,11 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 				else
 				{
 //					pt.m_Lmd = 0;
-//					pt.m_gap = 0;
+					pt.m_gap = 0;
 					pt.m_pme = 0;
 					if (sporo) {
 //						pt.m_Lmp = 0;
-//						pt.m_pg = 0;
+						pt.m_pg = 0;
 					}
 				}
 			}
