@@ -3,6 +3,7 @@
 #include "FETransverselyIsotropic.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
+#include "FERemodelingElasticMaterial.h"
 #include <FECore/log.h>
 
 #ifdef WIN32
@@ -75,6 +76,13 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 				}
 			}
 
+			// initialize referential solid density
+			for (int n=0; n<el.GaussPoints(); ++n)
+			{
+				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+				pt.rhor = pme->Density();
+			}
+
 			// check if this is also a viscoelastic material
 			FEViscoElasticMaterial* pve = dynamic_cast<FEViscoElasticMaterial*> (pme);
 			if (pve)
@@ -113,8 +121,13 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
+//! Initialize element data
+//! \todo The explicit reference to FERemodelingElasticMaterial is awkward. Let's see if we can put that elsewhere.
 void FEElasticSolidDomain::InitElements()
 {
+	// determine if remodeling solid
+	FERemodelingElasticMaterial* prs = dynamic_cast<FERemodelingElasticMaterial*> (m_pMat);
+
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
 	FEMesh& m = *GetMesh();
@@ -142,6 +155,14 @@ void FEElasticSolidDomain::InitElements()
 			pt.J = defgrad(el, pt.F, j);
 
 			el.m_State[j]->Init(false);
+
+			// initialize remodeling data
+            if (prs) {
+                FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+                FERemodelingMaterialPoint& rpt = *el.m_State[j]->ExtractData<FERemodelingMaterialPoint>();
+                // reset referential solid density at previous time
+                rpt.rhorp = pt.rhor;
+            }
 		}
 	}
 }
@@ -721,6 +742,96 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 }
 
 //-----------------------------------------------------------------------------
+//! calculates element's density stiffness component for integration point n
+//! \todo Remove the FEModel parameter. We only need to dt parameter, not the entire model.
+//! \todo Problems seem to run better without this stiffness matrix
+void FEElasticSolidDomain::ElementDensityStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
+{
+	int n, i, j;
+    
+	FERemodelingElasticMaterial* pmat = dynamic_cast<FERemodelingElasticMaterial*>(fem.GetMaterial(el.GetMatID()));
+    
+    if (pmat) {
+        const int NE = FEElement::MAX_NODES;
+        vec3d gradN[NE];
+        double *Grn, *Gsn, *Gtn;
+        double Gr, Gs, Gt;
+        vec3d kru, kur;
+        
+        // nr of nodes
+        int neln = el.Nodes();
+        
+        // nr of integration points
+        int nint = el.GaussPoints();
+        
+        // get the time step value
+        double dt = fem.GetCurrentStep()->m_dt;
+        
+        // jacobian
+        double Ji[3][3], detJt;
+        
+        // weights at gauss points
+        const double *gw = el.GaussWeights();
+        
+        // density stiffness component for the stiffness matrix
+        mat3d kab;
+        
+        // calculate geometrical element stiffness matrix
+        for (n=0; n<nint; ++n)
+        {
+            // calculate jacobian
+            double J = invjact(el, Ji, n);
+            detJt = J*gw[n];
+            
+            Grn = el.Gr(n);
+            Gsn = el.Gs(n);
+            Gtn = el.Gt(n);
+            
+            for (i=0; i<neln; ++i)
+            {
+                Gr = Grn[i];
+                Gs = Gsn[i];
+                Gt = Gtn[i];
+                
+                // calculate global gradient of shape functions
+                // note that we need the transposed of Ji, not Ji itself !
+                gradN[i].x = Ji[0][0]*Gr+Ji[1][0]*Gs+Ji[2][0]*Gt;
+                gradN[i].y = Ji[0][1]*Gr+Ji[1][1]*Gs+Ji[2][1]*Gt;
+                gradN[i].z = Ji[0][2]*Gr+Ji[1][2]*Gs+Ji[2][2]*Gt;
+            }
+            
+            // get the material point data
+            FEMaterialPoint& mp = *el.m_State[n];
+            double drhohat = pmat->m_pSupp->Tangent_Supply_Density(mp);
+            mat3ds ruhat = pmat->m_pSupp->Tangent_Supply_Strain(mp);
+            mat3ds crho = pmat->Tangent_Stress_Density(mp);
+            double krr = (drhohat - 1./dt)/J;
+            
+            for (i=0; i<neln; ++i) {
+                kur = (crho*gradN[i])/krr;
+                for (j=0; j<neln; ++j)
+                {
+                    kru = ruhat*gradN[j];
+                    kab = kur & kru;
+                    ke[3*i  ][3*j  ] -= kab(0,0)*detJt;
+                    ke[3*i  ][3*j+1] -= kab(0,1)*detJt;
+                    ke[3*i  ][3*j+2] -= kab(0,2)*detJt;
+                    
+                    ke[3*i+1][3*j  ] -= kab(1,0)*detJt;
+                    ke[3*i+1][3*j+1] -= kab(1,1)*detJt;
+                    ke[3*i+1][3*j+2] -= kab(1,2)*detJt;
+                    
+                    ke[3*i+2][3*j  ] -= kab(2,0)*detJt;
+                    ke[3*i+2][3*j+1] -= kab(2,1)*detJt;
+                    ke[3*i+2][3*j+2] -= kab(2,2)*detJt;
+                }
+            }
+        }
+    }
+}
+
+
+//-----------------------------------------------------------------------------
 /*
 void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 {
@@ -774,6 +885,9 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 	// repeat over all solid elements
 	int NE = m_Elem.size();
 
+	// TODO: I only need this for the element density stiffness which I want to remove
+	FEModel& fem = psolver->GetFEModel();
+
 	#pragma omp parallel for private(ke,lm)
 	for (int iel=0; iel<NE; ++iel)
 	{
@@ -789,6 +903,9 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 		// calculate material stiffness
 		ElementMaterialStiffness(el, ke);
+
+		// calculate density stiffness
+		ElementDensityStiffness(fem, el, ke);
 
 		// assign symmetic parts
 		// TODO: Can this be omitted by changing the Assemble routine so that it only
@@ -885,6 +1002,9 @@ void FEElasticSolidDomain::ElementStiffness(FEModel& fem, int iel, matrix& ke)
 	// calculate geometrical stiffness
 	ElementGeometricalStiffness(el, ke);
 
+	// calculate density stiffness
+	ElementDensityStiffness(fem, el, ke);
+
 	// assign symmetic parts
 	// TODO: Can this be omitted by changing the Assemble routine so that it only
 	// grabs elements from the upper diagonal matrix?
@@ -952,6 +1072,8 @@ void FEElasticSolidDomain::ElementInertialStiffness(FEModel& fem, FESolidElement
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 {
+	double dt = fem.GetCurrentStep()->m_dt;
+
 	bool berr = false;
 	int NE = (int) m_Elem.size();
 	#pragma omp parallel for shared(NE, berr)
@@ -959,7 +1081,7 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 	{
 		try
 		{
-			UpdateElementStress(i);
+			UpdateElementStress(i, dt);
 		}
 		catch (NegativeJacobian e)
 		{
@@ -975,7 +1097,9 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 }
 
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::UpdateElementStress(int iel)
+//! Update element state data (mostly stresses, but some other stuff as well)
+//! \todo Remove the remodeling solid stuff
+void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 {
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
@@ -1002,6 +1126,9 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
 	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 	assert(pm);
 
+	// determine if remodeling solid
+	FERemodelingElasticMaterial* prs = dynamic_cast<FERemodelingElasticMaterial*> (m_pMat);
+
 	// loop over the integration points and calculate
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
@@ -1020,6 +1147,22 @@ void FEElasticSolidDomain::UpdateElementStress(int iel)
 
 		// calculate the stress at this material point
 		pt.s = pm->Stress(mp);
+
+		// calculate the strain energy density at this material point
+		pt.sed = pm->StrainEnergy(mp);
+
+		// for remodeling solids, update the referential mass density
+		if (prs)
+		{
+            FERemodelingMaterialPoint& rpt = *(mp.ExtractData<FERemodelingMaterialPoint>());
+            // calculate the sed derivative with respect to mass density at this material point
+            rpt.dsed = pm->Tangent_SE_Density(mp);
+                
+			double rhorhat = prs->m_pSupp->Supply(mp);
+			pt.rhor = rhorhat*dt + rpt.rhorp;
+			if (pt.rhor > prs->m_rhormax) pt.rhor = prs->m_rhormax;
+			if (pt.rhor < prs->m_rhormin) pt.rhor = prs->m_rhormin;
+		}
 	}
 }
 

@@ -11,6 +11,7 @@
 #include "FEBioLib/FEViscoElasticMaterial.h"
 #include "FEBioLib/FEUncoupledViscoElasticMaterial.h"
 #include "FEBioLib/FEElasticMultigeneration.h"
+#include "FEBioLib/FERemodelingElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Material Section
@@ -36,6 +37,7 @@ protected:
 	bool ParseViscoElasticMaterial		   (XMLTag& tag, FEViscoElasticMaterial* pm);
 	bool ParseUncoupledViscoElasticMaterial(XMLTag& tag, FEUncoupledViscoElasticMaterial* pm);
 	bool ParseElasticMultigeneration	   (XMLTag &tag, FEElasticMultigeneration *pm);
+	bool ParseRemodelingSolid			   (XMLTag &tag, FERemodelingElasticMaterial *pm);
 
 protected:
 	int	m_nmat;

@@ -767,6 +767,7 @@
     <ClInclude Include="..\..\FEBioLib\FEHeatSource.h" />
     <ClInclude Include="..\..\FEBioLib\FEHeatTransferMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FEHolmesMow.h" />
+    <ClInclude Include="..\..\FEBioLib\FEHuiskesSupply.h" />
     <ClInclude Include="..\..\FEBioLib\FEIncompNeoHookean.h" />
     <ClInclude Include="..\..\FEBioLib\FEIsotropicElastic.h" />
     <ClInclude Include="..\..\FEBioLib\FEIsotropicFourier.h" />
@@ -802,6 +803,7 @@
     <ClInclude Include="..\..\FEBioLib\FEPressureLoad.h" />
     <ClInclude Include="..\..\FEBioLib\FEReactionRateConst.h" />
     <ClInclude Include="..\..\FEBioLib\FEReactionRateHuiskes.h" />
+    <ClInclude Include="..\..\FEBioLib\FERemodelingElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidJoint.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidShellDomain.h" />
     <ClInclude Include="..\..\FEBioLib\FERigidSolidDomain.h" />
@@ -923,6 +925,7 @@
     <ClCompile Include="..\..\FEBioLib\FEHeatSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHeatSource.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FEHuiskesSupply.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIncompNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicElastic.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEIsotropicFourier.cpp" />
@@ -958,6 +961,7 @@
     <ClCompile Include="..\..\FEBioLib\FEPressureLoad.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEReactionRateConst.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEReactionRateHuiskes.cpp" />
+    <ClCompile Include="..\..\FEBioLib\FERemodelingElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidJoint.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidShellDomain.cpp" />
     <ClCompile Include="..\..\FEBioLib\FERigidSolidDomain.cpp" />

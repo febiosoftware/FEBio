@@ -54,6 +54,7 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FEElasticMultigeneration.h"
+#include "FERemodelingElasticMaterial.h"
 #include "FESlidingInterfaceBW.h"
 #include "FECore/log.h"
 #include "version.h"
@@ -503,6 +504,13 @@ void FEBioModel::EvaluateMaterialParameters(FEMaterial* pm)
 		EvaluateMaterialParameters(ps->m_pDiff );
 		EvaluateMaterialParameters(ps->m_pSolub);
 		if (ps->m_pSupp) EvaluateMaterialParameters(ps->m_pSupp );
+	}
+
+	FERemodelingElasticMaterial* prs = dynamic_cast<FERemodelingElasticMaterial*>(pm);
+	if (prs)
+	{
+		EvaluateMaterialParameters(prs->m_pBase);
+		EvaluateMaterialParameters(prs->m_pSupp);
 	}
 }
 

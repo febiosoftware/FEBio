@@ -11,9 +11,6 @@
 #include "FECarterHayes.h"
 #include "FEMultiphasic.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FECarterHayes, "Carter-Hayes");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECarterHayes, FEElasticMaterial)
 ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");

@@ -76,6 +76,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// TODO: this option will become obselete
 			bool bfound = false;
 
+			// additional remodeling solid
+			if (!bfound && dynamic_cast<FERemodelingElasticMaterial*>(pmat)) bfound = ParseRemodelingSolid(tag, dynamic_cast<FERemodelingElasticMaterial*>(pmat));
+
 			// additional elastic material parameters
 			if (!bfound && dynamic_cast<FEElasticMaterial*>(pmat)) bfound = ParseElasticMaterial(tag, dynamic_cast<FEElasticMaterial*>(pmat));
 
@@ -414,6 +417,88 @@ bool FEBioMaterialSection::ParseElasticMultigeneration(XMLTag &tag, FEElasticMul
 	
 	return false;
 }
+
+//-----------------------------------------------------------------------------
+// Parse FERemodelingElasticMaterial material 
+//
+bool FEBioMaterialSection::ParseRemodelingSolid(XMLTag &tag, FERemodelingElasticMaterial *pm)
+{
+	const char* sztype = 0;
+	const char* szname = 0;
+	
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
+	// read the solid material
+	if (tag == "solid")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. an elastic material)
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
+		
+		// don't allow rigid bodies
+		if ((pme == 0) || (dynamic_cast<FERigidMaterial*>(pme)))
+		{
+			clog.printbox("INPUT ERROR", "Invalid elastic solid %s in remodeling solid material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solid material pointer
+		pm->m_pBase = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else if (tag == "supply")
+	{
+		// get the material type
+		sztype = tag.AttributeValue("type");
+		
+		// get the material name
+		szname = tag.AttributeValue("name", true);
+		
+		// create a new material of this type
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+		
+		// make sure the base material is a valid material (i.e. a permeability material)
+		FESolidSupply* pme = dynamic_cast<FESolidSupply*>(pmat);
+		
+		if (pme == 0)
+		{
+			clog.printbox("INPUT ERROR", "Invalid solid supply %s in remodeling solid material %s\n", szname, pm->GetName());
+			throw XMLReader::Error();
+		}
+		
+		// set the solid supply pointer
+		pm->m_pSupp = pme;
+		
+		// set the material's name
+		if (szname) pme->SetName(szname);
+		
+		// parse the solid
+		ParseMaterial(tag, pme);
+		
+		return true;
+	}
+	else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+	
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 // Parse FEUncoupledElasticMixture material 

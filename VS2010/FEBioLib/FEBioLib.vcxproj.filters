@@ -486,6 +486,12 @@
     <ClInclude Include="..\..\FEBioLib\FEReactionRateHuiskes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FERemodelingElasticMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioLib\FEHuiskesSupply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\PardisoSolver.cpp">
@@ -954,6 +960,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FEReactionRateHuiskes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FERemodelingElasticMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioLib\FEHuiskesSupply.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -77,6 +77,10 @@
 #include "FESolventSupplyStarling.h"
 #include "FEMRVonMisesFibers.h"
 #include "FEUncoupledActiveContraction.h"
+#include "FEHuiskesSupply.h"
+#include "FERemodelingElasticMaterial.h"
+#include "FECarterHayes.h"
+#include "FECarterHayesOld.h"
 
 #include "FESurfaceConstraint.h"
 #include "FEPeriodicBoundary.h"
@@ -187,6 +191,10 @@ REGISTER_MATERIAL(FEElasticMultigeneration       , "multigeneration"            
 REGISTER_MATERIAL(FESolventSupplyStarling        , "Starling"                      );
 REGISTER_MATERIAL(FEMRVonMisesFibers             , "Mooney-Rivlin von Mises Fibers");
 REGISTER_MATERIAL(FEUncoupledActiveContraction   , "uncoupled active contraction"  );
+REGISTER_MATERIAL(FEHuiskesSupply                , "Huiskes-supply"                );
+REGISTER_MATERIAL(FERemodelingElasticMaterial    , "remodeling solid"              );
+REGISTER_MATERIAL(FECarterHayes					 , "Carter-Hayes"                  );
+REGISTER_MATERIAL(FECarterHayesOld               , "Carter-Hayes (old)"            );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

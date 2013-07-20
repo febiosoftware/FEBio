@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "FECarterHayesOld.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FECarterHayesOld, "Carter-Hayes (old)");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECarterHayesOld, FEElasticMaterial)
 ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");

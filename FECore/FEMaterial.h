@@ -118,6 +118,15 @@ public:
 	//! return the molar mass
 	virtual double MolarMass() { return m_molarmass; }
 
+	//! calculate strain energy density at material point \todo remove this
+	virtual double StrainEnergy(FEMaterialPoint& pt) { return 0; }
+
+	//! calculate tangent of strain energy density with solid density at material point \todo remove this
+	virtual double Tangent_SE_Density(FEMaterialPoint& pt) { return 0;}
+
+	//! calculate tangent of stress with solid density at material point \todo remove this
+	virtual mat3ds Tangent_Stress_Density(FEMaterialPoint& pt) { return mat3ds(); }
+
 protected:
 	double	m_density;	//!< material density
 	double	m_molarmass;//!< material molar mass (molecular weight)

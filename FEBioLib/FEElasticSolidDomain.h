@@ -39,7 +39,7 @@ public: // overrides from FEElasticDomain
 	void UpdateStresses(FEModel& fem);
 
 	// update the element stress
-	void UpdateElementStress(int iel);
+	void UpdateElementStress(int iel, double dt);
 
 	//! calculates the residual
 //	void Residual(FENLSolver* psolver, vector<double>& R);
@@ -79,6 +79,9 @@ public:
 
 	//! calculates the solid element inertial stiffness matrix
 	void ElementInertialStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
+
+	//! density stiffness component \todo this is only used by remodeling solids and I would like to remove this
+	void ElementDensityStiffness(FEModel& fem, FESolidElement& el, matrix& ke);
 
 	//! calculates the stiffness matrix due to body forces 
 	void ElementBodyForceStiffness(FEBodyForce& bf, FESolidElement& el, matrix& ke);

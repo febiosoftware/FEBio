@@ -62,6 +62,8 @@ public:
 			s0.zero();
 
 //			Q.unit();
+
+	        sed = rhor = 0;
 		}
 
 		if (m_pt) m_pt->Init(bflag);
