@@ -21,51 +21,6 @@ END_PARAMETER_LIST();
 ///////////////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
-//! Finds the (master) element that contains the projection of a (slave) node
-
-FEElement* FERigidWallSurface::FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol)
-{
-	// get the mesh
-	FEMesh& mesh = *m_pMesh;
-
-	// see if we need to initialize the NQ structure
-	if (binit_nq) m_NQ.Init();
-	binit_nq = false;
-
-	// let's find the closest master node
-	int mn = m_NQ.Find(x);
-
-	// mn is a local index, so get the global node number too
-	int m = m_node[mn];
-
-	// get the nodal position
-	vec3d r0 = mesh.Node(m).m_rt;
-
-	// now that we found the closest master node, lets see if we can find 
-	// the best master element
-	int N;
-
-	// loop over all master elements that contain the node mn
-	int nval = m_NEL.Valence(mn);
-	FEElement** pe = m_NEL.ElementList(mn);
-	for (int j=0; j<nval; ++j)
-	{
-		// get the master element
-		FESurfaceElement& el = dynamic_cast<FESurfaceElement&> (*pe[j]);
-		N = el.Nodes();
-
-		// project the node on the element
-		r[0] = 0;
-		r[1] = 0;
-		q = ProjectToSurface(el, x, r[0], r[1]);
-		if (IsInsideElement(el, r[0], r[1], tol)) return pe[j];
-	}
-
-	// we did not find a master surface
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data
 //! structures are allocated.
 //! Note that it is assumed that the element array is already created
@@ -172,6 +127,15 @@ void FERigidWallSurface::UpdateNormals()
 	}
 
 	for (i=0; i<N; ++i) nu[i].unit();
+}
+
+//-----------------------------------------------------------------------------
+void FERigidWallSurface::ShallowCopy(FERigidWallSurface& s)
+{
+	Lm  = s.Lm;
+	gap = s.gap;
+	zero(pme);
+	Lt  = s.Lt;
 }
 
 //-----------------------------------------------------------------------------
@@ -588,6 +552,8 @@ bool FERigidWallInterface::Augment(int naug)
 
 void FERigidWallInterface::Serialize(DumpFile &ar)
 {
+	FEContactInterface::Serialize(ar);
+
 	if (ar.IsSaving())
 	{
 		ar << m_eps;

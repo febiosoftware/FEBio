@@ -27,19 +27,10 @@ public:
 	bool Init();
 
 	//! shallow copy
-	void ShallowCopy(FERigidWallSurface& s)
-	{
-		Lm  = s.Lm;
-		gap = s.gap;
-		zero(pme);
-		Lt  = s.Lt;
-	}
+	void ShallowCopy(FERigidWallSurface& s);
 
 	//! Update the surface data
 	void Update() {}
-
-	//! Find element that contains the projection of x
-	FEElement* FindMasterSegment(vec3d& x, vec3d& q, vec2d& r, bool& binit_nq, double tol);
 
 	//! Calculate the total traction at a node
 	vec3d traction(int inode);
