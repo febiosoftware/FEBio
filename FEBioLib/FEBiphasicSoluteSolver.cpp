@@ -740,7 +740,14 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 		// update nodal concentration
 		for (j=0; j<MAX_CDOFS; ++j) {
 			n = node.m_ID[DOF_C+j];
-			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+//			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+			// Force the concentrations to remain positive
+			if (n >= 0) {
+				node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+				if (node.m_ct[j] < 0) {
+					node.m_ct[j] = 0;
+				}
+			}
 		}
 	}
 	
