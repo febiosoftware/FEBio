@@ -3,6 +3,13 @@
 #include <FECore/FEBioFactory.h>
 #include <FECore/Logfile.h>
 #include "FEBioOpt.h"
+
+#ifdef WIN32
+	#define DLL_EXPORT __declspec(dllexport)
+#else
+	#define DLL_EXPORT
+#endif
+
 #ifdef WIN32
 #include "targetver.h"
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
@@ -48,11 +55,7 @@ FEBioKernel*	pFEBio;
 
 //-----------------------------------------------------------------------------
 // This function is called from the application and is used to register the plugin classes.
-#ifdef WIN32
-extern "C" __declspec(dllexport) void RegisterPlugin(FEBioKernel& febio)
-#else
-extern "C" void RegisterPlugin(FEBioKernel& febio)
-#endif
+extern "C" DLL_EXPORT void RegisterPlugin(FEBioKernel& febio)
 {
 	// register the plugin classes
 	febio.RegisterClass(&febioopt_factory);
