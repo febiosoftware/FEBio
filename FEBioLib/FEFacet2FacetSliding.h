@@ -34,6 +34,9 @@ public:
 	//! create a shallow copy for running restarts
 	void ShallowCopy(FEFacetSlidingSurface& s);
 
+	//! evaluate net contact force
+	vec3d NetContactForce();
+
 	//! serialize data for (cold) restart
 	void Serialize(DumpFile& ar);
 

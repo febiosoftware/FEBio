@@ -66,6 +66,40 @@ void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
 }
 
 //-----------------------------------------------------------------------------
+vec3d FEFacetSlidingSurface::NetContactForce()
+{
+	// initialize contact force
+	vec3d f(0,0,0);
+	
+	// loop over all elements of the primary surface
+	for (int n=0; n<Elements(); ++n)
+	{
+		FESurfaceElement& el = Element(n);
+		int nint = el.GaussPoints();
+		
+		// evaluate the contact force for that element
+		for (int i=0; i<nint; ++i) 
+		{
+			Data& pt = m_Data[n][i];
+			// unit vector
+			vec3d n = SurfaceNormal(el, i);
+			// gauss weight
+			double w = el.GaussWeights()[i];
+			// area in reference configuration
+			vec3d g0[2];
+			double r = el.gr(i);
+			double s = el.gs(i);
+			CoBaseVectors0(el, r, s, g0);
+			double A = (g0[0] ^ g0[1]).unit();
+			// contact force
+			f += n*(w*pt.m_Ln*A);
+		}
+	}
+	
+	return f;
+}
+
+//-----------------------------------------------------------------------------
 void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 {
 	FEContactSurface::Serialize(ar);
