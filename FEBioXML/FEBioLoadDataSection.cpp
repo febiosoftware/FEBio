@@ -7,8 +7,13 @@
 void FEBioLoadDataSection::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEAnalysis* pstep = m_pim->GetStep();
-	int nmplc = pstep->m_nmplc+1;
+	int nmplc = -1;
+	
+	if (m_pim->m_nsteps > 0)
+	{
+		FEAnalysis* pstep = m_pim->GetStep();
+		nmplc = pstep->m_nmplc+1;
+	}
 
 	++tag;
 	do

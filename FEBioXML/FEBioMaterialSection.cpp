@@ -107,7 +107,7 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			if (!bfound && dynamic_cast<FEChemicalReaction*>(pmat)) bfound = ParseReactionMaterial(tag, dynamic_cast<FEChemicalReaction*>(pmat));
 			
 			// triphasic material parameters
-//			if (!bfound && dynamic_cast<FETriphasic*>(pmat)) bfound = ParseTriphasicMaterial(tag, dynamic_cast<FETriphasic*>(pmat));
+			if (!bfound && dynamic_cast<FETriphasic*>(pmat)) bfound = ParseTriphasicMaterial(tag, dynamic_cast<FETriphasic*>(pmat));
 
 			// multiphasic material parameters
 			if (!bfound && dynamic_cast<FEMultiphasic*>(pmat)) bfound = ParseMultiphasicMaterial(tag, dynamic_cast<FEMultiphasic*>(pmat));
