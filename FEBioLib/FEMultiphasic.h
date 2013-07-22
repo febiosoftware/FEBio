@@ -264,6 +264,9 @@ public:
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 		return spt.m_sbmr[sbm]/SBMTrueDensity(sbm);
 	}
+
+	//! find local SBM ID from global one
+	int FindLocalSBMID(int nid);
 	
 	//! Serialization
 	void Serialize(DumpFile& ar);

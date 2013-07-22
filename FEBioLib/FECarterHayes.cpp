@@ -11,18 +11,16 @@
 #include "FECarterHayes.h"
 #include "FEMultiphasic.h"
 
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECarterHayes, FEElasticMaterial)
-ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
-ADD_PARAMETER(m_g, FE_PARAM_DOUBLE, "gamma");
-ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
-ADD_PARAMETER(m_sbm, FE_PARAM_INT, "sbm");
+	ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
+	ADD_PARAMETER(m_g, FE_PARAM_DOUBLE, "gamma");
+	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER(m_sbm, FE_PARAM_INT, "sbm");
 END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// FECarterHayes
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
 void FECarterHayes::Init()
 {
 	FEElasticMaterial::Init();
@@ -30,21 +28,17 @@ void FECarterHayes::Init()
 	if (m_c <= 0) throw MaterialError("Invalid value for c");
 	if (m_g < 0) throw MaterialError("Invalid value for gamma");
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialRangeError("v", -1.0, 0.5, true, false);
-	
-	// extract the local id of the SBM whose density controls Young's modulus from the global id
-	m_lsbm = -1;
+
+	// get the parent material which must be a multiphasic material
 	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (m_pParent);
     if (pMP == 0) throw MaterialError("Parent material must be multiphasic");
-	int nsbm = (int)pMP->m_pSBM.size();
-	for (int isbm=0; isbm<nsbm; ++isbm) {
-		if (pMP->m_pSBM[isbm]->GetSBMID() == m_sbm - 1) {
-			m_lsbm = isbm;
-			break;
-		}
-	}
+
+	// extract the local id of the SBM whose density controls Young's modulus from the global id
+	m_lsbm = pMP->FindLocalSBMID(m_sbm);
 	if (m_lsbm == -1) throw MaterialError("Invalid value for sbm");
 }
 
+//-----------------------------------------------------------------------------
 double FECarterHayes::StrainEnergy(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -68,6 +62,7 @@ double FECarterHayes::StrainEnergy(FEMaterialPoint& mp)
 	return sed;
 }
 
+//-----------------------------------------------------------------------------
 mat3ds FECarterHayes::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -95,6 +90,7 @@ mat3ds FECarterHayes::Stress(FEMaterialPoint& mp)
 	return s;
 }
 
+//-----------------------------------------------------------------------------
 tens4ds FECarterHayes::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
@@ -123,6 +119,7 @@ tens4ds FECarterHayes::Tangent(FEMaterialPoint& mp)
 	return tens4ds(D);
 }
 
+//-----------------------------------------------------------------------------
 //! calculate tangent of strain energy density with mass density
 double FECarterHayes::Tangent_SE_Density(FEMaterialPoint& mp)
 {
@@ -131,6 +128,7 @@ double FECarterHayes::Tangent_SE_Density(FEMaterialPoint& mp)
     return StrainEnergy(mp)*m_g/rhor;
 }
 
+//-----------------------------------------------------------------------------
 //! calculate tangent of stress with mass density
 mat3ds FECarterHayes::Tangent_Stress_Density(FEMaterialPoint& mp)
 {

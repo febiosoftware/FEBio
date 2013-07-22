@@ -248,6 +248,23 @@ FEMultiphasic::FEMultiphasic()
 }
 
 //-----------------------------------------------------------------------------
+//! Returns the local ID of the SBM, given the global ID.
+//! \param nid global ID (one - based)
+//! \return the local ID (zero-based index) or -1 if not found.
+int FEMultiphasic::FindLocalSBMID(int nid)
+{
+	int lsbm = -1;
+	int nsbm = (int) m_pSBM.size();
+	for (int isbm=0; isbm<nsbm; ++isbm) {
+		if (m_pSBM[isbm]->GetSBMID() == nid - 1) {
+			lsbm = isbm;
+			break;
+		}
+	}
+	return lsbm;
+}
+
+//-----------------------------------------------------------------------------
 void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 {
 	int isol, isbm, itot;
@@ -328,8 +345,8 @@ void FEMultiphasic::Init()
 	if (m_pSupp) m_pSupp->Init();
 	m_pOsmC->Init();
 	for (int i=0; i<(int)m_pSolute.size(); ++i) m_pSolute[i]->Init();
-	for (int i=0; i<m_pSBM.size(); ++i) m_pSBM[i]->Init();
-	for (int i=0; i<m_pReact.size(); ++i)
+	for (int i=0; i<(int)m_pSBM.size(); ++i) m_pSBM[i]->Init();
+	for (int i=0; i<(int)m_pReact.size(); ++i)
 		InitializeReaction(m_pReact[i]);
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
@@ -368,7 +385,7 @@ double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 	double rhosr = pet.m_phi0*m_pSolid->Density();
 
 	// add contribution from solid-bound molecules
-	for (int isbm=0; isbm<spt.m_sbmr.size(); ++isbm)
+	for (int isbm=0; isbm<(int)spt.m_sbmr.size(); ++isbm)
 		rhosr += spt.m_sbmr[isbm];
 	
 	return rhosr;
@@ -384,7 +401,7 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 	double phisr = m_phi0;
     
 	// add contribution from solid-bound molecules
-	for (int isbm=0; isbm<m_pSBM.size(); ++isbm)
+	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
 		phisr += SBMReferentialVolumeFraction(pt, isbm);
 	
 	return phisr;
@@ -425,7 +442,7 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	double ce = 0;
 
 	// add contribution from charged solid-bound molecules
-	for (int isbm=0; isbm<m_pSBM.size(); ++isbm)
+	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
 		ce += SBMChargeNumber(isbm)*spt.m_sbmr[isbm]/SBMMolarMass(isbm);
 	
 	double cF = (m_cFr*(1-phi0)+ce)/(J-phi0);
