@@ -33,7 +33,7 @@ void FECarterHayes::Init()
 	
 	// extract the local id of the SBM whose density controls Young's modulus from the global id
 	m_lsbm = -1;
-	FEMultiphasic* pMP = static_cast<FEMultiphasic*> (m_pParent);
+	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (m_pParent);
     if (pMP == 0) throw MaterialError("Parent material must be multiphasic");
 	int nsbm = (int)pMP->m_pSBM.size();
 	for (int isbm=0; isbm<nsbm; ++isbm) {
