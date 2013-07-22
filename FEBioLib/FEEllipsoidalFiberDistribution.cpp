@@ -39,11 +39,11 @@ mat3ds FEEllipsoidalFiberDistribution::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// get the element's local coordinate system
-	mat3d Q = pt.Q;
+	mat3d Q = pt.m_Q;
 
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
@@ -167,11 +167,11 @@ tens4ds FEEllipsoidalFiberDistribution::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// get the element's local coordinate system
-	mat3d Q = pt.Q;
+	mat3d Q = pt.m_Q;
 
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
@@ -364,11 +364,11 @@ mat3ds FEEllipsoidalFiberDistributionOld::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// get the element's local coordinate system
-	mat3d QT = (pt.Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 
 	// loop over all integration points
 	double ksi, beta;
@@ -424,11 +424,11 @@ tens4ds FEEllipsoidalFiberDistributionOld::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// get the element's local coordinate system
-	mat3d QT = (pt.Q).transpose();
+	mat3d QT = (pt.m_Q).transpose();
 
 	// loop over all integration points
 	double ksi, beta;

@@ -25,7 +25,7 @@ double FECarterHayesOld::StrainEnergy(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
-	double detF = pt.J;
+	double detF = pt.m_J;
 	double lndetF = log(detF);
 	
 	// calculate left Cauchy-Green tensor
@@ -33,7 +33,7 @@ double FECarterHayesOld::StrainEnergy(FEMaterialPoint& mp)
 	double I1 = b.tr();
 	
 	// lame parameters
-	double rhor = pt.rhor;
+	double rhor = pt.m_rhor;
 	double m_E = YoungModulus(rhor);
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	double mu  = 0.5*m_E/(1+m_v);
@@ -47,7 +47,7 @@ mat3ds FECarterHayesOld::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
-	double detF = pt.J;
+	double detF = pt.m_J;
 	double detFi = 1.0/detF;
 	double lndetF = log(detF);
 	
@@ -55,7 +55,7 @@ mat3ds FECarterHayesOld::Stress(FEMaterialPoint& mp)
 	mat3ds b = pt.LeftCauchyGreen();
 	
 	// lame parameters
-	double rhor = pt.rhor;
+	double rhor = pt.m_rhor;
 	double m_E = YoungModulus(rhor);
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	double mu  = 0.5*m_E/(1+m_v);
@@ -74,10 +74,10 @@ tens4ds FECarterHayesOld::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
-	double detF = pt.J;
+	double detF = pt.m_J;
 	
 	// lame parameters
-	double rhor = pt.rhor;
+	double rhor = pt.m_rhor;
 	double m_E = YoungModulus(rhor);
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));
 	double mu  = 0.5*m_E/(1+m_v);
@@ -100,13 +100,13 @@ tens4ds FECarterHayesOld::Tangent(FEMaterialPoint& mp)
 double FECarterHayesOld::Tangent_SE_Density(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    return StrainEnergy(mp)*m_g/pt.rhor;
+    return StrainEnergy(mp)*m_g/pt.m_rhor;
 }
 
 //! calculate tangent of stress with mass density
 mat3ds FECarterHayesOld::Tangent_Stress_Density(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-    return Stress(mp)*m_g/pt.rhor;
+    return Stress(mp)*m_g/pt.m_rhor;
 }
 

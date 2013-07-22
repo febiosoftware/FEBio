@@ -586,7 +586,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		double dJdt = (J-Jp)/dt;
 		
 		// and then finally
@@ -756,7 +756,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// and then finally
 		double divv = ((J-Jp)/dt)/J;
@@ -1231,7 +1231,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// and then finally
 		double dJdt = (J-Jp)/dt;
@@ -1697,7 +1697,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffnessSS(FESolidElement& el, matr
 		}
 		
 		// next we get the determinant
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// get the fluid flux and pressure gradient
 		vec3d w = ppt.m_w;
@@ -2269,11 +2269,11 @@ void FEMultiphasicDomain::UpdateElementStress(int iel)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.r0 = el.Evaluate(r0, n);
-		pt.rt = el.Evaluate(rt, n);
+		pt.m_r0 = el.Evaluate(r0, n);
+		pt.m_rt = el.Evaluate(rt, n);
 			
 		// get the deformation gradient and determinant
-		pt.J = defgrad(el, pt.F, n);
+		pt.m_J = defgrad(el, pt.m_F, n);
 			
 		// solute-poroelastic data
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
@@ -2292,7 +2292,7 @@ void FEMultiphasicDomain::UpdateElementStress(int iel)
 					double zetahat = pmb->m_pReact[k]->ReactionSupply(mp);
 					double v = pmb->m_pReact[k]->m_v[nsol+isbm];
 					// remember to convert from molar supply to referential mass supply
-					spt.m_sbmrhat[isbm] += (pt.J-phi0)*pmb->SBMMolarMass(isbm)*v*zetahat;
+					spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*pmb->SBMMolarMass(isbm)*v*zetahat;
 				}
 				// perform the time integration (Euler's method)
 				spt.m_sbmr[isbm] = spt.m_sbmrp[isbm] + dt*spt.m_sbmrhat[isbm];
@@ -2335,7 +2335,7 @@ void FEMultiphasicDomain::UpdateElementStress(int iel)
 		pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
                                                spt.m_dkdJJ, spt.m_dkdJc, spt.m_dkdcc);
 			
-		pt.s = pmb->Stress(mp);
+		pt.m_s = pmb->Stress(mp);
 
 		// evaluate the strain energy density
 //		pt.sed = pme->StrainEnergy(mp);

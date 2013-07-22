@@ -384,9 +384,9 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 			FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 			
 			// setup the material point
-			ept.F = mat3dd(1.0);
-			ept.J = 1;
-			ept.s.zero();
+			ept.m_F = mat3dd(1.0);
+			ept.m_J = 1;
+			ept.m_s.zero();
 			
 			// if this is a poroelastic element, then get the permeability tensor
 			FEBiphasicMaterialPoint& pt = *(mp.ExtractData<FEBiphasicMaterialPoint>());

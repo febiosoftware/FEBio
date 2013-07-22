@@ -67,8 +67,8 @@ mat3ds FEFungOrthotropic::DevStress(FEMaterialPoint& mp)
 	double eQ;			// exp(Q)
 	mat3ds bmi;			// B - I
 	// Evaluate the deformation gradient
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 	mat3d Fd = F*pow(detF,-1./3.);
 	
 	// calculate deviatoric left and right Cauchy-Green tensor
@@ -78,7 +78,7 @@ mat3ds FEFungOrthotropic::DevStress(FEMaterialPoint& mp)
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
+		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
 		a[i] = Fd*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
@@ -123,8 +123,8 @@ tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 	double eQ;			// exp(Q)
 	mat3ds bmi;			// B - I
 	// Evaluate the strain and texture
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 	mat3d Fd = F*pow(detF,-1./3.);
 	
 	// calculate left and right Cauchy-Green tensor
@@ -135,7 +135,7 @@ tens4ds FEFungOrthotropic::DevTangent(FEMaterialPoint& mp)
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
+		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
 		a[i] = Fd*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration

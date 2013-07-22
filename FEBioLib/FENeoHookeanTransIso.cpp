@@ -19,8 +19,8 @@ mat3ds FENeoHookeanTransIso::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 
 	//define jacobian
 	double J = detF;
@@ -30,9 +30,9 @@ mat3ds FENeoHookeanTransIso::Stress(FEMaterialPoint& mp)
 	double lam;
 
 	// get the initial fiber direction
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// for testing (comment out)
 //	a0.x=1;
@@ -128,8 +128,8 @@ tens4ds FENeoHookeanTransIso::Tangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 
 	//define jacobian
 	double J = detF;
@@ -139,9 +139,9 @@ tens4ds FENeoHookeanTransIso::Tangent(FEMaterialPoint& mp)
 	double lam;
 
 	// get the initial fiber direction
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// for testing (comment out)
 //	a0.x=1;

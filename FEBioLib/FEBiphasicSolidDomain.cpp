@@ -329,7 +329,7 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// and then finally
 		double divv = ((J-Jp)/dt)/J;
@@ -732,7 +732,7 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// and then finally
 		double dJdt = (J-Jp)/dt;
@@ -1199,11 +1199,11 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.r0 = el.Evaluate(r0, n);
-		pt.rt = el.Evaluate(rt, n);
+		pt.m_r0 = el.Evaluate(r0, n);
+		pt.m_rt = el.Evaluate(rt, n);
 			
 		// get the deformation gradient and determinant
-		pt.J = defgrad(el, pt.F, n);
+		pt.m_J = defgrad(el, pt.m_F, n);
 			
 		// poroelasticity data
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
@@ -1219,9 +1219,9 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		ppt.m_pa = pmb->Pressure(mp);
 			
 		// calculate the stress at this material point
-		pt.s = pmb->Stress(mp);
+		pt.m_s = pmb->Stress(mp);
 
 		// evaluate the strain energy density
-//		pt.sed = pme->StrainEnergy(mp);
+//		pt.m_sed = pme->StrainEnergy(mp);
 	}
 }

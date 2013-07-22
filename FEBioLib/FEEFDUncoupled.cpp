@@ -39,12 +39,12 @@ mat3ds FEEFDUncoupled::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
-	double J = pt.J;
+	double J = pt.m_J;
 	// deviatoric deformation gradient
-	mat3d F = pt.F*pow(J,-1.0/3.0);
+	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// get the element's local coordinate system
-	mat3d Q = pt.Q;
+	mat3d Q = pt.m_Q;
 	
 	// loop over all integration points
 	vec3d n0e, n0a, n0q, nt;
@@ -116,12 +116,12 @@ tens4ds FEEFDUncoupled::DevTangent(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
-	double J = pt.J;
+	double J = pt.m_J;
 	// deviatoric deformation gradient
-	mat3d F = pt.F*pow(J,-1.0/3.0);
+	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// get the element's local coordinate system
-	mat3d Q = pt.Q;
+	mat3d Q = pt.m_Q;
 	
 	// loop over all integration points
 	vec3d n0e, n0a, nt;

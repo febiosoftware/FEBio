@@ -39,7 +39,7 @@ mat3ds FEDonnanEquilibrium::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// calculate fixed charge density in current configuration
 	double cF = m_phiwr*m_cFr/(J-1+m_phiwr);
@@ -59,7 +59,7 @@ tens4ds FEDonnanEquilibrium::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 
 	// calculate fixed charge density in current configuration
 	double cF = m_phiwr*m_cFr/(J-1+m_phiwr);

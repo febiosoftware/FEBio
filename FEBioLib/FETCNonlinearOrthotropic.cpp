@@ -37,8 +37,8 @@ mat3ds FETCNonlinearOrthotropic::DevStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Ji = 1.0 / J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
@@ -59,9 +59,9 @@ mat3ds FETCNonlinearOrthotropic::DevStress(FEMaterialPoint& mp)
 	const double third = 1.0/3.0;
 
 	// get the initial fiber directions
-	a0.x = pt.Q[0][0]; b0.x = pt.Q[0][1]; c0.x = pt.Q[0][2];
-	a0.y = pt.Q[1][0]; b0.y = pt.Q[1][1]; c0.y = pt.Q[1][2];
-	a0.z = pt.Q[2][0]; b0.z = pt.Q[2][1]; c0.z = pt.Q[2][2];
+	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
+	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
+	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];
 
 	// calculate the current material axes lam*a = F*a0;
 	a = F*a0;
@@ -159,15 +159,15 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	const double third = 1.0 / 3.0;
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
 	double s[3][3], trs;
-	mat3ds& es = pt.s;
+	mat3ds& es = pt.m_s;
 	s[0][0] = es.xx();
 	s[1][1] = es.yy();
 	s[2][2] = es.zz();
@@ -185,9 +185,9 @@ tens4ds FETCNonlinearOrthotropic::DevTangent(FEMaterialPoint& mp)
 	double la, lb, lc, lat, lbt, lct;
 
 	// get the initial fiber directions
-	a0.x = pt.Q[0][0]; b0.x = pt.Q[0][1]; c0.x = pt.Q[0][2];
-	a0.y = pt.Q[1][0]; b0.y = pt.Q[1][1]; c0.y = pt.Q[1][2];
-	a0.z = pt.Q[2][0]; b0.z = pt.Q[2][1]; c0.z = pt.Q[2][2];
+	a0.x = pt.m_Q[0][0]; b0.x = pt.m_Q[0][1]; c0.x = pt.m_Q[0][2];
+	a0.y = pt.m_Q[1][0]; b0.y = pt.m_Q[1][1]; c0.y = pt.m_Q[1][2];
+	a0.z = pt.m_Q[2][0]; b0.z = pt.m_Q[2][1]; c0.z = pt.m_Q[2][2];
 
 	// calculate the current material axes lam*a = F*a0;
 	a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;

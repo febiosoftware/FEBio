@@ -27,7 +27,7 @@ FEPointBodyForce::FEPointBodyForce(FEModel* pfem) : FEBodyForce(pfem)
 vec3d FEPointBodyForce::force(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	vec3d x = pt.rt;
+	vec3d x = pt.m_rt;
 	vec3d n = x - m_rc;
 	double l = n.unit();
 
@@ -40,7 +40,7 @@ mat3ds FEPointBodyForce::stiffness(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	vec3d x = pt.rt;
+	vec3d x = pt.m_rt;
 	vec3d n = x - m_rc;
 	double l = n.unit();
 

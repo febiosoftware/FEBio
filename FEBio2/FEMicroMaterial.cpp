@@ -142,7 +142,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	mat3d F = pt.F;
+	mat3d F = pt.m_F;
 
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
@@ -198,8 +198,8 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 {
 	// get the deformation gradient
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-	mat3d F = pt.F;
-	double J = pt.J;
+	mat3d F = pt.m_F;
+	double J = pt.m_J;
 
 	// get the mesh
 	FEMesh& m = m_rve.GetMesh();
@@ -271,11 +271,11 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	double D[6][6] = {0};
 
 	// get deformation gradient and its inverse
-	mat3d F = pt.F;
+	mat3d F = pt.m_F;
 	mat3d Fi = F.inverse();
 
 	// get the stress
-	mat3ds s = pt.s;
+	mat3ds s = pt.m_s;
 
 	// calculate the stiffness matrix and residual
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
@@ -396,7 +396,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	}
 
 	// divide by volume
-	double Vi = 1.0/(pt.J * m_V0);
+	double Vi = 1.0/(pt.m_J * m_V0);
 	D[0][0] *= Vi; D[0][1] *= Vi; D[0][2] *= Vi; D[0][3] *= Vi; D[0][4] *= Vi; D[0][5] *= Vi;
 	D[1][1] *= Vi; D[1][2] *= Vi; D[1][3] *= Vi; D[1][4] *= Vi; D[1][5] *= Vi;
 	D[2][2] *= Vi; D[2][3] *= Vi; D[2][4] *= Vi; D[2][5] *= Vi;

@@ -35,17 +35,17 @@ mat3ds FEFiberMaterial::Stress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Ji = 1.0 / J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double twoJi = 2.0*Ji;
 
 	// get the initial fiber direction
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -129,17 +129,17 @@ tens4ds FEFiberMaterial::Tangent(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
 	// get initial local material axis
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate current local material axis
 	vec3d a = F*a0;

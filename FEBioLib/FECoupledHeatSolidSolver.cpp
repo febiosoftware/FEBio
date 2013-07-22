@@ -107,7 +107,7 @@ void FECoupledHeatSolidSolver::CalculateInitialStresses()
 
 			// set the initial stress
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			pt.s0 = C.dot(e);
+			pt.m_s0 = C.dot(e);
 		}
 	}
 }

@@ -303,16 +303,16 @@ void FEUT4Domain::UpdateStresses(FEModel &fem)
 		UT4NODE& node = m_NODE[i];
 
 		// set the material point data
-		pt.r0 = m_pMesh->Node(node.inode).m_r0;
-		pt.rt = m_pMesh->Node(node.inode).m_rt;
+		pt.m_r0 = m_pMesh->Node(node.inode).m_r0;
+		pt.m_rt = m_pMesh->Node(node.inode).m_rt;
 
-		pt.F = node.Fi;
-		pt.J = pt.F.det();
+		pt.m_F = node.Fi;
+		pt.m_J = pt.m_F.det();
 
 		// copy the orientation data of the first element adjacent to this node
 		// TODO: This will only really work when the fiber orientation field is
 		//       constant or sufficiently smooth.
-		pt.Q = m_NEL.ElementList(node.inode)[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->Q;
+		pt.m_Q = m_NEL.ElementList(node.inode)[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->m_Q;
 
 		// calculate the stress
 		node.si = pme->Stress(pt);
@@ -521,7 +521,7 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-		mat3ds s = pt.s;
+		mat3ds s = pt.m_s;
 
 		// take the deviatoric component and multiply it
 		// with the stabilization factor
@@ -769,17 +769,17 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	//       first element that connects to this node
 	FEElasticMaterialPoint pt;
 	pt.Init(true);
-	pt.Q = ppe[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->Q;
+	pt.m_Q = ppe[0]->m_State[0]->ExtractData<FEElasticMaterialPoint>()->m_Q;
 
 	// set the material point data
-	pt.r0 = m_pMesh->Node(node.inode).m_r0;
-	pt.rt = m_pMesh->Node(node.inode).m_rt;
+	pt.m_r0 = m_pMesh->Node(node.inode).m_r0;
+	pt.m_rt = m_pMesh->Node(node.inode).m_rt;
 
-	pt.F = node.Fi;
-	pt.J = pt.F.det();
+	pt.m_F = node.Fi;
+	pt.m_J = pt.m_F.det();
 
 	// set the Cauchy-stress
-	pt.s = node.si;
+	pt.m_s = node.si;
 
 	// Calculate the spatial tangent
 	tens4ds C = pme->Tangent(pt);
@@ -789,7 +789,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	{
 		// subtract the isochoric component from C;
 		// C = C - a*Ciso = C - (a*(C - Cvol)) = (1-a)*C + a*Cvol
-		C = C*(1 - m_alpha) + Cvol(C, pt.s)*m_alpha;
+		C = C*(1 - m_alpha) + Cvol(C, pt.m_s)*m_alpha;
 	}
 	else
 	{
@@ -797,7 +797,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 	}
 
 	// convert spatial matrix to material
-	C = spatial_to_material(C, pt.F);
+	C = spatial_to_material(C, pt.m_F);
 
 	// extract the 'D' matrix
 	double D[6][6] = {0};
@@ -1029,7 +1029,7 @@ void FEUT4Domain::ElementGeometricalStiffness(FESolidElement &el, matrix &ke)
 
 		// element's Cauchy-stress tensor at gauss point n
 		// s is the voight vector
-		mat3ds s = pt.s;
+		mat3ds s = pt.m_s;
 
 		// we work with the deviatoric component only
 		if (m_bdev)
@@ -1118,7 +1118,7 @@ void FEUT4Domain::ElementMaterialStiffness(FEModel& fem, FESolidElement &el, mat
 		if (m_bdev)
 		{
 			// subtract the volumetric tensor from C;
-			C = (C - Cvol(C, pt.s))*m_alpha;
+			C = (C - Cvol(C, pt.m_s))*m_alpha;
 		}
 		else
 		{

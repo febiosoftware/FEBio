@@ -50,7 +50,7 @@ mat3ds FEPermRefIso::Permeability(FEMaterialPoint& mp)
 	mat3ds b = et.LeftCauchyGreen();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	
@@ -79,7 +79,7 @@ tens4ds FEPermRefIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3ds b = et.LeftCauchyGreen();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	

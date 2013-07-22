@@ -37,8 +37,8 @@ mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
-	double J = pt.J;
-	mat3d F = pt.F*pow(J,-1.0/3.0);
+	double J = pt.m_J;
+	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// loop over all integration points
 	vec3d n0, nt;
@@ -48,7 +48,7 @@ mat3ds FEFiberExpPowUncoupled::DevStress(FEMaterialPoint& mp)
 	mat3ds s;
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.Q*m_n0;
+	n0 = pt.m_Q*m_n0;
 	
 	// Calculate In = n0*C*n0
 	In_1 = n0*(C*n0) - 1.0;
@@ -82,8 +82,8 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// deformation gradient
-	double J = pt.J;
-	mat3d F = pt.F*pow(J,-1.0/3.0);
+	double J = pt.m_J;
+	mat3d F = pt.m_F*pow(J,-1.0/3.0);
 	
 	// loop over all integration points
 	vec3d n0, nt;
@@ -94,7 +94,7 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
 	tens4ds c;
 	
 	// evaluate fiber direction in global coordinate system
-	n0 = pt.Q*m_n0;
+	n0 = pt.m_Q*m_n0;
 	
 	// Calculate In = n0*C*n0
 	In_1 = n0*(C*n0) - 1.0;

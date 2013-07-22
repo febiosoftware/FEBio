@@ -367,7 +367,7 @@ void FE3FieldElasticSolidDomain::ElementGeometricalStiffness(int iel, matrix &ke
 
 		// element's Cauchy-stress tensor at gauss point n
 		// s is the voight vector
-		mat3ds& s = pt.s;
+		mat3ds& s = pt.m_s;
 
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
@@ -465,11 +465,11 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are not used by most materials.
-		pt.r0 = el.Evaluate(r0, n);
-		pt.rt = el.Evaluate(rt, n);
+		pt.m_r0 = el.Evaluate(r0, n);
+		pt.m_rt = el.Evaluate(rt, n);
 
 		// get the deformation gradient and determinant
-		pt.J = defgrad(el, pt.F, n);
+		pt.m_J = defgrad(el, pt.m_F, n);
 
 		// calculate the stress at this material point
 		// Note that we don't call the material's Stress member function.
@@ -477,7 +477,7 @@ void FE3FieldElasticSolidDomain::UpdateElementStress(int iel)
 		// and the Stress function uses the pointwise pressure. 
 		// Therefore we call the DevStress function and add the pressure term
 		// seperately. 
-		pt.s = mat3dd(ed.ep) + mat.DevStress(mp);
+		pt.m_s = mat3dd(ed.ep) + mat.DevStress(mp);
 	}
 }
 

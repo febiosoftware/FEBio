@@ -65,8 +65,8 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 		FEElasticMaterialPoint& pt = *((*this).ExtractData<FEElasticMaterialPoint>());
 					
 		// push back F and J to define relative deformation gradient of this generation
-		mat3d F = pt.F;
-		double J = pt.J; 
+		mat3d F = pt.m_F;
+		double J = pt.m_J; 
 		Fi.push_back(F.inverse());
 		Ji.push_back(1.0/J);
 
@@ -123,23 +123,23 @@ mat3ds FEElasticMultigeneration::Stress(FEMaterialPoint& mp)
 	s = m_pMat[0]->Stress(mp);
 	
 	// extract deformation gradient
-	mat3d Fs = mpt.F;
-	double Js = mpt.J;
+	mat3d Fs = mpt.m_F;
+	double Js = mpt.m_J;
 	
 	for (int i=0; i < (int)pt.Fi.size(); ++i) 
 	{
 		// evaluate deformation gradient for this generation
 		mat3d Fi = pt.Fi[i];
-       	mpt.F = Fs*Fi;
+       	mpt.m_F = Fs*Fi;
 		double Ji = pt.Ji[i];
-		mpt.J = Js*Ji;
+		mpt.m_J = Js*Ji;
 		// evaluate stress for this generation
 		s += Ji*m_pMat[i+1]->Stress(mp);
 	}
 
 	// restore the material point deformation gradient
-	mpt.F = Fs;
-	mpt.J = Js;
+	mpt.m_F = Fs;
+	mpt.m_J = Js;
 	
 	return s;
 }
@@ -155,23 +155,23 @@ tens4ds FEElasticMultigeneration::Tangent(FEMaterialPoint& mp)
 	c = m_pMat[0]->Tangent(mp);
 
 	// extract deformation gradient
-	mat3d Fs = mpt.F;
-	double Js = mpt.J;
+	mat3d Fs = mpt.m_F;
+	double Js = mpt.m_J;
 	
 	for (int i=0; i < (int)pt.Fi.size(); ++i) 
 	{
 		// evaluate deformation gradient for this generation
 		mat3d Fi = pt.Fi[i];
-       	mpt.F = Fs*Fi;
+       	mpt.m_F = Fs*Fi;
 		double Ji = pt.Ji[i];
-		mpt.J = Js*Ji;
+		mpt.m_J = Js*Ji;
 		// evaluate stress for this generation
 		c += Ji*m_pMat[i+1]->Tangent(mp);
 	}
 	
 	// restore the material point deformation gradient
-	mpt.F = Fs;
-	mpt.J = Js;
+	mpt.m_F = Fs;
+	mpt.m_J = Js;
 	
 	return c;
 }

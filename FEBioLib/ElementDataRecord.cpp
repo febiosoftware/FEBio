@@ -141,14 +141,14 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
 			if (bE) E = pt.Strain();
 			if (blE) E.exact_eigen(lE);
-			if (bls) pt.s.exact_eigen(ls);
+			if (bls) pt.m_s.exact_eigen(ls);
 
 			switch (ndata)
 			{
-			case X: val += pt.rt.x; break;
-			case Y: val += pt.rt.y; break;
-			case Z: val += pt.rt.z; break;
-			case J: val += pt.J; break;
+			case X: val += pt.m_rt.x; break;
+			case Y: val += pt.m_rt.y; break;
+			case Z: val += pt.m_rt.z; break;
+			case J: val += pt.m_J; break;
 			case EX: val += E.xx(); break;
 			case EY: val += E.yy(); break;
 			case EZ: val += E.zz(); break;
@@ -158,24 +158,24 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			case E1: val += lE[0]; break;
 			case E2: val += lE[1]; break;
 			case E3: val += lE[2]; break;
-			case SX: val += pt.s.xx(); break;
-			case SY: val += pt.s.yy(); break;
-			case SZ: val += pt.s.zz(); break;
-			case SXY: val += pt.s.xy(); break;
-			case SYZ: val += pt.s.yz(); break;
-			case SXZ: val += pt.s.xz(); break;
+			case SX: val += pt.m_s.xx(); break;
+			case SY: val += pt.m_s.yy(); break;
+			case SZ: val += pt.m_s.zz(); break;
+			case SXY: val += pt.m_s.xy(); break;
+			case SYZ: val += pt.m_s.yz(); break;
+			case SXZ: val += pt.m_s.xz(); break;
 			case S1: val += ls[0]; break;
 			case S2: val += ls[1]; break;
 			case S3: val += ls[2]; break;
-			case FXX: val += pt.F(0,0); break;
-			case FYY: val += pt.F(1,1); break;
-			case FZZ: val += pt.F(2,2); break;
-			case FYZ: val += pt.F(1,2); break;
-			case FZX: val += pt.F(2,0); break;
-			case FXY: val += pt.F(0,1); break;
-			case FYX: val += pt.F(1,0); break;
-			case FXZ: val += pt.F(0,2); break;
-			case FZY: val += pt.F(2,1); break;
+			case FXX: val += pt.m_F(0,0); break;
+			case FYY: val += pt.m_F(1,1); break;
+			case FZZ: val += pt.m_F(2,2); break;
+			case FYZ: val += pt.m_F(1,2); break;
+			case FZX: val += pt.m_F(2,0); break;
+			case FXY: val += pt.m_F(0,1); break;
+			case FYX: val += pt.m_F(1,0); break;
+			case FXZ: val += pt.m_F(0,2); break;
+			case FZY: val += pt.m_F(2,1); break;
 			}
 
 			FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
@@ -288,31 +288,31 @@ double ElementDataRecord::Evaluate(int item, int ndata)
 			E = pt.Strain();
 			switch (ndata)
 			{
-			case X: val += pt.rt.x; break;
-			case Y: val += pt.rt.y; break;
-			case Z: val += pt.rt.z; break;
-			case J: val += pt.J; break;
+			case X: val += pt.m_rt.x; break;
+			case Y: val += pt.m_rt.y; break;
+			case Z: val += pt.m_rt.z; break;
+			case J: val += pt.m_J; break;
 			case EX: val += E.xx(); break;
 			case EY: val += E.yy(); break;
 			case EZ: val += E.zz(); break;
 			case EXY: val += E.xy(); break;
 			case EYZ: val += E.yz(); break;
 			case EXZ: val += E.xz(); break;
-			case SX: val += pt.s.xx(); break;
-			case SY: val += pt.s.yy(); break;
-			case SZ: val += pt.s.zz(); break;
-			case SXY: val += pt.s.xy(); break;
-			case SYZ: val += pt.s.yz(); break;
-			case SXZ: val += pt.s.xz(); break;
-			case FXX: val += pt.F(0,0); break;
-			case FYY: val += pt.F(1,1); break;
-			case FZZ: val += pt.F(2,2); break;
-			case FYZ: val += pt.F(1,2); break;
-			case FZX: val += pt.F(2,0); break;
-			case FXY: val += pt.F(0,1); break;
-			case FYX: val += pt.F(1,0); break;
-			case FXZ: val += pt.F(0,2); break;
-			case FZY: val += pt.F(2,1); break;
+			case SX: val += pt.m_s.xx(); break;
+			case SY: val += pt.m_s.yy(); break;
+			case SZ: val += pt.m_s.zz(); break;
+			case SXY: val += pt.m_s.xy(); break;
+			case SYZ: val += pt.m_s.yz(); break;
+			case SXZ: val += pt.m_s.xz(); break;
+			case FXX: val += pt.m_F(0,0); break;
+			case FYY: val += pt.m_F(1,1); break;
+			case FZZ: val += pt.m_F(2,2); break;
+			case FYZ: val += pt.m_F(1,2); break;
+			case FZX: val += pt.m_F(2,0); break;
+			case FXY: val += pt.m_F(0,1); break;
+			case FYX: val += pt.m_F(1,0); break;
+			case FXZ: val += pt.m_F(0,2); break;
+			case FZY: val += pt.m_F(2,1); break;
 			}
 		}
 		val /= nint;

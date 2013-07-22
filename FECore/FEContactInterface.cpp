@@ -52,9 +52,9 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 			FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 
 			// setup the material point
-			pt.F = mat3dd(1.0);
-			pt.J = 1;
-			pt.s.zero();
+			pt.m_F = mat3dd(1.0);
+			pt.m_J = 1;
+			pt.m_s.zero();
 
 			// get the tangent (stiffness) and it inverse (compliance) at this point
 			tens4ds S = pme->Tangent(pt);

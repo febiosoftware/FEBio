@@ -82,7 +82,7 @@ mat3ds FEMichaelisMenten::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 	double dcdJ;
 	if (m_Rtype) {
 		c = m_pMP->SBMConcentration(pt, m_Rid);
-		double J = ept.J;
+		double J = ept.m_J;
 		double phi0 = bpt.m_phi0;
 		dcdJ = -c/(J-phi0);
 	}

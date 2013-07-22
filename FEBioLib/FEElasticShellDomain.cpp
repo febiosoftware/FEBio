@@ -44,7 +44,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 				for (int n=0; n<el.GaussPoints(); ++n)
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-					pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+					pt.m_Q = pme->m_pmap->LocalElementCoord(el, n);
 				}
 			}
 			else
@@ -57,7 +57,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 				if (dynamic_cast<FETransverselyIsotropic*>(pme))
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-					mat3d& m = pt.Q;
+					mat3d& m = pt.m_Q;
 					if (fabs(m.det() - 1) > 1e-7)
 					{
 						// this element did not get specified a user-defined fiber direction
@@ -236,7 +236,7 @@ void FEElasticShellDomain::ElementInternalForce(FEShellElement& el, vector<doubl
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-		mat3ds& s = pt.s;
+		mat3ds& s = pt.m_s;
 
 		gt = el.gt(n);
 
@@ -352,8 +352,8 @@ void FEElasticShellDomain::ElementBodyForce(FEBodyForce& BF, FEShellElement& el,
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		pt.r0 = el.Evaluate(r0, n);
-		pt.rt = el.Evaluate(rt, n);
+		pt.m_r0 = el.Evaluate(r0, n);
+		pt.m_rt = el.Evaluate(rt, n);
 
 		detJ = detJ0(el, n)*gw[n];
 		Hn  = el.H(n);
@@ -629,7 +629,7 @@ void FEElasticShellDomain::ElementStiffness(int iel, matrix& ke)
 	
 		// element's Cauchy-stress tensor at gauss point n
 		// s is the voight vector
-		s = pt.s;
+		s = pt.m_s;
 
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
@@ -722,8 +722,8 @@ void FEElasticShellDomain::ElementBodyForce(FEModel& fem, FEShellElement& el, ve
 			{
 				FEMaterialPoint& mp = *el.m_State[n];
 				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-				pt.r0 = el.Evaluate(r0, n);
-				pt.rt = el.Evaluate(rt, n);
+				pt.m_r0 = el.Evaluate(r0, n);
+				pt.m_rt = el.Evaluate(rt, n);
 
 				detJ = detJ0(el, n)*gw[n];
 				Hn  = el.H(n);
@@ -792,14 +792,14 @@ void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are used by most materials.
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
+			pt.m_r0 = el.Evaluate(r0, n);
+			pt.m_rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
-			pt.J = defgrad(el, pt.F, n);
+			pt.m_J = defgrad(el, pt.m_F, n);
 
 			// calculate the stress at this material point
-			pt.s = pm->Stress(mp);
+			pt.m_s = pm->Stress(mp);
 		}
 	}
 }

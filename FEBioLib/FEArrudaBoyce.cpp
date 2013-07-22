@@ -32,7 +32,7 @@ mat3ds FEArrudaBoyce::DevStress(FEMaterialPoint& mp)
 	const double a[] = {0.5, 0.1, 11.0/350.0, 19.0/1750.0, 519.0/134750.0};
 
 	// deformation gradient
-	double J = pt.J;
+	double J = pt.m_J;
 
 	// left Cauchy-Green tensor and its square
 	mat3ds B = pt.DevLeftCauchyGreen();
@@ -59,8 +59,8 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	const double a[] = {0.5, 0.1, 11.0/350.0, 19.0/1750.0, 519.0/134750.0};
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 	double Ji = 1.0/J;
 
 	// calculate deviatoric left Cauchy-Green tensor: B = F*Ft
@@ -87,7 +87,7 @@ tens4ds FEArrudaBoyce::DevTangent(FEMaterialPoint& mp)
 	double CWWC = W11*I1*I1;
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.s.dev();
+	mat3ds devs = pt.m_s.dev();
 
 	// Identity tensor
 	mat3ds I(1,1,1,0,0,0);

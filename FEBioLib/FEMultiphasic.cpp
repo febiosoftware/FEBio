@@ -321,7 +321,7 @@ void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 void FEMultiphasic::Init()
 {
 	FEMaterial::Init();
-	m_pSolid->pVoid = this;
+	m_pSolid->m_pParent = this;
 	m_pSolid->Init();
 
 	m_pPerm->Init();
@@ -401,7 +401,7 @@ double FEMultiphasic::Porosity(FEMaterialPoint& pt)
 	double phisr = bt.m_phi0;
     
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	
 	double phiw = 1 - phisr/J;
 	// check for pore collapse
@@ -420,7 +420,7 @@ double FEMultiphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	double phi0 = bt.m_phi0;
 	double ce = 0;
 
@@ -565,7 +565,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp,
 	}
 	
 	// get the charge density and its derivatives
-	double J = ept.J;
+	double J = ept.m_J;
 	double phi0 = ppt.m_phi0;
 	double cF = FixedChargeDensity(mp);
 	double dcFdJ = -cF/(J - phi0);
@@ -707,7 +707,7 @@ tens4ds FEMultiphasic::Tangent(FEMaterialPoint& mp)
 	C.extract(D);
 	
 	// relative volume and solid volume fraction
-	double J = ept.J;
+	double J = ept.m_J;
 	double phi0 = bpt.m_phi0;
 	
 	// get the charge density and its derivatives

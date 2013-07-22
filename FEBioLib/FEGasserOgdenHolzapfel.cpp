@@ -35,17 +35,17 @@ mat3ds FEGasserOgdenHolzapfel::DevStress(FEMaterialPoint& mp)
 	double E[2];		// fiber strain
 
 	// determinant of deformation gradient
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// Evaluate the distortional deformation gradient
-	mat3d F = pt.F*pow(J,-1./3.);
+	mat3d F = pt.m_F*pow(J,-1./3.);
 	
 	// calculate deviatoric left Cauchy-Green tensor: b = F*Ft
 	mat3ds b = pt.DevLeftCauchyGreen();
 	
 	// Copy the local element basis directions to n
-	n[0].x = pt.Q[0][0]; n[0].y = pt.Q[1][0]; n[0].z = pt.Q[2][0];
-	n[1].x = pt.Q[0][1]; n[1].y = pt.Q[1][1]; n[1].z = pt.Q[2][1];
+	n[0].x = pt.m_Q[0][0]; n[0].y = pt.m_Q[1][0]; n[0].z = pt.m_Q[2][0];
+	n[1].x = pt.m_Q[0][1]; n[1].y = pt.m_Q[1][1]; n[1].z = pt.m_Q[2][1];
 
 	// Evaluate the structural direction in the current configuration
 	double cg = cos(m_g); double sg = sin(m_g);
@@ -84,17 +84,17 @@ tens4ds FEGasserOgdenHolzapfel::DevTangent(FEMaterialPoint& mp)
 	double E[2];		// fiber strain
 	
 	// determinant of deformation gradient
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// Evaluate the distortional deformation gradient
-	mat3d F = pt.F*pow(J,-1./3.);
+	mat3d F = pt.m_F*pow(J,-1./3.);
 	
 	// calculate deviatoric left Cauchy-Green tensor: b = F*Ft
 	mat3ds b = pt.DevLeftCauchyGreen();
 	
 	// Copy the local element basis directions to n
-	n[0].x = pt.Q[0][0]; n[0].y = pt.Q[1][0]; n[0].z = pt.Q[2][0];
-	n[1].x = pt.Q[0][1]; n[1].y = pt.Q[1][1]; n[1].z = pt.Q[2][1];
+	n[0].x = pt.m_Q[0][0]; n[0].y = pt.m_Q[1][0]; n[0].z = pt.m_Q[2][0];
+	n[1].x = pt.m_Q[0][1]; n[1].y = pt.m_Q[1][1]; n[1].z = pt.m_Q[2][1];
 	
 	// Evaluate the structural direction in the current configuration
 	double cg = cos(m_g); double sg = sin(m_g);

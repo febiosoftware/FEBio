@@ -47,7 +47,7 @@ tens4ds FELinearTransIso::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get the transformation tensor
-	mat3d& Q = pt.Q;
+	mat3d& Q = pt.m_Q;
 
 	// set-up the elasticity tensor in the local coordinate system
 	double v13 = E3*v31/E1;

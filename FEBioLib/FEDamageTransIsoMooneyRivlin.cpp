@@ -52,7 +52,7 @@ mat3ds FEDamageTransIsoMooneyRivlin::MatrixStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// determinant of deformation gradient
-	double J = pt.J;
+	double J = pt.m_J;
 
 	// calculate deviatoric left Cauchy-Green tensor
 	mat3ds B = pt.DevLeftCauchyGreen();
@@ -88,15 +88,15 @@ mat3ds FEDamageTransIsoMooneyRivlin::FiberStress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
 	// get the initial fiber direction
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -147,7 +147,7 @@ tens4ds FEDamageTransIsoMooneyRivlin::MatrixTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// determinant of deformation gradient
-	double J = pt.J;
+	double J = pt.m_J;
 	double Ji = 1.0/J;
 
 	// calculate deviatoric left Cauchy-Green tensor: B = F*Ft
@@ -174,7 +174,7 @@ tens4ds FEDamageTransIsoMooneyRivlin::MatrixTangent(FEMaterialPoint& mp)
 	double CWWC = 2*I2*W2;
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.s.dev();
+	mat3ds devs = pt.m_s.dev();
 
 	// Identity tensor
 	mat3ds I(1,1,1,0,0,0);
@@ -203,17 +203,17 @@ tens4ds FEDamageTransIsoMooneyRivlin::FiberTangent(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
 	// get initial local material axis
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate current local material axis
 	vec3d a = F*a0;
@@ -250,7 +250,7 @@ tens4ds FEDamageTransIsoMooneyRivlin::FiberTangent(FEMaterialPoint &mp)
 	FETIMRDamageMaterialPoint& dp = *mp.ExtractData<FETIMRDamageMaterialPoint>();
 	if (dp.m_FEtrial > dp.m_FEmax)
 	{
-		mat3ds devs = pt.s.dev();
+		mat3ds devs = pt.m_s.dev();
 		double dg = FiberDamageDerive(mp);
 		c += dyad1s(devs)*(J*dg/dp.m_FEtrial);
 	}
@@ -346,15 +346,15 @@ double FEDamageTransIsoMooneyRivlin::FiberDamage(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
 	// get the initial fiber direction
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -401,15 +401,15 @@ double FEDamageTransIsoMooneyRivlin::FiberDamageDerive(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double J = pt.J;
+	mat3d& F = pt.m_F;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
 	// get the initial fiber direction
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

@@ -53,7 +53,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 				for (int n=0; n<el.GaussPoints(); ++n)
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-					pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+					pt.m_Q = pme->m_pmap->LocalElementCoord(el, n);
 				}
 			}
 			else
@@ -66,7 +66,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 				if (dynamic_cast<FETransverselyIsotropic*>(pme))
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-					mat3d& m = pt.Q;
+					mat3d& m = pt.m_Q;
 					if (fabs(m.det() - 1) > 1e-7)
 					{
 						// this element did not get specified a user-defined fiber direction
@@ -80,7 +80,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 			for (int n=0; n<el.GaussPoints(); ++n)
 			{
 				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-				pt.rhor = pme->Density();
+				pt.m_rhor = pme->Density();
 			}
 
 			// check if this is also a viscoelastic material
@@ -94,7 +94,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 						// compound the local map with the global material axes
 						mat3d Qlocal = pve->GetBaseMaterial()->m_pmap->LocalElementCoord(el, n);
-						pt.Q = Qlocal*pt.Q;
+						pt.m_Q = Qlocal*pt.m_Q;
 					}
 				}
 			}
@@ -110,7 +110,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 						// compound the local map with the global material axes
 						mat3d Qlocal = puve->GetBaseMaterial()->m_pmap->LocalElementCoord(el, n);
-						pt.Q = Qlocal*pt.Q;
+						pt.m_Q = Qlocal*pt.m_Q;
 					}
 				}
 			}
@@ -149,10 +149,10 @@ void FEElasticSolidDomain::InitElements()
 
 			FEMaterialPoint& mp = *el.m_State[j];
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			pt.r0 = r0;
-			pt.rt = rt;
+			pt.m_r0 = r0;
+			pt.m_rt = rt;
 
-			pt.J = defgrad(el, pt.F, j);
+			pt.m_J = defgrad(el, pt.m_F, j);
 
 			el.m_State[j]->Init(false);
 
@@ -161,7 +161,7 @@ void FEElasticSolidDomain::InitElements()
                 FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
                 FERemodelingMaterialPoint& rpt = *el.m_State[j]->ExtractData<FERemodelingMaterialPoint>();
                 // reset referential solid density at previous time
-                rpt.rhorp = pt.rhor;
+                rpt.rhorp = pt.m_rhor;
             }
 		}
 	}
@@ -314,7 +314,7 @@ void FEElasticSolidDomain::ElementInternalForce(FESolidElement& el, vector<doubl
 		detJt *= gw[n];
 
 		// get the stress vector for this integration point
-		s = pt.s;
+		s = pt.m_s;
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -407,8 +407,8 @@ void FEElasticSolidDomain::ElementBodyForce(FEBodyForce& BF, FESolidElement& el,
 	{
 		FEMaterialPoint& mp = *el.m_State[n];
 		FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-		pt.r0 = el.Evaluate(r0, n);
-		pt.rt = el.Evaluate(rt, n);
+		pt.m_r0 = el.Evaluate(r0, n);
+		pt.m_rt = el.Evaluate(rt, n);
 
 		detJ = detJ0(el, n)*gw[n];
 
@@ -598,7 +598,7 @@ void FEElasticSolidDomain::ElementGeometricalStiffness(FESolidElement &el, matri
 
 		// element's Cauchy-stress tensor at gauss point n
 		// s is the voight vector
-		mat3ds& s = pt.s;
+		mat3ds& s = pt.m_s;
 
 		for (i=0; i<neln; ++i)
 			for (j=i; j<neln; ++j)
@@ -1139,17 +1139,17 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.r0 = el.Evaluate(r0, n);
-		pt.rt = el.Evaluate(rt, n);
+		pt.m_r0 = el.Evaluate(r0, n);
+		pt.m_rt = el.Evaluate(rt, n);
 
 		// get the deformation gradient and determinant
-		pt.J = defgrad(el, pt.F, n);
+		pt.m_J = defgrad(el, pt.m_F, n);
 
 		// calculate the stress at this material point
-		pt.s = pm->Stress(mp);
+		pt.m_s = pm->Stress(mp);
 
 		// calculate the strain energy density at this material point
-		pt.sed = pm->StrainEnergy(mp);
+		pt.m_sed = pm->StrainEnergy(mp);
 
 		// for remodeling solids, update the referential mass density
 		if (prs)
@@ -1159,9 +1159,9 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
             rpt.dsed = pm->Tangent_SE_Density(mp);
                 
 			double rhorhat = prs->m_pSupp->Supply(mp);
-			pt.rhor = rhorhat*dt + rpt.rhorp;
-			if (pt.rhor > prs->m_rhormax) pt.rhor = prs->m_rhormax;
-			if (pt.rhor < prs->m_rhormin) pt.rhor = prs->m_rhormin;
+			pt.m_rhor = rhorhat*dt + rpt.rhorp;
+			if (pt.m_rhor > prs->m_rhormax) pt.m_rhor = prs->m_rhormax;
+			if (pt.m_rhor < prs->m_rhormin) pt.m_rhor = prs->m_rhormin;
 		}
 	}
 }

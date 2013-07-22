@@ -23,8 +23,8 @@ mat3ds FEIsotropicElastic::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	mat3d &F = pt.F;
-	double Ji = 1.0 / pt.J;
+	mat3d &F = pt.m_F;
+	double Ji = 1.0 / pt.m_J;
 
 	double trE;
 
@@ -54,8 +54,8 @@ tens4ds FEIsotropicElastic::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d& F = pt.F;
-	double Ji = 1.0 / pt.J;
+	mat3d& F = pt.m_F;
+	double Ji = 1.0 / pt.m_J;
 
 	// lame parameters
 	double lam = Ji*(m_v*m_E/((1+m_v)*(1-2*m_v)));

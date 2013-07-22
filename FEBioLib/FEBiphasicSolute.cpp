@@ -58,7 +58,7 @@ double FEBiphasicSolute::Porosity(FEMaterialPoint& pt)
 	FEBiphasicMaterialPoint& pet = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// porosity
 //	double phiw = 1 - m_phi0/J;
 	double phi0 = pet.m_phi0;
@@ -106,7 +106,7 @@ tens4ds FEBiphasicSolute::Tangent(FEMaterialPoint& mp)
 	tens4ds C = m_pSolid->Tangent(mp);
 	
 	// relative volume
-	double J = ept.J;
+	double J = ept.m_J;
 	
 	// fluid pressure and solute concentration
 	double p = ppt.m_pa;
@@ -270,7 +270,7 @@ double FEBiphasicSolute::ReferentialConcentration(FEMaterialPoint& pt)
 {
 	FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 
-	double J = ept.J;
+	double J = ept.m_J;
 	double phiw = Porosity(pt);
 	double cr = J*phiw*Concentration(pt);
 	

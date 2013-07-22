@@ -44,8 +44,8 @@ mat3ds FEDamageNeoHookean::Stress(FEMaterialPoint& mp)
 	// --- A. Calculate neo-Hookean stress ----
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 	double detFi = 1.0/detF;
 	double lndetF = log(detF);
 
@@ -71,14 +71,14 @@ double FEDamageNeoHookean::Damage(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get the deformation gradient
-	mat3d &F = pt.F;
+	mat3d &F = pt.m_F;
 
 	// calculate right Cauchy-Green tensor
 	mat3ds C = pt.RightCauchyGreen();
 
 	// Invariants
 	double I1 = C.tr();
-	double J = pt.J;
+	double J = pt.m_J;
 
 	// strain-energy value
 	double lnJ = log(J);
@@ -110,8 +110,8 @@ tens4ds FEDamageNeoHookean::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 
 	// lame parameters
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));

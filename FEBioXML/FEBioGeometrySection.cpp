@@ -920,7 +920,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 					for (int i=0; i<pbe->GaussPoints(); ++i)
 					{
 						FEElasticMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEElasticMaterialPoint>();
-						mat3d& m = pt.Q;
+						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
 						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
@@ -932,7 +932,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 					for (int i=0; i<pse->GaussPoints(); ++i)
 					{
 						FEElasticMaterialPoint& pt = *pse->m_State[i]->ExtractData<FEElasticMaterialPoint>();
-						mat3d& m = pt.Q;
+						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
 						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
@@ -971,7 +971,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 					for (int i=0; i<pbe->GaussPoints(); ++i)
 					{
 						FEElasticMaterialPoint& pt = *pbe->m_State[i]->ExtractData<FEElasticMaterialPoint>();
-						mat3d& m = pt.Q;
+						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
 						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;
@@ -983,7 +983,7 @@ void FEBioGeometrySection::ParseElementDataSection(XMLTag& tag)
 					for (int i=0; i<pse->GaussPoints(); ++i)
 					{
 						FEElasticMaterialPoint& pt = *pse->m_State[i]->ExtractData<FEElasticMaterialPoint>();
-						mat3d& m = pt.Q;
+						mat3d& m = pt.m_Q;
 						m.zero();
 						m[0][0] = a.x; m[0][1] = b.x; m[0][2] = c.x;
 						m[1][0] = a.y; m[1][1] = b.y; m[1][2] = c.y;

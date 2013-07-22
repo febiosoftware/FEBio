@@ -34,7 +34,7 @@ mat3ds FEVonMisesPlasticity::Stress(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FEJ2PlasticMaterialPoint& pp = *mp.ExtractData<FEJ2PlasticMaterialPoint>();
-	mat3d& F = pt.F;
+	mat3d& F = pt.m_F;
 	
 	// get the current strain
 	mat3ds e = F.sym() - mat3dd(1.0);
@@ -101,7 +101,7 @@ tens4ds FEVonMisesPlasticity::Tangent(FEMaterialPoint &mp)
 	if (pp.b)
 	{
 		// get the stress
-		mat3ds s = pt.s;
+		mat3ds s = pt.m_s;
 		mat3ds n = s.dev()*2.0;
 
 		mat3ds A = C.dot(n);

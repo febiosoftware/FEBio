@@ -45,7 +45,7 @@ double FESupplyMichaelisMenten::Supply(FEMaterialPoint& mp)
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
-	double J = et.J;
+	double J = et.m_J;
 	double ca = spt.m_ca;
 	double phi0 = ppt.m_phi0;
 	double cr = (J-phi0)*ca;
@@ -69,7 +69,7 @@ double FESupplyMichaelisMenten::Tangent_Supply_Concentration(FEMaterialPoint &mp
 	FEBiphasicMaterialPoint& ppt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	FESoluteMaterialPoint& spt = *mp.ExtractData<FESoluteMaterialPoint>();
 	
-	double J = et.J;
+	double J = et.m_J;
 	double ca = spt.m_ca;
 	double phi0 = ppt.m_phi0;
 	double cr = (J-phi0)*ca;

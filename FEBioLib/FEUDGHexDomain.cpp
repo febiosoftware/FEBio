@@ -43,7 +43,7 @@ void FEUDGHexDomain::UDGInternalForces(FESolidElement& el, vector<double>& fe)
 	// get the stress data
 	FEMaterialPoint& mp = *el.m_State[0];
 	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
-	mat3ds& s = pt.s;
+	mat3ds& s = pt.m_s;
 
 	// calculate the average cartesian derivatives
 	double GX[8], GY[8], GZ[8];
@@ -335,7 +335,7 @@ void FEUDGHexDomain::UDGGeometricalStiffness(FESolidElement& el, matrix& ke)
 
 	// element's Cauchy-stress tensor at gauss point n
 	// s is the voight vector
-	mat3ds& s = pt.s;
+	mat3ds& s = pt.m_s;
 
 	FEMesh& mesh = *GetMesh();
 
@@ -536,19 +536,19 @@ void FEUDGHexDomain::UpdateStresses(FEModel &fem)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.r0 = el.Evaluate(r0, 0);
-		pt.rt = el.Evaluate(rt, 0);
+		pt.m_r0 = el.Evaluate(r0, 0);
+		pt.m_rt = el.Evaluate(rt, 0);
 
 		// get the average cartesian derivatives
 		double GX[8], GY[8], GZ[8];
 		AvgCartDerivs(el, GX, GY, GZ);
 
 		// get the average deformation gradient and determinant
-		AvgDefGrad(el, pt.F, GX, GY, GZ);
-		pt.J = pt.F.det();
+		AvgDefGrad(el, pt.m_F, GX, GY, GZ);
+		pt.m_J = pt.m_F.det();
 
 		// calculate the stress at this material point
-		pt.s = pm->Stress(mp);
+		pt.m_s = pm->Stress(mp);
 	}
 }
 

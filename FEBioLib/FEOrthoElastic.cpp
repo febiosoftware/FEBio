@@ -73,8 +73,8 @@ mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 	double L[3];		// La
 	mat3ds bmi;			// B - I
 	// Evaluate the deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 	
 	// calculate left and right Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();
@@ -84,7 +84,7 @@ mat3ds FEOrthoElastic::Stress(FEMaterialPoint& mp)
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
+		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		L[i] = a0[i]*(c2*a0[i]);
 		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
@@ -116,8 +116,8 @@ tens4ds FEOrthoElastic::Tangent(FEMaterialPoint& mp)
 	mat3ds A[3];		// texture tensor in current configuration
 	double K[3];		// Ka
 	// Evaluate the strain and texture
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 	
 	// calculate left and right Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();
@@ -127,7 +127,7 @@ tens4ds FEOrthoElastic::Tangent(FEMaterialPoint& mp)
 	
 	for (i=0; i<3; i++) {	// Perform sum over all three texture directions
 		// Copy the texture direction in the reference configuration to a0
-		a0[i].x = pt.Q[0][i]; a0[i].y = pt.Q[1][i]; a0[i].z = pt.Q[2][i];
+		a0[i].x = pt.m_Q[0][i]; a0[i].y = pt.m_Q[1][i]; a0[i].z = pt.m_Q[2][i];
 		K[i] = a0[i]*(c*a0[i]);
 		a[i] = F*a0[i]/sqrt(K[i]);	// Evaluate the texture direction in the current configuration
 		A[i] = dyad(a[i]);			// Evaluate the texture tensor in the current configuration

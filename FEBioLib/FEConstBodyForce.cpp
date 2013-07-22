@@ -34,7 +34,7 @@ vec3d FENonConstBodyForce::force(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// get the material point's spatial position
-	vec3d r = pt.rt;
+	vec3d r = pt.m_rt;
 
 	// define a math parser object
 	MathParser m;

@@ -256,7 +256,7 @@ public:
 		FEElasticMaterialPoint& ept = *pt.ExtractData<FEElasticMaterialPoint>();
 		FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-		return spt.m_sbmr[sbm]/(ept.J-bpt.m_phi0)/SBMMolarMass(sbm);
+		return spt.m_sbmr[sbm]/(ept.m_J-bpt.m_phi0)/SBMMolarMass(sbm);
 	}
 
 	//! SBM referential volume fraction

@@ -36,8 +36,8 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
     double phir = m_pReact->m_pMP->SolidReferentialVolumeFraction(pt);
 	
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
-    double J = et.J;
-	double sed = et.sed;
+    double J = et.m_J;
+	double sed = et.m_sed;
 	double zhat = m_B*(sed/rhor - m_k)/(J-phir);
 	return zhat;
 }
@@ -51,11 +51,11 @@ mat3ds FEReactionRateHuiskes::Tangent_ReactionRate_Strain(FEMaterialPoint& pt)
 	
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
     FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-    double J = et.J;
+    double J = et.m_J;
     double p = bt.m_pa;
     double zhat = ReactionRate(pt);
     mat3dd I(1);
-    mat3ds dzhatde = (I*(-zhat) + (et.s+I*p)*(m_B/rhor))/(J-phir);
+    mat3ds dzhatde = (I*(-zhat) + (et.m_s+I*p)*(m_B/rhor))/(J-phir);
 	return dzhatde;
 }
 

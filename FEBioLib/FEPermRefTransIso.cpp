@@ -62,18 +62,18 @@ mat3ds FEPermRefTransIso::Permeability(FEMaterialPoint& mp)
 	mat3dd I(1);
 	
 	// deformation gradient
-	mat3d &F = et.F;
+	mat3d &F = et.m_F;
 	
 	// left cauchy-green matrix
 	mat3ds b = et.LeftCauchyGreen();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	
 	// Copy the texture direction in the reference configuration to V
-	V.x = et.Q[0][0]; V.y = et.Q[1][0]; V.z = et.Q[2][0];
+	V.x = et.m_Q[0][0]; V.y = et.m_Q[1][0]; V.z = et.m_Q[2][0];
 	m = dyad(F*V);	// Evaluate texture tensor in the current configuration
 	
 	// --- strain-dependent permeability ---
@@ -108,18 +108,18 @@ tens4ds FEPermRefTransIso::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	mat3dd I(1);
 	
 	// deformation gradient
-	mat3d &F = et.F;
+	mat3d &F = et.m_F;
 	
 	// left cauchy-green matrix
 	mat3ds b = et.LeftCauchyGreen();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	
 	// Copy the texture direction in the reference configuration to V
-	V.x = et.Q[0][0]; V.y = et.Q[1][0]; V.z = et.Q[2][0];
+	V.x = et.m_Q[0][0]; V.y = et.m_Q[1][0]; V.z = et.m_Q[2][0];
 	m = dyad(F*V);	// Evaluate texture tensor in the current configuration
 	
 	double f, k0, K0prime;

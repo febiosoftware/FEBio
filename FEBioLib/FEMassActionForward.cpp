@@ -58,7 +58,7 @@ mat3ds FEMassActionForward::Tangent_ReactionSupply_Strain(FEMaterialPoint& pt)
 	
 	const int nsol = m_nsol;
 	const int nsbm = (int)m_v.size() - nsol;
-	double J = ept.J;
+	double J = ept.m_J;
 	double phi0 = bpt.m_phi0;
 
 	double kF = m_pFwd->ReactionRate(pt);

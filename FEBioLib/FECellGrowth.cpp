@@ -40,7 +40,7 @@ mat3ds FECellGrowth::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// calculate intracellular osmolarity relative to mixture volume in reference configuration
 	double c = m_cr/(J-m_phir);
@@ -60,7 +60,7 @@ tens4ds FECellGrowth::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// calculate intracellular osmolarity relative to mixture volume in reference configuration
 	double c = m_cr/(J-m_phir);

@@ -83,7 +83,7 @@ mat3ds FEOgdenMaterial::DevStress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
 	// get the left Cauchy-Green tensor
@@ -175,7 +175,7 @@ tens4ds FEOgdenMaterial::DevTangent(FEMaterialPoint& mp)
 	mat3ds b = pt.LeftCauchyGreen();
 
 	// get the jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 
 	// get the eigenvalues and vectors of b

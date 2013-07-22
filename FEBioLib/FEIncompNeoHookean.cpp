@@ -25,8 +25,8 @@ mat3ds FEIncompNeoHookean::DevStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// calculate left Cauchy-Green tensor
 	mat3ds B = pt.LeftCauchyGreen();
@@ -42,8 +42,8 @@ tens4ds FEIncompNeoHookean::DevTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// left cauchy-green matrix (i.e. the 'b' matrix)
 	mat3ds B = pt.LeftCauchyGreen();

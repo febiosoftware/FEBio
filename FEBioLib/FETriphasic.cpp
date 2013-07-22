@@ -73,7 +73,7 @@ double FETriphasic::Porosity(FEMaterialPoint& pt)
 	FEBiphasicMaterialPoint& pet = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// porosity
 	//	double phiw = 1 - m_phi0/J;
 	double phi0 = pet.m_phi0;
@@ -93,7 +93,7 @@ double FETriphasic::FixedChargeDensity(FEMaterialPoint& pt)
 	FEBiphasicMaterialPoint& pet = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	double phi0 = pet.m_phi0;
 	double cF = m_cFr*(1-phi0)/(J-phi0);
 	
@@ -205,7 +205,7 @@ tens4ds FETriphasic::Tangent(FEMaterialPoint& mp)
 	tens4ds C = m_pSolid->Tangent(mp);
 	
 	// relative volume and solid volume fraction
-	double J = ept.J;
+	double J = ept.m_J;
 	double phi0 = ppt.m_phi0;
 	
 	// get the charge density and its derivatives

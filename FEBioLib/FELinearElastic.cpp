@@ -31,8 +31,8 @@ mat3ds FELinearElastic::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 
 	// lame parameters
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));

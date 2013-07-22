@@ -64,7 +64,7 @@ mat3ds FEOgdenUnconstrained::Stress(FEMaterialPoint &mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// get the left Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();
@@ -104,7 +104,7 @@ tens4ds FEOgdenUnconstrained::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// get the left Cauchy-Green tensor
 	mat3ds b = pt.LeftCauchyGreen();

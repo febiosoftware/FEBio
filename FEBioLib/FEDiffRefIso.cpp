@@ -63,7 +63,7 @@ mat3ds FEDiffRefIso::Diffusivity(FEMaterialPoint& mp)
 	mat3ds b = et.LeftCauchyGreen();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	
 	// solid volume fraction in reference configuration
 	double phi0 = ppt.m_phi0;
@@ -94,7 +94,7 @@ tens4ds FEDiffRefIso::Tangent_Diffusivity_Strain(FEMaterialPoint &mp)
 	mat3ds b = et.LeftCauchyGreen();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	
 	// solid volume fraction in reference configuration
 	double phi0 = ppt.m_phi0;

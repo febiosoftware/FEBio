@@ -41,14 +41,14 @@ mat3ds FEMuscleMaterial::DevStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// get the initial fiber direction
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;
@@ -196,17 +196,17 @@ tens4ds FEMuscleMaterial::DevTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.s.dev();
+	mat3ds devs = pt.m_s.dev();
 
 	// get the initial fiber direction
 	vec3d a0;
-	a0.x = pt.Q[0][0];
-	a0.y = pt.Q[1][0];
-	a0.z = pt.Q[2][0];
+	a0.x = pt.m_Q[0][0];
+	a0.y = pt.m_Q[1][0];
+	a0.z = pt.m_Q[2][0];
 
 	// calculate the current material axis lam*a = F*a0;
 	vec3d a = F*a0;

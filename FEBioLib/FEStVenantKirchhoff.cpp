@@ -41,7 +41,7 @@ mat3ds FEStVenantKirchhoff::Stress(FEMaterialPoint& mp)
 	double trE = 0.5*(b.tr()-3);
 
 	// inverse jacobian
-	double Ji = 1.0 / pt.J;
+	double Ji = 1.0 / pt.m_J;
 
 	// calculate stress
 	// s = (lam*trE*b - mu*(b2 - b))/J;
@@ -54,7 +54,7 @@ tens4ds FEStVenantKirchhoff::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 
 	// lame parameters
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));

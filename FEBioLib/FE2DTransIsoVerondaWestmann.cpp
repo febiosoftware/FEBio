@@ -43,8 +43,8 @@ mat3ds FE2DTransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 	double Ji = 1.0 / J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
@@ -91,7 +91,7 @@ mat3ds FE2DTransIsoVerondaWestmann::DevStress(FEMaterialPoint& mp)
 		v.x = 0;
 
 		// calculate the global material fiber vector
-		a0 = pt.Q*v;
+		a0 = pt.m_Q*v;
 
 		// calculate the global spatial fiber vector
 		a = F*a0;
@@ -147,14 +147,14 @@ tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double J = pt.J;
+	mat3d &F = pt.m_F;
+	double J = pt.m_J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;
 
 	// deviatoric cauchy-stress, trs = trace[s]/3
-	mat3ds devs = pt.s.dev();
+	mat3ds devs = pt.m_s.dev();
 
 	// deviatoric right Cauchy-Green tensor: C = Ft*F
 	mat3ds C = pt.DevRightCauchyGreen();
@@ -225,7 +225,7 @@ tens4ds FE2DTransIsoVerondaWestmann::DevTangent(FEMaterialPoint& mp)
 		v.x = 0;
 
 		// calculate the global material fiber vector
-		a0 = pt.Q*v;
+		a0 = pt.m_Q*v;
 
 		// calculate the global spatial fiber vector
 		a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;

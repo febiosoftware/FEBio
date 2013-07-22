@@ -40,7 +40,7 @@ mat3ds FEPerfectOsmometer::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 	
 	// calculate internal concentration in current configuration
 	double iosm = m_iosm*m_phiwr/(J-1+m_phiwr);
@@ -60,7 +60,7 @@ tens4ds FEPerfectOsmometer::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	
 	// jacobian
-	double J = pt.J;
+	double J = pt.m_J;
 
 	// calculate internal osmolarity in current configuration
 	double iosm = m_iosm*m_phiwr/(J-1+m_phiwr);

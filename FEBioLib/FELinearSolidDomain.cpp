@@ -44,7 +44,7 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 			for (int n=0; n<el.GaussPoints(); ++n)
 			{
 				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-				pt.Q = pme->m_pmap->LocalElementCoord(el, n);
+				pt.m_Q = pme->m_pmap->LocalElementCoord(el, n);
 			}
 		}
 		else
@@ -57,7 +57,7 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 			if (dynamic_cast<FETransverselyIsotropic*>(pme))
 			{
 				FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-				mat3d& m = pt.Q;
+				mat3d& m = pt.m_Q;
 				if (fabs(m.det() - 1) > 1e-7)
 				{
 					// this element did not get specified a user-defined fiber direction
@@ -96,10 +96,10 @@ void FELinearSolidDomain::InitElements()
 
 			FEMaterialPoint& mp = *el.m_State[j];
 			FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
-			pt.r0 = r0;
-			pt.rt = rt;
+			pt.m_r0 = r0;
+			pt.m_rt = rt;
 
-			pt.J = defgrad(el, pt.F, j);
+			pt.m_J = defgrad(el, pt.m_F, j);
 
 			el.m_State[j]->Init(false);
 		}
@@ -352,7 +352,7 @@ void FELinearSolidDomain::InitialStress(FESolidElement& el, vector<double>& fe)
 		detJ0 *= gw[n];
 
 		// get the stress vector for this integration point
-		s = pt.s0;
+		s = pt.m_s0;
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -416,7 +416,7 @@ void FELinearSolidDomain::InternalForce(FESolidElement& el, vector<double>& fe)
 		detJ0 *= gw[n];
 
 		// get the stress vector for this integration point
-		s = pt.s;
+		s = pt.m_s;
 
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
@@ -500,18 +500,18 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 			// material point coordinates
 			// TODO: I'm not entirly happy with this solution
 			//		 since the material point coordinates are not used by most materials.
-			pt.r0 = el.Evaluate(r0, n);
-			pt.rt = el.Evaluate(rt, n);
+			pt.m_r0 = el.Evaluate(r0, n);
+			pt.m_rt = el.Evaluate(rt, n);
 
 			// get the deformation gradient and determinant
 			// TODO: I should not evaulate this, since this can throw negative jacobians
 			//       for large deformations. I known I shouldn't use this for large
 			//       deformations, but in principle there should never be a negative 
 			//       jacobian for small deformations!
-			pt.J = defgrad(el, pt.F, n);
+			pt.m_J = defgrad(el, pt.m_F, n);
 
 			// calculate the stress at this material point
-			pt.s = pm->Stress(mp) + pt.s0;
+			pt.m_s = pm->Stress(mp) + pt.m_s0;
 		}
 	}
 }

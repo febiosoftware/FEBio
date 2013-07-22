@@ -475,7 +475,7 @@ bool FETriphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<doub
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// and then finally
 		double divv = ((J-Jp)/dt)/J;
@@ -683,7 +683,7 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		double dJdt = (J-Jp)/dt;
 		gradJ *= J;
 
@@ -1165,7 +1165,7 @@ bool FETriphasicDomain::ElementTriphasicStiffness(FESolidElement& el, matrix& ke
 		
 		// next we get the determinant
 		double Jp = Fp.det();
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// and then finally
 		double dJdt = (J-Jp)/dt;
@@ -1625,7 +1625,7 @@ bool FETriphasicDomain::ElementTriphasicStiffnessSS(FESolidElement& el, matrix& 
 		}
 		
 		// next we get the determinant
-		double J = ept.J;
+		double J = ept.m_J;
 		
 		// get the fluid flux and pressure gradient
 		vec3d w = ppt.m_w;
@@ -2196,11 +2196,11 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		// material point coordinates
 		// TODO: I'm not entirly happy with this solution
 		//		 since the material point coordinates are used by most materials.
-		pt.r0 = el.Evaluate(r0, n);
-		pt.rt = el.Evaluate(rt, n);
+		pt.m_r0 = el.Evaluate(r0, n);
+		pt.m_rt = el.Evaluate(rt, n);
 			
 		// get the deformation gradient and determinant
-		pt.J = defgrad(el, pt.F, n);
+		pt.m_J = defgrad(el, pt.m_F, n);
 			
 		// solute-poroelastic data
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
@@ -2232,7 +2232,7 @@ void FETriphasicDomain::UpdateElementStress(int iel)
 		spt.m_cF = pmb->FixedChargeDensity(mp);
 		spt.m_Ie = pmb->CurrentDensity(mp);
 			
-		pt.s = pmb->Stress(mp);
+		pt.m_s = pmb->Stress(mp);
 
 		// evaluate the strain energy density
 //		pt.sed = pme->StrainEnergy(mp);

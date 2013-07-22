@@ -50,8 +50,8 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 	double detFi = 1.0/detF;
 	double lndetF = log(detF);
 
@@ -103,7 +103,7 @@ mat3ds FE2DFiberNeoHookean::Stress(FEMaterialPoint& mp)
 			v.z = 0;
 
 			// calculate the global material fiber vector
-			a0 = pt.Q*v;
+			a0 = pt.m_Q*v;
 
 			// calculate the global spatial fiber vector
 			a.x = F[0][0]*a0.x + F[0][1]*a0.y + F[0][2]*a0.z;
@@ -133,8 +133,8 @@ tens4ds FE2DFiberNeoHookean::Tangent(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// deformation gradient
-	mat3d &F = pt.F;
-	double detF = pt.J;
+	mat3d &F = pt.m_F;
+	double detF = pt.m_J;
 
 	// lame parameters
 	double lam = m_v*m_E/((1+m_v)*(1-2*m_v));

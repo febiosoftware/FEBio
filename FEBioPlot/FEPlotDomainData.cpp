@@ -59,12 +59,12 @@ bool FEPlotElementStress::WriteSolidStress(FEElasticSolidDomain& d, vector<float
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.s.xx());
-				s[1] += (float) (f*pt.s.yy());
-				s[2] += (float) (f*pt.s.zz());
-				s[3] += (float) (f*pt.s.xy());
-				s[4] += (float) (f*pt.s.yz());
-				s[5] += (float) (f*pt.s.xz());
+				s[0] += (float) (f*pt.m_s.xx());
+				s[1] += (float) (f*pt.m_s.yy());
+				s[2] += (float) (f*pt.m_s.zz());
+				s[3] += (float) (f*pt.m_s.xy());
+				s[4] += (float) (f*pt.m_s.yz());
+				s[5] += (float) (f*pt.m_s.xz());
 			}
 		}
 
@@ -104,12 +104,12 @@ bool FEPlotElementStress::WriteShellStress(FEElasticShellDomain& d, vector<float
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
-				s[0] += (float) (f*pt.s.xx());
-				s[1] += (float) (f*pt.s.yy());
-				s[2] += (float) (f*pt.s.zz());
-				s[3] += (float) (f*pt.s.xy());
-				s[4] += (float) (f*pt.s.yz());
-				s[5] += (float) (f*pt.s.xz());
+				s[0] += (float) (f*pt.m_s.xx());
+				s[1] += (float) (f*pt.m_s.yy());
+				s[2] += (float) (f*pt.m_s.zz());
+				s[3] += (float) (f*pt.m_s.xy());
+				s[4] += (float) (f*pt.m_s.yz());
+				s[5] += (float) (f*pt.m_s.xz());
 			}
 		}
 
@@ -147,7 +147,7 @@ bool FEPlotElementStress::WriteLinearSolidStress(FELinearSolidDomain& d, vector<
 			if (ppt)
 			{
 				FEElasticMaterialPoint& pt = *ppt;
-				mat3ds& es = pt.s;
+				mat3ds& es = pt.m_s;
 				s[0] += (float) (f*es.xx());
 				s[1] += (float) (f*es.yy());
 				s[2] += (float) (f*es.zz());
@@ -188,7 +188,7 @@ bool FEPlotStrainEnergyDensity::Save(FEDomain &dom, vector<float>& a)
 				FEMaterialPoint& mp = *el.m_State[j];
 				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
 				
-				if (pt) ew += pt->sed;
+				if (pt) ew += pt->m_sed;
 			}
 			
 			ew /= el.GaussPoints();
@@ -219,7 +219,7 @@ bool FEPlotSpecificStrainEnergy::Save(FEDomain &dom, vector<float>& a)
 				FEMaterialPoint& mp = *el.m_State[j];
 				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
 				
-				if (pt) ew += pt->sed/pt->rhor;
+				if (pt) ew += pt->m_sed/pt->m_rhor;
 			}
 			
 			ew /= el.GaussPoints();
@@ -250,7 +250,7 @@ bool FEPlotDensity::Save(FEDomain &dom, vector<float>& a)
 				FEMaterialPoint& mp = *el.m_State[j];
 				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
 				
-				if (pt) ew += pt->rhor;
+				if (pt) ew += pt->m_rhor;
 			}
 			
 			ew /= el.GaussPoints();
@@ -282,7 +282,7 @@ bool FEPlotRelativeVolume::Save(FEDomain &dom, vector<float>& a)
 				FEMaterialPoint& mp = *el.m_State[j];
 				FEElasticMaterialPoint* pt = (mp.ExtractData<FEElasticMaterialPoint>());
 				
-				if (pt) ew += pt->J;
+				if (pt) ew += pt->m_J;
 			}
 			
 			ew /= el.GaussPoints();
@@ -926,7 +926,7 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
                 FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 				FESaltMaterialPoint* spt = (mp.ExtractData<FESaltMaterialPoint>());
 				
-				if (spt) ew += (ept->J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
+				if (spt) ew += (ept->m_J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
 			}
 			
 			ew /= el.GaussPoints();
@@ -950,7 +950,7 @@ bool FEPlotReferentialFixedChargeDensity::Save(FEDomain &dom, vector<float>& a)
                 FEBiphasicMaterialPoint* bpt = (mp.ExtractData<FEBiphasicMaterialPoint>());
 				FESolutesMaterialPoint* spt = (mp.ExtractData<FESolutesMaterialPoint>());
 				
-				if (spt) ew += (ept->J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
+				if (spt) ew += (ept->m_J - bpt->m_phi0)*spt->m_cF/(1 - bpt->m_phi0);
 			}
 			
 			ew /= el.GaussPoints();
@@ -1019,9 +1019,9 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<n; ++j)
 			{
 				FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-				r.x += pt.Q[0][0];
-				r.y += pt.Q[1][0];
-				r.z += pt.Q[2][0];
+				r.x += pt.m_Q[0][0];
+				r.y += pt.m_Q[1][0];
+				r.z += pt.m_Q[2][0];
 			}
 			r /= n;
 			f[0] = (float) r.x;

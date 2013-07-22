@@ -33,7 +33,7 @@ mat3ds FEPermHolmesMow::Permeability(FEMaterialPoint& mp)
 	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	
@@ -50,7 +50,7 @@ tens4ds FEPermHolmesMow::Tangent_Permeability_Strain(FEMaterialPoint &mp)
 	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
 	
 	// relative volume
-	double J = et.J;
+	double J = et.m_J;
 	// referential solid volume fraction
 	double phi0 = pt.m_phi0;
 	

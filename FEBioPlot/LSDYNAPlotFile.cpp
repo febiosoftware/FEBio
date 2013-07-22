@@ -443,12 +443,12 @@ void LSDYNAPlotFile::write_solid_stress()
 					if (ppt)
 					{
 						FEElasticMaterialPoint& pt = *ppt;
-						s[0] += (float) (f*pt.s.xx());
-						s[1] += (float) (f*pt.s.yy());
-						s[2] += (float) (f*pt.s.zz());
-						s[3] += (float) (f*pt.s.xy());
-						s[4] += (float) (f*pt.s.yz());
-						s[5] += (float) (f*pt.s.xz());
+						s[0] += (float) (f*pt.m_s.xx());
+						s[1] += (float) (f*pt.m_s.yy());
+						s[2] += (float) (f*pt.m_s.zz());
+						s[3] += (float) (f*pt.m_s.xy());
+						s[4] += (float) (f*pt.m_s.yz());
+						s[5] += (float) (f*pt.m_s.xz());
 
 						if (m_nfield[4] == PLOT_FIBER_STRAIN)
 						{
@@ -502,28 +502,28 @@ void LSDYNAPlotFile::write_shell_stress()
 							FEElasticMaterialPoint& pto = *(el.m_State[j+2*neln]->ExtractData<FEElasticMaterialPoint>());
 
 							// mid-surface stresses
-							s[ 0] += (float) (f*ptm.s.xx());
-							s[ 1] += (float) (f*ptm.s.yy());
-							s[ 2] += (float) (f*ptm.s.zz());
-							s[ 3] += (float) (f*ptm.s.xy());
-							s[ 4] += (float) (f*ptm.s.yz());
-							s[ 5] += (float) (f*ptm.s.xz());
+							s[ 0] += (float) (f*ptm.m_s.xx());
+							s[ 1] += (float) (f*ptm.m_s.yy());
+							s[ 2] += (float) (f*ptm.m_s.zz());
+							s[ 3] += (float) (f*ptm.m_s.xy());
+							s[ 4] += (float) (f*ptm.m_s.yz());
+							s[ 5] += (float) (f*ptm.m_s.xz());
 
 							// inner surface stresses
-							s[ 7] += (float) (f*pti.s.xx());
-							s[ 8] += (float) (f*pti.s.yy());
-							s[ 9] += (float) (f*pti.s.zz());
-							s[10] += (float) (f*pti.s.xy());
-							s[11] += (float) (f*pti.s.yz());
-							s[12] += (float) (f*pti.s.xz());
+							s[ 7] += (float) (f*pti.m_s.xx());
+							s[ 8] += (float) (f*pti.m_s.yy());
+							s[ 9] += (float) (f*pti.m_s.zz());
+							s[10] += (float) (f*pti.m_s.xy());
+							s[11] += (float) (f*pti.m_s.yz());
+							s[12] += (float) (f*pti.m_s.xz());
 
 							// outer surface stresses
-							s[14] += (float) (f*pto.s.xx());
-							s[15] += (float) (f*pto.s.yy());
-							s[16] += (float) (f*pto.s.zz());
-							s[17] += (float) (f*pto.s.xy());
-							s[18] += (float) (f*pto.s.yz());
-							s[19] += (float) (f*pto.s.xz());
+							s[14] += (float) (f*pto.m_s.xx());
+							s[15] += (float) (f*pto.m_s.yy());
+							s[16] += (float) (f*pto.m_s.zz());
+							s[17] += (float) (f*pto.m_s.xy());
+							s[18] += (float) (f*pto.m_s.yz());
+							s[19] += (float) (f*pto.m_s.xz());
 
 							// shell thicknesses
 							s[29] += (float) (el.m_h0[j]*f*mesh.Node(el.m_node[j]).m_Dt.norm());
@@ -1359,9 +1359,9 @@ void LSDYNAPlotFile::write_material_fibers()
 				for (j=0; j<n; ++j)
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-					r.x += pt.Q[0][0];
-					r.y += pt.Q[1][0];
-					r.z += pt.Q[2][0];
+					r.x += pt.m_Q[0][0];
+					r.y += pt.m_Q[1][0];
+					r.z += pt.m_Q[2][0];
 				}
 				r /= n;
 
@@ -1381,9 +1381,9 @@ void LSDYNAPlotFile::write_material_fibers()
 				for (j=0; j<n; ++j)
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-					r.x += pt.Q[0][0];
-					r.y += pt.Q[1][0];
-					r.z += pt.Q[2][0];
+					r.x += pt.m_Q[0][0];
+					r.y += pt.m_Q[1][0];
+					r.z += pt.m_Q[2][0];
 				}
 				r /= n;
 
@@ -1415,12 +1415,12 @@ float LSDYNAPlotFile::fiber_strain(FESolidElement &el, int j)
 
 		// get the initial fiber direction
 		vec3d a0;
-		a0.x = pt.Q[0][0];
-		a0.y = pt.Q[1][0];
-		a0.z = pt.Q[2][0];
+		a0.x = pt.m_Q[0][0];
+		a0.y = pt.m_Q[1][0];
+		a0.z = pt.m_Q[2][0];
 
 		// calculate the current fiber direction
-		vec3d a = pt.F*a0;
+		vec3d a = pt.m_F*a0;
 
 		return (float) a.norm();
 	}
@@ -1436,17 +1436,17 @@ float LSDYNAPlotFile::dev_fiber_strain(FESolidElement &el, int j)
 		FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
 
 		// get the jacobian
-		double J = pt.J;
+		double J = pt.m_J;
 		double Jm13 = pow(J, -1.0/3.0);
 
 		// get the initial fiber direction
 		vec3d a0;
-		a0.x = pt.Q[0][0];
-		a0.y = pt.Q[1][0];
-		a0.z = pt.Q[2][0];
+		a0.x = pt.m_Q[0][0];
+		a0.y = pt.m_Q[1][0];
+		a0.z = pt.m_Q[2][0];
 
 		// calculate the current fiber direction
-		vec3d a = pt.F*a0;
+		vec3d a = pt.m_F*a0;
 		return (float) (Jm13*a.unit());
 	}
 	else return 0.f;

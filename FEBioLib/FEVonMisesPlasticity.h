@@ -29,7 +29,7 @@ public:
 		else
 		{
 			e0 = e1;
-			sn = pt.s;
+			sn = pt.m_s;
 			Y0 = Y1;
 		}
 

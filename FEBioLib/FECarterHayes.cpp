@@ -33,7 +33,7 @@ void FECarterHayes::Init()
 	
 	// extract the local id of the SBM whose density controls Young's modulus from the global id
 	m_lsbm = -1;
-	FEMultiphasic* pMP = static_cast<FEMultiphasic*> (pVoid);
+	FEMultiphasic* pMP = static_cast<FEMultiphasic*> (m_pParent);
     if (pMP == 0) throw MaterialError("Parent material must be multiphasic");
 	int nsbm = (int)pMP->m_pSBM.size();
 	for (int isbm=0; isbm<nsbm; ++isbm) {
@@ -50,7 +50,7 @@ double FECarterHayes::StrainEnergy(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
 	
-	double detF = pt.J;
+	double detF = pt.m_J;
 	double lndetF = log(detF);
 	
 	// calculate left Cauchy-Green tensor
@@ -73,7 +73,7 @@ mat3ds FECarterHayes::Stress(FEMaterialPoint& mp)
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
 	
-	double detF = pt.J;
+	double detF = pt.m_J;
 	double detFi = 1.0/detF;
 	double lndetF = log(detF);
 	
@@ -101,7 +101,7 @@ tens4ds FECarterHayes::Tangent(FEMaterialPoint& mp)
 	FESolutesMaterialPoint& spt = *mp.ExtractData<FESolutesMaterialPoint>();
 	
 	// deformation gradient
-	double detF = pt.J;
+	double detF = pt.m_J;
 	
 	// lame parameters
 	double rhor = spt.m_sbmr[m_lsbm];
