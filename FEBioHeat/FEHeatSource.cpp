@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FEHeatSource.h"
 #include <FECore/FEModel.h>
 

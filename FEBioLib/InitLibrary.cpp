@@ -35,7 +35,6 @@
 #include "FEHolmesMow.h"
 #include "FEIncompNeoHookean.h"
 #include "FEIsotropicElastic.h"
-#include "FEIsotropicFourier.h"
 #include "FELinearElastic.h"
 #include "FELinearOrthotropic.h"
 #include "FELinearTransIso.h"
@@ -146,7 +145,6 @@ REGISTER_MATERIAL(FEGasserOgdenHolzapfel         , "Gasser-Ogden-Holzapfel"     
 REGISTER_MATERIAL(FEHolmesMow                    , "Holmes-Mow"                    );
 REGISTER_MATERIAL(FEIncompNeoHookean             , "incomp neo-Hookean"            );
 REGISTER_MATERIAL(FEIsotropicElastic             , "isotropic elastic"             );
-REGISTER_MATERIAL(FEIsotropicFourier             , "isotropic Fourier"             );
 REGISTER_MATERIAL(FELinearElastic                , "linear elastic"                );
 REGISTER_MATERIAL(FELinearOrthotropic            , "linear orthotropic"            );
 REGISTER_MATERIAL(FELinearSpring                 , "linear spring"                 );

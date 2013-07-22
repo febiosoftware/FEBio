@@ -1,6 +1,6 @@
 #pragma once
 #include "FESolver.h"
-#include "FEHeatSolver.h"
+#include <FEBioHeat\FEHeatSolver.h>
 #include "FELinearSolidSolver.h"
 
 //-----------------------------------------------------------------------------

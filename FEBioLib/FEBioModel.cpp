@@ -25,13 +25,10 @@
 #include "FEFluidFlux.h"
 #include "FEPoroTraction.h"
 #include "FESoluteFlux.h"
-#include "FEHeatFlux.h"
-#include "FEConvectiveHeatFlux.h"
 #include "FEAnalysisStep.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"
 #include "FEElasticTrussDomain.h"
-#include "FEHeatSolidDomain.h"
 #include "FEDiscreteSpringDomain.h"
 #include "FEBiphasicSolidDomain.h"
 #include "FEBiphasicSoluteDomain.h"
@@ -56,6 +53,9 @@
 #include "FEElasticMultigeneration.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FESlidingInterfaceBW.h"
+#include <FEBioHeat\FEHeatSolidDomain.h>
+#include <FEBioHeat\FEHeatFlux.h>
+#include <FEBioHeat\FEConvectiveHeatFlux.h>
 #include "FECore/log.h"
 #include "version.h"
 

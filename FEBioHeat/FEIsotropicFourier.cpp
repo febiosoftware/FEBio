@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "FEIsotropicFourier.h"
 
+//-----------------------------------------------------------------------------
 // define the parameter list
 BEGIN_PARAMETER_LIST(FEIsotropicFourier, FEMaterial)
 	ADD_PARAMETER(m_k  , FE_PARAM_DOUBLE, "k");
@@ -8,10 +8,8 @@ BEGIN_PARAMETER_LIST(FEIsotropicFourier, FEMaterial)
 	ADD_PARAMETER(m_rho, FE_PARAM_DOUBLE, "density");
 END_PARAMETER_LIST();
 
-//////////////////////////////////////////////////////////////////////
-// FEIsotropicFourier
-//////////////////////////////////////////////////////////////////////
-
+//-----------------------------------------------------------------------------
+//! Initialize isotropic Fourier material data
 void FEIsotropicFourier::Init()
 {
 	if (m_k <= 0) throw MaterialError("Invalid value for k");
@@ -19,6 +17,7 @@ void FEIsotropicFourier::Init()
 	if (m_rho <= 0) throw MaterialError("Invalid value for density");
 }
 
+//-----------------------------------------------------------------------------
 void FEIsotropicFourier::Conductivity(double D[3][3])
 {
 	D[0][0] = D[1][1] = D[2][2] = m_k;

@@ -13,8 +13,8 @@
 #include "FEBioLib/FEMultiphasicDomain.h"
 #include "FEBioLib/FEMultiphasic.h"
 #include "FEBioLib/FEUT4Domain.h"
-#include <FEBioLib/FEHeatSolidDomain.h>
-#include <FEBioLib/FEHeatTransferMaterial.h>
+#include <FEBioHeat/FEHeatSolidDomain.h>
+#include <FEBioHeat/FEHeatTransferMaterial.h>
 
 //-----------------------------------------------------------------------------
 //! Store the average stresses for each element. 

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioGeometrySection.h"
-#include <FEBioLib/FEHeatTransferMaterial.h>
 #include <FECore/FERigid.h>
 #include <FEBioLib/FEBiphasic.h>
 #include <FEBioLib/FEBiphasicSolute.h>
@@ -14,13 +13,14 @@
 #include <FEBioLib/FERigidShellDomain.h>
 #include <FEBioLib/FEUDGHexDomain.h>
 #include <FEBioLib/FEUT4Domain.h>
-#include <FEBioLib/FEHeatSolidDomain.h>
 #include <FEBioLib/FEBiphasicSolidDomain.h>
 #include <FEBioLib/FETriphasicDomain.h>
 #include <FEBioLib/FEBiphasicSoluteDomain.h>
 #include <FEBioLib/FE3FieldElasticSolidDomain.h>
 #include <FEBioLib/FELinearSolidDomain.h>
 #include <FEBioLib/FEMultiphasicDomain.h>
+#include <FEBioHeat/FEHeatTransferMaterial.h>
+#include <FEBioHeat/FEHeatSolidDomain.h>
 
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file

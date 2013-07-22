@@ -189,12 +189,6 @@
     <ClInclude Include="..\..\FEBioLib\FEFiberExpPowUncoupled.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEHeatTransferMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEIsotropicFourier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FENeoHookeanTransIso.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -282,9 +276,6 @@
     <ClInclude Include="..\..\FEBioLib\FETiedInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEHeatFlux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FEPressureLoad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -292,9 +283,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FEFluidFlux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEHeatSolidDomain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FELinearSolidDomain.h">
@@ -387,9 +375,6 @@
     <ClInclude Include="..\..\FEBioLib\FECoupledHeatSolidSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEHeatSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FELinearSolidSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -445,12 +430,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FEExplicitSolidSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEConvectiveHeatFlux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEHeatSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FESolventSupplyStarling.h">
@@ -662,9 +641,6 @@
     <ClCompile Include="..\..\FEBioLib\FEFiberExpPowUncoupled.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\FEIsotropicFourier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FENeoHookeanTransIso.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -749,9 +725,6 @@
     <ClCompile Include="..\..\FEBioLib\FETiedInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\FEHeatFlux.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FEPressureLoad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -759,9 +732,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FEFluidFlux.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\FEHeatSolidDomain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FELinearSolidDomain.cpp">
@@ -851,9 +821,6 @@
     <ClCompile Include="..\..\FEBioLib\FECoupledHeatSolidSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\FEHeatSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FELinearSolidSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -921,12 +888,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FEExplicitSolidSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\FEConvectiveHeatFlux.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\FEBioLib\FEHeatSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioLib\FESolventSupplyStarling.cpp">

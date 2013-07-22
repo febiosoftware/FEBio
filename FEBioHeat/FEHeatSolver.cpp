@@ -1,10 +1,9 @@
-#include "stdafx.h"
 #include "FEHeatSolver.h"
 #include "FEHeatFlux.h"
 #include "FEConvectiveHeatFlux.h"
-#include "FECore/FENodeReorder.h"
 #include "FEHeatTransferMaterial.h"
 #include "FEHeatSource.h"
+#include <FECore/FENodeReorder.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list

@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "FEBioControlSection.h"
+#include <NumCore/ConjGradIterSolver.h>
 #include <FEBioLib/FESolidSolver.h>
 #include <FEBioLib/FEExplicitSolidSolver.h>
 #include <FEBioLib/FEBiphasicSolver.h>
 #include <FEBioLib/FEBiphasicSoluteSolver.h>
-#include <FEBioLib/FEHeatSolver.h>
 #include <FEBioLib/FELinearSolidSolver.h>
 #include <FEBioLib/FECoupledHeatSolidSolver.h>
 #include <FEBioLib/FEUDGHexDomain.h>
 #include <FEBioLib/FEUT4Domain.h>
-#include <NumCore/ConjGradIterSolver.h>
 #include <FEBioLib/SuperLUSolver.h>
+#include <FEBioHeat/FEHeatSolver.h>
 
 //-----------------------------------------------------------------------------
 FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)

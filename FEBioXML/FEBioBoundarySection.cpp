@@ -5,8 +5,6 @@
 #include <FEBioLib/FEPoroTraction.h>
 #include <FEBioLib/FEFluidFlux.h>
 #include <FEBioLib/FESoluteFlux.h>
-#include <FEBioLib/FEHeatFlux.h>
-#include <FEBioLib/FEConvectiveHeatFlux.h>
 #include <FEBioLib/FEDiscreteMaterial.h>
 #include <FEBioLib/FEDiscreteSpringDomain.h>
 #include <FEBioLib/FESlidingInterface.h>
@@ -22,6 +20,8 @@
 #include <FEBioLib/FERigidWallInterface.h>
 #include <FEBioLib/FEAugLagLinearConstraint.h>
 #include <FEBioLib/FERigidJoint.h>
+#include <FEBioHeat/FEHeatFlux.h>
+#include <FEBioHeat/FEConvectiveHeatFlux.h>
 
 //-----------------------------------------------------------------------------
 //!  Parses the boundary section from the xml file
