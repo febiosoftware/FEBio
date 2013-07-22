@@ -298,10 +298,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEConvectiveHeatFlux.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FECoupledHeatSolidSolver.cpp"
 				>
 			</File>
@@ -434,22 +430,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEHeatFlux.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEHeatSolidDomain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEHeatSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEHeatSource.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.cpp"
 				>
 			</File>
@@ -463,10 +443,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicElastic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEIsotropicFourier.cpp"
 				>
 			</File>
 			<File
@@ -916,10 +892,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEConvectiveHeatFlux.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FECoupledHeatSolidSolver.h"
 				>
 			</File>
@@ -1056,26 +1028,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEHeatFlux.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEHeatSolidDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEHeatSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEHeatSource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEHeatTransferMaterial.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEHolmesMow.h"
 				>
 			</File>
@@ -1089,10 +1041,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEIsotropicElastic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEIsotropicFourier.h"
 				>
 			</File>
 			<File
