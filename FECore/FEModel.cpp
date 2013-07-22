@@ -116,3 +116,17 @@ FESBMData* FEModel::FindSBM(int nid)
 	
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+//! Set the title of the model
+void FEModel::SetTitle(const char* sz)
+{ 
+	strcpy(m_sztitle, sz); 
+}
+
+//-----------------------------------------------------------------------------
+//! Return the title of the model
+const char* FEModel::GetTitle()
+{ 
+	return m_sztitle; 
+}

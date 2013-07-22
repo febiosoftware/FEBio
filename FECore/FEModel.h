@@ -62,10 +62,10 @@ public:
 
 public:
 	//! set the problem title
-	void SetTitle(const char* sz) { strcpy(m_sztitle, sz); }
+	void SetTitle(const char* sz);
 
 	//! get the problem title
-	const char* GetTitle() { return m_sztitle; }
+	const char* GetTitle();
 
 public:	// --- Load curve functions ----
 
