@@ -278,6 +278,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FECarterHayes.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FECarterHayesOld.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FECellGrowth.cpp"
 				>
 			</File>
@@ -446,6 +454,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHuiskesSupply.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEIncompNeoHookean.cpp"
 				>
 			</File>
@@ -563,6 +575,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPressureLoad.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERemodelingElasticMaterial.cpp"
 				>
 			</File>
 			<File
@@ -880,6 +896,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FECarterHayes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FECarterHayesOld.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FECellGrowth.h"
 				>
 			</File>
@@ -1056,6 +1080,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioLib\FEHuiskesSupply.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioLib\FEIncompNeoHookean.h"
 				>
 			</File>
@@ -1173,6 +1201,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPressureLoad.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FERemodelingElasticMaterial.h"
 				>
 			</File>
 			<File
