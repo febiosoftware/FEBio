@@ -7,61 +7,22 @@ class FEMultiphasic;
 class FEChemicalReaction;
 
 //-----------------------------------------------------------------------------
-// Multiple solutes
+//! Class for storing material point data for solute materials
 
 class FESolutesMaterialPoint : public FEMaterialPoint
 {
 public:
+	//! Constructor
 	FESolutesMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
 	
-	FEMaterialPoint* Copy()
-	{
-		FESolutesMaterialPoint* pt = new FESolutesMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
-		return pt;
-	}
+	//! Create a shallow copy
+	FEMaterialPoint* Copy();
 	
-	void Serialize(DumpFile& ar)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
-			for (int i=0; i<m_nsol; ++i) {
-				ar << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
-				<< m_k[i] << m_dkdJ[i];
-				for (int j=0; j<m_nsol; ++j)
-					ar << m_dkdc[i][j];
-			}
-			for (int i=0; i<m_nsbm; ++i)
-				ar << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i];
-		}
-		else
-		{
-			ar >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
-			for (int i=0; i<m_nsol; ++i) {
-				ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
-				>> m_k[i] << m_dkdJ[i];
-				for (int j=0; j<m_nsol; ++j)
-					ar >> m_dkdc[i][j];
-			}
-			for (int i=0; i<m_nsbm; ++i)
-				ar >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i];
-		}
-		
-		if (m_pt) m_pt->Serialize(ar);
-	}
+	//! serialize data
+	void Serialize(DumpFile& ar);
 	
-	void Init(bool bflag)
-	{
-		if (bflag)
-		{
-			m_nsol = m_nsbm = 0;
-			m_psi = m_cF = 0;
-			m_Ie = vec3d(0,0,0);
-		}
-		
-		if (m_pt) m_pt->Init(bflag);
-	}
+	//! Initialize material point data
+	void Init(bool bflag);
 	
 public:
 	// solutes material data
