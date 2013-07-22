@@ -83,6 +83,8 @@
     <ClInclude Include="..\..\FEBioHeat\FEHeatSource.h" />
     <ClInclude Include="..\..\FEBioHeat\FEHeatTransferMaterial.h" />
     <ClInclude Include="..\..\FEBioHeat\FEIsotropicFourier.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEPlotHeatFlux.h" />
+    <ClInclude Include="..\..\FEBioHeat\FEPlotNodeTemperature.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioHeat\FEBioHeat.cpp" />
@@ -92,6 +94,8 @@
     <ClCompile Include="..\..\FEBioHeat\FEHeatSolver.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEHeatSource.cpp" />
     <ClCompile Include="..\..\FEBioHeat\FEIsotropicFourier.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEPlotHeatFlux.cpp" />
+    <ClCompile Include="..\..\FEBioHeat\FEPlotNodeTemperature.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -42,6 +42,12 @@
     <ClInclude Include="..\..\FEBioHeat\FEConvectiveHeatFlux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioHeat\FEPlotNodeTemperature.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioHeat\FEPlotHeatFlux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioHeat\FEBioHeat.cpp">
@@ -63,6 +69,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioHeat\FEConvectiveHeatFlux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioHeat\FEPlotNodeTemperature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioHeat\FEPlotHeatFlux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

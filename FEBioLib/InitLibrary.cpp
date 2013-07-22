@@ -256,13 +256,11 @@ REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed cha
 REGISTER_FEBIO_CLASS(FEPlotReferentialFixedChargeDensity, FEPlotData, "referential fixed charge density");
 REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"    );
 REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPlotData, "ut4 nodal stress"    );
-REGISTER_FEBIO_CLASS(FEPlotHeatFlux                     , FEPlotData, "heat flux"           );
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
 REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );
 REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPlotData, "acceleration"   );
-REGISTER_FEBIO_CLASS(FEPlotNodeTemperature   , FEPlotData, "temperature"    );
 REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
 
 //-----------------------------------------------------------------------------
