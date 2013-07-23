@@ -176,6 +176,14 @@
 				RelativePath="..\..\FEBioHeat\FEIsotropicFourier.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\FEBioHeat\FEPlotHeatFlux.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioHeat\FEPlotNodeTemperature.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -212,6 +220,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioHeat\FEIsotropicFourier.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioHeat\FEPlotHeatFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioHeat\FEPlotNodeTemperature.h"
 				>
 			</File>
 		</Filter>

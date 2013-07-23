@@ -395,6 +395,10 @@
 				RelativePath="..\..\FECore\tens4d.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\FECore\Timer.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -639,6 +643,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\tens4d.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\Timer.h"
 				>
 			</File>
 			<File
