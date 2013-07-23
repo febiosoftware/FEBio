@@ -12,7 +12,7 @@
 #include <time.h>
 
 //-----------------------------------------------------------------------------
-//! This implements a simple timer. 
+//! This class implements a simple timer. 
 
 //! The start function starts the timer, the stop
 //! function stops it and the GetTime function returns the time elapsed between
@@ -22,7 +22,7 @@ class Timer
 {
 public:
 	//! constructor
-	Timer() { reset(); }
+	Timer();
 
 	//! Start the timer
 	void start();

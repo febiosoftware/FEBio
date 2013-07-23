@@ -730,6 +730,7 @@
     <ClInclude Include="..\..\FECore\targetver.h" />
     <ClInclude Include="..\..\FECore\tens4d.h" />
     <ClInclude Include="..\..\FECore\tens4d.hpp" />
+    <ClInclude Include="..\..\FECore\Timer.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
   </ItemGroup>
@@ -780,6 +781,7 @@
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
     <ClCompile Include="..\..\FECore\tens4d.cpp" />
+    <ClCompile Include="..\..\FECore\Timer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

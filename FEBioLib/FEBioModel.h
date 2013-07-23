@@ -1,7 +1,7 @@
 #pragma once
-#include "FECore/FEModel.h"
+#include <FECore\FEModel.h>
+#include <FECore\Timer.h>
 #include "DataStore.h"
-#include "Timer.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
 

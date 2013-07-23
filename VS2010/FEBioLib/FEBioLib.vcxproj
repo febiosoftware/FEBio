@@ -851,7 +851,6 @@
     <ClInclude Include="..\..\FEBioLib\SuperLUSolver.h" />
     <ClInclude Include="..\..\FEBioLib\SuperLU_MT_Solver.h" />
     <ClInclude Include="..\..\FEBioLib\targetver.h" />
-    <ClInclude Include="..\..\FEBioLib\Timer.h" />
     <ClInclude Include="..\..\FEBioLib\validate.h" />
     <ClInclude Include="..\..\FEBioLib\version.h" />
     <ClInclude Include="..\..\FEBioLib\WSMPSolver.h" />
@@ -1006,7 +1005,6 @@
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioLib\SuperLUSolver.cpp" />
     <ClCompile Include="..\..\FEBioLib\SuperLU_MT_Solver.cpp" />
-    <ClCompile Include="..\..\FEBioLib\Timer.cpp" />
     <ClCompile Include="..\..\FEBioLib\validate.cpp" />
     <ClCompile Include="..\..\FEBioLib\WSMPSolver.cpp" />
   </ItemGroup>

@@ -9,10 +9,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEBioLib/FEStiffnessMatrix.h"
-#include "FEBioLib/Timer.h"
-#include "FECore/FEException.h"
-#include "FECore/FENLSolver.h"
+#include <FECore/Timer.h>
+#include <FECore/FEException.h>
+#include <FECore/FENLSolver.h>
+#include "FEStiffnessMatrix.h"
 using namespace NumCore;
 
 //-----------------------------------------------------------------------------
