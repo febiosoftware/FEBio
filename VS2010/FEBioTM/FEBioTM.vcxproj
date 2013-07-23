@@ -229,7 +229,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioplot.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fecore.lib;numcore.lib;febiolib.lib;febioheat.lib;febioplot.lib;febioxml.lib;mkl_intel_c.lib;mkl_intel_thread.lib;mkl_core.lib;mkl_solver.lib;libiomp5mt.lib;flex.lib;fltk.lib;fltkzlib.lib;fltkimages.lib;fltkjpeg.lib;fltkpng.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
