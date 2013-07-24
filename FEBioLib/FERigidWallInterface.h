@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "NumCore/vector.h"
+#include "FECore/vector.h"
 #include "FECore/FEContactInterface.h"
 #include "FECore/FESurface.h"
 #include "FECore/vec3d.h"

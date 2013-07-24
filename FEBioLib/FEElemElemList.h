@@ -1,7 +1,7 @@
 #pragma once
 
-#include "NumCore/vector.h"
 #include "FECore/FEMesh.h"
+#include <vector>
 
 //-----------------------------------------------------------------------------
 //! This class finds for each element the neighbouring elements
@@ -20,7 +20,7 @@ protected:
 	void Init();
 
 protected:
-	vector<int>	m_ref;		// start index into pel array
-	vector<FEElement*>	m_pel;	// list of all neighbouring elements (or 0 if no neighbor)
+	std::vector<int>	m_ref;		// start index into pel array
+	std::vector<FEElement*>	m_pel;	// list of all neighbouring elements (or 0 if no neighbor)
 	FEMesh*	m_pmesh;
 };

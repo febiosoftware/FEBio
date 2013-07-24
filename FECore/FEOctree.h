@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FECore/vec3d.h"
-#include "NumCore/vector.h"
+#include "vector.h"
 #include <set>
 
 class FESurface;

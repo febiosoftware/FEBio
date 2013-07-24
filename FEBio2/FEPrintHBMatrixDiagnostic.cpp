@@ -4,7 +4,6 @@
 #include "FEPrintHBMatrixDiagnostic.h"
 #include "FEBioLib/FESolidSolver.h"
 #include "NumCore/CompactMatrix.h"
-using namespace NumCore;
 
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {

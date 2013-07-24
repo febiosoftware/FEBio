@@ -1,9 +1,8 @@
 // This class implements an interface to the RCI CG iterative solver from the MKL math library.
 #pragma once
 
-#include "NumCore/LinearSolver.h"
+#include "FECore/LinearSolver.h"
 
-namespace NumCore {
 
 class RCICGSolver : public LinearSolver
 {
@@ -15,5 +14,3 @@ public:
 
 	virtual SparseMatrix* CreateSparseMatrix(Matrix_Type ntype);
 };
-
-} // namespace NumCore

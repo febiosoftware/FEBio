@@ -1,7 +1,6 @@
 #pragma once
-#include "NumCore/LinearSolver.h"
-#include "NumCore/CompactMatrix.h"
-using namespace NumCore;
+#include "FECore/LinearSolver.h"
+#include "CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a wrapper class for the SuperLU_MT solver

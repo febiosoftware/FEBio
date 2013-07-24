@@ -11,7 +11,6 @@
 
 #include "FEDiagnostic.h"
 #include "NumCore/DenseMatrix.h"
-using namespace NumCore;
 
 class FEContactDiagnostic : public FEDiagnostic  
 {

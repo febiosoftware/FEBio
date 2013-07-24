@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------------------------
 //! Takes a SparseMatrix structure that defines the structure of the global matrix.
-FEGlobalMatrix::FEGlobalMatrix(NumCore::SparseMatrix* pK)
+FEGlobalMatrix::FEGlobalMatrix(SparseMatrix* pK)
 {
 	m_pA = pK;
 	m_LM.resize(MAX_LM_SIZE);
@@ -32,7 +32,7 @@ void FEGlobalMatrix::Clear()
 void FEGlobalMatrix::build_begin(int neq)
 {
 	if (m_pMP) delete m_pMP;
-	m_pMP = new NumCore::SparseMatrixProfile(neq);
+	m_pMP = new SparseMatrixProfile(neq);
 	m_nlm = 0;
 }
 

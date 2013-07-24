@@ -9,7 +9,7 @@
 //! MatrixProfile constructor. Takes the nr of equations as input argument.
 //! If n is larger than zero a default profile is constructor for a diagonal
 //! matrix.
-NumCore::SparseMatrixProfile::SparseMatrixProfile(int n)
+SparseMatrixProfile::SparseMatrixProfile(int n)
 {
 	if (n>0)
 	{
@@ -30,7 +30,7 @@ NumCore::SparseMatrixProfile::SparseMatrixProfile(int n)
 //-----------------------------------------------------------------------------
 //! Copy constructor. Simply copies the profile
 
-NumCore::SparseMatrixProfile::SparseMatrixProfile(SparseMatrixProfile& mp)
+SparseMatrixProfile::SparseMatrixProfile(SparseMatrixProfile& mp)
 {
 	m_prof = mp.m_prof;
 }
@@ -38,7 +38,7 @@ NumCore::SparseMatrixProfile::SparseMatrixProfile(SparseMatrixProfile& mp)
 //-----------------------------------------------------------------------------
 //! Assignment operator. Copies the profile.
  
-NumCore::SparseMatrixProfile& NumCore::SparseMatrixProfile::operator =(SparseMatrixProfile& mp)
+SparseMatrixProfile& SparseMatrixProfile::operator =(SparseMatrixProfile& mp)
 {
 	if (m_prof.size() != mp.m_prof.size()) m_prof = mp.m_prof;
 	else
@@ -55,7 +55,7 @@ NumCore::SparseMatrixProfile& NumCore::SparseMatrixProfile::operator =(SparseMat
 //! are somehow connected. Each pair of dofs that are connected contributes to
 //! the global stiffness matrix and therefor also to the matrix profile.
 
-void NumCore::SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
+void SparseMatrixProfile::UpdateProfile(vector< vector<int> >& LM, int M)
 {
 	int i, j, k, l, iel, n, *lm, N, Ntot = 0;
 

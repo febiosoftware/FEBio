@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "NumCore/vector.h"
+#include <vector>
 
 class FEMesh;
 class FEDomain;
@@ -44,9 +44,9 @@ public:
 	void Sort();
 
 protected:
-	vector<int>	m_nval;	// nodal valences
-	vector<int>	m_nref;	// adjacent nodes indices
-	vector<int>	m_pn;	// start index into the nref array
+	std::vector<int>	m_nval;	// nodal valences
+	std::vector<int>	m_nref;	// adjacent nodes indices
+	std::vector<int>	m_pn;	// start index into the nref array
 
 	static FENodeNodeList*	m_pthis;
 	static int compare(const void* e1, const void* e2);

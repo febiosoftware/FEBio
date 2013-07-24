@@ -1,7 +1,6 @@
 #pragma once
-#include "SparseMatrix.h"
+#include <FECore\SparseMatrix.h>
 
-namespace NumCore {
 //=============================================================================
 //! This class implements a full matrix
 
@@ -45,5 +44,3 @@ public:
 protected:
 	double**	m_pr;	//!< pointers to rows
 };
-
-} // namespace NumCore

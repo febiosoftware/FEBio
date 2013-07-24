@@ -6,7 +6,7 @@
 #include "SparseMatrix.h"
 
 //-----------------------------------------------------------------------------
-NumCore::SparseMatrix::SparseMatrix()
+SparseMatrix::SparseMatrix()
 {
 	m_ndim = 0;
 	m_nsize = 0;
@@ -14,20 +14,20 @@ NumCore::SparseMatrix::SparseMatrix()
 }
 
 //-----------------------------------------------------------------------------
-void NumCore::SparseMatrix::Clear()
+void SparseMatrix::Clear()
 {
 	if (m_pd) delete [] m_pd; m_pd = 0;
 }
 
 //-----------------------------------------------------------------------------
-void NumCore::SparseMatrix::zero()
+void SparseMatrix::zero()
 {
 	memset(m_pd, 0, m_nsize*sizeof(double)); 
 }
 
 //-----------------------------------------------------------------------------
 //! Print a block from a sparse matrix to file
-void NumCore::print(SparseMatrix& m, FILE* fp, int i0, int j0, int i1, int j1)
+void print(SparseMatrix& m, FILE* fp, int i0, int j0, int i1, int j1)
 {
 	int ndim = m.Size();
 	if ((i1 < 0) || (i1 >= ndim)) i1 = ndim-1;

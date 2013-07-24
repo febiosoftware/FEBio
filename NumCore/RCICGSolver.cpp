@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "RCICGSolver.h"
 #include "NumCore/CompactMatrix.h"
-using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 // We must undef PARDISO since it is defined as a function in mkl_solver.h

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "NumCore/LinearSolver.h"
-#include "NumCore/CompactMatrix.h"
-using namespace NumCore;
+#include "FECore/LinearSolver.h"
+#include "CompactMatrix.h"
 
 //-----------------------------------------------------------------------------
 //! Implements a linear solver that uses a compact column storage format.

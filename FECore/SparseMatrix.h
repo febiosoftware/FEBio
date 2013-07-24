@@ -16,8 +16,6 @@
 #include "MatrixProfile.h"
 #include "matrix.h"
 
-namespace NumCore {
-
 //=============================================================================
 //! Base class for sparse matrices
 
@@ -76,7 +74,5 @@ protected:
 
 //-----------------------------------------------------------------------------
 void print(SparseMatrix& A, FILE* fp, int i0 = 0, int j0 = 0, int i1 = -1, int j1 = -1);
-
-} // namespace NumCore
 
 #endif // !defined(AFX_SPARSEMATRIX_H__B6DFA524_679D_4A35_86F8_D7F080D0ACD5__INCLUDED_)

@@ -13,7 +13,6 @@
 #include <FECore/FEException.h>
 #include <FECore/FENLSolver.h>
 #include "FEStiffnessMatrix.h"
-using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 //! The solver class.

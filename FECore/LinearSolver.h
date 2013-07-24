@@ -5,8 +5,6 @@
 #include <vector>
 using namespace std;
 
-namespace NumCore {
-
 //-----------------------------------------------------------------------------
 // matrix types
 enum Matrix_Type {
@@ -47,5 +45,3 @@ protected:
 
 	static int	m_numthreads;	//!< nr of threads to create
 };
-
-} // namespace NumCore

@@ -114,6 +114,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)d</TargetName>
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;C:\Program Files\Intel\MKL\10.1.1.022\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)d</TargetName>
@@ -124,13 +125,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|x64'">
     <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;C:\Program Files\Intel\MKL\10.1.1.022\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;PARDISO;MKL_ISS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
     </ClCompile>
@@ -191,7 +195,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;PARDISO;MKL_ISS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>
       </OpenMPSupport>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -263,35 +267,36 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\NumCore\colsol.cpp" />
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
-    <ClCompile Include="..\..\NumCore\LinearSolver.cpp" />
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
-    <ClCompile Include="..\..\NumCore\matrix.cpp" />
-    <ClCompile Include="..\..\NumCore\MatrixProfile.cpp" />
-    <ClCompile Include="..\..\NumCore\qsort.cpp" />
+    <ClCompile Include="..\..\NumCore\PardisoSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\PardisoSolverDL.cpp" />
+    <ClCompile Include="..\..\NumCore\PSLDLTSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\RCICGSolver.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
-    <ClCompile Include="..\..\NumCore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\stdafx.cpp" />
-    <ClCompile Include="..\..\NumCore\vector.cpp" />
+    <ClCompile Include="..\..\NumCore\SuperLUSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\SuperLU_MT_Solver.cpp" />
+    <ClCompile Include="..\..\NumCore\WSMPSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
     <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
-    <ClInclude Include="..\..\NumCore\LinearSolver.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
-    <ClInclude Include="..\..\NumCore\matrix.h" />
-    <ClInclude Include="..\..\NumCore\MatrixProfile.h" />
+    <ClInclude Include="..\..\NumCore\PardisoSolver.h" />
+    <ClInclude Include="..\..\NumCore\PSLDLTSolver.h" />
+    <ClInclude Include="..\..\NumCore\RCICGSolver.h" />
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />
     <ClInclude Include="..\..\NumCore\SkylineSolver.h" />
-    <ClInclude Include="..\..\NumCore\SparseMatrix.h" />
     <ClInclude Include="..\..\NumCore\stdafx.h" />
+    <ClInclude Include="..\..\NumCore\SuperLUSolver.h" />
+    <ClInclude Include="..\..\NumCore\SuperLU_MT_Solver.h" />
     <ClInclude Include="..\..\NumCore\targetver.h" />
-    <ClInclude Include="..\..\NumCore\vector.h" />
+    <ClInclude Include="..\..\NumCore\WSMPSolver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include "NumCore/LinearSolver.h"
-#include "NumCore/CompactMatrix.h"
-using namespace NumCore;
+#include "FECore/LinearSolver.h"
+#include "CompactMatrix.h"
 
 #ifdef PARDISO
 	/* Pardiso prototypes for MKL version */

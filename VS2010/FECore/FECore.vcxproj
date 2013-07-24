@@ -719,6 +719,7 @@
     <ClInclude Include="..\..\FECore\FETypes.h" />
     <ClInclude Include="..\..\FECore\FE_enum.h" />
     <ClInclude Include="..\..\FECore\Image.h" />
+    <ClInclude Include="..\..\FECore\LinearSolver.h" />
     <ClInclude Include="..\..\FECore\LoadCurve.h" />
     <ClInclude Include="..\..\FECore\log.h" />
     <ClInclude Include="..\..\FECore\Logfile.h" />
@@ -727,7 +728,10 @@
     <ClInclude Include="..\..\FECore\mat3d.h" />
     <ClInclude Include="..\..\FECore\mat3d.hpp" />
     <ClInclude Include="..\..\FECore\MathParser.h" />
+    <ClInclude Include="..\..\FECore\matrix.h" />
+    <ClInclude Include="..\..\FECore\MatrixProfile.h" />
     <ClInclude Include="..\..\FECore\quatd.h" />
+    <ClInclude Include="..\..\FECore\SparseMatrix.h" />
     <ClInclude Include="..\..\FECore\stdafx.h" />
     <ClInclude Include="..\..\FECore\targetver.h" />
     <ClInclude Include="..\..\FECore\tens4d.h" />
@@ -735,10 +739,12 @@
     <ClInclude Include="..\..\FECore\Timer.h" />
     <ClInclude Include="..\..\FECore\vec2d.h" />
     <ClInclude Include="..\..\FECore\vec3d.h" />
+    <ClInclude Include="..\..\FECore\vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
+    <ClCompile Include="..\..\FECore\colsol.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
@@ -780,13 +786,19 @@
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />
     <ClCompile Include="..\..\FECore\Image.cpp" />
     <ClCompile Include="..\..\FECore\kernel.cpp" />
+    <ClCompile Include="..\..\FECore\LinearSolver.cpp" />
     <ClCompile Include="..\..\FECore\LoadCurve.cpp" />
     <ClCompile Include="..\..\FECore\Logfile.cpp" />
     <ClCompile Include="..\..\FECore\mat3d.cpp" />
     <ClCompile Include="..\..\FECore\MathParser.cpp" />
+    <ClCompile Include="..\..\FECore\matrix.cpp" />
+    <ClCompile Include="..\..\FECore\MatrixProfile.cpp" />
+    <ClCompile Include="..\..\FECore\qsort.cpp" />
+    <ClCompile Include="..\..\FECore\SparseMatrix.cpp" />
     <ClCompile Include="..\..\FECore\stdafx.cpp" />
     <ClCompile Include="..\..\FECore\tens4d.cpp" />
     <ClCompile Include="..\..\FECore\Timer.cpp" />
+    <ClCompile Include="..\..\FECore\vector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

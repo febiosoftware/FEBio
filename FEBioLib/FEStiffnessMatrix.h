@@ -11,7 +11,6 @@
 
 #include <FECore\FEGlobalMatrix.h>
 #include <FECore\FEModel.h>
-using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 //! The FEStiffnessmatrix class stores the global stiffness matrix of the FE

@@ -11,8 +11,6 @@
 
 #include "vector.h"
 
-namespace NumCore {
-
 //-----------------------------------------------------------------------------
 //! Memory exception class
 //! \todo move this to a seperate file
@@ -65,7 +63,5 @@ public:
 protected:
 	vector< vector<int> >	m_prof;	//!< the actual profile in condensed format
 };
-
-} // namespace NumCore
 
 #endif // !defined(AFX_MATRIXPROFILE_H__F83C6F4F_AB5B_445F_AD8C_9C0CBAD26D09__INCLUDED_)

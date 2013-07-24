@@ -6,13 +6,13 @@
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-NumCore::SkylineMatrix::SkylineMatrix()
+SkylineMatrix::SkylineMatrix()
 {
 	m_ppointers = 0;
 }
 
 //-----------------------------------------------------------------------------
-NumCore::SkylineMatrix::~SkylineMatrix()
+SkylineMatrix::~SkylineMatrix()
 {
 	delete [] m_pd;
 	delete [] m_ppointers;
@@ -20,7 +20,7 @@ NumCore::SkylineMatrix::~SkylineMatrix()
 
 //-----------------------------------------------------------------------------
 //! \todo Can I get rid of this function?
-void NumCore::SkylineMatrix::Create(double* pv, int* pp, int N)
+void SkylineMatrix::Create(double* pv, int* pp, int N)
 {
 	delete [] m_pd  ; m_pd = pv;
 	delete [] m_ppointers; m_ppointers = pp;
@@ -30,7 +30,7 @@ void NumCore::SkylineMatrix::Create(double* pv, int* pp, int N)
 }
 
 //-----------------------------------------------------------------------------
-void NumCore::SkylineMatrix::Create(SparseMatrixProfile& mp)
+void SkylineMatrix::Create(SparseMatrixProfile& mp)
 {
 	int i, n;
 
@@ -63,7 +63,7 @@ void NumCore::SkylineMatrix::Create(SparseMatrixProfile& mp)
 //! This function assembles the local stiffness matrix
 //! into the global stiffness matrix which is in skyline format
 //!
-void NumCore::SkylineMatrix::Assemble(matrix& ke, vector<int>& LM)
+void SkylineMatrix::Assemble(matrix& ke, vector<int>& LM)
 {
 	int i, j, I, J;
 
@@ -94,7 +94,7 @@ void NumCore::SkylineMatrix::Assemble(matrix& ke, vector<int>& LM)
 
 
 //-----------------------------------------------------------------------------
-void NumCore::SkylineMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
+void SkylineMatrix::Assemble(matrix& ke, vector<int>& LMi, vector<int>& LMj)
 {
 	int i, j, I, J;
 

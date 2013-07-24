@@ -21,7 +21,6 @@
 #include <FECore/log.h>
 #include <string.h>
 #include <FECore/Image.h>
-using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }

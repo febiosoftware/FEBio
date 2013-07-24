@@ -1,8 +1,8 @@
 #pragma once
 
-#include <NumCore\matrix.h>
-#include <NumCore\vector.h>
-#include <NumCore\LinearSolver.h>
+#include "matrix.h"
+#include "vector.h"
+#include "LinearSolver.h"
 
 //-----------------------------------------------------------------------------
 class FENLSolver;
@@ -18,7 +18,7 @@ public:
 	BFGSSolver();
 
 	//! New initialization method
-	void Init(int neq, FENLSolver* pNLS, NumCore::LinearSolver* pls);
+	void Init(int neq, FENLSolver* pNLS, LinearSolver* pls);
 
 	//! perform a BFGS udpate
 	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);
@@ -44,7 +44,7 @@ public:
 
 public:
 	// keep a pointer to the linear solver
-	NumCore::LinearSolver*	m_plinsolve;	//!< pointer to linear solver
+	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 
 	// the non-linear system to solve
 	FENLSolver*		m_pNLS;		//!< pointer to nonlinear system to solve

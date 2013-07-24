@@ -2,7 +2,7 @@
 
 #include <FEBioXML/XMLReader.h>
 #include <FECore/FEModel.h>
-#include <NumCore/vector.h>
+#include <vector>
 #include <string.h>
 
 //-----------------------------------------------------------------------------
@@ -121,6 +121,6 @@ protected:
 
 	FELoadCurve	m_rf;	// reaction force data
 
-	vector<FELoadCurve*>	m_LC;
-	vector<OPT_VARIABLE>	m_Var;
+	std::vector<FELoadCurve*>	m_LC;
+	std::vector<OPT_VARIABLE>	m_Var;
 };

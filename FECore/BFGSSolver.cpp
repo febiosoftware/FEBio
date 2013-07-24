@@ -26,7 +26,7 @@ BFGSSolver::BFGSSolver()
 
 //-----------------------------------------------------------------------------
 // Initialization method
-void BFGSSolver::Init(int neq, FENLSolver* pNLS, NumCore::LinearSolver* pls)
+void BFGSSolver::Init(int neq, FENLSolver* pNLS, LinearSolver* pls)
 {
 	// allocate storage for BFGS update vectors
 	m_V.resize(m_maxups, neq);

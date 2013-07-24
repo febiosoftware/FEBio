@@ -1,9 +1,7 @@
 #pragma once
-#include "LinearSolver.h"
+#include <FECore\LinearSolver.h>
 #include "CompactMatrix.h"
 #include <vector>
-
-namespace NumCore {
 
 //-----------------------------------------------------------------------------
 //! this class implements an iterative conjugate gradient solver 
@@ -35,5 +33,3 @@ public:
 
 	std::vector<double>	m_P;	//!< preconditioning vector
 };
-
-} // namespace NumCore

@@ -9,8 +9,8 @@
 #include <FEBioLib/FECoupledHeatSolidSolver.h>
 #include <FEBioLib/FEUDGHexDomain.h>
 #include <FEBioLib/FEUT4Domain.h>
-#include <FEBioLib/SuperLUSolver.h>
 #include <FEBioHeat/FEHeatSolver.h>
+#include <NumCore/SuperLUSolver.h>
 
 //-----------------------------------------------------------------------------
 FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)

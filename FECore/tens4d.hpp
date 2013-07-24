@@ -1,7 +1,7 @@
 // NOTE: This file is automatically included from tens4d.h
 // Users should not include this file manually!
 
-#include <NumCore/matrix.h>
+#include "matrix.h"
 
 // operator +
 inline tens4ds tens4ds::operator + (const tens4ds& t) const

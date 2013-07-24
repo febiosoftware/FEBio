@@ -7,12 +7,12 @@
 #include "NumCore/SkylineSolver.h"
 #include "NumCore/LUSolver.h"
 #include "NumCore/ConjGradIterSolver.h"
-#include "PSLDLTSolver.h"
-#include "SuperLUSolver.h"
-#include "SuperLU_MT_Solver.h"
-#include "PardisoSolver.h"
-#include "WSMPSolver.h"
-#include "RCICGSolver.h"
+#include "NumCore/PSLDLTSolver.h"
+#include "NumCore/SuperLUSolver.h"
+#include "NumCore/SuperLU_MT_Solver.h"
+#include "NumCore/PardisoSolver.h"
+#include "NumCore/WSMPSolver.h"
+#include "NumCore/RCICGSolver.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

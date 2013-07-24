@@ -1,9 +1,5 @@
 #pragma once
-#include "SparseMatrix.h"
-
-//-----------------------------------------------------------------------------
-//! The NumCore library implements a selection of numerical algorithms useful for FE analysis.
-namespace NumCore {
+#include <FECore\SparseMatrix.h>
 
 //=============================================================================
 //! This class stores a sparse matrix in Harwell-Boeing format.
@@ -281,5 +277,3 @@ void write_hb(CompactMatrix& m, FILE* fp);
 //-----------------------------------------------------------------------------
 //! read Symmetric compact matrix data
 void read_hb(CompactSymmMatrix& m, FILE* fp);
-
-} // namespace NumCore

@@ -2,7 +2,6 @@
 #include "BFGSSolver.h"
 #include "FEParameterList.h"
 #include "DumpFile.h"
-using namespace NumCore;
 
 //-----------------------------------------------------------------------------
 class FEModel;

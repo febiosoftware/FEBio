@@ -1,7 +1,7 @@
 #pragma once
 
-#include <NumCore\SparseMatrix.h>
-#include <FECore\FENLSolver.h>
+#include "SparseMatrix.h"
+#include "FENLSolver.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ protected:
 
 public:
 	//! constructor
-	FEGlobalMatrix(NumCore::SparseMatrix* pK);
+	FEGlobalMatrix(SparseMatrix* pK);
 
 	//! destructor
 	virtual ~FEGlobalMatrix();
@@ -48,13 +48,13 @@ public:
 	int Rows() { return m_pA->Size(); }
 
 	//! converts a FEStiffnessMatrix to a SparseMatrix
-	operator NumCore::SparseMatrix* () { return m_pA; }
+	operator SparseMatrix* () { return m_pA; }
 
 	//! converts a FEStiffnessMatrix to a SparseMatrix
-	operator NumCore::SparseMatrix& () { return *m_pA;}
+	operator SparseMatrix& () { return *m_pA;}
 
 	//! return a pointer to the sparse matrix
-	NumCore::SparseMatrix* GetSparseMatrixPtr() { return m_pA; }
+	SparseMatrix* GetSparseMatrixPtr() { return m_pA; }
 
 	//! zero the sparse matrix
 	void Zero() { m_pA->zero(); }
@@ -66,11 +66,11 @@ protected:
 	void build_flush();
 
 protected:
-	NumCore::SparseMatrix*	m_pA;	//!< the actual global stiffness matrix
+	SparseMatrix*	m_pA;	//!< the actual global stiffness matrix
 
 	// The following data structures are used to incrementally
 	// build the profile of the sparse matrix
-	NumCore::SparseMatrixProfile*	m_pMP;		//!< profile of sparse matrix
+	SparseMatrixProfile*	m_pMP;		//!< profile of sparse matrix
 	vector< vector<int> >			m_LM;		//!< used for building the stiffness matrix
 	int	m_nlm;									//!< nr of elements in m_LM array
 };
