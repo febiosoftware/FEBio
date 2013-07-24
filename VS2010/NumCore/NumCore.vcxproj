@@ -263,7 +263,6 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\NumCore\BFGSSolver.cpp" />
     <ClCompile Include="..\..\NumCore\colsol.cpp" />
     <ClCompile Include="..\..\NumCore\CompactMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp" />
@@ -272,7 +271,6 @@
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
     <ClCompile Include="..\..\NumCore\matrix.cpp" />
     <ClCompile Include="..\..\NumCore\MatrixProfile.cpp" />
-    <ClCompile Include="..\..\NumCore\NonLinearSystem.cpp" />
     <ClCompile Include="..\..\NumCore\qsort.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\SkylineSolver.cpp" />
@@ -281,7 +279,6 @@
     <ClCompile Include="..\..\NumCore\vector.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\NumCore\BFGSSolver.h" />
     <ClInclude Include="..\..\NumCore\CompactMatrix.h" />
     <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
@@ -289,7 +286,6 @@
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
     <ClInclude Include="..\..\NumCore\matrix.h" />
     <ClInclude Include="..\..\NumCore\MatrixProfile.h" />
-    <ClInclude Include="..\..\NumCore\NonLinearSystem.h" />
     <ClInclude Include="..\..\NumCore\SkylineMatrix.h" />
     <ClInclude Include="..\..\NumCore\SkylineSolver.h" />
     <ClInclude Include="..\..\NumCore\SparseMatrix.h" />

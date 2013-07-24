@@ -1,6 +1,5 @@
 #pragma once
-#include "NumCore/NonLinearSystem.h"
-#include "NumCore/BFGSSolver.h"
+#include "BFGSSolver.h"
 #include "FEParameterList.h"
 #include "DumpFile.h"
 using namespace NumCore;
@@ -9,19 +8,19 @@ using namespace NumCore;
 class FEModel;
 
 //-----------------------------------------------------------------------------
-class FENLSolver : public NonLinearSystem, public FEParamContainer
+class FENLSolver : public FEParamContainer
 {
 public:
-	FENLSolver(FEModel& fem) : m_fem(fem)
-	{ 
-		m_bsymm = true; // assume symmetric stiffness matrix
-		m_solvertype = 0;
-	}
+	//! constructor
+	FENLSolver(FEModel& fem);
 
-	virtual ~FENLSolver() {}
+	//! destructor
+	virtual ~FENLSolver();
 
-	FEModel& GetFEModel() { return m_fem; }
+	//! Get the FE model
+	FEModel& GetFEModel();
 
+public:
 	virtual bool Init() = 0;
 
 	virtual void Clean() = 0;
@@ -45,12 +44,12 @@ public:
 	//! Solve an analysis step
 	virtual bool SolveStep(double time) = 0;
 
-private:
-	// TODO: I'm overriding these functions, but they are not used yet
+public:
+	//! Evaluate the state of the current system
 	virtual void Evaluate(std::vector<double>& F) { assert(false); };
-	virtual void Jacobian(SparseMatrix& K) { assert(false); };
+
+	//! Update the state of the sytem
 	virtual void Update(std::vector<double>& u) { assert(false); };
-	virtual bool Converged() { assert(false); return false; };
 
 protected:
 	FEModel&	m_fem;
@@ -58,8 +57,8 @@ protected:
 public: // TODO: temporary data that I would like to move elsewhere
 
 	// BFGS parameters
-	BFGSSolver	m_bfgs;		//!< BFGS solver parameters
-	bool		m_bsymm;	//!< symmetry flag for linear solver allocation
+	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
+	bool		m_bsymm;		//!< symmetry flag for linear solver allocation
 	int			m_solvertype;	//!< defines the type of solver; 0=BFGs, 1-Hager-Zhang NLCG
 
 	// counters

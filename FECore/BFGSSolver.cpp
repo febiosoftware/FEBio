@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "BFGSSolver.h"
+#include "FENLSolver.h"
 
 //-----------------------------------------------------------------------------
 // BFGSSolver
 //-----------------------------------------------------------------------------
 
-NumCore::BFGSSolver::BFGSSolver()
+BFGSSolver::BFGSSolver()
 {
 	m_maxups = 10;
 	m_maxref = 15;
@@ -24,8 +25,8 @@ NumCore::BFGSSolver::BFGSSolver()
 }
 
 //-----------------------------------------------------------------------------
-// New initialization method
-void NumCore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls)
+// Initialization method
+void BFGSSolver::Init(int neq, FENLSolver* pNLS, NumCore::LinearSolver* pls)
 {
 	// allocate storage for BFGS update vectors
 	m_V.resize(m_maxups, neq);
@@ -58,7 +59,7 @@ void NumCore::BFGSSolver::Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls
 //! be an indication of an ill-conditioned matrix and the update should
 //! not be performed.
 
-bool NumCore::BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
+bool BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1)
 {
 	int i;
 	double dg, dh,dgi, c, r;
@@ -113,7 +114,7 @@ bool NumCore::BFGSSolver::Update(double s, vector<double>& ui, vector<double>& R
 // The variable m_nups keeps track of how many updates have been made so far.
 // 
 
-void NumCore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
+void BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 {
 	int i, j;
 	double *vi, *wi, vr, wr;
@@ -154,52 +155,6 @@ void NumCore::BFGSSolver::SolveEquations(vector<double>& x, vector<double>& b)
 }
 
 //-----------------------------------------------------------------------------
-// New Solve routine
-void NumCore::BFGSSolver::Solve()
-{
-	// create the initial jacobian matrix
-	SparseMatrix* pK = m_plinsolve->CreateSparseMatrix(SPARSE_SYMMETRIC);
-	m_pNLS->Jacobian(*pK);
-	m_plinsolve->PreProcess();
-	m_plinsolve->Factor();
-
-	// create the initial RHS vector
-	m_pNLS->Evaluate(m_R0);
-	for (int i=0; i<m_neq; ++i) m_R0[i] *= -1;
-
-	// repeat until converged
-	do
-	{
-		// solve the equations
-		SolveEquations(m_ui, m_R0);
-
-		// update solution
-		if (m_LStol > 0) LineSearch(1.0);
-		else m_pNLS->Update(m_ui);
-
-		// check for convergence
-		bool bconv = true;
-		for (int i=0; i<m_neq; ++i) 
-			if (fabs(m_ui[i]) > 1e-3)
-			{
-				bconv = false;
-				break;
-			}
-
-		if (bconv == false)
-		{
-			m_pNLS->Evaluate(m_R1);
-			for (int i=0; i<m_neq; ++i) m_R1[i] *= -1;
-
-			Update(1.0, m_ui, m_R0, m_R1);
-			m_R0 = m_R1;
-		}
-		else break;
-	}
-	while (true);
-}
-
-//-----------------------------------------------------------------------------
 //! Performs a linesearch on a NR iteration
 //! The description of this method can be found in:
 //!    "Nonlinear Continuum Mechanics for Finite Element Analysis", 	Bonet & Wood.
@@ -208,7 +163,7 @@ void NumCore::BFGSSolver::Solve()
 //! For instance, define a di so that ui = s*di. Also, define the 
 //! position of the nodes at the previous iteration.
 
-double NumCore::BFGSSolver::LineSearch(double s)
+double BFGSSolver::LineSearch(double s)
 {
 	double smin = s;
 
@@ -337,7 +292,7 @@ double NumCore::BFGSSolver::LineSearch(double s)
 }
 
 
-double NumCore::BFGSSolver::LineSearchCG(double s)
+double BFGSSolver::LineSearchCG(double s)
 {
 	//  s is now passed from the solver routine instead of defaulting to 1.0
 	double smin = s;

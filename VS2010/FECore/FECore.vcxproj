@@ -671,6 +671,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\FECore\Archive.h" />
     <ClInclude Include="..\..\FECore\BC.h" />
+    <ClInclude Include="..\..\FECore\BFGSSolver.h" />
     <ClInclude Include="..\..\FECore\DumpFile.h" />
     <ClInclude Include="..\..\FECore\FEAnalysis.h" />
     <ClInclude Include="..\..\FECore\febio.h" />
@@ -689,6 +690,7 @@
     <ClInclude Include="..\..\FECore\FEElementLibrary.h" />
     <ClInclude Include="..\..\FECore\FEElementTraits.h" />
     <ClInclude Include="..\..\FECore\FEException.h" />
+    <ClInclude Include="..\..\FECore\FEGlobalMatrix.h" />
     <ClInclude Include="..\..\FECore\FEGlobalVector.h" />
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
@@ -736,6 +738,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FECore\Archive.cpp" />
+    <ClCompile Include="..\..\FECore\BFGSSolver.cpp" />
     <ClCompile Include="..\..\FECore\DumpFile.cpp" />
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
@@ -752,6 +755,7 @@
     <ClCompile Include="..\..\FECore\FEElementLibrary.cpp" />
     <ClCompile Include="..\..\FECore\FEElementTraits.cpp" />
     <ClCompile Include="..\..\FECore\FEException.cpp" />
+    <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp" />
     <ClCompile Include="..\..\FECore\FEGlobalVector.cpp" />
     <ClCompile Include="..\..\FECore\FELevelStructure.cpp" />
     <ClCompile Include="..\..\FECore\FELinearConstraint.cpp" />
@@ -759,6 +763,7 @@
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEModel.cpp" />
+    <ClCompile Include="..\..\FECore\FENLSolver.cpp" />
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeNodeList.cpp" />

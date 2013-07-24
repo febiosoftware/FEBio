@@ -1,11 +1,11 @@
 #pragma once
 
-#include "matrix.h"
-#include "vector.h"
-#include "LinearSolver.h"
-#include "NonLinearSystem.h"
+#include <NumCore\matrix.h>
+#include <NumCore\vector.h>
+#include <NumCore\LinearSolver.h>
 
-namespace NumCore {
+//-----------------------------------------------------------------------------
+class FENLSolver;
 
 //-----------------------------------------------------------------------------
 //! The BFGSSolver solves a nonlinear system of equations using the BFGS method.
@@ -18,16 +18,13 @@ public:
 	BFGSSolver();
 
 	//! New initialization method
-	void Init(int neq, NonLinearSystem* pNLS, LinearSolver* pls);
+	void Init(int neq, FENLSolver* pNLS, NumCore::LinearSolver* pls);
 
 	//! perform a BFGS udpate
 	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);
 
 	//! solve the equations
 	void SolveEquations(vector<double>& x, vector<double>& b);
-
-	//! Solve the system
-	void Solve();
 
 	//! Performs a linesearch
 	double LineSearch(double s);
@@ -47,11 +44,11 @@ public:
 
 public:
 	// keep a pointer to the linear solver
-	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
+	NumCore::LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 
 	// the non-linear system to solve
-	NonLinearSystem*	m_pNLS;		//!< pointer to nonlinear system to solve
-	int					m_neq;		//!< number of equations
+	FENLSolver*		m_pNLS;		//!< pointer to nonlinear system to solve
+	int				m_neq;		//!< number of equations
 
 	// counters
 	int		m_nups;			//!< nr of stiffness updates
@@ -67,5 +64,3 @@ public:
 	matrix			m_W;		//!< BFGS update vector
 	vector<double>	m_D, m_G, m_H;	//!< temp vectors for calculating BFGS update vectors
 };
-
-} // namespace NumCore
