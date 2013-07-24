@@ -567,7 +567,7 @@ void FEUT4Domain::ElementInternalForces(FESolidElement& el, vector<double>& fe)
 //-----------------------------------------------------------------------------
 //! Calculates the stiffness matrix. The stiffness matrix is a sum of the
 //! nodal and element stiffness matrices
-void FEUT4Domain::StiffnessMatrix(FENLSolver *psolver)
+void FEUT4Domain::StiffnessMatrix(FESolver *psolver)
 {
 	// calculate nodal stiffness matrix
 	NodalStiffnessMatrix(psolver);
@@ -578,7 +578,7 @@ void FEUT4Domain::StiffnessMatrix(FENLSolver *psolver)
 
 //-----------------------------------------------------------------------------
 //! Calculates the nodal contribution to the global stiffness matrix
-void FEUT4Domain::NodalStiffnessMatrix(FENLSolver *psolver)
+void FEUT4Domain::NodalStiffnessMatrix(FESolver *psolver)
 {
 	vector<int> elm;
 	vector<int> LM;
@@ -916,7 +916,7 @@ void FEUT4Domain::NodalMaterialStiffness(UT4NODE& node, matrix& ke, FESolidMater
 
 //-----------------------------------------------------------------------------
 //! Calculates the element contribution to the global stiffness matrix
-void FEUT4Domain::ElementalStiffnessMatrix(FENLSolver *psolver)
+void FEUT4Domain::ElementalStiffnessMatrix(FESolver *psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 

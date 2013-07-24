@@ -16,10 +16,10 @@ public:
 public:
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	//! calculates the residual (nothing to do)
-	void InternalForces(FENLSolver* psolver, vector<double>& R);
+	void InternalForces(FESolver* psolver, vector<double>& R);
 
 	// update stresses (nothing to do)
 	void UpdateStresses(FEModel& fem);

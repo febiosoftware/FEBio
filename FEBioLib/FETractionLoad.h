@@ -33,7 +33,7 @@ public:
 	LOAD& TractionLoad(int n) { return m_TC[n]; }
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(FENLSolver* psolver) {}
+	void StiffnessMatrix(FESolver* psolver) {}
 
 	//! calculate residual
 	void Residual(FEGlobalVector& R);

@@ -42,7 +42,7 @@ void FERigidJoint::ShallowCopy(FERigidJoint& rj)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Why is this class not using the FENLSolver for assembly?
+//! \todo Why is this class not using the FESolver for assembly?
 void FERigidJoint::Residual(FEGlobalVector& R)
 {
 	vector<double> fa(6);
@@ -88,8 +88,8 @@ void FERigidJoint::Residual(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Why is this class not using the FENLSolver for assembly?
-void FERigidJoint::StiffnessMatrix(FENLSolver* psolver)
+//! \todo Why is this class not using the FESolver for assembly?
+void FERigidJoint::StiffnessMatrix(FESolver* psolver)
 {
 	int j, k;
 

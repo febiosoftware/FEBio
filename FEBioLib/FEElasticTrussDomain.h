@@ -43,13 +43,13 @@ public: // overloads from FEElasticDomain
 	void InertialForces(FEGlobalVector& R, vector<double>& F) { assert(false); }
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	//! intertial stiffness matrix \todo implement this
-	void InertialStiffness(FENLSolver* psolver) { assert(false); }
+	void InertialStiffness(FESolver* psolver) { assert(false); }
 
 	//! body force stiffness matrix \todo implement this
-	void BodyForceStiffness(FENLSolver* psolver, FEBodyForce& bf) { assert(false); }
+	void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) { assert(false); }
 
 protected:
 	//! calculates the truss element stiffness matrix

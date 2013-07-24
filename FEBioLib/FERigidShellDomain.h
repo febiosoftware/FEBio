@@ -15,7 +15,7 @@ public:
 
 public:
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	//! calculates the internal forces (nothing to do)
 	void InternalForces(FEGlobalVector& R);

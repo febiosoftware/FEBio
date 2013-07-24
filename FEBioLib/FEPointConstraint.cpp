@@ -83,7 +83,7 @@ void FEPointConstraint::Residual(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::StiffnessMatrix(FENLSolver* psolver)
+void FEPointConstraint::StiffnessMatrix(FESolver* psolver)
 {
 	int i, j;
 	FEMesh& m = m_pfem->GetMesh();

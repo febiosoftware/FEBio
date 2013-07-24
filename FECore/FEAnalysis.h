@@ -6,7 +6,7 @@
 
 //-----------------------------------------------------------------------------
 class FEModel;
-class FENLSolver;
+class FESolver;
 class FEDomain;
 
 namespace FECore {
@@ -108,7 +108,7 @@ public:
 	// --- Quasi-Newton Solver Variables ---
 	//{
 		// the FE solver
-		FENLSolver*	m_psolver;
+		FESolver*	m_psolver;
 
 		int		m_nretries;		//!< nr of retries tried so far
 		int		m_maxretries;	//!< max nr of retries allowed per time step

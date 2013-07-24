@@ -38,7 +38,7 @@ public:
 	void Residual(FEGlobalVector& R);
 
 	//! calculates the joint stiffness
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	//! calculate Lagrangian augmentation
 	bool Augment(int naug);

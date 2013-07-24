@@ -23,7 +23,7 @@ public:
 	void Residual(FEGlobalVector& R);
 
 	//! calculate the constraint stiffness
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	//! augmentations \todo implement this
 	bool Augment(int naug) { return true; }

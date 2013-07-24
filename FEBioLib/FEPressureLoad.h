@@ -36,7 +36,7 @@ public:
 	LOAD& PressureLoad(int n) { return m_PC[n]; }
 
 	//! calculate pressure stiffness
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	//! calculate residual
 	void Residual(FEGlobalVector& R);

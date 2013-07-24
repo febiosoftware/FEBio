@@ -218,7 +218,7 @@ void FESoluteFlux::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FESoluteFlux::StiffnessMatrix(FENLSolver* psolver)
+void FESoluteFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;

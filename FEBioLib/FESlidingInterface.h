@@ -88,7 +88,7 @@ public:
 	virtual void ContactForces(FEGlobalVector& R);
 
 	//! calculate contact stiffness
-	virtual void ContactStiffness(FENLSolver* psolver);
+	virtual void ContactStiffness(FESolver* psolver);
 
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug);

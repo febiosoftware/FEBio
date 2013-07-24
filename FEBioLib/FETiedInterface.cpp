@@ -253,7 +253,7 @@ void FETiedInterface::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness matrix contribution.
-void FETiedInterface::ContactStiffness(FENLSolver* psolver)
+void FETiedInterface::ContactStiffness(FESolver* psolver)
 {
 	vector<int> sLM, mLM, lm, en;
 	const int MN = FEElement::MAX_NODES;

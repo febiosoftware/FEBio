@@ -1,6 +1,7 @@
 #pragma once
 
-#include "FESolver.h"
+#include <FECore\FESolver.h>
+#include "FEStiffnessMatrix.h"
 #include <FECore/FETypes.h>
 
 //-----------------------------------------------------------------------------
@@ -14,7 +15,10 @@ public:
 	FESolidSolver(FEModel& fem);
 
 	//! destructor
-	virtual ~FESolidSolver(){}
+	virtual ~FESolidSolver();
+
+	//! Clean up
+	virtual void Clean();
 
 	//! serialize data to/from dump file
 	void Serialize(DumpFile& ar);
@@ -35,8 +39,11 @@ public:
 	//! adjust the residual matrix for prescribed displacements
 	void AssembleStiffness(vector<int>& en, vector<int>& elm, matrix& ke);
 
+	//! assemble global stiffness matrix \todo this is only used by rigid joints
+	void AssembleStiffness(vector<int>& elm, matrix& ke);
+
 public:
-	//{ --- NonLinearSystem overrides ---
+	//{ --- evaluation and update ---
 		//! Perform an update
 		void Update(vector<double>& ui);
 
@@ -69,6 +76,11 @@ public:
 	//}
 
 	//{ --- Stiffness matrix routines ---
+		//! return pointer to stiffness matrix
+		FEStiffnessMatrix* GetStiffnessMatrix() { return m_pK; }
+
+		//! recalculates the shape of the stiffness matrix
+		bool CreateStiffness(bool breset);
 
 		//! calculates the global stiffness matrix
 		virtual bool StiffnessMatrix(const FETimePoint& tp);
@@ -125,6 +137,12 @@ public:
 	bool	m_breshape;		//!< Matrix reshape flag
 
 public:
+	LinearSolver*		m_plinsolve;	//!< the linear solver
+
+	// global stiffness matrix
+	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
+	int					m_neq;		//!< number of equations
+
 	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
 
 	// declare the parameter list

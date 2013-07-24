@@ -366,7 +366,7 @@ void FERigidWallInterface::ContactForces(FEGlobalVector& R)
 //! interface.
 //! \todo I think there are a couple of stiffness terms missing in this formulation
 
-void FERigidWallInterface::ContactStiffness(FENLSolver* psolver)
+void FERigidWallInterface::ContactStiffness(FESolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, ndof;

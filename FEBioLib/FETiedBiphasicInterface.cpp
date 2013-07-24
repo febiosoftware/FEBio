@@ -262,7 +262,7 @@ void FETiedBiphasicInterface::Activate()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
+		FESolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 	
@@ -730,7 +730,7 @@ void FETiedBiphasicInterface::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::ContactStiffness(FENLSolver* psolver)
+void FETiedBiphasicInterface::ContactStiffness(FESolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;

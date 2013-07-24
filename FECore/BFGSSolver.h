@@ -4,8 +4,7 @@
 #include "vector.h"
 #include "LinearSolver.h"
 
-//-----------------------------------------------------------------------------
-class FENLSolver;
+class FESolver;
 
 //-----------------------------------------------------------------------------
 //! The BFGSSolver solves a nonlinear system of equations using the BFGS method.
@@ -18,7 +17,7 @@ public:
 	BFGSSolver();
 
 	//! New initialization method
-	void Init(int neq, FENLSolver* pNLS, LinearSolver* pls);
+	void Init(int neq, FESolver* pNLS, LinearSolver* pls);
 
 	//! perform a BFGS udpate
 	bool Update(double s, vector<double>& ui, vector<double>& R0, vector<double>& R1);
@@ -47,7 +46,7 @@ public:
 	LinearSolver*	m_plinsolve;	//!< pointer to linear solver
 
 	// the non-linear system to solve
-	FENLSolver*		m_pNLS;		//!< pointer to nonlinear system to solve
+	FESolver*		m_pNLS;		//!< pointer to nonlinear system to solve
 	int				m_neq;		//!< number of equations
 
 	// counters

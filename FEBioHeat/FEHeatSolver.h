@@ -1,7 +1,10 @@
 #pragma once
 
-#include <FEBioLib/FESolver.h>
+#include <FECore\FESolver.h>
+#include <FECore\LinearSolver.h>
 #include "FEHeatSolidDomain.h"
+
+class FEStiffnessMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FEHeatSolver solves heat-conduction problems
@@ -13,8 +16,14 @@ public:
 	//! constructor
 	FEHeatSolver(FEModel& fem);
 
+	//! destructor
+	~FEHeatSolver();
+
 	//! one-time initialization
 	bool Init();
+
+	//! Clean up
+	virtual void Clean();
 
 	//! solve a timestep
 	bool SolveStep(double time);
@@ -28,6 +37,9 @@ public:
 protected:
 	//! calculate the residual
 	void Residual();
+
+	//! recalculates the shape of the stiffness matrix
+	bool CreateStiffness(bool breset);
 
 	//! calculate the stiffness matrix
 	bool StiffnessMatrix(); 
@@ -69,6 +81,11 @@ public:
 
 protected:
 	bool	m_brhs;	//!< flag used to indicate if element stiffness must be assembled into RHS
+
+	LinearSolver*	m_plinsolve;
+
+	FEStiffnessMatrix*	m_pK;
+	int					m_neq;		//!< number of equations
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

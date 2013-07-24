@@ -67,7 +67,7 @@ void FEElasticTrussDomain::InitElements()
 
 //-----------------------------------------------------------------------------
 
-void FEElasticTrussDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEElasticTrussDomain::StiffnessMatrix(FESolver* psolver)
 {
 	matrix ke;
 	int NT = m_Elem.size();
@@ -142,7 +142,7 @@ void FEElasticTrussDomain::ElementStiffness(int iel, matrix& ke)
 
 //----------------------------------------------------------------------------
 /*
-void FEElasticTrussDomain::Residual(FENLSolver* psolver, vector<double>& R)
+void FEElasticTrussDomain::Residual(FESolver* psolver, vector<double>& R)
 {
 	// element force vector
 	vector<double> fe;

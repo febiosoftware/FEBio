@@ -23,13 +23,13 @@ public:
 	void InitElements();
 	
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver, bool bsymm, const FETimePoint& tp);
+	void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp);
 
 	//! calculates the global stiffness matrix for this domain (steady-state case)
-	void StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, const FETimePoint& tp);
+	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
 	
 	//! calculates the residual
-//	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FESolver* psolver, vector<double>& R);
 
 	//! initialize class
 	bool Initialize(FEModel& fem);
@@ -42,16 +42,16 @@ public:
 
 public:
 	//! internal fluid work
-	void InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
 
 	//! internal fluid work (steady-state analysis)
-	void InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
 
 	//! internal solute work
-	void InternalSoluteWork(FENLSolver* psolver, vector<double>& R, double dt);
+	void InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt);
 
 	//! internal solute work (steady-state analysis)
-	void InternalSoluteWorkSS(FENLSolver* psolver, vector<double>& R, double dt);
+	void InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt);
 
 protected:
 	//! Calculates the internal fluid forces

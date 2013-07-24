@@ -1,5 +1,5 @@
 #pragma once
-#include "FENLSolver.h"
+#include "FESolver.h"
 #include "DumpFile.h"
 #include "FEParameterList.h"
 #include "FEGlobalVector.h"
@@ -26,7 +26,7 @@ public:
 public:
 	virtual void Init() = 0;
 	virtual void Residual(FEGlobalVector& R) = 0;
-	virtual void StiffnessMatrix(FENLSolver* psolver) = 0;
+	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 	virtual bool Augment(int naug) = 0;
 	virtual void Serialize(DumpFile& ar) = 0;
 

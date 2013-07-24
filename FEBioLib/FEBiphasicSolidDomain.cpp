@@ -78,7 +78,7 @@ void FEBiphasicSolidDomain::Reset()
 
 /*
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::Residual(FENLSolver* psolver, vector<double>& R)
+void FEBiphasicSolidDomain::Residual(FESolver* psolver, vector<double>& R)
 {
 	int i, j;
 	
@@ -167,7 +167,7 @@ void FEBiphasicSolidDomain::Residual(FENLSolver* psolver, vector<double>& R)
 */
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSolidDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -211,7 +211,7 @@ void FEBiphasicSolidDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<doub
 
 //-----------------------------------------------------------------------------
 // Calculate the work due to the internal fluid pressure
-void FEBiphasicSolidDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt)
+void FEBiphasicSolidDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -430,7 +430,7 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWorkSS(FESolidElement& el, vecto
 
 //-----------------------------------------------------------------------------
 /*
-void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
@@ -524,7 +524,7 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 */
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt)
+void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, double dt)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -566,7 +566,7 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, dou
 }
 
 //-----------------------------------------------------------------------------
-void FEBiphasicSolidDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt)
+void FEBiphasicSolidDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt)
 {
 	// element stiffness matrix
 	matrix ke;

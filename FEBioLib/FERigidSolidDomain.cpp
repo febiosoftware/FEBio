@@ -12,14 +12,14 @@ FEDomain* FERigidSolidDomain::Clone()
 //-----------------------------------------------------------------------------
 //! Calculates the stiffness matrix for 3D rigid elements.
 //! Rigid elements don't generate stress, so there is nothing to do here
-void FERigidSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+void FERigidSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	// Caught you looking!
 }
 
 //-----------------------------------------------------------------------------
 // Rigid bodies do not generate stress so there is nothing to do here
-void FERigidSolidDomain::InternalForces(FENLSolver* psolver, vector<double>& R)
+void FERigidSolidDomain::InternalForces(FESolver* psolver, vector<double>& R)
 {
 	// what you looking at ?!
 }

@@ -37,21 +37,21 @@ public: // overrides from FEElasticDomain
 	void UpdateElementStress(int iel);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrix(FESolver* psolver, bool bsymm, double dt);
 
 	//! calculates the global stiffness matrix (steady-state case)
-	void StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt);
 	
 	//! calculates the residual
-//	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FESolver* psolver, vector<double>& R);
 
 public: // TODO: The following functions are to replace Residual
 
 	//! internal fluid work
-	void InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
 
 	//! internal fluid work (steady state analysis)
-	void InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt);
+	void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
 
 public:
 	

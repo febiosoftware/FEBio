@@ -351,7 +351,7 @@ void FEFacet2FacetTied::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! Calculate the stiffness matrix contribution.
-void FEFacet2FacetTied::ContactStiffness(FENLSolver* psolver)
+void FEFacet2FacetTied::ContactStiffness(FESolver* psolver)
 {
 	vector<int> sLM, mLM, LM, en;
 	matrix ke;

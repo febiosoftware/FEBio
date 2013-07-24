@@ -408,7 +408,7 @@ void FESurfaceConstraint::ContactForces(FEGlobalVector& R)
 
 
 //-----------------------------------------------------------------------------
-void FESurfaceConstraint::ContactStiffness(FENLSolver* psolver)
+void FESurfaceConstraint::ContactStiffness(FESolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEFluidFlux.h"
-#include "FECore/FENLSolver.h"
+#include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
@@ -450,7 +450,7 @@ void FEFluidFlux::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEFluidFlux::StiffnessMatrix(FENLSolver* psolver)
+void FEFluidFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 	double dt = fem.GetCurrentStep()->m_dt;

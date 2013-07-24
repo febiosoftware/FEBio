@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FENLSolver.h"
+#include "FECore/FESolver.h"
 #include "FECore/FEModel.h"
 #include "FECore/FEBodyForce.h"
 #include <vector>
@@ -24,7 +24,7 @@ public:
 	// --- R E S I D U A L ---
 
 	// calculate total residual (TODO: remove this)
-//	virtual void Residual(FENLSolver* psolver, vector<double>& R) = 0;
+//	virtual void Residual(FESolver* psolver, vector<double>& R) = 0;
 
 	//! calculate the internal forces
 	virtual void InternalForces(FEGlobalVector& R) = 0;
@@ -39,11 +39,11 @@ public:
 
 	//! Calculate global stiffness matrix (only contribution from internal force derivative)
 	//! \todo maybe I should rename this the InternalStiffness matrix?
-	virtual void StiffnessMatrix   (FENLSolver* psolver) = 0;
+	virtual void StiffnessMatrix   (FESolver* psolver) = 0;
 
 	//! Calculate stiffness contribution of body forces
-	virtual void BodyForceStiffness(FENLSolver* psolver, FEBodyForce& bf) = 0;
+	virtual void BodyForceStiffness(FESolver* psolver, FEBodyForce& bf) = 0;
 
 	//! calculate the inertial stiffness matrix (for dynamic problems)
-	virtual void InertialStiffness (FENLSolver* psolver) = 0;
+	virtual void InertialStiffness (FESolver* psolver) = 0;
 };

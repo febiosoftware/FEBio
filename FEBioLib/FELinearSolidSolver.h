@@ -1,5 +1,7 @@
 #pragma once
-#include "FESolver.h"
+#include <FECore\FESolver.h>
+
+class FEStiffnessMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FELinearSolidSolver class solves linear (quasi-static) elasticity 
@@ -11,8 +13,11 @@ public:
 	//! constructor
 	FELinearSolidSolver(FEModel& fem);
 
-	//! destructor (does nothing)
-	~FELinearSolidSolver(){}
+	//! destructor
+	~FELinearSolidSolver();
+
+	//! Clean up
+	virtual void Clean();
 
 	//! Initialization
 	bool Init();
@@ -29,6 +34,9 @@ public:
 protected:
 	//! calculate the residual
 	void Residual();
+
+	//! recalculates the shape of the stiffness matrix
+	bool CreateStiffness(bool breset);
 
 	//! calculate the stiffness matrix
 	bool StiffnessMatrix(); 
@@ -56,6 +64,13 @@ protected:
 	vector<double>	m_u;	//!< nodal displacements
 	vector<double>	m_R;	//!< right hand side
 	vector<double>	m_d;	//!< prescribed displacements
+
+public:
+	LinearSolver*		m_plinsolve;	//!< the linear solver
+
+	// global stiffness matrix
+	FEStiffnessMatrix*	m_pK;		//!< global stiffness matrix
+	int					m_neq;		//!< number of equations
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

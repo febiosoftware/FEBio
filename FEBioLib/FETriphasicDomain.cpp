@@ -112,7 +112,7 @@ void FETriphasicDomain::InitElements()
 
 /*
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
+void FETriphasicDomain::Residual(FESolver* psolver, vector<double>& R)
 {
 	int i, j;
 	
@@ -255,7 +255,7 @@ void FETriphasicDomain::Residual(FENLSolver* psolver, vector<double>& R)
 */
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<double>& R, double dt, const int ion)
+void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt, const int ion)
 {
 	// element force vector
 	vector<double> fe;
@@ -291,7 +291,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<double>
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>& R, double dt, const int ion)
+void FETriphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt, const int ion)
 {
 	// element force vector
 	vector<double> fe;
@@ -327,7 +327,7 @@ void FETriphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>& 
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
+void FETriphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -360,7 +360,7 @@ void FETriphasicDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>&
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt)
+void FETriphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -839,7 +839,7 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 
 //-----------------------------------------------------------------------------
 /*
-void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
+void FETriphasicDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 	
@@ -940,7 +940,7 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver)
 */
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt)
+void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, double dt)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -988,7 +988,7 @@ void FETriphasicDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double 
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt)
+void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt)
 {
 	// element stiffness matrix
 	matrix ke;

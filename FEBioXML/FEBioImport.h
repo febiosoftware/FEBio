@@ -3,7 +3,7 @@
 #include "FileImport.h"
 #include "XMLReader.h"
 #include "FEBioLib/FEAnalysisStep.h"
-#include "FEBioLib/FESolver.h"
+#include "FECore/FESolver.h"
 #include <map>
 #include <string>
 using namespace std;

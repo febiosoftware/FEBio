@@ -2,7 +2,7 @@
 #include "FEBoundaryCondition.h"
 #include "FESurface.h"
 #include "DumpFile.h"
-#include "FENLSolver.h"
+#include "FESolver.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
@@ -17,7 +17,7 @@ public:
 	FESurface& Surface() { return *m_psurf; }
 
 	//! calculate stiffness matrix
-	virtual void StiffnessMatrix(FENLSolver* psolver) = 0;
+	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 
 	//! calculate residual
 	virtual void Residual(FEGlobalVector& R) = 0;

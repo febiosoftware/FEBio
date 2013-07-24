@@ -162,9 +162,6 @@
     <ClInclude Include="..\..\FECore\FENodeReorder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\FENLSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -229,6 +226,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FECore\vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FECore\FESolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -377,9 +377,6 @@
     <ClCompile Include="..\..\FECore\FEGlobalMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FECore\FENLSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\FECore\BFGSSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -402,6 +399,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FECore\vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FECore\FESolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

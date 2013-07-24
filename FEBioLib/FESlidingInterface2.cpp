@@ -264,7 +264,7 @@ bool FESlidingInterface2::Init()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FENLSolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
+		FESolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 
@@ -891,7 +891,7 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ContactStiffness(FENLSolver* psolver)
+void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 {
 	int i, j, k, l;
 	vector<int> sLM, mLM, LM, en;

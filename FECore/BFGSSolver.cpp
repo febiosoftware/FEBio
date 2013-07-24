@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "BFGSSolver.h"
-#include "FENLSolver.h"
+#include "FESolver.h"
 
 //-----------------------------------------------------------------------------
 // BFGSSolver
@@ -26,7 +26,7 @@ BFGSSolver::BFGSSolver()
 
 //-----------------------------------------------------------------------------
 // Initialization method
-void BFGSSolver::Init(int neq, FENLSolver* pNLS, LinearSolver* pls)
+void BFGSSolver::Init(int neq, FESolver* pNLS, LinearSolver* pls)
 {
 	// allocate storage for BFGS update vectors
 	m_V.resize(m_maxups, neq);

@@ -12,7 +12,7 @@
 #include "FEMesh.h"
 #include "DumpFile.h"
 #include "FEParameterList.h"
-#include "FECore/FENLSolver.h"
+#include "FESolver.h"
 
 class FEModel;
 
@@ -51,7 +51,7 @@ public:
 	virtual void ContactForces(FEGlobalVector& R) = 0;
 
 	//! calculate contact stiffness
-	virtual void ContactStiffness(FENLSolver* psolver) = 0;
+	virtual void ContactStiffness(FESolver* psolver) = 0;
 
 	//! calculate Lagrangian augmentations
 	virtual bool Augment(int naug) = 0;

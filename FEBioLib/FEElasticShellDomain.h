@@ -33,7 +33,7 @@ public:
 public: // overrides from FEElasticDomain
 
 	//! calculates the residual
-//	void Residual(FENLSolver* psolver, vector<double>& R);
+//	void Residual(FESolver* psolver, vector<double>& R);
 
 	//! internal stress forces
 	void InternalForces(FEGlobalVector& R);
@@ -48,13 +48,13 @@ public: // overrides from FEElasticDomain
 	void UpdateStresses(FEModel& fem);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	// inertial stiffness \todo implement this
-	void InertialStiffness   (FENLSolver* psolver) { assert(false); }
+	void InertialStiffness   (FESolver* psolver) { assert(false); }
 
 	// body force stiffness \todo implement this
-	void BodyForceStiffness  (FENLSolver* psolver, FEBodyForce& bf) { assert(false); }
+	void BodyForceStiffness  (FESolver* psolver, FEBodyForce& bf) { assert(false); }
 
 public:
 

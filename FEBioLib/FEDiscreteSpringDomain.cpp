@@ -101,7 +101,7 @@ void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 //-----------------------------------------------------------------------------
 //! Calculates the forces due to discrete elements (i.e. springs)
 /*
-void FEDiscreteSpringDomain::Residual(FENLSolver* psolver, vector<double>& R)
+void FEDiscreteSpringDomain::Residual(FESolver* psolver, vector<double>& R)
 {
 	FEMesh& mesh = *m_pMesh;
 
@@ -230,7 +230,7 @@ void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! Calculates the discrete element stiffness
 
-void FEDiscreteSpringDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEMesh& mesh = *m_pMesh;
 

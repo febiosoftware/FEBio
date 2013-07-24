@@ -7,7 +7,6 @@
 #include "FECore/FECore.h"
 #include "NumCore/CompactMatrix.h"
 #include "FEBioLib/FEAnalysisStep.h"
-#include "FEBioLib/FESolver.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_COMMAND(FEBioCmd_Cont   , "cont"   , "continues run");
@@ -143,36 +142,12 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 {
 	assert(m_pfem);
 	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
-	FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
 
 	if (nargs >= 2)
 	{
-		if (strcmp(argv[1], "nnz") == 0)
-		{
-			int nnz = psolver->m_pK->NonZeroes();
-			printf("Nonzeroes in stiffness matrix: %d\n", nnz);
-		}
-		else if (strcmp(argv[1], "time") == 0)
+		if (strcmp(argv[1], "time") == 0)
 		{
 			printf("Time : %lg\n", m_pfem->m_ftime);
-		}
-		else if (strcmp(argv[1], "K") == 0)
-		{
-			// print the stiffness matrix to file
-			if (nargs == 3)
-			{
-				CompactMatrix* pK = dynamic_cast<CompactMatrix*>(psolver->m_pK->GetSparseMatrixPtr());
-				if (pK)
-				{
-					printf("Writing sparse matrix to %s ...", argv[2]);
-					FILE* fp = fopen(argv[2], "wb");
-					write_hb(*pK, fp);
-					fclose(fp);
-					printf("done!\n");
-				}
-				else printf("Don't know how to write sparse matrix type\n");
-			}
-			else printf("Incorrect number of arguments for print command\n");
 		}
 		else
 		{

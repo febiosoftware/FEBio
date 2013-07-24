@@ -89,7 +89,7 @@ public:
 	void ContactForces(FEGlobalVector& R);
 	
 	//! calculate contact stiffness
-	void ContactStiffness(FENLSolver* psolver);
+	void ContactStiffness(FESolver* psolver);
 
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();

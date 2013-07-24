@@ -1,5 +1,5 @@
 #pragma once
-#include "FESolver.h"
+#include <FECore\FESolver.h>
 #include <FEBioHeat/FEHeatSolver.h>
 #include "FELinearSolidSolver.h"
 
@@ -17,6 +17,9 @@ public:
 
 	//! Initializiation
 	bool Init();
+
+	//! Clean
+	void Clean();
 
 	//! Solve a step
 	bool SolveStep(double time);

@@ -129,7 +129,7 @@ void FELinearSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 }
 
 //-----------------------------------------------------------------------------
-void FELinearSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+void FELinearSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	vector<int> elm;
 	for (int i=0; i<(int) m_Elem.size(); ++i)

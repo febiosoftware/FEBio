@@ -509,7 +509,7 @@ void FEFacet2FacetSliding::ContactForces(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 
-void FEFacet2FacetSliding::ContactStiffness(FENLSolver* psolver)
+void FEFacet2FacetSliding::ContactStiffness(FESolver* psolver)
 {
 	vector<int> sLM, mLM, LM, en;
 	const int MN = FEElement::MAX_NODES;

@@ -62,7 +62,7 @@ public:
 	void ContactForces(FEGlobalVector& R);
 
 	//! calculate contact stiffness
-	void ContactStiffness(FENLSolver* psolver);
+	void ContactStiffness(FESolver* psolver);
 
 	//! calculate Lagrangian augmentations
 	bool Augment(int naug);

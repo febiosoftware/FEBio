@@ -3,7 +3,7 @@
 #include "FEElement.h"
 #include "DumpFile.h"
 #include "FE_enum.h"
-#include "FENLSolver.h"
+#include "FESolver.h"
 #include "FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------

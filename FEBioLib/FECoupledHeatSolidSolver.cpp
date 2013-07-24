@@ -10,6 +10,13 @@ FECoupledHeatSolidSolver::FECoupledHeatSolidSolver(FEModel& fem) : FESolver(fem)
 }
 
 //-----------------------------------------------------------------------------
+void FECoupledHeatSolidSolver::Clean()
+{
+	m_Heat.Clean();
+	m_Solid.Clean();
+}
+
+//-----------------------------------------------------------------------------
 //! Initialization
 bool FECoupledHeatSolidSolver::Init()
 {

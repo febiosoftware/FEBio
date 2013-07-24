@@ -217,7 +217,7 @@ void FEElasticSolidDomain::Serialize(DumpFile &ar)
 }
 /*
 //-----------------------------------------------------------------------------
-void FEElasticSolidDomain::Residual(FENLSolver *psolver, vector<double>& R)
+void FEElasticSolidDomain::Residual(FESolver *psolver, vector<double>& R)
 {
 	FEModel& fem = psolver->GetFEModel();
 
@@ -833,7 +833,7 @@ void FEElasticSolidDomain::ElementDensityStiffness(FEModel& fem, FESolidElement 
 
 //-----------------------------------------------------------------------------
 /*
-void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEM& fem = dynamic_cast<FEM&>(psolver->GetFEModel());
 
@@ -876,7 +876,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -925,7 +925,7 @@ void FEElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEElasticSolidDomain::InertialStiffness(FENLSolver* psolver)
+void FEElasticSolidDomain::InertialStiffness(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 
@@ -957,7 +957,7 @@ void FEElasticSolidDomain::InertialStiffness(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 
-void FEElasticSolidDomain::BodyForceStiffness(FENLSolver* psolver, FEBodyForce& bf)
+void FEElasticSolidDomain::BodyForceStiffness(FESolver* psolver, FEBodyForce& bf)
 {
 	// element stiffness matrix
 	matrix ke;

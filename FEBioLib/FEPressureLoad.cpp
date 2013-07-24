@@ -219,7 +219,7 @@ void FEPressureLoad::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEPressureLoad::StiffnessMatrix(FENLSolver* psolver)
+void FEPressureLoad::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 

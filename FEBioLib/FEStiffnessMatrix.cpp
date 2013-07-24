@@ -44,7 +44,7 @@ FEStiffnessMatrix::~FEStiffnessMatrix()
 //! to the profile. Dynamic elements can change connectivity in between calls to
 //! Create() and therefore have to be added explicitly every time.
 
-bool FEStiffnessMatrix::Create(FENLSolver* pnls, int neq, bool breset)
+bool FEStiffnessMatrix::Create(FESolver* pnls, int neq, bool breset)
 {
 	int i, j, k, l, m, n;
 

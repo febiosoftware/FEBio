@@ -787,7 +787,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 
 //-----------------------------------------------------------------------------
 
-void FESlidingInterface::ContactStiffness(FENLSolver* psolver)
+void FESlidingInterface::ContactStiffness(FESolver* psolver)
 {
 	int j, k, l, n, m, np;
 	int nseln, nmeln, ndof;

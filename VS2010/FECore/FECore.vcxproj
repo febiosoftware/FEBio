@@ -700,7 +700,6 @@
     <ClInclude Include="..\..\FECore\FEMesh.h" />
     <ClInclude Include="..\..\FECore\FEModel.h" />
     <ClInclude Include="..\..\FECore\FENLConstraint.h" />
-    <ClInclude Include="..\..\FECore\FENLSolver.h" />
     <ClInclude Include="..\..\FECore\FENNQuery.h" />
     <ClInclude Include="..\..\FECore\FENodeElemList.h" />
     <ClInclude Include="..\..\FECore\FENodeNodeList.h" />
@@ -713,6 +712,7 @@
     <ClInclude Include="..\..\FECore\FERigidBody.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
+    <ClInclude Include="..\..\FECore\FESolver.h" />
     <ClInclude Include="..\..\FECore\FESurface.h" />
     <ClInclude Include="..\..\FECore\FESurfaceLoad.h" />
     <ClInclude Include="..\..\FECore\FETrussDomain.h" />
@@ -769,7 +769,6 @@
     <ClCompile Include="..\..\FECore\FEMaterialPoint.cpp" />
     <ClCompile Include="..\..\FECore\FEMesh.cpp" />
     <ClCompile Include="..\..\FECore\FEModel.cpp" />
-    <ClCompile Include="..\..\FECore\FENLSolver.cpp" />
     <ClCompile Include="..\..\FECore\FENNQuery.cpp" />
     <ClCompile Include="..\..\FECore\FENodeElemList.cpp" />
     <ClCompile Include="..\..\FECore\FENodeNodeList.cpp" />
@@ -781,6 +780,7 @@
     <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
+    <ClCompile Include="..\..\FECore\FESolver.cpp" />
     <ClCompile Include="..\..\FECore\FESurface.cpp" />
     <ClCompile Include="..\..\FECore\FESurfaceLoad.cpp" />
     <ClCompile Include="..\..\FECore\FETrussDomain.cpp" />

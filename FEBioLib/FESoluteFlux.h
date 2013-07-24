@@ -37,7 +37,7 @@ public:
 	LOAD& SoluteFlux(int n) { return m_PC[n]; }
 	
 	//! calculate flux stiffness
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 	
 	//! calculate residual
 	void Residual(FEGlobalVector& R);

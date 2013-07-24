@@ -1,21 +1,22 @@
 #include "stdafx.h"
-#include "FENLSolver.h"
+#include "FESolver.h"
 
 //-----------------------------------------------------------------------------
-FENLSolver::FENLSolver(FEModel& fem) : m_fem(fem)
+FESolver::FESolver(FEModel& fem) : m_fem(fem)
 { 
 	m_bsymm = true; // assume symmetric stiffness matrix
 	m_solvertype = 0;
+	m_niter = 0;
 }
 
 //-----------------------------------------------------------------------------
-FENLSolver::~FENLSolver()
+FESolver::~FESolver()
 {
 }
 
 //-----------------------------------------------------------------------------
 //! Get the FE model
-FEModel& FENLSolver::GetFEModel()
+FEModel& FESolver::GetFEModel()
 { 
 	return m_fem; 
 }

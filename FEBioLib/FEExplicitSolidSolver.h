@@ -1,5 +1,6 @@
 #pragma once
-#include "FESolver.h"
+#include <FECore\FESolver.h>
+#include <FECore\FEGlobalVector.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a nonlinear explicit solver for solid mechanics
@@ -16,6 +17,9 @@ public:
 public:
 	//! Data initialization
 	bool Init();
+
+	//! clean up
+	void Clean();
 
 	//! Solve an analysis step
 	bool SolveStep(double time);
@@ -68,6 +72,7 @@ public:
 
 public:
 	// equation numbers
+	int		m_neq;			//!< number of equations
 	int		m_nreq;			//!< start of rigid body equations
 
 	vector<double> m_inv_mass;	//!< inverse mass vector for explicit analysis

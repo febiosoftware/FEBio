@@ -271,6 +271,7 @@
     <ClCompile Include="..\..\NumCore\ConjGradIterSolver.cpp" />
     <ClCompile Include="..\..\NumCore\DenseMatrix.cpp" />
     <ClCompile Include="..\..\NumCore\LUSolver.cpp" />
+    <ClCompile Include="..\..\NumCore\NumCore.cpp" />
     <ClCompile Include="..\..\NumCore\PardisoSolver.cpp" />
     <ClCompile Include="..\..\NumCore\PardisoSolverDL.cpp" />
     <ClCompile Include="..\..\NumCore\PSLDLTSolver.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="..\..\NumCore\ConjGradIterSolver.h" />
     <ClInclude Include="..\..\NumCore\DenseMatrix.h" />
     <ClInclude Include="..\..\NumCore\LUSolver.h" />
+    <ClInclude Include="..\..\NumCore\NumCore.h" />
     <ClInclude Include="..\..\NumCore\PardisoSolver.h" />
     <ClInclude Include="..\..\NumCore\PSLDLTSolver.h" />
     <ClInclude Include="..\..\NumCore\RCICGSolver.h" />

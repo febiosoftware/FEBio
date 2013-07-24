@@ -38,7 +38,7 @@ FEDomain* FE3FieldElasticSolidDomain::Clone()
 
 //-----------------------------------------------------------------------------
 //! Stiffness matrix for three-field domain
-void FE3FieldElasticSolidDomain::StiffnessMatrix(FENLSolver* psolver)
+void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 

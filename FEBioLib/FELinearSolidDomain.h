@@ -1,7 +1,7 @@
 #pragma once
 
 #include <FECore/FESolidDomain.h>
-#include <FECore/FENLSolver.h>
+#include <FECore/FESolver.h>
 #include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
@@ -9,7 +9,7 @@ class FELinearElasticDomain
 {
 public:
 	virtual ~FELinearElasticDomain(){}
-	virtual void StiffnessMatrix(FENLSolver* psolver) = 0;
+	virtual void StiffnessMatrix(FESolver* psolver) = 0;
 	virtual void RHS(FEGlobalVector& R) = 0;
 	virtual void UpdateStresses(FEModel& fem) = 0;
 };
@@ -40,7 +40,7 @@ public:
 public: // overrides from FELinearElasticDomain
 
 	//! Build the stiffness matrix
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	// Calculate the RHS vector
 	void RHS(FEGlobalVector& R);

@@ -2,19 +2,25 @@
 #include "BFGSSolver.h"
 #include "FEParameterList.h"
 #include "DumpFile.h"
+#include "Timer.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
 
 //-----------------------------------------------------------------------------
-class FENLSolver : public FEParamContainer
+//! This is the base class for all FEBio solvers.
+
+//! A class derived from FESolver implements a solver for a specific type
+//! of physics problem. It takes the FEModel in its constructor and implements
+//! the SolveStep function to solve the FE problem.
+class FESolver : public FEParamContainer
 {
 public:
 	//! constructor
-	FENLSolver(FEModel& fem);
+	FESolver(FEModel& fem);
 
 	//! destructor
-	virtual ~FENLSolver();
+	virtual ~FESolver();
 
 	//! Get the FE model
 	FEModel& GetFEModel();
@@ -25,12 +31,6 @@ public:
 	virtual void Clean() = 0;
 
 public:
-	//! assemble into global residual (TODO: this is only used by rigid joints)
-//	virtual void AssembleResidual(vector<int>& lm, vector<double>& fe, vector<double>& R) { assert(false); }
-
-	//! assemble the element residual into the global residual
-//	virtual void AssembleResidual(vector<int>& en, vector<int>& elm, vector<double>& fe, vector<double>& R) = 0;
-
 	//! assemble global stiffness matrix (TODO: this is only used by rigid joints)
 	virtual void AssembleStiffness(vector<int>& elm, matrix& ke) { assert(false); }
 
@@ -53,15 +53,18 @@ public:
 protected:
 	FEModel&	m_fem;
 
-public: // TODO: temporary data that I would like to move elsewhere
+public: //TODO Move these parameters elsewhere
 
 	bool		m_bsymm;		//!< symmetry flag for linear solver allocation
 	int			m_solvertype;	//!< defines the type of solver; 0=BFGs, 1-Hager-Zhang NLCG
+
+	// timers
+	Timer	m_SolverTime;	//!< time spent in solver
 
 	// counters
 	int		m_nrhs;			//!< nr of right hand side evalutations
 	int		m_niter;		//!< nr of quasi-newton iterations
 	int		m_nref;			//!< nr of stiffness retormations
-	int		m_ntotref;
+	int		m_ntotref;		//!< nr of total stiffness reformations
 	int		m_naug;			//!< nr of augmentations
 };

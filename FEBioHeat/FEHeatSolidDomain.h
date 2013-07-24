@@ -1,14 +1,14 @@
 #pragma once
 #include <FECore/FESolidDomain.h>
-#include <FECore/FENLSolver.h>
+#include <FECore/FESolver.h>
 
 //-----------------------------------------------------------------------------
 class FEHeatDomain
 {
 public:
 	virtual ~FEHeatDomain(){}
-	virtual void ConductionMatrix (FENLSolver* pnls) = 0;
-	virtual void CapacitanceMatrix(FENLSolver* pnls, double dt) = 0;
+	virtual void ConductionMatrix (FESolver* pnls) = 0;
+	virtual void CapacitanceMatrix(FESolver* pnls, double dt) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -28,10 +28,10 @@ public:
 public: // overloaded from FEHeatDomain
 
 	//! Calculate the conduction stiffness 
-	void ConductionMatrix(FENLSolver* psolver);
+	void ConductionMatrix(FESolver* psolver);
 
 	//! Calculate capacitance stiffness matrix
-	void CapacitanceMatrix(FENLSolver* psolver, double dt);
+	void CapacitanceMatrix(FESolver* psolver, double dt);
 
 protected:
 	//! calculate the conductive element stiffness matrix

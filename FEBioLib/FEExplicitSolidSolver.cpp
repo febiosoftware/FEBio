@@ -22,11 +22,13 @@ FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel& fem) : FESolver(fem)
 }
 
 //-----------------------------------------------------------------------------
+void FEExplicitSolidSolver::Clean()
+{
+}
+
+//-----------------------------------------------------------------------------
 bool FEExplicitSolidSolver::Init()
 {
-	// initialize base class
-	if (FESolver::Init() == false) return false;
-
 	// get nr of equations
 	int neq = m_neq;
 

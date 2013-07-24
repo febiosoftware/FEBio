@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioControlSection.h"
-#include <NumCore/ConjGradIterSolver.h>
 #include <FEBioLib/FESolidSolver.h>
 #include <FEBioLib/FEExplicitSolidSolver.h>
 #include <FEBioLib/FEBiphasicSolver.h>
@@ -10,7 +9,6 @@
 #include <FEBioLib/FEUDGHexDomain.h>
 #include <FEBioLib/FEUT4Domain.h>
 #include <FEBioHeat/FEHeatSolver.h>
-#include <NumCore/SuperLUSolver.h>
 
 //-----------------------------------------------------------------------------
 FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
@@ -38,7 +36,7 @@ void FEBioControlSection::Parse(XMLTag& tag)
 
 	// make sure we have a solver defined
 	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(pstep->GetType(), fem);
-	FENLSolver* psolver = pstep->m_psolver;
+	FESolver* psolver = pstep->m_psolver;
 
 	++tag;
 	do
@@ -229,59 +227,6 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 			++tag;
 		}
 		while (!tag.isend());
-	}
-	else if (tag == "linear_solver")
-	{
-		XMLAtt& type = tag.Attribute("type");
-		if      (type == "skyline") fem.m_nsolver = SKYLINE_SOLVER;
-		else if (type == "psldlt" ) fem.m_nsolver = PSLDLT_SOLVER;
-		else if (type == "superlu")
-		{
-			fem.m_nsolver = SUPERLU_SOLVER;
-			if (!tag.isleaf())
-			{
-				SuperLUSolver* ps = new SuperLUSolver();
-				FEAnalysisStep* pstep = GetStep();
-				FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
-				psolver->m_plinsolve = ps;
-
-				++tag;
-				do
-				{
-					if (tag == "print_cnorm") { bool b; tag.value(b); ps->print_cnorm(b); }
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-			}
-		}
-		else if (type == "superlu_mt"        ) fem.m_nsolver = SUPERLU_MT_SOLVER;
-		else if (type == "pardiso"           ) fem.m_nsolver = PARDISO_SOLVER;
-		else if (type == "wsmp"              ) fem.m_nsolver = WSMP_SOLVER;
-		else if (type == "lusolver"          ) fem.m_nsolver = LU_SOLVER;
-		else if (type == "rcicg"             ) fem.m_nsolver = RCICG_SOLVER;
-		else if (type == "conjugate gradient")
-		{
-			fem.m_nsolver = CG_ITERATIVE_SOLVER;
-			ConjGradIterSolver* ps;
-			FEAnalysisStep* pstep = GetStep();
-			FESolver* psolver = dynamic_cast<FESolver*>(pstep->m_psolver);
-			psolver->m_plinsolve = ps = new ConjGradIterSolver();
-			if (!tag.isleaf())
-			{
-				++tag;
-				do
-				{
-					if      (tag == "tolerance"     ) tag.value(ps->m_tol);
-					else if (tag == "max_iterations") tag.value(ps->m_kmax);
-					else if (tag == "print_level"   ) tag.value(ps->m_nprint);
-					else throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-			}
-		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 	}
 	else return false;
 

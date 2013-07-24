@@ -315,7 +315,7 @@ void FEMultiphasicDomain::Residual(FESolidSolver* psolver, vector<double>& R)
 //! solute concentration)
 //! Note that we only use the first n entries in fe, where n is the number
 //! of nodes
-void FEMultiphasicDomain::InternalSoluteWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -432,7 +432,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& elem, vect
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalSoluteWork(FENLSolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -639,7 +639,7 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalFluidWork(FENLSolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalFluidWork(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -779,7 +779,7 @@ bool FEMultiphasicDomain::ElementInternalFluidWork(FESolidElement& el, vector<do
 }
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::InternalFluidWorkSS(FENLSolver* psolver, vector<double>& R, double dt)
+void FEMultiphasicDomain::InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -1001,7 +1001,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FESolidSolver* psolver)
 */
 
 //-----------------------------------------------------------------------------
-void FEMultiphasicDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, double dt)
+void FEMultiphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, double dt)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -1052,7 +1052,7 @@ void FEMultiphasicDomain::StiffnessMatrix(FENLSolver* psolver, bool bsymm, doubl
 	}
 }
 
-void FEMultiphasicDomain::StiffnessMatrixSS(FENLSolver* psolver, bool bsymm, double dt)
+void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt)
 {
 	// element stiffness matrix
 	matrix ke;

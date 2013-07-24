@@ -5,6 +5,8 @@
 #include "FEPressureLoad.h"
 #include <FECore/FERigid.h>
 #include "FECore/log.h"
+#include "FEStiffnessMatrix.h"
+#include <NumCore\NumCore.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -17,6 +19,25 @@ END_PARAMETER_LIST();
 FELinearSolidSolver::FELinearSolidSolver(FEModel& fem) : FESolver(fem)
 {
 	m_Dtol = 1e-9;
+
+	m_pK = 0;
+	m_neq = 0;
+	m_plinsolve = 0;
+}
+
+//-----------------------------------------------------------------------------
+FELinearSolidSolver::~FELinearSolidSolver()
+{
+	delete m_plinsolve;	// clean up linear solver data
+	delete m_pK;		// clean up stiffnes matrix data
+}
+
+//-----------------------------------------------------------------------------
+//! Clean
+//! \todo Why can this not be done in destructor?
+void FELinearSolidSolver::Clean()
+{
+	if (m_plinsolve) m_plinsolve->Destroy();
 }
 
 //-----------------------------------------------------------------------------
@@ -24,8 +45,42 @@ FELinearSolidSolver::FELinearSolidSolver(FEModel& fem) : FESolver(fem)
 //! This function will be called before each analysis step
 bool FELinearSolidSolver::Init()
 {
-	// initialize base class
-	if (FESolver::Init() == false) return false;
+	// Now that we have determined the equation numbers we can continue
+	// with creating the stiffness matrix. First we select the linear solver
+	// The stiffness matrix is created in CreateStiffness
+	// Note that if a particular solver was requested in the input file
+	// then the solver might already be allocated. That's way we need to check it.
+	if (m_plinsolve == 0)
+	{
+		m_plinsolve = NumCore::CreateLinearSolver(m_fem.m_nsolver);
+		if (m_plinsolve == 0)
+		{
+			clog.printbox("FATAL ERROR","Unknown solver type selected\n");
+			return false;
+		}
+	}
+
+	// allocate storage for the sparse matrix that will hold the stiffness matrix data
+	// we let the solver allocate the correct type of matrix format
+	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
+	if (pS == 0)
+	{
+		clog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
+		return false;
+	}
+
+	// clean up the stiffness matrix if we have one
+	if (m_pK) delete m_pK; m_pK = 0;
+
+	// Create the stiffness matrix.
+	// Note that this does not construct the stiffness matrix. This
+	// is done later in the StiffnessMatrix routine.
+	m_pK = new FEStiffnessMatrix(pS);
+	if (m_pK == 0)
+	{
+		clog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		return false;
+	}
 
 	// number of equations
 	int neq = m_neq;
@@ -51,7 +106,6 @@ bool FELinearSolidSolver::Init()
 
 	return true;
 }
-
 
 //-----------------------------------------------------------------------------
 //!	This function initializes the equation system.
@@ -274,6 +328,46 @@ void FELinearSolidSolver::Residual()
 		if (pl && (pl->IsLinear())) pl->Residual(RHS);
 	}
 }
+
+//-----------------------------------------------------------------------------
+//!  Creates the global stiffness matrix
+//! \todo Can we move this to the FEStiffnessMatrix::Create function?
+bool FELinearSolidSolver::CreateStiffness(bool breset)
+{
+	// clean up the solver
+	if (m_pK->NonZeroes()) m_plinsolve->Destroy();
+
+	// clean up the stiffness matrix
+	m_pK->Clear();
+
+	// create the stiffness matrix
+	clog.printf("===== reforming stiffness matrix:\n");
+	if (m_pK->Create(this, m_neq, breset) == false) 
+	{
+		clog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+		return false;
+	}
+	else
+	{
+		// output some information about the direct linear solver
+		int neq = m_pK->Rows();
+		int nnz = m_pK->NonZeroes();
+		clog.printf("\tNr of equations ........................... : %d\n", neq);
+		clog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+		clog.printf("\n");
+	}
+
+	// Do the preprocessing of the solver
+	m_SolverTime.start();
+	{
+		if (!m_plinsolve->PreProcess()) throw FatalError();
+	}
+	m_SolverTime.stop();
+
+	// done!
+	return true;
+}
+
 
 //-----------------------------------------------------------------------------
 //! Reform the stiffness matrix. That is, calculate the shape of the stiffness

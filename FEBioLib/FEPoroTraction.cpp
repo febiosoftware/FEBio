@@ -274,7 +274,7 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-void FEPoroNormalTraction::StiffnessMatrix(FENLSolver* psolver)
+void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 	FEAnalysis* pstep = fem.GetCurrentStep();

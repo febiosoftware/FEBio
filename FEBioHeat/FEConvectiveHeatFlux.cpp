@@ -83,7 +83,7 @@ void FEConvectiveHeatFlux::Residual(FEGlobalVector& R)
 
 //-----------------------------------------------------------------------------
 //! stiffness matrix
-void FEConvectiveHeatFlux::StiffnessMatrix(FENLSolver* psolver)
+void FEConvectiveHeatFlux::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
 

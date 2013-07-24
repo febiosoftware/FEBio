@@ -2,7 +2,7 @@
 
 #include "FECore/FEAnalysis.h"
 #include "FECore/FEModel.h"
-#include "FECore/FENLSolver.h"
+#include "FECore/FESolver.h"
 #include <vector>
 using namespace std;
 

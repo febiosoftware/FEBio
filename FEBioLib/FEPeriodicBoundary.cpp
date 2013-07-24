@@ -362,7 +362,7 @@ void FEPeriodicBoundary::ContactForces(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ContactStiffness(FENLSolver* psolver)
+void FEPeriodicBoundary::ContactStiffness(FESolver* psolver)
 {
 	int j, k, l, n, m;
 	int nseln, nmeln, ndof;

@@ -22,7 +22,7 @@ public:
 	void InternalForces(FEGlobalVector& R);
 
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 	// update stresses
 	void UpdateStresses(FEModel& fem);

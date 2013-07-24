@@ -13,7 +13,7 @@ FEDomain* FERigidShellDomain::Clone()
 //! Calculate stiffness contributions for rigid shells.
 //! Since rigid elements don't generate stress, we don't need to do
 //! anything here.
-void FERigidShellDomain::StiffnessMatrix(FENLSolver* psolver)
+void FERigidShellDomain::StiffnessMatrix(FESolver* psolver)
 {
 	// Caught you looking!
 }

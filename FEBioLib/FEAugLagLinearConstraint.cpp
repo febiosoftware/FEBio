@@ -170,7 +170,7 @@ void FELinearConstraintSet::Residual(FEGlobalVector& R)
 //-----------------------------------------------------------------------------
 //! This function calculates the contribution to the stiffness matrix.
 
-void FELinearConstraintSet::StiffnessMatrix(FENLSolver* psolver)
+void FELinearConstraintSet::StiffnessMatrix(FESolver* psolver)
 {
 	vector<int> en;
 	vector<int> elm;

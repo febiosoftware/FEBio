@@ -39,7 +39,7 @@ public: // overridden from FEElasticDomain
 	void UpdateStresses(FEModel& fem);
 
 	// calculate stiffness matrix
-	void StiffnessMatrix(FENLSolver* psolver);
+	void StiffnessMatrix(FESolver* psolver);
 
 protected:
 	//! Dilatational stiffness component for nearly-incompressible materials

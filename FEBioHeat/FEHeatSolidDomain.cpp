@@ -32,7 +32,7 @@ void FEHeatSolidDomain::UnpackLM(FEElement& el, vector<int>& lm)
 
 //-----------------------------------------------------------------------------
 // Calculate the heat conduction matrix
-void FEHeatSolidDomain::ConductionMatrix(FENLSolver* psolver)
+void FEHeatSolidDomain::ConductionMatrix(FESolver* psolver)
 {
 	vector<int> lm;
 
@@ -56,7 +56,7 @@ void FEHeatSolidDomain::ConductionMatrix(FENLSolver* psolver)
 
 //-----------------------------------------------------------------------------
 // Calculate the capacitance matrix
-void FEHeatSolidDomain::CapacitanceMatrix(FENLSolver* psolver, double dt)
+void FEHeatSolidDomain::CapacitanceMatrix(FESolver* psolver, double dt)
 {
 	vector<int> lm;
 
