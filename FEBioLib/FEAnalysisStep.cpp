@@ -3,7 +3,7 @@
 #include <FECore/FERigid.h>
 #include "FEUncoupledMaterial.h"
 #include "FESolidSolver.h"
-#include <FEBioHeat\FEHeatSolver.h>
+#include <FEBioHeat/FEHeatSolver.h>
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"
 #include "FELinearSolidSolver.h"

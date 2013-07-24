@@ -1,6 +1,6 @@
 #pragma once
 
-#include <FEBioLib\FESolver.h>
+#include <FEBioLib/FESolver.h>
 #include "FEHeatSolidDomain.h"
 
 //-----------------------------------------------------------------------------

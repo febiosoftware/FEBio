@@ -1,6 +1,6 @@
 #pragma once
-#include <FECore\FEModel.h>
-#include <FECore\Timer.h>
+#include <FECore/FEModel.h>
+#include <FECore/Timer.h>
 #include "DataStore.h"
 #include "FEElasticMixture.h"
 #include "FEUncoupledElasticMixture.h"
