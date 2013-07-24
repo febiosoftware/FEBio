@@ -77,6 +77,11 @@ public:
 	vector<double> m_Ut;	//!< Total dispalcement vector at time t (incl all previous timesteps)
 	vector<double> m_Fd;	//!< residual correction due to prescribed displacements
 
+	vector<double> m_ui;	//!< displacement increment vector
+
+	vector<double> m_R0;	//!< residual at iteration i-1
+	vector<double> m_R1;	//!< residual at iteration i
+
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

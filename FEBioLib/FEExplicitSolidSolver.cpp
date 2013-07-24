@@ -58,9 +58,6 @@ bool FEExplicitSolidSolver::Init()
 		n = node.m_ID[DOF_W]; if (n >= 0) m_Ut[n] = node.m_Dt.z - node.m_D0.z;
 	}
 
-	// initialize BFGS data
-	m_bfgs.Init(neq, this, m_plinsolve);
-
 	// calculate the inverse mass vector for explicit analysis
 	vector<double> dummy(m_inv_mass);
 	FEGlobalVector Mi(GetFEModel(), m_inv_mass, dummy);
@@ -496,11 +493,6 @@ void FEExplicitSolidSolver::Serialize(DumpFile& ar)
 		ar << m_nref << m_ntotref;
 		ar << m_naug;
 		ar << m_neq << m_nreq;
-
-		ar << m_bfgs.m_maxups;
-		ar << m_bfgs.m_maxref;
-		ar << m_bfgs.m_cmax;
-		ar << m_bfgs.m_nups;
 	}
 	else
 	{
@@ -509,11 +501,6 @@ void FEExplicitSolidSolver::Serialize(DumpFile& ar)
 		ar >> m_nref >> m_ntotref;
 		ar >> m_naug;
 		ar >> m_neq >> m_nreq;
-
-		ar >> m_bfgs.m_maxups;
-		ar >> m_bfgs.m_maxref;
-		ar >> m_bfgs.m_cmax;
-		ar >> m_bfgs.m_nups;
 	}
 }
 
@@ -589,7 +576,6 @@ void FEExplicitSolidSolver::PrepStep(double time)
 	m_nrhs  = 0;	// nr of RHS evaluations
 	m_nref  = 0;	// nr of stiffness reformations
 	m_ntotref = 0;
-	m_bfgs.m_nups	= 0;	// nr of stiffness updates between reformations
 	m_naug  = 0;	// nr of augmentations
 
 	// zero total displacements
@@ -614,7 +600,7 @@ void FEExplicitSolidSolver::PrepStep(double time)
 
 	// apply prescribed displacements
 	// we save the prescribed displacements increments in the ui vector
-	vector<double>& ui = m_bfgs.m_ui;
+	vector<double>& ui = m_ui;
 	zero(ui);
 	int neq = m_neq;
 	int nbc = m_fem.PrescribedBCs();
@@ -958,9 +944,9 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	m_fem.CheckInterruption();
 
 	// calculate initial residual
-	if (Residual(m_bfgs.m_R0) == false) return false;
+	if (Residual(m_R0) == false) return false;
 
-	m_bfgs.m_R0 += m_Fd;
+	m_R0 += m_Fd;
 
 	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
@@ -979,9 +965,9 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	{
 		FENode& node = mesh.Node(i);
 		//  calculate acceleration using F=ma and update
-		if ((n = node.m_ID[DOF_X]) >= 0) node.m_at.x = m_inv_mass[n]*m_bfgs.m_R1[n];
-		if ((n = node.m_ID[DOF_Y]) >= 0) node.m_at.y = m_inv_mass[n]*m_bfgs.m_R1[n];
-		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = m_inv_mass[n]*m_bfgs.m_R1[n];
+		if ((n = node.m_ID[DOF_X]) >= 0) node.m_at.x = m_inv_mass[n]*m_R1[n];
+		if ((n = node.m_ID[DOF_Y]) >= 0) node.m_at.y = m_inv_mass[n]*m_R1[n];
+		if ((n = node.m_ID[DOF_Z]) >= 0) node.m_at.z = m_inv_mass[n]*m_R1[n];
 		// and update the velocities using the accelerations
 		node.m_vt = node.m_vp + node.m_at*dt;	//  update velocity using acceleration m_at
 		node.m_vt.x*=m_dyn_damping;
@@ -989,21 +975,21 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 		node.m_vt.z*=m_dyn_damping;
 		//	calculate incremental displacement using velocity
 		double vel=node.m_vt.x;
-		if ((n = node.m_ID[DOF_X]) >= 0) m_bfgs.m_ui[n] = node.m_vt.x*dt;
-		if ((n = node.m_ID[DOF_Y]) >= 0) m_bfgs.m_ui[n] = node.m_vt.y*dt;
-		if ((n = node.m_ID[DOF_Z]) >= 0) m_bfgs.m_ui[n] = node.m_vt.z*dt;
+		if ((n = node.m_ID[DOF_X]) >= 0) m_ui[n] = node.m_vt.x*dt;
+		if ((n = node.m_ID[DOF_Y]) >= 0) m_ui[n] = node.m_vt.y*dt;
+		if ((n = node.m_ID[DOF_Z]) >= 0) m_ui[n] = node.m_vt.z*dt;
 	}
 
 	// need to update everything for the explicit solver
 	// Update geometry
-	Update(m_bfgs.m_ui);
+	Update(m_ui);
 
 	// calculate residual at this point
-	Residual(m_bfgs.m_R1);
+	Residual(m_R1);
 
 	// update total displacements
 	int neq = m_Ui.size();
-	for (i=0; i<neq; ++i) m_Ui[i] += m_bfgs.m_ui[i];
+	for (i=0; i<neq; ++i) m_Ui[i] += m_ui[i];
 
 	// increase iteration number
 	m_niter++;

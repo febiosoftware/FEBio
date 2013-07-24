@@ -162,13 +162,13 @@ void echo_input(FEBioModel& fem)
 //	clog.printf("\tNumber of constant traction boundary cards ..... : %d\n", (fem.m_ptrac ? fem.m_ptrac->Surface().Elements() : 0));
 //	clog.printf("\tNumber of fluid flux boundary cards .............: %d\n", (fem.m_fsurf ? fem.m_fsurf->Surface().Elements() : 0));
 	clog.printf("\tNumber of concentrated nodal forces ............ : %d\n", fem.NodalLoads());
-	clog.printf("\tMax nr of stiffness reformations ............... : %d\n", step.m_psolver->m_bfgs.m_maxref);
-	clog.printf("\tper time steps\n");
-	clog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", step.m_psolver->m_bfgs.m_maxups);
-	clog.printf("\tbetween stiffness matrix reformations\n");
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(step.m_psolver);
 	if (ps)
 	{
+		clog.printf("\tMax nr of stiffness reformations ............... : %d\n", ps->m_bfgs.m_maxref);
+		clog.printf("\tper time steps\n");
+		clog.printf("\tMax nr of Quasi-Newton iterations .............. : %d\n", ps->m_bfgs.m_maxups);
+		clog.printf("\tbetween stiffness matrix reformations\n");
 		clog.printf("\tDisplacement convergence tolerance ............. : %lg\n", ps->m_Dtol);
 		clog.printf("\tEnergy convergence tolerance ................... : %lg\n", ps->m_Etol);
 		clog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
@@ -178,10 +178,13 @@ void echo_input(FEBioModel& fem)
 	if (pps) clog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
 	FEBiphasicSoluteSolver* pss = dynamic_cast<FEBiphasicSoluteSolver*>(step.m_psolver);
 	if (pss) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pss->m_Ctol);
-	clog.printf("\tLinesearch convergence tolerance ............... : %lg\n", step.m_psolver->m_bfgs.m_LStol );
-	clog.printf("\tMinimum line search size ....................... : %lg\n", step.m_psolver->m_bfgs.m_LSmin );
-	clog.printf("\tMaximum number of line search iterations ....... : %d\n" , step.m_psolver->m_bfgs.m_LSiter);
-	clog.printf("\tMax condition number ........................... : %lg\n", step.m_psolver->m_bfgs.m_cmax  );
+	if (ps)
+	{
+		clog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps->m_bfgs.m_LStol );
+		clog.printf("\tMinimum line search size ....................... : %lg\n", ps->m_bfgs.m_LSmin );
+		clog.printf("\tMaximum number of line search iterations ....... : %d\n" , ps->m_bfgs.m_LSiter);
+		clog.printf("\tMax condition number ........................... : %lg\n", ps->m_bfgs.m_cmax  );
+	}
 	clog.printf("\n\n");
 
 	// print output data

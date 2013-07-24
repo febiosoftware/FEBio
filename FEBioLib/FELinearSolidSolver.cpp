@@ -10,12 +10,6 @@
 // define the parameter list
 BEGIN_PARAMETER_LIST(FELinearSolidSolver, FESolver)
 	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"    );
-	ADD_PARAMETER(m_bfgs.m_LStol , FE_PARAM_DOUBLE, "lstol"   );
-	ADD_PARAMETER(m_bfgs.m_LSmin , FE_PARAM_DOUBLE, "lsmin"   );
-	ADD_PARAMETER(m_bfgs.m_LSiter, FE_PARAM_INT   , "lsiter"  );
-	ADD_PARAMETER(m_bfgs.m_maxref, FE_PARAM_INT   , "max_refs");
-	ADD_PARAMETER(m_bfgs.m_maxups, FE_PARAM_INT   , "max_ups" );
-	ADD_PARAMETER(m_bfgs.m_cmax  , FE_PARAM_DOUBLE, "cmax"    );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -306,9 +300,6 @@ bool FELinearSolidSolver::ReformStiffness()
 		// increase total nr of reformations
 		m_nref++;
 		m_ntotref++;
-
-		// reset bfgs update counter
-		m_bfgs.m_nups = 0;
 	}
 
 	return bret;

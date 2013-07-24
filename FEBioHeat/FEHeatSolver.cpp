@@ -330,9 +330,6 @@ bool FEHeatSolver::ReformStiffness()
 	m_nref++;
 	m_ntotref++;
 
-	// reset bfgs update counter
-	m_bfgs.m_nups = 0;
-
 	return true;
 }
 

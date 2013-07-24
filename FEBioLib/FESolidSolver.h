@@ -124,6 +124,9 @@ public:
 	// matrix reshape flag
 	bool	m_breshape;		//!< Matrix reshape flag
 
+public:
+	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
+
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

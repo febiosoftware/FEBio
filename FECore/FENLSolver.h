@@ -56,8 +56,6 @@ protected:
 
 public: // TODO: temporary data that I would like to move elsewhere
 
-	// BFGS parameters
-	BFGSSolver	m_bfgs;			//!< BFGS solver parameters
 	bool		m_bsymm;		//!< symmetry flag for linear solver allocation
 	int			m_solvertype;	//!< defines the type of solver; 0=BFGs, 1-Hager-Zhang NLCG
 

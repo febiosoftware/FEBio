@@ -177,10 +177,10 @@ bool FERestartImport::ParseControlSection(XMLTag& tag)
 //		else if (tag == "ctol"              ) tag.value(pstep->m_psolver->m_Ctol);
 //		else if (tag == "etol"              ) tag.value(pstep->m_psolver->m_Etol);
 //		else if (tag == "rtol"              ) tag.value(pstep->m_psolver->m_Rtol);
-		else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_bfgs.m_LStol);
-		else if (tag == "max_refs"          ) tag.value(pstep->m_psolver->m_bfgs.m_maxref);
-		else if (tag == "max_ups"           ) tag.value(pstep->m_psolver->m_bfgs.m_maxups);
-		else if (tag == "cmax"              ) tag.value(pstep->m_psolver->m_bfgs.m_cmax);
+//		else if (tag == "lstol"             ) tag.value(pstep->m_psolver->m_bfgs.m_LStol);
+//		else if (tag == "max_refs"          ) tag.value(pstep->m_psolver->m_bfgs.m_maxref);
+//		else if (tag == "max_ups"           ) tag.value(pstep->m_psolver->m_bfgs.m_maxups);
+//		else if (tag == "cmax"              ) tag.value(pstep->m_psolver->m_bfgs.m_cmax);
 		else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
 		else if (tag == "debug")
 		{

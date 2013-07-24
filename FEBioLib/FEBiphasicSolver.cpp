@@ -405,8 +405,7 @@ bool FEBiphasicSolver::Quasin(double time)
 				Residual(m_bfgs.m_R0);
 
 				// reform the matrix if we are using full-Newton
-				FEAnalysis* pstep = m_fem.GetCurrentStep();
-				if (pstep->m_psolver->m_bfgs.m_maxups == 0)
+				if (m_bfgs.m_maxups == 0)
 				{
 					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness() == false) break;
