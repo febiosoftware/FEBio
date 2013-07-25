@@ -173,6 +173,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioHeat\FEHeatStiffnessMatrix.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioHeat\FEIsotropicFourier.cpp"
 				>
 			</File>
@@ -212,6 +216,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioHeat\FEHeatSource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioHeat\FEHeatStiffnessMatrix.h"
 				>
 			</File>
 			<File

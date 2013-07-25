@@ -149,14 +149,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\NumCore\BFGSSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\NumCore\colsol.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\NumCore\CompactMatrix.cpp"
 				>
 			</File>
@@ -169,27 +161,27 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\LinearSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\NumCore\LUSolver.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\matrix.cpp"
+				RelativePath="..\..\NumCore\NumCore.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\MatrixProfile.cpp"
+				RelativePath="..\..\NumCore\PardisoSolver.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\NonLinearSystem.cpp"
+				RelativePath="..\..\NumCore\PardisoSolverDL.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\qsort.cpp"
+				RelativePath="..\..\NumCore\PSLDLTSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\RCICGSolver.cpp"
 				>
 			</File>
 			<File
@@ -201,15 +193,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\SparseMatrix.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\NumCore\stdafx.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\vector.cpp"
+				RelativePath="..\..\NumCore\SuperLU_MT_Solver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\SuperLUSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\WSMPSolver.cpp"
 				>
 			</File>
 		</Filter>
@@ -218,10 +214,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\NumCore\BFGSSolver.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\NumCore\CompactMatrix.h"
 				>
@@ -235,23 +227,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\LinearSolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\NumCore\LUSolver.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\matrix.h"
+				RelativePath="..\..\NumCore\NumCore.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\MatrixProfile.h"
+				RelativePath="..\..\NumCore\PardisoSolver.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\NonLinearSystem.h"
+				RelativePath="..\..\NumCore\PSLDLTSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\RCICGSolver.h"
 				>
 			</File>
 			<File
@@ -263,11 +255,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\SparseMatrix.h"
+				RelativePath="..\..\NumCore\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\stdafx.h"
+				RelativePath="..\..\NumCore\SuperLU_MT_Solver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\NumCore\SuperLUSolver.h"
 				>
 			</File>
 			<File
@@ -275,7 +271,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\NumCore\vector.h"
+				RelativePath="..\..\NumCore\WSMPSolver.h"
 				>
 			</File>
 		</Filter>

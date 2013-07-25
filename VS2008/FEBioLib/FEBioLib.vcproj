@@ -614,10 +614,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FESolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FESphericalFiberDistribution.cpp"
 				>
 			</File>
@@ -754,22 +750,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\PardisoSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\PardisoSolverDL.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\PSLDLTSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\RCICGSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\RigidBodyDataRecord.cpp"
 				>
 			</File>
@@ -778,19 +758,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\SuperLU_MT_Solver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\SuperLUSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\validate.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\WSMPSolver.cpp"
 				>
 			</File>
 		</Filter>
@@ -1208,10 +1176,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FESolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FESphericalFiberDistribution.h"
 				>
 			</File>
@@ -1336,31 +1300,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\PardisoSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\PSLDLTSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\RCICGSolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\RigidBodyDataRecord.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\SuperLU_MT_Solver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\SuperLUSolver.h"
 				>
 			</File>
 			<File
@@ -1373,10 +1317,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\version.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\WSMPSolver.h"
 				>
 			</File>
 		</Filter>

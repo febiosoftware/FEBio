@@ -216,6 +216,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\BFGSSolver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\colsol.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\DumpFile.cpp"
 				>
 			</File>
@@ -277,6 +285,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEException.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEGlobalMatrix.cpp"
 				>
 			</File>
 			<File
@@ -352,6 +364,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FESolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FESurface.cpp"
 				>
 			</File>
@@ -372,6 +388,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\LinearSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\LoadCurve.cpp"
 				>
 			</File>
@@ -388,6 +408,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\matrix.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\MatrixProfile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\qsort.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\SparseMatrix.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\stdafx.cpp"
 				>
 			</File>
@@ -397,6 +433,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\Timer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\vector.cpp"
 				>
 			</File>
 		</Filter>
@@ -411,6 +451,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\BC.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\BFGSSolver.h"
 				>
 			</File>
 			<File
@@ -490,6 +534,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEGlobalMatrix.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEGlobalVector.h"
 				>
 			</File>
@@ -523,10 +571,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FENLConstraint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FENLSolver.h"
 				>
 			</File>
 			<File
@@ -578,6 +622,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FESolver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FESurface.h"
 				>
 			</File>
@@ -595,6 +643,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\Image.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\LinearSolver.h"
 				>
 			</File>
 			<File
@@ -626,7 +678,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\matrix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\MatrixProfile.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\quatd.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\SparseMatrix.h"
 				>
 			</File>
 			<File
@@ -655,6 +719,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\vec3d.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\vector.h"
 				>
 			</File>
 		</Filter>
