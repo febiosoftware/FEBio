@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore\FEGlobalMatrix.h>
+#include <FECore/FEGlobalMatrix.h>
 
 //-----------------------------------------------------------------------------
 //! The "stiffness" matrix for a heat-transfer problem

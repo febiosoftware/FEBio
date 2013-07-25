@@ -1,4 +1,4 @@
-#include <FECore\FEPlotData.h>
+#include <FECore/FEPlotData.h>
 
 //-----------------------------------------------------------------------------
 //! Class the outputs the heat flux

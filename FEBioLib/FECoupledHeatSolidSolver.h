@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore\FESolver.h>
+#include <FECore/FESolver.h>
 #include <FEBioHeat/FEHeatSolver.h>
 #include "FELinearSolidSolver.h"
 

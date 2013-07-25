@@ -6,8 +6,8 @@
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEPointBodyForce.h"
 #include "FEPressureLoad.h"
-#include <FECore\log.h>
-#include <NumCore\NumCore.h>
+#include <FECore/log.h>
+#include <NumCore/NumCore.h>
 
 #ifdef WIN32
 	#include <float.h>

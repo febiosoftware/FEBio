@@ -9,8 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <FECore\FEGlobalMatrix.h>
-#include <FECore\FEModel.h>
+#include <FECore/FEGlobalMatrix.h>
+#include <FECore/FEModel.h>
 
 //-----------------------------------------------------------------------------
 //! The FEStiffnessmatrix class stores the global stiffness matrix of the FE

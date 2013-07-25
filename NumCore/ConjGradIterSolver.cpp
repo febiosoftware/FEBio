@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ConjGradIterSolver.h"
-#include <FECore\vector.h>
+#include <FECore/vector.h>
 #include <algorithm>
 
 //-----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #pragma once
-#include <FECore\FESolver.h>
-#include <FECore\FEGlobalVector.h>
+#include <FECore/FESolver.h>
+#include <FECore/FEGlobalVector.h>
 
 //-----------------------------------------------------------------------------
 //! This class implements a nonlinear explicit solver for solid mechanics
