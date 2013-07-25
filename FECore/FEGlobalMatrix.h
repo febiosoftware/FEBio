@@ -30,7 +30,7 @@ public:
 	virtual ~FEGlobalMatrix();
 
 	//! construct the stiffness matrix from a FEM object
-	virtual bool Create(FESolver* psolver, int neq, bool breset) = 0;
+	virtual bool Create(FEModel* psolver, int neq, bool breset) = 0;
 
 	//! clears the sparse matrix that stores the stiffness matrix
 	void Clear();

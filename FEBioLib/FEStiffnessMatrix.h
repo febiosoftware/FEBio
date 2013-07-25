@@ -27,7 +27,7 @@ public:
 	virtual ~FEStiffnessMatrix();
 
 	//! construct the stiffness matrix from a FEM object
-	bool Create(FESolver* psolver, int neq, bool breset);
+	bool Create(FEModel* pfem, int neq, bool breset);
 
 protected:
 	void AddContactInterface(FEContactInterface* pci);

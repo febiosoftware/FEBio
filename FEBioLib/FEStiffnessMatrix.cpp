@@ -44,12 +44,12 @@ FEStiffnessMatrix::~FEStiffnessMatrix()
 //! to the profile. Dynamic elements can change connectivity in between calls to
 //! Create() and therefore have to be added explicitly every time.
 
-bool FEStiffnessMatrix::Create(FESolver* pnls, int neq, bool breset)
+bool FEStiffnessMatrix::Create(FEModel* pfem, int neq, bool breset)
 {
 	int i, j, k, l, m, n;
 
 	// keep a pointer to the FEM object
-	m_pfem = &pnls->GetFEModel();
+	m_pfem = pfem;
 	FEModel& fem = *m_pfem;
 	FEAnalysis* pstep = fem.GetCurrentStep();
 	FEMesh& mesh = fem.GetMesh();

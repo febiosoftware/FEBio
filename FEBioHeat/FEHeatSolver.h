@@ -4,7 +4,8 @@
 #include <FECore\LinearSolver.h>
 #include "FEHeatSolidDomain.h"
 
-class FEStiffnessMatrix;
+//-----------------------------------------------------------------------------
+class FEHeatStiffnessMatrix;
 
 //-----------------------------------------------------------------------------
 //! The FEHeatSolver solves heat-conduction problems
@@ -84,8 +85,8 @@ protected:
 
 	LinearSolver*	m_plinsolve;
 
-	FEStiffnessMatrix*	m_pK;
-	int					m_neq;		//!< number of equations
+	FEHeatStiffnessMatrix*	m_pK;
+	int						m_neq;		//!< number of equations
 
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();

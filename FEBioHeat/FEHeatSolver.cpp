@@ -3,13 +3,11 @@
 #include "FEConvectiveHeatFlux.h"
 #include "FEHeatTransferMaterial.h"
 #include "FEHeatSource.h"
+#include "FEHeatStiffnessMatrix.h"
 #include <FECore\FENodeReorder.h>
 #include <FECore\FEModel.h>
-#include <NumCore\NumCore.h>
 #include <FECore\log.h>
-
-// TODO: replace this with a custom matrix
-#include <FEBioLib\FEStiffnessMatrix.h>
+#include <NumCore\NumCore.h>
 
 //-----------------------------------------------------------------------------
 // define the parameter list
@@ -79,7 +77,7 @@ bool FEHeatSolver::Init()
 	// Create the stiffness matrix.
 	// Note that this does not construct the stiffness matrix. This
 	// is done later in the StiffnessMatrix routine.
-	m_pK = new FEStiffnessMatrix(pS);
+	m_pK = new FEHeatStiffnessMatrix(pS);
 	if (m_pK == 0)
 	{
 		clog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
@@ -378,7 +376,7 @@ bool FEHeatSolver::CreateStiffness(bool breset)
 
 	// create the stiffness matrix
 	clog.printf("===== reforming stiffness matrix:\n");
-	if (m_pK->Create(this, m_neq, breset) == false) 
+	if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
 	{
 		clog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;
