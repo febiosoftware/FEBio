@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FESoluteFlux.h"
 #include "FECore/FEModel.h"
 

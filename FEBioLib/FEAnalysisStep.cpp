@@ -4,8 +4,8 @@
 #include "FEUncoupledMaterial.h"
 #include "FESolidSolver.h"
 #include <FEBioHeat/FEHeatSolver.h>
-#include "FEBiphasicSolver.h"
-#include "FEBiphasicSoluteSolver.h"
+#include "FEBioMix/FEBiphasicSolver.h"
+#include "FEBioMix/FEBiphasicSoluteSolver.h"
 #include "FELinearSolidSolver.h"
 #include "FECoupledHeatSolidSolver.h"
 #include "FEExplicitSolidSolver.h"

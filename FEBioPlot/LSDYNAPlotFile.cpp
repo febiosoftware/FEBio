@@ -10,8 +10,8 @@
 #include "FEBioLib/FERigidWallInterface.h"
 #include "FEBioLib/FEPeriodicBoundary.h"
 #include "FEBioLib/FESurfaceConstraint.h"
-#include "FEBioLib/FESlidingInterface2.h"
-#include "FEBioLib/FESlidingInterface3.h"
+#include "FEBioMix/FESlidingInterface2.h"
+#include "FEBioMix/FESlidingInterface3.h"
 #include "FEBioLib/FEFacet2FacetSliding.h"
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include <FEBioHeat/FEHeatTransferMaterial.h>

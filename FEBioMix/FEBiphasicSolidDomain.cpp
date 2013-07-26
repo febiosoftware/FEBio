@@ -1,6 +1,5 @@
-#include "stdafx.h"
 #include "FEBiphasicSolidDomain.h"
-#include "FEBioMix/FEBiphasic.h"
+#include "FEBiphasic.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

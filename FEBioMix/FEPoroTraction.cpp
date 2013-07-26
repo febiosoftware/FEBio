@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FEPoroTraction.h"
 #include "FECore/FEModel.h"
 
@@ -277,7 +276,6 @@ void FEPoroNormalTraction::Serialize(DumpFile& ar)
 void FEPoroNormalTraction::StiffnessMatrix(FESolver* psolver)
 {
 	FEModel& fem = psolver->GetFEModel();
-	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	matrix ke;
 

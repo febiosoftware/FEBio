@@ -11,8 +11,8 @@
 
 #include <FECore/FEContactInterface.h>
 #include <FECore/FEClosestPointProjection.h>
+#include <FECore/FEContactSurface.h>
 #include <FECore/vector.h>
-#include "FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 class FESlidingSurface : public FEContactSurface

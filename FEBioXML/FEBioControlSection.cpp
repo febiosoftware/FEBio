@@ -2,8 +2,8 @@
 #include "FEBioControlSection.h"
 #include <FEBioLib/FESolidSolver.h>
 #include <FEBioLib/FEExplicitSolidSolver.h>
-#include <FEBioLib/FEBiphasicSolver.h>
-#include <FEBioLib/FEBiphasicSoluteSolver.h>
+#include <FEBioMix/FEBiphasicSolver.h>
+#include <FEBioMix/FEBiphasicSoluteSolver.h>
 #include <FEBioLib/FELinearSolidSolver.h>
 #include <FEBioLib/FECoupledHeatSolidSolver.h>
 #include <FEBioLib/FEUDGHexDomain.h>

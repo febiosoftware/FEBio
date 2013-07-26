@@ -1,8 +1,7 @@
-#include "stdafx.h"
 #include "FESlidingInterface3.h"
+#include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
 #include "FECore/FEModel.h"
-#include "FEBioMix/FEBiphasic.h"
-#include "FEBioMix/FEBiphasicSolute.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

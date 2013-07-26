@@ -1,5 +1,5 @@
 #pragma once
-#include "FEElasticSolidDomain.h"
+#include "FEBioLib/FEElasticSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for multiphasic 3D solid elements

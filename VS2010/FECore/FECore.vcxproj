@@ -681,6 +681,7 @@
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
     <ClInclude Include="..\..\FECore\FEContactInterface.h" />
+    <ClInclude Include="..\..\FECore\FEContactSurface.h" />
     <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
@@ -752,6 +753,7 @@
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
     <ClCompile Include="..\..\FECore\FEContactInterface.cpp" />
+    <ClCompile Include="..\..\FECore\FEContactSurface.cpp" />
     <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />
     <ClCompile Include="..\..\FECore\FECore.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />

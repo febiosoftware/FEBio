@@ -12,8 +12,8 @@
 #include "FEFacet2FacetSliding.h"
 #include "FEFacet2FacetTied.h"
 #include "FERigidJoint.h"
-#include "FEBiphasicSolver.h"
-#include "FEBiphasicSoluteSolver.h"
+#include "FEBioMix/FEBiphasicSolver.h"
+#include "FEBioMix/FEBiphasicSoluteSolver.h"
 #include <FECore/FERigidBody.h>
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"

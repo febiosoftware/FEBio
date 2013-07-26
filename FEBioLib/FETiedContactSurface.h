@@ -1,5 +1,5 @@
 #pragma once
-#include "FEContactSurface.h"
+#include "FECore/FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
 //! This class describes a contact slave or master surface used for 

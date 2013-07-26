@@ -13,12 +13,12 @@
 #include <FEBioLib/FERigidShellDomain.h>
 #include <FEBioLib/FEUDGHexDomain.h>
 #include <FEBioLib/FEUT4Domain.h>
-#include <FEBioLib/FEBiphasicSolidDomain.h>
-#include <FEBioLib/FETriphasicDomain.h>
-#include <FEBioLib/FEBiphasicSoluteDomain.h>
+#include <FEBioMix/FEBiphasicSolidDomain.h>
+#include <FEBioMix/FETriphasicDomain.h>
+#include <FEBioMix/FEBiphasicSoluteDomain.h>
 #include <FEBioLib/FE3FieldElasticSolidDomain.h>
 #include <FEBioLib/FELinearSolidDomain.h>
-#include <FEBioLib/FEMultiphasicDomain.h>
+#include <FEBioMix/FEMultiphasicDomain.h>
 #include <FEBioHeat/FEHeatTransferMaterial.h>
 #include <FEBioHeat/FEHeatSolidDomain.h>
 

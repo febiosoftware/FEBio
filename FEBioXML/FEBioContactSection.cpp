@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEBioContactSection.h"
 #include <FEBioLib/FESlidingInterface.h>
-#include <FEBioLib/FESlidingInterface2.h>
-#include <FEBioLib/FESlidingInterface3.h>
+#include <FEBioMix/FESlidingInterface2.h>
+#include <FEBioMix/FESlidingInterface3.h>
 #include <FEBioLib/FETiedInterface.h>
 #include <FEBioLib/FEFacet2FacetTied.h>
 #include <FEBioLib/FETiedBiphasicInterface.h>
