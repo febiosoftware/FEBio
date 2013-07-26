@@ -16,7 +16,7 @@
 #include "FEBioLib/FETransverselyIsotropic.h"
 #include <FEBioHeat/FEHeatTransferMaterial.h>
 #include "FEBioLib/FETrussMaterial.h"
-#include "FEBioLib/FEBiphasic.h"
+#include "FEBioMix/FEBiphasic.h"
 #include "FEBioLib/FEAnalysisStep.h"
 
 LSDYNAPlotFile::LSDYNAPlotFile()

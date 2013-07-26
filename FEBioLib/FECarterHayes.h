@@ -9,7 +9,7 @@
 
 #pragma once
 #include <FECore/FEElasticMaterial.h>
-#include "FEMultiphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 //! This is a neo-Hookean material whose Young's modulus is evaluated from the density

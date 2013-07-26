@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ElementDataRecord.h"
-#include "FETriphasic.h"
-#include "FEMultiphasic.h"
+#include "FEBioMix/FETriphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 void ElementDataRecord::Parse(const char *szexpr)

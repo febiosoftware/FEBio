@@ -9,7 +9,7 @@
 
 #include "stdafx.h"
 #include "FECarterHayes.h"
-#include "FEMultiphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
 // define the material parameters

@@ -8,10 +8,10 @@
 #include "FEBioLib/FERigidSolidDomain.h"
 #include "FEBioLib/FERigidShellDomain.h"
 #include "FEBioLib/FEElasticMixture.h"
-#include "FEBioLib/FEBiphasicSolute.h"
-#include "FEBioLib/FETriphasic.h"
+#include "FEBioMix/FEBiphasicSolute.h"
+#include "FEBioMix/FETriphasic.h"
 #include "FEBioLib/FEMultiphasicDomain.h"
-#include "FEBioLib/FEMultiphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
 #include "FEBioLib/FEUT4Domain.h"
 
 //-----------------------------------------------------------------------------

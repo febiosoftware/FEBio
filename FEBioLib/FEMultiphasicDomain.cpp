@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEMultiphasicDomain.h"
 #include "FECore/FEMaterial.h"
-#include "FEMultiphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
 #include "FECore/log.h"
 
 #ifndef SQR
@@ -2288,7 +2288,7 @@ void FEMultiphasicDomain::UpdateElementStress(int iel)
 			for (int isbm=0; isbm<nsbm; ++isbm) {
 				spt.m_sbmrhat[isbm] = 0;
 				// combine the molar supplies from all the reactions
-				for (int k=0; k<pmb->m_pReact.size(); ++k) {
+				for (int k=0; k<(int)pmb->m_pReact.size(); ++k) {
 					double zetahat = pmb->m_pReact[k]->ReactionSupply(mp);
 					double v = pmb->m_pReact[k]->m_v[nsol+isbm];
 					// remember to convert from molar supply to referential mass supply

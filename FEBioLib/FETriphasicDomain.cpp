@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FETriphasicDomain.h"
 #include "FECore/FEMaterial.h"
-#include "FETriphasic.h"
+#include "FEBioMix/FETriphasic.h"
 #include "FECore/log.h"
 
 #ifndef SQR

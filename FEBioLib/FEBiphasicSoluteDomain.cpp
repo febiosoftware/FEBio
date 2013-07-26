@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FECore/FEMaterial.h"
 #include "FEBiphasicSoluteDomain.h"
-#include "FEBiphasicSolute.h"
+#include "FEBioMix/FEBiphasicSolute.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

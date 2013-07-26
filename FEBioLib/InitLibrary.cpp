@@ -8,15 +8,12 @@
 #include "FE2DTransIsoMooneyRivlin.h"
 #include "FE2DTransIsoVerondaWestmann.h"
 #include "FEArrudaBoyce.h"
-#include "FEBiphasic.h"
-#include "FEBiphasicSolute.h"
+#include "FEBioMix/FEBiphasic.h"
+#include "FEBioMix/FEBiphasicSolute.h"
 #include "FECellGrowth.h"
 #include "FEDamageMooneyRivlin.h"
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
-#include "FEDiffConstIso.h"
-#include "FEDiffConstOrtho.h"
-#include "FEDiffRefIso.h"
 #include "FEDiscreteMaterial.h"
 #include "FEDonnanEquilibrium.h"
 #include "FEEFDDonnanEquilibrium.h"
@@ -39,33 +36,23 @@
 #include "FELinearOrthotropic.h"
 #include "FELinearTransIso.h"
 #include "FEMooneyRivlin.h"
-#include "FEMultiphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
 #include "FEMuscleMaterial.h"
 #include "FENeoHookean.h"
 #include "FENeoHookeanTransIso.h"
 #include "FEOgdenMaterial.h"
 #include "FEOgdenUnconstrained.h"
 #include "FEOrthoElastic.h"
-#include "FEOsmCoefConst.h"
 #include "FEPerfectOsmometer.h"
-#include "FEPermConstIso.h"
-#include "FEPermHolmesMow.h"
-#include "FEPermRefIso.h"
-#include "FEPermRefOrtho.h"
-#include "FEPermRefTransIso.h"
 #include <FECore/FERigid.h>
 #include "FEStVenantKirchhoff.h"
-#include "FESolubConst.h"
-#include "FESupplyBinding.h"
-#include "FESupplyConst.h"
-#include "FESupplySynthesisBinding.h"
-#include "FESolute.h"
+#include "FEBioMix/FESolute.h"
 #include "FESphericalFiberDistribution.h"
 #include "FETCNonlinearOrthotropic.h"
 #include "FETendonMaterial.h"
 #include "FETransIsoMooneyRivlin.h"
 #include "FETransIsoVerondaWestmann.h"
-#include "FETriphasic.h"
+#include "FEBioMix/FETriphasic.h"
 #include "FETrussMaterial.h"
 #include "FEUncoupledElasticMixture.h"
 #include "FEVerondaWestmann.h"
@@ -73,13 +60,13 @@
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEElasticMultigeneration.h"
-#include "FESolventSupplyStarling.h"
 #include "FEMRVonMisesFibers.h"
 #include "FEUncoupledActiveContraction.h"
 #include "FEHuiskesSupply.h"
 #include "FERemodelingElasticMaterial.h"
 #include "FECarterHayes.h"
 #include "FECarterHayesOld.h"
+
 
 #include "FESurfaceConstraint.h"
 #include "FEPeriodicBoundary.h"
@@ -97,8 +84,7 @@
 #include "FERigidSolidDomain.h"
 #include "FERigidShellDomain.h"
 #include "FEElasticMixture.h"
-#include "FEBiphasicSolute.h"
-#include "FETriphasic.h"
+#include "FEBioMix/FEBiphasicSolute.h"
 #include "FEBioPlot/FEPlotNodeData.h"
 #include "FEBioPlot/FEPlotSurfaceData.h"
 #include <FECore/FECoordSysMap.h>
@@ -124,9 +110,6 @@ REGISTER_MATERIAL(FECellGrowth                   , "cell growth"                
 REGISTER_MATERIAL(FEDamageMooneyRivlin           , "damage Mooney-Rivlin"          );
 REGISTER_MATERIAL(FEDamageNeoHookean             , "damage neo-Hookean"            );
 REGISTER_MATERIAL(FEDamageTransIsoMooneyRivlin   , "damage trans iso Mooney-Rivlin");
-REGISTER_MATERIAL(FEDiffConstIso                 , "diff-const-iso"                );
-REGISTER_MATERIAL(FEDiffConstOrtho               , "diff-const-ortho"              );
-REGISTER_MATERIAL(FEDiffRefIso                   , "diff-ref-iso"                  );
 REGISTER_MATERIAL(FEDonnanEquilibrium            , "Donnan equilibrium"            );
 REGISTER_MATERIAL(FEEFDDonnanEquilibrium         , "EFD Donnan equilibrium"        );
 REGISTER_MATERIAL(FEEFDMooneyRivlin              , "EFD Mooney-Rivlin"             );
@@ -158,21 +141,11 @@ REGISTER_MATERIAL(FENonLinearSpring              , "nonlinear spring"           
 REGISTER_MATERIAL(FEOgdenMaterial                , "Ogden"                         );
 REGISTER_MATERIAL(FEOgdenUnconstrained           , "Ogden unconstrained"           );
 REGISTER_MATERIAL(FEOrthoElastic                 , "orthotropic elastic"           );
-REGISTER_MATERIAL(FEOsmCoefConst                 , "osm-coef-const"                );
 REGISTER_MATERIAL(FEPerfectOsmometer             , "perfect osmometer"             );
-REGISTER_MATERIAL(FEPermConstIso                 , "perm-const-iso"                );
-REGISTER_MATERIAL(FEPermHolmesMow                , "perm-Holmes-Mow"               );
-REGISTER_MATERIAL(FEPermRefIso                   , "perm-ref-iso"                  );
-REGISTER_MATERIAL(FEPermRefOrtho                 , "perm-ref-ortho"                );
-REGISTER_MATERIAL(FEPermRefTransIso              , "perm-ref-trans-iso"            );
 REGISTER_MATERIAL(FERigidMaterial                , "rigid body"                    );
 REGISTER_MATERIAL(FESphericalFiberDistribution   , "spherical fiber distribution"  );
 REGISTER_MATERIAL(FEStVenantKirchhoff            , "St.Venant-Kirchhoff"           );
-REGISTER_MATERIAL(FESolubConst                   , "solub-const"                   );
 REGISTER_MATERIAL(FESolute                       , "solute"                        );
-REGISTER_MATERIAL(FESupplyBinding                , "supply-binding"                );
-REGISTER_MATERIAL(FESupplyConst                  , "supply-const"                  );
-REGISTER_MATERIAL(FESupplySynthesisBinding       , "supply-synthesis-binding"      );
 REGISTER_MATERIAL(FETCNonlinearOrthotropic       , "TC nonlinear orthotropic"      );
 REGISTER_MATERIAL(FETendonMaterial               , "tendon material"               );
 REGISTER_MATERIAL(FETensionOnlyLinearSpring      , "tension only linear spring"    );
@@ -186,7 +159,6 @@ REGISTER_MATERIAL(FEViscoElasticMaterial         , "viscoelastic"               
 REGISTER_MATERIAL(FEUncoupledViscoElasticMaterial, "uncoupled viscoelastic"        );
 REGISTER_MATERIAL(FEVonMisesPlasticity           , "von-Mises plasticity"          );
 REGISTER_MATERIAL(FEElasticMultigeneration       , "multigeneration"               );
-REGISTER_MATERIAL(FESolventSupplyStarling        , "Starling"                      );
 REGISTER_MATERIAL(FEMRVonMisesFibers             , "Mooney-Rivlin von Mises Fibers");
 REGISTER_MATERIAL(FEUncoupledActiveContraction   , "uncoupled active contraction"  );
 REGISTER_MATERIAL(FEHuiskesSupply                , "Huiskes-supply"                );

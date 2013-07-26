@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D41F2690-2378-44C1-BCFB-1173752C8C6C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FEBioMix</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)d</TargetName>
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\FEBioMix\FEBioMix.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasic.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicSolute.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEDiffConstIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEDiffConstOrtho.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEDiffRefIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMassActionForward.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMassActionReversible.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMichaelisMenten.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEMultiphasic.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEOsmCoefConst.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPermConstIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPermHolmesMow.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPermRefIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPermRefOrtho.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEPermRefTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEReactionRateConst.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEReactionRateHuiskes.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESolubConst.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESolute.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESolventSupplyStarling.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESupplyBinding.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESupplyConst.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESupplyMichaelisMenten.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FESupplySynthesisBinding.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FETriphasic.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\FEBioMix\FEBioMix.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasic.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicSolute.h" />
+    <ClInclude Include="..\..\FEBioMix\FEDiffConstIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEDiffConstOrtho.h" />
+    <ClInclude Include="..\..\FEBioMix\FEDiffRefIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMassActionForward.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMassActionReversible.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMichaelisMenten.h" />
+    <ClInclude Include="..\..\FEBioMix\FEMultiphasic.h" />
+    <ClInclude Include="..\..\FEBioMix\FEOsmCoefConst.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPermConstIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPermHolmesMow.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPermRefIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPermRefOrtho.h" />
+    <ClInclude Include="..\..\FEBioMix\FEPermRefTransIso.h" />
+    <ClInclude Include="..\..\FEBioMix\FEReactionRateConst.h" />
+    <ClInclude Include="..\..\FEBioMix\FEReactionRateHuiskes.h" />
+    <ClInclude Include="..\..\FEBioMix\FESolubConst.h" />
+    <ClInclude Include="..\..\FEBioMix\FESolute.h" />
+    <ClInclude Include="..\..\FEBioMix\FESolventSupplyStarling.h" />
+    <ClInclude Include="..\..\FEBioMix\FESupplyBinding.h" />
+    <ClInclude Include="..\..\FEBioMix\FESupplyConst.h" />
+    <ClInclude Include="..\..\FEBioMix\FESupplyMichaelisMenten.h" />
+    <ClInclude Include="..\..\FEBioMix\FESupplySynthesisBinding.h" />
+    <ClInclude Include="..\..\FEBioMix\FETriphasic.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

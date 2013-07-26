@@ -52,6 +52,7 @@
 #include "FECore/febio.h"
 #include "FEBioLib/FEPointBodyForce.h"
 #include <FEBioHeat/FEBioHeat.h>
+#include <FEBioMix/FEBioMix.h>
 #include "plugin.h"
 
 //-----------------------------------------------------------------------------
@@ -145,6 +146,7 @@ int main(int argc, char* argv[])
 	// initialize FEBio library
 	InitFEBioLibrary();
 	FEBioHeat::InitModule();
+	FEBioMix::InitModule();
 
 	// if there are no arguments, print the FEBio prompt
 	if (argc == 1)

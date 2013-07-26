@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FETiedBiphasicInterface.h"
 #include "FESolidSolver.h"
-#include "FEBiphasic.h"
+#include "FEBioMix/FEBiphasic.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
