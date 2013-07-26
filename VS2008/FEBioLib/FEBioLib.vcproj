@@ -250,30 +250,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEBiphasic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSolidDomain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSolute.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSoluteDomain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSoluteSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSolver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEBox.cpp"
 				>
 			</File>
@@ -294,10 +270,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEContactSurface.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FECoupledHeatSolidSolver.cpp"
 				>
 			</File>
@@ -311,18 +283,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDiffConstIso.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDiffConstOrtho.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDiffRefIso.cpp"
 				>
 			</File>
 			<File
@@ -414,10 +374,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEFluidFlux.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEFungOrthoCompressible.cpp"
 				>
 			</File>
@@ -474,14 +430,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEMultiphasic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEMultiphasicDomain.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEMuscleMaterial.cpp"
 				>
 			</File>
@@ -506,10 +454,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEOsmCoefConst.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEPerfectOsmometer.cpp"
 				>
 			</File>
@@ -518,35 +462,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEPermConstIso.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermHolmesMow.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermRefIso.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermRefOrtho.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermRefTransIso.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPointConstraint.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPoroTraction.cpp"
 				>
 			</File>
 			<File
@@ -582,35 +502,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FESlidingInterface2.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESlidingInterface3.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FESlidingInterfaceBW.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESolidSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESolubConst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESolute.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESoluteFlux.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESolventSupplyStarling.cpp"
 				>
 			</File>
 			<File
@@ -623,22 +519,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplyBinding.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplyConst.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplyMichaelisMenten.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplySynthesisBinding.cpp"
 				>
 			</File>
 			<File
@@ -679,14 +559,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETriphasic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETriphasicDomain.cpp"
 				>
 			</File>
 			<File
@@ -808,30 +680,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEBiphasic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSolidDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSolute.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSoluteDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSoluteSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEBiphasicSolver.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEBox.h"
 				>
 			</File>
@@ -852,10 +700,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEContactSurface.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FECoupledHeatSolidSolver.h"
 				>
 			</File>
@@ -869,18 +713,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEDamageTransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDiffConstIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDiffConstOrtho.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEDiffRefIso.h"
 				>
 			</File>
 			<File
@@ -976,10 +808,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEFluidFlux.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEFungOrthoCompressible.h"
 				>
 			</File>
@@ -1036,14 +864,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEMultiphasic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEMultiphasicDomain.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEMuscleMaterial.h"
 				>
 			</File>
@@ -1068,10 +888,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEOsmCoefConst.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEPerfectOsmometer.h"
 				>
 			</File>
@@ -1080,35 +896,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEPermConstIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermHolmesMow.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermRefIso.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermRefOrtho.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPermRefTransIso.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEPointBodyForce.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEPointConstraint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEPoroTraction.h"
 				>
 			</File>
 			<File
@@ -1144,35 +936,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FESlidingInterface2.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESlidingInterface3.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FESlidingInterfaceBW.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FESolidSolver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESolubConst.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESolute.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESoluteFlux.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESolventSupplyStarling.h"
 				>
 			</File>
 			<File
@@ -1185,22 +953,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEStVenantKirchhoff.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplyBinding.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplyConst.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplyMichaelisMenten.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FESupplySynthesisBinding.h"
 				>
 			</File>
 			<File
@@ -1241,14 +993,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FETransverselyIsotropic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETriphasic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FETriphasicDomain.h"
 				>
 			</File>
 			<File
