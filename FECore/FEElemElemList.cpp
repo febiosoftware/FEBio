@@ -1,22 +1,25 @@
 #include "stdafx.h"
 #include "FEElemElemList.h"
-#include "FECore/FENodeElemList.h"
-#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FENodeElemList.h"
+#include "FESolidDomain.h"
 
+//-----------------------------------------------------------------------------
 FEElemElemList::FEElemElemList(void)
 {
 }
 
+//-----------------------------------------------------------------------------
 FEElemElemList::~FEElemElemList(void)
 {
 }
 
+//-----------------------------------------------------------------------------
 void FEElemElemList::Init()
 {
 	int i;
 	FEMesh& m = *m_pmesh;
 
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
 
 	// get total nr of elements
 	int NE = bd.Elements();
@@ -40,6 +43,7 @@ void FEElemElemList::Init()
 	// TODO: do this for shells as well (if we have to)
 }
 
+//-----------------------------------------------------------------------------
 void FEElemElemList::Create(FEMesh* pmesh)
 {
 	// store a pointer to the mesh
@@ -57,7 +61,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 	int i, j, k, l;
 	int n = 0, en0[8], en1[8], n0, n1, M = 0;
 	int nf0, nf1;
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
+	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
 	for (i=0; i<bd.Elements(); ++i, ++n)
 	{
 		FEElement& el = bd.Element(i);

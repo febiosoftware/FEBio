@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEMicroMaterial.h"
-#include "FEBioLib/FEElemElemList.h"
+#include "FECore/FEElemElemList.h"
 #include "FECore/log.h"
 #include "FEBioMech/FESolidSolver.h"
 #include "FEBioMech/FEElasticSolidDomain.h"

@@ -710,7 +710,6 @@
     <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
-    <ClInclude Include="..\..\FEBioLib\FEElemElemList.h" />
     <ClInclude Include="..\..\FEBioLib\NodeDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\RigidBodyDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
@@ -724,7 +723,6 @@
     <ClCompile Include="..\..\FEBioLib\FEAnalysisStep.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FEElemElemList.cpp" />
     <ClCompile Include="..\..\FEBioLib\getapppath.cpp" />
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
