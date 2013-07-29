@@ -191,10 +191,10 @@ public:
 	vec3d CurrentDensity(FEMaterialPoint& pt);
 
 	//! fluid true density
-	double FluidTrueDensity() { return m_rhoTw; }
+	double FluidDensity() { return m_rhoTw; }
 	
 	//! solute density
-	double SoluteTrueDensity(const int sol) { return m_pSolute[sol]->TrueDensity(); }
+	double SoluteDensity(const int sol) { return m_pSolute[sol]->Density(); }
 	
 	//! solute molar mass
 	double SoluteMolarMass(const int sol) { return m_pSolute[sol]->MolarMass(); }
@@ -203,7 +203,7 @@ public:
 	int SoluteChargeNumber(const int sol) { return m_pSolute[sol]->ChargeNumber(); }
 	
 	//! SBM density
-	double SBMTrueDensity(const int sbm) { return m_pSBM[sbm]->TrueDensity(); }
+	double SBMDensity(const int sbm) { return m_pSBM[sbm]->Density(); }
 	
 	//! SBM molar mass
 	double SBMMolarMass(const int sbm) { return m_pSBM[sbm]->MolarMass(); }
@@ -222,7 +222,7 @@ public:
 	//! SBM referential volume fraction
 	double SBMReferentialVolumeFraction(FEMaterialPoint& pt, const int sbm) {
 		FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
-		return spt.m_sbmr[sbm]/SBMTrueDensity(sbm);
+		return spt.m_sbmr[sbm]/SBMDensity(sbm);
 	}
 
 	//! find local SBM ID from global one

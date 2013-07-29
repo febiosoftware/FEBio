@@ -135,6 +135,12 @@
     <ClCompile Include="..\..\FEBioMix\FECarterHayes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FEConcentrationIndependentReaction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FESFDSBM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMix\FEBioMix.h">
@@ -252,6 +258,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMix\FECarterHayes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FEConcentrationIndependentReaction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FESFDSBM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

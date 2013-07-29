@@ -375,9 +375,9 @@ void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
     if (!m_pReact->m_Vovr) {
         m_pReact->m_Vbar = 0;
         for (isol=0; isol<nsol; ++isol)
-            m_pReact->m_Vbar += m_pReact->m_v[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->TrueDensity();
+            m_pReact->m_Vbar += m_pReact->m_v[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
         for (isbm=0; isbm<nsbm; ++isbm)
-            m_pReact->m_Vbar += m_pReact->m_v[nsol+isbm]*m_pSBM[isbm]->MolarMass()/m_pSBM[isbm]->TrueDensity();
+            m_pReact->m_Vbar += m_pReact->m_v[nsol+isbm]*m_pSBM[isbm]->MolarMass()/m_pSBM[isbm]->Density();
     }
 	
 	// check that the chemical reaction satisfies electroneutrality
@@ -929,6 +929,7 @@ vec3d FEMultiphasic::FluidFlux(FEMaterialPoint& pt)
 
 vec3d FEMultiphasic::SoluteFlux(FEMaterialPoint& pt, const int sol)
 {
+	FEBiphasicMaterialPoint& bpt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
@@ -954,7 +955,7 @@ vec3d FEMultiphasic::SoluteFlux(FEMaterialPoint& pt, const int sol)
 	double kappa = zz*khat;
 	
 	// fluid flux w
-	vec3d w = FluidFlux(pt);
+	vec3d w = bpt.m_w;
 	
 	// solute flux j
 	vec3d j = (D*(w*(c/D0) - gradc*phiw))*kappa;

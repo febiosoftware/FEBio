@@ -97,6 +97,7 @@ void FEViscoElasticMaterial::Init()
 {
 	FEElasticMaterial::Init();
 	if (m_pBase == 0) throw MaterialError("This material needs an elastic base.");
+	m_pBase->m_pParent = m_pParent;
 	m_pBase->Init();
 }
 

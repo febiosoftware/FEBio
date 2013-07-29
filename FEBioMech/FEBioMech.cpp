@@ -12,6 +12,7 @@
 #include "FEDamageTransIsoMooneyRivlin.h"
 #include "FEDiscreteMaterial.h"
 #include "FEDonnanEquilibrium.h"
+#include "FEEFD.h"
 #include "FEEFDDonnanEquilibrium.h"
 #include "FEEFDMooneyRivlin.h"
 #include "FEEFDNeoHookean.h"
@@ -84,6 +85,7 @@ REGISTER_MATERIAL(FEDamageMooneyRivlin           , "damage Mooney-Rivlin"       
 REGISTER_MATERIAL(FEDamageNeoHookean             , "damage neo-Hookean"            );
 REGISTER_MATERIAL(FEDamageTransIsoMooneyRivlin   , "damage trans iso Mooney-Rivlin");
 REGISTER_MATERIAL(FEDonnanEquilibrium            , "Donnan equilibrium"            );
+REGISTER_MATERIAL(FEEFD                          , "EFD"                           );
 REGISTER_MATERIAL(FEEFDDonnanEquilibrium         , "EFD Donnan equilibrium"        );
 REGISTER_MATERIAL(FEEFDMooneyRivlin              , "EFD Mooney-Rivlin"             );
 //REGISTER_MATERIAL(FEEFDNeoHookean                , "EFD neo-Hookean"               );

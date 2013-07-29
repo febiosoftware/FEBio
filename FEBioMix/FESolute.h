@@ -113,7 +113,7 @@ public:
 	void Init();
 	
 	//! solute density
-	double TrueDensity() { return m_rhoT; }
+	double Density() { return m_rhoT; }
 	
 	//! solute molecular weight
 	double MolarMass() { return m_M; }
@@ -161,7 +161,7 @@ public:
 	void Init();
 	
 	//! solute density
-	double TrueDensity() { return m_rhoT; }
+	double Density() { return m_rhoT; }
 	
 	//! solute molecular weight
 	double MolarMass() { return m_M; }

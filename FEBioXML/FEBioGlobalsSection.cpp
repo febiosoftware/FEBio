@@ -134,7 +134,7 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 			{
 				tag.value(psd->m_z);
 			}
-			else if (tag == "true_density")
+			else if (tag == "density")
 			{
 				tag.value(psd->m_rhoT);
 			}
@@ -186,7 +186,7 @@ void FEBioGlobalsSection::ParseGSSBMData(XMLTag &tag)
 			{
 				tag.value(psd->m_z);
 			}
-			else if (tag == "true_density")
+			else if (tag == "density")
 			{
 				tag.value(psd->m_rhoT);
 			}

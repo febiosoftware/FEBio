@@ -24,7 +24,7 @@ void FEOsmCoefConst::Init()
 //! Osmotic coefficient
 double FEOsmCoefConst::OsmoticCoefficient(FEMaterialPoint& mp)
 {
-	// --- constant solubility ---
+	// --- constant osmotic coefficient ---
 	
 	return m_osmcoef;
 }

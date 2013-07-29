@@ -13,6 +13,7 @@
 #include "FEPermRefOrtho.h"
 #include "FEPermRefTransIso.h"
 #include "FEOsmCoefConst.h"
+#include "FESFDSBM.h"
 #include "FESolventSupplyStarling.h"
 #include "FESolubConst.h"
 #include "FESupplyBinding.h"
@@ -48,6 +49,7 @@ REGISTER_MATERIAL(FEPermRefIso                   , "perm-ref-iso"      );
 REGISTER_MATERIAL(FEPermRefOrtho                 , "perm-ref-ortho"    );
 REGISTER_MATERIAL(FEPermRefTransIso              , "perm-ref-trans-iso");
 REGISTER_MATERIAL(FEOsmCoefConst                 , "osm-coef-const"    );
+REGISTER_MATERIAL(FESFDSBM                       , "spherical fiber distribution sbm");
 REGISTER_MATERIAL(FESolventSupplyStarling        , "Starling"          );
 REGISTER_MATERIAL(FESolubConst                   , "solub-const"       );
 REGISTER_MATERIAL(FESupplyBinding                , "supply-binding"          );
