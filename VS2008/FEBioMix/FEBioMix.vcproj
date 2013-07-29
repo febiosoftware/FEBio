@@ -181,6 +181,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEConcentrationIndependentReaction.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEDiffConstIso.cpp"
 				>
 			</File>
@@ -250,6 +254,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEReactionRateHuiskes.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FESFDSBM.cpp"
 				>
 			</File>
 			<File
@@ -343,6 +351,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEConcentrationIndependentReaction.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEDiffConstIso.h"
 				>
 			</File>
@@ -412,6 +424,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEReactionRateHuiskes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FESFDSBM.h"
 				>
 			</File>
 			<File

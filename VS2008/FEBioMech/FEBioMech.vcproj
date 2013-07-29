@@ -221,6 +221,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEEFD.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEEFDDonnanEquilibrium.cpp"
 				>
 			</File>
@@ -608,6 +612,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEDonnanEquilibrium.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEEFD.h"
 				>
 			</File>
 			<File
