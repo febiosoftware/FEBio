@@ -248,10 +248,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\FEContactInterface.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\FECoordSysMap.cpp"
 				>
 			</File>
@@ -265,10 +261,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEDomain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FEElasticMaterial.cpp"
 				>
 			</File>
 			<File
@@ -348,14 +340,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\FERigid.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FERigidBody.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\FEShellDomain.cpp"
 				>
 			</File>
@@ -373,6 +357,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FESurfaceLoad.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FESurfacePairInteraction.cpp"
 				>
 			</File>
 			<File
@@ -494,10 +482,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\FEContactInterface.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\FECoordSysMap.h"
 				>
 			</File>
@@ -511,10 +495,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEDomain.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FEElasticMaterial.h"
 				>
 			</File>
 			<File
@@ -606,14 +586,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FECore\FERigid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FERigidBody.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FECore\FEShellDomain.h"
 				>
 			</File>
@@ -631,6 +603,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FESurfaceLoad.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FESurfacePairInteraction.h"
 				>
 			</File>
 			<File

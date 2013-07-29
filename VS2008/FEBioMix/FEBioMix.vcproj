@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FECarterHayes.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEDiffConstIso.cpp"
 				>
 			</File>
@@ -332,6 +336,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEBiphasicSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FECarterHayes.h"
 				>
 			</File>
 			<File
