@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEElasticMaterial.h"
+#include "FEBioMech/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! Biphasic material point class.

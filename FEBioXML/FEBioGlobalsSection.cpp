@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioGlobalsSection.h"
-#include <FEBioLib/FEPointBodyForce.h>
-#include <FEBioLib/FEElasticMultigeneration.h>
+#include <FEBioMech/FEPointBodyForce.h>
+#include <FEBioMech/FEElasticMultigeneration.h>
 
 //-----------------------------------------------------------------------------
 //!  This function reads the global variables from the xml file

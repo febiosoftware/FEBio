@@ -4,17 +4,17 @@
 #include "FEBioModel.h"
 #include "FEBioXML/FileImport.h"
 #include "FEBioXML/FEBioImport.h"
-#include "FESlidingInterface.h"
-#include "FETiedInterface.h"
-#include "FERigidWallInterface.h"
-#include "FEPeriodicBoundary.h"
-#include "FESurfaceConstraint.h"
-#include "FEFacet2FacetSliding.h"
-#include "FEFacet2FacetTied.h"
-#include "FERigidJoint.h"
+#include "FEBioMech/FESlidingInterface.h"
+#include "FEBioMech/FETiedInterface.h"
+#include "FEBioMech/FERigidWallInterface.h"
+#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FESurfaceConstraint.h"
+#include "FEBioMech/FEFacet2FacetSliding.h"
+#include "FEBioMech/FEFacet2FacetTied.h"
+#include "FEBioMech/FERigidJoint.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
-#include <FECore/FERigidBody.h>
+#include "FEBioMech/FERigidBody.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/log.h"
@@ -347,15 +347,15 @@ void echo_input(FEBioModel& fem)
 		clog.printf("\n\n");
 	}
 
-	if (fem.ContactInterfaces() > 0)
+	if (fem.SurfacePairInteractions() > 0)
 	{
 		clog.printf(" CONTACT INTERFACE DATA\n");
 		clog.printf("===========================================================================\n");
-		for (i=0; i<fem.ContactInterfaces(); ++i)
+		for (i=0; i<fem.SurfacePairInteractions(); ++i)
 		{
 			if (i>0) clog.printf("---------------------------------------------------------------------------\n");
 
-			FEContactInterface* pi = fem.ContactInterface(i);
+			FEContactInterface* pi = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
 			const char* sztype = febio.GetTypeStr<FEContactInterface>(pi);
 			if (sztype == 0) sztype = "unknown";
 			clog.printf("contact interface %d - Type: %s\n", i+1, sztype);

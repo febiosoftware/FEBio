@@ -4,18 +4,18 @@
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEShellDomain.h"
 #include "FECore/FESolidDomain.h"
-#include "FEBioLib/FESolidSolver.h"
-#include "FEBioLib/FESlidingInterface.h"
-#include "FEBioLib/FETiedInterface.h"
-#include "FEBioLib/FERigidWallInterface.h"
-#include "FEBioLib/FEPeriodicBoundary.h"
-#include "FEBioLib/FESurfaceConstraint.h"
+#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESlidingInterface.h"
+#include "FEBioMech/FETiedInterface.h"
+#include "FEBioMech/FERigidWallInterface.h"
+#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FESurfaceConstraint.h"
 #include "FEBioMix/FESlidingInterface2.h"
 #include "FEBioMix/FESlidingInterface3.h"
-#include "FEBioLib/FEFacet2FacetSliding.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
+#include "FEBioMech/FEFacet2FacetSliding.h"
+#include "FEBioMech/FETransverselyIsotropic.h"
 #include <FEBioHeat/FEHeatTransferMaterial.h>
-#include "FEBioLib/FETrussMaterial.h"
+#include "FEBioMech/FETrussMaterial.h"
 #include "FEBioMix/FEBiphasic.h"
 #include "FEBioLib/FEAnalysisStep.h"
 
@@ -76,14 +76,14 @@ bool LSDYNAPlotFile::Open(FEModel& fem, const char* szfile)
 		m_nfield[2] = PLOT_NONE;
 		if (nmode == FE_BIPHASIC) m_nfield[2] = PLOT_FLUID_FLUX;
 		else if (ntype == FE_DYNAMIC) m_nfield[2] = PLOT_ACCELERATION;
-		else if (fem.ContactInterfaces() > 0) m_nfield[2] = PLOT_CONTACT_TRACTION;
+		else if (fem.SurfacePairInteractions() > 0) m_nfield[2] = PLOT_CONTACT_TRACTION;
 	}
 	if (m_nfield[3] == -1)
 	{
 		m_nfield[3] = PLOT_NONE;
 		if (nmode == FE_BIPHASIC) m_nfield[3] = PLOT_FLUID_PRESSURE;
 		else if (nmode == FE_HEAT) m_nfield[3] = PLOT_TEMPERATURE;
-		else if (fem.ContactInterfaces() > 0) m_nfield[3] = PLOT_CONTACT_GAP;
+		else if (fem.SurfacePairInteractions() > 0) m_nfield[3] = PLOT_CONTACT_GAP;
 	}
 	if (m_nfield[4] == -1)
 	{
@@ -716,9 +716,9 @@ void LSDYNAPlotFile::write_contact_tractions()
 	int i, j, k, n;
 
 	vector<float> acc(3*mesh.Nodes()); zero(acc);
-	for (i=0; i<fem.ContactInterfaces(); ++i)
+	for (i=0; i<fem.SurfacePairInteractions(); ++i)
 	{
-		FEContactInterface* pci = fem.ContactInterface(i);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
 
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*> (pci);
 		if (psi)
@@ -1049,9 +1049,9 @@ void LSDYNAPlotFile::write_contact_pressures()
 
 	int i, j;
 
-	for (i=0; i<fem.ContactInterfaces(); ++i)
+	for (i=0; i<fem.SurfacePairInteractions(); ++i)
 	{
-		FEContactInterface* pci = fem.ContactInterface(i);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
 
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(pci);
 		if (psi)
@@ -1167,9 +1167,9 @@ void LSDYNAPlotFile::write_contact_gaps()
 
 	int i, j;
 
-	for (i=0; i<fem.ContactInterfaces(); ++i)
+	for (i=0; i<fem.SurfacePairInteractions(); ++i)
 	{
-		FEContactInterface* pci = fem.ContactInterface(i);
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
 
 		FESlidingInterface* psi = dynamic_cast<FESlidingInterface*>(pci);
 		if (psi)

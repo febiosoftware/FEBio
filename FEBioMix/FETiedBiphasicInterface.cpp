@@ -537,7 +537,7 @@ void FETiedBiphasicInterface::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::ShallowCopy(FEContactInterface &ci)
+void FETiedBiphasicInterface::ShallowCopy(FESurfacePairInteraction &ci)
 {
 	FETiedBiphasicInterface& si = dynamic_cast<FETiedBiphasicInterface&>(ci);
 	m_ss.ShallowCopy(si.m_ss);

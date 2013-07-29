@@ -697,7 +697,7 @@ void FESlidingInterface2::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ShallowCopy(FEContactInterface &ci)
+void FESlidingInterface2::ShallowCopy(FESurfacePairInteraction &ci)
 {
 	FESlidingInterface2& si = dynamic_cast<FESlidingInterface2&>(ci);
 	m_ss.ShallowCopy(si.m_ss);

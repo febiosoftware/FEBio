@@ -1,8 +1,8 @@
 #pragma once
 #include "FECore/FEPlotData.h"
-#include "FEBioLib/FEElasticShellDomain.h"
-#include "FEBioLib/FEElasticSolidDomain.h"
-#include "FEBioLib/FELinearSolidDomain.h"
+#include "FEBioMech/FEElasticShellDomain.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBioMech/FELinearSolidDomain.h"
 
 //=============================================================================
 // The following classes define data fields for domains. 

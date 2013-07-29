@@ -1,5 +1,5 @@
 #pragma once
-#include "FECore/FEContactInterface.h"
+#include "FEBioMech/FEContactInterface.h"
 #include "FECore/FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ public:
 	void Update(int n);
 	
 	//! Create a shallow copy
-	void ShallowCopy(FEContactInterface& ci);
+	void ShallowCopy(FESurfacePairInteraction& ci);
 	
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);

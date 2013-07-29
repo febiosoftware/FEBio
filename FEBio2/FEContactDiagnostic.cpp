@@ -4,10 +4,11 @@
 
 #include "stdafx.h"
 #include "FEContactDiagnostic.h"
-#include "FEBioLib/FENeoHookean.h"
-#include "FEBioLib/FESolidSolver.h"
-#include "FEBioLib/FESlidingInterface.h"
-#include "FEBioLib/FEElasticSolidDomain.h"
+#include "FEBioMech/FENeoHookean.h"
+#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FESlidingInterface.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBioMech/FEResidualVector.h"
 #include "FECore/log.h"
 
 void print_matrix(Logfile& log, DenseMatrix& m)
@@ -228,7 +229,7 @@ bool FEContactDiagnostic::Init()
 	ss.Element(0).m_node[1] = 10;
 	ss.Element(0).m_node[2] = 9;
 	ss.Element(0).m_node[3] = 8;
-	m_fem.AddContactInterface(ps);
+	m_fem.AddSurfacePairInteraction(ps);
 
 	// --- set fem data ---
 	m_fem.m_nsolver = LU_SOLVER;	// make sure we have the LU solver
@@ -251,7 +252,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 	// first calculate the initial residual
 	vector<double> R0; R0.assign(48, 0);
 	vector<double> dummy(R0);
-	FEGlobalVector RHS0(m_fem, R0, dummy);
+	FEResidualVector RHS0(m_fem, R0, dummy);
 	solver.ContactForces(RHS0);
 //	solver.Residual(RHS);
 
@@ -277,7 +278,7 @@ void FEContactDiagnostic::deriv_residual(DenseMatrix& K)
 		solver.UpdateContact();
 
 		zero(R1);
-		FEGlobalVector RHS1(m_fem, R1, dummy);
+		FEResidualVector RHS1(m_fem, R1, dummy);
 		solver.ContactForces(RHS1);
 //		solver.Residual(R1);
 

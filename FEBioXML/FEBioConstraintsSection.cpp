@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioConstraintsSection.h"
-#include <FECore/FERigid.h>
-#include <FEBioLib/FEPointConstraint.h>
+#include "FEBioMech/FERigid.h"
+#include "FEBioMech/FEPointConstraint.h"
 
 //=============================================================================
 //

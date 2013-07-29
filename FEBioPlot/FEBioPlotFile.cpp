@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBioPlotFile.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
+#include "FEBioMech/FETransverselyIsotropic.h"
 #include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------

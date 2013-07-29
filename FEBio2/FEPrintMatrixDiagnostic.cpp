@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEPrintMatrixDiagnostic.h"
-#include "FEBioLib/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver.h"
 
 FEPrintMatrixDiagnostic::FEPrintMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
 {
@@ -59,7 +59,7 @@ bool FEPrintMatrixDiagnostic::Run()
 
 	// build the stiffness matrix
 	// recalculate the shape of the stiffness matrix if necessary
-	if (m_fem.ContactInterfaces() > 0) solver.UpdateContact();
+	if (m_fem.SurfacePairInteractions() > 0) solver.UpdateContact();
 
 	// reshape the stiffness matrix
 	if (!solver.CreateStiffness(true)) return false;

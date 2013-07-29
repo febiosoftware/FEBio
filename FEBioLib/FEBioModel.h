@@ -2,8 +2,8 @@
 #include <FECore/FEModel.h>
 #include <FECore/Timer.h>
 #include "DataStore.h"
-#include "FEElasticMixture.h"
-#include "FEUncoupledElasticMixture.h"
+#include "FEBioMech/FEElasticMixture.h"
+#include "FEBioMech/FEUncoupledElasticMixture.h"
 
 //-----------------------------------------------------------------------------
 //! The FEBio model specializes the FEModel class to implement FEBio specific

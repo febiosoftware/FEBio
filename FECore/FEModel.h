@@ -4,7 +4,7 @@
 #include "LoadCurve.h"
 #include "BC.h"
 #include "FEBodyForce.h"
-#include "FEContactInterface.h"
+#include "FESurfacePairInteraction.h"
 #include "FEAnalysis.h"
 #include "FESurfaceLoad.h"
 #include "FENLConstraint.h"
@@ -151,14 +151,14 @@ public: // --- Analysis steps functions ---
 
 public: // --- Contact interface functions ---
 
-	//! return number of contact interfaces
-	int ContactInterfaces() { return m_CI.size(); } 
+	//! return number of surface pair interactions
+	int SurfacePairInteractions() { return m_CI.size(); } 
 
-	//! retrive a contact interface
-	FEContactInterface* ContactInterface(int i) { return m_CI[i]; }
+	//! retrive a surface pair interaction
+	FESurfacePairInteraction* SurfacePairInteraction(int i) { return m_CI[i]; }
 
-	//! Add a contact interface
-	void AddContactInterface(FEContactInterface* pci) { m_CI.push_back(pci); }
+	//! Add a surface pair interaction
+	void AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_CI.push_back(pci); }
 
 public: // --- Nonlinear constraints functions ---
 
@@ -248,11 +248,11 @@ public: // TODO: Find a better place for these parameters
 	bool	m_debug;			//!< debug flag
 
 protected:
-	std::vector<FELoadCurve*>			m_LC;	//!< load curve data
-	std::vector<FEMaterial*>			m_MAT;	//!< array of materials
-	std::vector<FEBodyLoad*>			m_BL;	//!< body load data
-	std::vector<FEContactInterface*>	m_CI;	//!< contact interface array
-	std::vector<FENLConstraint*>		m_NLC;	//!< nonlinear constraints
+	std::vector<FELoadCurve*>				m_LC;	//!< load curve data
+	std::vector<FEMaterial*>				m_MAT;	//!< array of materials
+	std::vector<FEBodyLoad*>				m_BL;	//!< body load data
+	std::vector<FESurfacePairInteraction*>	m_CI;	//!< contact interface array
+	std::vector<FENLConstraint*>			m_NLC;	//!< nonlinear constraints
 
 protected:
 	std::vector<FEAnalysis*>	m_Step;		//!< array of analysis steps

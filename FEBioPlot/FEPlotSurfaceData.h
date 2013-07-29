@@ -1,10 +1,10 @@
 #pragma once
 #include "FECore/FEPlotData.h"
-#include "FEBioLib/FESlidingInterface.h"
-#include "FEBioLib/FEFacet2FacetSliding.h"
+#include "FEBioMech/FESlidingInterface.h"
+#include "FEBioMech/FEFacet2FacetSliding.h"
+#include "FEBioMech/FETiedInterface.h"
 #include "FEBioMix/FESlidingInterface2.h"
 #include "FEBioMix/FESlidingInterface3.h"
-#include "FEBioLib/FETiedInterface.h"
 
 //=============================================================================
 //                         S U R F A C E   D A T A

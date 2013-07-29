@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "NodeDataRecord.h"
 #include "FEAnalysisStep.h"
-#include "FESolidSolver.h"
+#include "FEBioMech/FESolidSolver.h"
 
 //-----------------------------------------------------------------------------
 void NodeDataRecord::Parse(const char* szexpr)

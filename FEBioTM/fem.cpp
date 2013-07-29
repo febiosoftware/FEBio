@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "fem.h"
 #include "FEBioXML/FEBioImport.h"
-#include <FECore/FERigidBody.h>
-#include "FEBioLib/FESlidingInterface.h"
-#include "FEBioLib/FETiedInterface.h"
-#include "FEBioLib/FERigidWallInterface.h"
-#include "FEBioLib/FEFacet2FacetSliding.h"
-#include "FEBioLib/FEFacet2FacetTied.h"
+#include "FEBioMech/FERigidBody.h"
+#include "FEBioMech/FESlidingInterface.h"
+#include "FEBioMech/FETiedInterface.h"
+#include "FEBioMech/FERigidWallInterface.h"
+#include "FEBioMech/FEFacet2FacetSliding.h"
+#include "FEBioMech/FEFacet2FacetTied.h"
 #include "FEBioMix/FESlidingInterface2.h"
 #include "FEBioMix/FESlidingInterface3.h"
-#include "FEBioLib/FEPeriodicBoundary.h"
-#include "FEBioLib/FESurfaceConstraint.h"
+#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FESurfaceConstraint.h"
 #include "Document.h"
 #include "FECore/FEException.h"
 
@@ -91,7 +91,7 @@ void FEM::ShallowCopy(FEM& fem)
 	if (m_CI.empty())
 	{
 		FEContactInterface* pci;
-		for (int i=0; i<fem.ContactInterfaces(); ++i)
+		for (int i=0; i<fem.SurfacePairInteractions(); ++i)
 		{
 			switch (fem.m_CI[i]->Type())
 			{
@@ -110,6 +110,6 @@ void FEM::ShallowCopy(FEM& fem)
 			m_CI.push_back(pci);
 		}
 	}
-	assert(ContactInterfaces() == fem.ContactInterfaces());
-	for (i=0; i<ContactInterfaces(); ++i) m_CI[i]->ShallowCopy(*fem.m_CI[i]);
+	assert(SurfacePairInteractions() == fem.SurfacePairInteractions());
+	for (i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->ShallowCopy(*fem.m_CI[i]);
 }

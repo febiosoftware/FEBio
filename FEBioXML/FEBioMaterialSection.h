@@ -1,17 +1,17 @@
 #pragma once
 #include "FEBioImport.h"
-#include "FEBioLib/FETransverselyIsotropic.h"
-#include <FECore/FERigid.h>
-#include "FEBioLib/FEElasticMixture.h"
-#include "FEBioLib/FEUncoupledElasticMixture.h"
+#include "FEBioMech/FETransverselyIsotropic.h"
+#include "FEBioMech/FERigid.h"
+#include "FEBioMech/FEElasticMixture.h"
+#include "FEBioMech/FEUncoupledElasticMixture.h"
 #include "FEBioMix/FEBiphasic.h"
 #include "FEBioMix/FEBiphasicSolute.h"
 #include "FEBioMix/FETriphasic.h"
 #include "FEBioMix/FEMultiphasic.h"
-#include "FEBioLib/FEViscoElasticMaterial.h"
-#include "FEBioLib/FEUncoupledViscoElasticMaterial.h"
-#include "FEBioLib/FEElasticMultigeneration.h"
-#include "FEBioLib/FERemodelingElasticMaterial.h"
+#include "FEBioMech/FEViscoElasticMaterial.h"
+#include "FEBioMech/FEUncoupledViscoElasticMaterial.h"
+#include "FEBioMech/FEElasticMultigeneration.h"
+#include "FEBioMech/FERemodelingElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Material Section

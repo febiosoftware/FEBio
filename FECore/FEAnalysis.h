@@ -1,7 +1,7 @@
 #pragma once
 #include "DumpFile.h"
 #include "FEBoundaryCondition.h"
-#include "FEContactInterface.h"
+#include "FESurfacePairInteraction.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -60,8 +60,8 @@ public:
 	//! return number of boundary conditions
 	int BoundaryConditions() { return (int) m_BC.size(); }
 
-	//! add a boundary condition to the analysis
-	void AddContactInterface(FEContactInterface* pci) { m_CI.push_back(pci); }
+	//! add a surface pair interaction to the analysis
+	void AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_CI.push_back(pci); }
 
 public:
 	//! sets the plot level
@@ -127,9 +127,9 @@ public:
 	//}
 
 protected:
-	std::vector<int>					m_Dom;	//!< list of active domains for this analysis
-	std::vector<FEBoundaryCondition*>	m_BC;	//!< array of boundary conditions
-	std::vector<FEContactInterface* >	m_CI;	//!< active contact interfaces
+	std::vector<int>						m_Dom;	//!< list of active domains for this analysis
+	std::vector<FEBoundaryCondition*>		m_BC;	//!< array of boundary conditions
+	std::vector<FESurfacePairInteraction* >	m_CI;	//!< active surface pair interactions
 
 protected:
 	int		m_ntype;		// step type

@@ -1,5 +1,5 @@
 #pragma once
-#include "FEBioLib/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver.h"
 #include "FECore/FEElementTraits.h"
 
 //-----------------------------------------------------------------------------

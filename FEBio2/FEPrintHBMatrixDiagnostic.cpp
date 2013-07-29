@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "FEPrintHBMatrixDiagnostic.h"
-#include "FEBioLib/FESolidSolver.h"
+#include "FEBioMech/FESolidSolver.h"
 #include "NumCore/CompactMatrix.h"
 
 FEPrintHBMatrixDiagnostic::FEPrintHBMatrixDiagnostic(FEModel& fem) : FEDiagnostic(fem)
@@ -52,7 +52,7 @@ bool FEPrintHBMatrixDiagnostic::Run()
 
 	// build the stiffness matrix
 	// recalculate the shape of the stiffness matrix if necessary
-	if (m_fem.ContactInterfaces()) solver.UpdateContact();
+	if (m_fem.SurfacePairInteractions()) solver.UpdateContact();
 
 	// reshape the stiffness matrix
 	if (!solver.CreateStiffness(true)) return false;

@@ -8,8 +8,6 @@
 #include "MainApp.h"
 #include "XMLWriter.h"
 #include "FEBioXML/XMLReader.h"
-#include <FEBioHeat/FEBioHeat.h>
-#include <FEBioMix/FEBioMix.h>
 #include "flx_threads.h"
 #include <time.h>
 
@@ -68,8 +66,6 @@ CDocument::CDocument()
 {
 	// initialize FEBio library
 	InitFEBioLibrary();
-	FEBioHeat::InitModule();
-	FEBioMix::InitModule();
 }
 
 //-----------------------------------------------------------------------------

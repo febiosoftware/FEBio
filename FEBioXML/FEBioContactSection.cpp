@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "FEBioContactSection.h"
-#include <FEBioLib/FESlidingInterface.h>
+#include <FEBioMech/FESlidingInterface.h>
 #include <FEBioMix/FESlidingInterface2.h>
 #include <FEBioMix/FESlidingInterface3.h>
-#include <FEBioLib/FETiedInterface.h>
-#include <FEBioLib/FEFacet2FacetTied.h>
-#include <FEBioLib/FETiedBiphasicInterface.h>
-#include <FEBioLib/FEFacet2FacetSliding.h>
-#include <FEBioLib/FESlidingInterfaceBW.h>
-#include <FEBioLib/FEPeriodicBoundary.h>
-#include <FEBioLib/FESurfaceConstraint.h>
-#include <FEBioLib/FERigidWallInterface.h>
-#include <FEBioLib/FERigidJoint.h>
-#include <FEBioLib/FEAugLagLinearConstraint.h>
+#include <FEBioMix/FETiedBiphasicInterface.h>
+#include <FEBioMech/FETiedInterface.h>
+#include <FEBioMech/FEFacet2FacetTied.h>
+#include <FEBioMech/FEFacet2FacetSliding.h>
+#include <FEBioMech/FESlidingInterfaceBW.h>
+#include <FEBioMech/FEPeriodicBoundary.h>
+#include <FEBioMech/FESurfaceConstraint.h>
+#include <FEBioMech/FERigidWallInterface.h>
+#include <FEBioMech/FERigidJoint.h>
+#include <FEBioMech/FEAugLagLinearConstraint.h>
 
 //-----------------------------------------------------------------------------
 //! Parse the Contact section (new in version 2.0)
@@ -59,7 +59,7 @@ void FEBioContactSection::ParseSlidingInterface(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FESlidingInterface* ps = new FESlidingInterface(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -105,7 +105,7 @@ void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -152,7 +152,7 @@ void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FESlidingInterface2* ps = new FESlidingInterface2(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -199,7 +199,7 @@ void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FESlidingInterface3* ps = new FESlidingInterface3(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 	
@@ -246,7 +246,7 @@ void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FETiedInterface* ps = new FETiedInterface(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -292,7 +292,7 @@ void FEBioContactSection::ParseFacetTiedInterface(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FEFacet2FacetTied* pt = new FEFacet2FacetTied(&fem);
-	fem.AddContactInterface(pt);
+	fem.AddSurfacePairInteraction(pt);
 
 	FEParameterList& pl = pt->GetParameterList();
 
@@ -337,7 +337,7 @@ void FEBioContactSection::ParsePeriodicBoundary(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -383,7 +383,7 @@ void FEBioContactSection::ParseSurfaceConstraint(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 
@@ -429,7 +429,7 @@ void FEBioContactSection::ParseRigidWall(XMLTag& tag)
 	FEMesh& m = fem.GetMesh();
 
 	FERigidWallInterface* ps = new FERigidWallInterface(&fem);
-	fem.AddContactInterface(ps);
+	fem.AddSurfacePairInteraction(ps);
 
 	FEParameterList& pl = ps->GetParameterList();
 

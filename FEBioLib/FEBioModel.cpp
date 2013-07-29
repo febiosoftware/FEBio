@@ -1,46 +1,46 @@
 #include "stdafx.h"
 #include "FEBioModel.h"
-#include <FECore/FERigid.h>
-#include <FECore/FERigidBody.h>
-#include "FERigidJoint.h"
-#include "FEDiscreteMaterial.h"
-#include "FEElasticSolidDomain.h"
-#include "FEElasticShellDomain.h"
+#include "FEBioMech/FERigid.h"
+#include "FEBioMech/FERigidBody.h"
+#include "FEBioMech/FERigidJoint.h"
+#include "FEBioMech/FEDiscreteMaterial.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBioMech/FEElasticShellDomain.h"
 #include "FEBioMix/FEBiphasic.h"
 #include "FEBioMix/FEBiphasicSolute.h"
 #include "FEBioMix/FETriphasic.h"
-#include "FESlidingInterface.h"
-#include "FETiedInterface.h"
-#include "FETiedBiphasicInterface.h"
-#include "FERigidWallInterface.h"
-#include "FEFacet2FacetSliding.h"
-#include "FEFacet2FacetTied.h"
+#include "FEBioMech/FESlidingInterface.h"
+#include "FEBioMech/FETiedInterface.h"
+#include "FEBioMix/FETiedBiphasicInterface.h"
+#include "FEBioMech/FERigidWallInterface.h"
+#include "FEBioMech/FEFacet2FacetSliding.h"
+#include "FEBioMech/FEFacet2FacetTied.h"
 #include "FEBioMix/FESlidingInterface2.h"
 #include "FEBioMix/FESlidingInterface3.h"
-#include "FEPeriodicBoundary.h"
-#include "FESurfaceConstraint.h"
-#include "FETransverselyIsotropic.h"
-#include "FEPressureLoad.h"
-#include "FETractionLoad.h"
+#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FESurfaceConstraint.h"
+#include "FEBioMech/FETransverselyIsotropic.h"
+#include "FEBioMech/FEPressureLoad.h"
+#include "FEBioMech/FETractionLoad.h"
 #include "FEBioMix/FEPoroTraction.h"
 #include "FEBioMix/FEFluidFlux.h"
 #include "FEBioMix/FESoluteFlux.h"
 #include "FEAnalysisStep.h"
-#include "FEElasticSolidDomain.h"
-#include "FEElasticShellDomain.h"
-#include "FEElasticTrussDomain.h"
-#include "FEDiscreteSpringDomain.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBioMech/FEElasticShellDomain.h"
+#include "FEBioMech/FEElasticTrussDomain.h"
+#include "FEBioMech/FEDiscreteSpringDomain.h"
 #include "FEBioMix/FEBiphasicSolidDomain.h"
 #include "FEBioMix/FEBiphasicSoluteDomain.h"
-#include "FEUDGHexDomain.h"
-#include "FERigidSolidDomain.h"
-#include "FERigidShellDomain.h"
-#include "FE3FieldElasticSolidDomain.h"
-#include "FEUT4Domain.h"
-#include "FEConstBodyForce.h"
-#include "FEPointConstraint.h"
-#include "FEAugLagLinearConstraint.h"
-#include <FECore/FERigidBody.h>
+#include "FEBioMech/FEUDGHexDomain.h"
+#include "FEBioMech/FERigidSolidDomain.h"
+#include "FEBioMech/FERigidShellDomain.h"
+#include "FEBioMech/FE3FieldElasticSolidDomain.h"
+#include "FEBioMech/FEUT4Domain.h"
+#include "FEBioMech/FEConstBodyForce.h"
+#include "FEBioMech/FEPointConstraint.h"
+#include "FEBioMech/FEAugLagLinearConstraint.h"
+#include "FEBioMech/FERigidBody.h"
 #include "NodeDataRecord.h"
 #include "ElementDataRecord.h"
 #include "RigidBodyDataRecord.h"
@@ -48,11 +48,11 @@
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioMix/FEMultiphasic.h"
-#include "FEViscoElasticMaterial.h"
-#include "FEUncoupledViscoElasticMaterial.h"
-#include "FEElasticMultigeneration.h"
-#include "FERemodelingElasticMaterial.h"
-#include "FESlidingInterfaceBW.h"
+#include "FEBioMech/FEViscoElasticMaterial.h"
+#include "FEBioMech/FEUncoupledViscoElasticMaterial.h"
+#include "FEBioMech/FEElasticMultigeneration.h"
+#include "FEBioMech/FERemodelingElasticMaterial.h"
+#include "FEBioMech/FESlidingInterfaceBW.h"
 #include <FEBioHeat/FEHeatSolidDomain.h>
 #include <FEBioHeat/FEHeatFlux.h>
 #include <FEBioHeat/FEConvectiveHeatFlux.h>
@@ -981,8 +981,8 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 {
 	if (ar.IsSaving())
 	{
-		ar << ContactInterfaces();
-		for (int i=0; i<ContactInterfaces(); ++i)
+		ar << SurfacePairInteractions();
+		for (int i=0; i<SurfacePairInteractions(); ++i)
 		{
 			ar << m_CI[i]->Type();
 			m_CI[i]->Serialize(ar);
@@ -1547,10 +1547,10 @@ bool FEBioModel::Init()
 bool FEBioModel::InitContact()
 {
 	// loop over all contact interfaces
-	for (int i=0; i<ContactInterfaces(); ++i)
+	for (int i=0; i<SurfacePairInteractions(); ++i)
 	{
 		// get the contact interface
-		FEContactInterface& ci = *m_CI[i];
+		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_CI[i]);
 
 		// initializes contact interface data
 		if (ci.Init() == false) return false;

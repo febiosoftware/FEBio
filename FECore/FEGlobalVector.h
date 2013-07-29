@@ -13,8 +13,11 @@ public:
 	//! constructor
 	FEGlobalVector(FEModel& fem, vector<double>& R, vector<double>& Fr);
 
+	//! destructor
+	virtual ~FEGlobalVector();
+
 	//! Assemble the element vector into this global vector
-	void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
+	virtual void Assemble(vector<int>& en, vector<int>& elm, vector<double>& fe);
 
 	//! access operator
 	double& operator [] (int i) { return m_R[i]; }

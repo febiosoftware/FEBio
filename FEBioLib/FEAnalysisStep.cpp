@@ -1,15 +1,15 @@
 #include "stdafx.h"
 #include "FEAnalysisStep.h"
-#include <FECore/FERigid.h>
-#include "FEUncoupledMaterial.h"
-#include "FESolidSolver.h"
+#include "FEBioMech/FERigid.h"
+#include "FEBioMech/FEUncoupledMaterial.h"
+#include "FEBioMech/FESolidSolver.h"
 #include <FEBioHeat/FEHeatSolver.h>
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
-#include "FELinearSolidSolver.h"
-#include "FECoupledHeatSolidSolver.h"
-#include "FEExplicitSolidSolver.h"
-#include <FECore/FERigidBody.h>
+#include "FEBioMech/FELinearSolidSolver.h"
+#include "FEBioMech/FECoupledHeatSolidSolver.h"
+#include "FEBioMech/FEExplicitSolidSolver.h"
+#include "FEBioMech/FERigidBody.h"
 #include "FECore/log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
@@ -333,9 +333,9 @@ bool FEAnalysisStep::Init()
 
 	// see if we need to do contact augmentations
 	m_baugment = false;
-	for (i=0; i<m_fem.ContactInterfaces(); ++i)
+	for (i=0; i<m_fem.SurfacePairInteractions(); ++i)
 	{
-		FEContactInterface& ci = *m_fem.ContactInterface(i);
+		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairInteraction(i));
 		if (ci.IsActive() && ci.m_blaugon) m_baugment = true;
 	}
 
@@ -501,9 +501,9 @@ bool FEAnalysisStep::Solve()
 		}
 
 		// evaluate contact interface parameter lists
-		for (i=0; i<m_fem.ContactInterfaces(); ++i)
+		for (i=0; i<m_fem.SurfacePairInteractions(); ++i)
 		{
-			FEParameterList& pl = m_fem.ContactInterface(i)->GetParameterList();
+			FEParameterList& pl = m_fem.SurfacePairInteraction(i)->GetParameterList();
 			m_fem.EvaluateParameterList(pl);
 		}
 

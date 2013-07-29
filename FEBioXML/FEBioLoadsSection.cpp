@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
-#include <FEBioLib/FEPointBodyForce.h>
+#include <FEBioMech/FEPointBodyForce.h>
 #include <FEBioHeat/FEHeatSource.h>
 
 //-----------------------------------------------------------------------------

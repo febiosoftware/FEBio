@@ -1,7 +1,8 @@
 #include "FEBiphasicSoluteSolver.h"
 #include "FEBiphasicSoluteDomain.h"
-#include "FEBioLib/FEPressureLoad.h"
-#include "FECore/FERigidBody.h"
+#include "FEBioMech/FEPressureLoad.h"
+#include "FEBioMech/FERigidBody.h"
+#include "FEBioMech/FEResidualVector.h"
 #include "FECore/log.h"
 
 #ifdef WIN32
@@ -495,7 +496,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	zero(m_Fr);
 
 	// setup global RHS vector
-	FEGlobalVector RHS(GetFEModel(), R, m_Fr);
+	FEResidualVector RHS(GetFEModel(), R, m_Fr);
 
 	// zero rigid body reaction forces
 	int NRB = m_fem.Objects();
@@ -565,7 +566,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	}
 
 	// calculate contact forces
-	if (m_fem.ContactInterfaces() > 0)
+	if (m_fem.SurfacePairInteractions() > 0)
 	{
 		ContactForces(RHS);
 	}
@@ -639,7 +640,7 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimePoint& tp)
 	}
 
 	// calculate contact stiffness
-	if (m_fem.ContactInterfaces() > 0) 
+	if (m_fem.SurfacePairInteractions() > 0) 
 	{
 		ContactStiffness();
 	}
