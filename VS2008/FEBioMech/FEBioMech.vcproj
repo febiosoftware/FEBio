@@ -445,6 +445,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FESolidAnalysis.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FESolidSolver.cpp"
 				>
 			</File>
@@ -840,6 +844,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FESlidingInterfaceBW.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FESolidAnalysis.h"
 				>
 			</File>
 			<File

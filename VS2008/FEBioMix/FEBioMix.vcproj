@@ -157,6 +157,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEBiphasicAnalysis.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEBiphasicSolidDomain.cpp"
 				>
 			</File>
@@ -324,6 +328,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEBiphasic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEBiphasicAnalysis.h"
 				>
 			</File>
 			<File

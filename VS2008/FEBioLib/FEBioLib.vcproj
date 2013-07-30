@@ -218,19 +218,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEAnalysisStep.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEBioModel.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEBox.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEElemElemList.cpp"
 				>
 			</File>
 			<File
@@ -280,19 +272,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEAnalysisStep.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEBioModel.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEBox.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEElemElemList.h"
 				>
 			</File>
 			<File

@@ -264,6 +264,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEElemElemList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEElement.cpp"
 				>
 			</File>
@@ -495,6 +499,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEElemElemList.h"
 				>
 			</File>
 			<File
