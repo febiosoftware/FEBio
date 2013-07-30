@@ -24,9 +24,6 @@
     <ClInclude Include="..\..\FEBioLib\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FEBioLib\FEBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>

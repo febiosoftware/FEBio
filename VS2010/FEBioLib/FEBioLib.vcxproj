@@ -706,7 +706,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\FEBioLib\DataStore.h" />
     <ClInclude Include="..\..\FEBioLib\ElementDataRecord.h" />
-    <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
     <ClInclude Include="..\..\FEBioLib\NodeDataRecord.h" />
