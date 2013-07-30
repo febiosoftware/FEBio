@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBioMaterialSection.h"
+#include "FECore/FEModel.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

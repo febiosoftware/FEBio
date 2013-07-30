@@ -6,7 +6,7 @@
 #include "FECore/FEException.h"
 #include "FECore/FECore.h"
 #include "NumCore/CompactMatrix.h"
-#include "FEBioLib/FEAnalysisStep.h"
+#include "FECore/FEAnalysis.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_COMMAND(FEBioCmd_Cont   , "cont"   , "continues run");
@@ -89,7 +89,7 @@ int FEBioCmd_Conv::run(int nargs, char **argv)
 int FEBioCmd_Debug::run(int nargs, char** argv)
 {
 	assert(m_pfem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
+	FEAnalysis* pstep = m_pfem->GetCurrentStep();
 	bool bdebug = m_pfem->GetDebugFlag();
 	if (nargs == 1) bdebug = !bdebug;
 	else
@@ -141,7 +141,7 @@ int FEBioCmd_Plot::run(int nargs, char **argv)
 int FEBioCmd_Print::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
+	FEAnalysis* pstep = m_pfem->GetCurrentStep();
 
 	if (nargs >= 2)
 	{
@@ -173,7 +173,7 @@ int FEBioCmd_Print::run(int nargs, char **argv)
 int FEBioCmd_Restart::run(int nargs, char **argv)
 {
 	assert(m_pfem);
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_pfem->GetCurrentStep());
+	FEAnalysis* pstep = m_pfem->GetCurrentStep();
 	bool bdump = pstep->m_bDump;
 
 	if (nargs == 1) bdump = !bdump;

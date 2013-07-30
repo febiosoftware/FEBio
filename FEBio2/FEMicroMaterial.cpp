@@ -4,7 +4,7 @@
 #include "FECore/log.h"
 #include "FEBioMech/FESolidSolver.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
-#include "FEBioLib/FEAnalysisStep.h"
+#include "FECore/FEAnalysis.h"
 #include "console.h"
 
 // register the material with the framework
@@ -229,7 +229,7 @@ mat3ds FEMicroMaterial::AveragedStress(FEMaterialPoint& mp)
 	s /= V;
 */
 	// get the reaction force vector from the solid solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.GetCurrentStep());
+	FEAnalysis* pstep = m_rve.GetCurrentStep();
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 	assert(ps);
 	vector<double>& R = ps->m_Fr;
@@ -258,7 +258,7 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	FEMesh& m = m_rve.GetMesh();
 
 	// get the solver
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_rve.GetCurrentStep());
+	FEAnalysis* pstep = m_rve.GetCurrentStep();
 	FESolidSolver* ps = dynamic_cast<FESolidSolver*>(pstep->m_psolver);
 
 	// the element's stiffness matrix

@@ -90,7 +90,7 @@ void echo_input(FEBioModel& fem)
 	}
 
 	// get the analysis step
-	FEAnalysisStep& step = dynamic_cast<FEAnalysisStep&>(*fem.GetCurrentStep());
+	FEAnalysis& step = *fem.GetCurrentStep();
 
 	// get the FE mesh
 	FEMesh& mesh = fem.GetMesh();

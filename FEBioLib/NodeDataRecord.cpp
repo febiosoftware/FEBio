@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "NodeDataRecord.h"
-#include "FEAnalysisStep.h"
+#include "FECore/FEAnalysis.h"
 #include "FEBioMech/FESolidSolver.h"
 
 //-----------------------------------------------------------------------------

@@ -32,7 +32,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 void FEBioControlSection::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEAnalysisStep* pstep = GetStep();
+	FEAnalysis* pstep = GetStep();
 
 	// make sure we have a solver defined
 	if (pstep->m_psolver == 0) pstep->m_psolver = BuildSolver(pstep->GetType(), fem);
@@ -61,7 +61,7 @@ void FEBioControlSection::Parse(XMLTag& tag)
 bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEAnalysisStep* pstep = GetStep();
+	FEAnalysis* pstep = GetStep();
 	char sztitle[256];
 
 	if      (tag == "title"             ) { tag.value(sztitle); fem.SetTitle(sztitle); }

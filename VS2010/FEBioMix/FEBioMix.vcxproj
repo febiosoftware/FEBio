@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMix\FEBioMix.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasic.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBiphasicAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolute.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteDomain.cpp" />
@@ -123,6 +124,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMix\FEBioMix.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasic.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBiphasicAnalysis.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolute.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteDomain.h" />

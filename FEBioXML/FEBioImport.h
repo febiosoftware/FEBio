@@ -2,7 +2,7 @@
 
 #include "FileImport.h"
 #include "XMLReader.h"
-#include "FEBioLib/FEAnalysisStep.h"
+#include "FECore/FEAnalysis.h"
 #include "FECore/FESolver.h"
 #include <map>
 #include <string>
@@ -20,7 +20,7 @@ public:
 	virtual void Parse(XMLTag& tag) = 0;
 
 	FEModel* GetFEModel();
-	FEAnalysisStep* GetStep();
+	FECore::FEAnalysis* GetStep();
 
 protected:
 	FEFEBioImport*	m_pim;
@@ -74,7 +74,7 @@ public:
 public:
 	FEModel* GetFEModel() { return m_pfem; }
 	FEMesh* GetFEMesh() { return m_pMesh; }
-	FEAnalysis*	GetStep();
+	FECore::FEAnalysis*	GetStep();
 
 	int Version() { return m_nversion; }
 
@@ -82,7 +82,7 @@ public:
 
 	void ReadList(XMLTag& tag, vector<int>& l);
 
-	FEAnalysis* CreateNewStep();
+	FECore::FEAnalysis* CreateNewStep();
 
 public:
 	void SetDumpfileName(const char* sz) { sprintf(m_szdmp, sz); }
@@ -93,9 +93,9 @@ protected:
 	void ParseVersion			(XMLTag& tag);
 
 public:
-	FEModel*	m_pfem;		//!< pointer to the fem class
-	FEAnalysis*	m_pStep;	//!< pointer to current analysis step
-	FEMesh*		m_pMesh;	//!< pointer to the mesh class
+	FEModel*			m_pfem;		//!< pointer to the fem class
+	FECore::FEAnalysis*	m_pStep;	//!< pointer to current analysis step
+	FEMesh*				m_pMesh;	//!< pointer to the mesh class
 
 public:
 	char	m_szdmp[256];

@@ -17,7 +17,7 @@
 #include <FEBioHeat/FEHeatTransferMaterial.h>
 #include "FEBioMech/FETrussMaterial.h"
 #include "FEBioMix/FEBiphasic.h"
-#include "FEBioLib/FEAnalysisStep.h"
+#include "FECore/FEAnalysis.h"
 
 LSDYNAPlotFile::LSDYNAPlotFile()
 {
@@ -1317,7 +1317,7 @@ void LSDYNAPlotFile::write_reaction_forces()
 {
 	FEModel& fem = *m_pfem;
 	FEMesh& mesh = fem.GetMesh();
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FEAnalysis* pstep = fem.GetCurrentStep();
 	FESolidSolver& solver = dynamic_cast<FESolidSolver&>(*pstep->m_psolver);
 	vector<double>& Fr = solver.m_Fr;
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBioLoadDataSection.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //!  This function reads the load data section from the xml file
@@ -11,7 +12,7 @@ void FEBioLoadDataSection::Parse(XMLTag& tag)
 	
 	if (m_pim->m_nsteps > 0)
 	{
-		FEAnalysis* pstep = m_pim->GetStep();
+		FECore::FEAnalysis* pstep = m_pim->GetStep();
 		nmplc = pstep->m_nmplc+1;
 	}
 

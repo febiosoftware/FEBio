@@ -2,6 +2,7 @@
 #include "FEBioConstraintsSection.h"
 #include "FEBioMech/FERigid.h"
 #include "FEBioMech/FEPointConstraint.h"
+#include "FECore/FEModel.h"
 
 //=============================================================================
 //
@@ -61,7 +62,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEAnalysisStep* pStep = (m_pim->m_nsteps > 0 ? GetStep() : 0);
+	FEAnalysis* pStep = (m_pim->m_nsteps > 0 ? GetStep() : 0);
 
 	const char* szm = tag.AttributeValue("mat");
 	assert(szm);

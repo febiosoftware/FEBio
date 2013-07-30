@@ -4,8 +4,9 @@
 
 #include "stdafx.h"
 #include "FERestartImport.h"
-#include <FECore/FESolver.h>
-#include "FEBioLib/FEAnalysisStep.h"
+#include "FECore/FESolver.h"
+#include "FECore/FEAnalysis.h"
+#include "FECore/FEModel.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -164,7 +165,7 @@ bool FERestartImport::ParseLoadSection(XMLTag& tag)
 bool FERestartImport::ParseControlSection(XMLTag& tag)
 {
 	FEModel& fem = *m_pfem;
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(fem.GetCurrentStep());
+	FEAnalysis* pstep = fem.GetCurrentStep();
 
 	++tag;
 	do

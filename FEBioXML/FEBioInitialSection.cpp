@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBioInitialSection.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Read the Initial from the FEBio input file

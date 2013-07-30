@@ -23,16 +23,16 @@ public:
 	virtual ~FEAnalysis(){}
 
 	//! Data initialization
-	virtual bool Init() { return false; }
+	virtual bool Init();
 
 	//! Solve the analysis step
-	virtual bool Solve() { return false; }
+	virtual bool Solve();
 
 	//! wrap it up
-	virtual void Finish() {}
+	virtual void Finish();
 
 	//! Serialize data from and to a binary archive
-	virtual void Serialize(DumpFile& ar) {}
+	virtual void Serialize(DumpFile& ar);
 
 	//! get the step type
 	int GetType () { return m_ntype; }
@@ -75,6 +75,16 @@ public:
 
 	//! get the print level
 	int GetPrintLevel() { return m_nprint; }
+
+protected:
+	//! initialize constraint data
+	bool InitConstraints();
+
+	//! Do a running restart
+	void Retry();
+
+	//! Update Time step
+	void AutoTimeStep(int niter);
 
 public:
 	// --- The FE Model

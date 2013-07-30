@@ -41,7 +41,7 @@ bool FEPrintHBMatrixDiagnostic::ParseSection(XMLTag &tag)
 bool FEPrintHBMatrixDiagnostic::Run()
 {
 	// Get the current step
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetCurrentStep());
+	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
 	// initialize the step
 	pstep->Init();

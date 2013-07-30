@@ -12,6 +12,7 @@
 #include "FECore/log.h"
 #include <FEBioXML/FEBioControlSection.h>
 #include <FEBioXML/FEBioMaterialSection.h>
+#include <FEBioMech/FESolidAnalysis.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -42,7 +43,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	m_pfem = &fem;
 	m_pdia = 0;
 
-	FEAnalysisStep* pstep = new FEAnalysisStep(fem);
+	FEAnalysis* pstep = new FESolidAnalysis(fem);
 	fem.AddStep(pstep);
 	fem.m_nStep = 0;
 	fem.SetCurrentStep(pstep);

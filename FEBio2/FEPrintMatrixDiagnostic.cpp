@@ -50,7 +50,7 @@ bool FEPrintMatrixDiagnostic::ParseSection(XMLTag &tag)
 bool FEPrintMatrixDiagnostic::Run()
 {
 	// get and initialize the first step
-	FEAnalysisStep* pstep = dynamic_cast<FEAnalysisStep*>(m_fem.GetStep(0));
+	FEAnalysis* pstep = m_fem.GetStep(0);
 	pstep->Init();
 
 	// get and initialize the solver

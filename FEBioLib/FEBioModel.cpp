@@ -25,7 +25,9 @@
 #include "FEBioMix/FEPoroTraction.h"
 #include "FEBioMix/FEFluidFlux.h"
 #include "FEBioMix/FESoluteFlux.h"
-#include "FEAnalysisStep.h"
+#include "FEBioHeat/FEHeatTransferAnalysis.h"
+#include "FEBioMix/FEBiphasicAnalysis.h"
+#include "FEBioMech/FESolidAnalysis.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FEBioMech/FEElasticShellDomain.h"
 #include "FEBioMech/FEElasticTrussDomain.h"
@@ -745,16 +747,16 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		for (int i=0; i<nsteps; ++i)
 		{
 			ar >> ntype;
-			FEAnalysisStep* pstep = 0;
+			FEAnalysis* pstep = 0;
 			switch (ntype)
 			{
 			case FE_SOLID         : pstep = new FESolidAnalysis         (*this); break;
-			case FE_EXPLICIT_SOLID: pstep = new FEExplicitSolidAnalysis         (*this); break;
+			case FE_EXPLICIT_SOLID: pstep = new FEExplicitSolidAnalysis (*this); break;
 			case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (*this); break;
 			case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (*this); break;
 			case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(*this); break;
 			case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (*this); break;
-			case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*this); break;
+//			case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*this); break;
 			default:
 				assert(false);
 			}
@@ -2211,7 +2213,7 @@ bool FEBioModel::InitMesh()
 //! Initialize solute-poroelastic data.
 //! Find all nodes that are not part of a poro-solute domain and fix the 
 //! pressure and concentration DOFS. 
-//! \todo This function should probably move to the FEAnalysisStep class.
+//! \todo This function should probably move to the FEBiphasicSoluteAnalysis class.
 bool FEBioModel::InitPoroSolute()
 {
 	int i, j, k, nd;
@@ -2430,7 +2432,7 @@ bool FEBioModel::InitPoroSolute()
 //-----------------------------------------------------------------------------
 //! This is the main solve method. This function loops over all analysis steps
 //! and solves each one in turn. 
-//! \sa FEAnalysisStep
+//! \sa FEAnalysis
 
 bool FEBioModel::Solve()
 {

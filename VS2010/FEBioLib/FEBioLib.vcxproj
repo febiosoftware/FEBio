@@ -706,7 +706,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\FEBioLib\DataStore.h" />
     <ClInclude Include="..\..\FEBioLib\ElementDataRecord.h" />
-    <ClInclude Include="..\..\FEBioLib\FEAnalysisStep.h" />
     <ClInclude Include="..\..\FEBioLib\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
@@ -720,7 +719,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\FEBioLib\DataStore.cpp" />
     <ClCompile Include="..\..\FEBioLib\ElementDataRecord.cpp" />
-    <ClCompile Include="..\..\FEBioLib\FEAnalysisStep.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />
     <ClCompile Include="..\..\FEBioLib\getapppath.cpp" />

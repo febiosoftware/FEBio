@@ -21,10 +21,13 @@
 #include <FECore/log.h>
 #include <string.h>
 #include <FECore/Image.h>
+#include <FEBioHeat/FEHeatTransferAnalysis.h>
+#include <FEBioMix/FEBiphasicAnalysis.h>
+#include <FEBioMech/FESolidAnalysis.h>
 
 //-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
-FEAnalysisStep* FEBioFileSection::GetStep() { return dynamic_cast<FEAnalysisStep*>(m_pim->GetStep()); }
+FEAnalysis* FEBioFileSection::GetStep() { return m_pim->GetStep(); }
 
 //-----------------------------------------------------------------------------
 FEBioFileSectionMap::~FEBioFileSectionMap()
@@ -288,7 +291,7 @@ FEAnalysis* FEFEBioImport::CreateNewStep()
 	case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (*m_pfem); break;
 	case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(*m_pfem); break;
 	case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (*m_pfem); break;
-	case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
+//	case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
 	default:
 		assert(false);
 	}
