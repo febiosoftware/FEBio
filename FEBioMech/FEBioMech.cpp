@@ -70,6 +70,8 @@
 #include "FESurfaceConstraint.h"
 #include "FETiedInterface.h"
 
+#include "FEBioMechPlot.h"
+
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
 void FEBioMech::InitModule()
@@ -153,5 +155,24 @@ REGISTER_FEBIO_CLASS(FESlidingInterface     , FEContactInterface, "sliding_with_
 REGISTER_FEBIO_CLASS(FESlidingInterfaceBW   , FEContactInterface, "sliding-Bonet-Wood"    );
 REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FEContactInterface, "surface constraint"    );
 REGISTER_FEBIO_CLASS(FETiedInterface        , FEContactInterface, "tied"                  );
+
+//-----------------------------------------------------------------------------
+// classes derived from FEPlotData
+REGISTER_FEBIO_CLASS(FEPlotStrainEnergyDensity          , FEPlotData, "strain energy density"           );
+REGISTER_FEBIO_CLASS(FEPlotSpecificStrainEnergy         , FEPlotData, "specific strain energy"          );
+REGISTER_FEBIO_CLASS(FEPlotDensity                      , FEPlotData, "density"                         );
+REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPlotData, "stress"                          );
+REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPlotData, "relative volume"                 );
+REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vector"                    );
+REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"                 );
+REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                          );
+REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"                 );
+REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPlotData, "ut4 nodal stress"    );
+
+//-----------------------------------------------------------------------------
+REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );
+REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPlotData, "acceleration"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
 
 }
