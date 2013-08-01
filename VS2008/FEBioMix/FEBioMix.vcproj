@@ -189,6 +189,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEChemicalReaction.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEConcentrationIndependentReaction.cpp"
 				>
 			</File>
@@ -364,6 +368,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FECarterHayes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEChemicalReaction.h"
 				>
 			</File>
 			<File
