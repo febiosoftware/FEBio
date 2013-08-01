@@ -153,14 +153,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioPlot\FEPlotDomainData.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioPlot\FEPlotNodeData.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioPlot\FEPlotSurfaceData.cpp"
 				>
 			</File>
@@ -184,14 +176,6 @@
 			>
 			<File
 				RelativePath="..\..\FEBioPlot\FEBioPlotFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioPlot\FEPlotDomainData.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioPlot\FEPlotNodeData.h"
 				>
 			</File>
 			<File

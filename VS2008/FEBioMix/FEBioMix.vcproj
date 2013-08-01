@@ -153,6 +153,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEBioMixPlot.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEBiphasic.cpp"
 				>
 			</File>
@@ -324,6 +328,10 @@
 			>
 			<File
 				RelativePath="..\..\FEBioMix\FEBioMix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEBioMixPlot.h"
 				>
 			</File>
 			<File

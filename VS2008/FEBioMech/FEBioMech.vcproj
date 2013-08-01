@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEBioMechPlot.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FECarterHayesOld.cpp"
 				>
 			</File>
@@ -572,6 +576,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEBioMech.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEBioMechPlot.h"
 				>
 			</File>
 			<File
