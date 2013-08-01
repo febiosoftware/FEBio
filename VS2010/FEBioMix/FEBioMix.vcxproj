@@ -88,6 +88,7 @@
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSoluteSolver.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicSolver.cpp" />
     <ClCompile Include="..\..\FEBioMix\FECarterHayes.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEChemicalReaction.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEConcentrationIndependentReaction.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEDiffConstIso.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEDiffConstOrtho.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSoluteSolver.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicSolver.h" />
     <ClInclude Include="..\..\FEBioMix\FECarterHayes.h" />
+    <ClInclude Include="..\..\FEBioMix\FEChemicalReaction.h" />
     <ClInclude Include="..\..\FEBioMix\FEConcentrationIndependentReaction.h" />
     <ClInclude Include="..\..\FEBioMix\FEDiffConstIso.h" />
     <ClInclude Include="..\..\FEBioMix\FEDiffConstOrtho.h" />

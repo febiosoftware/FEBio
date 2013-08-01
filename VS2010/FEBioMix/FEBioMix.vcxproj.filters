@@ -147,6 +147,9 @@
     <ClCompile Include="..\..\FEBioMix\FEBioMixPlot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\FEBioMix\FEChemicalReaction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMix\FEBioMix.h">
@@ -279,6 +282,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioMix\FEBioMixPlot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\FEBioMix\FEChemicalReaction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

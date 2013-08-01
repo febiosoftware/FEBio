@@ -1,9 +1,7 @@
 #pragma once
 #include "FEBiphasicSolute.h"
+#include "FEChemicalReaction.h"
 #include <map>
-
-class FEMultiphasic;
-class FEChemicalReaction;
 
 //-----------------------------------------------------------------------------
 //! Class for storing material point data for solute materials
@@ -45,79 +43,6 @@ public:
 	vector< vector<double> >	m_dkdc;			//!< 1st deriv of m_k with effective concentration
 	vector< vector<double> >	m_dkdJc;		//!< cross deriv of m_k with J and c
 	vector< vector< vector<double> > > m_dkdcc;	// 2nd deriv of m_k with c
-};
-
-//-----------------------------------------------------------------------------
-//! Base class for reaction rates.
-
-class FEReactionRate : public FEMaterial
-{
-public:
-	virtual void Init() {}
-	
-	//! reaction rate at material point
-	virtual double ReactionRate(FEMaterialPoint& pt) = 0;
-	
-	//! tangent of reaction rate with strain at material point
-	virtual mat3ds Tangent_ReactionRate_Strain(FEMaterialPoint& pt) = 0;
-	
-	//! tangent of reaction rate with effective fluid pressure at material point
-	virtual double Tangent_ReactionRate_Pressure(FEMaterialPoint& pt) = 0;
-	
-public:
-	FEChemicalReaction*	m_pReact;	//!< pointer to parent chemical reaction
-
-};
-
-//-----------------------------------------------------------------------------
-//! Base class for chemical reactions.
-
-typedef std::map<int,int> intmap;
-typedef std::map<int,int>::iterator itrmap;
-
-class FEChemicalReaction : public FEMaterial
-{
-public:
-    FEChemicalReaction() {m_Vovr = false; m_pMP = 0; }
-    
-	virtual void Init() {
-		if (m_pFwd) InitializeReactionRate(m_pFwd);
-		if (m_pRev) InitializeReactionRate(m_pRev);
-	}
-	
-	//! molar supply at material point
-	virtual double ReactionSupply(FEMaterialPoint& pt) = 0;
-	
-	//! tangent of molar supply with strain at material point
-	virtual mat3ds Tangent_ReactionSupply_Strain(FEMaterialPoint& pt) = 0;
-	
-	//! tangent of molar supply with effective pressure at material point
-	virtual double Tangent_ReactionSupply_Pressure(FEMaterialPoint& pt) = 0;
-	
-	//! tangent of molar supply with effective concentration at material point
-	virtual double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol) = 0;
-	
-	// initialize chemical reaction rate
-	void InitializeReactionRate(FEReactionRate* m_pRate) {m_pRate->m_pReact = this; }
-	
-public:
-	intmap			m_solR;		//!< stoichiometric coefficients of solute reactants (input)
-	intmap			m_solP;		//!< stoichiometric coefficients of solute products (input)
-	intmap			m_sbmR;		//!< stoichiometric coefficients of solid-bound reactants (input)
-	intmap			m_sbmP;		//!< stoichiometric coefficients of solid-bound products (input)
-	
-public:
-	int				m_nsol;		//!< number of solutes in the mixture
-	vector<int>		m_vR;		//!< stoichiometric coefficients of reactants
-	vector<int>		m_vP;		//!< stoichiometric coefficients of products
-	vector<int>		m_v;		//!< net stoichiometric coefficients of reactants and products
-	FEReactionRate*	m_pFwd;		//!< pointer to forward reaction rate
-	FEReactionRate*	m_pRev;		//!< pointer to reverse reaction rate
-    double          m_Vbar;     //!< weighted molar volume of reactants and products
-    bool            m_Vovr;     //!< override flag for m_Vbar
-	
-public:
-	FEMultiphasic*	m_pMP;		//!< pointer to multiphasic material where reaction occurs
 };
 
 //-----------------------------------------------------------------------------

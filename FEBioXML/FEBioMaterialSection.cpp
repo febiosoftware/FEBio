@@ -11,9 +11,6 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 	// Make sure no materials are defined
 	if (fem.Materials() != 0) throw FEFEBioImport::DuplicateMaterialSection();
 
-	const char* sztype = 0;
-	const char* szname = 0;
-
 	m_nmat = 0;
 
 	FEBioKernel& febio = FEBioKernel::GetInstance();
@@ -22,21 +19,14 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 	do
 	{
 		// get the material type
-		sztype = tag.AttributeValue("type");
+		const char* sztype = tag.AttributeValue("type");
 
 		// get the material name
-		szname = tag.AttributeValue("name", true);
+		const char* szname = tag.AttributeValue("name", true);
 
 		// create a new material of this type
 		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, &fem);
 		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(pmat);
-		if (pm)
-		{
-			// rigid degrees of freedom are initially unconstrained
-			for (int i=0; i<6; ++i) pm->m_bc[i] = 0;
-		}
 
 		// add the material
 		fem.AddMaterial(pmat);
@@ -48,6 +38,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 		// set the material's ID
 		pmat->SetID(m_nmat);
 
+		// parse the material parameters
 		ParseMaterial(tag, pmat);
 
 		// read next tag
@@ -801,7 +792,7 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 			if (id < 0)
 				throw XMLReader::InvalidAttributeValue(tag, "sbm", szid);
 			tag.value(vR);
-			pm->m_sbmR.insert(std::pair<int, int>(id, vR));
+			pm->SetSolidReactantsCoefficients(id, vR);
 		}
 		szid = tag.AttributeValue("sol", true);
 		if (szid) {
@@ -809,7 +800,7 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 			if ((id < 0) || (id >= MAX_CDOFS))
 				throw XMLReader::InvalidAttributeValue(tag, "sol", szid);
 			tag.value(vR);
-			pm->m_solR.insert(std::pair<int, int>(id, vR));
+			pm->SetSoluteReactantsCoefficients(id, vR);
 		}
 		
 		return true;
@@ -823,7 +814,7 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 			if (id < 0)
 				throw XMLReader::InvalidAttributeValue(tag, "sbm", szid);
 			tag.value(vP);
-			pm->m_sbmP.insert(std::pair<int, int>(id, vP));
+			pm->SetSolidProductsCoefficients(id, vP);
 		}
 		szid = tag.AttributeValue("sol", true);
 		if (szid) {
@@ -831,7 +822,7 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 			if ((id < 0) || (id >= MAX_CDOFS))
 				throw XMLReader::InvalidAttributeValue(tag, "sol", szid);
 			tag.value(vP);
-			pm->m_solP.insert(std::pair<int, int>(id, vP));
+			pm->SetSoluteProductsCoefficients(id, vP);
 		}
 		
 		return true;
@@ -859,7 +850,7 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 		}
 		
 		// set the reaction rate pointer
-		pm->m_pFwd = pme;
+		pm->SetForwardReactionRate(pme);
 		
 		// set the material's name
 		if (szname) pme->SetName(szname);
@@ -892,7 +883,7 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 		}
 		
 		// set the reaction rate pointer
-		pm->m_pRev = pme;
+		pm->SetReverseReactionRate(pme);
 		
 		// set the material's name
 		if (szname) pme->SetName(szname);
