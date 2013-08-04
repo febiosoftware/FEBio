@@ -186,9 +186,6 @@
     <ClInclude Include="..\..\FECore\Logfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FECore\LogStream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\FECore\FETypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
