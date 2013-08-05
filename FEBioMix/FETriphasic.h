@@ -125,6 +125,9 @@ public:
 	
 	//! Serialization
 	void Serialize(DumpFile& ar);
+
+	//! Add a solute component
+	void AddSolute(FESolute* ps);
 	
 public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration

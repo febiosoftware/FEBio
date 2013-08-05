@@ -15,6 +15,7 @@ BEGIN_PARAMETER_LIST(FETriphasic, FEMaterial)
 ADD_PARAMETER(m_phi0, FE_PARAM_DOUBLE, "phi0");
 ADD_PARAMETER(m_rhoTw, FE_PARAM_DOUBLE, "fluid_density");
 ADD_PARAMETER(m_cFr, FE_PARAM_DOUBLE, "fixed_charge_density");
+ADD_PARAMETER(m_penalty, FE_PARAM_DOUBLE, "penalty");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -26,13 +27,19 @@ FETriphasic::FETriphasic()
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_phi0 = 0;
 	m_rhoTw = 0;
+	m_penalty = 1;
 
-	m_pSolute.resize(2);
 	AddComponent<FEElasticMaterial      >(&m_pSolid    , "solid"              );
 	AddComponent<FEHydraulicPermeability>(&m_pPerm     , "permeability"       );
 	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC     , "osmotic_coefficient");
-	AddComponent<FESolute               >(&m_pSolute[0], "solute",           0);
-	AddComponent<FESolute               >(&m_pSolute[1], "solute",           1);
+}
+
+//-----------------------------------------------------------------------------
+void FETriphasic::AddSolute(FESolute* ps)
+{
+	int n = (int) m_pSolute.size();
+	m_pSolute.push_back(ps);
+//	AddComponent<FESolute>(&m_pSolute[n], "solute", n);
 }
 
 //-----------------------------------------------------------------------------
@@ -44,10 +51,12 @@ void FETriphasic::Init()
 	m_pOsmC->Init();
 
 	if (m_pSolute.size() != 2) throw MaterialError("Exactly two solutes must be specified");
+	
 	m_pSolute[0]->Init(); m_pSolute[1]->Init();
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
+	if (m_penalty < 0) throw MaterialError("penalty must be positive");
 	if ((m_pSolute[0]->ChargeNumber() != 1) && (m_pSolute[0]->ChargeNumber() != -1))
 		throw MaterialError("charge_number for first solute must be +1 or -1");
 	if ((m_pSolute[1]->ChargeNumber() != 1) && (m_pSolute[1]->ChargeNumber() != -1))
@@ -174,8 +183,6 @@ double FETriphasic::Concentration(FEMaterialPoint& pt, const int ion)
 
 mat3ds FETriphasic::Stress(FEMaterialPoint& mp)
 {
-	FEBiphasicMaterialPoint& pt = *mp.ExtractData<FEBiphasicMaterialPoint>();
-	
 	// calculate solid material stress
 	mat3ds s = m_pSolid->Stress(mp);
 	
@@ -333,14 +340,10 @@ vec3d FETriphasic::FluidFlux(FEMaterialPoint& pt)
 
 vec3d FETriphasic::SoluteFlux(FEMaterialPoint& pt, const int ion)
 {
-	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESaltMaterialPoint& spt = *pt.ExtractData<FESaltMaterialPoint>();
 	
 	// fluid volume fraction (porosity) in current configuration
 	double phiw = Porosity(pt);
-	
-	// pressure gradient
-	vec3d gradp = ppt.m_gradp;
 	
 	// concentration
 	double c = spt.m_c[ion];
@@ -365,7 +368,7 @@ vec3d FETriphasic::SoluteFlux(FEMaterialPoint& pt, const int ion)
 	vec3d w = FluidFlux(pt);
 	
 	// solute flux j
-	vec3d j = D*(w*(c/D0) - gradc*phiw)*kappa;
+	vec3d j = (D*(w*(c/D0) - gradc*phiw))*kappa;
 	
 	return j;
 }
@@ -375,7 +378,6 @@ vec3d FETriphasic::SoluteFlux(FEMaterialPoint& pt, const int ion)
 double FETriphasic::Pressure(FEMaterialPoint& pt)
 {
 	FEBiphasicMaterialPoint& ppt = *pt.ExtractData<FEBiphasicMaterialPoint>();
-	FESaltMaterialPoint& spt = *pt.ExtractData<FESaltMaterialPoint>();
 	
 	// effective pressure
 	double p = ppt.m_p;

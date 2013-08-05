@@ -910,49 +910,62 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 //
 bool FEBioMaterialSection::ParseTriphasicMaterial(XMLTag &tag, FETriphasic *pm)
 {
-	// get the material type
-	const char* sztype = tag.AttributeValue("type", true);
-	if (sztype == 0)
+	// we handle solutes differently
+	if (tag == "solute")
 	{
-		if (tag == "solute") sztype = "solute";
-		else throw XMLReader::InvalidTag(tag);
-	}
+		const char* sztype = "solute";
+
+		// get the (optional) material name
+		const char* szname = tag.AttributeValue("name", true);
+
+		// get the solute ID
+		int nid = 0;
+		const char* szid = tag.AttributeValue("sol");
+		nid = atoi(szid) - 1;
+
+		// create a new material of this type
+		FESolute* psol = new FESolute;
+		psol->SetSoluteID(nid);
+
+		// add the solute
+		pm->AddSolute(psol);
+
+		// set the new material's name (if defined)
+		if (szname) psol->SetName(szname);
 		
-	// get the material name
-	const char* szname = tag.AttributeValue("name", true);
-
-	// get the material ID
-	// TODO: If this is a triphasic material, this is only used for the solutes.
-	//       Perhaps I can encode whether the ID is necessary in the FEMultiMaterial class.
-	//       For now I have to define it as an optional argument.
-	int nid = 0;
-	const char* szid = tag.AttributeValue("sol", true);
-	if (szid) nid = atoi(szid) - 1;
-
-	// see if we can find a material property with this name
-	int nc = pm->FindComponent(tag.Name(), nid);
-	if (nc == -1) throw XMLReader::InvalidTag(tag);
-
-	// create a new material of this type
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-	FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-	FESolute* psol = dynamic_cast<FESolute*>(pmat);
-	if (psol) psol->SetSoluteID(nid);
-
-	// assign the new material to the corresponding material property
-	if (pm->SetComponent(nc, pmat) == false)
+		// parse the new material
+		ParseMaterial(tag, psol);
+	}
+	else
 	{
-		clog.printbox("INPUT ERROR: Invalid %s definition in material %s\n", tag.Name(), pm->GetName());
-		throw XMLReader::Error();
-	}
-
-	// set the new material's name (if defined)
-	if (szname) pmat->SetName(szname);
+		// get the material type
+		const char* sztype = tag.AttributeValue("type");
 		
-	// parse the new material
-	ParseMaterial(tag, pmat);
+		// get the (optional) material name
+		const char* szname = tag.AttributeValue("name", true);
+
+		// see if we can find a material property with this name
+		int nc = pm->FindComponent(tag.Name());
+		if (nc == -1) throw XMLReader::InvalidTag(tag);
+
+		// create a new material of this type
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
+		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+
+		// assign the new material to the corresponding material property
+		if (pm->SetComponent(nc, pmat) == false)
+		{
+			clog.printbox("INPUT ERROR: Invalid %s definition in material %s\n", tag.Name(), pm->GetName());
+			throw XMLReader::Error();
+		}
+
+		// set the new material's name (if defined)
+		if (szname) pmat->SetName(szname);
+		
+		// parse the new material
+		ParseMaterial(tag, pmat);
+	}
 	
 	return true;
 }

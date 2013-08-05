@@ -57,7 +57,7 @@ void print_banner()
 	printf("  University of Utah                                                       \n");
 	printf("  http://mrl.sci.utah.edu                                                  \n");
 	printf("                                                                           \n");
-	printf("  copyright (c) 2006-2012 - All rights reserved                            \n");
+	printf("  copyright (c) 2006-2013 - All rights reserved                            \n");
 	printf("                                                                           \n");
 	pwnd->Write(sz, 0xF0 );
 	printf("\n\n");
@@ -99,7 +99,7 @@ void Hello()
 	clog.printf("  University of Utah                                                       \n");
 	clog.printf("  http://mrl.sci.utah.edu                                                  \n");
 	clog.printf("                                                                           \n");
-	clog.printf("  copyright (c) 2006-2012 - All rights reserved                            \n");
+	clog.printf("  copyright (c) 2006-2013 - All rights reserved                            \n");
 	if(nlic == 0)
 	{
 		clog.printf("                                                                              \n");

@@ -241,8 +241,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		else if (strcmp(sz, "p") == 0) bc = DOF_P;
 		else if (strcmp(sz, "t") == 0) bc = DOF_T; 
 		else if (strcmp(sz, "c") == 0) bc = DOF_C;
-		else if (strcmp(sz, "c1") == 0) bc = DOF_C;
-		else if (strcmp(sz, "c2") == 0) bc = DOF_C + 1;
+		else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 		// read the prescribed data
@@ -297,8 +296,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			else if (strcmp(sz, "p") == 0) bc = DOF_P;
 			else if (strcmp(sz, "t") == 0) bc = DOF_T; 
 			else if (strcmp(sz, "c") == 0) bc = DOF_C;
-			else if (strcmp(sz, "c1") == 0) bc = DOF_C;
-			else if (strcmp(sz, "c2") == 0) bc = DOF_C + 1;
+			else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 			// get the lc attribute
@@ -359,7 +357,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 				else if (strcmp(sz, "t") == 0) bc = DOF_T; 
 				else if (strcmp(sz, "c") == 0) bc = DOF_C;
 				else if (strcmp(sz, "c1") == 0) bc = DOF_C;
-				else if (strcmp(sz, "c2") == 0) bc = DOF_C + 1;
+				else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
 				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
 				sz = tag.AttributeValue("lc");

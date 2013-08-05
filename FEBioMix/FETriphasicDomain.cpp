@@ -8,6 +8,12 @@
 #endif
 
 //-----------------------------------------------------------------------------
+FETriphasicDomain::FETriphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEBiphasicSoluteDomain(pm, pmat)
+{
+	m_ntype = FE_TRIPHASIC_DOMAIN; 
+}
+
+//-----------------------------------------------------------------------------
 FEDomain* FETriphasicDomain::Clone()
 {
 	FETriphasicDomain* pd = new FETriphasicDomain(m_pMesh, m_pMat);
@@ -25,7 +31,8 @@ bool FETriphasicDomain::Initialize(FEModel &mdl)
 	FEMaterial* pm = dynamic_cast<FEMaterial*>(GetMaterial());
 		
 	// get the triphasic material
-	FETriphasic* pmb = dynamic_cast<FETriphasic*>(pm); assert(pmb);
+	FETriphasic* pmb = dynamic_cast<FETriphasic*>(pm);
+	assert(pmb);
 
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
@@ -61,7 +68,7 @@ void FETriphasicDomain::Reset()
 	// get the triphasic material
 	FETriphasic* pmb = dynamic_cast<FETriphasic*>(pm);
 	assert(pmb);
-	
+    
 	for (int i=0; i<(int) m_Elem.size(); ++i)
 	{
 		// get the solid element
@@ -254,7 +261,7 @@ void FETriphasicDomain::Residual(FESolver* psolver, vector<double>& R)
 */
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt, const int ion)
+void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -267,6 +274,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& 
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
 		UnpackLM(el, elm);
@@ -276,11 +284,21 @@ void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& 
 		fe.assign(ndof, 0);
 			
 		// calculate cation internal work
-		ElementInternalSoluteWorkSS(el, fe, dt, ion);
+		ElementInternalSoluteWorkSS(el, fe, dt, 0);
 			
 		// add solute work to global residual
-		int neln = el.Nodes();
-		int dofc = DOF_C + pm->m_pSolute[ion]->GetSoluteID();
+		int dofc = DOF_C + pm->m_pSolute[0]->GetSoluteID();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[dofc*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+
+		// calculate anion internal work
+		ElementInternalSoluteWorkSS(el, fe, dt, 1);
+			
+		// add solute work to global residual
+		dofc = DOF_C + pm->m_pSolute[1]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
 			int J = elm[dofc*neln+j];
@@ -290,7 +308,7 @@ void FETriphasicDomain::InternalSoluteWorkSS(FESolver* psolver, vector<double>& 
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt, const int ion)
+void FETriphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt)
 {
 	// element force vector
 	vector<double> fe;
@@ -303,6 +321,7 @@ void FETriphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R,
 	{
 		// get the element
 		FESolidElement& el = m_Elem[i];
+		int neln = el.Nodes();
 			
 		// unpack the element
 		UnpackLM(el, elm);
@@ -312,11 +331,21 @@ void FETriphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& R,
 		fe.assign(ndof, 0);
 			
 		// calculate cation internal work
-		ElementInternalSoluteWork(el, fe, dt, ion);
+		ElementInternalSoluteWork(el, fe, dt, 0);
 			
 		// add solute work to global residual
-		int neln = el.Nodes();
-		int dofc = DOF_C + pm->m_pSolute[ion]->GetSoluteID();
+		int dofc = DOF_C + pm->m_pSolute[0]->GetSoluteID();
+		for (int j=0; j<neln; ++j)
+		{
+			int J = elm[dofc*neln+j];
+			if (J >= 0) R[J] += fe[j];
+		}
+
+		// calculate anion internal work
+		ElementInternalSoluteWork(el, fe, dt, 1);
+			
+		// add solute work to global residual
+		dofc = DOF_C + pm->m_pSolute[1]->GetSoluteID();
 		for (int j=0; j<neln; ++j)
 		{
 			int J = elm[dofc*neln+j];
@@ -576,11 +605,10 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 	double Ji[3][3], detJ, J0i[3][3];
 	
 	double *Gr, *Gs, *Gt, *H;
-	double *Grr, *Gsr, *Gtr, *Grs, *Gss, *Gts, *Grt, *Gst, *Gtt;
 	double Gx, Gy, Gz, GX, GY, GZ;
 	
-	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
+	// gradient of shape functions
+	vector<vec3d> gradN(neln);
 	
 	// gauss-weights
 	double* wg = el.GaussWeights();
@@ -588,7 +616,9 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 	FEMesh& mesh = *m_pMesh;
 
 	// get the element's material
-	FETriphasic* pm = dynamic_cast<FETriphasic*> (GetMaterial()); assert(pm);
+	FETriphasic* pm = dynamic_cast<FETriphasic*> (GetMaterial());
+	assert(pm);
+	
 	int id0 = pm->m_pSolute[0]->GetSoluteID();
 	int id1 = pm->m_pSolute[1]->GetSoluteID();
 	
@@ -633,16 +663,11 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 		mat3d Fp;
 		Fp.zero();
 		vec3d vs(0);
-		vec3d gradJ(0);
 		double cprev[2] = {0,0};
 		
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
-		
-		Grr = el.Grr(n); Grs = el.Grs(n); Grt = el.Grt(n);
-		Gsr = el.Gsr(n); Gss = el.Gss(n); Gst = el.Gst(n);
-		Gtr = el.Gtr(n); Gts = el.Gts(n); Gtt = el.Gtt(n);
 		
 		H = el.H(n);
 		
@@ -665,15 +690,8 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 			// calculate solid velocity
 			vs += vt[i]*H[i];
 			
-			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
-			
-			// calculate gradJ
-			gradJ += (g1*Grr[i] + g2*Grs[i] + g3*Grt[i])*(rt[i]*g1-r0[i]*G1)
-			+ (g1*Gsr[i] + g2*Gss[i] + g3*Gst[i])*(rt[i]*g2-r0[i]*G2)
-			+ (g1*Gtr[i] + g2*Gts[i] + g3*Gtt[i])*(rt[i]*g3-r0[i]*G3);
+			// save spatial gradient of shape functions
+			gradN[i] = vec3d(Gx,Gy,Gz);
 			
 			// calculate effective concentration at previous time step
 			cprev[0] += cp[0][i]*H[i];
@@ -684,18 +702,17 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 		double Jp = Fp.det();
 		double J = ept.m_J;
 		double dJdt = (J-Jp)/dt;
-		gradJ *= J;
 
 		// and then finally
 		double divv = dJdt/J;
 		
 		// get the solute flux
-		vec3d& j = spt.m_j[ion];
+		vec3d j[2] = {spt.m_j[0],spt.m_j[1]};
 		// get the effective concentration
 		double c[2] = {spt.m_c[0],spt.m_c[1]};
 
 		// get the charge number
-		double z[2] = {pm->m_pSolute[0]->ChargeNumber(),
+		int z[2] = {pm->m_pSolute[0]->ChargeNumber(),
 			pm->m_pSolute[1]->ChargeNumber()};
 		
 		// get the charge density and its derivatives
@@ -744,7 +761,6 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 		// evaluate the porosity, its derivative w.r.t. J, and its gradient
 		double phiw = pm->Porosity(mp);
 		double dpdJ = (1. - phiw)/J;
-		vec3d gradp = gradJ*dpdJ;
 		// evaluate time derivatives of concentration, solubility and porosity
 		double dcdt[2] = {(c[0] - cprev[0])/dt, (c[1] - cprev[1])/dt};
 		double dkdt[2] = {dkdJ[0]*dJdt + dkdc[0][0]*dcdt[0] + dkdc[0][1]*dcdt[1],
@@ -754,7 +770,7 @@ bool FETriphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<dou
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z 
+			fe[i] -= dt*(gradN[i]*(j[ion]+(j[0]*z[0]+j[1]*z[1])*pm->m_penalty)
 						 - H[i]*(dpdt*kappa[ion]*c[ion]+phiw*dkdt[ion]*c[ion]
 								 +phiw*kappa[ion]*dcdt[ion]+phiw*kappa[ion]*c[ion]*divv)
 						 )*detJ*wg[n];
@@ -782,11 +798,11 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 	// jacobian
 	double Ji[3][3], detJ;
 	
-	double *Gr, *Gs, *Gt;
+	double *Gr, *Gs, *Gt, *H;
 	double Gx, Gy, Gz;
 	
-	// Bp-matrix
-	vector<double> B1(neln), B2(neln), B3(neln);
+	// gradient of shape functions
+	vector<vec3d> gradN(neln);
 	
 	// gauss-weights
 	double* wg = el.GaussWeights();
@@ -800,7 +816,9 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 	// loop over gauss-points
 	for (n=0; n<nint; ++n)
 	{
-		FESaltMaterialPoint& spt = *(el.m_State[n]->ExtractData<FESaltMaterialPoint>());
+		FEMaterialPoint& mp = *el.m_State[n];
+		FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
+		FESaltMaterialPoint& spt = *(mp.ExtractData<FESaltMaterialPoint>());
 		
 		// calculate jacobian
 		detJ = invjact(el, Ji, n);
@@ -808,7 +826,9 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 		Gr = el.Gr(n);
 		Gs = el.Gs(n);
 		Gt = el.Gt(n);
-		
+
+		H = el.H(n);
+
 		for (i=0; i<neln; ++i)
 		{
 			// calculate global gradient of shape functions
@@ -817,19 +837,22 @@ bool FETriphasicDomain::ElementInternalSoluteWorkSS(FESolidElement& el, vector<d
 			Gy = Ji[0][1]*Gr[i]+Ji[1][1]*Gs[i]+Ji[2][1]*Gt[i];
 			Gz = Ji[0][2]*Gr[i]+Ji[1][2]*Gs[i]+Ji[2][2]*Gt[i];
 			
-			// calculate Bp matrix
-			B1[i] = Gx;
-			B2[i] = Gy;
-			B3[i] = Gz;
+			// save spatial gradient of shape functions
+			gradN[i] = vec3d(Gx,Gy,Gz);
 		}
 		
 		// get the solute flux
-		vec3d& j = spt.m_j[ion];
-		
+		vec3d j[2] = {spt.m_j[0],spt.m_j[1]};
+
+		// get the charge number
+		int z[2] = {pm->m_pSolute[0]->ChargeNumber(),
+			pm->m_pSolute[1]->ChargeNumber()};
+
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
-			fe[i] -= dt*(B1[i]*j.x+B2[i]*j.y+B3[i]*j.z)*detJ*wg[n];
+			fe[i] -= dt*(gradN[i]*(j[ion]+(j[0]*z[0]+j[1]*z[1])*pm->m_penalty)
+						 )*detJ*wg[n];
 		}
 	}
 	
@@ -939,7 +962,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver)
 */
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, double dt)
+void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -963,7 +986,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, double dt
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementTriphasicStiffness(el, ke, bsymm, dt);
+		ElementTriphasicStiffness(el, ke, bsymm, tp.dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -987,7 +1010,7 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver, bool bsymm, double dt
 }
 
 //-----------------------------------------------------------------------------
-void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt)
+void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp)
 {
 	// element stiffness matrix
 	matrix ke;
@@ -1012,7 +1035,7 @@ void FETriphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, double 
 		ke.resize(ndof, ndof);
 		
 		// calculate the element stiffness matrix
-		ElementTriphasicStiffnessSS(el, ke, bsymm, dt);
+		ElementTriphasicStiffnessSS(el, ke, bsymm, tp.dt);
 		
 		// TODO: the problem here is that the LM array that is returned by the UnpackLM
 		// function does not give the equation numbers in the right order. For this reason we
@@ -2032,7 +2055,6 @@ void FETriphasicDomain::ElementTriphasicMaterialStiffness(FESolidElement &el, ma
 	// weights at gauss points
 	const double *gw = el.GaussWeights();
 	
-
 	// calculate element stiffness matrix
 	for (n=0; n<nint; ++n)
 	{
@@ -2046,7 +2068,6 @@ void FETriphasicDomain::ElementTriphasicMaterialStiffness(FESolidElement &el, ma
 		// setup the material point
 		// NOTE: deformation gradient and determinant have already been evaluated in the stress routine
 		FEMaterialPoint& mp = *el.m_State[n];
-		FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
 		
 		// evaluate concentration at gauss-point
 		FESaltMaterialPoint& spt = *(mp.ExtractData<FESaltMaterialPoint>());

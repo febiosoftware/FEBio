@@ -11,7 +11,7 @@ class FEBiphasicSoluteDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_BIPHASIC_SOLUTE_DOMAIN; }
+	FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat);
 	
 	//! Create shallow copy
 	FEDomain* Clone();
@@ -19,21 +19,12 @@ public:
 	//! reset domain data
 	void Reset();
 
-	//! initialize elements for this domain
-	void InitElements();
-	
-	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp);
-
-	//! calculates the global stiffness matrix for this domain (steady-state case)
-	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
-	
-	//! calculates the residual
-//	void Residual(FESolver* psolver, vector<double>& R);
-
 	//! initialize class
 	bool Initialize(FEModel& fem);
-	
+
+	//! initialize elements for this domain
+	void InitElements();
+
 	// update stresses
 	void UpdateStresses(FEModel& fem);
 
@@ -42,16 +33,23 @@ public:
 
 public:
 	//! internal fluid work
-	void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
 
 	//! internal fluid work (steady-state analysis)
-	void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
 
 	//! internal solute work
-	void InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt);
 
 	//! internal solute work (steady-state analysis)
-	void InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt);
+	virtual void InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt);
+
+public:
+	//! calculates the global stiffness matrix for this domain
+	virtual void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp);
+
+	//! calculates the global stiffness matrix for this domain (steady-state case)
+	virtual void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
 
 protected:
 	//! Calculates the internal fluid forces

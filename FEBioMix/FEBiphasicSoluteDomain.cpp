@@ -4,6 +4,12 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
+FEBiphasicSoluteDomain::FEBiphasicSoluteDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
+{
+	m_ntype = FE_BIPHASIC_SOLUTE_DOMAIN; 
+}
+
+//-----------------------------------------------------------------------------
 FEDomain* FEBiphasicSoluteDomain::Clone()
 {
 	FEBiphasicSoluteDomain* pd = new FEBiphasicSoluteDomain(m_pMesh, m_pMat);

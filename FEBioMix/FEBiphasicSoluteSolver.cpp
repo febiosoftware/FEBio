@@ -520,7 +520,7 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 	// internal stress work
 	for (i=0; i<mesh.Domains(); ++i) 
 	{
-		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
+		FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
 		dom.InternalForces(RHS);
 	}
 

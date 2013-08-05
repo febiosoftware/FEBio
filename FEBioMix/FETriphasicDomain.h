@@ -1,37 +1,31 @@
 #pragma once
-#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBiphasicSoluteDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for triphasic 3D solid elements
 //! Note that this class inherits from FEElasticSolidDomain since this domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FETriphasicDomain : public FEElasticSolidDomain
+class FETriphasicDomain : public FEBiphasicSoluteDomain
 {
 public:
 	//! constructor
-	FETriphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_TRIPHASIC_DOMAIN; }
+	FETriphasicDomain(FEMesh* pm, FEMaterial* pmat);
 	
 	//! create shallow copy
 	FEDomain* Clone();
 
-	//! Reset data
+	//! reset domain data
 	void Reset();
+
+	//! initialize class
+	bool Initialize(FEModel& fem);
 
 	//! initialize elements for this domain
 	void InitElements();
 	
-	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver, bool bsymm, double dt);
-
-	//! calculates the global stiffness matrix for this domain (steady-state case)
-	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt);
-	
 	//! calculates the residual
 //	void Residual(FESolver* psolver, vector<double>& R);
-	
-	//! initialize class
-	bool Initialize(FEModel& fem);
 	
 	// update stresses
 	void UpdateStresses(FEModel& fem);
@@ -39,13 +33,8 @@ public:
 	//! update element state data
 	void UpdateElementStress(int iel);
 
-	//! return element stiffness matrix
-/*	void ElementStiffness(int iel, matrix& ke) {
-		FESolidElement& el = Element(iel);
-		ElementTriphasicStiffness(el, ke);
-	}
-*/
-public:
+public: // --- overridden from FEBiphasicSoluteDomain ---
+
 	// internal fluid work
 	void InternalFluidWork(FESolver* psolver, vector<double>& R, double dt);
 
@@ -53,12 +42,18 @@ public:
 	void InternalFluidWorkSS(FESolver* psolver, vector<double>& R, double dt);
 
 	// solute work
-	void InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt, const int ion);
+	void InternalSoluteWork(FESolver* psolver, vector<double>& R, double dt);
 
 	// solute work (steady state analysis)
-	void InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt, const int ion);
+	void InternalSoluteWorkSS(FESolver* psolver, vector<double>& R, double dt);
 
-public:
+	//! calculates the global stiffness matrix for this domain
+	void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp);
+
+	//! calculates the global stiffness matrix for this domain (steady-state case)
+	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
+
+protected:
 
 	//! Calculates the internal fluid forces
 	bool ElementInternalFluidWork(FESolidElement& elem, vector<double>& fe, double dt);
