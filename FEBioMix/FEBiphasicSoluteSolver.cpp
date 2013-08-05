@@ -518,42 +518,34 @@ bool FEBiphasicSoluteSolver::Residual(vector<double>& R)
 */
 
 	// internal stress work
-	for (i=0; i<mesh.Domains(); ++i) 
+	for (i=0; i<mesh.Domains(); ++i)
 	{
-		FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
+		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.InternalForces(RHS);
 	}
 
 	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
-		// internal fluid work
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
-			dom.InternalFluidWorkSS(this, R, dt);
-		}
-
-		// internal solute work
-		for (i=0; i<mesh.Domains(); ++i) 
-		{
-			FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
-			dom.InternalSoluteWorkSS(this, R, dt);
+			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
+			if (pdom)
+			{
+				pdom->InternalFluidWorkSS (this, R, dt);
+				pdom->InternalSoluteWorkSS(this, R, dt);
+			}
 		}
 	}
 	else
 	{
-		// internal fluid work
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
-			dom.InternalFluidWork(this, R, dt);
-		}
-
-		// internal solute work
-		for (i=0; i<mesh.Domains(); ++i) 
-		{
-			FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
-			dom.InternalSoluteWork(this, R, dt);
+			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
+			if (pdom)
+			{
+ 				pdom->InternalFluidWork (this, R, dt);
+				pdom->InternalSoluteWork(this, R, dt);
+			}
 		}
 	}
 
@@ -626,16 +618,16 @@ bool FEBiphasicSoluteSolver::StiffnessMatrix(const FETimePoint& tp)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
-			dom.StiffnessMatrixSS(this, bsymm, tp);
+			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
+			if (pdom) pdom->StiffnessMatrixSS(this, bsymm, tp);
 		}
 	}
 	else
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSoluteDomain& dom = dynamic_cast<FEBiphasicSoluteDomain&>(mesh.Domain(i));
-			dom.StiffnessMatrix(this, bsymm, tp);
+			FEBiphasicSoluteDomain* pdom = dynamic_cast<FEBiphasicSoluteDomain*>(&mesh.Domain(i));
+			if (pdom) pdom->StiffnessMatrix(this, bsymm, tp);
 		}
 	}
 

@@ -294,19 +294,36 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 //! FEMultiphasic constructor
 FEMultiphasic::FEMultiphasic()
 {	m_pPerm = 0;
+	m_pSupp = 0;
 	m_pOsmC = 0;
 	m_phi0 = 0;
 	m_rhoTw = 0;
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_penalty = 1;
-	m_pSupp = 0;
 
 	AddComponent<FEElasticMaterial      >(&m_pSolid	, "solid"				);
 	AddComponent<FEHydraulicPermeability>(&m_pPerm	, "permeability"		);
 	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC	, "osmotic_coefficient"	);
 	AddComponent<FESolventSupply        >(&m_pSupp	, "solvent_supply"		);
-//	AddComponent<FESolute               >(&m_pSolute[0], "solute",           0);
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasic::AddSolute(FESolute* psol)
+{
+	m_pSolute.push_back(psol);
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasic::AddSolidBoundMolecule(FESolidBoundMolecule* psbm)
+{
+	m_pSBM.push_back(psbm);
+}
+
+//-----------------------------------------------------------------------------
+void FEMultiphasic::AddChemicalReaction(FEChemicalReaction* pcr)
+{
+	m_pReact.push_back(pcr);
 }
 
 //-----------------------------------------------------------------------------
@@ -433,7 +450,6 @@ void FEMultiphasic::Init()
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
 	if ((zmin || zmax) && (m_Fc <= 0)) throw MaterialError("A positive Faraday constant Fc must be defined in Globals section");
-	
 }
 
 //-----------------------------------------------------------------------------

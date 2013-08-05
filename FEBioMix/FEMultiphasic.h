@@ -159,6 +159,15 @@ public:
 	// initialize chemical reaction
 	void InitializeReaction(FEChemicalReaction* m_pReact);
 
+	//! Add a solute
+	void AddSolute(FESolute* psol);
+
+	//! Add a solid bound molecule
+	void AddSolidBoundMolecule(FESolidBoundMolecule* psbm);
+
+	//! Add a chemical reaction
+	void AddChemicalReaction(FEChemicalReaction* pcr);
+
 public:
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density

@@ -1,16 +1,16 @@
 #pragma once
-#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBiphasicSoluteDomain.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for multiphasic 3D solid elements
 //! Note that this class inherits from FEElasticSolidDomain since this domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FEMultiphasicDomain : public FEElasticSolidDomain
+class FEMultiphasicDomain : public FEBiphasicSoluteDomain
 {
 public:
 	//! constructor
-	FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_MULTIPHASIC_DOMAIN; }
+	FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat);
 	
 	//! clone domain
 	FEDomain* Clone();
@@ -22,10 +22,10 @@ public:
 	void InitElements();
 	
 	//! calculates the global stiffness matrix for this domain
-	void StiffnessMatrix(FESolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrix(FESolver* psolver, bool bsymm, const FETimePoint& tp);
 
 	//! calculates the global stiffness matrix for this domain (steady-state case)
-	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, double dt);
+	void StiffnessMatrixSS(FESolver* psolver, bool bsymm, const FETimePoint& tp);
 	
 	//! calculates the residual
 //	void Residual(FESolidSolver* psolver, vector<double>& R);
@@ -37,7 +37,7 @@ public:
 	void UpdateStresses(FEModel& fem);
 
 	// update element state data
-	void UpdateElementStress(int iel);
+	void UpdateElementStress(int iel, double dt);
 
 /*	
 	//! return element stiffness matrix

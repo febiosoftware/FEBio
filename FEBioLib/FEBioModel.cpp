@@ -2333,7 +2333,7 @@ bool FEBioModel::InitPoroSolute()
 				int nsol = bmm->m_pSolute.size();
 				for (j=0; j<N; ++j) {
 					for (k=0; k<nsol; ++k) {
-						int dofc = DOF_C + btm->m_pSolute[k]->GetSoluteID();
+						int dofc = DOF_C + bmm->m_pSolute[k]->GetSoluteID();
 						if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = 1;
 					}
 				}
