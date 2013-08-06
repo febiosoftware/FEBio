@@ -1,6 +1,56 @@
 #include "FEBiphasicSolute.h"
 #include "FECore/FEModel.h"
 
+//=============================================================================
+//                 S O L U T E M A T E R I A L P O I N T
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+FESoluteMaterialPoint::FESoluteMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt)
+{
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FESoluteMaterialPoint::Copy()
+{
+	FESoluteMaterialPoint* pt = new FESoluteMaterialPoint(*this);
+	if (m_pt) pt->m_pt = m_pt->Copy();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FESoluteMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp << m_crchat << m_crchatp;
+	}
+	else
+	{
+		ar >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp >> m_crchat >> m_crchatp;
+	}
+	
+	if (m_pt) m_pt->Serialize(ar);
+}
+
+//-----------------------------------------------------------------------------
+void FESoluteMaterialPoint::Init(bool bflag)
+{
+	if (bflag)
+	{
+		m_c = m_ca = 0;
+		m_gradc = vec3d(0,0,0);
+		m_j = vec3d(0,0,0);
+		m_crc = m_crcp = m_crchat = m_crchat = m_crchatp = 0;
+	}
+		
+	if (m_pt) m_pt->Init(bflag);
+}
+
+//=============================================================================
+//                 B I P H A S I C S O L U T E
+//=============================================================================
+
 //-----------------------------------------------------------------------------
 // Material parameters for the FEBiphasicSolute material
 BEGIN_PARAMETER_LIST(FEBiphasicSolute, FEMaterial)

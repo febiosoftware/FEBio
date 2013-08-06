@@ -1,7 +1,6 @@
 #pragma once
 #include "FEBiphasicSolute.h"
 #include "FEChemicalReaction.h"
-#include <map>
 
 //-----------------------------------------------------------------------------
 //! Class for storing material point data for solute materials

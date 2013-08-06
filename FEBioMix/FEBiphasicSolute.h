@@ -20,45 +20,21 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-
+//! material point data for solute in biphasic-solute material
 class FESoluteMaterialPoint : public FEMaterialPoint
 {
 public:
-	FESoluteMaterialPoint(FEMaterialPoint* ppt) : FEMaterialPoint(ppt) {}
+	//! constructor
+	FESoluteMaterialPoint(FEMaterialPoint* ppt);
 	
-	FEMaterialPoint* Copy()
-	{
-		FESoluteMaterialPoint* pt = new FESoluteMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
-		return pt;
-	}
+	//! shallow copy 
+	FEMaterialPoint* Copy();
 	
-	void Serialize(DumpFile& ar)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp << m_crchat << m_crchatp;
-		}
-		else
-		{
-			ar >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp >> m_crchat >> m_crchatp;
-		}
-		
-		if (m_pt) m_pt->Serialize(ar);
-	}
-	
-	void Init(bool bflag)
-	{
-		if (bflag)
-		{
-			m_c = m_ca = 0;
-			m_gradc = vec3d(0,0,0);
-			m_j = vec3d(0,0,0);
-			m_crc = m_crcp = m_crchat = m_crchat = m_crchatp = 0;
-		}
-		
-		if (m_pt) m_pt->Init(bflag);
-	}
+	//! serialize data
+	void Serialize(DumpFile& ar);
+
+	//! Data initialization
+	void Init(bool bflag);
 	
 public:
 	// solute material data
