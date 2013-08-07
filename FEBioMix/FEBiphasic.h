@@ -129,6 +129,13 @@ public:
 
 	//! Serialization
 	void Serialize(DumpFile& ar);
+
+public:
+	//! return number of material properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int n);
 	
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density

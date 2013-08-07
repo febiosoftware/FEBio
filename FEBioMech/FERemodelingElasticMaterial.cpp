@@ -17,6 +17,25 @@ void FERemodelingElasticMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! This material has two properties
+int FERemodelingElasticMaterial::Properties()
+{
+	return 2;
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FERemodelingElasticMaterial::GetProperty(int i)
+{
+	switch (i)
+	{
+	case 0: return m_pBase;
+	case 1: return m_pSupp;
+	}
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Strain energy density function
 double FERemodelingElasticMaterial::StrainEnergy(FEMaterialPoint& mp)
 {

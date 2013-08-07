@@ -50,6 +50,9 @@ public:
 	bool IsActive() { return m_bActive; }
 	void Activate(bool b) { m_bActive = b; }
 
+	//! get the material ID
+	int GetMaterialID() { return m_mat; }
+
 public:
 	int		m_nID;		//!< ID of rigid body
 	int		m_mat;		//!< material ID
@@ -75,6 +78,9 @@ public:
 
 protected:
 	bool	m_bActive;	// activation flag
+
+public:
+	DECLARE_PARAMETER_LIST();
 };
 
 #endif // !defined(AFX_FERIGIDBODY_H__2C1FB6E7_60F0_46E9_94D0_3B4D07EAC5CF__INCLUDED_)

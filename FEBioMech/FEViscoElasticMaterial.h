@@ -54,6 +54,13 @@ public:
 	void SetBaseMaterial(FEElasticMaterial* pbase) { m_pBase = pbase; }
 
 public:
+	//! return number of properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
+
+public:
 	//! data initialization
 	void Init();
 

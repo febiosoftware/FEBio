@@ -91,6 +91,14 @@ public:
 	//! Return elastic material \todo I need to move this function up the hierarchy once I redesign the material library
 	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
 
+public: // interface for getting/setting material properties
+
+	//! get the number of material properties
+	virtual int Properties () { return 0; }
+
+	//! get a specific material property
+	virtual FEMaterial* GetProperty(int i) { return 0; }
+
 protected:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID

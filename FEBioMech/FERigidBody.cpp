@@ -9,6 +9,16 @@
 #include "FECore/FESolidDomain.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FERigidBody, FEObject);
+	ADD_PARAMETER(m_Fr.x, FE_PARAM_DOUBLE, "Fx");
+	ADD_PARAMETER(m_Fr.y, FE_PARAM_DOUBLE, "Fy");
+	ADD_PARAMETER(m_Fr.z, FE_PARAM_DOUBLE, "Fz");
+	ADD_PARAMETER(m_Mr.x, FE_PARAM_DOUBLE, "Mx");
+	ADD_PARAMETER(m_Mr.y, FE_PARAM_DOUBLE, "My");
+	ADD_PARAMETER(m_Mr.z, FE_PARAM_DOUBLE, "Mz");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FERigidBody::FERigidBody(FEModel* pfem) : FEObject(pfem)
 {
 	m_bActive = true;

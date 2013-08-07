@@ -103,6 +103,13 @@ public:
     
 	// get the elastic material
 	FEElasticMaterial* GetElasticMaterial() { return m_pBase; }
+
+public:
+	//! return number of material properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
 	
 public:
 	FEElasticMaterial*	m_pBase;		//!< pointer to elastic solid material

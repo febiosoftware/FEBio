@@ -73,6 +73,25 @@ void FESolute::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+int FESolute::Properties()
+{
+	return (m_pSupp ? 3 : 2);
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FESolute::GetProperty(int i)
+{
+	switch (i)
+	{
+	case 0: return m_pDiff;
+	case 1: return m_pSolub;
+	case 2: return m_pSupp;
+	}
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 FEParam* FESolute::GetParameter(const ParamString& s)
 {
 	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);

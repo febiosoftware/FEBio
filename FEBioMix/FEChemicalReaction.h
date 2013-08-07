@@ -46,6 +46,13 @@ public:
 	void InitializeReactionRate(FEReactionRate* m_pRate);
 
 public:
+	//! return number of properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
+
+public:
 	//! set the forward reaction rate
 	void SetForwardReactionRate(FEReactionRate* pfwd) { m_pFwd = pfwd; }
 
@@ -89,11 +96,12 @@ public:
 	vector<int>		m_vR;		//!< stoichiometric coefficients of reactants
 	vector<int>		m_vP;		//!< stoichiometric coefficients of products
 	vector<int>		m_v;		//!< net stoichiometric coefficients of reactants and products
-	FEReactionRate*	m_pFwd;		//!< pointer to forward reaction rate
-	FEReactionRate*	m_pRev;		//!< pointer to reverse reaction rate
     double          m_Vbar;     //!< weighted molar volume of reactants and products
     bool            m_Vovr;     //!< override flag for m_Vbar
-	
+
+	FEReactionRate*	m_pFwd;		//!< pointer to forward reaction rate
+	FEReactionRate*	m_pRev;		//!< pointer to reverse reaction rate
+
 public:
 	FEMultiphasic*	m_pMP;		//!< pointer to multiphasic material where reaction occurs
 };

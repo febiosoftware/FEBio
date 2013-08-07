@@ -57,6 +57,13 @@ public:
 	
 public:
 	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic material
+
+public:
+	//! return material properties
+	int Properties() { return (int) m_pMat.size(); }
+
+	//! return a material property
+	FEMaterial* GetProperty(int i) { return m_pMat[i]; }
 		
 public:
 	//! calculate stress at material point

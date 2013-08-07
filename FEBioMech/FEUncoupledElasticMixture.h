@@ -8,6 +8,7 @@
 //! uncoupled elastic solids that can be combined within this class.  The stress and
 //! tangent tensors evaluated in this class represent the sum of the respective
 //! tensors of all the solids forming the mixture.
+//! \todo This class defines two accessor interfaces. Modify to use the FEMaterial interface only.
 
 class FEUncoupledElasticMixture : public FEUncoupledMaterial
 {
@@ -25,6 +26,13 @@ public:
 
 	// get a material parameter
 	FEParam* GetParameter(const ParamString& s);
+
+public:
+	//! get number of material properties
+	int Properties() { return m_pMat.size(); }
+
+	//! return a material property
+	FEMaterial* GetProperty(int n) { return m_pMat[n]; }
 	
 public:
 	//! calculate stress at material point

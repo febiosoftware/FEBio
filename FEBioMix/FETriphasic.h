@@ -128,6 +128,13 @@ public:
 
 	//! Add a solute component
 	void AddSolute(FESolute* ps);
+
+public:
+	//! return number of material properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
 	
 public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration

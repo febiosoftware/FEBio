@@ -27,6 +27,13 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
+	//! return the number of properties
+	int Properties();
+
+	//! return a pointer to the property
+	FEMaterial* GetProperty(int n);
+
+public:
 	FEFiberMaterial	m_fib;
 
 	// declare parameter list

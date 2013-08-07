@@ -102,6 +102,21 @@ void FEViscoElasticMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! This material only has one property
+int FEViscoElasticMaterial::Properties()
+{
+	return 1;
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FEViscoElasticMaterial::GetProperty(int i)
+{
+	if (i == 0) return m_pBase;
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
 { 

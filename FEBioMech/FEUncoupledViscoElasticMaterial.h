@@ -29,6 +29,13 @@ public:
 	FEParam* GetParameter(const ParamString& s);
 
 public:
+	//! return number of properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
+
+public:
 	//! data initialization and checking
 	void Init();
 	

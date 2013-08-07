@@ -132,6 +132,13 @@ public:
 
 	//! Find a material parameter
 	FEParam* GetParameter(const ParamString& s);
+
+public:
+	//! return number of material properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
 	
 private:
 	int						m_ID;		//!< solute ID in global table

@@ -66,6 +66,13 @@ public:
 	FEParam* GetParameter(const ParamString& s);
 	
 public:
+	//! return number of material properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
+
+public:
 	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);

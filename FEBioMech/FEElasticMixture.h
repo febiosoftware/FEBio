@@ -48,6 +48,7 @@ public:
 //! tangent tensors evaluated in this class represent the sum of the respective
 //! tensors of all the solids forming the mixture.
 
+//! \todo This class defines two accessor interfaces. Modify to use the FEMaterial interface only.
 class FEElasticMixture : public FEElasticMaterial
 {
 public:
@@ -67,6 +68,13 @@ public:
 
 	// get a material parameter
 	FEParam* GetParameter(const ParamString& s);
+
+public:
+	//! return number of properties
+	int Properties() { return (int) m_pMat.size(); }
+
+	//! return a material property
+	FEMaterial* GetProperty(int i) { return m_pMat[i]; }
 	
 public:
 	//! calculate stress at material point

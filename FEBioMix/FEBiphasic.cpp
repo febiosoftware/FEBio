@@ -80,6 +80,27 @@ void FEBiphasic::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! A biphasic material has three properties
+int FEBiphasic::Properties()
+{
+	return 3;
+}
+
+//-----------------------------------------------------------------------------
+//! return a pointer to a biphasic material property
+FEMaterial* FEBiphasic::GetProperty(int i)
+{
+	switch (i)
+	{
+	case 0: return m_pSolid;
+	case 1: return m_pPerm;
+	case 2: return m_pSupp;
+	}
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Porosity in current configuration
 double FEBiphasic::Porosity(FEMaterialPoint& pt)
 {

@@ -43,6 +43,29 @@ void FETriphasic::AddSolute(FESolute* ps)
 }
 
 //-----------------------------------------------------------------------------
+//! A triphasic has five properties
+int FETriphasic::Properties()
+{
+	return 5;
+}
+
+//-----------------------------------------------------------------------------
+//! return a triphasic material property
+FEMaterial* FETriphasic::GetProperty(int i)
+{
+	switch (i)
+	{
+	case 0: return m_pSolid;
+	case 1: return m_pPerm;
+	case 2: return m_pOsmC;
+	case 3: return m_pSolute[0];
+	case 4: return m_pSolute[1];
+	}
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 void FETriphasic::Init()
 {
 	FEMaterial::Init();

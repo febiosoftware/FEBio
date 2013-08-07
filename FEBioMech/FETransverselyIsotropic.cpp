@@ -19,6 +19,20 @@ void FETransverselyIsotropic::Init()
 }
 
 //-----------------------------------------------------------------------------
+// This material has only one property (the fiber material)
+int FETransverselyIsotropic::Properties()
+{
+	return 1;
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FETransverselyIsotropic::GetProperty(int n)
+{
+	if ((n < 0) || (n > 1)) return 0;
+	return &m_fib;
+}
+
+//-----------------------------------------------------------------------------
 //! Serialize data to or from the dump file 
 void FETransverselyIsotropic::Serialize(DumpFile &ar)
 {

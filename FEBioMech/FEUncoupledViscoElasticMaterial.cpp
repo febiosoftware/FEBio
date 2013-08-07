@@ -49,6 +49,21 @@ void FEUncoupledViscoElasticMaterial::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! This material only has one property
+int FEUncoupledViscoElasticMaterial::Properties()
+{
+	return 1;
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FEUncoupledViscoElasticMaterial::GetProperty(int i)
+{
+	if (i == 0) return m_pBase;
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data
 FEMaterialPoint* FEUncoupledViscoElasticMaterial::CreateMaterialPointData()
 { 

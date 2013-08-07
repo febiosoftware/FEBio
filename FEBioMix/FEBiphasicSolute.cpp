@@ -324,6 +324,27 @@ double FEBiphasicSolute::ReferentialConcentration(FEMaterialPoint& pt)
 }
 
 //-----------------------------------------------------------------------------
+//! A biphasic-solute material has four properties
+int FEBiphasicSolute::Properties()
+{
+	return 4;
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FEBiphasicSolute::GetProperty(int i)
+{
+	switch (i)
+	{
+	case 0: return m_pSolid;
+	case 1: return m_pPerm;
+	case 2: return m_pOsmC;
+	case 3: return m_pSolute;
+	}
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 //! Data serialization
 void FEBiphasicSolute::Serialize(DumpFile& ar)
 {

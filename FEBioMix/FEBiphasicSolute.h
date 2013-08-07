@@ -68,6 +68,12 @@ public:
 
 	// find a material parameter
 	FEParam* GetParameter(const ParamString& s);
+
+	//! return number of material properties
+	int Properties();
+
+	//! return a material property
+	FEMaterial* GetProperty(int i);
 	
 public:
 	void Init();

@@ -1,5 +1,6 @@
 #pragma once
 #include "DumpFile.h"
+#include "FEParameterList.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -13,7 +14,7 @@ class FEModel;
 
 // NOTE: This is currently only used as a method to abstract the rigid body concept.
 
-class FEObject
+class FEObject : public FEParamContainer
 {
 public:
 	//! constructor
@@ -33,6 +34,9 @@ public:
 
 	//! update solution
 	virtual void Update(std::vector<double>& Ui, std::vector<double>& ui) = 0;
+	
+	//! get the material ID
+	virtual int GetMaterialID() { assert(false); return -1; }
 
 protected:
 	FEModel&	m_fem;	//!< Pointer to FE model

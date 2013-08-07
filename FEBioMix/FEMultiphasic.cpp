@@ -1091,6 +1091,44 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+//! This material number of properties varies depending on the number solutes
+//! solid-bound molecules and chemical reactions defined.
+int FEMultiphasic::Properties()
+{
+	return 4 + (int) m_pSolute.size() + (int) m_pSBM.size() + (int) m_pReact.size();
+}
+
+//-----------------------------------------------------------------------------
+FEMaterial* FEMultiphasic::GetProperty(int i)
+{
+	if (i < 0) { assert(false); return 0; }
+	if (i < 4)
+	{
+		switch (i)
+		{
+		case 0: return m_pSolid;
+		case 1: return m_pPerm;
+		case 2: return m_pOsmC;
+		case 3: return m_pSupp;
+		}
+	}
+	i -= 4;
+
+	int NS = (int) m_pSolute.size();
+	if (i < NS) return m_pSolute[i];
+	i -= NS;
+
+	int NM = (int) m_pSBM.size();
+	if (i < NM) return m_pSBM[i];
+	i -= NM;
+
+	int NR = (int) m_pReact.size();
+	if (i < NR) return m_pReact[i];
+	assert(false);
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
 FEParam* FEMultiphasic::GetParameter(const ParamString& s)
 {
 	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);

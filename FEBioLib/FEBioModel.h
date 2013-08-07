@@ -61,15 +61,6 @@ protected: //! --- serialization for restarts ---
 	void SerializeConstants   (DumpFile& ar);
 	void SerializeDataStore   (DumpFile& ar);
 
-public: //! --- parameter functions ---
-
-	//! return a pointer to the named variable
-	double* FindParameter(const char* szname);
-
-	//! Evaluate parameter list
-	void EvaluateParameterList(FEParameterList& pl);
-	void EvaluateMaterialParameters(FEMaterial* pm);
-
 protected: // --- initialization functions ---
 
 	//! Initialize mesh data

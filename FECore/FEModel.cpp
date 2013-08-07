@@ -49,6 +49,124 @@ void FEModel::ClearBCs()
 	m_DC.clear();
 }
 
+//=============================================================================
+//    P A R A M E T E R   F U N C T I O N S
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Return a pointer to the named variable
+
+//! This function returns a pointer to a named variable. Currently, we only
+//! support names of the form:
+//!		material_name.parameter_name
+//!		material_name.elastic.parameter_name (nested material)
+//!		material_name.solid_name.parameter_name (solid mixture)
+//!		material_name.solid.parameter_name (biphasic material)
+//!		material_name.permeability.parameter_name (biphasic material)
+//!		material_name.solid.solid_name.parameter_name (biphasic material with solid mixture)
+//! The 'material_name' is a user defined name for a material.
+//! The 'parameter_name' is the predefined name of the variable.
+//! The keywords 'elastic', 'solid', and 'permeability' must appear as shown.
+//! \todo perhaps I should use XPath to refer to material parameters ?
+
+double* FEModel::FindParameter(const char* szparam)
+{
+	char szname[256];
+	strcpy(szname, szparam);
+
+	// get the material and parameter name
+	char* ch = strchr((char*)szname, '.');
+	if (ch == 0) return 0;
+	*ch = 0;
+	const char* szmat = szname;
+	const char* szvar = ch+1;
+
+	// find the material with the same name
+	FEMaterial* pmat = 0;
+	int nmat = -1;
+	for (int i=0; i<Materials(); ++i)
+	{
+		pmat = GetMaterial(i);
+		nmat = i;
+		if (strcmp(szmat, pmat->GetName()) == 0) break;
+		pmat = 0;
+	}
+
+	// make sure we found a material with the same name
+	if (pmat == 0) return false;
+
+	// if the variable is a vector, then we require an index
+	char* szarg = strchr((char*) szvar, '[');
+	int index = 0;
+	if (szarg)
+	{
+		*szarg = 0; szarg++;
+		const char* ch = strchr(szarg, ']');
+		assert(ch);
+		index = atoi(szarg);
+	}
+
+	// find the material parameter
+	ParamString sz(szvar);
+	FEParam* pp = pmat->GetParameter(sz);
+	if (pp) return pp->pvalue<double>(index);
+
+	// the rigid bodies are dealt with differently
+	int nrb = m_Obj.size();
+	for (int i=0; i<nrb; ++i)
+	{
+		FEObject& ob = *m_Obj[i];
+		if (ob.GetMaterialID() == nmat)
+		{
+			FEParam* pp = pmat->GetParameter(sz);
+			if (pp) return pp->pvalue<double>(index);
+		}
+	}
+
+	// oh, oh, we didn't find it
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Evaluate a parameter list
+void FEModel::EvaluateParameterList(FEParameterList &pl)
+{
+	list<FEParam>::iterator pi = pl.first();
+	for (int j=0; j<pl.Parameters(); ++j, ++pi)
+	{
+		if (pi->m_nlc >= 0)
+		{
+			double v = GetLoadCurve(pi->m_nlc)->Value();
+			switch (pi->m_itype)
+			{
+			case FE_PARAM_INT   : pi->value<int>() = (int) v; break;
+			case FE_PARAM_DOUBLE: pi->value<double>() = pi->m_scl*v; break;
+			case FE_PARAM_BOOL  : pi->value<bool>() = (v > 0? true : false); break;
+			default: 
+				assert(false);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! This function evaluates material parameter lists. Since some of the materials
+//! can have other materials as sub-componenents, we need to set up a recursive
+//! call to evaluate the parameter lists of the sub-materials.
+void FEModel::EvaluateMaterialParameters(FEMaterial* pm)
+{
+	// evaluate the materials' parameter list
+	EvaluateParameterList(pm->GetParameterList());
+
+	// evaluate the material properties
+	int N = pm->Properties();
+	for (int i=0; i<N; ++i)
+	{
+		FEMaterial* pmi = pm->GetProperty(i); assert(pmi);
+		if (pmi) EvaluateMaterialParameters(pmi);
+	}
+}
+
 //-----------------------------------------------------------------------------
 // This function adds a callback routine
 //

@@ -171,23 +171,27 @@ public: // --- Nonlinear constraints functions ---
 	//! add a nonlinear constraint
 	void AddNonlinearConstraint(FENLConstraint* pnlc) { m_NLC.push_back(pnlc); }
 
-public:	// Miscellaneous routines
+public: // --- parameter functions ---
+
+	//! Evaluate parameter list
+	void EvaluateParameterList(FEParameterList& pl);
+
+	//! Evaluate material parameters
+	void EvaluateMaterialParameters(FEMaterial* pm);
+
+	//! return a pointer to the named variable
+	double* FindParameter(const char* szname);
+
+public:	// --- Miscellaneous routines ---
 
 	// facilities for (re)storing the model state data (used for running restarts)
 	virtual void PushState() = 0;
 	virtual void PopState () = 0;
 
-	//! Evaluate parameter list
-	virtual void EvaluateParameterList(FEParameterList& pl) = 0;
-	virtual void EvaluateMaterialParameters(FEMaterial* pm) = 0;
-
-	//! return a pointer to the named variable
-	virtual double* FindParameter(const char* szname) = 0;
-
 	//! find a boundary condition from the ID
 	virtual FEBoundaryCondition* FindBC(int nid) = 0;
 
-	//! check for user interruption
+	//! check for user interruption \todo can I incorporate that in the callback mechanism
 	virtual void CheckInterruption() = 0;
 
 	//! set callback function
