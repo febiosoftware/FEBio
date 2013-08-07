@@ -17,7 +17,7 @@
 #include "FEBioLoadDataSection.h"
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
-#include <FEBioLib/DataStore.h>
+#include <FECore/DataStore.h>
 #include <FECore/log.h>
 #include <string.h>
 #include <FECore/Image.h>

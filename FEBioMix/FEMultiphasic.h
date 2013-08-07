@@ -50,13 +50,14 @@ public:
 class FEMultiphasic : public FEMultiMaterial
 {
 public:
+	//! constructor
 	FEMultiphasic();
-	
+
+	//! initialization
+	void Init();
+
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() 
-	{ 
-		return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
-	}
+	FEMaterialPoint* CreateMaterialPointData();
 	
 	// return elastic material component
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
@@ -65,7 +66,6 @@ public:
 	FEParam* GetParameter(const ParamString& s);
 	
 public:
-	void Init();
 	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);

@@ -704,7 +704,6 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FEBioLib\DataStore.h" />
     <ClInclude Include="..\..\FEBioLib\ElementDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
@@ -716,7 +715,6 @@
     <ClInclude Include="..\..\FEBioLib\version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioLib\DataStore.cpp" />
     <ClCompile Include="..\..\FEBioLib\ElementDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />

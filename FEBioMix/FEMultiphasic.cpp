@@ -309,6 +309,12 @@ FEMultiphasic::FEMultiphasic()
 }
 
 //-----------------------------------------------------------------------------
+FEMaterialPoint* FEMultiphasic::CreateMaterialPointData() 
+{ 
+	return new FESolutesMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
+}
+
+//-----------------------------------------------------------------------------
 void FEMultiphasic::AddSolute(FESolute* psol)
 {
 	m_pSolute.push_back(psol);
