@@ -37,9 +37,6 @@ public:
 	//! return Young's modulus
 	double YoungModulus(double rhor) { return m_c*pow(rhor, m_g);}
 	
-	//! return bulk modulus
-	double BulkModulus() { return YoungModulus(Density())/(3.0*(1.0 - 2.0*m_v));}
-	
 	// declare as registered
 	DECLARE_REGISTERED(FECarterHayesOld);
 	

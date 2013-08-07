@@ -57,9 +57,6 @@ public:
 	//! data initialization and checking
 	void Init();
 
-	//! return bulk modulus
-	double BulkModulus();
-
 public:
 
 	FEEllipsoidalFiberDistributionOld	m_EFD;
