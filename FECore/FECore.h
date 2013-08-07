@@ -26,6 +26,9 @@ namespace FECore
 	// retrieve version number string
 	const char* get_version_string();
 
+	// initialize the module
+	void InitModule();
+
 } // namespace FECore
 
 #endif // _FECORE_H_04222008_
