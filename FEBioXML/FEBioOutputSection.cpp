@@ -154,7 +154,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		else if (strcmp(sz, "lsdyna") == 0) pplt = new LSDYNAPlotFile;
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
-	else pplt = new LSDYNAPlotFile;
+	else pplt = new FEBioPlotFile(fem);
 	fem.SetPlotFile(pplt);
 
 	const char* szplt = tag.AttributeValue("file", true);

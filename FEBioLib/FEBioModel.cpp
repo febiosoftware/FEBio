@@ -266,7 +266,11 @@ bool FEBioModel::Reset()
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
-		if (m_plot == 0) m_plot = new LSDYNAPlotFile;
+		if (m_plot == 0) 
+		{
+			m_plot = new FEBioPlotFile(*this);
+			SetPlotFileNameExtension(".xplt");
+		}
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
@@ -1295,7 +1299,11 @@ bool FEBioModel::Init()
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
 	{
-		if (m_plot == 0) m_plot = new LSDYNAPlotFile;
+		if (m_plot == 0) 
+		{
+			m_plot = new FEBioPlotFile(*this);
+			SetPlotFileNameExtension(".xplt");
+		}
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
