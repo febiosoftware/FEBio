@@ -224,6 +224,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\DataStore.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\DumpFile.cpp"
 				>
 			</File>
@@ -447,6 +451,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\BFGSSolver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\DataStore.h"
 				>
 			</File>
 			<File
