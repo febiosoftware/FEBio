@@ -189,7 +189,7 @@ public:	// --- Miscellaneous routines ---
 	virtual void PopState () = 0;
 
 	//! find a boundary condition from the ID
-	virtual FEBoundaryCondition* FindBC(int nid) = 0;
+	FEBoundaryCondition* FindBC(int nid);
 
 	//! check for user interruption \todo can I incorporate that in the callback mechanism
 	virtual void CheckInterruption() = 0;

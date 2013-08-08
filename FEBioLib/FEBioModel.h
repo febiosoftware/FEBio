@@ -31,9 +31,6 @@ public:
 	//! Solves the problem
 	bool Solve();
 
-	//! find a boundary condition from the ID
-	FEBoundaryCondition* FindBC(int nid);
-
 public: // --- virtual I/O functions ---
 	//! write to plot file
 	void Write();

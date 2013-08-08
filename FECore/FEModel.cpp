@@ -248,3 +248,23 @@ const char* FEModel::GetTitle()
 { 
 	return m_sztitle; 
 }
+
+//-----------------------------------------------------------------------------
+//! Find a BC based on its ID. This is needed for restarts.
+FEBoundaryCondition* FEModel::FindBC(int nid)
+{
+	int i;
+	for (i=0; i<(int) m_DC.size(); ++i) if (m_DC[i]->GetID() == nid) return m_DC[i];
+
+	for (i=0; i<(int) m_FC.size(); ++i) if (m_FC[i]->GetID() == nid) return m_FC[i];
+
+	for (i=0; i<(int) m_SL.size(); ++i) if (m_SL[i]->GetID() == nid) return m_SL[i];
+
+	for (i=0; i<(int) m_RDC.size(); ++i) if (m_RDC[i]->GetID() == nid) return m_RDC[i];
+
+	for (i=0; i<(int) m_RFC.size(); ++i) if (m_RFC[i]->GetID() == nid) return m_RFC[i];
+
+	for (i=0; i<(int) m_RN.size(); ++i) if (m_RN[i]->GetID() == nid) return m_RN[i];
+
+	return 0;
+}
