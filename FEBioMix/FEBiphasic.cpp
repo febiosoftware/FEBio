@@ -83,7 +83,7 @@ void FEBiphasic::Init()
 //! A biphasic material has three properties
 int FEBiphasic::Properties()
 {
-	return 3;
+	return (m_pSupp ? 3 : 2);
 }
 
 //-----------------------------------------------------------------------------
