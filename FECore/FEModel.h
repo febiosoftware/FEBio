@@ -22,10 +22,14 @@ class PlotFile;
 
 //-----------------------------------------------------------------------------
 // FEBIO callback structure
+#define CB_ALWAYS		0x00000011
+#define CB_MAJOR_ITERS	0x00000001
+#define CB_MINOR_ITERS	0x00000010
 typedef void (*FEBIO_CB_FNC)(FEModel*,void*);
 struct FEBIO_CALLBACK {
-	FEBIO_CB_FNC	m_pcb;
-	void*	m_pd;
+	FEBIO_CB_FNC	m_pcb;		// pointer to callback function
+	void*			m_pd;		// pointer to user data
+	unsigned int	m_nwhen;	// when to call function
 };
 
 //-----------------------------------------------------------------------------
@@ -191,14 +195,11 @@ public:	// --- Miscellaneous routines ---
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
 
-	//! check for user interruption \todo can I incorporate this in the callback mechanism
-	virtual void CheckInterruption() { assert(false); }
-
 	//! set callback function
-	void AddCallback(FEBIO_CB_FNC pcb, void* pd);
+	void AddCallback(FEBIO_CB_FNC pcb, unsigned int nwhen, void* pd);
 
 	//! call the callback function
-	void DoCallback();
+	void DoCallback(unsigned int nevent);
 
 	// get/set global data
 	static void SetGlobalConstant(const string& s, double v);

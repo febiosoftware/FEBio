@@ -53,7 +53,7 @@ bool FEPowellOptimizeMethod::Solve(FEOptimizeData *pOpt)
 
 	// set the FEM callback function
 	FEModel& fem = opt.GetFEM();
-	fem.AddCallback(fecb, &opt);
+	fem.AddCallback(fecb, CB_MAJOR_ITERS, &opt);
 
 	// don't plot anything
 	fem.GetCurrentStep()->m_nplot = FE_PLOT_NEVER;

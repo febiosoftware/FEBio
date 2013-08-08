@@ -50,6 +50,7 @@
 #include "FECore/log.h"
 #include "FEBioStdSolver.h"
 #include "FECore/febio.h"
+#include "Interrupt.h"
 #include "plugin.h"
 
 //-----------------------------------------------------------------------------
@@ -120,6 +121,18 @@ void update_console_cb(FEModel* pfem, void* pd)
 }
 
 //-----------------------------------------------------------------------------
+// callback for ctrl+c interruptions
+void interrupt_cb(FEModel* pfem, void* pd)
+{
+	Interruption itr;
+	if (itr.m_bsig)
+	{
+		itr.m_bsig = false;
+		itr.interrupt();
+	}
+}
+
+//-----------------------------------------------------------------------------
 // The starting point of the application
 //
 int main(int argc, char* argv[])
@@ -152,8 +165,9 @@ int main(int argc, char* argv[])
 	// create the one and only FEM object
 	FEM fem;
 
-	// register update callback
-	fem.AddCallback(update_console_cb, 0);
+	// register callbacks
+	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS, 0);
+	fem.AddCallback(interrupt_cb     , CB_MINOR_ITERS, 0);
 
 	// intialize the framework
 	FEBioCommand::SetFEM(&fem);

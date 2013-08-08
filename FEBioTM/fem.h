@@ -14,10 +14,6 @@ public:
 	FEM();
 	FEM(CTask* pt);
 
-public:
-	//! check for user interruption
-	virtual void CheckInterruption();
-
 private:
 	CTask*	m_pTask;
 };

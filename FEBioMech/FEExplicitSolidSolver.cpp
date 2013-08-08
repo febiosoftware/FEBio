@@ -950,8 +950,8 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	// prepare for the first iteration
 	PrepStep(time);
 
-	// check for CTRL+C interruption before we do any work
-	m_fem.CheckInterruption();
+	// do minor iterations callbacks
+	m_fem.DoCallback(CB_MINOR_ITERS);
 
 	// calculate initial residual
 	if (Residual(m_R0) == false) return false;
@@ -1007,8 +1007,8 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	// let's flush the logfile to make sure the last output will not get lost
 	clog.flush();
 
-	// check for CTRL+C interruption
-	m_fem.CheckInterruption();
+	// do minor iterations callbacks
+	m_fem.DoCallback(CB_MINOR_ITERS);
 
 	// when converged, 
 	// print a convergence summary to the clog file

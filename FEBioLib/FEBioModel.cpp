@@ -299,7 +299,7 @@ bool FEBioModel::Reset()
 	}
 */
 	// do the callback
-	DoCallback();
+	DoCallback(CB_MAJOR_ITERS);
 
 	// All data is reset successfully
 	return true;
@@ -1320,7 +1320,7 @@ bool FEBioModel::Init()
 	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot->Write(*this);
 
 	// do the callback
-	DoCallback();
+	DoCallback(CB_MAJOR_ITERS);
 
 	// Alright, all initialization is done, so let's get busy !
 	return true;

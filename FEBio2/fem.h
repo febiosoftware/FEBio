@@ -33,9 +33,6 @@ public:
 	//! Restart from restart point
 	bool Restart(const char* szfile);
 
-	//! check for user-interruption
-	virtual void CheckInterruption();
-
 public:
 	bool	m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
 };

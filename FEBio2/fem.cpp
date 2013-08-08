@@ -155,19 +155,3 @@ bool FEM::Configure(const char *szfile)
 
 	return true;
 }
-
-//-----------------------------------------------------------------------------
-//! This function is called in several places to see if the user requested to
-//! pause the run. If so, the FEBio prompt appears and users can enter a command.
-void FEM::CheckInterruption()
-{
-	if (m_bInterruptable)
-	{
-		Interruption itr;
-		if (itr.m_bsig)
-		{
-			itr.m_bsig = false;
-			itr.interrupt();
-		}
-	}
-}

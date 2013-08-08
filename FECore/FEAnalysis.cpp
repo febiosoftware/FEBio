@@ -347,7 +347,7 @@ bool FEAnalysis::Solve()
 			m_nretries = 0;
 
 			// call callback function
-			m_fem.DoCallback();
+			m_fem.DoCallback(CB_MAJOR_ITERS);
 		}
 		else 
 		{

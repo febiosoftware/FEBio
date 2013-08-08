@@ -242,6 +242,23 @@ void update_ui_cb(FEModel* pfem, void* pd)
 }
 
 //-----------------------------------------------------------------------------
+// This callback will check for user interruption
+void intterupt_cb(FEModel* pfem, void* pd)
+{
+	// get a lock
+	Fl::lock();
+	CTask* ptask = static_cast<CTask*>(pd);
+	if (ptask->GetStatus() == CTask::CANCELLED)
+	{
+		// release lock
+		Fl::unlock();
+		throw ExitRequest();
+	}
+	// release lock
+	Fl::unlock();
+}
+
+//-----------------------------------------------------------------------------
 void CTask::Run(Progress& prg)
 {
 	// set the status to running
@@ -255,7 +272,8 @@ void CTask::Run(Progress& prg)
 	FEM fem(this);
 
 	// set the callback function
-	fem.AddCallback(update_ui_cb, &prg);
+	fem.AddCallback(update_ui_cb, CB_MAJOR_ITERS, &prg);
+	fem.AddCallback(intterupt_cb, CB_MINOR_ITERS, this);
 
 	// set the default output file names
 	char szbase[1024] = {0}, szfile[1024] = {0};

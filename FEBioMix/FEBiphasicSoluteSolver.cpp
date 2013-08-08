@@ -158,8 +158,8 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 	// prepare for the first iteration
 	PrepStep(time);
 
-	// check for CTRL+C interruption before we do any work
-	m_fem.CheckInterruption();
+	// do minor iterations callbacks
+	m_fem.DoCallback(CB_MINOR_ITERS);
 
 	// calculate initial stiffness matrix
 	if (ReformStiffness() == false) return false;
@@ -450,8 +450,8 @@ bool FEBiphasicSoluteSolver::Quasin(double time)
 		// let's flush the logfile to make sure the last output will not get lost
 		clog.flush();
 
-		// check for CTRL+C interruption
-		m_fem.CheckInterruption();
+		// do minor iterations callbacks
+		m_fem.DoCallback(CB_MINOR_ITERS);
 	}
 	while (bconv == false);
 
