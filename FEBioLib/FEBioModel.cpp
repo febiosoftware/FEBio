@@ -2294,3 +2294,78 @@ bool FEBioModel::Solve()
 	// We're done !
 	return bconv;
 }
+
+
+//-----------------------------------------------------------------------------
+static FEBioModel* pfem_copy = 0;
+
+//-----------------------------------------------------------------------------
+void FEBioModel::PushState()
+{
+	if (pfem_copy == 0) pfem_copy = new FEBioModel;
+	pfem_copy->ShallowCopy(*this);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioModel::PopState()
+{
+	assert(pfem_copy);
+	ShallowCopy(*pfem_copy);
+	delete pfem_copy;
+	pfem_copy = 0;
+}
+
+//-----------------------------------------------------------------------------
+//! This function is used when pushing the FEM state data. Since we don't need
+//! to copy all the data, this function only copies the data that needs to be 
+//! restored for a running restart.
+//!
+//! \todo Shallow copy nonlinear constraints
+void FEBioModel::ShallowCopy(FEBioModel& fem)
+{
+	// copy time data
+	m_ftime = fem.m_ftime;
+
+	// copy the mesh
+	m_mesh = fem.GetMesh();
+
+	// copy rigid body data
+	if (m_Obj.empty())
+	{
+		for (int i=0; i<(int) fem.m_Obj.size();	++i)
+		{
+			FERigidBody* prb = new FERigidBody(this);
+			m_Obj.push_back(prb);
+		}
+	}
+	assert(m_Obj.size() == fem.m_Obj.size());
+	for (int i=0; i<(int) m_Obj.size(); ++i) m_Obj[i]->ShallowCopy(fem.m_Obj[i]);
+
+	// copy contact data
+	if (m_CI.empty())
+	{
+		FEContactInterface* pci;
+		for (int i=0; i<fem.SurfacePairInteractions(); ++i)
+		{
+			switch (fem.m_CI[i]->Type())
+			{
+			case FE_CONTACT_SLIDING      : pci = new FESlidingInterface     (this); break;
+			case FE_FACET2FACET_SLIDING  : pci = new FEFacet2FacetSliding   (this); break;
+			case FE_CONTACT_TIED         : pci = new FETiedInterface        (this); break;
+			case FE_CONTACT_RIGIDWALL    : pci = new FERigidWallInterface   (this); break;
+			case FE_CONTACT_SLIDING2     : pci = new FESlidingInterface2    (this); break;
+			case FE_PERIODIC_BOUNDARY    : pci = new FEPeriodicBoundary     (this); break;
+			case FE_SURFACE_CONSTRAINT   : pci = new FESurfaceConstraint    (this); break;
+			case FE_CONTACT_SLIDING3     : pci = new FESlidingInterface3    (this); break;
+			case FE_CONTACT_TIED_BIPHASIC: pci = new FETiedBiphasicInterface(this); break;
+			case FE_CONTACT_SLIDINGBW    : pci = new FESlidingInterfaceBW   (this); break;
+			case FE_FACET2FACET_TIED     : pci = new FEFacet2FacetTied      (this); break;
+			default:
+				assert(false);
+			}
+			m_CI.push_back(pci);
+		}
+	}
+	assert(SurfacePairInteractions() == fem.SurfacePairInteractions());
+	for (int i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->ShallowCopy(*fem.m_CI[i]);
+}

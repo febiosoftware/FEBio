@@ -15,14 +15,6 @@ public:
 	FEM(CTask* pt);
 
 public:
-	virtual void PushState();
-	virtual void PopState ();
-
-protected:
-	//! copy the model
-	void ShallowCopy(FEM& fem);
-
-public:
 	//! check for user interruption
 	virtual void CheckInterruption();
 

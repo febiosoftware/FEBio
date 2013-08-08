@@ -37,13 +37,6 @@ public:
 	virtual void CheckInterruption();
 
 public:
-	virtual void PushState();
-	virtual void PopState ();
-
-protected:
-	void ShallowCopy(FEM& fem);
-
-public:
 	bool	m_bInterruptable;	//!< true if this model can be interrupted with ctrl+c
 };
 

@@ -191,8 +191,8 @@ public:	// --- Miscellaneous routines ---
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);
 
-	//! check for user interruption \todo can I incorporate that in the callback mechanism
-	virtual void CheckInterruption() = 0;
+	//! check for user interruption \todo can I incorporate this in the callback mechanism
+	virtual void CheckInterruption() { assert(false); }
 
 	//! set callback function
 	void AddCallback(FEBIO_CB_FNC pcb, void* pd);
