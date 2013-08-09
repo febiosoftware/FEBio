@@ -124,8 +124,8 @@ tens4ds FEFiberExpPowUncoupled::DevTangent(FEMaterialPoint& mp)
 		mat3dd I(1);
 		tens4ds IxI = dyad1s(I);
 		tens4ds I4  = dyad4s(I);
-		c += - 1./3.*(ddots(c,IxI) - IxI*(c.tr()/3.))
-		+ 2./3.*((I4-IxI/3.)*s.tr()-dyad1s(s.dev(),I));
+		c += ((I4+IxI/3.0)*s.tr() - dyad1s(I,s))*(2./3.)
+		- (ddots(IxI, c)-IxI*(c.tr()/3.))/3.;
 	}
 	else
 	{
