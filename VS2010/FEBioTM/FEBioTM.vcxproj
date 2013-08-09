@@ -295,7 +295,6 @@
     <ClInclude Include="..\..\FEBioTM\DlgEditFind.h" />
     <ClInclude Include="..\..\FEBioTM\Document.h" />
     <ClInclude Include="..\..\FEBioTM\FEBioTM.h" />
-    <ClInclude Include="..\..\FEBioTM\fem.h" />
     <ClInclude Include="..\..\FEBioTM\FileBrowser.h" />
     <ClInclude Include="..\..\FEBioTM\MainApp.h" />
     <ClInclude Include="..\..\FEBioTM\Menu.h" />
@@ -315,7 +314,6 @@
     <ClCompile Include="..\..\FEBioTM\DlgEditFind.cpp" />
     <ClCompile Include="..\..\FEBioTM\Document.cpp" />
     <ClCompile Include="..\..\FEBioTM\FEBioTM.cpp" />
-    <ClCompile Include="..\..\FEBioTM\fem.cpp" />
     <ClCompile Include="..\..\FEBioTM\FileBrowser.cpp" />
     <ClCompile Include="..\..\FEBioTM\MainApp.cpp" />
     <ClCompile Include="..\..\FEBioTM\Menu.cpp" />

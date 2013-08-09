@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "MainApp.h"
 #include "Document.h"
+#include "FEBioLib/FEBioModel.h"
 
 //-----------------------------------------------------------------------------
 // This function will be called when the text buffer is modified
@@ -269,7 +270,7 @@ void CTask::Run(Progress& prg)
 	m_prun = this;
 
 	// setup the FE problem
-	FEM fem(this);
+	FEBioModel fem;
 
 	// set the callback function
 	fem.AddCallback(update_ui_cb, CB_MAJOR_ITERS, &prg);

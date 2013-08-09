@@ -9,11 +9,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "FEM.h"
 #include "FECore/log.h"
 #include <FL/Fl_Progress.H>
 #include <FL/Fl.H>
 #include "Task.h"
+#include <vector>
+using namespace std;
 
 class CWnd;
 

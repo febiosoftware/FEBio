@@ -14,6 +14,7 @@
 #include "MainApp.h"
 #include <flx_message.h>
 #include "DlgEditFind.h"
+#include <assert.h>
 
 #ifdef WIN32
 #define IDI_ICON1	101

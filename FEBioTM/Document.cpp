@@ -10,6 +10,7 @@
 #include "FEBioXML/XMLReader.h"
 #include "flx_threads.h"
 #include <time.h>
+#include <assert.h>
 
 extern void InitFEBioLibrary();
 
