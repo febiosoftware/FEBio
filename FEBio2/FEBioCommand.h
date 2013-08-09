@@ -2,7 +2,7 @@
 #include "Command.h"
 #include "CommandManager.h"
 
-class FEM;
+class FEBioModel;
 
 //-----------------------------------------------------------------------------
 //! Base class of FEBio commands
@@ -13,10 +13,10 @@ public:
 	FEBioCommand();
 	virtual ~FEBioCommand(void);
 
-	static void SetFEM(FEM* pfem);
+	static void SetFEM(FEBioModel* pfem);
 
 protected:
-	static FEM*	m_pfem;
+	static FEBioModel*	m_pfem;
 };
 
 //-----------------------------------------------------------------------------

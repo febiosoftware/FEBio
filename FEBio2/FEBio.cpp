@@ -41,7 +41,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "fem.h"
+#include "FEBioLib/FEBioModel.h"
 #include "FEBioLib/version.h"
 #include "FEBioCommand.h"
 #include "FECore/FECore.h"
@@ -52,6 +52,13 @@
 #include "FECore/febio.h"
 #include "Interrupt.h"
 #include "plugin.h"
+#include "FEBioXML/XMLReader.h"
+
+#ifdef WIN32
+extern "C" void __cdecl omp_set_num_threads(int);
+#else
+extern "C" void omp_set_num_threads(int);
+#endif
 
 //-----------------------------------------------------------------------------
 //!  Command line options
@@ -82,6 +89,7 @@ void Hello();
 int prompt(CMDOPTIONS& ops);
 int get_app_path (char *pname, size_t pathsize);
 extern void InitFEBioLibrary();
+bool Configure(FEBioModel& fem, const char *szfile);
 
 //-----------------------------------------------------------------------------
 // we use the console to log output 
@@ -95,7 +103,7 @@ public:
 // callback to update window title
 void update_console_cb(FEModel* pfem, void* pd)
 {
-	FEM& fem = dynamic_cast<FEM&>(*pfem);
+	FEBioModel& fem = dynamic_cast<FEBioModel&>(*pfem);
 
 	// get the number of steps
 	int nsteps = fem.Steps();
@@ -162,8 +170,8 @@ int main(int argc, char* argv[])
 		 if (prompt(ops) == 0) return 0;
 	}
 
-	// create the one and only FEM object
-	FEM fem;
+	// create the one and only FEBioModel object
+	FEBioModel fem;
 
 	// register callbacks
 	fem.AddCallback(update_console_cb, CB_MAJOR_ITERS, 0);
@@ -175,7 +183,7 @@ int main(int argc, char* argv[])
 	// read the configration file if specified
 	if (ops.szcnf[0])
 	{
-		if (fem.Configure(ops.szcnf) == false) return 1;
+		if (Configure(fem, ops.szcnf) == false) return 1;
 	}
 
 	// store the input file name
@@ -449,4 +457,120 @@ int prompt(CMDOPTIONS& ops)
 		}
 	}
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+//! Reads the FEBio configuration file. This file contains some default settings.
+
+bool Configure(FEBioModel& fem, const char *szfile)
+{
+	// open the configuration file
+	XMLReader xml;
+	if (xml.Open(szfile) == false)
+	{
+		fprintf(stderr, "FATAL ERROR: Failed reading FEBio configuration file %s.\n", szfile);
+		return false;
+	}
+
+	// loop over all child tags
+	try
+	{
+		// Find the root element
+		XMLTag tag;
+		if (xml.FindTag("febio_config", tag) == false) return false;
+
+		if (strcmp(tag.m_att[0].m_szatv, "1.0") == 0)
+		{
+			if (!tag.isleaf())
+			{
+				// Read version 1.0
+				++tag;
+				do
+				{
+					if (tag == "linear_solver")
+					{
+						const char* szt = tag.AttributeValue("type");
+						if      (strcmp(szt, "skyline"           ) == 0) fem.m_nsolver = SKYLINE_SOLVER;
+						else if (strcmp(szt, "psldlt"            ) == 0) fem.m_nsolver = PSLDLT_SOLVER;
+						else if (strcmp(szt, "superlu"           ) == 0) fem.m_nsolver = SUPERLU_SOLVER;
+						else if (strcmp(szt, "superlu_mt"        ) == 0) fem.m_nsolver = SUPERLU_MT_SOLVER;
+						else if (strcmp(szt, "pardiso"           ) == 0) fem.m_nsolver = PARDISO_SOLVER;
+						else if (strcmp(szt, "rcicg"             ) == 0) fem.m_nsolver = RCICG_SOLVER;
+						else if (strcmp(szt, "wsmp"              ) == 0) fem.m_nsolver = WSMP_SOLVER;
+					}
+					else if (tag == "import")
+					{
+						const char* szfile = tag.szvalue();
+						if (LoadPlugin(szfile) == false) throw XMLReader::InvalidValue(tag);
+						printf("Plugin \"%s\" loaded successfully\n", szfile);
+					}
+					else if (tag == "import_folder")
+					{
+						const char* szfile = tag.szvalue();
+						if (LoadPluginFolder(szfile) == false) throw XMLReader::InvalidTag(tag);
+					}
+					else if (tag == "omp_num_threads")
+					{
+						int n;
+						tag.value(n);
+						omp_set_num_threads(n);
+					}
+					else throw XMLReader::InvalidTag(tag);
+
+					// go to the next tag
+					++tag;
+				}
+				while (!tag.isend());
+			}
+		}
+		else
+		{
+			clog.printbox("FATAL ERROR", "Invalid version for FEBio configuration file.");
+			return false;
+		}
+	}
+	catch (XMLReader::XMLSyntaxError)
+	{
+		clog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
+		return false;
+	}
+	catch (XMLReader::InvalidTag e)
+	{
+		clog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (XMLReader::InvalidAttributeValue e)
+	{
+		const char* szt = e.tag.m_sztag;
+		const char* sza = e.szatt;
+		const char* szv = e.szval;
+		int l = e.tag.m_nstart_line;
+		clog.printf("FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
+		return false;
+	}
+	catch (XMLReader::InvalidValue e)
+	{
+		clog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (XMLReader::MissingAttribute e)
+	{
+		clog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (XMLReader::UnmatchedEndTag e)
+	{
+		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
+		clog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+		return false;
+	}
+	catch (...)
+	{
+		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		return false;
+	}
+
+	xml.Close();
+
+	return true;
 }

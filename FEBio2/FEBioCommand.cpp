@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <cstdlib>
 #include "FEBioCommand.h"
-#include "fem.h"
+#include "FEBioLib/FEBioModel.h"
 #include "FEBioLib/version.h"
 #include "FECore/FEException.h"
 #include "FECore/FECore.h"
@@ -25,7 +25,7 @@ REGISTER_COMMAND(FEBioCmd_Time   , "time"   , "print progress time statistics");
 //-----------------------------------------------------------------------------
 
 
-FEM* FEBioCommand::m_pfem = 0;
+FEBioModel* FEBioCommand::m_pfem = 0;
 
 FEBioCommand::FEBioCommand()
 {
@@ -35,7 +35,7 @@ FEBioCommand::~FEBioCommand()
 {
 }
 
-void FEBioCommand::SetFEM(FEM* pfem)
+void FEBioCommand::SetFEM(FEBioModel* pfem)
 {
 	m_pfem = pfem;
 }

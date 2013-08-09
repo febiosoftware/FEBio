@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBioStdSolver.h"
-#include "fem.h"
+#include "FEBioLib/FEBioModel.h"
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEBioStdSolver , FEBioTask, "solve"   );
@@ -24,7 +24,7 @@ bool FEBioStdSolver::Run(const char* szfile)
 //-----------------------------------------------------------------------------
 bool FEBioRestart::Run(const char *szfile)
 {
-	FEM& fem = dynamic_cast<FEM&>(*m_pfem);
+	FEBioModel& fem = dynamic_cast<FEBioModel&>(*m_pfem);
 
 	// load restart data
 	if (fem.Restart(szfile) == false) return false;

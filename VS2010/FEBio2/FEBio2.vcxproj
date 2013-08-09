@@ -749,7 +749,6 @@
     <ClInclude Include="..\..\FEBio2\FEBioStdSolver.h" />
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\fem.h" />
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
@@ -769,7 +768,6 @@
     <ClCompile Include="..\..\FEBio2\FEBioStdSolver.cpp" />
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\fem.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
@@ -777,7 +775,6 @@
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\Interrupt.cpp" />
     <ClCompile Include="..\..\FEBio2\plugin.cpp" />
-    <ClCompile Include="..\..\FEBio2\restart.cpp" />
     <ClCompile Include="..\..\FEBio2\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>

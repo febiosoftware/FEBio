@@ -19,10 +19,6 @@ END_PARAMETER_LIST();
 FEMicroMaterial::FEMicroMaterial(void)
 {
 	m_szrve[0] = 0;
-
-	// make sure the RVE run cannot be interrupted
-	// since it will prevent the parent run from being interrupted
-	m_rve.m_bInterruptable = false;
 }
 
 //-----------------------------------------------------------------------------

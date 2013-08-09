@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
-#include "fem.h"
+#include "FEBioLib/FEBioModel.h"
 
 //-----------------------------------------------------------------------------
 //! The micro-material implements material homogenization. The stress and tangents
@@ -17,8 +17,8 @@ public:
 	char	m_szrve[256];	//!< filename for RVE file
 
 protected:
-	FEM		m_rve;	//!< the RVE (Representive Volume Element)
-	double	m_V0;	//!< initial volume of RVE
+	FEBioModel	m_rve;	//!< the RVE (Representive Volume Element)
+	double		m_V0;	//!< initial volume of RVE
 
 public:
 	//! calculate stress at material point

@@ -41,11 +41,15 @@ public: // --- virtual I/O functions ---
 	//! dump data to archive for restart
 	void DumpData();
 
-protected: //! --- serialization for restarts ---
+public: //! --- serialization for restarts ---
 	
+	//! Restart from restart point
+	bool Restart(const char* szfile);
+
 	//! Write or read data from archive
 	bool Serialize(DumpFile& ar);
 
+protected:
 	// helper functions for serialization
 	void SerializeMaterials   (DumpFile& ar);
 	void SerializeAnalysisData(DumpFile& ar);
