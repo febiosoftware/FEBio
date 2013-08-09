@@ -5,7 +5,6 @@
 #include "FEBioMech/FESolidSolver.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
-#include "console.h"
 
 // register the material with the framework
 REGISTER_MATERIAL(FEMicroMaterial, "micro-material");
@@ -170,17 +169,11 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 		dz.s = r1.z - r0.z;
 	}
 
-	// turn the console off
-	Console::GetHandle()->Deactivate();
-
 	// solve the RVE
 	bool bret = m_rve.Solve();
 
 	// reset the logfile mode
 	clog.SetMode(nmode);
-
-	// reactivate the console
-	Console::GetHandle()->Activate();
 
 	if (bret == false) throw FEMultiScaleException();
 

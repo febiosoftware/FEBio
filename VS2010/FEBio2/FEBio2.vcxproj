@@ -750,7 +750,6 @@
     <ClInclude Include="..\..\FEBio2\FEContactDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEMemoryDiagnostic.h" />
-    <ClInclude Include="..\..\FEBio2\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FEPrintMatrixDiagnostic.h" />
     <ClInclude Include="..\..\FEBio2\FETangentDiagnostic.h" />
@@ -769,7 +768,6 @@
     <ClCompile Include="..\..\FEBio2\FEContactDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEMemoryDiagnostic.cpp" />
-    <ClCompile Include="..\..\FEBio2\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintHBMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FEPrintMatrixDiagnostic.cpp" />
     <ClCompile Include="..\..\FEBio2\FETangentDiagnostic.cpp" />
