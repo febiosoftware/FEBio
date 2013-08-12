@@ -25,11 +25,13 @@ class PlotFile;
 #define CB_ALWAYS		0x00000011
 #define CB_MAJOR_ITERS	0x00000001
 #define CB_MINOR_ITERS	0x00000010
+
+typedef unsigned int FEBIO_CB_WHEN;
 typedef void (*FEBIO_CB_FNC)(FEModel*,void*);
 struct FEBIO_CALLBACK {
 	FEBIO_CB_FNC	m_pcb;		// pointer to callback function
 	void*			m_pd;		// pointer to user data
-	unsigned int	m_nwhen;	// when to call function
+	FEBIO_CB_WHEN	m_nwhen;	// when to call function
 };
 
 //-----------------------------------------------------------------------------
