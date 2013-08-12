@@ -1,5 +1,6 @@
 #pragma once
 #include "FEUncoupledMaterial.h"
+#include "FEElasticMixture.h"
 
 //-----------------------------------------------------------------------------
 //! Uncoupled elastic mixtures
@@ -14,6 +15,9 @@ class FEUncoupledElasticMixture : public FEUncoupledMaterial
 {
 public:
 	FEUncoupledElasticMixture() {}
+
+	// returns a pointer to a new material point object
+	FEMaterialPoint* CreateMaterialPointData();
 
 	// return number of materials
 	int Materials() const { return m_pMat.size(); }

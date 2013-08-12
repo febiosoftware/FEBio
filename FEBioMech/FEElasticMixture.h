@@ -7,37 +7,21 @@
 class FEElasticMixtureMaterialPoint : public FEMaterialPoint
 {
 public:
-	FEElasticMixtureMaterialPoint() { m_pt = new FEElasticMaterialPoint; }
-	FEMaterialPoint* Copy()
-	{
-		FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint;
-		pt->m_w = m_w;
-		if (m_pt) pt->m_pt = m_pt->Copy();
-		return pt;
-	}
+	//! constructor
+	FEElasticMixtureMaterialPoint();
 
-	void Init(bool bflag)
-	{
-		if (bflag)
-		{
-			for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
-		}
-	}
+	//! Copy material point data
+	FEMaterialPoint* Copy();
 
-	void Serialize(DumpFile& ar)
-	{
-		if (ar.IsSaving())
-		{
-			ar << m_w;
-		}
-		else
-		{
-			ar >> m_w;
-		}
-	}
+	//! material point initialization
+	void Init(bool bflag);
+
+	//! data serialization
+	void Serialize(DumpFile& ar);
 
 public:
-	vector<double>	m_w;	//!< material weights
+	vector<double>				m_w;	//!< material weights
+	vector<FEMaterialPoint*>	m_mp;	//!< material point data for mixture components
 };
 
 //-----------------------------------------------------------------------------

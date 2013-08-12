@@ -10,6 +10,17 @@
 //////////////////////////////////////////////////////////////////////
 
 //-----------------------------------------------------------------------------
+FEMaterialPoint* FEUncoupledElasticMixture::CreateMaterialPointData() 
+{ 
+	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
+	int NMAT = Materials();
+	pt->m_w.resize(NMAT);
+	pt->m_mp.resize(NMAT);
+	for (int i=0; i<NMAT; ++i) pt->m_mp[i] = m_pMat[i]->CreateMaterialPointData();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
 void FEUncoupledElasticMixture::Init()
 {
 	FEUncoupledMaterial::Init();
@@ -22,12 +33,27 @@ void FEUncoupledElasticMixture::Init()
 //-----------------------------------------------------------------------------
 mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 {
-	mat3ds s;
-	
+	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+	vector<double>& w = pt.m_w;
+	assert(w.size() == m_pMat.size());
+
+	// get the elastic material point
+	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
 	// calculate stress
-	s.zero();
+	mat3ds s(0.0);
 	for (int i=0; i < (int)m_pMat.size(); ++i)
-		s += m_pMat[i]->DevStress(mp);
+	{
+		// copy the elastic material point data to the components
+		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		epi.m_rt = ep.m_rt;
+		epi.m_r0 = ep.m_r0;
+		epi.m_F = ep.m_F;
+		epi.m_J = ep.m_J;
+		epi.m_s = m_pMat[i]->DevStress(*pt.m_mp[i]);
+		epi.m_Q = ep.m_Q;
+		s += epi.m_s;
+	}
 	
 	return s;
 }
@@ -35,11 +61,26 @@ mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 //-----------------------------------------------------------------------------
 tens4ds FEUncoupledElasticMixture::DevTangent(FEMaterialPoint& mp)
 {
-	tens4ds c(0.);
-	
+	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
+	vector<double>& w = pt.m_w;
+	assert(w.size() == m_pMat.size());
+
+	// get the elastic material point
+	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
 	// calculate elasticity tensor
+	tens4ds c(0.);
 	for (int i=0; i < (int)m_pMat.size(); ++i)
-		c += m_pMat[i]->DevTangent(mp);
+	{
+		// copy the elastic material point data to the components
+		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		epi.m_rt = ep.m_rt;
+		epi.m_r0 = ep.m_r0;
+		epi.m_F = ep.m_F;
+		epi.m_J = ep.m_J;
+		epi.m_Q = ep.m_Q;
+		c += m_pMat[i]->DevTangent(*pt.m_mp[i]);
+	}
 	
 	return c;
 }

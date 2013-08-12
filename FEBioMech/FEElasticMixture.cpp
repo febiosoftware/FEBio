@@ -2,6 +2,50 @@
 #include "FEElasticMixture.h"
 
 //-----------------------------------------------------------------------------
+FEElasticMixtureMaterialPoint::FEElasticMixtureMaterialPoint()
+{ 
+	m_pt = new FEElasticMaterialPoint; 
+}
+
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FEElasticMixtureMaterialPoint::Copy()
+{
+	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint;
+	pt->m_w = m_w;
+	pt->m_mp = m_mp;
+	if (m_pt) pt->m_pt = m_pt->Copy();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMixtureMaterialPoint::Init(bool bflag)
+{
+	if (bflag)
+	{
+		for (int i=0; i<(int) m_w.size(); ++i) m_w[i] = 1.0;
+	}
+
+	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->Init(bflag);
+}
+
+//-----------------------------------------------------------------------------
+void FEElasticMixtureMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_w;
+	}
+	else
+	{
+		ar >> m_w;
+	}
+}
+
+//=============================================================================
+//								FEElasticMixture
+//=============================================================================
+
+//-----------------------------------------------------------------------------
 FEElasticMixture::FEElasticMixture()
 {
 
@@ -11,7 +55,10 @@ FEElasticMixture::FEElasticMixture()
 FEMaterialPoint* FEElasticMixture::CreateMaterialPointData() 
 { 
 	FEElasticMixtureMaterialPoint* pt = new FEElasticMixtureMaterialPoint();
-	pt->m_w.resize(m_pMat.size());
+	int NMAT = Materials();
+	pt->m_w.resize(NMAT);
+	pt->m_mp.resize(NMAT);
+	for (int i=0; i<NMAT; ++i) pt->m_mp[i] = m_pMat[i]->CreateMaterialPointData();
 	return pt;
 }
 
@@ -27,18 +74,34 @@ void FEElasticMixture::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! This function evaluates the stress at the material point by evaluating the
+//! individual stress components. 
+
+//! \todo This function copies some material point data from the mixture material
+//!       to the component materials, but not all. I need to check if more data needs
+//!       to be copied.
 mat3ds FEElasticMixture::Stress(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
 
-	mat3ds s;
-	
+	// get the elastic material point
+	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
+
 	// calculate stress
-	s.zero();
+	mat3ds s(0.0);
 	for (int i=0; i < (int) m_pMat.size(); ++i)
-		s += m_pMat[i]->Stress(mp)*w[i];
+	{
+		// copy the elastic material point data to the components
+		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		epi.m_rt = ep.m_rt;
+		epi.m_r0 = ep.m_r0;
+		epi.m_F = ep.m_F;
+		epi.m_J = ep.m_J;
+		epi.m_Q = ep.m_Q;
+		s += epi.m_s = m_pMat[i]->Stress(*pt.m_mp[i])*w[i];
+	}
 
 	return s;
 }
@@ -50,11 +113,22 @@ tens4ds FEElasticMixture::Tangent(FEMaterialPoint& mp)
 	vector<double>& w = pt.m_w;
 	assert(w.size() == m_pMat.size());
 
-	tens4ds c(0.);
+	// get the elastic material point
+	FEElasticMaterialPoint& ep = *mp.ExtractData<FEElasticMaterialPoint>();
 
 	// calculate elasticity tensor
+	tens4ds c(0.);
 	for (int i=0; i < (int) m_pMat.size(); ++i)
-		c += m_pMat[i]->Tangent(mp)*w[i];
+	{
+		// copy the elastic material point data to the components
+		FEElasticMaterialPoint& epi = *pt.m_mp[i]->ExtractData<FEElasticMaterialPoint>();
+		epi.m_rt = ep.m_rt;
+		epi.m_r0 = ep.m_r0;
+		epi.m_F = ep.m_F;
+		epi.m_J = ep.m_J;
+		epi.m_Q = ep.m_Q;
+		c += m_pMat[i]->Tangent(*pt.m_mp[i])*w[i];
+	}
 
 	return c;
 }
