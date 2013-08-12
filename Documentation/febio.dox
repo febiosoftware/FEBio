@@ -1,0 +1,20 @@
+/** 
+\page febio Overview of FEBio
+
+As of FEBio 2.0, the source code is organized into different modules, each module implemented in a separate library.
+Each library collects a set of classes and functions to solve a specific task. The two most important of these libraries 
+are FECore and FEBioLib. The first library defines all the core classes that FEBio uses. The latter contains specialized
+implementations of the core classes, each class implementing a specific feature in FEBio. For instance, the FEMaterial
+class is defined in FECore and is used to define the constitutive behavior of a domain. This core class does not define 
+any explicit material behavior. Instead, different material classes are derived from this class in FEBioLib, each class 
+defining a specific material behavior.
+
+The following list shows the different libraries and the functionality they implement.
+
+\li NumCore: a library of numerical algorithms useful for finite element solvers (e.g. sparse linear solvers)
+\li FECore: a library containing most base classes that define the FEBio framework.
+\li FEBioLib: all FEBio features are collected in this library.
+\li FEBioXML: An xml-parser for reading the FEBio input files
+\li FEBioPlot: library for creating the FEBio plot files. 
+
+*/

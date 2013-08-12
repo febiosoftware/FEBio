@@ -1,0 +1,9 @@
+/**
+\page intro Introduction
+
+FEBio is a finite element solver that is specifically designed for three
+dimensional biomechanical applications. It solves the nonlinear finite
+element equations using a quasi-Newton method called the BFGS-method. It
+offers  biologically relevant constitutive models and modeling scenarios.
+
+*/

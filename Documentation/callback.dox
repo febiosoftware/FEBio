@@ -1,0 +1,46 @@
+/**
+\page callback FEBio callbacks
+
+An easy, although somewhat limited, way to extend FEBio's capabilities is by defining callbacks. A callback is a function
+that is defined by the user and is called by the FEBio framework at specific places in the code. 
+
+FEBio uses this callback mechanism to update the title of the shell window to display the progress and to query for user interruptions. 
+
+To register a callback function, call the FEModel::AddCallback function. 
+
+\code
+void FEModel::AddCallback(FEBIO_CB_FNC pcb, FEBIO_CB_WHEN nwhen, void *pd);
+\endcode
+
+This function takes three parameters. The first is a pointer to the callback function. This function must be of FEBIO_CB_FNC type which is described below.
+The second parameter is a variable of type FEBIO_CB_WHEN that defines when FEBio will call the callback. The third parameter is a void pointer that the user
+can use to pass data to the callback. 
+
+The callback function must have the FEBIO_CB_FNC type which is defined as follows.
+
+\code
+void (*FEBIO_CB_FNC)(FEModel&, void*);
+\endcode
+
+When FEBio calls the function, the first parameter will be a reference to the FE model. The second parameter is the data pointer that was passed
+when registering the callback.
+
+The nwhen parameter above can take on the following values.
+\li CB_ALWAYS: Call the callback whenever FEBio calls the callbacks.
+\li CB_MAJOR_ITERS: Only call the callback at end of major iterations (and the beginning of the first).
+\li CB_MINOR_ITERS: Only call the function at each minor iteration. 
+
+These flags can be combined using bitwise OR. For instance, CB_MAJOR_ITERS | CB_MINOR_ITERS will cause the callback to be called both during the 
+major and minor iterstions.
+
+For example, the following code snippet shows how to define a callback that is always called.
+
+\code
+void my_cb(FEModel&,void*);
+
+FEModel fem;
+fem.AddCallback(my_cb, CB_ALWAYS, 0);
+\endcode
+
+
+*/

@@ -1,0 +1,13 @@
+/**
+\mainpage FEBio Developer's Manual
+
+This software is developed at the Musculoskeletal Research Laboratories
+at the University of Utah. All rights reserved.
+Copyright (c) 2006 - 2013
+
+\li \subpage intro
+\li \subpage febio
+\li \subpage material
+\li \subpage callback
+
+*/
