@@ -4,100 +4,758 @@
 #include "FEBioMix/FEMultiphasic.h"
 
 //-----------------------------------------------------------------------------
+double FELogElemPosX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_rt.x;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPosY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_rt.y;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemPosZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_rt.z;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemJacobian::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_J;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrainX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		val += E.xx();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrainY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		val += E.yy();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrainZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		val += E.zz();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrainXY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		val += E.xy();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrainYZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		val += E.yz();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrainXZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		val += E.xz();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrain1::value(FEElement& el)
+{
+	double l[3];
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		E.exact_eigen(l);
+		val += l[0];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrain2::value(FEElement& el)
+{
+	double l[3];
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		E.exact_eigen(l);
+		val += l[1];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStrain3::value(FEElement& el)
+{
+	double l[3];
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		mat3ds E = pt.Strain();
+		E.exact_eigen(l);
+		val += l[2];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStressX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_s.xx();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStressY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_s.yy();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStressZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_s.zz();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStressXY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_s.xy();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStressYZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_s.yz();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStressXZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_s.xz();
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStress1::value(FEElement& el)
+{
+	double l[3];
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		pt.m_s.exact_eigen(l);
+		val += l[0];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStress2::value(FEElement& el)
+{
+	double l[3];
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		pt.m_s.exact_eigen(l);
+		val += l[1];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemStress3::value(FEElement& el)
+{
+	double l[3];
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		pt.m_s.exact_eigen(l);
+		val += l[2];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientXX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(0,0);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientXY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(0,1);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientXZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(0,2);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientYX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(1,0);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientYY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(1,1);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientYZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(1,2);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientZX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(2,0);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientZY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(2,1);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemDeformationGradientZZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
+		val += pt.m_F(2,2);
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemFluidPressure::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		if (ppt) val += ppt->m_pa;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemFluidFluxX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		if (ppt) val += ppt->m_w.x;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemFluidFluxY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		if (ppt) val += ppt->m_w.y;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemFluidFluxZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
+		if (ppt) val += ppt->m_w.z;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteConcentration::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
+		if (ppt) val += ppt->m_ca;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteFluxX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
+		if (ppt) val += ppt->m_j.x;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteFluxY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
+		if (ppt) val += ppt->m_j.y;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteFluxZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
+		if (ppt) val += ppt->m_j.z;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteRefConcentration::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESoluteMaterialPoint* ppt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
+		if (ppt) val += ppt->m_crc;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteConcentration_::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_ca[m_nsol];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteFluxX_::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_j[m_nsol].x;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteFluxY_::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_j[m_nsol].y;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSoluteFluxZ_::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_j[m_nsol].z;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemElectricPotential::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_psi;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemCurrentDensityX::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_Ie.x;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemCurrentDensityY::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_Ie.y;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemCurrentDensityZ::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_Ie.z;
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
+double FELogElemSBMConcentration_::value(FEElement& el)
+{
+	double val = 0.0;
+	int nint = el.GaussPoints();
+	for (int i=0; i<nint; ++i)
+	{
+		FESolutesMaterialPoint* ppt = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
+		if (ppt) val += ppt->m_sbmr[m_nsol];
+	}
+	return val / (double) nint;
+}
+
+//-----------------------------------------------------------------------------
 void ElementDataRecord::Parse(const char *szexpr)
 {
 	char szcopy[MAX_STRING] = {0};
 	strcpy(szcopy, szexpr);
 	char* sz = szcopy, *ch;
-	m_data.clear();
+	m_Data.clear();
 	do
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		if      (strcmp(sz, "x"  ) == 0) m_data.push_back(X  );
-		else if (strcmp(sz, "y"  ) == 0) m_data.push_back(Y  );
-		else if (strcmp(sz, "z"  ) == 0) m_data.push_back(Z  );
-		else if (strcmp(sz, "J"  ) == 0) m_data.push_back(J  );
-		else if (strcmp(sz, "Ex" ) == 0) m_data.push_back(EX );
-		else if (strcmp(sz, "Ey" ) == 0) m_data.push_back(EY );
-		else if (strcmp(sz, "Ez" ) == 0) m_data.push_back(EZ );
-		else if (strcmp(sz, "Exy") == 0) m_data.push_back(EXY);
-		else if (strcmp(sz, "Eyz") == 0) m_data.push_back(EYZ);
-		else if (strcmp(sz, "Exz") == 0) m_data.push_back(EXZ);
-		else if (strcmp(sz, "E1" ) == 0) m_data.push_back(E1);
-		else if (strcmp(sz, "E2" ) == 0) m_data.push_back(E2);
-		else if (strcmp(sz, "E3" ) == 0) m_data.push_back(E3);
-		else if (strcmp(sz, "sx" ) == 0) m_data.push_back(SX );
-		else if (strcmp(sz, "sy" ) == 0) m_data.push_back(SY );
-		else if (strcmp(sz, "sz" ) == 0) m_data.push_back(SZ );
-		else if (strcmp(sz, "sxy") == 0) m_data.push_back(SXY);
-		else if (strcmp(sz, "syz") == 0) m_data.push_back(SYZ);
-		else if (strcmp(sz, "sxz") == 0) m_data.push_back(SXZ);
-		else if (strcmp(sz, "s1" ) == 0) m_data.push_back(S1 );
-		else if (strcmp(sz, "s2" ) == 0) m_data.push_back(S2 );
-		else if (strcmp(sz, "s3" ) == 0) m_data.push_back(S3 );
-		else if (strcmp(sz, "Fxx") == 0) m_data.push_back(FXX);
-		else if (strcmp(sz, "Fyy") == 0) m_data.push_back(FYY);
-		else if (strcmp(sz, "Fzz") == 0) m_data.push_back(FZZ);
-		else if (strcmp(sz, "Fyz") == 0) m_data.push_back(FYZ);
-		else if (strcmp(sz, "Fzx") == 0) m_data.push_back(FZX);
-		else if (strcmp(sz, "Fxy") == 0) m_data.push_back(FXY);
-		else if (strcmp(sz, "Fyx") == 0) m_data.push_back(FYX);
-		else if (strcmp(sz, "Fxz") == 0) m_data.push_back(FXZ);
-		else if (strcmp(sz, "Fzy") == 0) m_data.push_back(FZY);
-		else if (strcmp(sz, "p"  ) == 0) m_data.push_back(P  );
-		else if (strcmp(sz, "wx" ) == 0) m_data.push_back(WX );
-		else if (strcmp(sz, "wy" ) == 0) m_data.push_back(WY );
-		else if (strcmp(sz, "wz" ) == 0) m_data.push_back(WZ );
-		else if (strcmp(sz, "c"  ) == 0) m_data.push_back(C  );
-		else if (strcmp(sz, "jx" ) == 0) m_data.push_back(JX );
-		else if (strcmp(sz, "jy" ) == 0) m_data.push_back(JY );
-		else if (strcmp(sz, "jz" ) == 0) m_data.push_back(JZ );
-		else if (strcmp(sz, "crc") == 0) m_data.push_back(CRC);
-		else if (strcmp(sz, "c1"  ) == 0) m_data.push_back(C1 );
-		else if (strcmp(sz, "c2"  ) == 0) m_data.push_back(C2 );
-		else if (strcmp(sz, "c3"  ) == 0) m_data.push_back(C3 );
-		else if (strcmp(sz, "c4"  ) == 0) m_data.push_back(C4 );
-		else if (strcmp(sz, "c5"  ) == 0) m_data.push_back(C5 );
-		else if (strcmp(sz, "c6"  ) == 0) m_data.push_back(C6 );
-		else if (strcmp(sz, "c7"  ) == 0) m_data.push_back(C7 );
-		else if (strcmp(sz, "c8"  ) == 0) m_data.push_back(C8 );
-		else if (strcmp(sz, "j1x" ) == 0) m_data.push_back(J1X);
-		else if (strcmp(sz, "j1y" ) == 0) m_data.push_back(J1Y);
-		else if (strcmp(sz, "j1z" ) == 0) m_data.push_back(J1Z);
-		else if (strcmp(sz, "j2x" ) == 0) m_data.push_back(J2X);
-		else if (strcmp(sz, "j2y" ) == 0) m_data.push_back(J2Y);
-		else if (strcmp(sz, "j2z" ) == 0) m_data.push_back(J2Z);
-		else if (strcmp(sz, "j3x" ) == 0) m_data.push_back(J3X);
-		else if (strcmp(sz, "j3y" ) == 0) m_data.push_back(J3Y);
-		else if (strcmp(sz, "j3z" ) == 0) m_data.push_back(J3Z);
-		else if (strcmp(sz, "j4x" ) == 0) m_data.push_back(J4X);
-		else if (strcmp(sz, "j4y" ) == 0) m_data.push_back(J4Y);
-		else if (strcmp(sz, "j4z" ) == 0) m_data.push_back(J4Z);
-		else if (strcmp(sz, "j5x" ) == 0) m_data.push_back(J5X);
-		else if (strcmp(sz, "j5y" ) == 0) m_data.push_back(J5Y);
-		else if (strcmp(sz, "j5z" ) == 0) m_data.push_back(J5Z);
-		else if (strcmp(sz, "j6x" ) == 0) m_data.push_back(J6X);
-		else if (strcmp(sz, "j6y" ) == 0) m_data.push_back(J6Y);
-		else if (strcmp(sz, "j6z" ) == 0) m_data.push_back(J6Z);
-		else if (strcmp(sz, "j7x" ) == 0) m_data.push_back(J7X);
-		else if (strcmp(sz, "j7y" ) == 0) m_data.push_back(J7Y);
-		else if (strcmp(sz, "j7z" ) == 0) m_data.push_back(J7Z);
-		else if (strcmp(sz, "j8x" ) == 0) m_data.push_back(J8X);
-		else if (strcmp(sz, "j8y" ) == 0) m_data.push_back(J8Y);
-		else if (strcmp(sz, "j8z" ) == 0) m_data.push_back(J8Z);
-		else if (strcmp(sz, "psi" ) == 0) m_data.push_back(PSI);
-		else if (strcmp(sz, "Iex" ) == 0) m_data.push_back(IEX);
-		else if (strcmp(sz, "Iey" ) == 0) m_data.push_back(IEY);
-		else if (strcmp(sz, "Iez" ) == 0) m_data.push_back(IEZ);
-		else if (strcmp(sz, "sbm1") == 0) m_data.push_back(SBM1);
-		else if (strcmp(sz, "sbm2") == 0) m_data.push_back(SBM2);
-		else if (strcmp(sz, "sbm3") == 0) m_data.push_back(SBM3);
-		else if (strcmp(sz, "sbm4") == 0) m_data.push_back(SBM4);
-		else if (strcmp(sz, "sbm5") == 0) m_data.push_back(SBM5);
-		else if (strcmp(sz, "sbm6") == 0) m_data.push_back(SBM6);
-		else if (strcmp(sz, "sbm7") == 0) m_data.push_back(SBM7);
-		else if (strcmp(sz, "sbm8") == 0) m_data.push_back(SBM8);
+		if      (strcmp(sz, "x"  ) == 0) m_Data.push_back(new FELogElemPosX(m_pfem));
+		else if (strcmp(sz, "y"  ) == 0) m_Data.push_back(new FELogElemPosY(m_pfem));
+		else if (strcmp(sz, "z"  ) == 0) m_Data.push_back(new FELogElemPosZ(m_pfem));
+		else if (strcmp(sz, "J"  ) == 0) m_Data.push_back(new FELogElemJacobian(m_pfem));
+		else if (strcmp(sz, "Ex" ) == 0) m_Data.push_back(new FELogElemStrainX(m_pfem));
+		else if (strcmp(sz, "Ey" ) == 0) m_Data.push_back(new FELogElemStrainY(m_pfem));
+		else if (strcmp(sz, "Ez" ) == 0) m_Data.push_back(new FELogElemStrainZ(m_pfem));
+		else if (strcmp(sz, "Exy") == 0) m_Data.push_back(new FELogElemStrainXY(m_pfem));
+		else if (strcmp(sz, "Eyz") == 0) m_Data.push_back(new FELogElemStrainYZ(m_pfem));
+		else if (strcmp(sz, "Exz") == 0) m_Data.push_back(new FELogElemStrainXZ(m_pfem));
+		else if (strcmp(sz, "E1" ) == 0) m_Data.push_back(new FELogElemStrain1(m_pfem));
+		else if (strcmp(sz, "E2" ) == 0) m_Data.push_back(new FELogElemStrain2(m_pfem));
+		else if (strcmp(sz, "E3" ) == 0) m_Data.push_back(new FELogElemStrain3(m_pfem));
+		else if (strcmp(sz, "sx" ) == 0) m_Data.push_back(new FELogElemStressX(m_pfem));
+		else if (strcmp(sz, "sy" ) == 0) m_Data.push_back(new FELogElemStressY(m_pfem));
+		else if (strcmp(sz, "sz" ) == 0) m_Data.push_back(new FELogElemStressZ(m_pfem));
+		else if (strcmp(sz, "sxy") == 0) m_Data.push_back(new FELogElemStressXY(m_pfem));
+		else if (strcmp(sz, "syz") == 0) m_Data.push_back(new FELogElemStressYZ(m_pfem));
+		else if (strcmp(sz, "sxz") == 0) m_Data.push_back(new FELogElemStressXZ(m_pfem));
+		else if (strcmp(sz, "s1" ) == 0) m_Data.push_back(new FELogElemStress1(m_pfem));
+		else if (strcmp(sz, "s2" ) == 0) m_Data.push_back(new FELogElemStress2(m_pfem));
+		else if (strcmp(sz, "s3" ) == 0) m_Data.push_back(new FELogElemStress3(m_pfem));
+		else if (strcmp(sz, "Fxx") == 0) m_Data.push_back(new FELogElemDeformationGradientXX(m_pfem));
+		else if (strcmp(sz, "Fyy") == 0) m_Data.push_back(new FELogElemDeformationGradientXY(m_pfem));
+		else if (strcmp(sz, "Fzz") == 0) m_Data.push_back(new FELogElemDeformationGradientXZ(m_pfem));
+		else if (strcmp(sz, "Fyz") == 0) m_Data.push_back(new FELogElemDeformationGradientYX(m_pfem));
+		else if (strcmp(sz, "Fzx") == 0) m_Data.push_back(new FELogElemDeformationGradientYY(m_pfem));
+		else if (strcmp(sz, "Fxy") == 0) m_Data.push_back(new FELogElemDeformationGradientYZ(m_pfem));
+		else if (strcmp(sz, "Fyx") == 0) m_Data.push_back(new FELogElemDeformationGradientZX(m_pfem));
+		else if (strcmp(sz, "Fxz") == 0) m_Data.push_back(new FELogElemDeformationGradientZY(m_pfem));
+		else if (strcmp(sz, "Fzy") == 0) m_Data.push_back(new FELogElemDeformationGradientZZ(m_pfem));
+		else if (strcmp(sz, "p"  ) == 0) m_Data.push_back(new FELogElemFluidPressure(m_pfem));
+		else if (strcmp(sz, "wx" ) == 0) m_Data.push_back(new FELogElemFluidFluxX(m_pfem));
+		else if (strcmp(sz, "wy" ) == 0) m_Data.push_back(new FELogElemFluidFluxY(m_pfem));
+		else if (strcmp(sz, "wz" ) == 0) m_Data.push_back(new FELogElemFluidFluxZ(m_pfem));
+		else if (strcmp(sz, "c"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration(m_pfem));
+		else if (strcmp(sz, "jx" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX(m_pfem));
+		else if (strcmp(sz, "jy" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY(m_pfem));
+		else if (strcmp(sz, "jz" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ(m_pfem));
+		else if (strcmp(sz, "crc") == 0) m_Data.push_back(new FELogElemSoluteRefConcentration(m_pfem));
+		else if (strcmp(sz, "c1"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<0>(m_pfem));
+		else if (strcmp(sz, "c2"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<1>(m_pfem));
+		else if (strcmp(sz, "c3"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<2>(m_pfem));
+		else if (strcmp(sz, "c4"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<3>(m_pfem));
+		else if (strcmp(sz, "c5"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<4>(m_pfem));
+		else if (strcmp(sz, "c6"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<5>(m_pfem));
+		else if (strcmp(sz, "c7"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<6>(m_pfem));
+		else if (strcmp(sz, "c8"  ) == 0) m_Data.push_back(new FELogElemSoluteConcentration_T<7>(m_pfem));
+		else if (strcmp(sz, "j1x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<0>(m_pfem));
+		else if (strcmp(sz, "j1y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<0>(m_pfem));
+		else if (strcmp(sz, "j1z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<0>(m_pfem));
+		else if (strcmp(sz, "j2x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<1>(m_pfem));
+		else if (strcmp(sz, "j2y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<1>(m_pfem));
+		else if (strcmp(sz, "j2z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<1>(m_pfem));
+		else if (strcmp(sz, "j3x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<2>(m_pfem));
+		else if (strcmp(sz, "j3y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<2>(m_pfem));
+		else if (strcmp(sz, "j3z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<2>(m_pfem));
+		else if (strcmp(sz, "j4x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<3>(m_pfem));
+		else if (strcmp(sz, "j4y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<3>(m_pfem));
+		else if (strcmp(sz, "j4z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<3>(m_pfem));
+		else if (strcmp(sz, "j5x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<4>(m_pfem));
+		else if (strcmp(sz, "j5y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<4>(m_pfem));
+		else if (strcmp(sz, "j5z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<4>(m_pfem));
+		else if (strcmp(sz, "j6x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<5>(m_pfem));
+		else if (strcmp(sz, "j6y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<5>(m_pfem));
+		else if (strcmp(sz, "j6z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<5>(m_pfem));
+		else if (strcmp(sz, "j7x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<6>(m_pfem));
+		else if (strcmp(sz, "j7y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<6>(m_pfem));
+		else if (strcmp(sz, "j7z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<6>(m_pfem));
+		else if (strcmp(sz, "j8x" ) == 0) m_Data.push_back(new FELogElemSoluteFluxX_T<7>(m_pfem));
+		else if (strcmp(sz, "j8y" ) == 0) m_Data.push_back(new FELogElemSoluteFluxY_T<7>(m_pfem));
+		else if (strcmp(sz, "j8z" ) == 0) m_Data.push_back(new FELogElemSoluteFluxZ_T<7>(m_pfem));
+		else if (strcmp(sz, "psi" ) == 0) m_Data.push_back(new FELogElemElectricPotential(m_pfem));
+		else if (strcmp(sz, "Iex" ) == 0) m_Data.push_back(new FELogElemCurrentDensityX(m_pfem));
+		else if (strcmp(sz, "Iey" ) == 0) m_Data.push_back(new FELogElemCurrentDensityY(m_pfem));
+		else if (strcmp(sz, "Iez" ) == 0) m_Data.push_back(new FELogElemCurrentDensityZ(m_pfem));
+		else if (strcmp(sz, "sbm1") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<0>(m_pfem));
+		else if (strcmp(sz, "sbm2") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<1>(m_pfem));
+		else if (strcmp(sz, "sbm3") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<2>(m_pfem));
+		else if (strcmp(sz, "sbm4") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<3>(m_pfem));
+		else if (strcmp(sz, "sbm5") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<4>(m_pfem));
+		else if (strcmp(sz, "sbm6") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<5>(m_pfem));
+		else if (strcmp(sz, "sbm7") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<6>(m_pfem));
+		else if (strcmp(sz, "sbm8") == 0) m_Data.push_back(new FELogElemSBMConcentration_T<7>(m_pfem));
 		else throw UnknownDataField(sz);
 		sz = ch;
 	}
@@ -107,217 +765,18 @@ void ElementDataRecord::Parse(const char *szexpr)
 //-----------------------------------------------------------------------------
 double ElementDataRecord::Evaluate(int item, int ndata)
 {
-	FEMesh& mesh = m_pfem->GetMesh();
-
 	// make sure we have an ELT
 	if (m_ELT.empty()) BuildELT();
 
 	// find the element
+	FEMesh& mesh = m_pfem->GetMesh();
 	assert((item >= 1) && (item <= mesh.Elements()));
 	ELEMREF e = m_ELT[item-1];
 	assert((e.ndom != -1) && (e.nid != -1));
-	FEElement* pe = &mesh.Domain(e.ndom).ElementRef(e.nid);
+	FEElement* pe = &mesh.Domain(e.ndom).ElementRef(e.nid); assert(pe);
 
-	// see if we need to calculate strain
-	bool bE = false;
-	if ((ndata>=EX)&&(ndata<=E3)) bE = true;
-
-	// see if ndata requires eigen values
-	bool blE = false; if ((ndata>=E1)&&(ndata<=E3)) blE = true;
-	bool bls = false; if ((ndata>=S1)&&(ndata<=S3)) bls = true;
-
-	// calculate the return val
-	double val = 0;
-	mat3ds E;
-	double lE[3], ls[3];
-	if (dynamic_cast<FESolidElement*>(pe)) 
-	{
-		// this is a solid element
-		FESolidElement& el = dynamic_cast<FESolidElement&>(*pe);
-
-		int nint = el.GaussPoints();
-		for (int i=0; i<nint; ++i)
-		{
-			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
-			if (bE) E = pt.Strain();
-			if (blE) E.exact_eigen(lE);
-			if (bls) pt.m_s.exact_eigen(ls);
-
-			switch (ndata)
-			{
-			case X: val += pt.m_rt.x; break;
-			case Y: val += pt.m_rt.y; break;
-			case Z: val += pt.m_rt.z; break;
-			case J: val += pt.m_J; break;
-			case EX: val += E.xx(); break;
-			case EY: val += E.yy(); break;
-			case EZ: val += E.zz(); break;
-			case EXY: val += E.xy(); break;
-			case EYZ: val += E.yz(); break;
-			case EXZ: val += E.xz(); break;
-			case E1: val += lE[0]; break;
-			case E2: val += lE[1]; break;
-			case E3: val += lE[2]; break;
-			case SX: val += pt.m_s.xx(); break;
-			case SY: val += pt.m_s.yy(); break;
-			case SZ: val += pt.m_s.zz(); break;
-			case SXY: val += pt.m_s.xy(); break;
-			case SYZ: val += pt.m_s.yz(); break;
-			case SXZ: val += pt.m_s.xz(); break;
-			case S1: val += ls[0]; break;
-			case S2: val += ls[1]; break;
-			case S3: val += ls[2]; break;
-			case FXX: val += pt.m_F(0,0); break;
-			case FYY: val += pt.m_F(1,1); break;
-			case FZZ: val += pt.m_F(2,2); break;
-			case FYZ: val += pt.m_F(1,2); break;
-			case FZX: val += pt.m_F(2,0); break;
-			case FXY: val += pt.m_F(0,1); break;
-			case FYX: val += pt.m_F(1,0); break;
-			case FXZ: val += pt.m_F(0,2); break;
-			case FZY: val += pt.m_F(2,1); break;
-			}
-
-			FEBiphasicMaterialPoint* ppt = el.m_State[i]->ExtractData<FEBiphasicMaterialPoint>();
-			if (ppt)
-			{
-				switch (ndata)
-				{
-					case P: val += ppt->m_pa; break;
-					case WX: val += ppt->m_w.x; break;
-					case WY: val += ppt->m_w.y; break;
-					case WZ: val += ppt->m_w.z; break;
-				}
-			}
-
-			FESoluteMaterialPoint* spt = el.m_State[i]->ExtractData<FESoluteMaterialPoint>();
-			if (spt)
-			{
-				switch (ndata)
-				{
-					case C: val += spt->m_ca; break;
-					case JX: val += spt->m_j.x; break;
-					case JY: val += spt->m_j.y; break;
-					case JZ: val += spt->m_j.z; break;
-					case CRC: val += spt->m_crc; break;
-				}
-			}
-
-			FESaltMaterialPoint* stt = el.m_State[i]->ExtractData<FESaltMaterialPoint>();
-			if (stt)
-			{
-				switch (ndata)
-				{
-					case C1: val += stt->m_ca[0]; break;
-					case J1X: val += stt->m_j[0].x; break;
-					case J1Y: val += stt->m_j[0].y; break;
-					case J1Z: val += stt->m_j[0].z; break;
-					case C2: val += stt->m_ca[1]; break;
-					case J2X: val += stt->m_j[1].x; break;
-					case J2Y: val += stt->m_j[1].y; break;
-					case J2Z: val += stt->m_j[1].z; break;
-					case PSI: val += stt->m_psi; break;
-					case IEX: val += stt->m_Ie.x; break;
-					case IEY: val += stt->m_Ie.y; break;
-					case IEZ: val += stt->m_Ie.z; break;
-				}
-			}
-			FESolutesMaterialPoint* sst = el.m_State[i]->ExtractData<FESolutesMaterialPoint>();
-			if (sst)
-			{
-				switch (ndata)
-				{
-					case C1: val += sst->m_ca[0]; break;
-					case J1X: val += sst->m_j[0].x; break;
-					case J1Y: val += sst->m_j[0].y; break;
-					case J1Z: val += sst->m_j[0].z; break;
-					case C2: val += sst->m_ca[1]; break;
-					case J2X: val += sst->m_j[1].x; break;
-					case J2Y: val += sst->m_j[1].y; break;
-					case J2Z: val += sst->m_j[1].z; break;
-					case C3: val += sst->m_ca[2]; break;
-					case J3X: val += sst->m_j[2].x; break;
-					case J3Y: val += sst->m_j[2].y; break;
-					case J3Z: val += sst->m_j[2].z; break;
-					case C4: val += sst->m_ca[3]; break;
-					case J4X: val += sst->m_j[3].x; break;
-					case J4Y: val += sst->m_j[3].y; break;
-					case J4Z: val += sst->m_j[3].z; break;
-					case C5: val += sst->m_ca[4]; break;
-					case J5X: val += sst->m_j[4].x; break;
-					case J5Y: val += sst->m_j[4].y; break;
-					case J5Z: val += sst->m_j[4].z; break;
-					case C6: val += sst->m_ca[5]; break;
-					case J6X: val += sst->m_j[5].x; break;
-					case J6Y: val += sst->m_j[5].y; break;
-					case J6Z: val += sst->m_j[5].z; break;
-					case C7: val += sst->m_ca[6]; break;
-					case J7X: val += sst->m_j[6].x; break;
-					case J7Y: val += sst->m_j[6].y; break;
-					case J7Z: val += sst->m_j[6].z; break;
-					case C8: val += sst->m_ca[7]; break;
-					case J8X: val += sst->m_j[7].x; break;
-					case J8Y: val += sst->m_j[7].y; break;
-					case J8Z: val += sst->m_j[7].z; break;
-					case PSI: val += sst->m_psi; break;
-					case IEX: val += sst->m_Ie.x; break;
-					case IEY: val += sst->m_Ie.y; break;
-					case IEZ: val += sst->m_Ie.z; break;
-					case SBM1: val += sst->m_sbmr[0]; break;
-					case SBM2: val += sst->m_sbmr[1]; break;
-					case SBM3: val += sst->m_sbmr[2]; break;
-					case SBM4: val += sst->m_sbmr[3]; break;
-					case SBM5: val += sst->m_sbmr[4]; break;
-					case SBM6: val += sst->m_sbmr[5]; break;
-					case SBM7: val += sst->m_sbmr[6]; break;
-					case SBM8: val += sst->m_sbmr[7]; break;
-				}
-			}
-		}
-		val /= nint;
-	}
-	else if (dynamic_cast<FEShellElement*>(pe))
-	{
-		// this is a shell element
-		FEShellElement& el = dynamic_cast<FEShellElement&>(*pe);
-		int nint = el.GaussPoints();
-		for (int i=0; i<nint; ++i)
-		{
-			FEElasticMaterialPoint& pt = *el.m_State[i]->ExtractData<FEElasticMaterialPoint>();
-
-			E = pt.Strain();
-			switch (ndata)
-			{
-			case X: val += pt.m_rt.x; break;
-			case Y: val += pt.m_rt.y; break;
-			case Z: val += pt.m_rt.z; break;
-			case J: val += pt.m_J; break;
-			case EX: val += E.xx(); break;
-			case EY: val += E.yy(); break;
-			case EZ: val += E.zz(); break;
-			case EXY: val += E.xy(); break;
-			case EYZ: val += E.yz(); break;
-			case EXZ: val += E.xz(); break;
-			case SX: val += pt.m_s.xx(); break;
-			case SY: val += pt.m_s.yy(); break;
-			case SZ: val += pt.m_s.zz(); break;
-			case SXY: val += pt.m_s.xy(); break;
-			case SYZ: val += pt.m_s.yz(); break;
-			case SXZ: val += pt.m_s.xz(); break;
-			case FXX: val += pt.m_F(0,0); break;
-			case FYY: val += pt.m_F(1,1); break;
-			case FZZ: val += pt.m_F(2,2); break;
-			case FYZ: val += pt.m_F(1,2); break;
-			case FZX: val += pt.m_F(2,0); break;
-			case FXY: val += pt.m_F(0,1); break;
-			case FYX: val += pt.m_F(1,0); break;
-			case FXZ: val += pt.m_F(0,2); break;
-			case FZY: val += pt.m_F(2,1); break;
-			}
-		}
-		val /= nint;
-	}
-	return val;
+	// get the element value
+	return m_Data[ndata]->value(*pe);
 }
 
 //-----------------------------------------------------------------------------

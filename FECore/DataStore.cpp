@@ -141,10 +141,10 @@ bool DataRecord::Write()
 	for (size_t i=0; i<m_item.size(); ++i)
 	{
 		fprintf(fp, "%d%s", m_item[i], m_szdelim);
-		int nd = (int) m_data.size();
+		int nd = Size();
 		for (int j=0; j<nd; ++j)
 		{
-			val = Evaluate(m_item[i], m_data[j]);
+			val = Evaluate(m_item[i], j);
 			fprintf(fp, "%lg", val);
 			if (j!=nd-1) fprintf(fp, "%s", m_szdelim);
 			else fprintf(fp, "\n");

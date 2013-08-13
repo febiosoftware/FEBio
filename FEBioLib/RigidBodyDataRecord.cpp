@@ -4,29 +4,50 @@
 #include <FEBioMech/FERigidBody.h>
 
 //-----------------------------------------------------------------------------
+double FELogRigidBodyPosX::value(FERigidBody& rb) { return rb.m_rt.x; }
+double FELogRigidBodyPosY::value(FERigidBody& rb) { return rb.m_rt.y; }
+double FELogRigidBodyPosZ::value(FERigidBody& rb) { return rb.m_rt.z; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyQuatX::value(FERigidBody& rb) { return rb.m_qt.x; }
+double FELogRigidBodyQuatY::value(FERigidBody& rb) { return rb.m_qt.y; }
+double FELogRigidBodyQuatZ::value(FERigidBody& rb) { return rb.m_qt.z; }
+double FELogRigidBodyQuatW::value(FERigidBody& rb) { return rb.m_qt.w; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyForceX::value(FERigidBody& rb) { return rb.m_Fr.x; }
+double FELogRigidBodyForceY::value(FERigidBody& rb) { return rb.m_Fr.y; }
+double FELogRigidBodyForceZ::value(FERigidBody& rb) { return rb.m_Fr.z; }
+
+//-----------------------------------------------------------------------------
+double FELogRigidBodyTorqueX::value(FERigidBody& rb) { return rb.m_Mr.x; }
+double FELogRigidBodyTorqueY::value(FERigidBody& rb) { return rb.m_Mr.y; }
+double FELogRigidBodyTorqueZ::value(FERigidBody& rb) { return rb.m_Mr.z; }
+
+//-----------------------------------------------------------------------------
 void RigidBodyDataRecord::Parse(const char* szexpr)
 {
 	char szcopy[MAX_STRING] = {0};
 	strcpy(szcopy, szexpr);
 	char* sz = szcopy, *ch;
-	m_data.clear();
+	m_Data.clear();
 	do
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		if      (strcmp(sz, "x" ) == 0) m_data.push_back(X );
-		else if (strcmp(sz, "y" ) == 0) m_data.push_back(Y );
-		else if (strcmp(sz, "z" ) == 0) m_data.push_back(Z );
-		else if (strcmp(sz, "qx") == 0) m_data.push_back(QX);
-		else if (strcmp(sz, "qy") == 0) m_data.push_back(QY);
-		else if (strcmp(sz, "qz") == 0) m_data.push_back(QZ);
-		else if (strcmp(sz, "qw") == 0) m_data.push_back(QW);
-		else if (strcmp(sz, "Fx") == 0) m_data.push_back(FX);
-		else if (strcmp(sz, "Fy") == 0) m_data.push_back(FY);
-		else if (strcmp(sz, "Fz") == 0) m_data.push_back(FZ);
-		else if (strcmp(sz, "Mx") == 0) m_data.push_back(MX);
-		else if (strcmp(sz, "My") == 0) m_data.push_back(MY);
-		else if (strcmp(sz, "Mz") == 0) m_data.push_back(MZ);
+		if      (strcmp(sz, "x" ) == 0) m_Data.push_back(new FELogRigidBodyPosX(m_pfem));
+		else if (strcmp(sz, "y" ) == 0) m_Data.push_back(new FELogRigidBodyPosY(m_pfem));
+		else if (strcmp(sz, "z" ) == 0) m_Data.push_back(new FELogRigidBodyPosZ(m_pfem));
+		else if (strcmp(sz, "qx") == 0) m_Data.push_back(new FELogRigidBodyQuatX(m_pfem));
+		else if (strcmp(sz, "qy") == 0) m_Data.push_back(new FELogRigidBodyQuatY(m_pfem));
+		else if (strcmp(sz, "qz") == 0) m_Data.push_back(new FELogRigidBodyQuatZ(m_pfem));
+		else if (strcmp(sz, "qw") == 0) m_Data.push_back(new FELogRigidBodyQuatW(m_pfem));
+		else if (strcmp(sz, "Fx") == 0) m_Data.push_back(new FELogRigidBodyForceX(m_pfem));
+		else if (strcmp(sz, "Fy") == 0) m_Data.push_back(new FELogRigidBodyForceY(m_pfem));
+		else if (strcmp(sz, "Fz") == 0) m_Data.push_back(new FELogRigidBodyForceZ(m_pfem));
+		else if (strcmp(sz, "Mx") == 0) m_Data.push_back(new FELogRigidBodyTorqueX(m_pfem));
+		else if (strcmp(sz, "My") == 0) m_Data.push_back(new FELogRigidBodyTorqueY(m_pfem));
+		else if (strcmp(sz, "Mz") == 0) m_Data.push_back(new FELogRigidBodyTorqueZ(m_pfem));
 		else throw UnknownDataField(sz);
 		sz = ch;
 	}
@@ -49,25 +70,7 @@ double RigidBodyDataRecord::Evaluate(int item, int ndata)
 	for (int i=0; i<NRB; ++i)
 	{
 		FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_pfem->Object(i));
-		if (RB.m_mat == nrb)
-		{
-			switch (ndata)
-			{
-			case X: val = RB.m_rt.x; break;
-			case Y: val = RB.m_rt.y; break;
-			case Z: val = RB.m_rt.z; break;
-			case QX: val = RB.m_qt.x; break;
-			case QY: val = RB.m_qt.y; break;
-			case QZ: val = RB.m_qt.z; break;
-			case QW: val = RB.m_qt.w; break;
-			case FX: val = RB.m_Fr.x; break;
-			case FY: val = RB.m_Fr.y; break;
-			case FZ: val = RB.m_Fr.z; break;
-			case MX: val = RB.m_Mr.x; break;
-			case MY: val = RB.m_Mr.y; break;
-			case MZ: val = RB.m_Mr.z; break;
-			}
-		}
+		if (RB.m_mat == nrb) return m_Data[ndata]->value(RB);
 	}
 
 	return val;

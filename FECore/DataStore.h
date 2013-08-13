@@ -9,10 +9,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "DumpFile.h"
+#include "FEMesh.h"
+#include "FEModel.h"
 #include <stdio.h>
-#include "FECore/DumpFile.h"
-#include "FECore/FEMesh.h"
-#include "FECore/FEModel.h"
 #include <vector>
 using namespace std;
 
@@ -44,22 +44,20 @@ public:
 
 	void SetItemList(const char* szlist);
 
-	virtual double Evaluate(int item, int ndata) = 0;
-
-	virtual void SelectAllItems() = 0;
-
-	virtual void Serialize(DumpFile& ar);
-
-	virtual void Parse(const char* sz) = 0;
-
 	void SetName(const char* sz);
 	void SetDelim(const char* sz);
 	void SetComments(bool b) { m_bcomm = b; }
 
 public:
-	int		m_nid;					//!< ID of data record
+	virtual double Evaluate(int item, int ndata) = 0;
+	virtual void SelectAllItems() = 0;
+	virtual void Serialize(DumpFile& ar);
+	virtual void Parse(const char* sz) = 0;
+	virtual int Size() = 0;
+
+public:
+	int			m_nid;				//!< ID of data record
 	vector<int>	m_item;				//!< item list
-	vector<int>	m_data;				//!< data list
 
 protected:
 	bool	m_bcomm;				//!< export comments or not
