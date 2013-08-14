@@ -45,7 +45,7 @@ PROJECT_BRIEF          = "Finite Elements for Biomechanics"
 # exceed 55 pixels and the maximum width should not exceed 200 pixels. 
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           = 
+PROJECT_LOGO           = "C:/Users/Steve/Documents/Visual Studio 2010/Projects/FEBio2/Documentation/febio_logo.png"
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
