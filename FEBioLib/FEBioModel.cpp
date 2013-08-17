@@ -43,9 +43,9 @@
 #include "FEBioMech/FEPointConstraint.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidBody.h"
-#include "NodeDataRecord.h"
-#include "ElementDataRecord.h"
-#include "RigidBodyDataRecord.h"
+#include "FECore/NodeDataRecord.h"
+#include "FECore/ElementDataRecord.h"
+#include "FECore/ObjectDataRecord.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
@@ -1160,7 +1160,7 @@ void FEBioModel::SerializeDataStore(DumpFile& ar)
 			int ntype = -1;
 			if (dynamic_cast<NodeDataRecord*>(pd)) ntype = FE_DATA_NODE;
 			if (dynamic_cast<ElementDataRecord*>(pd)) ntype = FE_DATA_ELEM;
-			if (dynamic_cast<RigidBodyDataRecord*>(pd)) ntype = FE_DATA_RB;
+			if (dynamic_cast<ObjectDataRecord*>(pd)) ntype = FE_DATA_RB;
 			assert(ntype != -1);
 			ar << ntype;
 			pd->Serialize(ar);
@@ -1181,7 +1181,7 @@ void FEBioModel::SerializeDataStore(DumpFile& ar)
 			{
 			case FE_DATA_NODE: pd = new NodeDataRecord(this, 0); break;
 			case FE_DATA_ELEM: pd = new ElementDataRecord(this, 0); break;
-			case FE_DATA_RB  : pd = new RigidBodyDataRecord(this, 0); break;
+			case FE_DATA_RB  : pd = new ObjectDataRecord(this, 0); break;
 			}
 			assert(pd);
 			pd->Serialize(ar);

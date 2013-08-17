@@ -704,19 +704,15 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FEBioLib\ElementDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\FEBioModel.h" />
     <ClInclude Include="..\..\FEBioLib\FEBox.h" />
     <ClInclude Include="..\..\FEBioLib\FEMicroMaterial.h" />
-    <ClInclude Include="..\..\FEBioLib\NodeDataRecord.h" />
-    <ClInclude Include="..\..\FEBioLib\RigidBodyDataRecord.h" />
     <ClInclude Include="..\..\FEBioLib\stdafx.h" />
     <ClInclude Include="..\..\FEBioLib\targetver.h" />
     <ClInclude Include="..\..\FEBioLib\validate.h" />
     <ClInclude Include="..\..\FEBioLib\version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FEBioLib\ElementDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBioModel.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEBox.cpp" />
     <ClCompile Include="..\..\FEBioLib\FEMicroMaterial.cpp" />
@@ -724,8 +720,6 @@
     <ClCompile Include="..\..\FEBioLib\hello.cpp" />
     <ClCompile Include="..\..\FEBioLib\InitLibrary.cpp" />
     <ClCompile Include="..\..\FEBioLib\input.cpp" />
-    <ClCompile Include="..\..\FEBioLib\NodeDataRecord.cpp" />
-    <ClCompile Include="..\..\FEBioLib\RigidBodyDataRecord.cpp" />
     <ClCompile Include="..\..\FEBioLib\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioLib\validate.cpp" />
   </ItemGroup>

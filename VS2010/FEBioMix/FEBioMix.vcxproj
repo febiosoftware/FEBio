@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioMix\FEBioMix.cpp" />
+    <ClCompile Include="..\..\FEBioMix\FEBioMixData.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBioMixPlot.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasic.cpp" />
     <ClCompile Include="..\..\FEBioMix\FEBiphasicAnalysis.cpp" />
@@ -125,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioMix\FEBioMix.h" />
+    <ClInclude Include="..\..\FEBioMix\FEBioMixData.h" />
     <ClInclude Include="..\..\FEBioMix\FEBioMixPlot.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasic.h" />
     <ClInclude Include="..\..\FEBioMix\FEBiphasicAnalysis.h" />

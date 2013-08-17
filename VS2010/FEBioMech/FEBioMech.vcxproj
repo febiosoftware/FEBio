@@ -85,6 +85,7 @@
     <ClCompile Include="..\..\FEBioMech\FEArrudaBoyce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEAugLagLinearConstraint.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMech.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBioMechData.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMechPlot.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECarterHayesOld.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="..\..\FEBioMech\FEArrudaBoyce.h" />
     <ClInclude Include="..\..\FEBioMech\FEAugLagLinearConstraint.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMech.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBioMechData.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h" />
     <ClInclude Include="..\..\FEBioMech\FECarterHayesOld.h" />
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />

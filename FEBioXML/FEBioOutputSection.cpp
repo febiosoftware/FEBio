@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEBioOutputSection.h"
-#include <FEBioLib/NodeDataRecord.h>
-#include <FEBioLib/ElementDataRecord.h>
-#include <FEBioLib/RigidBodyDataRecord.h>
+#include <FECore/NodeDataRecord.h>
+#include <FECore/ElementDataRecord.h>
+#include <FECore/ObjectDataRecord.h>
 #include <FEBioPlot/FEBioPlotFile.h>
 #include <FEBioPlot/LSDYNAPlotFile.h>
 
@@ -112,7 +112,7 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 		{
 			sz = tag.AttributeValue("file", true);
 
-			RigidBodyDataRecord* prec = new RigidBodyDataRecord(&fem, sz);
+			ObjectDataRecord* prec = new ObjectDataRecord(&fem, sz);
 			const char* szdata = tag.AttributeValue("data");
 			prec->Parse(szdata);
 

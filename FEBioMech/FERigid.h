@@ -41,6 +41,10 @@ public:
 	int		m_pmid;		//!< parent material ID
 
 public:
+	// inherited from FEMaterial
+	virtual bool IsRigid() { return true; }
+
+public:
 	//! Create a rigid material point
 	FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint(); }
 

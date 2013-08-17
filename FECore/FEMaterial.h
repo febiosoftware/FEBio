@@ -91,6 +91,9 @@ public:
 	//! Return elastic material \todo I need to move this function up the hierarchy once I redesign the material library
 	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
 
+	//! is this a rigid material \todo this is temporary solution to avoid RTTI and the need to define rigid materials in FECore
+	virtual bool IsRigid() { return false; }
+
 public: // interface for getting/setting material properties
 
 	//! get the number of material properties

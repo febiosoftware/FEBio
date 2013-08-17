@@ -1,16 +1,112 @@
 #pragma once
 #include "FECore/DataStore.h"
+#include "FECore/NodeDataRecord.h"
+#include "FECore/ElementDataRecord.h"
+#include "FECore/ObjectDataRecord.h"
+
+//=============================================================================
+// N O D E  D A T A
+//=============================================================================
 
 //-----------------------------------------------------------------------------
-class FELogElemData
-{
-public:
-	FELogElemData(FEModel* pfem) : m_pfem(pfem){}
-	virtual ~FELogElemData(){}
-	virtual double value(FEElement& el) = 0;
-protected:
-	FEModel*	m_pfem;
+class FENodeXPos : public FENodeLogData
+{ 
+public: 
+	FENodeXPos(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
 };
+
+//-----------------------------------------------------------------------------
+class FENodeYPos : public FENodeLogData 
+{ 
+public: 
+	FENodeYPos(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeZPos : public FENodeLogData
+{ 
+public: 
+	FENodeZPos(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeXDisp : public FENodeLogData
+{ 
+public: 
+	FENodeXDisp(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeYDisp : public FENodeLogData
+{ 
+public: 
+	FENodeYDisp(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeZDisp : public FENodeLogData
+{ 
+public: 
+	FENodeZDisp(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeXVel : public FENodeLogData
+{ 
+public: 
+	FENodeXVel(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeYVel : public FENodeLogData
+{ 
+public: 
+	FENodeYVel(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeZVel : public FENodeLogData
+{ 
+public: 
+	FENodeZVel(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeForceX: public FENodeLogData
+{ 
+public: 
+	FENodeForceX(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeForceY: public FENodeLogData
+{ 
+public: 
+	FENodeForceY(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//-----------------------------------------------------------------------------
+class FENodeForceZ: public FENodeLogData
+{ 
+public: 
+	FENodeForceZ(FEModel* pfem) : FENodeLogData(pfem){} 
+	double value(int node); 
+};
+
+//=============================================================================
+// E L E M E N T   D A T A
+//=============================================================================
 
 //-----------------------------------------------------------------------------
 class FELogElemPosX : public FELogElemData
@@ -260,215 +356,111 @@ public:
 	double value(FEElement& el);
 };
 
-//-----------------------------------------------------------------------------
-class FELogElemFluidPressure : public FELogElemData
-{
-public:
-	FELogElemFluidPressure(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
+//=============================================================================
+// R I G I D   B O D Y    D A T A
+//=============================================================================
 
 //-----------------------------------------------------------------------------
-class FELogElemFluidFluxX : public FELogElemData
+class FELogRigidBodyPosX : public FELogObjectData
 {
 public:
-	FELogElemFluidFluxX(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyPosX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemFluidFluxY : public FELogElemData
+class FELogRigidBodyPosY : public FELogObjectData
 {
 public:
-	FELogElemFluidFluxY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyPosY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemFluidFluxZ : public FELogElemData
+class FELogRigidBodyPosZ : public FELogObjectData
 {
 public:
-	FELogElemFluidFluxZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyPosZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteConcentration : public FELogElemData
+class FELogRigidBodyQuatX : public FELogObjectData
 {
 public:
-	FELogElemSoluteConcentration(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyQuatX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteFluxX : public FELogElemData
+class FELogRigidBodyQuatY : public FELogObjectData
 {
 public:
-	FELogElemSoluteFluxX(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyQuatY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteFluxY : public FELogElemData
+class FELogRigidBodyQuatZ : public FELogObjectData
 {
 public:
-	FELogElemSoluteFluxY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyQuatZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteFluxZ : public FELogElemData
+class FELogRigidBodyQuatW : public FELogObjectData
 {
 public:
-	FELogElemSoluteFluxZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyQuatW(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteRefConcentration : public FELogElemData
+class FELogRigidBodyForceX : public FELogObjectData
 {
 public:
-	FELogElemSoluteRefConcentration(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyForceX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteConcentration_ : public FELogElemData
-{
-protected:
-	FELogElemSoluteConcentration_(FEModel* pfem, int nsol) : FELogElemData(pfem), m_nsol(nsol) {}
-	double value(FEElement& el);
-private:
-	int m_nsol;
-};
-
-template <int N> class FELogElemSoluteConcentration_T : public FELogElemSoluteConcentration_
+class FELogRigidBodyForceY : public FELogObjectData
 {
 public:
-	FELogElemSoluteConcentration_T(FEModel* pfem) : FELogElemSoluteConcentration_(pfem, N) {}
-	double value(FEElement& el) { return FELogElemSoluteConcentration_::value(el); }
+	FELogRigidBodyForceY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteFluxX_ : public FELogElemData
-{
-protected:
-	FELogElemSoluteFluxX_(FEModel* pfem, int nsol) : FELogElemData(pfem), m_nsol(nsol) {}
-	double value(FEElement& el);
-private:
-	int	m_nsol;
-};
-
-template <int N> class FELogElemSoluteFluxX_T : public FELogElemSoluteFluxX_
+class FELogRigidBodyForceZ : public FELogObjectData
 {
 public:
-	FELogElemSoluteFluxX_T(FEModel* pfem) : FELogElemSoluteFluxX_(pfem, N) {}
-	double value(FEElement& el) { return FELogElemSoluteFluxX_::value(el); }
+	FELogRigidBodyForceZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteFluxY_ : public FELogElemData
-{
-protected:
-	FELogElemSoluteFluxY_(FEModel* pfem, int nsol) : FELogElemData(pfem), m_nsol(nsol) {}
-	double value(FEElement& el);
-private:
-	int	m_nsol;
-};
-
-template <int N> class FELogElemSoluteFluxY_T : public FELogElemSoluteFluxY_
+class FELogRigidBodyTorqueX : public FELogObjectData
 {
 public:
-	FELogElemSoluteFluxY_T(FEModel* pfem) : FELogElemSoluteFluxY_(pfem, N) {}
-	double value(FEElement& el) { return FELogElemSoluteFluxY_::value(el); }
+	FELogRigidBodyTorqueX(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemSoluteFluxZ_ : public FELogElemData
-{
-protected:
-	FELogElemSoluteFluxZ_(FEModel* pfem, int nsol) : FELogElemData(pfem), m_nsol(nsol) {}
-	double value(FEElement& el);
-private:
-	int	m_nsol;
-};
-
-template <int N> class FELogElemSoluteFluxZ_T : public FELogElemSoluteFluxZ_
+class FELogRigidBodyTorqueY : public FELogObjectData
 {
 public:
-	FELogElemSoluteFluxZ_T(FEModel* pfem) : FELogElemSoluteFluxZ_(pfem, N) {}
-	double value(FEElement& el) { return FELogElemSoluteFluxZ_::value(el); }
+	FELogRigidBodyTorqueY(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
 //-----------------------------------------------------------------------------
-class FELogElemElectricPotential : public FELogElemData
+class FELogRigidBodyTorqueZ : public FELogObjectData
 {
 public:
-	FELogElemElectricPotential(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
+	FELogRigidBodyTorqueZ(FEModel* pfem) : FELogObjectData(pfem){}
+	double value(FEObject& rb);
 };
 
-//-----------------------------------------------------------------------------
-class FELogElemCurrentDensityX : public FELogElemData
-{
-public:
-	FELogElemCurrentDensityX(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemCurrentDensityY : public FELogElemData
-{
-public:
-	FELogElemCurrentDensityY(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemCurrentDensityZ : public FELogElemData
-{
-public:
-	FELogElemCurrentDensityZ(FEModel* pfem) : FELogElemData(pfem){}
-	double value(FEElement& el);
-};
-
-//-----------------------------------------------------------------------------
-class FELogElemSBMConcentration_: public FELogElemData
-{
-protected:
-	FELogElemSBMConcentration_(FEModel* pfem, int nsol) : FELogElemData(pfem), m_nsol(nsol) {}
-	double value(FEElement& el);
-private:
-	int	m_nsol;
-};
-
-template <int N> class FELogElemSBMConcentration_T: public FELogElemSBMConcentration_
-{
-public:
-	FELogElemSBMConcentration_T(FEModel* pfem) : FELogElemSBMConcentration_(pfem, N) {}
-	double value(FEElement& el) { return FELogElemSBMConcentration_::value(el); }
-};
-
-//-----------------------------------------------------------------------------
-class ElementDataRecord : public DataRecord
-{
-	struct ELEMREF
-	{
-		int	ndom;
-		int	nid;
-	};
-
-public:
-	ElementDataRecord(FEModel* pfem, const char* szfile) :  DataRecord(pfem, szfile){}
-	double Evaluate(int item, int ndata);
-	void Parse(const char* sz);
-	void SelectAllItems();
-	int Size() { return (int) m_Data.size(); }
-
-protected:
-	void BuildELT();
-
-protected:
-	vector<ELEMREF>	m_ELT;
-	vector<FELogElemData*>	m_Data;
-};

@@ -72,7 +72,6 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-//! \todo I'd like to move this to FECore.
 class DataStore  
 {
 public:
@@ -92,5 +91,6 @@ public:
 protected:
 	vector<DataRecord*>	m_data;	//!< the data records
 };
+
 
 #endif // !defined(AFX_DATASTORE_H__FC7861A3_2B1A_438C_AC7D_7ADD2F8DE6F4__INCLUDED_)

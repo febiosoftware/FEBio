@@ -27,6 +27,7 @@
 #include "FETiedBiphasicInterface.h"
 
 #include "FEBioMixPlot.h"
+#include "FEBioMixData.h"
 
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioMix module. This function registers all the classes
@@ -106,4 +107,72 @@ REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed cha
 REGISTER_FEBIO_CLASS(FEPlotReferentialFixedChargeDensity, FEPlotData, "referential fixed charge density");
 REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"    );
 
+//-----------------------------------------------------------------------------
+REGISTER_FEBIO_CLASS(FENodeTemp, FENodeLogData, "T");
+REGISTER_FEBIO_CLASS(FENodePressure, FENodeLogData, "p");
+REGISTER_FEBIO_CLASS(FENodeConcentration, FENodeLogData, "c");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 0, "c1");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 1, "c2");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 2, "c3");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 3, "c4");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 4, "c5");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 5, "c6");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 6, "c7");
+REGISTER_FEBIO_CLASS_T(FENodeConcentration_T, FENodeLogData, 7, "c8");
+
+//-----------------------------------------------------------------------------
+REGISTER_FEBIO_CLASS(FELogElemFluidPressure, FELogElemData, "p");
+REGISTER_FEBIO_CLASS(FELogElemFluidFluxX, FELogElemData, "wx");
+REGISTER_FEBIO_CLASS(FELogElemFluidFluxY, FELogElemData, "wy");
+REGISTER_FEBIO_CLASS(FELogElemFluidFluxZ, FELogElemData, "wz");
+REGISTER_FEBIO_CLASS(FELogElemSoluteConcentration, FELogElemData, "c");
+REGISTER_FEBIO_CLASS(FELogElemSoluteFluxX, FELogElemData, "jx");
+REGISTER_FEBIO_CLASS(FELogElemSoluteFluxY, FELogElemData, "jy");
+REGISTER_FEBIO_CLASS(FELogElemSoluteFluxZ, FELogElemData, "jz");
+REGISTER_FEBIO_CLASS(FELogElemSoluteRefConcentration, FELogElemData, "crc");
+REGISTER_FEBIO_CLASS(FELogElemElectricPotential, FELogElemData, "psi");
+REGISTER_FEBIO_CLASS(FELogElemCurrentDensityX, FELogElemData, "Iex");
+REGISTER_FEBIO_CLASS(FELogElemCurrentDensityY, FELogElemData, "Iey");
+REGISTER_FEBIO_CLASS(FELogElemCurrentDensityZ, FELogElemData, "Iez");
+
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 0, "c1");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 1, "c2");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 2, "c3");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 3, "c4");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 4, "c5");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 5, "c6");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 6, "c7");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteConcentration_T, FELogElemData, 7, "c8");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 0, "j1x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 0, "j1y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 0, "j1z");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 1, "j2x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 1, "j2y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 1, "j2z");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 2, "j3x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 2, "j3y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 2, "j3z");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 3, "j4x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 3, "j4y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 3, "j4z");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 4, "j5x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 4, "j5y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 4, "j5z");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 5, "j6x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 5, "j6y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 5, "j6z");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 6, "j7x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 6, "j7y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 6, "j7z");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxX_T, FELogElemData, 7, "j8x");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxY_T, FELogElemData, 7, "j8y");
+REGISTER_FEBIO_CLASS_T(FELogElemSoluteFluxZ_T, FELogElemData, 7, "j8z");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 0, "sbm1");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 1, "sbm2");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 2, "sbm3");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 3, "sbm4");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 4, "sbm5");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 5, "sbm6");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 6, "sbm7");
+REGISTER_FEBIO_CLASS_T(FELogElemSBMConcentration_T, FELogElemData, 7, "sbm8");
 }

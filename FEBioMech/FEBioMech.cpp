@@ -71,6 +71,7 @@
 #include "FETiedInterface.h"
 
 #include "FEBioMechPlot.h"
+#include "FEBioMechData.h"
 
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
@@ -175,4 +176,68 @@ REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );
 REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPlotData, "acceleration"   );
 REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
 
+//-----------------------------------------------------------------------------
+// Derived from FENodeLogData
+REGISTER_FEBIO_CLASS(FENodeXPos, FENodeLogData, "x");
+REGISTER_FEBIO_CLASS(FENodeYPos, FENodeLogData, "y");
+REGISTER_FEBIO_CLASS(FENodeZPos, FENodeLogData, "z");
+REGISTER_FEBIO_CLASS(FENodeXDisp, FENodeLogData, "ux");
+REGISTER_FEBIO_CLASS(FENodeYDisp, FENodeLogData, "uy");
+REGISTER_FEBIO_CLASS(FENodeZDisp, FENodeLogData, "uz");
+REGISTER_FEBIO_CLASS(FENodeXVel, FENodeLogData, "vx");
+REGISTER_FEBIO_CLASS(FENodeYVel, FENodeLogData, "vy");
+REGISTER_FEBIO_CLASS(FENodeZVel, FENodeLogData, "vz");
+REGISTER_FEBIO_CLASS(FENodeForceX, FENodeLogData, "Rx");
+REGISTER_FEBIO_CLASS(FENodeForceY, FENodeLogData, "Ry");
+REGISTER_FEBIO_CLASS(FENodeForceZ, FENodeLogData, "Rz");
+
+//-----------------------------------------------------------------------------
+// Derived from FELogElemData
+REGISTER_FEBIO_CLASS(FELogElemPosX, FELogElemData, "x");
+REGISTER_FEBIO_CLASS(FELogElemPosY, FELogElemData, "y");
+REGISTER_FEBIO_CLASS(FELogElemPosZ, FELogElemData, "z");
+REGISTER_FEBIO_CLASS(FELogElemJacobian, FELogElemData, "J");
+REGISTER_FEBIO_CLASS(FELogElemStrainX, FELogElemData, "Ex");
+REGISTER_FEBIO_CLASS(FELogElemStrainY, FELogElemData, "Ey");
+REGISTER_FEBIO_CLASS(FELogElemStrainZ, FELogElemData, "Ez");
+REGISTER_FEBIO_CLASS(FELogElemStrainXY, FELogElemData, "Exy");
+REGISTER_FEBIO_CLASS(FELogElemStrainYZ, FELogElemData, "Eyz");
+REGISTER_FEBIO_CLASS(FELogElemStrainXZ, FELogElemData, "Exz");
+REGISTER_FEBIO_CLASS(FELogElemStrain1, FELogElemData, "E1");
+REGISTER_FEBIO_CLASS(FELogElemStrain2, FELogElemData, "E2");
+REGISTER_FEBIO_CLASS(FELogElemStrain3, FELogElemData, "E3");
+REGISTER_FEBIO_CLASS(FELogElemStressX, FELogElemData, "sx");
+REGISTER_FEBIO_CLASS(FELogElemStressY, FELogElemData, "sy");
+REGISTER_FEBIO_CLASS(FELogElemStressZ, FELogElemData, "sz");
+REGISTER_FEBIO_CLASS(FELogElemStressXY, FELogElemData, "sxy");
+REGISTER_FEBIO_CLASS(FELogElemStressYZ, FELogElemData, "syz");
+REGISTER_FEBIO_CLASS(FELogElemStressXZ, FELogElemData, "sxz");
+REGISTER_FEBIO_CLASS(FELogElemStress1, FELogElemData, "s1");
+REGISTER_FEBIO_CLASS(FELogElemStress2, FELogElemData, "s2");
+REGISTER_FEBIO_CLASS(FELogElemStress3, FELogElemData, "s3");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXX, FELogElemData, "Fxx");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXY, FELogElemData, "Fxy");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXZ, FELogElemData, "Fxz");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYX, FELogElemData, "Fyx");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYY, FELogElemData, "Fyy");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYZ, FELogElemData, "Fyz");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZX, FELogElemData, "Fzx");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZY, FELogElemData, "Fzy");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZZ, FELogElemData, "Fzz");
+
+//-----------------------------------------------------------------------------
+// Derived from FELogObjectData
+REGISTER_FEBIO_CLASS(FELogRigidBodyPosX, FELogObjectData, "x");
+REGISTER_FEBIO_CLASS(FELogRigidBodyPosY, FELogObjectData, "y");
+REGISTER_FEBIO_CLASS(FELogRigidBodyPosZ, FELogObjectData, "z");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatX, FELogObjectData, "qx");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatY, FELogObjectData, "qy");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatZ, FELogObjectData, "qz");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatW, FELogObjectData, "qw");
+REGISTER_FEBIO_CLASS(FELogRigidBodyForceX, FELogObjectData, "Fx");
+REGISTER_FEBIO_CLASS(FELogRigidBodyForceY, FELogObjectData, "Fy");
+REGISTER_FEBIO_CLASS(FELogRigidBodyForceZ, FELogObjectData, "Fz");
+REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueX, FELogObjectData, "Mx");
+REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueY, FELogObjectData, "My");
+REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueZ, FELogObjectData, "Mz");
 }
