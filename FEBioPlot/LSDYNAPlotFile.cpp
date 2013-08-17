@@ -14,7 +14,7 @@
 #include "FEBioMix/FESlidingInterface3.h"
 #include "FEBioMech/FEFacet2FacetSliding.h"
 #include "FEBioMech/FETransverselyIsotropic.h"
-#include <FEBioHeat/FEHeatTransferMaterial.h>
+#include "FEBioHeat/FEHeatTransferMaterial.h"
 #include "FEBioMech/FETrussMaterial.h"
 #include "FEBioMix/FEBiphasic.h"
 #include "FECore/FEAnalysis.h"

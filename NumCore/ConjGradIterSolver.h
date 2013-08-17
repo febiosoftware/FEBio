@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/LinearSolver.h>
+#include "FECore/LinearSolver.h"
 #include "CompactMatrix.h"
 #include <vector>
 

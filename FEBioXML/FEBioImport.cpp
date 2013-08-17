@@ -17,13 +17,13 @@
 #include "FEBioLoadDataSection.h"
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
-#include <FECore/DataStore.h>
-#include <FECore/log.h>
+#include "FECore/DataStore.h"
+#include "FECore/log.h"
 #include <string.h>
-#include <FECore/Image.h>
-#include <FEBioHeat/FEHeatTransferAnalysis.h>
-#include <FEBioMix/FEBiphasicAnalysis.h>
-#include <FEBioMech/FESolidAnalysis.h>
+#include "FECore/Image.h"
+#include "FEBioHeat/FEHeatTransferAnalysis.h"
+#include "FEBioMix/FEBiphasicAnalysis.h"
+#include "FEBioMech/FESolidAnalysis.h"
 
 //-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }

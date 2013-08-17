@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "FEBioContactSection.h"
-#include <FEBioMech/FESlidingInterface.h>
-#include <FEBioMix/FESlidingInterface2.h>
-#include <FEBioMix/FESlidingInterface3.h>
-#include <FEBioMix/FETiedBiphasicInterface.h>
-#include <FEBioMech/FETiedInterface.h>
-#include <FEBioMech/FEFacet2FacetTied.h>
-#include <FEBioMech/FEFacet2FacetSliding.h>
-#include <FEBioMech/FESlidingInterfaceBW.h>
-#include <FEBioMech/FEPeriodicBoundary.h>
-#include <FEBioMech/FESurfaceConstraint.h>
-#include <FEBioMech/FERigidWallInterface.h>
-#include <FEBioMech/FERigidJoint.h>
-#include <FEBioMech/FEAugLagLinearConstraint.h>
+#include "FEBioMech/FESlidingInterface.h"
+#include "FEBioMix/FESlidingInterface2.h"
+#include "FEBioMix/FESlidingInterface3.h"
+#include "FEBioMix/FETiedBiphasicInterface.h"
+#include "FEBioMech/FETiedInterface.h"
+#include "FEBioMech/FEFacet2FacetTied.h"
+#include "FEBioMech/FEFacet2FacetSliding.h"
+#include "FEBioMech/FESlidingInterfaceBW.h"
+#include "FEBioMech/FEPeriodicBoundary.h"
+#include "FEBioMech/FESurfaceConstraint.h"
+#include "FEBioMech/FERigidWallInterface.h"
+#include "FEBioMech/FERigidJoint.h"
+#include "FEBioMech/FEAugLagLinearConstraint.h"
 
 //-----------------------------------------------------------------------------
 //! Parse the Contact section (new in version 2.0)

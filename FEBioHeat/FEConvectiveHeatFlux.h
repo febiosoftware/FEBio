@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FESurfaceLoad.h>
+#include "FECore/FESurfaceLoad.h"
 
 //-----------------------------------------------------------------------------
 //! Surface that sustains a convective heat flux boundary condition

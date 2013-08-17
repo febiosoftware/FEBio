@@ -1,8 +1,8 @@
 #pragma once
 
-#include <FECore/FESolver.h>
+#include "FECore/FESolver.h"
 #include "FEStiffnessMatrix.h"
-#include <FECore/FETypes.h>
+#include "FECore/FETypes.h"
 
 //-----------------------------------------------------------------------------
 //! The FESolidSolver class solves large deformation solid mechanics problems

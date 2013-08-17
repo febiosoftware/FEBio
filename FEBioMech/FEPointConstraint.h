@@ -1,7 +1,7 @@
 #pragma once
-#include <FECore/FENLConstraint.h>
-#include <FECore/FEElement.h>
-#include <FECore/FEGlobalVector.h>
+#include "FECore/FENLConstraint.h"
+#include "FECore/FEElement.h"
+#include "FECore/FEGlobalVector.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a point constraint. That is, it forces a node of a 

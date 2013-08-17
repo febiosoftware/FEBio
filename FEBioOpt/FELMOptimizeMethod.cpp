@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FELMOptimizeMethod.h"
-#include <FECore/Logfile.h>
+#include "FECore/Logfile.h"
 
 //-----------------------------------------------------------------------------
 // declared in dllmain.cpp

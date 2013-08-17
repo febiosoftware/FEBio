@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FEPlotData.h>
+#include "FECore/FEPlotData.h"
 
 //-----------------------------------------------------------------------------
 //! Nodal temperatures

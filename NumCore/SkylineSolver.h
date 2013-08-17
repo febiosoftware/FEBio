@@ -1,6 +1,6 @@
 #pragma once
 
-#include <FECore/LinearSolver.h>
+#include "FECore/LinearSolver.h"
 #include "SkylineMatrix.h"
 
 //-----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "version.h"
 #include "validate.h"
-#include <FECore/log.h>
+#include "FECore/log.h"
 #include <stdio.h>
 
 unsigned char banner[] = {

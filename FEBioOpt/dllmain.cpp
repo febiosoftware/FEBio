@@ -1,7 +1,7 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
-#include <FECore/febio.h>
-#include <FECore/FEBioFactory.h>
-#include <FECore/Logfile.h>
+#include "FECore/febio.h"
+#include "FECore/FEBioFactory.h"
+#include "FECore/Logfile.h"
 #include "FEBioOpt.h"
 
 #ifdef WIN32

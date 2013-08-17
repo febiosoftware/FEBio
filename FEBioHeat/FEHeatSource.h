@@ -1,7 +1,7 @@
 #pragma once
-#include <FECore/FEParameterList.h>
-#include <FECore/FEGlobalVector.h>
-#include <FECore/FEBodyForce.h>
+#include "FECore/FEParameterList.h"
+#include "FECore/FEGlobalVector.h"
+#include "FECore/FEBodyForce.h"
 #include "FEHeatSolidDomain.h"
 
 //-----------------------------------------------------------------------------

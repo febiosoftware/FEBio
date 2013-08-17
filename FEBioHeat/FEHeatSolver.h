@@ -1,7 +1,7 @@
 #pragma once
 
-#include <FECore/FESolver.h>
-#include <FECore/LinearSolver.h>
+#include "FECore/FESolver.h"
+#include "FECore/LinearSolver.h"
 #include "FEHeatSolidDomain.h"
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #pragma once
-#include <FECore/FEMaterial.h>
+#include "FECore/FEMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Material point class for heat transfer materials.

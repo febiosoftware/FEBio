@@ -7,8 +7,8 @@
 #include "FEPointBodyForce.h"
 #include "FEPressureLoad.h"
 #include "FEResidualVector.h"
-#include <FECore/log.h>
-#include <NumCore/NumCore.h>
+#include "FECore/log.h"
+#include "NumCore/NumCore.h"
 
 #ifdef WIN32
 	#include <float.h>

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
-#include <FEBioMech/FEPointBodyForce.h>
-#include <FEBioHeat/FEHeatSource.h>
-#include <FECore/FEModel.h>
+#include "FEBioMech/FEPointBodyForce.h"
+#include "FEBioHeat/FEHeatSource.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the loads section from the xml file (version 1.2 or up)

@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "FEBioControlSection.h"
-#include <FEBioMech/FESolidSolver.h>
-#include <FEBioMech/FEExplicitSolidSolver.h>
-#include <FEBioMix/FEBiphasicSolver.h>
-#include <FEBioMix/FEBiphasicSoluteSolver.h>
-#include <FEBioMech/FELinearSolidSolver.h>
-#include <FEBioMech/FECoupledHeatSolidSolver.h>
-#include <FEBioMech/FEUDGHexDomain.h>
-#include <FEBioMech/FEUT4Domain.h>
-#include <FEBioHeat/FEHeatSolver.h>
+#include "FEBioMech/FESolidSolver.h"
+#include "FEBioMech/FEExplicitSolidSolver.h"
+#include "FEBioMix/FEBiphasicSolver.h"
+#include "FEBioMix/FEBiphasicSoluteSolver.h"
+#include "FEBioMech/FELinearSolidSolver.h"
+#include "FEBioMech/FECoupledHeatSolidSolver.h"
+#include "FEBioMech/FEUDGHexDomain.h"
+#include "FEBioMech/FEUT4Domain.h"
+#include "FEBioHeat/FEHeatSolver.h"
 
 //-----------------------------------------------------------------------------
 FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)

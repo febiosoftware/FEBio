@@ -1,5 +1,5 @@
 #include "FEHeatFlux.h"
-#include <FECore/FEModel.h>
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Calculate the heat flux residual

@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "FEBioOutputSection.h"
-#include <FECore/NodeDataRecord.h>
-#include <FECore/ElementDataRecord.h>
-#include <FECore/ObjectDataRecord.h>
-#include <FEBioPlot/FEBioPlotFile.h>
-#include <FEBioPlot/LSDYNAPlotFile.h>
+#include "FECore/NodeDataRecord.h"
+#include "FECore/ElementDataRecord.h"
+#include "FECore/ObjectDataRecord.h"
+#include "FEBioPlot/FEBioPlotFile.h"
+#include "FEBioPlot/LSDYNAPlotFile.h"
 
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::Parse(XMLTag& tag)

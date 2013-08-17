@@ -1,6 +1,6 @@
 #pragma once
-#include <FECore/FESolidDomain.h>
-#include <FECore/FESolver.h>
+#include "FECore/FESolidDomain.h"
+#include "FECore/FESolver.h"
 
 //-----------------------------------------------------------------------------
 class FEHeatDomain

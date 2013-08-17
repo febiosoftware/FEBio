@@ -6,7 +6,7 @@
 #include "FERigid.h"
 #include "FECore/log.h"
 #include "FEStiffnessMatrix.h"
-#include <NumCore/NumCore.h>
+#include "NumCore/NumCore.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list

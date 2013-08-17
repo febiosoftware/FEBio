@@ -1,6 +1,6 @@
 #include "FEHeatStiffnessMatrix.h"
-#include <FECore/FEAnalysis.h>
-#include <FECore/FEModel.h>
+#include "FECore/FEAnalysis.h"
+#include "FECore/FEModel.h"
 using namespace FECore;
 
 //-----------------------------------------------------------------------------

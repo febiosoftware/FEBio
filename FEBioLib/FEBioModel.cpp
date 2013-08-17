@@ -56,9 +56,9 @@
 #include "FEBioMech/FEElasticMultigeneration.h"
 #include "FEBioMech/FERemodelingElasticMaterial.h"
 #include "FEBioMech/FESlidingInterfaceBW.h"
-#include <FEBioHeat/FEHeatSolidDomain.h>
-#include <FEBioHeat/FEHeatFlux.h>
-#include <FEBioHeat/FEConvectiveHeatFlux.h>
+#include "FEBioHeat/FEHeatSolidDomain.h"
+#include "FEBioHeat/FEHeatFlux.h"
+#include "FEBioHeat/FEConvectiveHeatFlux.h"
 #include "FECore/log.h"
 #include "version.h"
 

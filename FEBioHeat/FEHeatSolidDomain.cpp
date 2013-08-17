@@ -1,6 +1,6 @@
 #include "FEHeatSolidDomain.h"
 #include "FEHeatTransferMaterial.h"
-#include <FECore/FEMesh.h>
+#include "FECore/FEMesh.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEHeatSolidDomain::Clone()

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <FECore/FESolidDomain.h>
-#include <FECore/FESolver.h>
-#include <FECore/FEModel.h>
+#include "FECore/FESolidDomain.h"
+#include "FECore/FESolver.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 class FELinearElasticDomain

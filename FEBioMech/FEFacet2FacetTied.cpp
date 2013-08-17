@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEFacet2FacetTied.h"
-#include <FECore/FEModel.h>
-#include <FECore/log.h>
+#include "FECore/FEModel.h"
+#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
 // Define tied interface parameters

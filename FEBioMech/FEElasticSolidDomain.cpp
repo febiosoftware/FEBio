@@ -4,7 +4,7 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEUncoupledViscoElasticMaterial.h"
 #include "FERemodelingElasticMaterial.h"
-#include <FECore/log.h>
+#include "FECore/log.h"
 
 #ifdef WIN32
 extern "C" int __cdecl omp_get_num_threads(void);

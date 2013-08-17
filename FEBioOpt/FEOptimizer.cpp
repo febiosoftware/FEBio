@@ -1,6 +1,6 @@
 #include "FEOptimizer.h"
 #include "FELMOptimizeMethod.h"
-#include <FECore/Logfile.h>
+#include "FECore/Logfile.h"
 
 //-----------------------------------------------------------------------------
 // FEOptimizeInput

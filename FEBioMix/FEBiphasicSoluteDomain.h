@@ -1,6 +1,6 @@
 #pragma once
 #include "FEBioMech/FEElasticSolidDomain.h"
-#include <FECore/FETypes.h>
+#include "FECore/FETypes.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for biphasic-solute 3D solid elements

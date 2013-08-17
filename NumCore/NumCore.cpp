@@ -9,7 +9,7 @@
 #include "PardisoSolver.h"
 #include "WSMPSolver.h"
 #include "RCICGSolver.h"
-#include <FECore/FE_enum.h>
+#include "FECore/FE_enum.h"
 
 LinearSolver* NumCore::CreateLinearSolver(int ntype)
 {

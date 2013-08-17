@@ -4,10 +4,10 @@
 #include "FEHeatTransferMaterial.h"
 #include "FEHeatSource.h"
 #include "FEHeatStiffnessMatrix.h"
-#include <FECore/FENodeReorder.h>
-#include <FECore/FEModel.h>
-#include <FECore/log.h>
-#include <NumCore/NumCore.h>
+#include "FECore/FENodeReorder.h"
+#include "FECore/FEModel.h"
+#include "FECore/log.h"
+#include "NumCore/NumCore.h"
 
 //-----------------------------------------------------------------------------
 // define the parameter list

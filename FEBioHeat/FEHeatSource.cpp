@@ -1,5 +1,5 @@
 #include "FEHeatSource.h"
-#include <FECore/FEModel.h>
+#include "FECore/FEModel.h"
 
 BEGIN_PARAMETER_LIST(FEHeatSource, FEBodyLoad);
 	ADD_PARAMETER(m_Q, FE_PARAM_DOUBLE, "Q");

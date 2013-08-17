@@ -1,7 +1,7 @@
 #include "FEBioOpt.h"
 #include "FEOptimizer.h"
-#include <FECore/febio.h>
-#include <FECore/Logfile.h>
+#include "FECore/febio.h"
+#include "FECore/Logfile.h"
 
 //-----------------------------------------------------------------------------
 // declared in dllmain.cpp

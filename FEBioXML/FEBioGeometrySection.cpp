@@ -1,26 +1,26 @@
 #include "stdafx.h"
 #include "FEBioGeometrySection.h"
-#include <FEBioMech/FERigid.h>
-#include <FEBioMix/FEBiphasic.h>
-#include <FEBioMix/FEBiphasicSolute.h>
-#include <FEBioMix/FETriphasic.h>
-#include <FEBioMix/FEMultiphasic.h>
-#include <FEBioMech/FEUncoupledMaterial.h>
-#include <FEBioMech/FEElasticSolidDomain.h>
-#include <FEBioMech/FEElasticShellDomain.h>
-#include <FEBioMech/FEElasticTrussDomain.h>
-#include <FEBioMech/FERigidSolidDomain.h>
-#include <FEBioMech/FERigidShellDomain.h>
-#include <FEBioMech/FEUDGHexDomain.h>
-#include <FEBioMech/FEUT4Domain.h>
-#include <FEBioMix/FEBiphasicSolidDomain.h>
-#include <FEBioMix/FETriphasicDomain.h>
-#include <FEBioMix/FEBiphasicSoluteDomain.h>
-#include <FEBioMech/FE3FieldElasticSolidDomain.h>
-#include <FEBioMech/FELinearSolidDomain.h>
-#include <FEBioMix/FEMultiphasicDomain.h>
-#include <FEBioHeat/FEHeatTransferMaterial.h>
-#include <FEBioHeat/FEHeatSolidDomain.h>
+#include "FEBioMech/FERigid.h"
+#include "FEBioMix/FEBiphasic.h"
+#include "FEBioMix/FEBiphasicSolute.h"
+#include "FEBioMix/FETriphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
+#include "FEBioMech/FEUncoupledMaterial.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FEBioMech/FEElasticShellDomain.h"
+#include "FEBioMech/FEElasticTrussDomain.h"
+#include "FEBioMech/FERigidSolidDomain.h"
+#include "FEBioMech/FERigidShellDomain.h"
+#include "FEBioMech/FEUDGHexDomain.h"
+#include "FEBioMech/FEUT4Domain.h"
+#include "FEBioMix/FEBiphasicSolidDomain.h"
+#include "FEBioMix/FETriphasicDomain.h"
+#include "FEBioMix/FEBiphasicSoluteDomain.h"
+#include "FEBioMech/FE3FieldElasticSolidDomain.h"
+#include "FEBioMech/FELinearSolidDomain.h"
+#include "FEBioMix/FEMultiphasicDomain.h"
+#include "FEBioHeat/FEHeatTransferMaterial.h"
+#include "FEBioHeat/FEHeatSolidDomain.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file

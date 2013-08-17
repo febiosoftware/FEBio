@@ -1,5 +1,5 @@
 #include "FEConvectiveHeatFlux.h"
-#include <FECore/FEModel.h>
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! residual
