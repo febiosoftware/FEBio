@@ -210,15 +210,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\FEBioLib\ElementDataRecord.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEBioModel.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEBox.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioLib\FEMicroMaterial.cpp"
 				>
 			</File>
 			<File
@@ -238,14 +238,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\NodeDataRecord.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\RigidBodyDataRecord.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\stdafx.cpp"
 				>
 			</File>
@@ -260,10 +252,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\FEBioLib\ElementDataRecord.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\FEBioModel.h"
 				>
 			</File>
@@ -272,11 +260,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\NodeDataRecord.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\RigidBodyDataRecord.h"
+				RelativePath="..\..\FEBioLib\FEMicroMaterial.h"
 				>
 			</File>
 			<File

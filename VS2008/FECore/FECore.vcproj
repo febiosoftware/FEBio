@@ -232,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\ElementDataRecord.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEAnalysis.cpp"
 				>
 			</File>
@@ -412,6 +416,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\NodeDataRecord.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\ObjectDataRecord.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\qsort.cpp"
 				>
 			</File>
@@ -459,6 +471,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\DumpFile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\ElementDataRecord.h"
 				>
 			</File>
 			<File
@@ -675,6 +691,14 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\MatrixProfile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\NodeDataRecord.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\ObjectDataRecord.h"
 				>
 			</File>
 			<File

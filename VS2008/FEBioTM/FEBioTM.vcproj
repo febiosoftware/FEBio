@@ -185,10 +185,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioTM\fem.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioTM\FileBrowser.cpp"
 				>
 			</File>
@@ -240,10 +236,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioTM\FEBioTM.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioTM\fem.h"
 				>
 			</File>
 			<File

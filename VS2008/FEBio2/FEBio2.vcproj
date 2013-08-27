@@ -277,15 +277,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\fem.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEMemoryDiagnostic.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEMicroMaterial.cpp"
 				>
 			</File>
 			<File
@@ -306,10 +298,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBio2\plugin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\restart.cpp"
 				>
 			</File>
 			<File
@@ -351,15 +339,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBio2\fem.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBio2\FEMemoryDiagnostic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBio2\FEMicroMaterial.h"
 				>
 			</File>
 			<File
