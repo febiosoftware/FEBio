@@ -145,6 +145,11 @@ public:
 
 	int				m_nsegup;	//!< segment update parameter
 
+private:
+	bool	m_bfirst;	//!< flag to indicate the first time we enter Update
+	double	m_normg0;	//!< initial gap norm
+
+public:
 	DECLARE_PARAMETER_LIST();
 };
 

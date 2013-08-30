@@ -241,6 +241,7 @@ bool FEBioModel::Reset()
 			{
 				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
 				rj.m_F = vec3d(0,0,0);
+				rj.m_L = vec3d(0,0,0);
 
 				FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBa]);
 				FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBb]);
@@ -258,11 +259,11 @@ bool FEBioModel::Reset()
 	// set first time step
 	m_pStep = m_Step[0];
 	m_nStep = 0;
-	m_pStep->m_dt = m_pStep->m_dt0;
-	m_pStep->m_ntotref    = 0;		// total nr of stiffness reformations
-	m_pStep->m_ntotiter   = 0;		// total nr of non-linear iterations
-	m_pStep->m_ntimesteps = 0;		// time steps completed
-	m_pStep->m_ntotrhs    = 0;		// total nr of right hand side evaluations
+	for (int i=0; i<(int)m_Step.size(); ++i) m_Step[i]->Reset();
+
+	// reset contact data
+	// TODO: I just call Init which I think is okay
+	InitContact();
 
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)

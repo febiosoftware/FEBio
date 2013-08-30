@@ -117,5 +117,10 @@ public:
 	FEFacetSlidingSurface	m_ms;	//!< master surface
 	FEFacetSlidingSurface	m_ss;	//!< slave surface
 
+private:
+	bool	m_bfirst;
+	double	m_normg0;
+
+public:
 	DECLARE_PARAMETER_LIST();
 };

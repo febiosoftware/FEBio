@@ -25,6 +25,9 @@ public:
 	//! Data initialization
 	virtual bool Init();
 
+	//! Reset analysis data
+	virtual void Reset();
+
 	//! Solve the analysis step
 	virtual bool Solve();
 

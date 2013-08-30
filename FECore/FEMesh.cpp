@@ -327,6 +327,9 @@ void FEMesh::Reset()
 			node.m_ct[k] = node.m_cp[k] = node.m_c0[k];
 		
 		node.m_T = 0;
+
+		node.m_Fr = vec3d(0,0,0);
+		node.m_Dt = node.m_D0;
 	}
 
 	// update the mesh

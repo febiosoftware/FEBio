@@ -27,6 +27,28 @@ FEDomain* FEElasticSolidDomain::Clone()
 void FEElasticSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
+
+	// determine if remodeling solid
+	FERemodelingElasticMaterial* prs = dynamic_cast<FERemodelingElasticMaterial*> (m_pMat);
+	if (prs)
+	{
+		FEElasticMaterial* pme = prs->GetElasticMaterial();
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FESolidElement& el = m_Elem[i];
+			int n = el.GaussPoints();
+			for (int j=0; j<n; ++j) {
+				el.m_State[j]->Init(false);
+				FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+				FERemodelingMaterialPoint& rpt = *el.m_State[j]->ExtractData<FERemodelingMaterialPoint>();
+
+				pt.m_rhor = pme->Density();
+
+				// reset referential solid density at previous time
+				rpt.rhorp = pt.m_rhor;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -54,6 +54,16 @@ FEDomain* FEAnalysis::Domain(int i)
 }
 
 //-----------------------------------------------------------------------------
+void FEAnalysis::Reset()
+{
+	m_dt = m_dt0;
+	m_ntotref    = 0;		// total nr of stiffness reformations
+	m_ntotiter   = 0;		// total nr of non-linear iterations
+	m_ntimesteps = 0;		// time steps completed
+	m_ntotrhs    = 0;		// total nr of right hand side evaluations
+}
+
+//-----------------------------------------------------------------------------
 bool FEAnalysis::Init()
 {
 	// set first time step

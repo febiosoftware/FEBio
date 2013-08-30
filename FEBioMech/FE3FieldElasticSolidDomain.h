@@ -27,6 +27,9 @@ public:
 	//! initialize class
 	bool Initialize(FEModel& fem);
 
+	//! Reset data
+	void Reset();
+
 	//! augmentation
 	bool Augment();
 

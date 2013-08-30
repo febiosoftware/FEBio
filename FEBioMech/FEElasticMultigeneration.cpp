@@ -52,6 +52,7 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 	{
 		Fi.clear();
 		Ji.clear();
+		m_tgen = 0.0;
 	}
 
 	// get the time

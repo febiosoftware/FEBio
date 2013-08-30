@@ -55,7 +55,7 @@ bool FESlidingSurface::Init()
 	m_rsp.resize(nn);
 	m_Lm.assign(nn, 0.0);
 	m_M.resize(nn);
-	m_Lt.resize(nn);
+	m_Lt.assign(nn, vec2d(0,0));
 	m_off.assign(nn, 0.0);
 	m_eps.assign(nn, 1.0);
 	m_Ln.assign(nn, 0.0);
@@ -245,6 +245,10 @@ void FESlidingInterface::CalcAutoPenalty(FESlidingSurface& s)
 
 bool FESlidingInterface::Init()
 {
+	// set data
+	m_bfirst = true;
+	m_normg0 = 0.0;
+
 	// create the surfaces
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
@@ -417,13 +421,11 @@ void FESlidingInterface::ProjectSurface(FESlidingSurface& ss, FESlidingSurface& 
 //! \todo Should I get rid of the bfirst static variable?
 void FESlidingInterface::Update(int niter)
 {
-	static bool bfirst = true;
-
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;
 	// We have to make sure that in this case, both surfaces get at least
 	// one pass!
-	bool bupdate = (bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
+	bool bupdate = (m_bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
 
 	// project slave surface onto master surface
 	// this also calculates the nodal gap functions
@@ -434,7 +436,7 @@ void FESlidingInterface::Update(int niter)
 	UpdateContactPressures();
 
 	// set the first-entry-flag to false
-	bfirst = false;
+	m_bfirst = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1276,11 +1278,8 @@ bool FESlidingInterface::Augment(int naug)
 	bool bconv = true;
 	mat2d Mi;
 
-	static double normg0 = 0;
-
 	// penalty factor
 	double eps, scale = Penalty();
-
 
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
@@ -1424,12 +1423,12 @@ bool FESlidingInterface::Augment(int naug)
 	normL1 = sqrt(normL1);
 	normg1 = sqrt(normg1 / N);
 
-	if (naug == 0) normg0 = 0;
+	if (naug == 0) m_normg0 = 0;
 
 	// calculate and print convergence norms
 	double lnorm = 0, gnorm = 0;
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
-	if (normg1 != 0) gnorm = fabs(normg1 - normg0)/normg1; else gnorm = fabs(normg1 - normg0);
+	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 
 	clog.printf(" sliding interface # %d\n", m_nID);
 	clog.printf("                        CURRENT        REQUIRED\n");
@@ -1548,7 +1547,7 @@ bool FESlidingInterface::Augment(int naug)
 	}
 
 	// store the last gap norm
-	normg0 = normg1;
+	m_normg0 = normg1;
 
 	return bconv;
 }

@@ -179,6 +179,9 @@ FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(p
 //! Initialization routine
 bool FEFacet2FacetSliding::Init()
 {
+	m_bfirst = true;
+	m_normg0 = 0.0;
+
 	// initialize surface data
 	if (m_ss.Init() == false) return false;
 	if (m_ms.Init() == false) return false;
@@ -333,15 +336,13 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::Update(int niter)
 {
-	static bool bfirst = true;
-
 	FEModel& fem = *m_pfem;
 
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;
 	// We have to make sure that in this case, both surfaces get at least
 	// one pass!
-	bool bupdate = (bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
+	bool bupdate = (m_bfirst || (m_nsegup == 0)? true : (niter <= m_nsegup));
 
 	// project slave surface to master surface
 	ProjectSurface(m_ss, m_ms, bupdate);
@@ -350,7 +351,7 @@ void FEFacet2FacetSliding::Update(int niter)
 	// Update the net contact pressures
 	UpdateContactPressures();
 
-	bfirst = false;
+	m_bfirst = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -866,9 +867,6 @@ bool FEFacet2FacetSliding::Augment(int naug)
 
 	bool bconv = true;
 
-	// TODO: why is this static?
-	static double normg0 = 0;
-
 	// --- c a l c u l a t e   i n i t i a l   n o r m s ---
 	// a. normal component
 	int NS = (int) m_ss.m_Data.size();
@@ -951,12 +949,12 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	normL1 = sqrt(normL1);
 	normg1 = sqrt(normg1 / N);
 
-	if (naug == 0) normg0 = 0;
+	if (naug == 0) m_normg0 = 0;
 
 	// calculate and print convergence norms
 	double lnorm = 0, gnorm = 0;
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
-	if (normg1 != 0) gnorm = fabs(normg1 - normg0)/normg1; else gnorm = fabs(normg1 - normg0);
+	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 
 	clog.printf(" sliding interface # %d\n", m_nID);
 	clog.printf("                        CURRENT        REQUIRED\n");
@@ -1009,7 +1007,7 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	}
 
 	// store the last gap norm
-	normg0 = normg1;
+	m_normg0 = normg1;
 
 	return bconv;
 }

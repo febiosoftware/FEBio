@@ -37,6 +37,21 @@ FEDomain* FE3FieldElasticSolidDomain::Clone()
 }
 
 //-----------------------------------------------------------------------------
+void FE3FieldElasticSolidDomain::Reset()
+{
+	FEElasticSolidDomain::Reset();
+	// initialize element data
+	int NE = m_Data.size();
+	for (int i=0; i<NE; ++i)
+	{
+		ELEM_DATA& d = m_Data[i];
+		d.eJ = 1.0;
+		d.ep = 0.0;
+		d.Lk = 0.0;
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! Stiffness matrix for three-field domain
 void FE3FieldElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 {
