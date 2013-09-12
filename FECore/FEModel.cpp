@@ -118,7 +118,7 @@ double* FEModel::FindParameter(const char* szparam)
 		FEObject& ob = *m_Obj[i];
 		if (ob.GetMaterialID() == nmat)
 		{
-			FEParam* pp = pmat->GetParameter(sz);
+			FEParam* pp = ob.GetParameter(sz);
 			if (pp) return pp->pvalue<double>(index);
 		}
 	}
