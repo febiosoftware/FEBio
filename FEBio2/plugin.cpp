@@ -9,12 +9,12 @@
 #include "windows.h"
 #include <direct.h>
 
-typedef void (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
+#undef RegisterClass
+
+typedef FEBioFactory* (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 
 bool LoadPlugin(const char* szfile)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-
 	// load the library
 	HMODULE hm = LoadLibraryA(szfile);
 	if (hm == NULL) return false;
@@ -23,8 +23,15 @@ bool LoadPlugin(const char* szfile)
 	FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) GetProcAddress(hm, "RegisterPlugin");
 	if (pfnc == 0) return false;
 
-	// allow the plugin to register itself with the framework
-	pfnc(febio);
+	// call the register function repeatedly until it returns zero
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FEBioFactory* pfac = 0;
+	do
+	{
+		pfac = pfnc(febio);
+		if (pfac) febio.RegisterClass(pfac);
+	}
+	while (pfac);
 
 	// a-ok!
 	return true;
@@ -63,19 +70,25 @@ typedef void (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 
 bool LoadPlugin(const char* szfile)
 {
-  // load the library
-  void* hlib = dlopen(szfile, RTLD_LAZY);
-  if (hlib == NULL) return false;
+	// load the library
+	void* hlib = dlopen(szfile, RTLD_LAZY);
+	if (hlib == NULL) return false;
 
-  // find the plugin's registration function
-  FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) dlsym(hlib, "RegisterPlugin");
-  if (pfnc == NULL) return false;
+	// find the plugin's registration function
+	FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) dlsym(hlib, "RegisterPlugin");
+	if (pfnc == NULL) return false;
 
-  // allow the plugin to register itself with the framework
-  FEBioKernel& febio = FEBioKernel::GetInstance();
-  pfnc(febio);
+	// call the register function repeatedly until it returns zero
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FEBioFactory* pfac = 0;
+	do
+	{
+		pfac = pfnc(febio);
+		if (pfac) febio.RegisterClass(pfac);
+	}
+	while (pfac);
 
-  return true;
+	return true;
 }
 
 bool LoadPluginFolder(const char* szdir)
