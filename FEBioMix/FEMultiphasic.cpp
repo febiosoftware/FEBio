@@ -613,21 +613,25 @@ double FEMultiphasic::PartitionCoefficient(FEMaterialPoint& pt, const int sol)
 
 //-----------------------------------------------------------------------------
 //! partition coefficients and their derivatives
-void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp,
-												  vector<double>& kappa,
-												  vector<double>& dkdJ,
-												  vector< vector<double> >& dkdc,
-												  vector<double>& dkdJJ,
-												  vector< vector<double> >& dkdJc,
-												  vector< vector< vector<double> > >& dkdcc)
+void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp, vector<double>& kappa,
+                                                  vector<double>& dkdJ,
+                                                  vector< vector<double> >& dkdc,
+                                                  vector<double>& dkdJJ,
+                                                  vector< vector<double> >& dkdJc,
+                                                  vector< vector< vector<double> > >& dkdcc,
+                                                  vector< vector<double> >& dkdr,
+                                                  vector< vector<double> >& dkdJr,
+                                                  vector< vector< vector<double> > >& dkdrc)
 {
 	int isol, jsol, ksol;
+    int isbm;
 	
 	FEElasticMaterialPoint& ept = *(mp.ExtractData<FEElasticMaterialPoint>());
 	FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 	FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
 	
 	const int nsol = (int)m_pSolute.size();
+    const int nsbm = (int)m_pSBM.size();
 	
 	vector<double> c(nsol);
 	vector<int> z(nsol);
@@ -641,6 +645,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp,
 	kappa.resize(nsol);
 
 	double den = 0;
+    double num = 0;
 	double zeta = ElectricPotential(mp, true);
 
 	for (isol=0; isol<nsol; ++isol) {
@@ -663,6 +668,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp,
 		zz[isol] = pow(zeta, z[isol]);
 		kappa[isol] = zz[isol]*khat[isol];
 		den += SQR(z[isol])*kappa[isol]*c[isol];
+        num += pow((double)z[isol],3)*kappa[isol]*c[isol];
 	}
 	
 	// get the charge density and its derivatives
@@ -682,6 +688,7 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp,
 	vector< vector<double> > zidzdcc1(nsol, vector<double>(nsol,0));
 	vector<double> zidzdcc2(nsol,0);
 	double zidzdcc3 = 0;
+
 	if (den > 0) {
 		
 		for (isol=0; isol<nsol; ++isol)
@@ -724,10 +731,10 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp,
 	}
 	
 	dkdJ.resize(nsol);
-	dkdc.resize(nsol, vector<double>(nsol));
+	dkdc.resize(nsol, vector<double>(nsol,0));
 	dkdJJ.resize(nsol);
 	dkdJc.resize(nsol, vector<double>(nsol));
-	dkdcc.resize(nsol, dkdc);	// use dkhdc for initialization only
+	dkdcc.resize(nsol, dkdc);	// use dkdc for initialization only
 	
 	for (isol=0; isol<nsol; ++isol) {
 		dkdJ[isol] = zz[isol]*dkhdJ[isol]+z[isol]*kappa[isol]*zidzdJ;
@@ -746,6 +753,46 @@ void FEMultiphasic::PartitionCoefficientFunctions(FEMaterialPoint& mp,
 			}
 		}
 	}
+    vector<double> zidzdr(nsbm,0);
+    vector<double> zidzdJr(nsbm,0);
+	vector< vector<double> > zidzdrc(nsbm, vector<double>(nsol,0));
+	dkdr.resize(nsol, vector<double>(nsbm));
+	dkdJr.resize(nsol, vector<double>(nsbm));
+	dkdrc.resize(nsol, zidzdrc);	// use zidzdrc for initialization only
+    
+	if (den > 0) {
+		
+        for (isbm=0; isbm<nsbm; ++isbm) {
+            zidzdr[isbm] = -(cF/SBMDensity(isbm) + SBMChargeNumber(isbm)/SBMMolarMass(isbm))/(J-phi0)/den;
+            
+            for (isol=0; isol<nsol; ++isol) {
+                zidzdJr[isbm] += SQR(z[isol])*dkdJ[isol]*c[isol];
+            }
+            zidzdJr[isbm] = 1/(J-phi0) + zidzdJr[isbm]/den;
+            zidzdJr[isbm] = (zidzdJr[isbm] + zidzdJ)*zidzdr[isbm];
+            zidzdJr[isbm] += cF/SBMDensity(isbm)/SQR(J-phi0)/den;
+            
+            for (isol=0; isol<nsol; ++isol) {
+                zidzdrc[isbm][isol] = SQR(z[isol])*kappa[isol];
+                for (jsol=0; jsol<nsol; ++jsol)
+                    zidzdrc[isbm][isol] += SQR(z[jsol])*zz[jsol]*c[jsol]*dkhdc[jsol][isol];
+                zidzdrc[isbm][isol] = zidzdr[isbm]*(zidzdc[isol]*(1+num/den) - zidzdrc[isbm][isol]/den);
+            }
+        }
+	}
+    
+    for (isbm=0; isbm<nsbm; ++isbm) {
+        for (isol=0; isol<nsol; ++isol) {
+            dkdr[isol][isbm] = z[isol]*kappa[isol]*zidzdr[isbm];
+            dkdJr[isol][isbm] = z[isol]*((dkhdJ[isol]*zz[isol]+(z[isol]-1)*kappa[isol]*zidzdJ)*zidzdr[isbm]
+                                         +kappa[isol]*zidzdJr[isbm]);
+            for (jsol=0; jsol<nsol; ++jsol) {
+                dkdrc[isol][isbm][jsol] = z[isol]*(zz[isol]*dkhdc[isol][jsol]*zidzdr[isbm]
+                                                   +(z[isol]-1)*kappa[isol]*zidzdr[isbm]*zidzdc[jsol]
+                                                   +kappa[isol]*zidzdrc[isbm][jsol]);
+            }
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------

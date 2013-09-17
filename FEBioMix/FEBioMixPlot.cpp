@@ -416,6 +416,85 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 }
 
 //-----------------------------------------------------------------------------
+bool FEPlotOsmolarity::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FEBiphasicSoluteDomain* psd = dynamic_cast<FEBiphasicSoluteDomain*>(&dom);
+	FETriphasicDomain* ptd = dynamic_cast<FETriphasicDomain*>(&dom);
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	if (psd)
+	{
+		for (i=0; i<psd->Elements(); ++i)
+		{
+			FESolidElement& el = psd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (ptd)
+	{
+		for (i=0; i<ptd->Elements(); ++i)
+		{
+			FESolidElement& el = ptd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESaltMaterialPoint* pt = (mp.ExtractData<FESaltMaterialPoint>());
+				
+				if (pt) ew += pt->m_ca[0] + pt->m_ca[1];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	else if (pmd)
+	{
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* pt = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (pt)
+                    for (int isol=0; isol<pt->m_ca.size(); ++isol)
+                        ew += pt->m_ca[isol];
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 bool FEPlotSBMConcentration_::Save(FEDomain &dom, vector<float>& a)
 {
 	int i, j;
@@ -859,6 +938,44 @@ bool FEPlotReceptorLigandConcentration::Save(FEDomain &dom, vector<float>& a)
 				FESoluteMaterialPoint* pt = (mp.ExtractData<FESoluteMaterialPoint>());
 				
 				if (pt) ew += pt->m_crc;
+			}
+			
+			ew /= el.GaussPoints();
+			
+			a.push_back((float) ew);
+		}
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, vector<float>& a)
+{
+	int i, j;
+	double ew;
+	FEMultiphasicDomain* pmd = dynamic_cast<FEMultiphasicDomain*>(&dom);
+	if (pmd)
+	{
+		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
+		// Check if this solid-bound molecule is present in this specific multiphasic mixture
+		int sid = -1;
+		for (i=0; i<(int)pm->m_pSBM.size(); ++i)
+			if (pm->m_pSBM[i]->GetSBMID() == m_nsbm) {sid = i; break;}
+		if (sid == -1) return false;
+		
+		for (i=0; i<pmd->Elements(); ++i)
+		{
+			FESolidElement& el = pmd->Element(i);
+			
+			// calculate average concentration
+			ew = 0;
+			for (j=0; j<el.GaussPoints(); ++j)
+			{
+				FEMaterialPoint& mp = *el.m_State[j];
+				FESolutesMaterialPoint* st = (mp.ExtractData<FESolutesMaterialPoint>());
+				
+				if (st) ew += st->m_sbmr[sid];
 			}
 			
 			ew /= el.GaussPoints();

@@ -42,6 +42,9 @@ public:
 	vector< vector<double> >	m_dkdc;			//!< 1st deriv of m_k with effective concentration
 	vector< vector<double> >	m_dkdJc;		//!< cross deriv of m_k with J and c
 	vector< vector< vector<double> > > m_dkdcc;	// 2nd deriv of m_k with c
+	vector< vector<double> >	m_dkdr;			//!< 1st deriv of m_k with m_sbmr
+	vector< vector<double> >	m_dkdJr;		//!< cross deriv of m_k with J and m_sbmr
+	vector< vector< vector<double> > > m_dkdrc;	//!< cross deriv of m_k with m_sbmr and c
 };
 
 //-----------------------------------------------------------------------------
@@ -98,7 +101,10 @@ public:
 									   vector< vector<double> >& dkdc,
 									   vector<double>& dkdJJ,
 									   vector< vector<double> >& dkdJc,
-									   vector< vector< vector<double> > >& dkdcc);
+									   vector< vector< vector<double> > >& dkdcc,
+                                       vector< vector<double> >& dkdr,
+                                       vector< vector<double> >& dkdJr,
+                                       vector< vector< vector<double> > >& dkdrc);
 	
 	//! solid referential apparent density
 	double SolidReferentialApparentDensity(FEMaterialPoint& pt);

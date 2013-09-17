@@ -106,6 +106,15 @@ REGISTER_FEBIO_CLASS(FEPlotCurrentDensity               , FEPlotData, "current d
 REGISTER_FEBIO_CLASS(FEPlotFixedChargeDensity           , FEPlotData, "fixed charge density");
 REGISTER_FEBIO_CLASS(FEPlotReferentialFixedChargeDensity, FEPlotData, "referential fixed charge density");
 REGISTER_FEBIO_CLASS(FEPlotNodalFluidFlux               , FEPlotData, "nodal fluid flux"    );
+REGISTER_FEBIO_CLASS(FEPlotOsmolarity                   , FEPlotData,  "osmolarity"         );
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 0, "sbm 1 referential apparent density");
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 1, "sbm 2 referential apparent density");
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 2, "sbm 3 referential apparent density");
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 3, "sbm 4 referential apparent density");
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 4, "sbm 5 referential apparent density");
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 5, "sbm 6 referential apparent density");
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 6, "sbm 7 referential apparent density");
+REGISTER_FEBIO_CLASS_T(FEPlotSBMRefAppDensityT          , FEPlotData, 7, "sbm 8 referential apparent density");
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FENodeTemp, FENodeLogData, "T");

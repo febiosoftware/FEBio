@@ -494,7 +494,7 @@ void FEMultiphasicDomain::InternalSoluteWork(FESolver* psolver, vector<double>& 
 //! of nodes
 bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<double>& fe, double dt, const int sol)
 {
-	int i, isol, jsol, n;
+	int i, isol, jsol, n, isbm;
 	
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
@@ -518,6 +518,8 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 	assert(pm);
 
 	const int nsol = (int)pm->m_pSolute.size();
+    const int nsbm = (int)pm->m_pSBM.size();
+
 	vector<int> sid(nsol);
 	for (isol=0; isol<nsol; ++isol)
 		sid[isol] = pm->m_pSolute[isol]->GetSoluteID();
@@ -604,9 +606,6 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 		double J = ept.m_J;
 		double dJdt = (J-Jp)/dt;
 		
-		// and then finally
-		double divv = dJdt/J;
-		
 		vector<vec3d> j(spt.m_j);
 		vector<double> c(spt.m_c);
 		vector<int> z(nsol);
@@ -622,30 +621,40 @@ bool FEMultiphasicDomain::ElementInternalSoluteWork(FESolidElement& el, vector<d
 			je += j[isol]*z[isol];
 		}
 		
-			double dkdJ = spt.m_dkdJ[sol];
+		double dkdJ = spt.m_dkdJ[sol];
 		vector<double> dkdc(spt.m_dkdc[sol]);
+		vector<double> dkdr(spt.m_dkdr[sol]);
 		
 		// evaluate the porosity, its derivative w.r.t. J, and its gradient
 		double phiw = pm->Porosity(mp);
-		double dpdJ = (1. - phiw)/J;
 		// evaluate time derivatives of solubility and porosity
 		double dkdt = dkdJ*dJdt;
 		for (jsol=0; jsol<nsol; ++jsol)
 			dkdt += dkdc[jsol]*dcdt[jsol];
-		double dpdt = dpdJ*dJdt;
+        double dphi0dt = 0;
+        double chat = 0;
 		
 		// chemical reactions
-		double chat = 0;
-		for (i=0; i<nreact; ++i)
-			chat += pm->m_pReact[i]->m_v[sol]*pm->m_pReact[i]->ReactionSupply(mp);
-		
+        for (i=0; i<nreact; ++i) {
+            double zhat = pm->m_pReact[i]->ReactionSupply(mp);
+            chat += phiw*zhat*pm->m_pReact[i]->m_v[sol];
+            for (isbm=0; isbm<nsbm; ++isbm) {
+                double M = pm->SBMMolarMass(isbm);
+                double rhoT = pm->SBMDensity(isbm);
+                double v = pm->m_pReact[i]->m_v[nsol+isbm];
+                dkdt += J*phiw*zhat*M*v*dkdr[isbm];
+                dphi0dt += J*phiw*zhat*v*M/rhoT;
+            }
+        }
+
 		// update force vector
 		for (i=0; i<neln; ++i)
 		{
 			fe[i] -= dt*(gradN[i]*(j[sol]+je*pm->m_penalty)
-						 - H[i]*(dpdt*kappa[sol]*c[sol]+phiw*dkdt*c[sol]
-								 +phiw*kappa[sol]*dcdt[sol]+phiw*kappa[sol]*c[sol]*divv
-								 -phiw*chat)
+						 + H[i]*(chat - (dJdt-dphi0dt)*kappa[sol]*c[sol]/J
+                                 - phiw*dkdt*c[sol]
+                                 - phiw*kappa[sol]*dcdt[sol]
+                                 )
 						 )*detJ*wg[n];
 		}
 	}
@@ -1136,7 +1145,7 @@ void FEMultiphasicDomain::StiffnessMatrixSS(FESolver* psolver, bool bsymm, const
 //!
 bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix& ke, bool bsymm, double dt)
 {
-	int i, j, isol, jsol, ksol, n, ireact;
+	int i, j, isol, jsol, ksol, n, ireact, isbm;
 	
 	int nint = el.GaussPoints();
 	int neln = el.Nodes();
@@ -1166,6 +1175,7 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 	for (isol=0; isol<nsol; ++isol)
 		sid[isol] = pm->m_pSolute[isol]->GetSoluteID();
 	
+	const int nsbm = (int)pm->m_pSBM.size();
 	const int nreact = (int)pm->m_pReact.size();
 
 	vec3d rp[FEElement::MAX_NODES], v[FEElement::MAX_NODES];
@@ -1293,9 +1303,13 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 		vector<double> dkdJJ(spt.m_dkdJJ);
 		vector< vector<double> > dkdJc(spt.m_dkdJc);
 		vector< vector< vector<double> > > dkdcc(spt.m_dkdcc);
+		vector< vector<double> > dkdr(spt.m_dkdr);
+		vector< vector<double> > dkdJr(spt.m_dkdJr);
+		vector< vector< vector<double> > > dkdrc(spt.m_dkdrc);
 		
 		// evaluate the porosity and its derivative
 		double phiw = pm->Porosity(mp);
+        double phi0 = ppt.m_phi0;
 		double phis = 1. - phiw;
 		double dpdJ = phis/J;
 		double dpdJJ = -2*phis/(J*J);
@@ -1459,6 +1473,24 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 														  +J*(dpdJJ*kappa[isol]+phiw*dkdJJ[isol])) + sum)
 										   +dcdt[isol]*((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]))
 					+qpu*(c[isol]*((phiw+J*dpdJ)*kappa[isol]+J*phiw*dkdJ[isol]));
+
+                    // chemical reactions
+                    for (ireact=0; ireact<nreact; ++ireact) {
+                        double sum1 = 0;
+                        double sum2 = 0;
+                        for (isbm=0; isbm<nsbm; ++isbm) {
+                            sum1 += pm->SBMMolarMass(isbm)*pm->m_pReact[ireact]->m_v[nsol+isbm]*
+                            ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/pm->SBMDensity(isbm));
+                            sum2 += pm->SBMMolarMass(isbm)*pm->m_pReact[ireact]->m_v[nsol+isbm]*
+                            (dkdr[isol][isbm]+(J-phi0)*dkdJr[isol][isbm]-dkdJ[isol]/pm->SBMDensity(isbm));
+                        }
+                        double zhat = pm->m_pReact[ireact]->ReactionSupply(mp);
+                        mat3dd zhatI(zhat);
+                        mat3ds dzde = pm->m_pReact[ireact]->Tangent_ReactionSupply_Strain(mp);
+                        qcu[isol] -= ((zhatI+dzde*(J-phi0))*gradN[j])*(sum1*c[isol])
+                        +gradN[j]*(c[isol]*(J-phi0)*sum2*zhat);
+                    }
+
 				}
 				
 				for (isol=0; isol<nsol; ++isol) {
@@ -1532,9 +1564,26 @@ bool FEMultiphasicDomain::ElementMultiphasicStiffness(FESolidElement& el, matrix
 						
 						// chemical reactions
 						dchatdc[isol][jsol] = 0;
-						for (ireact=0; ireact<nreact; ++ireact)
+						for (ireact=0; ireact<nreact; ++ireact) {
 							dchatdc[isol][jsol] += pm->m_pReact[ireact]->m_v[isol]
 							*pm->m_pReact[ireact]->Tangent_ReactionSupply_Concentration(mp,jsol);
+                            double sum1 = 0;
+                            double sum2 = 0;
+                            for (isbm=0; isbm<nsbm; ++isbm) {
+                                sum1 += pm->SBMMolarMass(isbm)*pm->m_pReact[ireact]->m_v[nsol+isbm]*
+                                ((J-phi0)*dkdr[isol][isbm]-kappa[isol]/pm->SBMDensity(isbm));
+                                sum2 += pm->SBMMolarMass(isbm)*pm->m_pReact[ireact]->m_v[nsol+isbm]*
+                                ((J-phi0)*dkdrc[isol][isbm][jsol]-dkdc[isol][jsol]/pm->SBMDensity(isbm));
+                            }
+                            double zhat = pm->m_pReact[ireact]->ReactionSupply(mp);
+                            double dzdc = pm->m_pReact[ireact]->Tangent_ReactionSupply_Concentration(mp, jsol);
+                            if (jsol != isol) {
+                                qcc[isol][jsol] -= H[j]*phiw*c[isol]*(dzdc*sum1+zhat*sum2);
+                            }
+                            else {
+                                qcc[isol][jsol] -= H[j]*phiw*((zhat+c[isol]*dzdc)*sum1+c[isol]*zhat*sum2);
+                            }
+                        }
 					}
 				}
 
@@ -2191,8 +2240,9 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 		ppt.m_pa = pmb->Pressure(mp);
 		spt.m_cF = pmb->FixedChargeDensity(mp);
 		spt.m_Ie = pmb->CurrentDensity(mp);
-		pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
-                                               spt.m_dkdJJ, spt.m_dkdJc, spt.m_dkdcc);
+           pmb->PartitionCoefficientFunctions(mp, spt.m_k, spt.m_dkdJ, spt.m_dkdc,
+                                              spt.m_dkdJJ, spt.m_dkdJc, spt.m_dkdcc,
+                                              spt.m_dkdr, spt.m_dkdJr, spt.m_dkdrc);
 			
 		pt.m_s = pmb->Stress(mp);
 

@@ -85,6 +85,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+//! Osmolarity
+class FEPlotOsmolarity : public FEDomainData
+{
+public:
+    FEPlotOsmolarity(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
+    bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
 //! Base class for solid-bound molecule concentration
 class FEPlotSBMConcentration_ : public FEDomainData
 {
@@ -192,4 +201,23 @@ class FEPlotReceptorLigandConcentration : public FEDomainData
 public:
 	FEPlotReceptorLigandConcentration(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM){}
 	bool Save(FEDomain& dom, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Base class for solid-bound molecule referential apparent density
+class FEPlotSBMRefAppDensity_ : public FEDomainData
+{
+public:
+	FEPlotSBMRefAppDensity_(int nsbm) : FEDomainData(PLT_FLOAT, FMT_ITEM), m_nsbm(nsbm) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+private:
+	int m_nsbm;
+};
+
+//-----------------------------------------------------------------------------
+// template class for instantiating solid-bound molecule variables
+template <int SBM> class FEPlotSBMRefAppDensityT : public FEPlotSBMRefAppDensity_
+{
+public:
+	FEPlotSBMRefAppDensityT(FEModel* pfem) : FEPlotSBMRefAppDensity_(SBM) {}
 };
