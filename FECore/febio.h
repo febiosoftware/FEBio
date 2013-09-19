@@ -41,8 +41,10 @@ public:
 	template <typename T> const char* GetTypeStr(int i);
 
 	template <typename T> int Count();
+	
+	template <typename T> void List();
 
-private:
+public:
 	std::vector<FEBioFactory*>	m_Fac;	// list of registered factory classes
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
@@ -68,6 +70,14 @@ template <typename T> inline T* FEBioKernel::Create(const char* sztag, FEModel* 
 			if (strcmp(pfac->GetTypeStr(), sztag) == 0) return pfac->Create(pfem);
 		}
 	}
+
+	fprintf(stderr, "Unable to create class\n. These are the possible values:\n");
+	for (pf=m_Fac.begin(); pf!=m_Fac.end(); ++pf)
+	  {
+	    FEBioFactory_T<T>* pfac = dynamic_cast<FEBioFactory_T<T>*>(*pf);
+	    if (pfac) fprintf(stderr, "%s\n", pfac->GetTypeStr());
+	  }
+
 	return 0;
 }
 
@@ -114,6 +124,17 @@ template <typename T> inline int FEBioKernel::Count()
 		if (pfac) N++;
 	}
 	return N;
+}
+
+//-----------------------------------------------------------------------------
+template <typename T> inline void FEBioKernel::List()
+{
+  std::vector<FEBioFactory*>::iterator pf;
+  for (pf = m_Fac.begin(); pf != m_Fac.end(); ++pf)
+    {
+      FEBioFactory_T<T>* pfac = dynamic_cast<FEBioFactory_T<T>*>(*pf);
+      if (pfac) fprintf(stdout, "%s\n", pfac->GetTypeStr());
+    }
 }
 
 //-----------------------------------------------------------------------------

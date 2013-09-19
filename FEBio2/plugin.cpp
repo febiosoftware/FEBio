@@ -65,7 +65,7 @@ bool LoadPluginFolder(const char* szdir)
 #include <dlfcn.h>
 
 extern "C" {
-typedef FEBioFactory* (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
+typedef FEBioFactory* (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 }
 
 bool LoadPlugin(const char* szfile)
