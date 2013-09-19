@@ -17,12 +17,13 @@
 class FECarterHayes : public FEElasticMaterial
 {
 public:
-	FECarterHayes() {}
+	FECarterHayes() { m_E0 = 0; m_rho0 = 1; m_sbm = -1; m_lsbm = -1; m_g = 0; }
 	
 public:
-	double	m_c;	//!< c coefficient for calculation of Young's modulus
+	double	m_E0;	//!< Young's modulus at reference sbm density
 	double	m_g;	//!< gamma exponent for calculation of Young's modulus
 	double	m_v;	//!< prescribed Poisson's ratio
+    double  m_rho0; //!< reference sbm density
 	int		m_sbm;	//!< global id of solid-bound molecule
 	int		m_lsbm;	//!< local id of solid-bound molecule
 	
@@ -46,7 +47,7 @@ public:
 	void Init();
 	
 	//! return Young's modulus
-	double YoungModulus(double rhor) { return m_c*pow(rhor, m_g);}
+	double YoungModulus(double rhor) { return m_E0*pow(rhor/m_rho0, m_g);}
 	
 	// declare as registered
 	DECLARE_REGISTERED(FECarterHayes);

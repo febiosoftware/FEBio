@@ -13,7 +13,8 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FECarterHayes, FEElasticMaterial)
-	ADD_PARAMETER(m_c, FE_PARAM_DOUBLE, "c");
+	ADD_PARAMETER(m_E0, FE_PARAM_DOUBLE, "E0");
+	ADD_PARAMETER(m_rho0, FE_PARAM_DOUBLE, "rho0");
 	ADD_PARAMETER(m_g, FE_PARAM_DOUBLE, "gamma");
 	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
 	ADD_PARAMETER(m_sbm, FE_PARAM_INT, "sbm");
@@ -24,8 +25,9 @@ void FECarterHayes::Init()
 {
 	FEElasticMaterial::Init();
 	
-	if (m_c <= 0) throw MaterialError("Invalid value for c");
-	if (m_g < 0) throw MaterialError("Invalid value for gamma");
+	if (m_E0 <= 0) throw MaterialError("E0 must be strictly positive");
+	if (m_rho0 <= 0) throw MaterialError("rho0 must be stricly positive");
+	if (m_g < 0) throw MaterialError("gamma must be positive");
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialRangeError("v", -1.0, 0.5, true, false);
 
 	// get the parent material which must be a multiphasic material

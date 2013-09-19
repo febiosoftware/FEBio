@@ -9,9 +9,6 @@
 
 #include "FEReactionRateConst.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEReactionRateConst, "constant");
-
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactionRateConst, FEMaterial)
 	ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");

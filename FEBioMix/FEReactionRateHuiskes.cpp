@@ -9,13 +9,10 @@
 
 #include "FEReactionRateHuiskes.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEReactionRateHuiskes, "Huiskes");
-
 // Material parameters for the FEMultiphasic material
 BEGIN_PARAMETER_LIST(FEReactionRateHuiskes, FEMaterial)
-ADD_PARAMETER(m_B, FE_PARAM_DOUBLE, "B");
-ADD_PARAMETER(m_k, FE_PARAM_DOUBLE, "k");
+	ADD_PARAMETER(m_B, FE_PARAM_DOUBLE, "B");
+	ADD_PARAMETER(m_psi0, FE_PARAM_DOUBLE, "psi0");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -23,8 +20,8 @@ void FEReactionRateHuiskes::Init()
 {
 	FEMaterial::Init();
 	
-	if (m_k < 0) throw MaterialError("k must be positive");
-	
+	if (m_psi0 < 0) throw MaterialError("k must be positive");
+
 }
 
 //-----------------------------------------------------------------------------
@@ -37,7 +34,7 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
 	FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
     double J = et.m_J;
 	double sed = et.m_sed;
-	double zhat = m_B*(sed/rhor - m_k)/(J-phir);
+	double zhat = m_B*(sed/rhor - m_psi0)/(J-phir);
 	return zhat;
 }
 

@@ -21,6 +21,8 @@
 #include "FESupplySynthesisBinding.h"
 #include "FESupplyMichaelisMenten.h"
 #include "FECarterHayes.h"
+#include "FEReactionRateConst.h"
+#include "FEReactionRateHuiskes.h"
 
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
@@ -59,7 +61,9 @@ REGISTER_MATERIAL(FESupplyBinding                , "supply-binding"          );
 REGISTER_MATERIAL(FESupplyConst                  , "supply-const"            );
 REGISTER_MATERIAL(FESupplySynthesisBinding       , "supply-synthesis-binding");
 REGISTER_MATERIAL(FESupplyMichaelisMenten        , "supply-Michaelis-Menten" );
-REGISTER_MATERIAL(FECarterHayes					 , "Carter-Hayes"             );
+REGISTER_MATERIAL(FECarterHayes					 , "Carter-Hayes"            );
+REGISTER_MATERIAL(FEReactionRateConst			 , "constant reaction rate"  );
+REGISTER_MATERIAL(FEReactionRateHuiskes			 , "Huiskes reaction rate"   );
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

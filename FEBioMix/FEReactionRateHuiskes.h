@@ -13,7 +13,7 @@ class FEReactionRateHuiskes : public FEReactionRate
 {
 public:
 	//! constructor
-	FEReactionRateHuiskes() { m_B = m_k = 0; }
+	FEReactionRateHuiskes() { m_B = m_psi0 = 0; }
 	
 	//! data initialization and checking
 	void Init();
@@ -29,7 +29,7 @@ public:
 	
 public:
 	double	m_B;					//!< mass supply coefficient
-	double	m_k;					//!< specific strain energy at homeostasis
+	double	m_psi0;					//!< specific strain energy at homeostasis
 	
 	// declare as registered
 	DECLARE_REGISTERED(FEReactionRateHuiskes);
