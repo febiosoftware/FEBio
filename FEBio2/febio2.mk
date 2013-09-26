@@ -13,11 +13,15 @@ FEBIOMIX = ../lib/febiomix_$(PLAT).a
 
 FEBIOHEAT = ../lib/febioheat_$(PLAT).a
 
+FEBIOMIX = ../lib/febiomix_$(PLAT).a
+
+FEBIOMECH = ../lib/febiomech_$(PLAT).a
+
 FEBIOXML = ../lib/febioxml_$(PLAT).a
 
 NUMCORE = ../lib/numcore_$(PLAT).a
 
-FEBIO2LIBS = -Wl,--start-group $(FECORE) $(FEBIOLIB) $(FEBIOPLOT) $(FEBIOMECH) $(FEBIOMIX) $(FEBIOHEAT) $(FEBIOXML) $(NUMCORE) -Wl,--end-group
+FEBIO2LIBS = -Wl,--start-group $(FEBIOLIB) $(FEBIOPLOT) $(FEBIOOPT) $(FEBIOHEAT) $(FEBIOMIX) $(FEBIOMECH) $(FEBIOXML) $(FECORE) $(NUMCORE) -Wl,--end-group
 
 $(TARGET):
 	$(CC) -o $(TARGET) $(DEF) *.cpp $(FLG) $(INC) $(FEBIO2LIBS) $(LIBS)
