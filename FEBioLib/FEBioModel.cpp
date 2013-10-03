@@ -54,7 +54,6 @@
 #include "FEBioMech/FEViscoElasticMaterial.h"
 #include "FEBioMech/FEUncoupledViscoElasticMaterial.h"
 #include "FEBioMech/FEElasticMultigeneration.h"
-#include "FEBioMech/FERemodelingElasticMaterial.h"
 #include "FEBioMech/FESlidingInterfaceBW.h"
 #include "FEBioHeat/FEHeatSolidDomain.h"
 #include "FEBioHeat/FEHeatFlux.h"

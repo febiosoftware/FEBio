@@ -29,39 +29,11 @@ class FERemodelingMaterialPoint : public FEMaterialPoint
 public:
 	FERemodelingMaterialPoint(FEMaterialPoint *pt) : FEMaterialPoint(pt) {}
     
-	FEMaterialPoint* Copy()
-	{
-		FERemodelingMaterialPoint* pt = new FERemodelingMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
-		return pt;
-	}
+	FEMaterialPoint* Copy();
     
-	void Init(bool bflag)
-	{
-		FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
-		if (bflag)
-		{
-			// intialize data to zero
-            dsed = rhorp = 0;
-		}
-        
-		// don't forget to intialize the nested data
-		if (m_pt) m_pt->Init(bflag);
-	}
+	void Init(bool bflag);
     
-	void Serialize(DumpFile& ar)
-	{
-		if (m_pt) m_pt->Serialize(ar);
-        
-		if (ar.IsSaving())
-		{
-			ar << dsed << rhorp;
-		}
-		else
-		{
-			ar >> dsed >> rhorp;
-		}
-	}
+	void Serialize(DumpFile& ar);
     
 public:
 	double	dsed;		//!< derivative of strain energy density with mass density

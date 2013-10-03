@@ -1,10 +1,56 @@
 #include "stdafx.h"
 #include "FERemodelingElasticMaterial.h"
 
+//-----------------------------------------------------------------------------
+FEMaterialPoint* FERemodelingMaterialPoint::Copy()
+{
+	FERemodelingMaterialPoint* pt = new FERemodelingMaterialPoint(*this);
+	if (m_pt) pt->m_pt = m_pt->Copy();
+	return pt;
+}
+
+//-----------------------------------------------------------------------------
+void FERemodelingMaterialPoint::Init(bool bflag)
+{
+	FEElasticMaterialPoint& pt = *m_pt->ExtractData<FEElasticMaterialPoint>();
+	if (bflag)
+	{
+		// intialize data to zero
+        dsed = rhorp = 0;
+	}
+	else
+	{
+		rhorp = pt.m_rhor;
+	}
+        
+	// don't forget to intialize the nested data
+	if (m_pt) m_pt->Init(bflag);
+}
+
+//-----------------------------------------------------------------------------
+void FERemodelingMaterialPoint::Serialize(DumpFile& ar)
+{
+	if (m_pt) m_pt->Serialize(ar);
+        
+	if (ar.IsSaving())
+	{
+		ar << dsed << rhorp;
+	}
+	else
+	{
+		ar >> dsed >> rhorp;
+	}
+}
+
+//=============================================================================
+// FERemodelingElasticMaterial
+//=============================================================================
+
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FERemodelingElasticMaterial, FEElasticMaterial)
-ADD_PARAMETER(m_rhormin, FE_PARAM_DOUBLE, "min_density");
-ADD_PARAMETER(m_rhormax, FE_PARAM_DOUBLE, "max_density");
+	ADD_PARAMETER(m_rhormin, FE_PARAM_DOUBLE, "min_density");
+	ADD_PARAMETER(m_rhormax, FE_PARAM_DOUBLE, "max_density");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -46,6 +92,19 @@ double FERemodelingElasticMaterial::StrainEnergy(FEMaterialPoint& mp)
 //! Stress function
 mat3ds FERemodelingElasticMaterial::Stress(FEMaterialPoint& mp)
 {
+	double dt = FEMaterialPoint::dt;
+
+    FERemodelingMaterialPoint& rpt = *(mp.ExtractData<FERemodelingMaterialPoint>());
+	FEElasticMaterialPoint& pt = *(mp.ExtractData<FEElasticMaterialPoint>());
+
+	// calculate the sed derivative with respect to mass density at this material point
+    rpt.dsed = Tangent_SE_Density(mp);
+                
+	double rhorhat = m_pSupp->Supply(mp);
+	pt.m_rhor = rhorhat*dt + rpt.rhorp;
+	if (pt.m_rhor > m_rhormax) pt.m_rhor = m_rhormax;
+	if (pt.m_rhor < m_rhormin) pt.m_rhor = m_rhormin;
+
 	return m_pBase->Stress(mp);
 }
 

@@ -28,25 +28,14 @@ void FEElasticSolidDomain::Reset()
 {
 	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 
-	// determine if remodeling solid
-	FERemodelingElasticMaterial* prs = dynamic_cast<FERemodelingElasticMaterial*> (m_pMat);
-	if (prs)
+	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
-		FEElasticMaterial* pme = prs->GetElasticMaterial();
-		for (size_t i=0; i<m_Elem.size(); ++i)
-		{
-			FESolidElement& el = m_Elem[i];
-			int n = el.GaussPoints();
-			for (int j=0; j<n; ++j) {
-				el.m_State[j]->Init(false);
-				FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-				FERemodelingMaterialPoint& rpt = *el.m_State[j]->ExtractData<FERemodelingMaterialPoint>();
-
-				pt.m_rhor = pme->Density();
-
-				// reset referential solid density at previous time
-				rpt.rhorp = pt.m_rhor;
-			}
+		FESolidElement& el = m_Elem[i];
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) {
+			FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
+			pt.m_rhor = pme->Density();
 		}
 	}
 }
@@ -144,12 +133,8 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 
 //-----------------------------------------------------------------------------
 //! Initialize element data
-//! \todo The explicit reference to FERemodelingElasticMaterial is awkward. Let's see if we can put that elsewhere.
 void FEElasticSolidDomain::InitElements()
 {
-	// determine if remodeling solid
-	FERemodelingElasticMaterial* prs = dynamic_cast<FERemodelingElasticMaterial*> (m_pMat);
-
 	const int NE = FEElement::MAX_NODES;
 	vec3d x0[NE], xt[NE], r0, rt;
 	FEMesh& m = *GetMesh();
@@ -177,14 +162,6 @@ void FEElasticSolidDomain::InitElements()
 			pt.m_J = defgrad(el, pt.m_F, j);
 
 			el.m_State[j]->Init(false);
-
-			// initialize remodeling data
-            if (prs) {
-                FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-                FERemodelingMaterialPoint& rpt = *el.m_State[j]->ExtractData<FERemodelingMaterialPoint>();
-                // reset referential solid density at previous time
-                rpt.rhorp = pt.m_rhor;
-            }
 		}
 	}
 }
@@ -1148,9 +1125,6 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 	FESolidMaterial* pm = dynamic_cast<FESolidMaterial*>(m_pMat);
 	assert(pm);
 
-	// determine if remodeling solid
-	FERemodelingElasticMaterial* prs = dynamic_cast<FERemodelingElasticMaterial*> (m_pMat);
-
 	// loop over the integration points and calculate
 	// the stress at the integration point
 	for (int n=0; n<nint; ++n)
@@ -1167,24 +1141,11 @@ void FEElasticSolidDomain::UpdateElementStress(int iel, double dt)
 		// get the deformation gradient and determinant
 		pt.m_J = defgrad(el, pt.m_F, n);
 
-		// calculate the stress at this material point
-		pt.m_s = pm->Stress(mp);
-
 		// calculate the strain energy density at this material point
 		pt.m_sed = pm->StrainEnergy(mp);
 
-		// for remodeling solids, update the referential mass density
-		if (prs)
-		{
-            FERemodelingMaterialPoint& rpt = *(mp.ExtractData<FERemodelingMaterialPoint>());
-            // calculate the sed derivative with respect to mass density at this material point
-            rpt.dsed = pm->Tangent_SE_Density(mp);
-                
-			double rhorhat = prs->m_pSupp->Supply(mp);
-			pt.m_rhor = rhorhat*dt + rpt.rhorp;
-			if (pt.m_rhor > prs->m_rhormax) pt.m_rhor = prs->m_rhormax;
-			if (pt.m_rhor < prs->m_rhormin) pt.m_rhor = prs->m_rhormin;
-		}
+		// calculate the stress at this material point
+		pt.m_s = pm->Stress(mp);
 	}
 }
 
