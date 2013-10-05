@@ -1,8 +1,5 @@
-#include "FEBiphasicSolver.h"
-#include "FEBiphasicSolidDomain.h"
-#include "FESlidingInterface2.h"
-#include "FESlidingInterface3.h"
-#include "FEBioMech/FEElasticDomain.h"
+#include "FEMultiphasicSolver.h"
+#include "FEMultiphasicDomain.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FEResidualVector.h"
@@ -25,11 +22,12 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolver)
+BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolver)
 	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"        );
 	ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );
 	ADD_PARAMETER(m_Ptol         , FE_PARAM_DOUBLE, "ptol"        );
+	ADD_PARAMETER(m_Ctol         , FE_PARAM_DOUBLE, "ctol"        );
 	ADD_PARAMETER(m_Rmin         , FE_PARAM_DOUBLE, "min_residual");
 	ADD_PARAMETER(m_bsymm        , FE_PARAM_BOOL  , "symmetric_biphasic");
 	ADD_PARAMETER(m_bfgs.m_LStol , FE_PARAM_DOUBLE, "lstol"       );
@@ -41,86 +39,80 @@ BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolver)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEBiphasicSolver::FEBiphasicSolver(FEModel& fem) : FESolidSolver(fem)
+FEMultiphasicSolver::FEMultiphasicSolver(FEModel& fem) : FEBiphasicSolver(fem)
 {
-	m_Ptol = 0.01;
-	m_ndeq = 0;
-	m_npeq = 0;
+	m_Ctol = 0.01;
+	for (int k=0; k<MAX_CDOFS; ++k) m_nceq[k] = 0;
 }
 
 //-----------------------------------------------------------------------------
 //! Allocates and initializes the data structures.
 //
-bool FEBiphasicSolver::Init()
+bool FEMultiphasicSolver::Init()
 {
 	// initialize base class
-	if (FESolidSolver::Init() == false) return false;
+	if (FEBiphasicSolver::Init() == false) return false;
 
-	// allocate poro-vectors
-	assert(m_ndeq > 0);
-	m_di.assign(m_ndeq, 0);
-	m_Di.assign(m_ndeq, 0);
-
-//	assert(m_npeq > 0);
-	if (m_npeq > 0) {
-		m_pi.assign(m_npeq, 0);
-		m_Pi.assign(m_npeq, 0);
-
-		// we need to fill the total displacement vector m_Ut
-		// TODO: I need to find an easier way to do this
-		FEMesh& mesh = m_fem.GetMesh();
-		int i, n;
-		for (i=0; i<mesh.Nodes(); ++i)
-		{
-			FENode& node = mesh.Node(i);
-
-			// pressure dofs
-			n = node.m_ID[DOF_P]; if (n >= 0) m_Ut[n] = node.m_pt;
+	int i, j, n;
+	
+	// allocate concentration-vectors
+	m_ci.assign(MAX_CDOFS,vector<double>(0,0));
+	m_Ci.assign(MAX_CDOFS,vector<double>(0,0));
+	for (i=0; i<MAX_CDOFS; ++i) {
+		m_ci[i].assign(m_nceq[i], 0);
+		m_Ci[i].assign(m_nceq[i], 0);
+	}
+	
+	// we need to fill the total displacement vector m_Ut
+	// TODO: I need to find an easier way to do this
+	FEMesh& mesh = m_fem.GetMesh();
+	for (i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		
+		// concentration dofs
+		for (j=0; j<MAX_CDOFS; ++j) {
+			if (m_nceq[j]) {
+				n = node.m_ID[DOF_C+j];
+				if (n >= 0) m_Ut[n] = node.m_ct[j];
+			}
 		}
 	}
 
 	return true;
 }
 
-
 //-----------------------------------------------------------------------------
 //! Initialize equations
-bool FEBiphasicSolver::InitEquations()
+bool FEMultiphasicSolver::InitEquations()
 {
 	// base class does most of the work
-	FESolidSolver::InitEquations();
-
-	int i;
-
-	// determined the nr of pressure and concentration equations
+	FEBiphasicSolver::InitEquations();
+	
+	int i,j;
+	
+	// determined the nr of concentration equations
 	FEMesh& mesh = m_fem.GetMesh();
-	m_ndeq = m_npeq = 0;
+	for (j=0; j<MAX_CDOFS; ++j) m_nceq[j] = 0;
 	
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& n = mesh.Node(i);
-		if (n.m_ID[DOF_X] != -1) m_ndeq++;
-		if (n.m_ID[DOF_Y] != -1) m_ndeq++;
-		if (n.m_ID[DOF_Z] != -1) m_ndeq++;
-		if (n.m_ID[DOF_P] != -1) m_npeq++;
+		for (j=0; j<MAX_CDOFS; ++j)
+			if (n.m_ID[DOF_C+j] != -1) m_nceq[j]++;
 	}
-
+	
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 //! Prepares the data for the first QN iteration. 
 //!
-//! \todo There is some more stuff in the base method that 
-//!       I need to move to this method, but since it will
-//!       change the order of some operations I need to make
-//!       sure it won't break anything
-void FEBiphasicSolver::PrepStep(double time)
+void FEMultiphasicSolver::PrepStep(double time)
 {
-	zero(m_Pi);
-	zero(m_Di);
-
-	FESolidSolver::PrepStep(time);
+	for (int j=0; j<MAX_CDOFS; ++j)
+		if (m_nceq[j]) zero(m_Ci[j]);
+	FEBiphasicSolver::PrepStep(time);
 }
 
 //-----------------------------------------------------------------------------
@@ -128,9 +120,9 @@ void FEBiphasicSolver::PrepStep(double time)
 //! The details of this implementation of the BFGS method can be found in:
 //!   "Finite Element Procedures", K.J. Bathe, p759 and following
 //!
-bool FEBiphasicSolver::Quasin(double time)
+bool FEMultiphasicSolver::Quasin(double time)
 {
-	int i;
+	int i, j;
 	double s;
 
 	// convergence norms
@@ -148,6 +140,11 @@ bool FEBiphasicSolver::Quasin(double time)
 	double	normP;		// current pressure norm
 	double	normp;		// incremement pressure norm
 
+	// solute convergence data
+	double	normCi[MAX_CDOFS];	// initial concentration norm
+	double	normC[MAX_CDOFS];	// current concentration norm
+	double	normc[MAX_CDOFS];	// incremement concentration norm
+
 	// initialize flags
 	bool bconv = false;		// convergence flag
 	bool breform = false;	// reformation flag
@@ -155,8 +152,8 @@ bool FEBiphasicSolver::Quasin(double time)
 	// get the current step
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
 
-	// make-sure this is a poro-elastic problem
-	assert(pstep->GetType() == FE_BIPHASIC);
+	// make sure this is poro-solute problem
+	assert(pstep->GetType() == FE_MULTIPHASIC);
 
 	// prepare for the first iteration
 	PrepStep(time);
@@ -281,6 +278,34 @@ bool FEBiphasicSolver::Quasin(double time)
 			if ((m_Ptol > 0) && (normp > (m_Ptol*m_Ptol)*normP)) bconv = false;
 		}
 
+		// check solute convergence
+		{
+			// extract the concentration increments
+			for (j=0; j<MAX_CDOFS; ++j) {
+				if (m_nceq[j]) {
+					GetConcentrationData(m_ci[j], m_bfgs.m_ui,j);
+					
+					// set initial norm
+					if (m_niter == 0)
+						normCi[j] = fabs(m_ci[j]*m_ci[j]);
+					
+					// update total concentration
+					for (i=0; i<m_nceq[j]; ++i) m_Ci[j][i] += s*m_ci[j][i];
+					
+					// calculate norms
+					normC[j] = m_Ci[j]*m_Ci[j];
+					normc[j] = (m_ci[j]*m_ci[j])*(s*s);
+					
+				}
+			}
+			
+			// check convergence
+			if (m_Ctol > 0) {
+				for (j=0; j<MAX_CDOFS; ++j)
+					if (m_nceq[j]) bconv = bconv && (normc[j] <= (m_Ctol*m_Ctol)*normC[j]);
+			}
+		}
+
 		// print convergence summary
 		oldmode = clog.GetMode();
 		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
@@ -291,11 +316,15 @@ bool FEBiphasicSolver::Quasin(double time)
 		clog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
 		clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
 		if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
-		clog.printf("\tconvergence norms :     INITIAL         CURRENT         REQUIRED\n");
-		clog.printf("\t   residual         %15le %15le %15le \n", normRi, normR1, m_Rtol*normRi);
-		clog.printf("\t   energy           %15le %15le %15le \n", normEi, normE1, m_Etol*normEi);
-		clog.printf("\t   displacement     %15le %15le %15le \n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
-		clog.printf("\t   fluid pressure   %15le %15le %15le \n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
+		clog.printf("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
+		clog.printf("\t residual               %15le %15le %15le\n", normRi, normR1, m_Rtol*normRi);
+		clog.printf("\t energy                 %15le %15le %15le\n", normEi, normE1, m_Etol*normEi);
+		clog.printf("\t displacement           %15le %15le %15le\n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
+		clog.printf("\t fluid pressure         %15le %15le %15le\n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
+		for (j=0; j<MAX_CDOFS; ++j) {
+			if (m_nceq[j])
+				clog.printf("\t solute %d concentration %15le %15le %15le\n", j+1, normCi[j], normc[j] ,(m_Ctol*m_Ctol)*normC[j] );
+		}
 
 		clog.SetMode(oldmode);
 
@@ -325,6 +354,8 @@ bool FEBiphasicSolver::Quasin(double time)
 				normRi = normR1;
 				normDi = normd;
 				normPi = normp;
+				for (j=0; j<MAX_CDOFS; ++j)
+					if (m_nceq[j]) normCi[j] = normc[j];
 				breform = true;
 			}
 			else
@@ -453,7 +484,7 @@ bool FEBiphasicSolver::Quasin(double time)
 //! This is because they do not depend on the geometry 
 //! so we only calculate them once (in Quasin) and then add them here.
 
-bool FEBiphasicSolver::Residual(vector<double>& R)
+bool FEMultiphasicSolver::Residual(vector<double>& R)
 {
 	int i;
 	double dt = m_fem.GetCurrentStep()->m_dt;
@@ -477,36 +508,44 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
-/*
-	// loop over all domains
+
+/*	// loop over all domains
 	for (i=0; i<mesh.Domains(); ++i) 
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.Residual(this, R);
 	}
 */
-	// calculate internal stress force
+
+	// internal stress work
 	for (i=0; i<mesh.Domains(); ++i)
 	{
 		FEElasticDomain& dom = dynamic_cast<FEElasticDomain&>(mesh.Domain(i));
 		dom.InternalForces(RHS);
 	}
 
-	// calculate internal fluid work
 	if (m_fem.GetCurrentStep()->m_nanalysis == FE_STEADY_STATE)
 	{
-		for (i=0; i<mesh.Domains(); ++i)
+		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalFluidWorkSS(this, R, dt);
+			FEMultiphasicDomain* pdom = dynamic_cast<FEMultiphasicDomain*>(&mesh.Domain(i));
+			if (pdom)
+			{
+				pdom->InternalFluidWorkSS (this, R, dt);
+				pdom->InternalSoluteWorkSS(this, R, dt);
+			}
 		}
 	}
 	else
 	{
-		for (i=0; i<mesh.Domains(); ++i)
+		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->InternalFluidWork(this, R, dt);
+			FEMultiphasicDomain* pdom = dynamic_cast<FEMultiphasicDomain*>(&mesh.Domain(i));
+			if (pdom)
+			{
+ 				pdom->InternalFluidWork (this, R, dt);
+				pdom->InternalSoluteWork(this, R, dt);
+			}
 		}
 	}
 
@@ -524,7 +563,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 		ContactForces(RHS);
 	}
 
-	// calculate nonlinear constraint forces
+	// calculate linear constraint forces
 	// note that these are the linear constraints
 	// enforced using the augmented lagrangian
 	NonLinearConstraintForces(RHS);
@@ -551,7 +590,7 @@ bool FEBiphasicSolver::Residual(vector<double>& R)
 //-----------------------------------------------------------------------------
 //! Calculates global stiffness matrix.
 
-bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
+bool FEMultiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 {
 	// get the stiffness matrix
 	SparseMatrix& K = *m_pK;
@@ -579,16 +618,16 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->StiffnessMatrixSS(this, bsymm, dt);
+			FEMultiphasicDomain* pdom = dynamic_cast<FEMultiphasicDomain*>(&mesh.Domain(i));
+			if (pdom) pdom->StiffnessMatrixSS(this, bsymm, tp);
 		}
 	}
 	else
 	{
 		for (i=0; i<mesh.Domains(); ++i) 
 		{
-			FEBiphasicSolidDomain* pdom = dynamic_cast<FEBiphasicSolidDomain*>(&mesh.Domain(i));
-			if (pdom) pdom->StiffnessMatrix(this, bsymm, dt);
+			FEMultiphasicDomain* pdom = dynamic_cast<FEMultiphasicDomain*>(&mesh.Domain(i));
+			if (pdom) pdom->StiffnessMatrix(this, bsymm, tp);
 		}
 	}
 
@@ -645,46 +684,74 @@ bool FEBiphasicSolver::StiffnessMatrix(const FETimePoint& tp)
 }
 
 //-----------------------------------------------------------------------------
-//! Update the model's kinematic data. This is overriden from FESolidSolver so
-//! that biphasic data is updated
-void FEBiphasicSolver::UpdateKinematics(vector<double>& ui)
+void FEMultiphasicSolver::GetConcentrationData(vector<double> &ci, vector<double> &ui, const int sol)
+{
+	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
+	zero(ci);
+	for (int i=0; i<N; ++i)
+	{
+		FENode& n = m_fem.GetMesh().Node(i);
+		nid = n.m_ID[DOF_C+sol];
+		if (nid != -1)
+		{
+			nid = (nid < -1 ? -nid-2 : nid);
+			ci[m++] = ui[nid];
+			assert(m <= (int) ci.size());
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+//! Update the model's kinematic data. This is overriden from FEBiphasicSolver so
+//! that solute data is updated
+void FEMultiphasicSolver::UpdateKinematics(vector<double>& ui)
 {
 	// first update all solid-mechanics kinematics
-	FESolidSolver::UpdateKinematics(ui);
+	FEBiphasicSolver::UpdateKinematics(ui);
 
-	// update poroelastic data
-	UpdatePoro(ui);
+	// update solute-poroelastic data
+	UpdateSolute(ui);
 }
 
 //-----------------------------------------------------------------------------
-//! Updates the poroelastic data
-void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
+//! Updates the solute data
+void FEMultiphasicSolver::UpdateSolute(vector<double>& ui)
 {
-	int i, n;
-
+	int i, j, n;
+	
 	FEMesh& mesh = m_fem.GetMesh();
 	FEAnalysis* pstep = m_fem.GetCurrentStep();
-
-	// update poro-elasticity data
+	
+	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-
-		// update nodal pressures
-		n = node.m_ID[DOF_P];
-		if (n >= 0) node.m_pt = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+		
+		// update nodal concentration
+		for (j=0; j<MAX_CDOFS; ++j) {
+			n = node.m_ID[DOF_C+j];
+//			if (n >= 0) node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+			// Force the concentrations to remain positive
+			if (n >= 0) {
+				node.m_ct[j] = 0 + m_Ut[n] + m_Ui[n] + ui[n];
+				if (node.m_ct[j] < 0) {
+					node.m_ct[j] = 0;
+				}
+			}
+		}
 	}
-
-	// update poro-elasticity data
+	
+	// update solute data
 	for (i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-
+		
 		// update velocities
 		node.m_vt  = (node.m_rt - node.m_rp) / pstep->m_dt;
 	}
-
-	// make sure the prescribed pressures are fullfilled
+	
+	// make sure the prescribed concentrations are fullfilled
 	int ndis = m_fem.PrescribedBCs();
 	for (i=0; i<ndis; ++i)
 	{
@@ -696,101 +763,12 @@ void FEBiphasicSolver::UpdatePoro(vector<double>& ui)
 			int bc   = dc.bc;
 			double s = dc.s;
 			double r = dc.r;	// GAA
-
+			
 			FENode& node = mesh.Node(n);
-
-			if (bc == DOF_P) node.m_pt = r + s*m_fem.GetLoadCurve(lc)->Value(); // GAA
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEBiphasicSolver::UpdateContact()
-{
-	FEAnalysis* pstep = m_fem.GetCurrentStep();
-
-	// If this analysis is a poroelastic analysis that uses
-	// a biphasic contact interface, we need to make sure that
-	// the free draining dof's are processed properly
-	bool bporo = (pstep->GetType() == FE_BIPHASIC) || (pstep->GetType() == FE_POROSOLUTE) || (pstep->GetType() == FE_MULTIPHASIC);
-	if (bporo)
-	{
-		// mark all free-draining surfaces
-		for (int i=0; i<m_fem.SurfacePairInteractions(); ++i) 
-		{
-			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-
-			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
-			if (psi2) psi2->MarkFreeDraining();
-			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(pci);
-			if (psi3) psi3->MarkAmbient();
-		}
-	}
-
-	// Update all contact interfaces
-	FESolidSolver::UpdateContact();
-
-	if (bporo)
-	{
-		// set free-draining boundary conditions
-		for (int i=0; i<m_fem.SurfacePairInteractions(); ++i) 
-		{
-			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(m_fem.SurfacePairInteraction(i));
-
-			FESlidingInterface2* psi2 = dynamic_cast<FESlidingInterface2*>(pci);
-			if (psi2) psi2->SetFreeDraining();
-			FESlidingInterface3* psi3 = dynamic_cast<FESlidingInterface3*>(pci);
-			if (psi3) psi3->SetAmbient();
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEBiphasicSolver::GetDisplacementData(vector<double> &di, vector<double> &ui)
-{
-	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
-	zero(di);
-	for (int i=0; i<N; ++i)
-	{
-		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_X];
-		if (nid != -1)
-		{
-			nid = (nid < -1 ? -nid-2 : nid);
-			di[m++] = ui[nid];
-			assert(m <= (int) di.size());
-		}
-		nid = n.m_ID[DOF_Y];
-		if (nid != -1)
-		{
-			nid = (nid < -1 ? -nid-2 : nid);
-			di[m++] = ui[nid];
-			assert(m <= (int) di.size());
-		}
-		nid = n.m_ID[DOF_Z];
-		if (nid != -1)
-		{
-			nid = (nid < -1 ? -nid-2 : nid);
-			di[m++] = ui[nid];
-			assert(m <= (int) di.size());
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
-{
-	int N = m_fem.GetMesh().Nodes(), nid, m = 0;
-	zero(pi);
-	for (int i=0; i<N; ++i)
-	{
-		FENode& n = m_fem.GetMesh().Node(i);
-		nid = n.m_ID[DOF_P];
-		if (nid != -1)
-		{
-			nid = (nid < -1 ? -nid-2 : nid);
-			pi[m++] = ui[nid];
-			assert(m <= (int) pi.size());
+			
+			for (j=0; j<MAX_CDOFS; ++j) {
+				if (bc == DOF_C+j) node.m_ct[j] = r + s*m_fem.GetLoadCurve(lc)->Value();
+			}
 		}
 	}
 }
@@ -798,19 +776,18 @@ void FEBiphasicSolver::GetPressureData(vector<double> &pi, vector<double> &ui)
 //-----------------------------------------------------------------------------
 //! Save data to dump file
 
-void FEBiphasicSolver::Serialize(DumpFile& ar)
+void FEMultiphasicSolver::Serialize(DumpFile& ar)
 {
-	FESolidSolver::Serialize(ar);
+	FEBiphasicSolver::Serialize(ar);
 
 	if (ar.IsSaving())
 	{
-		ar << m_Ptol;
-		ar << m_ndeq << m_npeq;
+		ar << m_Ctol;
+		for (int i=0; i<MAX_CDOFS; ++i) ar << m_nceq[i];
 	}
 	else
 	{
-		ar >> m_Ptol;
-		ar >> m_ndeq >> m_npeq;
-		ar >> m_ndeq >> m_npeq;
+		ar >> m_Ctol;
+		for (int i=0; i<MAX_CDOFS; ++i) ar >> m_nceq[i];
 	}
 }

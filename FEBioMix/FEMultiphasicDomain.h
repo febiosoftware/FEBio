@@ -1,12 +1,13 @@
 #pragma once
-#include "FEBiphasicSoluteDomain.h"
+#include "FEBioMech/FEElasticSolidDomain.h"
+#include "FECore/FETypes.h"
 
 //-----------------------------------------------------------------------------
 //! Domain class for multiphasic 3D solid elements
 //! Note that this class inherits from FEElasticSolidDomain since this domain
 //! also needs to calculate elastic stiffness contributions.
 //!
-class FEMultiphasicDomain : public FEBiphasicSoluteDomain
+class FEMultiphasicDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor

@@ -23,6 +23,7 @@
 #include "FECore/Image.h"
 #include "FEBioHeat/FEHeatTransferAnalysis.h"
 #include "FEBioMix/FEBiphasicAnalysis.h"
+#include "FEBioMix/FEMultiphasicAnalysis.h"
 #include "FEBioMech/FESolidAnalysis.h"
 
 //-----------------------------------------------------------------------------
@@ -290,6 +291,7 @@ FEAnalysis* FEFEBioImport::CreateNewStep()
 	case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (*m_pfem); break;
 	case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (*m_pfem); break;
 	case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(*m_pfem); break;
+	case FE_MULTIPHASIC   : pstep = new FEMultiphasicAnalysis   (*m_pfem); break;
 	case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (*m_pfem); break;
 //	case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
 	default:

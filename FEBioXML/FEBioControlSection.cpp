@@ -4,6 +4,7 @@
 #include "FEBioMech/FEExplicitSolidSolver.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
+#include "FEBioMix/FEMultiphasicSolver.h"
 #include "FEBioMech/FELinearSolidSolver.h"
 #include "FEBioMech/FECoupledHeatSolidSolver.h"
 #include "FEBioMech/FEUDGHexDomain.h"
@@ -19,6 +20,7 @@ FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 	case FE_EXPLICIT_SOLID: return new FEExplicitSolidSolver   (fem);
 	case FE_BIPHASIC      : return new FEBiphasicSolver        (fem);
 	case FE_POROSOLUTE    : return new FEBiphasicSoluteSolver  (fem);
+	case FE_MULTIPHASIC   : return new FEMultiphasicSolver     (fem);
 	case FE_HEAT          : return new FEHeatSolver            (fem);
 	case FE_LINEAR_SOLID  : return new FELinearSolidSolver     (fem);
 	case FE_HEAT_SOLID    : return new FECoupledHeatSolidSolver(fem);

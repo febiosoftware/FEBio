@@ -7,7 +7,7 @@
 #endif
 
 //-----------------------------------------------------------------------------
-FEMultiphasicDomain::FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEBiphasicSoluteDomain(pm, pmat)
+FEMultiphasicDomain::FEMultiphasicDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
 { 
 	m_ntype = FE_MULTIPHASIC_DOMAIN; 
 }

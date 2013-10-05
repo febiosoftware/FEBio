@@ -14,6 +14,7 @@
 #include "FEBioMech/FERigidJoint.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
+#include "FEBioMix/FEMultiphasicSolver.h"
 #include "FEBioMech/FERigidBody.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
@@ -117,6 +118,7 @@ void echo_input(FEBioModel& fem)
 	case FE_BIPHASIC      : szmod = "poroelastic"    ; break;
 	case FE_HEAT          : szmod = "heat transfer"  ; break;
 	case FE_POROSOLUTE    : szmod = "biphasic-solute"; break;
+	case FE_MULTIPHASIC   : szmod = "multiphasic"    ; break;
 	case FE_LINEAR_SOLID  : szmod = "linear solid"   ; break;
 	case FE_HEAT_SOLID    : szmod = "heat solid"     ; break;
 	default:
@@ -174,10 +176,16 @@ void echo_input(FEBioModel& fem)
 		clog.printf("\tResidual convergence tolerance ................. : %lg\n", ps->m_Rtol);
 		clog.printf("\tMinimal residual value ......................... : %lg\n", ps->m_Rmin);
 	}
+
 	FEBiphasicSolver* pps = dynamic_cast<FEBiphasicSolver*>(step.m_psolver);
 	if (pps) clog.printf("\tFluid pressure convergence tolerance ........... : %lg\n", pps->m_Ptol);
+
 	FEBiphasicSoluteSolver* pss = dynamic_cast<FEBiphasicSoluteSolver*>(step.m_psolver);
 	if (pss) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pss->m_Ctol);
+
+	FEMultiphasicSolver* pmps = dynamic_cast<FEMultiphasicSolver*>(step.m_psolver);
+	if (pmps) clog.printf("\tSolute concentration convergence tolerance ..... : %lg\n", pmps->m_Ctol);
+
 	if (ps)
 	{
 		clog.printf("\tLinesearch convergence tolerance ............... : %lg\n", ps->m_bfgs.m_LStol );
@@ -186,6 +194,7 @@ void echo_input(FEBioModel& fem)
 		clog.printf("\tMax condition number ........................... : %lg\n", ps->m_bfgs.m_cmax  );
 	}
 	clog.printf("\n\n");
+
 
 	// print output data
 	clog.printf(" OUTPUT DATA\n");

@@ -162,7 +162,7 @@ void FEModel::EvaluateMaterialParameters(FEMaterial* pm)
 	int N = pm->Properties();
 	for (int i=0; i<N; ++i)
 	{
-		FEMaterial* pmi = pm->GetProperty(i); assert(pmi);
+		FEMaterial* pmi = pm->GetProperty(i);
 		if (pmi) EvaluateMaterialParameters(pmi);
 	}
 }

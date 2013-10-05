@@ -27,6 +27,7 @@
 #include "FEBioMix/FESoluteFlux.h"
 #include "FEBioHeat/FEHeatTransferAnalysis.h"
 #include "FEBioMix/FEBiphasicAnalysis.h"
+#include "FEBioMix/FEMultiphasicAnalysis.h"
 #include "FEBioMech/FESolidAnalysis.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FEBioMech/FEElasticShellDomain.h"
@@ -545,6 +546,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 			case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (*this); break;
 			case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (*this); break;
 			case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(*this); break;
+			case FE_MULTIPHASIC   : pstep = new FEMultiphasicAnalysis   (*this); break;
 			case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (*this); break;
 //			case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*this); break;
 			default:
@@ -2014,8 +2016,8 @@ bool FEBioModel::InitPoroSolute()
 
 	// make sure this is the poro-solute module
 	int nstep = m_pStep->GetType();
-	bool bporo = ((nstep == FE_BIPHASIC) || (nstep == FE_POROSOLUTE));
-	bool bsolu = (nstep == FE_POROSOLUTE);
+	bool bporo = ((nstep == FE_BIPHASIC) || (nstep == FE_POROSOLUTE) || (nstep == FE_MULTIPHASIC));
+	bool bsolu = (nstep == FE_POROSOLUTE) || (nstep == FE_MULTIPHASIC);
 	
 	if (!bporo)
 	{
