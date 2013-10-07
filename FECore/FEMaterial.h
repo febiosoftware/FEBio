@@ -204,7 +204,7 @@ protected:
 class FESoluteData 
 {
 public:
-	FESoluteData() { m_nID = -1; m_rhoT = 0; m_M = 0; m_z = 0; m_szname[0] = 0; }
+	FESoluteData() { m_nID = -1; m_rhoT = 1; m_M = 1; m_z = 0; m_szname[0] = 0; }
 
 public:
 	int		m_nID;			//!< solute ID
