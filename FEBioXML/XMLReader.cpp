@@ -121,6 +121,18 @@ int XMLTag::value(int* pi, int n)
 
 //////////////////////////////////////////////////////////////////////
 
+void XMLTag::value(bool& val)
+{ 
+	int n=0; 
+	sscanf(m_szval.c_str(), "%d", &n); 
+	val = (n != 0); 
+}
+
+void XMLTag::value(char* szstr)
+{
+	strcpy(szstr, m_szval.c_str()); 
+}
+
 void XMLTag::value(vec3d& v)
 {
 	int n = sscanf(m_szval.c_str(), "%lg,%lg,%lg", &v.x, &v.y, &v.z);
@@ -272,6 +284,20 @@ bool XMLTag::AttributeValue(const char* szat, int& n, bool bopt)
 	return true;
 }
 
+//////////////////////////////////////////////////////////////////////
+// XMLReader - Exceptions
+//////////////////////////////////////////////////////////////////////
+
+XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLReader::XMLTag& t, const char* sza, const char* szv) : tag(t)
+{ 
+	strcpy(szatt, sza);
+	strcpy(szval, szv);
+}
+
+XMLReader::MissingAttribute::MissingAttribute(XMLTag& t, const char* sza) : tag(t)
+{ 
+	strcpy(szatt, sza); 
+}
 
 //////////////////////////////////////////////////////////////////////
 // XMLReader

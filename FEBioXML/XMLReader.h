@@ -94,16 +94,16 @@ public:
 		
 		const char* Name() { return m_sztag; }
 
-		void value(char* szstr) { strcpy(szstr, m_szval.c_str()); }
 		void value(double& val) { val = atof(m_szval.c_str()); } 
 		void value(float& val)  { val = (float) atof(m_szval.c_str()); }
-		void value(bool& val) { int n=0; sscanf(m_szval.c_str(), "%d", &n); val = (n != 0); }
 		void value(int& val) { val = atoi(m_szval.c_str()); }
 		void value(long& val) { val = (long) atoi(m_szval.c_str()); }
 		void value(short& val) { val = (short) atoi(m_szval.c_str()); }
 		int value(double* pf, int n);
 		int value(float* pf, int n);
 		int value(int* pi, int n);
+		void value(bool& val);
+		void value(char* szstr);
 		void value(vec3d& v);
 		void value(vector<int>& l);
 
@@ -147,11 +147,7 @@ public:
 		XMLTag tag;
 		char szatt[MAX_TAG];
 		char szval[MAX_TAG];
-		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv) : tag(t)
-		{ 
-			strcpy(szatt, sza);
-			strcpy(szval, szv);
-		}
+		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv);
 	};
 
 	class MissingAttribute
@@ -159,7 +155,7 @@ public:
 	public:
 		XMLTag tag;
 		char szatt[MAX_TAG];
-		MissingAttribute(XMLTag& t, const char* sza) : tag(t) { strcpy(szatt, sza); }
+		MissingAttribute(XMLTag& t, const char* sza);
 	};
 
 	//------------------------

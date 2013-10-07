@@ -12,7 +12,7 @@
 class InvalidVariableName
 {
 public:
-	InvalidVariableName(const char* sz) { strcpy(szname, sz); }
+	InvalidVariableName(const char* sz);
 	char szname[256];
 };
 
