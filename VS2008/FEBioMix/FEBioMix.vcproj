@@ -233,7 +233,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEMultiphasicAnalysis.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEMultiphasicDomain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEMultiphasicSolver.cpp"
 				>
 			</File>
 			<File
@@ -419,7 +427,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEMultiphasicAnalysis.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEMultiphasicDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEMultiphasicSolver.h"
 				>
 			</File>
 			<File
