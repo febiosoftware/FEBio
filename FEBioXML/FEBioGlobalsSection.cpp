@@ -14,6 +14,7 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 	{
 		if      (tag == "Constants"  ) ParseConstants(tag);
 		else if (tag == "Solutes"    ) ParseGSSoluteData(tag);
+		else if (tag == "SolidBoundMolecules") ParseGSSBMData(tag);
 		else if (tag == "Generations") ParseMGData(tag);
 		else if (m_pim->Version() < 0x0102)
 		{

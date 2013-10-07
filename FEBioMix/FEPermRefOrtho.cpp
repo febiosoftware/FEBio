@@ -1,9 +1,6 @@
 #include "FEPermRefOrtho.h"
 
 
-// register the material with the framework
-REGISTER_MATERIAL(FEPermRefOrtho, "perm-ref-ortho");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefOrtho, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");

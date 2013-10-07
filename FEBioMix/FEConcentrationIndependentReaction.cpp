@@ -9,9 +9,6 @@
 #include "stdafx.h"
 #include "FEConcentrationIndependentReaction.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEConcentrationIndependentReaction, "concentration-independent");
-
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEConcentrationIndependentReaction::ReactionSupply(FEMaterialPoint& pt)

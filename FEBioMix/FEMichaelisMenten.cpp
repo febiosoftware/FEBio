@@ -9,9 +9,6 @@
 
 #include "FEMichaelisMenten.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEMichaelisMenten, "Michaelis-Menten");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMichaelisMenten, FEChemicalReaction)
 	ADD_PARAMETER(m_Km, FE_PARAM_DOUBLE, "Km");

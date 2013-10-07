@@ -9,9 +9,6 @@
 
 #include "FEMassActionForward.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEMassActionForward, "mass-action-forward");
-
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEMassActionForward::ReactionSupply(FEMaterialPoint& pt)

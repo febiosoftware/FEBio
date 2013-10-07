@@ -97,6 +97,7 @@ REGISTER_MATERIAL(FEEFDUncoupled                 , "EFD uncoupled"              
 REGISTER_MATERIAL(FEEFDVerondaWestmann           , "EFD Veronda-Westmann"          );
 REGISTER_MATERIAL(FEElasticMixture               , "solid mixture"                 );
 REGISTER_MATERIAL(FEEllipsoidalFiberDistribution , "ellipsoidal fiber distribution");
+REGISTER_MATERIAL(FEEllipsoidalFiberDistributionOld, "ellipsoidal fiber distribution (old)");
 REGISTER_MATERIAL(FEFiberExpPow                  , "fiber-exp-pow"                 );
 REGISTER_MATERIAL(FEFiberExpPowUncoupled         , "fiber-exp-pow-uncoupled"       );
 REGISTER_MATERIAL(FEFiberNeoHookean              , "fiber neo-Hookean"             );

@@ -13,9 +13,6 @@
 // FEEllipsoidalFiberDistribution
 //-----------------------------------------------------------------------------
 
-// register the material with the framework
-REGISTER_MATERIAL(FEEllipsoidalFiberDistribution, "ellipsoidal fiber distribution");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEllipsoidalFiberDistribution, FEElasticMaterial)
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");
@@ -311,9 +308,6 @@ double FEEllipsoidalFiberDistributionOld::m_sth[NSTH];
 double FEEllipsoidalFiberDistributionOld::m_cph[NSTH];
 double FEEllipsoidalFiberDistributionOld::m_sph[NSTH];
 double FEEllipsoidalFiberDistributionOld::m_w[NSTH];
-
-// register the material with the framework
-REGISTER_MATERIAL(FEEllipsoidalFiberDistributionOld, "ellipsoidal fiber distribution (old)");
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEllipsoidalFiberDistributionOld, FEElasticMaterial)

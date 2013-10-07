@@ -6,6 +6,8 @@ FEChemicalReaction::FEChemicalReaction()
 {
 	m_Vovr = false; 
 	m_pMP = 0; 
+	m_pFwd = 0;
+	m_pRev = 0;
 }
 
 //-----------------------------------------------------------------------------

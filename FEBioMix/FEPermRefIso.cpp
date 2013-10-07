@@ -1,9 +1,6 @@
 #include "FEPermRefIso.h"
 
 
-// register the material with the framework
-REGISTER_MATERIAL(FEPermRefIso, "perm-ref-iso");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEPermRefIso, FEHydraulicPermeability)
 	ADD_PARAMETER(m_perm0, FE_PARAM_DOUBLE, "perm0");

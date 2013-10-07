@@ -23,6 +23,10 @@
 #include "FECarterHayes.h"
 #include "FEReactionRateConst.h"
 #include "FEReactionRateHuiskes.h"
+#include "FEMassActionForward.h"
+#include "FEMichaelisMenten.h"
+#include "FEMassActionReversible.h"
+#include "FEConcentrationIndependentReaction.h"
 
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
@@ -64,6 +68,11 @@ REGISTER_MATERIAL(FESupplyMichaelisMenten        , "supply-Michaelis-Menten" );
 REGISTER_MATERIAL(FECarterHayes					 , "Carter-Hayes"            );
 REGISTER_MATERIAL(FEReactionRateConst			 , "constant reaction rate"  );
 REGISTER_MATERIAL(FEReactionRateHuiskes			 , "Huiskes reaction rate"   );
+REGISTER_MATERIAL(FEMassActionForward			 , "mass-action-forward"     );
+REGISTER_MATERIAL(FEConcentrationIndependentReaction, "concentration-independent");
+REGISTER_MATERIAL(FEMassActionReversible         , "mass-action-reversible");
+REGISTER_MATERIAL(FEMichaelisMenten              , "Michaelis-Menten"      );
+REGISTER_MATERIAL(FESolidBoundMolecule           , "solid_bound"           );
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

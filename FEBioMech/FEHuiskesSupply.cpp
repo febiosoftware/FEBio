@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "FEHuiskesSupply.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEHuiskesSupply, "Huiskes-supply");
-
+//-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEHuiskesSupply, FESolidSupply)
 ADD_PARAMETER(m_B, FE_PARAM_DOUBLE, "B");

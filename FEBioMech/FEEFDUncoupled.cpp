@@ -13,9 +13,6 @@
 // FEEFDUncoupled
 //-----------------------------------------------------------------------------
 
-// register the material with the framework
-REGISTER_MATERIAL(FEEFDUncoupled, "EFD uncoupled");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEEFDUncoupled, FEUncoupledMaterial)
 	ADD_PARAMETERV(m_beta, FE_PARAM_DOUBLEV, 3, "beta");

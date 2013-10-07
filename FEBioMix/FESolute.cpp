@@ -100,14 +100,11 @@ FEParam* FESolute::GetParameter(const ParamString& s)
 	return 0;
 }
 
-// register the FESolidBoundMolecule material with the framework
-REGISTER_MATERIAL(FESolidBoundMolecule, "solid_bound");
-
 // Material parameters for the FESolidBoundMolecule material
 BEGIN_PARAMETER_LIST(FESolidBoundMolecule, FEMaterial)
-ADD_PARAMETER(m_rho0, FE_PARAM_DOUBLE, "rho0");
-ADD_PARAMETER(m_rhomin, FE_PARAM_DOUBLE, "rhomin");
-ADD_PARAMETER(m_rhomax, FE_PARAM_DOUBLE, "rhomax");
+	ADD_PARAMETER(m_rho0, FE_PARAM_DOUBLE, "rho0");
+	ADD_PARAMETER(m_rhomin, FE_PARAM_DOUBLE, "rhomin");
+	ADD_PARAMETER(m_rhomax, FE_PARAM_DOUBLE, "rhomax");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

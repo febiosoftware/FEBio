@@ -9,9 +9,6 @@
 
 #include "FEMassActionReversible.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEMassActionReversible, "mass-action-reversible");
-
 //-----------------------------------------------------------------------------
 //! molar supply at material point
 double FEMassActionReversible::FwdReactionSupply(FEMaterialPoint& pt)

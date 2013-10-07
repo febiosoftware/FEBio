@@ -204,6 +204,7 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 			else if (strcmp(sz, "uvw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
 			else if (strcmp(sz, "t") == 0) node.m_ID[DOF_T] = -1;
 			else if (strcmp(sz, "c") == 0) { node.m_ID[DOF_C] = -1; }
+			else if (strncmp(sz, "c", 1) == 0) node.m_ID[DOF_C + atoi(&sz[1]) - 1] = -1;
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 			++tag;
 		}
