@@ -1160,6 +1160,9 @@ void FEBiphasicSolidDomain::UpdateStresses(FEModel &fem)
 //-----------------------------------------------------------------------------
 void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 {
+   // extract the elastic component
+    FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
 		
@@ -1221,6 +1224,6 @@ void FEBiphasicSolidDomain::UpdateElementStress(int iel)
 		pt.m_s = pmb->Stress(mp);
 
 		// evaluate the strain energy density
-//		pt.m_sed = pme->StrainEnergy(mp);
+		pt.m_sed = pme->StrainEnergy(mp);
 	}
 }

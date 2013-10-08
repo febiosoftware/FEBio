@@ -2136,6 +2136,9 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 	// get the solid element
 	FESolidElement& el = m_Elem[iel];
 
+   // extract the elastic component
+    FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+
 	// get the multiphasic material
 	FEMultiphasic* pmb = dynamic_cast<FEMultiphasic*>(GetMaterial());
 	assert(pmb);
@@ -2247,10 +2250,9 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 		pt.m_s = pmb->Stress(mp);
 
 		// evaluate the strain energy density
-//		pt.sed = pme->StrainEnergy(mp);
+		pt.m_sed = pme->StrainEnergy(mp);
             
 		// evaluate the referential solid density
-//		pt.rhor = pmb->SolidReferentialApparentDensity(mp);
-
+		pt.m_rhor = pmb->SolidReferentialApparentDensity(mp);
 	}
 }
