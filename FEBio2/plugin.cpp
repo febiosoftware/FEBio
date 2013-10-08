@@ -71,7 +71,8 @@ typedef void (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 bool LoadPlugin(const char* szfile)
 {
 	// load the library
-	void* hlib = dlopen(szfile, RTLD_LAZY);
+	void* hlib = dlopen(szfile, RTLD_NOW | RTLD_GLOBAL);
+
 	if (hlib == NULL) return false;
 
 	// find the plugin's registration function

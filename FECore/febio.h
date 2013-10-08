@@ -2,6 +2,7 @@
 #include "FEBioFactory.h"
 #include <vector>
 #include <string.h>
+#include <stdio.h>
 
 //-----------------------------------------------------------------------------
 // Forward declaration of model class
@@ -78,7 +79,7 @@ inline FEBioTask* FEBioKernel::CreateTask(const char* sztag, FEModel* pfem)
       FEBioFactory_T<FEBioTask>* pfac = static_cast< FEBioFactory_T<FEBioTask>* >(*pf);
       if (strcmp(pfac->GetTypeStr(), sztag) == 0) return pfac->Create(pfem);
     }
-  return 0;
+  return static_cast<FEBioTask*>(Create<FEBioTask>(sztag, pfem));
 }
 
 //-----------------------------------------------------------------------------

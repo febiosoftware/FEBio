@@ -14,7 +14,7 @@ CC = icpc
 DEF = -DLINUX -DNDEBUG
 DEFD = -DLINUX 
 
-FLG = -static -O3
+FLG = -O3
 
 #Intel Compiler (for omp.h)
 INTEL_INC = /usr/sci/linux64/intel/Compiler/2012/include/
@@ -70,14 +70,12 @@ MKL_LIB += -liomp5 -pthread
 LIBS += $(MKL_LIB)
 
 # Includes
-#INC += -I../FEBioLib -I../FEBioPlot -I../FEBioXML -I../NumCore -I../FECore -I../FEBioOpt -I../FEBioHeat -I../FEBioMix -I../FEBioMech
+#INC += -I../FEBioLib -I../FEBioPlot -I../FEBioXML -I../NumCore -I../FECore -I../FEBioHeat -I../FEBioMix -I../FEBioMech
 
 lnx64:
 	( cd FEBioLib; $(MAKE) -f febiolib.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioPlot; $(MAKE) -f febioplot.mk \
-	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioHeat; $(MAKE) -f febioheat.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
@@ -93,13 +91,13 @@ lnx64:
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBio2;  $(MAKE) -f febio2.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)" LIBS="$(LIBS)")
+	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
+	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEF)" FLG="$(FLG)" INC="$(INC)")
 
 lnx64d:
 	( cd FEBioLib; $(MAKE) -f febiolib.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioPlot; $(MAKE) -f febioplot.mk \
-	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
-	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBioHeat; $(MAKE) -f febioheat.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
@@ -115,6 +113,8 @@ lnx64d:
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
 	( cd FEBio2;  $(MAKE) -f febio2.mk \
 	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)" LIBS="$(LIBS)")
+	( cd FEBioOpt; $(MAKE) -f febioopt.mk \
+	  PLAT="$(PLAT)" CC="$(CC)" DEF="$(DEFD)" FLG="$(FLG)" INC="$(INC)")
 
 febio2:
 	( cd FEBio2;  $(MAKE) -f febio2.mk \
