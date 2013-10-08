@@ -385,7 +385,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2</IncludePath>
+    <IncludePath>..\..;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2</IncludePath>
     <LibraryPath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\x64\Release;C:\Program Files\Intel\MKL\10.2.7.040\em64t\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)x64</TargetName>
   </PropertyGroup>
