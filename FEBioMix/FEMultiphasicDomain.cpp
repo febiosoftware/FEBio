@@ -2144,7 +2144,6 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 	assert(pmb);
 	const int nsol = (int)pmb->m_pSolute.size();
 	const int nsbm = (int)pmb->m_pSBM.size();
-	vector< vector<double> > ct(nsol, vector<double>(FEElement::MAX_NODES));
 	vector<int> sid(nsol);
 	for (int j=0; j<nsol; ++j) sid[j] = pmb->m_pSolute[j]->GetSoluteID();
 		
@@ -2154,14 +2153,12 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 	// get the number of nodes
 	int neln = el.Nodes();
 		
-	// get the integration weights
-	double* gw = el.GaussWeights();
-		
 	// get the nodal data
 	FEMesh& mesh = *m_pMesh;
 	vec3d r0[FEElement::MAX_NODES];
 	vec3d rt[FEElement::MAX_NODES];
 	double pn[FEElement::MAX_NODES];
+	vector< vector<double> > ct(nsol, vector<double>(FEElement::MAX_NODES));
 	for (int j=0; j<neln; ++j)
 	{
 		r0[j] = mesh.Node(el.m_node[j]).m_r0;
@@ -2169,6 +2166,40 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 		pn[j] = mesh.Node(el.m_node[j]).m_pt;
 		for (int k=0; k<nsol; ++k)
 			ct[k][j] = mesh.Node(el.m_node[j]).m_ct[sid[k]];
+	}
+
+	// check if this mixture includes chemical reactions
+	int nreact = (int)pmb->m_pReact.size();
+	if (nreact) 
+	{
+		for (int n=0; n<nint; ++n)
+		{
+			FEMaterialPoint& mp = *el.m_State[n];
+			FEElasticMaterialPoint&  pt  = *(mp.ExtractData<FEElasticMaterialPoint >());
+			FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
+			FESolutesMaterialPoint&  spt = *(mp.ExtractData<FESolutesMaterialPoint >());
+
+			// for chemical reactions involving solid-bound molecules,
+			// update their concentration
+            double phi0 = ppt.m_phi0;
+			for (int isbm=0; isbm<nsbm; ++isbm) {
+				spt.m_sbmrhat[isbm] = 0;
+				// combine the molar supplies from all the reactions
+				for (int k=0; k<nreact; ++k) {
+					double zetahat = pmb->m_pReact[k]->ReactionSupply(mp);
+					double v = pmb->m_pReact[k]->m_v[nsol+isbm];
+					// remember to convert from molar supply to referential mass supply
+					spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*pmb->SBMMolarMass(isbm)*v*zetahat;
+				}
+				// perform the time integration (Euler's method)
+				spt.m_sbmr[isbm] = spt.m_sbmrp[isbm] + dt*spt.m_sbmrhat[isbm];
+				// check bounds
+				if (spt.m_sbmr[isbm] < pmb->m_pSBM[isbm]->m_rhomin)
+					spt.m_sbmr[isbm] = pmb->m_pSBM[isbm]->m_rhomin;
+				if ((pmb->m_pSBM[isbm]->m_rhomax > 0) && (spt.m_sbmr[isbm] > pmb->m_pSBM[isbm]->m_rhomax))
+					spt.m_sbmr[isbm] = pmb->m_pSBM[isbm]->m_rhomax;
+			}
+		}
 	}
 		
 	// loop over the integration points and calculate
@@ -2190,31 +2221,6 @@ void FEMultiphasicDomain::UpdateElementStress(int iel, double dt)
 		// solute-poroelastic data
 		FEBiphasicMaterialPoint& ppt = *(mp.ExtractData<FEBiphasicMaterialPoint>());
 		FESolutesMaterialPoint& spt = *(mp.ExtractData<FESolutesMaterialPoint>());
-
-		// check if this mixture includes chemical reactions
-		int nreact = (int)pmb->m_pReact.size();
-		if (nreact) {
-			// for chemical reactions involving solid-bound molecules,
-			// update their concentration
-            double phi0 = ppt.m_phi0;
-			for (int isbm=0; isbm<nsbm; ++isbm) {
-				spt.m_sbmrhat[isbm] = 0;
-				// combine the molar supplies from all the reactions
-				for (int k=0; k<(int)pmb->m_pReact.size(); ++k) {
-					double zetahat = pmb->m_pReact[k]->ReactionSupply(mp);
-					double v = pmb->m_pReact[k]->m_v[nsol+isbm];
-					// remember to convert from molar supply to referential mass supply
-					spt.m_sbmrhat[isbm] += (pt.m_J-phi0)*pmb->SBMMolarMass(isbm)*v*zetahat;
-				}
-				// perform the time integration (Euler's method)
-				spt.m_sbmr[isbm] = spt.m_sbmrp[isbm] + dt*spt.m_sbmrhat[isbm];
-				// check bounds
-				if (spt.m_sbmr[isbm] < pmb->m_pSBM[isbm]->m_rhomin)
-					spt.m_sbmr[isbm] = pmb->m_pSBM[isbm]->m_rhomin;
-				if ((pmb->m_pSBM[isbm]->m_rhomax > 0) && (spt.m_sbmr[isbm] > pmb->m_pSBM[isbm]->m_rhomax))
-					spt.m_sbmr[isbm] = pmb->m_pSBM[isbm]->m_rhomax;
-			}
-		}
 
         // evaluate referential solid volume fraction
         ppt.m_phi0 = pmb->SolidReferentialVolumeFraction(mp);
