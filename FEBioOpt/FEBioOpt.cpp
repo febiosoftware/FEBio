@@ -7,7 +7,7 @@
 // declared in dllmain.cpp
 extern FEBioKernel* pFEBio;
 
-static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
+static Logfile& GetLogfile() { return *pFEBio->m_plog; }
 
 //-----------------------------------------------------------------------------
 FEBioOpt::FEBioOpt(FEModel* pfem) : FEBioTask(pfem)
@@ -18,6 +18,8 @@ FEBioOpt::FEBioOpt(FEModel* pfem) : FEBioTask(pfem)
 //-----------------------------------------------------------------------------
 bool FEBioOpt::Run(const char* szfile)
 {
+  fprintf(stderr, "Inside FEBioOpt::Run\n");
+
 	Logfile& log = GetLogfile();
 
 	// TODO: the logfile has not been opened yet, so this will only get printed to the screen

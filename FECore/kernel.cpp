@@ -23,4 +23,5 @@ Logfile& FEBioKernel::GetLogfile()
 FEBioKernel::FEBioKernel()
 {
 	m_plog = Logfile::GetInstance();
+	m_pTask.reserve(32);
 }

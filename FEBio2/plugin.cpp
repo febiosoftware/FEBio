@@ -65,7 +65,7 @@ bool LoadPluginFolder(const char* szdir)
 #include <dlfcn.h>
 
 extern "C" {
-typedef FEBioFactory* (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
+typedef void (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 }
 
 bool LoadPlugin(const char* szfile)
@@ -78,15 +78,9 @@ bool LoadPlugin(const char* szfile)
 	FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) dlsym(hlib, "RegisterPlugin");
 	if (pfnc == NULL) return false;
 
-	// call the register function repeatedly until it returns zero
+	// call the register function
 	FEBioKernel& febio = FEBioKernel::GetInstance();
-	FEBioFactory* pfac = 0;
-	do
-	{
-		pfac = pfnc(febio);
-		if (pfac) febio.RegisterClass(pfac);
-	}
-	while (pfac);
+	pfnc(febio);
 
 	return true;
 }

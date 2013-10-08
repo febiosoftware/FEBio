@@ -1,6 +1,7 @@
 #pragma once
 #include "FEBioFactory.h"
 #include <vector>
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 // Forward declaration of model class
@@ -9,6 +10,10 @@ class FEModel;
 //-----------------------------------------------------------------------------
 // forward declaration of the log file
 class Logfile;
+
+//-----------------------------------------------------------------------------
+// A list of classes for which plugin's can be developed
+class FEBioTask; 
 
 //-----------------------------------------------------------------------------
 //! This is the FEBio kernel class that manages the interactions between the 
@@ -33,6 +38,8 @@ public:
 public:
 	void RegisterClass(FEBioFactory* ptf) { m_Fac.push_back(ptf); }
 
+	void RegisterTask(FEBioFactory* ptf) { m_pTask.push_back(ptf); }
+
 public:
 	template <typename T> T* Create(const char* sztag, FEModel* pfem);
 
@@ -45,7 +52,11 @@ public:
 	template <typename T> void List();
 
 public:
+	FEBioTask* CreateTask(const char* sztag, FEModel* pfem);
+
+public:
 	std::vector<FEBioFactory*>	m_Fac;	// list of registered factory classes
+	std::vector<FEBioFactory*>      m_pTask;  // list of registered tasks
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
 
@@ -57,6 +68,18 @@ private: // make singleton
 private:
 	static FEBioKernel* m_pKernel;	// the one-and-only kernel object
 };
+
+//-----------------------------------------------------------------------------
+inline FEBioTask* FEBioKernel::CreateTask(const char* sztag, FEModel* pfem)
+{
+  std::vector<FEBioFactory*>::iterator pf;
+  for (pf=m_pTask.begin(); pf != m_pTask.end(); ++pf)
+    {
+      FEBioFactory_T<FEBioTask>* pfac = static_cast< FEBioFactory_T<FEBioTask>* >(*pf);
+      if (strcmp(pfac->GetTypeStr(), sztag) == 0) return pfac->Create(pfem);
+    }
+  return 0;
+}
 
 //-----------------------------------------------------------------------------
 template <typename T> inline T* FEBioKernel::Create(const char* sztag, FEModel* pfem)

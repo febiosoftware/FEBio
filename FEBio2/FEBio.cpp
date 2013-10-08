@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	// find a task
-	FEBioTask* ptask = febio.Create<FEBioTask>(ops.sztask, &fem);
+	  FEBioTask* ptask = static_cast<FEBioTask*> (febio.CreateTask(ops.sztask, &fem));
 	if (ptask == 0)
 	{
 		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
