@@ -11,7 +11,7 @@
 
 #undef RegisterClass
 
-typedef FEBioFactory* (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
+typedef void (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 
 bool LoadPlugin(const char* szfile)
 {
@@ -25,13 +25,7 @@ bool LoadPlugin(const char* szfile)
 
 	// call the register function repeatedly until it returns zero
 	FEBioKernel& febio = FEBioKernel::GetInstance();
-	FEBioFactory* pfac = 0;
-	do
-	{
-		pfac = pfnc(febio);
-		if (pfac) febio.RegisterClass(pfac);
-	}
-	while (pfac);
+	pfnc(febio);
 
 	// a-ok!
 	return true;
