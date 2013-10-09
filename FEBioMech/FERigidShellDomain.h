@@ -13,6 +13,9 @@ public:
 	//! clone this domain
 	FEDomain* Clone();
 
+	//! reset data
+	void Reset();
+
 public:
 	//! calculates the global stiffness matrix for this domain
 	void StiffnessMatrix(FESolver* psolver);

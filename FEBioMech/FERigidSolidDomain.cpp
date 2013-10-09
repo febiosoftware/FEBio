@@ -10,6 +10,13 @@ FEDomain* FERigidSolidDomain::Clone()
 }
 
 //-----------------------------------------------------------------------------
+// We need to override it since the base class version will not work for rigid domains.
+void FERigidSolidDomain::Reset()
+{
+	// nothing to reset here
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the stiffness matrix for 3D rigid elements.
 //! Rigid elements don't generate stress, so there is nothing to do here
 void FERigidSolidDomain::StiffnessMatrix(FESolver* psolver)
