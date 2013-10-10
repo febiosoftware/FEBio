@@ -605,6 +605,7 @@ void FE3FieldElasticSolidDomain::Serialize(DumpFile &ar)
 		int NE;
 		ar >> NE;
 		assert(NE == Elements());
+		m_Data.resize(NE);
 		for (int i=0; i<NE; ++i)
 		{
 			ELEM_DATA& ed = m_Data[i];
