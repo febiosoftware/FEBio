@@ -148,3 +148,12 @@ public:
 	FEPlotUT4NodalStresses(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_NODE) {}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Class that outputs the in-situ fiber stretch
+class FEPlotFiberPreStretch : public FEDomainData
+{
+public:
+	FEPlotFiberPreStretch(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM) {}
+	bool Save(FEDomain& dom, vector<float>& a);
+};

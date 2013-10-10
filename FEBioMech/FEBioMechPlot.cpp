@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "FEBioMechPlot.h"
-#include "FEBioMech/FEDamageNeoHookean.h"
-#include "FEBioMech/FEDamageTransIsoMooneyRivlin.h"
-#include "FEBioMech/FERigidSolidDomain.h"
-#include "FEBioMech/FERigidShellDomain.h"
-#include "FEBioMech/FEElasticMixture.h"
-#include "FEBioMech/FEUT4Domain.h"
+#include "FEDamageNeoHookean.h"
+#include "FEDamageTransIsoMooneyRivlin.h"
+#include "FERigidSolidDomain.h"
+#include "FERigidShellDomain.h"
+#include "FEElasticMixture.h"
+#include "FEUT4Domain.h"
+#include "FEPreStrainTransIsoMR.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -513,6 +514,30 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, vector<float>& a)
 		a.push_back((float) s.xy());
 		a.push_back((float) s.yz());
 		a.push_back((float) s.xz());
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
+{
+	FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(dom.GetMaterial());
+	if (pm == 0) return false;
+
+	FESolidDomain& d = dynamic_cast<FESolidDomain&>(dom);
+	int NE = d.Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FESolidElement& e = d.Element(i);
+		int nint = e.GaussPoints();
+		double lam = 0.0;
+		for (int j=0; j<nint; ++j)
+		{
+			FEPreStrainMaterialPoint& pt = *e.m_State[j]->ExtractData<FEPreStrainMaterialPoint>();
+			lam += pt.m_lam;
+		}
+		lam /= (double) nint;
+		a.push_back((float)lam);
 	}
 	return true;
 }

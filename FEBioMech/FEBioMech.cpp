@@ -171,7 +171,8 @@ REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vec
 REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"                 );
 REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                          );
 REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"                 );
-REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPlotData, "ut4 nodal stress"    );
+REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPlotData, "ut4 nodal stress"                );
+REGISTER_FEBIO_CLASS(FEPlotFiberPreStretch				, FEPlotData, "in-situ fiber stretch"           );
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
