@@ -409,6 +409,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEPreStrainTransIsoMR.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FERemodelingElasticMaterial.cpp"
 				>
 			</File>
@@ -816,6 +820,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEPressureLoad.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEPreStrainTransIsoMR.h"
 				>
 			</File>
 			<File
