@@ -34,5 +34,8 @@ public:
 	double	m_l0;		//!< unloaded length
 	double	m_refl;		//!< sarcomere length
 
+	//--- pre-strain data ---
+	double	m_lcur;		//!< in-situ current stretch
+
 	DECLARE_PARAMETER_LIST();
 };

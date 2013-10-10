@@ -17,6 +17,8 @@ FEFiberMaterial::FEFiberMaterial()
 	m_Tmax = 1.0;
 	m_ca0 = 1.0;
 	m_camax = 0.0;
+
+	m_lcur = 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -34,9 +36,22 @@ mat3ds FEFiberMaterial::Stress(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
+	// get the deformation gradient
+	mat3d F = pt.m_F;
+
+	// apply in-situ strain
+	if (m_lcur != 1.0)
+	{
+		// set-up local uni-axial stretch tensor
+		mat3d U(m_lcur, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+
+		// transform to local coordinate system
+		F = F*(pt.m_Q*U);
+	}
+
 	// deformation gradient
-	mat3d& F = pt.m_F;
-	double J = pt.m_J;
+//	double J = pt.m_J;
+	double J = F.det();
 	double Ji = 1.0 / J;
 	double Jm13 = pow(J, -1.0/3.0);
 	double twoJi = 2.0*Ji;
@@ -128,9 +143,22 @@ tens4ds FEFiberMaterial::Tangent(FEMaterialPoint &mp)
 {
 	FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
 
+	// get the deformation gradient
+	mat3d F = pt.m_F;
+
+	// apply in-situ strain
+	if (m_lcur != 1.0)
+	{
+		// set-up local uni-axial stretch tensor
+		mat3d U(m_lcur, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+
+		// transform to local coordinate system
+		F = F*(pt.m_Q*U);
+	}
+
 	// deformation gradient
-	mat3d& F = pt.m_F;
-	double J = pt.m_J;
+//	double J = pt.m_J;
+	double J = F.det();
 	double Jm13 = pow(J, -1.0/3.0);
 	double Jm23 = Jm13*Jm13;
 	double Ji = 1.0/J;

@@ -58,6 +58,7 @@
 #include "FEVerondaWestmann.h"
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
+#include "FEPreStrainTransIsoMR.h"
 
 #include "FEConstBodyForce.h"
 #include "FEPointBodyForce.h"
@@ -140,6 +141,7 @@ REGISTER_MATERIAL(FEUncoupledActiveContraction   , "uncoupled active contraction
 REGISTER_MATERIAL(FEHuiskesSupply                , "Huiskes-supply"                );
 REGISTER_MATERIAL(FERemodelingElasticMaterial    , "remodeling solid"              );
 REGISTER_MATERIAL(FECarterHayesOld               , "Carter-Hayes (old)"            );
+REGISTER_MATERIAL(FEPreStrainTransIsoMR          , "pre-strain trans iso Mooney-Rivlin");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce

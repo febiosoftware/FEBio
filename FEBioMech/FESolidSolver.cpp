@@ -1174,18 +1174,20 @@ bool FESolidSolver::Quasin(double time)
 			clog.SetMode(oldmode);
 		}
 
+		// see if we may have a small residual
+		if ((bconv == false) && (normR1 < m_Rmin))
+		{
+			// check for almost zero-residual on the first iteration
+			// this might be an indication that there is no force on the system
+			clog.printbox("WARNING", "No force acting on the system.");
+			bconv = true;
+		}
+
 		// check if we have converged. 
 		// If not, calculate the BFGS update vectors
 		if (bconv == false)
 		{
-			if ((normR1 < m_Rmin))
-			{
-				// check for almost zero-residual on the first iteration
-				// this might be an indication that there is no force on the system
-				clog.printbox("WARNING", "No force acting on the system.");
-				bconv = true;
-			}
-			else if (s < m_bfgs.m_LSmin)
+			if (s < m_bfgs.m_LSmin)
 			{
 				// check for zero linestep size
 				clog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");

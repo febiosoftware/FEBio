@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEUncoupledMaterial.h"
+#include "FEPreStrainTransIsoMR.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -503,8 +504,40 @@ bool FE3FieldElasticSolidDomain::Augment()
 	FEUncoupledMaterial* pmi = dynamic_cast<FEUncoupledMaterial*>(m_pMat);
 	assert(pmi);
 
+	// do pre-strain augmentations
+	bool bconv = true;
+	FEPreStrainTransIsoMR* pm = dynamic_cast<FEPreStrainTransIsoMR*>(pmi);
+	if (pm)
+	{
+		int NE = Elements();
+		for (int i=0; i<NE; ++i)
+		{
+			FESolidElement& el = Element(i);
+			int nint = el.GaussPoints();
+			for (int i=0; i<nint; ++i)
+			{
+				FEMaterialPoint& mp = *el.m_State[i];
+				FEPreStrainMaterialPoint& psp = *mp.ExtractData<FEPreStrainMaterialPoint>();
+
+				FEElasticMaterialPoint& pt = *mp.ExtractData<FEElasticMaterialPoint>();
+				mat3d& F = pt.m_F;
+
+				vec3d a0(pt.m_Q[0][0], pt.m_Q[1][0], pt.m_Q[2][0]);
+				vec3d a = F*a0;
+				double lRtor = a.norm();
+
+				double err = pm->m_ltrg / lRtor - psp.m_lam;
+				psp.m_lam = psp.m_lam + err;
+
+				double dl = (psp.m_lam - psp.m_lamp)/psp.m_lamp;
+				if (fabs(dl) > pm->m_ltol) bconv = false;
+				psp.m_lamp = psp.m_lam;
+			}
+		}
+	}
+
 	// make sure Augmented Lagrangian flag is on
-	if (pmi->m_blaugon == false) return true;
+	if (pmi->m_blaugon == false) return bconv;
 
 	// do the augmentation
 	int n;
@@ -535,7 +568,6 @@ bool FE3FieldElasticSolidDomain::Augment()
 	clog.printf("                        CURRENT         CHANGE        REQUIRED\n");
 	clog.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
 
-	bool bconv = true;
 	if (pctn >= pmi->m_atol)
 	{
 		bconv = false;
