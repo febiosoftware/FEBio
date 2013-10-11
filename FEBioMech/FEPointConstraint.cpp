@@ -4,8 +4,18 @@
 #include "FECore/FEMesh.h"
 
 //-----------------------------------------------------------------------------
+// define the material parameters
+BEGIN_PARAMETER_LIST(FEPointConstraint, FENLConstraint)
+	ADD_PARAMETER(m_eps    , FE_PARAM_DOUBLE, "penalty");
+	ADD_PARAMETER(m_node_id, FE_PARAM_INT   , "node"   );
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem)
 {
+	m_node_id = -1;
+	m_eps = 0.0;
+
 	m_node = -1;
 	m_pel = 0;
 }
@@ -13,10 +23,11 @@ FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem)
 //-----------------------------------------------------------------------------
 void FEPointConstraint::Init()
 {
-	assert(m_node != -1);
+	assert(m_node_id != -1);
 	FEMesh& m = m_pfem->GetMesh();
 
 	// get the nodal position in the reference state
+	m_node = m_node_id - 1;
 	vec3d r = m.Node(m_node).m_r0;
 
 	// find the element in which this node lies

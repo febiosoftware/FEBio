@@ -29,9 +29,14 @@ public:
 	bool Augment(int naug) { return true; }
 
 public:
-	FEModel*			m_pfem;
+	double		m_eps;		//!< penalty parameter
+	int			m_node_id;	//!< id of master node
+
+public:
 	int					m_node;		//!< node to which the constraint is applied
 	FESolidElement*		m_pel;		//!< element in which the node is located.
 	double				m_rs[3];	//!< natural coordinates in element m_pel
-	double				m_eps;		//!< penalty parameter
+
+	// declare parameter list
+	DECLARE_PARAMETER_LIST();
 };

@@ -71,6 +71,7 @@
 #include "FESurfaceConstraint.h"
 #include "FETiedInterface.h"
 #include "FEInSituStretch.h"
+#include "FEPointConstraint.h"
 
 #include "FEBioMechPlot.h"
 #include "FEBioMechData.h"
@@ -153,7 +154,8 @@ REGISTER_FEBIO_CLASS(FEPointBodyForce      , FEBodyForce, "point"      );
 
 //-----------------------------------------------------------------------------
 // constraint classes
-REGISTER_FEBIO_CLASS(FEInSituStretch, FENLConstraint, "in-situ stretch");
+REGISTER_FEBIO_CLASS(FEPointConstraint, FENLConstraint, "point"          );
+REGISTER_FEBIO_CLASS(FEInSituStretch  , FENLConstraint, "in-situ stretch");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

@@ -21,8 +21,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 	++tag;
 	do
 	{
-		if (tag == "rigid_body") ParseRigidConstraint(tag);
-		else if (tag == "point") ParsePointConstraint(tag);
+		if      (tag == "rigid_body") ParseRigidConstraint(tag);
 		else if (tag == "constraint")
 		{
 			const char* sztype = tag.AttributeValue("type");
@@ -194,33 +193,6 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-void FEBioConstraintsSection::ParsePointConstraint(XMLTag &tag)
-{
-	FEModel& fem = *GetFEModel();
-	int node = -1;
-	double	eps;
-
-	++tag;
-	do
-	{
-		if (tag == "node") 
-		{
-			tag.value(node);
-			if (node <= 0) throw XMLReader::InvalidValue(tag);
-		}
-		else if (tag == "penalty") tag.value(eps);
-		++tag;
-	}
-	while (!tag.isend());
-	if (node == -1) throw XMLReader::Error();
-
-	FEPointConstraint* pc = new FEPointConstraint(&fem);
-	pc->m_eps = eps;
-	pc->m_node = node-1;
-	fem.AddNonlinearConstraint(pc);
 }
 
 //---------------------------------------------------------------------------------
