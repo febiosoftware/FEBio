@@ -70,6 +70,7 @@
 #include "FESlidingInterfaceBW.h"
 #include "FESurfaceConstraint.h"
 #include "FETiedInterface.h"
+#include "FEInSituStretch.h"
 
 #include "FEBioMechPlot.h"
 #include "FEBioMechData.h"
@@ -149,6 +150,10 @@ REGISTER_FEBIO_CLASS(FEConstBodyForce      , FEBodyForce, "const"      );
 REGISTER_FEBIO_CLASS(FENonConstBodyForce   , FEBodyForce, "non-const"  );
 REGISTER_FEBIO_CLASS(FECentrifugalBodyForce, FEBodyForce, "centrifugal");
 REGISTER_FEBIO_CLASS(FEPointBodyForce      , FEBodyForce, "point"      );
+
+//-----------------------------------------------------------------------------
+// constraint classes
+REGISTER_FEBIO_CLASS(FEInSituStretch, FENLConstraint, "in-situ stretch");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface

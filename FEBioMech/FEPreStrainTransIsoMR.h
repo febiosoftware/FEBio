@@ -28,7 +28,6 @@ public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1
 	double	c2;	//!< Mooney-Rivlin coefficient C2
 
-	double	m_ltol;	//!< augmented Lagrangian tolerance for pre-strain
 	double	m_ltrg;	//!< target stretch
 
 public:

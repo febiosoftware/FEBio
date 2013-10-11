@@ -28,7 +28,6 @@ void FEPreStrainMaterialPoint::Serialize(DumpFile& ar)
 BEGIN_PARAMETER_LIST(FEPreStrainTransIsoMR, FETransverselyIsotropic)
 	ADD_PARAMETER(c1, FE_PARAM_DOUBLE, "c1");
 	ADD_PARAMETER(c2, FE_PARAM_DOUBLE, "c2");
-	ADD_PARAMETER(m_ltol, FE_PARAM_DOUBLE, "stretch_tol");
 	ADD_PARAMETER(m_ltrg, FE_PARAM_DOUBLE, "pre_stretch");
 END_PARAMETER_LIST();
 

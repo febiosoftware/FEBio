@@ -542,8 +542,8 @@ bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 			vec3d a = F*a0;
 			double lRtor = a.norm();
 
-//			lam += psp.m_lam*lRtor;
-			lam += psp.m_lam;
+			lam += psp.m_lam*lRtor;
+//			lam += psp.m_lam;
 		}
 		lam /= (double) nint;
 		a.push_back((float)lam);

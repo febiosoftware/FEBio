@@ -253,8 +253,7 @@ bool FESolidAnalysis::Init()
 	}
 
 	// see if we need to do contact augmentations
-//	m_baugment = false;
-	m_baugment = true;
+	m_baugment = false;
 	for (int i=0; i<m_fem.SurfacePairInteractions(); ++i)
 	{
 		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_fem.SurfacePairInteraction(i));
