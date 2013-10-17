@@ -81,6 +81,14 @@ public:
 		return (*this);
 	}
 
+	DumpFile& operator << (const bool& b)
+	{
+		int i;
+		i = int(b);
+		fwrite(&i, sizeof(int), 1, m_fp);
+		return (*this);
+	}
+
 	template <class T> DumpFile& operator << (const T& o) { fwrite(&o, sizeof(T), 1, m_fp); return (*this); }
 
 	template <class T> DumpFile& operator << (std::vector<T>& v)
@@ -115,6 +123,14 @@ public:
 	DumpFile& operator >> (double a[3][3])
 	{
 		fread(a, sizeof(double), 9, m_fp);
+		return (*this);
+	}
+
+	DumpFile& operator >> (bool& b)
+	{
+		int i;
+		fread(&i, sizeof(int), 1, m_fp);
+		b = bool(i);
 		return (*this);
 	}
 

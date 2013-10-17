@@ -333,6 +333,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEInSituStretch.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEIsotropicElastic.cpp"
 				>
 			</File>
@@ -744,6 +748,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEIncompNeoHookean.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEInSituStretch.h"
 				>
 			</File>
 			<File
