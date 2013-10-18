@@ -834,7 +834,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		{
 			FEPrescribedBC& dc = *m_DC[i];
 			ar << dc.GetID() << dc.IsActive();
-			ar << dc.bc << dc.lc << dc.node << dc.s;
+			ar << dc.bc << dc.lc << dc.node << dc.s << dc.br << dc.r; //DSR
 		}
 
 		// nodal loads
