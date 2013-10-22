@@ -2,6 +2,9 @@
 #include "FEAnalysis.h"
 #include "FEModel.h"
 #include "log.h"
+#include "FEBioMech/FESolidSolver.h"
+#include "FEBioHeat/FEHeatSolver.h"
+#include "FEBioMech/FEExplicitSolidSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -621,7 +624,25 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		}
 
 		// TODO: allocate a new solver
-		assert(false);
+		//assert(false);
+
+		// create a solver
+		assert(m_psolver == 0);
+		//FEM& fem = dynamic_cast<FEM&>(m_fem);
+		switch (m_ntype)
+		{
+		case FE_SOLID: 
+			m_psolver = new FESolidSolver(m_fem); 
+			break;
+		case FE_HEAT:
+			m_psolver = new FEHeatSolver(m_fem);
+			break;
+		case FE_EXPLICIT_SOLID:
+			m_psolver = new FEExplicitSolidSolver(m_fem);
+			break;
+		default:
+			throw "Unknown module type in FEAnalysis::Serialize";
+		}
 	}
 
 	// Seriaize solver data

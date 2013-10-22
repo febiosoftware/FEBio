@@ -109,6 +109,7 @@ bool Logfile::open(const char* szfile)
 bool Logfile::append(const char* szfile)
 {
 	// store a copy of the filename
+	if (m_fp == 0) m_fp = new LogFileStream;
 	strcpy(m_szfile, szfile);
 	return m_fp->append(szfile);
 }
