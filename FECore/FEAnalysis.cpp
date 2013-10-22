@@ -1,10 +1,16 @@
 #include "stdafx.h"
 #include "FEAnalysis.h"
 #include "FEModel.h"
+#include "FEBioLib/FEBioModel.h"
 #include "log.h"
 #include "FEBioMech/FESolidSolver.h"
 #include "FEBioHeat/FEHeatSolver.h"
 #include "FEBioMech/FEExplicitSolidSolver.h"
+#include "FEBioMix/FEBiphasicSolver.h"
+#include "FEBioMix/FEBiphasicSoluteSolver.h"
+#include "FEBioMix/FEMultiphasicSolver.h"
+#include "FEBioMech/FELinearSolidSolver.h"
+#include "FEBioMech/FECoupledHeatSolidSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -628,17 +634,32 @@ void FEAnalysis::Serialize(DumpFile& ar)
 
 		// create a solver
 		assert(m_psolver == 0);
-		//FEM& fem = dynamic_cast<FEM&>(m_fem);
+		FEBioModel& fem = dynamic_cast<FEBioModel&>(m_fem);
 		switch (m_ntype)
 		{
 		case FE_SOLID: 
-			m_psolver = new FESolidSolver(m_fem); 
-			break;
-		case FE_HEAT:
-			m_psolver = new FEHeatSolver(m_fem);
+			m_psolver = new FESolidSolver(fem); 
 			break;
 		case FE_EXPLICIT_SOLID:
-			m_psolver = new FEExplicitSolidSolver(m_fem);
+			m_psolver = new FEExplicitSolidSolver(fem);
+			break;
+		case FE_BIPHASIC:
+			m_psolver = new FEBiphasicSolver(fem);
+			break;
+		case FE_POROSOLUTE:
+			m_psolver = new FEBiphasicSoluteSolver(fem);
+			break;
+		case FE_MULTIPHASIC:
+			m_psolver = new FEMultiphasicSolver(fem);
+			break;
+		case FE_HEAT:
+			m_psolver = new FEHeatSolver(fem);
+			break;
+		case FE_LINEAR_SOLID:
+			m_psolver = new FELinearSolidSolver(fem);
+			break;
+		case FE_HEAT_SOLID:
+			m_psolver = new FECoupledHeatSolidSolver(fem);
 			break;
 		default:
 			throw "Unknown module type in FEAnalysis::Serialize";
