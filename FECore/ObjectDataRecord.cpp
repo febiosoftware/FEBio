@@ -9,6 +9,7 @@ void ObjectDataRecord::Parse(const char* szexpr)
 	strcpy(szcopy, szexpr);
 	char* sz = szcopy, *ch;
 	m_Data.clear();
+	strcpy(m_szdata, szexpr);
 	do
 	{
 		ch = strchr(sz, ';');

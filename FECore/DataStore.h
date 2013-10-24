@@ -63,6 +63,7 @@ protected:
 	bool	m_bcomm;				//!< export comments or not
 	char	m_szname[MAX_STRING];	//!< name of expression
 	char	m_szdelim[MAX_DELIM];	//!< data delimitor
+	char	m_szdata[MAX_STRING];	//!< data expression
 
 protected:
 	char	m_szfile[MAX_STRING];	//!< file name of data record

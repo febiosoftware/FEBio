@@ -64,6 +64,7 @@ DataRecord::DataRecord(FEModel* pfem, const char* szfile)
 	m_pfem = pfem;
 	m_nid = 0;
 	m_szname[0] = 0;
+	m_szdata[0] = 0;
 
 	strcpy(m_szdelim, " ");
 	
@@ -235,6 +236,7 @@ void DataRecord::Serialize(DumpFile &ar)
 		ar << m_szfile;
 		ar << m_bcomm;
 		ar << m_item;
+		ar << m_szdata;
 	}
 	else
 	{
@@ -244,6 +246,9 @@ void DataRecord::Serialize(DumpFile &ar)
 		ar >> m_szfile;
 		ar >> m_bcomm;
 		ar >> m_item;
+		ar >> m_szdata;
+
+		Parse(m_szdata);
 
 		if (m_fp) fclose(m_fp);
 		m_fp = 0;
