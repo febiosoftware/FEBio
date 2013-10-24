@@ -40,13 +40,6 @@ public:
 class FEFEBioImport : public FEFileImport
 {
 public:
-	// Element types
-	enum { ET_HEX8, ET_HEX20, ET_PENTA6, ET_TET4, ET_UT4, ET_TETG1, ET_TET10, ET_QUAD4, ET_TRI3, ET_TRUSS2 };
-
-	// element classes
-	enum { EC_STRUCT, EC_RIGID, EC_PORO, EC_HEAT };
-
-public:
 	class InvalidVersion{};
 	class InvalidMaterial
 	{ 
@@ -109,9 +102,9 @@ public:
 	int	m_maxid;	// max element ID
 
 	bool	m_b3field;	//!< three-field element flag
+	bool	m_but4;		//!< use UT4 formulation flag
 	int		m_nhex8;	//!< hex integration rule
 	int		m_ntet4;	//!< tetrahedral integration rule
-	int		m_nut4;		//!< integration rule for stabilization of UT4
 	int		m_ntet10;	//!< tet10 integration rule
 	int		m_ntri6;	//!< tri6 integration rule
 	int		m_ntri3;	//!< tri3 integration rule

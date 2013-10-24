@@ -7,14 +7,14 @@ class FEBioGeometrySection : public FEBioFileSection
 {
 private:
 	enum {
-		ET_HEX,
+		ET_HEX8,
 		ET_HEX20,
-		ET_PENTA,
-		ET_TET,
+		ET_PENTA6,
+		ET_TET4,
 		ET_TET10,
-		ET_QUAD,
-		ET_TRI,
-		ET_TRUSS
+		ET_QUAD4,
+		ET_TRI3,
+		ET_TRUSS2
 	};
 
 	struct FEDOMAIN 

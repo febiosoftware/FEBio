@@ -174,14 +174,14 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 //! Get the element type from a XML tag
 int FEBioGeometrySection::ElementType(XMLTag& t)
 {
-	if (t=="hex8"  ) return ET_HEX;
+	if (t=="hex8"  ) return ET_HEX8;
 	if (t=="hex20" ) return ET_HEX20;
-	if (t=="penta6") return ET_PENTA;
-	if (t=="tet4"  ) return ET_TET;
+	if (t=="penta6") return ET_PENTA6;
+	if (t=="tet4"  ) return ET_TET4;
 	if (t=="tet10" ) return ET_TET10;
-	if (t=="quad4" ) return ET_QUAD;
-	if (t=="tri3"  ) return ET_TRI;
-	if (t=="truss2") return ET_TRUSS;
+	if (t=="quad4" ) return ET_QUAD4;
+	if (t=="tri3"  ) return ET_TRI3;
+	if (t=="truss2") return ET_TRUSS2;
 	return -1;
 }
 
@@ -195,17 +195,17 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 	// get the module
 	if (ntype == FE_HEAT)
 	{
-		if ((etype == ET_HEX) || (etype == ET_HEX20) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10)) return FE_HEAT_SOLID_DOMAIN;
+		if ((etype == ET_HEX8) || (etype == ET_HEX20) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10)) return FE_HEAT_SOLID_DOMAIN;
 		else return 0;
 	}
 	else if (ntype == FE_LINEAR_SOLID)
 	{
-		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET)) return FE_LINEAR_SOLID_DOMAIN;
+		if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4)) return FE_LINEAR_SOLID_DOMAIN;
 		else return 0;
 	}
 	else if (ntype == FE_HEAT_SOLID)
 	{
-		if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET))
+		if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4))
 		{
 			if (dynamic_cast<FEHeatTransferMaterial*>(pmat)) return FE_HEAT_SOLID_DOMAIN;
 			else return FE_LINEAR_SOLID_DOMAIN;
@@ -217,38 +217,38 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 		if (dynamic_cast<FERigidMaterial*>(pmat))
 		{
 			// rigid elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_RIGID_SOLID_DOMAIN;
-			else if ((etype == ET_QUAD) || (etype == ET_TRI)) return FE_RIGID_SHELL_DOMAIN;
+			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_RIGID_SOLID_DOMAIN;
+			else if ((etype == ET_QUAD4) || (etype == ET_TRI3)) return FE_RIGID_SHELL_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FEBiphasic*>(pmat))
 		{
 			// biphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_DOMAIN;
+			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FEBiphasicSolute*>(pmat))
 		{
 			// biphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_SOLUTE_DOMAIN;
+			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_SOLUTE_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FETriphasic*>(pmat))
 		{
 			// triphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_TRIPHASIC_DOMAIN;
+			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_TRIPHASIC_DOMAIN;
 			else return 0;
 		}
 		else if (dynamic_cast<FEMultiphasic*>(pmat))
 		{
 			// multiphasic elements
-			if ((etype == ET_HEX) || (etype == ET_PENTA) || (etype == ET_TET) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_MULTIPHASIC_DOMAIN;
+			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_MULTIPHASIC_DOMAIN;
 			else return 0;
 		}
 		else
 		{
 			// structural elements
-			if (etype == ET_HEX)
+			if (etype == ET_HEX8)
 			{
 				// three-field implementation for uncoupled materials
 				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && m_pim->m_b3field) return FE_3F_SOLID_DOMAIN;
@@ -262,23 +262,23 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 			{
 				return FE_SOLID_DOMAIN;
 			}
-			else if (etype == ET_TET)
+			else if (etype == ET_TET4)
 			{
-				if (m_pim->m_ntet4 == FEFEBioImport::ET_UT4) return FE_UT4_DOMAIN;
+				if (m_pim->m_but4) return FE_UT4_DOMAIN;
 				else return FE_SOLID_DOMAIN;
 			}
 			else if (etype == ET_TET10)
 			{
 				return FE_SOLID_DOMAIN;
 			}
-			else if (etype == ET_PENTA) 
+			else if (etype == ET_PENTA6) 
 			{
 				// three-field implementation for uncoupled materials
 				if (dynamic_cast<FEUncoupledMaterial*>(pmat)) return FE_3F_SOLID_DOMAIN;
 				else return FE_SOLID_DOMAIN;
 			}
-			else if ((etype == ET_QUAD) || (etype == ET_TRI)) return FE_SHELL_DOMAIN;
-			else if ((etype == ET_TRUSS)) return FE_TRUSS_DOMAIN;
+			else if ((etype == ET_QUAD4) || (etype == ET_TRI3)) return FE_SHELL_DOMAIN;
+			else if ((etype == ET_TRUSS2)) return FE_TRUSS_DOMAIN;
 			else return 0;
 		}
 	}
@@ -424,73 +424,61 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 
 		// determine element type
 		int etype = -1;
-		if      (tag == "hex8"  ) etype = FEFEBioImport::ET_HEX8;
-		else if (tag == "hex20" ) etype = FEFEBioImport::ET_HEX20;
-		else if (tag == "penta6") etype = FEFEBioImport::ET_PENTA6;
+		if      (tag == "hex8"  ) etype = ET_HEX8;
+		else if (tag == "hex20" ) etype = ET_HEX20;
+		else if (tag == "penta6") etype = ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
-		else if (tag == "tet10" ) etype = FEFEBioImport::ET_TET10;
-		else if (tag == "quad4" ) etype = FEFEBioImport::ET_QUAD4;
-		else if (tag == "tri3"  ) etype = FEFEBioImport::ET_TRI3;
-		else if (tag == "truss2") etype = FEFEBioImport::ET_TRUSS2;
+		else if (tag == "tet10" ) etype = ET_TET10;
+		else if (tag == "quad4" ) etype = ET_QUAD4;
+		else if (tag == "tri3"  ) etype = ET_TRI3;
+		else if (tag == "truss2") etype = ET_TRUSS2;
 		else throw XMLReader::InvalidTag(tag);
 
 		switch (etype)
 		{
-		case FEFEBioImport::ET_HEX8:
+		case ET_HEX8:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_HEX20:
+		case ET_HEX20:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_PENTA6:
+		case ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_TET4:
+		case ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET4G4, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet4, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_UT4:
-			{
-				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nut4, nid, nmat);
-			}
-			break;
-		case FEFEBioImport::ET_TETG1:
-			{
-				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET4G1, nid, nmat);
-			}
-			break;
-		case FEFEBioImport::ET_TET10:
+		case ET_TET10:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet10, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_QUAD4:
+		case ET_QUAD4:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_TRI3:
+		case ET_TRI3:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_TRUSS2:
+		case ET_TRUSS2:
 			{
 				FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
 				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, nmat);
@@ -599,73 +587,61 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 
 		// determine element type
 		int etype = -1;
-		if      (tag == "hex8"  ) etype = FEFEBioImport::ET_HEX8;
-		else if (tag == "hex20" ) etype = FEFEBioImport::ET_HEX20;
-		else if (tag == "penta6") etype = FEFEBioImport::ET_PENTA6;
+		if      (tag == "hex8"  ) etype = ET_HEX8;
+		else if (tag == "hex20" ) etype = ET_HEX20;
+		else if (tag == "penta6") etype = ET_PENTA6;
 		else if (tag == "tet4"  ) etype = m_pim->m_ntet4;
-		else if (tag == "tet10" ) etype = FEFEBioImport::ET_TET10;
-		else if (tag == "quad4" ) etype = FEFEBioImport::ET_QUAD4;
-		else if (tag == "tri3"  ) etype = FEFEBioImport::ET_TRI3;
-		else if (tag == "truss2") etype = FEFEBioImport::ET_TRUSS2;
+		else if (tag == "tet10" ) etype = ET_TET10;
+		else if (tag == "quad4" ) etype = ET_QUAD4;
+		else if (tag == "tri3"  ) etype = ET_TRI3;
+		else if (tag == "truss2") etype = ET_TRUSS2;
 		else throw XMLReader::InvalidTag(tag);
 
 		switch (etype)
 		{
-		case FEFEBioImport::ET_HEX8:
+		case ET_HEX8:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, 0);
 			}
 			break;
-		case FEFEBioImport::ET_HEX20:
+		case ET_HEX20:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_HEX20G27, nid, 0);
 			}
 			break;
-		case FEFEBioImport::ET_PENTA6:
+		case ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, 0);
 			}
 			break;
-		case FEFEBioImport::ET_TET4:
+		case ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET4G4, nid, 0);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet4, nid, 0);
 			}
 			break;
-		case FEFEBioImport::ET_UT4:
-			{
-				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nut4, nid, 0);
-			}
-			break;
-		case FEFEBioImport::ET_TETG1:
-			{
-				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET4G1, nid, 0);
-			}
-			break;
-		case FEFEBioImport::ET_TET10:
+		case ET_TET10:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_TET10G4, nid, 0);
 			}
 			break;
-		case FEFEBioImport::ET_QUAD4:
+		case ET_QUAD4:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, 0);
 			}
 			break;
-		case FEFEBioImport::ET_TRI3:
+		case ET_TRI3:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, 0);
 			}
 			break;
-		case FEFEBioImport::ET_TRUSS2:
+		case ET_TRUSS2:
 			{
 				FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
 				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, 0);
@@ -691,13 +667,13 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 
 	// determine element type
 	int etype = -1;
-	if      (strcmp(szel, "hex8"  ) == 0) etype = ET_HEX;
+	if      (strcmp(szel, "hex8"  ) == 0) etype = ET_HEX8;
 	else if (strcmp(szel, "hex20" ) == 0) etype = ET_HEX20;
-	else if (strcmp(szel, "penta6") == 0) etype = ET_PENTA;
-	else if (strcmp(szel, "tet4"  ) == 0) etype = ET_TET;
-	else if (strcmp(szel, "quad4" ) == 0) etype = ET_QUAD;
-	else if (strcmp(szel, "tri3"  ) == 0) etype = ET_TRI;
-	else if (strcmp(szel, "truss2") == 0) etype = ET_TRUSS;
+	else if (strcmp(szel, "penta6") == 0) etype = ET_PENTA6;
+	else if (strcmp(szel, "tet4"  ) == 0) etype = ET_TET4;
+	else if (strcmp(szel, "quad4" ) == 0) etype = ET_QUAD4;
+	else if (strcmp(szel, "tri3"  ) == 0) etype = ET_TRI3;
+	else if (strcmp(szel, "truss2") == 0) etype = ET_TRUSS2;
 	else throw XMLReader::InvalidAttributeValue(tag, "elem", szel);
 
 	// get the material ID
@@ -731,12 +707,12 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 	dom.create(nelems);
 
 	// determine element type
-	if      (etype == ET_HEX  ) etype = FEFEBioImport::ET_HEX8;
-	else if (etype == ET_PENTA) etype = FEFEBioImport::ET_PENTA6;
-	else if (etype == ET_TET  ) etype = m_pim->m_ntet4;
-	else if (etype == ET_QUAD ) etype = FEFEBioImport::ET_QUAD4;
-	else if (etype == ET_TRI  ) etype = FEFEBioImport::ET_TRI3;
-	else if (etype == ET_TRUSS) etype = FEFEBioImport::ET_TRUSS2;
+	if      (etype == ET_HEX8  ) etype = ET_HEX8;
+	else if (etype == ET_PENTA6) etype = ET_PENTA6;
+	else if (etype == ET_TET4  ) etype = m_pim->m_ntet4;
+	else if (etype == ET_QUAD4 ) etype = ET_QUAD4;
+	else if (etype == ET_TRI3  ) etype = ET_TRI3;
+	else if (etype == ET_TRUSS2) etype = ET_TRUSS2;
 	else throw XMLReader::InvalidTag(tag);
 
 	// read all elements 
@@ -747,49 +723,37 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 
 		switch (etype)
 		{
-		case FEFEBioImport::ET_HEX8:
+		case ET_HEX8:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nhex8, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_PENTA6:
+		case ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
 				ReadSolidElement(tag, bd.Element(ne), FE_PENTA6G6, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_TET4:
+		case ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET4G4, nid, nmat);
+				ReadSolidElement(tag, bd.Element(ne), m_pim->m_ntet4, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_UT4:
-			{
-				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), m_pim->m_nut4, nid, nmat);
-			}
-			break;
-		case FEFEBioImport::ET_TETG1:
-			{
-				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(ne), FE_TET4G1, nid, nmat);
-			}
-			break;
-		case FEFEBioImport::ET_QUAD4:
+		case ET_QUAD4:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 				ReadShellElement(tag, sd.Element(ne), FE_SHELL_QUAD, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_TRI3:
+		case ET_TRI3:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
 				ReadShellElement(tag, sd.Element(ne), FE_SHELL_TRI, nid, nmat);
 			}
 			break;
-		case FEFEBioImport::ET_TRUSS2:
+		case ET_TRUSS2:
 			{
 				FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
 				ReadTrussElement(tag, td.Element(ne), FE_TRUSS, nid, nmat);

@@ -193,17 +193,17 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 				{
 					if (tag.isleaf())
 					{
-						if      (strcmp(szv, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
-						else if (strcmp(szv, "GAUSS1") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TETG1;
-						else if (strcmp(szv, "UT4"   ) == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
+						if      (strcmp(szv, "GAUSS4") == 0) m_pim->m_ntet4 = FE_TET4G4;
+						else if (strcmp(szv, "GAUSS1") == 0) m_pim->m_ntet4 = FE_TET4G1;
+						else if (strcmp(szv, "UT4"   ) == 0) m_pim->m_but4 = true;
 						else throw XMLReader::InvalidValue(tag);
 					}
 					else
 					{
 						const char* szt = tag.AttributeValue("type");
-						if      (strcmp(szt, "GAUSS4") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TET4;
-						else if (strcmp(szt, "GAUSS1") == 0) m_pim->m_ntet4 = FEFEBioImport::ET_TETG1;
-						else if (strcmp(szt, "UT4"   ) == 0) m_pim->m_ntet4 = FEFEBioImport::ET_UT4;
+						if      (strcmp(szt, "GAUSS4") == 0) m_pim->m_ntet4 = FE_TET4G4;
+						else if (strcmp(szt, "GAUSS1") == 0) m_pim->m_ntet4 = FE_TET4G1;
+						else if (strcmp(szt, "UT4"   ) == 0) m_pim->m_but4 = true;
 						else throw XMLReader::InvalidAttributeValue(tag, "type", szv);
 
 						++tag;
@@ -214,8 +214,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 							else if (tag == "stab_int")
 							{
 								const char* sz = tag.szvalue();
-								if (strcmp(sz, "GAUSS4") == 0) m_pim->m_nut4 = FE_TET4G4;
-								else if (strcmp(sz, "GAUSS1") == 0) m_pim->m_nut4 = FE_TET4G1;
+								if      (strcmp(sz, "GAUSS4") == 0) m_pim->m_ntet4 = FE_TET4G4;
+								else if (strcmp(sz, "GAUSS1") == 0) m_pim->m_ntet4 = FE_TET4G1;
 							}
 							else throw XMLReader::InvalidTag(tag);
 							++tag;
