@@ -30,10 +30,9 @@
 #include "FEBioMech/FERigidShellDomain.h"
 #include "FEBioMech/FE3FieldElasticSolidDomain.h"
 #include "FEBioMech/FEUT4Domain.h"
-#include "FEBioMech/FEConstBodyForce.h"
-#include "FEBioMech/FEPointConstraint.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidBody.h"
+#include "FEBioMech/FEContactInterface.h"
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
 #include "FECore/ObjectDataRecord.h"
@@ -45,7 +44,6 @@
 #include "FEBioMech/FEViscoElasticMaterial.h"
 #include "FEBioMech/FEUncoupledViscoElasticMaterial.h"
 #include "FEBioMech/FEElasticMultigeneration.h"
-#include "FEBioMech/FESlidingInterfaceBW.h"
 #include "FEBioHeat/FEHeatSolidDomain.h"
 #include "FEBioHeat/FEHeatFlux.h"
 #include "FEBioHeat/FEConvectiveHeatFlux.h"
@@ -194,107 +192,6 @@ const char* FEBioModel::GetPlotFileName()
 const char* FEBioModel::GetFileTitle()
 { 
 	return m_szfile_title; 
-}
-
-//-----------------------------------------------------------------------------
-//! This function resets the FEM data so that a new run can be done.
-//! This routine is called from the optimization routine.
-
-bool FEBioModel::Reset()
-{
-	int i;
-
-	// initialize materials
-	FEMaterial* pmat;
-	
-	for (i=0; i<Materials(); ++i)
-	{
-		pmat = GetMaterial(i);
-		pmat->Init();
-	}
-
-	// reset mesh data
-	m_mesh.Reset();
-
-	// reset object data
-	int nrb = m_Obj.size();
-	for (i=0; i<nrb; ++i) m_Obj[i]->Reset();
-
-	// set up rigid joints
-	if (!m_NLC.empty())
-	{
-		int NC = (int) m_NLC.size();
-		for (i=0; i<NC; ++i)
-		{
-			FENLConstraint* plc = m_NLC[i];
-			if (dynamic_cast<FERigidJoint*>(plc))
-			{
-				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
-				rj.m_F = vec3d(0,0,0);
-				rj.m_L = vec3d(0,0,0);
-
-				FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBa]);
-				FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBb]);
-
-				rj.m_qa0 = rj.m_q0 - ra.m_r0;
-				rj.m_qb0 = rj.m_q0 - rb.m_r0;
-			}
-		}
-	}
-
-	// set the start time
-	m_ftime = 0;
-	m_ftime0 = 0;
-
-	// set first time step
-	m_pStep = m_Step[0];
-	m_nStep = 0;
-	for (int i=0; i<(int)m_Step.size(); ++i) m_Step[i]->Reset();
-
-	// reset contact data
-	// TODO: I just call Init which I think is okay
-	InitContact();
-
-	// open plot database file
-	if (m_pStep->m_nplot != FE_PLOT_NEVER)
-	{
-		if (m_plot == 0) 
-		{
-			m_plot = new FEBioPlotFile(*this);
-			SetPlotFileNameExtension(".xplt");
-		}
-
-		if (m_plot->Open(*this, m_szplot) == false)
-		{
-			clog.printf("ERROR : Failed creating PLOT database\n");
-			return false;
-		}
-	}
-
-	// Since it is assumed that for the first timestep
-	// there are no loads or initial displacements, the case n=0 is skipped.
-	// Therefor we can output those results here.
-	// Offcourse we should actually check if this is indeed
-	// the case, otherwise we should also solve for t=0
-	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot->Write(*this);
-/*
-	// reset the log file
-	if (!log.is_valid())
-	{
-		log.open(m_szlog);
-
-		// if we don't want to output anything we only output to the logfile
-		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
-
-		// print welcome message to file
-		Hello();
-	}
-*/
-	// do the callback
-	DoCallback(CB_MAJOR_ITERS);
-
-	// All data is reset successfully
-	return true;
 }
 
 //=============================================================================
@@ -484,6 +381,8 @@ void FEBioModel::SerializeConstants(DumpFile& ar)
 //! Serialize analysis data
 void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 {
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	if (ar.IsSaving())
 	{
 		// analysis steps
@@ -508,12 +407,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		for (int i=0; i<(int) m_BL.size(); ++i)
 		{
 			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_BL[i]);
-			int ntype = -1;
-			if (dynamic_cast<FEConstBodyForce*      >(pbf)) ntype = FE_CONST_BODY_FORCE;
-			if (dynamic_cast<FENonConstBodyForce*   >(pbf)) ntype = FE_NONCONST_BODY_FORCE;
-			if (dynamic_cast<FECentrifugalBodyForce*>(pbf)) ntype = FE_CENTRIFUGAL_BODY_FORCE;
-			assert(ntype);
-			ar << ntype;
+			ar << febio.GetTypeStr<FEBodyForce>(pbf);
 			pbf->Serialize(ar);
 		}
 	}
@@ -557,20 +451,13 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		int nbl;
 		ar >> nbl;
 		m_BL.clear();
+		char szbl[256] = {0};
 		for (int i=0; i<nbl; ++i)
 		{
-			int ntype = -1;
-			ar >> ntype;
-			FEBodyForce* pbl = 0;
-			switch (ntype)
-			{
-			case FE_CONST_BODY_FORCE      : pbl = new FEConstBodyForce      (pfem); break;
-			case FE_NONCONST_BODY_FORCE   : pbl = new FENonConstBodyForce   (pfem); break;
-			case FE_CENTRIFUGAL_BODY_FORCE: pbl = new FECentrifugalBodyForce(pfem); break;
-			default:
-				assert(false);
-			}
+			ar >> szbl;
+			FEBodyForce* pbl = febio.Create<FEBodyForce>(szbl, this);
 			assert(pbl);
+
 			pbl->Serialize(ar);
 			m_BL.push_back(pbl);
 		}
@@ -1308,6 +1195,107 @@ bool FEBioModel::Init()
 	DoCallback(CB_MAJOR_ITERS);
 
 	// Alright, all initialization is done, so let's get busy !
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! This function resets the FEM data so that a new run can be done.
+//! This routine is called from the optimization routine.
+
+bool FEBioModel::Reset()
+{
+	int i;
+
+	// initialize materials
+	FEMaterial* pmat;
+	
+	for (i=0; i<Materials(); ++i)
+	{
+		pmat = GetMaterial(i);
+		pmat->Init();
+	}
+
+	// reset mesh data
+	m_mesh.Reset();
+
+	// reset object data
+	int nrb = m_Obj.size();
+	for (i=0; i<nrb; ++i) m_Obj[i]->Reset();
+
+	// set up rigid joints
+	if (!m_NLC.empty())
+	{
+		int NC = (int) m_NLC.size();
+		for (i=0; i<NC; ++i)
+		{
+			FENLConstraint* plc = m_NLC[i];
+			if (dynamic_cast<FERigidJoint*>(plc))
+			{
+				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
+				rj.m_F = vec3d(0,0,0);
+				rj.m_L = vec3d(0,0,0);
+
+				FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBa]);
+				FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBb]);
+
+				rj.m_qa0 = rj.m_q0 - ra.m_r0;
+				rj.m_qb0 = rj.m_q0 - rb.m_r0;
+			}
+		}
+	}
+
+	// set the start time
+	m_ftime = 0;
+	m_ftime0 = 0;
+
+	// set first time step
+	m_pStep = m_Step[0];
+	m_nStep = 0;
+	for (int i=0; i<(int)m_Step.size(); ++i) m_Step[i]->Reset();
+
+	// reset contact data
+	// TODO: I just call Init which I think is okay
+	InitContact();
+
+	// open plot database file
+	if (m_pStep->m_nplot != FE_PLOT_NEVER)
+	{
+		if (m_plot == 0) 
+		{
+			m_plot = new FEBioPlotFile(*this);
+			SetPlotFileNameExtension(".xplt");
+		}
+
+		if (m_plot->Open(*this, m_szplot) == false)
+		{
+			clog.printf("ERROR : Failed creating PLOT database\n");
+			return false;
+		}
+	}
+
+	// Since it is assumed that for the first timestep
+	// there are no loads or initial displacements, the case n=0 is skipped.
+	// Therefor we can output those results here.
+	// Offcourse we should actually check if this is indeed
+	// the case, otherwise we should also solve for t=0
+	if (m_pStep->m_nplot != FE_PLOT_NEVER) m_plot->Write(*this);
+/*
+	// reset the log file
+	if (!log.is_valid())
+	{
+		log.open(m_szlog);
+
+		// if we don't want to output anything we only output to the logfile
+		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) log.SetMode(Logfile::FILE_ONLY);
+
+		// print welcome message to file
+		Hello();
+	}
+*/
+	// do the callback
+	DoCallback(CB_MAJOR_ITERS);
+
+	// All data is reset successfully
 	return true;
 }
 

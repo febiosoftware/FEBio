@@ -847,9 +847,6 @@ void FEElasticSolidDomain::StiffnessMatrix(FESolver* psolver)
 	{
 		FESolidElement& el = m_Elem[iel];
 
-		// this element should not be rigid
-		assert(!el.IsRigid());
-
 		// create the element's stiffness matrix
 		int ndof = 3*el.Nodes();
 		ke.resize(ndof, ndof);

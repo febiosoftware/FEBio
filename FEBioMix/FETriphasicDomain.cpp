@@ -140,12 +140,6 @@ void FETriphasicDomain::Residual(FESolver* psolver, vector<double>& R)
 			// get the element
 			FESolidElement& el = m_Elem[i];
 			
-			// this element should not be rigid
-			assert(!el.IsRigid());
-			
-			//! this element should not be UDG
-			assert(el.Type() != FE_HEX8G1);
-			
 			// unpack the element
 			UnpackLM(el, elm);
 			
@@ -200,12 +194,6 @@ void FETriphasicDomain::Residual(FESolver* psolver, vector<double>& R)
 		{
 			// get the element
 			FESolidElement& el = m_Elem[i];
-			
-			// this element should not be rigid
-			assert(!el.IsRigid());
-			
-			//! this element should not be UDG
-			assert(el.Type() != FE_HEX8G1);
 			
 			// unpack the element
 			UnpackLM(el, elm);
@@ -878,9 +866,6 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver)
 		{
 			FESolidElement& el = m_Elem[iel];
 			
-			// this element should not be rigid
-			assert(!el.IsRigid());
-			
 			UnpackLM(el, elm);
 			
 			// get the elements material
@@ -919,9 +904,6 @@ void FETriphasicDomain::StiffnessMatrix(FESolver* psolver)
 		for (int iel=0; iel<NE; ++iel)
 		{
 			FESolidElement& el = m_Elem[iel];
-			
-			// this element should not be rigid
-			assert(!el.IsRigid());
 			
 			UnpackLM(el, elm);
 			

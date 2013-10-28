@@ -148,8 +148,6 @@ void FEElasticShellDomain::Residual(FESolver* psolver, vector<double>& R)
 		// get the element
 		FEShellElement& el = m_Elem[i];
 
-		assert(!el.IsRigid());
-
 		// create the element force vector and initialize to zero
 		int ndof = 6*el.Nodes();
 		fe.assign(ndof, 0);
@@ -391,8 +389,6 @@ void FEElasticShellDomain::StiffnessMatrix(FESolver* psolver)
 	for (int iel=0; iel<NS; ++iel)
 	{
 		FEShellElement& el = m_Elem[iel];
-
-		assert(!el.IsRigid());
 
 		// get the elements material
 		FEMaterial* pmat = m_pMat;
@@ -760,8 +756,6 @@ void FEElasticShellDomain::UpdateStresses(FEModel &fem)
 	{
 		// get the solid element
 		FEShellElement& el = m_Elem[i];
-
-		assert(!el.IsRigid());
 
 		// get the number of integration points
 		int nint = el.GaussPoints();

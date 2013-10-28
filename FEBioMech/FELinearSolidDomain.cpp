@@ -460,10 +460,6 @@ void FELinearSolidDomain::UpdateStresses(FEModel &fem)
 		// get the solid element
 		FESolidElement& el = m_Elem[i];
 
-		assert(!el.IsRigid());
-
-		assert(el.Type() != FE_HEX8G1);
-
 		// get the number of integration points
 		nint = el.GaussPoints();
 

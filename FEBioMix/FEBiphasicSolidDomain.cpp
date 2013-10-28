@@ -443,9 +443,6 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver)
 		{
 			FESolidElement& el = m_Elem[iel];
 			
-			// this element should not be rigid
-			assert(!el.IsRigid());
-			
 			// get the elements material
 			FEMaterial* pmat = m_pMat;
 			assert(dynamic_cast<FEBiphasic*>(pmat) != 0);
@@ -482,9 +479,6 @@ void FEBiphasicSolidDomain::StiffnessMatrix(FESolver* psolver)
 		for (int iel=0; iel<NE; ++iel)
 		{
 			FESolidElement& el = m_Elem[iel];
-			
-			// this element should not be rigid
-			assert(!el.IsRigid());
 			
 			// get the elements material
 			FEMaterial* pmat = m_pMat;
