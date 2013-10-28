@@ -9,16 +9,6 @@
 #include "FEBioMix/FEBiphasic.h"
 #include "FEBioMix/FEBiphasicSolute.h"
 #include "FEBioMix/FETriphasic.h"
-#include "FEBioMech/FESlidingInterface.h"
-#include "FEBioMech/FETiedInterface.h"
-#include "FEBioMix/FETiedBiphasicInterface.h"
-#include "FEBioMech/FERigidWallInterface.h"
-#include "FEBioMech/FEFacet2FacetSliding.h"
-#include "FEBioMech/FEFacet2FacetTied.h"
-#include "FEBioMix/FESlidingInterface2.h"
-#include "FEBioMix/FESlidingInterface3.h"
-#include "FEBioMech/FEPeriodicBoundary.h"
-#include "FEBioMech/FESurfaceConstraint.h"
 #include "FEBioMech/FETransverselyIsotropic.h"
 #include "FEBioMech/FEPressureLoad.h"
 #include "FEBioMech/FETractionLoad.h"
@@ -773,49 +763,41 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 //! serialize contact data
 void FEBioModel::SerializeContactData(DumpFile &ar)
 {
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	if (ar.IsSaving())
 	{
 		ar << SurfacePairInteractions();
 		for (int i=0; i<SurfacePairInteractions(); ++i)
 		{
-			ar << m_CI[i]->Type();
-			m_CI[i]->Serialize(ar);
+			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(SurfacePairInteraction(i));
+
+			// store the type string
+			ar << febio.GetTypeStr<FEContactInterface>(pci);
+
+			pci->Serialize(ar);
 		}
 	}
 	else
 	{
-		int numci, ntype;
+		int numci;
 		ar >> numci;
+
+		char szci[256] = {0};
 		for (int i=0; i<numci; ++i)
 		{
-			FEContactInterface* ps;
-
 			// get the interface type
-			ar >> ntype;
+			ar >> szci;
 
 			// create a new interface
-			switch (ntype)
-			{
-			case FE_CONTACT_SLIDING      : ps = new FESlidingInterface     (this); break;
-			case FE_FACET2FACET_SLIDING  : ps = new FEFacet2FacetSliding   (this); break;
-			case FE_CONTACT_TIED         : ps = new FETiedInterface        (this); break;
-			case FE_CONTACT_RIGIDWALL    : ps = new FERigidWallInterface   (this); break;
-			case FE_CONTACT_SLIDING2     : ps = new FESlidingInterface2    (this); break;
-			case FE_PERIODIC_BOUNDARY    : ps = new FEPeriodicBoundary     (this); break;
-			case FE_SURFACE_CONSTRAINT   : ps = new FESurfaceConstraint    (this); break;
-			case FE_CONTACT_SLIDING3     : ps = new FESlidingInterface3    (this); break;
-			case FE_CONTACT_TIED_BIPHASIC: ps = new FETiedBiphasicInterface(this); break;
-			case FE_CONTACT_SLIDINGBW    : ps = new FESlidingInterfaceBW   (this); break;
-			case FE_FACET2FACET_TIED     : ps = new FEFacet2FacetTied      (this); break;
-			default:
-				assert(false);
-			}
-				
+			FEContactInterface* pci = febio.Create<FEContactInterface>(szci, this);
+			assert(pci);
+
 			// serialize interface data from archive
-			ps->Serialize(ar);
+			pci->Serialize(ar);
 
 			// add interface to list
-			m_CI.push_back(ps);
+			AddSurfacePairInteraction(pci);
 		}	
 	}
 }
@@ -2347,26 +2329,16 @@ void FEBioModel::ShallowCopy(FEBioModel& fem)
 	// copy contact data
 	if (m_CI.empty())
 	{
-		FEContactInterface* pci;
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+
 		for (int i=0; i<fem.SurfacePairInteractions(); ++i)
 		{
-			switch (fem.m_CI[i]->Type())
-			{
-			case FE_CONTACT_SLIDING      : pci = new FESlidingInterface     (this); break;
-			case FE_FACET2FACET_SLIDING  : pci = new FEFacet2FacetSliding   (this); break;
-			case FE_CONTACT_TIED         : pci = new FETiedInterface        (this); break;
-			case FE_CONTACT_RIGIDWALL    : pci = new FERigidWallInterface   (this); break;
-			case FE_CONTACT_SLIDING2     : pci = new FESlidingInterface2    (this); break;
-			case FE_PERIODIC_BOUNDARY    : pci = new FEPeriodicBoundary     (this); break;
-			case FE_SURFACE_CONSTRAINT   : pci = new FESurfaceConstraint    (this); break;
-			case FE_CONTACT_SLIDING3     : pci = new FESlidingInterface3    (this); break;
-			case FE_CONTACT_TIED_BIPHASIC: pci = new FETiedBiphasicInterface(this); break;
-			case FE_CONTACT_SLIDINGBW    : pci = new FESlidingInterfaceBW   (this); break;
-			case FE_FACET2FACET_TIED     : pci = new FEFacet2FacetTied      (this); break;
-			default:
-				assert(false);
-			}
-			m_CI.push_back(pci);
+			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
+
+			FEContactInterface* pcopy = febio.Create<FEContactInterface>(febio.GetTypeStr<FEContactInterface>(pci), this);
+			assert(pcopy);
+
+			AddSurfacePairInteraction(pcopy);
 		}
 	}
 	assert(SurfacePairInteractions() == fem.SurfacePairInteractions());
