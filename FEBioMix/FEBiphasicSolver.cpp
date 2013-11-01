@@ -811,6 +811,5 @@ void FEBiphasicSolver::Serialize(DumpFile& ar)
 	{
 		ar >> m_Ptol;
 		ar >> m_ndeq >> m_npeq;
-		ar >> m_ndeq >> m_npeq;
 	}
 }

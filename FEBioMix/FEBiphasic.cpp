@@ -229,6 +229,7 @@ void FEBiphasic::Serialize(DumpFile &ar)
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	// serialize sub-materials
+	int nsol = 0;
 	if (ar.IsSaving())
 	{
 		ar << febio.GetTypeStr<FEMaterial>(m_pSolid);
@@ -237,8 +238,14 @@ void FEBiphasic::Serialize(DumpFile &ar)
 		ar << febio.GetTypeStr<FEMaterial>(m_pPerm);
 		m_pPerm->Serialize(ar);
 
-		ar << febio.GetTypeStr<FEMaterial>(m_pSupp);
-		m_pSupp->Serialize(ar);
+		if (m_pSupp == 0) ar << nsol;
+		else
+		{
+			nsol = 1;
+			ar << nsol;
+			ar << febio.GetTypeStr<FEMaterial>(m_pSupp);
+			m_pSupp->Serialize(ar);
+		}
 	}
 	else
 	{
@@ -256,11 +263,15 @@ void FEBiphasic::Serialize(DumpFile &ar)
 		m_pPerm->Serialize(ar);
 		m_pPerm->Init();
 
-		ar >> sz;
-		m_pSupp = dynamic_cast<FESolventSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
-		assert(m_pSupp);
-		m_pSupp->Serialize(ar);
-		m_pSupp->Init();
+		ar >> nsol;
+		if (nsol)
+		{
+			ar >> sz;
+			m_pSupp = dynamic_cast<FESolventSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+			assert(m_pSupp);
+			m_pSupp->Serialize(ar);
+			m_pSupp->Init();
+		}
 	}
 }
 
