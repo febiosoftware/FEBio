@@ -27,6 +27,7 @@ public:
 public:
 	double	m_E;		//!< Young's modulus
 	double	m_v;		//!< Poisson's ratio
+	int		m_pmid;		//!< parent material ID
 
 public:
 	int		m_com;	//!< center of mass input flag
@@ -38,7 +39,6 @@ public:
 	double	m_fs[6];	//!< rigid force/torque scale factors
 
 	int		m_nRB;		//!< rigid body ID
-	int		m_pmid;		//!< parent material ID
 
 public:
 	// inherited from FEMaterial

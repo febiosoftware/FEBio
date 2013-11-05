@@ -293,7 +293,6 @@ bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
 	FEModel& fem = *GetFEModel();
 
 	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
-	else if (tag == "parent_id") { tag.value(pm->m_pmid); return true; }
 	return false;
 }
 

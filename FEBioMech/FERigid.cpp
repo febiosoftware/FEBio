@@ -10,6 +10,7 @@ BEGIN_PARAMETER_LIST(FERigidMaterial, FESolidMaterial)
 	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE, "density");
 	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
 	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
+	ADD_PARAMETER(m_pmid, FE_PARAM_INT, "parent_id");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
