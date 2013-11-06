@@ -44,6 +44,9 @@ public:
 	// inherited from FEMaterial
 	virtual bool IsRigid() { return true; }
 
+	// override this function to set the COM logic
+	void SetParameter(FEParam& p);
+
 public:
 	//! Create a rigid material point
 	FEMaterialPoint* CreateMaterialPointData() { return new FEElasticMaterialPoint(); }

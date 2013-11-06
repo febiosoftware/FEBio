@@ -73,10 +73,17 @@ template<class T> inline T* FEParam::pvalue(int n)
 }
 
 //-----------------------------------------------------------------------------
+// forward declaration of the param container
+class FEParamContainer;
+
+//-----------------------------------------------------------------------------
 //! A list of material parameters
 class FEParameterList
 {
 public:
+	FEParameterList(FEParamContainer* pc) : m_pc(pc) {}
+	virtual ~FEParameterList(){}
+
 	//! Add a parameter to the list
 	void AddParameter(void* pv, FEParamType itype, int ndim, const char* sz);
 
@@ -92,8 +99,12 @@ public:
 	//! number of parameters
 	int Parameters() { return m_pl.size(); }
 
+	//! return the parameter container
+	FEParamContainer* GetContainer() { return m_pc; }
+
 protected:
-	list<FEParam>	m_pl;	//!< the actual parameter list
+	FEParamContainer*	m_pc;	//!< parent container
+	list<FEParam>		m_pl;	//!< the actual parameter list
 };
 
 //-----------------------------------------------------------------------------
@@ -153,6 +164,11 @@ public:
 
 	// serialize parameter data
 	virtual void Serialize(DumpFile& ar);
+
+public:
+	//! This function is called after the parameter was read in from the input file.
+	//! It can be used to do additional processing when a parameter is read in.
+	virtual void SetParameter(FEParam& p) {}
 
 protected:
 	// This function will be overridden by each class that defines a parameter list

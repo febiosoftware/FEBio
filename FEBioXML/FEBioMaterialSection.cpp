@@ -77,9 +77,6 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// additional transversely isotropic material parameters
 			if (!bfound && dynamic_cast<FETransverselyIsotropic*>(pmat)) bfound = ParseTransIsoMaterial(tag, dynamic_cast<FETransverselyIsotropic*>(pmat));
 
-			// read rigid body data
-			if (!bfound && dynamic_cast<FERigidMaterial*>(pmat)) bfound = ParseRigidMaterial(tag, dynamic_cast<FERigidMaterial*>(pmat));
-
 			// elastic mixtures
 			if (!bfound && dynamic_cast<FEElasticMixture*>(pmat)) bfound = ParseElasticMixture(tag, dynamic_cast<FEElasticMixture*>(pmat));
 			
@@ -268,13 +265,7 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 		++tag;
 		do
 		{
-			if      (tag == "Tmax" ) tag.value(pm->m_fib.m_Tmax );
-			else if (tag == "ca0"  ) tag.value(pm->m_fib.m_ca0  );
-			else if (tag == "camax") tag.value(pm->m_fib.m_camax);
-			else if (tag == "beta" ) tag.value(pm->m_fib.m_beta );
-			else if (tag == "l0"   ) tag.value(pm->m_fib.m_l0   );
-			else if (tag == "refl" ) tag.value(pm->m_fib.m_refl );
-			else throw XMLReader::InvalidTag(tag);
+			if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
 			++tag;
 		}
 		while (!tag.isend());
@@ -282,17 +273,6 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 		// mark tag as read
 		return true;
 	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Read rigid materials
-//
-bool FEBioMaterialSection::ParseRigidMaterial(XMLTag &tag, FERigidMaterial *pm)
-{
-	FEModel& fem = *GetFEModel();
-
-	if (tag == "center_of_mass") { tag.value(pm->m_rc); pm->m_com = 1; return true; }
 	return false;
 }
 

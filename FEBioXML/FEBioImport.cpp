@@ -373,6 +373,9 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 //			else clog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}
 
+		// give the parameter container a chance to do additional processing
+		pl.GetContainer()->SetParameter(*pp);
+
 		return true;
 	}
 	return false;

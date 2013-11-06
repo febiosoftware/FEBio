@@ -7,10 +7,11 @@
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FERigidMaterial, FESolidMaterial)
-	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE, "density");
-	ADD_PARAMETER(m_E, FE_PARAM_DOUBLE, "E");
-	ADD_PARAMETER(m_v, FE_PARAM_DOUBLE, "v");
-	ADD_PARAMETER(m_pmid, FE_PARAM_INT, "parent_id");
+	ADD_PARAMETER(m_density, FE_PARAM_DOUBLE, "density"       );
+	ADD_PARAMETER(m_E      , FE_PARAM_DOUBLE, "E"             );
+	ADD_PARAMETER(m_v      , FE_PARAM_DOUBLE, "v"             );
+	ADD_PARAMETER(m_pmid   , FE_PARAM_INT   , "parent_id"     );
+	ADD_PARAMETER(m_rc     , FE_PARAM_VEC3D , "center_of_mass");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -27,6 +28,15 @@ FERigidMaterial::FERigidMaterial()
 	m_E = 1;
 	m_v = 0;
 	m_pmid = -1;
+}
+
+//-----------------------------------------------------------------------------
+void FERigidMaterial::SetParameter(FEParam& p)
+{
+	if (strcmp(p.m_szname, "center_of_mass") == 0)
+	{
+		m_com = 1;
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -25,7 +25,6 @@ protected:
 	void ParseMaterial					   (XMLTag& tag, FEMaterial* pm);
 	bool ParseElasticMaterial			   (XMLTag& tag, FEElasticMaterial* pm);
 	bool ParseTransIsoMaterial			   (XMLTag& tag, FETransverselyIsotropic* pm);
-	bool ParseRigidMaterial				   (XMLTag& tag, FERigidMaterial* pm);
 	bool ParseElasticMixture			   (XMLTag& tag, FEElasticMixture* pm);
 	bool ParseUncoupledElasticMixture	   (XMLTag& tag, FEUncoupledElasticMixture* pm);
 	bool ParseBiphasicMaterial		  	   (XMLTag& tag, FEBiphasic* pm);

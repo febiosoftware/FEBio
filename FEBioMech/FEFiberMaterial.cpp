@@ -4,7 +4,13 @@
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEFiberMaterial, FEMaterial);
-	ADD_PARAMETER(m_ascl, FE_PARAM_DOUBLE, "ascl");
+	ADD_PARAMETER(m_ascl , FE_PARAM_DOUBLE, "ascl" );
+	ADD_PARAMETER(m_Tmax , FE_PARAM_DOUBLE, "Tmax" );
+	ADD_PARAMETER(m_ca0  , FE_PARAM_DOUBLE, "ca0"  );
+	ADD_PARAMETER(m_camax, FE_PARAM_DOUBLE, "camax");
+	ADD_PARAMETER(m_beta , FE_PARAM_DOUBLE, "beta" );
+	ADD_PARAMETER(m_l0   , FE_PARAM_DOUBLE, "l0"   );
+	ADD_PARAMETER(m_refl , FE_PARAM_DOUBLE, "refl" );
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------

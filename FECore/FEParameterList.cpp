@@ -144,7 +144,7 @@ FEParameterList& FEParamContainer::GetParameterList()
 {
 	if (m_pParam == 0) 
 	{
-		m_pParam = new FEParameterList;
+		m_pParam = new FEParameterList(this);
 		BuildParamList();
 	}
 	return *m_pParam;
