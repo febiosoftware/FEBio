@@ -101,6 +101,44 @@ FEMaterial* FEBiphasic::GetProperty(int i)
 }
 
 //-----------------------------------------------------------------------------
+//! Find the index of a material property
+int FEBiphasic::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "solid"         ) == 0) return 0;
+	if (strcmp(szname, "permeability"  ) == 0) return 1;
+	if (strcmp(szname, "solvent_supply") == 0) return 2;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a material property
+bool FEBiphasic::SetProperty(int n, FEMaterial* pm)
+{
+	switch(n)
+	{
+	case 0:
+		{
+			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+			if (pme) { m_pSolid = pme; return true; }
+		}
+		break;
+	case 1: 
+		{
+			FEHydraulicPermeability* pmp = dynamic_cast<FEHydraulicPermeability*>(pm);
+			if (pmp) { m_pPerm = pmp; return true; }
+		}
+		break;
+	case 2:
+		{
+			FESolventSupply* pms = dynamic_cast<FESolventSupply*>(pm);
+			if (pms) { m_pSupp = pms; return true; }
+		}
+		break;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Porosity in current configuration
 double FEBiphasic::Porosity(FEMaterialPoint& pt)
 {

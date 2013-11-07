@@ -69,11 +69,18 @@ public:
 	// find a material parameter
 	FEParam* GetParameter(const ParamString& s);
 
+public:
 	//! return number of material properties
 	int Properties();
 
 	//! return a material property
 	FEMaterial* GetProperty(int i);
+
+	//! find a material property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a material property (returns false on error)
+	bool SetProperty(int i, FEMaterial* pm);
 	
 public:
 	void Init();

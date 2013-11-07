@@ -26,7 +26,7 @@ public:
 	FEUncoupledMaterial* GetMaterial(int i) { return m_pMat[i]; }
 
 	// Add a material component
-	void AddMaterial(FEUncoupledMaterial* pm) { m_pMat.push_back(pm); }
+	void AddMaterial(FEUncoupledMaterial* pm);
 
 	// get a material parameter
 	FEParam* GetParameter(const ParamString& s);
@@ -37,6 +37,12 @@ public:
 
 	//! return a material property
 	FEMaterial* GetProperty(int n) { return m_pMat[n]; }
+
+	//! find a material property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a material property (returns false on error)
+	bool SetProperty(int i, FEMaterial* pm);
 	
 public:
 	//! calculate stress at material point

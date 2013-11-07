@@ -345,6 +345,51 @@ FEMaterial* FEBiphasicSolute::GetProperty(int i)
 }
 
 //-----------------------------------------------------------------------------
+//! Find the index of a material property
+int FEBiphasicSolute::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "solid"              ) == 0) return 0;
+	if (strcmp(szname, "permeability"       ) == 0) return 1;
+	if (strcmp(szname, "osmotic_coefficient") == 0) return 2;
+	if (strcmp(szname, "solute"             ) == 0) return 3;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a material property
+bool FEBiphasicSolute::SetProperty(int n, FEMaterial* pm)
+{
+	switch(n)
+	{
+	case 0:
+		{
+			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+			if (pme) { m_pSolid = pme; return true; }
+		}
+		break;
+	case 1: 
+		{
+			FEHydraulicPermeability* pmp = dynamic_cast<FEHydraulicPermeability*>(pm);
+			if (pmp) { m_pPerm = pmp; return true; }
+		}
+		break;
+	case 2:
+		{
+			FEOsmoticCoefficient* pmc = dynamic_cast<FEOsmoticCoefficient*>(pm);
+			if (pmc) { m_pOsmC = pmc; return true; }
+		}
+		break;
+	case 3:
+		{
+			FESolute* pms = dynamic_cast<FESolute*>(pm);
+			if (pms) { m_pSolute = pms; return true; }
+		}
+		break;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Data serialization
 void FEBiphasicSolute::Serialize(DumpFile& ar)
 {

@@ -82,6 +82,12 @@ public:
 
 	//! return a material property
 	FEMaterial* GetProperty(int i);
+
+	//! find a material property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a material property (returns false on error)
+	bool SetProperty(int i, FEMaterial* pm);
 	
 public:
 	FEElasticMaterial*	m_pBase;		//!< pointer to elastic solid material

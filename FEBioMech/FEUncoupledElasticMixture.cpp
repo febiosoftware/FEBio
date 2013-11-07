@@ -32,6 +32,34 @@ void FEUncoupledElasticMixture::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEUncoupledElasticMixture::AddMaterial(FEUncoupledMaterial* pm) 
+{ 
+	m_pMat.push_back(pm); 
+	// TODO: assume that the material becomes stable since it is combined with others
+	// in a solid mixture.  (This may not necessarily be true.)
+	pm->m_unstable = false;
+}
+
+//-----------------------------------------------------------------------------
+//! Find the index of a material property
+int FEUncoupledElasticMixture::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "solid") == 0) return (int) m_pMat.size();
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a material property
+bool FEUncoupledElasticMixture::SetProperty(int n, FEMaterial* pm)
+{
+	assert(n <= (int) m_pMat.size());
+	FEUncoupledMaterial* pme = dynamic_cast<FEUncoupledMaterial*>(pm);
+	if (pme == 0) return false;
+	AddMaterial(pme);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 mat3ds FEUncoupledElasticMixture::DevStress(FEMaterialPoint& mp)
 {
 	FEElasticMixtureMaterialPoint& pt = *mp.ExtractData<FEElasticMixtureMaterialPoint>();

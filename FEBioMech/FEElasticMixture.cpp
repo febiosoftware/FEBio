@@ -74,6 +74,34 @@ void FEElasticMixture::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticMixture::AddMaterial(FEElasticMaterial* pm) 
+{ 
+	m_pMat.push_back(pm); 
+	// TODO: assume that the material becomes stable since it is combined with others
+	// in a solid mixture.  (This may not necessarily be true.)
+	pm->m_unstable = false;
+}
+
+//-----------------------------------------------------------------------------
+//! Find the index of a material property
+int FEElasticMixture::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "solid") == 0) return (int) m_pMat.size();
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a material property
+bool FEElasticMixture::SetProperty(int n, FEMaterial* pm)
+{
+	assert(n <= (int) m_pMat.size());
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+	if (pme == 0) return false;
+	AddMaterial(pme);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! This function evaluates the stress at the material point by evaluating the
 //! individual stress components. 
 

@@ -92,6 +92,44 @@ FEMaterial* FESolute::GetProperty(int i)
 }
 
 //-----------------------------------------------------------------------------
+//! Find the index of a material property
+int FESolute::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "diffusivity") == 0) return 0;
+	if (strcmp(szname, "solubility" ) == 0) return 1;
+	if (strcmp(szname, "supply"     ) == 0) return 2;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a material property
+bool FESolute::SetProperty(int n, FEMaterial* pm)
+{
+	switch(n)
+	{
+	case 0:
+		{
+			FESoluteDiffusivity* pmd = dynamic_cast<FESoluteDiffusivity*>(pm);
+			if (pmd) { m_pDiff = pmd; return true; }
+		}
+		break;
+	case 1: 
+		{
+			FESoluteSolubility* pms = dynamic_cast<FESoluteSolubility*>(pm);
+			if (pms) { m_pSolub = pms; return true; }
+		}
+		break;
+	case 2:
+		{
+			FESoluteSupply* pms = dynamic_cast<FESoluteSupply*>(pm);
+			if (pms) { m_pSupp = pms; return true; }
+		}
+		break;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 FEParam* FESolute::GetParameter(const ParamString& s)
 {
 	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);

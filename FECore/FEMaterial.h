@@ -102,6 +102,12 @@ public: // interface for getting/setting material properties
 	//! get a specific material property
 	virtual FEMaterial* GetProperty(int i) { return 0; }
 
+	//! find a material property index ( returns <0 for error)
+	virtual int FindPropertyIndex(const char* szname) { return -1; }
+
+	//! set a material property (returns false on error)
+	virtual bool SetProperty(int i, FEMaterial* pm) { return false; }
+
 protected:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID

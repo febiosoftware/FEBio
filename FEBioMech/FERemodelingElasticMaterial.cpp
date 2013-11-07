@@ -82,6 +82,37 @@ FEMaterial* FERemodelingElasticMaterial::GetProperty(int i)
 }
 
 //-----------------------------------------------------------------------------
+//! Find the index of a material property
+int FERemodelingElasticMaterial::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "solid" ) == 0) return 0;
+	if (strcmp(szname, "supply") == 0) return 1;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a material property
+bool FERemodelingElasticMaterial::SetProperty(int n, FEMaterial* pm)
+{
+	switch(n)
+	{
+	case 0:
+		{
+			FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+			if (pme) { m_pBase = pme; return true; }
+		}
+		break;
+	case 1: 
+		{
+			FESolidSupply* pms = dynamic_cast<FESolidSupply*>(pm);
+			if (pms) { m_pSupp = pms; return true; }
+		}
+		break;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Strain energy density function
 double FERemodelingElasticMaterial::StrainEnergy(FEMaterialPoint& mp)
 {

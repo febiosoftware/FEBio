@@ -117,6 +117,29 @@ FEMaterial* FEViscoElasticMaterial::GetProperty(int i)
 }
 
 //-----------------------------------------------------------------------------
+//! find a material property index ( returns <0 for error)
+int FEViscoElasticMaterial::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "elastic") == 0) return 0; else return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! set a material property (returns false on error)
+bool FEViscoElasticMaterial::SetProperty(int i, FEMaterial* pm)
+{
+	if (i==0)
+	{
+		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+		if (pme)
+		{ 
+			SetBaseMaterial(pme);
+			return true;
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Create material point data for this material
 FEMaterialPoint* FEViscoElasticMaterial::CreateMaterialPointData()
 { 

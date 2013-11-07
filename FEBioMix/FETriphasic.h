@@ -135,6 +135,12 @@ public:
 
 	//! return a material property
 	FEMaterial* GetProperty(int i);
+
+	//! find a material property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a material property (returns false on error)
+	bool SetProperty(int i, FEMaterial* pm);
 	
 public: // material parameters
 	double						m_phi0;			//!< solid volume fraction in reference configuration

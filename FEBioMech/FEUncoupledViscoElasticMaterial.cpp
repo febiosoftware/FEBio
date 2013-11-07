@@ -4,19 +4,19 @@
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEUncoupledViscoElasticMaterial, FEUncoupledMaterial)
-ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
-ADD_PARAMETER(m_t[1], FE_PARAM_DOUBLE, "t2");
-ADD_PARAMETER(m_t[2], FE_PARAM_DOUBLE, "t3");
-ADD_PARAMETER(m_t[3], FE_PARAM_DOUBLE, "t4");
-ADD_PARAMETER(m_t[4], FE_PARAM_DOUBLE, "t5");
-ADD_PARAMETER(m_t[5], FE_PARAM_DOUBLE, "t6");
-ADD_PARAMETER(m_g0  , FE_PARAM_DOUBLE, "g0");
-ADD_PARAMETER(m_g[0], FE_PARAM_DOUBLE, "g1");
-ADD_PARAMETER(m_g[1], FE_PARAM_DOUBLE, "g2");
-ADD_PARAMETER(m_g[2], FE_PARAM_DOUBLE, "g3");
-ADD_PARAMETER(m_g[3], FE_PARAM_DOUBLE, "g4");
-ADD_PARAMETER(m_g[4], FE_PARAM_DOUBLE, "g5");
-ADD_PARAMETER(m_g[5], FE_PARAM_DOUBLE, "g6");
+	ADD_PARAMETER(m_t[0], FE_PARAM_DOUBLE, "t1");
+	ADD_PARAMETER(m_t[1], FE_PARAM_DOUBLE, "t2");
+	ADD_PARAMETER(m_t[2], FE_PARAM_DOUBLE, "t3");
+	ADD_PARAMETER(m_t[3], FE_PARAM_DOUBLE, "t4");
+	ADD_PARAMETER(m_t[4], FE_PARAM_DOUBLE, "t5");
+	ADD_PARAMETER(m_t[5], FE_PARAM_DOUBLE, "t6");
+	ADD_PARAMETER(m_g0  , FE_PARAM_DOUBLE, "g0");
+	ADD_PARAMETER(m_g[0], FE_PARAM_DOUBLE, "g1");
+	ADD_PARAMETER(m_g[1], FE_PARAM_DOUBLE, "g2");
+	ADD_PARAMETER(m_g[2], FE_PARAM_DOUBLE, "g3");
+	ADD_PARAMETER(m_g[3], FE_PARAM_DOUBLE, "g4");
+	ADD_PARAMETER(m_g[4], FE_PARAM_DOUBLE, "g5");
+	ADD_PARAMETER(m_g[5], FE_PARAM_DOUBLE, "g6");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
@@ -68,6 +68,29 @@ FEMaterial* FEUncoupledViscoElasticMaterial::GetProperty(int i)
 FEMaterialPoint* FEUncoupledViscoElasticMaterial::CreateMaterialPointData()
 { 
 	return new FEViscoElasticMaterialPoint(m_pBase->CreateMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
+//! find a material property index ( returns <0 for error)
+int FEUncoupledViscoElasticMaterial::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "elastic") == 0) return 0; else return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! set a material property (returns false on error)
+bool FEUncoupledViscoElasticMaterial::SetProperty(int i, FEMaterial* pm)
+{
+	if (i==0)
+	{
+		FEUncoupledMaterial* pme = dynamic_cast<FEUncoupledMaterial*>(pm);
+		if (pme)
+		{ 
+			SetBaseMaterial(pme);
+			return true;
+		}
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
