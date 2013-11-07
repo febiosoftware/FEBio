@@ -147,7 +147,7 @@ public:
 		XMLTag tag;
 		char szatt[MAX_TAG];
 		char szval[MAX_TAG];
-		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv);
+		InvalidAttributeValue(XMLTag& t, const char* sza, const char* szv = 0);
 	};
 
 	class MissingAttribute

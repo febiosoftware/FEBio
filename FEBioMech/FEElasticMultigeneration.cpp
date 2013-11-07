@@ -76,6 +76,16 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 }
 
 //=============================================================================
+void FEElasticMultigeneration::AddMaterial(FEElasticMaterial* pmat)
+{
+	m_pMat.push_back(pmat);
+
+	// TODO: assume that the material becomes stable since it is combined with others
+	// in a solid mixture.  (This may not necessarily be true.)
+	pmat->m_unstable = false;
+}
+
+//--------------------------------------------------------------------------------
 void FEElasticMultigeneration::PushGeneration(FEGenerationData* G)
 {
 	m_MG.push_back (G);

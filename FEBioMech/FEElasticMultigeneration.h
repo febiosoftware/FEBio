@@ -54,6 +54,8 @@ public:
 		// use the zero-th generation material point as the base elastic material point
 		return new FEMultigenerationMaterialPoint(this, m_pMat[0]->CreateMaterialPointData());
 	}
+
+	void AddMaterial(FEElasticMaterial* pmat);
 	
 public:
 	vector <FEElasticMaterial*>	m_pMat;	//!< pointers to elastic material

@@ -291,7 +291,7 @@ bool XMLTag::AttributeValue(const char* szat, int& n, bool bopt)
 XMLReader::InvalidAttributeValue::InvalidAttributeValue(XMLReader::XMLTag& t, const char* sza, const char* szv) : tag(t)
 { 
 	strcpy(szatt, sza);
-	strcpy(szval, szv);
+	if (szv) strcpy(szval, szv); else szval[0] = 0;
 }
 
 XMLReader::MissingAttribute::MissingAttribute(XMLTag& t, const char* sza) : tag(t)
