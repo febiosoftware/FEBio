@@ -26,14 +26,11 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 	// set the material's name
 	if (szname) pmat->SetName(szname);
 
-	// TODO: Solute materials need to have their ID set
-	if (dynamic_cast<FESolute*>(pmat))
+	// set the material attributes
+	for (int i=0; i<tag.m_natt; ++i)
 	{
-		FESolute* ps = dynamic_cast<FESolute*>(pmat);
-		const char* szid = tag.AttributeValue("sol");
-		int nid = atoi(szid) - 1;
-		if ((nid < 0) || (nid >= MAX_CDOFS)) throw XMLReader::InvalidAttributeValue(tag, "sol", szid);
-		ps->SetSoluteID(nid);
+		XMLReader::XMLAtt& att = tag.m_att[i];
+		if (pmat->SetAttribute(att.m_szatt, att.m_szatv) == false) { delete pmat; throw XMLReader::InvalidAttributeValue(tag, att.m_szatt); };
 	}
 
 	return pmat;
@@ -102,12 +99,6 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// chemical reaction material parameters
 			if (!bfound && dynamic_cast<FEChemicalReaction*>(pmat)) bfound = ParseReactionMaterial(tag, dynamic_cast<FEChemicalReaction*>(pmat));
 			
-			// multiphasic material parameters
-			if (!bfound && dynamic_cast<FEMultiphasic*>(pmat)) bfound = ParseMultiphasicMaterial(tag, dynamic_cast<FEMultiphasic*>(pmat));
-
-			// multigeneration materials
-			if (!bfound && dynamic_cast<FEElasticMultigeneration*>(pmat)) bfound = ParseElasticMultigeneration(tag, dynamic_cast<FEElasticMultigeneration*>(pmat));
-
 			// If we get here, we use the new "material property" interface.
 			if (!bfound)
 			{
@@ -296,45 +287,6 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 }
 
 //-----------------------------------------------------------------------------
-// Parse ParseElasticMultigeneration material 
-//
-bool FEBioMaterialSection::ParseElasticMultigeneration(XMLTag &tag, FEElasticMultigeneration *pm)
-{
-	// read the solid material
-	if (tag == "solid")
-	{
-		// create a new material of this type
-		FEMaterial* pmat = CreateMaterial(tag);
-		
-		// make sure the base material is a valid material (i.e. an elastic material)
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pmat);
-		
-		// don't allow rigid bodies
-		if ((pme == 0) || pme->IsRigid()) throw XMLReader::InvalidTag(tag);
-		
-		// get the growth generation and store it in the material ID
-		int id;
-		tag.AttributeValue("gen", id);
-
-		// make the ID zero-based
-		id--;
-		if (id < 0) throw XMLReader::InvalidAttributeValue(tag, "gen");
-
-		// Set the ID
-		pme->SetID(id);
-		
-		// add the material as a new generation
-		pm->AddMaterial(pme);
-		
-		// parse the solid
-		ParseMaterial(tag, pmat);
-		
-		return true;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
 // Parse FEChemicalReaction material 
 //
 bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction *pm)
@@ -427,113 +379,4 @@ bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction
 	else throw XMLReader::InvalidTag(tag);
 	
 	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Parse FETriphasic material 
-//
-bool FEBioMaterialSection::ParseMultiphasicMaterial(XMLTag &tag, FEMultiphasic *pm)
-{
-	// solutes are handled slightly differently
-	if (tag == "solute")
-	{
-		// get the (optional) material name
-		const char* szname = tag.AttributeValue("name", true);
-
-		// get the solute ID
-		const char* szid = tag.AttributeValue("sol");
-		int nid = atoi(szid) - 1;
-
-		// create a new solute material
-		FESolute* psol = new FESolute;
-		psol->SetSoluteID(nid);
-
-		// add the solute
-		pm->AddSolute(psol);
-
-		// set the new material's name (if defined)
-		if (szname) psol->SetName(szname);
-		
-		// parse the new material
-		ParseMaterial(tag, psol);
-	}
-	else if (tag == "solid_bound")
-	{
-		// get the material type
-		const char* sztype = "solid_bound";
-		
-		// get the material name
-		const char* szname = tag.AttributeValue("name", true);
-		
-		// get the solid-bound molecule id
-		const char* szid = tag.AttributeValue("sbm");
-		int id = atoi(szid) - 1;
-		if (id < 0) throw XMLReader::InvalidAttributeValue(tag, "sbm", szid);
-		
-		// create a new material of this type
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-		FEMaterial* pmat = febio.Create<FEMaterial>(sztype, GetFEModel());
-		if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-		
-		// make sure the base material is a valid material (i.e. a solid-bound molecule material)
-		FESolidBoundMolecule* pme = dynamic_cast<FESolidBoundMolecule*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid solid-bound molecule %s in multiphasic material %s\n", szname, pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the solid-bound molecule pointer
-		pm->AddSolidBoundMolecule(pme);
-		
-		// set the material's name
-		if (szname) pme->SetName(szname);
-		
-		// set the solute ID
-		pme->SetSBMID(id);
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-	}
-	else if (tag == "reaction")
-	{
-		// create a new material of this type
-		FEMaterial* pmat = CreateMaterial(tag);
-		
-		// make sure the base material is a valid material (i.e. a chemical reaction material)
-		FEChemicalReaction* pme = dynamic_cast<FEChemicalReaction*>(pmat);
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid chemical reaction in multiphasic material %s\n", pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the chemical reaction pointer
-		pm->AddChemicalReaction(pme);
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-	}
-	else
-	{
-		// see if we can find a material property with this name
-		int nc = pm->FindComponent(tag.Name());
-		if (nc == -1) throw XMLReader::InvalidTag(tag);
-
-		// create a new material of this type
-		FEMaterial* pmat = CreateMaterial(tag);
-
-		// assign the new material to the corresponding material property
-		if (pm->SetComponent(nc, pmat) == false)
-		{
-			clog.printbox("INPUT ERROR: Invalid %s definition in material %s\n", tag.Name(), pm->GetName());
-			throw XMLReader::Error();
-		}
-
-		// parse the new material
-		ParseMaterial(tag, pmat);
-	}
-	
-	return true;
 }

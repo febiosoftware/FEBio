@@ -26,8 +26,6 @@ protected:
 	bool ParseElasticMaterial			   (XMLTag& tag, FEElasticMaterial* pm);
 	bool ParseTransIsoMaterial			   (XMLTag& tag, FETransverselyIsotropic* pm);
 	bool ParseReactionMaterial			   (XMLTag& tag, FEChemicalReaction* pm);
-	bool ParseMultiphasicMaterial          (XMLTag& tag, FEMultiphasic* pm);
-	bool ParseElasticMultigeneration	   (XMLTag &tag, FEElasticMultigeneration *pm);
 
 	FEMaterial* CreateMaterial(XMLTag& tag);
 

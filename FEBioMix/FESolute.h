@@ -145,6 +145,9 @@ public:
 
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FEMaterial* pm);
+
+	//! set the material attribute
+	bool SetAttribute(const char* szname, const char* szval);
 	
 private:
 	int						m_ID;		//!< solute ID in global table
@@ -191,6 +194,10 @@ public:
 	//! get SBM ID
 	int GetSBMID() {return m_ID;}
 	
+public:
+	//! set the material attribute
+	bool SetAttribute(const char* szname, const char* szval);
+
 	//! Find a material parameter
 	FEParam* GetParameter(const ParamString& s);
 	

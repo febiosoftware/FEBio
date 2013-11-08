@@ -76,6 +76,30 @@ void FEMultigenerationMaterialPoint::Init(bool bflag)
 }
 
 //=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Find the index of a material property
+int FEElasticMultigeneration::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "solid") == 0) return (int) m_pMat.size();
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! Set a material property
+bool FEElasticMultigeneration::SetProperty(int n, FEMaterial* pm)
+{
+	assert(n == (int)m_pMat.size());
+	FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(pm);
+	if (pme)
+	{
+		AddMaterial(pme);
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticMultigeneration::AddMaterial(FEElasticMaterial* pmat)
 {
 	m_pMat.push_back(pmat);

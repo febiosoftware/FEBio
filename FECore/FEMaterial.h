@@ -108,6 +108,11 @@ public: // interface for getting/setting material properties
 	//! set a material property (returns false on error)
 	virtual bool SetProperty(int i, FEMaterial* pm) { return false; }
 
+public: // interface for managing attributes
+
+	//! Set the attribute
+	virtual bool SetAttribute(const char* szname, const char* szval) { return true; }
+
 protected:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID

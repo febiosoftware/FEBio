@@ -74,6 +74,9 @@ public:
 	FEElasticMaterial* GetElasticMaterial() { return this; }
 
 public:
+	bool SetAttribute(const char* szatt, const char* szval);
+
+public:
 	bool			m_unstable;		//!< flag indicating whether material is unstable on its own
 	FEMaterial*		m_pParent;		//!< pointer to parent	\todo This has to go!
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system

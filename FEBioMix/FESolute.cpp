@@ -130,6 +130,18 @@ bool FESolute::SetProperty(int n, FEMaterial* pm)
 }
 
 //-----------------------------------------------------------------------------
+bool FESolute::SetAttribute(const char* szname, const char* szval)
+{
+	if (strcmp(szname, "sol") == 0)
+	{
+		int nid = atoi(szval) - 1;
+		if ((nid < 0) || (nid >= MAX_CDOFS)) return false;
+		SetSoluteID(nid);
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 FEParam* FESolute::GetParameter(const ParamString& s)
 {
 	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
@@ -173,6 +185,18 @@ void FESolidBoundMolecule::Init()
 	if (m_rhoT < 0) throw MaterialError("density must be positive");
 	if (m_M < 0) throw MaterialError("molar_mass must be positive");
 	
+}
+
+//-----------------------------------------------------------------------------
+bool FESolidBoundMolecule::SetAttribute(const char* szname, const char* szval)
+{
+	if (strcmp(szname, "sbm") == 0)
+	{
+		int nid = atoi(szval) - 1;
+		if (nid < 0) return false;
+		SetSBMID(nid);
+	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
