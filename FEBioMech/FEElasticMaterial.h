@@ -1,6 +1,6 @@
 #pragma once
-#include "FECore/FEMaterial.h"
 #include "FECore/FECoordSysMap.h"
+#include "FESolidMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! This class defines material point data for elastic materials.
