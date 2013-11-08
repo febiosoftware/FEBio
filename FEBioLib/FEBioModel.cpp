@@ -1229,18 +1229,7 @@ bool FEBioModel::Reset()
 		for (i=0; i<NC; ++i)
 		{
 			FENLConstraint* plc = m_NLC[i];
-			if (dynamic_cast<FERigidJoint*>(plc))
-			{
-				FERigidJoint& rj = dynamic_cast<FERigidJoint&>(*plc);
-				rj.m_F = vec3d(0,0,0);
-				rj.m_L = vec3d(0,0,0);
-
-				FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBa]);
-				FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[rj.m_nRBb]);
-
-				rj.m_qa0 = rj.m_q0 - ra.m_r0;
-				rj.m_qb0 = rj.m_q0 - rb.m_r0;
-			}
+			plc->Reset();
 		}
 	}
 

@@ -31,6 +31,7 @@ public:
 	virtual void Serialize(DumpFile& ar) = 0;
 
 	// update state
+	virtual void Reset() {}
 	virtual void Update() {}
 
 	virtual FESurface* GetSurface(const char* sz) { return 0; }

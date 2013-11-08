@@ -49,6 +49,9 @@ public:
 	//! update state
 	void Update();
 
+	//! Reset data
+	void Reset();
+
 public:
 	int	m_nRBa;		//!< rigid body A that the joint connects
 	int	m_nRBb;		//!< rigid body B that the joint connects

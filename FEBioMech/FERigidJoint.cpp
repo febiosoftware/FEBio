@@ -287,3 +287,16 @@ void FERigidJoint::Update()
 	vec3d c = ra + qa - rb - qb;
 	m_F = m_L + c*m_eps;
 }
+
+//-----------------------------------------------------------------------------
+void FERigidJoint::Reset()
+{
+	m_F = vec3d(0,0,0);
+	m_L = vec3d(0,0,0);
+
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+
+	m_qa0 = m_q0 - RBa.m_r0;
+	m_qb0 = m_q0 - RBb.m_r0;
+}
