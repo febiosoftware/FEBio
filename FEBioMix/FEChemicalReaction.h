@@ -52,6 +52,16 @@ public:
 	//! return a material property
 	FEMaterial* GetProperty(int i);
 
+	//! find a material property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a material property (returns false on error)
+	bool SetProperty(int i, FEMaterial* pm);
+
+	void SetParameter(FEParam& p);
+
+	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
+
 public:
 	//! set the forward reaction rate
 	void SetForwardReactionRate(FEReactionRate* pfwd) { m_pFwd = pfwd; }
@@ -98,10 +108,14 @@ public:
 	vector<int>		m_v;		//!< net stoichiometric coefficients of reactants and products
     double          m_Vbar;     //!< weighted molar volume of reactants and products
     bool            m_Vovr;     //!< override flag for m_Vbar
+	int				m_vRtmp;	//!< helper variable for reading in stoichiometric coefficients for reactants
+	int				m_vPtmp;	//!< helper variable for reading in stoichiometric coefficients for products
 
 	FEReactionRate*	m_pFwd;		//!< pointer to forward reaction rate
 	FEReactionRate*	m_pRev;		//!< pointer to reverse reaction rate
 
 public:
 	FEMultiphasic*	m_pMP;		//!< pointer to multiphasic material where reaction occurs
+
+	DECLARE_PARAMETER_LIST();
 };

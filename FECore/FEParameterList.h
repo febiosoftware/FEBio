@@ -170,6 +170,9 @@ public:
 	//! It can be used to do additional processing when a parameter is read in.
 	virtual void SetParameter(FEParam& p) {}
 
+	//! If a parameter has attributes, this function will be called
+	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return true; }
+
 protected:
 	// This function will be overridden by each class that defines a parameter list
 	virtual void BuildParamList() {}

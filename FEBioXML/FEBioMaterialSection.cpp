@@ -96,9 +96,6 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// additional transversely isotropic material parameters
 			if (!bfound && dynamic_cast<FETransverselyIsotropic*>(pmat)) bfound = ParseTransIsoMaterial(tag, dynamic_cast<FETransverselyIsotropic*>(pmat));
 
-			// chemical reaction material parameters
-			if (!bfound && dynamic_cast<FEChemicalReaction*>(pmat)) bfound = ParseReactionMaterial(tag, dynamic_cast<FEChemicalReaction*>(pmat));
-			
 			// If we get here, we use the new "material property" interface.
 			if (!bfound)
 			{
@@ -226,45 +223,7 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
 
-	// read material fibers
-	if (tag == "fiber")
-	{
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-
-		// create a new coordinate system generator
-		const char* sztype = tag.AttributeValue("type");
-		if (strcmp(sztype, "user") == 0)
-		{
-			fprintf(stderr, "WARNING: The ""user"" fiber type is deprecated\n");
-		}
-		else
-		{
-			FECoordSysMap* pmap = febio.Create<FECoordSysMap>(sztype, &fem);
-			if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
-
-			// read the parameter list
-			FEParameterList& pl = pmap->GetParameterList();
-			if (pl.Parameters() > 0)
-			{
-				if (tag.isleaf()) m_pim->ReadParameter(tag, pl, sztype);
-				else
-				{
-					++tag;
-					do
-					{
-						if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-						++tag;
-					}
-					while(!tag.isend());
-				}
-			}
-			pm->m_pmap = pmap;
-		}
-
-		// mark the tag as read
-		return true;
-	}
-	else if (tag == "active_contraction")
+	if (tag == "active_contraction")
 	{
 		const char* szlc = tag.AttributeValue("lc");
 		FEParameterList& pl = pm->m_fib.GetParameterList();
@@ -283,100 +242,5 @@ bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsot
 		// mark tag as read
 		return true;
 	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Parse FEChemicalReaction material 
-//
-bool FEBioMaterialSection::ParseReactionMaterial(XMLTag &tag, FEChemicalReaction *pm)
-{
-	// read the stoichiometric coefficients and reaction rates
-	if (tag == "vR")
-	{
-		int id, vR;
-		if (tag.AttributeValue("sbm", id, true))
-		{
-			if (id < 1) throw XMLReader::InvalidAttributeValue(tag, "sbm");
-			tag.value(vR);
-			pm->SetSolidReactantsCoefficients(id-1, vR);
-		}
-		if (tag.AttributeValue("sol", id, true))
-		{
-			if ((id < 1) || (id > MAX_CDOFS)) throw XMLReader::InvalidAttributeValue(tag, "sol" );
-			tag.value(vR);
-			pm->SetSoluteReactantsCoefficients(id-1, vR);
-		}
-		return true;
-	}
-	else if (tag == "vP")
-	{
-		int id, vP;
-		if (tag.AttributeValue("sbm", id, true))
-		{
-			if (id < 1) throw XMLReader::InvalidAttributeValue(tag, "sbm");
-			tag.value(vP);
-			pm->SetSolidProductsCoefficients(id-1, vP);
-		}
-		if (tag.AttributeValue("sol", id, true))
-		{
-			if ((id < 1) || (id > MAX_CDOFS)) throw XMLReader::InvalidAttributeValue(tag, "sol");
-			tag.value(vP);
-			pm->SetSoluteProductsCoefficients(id-1, vP);
-		}
-		
-		return true;
-	}
-	else if (tag == "forward_rate")
-	{
-		// create a new material of this type
-		FEMaterial* pmat = CreateMaterial(tag);
-		
-		// make sure the base material is a valid material
-		FEReactionRate* pme = dynamic_cast<FEReactionRate*>(pmat);
-		
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid forward reaction rate in multiphasic material %s\n", pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the reaction rate pointer
-		pm->SetForwardReactionRate(pme);
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else if (tag == "reverse_rate")
-	{
-		// create a new material of this type
-		FEMaterial* pmat = CreateMaterial(tag);
-		
-		// make sure the base material is a valid material
-		FEReactionRate* pme = dynamic_cast<FEReactionRate*>(pmat);
-		if (pme == 0)
-		{
-			clog.printbox("INPUT ERROR", "Invalid reverse reaction rate in multiphasic material %s\n", pm->GetName());
-			throw XMLReader::Error();
-		}
-		
-		// set the reaction rate pointer
-		pm->SetReverseReactionRate(pme);
-		
-		// parse the material
-		ParseMaterial(tag, pme);
-		
-		return true;
-	}
-	else if (tag == "Vbar")
-    {
-        pm->m_Vovr = true;
-        tag.value(pm->m_Vbar);
-		return true;
-    }
-	else throw XMLReader::InvalidTag(tag);
-	
 	return false;
 }
