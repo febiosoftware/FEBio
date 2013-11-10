@@ -143,6 +143,7 @@ REGISTER_MATERIAL(FEUncoupledActiveContraction   , "uncoupled active contraction
 REGISTER_MATERIAL(FEHuiskesSupply                , "Huiskes-supply"                );
 REGISTER_MATERIAL(FERemodelingElasticMaterial    , "remodeling solid"              );
 REGISTER_MATERIAL(FECarterHayesOld               , "Carter-Hayes (old)"            );
+REGISTER_MATERIAL(FEActiveFiberContraction       , "active_contraction"            );
 REGISTER_MATERIAL(FEPreStrainTransIsoMR          , "pre-strain trans iso Mooney-Rivlin");
 
 //-----------------------------------------------------------------------------

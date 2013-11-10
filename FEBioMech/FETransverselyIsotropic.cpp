@@ -33,26 +33,32 @@ FEMaterial* FETransverselyIsotropic::GetProperty(int n)
 }
 
 //-----------------------------------------------------------------------------
+//! find a material property index ( returns <0 for error)
+int FETransverselyIsotropic::FindPropertyIndex(const char* szname)
+{
+	if (strcmp(szname, "active_contraction") == 0) return 1;
+	return -1;
+}
+
+//-----------------------------------------------------------------------------
+//! set a material property (returns false on error)
+bool FETransverselyIsotropic::SetProperty(int i, FEMaterial* pm)
+{
+	if (i == 1)
+	{
+		FEActiveFiberContraction* pma = dynamic_cast<FEActiveFiberContraction*>(pm);
+		if (pma) { m_fib.SetActiveContraction(pma); return true; }
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 //! Serialize data to or from the dump file 
 void FETransverselyIsotropic::Serialize(DumpFile &ar)
 {
 	// serialize the base class parameters
 	FEUncoupledMaterial::Serialize(ar);
 
-	if (ar.IsSaving())
-	{
-		ar << m_fib.m_ascl;
-		ar << m_fib.m_ca0;
-		ar << m_fib.m_beta;
-		ar << m_fib.m_l0;
-		ar << m_fib.m_refl;
-	}
-	else
-	{
-		ar >> m_fib.m_ascl;
-		ar >> m_fib.m_ca0;
-		ar >> m_fib.m_beta;
-		ar >> m_fib.m_l0;
-		ar >> m_fib.m_refl;
-	}
+	// serialize fiber data
+	m_fib.Serialize(ar);
 }

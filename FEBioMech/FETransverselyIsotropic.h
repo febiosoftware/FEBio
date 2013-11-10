@@ -33,6 +33,12 @@ public:
 	//! return a pointer to the property
 	FEMaterial* GetProperty(int n);
 
+	//! find a material property index ( returns <0 for error)
+	int FindPropertyIndex(const char* szname);
+
+	//! set a material property (returns false on error)
+	bool SetProperty(int i, FEMaterial* pm);
+
 public:
 	FEFiberMaterial	m_fib;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "FEBioImport.h"
-#include "FEBioMech/FETransverselyIsotropic.h"
+#include "FEBioMech/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Material Section
@@ -13,7 +13,6 @@ public:
 protected:
 	void ParseMaterial					   (XMLTag& tag, FEMaterial* pm);
 	bool ParseElasticMaterial			   (XMLTag& tag, FEElasticMaterial* pm);
-	bool ParseTransIsoMaterial			   (XMLTag& tag, FETransverselyIsotropic* pm);
 
 	FEMaterial* CreateMaterial(XMLTag& tag);
 

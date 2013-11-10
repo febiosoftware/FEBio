@@ -93,9 +93,6 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// additional elastic material parameters
 			if (!bfound && dynamic_cast<FEElasticMaterial*>(pmat)) bfound = ParseElasticMaterial(tag, dynamic_cast<FEElasticMaterial*>(pmat));
 
-			// additional transversely isotropic material parameters
-			if (!bfound && dynamic_cast<FETransverselyIsotropic*>(pmat)) bfound = ParseTransIsoMaterial(tag, dynamic_cast<FETransverselyIsotropic*>(pmat));
-
 			// If we get here, we use the new "material property" interface.
 			if (!bfound)
 			{
@@ -210,36 +207,6 @@ bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *
 		}
 
 		// mark the tag as read
-		return true;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Parse FETransverselyIsotropic
-//
-bool FEBioMaterialSection::ParseTransIsoMaterial(XMLTag &tag, FETransverselyIsotropic *pm)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
-
-	if (tag == "active_contraction")
-	{
-		const char* szlc = tag.AttributeValue("lc");
-		FEParameterList& pl = pm->m_fib.GetParameterList();
-		FEParam& p = *pl.Find("ascl");
-		p.m_nlc = atoi(szlc)-1;
-		p.value<double>() = 1.0;
-
-		++tag;
-		do
-		{
-			if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-
-		// mark tag as read
 		return true;
 	}
 	return false;
