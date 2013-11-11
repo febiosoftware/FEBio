@@ -19,17 +19,18 @@ void FETransverselyIsotropic::Init()
 }
 
 //-----------------------------------------------------------------------------
-// This material has only one property (the fiber material)
+// This material has two properties (the fiber material and the active contraction material)
 int FETransverselyIsotropic::Properties()
 {
-	return 1;
+	return 2;
 }
 
 //-----------------------------------------------------------------------------
 FEMaterial* FETransverselyIsotropic::GetProperty(int n)
 {
-	if ((n < 0) || (n > 1)) return 0;
-	return &m_fib;
+	if (n == 0) return &m_fib;
+	if (n == 1) return m_fib.GetActiveContraction();
+	return 0;
 }
 
 //-----------------------------------------------------------------------------

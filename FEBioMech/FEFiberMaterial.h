@@ -59,6 +59,9 @@ public:
 	//! Set the active contraction property
 	void SetActiveContraction(FEActiveFiberContraction* pma) { m_pafc = pma; }
 
+	//! get the active contraction property
+	FEMaterial* GetActiveContraction() { return m_pafc; }
+
 	//! get activation
 	double GetActivation() { return (m_pafc ? m_pafc->GetActivation() : 0.0); }
 
