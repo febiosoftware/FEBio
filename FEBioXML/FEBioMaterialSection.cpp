@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "FEBioMaterialSection.h"
 #include "FECore/FEModel.h"
-#include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
+//! This function creates a material by checking the type attribute against
+//! registered materials. Also, if the tag defines attributes (other than
+//! type and name), the material is offered a chance to process the attributes.
 FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
@@ -37,6 +39,8 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+//! Parse the Materials section. 
+//! \todo I should probably check that all tags are material tags.
 void FEBioMaterialSection::Parse(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
@@ -70,6 +74,7 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
+//! Parse the parameters and properties of the material.
 void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 {
 	FEModel& fem = *GetFEModel();
@@ -126,7 +131,7 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-// read the material axis
+//! read the material axis
 bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 {
 	FEModel& fem = *GetFEModel();
@@ -172,6 +177,7 @@ bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 }
 
 //-----------------------------------------------------------------------------
+//! Read the fiber tag.
 bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 {
 	FEModel& fem = *GetFEModel();

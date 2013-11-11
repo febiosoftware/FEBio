@@ -1,6 +1,5 @@
 #pragma once
 #include "FEBioImport.h"
-#include "FEBioMech/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 // Material Section
