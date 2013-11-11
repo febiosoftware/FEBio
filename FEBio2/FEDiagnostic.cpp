@@ -43,7 +43,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	m_pfem = &fem;
 	m_pdia = 0;
 
-	FEAnalysis* pstep = new FESolidAnalysis(fem);
+	FEAnalysis* pstep = new FESolidAnalysis(m_pfem);
 	fem.AddStep(pstep);
 	fem.m_nStep = 0;
 	fem.SetCurrentStep(pstep);

@@ -7,7 +7,7 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-FESolidAnalysis::FESolidAnalysis(FEModel& fem) : FEAnalysis(fem, FE_SOLID) 
+FESolidAnalysis::FESolidAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_SOLID) 
 {
 
 }

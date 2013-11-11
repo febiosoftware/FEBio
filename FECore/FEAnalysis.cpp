@@ -16,7 +16,7 @@
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel& fem, int ntype) : m_fem(fem), m_ntype(ntype) 
+FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : m_fem(*pfem), m_ntype(ntype) 
 {
 	m_psolver = 0;
 	m_tend = 0.0;
@@ -50,7 +50,7 @@ FEAnalysis::FEAnalysis(FEModel& fem, int ntype) : m_fem(fem), m_ntype(ntype)
 
 	// --- I/O Data ---
 	m_bDump = false;
-	bool bdebug = fem.GetDebugFlag();
+	bool bdebug = m_fem.GetDebugFlag();
 	m_nplot  = (bdebug?FE_PLOT_MINOR_ITRS     : FE_PLOT_MAJOR_ITRS );
 	m_nprint = (bdebug?FE_PRINT_MINOR_ITRS_EXP: FE_PRINT_MINOR_ITRS);
 }

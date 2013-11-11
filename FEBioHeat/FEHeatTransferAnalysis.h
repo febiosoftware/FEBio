@@ -8,7 +8,7 @@ class FEHeatTransferAnalysis : public FEAnalysis
 {
 public:
 	//! constructor
-	FEHeatTransferAnalysis(FEModel& fem);
+	FEHeatTransferAnalysis(FEModel* pfem);
 
 	//! Initialization
 	bool Init();

@@ -73,6 +73,8 @@
 #include "FEInSituStretch.h"
 #include "FEPointConstraint.h"
 
+#include "FESolidAnalysis.h"
+
 #include "FEBioMechPlot.h"
 #include "FEBioMechData.h"
 
@@ -80,6 +82,12 @@
 //! Register all the classes of the FEBioMech module with the FEBio framework.
 void FEBioMech::InitModule()
 {
+//-----------------------------------------------------------------------------
+// Analysis classes
+REGISTER_FEBIO_CLASS(FESolidAnalysis        , FEAnalysis, "solid"         );
+REGISTER_FEBIO_CLASS(FEExplicitSolidAnalysis, FEAnalysis, "explicit-solid");
+REGISTER_FEBIO_CLASS(FELinearSolidAnalysis  , FEAnalysis, "linear-solid"  );
+
 //-----------------------------------------------------------------------------
 // material classes
 REGISTER_MATERIAL(FE2DFiberNeoHookean            , "2D fiber neo-Hookean"          );

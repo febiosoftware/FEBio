@@ -7,7 +7,7 @@ using namespace FECore;
 class FEBiphasicAnalysis : public FEAnalysis
 {
 public:
-	FEBiphasicAnalysis(FEModel& fem) : FEAnalysis(fem, FE_BIPHASIC) {}
+	FEBiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_BIPHASIC) {}
 
 	bool Init();
 };
@@ -17,7 +17,7 @@ public:
 class FEBiphasicSoluteAnalysis : public FEAnalysis
 {
 public:
-	FEBiphasicSoluteAnalysis(FEModel& fem) : FEAnalysis(fem, FE_POROSOLUTE) {}
+	FEBiphasicSoluteAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_POROSOLUTE) {}
 
 	bool Init();
 };

@@ -19,12 +19,8 @@
 #include "FEBioStepSection.h"
 #include "FECore/DataStore.h"
 #include "FECore/log.h"
-#include <string.h>
 #include "FECore/Image.h"
-#include "FEBioHeat/FEHeatTransferAnalysis.h"
-#include "FEBioMix/FEBiphasicAnalysis.h"
-#include "FEBioMix/FEMultiphasicAnalysis.h"
-#include "FEBioMech/FESolidAnalysis.h"
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 FEModel* FEBioFileSection::GetFEModel() { return m_pim->GetFEModel(); }
@@ -286,15 +282,17 @@ FEAnalysis* FEFEBioImport::GetStep()
 FEAnalysis* FEFEBioImport::CreateNewStep()
 {
 	FEAnalysis* pstep = 0;
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	
 	switch (m_nstep_type)
 	{
-	case FE_SOLID         : pstep = new FESolidAnalysis         (*m_pfem); break;
-	case FE_EXPLICIT_SOLID: pstep = new FEExplicitSolidAnalysis (*m_pfem); break;
-	case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (*m_pfem); break;
-	case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (*m_pfem); break;
-	case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(*m_pfem); break;
-	case FE_MULTIPHASIC   : pstep = new FEMultiphasicAnalysis   (*m_pfem); break;
-	case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (*m_pfem); break;
+	case FE_SOLID         : pstep = febio.Create<FEAnalysis>("solid"          , m_pfem); break;
+	case FE_EXPLICIT_SOLID: pstep = febio.Create<FEAnalysis>("explicit-solid" , m_pfem); break;
+	case FE_LINEAR_SOLID  : pstep = febio.Create<FEAnalysis>("linear-solid"   , m_pfem); break;
+	case FE_BIPHASIC      : pstep = febio.Create<FEAnalysis>("biphasic"       , m_pfem); break;
+	case FE_POROSOLUTE    : pstep = febio.Create<FEAnalysis>("biphasic-solute", m_pfem); break;
+	case FE_MULTIPHASIC   : pstep = febio.Create<FEAnalysis>("multiphasic"    , m_pfem); break;
+	case FE_HEAT          : pstep = febio.Create<FEAnalysis>("heat transfer"  , m_pfem); break;
 //	case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*m_pfem); break;
 	default:
 		assert(false);

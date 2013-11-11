@@ -425,14 +425,14 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 			FEAnalysis* pstep = 0;
 			switch (ntype)
 			{
-			case FE_SOLID         : pstep = new FESolidAnalysis         (*this); break;
-			case FE_EXPLICIT_SOLID: pstep = new FEExplicitSolidAnalysis (*this); break;
-			case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (*this); break;
-			case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (*this); break;
-			case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(*this); break;
-			case FE_MULTIPHASIC   : pstep = new FEMultiphasicAnalysis   (*this); break;
-			case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (*this); break;
-//			case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (*this); break;
+			case FE_SOLID         : pstep = new FESolidAnalysis         (this); break;
+			case FE_EXPLICIT_SOLID: pstep = new FEExplicitSolidAnalysis (this); break;
+			case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (this); break;
+			case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (this); break;
+			case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(this); break;
+			case FE_MULTIPHASIC   : pstep = new FEMultiphasicAnalysis   (this); break;
+			case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (this); break;
+//			case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (this); break;
 			default:
 				assert(false);
 			}

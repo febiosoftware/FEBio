@@ -7,7 +7,7 @@ using namespace FECore;
 class FEMultiphasicAnalysis : public FEAnalysis
 {
 public:
-	FEMultiphasicAnalysis(FEModel& fem) : FEAnalysis(fem, FE_MULTIPHASIC) {}
+	FEMultiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_MULTIPHASIC) {}
 
 	bool Init();
 };

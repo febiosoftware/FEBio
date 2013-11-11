@@ -32,6 +32,9 @@
 #include "FESlidingInterface3.h"
 #include "FETiedBiphasicInterface.h"
 
+#include "FEBiphasicAnalysis.h"
+#include "FEMultiphasicAnalysis.h"
+
 #include "FEBioMixPlot.h"
 #include "FEBioMixData.h"
 
@@ -40,6 +43,11 @@
 //! in this module with the FEBio framework.
 void FEBioMix::InitModule()
 {
+//-----------------------------------------------------------------------------
+// Analysis classes
+REGISTER_FEBIO_CLASS(FEBiphasicAnalysis      , FEAnalysis, "biphasic"       );
+REGISTER_FEBIO_CLASS(FEBiphasicSoluteAnalysis, FEAnalysis, "biphasic-solute");
+REGISTER_FEBIO_CLASS(FEMultiphasicAnalysis   , FEAnalysis, "multiphasic"    );
 
 //-----------------------------------------------------------------------------
 // Materials

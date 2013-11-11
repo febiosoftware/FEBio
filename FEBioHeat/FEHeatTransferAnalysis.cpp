@@ -3,7 +3,7 @@
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-FEHeatTransferAnalysis::FEHeatTransferAnalysis(FEModel& fem) : FEAnalysis(fem, FE_HEAT)
+FEHeatTransferAnalysis::FEHeatTransferAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_HEAT)
 {
 }
 

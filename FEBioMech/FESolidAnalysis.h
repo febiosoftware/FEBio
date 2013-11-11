@@ -8,7 +8,7 @@ class FESolidAnalysis : public FEAnalysis
 {
 public:
 	//! constructor
-	FESolidAnalysis(FEModel& fem);
+	FESolidAnalysis(FEModel* pfem);
 
 	//! initialization
 	bool Init();
@@ -20,7 +20,7 @@ class FEExplicitSolidAnalysis : public FEAnalysis
 {
 public:
 	//! constructor
-	FEExplicitSolidAnalysis(FEModel& fem) : FEAnalysis(fem, FE_EXPLICIT_SOLID){}
+	FEExplicitSolidAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_EXPLICIT_SOLID){}
 
 	//! initialization
 	bool Init();
@@ -32,7 +32,7 @@ class FELinearSolidAnalysis : public FEAnalysis
 {
 public:
 	//! constructor
-	FELinearSolidAnalysis(FEModel& fem) : FEAnalysis(fem, FE_LINEAR_SOLID) {}
+	FELinearSolidAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_LINEAR_SOLID) {}
 
 	//! initialization
 	bool Init();
