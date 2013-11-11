@@ -215,14 +215,13 @@ FEElasticMaterial::FEElasticMaterial()
 	m_density = 1; 
 	m_molarmass = 0; 
 	m_unstable = false;
-	m_pmap = 0; 
 	m_pParent = 0;
 }
 
 //-----------------------------------------------------------------------------
 FEElasticMaterial::~FEElasticMaterial()
 { 
-	if (m_pmap) delete m_pmap; 
+	
 }
 
 //-----------------------------------------------------------------------------

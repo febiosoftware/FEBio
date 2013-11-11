@@ -49,22 +49,24 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 
 	bool bmerr = false;
 
+	// get the elements material
+	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
+
+	FECoordSysMap* pmap = m_pMat->GetCoordinateSystemMap();
+
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		FESolidElement& el = m_Elem[i];
 
-		// get the elements material
-		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-
 		// set the local element coordinates
 		if (pme)
 		{
-			if (pme->m_pmap)
+			if (pmap)
 			{
 				for (int n=0; n<el.GaussPoints(); ++n)
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-					pt.m_Q = pme->m_pmap->LocalElementCoord(el, n);
+					pt.m_Q = pmap->LocalElementCoord(el, n);
 				}
 			}
 			else
@@ -74,7 +76,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 				// TODO: This assumes that pt.Q will not get intialized to
 				//		 a valid value. I should find another way for checking since I
 				//		 would like pt.Q always to be initialized to a decent value.
-				if (dynamic_cast<FETransverselyIsotropic*>(pme))
+				if (dynamic_cast<FETransverselyIsotropic*>(m_pMat))
 				{
 					FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
 					mat3d& m = pt.m_Q;
@@ -99,12 +101,13 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 			if (pve)
 			{
 				// check if the nested elastic material has local material axes specified
-				if (pve->GetBaseMaterial()->m_pmap) {
+				FECoordSysMap* pmap2 = pve->GetBaseMaterial()->GetCoordinateSystemMap();
+				if (pmap2) {
 					for (int n=0; n<el.GaussPoints(); ++n)
 					{
 						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 						// compound the local map with the global material axes
-						mat3d Qlocal = pve->GetBaseMaterial()->m_pmap->LocalElementCoord(el, n);
+						mat3d Qlocal = pmap2->LocalElementCoord(el, n);
 						pt.m_Q = Qlocal*pt.m_Q;
 					}
 				}
@@ -115,12 +118,13 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 			if (puve)
 			{
 				// check if the nested elastic material has local material axes specified
-				if (puve->GetBaseMaterial()->m_pmap) {
+				FECoordSysMap* pmap2 = puve->GetBaseMaterial()->GetCoordinateSystemMap();
+				if (pmap2) {
 					for (int n=0; n<el.GaussPoints(); ++n)
 					{
 						FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
 						// compound the local map with the global material axes
-						mat3d Qlocal = puve->GetBaseMaterial()->m_pmap->LocalElementCoord(el, n);
+						mat3d Qlocal = pmap2->LocalElementCoord(el, n);
 						pt.m_Q = Qlocal*pt.m_Q;
 					}
 				}

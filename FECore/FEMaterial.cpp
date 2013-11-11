@@ -26,11 +26,13 @@ FEMaterial::FEMaterial()
 	static int n = 1;
 	m_szname[0] = 0;
 	m_nID = -1;
+	m_pmap = 0;
 }
 
 //-----------------------------------------------------------------------------
 FEMaterial::~FEMaterial()
 {
+	if (m_pmap) delete m_pmap; 
 }
 
 //-----------------------------------------------------------------------------
@@ -45,6 +47,18 @@ void FEMaterial::SetName(const char* sz)
 const char* FEMaterial::GetName()
 { 
 	return m_szname; 
+}
+
+//-----------------------------------------------------------------------------
+void FEMaterial::SetCoordinateSystemMap(FECoordSysMap* pmap)
+{
+	m_pmap = pmap;
+}
+
+//-----------------------------------------------------------------------------
+FECoordSysMap* FEMaterial::GetCoordinateSystemMap()
+{
+	return m_pmap;
 }
 
 //-----------------------------------------------------------------------------

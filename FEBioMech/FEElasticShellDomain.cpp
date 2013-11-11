@@ -28,42 +28,38 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 
 	bool bmerr = false;
 
+	FECoordSysMap* pmap = m_pMat->GetCoordinateSystemMap();
+
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
 		// unpack element data
 		FEShellElement& el = m_Elem[i];
 
-		// get the elements material
-		FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-
 		// set the local element coordinates
-		if (pme)
+		if (pmap)
 		{
-			if (pme->m_pmap)
+			for (int n=0; n<el.GaussPoints(); ++n)
 			{
-				for (int n=0; n<el.GaussPoints(); ++n)
-				{
-					FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-					pt.m_Q = pme->m_pmap->LocalElementCoord(el, n);
-				}
+				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+				pt.m_Q = pmap->LocalElementCoord(el, n);
 			}
-			else
+		}
+		else
+		{
+			// If we get here, then the element has a user-defined fiber direction
+			// we should check to see if it has indeed been specified.
+			// TODO: This assumes that pt.Q will not get intialized to
+			//		 a valid value. I should find another way for checking since I
+			//		 would like pt.Q always to be initialized to a decent value.
+			if (dynamic_cast<FETransverselyIsotropic*>(m_pMat))
 			{
-				// If we get here, then the element has a user-defined fiber direction
-				// we should check to see if it has indeed been specified.
-				// TODO: This assumes that pt.Q will not get intialized to
-				//		 a valid value. I should find another way for checking since I
-				//		 would like pt.Q always to be initialized to a decent value.
-				if (dynamic_cast<FETransverselyIsotropic*>(pme))
+				FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
+				mat3d& m = pt.m_Q;
+				if (fabs(m.det() - 1) > 1e-7)
 				{
-					FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
-					mat3d& m = pt.m_Q;
-					if (fabs(m.det() - 1) > 1e-7)
-					{
-						// this element did not get specified a user-defined fiber direction
-						clog.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
-						bmerr = true;
-					}
+					// this element did not get specified a user-defined fiber direction
+					clog.printbox("ERROR", "Shell element %d was not assigned a fiber direction.", i+1);
+					bmerr = true;
 				}
 			}
 		}
@@ -81,7 +77,6 @@ void FEElasticShellDomain::InitElements()
 		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
 	}
 }
-
 
 //-----------------------------------------------------------------------------
 void FEElasticShellDomain::Serialize(DumpFile &ar)

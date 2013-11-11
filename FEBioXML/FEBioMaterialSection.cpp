@@ -90,8 +90,9 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 			// TODO: this option will become obselete
 			bool bfound = false;
 
-			// additional elastic material parameters
-			if (!bfound && dynamic_cast<FEElasticMaterial*>(pmat)) bfound = ParseElasticMaterial(tag, dynamic_cast<FEElasticMaterial*>(pmat));
+			// additional material parameters
+			if (!bfound && (tag == "fiber"   )) bfound = ParseFiberTag  (tag, pmat);
+			if (!bfound && (tag == "mat_axis")) bfound = ParseMatAxisTag(tag, pmat);
 
 			// If we get here, we use the new "material property" interface.
 			if (!bfound)
@@ -125,89 +126,89 @@ void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 }
 
 //-----------------------------------------------------------------------------
-// Parse FEElasticMaterial 
-//
-bool FEBioMaterialSection::ParseElasticMaterial(XMLTag &tag, FEElasticMaterial *pm)
+// read the material axis
+bool FEBioMaterialSection::ParseMatAxisTag(XMLTag &tag, FEMaterial *pm)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& mesh = fem.GetMesh();
-	// read the material axis
-	if (tag == "mat_axis")
+
+	XMLAtt& type = tag.Attribute("type");
+	if (type == "local")
 	{
-		XMLAtt& type = tag.Attribute("type");
-		if (type == "local")
+		FELocalMap* pmap = new FELocalMap(&fem);
+		pm->SetCoordinateSystemMap(pmap);
+
+		int n[3] = {0};
+		tag.value(n, 3);
+		if ((n[0] == 0) && (n[1] == 0) && (n[2] == 0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
+
+		pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
+	}
+	else if (type == "vector")
+	{
+		FEVectorMap* pmap = new FEVectorMap(&fem);
+		pm->SetCoordinateSystemMap(pmap);
+
+		vec3d a(1,0,0), d(0,1,0);
+		++tag;
+		do
 		{
-			FELocalMap* pmap = new FELocalMap(&fem);
-			pm->m_pmap = pmap;
-
-			int n[3] = {0};
-			tag.value(n, 3);
-			if ((n[0] == 0) && (n[1] == 0) && (n[2] == 0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
-
-			pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
-		}
-		else if (type == "vector")
-		{
-			FEVectorMap* pmap = new FEVectorMap(&fem);
-			pm->m_pmap = pmap;
-
-			vec3d a(1,0,0), d(0,1,0);
+			if (tag == "a") tag.value(a);
+			else if (tag == "d") tag.value(d);
+			else throw XMLReader::InvalidTag(tag);
+			
 			++tag;
-			do
-			{
-				if (tag == "a") tag.value(a);
-				else if (tag == "d") tag.value(d);
-				else throw XMLReader::InvalidTag(tag);
-
-				++tag;
-			}
-			while (!tag.isend());
-			pmap->SetVectors(a, d);
 		}
-		else if (type == "user")
-		{
-			// material axis are read in from the ElementData section
-		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
-
-		return true;
+		while (!tag.isend());
+		pmap->SetVectors(a, d);
 	}
-	else if (tag == "fiber")
+	else if (type == "user")
 	{
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-
-		// create a new coordinate system generator
-		XMLAtt& type = tag.Attribute("type");
-		if (type == "user")
-		{
-			fprintf(stderr, "WARNING: The ""user"" fiber type is deprecated\n");
-		}
-		else
-		{
-			FECoordSysMap* pmap = febio.Create<FECoordSysMap>(type.cvalue(), &fem);
-			if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
-
-			// read the parameter list
-			FEParameterList& pl = pmap->GetParameterList();
-			if (pl.Parameters() > 0)
-			{
-				if (tag.isleaf()) m_pim->ReadParameter(tag, pl, type.cvalue());
-				else
-				{
-					++tag;
-					do
-					{
-						if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-						++tag;
-					}
-					while(!tag.isend());
-				}
-			}
-			pm->m_pmap = pmap;
-		}
-
-		// mark the tag as read
-		return true;
+		// material axis are read in from the ElementData section
 	}
-	return false;
+	else throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
+	// create a new coordinate system generator
+	XMLAtt& type = tag.Attribute("type");
+	if (type == "user")
+	{
+		fprintf(stderr, "WARNING: The ""user"" fiber type is deprecated\n");
+	}
+	else
+	{
+		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(type.cvalue(), &fem);
+		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
+
+		// read the parameter list
+		FEParameterList& pl = pmap->GetParameterList();
+		if (pl.Parameters() > 0)
+		{
+			if (tag.isleaf()) m_pim->ReadParameter(tag, pl, type.cvalue());
+			else
+			{
+				++tag;
+				do
+				{
+					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
+					++tag;
+				}
+				while(!tag.isend());
+			}
+		}
+		pm->SetCoordinateSystemMap(pmap);
+	}
+
+	// mark the tag as read
+	return true;
 }

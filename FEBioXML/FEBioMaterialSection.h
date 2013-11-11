@@ -11,8 +11,9 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	void ParseMaterial					   (XMLTag& tag, FEMaterial* pm);
-	bool ParseElasticMaterial			   (XMLTag& tag, FEElasticMaterial* pm);
+	void ParseMaterial  (XMLTag& tag, FEMaterial* pm);
+	bool ParseFiberTag  (XMLTag& tag, FEMaterial* pm);
+	bool ParseMatAxisTag(XMLTag& tag, FEMaterial* pm);
 
 	FEMaterial* CreateMaterial(XMLTag& tag);
 

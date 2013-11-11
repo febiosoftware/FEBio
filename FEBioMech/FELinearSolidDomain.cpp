@@ -27,35 +27,38 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 	// error flag
 	bool bmerr = false;
 
-	// loop over all elements
-	for (size_t i=0; i<m_Elem.size(); ++i)
+	// If the material has a material map
+	// generate the element's local coordinate transformation
+	FECoordSysMap* pmap = m_pMat->GetCoordinateSystemMap();
+	if (pmap)
 	{
-		// get the next element
-		FESolidElement& el = m_Elem[i];
-
-		// get the elements material
-		FEElasticMaterial* pme = dynamic_cast<FEElasticMaterial*>(m_pMat);
-		if (pme == 0) return false;
-
-		// If the material has a material map
-		// generate the element's local coordinate transformation
-		if (pme->m_pmap)
+		// loop over all elements
+		for (size_t i=0; i<m_Elem.size(); ++i)
 		{
+			// get the next element
+			FESolidElement& el = m_Elem[i];
+
 			for (int n=0; n<el.GaussPoints(); ++n)
 			{
 				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-				pt.m_Q = pme->m_pmap->LocalElementCoord(el, n);
+				pt.m_Q = pmap->LocalElementCoord(el, n);
 			}
 		}
-		else
+	}
+	else
+	{
+		// If we get here, then the element has a user-defined fiber axis
+		// we should check to see if it has indeed been specified.
+		// TODO: This assumes that pt.Q will not get intialized to
+		//		 a valid value. I should find another way for checking since I
+		//		 would like pt.Q always to be initialized to a decent value.
+		if (dynamic_cast<FETransverselyIsotropic*>(m_pMat))
 		{
-			// If we get here, then the element has a user-defined fiber axis
-			// we should check to see if it has indeed been specified.
-			// TODO: This assumes that pt.Q will not get intialized to
-			//		 a valid value. I should find another way for checking since I
-			//		 would like pt.Q always to be initialized to a decent value.
-			if (dynamic_cast<FETransverselyIsotropic*>(pme))
+			// loop over all elements
+			for (size_t i=0; i<m_Elem.size(); ++i)
 			{
+				// get the next element
+				FESolidElement& el = m_Elem[i];
 				FEElasticMaterialPoint& pt = *el.m_State[0]->ExtractData<FEElasticMaterialPoint>();
 				mat3d& m = pt.m_Q;
 				if (fabs(m.det() - 1) > 1e-7)

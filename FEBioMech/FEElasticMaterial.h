@@ -1,5 +1,4 @@
 #pragma once
-#include "FECore/FECoordSysMap.h"
 #include "FESolidMaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -79,7 +78,6 @@ public:
 public:
 	bool			m_unstable;		//!< flag indicating whether material is unstable on its own
 	FEMaterial*		m_pParent;		//!< pointer to parent	\todo This has to go!
-	FECoordSysMap*	m_pmap;			//!< local material coordinate system
 
 	DECLARE_PARAMETER_LIST();
 };

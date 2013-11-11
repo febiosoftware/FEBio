@@ -14,6 +14,7 @@
 #include "FEMaterialFactory.h"
 #include "FEParameterList.h"
 #include "FEMaterialPoint.h"
+#include "FECoordSysMap.h"
 #include "DumpFile.h"
 #include <string.h>
 
@@ -94,6 +95,12 @@ public:
 	//! is this a rigid material \todo this is temporary solution to avoid RTTI and the need to define rigid materials in FECore
 	virtual bool IsRigid() { return false; }
 
+	//! Set the local coordinate system map
+	void SetCoordinateSystemMap(FECoordSysMap* pmap);
+
+	//! Get the local coordinate system
+	FECoordSysMap* GetCoordinateSystemMap();
+
 public: // interface for getting/setting material properties
 
 	//! get the number of material properties
@@ -116,6 +123,9 @@ public: // interface for managing attributes
 protected:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID
+
+protected:
+	FECoordSysMap*	m_pmap;			//!< local material coordinate system
 };
 
 //-----------------------------------------------------------------------------
