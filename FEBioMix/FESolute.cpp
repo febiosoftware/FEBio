@@ -42,16 +42,29 @@ void FESolute::Serialize(DumpFile& ar)
 	FEMaterial::Serialize(ar);
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 	
+	int nSupp = 0;
 	if (ar.IsSaving())
 	{
+		ar << GetSoluteID();
 		ar << m_rhoT << m_M << m_z;
 		
 		ar << febio.GetTypeStr<FEMaterial>(m_pDiff ); m_pDiff ->Serialize(ar);
 		ar << febio.GetTypeStr<FEMaterial>(m_pSolub); m_pSolub->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pSupp ); m_pSupp ->Serialize(ar);
+		
+		if (m_pSupp == 0) ar << nSupp;
+		else
+		{
+			nSupp = 1;
+			ar << nSupp;
+			ar << febio.GetTypeStr<FEMaterial>(m_pSupp );
+			m_pSupp ->Serialize(ar);
+		}
 	}
 	else
 	{
+		int solID;
+		ar >> solID;
+		SetSoluteID(solID);
 		ar >> m_rhoT >> m_M >> m_z;
 		
 		char sz[256] = {0};
@@ -65,10 +78,14 @@ void FESolute::Serialize(DumpFile& ar)
 		assert(m_pSolub); m_pSolub->Serialize(ar);
 		m_pSolub->Init();
 		
-		ar >> sz;
-		m_pSupp = dynamic_cast<FESoluteSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
-		assert(m_pSupp); m_pSupp->Serialize(ar);
-		m_pSupp->Init();
+		ar >> nSupp;
+		if (nSupp)
+		{
+			ar >> sz;
+			m_pSupp = dynamic_cast<FESoluteSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+			assert(m_pSupp); m_pSupp->Serialize(ar);
+			m_pSupp->Init();
+		}
 	}
 }
 
