@@ -191,6 +191,26 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 	{
 		fprintf(stderr, "WARNING: The ""user"" fiber type is deprecated\n");
 	}
+	else if (type == "local")
+	{
+		FELocalMap* pmap = new FELocalMap(&fem);
+		pm->SetCoordinateSystemMap(pmap);
+
+		int n[3] = {0};
+		tag.value(n, 3);
+		if ((n[0] == 0) && (n[1] == 0) && (n[2] == 0)) { n[0] = 1; n[1] = 2; n[2] = 4; }
+
+		pmap->SetLocalNodes(n[0]-1, n[1]-1, n[2]-1);
+	}
+	else if (type == "vector")
+	{
+		FEVectorMap* pmap = new FEVectorMap(&fem);
+		pm->SetCoordinateSystemMap(pmap);
+
+		vec3d a;
+		tag.value(a);
+		pmap->SetVectors(a, vec3d(0,0,1));
+	}
 	else
 	{
 		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(type.cvalue(), &fem);

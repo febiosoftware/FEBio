@@ -390,11 +390,14 @@ bool FEPlotFiberVector::Save(FEDomain &dom, vector<float>& a)
 			for (j=0; j<n; ++j)
 			{
 				FEElasticMaterialPoint& pt = *el.m_State[j]->ExtractData<FEElasticMaterialPoint>();
-				r.x += pt.m_Q[0][0];
-				r.y += pt.m_Q[1][0];
-				r.z += pt.m_Q[2][0];
+				vec3d ri;
+				ri.x = pt.m_Q[0][0];
+				ri.y = pt.m_Q[1][0];
+				ri.z = pt.m_Q[2][0];
+
+				r += pt.m_F*ri;
 			}
-			r /= n;
+			r /= (double) n;
 			f[0] = (float) r.x;
 			f[1] = (float) r.y;
 			f[2] = (float) r.z;
