@@ -22,6 +22,8 @@ void FEBioContactSection::Parse(XMLTag& tag)
 	int nversion = m_pim->Version();
 	if (nversion < 0x0200) throw XMLReader::InvalidTag(tag);
 
+	FEModel& fem = *GetFEModel();
+
 	// loop over tags
 	++tag;
 	do
@@ -30,19 +32,25 @@ void FEBioContactSection::Parse(XMLTag& tag)
 		{
 			// get the contact type
 			const char* sztype = tag.AttributeValue("type");
-			if      (strcmp(sztype, "sliding_with_gaps"     ) == 0) ParseSlidingInterface     (tag);
-			else if (strcmp(sztype, "facet-to-facet sliding") == 0) ParseFacetSlidingInterface(tag);
-			else if (strcmp(sztype, "sliding2"              ) == 0) ParseSlidingInterface2    (tag);
-			else if (strcmp(sztype, "sliding3"              ) == 0) ParseSlidingInterface3    (tag);
-			else if (strcmp(sztype, "tied"                  ) == 0) ParseTiedInterface        (tag);
-			else if (strcmp(sztype, "facet-to-facet tied"   ) == 0) ParseFacetTiedInterface   (tag);
-			else if (strcmp(sztype, "periodic boundary"     ) == 0) ParsePeriodicBoundary     (tag);
-			else if (strcmp(sztype, "surface constraint"    ) == 0) ParseSurfaceConstraint    (tag);
-			else if (strcmp(sztype, "rigid_wall"            ) == 0) ParseRigidWall            (tag);
+
+			// Not all contact interfaces can be automated, so we first handle these special cases
+			if      (strcmp(sztype, "rigid_wall"            ) == 0) ParseRigidWall            (tag);
 			else if (strcmp(sztype, "rigid"                 ) == 0) ParseRigidInterface       (tag);
 			else if (strcmp(sztype, "rigid joint"           ) == 0) ParseRigidJoint           (tag);
 			else if (strcmp(sztype, "linear constraint"     ) == 0) ParseLinearConstraint     (tag);
-			else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			else 
+			{
+				// If we get here, we try to create a contact interface
+				// using the FEBio kernel. 
+				FEBioKernel& febio = FEBioKernel::GetInstance();
+				FEContactInterface* pci = febio.Create<FEContactInterface>(sztype, GetFEModel());
+				if (pci)
+				{
+					fem.AddSurfacePairInteraction(pci);
+					ParseContactInterface(tag, pci);
+				}
+				else throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 
@@ -52,204 +60,15 @@ void FEBioContactSection::Parse(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-// --- S L I D I N G   W I T H   G A P S ---
-void FEBioContactSection::ParseSlidingInterface(XMLTag& tag)
+void FEBioContactSection::ParseContactInterface(XMLTag& tag, FEContactInterface* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();
 
-	FESlidingInterface* ps = new FESlidingInterface(&fem);
-	fem.AddSurfacePairInteraction(ps);
+	// get the parameter list
+	FEParameterList& pl = pci->GetParameterList();
 
-	FEParameterList& pl = ps->GetParameterList();
-
-	++tag;
-	do
-	{
-		// read parameters
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FESlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, true);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// --- F A C E T   T O   F A C E T   S L I D I N G ---
-void FEBioContactSection::ParseFacetSlidingInterface(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	FEFacet2FacetSliding* ps = new FEFacet2FacetSliding(&fem);
-	fem.AddSurfacePairInteraction(ps);
-
-	FEParameterList& pl = ps->GetParameterList();
-
-	++tag;
-	do
-	{
-		// read parameters
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FEFacetSlidingSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, false);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// --- S L I D I N G   I N T E R F A C E   2 ---
-void FEBioContactSection::ParseSlidingInterface2(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	FESlidingInterface2* ps = new FESlidingInterface2(&fem);
-	fem.AddSurfacePairInteraction(ps);
-
-	FEParameterList& pl = ps->GetParameterList();
-
-	++tag;
-	do
-	{
-		// read parameters
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FESlidingSurface2& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, false);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// --- S L I D I N G   I N T E R F A C E   3 ---
-void FEBioContactSection::ParseSlidingInterface3(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	FESlidingInterface3* ps = new FESlidingInterface3(&fem);
-	fem.AddSurfacePairInteraction(ps);
-
-	FEParameterList& pl = ps->GetParameterList();
-	
-	++tag;
-	do
-	{
-		// read parameters
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-				
-				FESlidingSurface3& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-				
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-				
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, false);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-		
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// --- T I E D   C O N T A C T  ---
-void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	FETiedInterface* ps = new FETiedInterface(&fem);
-	fem.AddSurfacePairInteraction(ps);
-
-	FEParameterList& pl = ps->GetParameterList();
-
+	// read the parameters
 	++tag;
 	do
 	{
@@ -262,144 +81,7 @@ void FEBioContactSection::ParseTiedInterface(XMLTag& tag)
 				if (strcmp(sztype, "master") == 0) ntype = 1;
 				else if (strcmp(sztype, "slave") == 0) ntype = 2;
 
-				FETiedContactSurface& s = (ntype == 1? ps->ms : ps->ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, true);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// --- F2F T I E D   C O N T A C T  ---
-void FEBioContactSection::ParseFacetTiedInterface(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	FEFacet2FacetTied* pt = new FEFacet2FacetTied(&fem);
-	fem.AddSurfacePairInteraction(pt);
-
-	FEParameterList& pl = pt->GetParameterList();
-
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FEFacetTiedSurface& s = dynamic_cast<FEFacetTiedSurface&>((ntype == 1? *pt->GetMasterSurface(): *pt->GetSlaveSurface()));
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, true);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// --- P E R I O D I C   B O U N D A R Y  ---
-void FEBioContactSection::ParsePeriodicBoundary(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	FEPeriodicBoundary* ps = new FEPeriodicBoundary(&fem);
-	fem.AddSurfacePairInteraction(ps);
-
-	FEParameterList& pl = ps->GetParameterList();
-
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FEPeriodicSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
-				m.AddSurface(&s);
-
-				int nfmt = 0;
-				const char* szfmt = tag.AttributeValue("format", true);
-				if (szfmt)
-				{
-					if (strcmp(szfmt, "face nodes") == 0) nfmt = 0;
-					else if (strcmp(szfmt, "element face") == 0) nfmt = 1;
-				}
-
-				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, true);
-			}
-			else throw XMLReader::InvalidTag(tag);
-		}
-
-		++tag;
-	}
-	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-// --- S U R F A C E   C O N S T R A I N T ---
-void FEBioContactSection::ParseSurfaceConstraint(XMLTag& tag)
-{
-	FEModel& fem = *GetFEModel();
-	FEMesh& m = fem.GetMesh();
-
-	FESurfaceConstraint* ps = new FESurfaceConstraint(&fem);
-	fem.AddSurfacePairInteraction(ps);
-
-	FEParameterList& pl = ps->GetParameterList();
-
-	++tag;
-	do
-	{
-		if (m_pim->ReadParameter(tag, pl) == false)
-		{
-			if (tag == "surface")
-			{
-				const char* sztype = tag.AttributeValue("type");
-				int ntype;
-				if (strcmp(sztype, "master") == 0) ntype = 1;
-				else if (strcmp(sztype, "slave") == 0) ntype = 2;
-
-				FESurfaceConstraintSurface& s = (ntype == 1? ps->m_ms : ps->m_ss);
+				FESurface& s = *(ntype == 1? pci->GetMasterSurface() : pci->GetSlaveSurface());
 				m.AddSurface(&s);
 
 				int nfmt = 0;

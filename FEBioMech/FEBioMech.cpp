@@ -72,6 +72,7 @@
 #include "FETiedInterface.h"
 #include "FEInSituStretch.h"
 #include "FEPointConstraint.h"
+#include "FEFacet2FacetTied.h"
 
 #include "FESolidAnalysis.h"
 
@@ -175,6 +176,7 @@ REGISTER_FEBIO_CLASS(FESlidingInterface     , FEContactInterface, "sliding_with_
 REGISTER_FEBIO_CLASS(FESlidingInterfaceBW   , FEContactInterface, "sliding-Bonet-Wood"    );
 REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FEContactInterface, "surface constraint"    );
 REGISTER_FEBIO_CLASS(FETiedInterface        , FEContactInterface, "tied"                  );
+REGISTER_FEBIO_CLASS(FEFacet2FacetTied      , FEContactInterface, "facet-to-facet tied"   );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData

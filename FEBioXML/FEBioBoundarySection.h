@@ -1,5 +1,6 @@
 #pragma once
 #include "FEBioImport.h"
+#include "FEBioMech/FEContactInterface.h"
 
 //-----------------------------------------------------------------------------
 // Boundary Section
@@ -24,6 +25,9 @@ protected:
 	void ParseConstraints         (XMLTag& tag);
 	void ParseSpringSection       (XMLTag& tag);
 	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
+
+protected:
+	void ParseContactInterface(XMLTag& tag, FEContactInterface* pci);
 
 protected:
 	void ParseRigidJoint      (XMLTag& tag);
