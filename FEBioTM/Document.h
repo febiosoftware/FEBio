@@ -12,9 +12,7 @@
 #include "FECore/log.h"
 #include <FL/Fl_Progress.H>
 #include <FL/Fl.H>
-#include "Task.h"
-#include <vector>
-using namespace std;
+#include "Session.h"
 
 class CWnd;
 
@@ -50,17 +48,8 @@ public:
 	CDocument();
 	virtual ~CDocument();
 
-	// add a taks to the document
-	CTask* AddTask(const char* szfile);
-
-	// remove a task from the queue
-	void RemoveTask(int n);
-
-	// get the number of tasks
-	int Tasks() { return (int) m_Task.size(); }
-
-	// get a task
-	CTask* GetTask(int i);
+	// get the session
+	TMSession& GetSession() { return m_session; }
 
 	// run a task
 	void RunTask(CTask* pt);
@@ -77,7 +66,7 @@ protected:
 	void RunQueue();
 
 protected:
-	vector<CTask*>	m_Task;
+	TMSession	m_session;
 };
 
 #endif // !defined(AFX_DOCUMENT_H__E699CE33_76BC_46FB_8CFC_4FA83D106B4C__INCLUDED_)

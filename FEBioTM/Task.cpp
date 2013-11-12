@@ -306,11 +306,29 @@ void CTask::Run(Progress& prg)
 	}
 
 	// get the step
-	FEAnalysis* pstep = fem.GetStep(0);
-	if (m_nlog != FE_PRINT_DEFAULT) pstep->SetPrintLevel(m_nlog);
+	for (int i=0; i<fem.Steps(); ++i)
+	{
+		FEAnalysis* pstep = fem.GetStep(i);
+		if (m_nlog != FE_PRINT_DEFAULT) pstep->SetPrintLevel(m_nlog);
+	}
 
 	// run the problem
 	bool bret = fem.Solve();
+
+	// collect the stats
+	m_stats.nreturn = (bret? 1 : 0);
+	m_stats.ntime   = 0;
+	m_stats.niters  = 0;
+	m_stats.nrhs    = 0;
+	m_stats.nreform = 0;
+	for (int i=0; i<fem.Steps(); ++i)
+	{
+		FEAnalysis* pstep = fem.GetStep(i);
+		m_stats.ntime   += pstep->m_ntimesteps;
+		m_stats.niters  += pstep->m_ntotiter;
+		m_stats.nrhs    += pstep->m_ntotrhs;
+		m_stats.nreform += pstep->m_ntotref;
+	}
 
 	// set the final status
 	// Note that the user could have cancelled this task, so

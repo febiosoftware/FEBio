@@ -70,6 +70,8 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnRunCancelSelected(Fl_Widget* pw, void* pd);
 	void OnRunCancelAll     (Fl_Widget* pw, void* pd);
 
+	void OnToolsCreateTest(Fl_Widget* pw, void* pd);
+
 	// other envent handlers
 	void OnSelectFile(Fl_Widget* pw, void* pd);
 	void OnSelectTab (Fl_Widget* pw, void* pd);

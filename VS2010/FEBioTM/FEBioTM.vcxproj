@@ -365,6 +365,7 @@
     <ClInclude Include="..\..\FEBioTM\FileBrowser.h" />
     <ClInclude Include="..\..\FEBioTM\MainApp.h" />
     <ClInclude Include="..\..\FEBioTM\Menu.h" />
+    <ClInclude Include="..\..\FEBioTM\Session.h" />
     <ClInclude Include="..\..\FEBioTM\SettingsView.h" />
     <ClInclude Include="..\..\FEBioTM\stdafx.h" />
     <ClInclude Include="..\..\FEBioTM\targetver.h" />
@@ -384,6 +385,7 @@
     <ClCompile Include="..\..\FEBioTM\FileBrowser.cpp" />
     <ClCompile Include="..\..\FEBioTM\MainApp.cpp" />
     <ClCompile Include="..\..\FEBioTM\Menu.cpp" />
+    <ClCompile Include="..\..\FEBioTM\Session.cpp" />
     <ClCompile Include="..\..\FEBioTM\SettingsView.cpp" />
     <ClCompile Include="..\..\FEBioTM\stdafx.cpp" />
     <ClCompile Include="..\..\FEBioTM\Task.cpp" />

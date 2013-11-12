@@ -29,6 +29,9 @@ CMenu::CMenu(int w, int h, CWnd* pwnd) : Fl_Menu_Bar(0, 0, w, h), m_pWnd(pwnd)
 			{"Cancel Selected",                  0, FLX_MENU_HANDLER(pwnd, CWnd::OnRunCancelSelected)},
 			{"Cancel all"     ,                  0, FLX_MENU_HANDLER(pwnd, CWnd::OnRunCancelAll)},
 			{0},
+		{"Tools", 0, 0, 0, FL_SUBMENU},
+			{"Create Test ...", 0, FLX_MENU_HANDLER(pwnd, CWnd::OnToolsCreateTest)},
+			{0},
 		{0}
 	};
 

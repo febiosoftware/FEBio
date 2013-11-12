@@ -220,7 +220,7 @@ int CWnd::handle(int nevent)
 //-----------------------------------------------------------------------------
 bool CWnd::OpenFile(const char* szfile)
 {
-	CTask* pt = m_pDoc->AddTask(szfile);
+	CTask* pt = m_pDoc->GetSession().AddTask(szfile);
 	if (pt)
 	{
 		m_pTask->AddTask(pt);
@@ -251,7 +251,7 @@ void CWnd::OnFileSave(Fl_Widget* pw, void* pd)
 	if (m_pSel == m_pText)
 	{
 		int n = m_pTask->SelectedTask();
-		CTask* pt = m_pDoc->GetTask(n);
+		CTask* pt = m_pDoc->GetSession().GetTask(n);
 		if (pt == 0) flx_error("No task selected");
 		else 
 		{
@@ -272,7 +272,7 @@ void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 	if (m_pSel == m_pText)
 	{
 		int n = m_pTask->SelectedTask();
-		CTask* pt = m_pDoc->GetTask(n);
+		CTask* pt = m_pDoc->GetSession().GetTask(n);
 		if (pt == 0) flx_error("No task selected");
 		else 
 		{
@@ -298,7 +298,7 @@ void CWnd::OnFileSaveAs(Fl_Widget* pw, void* pd)
 void CWnd::OnFileRevert(Fl_Widget* pw, void* pd)
 {
 	int n = m_pTask->SelectedTask();
-	CTask* pt = m_pDoc->GetTask(n);
+	CTask* pt = m_pDoc->GetSession().GetTask(n);
 	if (pt == 0) flx_error("No task selected");
 	else 
 	{
@@ -319,7 +319,7 @@ void CWnd::OnFileClose(Fl_Widget* pw, void* pd)
 	if (n>=0)
 	{
 		if (m_pText) m_pText->buffer(0);
-		m_pDoc->RemoveTask(n);
+		m_pDoc->GetSession().RemoveTask(n);
 		m_pTask->RemoveTask(n);
 		SelectFile();
 	}
@@ -383,7 +383,7 @@ void CWnd::OnSelectFile(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::SelectFile()
 {
-	CTask* pt = GetDocument()->GetTask(m_pTask->SelectedTask());
+	CTask* pt = GetDocument()->GetSession().GetTask(m_pTask->SelectedTask());
 	if (pt)
 	{
 		if (m_pText) 
@@ -458,14 +458,14 @@ void CWnd::OnEditGoToLine(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 CTask* CWnd::GetSelectedTask()
 {
-	return m_pDoc->GetTask(m_pTask->SelectedTask());
+	return m_pDoc->GetSession().GetTask(m_pTask->SelectedTask());
 }
 
 //-----------------------------------------------------------------------------
 void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 {
 	// get the selected task
-	CTask* pt = m_pDoc->GetTask(m_pTask->SelectedTask());
+	CTask* pt = m_pDoc->GetSession().GetTask(m_pTask->SelectedTask());
 	if (pt == 0) { flx_error("No task selected"); return; }
 
 	// show the output window
@@ -493,7 +493,7 @@ void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 // Stop the task that the user has selected
 void CWnd::OnRunCancelSelected(Fl_Widget* pw, void* pd)
 {
-	CTask* pt = m_pDoc->GetTask(m_pTask->SelectedTask());
+	CTask* pt = m_pDoc->GetSession().GetTask(m_pTask->SelectedTask());
 	if (pt)
 	{
 		int n = pt->GetStatus();
@@ -505,12 +505,19 @@ void CWnd::OnRunCancelSelected(Fl_Widget* pw, void* pd)
 // Stop all queued tasks
 void CWnd::OnRunCancelAll(Fl_Widget* pw, void* pd)
 {
-	for (int i=0; i<m_pDoc->Tasks(); ++i)
+	for (int i=0; i<m_pDoc->GetSession().Tasks(); ++i)
 	{
-		CTask* pt = m_pDoc->GetTask(i);
+		CTask* pt = m_pDoc->GetSession().GetTask(i);
 		int n = pt->GetStatus();
 		if ((n==CTask::RUNNING)||(n==CTask::QUEUED)) pt->SetStatus(CTask::CANCELLED);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Create a new test
+void CWnd::OnToolsCreateTest(Fl_Widget* pw, void* pd)
+{
+
 }
 
 //-----------------------------------------------------------------------------
@@ -537,7 +544,7 @@ void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 void CWnd::OnChangeText(Fl_Widget* pw, void* pd)
 {
 	int n = m_pTask->SelectedTask();
-	CTask* pt = m_pDoc->GetTask(n);
+	CTask* pt = m_pDoc->GetSession().GetTask(n);
 
 	// we need to update the format of the modified line
 	int npos = m_pText->insert_position();

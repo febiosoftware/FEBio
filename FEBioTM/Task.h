@@ -27,6 +27,16 @@ class CTask
 	enum {MAX_FILE = 512};
 
 public:
+	struct STATS
+	{
+		int		nreturn;	// return value
+		int		ntime;		// number of time steps
+		int		niters;		// number of iterations
+		int		nrhs;		// number of RHS evaluations
+		int		nreform;	// number of reformations
+	};
+
+public:
 	// status values
 	// note that at any given time, only one task may have its status set to RUNNING
 	enum { READY, MODIFIED, QUEUED, RUNNING, COMPLETED, FAILED, CANCELLED };
@@ -79,6 +89,8 @@ protected:
 public: // FEBio command line and control options
 	bool	m_bdebug;	//!< debug mode
 	int		m_nlog;		//!< log level
+
+	STATS	m_stats;	//!< the stats
 
 private:
 	static CTask*	m_prun;	// this is the task that is running

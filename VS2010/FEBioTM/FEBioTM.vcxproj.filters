@@ -66,6 +66,9 @@
     <ClInclude Include="..\..\FEBioTM\SettingsView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FEBioTM\Session.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FEBioTM.rc">
@@ -107,6 +110,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\FEBioTM\SettingsView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FEBioTM\Session.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
