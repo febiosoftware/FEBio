@@ -197,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioTM\Session.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioTM\SettingsView.cpp"
 				>
 			</File>
@@ -252,6 +256,10 @@
 			</File>
 			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioTM\Session.h"
 				>
 			</File>
 			<File
