@@ -5,5 +5,5 @@ $(LIB):
 	ar -cvr $(LIB) *.o
 
 clean:
-	rm *.o
-	rm $(LIB)
+	rm -f *.o
+	rm -f $(LIB)

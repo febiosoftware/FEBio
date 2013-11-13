@@ -23,4 +23,4 @@ $(TARGET):
 	$(CC) -o $(TARGET) $(DEF) *.cpp $(FLG) $(INC) $(FEBIO2LIBS) $(LIBS) -ldl -fPIC
 
 clean:
-	rm $(TARGET)
+	rm -f $(TARGET)
