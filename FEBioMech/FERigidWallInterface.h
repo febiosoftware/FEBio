@@ -103,6 +103,9 @@ public:
 	FESurface* GetMasterSurface() { return 0; }
 	FESurface* GetSlaveSurface () { return &m_ss; }
 
+	//! return integration rule class
+	bool UseNodalIntegration() { return true; }
+
 private:
 	//! copy constructor hidden
 	FERigidWallInterface(FERigidWallInterface& ri){}

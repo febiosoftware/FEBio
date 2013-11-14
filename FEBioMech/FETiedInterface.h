@@ -55,6 +55,9 @@ public:
 	FESurface* GetMasterSurface() { return &ms; }
 	FESurface* GetSlaveSurface () { return &ss; }
 
+	//! return integration rule class
+	bool UseNodalIntegration() { return true; }
+
 private:
 	//! copy constructor hidden
 	FETiedInterface(FETiedInterface& si){}

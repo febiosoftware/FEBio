@@ -76,6 +76,9 @@ public:
 	FESurface* GetMasterSurface() { return &m_ms; }
 	FESurface* GetSlaveSurface () { return &m_ss; }
 
+	//! return integration rule class
+	bool UseNodalIntegration() { return true; }
+
 protected:
 	void ProjectSurface(FESurfaceConstraintSurface& ss, FESurfaceConstraintSurface& ms, bool bmove);
 

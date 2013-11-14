@@ -61,6 +61,9 @@ public:
 	FESurface* GetMasterSurface() { return &m_ms; }
 	FESurface* GetSlaveSurface () { return &m_ss; }
 
+	//! return integration rule class
+	bool UseNodalIntegration() { return false; }
+
 public:
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);

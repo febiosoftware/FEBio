@@ -85,6 +85,9 @@ public:
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }
 	FESurface* GetSlaveSurface () { return &m_ss; }
+
+	//! return integration rule class
+	bool UseNodalIntegration() { return false; }
 	
 protected:
 	void InitialProjection(FETiedBiphasicSurface& ss, FETiedBiphasicSurface& ms);

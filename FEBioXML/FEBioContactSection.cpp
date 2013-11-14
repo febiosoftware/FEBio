@@ -93,7 +93,7 @@ void FEBioContactSection::ParseContactInterface(XMLTag& tag, FEContactInterface*
 				}
 
 				// read the surface section
-				ParseSurfaceSection(tag, s, nfmt, true);
+				ParseSurfaceSection(tag, s, nfmt, pci->UseNodalIntegration());
 			}
 			else throw XMLReader::InvalidTag(tag);
 		}

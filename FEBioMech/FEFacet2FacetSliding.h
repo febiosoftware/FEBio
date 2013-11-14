@@ -88,6 +88,9 @@ public:
 	FESurface* GetMasterSurface() { return &m_ms; }
 	FESurface* GetSlaveSurface () { return &m_ss; }
 
+	//! return integration rule class
+	bool UseNodalIntegration() { return false; }
+
 protected:
 	//! project slave surface onto master
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup);
