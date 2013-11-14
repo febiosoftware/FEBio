@@ -40,6 +40,11 @@ FEModel::~FEModel(void)
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
 	for (i=0; i<m_NLC.size (); ++i) delete m_NLC[i] ; m_NLC.clear ();
 	for (i=0; i<m_Obj.size (); ++i) delete m_Obj[i] ; m_Obj.clear ();
+
+	// delete global data
+	for (i=0; i<m_SD.size(); ++i) delete m_SD[i]; m_SD.clear();
+	for (i=0; i<m_SBM.size(); ++i) delete m_SBM[i]; m_SBM.clear();
+	m_Const.clear();
 }
 
 //-----------------------------------------------------------------------------
