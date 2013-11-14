@@ -217,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioTM\Test.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioTM\Wnd.cpp"
 				>
 			</File>
@@ -280,6 +284,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioTM\TaskBrowser.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioTM\Test.h"
 				>
 			</File>
 			<File
