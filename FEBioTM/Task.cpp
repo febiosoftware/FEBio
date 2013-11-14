@@ -321,13 +321,16 @@ void CTask::Run(Progress& prg)
 	m_stats.niters  = 0;
 	m_stats.nrhs    = 0;
 	m_stats.nreform = 0;
-	for (int i=0; i<fem.Steps(); ++i)
+	if (bret)
 	{
-		FEAnalysis* pstep = fem.GetStep(i);
-		m_stats.ntime   += pstep->m_ntimesteps;
-		m_stats.niters  += pstep->m_ntotiter;
-		m_stats.nrhs    += pstep->m_ntotrhs;
-		m_stats.nreform += pstep->m_ntotref;
+		for (int i=0; i<fem.Steps(); ++i)
+		{
+			FEAnalysis* pstep = fem.GetStep(i);
+			m_stats.ntime   += pstep->m_ntimesteps;
+			m_stats.niters  += pstep->m_ntotiter;
+			m_stats.nrhs    += pstep->m_ntotrhs;
+			m_stats.nreform += pstep->m_ntotref;
+		}
 	}
 
 	// set the final status

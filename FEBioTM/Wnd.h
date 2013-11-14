@@ -47,8 +47,10 @@ public:
 
 	void ClearOutputWnd();
 	void ClearLogWnd();
+	void ClearTestWnd();
 
 	void AddLogEntry(const char* sz, ...);
+	void AddTestEntry(const char* sz, ...);
 
 public:	// --- M E N U   H A N D L E R S ---
 	void OnFileOpen       (Fl_Widget* pw, void* pd);
@@ -71,6 +73,9 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnRunCancelAll     (Fl_Widget* pw, void* pd);
 
 	void OnToolsCreateTest(Fl_Widget* pw, void* pd);
+	void OnToolsRunTest   (Fl_Widget* pw, void* pd);
+	void OnToolsSaveData  (Fl_Widget* pw, void* pd);
+	void OnToolsLoadData  (Fl_Widget* pw, void* pd);
 
 	// other envent handlers
 	void OnSelectFile(Fl_Widget* pw, void* pd);
@@ -96,6 +101,7 @@ protected:
 	Fl_Text_Editor*		m_pText;	//!< input file display
 	Fl_Text_Display*	m_pOut;		//!< output text display
 	Fl_Text_Display*	m_pLog;		//!< run-log display
+	Fl_Text_Display*	m_pTest;	//!< Test View
 	CSettingsView*		m_pOps;		//!< file settings view
 
 	Fl_Text_Display*	m_pSel;		//!< Target for editing

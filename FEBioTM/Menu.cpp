@@ -31,6 +31,9 @@ CMenu::CMenu(int w, int h, CWnd* pwnd) : Fl_Menu_Bar(0, 0, w, h), m_pWnd(pwnd)
 			{0},
 		{"Tools", 0, 0, 0, FL_SUBMENU},
 			{"Create Test ...", 0, FLX_MENU_HANDLER(pwnd, CWnd::OnToolsCreateTest)},
+			{"Run Test"       , 0, FLX_MENU_HANDLER(pwnd, CWnd::OnToolsRunTest   )},
+			{"Save Data ..."  , 0, FLX_MENU_HANDLER(pwnd, CWnd::OnToolsSaveData  )},
+			{"Load Data ..."  , 0, FLX_MENU_HANDLER(pwnd, CWnd::OnToolsLoadData  )},
 			{0},
 		{0}
 	};

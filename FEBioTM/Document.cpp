@@ -65,6 +65,8 @@ void Progress::SetProgress(double f)
 //-----------------------------------------------------------------------------
 CDocument::CDocument()
 {
+	m_ptest = 0;
+
 	// initialize FEBio library
 	InitFEBioLibrary();
 }
@@ -72,11 +74,52 @@ CDocument::CDocument()
 //-----------------------------------------------------------------------------
 CDocument::~CDocument()
 {
+	if (m_ptest) delete m_ptest;
+}
+
+//-----------------------------------------------------------------------------
+void CDocument::AddTest(CTest* ptest)
+{ 
+	if (m_ptest) delete m_ptest;
+	m_ptest = ptest; 
+}
+
+//-----------------------------------------------------------------------------
+void CDocument::RunTest()
+{
+	CWnd* pwnd = FLXGetMainWnd();
+	if (m_ptest)
+	{
+		const char* sz[] = {"Failed", "Passed", "No Data"};
+		const int M = 12;
+		char szret[M], sztime[M], sziter[M], szrhs[M], szref[M];
+
+		m_ptest->Run();
+
+		pwnd->AddTestEntry(" Name                           | Return code| Timesteps  | Iterations | RHS evals  |  Reforms   | Status\n");
+		pwnd->AddTestEntry("-------------------------------------------------------------------------------------------------------------------------\n");
+		int N = m_session.Tasks();
+		for (int i=0; i<N; ++i)
+		{
+			CTask& task = *m_session.GetTask(i);
+			CTest::STATS data =  m_ptest->GetStats(task);
+			CTask::STATS stat = task.m_stats;
+			if (stat.nreturn == data.nreturn) sprintf(szret , "%d", stat.nreturn); else sprintf(szret , "%d(%d)", stat.nreturn, data.nreturn);
+			if (stat.ntime   == data.ntime  ) sprintf(sztime, "%d", stat.ntime  ); else sprintf(sztime, "%d(%d)", stat.ntime  , data.ntime  );
+			if (stat.niters  == data.niters ) sprintf(sziter, "%d", stat.niters ); else sprintf(sziter, "%d(%d)", stat.niters , data.niters );
+			if (stat.nrhs    == data.nrhs   ) sprintf(szrhs , "%d", stat.nrhs   ); else sprintf(szrhs , "%d(%d)", stat.nrhs   , data.nrhs   );
+			if (stat.nreform == data.nreform) sprintf(szref , "%d", stat.nreform); else sprintf(szref , "%d(%d)", stat.nreform, data.nreform);
+
+			int nresult = m_ptest->GetResult(i);
+			pwnd->AddTestEntry("%-32s|%12s|%12s|%12s|%12s|%12s| %s\n", task.GetFileTitle(), szret, sztime, sziter, szrhs, szref, sz[nresult]);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
 void CDocument::NewSession()
 {
+	if (m_ptest) delete m_ptest;
 	m_session.Clear();
 }
 

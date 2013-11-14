@@ -169,14 +169,14 @@ REGISTER_FEBIO_CLASS(FEInSituStretch  , FENLConstraint, "in-situ stretch");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
-REGISTER_FEBIO_CLASS(FEFacet2FacetSliding   , FEContactInterface, "facet-to-facet sliding");
-REGISTER_FEBIO_CLASS(FEPeriodicBoundary     , FEContactInterface, "periodic boundary"     );
-REGISTER_FEBIO_CLASS(FERigidWallInterface   , FEContactInterface, "rigid_wall"            );
-REGISTER_FEBIO_CLASS(FESlidingInterface     , FEContactInterface, "sliding_with_gaps"     );
-REGISTER_FEBIO_CLASS(FESlidingInterfaceBW   , FEContactInterface, "sliding-Bonet-Wood"    );
-REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FEContactInterface, "surface constraint"    );
-REGISTER_FEBIO_CLASS(FETiedInterface        , FEContactInterface, "tied"                  );
-REGISTER_FEBIO_CLASS(FEFacet2FacetTied      , FEContactInterface, "facet-to-facet tied"   );
+REGISTER_FEBIO_CLASS(FEFacet2FacetSliding   , FEContactInterface, "facet-to-facet sliding"     );
+REGISTER_FEBIO_CLASS(FEPeriodicBoundary     , FEContactInterface, "periodic boundary"          );
+REGISTER_FEBIO_CLASS(FERigidWallInterface   , FEContactInterface, "rigid_wall"                 );
+REGISTER_FEBIO_CLASS(FESlidingInterface     , FEContactInterface, "sliding_with_gaps"          );
+REGISTER_FEBIO_CLASS(FESlidingInterfaceBW   , FEContactInterface, "sliding-tension-compression");
+REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FEContactInterface, "surface constraint"         );
+REGISTER_FEBIO_CLASS(FETiedInterface        , FEContactInterface, "tied"                       );
+REGISTER_FEBIO_CLASS(FEFacet2FacetTied      , FEContactInterface, "facet-to-facet tied"        );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData

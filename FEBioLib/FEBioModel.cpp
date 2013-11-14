@@ -55,6 +55,9 @@
 extern void echo_input(FEBioModel& fem);
 
 //-----------------------------------------------------------------------------
+static FEBioModel* pfem_copy = 0;
+
+//-----------------------------------------------------------------------------
 // Constructor of FEBioModel class.
 FEBioModel::FEBioModel()
 {
@@ -79,6 +82,8 @@ FEBioModel::FEBioModel()
 	m_debug = false;
 	m_becho = true;
 	m_plot = 0;
+
+	if (pfem_copy) { delete pfem_copy; pfem_copy = 0; }
 }
 
 //-----------------------------------------------------------------------------
@@ -2257,9 +2262,6 @@ bool FEBioModel::Solve()
 	return bconv;
 }
 
-
-//-----------------------------------------------------------------------------
-static FEBioModel* pfem_copy = 0;
 
 //-----------------------------------------------------------------------------
 void FEBioModel::PushState()

@@ -111,6 +111,17 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 					}
 					pg->end();
 					pg->labelsize(11);
+
+					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Test     ");
+					{
+						m_pTest = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
+						m_pTest->textfont(FL_COURIER);
+						m_pTest->box(FL_DOWN_BOX);
+						m_pTest->buffer(new Fl_Text_Buffer);
+						pg->resizable(m_pTest);
+					}
+					pg->end();
+					pg->labelsize(11);
 				}
 				m_pTabs->end();
 				pg->resizable(m_pTabs);
@@ -171,6 +182,14 @@ void CWnd::ClearLogWnd()
 }
 
 //-----------------------------------------------------------------------------
+void CWnd::ClearTestWnd()
+{
+	Fl_Text_Buffer* pb = m_pTest->buffer();
+	pb->select(0, pb->length());
+	pb->remove_selection();	
+}
+
+//-----------------------------------------------------------------------------
 void CWnd::AddLogEntry(const char* sz, ...)
 {
 	// get a pointer to the argument list
@@ -186,6 +205,24 @@ void CWnd::AddLogEntry(const char* sz, ...)
 	m_pLog->insert_position(m_pLog->buffer()->length());
 	m_pLog->insert(sztxt);
 	m_pLog->show_insert_position();	
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::AddTestEntry(const char* sz, ...)
+{
+	// get a pointer to the argument list
+	va_list	args;
+
+	// make the message
+	static char sztxt[1024] = {0};
+	va_start(args, sz);
+	vsprintf(sztxt, sz, args);
+	va_end(args);
+
+	// add the message to the log
+	m_pTest->insert_position(m_pTest->buffer()->length());
+	m_pTest->insert(sztxt);
+	m_pTest->show_insert_position();	
 }
 
 //-----------------------------------------------------------------------------
@@ -517,7 +554,50 @@ void CWnd::OnRunCancelAll(Fl_Widget* pw, void* pd)
 // Create a new test
 void CWnd::OnToolsCreateTest(Fl_Widget* pw, void* pd)
 {
+	CTest* ptest = new CTest(m_pDoc->GetSession());
+	m_pDoc->AddTest(ptest);
+}
 
+//-----------------------------------------------------------------------------
+// run a test
+void CWnd::OnToolsRunTest(Fl_Widget* pw, void* pd)
+{
+	ClearTestWnd();
+	m_pDoc->RunTest();
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnToolsLoadData(Fl_Widget* pw, void* pd)
+{
+	CTest* ptest = m_pDoc->GetActiveTest();
+	if (ptest)
+	{
+		char szfilename[512] = {0};
+		char szfilter[] = "All files\t*\n";
+		if (flx_file_open(szfilename, szfilter) == FLX_OK)
+		{
+			bool bret = ptest->LoadData(szfilename);
+			if (bret == false) flx_error("Failed reading meta data.");
+		}
+	}
+	else flx_error("No active test.");
+}
+
+//-----------------------------------------------------------------------------
+void CWnd::OnToolsSaveData(Fl_Widget* pw, void* pd)
+{
+	CTest* ptest = m_pDoc->GetActiveTest();
+	if (ptest)
+	{
+		char szfilename[512] = {0};
+		char szfilter[] = "All files\t*\n";
+		if (flx_file_save(szfilename, szfilter) == FLX_OK)
+		{
+			bool bret = ptest->SaveData(szfilename);
+			if (bret == false) flx_error("Failed saving meta data.");
+		}
+	}
+	else flx_error("No active test.");
 }
 
 //-----------------------------------------------------------------------------

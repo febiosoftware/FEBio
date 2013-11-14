@@ -13,6 +13,7 @@
 #include <FL/Fl_Progress.H>
 #include <FL/Fl.H>
 #include "Session.h"
+#include "Test.h"
 
 class CWnd;
 
@@ -62,11 +63,21 @@ public:
 	bool SaveSession(const char* szfile);
 	bool OpenSession(const char* szfile);
 
+	// Add a test
+	void AddTest(CTest* ptest);
+
+	// run test
+	void RunTest();
+
+	// get the active test
+	CTest* GetActiveTest() { return m_ptest; }
+
 protected:
 	void RunQueue();
 
 protected:
 	TMSession	m_session;
+	CTest*		m_ptest;
 };
 
 #endif // !defined(AFX_DOCUMENT_H__E699CE33_76BC_46FB_8CFC_4FA83D106B4C__INCLUDED_)
