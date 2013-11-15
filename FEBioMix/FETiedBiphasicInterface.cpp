@@ -1243,7 +1243,7 @@ bool FETiedBiphasicInterface::Augment(int naug)
 	clog.printf(" sliding interface # %d\n", m_nID);
 	clog.printf("                        CURRENT        REQUIRED\n");
 	clog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n");
-	if (bporo) { clog.printf("    P gap       : %15le", pnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n"); }
+	if (bporo) { clog.printf("    P gap        : %15le", pnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n"); }
 	
 	clog.printf("    maximum gap  : %15le", maxgap);
 	if (m_gtol > 0) clog.printf("%15le\n", m_gtol); else clog.printf("       ***\n");
