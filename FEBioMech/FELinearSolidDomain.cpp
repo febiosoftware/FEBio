@@ -29,7 +29,7 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 
 	// If the material has a material map
 	// generate the element's local coordinate transformation
-	FECoordSysMap* pmap = m_pMat->GetCoordinateSystemMap();
+	FECoordSysMap* pmap = m_pMat->GetElasticMaterial()->GetCoordinateSystemMap();
 	if (pmap)
 	{
 		// loop over all elements

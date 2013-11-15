@@ -28,7 +28,7 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 
 	bool bmerr = false;
 
-	FECoordSysMap* pmap = m_pMat->GetCoordinateSystemMap();
+	FECoordSysMap* pmap = m_pMat->GetElasticMaterial()->GetCoordinateSystemMap();
 
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{

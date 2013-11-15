@@ -51,8 +51,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 
 	// get the elements material
 	FEElasticMaterial* pme = m_pMat->GetElasticMaterial();
-
-	FECoordSysMap* pmap = m_pMat->GetCoordinateSystemMap();
+	FECoordSysMap* pmap = pme->GetCoordinateSystemMap();
 
 	for (size_t i=0; i<m_Elem.size(); ++i)
 	{
