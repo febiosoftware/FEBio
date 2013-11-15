@@ -237,6 +237,7 @@ public:
 	static FESoluteData* FindSD(int nid);
 	static void SetSBM(FESBMData* psd);
 	static FESBMData* FindSBM(int nid);
+	static void ClearGlobalData();
 
 public:
 	//! set the debug level

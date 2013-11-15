@@ -212,6 +212,9 @@ bool FEBioModel::Input(const char* szfile)
 	// create file reader
 	FEFEBioImport fim;
 
+	// first, clear all global data
+	ClearGlobalData();
+
 	// Load the file
 	if (fim.Load(*this, szfile) == false)
 	{
