@@ -13,6 +13,9 @@ public:
 	//! clone domain
 	FEDomain* Clone();
 
+	//! Initialize
+	bool Initialize(FEModel& fem);
+
 	//! reset data
 	void Reset();
 

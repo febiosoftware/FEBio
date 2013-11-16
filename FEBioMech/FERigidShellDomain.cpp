@@ -10,6 +10,12 @@ FEDomain* FERigidShellDomain::Clone()
 }
 
 //-----------------------------------------------------------------------------
+bool FERigidShellDomain::Initialize(FEModel& fem)
+{
+	return FEShellDomain::Initialize(fem);
+}
+
+//-----------------------------------------------------------------------------
 // We need to override it since the base class version will not work for rigid domains.
 void FERigidShellDomain::Reset()
 {

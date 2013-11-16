@@ -10,6 +10,12 @@ FEDomain* FERigidSolidDomain::Clone()
 }
 
 //-----------------------------------------------------------------------------
+bool FERigidSolidDomain::Initialize(FEModel& fem)
+{
+	return FESolidDomain::Initialize(fem);
+}
+
+//-----------------------------------------------------------------------------
 // We need to override it since the base class version will not work for rigid domains.
 void FERigidSolidDomain::Reset()
 {
