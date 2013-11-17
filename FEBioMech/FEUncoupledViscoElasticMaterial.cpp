@@ -30,22 +30,21 @@ FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial()
 		m_g[i] = 0;
 	}
 	m_pBase = 0;
+	m_binit = false;
 }
 
 //-----------------------------------------------------------------------------
 //! data initialization and checking
 void FEUncoupledViscoElasticMaterial::Init()
 {
-	static bool bfirst = true;
-
 	FEUncoupledMaterial::Init();
 	if (m_pBase == 0) throw MaterialError("This material needs a base material.");
 	m_pBase->Init();
 	
 	// combine bulk modulus from base material and uncoupled viscoelastic material
-	if (bfirst) m_K += m_pBase->m_K;
+	if (m_binit == false) m_K += m_pBase->m_K;
 
-	bfirst = false;
+	m_binit = true;
 }
 
 //-----------------------------------------------------------------------------

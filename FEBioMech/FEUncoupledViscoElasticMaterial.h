@@ -61,6 +61,7 @@ public:
 	
 private:
 	FEUncoupledMaterial*	m_pBase;	//!< pointer to elastic solid material
+	bool					m_binit;	//!< initialization flag
 	
 public:
 	// declare parameter list
