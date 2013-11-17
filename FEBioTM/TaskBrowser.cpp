@@ -6,6 +6,8 @@
 //=============================================================================
 CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X, Y, W, H), m_pWnd(pwnd)
 {
+	m_pg = 0;
+
     rows(0);				// how many rows
     row_header(0);          // enable row headers (along left)
     row_resize(0);          // disable row resizing
@@ -51,6 +53,16 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 			fl_draw(szc[COL], X+5,Y,W-5,H, FL_ALIGN_LEFT);
 		fl_pop_clip();
 		return; 
+	 case CONTEXT_RC_RESIZE:
+		if (m_pg && m_pg->visible()) 
+		{
+			if (ROW == m_nrow)
+			{
+				find_cell(CONTEXT_TABLE, ROW, 1, X, Y, W, H);
+				m_pg->resize(X, Y, W, H);
+			}
+		}
+		break;
      case CONTEXT_CELL:                        // Draw data in cells
 		 {
 			 if ((ROW == m_nrow) && (COL == 1) && m_pg->visible()) return;
