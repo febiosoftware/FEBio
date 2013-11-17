@@ -40,11 +40,12 @@ bool CTest::SaveData(const char* szfile)
 	FILE* fp = fopen(szfile, "wt");
 	if (fp == 0) return false;
 
-	int N = m_data.size();
+	int N = m_session.Tasks();
 	for (int i=0; i<N; ++i)
 	{
-		STATS& s = m_data[i];
-		fprintf(fp, "%s %d %d %d %d %d\n", s.szfile, s.nreturn, s.ntime, s.niters, s.nrhs, s.nreform);
+		CTask& task = *m_session.GetTask(i);
+		CTask::STATS& s = task.m_stats;
+		fprintf(fp, "%s %d %d %d %d %d\n", task.GetFileTitle(), s.nreturn, s.ntime, s.niters, s.nrhs, s.nreform);
 	}
 
 	fclose(fp);
