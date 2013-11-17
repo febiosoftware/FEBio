@@ -56,9 +56,9 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 	 case CONTEXT_RC_RESIZE:
 		if (m_pg && m_pg->visible()) 
 		{
-			if (ROW == m_nrow)
+			if ((ROW == 0)&&(COL == 0))
 			{
-				find_cell(CONTEXT_TABLE, ROW, 1, X, Y, W, H);
+				find_cell(CONTEXT_TABLE, m_nrow, 1, X, Y, W, H);
 				m_pg->resize(X, Y, W, H);
 			}
 		}
