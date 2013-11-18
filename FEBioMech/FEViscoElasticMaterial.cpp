@@ -80,7 +80,7 @@ void FEViscoElasticMaterialPoint::Serialize(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEViscoElasticMaterial::FEViscoElasticMaterial()
+FEViscoElasticMaterial::FEViscoElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_g0 = 1;
 	for (int i=0; i<MAX_TERMS; ++i)

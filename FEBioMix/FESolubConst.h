@@ -8,7 +8,7 @@ class FESolubConst : public FESoluteSolubility
 {
 public:
 	//! constructor
-	FESolubConst();
+	FESolubConst(FEModel* pfem);
 	
 	//! solubility
 	double Solubility(FEMaterialPoint& pt);

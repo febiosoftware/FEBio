@@ -17,7 +17,7 @@
 class FEVerondaWestmann : public FEUncoupledMaterial
 {
 public:
-	FEVerondaWestmann() {}
+	FEVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
 	double	m_c1;	//!< Veronda-Westmann coefficient C1;

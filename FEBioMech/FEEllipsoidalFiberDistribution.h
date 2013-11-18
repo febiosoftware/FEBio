@@ -8,7 +8,7 @@
 class FEEllipsoidalFiberDistribution : public FEElasticMaterial
 {
 public:
-	FEEllipsoidalFiberDistribution() {m_unstable = true;}
+	FEEllipsoidalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem) {m_unstable = true;}
 	
 	//! Initialization
 	void Init();
@@ -38,7 +38,7 @@ public:
 class FEEllipsoidalFiberDistributionOld : public FEElasticMaterial
 {
 public:
-	FEEllipsoidalFiberDistributionOld() {m_unstable = true;}
+	FEEllipsoidalFiberDistributionOld(FEModel* pfem) : FEElasticMaterial(pfem) {m_unstable = true;}
 	
 	//! Initialization
 	void Init();

@@ -63,7 +63,7 @@ public:
 class FETriphasic : public FEMultiMaterial
 {
 public:
-	FETriphasic();
+	FETriphasic(FEModel* pfem);
 
 	void Init();
 	

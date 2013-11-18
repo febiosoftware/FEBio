@@ -18,7 +18,7 @@
 class FEEFD : public FEElasticMaterial
 {
 public:
-	FEEFD() {m_unstable = true;}
+	FEEFD(FEModel* pfem) : FEElasticMaterial(pfem) {m_unstable = true;}
 	
 	//! Initialization
 	void Init();

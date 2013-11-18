@@ -14,7 +14,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEPermRefOrtho::FEPermRefOrtho()
+FEPermRefOrtho::FEPermRefOrtho(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm0 = 1;
 	m_perm1[0] = m_perm1[1] = m_perm1[2] = 0;

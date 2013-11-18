@@ -22,7 +22,7 @@ public:
 		febio.RegisterClass(this);
 	}
 
-	M* Create(FEModel*) { return new M; }
+	M* Create(FEModel* pfem) { return new M(pfem); }
 	bool IsType(FEMaterial* pm) { return (dynamic_cast<M*>(pm) != 0); }
 };
 

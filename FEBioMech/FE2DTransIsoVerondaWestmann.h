@@ -20,7 +20,7 @@ public:
 
 public:
 	//! constructor
-	FE2DTransIsoVerondaWestmann();
+	FE2DTransIsoVerondaWestmann(FEModel* pfem);
 	
 	//! calculate deviatoric stress at material point
 	virtual mat3ds DevStress(FEMaterialPoint& pt);

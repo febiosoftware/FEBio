@@ -210,7 +210,7 @@ mat3ds FEElasticMaterialPoint::push_forward(const mat3ds& A)
 //        F E E L A S T I C M A T E R I A L 
 //=============================================================================
 
-FEElasticMaterial::FEElasticMaterial()
+FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 { 
 	m_density = 1; 
 	m_molarmass = 0; 
@@ -242,7 +242,6 @@ bool FEElasticMaterial::SetAttribute(const char* szname, const char* szval)
 void FEElasticMaterial::Init()
 {
 	FEMaterial::Init();
-	if (m_pmap) m_pmap->Init();
 	if (m_density <= 0) throw MaterialError("Invalid material density");
 }
 
@@ -253,30 +252,9 @@ void FEElasticMaterial::Serialize(DumpFile& ar)
 	if (ar.IsSaving())
 	{
 		ar << m_density << m_unstable;
-		int ntype = -1;
-		if (m_pmap) ntype = m_pmap->m_ntype;
-		else ntype = FE_MAP_NONE;
-		assert(ntype != -1);
-		ar << ntype;
-		if (m_pmap) m_pmap->Serialize(ar);
 	}
 	else
 	{
 		ar >> m_density >> m_unstable;
-		int ntype;
-		ar >> ntype;
-		if (m_pmap) delete m_pmap;
-		m_pmap = 0;
-		assert(ntype != -1);
-		FEModel* pfem = ar.GetFEModel();
-		switch (ntype)
-		{
-		case FE_MAP_NONE    : m_pmap = 0; break;
-		case FE_MAP_LOCAL   : m_pmap = new FELocalMap      (pfem); break;
-		case FE_MAP_SPHERE  : m_pmap = new FESphericalMap  (pfem); break;
-		case FE_MAP_CYLINDER: m_pmap = new FECylindricalMap(pfem); break;
-		case FE_MAP_VECTOR  : m_pmap = new FEVectorMap     (pfem); break;
-		}
-		if (m_pmap) m_pmap->Serialize(ar);
 	}
 }

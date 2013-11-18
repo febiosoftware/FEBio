@@ -8,7 +8,7 @@ class FEDiffConstIso :	public FESoluteDiffusivity
 {
 public:
 	//! constructor
-	FEDiffConstIso();
+	FEDiffConstIso(FEModel* pfem);
 	
 	//! free diffusivity
 	double Free_Diffusivity(FEMaterialPoint& pt);

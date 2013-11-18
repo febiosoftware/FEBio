@@ -8,7 +8,7 @@ class FESupplyConst :	public FESoluteSupply
 {
 public:
 	//! constructor
-	FESupplyConst();
+	FESupplyConst(FEModel* pfem);
 	
 	//! Solute supply
 	double Supply(FEMaterialPoint& pt);

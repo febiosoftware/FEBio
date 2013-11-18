@@ -20,7 +20,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FESupplyMichaelisMenten::FESupplyMichaelisMenten()
+FESupplyMichaelisMenten::FESupplyMichaelisMenten(FEModel* pfem) : FESoluteSupply(pfem)
 {
 	m_Vmax = m_Km = 0;
 }

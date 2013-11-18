@@ -11,7 +11,7 @@ class FEDiffRefIso : public FESoluteDiffusivity
 {
 public:
 	//! constructor
-	FEDiffRefIso();
+	FEDiffRefIso(FEModel* pfem);
 	
 	//! free diffusivity
 	double Free_Diffusivity(FEMaterialPoint& pt);

@@ -8,7 +8,7 @@ class FEDiffConstOrtho :	public FESoluteDiffusivity
 {
 public:
 	//! constructor
-	FEDiffConstOrtho();
+	FEDiffConstOrtho(FEModel* pfem);
 	
 	//! free diffusivity
 	double Free_Diffusivity(FEMaterialPoint& pt);

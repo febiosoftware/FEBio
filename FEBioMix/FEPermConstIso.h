@@ -8,7 +8,7 @@ class FEPermConstIso :	public FEHydraulicPermeability
 	{
 	public:
 		//! constructor
-		FEPermConstIso();
+		FEPermConstIso(FEModel* pfem);
 		
 		//! permeability
 		mat3ds Permeability(FEMaterialPoint& pt);

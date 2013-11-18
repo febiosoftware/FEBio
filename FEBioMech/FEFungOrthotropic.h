@@ -12,7 +12,7 @@ public:
 	double	m_c;			// c coefficient
 		
 public:
-	FEFungOrthotropic() {m_K = 0;}
+	FEFungOrthotropic(FEModel* pfem) : FEUncoupledMaterial(pfem) {m_K = 0;}
 		
 	//! calculate deviatoric stress at material point
 	mat3ds DevStress(FEMaterialPoint& pt);

@@ -46,7 +46,7 @@ private:
 class FEElasticMultigeneration : public FEElasticMaterial
 {
 public:
-	FEElasticMultigeneration () {}
+	FEElasticMultigeneration(FEModel* pfem) : FEElasticMaterial(pfem) {}
 		
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 

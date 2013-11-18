@@ -17,7 +17,7 @@
 class FEIncompNeoHookean : public FEUncoupledMaterial
 {
 public:
-	FEIncompNeoHookean() {}
+	FEIncompNeoHookean(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
 	double	m_G;	//!< Shear modulus

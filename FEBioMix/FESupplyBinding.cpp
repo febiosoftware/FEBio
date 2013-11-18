@@ -16,7 +16,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FESupplyBinding::FESupplyBinding()
+FESupplyBinding::FESupplyBinding(FEModel* pfem) : FESoluteSupply(pfem)
 {
 	m_kf = m_kr = m_crt = 0;
 }

@@ -21,7 +21,7 @@
 class FETCNonlinearOrthotropic : public FEUncoupledMaterial
 {
 public:
-	FETCNonlinearOrthotropic() {}
+	FETCNonlinearOrthotropic(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
 	//! calculate deviatoric stress at material point

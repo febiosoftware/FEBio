@@ -22,6 +22,10 @@
 #define IN_RIGHT_OPEN_RANGE(x, a, b) ((x)>=(a) && (x)<(b))
 
 //-----------------------------------------------------------------------------
+// forward declaration of FEModel class
+class FEModel;
+
+//-----------------------------------------------------------------------------
 //! exception to throw during the material initialization phase
 
 class MaterialError
@@ -68,7 +72,7 @@ public:
 class FEMaterial : public FEParamContainer
 {
 public:
-	FEMaterial();
+	FEMaterial(FEModel* pfem);
 	virtual ~FEMaterial();
 
 	//! set material name
@@ -101,6 +105,9 @@ public:
 	//! Get the local coordinate system
 	FECoordSysMap* GetCoordinateSystemMap();
 
+	//! return the model this material belongs to
+	FEModel* GetFEModel();
+
 public: // interface for getting/setting material properties
 
 	//! get the number of material properties
@@ -120,12 +127,13 @@ public: // interface for managing attributes
 	//! Set the attribute
 	virtual bool SetAttribute(const char* szname, const char* szval) { return true; }
 
-protected:
+private:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID
 
-protected:
+private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system
+	FEModel*		m_pfem;			//!< pointer to model this material belongs to
 };
 
 //-----------------------------------------------------------------------------
@@ -163,7 +171,7 @@ class FEMultiMaterial : public FEMaterial
 	};
 
 public:
-	FEMultiMaterial(){}
+	FEMultiMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 	~FEMultiMaterial(){}
 
 	// return nr of material properties

@@ -8,7 +8,7 @@ class FEHuiskesSupply :	public FESolidSupply
 {
 public:
 	//! constructor
-	FEHuiskesSupply();
+	FEHuiskesSupply(FEModel* pfem);
 	
 	//! data initialization and checking
 	void Init();

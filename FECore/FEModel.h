@@ -233,10 +233,10 @@ public: // --- I/O functions
 
 public:
 	// TODO: I don't like this here.
-	static void SetSD(FESoluteData* psd);
-	static FESoluteData* FindSD(int nid);
-	static void SetSBM(FESBMData* psd);
-	static FESBMData* FindSBM(int nid);
+	static void AddSoluteData(FESoluteData* psd);
+	static FESoluteData* FindSoluteData(int nid);
+	static void AddSBMData(FESBMData* psd);
+	static FESBMData* FindSBMData(int nid);
 	static void ClearGlobalData();
 
 public:

@@ -10,7 +10,7 @@ BEGIN_PARAMETER_LIST(FEChemicalReaction, FEMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEChemicalReaction::FEChemicalReaction()
+FEChemicalReaction::FEChemicalReaction(FEModel* pfem) : FEMaterial(pfem)
 {
 	m_Vovr = false; 
 	m_pMP = 0; 

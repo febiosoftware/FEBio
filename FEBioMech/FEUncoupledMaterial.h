@@ -24,7 +24,7 @@ class FEUncoupledMaterial :	public FEElasticMaterial
 {
 public:
 	//! constructor
-	FEUncoupledMaterial(void);
+	FEUncoupledMaterial(FEModel* pfem);
 
 public:
 

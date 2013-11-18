@@ -9,7 +9,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEPermHolmesMow::FEPermHolmesMow()
+FEPermHolmesMow::FEPermHolmesMow(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm = 1;
 	m_M = m_alpha = 0;

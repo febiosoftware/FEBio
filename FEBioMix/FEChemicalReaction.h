@@ -12,6 +12,10 @@ class FEChemicalReaction;
 class FEReactionRate : public FEMaterial
 {
 public:
+	//! constructor
+	FEReactionRate(FEModel* pfem) : FEMaterial(pfem) {}
+
+	//! Initialization
 	virtual void Init() {}
 	
 	//! reaction rate at material point
@@ -37,7 +41,7 @@ class FEChemicalReaction : public FEMaterial
 {
 public:
 	//! constructor
-    FEChemicalReaction();
+    FEChemicalReaction(FEModel* pfem);
     
 	//! initialization
 	virtual void Init();	

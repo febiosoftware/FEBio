@@ -14,7 +14,7 @@
 class FEUncoupledElasticMixture : public FEUncoupledMaterial
 {
 public:
-	FEUncoupledElasticMixture() {}
+	FEUncoupledElasticMixture(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();

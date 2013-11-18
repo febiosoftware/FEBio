@@ -10,7 +10,7 @@
 class FEMicroMaterial :	public FEElasticMaterial
 {
 public:
-	FEMicroMaterial(void);
+	FEMicroMaterial(FEModel* pfem);
 	~FEMicroMaterial(void);
 
 public:

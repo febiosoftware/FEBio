@@ -7,7 +7,7 @@
 class FEFiberExpPowUncoupled : public FEUncoupledMaterial
 {
 public:
-	FEFiberExpPowUncoupled() {m_unstable = true;}
+	FEFiberExpPowUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) {m_unstable = true;}
 	
 	//! Initialization
 	void Init();

@@ -8,7 +8,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEOsmCoefConst::FEOsmCoefConst()
+FEOsmCoefConst::FEOsmCoefConst(FEModel* pfem) : FEOsmoticCoefficient(pfem)
 {
 	m_osmcoef = 1;
 }

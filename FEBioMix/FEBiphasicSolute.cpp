@@ -61,7 +61,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FEBiphasicSolute constructor
 
-FEBiphasicSolute::FEBiphasicSolute()
+FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMultiMaterial(pfem)
 {
 	m_phi0 = 0;
 	m_rhoTw = 0;

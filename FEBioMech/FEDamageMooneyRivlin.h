@@ -6,7 +6,7 @@
 class FEDamageMooneyRivlin : public FEUncoupledMaterial
 {
 public:
-	FEDamageMooneyRivlin(void);
+	FEDamageMooneyRivlin(FEModel* pfem);
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1

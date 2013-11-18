@@ -10,7 +10,7 @@ class FEEFDVerondaWestmann : public FEUncoupledMaterial
 {
 public:
 	// constructor
-	FEEFDVerondaWestmann(){}
+	FEEFDVerondaWestmann(FEModel* pfem) : FEUncoupledMaterial(pfem), m_VW(pfem), m_EFD(pfem) {}
 
 	//! material initialization
 	void Init();

@@ -201,7 +201,7 @@ bool FEContactDiagnostic::Init()
 	el1.m_node[7] = 15;
 
 	// --- create a material ---
-	FENeoHookean* pm = new FENeoHookean;
+	FENeoHookean* pm = new FENeoHookean(&m_fem);
 	pm->m_E = 1;
 	pm->m_v = 0.45;
 	m_fem.AddMaterial(pm);

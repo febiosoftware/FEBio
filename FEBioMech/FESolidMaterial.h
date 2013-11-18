@@ -8,6 +8,9 @@
 class FESolidMaterial : public FEMaterial
 {
 public:
+	//! constructor
+	FESolidMaterial(FEModel* pfem) : FEMaterial(pfem) {}
+
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt) = 0;
 

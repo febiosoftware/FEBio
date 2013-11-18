@@ -8,7 +8,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEDiffConstIso::FEDiffConstIso()
+FEDiffConstIso::FEDiffConstIso(FEModel* pfem) : FESoluteDiffusivity(pfem)
 {
 	m_free_diff = m_diff = 1;
 }

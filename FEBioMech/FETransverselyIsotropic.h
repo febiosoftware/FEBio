@@ -18,7 +18,7 @@ class FETransverselyIsotropic : public FEUncoupledMaterial
 {
 public:
 	//! constructor
-	FETransverselyIsotropic() {}
+	FETransverselyIsotropic(FEModel* pfem);
 
 	//! Initialization
 	void Init();

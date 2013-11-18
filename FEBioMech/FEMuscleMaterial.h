@@ -21,7 +21,7 @@
 class FEMuscleMaterial: public FETransverselyIsotropic
 {
 public:
-	FEMuscleMaterial ()
+	FEMuscleMaterial (FEModel* pfem) : FETransverselyIsotropic(pfem)
 	{
 		m_G1 = 0;
 		m_G2 = 0;

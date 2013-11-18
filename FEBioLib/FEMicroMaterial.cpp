@@ -10,12 +10,12 @@
 REGISTER_MATERIAL(FEMicroMaterial, "micro-material");
 
 // define the material parameters
-BEGIN_PARAMETER_LIST(FEMicroMaterial, FESolidMaterial)
+BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve, FE_PARAM_STRING, "RVE");
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMicroMaterial::FEMicroMaterial(void)
+FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_szrve[0] = 0;
 }

@@ -937,11 +937,11 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	const char* szt = tag.AttributeValue("type", true);
 	if (szt)
 	{
-		if (strcmp(szt, "linear") == 0) pm = new FELinearSpring;
-		else if (strcmp(szt, "tension-only linear") == 0) pm = new FETensionOnlyLinearSpring;
-		else if (strcmp(szt, "nonlinear") == 0) pm = new FENonLinearSpring;
+		if      (strcmp(szt, "linear"             ) == 0) pm = new FELinearSpring(&fem);
+		else if (strcmp(szt, "tension-only linear") == 0) pm = new FETensionOnlyLinearSpring(&fem);
+		else if (strcmp(szt, "nonlinear"          ) == 0) pm = new FENonLinearSpring(&fem);
 	}
-	else pm = new FELinearSpring;
+	else pm = new FELinearSpring(&fem);
 
 	// create a new spring "domain"
 	FEDiscreteSpringDomain* pd = new FEDiscreteSpringDomain(&mesh, pm);

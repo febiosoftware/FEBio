@@ -8,7 +8,7 @@
 class FECarterHayesOld : public FEElasticMaterial
 {
 public:
-	FECarterHayesOld() {}
+	FECarterHayesOld(FEModel* pfem) : FEElasticMaterial(pfem) {}
 	
 public:
 	double	m_c;	//!< c coefficient for calculation of Young's modulus

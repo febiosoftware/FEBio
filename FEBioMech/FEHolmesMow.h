@@ -5,7 +5,7 @@
 class FEHolmesMow : public FEElasticMaterial
 {
 public:
-	FEHolmesMow() {}
+	FEHolmesMow(FEModel* pfem) : FEElasticMaterial(pfem) {}
 		
 public:
 	double	m_E;	//!< Young's modulus

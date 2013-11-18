@@ -9,7 +9,7 @@ class FESolventSupplyStarling :	public FESolventSupply
 {
 public:
 	//! constructor
-	FESolventSupplyStarling();
+	FESolventSupplyStarling(FEModel* pfem);
 	
 	//! Solute supply
 	double Supply(FEMaterialPoint& pt);

@@ -11,7 +11,7 @@ class FEPermRefOrtho :	public FEHydraulicPermeability
 	{
 	public:
 		//! constructor
-		FEPermRefOrtho();
+		FEPermRefOrtho(FEModel* pfem);
 		
 		//! permeability
 		mat3ds Permeability(FEMaterialPoint& pt);

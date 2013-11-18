@@ -10,7 +10,7 @@ class FEEFDMooneyRivlin : public FEUncoupledMaterial
 {
 public:
 	// constructor
-	FEEFDMooneyRivlin();
+	FEEFDMooneyRivlin(FEModel* pfem);
 	
 	//! Data initialization
 	void Init();

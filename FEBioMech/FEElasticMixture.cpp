@@ -46,7 +46,7 @@ void FEElasticMixtureMaterialPoint::Serialize(DumpFile& ar)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-FEElasticMixture::FEElasticMixture()
+FEElasticMixture::FEElasticMixture(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 
 }

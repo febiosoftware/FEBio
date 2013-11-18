@@ -17,7 +17,7 @@
 class FEArrudaBoyce : public FEUncoupledMaterial
 {
 public:
-	FEArrudaBoyce() {}
+	FEArrudaBoyce(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
 	double	m_mu;	//!< shear modulus

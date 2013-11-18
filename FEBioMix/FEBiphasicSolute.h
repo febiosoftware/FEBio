@@ -9,6 +9,9 @@
 class FEOsmoticCoefficient : public FEMaterial
 {
 public:
+	//! constructor
+	FEOsmoticCoefficient(FEModel* pfem) : FEMaterial(pfem) {}
+
 	//! osmotic coefficient
 	virtual double OsmoticCoefficient(FEMaterialPoint& pt) = 0;
 	
@@ -54,7 +57,7 @@ public:
 class FEBiphasicSolute : public FEMultiMaterial
 {
 public:
-	FEBiphasicSolute();
+	FEBiphasicSolute(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 

@@ -22,7 +22,7 @@ public:
 class FEPreStrainTransIsoMR: public FETransverselyIsotropic
 {
 public:
-	FEPreStrainTransIsoMR() {}
+	FEPreStrainTransIsoMR(FEModel* pfem) : FETransverselyIsotropic(pfem) {}
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1

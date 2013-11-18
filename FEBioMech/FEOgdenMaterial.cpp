@@ -19,7 +19,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEOgdenMaterial::FEOgdenMaterial()
+FEOgdenMaterial::FEOgdenMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	for (int i=0; i<MAX_TERMS; ++i)
 	{

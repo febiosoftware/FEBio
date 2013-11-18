@@ -6,7 +6,7 @@
 class FEEFDUncoupled : public FEUncoupledMaterial
 {
 public:
-	FEEFDUncoupled() { m_unstable = true; }
+	FEEFDUncoupled(FEModel* pfem) : FEUncoupledMaterial(pfem) { m_unstable = true; }
 
 	//! Initialization
 	void Init();

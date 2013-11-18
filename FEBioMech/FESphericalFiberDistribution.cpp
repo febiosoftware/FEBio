@@ -29,7 +29,7 @@ END_PARAMETER_LIST();
 // FESphericalFiberDistribution
 //-----------------------------------------------------------------------------
 
-FESphericalFiberDistribution::FESphericalFiberDistribution()
+FESphericalFiberDistribution::FESphericalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_unstable = true;
 	m_alpha = 0.0;

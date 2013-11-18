@@ -54,7 +54,7 @@ class FEMultiphasic : public FEMultiMaterial
 {
 public:
 	//! constructor
-	FEMultiphasic();
+	FEMultiphasic(FEModel* pfem);
 
 	//! initialization
 	void Init();

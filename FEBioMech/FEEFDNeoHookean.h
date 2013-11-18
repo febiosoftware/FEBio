@@ -6,7 +6,7 @@
 class FEEFDNeoHookean :	public FEElasticMaterial
 {
 public:
-	FEEFDNeoHookean() {}
+	FEEFDNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem), m_EFD(pfem), m_NH(pfem) {}
 
 public:
 	double	m_E;	//!< Young's modulus
@@ -39,7 +39,7 @@ public:
 class FEEFDNeoHookeanOld :	public FEElasticMaterial
 {
 public:
-	FEEFDNeoHookeanOld() {}
+	FEEFDNeoHookeanOld(FEModel* pfem) : FEElasticMaterial(pfem), m_EFD(pfem), m_NH(pfem) {}
 
 public:
 	double	m_E;	//!< Young's modulus

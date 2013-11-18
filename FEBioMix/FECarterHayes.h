@@ -17,7 +17,7 @@
 class FECarterHayes : public FEElasticMaterial
 {
 public:
-	FECarterHayes() { m_E0 = 0; m_rho0 = 1; m_sbm = -1; m_lsbm = -1; m_g = 0; }
+	FECarterHayes(FEModel* pfem) : FEElasticMaterial(pfem) { m_E0 = 0; m_rho0 = 1; m_sbm = -1; m_lsbm = -1; m_g = 0; }
 	
 public:
 	double	m_E0;	//!< Young's modulus at reference sbm density

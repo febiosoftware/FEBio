@@ -22,7 +22,7 @@
 class FERigidMaterial : public FESolidMaterial
 {
 public:
-	FERigidMaterial();
+	FERigidMaterial(FEModel* pfem);
 
 public:
 	double	m_E;		//!< Young's modulus

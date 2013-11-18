@@ -10,7 +10,7 @@ BEGIN_PARAMETER_LIST(FEEFDMooneyRivlin, FEUncoupledMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEEFDMooneyRivlin::FEEFDMooneyRivlin()
+FEEFDMooneyRivlin::FEEFDMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem), m_EFD(pfem), m_MR(pfem)
 {
 
 }

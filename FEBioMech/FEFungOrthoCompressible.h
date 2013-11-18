@@ -13,7 +13,7 @@ public:
 	double	m_k;			// bulk modulus
 	
 public:
-	FEFungOrthoCompressible() {}
+	FEFungOrthoCompressible(FEModel* pfem) : FEElasticMaterial(pfem) {}
 	
 	//! calculate stress at material point
 	mat3ds Stress(FEMaterialPoint& pt);

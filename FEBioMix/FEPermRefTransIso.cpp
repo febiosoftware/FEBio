@@ -18,7 +18,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEPermRefTransIso::FEPermRefTransIso()
+FEPermRefTransIso::FEPermRefTransIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm0 = 1;
 	m_perm1T = m_perm1A = 0;

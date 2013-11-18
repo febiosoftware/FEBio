@@ -13,7 +13,7 @@ class FEReactionRateConst : public FEReactionRate
 {
 public:
 	//! constructor
-	FEReactionRateConst() { m_k = 0; }
+	FEReactionRateConst(FEModel* pfem) : FEReactionRate(pfem) { m_k = 0; }
 	
 	//! data initialization and checking
 	void Init();

@@ -9,7 +9,7 @@ class FEPermHolmesMow :	public FEHydraulicPermeability
 {
 public:
 	//! constructor
-	FEPermHolmesMow();
+	FEPermHolmesMow(FEModel* pfem);
 		
 	//! permeability
 	mat3ds Permeability(FEMaterialPoint& pt);

@@ -20,7 +20,7 @@
 class FETransIsoMooneyRivlin: public FETransverselyIsotropic
 {
 public:
-	FETransIsoMooneyRivlin () {}
+	FETransIsoMooneyRivlin(FEModel* pfem) : FETransverselyIsotropic (pfem) {}
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1

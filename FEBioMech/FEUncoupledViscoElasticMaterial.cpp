@@ -21,7 +21,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial()
+FEUncoupledViscoElasticMaterial::FEUncoupledViscoElasticMaterial(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	m_g0 = 1;
 	for (int i=0; i<MAX_TERMS; ++i)

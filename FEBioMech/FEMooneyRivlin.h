@@ -17,7 +17,7 @@
 class FEMooneyRivlin : public FEUncoupledMaterial
 {
 public:
-	FEMooneyRivlin() {}
+	FEMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem) {}
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1

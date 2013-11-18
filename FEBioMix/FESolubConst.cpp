@@ -8,7 +8,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FESolubConst::FESolubConst()
+FESolubConst::FESolubConst(FEModel* pfem) : FESoluteSolubility(pfem)
 {
 	m_solub = 1;
 }

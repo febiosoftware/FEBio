@@ -5,7 +5,7 @@
 class FEIsotropicElastic : public FEElasticMaterial
 {
 public:
-	FEIsotropicElastic() {}
+	FEIsotropicElastic(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 public:
 	double	m_E;	//!< Young's modulus

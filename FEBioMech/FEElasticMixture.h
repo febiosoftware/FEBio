@@ -36,7 +36,7 @@ public:
 class FEElasticMixture : public FEElasticMaterial
 {
 public:
-	FEElasticMixture();
+	FEElasticMixture(FEModel* pfem);
 
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData();

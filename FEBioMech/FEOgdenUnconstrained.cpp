@@ -19,7 +19,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEOgdenUnconstrained::FEOgdenUnconstrained()
+FEOgdenUnconstrained::FEOgdenUnconstrained(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	for (int i=0; i<MAX_TERMS; ++i)
 	{

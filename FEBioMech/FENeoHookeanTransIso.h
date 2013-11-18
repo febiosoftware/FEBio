@@ -7,7 +7,7 @@
 class FENeoHookeanTransIso : public FEElasticMaterial
 {
 public:
-	FENeoHookeanTransIso(void) {}
+	FENeoHookeanTransIso(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 public:
 	double	m_Ep;	//!< Young's modulus

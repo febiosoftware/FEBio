@@ -17,7 +17,7 @@ class FESupplyBinding :	public FESoluteSupply
 {
 public:
 	//! constructor
-	FESupplyBinding();
+	FESupplyBinding(FEModel* pfem);
 	
 	//! Solute supply
 	double Supply(FEMaterialPoint& pt);

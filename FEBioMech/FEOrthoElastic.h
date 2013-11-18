@@ -14,7 +14,7 @@ public:
 	double	mu[3];			// second Lame coefficients
 
 public:
-	FEOrthoElastic() {}
+	FEOrthoElastic(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);

@@ -32,6 +32,9 @@ public:
 class FEHeatTransferMaterial : public FEMaterial
 {
 public:
+	//! constructor
+	FEHeatTransferMaterial(FEModel* pfem) : FEMaterial(pfem) {}
+
 	//! create material point data
 	FEMaterialPoint* CreateMaterialPointData() { return new FEHeatMaterialPoint; }
 

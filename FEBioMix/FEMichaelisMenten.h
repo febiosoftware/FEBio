@@ -20,7 +20,7 @@ class FEMichaelisMenten : public FEChemicalReaction
 {
 public:
 	//! constructor
-	FEMichaelisMenten() {m_Rid = m_Pid = -1; m_Km = m_c0 = 0; m_Rtype = false; }
+	FEMichaelisMenten(FEModel* pfem) : FEChemicalReaction(pfem) {m_Rid = m_Pid = -1; m_Km = m_c0 = 0; m_Rtype = false; }
 	
 	//! data initialization and checking
 	void Init();

@@ -29,6 +29,8 @@ public:
 class FEDiscreteMaterial : public FEMaterial
 {
 public:
+	FEDiscreteMaterial(FEModel* pfem) : FEMaterial(pfem) {}
+
 	virtual double force    (double dl) = 0;
 	virtual double stiffness(double dl) = 0;
 
@@ -40,6 +42,7 @@ public:
 class FELinearSpring : public FEDiscreteMaterial
 {
 public:
+	FELinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem){}
 	double force    (double dl);
 	double stiffness(double dl);
 	void Init();
@@ -56,6 +59,7 @@ public:
 class FETensionOnlyLinearSpring : public FEDiscreteMaterial
 {
 public:
+	FETensionOnlyLinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem){}
 	double force    (double dl);
 	double stiffness(double dl);
 	void Init();
@@ -72,7 +76,7 @@ public:
 class FENonLinearSpring : public FEDiscreteMaterial
 {
 public:
-	FENonLinearSpring() { m_nlc = -1; m_F = 1; }
+	FENonLinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem) { m_nlc = -1; m_F = 1; }
 
 	double force    (double dl);
 	double stiffness(double dl);

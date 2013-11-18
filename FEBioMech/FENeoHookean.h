@@ -8,7 +8,7 @@
 class FENeoHookean : public FEElasticMaterial
 {
 public:
-	FENeoHookean() {}
+	FENeoHookean(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 public:
 	double	m_E;	//!< Young's modulus

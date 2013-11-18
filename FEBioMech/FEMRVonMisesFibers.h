@@ -21,7 +21,7 @@
 class FEMRVonMisesFibers: public FETransverselyIsotropic
 {
 public:
-	FEMRVonMisesFibers () {}
+	FEMRVonMisesFibers (FEModel* pfem) : FETransverselyIsotropic(pfem) {}
 
 public:
 	double	c1;	//!< Mooney-Rivlin coefficient C1

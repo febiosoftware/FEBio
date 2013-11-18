@@ -16,7 +16,7 @@
 class FESphericalFiberDistribution : public FEElasticMaterial
 {
 public:
-	FESphericalFiberDistribution();
+	FESphericalFiberDistribution(FEModel* pfem);
 	
 	//! Initialization
 	void Init();

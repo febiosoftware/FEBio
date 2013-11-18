@@ -27,7 +27,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FESolventSupplyStarling::FESolventSupplyStarling()
+FESolventSupplyStarling::FESolventSupplyStarling(FEModel* pfem) : FESolventSupply(pfem)
 {
 	m_kp = 0;
 	m_pv = 0;

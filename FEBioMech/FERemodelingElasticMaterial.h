@@ -10,6 +10,10 @@
 class FESolidSupply : public FEMaterial
 {
 public:
+	//! constructor
+	FESolidSupply(FEModel* pfem) : FEMaterial(pfem) {}
+
+	//! Initialization
 	virtual void Init() {}
 	
 	//! solid supply
@@ -47,7 +51,7 @@ class FERemodelingElasticMaterial : public FEElasticMaterial
 {
 public:
 	//! default constructor
-	FERemodelingElasticMaterial() {}
+	FERemodelingElasticMaterial(FEModel* pfem) : FEElasticMaterial(pfem) {}
 	
 	//! strain energy density function
 	double StrainEnergy(FEMaterialPoint& pt);

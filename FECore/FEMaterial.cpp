@@ -21,7 +21,7 @@ MaterialError::MaterialError(const char* szfmt, ...)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial::FEMaterial()
+FEMaterial::FEMaterial(FEModel* pfem) : m_pfem(pfem)
 {
 	static int n = 1;
 	m_szname[0] = 0;
@@ -33,6 +33,13 @@ FEMaterial::FEMaterial()
 FEMaterial::~FEMaterial()
 {
 	if (m_pmap) delete m_pmap; 
+}
+
+//-----------------------------------------------------------------------------
+//! Get the model this material belongs to
+FEModel* FEMaterial::GetFEModel()
+{
+	return m_pfem;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,67 +73,46 @@ FECoordSysMap* FEMaterial::GetCoordinateSystemMap()
 //! derived classes to initialize and check material parameters
 void FEMaterial::Init()
 {
+	if (m_pmap) m_pmap->Init();
 }
 
 //-----------------------------------------------------------------------------
 //! Store the material data to the archive
 void FEMaterial::Serialize(DumpFile &ar)
 {
+	FEParamContainer::Serialize(ar);
+
 	if (ar.IsSaving())
 	{
 		ar << m_nID;
 
-		// store all parameters
-		FEParameterList& pl = GetParameterList();
-		int n = pl.Parameters();
-		ar << n;
-		list<FEParam>::iterator it = pl.first();
-		for (int j=0; j<n; ++j, ++it)
-		{
-			// store the value
-			switch (it->m_itype)
-			{
-			case FE_PARAM_INT    : ar << it->value<int   >(); break;
-			case FE_PARAM_BOOL   : ar << it->value<bool  >(); break;
-			case FE_PARAM_DOUBLE : ar << it->value<double>(); break;
-			case FE_PARAM_VEC3D  : ar << it->value<vec3d >(); break;
-			case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<double>()[k]; } break;
-			case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar << it->pvalue<int   >()[k]; } break;
-			default:
-				assert(false);
-			}
+		int ntype = -1;
+		if (m_pmap) ntype = m_pmap->m_ntype;
+		else ntype = FE_MAP_NONE;
+		assert(ntype != -1);
+		ar << ntype;
+		if (m_pmap) m_pmap->Serialize(ar);
 
-			// store parameter loadcurve data
-			ar << it->m_nlc;
-		}
 	}
 	else
 	{
 		ar >> m_nID;
 
-		FEParameterList& pl = GetParameterList();
-		int n = 0;
-		ar >> n;
-		assert(n == pl.Parameters());
-		list<FEParam>::iterator it = pl.first();
-		for (int j=0; j<n; ++j, ++it)
+		int ntype;
+		ar >> ntype;
+		if (m_pmap) delete m_pmap;
+		m_pmap = 0;
+		assert(ntype != -1);
+		FEModel* pfem = ar.GetFEModel();
+		switch (ntype)
 		{
-			// read the value
-			switch (it->m_itype)
-			{
-			case FE_PARAM_INT    : ar >> it->value<int   >(); break;
-			case FE_PARAM_BOOL   : ar >> it->value<bool  >(); break;
-			case FE_PARAM_DOUBLE : ar >> it->value<double>(); break;
-			case FE_PARAM_VEC3D  : ar >> it->value<vec3d >(); break;
-			case FE_PARAM_DOUBLEV: { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<double>()[k]; } break;
-			case FE_PARAM_INTV   : { for (int k=0; k<it->m_ndim; ++k) ar >> it->pvalue<int   >()[k]; } break;
-			default:
-				assert(false);
-			}
-
-			// read parameter data
-			ar >> it->m_nlc;
+		case FE_MAP_NONE    : m_pmap = 0; break;
+		case FE_MAP_LOCAL   : m_pmap = new FELocalMap      (pfem); break;
+		case FE_MAP_SPHERE  : m_pmap = new FESphericalMap  (pfem); break;
+		case FE_MAP_CYLINDER: m_pmap = new FECylindricalMap(pfem); break;
+		case FE_MAP_VECTOR  : m_pmap = new FEVectorMap     (pfem); break;
 		}
+		if (m_pmap) m_pmap->Serialize(ar);
 	}
 }
 

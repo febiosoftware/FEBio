@@ -14,7 +14,7 @@ BEGIN_PARAMETER_LIST(FEActiveFiberContraction, FEMaterial);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEActiveFiberContraction::FEActiveFiberContraction()
+FEActiveFiberContraction::FEActiveFiberContraction(FEModel* pfem) : FEMaterial(pfem)
 {
 	m_ascl = 0;
 	m_Tmax = 1.0;
@@ -96,7 +96,7 @@ BEGIN_PARAMETER_LIST(FEFiberMaterial, FEMaterial);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEFiberMaterial::FEFiberMaterial()
+FEFiberMaterial::FEFiberMaterial(FEModel* pfem) : FEMaterial(pfem)
 {
 	m_c3 = m_c4 = m_c5 = 0;
 	m_lam1 = 1;
@@ -306,7 +306,7 @@ void FEFiberMaterial::Serialize(DumpFile& ar)
 		ar >> nafc;
 		if (nafc == 1)
 		{
-			m_pafc = new FEActiveFiberContraction;
+			m_pafc = new FEActiveFiberContraction(GetFEModel());
 			m_pafc->Serialize(ar);
 		}
 	}

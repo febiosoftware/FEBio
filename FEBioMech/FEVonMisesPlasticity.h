@@ -60,7 +60,7 @@ public:
 class FEVonMisesPlasticity : public FEElasticMaterial
 {
 public:
-	FEVonMisesPlasticity(void);
+	FEVonMisesPlasticity(FEModel* pfem);
 
 public:
 	double	m_E;	//!< Young's modulus

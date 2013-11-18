@@ -17,7 +17,7 @@ class FESupplyMichaelisMenten :	public FESoluteSupply
 {
 public:
 	//! constructor
-	FESupplyMichaelisMenten();
+	FESupplyMichaelisMenten(FEModel* pfem);
 	
 	//! Solute supply
 	double Supply(FEMaterialPoint& pt);

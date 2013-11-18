@@ -13,7 +13,7 @@ class FEReactionRateHuiskes : public FEReactionRate
 {
 public:
 	//! constructor
-	FEReactionRateHuiskes() { m_B = m_psi0 = 0; }
+	FEReactionRateHuiskes(FEModel* pfem) : FEReactionRate(pfem) { m_B = m_psi0 = 0; }
 	
 	//! data initialization and checking
 	void Init();

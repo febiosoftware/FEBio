@@ -16,7 +16,7 @@ class FEMassActionReversible : public FEChemicalReaction
 {
 public:
 	//! constructor
-	FEMassActionReversible() {}
+	FEMassActionReversible(FEModel* pfem) : FEChemicalReaction(pfem) {}
 	
 	//! data initialization and checking
 	void Init() {FEChemicalReaction::Init(); }

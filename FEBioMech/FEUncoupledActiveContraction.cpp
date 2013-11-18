@@ -13,7 +13,7 @@ BEGIN_PARAMETER_LIST(FEUncoupledActiveContraction, FEUncoupledMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEUncoupledActiveContraction::FEUncoupledActiveContraction()
+FEUncoupledActiveContraction::FEUncoupledActiveContraction(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 
 }

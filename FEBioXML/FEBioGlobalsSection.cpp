@@ -150,7 +150,7 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 		}
 		while (!tag.isend());
 		
-		fem.SetSD(psd);
+		fem.AddSoluteData(psd);
 		
 		++tag;
 	}
@@ -202,7 +202,7 @@ void FEBioGlobalsSection::ParseGSSBMData(XMLTag &tag)
 		}
 		while (!tag.isend());
 		
-		FEModel::SetSBM(psd);
+		FEModel::AddSBMData(psd);
 		
 		++tag;
 	}

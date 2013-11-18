@@ -8,6 +8,9 @@
 class FESoluteDiffusivity : public FEMaterial
 {
 public:
+	//! constructor
+	FESoluteDiffusivity(FEModel* pfem) : FEMaterial(pfem) {}
+
 	//! solute diffusivity
 	virtual mat3ds Diffusivity(FEMaterialPoint& pt) = 0;
 	
@@ -38,6 +41,9 @@ private:
 class FESoluteSolubility : public FEMaterial
 {
 public:
+	//! constructor
+	FESoluteSolubility(FEModel* pfem) : FEMaterial(pfem) {}
+
 	//! solute solubility
 	virtual double Solubility(FEMaterialPoint& pt) = 0;
 	
@@ -73,6 +79,10 @@ private:
 class FESoluteSupply : public FEMaterial
 {
 public:
+	//! constructor
+	FESoluteSupply(FEModel* pfem) : FEMaterial(pfem) {}
+
+	//! Initialization
 	virtual void Init() {}
 	
 	//! solute supply
@@ -107,7 +117,7 @@ public:
 class FESolute : public FEMultiMaterial
 {
 public:
-	FESolute();
+	FESolute(FEModel* pfem);
 
 public:
 	void Init();
@@ -171,7 +181,7 @@ public: // material properties
 class FESolidBoundMolecule : public FEMaterial
 {
 public:
-	FESolidBoundMolecule();
+	FESolidBoundMolecule(FEModel* pfem);
 	
 public:
 	void Init();

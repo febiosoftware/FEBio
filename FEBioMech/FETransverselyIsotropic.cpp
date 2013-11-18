@@ -11,6 +11,11 @@ BEGIN_PARAMETER_LIST(FETransverselyIsotropic, FEUncoupledMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
+FETransverselyIsotropic::FETransverselyIsotropic(FEModel* pfem) : FEUncoupledMaterial(pfem), m_fib(pfem) 
+{
+}
+
+//-----------------------------------------------------------------------------
 // Data initialization
 void FETransverselyIsotropic::Init()
 {

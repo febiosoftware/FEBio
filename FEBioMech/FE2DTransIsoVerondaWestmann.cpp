@@ -15,7 +15,7 @@ double FE2DTransIsoVerondaWestmann::m_sth[FE2DTransIsoVerondaWestmann::NSTEPS];
 // FE2DTransIsoVerondaWestmann
 //////////////////////////////////////////////////////////////////////
 
-FE2DTransIsoVerondaWestmann::FE2DTransIsoVerondaWestmann()
+FE2DTransIsoVerondaWestmann::FE2DTransIsoVerondaWestmann(FEModel* pfem) : FETransverselyIsotropic(pfem)
 {
 	static bool bfirst = true;
 

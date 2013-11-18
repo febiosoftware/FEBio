@@ -42,7 +42,7 @@ public:
 
 public:
 	//! default constructor
-	FEViscoElasticMaterial();
+	FEViscoElasticMaterial(FEModel* pfem);
 
 	//! Get a parameter
 	FEParam* GetParameter(const ParamString& s);

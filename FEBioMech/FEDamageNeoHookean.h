@@ -60,7 +60,7 @@ public:
 class FEDamageNeoHookean : public FEElasticMaterial
 {
 public:
-	FEDamageNeoHookean(void);
+	FEDamageNeoHookean(FEModel* pfem);
 
 public:
 	double	m_E;	//!< Young's modulus

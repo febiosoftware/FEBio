@@ -10,7 +10,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEHuiskesSupply::FEHuiskesSupply()
+FEHuiskesSupply::FEHuiskesSupply(FEModel* pfem) : FESolidSupply(pfem)
 {
 	m_B = m_k = 0;
 }

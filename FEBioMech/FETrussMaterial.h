@@ -36,7 +36,7 @@ public:
 class FETrussMaterial : public FEMaterial
 {
 public:
-	FETrussMaterial(){}
+	FETrussMaterial(FEModel* pfem) : FEMaterial(pfem) {}
 	~FETrussMaterial(){}
 
 public:

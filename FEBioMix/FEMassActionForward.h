@@ -16,7 +16,7 @@ class FEMassActionForward : public FEChemicalReaction
 {
 public:
 	//! constructor
-	FEMassActionForward() {}
+	FEMassActionForward(FEModel* pfem) : FEChemicalReaction(pfem) {}
 	
 	//! data initialization and checking
 	void Init() {FEChemicalReaction::Init(); }

@@ -25,7 +25,7 @@ public:
 
 public:
 	//! constructor
-	FE2DTransIsoMooneyRivlin();
+	FE2DTransIsoMooneyRivlin(FEModel* pfem);
 	
 	//! calculate deviatoric stress at material point
 	virtual mat3ds DevStress(FEMaterialPoint& pt);

@@ -11,7 +11,7 @@ BEGIN_PARAMETER_LIST(FEDamageMooneyRivlin, FEUncoupledMaterial)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEDamageMooneyRivlin::FEDamageMooneyRivlin(void)
+FEDamageMooneyRivlin::FEDamageMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem)
 {
 	c1 = 0;
 	c2 = 0;

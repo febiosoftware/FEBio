@@ -6,7 +6,7 @@
 class FEIsotropicFourier : public FEHeatTransferMaterial
 {
 public:
-	FEIsotropicFourier() {}
+	FEIsotropicFourier(FEModel* pfem) : FEHeatTransferMaterial(pfem) {}
 	void Init();
 
 public:

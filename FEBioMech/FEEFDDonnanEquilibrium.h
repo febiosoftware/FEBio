@@ -13,7 +13,7 @@
 class FEEFDDonnanEquilibrium : public FEElasticMaterial
 {
 public:
-	FEEFDDonnanEquilibrium() {}
+	FEEFDDonnanEquilibrium(FEModel* pfem) : FEElasticMaterial(pfem), m_Fib(pfem), m_DEQ(pfem) {}
 	
 public:
 	//! calculate stress at material point

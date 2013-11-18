@@ -12,7 +12,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // Constructor
-FEDamageNeoHookean::FEDamageNeoHookean(void)
+FEDamageNeoHookean::FEDamageNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_E = 0;
 	m_v = 0;

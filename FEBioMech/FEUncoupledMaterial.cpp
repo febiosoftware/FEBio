@@ -11,7 +11,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor
-FEUncoupledMaterial::FEUncoupledMaterial(void)
+FEUncoupledMaterial::FEUncoupledMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_blaugon = false;
 	m_atol = 0.01;

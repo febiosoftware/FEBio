@@ -12,7 +12,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FESupplyConst::FESupplyConst()
+FESupplyConst::FESupplyConst(FEModel* pfem) : FESoluteSupply(pfem)
 {
 	m_supp = 0;
 }

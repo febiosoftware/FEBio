@@ -4,7 +4,7 @@
 class FEFiberNeoHookean : public FEElasticMaterial
 {
 public:
-	FEFiberNeoHookean();
+	FEFiberNeoHookean(FEModel* pfem);
 
 public:
 	//! calculate stress at material point

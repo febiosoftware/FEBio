@@ -55,7 +55,7 @@ class FEElasticMaterial : public FESolidMaterial
 {
 public:
 	//! constructor 
-	FEElasticMaterial();
+	FEElasticMaterial(FEModel* pfem);
 
 	//! destructor
 	~FEElasticMaterial();

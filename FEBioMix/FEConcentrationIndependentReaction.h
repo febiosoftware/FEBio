@@ -18,7 +18,7 @@ class FEConcentrationIndependentReaction : public FEChemicalReaction
 {
 public:
 	//! constructor
-	FEConcentrationIndependentReaction() {}
+	FEConcentrationIndependentReaction(FEModel* pfem) : FEChemicalReaction(pfem) {}
 	
 	//! data initialization and checking
 	void Init() {FEChemicalReaction::Init(); }

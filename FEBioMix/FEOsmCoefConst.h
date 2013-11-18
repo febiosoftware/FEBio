@@ -8,7 +8,7 @@ class FEOsmCoefConst :	public FEOsmoticCoefficient
 {
 public:
 	//! constructor
-	FEOsmCoefConst();
+	FEOsmCoefConst(FEModel* pfem);
 	
 	//! osmotic coefficient
 	double OsmoticCoefficient(FEMaterialPoint& pt);

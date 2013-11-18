@@ -16,7 +16,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 // constructor
-FERigidMaterial::FERigidMaterial()
+FERigidMaterial::FERigidMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 {
 	m_com = 0;	// calculate COM automatically
 	for (int i=0; i<6; ++i)

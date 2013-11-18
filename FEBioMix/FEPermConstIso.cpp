@@ -7,7 +7,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Constructor. 
-FEPermConstIso::FEPermConstIso()
+FEPermConstIso::FEPermConstIso(FEModel* pfem) : FEHydraulicPermeability(pfem)
 {
 	m_perm = 1;
 }

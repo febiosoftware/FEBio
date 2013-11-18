@@ -11,7 +11,7 @@ END_PARAMETER_LIST();
 
 
 //-----------------------------------------------------------------------------
-FEVonMisesPlasticity::FEVonMisesPlasticity(void)
+FEVonMisesPlasticity::FEVonMisesPlasticity(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_E = m_v = m_Y = m_H = 0;
 	m_K = m_G = 0;

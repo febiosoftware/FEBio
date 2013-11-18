@@ -6,7 +6,7 @@
 class FEActiveFiberContraction : public FEMaterial
 {
 public:
-	FEActiveFiberContraction();
+	FEActiveFiberContraction(FEModel* pfem);
 
 	//! initialization
 	void Init();
@@ -42,7 +42,7 @@ class FEFiberMaterial : public FEMaterial
 {
 public:
 	//! Constructor
-	FEFiberMaterial();
+	FEFiberMaterial(FEModel* pfem);
 
 	//! Initialization
 	void Init();

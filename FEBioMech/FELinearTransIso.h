@@ -11,7 +11,7 @@ public:
 	double	G23;		// Shear moduli
 
 public:
-	FELinearTransIso() {}
+	FELinearTransIso(FEModel* pfem) : FEElasticMaterial(pfem) {}
 
 	//! calculate stress at material point
 	virtual mat3ds Stress(FEMaterialPoint& pt);

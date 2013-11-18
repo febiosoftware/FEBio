@@ -17,7 +17,7 @@ double FE2DFiberNeoHookean::m_sth[FE2DFiberNeoHookean::NSTEPS];
 // FE2DFiberNeoHookean
 //////////////////////////////////////////////////////////////////////
 
-FE2DFiberNeoHookean::FE2DFiberNeoHookean()
+FE2DFiberNeoHookean::FE2DFiberNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	static bool bfirst = true;
 

@@ -8,7 +8,7 @@
 class FEFiberExpPow : public FEElasticMaterial
 {
 public:
-	FEFiberExpPow() {m_unstable = true;}
+	FEFiberExpPow(FEModel* pfem) : FEElasticMaterial(pfem) {m_unstable = true;}
 	
 	//! Initialization
 	void Init();

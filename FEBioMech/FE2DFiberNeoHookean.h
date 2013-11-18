@@ -7,7 +7,7 @@ class FE2DFiberNeoHookean :	public FEElasticMaterial
 	enum { NSTEPS = 12 };	// nr of integration steps
 
 public:
-	FE2DFiberNeoHookean();
+	FE2DFiberNeoHookean(FEModel* pfem);
 
 public:
 	double	m_E;	//!< Young's modulus

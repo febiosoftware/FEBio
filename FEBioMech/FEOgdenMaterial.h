@@ -7,7 +7,7 @@ class FEOgdenMaterial :	public FEUncoupledMaterial
 public:
 	enum { MAX_TERMS = 6 };
 public:
-	FEOgdenMaterial();
+	FEOgdenMaterial(FEModel* pfem);
 
 	//! data initialization and checking
 	void Init();

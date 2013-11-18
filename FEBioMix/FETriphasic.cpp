@@ -21,7 +21,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FETriphasic constructor
 
-FETriphasic::FETriphasic()
+FETriphasic::FETriphasic(FEModel* pfem) : FEMultiMaterial(pfem)
 {	
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;

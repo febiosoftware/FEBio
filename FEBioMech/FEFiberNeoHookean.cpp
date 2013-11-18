@@ -29,7 +29,7 @@ END_PARAMETER_LIST();
 //////////////////////////////////////////////////////////////////////
 
 
-FEFiberNeoHookean::FEFiberNeoHookean()
+FEFiberNeoHookean::FEFiberNeoHookean(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	static bool bfirst = true;
 

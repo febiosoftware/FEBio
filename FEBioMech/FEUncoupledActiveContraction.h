@@ -8,7 +8,7 @@ class FEUncoupledActiveContraction : public FEUncoupledMaterial
 {
 public:
 	//! constructor
-	FEUncoupledActiveContraction();
+	FEUncoupledActiveContraction(FEModel* pfem);
 
 	//! Initialization
 	void Init();

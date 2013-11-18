@@ -57,7 +57,7 @@ void FEBiphasicMaterialPoint::Init(bool bflag)
 //-----------------------------------------------------------------------------
 //! FEBiphasic constructor
 
-FEBiphasic::FEBiphasic()
+FEBiphasic::FEBiphasic(FEModel* pfem) : FEMultiMaterial(pfem)
 { 
 	m_rhoTw = 0; 
 	m_phi0 = 0;

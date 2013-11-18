@@ -43,7 +43,7 @@ public:
 class FEHydraulicPermeability : public FEMaterial
 {
 public:
-	FEHydraulicPermeability() {}
+	FEHydraulicPermeability(FEModel* pfem) : FEMaterial(pfem) {}
 	virtual ~FEHydraulicPermeability(){}
 		
 	//! hydraulic permeability
@@ -65,7 +65,7 @@ public:
 class FESolventSupply : public FEMaterial
 {
 public:
-	FESolventSupply() {}
+	FESolventSupply(FEModel* pfem) : FEMaterial(pfem) {}
 	virtual ~FESolventSupply(){}
 	
 	//! solvent supply
@@ -89,7 +89,7 @@ public:
 class FEBiphasic : public FEMultiMaterial
 {
 public:
-	FEBiphasic();
+	FEBiphasic(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
 	FEMaterialPoint* CreateMaterialPointData() 

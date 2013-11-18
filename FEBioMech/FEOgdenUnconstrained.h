@@ -6,7 +6,7 @@ class FEOgdenUnconstrained : public FEElasticMaterial
 public:
 	enum { MAX_TERMS = 6 };
 public:
-	FEOgdenUnconstrained();
+	FEOgdenUnconstrained(FEModel* pfem);
 	
 	//! data initialization and checking
 	void Init();

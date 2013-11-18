@@ -217,13 +217,13 @@ double FEModel::GetGlobalConstant(const string& s)
 }
 
 //-----------------------------------------------------------------------------
-void FEModel::SetSD(FESoluteData* psd)
+void FEModel::AddSoluteData(FESoluteData* psd)
 {
 	m_SD.push_back(psd);
 }
 
 //-----------------------------------------------------------------------------
-FESoluteData* FEModel::FindSD(int nid)
+FESoluteData* FEModel::FindSoluteData(int nid)
 {
 	int i;
 	for (i=0; i<(int) m_SD.size(); ++i) if (m_SD[i]->m_nID == nid) return m_SD[i];
@@ -232,13 +232,13 @@ FESoluteData* FEModel::FindSD(int nid)
 }
 
 //-----------------------------------------------------------------------------
-void FEModel::SetSBM(FESBMData* psd)
+void FEModel::AddSBMData(FESBMData* psd)
 {
 	m_SBM.push_back(psd);
 }
 
 //-----------------------------------------------------------------------------
-FESBMData* FEModel::FindSBM(int nid)
+FESBMData* FEModel::FindSBMData(int nid)
 {
 	int i;
 	for (i=0; i<(int) m_SBM.size(); ++i) if (m_SBM[i]->m_nID == nid) return m_SBM[i];

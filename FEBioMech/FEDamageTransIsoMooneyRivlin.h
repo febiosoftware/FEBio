@@ -67,7 +67,7 @@ public:
 class FEDamageTransIsoMooneyRivlin : public FEUncoupledMaterial
 {
 public:
-	FEDamageTransIsoMooneyRivlin(void);
+	FEDamageTransIsoMooneyRivlin(FEModel* pfem);
 
 public:
 	// Mooney-Rivlin parameters
