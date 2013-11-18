@@ -203,10 +203,6 @@ public:	// --- Miscellaneous routines ---
 	//! call the callback function
 	void DoCallback(unsigned int nevent);
 
-	// get/set global data
-	static void SetGlobalConstant(const string& s, double v);
-	static double GetGlobalConstant(const string& s);
-
 public: // --- I/O functions
 
 	// input from file
@@ -233,11 +229,14 @@ public: // --- I/O functions
 
 public:
 	// TODO: I don't like this here.
-	static void AddSoluteData(FESoluteData* psd);
-	static FESoluteData* FindSoluteData(int nid);
-	static void AddSBMData(FESBMData* psd);
-	static FESBMData* FindSBMData(int nid);
-	static void ClearGlobalData();
+	void AddSoluteData(FESoluteData* psd);
+	FESoluteData* FindSoluteData(int nid);
+	void AddSBMData(FESBMData* psd);
+	FESBMData* FindSBMData(int nid);
+
+	// get/set global data
+	void SetGlobalConstant(const string& s, double v);
+	double GetGlobalConstant(const string& s);
 
 public:
 	//! set the debug level
@@ -295,7 +294,7 @@ protected:
 	char	m_sztitle[MAX_STRING];	//!< problem title
 
 protected:
-	static std::map<string, double> m_Const;
-	static vector<FESoluteData*> m_SD;	//!< unique identifier of solutes in multiphasic materials
-	static vector<FESBMData*> m_SBM;		//!< unique identifier of solid-bound molecules in multiphasic materials
+	std::map<string, double> m_Const;	//!< Global model constants
+	vector<FESoluteData*> m_SD;			//!< unique identifier of solutes in multiphasic materials
+	vector<FESBMData*> m_SBM;			//!< unique identifier of solid-bound molecules in multiphasic materials
 };

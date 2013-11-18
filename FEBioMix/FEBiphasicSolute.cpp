@@ -88,8 +88,8 @@ void FEBiphasicSolute::Init()
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");
 	
-	m_Rgas = FEModel::GetGlobalConstant("R");
-	m_Tabs = FEModel::GetGlobalConstant("T");
+	m_Rgas = GetFEModel()->GetGlobalConstant("R");
+	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");

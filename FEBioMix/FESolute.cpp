@@ -23,7 +23,7 @@ void FESolute::Init()
 	m_pSolub->Init();
 	if (m_pSupp) m_pSupp->Init();
 
-	FESoluteData* psd = FEModel::FindSoluteData(m_ID);
+	FESoluteData* psd = GetFEModel()->FindSoluteData(m_ID);
 	if (psd == 0) throw MaterialError("no match with global solute data");
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;
@@ -192,7 +192,7 @@ void FESolidBoundMolecule::Init()
 {
 	FEMaterial::Init();
 	
-	FESBMData* psd = FEModel::FindSBMData(m_ID);
+	FESBMData* psd = GetFEModel()->FindSBMData(m_ID);
 	if (psd == 0) throw MaterialError("no match with global solid-bound molecule data");
 	m_rhoT = psd->m_rhoT;
 	m_M = psd->m_M;

@@ -282,8 +282,8 @@ FESlidingInterface3::~FESlidingInterface3()
 //-----------------------------------------------------------------------------
 bool FESlidingInterface3::Init()
 {
-	m_Rgas = FEModel::GetGlobalConstant("R");
-	m_Tabs = FEModel::GetGlobalConstant("T");
+	m_Rgas = GetFEModel()->GetGlobalConstant("R");
+	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 
 	// initialize surface data
 	if (m_ss.Init() == false) return false;

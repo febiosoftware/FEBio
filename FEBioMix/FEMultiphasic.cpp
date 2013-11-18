@@ -450,9 +450,9 @@ void FEMultiphasic::Init()
 	m_zmin = zmin;
 	m_ndeg = zmax - zmin;	// polynomial degree
 
-	m_Rgas = FEModel::GetGlobalConstant("R");
-	m_Tabs = FEModel::GetGlobalConstant("T");
-	m_Fc = FEModel::GetGlobalConstant("Fc");
+	m_Rgas = GetFEModel()->GetGlobalConstant("R");
+	m_Tabs = GetFEModel()->GetGlobalConstant("T");
+	m_Fc   = GetFEModel()->GetGlobalConstant("Fc");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");

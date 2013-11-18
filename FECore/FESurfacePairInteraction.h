@@ -16,6 +16,9 @@ public:
 	//! return the type of this interface
 	int Type();
 
+	//! Get the FE model
+	FEModel* GetFEModel() { return m_pfem; }
+
 public:
 	//! Create a shallow copy
 	virtual void ShallowCopy(FESurfacePairInteraction& ci) = 0;

@@ -96,7 +96,7 @@ void FEBioGlobalsSection::ParseConstants(XMLTag& tag)
 	{
 		s = string(tag.Name());
 		tag.value(v);
-		FEModel::SetGlobalConstant(s, v);
+		fem.SetGlobalConstant(s, v);
 		++tag;
 	}
 	while (!tag.isend());
@@ -159,6 +159,8 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 //-----------------------------------------------------------------------------
 void FEBioGlobalsSection::ParseGSSBMData(XMLTag &tag)
 {
+	FEModel& fem = *GetFEModel();
+
 	// count how many solid-bound molecules there are
 	int nsbm = 0;
 	XMLTag t(tag); ++t;
@@ -202,7 +204,7 @@ void FEBioGlobalsSection::ParseGSSBMData(XMLTag &tag)
 		}
 		while (!tag.isend());
 		
-		FEModel::AddSBMData(psd);
+		fem.AddSBMData(psd);
 		
 		++tag;
 	}

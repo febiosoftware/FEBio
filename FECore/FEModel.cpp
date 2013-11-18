@@ -4,13 +4,6 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-// Global Constants Data 
-// m_Const and m_SD need a definitions, since static
-map<std::string, double> FEModel::m_Const;
-vector<FESoluteData*> FEModel::m_SD;
-vector<FESBMData*> FEModel::m_SBM;
-
-//-----------------------------------------------------------------------------
 FEModel::FEModel(void)
 {
 	// --- Analysis Data ---
@@ -40,13 +33,8 @@ FEModel::~FEModel(void)
 	for (i=0; i<m_RN.size  (); ++i) delete m_RN [i] ; m_RN.clear  ();
 	for (i=0; i<m_NLC.size (); ++i) delete m_NLC[i] ; m_NLC.clear ();
 	for (i=0; i<m_Obj.size (); ++i) delete m_Obj[i] ; m_Obj.clear ();
-}
 
-//-----------------------------------------------------------------------------
-void FEModel::ClearGlobalData()
-{
-	// delete global data
-	size_t i;
+	// global data
 	for (i=0; i<m_SD.size(); ++i) delete m_SD[i]; m_SD.clear();
 	for (i=0; i<m_SBM.size(); ++i) delete m_SBM[i]; m_SBM.clear();
 	m_Const.clear();

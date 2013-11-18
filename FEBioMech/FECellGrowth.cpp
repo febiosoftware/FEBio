@@ -26,8 +26,8 @@ void FECellGrowth::Init()
 	if (m_cr < 0) throw MaterialError("cr must be positive.");
 	if (m_ce < 0) throw MaterialError("ce must be positive.");
 	
-	m_Rgas = FEModel::GetGlobalConstant("R");
-	m_Tabs = FEModel::GetGlobalConstant("T");
+	m_Rgas = GetFEModel()->GetGlobalConstant("R");
+	m_Tabs = GetFEModel()->GetGlobalConstant("T");
 	
 	if (m_Rgas <= 0) throw MaterialError("A positive universal gas constant R must be defined in Globals section");
 	if (m_Tabs <= 0) throw MaterialError("A positive absolute temperature T must be defined in Globals section");
