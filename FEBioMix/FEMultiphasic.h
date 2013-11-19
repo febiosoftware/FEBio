@@ -187,6 +187,19 @@ public:
 	void AddChemicalReaction(FEChemicalReaction* pcr);
 
 public:
+	FEElasticMaterial*			GetSolid()				{ return m_pSolid; }
+	FEHydraulicPermeability*	GetPermeability()		{ return m_pPerm;  }
+	FEOsmoticCoefficient*		GetOsmoticCoefficient() { return m_pOsmC;  }
+	FESolventSupply*			GetSolventSupply()		{ return m_pSupp;  }
+	FESolute*					GetSolute			(int i) { return m_pSolute[i]; }
+	FESolidBoundMolecule*		GetSBM				(int i) { return m_pSBM[i];    }
+	FEChemicalReaction*			GetReaction			(int i) { return m_pReact[i];  }
+
+	int Solutes		() { return (int) m_pSolute.size(); }
+	int SBMs		() { return (int) m_pSBM.size();	}
+	int Reactions	() { return (int) m_pReact.size();	}
+
+public:
 	double						m_phi0;			//!< solid volume fraction in reference configuration
 	double						m_rhoTw;		//!< true fluid density
 	double						m_cFr;			//!< fixed charge density in reference configurations
@@ -197,7 +210,7 @@ public:
 	int							m_zmin;			//!< minimum charge number in mixture
 	int							m_ndeg;			//!< polynomial degree of zeta in electroneutrality
 
-public:
+private:
 	FEElasticMaterial*				m_pSolid;		//!< pointer to elastic solid material
 	FEHydraulicPermeability*		m_pPerm;		//!< pointer to permeability material
 	FEOsmoticCoefficient*			m_pOsmC;		//!< pointer to osmotic coefficient material

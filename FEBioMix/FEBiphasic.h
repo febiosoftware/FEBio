@@ -92,10 +92,7 @@ public:
 	FEBiphasic(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() 
-	{ 
-		return new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
-	}
+	FEMaterialPoint* CreateMaterialPointData();
 
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
@@ -114,6 +111,12 @@ public:
 
 	//! return the permeability tensor as a matrix
 	void Permeability(double k[3][3], FEMaterialPoint& pt);
+
+	//! return the permeability as a tensor
+	mat3ds Permeability(FEMaterialPoint& pt);
+
+	//! return the permeability property
+	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
 	
 	//! calculate fluid flux
 	vec3d Flux(FEMaterialPoint& pt);
@@ -126,6 +129,12 @@ public:
 	
 	//! fluid density
 	double FluidDensity() { return m_rhoTw; } 
+
+	//! get the solvent supply
+	double SolventSupply(FEMaterialPoint& mp) { return (m_pSupp? m_pSupp->Supply(mp) : 0); }
+
+	//! get the solvent supply property
+	FESolventSupply* GetSolventSupply() { return m_pSupp; }
 
 	//! Serialization
 	void Serialize(DumpFile& ar);
@@ -142,12 +151,12 @@ public:
 
 	//! set a material property (returns false on error)
 	bool SetProperty(int i, FEMaterial* pm);
-	
+
 public: // material parameters
 	double						m_rhoTw;	//!< true fluid density
 	double						m_phi0;		//!< solid volume fraction in reference configuration
 
-public: // material properties
+private: // material properties
 	FEElasticMaterial*			m_pSolid;	//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;	//!< pointer to permeability material
 	FESolventSupply*			m_pSupp;	//!< pointer to solvent supply

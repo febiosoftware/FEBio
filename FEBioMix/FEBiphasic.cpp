@@ -68,6 +68,13 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMultiMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+// returns a pointer to a new material point object
+FEMaterialPoint* FEBiphasic::CreateMaterialPointData() 
+{ 
+	return new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData());
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasic::Init()
 {
 	FEMaterial::Init();
@@ -255,6 +262,12 @@ void FEBiphasic::Permeability(double k[3][3], FEMaterialPoint& pt)
 	k[1][2] = k[2][1] = kt.yz();
 	k[2][0] = k[0][2] = kt.xz();
 	
+}
+
+//-----------------------------------------------------------------------------
+mat3ds FEBiphasic::Permeability(FEMaterialPoint& mp)
+{
+	return m_pPerm->Permeability(mp);
 }
 
 //-----------------------------------------------------------------------------

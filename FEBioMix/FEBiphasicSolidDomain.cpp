@@ -337,8 +337,7 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWork(FESolidElement& el, vector<
 		vec3d& w = pt.m_w;
 
 		// get the solvent supply
-		double phiwhat = 0;
-		if (pm->m_pSupp) phiwhat = pm->m_pSupp->Supply(mp);
+		double phiwhat = pm->SolventSupply(mp);
 		
 		// update force vector
 		for (i=0; i<neln; ++i)
@@ -413,8 +412,7 @@ bool FEBiphasicSolidDomain::ElementInternalFluidWorkSS(FESolidElement& el, vecto
 		vec3d& w = pt.m_w;
 
 		// get the solvent supply
-		double phiwhat = 0;
-		if (pm->m_pSupp) phiwhat = pm->m_pSupp->Supply(mp);
+		double phiwhat = pm->SolventSupply(mp);
 
 		// update force vector
 		for (i=0; i<neln; ++i)
@@ -736,17 +734,17 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffness(FESolidElement& el, matrix&
 		vec3d gradp = pt.m_gradp;
 		
 		// evaluate the permeability and its derivatives
-		mat3ds K = pm->m_pPerm->Permeability(mp);
-		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
+		mat3ds K = pm->Permeability(mp);
+		tens4ds dKdE = pm->GetPermeability()->Tangent_Permeability_Strain(mp);
 
 		// evaluate the solvent supply and its derivatives
 		double phiwhat = 0;
 		mat3ds Phie; Phie.zero();
 		double Phip = 0;
-		if (pm->m_pSupp) {
-			phiwhat = pm->m_pSupp->Supply(mp);
-			Phie = pm->m_pSupp->Tangent_Supply_Strain(mp);
-			Phip = pm->m_pSupp->Tangent_Supply_Pressure(mp);
+		if (pm->GetSolventSupply()) {
+			phiwhat = pm->GetSolventSupply()->Supply(mp);
+			Phie = pm->GetSolventSupply()->Tangent_Supply_Strain(mp);
+			Phip = pm->GetSolventSupply()->Tangent_Supply_Pressure(mp);
 		}
 		
 		// Miscellaneous constants
@@ -893,17 +891,17 @@ bool FEBiphasicSolidDomain::ElementBiphasicStiffnessSS(FESolidElement& el, matri
 		vec3d gradp = pt.m_gradp;
 		
 		// evaluate the permeability and its derivatives
-		mat3ds K = pm->m_pPerm->Permeability(mp);
-		tens4ds dKdE = pm->m_pPerm->Tangent_Permeability_Strain(mp);
+		mat3ds K = pm->Permeability(mp);
+		tens4ds dKdE = pm->GetPermeability()->Tangent_Permeability_Strain(mp);
 
 		// evaluate the solvent supply and its derivatives
 		double phiwhat = 0;
 		mat3ds Phie; Phie.zero();
 		double Phip = 0;
-		if (pm->m_pSupp) {
-			phiwhat = pm->m_pSupp->Supply(mp);
-			Phie = pm->m_pSupp->Tangent_Supply_Strain(mp);
-			Phip = pm->m_pSupp->Tangent_Supply_Pressure(mp);
+		if (pm->GetSolventSupply()) {
+			phiwhat = pm->GetSolventSupply()->Supply(mp);
+			Phie = pm->GetSolventSupply()->Tangent_Supply_Strain(mp);
+			Phip = pm->GetSolventSupply()->Tangent_Supply_Pressure(mp);
 		}
 
 		// Miscellaneous constants

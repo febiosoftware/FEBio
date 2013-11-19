@@ -60,14 +60,22 @@ public:
 	FEBiphasicSolute(FEModel* pfem);
 	
 	// returns a pointer to a new material point object
-	FEMaterialPoint* CreateMaterialPointData() 
-	{ 
-		return new FESoluteMaterialPoint
-		(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
-	}
+	FEMaterialPoint* CreateMaterialPointData();
 
 	// Get the elastic component (overridden from FEMaterial)
 	FEElasticMaterial* GetElasticMaterial() { return m_pSolid->GetElasticMaterial(); }
+
+	//! Get the solid
+	FEElasticMaterial* GetSolid() { return m_pSolid; }
+
+	//! Get the permeability
+	FEHydraulicPermeability* GetPermeability() { return m_pPerm; }
+
+	//! Get the osmotic coefficient
+	FEOsmoticCoefficient* GetOsmoticCoefficient() { return m_pOsmC; }
+
+	//! Get the solute
+	FESolute* GetSolute() { return m_pSolute; }
 
 	// find a material parameter
 	FEParam* GetParameter(const ParamString& s);
@@ -126,7 +134,7 @@ public: // material parameters
 	double						m_Rgas;			//!< universal gas constant
 	double						m_Tabs;			//!< absolute temperature
 
-public: // material properties
+private: // material properties
 	FEElasticMaterial*			m_pSolid;		//!< pointer to elastic solid material
 	FEHydraulicPermeability*	m_pPerm;		//!< pointer to permeability material
 	FEOsmoticCoefficient*		m_pOsmC;		//!< pointer to osmotic coefficient material

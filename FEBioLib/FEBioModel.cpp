@@ -2063,7 +2063,7 @@ bool FEBioModel::InitPoroSolute()
 				int N = el.Nodes();
 				int* n = &el.m_node[0];
 				for (j=0; j<N; ++j) {
-					int dofc = DOF_C + bsm->m_pSolute->GetSoluteID();
+					int dofc = DOF_C + bsm->GetSolute()->GetSoluteID();
 					if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = 1;
 				}
 			}
@@ -2090,10 +2090,10 @@ bool FEBioModel::InitPoroSolute()
 				FEElement& el = dom.ElementRef(i);
 				int N = el.Nodes();
 				int* n = &el.m_node[0];
-				int nsol = bmm->m_pSolute.size();
+				int nsol = bmm->Solutes();
 				for (j=0; j<N; ++j) {
 					for (k=0; k<nsol; ++k) {
-						int dofc = DOF_C + bmm->m_pSolute[k]->GetSoluteID();
+						int dofc = DOF_C + bmm->GetSolute(k)->GetSoluteID();
 						if (m_mesh.Node(n[j]).m_ID[dofc] == 0) m_mesh.Node(n[j]).m_ID[dofc] = 1;
 					}
 				}

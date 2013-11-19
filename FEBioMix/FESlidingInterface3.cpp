@@ -98,7 +98,7 @@ bool FESlidingSurface3::Init()
 				m_bporo = true;
 			}
 			if (pbs) {
-				m_solu[i] = pbs->m_pSolute->GetSoluteID();
+				m_solu[i] = pbs->GetSolute()->GetSoluteID();
 				m_bsolu = true;
 			}
 		}
@@ -465,7 +465,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 			spt.m_c = 0;
 			spt.m_j = vec3d(0,0,0);
 			
-			mat3ds K = bps->m_pPerm->Permeability(mp);
+			mat3ds K = bps->GetPermeability()->Permeability(mp);
 			
 			eps = n*(K*n);
 		}
@@ -555,8 +555,8 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 			spt.m_c = 0;
 			spt.m_j = vec3d(0,0,0);
 			
-			mat3ds D = pbs->m_pSolute->m_pDiff->Diffusivity(mp)
-			*(pbs->Porosity(mp)*pbs->m_pSolute->m_pSolub->Solubility(mp));
+			mat3ds D = pbs->GetSolute()->m_pDiff->Diffusivity(mp)
+			*(pbs->Porosity(mp)*pbs->GetSolute()->m_pSolub->Solubility(mp));
 			
 			eps = n*(D*n);
 		}

@@ -77,6 +77,12 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMultiMaterial(pfem)
 }
 
 //-----------------------------------------------------------------------------
+FEMaterialPoint* FEBiphasicSolute::CreateMaterialPointData() 
+{ 
+	return new FESoluteMaterialPoint(new FEBiphasicMaterialPoint(m_pSolid->CreateMaterialPointData()));
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicSolute::Init()
 {
 	FEMaterial::Init();

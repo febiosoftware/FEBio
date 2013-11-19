@@ -171,7 +171,7 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 	if (psm)
 	{
 		// Check if this solute is present in this specific biphasic-solute mixture
-		bool present = (psm->m_pSolute->GetSoluteID() == m_nsol);
+		bool present = (psm->GetSolute()->GetSoluteID() == m_nsol);
 		if (!present) return false;
 
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
@@ -232,8 +232,8 @@ bool FEPlotActualSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 	{
 		// Check if this solute is present in this specific multiphasic mixture
 		int sid = -1;
-		for (int i=0; i<(int)pmm->m_pSolute.size(); ++i)
-			if (pmm->m_pSolute[i]->GetSoluteID() == m_nsol) {sid = i; break;}
+		for (int i=0; i<pmm->Solutes(); ++i)
+			if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {sid = i; break;}
 		if (sid == -1) return false;
 		
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
@@ -305,7 +305,7 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 	if (psm)
 	{
 		// Check if this solute is present in this specific biphasic-solute mixture
-		bool present = (psm->m_pSolute->GetSoluteID() == m_nsol);
+		bool present = (psm->GetSolute()->GetSoluteID() == m_nsol);
 		if (!present) return false;
 		
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
@@ -380,8 +380,8 @@ bool FEPlotSolFlux_::Save(FEDomain &dom, vector<float>& a)
 	{
 		// Check if this solute is present in this specific multiphasic mixture
 		int sid = -1;
-		for (int i=0; i<(int)pmm->m_pSolute.size(); ++i)
-			if (pmm->m_pSolute[i]->GetSoluteID() == m_nsol) {sid = i; break;}
+		for (int i=0; i<pmm->Solutes(); ++i)
+			if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {sid = i; break;}
 		if (sid == -1) return false;
 		
 		FESolidDomain& sd = dynamic_cast<FESolidDomain&>(dom);
@@ -505,8 +505,8 @@ bool FEPlotSBMConcentration_::Save(FEDomain &dom, vector<float>& a)
 		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 		// Check if this solid-bound molecule is present in this specific multiphasic mixture
 		int sid = -1;
-		for (i=0; i<(int)pm->m_pSBM.size(); ++i)
-			if (pm->m_pSBM[i]->GetSBMID() == m_nsbm) {sid = i; break;}
+		for (i=0; i<pm->SBMs(); ++i)
+			if (pm->GetSBM(i)->GetSBMID() == m_nsbm) {sid = i; break;}
 		if (sid == -1) return false;
 		
 		for (i=0; i<pmd->Elements(); ++i)
@@ -870,7 +870,7 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 	if (pbm)
 	{
 		// Check if this solute is present in this specific biphasic-solute mixture
-		bool present = (pbm->m_pSolute->GetSoluteID() == m_nsol);
+		bool present = (pbm->GetSolute()->GetSoluteID() == m_nsol);
 		if (!present) return false;
 		
 		int N = dom.Nodes();
@@ -903,8 +903,8 @@ bool FEPlotEffectiveSolConcentration_::Save(FEDomain &dom, vector<float>& a)
 	{
 		// Check if this solute is present in this specific multiphasic mixture
 		bool present = false;
-		for (int i=0; i<(int)pmm->m_pSolute.size(); ++i)
-			if (pmm->m_pSolute[i]->GetSoluteID() == m_nsol) {present = true; break;}
+		for (int i=0; i<pmm->Solutes(); ++i)
+			if (pmm->GetSolute(i)->GetSoluteID() == m_nsol) {present = true; break;}
 		if (!present) return false;
 		
 		int N = dom.Nodes();
@@ -960,8 +960,8 @@ bool FEPlotSBMRefAppDensity_::Save(FEDomain &dom, vector<float>& a)
 		FEMultiphasic* pm = dynamic_cast<FEMultiphasic*> (dom.GetMaterial());
 		// Check if this solid-bound molecule is present in this specific multiphasic mixture
 		int sid = -1;
-		for (i=0; i<(int)pm->m_pSBM.size(); ++i)
-			if (pm->m_pSBM[i]->GetSBMID() == m_nsbm) {sid = i; break;}
+		for (i=0; i<pm->SBMs(); ++i)
+			if (pm->GetSBM(i)->GetSBMID() == m_nsbm) {sid = i; break;}
 		if (sid == -1) return false;
 		
 		for (i=0; i<pmd->Elements(); ++i)
