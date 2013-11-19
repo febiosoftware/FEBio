@@ -29,7 +29,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 	}
 	end();
 
-	type(Fl_Table_Row::SELECT_SINGLE);
+	type(Fl_Table_Row::SELECT_MULTI);
 	selection_color(fl_rgb_color(216,216,255));
 
 	color(FL_WHITE);
@@ -158,10 +158,31 @@ void CTaskBrowser::RemoveTask(int n)
 }
 
 //-----------------------------------------------------------------------------
+void CTaskBrowser::SelectAll()
+{
+	m_pg->select_all_rows(1);
+}
+
+//-----------------------------------------------------------------------------
 void CTaskBrowser::SelectTask(int n)
 {
 	m_pg->select_row(n);
 	m_pg->row_position(n);
+}
+
+//-----------------------------------------------------------------------------
+int CTaskBrowser::SelectedTasks()
+{
+	int n = 0;
+	for (int i=0; i<m_pg->rows(); ++i)
+		if (m_pg->row_selected(i) == 1) n++;
+	return n;
+}
+
+//-----------------------------------------------------------------------------
+bool CTaskBrowser::IsTaskSelected(int n)
+{
+	return (m_pg->row_selected(n) == 1);
 }
 
 //-----------------------------------------------------------------------------

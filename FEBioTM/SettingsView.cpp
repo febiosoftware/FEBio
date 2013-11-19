@@ -32,6 +32,7 @@ CSettingsView::CSettingsView(CWnd* pwnd, int X, int Y, int W, int H, const char*
 		AddCallback(pl, (FLX_CALLBACK) &CSettingsView::OnChange);
 	}
 	end();
+	resizable(0);
 	box(FL_DOWN_BOX);
 	fl_color(FL_GRAY);
 	UpdateData(false);
@@ -42,11 +43,20 @@ void CSettingsView::OnChange(Fl_Widget* pw, void* pd)
 {
 	UpdateData();
 
-	CTask* pt = m_pWnd->GetSelectedTask();
-	if (pt)
+	TMSession& session = m_pWnd->GetDocument()->GetSession();
+
+	int N = session.Tasks();
+	for (int i=0; i<N; ++i)
 	{
-		pt->m_bdebug = m_bdebug;
-		pt->m_nlog   = m_nlog;
+		if (m_pWnd->IsTaskSelected(i))
+		{
+			CTask* pt = session.GetTask(i);
+			if (pt)
+			{
+				pt->m_bdebug = m_bdebug;
+				pt->m_nlog   = m_nlog;
+			}
+		}
 	}
 }
 

@@ -44,7 +44,15 @@ public:
 
 	void SelectTask(int n);
 
+	void SelectAll();
+
 	int SelectedTask();
+
+	//! return the number of selected tasks
+	int SelectedTasks();
+
+	//! see if a task is selected
+	bool IsTaskSelected(int n);
 
 	Fl_Progress* TrackTask(int nrow);
 

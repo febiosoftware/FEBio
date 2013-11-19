@@ -45,6 +45,10 @@ public:
 
 	CTask* GetSelectedTask();
 
+	CTask* GetFirstSelectedTask();
+	CTask* GetNextSelectedTask(CTask* pt);
+	bool IsTaskSelected(int n) { return m_pTask->IsTaskSelected(n); }
+
 	void ClearOutputWnd();
 	void ClearLogWnd();
 	void ClearTestWnd();
@@ -63,6 +67,7 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnFileSaveSession(Fl_Widget* pw, void* pd);
 	void OnFileExit       (Fl_Widget* pw, void* pd);
 
+	void OnEditSelectAll(Fl_Widget* pw, void* pd);
 	void OnEditFind(Fl_Widget* pw, void* pd);
 	void OnEditFindAgain(Fl_Widget* pw, void* pd);
 	void OnEditGoToLine(Fl_Widget* pw, void* pd);

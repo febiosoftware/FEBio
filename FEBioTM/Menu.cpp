@@ -19,6 +19,7 @@ CMenu::CMenu(int w, int h, CWnd* pwnd) : Fl_Menu_Bar(0, 0, w, h), m_pWnd(pwnd)
 			{"&Exit"           ,              0, FLX_MENU_HANDLER(pwnd, CWnd::OnFileExit       )},
 			{0},
 		{"Edit", 0, 0, 0, FL_SUBMENU},
+			{"Select all"    ,             0, FLX_MENU_HANDLER(pwnd, CWnd::OnEditSelectAll ), FL_MENU_DIVIDER},
 			{"Find ..."      , FL_CTRL + 'f', FLX_MENU_HANDLER(pwnd, CWnd::OnEditFind)},
 			{"Find again"    ,      FL_F + 3, FLX_MENU_HANDLER(pwnd, CWnd::OnEditFindAgain)},
 			{"Go to line ...", FL_CTRL + 'l', FLX_MENU_HANDLER(pwnd, CWnd::OnEditGoToLine)},
