@@ -288,12 +288,11 @@ public:
 	vector<int>					m_LCT;		//!< linear constraint table
 	vector<FELinearConstraint*>	m_LCA;		//!< linear constraint array (temporary solution!)
 
-	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
-
 protected:
 	char	m_sztitle[MAX_STRING];	//!< problem title
+	list<FEBIO_CALLBACK>	m_pcb;	//!< pointer to callback function
 
-protected:
+protected: // Global Data
 	std::map<string, double> m_Const;	//!< Global model constants
 	vector<FESoluteData*> m_SD;			//!< unique identifier of solutes in multiphasic materials
 	vector<FESBMData*> m_SBM;			//!< unique identifier of solid-bound molecules in multiphasic materials
