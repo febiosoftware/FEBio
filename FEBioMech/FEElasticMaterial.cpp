@@ -215,7 +215,6 @@ FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 	m_density = 1; 
 	m_molarmass = 0; 
 	m_unstable = false;
-	m_pParent = 0;
 }
 
 //-----------------------------------------------------------------------------

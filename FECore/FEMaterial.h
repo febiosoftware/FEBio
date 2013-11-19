@@ -108,6 +108,12 @@ public:
 	//! return the model this material belongs to
 	FEModel* GetFEModel();
 
+	//! Get the parent of this material (zero if none)
+	FEMaterial* GetParent() { return m_pParent; }
+
+	//! Set the parent of this material
+	void SetParent(FEMaterial* pmat) { m_pParent = pmat; }
+
 public: // interface for getting/setting material properties
 
 	//! get the number of material properties
@@ -134,6 +140,7 @@ private:
 private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system
 	FEModel*		m_pfem;			//!< pointer to model this material belongs to
+	FEMaterial*		m_pParent;		//!< pointer to "parent" material (if any)
 };
 
 //-----------------------------------------------------------------------------

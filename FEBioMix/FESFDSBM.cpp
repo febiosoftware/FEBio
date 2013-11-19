@@ -50,7 +50,7 @@ void FESFDSBM::Init()
 	if (m_g < 0) throw MaterialError("gamma must be positive.");
 	
 	// get the parent material which must be a multiphasic material
-	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (m_pParent);
+	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetParent());
     if (pMP == 0) throw MaterialError("Parent material must be multiphasic");
     
 	// extract the local id of the SBM whose density controls Young's modulus from the global id

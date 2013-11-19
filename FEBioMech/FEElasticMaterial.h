@@ -77,7 +77,6 @@ public:
 
 public:
 	bool			m_unstable;		//!< flag indicating whether material is unstable on its own
-	FEMaterial*		m_pParent;		//!< pointer to parent	\todo This has to go!
 
 	DECLARE_PARAMETER_LIST();
 };

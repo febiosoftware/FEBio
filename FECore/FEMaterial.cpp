@@ -27,6 +27,7 @@ FEMaterial::FEMaterial(FEModel* pfem) : m_pfem(pfem)
 	m_szname[0] = 0;
 	m_nID = -1;
 	m_pmap = 0;
+	m_pParent = 0;
 }
 
 //-----------------------------------------------------------------------------

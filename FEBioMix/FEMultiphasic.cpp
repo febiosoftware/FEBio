@@ -424,7 +424,7 @@ void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 void FEMultiphasic::Init()
 {
 	FEMaterial::Init();
-	m_pSolid->m_pParent = this;
+	m_pSolid->SetParent(this);
 	m_pSolid->Init();
 
 	m_pPerm->Init();

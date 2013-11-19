@@ -31,7 +31,7 @@ void FECarterHayes::Init()
 	if (!IN_RIGHT_OPEN_RANGE(m_v, -1.0, 0.5)) throw MaterialRangeError("v", -1.0, 0.5, true, false);
 
 	// get the parent material which must be a multiphasic material
-	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (m_pParent);
+	FEMultiphasic* pMP = dynamic_cast<FEMultiphasic*> (GetParent());
     if (pMP == 0) throw MaterialError("Parent material must be multiphasic");
 
 	// extract the local id of the SBM whose density controls Young's modulus from the global id
