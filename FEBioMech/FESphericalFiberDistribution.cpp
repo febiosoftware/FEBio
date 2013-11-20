@@ -31,7 +31,6 @@ END_PARAMETER_LIST();
 
 FESphericalFiberDistribution::FESphericalFiberDistribution(FEModel* pfem) : FEElasticMaterial(pfem)
 {
-	m_unstable = true;
 	m_alpha = 0.0;
 }
 
@@ -40,7 +39,6 @@ void FESphericalFiberDistribution::Init()
 {
 	FEElasticMaterial::Init();
 
-	if (m_unstable) throw MaterialError("This fibrous material is unstable (collapses on itself) when used alone.  Combine it in a solid mixture with a material that can serve as a ground matrix.");
 	if (m_ksi < 0) throw MaterialError("ksi must be positive.");
 	if (m_beta < 2) throw MaterialError("beta must be greater than 2.");
 	if (m_alpha < 0) throw MaterialError("alpha must be positive.");

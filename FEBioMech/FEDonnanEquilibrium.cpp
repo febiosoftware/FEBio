@@ -21,7 +21,6 @@ END_PARAMETER_LIST();
 // FEDonnanEquilibrium
 void FEDonnanEquilibrium::Init()
 {
-	if (m_unstable) throw MaterialError("This material is unstable (produces infinite swelling) when used alone.  Combine it in a solid mixture with a material that can resist tension.");
 	if (m_phiwr < 0 || m_phiwr > 1) throw MaterialError("phiw0 must be between 0. and 1.");
 	if (m_bosm < 0) throw MaterialError("bosm must be positive.");
 

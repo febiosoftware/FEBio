@@ -18,7 +18,7 @@
 class FESFDSBM : public FEElasticMaterial
 {
 public:
-	FESFDSBM(FEModel* pfem) : FEElasticMaterial(pfem) {m_unstable = true; m_alpha = 0;}
+	FESFDSBM(FEModel* pfem) : FEElasticMaterial(pfem) { m_alpha = 0;}
 	
 	//! Initialization
 	void Init();

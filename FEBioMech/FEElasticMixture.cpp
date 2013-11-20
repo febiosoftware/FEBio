@@ -78,9 +78,6 @@ void FEElasticMixture::Init()
 void FEElasticMixture::AddMaterial(FEElasticMaterial* pm) 
 { 
 	m_pMat.push_back(pm); 
-	// TODO: assume that the material becomes stable since it is combined with others
-	// in a solid mixture.  (This may not necessarily be true.)
-	pm->m_unstable = false;
 }
 
 //-----------------------------------------------------------------------------

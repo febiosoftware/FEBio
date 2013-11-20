@@ -18,11 +18,7 @@ END_PARAMETER_LIST();
 void FEEFDDonnanEquilibrium::Init()
 {
 	FEElasticMaterial::Init();
-	// Donnan equilibrium is stable when combined with fibers that can resist swelling
-	m_DEQ.m_unstable = false;
 	m_DEQ.Init();
-	// ellipsoidal fiber distribution is stable when combined with a ground matrix
-	m_Fib.m_unstable = false;
 	m_Fib.Init();
 }
 

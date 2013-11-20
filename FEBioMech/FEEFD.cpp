@@ -74,7 +74,6 @@ END_PARAMETER_LIST();
 
 void FEEFD::Init()
 {
-	if (m_unstable) throw MaterialError("This fibrous material is unstable (collapses on itself) when used alone.  Combine it in a solid mixture with a material that can serve as a ground matrix.");
 	if (m_ksi[0] < 0) throw MaterialError("ksi1 must be positive.");
 	if (m_ksi[1] < 0) throw MaterialError("ksi2 must be positive.");
 	if (m_ksi[2] < 0) throw MaterialError("ksi3 must be positive.");

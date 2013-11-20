@@ -18,8 +18,6 @@ void FEEFDNeoHookean::Init()
 	FEElasticMaterial::Init();
 
 	m_NH.Init();
-	// ellipsoidal fiber distribution is stable when combined with a ground matrix
-	m_EFD.m_unstable = false;
 	m_EFD.Init();
 }
 
@@ -66,8 +64,6 @@ void FEEFDNeoHookeanOld::Init()
 	FEElasticMaterial::Init();
 
 	m_NH.Init();
-	// ellipsoidal fiber distribution is stable when combined with a ground matrix
-	m_EFD.m_unstable = false;
 	m_EFD.Init();
 }
 

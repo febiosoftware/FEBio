@@ -19,7 +19,6 @@ FEEFDMooneyRivlin::FEEFDMooneyRivlin(FEModel* pfem) : FEUncoupledMaterial(pfem),
 void FEEFDMooneyRivlin::Init()
 {
 	FEUncoupledMaterial::Init();
-	m_EFD.m_unstable = false;
 	m_MR.Init();
 	m_EFD.Init();
 }

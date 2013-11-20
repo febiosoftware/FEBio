@@ -103,10 +103,6 @@ bool FEElasticMultigeneration::SetProperty(int n, FEMaterial* pm)
 void FEElasticMultigeneration::AddMaterial(FEElasticMaterial* pmat)
 {
 	m_pMat.push_back(pmat);
-
-	// TODO: assume that the material becomes stable since it is combined with others
-	// in a solid mixture.  (This may not necessarily be true.)
-	pmat->m_unstable = false;
 }
 
 //--------------------------------------------------------------------------------

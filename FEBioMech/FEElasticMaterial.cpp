@@ -214,7 +214,6 @@ FEElasticMaterial::FEElasticMaterial(FEModel* pfem) : FESolidMaterial(pfem)
 { 
 	m_density = 1; 
 	m_molarmass = 0; 
-	m_unstable = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -250,10 +249,10 @@ void FEElasticMaterial::Serialize(DumpFile& ar)
 	FEMaterial::Serialize(ar);
 	if (ar.IsSaving())
 	{
-		ar << m_density << m_unstable;
+		ar << m_density;
 	}
 	else
 	{
-		ar >> m_density >> m_unstable;
+		ar >> m_density;
 	}
 }

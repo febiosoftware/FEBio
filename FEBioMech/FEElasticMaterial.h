@@ -75,8 +75,5 @@ public:
 public:
 	bool SetAttribute(const char* szatt, const char* szval);
 
-public:
-	bool			m_unstable;		//!< flag indicating whether material is unstable on its own
-
 	DECLARE_PARAMETER_LIST();
 };

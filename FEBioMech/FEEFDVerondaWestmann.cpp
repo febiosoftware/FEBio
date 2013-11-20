@@ -14,7 +14,6 @@ END_PARAMETER_LIST();
 void FEEFDVerondaWestmann::Init()
 {
 	FEUncoupledMaterial::Init();
-	m_EFD.m_unstable = false;
 	m_VW.Init();
 	m_EFD.Init();
 }
