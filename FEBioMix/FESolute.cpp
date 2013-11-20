@@ -4,15 +4,11 @@
 //-----------------------------------------------------------------------------
 //! FESolute constructor
 
-FESolute::FESolute(FEModel* pfem) : FEMultiMaterial(pfem)
+FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 {
 	m_rhoT = 0;
 	m_M = 0;
 	m_z = 0;
-
-	AddComponent<FESoluteDiffusivity>(&m_pDiff , "diffusivity");
-	AddComponent<FESoluteSolubility >(&m_pSolub, "solubility" );
-	AddComponent<FESoluteSupply     >(&m_pSupp , "supply"     );
 }
 
 //-----------------------------------------------------------------------------
@@ -161,7 +157,7 @@ bool FESolute::SetAttribute(const char* szname, const char* szval)
 //-----------------------------------------------------------------------------
 FEParam* FESolute::GetParameter(const ParamString& s)
 {
-	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
+	if (s.count() == 1) return FEMaterial::GetParameter(s);
 	if      (s == "diffusivity") return m_pDiff ->GetParameter(s.next());
 	else if (s == "solubility" ) return m_pSolub->GetParameter(s.next());
 	return 0;

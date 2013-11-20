@@ -114,7 +114,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for solute materials.
 
-class FESolute : public FEMultiMaterial
+class FESolute : public FEMaterial
 {
 public:
 	FESolute(FEModel* pfem);

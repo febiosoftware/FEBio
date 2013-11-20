@@ -61,7 +61,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FEBiphasicSolute constructor
 
-FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMultiMaterial(pfem)
+FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 {
 	m_phi0 = 0;
 	m_rhoTw = 0;
@@ -69,11 +69,6 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMultiMaterial(pfem)
 	m_Mu = 0;
 	m_Rgas = 0;
 	m_Tabs = 0; 
-
-	AddComponent<FEElasticMaterial      >(&m_pSolid , "solid"              );
-	AddComponent<FEHydraulicPermeability>(&m_pPerm  , "permeability"       );
-	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC  , "osmotic_coefficient");
-	AddComponent<FESolute               >(&m_pSolute, "solute"             ); 
 }
 
 //-----------------------------------------------------------------------------
@@ -443,7 +438,7 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 FEParam* FEBiphasicSolute::GetParameter(const ParamString& s)
 {
 	// see if this is a composite material parameter
-	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
+	if (s.count() == 1) return FEMaterial::GetParameter(s);
 
 	// otherwise, search the material components
 	if      (s == "solid"              ) return m_pSolid ->GetParameter(s.next());

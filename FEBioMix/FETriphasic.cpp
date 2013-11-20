@@ -21,17 +21,13 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FETriphasic constructor
 
-FETriphasic::FETriphasic(FEModel* pfem) : FEMultiMaterial(pfem)
+FETriphasic::FETriphasic(FEModel* pfem) : FEMaterial(pfem)
 {	
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_phi0 = 0;
 	m_rhoTw = 0;
 	m_penalty = 1;
-
-	AddComponent<FEElasticMaterial      >(&m_pSolid    , "solid"              );
-	AddComponent<FEHydraulicPermeability>(&m_pPerm     , "permeability"       );
-	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC     , "osmotic_coefficient");
 }
 
 //-----------------------------------------------------------------------------
@@ -528,7 +524,7 @@ void FETriphasic::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 FEParam* FETriphasic::GetParameter(const ParamString& s)
 {
-	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
+	if (s.count() == 1) return FEMaterial::GetParameter(s);
 	if      (s == "solid"              ) return m_pSolid->GetParameter(s.next());
 	else if (s == "permeability"       ) return m_pPerm ->GetParameter(s.next());
 	else if (s == "osmotic_coefficient") return m_pOsmC ->GetParameter(s.next());

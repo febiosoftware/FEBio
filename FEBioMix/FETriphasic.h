@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for triphasic materials.
 
-class FETriphasic : public FEMultiMaterial
+class FETriphasic : public FEMaterial
 {
 public:
 	FETriphasic(FEModel* pfem);

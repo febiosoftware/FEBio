@@ -54,7 +54,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for solute diffusion in biphasic materials.
 
-class FEBiphasicSolute : public FEMultiMaterial
+class FEBiphasicSolute : public FEMaterial
 {
 public:
 	FEBiphasicSolute(FEModel* pfem);

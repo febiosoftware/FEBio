@@ -292,7 +292,7 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 
 //-----------------------------------------------------------------------------
 //! FEMultiphasic constructor
-FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMultiMaterial(pfem)
+FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 {	
 	m_pPerm = 0;
 	m_pSupp = 0;
@@ -302,11 +302,6 @@ FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMultiMaterial(pfem)
 	m_cFr = 0;
 	m_Rgas = 0; m_Tabs = 0; m_Fc = 0;
 	m_penalty = 1;
-
-	AddComponent<FEElasticMaterial      >(&m_pSolid	, "solid"				);
-	AddComponent<FEHydraulicPermeability>(&m_pPerm	, "permeability"		);
-	AddComponent<FEOsmoticCoefficient   >(&m_pOsmC	, "osmotic_coefficient"	);
-	AddComponent<FESolventSupply        >(&m_pSupp	, "solvent_supply"		);
 }
 
 //-----------------------------------------------------------------------------
@@ -1245,7 +1240,7 @@ bool FEMultiphasic::SetProperty(int n, FEMaterial* pm)
 //-----------------------------------------------------------------------------
 FEParam* FEMultiphasic::GetParameter(const ParamString& s)
 {
-	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
+	if (s.count() == 1) return FEMaterial::GetParameter(s);
 		
 	if      (s == "solid"              ) return m_pSolid->GetParameter(s.next());
 	else if (s == "permeability"       ) return m_pPerm ->GetParameter(s.next());

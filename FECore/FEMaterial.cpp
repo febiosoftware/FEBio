@@ -116,18 +116,3 @@ void FEMaterial::Serialize(DumpFile &ar)
 		if (m_pmap) m_pmap->Serialize(ar);
 	}
 }
-
-//=============================================================================
-// FEMultiMaterial
-//=============================================================================
-
-//-----------------------------------------------------------------------------
-int FEMultiMaterial::FindComponent(const char* sz, int nid)
-{
-	for (int i=0; i<(int) m_Mat.size(); ++i)
-	{
-		Property* p = m_Mat[i];
-		if ((strcmp(p->GetName(), sz) == 0) && (p->GetID() == nid)) return i;
-	}
-	return -1;
-}

@@ -57,14 +57,10 @@ void FEBiphasicMaterialPoint::Init(bool bflag)
 //-----------------------------------------------------------------------------
 //! FEBiphasic constructor
 
-FEBiphasic::FEBiphasic(FEModel* pfem) : FEMultiMaterial(pfem)
+FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 { 
 	m_rhoTw = 0; 
 	m_phi0 = 0;
-
-	AddComponent<FEElasticMaterial      >(&m_pSolid, "solid"         );
-	AddComponent<FEHydraulicPermeability>(&m_pPerm , "permeability"  );
-	AddComponent<FESolventSupply        >(&m_pSupp , "solvent_supply");
 }
 
 //-----------------------------------------------------------------------------
@@ -330,7 +326,7 @@ void FEBiphasic::Serialize(DumpFile &ar)
 FEParam* FEBiphasic::GetParameter(const ParamString& s)
 {
 	// see if this is a composite parameter
-	if (s.count() == 1) return FEMultiMaterial::GetParameter(s);
+	if (s.count() == 1) return FEMaterial::GetParameter(s);
 
 	// else find the component's parameter
 	if      (s == "solid"       ) return m_pSolid->GetParameter(s.next());

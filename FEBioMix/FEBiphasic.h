@@ -86,7 +86,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for biphasic materials.
 
-class FEBiphasic : public FEMultiMaterial
+class FEBiphasic : public FEMaterial
 {
 public:
 	FEBiphasic(FEModel* pfem);

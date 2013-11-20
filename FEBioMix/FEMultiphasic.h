@@ -50,7 +50,7 @@ public:
 //-----------------------------------------------------------------------------
 //! Base class for multiphasic materials.
 
-class FEMultiphasic : public FEMultiMaterial
+class FEMultiphasic : public FEMaterial
 {
 public:
 	//! constructor
