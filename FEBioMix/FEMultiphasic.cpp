@@ -294,9 +294,11 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 //! FEMultiphasic constructor
 FEMultiphasic::FEMultiphasic(FEModel* pfem) : FEMaterial(pfem)
 {	
+	m_pSolid = 0;
 	m_pPerm = 0;
-	m_pSupp = 0;
 	m_pOsmC = 0;
+	m_pSupp = 0;
+
 	m_phi0 = 0;
 	m_rhoTw = 0;
 	m_cFr = 0;

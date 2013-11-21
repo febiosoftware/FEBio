@@ -61,6 +61,10 @@ FEBiphasic::FEBiphasic(FEModel* pfem) : FEMaterial(pfem)
 { 
 	m_rhoTw = 0; 
 	m_phi0 = 0;
+
+	m_pSolid = 0;
+	m_pPerm = 0;
+	m_pSupp = 0;
 }
 
 //-----------------------------------------------------------------------------

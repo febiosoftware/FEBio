@@ -28,6 +28,10 @@ FETriphasic::FETriphasic(FEModel* pfem) : FEMaterial(pfem)
 	m_phi0 = 0;
 	m_rhoTw = 0;
 	m_penalty = 1;
+
+	m_pSolid = 0;
+	m_pPerm = 0;
+	m_pOsmC = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -35,7 +39,6 @@ void FETriphasic::AddSolute(FESolute* ps)
 {
 	int n = (int) m_pSolute.size();
 	m_pSolute.push_back(ps);
-//	AddComponent<FESolute>(&m_pSolute[n], "solute", n);
 }
 
 //-----------------------------------------------------------------------------

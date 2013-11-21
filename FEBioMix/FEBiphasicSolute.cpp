@@ -69,6 +69,11 @@ FEBiphasicSolute::FEBiphasicSolute(FEModel* pfem) : FEMaterial(pfem)
 	m_Mu = 0;
 	m_Rgas = 0;
 	m_Tabs = 0; 
+
+	m_pSolid = 0;
+	m_pPerm = 0;
+	m_pOsmC = 0;
+	m_pSolute = 0;
 }
 
 //-----------------------------------------------------------------------------
