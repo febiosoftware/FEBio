@@ -324,6 +324,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FENLConstraint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FENNQuery.cpp"
 				>
 			</File>
