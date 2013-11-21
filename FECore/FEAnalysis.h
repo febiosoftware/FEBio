@@ -2,6 +2,7 @@
 #include "DumpFile.h"
 #include "FEBoundaryCondition.h"
 #include "FESurfacePairInteraction.h"
+#include "FENLConstraint.h"
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -65,6 +66,9 @@ public:
 
 	//! add a surface pair interaction to the analysis
 	void AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_CI.push_back(pci); }
+
+	//! Add a non-linear constraint to the analysis
+	void AddConstraint(FENLConstraint* pnlc) { m_NLC.push_back(pnlc); }
 
 public:
 	//! sets the plot level
@@ -143,6 +147,7 @@ protected:
 	std::vector<int>						m_Dom;	//!< list of active domains for this analysis
 	std::vector<FEBoundaryCondition*>		m_BC;	//!< array of boundary conditions
 	std::vector<FESurfacePairInteraction* >	m_CI;	//!< active surface pair interactions
+	std::vector<FENLConstraint*>			m_NLC;	//!< non-linear constraints
 
 protected:
 	int		m_ntype;		// step type

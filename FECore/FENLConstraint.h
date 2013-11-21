@@ -20,8 +20,8 @@ class FEModel;
 class FENLConstraint : public FEParamContainer
 {
 public:
-	FENLConstraint(FEModel* pfem) : m_pfem(pfem) {}
-	virtual ~FENLConstraint(){}
+	FENLConstraint(FEModel* pfem);
+	virtual ~FENLConstraint();
 
 public:
 	virtual void Init() = 0;
@@ -36,6 +36,17 @@ public:
 
 	virtual FESurface* GetSurface(const char* sz) { return 0; }
 
+public:
+	//! Is this contact interface active
+	bool IsActive();
+
+	//! Activate the contact interface
+	virtual void Activate();
+
+	//! Deactivate the contact interface
+	virtual void Deactivate();
+
 protected:
 	FEModel*	m_pfem;
+	bool	m_bactive;		//!< active flag
 };

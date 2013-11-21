@@ -95,6 +95,9 @@ bool FEAnalysis::Init()
 
 	// activate contact interface
 	for (int i=0; i<(int) m_CI.size(); ++i) m_CI[i]->Activate();
+
+	// activate non-linear constraints
+	for (int i=0; i<(int) m_NLC.size(); ++i) m_NLC[i]->Activate();
 	
 	return true;
 }
@@ -110,6 +113,9 @@ void FEAnalysis::Finish()
 
 	// deactivate contact interfaces
 	for (size_t i=0; i<m_CI.size(); ++i) m_CI[i]->Deactivate();
+
+	// deactive non-linear constraints
+	for (size_t i=0; i<m_NLC.size(); ++i) m_NLC[i]->Deactivate();
 
 	// clean up solver data (i.e. destroy linear solver)
 	m_psolver->Clean();

@@ -74,7 +74,7 @@ bool FEHeatTransferAnalysis::Init()
 	for (int m=0; m<M; ++m) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(m);
-		plc->Init();
+		if (plc->IsActive()) plc->Init();
 	}
 
 	// see if we have to do nonlinear constraint augmentations

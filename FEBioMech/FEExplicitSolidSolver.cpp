@@ -469,7 +469,7 @@ void FEExplicitSolidSolver::UpdateRigidBodies(vector<double>& ui)
 	for (int i=0; i<NC; ++i)
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		plc->Update();
+		if (plc->IsActive()) plc->Update();
 	}
 }
 
@@ -1152,7 +1152,7 @@ void FEExplicitSolidSolver::NonLinearConstraintForces(FEGlobalVector& R)
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		plc->Residual(R);
+		if (plc->IsActive()) plc->Residual(R);
 	}
 }
 

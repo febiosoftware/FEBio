@@ -50,6 +50,13 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 
 			FEModel& fem = *GetFEModel();
 			fem.AddNonlinearConstraint(plc);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddConstraint(plc);
+				plc->Deactivate();
+			}
 		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;

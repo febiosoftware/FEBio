@@ -373,7 +373,7 @@ bool FESolidSolver::Augment()
 	for (int i=0; i<n; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		bconv = plc->Augment(m_naug) && bconv;
+		if (plc->IsActive()) bconv = plc->Augment(m_naug) && bconv;
 	}
 
 	// do incompressibility multipliers for 3Field domains
@@ -568,7 +568,7 @@ void FESolidSolver::UpdateRigidBodies(vector<double>& ui)
 	for (int i=0; i<NC; ++i)
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		plc->Update();
+		if (plc->IsActive()) plc->Update();
 	}
 }
 
@@ -1480,7 +1480,7 @@ void FESolidSolver::NonLinearConstraintStiffness()
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		plc->StiffnessMatrix(this);
+		if (plc->IsActive()) plc->StiffnessMatrix(this);
 	}
 }
 
@@ -2028,7 +2028,7 @@ void FESolidSolver::NonLinearConstraintForces(FEGlobalVector& R)
 	for (int i=0; i<N; ++i) 
 	{
 		FENLConstraint* plc = m_fem.NonlinearConstraint(i);
-		plc->Residual(R);
+		if (plc->IsActive()) plc->Residual(R);
 	}
 }
 /*
