@@ -9,6 +9,14 @@
 #include "FEModel.h"
 
 //-----------------------------------------------------------------------------
+// Material parameters for FESoluteData
+BEGIN_PARAMETER_LIST(FESoluteData, FEParamContainer)
+	ADD_PARAMETER(m_rhoT, FE_PARAM_DOUBLE, "density");
+	ADD_PARAMETER(m_M, FE_PARAM_DOUBLE, "molar_mass");
+	ADD_PARAMETER(m_z, FE_PARAM_INT, "charge_number");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
 MaterialError::MaterialError(const char* szfmt, ...)
 {
 	// get a pointer to the argument list
@@ -115,4 +123,14 @@ void FEMaterial::Serialize(DumpFile &ar)
 		}
 		if (m_pmap) m_pmap->Serialize(ar);
 	}
+}
+
+//! Store the solute data to the archive
+void FESoluteData::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving()) ar << m_nID;
+	else ar >> m_nID;
+
+	// store parameters
+	FEParamContainer::Serialize(ar);
 }

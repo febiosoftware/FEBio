@@ -132,7 +132,7 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 		++tag;
 		do
 		{
-			if (tag == "charge_number")
+/*			if (tag == "charge_number")
 			{
 				tag.value(psd->m_z);
 			}
@@ -145,7 +145,11 @@ void FEBioGlobalsSection::ParseGSSoluteData(XMLTag &tag)
 				tag.value(psd->m_M);
 			}
 			else throw XMLReader::InvalidTag(tag);
-			
+*/			
+			if (m_pim->ReadParameter(tag, psd->GetParameterList()) == false)
+			{
+				throw XMLReader::InvalidTag(tag);
+			}
 			++tag;
 		}
 		while (!tag.isend());

@@ -147,7 +147,7 @@ private:
 //! Global solute data
 //! This structure uniquely identifies a solute in multiphasic problems
 //! \todo Move this to a different file
-class FESoluteData 
+class FESoluteData : public FEParamContainer 
 {
 public:
 	FESoluteData() { m_nID = -1; m_rhoT = 1; m_M = 1; m_z = 0; m_szname[0] = 0; }
@@ -158,13 +158,18 @@ public:
 	double	m_M;			//!< solute molecular weight
 	int		m_z;			//!< solute charge number
 	char	m_szname[128];	//!< solute name
+
+	//! Serialize solute data to archive
+	void Serialize(DumpFile& ar);
+
+	DECLARE_PARAMETER_LIST();
 };
 
 
 //-----------------------------------------------------------------------------
 //! Global solid-bound molecule (SBM) data.
 //! \todo move this to a different file
-class FESBMData 
+class FESBMData : public FEParamContainer
 {
 public:
 	FESBMData() { m_nID = -1; m_rhoT = 1; m_M = 1; m_z = 0; m_szname[0] = 0; }

@@ -59,7 +59,7 @@ protected:
 	void SerializeBoundaryData(DumpFile& ar);
 	void SerializeIOData      (DumpFile& ar);
 	void SerializeLoadData    (DumpFile& ar);
-	void SerializeConstants   (DumpFile& ar);
+	void SerializeGlobals     (DumpFile& ar);
 	void SerializeDataStore   (DumpFile& ar);
 
 public: // --- running restart ---

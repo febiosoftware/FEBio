@@ -297,8 +297,8 @@ bool FEBioModel::Serialize(DumpFile &ar)
 	// --- Load Data ---
 	SerializeLoadData(ar);
 
-	// --- Serialize global constants ---
-	SerializeConstants(ar);
+	// --- Global Data ---
+	SerializeGlobals(ar);
 
 	// --- Material Data ---
 	SerializeMaterials(ar);
@@ -348,8 +348,8 @@ void FEBioModel::SerializeLoadData(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-//! Serialize global constants
-void FEBioModel::SerializeConstants(DumpFile& ar)
+//! Serialize global data
+void FEBioModel::SerializeGlobals(DumpFile& ar)
 {
 	if (ar.IsSaving())
 	{
@@ -366,6 +366,14 @@ void FEBioModel::SerializeConstants(DumpFile& ar)
 				ar << it->second;
 			}
 		}
+		int nSD = 0;
+		if (m_SD[0] == 0) ar << nSD;
+		else
+		{
+			nSD = m_SD.size();
+			ar << nSD;
+			for (int i=0; i<nSD; i++) m_SD[i]->Serialize(ar);
+		}
 	}
 	else
 	{
@@ -378,6 +386,14 @@ void FEBioModel::SerializeConstants(DumpFile& ar)
 		{
 			ar >> sz >> v;
 			SetGlobalConstant(string(sz), v);
+		}
+		int nSD;
+		ar >> nSD;
+		if (nSD) for (int i=0; i<nSD; ++i)
+		{
+			FESoluteData* psd = new FESoluteData;
+			FEModel::AddSoluteData(psd);
+			psd->Serialize(ar);
 		}
 	}
 }
