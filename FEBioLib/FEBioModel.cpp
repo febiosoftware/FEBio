@@ -366,14 +366,9 @@ void FEBioModel::SerializeGlobals(DumpFile& ar)
 				ar << it->second;
 			}
 		}
-		int nSD = 0;
-		if (m_SD[0] == 0) ar << nSD;
-		else
-		{
-			nSD = m_SD.size();
-			ar << nSD;
-			for (int i=0; i<nSD; i++) m_SD[i]->Serialize(ar);
-		}
+		int nSD = m_SD.size();
+		ar << nSD;
+		for (int i=0; i<nSD; i++) m_SD[i]->Serialize(ar);
 	}
 	else
 	{
