@@ -6,9 +6,6 @@
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
 
-// register the material with the framework
-REGISTER_MATERIAL(FEMicroMaterial, "micro-material");
-
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
 	ADD_PARAMETER(m_szrve, FE_PARAM_STRING, "RVE");
@@ -18,6 +15,7 @@ END_PARAMETER_LIST();
 FEMicroMaterial::FEMicroMaterial(FEModel* pfem) : FEElasticMaterial(pfem)
 {
 	m_szrve[0] = 0;
+	m_brve = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -29,16 +27,21 @@ FEMicroMaterial::~FEMicroMaterial(void)
 void FEMicroMaterial::Init()
 {
 	// try to load the RVE model
-	if (m_rve.Input(m_szrve) == false)
+	if (m_brve == false)
 	{
-		throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
+		if (m_rve.Input(m_szrve) == false)
+		{
+			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
+		}
+
+		// make sure the RVE problem doesn't output anything to a plot file
+		m_rve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
+
+		// create the DC's for this RVE
+		PrepRVE();
+
+		m_brve = true;
 	}
-
-	// make sure the RVE problem doesn't output anything to a plot file
-	m_rve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
-
-	// create the DC's for this RVE
-	PrepRVE();
 }
 
 //-----------------------------------------------------------------------------
@@ -81,9 +84,17 @@ void FEMicroMaterial::PrepRVE()
 
 	assert(NN > 0);
 
+	// create a load curve
+	FELoadCurve* plc = new FELoadCurve;
+	plc->SetInterpolation(FELoadCurve::LINEAR);
+	plc->Add(0.0, 0.0);
+	plc->Add(1.0, 1.0);
+	m_rve.AddLoadCurve(plc);
+	int NLC = m_rve.LoadCurves() - 1;
+
 	// create the DC's
-	m_rve.ClearBCs();
 	NN = 0;
+	m_rve.ClearBCs();
 	for (i=0; i<N; ++i)
 		if (tag[i] == 1)
 		{
@@ -91,7 +102,7 @@ void FEMicroMaterial::PrepRVE()
 			{
 				FEPrescribedBC* pdc = new FEPrescribedBC();
 				pdc->bc = j;
-				pdc->lc = 0;	// we use the zeroth loadcurve
+				pdc->lc = NLC;
 				pdc->node = i;
 				pdc->s = 0;
 				m_rve.AddPrescribedBC(pdc);

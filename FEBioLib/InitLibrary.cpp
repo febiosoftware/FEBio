@@ -7,6 +7,7 @@
 #include "FEBioMech/FEBioMech.h"
 #include "FEBioMix/FEBioMix.h"
 #include "FEBioHeat/FEBioHeat.h"
+#include "FEMicroMaterial.h"
 
 void InitFEBioLibrary()
 {
@@ -16,6 +17,10 @@ FECore::InitModule();
 FEBioMech::InitModule();
 FEBioMix::InitModule();
 FEBioHeat::InitModule();
+
+//-----------------------------------------------------------------------------
+// register the material with the framework
+REGISTER_MATERIAL(FEMicroMaterial, "micro-material");
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );

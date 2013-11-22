@@ -18,6 +18,7 @@ public:
 
 protected:
 	FEBioModel	m_rve;	//!< the RVE (Representive Volume Element)
+	bool		m_brve;	//!< flag indicating whether RVE was read in
 	double		m_V0;	//!< initial volume of RVE
 
 public:
