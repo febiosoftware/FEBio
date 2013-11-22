@@ -3,7 +3,7 @@
 
 
 //-----------------------------------------------------------------------------
-FENLConstraint::FENLConstraint(FEModel* pfem) : m_pfem(pfem) {}
+FENLConstraint::FENLConstraint(FEModel* pfem) : m_pfem(pfem) { m_bactive = true; }
 
 //-----------------------------------------------------------------------------
 FENLConstraint::~FENLConstraint(){}
