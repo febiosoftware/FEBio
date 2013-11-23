@@ -1092,8 +1092,6 @@ void Hello();
 
 bool FEBioModel::Init()
 {
-	int i;
-
 	// Open the logfile
 	if (!clog.is_valid()) 
 	{
@@ -1112,44 +1110,8 @@ bool FEBioModel::Init()
 		clog.SetMode(m);
 	}
 
-	// intitialize time
-	m_ftime = 0;
-	m_ftime0 = 0;
-
-	// check step data
-	// TODO: should I let the Steps take care of this instead?
-	for (i=0; i<(int) m_Step.size(); ++i)
-	{
-		FEAnalysis& step = *m_Step[i];
-		if ((step.m_ntime <= 0) && (step.m_final_time <= 0.0)) { clog.printf("Invalid number of time steps for analysis step %d", i+1); return false; }
-		if ((step.m_ntime >  0) && (step.m_final_time >  0.0)) { clog.printf("You must either set the number of time steps or the final time but not both.\n"); return false; }
-		if (step.m_dt0   <= 0) { clog.printf("Invalid time step size for analysis step %d", i+1); return false; }
-		if (step.m_bautostep)
-		{
-//			if (m_pStep->m_dtmin <= 0) return err("Invalid minimum time step size");
-//			if (m_pStep->m_dtmax <= 0) return err("Invalid maximum time step size");
-		}
-	}
-
-	// evaluate all loadcurves at the initial time
-	for (i=0; i<LoadCurves(); ++i) m_LC[i]->Evaluate(0);
-
-	// if the analysis is run in plain-strain mode we fix all the z-dofs of all nodes
-	if (m_nplane_strain >= 0)
-	{
-		int bc = m_nplane_strain;
-		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[bc] = -1;
-	}
-
-	// find and remove isolated vertices
-	int ni = m_mesh.RemoveIsolatedVertices();
-	if (ni != 0) 
-	{
-		if (ni == 1)
-			clog.printbox("WARNING", "%d isolated vertex removed.", ni);
-		else
-			clog.printbox("WARNING", "%d isolated vertices removed.", ni);
-	}
+	// initialize model data
+	FEModel::Init();
 
 	// create and initialize the rigid body data
 	if (CreateRigidBodies() == false) return false;
@@ -1175,14 +1137,14 @@ bool FEBioModel::Init()
 	if (InitContact() == false) return false;
 
 	// init some other stuff
-	for (i=0; i<(int) m_BL.size(); ++i)
+	for (int i=0; i<(int) m_BL.size(); ++i)
 	{
 		if (m_BL[i]->Init() == false) return false;
 	}
 
 	// initialize nonlinear constraints
 	// TODO: This is also initialized in the analysis step. Do I need to do this here?
-	for (i=0; i<(int) m_NLC.size(); ++i) m_NLC[i]->Init();
+	for (int i=0; i<(int) m_NLC.size(); ++i) m_NLC[i]->Init();
 
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
@@ -1301,103 +1263,6 @@ bool FEBioModel::Reset()
 	DoCallback(CB_MAJOR_ITERS);
 
 	// All data is reset successfully
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Initializes contact data
-//! \todo Contact interfaces have two initialization functions: Init() and
-//!   Activate(). The Init member is called here and allocates the required memory
-//!   for each interface. The Activate() member is called during the step initialization
-//!   which is called later during the solve phase. However, for global interfaces (i.e.
-//!   interfaces that are active during the entire simulation), the Activate() member is
-//!   not called in the solve phase. That is why we have to call it here. Global interfaces
-//!   can be idenfitifed since they are active during the initialization. 
-//!   I am not entirely a fan of this approach but it does solve the problem that contact
-//!   interface shoulds only do work (e.g. update projection status) when they are active, but
-//!   have to allocate memory during the initialization fase.
-//!
-bool FEBioModel::InitContact()
-{
-	// loop over all contact interfaces
-	for (int i=0; i<SurfacePairInteractions(); ++i)
-	{
-		// get the contact interface
-		FEContactInterface& ci = dynamic_cast<FEContactInterface&>(*m_CI[i]);
-
-		// initializes contact interface data
-		if (ci.Init() == false) return false;
-
-		// If the contact interface is active
-		// we have to call the Activate() member. 
-		if (ci.IsActive()) ci.Activate();
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Initialize material data
-bool FEBioModel::InitMaterials()
-{
-	int i;
-
-	// initialize material data
-	for (i=0; i<Materials(); ++i)
-	{
-		// get the material
-		FEMaterial* pmat = GetMaterial(i);
-
-		// initialize material data
-		try
-		{
-			pmat->Init();
-		}
-		catch (MaterialError e)
-		{
-			clog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			clog.printf("ERROR: %s\n\n", e.Error());
-			return false;
-		}
-		catch (MaterialRangeError e)
-		{
-			clog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			clog.printf("ERROR: parameter \"%s\" out of range ", e.m_szvar);
-			if (e.m_bl) clog.printf("["); else clog.printf("(");
-			clog.printf("%lg, %lg", e.m_vmin, e.m_vmax);
-			if (e.m_br) clog.printf("]"); else clog.printf(")");
-			clog.printf("\n\n");
-			return false;
-		}
-		catch (...)
-		{
-			clog.printf("A fatal error occured during material intialization\n\n");
-			return false;
-		}
-	}
-
-	// initialize discrete materials
-	try
-	{
-		for (i=0; i<(int) m_MAT.size(); ++i)
-		{
-			FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(m_MAT[i]);
-			if (pm)
-			{
-				if (dynamic_cast<FENonLinearSpring*>(pm))
-				{
-					FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
-					ps->m_plc = GetLoadCurve(ps->m_nlc);
-				}
-				pm->Init();
-			}
-		}
-	}
-	catch (...)
-	{
-		return false;
-	}
-
 	return true;
 }
 

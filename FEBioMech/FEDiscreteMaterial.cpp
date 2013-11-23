@@ -58,9 +58,21 @@ BEGIN_PARAMETER_LIST(FENonLinearSpring, FEDiscreteMaterial)
 	ADD_PARAMETER(m_F, FE_PARAM_DOUBLE, "F");
 END_PARAMETER_LIST();
 
+FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem)
+{
+	m_nlc = -1; 
+	m_plc = 0;
+	m_F = 1; 
+}
+
 void FENonLinearSpring::Init()
 {
 	if (m_nlc < 0) throw MaterialError("Invalid load curve ID for nonlinear spring");
+	if (m_plc == 0)
+	{
+		m_plc = GetFEModel()->GetLoadCurve(m_nlc);
+		assert(m_plc);
+	}
 }
 
 double FENonLinearSpring::force(double dl)

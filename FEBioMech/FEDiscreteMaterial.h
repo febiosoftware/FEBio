@@ -76,7 +76,7 @@ public:
 class FENonLinearSpring : public FEDiscreteMaterial
 {
 public:
-	FENonLinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem) { m_nlc = -1; m_F = 1; }
+	FENonLinearSpring(FEModel* pfem);
 
 	double force    (double dl);
 	double stiffness(double dl);

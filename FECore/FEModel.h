@@ -49,7 +49,7 @@ public:
 	virtual ~FEModel(void);
 
 	// Initialization
-	virtual bool Init() = 0;
+	virtual bool Init();
 
 	//! Resets data structures
 	virtual bool Reset() = 0;
@@ -96,7 +96,7 @@ public: // --- Material functions ---
 	FEMaterial* GetMaterial(int i) { return m_MAT[i]; }
 
 	//! material initialization
-	virtual bool InitMaterials() = 0;
+	bool InitMaterials();
 
 public: // --- Boundary Conditions functions ---
 
@@ -165,6 +165,9 @@ public: // --- Contact interface functions ---
 
 	//! Add a surface pair interaction
 	void AddSurfacePairInteraction(FESurfacePairInteraction* pci) { m_CI.push_back(pci); }
+
+	//! Initializes contact data
+	bool InitContact();
 
 public: // --- Nonlinear constraints functions ---
 

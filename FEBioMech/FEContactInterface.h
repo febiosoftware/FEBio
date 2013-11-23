@@ -35,12 +35,6 @@ public:
 	//! destructor
 	virtual ~FEContactInterface();
 
-	//! initialization routine
-	virtual bool Init() = 0;
-
-	//! update 
-	virtual void Update(int niter) = 0;
-
 	//! calculate contact forces
 	virtual void ContactForces(FEGlobalVector& R) = 0;
 

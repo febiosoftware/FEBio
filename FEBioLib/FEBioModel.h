@@ -80,12 +80,6 @@ protected: // --- initialization functions ---
 	//! Initialize rigid bodies
 	bool CreateRigidBodies();
 
-	//! Initialize material data
-	bool InitMaterials();
-
-	//! Initializes contact data
-	bool InitContact();
-
 	//! Initialize poroelastic/biphasic and solute data
 	bool InitPoroSolute();
 

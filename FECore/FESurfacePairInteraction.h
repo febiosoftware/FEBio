@@ -20,6 +20,12 @@ public:
 	FEModel* GetFEModel() { return m_pfem; }
 
 public:
+	//! initialization routine
+	virtual bool Init() = 0;
+
+	//! update 
+	virtual void Update(int niter) = 0;
+
 	//! Create a shallow copy
 	virtual void ShallowCopy(FESurfacePairInteraction& ci) = 0;
 
