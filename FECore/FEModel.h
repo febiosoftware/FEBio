@@ -52,11 +52,12 @@ public:
 	virtual bool Init();
 
 	//! Resets data structures
-	virtual bool Reset() = 0;
+	virtual bool Reset();
 
 	// solve the model
-	virtual bool Solve() = 0;
+	virtual bool Solve();
 
+public:
 	// get the FE mesh
 	FEMesh& GetMesh() { return m_mesh; }
 

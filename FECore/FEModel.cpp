@@ -166,6 +166,87 @@ bool FEModel::InitContact()
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+//! This function solves the FE problem by calling the solve method for each step.
+bool FEModel::Solve()
+{
+	// convergence flag
+	bool bconv = true;
+
+	// loop over all analysis steps
+	// Note that we don't necessarily from step 0.
+	// This is because the user could have restarted
+	// the analysis. 
+	for (size_t nstep=m_nStep; nstep < m_Step.size(); ++nstep)
+	{
+		// set the current analysis step
+		m_nStep = nstep;
+		m_pStep = m_Step[nstep];
+
+		// intitialize step data
+		if (m_pStep->Init() == false)
+		{
+			bconv = false;
+			break;
+		}
+
+		// solve the analaysis step
+		bconv = m_pStep->Solve();
+
+		// break if the step has failed
+		if (bconv == false) break;
+
+		// wrap it up
+		m_pStep->Finish();
+	}
+
+	return bconv;
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::Reset()
+{
+	// initialize materials
+	for (int i=0; i<Materials(); ++i)
+	{
+		FEMaterial* pmat = GetMaterial(i);
+		pmat->Init();
+	}
+
+	// reset mesh data
+	m_mesh.Reset();
+
+	// reset object data
+	int nrb = m_Obj.size();
+	for (int i=0; i<nrb; ++i) m_Obj[i]->Reset();
+
+	// set up rigid joints
+	if (!m_NLC.empty())
+	{
+		int NC = (int) m_NLC.size();
+		for (int i=0; i<NC; ++i)
+		{
+			FENLConstraint* plc = m_NLC[i];
+			plc->Reset();
+		}
+	}
+
+	// set the start time
+	m_ftime = 0;
+	m_ftime0 = 0;
+
+	// set first time step
+	m_pStep = m_Step[0];
+	m_nStep = 0;
+	for (int i=0; i<(int)m_Step.size(); ++i) m_Step[i]->Reset();
+
+	// reset contact data
+	// TODO: I just call Init which I think is okay
+	InitContact();
+
+	return true;
+}
+
 //=============================================================================
 //    P A R A M E T E R   F U N C T I O N S
 //=============================================================================
