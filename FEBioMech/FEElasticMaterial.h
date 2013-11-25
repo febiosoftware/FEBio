@@ -18,6 +18,9 @@ public:
 	//! serialize material point data
 	void Serialize(DumpFile& ar);
 
+	//! stream material point data
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
 public:
 	mat3ds Strain();
 	mat3ds SmallStrain();

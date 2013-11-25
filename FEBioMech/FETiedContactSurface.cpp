@@ -30,10 +30,16 @@ bool FETiedContactSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedContactSurface::ShallowCopy(FETiedContactSurface& s)
+void FETiedContactSurface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	m_Lm  = s.m_Lm;
-	m_gap = s.m_gap;
+	if (bsave)
+	{
+		dmp << m_Lm << m_gap;
+	}
+	else
+	{
+		dmp >> m_Lm >> m_gap;
+	}
 }
 
 //-----------------------------------------------------------------------------

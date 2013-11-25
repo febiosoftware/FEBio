@@ -25,20 +25,18 @@ FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem)
 
 //-----------------------------------------------------------------------------
 //! create a shallow copy
-void FERigidJoint::ShallowCopy(FERigidJoint& rj)
+void FERigidJoint::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	m_nRBa = rj.m_nRBa;
-	m_nRBb = rj.m_nRBb;
-
-	m_q0  = rj.m_q0;
-	m_qa0 = rj.m_qa0;
-	m_qb0 = rj.m_qb0;
-
-	m_F = rj.m_F;
-	m_L = rj.m_L;
-
-	m_eps  = rj.m_eps;
-	m_atol = rj.m_atol;
+	if (bsave)
+	{
+		dmp << m_q0 << m_qa0 << m_qb0;
+		dmp << m_F << m_L;
+	}
+	else
+	{
+		dmp >> m_q0 >> m_qa0 >> m_qb0;
+		dmp >> m_F >> m_L;
+	}
 }
 
 //-----------------------------------------------------------------------------

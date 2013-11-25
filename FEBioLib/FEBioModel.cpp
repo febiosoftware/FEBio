@@ -55,9 +55,6 @@
 extern void echo_input(FEBioModel& fem);
 
 //-----------------------------------------------------------------------------
-static FEBioModel* pfem_copy = 0;
-
-//-----------------------------------------------------------------------------
 // Constructor of FEBioModel class.
 FEBioModel::FEBioModel()
 {
@@ -82,8 +79,6 @@ FEBioModel::FEBioModel()
 	m_debug = false;
 	m_becho = true;
 	m_plot = 0;
-
-	if (pfem_copy) { delete pfem_copy; pfem_copy = 0; }
 }
 
 //-----------------------------------------------------------------------------
@@ -2070,68 +2065,6 @@ bool FEBioModel::Solve()
 
 	// We're done !
 	return bconv;
-}
-
-
-//-----------------------------------------------------------------------------
-void FEBioModel::PushState()
-{
-	if (pfem_copy == 0) pfem_copy = new FEBioModel;
-	pfem_copy->ShallowCopy(*this);
-}
-
-//-----------------------------------------------------------------------------
-void FEBioModel::PopState()
-{
-	assert(pfem_copy);
-	ShallowCopy(*pfem_copy);
-	delete pfem_copy;
-	pfem_copy = 0;
-}
-
-//-----------------------------------------------------------------------------
-//! This function is used when pushing the FEM state data. Since we don't need
-//! to copy all the data, this function only copies the data that needs to be 
-//! restored for a running restart.
-//!
-//! \todo Shallow copy nonlinear constraints
-void FEBioModel::ShallowCopy(FEBioModel& fem)
-{
-	// copy time data
-	m_ftime = fem.m_ftime;
-
-	// copy the mesh
-	m_mesh = fem.GetMesh();
-
-	// copy rigid body data
-	if (m_Obj.empty())
-	{
-		for (int i=0; i<(int) fem.m_Obj.size();	++i)
-		{
-			FERigidBody* prb = new FERigidBody(this);
-			m_Obj.push_back(prb);
-		}
-	}
-	assert(m_Obj.size() == fem.m_Obj.size());
-	for (int i=0; i<(int) m_Obj.size(); ++i) m_Obj[i]->ShallowCopy(fem.m_Obj[i]);
-
-	// copy contact data
-	if (m_CI.empty())
-	{
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-
-		for (int i=0; i<fem.SurfacePairInteractions(); ++i)
-		{
-			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
-
-			FEContactInterface* pcopy = febio.Create<FEContactInterface>(febio.GetTypeStr<FEContactInterface>(pci), this);
-			assert(pcopy);
-
-			AddSurfacePairInteraction(pcopy);
-		}
-	}
-	assert(SurfacePairInteractions() == fem.SurfacePairInteractions());
-	for (int i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->ShallowCopy(*fem.m_CI[i]);
 }
 
 //-----------------------------------------------------------------------------

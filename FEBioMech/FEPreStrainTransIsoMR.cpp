@@ -17,6 +17,20 @@ FEMaterialPoint* FEPreStrainMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
+void FEPreStrainMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_lam << m_lamp;
+	}
+	else
+	{
+		dmp >> m_lam >> m_lamp;
+	}
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+}
+
+//-----------------------------------------------------------------------------
 //! \todo implement this.
 void FEPreStrainMaterialPoint::Serialize(DumpFile& ar)
 {

@@ -28,7 +28,7 @@ public:
 	bool Init();
 
 	//! create a shallow copy for running restarts
-	void ShallowCopy(FEFacetTiedSurface& surf);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! serialization for cold restarts
 	void Serialize(DumpFile& ar);
@@ -52,7 +52,7 @@ public:
 	void Activate();
 
 	//! Create a shallow copy
-	void ShallowCopy(FESurfacePairInteraction& ci);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);

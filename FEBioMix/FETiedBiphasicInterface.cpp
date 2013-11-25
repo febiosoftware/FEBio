@@ -103,17 +103,25 @@ bool FETiedBiphasicSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicSurface::ShallowCopy(FETiedBiphasicSurface &s)
+void FETiedBiphasicSurface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	m_Lmd = s.m_Lmd;
-	m_Gap = s.m_Gap;
-	m_dg = s.m_dg;
-	m_bporo = s.m_bporo;
-	
-	if (m_bporo)
+	if (bsave)
 	{
-		m_pg  = s.m_pg;
-		m_Lmp = s.m_Lmp;
+		dmp << m_bporo;
+		dmp << m_Lmd << m_Gap << m_dg;
+		if (m_bporo)
+		{
+			dmp << m_pg << m_Lmp;
+		}
+	}
+	else
+	{
+		dmp >> m_bporo;
+		dmp >> m_Lmd >> m_Gap >> m_dg;
+		if (m_bporo)
+		{
+			dmp >> m_pg >> m_Lmp;
+		}
 	}
 }
 
@@ -537,11 +545,10 @@ void FETiedBiphasicInterface::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FETiedBiphasicInterface::ShallowCopy(FESurfacePairInteraction &ci)
+void FETiedBiphasicInterface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FETiedBiphasicInterface& si = dynamic_cast<FETiedBiphasicInterface&>(ci);
-	m_ss.ShallowCopy(si.m_ss);
-	m_ms.ShallowCopy(si.m_ms);
+	m_ss.ShallowCopy(dmp, bsave);
+	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

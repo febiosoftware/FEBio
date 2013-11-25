@@ -78,6 +78,62 @@ void FEMesh::ClearParts()
 }
 
 //-----------------------------------------------------------------------------
+void FEMesh::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	// stream nodal data
+	if (bsave)
+	{
+		int NN = (int) m_Node.size();
+		for (int i=0; i<NN; ++i)
+		{
+			FENode& nd = m_Node[i];
+			dmp << nd.m_r0 << nd.m_v0;
+			dmp << nd.m_rt << nd.m_vt << nd.m_at;
+			dmp << nd.m_rp << nd.m_vp << nd.m_ap;
+			dmp << nd.m_Fr;
+			dmp << nd.m_D0 << nd.m_Dt;
+			dmp << nd.m_p0 << nd.m_pt;
+			dmp << nd.m_T;
+			for (int j=0; j<MAX_CDOFS; ++j)
+			{
+				dmp << nd.m_c0[j];
+				dmp << nd.m_ct[j];
+				dmp << nd.m_cp[j];
+			}
+		}
+	}
+	else
+	{
+		int NN = (int) m_Node.size();
+		for (int i=0; i<NN; ++i)
+		{
+			FENode& nd = m_Node[i];
+			dmp >> nd.m_r0 >> nd.m_v0;
+			dmp >> nd.m_rt >> nd.m_vt >> nd.m_at;
+			dmp >> nd.m_rp >> nd.m_vp >> nd.m_ap;
+			dmp >> nd.m_Fr;
+			dmp >> nd.m_D0 >> nd.m_Dt;
+			dmp >> nd.m_p0 >> nd.m_pt;
+			dmp >> nd.m_T;
+			for (int j=0; j<MAX_CDOFS; ++j)
+			{
+				dmp >> nd.m_c0[j];
+				dmp >> nd.m_ct[j];
+				dmp >> nd.m_cp[j];
+			}
+		}
+	}
+
+	// stream domain data
+	int ND = Domains();
+	for (int i=0; i<ND; ++i)
+	{
+		FEDomain& dom = Domain(i);
+		dom.ShallowCopy(dmp, bsave);
+	}
+}
+
+//-----------------------------------------------------------------------------
 FEMesh::FEMesh(FEMesh& m)
 {
 	// copy nodal data

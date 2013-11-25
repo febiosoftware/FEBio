@@ -37,7 +37,7 @@ public:
 	void ProjectSurface(FETiedContactSurface& ss, FETiedContactSurface& ms, bool bmove = false);
 
 	//! shallow copy
-	void ShallowCopy(FESurfacePairInteraction& ci);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! calculate contact forces
 	virtual void ContactForces(FEGlobalVector& R);

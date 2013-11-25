@@ -131,12 +131,17 @@ void FERigidWallSurface::UpdateNormals()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidWallSurface::ShallowCopy(FERigidWallSurface& s)
+void FERigidWallSurface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	Lm  = s.Lm;
-	gap = s.gap;
-	zero(pme);
-	Lt  = s.Lt;
+	if (bsave)
+	{
+		dmp << Lm << gap << Lt;
+	}
+	else
+	{
+		dmp >> Lm >> gap >> Lt;
+		zero(pme);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -189,10 +194,9 @@ FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(p
 };
 
 //-----------------------------------------------------------------------------
-void FERigidWallInterface::ShallowCopy(FESurfacePairInteraction& ci)
+void FERigidWallInterface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FERigidWallInterface& ri = dynamic_cast<FERigidWallInterface&>(ci);
-	m_ss.ShallowCopy(ri.m_ss);
+	m_ss.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

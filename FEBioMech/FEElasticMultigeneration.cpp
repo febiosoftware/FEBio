@@ -44,6 +44,27 @@ void FEMultigenerationMaterialPoint::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEMultigenerationMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+			
+	if (bsave)
+	{
+		for (int i=0; i < (int)Fi.size(); i++)
+			dmp << Fi[i];
+		for (int i=0; i < (int)Ji.size(); i++)
+			dmp << Ji[i];
+	}
+	else
+	{
+		for (int i=0; i < (int)Fi.size(); i++)
+			dmp >> Fi[i];
+		for (int i=0; i < (int)Ji.size(); i++)
+			dmp >> Ji[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEMultigenerationMaterialPoint::Init(bool bflag)
 {
 	if (m_pt) m_pt->Init(bflag);

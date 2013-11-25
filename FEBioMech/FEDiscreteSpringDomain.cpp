@@ -11,54 +11,6 @@ FEDomain* FEDiscreteSpringDomain::Clone()
 }
 
 //-----------------------------------------------------------------------------
-void FEDiscreteSpringDomain::Serialize(DumpFile& ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_Node;
-		int nel = (int) m_Elem.size();
-		for (int i=0; i<nel; ++i)
-		{
-			FEDiscreteElement& el = m_Elem[i];
-			int nmat = el.GetMatID();
-			ar << (int) el.Type();
-			
-			ar << nmat;
-			ar << el.m_nrigid;
-			ar << el.m_nID;
-			ar << el.m_node;
-
-			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
-		}
-	}
-	else
-	{
-		FEModel& fem = *ar.GetFEModel();
-		ar >> m_Node;
-		int n, mat;
-		for (size_t i=0; i<m_Elem.size(); ++i)
-		{
-			FEDiscreteElement& el = m_Elem[i];
-			ar >> n;
-
-			el.SetType(n);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nrigid;
-			ar >> el.m_nID;
-			ar >> el.m_node;
-
-			for (int j=0; j<el.GaussPoints(); ++j)
-			{
-				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
-				el.m_State[j]->Serialize(ar);
-			}
-		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
 void FEDiscreteSpringDomain::UnpackLM(FEElement &el, vector<int>& lm)
 {
 	int N = el.Nodes();

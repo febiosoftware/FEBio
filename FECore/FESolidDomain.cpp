@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FESolidDomain.h"
 #include "FEMesh.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 //! Domain initialization
@@ -450,4 +451,64 @@ double FESolidDomain::detJ0(FESolidElement &el, int n)
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 
 	return det;
+}
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	int NEL = (int) m_Elem.size();
+	for (int i=0; i<NEL; ++i)
+	{
+		FESolidElement& el = m_Elem[i];
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j) el.m_State[j]->ShallowCopy(dmp, bsave);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FESolidDomain::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		ar << m_Node;
+
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FESolidElement& el = m_Elem[i];
+			int nmat = el.GetMatID();
+			ar << el.Type();
+			
+			ar << nmat;
+			ar << el.m_nrigid;
+			ar << el.m_nID;
+			ar << el.m_node;
+
+			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
+		}
+	}
+	else
+	{
+		ar >> m_Node;
+
+		FEModel& fem = *ar.GetFEModel();
+		int n, mat;
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FESolidElement& el = m_Elem[i];
+			ar >> n;
+
+			el.SetType(n);
+
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
+
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.m_State[j]->Serialize(ar);
+			}
+		}
+	}
 }

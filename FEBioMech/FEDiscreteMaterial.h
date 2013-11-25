@@ -18,6 +18,11 @@ public:
 		if (m_pt) m_pt->Serialize(ar);
 	}
 
+	void ShallowCopy(DumpStream& dmp, bool bsave)
+	{
+		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	}
+
 	void Init(bool bflag)
 	{
 		if (m_pt) m_pt->Init(bflag);

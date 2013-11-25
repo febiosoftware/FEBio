@@ -10,6 +10,7 @@
 #include "FENLConstraint.h"
 #include "FELinearConstraint.h"
 #include "FEObject.h"
+#include "DumpStream.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -194,9 +195,8 @@ public: // --- parameter functions ---
 
 public:	// --- Miscellaneous routines ---
 
-	// facilities for (re)storing the model state data (used for running restarts)
-	virtual void PushState() = 0;
-	virtual void PopState () = 0;
+	//! read/write the model state to a dump stream (used for running restarts)
+	virtual void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! find a boundary condition from the ID
 	FEBoundaryCondition* FindBC(int nid);

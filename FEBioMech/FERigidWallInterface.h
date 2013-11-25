@@ -27,7 +27,7 @@ public:
 	bool Init();
 
 	//! shallow copy
-	void ShallowCopy(FERigidWallSurface& s);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! Update the surface data
 	void Update() {}
@@ -82,7 +82,7 @@ public:
 	void Update(int niter);
 
 	//! shallow copy
-	void ShallowCopy(FESurfacePairInteraction& ci);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! calculate contact forces
 	virtual void ContactForces(FEGlobalVector& R);

@@ -18,7 +18,7 @@ public:
 	bool Init();
 
 	//! shallow copy
-	void ShallowCopy(FETiedContactSurface& s);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! data serialization
 	void Serialize(DumpFile& ar);

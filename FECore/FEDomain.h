@@ -2,6 +2,7 @@
 
 #include "FEElement.h"
 #include "DumpFile.h"
+#include "DumpStream.h"
 #include "FE_enum.h"
 #include "FESolver.h"
 #include "FEGlobalVector.h"
@@ -77,6 +78,9 @@ public: // optional functions to overload
 
 	//! serialize domain to archive
 	virtual void Serialize(DumpFile& ar) {}
+
+	//! stream domain data
+	virtual void ShallowCopy(DumpStream& dmp, bool bsave) {}
 
 	//! initialize domain
 	virtual bool Initialize(FEModel& fem) { return true; }

@@ -94,23 +94,6 @@ bool FESlidingSurface2::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface2::ShallowCopy(FESlidingSurface2 &s)
-{
-	m_bporo = s.m_bporo;
-
-	// copy integration point data
-	m_Data = s.m_Data;
-
-	// reset element pointers
-	for (int i=0; i<Elements(); ++i)
-	{
-		vector<Data>& di = m_Data[i];
-		int n = (int) di.size();
-		for (int j=0; j<n; ++j) di[j].m_pme = 0;
-	}
-}
-
-//-----------------------------------------------------------------------------
 //! This function calculates the node normal. Due to the piecewise continuity
 //! of the surface elements this normal is not uniquely defined so in order to
 //! obtain a unique normal the normal is averaged for each node over all the 
@@ -146,6 +129,69 @@ void FESlidingSurface2::UpdateNodeNormals()
 	// normalize all vectors
 	const int N = Nodes();
 	for (int i=0; i<N; ++i) m_nn[i].unit();
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface2::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_bporo;
+
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp << d.m_gap;
+				dmp << d.m_nu;
+				dmp << d.m_rs;
+				dmp << d.m_Lmd;
+				dmp << d.m_Lmp;
+				dmp << d.m_epsn;
+				dmp << d.m_epsp;
+				dmp << d.m_pg;
+				dmp << d.m_Ln;
+			}
+		}
+		dmp << m_poro;
+		dmp << m_nn;
+	}
+	else
+	{
+		dmp >> m_bporo;
+
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp >> d.m_gap;
+				dmp >> d.m_nu;
+				dmp >> d.m_rs;
+				dmp >> d.m_Lmd;
+				dmp >> d.m_Lmp;
+				dmp >> d.m_epsn;
+				dmp >> d.m_epsp;
+				dmp >> d.m_pg;
+				dmp >> d.m_Ln;
+			}
+		}
+		dmp >> m_poro;
+		dmp >> m_nn;
+
+		// reset element pointers
+		for (int i=0; i<Elements(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int n = (int) di.size();
+			for (int j=0; j<n; ++j) di[j].m_pme = 0;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -697,11 +743,10 @@ void FESlidingInterface2::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface2::ShallowCopy(FESurfacePairInteraction &ci)
+void FESlidingInterface2::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FESlidingInterface2& si = dynamic_cast<FESlidingInterface2&>(ci);
-	m_ss.ShallowCopy(si.m_ss);
-	m_ms.ShallowCopy(si.m_ms);
+	m_ss.ShallowCopy(dmp, bsave);
+	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

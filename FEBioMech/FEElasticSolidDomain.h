@@ -18,9 +18,6 @@ public:
 	//! create a clone of this class
 	FEDomain* Clone();
 
-	//! serialize data to archive
-	void Serialize(DumpFile& ar);
-
 	//! initialize class
 	bool Initialize(FEModel& fem);
 

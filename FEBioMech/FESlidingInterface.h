@@ -25,7 +25,7 @@ public:
 	bool Init();
 
 	//! shallow copy
-	void ShallowCopy(FESlidingSurface& s);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! Calculate the total traction at a node
 	vec3d traction(int inode);
@@ -79,7 +79,7 @@ public:
 	void ProjectSurface(FESlidingSurface& ss, FESlidingSurface& ms, bool bupseg, bool bmove = false);
 
 	//! shallow copy
-	void ShallowCopy(FESurfacePairInteraction& ci);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! calculate penalty value
 	double Penalty() { return m_eps; }

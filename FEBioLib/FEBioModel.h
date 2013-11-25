@@ -62,16 +62,6 @@ protected:
 	void SerializeGlobals     (DumpFile& ar);
 	void SerializeDataStore   (DumpFile& ar);
 
-public: // --- running restart ---
-	//! push the current model state
-	virtual void PushState();
-
-	//! pop the current model state
-	virtual void PopState ();
-
-	// create a shallow copy
-	void ShallowCopy(FEBioModel& fem);
-
 protected: // --- initialization functions ---
 
 	//! Initialize mesh data

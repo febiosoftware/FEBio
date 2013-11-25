@@ -150,28 +150,37 @@ void FERigidBody::UpdateCOM()
 }
 
 //-----------------------------------------------------------------------------
-void FERigidBody::ShallowCopy(FEObject *po)
+void FERigidBody::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FERigidBody& rb = dynamic_cast<FERigidBody&>(*po);
-	m_mass = rb.m_mass;
-	m_Fr = rb.m_Fr;
-	m_Mr = rb.m_Mr;
-
-	m_rp = rb.m_rp;
-	m_rt = rb.m_rt;
-
-	m_qp = rb.m_qp;
-	m_qt = rb.m_qt;
-
-	m_bActive = rb.m_bActive;
-
-	for (int i=0; i<6; ++i)
+	if (bsave)
 	{
-		m_Up[i] = rb.m_Up[i];
-		m_Ut[i] = rb.m_Ut[i];
-		m_du[i] = rb.m_du[i];
-		m_dul[i] = rb.m_dul[i];
-		m_pDC[i] = rb.m_pDC[i];
+		dmp << m_mass;
+		dmp << m_Fr << m_Mr;
+		dmp << m_rp << m_rt;
+		dmp << m_qp << m_qt;
+		dmp << m_bActive;
+		for (int i=0; i<6; ++i)
+		{
+			dmp << m_Up[i];
+			dmp << m_Ut[i];
+			dmp << m_du[i];
+			dmp << m_dul[i];
+		}
+	}
+	else
+	{
+		dmp >> m_mass;
+		dmp >> m_Fr >> m_Mr;
+		dmp >> m_rp >> m_rt;
+		dmp >> m_qp >> m_qt;
+		dmp >> m_bActive;
+		for (int i=0; i<6; ++i)
+		{
+			dmp >> m_Up[i];
+			dmp >> m_Ut[i];
+			dmp >> m_du[i];
+			dmp >> m_dul[i];
+		}
 	}
 }
 

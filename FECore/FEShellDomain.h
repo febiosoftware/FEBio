@@ -21,7 +21,13 @@ public:
 
 	int GetElementType() { return m_Elem[0].Type(); }
 
+	//! Initialize elements
+	void InitElements();
+
 	bool Initialize(FEModel& fem);
+
+	//! Reset element data
+	void Reset();
 
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
@@ -37,6 +43,13 @@ public:
 
 	// jacobian with respect to reference frame
 	double detJ0(FEShellElement& el, int n);
+
+public:
+	//! shallow copy
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
+	//! Serialize domain data to archive
+	void Serialize(DumpFile& ar);
 
 protected:
 	vector<int>				m_Node;	//!< node list

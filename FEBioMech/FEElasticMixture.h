@@ -19,6 +19,9 @@ public:
 	//! data serialization
 	void Serialize(DumpFile& ar);
 
+	//! stream material point data
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
 public:
 	vector<double>				m_w;	//!< material weights
 	vector<FEMaterialPoint*>	m_mp;	//!< material point data for mixture components

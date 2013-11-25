@@ -247,6 +247,34 @@ bool FEModel::Reset()
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+//! This function is used when pushing the FEM state data. Since we don't need
+//! to copy all the data, this function only copies the data that needs to be 
+//! restored for a running restart.
+//!
+//! \todo Shallow copy nonlinear constraints
+void FEModel::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	// stream model data
+	if (bsave)
+	{
+		dmp << m_ftime;
+	}
+	else
+	{
+		dmp >> m_ftime;
+	}
+
+	// stream mesh
+	m_mesh.ShallowCopy(dmp, bsave);
+
+	// stream rigid body data
+	for (int i=0; i<(int) m_Obj.size(); ++i) m_Obj[i]->ShallowCopy(dmp, bsave);
+
+	// stream contact data
+	for (int i=0; i<SurfacePairInteractions(); ++i) m_CI[i]->ShallowCopy(dmp, bsave);
+}
+
 //=============================================================================
 //    P A R A M E T E R   F U N C T I O N S
 //=============================================================================

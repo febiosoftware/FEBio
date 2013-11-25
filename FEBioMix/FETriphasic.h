@@ -15,7 +15,25 @@ public:
 		if (m_pt) pt->m_pt = m_pt->Copy();
 		return pt;
 	}
-	
+
+	void ShallowCopy(DumpStream& dmp, bool bsave)
+	{
+		if (bsave)
+		{
+			dmp << m_c[0] << m_gradc[0] << m_j[0] << m_ca[0];
+			dmp << m_c[1] << m_gradc[1] << m_j[1] << m_ca[1];
+			dmp << m_psi << m_Ie << m_cF;
+		}
+		else
+		{
+			dmp >> m_c[0] >> m_gradc[0] >> m_j[0] >> m_ca[0];
+			dmp >> m_c[1] >> m_gradc[1] >> m_j[1] >> m_ca[1];
+			dmp >> m_psi >> m_Ie >> m_cF;
+		}
+		
+		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	}
+
 	void Serialize(DumpFile& ar)
 	{
 		if (ar.IsSaving())

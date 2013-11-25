@@ -13,6 +13,12 @@ public:
 		return pt;
 	}
 
+	void ShallowCopy(DumpStream& dmp, bool bsave)
+	{
+		if (bsave) { dmp << m_q; } else { dmp >> m_q; }
+		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	}
+
 	void Serialize(DumpFile& ar)
 	{
 		if (m_pt) m_pt->Serialize(ar);

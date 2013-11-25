@@ -16,9 +16,6 @@ public:
 	//! Unpack LM data
 	void UnpackLM(FEElement& el, vector<int>& lm);
 
-	//! Serialize data to archive
-	void Serialize(DumpFile& ar);
-
 public: // overridden from FEElasticDomain
 
 	//! calculate stiffness matrix

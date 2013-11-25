@@ -26,11 +26,6 @@ public:
 	//! destructor
 	virtual ~FERigidJoint() {}
 
-	//! create a shallow copy
-	void ShallowCopy(FERigidJoint& rj);
-
-public:
-
 	//! initialization \todo Find a use for this
 	void Init() {}
 
@@ -45,6 +40,9 @@ public:
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
+
+	//! create a shallow copy
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! update state
 	void Update();

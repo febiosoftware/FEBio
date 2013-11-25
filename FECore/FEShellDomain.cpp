@@ -1,6 +1,18 @@
 #include "stdafx.h"
 #include "FEShellDomain.h"
 #include "FEMesh.h"
+#include "FEModel.h"
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::InitElements()
+{
+	for (size_t i=0; i<m_Elem.size(); ++i)
+	{
+		FEShellElement& el = m_Elem[i];
+		int n = el.GaussPoints();
+		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
+	}
+}
 
 //-----------------------------------------------------------------------------
 bool FEShellDomain::Initialize(FEModel &fem)
@@ -26,6 +38,12 @@ bool FEShellDomain::Initialize(FEModel &fem)
 	for (i=0; i<N; ++i) if (tag[i] >= 0) m_Node.push_back(i);
 	assert(m_Node.size() == n);
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::Reset()
+{
+	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -288,4 +306,64 @@ double FEShellDomain::detJ0(FEShellElement &el, int n)
 				+ J[0][2]*(J[1][0]*J[2][1] - J[1][1]*J[2][0]);
 
 	return det;			
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	int NEL = (int) m_Elem.size();
+	for (int i=0; i<NEL; ++i)
+	{
+		FEShellElement& el = m_Elem[i];
+		int nint = el.GaussPoints();
+		for (int j=0; j<nint; ++j) el.m_State[j]->ShallowCopy(dmp, bsave);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void FEShellDomain::Serialize(DumpFile &ar)
+{
+	if (ar.IsSaving())
+	{
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FEShellElement& el = m_Elem[i];
+			ar << el.Type();
+
+			ar << el.GetMatID();
+			ar << el.m_nrigid;
+			ar << el.m_nID;
+			ar << el.m_node;
+
+			ar << el.m_h0;
+
+			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
+		}
+	}
+	else
+	{
+		int n, mat;
+		FEModel& fem = *ar.GetFEModel();
+
+		for (size_t i=0; i<m_Elem.size(); ++i)
+		{
+			FEShellElement& el = m_Elem[i];
+			ar >> n;
+
+			el.SetType(n);
+
+			ar >> mat; el.SetMatID(mat);
+			ar >> el.m_nrigid;
+			ar >> el.m_nID;
+			ar >> el.m_node;
+
+			ar >> el.m_h0;
+
+			for (int j=0; j<el.GaussPoints(); ++j)
+			{
+				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
+				el.m_State[j]->Serialize(ar);
+			}
+		}
+	}
 }

@@ -15,17 +15,8 @@ public:
 	//! Clone this domain
 	FEDomain* Clone();
 
-	//! Reset element data
-	void Reset();
-
-	//! Initialize elements
-	void InitElements();
-
 	//! Initialize domain
 	bool Initialize(FEModel& fem);
-
-	//! Serialize domain data to archive
-	void Serialize(DumpFile& ar);
 
 	//! Unpack shell element data
 	void UnpackLM(FEElement& el, vector<int>& lm);

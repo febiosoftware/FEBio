@@ -28,6 +28,21 @@ void FERemodelingMaterialPoint::Init(bool bflag)
 }
 
 //-----------------------------------------------------------------------------
+void FERemodelingMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+        
+	if (bsave)
+	{
+		dmp << dsed << rhorp;
+	}
+	else
+	{
+		dmp >> dsed >> rhorp;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FERemodelingMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (m_pt) m_pt->Serialize(ar);

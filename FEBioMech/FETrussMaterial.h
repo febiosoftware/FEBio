@@ -14,6 +14,11 @@ public:
 		return pt;
 	}
 
+	void ShallowCopy(DumpStream& dmp, bool bsave)
+	{
+		if (bsave) { dmp << m_l << m_tau; } else { dmp >> m_l >> m_tau; }
+	}
+
 	void Serialize(DumpFile& ar)
 	{
 		if (m_pt) m_pt->Serialize(ar);

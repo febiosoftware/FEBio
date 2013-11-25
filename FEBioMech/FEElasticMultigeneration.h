@@ -28,6 +28,8 @@ public:
 	FEMaterialPoint* Copy();
 		
 	void Serialize(DumpFile& ar);
+
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 		
 	void Init(bool bflag);
 		

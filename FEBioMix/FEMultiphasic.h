@@ -16,6 +16,9 @@ public:
 	
 	//! serialize data
 	void Serialize(DumpFile& ar);
+
+	//! shallow copy
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 	
 	//! Initialize material point data
 	void Init(bool bflag);

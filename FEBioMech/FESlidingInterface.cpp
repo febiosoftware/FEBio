@@ -85,13 +85,23 @@ bool FESlidingSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingSurface::ShallowCopy(FESlidingSurface& s)
+void FESlidingSurface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	m_Lm  = s.m_Lm;
-	m_gap = s.m_gap;
-	zero(m_pme);
-	m_Lt  = s.m_Lt;
-	m_Ln = s.m_Ln;
+	if (bsave)
+	{
+		dmp << m_Lm;
+		dmp << m_gap;
+		dmp << m_Lt;
+		dmp << m_Ln;
+	}
+	else
+	{
+		zero(m_pme);
+		dmp >> m_Lm;
+		dmp >> m_gap;
+		dmp >> m_Lt;
+		dmp >> m_Ln;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1634,11 +1644,10 @@ void FESlidingInterface::UpdateContactPressures()
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterface::ShallowCopy(FESurfacePairInteraction& ci)
+void FESlidingInterface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FESlidingInterface& si = dynamic_cast<FESlidingInterface&>(ci);
-	m_ss.ShallowCopy(si.m_ss);
-	m_ms.ShallowCopy(si.m_ms);
+	m_ss.ShallowCopy(dmp, bsave);
+	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

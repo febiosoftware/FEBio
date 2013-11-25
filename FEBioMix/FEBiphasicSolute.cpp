@@ -19,6 +19,21 @@ FEMaterialPoint* FESoluteMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
+void FESoluteMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_c << m_gradc << m_j << m_ca << m_crc << m_crcp << m_crchat << m_crchatp;
+	}
+	else
+	{
+		dmp >> m_c >> m_gradc >> m_j >> m_ca >> m_crc >> m_crcp >> m_crchat >> m_crchatp;
+	}
+	
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+}
+
+//-----------------------------------------------------------------------------
 void FESoluteMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())

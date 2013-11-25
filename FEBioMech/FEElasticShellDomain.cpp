@@ -7,12 +7,6 @@
 //-----------------------------------------------------------------------------
 // FEElasticShellDomain
 //-----------------------------------------------------------------------------
-void FEElasticShellDomain::Reset()
-{
-	for (int i=0; i<(int) m_Elem.size(); ++i) m_Elem[i].Init(true);
-}
-
-//-----------------------------------------------------------------------------
 FEDomain* FEElasticShellDomain::Clone()
 {
 	FEElasticShellDomain* pd = new FEElasticShellDomain(m_pMesh, m_pMat);
@@ -65,65 +59,6 @@ bool FEElasticShellDomain::Initialize(FEModel& mdl)
 		}
 	}
 	return (bmerr == false);
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticShellDomain::InitElements()
-{
-	for (size_t i=0; i<m_Elem.size(); ++i)
-	{
-		FEShellElement& el = m_Elem[i];
-		int n = el.GaussPoints();
-		for (int j=0; j<n; ++j) el.m_State[j]->Init(false);
-	}
-}
-
-//-----------------------------------------------------------------------------
-void FEElasticShellDomain::Serialize(DumpFile &ar)
-{
-	if (ar.IsSaving())
-	{
-		for (size_t i=0; i<m_Elem.size(); ++i)
-		{
-			FEShellElement& el = m_Elem[i];
-			ar << el.Type();
-
-			ar << el.GetMatID();
-			ar << el.m_nrigid;
-			ar << el.m_nID;
-			ar << el.m_node;
-
-			ar << el.m_h0;
-
-			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
-		}
-	}
-	else
-	{
-		int n, mat;
-		FEModel& fem = *ar.GetFEModel();
-
-		for (size_t i=0; i<m_Elem.size(); ++i)
-		{
-			FEShellElement& el = m_Elem[i];
-			ar >> n;
-
-			el.SetType(n);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nrigid;
-			ar >> el.m_nID;
-			ar >> el.m_node;
-
-			ar >> el.m_h0;
-
-			for (int j=0; j<el.GaussPoints(); ++j)
-			{
-				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
-				el.m_State[j]->Serialize(ar);
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------

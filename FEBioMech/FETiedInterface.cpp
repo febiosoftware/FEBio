@@ -67,11 +67,10 @@ void FETiedInterface::Activate()
 }
 
 //-----------------------------------------------------------------------------
-void FETiedInterface::ShallowCopy(FESurfacePairInteraction& ci)
+void FETiedInterface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FETiedInterface& si = dynamic_cast<FETiedInterface&>(ci);
-	ss.ShallowCopy(si.ss);
-	ms.ShallowCopy(si.ms);
+	ss.ShallowCopy(dmp, bsave);
+	ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

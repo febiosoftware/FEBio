@@ -12,6 +12,7 @@
 #include "FEDomain.h"
 #include "DumpFile.h"
 #include "FENodeElemList.h"
+#include "DumpStream.h"
 
 //-----------------------------------------------------------------------------
 //  This class stores the coordinates of a bounding box
@@ -226,6 +227,9 @@ public:
 	//! assignment operator
 	FEMesh& operator = (FEMesh& m);
 
+	//! stream mesh data
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);
 	void AddNodes(int nodes);
@@ -314,6 +318,7 @@ public:
 	int Surfaces() { return (int) m_Surf.size(); }
 	FESurface& Surface(int n) { return *m_Surf[n]; }
 	void AddSurface(FESurface* ps) { m_Surf.push_back(ps); }
+
 
 protected:
 	double SolidElementVolume(FESolidElement& el);

@@ -170,53 +170,6 @@ void FEElasticSolidDomain::InitElements()
 }
 
 
-//-----------------------------------------------------------------------------
-void FEElasticSolidDomain::Serialize(DumpFile &ar)
-{
-	if (ar.IsSaving())
-	{
-		ar << m_Node;
-
-		for (size_t i=0; i<m_Elem.size(); ++i)
-		{
-			FESolidElement& el = m_Elem[i];
-			int nmat = el.GetMatID();
-			ar << el.Type();
-			
-			ar << nmat;
-			ar << el.m_nrigid;
-			ar << el.m_nID;
-			ar << el.m_node;
-
-			for (int j=0; j<el.GaussPoints(); ++j) el.m_State[j]->Serialize(ar);
-		}
-	}
-	else
-	{
-		ar >> m_Node;
-
-		FEModel& fem = *ar.GetFEModel();
-		int n, mat;
-		for (size_t i=0; i<m_Elem.size(); ++i)
-		{
-			FESolidElement& el = m_Elem[i];
-			ar >> n;
-
-			el.SetType(n);
-
-			ar >> mat; el.SetMatID(mat);
-			ar >> el.m_nrigid;
-			ar >> el.m_nID;
-			ar >> el.m_node;
-
-			for (int j=0; j<el.GaussPoints(); ++j)
-			{
-				el.SetMaterialPointData(fem.GetMaterial(el.GetMatID())->CreateMaterialPointData(), j);
-				el.m_State[j]->Serialize(ar);
-			}
-		}
-	}
-}
 /*
 //-----------------------------------------------------------------------------
 void FEElasticSolidDomain::Residual(FESolver *psolver, vector<double>& R)

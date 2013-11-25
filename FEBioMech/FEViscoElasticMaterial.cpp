@@ -56,6 +56,26 @@ void FEViscoElasticMaterialPoint::Init(bool bflag)
 
 //-----------------------------------------------------------------------------
 //! Serialize data to the archive
+void FEViscoElasticMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+
+	if (bsave)
+	{
+		dmp << m_se;
+		dmp << m_Sep;
+		for (int i=0; i<MAX_TERMS; ++i) dmp << m_H[i] << m_Hp[i];
+	}
+	else
+	{
+		dmp >> m_se;
+		dmp >> m_Sep;
+		for (int i=0; i<MAX_TERMS; ++i) dmp >> m_H[i] >> m_Hp[i];
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Serialize data to the archive
 void FEViscoElasticMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (m_pt) m_pt->Serialize(ar);

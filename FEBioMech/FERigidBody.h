@@ -44,7 +44,7 @@ public:
 	void Serialize(DumpFile& ar);
 
 	//! shallow copy
-	void ShallowCopy(FEObject* po);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! State managment
 	bool IsActive() { return m_bActive; }

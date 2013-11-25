@@ -58,14 +58,6 @@ bool FEFacetSlidingSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-//! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
-//!       Need to check if this achieves the same
-void FEFacetSlidingSurface::ShallowCopy(FEFacetSlidingSurface &s)
-{
-	m_Data = s.m_Data;
-}
-
-//-----------------------------------------------------------------------------
 vec3d FEFacetSlidingSurface::NetContactForce()
 {
 	// initialize contact force
@@ -97,6 +89,49 @@ vec3d FEFacetSlidingSurface::NetContactForce()
 	}
 	
 	return f;
+}
+
+//-----------------------------------------------------------------------------
+//! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
+//!       Need to check if this achieves the same
+void FEFacetSlidingSurface::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp << d.m_gap;
+				dmp << d.m_nu;
+				dmp << d.m_rs;
+				dmp << d.m_Lm;
+				dmp << d.m_eps;
+				dmp << d.m_Ln;
+			}
+		}
+	}
+	else
+	{
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp >> d.m_gap;
+				dmp >> d.m_nu;
+				dmp >> d.m_rs;
+				dmp >> d.m_Lm;
+				dmp >> d.m_eps;
+				dmp >> d.m_Ln;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -355,11 +390,10 @@ void FEFacet2FacetSliding::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetSliding::ShallowCopy(FESurfacePairInteraction &ci)
+void FEFacet2FacetSliding::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FEFacet2FacetSliding& si = dynamic_cast<FEFacet2FacetSliding&>(ci);
-	m_ss.ShallowCopy(si.m_ss);
-	m_ms.ShallowCopy(si.m_ms);
+	m_ss.ShallowCopy(dmp, bsave);
+	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

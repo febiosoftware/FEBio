@@ -16,6 +16,9 @@ public:
 	//! data serialization
 	void Serialize(DumpFile& ar);
 
+	//! shallow copy
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
 	//! Data initialization
 	void Init(bool bflag);
 

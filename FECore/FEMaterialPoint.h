@@ -2,6 +2,7 @@
 
 #include "mat3d.h"
 #include "DumpFile.h"
+#include "DumpStream.h"
 #include <vector>
 using namespace std;
 
@@ -27,17 +28,9 @@ public:
 
 	virtual void Serialize(DumpFile& ar) = 0;
 
-	template <class T>
-	T* ExtractData()
-	{
-		T* p = dynamic_cast<T*>(this);
-		if (p) return p; 
-		else
-		{
-			if (m_pt) return m_pt->ExtractData<T>();
-			else return 0;
-		}
-	}
+	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
+
+	template <class T> T* ExtractData();
 
 protected:
 	FEMaterialPoint*	m_pt;	//<! nested point data
@@ -46,3 +39,15 @@ public:
 	static double time;	// time value
 	static double dt; // time increment
 };
+
+//-----------------------------------------------------------------------------
+template <class T> inline T* FEMaterialPoint::ExtractData()
+{
+	T* p = dynamic_cast<T*>(this);
+	if (p) return p; 
+	else
+	{
+		if (m_pt) return m_pt->ExtractData<T>();
+		else return 0;
+	}
+}

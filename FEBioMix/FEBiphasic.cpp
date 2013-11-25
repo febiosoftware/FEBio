@@ -21,6 +21,21 @@ FEMaterialPoint* FEBiphasicMaterialPoint::Copy()
 }
 
 //-----------------------------------------------------------------------------
+void FEBiphasicMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_p << m_gradp << m_w << m_pa << m_phi0 << m_phi0p << m_phi0hat << m_phi0hatp;
+	}
+	else
+	{
+		dmp >> m_p >> m_gradp >> m_w >> m_pa >> m_phi0 >> m_phi0p >> m_phi0hat >> m_phi0hatp;
+	}
+
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+}
+
+//-----------------------------------------------------------------------------
 void FEBiphasicMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())

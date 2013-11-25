@@ -34,7 +34,7 @@ public:
 	bool Init();
 	
 	//! shallow copy
-	void ShallowCopy(FESlidingSurfaceBW& s);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 	
 	void Serialize(DumpFile& ar);
 
@@ -71,7 +71,7 @@ public:
 	void Update(int niter);
 	
 	//! Create a shallow copy
-	void ShallowCopy(FESurfacePairInteraction& ci);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 	
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);

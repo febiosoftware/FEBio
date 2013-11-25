@@ -51,9 +51,38 @@ bool FEFacetTiedSurface::Init()
 //-----------------------------------------------------------------------------
 //! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
 //!       Need to check if this achieves the same
-void FEFacetTiedSurface::ShallowCopy(FEFacetTiedSurface& s)
+void FEFacetTiedSurface::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	m_Data = s.m_Data;
+	if (bsave)
+	{
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp << d.m_gap;
+				dmp << d.m_rs;
+				dmp << d.m_Lm;
+			}
+		}
+	}
+	else
+	{
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp >> d.m_gap;
+				dmp >> d.m_rs;
+				dmp >> d.m_Lm;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -126,11 +155,10 @@ bool FEFacet2FacetTied::Init()
 }
 
 //-----------------------------------------------------------------------------
-void FEFacet2FacetTied::ShallowCopy(FESurfacePairInteraction& ci)
+void FEFacet2FacetTied::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FEFacet2FacetTied& si = dynamic_cast<FEFacet2FacetTied&>(ci);
-	m_ss.ShallowCopy(si.m_ss);
-	m_ms.ShallowCopy(si.m_ms);
+	m_ss.ShallowCopy(dmp, bsave);
+	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

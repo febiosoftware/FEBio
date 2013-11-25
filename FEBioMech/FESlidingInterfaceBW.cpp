@@ -70,9 +70,45 @@ void FESlidingSurfaceBW::InitProjection()
 //-----------------------------------------------------------------------------
 //! \todo Originally, we only copied Lmd, gap, Ln and reset pme to zero.
 //!       Need to check if this achieves the same
-void FESlidingSurfaceBW::ShallowCopy(FESlidingSurfaceBW &s)
+void FESlidingSurfaceBW::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	m_Data = s.m_Data;
+	// And finally, we serialize the surface data
+	if (bsave)
+	{
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp << d.m_gap;
+				dmp << d.m_nu;
+				dmp << d.m_rs;
+				dmp << d.m_Lmd;
+				dmp << d.m_epsn;
+				dmp << d.m_Ln;
+			}
+		}
+	}
+	else
+	{
+		for (int i=0; i<(int) m_Data.size(); ++i)
+		{
+			vector<Data>& di = m_Data[i];
+			int nint = (int) di.size();
+			for (int j=0; j<nint; ++j)
+			{
+				Data& d = di[j];
+				dmp >> d.m_gap;
+				dmp >> d.m_nu;
+				dmp >> d.m_rs;
+				dmp >> d.m_Lmd;
+				dmp >> d.m_epsn;
+				dmp >> d.m_Ln;
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -393,11 +429,10 @@ void FESlidingInterfaceBW::Update(int nsolve_iter)
 }
 
 //-----------------------------------------------------------------------------
-void FESlidingInterfaceBW::ShallowCopy(FESurfacePairInteraction &ci)
+void FESlidingInterfaceBW::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FESlidingInterfaceBW& si = dynamic_cast<FESlidingInterfaceBW&>(ci);
-	m_ss.ShallowCopy(si.m_ss);
-	m_ms.ShallowCopy(si.m_ms);
+	m_ss.ShallowCopy(dmp, bsave);
+	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

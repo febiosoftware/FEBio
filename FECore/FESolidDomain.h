@@ -47,6 +47,13 @@ public:
 	//! calculate jacobian in current frame
 	double detJt(FESolidElement& el, int n);
 
+public:
+	//! serialize data to archive
+	void Serialize(DumpFile& ar);
+
+	//! shallow copy
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
 protected:
 	vector<int>				m_Node;		//!< node list
 	vector<FESolidElement>	m_Elem;		//!< array of elements

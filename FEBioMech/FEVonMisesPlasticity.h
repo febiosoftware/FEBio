@@ -37,6 +37,21 @@ public:
 		if (m_pt) m_pt->Init(bflag);
 	}
 
+	void ShallowCopy(DumpStream& dmp, bool bsave)
+	{
+		if (bsave)
+		{
+			dmp << e0 << e1 << sn;
+			dmp << Y0 << Y1 << b;
+		}
+		else
+		{
+			dmp >> e0 >> e1 >> sn;
+			dmp >> Y0 >> Y1 >> b;
+		}
+		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	}
+
 	void Serialize(DumpFile& ar)
 	{
 		if (ar.IsSaving())

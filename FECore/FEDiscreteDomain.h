@@ -17,6 +17,12 @@ public:
 	int Nodes() { return (int) m_Node.size(); }
 	FENode& Node(int i);
 
+	//! create a shallow copy
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
+	//! Serialize data to archive
+	void Serialize(DumpFile& ar);
+
 protected:
 	vector<int>					m_Node;
 	vector<FEDiscreteElement>	m_Elem;

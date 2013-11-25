@@ -32,7 +32,7 @@ public:
 	bool Init();
 
 	//! create a shallow copy for running restarts
-	void ShallowCopy(FEFacetSlidingSurface& s);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! evaluate net contact force
 	vec3d NetContactForce();
@@ -67,7 +67,7 @@ public:
 	void Update(int niter);
 
 	//! Create a shallow copy
-	void ShallowCopy(FESurfacePairInteraction& ci);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);

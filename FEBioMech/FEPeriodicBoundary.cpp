@@ -53,6 +53,19 @@ vec3d FEPeriodicSurface::CenterOfMass()
 }
 
 //-----------------------------------------------------------------------------
+void FEPeriodicSurface::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_Lm << m_gap;
+	}
+	else
+	{
+		dmp >> m_Lm >> m_gap;
+	}
+}
+
+//-----------------------------------------------------------------------------
 void FEPeriodicSurface::Serialize(DumpFile& ar)
 {
 	FEContactSurface::Serialize(ar);
@@ -197,11 +210,10 @@ void FEPeriodicBoundary::Update(int niter)
 }
 
 //-----------------------------------------------------------------------------
-void FEPeriodicBoundary::ShallowCopy(FESurfacePairInteraction &ci)
+void FEPeriodicBoundary::ShallowCopy(DumpStream& dmp, bool bsave)
 {
-	FEPeriodicBoundary& si = dynamic_cast<FEPeriodicBoundary&>(ci);
-	m_ss.ShallowCopy(si.m_ss);
-	m_ms.ShallowCopy(si.m_ms);
+	m_ss.ShallowCopy(dmp, bsave);
+	m_ms.ShallowCopy(dmp, bsave);
 }
 
 //-----------------------------------------------------------------------------

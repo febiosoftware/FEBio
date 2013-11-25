@@ -27,7 +27,7 @@ public:
 	virtual void Update(int niter) = 0;
 
 	//! Create a shallow copy
-	virtual void ShallowCopy(FESurfacePairInteraction& ci) = 0;
+	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 
 	//! serialize data to archive
 	virtual void Serialize(DumpFile& ar) = 0;

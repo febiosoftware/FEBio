@@ -39,6 +39,21 @@ public:
 		if (m_pt) m_pt->Init(bflag);
 	}
 
+	void ShallowCopy(DumpStream& dmp, bool bsave)
+	{
+		if (bsave)
+		{
+			dmp << m_MEtrial << m_MEmax << m_Dm;
+			dmp << m_FEtrial << m_FEmax << m_Df;
+		}
+		else
+		{
+			dmp >> m_MEtrial >> m_MEmax >> m_Dm;
+			dmp >> m_FEtrial >> m_FEmax >> m_Df;
+		}
+		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+	}
+
 	void Serialize(DumpFile& ar)
 	{
 		if (ar.IsSaving())

@@ -256,6 +256,38 @@ void FESolutesMaterialPoint::Init(bool bflag)
 
 //-----------------------------------------------------------------------------
 //! Serialize material point data to the archive
+void FESolutesMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_nsol << m_psi << m_cF << m_Ie << m_nsbm;
+		for (int i=0; i<m_nsol; ++i) {
+			dmp << m_c[i] << m_gradc[i] << m_j[i] << m_ca[i]
+			<< m_k[i] << m_dkdJ[i];
+			for (int j=0; j<m_nsol; ++j)
+				dmp << m_dkdc[i][j];
+		}
+		for (int i=0; i<m_nsbm; ++i)
+			dmp << m_sbmr[i] << m_sbmrp[i] << m_sbmrhat[i];
+	}
+	else
+	{
+		dmp >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
+		for (int i=0; i<m_nsol; ++i) {
+			dmp >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
+			>> m_k[i] >> m_dkdJ[i];
+			for (int j=0; j<m_nsol; ++j)
+				dmp >> m_dkdc[i][j];
+		}
+		for (int i=0; i<m_nsbm; ++i)
+			dmp >> m_sbmr[i] >> m_sbmrp[i] >> m_sbmrhat[i];
+	}
+		
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+}
+
+//-----------------------------------------------------------------------------
+//! Serialize material point data to the archive
 void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())

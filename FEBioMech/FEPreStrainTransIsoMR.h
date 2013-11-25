@@ -13,6 +13,8 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	void ShallowCopy(DumpStream& dmp, bool bsave);
+
 public:
 	double	m_lam;	//!< in-situ fiber stretch
 	double	m_lamp;	//!< previous in-situ fiber stretch

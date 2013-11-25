@@ -64,6 +64,9 @@ bool FEMultiphasicDomain::Initialize(FEModel &mdl)
 			ps.m_c.assign(nsol,0);
 			ps.m_ca.assign(nsol,0);
 			ps.m_gradc.assign(nsol,0);
+			ps.m_k.assign(nsol, 0);
+			ps.m_dkdJ.assign(nsol, 0);
+			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
 			ps.m_j.assign(nsol,0);
 			ps.m_nsbm = nsbm;
 			ps.m_sbmr = sbmr;
@@ -118,6 +121,9 @@ void FEMultiphasicDomain::Reset()
 			ps.m_c.assign(nsol,0);
 			ps.m_ca.assign(nsol,0);
 			ps.m_gradc.assign(nsol,0);
+			ps.m_k.assign(nsol, 0);
+			ps.m_dkdJ.assign(nsol, 0);
+			ps.m_dkdc.resize(nsol, vector<double>(nsol,0));
 			ps.m_j.assign(nsol,0);
 			ps.m_nsbm = nsbm;
 			ps.m_sbmr = sbmr;

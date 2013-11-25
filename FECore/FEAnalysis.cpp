@@ -218,13 +218,16 @@ bool FEAnalysis::Solve()
 		if (m_bautostep) AutoTimeStep(0);
 	}
 
+	// dump stream for running restarts
+	DumpStream dmp;
+
 	// repeat for all timesteps
 	m_nretries = 0;
 	while (endtime - m_fem.m_ftime > eps)
 	{
 		// keep a copy of the current state, in case
 		// we need to retry this time step
-		if (m_bautostep) m_fem.PushState();
+		if (m_bautostep) { dmp.clear(); m_fem.ShallowCopy(dmp, true); }
 
 		// update time
 		m_fem.m_ftime += m_dt;
@@ -383,7 +386,8 @@ bool FEAnalysis::Solve()
 			if (m_bautostep && (m_nretries < m_maxretries))
 			{
 				// restore the previous state
-				m_fem.PopState();
+				dmp.set_position(0);
+				m_fem.ShallowCopy(dmp, false);
 				
 				// let's try again
 				Retry();

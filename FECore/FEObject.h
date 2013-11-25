@@ -27,7 +27,7 @@ public:
 	virtual void Serialize(DumpFile& ar) = 0;
 
 	//! shallow copy
-	virtual void ShallowCopy(FEObject* po) = 0;
+	virtual void ShallowCopy(DumpStream& dmp, bool bsave) = 0;
 
 	//! reset object data
 	virtual void Reset() = 0;

@@ -39,7 +39,7 @@ public:
 	bool Init();
 	
 	//! shallow copy
-	void ShallowCopy(FESlidingSurface3& s);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 	
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
@@ -83,7 +83,7 @@ public:
 	void Update(int niter);
 	
 	//! Create a shallow copy
-	void ShallowCopy(FESurfacePairInteraction& ci);
+	void ShallowCopy(DumpStream& dmp, bool bsave);
 	
 	//! calculate contact forces
 	void ContactForces(FEGlobalVector& R);

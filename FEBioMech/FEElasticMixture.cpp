@@ -29,6 +29,22 @@ void FEElasticMixtureMaterialPoint::Init(bool bflag)
 }
 
 //-----------------------------------------------------------------------------
+void FEElasticMixtureMaterialPoint::ShallowCopy(DumpStream& dmp, bool bsave)
+{
+	if (bsave)
+	{
+		dmp << m_w;
+	}
+	else
+	{
+		dmp >> m_w;
+	}
+	for (int i=0; i<(int)m_mp.size(); ++i) m_mp[i]->ShallowCopy(dmp, bsave);
+
+	if (m_pt) m_pt->ShallowCopy(dmp, bsave);
+}
+
+//-----------------------------------------------------------------------------
 void FEElasticMixtureMaterialPoint::Serialize(DumpFile& ar)
 {
 	if (ar.IsSaving())
