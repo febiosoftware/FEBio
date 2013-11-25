@@ -63,7 +63,7 @@ template <> inline DumpStream& DumpStream::operator >> (bool& o)
 	return *this;
 }
 
-template <typename T> DumpStream& DumpStream::operator << (std::vector<T>& o)
+template <typename T> inline DumpStream& DumpStream::operator << (std::vector<T>& o)
 {
 	DumpStream& This = *this;
 	int N = (int) o.size();
@@ -71,7 +71,7 @@ template <typename T> DumpStream& DumpStream::operator << (std::vector<T>& o)
 	return This;
 }
 
-template <typename T> DumpStream& DumpStream::operator >> (std::vector<T>& o)
+template <typename T> inline DumpStream& DumpStream::operator >> (std::vector<T>& o)
 {
 	DumpStream& This = *this;
 	int N = (int) o.size();
@@ -79,7 +79,7 @@ template <typename T> DumpStream& DumpStream::operator >> (std::vector<T>& o)
 	return This;
 }
 
-template <> DumpStream& DumpStream::operator << (std::vector<bool>& o)
+template <> inline DumpStream& DumpStream::operator << (std::vector<bool>& o)
 {
 	DumpStream& This = *this;
 	int N = (int) o.size();
@@ -91,7 +91,7 @@ template <> DumpStream& DumpStream::operator << (std::vector<bool>& o)
 	return This;
 }
 
-template <> DumpStream& DumpStream::operator >> (std::vector<bool>& o)
+template <> inline DumpStream& DumpStream::operator >> (std::vector<bool>& o)
 {
 	DumpStream& This = *this;
 	int N = (int) o.size();

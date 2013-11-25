@@ -65,7 +65,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 	}
 	catch (XMLReader::InvalidValue e)
 	{
-		fprintf(stderr, "FATAL ERROR: The element %s has an invalid value.\n\n", e.tag.Name(), e.tag.szvalue());
+		fprintf(stderr, "FATAL ERROR: The element %s has an invalid value (%s).\n\n", e.tag.Name(), e.tag.szvalue());
 		return false;
 	}
 	catch (...)
