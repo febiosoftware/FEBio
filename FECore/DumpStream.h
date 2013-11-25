@@ -20,9 +20,13 @@ public:
 
 	template <typename T> DumpStream& operator << (T& o);
 	template <typename T> DumpStream& operator >> (T& o);
+	template <> DumpStream& operator >> (bool& o);
+	template <> DumpStream& operator << (bool& o);
 
 	template <typename T> DumpStream& operator << (std::vector<T>& o);
 	template <typename T> DumpStream& operator >> (std::vector<T>& o);
+	template <> DumpStream& operator << (std::vector<bool>& o);
+	template <> DumpStream& operator >> (std::vector<bool>& o);
 
 protected:
 	void grow_buffer(int l);
@@ -48,6 +52,21 @@ template <typename T> inline DumpStream& DumpStream::operator >> (T& o)
 	return *this;
 }
 
+template <> inline DumpStream& DumpStream::operator << (bool& o)
+{
+	char b = (o==true?1:0);
+	write(&b, sizeof(char));
+	return *this;
+}
+
+template <> inline DumpStream& DumpStream::operator >> (bool& o)
+{
+	char b;
+	read(&b, sizeof(char));
+	o = (b==1);
+	return *this;
+}
+
 template <typename T> DumpStream& DumpStream::operator << (std::vector<T>& o)
 {
 	DumpStream& This = *this;
@@ -61,5 +80,30 @@ template <typename T> DumpStream& DumpStream::operator >> (std::vector<T>& o)
 	DumpStream& This = *this;
 	int N = (int) o.size();
 	for (int i=0; i<N; ++i) This >> o[i];
+	return This;
+}
+
+template <> DumpStream& DumpStream::operator << (std::vector<bool>& o)
+{
+	DumpStream& This = *this;
+	int N = (int) o.size();
+	for (int i=0; i<N; ++i) 
+	{
+		bool b = o[i];
+		This << b;
+	}
+	return This;
+}
+
+template <> DumpStream& DumpStream::operator >> (std::vector<bool>& o)
+{
+	DumpStream& This = *this;
+	int N = (int) o.size();
+	for (int i=0; i<N; ++i) 
+	{
+		bool b;
+		This >> b;
+		o[i] = b;
+	}
 	return This;
 }
