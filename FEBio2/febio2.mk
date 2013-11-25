@@ -20,7 +20,7 @@ NUMCORE = ../lib/numcore_$(PLAT).a
 FEBIO2LIBS = -Wl,--start-group $(FEBIOLIB) $(FEBIOPLOT) $(FEBIOHEAT) $(FEBIOMIX) $(FEBIOMECH) $(FEBIOXML) $(FECORE) $(NUMCORE) -Wl,--end-group
 
 $(TARGET):
-	$(CC) -o $(TARGET) $(DEF) *.cpp $(FLG) $(INC) $(FEBIO2LIBS) $(LIBS) -ldl -fPIC
+	$(CC) -o $(TARGET) $(DEF) *.cpp $(FLG) $(INC) $(FEBIO2LIBS) $(LIBS) -ldl -fPIC -static
 
 clean:
 	rm -f $(TARGET)

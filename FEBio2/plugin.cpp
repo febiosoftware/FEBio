@@ -64,8 +64,12 @@ typedef void (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
 
 bool LoadPlugin(const char* szfile)
 {
+  fprintf(stderr, "Inside LoadPlugin\n");
+
 	// load the library
-	void* hlib = dlopen(szfile, RTLD_NOW | RTLD_GLOBAL);
+	void* hlib = dlopen(szfile, RTLD_NOW);
+
+	fprintf(stderr, "dlopen call returned\n");
 
 	if (hlib == NULL) return false;
 

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FEChemicalReaction.h"
 #include "FECore/FEElementTraits.h"
+#include <stdlib.h>
+
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEChemicalReaction, FEMaterial)

@@ -57,7 +57,7 @@
 #ifdef WIN32
 extern "C" void __cdecl omp_set_num_threads(int);
 #else
-extern "C" void omp_set_num_threads(int);
+//extern "C" void omp_set_num_threads(int);
 #endif
 
 //-----------------------------------------------------------------------------
@@ -513,7 +513,7 @@ bool Configure(FEBioModel& fem, const char *szfile)
 					{
 						int n;
 						tag.value(n);
-						omp_set_num_threads(n);
+						  //						omp_set_num_threads(n);
 					}
 					else throw XMLReader::InvalidTag(tag);
 

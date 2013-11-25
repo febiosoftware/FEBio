@@ -20,13 +20,9 @@ public:
 
 	template <typename T> DumpStream& operator << (T& o);
 	template <typename T> DumpStream& operator >> (T& o);
-	template <> DumpStream& operator >> (bool& o);
-	template <> DumpStream& operator << (bool& o);
 
 	template <typename T> DumpStream& operator << (std::vector<T>& o);
 	template <typename T> DumpStream& operator >> (std::vector<T>& o);
-	template <> DumpStream& operator << (std::vector<bool>& o);
-	template <> DumpStream& operator >> (std::vector<bool>& o);
 
 protected:
 	void grow_buffer(int l);

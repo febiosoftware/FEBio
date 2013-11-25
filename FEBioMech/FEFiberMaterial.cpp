@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "FEFiberMaterial.h"
 #include "FEElasticMaterial.h"
+#include <stdlib.h>
+
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FEActiveFiberContraction, FEMaterial);

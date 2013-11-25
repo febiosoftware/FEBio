@@ -60,14 +60,14 @@ INC = -I$(INTEL_INC) -I..
 # Linking Pardiso from the MKL depends on your machine architecture and the version of the MKL.
 # This example is for the MKL 10.2.3 on a 64bit linux machine.  See the MKL documentation
 # for your architecture and MKL version.
-DEF += -DPARDISO
-DEFD += -DPARDISO
+#DEF += -DPARDISO
+#DEFD += -DPARDISO
 # Put the path to the MKL library directory here
 MKL_PATH = /usr/sci/linux64/intel/Compiler/2012/mkl/lib/intel64
 MKL_LIB = -L$(MKL_PATH) -Wl,--start-group -lmkl_intel_lp64 
 MKL_LIB += -lmkl_intel_thread -lmkl_core -Wl,--end-group
 MKL_LIB += -liomp5 -pthread
-LIBS += $(MKL_LIB)
+#LIBS += $(MKL_LIB)
 
 # Includes
 #INC += -I../FEBioLib -I../FEBioPlot -I../FEBioXML -I../NumCore -I../FECore -I../FEBioHeat -I../FEBioMix -I../FEBioMech
