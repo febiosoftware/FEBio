@@ -24,25 +24,29 @@ class FEElementTraits;
 class FEElementLibrary  
 {
 public:
-	//! constructor
-	FEElementLibrary();
-
 	//! destructor
-	virtual ~FEElementLibrary();
+	~FEElementLibrary();
 
-	//! Function to register an element traits class
-	int RegisterTraits(FEElementTraits* ptrait);
+	//! return the element library
+	static FEElementLibrary* GetInstance();
 
 	//! Assign a traits class to an element
 	static void SetElementTraits(FEElement& el, int id);
 
 	//! return element traits data
-	static FEElementTraits* GetElementTraits(int ntype) { return m_Traits[ntype]; }
+	static FEElementTraits* GetElementTraits(int ntype);
 
-protected:
-	static std::vector<FEElementTraits*>	m_Traits;	//!< pointer to registered element traits
+private:
+	//! constructor
+	FEElementLibrary(){}
+	FEElementLibrary(const FEElementLibrary&){}
+
+	//! Function to register an element traits class
+	int RegisterTraits(FEElementTraits* ptrait);
+
+private:
+	std::vector<FEElementTraits*>	m_Traits;	//!< pointer to registered element traits
+	static FEElementLibrary*	m_pThis;
 };
-
-extern FEElementLibrary	elem_lib;
 
 #endif // !defined(AFX_FEELEMENTLIBRARY_H__3DB47576_A8D2_48BC_A48A_FD247DD84B43__INCLUDED_)
