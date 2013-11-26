@@ -281,7 +281,6 @@ bool FEAnalysis::Solve()
 		// solve this timestep,
 		try
 		{
-			int oldmode = 0;
 			bconv = m_psolver->SolveStep(m_fem.m_ftime);
 		}
 		catch (ExitRequest)

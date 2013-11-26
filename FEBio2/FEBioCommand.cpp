@@ -230,7 +230,7 @@ int FEBioCmd_Time::run(int nargs, char **argv)
 		printf("Est. time remaining:  %d:%02d:%02d\n", nhour, nmin, nsec);
 	}
 	else
-		printf("Est. time remaining:  (not available)\n", nhour, nmin, nsec);
+		printf("Est. time remaining:  (not available)\n");
 
 	return 0;
 }
