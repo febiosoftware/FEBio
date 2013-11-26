@@ -232,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\DumpStream.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\ElementDataRecord.cpp"
 				>
 			</File>
@@ -475,6 +479,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\DumpFile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\DumpStream.h"
 				>
 			</File>
 			<File
