@@ -526,44 +526,44 @@ bool FEExplicitSolidSolver::SolveStep(double time)
 	catch (NegativeJacobian e)
 	{
 		// A negative jacobian was detected
-		clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
+		felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 		if (m_fem.GetDebugFlag()) m_fem.Write();
 		return false;
 	}
 	catch (MaxStiffnessReformations)
 	{
 		// max nr of reformations is reached
-		clog.printbox("ERROR", "Max nr of reformations reached.");
+		felog.printbox("ERROR", "Max nr of reformations reached.");
 		return false;
 	}
 	catch (ForceConversion)
 	{
 		// user forced conversion of problem
-		clog.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
+		felog.printbox("WARNING", "User forced conversion.\nSolution might not be stable.");
 		return true;
 	}
 	catch (IterationFailure)
 	{
 		// user caused a forced iteration failure
-		clog.printbox("WARNING", "User forced iteration failure.");
+		felog.printbox("WARNING", "User forced iteration failure.");
 		return false;
 	}
 	catch (ZeroLinestepSize)
 	{
 		// a zero line step size was detected
-		clog.printbox("ERROR", "Zero line step size.");
+		felog.printbox("ERROR", "Zero line step size.");
 		return false;
 	}
 	catch (EnergyDiverging)
 	{
 		// problem was diverging after stiffness reformation
-		clog.printbox("ERROR", "Problem diverging uncontrollably.");
+		felog.printbox("ERROR", "Problem diverging uncontrollably.");
 		return false;
 	}
 	catch (FEMultiScaleException)
 	{
 		// the RVE problem didn't solve
-		clog.printbox("ERROR", "The RVE problem has failed. Aborting macro run.");
+		felog.printbox("ERROR", "The RVE problem has failed. Aborting macro run.");
 		return false;
 	}
 
@@ -958,14 +958,14 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 
 	m_R0 += m_Fd;
 
-	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
+	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
-	Logfile::MODE oldmode = clog.GetMode();
+	Logfile::MODE oldmode = felog.GetMode();
 	if ((pstep->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-		(pstep->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+		(pstep->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
 
-	clog.printf(" %d\n", m_niter+1);
-	clog.SetMode(oldmode);
+	felog.printf(" %d\n", m_niter+1);
+	felog.SetMode(oldmode);
 
 	// get the mesh
 	FEMesh& mesh = m_fem.GetMesh();
@@ -1005,21 +1005,21 @@ bool FEExplicitSolidSolver::DoSolve(double time)
 	m_niter++;
 
 	// let's flush the logfile to make sure the last output will not get lost
-	clog.flush();
+	felog.flush();
 
 	// do minor iterations callbacks
 	m_fem.DoCallback(CB_MINOR_ITERS);
 
 	// when converged, 
-	// print a convergence summary to the clog file
-	Logfile::MODE mode = clog.SetMode(Logfile::FILE_ONLY);
+	// print a convergence summary to the felog file
+	Logfile::MODE mode = felog.SetMode(Logfile::FILE_ONLY);
 	if (mode != Logfile::NEVER)
 	{
-		clog.printf("\nconvergence summary\n");
-		clog.printf("    number of iterations   : %d\n", m_niter);
-		clog.printf("    number of reformations : %d\n", m_nref);
+		felog.printf("\nconvergence summary\n");
+		felog.printf("    number of iterations   : %d\n", m_niter);
+		felog.printf("    number of reformations : %d\n", m_nref);
 	}
-	clog.SetMode(mode);
+	felog.SetMode(mode);
 
 	// if converged we update the total displacements
 	m_Ut += m_Ui;

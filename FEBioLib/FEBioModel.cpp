@@ -251,12 +251,12 @@ void FEBioModel::DumpData()
 	DumpFile ar(this);
 	if (ar.Create(m_szdump) == false)
 	{
-		clog.printf("WARNING: Failed creating restart point.\n");
+		felog.printf("WARNING: Failed creating restart point.\n");
 	}
 	else 
 	{
 		Serialize(ar);
-		clog.printf("\nRestart point created. Archive name is %s\n", m_szdump);
+		felog.printf("\nRestart point created. Archive name is %s\n", m_szdump);
 	}
 }
 
@@ -1088,21 +1088,21 @@ void Hello();
 bool FEBioModel::Init()
 {
 	// Open the logfile
-	if (!clog.is_valid()) 
+	if (!felog.is_valid()) 
 	{
-		if (clog.open(m_szlog) == false)
+		if (felog.open(m_szlog) == false)
 		{
-			clog.printbox("FATAL ERROR", "Failed creating log file");
+			felog.printbox("FATAL ERROR", "Failed creating log file");
 			return false;
 		}
 
 		// if we don't want to output anything we only output to the logfile
-		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) clog.SetMode(Logfile::FILE_ONLY);
+		if (m_pStep->GetPrintLevel() == FE_PRINT_NEVER) felog.SetMode(Logfile::FILE_ONLY);
 
 		// print welcome message to file
-		Logfile::MODE m = clog.SetMode(Logfile::FILE_ONLY);
+		Logfile::MODE m = felog.SetMode(Logfile::FILE_ONLY);
 		Hello();
-		clog.SetMode(m);
+		felog.SetMode(m);
 	}
 
 	// initialize model data
@@ -1152,7 +1152,7 @@ bool FEBioModel::Init()
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
-			clog.printf("ERROR : Failed creating PLOT database\n");
+			felog.printf("ERROR : Failed creating PLOT database\n");
 			return false;
 		}
 	}
@@ -1191,7 +1191,7 @@ bool FEBioModel::Reset()
 
 		if (m_plot->Open(*this, m_szplot) == false)
 		{
-			clog.printf("ERROR : Failed creating PLOT database\n");
+			felog.printf("ERROR : Failed creating PLOT database\n");
 			return false;
 		}
 	}
@@ -1478,7 +1478,7 @@ bool FEBioModel::CreateRigidBodies()
 				pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBa));
 				if (pm == 0)
 				{
-					clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+					felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
 					return false;
 				}
 				rj.m_nRBa = pm->m_nRB;
@@ -1486,7 +1486,7 @@ bool FEBioModel::CreateRigidBodies()
 				pm = dynamic_cast<FERigidMaterial*> (GetMaterial(rj.m_nRBb));
 				if (pm == 0)
 				{
-					clog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
+					felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", i+1);
 					return false;
 				}
 				rj.m_nRBb = pm->m_nRB;
@@ -1648,17 +1648,17 @@ bool FEBioModel::InitMesh()
 					double J0 = pbd->detJ0(el, n);
 					if (J0 <= 0)
 					{
-						clog.printf("**************************** E R R O R ****************************\n");
-						clog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-						clog.printf("Jacobian = %lg\n", J0);
-						clog.printf("Did you use the right node numbering?\n");
-						clog.printf("Nodes:");
+						felog.printf("**************************** E R R O R ****************************\n");
+						felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+						felog.printf("Jacobian = %lg\n", J0);
+						felog.printf("Did you use the right node numbering?\n");
+						felog.printf("Nodes:");
 						for (int l=0; l<el.Nodes(); ++l)
 						{
-							clog.printf("%d", el.m_node[l]+1);
-							if (l+1 != el.Nodes()) clog.printf(","); else clog.printf("\n");
+							felog.printf("%d", el.m_node[l]+1);
+							if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
 						}
-						clog.printf("*******************************************************************\n\n");
+						felog.printf("*******************************************************************\n\n");
 						++ninverted;
 					}
 				}
@@ -1722,17 +1722,17 @@ bool FEBioModel::InitMesh()
 						double J0 = psd->detJ0(el, n);
 						if (J0 <= 0)
 						{
-							clog.printf("**************************** E R R O R ****************************\n");
-							clog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-							clog.printf("Jacobian = %lg\n", J0);
-							clog.printf("Did you use the right node numbering?\n");
-							clog.printf("Nodes:");
+							felog.printf("**************************** E R R O R ****************************\n");
+							felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+							felog.printf("Jacobian = %lg\n", J0);
+							felog.printf("Did you use the right node numbering?\n");
+							felog.printf("Nodes:");
 							for (int l=0; l<el.Nodes(); ++l)
 							{
-								clog.printf("%d", el.m_node[l]+1);
-								if (l+1 != el.Nodes()) clog.printf(","); else clog.printf("\n");
+								felog.printf("%d", el.m_node[l]+1);
+								if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
 							}
-							clog.printf("*******************************************************************\n\n");
+							felog.printf("*******************************************************************\n\n");
 							++ninverted;
 						}
 					}
@@ -1744,10 +1744,10 @@ bool FEBioModel::InitMesh()
 	// report number of inverted elements
 	if (ninverted != 0)
 	{
-		clog.printf("**************************** E R R O R ****************************\n");
-		clog.printf(" FEBio found %d initially inverted elements.\n", ninverted);
-		clog.printf(" Run will be aborted.\n");
-		clog.printf("*******************************************************************\n\n");
+		felog.printf("**************************** E R R O R ****************************\n");
+		felog.printf(" FEBio found %d initially inverted elements.\n", ninverted);
+		felog.printf(" Run will be aborted.\n");
+		felog.printf("*******************************************************************\n\n");
 		return false;
 	}
 
@@ -1861,7 +1861,7 @@ bool FEBioModel::InitPoroSolute()
 //		if (m_pStep->m_psolver->m_bfgs.m_maxups != 0)
 //		{
 //			m_pStep->m_psolver->m_bfgs.m_maxups = 0;
-//			clog.printbox("WARNING", "The non-symmetric solver algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
+//			felog.printbox("WARNING", "The non-symmetric solver algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
 //		}
 	}
 */	
@@ -2049,19 +2049,19 @@ bool FEBioModel::Solve()
 	// get and print elapsed time
 	char sztime[64];
 	m_TotalTime.time_str(sztime);
-	clog.printf("\n Elapsed time : %s\n\n", sztime);
+	felog.printf("\n Elapsed time : %s\n\n", sztime);
 
 	if (bconv)
 	{
-		clog.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
+		felog.printf("\n N O R M A L   T E R M I N A T I O N\n\n");
 	}
 	else
 	{
-		clog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
+		felog.printf("\n E R R O R   T E R M I N A T I O N\n\n");
 	}
 
 	// flush the log file
-	clog.flush();
+	felog.flush();
 
 	// We're done !
 	return bconv;
@@ -2115,15 +2115,15 @@ bool FEBioModel::Restart(const char* szfile)
 	}
 
 	// Open the log file for appending
-	if (clog.append(m_szlog) == false)
+	if (felog.append(m_szlog) == false)
 	{
 		printf("WARNING: Could not reopen log file. A new log file is created\n");
-		clog.open(m_szlog);
+		felog.open(m_szlog);
 		return false;
 	}
 
 	// inform the user from where the problem is restarted
-	clog.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", m_ftime);
+	felog.printbox(" - R E S T A R T -", "Restarting from time %lg.\n", m_ftime);
 
 	return true;
 }

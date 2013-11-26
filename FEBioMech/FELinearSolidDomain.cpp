@@ -64,7 +64,7 @@ bool FELinearSolidDomain::Initialize(FEModel &mdl)
 				if (fabs(m.det() - 1) > 1e-7)
 				{
 					// this element did not get specified a user-defined fiber direction
-//					clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+//					felog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
 					bmerr = true;
 				}
 			}

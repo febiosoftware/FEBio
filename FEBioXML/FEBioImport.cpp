@@ -84,7 +84,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	}
 	catch (...)
 	{
-		clog.printf("An error occured while finding the febio_spec tag.\nIs this a valid FEBio input file?\n\n");
+		felog.printf("An error occured while finding the febio_spec tag.\nIs this a valid FEBio input file?\n\n");
 		return false;
 	}
 
@@ -174,7 +174,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	// --- XML Reader Exceptions ---
 	catch (XMLReader::XMLSyntaxError)
 	{
-		clog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
+		felog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 	catch (XMLReader::InvalidAttributeValue e)
@@ -183,75 +183,75 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		const char* sza = e.szatt;
 		const char* szv = e.szval;
 		int l = e.tag.m_nstart_line;
-		clog.printf("FATAL ERROR: invalid value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
+		felog.printf("FATAL ERROR: invalid value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
 		return false;
 	}
 	catch (XMLReader::InvalidValue e)
 	{
-		clog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::MissingAttribute e)
 	{
-		clog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::UnmatchedEndTag e)
 	{
 		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
-		clog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
 		return false;
 	}
 	// --- FEBio Exceptions ---
 	catch (InvalidVersion)
 	{
-		clog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
+		felog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
 		return false;
 	}
 	catch (InvalidMaterial e)
 	{
-		clog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
+		felog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
 		return false;
 	}
 	catch (XMLReader::InvalidTag e)
 	{
-		clog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (InvalidDomainType)	
 	{
-		clog.printf("Fatal Error: Invalid domain type\n");
+		felog.printf("Fatal Error: Invalid domain type\n");
 		return false;
 	}
 	catch (FailedCreatingDomain)
 	{
-		clog.printf("Fatal Error: Failed creating domain\n");
+		felog.printf("Fatal Error: Failed creating domain\n");
 		return false;
 	}
 	catch (InvalidElementType)
 	{
-		clog.printf("Fatal Error: Invalid element type\n");
+		felog.printf("Fatal Error: Invalid element type\n");
 		return false;
 	}
 	catch (FailedLoadingPlugin e)
 	{
-		clog.printf("Fatal Error: failed loading plugin %s\n", e.FileName());
+		felog.printf("Fatal Error: failed loading plugin %s\n", e.FileName());
 		return false;
 	}
 	catch (UnknownDataField e)
 	{
-		clog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
+		felog.printf("Fatal Error: \"%s\" is not a valid field variable name (line %d)\n", e.m_szdata, xml.GetCurrentLine()-1);
 		return false;
 	}
 	catch (DuplicateMaterialSection)
 	{
-		clog.printf("Fatal Error: Material section has already been defined (line %d).\n", xml.GetCurrentLine()-1);
+		felog.printf("Fatal Error: Material section has already been defined (line %d).\n", xml.GetCurrentLine()-1);
 		return false;
 	}
 	// --- Unknown exceptions ---
 	catch (...)
 	{
-		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		felog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 
@@ -375,7 +375,7 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 				}
 			}
 			// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
-//			else clog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
+//			else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}
 
 		// give the parameter container a chance to do additional processing

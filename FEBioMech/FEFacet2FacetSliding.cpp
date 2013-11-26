@@ -246,7 +246,7 @@ void FEFacet2FacetSliding::Activate()
 	// since friction has not been implemented yet
 	if ((m_mu != 0) || (m_epsf != 0))
 	{
-		clog.printbox("WARNING", "Friction has NOT been implemented yet for facet-to-facet contact\ninterfaces. Friction parameters are ignored.");
+		felog.printbox("WARNING", "Friction has NOT been implemented yet for facet-to-facet contact\ninterfaces. Friction parameters are ignored.");
 		m_mu = 0;
 		m_epsf = 0;
 	}
@@ -571,7 +571,7 @@ void FEFacet2FacetSliding::ContactStiffness(FESolver* psolver)
 		if (nref >= ni)
 		{
 			knmult = 1; 
-			clog.printf("Higher order stiffness terms included.\n");
+			felog.printf("Higher order stiffness terms included.\n");
 		}
 		else knmult = 0;
 	}
@@ -990,12 +990,12 @@ bool FEFacet2FacetSliding::Augment(int naug)
 	if (normL1 != 0) lnorm = fabs(normL1 - normL0)/normL1; else lnorm = fabs(normL1 - normL0);
 	if (normg1 != 0) gnorm = fabs(normg1 - m_normg0)/normg1; else gnorm = fabs(normg1 - m_normg0);
 
-	clog.printf(" sliding interface # %d\n", m_nID);
-	clog.printf("                        CURRENT        REQUIRED\n");
-	clog.printf("    normal force : %15le", lnorm);
-	if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n");
-	clog.printf("    gap function : %15le", gnorm);
-	if (m_gtol > 0) clog.printf("%15le\n", m_gtol); else clog.printf("       ***\n");
+	felog.printf(" sliding interface # %d\n", m_nID);
+	felog.printf("                        CURRENT        REQUIRED\n");
+	felog.printf("    normal force : %15le", lnorm);
+	if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
+	felog.printf("    gap function : %15le", gnorm);
+	if (m_gtol > 0) felog.printf("%15le\n", m_gtol); else felog.printf("       ***\n");
 
 	// check convergence
 	bconv = true;

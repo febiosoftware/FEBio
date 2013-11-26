@@ -110,7 +110,7 @@ bool DataRecord::Write()
 	double ftime = m_pfem->m_ftime;
 	double val;
 
-	FILE* fplog = (FILE*) clog;
+	FILE* fplog = (FILE*) felog;
 
 	// make a note in the log file
 	fprintf(fplog, "\nData Record #%d\n", m_nid);

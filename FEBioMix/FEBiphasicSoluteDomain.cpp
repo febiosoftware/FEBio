@@ -1697,7 +1697,7 @@ void FEBiphasicSoluteDomain::UpdateStresses(FEModel &fem)
 		catch (NegativeJacobian e)
 		{
 			// A negative jacobian was detected
-			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
+			felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 			#pragma omp critical
 			berr = true;
 		}

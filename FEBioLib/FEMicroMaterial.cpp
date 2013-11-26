@@ -112,8 +112,8 @@ void FEMicroMaterial::PrepRVE()
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
-	Logfile::MODE nmode = clog.GetMode();
-	clog.SetMode(Logfile::NEVER);
+	Logfile::MODE nmode = felog.GetMode();
+	felog.SetMode(Logfile::NEVER);
 
 	// initialize RVE
 	m_rve.Init();
@@ -140,7 +140,7 @@ void FEMicroMaterial::PrepRVE()
 	}
 
 	// reset the logfile mode
-	clog.SetMode(nmode);
+	felog.SetMode(nmode);
 }
 
 //-----------------------------------------------------------------------------
@@ -153,8 +153,8 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	// the logfile is a shared resource between the master FEM and the RVE
 	// in order not to corrupt the logfile we don't print anything for
 	// the RVE problem.
-	Logfile::MODE nmode = clog.GetMode();
-	clog.SetMode(Logfile::NEVER);
+	Logfile::MODE nmode = felog.GetMode();
+	felog.SetMode(Logfile::NEVER);
 
 	// reset the RVE
 	m_rve.Reset();
@@ -184,7 +184,7 @@ mat3ds FEMicroMaterial::Stress(FEMaterialPoint &mp)
 	bool bret = m_rve.Solve();
 
 	// reset the logfile mode
-	clog.SetMode(nmode);
+	felog.SetMode(nmode);
 
 	if (bret == false) throw FEMultiScaleException();
 

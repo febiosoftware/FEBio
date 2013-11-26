@@ -227,12 +227,12 @@ bool FERigidJoint::Augment(int naug)
 	normF1 = sqrt(Lm*Lm);
 
 	// check convergence of constraints
-	clog.printf(" rigid joint # %d\n", m_nID);
-	clog.printf("                  CURRENT        REQUIRED\n");
+	felog.printf(" rigid joint # %d\n", m_nID);
+	felog.printf("                  CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normF1) > 1e-10) pctn = fabs((normF1 - normF0)/normF1);
-	clog.printf("    force : %15le %15le\n", pctn, m_atol);
-	clog.printf("    gap   : %15le       ***\n", c.norm());
+	felog.printf("    force : %15le %15le\n", pctn, m_atol);
+	felog.printf("    gap   : %15le       ***\n", c.norm());
 		
 	if (pctn >= m_atol)
 	{

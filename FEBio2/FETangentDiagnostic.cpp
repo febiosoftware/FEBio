@@ -17,20 +17,20 @@ void print_matrix(matrix& m)
 	int N = m.rows();
 	int M = m.columns();
 
-	clog.printf("\n    ");
-	for (i=0; i<N; ++i) clog.printf("%15d ", i);
-	clog.printf("\n----");
-	for (i=0; i<N; ++i) clog.printf("----------------", i);
+	felog.printf("\n    ");
+	for (i=0; i<N; ++i) felog.printf("%15d ", i);
+	felog.printf("\n----");
+	for (i=0; i<N; ++i) felog.printf("----------------", i);
 
 	for (i=0; i<N; ++i)
 	{
-		clog.printf("\n%2d: ", i);
+		felog.printf("\n%2d: ", i);
 		for (j=0; j<M; ++j)
 		{
-			clog.printf("%15lg ", m[i][j]);
+			felog.printf("%15lg ", m[i][j]);
 		}
 	}
-	clog.printf("\n");
+	felog.printf("\n");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ void FETangentDiagnostic::BuildSimpleShear()
 // of the element residual.
 bool FETangentDiagnostic::Run()
 {
-	Logfile::MODE oldmode = clog.SetMode(Logfile::FILE_ONLY);
+	Logfile::MODE oldmode = felog.SetMode(Logfile::FILE_ONLY);
 
 	// solve the problem
 	m_fem.Solve();
@@ -224,7 +224,7 @@ bool FETangentDiagnostic::Run()
 	bd.ElementStiffness(m_fem, 0, k0);
 
 	// print the element stiffness matrix
-	clog.printf("\nActual stiffness matrix:\n");
+	felog.printf("\nActual stiffness matrix:\n");
 	print_matrix(k0);
 
 	// now calculate the derivative of the residual
@@ -232,11 +232,11 @@ bool FETangentDiagnostic::Run()
 	deriv_residual(k1);
 
 	// print the approximate element stiffness matrix
-	clog.printf("\nApproximate stiffness matrix:\n");
+	felog.printf("\nApproximate stiffness matrix:\n");
 	print_matrix(k1);
 
 	// finally calculate the difference matrix
-	clog.printf("\n");
+	felog.printf("\n");
 	matrix kd(24, 24);
 	double kmax = 0, kij;
 	int i0 = -1, j0 = -1, i, j;
@@ -254,12 +254,12 @@ bool FETangentDiagnostic::Run()
 		}
 
 	// print the difference
-	clog.printf("\ndifference matrix:\n");
+	felog.printf("\ndifference matrix:\n");
 	print_matrix(kd);
 
-	clog.SetMode(oldmode);
+	felog.SetMode(oldmode);
 
-	clog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	felog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
 
 	return (kmax < 1e-4);
 }

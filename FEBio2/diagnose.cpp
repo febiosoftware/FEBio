@@ -46,13 +46,13 @@ bool diagnose(FEModel& fem, const char* szfile)
 	}
 	catch (...)
 	{
-		clog.SetMode(Logfile::FILE_AND_SCREEN);
-		clog.printf("Exception thrown. Aborting diagnostic.\n");
+		felog.SetMode(Logfile::FILE_AND_SCREEN);
+		felog.printf("Exception thrown. Aborting diagnostic.\n");
 		bret = false;
 	}
 
-	if (bret) clog.printf("Diagnostic passed\n");
-	else clog.printf("Diagnostic failed\n");
+	if (bret) felog.printf("Diagnostic passed\n");
+	else felog.printf("Diagnostic failed\n");
 
 	return bret;
 }

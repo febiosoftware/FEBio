@@ -60,9 +60,9 @@ bool FEModel::Init()
 	for (int i=0; i<(int) m_Step.size(); ++i)
 	{
 		FEAnalysis& step = *m_Step[i];
-		if ((step.m_ntime <= 0) && (step.m_final_time <= 0.0)) { clog.printf("Invalid number of time steps for analysis step %d", i+1); return false; }
-		if ((step.m_ntime >  0) && (step.m_final_time >  0.0)) { clog.printf("You must either set the number of time steps or the final time but not both.\n"); return false; }
-		if (step.m_dt0   <= 0) { clog.printf("Invalid time step size for analysis step %d", i+1); return false; }
+		if ((step.m_ntime <= 0) && (step.m_final_time <= 0.0)) { felog.printf("Invalid number of time steps for analysis step %d", i+1); return false; }
+		if ((step.m_ntime >  0) && (step.m_final_time >  0.0)) { felog.printf("You must either set the number of time steps or the final time but not both.\n"); return false; }
+		if (step.m_dt0   <= 0) { felog.printf("Invalid time step size for analysis step %d", i+1); return false; }
 		if (step.m_bautostep)
 		{
 //			if (m_pStep->m_dtmin <= 0) return err("Invalid minimum time step size");
@@ -85,9 +85,9 @@ bool FEModel::Init()
 	if (ni != 0) 
 	{
 		if (ni == 1)
-			clog.printbox("WARNING", "%d isolated vertex removed.", ni);
+			felog.printbox("WARNING", "%d isolated vertex removed.", ni);
 		else
-			clog.printbox("WARNING", "%d isolated vertices removed.", ni);
+			felog.printbox("WARNING", "%d isolated vertices removed.", ni);
 	}
 
 	return true;
@@ -110,23 +110,23 @@ bool FEModel::InitMaterials()
 		}
 		catch (MaterialError e)
 		{
-			clog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			clog.printf("ERROR: %s\n\n", e.Error());
+			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			felog.printf("ERROR: %s\n\n", e.Error());
 			return false;
 		}
 		catch (MaterialRangeError e)
 		{
-			clog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
-			clog.printf("ERROR: parameter \"%s\" out of range ", e.m_szvar);
-			if (e.m_bl) clog.printf("["); else clog.printf("(");
-			clog.printf("%lg, %lg", e.m_vmin, e.m_vmax);
-			if (e.m_br) clog.printf("]"); else clog.printf(")");
-			clog.printf("\n\n");
+			felog.printf("Failed initializing material %d (name=\"%s\"):\n", i+1, pmat->GetName());
+			felog.printf("ERROR: parameter \"%s\" out of range ", e.m_szvar);
+			if (e.m_bl) felog.printf("["); else felog.printf("(");
+			felog.printf("%lg, %lg", e.m_vmin, e.m_vmax);
+			if (e.m_br) felog.printf("]"); else felog.printf(")");
+			felog.printf("\n\n");
 			return false;
 		}
 		catch (...)
 		{
-			clog.printf("A fatal error occured during material intialization\n\n");
+			felog.printf("A fatal error occured during material intialization\n\n");
 			return false;
 		}
 	}

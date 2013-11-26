@@ -83,7 +83,7 @@ bool FEHeatTransferAnalysis::Init()
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)
 	{
-		clog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
+		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
 		return false;
 	}
 

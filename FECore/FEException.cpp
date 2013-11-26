@@ -47,7 +47,7 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 				int n = l[k];
 				if (id == n)
 				{
-					clog.printf("Zero diagonal on row %d.\nThis dof belongs to rigid body %d (dof %d)\n", n, i+1, j+1);
+					felog.printf("Zero diagonal on row %d.\nThis dof belongs to rigid body %d (dof %d)\n", n, i+1, j+1);
 				}
 			}
 		}
@@ -83,9 +83,9 @@ ZeroDiagonal::ZeroDiagonal(vector<int>& l, FEM& fem)
 	{
 		n = l[i];
 		EQUATION& q = EQT[n];
-		clog.printf("Zero diagonal on row %d. (node %d, dof %d)\n", n+1, q.node+1, q.dof+1);
+		felog.printf("Zero diagonal on row %d. (node %d, dof %d)\n", n+1, q.node+1, q.dof+1);
 	}
-	if (nz > NMAX) clog.printf("(%d out of %d printed)\n", NMAX, nz);
+	if (nz > NMAX) felog.printf("(%d out of %d printed)\n", NMAX, nz);
 
 	// print error message
 	sprintf(m_szerr, "FATAL ERROR: %d zero(s) found on diagonal.", l.size());

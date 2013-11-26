@@ -71,13 +71,13 @@ bool FEContactDiagnostic::Run()
 	solver.ContactStiffness();
 //	solver.StiffnessMatrix();
 
-	print_matrix(clog, K0);
+	print_matrix(felog, K0);
 
 	// calculate the derivative of the residual
 	DenseMatrix K1;
 	deriv_residual(K1);
 
-	print_matrix(clog, K1);
+	print_matrix(felog, K1);
 
 	// calculate difference matrix
 	const int N = 48;
@@ -99,9 +99,9 @@ bool FEContactDiagnostic::Run()
 			}
 		}
 
-	print_matrix(clog, Kd);
+	print_matrix(felog, Kd);
 
-	clog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
+	felog.printf("\nMaximum difference: %lg%% (at (%d,%d))\n", kmax, i0, j0);
 
 	return (kmax < 1e-3);
 }

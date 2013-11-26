@@ -134,7 +134,7 @@ void* febio_func(void* pd)
 	TMSession& session = pdoc->GetSession();
 
 	LogBuffer log(pwnd->GetOutputWnd());
-	clog.SetLogStream(&log);
+	felog.SetLogStream(&log);
 
 	// continue looping until queue is empty
 	int itask = -1;

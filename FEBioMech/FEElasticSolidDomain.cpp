@@ -82,7 +82,7 @@ bool FEElasticSolidDomain::Initialize(FEModel &fem)
 					if (fabs(m.det() - 1) > 1e-7)
 					{
 						// this element did not get specified a user-defined fiber direction
-//							clog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
+//							felog.printbox("ERROR", "Solid element %d was not assigned a fiber direction.", i+1);
 						bmerr = true;
 					}
 				}
@@ -1038,7 +1038,7 @@ void FEElasticSolidDomain::UpdateStresses(FEModel &fem)
 		catch (NegativeJacobian e)
 		{
 			// A negative jacobian was detected
-			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
+			felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 			#pragma omp critical
 			berr = true;
 		}

@@ -536,12 +536,12 @@ bool FERigidWallInterface::Augment(int naug)
 	normgc = sqrt(normgc / N);
 
 	// check convergence of constraints
-	clog.printf(" rigid wall interface # %d\n", m_nID);
-	clog.printf("                        CURRENT        REQUIRED\n");
+	felog.printf(" rigid wall interface # %d\n", m_nID);
+	felog.printf("                        CURRENT        REQUIRED\n");
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
-	clog.printf("    normal force : %15le %15le\n", pctn, m_atol);
-	clog.printf("    gap function : %15le       ***\n", normgc);
+	felog.printf("    normal force : %15le %15le\n", pctn, m_atol);
+	felog.printf("    gap function : %15le       ***\n", normgc);
 		
 	if (pctn >= m_atol)
 	{

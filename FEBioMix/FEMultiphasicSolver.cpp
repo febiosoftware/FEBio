@@ -213,17 +213,17 @@ bool FEMultiphasicSolver::Quasin(double time)
 
 	Logfile::MODE oldmode;
 
-	clog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
+	felog.printf("\n===== beginning time step %d : %lg =====\n", pstep->m_ntimesteps+1, m_fem.m_ftime);
 
 	// loop until converged or when max nr of reformations reached
 	do
 	{
-		oldmode = clog.GetMode();
+		oldmode = felog.GetMode();
 		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
 
-		clog.printf(" %d\n", m_niter+1);
-		clog.SetMode(oldmode);
+		felog.printf(" %d\n", m_niter+1);
+		felog.SetMode(oldmode);
 
 		// assume we'll converge. 
 		bconv = true;
@@ -343,26 +343,26 @@ bool FEMultiphasicSolver::Quasin(double time)
 		}
 
 		// print convergence summary
-		oldmode = clog.GetMode();
+		oldmode = felog.GetMode();
 		if ((m_fem.GetCurrentStep()->GetPrintLevel() <= FE_PRINT_MAJOR_ITRS) &&
-			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) clog.SetMode(Logfile::FILE_ONLY);
+			(m_fem.GetCurrentStep()->GetPrintLevel() != FE_PRINT_NEVER)) felog.SetMode(Logfile::FILE_ONLY);
 
-		clog.printf(" Nonlinear solution status: time= %lg\n", time); 
-		clog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
-		clog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
-		clog.printf("\tstiffness matrix reformations = %d\n", m_nref);
-		if (m_bfgs.m_LStol > 0) clog.printf("\tstep from line search         = %lf\n", s);
-		clog.printf("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
-		clog.printf("\t residual               %15le %15le %15le\n", normRi, normR1, m_Rtol*normRi);
-		clog.printf("\t energy                 %15le %15le %15le\n", normEi, normE1, m_Etol*normEi);
-		clog.printf("\t displacement           %15le %15le %15le\n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
-		clog.printf("\t fluid pressure         %15le %15le %15le\n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
+		felog.printf(" Nonlinear solution status: time= %lg\n", time); 
+		felog.printf("\tstiffness updates             = %d\n", m_bfgs.m_nups);
+		felog.printf("\tright hand side evaluations   = %d\n", m_nrhs);
+		felog.printf("\tstiffness matrix reformations = %d\n", m_nref);
+		if (m_bfgs.m_LStol > 0) felog.printf("\tstep from line search         = %lf\n", s);
+		felog.printf("\tconvergence norms :        INITIAL         CURRENT         REQUIRED\n");
+		felog.printf("\t residual               %15le %15le %15le\n", normRi, normR1, m_Rtol*normRi);
+		felog.printf("\t energy                 %15le %15le %15le\n", normEi, normE1, m_Etol*normEi);
+		felog.printf("\t displacement           %15le %15le %15le\n", normDi, normd ,(m_Dtol*m_Dtol)*normD );
+		felog.printf("\t fluid pressure         %15le %15le %15le\n", normPi, normp ,(m_Ptol*m_Ptol)*normP );
 		for (j=0; j<MAX_CDOFS; ++j) {
 			if (m_nceq[j])
-				clog.printf("\t solute %d concentration %15le %15le %15le\n", j+1, normCi[j], normc[j] ,(m_Ctol*m_Ctol)*normC[j] );
+				felog.printf("\t solute %d concentration %15le %15le %15le\n", j+1, normCi[j], normc[j] ,(m_Ctol*m_Ctol)*normC[j] );
 		}
 
-		clog.SetMode(oldmode);
+		felog.SetMode(oldmode);
 
 		// check if we have converged. 
 		// If not, calculate the BFGS update vectors
@@ -372,19 +372,19 @@ bool FEMultiphasicSolver::Quasin(double time)
 			{
 				// check for almost zero-residual on the first iteration
 				// this might be an indication that there is no force on the system
-				clog.printbox("WARNING", "No force acting on the system.");
+				felog.printbox("WARNING", "No force acting on the system.");
 				bconv = true;
 			}
 			else if (s < m_bfgs.m_LSmin)
 			{
 				// check for zero linestep size
-				clog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
+				felog.printbox("WARNING", "Zero linestep size. Stiffness matrix will now be reformed");
 				breform = true;
 			}
 			else if (normE1 > normEm)
 			{
 				// check for diverging
-				clog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
+				felog.printbox("WARNING", "Problem is diverging. Stiffness matrix will now be reformed");
 				normEm = normE1;
 				normEi = normE1;
 				normRi = normR1;
@@ -407,7 +407,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 							// Stiffness update has failed.
 							// this might be due a too large condition number
 							// or the update was no longer positive definite.
-							clog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
+							felog.printbox("WARNING", "The BFGS update has failed.\nStiffness matrix will now be reformed.");
 							breform = true;
 						}
 					}
@@ -419,7 +419,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 
 						// print a warning only if the user did not intent full-Newton
 						if (m_bfgs.m_maxups > 0)
-							clog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
+							felog.printbox("WARNING", "Max nr of iterations reached.\nStiffness matrix will now be reformed.");
 
 					}
 				}
@@ -434,7 +434,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 			// reform stiffness matrices if necessary
 			if (breform)
 			{
-				clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+				felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 
 				// reform the matrix
 				if (ReformStiffness() == false) break;
@@ -450,7 +450,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 		{
 			// we have converged, so let's see if the augmentations have converged as well
 
-			clog.printf("\n........................ augmentation # %d\n", m_naug+1);
+			felog.printf("\n........................ augmentation # %d\n", m_naug+1);
 
 			// do the augmentations
 			bconv = Augment();
@@ -474,7 +474,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 				// reform the matrix if we are using full-Newton
 				if (m_bfgs.m_maxups == 0)
 				{
-					clog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
+					felog.printf("Reforming stiffness matrix: reformation #%d\n\n", m_nref);
 					if (ReformStiffness() == false) break;
 				}
 			}
@@ -484,7 +484,7 @@ bool FEMultiphasicSolver::Quasin(double time)
 		m_niter++;
 
 		// let's flush the logfile to make sure the last output will not get lost
-		clog.flush();
+		felog.flush();
 
 		// do minor iterations callbacks
 		m_fem.DoCallback(CB_MINOR_ITERS);
@@ -492,17 +492,17 @@ bool FEMultiphasicSolver::Quasin(double time)
 	while (bconv == false);
 
 	// when converged, 
-	// print a convergence summary to the clog file
+	// print a convergence summary to the felog file
 	if (bconv)
 	{
-		Logfile::MODE mode = clog.SetMode(Logfile::FILE_ONLY);
+		Logfile::MODE mode = felog.SetMode(Logfile::FILE_ONLY);
 		if (mode != Logfile::NEVER)
 		{
-			clog.printf("\nconvergence summary\n");
-			clog.printf("    number of iterations   : %d\n", m_niter);
-			clog.printf("    number of reformations : %d\n", m_nref);
+			felog.printf("\nconvergence summary\n");
+			felog.printf("    number of iterations   : %d\n", m_niter);
+			felog.printf("    number of reformations : %d\n", m_nref);
 		}
-		clog.SetMode(mode);
+		felog.SetMode(mode);
 	}
 
 	// if converged we update the total displacements

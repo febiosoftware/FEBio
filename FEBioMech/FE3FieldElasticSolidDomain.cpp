@@ -415,7 +415,7 @@ void FE3FieldElasticSolidDomain::UpdateStresses(FEModel &fem)
 		catch (NegativeJacobian e)
 		{
 			// A negative jacobian was detected
-			clog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
+			felog.printbox("ERROR","Negative jacobian was detected at element %d at gauss point %d\njacobian = %lg\n", e.m_iel, e.m_ng+1, e.m_vol);
 			#pragma omp critical
 			berr = true;
 		}
@@ -532,9 +532,9 @@ bool FE3FieldElasticSolidDomain::Augment()
 	double pctn = 0;
 	if (fabs(normL1) > 1e-10) pctn = fabs((normL1 - normL0)/normL1);
 
-	clog.printf(" material %d\n", pmi->GetID());
-	clog.printf("                        CURRENT         CHANGE        REQUIRED\n");
-	clog.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
+	felog.printf(" material %d\n", pmi->GetID());
+	felog.printf("                        CURRENT         CHANGE        REQUIRED\n");
+	felog.printf("   pressure norm : %15le%15le%15le\n", normL1, pctn, pmi->m_atol);
 
 	bool bconv = true;
 	if (pctn >= pmi->m_atol)

@@ -105,7 +105,7 @@ bool FEMultiphasicAnalysis::Init()
 		}
 	}
 
-	if (bdisp) clog.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
+	if (bdisp) felog.printbox("WARNING", "Rigid degrees of freedom cannot be prescribed.");
 
 	// Sometimes an (ignorant) user might have added a rigid body
 	// that is not being used. Since this can cause problems we need
@@ -123,7 +123,7 @@ bool FEMultiphasicAnalysis::Init()
 		if (mec[i] == 0)
 		{
 			FERigidBody& RB = dynamic_cast<FERigidBody&>(*m_fem.Object(i));
-			clog.printbox("WARNING", "Rigid body %d is not being used.", RB.m_mat+1);
+			felog.printbox("WARNING", "Rigid body %d is not being used.", RB.m_mat+1);
 			RB.Activate(false);
 		}
 
@@ -263,7 +263,7 @@ bool FEMultiphasicAnalysis::Init()
 	// do one time initialization of solver data
 	if (m_psolver->Init() == false)
 	{
-		clog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
+		felog.printbox("FATAL ERROR","Failed to initialize solver.\nAborting run.\n");
 		return false;
 	}
 

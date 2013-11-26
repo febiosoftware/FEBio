@@ -272,7 +272,7 @@ void FEOctree::Init()
 	//	root.PrintNodeContent();
 	//	int nnode = 0, nlevel = 0;
 	//	root.CountNodes(nnode, nlevel);
-	//	clog.printf("Max level and number of nodes in octree = %d, %d\n",
+	//	felog.printf("Max level and number of nodes in octree = %d, %d\n",
 	//				nlevel, nnode);
 	
 	return;

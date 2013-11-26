@@ -70,7 +70,7 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		else if (att == "memory test"   ) m_pdia = new FEMemoryDiagnostic(fem);
 		else 
 		{
-			clog.printf("\nERROR: unknown diagnostic\n\n");
+			felog.printf("\nERROR: unknown diagnostic\n\n");
 			return 0;
 		}
 
@@ -89,22 +89,22 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 	}
 	catch (InvalidVersion)
 	{
-		clog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
+		felog.printbox("FATAL ERROR", "Invalid version for FEBio specification.");
 		return false;
 	}
 	catch (InvalidMaterial e)
 	{
-		clog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
+		felog.printbox("FATAL ERROR:", "Element %d has an invalid material type.", e.m_nel);
 		return false;
 	}
 	catch (XMLReader::XMLSyntaxError)
 	{
-		clog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
+		felog.printf("FATAL ERROR: Syntax error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 	catch (XMLReader::InvalidTag e)
 	{
-		clog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: unrecognized tag \"%s\" (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::InvalidAttributeValue e)
@@ -113,28 +113,28 @@ FEDiagnostic* FEDiagnosticImport::LoadFile(FEModel& fem, const char* szfile)
 		const char* sza = e.szatt;
 		const char* szv = e.szval;
 		int l = e.tag.m_nstart_line;
-		clog.printf("FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
+		felog.printf("FATAL ERROR: unrecognized value \"%s\" for attribute \"%s.%s\" (line %d)\n", szv, szt, sza, l);
 		return false;
 	}
 	catch (XMLReader::InvalidValue e)
 	{
-		clog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: the value for tag \"%s\" is invalid (line %d)\n", e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::MissingAttribute e)
 	{
-		clog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: Missing attribute \"%s\" of tag \"%s\" (line %d)\n", e.szatt, e.tag.m_sztag, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (XMLReader::UnmatchedEndTag e)
 	{
 		const char* sz = e.tag.m_szroot[e.tag.m_nlevel];
-		clog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
+		felog.printf("FATAL ERROR: Unmatched end tag for \"%s\" (line %d)\n", sz, e.tag.m_nstart_line);
 		return false;
 	}
 	catch (...)
 	{
-		clog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
+		felog.printf("FATAL ERROR: unrecoverable error (line %d)\n", xml.GetCurrentLine());
 		return false;
 	}
 

@@ -55,7 +55,7 @@ bool FELinearSolidSolver::Init()
 		m_plinsolve = NumCore::CreateLinearSolver(m_fem.m_nsolver);
 		if (m_plinsolve == 0)
 		{
-			clog.printbox("FATAL ERROR","Unknown solver type selected\n");
+			felog.printbox("FATAL ERROR","Unknown solver type selected\n");
 			return false;
 		}
 	}
@@ -65,7 +65,7 @@ bool FELinearSolidSolver::Init()
 	SparseMatrix* pS = m_plinsolve->CreateSparseMatrix(m_bsymm? SPARSE_SYMMETRIC : SPARSE_UNSYMMETRIC);
 	if (pS == 0)
 	{
-		clog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
+		felog.printbox("FATAL ERROR", "The selected linear solver does not support the requested\n matrix format.\nPlease select a different linear solver.\n");
 		return false;
 	}
 
@@ -78,7 +78,7 @@ bool FELinearSolidSolver::Init()
 	m_pK = new FEStiffnessMatrix(pS);
 	if (m_pK == 0)
 	{
-		clog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
+		felog.printbox("FATAL ERROR", "Failed allocating stiffness matrix\n\n");
 		return false;
 	}
 
@@ -235,7 +235,7 @@ bool FELinearSolidSolver::SolveStep(double time)
 		double normu = fabs(du*du);
 		double normR = fabs(m_R*m_R);
 
-		clog.printf("normu = %lg\n", normu);
+		felog.printf("normu = %lg\n", normu);
 
 		if (normu < m_Dtol) bconv = true;
 		n++;
@@ -341,10 +341,10 @@ bool FELinearSolidSolver::CreateStiffness(bool breset)
 	m_pK->Clear();
 
 	// create the stiffness matrix
-	clog.printf("===== reforming stiffness matrix:\n");
+	felog.printf("===== reforming stiffness matrix:\n");
 	if (m_pK->Create(&GetFEModel(), m_neq, breset) == false) 
 	{
-		clog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
+		felog.printf("FATAL ERROR: An error occured while building the stiffness matrix\n\n");
 		return false;
 	}
 	else
@@ -352,9 +352,9 @@ bool FELinearSolidSolver::CreateStiffness(bool breset)
 		// output some information about the direct linear solver
 		int neq = m_pK->Rows();
 		int nnz = m_pK->NonZeroes();
-		clog.printf("\tNr of equations ........................... : %d\n", neq);
-		clog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
-		clog.printf("\n");
+		felog.printf("\tNr of equations ........................... : %d\n", neq);
+		felog.printf("\tNr of nonzeroes in stiffness matrix ....... : %d\n", nnz);
+		felog.printf("\n");
 	}
 
 	// Do the preprocessing of the solver

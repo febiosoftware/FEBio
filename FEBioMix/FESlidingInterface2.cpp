@@ -963,7 +963,7 @@ void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 		if (nref >= ni)
 		{
 			knmult = 1; 
-			clog.printf("Higher order stiffness terms included.\n");
+			felog.printf("Higher order stiffness terms included.\n");
 		}
 		else knmult = 0;
 	}
@@ -1553,16 +1553,16 @@ bool FESlidingInterface2::Augment(int naug)
 	if (naug < m_naugmin ) bconv = false;
 	if (naug >= m_naugmax) bconv = true;
 
-	clog.printf(" sliding interface # %d\n", m_nID);
-	clog.printf("                        CURRENT        REQUIRED\n");
-	clog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n");
-	if (bporo) { clog.printf("    P gap        : %15le", pnorm); if (m_atol > 0) clog.printf("%15le\n", m_atol); else clog.printf("       ***\n"); }
+	felog.printf(" sliding interface # %d\n", m_nID);
+	felog.printf("                        CURRENT        REQUIRED\n");
+	felog.printf("    D multiplier : %15le", lnorm); if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n");
+	if (bporo) { felog.printf("    P gap        : %15le", pnorm); if (m_atol > 0) felog.printf("%15le\n", m_atol); else felog.printf("       ***\n"); }
 
-	clog.printf("    maximum gap  : %15le", maxgap);
-	if (m_gtol > 0) clog.printf("%15le\n", m_gtol); else clog.printf("       ***\n");
+	felog.printf("    maximum gap  : %15le", maxgap);
+	if (m_gtol > 0) felog.printf("%15le\n", m_gtol); else felog.printf("       ***\n");
 	if (bporo) {
-		clog.printf("    maximum pgap : %15le", maxpg);
-		if (m_ptol > 0) clog.printf("%15le\n", m_ptol); else clog.printf("       ***\n");
+		felog.printf("    maximum pgap : %15le", maxpg);
+		if (m_ptol > 0) felog.printf("%15le\n", m_ptol); else felog.printf("       ***\n");
 	}
 	
 	return bconv;

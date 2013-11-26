@@ -60,7 +60,7 @@ void LogFileStream::print(const char* sztxt)
 
 //=============================================================================
 // The one-and-only logfile
-Logfile& clog = *Logfile::GetInstance();
+Logfile& felog = *Logfile::GetInstance();
 
 //-----------------------------------------------------------------------------
 Logfile* Logfile::m_plog = 0;
