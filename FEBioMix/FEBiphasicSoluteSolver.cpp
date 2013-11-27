@@ -778,9 +778,6 @@ void FEBiphasicSoluteSolver::UpdateSolute(vector<double>& ui)
 
 void FEBiphasicSoluteSolver::Serialize(DumpFile& ar)
 {
-	// store parameters
-	FEParamContainer::Serialize(ar);
-
 	FEBiphasicSolver::Serialize(ar);
 
 	if (ar.IsSaving())

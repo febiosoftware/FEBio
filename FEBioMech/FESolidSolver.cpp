@@ -161,6 +161,9 @@ bool FESolidSolver::Init()
 
 void FESolidSolver::Serialize(DumpFile& ar)
 {
+	// Serialize parameters
+	FEParamContainer::Serialize(ar);
+	
 	if (ar.IsSaving())
 	{
 		ar << m_Dtol << m_Etol << m_Rtol << m_Rmin;
