@@ -143,6 +143,7 @@ void CTaskBrowser::AddTask(CTask *pt)
 	int N = m_pg->rows();
 	m_pg->rows(N+1);
     m_pg->row_height_all(20); // default height of rows
+	m_pg->select_all_rows(0);
 	m_pg->select_row(N);
 }
 

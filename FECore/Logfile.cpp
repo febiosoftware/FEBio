@@ -115,6 +115,25 @@ bool Logfile::append(const char* szfile)
 }
 
 //-----------------------------------------------------------------------------
+//! flush the logfile
+void Logfile::flush()
+{
+	if (m_fp) m_fp->flush(); 
+}
+
+//-----------------------------------------------------------------------------
+//! close the logfile
+void Logfile::close()
+{ 
+	if (m_fp)
+	{
+		m_fp->close(); 
+		delete m_fp;
+		m_fp = 0;
+	}
+}
+
+//-----------------------------------------------------------------------------
 // This function works like all other printf functions
 // with the exception that everything that is output to the file
 // is (optionally) also output to the screen.

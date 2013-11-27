@@ -315,6 +315,9 @@ void CTask::Run(Progress& prg)
 	// run the problem
 	bool bret = fem.Solve();
 
+	// close the log file
+	felog.close();
+
 	// collect the stats
 	m_stats.nreturn = (bret? 1 : 0);
 	m_stats.ntime   = 0;
