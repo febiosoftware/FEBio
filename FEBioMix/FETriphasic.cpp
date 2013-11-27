@@ -479,6 +479,7 @@ vec3d FETriphasic::CurrentDensity(FEMaterialPoint& pt)
 //! Data serialization
 void FETriphasic::Serialize(DumpFile& ar)
 {
+	FEParamContainer::Serialize(ar);
 	FEMaterial::Serialize(ar);
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 	
@@ -506,11 +507,8 @@ void FETriphasic::Serialize(DumpFile& ar)
 		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pPerm); m_pPerm->Serialize(ar);
 		m_pPerm->Init();
-
-		ar >> sz;
-		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
-		assert(m_pOsmC); m_pOsmC->Serialize(ar);
-		m_pOsmC->Init();
+		
+		m_pSolute.resize(2);
 		
 		ar >> sz;
 		m_pSolute[0] = dynamic_cast<FESolute*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
@@ -521,6 +519,11 @@ void FETriphasic::Serialize(DumpFile& ar)
 		m_pSolute[1] = dynamic_cast<FESolute*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
 		assert(m_pSolute[1]); m_pSolute[1]->Serialize(ar);
 		m_pSolute[1]->Init();
+
+		ar >> sz;
+		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		assert(m_pOsmC); m_pOsmC->Serialize(ar);
+		m_pOsmC->Init();
 	}
 }
 
