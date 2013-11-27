@@ -11,12 +11,15 @@
 
 #include "DumpFile.h"
 #include "FEMesh.h"
-#include "FEModel.h"
 #include <stdio.h>
 #include <vector>
 using namespace std;
 
+//-----------------------------------------------------------------------------
+// forward declaration
+class FEModel;
 
+//-----------------------------------------------------------------------------
 #define FE_DATA_NODE	1
 #define FE_DATA_ELEM	2
 #define FE_DATA_RB		3

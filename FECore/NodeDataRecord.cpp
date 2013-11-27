@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "NodeDataRecord.h"
 #include "FEAnalysis.h"
+#include "febio.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 void NodeDataRecord::Parse(const char* szexpr)

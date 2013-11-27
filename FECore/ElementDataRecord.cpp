@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "ElementDataRecord.h"
+#include "febio.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 void ElementDataRecord::Parse(const char *szexpr)

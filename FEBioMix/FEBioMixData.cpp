@@ -2,6 +2,7 @@
 #include "FEBioMixData.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 double FENodeTemp::value(int nnode) 

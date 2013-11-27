@@ -20,6 +20,7 @@
 #include "FECore/DataStore.h"
 #include "FECore/log.h"
 #include "FECore/Image.h"
+#include "FECore/FEModel.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "ObjectDataRecord.h"
+#include "febio.h"
+#include "FEModel.h"
 
 //-----------------------------------------------------------------------------
 void ObjectDataRecord::Parse(const char* szexpr)

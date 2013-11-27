@@ -11,6 +11,7 @@
 #include "FELinearConstraint.h"
 #include "FEObject.h"
 #include "DumpStream.h"
+#include "DataStore.h"
 #include <string>
 #include <vector>
 #include <map>

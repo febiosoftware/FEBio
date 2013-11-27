@@ -1,5 +1,6 @@
 #pragma once
 #include "DataStore.h"
+#include "FEObject.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for object log data (e.g. rigid bodies)
