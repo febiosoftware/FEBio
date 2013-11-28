@@ -16,11 +16,6 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 		else if (tag == "Solutes"    ) ParseGSSoluteData(tag);
 		else if (tag == "SolidBoundMolecules") ParseGSSBMData(tag);
 		else if (tag == "Generations") ParseMGData(tag);
-		else if (m_pim->Version() < 0x0102)
-		{
-			if (tag == "body_force") ParseBodyForce(tag);
-			else throw XMLReader::InvalidTag(tag);
-		}
 		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}

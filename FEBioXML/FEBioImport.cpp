@@ -95,9 +95,8 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		// get the version number
 		ParseVersion(tag);
 
-		// FEBio2 only supports file version 1.1 and up
-		if ((m_nversion != 0x0101) &&
-			(m_nversion != 0x0102) && 
+		// FEBio2 only supports file version 1.2 and up
+		if ((m_nversion != 0x0102) && 
 			(m_nversion != 0x0200)) throw InvalidVersion();
 
 		// define the file structure
@@ -107,18 +106,13 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		map["Material"   ] = new FEBioMaterialSection   (this);
 		map["Geometry"   ] = new FEBioGeometrySection   (this);
 		map["Boundary"   ] = new FEBioBoundarySection   (this);
+		map["Loads"      ] = new FEBioLoadsSection      (this);
 		map["Initial"    ] = new FEBioInitialSection    (this);
 		map["LoadData"   ] = new FEBioLoadDataSection   (this);
 		map["Globals"    ] = new FEBioGlobalsSection    (this);
 		map["Output"     ] = new FEBioOutputSection     (this);
 		map["Constraints"] = new FEBioConstraintsSection(this);
 		map["Step"       ] = new FEBioStepSection       (this);
-
-		// version 1.2 only
-		if (m_nversion >= 0x0102)
-		{
-			map["Loads"] = new FEBioLoadsSection(this);
-		}
 
 		// version 2.0 only!
 		if (m_nversion >= 0x0200)

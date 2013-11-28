@@ -13,21 +13,13 @@ public:
 protected:
 	void ParseBCFix               (XMLTag& tag);
 	void ParseBCPrescribe         (XMLTag& tag);
-	void ParseBCForce             (XMLTag& tag);
-	void ParseBCPressure          (XMLTag& tag);
-	void ParseBCTraction          (XMLTag& tag);
-	void ParseBCPoroNormalTraction(XMLTag& tag);
-	void ParseBCFluidFlux         (XMLTag& tag);
-	void ParseBCSoluteFlux        (XMLTag &tag);
-	void ParseBCHeatFlux          (XMLTag& tag);
-	void ParseBCConvectiveHeatFlux(XMLTag& tag);
 	void ParseContactSection      (XMLTag& tag);
 	void ParseConstraints         (XMLTag& tag);
 	void ParseSpringSection       (XMLTag& tag);
-	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 
 protected:
 	void ParseContactInterface(XMLTag& tag, FEContactInterface* pci);
+	bool ParseSurfaceSection      (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 
 protected:
 	void ParseRigidJoint      (XMLTag& tag);
