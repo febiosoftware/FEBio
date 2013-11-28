@@ -30,6 +30,9 @@
 #include "FEBioMech/FERigidShellDomain.h"
 #include "FEBioMech/FE3FieldElasticSolidDomain.h"
 #include "FEBioMech/FEUT4Domain.h"
+#include "FEBioMix/FETriphasicDomain.h"
+#include "FEBioMech/FELinearSolidDomain.h"
+#include "FEBioMix/FEMultiphasicDomain.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FEContactInterface.h"
@@ -640,9 +643,12 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 			case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (&m, pm); break;
 			case FE_DISCRETE_DOMAIN       : pd = new FEDiscreteSpringDomain    (&m, pm); break;
 			case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(&m, pm); break;
-			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicSolidDomain          (&m, pm); break;
+			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicSolidDomain     (&m, pm); break;
 			case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (&m, pm); break;
 			case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (&m, pm); break;
+			case FE_TRIPHASIC_DOMAIN      : pd = new FETriphasicDomain         (&m, pm); break;
+			case FE_MULTIPHASIC_DOMAIN    : pd = new FEMultiphasicDomain       (&m, pm); break;
+			case FE_LINEAR_SOLID_DOMAIN   : pd = new FELinearSolidDomain       (&m, pm); break;
 			default: assert(false);
 			}
 
