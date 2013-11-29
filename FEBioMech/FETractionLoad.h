@@ -16,7 +16,7 @@ public:
 
 public:
 	//! constructor
-	FETractionLoad(FESurface* ps) : FESurfaceLoad(ps) {}
+	FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem) {}
 
 	//! allocate storage
 	void create(int n) { m_TC.resize(n); }

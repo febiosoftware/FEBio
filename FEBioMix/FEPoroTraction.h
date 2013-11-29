@@ -16,10 +16,14 @@ public:
 
 public:
 	//! constructor
-	FEPoroNormalTraction(FESurface* ps, bool blinear = false, bool beffective = false) : FESurfaceLoad(ps) { m_blinear = blinear; m_beffective = beffective; }
+	FEPoroNormalTraction(FEModel* pfem) : FESurfaceLoad(pfem) { m_blinear = false; m_beffective = false; }
 
 	//! allocate storage
 	void create(int n) { m_PC.resize(n); }
+
+	void SetLinear(bool blinear) { m_blinear = blinear; }
+
+	void SetEffective(bool beff) { m_beffective = beff; }
 /*
 	//! clone
 	FEDomain* Clone()

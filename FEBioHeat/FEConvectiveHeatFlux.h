@@ -16,7 +16,7 @@ public:
 	};
 
 public:
-	FEConvectiveHeatFlux(FESurface* ps) : FESurfaceLoad(ps){}
+	FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem){}
 
 	//! allocate storage
 	void create(int n) { m_FC.resize(n); }

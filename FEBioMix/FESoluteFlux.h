@@ -19,10 +19,14 @@ public:
 
 public:
 	//! constructor
-	FESoluteFlux(FESurface* ps, bool blinear = false, int isol = 0) : FESurfaceLoad(ps) { m_blinear = blinear; m_isol = isol; }
+	FESoluteFlux(FEModel* pfem) : FESurfaceLoad(pfem) { m_blinear = false; m_isol = 0; }
 	
 	//! allocate storage
 	void create(int n) { m_PC.resize(n); }
+
+	void SetLinear(bool blinear) { m_blinear = blinear; }
+
+	void SetSolute(int isol) { m_isol = isol; }
 	
 /*	//! clone
 	FEDomain* Clone()

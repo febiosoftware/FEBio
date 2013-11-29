@@ -18,7 +18,7 @@ public:
 
 public:
 	//! constructor
-	FEPressureLoad(FESurface* ps, bool blinear = false) : FESurfaceLoad(ps) { m_blinear = blinear; }
+	FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem) { m_blinear = false; }
 
 	//! allocate storage
 	void create(int n) { m_PC.resize(n); }
@@ -44,8 +44,18 @@ public:
 	//! serialize data
 	void Serialize(DumpFile& ar);
 
+	//! set the linear flag
+	void SetLinear(bool blinear) { m_blinear = blinear; }
+
 	//! Check if this is a linear force or not
 	bool IsLinear() { return m_blinear; }
+
+public:
+	//! set an attribute of the surface load
+	bool SetAttribute(const char* szatt, const char* szval);
+
+	//! set an attribute of a surface facet
+	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:
 	//! calculate stiffness for an element

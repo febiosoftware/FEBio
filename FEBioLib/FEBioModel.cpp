@@ -856,17 +856,18 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			FESurfaceLoad* ps = 0;
 			switch (ntype)
 			{
-			case FE_PRESSURE_LOAD : ps = new FEPressureLoad      (psurf); break;
-			case FE_TRACTION_LOAD : ps = new FETractionLoad      (psurf); break;
-			case FE_FLUID_FLUX    : ps = new FEFluidFlux         (psurf); break;
-			case FE_PORO_TRACTION : ps = new FEPoroNormalTraction(psurf); break;
-			case FE_SOLUTE_FLUX   : ps = new FESoluteFlux        (psurf); break;
-			case FE_HEAT_FLUX     : ps = new FEHeatFlux          (psurf); break;
-			case FE_CONV_HEAT_FLUX: ps = new FEConvectiveHeatFlux(psurf); break;
+			case FE_PRESSURE_LOAD : ps = new FEPressureLoad      (this); break;
+			case FE_TRACTION_LOAD : ps = new FETractionLoad      (this); break;
+			case FE_FLUID_FLUX    : ps = new FEFluidFlux         (this); break;
+			case FE_PORO_TRACTION : ps = new FEPoroNormalTraction(this); break;
+			case FE_SOLUTE_FLUX   : ps = new FESoluteFlux        (this); break;
+			case FE_HEAT_FLUX     : ps = new FEHeatFlux          (this); break;
+			case FE_CONV_HEAT_FLUX: ps = new FEConvectiveHeatFlux(this); break;
 			default:
 				assert(false);
 			}
 			assert(ps);
+			ps->SetSurface(psurf);
 
 			ar >> nid >> bactive;
 			ps->SetID(nid);

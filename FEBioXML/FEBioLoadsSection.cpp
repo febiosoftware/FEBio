@@ -217,16 +217,6 @@ void FEBioLoadsSection::ParseBCPressure(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 
-	const char* sz;
-	bool blinear = false;
-	sz = tag.AttributeValue("type", true);
-	if (sz)
-	{
-		if (strcmp(sz, "linear") == 0) blinear = true;
-		else if (strcmp(sz, "nonlinear") == 0) blinear = false;
-		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
-	}
-
 	// count how many pressure cards there are
 	int npr = tag.children();
 
@@ -235,10 +225,17 @@ void FEBioLoadsSection::ParseBCPressure(XMLTag& tag)
 	psurf->create(npr);
 	fem.GetMesh().AddSurface(psurf);
 
-	// allocate pressure data
-	FEPressureLoad* ps = new FEPressureLoad(psurf, blinear);
+	// create surface load
+	FEPressureLoad* ps = new FEPressureLoad(&fem);
 	ps->create(npr);
-	fem.AddSurfaceLoad(ps);
+	ps->SetSurface(psurf);
+
+	// parse attributes
+	for (int i=0; i<tag.m_natt; ++i)
+	{
+		XMLAtt& att = tag.m_att[i];
+		if (ps->SetAttribute(att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
+	}
 
 	// read the pressure data
 	++tag;
@@ -246,15 +243,13 @@ void FEBioLoadsSection::ParseBCPressure(XMLTag& tag)
 	double s;
 	for (int i=0; i<npr; ++i)
 	{
-		FEPressureLoad::LOAD& pc = ps->PressureLoad(i);
 		FESurfaceElement& el = psurf->Element(i);
 
-		sz = tag.AttributeValue("lc");
-		pc.lc = atoi(sz)-1;
-
-		s  = atof(tag.AttributeValue("scale"));
-		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
-		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+		for (int j=0; j<tag.m_natt; ++j)
+		{
+			XMLAtt& att = tag.m_att[j];
+			if (ps->SetFacetAttribute(i, att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
+		}
 
 		if      (tag == "quad4") el.SetType(FE_QUAD4G4);
 		else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
@@ -268,6 +263,9 @@ void FEBioLoadsSection::ParseBCPressure(XMLTag& tag)
 
 		++tag;
 	}
+
+	// add surface load to model
+	fem.AddSurfaceLoad(ps);
 
 	// add this boundary condition to the current step
 	if (m_pim->m_nsteps > 0)
@@ -293,9 +291,10 @@ void FEBioLoadsSection::ParseBCTraction(XMLTag &tag)
 	fem.GetMesh().AddSurface(psurf);
 
 	// allocate traction data
-	FETractionLoad* pt = new FETractionLoad(psurf);
-	fem.AddSurfaceLoad(pt);
+	FETractionLoad* pt = new FETractionLoad(&fem);
 	pt->create(ntc);
+	pt->SetSurface(psurf);
+	fem.AddSurfaceLoad(pt);
 
 	// read the traction data
 	++tag;
@@ -370,8 +369,11 @@ void FEBioLoadsSection::ParseBCPoroNormalTraction(XMLTag& tag)
 	fem.GetMesh().AddSurface(psurf);
 	
 	// allocate normal traction data
-	FEPoroNormalTraction* ps = new FEPoroNormalTraction(psurf, blinear, beffective);
+	FEPoroNormalTraction* ps = new FEPoroNormalTraction(&fem);
 	ps->create(npr);
+	ps->SetSurface(psurf);
+	ps->SetLinear(blinear);
+	ps->SetEffective(beffective);
 	fem.AddSurfaceLoad(ps);
 	
 	// read the normal traction data
@@ -444,8 +446,11 @@ void FEBioLoadsSection::ParseBCFluidFlux(XMLTag &tag)
 	fem.GetMesh().AddSurface(psurf);
 	
 	// allocate fluid flux data
-	FEFluidFlux* pfs = new FEFluidFlux(psurf, blinear, bmixture);
+	FEFluidFlux* pfs = new FEFluidFlux(&fem);
 	pfs->create(nfr);
+	pfs->SetSurface(psurf);
+	pfs->SetLinear(blinear);
+	pfs->SetMixture(bmixture);
 	fem.AddSurfaceLoad(pfs);
 	
 	// read the fluid flux data
@@ -509,8 +514,10 @@ void FEBioLoadsSection::ParseBCSoluteFlux(XMLTag &tag)
 	fem.GetMesh().AddSurface(psurf);
 	
 	// allocate fluid flux data
-	FESoluteFlux* pfs = new FESoluteFlux(psurf, blinear);
+	FESoluteFlux* pfs = new FESoluteFlux(&fem);
 	pfs->create(nfr);
+	pfs->SetSurface(psurf);
+	pfs->SetLinear(blinear);
 	fem.AddSurfaceLoad(pfs);
 	
 	// read the fluid flux data
@@ -564,8 +571,9 @@ void FEBioLoadsSection::ParseBCHeatFlux(XMLTag& tag)
 	fem.GetMesh().AddSurface(psurf);
 
 	// allocate flux data
-	FEHeatFlux* ph = new FEHeatFlux(psurf);
+	FEHeatFlux* ph = new FEHeatFlux(&fem);
 	ph->create(npr);
+	ph->SetSurface(psurf);
 	fem.AddSurfaceLoad(ph);
 
 	const char* sz;
@@ -621,8 +629,9 @@ void FEBioLoadsSection::ParseBCConvectiveHeatFlux(XMLTag& tag)
 	fem.GetMesh().AddSurface(psurf);
 
 	// allocate flux data
-	FEConvectiveHeatFlux* ph = new FEConvectiveHeatFlux(psurf);
+	FEConvectiveHeatFlux* ph = new FEConvectiveHeatFlux(&fem);
 	ph->create(npr);
+	ph->SetSurface(psurf);
 	fem.AddSurfaceLoad(ph);
 
 	const char* sz;

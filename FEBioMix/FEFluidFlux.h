@@ -18,7 +18,11 @@ public:
 
 public:
 	//! constructor
-	FEFluidFlux(FESurface* ps, bool blinear = false, bool bmixture = false) : FESurfaceLoad(ps) { m_blinear = blinear; m_bmixture = bmixture; }
+	FEFluidFlux(FEModel* pfem) : FESurfaceLoad(pfem) { m_blinear = false; m_bmixture = false; }
+
+	void SetLinear(bool blinear) { m_blinear = blinear; }
+
+	void SetMixture(bool bmix) { m_bmixture = bmix; }
 
 	//! allocate storage
 	void create(int n) { m_PC.resize(n); }
