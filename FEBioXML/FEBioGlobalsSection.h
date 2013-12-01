@@ -10,7 +10,6 @@ public:
 	void Parse            (XMLTag& tag);
 
 protected:
-	void ParseBodyForce   (XMLTag& tag);	// only for versions < 1.2
 	void ParseConstants   (XMLTag& tag);
 	void ParseGSSoluteData(XMLTag& tag);
 	void ParseGSSBMData   (XMLTag& tag);

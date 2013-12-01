@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioGlobalsSection.h"
-#include "FEBioMech/FEPointBodyForce.h"
 #include "FEBioMech/FEElasticMultigeneration.h"
 #include "FECore/FEModel.h"
 
@@ -20,64 +19,6 @@ void FEBioGlobalsSection::Parse(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-}
-
-//-----------------------------------------------------------------------------
-void FEBioGlobalsSection::ParseBodyForce(XMLTag &tag)
-{
-	FEModel& fem = *GetFEModel();
-
-	const char* szt = tag.AttributeValue("type", true);
-	if (szt == 0) szt = "const";
-
-	if (strcmp(szt, "point") == 0)
-	{
-		FEPointBodyForce* pf = new FEPointBodyForce(&fem);
-		FEParameterList& pl = pf->GetParameterList();
-		++tag;
-		do
-		{
-			if (tag == "a")
-			{
-				const char* szlc = tag.AttributeValue("lc");
-//						pf->lc[0] = pf->lc[1] = pf->lc[2] = atoi(szlc);
-				tag.value(pf->m_a);
-			}
-			else if (tag == "node")
-			{
-				tag.value(pf->m_inode); 
-				pf->m_inode -= 1;
-			}
-			else if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-			++tag;
-		}
-		while (!tag.isend());
-
-		fem.AddBodyLoad(pf);
-	}
-	else
-	{
-		// see if the kernel knows this force
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-		FEBodyForce* pf = febio.Create<FEBodyForce>(szt, &fem);
-		if (pf)
-		{
-			if (!tag.isleaf())
-			{
-				FEParameterList& pl = pf->GetParameterList();
-				++tag;
-				do
-				{
-					if (m_pim->ReadParameter(tag, pl) == false) throw XMLReader::InvalidTag(tag);
-					++tag;
-				}
-				while (!tag.isend());
-			}
-
-			fem.AddBodyLoad(pf);
-		}
-		else throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-	}
 }
 
 //-----------------------------------------------------------------------------
