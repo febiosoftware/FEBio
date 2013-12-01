@@ -22,3 +22,15 @@ public:
 public:
 	int	m_nline;
 };
+
+class CDlgEditFilter : public Flx_Dialog
+{
+public:
+	CDlgEditFilter();
+
+	int InitDialog();
+
+public:
+	bool	m_bcase;
+	char	m_sztxt[256];
+};

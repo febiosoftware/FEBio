@@ -44,7 +44,7 @@ public:
 
 	void SelectTask(int n);
 
-	void SelectAll();
+	void SelectAll(int n = 1);
 
 	int SelectedTask();
 

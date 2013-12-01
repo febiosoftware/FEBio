@@ -58,3 +58,37 @@ CDlgEditGoToLine::CDlgEditGoToLine() : Flx_Dialog(200, 100, "Go to line")
 	}
 	end();
 }
+
+
+CDlgEditFilter::CDlgEditFilter() : Flx_Dialog(400, 150, "Filter")
+{
+	int W = w();
+	int H = h();
+
+	m_sztxt[0] = 0;
+	m_bcase = false;
+
+	Fl_Input* pt;
+	Fl_Check_Button* pc;
+	Fl_Button* pb;
+	Fl_Return_Button* pr;
+	begin();
+	{
+		pt = new Fl_Input(5, 30, W-10, 20, "Filter:"); pt->align(FL_ALIGN_LEFT | FL_ALIGN_TOP); DDX_TEXT(pt, m_sztxt);
+		pc = new Fl_Check_Button(5, 60, 100, 20, "case sensitive"); DDX_BOOL(pc, &m_bcase);
+
+		pr = new Fl_Return_Button(W/2-75, H-40, 70, 30, "OK"  ); AddCallback(pr, (FLX_CALLBACK) &Flx_Dialog::OnOk);
+		pb = new Fl_Button       (W/2   , H-40, 70, 30, "Cancel"); AddCallback(pb, (FLX_CALLBACK) &Flx_Dialog::OnCancel);
+	}
+	end();
+}
+
+int CDlgEditFilter::InitDialog()
+{
+	Flx_Dialog::InitDialog();
+	Fl_Input* pt = dynamic_cast<Fl_Input*>(child(0));
+	assert(pt);
+	pt->take_focus();
+	pt->position(0, pt->size());
+	return 1;
+}

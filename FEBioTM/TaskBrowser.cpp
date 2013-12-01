@@ -159,9 +159,9 @@ void CTaskBrowser::RemoveTask(int n)
 }
 
 //-----------------------------------------------------------------------------
-void CTaskBrowser::SelectAll()
+void CTaskBrowser::SelectAll(int n)
 {
-	m_pg->select_all_rows(1);
+	m_pg->select_all_rows(n);
 }
 
 //-----------------------------------------------------------------------------

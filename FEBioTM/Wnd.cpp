@@ -482,6 +482,27 @@ void CWnd::OnEditFindAgain(Fl_Widget* pw, void* pd)
 }
 
 //-----------------------------------------------------------------------------
+void CWnd::OnEditFilter(Fl_Widget* pw, void* pd)
+{
+	CDlgEditFilter dlg;
+	if (dlg.DoModal() == FLX_OK)
+	{
+		m_pTask->SelectAll(0);
+		TMSession& session = m_pDoc->GetSession();
+		int N = session.Tasks();
+		int ncnt = 0;
+		for (int i=0; i<N; ++i)
+		{
+			CTask& task = *session.GetTask(i);
+			Fl_Text_Buffer* pbuf = task.GetTextBuffer();
+			int npos;
+			if (pbuf->search_forward(0, dlg.m_sztxt, &npos, dlg.m_bcase) > 0) { m_pTask->SelectTask(i); ncnt++; }
+		}
+		flx_alert("%d files found.", ncnt);
+	}
+}
+
+//-----------------------------------------------------------------------------
 void CWnd::OnEditGoToLine(Fl_Widget* pw, void* pd)
 {
 	CDlgEditGoToLine dlg;
