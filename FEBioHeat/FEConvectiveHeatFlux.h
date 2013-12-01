@@ -19,7 +19,7 @@ public:
 	FEConvectiveHeatFlux(FEModel* pfem) : FESurfaceLoad(pfem){}
 
 	//! allocate storage
-	void create(int n) { m_FC.resize(n); }
+	void Create(int n) { m_FC.resize(n); }
 
 	//! clone
 /*	FEDomain* Clone()
@@ -41,6 +41,9 @@ public:
 
 	//! serialization
 	void Serialize(DumpFile& ar) {}
+
+	//! set an attribute of a surface facet
+	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:
 	void ElementStiffness(FESurfaceElement& el, matrix& ke, double hc);

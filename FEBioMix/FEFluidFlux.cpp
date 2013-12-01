@@ -3,6 +3,43 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+bool FEFluidFlux::SetAttribute(const char* szatt, const char* szval)
+{
+	if (strcmp(szatt, "type") == 0)
+	{
+		if      (strcmp(szval, "linear"   ) == 0) SetLinear(true );
+		else if (strcmp(szval, "nonlinear") == 0) SetLinear(false);
+		else return false;
+		return true;
+	}
+	else if (strcmp(szatt, "flux") == 0)
+	{
+		if      (strcmp(szval, "mixture") == 0) SetMixture(true);
+		else if (strcmp(szval, "fluid"  ) == 0) SetMixture(false); 
+		else return false;
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool FEFluidFlux::SetFacetAttribute(int nface, const char* szatt, const char* szval)
+{
+	LOAD& pc = FluidFlux(nface);
+	if      (strcmp(szatt, "id") == 0) {}
+	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
+	else if (strcmp(szatt, "scale") == 0)
+	{
+		double s = atof(szval);
+		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+	}
+	else return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! calculates the stiffness contribution due to fluid flux
 
 void FEFluidFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>& wn, double dt, bool mixture)

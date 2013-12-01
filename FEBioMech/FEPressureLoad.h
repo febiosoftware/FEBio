@@ -21,7 +21,7 @@ public:
 	FEPressureLoad(FEModel* pfem) : FESurfaceLoad(pfem) { m_blinear = false; }
 
 	//! allocate storage
-	void create(int n) { m_PC.resize(n); }
+	void Create(int n) { m_PC.resize(n); }
 
 	//! clone
 /*	FEDomain* Clone()

@@ -28,6 +28,10 @@
 #include "FEMassActionReversible.h"
 #include "FEConcentrationIndependentReaction.h"
 
+#include "FEPoroTraction.h"
+#include "FEFluidFlux.h"
+#include "FESoluteFlux.h"
+
 #include "FESlidingInterface2.h"
 #include "FESlidingInterface3.h"
 #include "FETiedBiphasicInterface.h"
@@ -81,6 +85,12 @@ REGISTER_MATERIAL(FEConcentrationIndependentReaction, "concentration-independent
 REGISTER_MATERIAL(FEMassActionReversible         , "mass-action-reversible");
 REGISTER_MATERIAL(FEMichaelisMenten              , "Michaelis-Menten"      );
 REGISTER_MATERIAL(FESolidBoundMolecule           , "solid_bound"           );
+
+//-----------------------------------------------------------------------------
+// Surface loads
+REGISTER_FEBIO_CLASS(FEPoroNormalTraction, FESurfaceLoad, "normal_traction");
+REGISTER_FEBIO_CLASS(FEFluidFlux         , FESurfaceLoad, "fluidflux"      );
+REGISTER_FEBIO_CLASS(FESoluteFlux        , FESurfaceLoad, "soluteflux"     );
 
 //-----------------------------------------------------------------------------
 // Contact interfaces

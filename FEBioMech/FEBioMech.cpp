@@ -60,6 +60,8 @@
 #include "FEVonMisesPlasticity.h"
 #include "FEPreStrainTransIsoMR.h"
 
+#include "FEPressureLoad.h"
+#include "FETractionLoad.h"
 #include "FEConstBodyForce.h"
 #include "FEPointBodyForce.h"
 
@@ -154,6 +156,12 @@ REGISTER_MATERIAL(FERemodelingElasticMaterial    , "remodeling solid"           
 REGISTER_MATERIAL(FECarterHayesOld               , "Carter-Hayes (old)"            );
 REGISTER_MATERIAL(FEActiveFiberContraction       , "active_contraction"            );
 REGISTER_MATERIAL(FEPreStrainTransIsoMR          , "pre-strain trans iso Mooney-Rivlin");
+
+//-----------------------------------------------------------------------------
+// classes derived from FESurfaceLoad
+REGISTER_FEBIO_CLASS(FEPressureLoad, FESurfaceLoad, "pressure");
+REGISTER_FEBIO_CLASS(FETractionLoad, FESurfaceLoad, "traction");
+
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce

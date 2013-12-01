@@ -25,7 +25,7 @@ public:
 	void SetMixture(bool bmix) { m_bmixture = bmix; }
 
 	//! allocate storage
-	void create(int n) { m_PC.resize(n); }
+	void Create(int n) { m_PC.resize(n); }
 
 	//! clone
 /*	FEDomain* Clone()
@@ -47,6 +47,13 @@ public:
 
 	//! serialize data
 	void Serialize(DumpFile& ar);
+
+public:
+	//! set an attribute of the surface load
+	bool SetAttribute(const char* szatt, const char* szval);
+
+	//! set an attribute of a surface facet
+	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:
 	//! calculate stiffness for an element

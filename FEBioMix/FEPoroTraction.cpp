@@ -2,8 +2,45 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
-//! calculates the stiffness contribution due to normal traction
+bool FEPoroNormalTraction::SetAttribute(const char* szatt, const char* szval)
+{
+	if (strcmp(szatt, "type") == 0)
+	{
+		if      (strcmp(szval, "linear"   ) == 0) SetLinear(true );
+		else if (strcmp(szval, "nonlinear") == 0) SetLinear(false);
+		else return false;
+		return true;
+	}
+	else if (strcmp(szatt, "traction") == 0)
+	{
+		if      (strcmp(szval, "effective") == 0) SetEffective(true);
+		else if (strcmp(szval, "total"    ) == 0) SetEffective(false);
+		else if (strcmp(szval, "mixture"  ) == 0) SetEffective(false);
+		else return false;
+		return true;
+	}
+	return false;
+}
 
+//-----------------------------------------------------------------------------
+bool FEPoroNormalTraction::SetFacetAttribute(int nface, const char* szatt, const char* szval)
+{
+	LOAD& pc = NormalTraction(nface);
+	if      (strcmp(szatt, "id") == 0) {}
+	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
+	else if (strcmp(szatt, "scale") == 0)
+	{
+		double s = atof(szval);
+		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+	}
+	else return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! calculates the stiffness contribution due to normal traction
 void FEPoroNormalTraction::TractionStiffness(FESurfaceElement& el, matrix& ke, vector<double>& tn, bool effective, bool bsymm)
 {
 	int i, j, n;

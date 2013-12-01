@@ -110,3 +110,32 @@ void FETractionLoad::Serialize(DumpFile& ar)
 		}
 	}
 }
+
+//-----------------------------------------------------------------------------
+bool FETractionLoad::SetFacetAttribute(int nface, const char* szatt, const char* szval)
+{
+	LOAD& tc = TractionLoad(nface);
+	if      (strcmp(szatt, "id") == 0) {}
+	else if (strcmp(szatt, "lc") == 0) tc.lc = atoi(szval) - 1;
+	else if (strcmp(szatt, "tx") == 0)
+	{
+		double tx = atof(szval);
+		tc.s[0].x = tc.s[1].x = tc.s[2].x = tc.s[3].x = tx;
+		tc.s[4].x = tc.s[5].x = tc.s[6].x = tc.s[7].x = tx;
+	}
+	else if (strcmp(szatt, "ty") == 0)
+	{
+		double ty = atof(szval);
+		tc.s[0].y = tc.s[1].y = tc.s[2].y = tc.s[3].y = ty;
+		tc.s[4].y = tc.s[5].y = tc.s[6].y = tc.s[7].y = ty;
+	}
+	else if (strcmp(szatt, "tz") == 0)
+	{
+		double tz = atof(szval);
+		tc.s[0].z = tc.s[1].z = tc.s[2].z = tc.s[3].z = tz;
+		tc.s[4].z = tc.s[5].z = tc.s[6].z = tc.s[7].z = tz;
+	}
+	else return false;
+
+	return true;
+}

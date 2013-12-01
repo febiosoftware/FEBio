@@ -82,6 +82,23 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 }
 
 //-----------------------------------------------------------------------------
+bool FEHeatFlux::SetFacetAttribute(int nface, const char* szatt, const char* szval)
+{
+	LOAD& pc = HeatFlux(nface);
+	if      (strcmp(szatt, "id") == 0) {}
+	else if (strcmp(szatt, "lc") == 0) pc.lc = atoi(szval) - 1;
+	else if (strcmp(szatt, "scale") == 0)
+	{
+		double s = atof(szval);
+		pc.s[0] = pc.s[1] = pc.s[2] = pc.s[3] = s;
+		pc.s[4] = pc.s[5] = pc.s[6] = pc.s[7] = s;
+	}
+	else return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 void FEHeatFlux::Serialize(DumpFile &ar)
 {
 	if (ar.IsSaving())

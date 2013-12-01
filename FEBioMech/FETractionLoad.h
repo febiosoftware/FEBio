@@ -19,7 +19,7 @@ public:
 	FETractionLoad(FEModel* pfem) : FESurfaceLoad(pfem) {}
 
 	//! allocate storage
-	void create(int n) { m_TC.resize(n); }
+	void Create(int n) { m_TC.resize(n); }
 
 	//! clone
 /*	FEDomain* Clone()
@@ -40,6 +40,10 @@ public:
 
 	//! serialize data to archive
 	void Serialize(DumpFile& ar);
+
+public:
+	//! set an attribute of a surface facet
+	bool SetFacetAttribute(int nface, const char* szatt, const char* szval);
 
 protected:
 	vector<LOAD>	m_TC;		//!< traction boundary cards
