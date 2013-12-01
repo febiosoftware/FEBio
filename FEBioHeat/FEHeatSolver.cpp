@@ -16,7 +16,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! constructor for the class
-FEHeatSolver::FEHeatSolver(FEModel &fem) : FESolver(fem)
+FEHeatSolver::FEHeatSolver(FEModel* pfem) : FESolver(pfem)
 {
 	m_brhs = false;
 	m_ntotref = 0;

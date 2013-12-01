@@ -15,10 +15,6 @@
 #include "FEBioMix/FEPoroTraction.h"
 #include "FEBioMix/FEFluidFlux.h"
 #include "FEBioMix/FESoluteFlux.h"
-#include "FEBioHeat/FEHeatTransferAnalysis.h"
-#include "FEBioMix/FEBiphasicAnalysis.h"
-#include "FEBioMix/FEMultiphasicAnalysis.h"
-#include "FEBioMech/FESolidAnalysis.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FEBioMech/FEElasticShellDomain.h"
 #include "FEBioMech/FEElasticTrussDomain.h"
@@ -403,8 +399,8 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		ar << (int) m_Step.size();
 		for (int i=0; i<(int) m_Step.size(); ++i) 
 		{
-			int ntype = m_Step[i]->GetType();
-			ar << ntype;
+			const char* sztype = febio.GetTypeStr<FEAnalysis>(m_Step[i]);
+			ar << sztype;
 			m_Step[i]->Serialize(ar);
 		}
 
@@ -430,26 +426,15 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		m_Step.clear();
 		FEModel* pfem = ar.GetFEModel();
 
+		char sztype[256] = {0};
+
 		// analysis steps
-		int nsteps, ntype;
+		int nsteps;
 		ar >> nsteps;
 		for (int i=0; i<nsteps; ++i)
 		{
-			ar >> ntype;
-			FEAnalysis* pstep = 0;
-			switch (ntype)
-			{
-			case FE_SOLID         : pstep = new FESolidAnalysis         (this); break;
-			case FE_EXPLICIT_SOLID: pstep = new FEExplicitSolidAnalysis (this); break;
-			case FE_BIPHASIC      : pstep = new FEBiphasicAnalysis      (this); break;
-			case FE_HEAT          : pstep = new FEHeatTransferAnalysis  (this); break;
-			case FE_POROSOLUTE    : pstep = new FEBiphasicSoluteAnalysis(this); break;
-			case FE_MULTIPHASIC   : pstep = new FEMultiphasicAnalysis   (this); break;
-			case FE_LINEAR_SOLID  : pstep = new FELinearSolidAnalysis   (this); break;
-//			case FE_HEAT_SOLID    : pstep = new FEThermoElasticAnalysis (this); break;
-			default:
-				assert(false);
-			}
+			ar >> sztype;
+			FEAnalysis* pstep = febio.Create<FEAnalysis>(sztype, this); assert(pstep);
 			pstep->Serialize(ar);
 			m_Step.push_back(pstep);
 		}

@@ -1,16 +1,7 @@
 #include "stdafx.h"
 #include "FEAnalysis.h"
 #include "FEModel.h"
-#include "FEBioLib/FEBioModel.h"
 #include "log.h"
-#include "FEBioMech/FESolidSolver.h"
-#include "FEBioHeat/FEHeatSolver.h"
-#include "FEBioMech/FEExplicitSolidSolver.h"
-#include "FEBioMix/FEBiphasicSolver.h"
-#include "FEBioMix/FEBiphasicSoluteSolver.h"
-#include "FEBioMix/FEMultiphasicSolver.h"
-#include "FEBioMech/FELinearSolidSolver.h"
-#include "FEBioMech/FECoupledHeatSolidSolver.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
@@ -588,6 +579,11 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		// boundary conditions
 		ar << (int) m_BC.size();
 		for (int i=0; i< (int) m_BC.size(); ++i) ar << m_BC[i]->GetID();
+
+		// Seriaize solver data
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		ar << febio.GetTypeStr<FESolver>(m_psolver);
+		m_psolver->Serialize(ar);
 	}
 	else
 	{
@@ -638,43 +634,12 @@ void FEAnalysis::Serialize(DumpFile& ar)
 			m_BC.push_back(pbc);
 		}
 
-		// TODO: allocate a new solver
-		//assert(false);
-
-		// create a solver
+		// Serialize solver data
+		FEBioKernel& febio = FEBioKernel::GetInstance();
+		char szsolver[256] = {0};
+		ar >> szsolver;
 		assert(m_psolver == 0);
-		FEBioModel& fem = dynamic_cast<FEBioModel&>(m_fem);
-		switch (m_ntype)
-		{
-		case FE_SOLID: 
-			m_psolver = new FESolidSolver(fem); 
-			break;
-		case FE_EXPLICIT_SOLID:
-			m_psolver = new FEExplicitSolidSolver(fem);
-			break;
-		case FE_BIPHASIC:
-			m_psolver = new FEBiphasicSolver(fem);
-			break;
-		case FE_POROSOLUTE:
-			m_psolver = new FEBiphasicSoluteSolver(fem);
-			break;
-		case FE_MULTIPHASIC:
-			m_psolver = new FEMultiphasicSolver(fem);
-			break;
-		case FE_HEAT:
-			m_psolver = new FEHeatSolver(fem);
-			break;
-		case FE_LINEAR_SOLID:
-			m_psolver = new FELinearSolidSolver(fem);
-			break;
-		case FE_HEAT_SOLID:
-			m_psolver = new FECoupledHeatSolidSolver(fem);
-			break;
-		default:
-			throw "Unknown module type in FEAnalysis::Serialize";
-		}
+		m_psolver = febio.Create<FESolver>(szsolver, &m_fem); assert(m_psolver);
+		m_psolver->Serialize(ar);
 	}
-
-	// Seriaize solver data
-	m_psolver->Serialize(ar);
 }

@@ -77,6 +77,8 @@ void print_parameter_list(FEParameterList& pl)
 //! This function outputs the input data to the felog file.
 void echo_input(FEBioModel& fem)
 {
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+
 	// echo input
 	int i, j;
 
@@ -110,21 +112,8 @@ void echo_input(FEBioModel& fem)
 	// print control info
 	felog.printf(" CONTROL DATA\n");
 	felog.printf("===========================================================================\n");
-	const char* szmod = 0;
-	switch (step.GetType())
-	{
-	case FE_SOLID         : szmod = "solid mechanics"; break;
-	case FE_EXPLICIT_SOLID: szmod = "explicit solid mechanics"; break;
-	case FE_BIPHASIC      : szmod = "poroelastic"    ; break;
-	case FE_HEAT          : szmod = "heat transfer"  ; break;
-	case FE_POROSOLUTE    : szmod = "biphasic-solute"; break;
-	case FE_MULTIPHASIC   : szmod = "multiphasic"    ; break;
-	case FE_LINEAR_SOLID  : szmod = "linear solid"   ; break;
-	case FE_HEAT_SOLID    : szmod = "heat solid"     ; break;
-	default:
-		szmod = "unknown";
-		assert(false);
-	}
+	const char* szmod = febio.GetTypeStr<FEAnalysis>(&step);
+	if (szmod == 0) { szmod = "unknown"; assert(false); }
 	felog.printf("\tModule type .................................... : %s\n", szmod);
 
 	const char* szan = 0;
@@ -301,8 +290,6 @@ void echo_input(FEBioModel& fem)
 			}
 		}
 	}
-
-	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	// material data
 	felog.printf("\n\n");

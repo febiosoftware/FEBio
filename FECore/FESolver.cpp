@@ -2,7 +2,7 @@
 #include "FESolver.h"
 
 //-----------------------------------------------------------------------------
-FESolver::FESolver(FEModel& fem) : m_fem(fem)
+FESolver::FESolver(FEModel* pfem) : m_fem(*pfem)
 { 
 	m_bsymm = true; // assume symmetric stiffness matrix
 	m_solvertype = 0;

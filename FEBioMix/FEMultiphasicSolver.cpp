@@ -41,7 +41,7 @@ BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolver)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEMultiphasicSolver::FEMultiphasicSolver(FEModel& fem) : FESolidSolver(fem)
+FEMultiphasicSolver::FEMultiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
 {
 	m_Ctol = 0.01;
 	for (int k=0; k<MAX_CDOFS; ++k) m_nceq[k] = 0;

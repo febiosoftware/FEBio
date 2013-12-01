@@ -12,7 +12,7 @@ class FESolidSolver : public FESolver
 {
 public:
 	//! constructor
-	FESolidSolver(FEModel& fem);
+	FESolidSolver(FEModel* pfem);
 
 	//! destructor
 	virtual ~FESolidSolver();

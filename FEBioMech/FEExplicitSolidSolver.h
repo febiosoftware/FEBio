@@ -9,7 +9,7 @@ class FEExplicitSolidSolver : public FESolver
 {
 public:
 	//! constructor
-	FEExplicitSolidSolver(FEModel& fem);
+	FEExplicitSolidSolver(FEModel* pfem);
 
 	//! destructor
 	virtual ~FEExplicitSolidSolver() {}

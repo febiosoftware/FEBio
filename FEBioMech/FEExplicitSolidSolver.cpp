@@ -14,7 +14,7 @@ BEGIN_PARAMETER_LIST(FEExplicitSolidSolver, FESolver)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel& fem) : FESolver(fem)
+FEExplicitSolidSolver::FEExplicitSolidSolver(FEModel* pfem) : FESolver(pfem)
 {
 	m_dyn_damping = 0.99;
 

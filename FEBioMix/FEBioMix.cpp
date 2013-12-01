@@ -38,6 +38,9 @@
 
 #include "FEBiphasicAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
+#include "FEBiphasicSolver.h"
+#include "FEBiphasicSoluteSolver.h"
+#include "FEMultiphasicSolver.h"
 
 #include "FEBioMixPlot.h"
 #include "FEBioMixData.h"
@@ -52,6 +55,12 @@ void FEBioMix::InitModule()
 REGISTER_FEBIO_CLASS(FEBiphasicAnalysis      , FEAnalysis, "biphasic"       );
 REGISTER_FEBIO_CLASS(FEBiphasicSoluteAnalysis, FEAnalysis, "biphasic-solute");
 REGISTER_FEBIO_CLASS(FEMultiphasicAnalysis   , FEAnalysis, "multiphasic"    );
+
+//-----------------------------------------------------------------------------
+// solver classes
+REGISTER_FEBIO_CLASS(FEBiphasicSolver      , FESolver, "biphasic"       );
+REGISTER_FEBIO_CLASS(FEBiphasicSoluteSolver, FESolver, "biphasic-solute");
+REGISTER_FEBIO_CLASS(FEMultiphasicSolver   , FESolver, "multiphasic"    );
 
 //-----------------------------------------------------------------------------
 // Materials

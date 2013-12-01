@@ -44,7 +44,7 @@ END_PARAMETER_LIST();
 //-----------------------------------------------------------------------------
 //! FESolidSolver Construction
 //
-FESolidSolver::FESolidSolver(FEModel& fem) : FESolver(fem)
+FESolidSolver::FESolidSolver(FEModel* pfem) : FESolver(pfem)
 {
 	// default values
 	m_Rtol = 0;	// deactivate residual convergence 

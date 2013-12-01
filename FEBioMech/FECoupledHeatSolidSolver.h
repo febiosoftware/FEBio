@@ -10,7 +10,7 @@ class FECoupledHeatSolidSolver : public FESolver
 {
 public:
 	//! constructor
-	FECoupledHeatSolidSolver(FEModel& fem);
+	FECoupledHeatSolidSolver(FEModel* pfem);
 
 	//! destructor
 	~FECoupledHeatSolidSolver(){}

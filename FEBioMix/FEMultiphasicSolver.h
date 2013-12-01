@@ -8,7 +8,7 @@ class FEMultiphasicSolver : public FESolidSolver
 {
 public:
 	//! con/descructor
-	FEMultiphasicSolver(FEModel& fem);
+	FEMultiphasicSolver(FEModel* pfem);
 	virtual ~FEMultiphasicSolver(){}
 
 	//! Initialize data structures

@@ -16,7 +16,7 @@ END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
 //! Class constructor
-FELinearSolidSolver::FELinearSolidSolver(FEModel& fem) : FESolver(fem)
+FELinearSolidSolver::FELinearSolidSolver(FEModel* pfem) : FESolver(pfem)
 {
 	m_Dtol = 1e-9;
 

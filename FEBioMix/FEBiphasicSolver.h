@@ -9,7 +9,7 @@ class FEBiphasicSolver : public FESolidSolver
 {
 public:
 	//! constructor
-	FEBiphasicSolver(FEModel& fem);
+	FEBiphasicSolver(FEModel* pfem);
 	virtual ~FEBiphasicSolver() {}
 
 	//! Initialize data structures

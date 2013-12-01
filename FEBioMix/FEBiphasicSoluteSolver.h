@@ -8,7 +8,7 @@ class FEBiphasicSoluteSolver : public FEBiphasicSolver
 {
 public:
 	//! con/descructor
-	FEBiphasicSoluteSolver(FEModel& fem);
+	FEBiphasicSoluteSolver(FEModel* pfem);
 	virtual ~FEBiphasicSoluteSolver(){}
 
 	//! Initialize data structures

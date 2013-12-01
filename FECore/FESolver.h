@@ -17,7 +17,7 @@ class FESolver : public FEParamContainer
 {
 public:
 	//! constructor
-	FESolver(FEModel& fem);
+	FESolver(FEModel* pfem);
 
 	//! destructor
 	virtual ~FESolver();

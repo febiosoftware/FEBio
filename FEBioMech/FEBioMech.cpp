@@ -77,6 +77,9 @@
 #include "FEFacet2FacetTied.h"
 
 #include "FESolidAnalysis.h"
+#include "FESolidSolver.h"
+#include "FELinearSolidSolver.h"
+#include "FEExplicitSolidSolver.h"
 
 #include "FEBioMechPlot.h"
 #include "FEBioMechData.h"
@@ -90,6 +93,12 @@ void FEBioMech::InitModule()
 REGISTER_FEBIO_CLASS(FESolidAnalysis        , FEAnalysis, "solid"         );
 REGISTER_FEBIO_CLASS(FEExplicitSolidAnalysis, FEAnalysis, "explicit-solid");
 REGISTER_FEBIO_CLASS(FELinearSolidAnalysis  , FEAnalysis, "linear-solid"  );
+
+//-----------------------------------------------------------------------------
+// Solver classes
+REGISTER_FEBIO_CLASS(FESolidSolver        , FESolver, "solid"         );
+REGISTER_FEBIO_CLASS(FEExplicitSolidSolver, FESolver, "explicit-solid");
+REGISTER_FEBIO_CLASS(FELinearSolidSolver  , FESolver, "linear-solid"  );
 
 //-----------------------------------------------------------------------------
 // material classes

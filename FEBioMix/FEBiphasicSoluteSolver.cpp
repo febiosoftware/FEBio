@@ -39,7 +39,7 @@ BEGIN_PARAMETER_LIST(FEBiphasicSoluteSolver, FESolver)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel& fem) : FEBiphasicSolver(fem)
+FEBiphasicSoluteSolver::FEBiphasicSoluteSolver(FEModel* pfem) : FEBiphasicSolver(pfem)
 {
 	m_Ctol = 0.01;
 	for (int k=0; k<MAX_CDOFS; ++k) m_nceq[k] = 0;

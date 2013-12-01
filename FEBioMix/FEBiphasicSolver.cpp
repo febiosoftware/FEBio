@@ -41,7 +41,7 @@ BEGIN_PARAMETER_LIST(FEBiphasicSolver, FESolver)
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEBiphasicSolver::FEBiphasicSolver(FEModel& fem) : FESolidSolver(fem)
+FEBiphasicSolver::FEBiphasicSolver(FEModel* pfem) : FESolidSolver(pfem)
 {
 	m_Ptol = 0.01;
 	m_ndeq = 0;

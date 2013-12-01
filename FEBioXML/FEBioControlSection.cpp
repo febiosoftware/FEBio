@@ -1,29 +1,23 @@
 #include "stdafx.h"
 #include "FEBioControlSection.h"
-#include "FEBioMech/FESolidSolver.h"
-#include "FEBioMech/FEExplicitSolidSolver.h"
-#include "FEBioMix/FEBiphasicSolver.h"
-#include "FEBioMix/FEBiphasicSoluteSolver.h"
-#include "FEBioMix/FEMultiphasicSolver.h"
 #include "FEBioMech/FELinearSolidSolver.h"
 #include "FEBioMech/FECoupledHeatSolidSolver.h"
 #include "FEBioMech/FEUDGHexDomain.h"
 #include "FEBioMech/FEUT4Domain.h"
-#include "FEBioHeat/FEHeatSolver.h"
 
 //-----------------------------------------------------------------------------
 FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
 {
+	FEBioKernel& febio = FEBioKernel::GetInstance();
 	switch (nmod)
 	{
-	case FE_SOLID         : return new FESolidSolver           (fem);
-	case FE_EXPLICIT_SOLID: return new FEExplicitSolidSolver   (fem);
-	case FE_BIPHASIC      : return new FEBiphasicSolver        (fem);
-	case FE_POROSOLUTE    : return new FEBiphasicSoluteSolver  (fem);
-	case FE_MULTIPHASIC   : return new FEMultiphasicSolver     (fem);
-	case FE_HEAT          : return new FEHeatSolver            (fem);
-	case FE_LINEAR_SOLID  : return new FELinearSolidSolver     (fem);
-	case FE_HEAT_SOLID    : return new FECoupledHeatSolidSolver(fem);
+	case FE_SOLID         : return febio.Create<FESolver>("solid"          , &fem);
+	case FE_EXPLICIT_SOLID: return febio.Create<FESolver>("explicit-solid" , &fem);
+	case FE_LINEAR_SOLID  : return febio.Create<FESolver>("linear-solid"   , &fem);
+	case FE_BIPHASIC      : return febio.Create<FESolver>("biphasic"       , &fem);
+	case FE_POROSOLUTE    : return febio.Create<FESolver>("biphasic-solute", &fem);
+	case FE_MULTIPHASIC   : return febio.Create<FESolver>("multiphasic"    , &fem);
+	case FE_HEAT          : return febio.Create<FESolver>("heat transfer"  , &fem);
 	default:
 		assert(false);
 		return 0;

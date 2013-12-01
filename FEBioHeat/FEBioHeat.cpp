@@ -5,6 +5,8 @@
 #include "FEHeatTransferAnalysis.h"
 #include "FEHeatFlux.h"
 #include "FEConvectiveHeatFlux.h"
+#include "FEHeatSolver.h"
+
 
 namespace FEBioHeat {
 
@@ -12,6 +14,9 @@ void InitModule()
 {
 // Analysis
 REGISTER_FEBIO_CLASS(FEHeatTransferAnalysis, FEAnalysis, "heat transfer");
+
+// Solvers
+REGISTER_FEBIO_CLASS(FEHeatSolver, FESolver, "heat transfer");
 
 // Materials
 REGISTER_MATERIAL(FEIsotropicFourier, "isotropic Fourier");
