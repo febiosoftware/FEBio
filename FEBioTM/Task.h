@@ -61,6 +61,8 @@ public:
 	void SetStatus(int n) { m_nstatus = n; }
 	int GetStatus() { return m_nstatus; }
 
+	int FileSize() { return m_pFile->length(); }
+
 	// save the task input file
 	void Save() { if (m_nstatus == MODIFIED) { m_pFile->savefile(m_szfile); SetStatus(READY);} }
 	void Save(const char* szfile) { SetFileName(szfile); Save(); }

@@ -96,6 +96,7 @@ void CDocument::RunTest()
 
 		m_ptest->Run();
 
+		pwnd->SetTestFormat(0);
 		pwnd->AddTestEntry(" Name                           | Return code| Timesteps  | Iterations | RHS evals  |  Reforms   | Status\n");
 		pwnd->AddTestEntry("-------------------------------------------------------------------------------------------------------------------------\n");
 		int N = m_session.Tasks();
@@ -111,6 +112,7 @@ void CDocument::RunTest()
 			if (stat.nreform == data.nreform) sprintf(szref , "%d", stat.nreform); else sprintf(szref , "%d(%d)", stat.nreform, data.nreform);
 
 			int nresult = m_ptest->GetResult(i);
+			if (nresult == 0) pwnd->SetTestFormat(1); else pwnd->SetTestFormat(0);
 			pwnd->AddTestEntry("%-32s|%12s|%12s|%12s|%12s|%12s| %s\n", task.GetFileTitle(), szret, sztime, sziter, szrhs, szref, sz[nresult]);
 		}
 	}

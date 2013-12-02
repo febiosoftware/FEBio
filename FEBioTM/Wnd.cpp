@@ -34,6 +34,16 @@ static Fl_Text_Display::Style_Table_Entry stable[] = {
    };
 
 //-----------------------------------------------------------------------------
+// style table entries for test window
+static Fl_Text_Display::Style_Table_Entry stable_test[] = {
+       // FONT COLOR      FONT FACE   FONT SIZE
+       // --------------- ----------- --------------
+       {  FL_BLACK     , FL_COURIER, 12 }, // A - default
+       {  FL_RED       , FL_COURIER, 12 }, // B - keyword
+   };
+
+
+//-----------------------------------------------------------------------------
 const char* wnd_title = "FEBio Task Manager";
 
 //-----------------------------------------------------------------------------
@@ -55,6 +65,10 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 	m_pText = 0;
 	m_pOut = 0;
 	m_pLog = 0;
+	m_pTest = 0;
+
+	m_nTestFmt = 0;
+	m_pTestAtt = 0;
 
 	Fl_Group* pg;
 	begin();
@@ -108,17 +122,6 @@ CWnd::CWnd(int w, int h, const char* sztitle, CDocument* pdoc) : Flx_Wnd(w, h, w
 						m_pLog->box(FL_DOWN_BOX);
 						m_pLog->buffer(new Fl_Text_Buffer);
 						pg->resizable(m_pLog);
-					}
-					pg->end();
-					pg->labelsize(11);
-
-					pg = new Fl_Group(wf, hm+ht+24, w-wf, h-hm-ht-24, "    Test     ");
-					{
-						m_pTest = new Fl_Text_Display(wf, hm+ht+24, w-wf, h-hm-ht-24);
-						m_pTest->textfont(FL_COURIER);
-						m_pTest->box(FL_DOWN_BOX);
-						m_pTest->buffer(new Fl_Text_Buffer);
-						pg->resizable(m_pTest);
 					}
 					pg->end();
 					pg->labelsize(11);
@@ -187,6 +190,9 @@ void CWnd::ClearTestWnd()
 	Fl_Text_Buffer* pb = m_pTest->buffer();
 	pb->select(0, pb->length());
 	pb->remove_selection();	
+
+	m_pTestAtt->select(0, m_pTestAtt->length());
+	m_pTestAtt->remove_selection();
 }
 
 //-----------------------------------------------------------------------------
@@ -222,7 +228,14 @@ void CWnd::AddTestEntry(const char* sz, ...)
 	// add the message to the log
 	m_pTest->insert_position(m_pTest->buffer()->length());
 	m_pTest->insert(sztxt);
-	m_pTest->show_insert_position();	
+	m_pTest->show_insert_position();
+
+	static char szstyle[2] = {'A', 'B'};
+	int l = strlen(sztxt);
+	for (int i=0; i<l; ++i) sztxt[i] = szstyle[m_nTestFmt];
+	m_pTestAtt->insert(m_pTestAtt->length(), sztxt);
+
+	m_pTest->highlight_data(m_pTestAtt, stable_test, sizeof(stable_test)/sizeof(stable[0]), 'A', 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -600,6 +613,29 @@ void CWnd::OnRunCancelAll(Fl_Widget* pw, void* pd)
 // Create a new test
 void CWnd::OnToolsCreateTest(Fl_Widget* pw, void* pd)
 {
+	int X = m_pTabs->x();
+	int Y = m_pTabs->y();
+	int W = m_pTabs->w();
+	int H = m_pTabs->h();
+
+	if (m_pTest == 0)
+	{
+		Fl_Group* pg;
+		m_pTabs->add(pg = new Fl_Group(X, Y+24, W, H-24, "    Test     "));
+		{
+			m_pTest = new Fl_Text_Display(X, Y+24, W, H-24);
+			m_pTest->textfont(FL_COURIER);
+			m_pTest->box(FL_DOWN_BOX);
+			m_pTest->buffer(new Fl_Text_Buffer);
+			pg->resizable(m_pTest);
+			m_pTestAtt = new Fl_Text_Buffer;
+		}
+		pg->end();
+		pg->labelsize(11);
+		OnSelectTab(0, 0);
+		m_pTabs->redraw();
+	}
+
 	CTest* ptest = new CTest(m_pDoc->GetSession());
 	m_pDoc->AddTest(ptest);
 }
@@ -664,6 +700,7 @@ void CWnd::OnSelectTab(Fl_Widget* pw, void* pd)
 	if (pc == m_pText) m_pSel = m_pText;
 	if (pc == m_pOut ) m_pSel = m_pOut;
 	if (pc == m_pLog ) m_pSel = m_pLog;
+	if (pc == m_pTest) m_pSel = m_pTest;
 }
 
 //-----------------------------------------------------------------------------

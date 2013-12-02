@@ -55,6 +55,7 @@ public:
 
 	void AddLogEntry(const char* sz, ...);
 	void AddTestEntry(const char* sz, ...);
+	void SetTestFormat(int i) { m_nTestFmt = i; }
 
 public:	// --- M E N U   H A N D L E R S ---
 	void OnFileOpen       (Fl_Widget* pw, void* pd);
@@ -109,6 +110,9 @@ protected:
 	Fl_Text_Display*	m_pLog;		//!< run-log display
 	Fl_Text_Display*	m_pTest;	//!< Test View
 	CSettingsView*		m_pOps;		//!< file settings view
+
+	int					m_nTestFmt;	//!< format for test output
+	Fl_Text_Buffer*		m_pTestAtt;	//!< test attributes
 
 	Fl_Text_Display*	m_pSel;		//!< Target for editing
 };
