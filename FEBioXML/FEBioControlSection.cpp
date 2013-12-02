@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "FEBioControlSection.h"
-#include "FEBioMech/FELinearSolidSolver.h"
-#include "FEBioMech/FECoupledHeatSolidSolver.h"
 #include "FEBioMech/FEUDGHexDomain.h"
 #include "FEBioMech/FEUT4Domain.h"
 
