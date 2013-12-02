@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEBioModuleSection.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //! This function parses the Module section.
@@ -13,7 +14,6 @@ void FEBioModuleSection::Parse(XMLTag &tag)
 	if      (strcmp(szt, "solid"         ) == 0) m_pim->m_nstep_type = FE_SOLID;
 	else if (strcmp(szt, "explicit-solid") == 0) m_pim->m_nstep_type = FE_EXPLICIT_SOLID;
 	else if (strcmp(szt, "linear solid"  ) == 0) m_pim->m_nstep_type = FE_LINEAR_SOLID; 
-	else if (strcmp(szt, "poro"          ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;		// obsolete in 2.0
 	else if (strcmp(szt, "biphasic"      ) == 0) m_pim->m_nstep_type = FE_BIPHASIC;
 	else if (strcmp(szt, "solute"        ) == 0) m_pim->m_nstep_type = FE_POROSOLUTE;	// obsolete in 2.0
 	else if (strcmp(szt, "multiphasic"   ) == 0) m_pim->m_nstep_type = FE_MULTIPHASIC;

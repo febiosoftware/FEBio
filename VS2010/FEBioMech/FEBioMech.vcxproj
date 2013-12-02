@@ -282,6 +282,7 @@
     <ClCompile Include="..\..\FEBioMech\FESlidingInterfaceBW.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidAnalysis.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidMaterial.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FESolidDomainFactory.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FESphericalFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEStiffnessMatrix.cpp" />
@@ -388,6 +389,7 @@
     <ClInclude Include="..\..\FEBioMech\FESlidingInterfaceBW.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidAnalysis.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidMaterial.h" />
+    <ClInclude Include="..\..\FEBioMech\FESolidDomainFactory.h" />
     <ClInclude Include="..\..\FEBioMech\FESolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FESphericalFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FEStiffnessMatrix.h" />

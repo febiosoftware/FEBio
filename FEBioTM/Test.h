@@ -32,7 +32,6 @@ public:
 
 	STATS GetStats(CTask& task);
 
-protected:
 	int FindStatsIndex(const char* szfile);
 
 private:

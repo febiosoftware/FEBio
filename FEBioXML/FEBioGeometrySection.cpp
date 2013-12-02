@@ -1,26 +1,10 @@
 #include "stdafx.h"
 #include "FEBioGeometrySection.h"
-#include "FEBioMech/FERigid.h"
-#include "FEBioMix/FEBiphasic.h"
-#include "FEBioMix/FEBiphasicSolute.h"
-#include "FEBioMix/FETriphasic.h"
-#include "FEBioMix/FEMultiphasic.h"
-#include "FEBioMech/FEUncoupledMaterial.h"
-#include "FEBioMech/FEElasticSolidDomain.h"
-#include "FEBioMech/FEElasticShellDomain.h"
-#include "FEBioMech/FEElasticTrussDomain.h"
-#include "FEBioMech/FERigidSolidDomain.h"
-#include "FEBioMech/FERigidShellDomain.h"
-#include "FEBioMech/FEUDGHexDomain.h"
-#include "FEBioMech/FEUT4Domain.h"
-#include "FEBioMix/FEBiphasicSolidDomain.h"
-#include "FEBioMix/FETriphasicDomain.h"
-#include "FEBioMix/FEBiphasicSoluteDomain.h"
-#include "FEBioMech/FE3FieldElasticSolidDomain.h"
-#include "FEBioMech/FELinearSolidDomain.h"
-#include "FEBioMix/FEMultiphasicDomain.h"
-#include "FEBioHeat/FEHeatTransferMaterial.h"
-#include "FEBioHeat/FEHeatSolidDomain.h"
+#include "FECore/FESolidDomain.h"
+#include "FECore/FEShellDomain.h"
+#include "FECore/FETrussDomain.h"
+#include "FECore/FEModel.h"
+#include "FEBioMech/FEElasticMaterial.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file
@@ -172,118 +156,40 @@ void FEBioGeometrySection::ParseNodeSection(XMLTag& tag)
 
 //-----------------------------------------------------------------------------
 //! Get the element type from a XML tag
-int FEBioGeometrySection::ElementType(XMLTag& t)
+FE_Element_Shape FEBioGeometrySection::ElementShape(XMLTag& t)
 {
-	if (t=="hex8"  ) return ET_HEX8;
-	if (t=="hex20" ) return ET_HEX20;
-	if (t=="penta6") return ET_PENTA6;
-	if (t=="tet4"  ) return ET_TET4;
-	if (t=="tet10" ) return ET_TET10;
-	if (t=="quad4" ) return ET_QUAD4;
-	if (t=="tri3"  ) return ET_TRI3;
-	if (t=="truss2") return ET_TRUSS2;
-	return -1;
+	if      (t=="hex8"  ) return ET_HEX8;
+	else if (t=="hex20" ) return ET_HEX20;
+	else if (t=="penta6") return ET_PENTA6;
+	else if (t=="tet4"  ) return ET_TET4;
+	else if (t=="tet10" ) return ET_TET10;
+	else if (t=="quad4" ) return ET_QUAD4;
+	else if (t=="tri3"  ) return ET_TRI3;
+	else if (t=="truss2") return ET_TRUSS2;
+	else 
+	{
+		assert(false);
+		throw XMLReader::InvalidTag(t);
+	}
 }
 
 //-----------------------------------------------------------------------------
 //! find the domain type for the element and material type
-int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
+int FEBioGeometrySection::DomainType(FE_Element_Shape eshape, FEMaterial* pmat)
 {
-	FEMesh* pm = m_pim->GetFEMesh();
-	int ntype = m_pim->m_nstep_type;
-
-	// get the module
-	if (ntype == FE_HEAT)
-	{
-		if ((etype == ET_HEX8) || (etype == ET_HEX20) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10)) return FE_HEAT_SOLID_DOMAIN;
-		else return 0;
-	}
-	else if (ntype == FE_LINEAR_SOLID)
-	{
-		if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4)) return FE_LINEAR_SOLID_DOMAIN;
-		else return 0;
-	}
-	else if (ntype == FE_HEAT_SOLID)
-	{
-		if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4))
-		{
-			if (dynamic_cast<FEHeatTransferMaterial*>(pmat)) return FE_HEAT_SOLID_DOMAIN;
-			else return FE_LINEAR_SOLID_DOMAIN;
-		}
-		else return 0;
-	}
-	else
-	{
-		if (dynamic_cast<FERigidMaterial*>(pmat))
-		{
-			// rigid elements
-			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_RIGID_SOLID_DOMAIN;
-			else if ((etype == ET_QUAD4) || (etype == ET_TRI3)) return FE_RIGID_SHELL_DOMAIN;
-			else return 0;
-		}
-		else if (dynamic_cast<FEBiphasic*>(pmat))
-		{
-			// biphasic elements
-			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_DOMAIN;
-			else return 0;
-		}
-		else if (dynamic_cast<FEBiphasicSolute*>(pmat))
-		{
-			// biphasic elements
-			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_BIPHASIC_SOLUTE_DOMAIN;
-			else return 0;
-		}
-		else if (dynamic_cast<FETriphasic*>(pmat))
-		{
-			// triphasic elements
-			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_TRIPHASIC_DOMAIN;
-			else return 0;
-		}
-		else if (dynamic_cast<FEMultiphasic*>(pmat))
-		{
-			// multiphasic elements
-			if ((etype == ET_HEX8) || (etype == ET_PENTA6) || (etype == ET_TET4) || (etype == ET_TET10) || (etype == ET_HEX20)) return FE_MULTIPHASIC_DOMAIN;
-			else return 0;
-		}
-		else
-		{
-			// structural elements
-			if (etype == ET_HEX8)
-			{
-				// three-field implementation for uncoupled materials
-				if (dynamic_cast<FEUncoupledMaterial*>(pmat) && m_pim->m_b3field) return FE_3F_SOLID_DOMAIN;
-				else
-				{
-					if (m_pim->m_nhex8 == FE_HEX8G1) return FE_UDGHEX_DOMAIN;
-					else return FE_SOLID_DOMAIN;
-				}
-			}
-			else if (etype == ET_HEX20)
-			{
-				return FE_SOLID_DOMAIN;
-			}
-			else if (etype == ET_TET4)
-			{
-				if (m_pim->m_but4) return FE_UT4_DOMAIN;
-				else return FE_SOLID_DOMAIN;
-			}
-			else if (etype == ET_TET10)
-			{
-				return FE_SOLID_DOMAIN;
-			}
-			else if (etype == ET_PENTA6) 
-			{
-				// three-field implementation for uncoupled materials
-				if (dynamic_cast<FEUncoupledMaterial*>(pmat)) return FE_3F_SOLID_DOMAIN;
-				else return FE_SOLID_DOMAIN;
-			}
-			else if ((etype == ET_QUAD4) || (etype == ET_TRI3)) return FE_SHELL_DOMAIN;
-			else if ((etype == ET_TRUSS2)) return FE_TRUSS_DOMAIN;
-			else return 0;
-		}
-	}
-
-	return 0;
+	// setup the element specs
+	FE_Element_Spec spec;
+	spec.eshape = eshape;
+	spec.m_bthree_field = m_pim->m_b3field;
+	spec.m_but4 = m_pim->m_but4;
+	if      (eshape == ET_HEX8 ) spec.etype = m_pim->m_nhex8;
+	else if (eshape == ET_TET4 ) spec.etype = m_pim->m_ntet4;
+	else if (eshape == ET_TET10) spec.etype = m_pim->m_ntet10;
+	else if (eshape == ET_TRI3 ) spec.etype = m_pim->m_ntri3;
+	
+	// get the domain type
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	return febio.GetDomainType(spec, pmat);
 }
 
 //-----------------------------------------------------------------------------
@@ -291,24 +197,8 @@ int FEBioGeometrySection::DomainType(int etype, FEMaterial* pmat)
 FEDomain* FEBioGeometrySection::CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat)
 {
 	// create a new domain based on the type
-	FEDomain* pd = 0;
-	switch (ntype)
-	{
-	case FE_SOLID_DOMAIN          : pd = new FEElasticSolidDomain      (pm, pmat); break;
-	case FE_SHELL_DOMAIN          : pd = new FEElasticShellDomain      (pm, pmat); break;
-	case FE_TRUSS_DOMAIN          : pd = new FEElasticTrussDomain      (pm, pmat); break;
-	case FE_RIGID_SOLID_DOMAIN    : pd = new FERigidSolidDomain        (pm, pmat); break;
-	case FE_RIGID_SHELL_DOMAIN    : pd = new FERigidShellDomain        (pm, pmat); break;
-	case FE_UDGHEX_DOMAIN         : pd = new FEUDGHexDomain            (pm, pmat); break;
-	case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (pm, pmat); break;
-	case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (pm, pmat); break;
-	case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(pm, pmat); break;
-	case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicSolidDomain     (pm, pmat); break;
-	case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (pm, pmat); break;
-	case FE_TRIPHASIC_DOMAIN      : pd = new FETriphasicDomain         (pm, pmat); break;
-	case FE_MULTIPHASIC_DOMAIN    : pd = new FEMultiphasicDomain       (pm, pmat); break;
-	case FE_LINEAR_SOLID_DOMAIN   : pd = new FELinearSolidDomain       (pm, pmat); break;
-	}
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FEDomain* pd = febio.CreateDomain(ntype, pm, pmat);
 
 	// return the domain
 	return pd;
@@ -339,8 +229,7 @@ void FEBioGeometrySection::ParseElementSection(XMLTag& tag)
 		if ((nmat < 0) || (nmat >= fem.Materials())) throw FEFEBioImport::InvalidMaterial(elems+1);
 
 		// get the element type
-		int etype = ElementType(t);
-		if (etype < 0) throw XMLReader::InvalidTag(t);
+		FE_Element_Shape etype = ElementShape(t);
 
 		// get the element ID
 		int nid = -1;
@@ -519,8 +408,7 @@ void FEBioGeometrySection::ParseMesh(XMLTag& tag)
 	while (!t.isend())
 	{
 		// get the element type
-		int etype = ElementType(t);
-		if (etype < 0) throw XMLReader::InvalidTag(t);
+		FE_Element_Shape etype = ElementShape(t);
 
 		// find a domain for this element
 		int ndom = -1;
@@ -666,7 +554,7 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 	const char* szel = tag.AttributeValue("elem");
 
 	// determine element type
-	int etype = -1;
+	FE_Element_Shape etype;
 	if      (strcmp(szel, "hex8"  ) == 0) etype = ET_HEX8;
 	else if (strcmp(szel, "hex20" ) == 0) etype = ET_HEX20;
 	else if (strcmp(szel, "penta6") == 0) etype = ET_PENTA6;
@@ -705,15 +593,6 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 	mesh.AddDomain(pdom);
 	FEDomain& dom = *pdom;
 	dom.create(nelems);
-
-	// determine element type
-	if      (etype == ET_HEX8  ) etype = ET_HEX8;
-	else if (etype == ET_PENTA6) etype = ET_PENTA6;
-	else if (etype == ET_TET4  ) etype = m_pim->m_ntet4;
-	else if (etype == ET_QUAD4 ) etype = ET_QUAD4;
-	else if (etype == ET_TRI3  ) etype = ET_TRI3;
-	else if (etype == ET_TRUSS2) etype = ET_TRUSS2;
-	else throw XMLReader::InvalidTag(tag);
 
 	// read all elements 
 	++tag;

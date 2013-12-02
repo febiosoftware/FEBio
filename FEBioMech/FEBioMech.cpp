@@ -84,10 +84,17 @@
 #include "FEBioMechPlot.h"
 #include "FEBioMechData.h"
 
+#include "FESolidDomainFactory.h"
+
 //-----------------------------------------------------------------------------
 //! Register all the classes of the FEBioMech module with the FEBio framework.
 void FEBioMech::InitModule()
 {
+//-----------------------------------------------------------------------------
+// Domain factory
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	febio.RegisterDomain(new FESolidDomainFactory);
+
 //-----------------------------------------------------------------------------
 // Analysis classes
 REGISTER_FEBIO_CLASS(FESolidAnalysis        , FEAnalysis, "solid"         );

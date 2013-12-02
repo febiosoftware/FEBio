@@ -42,6 +42,13 @@ public:
 	void RegisterTask(FEBioFactory* ptf) { m_pTask.push_back(ptf); }
 
 public:
+	void RegisterDomain(FEDomainFactory* pf) { m_Dom.push_back(pf); }
+
+	int GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat);
+
+	FEDomain* CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat);
+
+public:
 	template <typename T> T* Create(const char* sztag, FEModel* pfem);
 
 	template <typename T> const char* GetTypeStr(T* po);
@@ -57,9 +64,12 @@ public:
 
 public:
 	std::vector<FEBioFactory*>	m_Fac;	// list of registered factory classes
-	std::vector<FEBioFactory*>      m_pTask;  // list of registered tasks
+	std::vector<FEBioFactory*>  m_pTask;  // list of registered tasks
 
 	Logfile*	m_plog;	// keep a pointer to the logfile (used by plugins)
+
+private:
+	std::vector<FEDomainFactory*>	m_Dom;	// list of domain factory classes
 
 private: // make singleton
 	FEBioKernel();
@@ -187,3 +197,25 @@ public:
 // version for classes that require template arguments
 #define REGISTER_FEBIO_CLASS_T(theClass, theBase, theArg, theName) \
 	static FERegisterClass_T<theClass<theArg>, theBase> _##theClass##theArg##_rc(theName);
+
+//-----------------------------------------------------------------------------
+inline int FEBioKernel::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
+{
+	for (int i=0; i<(int)m_Dom.size(); ++i)
+	{
+		int ndom = m_Dom[i]->GetDomainType(spec, pmat);
+		if (ndom != 0) return ndom;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+inline FEDomain* FEBioKernel::CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat)
+{
+	for (int i=0; i<(int)m_Dom.size(); ++i)
+	{
+		FEDomain* pdom = m_Dom[i]->CreateDomain(dtype, pm, pmat);
+		if (pdom != 0) return pdom;
+	}
+	return 0;
+}

@@ -5,8 +5,23 @@
 #ifndef _FE_ENUM_H_05132007_
 #define _FE_ENUM_H_05132007_
 
-///////////////////////////////////////////////////////////////////////////////
-// ENUM: Element types
+//-----------------------------------------------------------------------------
+// Element shapes:
+// This defines the general element shape classes. This classification differs from the
+// element types below, in that the latter is defined by a shape and integration rule.
+enum FE_Element_Shape {
+	ET_HEX8,
+	ET_HEX20,
+	ET_PENTA6,
+	ET_TET4,
+	ET_TET10,
+	ET_QUAD4,
+	ET_TRI3,
+	ET_TRUSS2
+};
+
+//-----------------------------------------------------------------------------
+// Element types:
 //  Note that these numbers are actually indices into the m_Traits array
 //  of the ElementLibrary class so make sure the numbers correspond
 //  with the entries into this array
@@ -47,6 +62,15 @@ enum FE_Element_Type {
 
 	// discrete elements
 	FE_DISCRETE,
+};
+
+//-----------------------------------------------------------------------------
+struct FE_Element_Spec
+{
+	FE_Element_Shape	eshape;
+	FE_Element_Type		etype;
+	bool				m_bthree_field;
+	bool				m_but4;
 };
 
 /////////////////////////////////////////////////////////////////////////////

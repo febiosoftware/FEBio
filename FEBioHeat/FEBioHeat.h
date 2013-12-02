@@ -1,4 +1,5 @@
 #pragma once
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //! The FEBioHeat module
@@ -8,5 +9,8 @@
 
 namespace FEBioHeat 
 {
-	void InitModule();
+//-----------------------------------------------------------------------------
+//! Module initialization
+void InitModule();
+
 };

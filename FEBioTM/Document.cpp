@@ -103,7 +103,8 @@ void CDocument::RunTest()
 		for (int i=0; i<N; ++i)
 		{
 			CTask& task = *m_session.GetTask(i);
-			CTest::STATS data =  m_ptest->GetStats(task);
+			int n = m_ptest->FindStatsIndex(task.GetFileTitle());
+			CTest::STATS data =  m_ptest->GetStats(n);
 			CTask::STATS stat = task.m_stats;
 			if (stat.nreturn == data.nreturn) sprintf(szret , "%d", stat.nreturn); else sprintf(szret , "%d(%d)", stat.nreturn, data.nreturn);
 			if (stat.ntime   == data.ntime  ) sprintf(sztime, "%d", stat.ntime  ); else sprintf(sztime, "%d(%d)", stat.ntime  , data.ntime  );
@@ -111,7 +112,7 @@ void CDocument::RunTest()
 			if (stat.nrhs    == data.nrhs   ) sprintf(szrhs , "%d", stat.nrhs   ); else sprintf(szrhs , "%d(%d)", stat.nrhs   , data.nrhs   );
 			if (stat.nreform == data.nreform) sprintf(szref , "%d", stat.nreform); else sprintf(szref , "%d(%d)", stat.nreform, data.nreform);
 
-			int nresult = m_ptest->GetResult(i);
+			int nresult = m_ptest->GetResult(n);
 			if (nresult == 0) pwnd->SetTestFormat(1); else pwnd->SetTestFormat(0);
 			pwnd->AddTestEntry("%-32s|%12s|%12s|%12s|%12s|%12s| %s\n", task.GetFileTitle(), szret, sztime, sziter, szrhs, szref, sz[nresult]);
 		}

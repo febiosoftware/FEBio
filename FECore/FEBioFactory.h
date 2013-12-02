@@ -1,4 +1,5 @@
 #pragma once
+#include "FE_enum.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
@@ -36,4 +37,21 @@ public:
 
 	// check type of class
 	virtual bool IsType(T* po) = 0;
+};
+
+//-----------------------------------------------------------------------------
+class FEDomain;
+class FEMesh;
+class FEMaterial;
+
+//-----------------------------------------------------------------------------
+// Creation of domains are a little more elaborate
+class FEDomainFactory
+{
+public:
+	FEDomainFactory(){}
+	virtual ~FEDomainFactory(){}
+
+	virtual int GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat) = 0;
+	virtual FEDomain* CreateDomain(int dtype, FEMesh* pm, FEMaterial* pmat) = 0;
 };

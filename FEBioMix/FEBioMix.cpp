@@ -45,11 +45,18 @@
 #include "FEBioMixPlot.h"
 #include "FEBioMixData.h"
 
+#include "FEMixDomainFactory.h"
+
 //-----------------------------------------------------------------------------
 //! Initialization of the FEBioMix module. This function registers all the classes
 //! in this module with the FEBio framework.
 void FEBioMix::InitModule()
 {
+//-----------------------------------------------------------------------------
+// Domain factory
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	febio.RegisterDomain(new FEMixDomainFactory);
+
 //-----------------------------------------------------------------------------
 // Analysis classes
 REGISTER_FEBIO_CLASS(FEBiphasicAnalysis      , FEAnalysis, "biphasic"       );

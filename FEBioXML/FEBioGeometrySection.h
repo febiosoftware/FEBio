@@ -6,22 +6,11 @@
 class FEBioGeometrySection : public FEBioFileSection
 {
 private:
-	enum {
-		ET_HEX8,
-		ET_HEX20,
-		ET_PENTA6,
-		ET_TET4,
-		ET_TET10,
-		ET_QUAD4,
-		ET_TRI3,
-		ET_TRUSS2
-	};
-
 	struct FEDOMAIN 
 	{
-		int		mat;	// material ID
-		int		elem;	// element type
-		int		nel;	// number of elements
+		FE_Element_Shape	elem;	// element type
+		int					mat;	// material ID
+		int					nel;	// number of elements
 	};
 	
 public:
@@ -41,7 +30,7 @@ protected:
 	void ReadShellElement(XMLTag& tag, FEShellElement& el, int ntype, int nid, int nmat);
 	void ReadTrussElement(XMLTag& tag, FETrussElement& el, int ntype, int nid, int nmat);
 
-	int ElementType(XMLTag& tag);
-	int DomainType(int etype, FEMaterial* pmat);
+	FE_Element_Shape ElementShape(XMLTag& tag);
+	int DomainType(FE_Element_Shape eshape, FEMaterial* pmat);
 	FEDomain* CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat);
 };
