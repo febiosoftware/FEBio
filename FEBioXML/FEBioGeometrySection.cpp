@@ -570,13 +570,7 @@ void FEBioGeometrySection::ParsePartSection(XMLTag& tag)
 	if ((nmat < 0) || (nmat >= fem.Materials())) throw XMLReader::InvalidAttributeValue(tag, "mat", szmat);
 
 	// Count the elements
-	XMLTag t(tag); ++t;
-	int nelems = 0;
-	while (!t.isend())
-	{
-		nelems++;
-		++t;
-	}
+	int nelems = tag.children();
 
 	// get the material class
 	FEMaterial* pmat = fem.GetMaterial(nmat);

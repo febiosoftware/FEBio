@@ -70,10 +70,6 @@ public:
 	// reload the file
 	void Revert();
 
-	// get/set progress indicator
-	void SetProgress(float f) { m_prg = f; }
-	float GetProgress() { return m_prg; }
-
 	// run this task
 	void Run(Progress& prg);
 	static CTask* GetRunningTask() { return m_prun; }
@@ -86,7 +82,6 @@ protected:
 	Fl_Text_Buffer*	m_pFile;				//!< text buffer for editing
 	Fl_Text_Buffer*	m_pStyle;				//!< text buffer for styling
 	int				m_nstatus;				//!< status
-	float			m_prg;					//!< progress indicator
 
 public: // FEBio command line and control options
 	bool	m_bdebug;	//!< debug mode

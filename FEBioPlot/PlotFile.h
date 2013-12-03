@@ -26,7 +26,7 @@ public:
 	virtual ~PlotFile();
 
 	//! close the plot database
-	void Close();
+	virtual void Close();
 
 	//! Open the plot database
 	virtual bool Open(FEModel& fem, const char* szfile) = 0;

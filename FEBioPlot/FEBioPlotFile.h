@@ -142,6 +142,9 @@ public:
 	//! Open the plot database
 	bool Open(FEModel& fem, const char* szfile);
 
+	//! Close the plot database
+	void Close();
+
 	//! Open for appending
 	bool Append(FEModel& fem, const char* szfile);
 

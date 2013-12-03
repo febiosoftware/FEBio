@@ -8,6 +8,7 @@
 #include "FEHeatSolver.h"
 #include "FEHeatSolidDomain.h"
 #include "FEHeatDomainFactory.h"
+#include "FEHeatSource.h"
 
 namespace FEBioHeat {
 
@@ -26,6 +27,9 @@ void InitModule()
 
 	// Materials
 	REGISTER_MATERIAL(FEIsotropicFourier, "isotropic Fourier");
+
+	// Body loads
+	REGISTER_FEBIO_CLASS(FEHeatSource, FEBodyLoad, "heat_source");
 
 	// Surface loads
 	REGISTER_FEBIO_CLASS(FEHeatFlux          , FESurfaceLoad, "heatflux"           );

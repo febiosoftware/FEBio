@@ -112,7 +112,11 @@ void CTaskTable::show_progress(int nrow)
 	m_nrow = nrow;
 	find_cell(CONTEXT_CELL, nrow, 2, X, Y, W, H);
 	m_pg->resize(X, Y, W, H);
-	if (m_pg->visible() == 0) m_pg->show();
+	if (m_pg->visible() == 0)
+	{
+		m_pg->label("0%");
+		m_pg->show();
+	}
 }
 
 //-----------------------------------------------------------------------------

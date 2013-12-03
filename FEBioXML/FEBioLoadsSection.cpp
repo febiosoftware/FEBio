@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FEBioLoadsSection.h"
 #include "FEBioMech/FEPointBodyForce.h"
-#include "FEBioHeat/FEHeatSource.h"
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
@@ -17,9 +16,9 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if      (tag == "force"              ) ParseBCForce    (tag);
-		else if (tag == "body_force"         ) ParseBodyForce  (tag);
-		else if (tag == "heat_source"        ) ParseHeatSource (tag);
+		if      (tag == "force"              ) ParseBCForce  (tag);
+		else if (tag == "body_force"         ) ParseBodyForce(tag);
+		else if (tag == "heat_source"        ) ParseBodyLoad (tag);
 		else ParseSurfaceLoad(tag);
 		++tag;
 	}
@@ -86,11 +85,12 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioLoadsSection::ParseHeatSource(XMLTag& tag)
+void FEBioLoadsSection::ParseBodyLoad(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEHeatSource* phs = new  FEHeatSource(&fem);
-	FEParameterList& PL = phs->GetParameterList();
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FEBodyLoad* pbl = febio.Create<FEBodyLoad>(tag.Name(), &fem);
+	FEParameterList& PL = pbl->GetParameterList();
 	++tag;
 	do
 	{
@@ -98,9 +98,8 @@ void FEBioLoadsSection::ParseHeatSource(XMLTag& tag)
 		++tag;
 	}
 	while (!tag.isend());
-	fem.AddBodyLoad(phs);
+	fem.AddBodyLoad(pbl);
 }
-
 
 //-----------------------------------------------------------------------------
 void FEBioLoadsSection::ParseBCForce(XMLTag &tag)

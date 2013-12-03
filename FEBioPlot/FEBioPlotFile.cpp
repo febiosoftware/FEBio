@@ -115,6 +115,12 @@ FEBioPlotFile::FEBioPlotFile(FEModel& fem) : m_fem(fem)
 
 FEBioPlotFile::~FEBioPlotFile(void)
 {
+	Close();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPlotFile::Close()
+{
 	m_ar.Close();
 
 	int i;

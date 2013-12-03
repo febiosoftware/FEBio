@@ -12,6 +12,6 @@ public:
 protected:
 	void ParseBCForce    (XMLTag& tag);
 	void ParseBodyForce  (XMLTag& tag);
-	void ParseHeatSource (XMLTag& tag);
+	void ParseBodyLoad   (XMLTag& tag);
 	void ParseSurfaceLoad(XMLTag& tag);
 };

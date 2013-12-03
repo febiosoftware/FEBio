@@ -33,7 +33,13 @@ LSDYNAPlotFile::LSDYNAPlotFile()
 
 LSDYNAPlotFile::~LSDYNAPlotFile()
 {
+	Close();
+}
+
+void LSDYNAPlotFile::Close()
+{
 	if (m_fp) fclose(m_fp);
+	m_fp = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
