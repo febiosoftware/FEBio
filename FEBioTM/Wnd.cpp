@@ -546,7 +546,7 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 	if (N == 0) { flx_error("No task selected"); return; }
 
 	// show the output window
-	m_pTabs->value(m_pTabs->child(2));
+	m_pTabs->value(m_pTabs->child(2)); OnSelectTab(0,0);
 	m_pTabs->do_callback();
 
 	TMSession& session = m_pDoc->GetSession();
@@ -569,8 +569,11 @@ void CWnd::OnRunSelected(Fl_Widget *pw, void *pd)
 void CWnd::OnRunSession(Fl_Widget* pw, void* pd)
 {
 	// show the output window
-	if (m_pTabs) m_pTabs->value(m_pTabs->child(2));
-	m_pTask->redraw();
+	if (m_pTabs) 
+	{
+		m_pTabs->value(m_pTabs->child(2));
+		OnSelectTab(0, 0);
+	}
 
 	// run the session
 	m_pDoc->RunSession();
@@ -646,6 +649,8 @@ void CWnd::OnToolsRunTest(Fl_Widget* pw, void* pd)
 {
 	ClearTestWnd();
 	m_pDoc->RunTest();
+	m_pTabs->value(m_pTabs->child(4));
+	OnSelectTab(0, 0);
 }
 
 //-----------------------------------------------------------------------------
