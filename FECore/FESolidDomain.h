@@ -17,7 +17,7 @@ public:
 
 	//! element access
 	FESolidElement& Element(int n) { return m_Elem[n]; }
-	FESolidElement& ElementRef(int n) { return m_Elem[n]; }
+	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
 	int GetElementType() { return m_Elem[0].Type(); }
 

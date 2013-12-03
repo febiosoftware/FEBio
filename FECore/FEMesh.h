@@ -230,6 +230,9 @@ public:
 	//! stream mesh data
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
+	//! initialize mesh
+	bool Init();
+
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);
 	void AddNodes(int nodes);
@@ -323,6 +326,12 @@ public:
 protected:
 	double SolidElementVolume(FESolidElement& el);
 	double ShellElementVolume(FEShellElement& el);
+
+	//! Look for any inverted elements
+	int FindInvertedElements();
+	
+	//! Initialize shell normals
+	void InitShellNormals();
 
 protected:
 	void ClearDomains();

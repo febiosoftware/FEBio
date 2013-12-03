@@ -10,6 +10,7 @@
 #include "FEShellDomain.h"
 #include "FESolidDomain.h"
 #include "FEMaterial.h"
+#include "log.h"
 
 //=============================================================================
 // FENodeSet
@@ -360,6 +361,205 @@ int FEMesh::RemoveIsolatedVertices()
 		}
 
 	return ni;
+}
+
+//-----------------------------------------------------------------------------
+//! Calculate all shell normals (i.e. the shell directors).
+void FEMesh::InitShellNormals()
+{
+	// zero initial directors for shell nodes
+	for (int i=0; i<Nodes(); ++i) Node(i).m_D0 = vec3d(0,0,0);
+
+	// loop over all domains
+	for (int nd = 0; nd < Domains(); ++nd)
+	{
+		// Calculate the shell directors as the local node normals
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&Domain(nd));
+		if (psd)
+		{
+			vec3d r0[4];
+			for (int i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+
+				int n = el.Nodes();
+				int* en = &el.m_node[0];
+
+				// get the nodes
+				for (int j=0; j<n; ++j) r0[j] = Node(en[j]).m_r0;
+
+				for (int j=0; j<n; ++j)
+				{
+					int m0 = j;
+					int m1 = (j+1)%n;
+					int m2 = (j==0? n-1: j-1);
+
+					vec3d a = r0[m0];
+					vec3d b = r0[m1];
+					vec3d c = r0[m2];
+
+					Node(en[m0]).m_D0 += (b-a)^(c-a);
+				}
+			}
+		}
+	}
+
+	// make sure we start with unit directors
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		node.m_D0.unit();
+		node.m_Dt = node.m_D0;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! Find all elements that inverted. That is, the elements whose jacobian with 
+//! respect to the reference configuration is negative. Negative initial jacobians
+//! may indicate a problem with the mesh (e.g. incorrect node numbering).
+int FEMesh::FindInvertedElements()
+{
+	// loop over all domains
+	int ninverted = 0;
+	for (int nd = 0; nd < Domains(); ++nd)
+	{
+		// check solid domains
+		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&Domain(nd));
+		if (pbd)
+		{
+			for (int i=0; i<pbd->Elements(); ++i)
+			{
+				FESolidElement& el = pbd->Element(i);
+
+				int nint = el.GaussPoints();
+				for (int n=0; n<nint; ++n)
+				{
+					double J0 = pbd->detJ0(el, n);
+					if (J0 <= 0)
+					{
+						felog.printf("**************************** E R R O R ****************************\n");
+						felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+						felog.printf("Jacobian = %lg\n", J0);
+						felog.printf("Did you use the right node numbering?\n");
+						felog.printf("Nodes:");
+						for (int l=0; l<el.Nodes(); ++l)
+						{
+							felog.printf("%d", el.m_node[l]+1);
+							if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
+						}
+						felog.printf("*******************************************************************\n\n");
+						++ninverted;
+					}
+				}
+			}
+		}
+
+		// check shell domains (we don't care about rigid domains)
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&Domain(nd));
+		if (psd)
+		{
+			// check the connectivity of the shells
+			for (int i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				if (!el.IsRigid())
+				{
+					int nint = el.GaussPoints();
+					for (int n=0; n<nint; ++n)
+					{
+						double J0 = psd->detJ0(el, n);
+						if (J0 <= 0)
+						{
+							felog.printf("**************************** E R R O R ****************************\n");
+							felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
+							felog.printf("Jacobian = %lg\n", J0);
+							felog.printf("Did you use the right node numbering?\n");
+							felog.printf("Nodes:");
+							for (int l=0; l<el.Nodes(); ++l)
+							{
+								felog.printf("%d", el.m_node[l]+1);
+								if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
+							}
+							felog.printf("*******************************************************************\n\n");
+							++ninverted;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// return the number of inverted elements
+	return ninverted;
+}
+
+//-----------------------------------------------------------------------------
+//! Initialize mesh data
+bool FEMesh::Init()
+{
+	// Initialize shell normals (i.e. directors)
+	// NOTE: we do this before we check for inverted elements since the jacobian of a shell
+	//       depends on its normal.
+	InitShellNormals();
+
+	// look for any initially inverted elements
+	int ninverted = FindInvertedElements();
+	if (ninverted != 0)
+	{
+		felog.printf("**************************** E R R O R ****************************\n");
+		felog.printf(" FEBio found %d initially inverted elements.\n", ninverted);
+		felog.printf(" Run will be aborted.\n");
+		felog.printf("*******************************************************************\n\n");
+		return false;
+	}
+
+	// next if a node does not belong to a shell
+	// we turn of the rotational degrees of freedom
+	// To do this, we first tag all shell nodes
+	vector<int> tag(Nodes());
+	zero(tag);
+	for (int nd = 0; nd < Domains(); ++nd)
+	{
+		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&Domain(nd));
+		if (psd)
+		{
+			for (int i=0; i<psd->Elements(); ++i)
+			{
+				FEShellElement& el = psd->Element(i);
+				int n = el.Nodes();
+				int* en = &el.m_node[0];
+				for (int j=0; j<n; ++j) tag[en[j]] = 1;
+			}
+		}
+	}
+
+	// fix rotational degrees of freedom of tagged nodes
+	for (int i=0; i<Nodes(); ++i) 
+	{
+		FENode& node = Node(i);
+		if (tag[i] == 0)
+		{
+			node.m_ID[DOF_U] = -1;
+			node.m_ID[DOF_V] = -1;
+			node.m_ID[DOF_W] = -1;
+		}
+	}
+
+	// At this point, the node ID still contains the boundary conditions
+	// so we copy that into the m_BC array
+	// TODO: perhaps we should put the BC's initially in BC instead of ID.
+	for (int i=0; i<Nodes(); ++i)
+	{
+		FENode& node = Node(i);
+		for (int j=0; j<MAX_NDOFS; ++j)	node.m_BC[j] = node.m_ID[j];
+	}
+
+	// reset data
+	// TODO: Not sure why this is here
+	Reset();
+
+	// All done
+	return true;
 }
 
 //-----------------------------------------------------------------------------

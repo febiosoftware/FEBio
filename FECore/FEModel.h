@@ -69,6 +69,9 @@ public:
 	// return number of rigid objects
 	int Objects() { return (int) m_Obj.size(); }
 
+	//! Initialize mesh data
+	bool InitMesh();
+
 public:
 	//! set the problem title
 	void SetTitle(const char* sz);
@@ -138,6 +141,9 @@ public: // --- Body load functions ---
 	//! see if there are any body loads
 	bool HasBodyLoads() { return !m_BL.empty();}
 
+	//! Init body loads
+	bool InitBodyLoads();
+
 public: // --- Analysis steps functions ---
 
 	//! retrieve the number of steps
@@ -182,6 +188,9 @@ public: // --- Nonlinear constraints functions ---
 
 	//! add a nonlinear constraint
 	void AddNonlinearConstraint(FENLConstraint* pnlc) { m_NLC.push_back(pnlc); }
+
+	//! Initialize constraint data
+	void InitConstraints();
 
 public: // --- parameter functions ---
 

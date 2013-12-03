@@ -3,49 +3,23 @@
 #include "FEBioMech/FERigid.h"
 #include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FERigidJoint.h"
-#include "FEBioMech/FEDiscreteMaterial.h"
-#include "FEBioMech/FEElasticSolidDomain.h"
-#include "FEBioMech/FEElasticShellDomain.h"
-#include "FEBioMix/FEBiphasic.h"
-#include "FEBioMix/FEBiphasicSolute.h"
-#include "FEBioMix/FETriphasic.h"
-#include "FEBioMech/FETransverselyIsotropic.h"
-#include "FEBioMech/FEPressureLoad.h"
-#include "FEBioMech/FETractionLoad.h"
-#include "FEBioMix/FEPoroTraction.h"
-#include "FEBioMix/FEFluidFlux.h"
-#include "FEBioMix/FESoluteFlux.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FEBioMech/FEElasticShellDomain.h"
 #include "FEBioMech/FEElasticTrussDomain.h"
-#include "FEBioMech/FEDiscreteSpringDomain.h"
-#include "FEBioMix/FEBiphasicSolidDomain.h"
-#include "FEBioMix/FEBiphasicSoluteDomain.h"
-#include "FEBioMech/FEUDGHexDomain.h"
-#include "FEBioMech/FERigidSolidDomain.h"
-#include "FEBioMech/FERigidShellDomain.h"
-#include "FEBioMech/FE3FieldElasticSolidDomain.h"
-#include "FEBioMech/FEUT4Domain.h"
-#include "FEBioMix/FETriphasicDomain.h"
-#include "FEBioMech/FELinearSolidDomain.h"
-#include "FEBioMix/FEMultiphasicDomain.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FEContactInterface.h"
+#include "FEBioPlot/LSDYNAPlotFile.h"
+#include "FEBioPlot/FEBioPlotFile.h"
+#include "FEBioMix/FEBiphasic.h"
+#include "FEBioMix/FEBiphasicSolute.h"
+#include "FEBioMix/FETriphasic.h"
+#include "FEBioMix/FEMultiphasic.h"
+#include "FEBioXML/FEBioImport.h"
+#include "FEBioXML/FERestartImport.h"
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
 #include "FECore/ObjectDataRecord.h"
-#include "FEBioPlot/LSDYNAPlotFile.h"
-#include "FEBioPlot/FEBioPlotFile.h"
-#include "FEBioXML/FEBioImport.h"
-#include "FEBioXML/FERestartImport.h"
-#include "FEBioMix/FEMultiphasic.h"
-#include "FEBioMech/FEViscoElasticMaterial.h"
-#include "FEBioMech/FEUncoupledViscoElasticMaterial.h"
-#include "FEBioMech/FEElasticMultigeneration.h"
-#include "FEBioHeat/FEHeatSolidDomain.h"
-#include "FEBioHeat/FEHeatFlux.h"
-#include "FEBioHeat/FEConvectiveHeatFlux.h"
 #include "FECore/log.h"
 #include "version.h"
 
@@ -596,18 +570,18 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 	}
 	else
 	{
-		int i;
+		FEBioKernel& febio = FEBioKernel::GetInstance();
 
 		// read nodal data
 		int nn;
 		ar >> nn;
 		m.CreateNodes(nn);
-		for (i=0; i<nn; ++i) ar.read(&m.Node(i), sizeof(FENode), 1);
+		for (int i=0; i<nn; ++i) ar.read(&m.Node(i), sizeof(FENode), 1);
 
 		// read domain data
 		int ND;
 		ar >> ND;
-		for (i=0; i<ND; ++i)
+		for (int i=0; i<ND; ++i)
 		{
 			int nmat;
 			ar >> nmat;
@@ -616,27 +590,7 @@ void FEBioModel::SerializeMesh(DumpFile& ar)
 
 			int ntype, ne;
 			ar >> ntype >> ne;
-			FEDomain* pd = 0;
-			switch (ntype)
-			{
-			case FE_SOLID_DOMAIN          : pd = new FEElasticSolidDomain      (&m, pm); break;
-			case FE_SHELL_DOMAIN          : pd = new FEElasticShellDomain      (&m, pm); break;
-			case FE_TRUSS_DOMAIN          : pd = new FEElasticTrussDomain      (&m, pm); break;
-			case FE_RIGID_SOLID_DOMAIN    : pd = new FERigidSolidDomain        (&m, pm); break;
-			case FE_RIGID_SHELL_DOMAIN    : pd = new FERigidShellDomain        (&m, pm); break;
-			case FE_UDGHEX_DOMAIN         : pd = new FEUDGHexDomain            (&m, pm); break;
-			case FE_HEAT_SOLID_DOMAIN     : pd = new FEHeatSolidDomain         (&m, pm); break;
-			case FE_DISCRETE_DOMAIN       : pd = new FEDiscreteSpringDomain    (&m, pm); break;
-			case FE_3F_SOLID_DOMAIN       : pd = new FE3FieldElasticSolidDomain(&m, pm); break;
-			case FE_BIPHASIC_DOMAIN       : pd = new FEBiphasicSolidDomain     (&m, pm); break;
-			case FE_BIPHASIC_SOLUTE_DOMAIN: pd = new FEBiphasicSoluteDomain    (&m, pm); break;
-			case FE_UT4_DOMAIN            : pd = new FEUT4Domain               (&m, pm); break;
-			case FE_TRIPHASIC_DOMAIN      : pd = new FETriphasicDomain         (&m, pm); break;
-			case FE_MULTIPHASIC_DOMAIN    : pd = new FEMultiphasicDomain       (&m, pm); break;
-			case FE_LINEAR_SOLID_DOMAIN   : pd = new FELinearSolidDomain       (&m, pm); break;
-			default: assert(false);
-			}
-
+			FEDomain* pd = febio.CreateDomain(ntype, &m, pm);
 			assert(pd);
 			pd->create(ne);
 			pd->Serialize(ar);
@@ -695,13 +649,13 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 //! \todo Do we need to store the m_bActive flag of the boundary conditions?
 void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 {
-	int i, n;
+	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	if (ar.IsSaving())
 	{
 		// displacements
 		ar << (int) m_DC.size();
-		for (i=0; i<(int) m_DC.size(); ++i) 
+		for (int i=0; i<(int) m_DC.size(); ++i) 
 		{
 			FEPrescribedBC& dc = *m_DC[i];
 			ar << dc.GetID() << dc.IsActive();
@@ -710,7 +664,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 		// nodal loads
 		ar << (int) m_FC.size();
-		for (i=0; i<(int) m_FC.size(); ++i)
+		for (int i=0; i<(int) m_FC.size(); ++i)
 		{
 			FENodalForce& fc = *m_FC[i];
 			ar << fc.GetID() << fc.IsActive();
@@ -719,7 +673,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 		// surface loads
 		ar << (int) m_SL.size();
-		for (i=0; i<(int) m_SL.size(); ++i)
+		for (int i=0; i<(int) m_SL.size(); ++i)
 		{
 			FESurfaceLoad* psl = m_SL[i];
 
@@ -728,23 +682,14 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			s.Serialize(ar);
 
 			// save the load data
-			int ntype = -1;
-			if (dynamic_cast<FEPressureLoad*      >(psl)) ntype = FE_PRESSURE_LOAD;
-			if (dynamic_cast<FETractionLoad*      >(psl)) ntype = FE_TRACTION_LOAD;
-			if (dynamic_cast<FEFluidFlux*         >(psl)) ntype = FE_FLUID_FLUX;
-			if (dynamic_cast<FEPoroNormalTraction*>(psl)) ntype = FE_PORO_TRACTION;
-			if (dynamic_cast<FESoluteFlux*        >(psl)) ntype = FE_SOLUTE_FLUX;
-			if (dynamic_cast<FEHeatFlux*          >(psl)) ntype = FE_HEAT_FLUX;
-			if (dynamic_cast<FEConvectiveHeatFlux*>(psl)) ntype = FE_CONV_HEAT_FLUX;
-			assert(ntype != -1);
-			ar << ntype;
+			ar << febio.GetTypeStr<FESurfaceLoad>(psl);
 			ar << psl->GetID() << psl->IsActive();
 			psl->Serialize(ar);
 		}
 
 		// rigid body displacements
 		ar << m_RDC.size();
-		for (i=0; i<(int) m_RDC.size(); ++i)
+		for (int i=0; i<(int) m_RDC.size(); ++i)
 		{
 			FERigidBodyDisplacement& dc = *m_RDC[i];
 			ar << dc.GetID() << dc.IsActive();
@@ -753,7 +698,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 		// rigid body forces
 		ar << m_RFC.size();
-		for (i=0; i<(int) m_RFC.size(); ++i)
+		for (int i=0; i<(int) m_RFC.size(); ++i)
 		{
 			FERigidBodyForce& fc = *m_RFC[i];
 			ar << fc.GetID() << fc.IsActive();
@@ -762,7 +707,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 
 		// rigid nodes
 		ar << m_RN.size();
-		for (i=0; i<(int) m_RN.size(); ++i)
+		for (int i=0; i<(int) m_RN.size(); ++i)
 		{
 			FERigidNode& rn = *m_RN[i];
 			ar << rn.GetID() << rn.IsActive();
@@ -772,7 +717,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// linear constraints
 		ar << (int) m_LinC.size();
 		list<FELinearConstraint>::iterator it = m_LinC.begin();
-		for (i=0; i<(int) m_LinC.size(); ++i, ++it) it->Serialize(ar);
+		for (int i=0; i<(int) m_LinC.size(); ++i, ++it) it->Serialize(ar);
 
 		ar << m_LCT;
 
@@ -784,11 +729,11 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			for (i=0; i<n; ++i) m_LCSet[i]->Serialize(ar);
 		}
 */
-		n = m_NLC.size();
+		int n = m_NLC.size();
 		ar << n;
 		if (n) 
 		{
-			for (i=0; i<n; ++i) 
+			for (int i=0; i<n; ++i) 
 			{
 //				ar << m_NLC[i]->Type();
 //				m_NLC[i]->Serialize(ar);
@@ -803,7 +748,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// displacements
 		ar >> n;
 		m_DC.clear();
-		for (i=0; i<n; ++i) 
+		for (int i=0; i<n; ++i) 
 		{
 			FEPrescribedBC* pdc = new FEPrescribedBC;
 			ar >> nid >> bactive;
@@ -816,7 +761,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// nodal loads
 		ar >> n;
 		m_FC.clear();
-		for (i=0; i<n; ++i)
+		for (int i=0; i<n; ++i)
 		{
 			FENodalForce* pfc = new FENodalForce;
 			ar >> nid >> bactive;
@@ -829,28 +774,16 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// surface loads
 		ar >> n;
 		m_SL.clear();
-		for (i=0; i<n; ++i)
+		for (int i=0; i<n; ++i)
 		{
 			// create a new surface
 			FESurface* psurf = new FESurface(&m_mesh);
 			psurf->Serialize(ar);
 
 			// read load data
-			int ntype;
-			ar >> ntype;
-			FESurfaceLoad* ps = 0;
-			switch (ntype)
-			{
-			case FE_PRESSURE_LOAD : ps = new FEPressureLoad      (this); break;
-			case FE_TRACTION_LOAD : ps = new FETractionLoad      (this); break;
-			case FE_FLUID_FLUX    : ps = new FEFluidFlux         (this); break;
-			case FE_PORO_TRACTION : ps = new FEPoroNormalTraction(this); break;
-			case FE_SOLUTE_FLUX   : ps = new FESoluteFlux        (this); break;
-			case FE_HEAT_FLUX     : ps = new FEHeatFlux          (this); break;
-			case FE_CONV_HEAT_FLUX: ps = new FEConvectiveHeatFlux(this); break;
-			default:
-				assert(false);
-			}
+			char sztype[256] = {0};
+			ar >> sztype;
+			FESurfaceLoad* ps = febio.Create<FESurfaceLoad>(sztype, this);
 			assert(ps);
 			ps->SetSurface(psurf);
 
@@ -865,7 +798,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// rigid body displacements
 		ar >> n;
 		m_RDC.clear();
-		for (i=0; i<n; ++i)
+		for (int i=0; i<n; ++i)
 		{
 			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement;
 			ar >> nid >> bactive;
@@ -878,7 +811,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// rigid body forces
 		ar >> n;
 		m_RFC.clear();
-		for (i=0; i<n; ++i)
+		for (int i=0; i<n; ++i)
 		{
 			FERigidBodyForce* pfc = new FERigidBodyForce;
 			ar >> nid >> bactive;
@@ -891,7 +824,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// rigid nodes
 		ar >> n;
 		m_RN.clear();
-		for (i=0; i<n; ++i)
+		for (int i=0; i<n; ++i)
 		{
 			FERigidNode* prn = new FERigidNode;
 			ar >> nid >> bactive;
@@ -904,7 +837,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		// linear constraints
 		ar >> n;
 		FELinearConstraint LC;
-		for (i=0; i<n; ++i)
+		for (int i=0; i<n; ++i)
 		{
 			LC.Serialize(ar);
 			m_LinC.push_back(LC);
@@ -916,13 +849,13 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		int nlin = m_LinC.size();
 		m_LCA.resize(nlin);
 		list<FELinearConstraint>::iterator ic = m_LinC.begin();
-		for (i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
+		for (int i=0; i<nlin; ++i, ++ic) m_LCA[i] = &(*ic);
 
 		// aug lag linear constraints
 		ar >> n;
 //		int ntype;
 		m_NLC.clear();
-		for (i=0; i<n; ++i)
+		for (int i=0; i<n; ++i)
 		{
 /*			ar >> ntype;
 			FENLConstraint* plc = 0;
@@ -1123,15 +1056,12 @@ bool FEBioModel::Init()
 	// initialize contact data
 	if (InitContact() == false) return false;
 
-	// init some other stuff
-	for (int i=0; i<(int) m_BL.size(); ++i)
-	{
-		if (m_BL[i]->Init() == false) return false;
-	}
+	// init body loads
+	if (InitBodyLoads() == false) return false;
 
 	// initialize nonlinear constraints
 	// TODO: This is also initialized in the analysis step. Do I need to do this here?
-	for (int i=0; i<(int) m_NLC.size(); ++i) m_NLC[i]->Init();
+	InitConstraints();
 
 	// open plot database file
 	if (m_pStep->m_nplot != FE_PLOT_NEVER)
@@ -1220,13 +1150,11 @@ bool FEBioModel::Reset()
 //!
 bool FEBioModel::CreateRigidBodies()
 {
-	int i, j, n, m, nd;
 	// count the number of rigid materials
 	int nrm = 0;
-	for (i=0; i<Materials(); ++i)
+	for (int i=0; i<Materials(); ++i)
 	{
-		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(i));
-		if (pm) nrm++;
+		if (GetMaterial(i)->IsRigid()) nrm++;
 	}
 	
 	// make sure there are rigid materials
@@ -1241,57 +1169,32 @@ bool FEBioModel::CreateRigidBodies()
 	// The mrb array will contain an index to the rigid body the material
 	// is attached too.
 	vector<int> mrb(Materials());
-	n = 0;
-	for (i=0; i<Materials(); ++i)
+	int n = 0;
+	for (int i=0; i<Materials(); ++i)
 	{
-		if (dynamic_cast<FERigidMaterial*>(GetMaterial(i))) mrb[i] = n++;
+		if (GetMaterial(i)->IsRigid()) mrb[i] = n++;
 		else mrb[i] = -1;
 	}
 
 	// Next, we assign to all nodes a rigid node number
 	// This number is preliminary since rigid materials can be merged
-	for (nd = 0; nd < m_mesh.Domains(); ++nd)
+	for (int nd = 0; nd < m_mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
-		if (pbd)
+		FEDomain& dom = m_mesh.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
 		{
-			for (i=0; i<pbd->Elements(); ++i)
+			FEElement& el = dom.ElementRef(i);
+			if (dom.GetMaterial()->IsRigid())
 			{
-				FESolidElement& el = pbd->Element(i);
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(el.GetMatID()));
-				if (pm)
+				el.m_nrigid = el.GetMatID();
+				for (int j=0; j<el.Nodes(); ++j)
 				{
-					el.m_nrigid = el.GetMatID();
-					for (j=0; j<el.Nodes(); ++j)
-					{
-						n = el.m_node[j];
-						FENode& node = m_mesh.Node(n);
-						node.m_rid = el.GetMatID();
-					}
+					int n = el.m_node[j];
+					FENode& node = m_mesh.Node(n);
+					node.m_rid = el.GetMatID();
 				}
-				else el.m_nrigid = -1;
 			}
-		}
-
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
-		if (psd)
-		{
-			for (i=0; i<psd->Elements(); ++i)
-			{
-				FEShellElement& el = psd->Element(i);
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(el.GetMatID()));
-				if (pm)
-				{
-					el.m_nrigid = el.GetMatID();
-					for (j=0; j<el.Nodes(); ++j)
-					{
-						n = el.m_node[j];
-						FENode& node = m_mesh.Node(n);
-						node.m_rid = el.GetMatID();
-					}		
-				}
-				else el.m_nrigid = -1;
-			}
+			else el.m_nrigid = -1;
 		}
 	}
 
@@ -1302,47 +1205,22 @@ bool FEBioModel::CreateRigidBodies()
 	do
 	{
 		bdone = true;
-		for (nd=0; nd<m_mesh.Domains(); ++nd)
+		for (int nd=0; nd<m_mesh.Domains(); ++nd)
 		{
-			FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
-			if (pbd)
+			FEDomain& dom = m_mesh.Domain(nd);
+			for (int i=0; i<dom.Elements(); ++i)
 			{
-				for (i=0; i<pbd->Elements(); ++i)
+				FEElement& el = dom.ElementRef(i);
+				if (el.m_nrigid >= 0)
 				{
-					FESolidElement& el = pbd->Element(i);
-					if (el.m_nrigid >= 0)
+					int m = m_mesh.Node(el.m_node[0]).m_rid;
+					for (int j=1; j<el.Nodes(); ++j)
 					{
-						m = m_mesh.Node(el.m_node[0]).m_rid;
-						for (j=1; j<el.Nodes(); ++j)
+						int n = m_mesh.Node(el.m_node[j]).m_rid;
+						if (mrb[n] != mrb[m])
 						{
-							n = m_mesh.Node(el.m_node[j]).m_rid;
-							if (mrb[n] != mrb[m])
-							{
-								if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
-								bdone = false;
-							}
-						}
-					}
-				}
-			}
-
-			FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
-			if (psd)
-			{
-				for (i=0; i<psd->Elements(); ++i)
-				{
-					FEShellElement& el = psd->Element(i);
-					if (el.m_nrigid >= 0)
-					{
-						m = m_mesh.Node(el.m_node[0]).m_rid;
-						for (j=1; j<el.Nodes(); ++j)
-						{
-							n = m_mesh.Node(el.m_node[j]).m_rid;
-							if (mrb[n] != mrb[m])
-							{
-								if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
-								bdone = false;
-							}
+							if (mrb[n]<mrb[m]) mrb[m] = mrb[n]; else mrb[n] = mrb[m];
+							bdone = false;
 						}
 					}
 				}
@@ -1355,20 +1233,20 @@ bool FEBioModel::CreateRigidBodies()
 	// we reindex the RB's.
 	int nmat = Materials();
 	vector<int> mrc; mrc.assign(nmat, -1);
-	for (i=0; i<nmat; ++i) if (mrb[i] >= 0) mrc[mrb[i]] = 0;
+	for (int i=0; i<nmat; ++i) if (mrb[i] >= 0) mrc[mrb[i]] = 0;
 	int nrb = 0;
-	for (i=0; i<nmat; ++i)
+	for (int i=0; i<nmat; ++i)
 	{
 		if (mrc[i] == 0) mrc[i] = nrb++;
 	}
 
-	for (i=0; i<nmat; ++i) 
+	for (int i=0; i<nmat; ++i) 
 	{
 		if (mrb[i] >= 0) mrb[i] = mrc[mrb[i]];
 	}
 
 	// set rigid body index for materials
-	for (i=0; i<Materials(); ++i)
+	for (int i=0; i<Materials(); ++i)
 	{
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (GetMaterial(i));
 		if (pm)	
@@ -1378,39 +1256,22 @@ bool FEBioModel::CreateRigidBodies()
 	}
 
 	// assign rigid body index to rigid elements
-	for (nd=0; nd<m_mesh.Domains(); ++nd)
+	for (int nd=0; nd<m_mesh.Domains(); ++nd)
 	{
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m_mesh.Domain(nd));
-		if (pbd)
+		FEDomain& dom = m_mesh.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
 		{
-			for (i=0; i<pbd->Elements(); ++i)
-			{
-				FESolidElement& el = pbd->Element(i);
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (GetMaterial(el.GetMatID()));
-				if (pm)
-					el.m_nrigid = pm->m_nRB;
-				else
-					el.m_nrigid = -1;
-			}
-		}
-
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
-		if (psd)
-		{
-			for (i=0; i<psd->Elements(); ++i)
-			{
-				FEShellElement& el = psd->Element(i);
-				FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (GetMaterial(el.GetMatID()));
-				if (pm)
-					el.m_nrigid = pm->m_nRB;
-				else
-					el.m_nrigid = -1;
-			}
+			FEElement& el = dom.ElementRef(i);
+			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (GetMaterial(el.GetMatID()));
+			if (pm)
+				el.m_nrigid = pm->m_nRB;
+			else
+				el.m_nrigid = -1;
 		}
 	}
 
 	// assign rigid body index to nodes
-	for (i=0; i<m_mesh.Nodes(); ++i)
+	for (int i=0; i<m_mesh.Nodes(); ++i)
 	{
 		FENode& node = m_mesh.Node(i);
 		if (node.m_rid >= 0) node.m_rid = mrb[ node.m_rid ];
@@ -1419,7 +1280,7 @@ bool FEBioModel::CreateRigidBodies()
 	// Ok, we now know how many rigid bodies there are
 	// so let's create them
 	m_Obj.clear();
-	for (i=0; i<nrb; ++i)
+	for (int i=0; i<nrb; ++i)
 	{
 		// create a new rigid body
 		FERigidBody* prb = new FERigidBody(this);
@@ -1429,6 +1290,7 @@ bool FEBioModel::CreateRigidBodies()
 		// we find the first material that this body has and use
 		// that materials data to set up the rigid body data
 		FERigidMaterial* pm = 0;
+		int j;
 		for (j=0; j<Materials(); ++j)
 		{
 			pm = dynamic_cast<FERigidMaterial*> (GetMaterial(j));
@@ -1459,7 +1321,7 @@ bool FEBioModel::CreateRigidBodies()
 	{
 		FERigidMaterial* pm;
 		int NC = m_NLC.size();
-		for (i=0; i<NC; ++i)
+		for (int i=0; i<NC; ++i)
 		{
 			FENLConstraint* plc = m_NLC[i];
 			if (dynamic_cast<FERigidJoint*>(plc))
@@ -1496,19 +1358,19 @@ bool FEBioModel::CreateRigidBodies()
 	// We do this so that these dofs do not
 	// get equation numbers assigned to them. Later we'll assign
 	// the rigid dofs equations numbers to these nodes
-	for (i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_bshell = false;
-	for (nd = 0; nd<m_mesh.Domains(); ++nd)
+	for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_bshell = false;
+	for (int nd = 0; nd<m_mesh.Domains(); ++nd)
 	{
 		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m_mesh.Domain(nd));
 		if (psd)
 		{
-			for (i=0; i<psd->Elements(); ++i)
+			for (int i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
 				if (el.m_nrigid < 0)
 				{
 					int n = el.Nodes();
-					for (j=0; j<n; ++j) m_mesh.Node(el.m_node[j]).m_bshell = true;
+					for (int j=0; j<n; ++j) m_mesh.Node(el.m_node[j]).m_bshell = true;
 				}
 			}
 		}
@@ -1517,7 +1379,7 @@ bool FEBioModel::CreateRigidBodies()
 	// The following fixes the degrees of freedom for rigid nodes.
 	// Note that also the rotational degrees of freedom are fixed
 	// for rigid nodes that do not belong to a non-rigid shell element.
-	for (i=0; i<m_mesh.Nodes(); ++i)
+	for (int i=0; i<m_mesh.Nodes(); ++i)
 	{
 		FENode& node = m_mesh.Node(i);
 		if (node.m_rid >= 0)
@@ -1535,7 +1397,7 @@ bool FEBioModel::CreateRigidBodies()
 	}
 
 	// assign correct rigid body ID's to rigid nodes
-	for (i=0; i<(int) m_RN.size(); ++i)
+	for (int i=0; i<(int) m_RN.size(); ++i)
 	{
 		FERigidNode& rn = *m_RN[i];
 		rn.rid = mrb[rn.rid];
@@ -1546,12 +1408,12 @@ bool FEBioModel::CreateRigidBodies()
 	for (int is = 0; is < (int) m_SL.size(); ++is)
 	{
 		FESurfaceLoad* ps = m_SL[is];
-		for (i=0; i<ps->Surface().Elements(); ++i)
+		for (int i=0; i<ps->Surface().Elements(); ++i)
 		{
 			FESurfaceElement& el = ps->Surface().Element(i);
 			int N = el.Nodes();
 			el.m_nrigid = 0;
-			for (j=0; j<N; ++j) 
+			for (int j=0; j<N; ++j) 
 			{
 				FENode& node = m_mesh.Node(el.m_node[j]);
 				if (node.m_rid < 0) 
@@ -1565,13 +1427,13 @@ bool FEBioModel::CreateRigidBodies()
 
 	// the rigid body constraints are still associated with the rigid materials
 	// so we now associate them with the rigid bodies
-	for (i=0; i<(int) m_RDC.size(); ++i)
+	for (int i=0; i<(int) m_RDC.size(); ++i)
 	{
 		FERigidBodyDisplacement& DC = *m_RDC[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(DC.id-1));
 		DC.id = pm->m_nRB;
 	}
-	for (i=0; i<(int) m_RFC.size(); ++i)
+	for (int i=0; i<(int) m_RFC.size(); ++i)
 	{
 		FERigidBodyForce& FC = *m_RFC[i];
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(GetMaterial(FC.id-1));
@@ -1579,7 +1441,7 @@ bool FEBioModel::CreateRigidBodies()
 	}
 
 	// set the rigid body parents
-	for (i=0; i<(int) m_Obj.size(); ++i)
+	for (int i=0; i<(int) m_Obj.size(); ++i)
 	{
 		FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_Obj[i]);
 		FERigidMaterial* pm = dynamic_cast<FERigidMaterial*>(m_MAT[rb.m_mat]);
@@ -1600,195 +1462,6 @@ bool FEBioModel::CreateRigidBodies()
 			pm->m_bc[5] = 1;
 		}
 	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Update the mesh data. This function calculates the initial directors
-//! for the shell elements.
-
-// NOTE: This function needs to be called after the rigid bodies have been
-// initialized
-
-bool FEBioModel::InitMesh()
-{
-	int i, j, n, m0, m1, m2, nd;
-	int* en;
-	vec3d a, b, c;
-
-	int ninverted = 0;
-
-	FEMesh& m = m_mesh;
-
-	// zero initial directors for shell nodes
-	for (i=0; i<m.Nodes(); ++i) m.Node(i).m_D0 = vec3d(0,0,0);
-
-	for (nd = 0; nd < m.Domains(); ++nd)
-	{
-		// check all solid elements to see if they are not initially inverted
-		FEElasticSolidDomain* pbd = dynamic_cast<FEElasticSolidDomain*>(&m.Domain(nd));
-		if (pbd)
-		{
-			for (i=0; i<pbd->Elements(); ++i)
-			{
-				FESolidElement& el = pbd->Element(i);
-
-				int nint = el.GaussPoints();
-				for (int n=0; n<nint; ++n)
-				{
-					double J0 = pbd->detJ0(el, n);
-					if (J0 <= 0)
-					{
-						felog.printf("**************************** E R R O R ****************************\n");
-						felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-						felog.printf("Jacobian = %lg\n", J0);
-						felog.printf("Did you use the right node numbering?\n");
-						felog.printf("Nodes:");
-						for (int l=0; l<el.Nodes(); ++l)
-						{
-							felog.printf("%d", el.m_node[l]+1);
-							if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
-						}
-						felog.printf("*******************************************************************\n\n");
-						++ninverted;
-					}
-				}
-			}
-		}
-
-		// Calculate the shell directors as the local node normals
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
-		if (psd)
-		{
-			vec3d r0[4];
-			for (i=0; i<psd->Elements(); ++i)
-			{
-				FEShellElement& el = psd->Element(i);
-
-				n = el.Nodes();
-				en = &el.m_node[0];
-
-				// get the nodes
-				for (j=0; j<n; ++j) r0[j] = psd->GetMesh()->Node(en[j]).m_r0;
-
-				for (j=0; j<n; ++j)
-				{
-					m0 = j;
-					m1 = (j+1)%n;
-					m2 = (j==0? n-1: j-1);
-
-					a = r0[m0];
-					b = r0[m1];
-					c = r0[m2];
-
-					m.Node(en[m0]).m_D0 += (b-a)^(c-a);
-				}
-			}
-		}
-	}
-
-	// make sure we start with unit directors
-	for (i=0; i<m.Nodes(); ++i)
-	{
-		FENode& node = m.Node(i);
-		node.m_D0.unit();
-		node.m_Dt = node.m_D0;
-	}
-
-	// Check initially inverted shell elements
-	for (nd = 0; nd < m.Domains(); ++nd)
-	{
-		FEElasticShellDomain* psd = dynamic_cast<FEElasticShellDomain*>(&m.Domain(nd));
-		if (psd)
-		{
-			// check the connectivity of the shells
-			for (i=0; i<psd->Elements(); ++i)
-			{
-				FEShellElement& el = psd->Element(i);
-				if (!el.IsRigid())
-				{
-					int nint = el.GaussPoints();
-					for (int n=0; n<nint; ++n)
-					{
-						double J0 = psd->detJ0(el, n);
-						if (J0 <= 0)
-						{
-							felog.printf("**************************** E R R O R ****************************\n");
-							felog.printf("Negative jacobian detected at integration point %d of element %d\n", n+1, el.m_nID);
-							felog.printf("Jacobian = %lg\n", J0);
-							felog.printf("Did you use the right node numbering?\n");
-							felog.printf("Nodes:");
-							for (int l=0; l<el.Nodes(); ++l)
-							{
-								felog.printf("%d", el.m_node[l]+1);
-								if (l+1 != el.Nodes()) felog.printf(","); else felog.printf("\n");
-							}
-							felog.printf("*******************************************************************\n\n");
-							++ninverted;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// report number of inverted elements
-	if (ninverted != 0)
-	{
-		felog.printf("**************************** E R R O R ****************************\n");
-		felog.printf(" FEBio found %d initially inverted elements.\n", ninverted);
-		felog.printf(" Run will be aborted.\n");
-		felog.printf("*******************************************************************\n\n");
-		return false;
-	}
-
-	// next if a node does not belong to a shell
-	// we turn of the rotational degrees of freedom
-	// To do this, we first tag all shell nodes
-	vector<int> tag(m.Nodes());
-	zero(tag);
-	for (nd = 0; nd < m.Domains(); ++nd)
-	{
-		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&m.Domain(nd));
-		if (psd)
-		{
-			for (i=0; i<psd->Elements(); ++i)
-			{
-				FEShellElement& el = psd->Element(i);
-				n = el.Nodes();
-				en = &el.m_node[0];
-				for (j=0; j<n; ++j) tag[en[j]] = 1;
-			}
-		}
-	}
-
-	// fix rotational degrees of freedom of tagged nodes
-	for (i=0; i<m.Nodes(); ++i) 
-	{
-		FENode& node = m.Node(i);
-		if (tag[i] == 0)
-		{
-			node.m_ID[DOF_U] = -1;
-			node.m_ID[DOF_V] = -1;
-			node.m_ID[DOF_W] = -1;
-		}
-	}
-
-	// At this point, the node ID still contains the boundary conditions
-	// so we copy that into the m_BC array
-	// TODO: perhaps we should put the BC's initially in BC instead of ID.
-	for (i=0; i<m.Nodes(); ++i)
-	{
-		FENode& node = m.Node(i);
-		for (j=0; j<MAX_NDOFS; ++j)	node.m_BC[j] = node.m_ID[j];
-	}
-
-	// reset data
-	m.Reset();
-
-	// intialize domains
-	for (i=0; i<m_mesh.Domains(); ++i) m_mesh.Domain(i).Initialize(*this);
 
 	return true;
 }
@@ -1840,23 +1513,9 @@ bool FEBioModel::InitPoroSolute()
 		}
 	}
 	
-	if (!bporo)
-		// let's go back
-		return true;
-	
-	// see if we are using the symmetric version or not
-/*	if (m_pStep->m_bsym_poro == false) 
-	{
-		m_pStep->m_psolver->m_bsymm = false;
-		
-		// make sure we are using full-Newton
-//		if (m_pStep->m_psolver->m_bfgs.m_maxups != 0)
-//		{
-//			m_pStep->m_psolver->m_bfgs.m_maxups = 0;
-//			felog.printbox("WARNING", "The non-symmetric solver algorithm does not work with BFGS yet.\nThe full-Newton method will be used instead.");
-//		}
-	}
-*/	
+	// let's go back
+	if (!bporo) return true;
+
 	// fix all mixture dofs that are not used
 	// that is, that are not part of a biphasic, biphasic-solute, or triphasic or multiphasic element
 	// this is done in three steps

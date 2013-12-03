@@ -94,6 +94,25 @@ bool FEModel::Init()
 }
 
 //-----------------------------------------------------------------------------
+//! Update the mesh data. This function calculates the initial directors
+//! for the shell elements.
+
+// NOTE: This function needs to be called after the rigid bodies have been
+// initialized
+
+bool FEModel::InitMesh()
+{
+	// Initialize mesh
+	if (m_mesh.Init() == false) return false;
+
+	// intialize domain data
+	// TODO: I'd like the mesh to take care of this, but I need to pass a FEModel pointer for some reason.
+	for (int i=0; i<m_mesh.Domains(); ++i) m_mesh.Domain(i).Initialize(*this);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 //! Initialize material data
 bool FEModel::InitMaterials()
 {
@@ -163,6 +182,22 @@ bool FEModel::InitContact()
 		if (ci.IsActive()) ci.Activate();
 	}
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FEModel::InitConstraints()
+{
+	for (int i=0; i<(int) m_NLC.size(); ++i) m_NLC[i]->Init();
+}
+
+//-----------------------------------------------------------------------------
+bool FEModel::InitBodyLoads()
+{
+	for (int i=0; i<(int) m_BL.size(); ++i)
+	{
+		if (m_BL[i]->Init() == false) return false;
+	}
 	return true;
 }
 

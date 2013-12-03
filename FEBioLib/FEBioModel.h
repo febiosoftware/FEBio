@@ -64,9 +64,6 @@ protected:
 
 protected: // --- initialization functions ---
 
-	//! Initialize mesh data
-	bool InitMesh();
-
 	//! Initialize rigid bodies
 	bool CreateRigidBodies();
 
