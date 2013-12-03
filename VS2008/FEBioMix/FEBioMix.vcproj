@@ -229,6 +229,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEMixDomainFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEMultiphasic.cpp"
 				>
 			</File>
@@ -420,6 +424,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEMichaelisMenten.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEMixDomainFactory.h"
 				>
 			</File>
 			<File

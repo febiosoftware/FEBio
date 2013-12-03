@@ -157,6 +157,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioHeat\FEHeatDomainFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioHeat\FEHeatFlux.cpp"
 				>
 			</File>
@@ -204,6 +208,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioHeat\FEConvectiveHeatFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioHeat\FEHeatDomainFactory.h"
 				>
 			</File>
 			<File

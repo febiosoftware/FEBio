@@ -465,6 +465,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FESolidDomainFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FESolidMaterial.cpp"
 				>
 			</File>
@@ -884,6 +888,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FESolidAnalysis.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FESolidDomainFactory.h"
 				>
 			</File>
 			<File
