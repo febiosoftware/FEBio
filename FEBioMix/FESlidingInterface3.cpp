@@ -1,6 +1,7 @@
 #include "FESlidingInterface3.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
+#include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 
@@ -354,6 +355,78 @@ bool FESlidingInterface3::Init()
 	if (m_ms.Init() == false) return false;
 	
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! build the matrix profile for use in the stiffness matrix
+void FESlidingInterface3::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vector<int> lm(8*FEElement::MAX_NODES*2);
+					
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
+	{
+		FESlidingSurface3& ss = (np == 0? m_ss : m_ms);
+		FESlidingSurface3& ms = (np == 0? m_ms : m_ss);
+		// get the mesh
+		FEMesh* pm = ss.GetMesh();
+		int sid, mid;
+						
+		int k, l;
+		for (int j=0; j<ss.Elements(); ++j)
+		{
+			FESurfaceElement& se = ss.Element(j);
+			sid = ss.m_solu[j];
+			int nint = se.GaussPoints();
+			int* sn = &se.m_node[0];
+			for (k=0; k<nint; ++k)
+			{
+				FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
+				if (pe != 0)
+				{
+					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					mid = ms.m_solu[pe->m_lid];
+					int* mn = &me.m_node[0];
+									
+					assign(lm, -1);
+									
+					int nseln = se.Nodes();
+					int nmeln = me.Nodes();
+									
+					for (l=0; l<nseln; ++l)
+					{
+						int* id = mesh.Node(sn[l]).m_ID;
+						lm[8*l  ] = id[DOF_X];
+						lm[8*l+1] = id[DOF_Y];
+						lm[8*l+2] = id[DOF_Z];
+						lm[8*l+3] = id[DOF_P];
+						lm[8*l+4] = id[DOF_RU];
+						lm[8*l+5] = id[DOF_RV];
+						lm[8*l+6] = id[DOF_RW];
+						lm[8*l+7] = id[DOF_C + sid];
+					}
+									
+					for (l=0; l<nmeln; ++l)
+					{
+						int* id = mesh.Node(mn[l]).m_ID;
+						lm[8*(l+nseln)  ] = id[DOF_X];
+						lm[8*(l+nseln)+1] = id[DOF_Y];
+						lm[8*(l+nseln)+2] = id[DOF_Z];
+						lm[8*(l+nseln)+3] = id[DOF_P];
+						lm[8*(l+nseln)+4] = id[DOF_RU];
+						lm[8*(l+nseln)+5] = id[DOF_RV];
+						lm[8*(l+nseln)+6] = id[DOF_RW];
+						lm[8*(l+nseln)+7] = id[DOF_C + mid];
+					}
+									
+					K.build_add(lm);
+				}
+			}
+		}
+	}
+
 }
 
 //-----------------------------------------------------------------------------

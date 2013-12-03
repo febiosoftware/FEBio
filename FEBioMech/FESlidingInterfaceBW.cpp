@@ -223,7 +223,6 @@ FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(p
 }
 
 //-----------------------------------------------------------------------------
-
 FESlidingInterfaceBW::~FESlidingInterfaceBW()
 {
 }
@@ -262,6 +261,68 @@ void FESlidingInterfaceBW::Activate()
 	
 	// update sliding interface data
 	Update(0);
+}
+
+//-----------------------------------------------------------------------------
+//! build the matrix profile for use in the stiffness matrix
+void FESlidingInterfaceBW::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vector<int> lm(6*FEElement::MAX_NODES*2);
+					
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
+	{
+		FESlidingSurfaceBW& ss = (np == 0? m_ss : m_ms);
+		FESlidingSurfaceBW& ms = (np == 0? m_ms : m_ss);
+						
+		int k, l;
+		for (int j=0; j<ss.Elements(); ++j)
+		{
+			FESurfaceElement& se = ss.Element(j);
+			int nint = se.GaussPoints();
+			int* sn = &se.m_node[0];
+			for (k=0; k<nint; ++k)
+			{
+				FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
+				if (pe != 0)
+				{
+					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					int* mn = &me.m_node[0];
+									
+					assign(lm, -1);
+									
+					int nseln = se.Nodes();
+					int nmeln = me.Nodes();
+									
+					for (l=0; l<nseln; ++l)
+					{
+						int* id = mesh.Node(sn[l]).m_ID;
+						lm[6*l  ] = id[DOF_X];
+						lm[6*l+1] = id[DOF_Y];
+						lm[6*l+2] = id[DOF_Z];
+						lm[6*l+3] = id[DOF_RU];
+						lm[6*l+4] = id[DOF_RV];
+						lm[6*l+5] = id[DOF_RW];
+					}
+									
+					for (l=0; l<nmeln; ++l)
+					{
+						int* id = mesh.Node(mn[l]).m_ID;
+						lm[6*(l+nseln)  ] = id[DOF_X];
+						lm[6*(l+nseln)+1] = id[DOF_Y];
+						lm[6*(l+nseln)+2] = id[DOF_Z];
+						lm[6*(l+nseln)+3] = id[DOF_RU];
+						lm[6*(l+nseln)+4] = id[DOF_RV];
+						lm[6*(l+nseln)+5] = id[DOF_RW];
+					}
+									
+					K.build_add(lm);
+				}
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

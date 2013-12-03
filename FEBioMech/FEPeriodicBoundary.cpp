@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEPeriodicBoundary.h"
+#include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
@@ -126,8 +127,54 @@ void FEPeriodicBoundary::Activate()
 }
 
 //-----------------------------------------------------------------------------
-//! project surface
+//! build the matrix profile for use in the stiffness matrix
+// TODO: what if two_pass ??
+void FEPeriodicBoundary::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
 
+	vector<int> lm(6*5);
+
+	for (int j=0; j<m_ss.Nodes(); ++j)
+	{
+		FESurfaceElement& me = *m_ss.m_pme[j];
+		int* en = &me.m_node[0];
+
+		int n = me.Nodes();
+		if (n == 3)
+		{
+			lm[6*(3+1)  ] = -1;
+			lm[6*(3+1)+1] = -1;
+			lm[6*(3+1)+2] = -1;
+			lm[6*(3+1)+3] = -1;
+			lm[6*(3+1)+4] = -1;
+			lm[6*(3+1)+5] = -1;
+		}
+
+		lm[0] = m_ss.Node(j).m_ID[DOF_X];
+		lm[1] = m_ss.Node(j).m_ID[DOF_Y];
+		lm[2] = m_ss.Node(j).m_ID[DOF_Z];
+		lm[3] = m_ss.Node(j).m_ID[DOF_RU];
+		lm[4] = m_ss.Node(j).m_ID[DOF_RV];
+		lm[5] = m_ss.Node(j).m_ID[DOF_RW];
+
+		for (int k=0; k<n; ++k)
+		{
+			int* id = mesh.Node(en[k]).m_ID;
+			lm[6*(k+1)  ] = id[DOF_X];
+			lm[6*(k+1)+1] = id[DOF_Y];
+			lm[6*(k+1)+2] = id[DOF_Z];
+			lm[6*(k+1)+3] = id[DOF_RU];
+			lm[6*(k+1)+4] = id[DOF_RV];
+			lm[6*(k+1)+5] = id[DOF_RW];
+		}
+
+		K.build_add(lm);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//! project surface
 void FEPeriodicBoundary::ProjectSurface(FEPeriodicSurface& ss, FEPeriodicSurface& ms, bool bmove)
 {
 	bool bfirst = true;

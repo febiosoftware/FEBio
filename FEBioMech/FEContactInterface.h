@@ -15,6 +15,7 @@
 
 class FEModel;
 class FESolver;
+class FEStiffnessMatrix;
 
 // Macauley bracket
 #define MBRACKET(x) ((x)>=0? (x): 0)
@@ -49,6 +50,9 @@ public:
 
 	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)
 	virtual bool UseNodalIntegration() = 0;
+
+	//! build the matrix profile for use in the stiffness matrix
+	virtual void BuildMatrixProfile(FEStiffnessMatrix& K) = 0;
 
 protected:
 	//! don't call the default constructor

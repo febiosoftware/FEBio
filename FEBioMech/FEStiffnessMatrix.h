@@ -31,9 +31,6 @@ public:
 	bool Create(FEModel* pfem, int neq, bool breset);
 
 protected:
-	void AddContactInterface(FEContactInterface* pci);
-
-protected:
 	FEModel*		m_pfem;	//!< pointer to model
 };
 

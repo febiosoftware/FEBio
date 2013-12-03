@@ -91,6 +91,9 @@ public:
 	//! return integration rule class
 	bool UseNodalIntegration() { return false; }
 
+	//! build the matrix profile for use in the stiffness matrix
+	void BuildMatrixProfile(FEStiffnessMatrix& K);
+
 protected:
 	//! project slave surface onto master
 	void ProjectSurface(FEFacetSlidingSurface& ss, FEFacetSlidingSurface& ms, bool bsegup);

@@ -1,5 +1,6 @@
 #include "FESlidingInterface2.h"
 #include "FEBiphasic.h"
+#include "FEBioMech/FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 
@@ -314,6 +315,70 @@ bool FESlidingInterface2::Init()
 	}
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingInterface2::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vector<int> lm(7*FEElement::MAX_NODES*2);
+
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
+	{
+		FESlidingSurface2& ss = (np == 0? m_ss : m_ms);
+		FESlidingSurface2& ms = (np == 0? m_ms : m_ss);
+
+		int k, l;
+		for (int j=0; j<ss.Elements(); ++j)
+		{
+			FESurfaceElement& se = ss.Element(j);
+			int nint = se.GaussPoints();
+			int* sn = &se.m_node[0];
+			for (k=0; k<nint; ++k)
+			{
+				FESlidingSurface2::Data& pt = ss.m_Data[j][k];
+				FESurfaceElement* pe = pt.m_pme;
+				if (pe != 0)
+				{
+					FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+					int* mn = &me.m_node[0];
+
+					assign(lm, -1);
+
+					int nseln = se.Nodes();
+					int nmeln = me.Nodes();
+
+					for (l=0; l<nseln; ++l)
+					{
+						int* id = mesh.Node(sn[l]).m_ID;
+						lm[7*l  ] = id[DOF_X];
+						lm[7*l+1] = id[DOF_Y];
+						lm[7*l+2] = id[DOF_Z];
+						lm[7*l+3] = id[DOF_P];
+						lm[7*l+4] = id[DOF_RU];
+						lm[7*l+5] = id[DOF_RV];
+						lm[7*l+6] = id[DOF_RW];
+					}
+
+					for (l=0; l<nmeln; ++l)
+					{
+						int* id = mesh.Node(mn[l]).m_ID;
+						lm[7*(l+nseln)  ] = id[DOF_X];
+						lm[7*(l+nseln)+1] = id[DOF_Y];
+						lm[7*(l+nseln)+2] = id[DOF_Z];
+						lm[7*(l+nseln)+3] = id[DOF_P];
+						lm[7*(l+nseln)+4] = id[DOF_RU];
+						lm[7*(l+nseln)+5] = id[DOF_RV];
+						lm[7*(l+nseln)+6] = id[DOF_RW];
+					}
+
+					K.build_add(lm);
+				}
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1614,7 +1679,6 @@ void FESlidingInterface2::MarkFreeDraining()
 }
 
 //-----------------------------------------------------------------------------
-
 void FESlidingInterface2::SetFreeDraining()
 {	
 	int i, np;

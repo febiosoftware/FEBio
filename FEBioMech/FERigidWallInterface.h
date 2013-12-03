@@ -106,6 +106,9 @@ public:
 	//! return integration rule class
 	bool UseNodalIntegration() { return true; }
 
+	//! build the matrix profile for use in the stiffness matrix
+	void BuildMatrixProfile(FEStiffnessMatrix& K);
+
 private:
 	//! copy constructor hidden
 	FERigidWallInterface(FERigidWallInterface& ri){}

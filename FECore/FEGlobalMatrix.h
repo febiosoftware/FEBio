@@ -59,7 +59,7 @@ public:
 	//! zero the sparse matrix
 	void Zero() { m_pA->zero(); }
 
-protected:
+public:
 	void build_begin(int neq);
 	void build_add(std::vector<int>& lm);
 	void build_end();

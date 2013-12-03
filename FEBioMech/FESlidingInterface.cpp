@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#include "FEStiffnessMatrix.h"
 #include "FESlidingInterface.h"
 #include "FEElasticShellDomain.h"
 #include "FECore/FEModel.h"
@@ -27,6 +28,76 @@ BEGIN_PARAMETER_LIST(FESlidingInterface, FEContactInterface)
 	ADD_PARAMETER(m_breloc   , FE_PARAM_BOOL  , "node_reloc"  );
 	ADD_PARAMETER(m_nsegup   , FE_PARAM_INT   , "seg_up"      );
 END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! build the matrix profile for use in the stiffness matrix
+void FESlidingInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	// TODO: this is currently for max 6 nodes (hence 7=6+1)
+	vector<int> lm(6*7);
+
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	int npass = (m_btwo_pass?2:1);
+	for (int np=0; np<npass; ++np)
+	{
+		FESlidingSurface& ss = (np==0? m_ss : m_ms);
+		FESlidingSurface& ms = (np==0? m_ms : m_ss);
+
+		for (int j=0; j<ss.Nodes(); ++j)
+		{
+			FESurfaceElement* pe = ss.m_pme[j];
+
+			if (pe != 0)
+			{
+				FESurfaceElement& me = *pe;
+				int* en = &me.m_node[0];
+
+				// Note that we need to grab the rigid degrees of freedom as well
+				// this is in case one of the nodes belongs to a rigid body.
+				int n = me.Nodes();
+				if (n == 3)
+				{
+					lm[6*(3+1)  ] = -1;lm[6*(3+2)  ] = -1;lm[6*(3+3)  ] = -1;
+					lm[6*(3+1)+1] = -1;lm[6*(3+2)+1] = -1;lm[6*(3+3)+1] = -1;
+					lm[6*(3+1)+2] = -1;lm[6*(3+2)+2] = -1;lm[6*(3+3)+2] = -1;
+					lm[6*(3+1)+3] = -1;lm[6*(3+2)+3] = -1;lm[6*(3+3)+3] = -1;
+					lm[6*(3+1)+4] = -1;lm[6*(3+2)+4] = -1;lm[6*(3+3)+4] = -1;
+					lm[6*(3+1)+5] = -1;lm[6*(3+2)+5] = -1;lm[6*(3+3)+5] = -1;
+				}
+				if (n == 4)
+				{
+					lm[6*(4+1)  ] = -1;lm[6*(4+2)  ] = -1;
+					lm[6*(4+1)+1] = -1;lm[6*(4+2)+1] = -1;
+					lm[6*(4+1)+2] = -1;lm[6*(4+2)+2] = -1;
+					lm[6*(4+1)+3] = -1;lm[6*(4+2)+3] = -1;
+					lm[6*(4+1)+4] = -1;lm[6*(4+2)+4] = -1;
+					lm[6*(4+1)+5] = -1;lm[6*(4+2)+5] = -1;
+				}
+
+				lm[0] = ss.Node(j).m_ID[DOF_X];
+				lm[1] = ss.Node(j).m_ID[DOF_Y];
+				lm[2] = ss.Node(j).m_ID[DOF_Z];
+				lm[3] = ss.Node(j).m_ID[DOF_RU];
+				lm[4] = ss.Node(j).m_ID[DOF_RV];
+				lm[5] = ss.Node(j).m_ID[DOF_RW];
+
+				for (int k=0; k<n; ++k)
+				{
+					int* id = mesh.Node(en[k]).m_ID;
+					lm[6*(k+1)  ] = id[DOF_X];
+					lm[6*(k+1)+1] = id[DOF_Y];
+					lm[6*(k+1)+2] = id[DOF_Z];
+					lm[6*(k+1)+3] = id[DOF_RU];
+					lm[6*(k+1)+4] = id[DOF_RV];
+					lm[6*(k+1)+5] = id[DOF_RW];
+				}
+
+				K.build_add(lm);
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! Creates a surface for use with a sliding interface. All surface data

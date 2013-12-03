@@ -88,6 +88,9 @@ public:
 
 	//! return integration rule class
 	bool UseNodalIntegration() { return false; }
+
+	//! build the matrix profile for use in the stiffness matrix
+	void BuildMatrixProfile(FEStiffnessMatrix& K);
 	
 protected:
 	void InitialProjection(FETiedBiphasicSurface& ss, FETiedBiphasicSurface& ms);

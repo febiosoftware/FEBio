@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FETiedInterface.h"
+#include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/FENNQuery.h"
 #include "FECore/log.h"
@@ -53,6 +54,49 @@ bool FETiedInterface::Init()
 	if (ms.Init() == false) return false;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! build the matrix profile for use in the stiffness matrix
+void FETiedInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	const int LMSIZE = 6*(FEElement::MAX_NODES+1);
+	vector<int> lm(LMSIZE);
+
+	for (int j=0; j<ss.Nodes(); ++j)
+	{
+		FEElement* pe = ss.m_pme[j];
+		if (pe != 0)
+		{
+			FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+			int* en = &me.m_node[0];
+
+			int n = me.Nodes();
+			lm.assign(LMSIZE, -1);
+
+			lm[0] = ss.Node(j).m_ID[DOF_X];
+			lm[1] = ss.Node(j).m_ID[DOF_Y];
+			lm[2] = ss.Node(j).m_ID[DOF_Z];
+			lm[3] = ss.Node(j).m_ID[DOF_RU];
+			lm[4] = ss.Node(j).m_ID[DOF_RV];
+			lm[5] = ss.Node(j).m_ID[DOF_RW];
+
+			for (int k=0; k<n; ++k)
+			{
+				int* id = mesh.Node(en[k]).m_ID;
+				lm[6*(k+1)  ] = id[DOF_X];
+				lm[6*(k+1)+1] = id[DOF_Y];
+				lm[6*(k+1)+2] = id[DOF_Z];
+				lm[6*(k+1)+3] = id[DOF_RU];
+				lm[6*(k+1)+4] = id[DOF_RV];
+				lm[6*(k+1)+5] = id[DOF_RW];
+			}
+
+			K.build_add(lm);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

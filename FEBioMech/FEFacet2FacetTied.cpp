@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FEFacet2FacetTied.h"
+#include "FEStiffnessMatrix.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
 
@@ -141,6 +142,63 @@ FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), 
 
 	// give this interface an ID (TODO: where is this actually used?)
 	m_nID = count++;
+}
+
+//-----------------------------------------------------------------------------
+//! build the matrix profile for use in the stiffness matrix
+void FEFacet2FacetTied::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vector<int> lm(6*FEElement::MAX_NODES*2);
+
+	FEFacetTiedSurface& ss = dynamic_cast<FEFacetTiedSurface&>(*GetSlaveSurface ());
+	FEFacetTiedSurface& ms = dynamic_cast<FEFacetTiedSurface&>(*GetMasterSurface());
+
+	for (int j=0; j<ss.Elements(); ++j)
+	{
+		FESurfaceElement& se = ss.Element(j);
+		int nint = se.GaussPoints();
+		int* sn = &se.m_node[0];
+		for (int k=0; k<nint; ++k)
+		{
+			FESurfaceElement* pe = ss.m_Data[j][k].m_pme;
+			if (pe != 0)
+			{
+				FESurfaceElement& me = dynamic_cast<FESurfaceElement&> (*pe);
+				int* mn = &me.m_node[0];
+
+				lm.assign(lm.size(), -1);
+
+				int nseln = se.Nodes();
+				int nmeln = me.Nodes();
+
+				for (int l=0; l<nseln; ++l)
+				{
+					int* id = mesh.Node(sn[l]).m_ID;
+					lm[6*l  ] = id[DOF_X];
+					lm[6*l+1] = id[DOF_Y];
+					lm[6*l+2] = id[DOF_Z];
+					lm[6*l+3] = id[DOF_RU];
+					lm[6*l+4] = id[DOF_RV];
+					lm[6*l+5] = id[DOF_RW];
+				}
+
+				for (int l=0; l<nmeln; ++l)
+				{
+					int* id = mesh.Node(mn[l]).m_ID;
+					lm[6*(l+nseln)  ] = id[DOF_X];
+					lm[6*(l+nseln)+1] = id[DOF_Y];
+					lm[6*(l+nseln)+2] = id[DOF_Z];
+					lm[6*(l+nseln)+3] = id[DOF_RU];
+					lm[6*(l+nseln)+4] = id[DOF_RV];
+					lm[6*(l+nseln)+5] = id[DOF_RW];
+				}
+
+				K.build_add(lm);
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

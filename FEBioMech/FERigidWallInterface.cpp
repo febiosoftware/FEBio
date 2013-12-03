@@ -6,6 +6,7 @@
 #include "FERigidWallInterface.h"
 #include "FECore/FENNQuery.h"
 #include "FEElasticShellDomain.h"
+#include "FEStiffnessMatrix.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
@@ -211,6 +212,27 @@ bool FERigidWallInterface::Init()
 	m_mp->Init();
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! build the matrix profile for use in the stiffness matrix
+void FERigidWallInterface::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	vector<int> lm(6);
+	for (int j=0; j<m_ss.Nodes(); ++j)
+	{
+		if (m_ss.gap[j] >= 0)
+		{
+			lm[0] = m_ss.Node(j).m_ID[DOF_X];
+			lm[1] = m_ss.Node(j).m_ID[DOF_Y];
+			lm[2] = m_ss.Node(j).m_ID[DOF_Z];
+			lm[3] = m_ss.Node(j).m_ID[DOF_RU];
+			lm[4] = m_ss.Node(j).m_ID[DOF_RV];
+			lm[5] = m_ss.Node(j).m_ID[DOF_RW];
+
+			K.build_add(lm);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

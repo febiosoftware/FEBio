@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FESurfaceConstraint.h"
+#include "FEStiffnessMatrix.h"
 #include "FECore/DumpFile.h"
 #include "FECore/FEModel.h"
 #include "FECore/log.h"
@@ -114,6 +115,73 @@ bool FESurfaceConstraint::Init()
 	if (m_ms.Init() == false) return false;
 
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+//! build the matrix profile for use in the stiffness matrix
+void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
+{
+	FEMesh& mesh = GetFEModel()->GetMesh();
+
+	vector<int> lm(6*5);
+
+	int nref = m_ss.m_nref;
+	FESurfaceElement* pref = m_ss.m_pme[nref];
+
+	int n0 = pref->Nodes();
+	int nr0[4];
+	for (int j=0; j<n0; ++j) nr0[j] = pref->m_node[j];
+
+	assign(lm, -1);
+
+	lm[0] = m_ss.Node(nref).m_ID[DOF_X];
+	lm[1] = m_ss.Node(nref).m_ID[DOF_Y];
+	lm[2] = m_ss.Node(nref).m_ID[DOF_Z];
+	lm[3] = m_ss.Node(nref).m_ID[DOF_RU];
+	lm[4] = m_ss.Node(nref).m_ID[DOF_RV];
+	lm[5] = m_ss.Node(nref).m_ID[DOF_RW];
+
+	for (int k=0; k<n0; ++k)
+	{
+		int* id = mesh.Node(nr0[k]).m_ID;
+		lm[6*(k+1)  ] = id[DOF_X];
+		lm[6*(k+1)+1] = id[DOF_Y];
+		lm[6*(k+1)+2] = id[DOF_Z];
+		lm[6*(k+1)+3] = id[DOF_RU];
+		lm[6*(k+1)+4] = id[DOF_RV];
+		lm[6*(k+1)+5] = id[DOF_RW];
+	}
+
+	for (int j=0; j<m_ss.Nodes(); ++j)
+	{
+		FESurfaceElement& me = *m_ss.m_pme[j];
+		int* en = &me.m_node[0];
+
+		assign(lm, -1);
+
+		int n = me.Nodes();
+
+		lm[0] = m_ss.Node(j).m_ID[DOF_X];
+		lm[1] = m_ss.Node(j).m_ID[DOF_Y];
+		lm[2] = m_ss.Node(j).m_ID[DOF_Z];
+		lm[3] = m_ss.Node(j).m_ID[DOF_RU];
+		lm[4] = m_ss.Node(j).m_ID[DOF_RV];
+		lm[5] = m_ss.Node(j).m_ID[DOF_RW];
+
+		for (int k=0; k<n; ++k)
+		{
+			int* id = mesh.Node(en[k]).m_ID;
+			lm[6*(k+1)  ] = id[DOF_X];
+			lm[6*(k+1)+1] = id[DOF_Y];
+			lm[6*(k+1)+2] = id[DOF_Z];
+			lm[6*(k+1)+3] = id[DOF_RU];
+			lm[6*(k+1)+4] = id[DOF_RV];
+			lm[6*(k+1)+5] = id[DOF_RW];
+		}
+
+		K.build_add(lm);
+	}
+
 }
 
 //-----------------------------------------------------------------------------
