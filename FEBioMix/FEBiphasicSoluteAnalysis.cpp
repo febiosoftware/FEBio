@@ -1,14 +1,16 @@
 #include "stdafx.h"
-#include "FEBiphasicAnalysis.h"
+#include "FEBiphasicSoluteAnalysis.h"
 #include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FERigid.h"
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBioMech/FEUncoupledMaterial.h"
 #include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
-void FEBiphasicAnalysis::InitNodes()
+void FEBiphasicSoluteAnalysis::InitNodes()
 {
 	// open all dofs we need
 	FEMesh& mesh = m_fem.GetMesh();
@@ -23,7 +25,12 @@ void FEBiphasicAnalysis::InitNodes()
 		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
 		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
 		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
-		if (node.m_BC[DOF_P] != -1) node.m_ID[DOF_P] = 0;		
+		if (node.m_BC[DOF_P] != -1) node.m_ID[DOF_P] = 0;
+
+		for (int k=0; k<MAX_CDOFS; ++k) {
+			int dofc = DOF_C + k;
+			if (node.m_BC[dofc] != -1) node.m_ID[dofc] = 0;
+		}
 	}
 
 	// fix all mixture dofs that are not used that is, that are not part of a biphasic material.
@@ -32,8 +39,10 @@ void FEBiphasicAnalysis::InitNodes()
 	for (int nd = 0; nd<mesh.Domains(); ++nd)
 	{
 		FEDomain& dom = mesh.Domain(nd);
-		FEBiphasic* bm  = dynamic_cast<FEBiphasic*>(dom.GetMaterial());
-		if (bm)
+		FEBiphasic*		  bm  = dynamic_cast<FEBiphasic*      >(dom.GetMaterial());
+		FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
+		FETriphasic*      btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
+		if (bm || bsm || btm)
 		{
 			for (int i=0; i<dom.Elements(); ++i)
 			{
@@ -42,6 +51,34 @@ void FEBiphasicAnalysis::InitNodes()
 				int* n = &el.m_node[0];
 				for (int j=0; j<N; ++j) 
 					if (mesh.Node(n[j]).m_ID[DOF_P] == 0) mesh.Node(n[j]).m_ID[DOF_P] = 1;
+			}
+		}
+		if (bsm)
+		{
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				int N = el.Nodes();
+				int* n = &el.m_node[0];
+				for (int j=0; j<N; ++j) {
+					int dofc = DOF_C + bsm->GetSolute()->GetSoluteID();
+					if (mesh.Node(n[j]).m_ID[dofc] == 0) mesh.Node(n[j]).m_ID[dofc] = 1;
+				}
+			}
+		}
+		else if (btm)
+		{
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				int N = el.Nodes();
+				int* n = &el.m_node[0];
+				for (int j=0; j<N; ++j) {
+					for (int k=0; k<2; ++k) {
+						int dofc = DOF_C + btm->m_pSolute[k]->GetSoluteID();
+						if (mesh.Node(n[j]).m_ID[dofc] == 0) mesh.Node(n[j]).m_ID[dofc] = 1;
+					}
+				}
 			}
 		}
 	}
@@ -57,6 +94,10 @@ void FEBiphasicAnalysis::InitNodes()
 			int* n = &el.m_node[0];
 			for (int j=0; j<N; ++j) {
 				if (mesh.Node(n[j]).m_ID[DOF_P] != 1) mesh.Node(n[j]).m_ID[DOF_P] = -1;
+				for (int k=0; k<MAX_CDOFS; ++k) {
+					int dofc = DOF_C + k;
+					if (mesh.Node(n[j]).m_ID[dofc] != 1) mesh.Node(n[j]).m_ID[dofc] = -1;
+				}
 			}
 		}
 	}
@@ -72,6 +113,10 @@ void FEBiphasicAnalysis::InitNodes()
 			int* n = &el.m_node[0];
 			for (int j=0; j<N; ++j) {
 				if (mesh.Node(n[j]).m_ID[DOF_P] == 1) mesh.Node(n[j]).m_ID[DOF_P] = 0;
+				for (int k=0; k<MAX_CDOFS; ++k) {
+					int dofc = DOF_C + k;
+					if (mesh.Node(n[j]).m_ID[dofc] == 1) mesh.Node(n[j]).m_ID[dofc] = 0;
+				}
 			}
 		}
 	}
@@ -81,7 +126,7 @@ void FEBiphasicAnalysis::InitNodes()
 //! This function is called before the analysis is solved and initializes all
 //! analysis data, such as determine active boundary conditions, initializes
 //! equation numbers (the latter is actually done by the FESolver class).
-bool FEBiphasicAnalysis::Init()
+bool FEBiphasicSoluteAnalysis::Init()
 {
 	// initialize base class data
 	FEAnalysis::Init();
@@ -255,6 +300,17 @@ bool FEBiphasicAnalysis::Init()
 				node.m_ID[bc] = (n<0?n:-n-2);
 				DC.r = br ? node.m_pt - node.m_p0 : 0;
 				break;
+/*			case DOF_C: // precribed concentration
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_ct[0] - node.m_c0[0] : 0;
+				break;
+			case DOF_C+1: // precribed concentration
+				n = node.m_ID[bc];
+				node.m_ID[bc] = (n<0?n:-n-2);
+				DC.r = br ? node.m_ct[1] - node.m_c0[1] : 0;
+				break;*/
+				//--> TODO: change bc=20 to something else
 			case 20: // y-z radial displacement
 				n = node.m_ID[DOF_Y];
 				node.m_ID[DOF_Y] = (n<0?n:-n-2);
@@ -262,6 +318,13 @@ bool FEBiphasicAnalysis::Init()
 				node.m_ID[DOF_Z] = (n<0?n:-n-2);
 				DC.r = 0;
 				break;
+			default:	// all prescribed concentrations
+				if ((bc >= DOF_C) && (bc < MAX_NDOFS)) {
+					n = node.m_ID[bc];
+					node.m_ID[bc] = (n<0?n:-n-2);
+					int sid = bc - DOF_C;
+					DC.r = br ? node.m_ct[sid] - node.m_c0[sid] : 0;
+				}
 			}
 		}
 	}
@@ -317,3 +380,5 @@ bool FEBiphasicAnalysis::Init()
 
 	return true;
 }
+
+

@@ -339,7 +339,7 @@ int FEMesh::RemoveIsolatedVertices()
 		{
 			++ni;
 			FENode& node = Node(i);
-			for (k=0; k<MAX_NDOFS; ++k) node.m_ID[k] = -1;
+			for (k=0; k<MAX_NDOFS; ++k) node.m_BC[k] = -1;
 		}
 
 	return ni;

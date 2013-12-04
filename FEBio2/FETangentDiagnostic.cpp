@@ -85,12 +85,12 @@ void FETangentDiagnostic::BuildUniaxial()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		n.m_ID[DOF_X] = BC[i][0];
-		n.m_ID[DOF_Y] = BC[i][1];
-		n.m_ID[DOF_Z] = BC[i][2];
+		n.m_BC[DOF_X] = BC[i][0];
+		n.m_BC[DOF_Y] = BC[i][1];
+		n.m_BC[DOF_Z] = BC[i][2];
 
 		// fix all DOFS
-		for (j=3; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
+		for (j=3; j<MAX_NDOFS; ++j) n.m_BC[j] = -1;
 	}
 
 	// get the material
@@ -156,12 +156,12 @@ void FETangentDiagnostic::BuildSimpleShear()
 		n.m_rid = -1;
 
 		// set displacement BC's
-		n.m_ID[DOF_X] = BC[i][0];
-		n.m_ID[DOF_Y] = BC[i][1];
-		n.m_ID[DOF_Z] = BC[i][2];
+		n.m_BC[DOF_X] = BC[i][0];
+		n.m_BC[DOF_Y] = BC[i][1];
+		n.m_BC[DOF_Z] = BC[i][2];
 
 		// fix all DOFS
-		for (j=3; j<MAX_NDOFS; ++j) n.m_ID[j] = -1;
+		for (j=3; j<MAX_NDOFS; ++j) n.m_BC[j] = -1;
 	}
 
 	// get the material

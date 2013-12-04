@@ -37,6 +37,7 @@
 #include "FETiedBiphasicInterface.h"
 
 #include "FEBiphasicAnalysis.h"
+#include "FEBiphasicSoluteAnalysis.h"
 #include "FEMultiphasicAnalysis.h"
 #include "FEBiphasicSolver.h"
 #include "FEBiphasicSoluteSolver.h"

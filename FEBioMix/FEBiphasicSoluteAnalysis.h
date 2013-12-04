@@ -3,11 +3,11 @@
 using namespace FECore;
 
 //-----------------------------------------------------------------------------
-//! Analysis class for biphasic problems
-class FEBiphasicAnalysis : public FEAnalysis
+//! Analysis class for biphasic-solute problems
+class FEBiphasicSoluteAnalysis : public FEAnalysis
 {
 public:
-	FEBiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_BIPHASIC) {}
+	FEBiphasicSoluteAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_POROSOLUTE) {}
 
 	bool Init();
 
