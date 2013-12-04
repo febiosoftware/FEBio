@@ -67,9 +67,6 @@ protected: // --- initialization functions ---
 	//! Initialize rigid bodies
 	bool CreateRigidBodies();
 
-	//! Initialize poroelastic/biphasic and solute data
-	bool InitPoroSolute();
-
 public: // --- I/O functions ---
 	//! Add data record
 	void AddDataRecord(DataRecord* pd);

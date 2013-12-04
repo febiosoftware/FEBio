@@ -13,6 +13,25 @@
 #include "log.h"
 
 //=============================================================================
+// FENode
+//-----------------------------------------------------------------------------
+FENode::FENode()
+{
+	// initialize nodal data
+	m_p0 = 0;
+	m_pt = 0;
+	m_T = 0;
+	for (int k=0; k<MAX_CDOFS; ++k) m_c0[k] = 0.;
+
+	// initialize dof stuff
+	for (int i=0; i<MAX_NDOFS; ++i) m_BC[i] =  0;
+	for (int i=0; i<MAX_NDOFS; ++i) m_ID[i] = -1;
+
+	// rigid body data
+	m_rid = -1;
+}
+
+//=============================================================================
 // FENodeSet
 //-----------------------------------------------------------------------------
 FENodeSet::FENodeSet(FEMesh* pm) : m_pmesh(pm), m_nID(-1)
@@ -206,43 +225,6 @@ void FEMesh::AddNodes(int nodes)
 	assert(nodes);
 	int N0 = (int) m_Node.size();
 	m_Node.resize(N0 + nodes);
-}
-
-//-----------------------------------------------------------------------------
-void FEMesh::AddNode(vec3d r)
-{
-	FENode node;
-	node.m_r0 = r;
-	node.m_rt = node.m_r0;
-
-	// set rigid body id
-	node.m_rid = -1;
-
-	// open displacement dofs
-	node.m_ID[DOF_X] = 0;
-	node.m_ID[DOF_Y] = 0;
-	node.m_ID[DOF_Z] = 0;
-
-	// open rotational dofs
-	node.m_ID[DOF_U] = 0;
-	node.m_ID[DOF_V] = 0;
-	node.m_ID[DOF_W] = 0;
-
-	// open pressure dof
-	node.m_ID[DOF_P] = 0;
-
-	// close the rigid rotational dofs
-	node.m_ID[DOF_RU] = -1;
-	node.m_ID[DOF_RV] = -1;
-	node.m_ID[DOF_RW] = -1;
-
-	// fix temperature dof
-	node.m_ID[DOF_T] = -1;
-
-	// open concentration dof
-	node.m_ID[DOF_C] = 0;
-
-	m_Node.push_back(node);
 }
 
 //-----------------------------------------------------------------------------
@@ -539,19 +521,10 @@ bool FEMesh::Init()
 		FENode& node = Node(i);
 		if (tag[i] == 0)
 		{
-			node.m_ID[DOF_U] = -1;
-			node.m_ID[DOF_V] = -1;
-			node.m_ID[DOF_W] = -1;
+			node.m_BC[DOF_U] = -1;
+			node.m_BC[DOF_V] = -1;
+			node.m_BC[DOF_W] = -1;
 		}
-	}
-
-	// At this point, the node ID still contains the boundary conditions
-	// so we copy that into the m_BC array
-	// TODO: perhaps we should put the BC's initially in BC instead of ID.
-	for (int i=0; i<Nodes(); ++i)
-	{
-		FENode& node = Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_BC[j] = node.m_ID[j];
 	}
 
 	// reset data

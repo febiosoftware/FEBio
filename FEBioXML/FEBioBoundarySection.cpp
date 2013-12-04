@@ -129,23 +129,23 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 		for (int i=0; i<N; ++i)
 		{
 			FENode& node = mesh.Node(s[i]);
-			if      (strcmp(sz, "x"  ) == 0) { node.m_ID[DOF_X] = -1; }
-			else if (strcmp(sz, "y"  ) == 0) { node.m_ID[DOF_Y] = -1; }
-			else if (strcmp(sz, "z"  ) == 0) { node.m_ID[DOF_Z] = -1; }
-			else if (strcmp(sz, "xy" ) == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = -1; }
-			else if (strcmp(sz, "yz" ) == 0) { node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
-			else if (strcmp(sz, "xz" ) == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Z] = -1; }
-			else if (strcmp(sz, "xyz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
-			else if (strcmp(sz, "p"  ) == 0) { node.m_ID[DOF_P] = -1; }
-			else if (strcmp(sz, "u"  ) == 0) { node.m_ID[DOF_U] = -1; }
-			else if (strcmp(sz, "v"  ) == 0) { node.m_ID[DOF_V] = -1; }
-			else if (strcmp(sz, "w"  ) == 0) { node.m_ID[DOF_W] = -1; }
-			else if (strcmp(sz, "uv" ) == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = -1; }
-			else if (strcmp(sz, "vw" ) == 0) { node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
-			else if (strcmp(sz, "uw" ) == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_W] = -1; }
-			else if (strcmp(sz, "uvw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
-			else if (strcmp(sz, "t"  ) == 0) { node.m_ID[DOF_T] = -1; }
-			else if (strcmp(sz, "c"  ) == 0) { node.m_ID[DOF_C] = -1; }
+			if      (strcmp(sz, "x"  ) == 0) { node.m_BC[DOF_X] = -1; }
+			else if (strcmp(sz, "y"  ) == 0) { node.m_BC[DOF_Y] = -1; }
+			else if (strcmp(sz, "z"  ) == 0) { node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "xy" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = -1; }
+			else if (strcmp(sz, "yz" ) == 0) { node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "xz" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "xyz") == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "p"  ) == 0) { node.m_BC[DOF_P] = -1; }
+			else if (strcmp(sz, "u"  ) == 0) { node.m_BC[DOF_U] = -1; }
+			else if (strcmp(sz, "v"  ) == 0) { node.m_BC[DOF_V] = -1; }
+			else if (strcmp(sz, "w"  ) == 0) { node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "uv" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = -1; }
+			else if (strcmp(sz, "vw" ) == 0) { node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "uw" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "uvw") == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "t"  ) == 0) { node.m_BC[DOF_T] = -1; }
+			else if (strcmp(sz, "c"  ) == 0) { node.m_BC[DOF_C] = -1; }
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 		}
 	}
@@ -158,24 +158,24 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 			int n = atoi(tag.AttributeValue("id"))-1;
 			FENode& node = fem.GetMesh().Node(n);
 			const char* sz = tag.AttributeValue("bc");
-			if      (strcmp(sz, "x") == 0) node.m_ID[DOF_X] = -1;
-			else if (strcmp(sz, "y") == 0) node.m_ID[DOF_Y] = -1;
-			else if (strcmp(sz, "z") == 0) node.m_ID[DOF_Z] = -1;
-			else if (strcmp(sz, "xy") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = -1; }
-			else if (strcmp(sz, "yz") == 0) { node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
-			else if (strcmp(sz, "xz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Z] = -1; }
-			else if (strcmp(sz, "xyz") == 0) { node.m_ID[DOF_X] = node.m_ID[DOF_Y] = node.m_ID[DOF_Z] = -1; }
-			else if (strcmp(sz, "p") == 0) { node.m_ID[DOF_P] = -1; }
-			else if (strcmp(sz, "u") == 0) node.m_ID[DOF_U] = -1;
-			else if (strcmp(sz, "v") == 0) node.m_ID[DOF_V] = -1;
-			else if (strcmp(sz, "w") == 0) node.m_ID[DOF_W] = -1;
-			else if (strcmp(sz, "uv") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = -1; }
-			else if (strcmp(sz, "vw") == 0) { node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
-			else if (strcmp(sz, "uw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_W] = -1; }
-			else if (strcmp(sz, "uvw") == 0) { node.m_ID[DOF_U] = node.m_ID[DOF_V] = node.m_ID[DOF_W] = -1; }
-			else if (strcmp(sz, "t") == 0) node.m_ID[DOF_T] = -1;
-			else if (strcmp(sz, "c") == 0) { node.m_ID[DOF_C] = -1; }
-			else if (strncmp(sz, "c", 1) == 0) node.m_ID[DOF_C + atoi(&sz[1]) - 1] = -1;
+			if      (strcmp(sz, "x"  ) == 0) { node.m_BC[DOF_X] = -1; }
+			else if (strcmp(sz, "y"  ) == 0) { node.m_BC[DOF_Y] = -1; }
+			else if (strcmp(sz, "z"  ) == 0) { node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "xy" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = -1; }
+			else if (strcmp(sz, "yz" ) == 0) { node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "xz" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "xyz") == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
+			else if (strcmp(sz, "p"  ) == 0) { node.m_BC[DOF_P] = -1; }
+			else if (strcmp(sz, "u"  ) == 0) { node.m_BC[DOF_U] = -1; }
+			else if (strcmp(sz, "v"  ) == 0) { node.m_BC[DOF_V] = -1; }
+			else if (strcmp(sz, "w"  ) == 0) { node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "uv" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = -1; }
+			else if (strcmp(sz, "vw" ) == 0) { node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "uw" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "uvw") == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
+			else if (strcmp(sz, "t"  ) == 0) { node.m_BC[DOF_T] = -1; }
+			else if (strcmp(sz, "c"  ) == 0) { node.m_BC[DOF_C] = -1; }
+			else if (strncmp(sz, "c", 1) == 0) node.m_BC[DOF_C + atoi(&sz[1]) - 1] = -1;
 			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 			++tag;
 		}
@@ -448,7 +448,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 
 	// we must deactive the master dof
 	// so that it does not get assigned an equation
-	fem.GetMesh().Node(node-1).m_ID[LC.master.bc] = -1;
+	fem.GetMesh().Node(node-1).m_BC[LC.master.bc] = -1;
 
 	// read the slave nodes
 	++tag;

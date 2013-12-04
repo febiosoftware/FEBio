@@ -56,7 +56,14 @@ bool FESolidAnalysis::Init()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = node.m_BC[j];
+		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = -1;
+
+		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
+		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
+		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
+		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
+		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
+		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
 	}
 
 	// set the rigid nodes
@@ -325,7 +332,14 @@ bool FEExplicitSolidAnalysis::Init()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = node.m_BC[j];
+		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = -1;
+
+		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
+		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
+		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
+		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
+		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
+		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
 	}
 
 	// set the rigid nodes
@@ -564,7 +578,14 @@ bool FELinearSolidAnalysis::Init()
 	for (int i=0; i<mesh.Nodes(); ++i)
 	{
 		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = node.m_BC[j];
+		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = -1;
+
+		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
+		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
+		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
+		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
+		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
+		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
 	}
 
 	// initialize equations

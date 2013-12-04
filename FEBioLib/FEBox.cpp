@@ -55,31 +55,6 @@ void FEBox::Create(int nx, int ny, int nz, vec3d r0, vec3d r1, int nhex)
 
 				// set rigid body id
 				node.m_rid = -1;
-
-				// open displacement dofs
-				node.m_ID[DOF_X] = 0;
-				node.m_ID[DOF_Y] = 0;
-				node.m_ID[DOF_Z] = 0;
-
-				// open rotational dofs
-				node.m_ID[DOF_U] = 0;
-				node.m_ID[DOF_V] = 0;
-				node.m_ID[DOF_W] = 0;
-
-				// open pressure dof
-				node.m_ID[DOF_P] = 0;
-
-				// close the rigid rotational dofs
-				node.m_ID[DOF_RU] = -1;
-				node.m_ID[DOF_RV] = -1;
-				node.m_ID[DOF_RW] = -1;
-
-				// open temperature dof
-				node.m_ID[DOF_T] = 0;
-				
-				// open concentration dof
-				for (int k=0; k<MAX_CDOFS; ++k)
-					node.m_ID[DOF_C+k] = 0;
 			}
 		}
 	}

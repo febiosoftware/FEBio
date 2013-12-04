@@ -4,7 +4,80 @@
 #include "FEBioMech/FERigid.h"
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBioMech/FEUncoupledMaterial.h"
+#include "FEBiphasic.h"
+#include "FEBiphasicSolute.h"
+#include "FETriphasic.h"
 #include "FECore/log.h"
+
+//-----------------------------------------------------------------------------
+void FEBiphasicAnalysis::InitNodes()
+{
+	// open all dofs we need
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int i=0; i<MAX_NDOFS; ++i) node.m_ID[i] = -1; 
+
+		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
+		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
+		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
+		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
+		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
+		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
+		if (node.m_BC[DOF_P] != -1) node.m_ID[DOF_P] = 0;		
+	}
+
+	// fix all mixture dofs that are not used that is, that are not part of a biphasic material.
+	// This is done in three steps.
+	// step 1. mark all pressure nodes
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		FEBiphasic* bm  = dynamic_cast<FEBiphasic*>(dom.GetMaterial());
+		if (bm)
+		{
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				int N = el.Nodes();
+				int* n = &el.m_node[0];
+				for (int j=0; j<N; ++j) 
+					if (mesh.Node(n[j]).m_ID[DOF_P] == 0) mesh.Node(n[j]).m_ID[DOF_P] = 1;
+			}
+		}
+	}
+	
+	// step 2. fix pressure dofs of all unmarked nodes
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			int N = el.Nodes();
+			int* n = &el.m_node[0];
+			for (int j=0; j<N; ++j) {
+				if (mesh.Node(n[j]).m_ID[DOF_P] != 1) mesh.Node(n[j]).m_ID[DOF_P] = -1;
+			}
+		}
+	}
+	
+	// step 3. free all marked dofs
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			int N = el.Nodes();
+			int* n = &el.m_node[0];
+			for (int j=0; j<N; ++j) {
+				if (mesh.Node(n[j]).m_ID[DOF_P] == 1) mesh.Node(n[j]).m_ID[DOF_P] = 0;
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 //! This function is called before the analysis is solved and initializes all
@@ -46,12 +119,7 @@ bool FEBiphasicAnalysis::Init()
 	}
 
 	// reset nodal ID's
-	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = node.m_BC[j];
-	}
+	InitNodes();
 
 	// set the rigid nodes
 	// Note that also the rotational degrees of freedom are fixed
@@ -253,6 +321,119 @@ bool FEBiphasicAnalysis::Init()
 }
 
 //-----------------------------------------------------------------------------
+void FEBiphasicSoluteAnalysis::InitNodes()
+{
+	// open all dofs we need
+	FEMesh& mesh = m_fem.GetMesh();
+	for (int i=0; i<mesh.Nodes(); ++i)
+	{
+		FENode& node = mesh.Node(i);
+		for (int i=0; i<MAX_NDOFS; ++i) node.m_ID[i] = -1; 
+
+		if (node.m_BC[DOF_X] != -1) node.m_ID[DOF_X] = 0;
+		if (node.m_BC[DOF_Y] != -1) node.m_ID[DOF_Y] = 0;
+		if (node.m_BC[DOF_Z] != -1) node.m_ID[DOF_Z] = 0;
+		if (node.m_BC[DOF_U] != -1) node.m_ID[DOF_U] = 0;
+		if (node.m_BC[DOF_V] != -1) node.m_ID[DOF_V] = 0;
+		if (node.m_BC[DOF_W] != -1) node.m_ID[DOF_W] = 0;
+		if (node.m_BC[DOF_P] != -1) node.m_ID[DOF_P] = 0;
+
+		for (int k=0; k<MAX_CDOFS; ++k) {
+			int dofc = DOF_C + k;
+			if (node.m_BC[dofc] != -1) node.m_ID[dofc] = 0;
+		}
+	}
+
+	// fix all mixture dofs that are not used that is, that are not part of a biphasic material.
+	// This is done in three steps.
+	// step 1. mark all pressure nodes
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		FEBiphasic*		  bm  = dynamic_cast<FEBiphasic*      >(dom.GetMaterial());
+		FEBiphasicSolute* bsm = dynamic_cast<FEBiphasicSolute*>(dom.GetMaterial());
+		FETriphasic*      btm = dynamic_cast<FETriphasic*     >(dom.GetMaterial());
+		if (bm || bsm || btm)
+		{
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				int N = el.Nodes();
+				int* n = &el.m_node[0];
+				for (int j=0; j<N; ++j) 
+					if (mesh.Node(n[j]).m_ID[DOF_P] == 0) mesh.Node(n[j]).m_ID[DOF_P] = 1;
+			}
+		}
+		if (bsm)
+		{
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				int N = el.Nodes();
+				int* n = &el.m_node[0];
+				for (int j=0; j<N; ++j) {
+					int dofc = DOF_C + bsm->GetSolute()->GetSoluteID();
+					if (mesh.Node(n[j]).m_ID[dofc] == 0) mesh.Node(n[j]).m_ID[dofc] = 1;
+				}
+			}
+		}
+		else if (btm)
+		{
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				int N = el.Nodes();
+				int* n = &el.m_node[0];
+				for (int j=0; j<N; ++j) {
+					for (int k=0; k<2; ++k) {
+						int dofc = DOF_C + btm->m_pSolute[k]->GetSoluteID();
+						if (mesh.Node(n[j]).m_ID[dofc] == 0) mesh.Node(n[j]).m_ID[dofc] = 1;
+					}
+				}
+			}
+		}
+	}
+	
+	// step 2. fix pressure dofs of all unmarked nodes
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			int N = el.Nodes();
+			int* n = &el.m_node[0];
+			for (int j=0; j<N; ++j) {
+				if (mesh.Node(n[j]).m_ID[DOF_P] != 1) mesh.Node(n[j]).m_ID[DOF_P] = -1;
+				for (int k=0; k<MAX_CDOFS; ++k) {
+					int dofc = DOF_C + k;
+					if (mesh.Node(n[j]).m_ID[dofc] != 1) mesh.Node(n[j]).m_ID[dofc] = -1;
+				}
+			}
+		}
+	}
+	
+	// step 3. free all marked dofs
+	for (int nd = 0; nd<mesh.Domains(); ++nd)
+	{
+		FEDomain& dom = mesh.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
+		{
+			FEElement& el = dom.ElementRef(i);
+			int N = el.Nodes();
+			int* n = &el.m_node[0];
+			for (int j=0; j<N; ++j) {
+				if (mesh.Node(n[j]).m_ID[DOF_P] == 1) mesh.Node(n[j]).m_ID[DOF_P] = 0;
+				for (int k=0; k<MAX_CDOFS; ++k) {
+					int dofc = DOF_C + k;
+					if (mesh.Node(n[j]).m_ID[dofc] == 1) mesh.Node(n[j]).m_ID[dofc] = 0;
+				}
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 //! This function is called before the analysis is solved and initializes all
 //! analysis data, such as determine active boundary conditions, initializes
 //! equation numbers (the latter is actually done by the FESolver class).
@@ -292,12 +473,7 @@ bool FEBiphasicSoluteAnalysis::Init()
 	}
 
 	// reset nodal ID's
-	FEMesh& mesh = m_fem.GetMesh();
-	for (int i=0; i<mesh.Nodes(); ++i)
-	{
-		FENode& node = mesh.Node(i);
-		for (int j=0; j<MAX_NDOFS; ++j)	node.m_ID[j] = node.m_BC[j];
-	}
+	InitNodes();
 
 	// set the rigid nodes
 	// Note that also the rotational degrees of freedom are fixed

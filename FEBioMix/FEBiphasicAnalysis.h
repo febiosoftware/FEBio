@@ -10,6 +10,9 @@ public:
 	FEBiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_BIPHASIC) {}
 
 	bool Init();
+
+protected:
+	void InitNodes();
 };
 
 //-----------------------------------------------------------------------------
@@ -20,4 +23,7 @@ public:
 	FEBiphasicSoluteAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_POROSOLUTE) {}
 
 	bool Init();
+
+protected:
+	void InitNodes();
 };

@@ -77,7 +77,7 @@ bool FEModel::Init()
 	if (m_nplane_strain >= 0)
 	{
 		int bc = m_nplane_strain;
-		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_ID[bc] = -1;
+		for (int i=0; i<m_mesh.Nodes(); ++i) m_mesh.Node(i).m_BC[bc] = -1;
 	}
 
 	// find and remove isolated vertices

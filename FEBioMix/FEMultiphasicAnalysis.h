@@ -10,4 +10,7 @@ public:
 	FEMultiphasicAnalysis(FEModel* pfem) : FEAnalysis(pfem, FE_MULTIPHASIC) {}
 
 	bool Init();
+
+protected:
+	void InitNodes();
 };

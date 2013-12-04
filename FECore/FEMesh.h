@@ -70,12 +70,24 @@ struct FE_BOUNDING_BOX
 //! This class defines a finite element node
 
 //! It stores nodal positions and nodal equations numbers and more.
+//!
+//! The m_BC array stores the status of the degrees of freedom. For a given
+//! dof, the value can be 0 = free or -1 = fixed. The array
+//! is initialized to 0 and then the different analysis classes
+//! will open the degrees of freedom they need to solve the analysis. 
+//!
+//! The m_ID array will store the equation number for the corresponding
+//! degree of freedom. Its values can be (a) non-negative (0 or higher) which
+//! gives the equation number in the linear system of equations, (b) -1 if the
+//! dof is fixed, and (c) < -1 if the dof corresponds to a prescribed dof. In
+//! that case the corresponding equation number is given by -ID-2.
 
 class FENode
 {
 public:
-	FENode() : m_p0(0) { for (int k=0; k<MAX_CDOFS; ++k) m_c0[k] = 0.; }
+	FENode();
 	
+public:
 	// geometry data
 	vec3d	m_r0;	//!< initial position
 	vec3d	m_v0;	//!< initial velocity
@@ -108,9 +120,9 @@ public:
 	
 	// rigid body data
 	int		m_rid;	//!< rigid body number
-
 	bool	m_bshell;	//!< does this node belong to a non-rigid shell element?
 
+public:
 	int		m_ID[MAX_NDOFS];	//!< nodal equation numbers
 	int		m_BC[MAX_NDOFS];	//!< boundary condition
 };
@@ -236,9 +248,6 @@ public:
 	//! allocate storage for mesh data
 	void CreateNodes(int nodes);
 	void AddNodes(int nodes);
-
-	//! add nodes to the mesh
-	void AddNode(vec3d r);
 
 	//! return number of nodes
 	int Nodes() { return m_Node.size(); }
