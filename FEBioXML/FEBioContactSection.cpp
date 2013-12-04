@@ -33,7 +33,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
 				// If we get here, we try to create a contact interface
 				// using the FEBio kernel. 
 				FEBioKernel& febio = FEBioKernel::GetInstance();
-				FEContactInterface* pci = febio.Create<FEContactInterface>(sztype, GetFEModel());
+				FEContactInterface* pci = dynamic_cast<FEContactInterface*>(febio.Create<FESurfacePairInteraction>(sztype, GetFEModel()));
 				if (pci)
 				{
 					fem.AddSurfacePairInteraction(pci);

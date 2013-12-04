@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioModel.h"
-#include "FEBioMech/FEContactInterface.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
@@ -602,10 +601,10 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 		ar << SurfacePairInteractions();
 		for (int i=0; i<SurfacePairInteractions(); ++i)
 		{
-			FEContactInterface* pci = dynamic_cast<FEContactInterface*>(SurfacePairInteraction(i));
+			FESurfacePairInteraction* pci = SurfacePairInteraction(i);
 
 			// store the type string
-			ar << febio.GetTypeStr<FEContactInterface>(pci);
+			ar << febio.GetTypeStr<FESurfacePairInteraction>(pci);
 
 			pci->Serialize(ar);
 		}
@@ -622,8 +621,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 			ar >> szci;
 
 			// create a new interface
-			FEContactInterface* pci = febio.Create<FEContactInterface>(szci, this);
-			assert(pci);
+			FESurfacePairInteraction* pci = febio.Create<FESurfacePairInteraction>(szci, this);
 
 			// serialize interface data from archive
 			pci->Serialize(ar);

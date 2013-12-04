@@ -352,7 +352,7 @@ void echo_input(FEBioModel& fem)
 			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 
 			FEContactInterface* pi = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
-			const char* sztype = febio.GetTypeStr<FEContactInterface>(pi);
+			const char* sztype = febio.GetTypeStr<FESurfacePairInteraction>(pi);
 			if (sztype == 0) sztype = "unknown";
 			felog.printf("contact interface %d - Type: %s\n", i+1, sztype);
 			FEParameterList& pl = pi->GetParameterList();

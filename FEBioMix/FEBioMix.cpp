@@ -111,9 +111,9 @@ REGISTER_FEBIO_CLASS(FESoluteFlux        , FESurfaceLoad, "soluteflux"     );
 
 //-----------------------------------------------------------------------------
 // Contact interfaces
-REGISTER_FEBIO_CLASS(FESlidingInterface2    , FEContactInterface, "sliding2"              );
-REGISTER_FEBIO_CLASS(FESlidingInterface3    , FEContactInterface, "sliding3"              );
-REGISTER_FEBIO_CLASS(FETiedBiphasicInterface, FEContactInterface, "tied-biphasic"         );
+REGISTER_FEBIO_CLASS(FESlidingInterface2    , FESurfacePairInteraction, "sliding2"              );
+REGISTER_FEBIO_CLASS(FESlidingInterface3    , FESurfacePairInteraction, "sliding3"              );
+REGISTER_FEBIO_CLASS(FETiedBiphasicInterface, FESurfacePairInteraction, "tied-biphasic"         );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
