@@ -1,6 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
-#include "FEBioLib/FEBioModel.h"
+#include "FEBioModel.h"
 
 //-----------------------------------------------------------------------------
 //! The micro-material implements material homogenization. The stress and tangents
