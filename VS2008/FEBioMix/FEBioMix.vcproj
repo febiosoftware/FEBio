@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMix\FEBiphasicSoluteAnalysis.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMix\FEBiphasicSoluteDomain.cpp"
 				>
 			</File>
@@ -372,6 +376,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMix\FEBiphasicSolute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMix\FEBiphasicSoluteAnalysis.h"
 				>
 			</File>
 			<File
