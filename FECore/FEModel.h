@@ -3,7 +3,7 @@
 #include "FEMesh.h"
 #include "LoadCurve.h"
 #include "BC.h"
-#include "FEBodyForce.h"
+#include "FEBodyLoad.h"
 #include "FESurfacePairInteraction.h"
 #include "FEAnalysis.h"
 #include "FESurfaceLoad.h"
@@ -239,10 +239,6 @@ public: // --- I/O functions
 
 	//! Add data record
 	virtual void AddDataRecord(DataRecord* pd) = 0;
-
-	//! Set plot file
-	virtual void SetPlotFile(PlotFile* pplt) = 0;
-	virtual void SetPlotFileNameExtension(const char *szext) = 0;
 
 public:
 	// TODO: I don't like this here.

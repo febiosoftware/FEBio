@@ -1,5 +1,6 @@
-#include "FECore/FEBodyForce.h"
-#include "FECore/FEParameterList.h"
+#pragma once
+#include "FEBodyForce.h"
+#include "FECore/FEElement.h"
 
 //-----------------------------------------------------------------------------
 class FEPointBodyForce : public FEBodyForce

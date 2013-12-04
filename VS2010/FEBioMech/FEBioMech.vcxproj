@@ -211,6 +211,7 @@
     <ClCompile Include="..\..\FEBioMech\FEBioMech.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMechData.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEBioMechPlot.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECarterHayesOld.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEConstBodyForce.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="..\..\FEBioMech\FEBioMech.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechData.h" />
     <ClInclude Include="..\..\FEBioMech\FEBioMechPlot.h" />
+    <ClInclude Include="..\..\FEBioMech\FEBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FECarterHayesOld.h" />
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioMech\FEConstBodyForce.h" />

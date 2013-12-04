@@ -66,9 +66,6 @@ public: // --- I/O functions ---
 	//! Add data record
 	void AddDataRecord(DataRecord* pd);
 
-	//! Set the plot file
-	void SetPlotFile(PlotFile* pplt);
-
 	//! Get the plot file
 	PlotFile* GetPlotFile();
 

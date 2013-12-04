@@ -76,13 +76,6 @@ PlotFile* FEBioModel::GetPlotFile()
 }
 
 //-----------------------------------------------------------------------------
-//! Set the plot file
-void FEBioModel::SetPlotFile(PlotFile* pplt) 
-{ 
-	m_plot = pplt; 
-}
-
-//-----------------------------------------------------------------------------
 //! Sets the extension of the plot file name.
 void FEBioModel::SetPlotFileNameExtension(const char *szext)
 {
@@ -182,6 +175,15 @@ bool FEBioModel::Input(const char* szfile)
 	if (fim.m_szdmp[0]) SetDumpFilename(fim.m_szdmp);
 	if (fim.m_szlog[0]) SetLogFilename (fim.m_szlog);
 	if (fim.m_szplt[0]) SetPlotFilename(fim.m_szplt);
+
+	// set the plot file
+	m_plot = fim.m_plot;
+
+	if (dynamic_cast<FEBioPlotFile*>(m_plot))
+	{
+		// change the extension of the plot file to .xplt
+		SetPlotFileNameExtension(".xplt");
+	}
 
 	// we're done reading
 	return true;
@@ -378,9 +380,9 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		ar << (int) m_BL.size();
 		for (int i=0; i<(int) m_BL.size(); ++i)
 		{
-			FEBodyForce* pbf = dynamic_cast<FEBodyForce*>(m_BL[i]);
-			ar << febio.GetTypeStr<FEBodyForce>(pbf);
-			pbf->Serialize(ar);
+			FEBodyLoad* pbl = dynamic_cast<FEBodyLoad*>(m_BL[i]);
+			ar << febio.GetTypeStr<FEBodyLoad>(pbl);
+			pbl->Serialize(ar);
 		}
 	}
 	else
@@ -416,7 +418,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		for (int i=0; i<nbl; ++i)
 		{
 			ar >> szbl;
-			FEBodyForce* pbl = febio.Create<FEBodyForce>(szbl, this);
+			FEBodyLoad* pbl = febio.Create<FEBodyLoad>(szbl, this);
 			assert(pbl);
 
 			pbl->Serialize(ar);

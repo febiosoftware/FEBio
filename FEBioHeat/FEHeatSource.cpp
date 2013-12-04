@@ -6,7 +6,7 @@ BEGIN_PARAMETER_LIST(FEHeatSource, FEBodyLoad);
 END_PARAMETER_LIST();
 
 //-----------------------------------------------------------------------------
-FEHeatSource::FEHeatSource(FEModel* pfem) : m_pfem(pfem)
+FEHeatSource::FEHeatSource(FEModel* pfem) : FEBodyLoad(pfem)
 {
 	m_Q = 0;
 }
@@ -15,7 +15,7 @@ FEHeatSource::FEHeatSource(FEModel* pfem) : m_pfem(pfem)
 void FEHeatSource::Residual(FEGlobalVector& R)
 {
 	// get the mesh
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	// loop over all domains
 	for (int nd = 0; nd < mesh.Domains(); ++nd)

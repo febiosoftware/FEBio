@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "FEBodyForce.h"
 
+
 //-----------------------------------------------------------------------------
-FEBodyForce::FEBodyForce(FEModel* pfem) : m_pfem(pfem)
+FEBodyForce::FEBodyForce(FEModel* pfem) : FEBodyLoad(pfem)
 {
 }
 

@@ -4,6 +4,7 @@
 #include "XMLReader.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FESolver.h"
+#include "FEBioPlot/PlotFile.h"
 #include <map>
 #include <string>
 using namespace std;
@@ -94,6 +95,8 @@ public:
 	char	m_szdmp[256];
 	char	m_szlog[256];
 	char	m_szplt[256];
+
+	PlotFile*	m_plot;
 
 public:
 	int m_nsteps;		//!< nr of step sections read

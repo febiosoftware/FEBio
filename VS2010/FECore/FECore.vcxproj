@@ -775,7 +775,7 @@
     <ClInclude Include="..\..\FECore\febio.h" />
     <ClInclude Include="..\..\FECore\FEBioFactory.h" />
     <ClInclude Include="..\..\FECore\FEBioTask.h" />
-    <ClInclude Include="..\..\FECore\FEBodyForce.h" />
+    <ClInclude Include="..\..\FECore\FEBodyLoad.h" />
     <ClInclude Include="..\..\FECore\FEBoundaryCondition.h" />
     <ClInclude Include="..\..\FECore\FEClosestPointProjection.h" />
     <ClInclude Include="..\..\FECore\FEContactSurface.h" />
@@ -850,7 +850,7 @@
     <ClCompile Include="..\..\FECore\ElementDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
-    <ClCompile Include="..\..\FECore\FEBodyForce.cpp" />
+    <ClCompile Include="..\..\FECore\FEBodyLoad.cpp" />
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
     <ClCompile Include="..\..\FECore\FEClosestPointProjection.cpp" />
     <ClCompile Include="..\..\FECore\FEContactSurface.cpp" />

@@ -63,7 +63,7 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 	{
 		// see if the kernel knows this force
 		FEBioKernel& febio = FEBioKernel::GetInstance();
-		FEBodyForce* pf = febio.Create<FEBodyForce>(szt, &fem);
+		FEBodyLoad* pf = febio.Create<FEBodyLoad>(szt, &fem);
 		if (pf)
 		{
 			if (!tag.isleaf())

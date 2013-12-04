@@ -1,7 +1,7 @@
 #pragma once
-#include "FECore/FEBodyForce.h"
-#include "FECore/MathParser.h"
+#include "FEBodyForce.h"
 #include "FEElasticMaterial.h"
+#include "FECore/MathParser.h"
 
 //-----------------------------------------------------------------------------
 //! This class defines a deformation-independent constant force (e.g. gravity)

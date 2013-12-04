@@ -155,7 +155,7 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
 	else pplt = new FEBioPlotFile(fem);
-	fem.SetPlotFile(pplt);
+	m_pim->m_plot = pplt;
 
 	const char* szplt = tag.AttributeValue("file", true);
 	if (szplt) m_pim->SetPlotfileName(szplt);
@@ -221,9 +221,6 @@ void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 	}
 	else if (dynamic_cast<FEBioPlotFile*>(pplt))
 	{
-		// change the extension of the plot file to .xplt
-		fem.SetPlotFileNameExtension(".xplt");
-
 		if (!tag.isleaf())
 		{
 			FEBioPlotFile& plt = *dynamic_cast<FEBioPlotFile*>(pplt);
