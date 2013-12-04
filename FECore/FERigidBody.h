@@ -31,6 +31,9 @@ public:
 	//! desctructor
 	virtual ~FERigidBody();
 
+	//! Set the center of mass directly
+	void SetCOM(vec3d rc);
+
 	//! Update total mass and center of mass
 	void UpdateCOM();
 

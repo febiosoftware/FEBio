@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "FESolidAnalysis.h"
-#include "FERigidBody.h"
 #include "FERigid.h"
 #include "FEContactInterface.h"
 #include "FEUncoupledMaterial.h"
+#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

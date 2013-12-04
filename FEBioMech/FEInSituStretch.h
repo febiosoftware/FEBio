@@ -8,7 +8,7 @@ public:
 	FEInSituStretch(FEModel* pfem);
 
 public:
-	void Init();
+	bool Init();
 	bool Augment(int naug);
 
 	void Residual(FEGlobalVector& R) {};

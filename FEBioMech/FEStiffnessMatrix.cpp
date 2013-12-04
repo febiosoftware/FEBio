@@ -7,7 +7,7 @@
 #include "FEUT4Domain.h"
 #include "FEPointConstraint.h"
 #include "FEAugLagLinearConstraint.h"
-#include "FEBioMech/FERigidBody.h"
+#include "FECore/FERigidBody.h"
 #include "FERigidJoint.h"
 
 //////////////////////////////////////////////////////////////////////

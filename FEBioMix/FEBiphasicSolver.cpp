@@ -4,8 +4,8 @@
 #include "FESlidingInterface3.h"
 #include "FEBioMech/FEElasticDomain.h"
 #include "FEBioMech/FEPressureLoad.h"
-#include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FEResidualVector.h"
+#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 
 #ifdef WIN32

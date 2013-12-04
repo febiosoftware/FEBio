@@ -14,7 +14,7 @@ public:
 	FEPointConstraint(FEModel* pfem);
 
 	//! initialize data
-	void Init();
+	bool Init();
 
 	//! serialize \todo Implement this
 	void Serialize(DumpFile& ar) {}

@@ -26,8 +26,8 @@ public:
 	//! destructor
 	virtual ~FERigidJoint() {}
 
-	//! initialization \todo Find a use for this
-	void Init() {}
+	//! initialization
+	bool Init();
 
 	//! calculates the joint forces
 	void Residual(FEGlobalVector& R);
@@ -64,7 +64,8 @@ public:
 	double	m_atol;	//! augmented Lagrangian tolerance
 
 protected:
-	int	m_nID;	//!< ID of rigid joint
+	int		m_nID;	//!< ID of rigid joint
+	bool	m_binit;
 	DECLARE_PARAMETER_LIST();
 };
 

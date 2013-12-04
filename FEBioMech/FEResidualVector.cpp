@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEResidualVector.h"
-#include "FERigidBody.h"
+#include "FECore/FERigidBody.h"
 using namespace std;
 
 //-----------------------------------------------------------------------------

@@ -38,8 +38,6 @@ public:
 	int		m_fc[6];	//!< rigid force/torque loadcurve ID's
 	double	m_fs[6];	//!< rigid force/torque scale factors
 
-	int		m_nRB;		//!< rigid body ID
-
 public:
 	// inherited from FEMaterial
 	virtual bool IsRigid() { return true; }
@@ -65,6 +63,9 @@ public:
 
 	// declare a parameter list
 	DECLARE_PARAMETER_LIST();
+
+private:
+	bool	m_binit;	//!< flag for first initialization
 };
 
 #endif // !defined(AFX_FERIGID_H__42385DA7_ECE1_4862_B6E1_EFE5B4D4CC4B__INCLUDED_)

@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "FERigidBody.h"
-#include "FERigid.h"
 #include "FECore/FEMaterial.h"
 #include "FECore/FESolidDomain.h"
 
@@ -67,6 +66,13 @@ void FERigidBody::Reset()
 }
 
 //-----------------------------------------------------------------------------
+//! Set the rigid body's center of mass directly
+void FERigidBody::SetCOM(vec3d rc)
+{
+	m_r0 = m_rt = rc;
+}
+
+//-----------------------------------------------------------------------------
 //! Calculates the total mass and center of mass of a rigid body
 //!
 void FERigidBody::UpdateCOM()
@@ -94,12 +100,14 @@ void FERigidBody::UpdateCOM()
 		FESolidDomain* pbd = dynamic_cast<FESolidDomain*>(&mesh.Domain(nd));
 		if (pbd)
 		{
-			FERigidMaterial* pm = dynamic_cast<FERigidMaterial*> (pbd->GetMaterial());
+			FEMaterial* pm = pbd->GetMaterial();
 			// make sure this element belongs to the rigid body
-			if (pm && (pm->m_nRB == m_nID))
+			if (pm->IsRigid() && (pm->GetRigidBodyID() == m_nID))
 			{
 				// get the material density
 				double dens = pm->Density();
+				assert(dens > 0.0);
+				if (dens == 0.0) dens = 1.0;
 
 				// loop over all elements
 				for (int iel=0; iel<pbd->Elements(); ++iel)

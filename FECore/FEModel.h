@@ -72,6 +72,9 @@ public:
 	//! Initialize mesh data
 	bool InitMesh();
 
+	//! Initialize the objects
+	bool InitObjects();
+
 public:
 	//! set the problem title
 	void SetTitle(const char* sz);
@@ -190,7 +193,7 @@ public: // --- Nonlinear constraints functions ---
 	void AddNonlinearConstraint(FENLConstraint* pnlc) { m_NLC.push_back(pnlc); }
 
 	//! Initialize constraint data
-	void InitConstraints();
+	bool InitConstraints();
 
 public: // --- parameter functions ---
 

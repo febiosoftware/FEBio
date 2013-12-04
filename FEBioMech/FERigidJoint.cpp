@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "FERigidJoint.h"
+#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
-#include "FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 BEGIN_PARAMETER_LIST(FERigidJoint, FENLConstraint);
@@ -21,6 +21,46 @@ FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem)
 {
 	static int count = 1;
 	m_nID = count++;
+	m_binit = false;
+}
+
+//-----------------------------------------------------------------------------
+bool FERigidJoint::Init()
+{
+	assert(m_binit == false);
+	if (m_binit) return true;
+
+	// reset force
+	m_F = vec3d(0,0,0);
+
+	// When the rigid joint is read in, the ID's correspond to the rigid materials.
+	// Now we want to make the ID's refer to the rigid body ID's
+
+	FEMaterial* pm = m_pfem->GetMaterial(m_nRBa);
+	if (pm->IsRigid() == false)
+	{
+		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+		return false;
+	}
+	m_nRBa = pm->GetRigidBodyID();
+
+	pm = m_pfem->GetMaterial(m_nRBb);
+	if (pm->IsRigid() == false)
+	{
+		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
+		return false;
+	}
+	m_nRBb = pm->GetRigidBodyID();
+
+	FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
+	FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+
+	m_qa0 = m_q0 - ra.m_r0;
+	m_qb0 = m_q0 - rb.m_r0;
+
+	m_binit = true;
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

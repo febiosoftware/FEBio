@@ -62,11 +62,6 @@ protected:
 	void SerializeGlobals     (DumpFile& ar);
 	void SerializeDataStore   (DumpFile& ar);
 
-protected: // --- initialization functions ---
-
-	//! Initialize rigid bodies
-	bool CreateRigidBodies();
-
 public: // --- I/O functions ---
 	//! Add data record
 	void AddDataRecord(DataRecord* pd);

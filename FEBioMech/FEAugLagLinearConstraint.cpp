@@ -42,7 +42,7 @@ FELinearConstraintSet::FELinearConstraintSet(FEModel* pfem) : FENLConstraint(pfe
 }
 
 //-----------------------------------------------------------------------------
-void FELinearConstraintSet::Init()
+bool FELinearConstraintSet::Init()
 {
 	// set the equation numbers for the linear constraints
 	list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
@@ -61,6 +61,7 @@ void FELinearConstraintSet::Init()
 			sn.neq = mesh.Node(sn.node).m_ID[sn.bc];
 		}		
 	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------

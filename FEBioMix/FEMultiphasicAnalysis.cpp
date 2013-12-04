@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEMultiphasicAnalysis.h"
-#include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FERigid.h"
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBioMech/FEUncoupledMaterial.h"
@@ -8,6 +7,7 @@
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
 #include "FEMultiphasic.h"
+#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------

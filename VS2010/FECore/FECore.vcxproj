@@ -806,6 +806,7 @@
     <ClInclude Include="..\..\FECore\FEOctree.h" />
     <ClInclude Include="..\..\FECore\FEParameterList.h" />
     <ClInclude Include="..\..\FECore\FEPlotData.h" />
+    <ClInclude Include="..\..\FECore\FERigidBody.h" />
     <ClInclude Include="..\..\FECore\FEShellDomain.h" />
     <ClInclude Include="..\..\FECore\FESolidDomain.h" />
     <ClInclude Include="..\..\FECore\FESolver.h" />
@@ -878,6 +879,7 @@
     <ClCompile Include="..\..\FECore\FEOctree.cpp" />
     <ClCompile Include="..\..\FECore\FEParameterList.cpp" />
     <ClCompile Include="..\..\FECore\FEPlotData.cpp" />
+    <ClCompile Include="..\..\FECore\FERigidBody.cpp" />
     <ClCompile Include="..\..\FECore\FEShellDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolidDomain.cpp" />
     <ClCompile Include="..\..\FECore\FESolver.cpp" />

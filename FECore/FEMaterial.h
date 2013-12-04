@@ -96,9 +96,23 @@ public:
 	//! Return elastic material \todo I need to move this function up the hierarchy once I redesign the material library
 	virtual FEElasticMaterial* GetElasticMaterial() { return 0; }
 
-	//! is this a rigid material \todo this is temporary solution to avoid RTTI and the need to define rigid materials in FECore
+public:
+	// TODO: Some rigid body stuff is moved to here to avoid RTTI and the definition of rigid materials in FECore, 
+	//       as well as simplify some initialization. I hope someday to refactor this a bit.
+	//! is this a rigid material
 	virtual bool IsRigid() { return false; }
 
+	//! get the ID of the rigid body this material is assigned to (-1 if not)
+	int GetRigidBodyID() { return m_nRB; }
+
+	//! Set the rigid body ID this material is assigned to
+	void SetRigidBodyID(int rid) { m_nRB = rid; }
+
+	//! return the density
+	//! TODO: This was added here because the rigid bodies need it to determine the COM
+	virtual double Density() { return 0.0; }
+
+public:
 	//! Set the local coordinate system map
 	void SetCoordinateSystemMap(FECoordSysMap* pmap);
 
@@ -136,6 +150,7 @@ public: // interface for managing attributes
 private:
 	char	m_szname[128];	//!< name of material
 	int		m_nID;			//!< material ID
+	int		m_nRB;			//!< rigid body ID (TODO: I hope to remove this sometime)
 
 private:
 	FECoordSysMap*	m_pmap;			//!< local material coordinate system

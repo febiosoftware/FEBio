@@ -21,7 +21,7 @@ FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEPointConstraint::Init()
+bool FEPointConstraint::Init()
 {
 	assert(m_node_id != -1);
 	FEMesh& m = m_pfem->GetMesh();
@@ -33,6 +33,8 @@ void FEPointConstraint::Init()
 	// find the element in which this node lies
 	m_pel = m.FindSolidElement(r, m_rs);
 	assert(m_pel);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

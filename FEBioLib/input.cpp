@@ -15,9 +15,9 @@
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
 #include "FEBioMix/FEMultiphasicSolver.h"
-#include "FEBioMech/FERigidBody.h"
 #include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
+#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 #include <string.h>
 

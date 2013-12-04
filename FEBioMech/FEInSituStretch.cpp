@@ -16,8 +16,9 @@ FEInSituStretch::FEInSituStretch(FEModel* pfem) : FENLConstraint(pfem)
 }
 
 //-----------------------------------------------------------------------------
-void FEInSituStretch::Init()
+bool FEInSituStretch::Init()
 {
+	return true;
 }
 
 //-----------------------------------------------------------------------------

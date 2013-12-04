@@ -2,8 +2,8 @@
 #include "FEBioMechData.h"
 #include "FEElasticMaterial.h"
 #include "FERigid.h"
-#include "FERigidBody.h"
 #include "FESolidSolver.h"
+#include "FECore/FERigidBody.h"
 
 //-----------------------------------------------------------------------------
 double FENodeXPos::value(int nnode) 

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "FEBiphasicSoluteAnalysis.h"
-#include "FEBioMech/FERigidBody.h"
 #include "FEBioMech/FERigid.h"
 #include "FEBioMech/FEContactInterface.h"
 #include "FEBioMech/FEUncoupledMaterial.h"
 #include "FEBiphasic.h"
 #include "FEBiphasicSolute.h"
 #include "FETriphasic.h"
+#include "FECore/FERigidBody.h"
 #include "FECore/log.h"
 
 //-----------------------------------------------------------------------------
