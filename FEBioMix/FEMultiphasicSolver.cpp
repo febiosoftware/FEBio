@@ -24,7 +24,7 @@
 
 //-----------------------------------------------------------------------------
 // define the parameter list
-BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolver)
+BEGIN_PARAMETER_LIST(FEMultiphasicSolver, FESolidSolver)
 	ADD_PARAMETER(m_Dtol         , FE_PARAM_DOUBLE, "dtol"        );
 	ADD_PARAMETER(m_Etol         , FE_PARAM_DOUBLE, "etol"        );
 	ADD_PARAMETER(m_Rtol         , FE_PARAM_DOUBLE, "rtol"        );

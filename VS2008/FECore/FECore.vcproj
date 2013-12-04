@@ -360,6 +360,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FERigidBody.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEShellDomain.cpp"
 				>
 			</File>
@@ -627,6 +631,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEPlotData.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FERigidBody.h"
 				>
 			</File>
 			<File
