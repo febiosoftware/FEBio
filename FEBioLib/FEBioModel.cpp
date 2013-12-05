@@ -1125,7 +1125,7 @@ bool FEBioModel::Solve()
 	bool bconv = FEModel::Solve();
 
 	// close the plot file
-	if (m_plot) m_plot->Close();
+	if (m_plot) { delete m_plot; m_plot = 0; }
 
 	// stop total time tracker
 	m_TotalTime.stop();
