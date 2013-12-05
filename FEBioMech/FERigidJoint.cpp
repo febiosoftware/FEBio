@@ -25,9 +25,10 @@ FERigidJoint::FERigidJoint(FEModel* pfem) : FENLConstraint(pfem)
 }
 
 //-----------------------------------------------------------------------------
+//! TODO: This function is called twice: once in the Init and once in the Solve
+//!       phase. Is that necessary?
 bool FERigidJoint::Init()
 {
-	assert(m_binit == false);
 	if (m_binit) return true;
 
 	// reset force
