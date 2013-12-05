@@ -244,6 +244,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEBioFactory.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEBioTask.cpp"
 				>
 			</File>
@@ -265,6 +269,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FECore.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FECoreBase.cpp"
 				>
 			</File>
 			<File
@@ -534,6 +542,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FECoreBase.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEDiscreteDomain.h"
 				>
 			</File>
@@ -579,10 +591,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FECore\FEMaterialFactory.h"
 				>
 			</File>
 			<File
