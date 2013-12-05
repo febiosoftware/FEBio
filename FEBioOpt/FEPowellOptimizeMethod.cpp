@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEPowellOptimizeMethod.h"
 #include "FECore/Logfile.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 // declared in dllmain.cpp

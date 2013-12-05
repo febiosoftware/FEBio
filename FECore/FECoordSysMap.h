@@ -12,7 +12,7 @@
 #include "mat3d.h"
 #include "FEElement.h"
 #include "DumpFile.h"
-#include "FEParameterList.h"
+#include "FECoreBase.h"
 
 class FEModel;
 class FEMesh;
@@ -26,10 +26,10 @@ class FEMesh;
 //-----------------------------------------------------------------------------
 //! The FECoordSysMap class is used to create local coordinate systems.
 
-class FECoordSysMap : public FEParamContainer
+class FECoordSysMap : public FECoreBase
 {
 public:
-	FECoordSysMap(int ntype) { m_ntype = ntype; }
+	FECoordSysMap(int ntype) : FECoreBase(FECOORDSYSMAP_ID) { m_ntype = ntype; }
 	virtual ~FECoordSysMap() {}
 
 	//! initialization

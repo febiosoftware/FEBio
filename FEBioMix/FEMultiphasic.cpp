@@ -4,6 +4,7 @@
 
 #include "FEMultiphasic.h"
 #include "FECore/FEModel.h"
+#include "FECore/febio.h"
 #include <complex>
 using namespace std;
 
@@ -1123,12 +1124,12 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 	{
 		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc << m_pSolute.size();
 		
-		ar << febio.GetTypeStr<FEMaterial>(m_pSolid); m_pSolid->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pPerm ); m_pPerm ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pSupp ); m_pSupp ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pOsmC ); m_pOsmC ->Serialize(ar);
+		ar << m_pSolid->GetTypeStr(); m_pSolid->Serialize(ar);
+		ar << m_pPerm ->GetTypeStr(); m_pPerm ->Serialize(ar);
+		ar << m_pSupp ->GetTypeStr(); m_pSupp ->Serialize(ar);
+		ar << m_pOsmC ->GetTypeStr(); m_pOsmC ->Serialize(ar);
 		for (i=0; i<(int)m_pSolute.size(); ++i) {
-			ar << febio.GetTypeStr<FEMaterial>(m_pSolute[i]);
+			ar << m_pSolute[i]->GetTypeStr();
 			m_pSolute[i] ->Serialize(ar);
 		}
 	}
@@ -1138,28 +1139,28 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 		
 		char sz[256] = {0};
 		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pSolid); m_pSolid->Serialize(ar);
 		m_pSolid->Init();
 		
 		ar >> sz;
-		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pPerm); m_pPerm->Serialize(ar);
 		m_pPerm->Init();
 
 		ar >> sz;
-		m_pSupp = dynamic_cast<FESolventSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pSupp = dynamic_cast<FESolventSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pSupp); m_pSupp->Serialize(ar);
 		m_pSupp->Init();
 		
 		ar >> sz;
-		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pOsmC); m_pOsmC->Serialize(ar);
 		m_pOsmC->Init();
 		
 		for (i=0; i<nsol; ++i) {
 			ar >> sz;
-			m_pSolute.push_back(dynamic_cast<FESolute*>(febio.Create<FEMaterial>(sz, ar.GetFEModel())));
+			m_pSolute.push_back(dynamic_cast<FESolute*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel())));
 			assert(m_pSolute[i]); m_pSolute[i]->Serialize(ar);
 			m_pSolute[i]->Init();
 		}

@@ -20,10 +20,10 @@ FEBioHeat::InitModule();
 
 //-----------------------------------------------------------------------------
 // register the material with the framework
-REGISTER_MATERIAL(FEMicroMaterial, "micro-material");
+REGISTER_FEBIO_CLASS(FEMicroMaterial, FEMATERIAL_ID, "micro-material");
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPlotData, "contact gap"     );
-REGISTER_FEBIO_CLASS(FEPlotContactPressure , FEPlotData, "contact pressure");
-REGISTER_FEBIO_CLASS(FEPlotContactTraction , FEPlotData, "contact traction");
+REGISTER_FEBIO_CLASS(FEPlotContactGap      , FEPLOTDATA_ID, "contact gap"     );
+REGISTER_FEBIO_CLASS(FEPlotContactPressure , FEPLOTDATA_ID, "contact pressure");
+REGISTER_FEBIO_CLASS(FEPlotContactTraction , FEPLOTDATA_ID, "contact traction");
 }

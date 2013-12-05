@@ -102,9 +102,6 @@ public:
 	double				m_rhormax;		//!< maximum density
 	
 public:
-	// declare as registered
-	DECLARE_REGISTERED(FERemodelingElasticMaterial);
-	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

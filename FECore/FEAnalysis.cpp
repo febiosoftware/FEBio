@@ -1,13 +1,14 @@
 #include "stdafx.h"
 #include "FEAnalysis.h"
 #include "FEModel.h"
+#include "febio.h"
 #include "log.h"
 
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
 
 //-----------------------------------------------------------------------------
-FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : m_fem(*pfem), m_ntype(ntype) 
+FEAnalysis::FEAnalysis(FEModel* pfem, int ntype) : FECoreBase(FEANALYSIS_ID), m_fem(*pfem), m_ntype(ntype) 
 {
 	m_psolver = 0;
 	m_tend = 0.0;
@@ -581,8 +582,7 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		for (int i=0; i< (int) m_BC.size(); ++i) ar << m_BC[i]->GetID();
 
 		// Seriaize solver data
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-		ar << febio.GetTypeStr<FESolver>(m_psolver);
+		ar << m_psolver->GetTypeStr();
 		m_psolver->Serialize(ar);
 	}
 	else
@@ -635,11 +635,10 @@ void FEAnalysis::Serialize(DumpFile& ar)
 		}
 
 		// Serialize solver data
-		FEBioKernel& febio = FEBioKernel::GetInstance();
 		char szsolver[256] = {0};
 		ar >> szsolver;
 		assert(m_psolver == 0);
-		m_psolver = febio.Create<FESolver>(szsolver, &m_fem); assert(m_psolver);
+		m_psolver = fecore_new<FESolver>(FESOLVER_ID, szsolver, &m_fem); assert(m_psolver);
 		m_psolver->Serialize(ar);
 	}
 }

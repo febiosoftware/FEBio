@@ -781,6 +781,7 @@
     <ClInclude Include="..\..\FECore\FEContactSurface.h" />
     <ClInclude Include="..\..\FECore\FECoordSysMap.h" />
     <ClInclude Include="..\..\FECore\FECore.h" />
+    <ClInclude Include="..\..\FECore\FECoreBase.h" />
     <ClInclude Include="..\..\FECore\FEDiscreteDomain.h" />
     <ClInclude Include="..\..\FECore\FEDomain.h" />
     <ClInclude Include="..\..\FECore\FEElemElemList.h" />
@@ -793,7 +794,6 @@
     <ClInclude Include="..\..\FECore\FELevelStructure.h" />
     <ClInclude Include="..\..\FECore\FELinearConstraint.h" />
     <ClInclude Include="..\..\FECore\FEMaterial.h" />
-    <ClInclude Include="..\..\FECore\FEMaterialFactory.h" />
     <ClInclude Include="..\..\FECore\FEMaterialPoint.h" />
     <ClInclude Include="..\..\FECore\FEMesh.h" />
     <ClInclude Include="..\..\FECore\FEModel.h" />
@@ -849,6 +849,7 @@
     <ClCompile Include="..\..\FECore\DumpStream.cpp" />
     <ClCompile Include="..\..\FECore\ElementDataRecord.cpp" />
     <ClCompile Include="..\..\FECore\FEAnalysis.cpp" />
+    <ClCompile Include="..\..\FECore\FEBioFactory.cpp" />
     <ClCompile Include="..\..\FECore\FEBioTask.cpp" />
     <ClCompile Include="..\..\FECore\FEBodyLoad.cpp" />
     <ClCompile Include="..\..\FECore\FEBoundaryCondition.cpp" />
@@ -856,6 +857,7 @@
     <ClCompile Include="..\..\FECore\FEContactSurface.cpp" />
     <ClCompile Include="..\..\FECore\FECoordSysMap.cpp" />
     <ClCompile Include="..\..\FECore\FECore.cpp" />
+    <ClCompile Include="..\..\FECore\FECoreBase.cpp" />
     <ClCompile Include="..\..\FECore\FEDiscreteDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEDomain.cpp" />
     <ClCompile Include="..\..\FECore\FEElemElemList.cpp" />

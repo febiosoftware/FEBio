@@ -9,6 +9,7 @@
 #include "FECore/ObjectDataRecord.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
+#include "FECore/febio.h"
 #include "version.h"
 
 //-----------------------------------------------------------------------------
@@ -355,16 +356,13 @@ void FEBioModel::SerializeGlobals(DumpFile& ar)
 //! Serialize analysis data
 void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-
 	if (ar.IsSaving())
 	{
 		// analysis steps
 		ar << (int) m_Step.size();
 		for (int i=0; i<(int) m_Step.size(); ++i) 
 		{
-			const char* sztype = febio.GetTypeStr<FEAnalysis>(m_Step[i]);
-			ar << sztype;
+			ar << m_Step[i]->GetTypeStr();
 			m_Step[i]->Serialize(ar);
 		}
 
@@ -380,8 +378,8 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		ar << (int) m_BL.size();
 		for (int i=0; i<(int) m_BL.size(); ++i)
 		{
-			FEBodyLoad* pbl = dynamic_cast<FEBodyLoad*>(m_BL[i]);
-			ar << febio.GetTypeStr<FEBodyLoad>(pbl);
+			FEBodyLoad* pbl = m_BL[i];
+			ar << pbl->GetTypeStr();
 			pbl->Serialize(ar);
 		}
 	}
@@ -398,7 +396,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		for (int i=0; i<nsteps; ++i)
 		{
 			ar >> sztype;
-			FEAnalysis* pstep = febio.Create<FEAnalysis>(sztype, this); assert(pstep);
+			FEAnalysis* pstep = fecore_new<FEAnalysis>(FEANALYSIS_ID, sztype, this); assert(pstep);
 			pstep->Serialize(ar);
 			m_Step.push_back(pstep);
 		}
@@ -418,7 +416,7 @@ void FEBioModel::SerializeAnalysisData(DumpFile &ar)
 		for (int i=0; i<nbl; ++i)
 		{
 			ar >> szbl;
-			FEBodyLoad* pbl = febio.Create<FEBodyLoad>(szbl, this);
+			FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, szbl, this);
 			assert(pbl);
 
 			pbl->Serialize(ar);
@@ -447,7 +445,7 @@ void FEBioModel::SerializeMaterials(DumpFile& ar)
 			FEMaterial* pmat = GetMaterial(i);
 
 			// store the type string
-			ar << febio.GetTypeStr<FEMaterial>(pmat);
+			ar << pmat->GetTypeStr();
 
 			// store the name
 			ar << pmat->GetName();
@@ -470,7 +468,7 @@ void FEBioModel::SerializeMaterials(DumpFile& ar)
 			ar >> szmat;
 
 			// create a material
-			FEMaterial* pmat = febio.Create<FEMaterial>(szmat, this);
+			FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, szmat, this);
 			assert(pmat);
 
 			// read the name
@@ -606,7 +604,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 			FESurfacePairInteraction* pci = SurfacePairInteraction(i);
 
 			// store the type string
-			ar << febio.GetTypeStr<FESurfacePairInteraction>(pci);
+			ar << pci->GetTypeStr();
 
 			pci->Serialize(ar);
 		}
@@ -623,7 +621,7 @@ void FEBioModel::SerializeContactData(DumpFile &ar)
 			ar >> szci;
 
 			// create a new interface
-			FESurfacePairInteraction* pci = febio.Create<FESurfacePairInteraction>(szci, this);
+			FESurfacePairInteraction* pci = fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szci, this);
 
 			// serialize interface data from archive
 			pci->Serialize(ar);
@@ -671,7 +669,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			s.Serialize(ar);
 
 			// save the load data
-			ar << febio.GetTypeStr<FESurfaceLoad>(psl);
+			ar << psl->GetTypeStr();
 			ar << psl->GetID() << psl->IsActive();
 			psl->Serialize(ar);
 		}
@@ -772,7 +770,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 			// read load data
 			char sztype[256] = {0};
 			ar >> sztype;
-			FESurfaceLoad* ps = febio.Create<FESurfaceLoad>(sztype, this);
+			FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, sztype, this);
 			assert(ps);
 			ps->SetSurface(psurf);
 

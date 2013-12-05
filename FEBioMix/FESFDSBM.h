@@ -32,9 +32,6 @@ public:
 	//! return fiber modulus
 	double FiberModulus(double rhor) { return m_ksi0*pow(rhor/m_rho0, m_g);}
 	
-	// declare as registered
-	DECLARE_REGISTERED(FESFDSBM);
-	
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 	

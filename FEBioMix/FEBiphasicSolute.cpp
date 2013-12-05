@@ -1,5 +1,6 @@
 #include "FEBiphasicSolute.h"
 #include "FECore/FEModel.h"
+#include "FECore/febio.h"
 
 //=============================================================================
 //                 S O L U T E M A T E R I A L P O I N T
@@ -415,16 +416,15 @@ bool FEBiphasicSolute::SetProperty(int n, FEMaterial* pm)
 void FEBiphasicSolute::Serialize(DumpFile& ar)
 {
 	FEMaterial::Serialize(ar);
-	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	if (ar.IsSaving())
 	{
 		ar << m_Rgas << m_Tabs;
 
-		ar << febio.GetTypeStr<FEMaterial>(m_pSolid ); m_pSolid ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pPerm  ); m_pPerm  ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pOsmC  ); m_pOsmC  ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pSolute); m_pSolute->Serialize(ar);
+		ar << m_pSolid ->GetTypeStr(); m_pSolid ->Serialize(ar);
+		ar << m_pPerm  ->GetTypeStr(); m_pPerm  ->Serialize(ar);
+		ar << m_pOsmC  ->GetTypeStr(); m_pOsmC  ->Serialize(ar);
+		ar << m_pSolute->GetTypeStr(); m_pSolute->Serialize(ar);
 	}
 	else
 	{
@@ -432,22 +432,22 @@ void FEBiphasicSolute::Serialize(DumpFile& ar)
 
 		char sz[256] = {0};
 		ar >> sz;
-		m_pSolid = dynamic_cast<FEElasticMaterial*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pSolid = dynamic_cast<FEElasticMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pSolid); m_pSolid->Serialize(ar);
 		m_pSolid->Init();
 
 		ar >> sz;
-		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pPerm = dynamic_cast<FEHydraulicPermeability*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pPerm); m_pPerm->Serialize(ar);
 		m_pPerm->Init();
 
 		ar >> sz;
-		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pOsmC); m_pOsmC->Serialize(ar);
 		m_pOsmC->Init();
 
 		ar >> sz;
-		m_pSolute = dynamic_cast<FESolute*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pSolute = dynamic_cast<FESolute*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pSolute); m_pSolute->Serialize(ar);
 		m_pSolute->Init();
 

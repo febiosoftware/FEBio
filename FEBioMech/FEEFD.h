@@ -29,9 +29,6 @@ public:
 	// Spatial tangent
 	tens4ds Tangent(FEMaterialPoint& mp);
 	
-	// declare as registered
-	DECLARE_REGISTERED(FEEFD);
-	
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 	

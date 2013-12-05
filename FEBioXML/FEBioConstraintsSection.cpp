@@ -3,6 +3,7 @@
 #include "FEBioMech/FERigid.h"
 #include "FEBioMech/FEPointConstraint.h"
 #include "FECore/FEModel.h"
+#include "FECore/febio.h"
 
 //=============================================================================
 //
@@ -15,9 +16,6 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 	// make sure there is something to read
 	if (tag.isleaf()) return;
 
-	// get the FEBio kernel
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-
 	++tag;
 	do
 	{
@@ -25,7 +23,7 @@ void FEBioConstraintsSection::Parse(XMLTag &tag)
 		else if (tag == "constraint")
 		{
 			const char* sztype = tag.AttributeValue("type");
-			FENLConstraint* plc = febio.Create<FENLConstraint>(sztype, m_pim->GetFEModel());
+			FENLConstraint* plc = fecore_new<FENLConstraint>(FENLCONSTRAINT_ID, sztype, m_pim->GetFEModel());
 			if (plc == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 			FEParameterList& pl = plc->GetParameterList();

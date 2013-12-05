@@ -29,7 +29,7 @@ MaterialError::MaterialError(const char* szfmt, ...)
 }
 
 //-----------------------------------------------------------------------------
-FEMaterial::FEMaterial(FEModel* pfem) : m_pfem(pfem)
+FEMaterial::FEMaterial(FEModel* pfem) : FECoreBase(FEMATERIAL_ID), m_pfem(pfem)
 {
 	static int n = 1;
 	m_szname[0] = 0;

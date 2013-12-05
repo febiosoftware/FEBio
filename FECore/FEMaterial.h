@@ -11,8 +11,7 @@
 
 #include "tens4d.h"
 #include "LoadCurve.h"		//---> can we delete this?
-#include "FEMaterialFactory.h"
-#include "FEParameterList.h"
+#include "FECoreBase.h"
 #include "FEMaterialPoint.h"
 #include "FECoordSysMap.h"
 #include "DumpFile.h"
@@ -69,7 +68,7 @@ public:
 
 //! From this class all other material classes are derived.
 
-class FEMaterial : public FEParamContainer
+class FEMaterial : public FECoreBase
 {
 public:
 	FEMaterial(FEModel* pfem);

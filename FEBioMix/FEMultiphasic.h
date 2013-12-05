@@ -222,8 +222,5 @@ private:
 	vector<FESolidBoundMolecule*>	m_pSBM;			//!< pointer to solid-bound molecule materials
 	vector<FEChemicalReaction*>		m_pReact;		//!< pointer to chemical reactions
 
-	// declare as registered
-	DECLARE_REGISTERED(FEMultiphasic);
-	
 	DECLARE_PARAMETER_LIST();
 };

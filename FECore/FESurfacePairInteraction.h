@@ -1,5 +1,5 @@
 #pragma once
-#include "FEParameterList.h"
+#include "FECoreBase.h"
 #include "FESurface.h"
 
 //-----------------------------------------------------------------------------
@@ -7,7 +7,7 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This class describes a general purpose interaction between two surfaces.
-class FESurfacePairInteraction : public FEParamContainer
+class FESurfacePairInteraction : public FECoreBase
 {
 public:
 	//! constructor

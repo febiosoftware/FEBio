@@ -31,8 +31,5 @@ public:
 	double	m_B;					//!< mass supply coefficient
 	double	m_psi0;					//!< specific strain energy at homeostasis
 	
-	// declare as registered
-	DECLARE_REGISTERED(FEReactionRateHuiskes);
-	
 	DECLARE_PARAMETER_LIST();	
 };

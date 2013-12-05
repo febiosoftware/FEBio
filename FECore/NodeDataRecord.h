@@ -1,13 +1,14 @@
 #pragma once
+#include "FECoreBase.h"
 #include "DataStore.h"
 
 //-----------------------------------------------------------------------------
 //! This is the base class for a node data value.
 //! \todo I'd like to modify this so I can pass the FENode class instead of the node number
-class FENodeLogData
+class FENodeLogData : FECoreBase
 { 
 public:
-	FENodeLogData(FEModel* pfem) : m_pfem(pfem) {}
+	FENodeLogData(FEModel* pfem) : FECoreBase(FENODELOGDATA_ID), m_pfem(pfem) {}
 	virtual ~FENodeLogData(){}
 	virtual double value(int node) = 0; 
 protected:

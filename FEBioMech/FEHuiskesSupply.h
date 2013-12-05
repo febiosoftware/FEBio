@@ -26,9 +26,6 @@ public:
 	double	m_B;			//!< mass supply coefficient
 	double	m_k;			//!< specific strain energy at homeostasis
 	
-	// declare as registered
-	DECLARE_REGISTERED(FEHuiskesSupply);
-	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

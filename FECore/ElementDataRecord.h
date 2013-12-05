@@ -1,12 +1,12 @@
 #pragma once
+#include "FECoreBase.h"
 #include "DataStore.h"
-
 //-----------------------------------------------------------------------------
 //! Base class for element log data
-class FELogElemData
+class FELogElemData : public FECoreBase
 {
 public:
-	FELogElemData(FEModel* pfem) : m_pfem(pfem){}
+	FELogElemData(FEModel* pfem) : FECoreBase(FEELEMLOGDATA_ID), m_pfem(pfem){}
 	virtual ~FELogElemData(){}
 	virtual double value(FEElement& el) = 0;
 protected:

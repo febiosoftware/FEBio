@@ -1,6 +1,6 @@
 #pragma once
 #include "DumpFile.h"
-#include "FEParameterList.h"
+#include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of FEModel class
@@ -9,7 +9,7 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! Base class for body-loads
 //! \todo This is a work in progress
-class FEBodyLoad : public FEParamContainer
+class FEBodyLoad : public FECoreBase
 {
 public:
 	FEBodyLoad(FEModel* pfem);

@@ -1,6 +1,6 @@
 #pragma once
 #include "BFGSSolver.h"
-#include "FEParameterList.h"
+#include "FECoreBase.h"
 #include "DumpFile.h"
 #include "Timer.h"
 
@@ -13,7 +13,7 @@ class FEModel;
 //! A class derived from FESolver implements a solver for a specific type
 //! of physics problem. It takes the FEModel in its constructor and implements
 //! the SolveStep function to solve the FE problem.
-class FESolver : public FEParamContainer
+class FESolver : public FECoreBase
 {
 public:
 	//! constructor

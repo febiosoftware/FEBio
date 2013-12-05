@@ -171,8 +171,6 @@ public: // material properties
 	FESoluteDiffusivity*	m_pDiff;	//!< pointer to diffusivity material
 	FESoluteSolubility*		m_pSolub;	//!< pointer to solubility material
 	FESoluteSupply*			m_pSupp;	//!< pointer to solute supply material
-	
-	DECLARE_REGISTERED(FESolute);
 };
 
 //-----------------------------------------------------------------------------
@@ -221,9 +219,6 @@ public:
 	double					m_rho0;		//!< initial referential (apparent) density of SBM
 	double					m_rhomin;	//!< minimum referential (apparent) density of SBM
 	double					m_rhomax;	//!< maximum referential (apparent) density of SBM
-	
-	// declare as registered
-	DECLARE_REGISTERED(FESolidBoundMolecule);
 	
 	DECLARE_PARAMETER_LIST();
 };

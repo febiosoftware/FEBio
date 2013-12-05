@@ -39,9 +39,6 @@ public:
 	//! calculate tangent stiffness at material point
 	virtual tens4ds DevTangent(FEMaterialPoint& pt);
 
-	// declare as registered
-	DECLARE_REGISTERED(FEMRVonMisesFibers);
-
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

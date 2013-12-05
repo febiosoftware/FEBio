@@ -21,9 +21,6 @@ public:
 	double	m_beta[3];	// power in power-law relation
 	double	m_ksi[3];	// coefficient in power-law relation
 
-	// declare as registered
-	DECLARE_REGISTERED(FEEFDUncoupled);
-		
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

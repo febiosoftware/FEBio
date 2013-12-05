@@ -8,7 +8,7 @@ bool FEBioPlotFile::Dictionary::AddVariable(FEModel* pfem, const char* szname, v
 {
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 
-	FEPlotData* ps = febio.Create<FEPlotData>(szname, pfem);
+	FEPlotData* ps = fecore_new<FEPlotData>(FEPLOTDATA_ID, szname, pfem);
 	if (ps)
 	{
 		ps->SetItemList(item);

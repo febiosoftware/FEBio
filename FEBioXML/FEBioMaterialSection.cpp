@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FEBioMaterialSection.h"
 #include "FECore/FEModel.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //! This function creates a material by checking the type attribute against
@@ -9,7 +10,6 @@
 FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEBioKernel& febio = FEBioKernel::GetInstance();
 
 	// get the material type
 	const char* sztype = tag.AttributeValue("type", true);
@@ -22,7 +22,7 @@ FEMaterial* FEBioMaterialSection::CreateMaterial(XMLTag& tag)
 	const char* szname = tag.AttributeValue("name", true);
 
 	// create a new material of this type
-	FEMaterial* pmat = febio.Create<FEMaterial>(sztype, &fem);
+	FEMaterial* pmat = fecore_new<FEMaterial>(FEMATERIAL_ID, sztype, &fem);
 	if (pmat == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 
 	// set the material's name
@@ -213,7 +213,7 @@ bool FEBioMaterialSection::ParseFiberTag(XMLTag &tag, FEMaterial *pm)
 	}
 	else
 	{
-		FECoordSysMap* pmap = febio.Create<FECoordSysMap>(type.cvalue(), &fem);
+		FECoordSysMap* pmap = fecore_new<FECoordSysMap>(FECOORDSYSMAP_ID, type.cvalue(), &fem);
 		if (pmap == 0) throw XMLReader::InvalidAttributeValue(tag, "type", type.cvalue());
 
 		// read the parameter list

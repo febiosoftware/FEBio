@@ -1,51 +1,51 @@
 #pragma once
 #include "FE_enum.h"
+#include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
+//! Forward declaration of the FEModel class. All classes that register
+//! with the framework take a pointer to FEModel as their constructor parameter.
 class FEModel;
 
 //-----------------------------------------------------------------------------
+//! The factory class contains the mechanism for instantiating a class.
 class FEBioFactory
 {
 public:
-	virtual ~FEBioFactory(){}
+	//! constructor
+	FEBioFactory(SUPER_CLASS_ID scid, const char* sztype);
 
+	//! virtual constructor
+	virtual ~FEBioFactory();
+
+	//! This is the function that the kernel will use to intantiate an object
+	void* CreateInstance(FEModel* pfem);
+
+public:
 	// return the type string identifier
 	const char* GetTypeStr() { return m_sztype; }
 
-protected:
-	// constructor
-	FEBioFactory(const char* sztype) { m_sztype = sztype; }
-
-protected:
-	const char*	m_sztype;	//!< class type string
-};
-
-//-----------------------------------------------------------------------------
-// The FEBioFactory_T class is a template class that can be used to create 
-// factory classes for FEBio. Factory are used by the framework to create instance
-// of FEBio classes. 
-template <typename T> class FEBioFactory_T : public FEBioFactory
-{
-protected:
-	// contructor for the factory
-	FEBioFactory_T(const char* sztype) : FEBioFactory(sztype){}
+	//! return the super-class ID
+	SUPER_CLASS_ID GetSuperClassID() { return m_scid; }
 
 public:
-	// create an instance of TDerived class
-	virtual T* Create(FEModel* pfem) = 0;
+	//! derived classes implement this to create an instance of a class
+	virtual void* Create(FEModel*) = 0;
 
-	// check type of class
-	virtual bool IsType(T* po) = 0;
+private:
+	const char*		m_sztype;	//!< class type string
+	SUPER_CLASS_ID	m_scid;		//!< the super-class ID
 };
 
 //-----------------------------------------------------------------------------
+//! Forward declarations of classes used by the domain factory
 class FEDomain;
 class FEMesh;
 class FEMaterial;
 
 //-----------------------------------------------------------------------------
-// Creation of domains are a little more elaborate
+//! Creation of domains are a little more elaborate and deviate from the usual
+//! factory methods.
 class FEDomainFactory
 {
 public:

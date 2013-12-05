@@ -2,7 +2,7 @@
 #include "FESurfacePairInteraction.h"
 
 //-----------------------------------------------------------------------------
-FESurfacePairInteraction::FESurfacePairInteraction(FEModel* pfem) : m_pfem(pfem)
+FESurfacePairInteraction::FESurfacePairInteraction(FEModel* pfem) : FECoreBase(FESURFACEPAIRINTERACTION_ID), m_pfem(pfem)
 {
 	m_ntype = 0;
 	m_nID = -1;

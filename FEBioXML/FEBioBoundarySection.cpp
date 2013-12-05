@@ -5,6 +5,7 @@
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidJoint.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the boundary section from the xml file
@@ -732,8 +733,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 	{
 		// If we get here, we try to create a contact interface
 		// using the FEBio kernel. 
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(febio.Create<FESurfacePairInteraction>(szt, GetFEModel()));
+		FEContactInterface* pci = dynamic_cast<FEContactInterface*>(fecore_new<FESurfacePairInteraction>(FESURFACEPAIRINTERACTION_ID, szt, GetFEModel()));
 		if (pci)
 		{
 			fem.AddSurfacePairInteraction(pci);

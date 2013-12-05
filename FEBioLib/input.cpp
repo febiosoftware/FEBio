@@ -77,8 +77,6 @@ void print_parameter_list(FEParameterList& pl)
 //! This function outputs the input data to the felog file.
 void echo_input(FEBioModel& fem)
 {
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-
 	// echo input
 	int i, j;
 
@@ -112,7 +110,7 @@ void echo_input(FEBioModel& fem)
 	// print control info
 	felog.printf(" CONTROL DATA\n");
 	felog.printf("===========================================================================\n");
-	const char* szmod = febio.GetTypeStr<FEAnalysis>(&step);
+	const char* szmod = step.GetTypeStr();
 	if (szmod == 0) { szmod = "unknown"; assert(false); }
 	felog.printf("\tModule type .................................... : %s\n", szmod);
 
@@ -305,7 +303,7 @@ void echo_input(FEBioModel& fem)
 
 		// get the material name and type string
 		const char* szname = pmat->GetName();
-		const char* sztype = febio.GetTypeStr<FEMaterial>(pmat);
+		const char* sztype = pmat->GetTypeStr();
 		if (szname[0] == 0) szname = 0;
 
 		// print type and name
@@ -332,7 +330,7 @@ void echo_input(FEBioModel& fem)
 			FEBodyLoad* pbl = fem.GetBodyLoad(i);
 
 			// get the type string
-			const char* sztype = febio.GetTypeStr<FEBodyLoad>(pbl);
+			const char* sztype = pbl->GetTypeStr();
 			if (sztype == 0) sztype = "unknown";
 			felog.printf(" Type: %s\n", sztype);
 
@@ -351,8 +349,8 @@ void echo_input(FEBioModel& fem)
 		{
 			if (i>0) felog.printf("---------------------------------------------------------------------------\n");
 
-			FEContactInterface* pi = dynamic_cast<FEContactInterface*>(fem.SurfacePairInteraction(i));
-			const char* sztype = febio.GetTypeStr<FESurfacePairInteraction>(pi);
+			FESurfacePairInteraction* pi = fem.SurfacePairInteraction(i);
+			const char* sztype = pi->GetTypeStr();
 			if (sztype == 0) sztype = "unknown";
 			felog.printf("contact interface %d - Type: %s\n", i+1, sztype);
 			FEParameterList& pl = pi->GetParameterList();

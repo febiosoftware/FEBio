@@ -1,8 +1,8 @@
 #pragma once
+#include "FECoreBase.h"
 
 //-----------------------------------------------------------------------------
 class FEModel;
-class FEBioTask;
 
 //-----------------------------------------------------------------------------
 // The FEBioTask class is the base class for all tasks that FEBio can execute.
@@ -11,10 +11,10 @@ class FEBioTask;
 // FEBioNAGOptimize does a material parameter optimization using the NAG library;
 // the FEBioMaterialDiagnostic runs a material diagnostic on a set of predefined
 // scenarios, etc. 
-class FEBioTask
+class FEBioTask : public FECoreBase
 {
 public:
-	FEBioTask(FEModel* pfem) { m_pfem = pfem; }
+	FEBioTask(FEModel* pfem) : FECoreBase(FETASK_ID) { m_pfem = pfem; }
 	virtual ~FEBioTask(void){}
 
 	//! Run the task.

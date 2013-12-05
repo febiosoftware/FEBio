@@ -26,9 +26,6 @@ public:
 	FEMooneyRivlin	m_MR;
 	FEEFDUncoupled	m_EFD;
 
-	// declare as registered
-	DECLARE_REGISTERED(FEEFDMooneyRivlin);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

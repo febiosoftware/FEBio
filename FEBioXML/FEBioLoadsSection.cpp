@@ -2,6 +2,7 @@
 #include "FEBioLoadsSection.h"
 #include "FEBioMech/FEPointBodyForce.h"
 #include "FECore/FEModel.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the loads section from the xml file (version 1.2 or up)
@@ -62,8 +63,7 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 	else
 	{
 		// see if the kernel knows this force
-		FEBioKernel& febio = FEBioKernel::GetInstance();
-		FEBodyLoad* pf = febio.Create<FEBodyLoad>(szt, &fem);
+		FEBodyLoad* pf = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, szt, &fem);
 		if (pf)
 		{
 			if (!tag.isleaf())
@@ -88,8 +88,7 @@ void FEBioLoadsSection::ParseBodyForce(XMLTag &tag)
 void FEBioLoadsSection::ParseBodyLoad(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-	FEBodyLoad* pbl = febio.Create<FEBodyLoad>(tag.Name(), &fem);
+	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, tag.Name(), &fem);
 	FEParameterList& PL = pbl->GetParameterList();
 	++tag;
 	do
@@ -211,8 +210,7 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 	fem.GetMesh().AddSurface(psurf);
 
 	// create surface load
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-	FESurfaceLoad* ps = febio.Create<FESurfaceLoad>(tag.Name(), &fem);
+	FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, tag.Name(), &fem);
 	if (ps == 0) throw XMLReader::InvalidTag(tag);
 
 	ps->Create(npr);

@@ -27,7 +27,5 @@ public:
 	double	m_l0;
 	double	m_refl;
 
-	DECLARE_REGISTERED(FEUncoupledActiveContraction);
-
 	DECLARE_PARAMETER_LIST();
 };

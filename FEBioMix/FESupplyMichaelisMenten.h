@@ -50,9 +50,6 @@ public:
 	double	m_Vmax;			//!< maximum uptake rate
 	double	m_Km;			//!< concentration at which half-maximum rate occurs
 	
-	// declare as registered
-	DECLARE_REGISTERED(FESupplyMichaelisMenten);
-	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

@@ -25,9 +25,6 @@ public:
 	FEVerondaWestmann	m_VW;
 	FEEFDUncoupled		m_EFD;
 
-	// declare as registered
-	DECLARE_REGISTERED(FEEFDVerondaWestmann);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

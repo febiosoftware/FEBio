@@ -73,6 +73,26 @@ struct FE_Element_Spec
 	bool				m_but4;
 };
 
+//-----------------------------------------------------------------------------
+//! This lists the super-class id's that can be used to register new classes
+//! with the FEBio kernel. It effectively defines the base class that a class
+//! is derived from.
+typedef unsigned int SUPER_CLASS_ID;
+#define FETASK_ID                   0x0001	// derived from FEBioTask
+#define FESOLVER_ID                 0x0002	// derived from FESolver
+#define FEMATERIAL_ID               0x0003	// derived from FEMaterial
+#define FEBODYLOAD_ID               0x0004	// derived from FEBodyLoad
+#define FESURFACELOAD_ID            0x0005	// derived from FESurfaceLoad
+#define FENLCONSTRAINT_ID           0x0006	// derived from FENLConstraint
+#define FECOORDSYSMAP_ID            0x0007	// derived from FECoordSysMap
+#define FEPLOTDATA_ID               0x0008	// derived from FEPlotData
+#define FEANALYSIS_ID               0x0009	// derived from FEAnalysis
+#define FESURFACEPAIRINTERACTION_ID 0x000A	// derived from FESurfacePairInteraction
+#define FENODELOGDATA_ID            0x000B	// derived from FENodeLogData
+#define FEELEMLOGDATA_ID            0x000C	// derived from FElemLogData
+#define FEOBJLOGDATA_ID             0x000D	// derived from FELogObjectData
+#define FEBC_ID						0x000E	// derived from FEBoundaryCondition (TODO: This does not work yet)
+
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Fiber distribution generation functions
 //  Each element can be associated with a fiber direction which is generated

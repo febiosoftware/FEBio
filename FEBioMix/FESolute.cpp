@@ -1,5 +1,6 @@
 #include "FESolute.h"
 #include "FECore/FEModel.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //! FESolute constructor
@@ -40,7 +41,6 @@ void FESolute::Init()
 void FESolute::Serialize(DumpFile& ar)
 {
 	FEMaterial::Serialize(ar);
-	FEBioKernel& febio = FEBioKernel::GetInstance();
 	
 	int nSupp = 0;
 	if (ar.IsSaving())
@@ -48,15 +48,15 @@ void FESolute::Serialize(DumpFile& ar)
 		ar << GetSoluteID();
 		ar << m_rhoT << m_M << m_z;
 		
-		ar << febio.GetTypeStr<FEMaterial>(m_pDiff ); m_pDiff ->Serialize(ar);
-		ar << febio.GetTypeStr<FEMaterial>(m_pSolub); m_pSolub->Serialize(ar);
+		ar << m_pDiff->GetTypeStr(); m_pDiff ->Serialize(ar);
+		ar << m_pSolub->GetTypeStr(); m_pSolub->Serialize(ar);
 		
 		if (m_pSupp == 0) ar << nSupp;
 		else
 		{
 			nSupp = 1;
 			ar << nSupp;
-			ar << febio.GetTypeStr<FEMaterial>(m_pSupp );
+			ar << m_pSupp->GetTypeStr();
 			m_pSupp ->Serialize(ar);
 		}
 	}
@@ -69,12 +69,12 @@ void FESolute::Serialize(DumpFile& ar)
 		
 		char sz[256] = {0};
 		ar >> sz;
-		m_pDiff = dynamic_cast<FESoluteDiffusivity*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pDiff = dynamic_cast<FESoluteDiffusivity*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pDiff); m_pDiff->Serialize(ar);
 		m_pDiff->Init();
 		
 		ar >> sz;
-		m_pSolub = dynamic_cast<FESoluteSolubility*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+		m_pSolub = dynamic_cast<FESoluteSolubility*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 		assert(m_pSolub); m_pSolub->Serialize(ar);
 		m_pSolub->Init();
 		
@@ -82,7 +82,7 @@ void FESolute::Serialize(DumpFile& ar)
 		if (nSupp)
 		{
 			ar >> sz;
-			m_pSupp = dynamic_cast<FESoluteSupply*>(febio.Create<FEMaterial>(sz, ar.GetFEModel()));
+			m_pSupp = dynamic_cast<FESoluteSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
 			assert(m_pSupp); m_pSupp->Serialize(ar);
 			m_pSupp->Init();
 		}

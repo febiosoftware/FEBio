@@ -197,23 +197,11 @@ int main(int argc, char* argv[])
 	// set options that were passed on the command line
 	fem.SetDebugFlag(ops.bdebug);
 
-	// get the FEBio kernel
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-
 	// find a task
-	  FEBioTask* ptask = static_cast<FEBioTask*> (febio.CreateTask(ops.sztask, &fem));
+	FEBioTask* ptask = fecore_new<FEBioTask>(FETASK_ID, ops.sztask, &fem);
 	if (ptask == 0)
 	{
 		fprintf(stderr, "Don't know how to do task: %s\n", ops.sztask);
-		int N = febio.Count<FEBioTask>();
-		fprintf(stderr, "Nr. of task defined = %d:\n", N);
-		for (int i=0; i<N; ++i)
-		{
-			const char* sz = febio.GetTypeStr<FEBioTask>(i);
-			assert(sz);
-			if (sz == 0) sz = "(Unknown)";
-			fprintf(stderr, "Task %d = %s\n", i+1, sz);
-		}
 		return 1;
 	}
 

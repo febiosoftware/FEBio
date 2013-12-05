@@ -1,13 +1,14 @@
 #pragma once
+#include "FECoreBase.h"
 #include "DataStore.h"
 #include "FEObject.h"
 
 //-----------------------------------------------------------------------------
 //! Base class for object log data (e.g. rigid bodies)
-class FELogObjectData
+class FELogObjectData : public FECoreBase
 {
 public:
-	FELogObjectData(FEModel* pfem) : m_pfem(pfem) {}
+	FELogObjectData(FEModel* pfem) : FECoreBase(FEOBJLOGDATA_ID), m_pfem(pfem) {}
 	virtual ~FELogObjectData(){}
 	virtual double value(FEObject& rb) = 0;
 private:

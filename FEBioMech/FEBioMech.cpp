@@ -97,193 +97,193 @@ void FEBioMech::InitModule()
 
 //-----------------------------------------------------------------------------
 // Analysis classes
-REGISTER_FEBIO_CLASS(FESolidAnalysis        , FEAnalysis, "solid"         );
-REGISTER_FEBIO_CLASS(FEExplicitSolidAnalysis, FEAnalysis, "explicit-solid");
-REGISTER_FEBIO_CLASS(FELinearSolidAnalysis  , FEAnalysis, "linear-solid"  );
+REGISTER_FEBIO_CLASS(FESolidAnalysis        , FEANALYSIS_ID, "solid"         );
+REGISTER_FEBIO_CLASS(FEExplicitSolidAnalysis, FEANALYSIS_ID, "explicit-solid");
+REGISTER_FEBIO_CLASS(FELinearSolidAnalysis  , FEANALYSIS_ID, "linear-solid"  );
 
 //-----------------------------------------------------------------------------
 // Solver classes
-REGISTER_FEBIO_CLASS(FESolidSolver        , FESolver, "solid"         );
-REGISTER_FEBIO_CLASS(FEExplicitSolidSolver, FESolver, "explicit-solid");
-REGISTER_FEBIO_CLASS(FELinearSolidSolver  , FESolver, "linear-solid"  );
+REGISTER_FEBIO_CLASS(FESolidSolver        , FESOLVER_ID, "solid"         );
+REGISTER_FEBIO_CLASS(FEExplicitSolidSolver, FESOLVER_ID, "explicit-solid");
+REGISTER_FEBIO_CLASS(FELinearSolidSolver  , FESOLVER_ID, "linear-solid"  );
 
 //-----------------------------------------------------------------------------
 // material classes
-REGISTER_MATERIAL(FE2DFiberNeoHookean            , "2D fiber neo-Hookean"          );
-REGISTER_MATERIAL(FE2DTransIsoMooneyRivlin       , "2D trans iso Mooney-Rivlin"    );
-REGISTER_MATERIAL(FE2DTransIsoVerondaWestmann    , "2D trans iso Veronda-Westmann" );
-REGISTER_MATERIAL(FEArrudaBoyce                  , "Arruda-Boyce"                  );
-REGISTER_MATERIAL(FECellGrowth                   , "cell growth"                   );
-REGISTER_MATERIAL(FEDamageMooneyRivlin           , "damage Mooney-Rivlin"          );
-REGISTER_MATERIAL(FEDamageNeoHookean             , "damage neo-Hookean"            );
-REGISTER_MATERIAL(FEDamageTransIsoMooneyRivlin   , "damage trans iso Mooney-Rivlin");
-REGISTER_MATERIAL(FEDonnanEquilibrium            , "Donnan equilibrium"            );
-REGISTER_MATERIAL(FEEFD                          , "EFD"                           );
-REGISTER_MATERIAL(FEEFDDonnanEquilibrium         , "EFD Donnan equilibrium"        );
-REGISTER_MATERIAL(FEEFDMooneyRivlin              , "EFD Mooney-Rivlin"             );
-//REGISTER_MATERIAL(FEEFDNeoHookean                , "EFD neo-Hookean"               );
-REGISTER_MATERIAL(FEEFDNeoHookeanOld             , "EFD neo-Hookean"               );
-REGISTER_MATERIAL(FEEFDUncoupled                 , "EFD uncoupled"                 );
-REGISTER_MATERIAL(FEEFDVerondaWestmann           , "EFD Veronda-Westmann"          );
-REGISTER_MATERIAL(FEElasticMixture               , "solid mixture"                 );
-REGISTER_MATERIAL(FEEllipsoidalFiberDistribution , "ellipsoidal fiber distribution");
-REGISTER_MATERIAL(FEEllipsoidalFiberDistributionOld, "ellipsoidal fiber distribution (old)");
-REGISTER_MATERIAL(FEFiberExpPow                  , "fiber-exp-pow"                 );
-REGISTER_MATERIAL(FEFiberExpPowUncoupled         , "fiber-exp-pow-uncoupled"       );
-REGISTER_MATERIAL(FEFiberNeoHookean              , "fiber neo-Hookean"             );
-REGISTER_MATERIAL(FEFungOrthoCompressible        , "Fung-ortho-compressible"       );
-REGISTER_MATERIAL(FEFungOrthotropic              , "Fung orthotropic"              );
-REGISTER_MATERIAL(FEGasserOgdenHolzapfel         , "Gasser-Ogden-Holzapfel"        );
-REGISTER_MATERIAL(FEHolmesMow                    , "Holmes-Mow"                    );
-REGISTER_MATERIAL(FEIncompNeoHookean             , "incomp neo-Hookean"            );
-REGISTER_MATERIAL(FEIsotropicElastic             , "isotropic elastic"             );
-REGISTER_MATERIAL(FELinearElastic                , "linear elastic"                );
-REGISTER_MATERIAL(FELinearOrthotropic            , "linear orthotropic"            );
-REGISTER_MATERIAL(FELinearSpring                 , "linear spring"                 );
-REGISTER_MATERIAL(FELinearTransIso               , "linear trans iso"              );
-REGISTER_MATERIAL(FEMooneyRivlin                 , "Mooney-Rivlin"                 );
-REGISTER_MATERIAL(FEMuscleMaterial               , "muscle material"               );
-REGISTER_MATERIAL(FENeoHookean                   , "neo-Hookean"                   );
-REGISTER_MATERIAL(FENeoHookeanTransIso           , "neo-Hookean transiso"          );
-REGISTER_MATERIAL(FENonLinearSpring              , "nonlinear spring"              );
-REGISTER_MATERIAL(FEOgdenMaterial                , "Ogden"                         );
-REGISTER_MATERIAL(FEOgdenUnconstrained           , "Ogden unconstrained"           );
-REGISTER_MATERIAL(FEOrthoElastic                 , "orthotropic elastic"           );
-REGISTER_MATERIAL(FEPerfectOsmometer             , "perfect osmometer"             );
-REGISTER_MATERIAL(FERigidMaterial                , "rigid body"                    );
-REGISTER_MATERIAL(FESphericalFiberDistribution   , "spherical fiber distribution"  );
-REGISTER_MATERIAL(FEStVenantKirchhoff            , "St.Venant-Kirchhoff"           );
-REGISTER_MATERIAL(FETCNonlinearOrthotropic       , "TC nonlinear orthotropic"      );
-REGISTER_MATERIAL(FETendonMaterial               , "tendon material"               );
-REGISTER_MATERIAL(FETensionOnlyLinearSpring      , "tension only linear spring"    );
-REGISTER_MATERIAL(FETransIsoMooneyRivlin         , "trans iso Mooney-Rivlin"       );
-REGISTER_MATERIAL(FETransIsoVerondaWestmann      , "trans iso Veronda-Westmann"    );
-REGISTER_MATERIAL(FETrussMaterial                , "linear truss"                  );
-REGISTER_MATERIAL(FEUncoupledElasticMixture      , "uncoupled solid mixture"       );
-REGISTER_MATERIAL(FEVerondaWestmann              , "Veronda-Westmann"              );
-REGISTER_MATERIAL(FEViscoElasticMaterial         , "viscoelastic"                  );
-REGISTER_MATERIAL(FEUncoupledViscoElasticMaterial, "uncoupled viscoelastic"        );
-REGISTER_MATERIAL(FEVonMisesPlasticity           , "von-Mises plasticity"          );
-REGISTER_MATERIAL(FEElasticMultigeneration       , "multigeneration"               );
-REGISTER_MATERIAL(FEMRVonMisesFibers             , "Mooney-Rivlin von Mises Fibers");
-REGISTER_MATERIAL(FEUncoupledActiveContraction   , "uncoupled active contraction"  );
-REGISTER_MATERIAL(FEHuiskesSupply                , "Huiskes-supply"                );
-REGISTER_MATERIAL(FERemodelingElasticMaterial    , "remodeling solid"              );
-REGISTER_MATERIAL(FECarterHayesOld               , "Carter-Hayes (old)"            );
-REGISTER_MATERIAL(FEActiveFiberContraction       , "active_contraction"            );
-REGISTER_MATERIAL(FEPreStrainTransIsoMR          , "pre-strain trans iso Mooney-Rivlin");
+REGISTER_FEBIO_CLASS(FE2DFiberNeoHookean            ,FEMATERIAL_ID, "2D fiber neo-Hookean"          );
+REGISTER_FEBIO_CLASS(FE2DTransIsoMooneyRivlin       ,FEMATERIAL_ID, "2D trans iso Mooney-Rivlin"    );
+REGISTER_FEBIO_CLASS(FE2DTransIsoVerondaWestmann    ,FEMATERIAL_ID, "2D trans iso Veronda-Westmann" );
+REGISTER_FEBIO_CLASS(FEArrudaBoyce                  ,FEMATERIAL_ID, "Arruda-Boyce"                  );
+REGISTER_FEBIO_CLASS(FECellGrowth                   ,FEMATERIAL_ID, "cell growth"                   );
+REGISTER_FEBIO_CLASS(FEDamageMooneyRivlin           ,FEMATERIAL_ID, "damage Mooney-Rivlin"          );
+REGISTER_FEBIO_CLASS(FEDamageNeoHookean             ,FEMATERIAL_ID, "damage neo-Hookean"            );
+REGISTER_FEBIO_CLASS(FEDamageTransIsoMooneyRivlin   ,FEMATERIAL_ID, "damage trans iso Mooney-Rivlin");
+REGISTER_FEBIO_CLASS(FEDonnanEquilibrium            ,FEMATERIAL_ID, "Donnan equilibrium"            );
+REGISTER_FEBIO_CLASS(FEEFD                          ,FEMATERIAL_ID, "EFD"                           );
+REGISTER_FEBIO_CLASS(FEEFDDonnanEquilibrium         ,FEMATERIAL_ID, "EFD Donnan equilibrium"        );
+REGISTER_FEBIO_CLASS(FEEFDMooneyRivlin              ,FEMATERIAL_ID, "EFD Mooney-Rivlin"             );
+//REGISTER_FEBIO_CLASS(FEEFDNeoHookean                ,FEMATERIAL_ID, "EFD neo-Hookean"               );
+REGISTER_FEBIO_CLASS(FEEFDNeoHookeanOld             ,FEMATERIAL_ID, "EFD neo-Hookean"               );
+REGISTER_FEBIO_CLASS(FEEFDUncoupled                 ,FEMATERIAL_ID, "EFD uncoupled"                 );
+REGISTER_FEBIO_CLASS(FEEFDVerondaWestmann           ,FEMATERIAL_ID, "EFD Veronda-Westmann"          );
+REGISTER_FEBIO_CLASS(FEElasticMixture               ,FEMATERIAL_ID, "solid mixture"                 );
+REGISTER_FEBIO_CLASS(FEEllipsoidalFiberDistribution ,FEMATERIAL_ID, "ellipsoidal fiber distribution");
+REGISTER_FEBIO_CLASS(FEEllipsoidalFiberDistributionOld,FEMATERIAL_ID, "ellipsoidal fiber distribution (old)");
+REGISTER_FEBIO_CLASS(FEFiberExpPow                  ,FEMATERIAL_ID, "fiber-exp-pow"                 );
+REGISTER_FEBIO_CLASS(FEFiberExpPowUncoupled         ,FEMATERIAL_ID, "fiber-exp-pow-uncoupled"       );
+REGISTER_FEBIO_CLASS(FEFiberNeoHookean              ,FEMATERIAL_ID, "fiber neo-Hookean"             );
+REGISTER_FEBIO_CLASS(FEFungOrthoCompressible        ,FEMATERIAL_ID, "Fung-ortho-compressible"       );
+REGISTER_FEBIO_CLASS(FEFungOrthotropic              ,FEMATERIAL_ID, "Fung orthotropic"              );
+REGISTER_FEBIO_CLASS(FEGasserOgdenHolzapfel         ,FEMATERIAL_ID, "Gasser-Ogden-Holzapfel"        );
+REGISTER_FEBIO_CLASS(FEHolmesMow                    ,FEMATERIAL_ID, "Holmes-Mow"                    );
+REGISTER_FEBIO_CLASS(FEIncompNeoHookean             ,FEMATERIAL_ID, "incomp neo-Hookean"            );
+REGISTER_FEBIO_CLASS(FEIsotropicElastic             ,FEMATERIAL_ID, "isotropic elastic"             );
+REGISTER_FEBIO_CLASS(FELinearElastic                ,FEMATERIAL_ID, "linear elastic"                );
+REGISTER_FEBIO_CLASS(FELinearOrthotropic            ,FEMATERIAL_ID, "linear orthotropic"            );
+REGISTER_FEBIO_CLASS(FELinearSpring                 ,FEMATERIAL_ID, "linear spring"                 );
+REGISTER_FEBIO_CLASS(FELinearTransIso               ,FEMATERIAL_ID, "linear trans iso"              );
+REGISTER_FEBIO_CLASS(FEMooneyRivlin                 ,FEMATERIAL_ID, "Mooney-Rivlin"                 );
+REGISTER_FEBIO_CLASS(FEMuscleMaterial               ,FEMATERIAL_ID, "muscle material"               );
+REGISTER_FEBIO_CLASS(FENeoHookean                   ,FEMATERIAL_ID, "neo-Hookean"                   );
+REGISTER_FEBIO_CLASS(FENeoHookeanTransIso           ,FEMATERIAL_ID, "neo-Hookean transiso"          );
+REGISTER_FEBIO_CLASS(FENonLinearSpring              ,FEMATERIAL_ID, "nonlinear spring"              );
+REGISTER_FEBIO_CLASS(FEOgdenMaterial                ,FEMATERIAL_ID, "Ogden"                         );
+REGISTER_FEBIO_CLASS(FEOgdenUnconstrained           ,FEMATERIAL_ID, "Ogden unconstrained"           );
+REGISTER_FEBIO_CLASS(FEOrthoElastic                 ,FEMATERIAL_ID, "orthotropic elastic"           );
+REGISTER_FEBIO_CLASS(FEPerfectOsmometer             ,FEMATERIAL_ID, "perfect osmometer"             );
+REGISTER_FEBIO_CLASS(FERigidMaterial                ,FEMATERIAL_ID, "rigid body"                    );
+REGISTER_FEBIO_CLASS(FESphericalFiberDistribution   ,FEMATERIAL_ID, "spherical fiber distribution"  );
+REGISTER_FEBIO_CLASS(FEStVenantKirchhoff            ,FEMATERIAL_ID, "St.Venant-Kirchhoff"           );
+REGISTER_FEBIO_CLASS(FETCNonlinearOrthotropic       ,FEMATERIAL_ID, "TC nonlinear orthotropic"      );
+REGISTER_FEBIO_CLASS(FETendonMaterial               ,FEMATERIAL_ID, "tendon material"               );
+REGISTER_FEBIO_CLASS(FETensionOnlyLinearSpring      ,FEMATERIAL_ID, "tension only linear spring"    );
+REGISTER_FEBIO_CLASS(FETransIsoMooneyRivlin         ,FEMATERIAL_ID, "trans iso Mooney-Rivlin"       );
+REGISTER_FEBIO_CLASS(FETransIsoVerondaWestmann      ,FEMATERIAL_ID, "trans iso Veronda-Westmann"    );
+REGISTER_FEBIO_CLASS(FETrussMaterial                ,FEMATERIAL_ID, "linear truss"                  );
+REGISTER_FEBIO_CLASS(FEUncoupledElasticMixture      ,FEMATERIAL_ID, "uncoupled solid mixture"       );
+REGISTER_FEBIO_CLASS(FEVerondaWestmann              ,FEMATERIAL_ID, "Veronda-Westmann"              );
+REGISTER_FEBIO_CLASS(FEViscoElasticMaterial         ,FEMATERIAL_ID, "viscoelastic"                  );
+REGISTER_FEBIO_CLASS(FEUncoupledViscoElasticMaterial,FEMATERIAL_ID, "uncoupled viscoelastic"        );
+REGISTER_FEBIO_CLASS(FEVonMisesPlasticity           ,FEMATERIAL_ID, "von-Mises plasticity"          );
+REGISTER_FEBIO_CLASS(FEElasticMultigeneration       ,FEMATERIAL_ID, "multigeneration"               );
+REGISTER_FEBIO_CLASS(FEMRVonMisesFibers             ,FEMATERIAL_ID, "Mooney-Rivlin von Mises Fibers");
+REGISTER_FEBIO_CLASS(FEUncoupledActiveContraction   ,FEMATERIAL_ID, "uncoupled active contraction"  );
+REGISTER_FEBIO_CLASS(FEHuiskesSupply                ,FEMATERIAL_ID, "Huiskes-supply"                );
+REGISTER_FEBIO_CLASS(FERemodelingElasticMaterial    ,FEMATERIAL_ID, "remodeling solid"              );
+REGISTER_FEBIO_CLASS(FECarterHayesOld               ,FEMATERIAL_ID, "Carter-Hayes (old)"            );
+REGISTER_FEBIO_CLASS(FEActiveFiberContraction       ,FEMATERIAL_ID, "active_contraction"            );
+REGISTER_FEBIO_CLASS(FEPreStrainTransIsoMR          ,FEMATERIAL_ID, "pre-strain trans iso Mooney-Rivlin");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad
-REGISTER_FEBIO_CLASS(FEPressureLoad, FESurfaceLoad, "pressure");
-REGISTER_FEBIO_CLASS(FETractionLoad, FESurfaceLoad, "traction");
+REGISTER_FEBIO_CLASS(FEPressureLoad, FESURFACELOAD_ID, "pressure");
+REGISTER_FEBIO_CLASS(FETractionLoad, FESURFACELOAD_ID, "traction");
 
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce
-REGISTER_FEBIO_CLASS(FEConstBodyForce      , FEBodyLoad, "const"      );
-REGISTER_FEBIO_CLASS(FENonConstBodyForce   , FEBodyLoad, "non-const"  );
-REGISTER_FEBIO_CLASS(FECentrifugalBodyForce, FEBodyLoad, "centrifugal");
-REGISTER_FEBIO_CLASS(FEPointBodyForce      , FEBodyLoad, "point"      );
+REGISTER_FEBIO_CLASS(FEConstBodyForce      , FEBODYLOAD_ID, "const"      );
+REGISTER_FEBIO_CLASS(FENonConstBodyForce   , FEBODYLOAD_ID, "non-const"  );
+REGISTER_FEBIO_CLASS(FECentrifugalBodyForce, FEBODYLOAD_ID, "centrifugal");
+REGISTER_FEBIO_CLASS(FEPointBodyForce      , FEBODYLOAD_ID, "point"      );
 
 //-----------------------------------------------------------------------------
 // constraint classes
-REGISTER_FEBIO_CLASS(FEPointConstraint, FENLConstraint, "point"          );
-REGISTER_FEBIO_CLASS(FEInSituStretch  , FENLConstraint, "in-situ stretch");
+REGISTER_FEBIO_CLASS(FEPointConstraint, FENLCONSTRAINT_ID, "point"          );
+REGISTER_FEBIO_CLASS(FEInSituStretch  , FENLCONSTRAINT_ID, "in-situ stretch");
 
 //-----------------------------------------------------------------------------
 // classes derived from FEContactInterface
-REGISTER_FEBIO_CLASS(FEFacet2FacetSliding   , FESurfacePairInteraction, "facet-to-facet sliding"     );
-REGISTER_FEBIO_CLASS(FEPeriodicBoundary     , FESurfacePairInteraction, "periodic boundary"          );
-REGISTER_FEBIO_CLASS(FERigidWallInterface   , FESurfacePairInteraction, "rigid_wall"                 );
-REGISTER_FEBIO_CLASS(FESlidingInterface     , FESurfacePairInteraction, "sliding_with_gaps"          );
-REGISTER_FEBIO_CLASS(FESlidingInterfaceBW   , FESurfacePairInteraction, "sliding-tension-compression");
-REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FESurfacePairInteraction, "surface constraint"         );
-REGISTER_FEBIO_CLASS(FETiedInterface        , FESurfacePairInteraction, "tied"                       );
-REGISTER_FEBIO_CLASS(FEFacet2FacetTied      , FESurfacePairInteraction, "facet-to-facet tied"        );
+REGISTER_FEBIO_CLASS(FEFacet2FacetSliding   , FESURFACEPAIRINTERACTION_ID, "facet-to-facet sliding"     );
+REGISTER_FEBIO_CLASS(FEPeriodicBoundary     , FESURFACEPAIRINTERACTION_ID, "periodic boundary"          );
+REGISTER_FEBIO_CLASS(FERigidWallInterface   , FESURFACEPAIRINTERACTION_ID, "rigid_wall"                 );
+REGISTER_FEBIO_CLASS(FESlidingInterface     , FESURFACEPAIRINTERACTION_ID, "sliding_with_gaps"          );
+REGISTER_FEBIO_CLASS(FESlidingInterfaceBW   , FESURFACEPAIRINTERACTION_ID, "sliding-tension-compression");
+REGISTER_FEBIO_CLASS(FESurfaceConstraint    , FESURFACEPAIRINTERACTION_ID, "surface constraint"         );
+REGISTER_FEBIO_CLASS(FETiedInterface        , FESURFACEPAIRINTERACTION_ID, "tied"                       );
+REGISTER_FEBIO_CLASS(FEFacet2FacetTied      , FESURFACEPAIRINTERACTION_ID, "facet-to-facet tied"        );
 
 //-----------------------------------------------------------------------------
 // classes derived from FEPlotData
-REGISTER_FEBIO_CLASS(FEPlotStrainEnergyDensity          , FEPlotData, "strain energy density"           );
-REGISTER_FEBIO_CLASS(FEPlotSpecificStrainEnergy         , FEPlotData, "specific strain energy"          );
-REGISTER_FEBIO_CLASS(FEPlotDensity                      , FEPlotData, "density"                         );
-REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPlotData, "stress"                          );
-REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPlotData, "relative volume"                 );
-REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPlotData, "fiber vector"                    );
-REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPlotData, "shell thickness"                 );
-REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPlotData, "damage"                          );
-REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPlotData, "volume fraction"                 );
-REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPlotData, "ut4 nodal stress"                );
-REGISTER_FEBIO_CLASS(FEPlotFiberPreStretch				, FEPlotData, "in-situ fiber stretch"           );
+REGISTER_FEBIO_CLASS(FEPlotStrainEnergyDensity          , FEPLOTDATA_ID, "strain energy density"           );
+REGISTER_FEBIO_CLASS(FEPlotSpecificStrainEnergy         , FEPLOTDATA_ID, "specific strain energy"          );
+REGISTER_FEBIO_CLASS(FEPlotDensity                      , FEPLOTDATA_ID, "density"                         );
+REGISTER_FEBIO_CLASS(FEPlotElementStress                , FEPLOTDATA_ID, "stress"                          );
+REGISTER_FEBIO_CLASS(FEPlotRelativeVolume               , FEPLOTDATA_ID, "relative volume"                 );
+REGISTER_FEBIO_CLASS(FEPlotFiberVector                  , FEPLOTDATA_ID, "fiber vector"                    );
+REGISTER_FEBIO_CLASS(FEPlotShellThickness               , FEPLOTDATA_ID, "shell thickness"                 );
+REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPLOTDATA_ID, "damage"                          );
+REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPLOTDATA_ID, "volume fraction"                 );
+REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPLOTDATA_ID, "ut4 nodal stress"                );
+REGISTER_FEBIO_CLASS(FEPlotFiberPreStretch				, FEPLOTDATA_ID, "in-situ fiber stretch"           );
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPlotData, "displacement"   );
-REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPlotData, "velocity"       );
-REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPlotData, "acceleration"   );
-REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPlotData, "reaction forces");
+REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPLOTDATA_ID, "displacement"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPLOTDATA_ID, "velocity"       );
+REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPLOTDATA_ID, "acceleration"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPLOTDATA_ID, "reaction forces");
 
 //-----------------------------------------------------------------------------
 // Derived from FENodeLogData
-REGISTER_FEBIO_CLASS(FENodeXPos, FENodeLogData, "x");
-REGISTER_FEBIO_CLASS(FENodeYPos, FENodeLogData, "y");
-REGISTER_FEBIO_CLASS(FENodeZPos, FENodeLogData, "z");
-REGISTER_FEBIO_CLASS(FENodeXDisp, FENodeLogData, "ux");
-REGISTER_FEBIO_CLASS(FENodeYDisp, FENodeLogData, "uy");
-REGISTER_FEBIO_CLASS(FENodeZDisp, FENodeLogData, "uz");
-REGISTER_FEBIO_CLASS(FENodeXVel, FENodeLogData, "vx");
-REGISTER_FEBIO_CLASS(FENodeYVel, FENodeLogData, "vy");
-REGISTER_FEBIO_CLASS(FENodeZVel, FENodeLogData, "vz");
-REGISTER_FEBIO_CLASS(FENodeForceX, FENodeLogData, "Rx");
-REGISTER_FEBIO_CLASS(FENodeForceY, FENodeLogData, "Ry");
-REGISTER_FEBIO_CLASS(FENodeForceZ, FENodeLogData, "Rz");
+REGISTER_FEBIO_CLASS(FENodeXPos  , FENODELOGDATA_ID, "x");
+REGISTER_FEBIO_CLASS(FENodeYPos  , FENODELOGDATA_ID, "y");
+REGISTER_FEBIO_CLASS(FENodeZPos  , FENODELOGDATA_ID, "z");
+REGISTER_FEBIO_CLASS(FENodeXDisp , FENODELOGDATA_ID, "ux");
+REGISTER_FEBIO_CLASS(FENodeYDisp , FENODELOGDATA_ID, "uy");
+REGISTER_FEBIO_CLASS(FENodeZDisp , FENODELOGDATA_ID, "uz");
+REGISTER_FEBIO_CLASS(FENodeXVel  , FENODELOGDATA_ID, "vx");
+REGISTER_FEBIO_CLASS(FENodeYVel  , FENODELOGDATA_ID, "vy");
+REGISTER_FEBIO_CLASS(FENodeZVel  , FENODELOGDATA_ID, "vz");
+REGISTER_FEBIO_CLASS(FENodeForceX, FENODELOGDATA_ID, "Rx");
+REGISTER_FEBIO_CLASS(FENodeForceY, FENODELOGDATA_ID, "Ry");
+REGISTER_FEBIO_CLASS(FENodeForceZ, FENODELOGDATA_ID, "Rz");
 
 //-----------------------------------------------------------------------------
 // Derived from FELogElemData
-REGISTER_FEBIO_CLASS(FELogElemPosX, FELogElemData, "x");
-REGISTER_FEBIO_CLASS(FELogElemPosY, FELogElemData, "y");
-REGISTER_FEBIO_CLASS(FELogElemPosZ, FELogElemData, "z");
-REGISTER_FEBIO_CLASS(FELogElemJacobian, FELogElemData, "J");
-REGISTER_FEBIO_CLASS(FELogElemStrainX, FELogElemData, "Ex");
-REGISTER_FEBIO_CLASS(FELogElemStrainY, FELogElemData, "Ey");
-REGISTER_FEBIO_CLASS(FELogElemStrainZ, FELogElemData, "Ez");
-REGISTER_FEBIO_CLASS(FELogElemStrainXY, FELogElemData, "Exy");
-REGISTER_FEBIO_CLASS(FELogElemStrainYZ, FELogElemData, "Eyz");
-REGISTER_FEBIO_CLASS(FELogElemStrainXZ, FELogElemData, "Exz");
-REGISTER_FEBIO_CLASS(FELogElemStrain1, FELogElemData, "E1");
-REGISTER_FEBIO_CLASS(FELogElemStrain2, FELogElemData, "E2");
-REGISTER_FEBIO_CLASS(FELogElemStrain3, FELogElemData, "E3");
-REGISTER_FEBIO_CLASS(FELogElemStressX, FELogElemData, "sx");
-REGISTER_FEBIO_CLASS(FELogElemStressY, FELogElemData, "sy");
-REGISTER_FEBIO_CLASS(FELogElemStressZ, FELogElemData, "sz");
-REGISTER_FEBIO_CLASS(FELogElemStressXY, FELogElemData, "sxy");
-REGISTER_FEBIO_CLASS(FELogElemStressYZ, FELogElemData, "syz");
-REGISTER_FEBIO_CLASS(FELogElemStressXZ, FELogElemData, "sxz");
-REGISTER_FEBIO_CLASS(FELogElemStress1, FELogElemData, "s1");
-REGISTER_FEBIO_CLASS(FELogElemStress2, FELogElemData, "s2");
-REGISTER_FEBIO_CLASS(FELogElemStress3, FELogElemData, "s3");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXX, FELogElemData, "Fxx");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXY, FELogElemData, "Fxy");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXZ, FELogElemData, "Fxz");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYX, FELogElemData, "Fyx");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYY, FELogElemData, "Fyy");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYZ, FELogElemData, "Fyz");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZX, FELogElemData, "Fzx");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZY, FELogElemData, "Fzy");
-REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZZ, FELogElemData, "Fzz");
+REGISTER_FEBIO_CLASS(FELogElemPosX    , FEELEMLOGDATA_ID, "x");
+REGISTER_FEBIO_CLASS(FELogElemPosY    , FEELEMLOGDATA_ID, "y");
+REGISTER_FEBIO_CLASS(FELogElemPosZ    , FEELEMLOGDATA_ID, "z");
+REGISTER_FEBIO_CLASS(FELogElemJacobian, FEELEMLOGDATA_ID, "J");
+REGISTER_FEBIO_CLASS(FELogElemStrainX , FEELEMLOGDATA_ID, "Ex");
+REGISTER_FEBIO_CLASS(FELogElemStrainY , FEELEMLOGDATA_ID, "Ey");
+REGISTER_FEBIO_CLASS(FELogElemStrainZ , FEELEMLOGDATA_ID, "Ez");
+REGISTER_FEBIO_CLASS(FELogElemStrainXY, FEELEMLOGDATA_ID, "Exy");
+REGISTER_FEBIO_CLASS(FELogElemStrainYZ, FEELEMLOGDATA_ID, "Eyz");
+REGISTER_FEBIO_CLASS(FELogElemStrainXZ, FEELEMLOGDATA_ID, "Exz");
+REGISTER_FEBIO_CLASS(FELogElemStrain1 , FEELEMLOGDATA_ID, "E1");
+REGISTER_FEBIO_CLASS(FELogElemStrain2 , FEELEMLOGDATA_ID, "E2");
+REGISTER_FEBIO_CLASS(FELogElemStrain3 , FEELEMLOGDATA_ID, "E3");
+REGISTER_FEBIO_CLASS(FELogElemStressX , FEELEMLOGDATA_ID, "sx");
+REGISTER_FEBIO_CLASS(FELogElemStressY , FEELEMLOGDATA_ID, "sy");
+REGISTER_FEBIO_CLASS(FELogElemStressZ , FEELEMLOGDATA_ID, "sz");
+REGISTER_FEBIO_CLASS(FELogElemStressXY, FEELEMLOGDATA_ID, "sxy");
+REGISTER_FEBIO_CLASS(FELogElemStressYZ, FEELEMLOGDATA_ID, "syz");
+REGISTER_FEBIO_CLASS(FELogElemStressXZ, FEELEMLOGDATA_ID, "sxz");
+REGISTER_FEBIO_CLASS(FELogElemStress1 , FEELEMLOGDATA_ID, "s1");
+REGISTER_FEBIO_CLASS(FELogElemStress2 , FEELEMLOGDATA_ID, "s2");
+REGISTER_FEBIO_CLASS(FELogElemStress3 , FEELEMLOGDATA_ID, "s3");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXX, FEELEMLOGDATA_ID, "Fxx");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXY, FEELEMLOGDATA_ID, "Fxy");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientXZ, FEELEMLOGDATA_ID, "Fxz");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYX, FEELEMLOGDATA_ID, "Fyx");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYY, FEELEMLOGDATA_ID, "Fyy");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientYZ, FEELEMLOGDATA_ID, "Fyz");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZX, FEELEMLOGDATA_ID, "Fzx");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZY, FEELEMLOGDATA_ID, "Fzy");
+REGISTER_FEBIO_CLASS(FELogElemDeformationGradientZZ, FEELEMLOGDATA_ID, "Fzz");
 
 //-----------------------------------------------------------------------------
 // Derived from FELogObjectData
-REGISTER_FEBIO_CLASS(FELogRigidBodyPosX, FELogObjectData, "x");
-REGISTER_FEBIO_CLASS(FELogRigidBodyPosY, FELogObjectData, "y");
-REGISTER_FEBIO_CLASS(FELogRigidBodyPosZ, FELogObjectData, "z");
-REGISTER_FEBIO_CLASS(FELogRigidBodyQuatX, FELogObjectData, "qx");
-REGISTER_FEBIO_CLASS(FELogRigidBodyQuatY, FELogObjectData, "qy");
-REGISTER_FEBIO_CLASS(FELogRigidBodyQuatZ, FELogObjectData, "qz");
-REGISTER_FEBIO_CLASS(FELogRigidBodyQuatW, FELogObjectData, "qw");
-REGISTER_FEBIO_CLASS(FELogRigidBodyForceX, FELogObjectData, "Fx");
-REGISTER_FEBIO_CLASS(FELogRigidBodyForceY, FELogObjectData, "Fy");
-REGISTER_FEBIO_CLASS(FELogRigidBodyForceZ, FELogObjectData, "Fz");
-REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueX, FELogObjectData, "Mx");
-REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueY, FELogObjectData, "My");
-REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueZ, FELogObjectData, "Mz");
+REGISTER_FEBIO_CLASS(FELogRigidBodyPosX   , FEOBJLOGDATA_ID, "x");
+REGISTER_FEBIO_CLASS(FELogRigidBodyPosY   , FEOBJLOGDATA_ID, "y");
+REGISTER_FEBIO_CLASS(FELogRigidBodyPosZ   , FEOBJLOGDATA_ID, "z");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatX  , FEOBJLOGDATA_ID, "qx");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatY  , FEOBJLOGDATA_ID, "qy");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatZ  , FEOBJLOGDATA_ID, "qz");
+REGISTER_FEBIO_CLASS(FELogRigidBodyQuatW  , FEOBJLOGDATA_ID, "qw");
+REGISTER_FEBIO_CLASS(FELogRigidBodyForceX , FEOBJLOGDATA_ID, "Fx");
+REGISTER_FEBIO_CLASS(FELogRigidBodyForceY , FEOBJLOGDATA_ID, "Fy");
+REGISTER_FEBIO_CLASS(FELogRigidBodyForceZ , FEOBJLOGDATA_ID, "Fz");
+REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueX, FEOBJLOGDATA_ID, "Mx");
+REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueY, FEOBJLOGDATA_ID, "My");
+REGISTER_FEBIO_CLASS(FELogRigidBodyTorqueZ, FEOBJLOGDATA_ID, "Mz");
 }

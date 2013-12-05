@@ -16,7 +16,7 @@ void ElementDataRecord::Parse(const char *szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FELogElemData* pdata = febio.Create<FELogElemData>(sz, m_pfem);
+		FELogElemData* pdata = fecore_new<FELogElemData>(FEELEMLOGDATA_ID, sz, m_pfem);
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;

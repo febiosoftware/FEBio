@@ -7,7 +7,7 @@
 // declared in dllmain.cpp
 extern FEBioKernel* pFEBio;
 
-static Logfile& GetLogfile() { return *pFEBio->m_plog; }
+static Logfile& GetLogfile() { return pFEBio->GetLogfile(); }
 
 //-----------------------------------------------------------------------------
 FEBioOpt::FEBioOpt(FEModel* pfem) : FEBioTask(pfem)

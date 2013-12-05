@@ -8,6 +8,9 @@ using namespace FECore;
 class FENodalForce : public FEBoundaryCondition
 {
 public:
+	FENodalForce() : FEBoundaryCondition(FEBC_ID){}
+
+public:
 	double	s;		// scale factor
 	int		node;	// node number
 	int		bc;		// force direction
@@ -19,6 +22,9 @@ public:
 
 class FEPrescribedBC : public FEBoundaryCondition
 {
+public:
+	FEPrescribedBC() : FEBoundaryCondition(FEBC_ID){}
+
 public:
 	double	s;		// scale factor
 	int		node;	// node number
@@ -34,6 +40,9 @@ public:
 class FERigidNode : public FEBoundaryCondition
 {
 public:
+	FERigidNode() : FEBoundaryCondition(FEBC_ID){}
+
+public:
 	int	nid;	// node number
 	int	rid;	// rigid body number
 };
@@ -43,6 +52,9 @@ public:
 
 class FERigidBodyForce : public FEBoundaryCondition
 {
+public:
+	FERigidBodyForce() : FEBoundaryCondition(FEBC_ID){}
+
 public:
 	int		id;	// rigid body id
 	int		bc;	// force direction
@@ -55,6 +67,9 @@ public:
 
 class FERigidBodyDisplacement : public FEBoundaryCondition
 {
+public:
+	FERigidBodyDisplacement() : FEBoundaryCondition(FEBC_ID){}
+
 public:
 	int		id;	// rigid body id
 	int		bc;	// displacement direction

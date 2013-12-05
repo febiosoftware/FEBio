@@ -17,7 +17,7 @@ void NodeDataRecord::Parse(const char* szexpr)
 	{
 		ch = strchr(sz, ';');
 		if (ch) *ch++ = 0;
-		FENodeLogData* pdata = febio.Create<FENodeLogData>(sz, m_pfem);
+		FENodeLogData* pdata = fecore_new<FENodeLogData>(FENODELOGDATA_ID, sz, m_pfem);
 		if (pdata) m_Data.push_back(pdata);
 		else throw UnknownDataField(sz);
 		sz = ch;

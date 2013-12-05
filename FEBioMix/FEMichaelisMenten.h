@@ -44,9 +44,6 @@ public:
 	bool	m_Rtype;		//!< flag for reactant type (solute = false, sbm = true)
 	double	m_c0;			//!< minimum reactant concentration to trigger reaction
 	
-	// declare as registered
-	DECLARE_REGISTERED(FEMichaelisMenten);
-	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();	
 };

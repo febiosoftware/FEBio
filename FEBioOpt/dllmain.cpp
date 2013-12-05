@@ -39,12 +39,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 //-----------------------------------------------------------------------------
 // the optimization task factory
-class FEBioOptFactory : public FEBioFactory_T<FEBioTask>
+class FEBioOptFactory : public FEBioFactory
 {
 public:
-	FEBioOptFactory() : FEBioFactory_T<FEBioTask>("optimize"){}
-	bool IsType(FEBioTask* pf) { return (dynamic_cast<FEBioOpt*>(pf) != 0); }
-	FEBioTask* Create(FEModel* pfem) { return new FEBioOpt(pfem); }
+	FEBioOptFactory() : FEBioFactory(FETASK_ID, "optimize"){}
+	void* Create(FEModel* pfem) { return new FEBioOpt(pfem); }
 };
 
 FEBioOptFactory	febioopt_factory;
@@ -65,7 +64,7 @@ extern "C" DLL_EXPORT void RegisterPlugin(FEBioKernel& febio)
 //	log.printf("Hello, world!!!\n");
 
 	// register the plugin classes
-	febio.RegisterTask(&febioopt_factory);
+	febio.RegisterClass(&febioopt_factory);
 
 	fprintf(stderr, "Registration successful.\n\n");
 }

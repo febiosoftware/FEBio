@@ -30,8 +30,5 @@ public:
 public:
 	double	m_k;		//!< reaction rate
 	
-	// declare as registered
-	DECLARE_REGISTERED(FEReactionRateConst);
-	
 	DECLARE_PARAMETER_LIST();	
 };

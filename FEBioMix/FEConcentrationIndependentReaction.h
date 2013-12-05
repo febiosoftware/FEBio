@@ -34,10 +34,6 @@ public:
 	
 	//! tangent of molar supply with effective concentration at material point
 	double Tangent_ReactionSupply_Concentration(FEMaterialPoint& pt, const int sol);
-	
-	// declare as registered
-	DECLARE_REGISTERED(FEConcentrationIndependentReaction);
-    
 };
 
 #endif /* defined(__FEBioXCode4__FEConcentrationIndependentReaction__) */

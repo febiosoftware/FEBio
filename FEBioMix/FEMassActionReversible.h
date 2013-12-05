@@ -37,10 +37,6 @@ public:
 	double FwdReactionSupply(FEMaterialPoint& pt);
 	
 	//! molar supply at material point
-	double RevReactionSupply(FEMaterialPoint& pt);
-	
-	// declare as registered
-	DECLARE_REGISTERED(FEMassActionReversible);
-	
+	double RevReactionSupply(FEMaterialPoint& pt);	
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "FESolver.h"
 #include "DumpFile.h"
-#include "FEParameterList.h"
+#include "FECoreBase.h"
 #include "FEGlobalVector.h"
 #include "FESurface.h"
 #include <vector>
@@ -17,7 +17,7 @@ class FEModel;
 //! The constraint must provide a residual (force) contribution, its stiffness matrix
 //! and an augmentation function.
 //!
-class FENLConstraint : public FEParamContainer
+class FENLConstraint : public FECoreBase
 {
 public:
 	FENLConstraint(FEModel* pfem);

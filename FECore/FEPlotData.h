@@ -2,6 +2,7 @@
 
 #include "FEMesh.h"
 #include "FESurface.h"
+#include "FECoreBase.h"
 #include "Archive.h"
 
 //-----------------------------------------------------------------------------
@@ -23,10 +24,10 @@ enum Storage_Fmt { FMT_NODE, FMT_ITEM, FMT_MULT };
 //! base class. Instead they'll use one of the more specialized classes
 //! defined below.
 //!
-class FEPlotData
+class FEPlotData : public FECoreBase
 {
 public:
-	FEPlotData(Var_Type t, Storage_Fmt s) { m_ntype = t; m_sfmt = s; }
+	FEPlotData(Var_Type t, Storage_Fmt s) : FECoreBase(FEPLOTDATA_ID) { m_ntype = t; m_sfmt = s; }
 	virtual void Save(FEModel& fem, Archive& ar) = 0;
 
 	Var_Type DataType() { return m_ntype; }

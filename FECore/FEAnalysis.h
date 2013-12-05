@@ -1,5 +1,6 @@
 #pragma once
 #include "DumpFile.h"
+#include "FECoreBase.h"
 #include "FEBoundaryCondition.h"
 #include "FESurfacePairInteraction.h"
 #include "FENLConstraint.h"
@@ -14,7 +15,7 @@ namespace FECore {
 
 //-----------------------------------------------------------------------------
 //! Base class for finite element analysis
-class FEAnalysis
+class FEAnalysis : public FECoreBase
 {
 public:
 	//! constructor

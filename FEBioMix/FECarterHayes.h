@@ -49,9 +49,6 @@ public:
 	//! return Young's modulus
 	double YoungModulus(double rhor) { return m_E0*pow(rhor/m_rho0, m_g);}
 	
-	// declare as registered
-	DECLARE_REGISTERED(FECarterHayes);
-	
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

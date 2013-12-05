@@ -36,9 +36,6 @@ protected:
 	mat3ds AveragedStress(FEMaterialPoint& pt);
 
 public:
-	// declare as registered
-	DECLARE_REGISTERED(FEMicroMaterial);
-
 	// declare the parameter list
 	DECLARE_PARAMETER_LIST();
 };

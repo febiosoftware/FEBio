@@ -1,4 +1,5 @@
 #pragma once
+#include "FECoreBase.h"
 
 namespace FECore {
 
@@ -6,11 +7,11 @@ namespace FECore {
 //! This class is the base class of all boundary conditions
 
 //! Specific boundary conditions can be defined be inheriting from this class.
-class FEBoundaryCondition
+class FEBoundaryCondition : public FECoreBase
 {
 public:
 	//! constructor
-	FEBoundaryCondition();
+	FEBoundaryCondition(SUPER_CLASS_ID sid);
 
 	//! desctructor
 	virtual ~FEBoundaryCondition(){}

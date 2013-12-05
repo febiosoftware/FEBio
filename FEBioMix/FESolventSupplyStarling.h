@@ -32,9 +32,6 @@ public:
 	double		m_qc[MAX_CDOFS];	//!< coefficients of concentration drops
 	double		m_cv[MAX_CDOFS];	//!< prescribed (e.g., vascular) concentrations
 	
-	// declare as registered
-	DECLARE_REGISTERED(FESolventSupplyStarling);
-	
 	// declare parameter list
 	DECLARE_PARAMETER_LIST();
 };

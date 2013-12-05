@@ -32,9 +32,6 @@ class FEPermRefOrtho :	public FEHydraulicPermeability
 		double	m_M[3];			//!< nonlinear exponential coefficient
 		double	m_alpha[3];		//!< nonlinear power exponent
 		
-		// declare as registered
-		DECLARE_REGISTERED(FEPermRefOrtho);
-		
 		// declare parameter list
 		DECLARE_PARAMETER_LIST();
 	};

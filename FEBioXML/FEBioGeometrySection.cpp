@@ -5,6 +5,7 @@
 #include "FECore/FETrussDomain.h"
 #include "FECore/FEModel.h"
 #include "FEBioMech/FEElasticMaterial.h"
+#include "FECore/febio.h"
 
 //-----------------------------------------------------------------------------
 //!  Parses the geometry section from the xml file
