@@ -91,7 +91,6 @@ void FEPeriodicSurface::Serialize(DumpFile& ar)
 FEPeriodicBoundary::FEPeriodicBoundary(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
-	m_ntype = FE_PERIODIC_BOUNDARY;
 
 	m_stol = 0.01;
 	m_srad = 1.0;

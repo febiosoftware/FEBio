@@ -246,7 +246,6 @@ void FESlidingSurface::Serialize(DumpFile& ar)
 FESlidingInterface::FESlidingInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
-	m_ntype = FE_CONTACT_SLIDING;
 
 	m_mu = 0;
 	m_epsf = 0;

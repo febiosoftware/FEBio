@@ -219,7 +219,6 @@ void FETiedBiphasicSurface::Serialize(DumpFile& ar)
 
 FETiedBiphasicInterface::FETiedBiphasicInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
-	m_ntype = FE_CONTACT_TIED_BIPHASIC;
 	static int count = 1;
 	m_nID = count++;
 	

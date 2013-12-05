@@ -126,7 +126,6 @@ void FEFacetTiedSurface::Serialize(DumpFile &ar)
 FEFacet2FacetTied::FEFacet2FacetTied(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
 	static int count = 1;
-	m_ntype = FE_FACET2FACET_TIED;
 
 	// define sibling relationships
 	m_ss.SetSibling(&m_ms);

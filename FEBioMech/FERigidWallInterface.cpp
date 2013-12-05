@@ -184,7 +184,6 @@ void FERigidWallSurface::Serialize(DumpFile &ar)
 FERigidWallInterface::FERigidWallInterface(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh())
 {
 	static int count = 1;
-	m_ntype = FE_CONTACT_RIGIDWALL;
 
 	m_mp = 0;
 

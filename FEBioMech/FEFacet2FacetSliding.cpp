@@ -183,7 +183,6 @@ void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 
 FEFacet2FacetSliding::FEFacet2FacetSliding(FEModel* pfem) : FEContactInterface(pfem), m_ss(&pfem->GetMesh()), m_ms(&pfem->GetMesh())
 {
-	m_ntype = FE_FACET2FACET_SLIDING;
 	static int ncount = 1;
 	m_nID = ncount++;
 

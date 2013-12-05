@@ -198,7 +198,6 @@ vec3d FESlidingSurfaceBW::NetContactForce()
 
 FESlidingInterfaceBW::FESlidingInterfaceBW(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
-	m_ntype = FE_CONTACT_SLIDINGBW;
 	static int count = 1;
 	m_nID = count++;
 	

@@ -25,7 +25,6 @@ END_PARAMETER_LIST();
 FETiedInterface::FETiedInterface(FEModel* pfem) : FEContactInterface(pfem), ss(&pfem->GetMesh()), ms(&pfem->GetMesh())
 {
 	static int count = 1;
-	m_ntype = FE_CONTACT_TIED;
 
 	// define sibling relationships
 	ss.SetSibling(&ms);

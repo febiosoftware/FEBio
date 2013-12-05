@@ -13,9 +13,6 @@ public:
 	//! constructor
 	FESurfacePairInteraction(FEModel* pfem);
 
-	//! return the type of this interface
-	int Type();
-
 	//! Get the FE model
 	FEModel* GetFEModel() { return m_pfem; }
 
@@ -52,7 +49,6 @@ protected:
 	FEModel*	m_pfem;		//!< FEModel class this interface belongs to
 
 protected:
-	int		m_ntype;		//!< type of interface
 	int		m_nID;			//!< ID of interface
 	bool	m_bactive;		//!< active flag
 };

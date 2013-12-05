@@ -309,7 +309,6 @@ void FESlidingSurface3::Serialize(DumpFile& ar)
 
 FESlidingInterface3::FESlidingInterface3(FEModel* pfem) : FEContactInterface(pfem), m_ss(pfem), m_ms(pfem)
 {
-	m_ntype = FE_CONTACT_SLIDING3;
 	static int count = 1;
 	m_nID = count++;
 	

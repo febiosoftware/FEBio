@@ -65,6 +65,7 @@ enum FE_Element_Type {
 };
 
 //-----------------------------------------------------------------------------
+//! Helper class for creating domain classes.
 struct FE_Element_Spec
 {
 	FE_Element_Shape	eshape;
@@ -92,19 +93,6 @@ typedef unsigned int SUPER_CLASS_ID;
 #define FEELEMLOGDATA_ID            0x000C	// derived from FElemLogData
 #define FEOBJLOGDATA_ID             0x000D	// derived from FELogObjectData
 #define FEBC_ID						0x000E	// derived from FEBoundaryCondition (TODO: This does not work yet)
-
-/////////////////////////////////////////////////////////////////////////////
-// ENUM: Fiber distribution generation functions
-//  Each element can be associated with a fiber direction which is generated
-//  from a generator
-//
-
-enum FE_Fiber_Type {
-	FE_FIBER_LOCAL		= 0,
-	FE_FIBER_SPHERICAL	= 1,
-	FE_FIBER_VECTOR		= 2,
-	FE_FIBER_USER		= 3
-};
 
 /////////////////////////////////////////////////////////////////////////////
 // ENUM: Linear solvers
@@ -146,37 +134,6 @@ enum FE_Analysis_Type {
 	FE_STATIC		= 0,
 	FE_DYNAMIC		= 1,
 	FE_STEADY_STATE	= 2
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// ENUM: Rigid node types
-//  Designates the type of displacement dofs
-//  free      = node belongs to a deformable mesh
-//  rigid     = node belongs to a rigid body
-//  interface = node is on the face between deformable and rigid mesh
-//
-
-enum FE_Node_Type {
-	FE_NODE_FREE,
-	FE_NODE_RIGID,
-	FE_NODE_INTERFACE
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// ENUM: Contact interface types
-
-enum FE_Contact_Types {
-	FE_CONTACT_SLIDING		 = 1,
-	FE_CONTACT_RIGIDWALL	 = 2,
-	FE_CONTACT_TIED			 = 3,
-	FE_FACET2FACET_SLIDING	 = 4,
-	FE_CONTACT_SLIDING2		 = 5,
-	FE_PERIODIC_BOUNDARY	 = 6,
-	FE_SURFACE_CONSTRAINT	 = 7,
-	FE_CONTACT_SLIDING3		 = 8,
-	FE_CONTACT_TIED_BIPHASIC = 9,
-	FE_CONTACT_SLIDINGBW	 = 10,
-	FE_FACET2FACET_TIED		 = 11
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -226,21 +183,5 @@ enum FE_Print_Level {
 #define FE_LINEAR_SOLID_DOMAIN		14
 #define FE_TRIPHASIC_DOMAIN			15
 #define FE_MULTIPHASIC_DOMAIN		16
-
-//-----------------------------------------------------------------------------
-//! surface load types
-#define FE_PRESSURE_LOAD		1
-#define FE_TRACTION_LOAD		2
-#define FE_FLUID_FLUX			3
-#define FE_PORO_TRACTION		4
-#define FE_SOLUTE_FLUX			5
-#define FE_HEAT_FLUX			6
-#define FE_CONV_HEAT_FLUX		7
-
-//-----------------------------------------------------------------------------
-//! body loads
-#define FE_CONST_BODY_FORCE			1
-#define FE_NONCONST_BODY_FORCE		2
-#define FE_CENTRIFUGAL_BODY_FORCE	3
 
 #endif // _FE_ENUM_H_05132007_
