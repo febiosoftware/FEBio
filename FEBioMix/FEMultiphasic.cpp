@@ -1120,13 +1120,22 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 	FEMaterial::Serialize(ar);
 	FEBioKernel& febio = FEBioKernel::GetInstance();
 	
+	int nSupp = 0;
 	if (ar.IsSaving())
 	{
 		ar << m_phi0 << m_rhoTw << m_cFr << m_Rgas << m_Tabs << m_Fc << m_pSolute.size();
 		
 		ar << m_pSolid->GetTypeStr(); m_pSolid->Serialize(ar);
 		ar << m_pPerm ->GetTypeStr(); m_pPerm ->Serialize(ar);
-		ar << m_pSupp ->GetTypeStr(); m_pSupp ->Serialize(ar);
+
+		if (m_pSupp == 0) ar << nSupp;
+		else
+		{
+			nSupp = 1;
+			ar << nSupp;
+			ar << m_pSupp->GetTypeStr();
+			m_pSupp ->Serialize(ar);
+		}
 		ar << m_pOsmC ->GetTypeStr(); m_pOsmC ->Serialize(ar);
 		for (i=0; i<(int)m_pSolute.size(); ++i) {
 			ar << m_pSolute[i]->GetTypeStr();
@@ -1148,10 +1157,14 @@ void FEMultiphasic::Serialize(DumpFile& ar)
 		assert(m_pPerm); m_pPerm->Serialize(ar);
 		m_pPerm->Init();
 
-		ar >> sz;
-		m_pSupp = dynamic_cast<FESolventSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
-		assert(m_pSupp); m_pSupp->Serialize(ar);
-		m_pSupp->Init();
+		ar >> nSupp;
+		if (nSupp)
+		{
+			ar >> sz;
+			m_pSupp = dynamic_cast<FESolventSupply*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
+			assert(m_pSupp); m_pSupp->Serialize(ar);
+			m_pSupp->Init();
+		}
 		
 		ar >> sz;
 		m_pOsmC = dynamic_cast<FEOsmoticCoefficient*>(fecore_new<FEMaterial>(FEMATERIAL_ID, sz, ar.GetFEModel()));
