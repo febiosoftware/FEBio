@@ -336,6 +336,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEModelComponent.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FENLConstraint.cpp"
 				>
 			</File>
@@ -603,6 +607,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEModel.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEModelComponent.h"
 				>
 			</File>
 			<File
