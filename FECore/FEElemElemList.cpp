@@ -59,7 +59,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 
 	// loop over all solid elements first
 	int i, j, k, l;
-	int n = 0, en0[8], en1[8], n0, n1, M = 0;
+	int n = 0, en0[FEElement::MAX_NODES], en1[FEElement::MAX_NODES], n0, n1, M = 0;
 	int nf0, nf1;
 	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
 	for (i=0; i<bd.Elements(); ++i, ++n)
@@ -98,7 +98,7 @@ void FEElemElemList::Create(FEMesh* pmesh)
 						if (n1 == n0)
 						{
 							// check triangles
-							if (n0 == 3)
+							if ((n0 == 3) || (n0 == 6))
 							{
 								if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2])) &&
 									((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2])) &&

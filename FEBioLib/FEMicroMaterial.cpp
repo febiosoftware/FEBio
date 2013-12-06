@@ -57,7 +57,7 @@ void FEMicroMaterial::PrepRVE()
 	EEL.Create(&m);
 
 	// use the E-E list to tag all exterior nodes
-	int fn[8], nf, M = 0;
+	int fn[FEElement::MAX_NODES], nf, M = 0;
 	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
 	for (int i=0; i<bd.Elements(); ++i, ++M)
 	{
@@ -67,13 +67,9 @@ void FEMicroMaterial::PrepRVE()
 		{
 			if (EEL.Neighbor(M, j) == 0)
 			{
-				int nn = m.GetFace(el, j, fn);
-
 				// mark all nodes
-				tag[ fn[0] ] = 1;
-				tag[ fn[1] ] = 1;
-				tag[ fn[2] ] = 1;
-				if (nn == 4) tag[ fn[3] ] = 1;
+				int nn = m.GetFace(el, j, fn);
+				for (int k=0; k<nn; ++k) tag[fn[k]] = 1;
 			}
 		}
 	}
