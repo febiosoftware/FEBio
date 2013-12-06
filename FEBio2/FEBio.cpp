@@ -208,6 +208,10 @@ int main(int argc, char* argv[])
 	// run the FEBio analysis
 	bool bret = ptask->Run(ops.szfile);
 
+	// Don't forget to cleanup the plugins
+	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
+	pPM->DeleteThis();
+
 	// return the error code of the run
 	return (bret?0:1);
 }
@@ -331,7 +335,8 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		else if (strcmp(sz, "-import") == 0)
 		{
 			char* szfile = argv[++i];
-			if (LoadPlugin(szfile) == false)
+			FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
+			if (pPM->LoadPlugin(szfile) == false)
 			{
 				fprintf(stderr, "Failed loading plugin %s\n\n", szfile);
 			}
@@ -489,15 +494,16 @@ bool Configure(FEBioModel& fem, const char *szfile)
 					else if (tag == "import")
 					{
 						const char* szfile = tag.szvalue();
-						if (LoadPlugin(szfile) == false) throw XMLReader::InvalidValue(tag);
+						FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
+						if (pPM->LoadPlugin(szfile) == false) throw XMLReader::InvalidValue(tag);
 						printf("Plugin \"%s\" loaded successfully\n", szfile);
 					}
-					else if (tag == "import_folder")
+/*					else if (tag == "import_folder")
 					{
 						const char* szfile = tag.szvalue();
 						if (LoadPluginFolder(szfile) == false) throw XMLReader::InvalidTag(tag);
 					}
-					else if (tag == "omp_num_threads")
+*/					else if (tag == "omp_num_threads")
 					{
 						int n;
 						tag.value(n);

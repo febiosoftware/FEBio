@@ -53,18 +53,26 @@ FEBioOptFactory	febioopt_factory;
 FEBioKernel*	pFEBio;
 
 //-----------------------------------------------------------------------------
-// This function is called from the application and is used to register the plugin classes.
-extern "C" DLL_EXPORT void RegisterPlugin(FEBioKernel& febio)
+extern "C" DLL_EXPORT void PluginInitialize(FEBioKernel& febio)
 {
-	// store a pointer to the kernel
 	pFEBio = &febio;
+}
 
-	// write something to the logfile
-//	Logfile& log = pFEBio->GetLogfile();
-//	log.printf("Hello, world!!!\n");
+//-----------------------------------------------------------------------------
+extern "C" DLL_EXPORT int PluginNumClasses()
+{
+	return 1;
+}
 
-	// register the plugin classes
-	febio.RegisterClass(&febioopt_factory);
+//-----------------------------------------------------------------------------
+extern "C" DLL_EXPORT FEBioFactory* PluginGetFactory(int i)
+{
+	if (i==0) return &febioopt_factory;
+	return 0;
+}
 
-	fprintf(stderr, "Registration successful.\n\n");
+//-----------------------------------------------------------------------------
+extern "C" DLL_EXPORT void PluginCleanup()
+{
+
 }

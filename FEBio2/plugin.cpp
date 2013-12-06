@@ -3,34 +3,150 @@
 #include "FECore/febio.h"
 #include "FECore/log.h"
 
-//-----------------------------------------------------------------------------
 #ifdef WIN32
-
-#include "windows.h"
 #include <direct.h>
+#endif
 
-#undef RegisterClass
+//=============================================================================
+// Typedefs of the plugin functions.
+// These are the functions that the plugin must implement
+extern "C" {
+	typedef void (*FEPLUGIN_INIT_FNC)(FEBioKernel&);
+	typedef void (*FEPLUGIN_CLEANUP_FNC)();
+	typedef int  (*FEPLUGIN_NUMCLASSES_FNC)();
+	typedef FEBioFactory* (*FEPLUGIN_GETFACTORY_FNC)(int i);
+}
 
-typedef void (_cdecl *FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
+//=============================================================================
+// Wrappers for system calls
+#ifdef WIN32
+FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return LoadLibraryA(szfile); }
+void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return GetProcAddress(ph, szfunc); }
+#endif
+#ifdef LINUX
+FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
+void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
+#endif
 
-bool LoadPlugin(const char* szfile)
+//=============================================================================
+// FEBioPlugin
+//=============================================================================
+FEBioPlugin::FEBioPlugin()
 {
+	m_ph = 0;
+}
+
+//-----------------------------------------------------------------------------
+FEBioPlugin::~FEBioPlugin()
+{
+	if (m_ph) UnLoad();
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPlugin::Load(const char* szfile)
+{
+	// Make sure the plugin is not loaded already
+	assert(m_ph == 0);
+	if (m_ph) return true;
+
 	// load the library
-	HMODULE hm = LoadLibraryA(szfile);
-	if (hm == NULL) return false;
+	FEBIO_PLUGIN_HANDLE ph = LoadPlugin(szfile);
+	if (ph == NULL) return false;
 
-	// find the plugin's registration function
-	FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) GetProcAddress(hm, "RegisterPlugin");
-	if (pfnc == 0) return false;
+	// find the numclasses function
+	FEPLUGIN_NUMCLASSES_FNC pfnc_cnt = (FEPLUGIN_NUMCLASSES_FNC) FindPluginFunc(ph, "PluginNumClasses");
+	if (pfnc_cnt == 0) return false;
 
-	// call the register function repeatedly until it returns zero
+	// find the GetFactory function
+	FEPLUGIN_GETFACTORY_FNC pfnc_get = (FEPLUGIN_GETFACTORY_FNC) FindPluginFunc(ph, "PluginGetFactory");
+	if (pfnc_get == 0) return false;
+	
+	// find the plugin's initialization function
+	FEPLUGIN_INIT_FNC pfnc_init = (FEPLUGIN_INIT_FNC) FindPluginFunc(ph, "PluginInitialize");
+
+	// call the (optional) initialization function
 	FEBioKernel& febio = FEBioKernel::GetInstance();
-	pfnc(febio);
+	if (pfnc_init) pfnc_init(febio);
+
+	// find out how many classes there are in this plugin
+	int NC = pfnc_cnt();
+	if (NC < 0) return false;
+
+	// call the get factory functions
+	for (int i=0; i<NC; ++i)
+	{
+		FEBioFactory* pfac = pfnc_get(i);
+		if (pfac) febio.RegisterClass(pfac);
+	}
+
+	// If we get here everything seems okay so let's store the handle
+	m_ph = ph;
 
 	// a-ok!
 	return true;
+
 }
 
+//-----------------------------------------------------------------------------
+void FEBioPlugin::UnLoad()
+{
+	if (m_ph)
+	{
+		// find the plugin's cleanup function
+		FEPLUGIN_CLEANUP_FNC pfnc = (FEPLUGIN_CLEANUP_FNC) FindPluginFunc(m_ph, "PluginCleanup");
+		if (pfnc) pfnc();
+
+		// TODO: should I figure out how to actually unload the plugin from memory?
+		m_ph = 0;
+	}
+}
+
+//=============================================================================
+// FEBioPluginManager
+//=============================================================================
+
+FEBioPluginManager* FEBioPluginManager::m_pThis = 0;
+
+FEBioPluginManager* FEBioPluginManager::GetInstance()
+{
+	if (m_pThis == 0) m_pThis = new FEBioPluginManager;
+	return m_pThis;
+}
+
+//-----------------------------------------------------------------------------
+FEBioPluginManager::~FEBioPluginManager()
+{
+	for (size_t i = 0; i < m_Plugin.size(); ++i) delete m_Plugin[i];
+	m_Plugin.clear();
+}
+
+//-----------------------------------------------------------------------------
+void FEBioPluginManager::DeleteThis()
+{
+	delete m_pThis;
+	m_pThis = 0;
+}
+
+//-----------------------------------------------------------------------------
+bool FEBioPluginManager::LoadPlugin(const char* szfile)
+{
+	// create a new plugin object
+	FEBioPlugin* pdll = new FEBioPlugin;
+
+	// try to load the plugin
+	if (pdll->Load(szfile) == false)
+	{
+		delete pdll;
+		return false;
+	}
+	else
+	{
+		m_Plugin.push_back(pdll);
+		return true;
+	}
+}
+
+/*
 //-----------------------------------------------------------------------------
 // Import all the plugins from a folder. The szdir is actually a folder name
 // plus a wildcard file reference (e.g. C:\folder\*.dll)
@@ -50,43 +166,4 @@ bool LoadPluginFolder(const char* szdir)
 
 	return true;
 }
-
-#endif	// ifdef WIN32
-
-
-//-----------------------------------------------------------------------------
-#ifdef LINUX
-#include <dlfcn.h>
-
-extern "C" {
-typedef void (*FEBIO_REGISTER_PLUGIN_FNC)(FEBioKernel&);
-}
-
-bool LoadPlugin(const char* szfile)
-{
-  fprintf(stderr, "Inside LoadPlugin\n");
-
-	// load the library
-	void* hlib = dlopen(szfile, RTLD_NOW);
-
-	fprintf(stderr, "dlopen call returned\n");
-
-	if (hlib == NULL) return false;
-
-	// find the plugin's registration function
-	FEBIO_REGISTER_PLUGIN_FNC pfnc = (FEBIO_REGISTER_PLUGIN_FNC) dlsym(hlib, "RegisterPlugin");
-	if (pfnc == NULL) return false;
-
-	// call the register function
-	FEBioKernel& febio = FEBioKernel::GetInstance();
-	pfnc(febio);
-
-	return true;
-}
-
-bool LoadPluginFolder(const char* szdir)
-{
-	return false;
-}
-
-#endif // ifdef LINUX
+*/
