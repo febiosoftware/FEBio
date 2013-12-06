@@ -24,7 +24,7 @@ FEPointConstraint::FEPointConstraint(FEModel* pfem) : FENLConstraint(pfem)
 bool FEPointConstraint::Init()
 {
 	assert(m_node_id != -1);
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// get the nodal position in the reference state
 	m_node = m_node_id - 1;
@@ -41,7 +41,7 @@ bool FEPointConstraint::Init()
 void FEPointConstraint::Residual(FEGlobalVector& R)
 {
 	int i;
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// calculate H matrix
 	double H[9], *r = m_rs;
@@ -99,7 +99,7 @@ void FEPointConstraint::Residual(FEGlobalVector& R)
 void FEPointConstraint::StiffnessMatrix(FESolver* psolver)
 {
 	int i, j;
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// calculate H matrix
 	double H[9], *r = m_rs;

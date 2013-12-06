@@ -31,14 +31,14 @@ double FEContactInterface::AutoPenalty(FESurfaceElement& el, FESurface &s)
 	double eps = 0;
 
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// get the solid element this surface element belongs to
 	FESolidElement* pe = dynamic_cast<FESolidElement*>(m.FindElementFromID(el.m_nelem));
 	if (pe)
 	{
 		// extract the elastic material
-		FEElasticMaterial* pme = m_pfem->GetMaterial(pe->GetMatID())->GetElasticMaterial();
+		FEElasticMaterial* pme = GetFEModel()->GetMaterial(pe->GetMatID())->GetElasticMaterial();
 
 		if (pme)
 		{

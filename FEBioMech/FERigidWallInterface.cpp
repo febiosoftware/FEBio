@@ -625,17 +625,17 @@ void FERigidWallInterface::Serialize(DumpFile &ar)
 		{
 		case FE_RIGID_PLANE:
 			{
-				SetMasterSurface(new FEPlane(m_pfem));
+				SetMasterSurface(new FEPlane(GetFEModel()));
 				FEPlane& pl = dynamic_cast<FEPlane&>(*m_mp);
 				ar >> pl.m_nplc;
-				if (pl.m_nplc >= 0) pl.m_pplc = m_pfem->GetLoadCurve(pl.m_nplc);
+				if (pl.m_nplc >= 0) pl.m_pplc = GetFEModel()->GetLoadCurve(pl.m_nplc);
 				double* a = pl.GetEquation();
 				ar >> a[0] >> a[1] >> a[2] >> a[3];
 			}
 			break;
 		case FE_RIGID_SPHERE:
 			{
-				SetMasterSurface(new FERigidSphere(m_pfem));
+				SetMasterSurface(new FERigidSphere(GetFEModel()));
 				FERigidSphere& s = dynamic_cast<FERigidSphere&>(*m_mp);
 				ar >> s.m_rc;
 				ar >> s.m_R;

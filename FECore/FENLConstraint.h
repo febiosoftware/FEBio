@@ -1,7 +1,7 @@
 #pragma once
 #include "FESolver.h"
 #include "DumpFile.h"
-#include "FECoreBase.h"
+#include "FEModelComponent.h"
 #include "FEGlobalVector.h"
 #include "FESurface.h"
 #include <vector>
@@ -17,7 +17,7 @@ class FEModel;
 //! The constraint must provide a residual (force) contribution, its stiffness matrix
 //! and an augmentation function.
 //!
-class FENLConstraint : public FECoreBase
+class FENLConstraint : public FEModelComponent
 {
 public:
 	FENLConstraint(FEModel* pfem);
@@ -35,18 +35,4 @@ public:
 	virtual void Update() {}
 
 	virtual FESurface* GetSurface(const char* sz) { return 0; }
-
-public:
-	//! Is this contact interface active
-	bool IsActive();
-
-	//! Activate the contact interface
-	virtual void Activate();
-
-	//! Deactivate the contact interface
-	virtual void Deactivate();
-
-protected:
-	FEModel*	m_pfem;
-	bool	m_bactive;		//!< active flag
 };

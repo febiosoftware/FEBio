@@ -229,7 +229,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			int lc = atoi(sz) - 1;
 
 			// create a new BC
-			FEPrescribedBC* pdc = new FEPrescribedBC;
+			FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
 			pdc->node = n;
 			pdc->bc = bc;
 			pdc->lc = lc;
@@ -288,7 +288,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			int N = ns.size();
 			for (int i=0; i<N; ++i)
 			{
-				FEPrescribedBC* pdc = new FEPrescribedBC;
+				FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
 				pdc->node = ns[i];
 				pdc->bc = bc;
 				pdc->lc = lc;
@@ -336,7 +336,7 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 				sz = tag.AttributeValue("lc");
 				int lc = atoi(sz)-1;
 
-				FEPrescribedBC* pdc = new FEPrescribedBC;
+				FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
 				pdc->node = n;
 				pdc->bc = bc;
 				pdc->lc = lc;
@@ -643,7 +643,7 @@ void FEBioBoundarySection::ParseContactSection(XMLTag& tag)
 			id = atoi(tag.AttributeValue("id"))-1;
 			rb = atoi(tag.AttributeValue("rb"))-1;
 
-			FERigidNode* prn = new FERigidNode;
+			FERigidNode* prn = new FERigidNode(&fem);
 
 			prn->nid = id;
 			prn->rid = rb;

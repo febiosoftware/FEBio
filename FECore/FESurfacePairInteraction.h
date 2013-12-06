@@ -1,5 +1,5 @@
 #pragma once
-#include "FECoreBase.h"
+#include "FEModelComponent.h"
 #include "FESurface.h"
 
 //-----------------------------------------------------------------------------
@@ -7,14 +7,11 @@ class FEModel;
 
 //-----------------------------------------------------------------------------
 //! This class describes a general purpose interaction between two surfaces.
-class FESurfacePairInteraction : public FECoreBase
+class FESurfacePairInteraction : public FEModelComponent
 {
 public:
 	//! constructor
 	FESurfacePairInteraction(FEModel* pfem);
-
-	//! Get the FE model
-	FEModel* GetFEModel() { return m_pfem; }
 
 public:
 	//! initialization routine
@@ -35,20 +32,6 @@ public:
 	//! return the slave surface
 	virtual FESurface* GetSlaveSurface () = 0;
 
-public:
-	//! Is this contact interface active
-	bool IsActive();
-
-	//! Activate the contact interface
-	virtual void Activate();
-
-	//! Deactivate the contact interface
-	virtual void Deactivate();
-
-protected:
-	FEModel*	m_pfem;		//!< FEModel class this interface belongs to
-
 protected:
 	int		m_nID;			//!< ID of interface
-	bool	m_bactive;		//!< active flag
 };

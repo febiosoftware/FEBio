@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESurfaceLoad.h"
 
-FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEBoundaryCondition(FESURFACELOAD_ID), m_pfem(pfem)
+FESurfaceLoad::FESurfaceLoad(FEModel* pfem) : FEBoundaryCondition(FESURFACELOAD_ID, pfem)
 {
 	m_psurf = 0;
 }

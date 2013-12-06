@@ -47,7 +47,7 @@ bool FELinearConstraintSet::Init()
 	// set the equation numbers for the linear constraints
 	list<FEAugLagLinearConstraint*>::iterator it = m_LC.begin();
 	int N = m_LC.size();
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	for (int i=0; i<N; ++i, ++it)
 	{
 		FEAugLagLinearConstraint& lc = *(*it);
@@ -73,10 +73,10 @@ double FELinearConstraintSet::constraint(FEAugLagLinearConstraint& LC)
 	double c = 0;
 	list<FEAugLagLinearConstraint::DOF>::iterator it = LC.m_dof.begin();
 	double u;
-	FEMesh* pm = &m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	for (int i=0; i<n; ++i, ++it) 
 	{
-		FENode& node = pm->Node(it->node);
+		FENode& node = mesh.Node(it->node);
 		switch (it->bc)
 		{
 		case 0: u = node.m_rt.x - node.m_r0.x; break;

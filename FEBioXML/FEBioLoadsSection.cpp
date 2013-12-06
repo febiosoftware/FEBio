@@ -137,7 +137,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			int lc = atoi(sz)-1;
 
 			// create new nodal force
-			FENodalForce* pfc = new FENodalForce;
+			FENodalForce* pfc = new FENodalForce(&fem);
 			pfc->node = n;
 			pfc->bc = bc;
 			pfc->lc = lc;
@@ -177,7 +177,7 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 			sz = tag.AttributeValue("lc");
 			int lc = atoi(sz) - 1;
 
-			FENodalForce* pfc = new FENodalForce;
+			FENodalForce* pfc = new FENodalForce(&fem);
 			pfc->node = n;
 			pfc->bc = bc;
 			pfc->lc = lc;

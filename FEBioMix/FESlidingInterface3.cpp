@@ -439,7 +439,7 @@ void FESlidingInterface3::Activate()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FESolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
+		FESolver* psolver = GetFEModel()->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 	
@@ -462,7 +462,7 @@ void FESlidingInterface3::Activate()
 void FESlidingInterface3::CalcAutoPenalty(FESlidingSurface3& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 	
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
@@ -500,7 +500,7 @@ void FESlidingInterface3::CalcAutoPenalty(FESlidingSurface3& s)
 void FESlidingInterface3::CalcAutoPressurePenalty(FESlidingSurface3& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 	
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
@@ -539,7 +539,7 @@ void FESlidingInterface3::CalcAutoPressurePenalty(FESlidingSurface3& s)
 double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingSurface3& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// evaluate element surface normal at parametric center
 	vec3d t[2];
@@ -554,7 +554,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a poro-elastic element
 		FEBiphasic* bp = dynamic_cast<FEBiphasic*> (pm);
@@ -614,7 +614,7 @@ double FESlidingInterface3::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 void FESlidingInterface3::CalcAutoConcentrationPenalty(FESlidingSurface3& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 	
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
@@ -653,7 +653,7 @@ void FESlidingInterface3::CalcAutoConcentrationPenalty(FESlidingSurface3& s)
 double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESlidingSurface3& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// evaluate element surface normal at parametric center
 	vec3d t[2];
@@ -668,7 +668,7 @@ double FESlidingInterface3::AutoConcentrationPenalty(FESurfaceElement& el, FESli
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a biphasic-solute element
 		FEBiphasicSolute* pbs = dynamic_cast<FEBiphasicSolute*> (pm);
@@ -706,7 +706,7 @@ void FESlidingInterface3::ProjectSurface(FESlidingSurface3& ss, FESlidingSurface
 {
 	bool bfirst = true;
 
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r, nu;
 	double rs[2];
@@ -856,12 +856,12 @@ void FESlidingInterface3::Update(int niter)
 	int i, j, n, id, np;
 	double rs[2];
 
-	double R = m_srad*m_pfem->GetMesh().GetBoundingBox().radius();
+	FEModel& fem = *GetFEModel();
+
+	double R = m_srad*fem.GetMesh().GetBoundingBox().radius();
 	
 	static int naug = 0;
 	static int biter = 0;
-
-	FEModel& fem = *m_pfem;
 
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
@@ -1034,7 +1034,7 @@ void FESlidingInterface3::ContactForces(FEGlobalVector& R)
 	double detJ[MN], w[MN], *Hs, Hm[MN];
 	double N[10*MN];
 
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -1251,7 +1251,7 @@ void FESlidingInterface3::ContactStiffness(FESolver* psolver)
 	double N[10*MN];
 	matrix ke;
 
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();

@@ -692,7 +692,7 @@ void FESlidingInterface::ContactNodalForce(int m, FESlidingSurface& ss, FESurfac
 	double eps, scale = Penalty();
 
 	// get the mesh
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	double Tt[2];
 
@@ -1004,7 +1004,7 @@ void FESlidingInterface::ContactNodalStiffness(int m, FESlidingSurface& ss, FESu
 	double Nb1[3*(MAXMN+1)], Nb2[3*(MAXMN+1)];
 
 	// get the mesh
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 
 	// nr of element nodes and degrees of freedom 
 	int nmeln = mel.Nodes();

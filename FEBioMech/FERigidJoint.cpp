@@ -34,10 +34,12 @@ bool FERigidJoint::Init()
 	// reset force
 	m_F = vec3d(0,0,0);
 
+	FEModel& fem = *GetFEModel();
+
 	// When the rigid joint is read in, the ID's correspond to the rigid materials.
 	// Now we want to make the ID's refer to the rigid body ID's
 
-	FEMaterial* pm = m_pfem->GetMaterial(m_nRBa);
+	FEMaterial* pm = fem.GetMaterial(m_nRBa);
 	if (pm->IsRigid() == false)
 	{
 		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
@@ -45,7 +47,7 @@ bool FERigidJoint::Init()
 	}
 	m_nRBa = pm->GetRigidBodyID();
 
-	pm = m_pfem->GetMaterial(m_nRBb);
+	pm = fem.GetMaterial(m_nRBb);
 	if (pm->IsRigid() == false)
 	{
 		felog.printbox("FATAL ERROR", "Rigid joint %d does not connect two rigid bodies\n", m_nID);
@@ -53,8 +55,8 @@ bool FERigidJoint::Init()
 	}
 	m_nRBb = pm->GetRigidBodyID();
 
-	FERigidBody& ra = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
-	FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+	FERigidBody& ra = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBa));
+	FERigidBody& rb = dynamic_cast<FERigidBody&>(*fem.Object(m_nRBb));
 
 	m_qa0 = m_q0 - ra.m_r0;
 	m_qb0 = m_q0 - rb.m_r0;
@@ -89,8 +91,8 @@ void FERigidJoint::Residual(FEGlobalVector& R)
 	vector<int> lma(6);
 	vector<int> lmb(6);
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
 
 	for (int i=0; i<6; ++i)
 	{
@@ -139,8 +141,8 @@ void FERigidJoint::StiffnessMatrix(FESolver* psolver)
 
 	double y1[3][3], y2[3][3], y11[3][3], y12[3][3], y22[3][3];
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
 
 	a = m_qa0;
 	RBa.m_qt.RotateVector(a);
@@ -246,8 +248,8 @@ bool FERigidJoint::Augment(int naug)
 	double normF0, normF1;
 	bool bconv = true;
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
 
 	ra = RBa.m_rt;
 	rb = RBb.m_rt;
@@ -311,8 +313,8 @@ void FERigidJoint::Serialize(DumpFile& ar)
 //-----------------------------------------------------------------------------
 void FERigidJoint::Update()
 {
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
 
 	vec3d ra = RBa.m_rt;
 	vec3d rb = RBb.m_rt;
@@ -333,8 +335,8 @@ void FERigidJoint::Reset()
 	m_F = vec3d(0,0,0);
 	m_L = vec3d(0,0,0);
 
-	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBa));
-	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*m_pfem->Object(m_nRBb));
+	FERigidBody& RBa = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBa));
+	FERigidBody& RBb = dynamic_cast<FERigidBody&>(*GetFEModel()->Object(m_nRBb));
 
 	m_qa0 = m_q0 - RBa.m_r0;
 	m_qb0 = m_q0 - RBb.m_r0;

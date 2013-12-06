@@ -1,6 +1,6 @@
 #pragma once
 #include "DumpFile.h"
-#include "FECoreBase.h"
+#include "FEModelComponent.h"
 
 //-----------------------------------------------------------------------------
 // forward declaration of FEModel class
@@ -9,14 +9,11 @@ class FEModel;
 //-----------------------------------------------------------------------------
 //! Base class for body-loads
 //! \todo This is a work in progress
-class FEBodyLoad : public FECoreBase
+class FEBodyLoad : public FEModelComponent
 {
 public:
 	FEBodyLoad(FEModel* pfem);
 	virtual ~FEBodyLoad();
-
-	//! Get the FE model
-	FEModel* GetFEModel() { return m_pfem; }
 
 public:
 	//! initialization
@@ -27,7 +24,4 @@ public:
 
 	//! update
 	virtual void Update(){}
-
-private:
-	FEModel* m_pfem;
 };

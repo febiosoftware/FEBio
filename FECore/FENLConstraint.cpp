@@ -3,25 +3,7 @@
 
 
 //-----------------------------------------------------------------------------
-FENLConstraint::FENLConstraint(FEModel* pfem) : FECoreBase(FENLCONSTRAINT_ID), m_pfem(pfem) { m_bactive = true; }
+FENLConstraint::FENLConstraint(FEModel* pfem) : FEModelComponent(FENLCONSTRAINT_ID, pfem) {}
 
 //-----------------------------------------------------------------------------
 FENLConstraint::~FENLConstraint(){}
-
-//-----------------------------------------------------------------------------
-bool FENLConstraint::IsActive()
-{ 
-	return m_bactive; 
-}
-
-//-----------------------------------------------------------------------------
-void FENLConstraint::Activate()
-{ 
-	m_bactive = true; 
-}
-
-//-----------------------------------------------------------------------------
-void FENLConstraint::Deactivate()
-{ 
-	m_bactive = false; 
-}

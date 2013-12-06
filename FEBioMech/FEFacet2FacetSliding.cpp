@@ -318,7 +318,7 @@ void FEFacet2FacetSliding::Activate()
 void FEFacet2FacetSliding::CalcAutoPenalty(FEFacetSlidingSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
@@ -433,7 +433,7 @@ void FEFacet2FacetSliding::ProjectSurface(FEFacetSlidingSurface &ss, FEFacetSlid
 //-----------------------------------------------------------------------------
 void FEFacet2FacetSliding::Update(int niter)
 {
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 
 	// should we do a segment update or not?
 	// TODO: check what happens when m_nsegup == -1 and m_npass = 2;
@@ -622,7 +622,7 @@ void FEFacet2FacetSliding::ContactStiffness(FESolver* psolver)
 
 	// get the "size" of the model
 	// We need this to scale the insertion distance
-	double R = m_pfem->GetMesh().GetBoundingBox().radius();
+	double R = GetFEModel()->GetMesh().GetBoundingBox().radius();
 	double dxtol = R*m_dxtol;
 
 	// set higher order stiffness mutliplier

@@ -24,7 +24,7 @@ bool FEInSituStretch::Init()
 //-----------------------------------------------------------------------------
 bool FEInSituStretch::Augment(int naug)
 {
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	int ND = m.Domains();
 

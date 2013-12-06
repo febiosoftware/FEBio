@@ -92,7 +92,7 @@ bool FEPointBodyForce::Init()
 			m_rlc[0] = m_rlc[1] = m_rlc[2] = -1;
 
 			// find the element in which point r0 lies
-			FEMesh& m = m_pfem->GetMesh();
+			FEMesh& m = GetFEModel()->GetMesh();
 			m_pel = m.FindSolidElement(m_rc, m_rs);
 		}
 		else m_pel = 0;
@@ -102,7 +102,7 @@ bool FEPointBodyForce::Init()
 		// make sure we don't move the point
 		m_rlc[0] = m_rlc[1] = m_rlc[2] = -1;
 
-		FEMesh& m = m_pfem->GetMesh();
+		FEMesh& m = GetFEModel()->GetMesh();
 		m_rc = m.Node(m_inode).m_r0;
 	}
 
@@ -117,7 +117,7 @@ void FEPointBodyForce::Update()
 	{
 		if (m_pel)
 		{
-			FEMesh& m = m_pfem->GetMesh();
+			FEMesh& m = GetFEModel()->GetMesh();
 			vec3d x[FEElement::MAX_NODES];
 			for (int i=0; i<8; ++i) x[i] = m.Node(m_pel->m_node[i]).m_rt;
 
@@ -138,7 +138,7 @@ void FEPointBodyForce::Update()
 	}
 	else
 	{
-		FEMesh& m = m_pfem->GetMesh();
+		FEMesh& m = GetFEModel()->GetMesh();
 		m_rc = m.Node(m_inode).m_rt;
 	}
 }

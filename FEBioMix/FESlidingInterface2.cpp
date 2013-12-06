@@ -309,7 +309,7 @@ bool FESlidingInterface2::Init()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FESolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
+		FESolver* psolver = GetFEModel()->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 
@@ -404,7 +404,7 @@ void FESlidingInterface2::Activate()
 void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
@@ -442,7 +442,7 @@ void FESlidingInterface2::CalcAutoPenalty(FESlidingSurface2& s)
 void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
@@ -481,7 +481,7 @@ void FESlidingInterface2::CalcAutoPressurePenalty(FESlidingSurface2& s)
 double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingSurface2& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// evaluate element surface normal at parametric center
 	vec3d t[2];
@@ -496,7 +496,7 @@ double FESlidingInterface2::AutoPressurePenalty(FESurfaceElement& el, FESlidingS
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
 
 		// see if this is a poro-elastic element
 		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
@@ -533,7 +533,7 @@ void FESlidingInterface2::ProjectSurface(FESlidingSurface2& ss, FESlidingSurface
 {
 	bool bfirst = true;
 
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r, nu;
 	double rs[2];
@@ -658,12 +658,12 @@ void FESlidingInterface2::Update(int niter)
 	int i, n, id, np;
 	double rs[2];
 
-	double R = m_srad*m_pfem->GetMesh().GetBoundingBox().radius();
+	double R = m_srad*GetFEModel()->GetMesh().GetBoundingBox().radius();
 
 	static int naug = 0;
 	static int biter = 0;
 
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 	
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
@@ -823,7 +823,7 @@ void FESlidingInterface2::ContactForces(FEGlobalVector& R)
 	double detJ[MN], w[MN], *Hs, Hm[MN];
 	double N[4*MN*2]; // TODO: is the size correct?
 
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -1008,7 +1008,7 @@ void FESlidingInterface2::ContactStiffness(FESolver* psolver)
 	double N[4*MN*2];
 	matrix ke;
 
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();

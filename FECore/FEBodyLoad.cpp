@@ -2,7 +2,7 @@
 #include "FEBodyLoad.h"
 
 //-----------------------------------------------------------------------------
-FEBodyLoad::FEBodyLoad(FEModel* pfem) : FECoreBase(FEBODYLOAD_ID), m_pfem(pfem) {}
+FEBodyLoad::FEBodyLoad(FEModel* pfem) : FEModelComponent(FEBODYLOAD_ID, pfem) {}
 
 //-----------------------------------------------------------------------------
 FEBodyLoad::~FEBodyLoad(){}

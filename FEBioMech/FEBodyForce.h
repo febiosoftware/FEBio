@@ -24,7 +24,4 @@ public:
 
 	//! calculate constribution to stiffness matrix
 	virtual mat3ds stiffness(FEMaterialPoint& pt) = 0;
-
-public:
-	FEModel*	m_pfem;	//!< point to model class
 };

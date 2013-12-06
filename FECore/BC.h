@@ -8,7 +8,7 @@ using namespace FECore;
 class FENodalForce : public FEBoundaryCondition
 {
 public:
-	FENodalForce() : FEBoundaryCondition(FEBC_ID){}
+	FENodalForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
 public:
 	double	s;		// scale factor
@@ -23,7 +23,7 @@ public:
 class FEPrescribedBC : public FEBoundaryCondition
 {
 public:
-	FEPrescribedBC() : FEBoundaryCondition(FEBC_ID){}
+	FEPrescribedBC(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
 public:
 	double	s;		// scale factor
@@ -40,7 +40,7 @@ public:
 class FERigidNode : public FEBoundaryCondition
 {
 public:
-	FERigidNode() : FEBoundaryCondition(FEBC_ID){}
+	FERigidNode(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
 public:
 	int	nid;	// node number
@@ -53,7 +53,7 @@ public:
 class FERigidBodyForce : public FEBoundaryCondition
 {
 public:
-	FERigidBodyForce() : FEBoundaryCondition(FEBC_ID){}
+	FERigidBodyForce(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
 public:
 	int		id;	// rigid body id
@@ -68,7 +68,7 @@ public:
 class FERigidBodyDisplacement : public FEBoundaryCondition
 {
 public:
-	FERigidBodyDisplacement() : FEBoundaryCondition(FEBC_ID){}
+	FERigidBodyDisplacement(FEModel* pfem) : FEBoundaryCondition(FEBC_ID, pfem){}
 
 public:
 	int		id;	// rigid body id

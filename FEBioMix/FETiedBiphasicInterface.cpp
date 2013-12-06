@@ -333,7 +333,7 @@ void FETiedBiphasicInterface::Activate()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FESolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
+		FESolver* psolver = GetFEModel()->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 	
@@ -358,7 +358,7 @@ void FETiedBiphasicInterface::Activate()
 void FETiedBiphasicInterface::CalcAutoPenalty(FETiedBiphasicSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 	
 	// loop over all surface elements
 	int ni = 0;
@@ -393,7 +393,7 @@ void FETiedBiphasicInterface::CalcAutoPenalty(FETiedBiphasicSurface& s)
 void FETiedBiphasicInterface::CalcAutoPressurePenalty(FETiedBiphasicSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 	
 	// loop over all surface elements
 	int ni = 0;
@@ -429,7 +429,7 @@ void FETiedBiphasicInterface::CalcAutoPressurePenalty(FETiedBiphasicSurface& s)
 double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETiedBiphasicSurface& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 
 	// evaluate element surface normal at parametric center
 	vec3d t[2];
@@ -444,7 +444,7 @@ double FETiedBiphasicInterface::AutoPressurePenalty(FESurfaceElement& el, FETied
 	if (pe)
 	{
 		// get the material
-		FEMaterial* pm = dynamic_cast<FEMaterial*>(m_pfem->GetMaterial(pe->GetMatID()));
+		FEMaterial* pm = dynamic_cast<FEMaterial*>(GetFEModel()->GetMaterial(pe->GetMatID()));
 		
 		// see if this is a poro-elastic element
 		FEBiphasic* biph = dynamic_cast<FEBiphasic*> (pm);
@@ -482,7 +482,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 {
 	bool bfirst = true;
 
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	double R = m_srad*mesh.GetBoundingBox().radius();
 	
 	FESurfaceElement* pme;
@@ -533,7 +533,7 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 // Evaluate gap functions for position and fluid pressure
 void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBiphasicSurface& ms)
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	FESurfaceElement* pme;
 	vec3d r;
 	
@@ -626,7 +626,7 @@ void FETiedBiphasicInterface::ContactForces(FEGlobalVector& R)
 	double N[8*MN];
 
 	// get time step
-	double dt = m_pfem->GetCurrentStep()->m_dt;
+	double dt = GetFEModel()->GetCurrentStep()->m_dt;
 	
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();
@@ -809,7 +809,7 @@ void FETiedBiphasicInterface::ContactStiffness(FESolver* psolver)
 	matrix ke;
 
 	// get time step
-	double dt = m_pfem->GetCurrentStep()->m_dt;
+	double dt = GetFEModel()->GetCurrentStep()->m_dt;
 	
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();

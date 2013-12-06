@@ -201,7 +201,7 @@ void FESurfaceConstraint::ProjectSurface(FESurfaceConstraintSurface& ss, FESurfa
 {
 	bool bfirst = true;
 
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	double R = m_srad*mesh.GetBoundingBox().radius();
 
 	int i;

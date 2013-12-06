@@ -190,7 +190,7 @@ void FEBioContactSection::ParseRigidInterface(XMLTag& tag)
 		id = atoi(tag.AttributeValue("id"))-1;
 		rb = atoi(tag.AttributeValue("rb"))-1;
 
-		FERigidNode* prn = new FERigidNode;
+		FERigidNode* prn = new FERigidNode(&fem);
 
 		prn->nid = id;
 		prn->rid = rb;

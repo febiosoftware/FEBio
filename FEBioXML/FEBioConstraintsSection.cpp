@@ -95,7 +95,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
 				pDC->id = nmat;
 				pDC->bc = bc;
 				pDC->lc = lc;
@@ -117,7 +117,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyForce* pFC = new FERigidBodyForce;
+				FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
 				pFC->id = nmat;
 				pFC->bc = bc;
 				pFC->lc = lc;
@@ -152,7 +152,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement;
+				FERigidBodyDisplacement* pDC = new FERigidBodyDisplacement(&fem);
 				pDC->id = nmat;
 				pDC->bc = bc;
 				pDC->lc = lc;
@@ -174,7 +174,7 @@ void FEBioConstraintsSection::ParseRigidConstraint(XMLTag& tag)
 				const char* szlc = tag.AttributeValue("lc");
 				int lc = atoi(szlc) - 1;
 
-				FERigidBodyForce* pFC = new FERigidBodyForce;
+				FERigidBodyForce* pFC = new FERigidBodyForce(&fem);
 				pFC->id = nmat;
 				pFC->bc = bc;
 				pFC->lc = lc;

@@ -43,5 +43,4 @@ public:
 
 protected:
 	FESurface*	m_psurf;
-	FEModel*	m_pfem;
 };

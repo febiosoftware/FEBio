@@ -100,7 +100,7 @@ void FEMicroMaterial::PrepRVE()
 		{
 			for (int j=0; j<3; ++j, ++NN)
 			{
-				FEPrescribedBC* pdc = new FEPrescribedBC();
+				FEPrescribedBC* pdc = new FEPrescribedBC(&m_rve);
 				pdc->bc = j;
 				pdc->lc = NLC;
 				pdc->node = i;

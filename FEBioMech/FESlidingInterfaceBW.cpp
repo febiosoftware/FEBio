@@ -247,7 +247,7 @@ void FESlidingInterfaceBW::Activate()
 	if (!m_bsymm) 
 	{
 		// request a non-symmetric stiffness matrix
-		FESolver* psolver = m_pfem->GetCurrentStep()->m_psolver;
+		FESolver* psolver = GetFEModel()->GetCurrentStep()->m_psolver;
 		psolver->m_bsymm = false;
 	}
 	
@@ -328,7 +328,7 @@ void FESlidingInterfaceBW::BuildMatrixProfile(FEStiffnessMatrix& K)
 void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
 {
 	// get the mesh
-	FEMesh& m = m_pfem->GetMesh();
+	FEMesh& m = GetFEModel()->GetMesh();
 	
 	// loop over all surface elements
 	for (int i=0; i<s.Elements(); ++i)
@@ -365,7 +365,7 @@ void FESlidingInterfaceBW::CalcAutoPenalty(FESlidingSurfaceBW& s)
 //-----------------------------------------------------------------------------
 void FESlidingInterfaceBW::ProjectSurface(FESlidingSurfaceBW& ss, FESlidingSurfaceBW& ms, bool bupseg)
 {
-	FEMesh& mesh = m_pfem->GetMesh();
+	FEMesh& mesh = GetFEModel()->GetMesh();
 	double R = m_srad*mesh.GetBoundingBox().radius();
 
 	// initialize projection data
@@ -458,7 +458,7 @@ void FESlidingInterfaceBW::Update(int nsolve_iter)
 	static int naug = 0;
 	static int biter = 0;
 	
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 	
 	// get the iteration number
 	// we need this number to see if we can do segment updates or not
@@ -648,7 +648,7 @@ void FESlidingInterfaceBW::ContactStiffness(FESolver* psolver)
 	double N[MN*6];
 	matrix ke;
 	
-	FEModel& fem = *m_pfem;
+	FEModel& fem = *GetFEModel();
 	
 	// get the mesh
 	FEMesh* pm = m_ss.GetMesh();

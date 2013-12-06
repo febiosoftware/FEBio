@@ -737,7 +737,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_DC.clear();
 		for (int i=0; i<n; ++i) 
 		{
-			FEPrescribedBC* pdc = new FEPrescribedBC;
+			FEPrescribedBC* pdc = new FEPrescribedBC(this);
 			ar >> nid >> bactive;
 			ar >> pdc->bc >> pdc->lc >> pdc->node >> pdc->s >> pdc->br >> pdc->r; // GAA
 			pdc->SetID(nid);
@@ -750,7 +750,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_FC.clear();
 		for (int i=0; i<n; ++i)
 		{
-			FENodalForce* pfc = new FENodalForce;
+			FENodalForce* pfc = new FENodalForce(this);
 			ar >> nid >> bactive;
 			ar >> pfc->bc >> pfc->lc >> pfc->node >> pfc->s;
 			pfc->SetID(nid);
@@ -787,7 +787,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_RDC.clear();
 		for (int i=0; i<n; ++i)
 		{
-			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement;
+			FERigidBodyDisplacement* pdc = new FERigidBodyDisplacement(this);
 			ar >> nid >> bactive;
 			ar >> pdc->bc >> pdc->id >> pdc->lc >> pdc->sf;
 			pdc->SetID(nid);
@@ -800,7 +800,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_RFC.clear();
 		for (int i=0; i<n; ++i)
 		{
-			FERigidBodyForce* pfc = new FERigidBodyForce;
+			FERigidBodyForce* pfc = new FERigidBodyForce(this);
 			ar >> nid >> bactive;
 			ar >> pfc->bc >> pfc->id >> pfc->lc >> pfc->sf;
 			pfc->SetID(nid);
@@ -813,7 +813,7 @@ void FEBioModel::SerializeBoundaryData(DumpFile& ar)
 		m_RN.clear();
 		for (int i=0; i<n; ++i)
 		{
-			FERigidNode* prn = new FERigidNode;
+			FERigidNode* prn = new FERigidNode(this);
 			ar >> nid >> bactive;
 			ar >> prn->nid >> prn->rid;
 			prn->SetID(nid);
