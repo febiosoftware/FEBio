@@ -82,8 +82,6 @@ void FEPointBodyForce::Serialize(DumpFile &ar)
 //-----------------------------------------------------------------------------
 bool FEPointBodyForce::Init()
 {
-	assert(m_pfem);
-
 	if (m_inode == -1)
 	{
 		if (!m_brigid)
