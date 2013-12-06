@@ -6,6 +6,9 @@
 #ifdef WIN32
 #include <direct.h>
 #endif
+#ifdef LINUX
+#include <dlfcn.h>
+#endif
 
 //=============================================================================
 // Typedefs of the plugin functions.
