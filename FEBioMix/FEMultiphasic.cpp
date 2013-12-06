@@ -308,7 +308,7 @@ void FESolutesMaterialPoint::Serialize(DumpFile& ar)
 		ar >> m_nsol >> m_psi >> m_cF >> m_Ie >> m_nsbm;
 		for (int i=0; i<m_nsol; ++i) {
 			ar >> m_c[i] >> m_gradc[i] >> m_j[i] >> m_ca[i]
-			>> m_k[i] << m_dkdJ[i];
+			>> m_k[i] >> m_dkdJ[i];
 			for (int j=0; j<m_nsol; ++j)
 				ar >> m_dkdc[i][j];
 		}
