@@ -59,6 +59,12 @@
 #include "FEViscoElasticMaterial.h"
 #include "FEVonMisesPlasticity.h"
 #include "FEPreStrainTransIsoMR.h"
+#include "FEElasticFiberMaterial.h"
+#include "FEFiberDensityDistribution.h"
+#include "FEContinuousFiberDistribution.h"
+#include "FEFiberIntegrationGauss.h"
+#include "FEFiberIntegrationTrapezoidal.h"
+#include "FEFiberIntegrationGeodesic.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -172,12 +178,23 @@ REGISTER_FEBIO_CLASS(FERemodelingElasticMaterial    ,FEMATERIAL_ID, "remodeling 
 REGISTER_FEBIO_CLASS(FECarterHayesOld               ,FEMATERIAL_ID, "Carter-Hayes (old)"            );
 REGISTER_FEBIO_CLASS(FEActiveFiberContraction       ,FEMATERIAL_ID, "active_contraction"            );
 REGISTER_FEBIO_CLASS(FEPreStrainTransIsoMR          ,FEMATERIAL_ID, "pre-strain trans iso Mooney-Rivlin");
+REGISTER_FEBIO_CLASS(FEFiberExponentialPower        ,FEMATERIAL_ID, "fiber-exponential-power-law"   );
+REGISTER_FEBIO_CLASS(FEFiberNH                      ,FEMATERIAL_ID, "fiber-NH"                      );
+REGISTER_FEBIO_CLASS(FESphericalFiberDensityDistribution  , FEMATERIAL_ID, "spherical"   );
+REGISTER_FEBIO_CLASS(FEEllipsodialFiberDensityDistribution, FEMATERIAL_ID, "ellipsoidal" );
+REGISTER_FEBIO_CLASS(FEVonMises3DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-3d");
+REGISTER_FEBIO_CLASS(FECircularFiberDensityDistribution   , FEMATERIAL_ID, "circular"    );
+REGISTER_FEBIO_CLASS(FEEllipticalFiberDensityDistribution , FEMATERIAL_ID, "elliptical"  );
+REGISTER_FEBIO_CLASS(FEVonMises2DFiberDensityDistribution , FEMATERIAL_ID, "von-Mises-2d");
+REGISTER_FEBIO_CLASS(FEContinuousFiberDistribution        , FEMATERIAL_ID, "continuous fiber distribution");
+REGISTER_FEBIO_CLASS(FEFiberIntegrationGauss              , FEMATERIAL_ID, "fibers-3d-gauss");
+REGISTER_FEBIO_CLASS(FEFiberIntegrationTrapezoidal        , FEMATERIAL_ID, "fibers-2d-trapezoidal");
+REGISTER_FEBIO_CLASS(FEFiberIntegrationGeodesic           , FEMATERIAL_ID, "fibers-3d-geodesic");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad
 REGISTER_FEBIO_CLASS(FEPressureLoad, FESURFACELOAD_ID, "pressure");
 REGISTER_FEBIO_CLASS(FETractionLoad, FESURFACELOAD_ID, "traction");
-
 
 //-----------------------------------------------------------------------------
 // classes derived from FEBodyForce

@@ -216,6 +216,7 @@
     <ClCompile Include="..\..\FEBioMech\FECellGrowth.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FECoupledHeatSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
@@ -229,6 +230,7 @@
     <ClCompile Include="..\..\FEBioMech\FEEFDNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDUncoupled.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEEFDVerondaWestmann.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEElasticFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMixture.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEElasticMultigeneration.cpp" />
@@ -239,8 +241,13 @@
     <ClCompile Include="..\..\FEBioMech\FEExplicitSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFacet2FacetSliding.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFacet2FacetTied.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberDensityDistribution.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPow.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberExpPowUncoupled.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGauss.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationGeodesic.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationScheme.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFiberNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEFungOrthoCompressible.cpp" />
@@ -322,6 +329,7 @@
     <ClInclude Include="..\..\FEBioMech\FECellGrowth.h" />
     <ClInclude Include="..\..\FEBioMech\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
+    <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FECoupledHeatSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
@@ -336,6 +344,7 @@
     <ClInclude Include="..\..\FEBioMech\FEEFDUncoupled.h" />
     <ClInclude Include="..\..\FEBioMech\FEEFDVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticDomain.h" />
+    <ClInclude Include="..\..\FEBioMech\FEElasticFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMixture.h" />
     <ClInclude Include="..\..\FEBioMech\FEElasticMultigeneration.h" />
@@ -346,8 +355,13 @@
     <ClInclude Include="..\..\FEBioMech\FEExplicitSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FEFacet2FacetSliding.h" />
     <ClInclude Include="..\..\FEBioMech\FEFacet2FacetTied.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberDensityDistribution.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPow.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberExpPowUncoupled.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGauss.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationGeodesic.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationScheme.h" />
+    <ClInclude Include="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEFiberNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEFungOrthoCompressible.h" />
@@ -413,6 +427,7 @@
     <ClInclude Include="..\..\FEBioMech\FEVerondaWestmann.h" />
     <ClInclude Include="..\..\FEBioMech\FEViscoElasticMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEVonMisesPlasticity.h" />
+    <ClInclude Include="..\..\FEBioMech\gauss.h" />
     <ClInclude Include="..\..\FEBioMech\geodesic.h" />
     <ClInclude Include="..\..\FEBioMech\stdafx.h" />
   </ItemGroup>
