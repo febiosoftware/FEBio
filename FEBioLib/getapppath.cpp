@@ -12,6 +12,7 @@
 #include <sys/param.h>
 #include <mach-o/dyld.h>
 #include <unistd.h>
+#include <stdlib.h>
 #endif
 
 //-----------------------------------------------------------------------------
