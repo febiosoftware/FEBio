@@ -1,5 +1,6 @@
 #pragma once
 #include "FECore/FEMaterial.h"
+#include "FEBioMech/FEElasticMaterial.h"
 #include "FEBioModel.h"
 
 //-----------------------------------------------------------------------------
