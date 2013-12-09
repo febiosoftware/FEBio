@@ -31,5 +31,5 @@ private:
 	SUPER_CLASS_ID	m_sid;		//!< The super-class ID
 	const char*		m_sztype;	//!< the type string
 
-	friend FEBioFactory;
+	friend class FEBioFactory;
 };
