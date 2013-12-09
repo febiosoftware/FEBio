@@ -217,7 +217,6 @@
     <ClCompile Include="..\..\FEBioMech\FEConstBodyForce.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContactInterface.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEContinuousFiberDistribution.cpp" />
-    <ClCompile Include="..\..\FEBioMech\FECoupledHeatSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageNeoHookean.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.cpp" />
@@ -330,7 +329,6 @@
     <ClInclude Include="..\..\FEBioMech\FEConstBodyForce.h" />
     <ClInclude Include="..\..\FEBioMech\FEContactInterface.h" />
     <ClInclude Include="..\..\FEBioMech\FEContinuousFiberDistribution.h" />
-    <ClInclude Include="..\..\FEBioMech\FECoupledHeatSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageNeoHookean.h" />
     <ClInclude Include="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h" />

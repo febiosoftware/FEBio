@@ -1,7 +1,7 @@
 #pragma once
 #include "FECore/FESolver.h"
-#include "FEBioHeat/FEHeatSolver.h"
-#include "FELinearSolidSolver.h"
+#include "FEHeatSolver.h"
+#include "FEBioMech/FELinearSolidSolver.h"
 
 //-----------------------------------------------------------------------------
 //! This class implements a coupled thermo-elastic solver

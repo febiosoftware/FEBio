@@ -1,7 +1,6 @@
-#include "stdafx.h"
 #include "FECoupledHeatSolidSolver.h"
-#include "FELinearSolidDomain.h"
-#include "FELinearElastic.h"
+#include "FEBioMech/FELinearSolidDomain.h"
+#include "FEBioMech/FELinearElastic.h"
 
 //-----------------------------------------------------------------------------
 //! class constructor
