@@ -43,6 +43,11 @@ public:
 
 	//! initialize projection
 	void InitProjection();
+
+public:
+	void GetNodalContactGap     (int nface, double* pg);
+	void GetNodalContactPressure(int nface, double* pg);
+	void GetNodalContactTraction(int nface, vec3d* pt);
 	
 protected:
 	FEModel*	m_pfem;
