@@ -21,13 +21,13 @@ void FEHeatFlux::Residual(FEGlobalVector& R)
 		double g = fem.GetLoadCurve(hf.lc)->Value();
 
 		// calculate nodal fluxes
-		double qn[4];
+		double qn[FEElement::MAX_NODES];
 		for (j=0; j<el.Nodes(); ++j) qn[j] = g*hf.s[j];
 
 		vector<double> fe(ne);
 
 		// nodal coordinates
-		vec3d rt[4];
+		vec3d rt[FEElement::MAX_NODES];
 		for (j=0; j<ne; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 
 		double* Gr, *Gs;

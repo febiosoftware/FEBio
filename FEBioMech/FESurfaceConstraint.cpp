@@ -128,7 +128,7 @@ void FESurfaceConstraint::BuildMatrixProfile(FEStiffnessMatrix& K)
 	FESurfaceElement* pref = m_ss.m_pme[nref];
 
 	int n0 = pref->Nodes();
-	int nr0[4];
+	int nr0[FEElement::MAX_NODES];
 	for (int j=0; j<n0; ++j) nr0[j] = pref->m_node[j];
 
 	assign(lm, -1);

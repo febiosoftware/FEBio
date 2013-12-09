@@ -61,7 +61,7 @@ void FEFluidFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double>
 	double* w = el.GaussWeights();
 
 	// nodal coordinates and velocities
-	vec3d rt[4], vt[4];
+	vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
@@ -131,7 +131,7 @@ void FEFluidFlux::FluxStiffnessSS(FESurfaceElement& el, matrix& ke, vector<doubl
 	double* w = el.GaussWeights();
 	
 	// nodal coordinates and velocities
-	vec3d rt[4];
+	vec3d rt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
@@ -192,7 +192,7 @@ bool FEFluidFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<doub
 	int neln = el.Nodes();
 
 	// nodal coordinates and velocities
-	vec3d rt[4], vt[4];
+	vec3d rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
@@ -259,7 +259,7 @@ bool FEFluidFlux::FlowRateSS(FESurfaceElement& el, vector<double>& fe, vector<do
 	int neln = el.Nodes();
 	
 	// nodal coordinates and velocities
-	vec3d rt[4];
+	vec3d rt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_rt;
@@ -323,7 +323,7 @@ bool FEFluidFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vecto
 	FEMesh& mesh = *m_psurf->GetMesh();
 
 	// nodal coordinates and velocity
-	vec3d r0[4], rt[4], vt[4];
+	vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES], vt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;
@@ -399,7 +399,7 @@ bool FEFluidFlux::LinearFlowRateSS(FESurfaceElement& el, vector<double>& fe, vec
 	FEMesh& mesh = *m_psurf->GetMesh();
 	
 	// nodal coordinates and velocity
-	vec3d r0[4], rt[4];
+	vec3d r0[FEElement::MAX_NODES], rt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = mesh.Node(el.m_node[i]).m_r0;

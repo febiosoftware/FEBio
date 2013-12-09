@@ -359,7 +359,7 @@ void FEMesh::InitShellNormals()
 		FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&Domain(nd));
 		if (psd)
 		{
-			vec3d r0[4];
+			vec3d r0[FEElement::MAX_NODES];
 			for (int i=0; i<psd->Elements(); ++i)
 			{
 				FEShellElement& el = psd->Element(i);
@@ -637,7 +637,7 @@ double FEMesh::ShellElementVolume(FEShellElement& el)
 	int neln = el.Nodes();
 
 	// initial nodal coordinates and directors
-	vec3d r0[4], D0[4];
+	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = Node(el.m_node[i]).m_r0;

@@ -50,7 +50,7 @@ void FESoluteFlux::FluxStiffness(FESurfaceElement& el, matrix& ke, vector<double
 	double* w = el.GaussWeights();
 	
 	// get the element's nodal coordinates
-	vec3d rt[4];
+	vec3d rt[FEElement::MAX_NODES];
 	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 	
 	vec3d kab, t1, t2;
@@ -108,7 +108,7 @@ bool FESoluteFlux::FlowRate(FESurfaceElement& el, vector<double>& fe, vector<dou
 	int neln = el.Nodes();
 	
 	// get the element's nodal coordinates
-	vec3d rt[4];
+	vec3d rt[FEElement::MAX_NODES];
 	for (int j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 	
 	double* Gr, *Gs;
@@ -166,7 +166,7 @@ bool FESoluteFlux::LinearFlowRate(FESurfaceElement& el, vector<double>& fe, vect
 	int neln = el.Nodes();
 	
 	// nodal coordinates
-	vec3d r0[4];
+	vec3d r0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
 	
 	double* Gr, *Gs;

@@ -51,7 +51,7 @@ void FEPressureLoad::PressureStiffness(FESurfaceElement& el, matrix& ke, vector<
 	double* w = el.GaussWeights();
 
 	// nodal coordinates
-	vec3d rt[4];
+	vec3d rt[FEElement::MAX_NODES];
 	for (j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 
 	vec3d kab;
@@ -112,7 +112,7 @@ bool FEPressureLoad::PressureForce(FESurfaceElement& el, vector<double>& fe, vec
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d rt[4];
+	vec3d rt[FEElement::MAX_NODES];
 	for (int j=0; j<neln; ++j) rt[j] = m_psurf->GetMesh()->Node(el.m_node[j]).m_rt;
 
 	double* Gr, *Gs;
@@ -171,7 +171,7 @@ bool FEPressureLoad::LinearPressureForce(FESurfaceElement& el, vector<double>& f
 	int neln = el.Nodes();
 
 	// nodal coordinates
-	vec3d r0[4];
+	vec3d r0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i) r0[i] = m_psurf->GetMesh()->Node(el.m_node[i]).m_r0;
 
 	double* Gr, *Gs;

@@ -66,7 +66,7 @@ double FEShellDomain::defgrad(FEShellElement& el, mat3d& F, int n)
 	double za;
 
 	// current nodal coordinates and directors
-	vec3d r[4], D[4];
+	vec3d r[FEElement::MAX_NODES], D[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		r[i] = m_pMesh->Node(el.m_node[i]).m_rt;
@@ -131,7 +131,7 @@ double FEShellDomain::invjac0(FEShellElement& el, double Ji[3][3], int n)
 	int neln = el.Nodes();
 
 	// initial nodal coordinates and directors
-	vec3d r0[4], D0[4];
+	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
@@ -201,7 +201,7 @@ double FEShellDomain::invjact(FEShellElement& el, double Ji[3][3], int n)
 	int neln = el.Nodes();
 
 	// initial nodal coordinates and directors
-	vec3d rt[4], Dt[4];
+	vec3d rt[FEElement::MAX_NODES], Dt[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		rt[i] = m_pMesh->Node(el.m_node[i]).m_rt;
@@ -268,7 +268,7 @@ double FEShellDomain::detJ0(FEShellElement &el, int n)
 	int neln = el.Nodes();
 
 	// initial nodal coordinates and directors
-	vec3d r0[4], D0[4];
+	vec3d r0[FEElement::MAX_NODES], D0[FEElement::MAX_NODES];
 	for (i=0; i<neln; ++i)
 	{
 		r0[i] = m_pMesh->Node(el.m_node[i]).m_r0;
