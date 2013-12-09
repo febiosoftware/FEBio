@@ -14,7 +14,7 @@
 
 extern void InitFEBioLibrary();
 
-static Fl_Thread thread_id = -1;
+static Fl_Thread thread_id = (Fl_Thread)-1;
 
 //-----------------------------------------------------------------------------
 void LogBuffer::print(const char* sz)
@@ -210,7 +210,7 @@ void* febio_func(void* pd)
 
 	// done
 	Fl::lock();
-	thread_id = -1;
+	thread_id = (Fl_Thread)-1;
 	Fl::unlock();
 	return 0;
 }
@@ -218,7 +218,7 @@ void* febio_func(void* pd)
 //-----------------------------------------------------------------------------
 void CDocument::RunQueue()
 {
-	if (thread_id == -1)
+	if (thread_id == (Fl_Thread)-1)
 	{
 		fl_create_thread(thread_id, febio_func, (void*) FLXGetMainWnd());
 	}
