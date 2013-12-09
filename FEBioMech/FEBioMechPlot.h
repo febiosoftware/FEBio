@@ -157,3 +157,12 @@ public:
 	FEPlotFiberPreStretch(FEModel* pfem) : FEDomainData(PLT_FLOAT, FMT_ITEM) {}
 	bool Save(FEDomain& dom, vector<float>& a);
 };
+
+//-----------------------------------------------------------------------------
+//! Store shell strains
+class FEPlotShellStrain : public FEDomainData
+{
+public:
+	FEPlotShellStrain(FEModel* pfem) : FEDomainData(PLT_MAT3FS, FMT_ITEM){}
+	bool Save(FEDomain& dom, vector<float>& a);
+};

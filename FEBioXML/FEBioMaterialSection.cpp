@@ -77,6 +77,9 @@ void FEBioMaterialSection::Parse(XMLTag& tag)
 //! Parse the parameters and properties of the material.
 void FEBioMaterialSection::ParseMaterial(XMLTag &tag, FEMaterial* pmat)
 {
+	// make sure the tag is not empty
+	if (tag.isleaf()) return;
+
 	FEModel& fem = *GetFEModel();
 
 	// get the material's parameter list

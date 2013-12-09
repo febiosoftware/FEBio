@@ -232,6 +232,7 @@ REGISTER_FEBIO_CLASS(FEPlotDamage                       , FEPLOTDATA_ID, "damage
 REGISTER_FEBIO_CLASS(FEPlotMixtureVolumeFraction        , FEPLOTDATA_ID, "volume fraction"                 );
 REGISTER_FEBIO_CLASS(FEPlotUT4NodalStresses             , FEPLOTDATA_ID, "ut4 nodal stress"                );
 REGISTER_FEBIO_CLASS(FEPlotFiberPreStretch				, FEPLOTDATA_ID, "in-situ fiber stretch"           );
+REGISTER_FEBIO_CLASS(FEPlotShellStrain                  , FEPLOTDATA_ID, "shell strain"                    );
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPLOTDATA_ID, "displacement"   );

@@ -521,6 +521,40 @@ bool FEPlotUT4NodalStresses::Save(FEDomain& dom, vector<float>& a)
 	return true;
 }
 
+
+//-----------------------------------------------------------------------------
+bool FEPlotShellStrain::Save(FEDomain &dom, std::vector<float> &a)
+{
+	FEShellDomain* psd = dynamic_cast<FEShellDomain*>(&dom);
+	if (psd == 0) return false;
+	int NE = psd->Elements();
+	for (int i=0; i<NE; ++i)
+	{
+		FEShellElement& el = psd->Element(i);
+		int ni = el.Nodes();
+		mat3ds E; E.zero();
+		for (int j=0; j<ni; ++j)
+		{
+			FEElasticMaterialPoint& ptm = *(el.m_State[j + ni]->ExtractData<FEElasticMaterialPoint>());
+			FEElasticMaterialPoint& pti = *(el.m_State[j     ]->ExtractData<FEElasticMaterialPoint>());
+			FEElasticMaterialPoint& pto = *(el.m_State[j+2*ni]->ExtractData<FEElasticMaterialPoint>());
+
+			E += ptm.Strain();
+			E += pto.Strain();
+			E += pti.Strain();
+		}
+		E /= (3.0*ni);
+
+		a.push_back((float) E.xx());
+		a.push_back((float) E.yy());
+		a.push_back((float) E.zz());
+		a.push_back((float) E.xy());
+		a.push_back((float) E.yz());
+		a.push_back((float) E.xz());
+	}
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 bool FEPlotFiberPreStretch::Save(FEDomain& dom, vector<float>& a)
 {
