@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEContinuousFiberDistribution.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FECoupledHeatSolidSolver.cpp"
 				>
 			</File>
@@ -257,6 +261,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEElasticFiberMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEElasticMaterial.cpp"
 				>
 			</File>
@@ -297,11 +305,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberDensityDistribution.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberExpPow.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEFiberExpPowUncoupled.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGauss.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGeodesic.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationScheme.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.cpp"
 				>
 			</File>
 			<File
@@ -429,11 +457,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FERigid.cpp"
+				RelativePath="..\..\FEBioMech\FERigidJoint.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FERigidJoint.cpp"
+				RelativePath="..\..\FEBioMech\FERigidMaterial.cpp"
 				>
 			</File>
 			<File
@@ -627,6 +655,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEContinuousFiberDistribution.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FECoupledHeatSolidSolver.h"
 				>
 			</File>
@@ -683,6 +715,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEElasticFiberMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEElasticMaterial.h"
 				>
 			</File>
@@ -723,11 +759,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEFiberDensityDistribution.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEFiberExpPow.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEFiberExpPowUncoupled.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGauss.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationGeodesic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationScheme.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEFiberIntegrationTrapezoidal.h"
 				>
 			</File>
 			<File
@@ -855,11 +911,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FERigid.h"
+				RelativePath="..\..\FEBioMech\FERigidJoint.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FERigidJoint.h"
+				RelativePath="..\..\FEBioMech\FERigidMaterial.h"
 				>
 			</File>
 			<File
@@ -988,6 +1044,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEVonMisesPlasticity.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\gauss.h"
 				>
 			</File>
 			<File
