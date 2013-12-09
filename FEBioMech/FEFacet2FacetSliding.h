@@ -41,6 +41,11 @@ public:
 	void Serialize(DumpFile& ar);
 
 public:
+	void GetNodalContactGap     (int nface, double* gn);
+	void GetNodalContactPressure(int nface, double* pn);
+	void GetNodalContactTraction(int nface, vec3d* tn);
+
+public:
 	vector< vector<Data> >		m_Data;	//!< integration point data
 };
 

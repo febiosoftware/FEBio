@@ -7,6 +7,8 @@
 #include "FEElasticMixture.h"
 #include "FEUT4Domain.h"
 #include "FEPreStrainTransIsoMR.h"
+#include "FEBioPlot/FEBioPlotFile.h"
+#include "FECore/FEContactSurface.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -89,6 +91,83 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, vector<float>& a)
 	}
 	return true;
 }
+
+
+//=============================================================================
+//                       S U R F A C E    D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+// Plot contact gap
+bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+	if (pcs == 0) return false;
+
+	int NF = pcs->Elements();
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	double gn[MFN];
+	a.assign(MFN*NF, 0.f);
+	for (int i=0; i<NF; ++i) 
+	{
+		FESurfaceElement& f = pcs->Element(i);
+		pcs->GetNodalContactGap(i, gn);
+		int ne = f.m_lnode.size();
+		for (int j = 0; j< ne; ++j) a[MFN*i + j] = (float) gn[i];
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot contact pressure
+bool FEPlotContactPressure::Save(FESurface &surf, vector<float>& a)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+	if (pcs == 0) return false;
+
+	int NF = pcs->Elements();
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(MFN*NF, 0.f);
+	double tn[MFN];
+	for (int i=0; i<NF; ++i)
+	{
+		FESurfaceElement& el = pcs->Element(i);
+		pcs->GetNodalContactPressure(i, tn);
+		int ne = el.Nodes();
+		for (int k=0; k<ne; ++k) a[MFN*i + k] = (float) tn[k];
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Plot contact traction
+bool FEPlotContactTraction::Save(FESurface &surf, std::vector<float> &a)
+{
+	FEContactSurface* pcs = dynamic_cast<FEContactSurface*>(&surf);
+	if (pcs == 0) return false;
+
+	int NF = pcs->Elements();
+	const int MFN = FEBioPlotFile::PLT_MAX_FACET_NODES;
+	a.assign(3*MFN*NF, 0.f);
+	vec3d tn[MFN];
+	for (int j=0; j<NF; ++j)
+	{
+		FESurfaceElement& el = pcs->Element(j);
+		pcs->GetNodalContactTraction(j, tn);
+
+		// store in archive
+		int ne = el.Nodes();
+		for (int k=0; k<ne; ++k)
+		{
+			a[3*MFN*j +3*k   ] = (float) tn[k].x;
+			a[3*MFN*j +3*k +1] = (float) tn[k].y;
+			a[3*MFN*j +3*k +2] = (float) tn[k].z;
+		}
+	}
+
+	return true;
+}
+
 
 //=============================================================================
 //							D O M A I N   D A T A

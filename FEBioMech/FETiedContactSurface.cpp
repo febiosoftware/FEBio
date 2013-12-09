@@ -59,3 +59,27 @@ void FETiedContactSurface::Serialize(DumpFile &ar)
 		ar >> m_Lm;
 	}
 }
+
+//-----------------------------------------------------------------------------
+void FETiedContactSurface::GetNodalContactGap(int nface, double* gn)
+{
+	FESurfaceElement& f = Element(nface);
+	int ne = f.m_lnode.size();
+	for (int j= 0; j< ne; ++j) gn[j] = m_gap[f.m_lnode[j]].norm();
+}
+
+//-----------------------------------------------------------------------------
+void FETiedContactSurface::GetNodalContactPressure(int nface, double* pn)
+{
+	FESurfaceElement& f = Element(nface);
+	int ne = f.m_lnode.size();
+	for (int j= 0; j< ne; ++j) pn[j] = m_Lm[f.m_lnode[j]].norm();
+}
+
+//-----------------------------------------------------------------------------
+void FETiedContactSurface::GetNodalContactTraction(int nface, vec3d* tn)
+{
+	FESurfaceElement& f = Element(nface);
+	int ne = f.m_lnode.size();
+	for (int j= 0; j< ne; ++j) tn[j] = m_Lm[f.m_lnode[j]];
+}

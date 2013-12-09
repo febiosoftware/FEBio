@@ -49,6 +49,40 @@ public:
 
 
 //=============================================================================
+//                         S U R F A C E   D A T A
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+//! Contact gap
+//!
+class FEPlotContactGap : public FESurfaceData
+{
+public:
+	FEPlotContactGap(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Contact pressure
+//!
+class FEPlotContactPressure : public FESurfaceData
+{
+public:
+	FEPlotContactPressure(FEModel* pfem) : FESurfaceData(PLT_FLOAT, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Contact traction
+//!
+class FEPlotContactTraction : public FESurfaceData
+{
+public:
+	FEPlotContactTraction(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
+//=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================
 

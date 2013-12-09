@@ -13,11 +13,18 @@ class FEContactSurface : public FESurface
 {
 public:
 	//! constructor
-	FEContactSurface(FEMesh* pm=0) : FESurface(pm) { m_pSibling = 0; }
+	FEContactSurface(FEMesh* pm=0);
 
-	~FEContactSurface() { m_pSibling = 0; }
+	//! destructor
+	~FEContactSurface();
 
-	void SetSibling(FEContactSurface* ps) { m_pSibling = ps; }
+	//! Set the sibling of this contact surface
+	void SetSibling(FEContactSurface* ps);
+
+public:
+	virtual void GetNodalContactGap     (int nface, double* pg);
+	virtual void GetNodalContactPressure(int nface, double* pg);
+	virtual void GetNodalContactTraction(int nface, vec3d* pt);
 
 protected:
 	FEContactSurface* m_pSibling;

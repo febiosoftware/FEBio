@@ -304,6 +304,64 @@ void FESlidingSurface3::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FESlidingSurface3::GetNodalContactGap(int nface, double* gn)
+{
+	double gi[FEElement::MAX_INTPOINTS];
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+	for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
+	el.project_to_nodes(gi, gn);
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface3::GetNodalContactPressure(int nface, double* pn)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+	double ti[FEElement::MAX_INTPOINTS];
+	for (int k=0; k<ni; ++k) ti[k] = m_Data[nface][k].m_Ln;
+	el.project_to_nodes(ti, pn);
+}
+
+//-----------------------------------------------------------------------------
+void FESlidingSurface3::GetNodalContactTraction(int nface, vec3d* tn)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+
+	vec3d t;
+	const int MFI = FEElement::MAX_INTPOINTS;
+	double tix[MFI], tiy[MFI], tiz[MFI];
+	for (int k=0; k<ni; ++k)
+	{
+		FESlidingSurface3::Data& pt = m_Data[nface][k];
+		double gi = pt.m_gap;
+		double Li = pt.m_Ln;
+		vec3d  ti = pt.m_nu;
+		if (gi > 0) t = ti*(Li); else t = vec3d(0,0,0);
+		tix[k] = t.x; tiy[k] = t.y; tiz[k] = t.z;
+	}
+
+	// project traction to nodes
+	const int MFN = FEElement::MAX_NODES;
+	double tnx[MFN], tny[MFN], tnz[MFN];
+	el.project_to_nodes(tix, tnx);
+	el.project_to_nodes(tiy, tny);
+	el.project_to_nodes(tiz, tnz);
+
+	// store data
+	for (int k=0; k<ne; ++k)
+	{
+		tn[k].x = tnx[k];
+		tn[k].y = tny[k];
+		tn[k].z = tnz[k];
+	}
+}
+
+//-----------------------------------------------------------------------------
 // FESlidingInterface3
 //-----------------------------------------------------------------------------
 

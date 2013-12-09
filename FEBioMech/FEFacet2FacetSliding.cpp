@@ -178,6 +178,76 @@ void FEFacetSlidingSurface::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::GetNodalContactGap(int nface, double* gn)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+	double gi[FEElement::MAX_INTPOINTS];
+	for (int k=0; k<ni; ++k) gi[k] = m_Data[nface][k].m_gap;
+
+	for (int k=0; k<ni; ++k) if (gi[k] < 0) gi[k] = 0;
+	el.project_to_nodes(gi, gn);
+
+	for (int k=0; k<ne; ++k) if (gn[k] < 0) gn[k] = 0;
+}
+
+//-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::GetNodalContactPressure(int nface, double* pn)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+	double ti[FEElement::MAX_INTPOINTS];
+	for (int k=0; k<ni; ++k)
+	{
+		double L = m_Data[nface][k].m_Ln;
+		ti[k] = L;// + pf->m_epsn*gi[k];
+		ti[k] = (ti[k]>=0?ti[k] : 0);		
+	}
+
+	el.project_to_nodes(ti, pn);
+	for (int k=0; k<ni; ++k)
+		pn[k] = (pn[k]>=0?pn[k] : 0);		
+}
+
+//-----------------------------------------------------------------------------
+void FEFacetSlidingSurface::GetNodalContactTraction(int nface, vec3d* tn)
+{
+	FESurfaceElement& el = Element(nface);
+	int ne = el.Nodes();
+	int ni = el.GaussPoints();
+
+	vec3d t;
+	const int MFI = FEElement::MAX_INTPOINTS;
+	double tix[MFI], tiy[MFI], tiz[MFI];
+	for (int k=0; k<ni; ++k)
+	{
+		FEFacetSlidingSurface::Data& pt = m_Data[nface][k];
+		double gi = pt.m_gap;
+		double Li = pt.m_Ln;
+		vec3d  ti = pt.m_nu;
+		if (gi > 0) t = ti*(Li); else t = vec3d(0,0,0);
+		tix[k] = t.x; tiy[k] = t.y; tiz[k] = t.z;
+	}
+
+	// project traction to nodes
+	const int MFN = FEElement::MAX_NODES;
+	double tnx[MFN], tny[MFN], tnz[MFN];
+	el.project_to_nodes(tix, tnx);
+	el.project_to_nodes(tiy, tny);
+	el.project_to_nodes(tiz, tnz);
+
+	// store data
+	for (int k=0; k<ne; ++k)
+	{
+		tn[k].x = tnx[k];
+		tn[k].y = tny[k];
+		tn[k].z = tnz[k];
+	}
+}
+
+//-----------------------------------------------------------------------------
 // FEFacet2FacetSliding
 //-----------------------------------------------------------------------------
 

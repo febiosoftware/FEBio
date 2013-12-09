@@ -42,6 +42,11 @@ public:
 
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
 
+public:
+	void GetNodalContactGap     (int nface, double* pg);
+	void GetNodalContactPressure(int nface, double* pg);
+	void GetNodalContactTraction(int nface, vec3d* pt);
+
 protected:
 	FEModel*	m_pfem;
 
