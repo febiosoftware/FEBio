@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FESolidSolver.h"
-#include "FERigid.h"
+#include "FERigidMaterial.h"
 #include "FE3FieldElasticSolidDomain.h"
 #include "FEPointBodyForce.h"
 #include "FEPressureLoad.h"

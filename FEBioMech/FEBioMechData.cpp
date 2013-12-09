@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioMechData.h"
 #include "FEElasticMaterial.h"
-#include "FERigid.h"
+#include "FERigidMaterial.h"
 #include "FESolidSolver.h"
 #include "FECore/FERigidBody.h"
 

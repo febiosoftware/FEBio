@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FESolidDomainFactory.h"
 #include "FELinearSolidDomain.h"
-#include "FERigid.h"
+#include "FERigidMaterial.h"
 #include "FEUncoupledMaterial.h"
 #include "FEElasticSolidDomain.h"
 #include "FEElasticShellDomain.h"

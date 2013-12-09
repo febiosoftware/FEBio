@@ -44,7 +44,7 @@
 #include "FEOrthoElastic.h"
 #include "FEPerfectOsmometer.h"
 #include "FERemodelingElasticMaterial.h"
-#include "FERigid.h"
+#include "FERigidMaterial.h"
 #include "FESphericalFiberDistribution.h"
 #include "FEStVenantKirchhoff.h"
 #include "FETCNonlinearOrthotropic.h"

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEExplicitSolidSolver.h"
 #include "FEElasticSolidDomain.h"
-#include "FERigid.h"
+#include "FERigidMaterial.h"
 #include "FEPointBodyForce.h"
 #include "FEContactInterface.h"
 #include "FECore/FERigidBody.h"

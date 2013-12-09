@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "FERigid.h"
+#include "FERigidMaterial.h"
 #include "FECore/FEModel.h"
 #include "FECore/FERigidBody.h"
 
