@@ -46,6 +46,7 @@ private:
 	time_t	m_start;	//!< time at start
 	time_t	m_stop;		//!< time at last stop
 
+	bool	m_brunning;	//!< flag indicating whether start was called
 	double	m_sec;		//!< accumulated time so far in seconds
 };
 

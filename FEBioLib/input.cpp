@@ -1,16 +1,8 @@
 // input module
-
 #include "stdafx.h"
 #include "FEBioModel.h"
 #include "FEBioXML/FileImport.h"
 #include "FEBioXML/FEBioImport.h"
-#include "FEBioMech/FESlidingInterface.h"
-#include "FEBioMech/FETiedInterface.h"
-#include "FEBioMech/FERigidWallInterface.h"
-#include "FEBioMech/FEPeriodicBoundary.h"
-#include "FEBioMech/FESurfaceConstraint.h"
-#include "FEBioMech/FEFacet2FacetSliding.h"
-#include "FEBioMech/FEFacet2FacetTied.h"
 #include "FEBioMech/FERigidJoint.h"
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"

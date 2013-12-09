@@ -12,11 +12,12 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
     row_header(0);          // enable row headers (along left)
     row_resize(0);          // disable row resizing
 
-    cols(3);				// how many columns
+    cols(4);				// how many columns
     col_header(1);          // enable column headers (along top)
-    col_width(0,W-2*WIDTH);      // default width of columns
+    col_width(0,W-3*WIDTH);      // default width of columns
     col_width(1,WIDTH);      // default width of columns
-    col_width(2,WIDTH-4);      // default width of columns
+    col_width(2,WIDTH);      // default width of columns
+    col_width(3,WIDTH-4);      // default width of columns
     col_resize(0);          // enable column resizing
 
 	// the one-and-only progress bar
@@ -39,7 +40,7 @@ CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X,
 //-----------------------------------------------------------------------------
 void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y, int W, int H)
 {
-	static char* szc[] = {"Path", "File Size", "Status"};
+	static char* szc[] = {"Path", "File Size", "Status", "Run time"};
 	static char* szs[] = {"", "Modified", "Queued", "Running", "Completed", "Failed", "Cancelled"};
 
     switch ( context ) 
@@ -83,6 +84,17 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 			case 0: fl_draw(pt->GetFileName(), X+5,Y,W-5,H, FL_ALIGN_LEFT); break;
 			case 1: g = pt->FileSize() / 1024.f; sprintf(szl, "%.2f KB", g); fl_draw(szl, X+5,Y,W-10,H, FL_ALIGN_RIGHT); break;
 			case 2: fl_draw(szs[pt->GetStatus()], X+5,Y,W-5,H, FL_ALIGN_CENTER); break;
+			case 3: 
+				{
+					if ((pt->GetStatus() == CTask::COMPLETED) || (pt->GetStatus() == CTask::RUNNING))
+					{
+						char sz[32];
+						CTask::STATS& s = pt->m_stats;
+						sprintf(sz, "%d:%02d:%02d", s.nhour, s.nmin, s.nsec);
+						fl_draw(sz, X, Y, W-5, H, FL_ALIGN_RIGHT);
+					}
+				}
+				break;
 			}
 			 // Draw box border
 //			 fl_color(color()); fl_rect(X,Y,W,H);
@@ -99,9 +111,10 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 void CTaskTable::resize(int X, int Y, int W, int H)
 {
 	Fl_Table_Row::resize(X, Y, W, H);
-    col_width(0,W-2*WIDTH);      // default width of columns
-    col_width(1,WIDTH);      // default width of columns
-    col_width(2,WIDTH-4);      // default width of columns
+    col_width(0,W-3*WIDTH);      // default width of columns
+    col_width(1,WIDTH);			// default width of columns
+    col_width(2,WIDTH);			// default width of columns
+    col_width(3,WIDTH-4);      // default width of columns
 	if (m_pg->visible()) show_progress(m_nrow);
 }
 

@@ -16,6 +16,7 @@
 #include "Test.h"
 
 class CWnd;
+class FEBioModel;
 
 //-----------------------------------------------------------------------------
 class Progress
@@ -24,8 +25,15 @@ public:
 	Progress(Fl_Progress* pw);
 	void SetProgress(double f);
 
-protected:
+	Fl_Progress* GetWidget() { return m_pw; }
+
+	void SetTask(CTask* pt);
+	CTask* GetTask() { return m_pt; }
+
+public:
 	Fl_Progress*	m_pw;
+	CTask*			m_pt;
+	FEBioModel*		m_pfem;
 };
 
 //-----------------------------------------------------------------------------

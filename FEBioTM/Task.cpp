@@ -25,6 +25,8 @@ CTask::CTask()
 	// default FEBio options
 	m_bdebug = false;
 	m_nlog   = FE_PRINT_DEFAULT;
+
+	m_stats.nsec = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -240,6 +242,20 @@ void update_ui_cb(FEModel* pfem, void* pd)
 
 	// set the progress (will also update UI)
 	pp->SetProgress(f);
+
+	// update timer
+	// TODO: I'd like to replace this with an FL timer.
+	CTask* pt = pp->GetTask();
+	if (pt)
+	{
+		CTask::STATS& s = pt->m_stats;
+		pp->m_pfem->GetTotalTimer().GetTime(s.nhour, s.nmin, s.nsec);
+		Fl::lock();
+		Fl_Group* pg = pp->GetWidget()->parent()->parent();
+		if (pg) pg->redraw();
+		Fl::unlock();
+		Fl::awake((void*) 0); 
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -271,6 +287,7 @@ void CTask::Run(Progress& prg)
 
 	// setup the FE problem
 	FEBioModel fem;
+	prg.m_pfem = &fem;
 
 	// set the callback function
 	fem.AddCallback(update_ui_cb, CB_MAJOR_ITERS, &prg);
@@ -324,6 +341,9 @@ void CTask::Run(Progress& prg)
 	m_stats.niters  = 0;
 	m_stats.nrhs    = 0;
 	m_stats.nreform = 0;
+	m_stats.nhour   = 0;
+	m_stats.nmin    = 0;
+	m_stats.nsec    = 0;
 	if (bret)
 	{
 		for (int i=0; i<fem.Steps(); ++i)
@@ -334,6 +354,7 @@ void CTask::Run(Progress& prg)
 			m_stats.nrhs    += pstep->m_ntotrhs;
 			m_stats.nreform += pstep->m_ntotref;
 		}
+		fem.GetTotalTimer().GetTime(m_stats.nhour, m_stats.nmin, m_stats.nsec);
 	}
 
 	// set the final status

@@ -41,6 +41,13 @@ Progress::Progress(Fl_Progress* pw) : m_pw(pw)
 	pw->maximum(100.f); 
 	pw->minimum(0.f); 
 	pw->value(0.f); 
+	m_pt = 0;
+}
+
+//-----------------------------------------------------------------------------
+void Progress::SetTask(CTask* pt)
+{
+	m_pt = pt;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,6 +192,7 @@ void* febio_func(void* pd)
 
 			// set-up the progress tracker
 			Progress prg(pw);
+			prg.SetTask(pt);
 
 			// run the task
 			pt->Run(prg);
