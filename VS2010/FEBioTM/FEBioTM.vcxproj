@@ -169,7 +169,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(USERPROFILE)\Documents\fltk-1.3.2;$(USERPROFILE)\Documents\Flex\include;$(SolutionDir)\..;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;$(USERPROFILE)\Documents\Flex\lib;$(USERPROFILE)\Documents\fltk-1.3.2\lib;$(OutDir);$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\Intel\MKL\Current\ia32\lib;$(USERPROFILE)\Documents\Flex\lib;$(USERPROFILE)\Documents\fltk-1.3.2\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
