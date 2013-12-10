@@ -331,13 +331,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FEBioPlot\FEBioPlotFile.cpp" />
-    <ClCompile Include="..\..\FEBioPlot\LSDYNAPlotFile.cpp" />
     <ClCompile Include="..\..\FEBioPlot\PlotFile.cpp" />
     <ClCompile Include="..\..\FEBioPlot\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioPlot\FEBioPlotFile.h" />
-    <ClInclude Include="..\..\FEBioPlot\LSDYNAPlotFile.h" />
     <ClInclude Include="..\..\FEBioPlot\PlotFile.h" />
     <ClInclude Include="..\..\FEBioPlot\stdafx.h" />
     <ClInclude Include="..\..\FEBioPlot\targetver.h" />

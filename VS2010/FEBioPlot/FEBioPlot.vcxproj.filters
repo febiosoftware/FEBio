@@ -27,9 +27,6 @@
     <ClCompile Include="..\..\FEBioPlot\FEBioPlotFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FEBioPlot\LSDYNAPlotFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FEBioPlot\stdafx.h">
@@ -42,9 +39,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\FEBioPlot\FEBioPlotFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\FEBioPlot\LSDYNAPlotFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

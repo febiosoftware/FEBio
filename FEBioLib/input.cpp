@@ -7,7 +7,6 @@
 #include "FEBioMix/FEBiphasicSolver.h"
 #include "FEBioMix/FEBiphasicSoluteSolver.h"
 #include "FEBioMix/FEMultiphasicSolver.h"
-#include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/FERigidBody.h"
 #include "FECore/log.h"
@@ -188,51 +187,6 @@ void echo_input(FEBioModel& fem)
 	}
 
 	PlotFile* pplt = fem.GetPlotFile();
-	if (dynamic_cast<LSDYNAPlotFile*>(pplt))
-	{
-		LSDYNAPlotFile& plt = *dynamic_cast<LSDYNAPlotFile*>(pplt);
-
-		felog.printf("\tplotfile format ........................... : LSDYNA\n");
-		felog.printf("\tshell strains included .................... : %s\n", (plt.m_bsstrn? "Yes" : "No"));
-
-		felog.printf("\tplot file field data:\n");
-		felog.printf("\t\tdisplacement ...................... : ");
-		switch (plt.m_nfield[0])
-		{
-		case PLOT_DISPLACEMENT: felog.printf("displacement\n"); break;
-		default: felog.printf("???\n");
-		}
-		felog.printf("\t\tvelocity .......................... : ");
-		switch (plt.m_nfield[1])
-		{
-		case PLOT_NONE            : felog.printf("none\n"); break;
-		case PLOT_VELOCITY        : felog.printf("velocity\n"); break;
-		case PLOT_FLUID_FLUX      : felog.printf("fluid flux\n"); break;
-		case PLOT_CONTACT_TRACTION: felog.printf("contact traction\n"); break;
-		case PLOT_REACTION_FORCE  : felog.printf("reaction force\n"); break;
-		default: felog.printf("???\n");
-		}
-		felog.printf("\t\tacceleration ...................... : ");
-		switch (plt.m_nfield[2])
-		{
-		case PLOT_NONE            : felog.printf("none\n"); break;
-		case PLOT_ACCELERATION    : felog.printf("acceleration\n"); break;
-		case PLOT_FLUID_FLUX      : felog.printf("fluid flux\n"); break;
-		case PLOT_CONTACT_TRACTION: felog.printf("contact traction\n"); break;
-		case PLOT_REACTION_FORCE  : felog.printf("reaction force\n"); break;
-		default: felog.printf("???\n");
-		}
-		felog.printf("\t\ttemperature........................ : ");
-		switch (plt.m_nfield[3])
-		{
-		case PLOT_NONE            : felog.printf("none\n"); break;
-		case PLOT_FLUID_PRESSURE  : felog.printf("fluid pressure\n"); break;
-		case PLOT_CONTACT_PRESSURE: felog.printf("contact pressure\n"); break;
-		case PLOT_CONTACT_GAP     : felog.printf("contact gap\n"); break;
-		default: felog.printf("???\n");
-		}
-	}
-
 	if (dynamic_cast<FEBioPlotFile*>(pplt))
 	{
 		FEBioPlotFile* pf = dynamic_cast<FEBioPlotFile*>(pplt);

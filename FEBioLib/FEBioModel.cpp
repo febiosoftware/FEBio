@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FEBioModel.h"
-#include "FEBioPlot/LSDYNAPlotFile.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FEBioXML/FEBioImport.h"
 #include "FEBioXML/FERestartImport.h"
@@ -872,18 +871,9 @@ void FEBioModel::SerializeIOData(DumpFile &ar)
 
 		// plot file
 		int npltfmt = 0;
-		if (dynamic_cast<LSDYNAPlotFile*>(m_plot)) npltfmt = 1;
-		else if (dynamic_cast<FEBioPlotFile*>(m_plot)) npltfmt = 2;
+		if (dynamic_cast<FEBioPlotFile*>(m_plot)) npltfmt = 2;
 		assert(npltfmt != 0);
 		ar << npltfmt;
-
-		if (npltfmt == 1)
-		{
-			LSDYNAPlotFile* plt = dynamic_cast<LSDYNAPlotFile*>(m_plot);
-
-			int* n = plt->m_nfield;
-			ar << n[0] << n[1] << n[2] << n[3] << n[4];
-		}
 
 		// data records
 		SerializeDataStore(ar);
@@ -905,24 +895,6 @@ void FEBioModel::SerializeIOData(DumpFile &ar)
 
 		switch (npltfmt)
 		{
-		case 1:
-			{
-				// Open the plot file for appending
-				// TODO: We need a better way to create a plotfile
-				//		 what if the user created a different output format?
-				LSDYNAPlotFile* plt = new LSDYNAPlotFile;
-				m_plot = plt;
-				if (m_plot->Append(*this, m_szplot) == false)
-				{
-					printf("FATAL ERROR: Failed reopening plot database %s\n", m_szplot);
-					throw "FATAL ERROR";
-				}
-
-				// plot file
-				int* n = plt->m_nfield;
-				ar >> n[0] >> n[1] >> n[2] >> n[3] >> n[4];
-			}
-			break;
 		case 2:
 			{
 				m_plot = new FEBioPlotFile(*this);
