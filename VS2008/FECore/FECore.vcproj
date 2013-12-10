@@ -264,6 +264,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEContactSurface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FECoordSysMap.cpp"
 				>
 			</File>
@@ -535,6 +539,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEClosestPointProjection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEContactSurface.h"
 				>
 			</File>
 			<File

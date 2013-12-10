@@ -209,7 +209,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FECoupledHeatSolidSolver.cpp"
+				RelativePath="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.cpp"
 				>
 			</File>
 			<File
@@ -659,7 +663,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FECoupledHeatSolidSolver.h"
+				RelativePath="..\..\FEBioMech\FECoupledTransIsoMooneyRivlin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FECoupledTransIsoVerondaWestmann.h"
 				>
 			</File>
 			<File

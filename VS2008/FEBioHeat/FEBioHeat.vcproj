@@ -157,6 +157,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioHeat\FECoupledHeatSolidSolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioHeat\FEHeatDomainFactory.cpp"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioHeat\FEConvectiveHeatFlux.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioHeat\FECoupledHeatSolidSolver.h"
 				>
 			</File>
 			<File
