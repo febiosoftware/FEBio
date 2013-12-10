@@ -89,11 +89,11 @@ public:	// --- M E N U   H A N D L E R S ---
 	void OnSelectTab (Fl_Widget* pw, void* pd);
 	void OnChangeText(Fl_Widget* pw, void* pd);
 
+	void SelectFile();
+
 protected:
 	// handle events
 	int handle(int nevent);	
-
-	void SelectFile();
 
 protected:
 	CDocument*	m_pDoc;	//!< pointer to document

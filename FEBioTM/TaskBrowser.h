@@ -19,15 +19,22 @@ public:
 
 	void resize(int X, int Y, int W, int H);
 
+	int handle(int nevent);
+
 	void show_progress(int nrow);
 	void hide_progress();
 
 	Fl_Progress* GetProgressBar() { return m_pg; }
 
+public:
+	void SelectNext();
+	void SelectPrev();
+
 protected:
 	CWnd*	m_pWnd;
 	Fl_Progress*	m_pg;
 	int				m_nrow; // row where progress bar is visible
+	int				m_nfocus;	// row that has focus
 };
 
 //-----------------------------------------------------------------------------

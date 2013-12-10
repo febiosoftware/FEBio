@@ -7,6 +7,7 @@
 CTaskTable::CTaskTable(int X, int Y, int W, int H, CWnd* pwnd) : Fl_Table_Row(X, Y, W, H), m_pWnd(pwnd)
 {
 	m_pg = 0;
+	m_nfocus = -1;
 
     rows(0);				// how many rows
     row_header(0);          // enable row headers (along left)
@@ -75,6 +76,18 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 			 fl_push_clip(X,Y,W,H);
 			 // Draw cell bg
 			 fl_color((b?selection_color():FL_WHITE)); fl_rectf(X,Y,W,H);
+
+			 if (b && (Fl::focus() == this) && (m_nfocus == ROW))
+			 {
+				 fl_color(FL_BLACK);
+				 fl_line_style(FL_DOT);
+				 fl_line(X,Y,X+W,Y);
+				 fl_line(X,Y+H-1,X+W,Y+H-1);
+				 if (COL == 0) fl_line(X,Y,X,Y+H);
+				 if (COL == 3) fl_line(X+W-1,Y,X+W-1,Y+H);
+				 fl_line_style(0);
+			 }
+
 			 // Draw cell data
 			 fl_color(FL_GRAY0); 
 			 char szl[256] = {0};
@@ -108,6 +121,85 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 		 return;
     }
 }
+
+//-----------------------------------------------------------------------------
+void CTaskTable::SelectNext()
+{
+	// find a selected row
+	for (int i=0; i<rows(); ++i)
+	{
+		if (row_selected(i) == 1)
+		{
+			if (i != rows()-1)
+			{
+				select_all_rows(0);
+				select_row(i+1);
+				m_nfocus = i+1;
+			}
+			break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+void CTaskTable::SelectPrev()
+{
+	// find a selected row
+	for (int i=0; i<rows(); ++i)
+	{
+		if (row_selected(i) == 1)
+		{
+			if (i != 0)
+			{
+				select_all_rows(0);
+				select_row(i-1);
+				m_nfocus = i-1;
+			}
+			break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+int CTaskTable::handle(int nevent)
+{
+	switch (nevent)
+	{
+	case FL_FOCUS: 
+		{
+			for (int i=0; i<rows(); ++i)
+			{
+				if (row_selected(i)) { m_nfocus = i; break; }
+			}
+
+			return 1;
+		}
+	case FL_UNFOCUS: redraw(); return 1;
+	case FL_PUSH:
+		{
+			Fl::focus(this);
+		}
+		break;
+	case FL_KEYDOWN:
+		{
+			if (Fl::event_key() == FL_Up)
+			{
+				SelectPrev();
+				m_pWnd->SelectFile();
+				return 1;
+			}
+			if (Fl::event_key() == FL_Down)
+			{
+				SelectNext();
+				m_pWnd->SelectFile();
+				return 1;
+			}
+		}
+		break;
+	}
+	return Fl_Table_Row::handle(nevent);
+}
+
 
 //-----------------------------------------------------------------------------
 
