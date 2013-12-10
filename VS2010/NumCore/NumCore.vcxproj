@@ -138,8 +138,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)d</TargetName>
-    <IncludePath>$(SolutionDir)\..;C:\Program Files\Intel\MKL\10.1.1.022\include</IncludePath>
-    <LibraryPath />
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;C:\Program Files\Intel\MKL\10.1.1.022\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <TargetName>$(ProjectName)d</TargetName>
@@ -159,8 +158,7 @@
     <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)\..;C:\Program Files\Intel\MKL\Current\include;$(IncludePath)</IncludePath>
-    <LibraryPath />
+    <IncludePath>$(SolutionDir)\..;C:\Program Files\Intel\MKL\10.1.1.022\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>

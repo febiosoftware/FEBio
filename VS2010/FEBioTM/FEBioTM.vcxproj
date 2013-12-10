@@ -138,8 +138,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\..;$(USERPROFILE)\Documents\Flex\include;$(USERPROFILE)\Documents\fltk-1.3.2</IncludePath>
-    <LibraryPath>$(USERPROFILE)\Documents\fltk-1.3.2\lib;$(USERPROFILE)\Documents\Flex\lib;C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;$(OutDir)</LibraryPath>
+    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;C:\Users\Steve\Documents\Flex\include;C:\Users\Steve\Documents\fltk-1.3.2;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Steve\Documents\fltk-1.3.2\lib;C:\Users\Steve\Documents\Flex\lib;C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug - MTd|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -169,7 +169,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(USERPROFILE)\Documents\fltk-1.3.2;$(USERPROFILE)\Documents\Flex\include;$(SolutionDir)\..;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Intel\MKL\Current\ia32\lib;$(USERPROFILE)\Documents\Flex\lib;$(USERPROFILE)\Documents\fltk-1.3.2\lib;$(OutDir);$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\Intel\MKL\10.1.1.022\ia32\lib;$(USERPROFILE)\Documents\Flex\lib;$(USERPROFILE)\Documents\fltk-1.3.2\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
