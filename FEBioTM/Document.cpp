@@ -224,11 +224,30 @@ void* febio_func(void* pd)
 }
 
 //-----------------------------------------------------------------------------
+void timer_cb(void* pd)
+{
+	CDocument* pdoc = (CDocument*) pd;
+	pdoc->OnTimer();
+}
+
+//-----------------------------------------------------------------------------
+void CDocument::OnTimer()
+{
+	CTask* ptask = CTask::GetRunningTask();
+	if (ptask) ptask->UpdateRunTime();
+	FLXGetMainWnd()->GetTaskBrowser()->redraw();
+	if (thread_id != (Fl_Thread) -1) Fl::repeat_timeout(0.5, timer_cb, this);
+}
+
+//-----------------------------------------------------------------------------
 void CDocument::RunQueue()
 {
 	if (thread_id == (Fl_Thread)-1)
 	{
 		fl_create_thread(thread_id, febio_func, (void*) FLXGetMainWnd());
+
+		// start the timer
+		Fl::add_timeout(0.5, timer_cb, this);
 	}
 }
 

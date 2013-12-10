@@ -26,7 +26,11 @@ CTask::CTask()
 	m_bdebug = false;
 	m_nlog   = FE_PRINT_DEFAULT;
 
+	m_stats.nhour = 0;
+	m_stats.nmin = 0;
 	m_stats.nsec = 0;
+
+	m_ptime = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -242,20 +246,12 @@ void update_ui_cb(FEModel* pfem, void* pd)
 
 	// set the progress (will also update UI)
 	pp->SetProgress(f);
+}
 
-	// update timer
-	// TODO: I'd like to replace this with an FL timer.
-	CTask* pt = pp->GetTask();
-	if (pt)
-	{
-		CTask::STATS& s = pt->m_stats;
-		pp->m_pfem->GetTotalTimer().GetTime(s.nhour, s.nmin, s.nsec);
-		Fl::lock();
-		Fl_Group* pg = pp->GetWidget()->parent()->parent();
-		if (pg) pg->redraw();
-		Fl::unlock();
-		Fl::awake((void*) 0); 
-	}
+//-----------------------------------------------------------------------------
+void CTask::UpdateRunTime()
+{
+	if (m_ptime) m_ptime->GetTime(m_stats.nhour, m_stats.nmin, m_stats.nsec);
 }
 
 //-----------------------------------------------------------------------------
@@ -303,6 +299,20 @@ void CTask::Run(Progress& prg)
 	sprintf(szfile, "%s.dmp", szbase); fem.SetDumpFilename(szfile);
 	fem.SetInputFilename(GetFileName());
 
+	// reset the stats
+	m_stats.ntime   = 0;
+	m_stats.niters  = 0;
+	m_stats.nrhs    = 0;
+	m_stats.nreform = 0;
+	m_stats.nhour   = 0;
+	m_stats.nmin    = 0;
+	m_stats.nsec    = 0;
+
+	// start a timer
+	Timer timer;
+	timer.start();
+	m_ptime = &timer;
+
 	// set command line options
 	if (m_bdebug) fem.SetDebugFlag(true);
 
@@ -311,6 +321,7 @@ void CTask::Run(Progress& prg)
 	{
 		SetStatus(CTask::FAILED);
 		m_prun = 0;
+		m_ptime = 0;
 		return;
 	}
 
@@ -319,6 +330,7 @@ void CTask::Run(Progress& prg)
 	{
 		SetStatus(CTask::FAILED);
 		m_prun = 0;
+		m_ptime = 0;
 		return;
 	}
 
@@ -335,15 +347,12 @@ void CTask::Run(Progress& prg)
 	// close the log file
 	felog.close();
 
+	// stop timer
+	timer.stop();
+	timer.GetTime(m_stats.nhour, m_stats.nmin, m_stats.nsec);
+
 	// collect the stats
 	m_stats.nreturn = (bret? 1 : 0);
-	m_stats.ntime   = 0;
-	m_stats.niters  = 0;
-	m_stats.nrhs    = 0;
-	m_stats.nreform = 0;
-	m_stats.nhour   = 0;
-	m_stats.nmin    = 0;
-	m_stats.nsec    = 0;
 	if (bret)
 	{
 		for (int i=0; i<fem.Steps(); ++i)
@@ -354,7 +363,6 @@ void CTask::Run(Progress& prg)
 			m_stats.nrhs    += pstep->m_ntotrhs;
 			m_stats.nreform += pstep->m_ntotref;
 		}
-		fem.GetTotalTimer().GetTime(m_stats.nhour, m_stats.nmin, m_stats.nsec);
 	}
 
 	// set the final status
@@ -364,4 +372,5 @@ void CTask::Run(Progress& prg)
 
 	// reset running task
 	m_prun = 0;
+	m_ptime = 0;
 }

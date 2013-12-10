@@ -80,6 +80,9 @@ public:
 	// get the active test
 	CTest* GetActiveTest() { return m_ptest; }
 
+public:
+	void OnTimer();
+
 protected:
 	void RunQueue();
 

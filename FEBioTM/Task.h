@@ -2,6 +2,7 @@
 #include <FL/Fl_Text_Display.H>
 
 class Progress;
+class Timer;
 
 //-----------------------------------------------------------------------------
 // The task defines a problem to be run with FEBio. It has several states:
@@ -79,6 +80,8 @@ public:
 	void Run(Progress& prg);
 	static CTask* GetRunningTask() { return m_prun; }
 
+	void UpdateRunTime();
+
 public:
 	void UpdateStyle(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText);
 
@@ -93,6 +96,7 @@ public: // FEBio command line and control options
 	int		m_nlog;		//!< log level
 
 	STATS	m_stats;	//!< the stats
+	Timer*	m_ptime;
 
 private:
 	static CTask*	m_prun;	// this is the task that is running

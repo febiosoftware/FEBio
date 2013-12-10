@@ -86,7 +86,10 @@ void CTaskTable::draw_cell(TableContext context, int ROW, int COL, int X, int Y,
 			case 2: fl_draw(szs[pt->GetStatus()], X+5,Y,W-5,H, FL_ALIGN_CENTER); break;
 			case 3: 
 				{
-					if ((pt->GetStatus() == CTask::COMPLETED) || (pt->GetStatus() == CTask::RUNNING))
+					int nstatus = pt->GetStatus();
+					if ((nstatus == CTask::COMPLETED) || 
+						(nstatus == CTask::RUNNING  ) ||
+						(nstatus == CTask::CANCELLED))
 					{
 						char sz[32];
 						CTask::STATS& s = pt->m_stats;
