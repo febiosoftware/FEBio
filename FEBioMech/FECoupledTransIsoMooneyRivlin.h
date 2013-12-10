@@ -27,7 +27,7 @@ public:
 
 private:
 	//! calculate deviatoric stress at material point
-	virtual virtual virtual virtual mat3ds Stress(FEMaterialPoint& pt);
+	virtual mat3ds Stress(FEMaterialPoint& pt);
 
 	//! calculate deviatoric tangent stiffness at material point
 public:
