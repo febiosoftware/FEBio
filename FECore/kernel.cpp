@@ -33,12 +33,14 @@ void* FEBioKernel::Create(SUPER_CLASS_ID id, const char* sztype, FEModel* pfem)
 		}
 	}
 
+#ifdef _DEBUG
 	fprintf(stderr, "Unable to create class\n. These are the possible values:\n");
 	for (pf=m_Fac.begin(); pf!=m_Fac.end(); ++pf)
 	  {
 	    FEBioFactory* pfac = *pf;
 	    if (pfac->GetSuperClassID() == id) fprintf(stderr, "%s\n", pfac->GetTypeStr());
 	  }
+#endif
 
 	return 0;
 }

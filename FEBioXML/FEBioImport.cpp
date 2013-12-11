@@ -40,6 +40,19 @@ FEBioFileSectionMap::~FEBioFileSectionMap()
 	clear();
 }
 
+//-----------------------------------------------------------------------------
+FEFEBioImport::FEPlotVariable::FEPlotVariable(const FEFEBioImport::FEPlotVariable& pv)
+{
+	strcpy(m_szvar, pv.m_szvar);
+	m_item = pv.m_item;
+}
+
+FEFEBioImport::FEPlotVariable::FEPlotVariable(const char* szvar, vector<int>& item)
+{
+	strcpy(m_szvar, szvar);
+	m_item = item;
+}
+
 //=============================================================================
 //  The FEBioImport class imports an XML formatted FEBio input file.
 //  The actual file is parsed using the XMLReader class.
@@ -56,9 +69,6 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	// keep a pointer to the mesh
 	m_pMesh = &fem.GetMesh();
 
-	// reset plot file pointer
-	m_plot = 0;
-
 	// intialize some variables
 	m_pStep = 0;	// zero step pointer
 	m_nsteps = 0;	// reset step section counter
@@ -67,6 +77,10 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 	m_szdmp[0] = 0;
 	m_szlog[0] = 0;
 	m_szplt[0] = 0;
+
+	// plot output
+	m_szplot_type[0] = 0;
+	m_plot.clear();
 
 	// default element type
 	m_ntet4  = FE_TET4G1;
@@ -416,4 +430,11 @@ void FEFEBioImport::ReadList(XMLTag& tag, vector<int>& l)
 		if (ch) sz = ch+1;
 	}
 	while (ch != 0);
+}
+
+//-----------------------------------------------------------------------------
+void FEFEBioImport::AddPlotVariable(const char* szvar, vector<int>& item)
+{
+	FEPlotVariable var(szvar, item);
+	m_plot.push_back(var);
 }

@@ -1,10 +1,8 @@
 #pragma once
-
 #include "FileImport.h"
 #include "XMLReader.h"
 #include "FECore/FEAnalysis.h"
 #include "FECore/FESolver.h"
-#include "FEBioPlot/PlotFile.h"
 #include <map>
 #include <string>
 using namespace std;
@@ -62,6 +60,18 @@ public:
 	class DuplicateMaterialSection {};
 
 public:
+	class FEPlotVariable
+	{
+	public:
+		FEPlotVariable(const char* szvar, vector<int>& item);
+		FEPlotVariable(const FEPlotVariable& pv);
+
+	public:
+		char		m_szvar[32];	//!< name of output variable
+		vector<int>	m_item;			//!< (optional) list of items
+	};
+
+public:
 	//! Load the model data from file.
 	bool Load(FEModel& fem, const char* szfile);
 
@@ -83,6 +93,8 @@ public:
 	void SetLogfileName (const char* sz) { sprintf(m_szlog, sz); }
 	void SetPlotfileName(const char* sz) { sprintf(m_szplt, sz); }
 
+	void AddPlotVariable(const char* szvar, vector<int>& item);
+
 protected:
 	void ParseVersion			(XMLTag& tag);
 
@@ -96,7 +108,9 @@ public:
 	char	m_szlog[256];
 	char	m_szplt[256];
 
-	PlotFile*	m_plot;
+public:
+	char					m_szplot_type[256];
+	vector<FEPlotVariable>	m_plot;
 
 public:
 	int m_nsteps;		//!< nr of step sections read

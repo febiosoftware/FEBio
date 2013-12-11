@@ -168,7 +168,34 @@ bool FEBioModel::Input(const char* szfile)
 	if (fim.m_szplt[0]) SetPlotFilename(fim.m_szplt);
 
 	// set the plot file
-	m_plot = fim.m_plot;
+	FEBioPlotFile* pplt = new FEBioPlotFile(*this);
+	m_plot = pplt;
+
+	// define the plot file variables
+	FEMesh& mesh = GetMesh();
+	int NP = (int) fim.m_plot.size();
+	for (int i=0; i<NP; ++i)
+	{
+		FEFEBioImport::FEPlotVariable& var = fim.m_plot[i];
+
+		vector<int> item = var.m_item;
+		if (item.empty() == false)
+		{
+			// TODO: currently, this is only supported for domain variables, where
+			//       the list is a list of materials
+			vector<int> lmat = var.m_item;
+
+			// convert the material list to a domain list
+			mesh.DomainListFromMaterial(lmat, item);
+		}
+
+		// add the plot output variable
+		if (pplt->AddVariable(var.m_szvar, item) == false) 
+		{
+			felog.printf("FATAL ERROR: Output variable \"%s\" is not defined\n", var.m_szvar);
+			return false;
+		}
+	}
 
 	// we're done reading
 	return true;

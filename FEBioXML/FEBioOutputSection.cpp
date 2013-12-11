@@ -3,7 +3,7 @@
 #include "FECore/NodeDataRecord.h"
 #include "FECore/ElementDataRecord.h"
 #include "FECore/ObjectDataRecord.h"
-#include "FEBioPlot/FEBioPlotFile.h"
+#include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
 void FEBioOutputSection::Parse(XMLTag& tag)
@@ -143,51 +143,40 @@ void FEBioOutputSection::ParseLogfile(XMLTag &tag)
 void FEBioOutputSection::ParsePlotfile(XMLTag &tag)
 {
 	FEModel& fem = *GetFEModel();
-	FEMesh& mesh = fem.GetMesh();
 
-	PlotFile* pplt = 0;
+	// get the plot file type. Must be "febio"!
 	const char* sz = tag.AttributeValue("type", true);
 	if (sz)
 	{
-		if (strcmp(sz, "febio") == 0) pplt = new FEBioPlotFile(fem);
-		else throw XMLReader::InvalidAttributeValue(tag, "type", sz);
+		if (strcmp(sz, "febio") != 0) throw XMLReader::InvalidAttributeValue(tag, "type", sz);
 	}
-	else pplt = new FEBioPlotFile(fem);
-	m_pim->m_plot = pplt;
+	else sz = "febio";
+	strcpy(m_pim->m_szplot_type, sz);
 
+	// get the optional plot file name
 	const char* szplt = tag.AttributeValue("file", true);
 	if (szplt) m_pim->SetPlotfileName(szplt);
 
-	if (dynamic_cast<FEBioPlotFile*>(pplt))
+	// read and store the plot variables
+	if (!tag.isleaf())
 	{
-		if (!tag.isleaf())
+		++tag;
+		do
 		{
-			FEBioPlotFile& plt = *dynamic_cast<FEBioPlotFile*>(pplt);
-			++tag;
-			do
+			if (tag == "var")
 			{
-				if (tag == "var")
-				{
-					// get the variable name
-					const char* szt = tag.AttributeValue("type");
+				// get the variable name
+				const char* szt = tag.AttributeValue("type");
 
-					// get the item list
-					vector<int> item;
-					if (tag.isempty() == false)
-					{
-						// TODO: currently, this is only supported for domain variables, where
-						//       the list is a list of materials
-						vector<int> lmat;
-						tag.value(lmat);
-						// convert the material list to a domain list
-						mesh.DomainListFromMaterial(lmat, item);
-					}
+				// get the item list
+				vector<int> item;
+				if (tag.isempty() == false) tag.value(item);
 
-					if (plt.AddVariable(szt, item) == false) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
-				}
-				++tag;
+				// Add the plot variable
+				m_pim->AddPlotVariable(szt, item);
 			}
-			while (!tag.isend());
+			++tag;
 		}
+		while (!tag.isend());
 	}
 }
