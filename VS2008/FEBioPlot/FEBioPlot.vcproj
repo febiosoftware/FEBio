@@ -153,10 +153,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioPlot\LSDYNAPlotFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioPlot\PlotFile.cpp"
 				>
 			</File>
@@ -172,10 +168,6 @@
 			>
 			<File
 				RelativePath="..\..\FEBioPlot\FEBioPlotFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioPlot\LSDYNAPlotFile.h"
 				>
 			</File>
 			<File

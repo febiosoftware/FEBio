@@ -218,10 +218,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioLib\FEMicroMaterial.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioLib\getapppath.cpp"
 				>
 			</File>
@@ -257,10 +253,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioLib\FEBox.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioLib\FEMicroMaterial.h"
 				>
 			</File>
 			<File

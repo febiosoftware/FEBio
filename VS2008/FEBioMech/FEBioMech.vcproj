@@ -397,6 +397,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FEMicroMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEMooneyRivlin.cpp"
 				>
 			</File>
@@ -852,6 +856,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FELinearTransIso.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FEMicroMaterial.h"
 				>
 			</File>
 			<File
