@@ -158,8 +158,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Steve\Documents\Visual Studio 2010\Projects\FEBio2;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\steve\Documents\Visual Studio 2010\Projects\FEBio2\VS2010\Debug OpenMP;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OpenMP|x64'">
     <LinkIncremental>true</LinkIncremental>
