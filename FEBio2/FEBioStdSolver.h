@@ -12,6 +12,9 @@ public:
 
 	//! Run the FE model
 	virtual bool Run(const char* szfile);
+
+private:
+
 };
 
 //-----------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include "FEBioMech/FESolidSolver.h"
 #include "FEBioMech/FEElasticSolidDomain.h"
 #include "FECore/FEAnalysis.h"
+#include "FEBioXML/FEBioImport.h"
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FEMicroMaterial, FEElasticMaterial)
@@ -29,7 +30,8 @@ void FEMicroMaterial::Init()
 	// try to load the RVE model
 	if (m_brve == false)
 	{
-		if (m_rve.Input(m_szrve) == false)
+		FEFEBioImport fim;
+		if (fim.Load(m_rve, m_szrve) == false)
 		{
 			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 		}

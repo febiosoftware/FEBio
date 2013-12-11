@@ -264,6 +264,7 @@
     <ClCompile Include="..\..\FEBioMech\FELinearSolidDomain.cpp" />
     <ClCompile Include="..\..\FEBioMech\FELinearSolidSolver.cpp" />
     <ClCompile Include="..\..\FEBioMech\FELinearTransIso.cpp" />
+    <ClCompile Include="..\..\FEBioMech\FEMicroMaterial.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMooneyRivlin.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMRVonMisesFibers.cpp" />
     <ClCompile Include="..\..\FEBioMech\FEMuscleMaterial.cpp" />
@@ -379,6 +380,7 @@
     <ClInclude Include="..\..\FEBioMech\FELinearSolidDomain.h" />
     <ClInclude Include="..\..\FEBioMech\FELinearSolidSolver.h" />
     <ClInclude Include="..\..\FEBioMech\FELinearTransIso.h" />
+    <ClInclude Include="..\..\FEBioMech\FEMicroMaterial.h" />
     <ClInclude Include="..\..\FEBioMech\FEMooneyRivlin.h" />
     <ClInclude Include="..\..\FEBioMech\FEMRVonMisesFibers.h" />
     <ClInclude Include="..\..\FEBioMech\FEMuscleMaterial.h" />

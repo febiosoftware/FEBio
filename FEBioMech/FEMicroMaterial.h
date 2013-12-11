@@ -1,7 +1,7 @@
 #pragma once
+#include "FEElasticMaterial.h"
+#include "FECore/FEModel.h"
 #include "FECore/FEMaterial.h"
-#include "FEBioMech/FEElasticMaterial.h"
-#include "FEBioModel.h"
 
 //-----------------------------------------------------------------------------
 //! The micro-material implements material homogenization. The stress and tangents
@@ -18,7 +18,7 @@ public:
 	char	m_szrve[256];	//!< filename for RVE file
 
 protected:
-	FEBioModel	m_rve;	//!< the RVE (Representive Volume Element)
+	FEModel		m_rve;	//!< the RVE (Representive Volume Element)
 	bool		m_brve;	//!< flag indicating whether RVE was read in
 	double		m_V0;	//!< initial volume of RVE
 

@@ -378,27 +378,9 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	ch = strrchr(szbase, '.');
 	if (ch) *ch = 0;
 
-	char* szext = (ch?ch+1:0);
-
-	strcpy(szpath, ops.szfile);
-	ch = strrchr(szpath, '/');
-	if (ch == 0) ch = strrchr(szpath, '\\');
-	if (ch) *(ch+1) = 0; else szpath[0] = 0;
-
-	if (szext && ((strcmp(szext, "feb")==0) ||
-				  (strcmp(szext, "xml")==0) ||
-				  (strcmp(szext, "XML")==0)))
-	{
-		if (!blog) sprintf(ops.szlog, "%s.log", szbase);
-		if (!bplt) sprintf(ops.szplt, "%s.plt", szbase);
-		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
-	}
-	else
-	{
-		if (!blog) sprintf(ops.szlog, "%sf3log.txt", szpath);
-		if (!bplt) sprintf(ops.szplt, "%sf3plot"   , szpath);
-		if (!bdmp) sprintf(ops.szdmp, "%sf3dmp"    , szpath);
-	}
+	if (!blog) sprintf(ops.szlog, "%s.log", szbase);
+	if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
+	if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
 
 	return brun;
 }

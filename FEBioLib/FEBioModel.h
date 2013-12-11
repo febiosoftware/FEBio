@@ -17,9 +17,6 @@ public:
 	//! constructor
 	FEBioModel();
 
-	//! input data from file
-	bool Input(const char* szfile);
-
 	//! Initializes data structures
 	bool Init();
 
@@ -29,7 +26,11 @@ public:
 	//! Solves the problem
 	bool Solve();
 
-public: // --- virtual I/O functions ---
+public: // --- I/O functions ---
+
+	//! input data from file
+	bool Input(const char* szfile);
+
 	//! write to plot file
 	void Write();
 
@@ -72,9 +73,6 @@ public: // --- I/O functions ---
 	void SetLogFilename  (const char* szfile);
 	void SetPlotFilename (const char* szfile);
 	void SetDumpFilename (const char* szfile);
-
-	//! Set the extension of the plot file
-	void SetPlotFileNameExtension(const char* szext);
 
 	//! Get the I/O file names
 	const char* GetInputFileName();

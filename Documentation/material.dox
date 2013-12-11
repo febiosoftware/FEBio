@@ -52,9 +52,6 @@ class FENeoHookean : public FEElasticMaterial
  		// class initialization (optional)
  		virtual void Init();
  
- 		// declare as a registered class
- 		DECLARE_REGISTERED(FENeoHookean);
- 
  		// declare as having a parameter list
  		DECLARE_PARAMETER_LIST();
 };
@@ -73,32 +70,25 @@ this practice and therefore the neo-Hookean implementation is spread over two fi
 contains the class definition and FENeoHookean.cpp contains the member function definitions. It is recommended
 that the implementation of new materials follows this practice. 
 
-The last two lines of the class definition contain macros that will help with the registration procedure of the
-class and its material parameters.
+The last line of the class definition contain a macro that will help with the registration the
+class' material parameters.
 
 \subsection step2 Registering the new material
 
 In order for FEBio to recognize the new material, the material needs to be registered with the framework.
-FEBio defines two macros that help with this process. The first one is added to the class definition. 
+A macro is defined to help with the registration of the new class. This macro which actually registers the 
+class with the framework, is placed in intialization function of the module (e.g. FEBioMech::InitModule).
 
 \code
-DECLARE_REGISTERED(FENeoHookean);
+REGISTER_FEBIO_CLASS(FENeoHookean, FEMATERIAL_ID, "neo-Hookean");
 \endcode
 
-This macro takes one parameter, namely the name of the new material class, and informs that the class will
-be registered with the framework. The second one, which actually registers the class with the framework, is
-placed in the compilation unit (e.g. the .cpp file). In FENeoHookean.cpp it is the first line of the file
-after the include statements.
-
-\code
-REGISTER_MATERIAL(FENeoHookean, "neo-Hookean");
-\endcode
-
-This macro takes two parameters: the class that needs to be registered and a text parameter that defines 
-the name of the class. The name of the class is used in several places to identify the new material and 
-must be unique (that is, not two materials can have the same name). This name will be used, for instance,
-as the value of the type parameter in the xml-formatted input file. This aspect will be explained further
-when the use of the new material is discussed. 
+This macro takes three parameters: the class that needs to be registered, the core class ID identifying
+what type of class is defined (in this case it is FEMATERIAL_ID since we are creating a material) and a
+text parameter that defines the name of the class. The name of the class is used in several places to identify 
+the new material and must be unique (that is, two materials cannot have the same name). This name will be 
+used, for instance, as the value of the type parameter in the xml-formatted input file. This aspect will
+be explained further when the use of the new material is discussed. 
 
 \subsection step3 Defining the material parameters
 
@@ -106,7 +96,7 @@ Defining the material parameters of the class requires two steps. First, variabl
 will store the values for these parameters. In our example, the FENeoHookean class defines two parameters:
 m_E stores the Young’s modulus and m_v stores the Poisson's ratio. Note that these variables are defined
 as public. This is important, since only public variables can be used by FEBio's framework. 
-The second step is to register the material parameters with FEBio's framework. Again, a set of macros exist
+The second step is to register the material parameters with FEBio's framework. A set of macros exist
 that will facilitate this process. The first one is placed in the class definition.
 
 \code
@@ -300,7 +290,7 @@ For materials that require additional information to be stored at the material p
 If the steps to register the material and its material parameters have been followed as outlined in the previous sections, the material class will be seamlessly integrated in FEBio's framework. One of the important consequences of this is that the xml-input file reader will automatically recognize the new material and its parameters. For example, imagine the user created a new class MyFancyMaterial and named it "fancy material" by registering the material as follows. 
 
 \code
-REGISTER_MATERIAL(MyFancyMaterial, "fancy material");
+REGISTER_FEBIO_CLASS(MyFancyMaterial, FEMATERIAL_ID, "fancy material");
 \endcode
 
 This macro associates the name "fancy material" with the MyFancyMaterial class. This name will now be used as the type identifier in the xml-input file.

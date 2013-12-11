@@ -76,15 +76,6 @@ PlotFile* FEBioModel::GetPlotFile()
 }
 
 //-----------------------------------------------------------------------------
-//! Sets the extension of the plot file name.
-void FEBioModel::SetPlotFileNameExtension(const char *szext)
-{
-	char* ch = strrchr(m_szplot, '.');
-	if (ch) *ch = 0;
-	strcat(m_szplot, szext);
-}
-
-//-----------------------------------------------------------------------------
 //! Sets the name of the FEBio input file
 void FEBioModel::SetInputFilename(const char* szfile)
 { 
@@ -178,12 +169,6 @@ bool FEBioModel::Input(const char* szfile)
 
 	// set the plot file
 	m_plot = fim.m_plot;
-
-	if (dynamic_cast<FEBioPlotFile*>(m_plot))
-	{
-		// change the extension of the plot file to .xplt
-		SetPlotFileNameExtension(".xplt");
-	}
 
 	// we're done reading
 	return true;
@@ -998,7 +983,6 @@ bool FEBioModel::Init()
 		if (m_plot == 0) 
 		{
 			m_plot = new FEBioPlotFile(*this);
-			SetPlotFileNameExtension(".xplt");
 		}
 
 		if (m_plot->Open(*this, m_szplot) == false)
@@ -1037,7 +1021,6 @@ bool FEBioModel::Reset()
 		if (m_plot == 0) 
 		{
 			m_plot = new FEBioPlotFile(*this);
-			SetPlotFileNameExtension(".xplt");
 		}
 
 		if (m_plot->Open(*this, m_szplot) == false)

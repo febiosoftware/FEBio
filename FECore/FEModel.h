@@ -222,23 +222,20 @@ public:	// --- Miscellaneous routines ---
 
 public: // --- I/O functions
 
-	// input from file
-	virtual bool Input(const char* szfile) = 0;
-
 	//! write to plot file
-	virtual void Write() = 0;
+	virtual void Write() {}
 
 	//! write data to log file
-	virtual void WriteData() = 0;
+	virtual void WriteData() {}
 
 	//! write data to dump file
-	virtual void DumpData() = 0;
+	virtual void DumpData() {}
 
 	//! serialize data
-	virtual bool Serialize(DumpFile& ar) = 0;
+	virtual bool Serialize(DumpFile& ar) { return true; }
 
 	//! Add data record
-	virtual void AddDataRecord(DataRecord* pd) = 0;
+	virtual void AddDataRecord(DataRecord* pd) {}
 
 public:
 	// TODO: I don't like this here.

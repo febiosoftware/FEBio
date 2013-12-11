@@ -67,6 +67,7 @@
 #include "FEFiberIntegrationGeodesic.h"
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
+#include "FEMicroMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -194,6 +195,7 @@ REGISTER_FEBIO_CLASS(FEFiberIntegrationTrapezoidal        , FEMATERIAL_ID, "fibe
 REGISTER_FEBIO_CLASS(FEFiberIntegrationGeodesic           , FEMATERIAL_ID, "fibers-3d-geodesic");
 REGISTER_FEBIO_CLASS(FECoupledTransIsoVerondaWestmann     , FEMATERIAL_ID, "coupled trans-iso Veronda-Westmann");
 REGISTER_FEBIO_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "coupled trans-iso Mooney-Rivlin");
+REGISTER_FEBIO_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

@@ -1,6 +1,7 @@
 #include "FEOptimizer.h"
 #include "FELMOptimizeMethod.h"
 #include "FECore/Logfile.h"
+#include "FEBioXML/FEBioImport.h"
 
 //=============================================================================
 InvalidVariableName::InvalidVariableName(const char* sz)
@@ -88,8 +89,11 @@ bool FEOptimizeInput::ParseModel(XMLTag& tag, FEOptimizeData& opt)
 	char szfile[256];
 	tag.value(szfile);
 
+	// read the input file
+	FEFEBioImport fim;
+
 	// read input data
-	if (fem.Input(szfile) == false) return false;
+	if (fim.Load(fem, szfile) == false) return false;
 
 	// initialize data 
 	if (fem.Init() == false) return false;
