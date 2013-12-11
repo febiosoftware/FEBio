@@ -15,6 +15,10 @@ typedef HMODULE FEBIO_PLUGIN_HANDLE;
 typedef void* FEBIO_PLUGIN_HANDLE;
 #endif
 
+#ifdef __APPLE__
+typedef void* FEBIO_PLUGIN_HANDLE;
+#endif
+
 //-----------------------------------------------------------------------------
 //! This class defines a FEBio plugin
 class FEBioPlugin

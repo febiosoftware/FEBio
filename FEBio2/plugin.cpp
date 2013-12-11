@@ -9,6 +9,9 @@
 #ifdef LINUX
 #include <dlfcn.h>
 #endif
+#ifdef __APPLE__
+#include <dlfcn.h>
+#endif
 
 //=============================================================================
 // Typedefs of the plugin functions.
@@ -27,6 +30,10 @@ FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return LoadLibraryA(szfile)
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return GetProcAddress(ph, szfunc); }
 #endif
 #ifdef LINUX
+FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
+void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
+#endif
+#ifdef __APPLE__
 FEBIO_PLUGIN_HANDLE LoadPlugin(const char* szfile) { return dlopen(szfile, RTLD_NOW); }
 void* FindPluginFunc(FEBIO_PLUGIN_HANDLE ph, const char* szfunc) { return dlsym(ph, szfunc); }
 #endif
