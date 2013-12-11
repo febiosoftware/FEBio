@@ -2,7 +2,28 @@
 #include "FEUDGHexDomain.h"
 #include "FEElasticMaterial.h"
 
-double FEUDGHexDomain::m_hg = 1.0;
+//-----------------------------------------------------------------------------
+FEUDGHexDomain::FEUDGHexDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat)
+{ 
+	m_hg = 1.0; 
+	m_ntype = FE_UDGHEX_DOMAIN; 
+}
+
+//-----------------------------------------------------------------------------
+FEDomain* FEUDGHexDomain::Clone()
+{
+	FEUDGHexDomain* pd = new FEUDGHexDomain(m_pMesh, m_pMat);
+	pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
+	return pd;
+}
+
+//-----------------------------------------------------------------------------
+bool FEUDGHexDomain::Initialize(FEModel& fem)
+{
+	if (FEElasticSolidDomain::Initialize(fem) == false) return false;
+	m_hg = fem.m_udghex_hg;
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 void FEUDGHexDomain::InternalForces(FEGlobalVector& R)

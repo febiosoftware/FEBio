@@ -2,10 +2,6 @@
 #include "FEUT4Domain.h"
 #include "FECore/FEMesh.h"
 
-// set the default stabilization factor
-double FEUT4Domain::m_alpha = 0.05;
-bool FEUT4Domain::m_bdev = false;
-
 //-----------------------------------------------------------------------------
 // This function converts the Cauchy stress to a 2nd-PK stress
 mat3ds cauchy_to_pk2(mat3ds& s, mat3d& F)
@@ -124,6 +120,9 @@ FEUT4Domain::FEUT4Domain(FEMesh *pm, FEMaterial* pmat) : FEElasticSolidDomain(pm
 {
 	// overwrite the domain type
 	m_ntype = FE_UT4_DOMAIN; 
+
+	m_alpha = 0.05;
+	m_bdev = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -192,6 +191,10 @@ bool FEUT4Domain::Initialize(FEModel& mdl)
 {
 	// first call the base class
 	if (FEElasticSolidDomain::Initialize(mdl) == false) return false;
+
+	// copy model parameters
+	m_alpha = mdl.m_ut4_alpha;
+	m_bdev  = mdl.m_ut4_bdev;
 
 	// next, we need to identify all the nodes that belong to this domain
 	// we do this by looping over all the elements and tagging the nodes

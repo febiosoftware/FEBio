@@ -7,17 +7,15 @@ class FEUDGHexDomain : public FEElasticSolidDomain
 {
 public:
 	//! constructor
-	FEUDGHexDomain(FEMesh* pm, FEMaterial* pmat) : FEElasticSolidDomain(pm, pmat) { m_ntype = FE_UDGHEX_DOMAIN; }
+	FEUDGHexDomain(FEMesh* pm, FEMaterial* pmat);
 
-	FEDomain* Clone()
-	{
-		FEUDGHexDomain* pd = new FEUDGHexDomain(m_pMesh, m_pMat);
-		pd->m_Elem = m_Elem; pd->m_pMesh = m_pMesh; pd->m_Node = m_Node;
-		return pd;
-	}
+	//! Clone domain
+	FEDomain* Clone();
+
+	//! initialize class
+	bool Initialize(FEModel& fem);
 
 public:
-
 	//! calculates the residual
 	void InternalForces(FEGlobalVector& R);
 
@@ -50,5 +48,5 @@ protected:
 	double HexVolume(FESolidElement& el, int state = 0);
 
 public:
-	static double	m_hg;	//!< hourglass parameter
+	double	m_hg;	//!< hourglass parameter
 };

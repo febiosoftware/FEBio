@@ -94,9 +94,8 @@ protected:
 
 	tens4ds Cvol(const tens4ds& C, const mat3ds& S);
 
-public:
-	static double	m_alpha;	//!< stabilization factor alpha
-	static bool		m_bdev;		//!< use deviatoric components only for the element contribution
+	double	m_alpha;	//!< stabilization factor alpha
+	bool	m_bdev;		//!< use deviatoric components only for the element contribution
 
 private:
 	vector<int>		m_tag;	//!< nodal tags

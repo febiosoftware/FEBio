@@ -263,6 +263,9 @@ public: // TODO: Find a better place for these parameters
 	double	m_ftime0;			//!< start time of current step
 	int		m_nplane_strain;	//!< run analysis in plain strain mode \todo Move to the analysis class?
 	bool	m_debug;			//!< debug flag
+	double	m_ut4_alpha;		//!< UT4 integration alpha value
+	bool	m_ut4_bdev;			//!< UT4 integration deviatoric formulation flag
+	double	m_udghex_hg;		//!< hourglass parameter for UDGhex integration
 
 protected:
 	std::vector<FELoadCurve*>				m_LC;	//!< load curve data

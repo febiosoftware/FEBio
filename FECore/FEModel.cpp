@@ -16,6 +16,10 @@ FEModel::FEModel(void)
 	m_ftime = 0;
 	m_ftime0 = 0;
 	m_bwopt = 0;
+
+	// additional data
+	m_ut4_alpha = 0.05;
+	m_ut4_bdev = false;
 }
 
 //-----------------------------------------------------------------------------

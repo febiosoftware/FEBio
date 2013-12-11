@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "FEBioControlSection.h"
-#include "FEBioMech/FEUDGHexDomain.h"
-#include "FEBioMech/FEUT4Domain.h"
+#include "FECore/FEAnalysis.h"
+#include "FECore/FEModel.h"
 #include "FECore/febio.h"
+using namespace FECore;
 
 //-----------------------------------------------------------------------------
 FESolver* FEBioControlSection::BuildSolver(int nmod, FEModel& fem)
@@ -64,7 +65,7 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 	else if (tag == "step_size"         ) { tag.value(pstep->m_dt0); pstep->m_dt = pstep->m_dt0; }
 	else if (tag == "optimize_bw"       ) tag.value(fem.m_bwopt);
 	else if (tag == "pressure_stiffness") tag.value(pstep->m_istiffpr);
-	else if (tag == "hourglass"         ) tag.value(FEUDGHexDomain::m_hg);
+	else if (tag == "hourglass"         ) tag.value(fem.m_udghex_hg);
 	else if (tag == "plane_strain"      )
 	{
 		int bc = 2;
@@ -201,8 +202,8 @@ bool FEBioControlSection::ParseCommonParams(XMLTag& tag)
 						++tag;
 						do
 						{
-							if      (tag == "alpha"   ) tag.value(FEUT4Domain::m_alpha);
-							else if (tag == "iso_stab") tag.value(FEUT4Domain::m_bdev);
+							if      (tag == "alpha"   ) tag.value(fem.m_ut4_alpha);
+							else if (tag == "iso_stab") tag.value(fem.m_ut4_bdev );
 							else if (tag == "stab_int")
 							{
 								const char* sz = tag.szvalue();
