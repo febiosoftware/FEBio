@@ -26,6 +26,8 @@ public:
 
 	Fl_Progress* GetProgressBar() { return m_pg; }
 
+	void SelectTask(int n);
+
 public:
 	void SelectNext();
 	void SelectPrev();

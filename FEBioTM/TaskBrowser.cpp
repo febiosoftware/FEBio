@@ -139,6 +139,15 @@ void CTaskTable::SelectNext()
 			break;
 		}
 	}
+
+	// make sure the selected row is visible
+	if (m_nfocus >= 0)
+	{
+		int r1, r2, c1, c2;
+		visible_cells(r1, r2, c1, c2);
+		if (m_nfocus < r1) top_row(m_nfocus);
+		else if (m_nfocus > r2) top_row(r1 + m_nfocus - r2);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -158,6 +167,15 @@ void CTaskTable::SelectPrev()
 			break;
 		}
 	}
+
+	// make sure the selected row is visible
+	if (m_nfocus >= 0)
+	{
+		int r1, r2, c1, c2;
+		visible_cells(r1, r2, c1, c2);
+		if (m_nfocus < r1) top_row(m_nfocus);
+		else if (m_nfocus > r2) top_row(r1 + m_nfocus - r2);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -167,17 +185,20 @@ int CTaskTable::handle(int nevent)
 	{
 	case FL_FOCUS: 
 		{
-			for (int i=0; i<rows(); ++i)
-			{
-				if (row_selected(i)) { m_nfocus = i; break; }
-			}
-
 			return 1;
 		}
 	case FL_UNFOCUS: redraw(); return 1;
 	case FL_PUSH:
 		{
 			Fl::focus(this);
+		}
+		break;
+	case FL_RELEASE:
+		{
+			for (int i=0; i<rows(); ++i)
+			{
+				if (row_selected(i)) { m_nfocus = i; redraw(); break; }
+			}
 		}
 		break;
 	case FL_KEYDOWN:
@@ -206,10 +227,16 @@ int CTaskTable::handle(int nevent)
 void CTaskTable::resize(int X, int Y, int W, int H)
 {
 	Fl_Table_Row::resize(X, Y, W, H);
+	int DX = 0;
+	if (vscrollbar->visible()) DX = vscrollbar->w();
     col_width(0,W-3*WIDTH);      // default width of columns
     col_width(1,WIDTH);			// default width of columns
     col_width(2,WIDTH);			// default width of columns
-    col_width(3,WIDTH-4);      // default width of columns
+    col_width(3,WIDTH-4-DX);      // default width of columns
+	if (hscrollbar->visible())
+	{
+		Fl_Table_Row::resize(X, Y, W, H);
+	}
 	if (m_pg->visible()) show_progress(m_nrow);
 }
 
@@ -233,6 +260,15 @@ void CTaskTable::hide_progress()
 	if (m_pg->visible()) m_pg->hide();
 }
 
+//-----------------------------------------------------------------------------
+void CTaskTable::SelectTask(int n)
+{
+	select_row(n);
+	row_position(n);
+	m_nfocus = n;
+	Fl::focus(this);
+}
+
 //=============================================================================
 CTaskBrowser::CTaskBrowser(int x, int y, int w, int h, CWnd* pwnd) : Flx_Group(x, y, w, h), m_pWnd(pwnd)
 {
@@ -254,7 +290,8 @@ void CTaskBrowser::Update()
 	if (m_pg->rows() > 0)
 	{
 		m_pg->row_height_all(20); // default height of rows
-		m_pg->select_row(0);
+		m_pg->SelectTask(0);
+		m_pg->size(m_pg->w(), m_pg->h());
 	}
 }
 
@@ -267,6 +304,7 @@ void CTaskBrowser::AddTask(CTask *pt)
     m_pg->row_height_all(20); // default height of rows
 	m_pg->select_all_rows(0);
 	m_pg->select_row(N);
+	m_pg->size(m_pg->w(), m_pg->h());
 }
 
 //-----------------------------------------------------------------------------
@@ -289,8 +327,7 @@ void CTaskBrowser::SelectAll(int n)
 //-----------------------------------------------------------------------------
 void CTaskBrowser::SelectTask(int n)
 {
-	m_pg->select_row(n);
-	m_pg->row_position(n);
+	m_pg->SelectTask(n);
 }
 
 //-----------------------------------------------------------------------------
