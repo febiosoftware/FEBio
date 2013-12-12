@@ -67,7 +67,7 @@ public:
 		FEPlotVariable(const FEPlotVariable& pv);
 
 	public:
-		char		m_szvar[32];	//!< name of output variable
+		char		m_szvar[64];	//!< name of output variable
 		vector<int>	m_item;			//!< (optional) list of items
 	};
 
