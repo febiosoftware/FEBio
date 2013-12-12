@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FEBioBoundarySection.h"
-#include "FEBioMech/FESpringMaterial.h"
-#include "FEBioMech/FEDiscreteSpringDomain.h"
+#include "FECore/FEDiscreteMaterial.h"
+#include "FECore/FEDiscreteDomain.h"
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
 #include "FEBioMech/FERigidJoint.h"
@@ -369,11 +369,16 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	// create a new spring "domain"
-	FEDiscreteSpringDomain* pd = new FEDiscreteSpringDomain(&mesh, pm);
+	FEBioKernel& febio = FEBioKernel::GetInstance();
+	FE_Element_Spec spec;
+	spec.eshape = ET_TRUSS2;
+	spec.etype  = FE_DISCRETE;
+	int ndomtype = febio.GetDomainType(spec, pm);
+	FEDiscreteDomain* pd = dynamic_cast<FEDiscreteDomain*>(febio.CreateDomain(ndomtype, &mesh, pm));
 	mesh.AddDomain(pd);
 
 	pd->create(1);
-	FEDiscreteElement& de = dynamic_cast<FEDiscreteElement&>(pd->ElementRef(0));
+	FEDiscreteElement& de = pd->Element(0);
 	de.SetType(FE_DISCRETE);
 	de.m_nID = ++m_pim->m_maxid;
 	
@@ -382,36 +387,27 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	pm->SetID(fem.Materials());
 	de.SetMatID(fem.Materials()-1);
 
-	int n[2];
-
 	// read spring discrete elements
 	++tag;
 	do
 	{
+		// read the required node tag
 		if (tag == "node")
 		{
+			int n[2];
 			tag.value(n, 2);
 			de.m_node[0] = n[0]-1;
 			de.m_node[1] = n[1]-1;
 		}
-		else if (tag == "E") 
+		else
 		{
-			if (dynamic_cast<FELinearSpring*>(pm)) tag.value((dynamic_cast<FELinearSpring*>(pm))->m_E);
-			else if (dynamic_cast<FETensionOnlyLinearSpring*>(pm)) tag.value((dynamic_cast<FETensionOnlyLinearSpring*>(pm))->m_E);
-			else throw XMLReader::InvalidTag(tag);
-		}
-		else if (tag == "force")
-		{
-			if (dynamic_cast<FENonLinearSpring*>(pm))
+			// read the actual spring material parameters
+			FEParameterList& pl = pm->GetParameterList();
+			if (m_pim->ReadParameter(tag, pl) == 0)
 			{
-				FENonLinearSpring* ps = dynamic_cast<FENonLinearSpring*>(pm);
-				tag.value(ps->m_F);
-				const char* szl = tag.AttributeValue("lc");
-				ps->m_nlc = atoi(szl) - 1;
+				throw XMLReader::InvalidTag(tag);
 			}
-			else throw XMLReader::InvalidTag(tag);
 		}
-		else throw XMLReader::InvalidTag(tag);
 		++tag;
 	}
 	while (!tag.isend());

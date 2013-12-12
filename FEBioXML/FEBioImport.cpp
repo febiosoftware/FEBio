@@ -369,23 +369,25 @@ bool FEFEBioImport::ReadParameter(XMLTag& tag, FEParameterList& pl, const char* 
 		for (int i=0; i<nattr; ++i)
 		{
 			const char* szat = tag.m_att[i].m_szatt;
-			if (strcmp(szat, "lc") == 0)
+			if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
 			{
-				int lc = atoi(tag.m_att[i].m_szatv)-1;
-				if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
-				pp->m_nlc = lc;
-				switch (pp->m_itype)
+				// If we get here, the container did not understand the attribute.
+				// If the attribute is a "lc", we interpret it as a load curve
+				if (strcmp(szat, "lc") == 0)
 				{
-				case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+					int lc = atoi(tag.m_att[i].m_szatv)-1;
+					if (lc < 0) throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
+					pp->m_nlc = lc;
+					switch (pp->m_itype)
+					{
+					case FE_PARAM_DOUBLE: pp->m_scl = pp->value<double>(); break;
+					}
 				}
-			}
-			else 
-			{
-				if (pl.GetContainer()->SetParameterAttribute(*pp, szat, tag.m_att[i].m_szatv) == false)
+/*				else 
 				{
 					throw XMLReader::InvalidAttributeValue(tag, szat, tag.m_att[i].m_szatv);
 				}
-			}
+*/			}
 			// This is not true. Parameters can have attributes that are used for other purposed. E.g. The local fiber option.
 //			else felog.printf("WARNING: attribute \"%s\" of parameter \"%s\" ignored (line %d)\n", szat, tag.Name(), tag.m_ncurrent_line-1);
 		}

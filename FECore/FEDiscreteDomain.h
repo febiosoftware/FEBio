@@ -12,6 +12,8 @@ public:
 	int Elements() { return (int) m_Elem.size(); }
 	FEElement& ElementRef(int n) { return m_Elem[n]; }
 
+	FEDiscreteElement& Element(int n) { return m_Elem[n]; }
+
 	bool Initialize(FEModel& fem);
 
 	int Nodes() { return (int) m_Node.size(); }

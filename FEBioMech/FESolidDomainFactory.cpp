@@ -12,6 +12,8 @@
 #include "FEUT4Domain.h"
 #include "FELinearElastic.h"
 #include "FE3FieldElasticSolidDomain.h"
+#include "FEDiscreteSpringDomain.h"
+#include "FECore/FEDiscreteMaterial.h"
 
 //-----------------------------------------------------------------------------
 int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial* pmat)
@@ -62,6 +64,12 @@ int FESolidDomainFactory::GetDomainType(const FE_Element_Spec& spec, FEMaterial*
 		else if ((eshape == ET_TRUSS2)) return FE_TRUSS_DOMAIN;
 		else return 0;
 	}
+	else if (dynamic_cast<FEDiscreteMaterial*>(pmat))
+	{
+		// TODO: check the element type
+		return FE_DISCRETE_DOMAIN;
+	}
+
 	else return 0;
 }
 
@@ -77,5 +85,6 @@ FEDomain* FESolidDomainFactory::CreateDomain(int dtype, FEMesh* pm, FEMaterial* 
 	if (dtype == FE_UT4_DOMAIN         ) return new FEUT4Domain               (pm, pmat);
 	if (dtype == FE_3F_SOLID_DOMAIN    ) return new FE3FieldElasticSolidDomain(pm, pmat);
 	if (dtype == FE_LINEAR_SOLID_DOMAIN) return new FELinearSolidDomain       (pm, pmat);
+	if (dtype == FE_DISCRETE_DOMAIN    ) return new FEDiscreteSpringDomain    (pm, pmat);
 	return 0;
 }

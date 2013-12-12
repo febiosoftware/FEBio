@@ -46,12 +46,14 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 			int id = atoi(szval) - 1;
 			if (id < 0) return false;
 			SetSolidReactantsCoefficients(id, m_vRtmp);
+			return true;
 		}
 		if (strcmp(szatt, "sol") == 0)
 		{
 			int id = atoi(szval) - 1;
 			if ((id < 0) || (id >= MAX_CDOFS)) return false;
 			SetSoluteReactantsCoefficients(id, m_vRtmp);
+			return true;
 		}
 	}
 	else if (strcmp(p.m_szname, "vP") == 0)
@@ -61,15 +63,17 @@ bool FEChemicalReaction::SetParameterAttribute(FEParam& p, const char* szatt, co
 			int id = atoi(szval) - 1;
 			if (id < 0) return false;
 			SetSolidProductsCoefficients(id, m_vPtmp);
+			return true;
 		}
 		if (strcmp(szatt, "sol") == 0)
 		{
 			int id = atoi(szval) - 1;
 			if ((id < 0) || (id >= MAX_CDOFS)) return false;
 			SetSoluteProductsCoefficients(id, m_vPtmp);
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 //-----------------------------------------------------------------------------

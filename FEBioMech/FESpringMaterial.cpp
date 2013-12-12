@@ -56,7 +56,7 @@ void FETensionOnlyLinearSpring::Init()
 
 // define the material parameters
 BEGIN_PARAMETER_LIST(FENonLinearSpring, FEDiscreteMaterial)
-	ADD_PARAMETER(m_F, FE_PARAM_DOUBLE, "F");
+	ADD_PARAMETER(m_F, FE_PARAM_DOUBLE, "force");
 END_PARAMETER_LIST();
 
 FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem)
@@ -99,4 +99,17 @@ void FENonLinearSpring::Serialize(DumpFile& ar)
 		ar >> m_F >> m_nlc;
 		m_plc = ar.GetFEModel()->GetLoadCurve(m_nlc);
 	}
+}
+
+bool FENonLinearSpring::SetParameterAttribute(FEParam& p, const char* szatt, const char* szval)
+{
+	if (strcmp(p.m_szname, "force") == 0)
+	{
+		if (strcmp(szatt, "lc") == 0)
+		{
+			m_nlc = atoi(szval) - 1;
+			return true;
+		}
+	}
+	return false;
 }

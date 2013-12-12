@@ -59,6 +59,8 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval);
+
 public:
 	double			m_F;	// force scale factor
 	int				m_nlc; // load curve ID

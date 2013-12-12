@@ -171,7 +171,7 @@ public:
 	virtual void SetParameter(FEParam& p) {}
 
 	//! If a parameter has attributes, this function will be called
-	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return true; }
+	virtual bool SetParameterAttribute(FEParam& p, const char* szatt, const char* szval) { return false; }
 
 protected:
 	// This function will be overridden by each class that defines a parameter list
