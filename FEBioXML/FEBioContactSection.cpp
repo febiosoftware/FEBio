@@ -50,7 +50,7 @@ void FEBioContactSection::Parse(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioContactSection::ParseContactInterface(XMLTag& tag, FEContactInterface* pci)
+void FEBioContactSection::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();

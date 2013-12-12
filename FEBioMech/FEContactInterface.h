@@ -48,9 +48,6 @@ public:
 	//! serialize data to archive
 	virtual void Serialize(DumpFile& ar);
 
-	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)
-	virtual bool UseNodalIntegration() = 0;
-
 	//! build the matrix profile for use in the stiffness matrix
 	virtual void BuildMatrixProfile(FEStiffnessMatrix& K) = 0;
 

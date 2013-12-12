@@ -480,7 +480,7 @@ void FEBioBoundarySection::ParseConstraints(XMLTag& tag)
 }
 
 //-----------------------------------------------------------------------------
-void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FEContactInterface* pci)
+void FEBioBoundarySection::ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci)
 {
 	FEModel& fem = *GetFEModel();
 	FEMesh& m = fem.GetMesh();

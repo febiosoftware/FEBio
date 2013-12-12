@@ -1,6 +1,6 @@
 #pragma once
 #include "FEBioImport.h"
-#include "FEBioMech/FEContactInterface.h"
+#include "FECore/FESurfacePairInteraction.h"
 
 //-----------------------------------------------------------------------------
 // Contact section (new in version 2.0)
@@ -17,6 +17,6 @@ protected:
 	void ParseLinearConstraint     (XMLTag& tag);
 
 protected:
-	void ParseContactInterface(XMLTag& tag, FEContactInterface* pci);
+	void ParseContactInterface(XMLTag& tag, FESurfacePairInteraction* pci);
 	bool ParseSurfaceSection  (XMLTag& tag, FESurface& s, int nfmt, bool bnodal);
 };

@@ -32,6 +32,9 @@ public:
 	//! return the slave surface
 	virtual FESurface* GetSlaveSurface () = 0;
 
+	//! temporary construct to determine if contact interface uses nodal integration rule (or facet)
+	virtual bool UseNodalIntegration() = 0;
+
 protected:
 	int		m_nID;			//!< ID of interface
 };
