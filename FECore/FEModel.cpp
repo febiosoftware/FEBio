@@ -20,6 +20,7 @@ FEModel::FEModel(void)
 	// additional data
 	m_ut4_alpha = 0.05;
 	m_ut4_bdev = false;
+	m_udghex_hg = 1.0;
 }
 
 //-----------------------------------------------------------------------------
