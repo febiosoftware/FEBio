@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEDiscreteSpringDomain.h"
-#include "FEDiscreteMaterial.h"
+#include "FESpringMaterial.h"
 
 //-----------------------------------------------------------------------------
 FEDomain* FEDiscreteSpringDomain::Clone()
@@ -150,7 +150,7 @@ void FEDiscreteSpringDomain::InternalForces(FEGlobalVector& R)
 		double DL = Lt - L0;
 		
 		// evaluate the spring stiffness
-		FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(m_pMat);
+		FESpringMaterial* pm = dynamic_cast<FESpringMaterial*>(m_pMat);
 		assert(pm);
 		double F = pm->force(DL);
 
@@ -219,7 +219,7 @@ void FEDiscreteSpringDomain::StiffnessMatrix(FESolver* psolver)
 		double DL = Lt - L0;
 
 		// evaluate the stiffness
-		FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(m_pMat);
+		FESpringMaterial* pm = dynamic_cast<FESpringMaterial*>(m_pMat);
 		assert(pm);
 		double F = pm->force(DL);
 		double E = pm->stiffness(DL);

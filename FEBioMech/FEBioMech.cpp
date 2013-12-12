@@ -10,7 +10,7 @@
 #include "FEDamageMooneyRivlin.h"
 #include "FEDamageNeoHookean.h"
 #include "FEDamageTransIsoMooneyRivlin.h"
-#include "FEDiscreteMaterial.h"
+#include "FESpringMaterial.h"
 #include "FEDonnanEquilibrium.h"
 #include "FEEFD.h"
 #include "FEEFDDonnanEquilibrium.h"
@@ -68,6 +68,7 @@
 #include "FECoupledTransIsoMooneyRivlin.h"
 #include "FECoupledTransIsoVerondaWestmann.h"
 #include "FEMicroMaterial.h"
+#include "FESpringMaterial.h"
 
 #include "FEPressureLoad.h"
 #include "FETractionLoad.h"
@@ -148,13 +149,11 @@ REGISTER_FEBIO_CLASS(FEIncompNeoHookean             ,FEMATERIAL_ID, "incomp neo-
 REGISTER_FEBIO_CLASS(FEIsotropicElastic             ,FEMATERIAL_ID, "isotropic elastic"             );
 REGISTER_FEBIO_CLASS(FELinearElastic                ,FEMATERIAL_ID, "linear elastic"                );
 REGISTER_FEBIO_CLASS(FELinearOrthotropic            ,FEMATERIAL_ID, "linear orthotropic"            );
-REGISTER_FEBIO_CLASS(FELinearSpring                 ,FEMATERIAL_ID, "linear spring"                 );
 REGISTER_FEBIO_CLASS(FELinearTransIso               ,FEMATERIAL_ID, "linear trans iso"              );
 REGISTER_FEBIO_CLASS(FEMooneyRivlin                 ,FEMATERIAL_ID, "Mooney-Rivlin"                 );
 REGISTER_FEBIO_CLASS(FEMuscleMaterial               ,FEMATERIAL_ID, "muscle material"               );
 REGISTER_FEBIO_CLASS(FENeoHookean                   ,FEMATERIAL_ID, "neo-Hookean"                   );
 REGISTER_FEBIO_CLASS(FENeoHookeanTransIso           ,FEMATERIAL_ID, "neo-Hookean transiso"          );
-REGISTER_FEBIO_CLASS(FENonLinearSpring              ,FEMATERIAL_ID, "nonlinear spring"              );
 REGISTER_FEBIO_CLASS(FEOgdenMaterial                ,FEMATERIAL_ID, "Ogden"                         );
 REGISTER_FEBIO_CLASS(FEOgdenUnconstrained           ,FEMATERIAL_ID, "Ogden unconstrained"           );
 REGISTER_FEBIO_CLASS(FEOrthoElastic                 ,FEMATERIAL_ID, "orthotropic elastic"           );
@@ -164,7 +163,6 @@ REGISTER_FEBIO_CLASS(FESphericalFiberDistribution   ,FEMATERIAL_ID, "spherical f
 REGISTER_FEBIO_CLASS(FEStVenantKirchhoff            ,FEMATERIAL_ID, "St.Venant-Kirchhoff"           );
 REGISTER_FEBIO_CLASS(FETCNonlinearOrthotropic       ,FEMATERIAL_ID, "TC nonlinear orthotropic"      );
 REGISTER_FEBIO_CLASS(FETendonMaterial               ,FEMATERIAL_ID, "tendon material"               );
-REGISTER_FEBIO_CLASS(FETensionOnlyLinearSpring      ,FEMATERIAL_ID, "tension only linear spring"    );
 REGISTER_FEBIO_CLASS(FETransIsoMooneyRivlin         ,FEMATERIAL_ID, "trans iso Mooney-Rivlin"       );
 REGISTER_FEBIO_CLASS(FETransIsoVerondaWestmann      ,FEMATERIAL_ID, "trans iso Veronda-Westmann"    );
 REGISTER_FEBIO_CLASS(FETrussMaterial                ,FEMATERIAL_ID, "linear truss"                  );
@@ -196,6 +194,11 @@ REGISTER_FEBIO_CLASS(FEFiberIntegrationGeodesic           , FEMATERIAL_ID, "fibe
 REGISTER_FEBIO_CLASS(FECoupledTransIsoVerondaWestmann     , FEMATERIAL_ID, "coupled trans-iso Veronda-Westmann");
 REGISTER_FEBIO_CLASS(FECoupledTransIsoMooneyRivlin        , FEMATERIAL_ID, "coupled trans-iso Mooney-Rivlin");
 REGISTER_FEBIO_CLASS(FEMicroMaterial                      , FEMATERIAL_ID, "micro-material");
+
+
+REGISTER_FEBIO_CLASS(FELinearSpring           , FEMATERIAL_ID, "linear");
+REGISTER_FEBIO_CLASS(FETensionOnlyLinearSpring, FEMATERIAL_ID, "tension-only linear");
+REGISTER_FEBIO_CLASS(FENonLinearSpring        , FEMATERIAL_ID, "nonlinear");
 
 //-----------------------------------------------------------------------------
 // classes derived from FESurfaceLoad

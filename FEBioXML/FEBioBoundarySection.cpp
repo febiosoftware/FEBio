@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FEBioBoundarySection.h"
-#include "FEBioMech/FEDiscreteMaterial.h"
+#include "FEBioMech/FESpringMaterial.h"
 #include "FEBioMech/FEDiscreteSpringDomain.h"
 #include "FEBioMech/FERigidWallInterface.h"
 #include "FEBioMech/FEAugLagLinearConstraint.h"
@@ -363,15 +363,10 @@ void FEBioBoundarySection::ParseSpringSection(XMLTag &tag)
 	FEMesh& mesh = fem.GetMesh();
 
 	// determine the spring type
-	FEDiscreteMaterial* pm = 0;
 	const char* szt = tag.AttributeValue("type", true);
-	if (szt)
-	{
-		if      (strcmp(szt, "linear"             ) == 0) pm = new FELinearSpring(&fem);
-		else if (strcmp(szt, "tension-only linear") == 0) pm = new FETensionOnlyLinearSpring(&fem);
-		else if (strcmp(szt, "nonlinear"          ) == 0) pm = new FENonLinearSpring(&fem);
-	}
-	else pm = new FELinearSpring(&fem);
+	if (szt == 0) szt = "linear";
+	FEDiscreteMaterial* pm = dynamic_cast<FEDiscreteMaterial*>(fecore_new<FEMaterial>(FEMATERIAL_ID, szt, &fem));
+	if (pm == 0) throw XMLReader::InvalidAttributeValue(tag, "type", szt);
 
 	// create a new spring "domain"
 	FEDiscreteSpringDomain* pd = new FEDiscreteSpringDomain(&mesh, pm);

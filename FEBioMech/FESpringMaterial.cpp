@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "FEDiscreteMaterial.h"
+#include "FESpringMaterial.h"
 #include "FECore/FEModel.h"
+
 //-----------------------------------------------------------------------------
 // FELinearSpring
 //-----------------------------------------------------------------------------
@@ -58,7 +59,7 @@ BEGIN_PARAMETER_LIST(FENonLinearSpring, FEDiscreteMaterial)
 	ADD_PARAMETER(m_F, FE_PARAM_DOUBLE, "F");
 END_PARAMETER_LIST();
 
-FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem)
+FENonLinearSpring::FENonLinearSpring(FEModel* pfem) : FESpringMaterial(pfem)
 {
 	m_nlc = -1; 
 	m_plc = 0;

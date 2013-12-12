@@ -1,53 +1,23 @@
 #pragma once
-#include "FECore/FEMaterial.h"
-
-//-----------------------------------------------------------------------------
-// Material point data for discrete materials.
-class FEDiscreteMaterialPoint : public FEMaterialPoint
-{
-public:
-	FEMaterialPoint* Copy()
-	{
-		FEDiscreteMaterialPoint* pt = new FEDiscreteMaterialPoint(*this);
-		if (m_pt) pt->m_pt = m_pt->Copy();
-		return pt;
-	}
-
-	void Serialize(DumpFile& ar)
-	{
-		if (m_pt) m_pt->Serialize(ar);
-	}
-
-	void ShallowCopy(DumpStream& dmp, bool bsave)
-	{
-		if (m_pt) m_pt->ShallowCopy(dmp, bsave);
-	}
-
-	void Init(bool bflag)
-	{
-		if (m_pt) m_pt->Init(bflag);
-	}
-};
+#include "FECore/FEDiscreteMaterial.h"
 
 //-----------------------------------------------------------------------------
 //! material class for discrete elements
-class FEDiscreteMaterial : public FEMaterial
+class FESpringMaterial : public FEDiscreteMaterial
 {
 public:
-	FEDiscreteMaterial(FEModel* pfem) : FEMaterial(pfem) {}
+	FESpringMaterial(FEModel* pfem) : FEDiscreteMaterial(pfem) {}
 
 	virtual double force    (double dl) = 0;
 	virtual double stiffness(double dl) = 0;
-
-	virtual FEMaterialPoint* CreateMaterialPointData() { return new FEDiscreteMaterialPoint; }
 };
 
 //-----------------------------------------------------------------------------
 //! linear spring
-class FELinearSpring : public FEDiscreteMaterial
+class FELinearSpring : public FESpringMaterial
 {
 public:
-	FELinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem){}
+	FELinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
 	double force    (double dl);
 	double stiffness(double dl);
 	void Init();
@@ -61,10 +31,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //! tension-only linear spring
-class FETensionOnlyLinearSpring : public FEDiscreteMaterial
+class FETensionOnlyLinearSpring : public FESpringMaterial
 {
 public:
-	FETensionOnlyLinearSpring(FEModel* pfem) : FEDiscreteMaterial(pfem){}
+	FETensionOnlyLinearSpring(FEModel* pfem) : FESpringMaterial(pfem){}
 	double force    (double dl);
 	double stiffness(double dl);
 	void Init();
@@ -78,7 +48,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //! general purpose nonlinear spring
-class FENonLinearSpring : public FEDiscreteMaterial
+class FENonLinearSpring : public FESpringMaterial
 {
 public:
 	FENonLinearSpring(FEModel* pfem);
