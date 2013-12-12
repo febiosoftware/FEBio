@@ -11,16 +11,8 @@ REGISTER_FEBIO_CLASS(FEBioDiagnostic, FETASK_ID, "diagnose");
 // This simply calls the FEM::Solve function which will solve the FE problem.
 bool FEBioStdSolver::Run(const char* szfile)
 {
-	FEBioModel& fem = dynamic_cast<FEBioModel&>(*m_pfem);
-
-	// read input data
-	if (fem.Input(szfile) == false) return false;
-
-	// initialize and check data
-	if (fem.Init() == false) return false;
-
 	// Solve the problem and return error code
-	return fem.Solve();
+	return m_pfem->Solve();
 }
 
 //-----------------------------------------------------------------------------
@@ -34,7 +26,6 @@ bool FEBioRestart::Run(const char *szfile)
 	// continue the analysis
 	return fem.Solve();
 }
-
 
 //-----------------------------------------------------------------------------
 bool diagnose(FEModel& fem, const char* szfile);

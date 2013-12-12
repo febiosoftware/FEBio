@@ -73,12 +73,13 @@ struct CMDOPTIONS
 	bool	bsplash;			//!< show splash screen or not
 	bool	bsilent;			//!< run FEBio in silent mode (no output to screen)
 
-	char	szfile[MAXFILE];	//!< input file name
+	char	szfile[MAXFILE];	//!< model input file name
 	char	szlog [MAXFILE];	//!< log file name
 	char	szplt [MAXFILE];	//!< plot file name
 	char	szdmp [MAXFILE];	//!< dump file name
 	char	szcnf [MAXFILE];	//!< configuration file
 	char	sztask[MAXFILE];	//!< task name
+	char	szctrl[MAXFILE];	//!< control file for tasks
 };
 
 //-----------------------------------------------------------------------------
@@ -186,9 +187,18 @@ int main(int argc, char* argv[])
 		if (Configure(fem, ops.szcnf) == false) return 1;
 	}
 
-	// store the input file name
-	fem.SetInputFilename(ops.szfile);
+	// read the input file if specified
+	if (ops.szfile[0])
+	{
+		// store the input file name
+		fem.SetInputFilename(ops.szfile);
 
+		// read the input file
+		if (fem.Input(ops.szfile) == false) return 1;
+
+		// initialize and check data
+		if (fem.Init() == false) return false;
+	}
 	// set the output filenames
 	fem.SetLogFilename (ops.szlog);
 	fem.SetPlotFilename(ops.szplt);
@@ -205,8 +215,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	// run the FEBio analysis
-	bool bret = ptask->Run(ops.szfile);
+	// run the FEBio task (and pass the optional control file)
+	bool bret = ptask->Run(ops.szctrl);
 
 	// Don't forget to cleanup the plugins
 	FEBioPluginManager* pPM = FEBioPluginManager::GetInstance();
@@ -233,6 +243,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 
 	ops.szfile[0] = 0;
 	ops.sztask[0] = 0;
+	ops.szctrl[0] = 0;
 
 	// set the location of the configuration file
 	char szpath[1024] = {0};
@@ -254,13 +265,13 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-r is incompatible with other command line option.\n"); return false; }
 			strcpy(ops.sztask, "restart");
-			strcpy(ops.szfile, argv[++i]);
+			strcpy(ops.szctrl, argv[++i]);
 		}
 		else if (strcmp(sz, "-d") == 0)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-d is incompatible with other command line option.\n"); return false; }
 			strcpy(ops.sztask, "diagnose");
-			strcpy(ops.szfile, argv[++i]);
+			strcpy(ops.szctrl, argv[++i]);
 		}
 		else if (strcmp(sz, "-p") == 0)
 		{
@@ -285,7 +296,7 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			if (ops.sztask[0] != 0) { fprintf(stderr, "-s is incompatible with other command line option.\n"); return false; }
 			strcpy(ops.sztask, "optimize");
-			strcpy(ops.szfile, argv[++i]);
+			strcpy(ops.szctrl, argv[++i]);
 		}
 		else if (strcmp(sz, "-g") == 0)
 		{
@@ -309,12 +320,13 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 		{
 			ops.szcnf[0] = 0;
 		}
+/*		// TODO: a task now needs an optional control file
 		else if (strncmp(sz, "-task", 5) == 0)
 		{
 			if (sz[5] != '=') { fprintf(stderr, "command line error when parsing task\n"); return false; }
 			strcpy(ops.sztask, sz+6);
 		}
-		else if (strcmp(sz, "-info")==0)
+*/		else if (strcmp(sz, "-info")==0)
 		{
 			FILE* fp = stdout;
 			if ((i<nargs-1) && (argv[i+1][0] != '-'))
@@ -374,13 +386,16 @@ bool ParseCmdLine(int nargs, char* argv[], CMDOPTIONS& ops)
 	if (ops.sztask[0] == 0) strcpy(ops.sztask, "solve");
 
 	// derive the other filenames
-	char szbase[256]; strcpy(szbase, ops.szfile);
-	ch = strrchr(szbase, '.');
-	if (ch) *ch = 0;
+	if (ops.szfile[0])
+	{
+		char szbase[256]; strcpy(szbase, ops.szfile);
+		ch = strrchr(szbase, '.');
+		if (ch) *ch = 0;
 
-	if (!blog) sprintf(ops.szlog, "%s.log", szbase);
-	if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
-	if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
+		if (!blog) sprintf(ops.szlog, "%s.log", szbase);
+		if (!bplt) sprintf(ops.szplt, "%s.xplt", szbase);
+		if (!bdmp) sprintf(ops.szdmp, "%s.dmp", szbase);
+	}
 
 	return brun;
 }

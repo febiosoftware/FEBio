@@ -33,7 +33,6 @@ public:
 	bool Input(const char* szfile, FEOptimizeData* pOpt);
 
 protected:
-	bool ParseModel     (XMLTag& tag, FEOptimizeData& opt);
 	bool ParseOptions   (XMLTag& tag, FEOptimizeData& opt);
 	bool ParseObjective (XMLTag& tag, FEOptimizeData& opt);
 	bool ParseParameters(XMLTag& tag, FEOptimizeData& opt);

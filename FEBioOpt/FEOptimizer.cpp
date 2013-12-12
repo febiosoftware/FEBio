@@ -1,7 +1,6 @@
 #include "FEOptimizer.h"
 #include "FELMOptimizeMethod.h"
 #include "FECore/Logfile.h"
-#include "FEBioXML/FEBioImport.h"
 
 //=============================================================================
 InvalidVariableName::InvalidVariableName(const char* sz)
@@ -35,8 +34,7 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		bool bret = true;
 		do
 		{
-			if		(tag == "Model"     ) bret = ParseModel     (tag, opt);
-			else if (tag == "Options"   ) bret = ParseOptions   (tag, opt);
+			if      (tag == "Options"   ) bret = ParseOptions   (tag, opt);
 			else if (tag == "Function"  ) bret = ParseObjective (tag, opt);
 			else if (tag == "Parameters") bret = ParseParameters(tag, opt);
 			else if (tag == "LoadData"  ) bret = ParseLoadData  (tag, opt);
@@ -69,34 +67,17 @@ bool FEOptimizeInput::Input(const char* szfile, FEOptimizeData* pOpt)
 		fprintf(stderr, "FATAL ERROR: The element %s has an invalid value (%s).\n\n", e.tag.Name(), e.tag.szvalue());
 		return false;
 	}
+	catch (XMLReader::InvalidAttributeValue e)
+	{
+		fprintf(stderr, "FATAL ERROR: Invalid attribute value (line %d)\n", e.tag.m_nstart_line);
+		return false;
+	}
 	catch (...)
 	{
 		fprintf(stderr, "FATAL ERROR: an exception occured in the optimize routine.\n\n");
 		return false;
 	}
 	xml.Close();
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-//! Read the Model section of the input file
-bool FEOptimizeInput::ParseModel(XMLTag& tag, FEOptimizeData& opt)
-{
-	FEModel& fem = opt.GetFEM();
-
-	// get the input file
-	char szfile[256];
-	tag.value(szfile);
-
-	// read the input file
-	FEFEBioImport fim;
-
-	// read input data
-	if (fim.Load(fem, szfile) == false) return false;
-
-	// initialize data 
-	if (fem.Init() == false) return false;
 
 	return true;
 }
