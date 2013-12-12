@@ -284,6 +284,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FECore\FEDiscreteMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FECore\FEDomain.cpp"
 				>
 			</File>
@@ -559,6 +563,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FECore\FEDiscreteDomain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FECore\FEDiscreteMaterial.h"
 				>
 			</File>
 			<File

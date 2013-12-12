@@ -229,10 +229,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\FEBioMech\FEDiscreteMaterial.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\FEBioMech\FEDiscreteSpringDomain.cpp"
 				>
 			</File>
@@ -517,6 +513,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioMech\FESpringMaterial.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioMech\FEStiffnessMatrix.cpp"
 				>
 			</File>
@@ -684,10 +684,6 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FEDamageTransIsoMooneyRivlin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\FEBioMech\FEDiscreteMaterial.h"
 				>
 			</File>
 			<File
@@ -976,6 +972,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioMech\FESphericalFiberDistribution.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioMech\FESpringMaterial.h"
 				>
 			</File>
 			<File
