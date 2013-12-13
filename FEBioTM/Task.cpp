@@ -294,9 +294,9 @@ void CTask::Run(Progress& prg)
 	strcpy(szbase, GetFileName());
 	char* ch = strrchr(szbase, '.'); assert(ch);
 	if (ch) *ch = 0;
-	sprintf(szfile, "%s.log", szbase); fem.SetLogFilename(szfile);
-	sprintf(szfile, "%s.plt", szbase); fem.SetPlotFilename(szfile);
-	sprintf(szfile, "%s.dmp", szbase); fem.SetDumpFilename(szfile);
+	sprintf(szfile, "%s.log" , szbase); fem.SetLogFilename(szfile);
+	sprintf(szfile, "%s.xplt", szbase); fem.SetPlotFilename(szfile);
+	sprintf(szfile, "%s.dmp" , szbase); fem.SetDumpFilename(szfile);
 	fem.SetInputFilename(GetFileName());
 
 	// reset the stats

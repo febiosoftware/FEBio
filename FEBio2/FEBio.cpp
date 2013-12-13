@@ -187,6 +187,11 @@ int main(int argc, char* argv[])
 		if (Configure(fem, ops.szcnf) == false) return 1;
 	}
 
+	// set the output filenames
+	fem.SetLogFilename (ops.szlog);
+	fem.SetPlotFilename(ops.szplt);
+	fem.SetDumpFilename(ops.szdmp);
+
 	// read the input file if specified
 	if (ops.szfile[0])
 	{
@@ -199,10 +204,6 @@ int main(int argc, char* argv[])
 		// initialize and check data
 		if (fem.Init() == false) return false;
 	}
-	// set the output filenames
-	fem.SetLogFilename (ops.szlog);
-	fem.SetPlotFilename(ops.szplt);
-	fem.SetDumpFilename(ops.szdmp);
 
 	// set options that were passed on the command line
 	fem.SetDebugFlag(ops.bdebug);
