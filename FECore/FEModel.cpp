@@ -9,6 +9,8 @@ using namespace std;
 //-----------------------------------------------------------------------------
 FEModel::FEModel(void)
 {
+	m_sztitle[0] = 0;
+
 	// --- Analysis Data ---
 	m_pStep = 0;
 	m_nStep = -1;

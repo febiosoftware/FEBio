@@ -16,26 +16,25 @@ FEElemElemList::~FEElemElemList(void)
 //-----------------------------------------------------------------------------
 void FEElemElemList::Init()
 {
-	int i;
 	FEMesh& m = *m_pmesh;
 
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
-
-	// get total nr of elements
-	int NE = bd.Elements();
-
 	// allocate storage
+	int NE = m.Elements();
 	m_ref.resize(NE);
 
 	// count nr of neighbors
 	int NN = 0, n = 0, nf;
 	m_ref[0] = 0;
-	for (i=0; i<bd.Elements(); ++i, ++n)
+	for (int i=0; i<m.Domains(); ++i)
 	{
-		FESolidElement& el = bd.Element(i);
-		nf = m.Faces(el);
-		if (n != 0) m_ref[n] = m_ref[n-1] + nf;
-		NN += nf;
+		FEDomain& dom = m.Domain(i);
+		for (int j=0; j<dom.Elements(); ++j, ++n)
+		{
+			FEElement& el = dom.ElementRef(j);
+			nf = m.Faces(el);
+			if (n != 0) m_ref[n] = m_ref[n-1] + nf;
+			NN += nf;
+		}
 	}
 
 	m_pel.resize(NN);
@@ -58,73 +57,75 @@ void FEElemElemList::Create(FEMesh* pmesh)
 	NEL.Create(m);
 
 	// loop over all solid elements first
-	int i, j, k, l;
-	int n = 0, en0[FEElement::MAX_NODES], en1[FEElement::MAX_NODES], n0, n1, M = 0;
+	int en0[FEElement::MAX_NODES], en1[FEElement::MAX_NODES], n0, n1, M = 0;
 	int nf0, nf1;
-	FESolidDomain& bd = dynamic_cast<FESolidDomain&>(m.Domain(0));
-	for (i=0; i<bd.Elements(); ++i, ++n)
+	for (int nd=0; nd<m.Domains(); ++nd)
 	{
-		FEElement& el = bd.Element(i);
-
-		// get the number of neighbors
-		nf0 = m.Faces(el);
-
-		// loop over all neighbors
-		for (j=0; j<nf0; ++j, ++M)
+		FEDomain& dom = m.Domain(nd);
+		for (int i=0; i<dom.Elements(); ++i)
 		{
-			// get the face nodes
-			n0 = m.GetFace(el, j, en0);
+			FEElement& el = dom.ElementRef(i);
+			
+			// get the number of neighbors
+			nf0 = m.Faces(el);
 
-			// find the neighbor element
-			m_pel[M] = 0;
-
-			// loop over all possible candidates
-			int nval = NEL.Valence(en0[0]);
-			FEElement** pne = NEL.ElementList(en0[0]);
-			for (k=0; k<nval; ++k)
+			// loop over all neighbors
+			for (int j=0; j<nf0; ++j, ++M)
 			{
-				// make sure we don't compare the current element
-				if (pne[k] != &el)
+				// get the face nodes
+				n0 = m.GetFace(el, j, en0);
+
+				// find the neighbor element
+				m_pel[M] = 0;
+
+				// loop over all possible candidates
+				int nval = NEL.Valence(en0[0]);
+				FEElement** pne = NEL.ElementList(en0[0]);
+				for (int k=0; k<nval; ++k)
 				{
-					// get the number of faces
-					nf1 = m.Faces(*pne[k]);
-
-					// see if any of these faces match en0
-					for (l=0; l<nf1; ++l)
+					// make sure we don't compare the current element
+					if (pne[k] != &el)
 					{
-						n1 = m.GetFace(*pne[k], l, en1);
+						// get the number of faces
+						nf1 = m.Faces(*pne[k]);
 
-						// make sure the faces have the same nr of nodes
-						if (n1 == n0)
+						// see if any of these faces match en0
+						for (int l=0; l<nf1; ++l)
 						{
-							// check triangles
-							if ((n0 == 3) || (n0 == 6))
-							{
-								if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2])) &&
-									((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2])) &&
-									((en0[2] == en1[0]) || (en0[2] == en1[1]) || (en0[2] == en1[2])))
-								{
-									// found it!
-									m_pel[M] = pne[k];
-									break;
-								}
-							}
-							// check quads
-							else if (n0 == 4)
-							{
-								if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2]) || (en0[0] == en1[3])) &&
-									((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2]) || (en0[1] == en1[3])) &&
-									((en0[2] == en1[0]) || (en0[2] == en1[1]) || (en0[2] == en1[2]) || (en0[2] == en1[3])) &&
-									((en0[3] == en1[0]) || (en0[3] == en1[1]) || (en0[3] == en1[2]) || (en0[3] == en1[3])))
-								{
-									// found it!
-									m_pel[M] = pne[k];
-									break;
-								}
-							}
-						}
+							n1 = m.GetFace(*pne[k], l, en1);
 
-						if (m_pel[M] != 0) break;
+							// make sure the faces have the same nr of nodes
+							if (n1 == n0)
+							{
+								// check triangles
+								if ((n0 == 3) || (n0 == 6))
+								{
+									if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2])) &&
+										((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2])) &&
+										((en0[2] == en1[0]) || (en0[2] == en1[1]) || (en0[2] == en1[2])))
+									{
+										// found it!
+										m_pel[M] = pne[k];
+										break;
+									}
+								}
+								// check quads
+								else if (n0 == 4)
+								{
+									if (((en0[0] == en1[0]) || (en0[0] == en1[1]) || (en0[0] == en1[2]) || (en0[0] == en1[3])) &&
+										((en0[1] == en1[0]) || (en0[1] == en1[1]) || (en0[1] == en1[2]) || (en0[1] == en1[3])) &&
+										((en0[2] == en1[0]) || (en0[2] == en1[1]) || (en0[2] == en1[2]) || (en0[2] == en1[3])) &&
+										((en0[3] == en1[0]) || (en0[3] == en1[1]) || (en0[3] == en1[2]) || (en0[3] == en1[3])))
+									{
+										// found it!
+										m_pel[M] = pne[k];
+										break;
+									}
+								}
+							}
+
+							if (m_pel[M] != 0) break;
+						}
 					}
 				}
 			}

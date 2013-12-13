@@ -36,7 +36,6 @@ FEBioModel::FEBioModel()
 	strcpy(m_szplot, "n3plot");
 	strcpy(m_szlog , "n3log" );
 	strcpy(m_szdump, "n3dump");
-	m_sztitle[0] = 0;
 	m_debug = false;
 	m_becho = true;
 	m_plot = 0;

@@ -36,6 +36,9 @@ void FEMicroMaterial::Init()
 			throw MaterialError("An error occured trying to read the RVE model from file %s.", m_szrve);
 		}
 
+		// set the pardiso solver 
+		m_rve.m_nsolver = PARDISO_SOLVER;
+
 		// make sure the RVE problem doesn't output anything to a plot file
 		m_rve.GetCurrentStep()->SetPlotLevel(FE_PLOT_NEVER);
 
@@ -60,18 +63,21 @@ void FEMicroMaterial::PrepRVE()
 
 	// use the E-E list to tag all exterior nodes
 	int fn[FEElement::MAX_NODES], nf, M = 0;
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
-	for (int i=0; i<bd.Elements(); ++i, ++M)
+	for (int k=0; k<m.Domains(); ++k)
 	{
-		FESolidElement& el = bd.Element(i);
-		nf = m.Faces(el);
-		for (int j=0; j<nf; ++j)
+		FEDomain& dom = m.Domain(k);
+		for (int i=0; i<dom.Elements(); ++i, ++M)
 		{
-			if (EEL.Neighbor(M, j) == 0)
+			FEElement& el = dom.ElementRef(i);
+			nf = m.Faces(el);
+			for (int j=0; j<nf; ++j)
 			{
-				// mark all nodes
-				int nn = m.GetFace(el, j, fn);
-				for (int k=0; k<nn; ++k) tag[fn[k]] = 1;
+				if (EEL.Neighbor(M, j) == 0)
+				{
+					// mark all nodes
+					int nn = m.GetFace(el, j, fn);
+					for (int k=0; k<nn; ++k) tag[fn[k]] = 1;
+				}
 			}
 		}
 	}
@@ -119,22 +125,26 @@ void FEMicroMaterial::PrepRVE()
 	// calculate intial RVE volume
 	m_V0 = 0;
 	double ve;
-	int nint, n;
+	int nint;
 	double* w, J;
-	for (i=0; i<bd.Elements(); ++i)
+	for (int k=0; k<m.Domains(); ++k)
 	{
-		FESolidElement& el = bd.Element(i);
-		nint = el.GaussPoints();
-		w = el.GaussWeights();
-		ve = 0;
-		for (n=0; n<nint; ++n)
+		FESolidDomain& dom = dynamic_cast<FESolidDomain&>(m.Domain(k));
+		for (int i=0; i<dom.Elements(); ++i)
 		{
-			FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
-			J = bd.detJt(el, n);
+			FESolidElement& el = dom.Element(i);
+			nint = el.GaussPoints();
+			w = el.GaussWeights();
+			ve = 0;
+			for (int n=0; n<nint; ++n)
+			{
+				FEElasticMaterialPoint& pt = *el.m_State[n]->ExtractData<FEElasticMaterialPoint>();
+				J = dom.detJt(el, n);
 
-			ve += J*w[n];
+				ve += J*w[n];
+			}
+			m_V0 += ve;
 		}
-		m_V0 += ve;
 	}
 
 	// reset the logfile mode
@@ -276,120 +286,123 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	mat3ds s = pt.m_s;
 
 	// calculate the stiffness matrix and residual
-	FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(0));
-	int NS = bd.Elements(), i, j;
-	for (int n=0; n<NS; ++n)
+	for (int k=0; k<m.Domains(); ++k)
 	{
-		FESolidElement& e = bd.Element(n);
-
-		// create the element's stiffness matrix
-		int ne = e.Nodes();
-		int ndof = 3*ne;
-		ke.resize(ndof, ndof);
-		ke.zero();
-
-		// calculate the element's stiffness matrix
-		bd.ElementStiffness(m_rve, n, ke);
-
-		// create the element's residual
-		fe.assign(ndof, 0);
-
-		// calculate the element's residual
-		bd.ElementInternalForce(e, fe);
-
-		// loop over the element's nodes
-		for (i=0; i<ne; ++i)
+		FEElasticSolidDomain& bd = dynamic_cast<FEElasticSolidDomain&>(m.Domain(k));
+		int NS = bd.Elements();
+		for (int n=0; n<NS; ++n)
 		{
-			FENode& ni = m.Node(e.m_node[i]);
-			for (j=0; j<ne; ++j)
+			FESolidElement& e = bd.Element(n);
+
+			// create the element's stiffness matrix
+			int ne = e.Nodes();
+			int ndof = 3*ne;
+			ke.resize(ndof, ndof);
+			ke.zero();
+
+			// calculate the element's stiffness matrix
+			bd.ElementStiffness(m_rve, n, ke);
+
+			// create the element's residual
+			fe.assign(ndof, 0);
+
+			// calculate the element's residual
+			bd.ElementInternalForce(e, fe);
+
+			// loop over the element's nodes
+			for (int i=0; i<ne; ++i)
 			{
-				FENode& nj = m.Node(e.m_node[j]);
-				if ((ni.m_ID[DOF_X] < 0) && (nj.m_ID[DOF_X] < 0))
+				FENode& ni = m.Node(e.m_node[i]);
+				for (int j=0; j<ne; ++j)
 				{
-					// both nodes are boundary nodes
-					// so grab the element's submatrix
-					double K[3][3];
-					K[0][0] = ke[3*i  ][3*j  ]; K[0][1] = ke[3*i  ][3*j+1]; K[0][2] = ke[3*i  ][3*j+2];
-					K[1][0] = ke[3*i+1][3*j  ]; K[1][1] = ke[3*i+1][3*j+1]; K[1][2] = ke[3*i+1][3*j+2];
-					K[2][0] = ke[3*i+2][3*j  ]; K[2][1] = ke[3*i+2][3*j+1]; K[2][2] = ke[3*i+2][3*j+2];
+					FENode& nj = m.Node(e.m_node[j]);
+					if ((ni.m_ID[DOF_X] < 0) && (nj.m_ID[DOF_X] < 0))
+					{
+						// both nodes are boundary nodes
+						// so grab the element's submatrix
+						double K[3][3];
+						K[0][0] = ke[3*i  ][3*j  ]; K[0][1] = ke[3*i  ][3*j+1]; K[0][2] = ke[3*i  ][3*j+2];
+						K[1][0] = ke[3*i+1][3*j  ]; K[1][1] = ke[3*i+1][3*j+1]; K[1][2] = ke[3*i+1][3*j+2];
+						K[2][0] = ke[3*i+2][3*j  ]; K[2][1] = ke[3*i+2][3*j+1]; K[2][2] = ke[3*i+2][3*j+2];
 
-					// get the nodal positions
-					vec3d ri = ni.m_rt;
-					vec3d rj = nj.m_rt;
+						// get the nodal positions
+						vec3d ri = ni.m_rt;
+						vec3d rj = nj.m_rt;
 
-					double Ri[3] = { ri.x, ri.y, ri.z };
-					double Rj[3] = { rj.x, rj.y, rj.z };
+						double Ri[3] = { ri.x, ri.y, ri.z };
+						double Rj[3] = { rj.x, rj.y, rj.z };
 
-					// create the elasticity tensor
-					D[0][0] += Ri[0]*K[0][0]*Rj[0]; 
-					D[1][1] += Ri[1]*K[1][1]*Rj[1]; 
-					D[2][2] += Ri[2]*K[2][2]*Rj[2]; 
+						// create the elasticity tensor
+						D[0][0] += Ri[0]*K[0][0]*Rj[0]; 
+						D[1][1] += Ri[1]*K[1][1]*Rj[1]; 
+						D[2][2] += Ri[2]*K[2][2]*Rj[2]; 
 
-					D[0][1] += Ri[0]*K[0][1]*Rj[1];
-					D[0][2] += Ri[0]*K[0][2]*Rj[2];
-					D[1][2] += Ri[1]*K[1][2]*Rj[2];
+						D[0][1] += Ri[0]*K[0][1]*Rj[1];
+						D[0][2] += Ri[0]*K[0][2]*Rj[2];
+						D[1][2] += Ri[1]*K[1][2]*Rj[2];
 
-					D[0][3] += 0.5*(Ri[0]*K[0][0]*Rj[1] + Ri[0]*K[0][1]*Rj[0]);
-					D[0][4] += 0.5*(Ri[0]*K[0][1]*Rj[2] + Ri[0]*K[0][2]*Rj[1]);
-					D[0][5] += 0.5*(Ri[0]*K[0][0]*Rj[2] + Ri[0]*K[0][2]*Rj[0]);
+						D[0][3] += 0.5*(Ri[0]*K[0][0]*Rj[1] + Ri[0]*K[0][1]*Rj[0]);
+						D[0][4] += 0.5*(Ri[0]*K[0][1]*Rj[2] + Ri[0]*K[0][2]*Rj[1]);
+						D[0][5] += 0.5*(Ri[0]*K[0][0]*Rj[2] + Ri[0]*K[0][2]*Rj[0]);
 
-					D[1][3] += 0.5*(Ri[1]*K[1][0]*Rj[1] + Ri[1]*K[1][1]*Rj[0]);
-					D[1][4] += 0.5*(Ri[1]*K[1][1]*Rj[2] + Ri[1]*K[1][2]*Rj[1]);
-					D[1][5] += 0.5*(Ri[1]*K[1][0]*Rj[2] + Ri[1]*K[1][2]*Rj[0]);
+						D[1][3] += 0.5*(Ri[1]*K[1][0]*Rj[1] + Ri[1]*K[1][1]*Rj[0]);
+						D[1][4] += 0.5*(Ri[1]*K[1][1]*Rj[2] + Ri[1]*K[1][2]*Rj[1]);
+						D[1][5] += 0.5*(Ri[1]*K[1][0]*Rj[2] + Ri[1]*K[1][2]*Rj[0]);
 
-					D[2][3] += 0.5*(Ri[2]*K[2][0]*Rj[1] + Ri[2]*K[2][1]*Rj[0]);
-					D[2][4] += 0.5*(Ri[2]*K[2][1]*Rj[2] + Ri[2]*K[2][2]*Rj[1]);
-					D[2][5] += 0.5*(Ri[2]*K[2][0]*Rj[2] + Ri[2]*K[2][2]*Rj[0]);
+						D[2][3] += 0.5*(Ri[2]*K[2][0]*Rj[1] + Ri[2]*K[2][1]*Rj[0]);
+						D[2][4] += 0.5*(Ri[2]*K[2][1]*Rj[2] + Ri[2]*K[2][2]*Rj[1]);
+						D[2][5] += 0.5*(Ri[2]*K[2][0]*Rj[2] + Ri[2]*K[2][2]*Rj[0]);
 
-					D[3][3] += 0.25*(Ri[0]*K[1][0]*Rj[1] + Ri[1]*K[0][0]*Rj[1] + Ri[0]*K[1][1]*Rj[0] + Ri[1]*K[0][1]*Rj[0]);
-					D[3][4] += 0.25*(Ri[0]*K[1][1]*Rj[2] + Ri[1]*K[0][1]*Rj[2] + Ri[0]*K[1][2]*Rj[1] + Ri[1]*K[0][2]*Rj[1]);
-					D[3][5] += 0.25*(Ri[0]*K[1][0]*Rj[2] + Ri[1]*K[0][0]*Rj[2] + Ri[0]*K[1][2]*Rj[0] + Ri[1]*K[0][2]*Rj[0]);
+						D[3][3] += 0.25*(Ri[0]*K[1][0]*Rj[1] + Ri[1]*K[0][0]*Rj[1] + Ri[0]*K[1][1]*Rj[0] + Ri[1]*K[0][1]*Rj[0]);
+						D[3][4] += 0.25*(Ri[0]*K[1][1]*Rj[2] + Ri[1]*K[0][1]*Rj[2] + Ri[0]*K[1][2]*Rj[1] + Ri[1]*K[0][2]*Rj[1]);
+						D[3][5] += 0.25*(Ri[0]*K[1][0]*Rj[2] + Ri[1]*K[0][0]*Rj[2] + Ri[0]*K[1][2]*Rj[0] + Ri[1]*K[0][2]*Rj[0]);
 
-					D[4][4] += 0.25*(Ri[1]*K[2][1]*Rj[2] + Ri[2]*K[1][1]*Rj[2] + Ri[1]*K[2][2]*Rj[1] + Ri[2]*K[1][2]*Rj[1]);
-					D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
+						D[4][4] += 0.25*(Ri[1]*K[2][1]*Rj[2] + Ri[2]*K[1][1]*Rj[2] + Ri[1]*K[2][2]*Rj[1] + Ri[2]*K[1][2]*Rj[1]);
+						D[4][5] += 0.25*(Ri[1]*K[2][0]*Rj[2] + Ri[2]*K[1][0]*Rj[2] + Ri[1]*K[2][2]*Rj[0] + Ri[2]*K[1][2]*Rj[0]);
 
-					D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
+						D[5][5] += 0.25*(Ri[0]*K[2][0]*Rj[2] + Ri[2]*K[0][0]*Rj[2] + Ri[0]*K[2][2]*Rj[0] + Ri[2]*K[0][2]*Rj[0]);
+					}
 				}
+	/*
+				if (ni.m_ID[DOF_X] < 0)
+				{
+					vec3d ri = ni.m_r0;
+
+					double Fi[3] = {fe[3*i], fe[3*i+1], fe[3*i+2] };
+					double Ri[3] = { ri.x, ri.y, ri.z };
+					double I[3][3] = {{1,0,0},{0,1,0},{0,0,1}};
+
+					D[0][0] += Fi[0]*Ri[0];
+					D[1][1] += Fi[1]*Ri[1];
+					D[2][2] += Fi[2]*Ri[2];
+
+	//				D[0][1] += 0;
+	//				D[0][2] += 0;
+	//				D[1][2] += 0;
+
+					D[0][3] += 0.5*(Fi[0]*I[0][0]*Ri[1] + Fi[0]*I[0][1]*Ri[0]);
+					D[0][4] += 0.5*(Fi[0]*I[0][1]*Ri[2] + Fi[0]*I[0][2]*Ri[1]);
+					D[0][5] += 0.5*(Fi[0]*I[0][0]*Ri[2] + Fi[0]*I[0][2]*Ri[0]);
+
+					D[1][3] += 0.5*(Fi[1]*I[1][0]*Ri[1] + Fi[1]*I[1][1]*Ri[0]);
+					D[1][4] += 0.5*(Fi[1]*I[1][1]*Ri[2] + Fi[1]*I[1][2]*Ri[1]);
+					D[1][5] += 0.5*(Fi[1]*I[1][0]*Ri[2] + Fi[1]*I[1][2]*Ri[0]);
+
+					D[2][3] += 0.5*(Fi[2]*I[2][0]*Ri[1] + Fi[2]*I[2][1]*Ri[0]);
+					D[2][4] += 0.5*(Fi[2]*I[2][1]*Ri[2] + Fi[2]*I[2][2]*Ri[1]);
+					D[2][5] += 0.5*(Fi[2]*I[2][0]*Ri[2] + Fi[2]*I[2][2]*Ri[0]);
+
+					D[3][3] += 0.25*(Fi[0]*I[1][0]*Ri[1] + Fi[1]*I[0][0]*Ri[1] + Fi[0]*I[1][1]*Ri[0] + Fi[1]*I[0][1]*Ri[0]);
+					D[3][4] += 0.25*(Fi[0]*I[1][1]*Ri[2] + Fi[1]*I[0][1]*Ri[2] + Fi[0]*I[1][2]*Ri[1] + Fi[1]*I[0][2]*Ri[1]);
+					D[3][5] += 0.25*(Fi[0]*I[1][0]*Ri[2] + Fi[1]*I[0][0]*Ri[2] + Fi[0]*I[1][2]*Ri[0] + Fi[1]*I[0][2]*Ri[0]);
+
+					D[4][4] += 0.25*(Fi[1]*I[2][1]*Ri[2] + Fi[2]*I[1][1]*Ri[2] + Fi[1]*I[2][2]*Ri[1] + Fi[2]*I[1][2]*Ri[1]);
+					D[4][5] += 0.25*(Fi[1]*I[2][0]*Ri[2] + Fi[2]*I[1][0]*Ri[2] + Fi[1]*I[2][2]*Ri[0] + Fi[2]*I[1][2]*Ri[0]);
+
+					D[5][5] += 0.25*(Fi[0]*I[2][0]*Ri[2] + Fi[2]*I[0][0]*Ri[2] + Fi[0]*I[2][2]*Ri[0] + Fi[2]*I[0][2]*Ri[0]);
+				}
+	*/
 			}
-/*
-			if (ni.m_ID[DOF_X] < 0)
-			{
-				vec3d ri = ni.m_r0;
-
-				double Fi[3] = {fe[3*i], fe[3*i+1], fe[3*i+2] };
-				double Ri[3] = { ri.x, ri.y, ri.z };
-				double I[3][3] = {{1,0,0},{0,1,0},{0,0,1}};
-
-				D[0][0] += Fi[0]*Ri[0];
-				D[1][1] += Fi[1]*Ri[1];
-				D[2][2] += Fi[2]*Ri[2];
-
-//				D[0][1] += 0;
-//				D[0][2] += 0;
-//				D[1][2] += 0;
-
-				D[0][3] += 0.5*(Fi[0]*I[0][0]*Ri[1] + Fi[0]*I[0][1]*Ri[0]);
-				D[0][4] += 0.5*(Fi[0]*I[0][1]*Ri[2] + Fi[0]*I[0][2]*Ri[1]);
-				D[0][5] += 0.5*(Fi[0]*I[0][0]*Ri[2] + Fi[0]*I[0][2]*Ri[0]);
-
-				D[1][3] += 0.5*(Fi[1]*I[1][0]*Ri[1] + Fi[1]*I[1][1]*Ri[0]);
-				D[1][4] += 0.5*(Fi[1]*I[1][1]*Ri[2] + Fi[1]*I[1][2]*Ri[1]);
-				D[1][5] += 0.5*(Fi[1]*I[1][0]*Ri[2] + Fi[1]*I[1][2]*Ri[0]);
-
-				D[2][3] += 0.5*(Fi[2]*I[2][0]*Ri[1] + Fi[2]*I[2][1]*Ri[0]);
-				D[2][4] += 0.5*(Fi[2]*I[2][1]*Ri[2] + Fi[2]*I[2][2]*Ri[1]);
-				D[2][5] += 0.5*(Fi[2]*I[2][0]*Ri[2] + Fi[2]*I[2][2]*Ri[0]);
-
-				D[3][3] += 0.25*(Fi[0]*I[1][0]*Ri[1] + Fi[1]*I[0][0]*Ri[1] + Fi[0]*I[1][1]*Ri[0] + Fi[1]*I[0][1]*Ri[0]);
-				D[3][4] += 0.25*(Fi[0]*I[1][1]*Ri[2] + Fi[1]*I[0][1]*Ri[2] + Fi[0]*I[1][2]*Ri[1] + Fi[1]*I[0][2]*Ri[1]);
-				D[3][5] += 0.25*(Fi[0]*I[1][0]*Ri[2] + Fi[1]*I[0][0]*Ri[2] + Fi[0]*I[1][2]*Ri[0] + Fi[1]*I[0][2]*Ri[0]);
-
-				D[4][4] += 0.25*(Fi[1]*I[2][1]*Ri[2] + Fi[2]*I[1][1]*Ri[2] + Fi[1]*I[2][2]*Ri[1] + Fi[2]*I[1][2]*Ri[1]);
-				D[4][5] += 0.25*(Fi[1]*I[2][0]*Ri[2] + Fi[2]*I[1][0]*Ri[2] + Fi[1]*I[2][2]*Ri[0] + Fi[2]*I[1][2]*Ri[0]);
-
-				D[5][5] += 0.25*(Fi[0]*I[2][0]*Ri[2] + Fi[2]*I[0][0]*Ri[2] + Fi[0]*I[2][2]*Ri[0] + Fi[2]*I[0][2]*Ri[0]);
-			}
-*/
 		}
 	}
 
