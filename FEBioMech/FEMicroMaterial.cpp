@@ -285,6 +285,11 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 	// get the stress
 	mat3ds s = pt.m_s;
 
+	// calculate the center point
+	vec3d rc(0,0,0);
+	for (int k=0; k<m.Nodes(); ++k) rc += m.Node(k).m_rt;
+	rc /= (double) m.Nodes();
+
 	// calculate the stiffness matrix and residual
 	for (int k=0; k<m.Domains(); ++k)
 	{
@@ -326,8 +331,8 @@ tens4ds FEMicroMaterial::Tangent(FEMaterialPoint &mp)
 						K[2][0] = ke[3*i+2][3*j  ]; K[2][1] = ke[3*i+2][3*j+1]; K[2][2] = ke[3*i+2][3*j+2];
 
 						// get the nodal positions
-						vec3d ri = ni.m_rt;
-						vec3d rj = nj.m_rt;
+						vec3d ri = ni.m_rt - rc;
+						vec3d rj = nj.m_rt - rc;
 
 						double Ri[3] = { ri.x, ri.y, ri.z };
 						double Rj[3] = { rj.x, rj.y, rj.z };
