@@ -113,7 +113,7 @@ bool FEPlotContactGap::Save(FESurface& surf, vector<float>& a)
 		FESurfaceElement& f = pcs->Element(i);
 		pcs->GetNodalContactGap(i, gn);
 		int ne = f.m_lnode.size();
-		for (int j = 0; j< ne; ++j) a[MFN*i + j] = (float) gn[i];
+		for (int j = 0; j< ne; ++j) a[MFN*i + j] = (float) gn[j];
 	}
 	return true;
 }
