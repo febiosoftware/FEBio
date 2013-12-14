@@ -388,7 +388,8 @@ Global
 		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release OpenMP|Itanium.ActiveCfg = Release|Win32
 		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release OpenMP|Win32.ActiveCfg = Release|Win32
 		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release OpenMP|Win32.Build.0 = Release|Win32
-		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release OpenMP|x64.ActiveCfg = Release|Win32
+		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release OpenMP|x64.ActiveCfg = Release OpenMP|x64
+		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release OpenMP|x64.Build.0 = Release OpenMP|x64
 		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release|Itanium.ActiveCfg = Release|Win32
 		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release|Win32.ActiveCfg = Release|Win32
 		{883DD510-90C6-40E2-BF5F-FF789D32B18A}.Release|Win32.Build.0 = Release|Win32
@@ -414,7 +415,8 @@ Global
 		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release OpenMP|Itanium.ActiveCfg = Release|Win32
 		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release OpenMP|Win32.ActiveCfg = Release|Win32
 		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release OpenMP|Win32.Build.0 = Release|Win32
-		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release OpenMP|x64.ActiveCfg = Release|Win32
+		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release OpenMP|x64.ActiveCfg = Release OpenMP|x64
+		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release OpenMP|x64.Build.0 = Release OpenMP|x64
 		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release|Itanium.ActiveCfg = Release|Win32
 		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release|Win32.ActiveCfg = Release|Win32
 		{D41F2690-2378-44C1-BCFB-1173752C8C6C}.Release|Win32.Build.0 = Release|Win32
@@ -440,7 +442,8 @@ Global
 		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release OpenMP|Itanium.ActiveCfg = Release|Win32
 		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release OpenMP|Win32.ActiveCfg = Release|Win32
 		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release OpenMP|Win32.Build.0 = Release|Win32
-		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release OpenMP|x64.ActiveCfg = Release|Win32
+		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release OpenMP|x64.ActiveCfg = Release OpenMP|x64
+		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release OpenMP|x64.Build.0 = Release OpenMP|x64
 		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release|Itanium.ActiveCfg = Release|Win32
 		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release|Win32.ActiveCfg = Release|Win32
 		{4ED90D66-2487-4E3B-98D6-4A55E2EAA59B}.Release|Win32.Build.0 = Release|Win32
