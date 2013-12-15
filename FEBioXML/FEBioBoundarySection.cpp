@@ -18,12 +18,22 @@ void FEBioBoundarySection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if      (tag == "fix"                  ) ParseBCFix               (tag);
-		else if (tag == "prescribe"            ) ParseBCPrescribe         (tag);
-		else if (tag == "contact"              ) ParseContactSection      (tag);
-		else if (tag == "linear_constraint"    ) ParseConstraints         (tag);
-		else if (tag == "spring"               ) ParseSpringSection       (tag);
-		else throw XMLReader::InvalidTag(tag);
+		if (m_pim->Version() < 0x0200)
+		{
+			if      (tag == "fix"              ) ParseBCFix         (tag);
+			else if (tag == "prescribe"        ) ParseBCPrescribe   (tag);
+			else if (tag == "contact"          ) ParseContactSection(tag);
+			else if (tag == "linear_constraint") ParseConstraints   (tag);
+			else if (tag == "spring"           ) ParseSpringSection (tag);
+			else throw XMLReader::InvalidTag(tag);
+		}
+		else
+		{
+			if      (tag == "fix"              ) ParseBCFix20      (tag);
+			else if (tag == "prescribe"        ) ParseBCPrescribe20(tag);
+			else if (tag == "linear_constraint") ParseConstraints  (tag);
+			else throw XMLReader::InvalidTag(tag);
+		}
 		++tag;
 	}
 	while (!tag.isend());
@@ -184,6 +194,49 @@ void FEBioBoundarySection::ParseBCFix(XMLTag &tag)
 	}
 }
 
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection::ParseBCFix20(XMLTag &tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	// make sure this section does not appear in a step section
+	if (m_pim->m_nsteps != 0) throw XMLReader::InvalidTag(tag);
+
+	// get the required bc attribute
+	char sz[8];
+	strcpy(sz, tag.AttributeValue("bc"));
+
+	// Read the fixed nodes
+	++tag;
+	do
+	{
+		int n = atoi(tag.AttributeValue("id"))-1;
+		FENode& node = fem.GetMesh().Node(n);
+		if      (strcmp(sz, "x"  ) == 0) { node.m_BC[DOF_X] = -1; }
+		else if (strcmp(sz, "y"  ) == 0) { node.m_BC[DOF_Y] = -1; }
+		else if (strcmp(sz, "z"  ) == 0) { node.m_BC[DOF_Z] = -1; }
+		else if (strcmp(sz, "xy" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = -1; }
+		else if (strcmp(sz, "yz" ) == 0) { node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
+		else if (strcmp(sz, "xz" ) == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Z] = -1; }
+		else if (strcmp(sz, "xyz") == 0) { node.m_BC[DOF_X] = node.m_BC[DOF_Y] = node.m_BC[DOF_Z] = -1; }
+		else if (strcmp(sz, "p"  ) == 0) { node.m_BC[DOF_P] = -1; }
+		else if (strcmp(sz, "u"  ) == 0) { node.m_BC[DOF_U] = -1; }
+		else if (strcmp(sz, "v"  ) == 0) { node.m_BC[DOF_V] = -1; }
+		else if (strcmp(sz, "w"  ) == 0) { node.m_BC[DOF_W] = -1; }
+		else if (strcmp(sz, "uv" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = -1; }
+		else if (strcmp(sz, "vw" ) == 0) { node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
+		else if (strcmp(sz, "uw" ) == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_W] = -1; }
+		else if (strcmp(sz, "uvw") == 0) { node.m_BC[DOF_U] = node.m_BC[DOF_V] = node.m_BC[DOF_W] = -1; }
+		else if (strcmp(sz, "t"  ) == 0) { node.m_BC[DOF_T] = -1; }
+		else if (strcmp(sz, "c"  ) == 0) { node.m_BC[DOF_C] = -1; }
+		else if (strncmp(sz, "c", 1) == 0) node.m_BC[DOF_C + atoi(&sz[1]) - 1] = -1;
+		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+		++tag;
+	}
+	while (!tag.isend());
+}
+
 //-----------------------------------------------------------------------------
 void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 {
@@ -192,19 +245,20 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 
 	int nversion = m_pim->Version();
 
-	if (nversion >= 0x0200)
+	assert(nversion < 0x0200);
+
+	// see if this tag defines a set
+	const char* szset = tag.AttributeValue("set", true);
+	if (szset)
 	{
-		// count how many prescibed nodes there are
-		int ndis = tag.children();
+		// Find the set
+		FENodeSet* ps = mesh.FindNodeSet(szset);
+		if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
 
-		// determine whether prescribed BC is relative or absolute
-		bool br = false;
-		const char* sztype = tag.AttributeValue("type",true);
-		if (sztype && strcmp(sztype, "relative") == 0) br = true;
-
-		// get the BC
-		int bc = -1;
+		// get the bc attribute
 		const char* sz = tag.AttributeValue("bc");
+
+		int bc;
 		if      (strcmp(sz, "x") == 0) bc = DOF_X;
 		else if (strcmp(sz, "y") == 0) bc = DOF_Y;
 		else if (strcmp(sz, "z") == 0) bc = DOF_Z;
@@ -217,18 +271,70 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 		else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
+		// get the lc attribute
+		sz = tag.AttributeValue("lc");
+		int lc = atoi(sz);
+
+		// make sure this tag is a leaf
+		if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
+
+		// get the scale factor
+		double s = 1;
+		tag.value(s);
+
+		// loop over all nodes in the nodeset
+		FENodeSet& ns = *ps;
+		int N = ns.size();
+		for (int i=0; i<N; ++i)
+		{
+			FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
+			pdc->node = ns[i];
+			pdc->bc = bc;
+			pdc->lc = lc;
+			pdc->s = s;
+			fem.AddPrescribedBC(pdc);
+
+			// add this boundary condition to the current step
+			if (m_pim->m_nsteps > 0)
+			{
+				GetStep()->AddBoundaryCondition(pdc);
+				pdc->Deactivate();
+			}
+		}
+	}
+	else
+	{
+		// count how many prescibed nodes there are
+		int ndis = tag.children();
+
+		// determine whether prescribed BC is relative or absolute
+		bool br = false;
+		const char* sztype = tag.AttributeValue("type",true);
+		if (sztype && strcmp(sztype, "relative") == 0) br = true;
+
 		// read the prescribed data
 		++tag;
 		for (int i=0; i<ndis; ++i)
 		{
-			// get the node ID
-			int n = atoi(tag.AttributeValue("id"))-1;
+			int n = atoi(tag.AttributeValue("id"))-1, bc;
+			const char* sz = tag.AttributeValue("bc");
 
-			// get the load curve number
+			if      (strcmp(sz, "x") == 0) bc = DOF_X;
+			else if (strcmp(sz, "y") == 0) bc = DOF_Y;
+			else if (strcmp(sz, "z") == 0) bc = DOF_Z;
+			else if (strcmp(sz, "u") == 0) bc = DOF_U;
+			else if (strcmp(sz, "v") == 0) bc = DOF_V;
+			else if (strcmp(sz, "w") == 0) bc = DOF_W;
+			else if (strcmp(sz, "p") == 0) bc = DOF_P;
+			else if (strcmp(sz, "t") == 0) bc = DOF_T; 
+			else if (strcmp(sz, "c") == 0) bc = DOF_C;
+			else if (strcmp(sz, "c1") == 0) bc = DOF_C;
+			else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
+			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
 			sz = tag.AttributeValue("lc");
-			int lc = atoi(sz) - 1;
+			int lc = atoi(sz)-1;
 
-			// create a new BC
 			FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
 			pdc->node = n;
 			pdc->bc = bc;
@@ -246,113 +352,68 @@ void FEBioBoundarySection::ParseBCPrescribe(XMLTag& tag)
 			++tag;
 		}
 	}
-	else
+}
+
+//-----------------------------------------------------------------------------
+void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+	FEMesh& mesh = fem.GetMesh();
+
+	int nversion = m_pim->Version();
+
+	assert(nversion >= 0x0200);
+
+	// count how many prescibed nodes there are
+	int ndis = tag.children();
+
+	// determine whether prescribed BC is relative or absolute
+	bool br = false;
+	const char* sztype = tag.AttributeValue("type",true);
+	if (sztype && strcmp(sztype, "relative") == 0) br = true;
+
+	// get the BC
+	int bc = -1;
+	const char* sz = tag.AttributeValue("bc");
+	if      (strcmp(sz, "x") == 0) bc = DOF_X;
+	else if (strcmp(sz, "y") == 0) bc = DOF_Y;
+	else if (strcmp(sz, "z") == 0) bc = DOF_Z;
+	else if (strcmp(sz, "u") == 0) bc = DOF_U;
+	else if (strcmp(sz, "v") == 0) bc = DOF_V;
+	else if (strcmp(sz, "w") == 0) bc = DOF_W;
+	else if (strcmp(sz, "p") == 0) bc = DOF_P;
+	else if (strcmp(sz, "t") == 0) bc = DOF_T; 
+	else if (strcmp(sz, "c") == 0) bc = DOF_C;
+	else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
+	else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
+
+	// read the prescribed data
+	++tag;
+	for (int i=0; i<ndis; ++i)
 	{
-		// see if this tag defines a set
-		const char* szset = tag.AttributeValue("set", true);
-		if (szset)
+		// get the node ID
+		int n = atoi(tag.AttributeValue("id"))-1;
+
+		// get the load curve number
+		sz = tag.AttributeValue("lc");
+		int lc = atoi(sz) - 1;
+
+		// create a new BC
+		FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
+		pdc->node = n;
+		pdc->bc = bc;
+		pdc->lc = lc;
+		tag.value(pdc->s);
+		pdc->br = br;
+		fem.AddPrescribedBC(pdc);
+
+		// add this boundary condition to the current step
+		if (m_pim->m_nsteps > 0)
 		{
-			// Find the set
-			FENodeSet* ps = mesh.FindNodeSet(szset);
-			if (ps == 0) throw XMLReader::InvalidAttributeValue(tag, "set", szset);
-
-			// get the bc attribute
-			const char* sz = tag.AttributeValue("bc");
-
-			int bc;
-			if      (strcmp(sz, "x") == 0) bc = DOF_X;
-			else if (strcmp(sz, "y") == 0) bc = DOF_Y;
-			else if (strcmp(sz, "z") == 0) bc = DOF_Z;
-			else if (strcmp(sz, "u") == 0) bc = DOF_U;
-			else if (strcmp(sz, "v") == 0) bc = DOF_V;
-			else if (strcmp(sz, "w") == 0) bc = DOF_W;
-			else if (strcmp(sz, "p") == 0) bc = DOF_P;
-			else if (strcmp(sz, "t") == 0) bc = DOF_T; 
-			else if (strcmp(sz, "c") == 0) bc = DOF_C;
-			else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
-			else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-
-			// get the lc attribute
-			sz = tag.AttributeValue("lc");
-			int lc = atoi(sz);
-
-			// make sure this tag is a leaf
-			if (tag.isleaf() == false) throw XMLReader::InvalidValue(tag);
-
-			// get the scale factor
-			double s = 1;
-			tag.value(s);
-
-			// loop over all nodes in the nodeset
-			FENodeSet& ns = *ps;
-			int N = ns.size();
-			for (int i=0; i<N; ++i)
-			{
-				FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
-				pdc->node = ns[i];
-				pdc->bc = bc;
-				pdc->lc = lc;
-				pdc->s = s;
-				fem.AddPrescribedBC(pdc);
-
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					GetStep()->AddBoundaryCondition(pdc);
-					pdc->Deactivate();
-				}
-			}
+			GetStep()->AddBoundaryCondition(pdc);
+			pdc->Deactivate();
 		}
-		else
-		{
-			// count how many prescibed nodes there are
-			int ndis = tag.children();
-
-			// determine whether prescribed BC is relative or absolute
-			bool br = false;
-			const char* sztype = tag.AttributeValue("type",true);
-			if (sztype && strcmp(sztype, "relative") == 0) br = true;
-
-			// read the prescribed data
-			++tag;
-			for (int i=0; i<ndis; ++i)
-			{
-				int n = atoi(tag.AttributeValue("id"))-1, bc;
-				const char* sz = tag.AttributeValue("bc");
-
-				if      (strcmp(sz, "x") == 0) bc = DOF_X;
-				else if (strcmp(sz, "y") == 0) bc = DOF_Y;
-				else if (strcmp(sz, "z") == 0) bc = DOF_Z;
-				else if (strcmp(sz, "u") == 0) bc = DOF_U;
-				else if (strcmp(sz, "v") == 0) bc = DOF_V;
-				else if (strcmp(sz, "w") == 0) bc = DOF_W;
-				else if (strcmp(sz, "p") == 0) bc = DOF_P;
-				else if (strcmp(sz, "t") == 0) bc = DOF_T; 
-				else if (strcmp(sz, "c") == 0) bc = DOF_C;
-				else if (strcmp(sz, "c1") == 0) bc = DOF_C;
-				else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
-				else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
-
-				sz = tag.AttributeValue("lc");
-				int lc = atoi(sz)-1;
-
-				FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
-				pdc->node = n;
-				pdc->bc = bc;
-				pdc->lc = lc;
-				tag.value(pdc->s);
-				pdc->br = br;
-				fem.AddPrescribedBC(pdc);
-
-				// add this boundary condition to the current step
-				if (m_pim->m_nsteps > 0)
-				{
-					GetStep()->AddBoundaryCondition(pdc);
-					pdc->Deactivate();
-				}
-				++tag;
-			}
-		}
+		++tag;
 	}
 }
 

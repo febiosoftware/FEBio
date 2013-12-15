@@ -70,4 +70,6 @@ protected:
 protected:
 	bool			m_blinear;	//!< pressure load type (linear or nonlinear)
 	vector<LOAD>	m_PC;		//!< pressure load cards
+
+	DECLARE_PARAMETER_LIST();
 };

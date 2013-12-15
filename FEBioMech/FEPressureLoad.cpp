@@ -3,6 +3,14 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+// Parameter block for pressure loads
+BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
+	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
+END_PARAMETER_LIST()
+
+//-----------------------------------------------------------------------------
+// \deprecated This function is only used by the 1.2 file reader and is to be 
+// considered obsolete.
 bool FEPressureLoad::SetAttribute(const char* szatt, const char* szval)
 {
 	if (strcmp(szatt, "type") == 0)

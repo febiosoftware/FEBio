@@ -20,6 +20,7 @@ public:
 protected:
 	void ParseNodeSection       (XMLTag& tag);
 	void ParseElementSection    (XMLTag& tag);
+	void ParseElementSection20  (XMLTag& tag);
 	void ParseElementDataSection(XMLTag& tag);
 	void ParseNodeSetSection    (XMLTag& tag);
 	void ParsePartSection       (XMLTag& tag);
@@ -33,4 +34,8 @@ protected:
 	FE_Element_Shape ElementShape(XMLTag& tag);
 	int DomainType(FE_Element_Shape eshape, FEMaterial* pmat);
 	FEDomain* CreateDomain(int ntype, FEMesh* pm, FEMaterial* pmat);
+
+
+protected:
+	vector<FEDOMAIN>	m_dom;
 };

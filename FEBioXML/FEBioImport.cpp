@@ -113,7 +113,7 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		// get the version number
 		ParseVersion(tag);
 
-		// FEBio2 only supports file version 1.2 and up
+		// FEBio2 only supports file version 1.2 and 2.0
 		if ((m_nversion != 0x0102) && 
 			(m_nversion != 0x0200)) throw InvalidVersion();
 

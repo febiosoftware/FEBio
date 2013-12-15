@@ -58,6 +58,12 @@ public:
 		string	m_szfile;
 	};
 	class DuplicateMaterialSection {};
+	class InvalidDomainMaterial
+	{ 
+	public: 
+		InvalidDomainMaterial(int ndom) : m_ndom(ndom){}
+		int m_ndom; 
+	};
 
 public:
 	class FEPlotVariable

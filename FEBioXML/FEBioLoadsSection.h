@@ -10,8 +10,9 @@ public:
 	void Parse(XMLTag& tag);
 
 protected:
-	void ParseBCForce    (XMLTag& tag);
-	void ParseBodyForce  (XMLTag& tag);
-	void ParseBodyLoad   (XMLTag& tag);
-	void ParseSurfaceLoad(XMLTag& tag);
+	void ParseBCForce      (XMLTag& tag);
+	void ParseBodyForce    (XMLTag& tag);
+	void ParseBodyLoad     (XMLTag& tag);
+	void ParseSurfaceLoad  (XMLTag& tag);
+	void ParseSurfaceLoad20(XMLTag& tag);
 };

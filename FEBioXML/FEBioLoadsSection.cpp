@@ -17,10 +17,20 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 	++tag;
 	do
 	{
-		if      (tag == "force"              ) ParseBCForce  (tag);
-		else if (tag == "body_force"         ) ParseBodyForce(tag);
-		else if (tag == "heat_source"        ) ParseBodyLoad (tag);
-		else ParseSurfaceLoad(tag);
+		if (m_pim->Version() < 0x0200)
+		{
+			if      (tag == "force"      ) ParseBCForce  (tag);
+			else if (tag == "body_force" ) ParseBodyForce(tag);
+			else if (tag == "heat_source") ParseBodyLoad (tag);
+			else ParseSurfaceLoad(tag);
+		}
+		else
+		{
+			if      (tag == "nodal_load"  ) ParseBCForce      (tag);
+			else if (tag == "surface_load") ParseSurfaceLoad20(tag);
+			else if (tag == "body_load"   ) ParseBodyLoad     (tag);
+			else throw XMLReader::InvalidTag(tag);
+		}
 		++tag;
 	}
 	while (!tag.isend());
@@ -248,6 +258,80 @@ void FEBioLoadsSection::ParseSurfaceLoad(XMLTag& tag)
 
 		++tag;
 	}
+
+	// add surface load to model
+	fem.AddSurfaceLoad(ps);
+
+	// add this boundary condition to the current step
+	if (m_pim->m_nsteps > 0)
+	{
+		GetStep()->AddBoundaryCondition(ps);
+		ps->Deactivate();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection::ParseSurfaceLoad20(XMLTag& tag)
+{
+	FEModel& fem = *GetFEModel();
+
+	// create surface load
+	const char* sztype = tag.AttributeValue("type");
+	FESurfaceLoad* ps = fecore_new<FESurfaceLoad>(FESURFACELOAD_ID, sztype, &fem);
+	if (ps == 0) throw XMLReader::InvalidTag(tag);
+
+	// create a new surface
+	FESurface* psurf = new FESurface(&fem.GetMesh());
+	fem.GetMesh().AddSurface(psurf);
+	ps->SetSurface(psurf);
+
+	// read the parameters
+	FEParameterList& pl = ps->GetParameterList();
+
+	// read the pressure data
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, pl) == false)
+		{
+			if (tag == "surface")
+			{
+				// count how many pressure cards there are
+				int npr = tag.children();
+				psurf->create(npr);
+				ps->Create(npr);
+
+				++tag;
+				int nf[FEElement::MAX_NODES ], N;
+				for (int i=0; i<npr; ++i)
+				{
+					FESurfaceElement& el = psurf->Element(i);
+
+					for (int j=0; j<tag.m_natt; ++j)
+					{
+						XMLAtt& att = tag.m_att[j];
+						if (ps->SetFacetAttribute(i, att.m_szatt, att.m_szatv) == false) throw XMLReader::InvalidAttributeValue(tag, att.m_szatt, att.m_szatv);
+					}
+
+					if      (tag == "quad4") el.SetType(FE_QUAD4G4);
+					else if (tag == "tri3" ) el.SetType(m_pim->m_ntri3);
+					else if (tag == "tri6" ) el.SetType(m_pim->m_ntri6);
+					else if (tag == "quad8") el.SetType(FE_QUAD8G9);
+					else throw XMLReader::InvalidTag(tag);
+
+					N = el.Nodes();
+					tag.value(nf, N);
+					for (int j=0; j<N; ++j) el.m_node[j] = nf[j]-1;
+
+					++tag;
+				}
+			}
+			else throw XMLReader::InvalidTag(tag);
+		}
+		++tag;
+	}
+	while (!tag.isend());
 
 	// add surface load to model
 	fem.AddSurfaceLoad(ps);

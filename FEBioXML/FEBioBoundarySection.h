@@ -12,7 +12,9 @@ public:
 
 protected:
 	void ParseBCFix               (XMLTag& tag);
+	void ParseBCFix20             (XMLTag& tag);
 	void ParseBCPrescribe         (XMLTag& tag);
+	void ParseBCPrescribe20       (XMLTag& tag);
 	void ParseContactSection      (XMLTag& tag);
 	void ParseConstraints         (XMLTag& tag);
 	void ParseSpringSection       (XMLTag& tag);
