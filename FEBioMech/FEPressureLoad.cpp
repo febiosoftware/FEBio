@@ -9,8 +9,8 @@ BEGIN_PARAMETER_LIST(FEPressureLoad, FESurfaceLoad)
 END_PARAMETER_LIST()
 
 //-----------------------------------------------------------------------------
-// \deprecated This function is only used by the 1.2 file reader and is to be 
-// considered obsolete.
+//! \deprecated This function is only used by the 1.2 file reader and is to be 
+//! considered obsolete.
 bool FEPressureLoad::SetAttribute(const char* szatt, const char* szval)
 {
 	if (strcmp(szatt, "type") == 0)

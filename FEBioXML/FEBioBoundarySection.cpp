@@ -387,16 +387,16 @@ void FEBioBoundarySection::ParseBCPrescribe20(XMLTag& tag)
 	else if (strncmp(sz, "c", 1) == 0) bc = DOF_C + atoi(&sz[1]) - 1;
 	else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
+	// get the load curve number
+	sz = tag.AttributeValue("lc");
+	int lc = atoi(sz) - 1;
+
 	// read the prescribed data
 	++tag;
 	for (int i=0; i<ndis; ++i)
 	{
 		// get the node ID
 		int n = atoi(tag.AttributeValue("id"))-1;
-
-		// get the load curve number
-		sz = tag.AttributeValue("lc");
-		int lc = atoi(sz) - 1;
 
 		// create a new BC
 		FEPrescribedBC* pdc = new FEPrescribedBC(&fem);
