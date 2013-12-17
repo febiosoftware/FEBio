@@ -17,6 +17,7 @@
 #include "FEBioLoadDataSection.h"
 #include "FEBioOutputSection.h"
 #include "FEBioStepSection.h"
+#include "FEBioDiscreteSection.h"
 #include "FECore/DataStore.h"
 #include "FECore/log.h"
 #include "FECore/Image.h"
@@ -135,7 +136,8 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		// version 2.0 only!
 		if (m_nversion >= 0x0200)
 		{
-			map["Contact"] = new FEBioContactSection(this);
+			map["Contact" ] = new FEBioContactSection(this);
+			map["Discrete"] = new FEBioDiscreteSection(this);
 		}
 
 		// parse the file

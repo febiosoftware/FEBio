@@ -344,6 +344,7 @@
     <ClCompile Include="..\..\FEBioXML\FEBioConstraintsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioContactSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioControlSection.cpp" />
+    <ClCompile Include="..\..\FEBioXML\FEBioDiscreteSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioGeometrySection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioGlobalsSection.cpp" />
     <ClCompile Include="..\..\FEBioXML\FEBioImport.cpp" />
@@ -363,6 +364,7 @@
     <ClInclude Include="..\..\FEBioXML\FEBioConstraintsSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioContactSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioControlSection.h" />
+    <ClInclude Include="..\..\FEBioXML\FEBioDiscreteSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioGeometrySection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioGlobalsSection.h" />
     <ClInclude Include="..\..\FEBioXML\FEBioImport.h" />

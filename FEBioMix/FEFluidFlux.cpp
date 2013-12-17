@@ -3,6 +3,13 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEFluidFlux, FESurfaceLoad)
+	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
+	ADD_PARAMETER(m_bmixture, FE_PARAM_BOOL, "mixture");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! \deprecated This is only used in the 1.2 file format which is obsolete
 bool FEFluidFlux::SetAttribute(const char* szatt, const char* szval)
 {
 	if (strcmp(szatt, "type") == 0)

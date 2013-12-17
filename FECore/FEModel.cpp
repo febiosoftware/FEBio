@@ -222,20 +222,28 @@ bool FEModel::InitObjects()
 	for (int nd = 0; nd < m_mesh.Domains(); ++nd)
 	{
 		FEDomain& dom = m_mesh.Domain(nd);
-		for (int i=0; i<dom.Elements(); ++i)
+		FEMaterial* pmat = dom.GetMaterial();
+		if (pmat->IsRigid())
 		{
-			FEElement& el = dom.ElementRef(i);
-			if (dom.GetMaterial()->IsRigid())
+			for (int i=0; i<dom.Elements(); ++i)
 			{
-				el.m_nrigid = el.GetMatID();
+				FEElement& el = dom.ElementRef(i);
+				el.m_nrigid = pmat->GetID() - 1;
 				for (int j=0; j<el.Nodes(); ++j)
 				{
 					int n = el.m_node[j];
 					FENode& node = m_mesh.Node(n);
-					node.m_rid = el.GetMatID();
+					node.m_rid = pmat->GetID() - 1;
 				}
 			}
-			else el.m_nrigid = -1;
+		}
+		else 
+		{
+			for (int i=0; i<dom.Elements(); ++i)
+			{
+				FEElement& el = dom.ElementRef(i);
+				el.m_nrigid = -1;
+			}
 		}
 	}
 

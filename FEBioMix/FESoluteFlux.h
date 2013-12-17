@@ -72,4 +72,6 @@ protected:
 
 	// solute flux boundary data
 	vector<LOAD>	m_PC;		//!< solute flux boundary cards
+
+	DECLARE_PARAMETER_LIST();
 };

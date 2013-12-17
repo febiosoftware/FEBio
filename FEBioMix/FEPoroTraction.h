@@ -68,4 +68,6 @@ protected:
 
 	// pressure boundary data
 	vector<LOAD>	m_PC;		//!< pressure boundary cards
+
+	DECLARE_PARAMETER_LIST();
 };

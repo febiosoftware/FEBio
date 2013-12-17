@@ -2,6 +2,13 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FEPoroNormalTraction, FESurfaceLoad)
+	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
+	ADD_PARAMETER(m_beffective, FE_PARAM_BOOL, "effective");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! \deprecated This function is only needed for the 1.2 file format which is obsolete
 bool FEPoroNormalTraction::SetAttribute(const char* szatt, const char* szval)
 {
 	if (strcmp(szatt, "type") == 0)

@@ -2,6 +2,13 @@
 #include "FECore/FEModel.h"
 
 //-----------------------------------------------------------------------------
+BEGIN_PARAMETER_LIST(FESoluteFlux, FESurfaceLoad)
+	ADD_PARAMETER(m_blinear, FE_PARAM_BOOL, "linear");
+	ADD_PARAMETER(m_isol, FE_PARAM_INT, "solute_id");
+END_PARAMETER_LIST();
+
+//-----------------------------------------------------------------------------
+//! \deprecated Only used by the 1.2 file reader
 bool FESoluteFlux::SetAttribute(const char* szatt, const char* szval)
 {
 	if (strcmp(szatt, "type") == 0)

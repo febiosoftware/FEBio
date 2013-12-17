@@ -80,4 +80,6 @@ protected:
 
 	// Fluid flux boundary data
 	vector<LOAD>	m_PC;		//!< fluid flux boundary cards
+
+	DECLARE_PARAMETER_LIST();
 };
