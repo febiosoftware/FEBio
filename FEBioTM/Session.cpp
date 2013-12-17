@@ -29,6 +29,13 @@ CTask* TMSession::GetTask(int i)
 //-----------------------------------------------------------------------------
 CTask* TMSession::AddTask(const char* szfile)
 {
+	// see if this task already exists
+	for (int i=0; i<(int)m_Task.size(); ++i)
+	{
+		CTask* pt = m_Task[i];
+		if (strcmp(pt->GetFileName(), szfile) == 0) return 0;
+	}
+
 	// create a new task
 	CTask* pt = new CTask;
 	pt->SetFileName(szfile);
