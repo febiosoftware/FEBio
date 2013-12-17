@@ -165,6 +165,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\FEBioXML\FEBioDiscreteSection.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\FEBioXML\FEBioGeometrySection.cpp"
 				>
 			</File>
@@ -236,6 +240,10 @@
 			</File>
 			<File
 				RelativePath="..\..\FEBioXML\FEBioControlSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\FEBioXML\FEBioDiscreteSection.h"
 				>
 			</File>
 			<File
