@@ -28,7 +28,7 @@ void FEBioLoadsSection::Parse(XMLTag& tag)
 		{
 			if      (tag == "nodal_load"  ) ParseBCForce      (tag);
 			else if (tag == "surface_load") ParseSurfaceLoad20(tag);
-			else if (tag == "body_load"   ) ParseBodyLoad     (tag);
+			else if (tag == "body_load"   ) ParseBodyLoad20   (tag);
 			else throw XMLReader::InvalidTag(tag);
 		}
 		++tag;
@@ -99,6 +99,25 @@ void FEBioLoadsSection::ParseBodyLoad(XMLTag& tag)
 {
 	FEModel& fem = *GetFEModel();
 	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, tag.Name(), &fem);
+	if (pbl == 0) throw XMLReader::InvalidTag(tag);
+	FEParameterList& PL = pbl->GetParameterList();
+	++tag;
+	do
+	{
+		if (m_pim->ReadParameter(tag, PL) == false) throw XMLReader::InvalidTag(tag);
+		++tag;
+	}
+	while (!tag.isend());
+	fem.AddBodyLoad(pbl);
+}
+
+//-----------------------------------------------------------------------------
+void FEBioLoadsSection::ParseBodyLoad20(XMLTag& tag)
+{
+	const char* sztype = tag.AttributeValue("type");
+	FEModel& fem = *GetFEModel();
+	FEBodyLoad* pbl = fecore_new<FEBodyLoad>(FEBODYLOAD_ID, sztype, &fem);
+	if (pbl == 0) throw XMLReader::InvalidAttributeValue(tag, "type", sztype);
 	FEParameterList& PL = pbl->GetParameterList();
 	++tag;
 	do
@@ -135,16 +154,16 @@ void FEBioLoadsSection::ParseBCForce(XMLTag &tag)
 		else if (strcmp(sz, "c2") == 0) bc = DOF_C+1;
 		else throw XMLReader::InvalidAttributeValue(tag, "bc", sz);
 
+		// get the load curve
+		sz = tag.AttributeValue("lc");
+		int lc = atoi(sz)-1;
+
 		// read the prescribed data
 		++tag;
 		for (int i=0; i<ncnf; ++i)
 		{
 			// get the nodal ID
 			int n = atoi(tag.AttributeValue("id"))-1;
-
-			// get the load curve
-			sz = tag.AttributeValue("lc");
-			int lc = atoi(sz)-1;
 
 			// create new nodal force
 			FENodalForce* pfc = new FENodalForce(&fem);
