@@ -454,7 +454,7 @@ void CWnd::OnEditSelectAll(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnEditFind(Fl_Widget* pw, void* pd)
 {
-	CDlgEditFind dlg;
+	static CDlgEditFind dlg;
 	strcpy(dlg.m_sztxt, m_szfind);
 	dlg.m_bcase = m_bcase;
 	if (dlg.DoModal() == FLX_OK)
@@ -497,7 +497,7 @@ void CWnd::OnEditFindAgain(Fl_Widget* pw, void* pd)
 //-----------------------------------------------------------------------------
 void CWnd::OnEditFilter(Fl_Widget* pw, void* pd)
 {
-	CDlgEditFilter dlg;
+	static CDlgEditFilter dlg;
 	if (dlg.DoModal() == FLX_OK)
 	{
 		m_pTask->SelectAll(0);
