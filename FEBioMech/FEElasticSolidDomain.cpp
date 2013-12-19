@@ -703,8 +703,9 @@ void FEElasticSolidDomain::ElementMaterialStiffness(FESolidElement &el, matrix &
 void FEElasticSolidDomain::ElementDensityStiffness(FEModel& fem, FESolidElement &el, matrix &ke)
 {
 	int n, i, j;
-    
-	FERemodelingElasticMaterial* pmat = dynamic_cast<FERemodelingElasticMaterial*>(fem.GetMaterial(el.GetMatID()));
+
+	// make sure this is a remodeling material
+	FERemodelingElasticMaterial* pmat = dynamic_cast<FERemodelingElasticMaterial*>(m_pMat);
     
     if (pmat) {
         const int NE = FEElement::MAX_NODES;

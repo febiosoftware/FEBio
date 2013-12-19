@@ -392,49 +392,49 @@ void FEBioGeometrySection::ParseElementSection20(XMLTag& tag)
 		case ET_HEX8:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), m_pim->m_nhex8, nid, nd);
+				ReadSolidElement(tag, bd.Element(i), m_pim->m_nhex8, nid, nmat);
 			}
 			break;
 		case ET_PENTA6:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), FE_PENTA6G6, nid, nd);
+				ReadSolidElement(tag, bd.Element(i), FE_PENTA6G6, nid, nmat);
 			}
 			break;
 		case ET_TET4:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet4, nid, nd);
+				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet4, nid, nmat);
 			}
 			break;
 		case ET_TET10:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet10, nid, nd);
+				ReadSolidElement(tag, bd.Element(i), m_pim->m_ntet10, nid, nmat);
 			}
 			break;
 		case ET_HEX20:
 			{
 				FESolidDomain& bd = dynamic_cast<FESolidDomain&>(dom);
-				ReadSolidElement(tag, bd.Element(i), FE_HEX20G27, nid, nd);
+				ReadSolidElement(tag, bd.Element(i), FE_HEX20G27, nid, nmat);
 			}
 			break;
 		case ET_QUAD4:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(i), FE_SHELL_QUAD, nid, nd);
+				ReadShellElement(tag, sd.Element(i), FE_SHELL_QUAD, nid, nmat);
 			}
 			break;
 		case ET_TRI3:
 			{
 				FEShellDomain& sd = dynamic_cast<FEShellDomain&>(dom);
-				ReadShellElement(tag, sd.Element(i), FE_SHELL_TRI, nid, nd);
+				ReadShellElement(tag, sd.Element(i), FE_SHELL_TRI, nid, nmat);
 			}
 			break;
 		case ET_TRUSS2:
 			{
 				FETrussDomain& td = dynamic_cast<FETrussDomain&>(dom);
-				ReadTrussElement(tag, td.Element(i), FE_TRUSS, nid, nd);
+				ReadTrussElement(tag, td.Element(i), FE_TRUSS, nid, nmat);
 			}
 			break;
 		default:
