@@ -238,6 +238,11 @@ bool FEFEBioImport::Load(FEModel& fem, const char* szfile)
 		felog.printf("Fatal Error: Invalid domain type\n");
 		return false;
 	}
+	catch (InvalidDomainMaterial)
+	{
+		felog.printf("Fatal Error: Invalid domain material (line %d)\n", xml.GetCurrentLine());
+		return false;
+	}
 	catch (FailedCreatingDomain)
 	{
 		felog.printf("Fatal Error: Failed creating domain\n");
