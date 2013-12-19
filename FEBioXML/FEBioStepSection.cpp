@@ -5,6 +5,7 @@
 #include "FEBioConstraintsSection.h"
 #include "FEBioBoundarySection.h"
 #include "FEBioLoadsSection.h"
+#include "FEBioContactSection.h"
 
 //=============================================================================
 //
@@ -26,6 +27,11 @@ void FEBioStepSection::Parse(XMLTag& tag)
 	Map["Constraints"] = new FEBioConstraintsSection(m_pim);
 	Map["Boundary"   ] = new FEBioBoundarySection   (m_pim);
 	Map["Loads"      ] = new FEBioLoadsSection      (m_pim);
+
+	if (m_pim->Version() >= 0x0200)
+	{
+		Map["Contact"] = new FEBioContactSection(m_pim);
+	}
 
 	++tag;
 	do
