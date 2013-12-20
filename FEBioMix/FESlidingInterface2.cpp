@@ -133,6 +133,80 @@ void FESlidingSurface2::UpdateNodeNormals()
 }
 
 //-----------------------------------------------------------------------------
+vec3d FESlidingSurface2::GetContactForce()
+{
+	int n, i;
+	
+	// initialize contact force
+	vec3d f(0,0,0);
+	
+	// loop over all elements of the surface
+	for (n=0; n<Elements(); ++n)
+	{
+		FESurfaceElement& el = Element(n);
+		int nint = el.GaussPoints();
+		
+		// evaluate the contact force for that element
+		for (i=0; i<nint; ++i)
+		{
+			Data& data = m_Data[n][i];
+			// get the base vectors
+			vec3d g[2];
+			CoBaseVectors(el, i, g);
+			// normal (magnitude = area)
+			vec3d n = g[0] ^ g[1];
+			// gauss weight
+			double w = el.GaussWeights()[i];
+			// contact force
+			f += n*(w*data.m_Ln);
+		}
+	}
+	
+	return f;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FESlidingSurface2::GetFluidForce()
+{
+	int n, i;
+	const int MN = FEElement::MAX_NODES;
+	double pn[MN];
+	
+	// initialize contact force
+	vec3d f(0,0,0);
+	
+	// loop over all elements of the surface
+	for (n=0; n<Elements(); ++n)
+	{
+		FESurfaceElement& el = Element(n);
+		int nseln = el.Nodes();
+        
+		// nodal pressures
+		for (i=0; i<nseln; ++i) pn[i] = GetMesh()->Node(el.m_node[i]).m_pt;
+		
+		int nint = el.GaussPoints();
+		
+		// evaluate the fluid force for that element
+		for (i=0; i<nint; ++i)
+		{
+			// get the base vectors
+			vec3d g[2];
+			CoBaseVectors(el, i, g);
+			// normal (magnitude = area)
+			vec3d n = g[0] ^ g[1];
+			// gauss weight
+			double w = el.GaussWeights()[i];
+			// fluid pressure
+			double p = el.eval(pn, i);
+			// contact force
+			f += n*(w*p);
+		}
+	}
+	
+	return f;
+}
+
+//-----------------------------------------------------------------------------
 void FESlidingSurface2::ShallowCopy(DumpStream& dmp, bool bsave)
 {
 	if (bsave)

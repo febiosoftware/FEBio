@@ -245,6 +245,8 @@ REGISTER_FEBIO_CLASS(FEPlotShellStrain                  , FEPLOTDATA_ID, "shell 
 REGISTER_FEBIO_CLASS(FEPlotContactGap					, FEPLOTDATA_ID, "contact gap"                     );
 REGISTER_FEBIO_CLASS(FEPlotContactPressure				, FEPLOTDATA_ID, "contact pressure"                );
 REGISTER_FEBIO_CLASS(FEPlotContactTraction				, FEPLOTDATA_ID, "contact traction"                );
+REGISTER_FEBIO_CLASS(FEPlotContactForce 				, FEPLOTDATA_ID, "contact force"                   );
+REGISTER_FEBIO_CLASS(FEPlotFluidForce                   , FEPLOTDATA_ID, "fluid force"                     );
 
 //-----------------------------------------------------------------------------
 REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );

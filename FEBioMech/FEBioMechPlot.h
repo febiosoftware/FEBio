@@ -92,6 +92,26 @@ public:
 	bool Save(FESurface& surf, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Contact force
+//!
+class FEPlotContactForce : public FESurfaceData
+{
+public:
+	FEPlotContactForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
+//-----------------------------------------------------------------------------
+//! Fluid force
+//!
+class FEPlotFluidForce : public FESurfaceData
+{
+public:
+	FEPlotFluidForce(FEModel* pfem) : FESurfaceData(PLT_VEC3F, FMT_MULT){}
+	bool Save(FESurface& surf, vector<float>& a);
+};
+
 //=============================================================================
 //							D O M A I N   D A T A
 //=============================================================================

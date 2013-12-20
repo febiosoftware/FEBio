@@ -39,7 +39,7 @@ public:
 	void Serialize(DumpFile& ar);
 
 	//! evaluate net contact force
-	vec3d NetContactForce();
+	vec3d GetContactForce();
 
 	//! initialize projection
 	void InitProjection();

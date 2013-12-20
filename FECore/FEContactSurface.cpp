@@ -19,3 +19,9 @@ void FEContactSurface::GetNodalContactPressure(int nface, double* pg) { assert(f
 
 //-----------------------------------------------------------------------------
 void FEContactSurface::GetNodalContactTraction(int nface, vec3d* pt) { assert(false); }
+
+//-----------------------------------------------------------------------------
+vec3d FEContactSurface::GetContactForce() { assert(false); }
+
+//-----------------------------------------------------------------------------
+vec3d FEContactSurface::GetFluidForce() { return vec3d(0,0,0); }

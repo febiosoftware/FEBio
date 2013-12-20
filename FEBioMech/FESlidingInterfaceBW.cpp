@@ -157,7 +157,7 @@ void FESlidingSurfaceBW::Serialize(DumpFile& ar)
 }
 
 //-----------------------------------------------------------------------------
-vec3d FESlidingSurfaceBW::NetContactForce()
+vec3d FESlidingSurfaceBW::GetContactForce()
 {
 	// initialize contact force
 	vec3d f(0,0,0);

@@ -37,6 +37,12 @@ public:
 
 	void Serialize(DumpFile& ar);
 
+	//! evaluate net contact force
+	vec3d GetContactForce();
+	
+	//! evaluate net fluid force
+	vec3d GetFluidForce();
+	
 	//! calculate the nodal normals
 	void UpdateNodeNormals();
 

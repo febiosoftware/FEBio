@@ -59,7 +59,7 @@ bool FEFacetSlidingSurface::Init()
 }
 
 //-----------------------------------------------------------------------------
-vec3d FEFacetSlidingSurface::NetContactForce()
+vec3d FEFacetSlidingSurface::GetContactForce()
 {
 	// initialize contact force
 	vec3d f(0,0,0);

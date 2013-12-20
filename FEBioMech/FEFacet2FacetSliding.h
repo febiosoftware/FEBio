@@ -35,7 +35,7 @@ public:
 	void ShallowCopy(DumpStream& dmp, bool bsave);
 
 	//! evaluate net contact force
-	vec3d NetContactForce();
+	vec3d GetContactForce();
 
 	//! serialize data for (cold) restart
 	void Serialize(DumpFile& ar);

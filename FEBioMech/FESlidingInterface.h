@@ -30,6 +30,9 @@ public:
 	//! Calculate the total traction at a node
 	vec3d traction(int inode);
 
+	//! evaluate net contact force
+	vec3d GetContactForce();
+	
 	//! Serialize data to archive
 	void Serialize(DumpFile& ar);
 

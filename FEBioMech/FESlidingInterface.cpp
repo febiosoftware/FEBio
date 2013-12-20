@@ -184,22 +184,72 @@ vec3d FESlidingSurface::traction(int inode)
 	{
 		FESurfaceElement& el = *m_pme[inode];
 		double Tn = m_Lm[inode];
-		double T1 = m_Lt[inode][0];
-		double T2 = m_Lt[inode][1];
+		double T1 = -m_Lt[inode][0];
+		double T2 = -m_Lt[inode][1];
 		double r = m_rs[inode][0];
 		double s = m_rs[inode][1];
-		double g = m_gap[inode];
-		double epsilon = m_eps[inode];
-		Tn = MBRACKET(Tn + epsilon*g);
-
+        
 		vec3d tn = m_nu[inode]*Tn, tt;
 		vec3d e[2];
-		ContraBaseVectors0(el, r, s, e);
+		ContraBaseVectors(el, r, s, e);
 		tt = e[0]*T1 + e[1]*T2;
 		t = tn + tt;
 	}
-
+    
 	return t;
+}
+
+//-----------------------------------------------------------------------------
+vec3d FESlidingSurface::GetContactForce()
+{
+	int n, i;
+	const int MN = FEElement::MAX_NODES;
+	double Tn[MN],T1[MN],T2[MN];
+	
+	// initialize contact force
+	vec3d f(0,0,0);
+	
+	// loop over all elements of the surface
+	for (n=0; n<Elements(); ++n)
+	{
+		FESurfaceElement& el = Element(n);
+		int nseln = el.Nodes();
+		
+		// nodal contact pressures and frictional tractions
+		for (i=0; i<nseln; ++i) {
+            Tn[i] = m_Ln[el.m_lnode[i]];
+            T1[i] = -m_Lt[el.m_lnode[i]][0];
+            T2[i] = -m_Lt[el.m_lnode[i]][1];
+        }
+		int nint = el.GaussPoints();
+		
+		// evaluate the contact force for that element
+		for (i=0; i<nint; ++i)
+		{
+			// area in reference configuration
+			vec3d g0[2],g[2];
+			double r = el.gr(i);
+			double s = el.gs(i);
+			CoBaseVectors0(el, r, s, g0);
+			double A = (g0[0] ^ g0[1]).unit();
+			// traction components at integration point
+            double t1 = el.eval(T1,i);
+            double t2 = el.eval(T2,i);
+			double t3 = el.eval(Tn,i);
+			// unit normal vector
+			vec3d n = SurfaceNormal(el, i);
+            // contravariant basis in spatial frame
+            ContraBaseVectors(el, r, s, g);
+            // Piola traction
+            vec3d t = g[0]*t1 + g[1]*t2 + n*t3;
+			// gauss weight
+			double w = el.GaussWeights()[i];
+			// contact force
+			f += t*(w*A);
+		}
+	}
+	
+	return f;
 }
 
 //-----------------------------------------------------------------------------

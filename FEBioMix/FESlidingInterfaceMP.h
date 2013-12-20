@@ -3,7 +3,7 @@
 #include "FECore/FEContactSurface.h"
 
 //-----------------------------------------------------------------------------
-class FESlidingSurface3 : public FEContactSurface
+class FESlidingSurfaceMP : public FEContactSurface
 {
 public:
 	//! integration point data
@@ -11,29 +11,29 @@ public:
 	{
 	public:
 		Data();
-
+        
 	public:
 		double	m_gap;	//!< gap function at integration points
 		double	m_Lmd;	//!< Lagrange multipliers for displacements
-		double	m_Lmp;	//!< Lagrange multipliers for fluid pressure
-		double	m_Lmc;	//!< Lagrange multipliers for solute concentrations
+		double	m_Lmp;  //!< Lagrange multipliers for fluid pressure
 		double	m_Ln;	//!< net contact pressure
 		double	m_epsn;	//!< displacement penalty factors
 		double	m_epsp;	//!< pressure penalty factors
-		double	m_epsc;	//!< concentration penatly factors
 		double	m_pg;	//!< pressure "gap"
-		double	m_cg;	//!< concentration "gap"
 		vec3d	m_nu;	//!< normal at integration points
 		vec2d	m_rs;	//!< natural coordinates of projection of integration point
+		vector<double>	m_Lmc;	//!< Lagrange multipliers for solute concentrations
+		vector<double>	m_epsc;	//!< concentration penatly factors
+		vector<double>	m_cg;	//!< concentration "gap"
 		FESurfaceElement*	m_pme;	//!< master element of projected integration point
 	};
-
+    
 public:
 	//! constructor
-	FESlidingSurface3(FEModel* pfem);
+	FESlidingSurfaceMP(FEModel* pfem);
 	
 	//! destructor
-	~FESlidingSurface3() {}
+	~FESlidingSurfaceMP() {}
 	
 	//! initialization
 	bool Init();
@@ -53,7 +53,7 @@ public:
 	void Serialize(DumpFile& ar);
 	
 	void SetPoroMode(bool bporo) { m_bporo = bporo; }
-
+	
 public:
 	void GetNodalContactGap     (int nface, double* pg);
 	void GetNodalContactPressure(int nface, double* pg);
@@ -63,26 +63,25 @@ protected:
 	FEModel*	m_pfem;
 	
 public:
+	vector< vector<Data> >		m_Data; //!< integration point data
+    
 	bool						m_bporo;	//!< set poro-mode
 	bool						m_bsolu;	//!< set solute-mode
 	
-	vector<bool>				m_poro;	//!< surface element poro status
-	vector<int>					m_solu;	//!< surface element solute id
-
-	vector< vector<Data> >		m_Data; //!< integration point data
+	vector<vec3d>				m_nn;	//!< node normals
 	
-	vector<vec3d>		m_nn;	//!< node normals	
+	vector<int>					m_sid;	//!< list of solute id's for this surface
 };
 
 //-----------------------------------------------------------------------------
-class FESlidingInterface3 :	public FEContactInterface
+class FESlidingInterfaceMP : public FEContactInterface
 {
 public:
 	//! constructor
-	FESlidingInterface3(FEModel* pfem);
+	FESlidingInterfaceMP(FEModel* pfem);
 	
 	//! destructor
-	~FESlidingInterface3();
+	~FESlidingInterfaceMP();
 	
 	//! initialization
 	bool Init();
@@ -101,10 +100,10 @@ public:
 	
 	//! calculate contact stiffness
 	void ContactStiffness(FESolver* psolver);
-
+	
 	//! calculate contact pressures for file output
 	void UpdateContactPressures();
-
+	
 	//! calculate Lagrangian augmentations
 	bool Augment(int naug);
 	
@@ -116,32 +115,32 @@ public:
 	
 	//! set ambient condition 
 	void SetAmbient();
-
+	
 	//! return the master and slave surface
 	FESurface* GetMasterSurface() { return &m_ms; }
 	FESurface* GetSlaveSurface () { return &m_ss; }
-
+    
 	//! return integration rule class
 	bool UseNodalIntegration() { return false; }
-
+    
 	//! build the matrix profile for use in the stiffness matrix
 	void BuildMatrixProfile(FEStiffnessMatrix& K);
-
+    
 protected:
-	void ProjectSurface(FESlidingSurface3& ss, FESlidingSurface3& ms, bool bupseg);
+	void ProjectSurface(FESlidingSurfaceMP& ss, FESlidingSurfaceMP& ms, bool bupseg);
 	
 	//! calculate penalty factor
-	void CalcAutoPenalty(FESlidingSurface3& s);
+	void CalcAutoPenalty(FESlidingSurfaceMP& s);
 	
-	void CalcAutoPressurePenalty(FESlidingSurface3& s);
-	double AutoPressurePenalty(FESurfaceElement& el, FESlidingSurface3& s);
+	void CalcAutoPressurePenalty(FESlidingSurfaceMP& s);
+	double AutoPressurePenalty(FESurfaceElement& el, FESlidingSurfaceMP& s);
 	
-	void CalcAutoConcentrationPenalty(FESlidingSurface3& s);
-	double AutoConcentrationPenalty(FESurfaceElement& el, FESlidingSurface3& s);
-
+	void CalcAutoConcentrationPenalty(FESlidingSurfaceMP& s, const int isol);
+	double AutoConcentrationPenalty(FESurfaceElement& el, FESlidingSurfaceMP& s, const int isol);
+	
 public:
-	FESlidingSurface3	m_ms;	//!< master surface
-	FESlidingSurface3	m_ss;	//!< slave surface
+	FESlidingSurfaceMP	m_ms;	//!< master surface
+	FESlidingSurfaceMP	m_ss;	//!< slave surface
 	
 	int				m_knmult;		//!< higher order stiffness multiplier
 	bool			m_btwo_pass;	//!< two-pass flag
@@ -159,13 +158,16 @@ public:
 	double			m_epsn;		//!< normal penalty factor
 	bool			m_bautopen;	//!< use autopenalty factor
 	
-	// biphasic-solute contact parameters
-	double	m_epsp;		//!< fluid volumetric flow rate penalty
-	double	m_epsc;		//!< solute molar flow rate penalty
-	double	m_Rgas;		//!< universal gas constant
-	double	m_Tabs;		//!< absolute temperature
-	double	m_ambp;		//!< ambient pressure
-	double	m_ambc;		//!< ambient concentration
-
+	// multiphasic contact parameters
+	double	m_epsp;					//!< fluid volumetric flow rate penalty
+	double	m_epsc;					//!< solute molar flow rate penalty
+	double	m_Rgas;					//!< universal gas constant
+	double	m_Tabs;					//!< absolute temperature
+	double	m_ambp;					//!< ambient pressure
+	double	m_ambc[MAX_CDOFS];		//!< ambient concentration
+	vector<int> m_sid;				//!< list of solute ids common to both contact surfaces
+	vector<int> m_ssl;				//!< list of slave surface solutes common to both contact surfaces
+	vector<int> m_msl;				//!< list of master surface solutes common to both contact surfaces
+	
 	DECLARE_PARAMETER_LIST();
 };
