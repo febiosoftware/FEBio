@@ -114,13 +114,14 @@ bool FETriphasic::SetProperty(int n, FEMaterial* pm)
 void FETriphasic::Init()
 {
 	FEMaterial::Init();
-	m_pSolid->Init();
-	m_pPerm->Init();
-	m_pOsmC->Init();
+	m_pSolid->SetParent(this); m_pSolid->Init();
+	m_pPerm->SetParent(this); m_pPerm->Init();
+	m_pOsmC->SetParent(this); m_pOsmC->Init();
 
 	if (m_pSolute.size() != 2) throw MaterialError("Exactly two solutes must be specified");
 	
-	m_pSolute[0]->Init(); m_pSolute[1]->Init();
+	m_pSolute[0]->SetParent(this); m_pSolute[0]->SetSoluteLocalID(0); m_pSolute[0]->Init();
+    m_pSolute[1]->SetParent(this); m_pSolute[1]->SetSoluteLocalID(1); m_pSolute[1]->Init();
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");

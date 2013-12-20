@@ -20,9 +20,9 @@ FESolute::FESolute(FEModel* pfem) : FEMaterial(pfem)
 void FESolute::Init()
 {
 	FEMaterial::Init();
-	m_pDiff->Init();
-	m_pSolub->Init();
-	if (m_pSupp) m_pSupp->Init();
+	m_pDiff->SetParent(this); m_pDiff->Init();
+	m_pSolub->SetParent(this); m_pSolub->Init();
+	if (m_pSupp) { m_pSupp->SetParent(this); m_pSupp->Init(); }
 
 	FESoluteData* psd = GetFEModel()->FindSoluteData(m_ID);
 	if (psd == 0) throw MaterialError("no match with global solute data");

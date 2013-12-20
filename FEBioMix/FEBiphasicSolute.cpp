@@ -102,10 +102,10 @@ FEMaterialPoint* FEBiphasicSolute::CreateMaterialPointData()
 void FEBiphasicSolute::Init()
 {
 	FEMaterial::Init();
-	m_pSolid->Init();
-	m_pPerm->Init();
-	m_pOsmC->Init();
-	m_pSolute->Init();
+	m_pSolid->SetParent(this); m_pSolid->Init();
+	m_pPerm->SetParent(this); m_pPerm->Init();
+	m_pOsmC->SetParent(this); m_pOsmC->Init();
+	m_pSolute->SetParent(this); m_pSolute->SetSoluteLocalID(0); m_pSolute->Init();
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
 	if (m_rhoTw < 0) throw MaterialError("fluid_density must be positive");

@@ -7,6 +7,7 @@
 #include "FEDiffConstIso.h"
 #include "FEDiffConstOrtho.h"
 #include "FEDiffRefIso.h"
+#include "FEDiffAlbroIso.h"
 #include "FEPermConstIso.h"
 #include "FEPermHolmesMow.h"
 #include "FEPermRefIso.h"
@@ -81,6 +82,7 @@ REGISTER_FEBIO_CLASS(FETriphasic                         ,FEMATERIAL_ID, "tripha
 REGISTER_FEBIO_CLASS(FEDiffConstIso                      ,FEMATERIAL_ID, "diff-const-iso"    );
 REGISTER_FEBIO_CLASS(FEDiffConstOrtho                    ,FEMATERIAL_ID, "diff-const-ortho"  );
 REGISTER_FEBIO_CLASS(FEDiffRefIso                        ,FEMATERIAL_ID, "diff-ref-iso"      );
+REGISTER_FEBIO_CLASS(FEDiffAlbroIso                      ,FEMATERIAL_ID, "diff-Albro-iso"    );
 REGISTER_FEBIO_CLASS(FEPermConstIso                      ,FEMATERIAL_ID, "perm-const-iso"    );
 REGISTER_FEBIO_CLASS(FEPermHolmesMow                     ,FEMATERIAL_ID, "perm-Holmes-Mow"   );
 REGISTER_FEBIO_CLASS(FEPermRefIso                        ,FEMATERIAL_ID, "perm-ref-iso"      );

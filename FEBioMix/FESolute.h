@@ -29,6 +29,9 @@ public:
 	//! set solute ID
 	void SetSoluteID(const int ID) {m_ID = ID;}
 	
+	//! set solute ID
+	int GetSoluteID() { return m_ID;}
+	
 private:
 	int	m_ID;		//!< solute ID
 	
@@ -65,6 +68,9 @@ public:
 	
 	//! set solute ID
 	void SetSoluteID(const int ID) {m_ID = ID;}
+	
+	//! set solute ID
+	int GetSoluteID() { return m_ID;}
 	
 private:
 	int	m_ID;		//!< solute ID
@@ -140,6 +146,12 @@ public:
 	//! get solute ID
 	int GetSoluteID() {return m_ID;}
 
+	//! set solute local ID
+	void SetSoluteLocalID(const int LID) {m_LID = LID;}
+	
+	//! get solute local ID
+	int GetSoluteLocalID() {return m_LID;}
+    
 	//! Find a material parameter
 	FEParam* GetParameter(const ParamString& s);
 
@@ -161,6 +173,7 @@ public:
 	
 private:
 	int						m_ID;		//!< solute ID in global table
+    int                     m_LID;      //!< solute local ID in parent material
 	
 public: // material parameters
 	double					m_rhoT;		//!< true solute density

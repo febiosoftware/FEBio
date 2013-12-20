@@ -391,7 +391,7 @@ void FEMultiphasic::AddChemicalReaction(FEChemicalReaction* pcr)
 int FEMultiphasic::FindLocalSBMID(int nid)
 {
 	int lsbm = -1;
-	int nsbm = (int) m_pSBM.size();
+	int nsbm = (int) SBMs();
 	for (int isbm=0; isbm<nsbm; ++isbm) {
 		if (m_pSBM[isbm]->GetSBMID() == nid - 1) {
 			lsbm = isbm;
@@ -465,6 +465,7 @@ void FEMultiphasic::InitializeReaction(FEChemicalReaction* m_pReact)
 	
 	// set pointer to this multiphasic material
 	m_pReact->m_pMP = this;
+    m_pReact->SetParent(this); // redundant for now
 	
 	// now run the local initialization
 	m_pReact->Init();
@@ -478,12 +479,16 @@ void FEMultiphasic::Init()
 	m_pSolid->SetParent(this);
 	m_pSolid->Init();
 
-	m_pPerm->Init();
-	if (m_pSupp) m_pSupp->Init();
-	m_pOsmC->Init();
-	for (int i=0; i<(int)m_pSolute.size(); ++i) m_pSolute[i]->Init();
-	for (int i=0; i<(int)m_pSBM.size(); ++i) m_pSBM[i]->Init();
-	for (int i=0; i<(int)m_pReact.size(); ++i)
+	m_pPerm->SetParent(this); m_pPerm->Init();
+	if (m_pSupp) { m_pSupp->SetParent(this); m_pSupp->Init(); }
+	m_pOsmC->SetParent(this); m_pOsmC->Init();
+	for (int i=0; i<Solutes(); ++i) {
+        m_pSolute[i]->SetParent(this);
+        m_pSolute[i]->SetSoluteLocalID(i);
+        m_pSolute[i]->Init();
+    }
+	for (int i=0; i<SBMs(); ++i) { m_pSBM[i]->SetParent(this); m_pSBM[i]->Init(); }
+	for (int i=0; i<Reactions(); ++i)
 		InitializeReaction(m_pReact[i]);
 	
 	if (!INRANGE(m_phi0, 0.0, 1.0)) throw MaterialError("phi0 must be in the range 0 <= phi0 <= 1");
