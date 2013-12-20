@@ -47,6 +47,16 @@ public:
 	bool Save(FEMesh& m, vector<float>& a);
 };
 
+//-----------------------------------------------------------------------------
+//! Rigid body reaction torque
+class FEPlotRigidReactionTorque : public FENodeData
+{
+public:
+	FEPlotRigidReactionTorque(FEModel* pfem) : FENodeData(PLT_VEC3F, FMT_NODE),  m_pfem(pfem) {}
+	bool Save(FEMesh& m, vector<float>& a);
+private:
+	FEModel* m_pfem;
+};
 
 //=============================================================================
 //                         S U R F A C E   D A T A

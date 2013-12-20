@@ -9,6 +9,7 @@
 #include "FEPreStrainTransIsoMR.h"
 #include "FEBioPlot/FEBioPlotFile.h"
 #include "FECore/FEContactSurface.h"
+#include "FECore/FERigidBody.h"
 
 //=============================================================================
 //                            N O D E   D A T A
@@ -92,6 +93,29 @@ bool FEPlotNodeReactionForces::Save(FEMesh& m, vector<float>& a)
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+bool FEPlotRigidReactionTorque::Save(FEMesh& m, vector<float>& a)
+{
+	int N = m.Nodes();
+	for (int i=0; i<N; ++i)
+	{
+		FENode& node = m.Node(i);
+		if (node.m_rid >= 0)
+		{
+			FERigidBody& rb = dynamic_cast<FERigidBody&>(*m_pfem->Object(node.m_rid));
+			a.push_back((float)rb.m_Mr.x);
+			a.push_back((float)rb.m_Mr.y);
+			a.push_back((float)rb.m_Mr.z);
+		}
+		else
+		{
+			a.push_back(0.f);
+			a.push_back(0.f);
+			a.push_back(0.f);
+		}
+	}
+	return true;
+}
 
 //=============================================================================
 //                       S U R F A C E    D A T A

@@ -247,10 +247,11 @@ REGISTER_FEBIO_CLASS(FEPlotContactPressure				, FEPLOTDATA_ID, "contact pressure
 REGISTER_FEBIO_CLASS(FEPlotContactTraction				, FEPLOTDATA_ID, "contact traction"                );
 
 //-----------------------------------------------------------------------------
-REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement  , FEPLOTDATA_ID, "displacement"   );
-REGISTER_FEBIO_CLASS(FEPlotNodeVelocity      , FEPLOTDATA_ID, "velocity"       );
-REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration  , FEPLOTDATA_ID, "acceleration"   );
-REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces, FEPLOTDATA_ID, "reaction forces");
+REGISTER_FEBIO_CLASS(FEPlotNodeDisplacement   , FEPLOTDATA_ID, "displacement"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeVelocity       , FEPLOTDATA_ID, "velocity"       );
+REGISTER_FEBIO_CLASS(FEPlotNodeAcceleration   , FEPLOTDATA_ID, "acceleration"   );
+REGISTER_FEBIO_CLASS(FEPlotNodeReactionForces , FEPLOTDATA_ID, "reaction forces");
+REGISTER_FEBIO_CLASS(FEPlotRigidReactionTorque, FEPLOTDATA_ID, "rigid torque"   );
 
 //-----------------------------------------------------------------------------
 // Derived from FENodeLogData
