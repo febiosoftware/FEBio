@@ -1,0 +1,485 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D5E10BAE1865E32800B23922 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10BAD1865E32800B23922 /* Cocoa.framework */; };
+		D5E10BB81865E32800B23922 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D5E10BB61865E32800B23922 /* InfoPlist.strings */; };
+		D5E10BE21865E36900B23922 /* FEBio2.icns in Resources */ = {isa = PBXBuildFile; fileRef = D5E10BE11865E36900B23922 /* FEBio2.icns */; };
+		D5E10C001865E38500B23922 /* DlgEditFind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BE31865E38400B23922 /* DlgEditFind.cpp */; };
+		D5E10C011865E38500B23922 /* Document.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BE51865E38400B23922 /* Document.cpp */; };
+		D5E10C021865E38500B23922 /* FEBioTM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BE71865E38400B23922 /* FEBioTM.cpp */; };
+		D5E10C031865E38500B23922 /* FileBrowser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BE91865E38400B23922 /* FileBrowser.cpp */; };
+		D5E10C041865E38500B23922 /* MainApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BEB1865E38400B23922 /* MainApp.cpp */; };
+		D5E10C051865E38500B23922 /* Menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BED1865E38400B23922 /* Menu.cpp */; };
+		D5E10C061865E38500B23922 /* Session.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BEF1865E38400B23922 /* Session.cpp */; };
+		D5E10C071865E38500B23922 /* SettingsView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BF11865E38400B23922 /* SettingsView.cpp */; };
+		D5E10C081865E38500B23922 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BF31865E38400B23922 /* stdafx.cpp */; };
+		D5E10C091865E38500B23922 /* Task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BF61865E38400B23922 /* Task.cpp */; };
+		D5E10C0A1865E38500B23922 /* TaskBrowser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BF81865E38400B23922 /* TaskBrowser.cpp */; };
+		D5E10C0B1865E38500B23922 /* Test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BFA1865E38400B23922 /* Test.cpp */; };
+		D5E10C0C1865E38500B23922 /* Wnd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BFC1865E38400B23922 /* Wnd.cpp */; };
+		D5E10C0D1865E38500B23922 /* XMLWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10BFE1865E38400B23922 /* XMLWriter.cpp */; };
+		D5E10C111865E40400B23922 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C0E1865E40400B23922 /* AGL.framework */; };
+		D5E10C121865E40400B23922 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C0F1865E40400B23922 /* CoreFoundation.framework */; };
+		D5E10C131865E40400B23922 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C101865E40400B23922 /* OpenGL.framework */; };
+		D5E10C1B1865E41D00B23922 /* libfltk_forms.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C141865E41D00B23922 /* libfltk_forms.a */; };
+		D5E10C1C1865E41D00B23922 /* libfltk_gl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C151865E41D00B23922 /* libfltk_gl.a */; };
+		D5E10C1D1865E41D00B23922 /* libfltk_images.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C161865E41D00B23922 /* libfltk_images.a */; };
+		D5E10C1E1865E41D00B23922 /* libfltk_jpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C171865E41D00B23922 /* libfltk_jpeg.a */; };
+		D5E10C1F1865E41D00B23922 /* libfltk_png.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C181865E41D00B23922 /* libfltk_png.a */; };
+		D5E10C201865E41D00B23922 /* libfltk_z.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C191865E41D00B23922 /* libfltk_z.a */; };
+		D5E10C211865E41D00B23922 /* libfltk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C1A1865E41D00B23922 /* libfltk.a */; };
+		D5E10C3D1865E57700B23922 /* libFEBioHeat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C341865E57600B23922 /* libFEBioHeat.a */; };
+		D5E10C3E1865E57700B23922 /* libFEBioLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C351865E57600B23922 /* libFEBioLib.a */; };
+		D5E10C3F1865E57700B23922 /* libFEBioMech.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C361865E57600B23922 /* libFEBioMech.a */; };
+		D5E10C401865E57700B23922 /* libFEBioMix.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C371865E57600B23922 /* libFEBioMix.a */; };
+		D5E10C411865E57700B23922 /* libFEBioOpt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C381865E57600B23922 /* libFEBioOpt.a */; };
+		D5E10C421865E57700B23922 /* libFEBioPlot.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C391865E57600B23922 /* libFEBioPlot.a */; };
+		D5E10C431865E57700B23922 /* libFEBioXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C3A1865E57700B23922 /* libFEBioXML.a */; };
+		D5E10C441865E57700B23922 /* libFECore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C3B1865E57700B23922 /* libFECore.a */; };
+		D5E10C451865E57700B23922 /* libNumCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C3C1865E57700B23922 /* libNumCore.a */; };
+		D5E10C471865E79D00B23922 /* libFlex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E10C461865E79D00B23922 /* libFlex.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D5E10BAA1865E32800B23922 /* FEBioTM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FEBioTM.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5E10BAD1865E32800B23922 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		D5E10BB01865E32800B23922 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		D5E10BB11865E32800B23922 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		D5E10BB21865E32800B23922 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D5E10BB51865E32800B23922 /* FEBioTM-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FEBioTM-Info.plist"; sourceTree = "<group>"; };
+		D5E10BB71865E32800B23922 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D5E10BBB1865E32800B23922 /* FEBioTM-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FEBioTM-Prefix.pch"; sourceTree = "<group>"; };
+		D5E10BCC1865E32800B23922 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		D5E10BE11865E36900B23922 /* FEBio2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = FEBio2.icns; sourceTree = "<group>"; };
+		D5E10BE31865E38400B23922 /* DlgEditFind.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DlgEditFind.cpp; path = ../../../FEBioTM/DlgEditFind.cpp; sourceTree = "<group>"; };
+		D5E10BE41865E38400B23922 /* DlgEditFind.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DlgEditFind.h; path = ../../../FEBioTM/DlgEditFind.h; sourceTree = "<group>"; };
+		D5E10BE51865E38400B23922 /* Document.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Document.cpp; path = ../../../FEBioTM/Document.cpp; sourceTree = "<group>"; };
+		D5E10BE61865E38400B23922 /* Document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Document.h; path = ../../../FEBioTM/Document.h; sourceTree = "<group>"; };
+		D5E10BE71865E38400B23922 /* FEBioTM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FEBioTM.cpp; path = ../../../FEBioTM/FEBioTM.cpp; sourceTree = "<group>"; };
+		D5E10BE81865E38400B23922 /* FEBioTM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FEBioTM.h; path = ../../../FEBioTM/FEBioTM.h; sourceTree = "<group>"; };
+		D5E10BE91865E38400B23922 /* FileBrowser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileBrowser.cpp; path = ../../../FEBioTM/FileBrowser.cpp; sourceTree = "<group>"; };
+		D5E10BEA1865E38400B23922 /* FileBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileBrowser.h; path = ../../../FEBioTM/FileBrowser.h; sourceTree = "<group>"; };
+		D5E10BEB1865E38400B23922 /* MainApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MainApp.cpp; path = ../../../FEBioTM/MainApp.cpp; sourceTree = "<group>"; };
+		D5E10BEC1865E38400B23922 /* MainApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainApp.h; path = ../../../FEBioTM/MainApp.h; sourceTree = "<group>"; };
+		D5E10BED1865E38400B23922 /* Menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Menu.cpp; path = ../../../FEBioTM/Menu.cpp; sourceTree = "<group>"; };
+		D5E10BEE1865E38400B23922 /* Menu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Menu.h; path = ../../../FEBioTM/Menu.h; sourceTree = "<group>"; };
+		D5E10BEF1865E38400B23922 /* Session.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Session.cpp; path = ../../../FEBioTM/Session.cpp; sourceTree = "<group>"; };
+		D5E10BF01865E38400B23922 /* Session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Session.h; path = ../../../FEBioTM/Session.h; sourceTree = "<group>"; };
+		D5E10BF11865E38400B23922 /* SettingsView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SettingsView.cpp; path = ../../../FEBioTM/SettingsView.cpp; sourceTree = "<group>"; };
+		D5E10BF21865E38400B23922 /* SettingsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SettingsView.h; path = ../../../FEBioTM/SettingsView.h; sourceTree = "<group>"; };
+		D5E10BF31865E38400B23922 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stdafx.cpp; path = ../../../FEBioTM/stdafx.cpp; sourceTree = "<group>"; };
+		D5E10BF41865E38400B23922 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../FEBioTM/stdafx.h; sourceTree = "<group>"; };
+		D5E10BF51865E38400B23922 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = targetver.h; path = ../../../FEBioTM/targetver.h; sourceTree = "<group>"; };
+		D5E10BF61865E38400B23922 /* Task.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Task.cpp; path = ../../../FEBioTM/Task.cpp; sourceTree = "<group>"; };
+		D5E10BF71865E38400B23922 /* Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Task.h; path = ../../../FEBioTM/Task.h; sourceTree = "<group>"; };
+		D5E10BF81865E38400B23922 /* TaskBrowser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TaskBrowser.cpp; path = ../../../FEBioTM/TaskBrowser.cpp; sourceTree = "<group>"; };
+		D5E10BF91865E38400B23922 /* TaskBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TaskBrowser.h; path = ../../../FEBioTM/TaskBrowser.h; sourceTree = "<group>"; };
+		D5E10BFA1865E38400B23922 /* Test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Test.cpp; path = ../../../FEBioTM/Test.cpp; sourceTree = "<group>"; };
+		D5E10BFB1865E38400B23922 /* Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Test.h; path = ../../../FEBioTM/Test.h; sourceTree = "<group>"; };
+		D5E10BFC1865E38400B23922 /* Wnd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Wnd.cpp; path = ../../../FEBioTM/Wnd.cpp; sourceTree = "<group>"; };
+		D5E10BFD1865E38400B23922 /* Wnd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Wnd.h; path = ../../../FEBioTM/Wnd.h; sourceTree = "<group>"; };
+		D5E10BFE1865E38400B23922 /* XMLWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XMLWriter.cpp; path = ../../../FEBioTM/XMLWriter.cpp; sourceTree = "<group>"; };
+		D5E10BFF1865E38500B23922 /* XMLWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLWriter.h; path = ../../../FEBioTM/XMLWriter.h; sourceTree = "<group>"; };
+		D5E10C0E1865E40400B23922 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = System/Library/Frameworks/AGL.framework; sourceTree = SDKROOT; };
+		D5E10C0F1865E40400B23922 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		D5E10C101865E40400B23922 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		D5E10C141865E41D00B23922 /* libfltk_forms.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_forms.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_forms.a; sourceTree = "<group>"; };
+		D5E10C151865E41D00B23922 /* libfltk_gl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_gl.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_gl.a; sourceTree = "<group>"; };
+		D5E10C161865E41D00B23922 /* libfltk_images.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_images.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_images.a; sourceTree = "<group>"; };
+		D5E10C171865E41D00B23922 /* libfltk_jpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_jpeg.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_jpeg.a; sourceTree = "<group>"; };
+		D5E10C181865E41D00B23922 /* libfltk_png.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_png.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_png.a; sourceTree = "<group>"; };
+		D5E10C191865E41D00B23922 /* libfltk_z.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk_z.a; path = ../../../../../../../../../../../usr/local/lib/libfltk_z.a; sourceTree = "<group>"; };
+		D5E10C1A1865E41D00B23922 /* libfltk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfltk.a; path = ../../../../../../../../../../../usr/local/lib/libfltk.a; sourceTree = "<group>"; };
+		D5E10C341865E57600B23922 /* libFEBioHeat.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioHeat.a; path = ../FEBioHeat/build/Debug/libFEBioHeat.a; sourceTree = "<group>"; };
+		D5E10C351865E57600B23922 /* libFEBioLib.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioLib.a; path = ../FEBioLib/build/Debug/libFEBioLib.a; sourceTree = "<group>"; };
+		D5E10C361865E57600B23922 /* libFEBioMech.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioMech.a; path = ../FEBioMech/build/Debug/libFEBioMech.a; sourceTree = "<group>"; };
+		D5E10C371865E57600B23922 /* libFEBioMix.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioMix.a; path = ../FEBioMix/build/Debug/libFEBioMix.a; sourceTree = "<group>"; };
+		D5E10C381865E57600B23922 /* libFEBioOpt.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioOpt.a; path = ../FEBioOpt/build/Debug/libFEBioOpt.a; sourceTree = "<group>"; };
+		D5E10C391865E57600B23922 /* libFEBioPlot.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioPlot.a; path = ../FEBioPlot/build/Debug/libFEBioPlot.a; sourceTree = "<group>"; };
+		D5E10C3A1865E57700B23922 /* libFEBioXML.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFEBioXML.a; path = ../FEBioXML/build/Debug/libFEBioXML.a; sourceTree = "<group>"; };
+		D5E10C3B1865E57700B23922 /* libFECore.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFECore.a; path = ../FECore/build/Debug/libFECore.a; sourceTree = "<group>"; };
+		D5E10C3C1865E57700B23922 /* libNumCore.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libNumCore.a; path = ../NumCore/build/Debug/libNumCore.a; sourceTree = "<group>"; };
+		D5E10C461865E79D00B23922 /* libFlex.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libFlex.a; path = ../../../Flex/XCode5/Flex/build/Debug/libFlex.a; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D5E10BA71865E32800B23922 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5E10C471865E79D00B23922 /* libFlex.a in Frameworks */,
+				D5E10C3D1865E57700B23922 /* libFEBioHeat.a in Frameworks */,
+				D5E10C3E1865E57700B23922 /* libFEBioLib.a in Frameworks */,
+				D5E10C3F1865E57700B23922 /* libFEBioMech.a in Frameworks */,
+				D5E10C401865E57700B23922 /* libFEBioMix.a in Frameworks */,
+				D5E10C411865E57700B23922 /* libFEBioOpt.a in Frameworks */,
+				D5E10C421865E57700B23922 /* libFEBioPlot.a in Frameworks */,
+				D5E10C431865E57700B23922 /* libFEBioXML.a in Frameworks */,
+				D5E10C441865E57700B23922 /* libFECore.a in Frameworks */,
+				D5E10C451865E57700B23922 /* libNumCore.a in Frameworks */,
+				D5E10C1B1865E41D00B23922 /* libfltk_forms.a in Frameworks */,
+				D5E10C1C1865E41D00B23922 /* libfltk_gl.a in Frameworks */,
+				D5E10C1D1865E41D00B23922 /* libfltk_images.a in Frameworks */,
+				D5E10C1E1865E41D00B23922 /* libfltk_jpeg.a in Frameworks */,
+				D5E10C1F1865E41D00B23922 /* libfltk_png.a in Frameworks */,
+				D5E10C201865E41D00B23922 /* libfltk_z.a in Frameworks */,
+				D5E10C211865E41D00B23922 /* libfltk.a in Frameworks */,
+				D5E10C111865E40400B23922 /* AGL.framework in Frameworks */,
+				D5E10C121865E40400B23922 /* CoreFoundation.framework in Frameworks */,
+				D5E10C131865E40400B23922 /* OpenGL.framework in Frameworks */,
+				D5E10BAE1865E32800B23922 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D5E10BA11865E32800B23922 = {
+			isa = PBXGroup;
+			children = (
+				D5E10BE11865E36900B23922 /* FEBio2.icns */,
+				D5E10BB31865E32800B23922 /* FEBioTM */,
+				D5E10BAC1865E32800B23922 /* Frameworks */,
+				D5E10BAB1865E32800B23922 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D5E10BAB1865E32800B23922 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D5E10BAA1865E32800B23922 /* FEBioTM.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D5E10BAC1865E32800B23922 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D5E10C461865E79D00B23922 /* libFlex.a */,
+				D5E10C341865E57600B23922 /* libFEBioHeat.a */,
+				D5E10C351865E57600B23922 /* libFEBioLib.a */,
+				D5E10C361865E57600B23922 /* libFEBioMech.a */,
+				D5E10C371865E57600B23922 /* libFEBioMix.a */,
+				D5E10C381865E57600B23922 /* libFEBioOpt.a */,
+				D5E10C391865E57600B23922 /* libFEBioPlot.a */,
+				D5E10C3A1865E57700B23922 /* libFEBioXML.a */,
+				D5E10C3B1865E57700B23922 /* libFECore.a */,
+				D5E10C3C1865E57700B23922 /* libNumCore.a */,
+				D5E10C141865E41D00B23922 /* libfltk_forms.a */,
+				D5E10C151865E41D00B23922 /* libfltk_gl.a */,
+				D5E10C161865E41D00B23922 /* libfltk_images.a */,
+				D5E10C171865E41D00B23922 /* libfltk_jpeg.a */,
+				D5E10C181865E41D00B23922 /* libfltk_png.a */,
+				D5E10C191865E41D00B23922 /* libfltk_z.a */,
+				D5E10C1A1865E41D00B23922 /* libfltk.a */,
+				D5E10C0E1865E40400B23922 /* AGL.framework */,
+				D5E10C0F1865E40400B23922 /* CoreFoundation.framework */,
+				D5E10C101865E40400B23922 /* OpenGL.framework */,
+				D5E10BAD1865E32800B23922 /* Cocoa.framework */,
+				D5E10BCC1865E32800B23922 /* XCTest.framework */,
+				D5E10BAF1865E32800B23922 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D5E10BAF1865E32800B23922 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D5E10BB01865E32800B23922 /* AppKit.framework */,
+				D5E10BB11865E32800B23922 /* CoreData.framework */,
+				D5E10BB21865E32800B23922 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		D5E10BB31865E32800B23922 /* FEBioTM */ = {
+			isa = PBXGroup;
+			children = (
+				D5E10BE31865E38400B23922 /* DlgEditFind.cpp */,
+				D5E10BE41865E38400B23922 /* DlgEditFind.h */,
+				D5E10BE51865E38400B23922 /* Document.cpp */,
+				D5E10BE61865E38400B23922 /* Document.h */,
+				D5E10BE71865E38400B23922 /* FEBioTM.cpp */,
+				D5E10BE81865E38400B23922 /* FEBioTM.h */,
+				D5E10BE91865E38400B23922 /* FileBrowser.cpp */,
+				D5E10BEA1865E38400B23922 /* FileBrowser.h */,
+				D5E10BEB1865E38400B23922 /* MainApp.cpp */,
+				D5E10BEC1865E38400B23922 /* MainApp.h */,
+				D5E10BED1865E38400B23922 /* Menu.cpp */,
+				D5E10BEE1865E38400B23922 /* Menu.h */,
+				D5E10BEF1865E38400B23922 /* Session.cpp */,
+				D5E10BF01865E38400B23922 /* Session.h */,
+				D5E10BF11865E38400B23922 /* SettingsView.cpp */,
+				D5E10BF21865E38400B23922 /* SettingsView.h */,
+				D5E10BF31865E38400B23922 /* stdafx.cpp */,
+				D5E10BF41865E38400B23922 /* stdafx.h */,
+				D5E10BF51865E38400B23922 /* targetver.h */,
+				D5E10BF61865E38400B23922 /* Task.cpp */,
+				D5E10BF71865E38400B23922 /* Task.h */,
+				D5E10BF81865E38400B23922 /* TaskBrowser.cpp */,
+				D5E10BF91865E38400B23922 /* TaskBrowser.h */,
+				D5E10BFA1865E38400B23922 /* Test.cpp */,
+				D5E10BFB1865E38400B23922 /* Test.h */,
+				D5E10BFC1865E38400B23922 /* Wnd.cpp */,
+				D5E10BFD1865E38400B23922 /* Wnd.h */,
+				D5E10BFE1865E38400B23922 /* XMLWriter.cpp */,
+				D5E10BFF1865E38500B23922 /* XMLWriter.h */,
+				D5E10BB41865E32800B23922 /* Supporting Files */,
+			);
+			path = FEBioTM;
+			sourceTree = "<group>";
+		};
+		D5E10BB41865E32800B23922 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D5E10BB51865E32800B23922 /* FEBioTM-Info.plist */,
+				D5E10BB61865E32800B23922 /* InfoPlist.strings */,
+				D5E10BBB1865E32800B23922 /* FEBioTM-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D5E10BA91865E32800B23922 /* FEBioTM */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D5E10BDB1865E32800B23922 /* Build configuration list for PBXNativeTarget "FEBioTM" */;
+			buildPhases = (
+				D5E10BA61865E32800B23922 /* Sources */,
+				D5E10BA71865E32800B23922 /* Frameworks */,
+				D5E10BA81865E32800B23922 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FEBioTM;
+			productName = FEBioTM;
+			productReference = D5E10BAA1865E32800B23922 /* FEBioTM.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D5E10BA21865E32800B23922 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = febio.org;
+			};
+			buildConfigurationList = D5E10BA51865E32800B23922 /* Build configuration list for PBXProject "FEBioTM" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D5E10BA11865E32800B23922;
+			productRefGroup = D5E10BAB1865E32800B23922 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D5E10BA91865E32800B23922 /* FEBioTM */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D5E10BA81865E32800B23922 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5E10BB81865E32800B23922 /* InfoPlist.strings in Resources */,
+				D5E10BE21865E36900B23922 /* FEBio2.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D5E10BA61865E32800B23922 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5E10C0D1865E38500B23922 /* XMLWriter.cpp in Sources */,
+				D5E10C0A1865E38500B23922 /* TaskBrowser.cpp in Sources */,
+				D5E10C081865E38500B23922 /* stdafx.cpp in Sources */,
+				D5E10C051865E38500B23922 /* Menu.cpp in Sources */,
+				D5E10C061865E38500B23922 /* Session.cpp in Sources */,
+				D5E10C031865E38500B23922 /* FileBrowser.cpp in Sources */,
+				D5E10C0C1865E38500B23922 /* Wnd.cpp in Sources */,
+				D5E10C091865E38500B23922 /* Task.cpp in Sources */,
+				D5E10C011865E38500B23922 /* Document.cpp in Sources */,
+				D5E10C041865E38500B23922 /* MainApp.cpp in Sources */,
+				D5E10C071865E38500B23922 /* SettingsView.cpp in Sources */,
+				D5E10C0B1865E38500B23922 /* Test.cpp in Sources */,
+				D5E10C001865E38500B23922 /* DlgEditFind.cpp in Sources */,
+				D5E10C021865E38500B23922 /* FEBioTM.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D5E10BB61865E32800B23922 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D5E10BB71865E32800B23922 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D5E10BD91865E32800B23922 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DHAVE_PTHREAD_H",
+				);
+				OTHER_LDFLAGS = (
+					/opt/intel/lib/libiomp5.a,
+					/opt/intel/mkl/lib/libmkl_core.a,
+					/opt/intel/mkl/lib/libmkl_intel.a,
+					/opt/intel/mkl/lib/libmkl_intel_lp64.a,
+					/opt/intel/mkl/lib/libmkl_intel_thread.a,
+				);
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../.. $(SRCROOT)/../../../Flex/Flex /usr/local/include";
+			};
+			name = Debug;
+		};
+		D5E10BDA1865E32800B23922 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DHAVE_PTHREAD_H",
+				);
+				OTHER_LDFLAGS = (
+					/opt/intel/lib/libiomp5.a,
+					/opt/intel/mkl/lib/libmkl_core.a,
+					/opt/intel/mkl/lib/libmkl_intel.a,
+					/opt/intel/mkl/lib/libmkl_intel_lp64.a,
+					/opt/intel/mkl/lib/libmkl_intel_thread.a,
+				);
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../.. $(SRCROOT)/../../../Flex/Flex /usr/local/include";
+			};
+			name = Release;
+		};
+		D5E10BDC1865E32800B23922 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FEBioTM/FEBioTM-Prefix.pch";
+				INFOPLIST_FILE = "FEBioTM/FEBioTM-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		D5E10BDD1865E32800B23922 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FEBioTM/FEBioTM-Prefix.pch";
+				INFOPLIST_FILE = "FEBioTM/FEBioTM-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D5E10BA51865E32800B23922 /* Build configuration list for PBXProject "FEBioTM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5E10BD91865E32800B23922 /* Debug */,
+				D5E10BDA1865E32800B23922 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D5E10BDB1865E32800B23922 /* Build configuration list for PBXNativeTarget "FEBioTM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5E10BDC1865E32800B23922 /* Debug */,
+				D5E10BDD1865E32800B23922 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D5E10BA21865E32800B23922 /* Project object */;
+}

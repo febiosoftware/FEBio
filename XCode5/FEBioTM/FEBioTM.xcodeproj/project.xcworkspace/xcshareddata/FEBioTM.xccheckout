@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>F1C6A672-4C8B-4FA5-A81C-2CBA8DCAC1E3</string>
+	<key>IDESourceControlProjectName</key>
+	<string>FEBioTM</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>C97430A4-2867-4E30-B3AF-BF475A052829</key>
+		<string>https://gforge.sci.utah.edu/svn/MRLProjects</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>FEBio2/XCode5/FEBioTM/FEBioTM.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>C97430A4-2867-4E30-B3AF-BF475A052829</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>C97430A4-2867-4E30-B3AF-BF475A052829</key>
+		<string>https://gforge.sci.utah.edu/svn/MRLProjects</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://gforge.sci.utah.edu/svn/MRLProjects/FEBio2/XCode5/FEBioTM/FEBioTM.xcodeproj</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>C97430A4-2867-4E30-B3AF-BF475A052829</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryBranchesRelativeLocationKey</key>
+			<string>branches</string>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>C97430A4-2867-4E30-B3AF-BF475A052829</string>
+			<key>IDESourceControlWCCName</key>
+			<string>MRLProjects</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,803 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D5E10A801865E15900B23922 /* Archive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109EF1865E15900B23922 /* Archive.cpp */; };
+		D5E10A811865E15900B23922 /* Archive.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109F01865E15900B23922 /* Archive.h */; };
+		D5E10A821865E15900B23922 /* BC.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109F11865E15900B23922 /* BC.h */; };
+		D5E10A831865E15900B23922 /* BFGSSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109F21865E15900B23922 /* BFGSSolver.cpp */; };
+		D5E10A841865E15900B23922 /* BFGSSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109F31865E15900B23922 /* BFGSSolver.h */; };
+		D5E10A851865E15900B23922 /* colsol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109F41865E15900B23922 /* colsol.cpp */; };
+		D5E10A861865E15900B23922 /* DataStore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109F51865E15900B23922 /* DataStore.cpp */; };
+		D5E10A871865E15900B23922 /* DataStore.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109F61865E15900B23922 /* DataStore.h */; };
+		D5E10A881865E15900B23922 /* DumpFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109F71865E15900B23922 /* DumpFile.cpp */; };
+		D5E10A891865E15900B23922 /* DumpFile.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109F81865E15900B23922 /* DumpFile.h */; };
+		D5E10A8A1865E15900B23922 /* DumpStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109F91865E15900B23922 /* DumpStream.cpp */; };
+		D5E10A8B1865E15900B23922 /* DumpStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109FA1865E15900B23922 /* DumpStream.h */; };
+		D5E10A8C1865E15900B23922 /* ElementDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109FB1865E15900B23922 /* ElementDataRecord.cpp */; };
+		D5E10A8D1865E15900B23922 /* ElementDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109FC1865E15900B23922 /* ElementDataRecord.h */; };
+		D5E10A8E1865E15900B23922 /* FE_enum.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109FD1865E15900B23922 /* FE_enum.h */; };
+		D5E10A8F1865E15900B23922 /* FEAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E109FE1865E15900B23922 /* FEAnalysis.cpp */; };
+		D5E10A901865E15900B23922 /* FEAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E109FF1865E15900B23922 /* FEAnalysis.h */; };
+		D5E10A911865E15900B23922 /* febio.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A001865E15900B23922 /* febio.h */; };
+		D5E10A921865E15900B23922 /* FEBioFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A011865E15900B23922 /* FEBioFactory.cpp */; };
+		D5E10A931865E15900B23922 /* FEBioFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A021865E15900B23922 /* FEBioFactory.h */; };
+		D5E10A941865E15900B23922 /* FEBioTask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A031865E15900B23922 /* FEBioTask.cpp */; };
+		D5E10A951865E15900B23922 /* FEBioTask.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A041865E15900B23922 /* FEBioTask.h */; };
+		D5E10A961865E15900B23922 /* FEBodyLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A051865E15900B23922 /* FEBodyLoad.cpp */; };
+		D5E10A971865E15900B23922 /* FEBodyLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A061865E15900B23922 /* FEBodyLoad.h */; };
+		D5E10A981865E15900B23922 /* FEBoundaryCondition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A071865E15900B23922 /* FEBoundaryCondition.cpp */; };
+		D5E10A991865E15900B23922 /* FEBoundaryCondition.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A081865E15900B23922 /* FEBoundaryCondition.h */; };
+		D5E10A9A1865E15900B23922 /* FEClosestPointProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A091865E15900B23922 /* FEClosestPointProjection.cpp */; };
+		D5E10A9B1865E15900B23922 /* FEClosestPointProjection.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A0A1865E15900B23922 /* FEClosestPointProjection.h */; };
+		D5E10A9C1865E15900B23922 /* FEContactSurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A0B1865E15900B23922 /* FEContactSurface.cpp */; };
+		D5E10A9D1865E15900B23922 /* FEContactSurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A0C1865E15900B23922 /* FEContactSurface.h */; };
+		D5E10A9E1865E15900B23922 /* FECoordSysMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A0D1865E15900B23922 /* FECoordSysMap.cpp */; };
+		D5E10A9F1865E15900B23922 /* FECoordSysMap.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A0E1865E15900B23922 /* FECoordSysMap.h */; };
+		D5E10AA01865E15900B23922 /* FECore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A0F1865E15900B23922 /* FECore.cpp */; };
+		D5E10AA11865E15900B23922 /* FECore.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A101865E15900B23922 /* FECore.h */; };
+		D5E10AA21865E15900B23922 /* FECoreBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A121865E15900B23922 /* FECoreBase.cpp */; };
+		D5E10AA31865E15900B23922 /* FECoreBase.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A131865E15900B23922 /* FECoreBase.h */; };
+		D5E10AA41865E15900B23922 /* FEDiscreteDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A141865E15900B23922 /* FEDiscreteDomain.cpp */; };
+		D5E10AA51865E15900B23922 /* FEDiscreteDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A151865E15900B23922 /* FEDiscreteDomain.h */; };
+		D5E10AA61865E15900B23922 /* FEDiscreteMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A161865E15900B23922 /* FEDiscreteMaterial.cpp */; };
+		D5E10AA71865E15900B23922 /* FEDiscreteMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A171865E15900B23922 /* FEDiscreteMaterial.h */; };
+		D5E10AA81865E15900B23922 /* FEDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A181865E15900B23922 /* FEDomain.cpp */; };
+		D5E10AA91865E15900B23922 /* FEDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A191865E15900B23922 /* FEDomain.h */; };
+		D5E10AAA1865E15900B23922 /* FEElemElemList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A1A1865E15900B23922 /* FEElemElemList.cpp */; };
+		D5E10AAB1865E15900B23922 /* FEElemElemList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A1B1865E15900B23922 /* FEElemElemList.h */; };
+		D5E10AAC1865E15900B23922 /* FEElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A1C1865E15900B23922 /* FEElement.cpp */; };
+		D5E10AAD1865E15900B23922 /* FEElement.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A1D1865E15900B23922 /* FEElement.h */; };
+		D5E10AAE1865E15900B23922 /* FEElementLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A1E1865E15900B23922 /* FEElementLibrary.cpp */; };
+		D5E10AAF1865E15900B23922 /* FEElementLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A1F1865E15900B23922 /* FEElementLibrary.h */; };
+		D5E10AB01865E15900B23922 /* FEElementTraits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A201865E15900B23922 /* FEElementTraits.cpp */; };
+		D5E10AB11865E15900B23922 /* FEElementTraits.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A211865E15900B23922 /* FEElementTraits.h */; };
+		D5E10AB21865E15900B23922 /* FEException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A221865E15900B23922 /* FEException.cpp */; };
+		D5E10AB31865E15900B23922 /* FEException.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A231865E15900B23922 /* FEException.h */; };
+		D5E10AB41865E15900B23922 /* FEGlobalMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A241865E15900B23922 /* FEGlobalMatrix.cpp */; };
+		D5E10AB51865E15900B23922 /* FEGlobalMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A251865E15900B23922 /* FEGlobalMatrix.h */; };
+		D5E10AB61865E15900B23922 /* FEGlobalVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A261865E15900B23922 /* FEGlobalVector.cpp */; };
+		D5E10AB71865E15900B23922 /* FEGlobalVector.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A271865E15900B23922 /* FEGlobalVector.h */; };
+		D5E10AB81865E15900B23922 /* FELevelStructure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A281865E15900B23922 /* FELevelStructure.cpp */; };
+		D5E10AB91865E15900B23922 /* FELevelStructure.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A291865E15900B23922 /* FELevelStructure.h */; };
+		D5E10ABA1865E15900B23922 /* FELinearConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A2A1865E15900B23922 /* FELinearConstraint.cpp */; };
+		D5E10ABB1865E15900B23922 /* FELinearConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A2B1865E15900B23922 /* FELinearConstraint.h */; };
+		D5E10ABC1865E15900B23922 /* FEMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A2C1865E15900B23922 /* FEMaterial.cpp */; };
+		D5E10ABD1865E15900B23922 /* FEMaterial.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A2D1865E15900B23922 /* FEMaterial.h */; };
+		D5E10ABE1865E15900B23922 /* FEMaterialPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A2E1865E15900B23922 /* FEMaterialPoint.cpp */; };
+		D5E10ABF1865E15900B23922 /* FEMaterialPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A2F1865E15900B23922 /* FEMaterialPoint.h */; };
+		D5E10AC01865E15900B23922 /* FEMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A301865E15900B23922 /* FEMesh.cpp */; };
+		D5E10AC11865E15900B23922 /* FEMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A311865E15900B23922 /* FEMesh.h */; };
+		D5E10AC21865E15900B23922 /* FEModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A321865E15900B23922 /* FEModel.cpp */; };
+		D5E10AC31865E15900B23922 /* FEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A331865E15900B23922 /* FEModel.h */; };
+		D5E10AC41865E15900B23922 /* FEModelComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A341865E15900B23922 /* FEModelComponent.cpp */; };
+		D5E10AC51865E15900B23922 /* FEModelComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A351865E15900B23922 /* FEModelComponent.h */; };
+		D5E10AC61865E15900B23922 /* FENLConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A361865E15900B23922 /* FENLConstraint.cpp */; };
+		D5E10AC71865E15900B23922 /* FENLConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A371865E15900B23922 /* FENLConstraint.h */; };
+		D5E10AC81865E15900B23922 /* FENNQuery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A381865E15900B23922 /* FENNQuery.cpp */; };
+		D5E10AC91865E15900B23922 /* FENNQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A391865E15900B23922 /* FENNQuery.h */; };
+		D5E10ACA1865E15900B23922 /* FENodeElemList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A3A1865E15900B23922 /* FENodeElemList.cpp */; };
+		D5E10ACB1865E15900B23922 /* FENodeElemList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A3B1865E15900B23922 /* FENodeElemList.h */; };
+		D5E10ACC1865E15900B23922 /* FENodeNodeList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A3C1865E15900B23922 /* FENodeNodeList.cpp */; };
+		D5E10ACD1865E15900B23922 /* FENodeNodeList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A3D1865E15900B23922 /* FENodeNodeList.h */; };
+		D5E10ACE1865E15900B23922 /* FENodeReorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A3E1865E15900B23922 /* FENodeReorder.cpp */; };
+		D5E10ACF1865E15900B23922 /* FENodeReorder.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A3F1865E15900B23922 /* FENodeReorder.h */; };
+		D5E10AD01865E15900B23922 /* FEObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A401865E15900B23922 /* FEObject.h */; };
+		D5E10AD11865E15900B23922 /* FEOctree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A411865E15900B23922 /* FEOctree.cpp */; };
+		D5E10AD21865E15900B23922 /* FEOctree.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A421865E15900B23922 /* FEOctree.h */; };
+		D5E10AD31865E15900B23922 /* FEParameterList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A431865E15900B23922 /* FEParameterList.cpp */; };
+		D5E10AD41865E15900B23922 /* FEParameterList.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A441865E15900B23922 /* FEParameterList.h */; };
+		D5E10AD51865E15900B23922 /* FEPlotData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A451865E15900B23922 /* FEPlotData.cpp */; };
+		D5E10AD61865E15900B23922 /* FEPlotData.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A461865E15900B23922 /* FEPlotData.h */; };
+		D5E10AD71865E15900B23922 /* FERigidBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A471865E15900B23922 /* FERigidBody.cpp */; };
+		D5E10AD81865E15900B23922 /* FERigidBody.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A481865E15900B23922 /* FERigidBody.h */; };
+		D5E10AD91865E15900B23922 /* FEShellDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A491865E15900B23922 /* FEShellDomain.cpp */; };
+		D5E10ADA1865E15900B23922 /* FEShellDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A4A1865E15900B23922 /* FEShellDomain.h */; };
+		D5E10ADB1865E15900B23922 /* FESolidDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A4B1865E15900B23922 /* FESolidDomain.cpp */; };
+		D5E10ADC1865E15900B23922 /* FESolidDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A4C1865E15900B23922 /* FESolidDomain.h */; };
+		D5E10ADD1865E15900B23922 /* FESolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A4D1865E15900B23922 /* FESolver.cpp */; };
+		D5E10ADE1865E15900B23922 /* FESolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A4E1865E15900B23922 /* FESolver.h */; };
+		D5E10ADF1865E15900B23922 /* FESurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A4F1865E15900B23922 /* FESurface.cpp */; };
+		D5E10AE01865E15900B23922 /* FESurface.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A501865E15900B23922 /* FESurface.h */; };
+		D5E10AE11865E15900B23922 /* FESurfaceLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A511865E15900B23922 /* FESurfaceLoad.cpp */; };
+		D5E10AE21865E15900B23922 /* FESurfaceLoad.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A521865E15900B23922 /* FESurfaceLoad.h */; };
+		D5E10AE31865E15900B23922 /* FESurfacePairInteraction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A531865E15900B23922 /* FESurfacePairInteraction.cpp */; };
+		D5E10AE41865E15900B23922 /* FESurfacePairInteraction.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A541865E15900B23922 /* FESurfacePairInteraction.h */; };
+		D5E10AE51865E15900B23922 /* FETrussDomain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A551865E15900B23922 /* FETrussDomain.cpp */; };
+		D5E10AE61865E15900B23922 /* FETrussDomain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A561865E15900B23922 /* FETrussDomain.h */; };
+		D5E10AE71865E15900B23922 /* FETypes.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A571865E15900B23922 /* FETypes.h */; };
+		D5E10AE81865E15900B23922 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A581865E15900B23922 /* Image.cpp */; };
+		D5E10AE91865E15900B23922 /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A591865E15900B23922 /* Image.h */; };
+		D5E10AEA1865E15900B23922 /* kernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A5A1865E15900B23922 /* kernel.cpp */; };
+		D5E10AEB1865E15900B23922 /* LinearSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A5B1865E15900B23922 /* LinearSolver.cpp */; };
+		D5E10AEC1865E15900B23922 /* LinearSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A5C1865E15900B23922 /* LinearSolver.h */; };
+		D5E10AED1865E15900B23922 /* LoadCurve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A5D1865E15900B23922 /* LoadCurve.cpp */; };
+		D5E10AEE1865E15900B23922 /* LoadCurve.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A5E1865E15900B23922 /* LoadCurve.h */; };
+		D5E10AEF1865E15900B23922 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A5F1865E15900B23922 /* log.h */; };
+		D5E10AF01865E15900B23922 /* Logfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A601865E15900B23922 /* Logfile.cpp */; };
+		D5E10AF11865E15900B23922 /* Logfile.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A611865E15900B23922 /* Logfile.h */; };
+		D5E10AF21865E15900B23922 /* mat2d.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A621865E15900B23922 /* mat2d.h */; };
+		D5E10AF31865E15900B23922 /* mat3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A631865E15900B23922 /* mat3d.cpp */; };
+		D5E10AF41865E15900B23922 /* mat3d.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A641865E15900B23922 /* mat3d.h */; };
+		D5E10AF51865E15900B23922 /* mat3d.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A651865E15900B23922 /* mat3d.hpp */; };
+		D5E10AF61865E15900B23922 /* MathParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A661865E15900B23922 /* MathParser.cpp */; };
+		D5E10AF71865E15900B23922 /* MathParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A671865E15900B23922 /* MathParser.h */; };
+		D5E10AF81865E15900B23922 /* matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A681865E15900B23922 /* matrix.cpp */; };
+		D5E10AF91865E15900B23922 /* matrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A691865E15900B23922 /* matrix.h */; };
+		D5E10AFA1865E15900B23922 /* MatrixProfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A6A1865E15900B23922 /* MatrixProfile.cpp */; };
+		D5E10AFB1865E15900B23922 /* MatrixProfile.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A6B1865E15900B23922 /* MatrixProfile.h */; };
+		D5E10AFC1865E15900B23922 /* NodeDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A6C1865E15900B23922 /* NodeDataRecord.cpp */; };
+		D5E10AFD1865E15900B23922 /* NodeDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A6D1865E15900B23922 /* NodeDataRecord.h */; };
+		D5E10AFE1865E15900B23922 /* ObjectDataRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A6E1865E15900B23922 /* ObjectDataRecord.cpp */; };
+		D5E10AFF1865E15900B23922 /* ObjectDataRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A6F1865E15900B23922 /* ObjectDataRecord.h */; };
+		D5E10B001865E15900B23922 /* qsort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A701865E15900B23922 /* qsort.cpp */; };
+		D5E10B011865E15900B23922 /* quatd.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A711865E15900B23922 /* quatd.h */; };
+		D5E10B021865E15900B23922 /* SparseMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A721865E15900B23922 /* SparseMatrix.cpp */; };
+		D5E10B031865E15900B23922 /* SparseMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A731865E15900B23922 /* SparseMatrix.h */; };
+		D5E10B041865E15900B23922 /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A741865E15900B23922 /* stdafx.cpp */; };
+		D5E10B051865E15900B23922 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A751865E15900B23922 /* stdafx.h */; };
+		D5E10B061865E15900B23922 /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A761865E15900B23922 /* targetver.h */; };
+		D5E10B071865E15900B23922 /* tens4d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A771865E15900B23922 /* tens4d.cpp */; };
+		D5E10B081865E15900B23922 /* tens4d.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A781865E15900B23922 /* tens4d.h */; };
+		D5E10B091865E15900B23922 /* tens4d.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A791865E15900B23922 /* tens4d.hpp */; };
+		D5E10B0A1865E15900B23922 /* Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A7A1865E15900B23922 /* Timer.cpp */; };
+		D5E10B0B1865E15900B23922 /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A7B1865E15900B23922 /* Timer.h */; };
+		D5E10B0C1865E15900B23922 /* vec2d.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A7C1865E15900B23922 /* vec2d.h */; };
+		D5E10B0D1865E15900B23922 /* vec3d.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A7D1865E15900B23922 /* vec3d.h */; };
+		D5E10B0E1865E15900B23922 /* vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D5E10A7E1865E15900B23922 /* vector.cpp */; };
+		D5E10B0F1865E15900B23922 /* vector.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E10A7F1865E15900B23922 /* vector.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D5E109E71865E14D00B23922 /* libFECore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFECore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5E109EF1865E15900B23922 /* Archive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Archive.cpp; sourceTree = "<group>"; };
+		D5E109F01865E15900B23922 /* Archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Archive.h; sourceTree = "<group>"; };
+		D5E109F11865E15900B23922 /* BC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BC.h; sourceTree = "<group>"; };
+		D5E109F21865E15900B23922 /* BFGSSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BFGSSolver.cpp; sourceTree = "<group>"; };
+		D5E109F31865E15900B23922 /* BFGSSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BFGSSolver.h; sourceTree = "<group>"; };
+		D5E109F41865E15900B23922 /* colsol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = colsol.cpp; sourceTree = "<group>"; };
+		D5E109F51865E15900B23922 /* DataStore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataStore.cpp; sourceTree = "<group>"; };
+		D5E109F61865E15900B23922 /* DataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataStore.h; sourceTree = "<group>"; };
+		D5E109F71865E15900B23922 /* DumpFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumpFile.cpp; sourceTree = "<group>"; };
+		D5E109F81865E15900B23922 /* DumpFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpFile.h; sourceTree = "<group>"; };
+		D5E109F91865E15900B23922 /* DumpStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumpStream.cpp; sourceTree = "<group>"; };
+		D5E109FA1865E15900B23922 /* DumpStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpStream.h; sourceTree = "<group>"; };
+		D5E109FB1865E15900B23922 /* ElementDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ElementDataRecord.cpp; sourceTree = "<group>"; };
+		D5E109FC1865E15900B23922 /* ElementDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ElementDataRecord.h; sourceTree = "<group>"; };
+		D5E109FD1865E15900B23922 /* FE_enum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FE_enum.h; sourceTree = "<group>"; };
+		D5E109FE1865E15900B23922 /* FEAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEAnalysis.cpp; sourceTree = "<group>"; };
+		D5E109FF1865E15900B23922 /* FEAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEAnalysis.h; sourceTree = "<group>"; };
+		D5E10A001865E15900B23922 /* febio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = febio.h; sourceTree = "<group>"; };
+		D5E10A011865E15900B23922 /* FEBioFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioFactory.cpp; sourceTree = "<group>"; };
+		D5E10A021865E15900B23922 /* FEBioFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioFactory.h; sourceTree = "<group>"; };
+		D5E10A031865E15900B23922 /* FEBioTask.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBioTask.cpp; sourceTree = "<group>"; };
+		D5E10A041865E15900B23922 /* FEBioTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBioTask.h; sourceTree = "<group>"; };
+		D5E10A051865E15900B23922 /* FEBodyLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBodyLoad.cpp; sourceTree = "<group>"; };
+		D5E10A061865E15900B23922 /* FEBodyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBodyLoad.h; sourceTree = "<group>"; };
+		D5E10A071865E15900B23922 /* FEBoundaryCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEBoundaryCondition.cpp; sourceTree = "<group>"; };
+		D5E10A081865E15900B23922 /* FEBoundaryCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEBoundaryCondition.h; sourceTree = "<group>"; };
+		D5E10A091865E15900B23922 /* FEClosestPointProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEClosestPointProjection.cpp; sourceTree = "<group>"; };
+		D5E10A0A1865E15900B23922 /* FEClosestPointProjection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEClosestPointProjection.h; sourceTree = "<group>"; };
+		D5E10A0B1865E15900B23922 /* FEContactSurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEContactSurface.cpp; sourceTree = "<group>"; };
+		D5E10A0C1865E15900B23922 /* FEContactSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEContactSurface.h; sourceTree = "<group>"; };
+		D5E10A0D1865E15900B23922 /* FECoordSysMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoordSysMap.cpp; sourceTree = "<group>"; };
+		D5E10A0E1865E15900B23922 /* FECoordSysMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoordSysMap.h; sourceTree = "<group>"; };
+		D5E10A0F1865E15900B23922 /* FECore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECore.cpp; sourceTree = "<group>"; };
+		D5E10A101865E15900B23922 /* FECore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECore.h; sourceTree = "<group>"; };
+		D5E10A121865E15900B23922 /* FECoreBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FECoreBase.cpp; sourceTree = "<group>"; };
+		D5E10A131865E15900B23922 /* FECoreBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FECoreBase.h; sourceTree = "<group>"; };
+		D5E10A141865E15900B23922 /* FEDiscreteDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiscreteDomain.cpp; sourceTree = "<group>"; };
+		D5E10A151865E15900B23922 /* FEDiscreteDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiscreteDomain.h; sourceTree = "<group>"; };
+		D5E10A161865E15900B23922 /* FEDiscreteMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDiscreteMaterial.cpp; sourceTree = "<group>"; };
+		D5E10A171865E15900B23922 /* FEDiscreteMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDiscreteMaterial.h; sourceTree = "<group>"; };
+		D5E10A181865E15900B23922 /* FEDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEDomain.cpp; sourceTree = "<group>"; };
+		D5E10A191865E15900B23922 /* FEDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEDomain.h; sourceTree = "<group>"; };
+		D5E10A1A1865E15900B23922 /* FEElemElemList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElemElemList.cpp; sourceTree = "<group>"; };
+		D5E10A1B1865E15900B23922 /* FEElemElemList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElemElemList.h; sourceTree = "<group>"; };
+		D5E10A1C1865E15900B23922 /* FEElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElement.cpp; sourceTree = "<group>"; };
+		D5E10A1D1865E15900B23922 /* FEElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElement.h; sourceTree = "<group>"; };
+		D5E10A1E1865E15900B23922 /* FEElementLibrary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElementLibrary.cpp; sourceTree = "<group>"; };
+		D5E10A1F1865E15900B23922 /* FEElementLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElementLibrary.h; sourceTree = "<group>"; };
+		D5E10A201865E15900B23922 /* FEElementTraits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEElementTraits.cpp; sourceTree = "<group>"; };
+		D5E10A211865E15900B23922 /* FEElementTraits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEElementTraits.h; sourceTree = "<group>"; };
+		D5E10A221865E15900B23922 /* FEException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEException.cpp; sourceTree = "<group>"; };
+		D5E10A231865E15900B23922 /* FEException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEException.h; sourceTree = "<group>"; };
+		D5E10A241865E15900B23922 /* FEGlobalMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGlobalMatrix.cpp; sourceTree = "<group>"; };
+		D5E10A251865E15900B23922 /* FEGlobalMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGlobalMatrix.h; sourceTree = "<group>"; };
+		D5E10A261865E15900B23922 /* FEGlobalVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEGlobalVector.cpp; sourceTree = "<group>"; };
+		D5E10A271865E15900B23922 /* FEGlobalVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEGlobalVector.h; sourceTree = "<group>"; };
+		D5E10A281865E15900B23922 /* FELevelStructure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELevelStructure.cpp; sourceTree = "<group>"; };
+		D5E10A291865E15900B23922 /* FELevelStructure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELevelStructure.h; sourceTree = "<group>"; };
+		D5E10A2A1865E15900B23922 /* FELinearConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FELinearConstraint.cpp; sourceTree = "<group>"; };
+		D5E10A2B1865E15900B23922 /* FELinearConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FELinearConstraint.h; sourceTree = "<group>"; };
+		D5E10A2C1865E15900B23922 /* FEMaterial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMaterial.cpp; sourceTree = "<group>"; };
+		D5E10A2D1865E15900B23922 /* FEMaterial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaterial.h; sourceTree = "<group>"; };
+		D5E10A2E1865E15900B23922 /* FEMaterialPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMaterialPoint.cpp; sourceTree = "<group>"; };
+		D5E10A2F1865E15900B23922 /* FEMaterialPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMaterialPoint.h; sourceTree = "<group>"; };
+		D5E10A301865E15900B23922 /* FEMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEMesh.cpp; sourceTree = "<group>"; };
+		D5E10A311865E15900B23922 /* FEMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEMesh.h; sourceTree = "<group>"; };
+		D5E10A321865E15900B23922 /* FEModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEModel.cpp; sourceTree = "<group>"; };
+		D5E10A331865E15900B23922 /* FEModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEModel.h; sourceTree = "<group>"; };
+		D5E10A341865E15900B23922 /* FEModelComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEModelComponent.cpp; sourceTree = "<group>"; };
+		D5E10A351865E15900B23922 /* FEModelComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEModelComponent.h; sourceTree = "<group>"; };
+		D5E10A361865E15900B23922 /* FENLConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENLConstraint.cpp; sourceTree = "<group>"; };
+		D5E10A371865E15900B23922 /* FENLConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENLConstraint.h; sourceTree = "<group>"; };
+		D5E10A381865E15900B23922 /* FENNQuery.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENNQuery.cpp; sourceTree = "<group>"; };
+		D5E10A391865E15900B23922 /* FENNQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENNQuery.h; sourceTree = "<group>"; };
+		D5E10A3A1865E15900B23922 /* FENodeElemList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeElemList.cpp; sourceTree = "<group>"; };
+		D5E10A3B1865E15900B23922 /* FENodeElemList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodeElemList.h; sourceTree = "<group>"; };
+		D5E10A3C1865E15900B23922 /* FENodeNodeList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeNodeList.cpp; sourceTree = "<group>"; };
+		D5E10A3D1865E15900B23922 /* FENodeNodeList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodeNodeList.h; sourceTree = "<group>"; };
+		D5E10A3E1865E15900B23922 /* FENodeReorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FENodeReorder.cpp; sourceTree = "<group>"; };
+		D5E10A3F1865E15900B23922 /* FENodeReorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FENodeReorder.h; sourceTree = "<group>"; };
+		D5E10A401865E15900B23922 /* FEObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEObject.h; sourceTree = "<group>"; };
+		D5E10A411865E15900B23922 /* FEOctree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEOctree.cpp; sourceTree = "<group>"; };
+		D5E10A421865E15900B23922 /* FEOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEOctree.h; sourceTree = "<group>"; };
+		D5E10A431865E15900B23922 /* FEParameterList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEParameterList.cpp; sourceTree = "<group>"; };
+		D5E10A441865E15900B23922 /* FEParameterList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEParameterList.h; sourceTree = "<group>"; };
+		D5E10A451865E15900B23922 /* FEPlotData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEPlotData.cpp; sourceTree = "<group>"; };
+		D5E10A461865E15900B23922 /* FEPlotData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEPlotData.h; sourceTree = "<group>"; };
+		D5E10A471865E15900B23922 /* FERigidBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FERigidBody.cpp; sourceTree = "<group>"; };
+		D5E10A481865E15900B23922 /* FERigidBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FERigidBody.h; sourceTree = "<group>"; };
+		D5E10A491865E15900B23922 /* FEShellDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FEShellDomain.cpp; sourceTree = "<group>"; };
+		D5E10A4A1865E15900B23922 /* FEShellDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FEShellDomain.h; sourceTree = "<group>"; };
+		D5E10A4B1865E15900B23922 /* FESolidDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolidDomain.cpp; sourceTree = "<group>"; };
+		D5E10A4C1865E15900B23922 /* FESolidDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolidDomain.h; sourceTree = "<group>"; };
+		D5E10A4D1865E15900B23922 /* FESolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESolver.cpp; sourceTree = "<group>"; };
+		D5E10A4E1865E15900B23922 /* FESolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESolver.h; sourceTree = "<group>"; };
+		D5E10A4F1865E15900B23922 /* FESurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESurface.cpp; sourceTree = "<group>"; };
+		D5E10A501865E15900B23922 /* FESurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESurface.h; sourceTree = "<group>"; };
+		D5E10A511865E15900B23922 /* FESurfaceLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESurfaceLoad.cpp; sourceTree = "<group>"; };
+		D5E10A521865E15900B23922 /* FESurfaceLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESurfaceLoad.h; sourceTree = "<group>"; };
+		D5E10A531865E15900B23922 /* FESurfacePairInteraction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FESurfacePairInteraction.cpp; sourceTree = "<group>"; };
+		D5E10A541865E15900B23922 /* FESurfacePairInteraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FESurfacePairInteraction.h; sourceTree = "<group>"; };
+		D5E10A551865E15900B23922 /* FETrussDomain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FETrussDomain.cpp; sourceTree = "<group>"; };
+		D5E10A561865E15900B23922 /* FETrussDomain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETrussDomain.h; sourceTree = "<group>"; };
+		D5E10A571865E15900B23922 /* FETypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FETypes.h; sourceTree = "<group>"; };
+		D5E10A581865E15900B23922 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
+		D5E10A591865E15900B23922 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
+		D5E10A5A1865E15900B23922 /* kernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kernel.cpp; sourceTree = "<group>"; };
+		D5E10A5B1865E15900B23922 /* LinearSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinearSolver.cpp; sourceTree = "<group>"; };
+		D5E10A5C1865E15900B23922 /* LinearSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinearSolver.h; sourceTree = "<group>"; };
+		D5E10A5D1865E15900B23922 /* LoadCurve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoadCurve.cpp; sourceTree = "<group>"; };
+		D5E10A5E1865E15900B23922 /* LoadCurve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadCurve.h; sourceTree = "<group>"; };
+		D5E10A5F1865E15900B23922 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		D5E10A601865E15900B23922 /* Logfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logfile.cpp; sourceTree = "<group>"; };
+		D5E10A611865E15900B23922 /* Logfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logfile.h; sourceTree = "<group>"; };
+		D5E10A621865E15900B23922 /* mat2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat2d.h; sourceTree = "<group>"; };
+		D5E10A631865E15900B23922 /* mat3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mat3d.cpp; sourceTree = "<group>"; };
+		D5E10A641865E15900B23922 /* mat3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat3d.h; sourceTree = "<group>"; };
+		D5E10A651865E15900B23922 /* mat3d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mat3d.hpp; sourceTree = "<group>"; };
+		D5E10A661865E15900B23922 /* MathParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MathParser.cpp; sourceTree = "<group>"; };
+		D5E10A671865E15900B23922 /* MathParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathParser.h; sourceTree = "<group>"; };
+		D5E10A681865E15900B23922 /* matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix.cpp; sourceTree = "<group>"; };
+		D5E10A691865E15900B23922 /* matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix.h; sourceTree = "<group>"; };
+		D5E10A6A1865E15900B23922 /* MatrixProfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MatrixProfile.cpp; sourceTree = "<group>"; };
+		D5E10A6B1865E15900B23922 /* MatrixProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatrixProfile.h; sourceTree = "<group>"; };
+		D5E10A6C1865E15900B23922 /* NodeDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NodeDataRecord.cpp; sourceTree = "<group>"; };
+		D5E10A6D1865E15900B23922 /* NodeDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NodeDataRecord.h; sourceTree = "<group>"; };
+		D5E10A6E1865E15900B23922 /* ObjectDataRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectDataRecord.cpp; sourceTree = "<group>"; };
+		D5E10A6F1865E15900B23922 /* ObjectDataRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectDataRecord.h; sourceTree = "<group>"; };
+		D5E10A701865E15900B23922 /* qsort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = qsort.cpp; sourceTree = "<group>"; };
+		D5E10A711865E15900B23922 /* quatd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quatd.h; sourceTree = "<group>"; };
+		D5E10A721865E15900B23922 /* SparseMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SparseMatrix.cpp; sourceTree = "<group>"; };
+		D5E10A731865E15900B23922 /* SparseMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SparseMatrix.h; sourceTree = "<group>"; };
+		D5E10A741865E15900B23922 /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
+		D5E10A751865E15900B23922 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		D5E10A761865E15900B23922 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
+		D5E10A771865E15900B23922 /* tens4d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tens4d.cpp; sourceTree = "<group>"; };
+		D5E10A781865E15900B23922 /* tens4d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tens4d.h; sourceTree = "<group>"; };
+		D5E10A791865E15900B23922 /* tens4d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tens4d.hpp; sourceTree = "<group>"; };
+		D5E10A7A1865E15900B23922 /* Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Timer.cpp; sourceTree = "<group>"; };
+		D5E10A7B1865E15900B23922 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
+		D5E10A7C1865E15900B23922 /* vec2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec2d.h; sourceTree = "<group>"; };
+		D5E10A7D1865E15900B23922 /* vec3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec3d.h; sourceTree = "<group>"; };
+		D5E10A7E1865E15900B23922 /* vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector.cpp; sourceTree = "<group>"; };
+		D5E10A7F1865E15900B23922 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D5E109E41865E14D00B23922 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D5E109DE1865E14D00B23922 = {
+			isa = PBXGroup;
+			children = (
+				D5E109EE1865E15900B23922 /* FECore */,
+				D5E109E81865E14D00B23922 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D5E109E81865E14D00B23922 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D5E109E71865E14D00B23922 /* libFECore.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D5E109EE1865E15900B23922 /* FECore */ = {
+			isa = PBXGroup;
+			children = (
+				D5E109EF1865E15900B23922 /* Archive.cpp */,
+				D5E109F01865E15900B23922 /* Archive.h */,
+				D5E109F11865E15900B23922 /* BC.h */,
+				D5E109F21865E15900B23922 /* BFGSSolver.cpp */,
+				D5E109F31865E15900B23922 /* BFGSSolver.h */,
+				D5E109F41865E15900B23922 /* colsol.cpp */,
+				D5E109F51865E15900B23922 /* DataStore.cpp */,
+				D5E109F61865E15900B23922 /* DataStore.h */,
+				D5E109F71865E15900B23922 /* DumpFile.cpp */,
+				D5E109F81865E15900B23922 /* DumpFile.h */,
+				D5E109F91865E15900B23922 /* DumpStream.cpp */,
+				D5E109FA1865E15900B23922 /* DumpStream.h */,
+				D5E109FB1865E15900B23922 /* ElementDataRecord.cpp */,
+				D5E109FC1865E15900B23922 /* ElementDataRecord.h */,
+				D5E109FD1865E15900B23922 /* FE_enum.h */,
+				D5E109FE1865E15900B23922 /* FEAnalysis.cpp */,
+				D5E109FF1865E15900B23922 /* FEAnalysis.h */,
+				D5E10A001865E15900B23922 /* febio.h */,
+				D5E10A011865E15900B23922 /* FEBioFactory.cpp */,
+				D5E10A021865E15900B23922 /* FEBioFactory.h */,
+				D5E10A031865E15900B23922 /* FEBioTask.cpp */,
+				D5E10A041865E15900B23922 /* FEBioTask.h */,
+				D5E10A051865E15900B23922 /* FEBodyLoad.cpp */,
+				D5E10A061865E15900B23922 /* FEBodyLoad.h */,
+				D5E10A071865E15900B23922 /* FEBoundaryCondition.cpp */,
+				D5E10A081865E15900B23922 /* FEBoundaryCondition.h */,
+				D5E10A091865E15900B23922 /* FEClosestPointProjection.cpp */,
+				D5E10A0A1865E15900B23922 /* FEClosestPointProjection.h */,
+				D5E10A0B1865E15900B23922 /* FEContactSurface.cpp */,
+				D5E10A0C1865E15900B23922 /* FEContactSurface.h */,
+				D5E10A0D1865E15900B23922 /* FECoordSysMap.cpp */,
+				D5E10A0E1865E15900B23922 /* FECoordSysMap.h */,
+				D5E10A0F1865E15900B23922 /* FECore.cpp */,
+				D5E10A101865E15900B23922 /* FECore.h */,
+				D5E10A121865E15900B23922 /* FECoreBase.cpp */,
+				D5E10A131865E15900B23922 /* FECoreBase.h */,
+				D5E10A141865E15900B23922 /* FEDiscreteDomain.cpp */,
+				D5E10A151865E15900B23922 /* FEDiscreteDomain.h */,
+				D5E10A161865E15900B23922 /* FEDiscreteMaterial.cpp */,
+				D5E10A171865E15900B23922 /* FEDiscreteMaterial.h */,
+				D5E10A181865E15900B23922 /* FEDomain.cpp */,
+				D5E10A191865E15900B23922 /* FEDomain.h */,
+				D5E10A1A1865E15900B23922 /* FEElemElemList.cpp */,
+				D5E10A1B1865E15900B23922 /* FEElemElemList.h */,
+				D5E10A1C1865E15900B23922 /* FEElement.cpp */,
+				D5E10A1D1865E15900B23922 /* FEElement.h */,
+				D5E10A1E1865E15900B23922 /* FEElementLibrary.cpp */,
+				D5E10A1F1865E15900B23922 /* FEElementLibrary.h */,
+				D5E10A201865E15900B23922 /* FEElementTraits.cpp */,
+				D5E10A211865E15900B23922 /* FEElementTraits.h */,
+				D5E10A221865E15900B23922 /* FEException.cpp */,
+				D5E10A231865E15900B23922 /* FEException.h */,
+				D5E10A241865E15900B23922 /* FEGlobalMatrix.cpp */,
+				D5E10A251865E15900B23922 /* FEGlobalMatrix.h */,
+				D5E10A261865E15900B23922 /* FEGlobalVector.cpp */,
+				D5E10A271865E15900B23922 /* FEGlobalVector.h */,
+				D5E10A281865E15900B23922 /* FELevelStructure.cpp */,
+				D5E10A291865E15900B23922 /* FELevelStructure.h */,
+				D5E10A2A1865E15900B23922 /* FELinearConstraint.cpp */,
+				D5E10A2B1865E15900B23922 /* FELinearConstraint.h */,
+				D5E10A2C1865E15900B23922 /* FEMaterial.cpp */,
+				D5E10A2D1865E15900B23922 /* FEMaterial.h */,
+				D5E10A2E1865E15900B23922 /* FEMaterialPoint.cpp */,
+				D5E10A2F1865E15900B23922 /* FEMaterialPoint.h */,
+				D5E10A301865E15900B23922 /* FEMesh.cpp */,
+				D5E10A311865E15900B23922 /* FEMesh.h */,
+				D5E10A321865E15900B23922 /* FEModel.cpp */,
+				D5E10A331865E15900B23922 /* FEModel.h */,
+				D5E10A341865E15900B23922 /* FEModelComponent.cpp */,
+				D5E10A351865E15900B23922 /* FEModelComponent.h */,
+				D5E10A361865E15900B23922 /* FENLConstraint.cpp */,
+				D5E10A371865E15900B23922 /* FENLConstraint.h */,
+				D5E10A381865E15900B23922 /* FENNQuery.cpp */,
+				D5E10A391865E15900B23922 /* FENNQuery.h */,
+				D5E10A3A1865E15900B23922 /* FENodeElemList.cpp */,
+				D5E10A3B1865E15900B23922 /* FENodeElemList.h */,
+				D5E10A3C1865E15900B23922 /* FENodeNodeList.cpp */,
+				D5E10A3D1865E15900B23922 /* FENodeNodeList.h */,
+				D5E10A3E1865E15900B23922 /* FENodeReorder.cpp */,
+				D5E10A3F1865E15900B23922 /* FENodeReorder.h */,
+				D5E10A401865E15900B23922 /* FEObject.h */,
+				D5E10A411865E15900B23922 /* FEOctree.cpp */,
+				D5E10A421865E15900B23922 /* FEOctree.h */,
+				D5E10A431865E15900B23922 /* FEParameterList.cpp */,
+				D5E10A441865E15900B23922 /* FEParameterList.h */,
+				D5E10A451865E15900B23922 /* FEPlotData.cpp */,
+				D5E10A461865E15900B23922 /* FEPlotData.h */,
+				D5E10A471865E15900B23922 /* FERigidBody.cpp */,
+				D5E10A481865E15900B23922 /* FERigidBody.h */,
+				D5E10A491865E15900B23922 /* FEShellDomain.cpp */,
+				D5E10A4A1865E15900B23922 /* FEShellDomain.h */,
+				D5E10A4B1865E15900B23922 /* FESolidDomain.cpp */,
+				D5E10A4C1865E15900B23922 /* FESolidDomain.h */,
+				D5E10A4D1865E15900B23922 /* FESolver.cpp */,
+				D5E10A4E1865E15900B23922 /* FESolver.h */,
+				D5E10A4F1865E15900B23922 /* FESurface.cpp */,
+				D5E10A501865E15900B23922 /* FESurface.h */,
+				D5E10A511865E15900B23922 /* FESurfaceLoad.cpp */,
+				D5E10A521865E15900B23922 /* FESurfaceLoad.h */,
+				D5E10A531865E15900B23922 /* FESurfacePairInteraction.cpp */,
+				D5E10A541865E15900B23922 /* FESurfacePairInteraction.h */,
+				D5E10A551865E15900B23922 /* FETrussDomain.cpp */,
+				D5E10A561865E15900B23922 /* FETrussDomain.h */,
+				D5E10A571865E15900B23922 /* FETypes.h */,
+				D5E10A581865E15900B23922 /* Image.cpp */,
+				D5E10A591865E15900B23922 /* Image.h */,
+				D5E10A5A1865E15900B23922 /* kernel.cpp */,
+				D5E10A5B1865E15900B23922 /* LinearSolver.cpp */,
+				D5E10A5C1865E15900B23922 /* LinearSolver.h */,
+				D5E10A5D1865E15900B23922 /* LoadCurve.cpp */,
+				D5E10A5E1865E15900B23922 /* LoadCurve.h */,
+				D5E10A5F1865E15900B23922 /* log.h */,
+				D5E10A601865E15900B23922 /* Logfile.cpp */,
+				D5E10A611865E15900B23922 /* Logfile.h */,
+				D5E10A621865E15900B23922 /* mat2d.h */,
+				D5E10A631865E15900B23922 /* mat3d.cpp */,
+				D5E10A641865E15900B23922 /* mat3d.h */,
+				D5E10A651865E15900B23922 /* mat3d.hpp */,
+				D5E10A661865E15900B23922 /* MathParser.cpp */,
+				D5E10A671865E15900B23922 /* MathParser.h */,
+				D5E10A681865E15900B23922 /* matrix.cpp */,
+				D5E10A691865E15900B23922 /* matrix.h */,
+				D5E10A6A1865E15900B23922 /* MatrixProfile.cpp */,
+				D5E10A6B1865E15900B23922 /* MatrixProfile.h */,
+				D5E10A6C1865E15900B23922 /* NodeDataRecord.cpp */,
+				D5E10A6D1865E15900B23922 /* NodeDataRecord.h */,
+				D5E10A6E1865E15900B23922 /* ObjectDataRecord.cpp */,
+				D5E10A6F1865E15900B23922 /* ObjectDataRecord.h */,
+				D5E10A701865E15900B23922 /* qsort.cpp */,
+				D5E10A711865E15900B23922 /* quatd.h */,
+				D5E10A721865E15900B23922 /* SparseMatrix.cpp */,
+				D5E10A731865E15900B23922 /* SparseMatrix.h */,
+				D5E10A741865E15900B23922 /* stdafx.cpp */,
+				D5E10A751865E15900B23922 /* stdafx.h */,
+				D5E10A761865E15900B23922 /* targetver.h */,
+				D5E10A771865E15900B23922 /* tens4d.cpp */,
+				D5E10A781865E15900B23922 /* tens4d.h */,
+				D5E10A791865E15900B23922 /* tens4d.hpp */,
+				D5E10A7A1865E15900B23922 /* Timer.cpp */,
+				D5E10A7B1865E15900B23922 /* Timer.h */,
+				D5E10A7C1865E15900B23922 /* vec2d.h */,
+				D5E10A7D1865E15900B23922 /* vec3d.h */,
+				D5E10A7E1865E15900B23922 /* vector.cpp */,
+				D5E10A7F1865E15900B23922 /* vector.h */,
+			);
+			name = FECore;
+			path = ../../FECore;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D5E109E51865E14D00B23922 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5E10B081865E15900B23922 /* tens4d.h in Headers */,
+				D5E10B011865E15900B23922 /* quatd.h in Headers */,
+				D5E10A9B1865E15900B23922 /* FEClosestPointProjection.h in Headers */,
+				D5E10A891865E15900B23922 /* DumpFile.h in Headers */,
+				D5E10AA11865E15900B23922 /* FECore.h in Headers */,
+				D5E10AA91865E15900B23922 /* FEDomain.h in Headers */,
+				D5E10B031865E15900B23922 /* SparseMatrix.h in Headers */,
+				D5E10AE91865E15900B23922 /* Image.h in Headers */,
+				D5E10AC11865E15900B23922 /* FEMesh.h in Headers */,
+				D5E10AAF1865E15900B23922 /* FEElementLibrary.h in Headers */,
+				D5E10A991865E15900B23922 /* FEBoundaryCondition.h in Headers */,
+				D5E10AF41865E15900B23922 /* mat3d.h in Headers */,
+				D5E10A971865E15900B23922 /* FEBodyLoad.h in Headers */,
+				D5E10A871865E15900B23922 /* DataStore.h in Headers */,
+				D5E10AF11865E15900B23922 /* Logfile.h in Headers */,
+				D5E10AE21865E15900B23922 /* FESurfaceLoad.h in Headers */,
+				D5E10AAB1865E15900B23922 /* FEElemElemList.h in Headers */,
+				D5E10A931865E15900B23922 /* FEBioFactory.h in Headers */,
+				D5E10A911865E15900B23922 /* febio.h in Headers */,
+				D5E10ADA1865E15900B23922 /* FEShellDomain.h in Headers */,
+				D5E10AD01865E15900B23922 /* FEObject.h in Headers */,
+				D5E10AB71865E15900B23922 /* FEGlobalVector.h in Headers */,
+				D5E10B0B1865E15900B23922 /* Timer.h in Headers */,
+				D5E10AB11865E15900B23922 /* FEElementTraits.h in Headers */,
+				D5E10AC91865E15900B23922 /* FENNQuery.h in Headers */,
+				D5E10ADE1865E15900B23922 /* FESolver.h in Headers */,
+				D5E10ABB1865E15900B23922 /* FELinearConstraint.h in Headers */,
+				D5E10ABF1865E15900B23922 /* FEMaterialPoint.h in Headers */,
+				D5E10ADC1865E15900B23922 /* FESolidDomain.h in Headers */,
+				D5E10AFD1865E15900B23922 /* NodeDataRecord.h in Headers */,
+				D5E10B091865E15900B23922 /* tens4d.hpp in Headers */,
+				D5E10A8B1865E15900B23922 /* DumpStream.h in Headers */,
+				D5E10A9D1865E15900B23922 /* FEContactSurface.h in Headers */,
+				D5E10AEF1865E15900B23922 /* log.h in Headers */,
+				D5E10ACF1865E15900B23922 /* FENodeReorder.h in Headers */,
+				D5E10AE61865E15900B23922 /* FETrussDomain.h in Headers */,
+				D5E10A951865E15900B23922 /* FEBioTask.h in Headers */,
+				D5E10AD21865E15900B23922 /* FEOctree.h in Headers */,
+				D5E10A8D1865E15900B23922 /* ElementDataRecord.h in Headers */,
+				D5E10AC31865E15900B23922 /* FEModel.h in Headers */,
+				D5E10AF21865E15900B23922 /* mat2d.h in Headers */,
+				D5E10AAD1865E15900B23922 /* FEElement.h in Headers */,
+				D5E10AE01865E15900B23922 /* FESurface.h in Headers */,
+				D5E10AB91865E15900B23922 /* FELevelStructure.h in Headers */,
+				D5E10AB31865E15900B23922 /* FEException.h in Headers */,
+				D5E10AA31865E15900B23922 /* FECoreBase.h in Headers */,
+				D5E10AE71865E15900B23922 /* FETypes.h in Headers */,
+				D5E10AFB1865E15900B23922 /* MatrixProfile.h in Headers */,
+				D5E10AC71865E15900B23922 /* FENLConstraint.h in Headers */,
+				D5E10AF51865E15900B23922 /* mat3d.hpp in Headers */,
+				D5E10ACB1865E15900B23922 /* FENodeElemList.h in Headers */,
+				D5E10B0C1865E15900B23922 /* vec2d.h in Headers */,
+				D5E10AD41865E15900B23922 /* FEParameterList.h in Headers */,
+				D5E10AFF1865E15900B23922 /* ObjectDataRecord.h in Headers */,
+				D5E10A811865E15900B23922 /* Archive.h in Headers */,
+				D5E10AA51865E15900B23922 /* FEDiscreteDomain.h in Headers */,
+				D5E10B051865E15900B23922 /* stdafx.h in Headers */,
+				D5E10AEE1865E15900B23922 /* LoadCurve.h in Headers */,
+				D5E10B0D1865E15900B23922 /* vec3d.h in Headers */,
+				D5E10AC51865E15900B23922 /* FEModelComponent.h in Headers */,
+				D5E10A901865E15900B23922 /* FEAnalysis.h in Headers */,
+				D5E10AA71865E15900B23922 /* FEDiscreteMaterial.h in Headers */,
+				D5E10B061865E15900B23922 /* targetver.h in Headers */,
+				D5E10AF91865E15900B23922 /* matrix.h in Headers */,
+				D5E10ACD1865E15900B23922 /* FENodeNodeList.h in Headers */,
+				D5E10A841865E15900B23922 /* BFGSSolver.h in Headers */,
+				D5E10A9F1865E15900B23922 /* FECoordSysMap.h in Headers */,
+				D5E10AD61865E15900B23922 /* FEPlotData.h in Headers */,
+				D5E10AD81865E15900B23922 /* FERigidBody.h in Headers */,
+				D5E10B0F1865E15900B23922 /* vector.h in Headers */,
+				D5E10AEC1865E15900B23922 /* LinearSolver.h in Headers */,
+				D5E10ABD1865E15900B23922 /* FEMaterial.h in Headers */,
+				D5E10AE41865E15900B23922 /* FESurfacePairInteraction.h in Headers */,
+				D5E10AF71865E15900B23922 /* MathParser.h in Headers */,
+				D5E10A8E1865E15900B23922 /* FE_enum.h in Headers */,
+				D5E10A821865E15900B23922 /* BC.h in Headers */,
+				D5E10AB51865E15900B23922 /* FEGlobalMatrix.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D5E109E61865E14D00B23922 /* FECore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D5E109EB1865E14D00B23922 /* Build configuration list for PBXNativeTarget "FECore" */;
+			buildPhases = (
+				D5E109E31865E14D00B23922 /* Sources */,
+				D5E109E41865E14D00B23922 /* Frameworks */,
+				D5E109E51865E14D00B23922 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FECore;
+			productName = FECore;
+			productReference = D5E109E71865E14D00B23922 /* libFECore.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D5E109DF1865E14D00B23922 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = febio.org;
+			};
+			buildConfigurationList = D5E109E21865E14D00B23922 /* Build configuration list for PBXProject "FECore" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D5E109DE1865E14D00B23922;
+			productRefGroup = D5E109E81865E14D00B23922 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D5E109E61865E14D00B23922 /* FECore */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D5E109E31865E14D00B23922 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5E10AE31865E15900B23922 /* FESurfacePairInteraction.cpp in Sources */,
+				D5E10AA81865E15900B23922 /* FEDomain.cpp in Sources */,
+				D5E10AC21865E15900B23922 /* FEModel.cpp in Sources */,
+				D5E10AB81865E15900B23922 /* FELevelStructure.cpp in Sources */,
+				D5E10AFE1865E15900B23922 /* ObjectDataRecord.cpp in Sources */,
+				D5E10B041865E15900B23922 /* stdafx.cpp in Sources */,
+				D5E10AD31865E15900B23922 /* FEParameterList.cpp in Sources */,
+				D5E10A921865E15900B23922 /* FEBioFactory.cpp in Sources */,
+				D5E10A831865E15900B23922 /* BFGSSolver.cpp in Sources */,
+				D5E10A8A1865E15900B23922 /* DumpStream.cpp in Sources */,
+				D5E10A8C1865E15900B23922 /* ElementDataRecord.cpp in Sources */,
+				D5E10ABA1865E15900B23922 /* FELinearConstraint.cpp in Sources */,
+				D5E10AC61865E15900B23922 /* FENLConstraint.cpp in Sources */,
+				D5E10ABC1865E15900B23922 /* FEMaterial.cpp in Sources */,
+				D5E10AEA1865E15900B23922 /* kernel.cpp in Sources */,
+				D5E10AAC1865E15900B23922 /* FEElement.cpp in Sources */,
+				D5E10A941865E15900B23922 /* FEBioTask.cpp in Sources */,
+				D5E10AF61865E15900B23922 /* MathParser.cpp in Sources */,
+				D5E10ACC1865E15900B23922 /* FENodeNodeList.cpp in Sources */,
+				D5E10AAE1865E15900B23922 /* FEElementLibrary.cpp in Sources */,
+				D5E10AFC1865E15900B23922 /* NodeDataRecord.cpp in Sources */,
+				D5E10AB01865E15900B23922 /* FEElementTraits.cpp in Sources */,
+				D5E10AAA1865E15900B23922 /* FEElemElemList.cpp in Sources */,
+				D5E10ADD1865E15900B23922 /* FESolver.cpp in Sources */,
+				D5E10AD51865E15900B23922 /* FEPlotData.cpp in Sources */,
+				D5E10B0E1865E15900B23922 /* vector.cpp in Sources */,
+				D5E10AA21865E15900B23922 /* FECoreBase.cpp in Sources */,
+				D5E10A9C1865E15900B23922 /* FEContactSurface.cpp in Sources */,
+				D5E10B0A1865E15900B23922 /* Timer.cpp in Sources */,
+				D5E10AED1865E15900B23922 /* LoadCurve.cpp in Sources */,
+				D5E10AB61865E15900B23922 /* FEGlobalVector.cpp in Sources */,
+				D5E10AE11865E15900B23922 /* FESurfaceLoad.cpp in Sources */,
+				D5E10AA41865E15900B23922 /* FEDiscreteDomain.cpp in Sources */,
+				D5E10AF81865E15900B23922 /* matrix.cpp in Sources */,
+				D5E10B021865E15900B23922 /* SparseMatrix.cpp in Sources */,
+				D5E10A9A1865E15900B23922 /* FEClosestPointProjection.cpp in Sources */,
+				D5E10A861865E15900B23922 /* DataStore.cpp in Sources */,
+				D5E10ACA1865E15900B23922 /* FENodeElemList.cpp in Sources */,
+				D5E10AC01865E15900B23922 /* FEMesh.cpp in Sources */,
+				D5E10A981865E15900B23922 /* FEBoundaryCondition.cpp in Sources */,
+				D5E10AE81865E15900B23922 /* Image.cpp in Sources */,
+				D5E10AD71865E15900B23922 /* FERigidBody.cpp in Sources */,
+				D5E10AF01865E15900B23922 /* Logfile.cpp in Sources */,
+				D5E10ADB1865E15900B23922 /* FESolidDomain.cpp in Sources */,
+				D5E10A851865E15900B23922 /* colsol.cpp in Sources */,
+				D5E10AFA1865E15900B23922 /* MatrixProfile.cpp in Sources */,
+				D5E10A961865E15900B23922 /* FEBodyLoad.cpp in Sources */,
+				D5E10AB21865E15900B23922 /* FEException.cpp in Sources */,
+				D5E10A801865E15900B23922 /* Archive.cpp in Sources */,
+				D5E10AC41865E15900B23922 /* FEModelComponent.cpp in Sources */,
+				D5E10AB41865E15900B23922 /* FEGlobalMatrix.cpp in Sources */,
+				D5E10B001865E15900B23922 /* qsort.cpp in Sources */,
+				D5E10A9E1865E15900B23922 /* FECoordSysMap.cpp in Sources */,
+				D5E10AF31865E15900B23922 /* mat3d.cpp in Sources */,
+				D5E10AA61865E15900B23922 /* FEDiscreteMaterial.cpp in Sources */,
+				D5E10B071865E15900B23922 /* tens4d.cpp in Sources */,
+				D5E10A8F1865E15900B23922 /* FEAnalysis.cpp in Sources */,
+				D5E10AD91865E15900B23922 /* FEShellDomain.cpp in Sources */,
+				D5E10ADF1865E15900B23922 /* FESurface.cpp in Sources */,
+				D5E10AD11865E15900B23922 /* FEOctree.cpp in Sources */,
+				D5E10ABE1865E15900B23922 /* FEMaterialPoint.cpp in Sources */,
+				D5E10ACE1865E15900B23922 /* FENodeReorder.cpp in Sources */,
+				D5E10AE51865E15900B23922 /* FETrussDomain.cpp in Sources */,
+				D5E10A881865E15900B23922 /* DumpFile.cpp in Sources */,
+				D5E10AA01865E15900B23922 /* FECore.cpp in Sources */,
+				D5E10AC81865E15900B23922 /* FENNQuery.cpp in Sources */,
+				D5E10AEB1865E15900B23922 /* LinearSolver.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D5E109E91865E14D00B23922 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Debug;
+		};
+		D5E109EA1865E14D00B23922 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../..";
+			};
+			name = Release;
+		};
+		D5E109EC1865E14D00B23922 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D5E109ED1865E14D00B23922 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D5E109E21865E14D00B23922 /* Build configuration list for PBXProject "FECore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5E109E91865E14D00B23922 /* Debug */,
+				D5E109EA1865E14D00B23922 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D5E109EB1865E14D00B23922 /* Build configuration list for PBXNativeTarget "FECore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5E109EC1865E14D00B23922 /* Debug */,
+				D5E109ED1865E14D00B23922 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D5E109DF1865E14D00B23922 /* Project object */;
+}
